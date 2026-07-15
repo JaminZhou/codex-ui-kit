@@ -1,9 +1,22 @@
 {
   "name": "codex-ui-kit",
-  "version": "0.0.0",
-  "private": true,
+  "version": "0.1.0",
   "description": "Independently designed React components for Codex-style coding-agent interfaces.",
+  "keywords": [
+    "agent-ui",
+    "codex",
+    "react",
+    "typescript"
+  ],
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/JaminZhou/codex-ui-kit.git"
+  },
+  "homepage": "https://github.com/JaminZhou/codex-ui-kit#readme",
+  "bugs": {
+    "url": "https://github.com/JaminZhou/codex-ui-kit/issues"
+  },
   "type": "module",
   "sideEffects": [
     "**/*.css"
@@ -29,7 +42,11 @@
     "build:electron": "pnpm --filter @codex-ui-kit/electron-playground build",
     "test": "vitest run tests",
     "typecheck": "tsc --noEmit",
-    "check": "pnpm typecheck && pnpm test && pnpm build && pnpm build:demo && pnpm --filter @codex-ui-kit/electron-playground check"
+    "check:package": "node scripts/check-package.mjs",
+    "check": "pnpm typecheck && pnpm test && pnpm build && pnpm check:package && pnpm build:demo && pnpm --filter @codex-ui-kit/electron-playground check"
+  },
+  "publishConfig": {
+    "access": "public"
   },
   "peerDependencies": {
     "react": ">=18",

@@ -6,7 +6,8 @@ Independently designed React components for building Codex-style coding-agent in
 
 ## Status
 
-Early private development. The public API is not stable yet.
+Foundation preview for an initial public release. The public API may change
+before 1.0.
 
 The current milestones cover the thread, approval, and composer surfaces:
 messages, grouped activities, commands, file changes, tool-call state,
@@ -53,6 +54,15 @@ the pnpm workspace. Electron is not a dependency of `codex-ui-kit`.
 The default stylesheet supports light, dark, and system color schemes. Set
 `data-theme="light"` or `data-theme="dark"` on an ancestor to force a theme.
 
+## Installation
+
+The package is prepared as `codex-ui-kit@0.1.0`. After the first registry
+release, install it with:
+
+```bash
+pnpm add codex-ui-kit
+```
+
 ## Usage
 
 ```tsx
@@ -88,10 +98,13 @@ application files are never committed or redistributed. See
 ```bash
 pnpm install
 pnpm check
+pnpm check:package
 ```
 
 `pnpm check` builds the library, browser showcase, Electron main/preload
-processes, and Electron Renderer without launching a graphical window in CI.
+processes, Electron Renderer, and a dry-run npm tarball without launching a
+graphical window in CI. `pnpm check:package` validates release metadata, export
+targets, and package contents after the library build.
 
 ## License
 
