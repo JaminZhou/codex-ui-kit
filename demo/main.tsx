@@ -213,6 +213,16 @@ function Showcase() {
                 <code>--codex-ui-focus</code>
               </div>
             </div>
+            <div className="theme-isolation" aria-label="Forced theme isolation">
+              <div data-theme="light">
+                <span>Forced light</span>
+                <code>#ffffff surface</code>
+              </div>
+              <div data-theme="dark">
+                <span>Forced dark</span>
+                <code>#181818 surface</code>
+              </div>
+            </div>
           </GalleryCard>
         </div>
       </div>

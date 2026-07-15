@@ -30,6 +30,18 @@
 
 [data-theme="light"] {
   color-scheme: light;
+  --codex-ui-bg: #ffffff;
+  --codex-ui-bg-subtle: #f4f4f3;
+  --codex-ui-bg-elevated: rgb(255 255 255 / 0.92);
+  --codex-ui-border: rgb(26 28 31 / 0.09);
+  --codex-ui-border-strong: rgb(26 28 31 / 0.15);
+  --codex-ui-text: #1a1c1f;
+  --codex-ui-text-secondary: rgb(26 28 31 / 0.7);
+  --codex-ui-text-tertiary: rgb(26 28 31 / 0.5);
+  --codex-ui-success: #16813e;
+  --codex-ui-warning: #a44913;
+  --codex-ui-danger: #c9362b;
+  --codex-ui-focus: #1677d2;
 }
 
 [data-theme="dark"] {
