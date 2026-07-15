@@ -18,6 +18,7 @@ import {
   type ApprovalDecision,
   type FileDiffLine,
 } from "../src";
+import "../src/styles.css";
 import "./showcase.css";
 
 interface GalleryCardProps {
