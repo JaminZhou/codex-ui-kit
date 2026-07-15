@@ -7,6 +7,8 @@ import {
   AgentMessage,
   AgentThread,
   ApprovalRequest,
+  CommandExecution,
+  CommandOutput,
   ComposerAttachment,
   StatusIndicator,
   ToolCallCard,
@@ -144,6 +146,33 @@ function Showcase() {
                   The implementation is ready; I’m waiting for the final checks.
                 </AgentMessage>
               </AgentThread>
+            </div>
+          </GalleryCard>
+
+          <GalleryCard
+            description="Command metadata and streams stay useful without binding the UI to a shell protocol."
+            title="Command execution"
+            wide
+          >
+            <div className="command-preview">
+              <CommandExecution
+                command="pnpm check"
+                cwd="/workspace/codex-ui-kit"
+                defaultOpen
+                exitCode={0}
+                status="completed"
+              >
+                <CommandOutput>{`Test Files  4 passed (4)\nTests       20 passed (20)\nBuilt library, showcase, and Electron Renderer`}</CommandOutput>
+              </CommandExecution>
+              <CommandExecution
+                command="pnpm lint"
+                exitCode={1}
+                status="failed"
+              >
+                <CommandOutput stream="stderr">
+                  src/example.ts:12:3 Unexpected any
+                </CommandOutput>
+              </CommandExecution>
             </div>
           </GalleryCard>
 
