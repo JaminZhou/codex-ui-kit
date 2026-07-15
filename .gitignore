@@ -1,5 +1,6 @@
 node_modules/
 dist/
+out/
 coverage/
 .research/
 .DS_Store

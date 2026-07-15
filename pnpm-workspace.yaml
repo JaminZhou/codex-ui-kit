@@ -1,2 +1,6 @@
+packages:
+  - playgrounds/*
+
 allowBuilds:
+  electron: true
   esbuild: true

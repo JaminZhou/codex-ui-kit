@@ -1,0 +1,39 @@
+# Electron playground
+
+This workspace is a desktop acceptance shell for `codex-ui-kit`. It is not a
+second component implementation and it is not published with the package.
+
+## Responsibilities
+
+- Load the workspace package in a real Electron Renderer.
+- Follow `nativeTheme` in system, light, and dark modes.
+- Exercise compact, standard, and wide BrowserWindow content sizes.
+- Report the computed system sans and monospace font stacks.
+- Validate a long, Renderer-owned scroll container.
+- Keep `contextIsolation`, sandboxing, and a narrow preload API enabled.
+
+Electron is intentionally declared only in this workspace's development
+dependencies. The root `codex-ui-kit` package remains React-only.
+
+## Run
+
+From the repository root:
+
+```bash
+pnpm dev:electron
+```
+
+Electron 42 downloads its platform binary on first launch instead of during
+package installation. The development and preview scripts run the official
+`install-electron` helper before starting the app so they also work with
+launchers such as `electron-vite` that resolve the binary eagerly.
+
+Build without launching a graphical window:
+
+```bash
+pnpm build
+pnpm build:electron
+```
+
+The Electron version is pinned to `42.1.0` to match the sampled Codex desktop
+build documented in `research/26.707.72221.md`.
