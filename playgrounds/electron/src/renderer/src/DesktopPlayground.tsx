@@ -15,9 +15,12 @@ import {
   CommandExecution,
   CommandOutput,
   ComposerAttachment,
+  FileChange,
+  FileDiff,
   StatusIndicator,
   ToolCallCard,
   type ApprovalDecision,
+  type FileDiffLine,
 } from "codex-ui-kit";
 import {
   themeSources,
@@ -51,6 +54,21 @@ const repeatedActivities = [
   "Checked standard window layout",
   "Checked wide window layout",
   "Built the isolated Renderer",
+];
+
+const desktopDiffLines: FileDiffLine[] = [
+  { content: "@@ -46,2 +46,3 @@", kind: "hunk" },
+  {
+    content: "Renderer build completed",
+    kind: "context",
+    newLineNumber: 46,
+    oldLineNumber: 46,
+  },
+  {
+    content: "Desktop diff rendering validated",
+    kind: "addition",
+    newLineNumber: 47,
+  },
 ];
 
 function useViewportMetrics(): ViewportMetrics {
@@ -306,6 +324,15 @@ export function DesktopPlayground() {
                   >
                     <CommandOutput>{`3 tests passed\nRenderer build completed`}</CommandOutput>
                   </CommandExecution>
+                  <FileChange
+                    additions={1}
+                    change="modified"
+                    defaultOpen
+                    deletions={0}
+                    path="playgrounds/electron/src/renderer/src/DesktopPlayground.tsx"
+                  >
+                    <FileDiff lines={desktopDiffLines} />
+                  </FileChange>
                   <ToolCallCard
                     name="desktop acceptance"
                     status="running"

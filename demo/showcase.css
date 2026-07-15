@@ -297,6 +297,24 @@ code {
   width: min(100%, 48rem);
 }
 
+.file-preview {
+  background: var(--codex-ui-bg-subtle);
+  border: 1px solid var(--codex-ui-border);
+  border-radius: var(--codex-ui-radius-xl);
+  display: grid;
+  gap: 0.75rem;
+  padding: clamp(1rem, 4vw, 3rem);
+}
+
+.file-preview > .codex-ui-file-change {
+  background: var(--codex-ui-bg);
+  border: 1px solid var(--codex-ui-border);
+  border-radius: var(--codex-ui-radius-lg);
+  margin-inline: auto;
+  padding: 0.5rem 0.75rem;
+  width: min(100%, 48rem);
+}
+
 .status-grid {
   display: grid;
   gap: 0.5rem;
@@ -425,6 +443,10 @@ code {
   }
 
   .command-preview {
+    padding: 1rem;
+  }
+
+  .file-preview {
     padding: 1rem;
   }
 

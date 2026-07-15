@@ -9,9 +9,9 @@ Independently designed React components for building Codex-style coding-agent in
 Early private development. The public API is not stable yet.
 
 The current milestones cover the thread, approval, and composer surfaces:
-messages, grouped activities, command and tool-call state, responsive content,
-controlled decisions, and an agent input with keyboard and running states. Run
-the local showcase with:
+messages, grouped activities, commands, file changes, tool-call state,
+responsive content, controlled decisions, and an agent input with keyboard and
+running states. Run the local showcase with:
 
 ```bash
 pnpm dev
@@ -44,6 +44,8 @@ the pnpm workspace. Electron is not a dependency of `codex-ui-kit`.
 - `ApprovalRequest`: controlled approve/reject surface with explicit outcomes.
 - `CommandExecution`: command activity with working directory and exit metadata.
 - `CommandOutput`: independently labeled stdout/stderr output surface.
+- `FileChange`: file path, rename, change-kind, and diff-stat activity.
+- `FileDiff`: structured context, hunk, addition, and deletion lines.
 - `StatusIndicator`: visual state primitive.
 - `AgentComposer`: controlled input surface with submit, stop, and slot APIs.
 - `ComposerAttachment`: removable attachment metadata primitive.

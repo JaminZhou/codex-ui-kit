@@ -10,10 +10,13 @@ import {
   CommandExecution,
   CommandOutput,
   ComposerAttachment,
+  FileChange,
+  FileDiff,
   StatusIndicator,
   ToolCallCard,
   type AgentItemStatus,
   type ApprovalDecision,
+  type FileDiffLine,
 } from "../src";
 import "./showcase.css";
 
@@ -46,6 +49,31 @@ const statuses: Array<{ label: string; status: AgentItemStatus }> = [
   { label: "Running", status: "running" },
   { label: "Completed", status: "completed" },
   { label: "Failed", status: "failed" },
+];
+
+const showcaseDiffLines: FileDiffLine[] = [
+  { content: "@@ -12,3 +12,4 @@", kind: "hunk" },
+  {
+    content: "export const status = 'running';",
+    kind: "context",
+    newLineNumber: 12,
+    oldLineNumber: 12,
+  },
+  {
+    content: "export const retries = 2;",
+    kind: "deletion",
+    oldLineNumber: 13,
+  },
+  {
+    content: "export const retries = 3;",
+    kind: "addition",
+    newLineNumber: 13,
+  },
+  {
+    content: "export const timeout = 30_000;",
+    kind: "addition",
+    newLineNumber: 14,
+  },
 ];
 
 function Showcase() {
@@ -146,6 +174,29 @@ function Showcase() {
                   The implementation is ready; I’m waiting for the final checks.
                 </AgentMessage>
               </AgentThread>
+            </div>
+          </GalleryCard>
+
+          <GalleryCard
+            description="Typed file metadata stays compact while structured diff lines preserve review context."
+            title="File changes"
+            wide
+          >
+            <div className="file-preview">
+              <FileChange
+                additions={2}
+                change="modified"
+                defaultOpen
+                deletions={1}
+                path="src/runtime/configuration.ts"
+              >
+                <FileDiff lines={showcaseDiffLines} />
+              </FileChange>
+              <FileChange
+                change="renamed"
+                path="src/components/ExecutionTimeline.tsx"
+                previousPath="src/components/ActivityTimeline.tsx"
+              />
             </div>
           </GalleryCard>
 
