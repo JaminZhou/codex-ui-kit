@@ -23,11 +23,13 @@
   },
   "scripts": {
     "dev": "vite demo",
+    "dev:electron": "pnpm build && pnpm --filter @codex-ui-kit/electron-playground dev",
     "build": "vite build && tsc -p tsconfig.build.json",
     "build:demo": "vite build demo",
-    "test": "vitest run",
+    "build:electron": "pnpm --filter @codex-ui-kit/electron-playground build",
+    "test": "vitest run tests",
     "typecheck": "tsc --noEmit",
-    "check": "pnpm typecheck && pnpm test && pnpm build && pnpm build:demo"
+    "check": "pnpm typecheck && pnpm test && pnpm build && pnpm build:demo && pnpm --filter @codex-ui-kit/electron-playground check"
   },
   "peerDependencies": {
     "react": ">=18",

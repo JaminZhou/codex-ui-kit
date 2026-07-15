@@ -15,6 +15,16 @@ tool-call state, and a responsive content column. Run the local showcase with:
 pnpm dev
 ```
 
+For validation in a real desktop Renderer, run the independent Electron
+playground:
+
+```bash
+pnpm dev:electron
+```
+
+The Electron app lives in `playgrounds/electron` and consumes this package via
+the pnpm workspace. Electron is not a dependency of `codex-ui-kit`.
+
 ## Principles
 
 - Keep the component model independent from any single agent protocol.
@@ -70,6 +80,9 @@ application files are never committed or redistributed. See
 pnpm install
 pnpm check
 ```
+
+`pnpm check` builds the library, browser showcase, Electron main/preload
+processes, and Electron Renderer without launching a graphical window in CI.
 
 ## License
 
