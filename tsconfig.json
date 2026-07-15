@@ -17,6 +17,5 @@
     "jsx": "react-jsx",
     "types": ["vitest/globals"]
   },
-  "include": ["src", "tests", "vite.config.ts"]
+  "include": ["src", "tests", "demo", "vite.config.ts"]
 }
-
