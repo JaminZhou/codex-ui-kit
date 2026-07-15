@@ -8,8 +8,10 @@ import {
 import {
   ActivityGroup,
   AgentActivity,
+  AgentComposer,
   AgentMessage,
   AgentThread,
+  ComposerAttachment,
   StatusIndicator,
   ToolCallCard,
 } from "codex-ui-kit";
@@ -104,6 +106,12 @@ export function DesktopPlayground() {
   const [activePreset, setActivePreset] = useState<WindowPreset>("standard");
   const [appliedSize, setAppliedSize] = useState<AppliedWindowSize | null>(null);
   const [scrollProgress, setScrollProgress] = useState(0);
+  const [composerValue, setComposerValue] = useState(
+    "Validate the composer in this desktop window.",
+  );
+  const [composerRunning, setComposerRunning] = useState(false);
+  const [composerStatus, setComposerStatus] = useState("Ready");
+  const [hasComposerAttachment, setHasComposerAttachment] = useState(true);
   const viewport = useViewportMetrics();
   const { metrics: fontMetrics, monoRef, sansRef } = useFontMetrics();
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -381,6 +389,58 @@ export function DesktopPlayground() {
           </AgentThread>
         </section>
       </div>
+
+      <section className="desktop-composer-dock" aria-label="Composer acceptance">
+        <div className="desktop-composer-dock__meta">
+          <span>Composer acceptance</span>
+          <output aria-live="polite">{composerStatus}</output>
+        </div>
+        <AgentComposer
+          actions={
+            <button
+              disabled={hasComposerAttachment}
+              onClick={() => setHasComposerAttachment(true)}
+              type="button"
+            >
+              + Attach
+            </button>
+          }
+          attachments={
+            hasComposerAttachment ? (
+              <ComposerAttachment
+                label="DesktopPlayground.tsx"
+                meta="Renderer"
+                onRemove={() => setHasComposerAttachment(false)}
+              />
+            ) : undefined
+          }
+          controls={
+            <>
+              <select aria-label="Desktop execution mode" defaultValue="local">
+                <option value="local">Local</option>
+                <option value="remote">Remote</option>
+              </select>
+              <select aria-label="Desktop permission mode" defaultValue="ask">
+                <option value="ask">Ask first</option>
+                <option value="auto">Auto</option>
+              </select>
+            </>
+          }
+          isRunning={composerRunning}
+          onStop={() => {
+            setComposerRunning(false);
+            setComposerStatus("Stopped");
+          }}
+          onSubmit={(value) => {
+            setComposerStatus(`Submitted: ${value}`);
+            setComposerValue("");
+            setComposerRunning(true);
+          }}
+          onValueChange={setComposerValue}
+          placeholder="Enter sends · Shift+Enter adds a line"
+          value={composerValue}
+        />
+      </section>
 
       <footer className="desktop-footer">
         <div>

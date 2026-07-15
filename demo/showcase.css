@@ -202,6 +202,37 @@ code {
   min-height: 26rem;
 }
 
+.composer-preview {
+  background:
+    linear-gradient(var(--codex-ui-border) 1px, transparent 1px),
+    linear-gradient(90deg, var(--codex-ui-border) 1px, transparent 1px),
+    var(--codex-ui-bg-subtle);
+  background-size: 2rem 2rem;
+  border: 1px solid var(--codex-ui-border);
+  border-radius: var(--codex-ui-radius-xl);
+  padding: clamp(1rem, 4vw, 3rem);
+}
+
+.composer-preview__meta {
+  align-items: center;
+  color: var(--codex-ui-text-tertiary);
+  display: flex;
+  font-size: 0.6875rem;
+  gap: 1rem;
+  justify-content: space-between;
+  margin: 0 auto 0.75rem;
+  max-width: 48rem;
+}
+
+.composer-preview__meta output {
+  color: var(--codex-ui-text-secondary);
+  font-family: var(--codex-ui-font-mono);
+  max-width: 55%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .status-grid {
   display: grid;
   gap: 0.5rem;
@@ -319,6 +350,20 @@ code {
 
   .thread-preview .codex-ui-thread {
     padding: 1rem;
+  }
+
+  .composer-preview {
+    padding: 1rem;
+  }
+
+  .composer-preview__meta {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .composer-preview__meta output {
+    max-width: 100%;
   }
 }
 

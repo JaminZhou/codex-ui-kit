@@ -3,8 +3,10 @@ import { createRoot } from "react-dom/client";
 import {
   ActivityGroup,
   AgentActivity,
+  AgentComposer,
   AgentMessage,
   AgentThread,
+  ComposerAttachment,
   StatusIndicator,
   ToolCallCard,
   type AgentItemStatus,
@@ -44,6 +46,12 @@ const statuses: Array<{ label: string; status: AgentItemStatus }> = [
 
 function Showcase() {
   const [dark, setDark] = useState(false);
+  const [composerValue, setComposerValue] = useState(
+    "Add keyboard navigation to the activity timeline.",
+  );
+  const [composerRunning, setComposerRunning] = useState(false);
+  const [composerStatus, setComposerStatus] = useState("Ready to submit");
+  const [hasAttachment, setHasAttachment] = useState(true);
 
   return (
     <main
@@ -132,6 +140,63 @@ function Showcase() {
                   The implementation is ready; I’m waiting for the final checks.
                 </AgentMessage>
               </AgentThread>
+            </div>
+          </GalleryCard>
+
+          <GalleryCard
+            description="A controlled, protocol-neutral input surface with keyboard and running states."
+            title="Composer interaction"
+            wide
+          >
+            <div className="composer-preview">
+              <div className="composer-preview__meta">
+                <span>Enter sends · Shift+Enter adds a line</span>
+                <output aria-live="polite">{composerStatus}</output>
+              </div>
+              <AgentComposer
+                actions={
+                  <button
+                    disabled={hasAttachment}
+                    onClick={() => setHasAttachment(true)}
+                    type="button"
+                  >
+                    + Attach
+                  </button>
+                }
+                attachments={
+                  hasAttachment ? (
+                    <ComposerAttachment
+                      label="src/App.tsx"
+                      meta="12 KB"
+                      onRemove={() => setHasAttachment(false)}
+                    />
+                  ) : undefined
+                }
+                controls={
+                  <>
+                    <select aria-label="Execution mode" defaultValue="local">
+                      <option value="local">Local</option>
+                      <option value="remote">Remote</option>
+                    </select>
+                    <select aria-label="Permission mode" defaultValue="ask">
+                      <option value="ask">Ask first</option>
+                      <option value="auto">Auto</option>
+                    </select>
+                  </>
+                }
+                isRunning={composerRunning}
+                onStop={() => {
+                  setComposerRunning(false);
+                  setComposerStatus("Generation stopped");
+                }}
+                onSubmit={(value) => {
+                  setComposerStatus(`Submitted: ${value}`);
+                  setComposerValue("");
+                  setComposerRunning(true);
+                }}
+                onValueChange={setComposerValue}
+                value={composerValue}
+              />
             </div>
           </GalleryCard>
 
