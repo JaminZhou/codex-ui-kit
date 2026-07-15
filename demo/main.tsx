@@ -215,12 +215,16 @@ function Showcase() {
             </div>
             <div className="theme-isolation" aria-label="Forced theme isolation">
               <div data-theme="light">
-                <span>Forced light</span>
-                <code>#ffffff surface</code>
+                <div data-codex-ui>
+                  <span>Light ancestor</span>
+                  <code>scoped kit surface</code>
+                </div>
               </div>
               <div data-theme="dark">
-                <span>Forced dark</span>
-                <code>#181818 surface</code>
+                <div data-codex-ui>
+                  <span>Dark ancestor</span>
+                  <code>scoped kit surface</code>
+                </div>
               </div>
             </div>
           </GalleryCard>
