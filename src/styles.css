@@ -245,6 +245,20 @@ summary.codex-ui-activity__header::after {
   padding: 0.25rem 0 0.25rem 1rem;
 }
 
+.codex-ui-activity__description {
+  color: var(--codex-ui-text-secondary);
+  margin: 0.25rem 0 0 1rem;
+  overflow-wrap: anywhere;
+}
+
+.codex-ui-activity__description > :first-child {
+  margin-top: 0;
+}
+
+.codex-ui-activity__description > :last-child {
+  margin-bottom: 0;
+}
+
 .codex-ui-status-indicator {
   background: var(--codex-ui-text-tertiary);
   border-radius: 999px;

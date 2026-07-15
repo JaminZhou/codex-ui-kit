@@ -20,13 +20,14 @@ export function ToolCallCard({
   return (
     <AgentActivity
       className={classes}
+      description={
+        summary ? <p className="codex-ui-tool-call__summary">{summary}</p> : null
+      }
       detail={status}
       kind="tool"
       status={status}
       summary={name}
       {...props}
-    >
-      {summary ? <p className="codex-ui-tool-call__summary">{summary}</p> : null}
-    </AgentActivity>
+    />
   );
 }

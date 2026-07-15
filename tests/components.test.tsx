@@ -75,5 +75,7 @@ describe("components", () => {
 
     expect(html).toContain("shell");
     expect(html).toContain("Running the test suite");
+    expect(html).toContain("codex-ui-activity__description");
+    expect(html).not.toContain("<details");
   });
 });

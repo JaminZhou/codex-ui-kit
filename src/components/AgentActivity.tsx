@@ -6,6 +6,7 @@ export interface AgentActivityProps
   extends Omit<HTMLAttributes<HTMLDivElement>, "children"> {
   children?: ReactNode;
   defaultOpen?: boolean;
+  description?: ReactNode;
   detail?: ReactNode;
   kind?: AgentActivityKind;
   status: AgentItemStatus;
@@ -16,6 +17,7 @@ export function AgentActivity({
   children,
   className,
   defaultOpen = false,
+  description,
   detail,
   kind = "generic",
   status,
@@ -48,6 +50,9 @@ export function AgentActivity({
       ) : (
         <div className="codex-ui-activity__header">{header}</div>
       )}
+      {description ? (
+        <div className="codex-ui-activity__description">{description}</div>
+      ) : null}
     </div>
   );
 }
