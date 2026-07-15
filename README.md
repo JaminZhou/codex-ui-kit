@@ -8,8 +8,9 @@ Independently designed React components for building Codex-style coding-agent in
 
 Early private development. The public API is not stable yet.
 
-The first milestone covers the thread surface: messages, grouped activities,
-tool-call state, and a responsive content column. Run the local showcase with:
+The current milestones cover the thread and composer surfaces: messages,
+grouped activities, tool-call state, responsive content, and a controlled agent
+input with keyboard and running states. Run the local showcase with:
 
 ```bash
 pnpm dev
@@ -40,6 +41,8 @@ the pnpm workspace. Electron is not a dependency of `codex-ui-kit`.
 - `ActivityGroup`: compact grouping for related activities.
 - `ToolCallCard`: tool-call convenience component.
 - `StatusIndicator`: visual state primitive.
+- `AgentComposer`: controlled input surface with submit, stop, and slot APIs.
+- `ComposerAttachment`: removable attachment metadata primitive.
 
 The default stylesheet supports light, dark, and system color schemes. Set
 `data-theme="light"` or `data-theme="dark"` on an ancestor to force a theme.
