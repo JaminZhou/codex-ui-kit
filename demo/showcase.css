@@ -233,6 +233,52 @@ code {
   white-space: nowrap;
 }
 
+.approval-preview {
+  background:
+    linear-gradient(var(--codex-ui-border) 1px, transparent 1px),
+    linear-gradient(90deg, var(--codex-ui-border) 1px, transparent 1px),
+    var(--codex-ui-bg-subtle);
+  background-size: 2rem 2rem;
+  border: 1px solid var(--codex-ui-border);
+  border-radius: var(--codex-ui-radius-xl);
+  padding: clamp(1rem, 4vw, 3rem);
+}
+
+.approval-preview > .codex-ui-approval-request {
+  margin-inline: auto;
+  max-width: 42rem;
+}
+
+.approval-preview__meta {
+  align-items: center;
+  color: var(--codex-ui-text-tertiary);
+  display: flex;
+  font-size: 0.6875rem;
+  justify-content: space-between;
+  margin: 0 auto 0.75rem;
+  max-width: 42rem;
+}
+
+.approval-preview__meta button {
+  background: var(--codex-ui-bg);
+  border: 1px solid var(--codex-ui-border-strong);
+  border-radius: var(--codex-ui-radius-md);
+  color: var(--codex-ui-text-secondary);
+  cursor: pointer;
+  font-size: 0.6875rem;
+  padding: 0.35rem 0.55rem;
+}
+
+.approval-preview__meta button:disabled {
+  cursor: not-allowed;
+  opacity: 0.4;
+}
+
+.approval-preview__meta button:focus-visible {
+  outline: 2px solid var(--codex-ui-focus);
+  outline-offset: 1px;
+}
+
 .status-grid {
   display: grid;
   gap: 0.5rem;
@@ -353,6 +399,10 @@ code {
   }
 
   .composer-preview {
+    padding: 1rem;
+  }
+
+  .approval-preview {
     padding: 1rem;
   }
 

@@ -2,6 +2,8 @@ export type AgentItemStatus = "pending" | "running" | "completed" | "failed";
 
 export type AgentMessageRole = "user" | "assistant" | "system";
 
+export type ApprovalDecision = "pending" | "approved" | "rejected";
+
 export interface AgentMessageItem {
   id: string;
   type: "message";

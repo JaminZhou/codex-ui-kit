@@ -11,9 +11,11 @@ import {
   AgentComposer,
   AgentMessage,
   AgentThread,
+  ApprovalRequest,
   ComposerAttachment,
   StatusIndicator,
   ToolCallCard,
+  type ApprovalDecision,
 } from "codex-ui-kit";
 import {
   themeSources,
@@ -112,6 +114,8 @@ export function DesktopPlayground() {
   const [composerRunning, setComposerRunning] = useState(false);
   const [composerStatus, setComposerStatus] = useState("Ready");
   const [hasComposerAttachment, setHasComposerAttachment] = useState(true);
+  const [approvalDecision, setApprovalDecision] =
+    useState<ApprovalDecision>("pending");
   const viewport = useViewportMetrics();
   const { metrics: fontMetrics, monoRef, sansRef } = useFontMetrics();
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -297,6 +301,15 @@ export function DesktopPlayground() {
                     summary="Watching native theme and viewport changes"
                   />
                 </ActivityGroup>
+                <ApprovalRequest
+                  decision={approvalDecision}
+                  description="Exercise an interactive privileged-action surface inside the desktop Renderer."
+                  onApprove={() => setApprovalDecision("approved")}
+                  onReject={() => setApprovalDecision("rejected")}
+                  title="Run the desktop acceptance command?"
+                >
+                  pnpm --filter @codex-ui-kit/electron-playground check
+                </ApprovalRequest>
               </AgentThread>
             </div>
           </article>

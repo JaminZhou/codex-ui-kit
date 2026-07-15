@@ -6,10 +6,12 @@ import {
   AgentComposer,
   AgentMessage,
   AgentThread,
+  ApprovalRequest,
   ComposerAttachment,
   StatusIndicator,
   ToolCallCard,
   type AgentItemStatus,
+  type ApprovalDecision,
 } from "../src";
 import "./showcase.css";
 
@@ -52,6 +54,8 @@ function Showcase() {
   const [composerRunning, setComposerRunning] = useState(false);
   const [composerStatus, setComposerStatus] = useState("Ready to submit");
   const [hasAttachment, setHasAttachment] = useState(true);
+  const [approvalDecision, setApprovalDecision] =
+    useState<ApprovalDecision>("pending");
 
   return (
     <main
@@ -140,6 +144,34 @@ function Showcase() {
                   The implementation is ready; I’m waiting for the final checks.
                 </AgentMessage>
               </AgentThread>
+            </div>
+          </GalleryCard>
+
+          <GalleryCard
+            description="A controlled decision surface for commands and other privileged work."
+            title="Approval interaction"
+            wide
+          >
+            <div className="approval-preview">
+              <div className="approval-preview__meta">
+                <span>Decision: {approvalDecision}</span>
+                <button
+                  disabled={approvalDecision === "pending"}
+                  onClick={() => setApprovalDecision("pending")}
+                  type="button"
+                >
+                  Reset request
+                </button>
+              </div>
+              <ApprovalRequest
+                decision={approvalDecision}
+                description="This command publishes the package to a public registry."
+                onApprove={() => setApprovalDecision("approved")}
+                onReject={() => setApprovalDecision("rejected")}
+                title="Publish codex-ui-kit?"
+              >
+                pnpm publish --access public
+              </ApprovalRequest>
             </div>
           </GalleryCard>
 
