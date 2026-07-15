@@ -32,7 +32,10 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
     },
-    "./styles.css": "./dist/style.css"
+    "./styles.css": {
+      "types": "./dist/styles.d.ts",
+      "default": "./dist/style.css"
+    }
   },
   "scripts": {
     "dev": "vite demo",
@@ -42,7 +45,7 @@
     "build:electron": "pnpm --filter @codex-ui-kit/electron-playground build",
     "test": "vitest run tests",
     "typecheck": "tsc --noEmit",
-    "check:package": "node scripts/check-package.mjs",
+    "check:package": "node scripts/check-package.mjs && tsc -p fixtures/package-consumer/tsconfig.json",
     "check": "pnpm typecheck && pnpm test && pnpm build && pnpm check:package && pnpm build:demo && pnpm --filter @codex-ui-kit/electron-playground check"
   },
   "publishConfig": {

@@ -41,6 +41,12 @@ for (const field of ["main", "module", "types"]) {
   assert(existsSync(new URL(target.slice(2), root)), `missing ${field} target: ${target}`);
 }
 
+const rootDeclaration = readFileSync(new URL("dist/index.d.ts", root), "utf8");
+assert(
+  !rootDeclaration.includes(".css"),
+  "root declarations must not retain a CSS side-effect import",
+);
+
 const npmExecutable = process.platform === "win32" ? "npm.cmd" : "npm";
 const packed = spawnSync(npmExecutable, ["pack", "--dry-run", "--json"], {
   cwd: new URL(".", root),
@@ -65,13 +71,14 @@ for (const requiredPath of [
   "dist/index.js",
   "dist/index.d.ts",
   "dist/style.css",
+  "dist/styles.d.ts",
 ]) {
   assert(packedPaths.has(requiredPath), `package is missing ${requiredPath}`);
 }
 
 for (const file of packedPaths) {
   assert(
-    !/^(demo|playgrounds|research|src|tests)\//.test(file),
+    !/^(demo|fixtures|playgrounds|research|src|tests)\//.test(file),
     `development-only file leaked into package: ${file}`,
   );
 }
