@@ -12,6 +12,8 @@ import {
   AgentMessage,
   AgentThread,
   ApprovalRequest,
+  CommandExecution,
+  CommandOutput,
   ComposerAttachment,
   StatusIndicator,
   ToolCallCard,
@@ -295,6 +297,15 @@ export function DesktopPlayground() {
                       <li>Electron remains a playground-only dependency.</li>
                     </ul>
                   </AgentActivity>
+                  <CommandExecution
+                    command="pnpm --filter @codex-ui-kit/electron-playground check"
+                    cwd="playgrounds/electron"
+                    defaultOpen
+                    exitCode={0}
+                    status="completed"
+                  >
+                    <CommandOutput>{`3 tests passed\nRenderer build completed`}</CommandOutput>
+                  </CommandExecution>
                   <ToolCallCard
                     name="desktop acceptance"
                     status="running"

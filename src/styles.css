@@ -91,7 +91,9 @@
 .codex-ui-composer,
 .codex-ui-composer *,
 .codex-ui-approval-request,
-.codex-ui-approval-request * {
+.codex-ui-approval-request *,
+.codex-ui-command-output,
+.codex-ui-command-output * {
   box-sizing: border-box;
 }
 
@@ -294,6 +296,58 @@ summary.codex-ui-activity__header::after {
   font-family: var(--codex-ui-font-mono);
   font-size: 0.8125rem;
   white-space: pre-wrap;
+}
+
+.codex-ui-command-execution__command {
+  color: inherit;
+  font-family: var(--codex-ui-font-mono);
+  font-size: 0.8125rem;
+}
+
+.codex-ui-command-execution__context {
+  display: grid;
+  gap: 0.125rem;
+  margin-bottom: 0.625rem;
+  min-width: 0;
+}
+
+.codex-ui-command-execution__context span {
+  color: var(--codex-ui-text-tertiary);
+  font-size: 0.6875rem;
+}
+
+.codex-ui-command-execution__context code {
+  color: var(--codex-ui-text-secondary);
+  font-family: var(--codex-ui-font-mono);
+  font-size: 0.75rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.codex-ui-command-output {
+  background: var(--codex-ui-bg-subtle);
+  border: 1px solid var(--codex-ui-border);
+  border-radius: var(--codex-ui-radius-md);
+  color: var(--codex-ui-text-secondary);
+  font-family: var(--codex-ui-font-mono);
+  font-size: 0.75rem;
+  line-height: 1.55;
+  margin: 0;
+  max-height: 18rem;
+  overflow: auto;
+  padding: 0.625rem 0.75rem;
+  white-space: pre;
+}
+
+.codex-ui-command-output[data-stream="stderr"] {
+  background: color-mix(in srgb, var(--codex-ui-danger) 6%, var(--codex-ui-bg));
+  border-color: color-mix(in srgb, var(--codex-ui-danger) 22%, var(--codex-ui-border));
+  color: var(--codex-ui-danger);
+}
+
+.codex-ui-command-output + .codex-ui-command-output {
+  margin-top: 0.5rem;
 }
 
 .codex-ui-approval-request {
