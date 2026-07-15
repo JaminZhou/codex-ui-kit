@@ -1,73 +1,294 @@
-:root {
+:root,
+[data-codex-ui] {
+  color-scheme: light dark;
+  --codex-ui-font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --codex-ui-font-mono: ui-monospace, "SFMono-Regular", "SF Mono", Menlo,
+    Consolas, monospace;
+  --codex-ui-font-size: 0.9375rem;
+  --codex-ui-line-height: 1.5;
   --codex-ui-bg: #ffffff;
-  --codex-ui-bg-subtle: #f6f7f8;
-  --codex-ui-border: #e2e4e8;
-  --codex-ui-text: #1f2328;
-  --codex-ui-text-muted: #667085;
-  --codex-ui-success: #27864c;
+  --codex-ui-bg-subtle: #f4f4f3;
+  --codex-ui-bg-elevated: rgb(255 255 255 / 0.92);
+  --codex-ui-border: rgb(26 28 31 / 0.09);
+  --codex-ui-border-strong: rgb(26 28 31 / 0.15);
+  --codex-ui-text: #1a1c1f;
+  --codex-ui-text-secondary: rgb(26 28 31 / 0.7);
+  --codex-ui-text-tertiary: rgb(26 28 31 / 0.5);
+  --codex-ui-success: #16813e;
+  --codex-ui-warning: #a44913;
   --codex-ui-danger: #c9362b;
-  --codex-ui-radius: 10px;
+  --codex-ui-focus: #1677d2;
+  --codex-ui-radius-sm: 0.375rem;
+  --codex-ui-radius-md: 0.5rem;
+  --codex-ui-radius-lg: 0.625rem;
+  --codex-ui-radius-xl: 0.75rem;
+  --codex-ui-radius-message: 1rem;
+  --codex-ui-item-gap: 1rem;
+  --codex-ui-group-gap: 0.25rem;
+  --codex-ui-transition: 150ms ease;
+}
+
+[data-theme="light"] {
+  color-scheme: light;
+}
+
+[data-theme="dark"] {
+  color-scheme: dark;
+  --codex-ui-bg: #181818;
+  --codex-ui-bg-subtle: #242424;
+  --codex-ui-bg-elevated: rgb(33 33 33 / 0.94);
+  --codex-ui-border: rgb(255 255 255 / 0.09);
+  --codex-ui-border-strong: rgb(255 255 255 / 0.16);
+  --codex-ui-text: #ffffff;
+  --codex-ui-text-secondary: rgb(255 255 255 / 0.7);
+  --codex-ui-text-tertiary: rgb(255 255 255 / 0.5);
+  --codex-ui-success: #40c977;
+  --codex-ui-warning: #ff985c;
+  --codex-ui-danger: #ff6764;
+  --codex-ui-focus: #5aa7ff;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]),
+  [data-codex-ui]:not([data-theme="light"]) {
+    color-scheme: dark;
+    --codex-ui-bg: #181818;
+    --codex-ui-bg-subtle: #242424;
+    --codex-ui-bg-elevated: rgb(33 33 33 / 0.94);
+    --codex-ui-border: rgb(255 255 255 / 0.09);
+    --codex-ui-border-strong: rgb(255 255 255 / 0.16);
+    --codex-ui-text: #ffffff;
+    --codex-ui-text-secondary: rgb(255 255 255 / 0.7);
+    --codex-ui-text-tertiary: rgb(255 255 255 / 0.5);
+    --codex-ui-success: #40c977;
+    --codex-ui-warning: #ff985c;
+    --codex-ui-danger: #ff6764;
+    --codex-ui-focus: #5aa7ff;
+  }
+}
+
+.codex-ui-thread,
+.codex-ui-agent-message,
+.codex-ui-activity {
+  box-sizing: border-box;
+}
+
+.codex-ui-thread {
+  background: var(--codex-ui-bg);
+  color: var(--codex-ui-text);
+  display: flex;
+  flex-direction: column;
+  font-family: var(--codex-ui-font-sans);
+  font-size: var(--codex-ui-font-size);
+  gap: var(--codex-ui-item-gap);
+  line-height: var(--codex-ui-line-height);
+  margin-inline: auto;
+  max-width: 48rem;
+  padding: 1.5rem;
+  width: 100%;
+}
+
+.codex-ui-thread[data-width="narrow"] {
+  max-width: 32rem;
+}
+
+.codex-ui-thread[data-width="full"] {
+  max-width: none;
+}
+
+.codex-ui-activity-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--codex-ui-group-gap);
 }
 
 .codex-ui-agent-message {
   color: var(--codex-ui-text);
-  font-family: ui-sans-serif, system-ui, sans-serif;
-  line-height: 1.55;
+  display: flex;
+  min-width: 0;
 }
 
 .codex-ui-agent-message[data-role="user"] {
-  background: var(--codex-ui-bg-subtle);
-  border-radius: var(--codex-ui-radius);
-  padding: 0.75rem 0.875rem;
+  justify-content: flex-end;
 }
 
-.codex-ui-agent-message__content > :first-child {
+.codex-ui-agent-message__content {
+  min-width: 0;
+}
+
+.codex-ui-agent-message[data-role="user"]
+  .codex-ui-agent-message__content {
+  background: color-mix(in srgb, var(--codex-ui-text) 5%, transparent);
+  border-radius: var(--codex-ui-radius-message);
+  max-width: 77%;
+  overflow-wrap: anywhere;
+  padding: 0.5rem 0.75rem;
+}
+
+.codex-ui-agent-message[data-role="assistant"]
+  .codex-ui-agent-message__content {
+  max-width: 100%;
+}
+
+.codex-ui-agent-message[data-role="system"]
+  .codex-ui-agent-message__content {
+  border-left: 2px solid var(--codex-ui-border-strong);
+  color: var(--codex-ui-text-secondary);
+  padding-left: 0.75rem;
+}
+
+.codex-ui-agent-message__content > :first-child,
+.codex-ui-activity__body > :first-child {
   margin-top: 0;
 }
 
-.codex-ui-agent-message__content > :last-child {
+.codex-ui-agent-message__content > :last-child,
+.codex-ui-activity__body > :last-child {
   margin-bottom: 0;
 }
 
-.codex-ui-tool-call {
-  background: var(--codex-ui-bg);
-  border: 1px solid var(--codex-ui-border);
-  border-radius: var(--codex-ui-radius);
-  color: var(--codex-ui-text);
-  font-family: ui-sans-serif, system-ui, sans-serif;
-  padding: 0.75rem;
+.codex-ui-agent-message[data-status="running"] {
+  animation: codex-ui-pulse 1.8s ease-in-out infinite;
 }
 
-.codex-ui-tool-call__header {
+.codex-ui-activity {
+  color: var(--codex-ui-text-secondary);
+  min-width: 0;
+}
+
+.codex-ui-activity__disclosure {
+  min-width: 0;
+}
+
+.codex-ui-activity__header {
   align-items: center;
+  border-radius: var(--codex-ui-radius-sm);
   display: flex;
   gap: 0.5rem;
+  min-height: 1.75rem;
+  min-width: 0;
+  padding: 0.125rem 0;
 }
 
-.codex-ui-tool-call__indicator {
-  background: var(--codex-ui-text-muted);
-  border-radius: 999px;
-  height: 0.5rem;
-  width: 0.5rem;
+summary.codex-ui-activity__header {
+  cursor: pointer;
+  list-style: none;
 }
 
-.codex-ui-tool-call[data-status="completed"] .codex-ui-tool-call__indicator {
-  background: var(--codex-ui-success);
+summary.codex-ui-activity__header::-webkit-details-marker {
+  display: none;
 }
 
-.codex-ui-tool-call[data-status="failed"] .codex-ui-tool-call__indicator {
-  background: var(--codex-ui-danger);
+summary.codex-ui-activity__header:focus-visible {
+  outline: 2px solid var(--codex-ui-focus);
+  outline-offset: 2px;
 }
 
-.codex-ui-tool-call__status {
-  color: var(--codex-ui-text-muted);
+summary.codex-ui-activity__header::after {
+  border-bottom: 1.5px solid currentColor;
+  border-right: 1.5px solid currentColor;
+  content: "";
+  height: 0.35rem;
+  margin-left: 0.25rem;
+  opacity: 0.55;
+  transform: rotate(45deg) translateY(-0.1rem);
+  transition: transform var(--codex-ui-transition);
+  width: 0.35rem;
+}
+
+.codex-ui-activity__disclosure[open]
+  > summary.codex-ui-activity__header::after {
+  transform: rotate(225deg) translate(-0.1rem, -0.1rem);
+}
+
+.codex-ui-activity__summary {
+  color: var(--codex-ui-text-secondary);
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.codex-ui-activity[data-status="running"] .codex-ui-activity__summary {
+  color: var(--codex-ui-text);
+}
+
+.codex-ui-activity__detail {
+  color: var(--codex-ui-text-tertiary);
   font-size: 0.75rem;
   margin-left: auto;
   text-transform: capitalize;
 }
 
-.codex-ui-tool-call__summary {
-  color: var(--codex-ui-text-muted);
-  margin: 0.5rem 0 0;
+.codex-ui-activity__body {
+  border-left: 1px solid var(--codex-ui-border);
+  color: var(--codex-ui-text-secondary);
+  margin: 0.25rem 0 0 0.25rem;
+  overflow-wrap: anywhere;
+  padding: 0.25rem 0 0.25rem 1rem;
 }
 
+.codex-ui-status-indicator {
+  background: var(--codex-ui-text-tertiary);
+  border-radius: 999px;
+  flex: 0 0 auto;
+  height: 0.5rem;
+  width: 0.5rem;
+}
+
+.codex-ui-status-indicator[data-status="pending"] {
+  background: transparent;
+  box-shadow: inset 0 0 0 1px var(--codex-ui-text-tertiary);
+}
+
+.codex-ui-status-indicator[data-status="running"] {
+  animation: codex-ui-pulse 1.2s ease-in-out infinite;
+  background: var(--codex-ui-focus);
+}
+
+.codex-ui-status-indicator[data-status="completed"] {
+  background: var(--codex-ui-success);
+}
+
+.codex-ui-status-indicator[data-status="failed"] {
+  background: var(--codex-ui-danger);
+}
+
+.codex-ui-tool-call__summary {
+  font-family: var(--codex-ui-font-mono);
+  font-size: 0.8125rem;
+  white-space: pre-wrap;
+}
+
+@keyframes codex-ui-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.45;
+  }
+}
+
+@media (max-width: 640px) {
+  .codex-ui-thread {
+    padding: 1rem;
+  }
+
+  .codex-ui-agent-message[data-role="user"]
+    .codex-ui-agent-message__content {
+    max-width: 88%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .codex-ui-agent-message[data-status="running"],
+  .codex-ui-status-indicator[data-status="running"] {
+    animation: none;
+  }
+
+  summary.codex-ui-activity__header::after {
+    transition: none;
+  }
+}

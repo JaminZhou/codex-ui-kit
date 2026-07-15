@@ -20,3 +20,11 @@ export interface ToolCallItem {
 
 export type AgentItem = AgentMessageItem | ToolCallItem;
 
+export type AgentActivityKind =
+  | "command"
+  | "file-change"
+  | "reasoning"
+  | "search"
+  | "subagent"
+  | "tool"
+  | "generic";

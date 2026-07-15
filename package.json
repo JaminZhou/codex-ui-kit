@@ -22,10 +22,12 @@
     "./styles.css": "./dist/style.css"
   },
   "scripts": {
+    "dev": "vite demo",
     "build": "vite build && tsc -p tsconfig.build.json",
+    "build:demo": "vite build demo",
     "test": "vitest run",
     "typecheck": "tsc --noEmit",
-    "check": "pnpm typecheck && pnpm test && pnpm build"
+    "check": "pnpm typecheck && pnpm test && pnpm build && pnpm build:demo"
   },
   "peerDependencies": {
     "react": ">=18",

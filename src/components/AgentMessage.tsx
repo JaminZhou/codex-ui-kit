@@ -23,8 +23,12 @@ export function AgentMessage({
       data-status={status}
       {...props}
     >
-      <div className="codex-ui-agent-message__content">{children}</div>
+      <div
+        className="codex-ui-agent-message__content"
+        data-user-message-bubble={role === "user" ? "" : undefined}
+      >
+        {children}
+      </div>
     </article>
   );
 }
-
