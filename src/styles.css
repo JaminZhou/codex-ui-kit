@@ -89,7 +89,9 @@
 .codex-ui-agent-message,
 .codex-ui-activity,
 .codex-ui-composer,
-.codex-ui-composer * {
+.codex-ui-composer *,
+.codex-ui-approval-request,
+.codex-ui-approval-request * {
   box-sizing: border-box;
 }
 
@@ -292,6 +294,128 @@ summary.codex-ui-activity__header::after {
   font-family: var(--codex-ui-font-mono);
   font-size: 0.8125rem;
   white-space: pre-wrap;
+}
+
+.codex-ui-approval-request {
+  background: var(--codex-ui-bg-elevated);
+  border: 1px solid var(--codex-ui-border-strong);
+  border-radius: var(--codex-ui-radius-xl);
+  color: var(--codex-ui-text);
+  font-family: var(--codex-ui-font-sans);
+  overflow: hidden;
+  transition: border-color var(--codex-ui-transition);
+}
+
+.codex-ui-approval-request[data-decision="approved"] {
+  border-color: color-mix(in srgb, var(--codex-ui-success) 32%, var(--codex-ui-border));
+}
+
+.codex-ui-approval-request[data-decision="rejected"] {
+  border-color: color-mix(in srgb, var(--codex-ui-danger) 32%, var(--codex-ui-border));
+}
+
+.codex-ui-approval-request__header {
+  align-items: center;
+  display: flex;
+  gap: 0.625rem;
+  min-width: 0;
+  padding: 0.75rem 0.875rem;
+}
+
+.codex-ui-approval-request__header h3 {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  margin: 0;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.codex-ui-approval-request__decision {
+  color: var(--codex-ui-text-tertiary);
+  flex: 0 0 auto;
+  font-size: 0.6875rem;
+  margin-left: auto;
+}
+
+.codex-ui-approval-request__body {
+  border-top: 1px solid var(--codex-ui-border);
+  display: grid;
+  gap: 0.625rem;
+  padding: 0.75rem 0.875rem;
+}
+
+.codex-ui-approval-request__description {
+  color: var(--codex-ui-text-secondary);
+  font-size: 0.8125rem;
+  overflow-wrap: anywhere;
+}
+
+.codex-ui-approval-request__detail {
+  background: var(--codex-ui-bg-subtle);
+  border: 1px solid var(--codex-ui-border);
+  border-radius: var(--codex-ui-radius-md);
+  color: var(--codex-ui-text-secondary);
+  font-family: var(--codex-ui-font-mono);
+  font-size: 0.75rem;
+  overflow-x: auto;
+  padding: 0.625rem 0.75rem;
+  white-space: pre-wrap;
+}
+
+.codex-ui-approval-request__description > :first-child,
+.codex-ui-approval-request__detail > :first-child {
+  margin-top: 0;
+}
+
+.codex-ui-approval-request__description > :last-child,
+.codex-ui-approval-request__detail > :last-child {
+  margin-bottom: 0;
+}
+
+.codex-ui-approval-request__actions {
+  border: 0;
+  border-top: 1px solid var(--codex-ui-border);
+  display: flex;
+  gap: 0.5rem;
+  justify-content: flex-end;
+  margin: 0;
+  min-inline-size: 0;
+  padding: 0.625rem 0.875rem;
+}
+
+.codex-ui-approval-request__actions button {
+  background: transparent;
+  border: 1px solid var(--codex-ui-border-strong);
+  border-radius: var(--codex-ui-radius-md);
+  color: var(--codex-ui-text-secondary);
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.75rem;
+  font-weight: 600;
+  min-height: 2rem;
+  padding: 0.35rem 0.75rem;
+}
+
+.codex-ui-approval-request__actions button[data-action="approve"] {
+  background: var(--codex-ui-text);
+  border-color: var(--codex-ui-text);
+  color: var(--codex-ui-bg);
+}
+
+.codex-ui-approval-request__actions button:hover:not(:disabled) {
+  transform: translateY(-1px);
+}
+
+.codex-ui-approval-request__actions button:focus-visible {
+  outline: 2px solid var(--codex-ui-focus);
+  outline-offset: 2px;
+}
+
+.codex-ui-approval-request__actions button:disabled {
+  cursor: not-allowed;
+  opacity: 0.35;
 }
 
 .codex-ui-composer {
@@ -550,6 +674,23 @@ summary.codex-ui-activity__header::after {
   .codex-ui-composer__input {
     max-height: 9rem;
   }
+
+  .codex-ui-approval-request__header {
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .codex-ui-approval-request__header h3 {
+    flex: 1 1 calc(100% - 1.25rem);
+  }
+
+  .codex-ui-approval-request__decision {
+    margin-left: 1.125rem;
+  }
+
+  .codex-ui-approval-request__actions button {
+    flex: 1;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -563,7 +704,9 @@ summary.codex-ui-activity__header::after {
   }
 
   .codex-ui-composer,
-  .codex-ui-composer__primary {
+  .codex-ui-composer__primary,
+  .codex-ui-approval-request,
+  .codex-ui-approval-request__actions button {
     transition: none;
   }
 }
