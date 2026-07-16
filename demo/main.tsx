@@ -393,15 +393,15 @@ function Showcase() {
             </div>
             <div className="theme-isolation" aria-label="Forced theme isolation">
               <div data-theme="light">
-                <div data-codex-ui>
+                <div className="theme-isolation__surface">
                   <span>Light ancestor</span>
-                  <code>scoped kit surface</code>
+                  <code>unscoped component surface</code>
                 </div>
               </div>
               <div data-theme="dark">
-                <div data-codex-ui>
+                <div className="theme-isolation__surface">
                   <span>Dark ancestor</span>
-                  <code>scoped kit surface</code>
+                  <code>unscoped component surface</code>
                 </div>
               </div>
             </div>

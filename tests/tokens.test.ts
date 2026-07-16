@@ -33,5 +33,8 @@ describe("visual token contract", () => {
     expect(tokens).not.toContain(
       ':root:not([data-theme="light"]),\n  [data-codex-ui]',
     );
+    expect(tokens).toContain(
+      ':root,\n[data-codex-ui],\n[data-theme="light"],\n[data-theme="dark"] {\n  --codex-ui-bg:',
+    );
   });
 });

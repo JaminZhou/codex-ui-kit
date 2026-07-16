@@ -385,7 +385,7 @@ code {
   margin-top: 1.25rem;
 }
 
-.theme-isolation [data-codex-ui] {
+.theme-isolation__surface {
   background: var(--codex-ui-bg);
   border: 1px solid var(--codex-ui-border);
   border-radius: var(--codex-ui-radius-md);

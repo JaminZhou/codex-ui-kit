@@ -456,7 +456,9 @@
 }
 
 :root,
-[data-codex-ui] {
+[data-codex-ui],
+[data-theme="light"],
+[data-theme="dark"] {
   --codex-ui-bg: var(--codex-ui-background-surface);
   --codex-ui-bg-subtle: var(--codex-ui-background-editor-opaque);
   --codex-ui-bg-elevated: var(--codex-ui-background-elevated-primary);
