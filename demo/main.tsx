@@ -16,6 +16,7 @@ import {
   ComposerAttachment,
   FileChange,
   FileDiff,
+  fileDiffToText,
   ProposedPlan,
   StatusIndicator,
   ToolCallCard,
@@ -82,6 +83,18 @@ const showcaseDiffLines: FileDiffLine[] = [
     newLineNumber: 14,
   },
 ];
+
+const longShowcaseDiffLines: FileDiffLine[] = [
+  { content: "@@ -12,8 +12,18 @@", kind: "hunk" },
+  ...Array.from({ length: 16 }, (_, index) => ({
+    content: `export const checkpoint${index + 1} = 'verified';`,
+    kind: index === 2 ? ("deletion" as const) : ("addition" as const),
+    newLineNumber: index === 2 ? undefined : index + 12,
+    oldLineNumber: index === 2 ? index + 12 : undefined,
+  })),
+  { content: "No newline at end of file", kind: "meta" },
+];
+const shortShowcaseDiffLines = longShowcaseDiffLines.slice(0, 8);
 
 const markdownShowcase = [
   "## Implementation notes",
@@ -332,25 +345,75 @@ function Showcase() {
           </GalleryCard>
 
           <GalleryCard
-            description="Typed file metadata stays compact while structured diff lines preserve review context."
+            description="Creating, applied, stopped, rejected, deleted, and renamed states with measured inline diff geometry."
             title="File changes"
             wide
           >
             <div className="file-preview">
-              <FileChange
-                additions={2}
-                change="modified"
-                defaultOpen
-                deletions={1}
-                path="src/runtime/configuration.ts"
-              >
-                <FileDiff lines={showcaseDiffLines} />
-              </FileChange>
-              <FileChange
-                change="renamed"
-                path="src/components/ExecutionTimeline.tsx"
-                previousPath="src/components/ActivityTimeline.tsx"
-              />
+              <div className="file-preview__grid">
+                <div className="file-preview__surface file-preview__surface--wide">
+                  <span className="file-preview__label">Applied · expanded</span>
+                  <FileChange
+                    additions={15}
+                    change="modified"
+                    defaultOpen
+                    deletions={1}
+                    diffText={fileDiffToText(longShowcaseDiffLines)}
+                    path="src/runtime/configuration.ts"
+                  >
+                    <FileDiff lines={longShowcaseDiffLines} />
+                  </FileChange>
+                </div>
+                <div className="file-preview__surface">
+                  <span className="file-preview__label">Creating · short stream</span>
+                  <FileChange
+                    additions={7}
+                    change="added"
+                    defaultOpen
+                    deletions={0}
+                    diffText={fileDiffToText(shortShowcaseDiffLines)}
+                    path="src/components/FileStatus.tsx"
+                    status="streaming"
+                  >
+                    <FileDiff lines={shortShowcaseDiffLines} size="short" />
+                  </FileChange>
+                </div>
+                <div className="file-preview__surface">
+                  <span className="file-preview__label">Stopped</span>
+                  <FileChange
+                    change="deleted"
+                    path="src/legacy/adapter.ts"
+                    status="stopped"
+                  />
+                </div>
+                <div className="file-preview__surface">
+                  <span className="file-preview__label">Rejected</span>
+                  <FileChange
+                    additions={1}
+                    change="modified"
+                    deletions={1}
+                    path="src/private/config.ts"
+                    status="rejected"
+                  />
+                </div>
+                <div className="file-preview__surface">
+                  <span className="file-preview__label">Deleted · expanded</span>
+                  <FileChange
+                    change="deleted"
+                    defaultOpen
+                    path="src/obsolete.ts"
+                  />
+                </div>
+                <div className="file-preview__surface file-preview__surface--wide">
+                  <span className="file-preview__label">Renamed without content</span>
+                  <FileChange
+                    change="renamed"
+                    defaultOpen
+                    path="src/components/ExecutionTimeline.tsx"
+                    previousPath="src/components/ActivityTimeline.tsx"
+                  />
+                </div>
+              </div>
             </div>
           </GalleryCard>
 
