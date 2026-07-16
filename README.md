@@ -54,7 +54,12 @@ the pnpm workspace. Electron is not a dependency of `codex-ui-kit`.
 - `AgentReasoning`: active and completed reasoning disclosure states.
 - `AgentPlan`: structured pending, in-progress, and completed plan steps.
 - `ProposedPlan`: writing and completed plan-card states with action slots.
-- `ToolCallCard`: tool-call convenience component.
+- `ToolCallCard`: generic MCP, connector, browser, and arbitrary tool-call row
+  with source icons, active/completed labels, controlled results, structured
+  JSON, empty/error states, and a raw-output inspection hook.
+- `SearchActivity`: exact code-search and grouped web-search language with
+  controlled disclosure, current-query summaries, favicons, and a `320px`
+  result viewport.
 - `ApprovalRequest`: controlled approve/reject surface with explicit outcomes.
 - `CommandExecution`: collapsed command language plus expandable shell, exact
   duration, copy, background-terminal, success, failure, and interruption states.

@@ -18,6 +18,7 @@ import {
   FileDiff,
   fileDiffToText,
   ProposedPlan,
+  SearchActivity,
   StatusIndicator,
   ToolCallCard,
   TurnDuration,
@@ -96,6 +97,16 @@ const longShowcaseDiffLines: FileDiffLine[] = [
 ];
 const shortShowcaseDiffLines = longShowcaseDiffLines.slice(0, 8);
 
+const webSearchEntries = Array.from({ length: 15 }, (_, index) => ({
+  completed: index < 14,
+  detail: [
+    "Codex app-server protocol",
+    "TypeScript SDK execution model",
+    "MCP tool result content blocks",
+  ][index % 3] + ` · source ${index + 1}`,
+  id: `web-result-${index + 1}`,
+}));
+
 const markdownShowcase = [
   "## Implementation notes",
   "",
@@ -158,6 +169,9 @@ function Showcase() {
   const [wrapMarkdownCode, setWrapMarkdownCode] = useState(false);
   const [markdownCopyStatus, setMarkdownCopyStatus] = useState("Ready to copy");
   const [planActionStatus, setPlanActionStatus] = useState("Plan actions ready");
+  const [toolActionStatus, setToolActionStatus] = useState(
+    "Raw tool output ready",
+  );
 
   return (
     <main
@@ -252,6 +266,102 @@ function Showcase() {
                   The implementation is ready; I’m waiting for the final checks.
                 </AgentMessage>
               </AgentThread>
+            </div>
+          </GalleryCard>
+
+          <GalleryCard
+            description="Code and web searches plus generic MCP, connector, browser, result, raw-output, empty, and error states."
+            title="Search and tool calls"
+            wide
+          >
+            <div className="tool-preview">
+              <div className="tool-preview__controls">
+                <span>Protocol-neutral state matrix</span>
+                <output aria-live="polite">{toolActionStatus}</output>
+              </div>
+              <div className="tool-preview__grid">
+                <div className="tool-preview__surface tool-preview__surface--wide">
+                  <span className="tool-preview__label">Web · running accordion</span>
+                  <SearchActivity
+                    defaultOpen
+                    entries={webSearchEntries}
+                    kind="web"
+                    status="running"
+                  />
+                </div>
+                <div className="tool-preview__surface">
+                  <span className="tool-preview__label">Web · completed</span>
+                  <SearchActivity
+                    entries={webSearchEntries.map((entry) => ({
+                      ...entry,
+                      completed: true,
+                    }))}
+                    kind="web"
+                    status="completed"
+                  />
+                </div>
+                <div className="tool-preview__surface">
+                  <span className="tool-preview__label">Code · active</span>
+                  <SearchActivity
+                    kind="code"
+                    path="src/components"
+                    query="AgentActivity"
+                    status="running"
+                  />
+                </div>
+                <div className="tool-preview__surface">
+                  <span className="tool-preview__label">MCP · running</span>
+                  <ToolCallCard
+                    activeLabel="Searching issues"
+                    icon={<span className="tool-preview__source-mark">G</span>}
+                    name="search_issues"
+                    source="GitHub"
+                    status="running"
+                  />
+                </div>
+                <div className="tool-preview__surface">
+                  <span className="tool-preview__label">Connector · result</span>
+                  <ToolCallCard
+                    completedLabel="Searched issues"
+                    defaultOpen
+                    icon={<span className="tool-preview__source-mark">G</span>}
+                    name="search_issues"
+                    onViewRawOutput={() =>
+                      setToolActionStatus("Opened raw GitHub tool output")
+                    }
+                    rawOutput={{ callId: "call-github-1" }}
+                    source="GitHub"
+                    status="completed"
+                    structuredContent={{
+                      count: 2,
+                      issues: ["#14 File diff parity", "#15 Search parity"],
+                    }}
+                  />
+                </div>
+                <div className="tool-preview__surface">
+                  <span className="tool-preview__label">Browser · empty</span>
+                  <ToolCallCard
+                    completedLabel="Used the browser"
+                    defaultOpen
+                    icon={<span className="tool-preview__source-mark">B</span>}
+                    name="browser"
+                    source="browser-use"
+                    status="completed"
+                  />
+                </div>
+                <div className="tool-preview__surface">
+                  <span className="tool-preview__label">MCP · failed</span>
+                  <ToolCallCard
+                    defaultOpen
+                    error="Connector authorization expired"
+                    failedLabel="GitHub search failed"
+                    icon={<span className="tool-preview__source-mark">G</span>}
+                    name="search_issues"
+                    source="GitHub"
+                    status="failed"
+                  />
+                </div>
+              </div>
             </div>
           </GalleryCard>
 
