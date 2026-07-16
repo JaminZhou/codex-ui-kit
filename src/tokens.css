@@ -93,7 +93,6 @@
 }
 
 :root,
-[data-codex-ui],
 [data-theme="light"] {
   color-scheme: light;
   --codex-ui-background-surface: var(--codex-ui-gray-0);
@@ -337,8 +336,7 @@
 }
 
 @media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]),
-  [data-codex-ui]:not([data-theme="light"]) {
+  :root:not([data-theme="light"]) {
     color-scheme: dark;
     --codex-ui-background-surface: var(--codex-ui-gray-900);
     --codex-ui-background-surface-under: #000000;

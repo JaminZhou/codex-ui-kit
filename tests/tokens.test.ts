@@ -24,4 +24,14 @@ describe("visual token contract", () => {
   it("loads the token contract before component styles", () => {
     expect(styles.startsWith('@import "./tokens.css";')).toBe(true);
   });
+
+  it("inherits forced themes through nested kit scopes", () => {
+    expect(tokens).toContain(':root,\n[data-theme="light"] {');
+    expect(tokens).not.toContain(
+      ':root,\n[data-codex-ui],\n[data-theme="light"] {',
+    );
+    expect(tokens).not.toContain(
+      ':root:not([data-theme="light"]),\n  [data-codex-ui]',
+    );
+  });
 });
