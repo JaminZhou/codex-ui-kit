@@ -103,6 +103,25 @@ describe("AgentMarkdown", () => {
     expect(html).toContain('data-host-link="true"');
   });
 
+  it("preserves pre semantics when a host overrides only fenced code", () => {
+    const html = renderToStaticMarkup(
+      <AgentMarkdown
+        components={{
+          code: ({ children, node: _node, ...props }) => (
+            <code data-host-code="true" {...props}>
+              {children}
+            </code>
+          ),
+        }}
+      >
+        {"```ts\nconst highlighted = true;\n```"}
+      </AgentMarkdown>,
+    );
+
+    expect(html).toContain('<pre><code data-host-code="true"');
+    expect(html).toContain("const highlighted = true;");
+  });
+
   it("preserves copy feedback when an inline host callback updates its parent", async () => {
     function CopyHarness() {
       const [status, setStatus] = useState("ready");

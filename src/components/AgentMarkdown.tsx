@@ -252,8 +252,15 @@ export function AgentMarkdown({
         img({ alt = "", node: _node, ...imageProps }) {
           return <img alt={alt} loading="lazy" {...imageProps} />;
         },
-        pre({ children: preChildren }) {
-          return isValidElement(preChildren) ? preChildren : <>{preChildren}</>;
+        pre({ children: preChildren, node: _node, ...preProps }) {
+          if (
+            isValidElement(preChildren) &&
+            preChildren.type === CodeBlock
+          ) {
+            return preChildren;
+          }
+
+          return <pre {...preProps}>{preChildren}</pre>;
         },
         table({ children: tableChildren, node: _node, ...tableProps }) {
           return (
