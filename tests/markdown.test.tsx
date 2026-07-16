@@ -29,6 +29,8 @@ Use **semantic markup** with \`inline code\` and [a link](https://example.com).
 | --- | ---: |
 | Code | 3 |
 
+![Preview](https://example.com/preview.png)
+
 \`\`\`ts
 const ready = true;
 \`\`\``;
@@ -51,9 +53,12 @@ describe("AgentMarkdown", () => {
     expect(html).toContain('class="contains-task-list"');
     expect(html).toContain('type="checkbox"');
     expect(html).toContain('class="codex-ui-markdown__table-scroll"');
+    expect(html).toContain('alt="Preview"');
+    expect(html).toContain('loading="lazy"');
     expect(html).toContain('data-markdown-copy="code-block"');
     expect(html).toContain('data-language="ts"');
     expect(html).toContain("const ready = true;");
+    expect(html).not.toContain("node=");
   });
 
   it("stabilizes incomplete streaming fences and links", () => {
@@ -118,7 +123,7 @@ describe("AgentMarkdown", () => {
     fireEvent.click(screen.getByRole("button", { name: "Copy code" }));
 
     await waitFor(() => expect(screen.getByText("copied 19")).toBeTruthy());
-    expect(screen.getByRole("button", { name: "Copy code" }).textContent).toBe(
+    expect(screen.getByRole("button", { name: "Copied" }).textContent).toBe(
       "Copied",
     );
   });
@@ -139,7 +144,7 @@ describe("CodeBlock", () => {
     await waitFor(() =>
       expect(onCopy).toHaveBeenCalledWith("const value = true;"),
     );
-    expect(screen.getByRole("button", { name: "Copy code" }).textContent).toBe(
+    expect(screen.getByRole("button", { name: "Copied" }).textContent).toBe(
       "Copied",
     );
   });

@@ -70,6 +70,13 @@ export function CodeBlock({
     .join(" ");
   const normalizedCode = children.replace(/\n$/, "");
   const resolvedLabel = label ?? language ?? "text";
+  const accessibleCopyLabel = copied
+    ? typeof copiedLabel === "string"
+      ? copiedLabel
+      : "Copied"
+    : typeof copyLabel === "string"
+      ? copyLabel
+      : "Copy code";
 
   useEffect(
     () => () => {
@@ -112,7 +119,7 @@ export function CodeBlock({
         <span className="codex-ui-code-block__language">{resolvedLabel}</span>
         {copyable ? (
           <button
-            aria-label={typeof copyLabel === "string" ? copyLabel : "Copy code"}
+            aria-label={accessibleCopyLabel}
             className="codex-ui-code-block__copy"
             data-copied={copied || undefined}
             onClick={() => void handleCopy()}
@@ -202,7 +209,7 @@ export function AgentMarkdown({
         : undefined;
 
       return {
-        a({ children: linkChildren, ...linkProps }) {
+        a({ children: linkChildren, node: _node, ...linkProps }) {
           return (
             <a
               {...linkProps}
@@ -213,7 +220,12 @@ export function AgentMarkdown({
             </a>
           );
         },
-        code({ children: codeChildren, className: codeClassName, ...codeProps }) {
+        code({
+          children: codeChildren,
+          className: codeClassName,
+          node: _node,
+          ...codeProps
+        }) {
           const value = String(codeChildren);
           const language = /language-([^\s]+)/.exec(codeClassName ?? "")?.[1];
           const isBlock = Boolean(language) || value.endsWith("\n");
@@ -237,13 +249,13 @@ export function AgentMarkdown({
             </InlineCode>
           );
         },
-        img({ alt = "", ...imageProps }) {
+        img({ alt = "", node: _node, ...imageProps }) {
           return <img alt={alt} loading="lazy" {...imageProps} />;
         },
         pre({ children: preChildren }) {
           return isValidElement(preChildren) ? preChildren : <>{preChildren}</>;
         },
-        table({ children: tableChildren, ...tableProps }) {
+        table({ children: tableChildren, node: _node, ...tableProps }) {
           return (
             <div className="codex-ui-markdown__table-scroll" tabIndex={0}>
               <div className="codex-ui-markdown__table-margin">
