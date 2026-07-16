@@ -87,7 +87,7 @@ export interface CommandExecutionProps
   completedAtMs?: number;
   copyCommandLabel?: string;
   copyCommandText?: string;
-  cwd?: ReactNode;
+  cwd?: string;
   defaultOpen?: boolean;
   detail?: ReactNode;
   durationMs?: number;
@@ -181,6 +181,15 @@ export function CommandExecution({
         <>Stopped {summaryCommand}{timer}</>
       );
     }
+    if (status === "failed") {
+      // The sampled Renderer intentionally keeps the collapsed verb as "Ran";
+      // the expanded footer is the authoritative exit/failure signal.
+      return resolvedOpen ? (
+        <>Ran command{timer}</>
+      ) : (
+        <>Ran {summaryCommand}{timer}</>
+      );
+    }
     return resolvedOpen ? (
       <>Ran command{timer}</>
     ) : (
@@ -200,7 +209,7 @@ export function CommandExecution({
   const resolvedCommandLabel =
     commandLabel ??
     (typeof command === "string" ? `$ ${command}` : "Expand command");
-  const cwdTitle = typeof cwd === "string" ? `cwd\n${cwd}` : undefined;
+  const cwdTitle = cwd === undefined ? undefined : `cwd\n${cwd}`;
 
   const handleOpenChange = (nextOpen: boolean) => {
     if (open === undefined) setInternalOpen(nextOpen);

@@ -117,6 +117,9 @@ describe("CommandExecution", () => {
     expect(failed).toContain('data-stream="stderr"');
     expect(failed).toContain('aria-label="Standard error"');
     expect(failed).toContain("Exit code 1");
+    expect(failed).toContain(
+      '<span class="codex-ui-activity__summary">Ran <span class="codex-ui-command-execution__summary-command">pnpm lint</span></span>',
+    );
     expect(unknown).toContain("Exit code unknown");
   });
 
