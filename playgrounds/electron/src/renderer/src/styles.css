@@ -240,7 +240,8 @@ button {
 
 .acceptance-card--activity,
 .acceptance-card--command,
-.acceptance-card--file {
+.acceptance-card--file,
+.acceptance-card--tool {
   grid-column: 1 / -1;
 }
 
@@ -318,6 +319,48 @@ button {
   font-weight: 600;
   margin-bottom: 0.875rem;
   text-transform: uppercase;
+}
+
+.tool-state-matrix {
+  background: var(--codex-ui-bg-subtle);
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.tool-state-matrix > div {
+  background: var(--codex-ui-bg);
+  border: 1px solid var(--codex-ui-border);
+  border-radius: var(--codex-ui-radius-lg);
+  min-width: 0;
+  padding: 1rem;
+}
+
+.tool-state-matrix__wide {
+  grid-column: 1 / -1;
+}
+
+.tool-state-matrix__label {
+  color: var(--codex-ui-text-tertiary);
+  display: block;
+  font-size: 0.625rem;
+  font-weight: 600;
+  margin-bottom: 0.875rem;
+  text-transform: uppercase;
+}
+
+.tool-state-matrix__source-mark {
+  align-items: center;
+  background: var(--codex-ui-text);
+  border-radius: var(--codex-ui-radius-xs);
+  color: var(--codex-ui-bg);
+  display: inline-flex;
+  flex: 0 0 auto;
+  font-size: 0.5625rem;
+  font-weight: 700;
+  height: 1rem;
+  justify-content: center;
+  width: 1rem;
 }
 
 .acceptance-card > header {
@@ -528,7 +571,8 @@ button {
 
   .acceptance-card--activity,
   .acceptance-card--command,
-  .acceptance-card--file {
+  .acceptance-card--file,
+  .acceptance-card--tool {
     grid-column: auto;
   }
 
@@ -537,6 +581,14 @@ button {
   }
 
   .file-state-matrix__wide {
+    grid-column: auto;
+  }
+
+  .tool-state-matrix {
+    grid-template-columns: 1fr;
+  }
+
+  .tool-state-matrix__wide {
     grid-column: auto;
   }
 

@@ -23,6 +23,7 @@ import {
   FileDiff,
   fileDiffToText,
   ProposedPlan,
+  SearchActivity,
   StatusIndicator,
   ToolCallCard,
   TurnDuration,
@@ -88,6 +89,12 @@ const desktopLongDiffLines: FileDiffLine[] = [
   })),
 ];
 const desktopShortDiffLines = desktopLongDiffLines.slice(0, 8);
+
+const desktopWebSearchEntries = Array.from({ length: 15 }, (_, index) => ({
+  completed: index < 14,
+  detail: `Desktop search result ${index + 1}: Codex Renderer behavior`,
+  id: `desktop-web-result-${index + 1}`,
+}));
 
 const desktopMarkdown = [
   "### Desktop Markdown",
@@ -504,6 +511,96 @@ export function DesktopPlayground() {
                   defaultOpen
                   path="src/components/DesktopTimeline.tsx"
                   previousPath="src/components/LegacyTimeline.tsx"
+                />
+              </div>
+            </div>
+          </article>
+
+          <article className="acceptance-card acceptance-card--tool">
+            <header>
+              <div>
+                <h2>Search and tool-call states</h2>
+                <p>
+                  Web and code search, MCP, connector, browser, structured,
+                  empty, and error results.
+                </p>
+              </div>
+            </header>
+            <div className="acceptance-card__body tool-state-matrix">
+              <div className="tool-state-matrix__wide">
+                <span className="tool-state-matrix__label">Web · running · 320px max</span>
+                <SearchActivity
+                  defaultOpen
+                  entries={desktopWebSearchEntries}
+                  kind="web"
+                  status="running"
+                />
+              </div>
+              <div>
+                <span className="tool-state-matrix__label">Web · completed</span>
+                <SearchActivity
+                  entries={desktopWebSearchEntries.map((entry) => ({
+                    ...entry,
+                    completed: true,
+                  }))}
+                  kind="web"
+                  status="completed"
+                />
+              </div>
+              <div>
+                <span className="tool-state-matrix__label">Code · running</span>
+                <SearchActivity
+                  kind="code"
+                  path="src/renderer"
+                  query="ToolCallCard"
+                  status="running"
+                />
+              </div>
+              <div>
+                <span className="tool-state-matrix__label">MCP · running</span>
+                <ToolCallCard
+                  activeLabel="Searching issues"
+                  icon={<span className="tool-state-matrix__source-mark">G</span>}
+                  name="search_issues"
+                  source="GitHub"
+                  status="running"
+                />
+              </div>
+              <div>
+                <span className="tool-state-matrix__label">Connector · structured</span>
+                <ToolCallCard
+                  completedLabel="Searched issues"
+                  defaultOpen
+                  icon={<span className="tool-state-matrix__source-mark">G</span>}
+                  name="search_issues"
+                  onViewRawOutput={() => undefined}
+                  rawOutput={{ callId: "desktop-call-1" }}
+                  source="GitHub"
+                  status="completed"
+                  structuredContent={{ count: 2, state: "open" }}
+                />
+              </div>
+              <div>
+                <span className="tool-state-matrix__label">Browser · empty</span>
+                <ToolCallCard
+                  completedLabel="Used the browser"
+                  defaultOpen
+                  icon={<span className="tool-state-matrix__source-mark">B</span>}
+                  name="browser"
+                  source="browser-use"
+                  status="completed"
+                />
+              </div>
+              <div>
+                <span className="tool-state-matrix__label">MCP · failed</span>
+                <ToolCallCard
+                  defaultOpen
+                  error="Connector authorization expired"
+                  failedLabel="GitHub search failed"
+                  icon={<span className="tool-state-matrix__source-mark">G</span>}
+                  name="search_issues"
+                  source="GitHub"
+                  status="failed"
                 />
               </div>
             </div>

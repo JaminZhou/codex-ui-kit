@@ -10,6 +10,7 @@ export * from "./components/ApprovalRequest";
 export * from "./components/CommandExecution";
 export * from "./components/FileChange";
 export * from "./components/ProposedPlan";
+export * from "./components/SearchActivity";
 export * from "./components/StatusIndicator";
 export * from "./components/ToolCallCard";
 export * from "./components/TurnDuration";
