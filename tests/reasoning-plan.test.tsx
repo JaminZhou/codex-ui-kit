@@ -41,11 +41,13 @@ describe("AgentReasoning", () => {
       </AgentReasoning>,
     );
     const details = container.querySelector("details")!;
+    const summary = container.querySelector("summary")!;
 
-    details.open = true;
-    fireEvent(details, new Event("toggle"));
+    fireEvent.click(summary);
 
     expect(onOpenChange).toHaveBeenCalledWith(true);
+    expect(details.open).toBe(false);
+    expect(summary.getAttribute("aria-expanded")).toBe("false");
   });
 });
 

@@ -37,7 +37,15 @@ export function AgentReasoning({
         className="codex-ui-reasoning__disclosure"
         onToggle={(event) => {
           const nextOpen = event.currentTarget.open;
-          if (open === undefined) setInternalOpen(nextOpen);
+          if (open !== undefined) {
+            if (nextOpen !== open) {
+              onOpenChange?.(nextOpen);
+              event.currentTarget.open = open;
+            }
+            return;
+          }
+
+          setInternalOpen(nextOpen);
           onOpenChange?.(nextOpen);
         }}
         open={resolvedOpen}
@@ -45,6 +53,11 @@ export function AgentReasoning({
         <summary
           aria-expanded={resolvedOpen}
           className="codex-ui-reasoning__summary"
+          onClick={(event) => {
+            if (open === undefined) return;
+            event.preventDefault();
+            onOpenChange?.(!open);
+          }}
         >
           <span className="codex-ui-reasoning__label">{resolvedLabel}</span>
           <span aria-hidden="true" className="codex-ui-reasoning__chevron" />
