@@ -6,13 +6,32 @@ export default defineConfig({
     {
       name: "emit-style-assets",
       generateBundle() {
+        const tokenSource = readFileSync(
+          new URL("./src/tokens.css", import.meta.url),
+          "utf8",
+        );
+        const componentSource = readFileSync(
+          new URL("./src/styles.css", import.meta.url),
+          "utf8",
+        ).replace('@import "./tokens.css";\n', "");
+
         this.emitFile({
           fileName: "style.css",
-          source: readFileSync(new URL("./src/styles.css", import.meta.url), "utf8"),
+          source: `${tokenSource}\n${componentSource}`,
+          type: "asset",
+        });
+        this.emitFile({
+          fileName: "tokens.css",
+          source: tokenSource,
           type: "asset",
         });
         this.emitFile({
           fileName: "styles.d.ts",
+          source: "export {};\n",
+          type: "asset",
+        });
+        this.emitFile({
+          fileName: "tokens.d.ts",
           source: "export {};\n",
           type: "asset",
         });

@@ -102,7 +102,7 @@ function Showcase() {
           <span>codex-ui-kit</span>
         </a>
         <div className="showcase__topbar-actions">
-          <span className="showcase__version">foundations preview</span>
+          <span className="showcase__version">parity preview</span>
           <button type="button" onClick={() => setDark((value) => !value)}>
             {dark ? "Light" : "Dark"} theme
           </button>

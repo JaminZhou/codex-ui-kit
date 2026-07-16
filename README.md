@@ -6,10 +6,10 @@ Independently designed React components for building Codex-style coding-agent in
 
 ## Status
 
-Foundation preview for an initial public release. The public API may change
-before 1.0.
+High-fidelity preview for an initial public release. The public API may change
+before 1.0 while component and visual parity work is completed.
 
-The current milestones cover the thread, approval, and composer surfaces:
+The completed foundations cover the thread, approval, and composer surfaces:
 messages, grouped activities, commands, file changes, tool-call state,
 responsive content, controlled decisions, and an agent input with keyboard and
 running states. Run the local showcase with:
@@ -32,7 +32,8 @@ the pnpm workspace. Electron is not a dependency of `codex-ui-kit`.
 
 - Keep the component model independent from any single agent protocol.
 - Represent messages, tool calls, commands, file changes, and approvals as composable primitives.
-- Use original styling, assets, and implementation code.
+- Match the sampled Codex component behavior and visual system with independently written implementation code.
+- Keep extracted application files, bundled fonts, logos, and other private assets out of the package.
 - Keep protocol-specific mapping in adapters rather than UI components.
 
 ## Components
@@ -53,6 +54,22 @@ the pnpm workspace. Electron is not a dependency of `codex-ui-kit`.
 
 The default stylesheet supports light, dark, and system color schemes. Set
 `data-theme="light"` or `data-theme="dark"` on an ancestor to force a theme.
+
+## Visual tokens
+
+The component stylesheet includes the complete public token foundation. Import
+the standalone token contract when building additional parity components that
+do not need the packaged component styles:
+
+```tsx
+import "codex-ui-kit/tokens.css";
+```
+
+All public variables use the `--codex-ui-` prefix. They cover the measured
+neutral and status palettes, semantic light and dark surfaces, typography,
+spacing, radii, shadows, thread width, and composer geometry. The font stack
+names OpenAI Sans when a host has licensed and provided it, then falls back to
+the native system stack; this package does not redistribute the bundled font.
 
 ## Installation
 
