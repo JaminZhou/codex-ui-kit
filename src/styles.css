@@ -1,89 +1,4 @@
-:root {
-  color-scheme: light dark;
-}
-
-:root,
-[data-codex-ui] {
-  --codex-ui-font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  --codex-ui-font-mono: ui-monospace, "SFMono-Regular", "SF Mono", Menlo,
-    Consolas, monospace;
-  --codex-ui-font-size: 0.9375rem;
-  --codex-ui-line-height: 1.5;
-  --codex-ui-radius-sm: 0.375rem;
-  --codex-ui-radius-md: 0.5rem;
-  --codex-ui-radius-lg: 0.625rem;
-  --codex-ui-radius-xl: 0.75rem;
-  --codex-ui-radius-message: 1rem;
-  --codex-ui-radius-composer: 1rem;
-  --codex-ui-item-gap: 1rem;
-  --codex-ui-group-gap: 0.25rem;
-  --codex-ui-transition: 150ms ease;
-}
-
-:root {
-  --codex-ui-bg: #ffffff;
-  --codex-ui-bg-subtle: #f4f4f3;
-  --codex-ui-bg-elevated: rgb(255 255 255 / 0.92);
-  --codex-ui-border: rgb(26 28 31 / 0.09);
-  --codex-ui-border-strong: rgb(26 28 31 / 0.15);
-  --codex-ui-text: #1a1c1f;
-  --codex-ui-text-secondary: rgb(26 28 31 / 0.7);
-  --codex-ui-text-tertiary: rgb(26 28 31 / 0.5);
-  --codex-ui-success: #16813e;
-  --codex-ui-warning: #a44913;
-  --codex-ui-danger: #c9362b;
-  --codex-ui-focus: #1677d2;
-}
-
-[data-theme="light"] {
-  color-scheme: light;
-  --codex-ui-bg: #ffffff;
-  --codex-ui-bg-subtle: #f4f4f3;
-  --codex-ui-bg-elevated: rgb(255 255 255 / 0.92);
-  --codex-ui-border: rgb(26 28 31 / 0.09);
-  --codex-ui-border-strong: rgb(26 28 31 / 0.15);
-  --codex-ui-text: #1a1c1f;
-  --codex-ui-text-secondary: rgb(26 28 31 / 0.7);
-  --codex-ui-text-tertiary: rgb(26 28 31 / 0.5);
-  --codex-ui-success: #16813e;
-  --codex-ui-warning: #a44913;
-  --codex-ui-danger: #c9362b;
-  --codex-ui-focus: #1677d2;
-}
-
-[data-theme="dark"] {
-  color-scheme: dark;
-  --codex-ui-bg: #181818;
-  --codex-ui-bg-subtle: #242424;
-  --codex-ui-bg-elevated: rgb(33 33 33 / 0.94);
-  --codex-ui-border: rgb(255 255 255 / 0.09);
-  --codex-ui-border-strong: rgb(255 255 255 / 0.16);
-  --codex-ui-text: #ffffff;
-  --codex-ui-text-secondary: rgb(255 255 255 / 0.7);
-  --codex-ui-text-tertiary: rgb(255 255 255 / 0.5);
-  --codex-ui-success: #40c977;
-  --codex-ui-warning: #ff985c;
-  --codex-ui-danger: #ff6764;
-  --codex-ui-focus: #5aa7ff;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    color-scheme: dark;
-    --codex-ui-bg: #181818;
-    --codex-ui-bg-subtle: #242424;
-    --codex-ui-bg-elevated: rgb(33 33 33 / 0.94);
-    --codex-ui-border: rgb(255 255 255 / 0.09);
-    --codex-ui-border-strong: rgb(255 255 255 / 0.16);
-    --codex-ui-text: #ffffff;
-    --codex-ui-text-secondary: rgb(255 255 255 / 0.7);
-    --codex-ui-text-tertiary: rgb(255 255 255 / 0.5);
-    --codex-ui-success: #40c977;
-    --codex-ui-warning: #ff985c;
-    --codex-ui-danger: #ff6764;
-    --codex-ui-focus: #5aa7ff;
-  }
-}
+@import "./tokens.css";
 
 .codex-ui-thread,
 .codex-ui-agent-message,
@@ -109,7 +24,7 @@
   gap: var(--codex-ui-item-gap);
   line-height: var(--codex-ui-line-height);
   margin-inline: auto;
-  max-width: 48rem;
+  max-width: var(--codex-ui-thread-content-max-width);
   padding: 1.5rem;
   width: 100%;
 }

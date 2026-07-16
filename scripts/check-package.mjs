@@ -47,6 +47,13 @@ assert(
   "root declarations must not retain a CSS side-effect import",
 );
 
+const tokenStyles = readFileSync(new URL("dist/tokens.css", root), "utf8");
+const componentStyles = readFileSync(new URL("dist/style.css", root), "utf8");
+assert(
+  componentStyles.startsWith(tokenStyles),
+  "component stylesheet must embed the standalone token contract first",
+);
+
 const npmExecutable = process.platform === "win32" ? "npm.cmd" : "npm";
 const packed = spawnSync(npmExecutable, ["pack", "--dry-run", "--json"], {
   cwd: new URL(".", root),
@@ -72,6 +79,8 @@ for (const requiredPath of [
   "dist/index.d.ts",
   "dist/style.css",
   "dist/styles.d.ts",
+  "dist/tokens.css",
+  "dist/tokens.d.ts",
 ]) {
   assert(packedPaths.has(requiredPath), `package is missing ${requiredPath}`);
 }

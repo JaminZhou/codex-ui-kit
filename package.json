@@ -35,6 +35,10 @@
     "./styles.css": {
       "types": "./dist/styles.d.ts",
       "default": "./dist/style.css"
+    },
+    "./tokens.css": {
+      "types": "./dist/tokens.d.ts",
+      "default": "./dist/tokens.css"
     }
   },
   "scripts": {

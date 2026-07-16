@@ -102,7 +102,7 @@ function Showcase() {
           <span>codex-ui-kit</span>
         </a>
         <div className="showcase__topbar-actions">
-          <span className="showcase__version">foundations preview</span>
+          <span className="showcase__version">parity preview</span>
           <button type="button" onClick={() => setDark((value) => !value)}>
             {dark ? "Light" : "Dark"} theme
           </button>
@@ -393,15 +393,15 @@ function Showcase() {
             </div>
             <div className="theme-isolation" aria-label="Forced theme isolation">
               <div data-theme="light">
-                <div data-codex-ui>
+                <div className="theme-isolation__surface">
                   <span>Light ancestor</span>
-                  <code>scoped kit surface</code>
+                  <code>unscoped component surface</code>
                 </div>
               </div>
               <div data-theme="dark">
-                <div data-codex-ui>
+                <div className="theme-isolation__surface">
                   <span>Dark ancestor</span>
-                  <code>scoped kit surface</code>
+                  <code>unscoped component surface</code>
                 </div>
               </div>
             </div>

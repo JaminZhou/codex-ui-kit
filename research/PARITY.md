@@ -1,0 +1,62 @@
+# Codex component parity matrix
+
+This matrix defines completion for the component library. A foundation release,
+a passing build, or a locally complete primitive does not make the project
+complete. Each surface must reach component, state, visual-token, browser, and
+Electron parity against the locked sampled build.
+
+## Baseline
+
+- Sample: Codex Desktop `26.707.72221` (`5307`).
+- Renderer archive hash: `b5da51e5df6e996076e4cb19045cec46dd4c08cf61c19cdbc5cb426b8413b73c`.
+- Runtime: Electron `42.1.0`, React Renderer, Vite build.
+- Raw extracted files remain outside the repository.
+
+## Completion gates
+
+A row is complete only when all applicable gates pass:
+
+1. Public React API covers every observed state without protocol coupling.
+2. DOM semantics and keyboard behavior match the observed interaction.
+3. Namespaced tokens reproduce measured light, dark, spacing, type, radius,
+   border, shadow, and motion roles.
+4. The H5 showcase demonstrates the full state matrix.
+5. The Electron playground verifies desktop theme, font fallback, scrolling,
+   resizing, focus, and rendered geometry.
+6. Automated tests and package-consumer checks protect the contract.
+
+## Surface matrix
+
+| Surface | Component/API | Visual parity | H5 states | Electron | Tests | Status |
+| --- | --- | --- | --- | --- | --- | --- |
+| Global tokens and themes | Complete | Measured core | Complete | Complete | Good | Complete |
+| Thread layout and turn spacing | Foundation | Partial | Partial | Partial | Basic | Gap |
+| User, assistant, and system messages | Foundation | Partial | Partial | Partial | Basic | Gap |
+| Markdown, inline code, code blocks, tables, and links | Missing | Missing | Missing | Missing | Missing | Gap |
+| Activity rows and grouped work | Foundation | Partial | Partial | Partial | Basic | Gap |
+| Reasoning and plan states | Generic only | Missing | Missing | Missing | Missing | Gap |
+| Command execution and output | Foundation | Partial | Partial | Partial | Basic | Gap |
+| File changes and structured diffs | Foundation | Partial | Partial | Partial | Basic | Gap |
+| Search, web, MCP, and connector calls | Missing | Missing | Missing | Missing | Missing | Gap |
+| Subagent and delegated work | Missing | Missing | Missing | Missing | Missing | Gap |
+| Approval and permission requests | Foundation | Partial | Partial | Partial | Basic | Gap |
+| Errors, warnings, notices, retry, and interruption | Generic only | Missing | Missing | Missing | Missing | Gap |
+| Composer shell and autosizing input | Foundation | Partial | Partial | Partial | Good | Gap |
+| Composer attachments, mentions, modes, and queued prompts | Attachment only | Partial | Partial | Partial | Basic | Gap |
+| Buttons, icon buttons, menus, tooltips, popovers, and selects | Slots only | Missing | Missing | Missing | Missing | Gap |
+| Resource cards, citations, images, and artifacts | Missing | Missing | Missing | Missing | Missing | Gap |
+| Thread header, floating controls, and navigation affordances | Missing | Missing | Missing | Missing | Missing | Gap |
+| Loading, streaming, skeleton, hover, focus, and reduced motion | Partial | Partial | Partial | Partial | Basic | Gap |
+| Responsive and narrow-window behavior | Partial | Partial | Partial | Partial | Basic | Gap |
+| Package tokens, CSS exports, documentation, and provenance | Foundation | Partial | N/A | N/A | Good | Gap |
+
+## Stop rule
+
+The implementation loop stops only when every in-scope row is complete, the
+showcase and Electron screenshots have no material visual discrepancy at the
+agreed viewport matrix, CI is green, review threads are resolved, and the
+public package/open-source release decision has been completed explicitly.
+
+Bundled OpenAI fonts, logos, sounds, illustrations, and private IPC are not
+redistributed. Those asset boundaries do not reduce the required parity of the
+independently implemented component geometry, tokens, states, or behavior.
