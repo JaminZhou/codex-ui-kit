@@ -6,6 +6,8 @@ import {
   AgentComposer,
   AgentMarkdown,
   AgentMessage,
+  AgentPlan,
+  AgentReasoning,
   AgentThread,
   ApprovalRequest,
   CommandExecution,
@@ -13,6 +15,7 @@ import {
   ComposerAttachment,
   FileChange,
   FileDiff,
+  ProposedPlan,
   StatusIndicator,
   ToolCallCard,
   type AgentItemStatus,
@@ -108,6 +111,25 @@ const streamingMarkdownShowcase = [
   "const status = 'running';",
 ].join("\n");
 
+const proposedPlanShowcase = [
+  "## Delivery plan",
+  "",
+  "1. Lock the observed interaction states.",
+  "2. Implement protocol-neutral React primitives.",
+  "3. Verify browser and Electron rendering.",
+].join("\n");
+
+const activePlanSteps = [
+  { status: "completed" as const, step: "Inspect the sampled behavior" },
+  { status: "in_progress" as const, step: "Implement the public components" },
+  { status: "pending" as const, step: "Verify both renderer targets" },
+];
+
+const completedPlanSteps = activePlanSteps.map((item) => ({
+  ...item,
+  status: "completed" as const,
+}));
+
 function Showcase() {
   const [dark, setDark] = useState(false);
   const [composerValue, setComposerValue] = useState(
@@ -120,6 +142,7 @@ function Showcase() {
     useState<ApprovalDecision>("pending");
   const [wrapMarkdownCode, setWrapMarkdownCode] = useState(false);
   const [markdownCopyStatus, setMarkdownCopyStatus] = useState("Ready to copy");
+  const [planActionStatus, setPlanActionStatus] = useState("Plan actions ready");
 
   return (
     <main
@@ -179,11 +202,9 @@ function Showcase() {
                 </AgentMessage>
 
                 <ActivityGroup aria-label="Agent activity">
-                  <AgentActivity
-                    kind="reasoning"
-                    status="completed"
-                    summary="Inspected the existing component boundaries"
-                  />
+                  <AgentReasoning status="completed">
+                    <p>Inspected the existing component boundaries.</p>
+                  </AgentReasoning>
                   <AgentActivity
                     defaultOpen
                     detail="3 files"
@@ -208,6 +229,56 @@ function Showcase() {
                   The implementation is ready; I’m waiting for the final checks.
                 </AgentMessage>
               </AgentThread>
+            </div>
+          </GalleryCard>
+
+          <GalleryCard
+            description="Observed disclosure defaults, plan progress, and proposed-plan actions across every sampled state."
+            title="Reasoning and plans"
+            wide
+          >
+            <div className="reasoning-plan-preview">
+              <div className="reasoning-plan-preview__surface">
+                <span className="reasoning-plan-preview__label">Reasoning</span>
+                <AgentReasoning status="running">
+                  <p>
+                    Comparing the interaction model with the sampled desktop
+                    behavior.
+                  </p>
+                </AgentReasoning>
+                <AgentReasoning status="completed">
+                  <p>
+                    Confirmed the active-open and completed-collapsed defaults.
+                  </p>
+                </AgentReasoning>
+              </div>
+
+              <div className="reasoning-plan-preview__surface">
+                <span className="reasoning-plan-preview__label">Step plan</span>
+                <AgentPlan aria-label="Active implementation plan" steps={activePlanSteps} />
+                <AgentPlan
+                  aria-label="Completed implementation plan"
+                  defaultOpen={false}
+                  steps={completedPlanSteps}
+                />
+              </div>
+
+              <div className="reasoning-plan-preview__surface reasoning-plan-preview__surface--wide">
+                <div className="reasoning-plan-preview__meta">
+                  <span className="reasoning-plan-preview__label">Proposed plan</span>
+                  <output aria-live="polite">{planActionStatus}</output>
+                </div>
+                <ProposedPlan
+                  onCopy={() => setPlanActionStatus("Plan copied")}
+                  onDownload={() => setPlanActionStatus("Plan download requested")}
+                  status="completed"
+                >
+                  <AgentMarkdown>{proposedPlanShowcase}</AgentMarkdown>
+                </ProposedPlan>
+                <ProposedPlan status="writing">
+                  <AgentMarkdown streaming>{proposedPlanShowcase}</AgentMarkdown>
+                </ProposedPlan>
+              </div>
             </div>
           </GalleryCard>
 

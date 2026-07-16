@@ -9,7 +9,7 @@ Independently designed React components for building Codex-style coding-agent in
 High-fidelity preview for an initial public release. The public API may change
 before 1.0 while component and visual parity work is completed.
 
-The completed foundations cover the thread, approval, composer, and rich-text
+The completed foundations cover the thread, reasoning, plan, approval, composer, and rich-text
 surfaces: messages, GFM Markdown, inline and block code, grouped activities,
 commands, file changes, tool-call state, responsive content, controlled
 decisions, and an agent input with keyboard and running states. Run the local
@@ -47,6 +47,9 @@ the pnpm workspace. Electron is not a dependency of `codex-ui-kit`.
 - `CodeBlock`: language header, copy feedback, and wrapped/unwrapped states.
 - `AgentActivity`: accessible expandable activity primitive.
 - `ActivityGroup`: compact grouping for related activities.
+- `AgentReasoning`: active and completed reasoning disclosure states.
+- `AgentPlan`: structured pending, in-progress, and completed plan steps.
+- `ProposedPlan`: writing and completed plan-card states with action slots.
 - `ToolCallCard`: tool-call convenience component.
 - `ApprovalRequest`: controlled approve/reject surface with explicit outcomes.
 - `CommandExecution`: command activity with working directory and exit metadata.
@@ -90,9 +93,10 @@ pnpm add codex-ui-kit
 ```tsx
 import {
   ActivityGroup,
-  AgentActivity,
   AgentMarkdown,
   AgentMessage,
+  AgentPlan,
+  AgentReasoning,
   AgentThread,
 } from "codex-ui-kit";
 import "codex-ui-kit/styles.css";
@@ -105,7 +109,15 @@ export function Example() {
         <AgentMarkdown>{"**Running** `pnpm check`."}</AgentMarkdown>
       </AgentMessage>
       <ActivityGroup>
-        <AgentActivity status="running" summary="Running tests" />
+        <AgentReasoning status="running">
+          Inspecting the test configuration.
+        </AgentReasoning>
+        <AgentPlan
+          steps={[
+            { status: "completed", step: "Inspect configuration" },
+            { status: "in_progress", step: "Run tests" },
+          ]}
+        />
       </ActivityGroup>
     </AgentThread>
   );

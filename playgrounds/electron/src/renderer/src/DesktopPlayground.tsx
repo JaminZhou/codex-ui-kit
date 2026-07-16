@@ -11,6 +11,8 @@ import {
   AgentComposer,
   AgentMarkdown,
   AgentMessage,
+  AgentPlan,
+  AgentReasoning,
   AgentThread,
   ApprovalRequest,
   CommandExecution,
@@ -18,6 +20,7 @@ import {
   ComposerAttachment,
   FileChange,
   FileDiff,
+  ProposedPlan,
   StatusIndicator,
   ToolCallCard,
   type ApprovalDecision,
@@ -86,6 +89,19 @@ const desktopMarkdown = [
   "const renderer = 'electron';",
   "```",
 ].join("\n");
+
+const desktopPlanMarkdown = [
+  "### Desktop acceptance plan",
+  "",
+  "- Reuse the workspace React package.",
+  "- Exercise theme, font, scroll, and compact-window behavior.",
+].join("\n");
+
+const desktopPlanSteps = [
+  { status: "completed" as const, step: "Load the shared primitives" },
+  { status: "in_progress" as const, step: "Inspect desktop rendering" },
+  { status: "pending" as const, step: "Record the viewport matrix" },
+];
 
 function useViewportMetrics(): ViewportMetrics {
   const [metrics, setMetrics] = useState<ViewportMetrics>(() => ({
@@ -319,10 +335,18 @@ export function DesktopPlayground() {
                   </AgentMarkdown>
                 </AgentMessage>
                 <ActivityGroup>
-                  <AgentActivity
-                    kind="reasoning"
-                    status="completed"
-                    summary="Connected the isolated preload bridge"
+                  <AgentReasoning status="running">
+                    <p>
+                      Comparing system theme, font fallback, and compact-window
+                      geometry.
+                    </p>
+                  </AgentReasoning>
+                  <AgentReasoning status="completed">
+                    <p>Connected the isolated preload bridge.</p>
+                  </AgentReasoning>
+                  <AgentPlan
+                    aria-label="Desktop acceptance plan"
+                    steps={desktopPlanSteps}
                   />
                   <AgentActivity
                     defaultOpen
@@ -360,6 +384,20 @@ export function DesktopPlayground() {
                     summary="Watching native theme and viewport changes"
                   />
                 </ActivityGroup>
+                <ProposedPlan
+                  onCopy={() => undefined}
+                  onDownload={() => undefined}
+                  status="completed"
+                >
+                  <AgentMarkdown codeBlockCopyable={false}>
+                    {desktopPlanMarkdown}
+                  </AgentMarkdown>
+                </ProposedPlan>
+                <ProposedPlan status="writing">
+                  <AgentMarkdown codeBlockCopyable={false} streaming>
+                    {desktopPlanMarkdown}
+                  </AgentMarkdown>
+                </ProposedPlan>
                 <ApprovalRequest
                   decision={approvalDecision}
                   description="Exercise an interactive privileged-action surface inside the desktop Renderer."
