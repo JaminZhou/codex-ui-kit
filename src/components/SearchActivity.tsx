@@ -80,10 +80,12 @@ export function SearchActivity({
     .filter(Boolean)
     .join(" ");
   const isActive = status === "running" || status === "pending";
-  const activeEntry =
-    [...entries].reverse().find((entry) => entry.completed !== true) ??
-    entries.at(-1);
-  const detail = activeEntry?.detail ?? query;
+  const unfinishedEntry = [...entries]
+    .reverse()
+    .find((entry) => entry.completed !== true);
+  const detail = isActive
+    ? (unfinishedEntry?.detail ?? query)
+    : (entries.at(-1)?.detail ?? query);
   const webDetail = isActive || entries.length === 0 ? detail : undefined;
   const action =
     kind === "web"

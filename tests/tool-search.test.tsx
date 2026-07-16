@@ -152,6 +152,21 @@ describe("SearchActivity", () => {
     expect(html).toContain('data-search-kind="web"');
   });
 
+  it("prefers a new query over stale completed entries while running", () => {
+    const { container } = render(
+      <SearchActivity
+        entries={webEntries.map((entry) => ({ ...entry, completed: true }))}
+        kind="web"
+        query="new in-flight query"
+        status="running"
+      />,
+    );
+
+    expect(
+      container.querySelector(".codex-ui-activity__summary")?.textContent,
+    ).toBe("Searching the web for new in-flight query");
+  });
+
   it("retains the query on a standalone completed web row", () => {
     const html = renderToStaticMarkup(
       <SearchActivity kind="web" query="Codex SDK" status="completed" />,
