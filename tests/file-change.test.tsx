@@ -230,6 +230,23 @@ describe("FileDiff", () => {
     expect(fallback).toContain('data-size="fallback"');
   });
 
+  it("updates edge fades without replacing a caller scroll handler", () => {
+    const onScroll = vi.fn();
+    const { container } = render(<FileDiff lines={lines} onScroll={onScroll} />);
+    const diff = container.querySelector(".codex-ui-file-diff") as HTMLDivElement;
+    Object.defineProperties(diff, {
+      clientHeight: { configurable: true, value: 100 },
+      scrollHeight: { configurable: true, value: 240 },
+    });
+    diff.scrollTop = 40;
+
+    fireEvent.scroll(diff);
+
+    expect(onScroll).toHaveBeenCalledOnce();
+    expect(diff.hasAttribute("data-fade-top")).toBe(true);
+    expect(diff.hasAttribute("data-fade-bottom")).toBe(true);
+  });
+
   it("renders a useful empty diff state", () => {
     const html = renderToStaticMarkup(<FileDiff lines={[]} />);
 

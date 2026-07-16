@@ -287,6 +287,7 @@ export function FileDiff({
   className,
   emptyLabel = "No diff lines",
   lines,
+  onScroll,
   renderContent,
   size = "default",
   wrapLines = false,
@@ -336,7 +337,10 @@ export function FileDiff({
       data-fade-top={fade.top || undefined}
       data-size={size}
       data-wrap={wrapLines || undefined}
-      onScroll={updateFade}
+      onScroll={(event) => {
+        updateFade();
+        onScroll?.(event);
+      }}
       ref={rootRef}
       role="list"
       {...props}
