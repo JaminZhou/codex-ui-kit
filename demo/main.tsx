@@ -94,7 +94,7 @@ const markdownShowcase = [
   "| Browser | ready |",
   "| Electron | ready |",
   "",
-  "```tsx",
+  "```typescript",
   "export function Result() {",
   "  return <AgentMarkdown>Measured output</AgentMarkdown>;",
   "}",

@@ -42,6 +42,27 @@
   --codex-ui-yellow-300: #ffd240;
   --codex-ui-yellow-400: #ffc300;
 
+  --codex-ui-code-syntax-light-foreground: #383a42;
+  --codex-ui-code-syntax-light-comment: #a0a1a7;
+  --codex-ui-code-syntax-light-meta: #4078f2;
+  --codex-ui-code-syntax-light-builtin: #c18401;
+  --codex-ui-code-syntax-light-keyword: #a626a4;
+  --codex-ui-code-syntax-light-literal: #0184bb;
+  --codex-ui-code-syntax-light-section: #e45649;
+  --codex-ui-code-syntax-light-string: #50a14f;
+  --codex-ui-code-syntax-light-variable: #986801;
+  --codex-ui-code-syntax-light-title: #4078f2;
+  --codex-ui-code-syntax-dark-foreground: #ffffff;
+  --codex-ui-code-syntax-dark-comment: rgb(255 255 255 / 0.5);
+  --codex-ui-code-syntax-dark-meta: rgb(255 255 255 / 0.6);
+  --codex-ui-code-syntax-dark-builtin: #e9950c;
+  --codex-ui-code-syntax-dark-keyword: #2e95d3;
+  --codex-ui-code-syntax-dark-literal: #2e95d3;
+  --codex-ui-code-syntax-dark-section: #f22c3d;
+  --codex-ui-code-syntax-dark-string: #00a67d;
+  --codex-ui-code-syntax-dark-variable: #df3079;
+  --codex-ui-code-syntax-dark-title: #f22c3d;
+
   --codex-ui-font-sans-default: -apple-system, BlinkMacSystemFont, "Segoe UI",
     sans-serif;
   --codex-ui-font-openai-sans: "OpenAI Sans",
@@ -102,6 +123,7 @@
 :root,
 [data-theme="light"] {
   color-scheme: light;
+  --codex-ui-code-syntax-comment-style: italic;
   --codex-ui-background-surface: var(--codex-ui-gray-0);
   --codex-ui-background-surface-under: var(--codex-ui-gray-50);
   --codex-ui-background-editor-opaque: color-mix(
@@ -223,6 +245,7 @@
 
 [data-theme="dark"] {
   color-scheme: dark;
+  --codex-ui-code-syntax-comment-style: normal;
   --codex-ui-background-surface: var(--codex-ui-gray-900);
   --codex-ui-background-surface-under: #000000;
   --codex-ui-background-editor-opaque: var(--codex-ui-gray-800);
@@ -345,6 +368,7 @@
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     color-scheme: dark;
+    --codex-ui-code-syntax-comment-style: normal;
     --codex-ui-background-surface: var(--codex-ui-gray-900);
     --codex-ui-background-surface-under: #000000;
     --codex-ui-background-editor-opaque: var(--codex-ui-gray-800);
@@ -470,6 +494,46 @@
   --codex-ui-bg-subtle: var(--codex-ui-background-editor-opaque);
   --codex-ui-bg-elevated: var(--codex-ui-background-elevated-primary);
   --codex-ui-code-block-bg: var(--codex-ui-background-editor-opaque);
+  --codex-ui-code-syntax-foreground: light-dark(
+    var(--codex-ui-code-syntax-light-foreground),
+    var(--codex-ui-code-syntax-dark-foreground)
+  );
+  --codex-ui-code-syntax-comment: light-dark(
+    var(--codex-ui-code-syntax-light-comment),
+    var(--codex-ui-code-syntax-dark-comment)
+  );
+  --codex-ui-code-syntax-meta: light-dark(
+    var(--codex-ui-code-syntax-light-meta),
+    var(--codex-ui-code-syntax-dark-meta)
+  );
+  --codex-ui-code-syntax-builtin: light-dark(
+    var(--codex-ui-code-syntax-light-builtin),
+    var(--codex-ui-code-syntax-dark-builtin)
+  );
+  --codex-ui-code-syntax-keyword: light-dark(
+    var(--codex-ui-code-syntax-light-keyword),
+    var(--codex-ui-code-syntax-dark-keyword)
+  );
+  --codex-ui-code-syntax-literal: light-dark(
+    var(--codex-ui-code-syntax-light-literal),
+    var(--codex-ui-code-syntax-dark-literal)
+  );
+  --codex-ui-code-syntax-section: light-dark(
+    var(--codex-ui-code-syntax-light-section),
+    var(--codex-ui-code-syntax-dark-section)
+  );
+  --codex-ui-code-syntax-string: light-dark(
+    var(--codex-ui-code-syntax-light-string),
+    var(--codex-ui-code-syntax-dark-string)
+  );
+  --codex-ui-code-syntax-variable: light-dark(
+    var(--codex-ui-code-syntax-light-variable),
+    var(--codex-ui-code-syntax-dark-variable)
+  );
+  --codex-ui-code-syntax-title: light-dark(
+    var(--codex-ui-code-syntax-light-title),
+    var(--codex-ui-code-syntax-dark-title)
+  );
   --codex-ui-inline-code-bg: color-mix(
     in oklab,
     var(--codex-ui-text-foreground) 6%,

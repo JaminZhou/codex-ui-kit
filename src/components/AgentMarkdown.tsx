@@ -12,6 +12,31 @@ import remarkGfm from "remark-gfm";
 
 export type CodeCopyHandler = (code: string) => void | Promise<void>;
 
+export interface CodeHighlightResult {
+  code: string;
+  html: string;
+  language?: string;
+}
+
+export type CodeHighlighter = (
+  code: string,
+  language?: string,
+) => CodeHighlightResult | Promise<CodeHighlightResult>;
+
+const codeHighlightIntervalMs = 120;
+let defaultCodeHighlighter: Promise<CodeHighlighter> | undefined;
+
+function getCodeHighlightClock() {
+  return typeof performance === "undefined" ? Date.now() : performance.now();
+}
+
+function loadDefaultCodeHighlighter() {
+  defaultCodeHighlighter ??= import("../highlightCode").then(
+    ({ highlightCode }) => highlightCode,
+  );
+  return defaultCodeHighlighter;
+}
+
 export interface InlineCodeProps extends HTMLAttributes<HTMLElement> {
   children: ReactNode;
 }
@@ -31,9 +56,11 @@ export function InlineCode({ children, className, ...props }: InlineCodeProps) {
 export interface CodeBlockProps
   extends Omit<HTMLAttributes<HTMLElement>, "children" | "onCopy"> {
   children: string;
+  codeHighlighter?: CodeHighlighter | false;
   copiedLabel?: ReactNode;
   copyLabel?: ReactNode;
   copyable?: boolean;
+  deferHighlightUntilVisible?: boolean;
   language?: string;
   label?: ReactNode;
   onCopy?: CodeCopyHandler;
@@ -52,9 +79,11 @@ async function copyText(value: string) {
 export function CodeBlock({
   children,
   className,
+  codeHighlighter,
   copiedLabel = "Copied",
   copyLabel = "Copy code",
   copyable = true,
+  deferHighlightUntilVisible = true,
   language,
   label,
   onCopy,
@@ -62,6 +91,15 @@ export function CodeBlock({
   ...props
 }: CodeBlockProps) {
   const [copied, setCopied] = useState(false);
+  const [canHighlight, setCanHighlight] = useState(
+    !deferHighlightUntilVisible,
+  );
+  const [highlighted, setHighlighted] = useState<{
+    requestedLanguage?: string;
+    result: CodeHighlightResult;
+    source?: CodeHighlighter;
+  }>();
+  const containerRef = useRef<HTMLElement | null>(null);
   const resetTimer = useRef<ReturnType<typeof setTimeout> | undefined>(
     undefined,
   );
@@ -77,6 +115,131 @@ export function CodeBlock({
     : typeof copyLabel === "string"
       ? copyLabel
       : "Copy code";
+  const highlightRequest = useRef({
+    disposed: false,
+    lastStartedAtMs: null as number | null,
+    latestCode: normalizedCode,
+    latestHighlighter: codeHighlighter,
+    latestLanguage: language,
+    timeoutHandle: undefined as ReturnType<typeof setTimeout> | undefined,
+  });
+  highlightRequest.current.latestCode = normalizedCode;
+  highlightRequest.current.latestHighlighter = codeHighlighter;
+  highlightRequest.current.latestLanguage = language;
+
+  useEffect(() => {
+    if (canHighlight || !deferHighlightUntilVisible) {
+      if (!canHighlight) setCanHighlight(true);
+      return;
+    }
+
+    const container = containerRef.current;
+    if (!container) return;
+
+    if (typeof IntersectionObserver === "undefined") {
+      const fallbackTimer = setTimeout(() => setCanHighlight(true), 0);
+      return () => clearTimeout(fallbackTimer);
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((entry) => entry.isIntersecting)) {
+          setCanHighlight(true);
+          observer.disconnect();
+        }
+      },
+      { rootMargin: "600px 0px" },
+    );
+    observer.observe(container);
+    return () => observer.disconnect();
+  }, [canHighlight, deferHighlightUntilVisible]);
+
+  useEffect(() => {
+    const request = highlightRequest.current;
+    request.disposed = false;
+
+    return () => {
+      request.disposed = true;
+      if (request.timeoutHandle !== undefined) {
+        clearTimeout(request.timeoutHandle);
+        request.timeoutHandle = undefined;
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    const request = highlightRequest.current;
+    if (
+      !canHighlight ||
+      request.latestHighlighter === false ||
+      request.timeoutHandle !== undefined
+    ) {
+      return;
+    }
+
+    const now = getCodeHighlightClock();
+    const timeSinceLastStart =
+      request.lastStartedAtMs === null
+        ? codeHighlightIntervalMs
+        : now - request.lastStartedAtMs;
+    const delay = Math.max(0, codeHighlightIntervalMs - timeSinceLastStart);
+    const startHighlighting = () => {
+      request.timeoutHandle = undefined;
+      if (request.disposed) return;
+
+      const code = request.latestCode;
+      const requestedLanguage = request.latestLanguage;
+      const selectedHighlighter = request.latestHighlighter;
+      if (selectedHighlighter === false) return;
+      request.lastStartedAtMs = getCodeHighlightClock();
+
+      const highlightPromise =
+        selectedHighlighter === undefined
+          ? loadDefaultCodeHighlighter().then((highlighter) =>
+              highlighter(code, requestedLanguage),
+            )
+          : Promise.resolve().then(() =>
+              selectedHighlighter(code, requestedLanguage),
+            );
+
+      void highlightPromise
+        .then((result) => {
+          if (
+            request.disposed ||
+            result.code !== code ||
+            request.latestHighlighter !== selectedHighlighter ||
+            request.latestLanguage !== requestedLanguage
+          ) {
+            return;
+          }
+          setHighlighted({
+            requestedLanguage,
+            result,
+            source: selectedHighlighter,
+          });
+        })
+        .catch(() => undefined);
+    };
+
+    if (delay === 0) {
+      startHighlighting();
+      return;
+    }
+
+    request.timeoutHandle = setTimeout(startHighlighting, delay);
+  }, [canHighlight, codeHighlighter, language, normalizedCode]);
+
+  const compatibleHighlight =
+    codeHighlighter !== false &&
+    highlighted !== undefined &&
+    highlighted.source === codeHighlighter &&
+    highlighted.requestedLanguage === language &&
+    normalizedCode.startsWith(highlighted.result.code)
+      ? highlighted.result
+      : undefined;
+  const unhighlightedSuffix = compatibleHighlight
+    ? normalizedCode.slice(compatibleHighlight.code.length)
+    : normalizedCode;
 
   useEffect(
     () => () => {
@@ -108,6 +271,7 @@ export function CodeBlock({
 
   return (
     <figure
+      ref={containerRef}
       className={classes}
       data-language={language}
       data-markdown-copy="code-block"
@@ -130,8 +294,23 @@ export function CodeBlock({
         ) : null}
       </figcaption>
       <pre className="codex-ui-code-block__body" dir="ltr">
-        <code className={language ? `language-${language}` : undefined}>
-          {normalizedCode}
+        <code
+          className={[
+            compatibleHighlight ? "hljs" : undefined,
+            language ? `language-${language}` : undefined,
+          ]
+            .filter(Boolean)
+            .join(" ")}
+          data-highlight-language={compatibleHighlight?.language}
+          data-highlighted={compatibleHighlight ? true : undefined}
+        >
+          {compatibleHighlight ? (
+            <span
+              className="codex-ui-code-block__highlight"
+              dangerouslySetInnerHTML={{ __html: compatibleHighlight.html }}
+            />
+          ) : null}
+          {unhighlightedSuffix}
         </code>
       </pre>
     </figure>
@@ -178,6 +357,7 @@ export function stabilizeStreamingMarkdown(source: string) {
 export interface AgentMarkdownProps
   extends Omit<HTMLAttributes<HTMLDivElement>, "children"> {
   children: string;
+  codeHighlighter?: CodeHighlighter | false;
   codeBlockCopyable?: boolean;
   codeBlockWrap?: boolean;
   components?: Components;
@@ -189,6 +369,7 @@ export interface AgentMarkdownProps
 export function AgentMarkdown({
   children,
   className,
+  codeHighlighter,
   codeBlockCopyable = true,
   codeBlockWrap = false,
   components,
@@ -233,6 +414,7 @@ export function AgentMarkdown({
           if (isBlock) {
             return (
               <CodeBlock
+                codeHighlighter={codeHighlighter}
                 copyable={codeBlockCopyable}
                 language={language}
                 onCopy={handleCodeCopy}
@@ -277,6 +459,7 @@ export function AgentMarkdown({
     [
       codeBlockCopyable,
       codeBlockWrap,
+      codeHighlighter,
       components,
       hasCodeCopyHandler,
       linkTarget,

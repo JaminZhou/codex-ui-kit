@@ -42,7 +42,7 @@ the pnpm workspace. Electron is not a dependency of `codex-ui-kit`.
 - `AgentThread`: responsive thread content column.
 - `AgentMessage`: user, assistant, and system message presentation.
 - `AgentMarkdown`: safe GFM rendering with measured rich-text geometry and
-  streaming stabilization.
+  streaming stabilization plus viewport-aware lazy syntax highlighting.
 - `InlineCode`: standalone inline-code treatment.
 - `CodeBlock`: language header, copy feedback, and wrapped/unwrapped states.
 - `AgentActivity`: accessible expandable activity primitive.
@@ -115,6 +115,15 @@ export function Example() {
 `AgentMarkdown` parses GFM but does not enable raw HTML. Hosts can override its
 semantic renderer map and code-copy handler without coupling the component to a
 protocol or clipboard bridge.
+
+Fenced code uses the same observed highlight.js language surface as the sampled
+desktop build. Highlighting is loaded only when needed, starts when a block is
+within `600px` of the viewport, and is throttled to one start per `120ms` while
+streaming. The previous highlighted prefix remains stable while newly streamed
+text is still plain. Pass `codeHighlighter={false}` to disable highlighting or a
+`CodeHighlighter` to integrate another engine. A custom highlighter's `html`
+result is rendered as trusted markup, so the host must escape untrusted code;
+the built-in highlighter performs that escaping.
 
 ## Research and provenance
 
