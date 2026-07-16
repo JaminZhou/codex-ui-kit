@@ -118,6 +118,29 @@ describe("ProposedPlan", () => {
     ).toBe("false");
   });
 
+  it("does not override the uncontrolled disclosure when writing completes", () => {
+    const { rerender } = render(
+      <ProposedPlan status="writing">
+        <p>Plan content</p>
+      </ProposedPlan>,
+    );
+
+    rerender(
+      <ProposedPlan status="completed">
+        <p>Plan content</p>
+      </ProposedPlan>,
+    );
+
+    expect(
+      screen
+        .getByRole("button", { name: "Expand plan summary" })
+        .getAttribute("aria-expanded"),
+    ).toBe("false");
+    expect(
+      screen.getByText("Plan content").closest("[hidden]")?.hasAttribute("hidden"),
+    ).toBe(true);
+  });
+
   it("shows completed actions and copy feedback", async () => {
     const onCopy = vi.fn(async () => undefined);
     const onDownload = vi.fn();

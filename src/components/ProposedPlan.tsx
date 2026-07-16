@@ -87,6 +87,9 @@ export function ProposedPlan({
   writingTitle = "Writing plan",
   ...props
 }: ProposedPlanProps) {
+  // Seed the disclosure once, matching the sampled client: streaming completion
+  // must not override a user's current choice. Hosts can control `collapsed`
+  // when their product intentionally changes that state on completion.
   const [internalCollapsed, setInternalCollapsed] = useState(
     () => defaultCollapsed ?? status === "writing",
   );
