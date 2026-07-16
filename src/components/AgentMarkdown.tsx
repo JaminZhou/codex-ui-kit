@@ -1,0 +1,297 @@
+import {
+  isValidElement,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type HTMLAttributes,
+  type ReactNode,
+} from "react";
+import ReactMarkdown, { type Components } from "react-markdown";
+import remarkGfm from "remark-gfm";
+
+export type CodeCopyHandler = (code: string) => void | Promise<void>;
+
+export interface InlineCodeProps extends HTMLAttributes<HTMLElement> {
+  children: ReactNode;
+}
+
+export function InlineCode({ children, className, ...props }: InlineCodeProps) {
+  const classes = ["codex-ui-inline-code", className]
+    .filter(Boolean)
+    .join(" ");
+
+  return (
+    <code className={classes} {...props}>
+      {children}
+    </code>
+  );
+}
+
+export interface CodeBlockProps
+  extends Omit<HTMLAttributes<HTMLElement>, "children" | "onCopy"> {
+  children: string;
+  copiedLabel?: ReactNode;
+  copyLabel?: ReactNode;
+  copyable?: boolean;
+  language?: string;
+  label?: ReactNode;
+  onCopy?: CodeCopyHandler;
+  wrap?: boolean;
+}
+
+async function copyText(value: string) {
+  if (typeof navigator === "undefined" || !navigator.clipboard?.writeText) {
+    return false;
+  }
+
+  await navigator.clipboard.writeText(value);
+  return true;
+}
+
+export function CodeBlock({
+  children,
+  className,
+  copiedLabel = "Copied",
+  copyLabel = "Copy code",
+  copyable = true,
+  language,
+  label,
+  onCopy,
+  wrap = false,
+  ...props
+}: CodeBlockProps) {
+  const [copied, setCopied] = useState(false);
+  const resetTimer = useRef<ReturnType<typeof setTimeout> | undefined>(
+    undefined,
+  );
+  const classes = ["codex-ui-code-block", className]
+    .filter(Boolean)
+    .join(" ");
+  const normalizedCode = children.replace(/\n$/, "");
+  const resolvedLabel = label ?? language ?? "text";
+  const accessibleCopyLabel = copied
+    ? typeof copiedLabel === "string"
+      ? copiedLabel
+      : "Copied"
+    : typeof copyLabel === "string"
+      ? copyLabel
+      : "Copy code";
+
+  useEffect(
+    () => () => {
+      if (resetTimer.current !== undefined) {
+        clearTimeout(resetTimer.current);
+      }
+    },
+    [],
+  );
+
+  const handleCopy = async () => {
+    try {
+      if (onCopy) {
+        await onCopy(normalizedCode);
+      } else {
+        const copiedToClipboard = await copyText(normalizedCode);
+        if (!copiedToClipboard) return;
+      }
+    } catch {
+      return;
+    }
+
+    setCopied(true);
+    if (resetTimer.current !== undefined) {
+      clearTimeout(resetTimer.current);
+    }
+    resetTimer.current = setTimeout(() => setCopied(false), 2_000);
+  };
+
+  return (
+    <figure
+      className={classes}
+      data-language={language}
+      data-markdown-copy="code-block"
+      data-markdown-copy-text={normalizedCode}
+      data-wrap={wrap || undefined}
+      {...props}
+    >
+      <figcaption className="codex-ui-code-block__header">
+        <span className="codex-ui-code-block__language">{resolvedLabel}</span>
+        {copyable ? (
+          <button
+            aria-label={accessibleCopyLabel}
+            className="codex-ui-code-block__copy"
+            data-copied={copied || undefined}
+            onClick={() => void handleCopy()}
+            type="button"
+          >
+            {copied ? copiedLabel : copyLabel}
+          </button>
+        ) : null}
+      </figcaption>
+      <pre className="codex-ui-code-block__body" dir="ltr">
+        <code className={language ? `language-${language}` : undefined}>
+          {normalizedCode}
+        </code>
+      </pre>
+    </figure>
+  );
+}
+
+export function stabilizeStreamingMarkdown(source: string) {
+  let stabilized = source;
+  let openFence: { marker: "`" | "~"; length: number } | undefined;
+
+  for (const line of stabilized.split("\n")) {
+    const fence = /^ {0,3}(`{3,}|~{3,})(.*)$/.exec(line);
+    if (!fence) continue;
+
+    const marker = fence[1][0] as "`" | "~";
+    const length = fence[1].length;
+    const suffix = fence[2];
+
+    if (!openFence) {
+      openFence = { marker, length };
+    } else if (
+      marker === openFence.marker &&
+      length >= openFence.length &&
+      suffix.trim() === ""
+    ) {
+      openFence = undefined;
+    }
+  }
+
+  if (openFence) {
+    const closingFence = openFence.marker.repeat(openFence.length);
+    stabilized += stabilized.endsWith("\n")
+      ? closingFence
+      : `\n${closingFence}`;
+  }
+
+  if (/\[[^\]\n]*\]\([^\)\n]*$/.test(stabilized)) {
+    stabilized += ")";
+  }
+
+  return stabilized;
+}
+
+export interface AgentMarkdownProps
+  extends Omit<HTMLAttributes<HTMLDivElement>, "children"> {
+  children: string;
+  codeBlockCopyable?: boolean;
+  codeBlockWrap?: boolean;
+  components?: Components;
+  linkTarget?: "_blank" | "_parent" | "_self" | "_top";
+  onCopyCode?: CodeCopyHandler;
+  streaming?: boolean;
+}
+
+export function AgentMarkdown({
+  children,
+  className,
+  codeBlockCopyable = true,
+  codeBlockWrap = false,
+  components,
+  linkTarget,
+  onCopyCode,
+  streaming = false,
+  ...props
+}: AgentMarkdownProps) {
+  const classes = ["codex-ui-markdown", className].filter(Boolean).join(" ");
+  const source = streaming ? stabilizeStreamingMarkdown(children) : children;
+  const onCopyCodeRef = useRef(onCopyCode);
+  onCopyCodeRef.current = onCopyCode;
+  const hasCodeCopyHandler = onCopyCode !== undefined;
+  const markdownComponents = useMemo<Components>(
+    () => {
+      const handleCodeCopy: CodeCopyHandler | undefined = hasCodeCopyHandler
+        ? (code) => onCopyCodeRef.current?.(code)
+        : undefined;
+
+      return {
+        a({ children: linkChildren, node: _node, ...linkProps }) {
+          return (
+            <a
+              {...linkProps}
+              rel={linkTarget === "_blank" ? "noreferrer" : linkProps.rel}
+              target={linkTarget}
+            >
+              {linkChildren}
+            </a>
+          );
+        },
+        code({
+          children: codeChildren,
+          className: codeClassName,
+          node: _node,
+          ...codeProps
+        }) {
+          const value = String(codeChildren);
+          const language = /language-([^\s]+)/.exec(codeClassName ?? "")?.[1];
+          const isBlock = Boolean(language) || value.endsWith("\n");
+
+          if (isBlock) {
+            return (
+              <CodeBlock
+                copyable={codeBlockCopyable}
+                language={language}
+                onCopy={handleCodeCopy}
+                wrap={codeBlockWrap}
+              >
+                {value}
+              </CodeBlock>
+            );
+          }
+
+          return (
+            <InlineCode className={codeClassName} {...codeProps}>
+              {codeChildren}
+            </InlineCode>
+          );
+        },
+        img({ alt = "", node: _node, ...imageProps }) {
+          return <img alt={alt} loading="lazy" {...imageProps} />;
+        },
+        pre({ children: preChildren, node: _node, ...preProps }) {
+          if (
+            isValidElement(preChildren) &&
+            preChildren.type === CodeBlock
+          ) {
+            return preChildren;
+          }
+
+          return <pre {...preProps}>{preChildren}</pre>;
+        },
+        table({ children: tableChildren, node: _node, ...tableProps }) {
+          return (
+            <div className="codex-ui-markdown__table-scroll" tabIndex={0}>
+              <div className="codex-ui-markdown__table-margin">
+                <table {...tableProps}>{tableChildren}</table>
+              </div>
+            </div>
+          );
+        },
+        ...components,
+      };
+    },
+    [
+      codeBlockCopyable,
+      codeBlockWrap,
+      components,
+      hasCodeCopyHandler,
+      linkTarget,
+    ],
+  );
+
+  return (
+    <div
+      className={classes}
+      data-streaming={streaming || undefined}
+      {...props}
+    >
+      <ReactMarkdown components={markdownComponents} remarkPlugins={[remarkGfm]}>
+        {source}
+      </ReactMarkdown>
+    </div>
+  );
+}

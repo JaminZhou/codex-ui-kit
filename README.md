@@ -9,10 +9,11 @@ Independently designed React components for building Codex-style coding-agent in
 High-fidelity preview for an initial public release. The public API may change
 before 1.0 while component and visual parity work is completed.
 
-The completed foundations cover the thread, approval, and composer surfaces:
-messages, grouped activities, commands, file changes, tool-call state,
-responsive content, controlled decisions, and an agent input with keyboard and
-running states. Run the local showcase with:
+The completed foundations cover the thread, approval, composer, and rich-text
+surfaces: messages, GFM Markdown, inline and block code, grouped activities,
+commands, file changes, tool-call state, responsive content, controlled
+decisions, and an agent input with keyboard and running states. Run the local
+showcase with:
 
 ```bash
 pnpm dev
@@ -40,6 +41,10 @@ the pnpm workspace. Electron is not a dependency of `codex-ui-kit`.
 
 - `AgentThread`: responsive thread content column.
 - `AgentMessage`: user, assistant, and system message presentation.
+- `AgentMarkdown`: safe GFM rendering with measured rich-text geometry and
+  streaming stabilization.
+- `InlineCode`: standalone inline-code treatment.
+- `CodeBlock`: language header, copy feedback, and wrapped/unwrapped states.
 - `AgentActivity`: accessible expandable activity primitive.
 - `ActivityGroup`: compact grouping for related activities.
 - `ToolCallCard`: tool-call convenience component.
@@ -86,6 +91,7 @@ pnpm add codex-ui-kit
 import {
   ActivityGroup,
   AgentActivity,
+  AgentMarkdown,
   AgentMessage,
   AgentThread,
 } from "codex-ui-kit";
@@ -95,6 +101,9 @@ export function Example() {
   return (
     <AgentThread aria-label="Coding agent thread">
       <AgentMessage role="user">Run the checks.</AgentMessage>
+      <AgentMessage role="assistant">
+        <AgentMarkdown>{"**Running** `pnpm check`."}</AgentMarkdown>
+      </AgentMessage>
       <ActivityGroup>
         <AgentActivity status="running" summary="Running tests" />
       </ActivityGroup>
@@ -102,6 +111,10 @@ export function Example() {
   );
 }
 ```
+
+`AgentMarkdown` parses GFM but does not enable raw HTML. Hosts can override its
+semantic renderer map and code-copy handler without coupling the component to a
+protocol or clipboard bridge.
 
 ## Research and provenance
 

@@ -4,6 +4,7 @@ import {
   ActivityGroup,
   AgentActivity,
   AgentComposer,
+  AgentMarkdown,
   AgentMessage,
   AgentThread,
   ApprovalRequest,
@@ -77,6 +78,36 @@ const showcaseDiffLines: FileDiffLine[] = [
   },
 ];
 
+const markdownShowcase = [
+  "## Implementation notes",
+  "",
+  "Use **semantic markup** with `inline code`, [links](https://example.com), and measured spacing.",
+  "",
+  "> Keep the package protocol-neutral while matching the rendered behavior.",
+  "",
+  "- [x] Parse GFM content",
+  "- [x] Preserve table overflow",
+  "- [ ] Finish every parity row",
+  "",
+  "| Surface | State |",
+  "| --- | ---: |",
+  "| Browser | ready |",
+  "| Electron | ready |",
+  "",
+  "```tsx",
+  "export function Result() {",
+  "  return <AgentMarkdown>Measured output</AgentMarkdown>;",
+  "}",
+  "```",
+].join("\n");
+
+const streamingMarkdownShowcase = [
+  "Streaming keeps an unfinished fence stable:",
+  "",
+  "```ts",
+  "const status = 'running';",
+].join("\n");
+
 function Showcase() {
   const [dark, setDark] = useState(false);
   const [composerValue, setComposerValue] = useState(
@@ -87,6 +118,8 @@ function Showcase() {
   const [hasAttachment, setHasAttachment] = useState(true);
   const [approvalDecision, setApprovalDecision] =
     useState<ApprovalDecision>("pending");
+  const [wrapMarkdownCode, setWrapMarkdownCode] = useState(false);
+  const [markdownCopyStatus, setMarkdownCopyStatus] = useState("Ready to copy");
 
   return (
     <main
@@ -175,6 +208,45 @@ function Showcase() {
                   The implementation is ready; I’m waiting for the final checks.
                 </AgentMessage>
               </AgentThread>
+            </div>
+          </GalleryCard>
+
+          <GalleryCard
+            description="Measured typography, GFM structure, code actions, overflow, and streaming-safe rendering."
+            title="Markdown and code"
+            wide
+          >
+            <div className="markdown-preview">
+              <div className="markdown-preview__controls">
+                <button
+                  aria-pressed={wrapMarkdownCode}
+                  onClick={() => setWrapMarkdownCode((value) => !value)}
+                  type="button"
+                >
+                  {wrapMarkdownCode ? "Disable" : "Enable"} code wrapping
+                </button>
+                <output aria-live="polite">{markdownCopyStatus}</output>
+              </div>
+              <div className="markdown-preview__grid">
+                <div className="markdown-preview__surface">
+                  <span className="markdown-preview__label">Complete</span>
+                  <AgentMarkdown
+                    codeBlockWrap={wrapMarkdownCode}
+                    linkTarget="_blank"
+                    onCopyCode={(code) => {
+                      setMarkdownCopyStatus(`Copied ${code.length} characters`);
+                    }}
+                  >
+                    {markdownShowcase}
+                  </AgentMarkdown>
+                </div>
+                <div className="markdown-preview__surface">
+                  <span className="markdown-preview__label">Streaming</span>
+                  <AgentMarkdown codeBlockCopyable={false} streaming>
+                    {streamingMarkdownShowcase}
+                  </AgentMarkdown>
+                </div>
+              </div>
             </div>
           </GalleryCard>
 
