@@ -66,7 +66,9 @@ describe("ActivityTimeline", () => {
         <span>Grouped activity</span>
       </ActivityTimeline>,
     );
-    const toggle = screen.getByRole("button", { name: "Expand activity" });
+    const toggle = screen.getByRole("button", {
+      name: "2 previous messages",
+    });
 
     expect(screen.getByText("2 previous messages")).toBeTruthy();
     expect(toggle.getAttribute("aria-expanded")).toBe("false");
@@ -94,7 +96,7 @@ describe("ActivityTimeline", () => {
     expect(screen.getByText("Current running activity")).toBeTruthy();
     expect(screen.getByText("Completed activity")).toBeTruthy();
 
-    fireEvent.click(screen.getByRole("button", { name: "Collapse activity" }));
+    fireEvent.click(screen.getByRole("button", { name: "Worked for 12s" }));
 
     expect(screen.getByText("Current running activity")).toBeTruthy();
     expect(screen.queryByText("Completed activity")).toBeNull();
@@ -107,7 +109,7 @@ describe("ActivityTimeline", () => {
         <span>Hidden work</span>
       </ActivityTimeline>,
     );
-    const toggle = screen.getByRole("button", { name: "Expand activity" });
+    const toggle = screen.getByRole("button", { name: "Working" });
 
     fireEvent.click(toggle);
 
@@ -125,6 +127,30 @@ describe("ActivityTimeline", () => {
 
     expect(screen.getByText("Always visible activity")).toBeTruthy();
     expect(screen.queryByRole("button")).toBeNull();
+  });
+
+  it("keeps each visible summary in the disclosure accessible name", () => {
+    render(
+      <>
+        <ActivityTimeline summary="Worked for 1m">
+          <span>Completed work</span>
+        </ActivityTimeline>
+        <ActivityTimeline defaultOpen summary="You stopped after 8s">
+          <span>Interrupted work</span>
+        </ActivityTimeline>
+      </>,
+    );
+
+    expect(
+      screen
+        .getByRole("button", { name: "Worked for 1m" })
+        .getAttribute("aria-expanded"),
+    ).toBe("false");
+    expect(
+      screen
+        .getByRole("button", { name: "You stopped after 8s" })
+        .getAttribute("aria-expanded"),
+    ).toBe("true");
   });
 });
 

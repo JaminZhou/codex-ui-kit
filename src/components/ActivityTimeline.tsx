@@ -9,9 +9,7 @@ export interface ActivityTimelineProps
   extends Omit<HTMLAttributes<HTMLDivElement>, "children"> {
   children?: ReactNode;
   collapsedCount?: number;
-  collapseLabel?: string;
   defaultOpen?: boolean;
-  expandLabel?: string;
   onOpenChange?: (open: boolean) => void;
   open?: boolean;
   persistentContent?: ReactNode;
@@ -29,9 +27,7 @@ export function ActivityTimeline({
   children,
   className,
   collapsedCount = 0,
-  collapseLabel = "Collapse activity",
   defaultOpen = false,
-  expandLabel = "Expand activity",
   onOpenChange,
   open,
   persistentContent,
@@ -73,7 +69,6 @@ export function ActivityTimeline({
           <button
             aria-controls={contentId}
             aria-expanded={resolvedOpen}
-            aria-label={resolvedOpen ? collapseLabel : expandLabel}
             className="codex-ui-activity-timeline__toggle"
             onClick={() => setOpen(!resolvedOpen)}
             type="button"
