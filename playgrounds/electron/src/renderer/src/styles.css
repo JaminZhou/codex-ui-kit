@@ -239,7 +239,8 @@ button {
 }
 
 .acceptance-card--activity,
-.acceptance-card--command {
+.acceptance-card--command,
+.acceptance-card--file {
   grid-column: 1 / -1;
 }
 
@@ -283,6 +284,34 @@ button {
 }
 
 .command-state-matrix__label {
+  color: var(--codex-ui-text-tertiary);
+  display: block;
+  font-size: 0.625rem;
+  font-weight: 600;
+  margin-bottom: 0.875rem;
+  text-transform: uppercase;
+}
+
+.file-state-matrix {
+  background: var(--codex-ui-bg-subtle);
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.file-state-matrix > div {
+  background: var(--codex-ui-bg);
+  border: 1px solid var(--codex-ui-border);
+  border-radius: var(--codex-ui-radius-lg);
+  min-width: 0;
+  padding: 1rem;
+}
+
+.file-state-matrix__wide {
+  grid-column: 1 / -1;
+}
+
+.file-state-matrix__label {
   color: var(--codex-ui-text-tertiary);
   display: block;
   font-size: 0.625rem;
@@ -498,7 +527,16 @@ button {
   }
 
   .acceptance-card--activity,
-  .acceptance-card--command {
+  .acceptance-card--command,
+  .acceptance-card--file {
+    grid-column: auto;
+  }
+
+  .file-state-matrix {
+    grid-template-columns: 1fr;
+  }
+
+  .file-state-matrix__wide {
     grid-column: auto;
   }
 

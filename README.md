@@ -60,8 +60,12 @@ the pnpm workspace. Electron is not a dependency of `codex-ui-kit`.
   duration, copy, background-terminal, success, failure, and interruption states.
 - `CommandOutput`: independently labeled stdout/stderr output with no-output,
   tail-following, `140px` overflow, edge-fade, and copy behavior.
-- `FileChange`: file path, rename, change-kind, and diff-stat activity.
-- `FileDiff`: structured context, hunk, addition, and deletion lines.
+- `FileChange`: creating, applied, stopped, rejected, deleted, and renamed
+  activities with controlled disclosure, diff statistics, path opening, copy,
+  and state-specific empty content.
+- `FileDiff`: structured context, hunk, metadata, addition, and deletion lines
+  with host-rendered syntax tokens, optional wrapping, `100px`/`240px`/`160px`
+  viewport modes, and scroll-edge fades.
 - `StatusIndicator`: visual state primitive.
 - `AgentComposer`: controlled input surface with submit, stop, and slot APIs.
 - `ComposerAttachment`: removable attachment metadata primitive.

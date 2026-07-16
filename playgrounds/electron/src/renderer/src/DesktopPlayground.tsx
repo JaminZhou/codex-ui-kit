@@ -21,6 +21,7 @@ import {
   ComposerAttachment,
   FileChange,
   FileDiff,
+  fileDiffToText,
   ProposedPlan,
   StatusIndicator,
   ToolCallCard,
@@ -76,6 +77,17 @@ const desktopDiffLines: FileDiffLine[] = [
     newLineNumber: 47,
   },
 ];
+
+const desktopLongDiffLines: FileDiffLine[] = [
+  { content: "@@ -46,4 +46,20 @@", kind: "hunk" },
+  ...Array.from({ length: 17 }, (_, index) => ({
+    content: `const desktopCheckpoint${index + 1} = 'verified';`,
+    kind: index === 3 ? ("deletion" as const) : ("addition" as const),
+    newLineNumber: index === 3 ? undefined : index + 46,
+    oldLineNumber: index === 3 ? index + 46 : undefined,
+  })),
+];
+const desktopShortDiffLines = desktopLongDiffLines.slice(0, 8);
 
 const desktopMarkdown = [
   "### Desktop Markdown",
@@ -419,6 +431,81 @@ export function DesktopPlayground() {
                   pnpm --filter @codex-ui-kit/electron-playground check
                 </ApprovalRequest>
               </AgentThread>
+            </div>
+          </article>
+
+          <article className="acceptance-card acceptance-card--file">
+            <header>
+              <div>
+                <h2>File change states</h2>
+                <p>
+                  Patch status language, inline diff overflow, fallback content,
+                  and compact-window geometry.
+                </p>
+              </div>
+            </header>
+            <div className="acceptance-card__body file-state-matrix">
+              <div className="file-state-matrix__wide">
+                <span className="file-state-matrix__label">Applied · 240px viewport</span>
+                <FileChange
+                  additions={16}
+                  change="modified"
+                  defaultOpen
+                  deletions={1}
+                  diffText={fileDiffToText(desktopLongDiffLines)}
+                  path="playgrounds/electron/src/renderer/src/DesktopPlayground.tsx"
+                >
+                  <FileDiff lines={desktopLongDiffLines} />
+                </FileChange>
+              </div>
+              <div>
+                <span className="file-state-matrix__label">Creating · 100px viewport</span>
+                <FileChange
+                  additions={7}
+                  change="added"
+                  defaultOpen
+                  diffText={fileDiffToText(desktopShortDiffLines)}
+                  path="src/components/FileStatus.tsx"
+                  status="streaming"
+                >
+                  <FileDiff lines={desktopShortDiffLines} size="short" />
+                </FileChange>
+              </div>
+              <div>
+                <span className="file-state-matrix__label">Stopped delete</span>
+                <FileChange
+                  change="deleted"
+                  path="src/legacy/desktop.ts"
+                  status="stopped"
+                />
+              </div>
+              <div>
+                <span className="file-state-matrix__label">Rejected edit</span>
+                <FileChange
+                  additions={1}
+                  change="modified"
+                  deletions={1}
+                  path="src/private/bridge.ts"
+                  status="rejected"
+                />
+              </div>
+              <div>
+                <span className="file-state-matrix__label">Deleted fallback</span>
+                <FileChange
+                  change="deleted"
+                  defaultOpen
+                  path="src/obsolete.ts"
+                />
+              </div>
+              <div className="file-state-matrix__wide">
+                <span className="file-state-matrix__label">Rename fallback</span>
+                <FileChange
+                  change="renamed"
+                  defaultOpen
+                  path="src/components/DesktopTimeline.tsx"
+                  previousPath="src/components/LegacyTimeline.tsx"
+                />
+              </div>
             </div>
           </article>
 
