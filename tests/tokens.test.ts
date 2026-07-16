@@ -21,6 +21,12 @@ describe("visual token contract", () => {
     expect(tokens).toContain("--codex-ui-border-focus: var(--codex-ui-blue-300)");
   });
 
+  it("keeps the light editor surface opaque on arbitrary host backgrounds", () => {
+    expect(tokens).toContain(
+      "--codex-ui-background-editor-opaque: color-mix(\n    in oklab,\n    var(--codex-ui-gray-100) 40%,\n    var(--codex-ui-background-surface-under)\n  )",
+    );
+  });
+
   it("loads the token contract before component styles", () => {
     expect(styles.startsWith('@import "./tokens.css";')).toBe(true);
   });

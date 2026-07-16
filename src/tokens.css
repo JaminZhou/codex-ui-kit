@@ -100,7 +100,7 @@
   --codex-ui-background-editor-opaque: color-mix(
     in oklab,
     var(--codex-ui-gray-100) 40%,
-    transparent
+    var(--codex-ui-background-surface-under)
   );
   --codex-ui-background-elevated-primary: color-mix(
     in oklab,
