@@ -22,6 +22,10 @@ assert(
   packageJson.sideEffects?.includes("**/*.css"),
   "CSS must remain marked as a side effect",
 );
+assert(
+  packageJson.dependencies?.["highlight.js"] === "11.11.1",
+  "highlight.js must remain a pinned runtime dependency",
+);
 
 function collectExportTargets(value) {
   if (typeof value === "string") return [value];
@@ -84,6 +88,10 @@ for (const requiredPath of [
 ]) {
   assert(packedPaths.has(requiredPath), `package is missing ${requiredPath}`);
 }
+assert(
+  [...packedPaths].some((file) => /^dist\/highlightCode-[\w-]+\.js$/.test(file)),
+  "package is missing the lazy code-highlight chunk",
+);
 
 for (const file of packedPaths) {
   assert(

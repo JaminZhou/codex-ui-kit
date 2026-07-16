@@ -14,6 +14,7 @@ import {
   AgentMarkdown,
   CodeBlock,
   stabilizeStreamingMarkdown,
+  type CodeHighlighter,
 } from "../src";
 
 const markdownFixture = `# Result
@@ -35,7 +36,10 @@ Use **semantic markup** with \`inline code\` and [a link](https://example.com).
 const ready = true;
 \`\`\``;
 
-afterEach(cleanup);
+afterEach(() => {
+  cleanup();
+  vi.unstubAllGlobals();
+});
 
 describe("AgentMarkdown", () => {
   it("renders the observed semantic and GFM surface", () => {
@@ -149,6 +153,159 @@ describe("AgentMarkdown", () => {
 });
 
 describe("CodeBlock", () => {
+  it("defers highlighting until code is near the viewport", async () => {
+    let intersect: IntersectionObserverCallback | undefined;
+    const observe = vi.fn();
+    const disconnect = vi.fn();
+    vi.stubGlobal(
+      "IntersectionObserver",
+      class {
+        constructor(
+          callback: IntersectionObserverCallback,
+          options?: IntersectionObserverInit,
+        ) {
+          intersect = callback;
+          expect(options?.rootMargin).toBe("600px 0px");
+        }
+
+        disconnect = disconnect;
+        observe = observe;
+        root = null;
+        rootMargin = "600px 0px";
+        thresholds = [0];
+        takeRecords = () => [];
+        unobserve = vi.fn();
+      },
+    );
+    const highlighter = vi.fn<CodeHighlighter>((code) => ({
+      code,
+      html: code,
+      language: "typescript",
+    }));
+
+    const { container } = render(
+      <CodeBlock codeHighlighter={highlighter} language="ts">
+        const ready = true;
+      </CodeBlock>,
+    );
+
+    expect(observe).toHaveBeenCalledWith(container.querySelector("figure"));
+    expect(highlighter).not.toHaveBeenCalled();
+
+    intersect?.(
+      [{ isIntersecting: true } as IntersectionObserverEntry],
+      {} as IntersectionObserver,
+    );
+
+    await waitFor(() => expect(highlighter).toHaveBeenCalledOnce());
+    expect(disconnect).toHaveBeenCalled();
+  });
+
+  it("lazy highlights registered languages without turning code into markup", async () => {
+    const source = '<button onclick="alert(1)">run</button>';
+    const { container } = render(
+      <CodeBlock deferHighlightUntilVisible={false} language="html">
+        {source}
+      </CodeBlock>,
+    );
+    const code = container.querySelector("code");
+
+    await waitFor(
+      () => expect(code?.getAttribute("data-highlighted")).toBe("true"),
+      { timeout: 10_000 },
+    );
+
+    expect(code?.classList.contains("hljs")).toBe(true);
+    expect(code?.querySelector("button")).toBeNull();
+    expect(code?.querySelector(".hljs-tag")).toBeTruthy();
+    expect(code?.textContent).toBe(source);
+  });
+
+  it("keeps a highlighted prefix while streaming content catches up", async () => {
+    const pendingHighlight = new Promise<never>(() => undefined);
+    const highlighter = vi.fn<CodeHighlighter>((code) => {
+      if (code === "const ready") {
+        return {
+          code,
+          html: '<span class="hljs-keyword">const</span> ready',
+          language: "typescript",
+        };
+      }
+
+      return pendingHighlight;
+    });
+    const { container, rerender } = render(
+      <CodeBlock
+        codeHighlighter={highlighter}
+        deferHighlightUntilVisible={false}
+        language="ts"
+      >
+        const ready
+      </CodeBlock>,
+    );
+
+    await waitFor(() =>
+      expect(
+        container.querySelector("code")?.getAttribute("data-highlighted"),
+      ).toBe("true"),
+    );
+
+    rerender(
+      <CodeBlock
+        codeHighlighter={highlighter}
+        deferHighlightUntilVisible={false}
+        language="ts"
+      >
+        const ready = true
+      </CodeBlock>,
+    );
+
+    const code = container.querySelector("code");
+    expect(code?.querySelector(".hljs-keyword")?.textContent).toBe("const");
+    expect(code?.textContent).toBe("const ready = true");
+  });
+
+  it("can disable the default highlighter", async () => {
+    const { container } = render(
+      <CodeBlock
+        codeHighlighter={false}
+        deferHighlightUntilVisible={false}
+        language="ts"
+      >
+        const ready = true;
+      </CodeBlock>,
+    );
+
+    await Promise.resolve();
+    expect(container.querySelector("code")?.textContent).toBe(
+      "const ready = true;",
+    );
+    expect(
+      container.querySelector("code")?.hasAttribute("data-highlighted"),
+    ).toBe(false);
+  });
+
+  it("falls back to plaintext when a custom highlighter throws", async () => {
+    const highlighter = vi.fn<CodeHighlighter>(() => {
+      throw new Error("unsupported");
+    });
+    const { container } = render(
+      <CodeBlock
+        codeHighlighter={highlighter}
+        deferHighlightUntilVisible={false}
+        language="unknown"
+      >
+        plain text
+      </CodeBlock>,
+    );
+
+    await waitFor(() => expect(highlighter).toHaveBeenCalledOnce());
+    expect(container.querySelector("code")?.textContent).toBe("plain text");
+    expect(
+      container.querySelector("code")?.hasAttribute("data-highlighted"),
+    ).toBe(false);
+  });
+
   it("copies normalized code and exposes copied feedback", async () => {
     const onCopy = vi.fn(async () => undefined);
 

@@ -1,6 +1,7 @@
 import {
   AgentMarkdown,
   CodeBlock,
+  type CodeHighlighter,
   FileChange,
   type FileDiffLine,
 } from "codex-ui-kit";
@@ -11,8 +12,10 @@ const line: FileDiffLine = {
   content: "package contract",
   kind: "context",
 };
+const highlighter: CodeHighlighter = (code) => ({ code, html: code });
 
 void FileChange;
 void AgentMarkdown;
 void CodeBlock;
+void highlighter;
 void line;

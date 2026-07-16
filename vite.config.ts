@@ -52,6 +52,7 @@ export default defineConfig({
         "react/jsx-runtime",
         "react-markdown",
         "remark-gfm",
+        /^highlight\.js(?:\/.*)?$/,
       ],
     },
   },

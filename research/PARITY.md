@@ -32,7 +32,7 @@ A row is complete only when all applicable gates pass:
 | Global tokens and themes | Complete | Measured core | Complete | Complete | Good | Complete |
 | Thread layout and turn spacing | Foundation | Partial | Partial | Partial | Basic | Gap |
 | User, assistant, and system messages | Foundation | Partial | Partial | Partial | Basic | Gap |
-| Markdown, inline code, code blocks, tables, and links | GFM foundation | Measured core | Complete | Complete | Good | Gap |
+| Markdown, inline code, code blocks, tables, and links | GFM + lazy highlighting | Measured core + syntax | Complete | Complete | Good | Gap |
 | Activity rows and grouped work | Foundation | Partial | Partial | Partial | Basic | Gap |
 | Reasoning and plan states | Generic only | Missing | Missing | Missing | Missing | Gap |
 | Command execution and output | Foundation | Partial | Partial | Partial | Basic | Gap |
@@ -46,7 +46,7 @@ A row is complete only when all applicable gates pass:
 | Buttons, icon buttons, menus, tooltips, popovers, and selects | Slots only | Missing | Missing | Missing | Missing | Gap |
 | Resource cards, citations, images, and artifacts | Missing | Missing | Missing | Missing | Missing | Gap |
 | Thread header, floating controls, and navigation affordances | Missing | Missing | Missing | Missing | Missing | Gap |
-| Loading, streaming, skeleton, hover, focus, and reduced motion | Partial | Partial | Expanded | Expanded | Good | Gap |
+| Loading, streaming, skeleton, hover, focus, and reduced motion | Partial + code-prefix retention | Partial | Expanded | Expanded | Good | Gap |
 | Responsive and narrow-window behavior | Partial | Partial | Partial | Partial | Basic | Gap |
 | Package tokens, CSS exports, documentation, and provenance | Foundation | Partial | N/A | N/A | Good | Gap |
 

@@ -941,6 +941,83 @@ summary.codex-ui-activity__header::after {
   white-space: pre;
 }
 
+.codex-ui-code-block__body .hljs {
+  background: transparent;
+  color: var(--codex-ui-code-syntax-foreground);
+}
+
+.codex-ui-code-block__body .hljs-comment,
+.codex-ui-code-block__body .hljs-quote {
+  color: var(--codex-ui-code-syntax-comment);
+  font-style: var(--codex-ui-code-syntax-comment-style);
+}
+
+.codex-ui-code-block__body .hljs-meta {
+  color: var(--codex-ui-code-syntax-meta);
+}
+
+.codex-ui-code-block__body .hljs-built_in,
+.codex-ui-code-block__body .hljs-class .hljs-title {
+  color: var(--codex-ui-code-syntax-builtin);
+}
+
+.codex-ui-code-block__body .hljs-doctag,
+.codex-ui-code-block__body .hljs-keyword,
+.codex-ui-code-block__body .hljs-formula {
+  color: var(--codex-ui-code-syntax-keyword);
+}
+
+.codex-ui-code-block__body .hljs-literal {
+  color: var(--codex-ui-code-syntax-literal);
+}
+
+.codex-ui-code-block__body .hljs-section,
+.codex-ui-code-block__body .hljs-name,
+.codex-ui-code-block__body .hljs-selector-tag,
+.codex-ui-code-block__body .hljs-deletion,
+.codex-ui-code-block__body .hljs-subst {
+  color: var(--codex-ui-code-syntax-section);
+}
+
+.codex-ui-code-block__body .hljs-string,
+.codex-ui-code-block__body .hljs-regexp,
+.codex-ui-code-block__body .hljs-addition,
+.codex-ui-code-block__body .hljs-attribute,
+.codex-ui-code-block__body .hljs-meta-string {
+  color: var(--codex-ui-code-syntax-string);
+}
+
+.codex-ui-code-block__body .hljs-attr,
+.codex-ui-code-block__body .hljs-variable,
+.codex-ui-code-block__body .hljs-template-variable,
+.codex-ui-code-block__body .hljs-type,
+.codex-ui-code-block__body .hljs-selector-class,
+.codex-ui-code-block__body .hljs-selector-attr,
+.codex-ui-code-block__body .hljs-selector-pseudo,
+.codex-ui-code-block__body .hljs-number {
+  color: var(--codex-ui-code-syntax-variable);
+}
+
+.codex-ui-code-block__body .hljs-symbol,
+.codex-ui-code-block__body .hljs-bullet,
+.codex-ui-code-block__body .hljs-link,
+.codex-ui-code-block__body .hljs-selector-id,
+.codex-ui-code-block__body .hljs-title {
+  color: var(--codex-ui-code-syntax-title);
+}
+
+.codex-ui-code-block__body .hljs-emphasis {
+  font-style: italic;
+}
+
+.codex-ui-code-block__body .hljs-strong {
+  font-weight: var(--codex-ui-font-weight-bold);
+}
+
+.codex-ui-code-block__body .hljs-link {
+  text-decoration: underline;
+}
+
 .codex-ui-code-block[data-wrap] .codex-ui-code-block__body code {
   overflow-wrap: anywhere;
   white-space: pre-wrap;

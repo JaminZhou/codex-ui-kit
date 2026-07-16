@@ -35,6 +35,23 @@ describe("Markdown visual contract", () => {
     );
   });
 
+  it("maps the observed light and dark highlight roles", () => {
+    expect(tokens).toContain(
+      "--codex-ui-code-syntax-light-keyword: #a626a4",
+    );
+    expect(tokens).toContain(
+      "--codex-ui-code-syntax-dark-keyword: #2e95d3",
+    );
+    expect(tokens).toContain(
+      "--codex-ui-code-syntax-light-string: #50a14f",
+    );
+    expect(tokens).toContain(
+      "--codex-ui-code-syntax-dark-string: #00a67d",
+    );
+    expect(styles).toContain(".codex-ui-code-block__body .hljs-keyword");
+    expect(styles).toContain("var(--codex-ui-code-syntax-variable)");
+  });
+
   it("disables streaming motion when the host requests reduced motion", () => {
     expect(styles).toContain("@keyframes codex-ui-markdown-stream-enter");
     expect(styles).toContain("@media (prefers-reduced-motion: reduce)");
