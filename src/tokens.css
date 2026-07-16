@@ -116,7 +116,7 @@
   --codex-ui-background-elevated-secondary-opaque: color-mix(
     in oklab,
     var(--codex-ui-gray-100) 40%,
-    transparent
+    var(--codex-ui-background-surface)
   );
   --codex-ui-background-button-primary: var(--codex-ui-text-foreground);
   --codex-ui-background-button-primary-hover: color-mix(

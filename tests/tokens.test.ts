@@ -27,6 +27,17 @@ describe("visual token contract", () => {
     );
   });
 
+  it("never composes opaque surface tokens with transparency", () => {
+    const opaqueDeclarations = tokens.match(
+      /--codex-ui-[^:\n]*opaque:\s*[^;]+;/g,
+    );
+
+    expect(opaqueDeclarations).not.toBeNull();
+    for (const declaration of opaqueDeclarations ?? []) {
+      expect(declaration).not.toContain("transparent");
+    }
+  });
+
   it("loads the token contract before component styles", () => {
     expect(styles.startsWith('@import "./tokens.css";')).toBe(true);
   });
