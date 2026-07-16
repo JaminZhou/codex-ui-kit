@@ -4,10 +4,13 @@ import {
   AgentPlan,
   AgentReasoning,
   CodeBlock,
+  CommandExecution,
+  CommandOutput,
   type CodeHighlighter,
   FileChange,
   ProposedPlan,
   TurnDuration,
+  formatCommandDuration,
   formatTurnDuration,
   type FileDiffLine,
 } from "codex-ui-kit";
@@ -26,8 +29,11 @@ void AgentMarkdown;
 void AgentPlan;
 void AgentReasoning;
 void CodeBlock;
+void CommandExecution;
+void CommandOutput;
 void ProposedPlan;
 void TurnDuration;
+void formatCommandDuration;
 void formatTurnDuration;
 void highlighter;
 void line;

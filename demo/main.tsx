@@ -355,29 +355,90 @@ function Showcase() {
           </GalleryCard>
 
           <GalleryCard
-            description="Command metadata and streams stay useful without binding the UI to a shell protocol."
+            description="Collapsed command language, embedded shell output, duration, exit, interruption, and background-terminal states."
             title="Command execution"
             wide
           >
             <div className="command-preview">
-              <CommandExecution
-                command="pnpm check"
-                cwd="/workspace/codex-ui-kit"
-                defaultOpen
-                exitCode={0}
-                status="completed"
-              >
-                <CommandOutput>{`Test Files  4 passed (4)\nTests       20 passed (20)\nBuilt library, showcase, and Electron Renderer`}</CommandOutput>
-              </CommandExecution>
-              <CommandExecution
-                command="pnpm lint"
-                exitCode={1}
-                status="failed"
-              >
-                <CommandOutput stream="stderr">
-                  src/example.ts:12:3 Unexpected any
-                </CommandOutput>
-              </CommandExecution>
+              <div className="command-preview__grid">
+                <div className="command-preview__surface">
+                  <span className="command-preview__label">Running</span>
+                  <CommandExecution
+                    command="pnpm test --watch"
+                    defaultOpen
+                    durationMs={5_000}
+                    status="running"
+                  >
+                    <CommandOutput>{Array.from(
+                      { length: 12 },
+                      (_, index) =>
+                        `watch cycle ${index + 1}: ${index === 11 ? "waiting" : "passed"}`,
+                    ).join("\n")}</CommandOutput>
+                  </CommandExecution>
+                </div>
+
+                <div className="command-preview__surface">
+                  <span className="command-preview__label">Success</span>
+                  <CommandExecution
+                    command="pnpm check"
+                    cwd="/workspace/codex-ui-kit"
+                    defaultOpen
+                    durationMs={61_000}
+                    exitCode={0}
+                    status="completed"
+                  >
+                    <CommandOutput>{`Test Files  11 passed (11)\nTests       88 passed (88)\nBuilt library, showcase, and Electron Renderer`}</CommandOutput>
+                  </CommandExecution>
+                </div>
+
+                <div className="command-preview__surface">
+                  <span className="command-preview__label">Failure</span>
+                  <CommandExecution
+                    command="pnpm lint"
+                    defaultOpen
+                    durationMs={2_000}
+                    exitCode={1}
+                    status="failed"
+                  >
+                    <CommandOutput stream="stderr">
+                      src/example.ts:12:3 Unexpected any
+                    </CommandOutput>
+                  </CommandExecution>
+                </div>
+
+                <div className="command-preview__surface">
+                  <span className="command-preview__label">Interrupted</span>
+                  <CommandExecution
+                    command="pnpm test --watch"
+                    defaultOpen
+                    durationMs={8_000}
+                    status="interrupted"
+                  >
+                    <CommandOutput>Waiting for file changes…</CommandOutput>
+                  </CommandExecution>
+                </div>
+
+                <div className="command-preview__surface">
+                  <span className="command-preview__label">Background</span>
+                  <CommandExecution
+                    command="vite --host 127.0.0.1"
+                    status="background-running"
+                  >
+                    <CommandOutput>Local: http://127.0.0.1:5173/</CommandOutput>
+                  </CommandExecution>
+                </div>
+
+                <div className="command-preview__surface">
+                  <span className="command-preview__label">No output</span>
+                  <CommandExecution
+                    command="touch .ready"
+                    defaultOpen
+                    durationMs={900}
+                    exitCode={0}
+                    status="completed"
+                  />
+                </div>
+              </div>
             </div>
           </GalleryCard>
 

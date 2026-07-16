@@ -56,8 +56,10 @@ the pnpm workspace. Electron is not a dependency of `codex-ui-kit`.
 - `ProposedPlan`: writing and completed plan-card states with action slots.
 - `ToolCallCard`: tool-call convenience component.
 - `ApprovalRequest`: controlled approve/reject surface with explicit outcomes.
-- `CommandExecution`: command activity with working directory and exit metadata.
-- `CommandOutput`: independently labeled stdout/stderr output surface.
+- `CommandExecution`: collapsed command language plus expandable shell, exact
+  duration, copy, background-terminal, success, failure, and interruption states.
+- `CommandOutput`: independently labeled stdout/stderr output with no-output,
+  tail-following, `140px` overflow, edge-fade, and copy behavior.
 - `FileChange`: file path, rename, change-kind, and diff-stat activity.
 - `FileDiff`: structured context, hunk, addition, and deletion lines.
 - `StatusIndicator`: visual state primitive.

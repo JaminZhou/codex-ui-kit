@@ -378,6 +378,7 @@ export function DesktopPlayground() {
                       command="pnpm --filter @codex-ui-kit/electron-playground check"
                       cwd="playgrounds/electron"
                       defaultOpen
+                      durationMs={61_000}
                       exitCode={0}
                       status="completed"
                     >
@@ -418,6 +419,88 @@ export function DesktopPlayground() {
                   pnpm --filter @codex-ui-kit/electron-playground check
                 </ApprovalRequest>
               </AgentThread>
+            </div>
+          </article>
+
+          <article className="acceptance-card acceptance-card--command">
+            <header>
+              <div>
+                <h2>Command shell states</h2>
+                <p>Summary, output overflow, footer, and background states.</p>
+              </div>
+            </header>
+            <div className="acceptance-card__body command-state-matrix">
+              <div>
+                <span className="command-state-matrix__label">Running</span>
+                <CommandExecution
+                  command="pnpm test --watch"
+                  defaultOpen
+                  durationMs={5_000}
+                  status="running"
+                >
+                  <CommandOutput>{Array.from(
+                    { length: 12 },
+                    (_, index) =>
+                      `desktop cycle ${index + 1}: ${index === 11 ? "waiting" : "passed"}`,
+                  ).join("\n")}</CommandOutput>
+                </CommandExecution>
+              </div>
+              <div>
+                <span className="command-state-matrix__label">Success</span>
+                <CommandExecution
+                  command="pnpm check"
+                  defaultOpen
+                  durationMs={61_000}
+                  exitCode={0}
+                  status="completed"
+                >
+                  <CommandOutput>{`88 tests passed\nRenderer build completed`}</CommandOutput>
+                </CommandExecution>
+              </div>
+              <div>
+                <span className="command-state-matrix__label">Failure</span>
+                <CommandExecution
+                  command="pnpm lint"
+                  defaultOpen
+                  durationMs={2_000}
+                  exitCode={1}
+                  status="failed"
+                >
+                  <CommandOutput stream="stderr">
+                    src/example.ts:12:3 Unexpected any
+                  </CommandOutput>
+                </CommandExecution>
+              </div>
+              <div>
+                <span className="command-state-matrix__label">Stopped</span>
+                <CommandExecution
+                  command="pnpm test --watch"
+                  defaultOpen
+                  durationMs={8_000}
+                  status="interrupted"
+                >
+                  <CommandOutput>Waiting for file changes…</CommandOutput>
+                </CommandExecution>
+              </div>
+              <div>
+                <span className="command-state-matrix__label">Background</span>
+                <CommandExecution
+                  command="vite --host 127.0.0.1"
+                  status="background-running"
+                >
+                  <CommandOutput>Local: http://127.0.0.1:5173/</CommandOutput>
+                </CommandExecution>
+              </div>
+              <div>
+                <span className="command-state-matrix__label">No output</span>
+                <CommandExecution
+                  command="touch .ready"
+                  defaultOpen
+                  durationMs={900}
+                  exitCode={0}
+                  status="completed"
+                />
+              </div>
             </div>
           </article>
 
