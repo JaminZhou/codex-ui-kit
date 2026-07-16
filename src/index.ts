@@ -1,4 +1,5 @@
 export * from "./components/AgentMessage";
+export * from "./components/AgentMarkdown";
 export * from "./components/AgentActivity";
 export * from "./components/AgentThread";
 export * from "./components/AgentComposer";

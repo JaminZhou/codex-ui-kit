@@ -9,6 +9,7 @@ import {
   ActivityGroup,
   AgentActivity,
   AgentComposer,
+  AgentMarkdown,
   AgentMessage,
   AgentThread,
   ApprovalRequest,
@@ -70,6 +71,21 @@ const desktopDiffLines: FileDiffLine[] = [
     newLineNumber: 47,
   },
 ];
+
+const desktopMarkdown = [
+  "### Desktop Markdown",
+  "",
+  "Renderer typography supports `inline code`, **GFM**, and overflow-safe tables.",
+  "",
+  "| Check | Result |",
+  "| --- | ---: |",
+  "| Theme | inherited |",
+  "| Font | measured |",
+  "",
+  "```ts",
+  "const renderer = 'electron';",
+  "```",
+].join("\n");
 
 function useViewportMetrics(): ViewportMetrics {
   const [metrics, setMetrics] = useState<ViewportMetrics>(() => ({
@@ -296,6 +312,11 @@ export function DesktopPlayground() {
                 <AgentMessage role="assistant">
                   I’ll exercise the system theme, font stack, scroll container,
                   and responsive window presets.
+                </AgentMessage>
+                <AgentMessage role="assistant">
+                  <AgentMarkdown codeBlockCopyable={false}>
+                    {desktopMarkdown}
+                  </AgentMarkdown>
                 </AgentMessage>
                 <ActivityGroup>
                   <AgentActivity

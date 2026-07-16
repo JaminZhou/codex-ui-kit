@@ -1,4 +1,9 @@
-import { FileChange, type FileDiffLine } from "codex-ui-kit";
+import {
+  AgentMarkdown,
+  CodeBlock,
+  FileChange,
+  type FileDiffLine,
+} from "codex-ui-kit";
 import "codex-ui-kit/styles.css";
 import "codex-ui-kit/tokens.css";
 
@@ -8,4 +13,6 @@ const line: FileDiffLine = {
 };
 
 void FileChange;
+void AgentMarkdown;
+void CodeBlock;
 void line;

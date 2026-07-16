@@ -57,6 +57,10 @@
   --codex-ui-line-height-sm: 1.125rem;
   --codex-ui-line-height-md: 1.5rem;
   --codex-ui-line-height-lg: 1.75rem;
+  --codex-ui-font-size-chat: var(--codex-ui-font-size-md);
+  --codex-ui-font-size-code: var(--codex-ui-font-size-xs);
+  --codex-ui-line-height-chat: calc(var(--codex-ui-font-size-chat) + 0.5rem);
+  --codex-ui-line-height-code: 1.25rem;
   --codex-ui-font-weight-normal: 400;
   --codex-ui-font-weight-medium: 500;
   --codex-ui-font-weight-semibold: 600;
@@ -82,6 +86,9 @@
   --codex-ui-thread-content-top-inset: calc(var(--codex-ui-spacing) * 8);
   --codex-ui-item-gap: calc(var(--codex-ui-spacing) * 4);
   --codex-ui-group-gap: var(--codex-ui-spacing);
+  --codex-ui-markdown-block-gap: 0.6875rem;
+  --codex-ui-markdown-inline-overhang: 1.5rem;
+  --codex-ui-markdown-table-max-width: 40rem;
   --codex-ui-transition-fast: 150ms ease;
   --codex-ui-transition-relaxed: 300ms ease;
   --codex-ui-transition: var(--codex-ui-transition-fast);
@@ -462,6 +469,14 @@
   --codex-ui-bg: var(--codex-ui-background-surface);
   --codex-ui-bg-subtle: var(--codex-ui-background-editor-opaque);
   --codex-ui-bg-elevated: var(--codex-ui-background-elevated-primary);
+  --codex-ui-code-block-bg: var(--codex-ui-background-editor-opaque);
+  --codex-ui-inline-code-bg: color-mix(
+    in oklab,
+    var(--codex-ui-text-foreground) 6%,
+    var(--codex-ui-background-surface)
+  );
+  --codex-ui-link: var(--codex-ui-text-accent);
+  --codex-ui-markdown-quote-border: var(--codex-ui-border-heavy);
   --codex-ui-border-strong: var(--codex-ui-border-heavy);
   --codex-ui-text: var(--codex-ui-text-foreground);
   --codex-ui-success: var(--codex-ui-text-success);
