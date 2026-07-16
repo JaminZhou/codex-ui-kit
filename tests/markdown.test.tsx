@@ -63,6 +63,15 @@ describe("AgentMarkdown", () => {
     expect(stabilizeStreamingMarkdown("See [docs](https://example.com")).toBe(
       "See [docs](https://example.com)",
     );
+    expect(stabilizeStreamingMarkdown("````md\n```\ncode")).toBe(
+      "````md\n```\ncode\n````",
+    );
+    expect(stabilizeStreamingMarkdown("~~~ts\nconst value = 1;")).toBe(
+      "~~~ts\nconst value = 1;\n~~~",
+    );
+    expect(stabilizeStreamingMarkdown("````md\ncode\n`````")).toBe(
+      "````md\ncode\n`````",
+    );
 
     const html = renderToStaticMarkup(
       <AgentMarkdown streaming>{"```ts\nconst value = 1;"}</AgentMarkdown>,

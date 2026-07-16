@@ -10,7 +10,9 @@
 .codex-ui-command-output,
 .codex-ui-command-output *,
 .codex-ui-file-diff,
-.codex-ui-file-diff * {
+.codex-ui-file-diff *,
+.codex-ui-markdown,
+.codex-ui-markdown * {
   box-sizing: border-box;
 }
 

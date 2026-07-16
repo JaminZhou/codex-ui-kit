@@ -29,6 +29,12 @@ describe("Markdown visual contract", () => {
     expect(styles).toContain("padding-inline-end: 1.5rem");
   });
 
+  it("does not rely on a host box-sizing reset for table overhangs", () => {
+    expect(styles).toMatch(
+      /\.codex-ui-markdown,\s*\.codex-ui-markdown \* \{\s*box-sizing: border-box;/,
+    );
+  });
+
   it("disables streaming motion when the host requests reduced motion", () => {
     expect(styles).toContain("@keyframes codex-ui-markdown-stream-enter");
     expect(styles).toContain("@media (prefers-reduced-motion: reduce)");

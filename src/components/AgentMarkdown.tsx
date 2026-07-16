@@ -133,10 +133,32 @@ export function CodeBlock({
 
 export function stabilizeStreamingMarkdown(source: string) {
   let stabilized = source;
-  const fences = stabilized.match(/^\s*```/gm)?.length ?? 0;
+  let openFence: { marker: "`" | "~"; length: number } | undefined;
 
-  if (fences % 2 === 1) {
-    stabilized += stabilized.endsWith("\n") ? "```" : "\n```";
+  for (const line of stabilized.split("\n")) {
+    const fence = /^ {0,3}(`{3,}|~{3,})(.*)$/.exec(line);
+    if (!fence) continue;
+
+    const marker = fence[1][0] as "`" | "~";
+    const length = fence[1].length;
+    const suffix = fence[2];
+
+    if (!openFence) {
+      openFence = { marker, length };
+    } else if (
+      marker === openFence.marker &&
+      length >= openFence.length &&
+      suffix.trim() === ""
+    ) {
+      openFence = undefined;
+    }
+  }
+
+  if (openFence) {
+    const closingFence = openFence.marker.repeat(openFence.length);
+    stabilized += stabilized.endsWith("\n")
+      ? closingFence
+      : `\n${closingFence}`;
   }
 
   if (/\[[^\]\n]*\]\([^\)\n]*$/.test(stabilized)) {
