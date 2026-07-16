@@ -9,8 +9,9 @@ Independently designed React components for building Codex-style coding-agent in
 High-fidelity preview for an initial public release. The public API may change
 before 1.0 while component and visual parity work is completed.
 
-The completed foundations cover the thread, reasoning, plan, approval, composer, and rich-text
-surfaces: messages, GFM Markdown, inline and block code, grouped activities,
+The completed foundations cover the thread, activity timeline, reasoning, plan,
+approval, composer, and rich-text surfaces: messages, GFM Markdown, inline and
+block code, grouped and collapsible activities, turn duration and interruption,
 commands, file changes, tool-call state, responsive content, controlled
 decisions, and an agent input with keyboard and running states. Run the local
 showcase with:
@@ -47,6 +48,9 @@ the pnpm workspace. Electron is not a dependency of `codex-ui-kit`.
 - `CodeBlock`: language header, copy feedback, and wrapped/unwrapped states.
 - `AgentActivity`: accessible expandable activity primitive.
 - `ActivityGroup`: compact grouping for related activities.
+- `ActivityTimeline`: controlled or uncontrolled turn-level activity collapse
+  with pre-toggle, persistent, and animated historical content slots.
+- `TurnDuration`: exact working, worked, and user-stopped duration language.
 - `AgentReasoning`: active and completed reasoning disclosure states.
 - `AgentPlan`: structured pending, in-progress, and completed plan steps.
 - `ProposedPlan`: writing and completed plan-card states with action slots.
@@ -93,11 +97,13 @@ pnpm add codex-ui-kit
 ```tsx
 import {
   ActivityGroup,
+  ActivityTimeline,
   AgentMarkdown,
   AgentMessage,
   AgentPlan,
   AgentReasoning,
   AgentThread,
+  TurnDuration,
 } from "codex-ui-kit";
 import "codex-ui-kit/styles.css";
 
@@ -108,17 +114,25 @@ export function Example() {
       <AgentMessage role="assistant">
         <AgentMarkdown>{"**Running** `pnpm check`."}</AgentMarkdown>
       </AgentMessage>
-      <ActivityGroup>
-        <AgentReasoning status="running">
-          Inspecting the test configuration.
-        </AgentReasoning>
-        <AgentPlan
-          steps={[
-            { status: "completed", step: "Inspect configuration" },
-            { status: "in_progress", step: "Run tests" },
-          ]}
-        />
-      </ActivityGroup>
+      <ActivityTimeline
+        defaultOpen
+        persistentContent={
+          <AgentReasoning status="running">
+            Inspecting the test configuration.
+          </AgentReasoning>
+        }
+        shouldShowPersistentContentGap
+        summary={<TurnDuration durationMs={4_200} status="working" />}
+      >
+        <ActivityGroup>
+          <AgentPlan
+            steps={[
+              { status: "completed", step: "Inspect configuration" },
+              { status: "in_progress", step: "Run tests" },
+            ]}
+          />
+        </ActivityGroup>
+      </ActivityTimeline>
     </AgentThread>
   );
 }

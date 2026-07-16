@@ -238,6 +238,34 @@ button {
   grid-column: 1 / -1;
 }
 
+.acceptance-card--activity {
+  grid-column: 1 / -1;
+}
+
+.activity-state-matrix {
+  background: var(--codex-ui-bg-subtle);
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.activity-state-matrix > div {
+  background: var(--codex-ui-bg);
+  border: 1px solid var(--codex-ui-border);
+  border-radius: var(--codex-ui-radius-lg);
+  min-width: 0;
+  padding: 1rem;
+}
+
+.activity-state-matrix__label {
+  color: var(--codex-ui-text-tertiary);
+  display: block;
+  font-size: 0.625rem;
+  font-weight: 600;
+  margin-bottom: 0.875rem;
+  text-transform: uppercase;
+}
+
 .acceptance-card > header {
   align-items: start;
   border-bottom: 1px solid var(--codex-ui-border);
@@ -442,6 +470,14 @@ button {
 
   .acceptance-card--thread {
     grid-column: auto;
+  }
+
+  .acceptance-card--activity {
+    grid-column: auto;
+  }
+
+  .activity-state-matrix {
+    grid-template-columns: 1fr;
   }
 }
 
