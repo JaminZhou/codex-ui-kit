@@ -1,4 +1,5 @@
 import {
+  ActivityTimeline,
   AgentMarkdown,
   AgentPlan,
   AgentReasoning,
@@ -6,6 +7,8 @@ import {
   type CodeHighlighter,
   FileChange,
   ProposedPlan,
+  TurnDuration,
+  formatTurnDuration,
   type FileDiffLine,
 } from "codex-ui-kit";
 import "codex-ui-kit/styles.css";
@@ -18,10 +21,13 @@ const line: FileDiffLine = {
 const highlighter: CodeHighlighter = (code) => ({ code, html: code });
 
 void FileChange;
+void ActivityTimeline;
 void AgentMarkdown;
 void AgentPlan;
 void AgentReasoning;
 void CodeBlock;
 void ProposedPlan;
+void TurnDuration;
+void formatTurnDuration;
 void highlighter;
 void line;

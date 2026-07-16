@@ -7,6 +7,7 @@ import {
 } from "react";
 import {
   ActivityGroup,
+  ActivityTimeline,
   AgentActivity,
   AgentComposer,
   AgentMarkdown,
@@ -23,6 +24,7 @@ import {
   ProposedPlan,
   StatusIndicator,
   ToolCallCard,
+  TurnDuration,
   type ApprovalDecision,
   type FileDiffLine,
 } from "codex-ui-kit";
@@ -334,56 +336,64 @@ export function DesktopPlayground() {
                     {desktopMarkdown}
                   </AgentMarkdown>
                 </AgentMessage>
-                <ActivityGroup>
-                  <AgentReasoning status="running">
-                    <p>
-                      Comparing system theme, font fallback, and compact-window
-                      geometry.
-                    </p>
-                  </AgentReasoning>
-                  <AgentReasoning status="completed">
-                    <p>Connected the isolated preload bridge.</p>
-                  </AgentReasoning>
-                  <AgentPlan
-                    aria-label="Desktop acceptance plan"
-                    steps={desktopPlanSteps}
-                  />
-                  <AgentActivity
-                    defaultOpen
-                    detail="desktop"
-                    kind="file-change"
-                    status="completed"
-                    summary="Loaded shared UI primitives"
-                  >
-                    <ul>
-                      <li>React components resolve from the workspace package.</li>
-                      <li>Electron remains a playground-only dependency.</li>
-                    </ul>
-                  </AgentActivity>
-                  <CommandExecution
-                    command="pnpm --filter @codex-ui-kit/electron-playground check"
-                    cwd="playgrounds/electron"
-                    defaultOpen
-                    exitCode={0}
-                    status="completed"
-                  >
-                    <CommandOutput>{`3 tests passed\nRenderer build completed`}</CommandOutput>
-                  </CommandExecution>
-                  <FileChange
-                    additions={1}
-                    change="modified"
-                    defaultOpen
-                    deletions={0}
-                    path="playgrounds/electron/src/renderer/src/DesktopPlayground.tsx"
-                  >
-                    <FileDiff lines={desktopDiffLines} />
-                  </FileChange>
-                  <ToolCallCard
-                    name="desktop acceptance"
-                    status="running"
-                    summary="Watching native theme and viewport changes"
-                  />
-                </ActivityGroup>
+                <ActivityTimeline
+                  defaultOpen
+                  persistentContent={
+                    <ToolCallCard
+                      name="desktop acceptance"
+                      status="running"
+                      summary="Watching native theme and viewport changes"
+                    />
+                  }
+                  shouldShowPersistentContentGap
+                  summary={<TurnDuration durationMs={4_200} status="working" />}
+                >
+                  <ActivityGroup>
+                    <AgentReasoning status="running">
+                      <p>
+                        Comparing system theme, font fallback, and compact-window
+                        geometry.
+                      </p>
+                    </AgentReasoning>
+                    <AgentReasoning status="completed">
+                      <p>Connected the isolated preload bridge.</p>
+                    </AgentReasoning>
+                    <AgentPlan
+                      aria-label="Desktop acceptance plan"
+                      steps={desktopPlanSteps}
+                    />
+                    <AgentActivity
+                      defaultOpen
+                      detail="desktop"
+                      kind="file-change"
+                      status="completed"
+                      summary="Loaded shared UI primitives"
+                    >
+                      <ul>
+                        <li>React components resolve from the workspace package.</li>
+                        <li>Electron remains a playground-only dependency.</li>
+                      </ul>
+                    </AgentActivity>
+                    <CommandExecution
+                      command="pnpm --filter @codex-ui-kit/electron-playground check"
+                      cwd="playgrounds/electron"
+                      defaultOpen
+                      exitCode={0}
+                      status="completed"
+                    >
+                      <CommandOutput>{`3 tests passed\nRenderer build completed`}</CommandOutput>
+                    </CommandExecution>
+                    <FileChange
+                      additions={1}
+                      change="modified"
+                      defaultOpen
+                      deletions={0}
+                      path="playgrounds/electron/src/renderer/src/DesktopPlayground.tsx"
+                    >
+                      <FileDiff lines={desktopDiffLines} />
+                    </FileChange>
+                  </ActivityGroup>
+                </ActivityTimeline>
                 <ProposedPlan
                   onCopy={() => undefined}
                   onDownload={() => undefined}
@@ -408,6 +418,75 @@ export function DesktopPlayground() {
                   pnpm --filter @codex-ui-kit/electron-playground check
                 </ApprovalRequest>
               </AgentThread>
+            </div>
+          </article>
+
+          <article className="acceptance-card acceptance-card--activity">
+            <header>
+              <div>
+                <h2>Activity timeline states</h2>
+                <p>Expanded, collapsed, and interrupted states in Chromium.</p>
+              </div>
+            </header>
+            <div className="acceptance-card__body activity-state-matrix">
+              <div>
+                <span className="activity-state-matrix__label">Working</span>
+                <ActivityTimeline
+                  defaultOpen
+                  persistentContent={
+                    <AgentActivity
+                      kind="command"
+                      status="running"
+                      summary="Checking the Renderer"
+                    />
+                  }
+                  shouldShowPersistentContentGap
+                  summary={
+                    <TurnDuration durationMs={4_200} status="working" />
+                  }
+                >
+                  <ActivityGroup>
+                    <AgentActivity
+                      kind="search"
+                      status="completed"
+                      summary="Inspected activity geometry"
+                    />
+                    <AgentActivity
+                      kind="file-change"
+                      status="completed"
+                      summary="Added desktop states"
+                    />
+                  </ActivityGroup>
+                </ActivityTimeline>
+              </div>
+              <div>
+                <span className="activity-state-matrix__label">Completed</span>
+                <ActivityTimeline
+                  summary={<TurnDuration durationMs={72_000} status="worked" />}
+                >
+                  <AgentActivity
+                    kind="command"
+                    status="completed"
+                    summary="Built the Renderer"
+                  />
+                </ActivityTimeline>
+              </div>
+              <div>
+                <span className="activity-state-matrix__label">Stopped</span>
+                <ActivityTimeline
+                  defaultOpen
+                  summary={
+                    <TurnDuration durationMs={8_000} status="stopped" />
+                  }
+                >
+                  <AgentActivity
+                    indicator={<span aria-label="Stopped">■</span>}
+                    kind="command"
+                    status="failed"
+                    summary="Stopped by the user"
+                  />
+                </ActivityTimeline>
+              </div>
             </div>
           </article>
 

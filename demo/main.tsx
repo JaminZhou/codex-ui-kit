@@ -2,6 +2,7 @@ import { StrictMode, useState, type ReactNode } from "react";
 import { createRoot } from "react-dom/client";
 import {
   ActivityGroup,
+  ActivityTimeline,
   AgentActivity,
   AgentComposer,
   AgentMarkdown,
@@ -18,6 +19,7 @@ import {
   ProposedPlan,
   StatusIndicator,
   ToolCallCard,
+  TurnDuration,
   type AgentItemStatus,
   type ApprovalDecision,
   type FileDiffLine,
@@ -201,29 +203,37 @@ function Showcase() {
                   </p>
                 </AgentMessage>
 
-                <ActivityGroup aria-label="Agent activity">
-                  <AgentReasoning status="completed">
-                    <p>Inspected the existing component boundaries.</p>
-                  </AgentReasoning>
-                  <AgentActivity
-                    defaultOpen
-                    detail="3 files"
-                    kind="file-change"
-                    status="completed"
-                    summary="Implemented thread primitives"
-                  >
-                    <ul>
-                      <li>Added an expandable activity primitive.</li>
-                      <li>Added responsive thread and grouping layout.</li>
-                      <li>Added semantic light and dark tokens.</li>
-                    </ul>
-                  </AgentActivity>
-                  <ToolCallCard
-                    name="pnpm check"
-                    status="running"
-                    summary="Typechecking, testing, and building the package"
-                  />
-                </ActivityGroup>
+                <ActivityTimeline
+                  defaultOpen
+                  persistentContent={
+                    <ToolCallCard
+                      name="pnpm check"
+                      status="running"
+                      summary="Typechecking, testing, and building the package"
+                    />
+                  }
+                  shouldShowPersistentContentGap
+                  summary={<TurnDuration durationMs={4_200} status="working" />}
+                >
+                  <ActivityGroup aria-label="Previous agent activity">
+                    <AgentReasoning status="completed">
+                      <p>Inspected the existing component boundaries.</p>
+                    </AgentReasoning>
+                    <AgentActivity
+                      defaultOpen
+                      detail="3 files"
+                      kind="file-change"
+                      status="completed"
+                      summary="Implemented thread primitives"
+                    >
+                      <ul>
+                        <li>Added an expandable activity primitive.</li>
+                        <li>Added responsive thread and grouping layout.</li>
+                        <li>Added semantic light and dark tokens.</li>
+                      </ul>
+                    </AgentActivity>
+                  </ActivityGroup>
+                </ActivityTimeline>
 
                 <AgentMessage role="assistant" status="running">
                   The implementation is ready; I’m waiting for the final checks.
@@ -472,29 +482,95 @@ function Showcase() {
           </GalleryCard>
 
           <GalleryCard
-            description="Compact summaries keep detail available without dominating the thread."
-            title="Activity disclosure"
+            description="Turn-level collapse, persistent running work, precise durations, and row detail across the observed lifecycle."
+            title="Activity timeline"
+            wide
           >
-            <ActivityGroup>
-              <AgentActivity
-                kind="command"
-                status="completed"
-                summary="Read package configuration"
-              />
-              <AgentActivity
-                detail="2 changes"
-                kind="file-change"
-                status="completed"
-                summary="Updated component exports"
-              >
-                <code>src/index.ts</code>
-              </AgentActivity>
-              <AgentActivity
-                kind="search"
-                status="failed"
-                summary="Could not resolve design reference"
-              />
-            </ActivityGroup>
+            <div className="activity-timeline-preview">
+              <div className="activity-timeline-preview__surface">
+                <span className="activity-timeline-preview__label">
+                  Working · expanded
+                </span>
+                <ActivityTimeline
+                  defaultOpen
+                  persistentContent={
+                    <AgentActivity
+                      kind="command"
+                      status="running"
+                      summary="Running package checks"
+                    />
+                  }
+                  shouldShowPersistentContentGap
+                  summary={
+                    <TurnDuration durationMs={4_200} status="working" />
+                  }
+                >
+                  <ActivityGroup>
+                    <AgentActivity
+                      kind="command"
+                      status="completed"
+                      summary="Read package configuration"
+                    />
+                    <AgentActivity
+                      detail="2 changes"
+                      kind="file-change"
+                      status="completed"
+                      summary="Updated component exports"
+                    >
+                      <code>src/index.ts</code>
+                    </AgentActivity>
+                  </ActivityGroup>
+                </ActivityTimeline>
+              </div>
+
+              <div className="activity-timeline-preview__surface">
+                <span className="activity-timeline-preview__label">
+                  Completed · collapsed
+                </span>
+                <ActivityTimeline
+                  summary={<TurnDuration durationMs={72_000} status="worked" />}
+                >
+                  <ActivityGroup>
+                    <AgentActivity
+                      kind="search"
+                      status="completed"
+                      summary="Located the Renderer entry point"
+                    />
+                    <AgentActivity
+                      kind="file-change"
+                      status="completed"
+                      summary="Updated activity exports"
+                    />
+                  </ActivityGroup>
+                </ActivityTimeline>
+              </div>
+
+              <div className="activity-timeline-preview__surface">
+                <span className="activity-timeline-preview__label">
+                  Interrupted · expanded
+                </span>
+                <ActivityTimeline
+                  defaultOpen
+                  summary={
+                    <TurnDuration durationMs={8_000} status="stopped" />
+                  }
+                >
+                  <ActivityGroup>
+                    <AgentActivity
+                      kind="search"
+                      status="failed"
+                      summary="Could not resolve design reference"
+                    />
+                    <AgentActivity
+                      indicator={<span aria-label="Stopped">■</span>}
+                      kind="command"
+                      status="failed"
+                      summary="Stopped by the user"
+                    />
+                  </ActivityGroup>
+                </ActivityTimeline>
+              </div>
+            </div>
           </GalleryCard>
 
           <GalleryCard

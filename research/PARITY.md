@@ -33,7 +33,7 @@ A row is complete only when all applicable gates pass:
 | Thread layout and turn spacing | Foundation | Partial | Partial | Partial | Basic | Gap |
 | User, assistant, and system messages | Foundation | Partial | Partial | Partial | Basic | Gap |
 | Markdown, inline code, code blocks, tables, and links | GFM + lazy highlighting | Measured core + syntax | Complete | Complete | Good | Gap |
-| Activity rows and grouped work | Foundation | Partial | Partial | Partial | Basic | Gap |
+| Activity rows and grouped work | Complete | Measured | Complete | Complete | Good | Complete |
 | Reasoning and plan states | Complete | Measured | Complete | Complete | Good | Complete |
 | Command execution and output | Foundation | Partial | Partial | Partial | Basic | Gap |
 | File changes and structured diffs | Foundation | Partial | Partial | Partial | Basic | Gap |
