@@ -121,13 +121,13 @@
   --codex-ui-background-button-primary: var(--codex-ui-text-foreground);
   --codex-ui-background-button-primary-hover: color-mix(
     in oklab,
-    var(--codex-ui-text-foreground) 8%,
-    transparent
+    var(--codex-ui-text-foreground) 92%,
+    var(--codex-ui-background-surface)
   );
   --codex-ui-background-button-primary-active: color-mix(
     in oklab,
-    var(--codex-ui-text-foreground) 16%,
-    transparent
+    var(--codex-ui-text-foreground) 84%,
+    var(--codex-ui-background-surface)
   );
   --codex-ui-background-button-secondary: color-mix(
     in oklab,
@@ -231,16 +231,16 @@
     transparent
   );
   --codex-ui-background-elevated-secondary-opaque: var(--codex-ui-gray-800);
-  --codex-ui-background-button-primary: var(--codex-ui-gray-1000);
+  --codex-ui-background-button-primary: var(--codex-ui-text-foreground);
   --codex-ui-background-button-primary-hover: color-mix(
     in oklab,
-    var(--codex-ui-gray-1000) 6%,
-    transparent
+    var(--codex-ui-text-foreground) 92%,
+    var(--codex-ui-background-surface)
   );
   --codex-ui-background-button-primary-active: color-mix(
     in oklab,
-    var(--codex-ui-gray-1000) 10%,
-    transparent
+    var(--codex-ui-text-foreground) 84%,
+    var(--codex-ui-background-surface)
   );
   --codex-ui-background-button-secondary: color-mix(
     in oklab,
@@ -353,16 +353,16 @@
       transparent
     );
     --codex-ui-background-elevated-secondary-opaque: var(--codex-ui-gray-800);
-    --codex-ui-background-button-primary: var(--codex-ui-gray-1000);
+    --codex-ui-background-button-primary: var(--codex-ui-text-foreground);
     --codex-ui-background-button-primary-hover: color-mix(
       in oklab,
-      var(--codex-ui-gray-1000) 6%,
-      transparent
+      var(--codex-ui-text-foreground) 92%,
+      var(--codex-ui-background-surface)
     );
     --codex-ui-background-button-primary-active: color-mix(
       in oklab,
-      var(--codex-ui-gray-1000) 10%,
-      transparent
+      var(--codex-ui-text-foreground) 84%,
+      var(--codex-ui-background-surface)
     );
     --codex-ui-background-button-secondary: color-mix(
       in oklab,

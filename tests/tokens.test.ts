@@ -38,6 +38,31 @@ describe("visual token contract", () => {
     }
   });
 
+  it("keeps primary button fills solid and inverse to their labels", () => {
+    const primaryBackgrounds = tokens.match(
+      /--codex-ui-background-button-primary:\s*var\(--codex-ui-text-foreground\);/g,
+    );
+    const primaryStates = tokens.match(
+      /--codex-ui-background-button-primary-(?:hover|active):\s*[^;]+;/g,
+    );
+
+    expect(primaryBackgrounds).toHaveLength(3);
+    expect(
+      tokens.match(
+        /--codex-ui-text-button-primary:\s*var\(--codex-ui-gray-0\);/g,
+      ),
+    ).toHaveLength(1);
+    expect(
+      tokens.match(
+        /--codex-ui-text-button-primary:\s*var\(--codex-ui-gray-1000\);/g,
+      ),
+    ).toHaveLength(2);
+    expect(primaryStates).toHaveLength(6);
+    for (const declaration of primaryStates ?? []) {
+      expect(declaration).not.toContain("transparent");
+    }
+  });
+
   it("loads the token contract before component styles", () => {
     expect(styles.startsWith('@import "./tokens.css";')).toBe(true);
   });
