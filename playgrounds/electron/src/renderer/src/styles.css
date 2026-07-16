@@ -238,7 +238,8 @@ button {
   grid-column: 1 / -1;
 }
 
-.acceptance-card--activity {
+.acceptance-card--activity,
+.acceptance-card--command {
   grid-column: 1 / -1;
 }
 
@@ -258,6 +259,30 @@ button {
 }
 
 .activity-state-matrix__label {
+  color: var(--codex-ui-text-tertiary);
+  display: block;
+  font-size: 0.625rem;
+  font-weight: 600;
+  margin-bottom: 0.875rem;
+  text-transform: uppercase;
+}
+
+.command-state-matrix {
+  background: var(--codex-ui-bg-subtle);
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.command-state-matrix > div {
+  background: var(--codex-ui-bg);
+  border: 1px solid var(--codex-ui-border);
+  border-radius: var(--codex-ui-radius-lg);
+  min-width: 0;
+  padding: 1rem;
+}
+
+.command-state-matrix__label {
   color: var(--codex-ui-text-tertiary);
   display: block;
   font-size: 0.625rem;
@@ -472,11 +497,13 @@ button {
     grid-column: auto;
   }
 
-  .acceptance-card--activity {
+  .acceptance-card--activity,
+  .acceptance-card--command {
     grid-column: auto;
   }
 
-  .activity-state-matrix {
+  .activity-state-matrix,
+  .command-state-matrix {
     grid-template-columns: 1fr;
   }
 }
