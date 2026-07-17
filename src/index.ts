@@ -19,4 +19,5 @@ export * from "./components/StatusIndicator";
 export * from "./components/SubagentActivity";
 export * from "./components/ToolCallCard";
 export * from "./components/TurnDuration";
+export * from "./components/ThreadNavigation";
 export * from "./types";

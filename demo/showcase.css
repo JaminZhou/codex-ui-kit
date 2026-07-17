@@ -202,6 +202,96 @@ code {
   min-height: 26rem;
 }
 
+.navigation-preview {
+  background: var(--codex-ui-bg-subtle);
+  border: 1px solid var(--codex-ui-border);
+  border-radius: var(--codex-ui-radius-xl);
+  min-height: 23rem;
+  overflow: hidden;
+  position: relative;
+}
+
+.navigation-preview__body {
+  align-content: center;
+  display: grid;
+  gap: 0.75rem;
+  min-height: calc(23rem - var(--codex-ui-toolbar-height));
+  padding: 2rem 2rem 7rem max(20rem, 30%);
+}
+
+.navigation-preview__body > p {
+  color: var(--codex-ui-text-secondary);
+  font-size: var(--codex-ui-font-size-sm);
+  line-height: var(--codex-ui-line-height-md);
+  margin: 0;
+  max-width: 30rem;
+}
+
+.navigation-preview__body > output {
+  color: var(--codex-ui-text-tertiary);
+  font-family: var(--codex-ui-font-mono);
+  font-size: var(--codex-ui-font-size-xs);
+}
+
+.navigation-preview .navigation-preview__panel {
+  bottom: 0;
+  position: absolute;
+}
+
+.navigation-preview__panel {
+  display: flex;
+  flex-direction: column;
+  padding: 0.5rem;
+}
+
+.navigation-preview__panel-header {
+  align-items: center;
+  display: flex;
+  height: 2.5rem;
+  justify-content: space-between;
+  padding-inline-start: 0.5rem;
+}
+
+.navigation-preview__panel button:not(.codex-ui-icon-button) {
+  background: transparent;
+  border: 0;
+  border-radius: var(--codex-ui-radius-md);
+  color: var(--codex-ui-text-secondary);
+  padding: 0.5rem;
+  text-align: start;
+}
+
+.navigation-preview__panel button:not(.codex-ui-icon-button):hover {
+  background: var(--codex-ui-background-button-tertiary-hover);
+}
+
+.navigation-preview__floating-states {
+  bottom: 1.5rem;
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  inset-inline: max(20rem, 30%) 2rem;
+  position: absolute;
+}
+
+.navigation-preview__floating-states > div {
+  background: var(--codex-ui-bg);
+  border: 1px solid var(--codex-ui-border);
+  border-radius: var(--codex-ui-radius-lg);
+  height: 4.75rem;
+  padding: 0.625rem;
+  position: relative;
+}
+
+.navigation-preview__floating-states span {
+  color: var(--codex-ui-text-tertiary);
+  font-size: 0.625rem;
+}
+
+.navigation-preview__floating-states .navigation-preview__floating-button {
+  bottom: 0.5rem;
+}
+
 .primitive-preview {
   background: var(--codex-ui-bg-subtle);
   border: 1px solid var(--codex-ui-border);
@@ -1070,6 +1160,14 @@ code {
 
   .thread-preview .codex-ui-thread {
     padding: 1rem;
+  }
+
+  .navigation-preview__body {
+    padding: 2rem 1rem 7rem;
+  }
+
+  .navigation-preview__floating-states {
+    inset-inline: 1rem;
   }
 
   .composer-preview {

@@ -22,6 +22,7 @@ import {
   FileChange,
   FileDiff,
   fileDiffToText,
+  FloatingThreadPanel,
   GeneratedImageGallery,
   ImagePreviewDialog,
   InlineNotice,
@@ -50,6 +51,10 @@ import {
   SubagentTranscriptHeader,
   ToolCallCard,
   Tooltip,
+  ThreadFloatingButton,
+  ThreadHeader,
+  ThreadMessageNavigationRail,
+  ThreadNavigationControls,
   TurnDuration,
   type AgentItemStatus,
   type ApprovalDecision,
@@ -92,6 +97,36 @@ const statuses: Array<{ label: string; status: AgentItemStatus }> = [
   { label: "Completed", status: "completed" },
   { label: "Failed", status: "failed" },
 ];
+
+const navigationMessages = [
+  {
+    id: "navigation-message-1",
+    label: "Create a protocol-neutral component library.",
+    outputs: ["Mapped the public API", "Measured the layout"],
+    preview: "Start with the thread shell and preserve host-owned behavior.",
+  },
+  {
+    id: "navigation-message-2",
+    label: "Add browser and Electron acceptance surfaces.",
+    outputs: ["H5 showcase", "Electron playground", "Package consumer"],
+    preview: "Reuse the same React components in both renderers.",
+  },
+  {
+    id: "navigation-message-3",
+    label: "Verify light, dark, compact, and focus states.",
+    preview: "Capture measured geometry before declaring parity.",
+  },
+  {
+    id: "navigation-message-4",
+    label: "Keep the package independent from product transport.",
+    preview: "Navigation callbacks remain host-controlled.",
+  },
+  {
+    id: "navigation-message-5",
+    label: "Finish the complete parity matrix.",
+    preview: "Every row requires component, visual, H5, Electron, and test gates.",
+  },
+] as const;
 
 const showcaseDiffLines: FileDiffLine[] = [
   { content: "@@ -12,3 +12,4 @@", kind: "hunk" },
@@ -340,6 +375,12 @@ function Showcase() {
     "Interactive controls ready",
   );
   const [previewImageId, setPreviewImageId] = useState<string | null>(null);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [floatingPanelOpen, setFloatingPanelOpen] = useState(true);
+  const [navigationStatus, setNavigationStatus] = useState("Navigation ready");
+  const [activeNavigationMessageId, setActiveNavigationMessageId] = useState<string>(
+    navigationMessages[2].id,
+  );
 
   const reorderQueuedPrompts = (activeId: string, overId: string) => {
     setQueuedPrompts((current) => {
@@ -447,6 +488,110 @@ function Showcase() {
                   The implementation is ready; I’m waiting for the final checks.
                 </AgentMessage>
               </AgentThread>
+            </div>
+          </GalleryCard>
+
+          <GalleryCard
+            description="Measured 48px draggable header, 28px navigation controls, transient sidebar, and latest-message floating states."
+            title="Thread header and navigation"
+            wide
+          >
+            <div className="navigation-preview">
+              <ThreadHeader
+                endActions={
+                  <Tooltip content="More actions">
+                    <IconButton icon={<span>•••</span>} label="More actions" />
+                  </Tooltip>
+                }
+                navigation={
+                  <ThreadNavigationControls
+                    backShortcut="⌘["
+                    canGoBack
+                    canGoForward={false}
+                    forwardShortcut="⌘]"
+                    onGoBack={() => setNavigationStatus("Navigated back")}
+                    onGoForward={() => setNavigationStatus("Navigated forward")}
+                    onSidebarPointerEnter={() => setFloatingPanelOpen(true)}
+                    onToggleSidebar={() => {
+                      setSidebarOpen((value) => !value);
+                      setFloatingPanelOpen((value) => !value);
+                    }}
+                    sidebarOpen={sidebarOpen}
+                    sidebarShortcut="⌘B"
+                  />
+                }
+                position="static"
+                subtitle="codex-ui-kit"
+                title="Match the desktop thread surfaces"
+              />
+              <div className="navigation-preview__body">
+                <ThreadMessageNavigationRail
+                  activeIds={[activeNavigationMessageId]}
+                  insetInlineStart="calc(var(--codex-ui-floating-panel-width) + 0.75rem)"
+                  items={navigationMessages}
+                  onNavigate={(item, behavior) => {
+                    setActiveNavigationMessageId(item.id);
+                    setNavigationStatus(
+                      `${behavior === "instant" ? "Scrubbed" : "Jumped"} to ${item.id}`,
+                    );
+                  }}
+                />
+                <FloatingThreadPanel
+                  className="navigation-preview__panel"
+                  label="Project navigation"
+                  open={floatingPanelOpen}
+                  onPointerLeave={() => {
+                    if (!sidebarOpen) setFloatingPanelOpen(false);
+                  }}
+                  topInset="var(--codex-ui-toolbar-height)"
+                >
+                  <div className="navigation-preview__panel-header">
+                    <strong>codex-ui-kit</strong>
+                    <IconButton
+                      icon={<span>×</span>}
+                      label="Close sidebar"
+                      onClick={() => {
+                        setFloatingPanelOpen(false);
+                        setSidebarOpen(false);
+                      }}
+                    />
+                  </div>
+                  <button type="button">New thread</button>
+                  <button type="button">Component parity</button>
+                  <button type="button">Desktop acceptance</button>
+                </FloatingThreadPanel>
+                <p>
+                  Header content remains draggable while buttons opt out. Resize
+                  the browser to verify title truncation and compact navigation.
+                </p>
+                <output aria-live="polite">{navigationStatus}</output>
+                <div className="navigation-preview__floating-states">
+                  <div>
+                    <span>Latest available</span>
+                    <ThreadFloatingButton
+                      className="navigation-preview__floating-button"
+                      onClick={() => setNavigationStatus("Scrolled to bottom")}
+                      show
+                    />
+                  </div>
+                  <div>
+                    <span>Working below</span>
+                    <ThreadFloatingButton
+                      className="navigation-preview__floating-button"
+                      onClick={() => setNavigationStatus("Followed working output")}
+                      show
+                      working
+                    />
+                  </div>
+                  <div>
+                    <span>Hidden</span>
+                    <ThreadFloatingButton
+                      className="navigation-preview__floating-button"
+                      show={false}
+                    />
+                  </div>
+                </div>
+              </div>
             </div>
           </GalleryCard>
 

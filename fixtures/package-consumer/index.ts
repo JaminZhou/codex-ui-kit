@@ -40,6 +40,12 @@ import {
   Select,
   StatusBanner,
   SourceList,
+  FloatingThreadPanel,
+  ThreadFloatingButton,
+  ThreadHeader,
+  ThreadMessageNavigationRail,
+  ThreadNavigationControls,
+  type ThreadMessageNavigationItem,
   type StatusBannerAction,
   StreamNotice,
   SubagentActivity,
@@ -104,6 +110,11 @@ const generatedImage: GeneratedImageItem = {
   id: "package-image",
   src: "https://example.com/image.png",
 };
+const navigationItem: ThreadMessageNavigationItem = {
+  id: "package-navigation-message",
+  label: "Package consumer",
+  preview: "Public navigation rail type",
+};
 
 void FileChange;
 void FileDiff;
@@ -131,6 +142,12 @@ void QueuedPromptList;
 void SearchActivity;
 void StatusBanner;
 void SourceList;
+void FloatingThreadPanel;
+void ThreadFloatingButton;
+void ThreadHeader;
+void ThreadMessageNavigationRail;
+void ThreadNavigationControls;
+void navigationItem;
 void StreamNotice;
 void SubagentActivity;
 void SubagentActivityGroup;
