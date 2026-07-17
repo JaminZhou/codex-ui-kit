@@ -12,6 +12,7 @@ import {
   AgentThread,
   ApprovalCommandPreview,
   ApprovalRequest,
+  ArtifactList,
   Button,
   CommandExecution,
   CommandOutput,
@@ -21,6 +22,8 @@ import {
   FileChange,
   FileDiff,
   fileDiffToText,
+  GeneratedImageGallery,
+  ImagePreviewDialog,
   InlineNotice,
   IconButton,
   Menu,
@@ -32,10 +35,13 @@ import {
   Popover,
   ProposedPlan,
   QueuedPromptList,
+  ResourceCard,
+  ResourceList,
   SearchActivity,
   Select,
   StatusIndicator,
   StatusBanner,
+  SourceList,
   StreamNotice,
   SubagentActivity,
   SubagentActivityGroup,
@@ -48,6 +54,7 @@ import {
   type AgentItemStatus,
   type ApprovalDecision,
   type FileDiffLine,
+  type GeneratedImageItem,
   type QueuedPrompt,
   type SubagentActivityItem,
   type SubagentItem,
@@ -275,6 +282,23 @@ const completedPlanSteps = activePlanSteps.map((item) => ({
   status: "completed" as const,
 }));
 
+const resourceImages: GeneratedImageItem[] = [
+  ["image-sky", "#4f87ff", "#dce8ff"],
+  ["image-leaf", "#4ba66c", "#d9f4e4"],
+  ["image-sunset", "#eb7440", "#ffe7d9"],
+  ["image-violet", "#805ad5", "#ede5ff"],
+  ["image-night", "#34445f", "#c8d3e5"],
+  ["image-sand", "#ba873c", "#f6e4bd"],
+].map(([id, foreground, background], index) => ({
+  alt: `Generated image ${index + 1}`,
+  height: index % 2 === 0 ? 720 : 640,
+  id,
+  src: `data:image/svg+xml,${encodeURIComponent(
+    `<svg xmlns="http://www.w3.org/2000/svg" width="960" height="720" viewBox="0 0 960 720"><rect width="960" height="720" fill="${background}"/><circle cx="${250 + index * 70}" cy="250" r="170" fill="${foreground}" opacity=".9"/><path d="M0 610 230 390l170 145 150-175 410 350H0Z" fill="${foreground}" opacity=".55"/></svg>`,
+  )}`,
+  width: index % 2 === 0 ? 960 : 760,
+}));
+
 function Showcase() {
   const [dark, setDark] = useState(false);
   const [composerValue, setComposerValue] = useState(
@@ -315,6 +339,7 @@ function Showcase() {
   const [primitiveStatus, setPrimitiveStatus] = useState(
     "Interactive controls ready",
   );
+  const [previewImageId, setPreviewImageId] = useState<string | null>(null);
 
   const reorderQueuedPrompts = (activeId: string, overId: string) => {
     setQueuedPrompts((current) => {
@@ -704,6 +729,111 @@ function Showcase() {
                 </div>
               </div>
             </div>
+          </GalleryCard>
+
+          <GalleryCard
+            description="Files, websites, Drive items, citations, artifacts, generated-image overflow, pending placeholders, and keyboard preview."
+            title="Resources, sources, and generated images"
+            wide
+          >
+            <div className="resource-preview">
+              <div className="resource-preview__surface resource-preview__surface--wide">
+                <span className="resource-preview__label">Generated images · overflow + preview</span>
+                <GeneratedImageGallery
+                  images={resourceImages}
+                  onOpenImage={(image) => setPreviewImageId(image.id)}
+                />
+              </div>
+              <div className="resource-preview__surface">
+                <span className="resource-preview__label">Inline resources · first three + reveal</span>
+                <ResourceList>
+                  <ResourceCard
+                    hoverLabel="Open in editor"
+                    kind="document"
+                    subtitle="Document · MD"
+                    title="research-notes.md"
+                  />
+                  <ResourceCard
+                    hoverLabel="Open in browser"
+                    kind="website"
+                    subtitle="Website"
+                    title="Component research"
+                  />
+                  <ResourceCard
+                    hoverLabel="Open in Drive"
+                    kind="spreadsheet"
+                    subtitle="Google Sheets"
+                    title="Parity matrix"
+                  />
+                  <ResourceCard
+                    action={<Button size="small" tone="ghost">Share</Button>}
+                    hoverLabel="Open app"
+                    kind="app"
+                    subtitle="Interactive app"
+                    title="Acceptance lab"
+                  />
+                  <ResourceCard
+                    hoverLabel="Open image preview"
+                    kind="image"
+                    previewSrc={resourceImages[0]?.src}
+                    subtitle="Image · PNG"
+                    title="generated-preview.png"
+                  />
+                </ResourceList>
+              </div>
+              <div className="resource-preview__surface">
+                <span className="resource-preview__label">Sources · compact + full</span>
+                <SourceList
+                  items={[
+                    {
+                      id: "attached-source",
+                      kind: "file",
+                      meta: "Attached to the conversation",
+                      title: "renderer-observations.md",
+                    },
+                    {
+                      id: "web-source",
+                      kind: "web",
+                      meta: "Web search",
+                      title: "React accessibility reference",
+                    },
+                    {
+                      id: "tool-source",
+                      kind: "tool",
+                      meta: "Connector result",
+                      title: "Issue parity audit",
+                    },
+                    {
+                      id: "external-source",
+                      kind: "external",
+                      meta: "External resource",
+                      title: "Renderer architecture notes",
+                    },
+                  ]}
+                  visibleLimit={3}
+                />
+              </div>
+              <div className="resource-preview__surface">
+                <span className="resource-preview__label">Generating · reserved square slots</span>
+                <GeneratedImageGallery
+                  images={resourceImages.slice(0, 2)}
+                  onOpenImage={(image) => setPreviewImageId(image.id)}
+                  pendingCount={2}
+                />
+              </div>
+              <div className="resource-preview__surface resource-preview__empty">
+                <span className="resource-preview__label">Artifacts · empty</span>
+                <ArtifactList />
+              </div>
+            </div>
+            <ImagePreviewDialog
+              imageId={previewImageId}
+              images={resourceImages}
+              onOpenChange={(open) => {
+                if (!open) setPreviewImageId(null);
+              }}
+              open={previewImageId !== null}
+            />
           </GalleryCard>
 
           <GalleryCard

@@ -13,6 +13,7 @@ export * from "./components/FileChange";
 export * from "./components/InteractivePrimitives";
 export * from "./components/Notices";
 export * from "./components/ProposedPlan";
+export * from "./components/ResourceSurfaces";
 export * from "./components/SearchActivity";
 export * from "./components/StatusIndicator";
 export * from "./components/SubagentActivity";
