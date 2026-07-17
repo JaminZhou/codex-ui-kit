@@ -152,6 +152,37 @@ describe("SubagentSummary", () => {
     expect(screen.getByText("Researcher")).toBeTruthy();
   });
 
+  it("reopens when active work follows a completed row-only section", () => {
+    const { rerender } = render(<SubagentSummary items={[doneAgent]} />);
+
+    expect(
+      screen
+        .getByRole("button", { name: /Subagents/ })
+        .getAttribute("aria-expanded"),
+    ).toBe("false");
+
+    rerender(<SubagentSummary items={[doneAgent, activeAgent]} />);
+
+    expect(
+      screen
+        .getByRole("button", { name: /Subagents/ })
+        .getAttribute("aria-expanded"),
+    ).toBe("true");
+    expect(screen.getByText("Researcher")).toBeTruthy();
+  });
+
+  it("renders only the supplied side of partial diff metadata", () => {
+    const additionsOnly = {
+      ...doneAgent,
+      additions: 4,
+      deletions: undefined,
+    };
+    render(<SubagentSummary defaultOpen items={[additionsOnly]} />);
+
+    expect(screen.getByLabelText("4 additions").textContent).toBe("+4");
+    expect(screen.queryByText("−0")).toBeNull();
+  });
+
   it("opens grouped agents individually when no overview action exists", () => {
     const onOpenSubagent = vi.fn();
     const groupedAgent = { ...activeAgent, presentation: "grouped" as const };

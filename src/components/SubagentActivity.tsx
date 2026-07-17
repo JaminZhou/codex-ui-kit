@@ -233,11 +233,21 @@ function sortForSummary(items: SubagentItem[]) {
     .map(({ item }) => item);
 }
 
-function DiffStats({ additions = 0, deletions = 0 }) {
+function DiffStats({
+  additions,
+  deletions,
+}: Pick<SubagentItem, "additions" | "deletions">) {
+  const label = [
+    additions !== undefined ? `${additions} additions` : null,
+    deletions !== undefined ? `${deletions} deletions` : null,
+  ]
+    .filter(Boolean)
+    .join(", ");
+
   return (
-    <span className="codex-ui-subagent-summary__diff" aria-label={`${additions} additions, ${deletions} deletions`}>
-      <span>+{additions}</span>
-      <span>−{deletions}</span>
+    <span className="codex-ui-subagent-summary__diff" aria-label={label}>
+      {additions !== undefined ? <span>+{additions}</span> : null}
+      {deletions !== undefined ? <span>−{deletions}</span> : null}
     </span>
   );
 }
@@ -402,7 +412,7 @@ export function SubagentSummary({
   const [internalOpen, setInternalOpen] = useState(initialOpen);
   const resolvedOpen = open ?? internalOpen;
   const contentId = useId();
-  const hadItems = useRef(items.length > 0);
+  const previousInitialOpen = useRef(initialOpen);
   const working = grouped.filter((item) => item.status !== "done");
   const done = grouped.filter((item) => item.status === "done");
   const groupedStatusLabel = [
@@ -413,12 +423,12 @@ export function SubagentSummary({
     .join(", ");
 
   useEffect(() => {
-    const itemsArrived = !hadItems.current && items.length > 0;
-    hadItems.current = items.length > 0;
-    if (open === undefined && itemsArrived && initialOpen) {
+    const becameAutoOpen = !previousInitialOpen.current && initialOpen;
+    previousInitialOpen.current = initialOpen;
+    if (open === undefined && becameAutoOpen) {
       setInternalOpen(true);
     }
-  }, [initialOpen, items.length, open]);
+  }, [initialOpen, open]);
 
   if (items.length === 0) return null;
 
