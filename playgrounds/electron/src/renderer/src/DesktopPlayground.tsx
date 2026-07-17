@@ -27,6 +27,7 @@ import {
   FileChange,
   FileDiff,
   fileDiffToText,
+  FloatingThreadPanel,
   GeneratedImageGallery,
   ImagePreviewDialog,
   InlineNotice,
@@ -55,6 +56,9 @@ import {
   SubagentTranscriptHeader,
   ToolCallCard,
   Tooltip,
+  ThreadFloatingButton,
+  ThreadHeader,
+  ThreadNavigationControls,
   TurnDuration,
   type ApprovalDecision,
   type FileDiffLine,
@@ -314,6 +318,9 @@ export function DesktopPlayground() {
     "Desktop controls ready",
   );
   const [previewImageId, setPreviewImageId] = useState<string | null>(null);
+  const [navigationSidebarOpen, setNavigationSidebarOpen] = useState(false);
+  const [navigationPanelOpen, setNavigationPanelOpen] = useState(true);
+  const [navigationStatus, setNavigationStatus] = useState("Desktop navigation ready");
   const viewport = useViewportMetrics();
   const { metrics: fontMetrics, monoRef, sansRef } = useFontMetrics();
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -569,6 +576,105 @@ export function DesktopPlayground() {
                   <ApprovalCommandPreview command="pnpm --filter @codex-ui-kit/electron-playground check" />
                 </ApprovalRequest>
               </AgentThread>
+            </div>
+          </article>
+
+          <article className="acceptance-card acceptance-card--navigation">
+            <header>
+              <div>
+                <h2>Header, navigation, and floating controls</h2>
+                <p>
+                  Draggable geometry, toolbar focus, transient panel, compact
+                  title handling, and latest-message states.
+                </p>
+              </div>
+              <span className="acceptance-badge">48px toolbar</span>
+            </header>
+            <div className="acceptance-card__body desktop-navigation-surface">
+              <ThreadHeader
+                endActions={
+                  <Tooltip content="More actions">
+                    <IconButton icon={<span>•••</span>} label="More actions" />
+                  </Tooltip>
+                }
+                navigation={
+                  <ThreadNavigationControls
+                    backShortcut="⌘["
+                    canGoBack
+                    canGoForward={false}
+                    forwardShortcut="⌘]"
+                    onGoBack={() => setNavigationStatus("Navigated back")}
+                    onGoForward={() => setNavigationStatus("Navigated forward")}
+                    onSidebarPointerEnter={() => setNavigationPanelOpen(true)}
+                    onToggleSidebar={() => {
+                      setNavigationSidebarOpen((value) => !value);
+                      setNavigationPanelOpen((value) => !value);
+                    }}
+                    sidebarOpen={navigationSidebarOpen}
+                    sidebarShortcut="⌘B"
+                  />
+                }
+                position="static"
+                subtitle="Electron Renderer"
+                title="Desktop thread navigation acceptance"
+              />
+              <div className="desktop-navigation-surface__body">
+                <FloatingThreadPanel
+                  className="desktop-navigation-surface__panel"
+                  label="Desktop project navigation"
+                  open={navigationPanelOpen}
+                  onPointerLeave={() => {
+                    if (!navigationSidebarOpen) setNavigationPanelOpen(false);
+                  }}
+                  topInset="var(--codex-ui-toolbar-height)"
+                >
+                  <div className="desktop-navigation-surface__panel-header">
+                    <strong>codex-ui-kit</strong>
+                    <IconButton
+                      icon={<span>×</span>}
+                      label="Close sidebar"
+                      onClick={() => {
+                        setNavigationPanelOpen(false);
+                        setNavigationSidebarOpen(false);
+                      }}
+                    />
+                  </div>
+                  <button type="button">New thread</button>
+                  <button type="button">Component parity</button>
+                  <button type="button">Electron acceptance</button>
+                </FloatingThreadPanel>
+                <p>
+                  Resize to Compact and change the native theme while this
+                  surface remains visible.
+                </p>
+                <output aria-live="polite">{navigationStatus}</output>
+                <div className="desktop-navigation-surface__floating-states">
+                  <div>
+                    <span>Latest available</span>
+                    <ThreadFloatingButton
+                      className="desktop-navigation-surface__floating-button"
+                      onClick={() => setNavigationStatus("Scrolled to bottom")}
+                      show
+                    />
+                  </div>
+                  <div>
+                    <span>Working below</span>
+                    <ThreadFloatingButton
+                      className="desktop-navigation-surface__floating-button"
+                      onClick={() => setNavigationStatus("Followed working output")}
+                      show
+                      working
+                    />
+                  </div>
+                  <div>
+                    <span>Hidden</span>
+                    <ThreadFloatingButton
+                      className="desktop-navigation-surface__floating-button"
+                      show={false}
+                    />
+                  </div>
+                </div>
+              </div>
             </div>
           </article>
 

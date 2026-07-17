@@ -137,6 +137,16 @@ the pnpm workspace. Electron is not a dependency of `codex-ui-kit`.
 - `ImagePreviewDialog`: portalled lightbox with focus restoration and trapping,
   Escape and Arrow navigation, download, backdrop dismissal, and previous/next
   controls.
+- `ThreadHeader`: measured `48px` draggable desktop header with truncating
+  identity, leading/navigation, start/end action, and independently centered
+  action slots.
+- `ThreadNavigationControls`: sidebar plus optional Back/Forward toolbar
+  controls with observed accessible names, disabled history states, shortcuts,
+  and hover hooks for transient navigation.
+- `FloatingThreadPanel`: non-modal, inert-when-closed leading panel with
+  host-controlled contents and top inset.
+- `ThreadFloatingButton`: latest-message chevron plus working-dot state with
+  hidden interaction removal and reduced-motion behavior.
 
 The default stylesheet supports light, dark, and system color schemes. Set
 `data-theme="light"` or `data-theme="dark"` on an ancestor to force a theme.

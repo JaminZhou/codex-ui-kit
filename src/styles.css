@@ -60,6 +60,253 @@
   box-sizing: border-box;
 }
 
+.codex-ui-thread-header,
+.codex-ui-thread-header *,
+.codex-ui-thread-navigation,
+.codex-ui-thread-navigation *,
+.codex-ui-thread-floating-button,
+.codex-ui-thread-floating-button *,
+.codex-ui-floating-thread-panel,
+.codex-ui-floating-thread-panel * {
+  box-sizing: border-box;
+}
+
+.codex-ui-thread-header {
+  -webkit-app-region: drag;
+  align-items: center;
+  backdrop-filter: blur(18px);
+  background: color-mix(in srgb, var(--codex-ui-background-surface) 88%, transparent);
+  color: var(--codex-ui-text);
+  display: flex;
+  height: var(--codex-ui-toolbar-height);
+  inset-inline: 0;
+  min-width: 0;
+  padding-inline-end: calc(var(--codex-ui-spacing) * 2);
+  pointer-events: none;
+  top: var(--codex-ui-header-top, 0);
+  z-index: 30;
+}
+
+.codex-ui-thread-header[data-position="fixed"] {
+  position: fixed;
+}
+
+.codex-ui-thread-header[data-position="sticky"] {
+  position: sticky;
+}
+
+.codex-ui-thread-header[data-position="static"] {
+  position: relative;
+}
+
+.codex-ui-thread-header__navigation {
+  align-items: center;
+  align-self: stretch;
+  display: flex;
+  flex: 0 0 auto;
+  padding-inline-start: max(
+    var(--codex-ui-header-safe-inset-left),
+    var(--codex-ui-spacing)
+  );
+  pointer-events: auto;
+}
+
+.codex-ui-thread-header__context {
+  align-items: center;
+  align-self: stretch;
+  contain: layout paint;
+  display: flex;
+  flex: 1 1 auto;
+  gap: var(--codex-ui-header-action-gap);
+  margin-inline-start: calc(var(--codex-ui-spacing) * 2);
+  min-width: 0;
+  overflow: hidden;
+}
+
+.codex-ui-thread-header__identity {
+  display: grid;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.codex-ui-thread-header__title,
+.codex-ui-thread-header__subtitle {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.codex-ui-thread-header__title {
+  font-family: var(--codex-ui-font-sans);
+  font-size: var(--codex-ui-font-size-sm);
+  font-weight: var(--codex-ui-font-weight-medium);
+  line-height: var(--codex-ui-line-height-sm);
+}
+
+.codex-ui-thread-header__subtitle {
+  color: var(--codex-ui-text-secondary);
+  font-family: var(--codex-ui-font-sans);
+  font-size: var(--codex-ui-font-size-xs);
+  line-height: var(--codex-ui-line-height-xs);
+}
+
+.codex-ui-thread-header__actions,
+.codex-ui-thread-header__center-actions {
+  -webkit-app-region: no-drag;
+  align-items: center;
+  display: flex;
+  flex: 0 0 auto;
+  gap: var(--codex-ui-header-action-gap);
+  pointer-events: auto;
+}
+
+.codex-ui-thread-header__actions[data-align="end"] {
+  margin-inline-start: auto;
+}
+
+.codex-ui-thread-header__center-actions {
+  inset-inline: 0;
+  justify-content: center;
+  pointer-events: none;
+  position: absolute;
+}
+
+.codex-ui-thread-header__center-actions > * {
+  pointer-events: auto;
+}
+
+.codex-ui-thread-navigation {
+  align-items: center;
+  display: flex;
+  gap: var(--codex-ui-spacing);
+}
+
+.codex-ui-thread-floating-button {
+  align-items: center;
+  appearance: none;
+  background: var(--codex-ui-background-surface);
+  bottom: var(--codex-ui-floating-control-composer-offset);
+  border: 1px solid var(--codex-ui-border);
+  border-radius: var(--codex-ui-radius-full);
+  color: var(--codex-ui-text-secondary);
+  cursor: pointer;
+  display: flex;
+  height: var(--codex-ui-floating-control-size);
+  inset-inline-end: 50%;
+  justify-content: center;
+  opacity: 0;
+  padding: 0;
+  pointer-events: none;
+  position: absolute;
+  transform: translateX(50%);
+  transition: opacity var(--codex-ui-transition);
+  width: var(--codex-ui-floating-control-size);
+  z-index: 30;
+}
+
+.codex-ui-thread-floating-button[data-show] {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.codex-ui-thread-floating-button:hover {
+  background: var(--codex-ui-background-button-tertiary-hover);
+  color: var(--codex-ui-text);
+}
+
+.codex-ui-thread-floating-button:focus-visible {
+  outline: 2px solid var(--codex-ui-focus);
+  outline-offset: 2px;
+}
+
+.codex-ui-thread-floating-button__icon {
+  display: inline-flex;
+  height: 1.25rem;
+  width: 1.25rem;
+}
+
+.codex-ui-thread-floating-button__dots {
+  align-items: center;
+  display: flex;
+  gap: var(--codex-ui-spacing);
+}
+
+.codex-ui-thread-floating-button__dots > span {
+  animation: codex-ui-working-dot-wave 900ms ease-in-out infinite;
+  background: currentColor;
+  border-radius: var(--codex-ui-radius-full);
+  height: var(--codex-ui-spacing);
+  opacity: 0.7;
+  width: var(--codex-ui-spacing);
+}
+
+.codex-ui-thread-floating-button__dots > span:nth-child(2) {
+  animation-delay: 120ms;
+}
+
+.codex-ui-thread-floating-button__dots > span:nth-child(3) {
+  animation-delay: 240ms;
+}
+
+.codex-ui-floating-thread-panel {
+  background: var(--codex-ui-background-surface);
+  border: 1px solid var(--codex-ui-border);
+  border-radius: var(--codex-ui-radius-lg);
+  bottom: 0;
+  box-shadow: var(--codex-ui-shadow-floating-panel);
+  color: var(--codex-ui-text);
+  inset-inline-start: 0;
+  opacity: 0;
+  overflow: hidden;
+  pointer-events: none;
+  position: fixed;
+  transform: translateX(calc(var(--codex-ui-spacing) * -2));
+  transition:
+    opacity var(--codex-ui-transition),
+    transform var(--codex-ui-transition);
+  width: min(var(--codex-ui-floating-panel-width), calc(100vw - 1rem));
+  z-index: 42;
+}
+
+.codex-ui-floating-thread-panel[data-open] {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateX(0);
+}
+
+@keyframes codex-ui-working-dot-wave {
+  0%,
+  60%,
+  100% {
+    transform: translateY(0);
+  }
+  30% {
+    transform: translateY(calc(var(--codex-ui-spacing) * -0.75));
+  }
+}
+
+@media (max-width: 36rem) {
+  .codex-ui-thread-header__subtitle,
+  .codex-ui-thread-header__actions[data-align="start"] {
+    display: none;
+  }
+
+  .codex-ui-thread-navigation {
+    gap: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .codex-ui-thread-floating-button,
+  .codex-ui-floating-thread-panel {
+    transition-duration: 0ms;
+  }
+
+  .codex-ui-thread-floating-button__dots > span {
+    animation: none;
+  }
+}
+
 .codex-ui-button,
 .codex-ui-icon-button {
   --codex-ui-control-background: var(--codex-ui-background-button-secondary);

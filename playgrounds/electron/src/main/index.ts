@@ -157,6 +157,72 @@ async function captureResourceSurfaces(
   })()`);
 }
 
+async function captureNavigationSurfaces(webContents: WebContents) {
+  return webContents.executeJavaScript(`(async () => {
+    const wait = (duration) => new Promise((resolve) => setTimeout(resolve, duration));
+    const rect = (element) => {
+      if (!element) return null;
+      const bounds = element.getBoundingClientRect();
+      return {
+        bottom: bounds.bottom,
+        height: bounds.height,
+        left: bounds.left,
+        right: bounds.right,
+        top: bounds.top,
+        width: bounds.width,
+      };
+    };
+    document.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true }));
+    const dock = document.querySelector('.desktop-composer-dock');
+    if (dock instanceof HTMLElement) dock.style.display = 'none';
+    const card = document.querySelector('.acceptance-card--navigation');
+    const scrollRegion = document.querySelector('.desktop-scroll-region');
+    if (card && scrollRegion instanceof HTMLElement) {
+      scrollRegion.style.scrollBehavior = 'auto';
+      const regionBounds = scrollRegion.getBoundingClientRect();
+      const cardBounds = card.getBoundingClientRect();
+      scrollRegion.scrollTop += cardBounds.top - regionBounds.top - 12;
+    }
+    await wait(180);
+    const header = card?.querySelector('.codex-ui-thread-header');
+    const context = card?.querySelector('.codex-ui-thread-header__context');
+    const panel = card?.querySelector('.desktop-navigation-surface__panel');
+    const navigation = card?.querySelector('.codex-ui-thread-navigation');
+    const floatingButtons = [...(card?.querySelectorAll('.desktop-navigation-surface__floating-button') ?? [])];
+    const navigationButtons = [...(navigation?.querySelectorAll('button') ?? [])];
+    return {
+      bodyScrollWidth: document.body.scrollWidth,
+      card: rect(card),
+      clientWidth: document.documentElement.clientWidth,
+      contextGap: context ? getComputedStyle(context).gap : null,
+      floatingButtons: floatingButtons.map((button) => ({
+        bounds: rect(button),
+        opacity: getComputedStyle(button).opacity,
+        pointerEvents: getComputedStyle(button).pointerEvents,
+        tabIndex: button.tabIndex,
+        working: button.hasAttribute('data-working'),
+      })),
+      header: rect(header),
+      headerPosition: header ? getComputedStyle(header).position : null,
+      navigationButtons: navigationButtons.map((button) => ({
+        bounds: rect(button),
+        disabled: button.disabled,
+        label: button.getAttribute('aria-label'),
+      })),
+      navigationGap: navigation ? getComputedStyle(navigation).gap : null,
+      panel: rect(panel),
+      panelOpen: panel?.hasAttribute('data-open') ?? false,
+      panelZIndex: panel ? getComputedStyle(panel).zIndex : null,
+      resolvedTheme: document.querySelector('.desktop-playground')?.getAttribute('data-theme'),
+      titleOverflow: (() => {
+        const title = card?.querySelector('.codex-ui-thread-header__title');
+        return title ? title.scrollWidth > title.clientWidth : null;
+      })(),
+      viewport: { height: window.innerHeight, width: window.innerWidth },
+    };
+  })()`);
+}
+
 async function captureAcceptance(browserWindow: BrowserWindow) {
   const outputDirectory = process.env.CODEX_UI_KIT_ACCEPTANCE_DIR;
   if (!outputDirectory) return;
@@ -214,6 +280,10 @@ async function captureAcceptance(browserWindow: BrowserWindow) {
     };
   })()`);
   const screenshot = await browserWindow.webContents.capturePage();
+  const navigationMetrics = await captureNavigationSurfaces(
+    browserWindow.webContents,
+  );
+  const navigationScreenshot = await browserWindow.webContents.capturePage();
   const interactiveMetrics = await captureInteractivePrimitives(
     browserWindow.webContents,
   );
@@ -251,6 +321,11 @@ async function captureAcceptance(browserWindow: BrowserWindow) {
     browserWindow.webContents,
   );
   const compactResourceScreenshot = await browserWindow.webContents.capturePage();
+  const compactNavigationMetrics = await captureNavigationSurfaces(
+    browserWindow.webContents,
+  );
+  const compactNavigationScreenshot =
+    await browserWindow.webContents.capturePage();
 
   await mkdir(outputDirectory, { recursive: true });
   await Promise.all([
@@ -261,6 +336,22 @@ async function captureAcceptance(browserWindow: BrowserWindow) {
     writeFile(
       join(outputDirectory, "composer-auxiliary.png"),
       screenshot.toPNG(),
+    ),
+    writeFile(
+      join(outputDirectory, "navigation-surfaces-metrics.json"),
+      `${JSON.stringify(navigationMetrics, null, 2)}\n`,
+    ),
+    writeFile(
+      join(outputDirectory, "navigation-surfaces.png"),
+      navigationScreenshot.toPNG(),
+    ),
+    writeFile(
+      join(outputDirectory, "navigation-surfaces-compact-light-metrics.json"),
+      `${JSON.stringify(compactNavigationMetrics, null, 2)}\n`,
+    ),
+    writeFile(
+      join(outputDirectory, "navigation-surfaces-compact-light.png"),
+      compactNavigationScreenshot.toPNG(),
     ),
     writeFile(
       join(outputDirectory, "interactive-primitives-metrics.json"),

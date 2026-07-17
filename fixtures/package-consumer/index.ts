@@ -40,6 +40,10 @@ import {
   Select,
   StatusBanner,
   SourceList,
+  FloatingThreadPanel,
+  ThreadFloatingButton,
+  ThreadHeader,
+  ThreadNavigationControls,
   type StatusBannerAction,
   StreamNotice,
   SubagentActivity,
@@ -131,6 +135,10 @@ void QueuedPromptList;
 void SearchActivity;
 void StatusBanner;
 void SourceList;
+void FloatingThreadPanel;
+void ThreadFloatingButton;
+void ThreadHeader;
+void ThreadNavigationControls;
 void StreamNotice;
 void SubagentActivity;
 void SubagentActivityGroup;
