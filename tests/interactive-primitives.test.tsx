@@ -155,6 +155,41 @@ describe("menus and selects", () => {
     expect(screen.getAllByRole("menu")).toHaveLength(2);
   });
 
+  it("keeps nested popover portals inside the ancestor ownership chain", () => {
+    const onValueChange = vi.fn();
+    render(
+      <Popover
+        defaultOpen
+        label="Parent popover"
+        trigger={<button type="button">Parent</button>}
+      >
+        <Select
+          label="Nested mode"
+          onValueChange={onValueChange}
+          options={[
+            { label: "Local", value: "local" },
+            { label: "Cloud", value: "cloud" },
+          ]}
+          value="local"
+        />
+        <button type="button">Parent action</button>
+      </Popover>,
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "Nested mode" }));
+    const cloud = screen.getByRole("option", { name: "Cloud" });
+    fireEvent.pointerDown(cloud);
+    expect(screen.getByRole("dialog", { name: "Parent popover" })).toBeTruthy();
+    fireEvent.click(cloud);
+    expect(onValueChange).toHaveBeenCalledWith("cloud");
+    expect(screen.getByRole("dialog", { name: "Parent popover" })).toBeTruthy();
+
+    fireEvent.click(screen.getByRole("button", { name: "Nested mode" }));
+    fireEvent.pointerDown(screen.getByRole("button", { name: "Parent action" }));
+    expect(screen.queryByRole("listbox", { name: "Nested mode" })).toBeNull();
+    expect(screen.getByRole("dialog", { name: "Parent popover" })).toBeTruthy();
+  });
+
   it("selects enabled listbox options and ignores disabled options", () => {
     const onValueChange = vi.fn();
     render(

@@ -8,6 +8,7 @@ import {
   useEffect,
   useId,
   useLayoutEffect,
+  useMemo,
   useRef,
   useState,
   type ButtonHTMLAttributes,
@@ -148,7 +149,7 @@ export type OverlaySide = "bottom" | "left" | "right" | "top";
 export type OverlayAlign = "center" | "end" | "start";
 export type OverlayWidth = "auto" | "menu" | "menu-wide" | "trigger";
 
-const OverlayOwnerContext = createContext<string | null>(null);
+const OverlayOwnerContext = createContext<readonly string[]>([]);
 
 interface TriggerProps {
   "aria-controls"?: string;
@@ -239,7 +240,7 @@ interface FloatingSurfaceProps {
   label?: string;
   onKeyDown?: KeyboardEventHandler<HTMLDivElement>;
   open: boolean;
-  ownerId?: string;
+  ownerIds?: readonly string[];
   role: "dialog" | "listbox" | "menu" | "tooltip";
   side: OverlaySide;
   sideOffset: number;
@@ -257,7 +258,7 @@ function FloatingSurface({
   label,
   onKeyDown,
   open,
-  ownerId,
+  ownerIds,
   role,
   side,
   sideOffset,
@@ -391,7 +392,7 @@ function FloatingSurface({
       aria-label={label}
       className={className}
       data-align={align}
-      data-codex-ui-overlay-owner={ownerId}
+      data-codex-ui-overlay-owner={ownerIds?.join(" ")}
       data-side={position?.resolvedSide ?? side}
       data-state="open"
       data-theme={position?.theme}
@@ -558,6 +559,11 @@ export function Popover({
   width = "auto",
 }: PopoverProps) {
   const id = useId();
+  const inheritedOwnerIds = useContext(OverlayOwnerContext);
+  const ownerIds = useMemo(
+    () => [...inheritedOwnerIds, id],
+    [id, inheritedOwnerIds],
+  );
   const anchorRef = useRef<HTMLSpanElement | null>(null);
   const contentRef = useRef<HTMLDivElement | null>(null);
   const keyboardOpenTargetRef = useRef<"first" | "last" | null>(null);
@@ -594,7 +600,7 @@ export function Popover({
       if (
         !anchorRef.current?.contains(target) &&
         !contentRef.current?.contains(target) &&
-        ownedOverlay?.dataset.codexUiOverlayOwner !== id
+        !ownedOverlay?.dataset.codexUiOverlayOwner?.split(/\s+/).includes(id)
       ) {
         close();
       }
@@ -661,7 +667,7 @@ export function Popover({
     .filter(Boolean)
     .join(" ");
   return (
-    <OverlayOwnerContext.Provider value={id}>
+    <OverlayOwnerContext.Provider value={ownerIds}>
       <span className="codex-ui-popover-anchor" ref={anchorRef}>
         {mergedTrigger}
         <FloatingSurface
@@ -681,7 +687,7 @@ export function Popover({
             if (role === "menu" || role === "listbox") focusByKey(event);
           }}
           open={resolvedOpen && !disabled}
-          ownerId={id}
+          ownerIds={ownerIds}
           role={role}
           side={side}
           sideOffset={sideOffset}
@@ -874,7 +880,7 @@ export function MenuSubmenu({
   startIcon,
 }: MenuSubmenuProps) {
   const id = useId();
-  const ownerId = useContext(OverlayOwnerContext) ?? undefined;
+  const ownerIds = useContext(OverlayOwnerContext);
   const anchorRef = useRef<HTMLButtonElement | null>(null);
   const contentRef = useRef<HTMLDivElement | null>(null);
   const closeTimerRef = useRef<number | null>(null);
@@ -959,7 +965,7 @@ export function MenuSubmenu({
           focusByKey(event);
         }}
         open={open && !disabled}
-        ownerId={ownerId}
+        ownerIds={ownerIds}
         role="menu"
         side="right"
         sideOffset={4}
