@@ -6,6 +6,7 @@ import {
   FloatingThreadPanel,
   ThreadFloatingButton,
   ThreadHeader,
+  ThreadMessageNavigationRail,
   ThreadNavigationControls,
 } from "../src";
 
@@ -111,5 +112,70 @@ describe("thread navigation surfaces", () => {
     );
     expect(panel.getAttribute("aria-hidden")).toBe("false");
     expect(panel.hasAttribute("inert")).toBe(false);
+  });
+
+  it("reveals the user-message rail only at the observed item threshold", () => {
+    const items = Array.from({ length: 4 }, (_, index) => ({
+      id: `message-${index + 1}`,
+      label: `Message ${index + 1}`,
+    }));
+    const { rerender } = render(
+      <ThreadMessageNavigationRail items={items.slice(0, 3)} />,
+    );
+    expect(screen.queryByRole("navigation", { name: "User messages" })).toBeNull();
+
+    rerender(
+      <ThreadMessageNavigationRail activeIds={["message-2"]} items={items} />,
+    );
+    expect(screen.getByRole("navigation", { name: "User messages" })).toBeTruthy();
+    expect(
+      screen.getByRole("button", { name: "Jump to user message 2" }).getAttribute(
+        "aria-current",
+      ),
+    ).toBe("true");
+  });
+
+  it("previews message content and uses smooth click navigation", () => {
+    const onNavigate = vi.fn();
+    const items = Array.from({ length: 4 }, (_, index) => ({
+      id: `message-${index + 1}`,
+      label: index === 0 ? "" : `Message ${index + 1}`,
+      outputs: index === 0 ? ["Command", "Patch", "Search"] : undefined,
+      preview: index === 0 ? "Inspect the complete thread surface." : undefined,
+    }));
+    render(
+      <ThreadMessageNavigationRail items={items} onNavigate={onNavigate} />,
+    );
+
+    const first = screen.getByRole("button", { name: "Jump to user message 1" });
+    fireEvent.focus(first);
+    expect(screen.getByRole("tooltip").textContent).toContain("(No content)");
+    expect(screen.getByRole("tooltip").textContent).toContain("+1 more");
+    fireEvent.click(first);
+    expect(onNavigate).toHaveBeenCalledWith(items[0], "smooth");
+  });
+
+  it("scrubs across captured markers with instant navigation", () => {
+    const onNavigate = vi.fn();
+    const items = Array.from({ length: 4 }, (_, index) => ({
+      id: `message-${index + 1}`,
+      label: `Message ${index + 1}`,
+    }));
+    render(
+      <ThreadMessageNavigationRail items={items} onNavigate={onNavigate} />,
+    );
+    const first = screen.getByRole("button", { name: "Jump to user message 1" });
+    const third = screen
+      .getByRole("button", { name: "Jump to user message 3" })
+      .closest<HTMLElement>("[data-message-navigation-id]")!;
+    vi.spyOn(document, "elementFromPoint").mockReturnValue(third);
+
+    fireEvent.pointerDown(first, { button: 0, pointerId: 7 });
+    fireEvent.pointerMove(first, { clientX: 8, clientY: 24, pointerId: 7 });
+    fireEvent.pointerUp(first, { pointerId: 7 });
+    fireEvent.click(first);
+
+    expect(onNavigate).toHaveBeenCalledTimes(1);
+    expect(onNavigate).toHaveBeenCalledWith(items[2], "instant");
   });
 });

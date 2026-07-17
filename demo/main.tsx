@@ -53,6 +53,7 @@ import {
   Tooltip,
   ThreadFloatingButton,
   ThreadHeader,
+  ThreadMessageNavigationRail,
   ThreadNavigationControls,
   TurnDuration,
   type AgentItemStatus,
@@ -96,6 +97,36 @@ const statuses: Array<{ label: string; status: AgentItemStatus }> = [
   { label: "Completed", status: "completed" },
   { label: "Failed", status: "failed" },
 ];
+
+const navigationMessages = [
+  {
+    id: "navigation-message-1",
+    label: "Create a protocol-neutral component library.",
+    outputs: ["Mapped the public API", "Measured the layout"],
+    preview: "Start with the thread shell and preserve host-owned behavior.",
+  },
+  {
+    id: "navigation-message-2",
+    label: "Add browser and Electron acceptance surfaces.",
+    outputs: ["H5 showcase", "Electron playground", "Package consumer"],
+    preview: "Reuse the same React components in both renderers.",
+  },
+  {
+    id: "navigation-message-3",
+    label: "Verify light, dark, compact, and focus states.",
+    preview: "Capture measured geometry before declaring parity.",
+  },
+  {
+    id: "navigation-message-4",
+    label: "Keep the package independent from product transport.",
+    preview: "Navigation callbacks remain host-controlled.",
+  },
+  {
+    id: "navigation-message-5",
+    label: "Finish the complete parity matrix.",
+    preview: "Every row requires component, visual, H5, Electron, and test gates.",
+  },
+] as const;
 
 const showcaseDiffLines: FileDiffLine[] = [
   { content: "@@ -12,3 +12,4 @@", kind: "hunk" },
@@ -347,6 +378,9 @@ function Showcase() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [floatingPanelOpen, setFloatingPanelOpen] = useState(true);
   const [navigationStatus, setNavigationStatus] = useState("Navigation ready");
+  const [activeNavigationMessageId, setActiveNavigationMessageId] = useState<string>(
+    navigationMessages[2].id,
+  );
 
   const reorderQueuedPrompts = (activeId: string, overId: string) => {
     setQueuedPrompts((current) => {
@@ -491,6 +525,17 @@ function Showcase() {
                 title="Match the desktop thread surfaces"
               />
               <div className="navigation-preview__body">
+                <ThreadMessageNavigationRail
+                  activeIds={[activeNavigationMessageId]}
+                  insetInlineStart="calc(var(--codex-ui-floating-panel-width) + 0.75rem)"
+                  items={navigationMessages}
+                  onNavigate={(item, behavior) => {
+                    setActiveNavigationMessageId(item.id);
+                    setNavigationStatus(
+                      `${behavior === "instant" ? "Scrubbed" : "Jumped"} to ${item.id}`,
+                    );
+                  }}
+                />
                 <FloatingThreadPanel
                   className="navigation-preview__panel"
                   label="Project navigation"

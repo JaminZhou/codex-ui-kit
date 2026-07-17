@@ -58,6 +58,7 @@ import {
   Tooltip,
   ThreadFloatingButton,
   ThreadHeader,
+  ThreadMessageNavigationRail,
   ThreadNavigationControls,
   TurnDuration,
   type ApprovalDecision,
@@ -244,6 +245,36 @@ const desktopResourceImages: GeneratedImageItem[] = [
   width: index % 2 === 0 ? 960 : 760,
 }));
 
+const desktopNavigationMessages = [
+  {
+    id: "desktop-message-1",
+    label: "Reuse the public package in Electron.",
+    outputs: ["Renderer loaded", "System theme connected"],
+    preview: "Keep the component package independent from the desktop host.",
+  },
+  {
+    id: "desktop-message-2",
+    label: "Measure the native window surface.",
+    outputs: ["Standard viewport", "Compact viewport", "Font fallback"],
+    preview: "Capture geometry under native resizing and theme changes.",
+  },
+  {
+    id: "desktop-message-3",
+    label: "Verify navigation and focus behavior.",
+    preview: "Keyboard focus opens the same message preview as pointer hover.",
+  },
+  {
+    id: "desktop-message-4",
+    label: "Scrub between user turns.",
+    preview: "Pointer capture uses instant navigation while click stays smooth.",
+  },
+  {
+    id: "desktop-message-5",
+    label: "Complete desktop acceptance.",
+    preview: "No horizontal overflow at either verified window size.",
+  },
+] as const;
+
 function useViewportMetrics(): ViewportMetrics {
   const [metrics, setMetrics] = useState<ViewportMetrics>(() => ({
     height: window.innerHeight,
@@ -321,6 +352,9 @@ export function DesktopPlayground() {
   const [navigationSidebarOpen, setNavigationSidebarOpen] = useState(false);
   const [navigationPanelOpen, setNavigationPanelOpen] = useState(true);
   const [navigationStatus, setNavigationStatus] = useState("Desktop navigation ready");
+  const [activeNavigationMessageId, setActiveNavigationMessageId] = useState<string>(
+    desktopNavigationMessages[2].id,
+  );
   const viewport = useViewportMetrics();
   const { metrics: fontMetrics, monoRef, sansRef } = useFontMetrics();
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -619,6 +653,17 @@ export function DesktopPlayground() {
                 title="Desktop thread navigation acceptance"
               />
               <div className="desktop-navigation-surface__body">
+                <ThreadMessageNavigationRail
+                  activeIds={[activeNavigationMessageId]}
+                  insetInlineStart="calc(var(--codex-ui-floating-panel-width) + 1rem)"
+                  items={desktopNavigationMessages}
+                  onNavigate={(item, behavior) => {
+                    setActiveNavigationMessageId(item.id);
+                    setNavigationStatus(
+                      `${behavior === "instant" ? "Scrubbed" : "Jumped"} to ${item.id}`,
+                    );
+                  }}
+                />
                 <FloatingThreadPanel
                   className="desktop-navigation-surface__panel"
                   label="Desktop project navigation"

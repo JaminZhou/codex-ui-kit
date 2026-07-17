@@ -143,6 +143,9 @@ the pnpm workspace. Electron is not a dependency of `codex-ui-kit`.
 - `ThreadNavigationControls`: sidebar plus optional Back/Forward toolbar
   controls with observed accessible names, disabled history states, shortcuts,
   and hover hooks for transient navigation.
+- `ThreadMessageNavigationRail`: four-or-more-message overview with active-turn
+  markers, keyboard and pointer previews, smooth click navigation, and captured
+  pointer scrubbing through host-controlled instant navigation callbacks.
 - `FloatingThreadPanel`: non-modal, inert-when-closed leading panel with
   host-controlled contents and top inset.
 - `ThreadFloatingButton`: latest-message chevron plus working-dot state with

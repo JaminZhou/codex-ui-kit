@@ -155,6 +155,13 @@
     var(--codex-ui-spacing) * 6
   );
   --codex-ui-floating-panel-width: calc(var(--codex-ui-spacing) * 70);
+  --codex-ui-message-navigation-inset: calc(var(--codex-ui-spacing) * 3);
+  --codex-ui-message-navigation-row-width: calc(var(--codex-ui-spacing) * 9);
+  --codex-ui-message-navigation-row-height: calc(var(--codex-ui-spacing) * 2.5);
+  --codex-ui-message-navigation-marker-width: calc(var(--codex-ui-spacing) * 7.5);
+  --codex-ui-message-navigation-marker-height: calc(var(--codex-ui-spacing) * 0.5);
+  --codex-ui-message-navigation-tooltip-width: 20rem;
+  --codex-ui-message-navigation-edge-fade: calc(var(--codex-ui-spacing) * 10);
   --codex-ui-summary-panel-width: 18.75rem;
   --codex-ui-approval-card-radius: var(--codex-ui-radius-4xl);
   --codex-ui-approval-command-max-height: 20rem;

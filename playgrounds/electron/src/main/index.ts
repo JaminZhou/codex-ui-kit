@@ -184,12 +184,25 @@ async function captureNavigationSurfaces(webContents: WebContents) {
       scrollRegion.scrollTop += cardBounds.top - regionBounds.top - 12;
     }
     await wait(180);
+    const messageRailButton = card?.querySelector('.codex-ui-message-navigation-rail__button');
+    if (messageRailButton instanceof HTMLElement) {
+      messageRailButton.focus();
+      messageRailButton.dispatchEvent(new PointerEvent('pointerover', {
+        bubbles: true,
+        pointerType: 'mouse',
+      }));
+    }
+    await wait(120);
     const header = card?.querySelector('.codex-ui-thread-header');
     const context = card?.querySelector('.codex-ui-thread-header__context');
     const panel = card?.querySelector('.desktop-navigation-surface__panel');
     const navigation = card?.querySelector('.codex-ui-thread-navigation');
     const floatingButtons = [...(card?.querySelectorAll('.desktop-navigation-surface__floating-button') ?? [])];
     const navigationButtons = [...(navigation?.querySelectorAll('button') ?? [])];
+    const messageRail = card?.querySelector('.codex-ui-message-navigation-rail');
+    const messageRailRows = [...(messageRail?.querySelectorAll('.codex-ui-message-navigation-rail__row') ?? [])];
+    const messageRailMarkers = [...(messageRail?.querySelectorAll('.codex-ui-message-navigation-rail__marker') ?? [])];
+    const messageRailTooltip = messageRail?.querySelector('.codex-ui-message-navigation-rail__tooltip');
     return {
       bodyScrollWidth: document.body.scrollWidth,
       card: rect(card),
@@ -204,6 +217,16 @@ async function captureNavigationSurfaces(webContents: WebContents) {
       })),
       header: rect(header),
       headerPosition: header ? getComputedStyle(header).position : null,
+      focusedLabel: document.activeElement?.getAttribute('aria-label'),
+      messageRail: rect(messageRail),
+      messageRailCurrent: messageRail?.querySelector('[aria-current="true"]')?.getAttribute('aria-label'),
+      messageRailMarkers: messageRailMarkers.map((marker) => ({
+        bounds: rect(marker),
+        opacity: getComputedStyle(marker).opacity,
+      })),
+      messageRailRows: messageRailRows.map(rect),
+      messageRailTooltip: rect(messageRailTooltip),
+      messageRailTooltipText: messageRailTooltip?.textContent ?? null,
       navigationButtons: navigationButtons.map((button) => ({
         bounds: rect(button),
         disabled: button.disabled,
