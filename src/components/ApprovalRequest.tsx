@@ -532,6 +532,7 @@ export function ApprovalCommandPreview({
     return command.split(/\r?\n/u).length > collapsedLines || command.length > 96;
   });
   const collapsible = forceCollapsible ?? measuredCollapsible;
+  const visuallyExpanded = expanded || forceCollapsible === false;
 
   useLayoutEffect(() => {
     if (forceCollapsible !== undefined) return;
@@ -556,7 +557,7 @@ export function ApprovalCommandPreview({
       className={["codex-ui-approval-command", className]
         .filter(Boolean)
         .join(" ")}
-      data-expanded={expanded || undefined}
+      data-expanded={visuallyExpanded || undefined}
       role="region"
       style={
         {

@@ -273,4 +273,17 @@ describe("ApprovalCommandPreview", () => {
       preview.style.getPropertyValue("--codex-ui-approval-command-lines"),
     ).toBe("5");
   });
+
+  it("shows the full command when collapsing is explicitly disabled", () => {
+    render(
+      <ApprovalCommandPreview
+        command={"line one\nline two\nline three\nline four"}
+        forceCollapsible={false}
+      />,
+    );
+
+    const preview = screen.getByRole("region", { name: "Command preview" });
+    expect(preview.getAttribute("data-expanded")).toBe("true");
+    expect(screen.queryByRole("button", { name: "Expand" })).toBeNull();
+  });
 });
