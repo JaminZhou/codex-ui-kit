@@ -113,6 +113,8 @@
   --codex-ui-subagent-chip-height: 1.75rem;
   --codex-ui-subagent-panel-row-min-height: 2rem;
   --codex-ui-subagent-panel-header-height: 3rem;
+  --codex-ui-approval-card-radius: var(--codex-ui-radius-4xl);
+  --codex-ui-approval-command-max-height: 20rem;
   --codex-ui-transition-fast: 150ms ease;
   --codex-ui-transition-relaxed: 300ms ease;
   --codex-ui-transition: var(--codex-ui-transition-fast);

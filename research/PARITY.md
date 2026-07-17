@@ -39,7 +39,7 @@ A row is complete only when all applicable gates pass:
 | File changes and structured diffs | Complete | Measured | Complete | Complete | Good | Complete |
 | Search, web, MCP, and connector calls | Complete | Measured | Complete | Complete | Good | Complete |
 | Subagent and delegated work | Complete | Measured | Complete | Complete | Good | Complete |
-| Approval and permission requests | Foundation | Partial | Partial | Partial | Basic | Gap |
+| Approval and permission requests | Complete | Measured | Complete | Complete | Good | Complete |
 | Errors, warnings, notices, retry, and interruption | Generic only | Missing | Missing | Missing | Missing | Gap |
 | Composer shell and autosizing input | Foundation | Partial | Partial | Partial | Good | Gap |
 | Composer attachments, mentions, modes, and queued prompts | Attachment only | Partial | Partial | Partial | Basic | Gap |
