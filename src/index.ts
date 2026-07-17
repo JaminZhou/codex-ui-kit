@@ -9,6 +9,7 @@ export * from "./components/AgentComposer";
 export * from "./components/ApprovalRequest";
 export * from "./components/CommandExecution";
 export * from "./components/FileChange";
+export * from "./components/Notices";
 export * from "./components/ProposedPlan";
 export * from "./components/SearchActivity";
 export * from "./components/StatusIndicator";

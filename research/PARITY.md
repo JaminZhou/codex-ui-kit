@@ -40,7 +40,7 @@ A row is complete only when all applicable gates pass:
 | Search, web, MCP, and connector calls | Complete | Measured | Complete | Complete | Good | Complete |
 | Subagent and delegated work | Complete | Measured | Complete | Complete | Good | Complete |
 | Approval and permission requests | Complete | Measured | Complete | Complete | Good | Complete |
-| Errors, warnings, notices, retry, and interruption | Generic only | Missing | Missing | Missing | Missing | Gap |
+| Errors, warnings, notices, retry, and interruption | Complete | Measured | Complete | Complete | Good | Complete |
 | Composer shell and autosizing input | Foundation | Partial | Partial | Partial | Good | Gap |
 | Composer attachments, mentions, modes, and queued prompts | Attachment only | Partial | Partial | Partial | Basic | Gap |
 | Buttons, icon buttons, menus, tooltips, popovers, and selects | Slots only | Missing | Missing | Missing | Missing | Gap |

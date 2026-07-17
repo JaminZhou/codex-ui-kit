@@ -18,9 +18,12 @@ import {
   FileChange,
   FileDiff,
   fileDiffToText,
+  InlineNotice,
   ProposedPlan,
   SearchActivity,
   StatusIndicator,
+  StatusBanner,
+  StreamNotice,
   SubagentActivity,
   SubagentActivityGroup,
   SubagentPanel,
@@ -275,6 +278,9 @@ function Showcase() {
   const [planActionStatus, setPlanActionStatus] = useState("Plan actions ready");
   const [toolActionStatus, setToolActionStatus] = useState(
     "Raw tool output ready",
+  );
+  const [noticeActionStatus, setNoticeActionStatus] = useState(
+    "Notice actions ready",
   );
   const [selectedSubagent, setSelectedSubagent] =
     useState<SubagentItem | null>(null);
@@ -1009,6 +1015,183 @@ function Showcase() {
                   <code>{status}</code>
                 </div>
               ))}
+            </div>
+          </GalleryCard>
+
+          <GalleryCard
+            description="Banner, inline divider, reconnect details, retry, interruption, semantic tone, and narrow-container states."
+            title="Errors, warnings, notices, and retry"
+            wide
+          >
+            <div className="notice-preview">
+              <div className="notice-preview__controls">
+                <span>Protocol-neutral state matrix</span>
+                <output aria-live="polite">{noticeActionStatus}</output>
+              </div>
+              <div className="notice-preview__grid">
+                <div className="notice-preview__surface notice-preview__surface--wide">
+                  <span className="notice-preview__label">
+                    Warning · responsive actions
+                  </span>
+                  <StatusBanner
+                    actions={[
+                      {
+                        label: "Try again",
+                        onClick: () =>
+                          setNoticeActionStatus("Retried sandbox readiness"),
+                        variant: "primary",
+                      },
+                    ]}
+                    aria-live="polite"
+                    heading="Couldn’t check the sandbox"
+                    onDismiss={() =>
+                      setNoticeActionStatus("Dismissed sandbox warning")
+                    }
+                    role="status"
+                    stackOnNarrow
+                    tone="warning"
+                  >
+                    Try again to continue setup.
+                  </StatusBanner>
+                </div>
+
+                <div className="notice-preview__surface">
+                  <span className="notice-preview__label">
+                    Error · vertical icon
+                  </span>
+                  <StatusBanner
+                    actions={[
+                      {
+                        label: "Try again",
+                        onClick: () =>
+                          setNoticeActionStatus("Retried failed operation"),
+                        variant: "primary",
+                      },
+                      {
+                        label: "View logs",
+                        onClick: () =>
+                          setNoticeActionStatus("Opened failure details"),
+                      },
+                    ]}
+                    heading="Task couldn’t continue"
+                    layout="icon"
+                    role="alert"
+                    tone="error"
+                  >
+                    The response stream closed before the turn completed.
+                  </StatusBanner>
+                </div>
+
+                <div className="notice-preview__surface">
+                  <span className="notice-preview__label">
+                    Info accent · custom action
+                  </span>
+                  <StatusBanner
+                    customActions={
+                      <button
+                        className="notice-preview__link"
+                        onClick={() =>
+                          setNoticeActionStatus("Opened usage details")
+                        }
+                        type="button"
+                      >
+                        Learn more
+                      </button>
+                    }
+                    heading="You’re approaching your usage limit"
+                    tone="info"
+                  >
+                    Some models may become unavailable until the window resets.
+                  </StatusBanner>
+                </div>
+
+                <div className="notice-preview__surface notice-preview__surface--narrow">
+                  <span className="notice-preview__label">
+                    Narrow · loading action
+                  </span>
+                  <StatusBanner
+                    actions={[
+                      {
+                        label: "Checking",
+                        loading: true,
+                        variant: "primary",
+                      },
+                      { label: "Not now", variant: "ghost" },
+                    ]}
+                    heading="Finish setup before continuing"
+                    stackOnNarrow
+                  >
+                    Codex is checking the desktop environment.
+                  </StatusBanner>
+                </div>
+
+                <div className="notice-preview__surface">
+                  <span className="notice-preview__label">
+                    Stream · reconnecting
+                  </span>
+                  <StreamNotice
+                    additionalDetails="upstream closed before a complete response"
+                    reconnectAttempt={2}
+                    reconnectMaxAttempts={5}
+                    serverBusy
+                  />
+                </div>
+
+                <div className="notice-preview__surface">
+                  <span className="notice-preview__label">
+                    Stream · failed + retry
+                  </span>
+                  <StreamNotice
+                    additionalDetails="request id: req_01 · transport closed"
+                    defaultExpanded
+                    onRetry={() =>
+                      setNoticeActionStatus("Retried disconnected stream")
+                    }
+                    status="failed"
+                  >
+                    Response stream disconnected.
+                  </StreamNotice>
+                </div>
+
+                <div className="notice-preview__surface notice-preview__surface--wide">
+                  <span className="notice-preview__label">
+                    Inline · usage and interruption
+                  </span>
+                  <div className="notice-preview__inline-stack">
+                    <InlineNotice wrap>
+                      You’ve hit your usage limit. Try again later.
+                    </InlineNotice>
+                    <InlineNotice
+                      icon={<span aria-hidden="true">■</span>}
+                      tone="warning"
+                      trailingContent={
+                        <button
+                          aria-label="Why Auto-review stopped the turn"
+                          className="notice-preview__help"
+                          onClick={() =>
+                            setNoticeActionStatus(
+                              "Opened interruption guidance",
+                            )
+                          }
+                          title="Auto-review stopped after repeated denials"
+                          type="button"
+                        >
+                          ?
+                        </button>
+                      }
+                      wrap
+                    >
+                      Turn ended by Auto-review
+                    </InlineNotice>
+                    <InlineNotice shimmering>
+                      Reconnecting to the response stream
+                    </InlineNotice>
+                    <InlineNotice>
+                      <TurnDuration durationMs={8_000} status="stopped" />
+                    </InlineNotice>
+                  </div>
+                </div>
+              </div>
             </div>
           </GalleryCard>
 

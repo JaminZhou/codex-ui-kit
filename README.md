@@ -14,7 +14,9 @@ approval, composer, and rich-text surfaces: messages, GFM Markdown, inline and
 block code, grouped and collapsible activities, turn duration and interruption,
 commands, file changes, tool-call state, responsive content, controlled
 decisions, delegated-work activity, subagent summaries and panels, and an agent
-input with keyboard and running states. Run the local showcase with:
+input with keyboard and running states. Error, warning, reconnect, retry,
+interruption, and status-banner surfaces are also covered. Run the local
+showcase with:
 
 ```bash
 pnpm dev
@@ -85,6 +87,13 @@ the pnpm workspace. Electron is not a dependency of `codex-ui-kit`.
 - `FileDiff`: structured context, hunk, metadata, addition, and deletion lines
   with host-rendered syntax tokens, optional wrapping, `100px`/`240px`/`160px`
   viewport modes, and scroll-edge fades.
+- `StatusBanner`: neutral, info, warning, and error status shell with horizontal,
+  vertical, and icon layouts; protocol-neutral actions; dismiss behavior; ARIA
+  passthrough; and compact-container action reflow.
+- `InlineNotice`: the measured two-rule transcript divider with optional icon,
+  trailing guidance, wrapping, tone, and active shimmer.
+- `StreamNotice`: reconnecting, server-busy, failed, retry, progress, and
+  controlled/uncontrolled additional-detail states.
 - `StatusIndicator`: visual state primitive.
 - `AgentComposer`: controlled input surface with submit, stop, and slot APIs.
 - `ComposerAttachment`: removable attachment metadata primitive.
