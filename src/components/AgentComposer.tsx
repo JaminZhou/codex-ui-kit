@@ -217,12 +217,18 @@ export const AgentComposer = forwardRef<
 
     const target = event.target;
     if (!(target instanceof Element)) return;
-    if (
-      target.closest(
-        'a, button, input, select, textarea, [contenteditable="true"], [draggable="true"], [role], [tabindex]',
-      )
-    ) {
-      return;
+    const form = formRef.current;
+    if (!form?.contains(target)) return;
+
+    for (let node: Element | null = target; node && node !== form; ) {
+      if (
+        node.matches(
+          'a, button, input, select, textarea, [contenteditable="true"], [draggable="true"], [role], [tabindex]',
+        )
+      ) {
+        return;
+      }
+      node = node.parentElement;
     }
     textareaRef.current?.focus();
   };

@@ -379,12 +379,14 @@ describe("AgentComposer", () => {
 
   it("focuses the input from surface clicks without stealing control clicks", () => {
     const { container } = render(
-      <AgentComposer
-        actions={<button type="button">Attach</button>}
-        onSubmit={() => undefined}
-        onValueChange={() => undefined}
-        value=""
-      />,
+      <main role="main" tabIndex={-1}>
+        <AgentComposer
+          actions={<button type="button">Attach</button>}
+          onSubmit={() => undefined}
+          onValueChange={() => undefined}
+          value=""
+        />
+      </main>,
     );
     const textarea = screen.getByRole("textbox", { name: "Message" });
     const attach = screen.getByRole("button", { name: "Attach" });
