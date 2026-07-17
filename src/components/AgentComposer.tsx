@@ -1,4 +1,5 @@
 import {
+  Children,
   forwardRef,
   useCallback,
   useEffect,
@@ -64,7 +65,10 @@ export const AgentComposer = forwardRef<
   },
   forwardedRef,
 ) {
-  const hasAttachments = Boolean(attachments);
+  const attachmentChildren = Children.toArray(attachments).filter(
+    (child) => typeof child !== "string" || child.trim().length > 0,
+  );
+  const hasAttachments = attachmentChildren.length > 0;
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
   const formRef = useRef<HTMLFormElement | null>(null);
   const fieldsetRef = useRef<HTMLFieldSetElement | null>(null);
@@ -230,7 +234,7 @@ export const AgentComposer = forwardRef<
       >
         {hasAttachments ? (
           <div className="codex-ui-composer__attachments" aria-label="Attachments">
-            {attachments}
+            {attachmentChildren}
           </div>
         ) : null}
 

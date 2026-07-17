@@ -87,6 +87,38 @@ describe("AgentComposer", () => {
     ).toBe("single-line");
   });
 
+  it("treats empty attachment collections as absent", () => {
+    const files: string[] = [];
+    const { container, rerender } = render(
+      <AgentComposer
+        attachments={files.map((file) => (
+          <span key={file}>{file}</span>
+        ))}
+        onSubmit={() => undefined}
+        onValueChange={() => undefined}
+        value="Short"
+      />,
+    );
+
+    expect(container.querySelector(".codex-ui-composer__attachments")).toBeNull();
+    expect(
+      container.querySelector("form")?.getAttribute("data-layout"),
+    ).toBe("single-line");
+
+    rerender(
+      <AgentComposer
+        attachments={[null, false, ""]}
+        onSubmit={() => undefined}
+        onValueChange={() => undefined}
+        value="Short"
+      />,
+    );
+    expect(container.querySelector(".codex-ui-composer__attachments")).toBeNull();
+    expect(
+      container.querySelector("form")?.getAttribute("data-layout"),
+    ).toBe("single-line");
+  });
+
   it("supports forced layouts for deterministic host rendering", () => {
     const { container, rerender } = render(
       <AgentComposer
