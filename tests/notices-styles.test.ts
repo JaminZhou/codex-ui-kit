@@ -36,4 +36,10 @@ describe("notice visual contract", () => {
       /\.codex-ui-stream-notice__details \{[\s\S]*?margin: 0\.25rem 0 0 1\.5rem/,
     );
   });
+
+  it("disables notice motion for reduced-motion users", () => {
+    expect(styles).toMatch(
+      /@media \(prefers-reduced-motion: reduce\) \{[\s\S]*?\.codex-ui-stream-notice__details,[\s\S]*?animation: none/,
+    );
+  });
 });

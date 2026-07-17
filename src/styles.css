@@ -3755,6 +3755,7 @@ button.codex-ui-subagent-panel__item:focus-visible {
   .codex-ui-approval-request__spinner,
   .codex-ui-inline-notice__message[data-shimmering],
   .codex-ui-notice-action__spinner,
+  .codex-ui-stream-notice__details,
   .codex-ui-stream-notice__icon svg {
     animation: none;
   }
