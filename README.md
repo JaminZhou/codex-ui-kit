@@ -16,7 +16,9 @@ commands, file changes, tool-call state, responsive content, controlled
 decisions, delegated-work activity, subagent summaries and panels, and an agent
 input with keyboard and running states. Error, warning, reconnect, retry,
 interruption, status-banner, button, tooltip, popover, menu, submenu, and
-select surfaces are also covered. Run the local
+select surfaces are also covered. Resource cards, source summaries, artifact
+states, generated-image galleries, pending placeholders, and keyboard image
+preview are covered by the same browser and Electron acceptance matrix. Run the local
 showcase with:
 
 ```bash
@@ -122,6 +124,19 @@ the pnpm workspace. Electron is not a dependency of `codex-ui-kit`.
   menus, shortcuts, descriptions, and destructive actions.
 - `Select`: controlled value selection over the shared listbox surface with
   descriptions, icons, selected state, disabled options, and empty fallback.
+- `ResourceCard` and `ResourceList`: protocol-neutral file, website, Drive,
+  app, and image rows with a `40px` visual well, hover/open affordances,
+  independent trailing actions, and the observed three-item reveal behavior.
+- `SourceList`: compact file, web, tool, and external citation summaries with
+  `View all`, `18px` previews, metadata, and a measured `300px` panel width.
+- `ArtifactList`: resource-list composition with the observed
+  `No artifacts yet` empty state.
+- `GeneratedImageGallery`: one-to-four-slot natural/square image geometry,
+  `8px` gaps, pending placeholders, overflow paging, no-referrer images, and
+  reduced-motion support.
+- `ImagePreviewDialog`: portalled lightbox with focus restoration and trapping,
+  Escape and Arrow navigation, download, backdrop dismissal, and previous/next
+  controls.
 
 The default stylesheet supports light, dark, and system color schemes. Set
 `data-theme="light"` or `data-theme="dark"` on an ancestor to force a theme.

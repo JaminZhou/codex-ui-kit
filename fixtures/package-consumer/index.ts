@@ -4,6 +4,7 @@ import {
   AgentPlan,
   AgentReasoning,
   AgentComposer,
+  ArtifactList,
   ApprovalCommandPreview,
   ApprovalRequest,
   Button,
@@ -20,6 +21,8 @@ import {
   type ComposerLayout,
   FileChange,
   FileDiff,
+  GeneratedImageGallery,
+  ImagePreviewDialog,
   IconButton,
   InlineNotice,
   Menu,
@@ -29,11 +32,14 @@ import {
   type NoticeTone,
   ProposedPlan,
   Popover,
+  ResourceCard,
+  ResourceList,
   type QueuedPrompt,
   QueuedPromptList,
   SearchActivity,
   Select,
   StatusBanner,
+  SourceList,
   type StatusBannerAction,
   StreamNotice,
   SubagentActivity,
@@ -48,6 +54,7 @@ import {
   formatTurnDuration,
   type FileDiffSize,
   type FileDiffLine,
+  type GeneratedImageItem,
   type SearchActivityEntry,
   type SubagentActivityItem,
   type SubagentItem,
@@ -93,15 +100,22 @@ const queuedPrompt: QueuedPrompt = {
   id: "queued-package-consumer",
   text: "Verify public types",
 };
+const generatedImage: GeneratedImageItem = {
+  id: "package-image",
+  src: "https://example.com/image.png",
+};
 
 void FileChange;
 void FileDiff;
+void GeneratedImageGallery;
+void ImagePreviewDialog;
 void InlineNotice;
 void ActivityTimeline;
 void AgentMarkdown;
 void AgentPlan;
 void AgentReasoning;
 void AgentComposer;
+void ArtifactList;
 void ApprovalCommandPreview;
 void ApprovalRequest;
 void CodeBlock;
@@ -111,9 +125,12 @@ void ComposerAttachment;
 void ComposerMentionMenu;
 void ComposerModeIndicator;
 void ProposedPlan;
+void ResourceCard;
+void ResourceList;
 void QueuedPromptList;
 void SearchActivity;
 void StatusBanner;
+void SourceList;
 void StreamNotice;
 void SubagentActivity;
 void SubagentActivityGroup;
@@ -146,3 +163,4 @@ void noticeAction;
 void composerLayout;
 void mentionOption;
 void queuedPrompt;
+void generatedImage;

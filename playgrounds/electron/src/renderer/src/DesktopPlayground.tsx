@@ -17,6 +17,7 @@ import {
   AgentThread,
   ApprovalCommandPreview,
   ApprovalRequest,
+  ArtifactList,
   Button,
   CommandExecution,
   CommandOutput,
@@ -26,6 +27,8 @@ import {
   FileChange,
   FileDiff,
   fileDiffToText,
+  GeneratedImageGallery,
+  ImagePreviewDialog,
   InlineNotice,
   IconButton,
   Menu,
@@ -37,10 +40,13 @@ import {
   Popover,
   ProposedPlan,
   QueuedPromptList,
+  ResourceCard,
+  ResourceList,
   SearchActivity,
   Select,
   StatusIndicator,
   StatusBanner,
+  SourceList,
   StreamNotice,
   SubagentActivity,
   SubagentActivityGroup,
@@ -52,6 +58,7 @@ import {
   TurnDuration,
   type ApprovalDecision,
   type FileDiffLine,
+  type GeneratedImageItem,
   type SubagentActivityItem,
   type SubagentItem,
 } from "codex-ui-kit";
@@ -216,6 +223,23 @@ const desktopPlanSteps = [
   { status: "pending" as const, step: "Record the viewport matrix" },
 ];
 
+const desktopResourceImages: GeneratedImageItem[] = [
+  ["desktop-sky", "#4f87ff", "#dce8ff"],
+  ["desktop-leaf", "#4ba66c", "#d9f4e4"],
+  ["desktop-sunset", "#eb7440", "#ffe7d9"],
+  ["desktop-violet", "#805ad5", "#ede5ff"],
+  ["desktop-night", "#34445f", "#c8d3e5"],
+  ["desktop-sand", "#ba873c", "#f6e4bd"],
+].map(([id, foreground, background], index) => ({
+  alt: `Generated image ${index + 1}`,
+  height: index % 2 === 0 ? 720 : 640,
+  id,
+  src: `data:image/svg+xml,${encodeURIComponent(
+    `<svg xmlns="http://www.w3.org/2000/svg" width="960" height="720" viewBox="0 0 960 720"><rect width="960" height="720" fill="${background}"/><circle cx="${250 + index * 70}" cy="250" r="170" fill="${foreground}" opacity=".9"/><path d="M0 610 230 390l170 145 150-175 410 350H0Z" fill="${foreground}" opacity=".55"/></svg>`,
+  )}`,
+  width: index % 2 === 0 ? 960 : 760,
+}));
+
 function useViewportMetrics(): ViewportMetrics {
   const [metrics, setMetrics] = useState<ViewportMetrics>(() => ({
     height: window.innerHeight,
@@ -289,6 +313,7 @@ export function DesktopPlayground() {
   const [primitiveStatus, setPrimitiveStatus] = useState(
     "Desktop controls ready",
   );
+  const [previewImageId, setPreviewImageId] = useState<string | null>(null);
   const viewport = useViewportMetrics();
   const { metrics: fontMetrics, monoRef, sansRef } = useFontMetrics();
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -1290,6 +1315,120 @@ export function DesktopPlayground() {
                 {primitiveStatus} · line numbers {desktopLineNumbers ? "on" : "off"}
               </output>
             </div>
+          </article>
+
+          <article
+            className="acceptance-card acceptance-card--resources"
+            data-acceptance-surface="resource-surfaces"
+          >
+            <header>
+              <div>
+                <h2>Resources, sources, and generated images</h2>
+                <p>
+                  Desktop image geometry, hover actions, scroll-safe expansion,
+                  native focus, and portalled preview.
+                </p>
+              </div>
+              <span className="acceptance-badge">desktop images</span>
+            </header>
+            <div className="acceptance-card__body resource-state-matrix">
+              <div className="resource-state-matrix__wide">
+                <span className="resource-state-matrix__label">
+                  Generated images · overflow + preview
+                </span>
+                <GeneratedImageGallery
+                  images={desktopResourceImages}
+                  onOpenImage={(image) => setPreviewImageId(image.id)}
+                />
+              </div>
+              <div>
+                <span className="resource-state-matrix__label">
+                  Inline resources · reveal remainder
+                </span>
+                <ResourceList>
+                  <ResourceCard
+                    hoverLabel="Open in editor"
+                    kind="document"
+                    subtitle="Document · MD"
+                    title="renderer-notes.md"
+                  />
+                  <ResourceCard
+                    hoverLabel="Open in browser"
+                    kind="website"
+                    subtitle="Website"
+                    title="Desktop research"
+                  />
+                  <ResourceCard
+                    hoverLabel="Open in Drive"
+                    kind="spreadsheet"
+                    subtitle="Google Sheets"
+                    title="Viewport matrix"
+                  />
+                  <ResourceCard
+                    action={<Button size="small" tone="ghost">Share</Button>}
+                    hoverLabel="Open app"
+                    kind="app"
+                    subtitle="Interactive app"
+                    title="Acceptance lab"
+                  />
+                </ResourceList>
+              </div>
+              <div>
+                <span className="resource-state-matrix__label">
+                  Sources · compact summary
+                </span>
+                <SourceList
+                  items={[
+                    {
+                      id: "desktop-attached-source",
+                      kind: "file",
+                      meta: "Attached to the conversation",
+                      title: "desktop-observations.md",
+                    },
+                    {
+                      id: "desktop-web-source",
+                      kind: "web",
+                      meta: "Web search",
+                      title: "Electron renderer reference",
+                    },
+                    {
+                      id: "desktop-tool-source",
+                      kind: "tool",
+                      meta: "Connector result",
+                      title: "Desktop issue audit",
+                    },
+                    {
+                      id: "desktop-external-source",
+                      kind: "external",
+                      meta: "External resource",
+                      title: "Window geometry notes",
+                    },
+                  ]}
+                />
+              </div>
+              <div>
+                <span className="resource-state-matrix__label">
+                  Generating · reserved slots
+                </span>
+                <GeneratedImageGallery
+                  images={desktopResourceImages.slice(0, 2)}
+                  onOpenImage={(image) => setPreviewImageId(image.id)}
+                  pendingCount={2}
+                />
+              </div>
+              <div>
+                <span className="resource-state-matrix__label">Artifacts · empty</span>
+                <ArtifactList />
+              </div>
+            </div>
+            <ImagePreviewDialog
+              imageId={previewImageId}
+              images={desktopResourceImages}
+              onOpenChange={(open) => {
+                if (!open) setPreviewImageId(null);
+              }}
+              open={previewImageId !== null}
+            />
           </article>
 
           <article className="acceptance-card">

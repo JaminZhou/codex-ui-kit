@@ -141,6 +141,13 @@
   --codex-ui-subagent-chip-height: 1.75rem;
   --codex-ui-subagent-panel-row-min-height: 2rem;
   --codex-ui-subagent-panel-header-height: 3rem;
+  --codex-ui-resource-card-height: 3.75rem;
+  --codex-ui-resource-icon-size: 2.5rem;
+  --codex-ui-resource-preview-radius: var(--codex-ui-radius-md);
+  --codex-ui-generated-image-radius: var(--codex-ui-radius-2xl);
+  --codex-ui-generated-image-gap: calc(var(--codex-ui-spacing) * 2);
+  --codex-ui-generated-image-control-size: 1.5rem;
+  --codex-ui-summary-panel-width: 18.75rem;
   --codex-ui-approval-card-radius: var(--codex-ui-radius-4xl);
   --codex-ui-approval-command-max-height: 20rem;
   --codex-ui-transition-fast: 150ms ease;

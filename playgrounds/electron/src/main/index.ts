@@ -94,6 +94,69 @@ async function captureInteractivePrimitives(webContents: WebContents) {
   })()`);
 }
 
+async function captureResourceSurfaces(
+  webContents: WebContents,
+  openPreview = false,
+) {
+  return webContents.executeJavaScript(`(async () => {
+    const wait = (duration) => new Promise((resolve) => setTimeout(resolve, duration));
+    const rect = (element) => {
+      if (!element) return null;
+      const bounds = element.getBoundingClientRect();
+      return {
+        bottom: bounds.bottom,
+        height: bounds.height,
+        left: bounds.left,
+        right: bounds.right,
+        top: bounds.top,
+        width: bounds.width,
+      };
+    };
+    document.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true }));
+    const dock = document.querySelector('.desktop-composer-dock');
+    if (dock instanceof HTMLElement) dock.style.display = 'none';
+    await wait(80);
+    const card = document.querySelector('[data-acceptance-surface="resource-surfaces"]');
+    const scrollRegion = document.querySelector('.desktop-scroll-region');
+    if (card && scrollRegion instanceof HTMLElement) {
+      scrollRegion.style.scrollBehavior = 'auto';
+      const regionBounds = scrollRegion.getBoundingClientRect();
+      const cardBounds = card.getBoundingClientRect();
+      scrollRegion.scrollTop += cardBounds.top - regionBounds.top - 16;
+    }
+    await wait(180);
+    if (${openPreview ? "true" : "false"}) {
+      card
+        ?.querySelector('.resource-state-matrix__wide .codex-ui-generated-image-gallery__image')
+        ?.click();
+      await wait(180);
+    }
+    const gallery = card?.querySelector('.resource-state-matrix__wide .codex-ui-generated-image-gallery');
+    const galleryImage = gallery?.querySelector('.codex-ui-generated-image-gallery__image');
+    const sourceList = card?.querySelector('.codex-ui-source-list');
+    const preview = document.querySelector('.codex-ui-image-preview');
+    const previewDialog = preview?.querySelector('.codex-ui-image-preview__dialog');
+    const previewImage = preview?.querySelector('.codex-ui-image-preview__stage > img');
+    return {
+      bodyScrollWidth: document.body.scrollWidth,
+      card: rect(card),
+      clientWidth: document.documentElement.clientWidth,
+      focusedLabel: document.activeElement?.getAttribute('aria-label'),
+      gallery: rect(gallery),
+      galleryImage: rect(galleryImage),
+      galleryImageRadius: galleryImage ? getComputedStyle(galleryImage).borderRadius : null,
+      pendingCount: card?.querySelectorAll('.codex-ui-generated-image-gallery__placeholder').length ?? 0,
+      preview: rect(preview),
+      previewDialog: rect(previewDialog),
+      previewImage: rect(previewImage),
+      resourceRows: [...(card?.querySelectorAll('.codex-ui-resource-card') ?? [])].map(rect),
+      resolvedTheme: document.querySelector('.desktop-playground')?.getAttribute('data-theme'),
+      sourceList: rect(sourceList),
+      viewport: { height: window.innerHeight, width: window.innerWidth },
+    };
+  })()`);
+}
+
 async function captureAcceptance(browserWindow: BrowserWindow) {
   const outputDirectory = process.env.CODEX_UI_KIT_ACCEPTANCE_DIR;
   if (!outputDirectory) return;
@@ -158,6 +221,19 @@ async function captureAcceptance(browserWindow: BrowserWindow) {
   await browserWindow.webContents.executeJavaScript(
     "document.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true }))",
   );
+  const resourceMetrics = await captureResourceSurfaces(
+    browserWindow.webContents,
+  );
+  const resourceScreenshot = await browserWindow.webContents.capturePage();
+  const resourcePreviewMetrics = await captureResourceSurfaces(
+    browserWindow.webContents,
+    true,
+  );
+  const resourcePreviewScreenshot =
+    await browserWindow.webContents.capturePage();
+  await browserWindow.webContents.executeJavaScript(
+    "document.querySelector('[aria-label=\"Close image preview\"]')?.click()",
+  );
   nativeTheme.themeSource = "light";
   sendThemeState(browserWindow.webContents);
   await browserWindow.webContents.executeJavaScript(
@@ -171,6 +247,10 @@ async function captureAcceptance(browserWindow: BrowserWindow) {
   );
   const compactInteractiveScreenshot =
     await browserWindow.webContents.capturePage();
+  const compactResourceMetrics = await captureResourceSurfaces(
+    browserWindow.webContents,
+  );
+  const compactResourceScreenshot = await browserWindow.webContents.capturePage();
 
   await mkdir(outputDirectory, { recursive: true });
   await Promise.all([
@@ -197,6 +277,30 @@ async function captureAcceptance(browserWindow: BrowserWindow) {
     writeFile(
       join(outputDirectory, "interactive-primitives-compact-light.png"),
       compactInteractiveScreenshot.toPNG(),
+    ),
+    writeFile(
+      join(outputDirectory, "resource-surfaces-metrics.json"),
+      `${JSON.stringify(resourceMetrics, null, 2)}\n`,
+    ),
+    writeFile(
+      join(outputDirectory, "resource-surfaces.png"),
+      resourceScreenshot.toPNG(),
+    ),
+    writeFile(
+      join(outputDirectory, "resource-preview-metrics.json"),
+      `${JSON.stringify(resourcePreviewMetrics, null, 2)}\n`,
+    ),
+    writeFile(
+      join(outputDirectory, "resource-preview.png"),
+      resourcePreviewScreenshot.toPNG(),
+    ),
+    writeFile(
+      join(outputDirectory, "resource-surfaces-compact-light-metrics.json"),
+      `${JSON.stringify(compactResourceMetrics, null, 2)}\n`,
+    ),
+    writeFile(
+      join(outputDirectory, "resource-surfaces-compact-light.png"),
+      compactResourceScreenshot.toPNG(),
     ),
   ]);
   console.log(`acceptance capture: ${outputDirectory}`);

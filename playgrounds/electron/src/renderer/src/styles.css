@@ -244,6 +244,7 @@ button {
 .acceptance-card--file,
 .acceptance-card--notice,
 .acceptance-card--primitives,
+.acceptance-card--resources,
 .acceptance-card--subagent,
 .acceptance-card--tool {
   grid-column: 1 / -1;
@@ -297,6 +298,34 @@ button {
 .primitive-state-matrix__popover-copy span {
   color: var(--codex-ui-text-secondary);
   font-size: var(--codex-ui-font-size-xs);
+}
+
+.resource-state-matrix {
+  background: var(--codex-ui-bg-subtle);
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.resource-state-matrix > div {
+  background: var(--codex-ui-bg);
+  border: 1px solid var(--codex-ui-border);
+  border-radius: var(--codex-ui-radius-lg);
+  min-width: 0;
+  padding: 1rem;
+}
+
+.resource-state-matrix__wide {
+  grid-column: 1 / -1;
+}
+
+.resource-state-matrix__label {
+  color: var(--codex-ui-text-tertiary);
+  display: block;
+  font-size: 0.625rem;
+  font-weight: 600;
+  margin-bottom: 0.875rem;
+  text-transform: uppercase;
 }
 
 .notice-state-matrix {
@@ -828,6 +857,7 @@ button {
   .acceptance-card--file,
   .acceptance-card--notice,
   .acceptance-card--primitives,
+  .acceptance-card--resources,
   .acceptance-card--subagent,
   .acceptance-card--tool {
     grid-column: auto;
@@ -870,6 +900,14 @@ button {
   }
 
   .subagent-state-matrix__wide {
+    grid-column: auto;
+  }
+
+  .resource-state-matrix {
+    grid-template-columns: 1fr;
+  }
+
+  .resource-state-matrix__wide {
     grid-column: auto;
   }
 
