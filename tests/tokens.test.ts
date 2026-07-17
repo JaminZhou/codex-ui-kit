@@ -108,6 +108,17 @@ describe("visual token contract", () => {
     expect(styles).toContain("outline: 2px solid Highlight");
   });
 
+  it("clips the intrinsic composer width probe from scrollable overflow", () => {
+    const measureClip = styles.match(
+      /\.codex-ui-composer__measure-clip\s*\{([^}]+)\}/,
+    )?.[1];
+
+    expect(measureClip).toContain("height: 1px");
+    expect(measureClip).toContain("overflow: hidden");
+    expect(measureClip).toContain("position: absolute");
+    expect(measureClip).toContain("width: 1px");
+  });
+
   it("inherits forced themes through nested kit scopes", () => {
     expect(tokens).toContain(':root,\n[data-theme="light"] {');
     expect(tokens).not.toContain(

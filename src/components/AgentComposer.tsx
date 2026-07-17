@@ -255,12 +255,10 @@ export const AgentComposer = forwardRef<
           {...restTextareaProps}
         />
 
-        <span
-          aria-hidden="true"
-          className="codex-ui-composer__measure"
-          ref={measureRef}
-        >
-          {value || "\u200b"}
+        <span aria-hidden="true" className="codex-ui-composer__measure-clip">
+          <span className="codex-ui-composer__measure" ref={measureRef}>
+            {value || "\u200b"}
+          </span>
         </span>
 
         <div className="codex-ui-composer__toolbar">

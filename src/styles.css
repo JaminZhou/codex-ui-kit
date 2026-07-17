@@ -2595,14 +2595,21 @@ summary.codex-ui-activity__header::after {
   opacity: 0.5;
 }
 
-.codex-ui-composer__measure {
-  font: inherit;
+.codex-ui-composer__measure-clip {
+  height: 1px;
   left: 0;
-  line-height: 1.25rem;
+  overflow: hidden;
   pointer-events: none;
   position: absolute;
   top: 0;
   visibility: hidden;
+  width: 1px;
+}
+
+.codex-ui-composer__measure {
+  display: inline-block;
+  font: inherit;
+  line-height: 1.25rem;
   white-space: pre;
 }
 
