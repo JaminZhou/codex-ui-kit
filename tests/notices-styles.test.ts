@@ -22,6 +22,12 @@ describe("notice visual contract", () => {
     );
   });
 
+  it("spans the content grid when the icon is suppressed", () => {
+    expect(styles).toMatch(
+      /\.codex-ui-status-banner--iconless \.codex-ui-status-banner__main \{[\s\S]*?grid-column: 1 \/ -1/,
+    );
+  });
+
   it("locks the divider and reconnect disclosure geometry", () => {
     expect(styles).toMatch(
       /\.codex-ui-inline-notice__rule \{[\s\S]*?border-top: 1px solid var\(--codex-ui-border\)/,

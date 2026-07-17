@@ -8,6 +8,15 @@ import { InlineNotice, StatusBanner, StreamNotice } from "../src";
 afterEach(cleanup);
 
 describe("StatusBanner", () => {
+  it("uses a non-landmark wrapper by default", () => {
+    const { container } = render(
+      <StatusBanner>Connection restored.</StatusBanner>,
+    );
+
+    expect(container.firstElementChild?.tagName).toBe("DIV");
+    expect(screen.queryByRole("complementary")).toBeNull();
+  });
+
   it("renders the measured tone, layout, content, and status semantics", () => {
     render(
       <StatusBanner
@@ -100,6 +109,19 @@ describe("StatusBanner", () => {
     );
 
     expect(screen.getByRole("button", { name: "Continue" })).toBeTruthy();
+  });
+
+  it("marks an explicitly iconless banner for full-width grid layout", () => {
+    const { container } = render(
+      <StatusBanner icon={null}>Full-width notice</StatusBanner>,
+    );
+
+    expect(container.firstElementChild?.classList).toContain(
+      "codex-ui-status-banner--iconless",
+    );
+    expect(
+      container.querySelector(".codex-ui-status-banner__icon"),
+    ).toBeNull();
   });
 });
 

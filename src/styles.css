@@ -265,6 +265,10 @@
   min-width: 0;
 }
 
+.codex-ui-status-banner--iconless .codex-ui-status-banner__main {
+  grid-column: 1 / -1;
+}
+
 .codex-ui-status-banner__body {
   display: flex;
   flex: 1;

@@ -25,7 +25,7 @@ export interface StatusBannerAction {
 }
 
 export interface StatusBannerProps
-  extends Omit<HTMLAttributes<HTMLElement>, "children" | "title"> {
+  extends Omit<HTMLAttributes<HTMLDivElement>, "children" | "title"> {
   actions?: StatusBannerAction[];
   children?: ReactNode;
   customActions?: ReactNode;
@@ -108,10 +108,18 @@ export function StatusBanner({
   tone = "neutral",
   ...props
 }: StatusBannerProps) {
-  const classes = ["codex-ui-status-banner", className]
+  const resolvedIcon = icon === undefined ? <NoticeIcon tone={tone} /> : icon;
+  const hasIcon =
+    resolvedIcon !== undefined &&
+    resolvedIcon !== null &&
+    resolvedIcon !== false;
+  const classes = [
+    "codex-ui-status-banner",
+    !hasIcon && "codex-ui-status-banner--iconless",
+    className,
+  ]
     .filter(Boolean)
     .join(" ");
-  const resolvedIcon = icon === undefined ? <NoticeIcon tone={tone} /> : icon;
   const hasCustomActions =
     customActions !== undefined &&
     customActions !== null &&
@@ -120,7 +128,7 @@ export function StatusBanner({
     hasCustomActions || actions.length > 0 || onDismiss !== undefined;
 
   return (
-    <aside
+    <div
       className={classes}
       data-layout={layout}
       data-stack-on-narrow={stackOnNarrow || undefined}
@@ -128,7 +136,7 @@ export function StatusBanner({
       {...props}
     >
       <span aria-hidden="true" className="codex-ui-status-banner__backdrop" />
-      {resolvedIcon ? (
+      {hasIcon ? (
         <span className="codex-ui-status-banner__icon">{resolvedIcon}</span>
       ) : null}
       <div className="codex-ui-status-banner__main">
@@ -174,7 +182,7 @@ export function StatusBanner({
           </div>
         ) : null}
       </div>
-    </aside>
+    </div>
   );
 }
 
