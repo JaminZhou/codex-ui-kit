@@ -110,6 +110,14 @@
   --codex-ui-composer-compact-inline-padding: calc(
     var(--codex-ui-spacing) * 2
   );
+  --codex-ui-composer-attachment-gap: calc(var(--codex-ui-spacing) * 2);
+  --codex-ui-composer-attachment-inset: calc(var(--codex-ui-spacing) * 2);
+  --codex-ui-composer-attachment-card-height: calc(var(--codex-ui-spacing) * 14);
+  --codex-ui-composer-mention-max-height: 11.0625rem;
+  --codex-ui-composer-queue-max-height: 30dvh;
+  --codex-ui-composer-top-tray-inline-overhang: calc(
+    var(--codex-ui-spacing) * 4
+  );
   --codex-ui-radius-row: var(--codex-ui-radius-lg);
   --codex-ui-thread-content-max-width: 48rem;
   --codex-ui-thread-content-top-inset: calc(var(--codex-ui-spacing) * 8);

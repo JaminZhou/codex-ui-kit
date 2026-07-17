@@ -6,6 +6,7 @@ export * from "./components/AgentActivity";
 export * from "./components/ActivityTimeline";
 export * from "./components/AgentThread";
 export * from "./components/AgentComposer";
+export * from "./components/ComposerAuxiliary";
 export * from "./components/ApprovalRequest";
 export * from "./components/CommandExecution";
 export * from "./components/FileChange";

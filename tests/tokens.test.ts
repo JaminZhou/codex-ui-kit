@@ -22,6 +22,13 @@ describe("visual token contract", () => {
     expect(tokens).toContain(
       "--codex-ui-shadow-composer: var(--codex-ui-shadow-composer-prominent)",
     );
+    expect(tokens).toContain(
+      "--codex-ui-composer-mention-max-height: 11.0625rem",
+    );
+    expect(tokens).toContain("--codex-ui-composer-queue-max-height: 30dvh");
+    expect(tokens).toContain(
+      "--codex-ui-composer-attachment-gap: calc(var(--codex-ui-spacing) * 2)",
+    );
   });
 
   it("keeps the measured semantic light and dark color anchors", () => {

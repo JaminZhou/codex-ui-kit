@@ -3,7 +3,12 @@
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { createRef, useState } from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { AgentComposer, ComposerAttachment } from "../src";
+import {
+  AgentComposer,
+  ComposerAttachment,
+  ComposerMentionMenu,
+  QueuedPromptList,
+} from "../src";
 
 afterEach(() => {
   cleanup();
@@ -89,6 +94,168 @@ describe("AgentComposer", () => {
     expect(
       container.querySelector("form")?.getAttribute("data-layout"),
     ).toBe("single-line");
+  });
+
+  it("keeps queue content multiline and suggestion trays structural", () => {
+    const { container, rerender } = render(
+      <AgentComposer
+        onSubmit={() => undefined}
+        onValueChange={() => undefined}
+        queue={<span>Queued follow-up</span>}
+        suggestions={<span role="listbox">Mention results</span>}
+        value="Short"
+      />,
+    );
+
+    const composer = container.querySelector("form");
+    expect(composer?.getAttribute("data-layout")).toBe("multiline");
+    expect(composer?.getAttribute("data-suggestions-open")).toBe("true");
+    expect(
+      container.querySelector(".codex-ui-composer__queue")?.textContent,
+    ).toContain("Queued follow-up");
+
+    rerender(
+      <AgentComposer
+        onSubmit={() => undefined}
+        onValueChange={() => undefined}
+        queue={false}
+        value="Short"
+      />,
+    );
+    expect(composer?.getAttribute("data-layout")).toBe("single-line");
+    expect(composer?.hasAttribute("data-suggestions-open")).toBe(false);
+
+    rerender(
+      <AgentComposer
+        onSubmit={() => undefined}
+        onValueChange={() => undefined}
+        suggestions={<></>}
+        value="Short"
+      />,
+    );
+    expect(
+      container.querySelector(".codex-ui-composer__suggestions"),
+    ).toBeNull();
+  });
+
+  it("derives queue layout from rendered content rather than the element shell", () => {
+    const { container, rerender } = render(
+      <AgentComposer
+        onSubmit={() => undefined}
+        onValueChange={() => undefined}
+        queue={<QueuedPromptList items={[]} />}
+        value="Short"
+      />,
+    );
+
+    const composer = container.querySelector("form");
+    const queue = container.querySelector(".codex-ui-composer__queue");
+    expect(composer?.getAttribute("data-layout")).toBe("single-line");
+    expect(queue?.hasAttribute("hidden")).toBe(true);
+
+    rerender(
+      <AgentComposer
+        onSubmit={() => undefined}
+        onValueChange={() => undefined}
+        queue={
+          <QueuedPromptList items={[{ id: "one", text: "Run checks" }]} />
+        }
+        value="Short"
+      />,
+    );
+    expect(composer?.getAttribute("data-layout")).toBe("multiline");
+    expect(queue?.hasAttribute("hidden")).toBe(false);
+
+    rerender(
+      <AgentComposer
+        onSubmit={() => undefined}
+        onValueChange={() => undefined}
+        queue={<QueuedPromptList items={[]} />}
+        value="Short"
+      />,
+    );
+    expect(composer?.getAttribute("data-layout")).toBe("single-line");
+    expect(queue?.hasAttribute("hidden")).toBe(true);
+  });
+
+  it("closes suggestion controls when the composer becomes disabled", () => {
+    const onSelect = vi.fn();
+    const { rerender } = render(
+      <AgentComposer
+        onSubmit={() => undefined}
+        onValueChange={() => undefined}
+        suggestions={
+          <ComposerMentionMenu
+            groups={[
+              {
+                id: "files",
+                label: "Files",
+                options: [{ id: "app", label: "src/App.tsx" }],
+              },
+            ]}
+            onSelect={onSelect}
+          />
+        }
+        value="@app"
+      />,
+    );
+
+    expect(screen.getByRole("listbox")).not.toBeNull();
+    rerender(
+      <AgentComposer
+        disabled
+        onSubmit={() => undefined}
+        onValueChange={() => undefined}
+        suggestions={
+          <ComposerMentionMenu
+            groups={[
+              {
+                id: "files",
+                label: "Files",
+                options: [{ id: "app", label: "src/App.tsx" }],
+              },
+            ]}
+            onSelect={onSelect}
+          />
+        }
+        value="@app"
+      />,
+    );
+    expect(screen.queryByRole("listbox")).toBeNull();
+    expect(onSelect).not.toHaveBeenCalled();
+  });
+
+  it("blocks queue drag interactions when the composer is disabled", () => {
+    const onReorder = vi.fn();
+    const { container } = render(
+      <AgentComposer
+        disabled
+        onSubmit={() => undefined}
+        onValueChange={() => undefined}
+        queue={
+          <QueuedPromptList
+            items={[
+              { id: "one", text: "First" },
+              { id: "two", text: "Second" },
+            ]}
+            onReorder={onReorder}
+          />
+        }
+        value="Short"
+      />,
+    );
+
+    const queue = container.querySelector(
+      ".codex-ui-composer__queue",
+    ) as HTMLElement;
+    const rows = container.querySelectorAll(
+      ".codex-ui-composer-queue__row",
+    );
+    expect(queue.hasAttribute("inert")).toBe(true);
+    fireEvent.dragStart(rows[0]!);
+    fireEvent.dragOver(rows[1]!);
+    fireEvent.drop(rows[1]!);
+    expect(onReorder).not.toHaveBeenCalled();
   });
 
   it("treats empty attachment collections as absent", () => {
@@ -626,5 +793,29 @@ describe("AgentComposer", () => {
     expect(screen.getByText("12 KB")).toBeTruthy();
     fireEvent.click(screen.getByRole("button", { name: "Remove src/App.tsx" }));
     expect(onRemove).toHaveBeenCalledOnce();
+  });
+
+  it("keeps attachment open and remove actions as sibling controls", () => {
+    const onOpen = vi.fn();
+    const onRemove = vi.fn();
+    const { container } = render(
+      <ComposerAttachment
+        label="reference.png"
+        layout="image"
+        onOpen={onOpen}
+        onRemove={onRemove}
+      />,
+    );
+
+    const open = screen.getByRole("button", { name: "Open reference.png" });
+    const remove = screen.getByRole("button", { name: "Remove reference.png" });
+    expect(open.parentElement).toBe(remove.parentElement);
+    expect(open.contains(remove)).toBe(false);
+
+    fireEvent.click(open);
+    fireEvent.click(remove);
+    expect(onOpen).toHaveBeenCalledOnce();
+    expect(onRemove).toHaveBeenCalledOnce();
+    expect(container.querySelector('[role="button"]')).toBeNull();
   });
 });
