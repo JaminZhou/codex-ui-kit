@@ -12,6 +12,7 @@ export * from "./components/FileChange";
 export * from "./components/ProposedPlan";
 export * from "./components/SearchActivity";
 export * from "./components/StatusIndicator";
+export * from "./components/SubagentActivity";
 export * from "./components/ToolCallCard";
 export * from "./components/TurnDuration";
 export * from "./types";

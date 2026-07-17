@@ -13,8 +13,8 @@ The completed foundations cover the thread, activity timeline, reasoning, plan,
 approval, composer, and rich-text surfaces: messages, GFM Markdown, inline and
 block code, grouped and collapsible activities, turn duration and interruption,
 commands, file changes, tool-call state, responsive content, controlled
-decisions, and an agent input with keyboard and running states. Run the local
-showcase with:
+decisions, delegated-work activity, subagent summaries and panels, and an agent
+input with keyboard and running states. Run the local showcase with:
 
 ```bash
 pnpm dev
@@ -60,6 +60,15 @@ the pnpm workspace. Electron is not a dependency of `codex-ui-kit`.
 - `SearchActivity`: exact code-search and grouped web-search language with
   controlled disclosure, current-query summaries, favicons, and a `320px`
   result viewport.
+- `SubagentActivity` and `SubagentActivityGroup`: standalone delegated-work
+  rows plus the measured three-chip inline group, overflow count, status
+  priority, entrance motion, and host-owned subagent navigation.
+- `SubagentSummary`: controlled summary section with grouped agent avatars,
+  working/done counts, individual role/model hints, and diff statistics.
+- `SubagentPanel`: active and done sections with two-line/one-line previews,
+  exact empty fallbacks, visible-item pagination, and selection hooks.
+- `SubagentTranscriptHeader` and `SubagentAvatar`: nested transcript navigation
+  and deterministic, asset-free agent identity primitives.
 - `ApprovalRequest`: controlled approve/reject surface with explicit outcomes.
 - `CommandExecution`: collapsed command language plus expandable shell, exact
   duration, copy, background-terminal, success, failure, and interruption states.
