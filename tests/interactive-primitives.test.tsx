@@ -81,6 +81,46 @@ describe("interactive controls", () => {
     expect(screen.queryByRole("dialog", { name: "Details" })).toBeNull();
     await waitFor(() => expect(document.activeElement).toBe(trigger));
   });
+
+  it("closes stale open state and ARIA references when disabled", () => {
+    const { rerender } = render(
+      <Popover
+        defaultOpen
+        label="Disable test"
+        trigger={<button type="button">Toggle surface</button>}
+      >
+        Content
+      </Popover>,
+    );
+
+    expect(screen.getByRole("dialog", { name: "Disable test" })).toBeTruthy();
+    rerender(
+      <Popover
+        defaultOpen
+        disabled
+        label="Disable test"
+        trigger={<button type="button">Toggle surface</button>}
+      >
+        Content
+      </Popover>,
+    );
+    const trigger = screen.getByRole("button", { name: "Toggle surface" });
+    expect(trigger.getAttribute("aria-expanded")).toBe("false");
+    expect(trigger.getAttribute("aria-controls")).toBeNull();
+    expect(trigger.getAttribute("data-state")).toBe("closed");
+    expect(screen.queryByRole("dialog", { name: "Disable test" })).toBeNull();
+
+    rerender(
+      <Popover
+        defaultOpen
+        label="Disable test"
+        trigger={<button type="button">Toggle surface</button>}
+      >
+        Content
+      </Popover>,
+    );
+    expect(screen.queryByRole("dialog", { name: "Disable test" })).toBeNull();
+  });
 });
 
 describe("menus and selects", () => {

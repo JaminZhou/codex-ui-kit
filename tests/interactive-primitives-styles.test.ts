@@ -29,4 +29,13 @@ describe("interactive primitive visual contract", () => {
     expect(styles).toContain(".codex-ui-select-option[data-selected]");
     expect(styles).toContain("outline: 2px solid var(--codex-ui-focus)");
   });
+
+  it("resets select trigger sizing without relying on a host stylesheet", () => {
+    expect(styles).toContain(
+      ".codex-ui-select-trigger,\n.codex-ui-select-trigger *,",
+    );
+    expect(styles).toMatch(
+      /\.codex-ui-select-trigger \{[\s\S]*?height: var\(--codex-ui-control-height-medium\);/,
+    );
+  });
 });

@@ -2,7 +2,6 @@ import {
   Children,
   cloneElement,
   createContext,
-  isValidElement,
   useCallback,
   useContext,
   useEffect,
@@ -572,6 +571,13 @@ export function Popover({
     onOpenChange,
     open,
   });
+  const triggerNode = Children.only(trigger);
+  const nativeDisabled = disabled || Boolean(triggerNode.props.disabled);
+  const effectiveOpen = resolvedOpen && !nativeDisabled;
+
+  useEffect(() => {
+    if (nativeDisabled && resolvedOpen) setOpen(false);
+  }, [nativeDisabled, resolvedOpen, setOpen]);
 
   const close = useCallback(
     (restoreFocus = false) => {
@@ -589,7 +595,7 @@ export function Popover({
   );
 
   useEffect(() => {
-    if (!resolvedOpen || typeof document === "undefined") return;
+    if (!effectiveOpen || typeof document === "undefined") return;
     const handlePointerDown = (event: PointerEvent) => {
       const target = event.target;
       if (!(target instanceof Node)) return;
@@ -612,10 +618,10 @@ export function Popover({
       document.removeEventListener("pointerdown", handlePointerDown, true);
       window.removeEventListener("blur", handleBlur);
     };
-  }, [close, id, resolvedOpen]);
+  }, [close, effectiveOpen, id]);
 
   useEffect(() => {
-    if (!resolvedOpen || initialFocus === "none" || typeof window === "undefined") {
+    if (!effectiveOpen || initialFocus === "none" || typeof window === "undefined") {
       return;
     }
     const timer = window.setTimeout(() => {
@@ -635,16 +641,13 @@ export function Popover({
       target?.focus();
     });
     return () => window.clearTimeout(timer);
-  }, [initialFocus, initialFocusSelector, resolvedOpen]);
+  }, [effectiveOpen, initialFocus, initialFocusSelector]);
 
-  const triggerNode = Children.only(trigger);
-  if (!isValidElement<TriggerProps>(triggerNode)) return null;
-  const nativeDisabled = disabled || Boolean(triggerNode.props.disabled);
   const mergedTrigger = cloneElement(triggerNode, {
-    "aria-controls": resolvedOpen ? id : undefined,
-    "aria-expanded": resolvedOpen,
+    "aria-controls": effectiveOpen ? id : undefined,
+    "aria-expanded": effectiveOpen,
     "aria-haspopup": role,
-    "data-state": resolvedOpen ? "open" : "closed",
+    "data-state": effectiveOpen ? "open" : "closed",
     disabled: nativeDisabled,
     onClick: (event) => {
       triggerNode.props.onClick?.(event);
@@ -686,7 +689,7 @@ export function Popover({
             if (event.key === "Tab" && role !== "dialog") close();
             if (role === "menu" || role === "listbox") focusByKey(event);
           }}
-          open={resolvedOpen && !disabled}
+          open={effectiveOpen}
           ownerIds={ownerIds}
           role={role}
           side={side}
