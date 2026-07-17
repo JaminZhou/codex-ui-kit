@@ -417,6 +417,7 @@ export function ApprovalRequest({
           className="codex-ui-approval-request__actions"
           onSubmit={(event) => {
             event.preventDefault();
+            setOptionsOpen(false);
             if (!primaryDisabled) onApprove?.();
           }}
           role="group"
@@ -540,9 +541,15 @@ export function ApprovalCommandPreview({
     if (!element) return;
 
     const measure = () => {
-      const lineHeight = Number.parseFloat(getComputedStyle(element).lineHeight);
+      const computed = getComputedStyle(element);
+      const lineHeight = Number.parseFloat(computed.lineHeight);
       if (!Number.isFinite(lineHeight)) return;
-      setMeasuredCollapsible(element.scrollHeight > lineHeight * collapsedLines + 1);
+      const paddingBlock =
+        Number.parseFloat(computed.paddingTop) +
+        Number.parseFloat(computed.paddingBottom);
+      setMeasuredCollapsible(
+        element.scrollHeight > lineHeight * collapsedLines + paddingBlock + 1,
+      );
     };
     measure();
     const observer =

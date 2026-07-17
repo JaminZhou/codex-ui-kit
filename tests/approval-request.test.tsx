@@ -4,7 +4,10 @@ import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { ApprovalCommandPreview, ApprovalRequest } from "../src";
 
-afterEach(cleanup);
+afterEach(() => {
+  cleanup();
+  vi.restoreAllMocks();
+});
 
 describe("ApprovalRequest", () => {
   it("renders the observed command hierarchy without protocol coupling", () => {
@@ -135,6 +138,27 @@ describe("ApprovalRequest", () => {
 
     expect(onScope).toHaveBeenCalledOnce();
     expect(onApprove).not.toHaveBeenCalled();
+    expect(screen.queryByRole("menu")).toBeNull();
+  });
+
+  it("closes the scoped menu when the primary action is submitted", () => {
+    const onApprove = vi.fn();
+    render(
+      <ApprovalRequest
+        disableHotkeys
+        kind="network"
+        onApprove={onApprove}
+        onReject={() => undefined}
+        scopedApproveAction={{ onClick: () => undefined }}
+        title="Connect?"
+      />,
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "Approval options" }));
+    expect(screen.getByRole("menu")).toBeTruthy();
+    fireEvent.click(screen.getByRole("button", { name: "Allow once" }));
+
+    expect(onApprove).toHaveBeenCalledOnce();
     expect(screen.queryByRole("menu")).toBeNull();
   });
 
@@ -284,6 +308,21 @@ describe("ApprovalCommandPreview", () => {
 
     const preview = screen.getByRole("region", { name: "Command preview" });
     expect(preview.getAttribute("data-expanded")).toBe("true");
+    expect(screen.queryByRole("button", { name: "Expand" })).toBeNull();
+  });
+
+  it("includes code padding when measuring an exact line count", () => {
+    vi.spyOn(window, "getComputedStyle").mockReturnValue({
+      lineHeight: "20px",
+      paddingBottom: "8px",
+      paddingTop: "8px",
+    } as CSSStyleDeclaration);
+    vi.spyOn(HTMLElement.prototype, "scrollHeight", "get").mockReturnValue(76);
+
+    render(
+      <ApprovalCommandPreview command={"line one\nline two\nline three"} />,
+    );
+
     expect(screen.queryByRole("button", { name: "Expand" })).toBeNull();
   });
 });
