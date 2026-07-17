@@ -2439,7 +2439,8 @@ summary.codex-ui-activity__header::after {
   background: var(--codex-ui-composer-background);
   border: 0;
   border-radius: var(--codex-ui-radius-composer-single-line);
-  box-shadow: var(--codex-ui-shadow-composer);
+  --codex-ui-composer-elevation: var(--codex-ui-shadow-composer);
+  box-shadow: var(--codex-ui-composer-elevation);
   color: var(--codex-ui-text);
   container-name: composer;
   container-type: inline-size;
@@ -2453,6 +2454,12 @@ summary.codex-ui-activity__header::after {
   position: relative;
   transition: box-shadow var(--codex-ui-transition);
   width: 100%;
+}
+
+.codex-ui-composer:focus-within {
+  box-shadow:
+    var(--codex-ui-composer-elevation),
+    0 0 0 2px color-mix(in srgb, var(--codex-ui-focus) 22%, transparent);
 }
 
 .codex-ui-composer[data-layout="multiline"] {
@@ -2722,6 +2729,11 @@ summary.codex-ui-activity__header::after {
   .codex-ui-composer {
     box-shadow: none;
     outline: 1px solid CanvasText;
+  }
+
+  .codex-ui-composer:focus-within {
+    outline: 2px solid Highlight;
+    outline-offset: 2px;
   }
 
   .codex-ui-composer__primary {

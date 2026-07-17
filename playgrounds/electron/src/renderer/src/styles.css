@@ -672,7 +672,7 @@ button {
 }
 
 .desktop-composer-dock .codex-ui-composer {
-  box-shadow: var(--codex-ui-shadow-composer-electron);
+  --codex-ui-composer-elevation: var(--codex-ui-shadow-composer-electron);
 }
 
 .desktop-playground[data-theme="dark"]

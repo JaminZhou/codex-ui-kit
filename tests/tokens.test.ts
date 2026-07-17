@@ -89,6 +89,14 @@ describe("visual token contract", () => {
     expect(multilineShell).not.toContain("overflow");
   });
 
+  it("keeps a visible composer keyboard focus state", () => {
+    expect(styles).toContain(".codex-ui-composer:focus-within {");
+    expect(styles).toContain(
+      "0 0 0 2px color-mix(in srgb, var(--codex-ui-focus) 22%, transparent)",
+    );
+    expect(styles).toContain("outline: 2px solid Highlight");
+  });
+
   it("inherits forced themes through nested kit scopes", () => {
     expect(tokens).toContain(':root,\n[data-theme="light"] {');
     expect(tokens).not.toContain(
