@@ -2462,6 +2462,11 @@ summary.codex-ui-activity__header::after {
     0 0 0 2px color-mix(in srgb, var(--codex-ui-focus) 22%, transparent);
 }
 
+.codex-ui-composer[data-disabled] {
+  cursor: default;
+  opacity: 0.58;
+}
+
 .codex-ui-composer[data-layout="multiline"] {
   border-radius: var(--codex-ui-radius-composer-multiline);
 }
@@ -2547,7 +2552,7 @@ summary.codex-ui-activity__header::after {
   width: 1.125rem;
 }
 
-.codex-ui-composer-attachment button:hover {
+.codex-ui-composer-attachment button:hover:not(:disabled) {
   background: var(--codex-ui-border);
   color: var(--codex-ui-text);
 }
@@ -2683,12 +2688,19 @@ summary.codex-ui-activity__header::after {
   padding: 0.25rem 0.45rem;
 }
 
-.codex-ui-composer__actions > button:hover,
-.codex-ui-composer__controls > button:not(.codex-ui-composer__primary):hover,
-.codex-ui-composer__actions > select:hover,
-.codex-ui-composer__controls > select:hover {
+.codex-ui-composer__actions > button:hover:not(:disabled),
+.codex-ui-composer__controls
+  > button:not(.codex-ui-composer__primary):hover:not(:disabled),
+.codex-ui-composer__actions > select:hover:not(:disabled),
+.codex-ui-composer__controls > select:hover:not(:disabled) {
   background: var(--codex-ui-bg-subtle);
   color: var(--codex-ui-text);
+}
+
+.codex-ui-composer[data-disabled] button:disabled,
+.codex-ui-composer[data-disabled] select:disabled,
+.codex-ui-composer[data-disabled] textarea:disabled {
+  cursor: default;
 }
 
 .codex-ui-composer__actions > button:focus-visible,
