@@ -241,17 +241,44 @@ function DiffStats({ additions = 0, deletions = 0 }) {
   );
 }
 
-function SummaryAvatarGroup({ items }: { items: SubagentItem[] }) {
+function SummaryAvatarGroup({
+  items,
+  onOpenItem,
+}: {
+  items: SubagentItem[];
+  onOpenItem?: (item: SubagentItem) => void;
+}) {
   return (
-    <span className="codex-ui-subagent-summary__avatars" aria-hidden="true">
-      {items.slice(0, 4).map((item) => (
-        <SubagentAvatar
-          active={item.status !== "done"}
-          key={item.id}
-          seed={item.id}
-          size="tiny"
-        />
-      ))}
+    <span
+      aria-hidden={onOpenItem ? undefined : "true"}
+      className="codex-ui-subagent-summary__avatars"
+    >
+      {items.slice(0, 4).map((item) => {
+        const avatar = (
+          <SubagentAvatar
+            active={item.status !== "done"}
+            aria-hidden="true"
+            seed={item.id}
+            size="tiny"
+          />
+        );
+
+        return onOpenItem ? (
+          <button
+            aria-label={displayName(item.name)}
+            className="codex-ui-subagent-summary__avatar-button"
+            key={item.id}
+            onClick={() => onOpenItem(item)}
+            type="button"
+          >
+            {avatar}
+          </button>
+        ) : (
+          <span className="codex-ui-subagent-summary__avatar" key={item.id}>
+            {avatar}
+          </span>
+        );
+      })}
     </span>
   );
 }
@@ -325,7 +352,10 @@ export function SubagentSummary({
           {grouped.length > 0 ? (() => {
             const content = (
               <>
-                <SummaryAvatarGroup items={working.length > 0 ? working : done} />
+                <SummaryAvatarGroup
+                  items={working.length > 0 ? working : done}
+                  onOpenItem={onOpenSummary ? undefined : onOpenSubagent}
+                />
                 <span>
                   {working.length > 0
                     ? `${working.length} working`

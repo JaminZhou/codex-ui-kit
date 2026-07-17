@@ -138,6 +138,20 @@ describe("SubagentSummary", () => {
     expect(onOpenChange).toHaveBeenCalledWith(true);
     expect(screen.queryByText("Researcher")).toBeNull();
   });
+
+  it("opens grouped agents individually when no overview action exists", () => {
+    const onOpenSubagent = vi.fn();
+    const groupedAgent = { ...activeAgent, presentation: "grouped" as const };
+    render(
+      <SubagentSummary
+        items={[groupedAgent]}
+        onOpenSubagent={onOpenSubagent}
+      />,
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "Researcher" }));
+    expect(onOpenSubagent).toHaveBeenCalledWith(groupedAgent);
+  });
 });
 
 describe("SubagentPanel", () => {
