@@ -1,5 +1,8 @@
 name: ci
 
+permissions:
+  contents: read
+
 on:
   push:
     branches: [main]
@@ -20,3 +23,38 @@ jobs:
           node-version: 22
       - run: pnpm install --frozen-lockfile
       - run: pnpm check
+
+  consumer:
+    name: React ${{ matrix.react }} consumer
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - react: "18"
+            react-version: "18.3.1"
+            react-dom-version: "18.3.1"
+            react-types-version: "18.3.27"
+            react-dom-types-version: "18.3.7"
+          - react: "19"
+            react-version: "19.2.7"
+            react-dom-version: "19.2.7"
+            react-types-version: "19.2.17"
+            react-dom-types-version: "19.2.3"
+    steps:
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+        with:
+          version: 11.7.0
+          dest: ${{ runner.temp }}/setup-pnpm
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm build
+      - run: |
+          node scripts/react-compatibility-smoke.mjs \
+            ${{ matrix.react-version }} \
+            ${{ matrix.react-dom-version }} \
+            ${{ matrix.react-types-version }} \
+            ${{ matrix.react-dom-types-version }}

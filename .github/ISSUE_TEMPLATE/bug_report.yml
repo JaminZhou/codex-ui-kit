@@ -1,0 +1,46 @@
+name: Bug report
+description: Report a reproducible component, styling, accessibility, or packaging problem.
+title: "bug: "
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: Thanks for helping improve Codex UI Kit. Do not include credentials or private Codex Desktop files.
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: What happened, and what did you expect instead?
+    validations:
+      required: true
+  - type: input
+    id: revision
+    attributes:
+      label: Package version or commit
+      placeholder: 0.1.0 or a full commit SHA
+    validations:
+      required: true
+  - type: dropdown
+    id: environment
+    attributes:
+      label: Environment
+      options:
+        - Browser
+        - Electron
+        - SSR or React Server Components
+        - Package build or TypeScript
+        - Other
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Reproduction
+      description: Provide the smallest public repository, code sample, or steps that reproduce the issue.
+    validations:
+      required: true
+  - type: textarea
+    id: verification
+    attributes:
+      label: Additional context
+      description: Include React/browser versions, screenshots, accessibility output, or reduced-motion/theme state when relevant.
