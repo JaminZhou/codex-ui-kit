@@ -78,6 +78,17 @@ describe("visual token contract", () => {
     expect(styles.startsWith('@import "./tokens.css";')).toBe(true);
   });
 
+  it("keeps multiline composer slots free to render overlays", () => {
+    const multilineShell = styles.match(
+      /\.codex-ui-composer\[data-layout="multiline"\]\s*\{([^}]+)\}/,
+    )?.[1];
+
+    expect(multilineShell).toContain(
+      "border-radius: var(--codex-ui-radius-composer-multiline)",
+    );
+    expect(multilineShell).not.toContain("overflow");
+  });
+
   it("inherits forced themes through nested kit scopes", () => {
     expect(tokens).toContain(':root,\n[data-theme="light"] {');
     expect(tokens).not.toContain(

@@ -106,12 +106,40 @@ describe("AgentComposer", () => {
         layout="single-line"
         onSubmit={() => undefined}
         onValueChange={() => undefined}
-        value={"First line\nSecond line"}
+        value="Short"
       />,
     );
     expect(
       container.querySelector("form")?.getAttribute("data-layout"),
     ).toBe("single-line");
+  });
+
+  it("keeps structural multiline content safe from forced compact layout", () => {
+    const { container, rerender } = render(
+      <AgentComposer
+        attachments={<span>README.md</span>}
+        layout="single-line"
+        onSubmit={() => undefined}
+        onValueChange={() => undefined}
+        value="Short"
+      />,
+    );
+
+    expect(
+      container.querySelector("form")?.getAttribute("data-layout"),
+    ).toBe("multiline");
+
+    rerender(
+      <AgentComposer
+        layout="single-line"
+        onSubmit={() => undefined}
+        onValueChange={() => undefined}
+        value={"First line\nSecond line"}
+      />,
+    );
+    expect(
+      container.querySelector("form")?.getAttribute("data-layout"),
+    ).toBe("multiline");
   });
 
   it("promotes overflowing auto content to multiline", () => {

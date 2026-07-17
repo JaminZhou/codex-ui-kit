@@ -2457,7 +2457,6 @@ summary.codex-ui-activity__header::after {
 
 .codex-ui-composer[data-layout="multiline"] {
   border-radius: var(--codex-ui-radius-composer-multiline);
-  overflow: hidden;
 }
 
 [data-theme="dark"] .codex-ui-composer {

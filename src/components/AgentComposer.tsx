@@ -85,7 +85,12 @@ export const AgentComposer = forwardRef<
     ...restTextareaProps
   } = textareaProps ?? {};
   const canSubmit = !disabled && !isRunning && value.trim().length > 0;
-  const resolvedLayout = layout === "auto" ? automaticLayout : layout;
+  const contentRequiresMultiline = hasAttachments || value.includes("\n");
+  const resolvedLayout = contentRequiresMultiline
+    ? "multiline"
+    : layout === "auto"
+      ? automaticLayout
+      : layout;
   const classes = ["codex-ui-composer", className].filter(Boolean).join(" ");
   const textareaClasses = ["codex-ui-composer__input", textareaClassName]
     .filter(Boolean)
@@ -108,7 +113,9 @@ export const AgentComposer = forwardRef<
     if (!textarea) return;
 
     let nextLayout: Exclude<ComposerLayout, "auto"> =
-      layout === "multiline" ? "multiline" : "single-line";
+      layout === "multiline" || contentRequiresMultiline
+        ? "multiline"
+        : "single-line";
 
     if (layout === "auto") {
       const fieldset = fieldsetRef.current;
@@ -142,7 +149,7 @@ export const AgentComposer = forwardRef<
       nextLayout === "multiline" ? 44 : 36,
       nextLayout === "multiline" ? contentHeight : 0,
     )}px`;
-  }, [hasAttachments, layout, value]);
+  }, [contentRequiresMultiline, hasAttachments, layout, value]);
 
   useLayoutEffect(measureLayoutAndResize, [measureLayoutAndResize]);
 
