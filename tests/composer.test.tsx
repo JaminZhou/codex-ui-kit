@@ -5,7 +5,10 @@ import { createRef, useState } from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { AgentComposer, ComposerAttachment } from "../src";
 
-afterEach(cleanup);
+afterEach(() => {
+  cleanup();
+  vi.unstubAllGlobals();
+});
 
 interface ComposerHarnessProps {
   isRunning?: boolean;
@@ -32,6 +35,190 @@ function ComposerHarness({
 }
 
 describe("AgentComposer", () => {
+  it("starts in the compact single-line layout", () => {
+    const { container } = render(
+      <AgentComposer
+        onSubmit={() => undefined}
+        onValueChange={() => undefined}
+        value="Short follow-up"
+      />,
+    );
+
+    expect(
+      container.querySelector("form")?.getAttribute("data-layout"),
+    ).toBe("single-line");
+  });
+
+  it("uses multiline layout for explicit line breaks and attachments", () => {
+    const { container, rerender } = render(
+      <AgentComposer
+        onSubmit={() => undefined}
+        onValueChange={() => undefined}
+        value={"First line\nSecond line"}
+      />,
+    );
+
+    expect(
+      container.querySelector("form")?.getAttribute("data-layout"),
+    ).toBe("multiline");
+
+    rerender(
+      <AgentComposer
+        attachments={<span>README.md</span>}
+        onSubmit={() => undefined}
+        onValueChange={() => undefined}
+        value="Short"
+      />,
+    );
+    expect(
+      container.querySelector("form")?.getAttribute("data-layout"),
+    ).toBe("multiline");
+
+    rerender(
+      <AgentComposer
+        attachments={false}
+        onSubmit={() => undefined}
+        onValueChange={() => undefined}
+        value="Short"
+      />,
+    );
+    expect(
+      container.querySelector("form")?.getAttribute("data-layout"),
+    ).toBe("single-line");
+  });
+
+  it("supports forced layouts for deterministic host rendering", () => {
+    const { container, rerender } = render(
+      <AgentComposer
+        layout="multiline"
+        onSubmit={() => undefined}
+        onValueChange={() => undefined}
+        value="Short"
+      />,
+    );
+
+    expect(
+      container.querySelector("form")?.getAttribute("data-layout"),
+    ).toBe("multiline");
+
+    rerender(
+      <AgentComposer
+        layout="single-line"
+        onSubmit={() => undefined}
+        onValueChange={() => undefined}
+        value={"First line\nSecond line"}
+      />,
+    );
+    expect(
+      container.querySelector("form")?.getAttribute("data-layout"),
+    ).toBe("single-line");
+  });
+
+  it("promotes overflowing auto content to multiline", () => {
+    const { container, rerender } = render(
+      <AgentComposer
+        onSubmit={() => undefined}
+        onValueChange={() => undefined}
+        value="Short"
+      />,
+    );
+    const textarea = screen.getByRole("textbox", { name: "Message" });
+    const measure = container.querySelector(".codex-ui-composer__measure");
+    Object.defineProperty(textarea, "clientWidth", {
+      configurable: true,
+      value: 120,
+    });
+    Object.defineProperty(measure, "offsetWidth", {
+      configurable: true,
+      value: 100,
+    });
+
+    rerender(
+      <AgentComposer
+        onSubmit={() => undefined}
+        onValueChange={() => undefined}
+        value="This value no longer fits the compact input"
+      />,
+    );
+
+    expect(
+      container.querySelector("form")?.getAttribute("data-layout"),
+    ).toBe("multiline");
+
+    Object.defineProperty(measure, "offsetWidth", {
+      configurable: true,
+      value: 40,
+    });
+    rerender(
+      <AgentComposer
+        onSubmit={() => undefined}
+        onValueChange={() => undefined}
+        value="Fits again"
+      />,
+    );
+    expect(
+      container.querySelector("form")?.getAttribute("data-layout"),
+    ).toBe("single-line");
+  });
+
+  it("resizes multiline input content and observes the composer width", () => {
+    const observe = vi.fn();
+    const disconnect = vi.fn();
+    vi.stubGlobal(
+      "ResizeObserver",
+      class ResizeObserverMock {
+        observe = observe;
+        disconnect = disconnect;
+      },
+    );
+    const { rerender, unmount } = render(
+      <AgentComposer
+        layout="multiline"
+        onSubmit={() => undefined}
+        onValueChange={() => undefined}
+        value="First"
+      />,
+    );
+    const textarea = screen.getByRole("textbox", { name: "Message" });
+    Object.defineProperty(textarea, "scrollHeight", { value: 96 });
+
+    rerender(
+      <AgentComposer
+        layout="multiline"
+        onSubmit={() => undefined}
+        onValueChange={() => undefined}
+        value={"First\nSecond\nThird"}
+      />,
+    );
+
+    expect(textarea.style.height).toBe("96px");
+    expect(observe).toHaveBeenCalledWith(
+      textarea.closest("form") as HTMLFormElement,
+    );
+    unmount();
+    expect(disconnect).toHaveBeenCalled();
+  });
+
+  it("focuses the input from surface clicks without stealing control clicks", () => {
+    const { container } = render(
+      <AgentComposer
+        actions={<button type="button">Attach</button>}
+        onSubmit={() => undefined}
+        onValueChange={() => undefined}
+        value=""
+      />,
+    );
+    const textarea = screen.getByRole("textbox", { name: "Message" });
+    const attach = screen.getByRole("button", { name: "Attach" });
+
+    fireEvent.click(container.querySelector("form") as HTMLFormElement);
+    expect(document.activeElement).toBe(textarea);
+
+    attach.focus();
+    fireEvent.click(attach);
+    expect(document.activeElement).toBe(attach);
+  });
+
   it("forwards the textarea ref", () => {
     const ref = createRef<HTMLTextAreaElement>();
     render(

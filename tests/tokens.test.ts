@@ -11,6 +11,17 @@ describe("visual token contract", () => {
     expect(tokens).toContain("--codex-ui-radius-2xl: 1rem");
     expect(tokens).toContain("--codex-ui-thread-content-max-width: 48rem");
     expect(tokens).toContain("--codex-ui-radius-composer: calc(var(--codex-ui-spacing) * 5.5)");
+    expect(tokens).toContain(
+      "--codex-ui-radius-composer-multiline: var(--codex-ui-radius-3xl)",
+    );
+    expect(tokens).toContain(
+      "--codex-ui-size-button-composer: calc(var(--codex-ui-spacing) * 7)",
+    );
+    expect(tokens).toContain("--codex-ui-shadow-composer-prominent:");
+    expect(tokens).toContain("--codex-ui-shadow-composer-electron:");
+    expect(tokens).toContain(
+      "--codex-ui-shadow-composer: var(--codex-ui-shadow-composer-prominent)",
+    );
   });
 
   it("keeps the measured semantic light and dark color anchors", () => {

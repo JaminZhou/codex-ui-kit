@@ -102,6 +102,10 @@
   --codex-ui-line-height: var(--codex-ui-line-height-md);
   --codex-ui-radius-message: var(--codex-ui-radius-2xl);
   --codex-ui-radius-composer: calc(var(--codex-ui-spacing) * 5.5);
+  --codex-ui-radius-composer-single-line: var(--codex-ui-radius-composer);
+  --codex-ui-radius-composer-multiline: var(--codex-ui-radius-3xl);
+  --codex-ui-size-button-composer: calc(var(--codex-ui-spacing) * 7);
+  --codex-ui-composer-control-gap: var(--codex-ui-spacing);
   --codex-ui-radius-row: var(--codex-ui-radius-lg);
   --codex-ui-thread-content-max-width: 48rem;
   --codex-ui-thread-content-top-inset: calc(var(--codex-ui-spacing) * 8);
@@ -123,6 +127,15 @@
   --codex-ui-shadow-lg: 0 4px 8px -2px rgb(0 0 0 / 0.1);
   --codex-ui-shadow-xl: 0 8px 16px -4px rgb(0 0 0 / 0.12);
   --codex-ui-shadow-2xl: 0 16px 32px -8px rgb(0 0 0 / 0.19);
+  --codex-ui-shadow-composer-prominent:
+    0 0 0 0.5px var(--codex-ui-border-strong),
+    0 3px 7.5px rgb(0 0 0 / 0.04),
+    0 0 20px rgb(0 0 0 / 0.05);
+  --codex-ui-shadow-composer-electron:
+    0 0 0 0.5px var(--codex-ui-border-strong),
+    0 3px 7.5px rgb(0 0 0 / 0.03),
+    0 0 16px rgb(0 0 0 / 0.02);
+  --codex-ui-shadow-composer: var(--codex-ui-shadow-composer-prominent);
 }
 
 :root,

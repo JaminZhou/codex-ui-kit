@@ -233,6 +233,32 @@ code {
   white-space: nowrap;
 }
 
+.composer-preview__matrix {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin: 1.5rem auto 0;
+  max-width: 48rem;
+}
+
+.composer-preview__sample {
+  align-content: start;
+  display: grid;
+  gap: 0.5rem;
+  min-width: 0;
+}
+
+.composer-preview__sample > span {
+  color: var(--codex-ui-text-tertiary);
+  font-size: 0.6875rem;
+}
+
+.composer-preview__sample--narrow {
+  justify-self: start;
+  max-width: 20rem;
+  width: 100%;
+}
+
 .approval-preview {
   background:
     linear-gradient(var(--codex-ui-border) 1px, transparent 1px),
@@ -882,6 +908,10 @@ code {
 
   .composer-preview {
     padding: 1rem;
+  }
+
+  .composer-preview__matrix {
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .approval-preview {

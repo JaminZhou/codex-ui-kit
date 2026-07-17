@@ -1307,6 +1307,50 @@ export function DesktopPlayground() {
           placeholder="Enter sends · Shift+Enter adds a line"
           value={composerValue}
         />
+        <div
+          aria-label="Desktop composer state matrix"
+          className="desktop-composer-dock__matrix"
+        >
+          <div className="desktop-composer-dock__sample">
+            <span>Auto · compact</span>
+            <AgentComposer
+              actions={<button type="button">+</button>}
+              controls={<button type="button">Local</button>}
+              onSubmit={() => undefined}
+              onValueChange={() => undefined}
+              value="Inspect the desktop shell"
+            />
+          </div>
+          <div className="desktop-composer-dock__sample">
+            <span>Multiline · autosized</span>
+            <AgentComposer
+              layout="multiline"
+              onSubmit={() => undefined}
+              onValueChange={() => undefined}
+              value={"Validate resizing and focus.\nUse the system font stack."}
+            />
+          </div>
+          <div className="desktop-composer-dock__sample desktop-composer-dock__sample--narrow">
+            <span>Running · narrow host</span>
+            <AgentComposer
+              isRunning
+              onStop={() => undefined}
+              onSubmit={() => undefined}
+              onValueChange={() => undefined}
+              value="Continue the renderer check"
+            />
+          </div>
+          <div className="desktop-composer-dock__sample">
+            <span>Disabled</span>
+            <AgentComposer
+              disabled
+              layout="multiline"
+              onSubmit={() => undefined}
+              onValueChange={() => undefined}
+              value="Waiting for the active task"
+            />
+          </div>
+        </div>
       </section>
 
       <footer className="desktop-footer">
