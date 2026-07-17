@@ -107,6 +107,23 @@ describe("AgentComposer", () => {
 
     rerender(
       <AgentComposer
+        attachments={
+          <>{files.map((file) => <span key={file}>{file}</span>)}</>
+        }
+        onSubmit={() => undefined}
+        onValueChange={() => undefined}
+        value="Short"
+      />,
+    );
+    expect(
+      container.querySelector(".codex-ui-composer__attachments"),
+    ).toBeNull();
+    expect(
+      container.querySelector("form")?.getAttribute("data-layout"),
+    ).toBe("single-line");
+
+    rerender(
+      <AgentComposer
         attachments={[null, false, ""]}
         onSubmit={() => undefined}
         onValueChange={() => undefined}
@@ -117,6 +134,24 @@ describe("AgentComposer", () => {
     expect(
       container.querySelector("form")?.getAttribute("data-layout"),
     ).toBe("single-line");
+
+    rerender(
+      <AgentComposer
+        attachments={
+          <>
+            <>
+              <span>README.md</span>
+            </>
+          </>
+        }
+        onSubmit={() => undefined}
+        onValueChange={() => undefined}
+        value="Short"
+      />,
+    );
+    expect(
+      container.querySelector("form")?.getAttribute("data-layout"),
+    ).toBe("multiline");
   });
 
   it("supports forced layouts for deterministic host rendering", () => {

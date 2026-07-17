@@ -1,6 +1,8 @@
 import {
   Children,
+  Fragment,
   forwardRef,
+  isValidElement,
   useCallback,
   useEffect,
   useLayoutEffect,
@@ -13,6 +15,19 @@ import {
   type MouseEvent as ReactMouseEvent,
   type ReactNode,
 } from "react";
+
+function hasRenderableAttachmentContent(children: ReactNode): boolean {
+  return Children.toArray(children).some((child) => {
+    if (typeof child === "string") return child.trim().length > 0;
+    if (
+      isValidElement<{ children?: ReactNode }>(child) &&
+      child.type === Fragment
+    ) {
+      return hasRenderableAttachmentContent(child.props.children);
+    }
+    return true;
+  });
+}
 
 export type ComposerLayout = "auto" | "single-line" | "multiline";
 
@@ -65,10 +80,7 @@ export const AgentComposer = forwardRef<
   },
   forwardedRef,
 ) {
-  const attachmentChildren = Children.toArray(attachments).filter(
-    (child) => typeof child !== "string" || child.trim().length > 0,
-  );
-  const hasAttachments = attachmentChildren.length > 0;
+  const hasAttachments = hasRenderableAttachmentContent(attachments);
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
   const formRef = useRef<HTMLFormElement | null>(null);
   const fieldsetRef = useRef<HTMLFieldSetElement | null>(null);
@@ -234,7 +246,7 @@ export const AgentComposer = forwardRef<
       >
         {hasAttachments ? (
           <div className="codex-ui-composer__attachments" aria-label="Attachments">
-            {attachmentChildren}
+            {attachments}
           </div>
         ) : null}
 
