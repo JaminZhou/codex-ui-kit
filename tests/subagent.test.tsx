@@ -180,6 +180,25 @@ describe("SubagentSummary", () => {
     fireEvent.click(screen.getByRole("button", { name: "Builder" }));
     expect(onOpenSubagent).toHaveBeenCalledWith(completedAgent);
   });
+
+  it("keeps every grouped agent openable in individual-navigation mode", () => {
+    const onOpenSubagent = vi.fn();
+    const groupedAgents = Array.from({ length: 5 }, (_, index) => ({
+      ...activeAgent,
+      id: `grouped-${index}`,
+      name: `Agent ${index + 1}`,
+      presentation: "grouped" as const,
+    }));
+    render(
+      <SubagentSummary
+        items={groupedAgents}
+        onOpenSubagent={onOpenSubagent}
+      />,
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "Agent 5" }));
+    expect(onOpenSubagent).toHaveBeenCalledWith(groupedAgents[4]);
+  });
 });
 
 describe("SubagentPanel", () => {
@@ -278,6 +297,27 @@ describe("SubagentPanel", () => {
 
     expect(onVisibleItemsChange).toHaveBeenLastCalledWith([updatedAgent]);
     expect(onVisibleItemsChange).toHaveBeenCalledTimes(2);
+  });
+
+  it("reports the current visible set to a replacement callback", () => {
+    const firstCallback = vi.fn();
+    const replacementCallback = vi.fn();
+    const { rerender } = render(
+      <SubagentPanel
+        items={[activeAgent]}
+        onVisibleItemsChange={firstCallback}
+      />,
+    );
+
+    rerender(
+      <SubagentPanel
+        items={[activeAgent]}
+        onVisibleItemsChange={replacementCallback}
+      />,
+    );
+
+    expect(replacementCallback).toHaveBeenCalledOnce();
+    expect(replacementCallback).toHaveBeenCalledWith([activeAgent]);
   });
 });
 

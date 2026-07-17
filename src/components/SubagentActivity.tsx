@@ -249,12 +249,14 @@ function SummaryAvatarGroup({
   items: SubagentItem[];
   onOpenItem?: (item: SubagentItem) => void;
 }) {
+  const visibleItems = onOpenItem ? items : items.slice(0, 4);
+
   return (
     <span
       aria-hidden={onOpenItem ? undefined : "true"}
       className="codex-ui-subagent-summary__avatars"
     >
-      {items.slice(0, 4).map((item) => {
+      {visibleItems.map((item) => {
         const avatar = (
           <SubagentAvatar
             active={item.status !== "done"}
@@ -565,7 +567,10 @@ export function SubagentPanel({
 }: SubagentPanelProps) {
   const [activeVisibleCount, setActiveVisibleCount] = useState(activeLimit);
   const [doneVisibleCount, setDoneVisibleCount] = useState(doneLimit);
-  const lastVisibleNotification = useRef<SubagentItem[] | null>(null);
+  const lastVisibleNotification = useRef<{
+    callback: NonNullable<SubagentPanelProps["onVisibleItemsChange"]>;
+    items: SubagentItem[];
+  } | null>(null);
   const { active, done } = useMemo(() => {
     const sorted = sortForSummary(items);
     return {
@@ -596,16 +601,21 @@ export function SubagentPanel({
 
   useEffect(() => {
     if (!onVisibleItemsChange) {
+      lastVisibleNotification.current = null;
       return;
     }
     const previous = lastVisibleNotification.current;
     if (
-      previous?.length === visibleItems.length &&
-      previous.every((item, index) => item === visibleItems[index])
+      previous?.callback === onVisibleItemsChange &&
+      previous.items.length === visibleItems.length &&
+      previous.items.every((item, index) => item === visibleItems[index])
     ) {
       return;
     }
-    lastVisibleNotification.current = visibleItems;
+    lastVisibleNotification.current = {
+      callback: onVisibleItemsChange,
+      items: visibleItems,
+    };
     onVisibleItemsChange(visibleItems);
   }, [onVisibleItemsChange, visibleItems]);
 
