@@ -106,6 +106,10 @@
   --codex-ui-radius-composer-multiline: var(--codex-ui-radius-3xl);
   --codex-ui-size-button-composer: calc(var(--codex-ui-spacing) * 7);
   --codex-ui-composer-control-gap: var(--codex-ui-spacing);
+  --codex-ui-composer-compact-column-gap: calc(var(--codex-ui-spacing) * 2);
+  --codex-ui-composer-compact-inline-padding: calc(
+    var(--codex-ui-spacing) * 2
+  );
   --codex-ui-radius-row: var(--codex-ui-radius-lg);
   --codex-ui-thread-content-max-width: 48rem;
   --codex-ui-thread-content-top-inset: calc(var(--codex-ui-spacing) * 8);

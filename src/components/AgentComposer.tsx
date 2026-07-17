@@ -87,6 +87,7 @@ export const AgentComposer = forwardRef<
   const actionsRef = useRef<HTMLDivElement | null>(null);
   const controlsRef = useRef<HTMLDivElement | null>(null);
   const measureRef = useRef<HTMLSpanElement | null>(null);
+  const compactMetricsRef = useRef<HTMLSpanElement | null>(null);
   const isComposingRef = useRef(false);
   const [automaticLayout, setAutomaticLayout] = useState<
     Exclude<ComposerLayout, "auto">
@@ -136,13 +137,14 @@ export const AgentComposer = forwardRef<
     if (layout === "auto") {
       const fieldset = fieldsetRef.current;
       const measuredTextWidth = measureRef.current?.offsetWidth ?? 0;
+      const compactChromeWidth = compactMetricsRef.current?.offsetWidth ?? 0;
       const fieldsetWidth = fieldset?.clientWidth ?? 0;
       const calculatedSingleLineWidth = Math.max(
         0,
         fieldsetWidth -
           (actionsRef.current?.offsetWidth ?? 0) -
           (controlsRef.current?.offsetWidth ?? 0) -
-          32,
+          compactChromeWidth,
       );
       const singleLineInputWidth =
         calculatedSingleLineWidth || textarea.clientWidth;
@@ -152,7 +154,7 @@ export const AgentComposer = forwardRef<
         compactInputHasNoSpace ||
         (measuredTextWidth > 0 &&
           singleLineInputWidth > 0 &&
-          measuredTextWidth + 32 > singleLineInputWidth);
+          measuredTextWidth + compactChromeWidth > singleLineInputWidth);
 
       nextLayout =
         hasAttachments || value.includes("\n") || textWouldOverflow
@@ -287,6 +289,10 @@ export const AgentComposer = forwardRef<
           <span className="codex-ui-composer__measure" ref={measureRef}>
             {value || "\u200b"}
           </span>
+          <span
+            className="codex-ui-composer__compact-metrics"
+            ref={compactMetricsRef}
+          />
         </span>
 
         <div className="codex-ui-composer__toolbar">

@@ -2486,10 +2486,10 @@ summary.codex-ui-activity__header::after {
 .codex-ui-composer[data-layout="single-line"] .codex-ui-composer__fieldset {
   align-items: center;
   display: grid;
-  gap: 0.5rem;
+  gap: var(--codex-ui-composer-compact-column-gap);
   grid-template-columns: auto minmax(0, 1fr) auto;
   min-height: 2.75rem;
-  padding: 0.25rem 0.5rem;
+  padding: 0.25rem var(--codex-ui-composer-compact-inline-padding);
 }
 
 .codex-ui-composer[data-layout="multiline"] .codex-ui-composer__fieldset {
@@ -2611,6 +2611,17 @@ summary.codex-ui-activity__header::after {
   font: inherit;
   line-height: 1.25rem;
   white-space: pre;
+}
+
+.codex-ui-composer__compact-metrics {
+  display: block;
+  height: 1px;
+  width: calc(
+    var(--codex-ui-composer-compact-inline-padding) +
+      var(--codex-ui-composer-compact-inline-padding) +
+      var(--codex-ui-composer-compact-column-gap) +
+      var(--codex-ui-composer-compact-column-gap)
+  );
 }
 
 .codex-ui-composer__toolbar,

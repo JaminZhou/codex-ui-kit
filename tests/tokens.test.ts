@@ -117,6 +117,12 @@ describe("visual token contract", () => {
     expect(measureClip).toContain("overflow: hidden");
     expect(measureClip).toContain("position: absolute");
     expect(measureClip).toContain("width: 1px");
+    expect(styles).toContain(
+      "var(--codex-ui-composer-compact-inline-padding) +",
+    );
+    expect(styles).toContain(
+      "var(--codex-ui-composer-compact-column-gap) +",
+    );
   });
 
   it("inherits forced themes through nested kit scopes", () => {

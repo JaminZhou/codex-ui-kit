@@ -223,6 +223,9 @@ describe("AgentComposer", () => {
     );
     const textarea = screen.getByRole("textbox", { name: "Message" });
     const measure = container.querySelector(".codex-ui-composer__measure");
+    const compactMetrics = container.querySelector(
+      ".codex-ui-composer__compact-metrics",
+    );
     Object.defineProperty(textarea, "clientWidth", {
       configurable: true,
       value: 120,
@@ -230,6 +233,10 @@ describe("AgentComposer", () => {
     Object.defineProperty(measure, "offsetWidth", {
       configurable: true,
       value: 100,
+    });
+    Object.defineProperty(compactMetrics, "offsetWidth", {
+      configurable: true,
+      value: 32,
     });
 
     rerender(
@@ -276,7 +283,7 @@ describe("AgentComposer", () => {
     const textarea = screen.getByRole("textbox", { name: "Message" });
     Object.defineProperty(fieldset, "clientWidth", {
       configurable: true,
-      value: 120,
+      value: 96,
     });
     Object.defineProperty(actions, "offsetWidth", {
       configurable: true,
@@ -295,6 +302,59 @@ describe("AgentComposer", () => {
       <AgentComposer
         actions={<button type="button">Attach</button>}
         controls={<select aria-label="Mode" />}
+        onSubmit={() => undefined}
+        onValueChange={() => undefined}
+        value="AB"
+      />,
+    );
+
+    expect(
+      container.querySelector("form")?.getAttribute("data-layout"),
+    ).toBe("multiline");
+  });
+
+  it("uses the CSS compact chrome metric for auto overflow", () => {
+    const { container, rerender } = render(
+      <AgentComposer
+        actions={<button type="button">Attach</button>}
+        controls={<button type="button">Local</button>}
+        onSubmit={() => undefined}
+        onValueChange={() => undefined}
+        value="A"
+      />,
+    );
+    const fieldset = container.querySelector("fieldset");
+    const actions = container.querySelector(".codex-ui-composer__actions");
+    const controls = container.querySelector(".codex-ui-composer__controls");
+    const measure = container.querySelector(".codex-ui-composer__measure");
+    const compactMetrics = container.querySelector(
+      ".codex-ui-composer__compact-metrics",
+    );
+    Object.defineProperty(fieldset, "clientWidth", {
+      configurable: true,
+      value: 180,
+    });
+    Object.defineProperty(actions, "offsetWidth", {
+      configurable: true,
+      value: 40,
+    });
+    Object.defineProperty(controls, "offsetWidth", {
+      configurable: true,
+      value: 40,
+    });
+    Object.defineProperty(measure, "offsetWidth", {
+      configurable: true,
+      value: 20,
+    });
+    Object.defineProperty(compactMetrics, "offsetWidth", {
+      configurable: true,
+      value: 44,
+    });
+
+    rerender(
+      <AgentComposer
+        actions={<button type="button">Attach</button>}
+        controls={<button type="button">Local</button>}
         onSubmit={() => undefined}
         onValueChange={() => undefined}
         value="AB"
