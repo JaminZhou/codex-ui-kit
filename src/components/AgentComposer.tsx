@@ -85,22 +85,23 @@ export const AgentComposer = forwardRef<
   forwardedRef,
 ) {
   const hasAttachments = hasRenderableContent(attachments);
-  const hasQueue = hasRenderableContent(queue);
+  const hasQueueCandidate = hasRenderableContent(queue);
   const hasSuggestions = hasRenderableContent(suggestions);
+  const showsSuggestions = hasSuggestions && !disabled;
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
   const formRef = useRef<HTMLFormElement | null>(null);
   const fieldsetRef = useRef<HTMLFieldSetElement | null>(null);
+  const queueRef = useRef<HTMLDivElement | null>(null);
   const actionsRef = useRef<HTMLDivElement | null>(null);
   const controlsRef = useRef<HTMLDivElement | null>(null);
   const measureRef = useRef<HTMLSpanElement | null>(null);
   const compactMetricsRef = useRef<HTMLSpanElement | null>(null);
   const isComposingRef = useRef(false);
+  const [hasRenderedQueue, setHasRenderedQueue] = useState(false);
   const [automaticLayout, setAutomaticLayout] = useState<
     Exclude<ComposerLayout, "auto">
   >(() =>
-    hasAttachments || hasQueue || value.includes("\n")
-      ? "multiline"
-      : "single-line",
+    hasAttachments || value.includes("\n") ? "multiline" : "single-line",
   );
   const {
     className: textareaClassName,
@@ -111,7 +112,7 @@ export const AgentComposer = forwardRef<
   } = textareaProps ?? {};
   const canSubmit = !disabled && !isRunning && value.trim().length > 0;
   const contentRequiresMultiline =
-    hasAttachments || hasQueue || value.includes("\n");
+    hasAttachments || hasRenderedQueue || value.includes("\n");
   const resolvedLayout = contentRequiresMultiline
     ? "multiline"
     : layout === "auto"
@@ -166,7 +167,10 @@ export const AgentComposer = forwardRef<
           measuredTextWidth > singleLineInputWidth);
 
       nextLayout =
-        hasAttachments || hasQueue || value.includes("\n") || textWouldOverflow
+        hasAttachments ||
+        hasRenderedQueue ||
+        value.includes("\n") ||
+        textWouldOverflow
           ? "multiline"
           : "single-line";
       setAutomaticLayout((current) =>
@@ -186,7 +190,35 @@ export const AgentComposer = forwardRef<
       textarea.scrollHeight,
     );
     textarea.style.height = nextHeight > 0 ? `${nextHeight}px` : "";
-  }, [contentRequiresMultiline, hasAttachments, hasQueue, layout, value]);
+  }, [contentRequiresMultiline, hasAttachments, hasRenderedQueue, layout, value]);
+
+  useLayoutEffect(() => {
+    const container = queueRef.current;
+    if (!hasQueueCandidate || !container) {
+      setHasRenderedQueue(false);
+      return;
+    }
+
+    const updateQueueVisibility = () => {
+      const hasContent = [...container.childNodes].some(
+        (node) => node.nodeType === 1 || Boolean(node.textContent?.trim()),
+      );
+      setHasRenderedQueue((current) =>
+        current === hasContent ? current : hasContent,
+      );
+    };
+
+    updateQueueVisibility();
+    if (typeof MutationObserver === "undefined") return;
+
+    const observer = new MutationObserver(updateQueueVisibility);
+    observer.observe(container, {
+      characterData: true,
+      childList: true,
+      subtree: true,
+    });
+    return () => observer.disconnect();
+  }, [hasQueueCandidate, queue]);
 
   useLayoutEffect(measureLayoutAndResize, [
     automaticLayout,
@@ -257,21 +289,29 @@ export const AgentComposer = forwardRef<
       data-disabled={disabled || undefined}
       data-layout={resolvedLayout}
       data-running={isRunning || undefined}
-      data-suggestions-open={hasSuggestions || undefined}
+      data-suggestions-open={showsSuggestions || undefined}
       ref={formRef}
       {...formProps}
       onClick={handleSurfaceClick}
       onSubmit={handleSubmit}
     >
-      {hasSuggestions ? (
-        <div className="codex-ui-composer__suggestions">{suggestions}</div>
-      ) : null}
       <fieldset
         className="codex-ui-composer__fieldset"
         disabled={disabled}
         ref={fieldsetRef}
       >
-        {hasQueue ? <div className="codex-ui-composer__queue">{queue}</div> : null}
+        {showsSuggestions ? (
+          <div className="codex-ui-composer__suggestions">{suggestions}</div>
+        ) : null}
+        {hasQueueCandidate ? (
+          <div
+            className="codex-ui-composer__queue"
+            hidden={!hasRenderedQueue}
+            ref={queueRef}
+          >
+            {queue}
+          </div>
+        ) : null}
         {hasAttachments ? (
           <div className="codex-ui-composer__attachments" aria-label="Attachments">
             {attachments}

@@ -3,7 +3,12 @@
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { createRef, useState } from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { AgentComposer, ComposerAttachment } from "../src";
+import {
+  AgentComposer,
+  ComposerAttachment,
+  ComposerMentionMenu,
+  QueuedPromptList,
+} from "../src";
 
 afterEach(() => {
   cleanup();
@@ -131,6 +136,93 @@ describe("AgentComposer", () => {
     expect(
       container.querySelector(".codex-ui-composer__suggestions"),
     ).toBeNull();
+  });
+
+  it("derives queue layout from rendered content rather than the element shell", () => {
+    const { container, rerender } = render(
+      <AgentComposer
+        onSubmit={() => undefined}
+        onValueChange={() => undefined}
+        queue={<QueuedPromptList items={[]} />}
+        value="Short"
+      />,
+    );
+
+    const composer = container.querySelector("form");
+    const queue = container.querySelector(".codex-ui-composer__queue");
+    expect(composer?.getAttribute("data-layout")).toBe("single-line");
+    expect(queue?.hasAttribute("hidden")).toBe(true);
+
+    rerender(
+      <AgentComposer
+        onSubmit={() => undefined}
+        onValueChange={() => undefined}
+        queue={
+          <QueuedPromptList items={[{ id: "one", text: "Run checks" }]} />
+        }
+        value="Short"
+      />,
+    );
+    expect(composer?.getAttribute("data-layout")).toBe("multiline");
+    expect(queue?.hasAttribute("hidden")).toBe(false);
+
+    rerender(
+      <AgentComposer
+        onSubmit={() => undefined}
+        onValueChange={() => undefined}
+        queue={<QueuedPromptList items={[]} />}
+        value="Short"
+      />,
+    );
+    expect(composer?.getAttribute("data-layout")).toBe("single-line");
+    expect(queue?.hasAttribute("hidden")).toBe(true);
+  });
+
+  it("closes suggestion controls when the composer becomes disabled", () => {
+    const onSelect = vi.fn();
+    const { rerender } = render(
+      <AgentComposer
+        onSubmit={() => undefined}
+        onValueChange={() => undefined}
+        suggestions={
+          <ComposerMentionMenu
+            groups={[
+              {
+                id: "files",
+                label: "Files",
+                options: [{ id: "app", label: "src/App.tsx" }],
+              },
+            ]}
+            onSelect={onSelect}
+          />
+        }
+        value="@app"
+      />,
+    );
+
+    expect(screen.getByRole("listbox")).not.toBeNull();
+    rerender(
+      <AgentComposer
+        disabled
+        onSubmit={() => undefined}
+        onValueChange={() => undefined}
+        suggestions={
+          <ComposerMentionMenu
+            groups={[
+              {
+                id: "files",
+                label: "Files",
+                options: [{ id: "app", label: "src/App.tsx" }],
+              },
+            ]}
+            onSelect={onSelect}
+          />
+        }
+        value="@app"
+      />,
+    );
+    expect(screen.queryByRole("listbox")).toBeNull();
+    expect(onSelect).not.toHaveBeenCalled();
   });
 
   it("treats empty attachment collections as absent", () => {
