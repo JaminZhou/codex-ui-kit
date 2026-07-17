@@ -154,7 +154,7 @@ export const AgentComposer = forwardRef<
         compactInputHasNoSpace ||
         (measuredTextWidth > 0 &&
           singleLineInputWidth > 0 &&
-          measuredTextWidth + compactChromeWidth > singleLineInputWidth);
+          measuredTextWidth > singleLineInputWidth);
 
       nextLayout =
         hasAttachments || value.includes("\n") || textWouldOverflow

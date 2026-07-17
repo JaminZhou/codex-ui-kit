@@ -232,7 +232,7 @@ describe("AgentComposer", () => {
     });
     Object.defineProperty(measure, "offsetWidth", {
       configurable: true,
-      value: 100,
+      value: 130,
     });
     Object.defineProperty(compactMetrics, "offsetWidth", {
       configurable: true,
@@ -313,7 +313,7 @@ describe("AgentComposer", () => {
     ).toBe("multiline");
   });
 
-  it("uses the CSS compact chrome metric for auto overflow", () => {
+  it("uses the CSS compact chrome metric without double counting it", () => {
     const { container, rerender } = render(
       <AgentComposer
         actions={<button type="button">Attach</button>}
@@ -361,6 +361,23 @@ describe("AgentComposer", () => {
       />,
     );
 
+    expect(
+      container.querySelector("form")?.getAttribute("data-layout"),
+    ).toBe("single-line");
+
+    Object.defineProperty(measure, "offsetWidth", {
+      configurable: true,
+      value: 60,
+    });
+    rerender(
+      <AgentComposer
+        actions={<button type="button">Attach</button>}
+        controls={<button type="button">Local</button>}
+        onSubmit={() => undefined}
+        onValueChange={() => undefined}
+        value="ABC"
+      />,
+    );
     expect(
       container.querySelector("form")?.getAttribute("data-layout"),
     ).toBe("multiline");
