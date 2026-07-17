@@ -556,7 +556,7 @@ export function SubagentPanel({
 }: SubagentPanelProps) {
   const [activeVisibleCount, setActiveVisibleCount] = useState(activeLimit);
   const [doneVisibleCount, setDoneVisibleCount] = useState(doneLimit);
-  const lastVisibleNotification = useRef<string | null>(null);
+  const lastVisibleNotification = useRef<SubagentItem[] | null>(null);
   const { active, done } = useMemo(() => {
     const sorted = sortForSummary(items);
     return {
@@ -573,8 +573,6 @@ export function SubagentPanel({
     ],
     [active, activeVisibleCount, done, doneVisibleCount],
   );
-  const visibleKey = visibleItems.map((item) => item.id).join("\u0000");
-
   useEffect(() => {
     setActiveVisibleCount((count) =>
       Math.max(activeLimit, Math.min(count, active.length)),
@@ -588,15 +586,19 @@ export function SubagentPanel({
   }, [done.length, doneKey, doneLimit]);
 
   useEffect(() => {
+    if (!onVisibleItemsChange) {
+      return;
+    }
+    const previous = lastVisibleNotification.current;
     if (
-      !onVisibleItemsChange ||
-      lastVisibleNotification.current === visibleKey
+      previous?.length === visibleItems.length &&
+      previous.every((item, index) => item === visibleItems[index])
     ) {
       return;
     }
-    lastVisibleNotification.current = visibleKey;
+    lastVisibleNotification.current = visibleItems;
     onVisibleItemsChange(visibleItems);
-  }, [onVisibleItemsChange, visibleItems, visibleKey]);
+  }, [onVisibleItemsChange, visibleItems]);
 
   return (
     <div

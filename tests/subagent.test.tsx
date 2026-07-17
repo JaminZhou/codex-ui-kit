@@ -226,6 +226,31 @@ describe("SubagentPanel", () => {
       doneAgent,
     ]);
   });
+
+  it("reports live updates when a visible item keeps the same id", () => {
+    const onVisibleItemsChange = vi.fn();
+    const { rerender } = render(
+      <SubagentPanel
+        items={[activeAgent]}
+        onVisibleItemsChange={onVisibleItemsChange}
+      />,
+    );
+    const updatedAgent: SubagentItem = {
+      ...activeAgent,
+      lastMessage: "Finished the renderer audit.",
+      status: "done",
+    };
+
+    rerender(
+      <SubagentPanel
+        items={[updatedAgent]}
+        onVisibleItemsChange={onVisibleItemsChange}
+      />,
+    );
+
+    expect(onVisibleItemsChange).toHaveBeenLastCalledWith([updatedAgent]);
+    expect(onVisibleItemsChange).toHaveBeenCalledTimes(2);
+  });
 });
 
 describe("SubagentTranscriptHeader", () => {
