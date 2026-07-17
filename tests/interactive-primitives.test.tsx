@@ -56,6 +56,32 @@ describe("interactive controls", () => {
     expect(screen.queryByRole("tooltip")).toBeNull();
   });
 
+  it("clears a tooltip's stale open state when disabled", () => {
+    const { rerender } = render(
+      <Tooltip defaultOpen content="Help text">
+        <button type="button">Help</button>
+      </Tooltip>,
+    );
+
+    expect(screen.getByRole("tooltip")).toBeTruthy();
+    rerender(
+      <Tooltip defaultOpen disabled content="Help text">
+        <button type="button">Help</button>
+      </Tooltip>,
+    );
+    expect(screen.queryByRole("tooltip")).toBeNull();
+    expect(
+      screen.getByRole("button", { name: "Help" }).getAttribute("aria-describedby"),
+    ).toBeNull();
+
+    rerender(
+      <Tooltip defaultOpen content="Help text">
+        <button type="button">Help</button>
+      </Tooltip>,
+    );
+    expect(screen.queryByRole("tooltip")).toBeNull();
+  });
+
   it("dismisses a popover from outside interaction and Escape", async () => {
     render(
       <Popover
@@ -195,6 +221,30 @@ describe("menus and selects", () => {
     expect(screen.getAllByRole("menu")).toHaveLength(2);
   });
 
+  it("clears submenu state and ARIA references when disabled", async () => {
+    const renderMenu = (disabled: boolean) => (
+      <Menu defaultOpen trigger={<button type="button">View</button>}>
+        <MenuSubmenu disabled={disabled} label="Theme">
+          <MenuItem keepOpen>System</MenuItem>
+        </MenuSubmenu>
+      </Menu>
+    );
+    const { rerender } = render(renderMenu(false));
+
+    const submenuTrigger = screen.getByRole("menuitem", { name: "Theme" });
+    fireEvent.click(submenuTrigger);
+    await waitFor(() => expect(screen.getAllByRole("menu")).toHaveLength(2));
+
+    rerender(renderMenu(true));
+    expect(submenuTrigger.getAttribute("aria-expanded")).toBe("false");
+    expect(submenuTrigger.getAttribute("aria-controls")).toBeNull();
+    expect(screen.getAllByRole("menu")).toHaveLength(1);
+
+    rerender(renderMenu(false));
+    expect(submenuTrigger.getAttribute("aria-expanded")).toBe("false");
+    expect(screen.getAllByRole("menu")).toHaveLength(1);
+  });
+
   it("keeps nested popover portals inside the ancestor ownership chain", () => {
     const onValueChange = vi.fn();
     render(
@@ -255,5 +305,26 @@ describe("menus and selects", () => {
     fireEvent.click(local);
     expect(onValueChange).toHaveBeenCalledWith("local");
     expect(screen.queryByRole("listbox")).toBeNull();
+  });
+
+  it("focuses the first enabled option when the selected option is disabled", async () => {
+    render(
+      <Select
+        label="Execution mode"
+        onValueChange={vi.fn()}
+        options={[
+          { label: "Local", value: "local" },
+          { disabled: true, label: "Cloud", value: "cloud" },
+        ]}
+        value="cloud"
+      />,
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "Execution mode" }));
+    await waitFor(() =>
+      expect(document.activeElement).toBe(
+        screen.getByRole("option", { name: "Local" }),
+      ),
+    );
   });
 });

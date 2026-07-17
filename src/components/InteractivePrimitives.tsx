@@ -454,6 +454,14 @@ export function Tooltip({
     onOpenChange,
     open,
   });
+  const effectiveOpen = resolvedOpen && !disabled;
+
+  useEffect(() => {
+    if (disabled && resolvedOpen) {
+      clearTimer();
+      setOpen(false);
+    }
+  }, [disabled, resolvedOpen, setOpen]);
 
   const clearTimer = () => {
     if (timerRef.current !== null && typeof window !== "undefined") {
@@ -481,7 +489,7 @@ export function Tooltip({
   useEffect(() => () => clearTimer(), []);
 
   const trigger = cloneElement(children, {
-    "aria-describedby": resolvedOpen && !disabled ? id : children.props["aria-describedby"],
+    "aria-describedby": effectiveOpen ? id : children.props["aria-describedby"],
   });
   return (
     <span
@@ -505,7 +513,7 @@ export function Tooltip({
         anchorRef={anchorRef}
         className="codex-ui-tooltip"
         id={id}
-        open={resolvedOpen && !disabled}
+        open={effectiveOpen}
         role="tooltip"
         side={side}
         sideOffset={sideOffset}
@@ -889,6 +897,7 @@ export function MenuSubmenu({
   const closeTimerRef = useRef<number | null>(null);
   const focusOnOpenRef = useRef(false);
   const [open, setOpen] = useState(false);
+  const effectiveOpen = open && !disabled;
   const clearCloseTimer = () => {
     if (closeTimerRef.current !== null && typeof window !== "undefined") {
       window.clearTimeout(closeTimerRef.current);
@@ -902,7 +911,14 @@ export function MenuSubmenu({
   };
   useEffect(() => () => clearCloseTimer(), []);
   useEffect(() => {
-    if (!open || !focusOnOpenRef.current || typeof window === "undefined") {
+    if (disabled && open) {
+      clearCloseTimer();
+      focusOnOpenRef.current = false;
+      setOpen(false);
+    }
+  }, [disabled, open]);
+  useEffect(() => {
+    if (!effectiveOpen || !focusOnOpenRef.current || typeof window === "undefined") {
       return;
     }
     const timer = window.setTimeout(() => {
@@ -911,13 +927,13 @@ export function MenuSubmenu({
       focusOnOpenRef.current = false;
     });
     return () => window.clearTimeout(timer);
-  }, [open]);
+  }, [effectiveOpen]);
   return (
     <>
       <button
-        aria-controls={open ? id : undefined}
+        aria-controls={effectiveOpen ? id : undefined}
         aria-disabled={disabled || undefined}
-        aria-expanded={open}
+        aria-expanded={effectiveOpen}
         aria-haspopup="menu"
         className="codex-ui-menu-item codex-ui-menu-submenu-trigger"
         disabled={disabled}
@@ -967,7 +983,7 @@ export function MenuSubmenu({
           }
           focusByKey(event);
         }}
-        open={open && !disabled}
+        open={effectiveOpen}
         ownerIds={ownerIds}
         role="menu"
         side="right"
@@ -1026,7 +1042,7 @@ export function Select({
       align="start"
       disabled={disabled}
       initialFocus="first"
-      initialFocusSelector='[role="option"][aria-selected="true"]'
+      initialFocusSelector='[role="option"][aria-selected="true"]:not(:disabled)'
       label={label}
       onOpenChange={setOpen}
       open={open}
