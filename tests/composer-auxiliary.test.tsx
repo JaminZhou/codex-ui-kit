@@ -84,10 +84,26 @@ describe("composer auxiliary surfaces", () => {
   });
 
   it("exposes loading and empty mention states", () => {
+    const onSelect = vi.fn();
     const { rerender } = render(
-      <ComposerMentionMenu groups={[]} loading onSelect={() => undefined} />,
+      <ComposerMentionMenu
+        groups={[
+          {
+            id: "stale",
+            label: "Previous results",
+            options: [{ id: "old", label: "Old result" }],
+          },
+        ]}
+        loading
+        onSelect={onSelect}
+      />,
     );
     expect(screen.getByRole("status").textContent).toContain("Searching…");
+    const listbox = screen.getByRole("listbox");
+    expect(listbox.hasAttribute("aria-activedescendant")).toBe(false);
+    expect(screen.queryByRole("option")).toBeNull();
+    fireEvent.keyDown(listbox, { key: "Enter" });
+    expect(onSelect).not.toHaveBeenCalled();
 
     rerender(
       <ComposerMentionMenu

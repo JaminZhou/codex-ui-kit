@@ -62,6 +62,12 @@ export function ComposerMentionMenu({
     () => availableOptions[0]?.id,
   );
   const resolvedActiveId = activeId ?? internalActiveId;
+  const selectableOptions = loading ? [] : availableOptions;
+  const visibleActiveId = selectableOptions.some(
+    (option) => option.id === resolvedActiveId,
+  )
+    ? resolvedActiveId
+    : selectableOptions[0]?.id;
   const setActiveId = (id: string) => {
     if (activeId === undefined) setInternalActiveId(id);
     onActiveIdChange?.(id);
@@ -77,16 +83,16 @@ export function ComposerMentionMenu({
   }, [activeId, availableOptions, internalActiveId]);
 
   const moveActive = (offset: number) => {
-    if (availableOptions.length === 0) return;
-    const currentIndex = availableOptions.findIndex(
-      (option) => option.id === resolvedActiveId,
+    if (selectableOptions.length === 0) return;
+    const currentIndex = selectableOptions.findIndex(
+      (option) => option.id === visibleActiveId,
     );
     const nextIndex =
       currentIndex < 0
         ? 0
-        : (currentIndex + offset + availableOptions.length) %
-          availableOptions.length;
-    const nextOption = availableOptions[nextIndex];
+        : (currentIndex + offset + selectableOptions.length) %
+          selectableOptions.length;
+    const nextOption = selectableOptions[nextIndex];
     if (nextOption) setActiveId(nextOption.id);
   };
 
@@ -103,14 +109,14 @@ export function ComposerMentionMenu({
       event.preventDefault();
       const nextOption =
         event.key === "Home"
-          ? availableOptions[0]
-          : availableOptions[availableOptions.length - 1];
+          ? selectableOptions[0]
+          : selectableOptions[selectableOptions.length - 1];
       if (nextOption) setActiveId(nextOption.id);
       return;
     }
     if (event.key === "Enter") {
-      const activeOption = availableOptions.find(
-        (option) => option.id === resolvedActiveId,
+      const activeOption = selectableOptions.find(
+        (option) => option.id === visibleActiveId,
       );
       if (activeOption) {
         event.preventDefault();
@@ -132,7 +138,7 @@ export function ComposerMentionMenu({
   return (
     <div
       aria-activedescendant={
-        resolvedActiveId ? getOptionDomId(resolvedActiveId) : undefined
+        visibleActiveId ? getOptionDomId(visibleActiveId) : undefined
       }
       aria-label={query ? `Mention results for ${query}` : "Mention suggestions"}
       aria-orientation="vertical"
@@ -165,9 +171,9 @@ export function ComposerMentionMenu({
               </div>
               {group.options.map((option) => (
                 <button
-                  aria-selected={option.id === resolvedActiveId}
+                  aria-selected={option.id === visibleActiveId}
                   className="codex-ui-composer-mention-menu__option"
-                  data-active={option.id === resolvedActiveId || undefined}
+                  data-active={option.id === visibleActiveId || undefined}
                   data-kind={option.kind}
                   disabled={option.disabled}
                   id={getOptionDomId(option.id)}
