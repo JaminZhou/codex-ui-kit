@@ -23,9 +23,12 @@ import {
   FileChange,
   FileDiff,
   fileDiffToText,
+  InlineNotice,
   ProposedPlan,
   SearchActivity,
   StatusIndicator,
+  StatusBanner,
+  StreamNotice,
   SubagentActivity,
   SubagentActivityGroup,
   SubagentPanel,
@@ -264,6 +267,7 @@ export function DesktopPlayground() {
   const [hasComposerAttachment, setHasComposerAttachment] = useState(true);
   const [approvalDecision, setApprovalDecision] =
     useState<ApprovalDecision>("pending");
+  const [noticeStatus, setNoticeStatus] = useState("Notice actions ready");
   const [selectedSubagent, setSelectedSubagent] =
     useState<SubagentItem | null>(null);
   const viewport = useViewportMetrics();
@@ -622,6 +626,143 @@ export function DesktopPlayground() {
                   onReject={() => undefined}
                   title="Allow the connector to update this issue?"
                 />
+              </div>
+            </div>
+          </article>
+
+          <article className="acceptance-card acceptance-card--notice">
+            <header>
+              <div>
+                <h2>Error, warning, notice, and retry states</h2>
+                <p>
+                  Native theme, desktop font, reconnect disclosure, interruption,
+                  retry, and compact-window action reflow.
+                </p>
+              </div>
+              <output aria-live="polite" className="notice-state-matrix__output">
+                {noticeStatus}
+              </output>
+            </header>
+            <div className="acceptance-card__body notice-state-matrix">
+              <div className="notice-state-matrix__wide">
+                <span className="notice-state-matrix__label">
+                  Warning · desktop status
+                </span>
+                <StatusBanner
+                  actions={[
+                    {
+                      label: "Try again",
+                      onClick: () => setNoticeStatus("Retried desktop setup"),
+                      variant: "primary",
+                    },
+                  ]}
+                  aria-live="polite"
+                  heading="Couldn’t check the sandbox"
+                  onDismiss={() => setNoticeStatus("Dismissed warning")}
+                  role="status"
+                  stackOnNarrow
+                  tone="warning"
+                >
+                  Try again to continue setup.
+                </StatusBanner>
+              </div>
+
+              <div>
+                <span className="notice-state-matrix__label">
+                  Error · vertical icon
+                </span>
+                <StatusBanner
+                  actions={[
+                    {
+                      label: "Try again",
+                      onClick: () => setNoticeStatus("Retried failed turn"),
+                      variant: "primary",
+                    },
+                  ]}
+                  heading="Task couldn’t continue"
+                  layout="icon"
+                  role="alert"
+                  tone="error"
+                >
+                  The response stream closed before the turn completed.
+                </StatusBanner>
+              </div>
+
+              <div className="notice-state-matrix__narrow">
+                <span className="notice-state-matrix__label">
+                  Compact · loading
+                </span>
+                <StatusBanner
+                  actions={[
+                    {
+                      label: "Checking",
+                      loading: true,
+                      variant: "primary",
+                    },
+                    { label: "Not now", variant: "ghost" },
+                  ]}
+                  heading="Finish setup before continuing"
+                  stackOnNarrow
+                >
+                  Checking the desktop environment.
+                </StatusBanner>
+              </div>
+
+              <div>
+                <span className="notice-state-matrix__label">
+                  Stream · reconnecting
+                </span>
+                <StreamNotice
+                  additionalDetails="upstream closed before a complete response"
+                  reconnectAttempt={2}
+                  reconnectMaxAttempts={5}
+                  serverBusy
+                />
+              </div>
+
+              <div>
+                <span className="notice-state-matrix__label">
+                  Stream · failed
+                </span>
+                <StreamNotice
+                  additionalDetails="request id: desktop_req_01"
+                  defaultExpanded
+                  onRetry={() => setNoticeStatus("Retried response stream")}
+                  status="failed"
+                >
+                  Response stream disconnected.
+                </StreamNotice>
+              </div>
+
+              <div className="notice-state-matrix__wide notice-state-matrix__inline">
+                <span className="notice-state-matrix__label">
+                  Inline · usage, interruption, stopped turn
+                </span>
+                <InlineNotice wrap>
+                  You’ve hit your usage limit. Try again later.
+                </InlineNotice>
+                <InlineNotice
+                  icon={<span aria-hidden="true">■</span>}
+                  tone="warning"
+                  trailingContent={
+                    <button
+                      aria-label="Why Auto-review stopped the turn"
+                      className="notice-state-matrix__help"
+                      onClick={() =>
+                        setNoticeStatus("Opened interruption guidance")
+                      }
+                      type="button"
+                    >
+                      ?
+                    </button>
+                  }
+                  wrap
+                >
+                  Turn ended by Auto-review
+                </InlineNotice>
+                <InlineNotice>
+                  <TurnDuration durationMs={8_000} status="stopped" />
+                </InlineNotice>
               </div>
             </div>
           </article>

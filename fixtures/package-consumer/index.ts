@@ -13,8 +13,13 @@ import {
   type CodeHighlighter,
   FileChange,
   FileDiff,
+  InlineNotice,
+  type NoticeTone,
   ProposedPlan,
   SearchActivity,
+  StatusBanner,
+  type StatusBannerAction,
+  StreamNotice,
   SubagentActivity,
   SubagentActivityGroup,
   SubagentPanel,
@@ -57,9 +62,15 @@ const approvalAction: ApprovalAction = {
   onClick: () => undefined,
 };
 const approvalKind: ApprovalRequestKind = "command";
+const noticeTone: NoticeTone = "warning";
+const noticeAction: StatusBannerAction = {
+  label: "Try again",
+  variant: "primary",
+};
 
 void FileChange;
 void FileDiff;
+void InlineNotice;
 void ActivityTimeline;
 void AgentMarkdown;
 void AgentPlan;
@@ -71,6 +82,8 @@ void CommandExecution;
 void CommandOutput;
 void ProposedPlan;
 void SearchActivity;
+void StatusBanner;
+void StreamNotice;
 void SubagentActivity;
 void SubagentActivityGroup;
 void SubagentPanel;
@@ -88,3 +101,5 @@ void subagent;
 void subagentActivity;
 void approvalAction;
 void approvalKind;
+void noticeTone;
+void noticeAction;
