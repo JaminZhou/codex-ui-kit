@@ -47,6 +47,10 @@ describe("AgentComposer", () => {
     expect(
       container.querySelector("form")?.getAttribute("data-layout"),
     ).toBe("single-line");
+    expect(
+      (screen.getByRole("textbox", { name: "Message" }) as HTMLTextAreaElement)
+        .style.height,
+    ).toBe("");
   });
 
   it("uses multiline layout for explicit line breaks and attachments", () => {
@@ -375,6 +379,39 @@ describe("AgentComposer", () => {
     );
     unmount();
     expect(disconnect).toHaveBeenCalled();
+  });
+
+  it("derives the multiline minimum height from computed styles", () => {
+    const style = document.createElement("style");
+    style.textContent =
+      '.codex-ui-composer[data-layout="multiline"] .codex-ui-composer__input { min-height: 55px; }';
+    document.head.append(style);
+    const { rerender, unmount } = render(
+      <AgentComposer
+        layout="multiline"
+        onSubmit={() => undefined}
+        onValueChange={() => undefined}
+        value="First"
+      />,
+    );
+    const textarea = screen.getByRole("textbox", { name: "Message" });
+    Object.defineProperty(textarea, "scrollHeight", {
+      configurable: true,
+      value: 20,
+    });
+
+    rerender(
+      <AgentComposer
+        layout="multiline"
+        onSubmit={() => undefined}
+        onValueChange={() => undefined}
+        value="Second"
+      />,
+    );
+
+    expect(textarea.style.height).toBe("55px");
+    unmount();
+    style.remove();
   });
 
   it("focuses the input from surface clicks without stealing control clicks", () => {

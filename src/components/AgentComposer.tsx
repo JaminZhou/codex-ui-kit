@@ -163,12 +163,18 @@ export const AgentComposer = forwardRef<
       );
     }
 
+    textarea.style.height = "";
+    if (nextLayout === "single-line") return;
+
+    const minimumHeight = Number.parseFloat(
+      getComputedStyle(textarea).minHeight,
+    );
     textarea.style.height = "0px";
-    const contentHeight = textarea.scrollHeight;
-    textarea.style.height = `${Math.max(
-      nextLayout === "multiline" ? 44 : 36,
-      nextLayout === "multiline" ? contentHeight : 0,
-    )}px`;
+    const nextHeight = Math.max(
+      Number.isFinite(minimumHeight) ? minimumHeight : 0,
+      textarea.scrollHeight,
+    );
+    textarea.style.height = nextHeight > 0 ? `${nextHeight}px` : "";
   }, [contentRequiresMultiline, hasAttachments, layout, value]);
 
   useLayoutEffect(measureLayoutAndResize, [
