@@ -246,8 +246,12 @@ function DiffStats({
 
   return (
     <span className="codex-ui-subagent-summary__diff" aria-label={label}>
-      {additions !== undefined ? <span>+{additions}</span> : null}
-      {deletions !== undefined ? <span>−{deletions}</span> : null}
+      {additions !== undefined ? (
+        <span data-kind="addition">+{additions}</span>
+      ) : null}
+      {deletions !== undefined ? (
+        <span data-kind="deletion">−{deletions}</span>
+      ) : null}
     </span>
   );
 }

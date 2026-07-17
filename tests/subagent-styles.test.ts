@@ -26,6 +26,18 @@ describe("subagent visual contract", () => {
     expect(tokens).toContain("--codex-ui-subagent-panel-header-height: 3rem");
   });
 
+  it("colors partial diff metadata by semantic kind instead of child position", () => {
+    expect(styles).toContain(
+      '.codex-ui-subagent-summary__diff [data-kind="addition"]',
+    );
+    expect(styles).toContain(
+      '.codex-ui-subagent-summary__diff [data-kind="deletion"]',
+    );
+    expect(styles).not.toContain(
+      ".codex-ui-subagent-summary__diff span:last-child",
+    );
+  });
+
   it("removes chip, active, and shimmer motion for reduced motion", () => {
     expect(styles).toContain(".codex-ui-subagent-avatar[data-active]::after");
     expect(styles).toContain(

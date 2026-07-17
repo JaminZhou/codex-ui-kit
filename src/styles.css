@@ -2686,11 +2686,11 @@ button.codex-ui-subagent-activity-group__chip:focus-visible {
   gap: 0.25rem;
 }
 
-.codex-ui-subagent-summary__diff span:first-child {
+.codex-ui-subagent-summary__diff [data-kind="addition"] {
   color: var(--codex-ui-success);
 }
 
-.codex-ui-subagent-summary__diff span:last-child {
+.codex-ui-subagent-summary__diff [data-kind="deletion"] {
   color: var(--codex-ui-danger);
 }
 
