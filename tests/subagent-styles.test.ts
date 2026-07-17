@@ -15,6 +15,9 @@ describe("subagent visual contract", () => {
 
   it("locks the 24px panel avatars, 20px previews, and 48px transcript header", () => {
     expect(styles).toMatch(
+      /\.codex-ui-subagent-panel,[\s\S]*?\.codex-ui-subagent-transcript-header \* \{\s*box-sizing: border-box;/,
+    );
+    expect(styles).toMatch(
       /\.codex-ui-subagent-avatar\[data-size="medium"\] \{[\s\S]*?height: 1\.5rem;[\s\S]*?width: 1\.5rem/,
     );
     expect(styles).toMatch(

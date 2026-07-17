@@ -16,10 +16,15 @@
 .codex-ui-file-diff *,
 .codex-ui-search-activity *,
 .codex-ui-tool-call *,
+.codex-ui-subagent-activity,
 .codex-ui-subagent-activity *,
+.codex-ui-subagent-activity-group,
 .codex-ui-subagent-activity-group *,
+.codex-ui-subagent-summary,
 .codex-ui-subagent-summary *,
+.codex-ui-subagent-panel,
 .codex-ui-subagent-panel *,
+.codex-ui-subagent-transcript-header,
 .codex-ui-subagent-transcript-header * {
   box-sizing: border-box;
 }
