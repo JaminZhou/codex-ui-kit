@@ -2,6 +2,7 @@ import {
   useEffect,
   useId,
   useMemo,
+  useRef,
   useState,
   type HTMLAttributes,
   type ReactNode,
@@ -442,9 +443,10 @@ interface SubagentPanelSectionProps {
   items: SubagentItem[];
   limit: number;
   onSelect?: (item: SubagentItem) => void;
-  onVisibleItemsChange?: (items: SubagentItem[]) => void;
+  onVisibleCountChange: (count: number) => void;
   previewLines: 1 | 2;
   title: ReactNode;
+  visibleCount: number;
 }
 
 function SubagentPanelSection({
@@ -452,23 +454,15 @@ function SubagentPanelSection({
   items,
   limit,
   onSelect,
-  onVisibleItemsChange,
+  onVisibleCountChange,
   previewLines,
   title,
+  visibleCount,
 }: SubagentPanelSectionProps) {
-  const [visibleCount, setVisibleCount] = useState(limit);
   const visibleItems = useMemo(
     () => items.slice(0, visibleCount),
     [items, visibleCount],
   );
-
-  useEffect(() => {
-    setVisibleCount(limit);
-  }, [items, limit]);
-
-  useEffect(() => {
-    onVisibleItemsChange?.(visibleItems);
-  }, [onVisibleItemsChange, visibleItems]);
 
   if (items.length === 0 && emptyState === undefined) return null;
 
@@ -481,13 +475,8 @@ function SubagentPanelSection({
         <div className="codex-ui-subagent-panel__list">
           {visibleItems.map((item) => {
             const preview = item.lastMessage ?? item.statusSummary;
-            return (
-              <button
-                className="codex-ui-subagent-panel__item"
-                key={item.id}
-                onClick={() => onSelect?.(item)}
-                type="button"
-              >
+            const content = (
+              <>
                 <SubagentAvatar seed={item.id} size="medium" />
                 <span className="codex-ui-subagent-panel__item-content">
                   <span className="codex-ui-subagent-panel__item-heading">
@@ -500,13 +489,27 @@ function SubagentPanelSection({
                     <span
                       className="codex-ui-subagent-panel__preview"
                       data-lines={previewLines}
-                      data-placeholder={item.lastMessage == null || undefined}
+                      data-placeholder={preview == null || undefined}
                     >
                       {preview ?? (item.status === "active" ? "Working" : "Thinking")}
                     </span>
                   )}
                 </span>
+              </>
+            );
+            return onSelect ? (
+              <button
+                className="codex-ui-subagent-panel__item"
+                key={item.id}
+                onClick={() => onSelect(item)}
+                type="button"
+              >
+                {content}
               </button>
+            ) : (
+              <div className="codex-ui-subagent-panel__item" key={item.id}>
+                {content}
+              </div>
             );
           })}
         </div>
@@ -514,7 +517,7 @@ function SubagentPanelSection({
       {visibleCount < items.length ? (
         <button
           className="codex-ui-subagent-panel__pagination"
-          onClick={() => setVisibleCount((count) => count + limit)}
+          onClick={() => onVisibleCountChange(visibleCount + limit)}
           type="button"
         >
           Show {Math.min(limit, items.length - visibleCount)} more
@@ -551,6 +554,9 @@ export function SubagentPanel({
   onVisibleItemsChange,
   ...props
 }: SubagentPanelProps) {
+  const [activeVisibleCount, setActiveVisibleCount] = useState(activeLimit);
+  const [doneVisibleCount, setDoneVisibleCount] = useState(doneLimit);
+  const lastVisibleNotification = useRef<string | null>(null);
   const { active, done } = useMemo(() => {
     const sorted = sortForSummary(items);
     return {
@@ -558,6 +564,39 @@ export function SubagentPanel({
       done: sorted.filter((item) => item.status === "done"),
     };
   }, [items]);
+  const activeKey = active.map((item) => item.id).join("\u0000");
+  const doneKey = done.map((item) => item.id).join("\u0000");
+  const visibleItems = useMemo(
+    () => [
+      ...active.slice(0, activeVisibleCount),
+      ...done.slice(0, doneVisibleCount),
+    ],
+    [active, activeVisibleCount, done, doneVisibleCount],
+  );
+  const visibleKey = visibleItems.map((item) => item.id).join("\u0000");
+
+  useEffect(() => {
+    setActiveVisibleCount((count) =>
+      Math.max(activeLimit, Math.min(count, active.length)),
+    );
+  }, [active.length, activeKey, activeLimit]);
+
+  useEffect(() => {
+    setDoneVisibleCount((count) =>
+      Math.max(doneLimit, Math.min(count, done.length)),
+    );
+  }, [done.length, doneKey, doneLimit]);
+
+  useEffect(() => {
+    if (
+      !onVisibleItemsChange ||
+      lastVisibleNotification.current === visibleKey
+    ) {
+      return;
+    }
+    lastVisibleNotification.current = visibleKey;
+    onVisibleItemsChange(visibleItems);
+  }, [onVisibleItemsChange, visibleItems, visibleKey]);
 
   return (
     <div
@@ -571,17 +610,19 @@ export function SubagentPanel({
         items={active}
         limit={activeLimit}
         onSelect={onSelect}
-        onVisibleItemsChange={onVisibleItemsChange}
+        onVisibleCountChange={setActiveVisibleCount}
         previewLines={2}
         title={activeTitle}
+        visibleCount={activeVisibleCount}
       />
       <SubagentPanelSection
         items={done}
         limit={doneLimit}
         onSelect={onSelect}
-        onVisibleItemsChange={onVisibleItemsChange}
+        onVisibleCountChange={setDoneVisibleCount}
         previewLines={1}
         title={doneTitle ?? `Done · ${done.length}`}
+        visibleCount={doneVisibleCount}
       />
     </div>
   );

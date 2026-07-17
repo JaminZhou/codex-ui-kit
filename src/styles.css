@@ -2651,7 +2651,7 @@ button.codex-ui-subagent-activity-group__chip:focus-visible {
   border: 0;
   border-radius: var(--codex-ui-radius-sm);
   color: var(--codex-ui-text);
-  cursor: pointer;
+  cursor: default;
   display: flex;
   font: inherit;
   gap: 0.5rem;
@@ -2661,8 +2661,12 @@ button.codex-ui-subagent-activity-group__chip:focus-visible {
   width: 100%;
 }
 
-.codex-ui-subagent-panel__item:hover,
-.codex-ui-subagent-panel__item:focus-visible {
+button.codex-ui-subagent-panel__item {
+  cursor: pointer;
+}
+
+button.codex-ui-subagent-panel__item:hover,
+button.codex-ui-subagent-panel__item:focus-visible {
   background: var(--codex-ui-background-button-secondary-hover);
 }
 

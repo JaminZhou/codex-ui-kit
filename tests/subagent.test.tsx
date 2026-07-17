@@ -180,7 +180,7 @@ describe("SubagentPanel", () => {
       name: `Agent ${index + 1}`,
       status: "active" as const,
     }));
-    render(<SubagentPanel items={items} />);
+    render(<SubagentPanel items={items} onSelect={() => undefined} />);
 
     expect(screen.getAllByRole("button", { name: /Agent/ })).toHaveLength(4);
     fireEvent.click(screen.getByRole("button", { name: "Show 2 more" }));
@@ -193,6 +193,38 @@ describe("SubagentPanel", () => {
 
     fireEvent.click(screen.getByRole("button", { name: /Researcher/ }));
     expect(onSelect).toHaveBeenCalledWith(activeAgent);
+  });
+
+  it("renders read-only rows without dead button controls", () => {
+    render(<SubagentPanel items={[activeAgent]} />);
+
+    expect(screen.queryByRole("button", { name: /Researcher/ })).toBeNull();
+    expect(screen.getByText("Researcher")).toBeTruthy();
+  });
+
+  it("does not shimmer a real status summary as a placeholder", () => {
+    const { container } = render(<SubagentPanel items={[doneAgent]} />);
+    const preview = container.querySelector(
+      ".codex-ui-subagent-panel__preview",
+    );
+
+    expect(preview?.textContent).toBe("Implemented the component boundary.");
+    expect(preview?.hasAttribute("data-placeholder")).toBe(false);
+  });
+
+  it("reports one combined visible set across active and done sections", () => {
+    const onVisibleItemsChange = vi.fn();
+    render(
+      <SubagentPanel
+        items={[activeAgent, doneAgent]}
+        onVisibleItemsChange={onVisibleItemsChange}
+      />,
+    );
+
+    expect(onVisibleItemsChange).toHaveBeenLastCalledWith([
+      activeAgent,
+      doneAgent,
+    ]);
   });
 });
 
