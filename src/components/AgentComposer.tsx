@@ -1,15 +1,35 @@
 import {
+  Children,
+  Fragment,
   forwardRef,
+  isValidElement,
   useCallback,
   useEffect,
   useLayoutEffect,
   useRef,
+  useState,
   type ComponentPropsWithoutRef,
   type FormEvent,
   type FormHTMLAttributes,
   type KeyboardEvent,
+  type MouseEvent as ReactMouseEvent,
   type ReactNode,
 } from "react";
+
+function hasRenderableAttachmentContent(children: ReactNode): boolean {
+  return Children.toArray(children).some((child) => {
+    if (typeof child === "string") return child.trim().length > 0;
+    if (
+      isValidElement<{ children?: ReactNode }>(child) &&
+      child.type === Fragment
+    ) {
+      return hasRenderableAttachmentContent(child.props.children);
+    }
+    return true;
+  });
+}
+
+export type ComposerLayout = "auto" | "single-line" | "multiline";
 
 export interface AgentComposerProps
   extends Omit<FormHTMLAttributes<HTMLFormElement>, "children" | "onSubmit"> {
@@ -18,6 +38,7 @@ export interface AgentComposerProps
   controls?: ReactNode;
   disabled?: boolean;
   isRunning?: boolean;
+  layout?: ComposerLayout;
   onStop?: () => void;
   onSubmit: (value: string) => void;
   onValueChange: (value: string) => void;
@@ -43,6 +64,7 @@ export const AgentComposer = forwardRef<
     controls,
     disabled = false,
     isRunning = false,
+    layout = "auto",
     onStop,
     onSubmit,
     onValueChange,
@@ -53,12 +75,25 @@ export const AgentComposer = forwardRef<
     textareaProps,
     value,
     "aria-label": ariaLabel = "Agent composer",
+    onClick,
     ...formProps
   },
   forwardedRef,
 ) {
+  const hasAttachments = hasRenderableAttachmentContent(attachments);
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
+  const formRef = useRef<HTMLFormElement | null>(null);
+  const fieldsetRef = useRef<HTMLFieldSetElement | null>(null);
+  const actionsRef = useRef<HTMLDivElement | null>(null);
+  const controlsRef = useRef<HTMLDivElement | null>(null);
+  const measureRef = useRef<HTMLSpanElement | null>(null);
+  const compactMetricsRef = useRef<HTMLSpanElement | null>(null);
   const isComposingRef = useRef(false);
+  const [automaticLayout, setAutomaticLayout] = useState<
+    Exclude<ComposerLayout, "auto">
+  >(() =>
+    hasAttachments || value.includes("\n") ? "multiline" : "single-line",
+  );
   const {
     className: textareaClassName,
     onCompositionEnd,
@@ -67,6 +102,12 @@ export const AgentComposer = forwardRef<
     ...restTextareaProps
   } = textareaProps ?? {};
   const canSubmit = !disabled && !isRunning && value.trim().length > 0;
+  const contentRequiresMultiline = hasAttachments || value.includes("\n");
+  const resolvedLayout = contentRequiresMultiline
+    ? "multiline"
+    : layout === "auto"
+      ? automaticLayout
+      : layout;
   const classes = ["codex-ui-composer", className].filter(Boolean).join(" ");
   const textareaClasses = ["codex-ui-composer__input", textareaClassName]
     .filter(Boolean)
@@ -84,28 +125,75 @@ export const AgentComposer = forwardRef<
     [forwardedRef],
   );
 
-  const resizeTextarea = useCallback(() => {
+  const measureLayoutAndResize = useCallback(() => {
     const textarea = textareaRef.current;
     if (!textarea) return;
-    textarea.style.height = "0px";
-    textarea.style.height = `${textarea.scrollHeight}px`;
-  }, []);
 
-  useLayoutEffect(resizeTextarea, [resizeTextarea, value]);
+    let nextLayout: Exclude<ComposerLayout, "auto"> =
+      layout === "multiline" || contentRequiresMultiline
+        ? "multiline"
+        : "single-line";
+
+    if (layout === "auto") {
+      const fieldset = fieldsetRef.current;
+      const measuredTextWidth = measureRef.current?.offsetWidth ?? 0;
+      const compactChromeWidth = compactMetricsRef.current?.offsetWidth ?? 0;
+      const fieldsetWidth = fieldset?.clientWidth ?? 0;
+      const calculatedSingleLineWidth = Math.max(
+        0,
+        fieldsetWidth -
+          (actionsRef.current?.offsetWidth ?? 0) -
+          (controlsRef.current?.offsetWidth ?? 0) -
+          compactChromeWidth,
+      );
+      const singleLineInputWidth =
+        calculatedSingleLineWidth || textarea.clientWidth;
+      const compactInputHasNoSpace =
+        fieldsetWidth > 0 && calculatedSingleLineWidth === 0;
+      const textWouldOverflow =
+        compactInputHasNoSpace ||
+        (measuredTextWidth > 0 &&
+          singleLineInputWidth > 0 &&
+          measuredTextWidth > singleLineInputWidth);
+
+      nextLayout =
+        hasAttachments || value.includes("\n") || textWouldOverflow
+          ? "multiline"
+          : "single-line";
+      setAutomaticLayout((current) =>
+        current === nextLayout ? current : nextLayout,
+      );
+    }
+
+    textarea.style.height = "";
+    if (nextLayout === "single-line") return;
+
+    const minimumHeight = Number.parseFloat(
+      getComputedStyle(textarea).minHeight,
+    );
+    textarea.style.height = "0px";
+    const nextHeight = Math.max(
+      Number.isFinite(minimumHeight) ? minimumHeight : 0,
+      textarea.scrollHeight,
+    );
+    textarea.style.height = nextHeight > 0 ? `${nextHeight}px` : "";
+  }, [contentRequiresMultiline, hasAttachments, layout, value]);
+
+  useLayoutEffect(measureLayoutAndResize, [
+    automaticLayout,
+    measureLayoutAndResize,
+  ]);
 
   useEffect(() => {
-    const textarea = textareaRef.current;
-    if (!textarea || typeof ResizeObserver === "undefined") return;
+    const form = formRef.current;
+    if (!form || typeof ResizeObserver === "undefined") return;
 
-    let previousWidth = textarea.clientWidth;
-    const observer = new ResizeObserver(([entry]) => {
-      if (!entry || entry.contentRect.width === previousWidth) return;
-      previousWidth = entry.contentRect.width;
-      resizeTextarea();
-    });
-    observer.observe(textarea);
+    const observer = new ResizeObserver(measureLayoutAndResize);
+    observer.observe(form);
+    if (actionsRef.current) observer.observe(actionsRef.current);
+    if (controlsRef.current) observer.observe(controlsRef.current);
     return () => observer.disconnect();
-  }, [resizeTextarea]);
+  }, [measureLayoutAndResize]);
 
   const submitCurrentValue = useCallback(() => {
     if (canSubmit) onSubmit(value);
@@ -131,17 +219,46 @@ export const AgentComposer = forwardRef<
     }
   };
 
+  const handleSurfaceClick = (event: ReactMouseEvent<HTMLFormElement>) => {
+    onClick?.(event);
+    if (event.defaultPrevented || disabled) return;
+
+    const target = event.target;
+    if (!(target instanceof Element)) return;
+    const form = formRef.current;
+    if (!form?.contains(target)) return;
+
+    for (let node: Element | null = target; node && node !== form; ) {
+      if (
+        node.matches(
+          'a, button, input, select, textarea, [contenteditable="true"], [draggable="true"], [role], [tabindex]',
+        )
+      ) {
+        return;
+      }
+      node = node.parentElement;
+    }
+    textareaRef.current?.focus();
+  };
+
   return (
     <form
       aria-label={ariaLabel}
       className={classes}
       data-disabled={disabled || undefined}
+      data-layout={resolvedLayout}
       data-running={isRunning || undefined}
-      onSubmit={handleSubmit}
+      ref={formRef}
       {...formProps}
+      onClick={handleSurfaceClick}
+      onSubmit={handleSubmit}
     >
-      <fieldset className="codex-ui-composer__fieldset" disabled={disabled}>
-        {attachments ? (
+      <fieldset
+        className="codex-ui-composer__fieldset"
+        disabled={disabled}
+        ref={fieldsetRef}
+      >
+        {hasAttachments ? (
           <div className="codex-ui-composer__attachments" aria-label="Attachments">
             {attachments}
           </div>
@@ -168,9 +285,21 @@ export const AgentComposer = forwardRef<
           {...restTextareaProps}
         />
 
+        <span aria-hidden="true" className="codex-ui-composer__measure-clip">
+          <span className="codex-ui-composer__measure" ref={measureRef}>
+            {value || "\u200b"}
+          </span>
+          <span
+            className="codex-ui-composer__compact-metrics"
+            ref={compactMetricsRef}
+          />
+        </span>
+
         <div className="codex-ui-composer__toolbar">
-          <div className="codex-ui-composer__actions">{actions}</div>
-          <div className="codex-ui-composer__controls">
+          <div className="codex-ui-composer__actions" ref={actionsRef}>
+            {actions}
+          </div>
+          <div className="codex-ui-composer__controls" ref={controlsRef}>
             {controls}
             {isRunning ? (
               <button
@@ -196,7 +325,9 @@ export const AgentComposer = forwardRef<
                 title={submitLabel}
                 type="submit"
               >
-                <span aria-hidden="true">↑</span>
+                <svg aria-hidden="true" viewBox="0 0 20 20">
+                  <path d="M10 15.5V4.75m0 0L5.75 9M10 4.75 14.25 9" />
+                </svg>
               </button>
             )}
           </div>

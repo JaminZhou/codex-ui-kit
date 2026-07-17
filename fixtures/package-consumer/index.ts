@@ -3,6 +3,7 @@ import {
   AgentMarkdown,
   AgentPlan,
   AgentReasoning,
+  AgentComposer,
   ApprovalCommandPreview,
   ApprovalRequest,
   type ApprovalAction,
@@ -11,6 +12,8 @@ import {
   CommandExecution,
   CommandOutput,
   type CodeHighlighter,
+  ComposerAttachment,
+  type ComposerLayout,
   FileChange,
   FileDiff,
   InlineNotice,
@@ -67,6 +70,7 @@ const noticeAction: StatusBannerAction = {
   label: "Try again",
   variant: "primary",
 };
+const composerLayout: ComposerLayout = "auto";
 
 void FileChange;
 void FileDiff;
@@ -75,11 +79,13 @@ void ActivityTimeline;
 void AgentMarkdown;
 void AgentPlan;
 void AgentReasoning;
+void AgentComposer;
 void ApprovalCommandPreview;
 void ApprovalRequest;
 void CodeBlock;
 void CommandExecution;
 void CommandOutput;
+void ComposerAttachment;
 void ProposedPlan;
 void SearchActivity;
 void StatusBanner;
@@ -103,3 +109,4 @@ void approvalAction;
 void approvalKind;
 void noticeTone;
 void noticeAction;
+void composerLayout;

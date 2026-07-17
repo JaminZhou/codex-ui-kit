@@ -1000,6 +1000,52 @@ function Showcase() {
                 onValueChange={setComposerValue}
                 value={composerValue}
               />
+              <div
+                aria-label="Composer layout state matrix"
+                className="composer-preview__matrix"
+              >
+                <div className="composer-preview__sample">
+                  <span>Auto · compact</span>
+                  <AgentComposer
+                    actions={<button type="button">+</button>}
+                    controls={<button type="button">Local</button>}
+                    onSubmit={() => undefined}
+                    onValueChange={() => undefined}
+                    value="Fix the failing test"
+                  />
+                </div>
+                <div className="composer-preview__sample">
+                  <span>Multiline · autosized</span>
+                  <AgentComposer
+                    layout="multiline"
+                    onSubmit={() => undefined}
+                    onValueChange={() => undefined}
+                    value={
+                      "Compare the desktop and browser renderers.\nKeep the component API protocol-neutral."
+                    }
+                  />
+                </div>
+                <div className="composer-preview__sample composer-preview__sample--narrow">
+                  <span>Running · narrow host</span>
+                  <AgentComposer
+                    isRunning
+                    onStop={() => undefined}
+                    onSubmit={() => undefined}
+                    onValueChange={() => undefined}
+                    value="Add the next parity state"
+                  />
+                </div>
+                <div className="composer-preview__sample">
+                  <span>Disabled · multiline</span>
+                  <AgentComposer
+                    disabled
+                    layout="multiline"
+                    onSubmit={() => undefined}
+                    onValueChange={() => undefined}
+                    value="Waiting for the current operation to finish"
+                  />
+                </div>
+              </div>
             </div>
           </GalleryCard>
 

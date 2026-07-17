@@ -11,6 +11,17 @@ describe("visual token contract", () => {
     expect(tokens).toContain("--codex-ui-radius-2xl: 1rem");
     expect(tokens).toContain("--codex-ui-thread-content-max-width: 48rem");
     expect(tokens).toContain("--codex-ui-radius-composer: calc(var(--codex-ui-spacing) * 5.5)");
+    expect(tokens).toContain(
+      "--codex-ui-radius-composer-multiline: var(--codex-ui-radius-3xl)",
+    );
+    expect(tokens).toContain(
+      "--codex-ui-size-button-composer: calc(var(--codex-ui-spacing) * 7)",
+    );
+    expect(tokens).toContain("--codex-ui-shadow-composer-prominent:");
+    expect(tokens).toContain("--codex-ui-shadow-composer-electron:");
+    expect(tokens).toContain(
+      "--codex-ui-shadow-composer: var(--codex-ui-shadow-composer-prominent)",
+    );
   });
 
   it("keeps the measured semantic light and dark color anchors", () => {
@@ -65,6 +76,53 @@ describe("visual token contract", () => {
 
   it("loads the token contract before component styles", () => {
     expect(styles.startsWith('@import "./tokens.css";')).toBe(true);
+  });
+
+  it("keeps multiline composer slots free to render overlays", () => {
+    const multilineShell = styles.match(
+      /\.codex-ui-composer\[data-layout="multiline"\]\s*\{([^}]+)\}/,
+    )?.[1];
+
+    expect(multilineShell).toContain(
+      "border-radius: var(--codex-ui-radius-composer-multiline)",
+    );
+    expect(multilineShell).not.toContain("overflow");
+  });
+
+  it("resets native fieldset spacing before applying composer geometry", () => {
+    const fieldsetShell = styles.match(
+      /\.codex-ui-composer__fieldset\s*\{([^}]+)\}/,
+    )?.[1];
+
+    expect(fieldsetShell).toContain("border: 0");
+    expect(fieldsetShell).toContain("margin: 0");
+    expect(fieldsetShell).toContain("padding: 0");
+    expect(fieldsetShell).toContain("min-inline-size: 0");
+  });
+
+  it("keeps a visible composer keyboard focus state", () => {
+    expect(styles).toContain(".codex-ui-composer:focus-within {");
+    expect(styles).toContain(
+      "0 0 0 2px color-mix(in srgb, var(--codex-ui-focus) 22%, transparent)",
+    );
+    expect(styles).toContain("outline: 2px solid Highlight");
+  });
+
+  it("clips the intrinsic composer width probe from scrollable overflow", () => {
+    const measureClip = styles.match(
+      /\.codex-ui-composer__measure-clip\s*\{([^}]+)\}/,
+    )?.[1];
+
+    expect(measureClip).toContain("height: 1px");
+    expect(measureClip).toContain("overflow: hidden");
+    expect(measureClip).toContain("position: absolute");
+    expect(measureClip).toContain("width: 1px");
+    expect(styles).toContain(
+      "var(--codex-ui-composer-compact-inline-padding) +",
+    );
+    expect(styles).toContain(
+      "var(--codex-ui-composer-compact-column-gap) +",
+    );
   });
 
   it("inherits forced themes through nested kit scopes", () => {

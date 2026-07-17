@@ -95,7 +95,11 @@ the pnpm workspace. Electron is not a dependency of `codex-ui-kit`.
 - `StreamNotice`: reconnecting, server-busy, failed, retry, progress, and
   controlled/uncontrolled additional-detail states.
 - `StatusIndicator`: visual state primitive.
-- `AgentComposer`: controlled input surface with submit, stop, and slot APIs.
+- `AgentComposer`: controlled input surface with measured `auto`, forced
+  `single-line`, and forced `multiline` layouts; autosizing; submit/stop
+  behavior; shell-to-input focus transfer; and protocol-neutral slots.
+  Attachments and explicit line breaks remain structurally multiline even when
+  a host requests the compact layout.
 - `ComposerAttachment`: removable attachment metadata primitive.
 
 The default stylesheet supports light, dark, and system color schemes. Set

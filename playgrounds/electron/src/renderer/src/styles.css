@@ -672,7 +672,41 @@ button {
 }
 
 .desktop-composer-dock .codex-ui-composer {
-  box-shadow: 0 0.35rem 1.5rem rgb(0 0 0 / 0.08);
+  --codex-ui-composer-elevation: var(--codex-ui-shadow-composer-electron);
+}
+
+.desktop-playground[data-theme="dark"]
+  .desktop-composer-dock
+  .codex-ui-composer {
+  --codex-ui-composer-background: var(
+    --codex-ui-background-elevated-primary-opaque
+  );
+}
+
+.desktop-composer-dock__matrix {
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin: 0.75rem auto 0;
+  max-width: 48rem;
+}
+
+.desktop-composer-dock__sample {
+  align-content: start;
+  display: grid;
+  gap: 0.25rem;
+  min-width: 0;
+}
+
+.desktop-composer-dock__sample > span {
+  color: var(--codex-ui-text-tertiary);
+  font-size: 0.625rem;
+}
+
+.desktop-composer-dock__sample--narrow {
+  justify-self: start;
+  max-width: 20rem;
+  width: 100%;
 }
 
 .desktop-footer {
@@ -818,6 +852,10 @@ button {
 
   .desktop-composer-dock__meta output {
     max-width: 52%;
+  }
+
+  .desktop-composer-dock__matrix {
+    grid-template-columns: minmax(0, 1fr);
   }
 }
 
