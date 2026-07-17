@@ -17,6 +17,7 @@ import {
   AgentThread,
   ApprovalCommandPreview,
   ApprovalRequest,
+  Button,
   CommandExecution,
   CommandOutput,
   ComposerAttachment,
@@ -26,9 +27,18 @@ import {
   FileDiff,
   fileDiffToText,
   InlineNotice,
+  IconButton,
+  Menu,
+  MenuCheckboxItem,
+  MenuItem,
+  MenuSectionLabel,
+  MenuSeparator,
+  MenuSubmenu,
+  Popover,
   ProposedPlan,
   QueuedPromptList,
   SearchActivity,
+  Select,
   StatusIndicator,
   StatusBanner,
   StreamNotice,
@@ -38,6 +48,7 @@ import {
   SubagentSummary,
   SubagentTranscriptHeader,
   ToolCallCard,
+  Tooltip,
   TurnDuration,
   type ApprovalDecision,
   type FileDiffLine,
@@ -273,6 +284,11 @@ export function DesktopPlayground() {
   const [noticeStatus, setNoticeStatus] = useState("Notice actions ready");
   const [selectedSubagent, setSelectedSubagent] =
     useState<SubagentItem | null>(null);
+  const [desktopExecutionMode, setDesktopExecutionMode] = useState("local");
+  const [desktopLineNumbers, setDesktopLineNumbers] = useState(true);
+  const [primitiveStatus, setPrimitiveStatus] = useState(
+    "Desktop controls ready",
+  );
   const viewport = useViewportMetrics();
   const { metrics: fontMetrics, monoRef, sansRef } = useFontMetrics();
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -1168,6 +1184,111 @@ export function DesktopPlayground() {
                   />
                 </ActivityTimeline>
               </div>
+            </div>
+          </article>
+
+          <article
+            className="acceptance-card acceptance-card--primitives"
+            data-acceptance-surface="interactive-primitives"
+          >
+            <header>
+              <div>
+                <h2>Interactive controls and overlays</h2>
+                <p>Portal placement, native focus, toolbar geometry, and menus.</p>
+              </div>
+              <span className="acceptance-badge">desktop portal</span>
+            </header>
+            <div className="acceptance-card__body primitive-state-matrix">
+              <div className="primitive-state-matrix__toolbar">
+                <Tooltip content="Create a task" shortcut="⌘N">
+                  <IconButton icon={<span>＋</span>} label="Create a task" />
+                </Tooltip>
+                <Tooltip content="Search files" shortcut="⌘P">
+                  <IconButton icon={<span>⌕</span>} label="Search files" />
+                </Tooltip>
+                <Menu
+                  trigger={
+                    <IconButton icon={<span>•••</span>} label="More actions" />
+                  }
+                >
+                  <MenuSectionLabel>Thread</MenuSectionLabel>
+                  <MenuItem
+                    shortcut="⌘R"
+                    onSelect={() => setPrimitiveStatus("Thread renamed")}
+                  >
+                    Rename
+                  </MenuItem>
+                  <MenuCheckboxItem
+                    checked={desktopLineNumbers}
+                    onCheckedChange={setDesktopLineNumbers}
+                  >
+                    Show line numbers
+                  </MenuCheckboxItem>
+                  <MenuSubmenu label="Appearance">
+                    <MenuItem keepOpen>System</MenuItem>
+                    <MenuItem keepOpen>Light</MenuItem>
+                    <MenuItem keepOpen>Dark</MenuItem>
+                  </MenuSubmenu>
+                  <MenuSeparator />
+                  <MenuItem
+                    onSelect={() => setPrimitiveStatus("Thread deleted")}
+                    tone="danger"
+                  >
+                    Delete
+                  </MenuItem>
+                </Menu>
+              </div>
+
+              <div className="primitive-state-matrix__buttons">
+                <Button
+                  onClick={() => setPrimitiveStatus("Primary action")}
+                  tone="primary"
+                >
+                  Continue
+                </Button>
+                <Button>Secondary</Button>
+                <Button tone="outline">Outline</Button>
+                <Button tone="ghost">Ghost</Button>
+                <Button tone="danger">Delete</Button>
+                <Button loading>Running</Button>
+              </div>
+
+              <div className="primitive-state-matrix__selectors">
+                <Popover
+                  label="Workspace information"
+                  trigger={<Button tone="outline">Workspace info</Button>}
+                  width="menu-wide"
+                >
+                  <div className="primitive-state-matrix__popover-copy">
+                    <strong>Electron Renderer</strong>
+                    <span>Shared package, portalled to the current document.</span>
+                  </div>
+                </Popover>
+                <Select
+                  label="Execution mode"
+                  onValueChange={(value) => {
+                    setDesktopExecutionMode(value);
+                    setPrimitiveStatus(`Execution mode: ${value}`);
+                  }}
+                  options={[
+                    {
+                      description: "Use the current workspace",
+                      label: "Local",
+                      value: "local",
+                    },
+                    {
+                      description: "Run in an isolated environment",
+                      label: "Cloud",
+                      value: "cloud",
+                    },
+                  ]}
+                  value={desktopExecutionMode}
+                />
+              </div>
+
+              <output aria-live="polite">
+                {primitiveStatus} · line numbers {desktopLineNumbers ? "on" : "off"}
+              </output>
             </div>
           </article>
 

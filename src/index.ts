@@ -10,6 +10,7 @@ export * from "./components/ComposerAuxiliary";
 export * from "./components/ApprovalRequest";
 export * from "./components/CommandExecution";
 export * from "./components/FileChange";
+export * from "./components/InteractivePrimitives";
 export * from "./components/Notices";
 export * from "./components/ProposedPlan";
 export * from "./components/SearchActivity";

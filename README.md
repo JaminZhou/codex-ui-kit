@@ -15,7 +15,8 @@ block code, grouped and collapsible activities, turn duration and interruption,
 commands, file changes, tool-call state, responsive content, controlled
 decisions, delegated-work activity, subagent summaries and panels, and an agent
 input with keyboard and running states. Error, warning, reconnect, retry,
-interruption, and status-banner surfaces are also covered. Run the local
+interruption, status-banner, button, tooltip, popover, menu, submenu, and
+select surfaces are also covered. Run the local
 showcase with:
 
 ```bash
@@ -109,6 +110,18 @@ the pnpm workspace. Electron is not a dependency of `codex-ui-kit`.
 - `QueuedPromptList`: reorderable queued follow-ups with queued, editing,
   paused, interrupted, retry/steer, edit, delete, resume, and queue-toggle
   behavior.
+- `Button` and `IconButton`: measured primary, secondary, outline, ghost,
+  danger, pressed, loading, disabled, toolbar, and size states.
+- `Tooltip`: delayed pointer and immediate keyboard disclosure with shortcut,
+  side, alignment, collision, and controlled-state support.
+- `Popover`: portal-based dialog, menu, or listbox positioning with outside
+  dismissal, focus restoration, viewport collision handling, and public width
+  roles.
+- `Menu`, `MenuItem`, `MenuCheckboxItem`, and `MenuSubmenu`: keyboard-navigable
+  action surfaces with sections, separators, checked states, nested portalled
+  menus, shortcuts, descriptions, and destructive actions.
+- `Select`: controlled value selection over the shared listbox surface with
+  descriptions, icons, selected state, disabled options, and empty fallback.
 
 The default stylesheet supports light, dark, and system color schemes. Set
 `data-theme="light"` or `data-theme="dark"` on an ancestor to force a theme.

@@ -24,6 +24,76 @@ const minimumSize = { height: 620, width: 720 };
 
 let mainWindow: BrowserWindow | null = null;
 
+async function captureInteractivePrimitives(webContents: WebContents) {
+  return webContents.executeJavaScript(`(async () => {
+    const wait = (duration) => new Promise((resolve) => setTimeout(resolve, duration));
+    const rect = (element) => {
+      if (!element) return null;
+      const bounds = element.getBoundingClientRect();
+      return {
+        bottom: bounds.bottom,
+        height: bounds.height,
+        left: bounds.left,
+        right: bounds.right,
+        top: bounds.top,
+        width: bounds.width,
+      };
+    };
+    const dock = document.querySelector('.desktop-composer-dock');
+    if (dock instanceof HTMLElement) dock.style.display = 'none';
+    await wait(80);
+    const card = document.querySelector('[data-acceptance-surface="interactive-primitives"]');
+    const scrollRegion = document.querySelector('.desktop-scroll-region');
+    if (card && scrollRegion instanceof HTMLElement) {
+      scrollRegion.style.scrollBehavior = 'auto';
+      const regionBounds = scrollRegion.getBoundingClientRect();
+      const cardBounds = card.getBoundingClientRect();
+      scrollRegion.scrollTop +=
+        cardBounds.top -
+        regionBounds.top -
+        Math.max(0, (scrollRegion.clientHeight - cardBounds.height) / 2);
+    }
+    await wait(180);
+    const moreActions = card?.querySelector('[aria-label="More actions"]');
+    moreActions?.click();
+    await wait(140);
+    const rootMenu = [...document.querySelectorAll('.codex-ui-popover[role="menu"]')]
+      .find((element) => element.querySelector('.codex-ui-menu-submenu-trigger'));
+    rootMenu?.querySelector('.codex-ui-menu-submenu-trigger')?.click();
+    await wait(160);
+    const overlays = [...document.querySelectorAll('.codex-ui-popover')].map((element) => {
+      const bounds = element.getBoundingClientRect();
+      const styles = getComputedStyle(element);
+      return {
+        borderRadius: styles.borderRadius,
+        bounds: rect(element),
+        inViewport:
+          bounds.left >= 0 &&
+          bounds.top >= 0 &&
+          bounds.right <= window.innerWidth &&
+          bounds.bottom <= window.innerHeight,
+        owner: element.getAttribute('data-codex-ui-overlay-owner'),
+        padding: styles.padding,
+        role: element.getAttribute('role'),
+        visible: styles.visibility,
+      };
+    });
+    const toolbarButton = card?.querySelector('.codex-ui-icon-button');
+    const mediumButton = card?.querySelector('.codex-ui-button[data-size="medium"]');
+    return {
+      bodyScrollWidth: document.body.scrollWidth,
+      clientWidth: document.documentElement.clientWidth,
+      card: rect(card),
+      mediumButton: rect(mediumButton),
+      overlayOwnerCount: new Set(overlays.map((overlay) => overlay.owner)).size,
+      overlays,
+      resolvedTheme: document.querySelector('.desktop-playground')?.getAttribute('data-theme'),
+      toolbarButton: rect(toolbarButton),
+      viewport: { height: window.innerHeight, width: window.innerWidth },
+    };
+  })()`);
+}
+
 async function captureAcceptance(browserWindow: BrowserWindow) {
   const outputDirectory = process.env.CODEX_UI_KIT_ACCEPTANCE_DIR;
   if (!outputDirectory) return;
@@ -81,6 +151,26 @@ async function captureAcceptance(browserWindow: BrowserWindow) {
     };
   })()`);
   const screenshot = await browserWindow.webContents.capturePage();
+  const interactiveMetrics = await captureInteractivePrimitives(
+    browserWindow.webContents,
+  );
+  const interactiveScreenshot = await browserWindow.webContents.capturePage();
+  await browserWindow.webContents.executeJavaScript(
+    "document.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true }))",
+  );
+  nativeTheme.themeSource = "light";
+  sendThemeState(browserWindow.webContents);
+  await browserWindow.webContents.executeJavaScript(
+    `[...document.querySelectorAll('.segmented-control button')]
+      .find((button) => button.textContent?.trim() === 'Compact')
+      ?.click()`,
+  );
+  await new Promise((resolve) => setTimeout(resolve, 350));
+  const compactInteractiveMetrics = await captureInteractivePrimitives(
+    browserWindow.webContents,
+  );
+  const compactInteractiveScreenshot =
+    await browserWindow.webContents.capturePage();
 
   await mkdir(outputDirectory, { recursive: true });
   await Promise.all([
@@ -91,6 +181,22 @@ async function captureAcceptance(browserWindow: BrowserWindow) {
     writeFile(
       join(outputDirectory, "composer-auxiliary.png"),
       screenshot.toPNG(),
+    ),
+    writeFile(
+      join(outputDirectory, "interactive-primitives-metrics.json"),
+      `${JSON.stringify(interactiveMetrics, null, 2)}\n`,
+    ),
+    writeFile(
+      join(outputDirectory, "interactive-primitives.png"),
+      interactiveScreenshot.toPNG(),
+    ),
+    writeFile(
+      join(outputDirectory, "interactive-primitives-compact-light-metrics.json"),
+      `${JSON.stringify(compactInteractiveMetrics, null, 2)}\n`,
+    ),
+    writeFile(
+      join(outputDirectory, "interactive-primitives-compact-light.png"),
+      compactInteractiveScreenshot.toPNG(),
     ),
   ]);
   console.log(`acceptance capture: ${outputDirectory}`);

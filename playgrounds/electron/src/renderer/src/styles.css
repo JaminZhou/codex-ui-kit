@@ -243,9 +243,60 @@ button {
 .acceptance-card--command,
 .acceptance-card--file,
 .acceptance-card--notice,
+.acceptance-card--primitives,
 .acceptance-card--subagent,
 .acceptance-card--tool {
   grid-column: 1 / -1;
+}
+
+.primitive-state-matrix {
+  background: var(--codex-ui-bg-subtle);
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+}
+
+.primitive-state-matrix__toolbar,
+.primitive-state-matrix__buttons,
+.primitive-state-matrix__selectors {
+  align-items: center;
+  background: var(--codex-ui-bg);
+  border: 1px solid var(--codex-ui-border);
+  border-radius: var(--codex-ui-radius-lg);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.375rem;
+  min-width: 0;
+  padding: 0.75rem;
+}
+
+.primitive-state-matrix__toolbar {
+  align-self: start;
+  flex-wrap: nowrap;
+  gap: 0.125rem;
+  padding: 0.25rem;
+}
+
+.primitive-state-matrix > output {
+  color: var(--codex-ui-text-secondary);
+  font-family: var(--codex-ui-font-mono);
+  font-size: var(--codex-ui-font-size-xs);
+  grid-column: 1 / -1;
+}
+
+.primitive-state-matrix__popover-copy {
+  display: grid;
+  gap: 0.25rem;
+  padding: 0.5rem;
+}
+
+.primitive-state-matrix__popover-copy strong {
+  font-size: var(--codex-ui-font-size-sm);
+}
+
+.primitive-state-matrix__popover-copy span {
+  color: var(--codex-ui-text-secondary);
+  font-size: var(--codex-ui-font-size-xs);
 }
 
 .notice-state-matrix {
@@ -776,6 +827,7 @@ button {
   .acceptance-card--command,
   .acceptance-card--file,
   .acceptance-card--notice,
+  .acceptance-card--primitives,
   .acceptance-card--subagent,
   .acceptance-card--tool {
     grid-column: auto;
@@ -823,6 +875,10 @@ button {
 
   .activity-state-matrix,
   .command-state-matrix {
+    grid-template-columns: 1fr;
+  }
+
+  .primitive-state-matrix {
     grid-template-columns: 1fr;
   }
 }

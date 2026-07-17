@@ -6,6 +6,7 @@ import {
   AgentComposer,
   ApprovalCommandPreview,
   ApprovalRequest,
+  Button,
   type ApprovalAction,
   type ApprovalRequestKind,
   CodeBlock,
@@ -19,12 +20,19 @@ import {
   type ComposerLayout,
   FileChange,
   FileDiff,
+  IconButton,
   InlineNotice,
+  Menu,
+  MenuCheckboxItem,
+  MenuItem,
+  MenuSubmenu,
   type NoticeTone,
   ProposedPlan,
+  Popover,
   type QueuedPrompt,
   QueuedPromptList,
   SearchActivity,
+  Select,
   StatusBanner,
   type StatusBannerAction,
   StreamNotice,
@@ -34,6 +42,7 @@ import {
   SubagentSummary,
   SubagentTranscriptHeader,
   TurnDuration,
+  Tooltip,
   formatCommandDuration,
   fileDiffToText,
   formatTurnDuration,
@@ -112,6 +121,15 @@ void SubagentPanel;
 void SubagentSummary;
 void SubagentTranscriptHeader;
 void TurnDuration;
+void Button;
+void IconButton;
+void Menu;
+void MenuCheckboxItem;
+void MenuItem;
+void MenuSubmenu;
+void Popover;
+void Select;
+void Tooltip;
 void formatCommandDuration;
 void fileDiffToText([line]);
 void formatTurnDuration;
