@@ -3,6 +3,10 @@ import {
   AgentMarkdown,
   AgentPlan,
   AgentReasoning,
+  ApprovalCommandPreview,
+  ApprovalRequest,
+  type ApprovalAction,
+  type ApprovalRequestKind,
   CodeBlock,
   CommandExecution,
   CommandOutput,
@@ -49,6 +53,10 @@ const subagentActivity: SubagentActivityItem = {
   id: subagent.id,
   name: subagent.name,
 };
+const approvalAction: ApprovalAction = {
+  onClick: () => undefined,
+};
+const approvalKind: ApprovalRequestKind = "command";
 
 void FileChange;
 void FileDiff;
@@ -56,6 +64,8 @@ void ActivityTimeline;
 void AgentMarkdown;
 void AgentPlan;
 void AgentReasoning;
+void ApprovalCommandPreview;
+void ApprovalRequest;
 void CodeBlock;
 void CommandExecution;
 void CommandOutput;
@@ -76,3 +86,5 @@ void line;
 void searchEntry;
 void subagent;
 void subagentActivity;
+void approvalAction;
+void approvalKind;

@@ -15,6 +15,7 @@ import {
   AgentPlan,
   AgentReasoning,
   AgentThread,
+  ApprovalCommandPreview,
   ApprovalRequest,
   CommandExecution,
   CommandOutput,
@@ -506,14 +507,122 @@ export function DesktopPlayground() {
                 </ProposedPlan>
                 <ApprovalRequest
                   decision={approvalDecision}
-                  description="Exercise an interactive privileged-action surface inside the desktop Renderer."
+                  kind="command"
                   onApprove={() => setApprovalDecision("approved")}
                   onReject={() => setApprovalDecision("rejected")}
-                  title="Run the desktop acceptance command?"
+                  reason="Verify the package in the independent Electron Renderer"
+                  scopedApproveAction={{
+                    info: "Allow commands that start with pnpm --filter for this conversation",
+                    label: "Allow similar commands",
+                    onClick: () => setApprovalDecision("approved"),
+                  }}
+                  title="Allow ChatGPT to run this command?"
                 >
-                  pnpm --filter @codex-ui-kit/electron-playground check
+                  <ApprovalCommandPreview command="pnpm --filter @codex-ui-kit/electron-playground check" />
                 </ApprovalRequest>
               </AgentThread>
+            </div>
+          </article>
+
+          <article className="acceptance-card acceptance-card--approval">
+            <header>
+              <div>
+                <h2>Approval and permission request states</h2>
+                <p>
+                  Elevated shell, identity hierarchy, command collapse, scoped
+                  actions, network copy, patch content, and narrow-window reflow.
+                </p>
+              </div>
+            </header>
+            <div className="acceptance-card__body approval-state-matrix">
+              <div className="approval-state-matrix__wide">
+                <span className="approval-state-matrix__label">
+                  Terminal · long command
+                </span>
+                <ApprovalRequest
+                  autoFocus={false}
+                  disableHotkeys
+                  kind="command"
+                  onApprove={() => undefined}
+                  onReject={() => undefined}
+                  reason="Run the desktop acceptance matrix"
+                  scopedApproveAction={{
+                    info: "Allow commands that start with pnpm for this conversation",
+                    label: "Allow similar commands",
+                    onClick: () => undefined,
+                  }}
+                  title="Allow ChatGPT to run this command?"
+                >
+                  <ApprovalCommandPreview
+                    command={[
+                      "pnpm --filter @codex-ui-kit/electron-playground check",
+                      "--reporter verbose",
+                      "--outputFile ./artifacts/electron-check.json",
+                      "--runInBand",
+                    ].join("\n")}
+                    forceCollapsible
+                  />
+                </ApprovalRequest>
+              </div>
+
+              <div>
+                <span className="approval-state-matrix__label">Edit files</span>
+                <ApprovalRequest
+                  autoFocus={false}
+                  disableHotkeys
+                  kind="file"
+                  onApprove={() => undefined}
+                  onReject={() => undefined}
+                  scopedApproveAction={{
+                    info: "Allow this and future file edits in this conversation",
+                    label: "Allow all edits",
+                    onClick: () => undefined,
+                  }}
+                  title="Allow ChatGPT to edit the following file?"
+                >
+                  <FileDiff lines={desktopDiffLines} size="fallback" />
+                </ApprovalRequest>
+              </div>
+
+              <div>
+                <span className="approval-state-matrix__label">Internet access</span>
+                <ApprovalRequest
+                  autoFocus={false}
+                  description="api.example.com isn't on the current network allowlist"
+                  disableHotkeys
+                  kind="network"
+                  onApprove={() => undefined}
+                  onReject={() => undefined}
+                  scopedApproveAction={{ onClick: () => undefined }}
+                  title="Allow ChatGPT to connect to https://api.example.com?"
+                />
+              </div>
+
+              <div>
+                <span className="approval-state-matrix__label">Permissions</span>
+                <ApprovalRequest
+                  autoFocus={false}
+                  disableHotkeys
+                  kind="permission"
+                  onApprove={() => undefined}
+                  onReject={() => undefined}
+                  scopedApproveAction={{ onClick: () => undefined }}
+                  title="Allow ChatGPT to view and edit the contents of this workspace?"
+                />
+              </div>
+
+              <div className="approval-state-matrix__narrow">
+                <span className="approval-state-matrix__label">Loading</span>
+                <ApprovalRequest
+                  autoFocus={false}
+                  disableHotkeys
+                  kind="mcp"
+                  loading
+                  onApprove={() => undefined}
+                  onReject={() => undefined}
+                  title="Allow the connector to update this issue?"
+                />
+              </div>
             </div>
           </article>
 

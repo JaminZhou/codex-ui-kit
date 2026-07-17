@@ -69,7 +69,12 @@ the pnpm workspace. Electron is not a dependency of `codex-ui-kit`.
   exact empty fallbacks, visible-item pagination, and selection hooks.
 - `SubagentTranscriptHeader` and `SubagentAvatar`: nested transcript navigation
   and deterministic, asset-free agent identity primitives.
-- `ApprovalRequest`: controlled approve/reject surface with explicit outcomes.
+- `ApprovalRequest`: elevated command, patch, network, permission, and generic
+  request card with identity/title/reason hierarchy, one-shot and scoped
+  actions, loading/outcome states, Enter/Escape shortcuts, and compact
+  container reflow.
+- `ApprovalCommandPreview`: measured three-line command collapse with a
+  `320px` expanded viewport and explicit expand/collapse controls.
 - `CommandExecution`: collapsed command language plus expandable shell, exact
   duration, copy, background-terminal, success, failure, and interruption states.
 - `CommandOutput`: independently labeled stdout/stderr output with no-output,

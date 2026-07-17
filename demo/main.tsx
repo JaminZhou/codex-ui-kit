@@ -10,6 +10,7 @@ import {
   AgentPlan,
   AgentReasoning,
   AgentThread,
+  ApprovalCommandPreview,
   ApprovalRequest,
   CommandExecution,
   CommandOutput,
@@ -266,6 +267,9 @@ function Showcase() {
   const [hasAttachment, setHasAttachment] = useState(true);
   const [approvalDecision, setApprovalDecision] =
     useState<ApprovalDecision>("pending");
+  const [approvalActionStatus, setApprovalActionStatus] = useState(
+    "Approval actions ready",
+  );
   const [wrapMarkdownCode, setWrapMarkdownCode] = useState(false);
   const [markdownCopyStatus, setMarkdownCopyStatus] = useState("Ready to copy");
   const [planActionStatus, setPlanActionStatus] = useState("Plan actions ready");
@@ -800,30 +804,139 @@ function Showcase() {
           </GalleryCard>
 
           <GalleryCard
-            description="A controlled decision surface for commands and other privileged work."
-            title="Approval interaction"
+            description="Command, patch, network, permission, scope, loading, outcome, keyboard, and narrow-container states."
+            title="Approval and permission requests"
             wide
           >
             <div className="approval-preview">
               <div className="approval-preview__meta">
-                <span>Decision: {approvalDecision}</span>
+                <output aria-live="polite">{approvalActionStatus}</output>
                 <button
                   disabled={approvalDecision === "pending"}
-                  onClick={() => setApprovalDecision("pending")}
+                  onClick={() => {
+                    setApprovalDecision("pending");
+                    setApprovalActionStatus("Command request reset");
+                  }}
                   type="button"
                 >
                   Reset request
                 </button>
               </div>
-              <ApprovalRequest
-                decision={approvalDecision}
-                description="This command publishes the package to a public registry."
-                onApprove={() => setApprovalDecision("approved")}
-                onReject={() => setApprovalDecision("rejected")}
-                title="Publish codex-ui-kit?"
-              >
-                pnpm publish --access public
-              </ApprovalRequest>
+              <div className="approval-preview__grid">
+                <div className="approval-preview__surface approval-preview__surface--wide">
+                  <span className="approval-preview__label">
+                    Terminal · interactive · three-line collapse
+                  </span>
+                  <ApprovalRequest
+                    decision={approvalDecision}
+                    kind="command"
+                    onApprove={() => {
+                      setApprovalDecision("approved");
+                      setApprovalActionStatus("Allowed command once");
+                    }}
+                    onReject={() => {
+                      setApprovalDecision("rejected");
+                      setApprovalActionStatus("Denied command");
+                    }}
+                    reason="Publish the verified package after all checks pass"
+                    scopedApproveAction={{
+                      info: "Allow commands that start with pnpm publish for this conversation",
+                      label: "Allow similar commands",
+                      onClick: () =>
+                        setApprovalActionStatus("Allowed similar commands"),
+                    }}
+                    title="Allow ChatGPT to run this command?"
+                  >
+                    <ApprovalCommandPreview
+                      command={[
+                        "pnpm publish --access public --no-git-checks",
+                        "--report-summary ./artifacts/publish-summary.json",
+                        "--tag parity-preview",
+                        "--provenance",
+                      ].join("\n")}
+                      forceCollapsible
+                    />
+                  </ApprovalRequest>
+                </div>
+
+                <div className="approval-preview__surface">
+                  <span className="approval-preview__label">Edit files · patch</span>
+                  <ApprovalRequest
+                    disableHotkeys
+                    kind="file"
+                    onApprove={() =>
+                      setApprovalActionStatus("Allowed this edit once")
+                    }
+                    onReject={() => setApprovalActionStatus("Denied file edit")}
+                    scopedApproveAction={{
+                      info: "Allow this and future file edits in this conversation",
+                      label: "Allow all edits",
+                      onClick: () =>
+                        setApprovalActionStatus("Allowed all edits"),
+                    }}
+                    title="Allow ChatGPT to edit the following file?"
+                  >
+                    <FileDiff lines={showcaseDiffLines} size="fallback" />
+                  </ApprovalRequest>
+                </div>
+
+                <div className="approval-preview__surface">
+                  <span className="approval-preview__label">Internet access</span>
+                  <ApprovalRequest
+                    description="api.example.com isn't on the current network allowlist"
+                    disableHotkeys
+                    kind="network"
+                    onApprove={() =>
+                      setApprovalActionStatus("Allowed network access once")
+                    }
+                    onReject={() =>
+                      setApprovalActionStatus("Denied network access")
+                    }
+                    scopedApproveAction={{
+                      label: "Allow this conversation",
+                      onClick: () =>
+                        setApprovalActionStatus(
+                          "Allowed network access for this conversation",
+                        ),
+                    }}
+                    title="Allow ChatGPT to connect to https://api.example.com?"
+                  />
+                </div>
+
+                <div className="approval-preview__surface">
+                  <span className="approval-preview__label">Permissions · session scope</span>
+                  <ApprovalRequest
+                    disableHotkeys
+                    kind="permission"
+                    onApprove={() =>
+                      setApprovalActionStatus("Allowed filesystem access once")
+                    }
+                    onReject={() =>
+                      setApprovalActionStatus("Denied filesystem access")
+                    }
+                    scopedApproveAction={{
+                      onClick: () =>
+                        setApprovalActionStatus(
+                          "Allowed filesystem access for this conversation",
+                        ),
+                    }}
+                    title="Allow ChatGPT to view and edit the contents of Developer/codex-ui-kit?"
+                  />
+                </div>
+
+                <div className="approval-preview__surface approval-preview__surface--narrow">
+                  <span className="approval-preview__label">Loading · disabled</span>
+                  <ApprovalRequest
+                    disableHotkeys
+                    kind="mcp"
+                    leadingAction={{ onClick: () => undefined }}
+                    loading
+                    onApprove={() => undefined}
+                    onReject={() => undefined}
+                    title="Allow the connector to update this issue?"
+                  />
+                </div>
+              </div>
             </div>
           </GalleryCard>
 

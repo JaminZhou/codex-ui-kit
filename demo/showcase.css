@@ -244,11 +244,6 @@ code {
   padding: clamp(1rem, 4vw, 3rem);
 }
 
-.approval-preview > .codex-ui-approval-request {
-  margin-inline: auto;
-  max-width: 42rem;
-}
-
 .approval-preview__meta {
   align-items: center;
   color: var(--codex-ui-text-tertiary);
@@ -256,7 +251,12 @@ code {
   font-size: 0.6875rem;
   justify-content: space-between;
   margin: 0 auto 0.75rem;
-  max-width: 42rem;
+  max-width: 64rem;
+}
+
+.approval-preview__meta output {
+  color: var(--codex-ui-text-secondary);
+  font-family: var(--codex-ui-font-mono);
 }
 
 .approval-preview__meta button {
@@ -277,6 +277,40 @@ code {
 .approval-preview__meta button:focus-visible {
   outline: 2px solid var(--codex-ui-focus);
   outline-offset: 1px;
+}
+
+.approval-preview__grid {
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin-inline: auto;
+  max-width: 64rem;
+}
+
+.approval-preview__surface {
+  background: color-mix(in srgb, var(--codex-ui-bg) 68%, transparent);
+  border: 1px solid var(--codex-ui-border);
+  border-radius: var(--codex-ui-radius-xl);
+  min-width: 0;
+  padding: 1rem;
+}
+
+.approval-preview__surface--wide {
+  grid-column: 1 / -1;
+}
+
+.approval-preview__surface--narrow {
+  max-width: 24rem;
+  width: 100%;
+}
+
+.approval-preview__label {
+  color: var(--codex-ui-text-tertiary);
+  display: block;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+  text-transform: uppercase;
 }
 
 .command-preview {
@@ -741,6 +775,14 @@ code {
 
   .approval-preview {
     padding: 1rem;
+  }
+
+  .approval-preview__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .approval-preview__surface--wide {
+    grid-column: auto;
   }
 
   .command-preview {
