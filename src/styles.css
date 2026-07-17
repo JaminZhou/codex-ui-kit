@@ -2577,6 +2577,85 @@ button.codex-ui-subagent-activity-group__chip:focus-visible {
   z-index: 1;
 }
 
+.codex-ui-subagent-summary__overflow {
+  display: inline-flex;
+  flex: 0 0 auto;
+  margin-left: 0.125rem;
+  position: relative;
+}
+
+.codex-ui-subagent-summary__overflow-toggle {
+  align-items: center;
+  background: var(--codex-ui-background-elevated-secondary-opaque);
+  border: 1px solid var(--codex-ui-border-light);
+  border-radius: var(--codex-ui-radius-full);
+  color: var(--codex-ui-text-tertiary);
+  cursor: pointer;
+  display: inline-flex;
+  font: inherit;
+  font-size: 0.5625rem;
+  height: 0.875rem;
+  justify-content: center;
+  line-height: 1;
+  min-width: 1.25rem;
+  padding: 0 0.1875rem;
+}
+
+.codex-ui-subagent-summary__overflow-toggle:hover,
+.codex-ui-subagent-summary__overflow-toggle:focus-visible {
+  background: var(--codex-ui-background-button-secondary-hover);
+  color: var(--codex-ui-text);
+}
+
+.codex-ui-subagent-summary__overflow-toggle:focus-visible,
+.codex-ui-subagent-summary__overflow-item:focus-visible {
+  outline: 2px solid var(--codex-ui-focus);
+  outline-offset: 1px;
+}
+
+.codex-ui-subagent-summary__overflow-menu {
+  background: var(--codex-ui-bg-elevated);
+  border: 1px solid var(--codex-ui-border);
+  border-radius: var(--codex-ui-radius-md);
+  box-shadow: var(--codex-ui-shadow-xl);
+  display: flex;
+  flex-direction: column;
+  left: 0;
+  min-width: 10rem;
+  padding: 0.25rem;
+  position: absolute;
+  top: calc(100% + 0.25rem);
+  z-index: 20;
+}
+
+.codex-ui-subagent-summary__overflow-item {
+  align-items: center;
+  background: transparent;
+  border: 0;
+  border-radius: var(--codex-ui-radius-sm);
+  color: var(--codex-ui-text);
+  cursor: pointer;
+  display: flex;
+  font: inherit;
+  gap: 0.5rem;
+  min-height: 1.75rem;
+  padding: 0.25rem 0.5rem;
+  text-align: start;
+  width: 100%;
+}
+
+.codex-ui-subagent-summary__overflow-item:hover,
+.codex-ui-subagent-summary__overflow-item:focus-visible {
+  background: var(--codex-ui-background-button-secondary-hover);
+}
+
+.codex-ui-subagent-summary__overflow-item > span:last-child {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .codex-ui-subagent-summary__avatar + .codex-ui-subagent-summary__avatar,
 .codex-ui-subagent-summary__avatar-button + .codex-ui-subagent-summary__avatar-button {
   margin-left: -0.25rem;

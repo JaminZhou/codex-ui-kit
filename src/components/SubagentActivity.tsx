@@ -249,7 +249,42 @@ function SummaryAvatarGroup({
   items: SubagentItem[];
   onOpenItem?: (item: SubagentItem) => void;
 }) {
-  const visibleItems = onOpenItem ? items : items.slice(0, 4);
+  const [overflowOpen, setOverflowOpen] = useState(false);
+  const overflowId = useId();
+  const overflowRoot = useRef<HTMLSpanElement>(null);
+  const overflowTrigger = useRef<HTMLButtonElement>(null);
+  const visibleItems = items.slice(0, 4);
+  const overflowItems = items.slice(4);
+
+  useEffect(() => {
+    if (!onOpenItem || overflowItems.length === 0) {
+      setOverflowOpen(false);
+    }
+  }, [onOpenItem, overflowItems.length]);
+
+  useEffect(() => {
+    if (!overflowOpen) return;
+
+    const dismissOutside = (event: PointerEvent) => {
+      if (
+        event.target instanceof Node &&
+        !overflowRoot.current?.contains(event.target)
+      ) {
+        setOverflowOpen(false);
+      }
+    };
+    const dismissOnEscape = (event: KeyboardEvent) => {
+      if (event.key !== "Escape") return;
+      setOverflowOpen(false);
+      overflowTrigger.current?.focus();
+    };
+    document.addEventListener("pointerdown", dismissOutside);
+    document.addEventListener("keydown", dismissOnEscape);
+    return () => {
+      document.removeEventListener("pointerdown", dismissOutside);
+      document.removeEventListener("keydown", dismissOnEscape);
+    };
+  }, [overflowOpen]);
 
   return (
     <span
@@ -282,6 +317,55 @@ function SummaryAvatarGroup({
           </span>
         );
       })}
+      {onOpenItem && overflowItems.length > 0 ? (
+        <span
+          className="codex-ui-subagent-summary__overflow"
+          ref={overflowRoot}
+        >
+          <button
+            aria-controls={overflowId}
+            aria-expanded={overflowOpen}
+            aria-haspopup="menu"
+            aria-label={`Open ${overflowItems.length} more ${
+              overflowItems.length === 1 ? "subagent" : "subagents"
+            }`}
+            className="codex-ui-subagent-summary__overflow-toggle"
+            onClick={() => setOverflowOpen((value) => !value)}
+            ref={overflowTrigger}
+            type="button"
+          >
+            +{overflowItems.length}
+          </button>
+          {overflowOpen ? (
+            <span
+              className="codex-ui-subagent-summary__overflow-menu"
+              id={overflowId}
+              role="menu"
+            >
+              {overflowItems.map((item) => (
+                <button
+                  className="codex-ui-subagent-summary__overflow-item"
+                  key={item.id}
+                  onClick={() => {
+                    setOverflowOpen(false);
+                    onOpenItem(item);
+                  }}
+                  role="menuitem"
+                  type="button"
+                >
+                  <SubagentAvatar
+                    active={item.status !== "done"}
+                    aria-hidden="true"
+                    seed={item.id}
+                    size="tiny"
+                  />
+                  <span>{displayName(item.name)}</span>
+                </button>
+              ))}
+            </span>
+          ) : null}
+        </span>
+      ) : null}
     </span>
   );
 }
@@ -321,6 +405,12 @@ export function SubagentSummary({
   const hadItems = useRef(items.length > 0);
   const working = grouped.filter((item) => item.status !== "done");
   const done = grouped.filter((item) => item.status === "done");
+  const groupedStatusLabel = [
+    working.length > 0 ? `${working.length} working` : null,
+    done.length > 0 ? `${done.length} done` : null,
+  ]
+    .filter(Boolean)
+    .join(", ");
 
   useEffect(() => {
     const itemsArrived = !hadItems.current && items.length > 0;
@@ -388,7 +478,7 @@ export function SubagentSummary({
             return onOpenSummary ? (
               <button
                 {...sharedProps}
-                aria-label="Open subagents"
+                aria-label={`Open subagents, ${groupedStatusLabel}`}
                 onClick={onOpenSummary}
                 type="button"
               >

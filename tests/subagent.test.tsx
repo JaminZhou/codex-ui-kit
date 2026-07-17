@@ -196,8 +196,29 @@ describe("SubagentSummary", () => {
       />,
     );
 
-    fireEvent.click(screen.getByRole("button", { name: "Agent 5" }));
+    fireEvent.click(
+      screen.getByRole("button", { name: "Open 1 more subagent" }),
+    );
+    fireEvent.click(screen.getByRole("menuitem", { name: "Agent 5" }));
     expect(onOpenSubagent).toHaveBeenCalledWith(groupedAgents[4]);
+  });
+
+  it("includes grouped status counts in the overview button name", () => {
+    render(
+      <SubagentSummary
+        items={[
+          { ...activeAgent, presentation: "grouped" },
+          { ...doneAgent, presentation: "grouped" },
+        ]}
+        onOpenSummary={() => undefined}
+      />,
+    );
+
+    expect(
+      screen.getByRole("button", {
+        name: "Open subagents, 1 working, 1 done",
+      }),
+    ).toBeTruthy();
   });
 });
 
