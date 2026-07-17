@@ -81,6 +81,23 @@ code {
   font-size: 0.75rem;
 }
 
+.showcase__source-link {
+  color: var(--codex-ui-text-secondary);
+  font-size: 0.8125rem;
+  font-weight: 550;
+  text-decoration: none;
+}
+
+.showcase__source-link:hover {
+  color: var(--codex-ui-text);
+}
+
+.showcase__source-link:focus-visible {
+  border-radius: var(--codex-ui-radius-sm);
+  outline: 2px solid var(--codex-ui-focus);
+  outline-offset: 3px;
+}
+
 .showcase__topbar button {
   background: var(--codex-ui-bg);
   border: 1px solid var(--codex-ui-border-strong);

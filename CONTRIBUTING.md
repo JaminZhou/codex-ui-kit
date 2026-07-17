@@ -1,0 +1,45 @@
+# Contributing
+
+## Development setup
+
+Use Node.js 22 and the pnpm version declared in `package.json`.
+
+```bash
+corepack enable
+pnpm install --frozen-lockfile
+pnpm check
+```
+
+`pnpm check` runs TypeScript checks, package tests, the library build, the npm package contract, the browser showcase build, and the Electron main/preload/Renderer checks.
+
+## Component changes
+
+1. Add or update the public component API and types.
+2. Cover behavior, accessibility, keyboard interaction, and visual contracts in tests.
+3. Add every public state to the browser showcase.
+4. Add desktop-specific geometry or interaction states to the Electron playground when relevant.
+5. Run `pnpm check` before opening a pull request.
+
+The package supports React 18 and React 19. CI installs the packed artifact into isolated consumers for both majors.
+
+## Research and implementation boundaries
+
+Read [`SOURCES.md`](SOURCES.md) and [`research/README.md`](research/README.md) before contributing parity work.
+
+- Record only abstract observations, public behavior, accessibility semantics, and representative measurements.
+- Keep extracted application files and raw inspection data outside the repository.
+- Do not copy, deminify, translate, or mechanically transform bundled implementation code.
+- Do not contribute private IPC, authentication details, service endpoints, fonts, logos, icons, sounds, or other OpenAI assets.
+- Implement public APIs, markup, styling, and assets independently.
+
+## Pull requests
+
+- Keep changes focused and explain the user-visible behavior.
+- Include verification commands and screenshots for visual changes.
+- Preserve the protocol-neutral component boundary.
+- Resolve automated review threads after fixing and pushing.
+- Do not resolve human review threads unless the reviewer asks.
+
+## Commit style
+
+Use a lowercase conventional prefix such as `feat:`, `fix:`, `docs:`, `test:`, `refactor:`, or `ci:` followed by a concise summary.

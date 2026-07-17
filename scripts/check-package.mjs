@@ -12,7 +12,10 @@ function assert(condition, message) {
 
 assert(packageJson.name === "codex-ui-kit", "unexpected package name");
 assert(packageJson.version === "0.1.0", "expected the 0.1.0 foundation version");
-assert(packageJson.private !== true, "release package must not be private");
+assert(
+  packageJson.private === true,
+  "package must remain private until the first registry release",
+);
 assert(packageJson.publishConfig?.access === "public", "package access must be public");
 assert(packageJson.repository?.url, "repository metadata is required");
 assert(packageJson.homepage, "homepage metadata is required");

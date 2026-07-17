@@ -419,6 +419,14 @@ function Showcase() {
         </a>
         <div className="showcase__topbar-actions">
           <span className="showcase__version">parity preview</span>
+          <a
+            className="showcase__source-link"
+            href="https://github.com/JaminZhou/codex-ui-kit"
+            rel="noreferrer"
+            target="_blank"
+          >
+            GitHub
+          </a>
           <button type="button" onClick={() => setDark((value) => !value)}>
             {dark ? "Light" : "Dark"} theme
           </button>

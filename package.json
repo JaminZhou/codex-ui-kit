@@ -1,6 +1,7 @@
 {
   "name": "codex-ui-kit",
   "version": "0.1.0",
+  "private": true,
   "description": "Independently designed React components for Codex-style coding-agent interfaces.",
   "keywords": [
     "agent-ui",
@@ -13,7 +14,7 @@
     "type": "git",
     "url": "git+https://github.com/JaminZhou/codex-ui-kit.git"
   },
-  "homepage": "https://github.com/JaminZhou/codex-ui-kit#readme",
+  "homepage": "https://jaminzhou.com/codex-ui-kit/",
   "bugs": {
     "url": "https://github.com/JaminZhou/codex-ui-kit/issues"
   },
@@ -45,7 +46,7 @@
     "dev": "vite demo",
     "dev:electron": "pnpm build && pnpm --filter @codex-ui-kit/electron-playground dev",
     "build": "vite build && tsc -p tsconfig.build.json",
-    "build:demo": "vite build demo",
+    "build:demo": "vite build demo --base=/codex-ui-kit/",
     "build:electron": "pnpm --filter @codex-ui-kit/electron-playground build",
     "test": "vitest run tests",
     "typecheck": "tsc --noEmit",
