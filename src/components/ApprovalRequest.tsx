@@ -229,6 +229,8 @@ export function ApprovalRequest({
     }
 
     const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.defaultPrevented) return;
+
       const activeSurfaces = Array.from(
         document.querySelectorAll<HTMLElement>(
           '[data-codex-approval-surface][data-decision="pending"]:not([data-hotkeys-disabled])',
@@ -237,7 +239,13 @@ export function ApprovalRequest({
       if (activeSurfaces.at(-1) !== rootRef.current) return;
 
       const target = event.target instanceof Element ? event.target : null;
-      if (target?.closest('[role="dialog"], [role="menu"]')) return;
+      if (
+        target?.closest(
+          'input, textarea, select, [contenteditable]:not([contenteditable="false"]), [role="textbox"], [role="dialog"], [role="menu"]',
+        )
+      ) {
+        return;
+      }
 
       if (
         event.key === "Enter" &&
@@ -514,6 +522,7 @@ export function ApprovalCommandPreview({
   defaultExpanded = false,
   expandLabel = "Expand",
   forceCollapsible,
+  style,
   ...props
 }: ApprovalCommandPreviewProps) {
   const contentRef = useRef<HTMLElement>(null);
@@ -551,6 +560,7 @@ export function ApprovalCommandPreview({
       role="region"
       style={
         {
+          ...style,
           "--codex-ui-approval-command-lines": collapsedLines,
         } as CSSProperties
       }

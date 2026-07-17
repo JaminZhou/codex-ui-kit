@@ -157,6 +157,37 @@ describe("ApprovalRequest", () => {
     expect(onReject).toHaveBeenCalledOnce();
   });
 
+  it("ignores approval hotkeys from editable or already handled events", () => {
+    const onApprove = vi.fn();
+    const onReject = vi.fn();
+    render(
+      <>
+        <textarea aria-label="Composer" />
+        <ApprovalRequest
+          autoFocus={false}
+          kind="permission"
+          onApprove={onApprove}
+          onReject={onReject}
+          title="Grant permissions?"
+        />
+      </>,
+    );
+
+    const composer = screen.getByRole("textbox", { name: "Composer" });
+    fireEvent.keyDown(composer, { key: "Enter" });
+    fireEvent.keyDown(composer, { key: "Escape" });
+    const handled = new KeyboardEvent("keydown", {
+      bubbles: true,
+      cancelable: true,
+      key: "Enter",
+    });
+    handled.preventDefault();
+    document.dispatchEvent(handled);
+
+    expect(onApprove).not.toHaveBeenCalled();
+    expect(onReject).not.toHaveBeenCalled();
+  });
+
   it("does not treat menu interaction as a global approval hotkey", () => {
     const onApprove = vi.fn();
     const onReject = vi.fn();
@@ -225,5 +256,21 @@ describe("ApprovalCommandPreview", () => {
     expect(preview.getAttribute("data-expanded")).toBe("true");
     fireEvent.click(screen.getByRole("button", { name: "Collapse" }));
     expect(preview.hasAttribute("data-expanded")).toBe(false);
+  });
+
+  it("merges caller styles without losing the collapsed-line contract", () => {
+    render(
+      <ApprovalCommandPreview
+        collapsedLines={5}
+        command="pnpm check"
+        style={{ width: "24rem" }}
+      />,
+    );
+
+    const preview = screen.getByRole("region", { name: "Command preview" });
+    expect(preview.style.width).toBe("24rem");
+    expect(
+      preview.style.getPropertyValue("--codex-ui-approval-command-lines"),
+    ).toBe("5");
   });
 });
