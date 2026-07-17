@@ -120,19 +120,23 @@ export const AgentComposer = forwardRef<
     if (layout === "auto") {
       const fieldset = fieldsetRef.current;
       const measuredTextWidth = measureRef.current?.offsetWidth ?? 0;
+      const fieldsetWidth = fieldset?.clientWidth ?? 0;
       const calculatedSingleLineWidth = Math.max(
         0,
-        (fieldset?.clientWidth ?? 0) -
+        fieldsetWidth -
           (actionsRef.current?.offsetWidth ?? 0) -
           (controlsRef.current?.offsetWidth ?? 0) -
           32,
       );
       const singleLineInputWidth =
         calculatedSingleLineWidth || textarea.clientWidth;
+      const compactInputHasNoSpace =
+        fieldsetWidth > 0 && calculatedSingleLineWidth === 0;
       const textWouldOverflow =
-        measuredTextWidth > 0 &&
-        singleLineInputWidth > 0 &&
-        measuredTextWidth + 32 > singleLineInputWidth;
+        compactInputHasNoSpace ||
+        (measuredTextWidth > 0 &&
+          singleLineInputWidth > 0 &&
+          measuredTextWidth + 32 > singleLineInputWidth);
 
       nextLayout =
         hasAttachments || value.includes("\n") || textWouldOverflow
@@ -151,7 +155,10 @@ export const AgentComposer = forwardRef<
     )}px`;
   }, [contentRequiresMultiline, hasAttachments, layout, value]);
 
-  useLayoutEffect(measureLayoutAndResize, [measureLayoutAndResize]);
+  useLayoutEffect(measureLayoutAndResize, [
+    automaticLayout,
+    measureLayoutAndResize,
+  ]);
 
   useEffect(() => {
     const form = formRef.current;

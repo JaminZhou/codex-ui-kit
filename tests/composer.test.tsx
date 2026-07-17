@@ -189,6 +189,89 @@ describe("AgentComposer", () => {
     ).toBe("single-line");
   });
 
+  it("promotes auto layout when compact controls leave no input width", () => {
+    const { container, rerender } = render(
+      <AgentComposer
+        actions={<button type="button">Attach</button>}
+        controls={<select aria-label="Mode" />}
+        onSubmit={() => undefined}
+        onValueChange={() => undefined}
+        value="A"
+      />,
+    );
+    const fieldset = container.querySelector("fieldset");
+    const actions = container.querySelector(".codex-ui-composer__actions");
+    const controls = container.querySelector(".codex-ui-composer__controls");
+    const textarea = screen.getByRole("textbox", { name: "Message" });
+    Object.defineProperty(fieldset, "clientWidth", {
+      configurable: true,
+      value: 120,
+    });
+    Object.defineProperty(actions, "offsetWidth", {
+      configurable: true,
+      value: 48,
+    });
+    Object.defineProperty(controls, "offsetWidth", {
+      configurable: true,
+      value: 48,
+    });
+    Object.defineProperty(textarea, "clientWidth", {
+      configurable: true,
+      value: 0,
+    });
+
+    rerender(
+      <AgentComposer
+        actions={<button type="button">Attach</button>}
+        controls={<select aria-label="Mode" />}
+        onSubmit={() => undefined}
+        onValueChange={() => undefined}
+        value="AB"
+      />,
+    );
+
+    expect(
+      container.querySelector("form")?.getAttribute("data-layout"),
+    ).toBe("multiline");
+  });
+
+  it("remeasures wrapped height after auto layout becomes multiline", () => {
+    const { container, rerender } = render(
+      <AgentComposer
+        onSubmit={() => undefined}
+        onValueChange={() => undefined}
+        value="Short"
+      />,
+    );
+    const form = container.querySelector("form");
+    const textarea = screen.getByRole("textbox", { name: "Message" });
+    const measure = container.querySelector(".codex-ui-composer__measure");
+    Object.defineProperty(textarea, "clientWidth", {
+      configurable: true,
+      value: 120,
+    });
+    Object.defineProperty(textarea, "scrollHeight", {
+      configurable: true,
+      get: () =>
+        form?.getAttribute("data-layout") === "multiline" ? 112 : 36,
+    });
+    Object.defineProperty(measure, "offsetWidth", {
+      configurable: true,
+      value: 240,
+    });
+
+    rerender(
+      <AgentComposer
+        onSubmit={() => undefined}
+        onValueChange={() => undefined}
+        value="This value wraps after automatic layout promotion"
+      />,
+    );
+
+    expect(form?.getAttribute("data-layout")).toBe("multiline");
+    expect(textarea.style.height).toBe("112px");
+  });
+
   it("resizes multiline input content and observes the composer width", () => {
     const observe = vi.fn();
     const disconnect = vi.fn();
