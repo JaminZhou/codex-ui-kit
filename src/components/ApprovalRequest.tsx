@@ -159,6 +159,10 @@ export function ApprovalRequest({
   const resolvedIdentity = identity ?? defaultIdentityLabels[kind];
 
   useEffect(() => {
+    if (!isPending) setOptionsOpen(false);
+  }, [isPending]);
+
+  useEffect(() => {
     if (!optionsOpen) return;
 
     const dismissOutside = (event: PointerEvent) => {
@@ -307,7 +311,7 @@ export function ApprovalRequest({
     items[next]?.focus();
   };
   const optionsMenu =
-    optionsOpen && scopedApproveAction && optionsPortalTarget
+    optionsOpen && isPending && scopedApproveAction && optionsPortalTarget
       ? createPortal(
           <div
             className="codex-ui-approval-request__options-menu"

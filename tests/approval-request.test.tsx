@@ -162,6 +162,30 @@ describe("ApprovalRequest", () => {
     expect(screen.queryByRole("menu")).toBeNull();
   });
 
+  it("clears an open scoped menu when a controlled request resolves", () => {
+    const request = (
+      decision: "approved" | "pending",
+    ) => (
+      <ApprovalRequest
+        decision={decision}
+        disableHotkeys
+        kind="network"
+        onApprove={() => undefined}
+        onReject={() => undefined}
+        scopedApproveAction={{ onClick: () => undefined }}
+        title="Connect?"
+      />
+    );
+    const { rerender } = render(request("pending"));
+
+    fireEvent.click(screen.getByRole("button", { name: "Approval options" }));
+    expect(screen.getByRole("menu")).toBeTruthy();
+    rerender(request("approved"));
+    expect(screen.queryByRole("menu")).toBeNull();
+    rerender(request("pending"));
+    expect(screen.queryByRole("menu")).toBeNull();
+  });
+
   it("supports Enter approval and Escape denial hotkeys", () => {
     const onApprove = vi.fn();
     const onReject = vi.fn();
