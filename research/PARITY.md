@@ -43,7 +43,7 @@ A row is complete only when all applicable gates pass:
 | Errors, warnings, notices, retry, and interruption | Complete | Measured | Complete | Complete | Good | Complete |
 | Composer shell and autosizing input | Complete | Measured | Complete | Complete | Good | Complete |
 | Composer attachments, mentions, modes, and queued prompts | Complete | Measured | Complete | Complete | Good | Complete |
-| Buttons, icon buttons, menus, tooltips, popovers, and selects | Slots only | Missing | Missing | Missing | Missing | Gap |
+| Buttons, icon buttons, menus, tooltips, popovers, and selects | Complete | Measured | Complete | Complete | Good | Complete |
 | Resource cards, citations, images, and artifacts | Missing | Missing | Missing | Missing | Missing | Gap |
 | Thread header, floating controls, and navigation affordances | Missing | Missing | Missing | Missing | Missing | Gap |
 | Loading, streaming, skeleton, hover, focus, and reduced motion | Partial + code-prefix retention | Partial | Expanded | Expanded | Good | Gap |

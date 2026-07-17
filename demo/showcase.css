@@ -202,6 +202,80 @@ code {
   min-height: 26rem;
 }
 
+.primitive-preview {
+  background: var(--codex-ui-bg-subtle);
+  border: 1px solid var(--codex-ui-border);
+  border-radius: var(--codex-ui-radius-xl);
+  padding: clamp(1rem, 4vw, 2rem);
+}
+
+.primitive-preview__toolbar {
+  align-items: center;
+  background: var(--codex-ui-bg);
+  border: 1px solid var(--codex-ui-border);
+  border-radius: var(--codex-ui-radius-lg);
+  display: inline-flex;
+  gap: 0.125rem;
+  padding: 0.25rem;
+}
+
+.primitive-preview__matrix {
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin-top: 1rem;
+}
+
+.primitive-preview__sample {
+  align-content: start;
+  background: var(--codex-ui-bg);
+  border: 1px solid var(--codex-ui-border);
+  border-radius: var(--codex-ui-radius-lg);
+  display: grid;
+  gap: 0.75rem;
+  min-width: 0;
+  padding: 1rem;
+}
+
+.primitive-preview__sample--wide {
+  grid-column: 1 / -1;
+}
+
+.primitive-preview__sample > span {
+  color: var(--codex-ui-text-tertiary);
+  font-size: 0.625rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.primitive-preview__row {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.primitive-preview__sample output {
+  color: var(--codex-ui-text-secondary);
+  font-family: var(--codex-ui-font-mono);
+  font-size: var(--codex-ui-font-size-xs);
+}
+
+.primitive-preview__popover-copy {
+  display: grid;
+  gap: 0.25rem;
+  padding: 0.5rem;
+}
+
+.primitive-preview__popover-copy strong {
+  font-size: var(--codex-ui-font-size-sm);
+}
+
+.primitive-preview__popover-copy span {
+  color: var(--codex-ui-text-secondary);
+  font-size: var(--codex-ui-font-size-xs);
+}
+
 .composer-preview {
   background:
     linear-gradient(var(--codex-ui-border) 1px, transparent 1px),
@@ -966,6 +1040,14 @@ code {
 
   .composer-preview {
     padding: 1rem;
+  }
+
+  .primitive-preview__matrix {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .primitive-preview__sample--wide {
+    grid-column: auto;
   }
 
   .composer-preview__matrix {

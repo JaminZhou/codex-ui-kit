@@ -10,6 +10,8 @@ second component implementation and it is not published with the package.
 - Exercise compact, standard, and wide BrowserWindow content sizes.
 - Report the computed system sans and monospace font stacks.
 - Validate a long, Renderer-owned scroll container.
+- Exercise portalled tooltips, popovers, menus, submenus, and selects inside the
+  real BrowserWindow.
 - Keep `contextIsolation`, sandboxing, and a narrow preload API enabled.
 
 Electron is intentionally declared only in this workspace's development
@@ -37,3 +39,7 @@ pnpm build:electron
 
 The Electron version is pinned to `42.1.0` to match the sampled Codex desktop
 build documented in `research/26.707.72221.md`.
+
+Set `CODEX_UI_KIT_ACCEPTANCE_DIR` while running `preview` to write package-safe
+geometry JSON and screenshots for the composer and interactive primitive
+surfaces. Acceptance output belongs in `/private/tmp`, never in the repository.

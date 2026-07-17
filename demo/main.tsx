@@ -12,6 +12,7 @@ import {
   AgentThread,
   ApprovalCommandPreview,
   ApprovalRequest,
+  Button,
   CommandExecution,
   CommandOutput,
   ComposerAttachment,
@@ -21,9 +22,18 @@ import {
   FileDiff,
   fileDiffToText,
   InlineNotice,
+  IconButton,
+  Menu,
+  MenuCheckboxItem,
+  MenuItem,
+  MenuSectionLabel,
+  MenuSeparator,
+  MenuSubmenu,
+  Popover,
   ProposedPlan,
   QueuedPromptList,
   SearchActivity,
+  Select,
   StatusIndicator,
   StatusBanner,
   StreamNotice,
@@ -33,6 +43,7 @@ import {
   SubagentSummary,
   SubagentTranscriptHeader,
   ToolCallCard,
+  Tooltip,
   TurnDuration,
   type AgentItemStatus,
   type ApprovalDecision,
@@ -299,6 +310,11 @@ function Showcase() {
   );
   const [selectedSubagent, setSelectedSubagent] =
     useState<SubagentItem | null>(null);
+  const [executionMode, setExecutionMode] = useState("local");
+  const [showLineNumbers, setShowLineNumbers] = useState(true);
+  const [primitiveStatus, setPrimitiveStatus] = useState(
+    "Interactive controls ready",
+  );
 
   const reorderQueuedPrompts = (activeId: string, overId: string) => {
     setQueuedPrompts((current) => {
@@ -574,6 +590,117 @@ function Showcase() {
                     }
                     value="Add another follow-up"
                   />
+                </div>
+              </div>
+            </div>
+          </GalleryCard>
+
+          <GalleryCard
+            description="Shared button, toolbar, tooltip, popover, menu, submenu, checkbox, and listbox states with portal collision handling."
+            title="Interactive controls and overlays"
+            wide
+          >
+            <div className="primitive-preview">
+              <div className="primitive-preview__toolbar">
+                <Tooltip content="Create a task" shortcut="⌘N">
+                  <IconButton icon={<span>＋</span>} label="Create a task" />
+                </Tooltip>
+                <Tooltip content="Search files" shortcut="⌘P">
+                  <IconButton icon={<span>⌕</span>} label="Search files" />
+                </Tooltip>
+                <Menu
+                  trigger={
+                    <IconButton icon={<span>•••</span>} label="More actions" />
+                  }
+                >
+                  <MenuSectionLabel>Thread</MenuSectionLabel>
+                  <MenuItem
+                    shortcut="⌘R"
+                    onSelect={() => setPrimitiveStatus("Thread renamed")}
+                  >
+                    Rename
+                  </MenuItem>
+                  <MenuCheckboxItem
+                    checked={showLineNumbers}
+                    onCheckedChange={setShowLineNumbers}
+                  >
+                    Show line numbers
+                  </MenuCheckboxItem>
+                  <MenuSubmenu label="Appearance">
+                    <MenuItem keepOpen>System</MenuItem>
+                    <MenuItem keepOpen>Light</MenuItem>
+                    <MenuItem keepOpen>Dark</MenuItem>
+                  </MenuSubmenu>
+                  <MenuSeparator />
+                  <MenuItem
+                    onSelect={() => setPrimitiveStatus("Thread deleted")}
+                    tone="danger"
+                  >
+                    Delete
+                  </MenuItem>
+                </Menu>
+              </div>
+
+              <div className="primitive-preview__matrix">
+                <div className="primitive-preview__sample">
+                  <span>Buttons · tones + states</span>
+                  <div className="primitive-preview__row">
+                    <Button
+                      onClick={() => setPrimitiveStatus("Primary action")}
+                      tone="primary"
+                    >
+                      Continue
+                    </Button>
+                    <Button>Secondary</Button>
+                    <Button tone="outline">Outline</Button>
+                    <Button tone="ghost">Ghost</Button>
+                    <Button tone="danger">Delete</Button>
+                    <Button loading>Running</Button>
+                  </div>
+                </div>
+
+                <div className="primitive-preview__sample">
+                  <span>Popover + select</span>
+                  <div className="primitive-preview__row">
+                    <Popover
+                      label="Workspace information"
+                      trigger={<Button tone="outline">Workspace info</Button>}
+                      width="menu-wide"
+                    >
+                      <div className="primitive-preview__popover-copy">
+                        <strong>codex-ui-kit</strong>
+                        <span>Renderer-neutral React package</span>
+                      </div>
+                    </Popover>
+                    <Select
+                      label="Execution mode"
+                      onValueChange={(value) => {
+                        setExecutionMode(value);
+                        setPrimitiveStatus(`Execution mode: ${value}`);
+                      }}
+                      options={[
+                        {
+                          description: "Use the current workspace",
+                          label: "Local",
+                          value: "local",
+                        },
+                        {
+                          description: "Run in an isolated environment",
+                          label: "Cloud",
+                          value: "cloud",
+                        },
+                        { disabled: true, label: "Unavailable", value: "off" },
+                      ]}
+                      value={executionMode}
+                    />
+                  </div>
+                </div>
+
+                <div className="primitive-preview__sample primitive-preview__sample--wide">
+                  <span>Live state</span>
+                  <output aria-live="polite">
+                    {primitiveStatus} · line numbers {showLineNumbers ? "on" : "off"}
+                  </output>
                 </div>
               </div>
             </div>
