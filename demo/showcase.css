@@ -194,12 +194,84 @@ code {
 .thread-preview {
   border: 1px solid var(--codex-ui-border);
   border-radius: var(--codex-ui-radius-xl);
-  min-height: 26rem;
+  height: 32rem;
   overflow: hidden;
+}
+
+.thread-preview .codex-ui-thread-viewport {
+  height: 100%;
 }
 
 .thread-preview .codex-ui-thread {
   min-height: 26rem;
+}
+
+.thread-preview__footer {
+  align-items: center;
+  color: var(--codex-ui-text-tertiary);
+  display: flex;
+  font-size: var(--codex-ui-font-size-xs);
+  justify-content: space-between;
+  line-height: var(--codex-ui-line-height-xs);
+  padding: 2rem 1.5rem 0.25rem;
+}
+
+.thread-preview__footer output {
+  font-family: var(--codex-ui-font-mono);
+}
+
+.thread-message-action {
+  appearance: none;
+  background: transparent;
+  border: 0;
+  color: inherit;
+  cursor: pointer;
+  font: inherit;
+  padding: 0;
+}
+
+.thread-message-action:hover {
+  color: var(--codex-ui-text);
+}
+
+.thread-state-matrix {
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin-top: 1rem;
+}
+
+.thread-state-matrix > div {
+  background: var(--codex-ui-bg-subtle);
+  border: 1px solid var(--codex-ui-border);
+  border-radius: var(--codex-ui-radius-xl);
+  min-width: 0;
+  padding: 1rem;
+}
+
+.thread-state-matrix > div > span:first-child {
+  color: var(--codex-ui-text-tertiary);
+  display: block;
+  font-size: 0.625rem;
+  margin-bottom: 0.75rem;
+  text-transform: uppercase;
+}
+
+.thread-state-matrix__placeholder {
+  grid-column: 1 / -1;
+  max-height: 8rem;
+  overflow: hidden;
+}
+
+.thread-state-matrix__placeholder .codex-ui-thread-virtualized-placeholder {
+  background: repeating-linear-gradient(
+    -45deg,
+    transparent,
+    transparent 0.5rem,
+    color-mix(in srgb, var(--codex-ui-text) 3%, transparent) 0.5rem,
+    color-mix(in srgb, var(--codex-ui-text) 3%, transparent) 1rem
+  );
+  border-radius: var(--codex-ui-radius-md);
 }
 
 .navigation-preview {
@@ -1159,7 +1231,15 @@ code {
   }
 
   .thread-preview .codex-ui-thread {
-    padding: 1rem;
+    --codex-ui-thread-content-inline-inset: 1rem;
+  }
+
+  .thread-state-matrix {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .thread-state-matrix__placeholder {
+    grid-column: auto;
   }
 
   .navigation-preview__body {

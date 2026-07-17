@@ -10,6 +10,9 @@ second component implementation and it is not published with the package.
 - Exercise compact, standard, and wide BrowserWindow content sizes.
 - Report the computed system sans and monospace font stacks.
 - Validate a long, Renderer-owned scroll container.
+- Validate thread follow state, turn spacing, user-message focus/edit actions,
+  loading/reconnect/shimmer/skeleton states, virtualized estimates, and turn
+  render errors at standard and compact window sizes.
 - Validate draggable header geometry, compact navigation, transient side
   panels, and latest-message floating states.
 - Exercise portalled tooltips, popovers, menus, submenus, and selects inside the

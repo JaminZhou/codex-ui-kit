@@ -133,8 +133,21 @@
   --codex-ui-radius-row: var(--codex-ui-radius-lg);
   --codex-ui-thread-content-max-width: 48rem;
   --codex-ui-thread-content-top-inset: calc(var(--codex-ui-spacing) * 8);
+  --codex-ui-thread-content-bottom-inset: calc(var(--codex-ui-spacing) * 8);
+  --codex-ui-thread-content-inline-inset: calc(var(--codex-ui-spacing) * 6);
+  --codex-ui-thread-turn-gap: calc(var(--codex-ui-spacing) * 3);
+  --codex-ui-thread-follow-threshold: calc(var(--codex-ui-spacing) * 6);
+  --codex-ui-thread-footer-bottom-inset: calc(var(--codex-ui-spacing) * 4);
+  --codex-ui-thread-placeholder-height: 17.5rem;
+  --codex-ui-thread-scroll-duration: 260ms;
+  --codex-ui-thread-scroll-easing: cubic-bezier(0.22, 1, 0.36, 1);
   --codex-ui-item-gap: calc(var(--codex-ui-spacing) * 4);
   --codex-ui-group-gap: var(--codex-ui-spacing);
+  --codex-ui-user-message-max-width: 77%;
+  --codex-ui-user-message-compact-max-width: 88%;
+  --codex-ui-loading-spinner-size: calc(var(--codex-ui-spacing) * 4);
+  --codex-ui-loading-shimmer-duration: 2s;
+  --codex-ui-message-highlight-duration: 1400ms;
   --codex-ui-markdown-block-gap: 0.6875rem;
   --codex-ui-markdown-inline-overhang: 1.5rem;
   --codex-ui-markdown-table-max-width: 40rem;
@@ -252,6 +265,16 @@
   );
   --codex-ui-background-status-warning: var(--codex-ui-orange-50);
   --codex-ui-background-status-error: var(--codex-ui-red-50);
+  --codex-ui-loading-shimmer-muted: color-mix(
+    in srgb,
+    var(--codex-ui-text-secondary) 55%,
+    transparent
+  );
+  --codex-ui-loading-shimmer-highlight: color-mix(
+    in srgb,
+    var(--codex-ui-text-foreground) 75%,
+    white
+  );
 
   --codex-ui-text-foreground: #1a1c1f;
   --codex-ui-text-secondary: color-mix(
@@ -370,6 +393,16 @@
   );
   --codex-ui-background-status-warning: var(--codex-ui-orange-900);
   --codex-ui-background-status-error: var(--codex-ui-red-900);
+  --codex-ui-loading-shimmer-muted: color-mix(
+    in srgb,
+    var(--codex-ui-text-secondary) 45%,
+    transparent
+  );
+  --codex-ui-loading-shimmer-highlight: color-mix(
+    in srgb,
+    var(--codex-ui-text-foreground) 60%,
+    black
+  );
 
   --codex-ui-text-foreground: var(--codex-ui-gray-0);
   --codex-ui-text-secondary: color-mix(
@@ -493,6 +526,16 @@
     );
     --codex-ui-background-status-warning: var(--codex-ui-orange-900);
     --codex-ui-background-status-error: var(--codex-ui-red-900);
+    --codex-ui-loading-shimmer-muted: color-mix(
+      in srgb,
+      var(--codex-ui-text-secondary) 45%,
+      transparent
+    );
+    --codex-ui-loading-shimmer-highlight: color-mix(
+      in srgb,
+      var(--codex-ui-text-foreground) 60%,
+      black
+    );
     --codex-ui-text-foreground: var(--codex-ui-gray-0);
     --codex-ui-text-secondary: color-mix(
       in oklab,
