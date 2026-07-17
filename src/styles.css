@@ -2478,6 +2478,7 @@ summary.codex-ui-activity__header::after {
   border: 0;
   margin: 0;
   min-inline-size: 0;
+  padding: 0;
   position: relative;
   width: 100%;
 }

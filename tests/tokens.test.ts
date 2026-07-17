@@ -89,6 +89,17 @@ describe("visual token contract", () => {
     expect(multilineShell).not.toContain("overflow");
   });
 
+  it("resets native fieldset spacing before applying composer geometry", () => {
+    const fieldsetShell = styles.match(
+      /\.codex-ui-composer__fieldset\s*\{([^}]+)\}/,
+    )?.[1];
+
+    expect(fieldsetShell).toContain("border: 0");
+    expect(fieldsetShell).toContain("margin: 0");
+    expect(fieldsetShell).toContain("padding: 0");
+    expect(fieldsetShell).toContain("min-inline-size: 0");
+  });
+
   it("keeps a visible composer keyboard focus state", () => {
     expect(styles).toContain(".codex-ui-composer:focus-within {");
     expect(styles).toContain(
