@@ -306,7 +306,25 @@ export const AgentComposer = forwardRef<
         {hasQueueCandidate ? (
           <div
             className="codex-ui-composer__queue"
+            data-disabled={disabled || undefined}
             hidden={!hasRenderedQueue}
+            inert={disabled || undefined}
+            onDragStartCapture={
+              disabled
+                ? (event) => {
+                    event.preventDefault();
+                    event.stopPropagation();
+                  }
+                : undefined
+            }
+            onDropCapture={
+              disabled
+                ? (event) => {
+                    event.preventDefault();
+                    event.stopPropagation();
+                  }
+                : undefined
+            }
             ref={queueRef}
           >
             {queue}

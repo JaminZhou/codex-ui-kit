@@ -225,6 +225,39 @@ describe("AgentComposer", () => {
     expect(onSelect).not.toHaveBeenCalled();
   });
 
+  it("blocks queue drag interactions when the composer is disabled", () => {
+    const onReorder = vi.fn();
+    const { container } = render(
+      <AgentComposer
+        disabled
+        onSubmit={() => undefined}
+        onValueChange={() => undefined}
+        queue={
+          <QueuedPromptList
+            items={[
+              { id: "one", text: "First" },
+              { id: "two", text: "Second" },
+            ]}
+            onReorder={onReorder}
+          />
+        }
+        value="Short"
+      />,
+    );
+
+    const queue = container.querySelector(
+      ".codex-ui-composer__queue",
+    ) as HTMLElement;
+    const rows = container.querySelectorAll(
+      ".codex-ui-composer-queue__row",
+    );
+    expect(queue.hasAttribute("inert")).toBe(true);
+    fireEvent.dragStart(rows[0]!);
+    fireEvent.dragOver(rows[1]!);
+    fireEvent.drop(rows[1]!);
+    expect(onReorder).not.toHaveBeenCalled();
+  });
+
   it("treats empty attachment collections as absent", () => {
     const files: string[] = [];
     const { container, rerender } = render(
