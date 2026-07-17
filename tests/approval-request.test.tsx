@@ -162,6 +162,29 @@ describe("ApprovalRequest", () => {
     expect(screen.queryByRole("menu")).toBeNull();
   });
 
+  it("does not nest or submit a consumer form", () => {
+    const onApprove = vi.fn();
+    const onHostSubmit = vi.fn((event: React.FormEvent) =>
+      event.preventDefault(),
+    );
+    const { container } = render(
+      <form aria-label="Host form" onSubmit={onHostSubmit}>
+        <ApprovalRequest
+          disableHotkeys
+          kind="command"
+          onApprove={onApprove}
+          onReject={() => undefined}
+          title="Run command?"
+        />
+      </form>,
+    );
+
+    expect(container.querySelectorAll("form")).toHaveLength(1);
+    fireEvent.click(screen.getByRole("button", { name: "Allow once" }));
+    expect(onApprove).toHaveBeenCalledOnce();
+    expect(onHostSubmit).not.toHaveBeenCalled();
+  });
+
   it("clears an open scoped menu when a controlled request resolves", () => {
     const request = (
       decision: "approved" | "pending",

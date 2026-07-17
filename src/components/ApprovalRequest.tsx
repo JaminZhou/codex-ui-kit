@@ -258,9 +258,11 @@ export function ApprovalRequest({
         !target?.closest("button, a")
       ) {
         event.preventDefault();
+        setOptionsOpen(false);
         onApprove();
       } else if (event.key === "Escape" && onReject) {
         event.preventDefault();
+        setOptionsOpen(false);
         onReject();
       }
     };
@@ -310,6 +312,10 @@ export function ApprovalRequest({
             : (current - 1 + items.length) % items.length;
     items[next]?.focus();
   };
+  const approveOnce = () => {
+    setOptionsOpen(false);
+    if (!primaryDisabled) onApprove?.();
+  };
   const optionsMenu =
     optionsOpen && isPending && scopedApproveAction && optionsPortalTarget
       ? createPortal(
@@ -324,10 +330,7 @@ export function ApprovalRequest({
           >
             <button
               disabled={primaryDisabled}
-              onClick={() => {
-                setOptionsOpen(false);
-                onApprove?.();
-              }}
+              onClick={approveOnce}
               role="menuitem"
               type="button"
             >
@@ -416,14 +419,9 @@ export function ApprovalRequest({
       ) : null}
 
       {isPending ? (
-        <form
+        <div
           aria-label="Approval actions"
           className="codex-ui-approval-request__actions"
-          onSubmit={(event) => {
-            event.preventDefault();
-            setOptionsOpen(false);
-            if (!primaryDisabled) onApprove?.();
-          }}
           role="group"
         >
           {leadingAction ? (
@@ -460,7 +458,8 @@ export function ApprovalRequest({
                   className="codex-ui-approval-request__button codex-ui-approval-request__button--primary"
                   data-action="approve"
                   disabled={primaryDisabled}
-                  type="submit"
+                  onClick={approveOnce}
+                  type="button"
                 >
                   {loading ? (
                     <span
@@ -491,7 +490,8 @@ export function ApprovalRequest({
                 className="codex-ui-approval-request__button codex-ui-approval-request__button--primary"
                 data-action="approve"
                 disabled={primaryDisabled}
-                type="submit"
+                onClick={approveOnce}
+                type="button"
               >
                 {loading ? (
                   <span
@@ -503,7 +503,7 @@ export function ApprovalRequest({
               </button>
             )}
           </div>
-        </form>
+        </div>
       ) : null}
     </section>
   );
