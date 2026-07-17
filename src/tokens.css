@@ -110,6 +110,9 @@
   --codex-ui-markdown-block-gap: 0.6875rem;
   --codex-ui-markdown-inline-overhang: 1.5rem;
   --codex-ui-markdown-table-max-width: 40rem;
+  --codex-ui-subagent-chip-height: 1.75rem;
+  --codex-ui-subagent-panel-row-min-height: 2rem;
+  --codex-ui-subagent-panel-header-height: 3rem;
   --codex-ui-transition-fast: 150ms ease;
   --codex-ui-transition-relaxed: 300ms ease;
   --codex-ui-transition: var(--codex-ui-transition-fast);

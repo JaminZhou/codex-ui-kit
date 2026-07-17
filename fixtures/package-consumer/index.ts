@@ -11,6 +11,11 @@ import {
   FileDiff,
   ProposedPlan,
   SearchActivity,
+  SubagentActivity,
+  SubagentActivityGroup,
+  SubagentPanel,
+  SubagentSummary,
+  SubagentTranscriptHeader,
   TurnDuration,
   formatCommandDuration,
   fileDiffToText,
@@ -18,6 +23,8 @@ import {
   type FileDiffSize,
   type FileDiffLine,
   type SearchActivityEntry,
+  type SubagentActivityItem,
+  type SubagentItem,
 } from "codex-ui-kit";
 import "codex-ui-kit/styles.css";
 import "codex-ui-kit/tokens.css";
@@ -32,6 +39,16 @@ const searchEntry: SearchActivityEntry = {
   detail: "package contract",
   id: "search-entry",
 };
+const subagent: SubagentItem = {
+  id: "package-consumer",
+  name: "Consumer",
+  status: "active",
+};
+const subagentActivity: SubagentActivityItem = {
+  activityStatus: "active",
+  id: subagent.id,
+  name: subagent.name,
+};
 
 void FileChange;
 void FileDiff;
@@ -44,6 +61,11 @@ void CommandExecution;
 void CommandOutput;
 void ProposedPlan;
 void SearchActivity;
+void SubagentActivity;
+void SubagentActivityGroup;
+void SubagentPanel;
+void SubagentSummary;
+void SubagentTranscriptHeader;
 void TurnDuration;
 void formatCommandDuration;
 void fileDiffToText([line]);
@@ -52,3 +74,5 @@ void diffSize;
 void highlighter;
 void line;
 void searchEntry;
+void subagent;
+void subagentActivity;

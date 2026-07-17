@@ -25,10 +25,17 @@ import {
   ProposedPlan,
   SearchActivity,
   StatusIndicator,
+  SubagentActivity,
+  SubagentActivityGroup,
+  SubagentPanel,
+  SubagentSummary,
+  SubagentTranscriptHeader,
   ToolCallCard,
   TurnDuration,
   type ApprovalDecision,
   type FileDiffLine,
+  type SubagentActivityItem,
+  type SubagentItem,
 } from "codex-ui-kit";
 import {
   themeSources,
@@ -95,6 +102,73 @@ const desktopWebSearchEntries = Array.from({ length: 15 }, (_, index) => ({
   detail: `Desktop search result ${index + 1}: Codex Renderer behavior`,
   id: `desktop-web-result-${index + 1}`,
 }));
+
+const desktopSubagentActivities: SubagentActivityItem[] = [
+  { activityStatus: "active", id: "desktop-research", name: "Researcher" },
+  { activityStatus: "updated", id: "desktop-build", name: "Builder" },
+  { activityStatus: "active", id: "desktop-review", name: "Reviewer" },
+  { activityStatus: "active", id: "desktop-test", name: "Tester" },
+];
+
+const desktopSubagents: SubagentItem[] = [
+  {
+    id: "desktop-research",
+    lastMessage: "Measured the desktop subagent surfaces.",
+    name: "Researcher",
+    presentation: "grouped",
+    status: "active",
+    timestamp: "now",
+  },
+  {
+    id: "desktop-build",
+    name: "Builder",
+    presentation: "grouped",
+    status: "done",
+    statusSummary: "Implemented desktop-safe geometry.",
+  },
+  {
+    id: "desktop-review",
+    name: "Reviewer",
+    presentation: "grouped",
+    status: "waiting",
+  },
+  {
+    additions: 36,
+    deletions: 4,
+    id: "desktop-integration",
+    model: "gpt-5",
+    name: "Integration",
+    role: "worker",
+    status: "active",
+    statusSummary: "Validating Electron rendering.",
+  },
+  {
+    id: "desktop-accessibility",
+    lastMessage: "Checked focus-visible and accessible names.",
+    name: "Accessibility",
+    status: "done",
+    timestamp: "2m",
+  },
+  {
+    id: "desktop-responsive",
+    name: "Responsive",
+    status: "waiting",
+  },
+  {
+    id: "desktop-scroll",
+    lastMessage: "Inspecting panel scroll containment.",
+    name: "Scroll",
+    status: "active",
+    timestamp: "1m",
+  },
+  {
+    id: "desktop-theme",
+    lastMessage: "Compared the native light and dark themes.",
+    name: "Theme",
+    status: "done",
+    timestamp: "4m",
+  },
+];
 
 const desktopMarkdown = [
   "### Desktop Markdown",
@@ -189,6 +263,8 @@ export function DesktopPlayground() {
   const [hasComposerAttachment, setHasComposerAttachment] = useState(true);
   const [approvalDecision, setApprovalDecision] =
     useState<ApprovalDecision>("pending");
+  const [selectedSubagent, setSelectedSubagent] =
+    useState<SubagentItem | null>(null);
   const viewport = useViewportMetrics();
   const { metrics: fontMetrics, monoRef, sansRef } = useFontMetrics();
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -438,6 +514,91 @@ export function DesktopPlayground() {
                   pnpm --filter @codex-ui-kit/electron-playground check
                 </ApprovalRequest>
               </AgentThread>
+            </div>
+          </article>
+
+          <article className="acceptance-card acceptance-card--subagent">
+            <header>
+              <div>
+                <h2>Subagent and delegated-work states</h2>
+                <p>
+                  Inline chips, summary aggregation, panel pagination, nested
+                  transcript navigation, and compact-window behavior.
+                </p>
+              </div>
+            </header>
+            <div className="acceptance-card__body subagent-state-matrix">
+              <div className="subagent-state-matrix__wide">
+                <span className="subagent-state-matrix__label">Thread activity</span>
+                <div className="subagent-state-matrix__activity">
+                  <SubagentActivity item={desktopSubagentActivities[0]} />
+                  <SubagentActivityGroup
+                    items={desktopSubagentActivities}
+                    onOpen={(item) =>
+                      setSelectedSubagent(
+                        desktopSubagents.find((agent) => agent.id === item.id) ??
+                          null,
+                      )
+                    }
+                  />
+                  <SubagentActivityGroup
+                    animateEntrance={false}
+                    items={desktopSubagentActivities.slice(0, 2).map((item) => ({
+                      ...item,
+                      activityStatus: "done",
+                    }))}
+                  />
+                  <SubagentActivity
+                    item={{
+                      activityStatus: "interrupted",
+                      id: "desktop-test",
+                      name: "Tester",
+                    }}
+                  />
+                </div>
+              </div>
+              <div>
+                <span className="subagent-state-matrix__label">Thread summary</span>
+                <SubagentSummary
+                  items={desktopSubagents.slice(0, 5)}
+                  onOpenSubagent={setSelectedSubagent}
+                  onOpenSummary={() => setSelectedSubagent(null)}
+                />
+                <SubagentSummary
+                  items={desktopSubagents
+                    .filter((item) => item.status === "done")
+                    .map((item) => ({ ...item, presentation: "row" }))}
+                  title="Completed section"
+                />
+              </div>
+              <div className="subagent-state-matrix__panel-shell">
+                <span className="subagent-state-matrix__label">Subagents panel</span>
+                <div className="subagent-state-matrix__panel">
+                  {selectedSubagent ? (
+                    <>
+                      <SubagentTranscriptHeader
+                        item={selectedSubagent}
+                        onBack={() => setSelectedSubagent(null)}
+                      />
+                      <div className="subagent-state-matrix__transcript">
+                        <strong>{selectedSubagent.name}</strong>
+                        <p>
+                          Host-rendered transcript content remains independent
+                          from the navigation shell.
+                        </p>
+                      </div>
+                    </>
+                  ) : (
+                    <SubagentPanel
+                      items={desktopSubagents.map((item) => ({
+                        ...item,
+                        presentation: "row",
+                      }))}
+                      onSelect={setSelectedSubagent}
+                    />
+                  )}
+                </div>
+              </div>
             </div>
           </article>
 

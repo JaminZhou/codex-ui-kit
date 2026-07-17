@@ -20,11 +20,18 @@ import {
   ProposedPlan,
   SearchActivity,
   StatusIndicator,
+  SubagentActivity,
+  SubagentActivityGroup,
+  SubagentPanel,
+  SubagentSummary,
+  SubagentTranscriptHeader,
   ToolCallCard,
   TurnDuration,
   type AgentItemStatus,
   type ApprovalDecision,
   type FileDiffLine,
+  type SubagentActivityItem,
+  type SubagentItem,
 } from "../src";
 import "../src/styles.css";
 import "./showcase.css";
@@ -107,6 +114,99 @@ const webSearchEntries = Array.from({ length: 15 }, (_, index) => ({
   id: `web-result-${index + 1}`,
 }));
 
+const subagentActivities: SubagentActivityItem[] = [
+  {
+    activityStatus: "active",
+    id: "researcher-thread",
+    name: "Researcher",
+  },
+  {
+    activityStatus: "updated",
+    id: "builder-thread",
+    name: "Builder",
+  },
+  {
+    activityStatus: "active",
+    id: "reviewer-thread",
+    name: "Reviewer",
+  },
+  {
+    activityStatus: "active",
+    id: "tester-thread",
+    name: "Tester",
+  },
+];
+
+const showcaseSubagents: SubagentItem[] = [
+  {
+    id: "researcher-thread",
+    lastMessage: "Mapped delegated-work labels and the three rendering layers.",
+    name: "Researcher",
+    presentation: "grouped",
+    role: "explorer",
+    status: "active",
+    timestamp: "now",
+  },
+  {
+    id: "builder-thread",
+    name: "Builder",
+    presentation: "grouped",
+    status: "done",
+    statusSummary: "Implemented the protocol-neutral component boundary.",
+  },
+  {
+    id: "reviewer-thread",
+    name: "Reviewer",
+    presentation: "grouped",
+    status: "waiting",
+  },
+  {
+    additions: 48,
+    deletions: 6,
+    id: "integration-thread",
+    model: "gpt-5",
+    name: "Integration",
+    role: "worker",
+    status: "active",
+    statusSummary: "Connecting H5 and Electron acceptance surfaces.",
+  },
+  {
+    additions: 12,
+    deletions: 2,
+    id: "accessibility-thread",
+    lastMessage: "Verified focus, names, and keyboard activation.",
+    name: "Accessibility",
+    status: "done",
+    timestamp: "2m",
+  },
+  {
+    id: "visual-thread",
+    name: "Visual QA",
+    status: "waiting",
+  },
+  {
+    id: "responsive-thread",
+    lastMessage: "Checking the narrow side-panel layout.",
+    name: "Responsive",
+    status: "active",
+    timestamp: "1m",
+  },
+  {
+    id: "tests-thread",
+    lastMessage: "Added interaction and visual-contract coverage.",
+    name: "Tests",
+    status: "active",
+    timestamp: "3m",
+  },
+  {
+    id: "docs-thread",
+    lastMessage: "Recorded independent implementation observations.",
+    name: "Docs",
+    status: "done",
+    timestamp: "5m",
+  },
+];
+
 const markdownShowcase = [
   "## Implementation notes",
   "",
@@ -172,6 +272,8 @@ function Showcase() {
   const [toolActionStatus, setToolActionStatus] = useState(
     "Raw tool output ready",
   );
+  const [selectedSubagent, setSelectedSubagent] =
+    useState<SubagentItem | null>(null);
 
   return (
     <main
@@ -266,6 +368,88 @@ function Showcase() {
                   The implementation is ready; I’m waiting for the final checks.
                 </AgentMessage>
               </AgentThread>
+            </div>
+          </GalleryCard>
+
+          <GalleryCard
+            description="Delegated-work activity, summary aggregation, active/done lists, pagination, and nested transcript navigation."
+            title="Subagents and delegated work"
+            wide
+          >
+            <div className="subagent-preview">
+              <div className="subagent-preview__surface subagent-preview__surface--wide">
+                <span className="subagent-preview__label">Thread activity</span>
+                <div className="subagent-preview__activity">
+                  <SubagentActivity item={subagentActivities[0]} />
+                  <SubagentActivityGroup
+                    items={subagentActivities}
+                    onOpen={(item) =>
+                      setSelectedSubagent(
+                        showcaseSubagents.find((agent) => agent.id === item.id) ??
+                          null,
+                      )
+                    }
+                  />
+                  <SubagentActivityGroup
+                    animateEntrance={false}
+                    items={subagentActivities.slice(0, 2).map((item) => ({
+                      ...item,
+                      activityStatus: "done",
+                    }))}
+                  />
+                  <SubagentActivity
+                    item={{
+                      activityStatus: "interrupted",
+                      id: "tester-thread",
+                      name: "Tester",
+                    }}
+                  />
+                </div>
+              </div>
+
+              <div className="subagent-preview__surface">
+                <span className="subagent-preview__label">Thread summary</span>
+                <SubagentSummary
+                  items={showcaseSubagents.slice(0, 5)}
+                  onOpenSubagent={setSelectedSubagent}
+                  onOpenSummary={() => setSelectedSubagent(null)}
+                />
+                <SubagentSummary
+                  items={showcaseSubagents
+                    .filter((item) => item.status === "done")
+                    .map((item) => ({ ...item, presentation: "row" }))}
+                  title="Completed section"
+                />
+              </div>
+
+              <div className="subagent-preview__surface subagent-preview__panel-shell">
+                <span className="subagent-preview__label">Subagents panel</span>
+                <div className="subagent-preview__panel">
+                  {selectedSubagent ? (
+                    <>
+                      <SubagentTranscriptHeader
+                        item={selectedSubagent}
+                        onBack={() => setSelectedSubagent(null)}
+                      />
+                      <div className="subagent-preview__transcript">
+                        <strong>{selectedSubagent.name}</strong>
+                        <p>
+                          Nested subagent transcripts remain host-rendered; the
+                          header preserves the selected identity and back path.
+                        </p>
+                      </div>
+                    </>
+                  ) : (
+                    <SubagentPanel
+                      items={showcaseSubagents.map((item) => ({
+                        ...item,
+                        presentation: "row",
+                      }))}
+                      onSelect={setSelectedSubagent}
+                    />
+                  )}
+                </div>
+              </div>
             </div>
           </GalleryCard>
 
