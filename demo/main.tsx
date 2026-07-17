@@ -15,11 +15,14 @@ import {
   CommandExecution,
   CommandOutput,
   ComposerAttachment,
+  ComposerMentionMenu,
+  ComposerModeIndicator,
   FileChange,
   FileDiff,
   fileDiffToText,
   InlineNotice,
   ProposedPlan,
+  QueuedPromptList,
   SearchActivity,
   StatusIndicator,
   StatusBanner,
@@ -34,6 +37,7 @@ import {
   type AgentItemStatus,
   type ApprovalDecision,
   type FileDiffLine,
+  type QueuedPrompt,
   type SubagentActivityItem,
   type SubagentItem,
 } from "../src";
@@ -268,6 +272,17 @@ function Showcase() {
   const [composerRunning, setComposerRunning] = useState(false);
   const [composerStatus, setComposerStatus] = useState("Ready to submit");
   const [hasAttachment, setHasAttachment] = useState(true);
+  const [mentionOpen, setMentionOpen] = useState(true);
+  const [queuedPrompts, setQueuedPrompts] = useState<QueuedPrompt[]>([
+    { id: "queue-tests", text: "Run the complete test matrix" },
+    {
+      attachmentSummary: "1 attachment",
+      id: "queue-fix",
+      status: "paused",
+      text: "Fix the remaining visual mismatch",
+    },
+    { id: "queue-docs", status: "editing", text: "Update parity notes" },
+  ]);
   const [approvalDecision, setApprovalDecision] =
     useState<ApprovalDecision>("pending");
   const [approvalActionStatus, setApprovalActionStatus] = useState(
@@ -284,6 +299,19 @@ function Showcase() {
   );
   const [selectedSubagent, setSelectedSubagent] =
     useState<SubagentItem | null>(null);
+
+  const reorderQueuedPrompts = (activeId: string, overId: string) => {
+    setQueuedPrompts((current) => {
+      const activeIndex = current.findIndex((item) => item.id === activeId);
+      const overIndex = current.findIndex((item) => item.id === overId);
+      if (activeIndex < 0 || overIndex < 0) return current;
+      const next = [...current];
+      const [active] = next.splice(activeIndex, 1);
+      if (!active) return current;
+      next.splice(overIndex, 0, active);
+      return next;
+    });
+  };
 
   return (
     <main
@@ -378,6 +406,176 @@ function Showcase() {
                   The implementation is ready; I’m waiting for the final checks.
                 </AgentMessage>
               </AgentThread>
+            </div>
+          </GalleryCard>
+
+          <GalleryCard
+            description="Card and image attachments, grouped mentions, active modes, and a reorderable queued-prompt state machine."
+            title="Composer context and queue"
+            wide
+          >
+            <div className="composer-aux-preview">
+              <div className="composer-aux-preview__grid">
+                <div className="composer-aux-preview__sample composer-aux-preview__sample--mentions">
+                  <span>Mention tray · grouped + keyboard</span>
+                  <AgentComposer
+                    actions={<button type="button">+</button>}
+                    controls={
+                      <ComposerModeIndicator
+                        clearLabel="Clear plan mode"
+                        kind="plan"
+                        label="Plan"
+                        onClear={() => setComposerStatus("Plan mode cleared")}
+                      />
+                    }
+                    onSubmit={() => undefined}
+                    onValueChange={() => undefined}
+                    suggestions={
+                      mentionOpen ? (
+                        <ComposerMentionMenu
+                          groups={[
+                            {
+                              id: "files",
+                              label: "Files",
+                              options: [
+                                {
+                                  description: "TypeScript",
+                                  icon: "TS",
+                                  id: "app-file",
+                                  kind: "file",
+                                  label: "src/App.tsx",
+                                },
+                                {
+                                  description: "Markdown",
+                                  icon: "#",
+                                  id: "readme-file",
+                                  kind: "file",
+                                  label: "README.md",
+                                },
+                              ],
+                            },
+                            {
+                              id: "skills",
+                              label: "Skills and agents",
+                              options: [
+                                {
+                                  description: "Local skill",
+                                  icon: "S",
+                                  id: "browser-skill",
+                                  kind: "skill",
+                                  label: "browser",
+                                },
+                              ],
+                            },
+                          ]}
+                          onDismiss={() => setMentionOpen(false)}
+                          onSelect={(option) => {
+                            setComposerStatus(`Mentioned: ${String(option.label)}`);
+                            setMentionOpen(false);
+                          }}
+                          query="@"
+                        />
+                      ) : undefined
+                    }
+                    value="@"
+                  />
+                  {!mentionOpen ? (
+                    <button
+                      className="composer-aux-preview__reset"
+                      onClick={() => setMentionOpen(true)}
+                      type="button"
+                    >
+                      Reopen mention tray
+                    </button>
+                  ) : null}
+                </div>
+
+                <div className="composer-aux-preview__sample">
+                  <span>Attachment tray · file + paste + image</span>
+                  <AgentComposer
+                    attachments={
+                      <>
+                        <ComposerAttachment
+                          kind="file"
+                          label="src/AgentComposer.tsx"
+                          layout="card"
+                          meta="TypeScript · 12 KB"
+                          onRemove={() => undefined}
+                        />
+                        <ComposerAttachment
+                          kind="pasted-text"
+                          label="Pasted text"
+                          layout="card"
+                          status="uploading"
+                        />
+                        <ComposerAttachment
+                          kind="image"
+                          label="UI reference"
+                          layout="image"
+                          previewSrc="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='72' height='72'%3E%3Crect width='72' height='72' fill='%23339cff'/%3E%3Cpath d='M14 50l14-17 9 10 8-9 13 16' fill='none' stroke='white' stroke-width='4'/%3E%3C/svg%3E"
+                        />
+                      </>
+                    }
+                    controls={
+                      <ComposerModeIndicator
+                        clearLabel="Clear goal"
+                        kind="goal"
+                        label="Goal"
+                        onClear={() => setComposerStatus("Goal cleared")}
+                      />
+                    }
+                    onSubmit={() => undefined}
+                    onValueChange={() => undefined}
+                    value="Use the attached context"
+                  />
+                </div>
+
+                <div className="composer-aux-preview__sample composer-aux-preview__sample--wide">
+                  <span>Queued prompts · interrupted + paused + editing</span>
+                  <AgentComposer
+                    controls={
+                      <ComposerModeIndicator
+                        clearLabel="Clear review mode"
+                        kind="review"
+                        label="Review"
+                        onClear={() => setComposerStatus("Review mode cleared")}
+                      />
+                    }
+                    isRunning
+                    onStop={() => setComposerStatus("Stopped from queue preview")}
+                    onSubmit={() => undefined}
+                    onValueChange={() => undefined}
+                    queue={
+                      <QueuedPromptList
+                        interrupted
+                        items={queuedPrompts}
+                        onDelete={(id) =>
+                          setQueuedPrompts((current) =>
+                            current.filter((item) => item.id !== id),
+                          )
+                        }
+                        onEdit={(id) =>
+                          setQueuedPrompts((current) =>
+                            current.map((item) => ({
+                              ...item,
+                              status: item.id === id ? "editing" : item.status,
+                            })),
+                          )
+                        }
+                        onQueueingChange={(enabled) =>
+                          setComposerStatus(`Queueing ${enabled ? "on" : "off"}`)
+                        }
+                        onReorder={reorderQueuedPrompts}
+                        onResume={() => setComposerStatus("Queue resumed")}
+                        onSendNow={(id) =>
+                          setComposerStatus(`Steered: ${id}`)
+                        }
+                      />
+                    }
+                    value="Add another follow-up"
+                  />
+                </div>
+              </div>
             </div>
           </GalleryCard>
 

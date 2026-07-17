@@ -42,7 +42,7 @@ A row is complete only when all applicable gates pass:
 | Approval and permission requests | Complete | Measured | Complete | Complete | Good | Complete |
 | Errors, warnings, notices, retry, and interruption | Complete | Measured | Complete | Complete | Good | Complete |
 | Composer shell and autosizing input | Complete | Measured | Complete | Complete | Good | Complete |
-| Composer attachments, mentions, modes, and queued prompts | Attachment only | Partial | Partial | Partial | Basic | Gap |
+| Composer attachments, mentions, modes, and queued prompts | Complete | Measured | Complete | Complete | Good | Complete |
 | Buttons, icon buttons, menus, tooltips, popovers, and selects | Slots only | Missing | Missing | Missing | Missing | Gap |
 | Resource cards, citations, images, and artifacts | Missing | Missing | Missing | Missing | Missing | Gap |
 | Thread header, floating controls, and navigation affordances | Missing | Missing | Missing | Missing | Missing | Gap |

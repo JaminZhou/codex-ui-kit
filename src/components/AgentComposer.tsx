@@ -16,14 +16,14 @@ import {
   type ReactNode,
 } from "react";
 
-function hasRenderableAttachmentContent(children: ReactNode): boolean {
+function hasRenderableContent(children: ReactNode): boolean {
   return Children.toArray(children).some((child) => {
     if (typeof child === "string") return child.trim().length > 0;
     if (
       isValidElement<{ children?: ReactNode }>(child) &&
       child.type === Fragment
     ) {
-      return hasRenderableAttachmentContent(child.props.children);
+      return hasRenderableContent(child.props.children);
     }
     return true;
   });
@@ -43,6 +43,8 @@ export interface AgentComposerProps
   onSubmit: (value: string) => void;
   onValueChange: (value: string) => void;
   placeholder?: string;
+  queue?: ReactNode;
+  suggestions?: ReactNode;
   stopLabel?: string;
   submitLabel?: string;
   textareaLabel?: string;
@@ -69,10 +71,12 @@ export const AgentComposer = forwardRef<
     onSubmit,
     onValueChange,
     placeholder = "Ask the agent to do something…",
+    queue,
     stopLabel = "Stop generation",
     submitLabel = "Send message",
     textareaLabel = "Message",
     textareaProps,
+    suggestions,
     value,
     "aria-label": ariaLabel = "Agent composer",
     onClick,
@@ -80,7 +84,9 @@ export const AgentComposer = forwardRef<
   },
   forwardedRef,
 ) {
-  const hasAttachments = hasRenderableAttachmentContent(attachments);
+  const hasAttachments = hasRenderableContent(attachments);
+  const hasQueue = hasRenderableContent(queue);
+  const hasSuggestions = hasRenderableContent(suggestions);
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
   const formRef = useRef<HTMLFormElement | null>(null);
   const fieldsetRef = useRef<HTMLFieldSetElement | null>(null);
@@ -92,7 +98,9 @@ export const AgentComposer = forwardRef<
   const [automaticLayout, setAutomaticLayout] = useState<
     Exclude<ComposerLayout, "auto">
   >(() =>
-    hasAttachments || value.includes("\n") ? "multiline" : "single-line",
+    hasAttachments || hasQueue || value.includes("\n")
+      ? "multiline"
+      : "single-line",
   );
   const {
     className: textareaClassName,
@@ -102,7 +110,8 @@ export const AgentComposer = forwardRef<
     ...restTextareaProps
   } = textareaProps ?? {};
   const canSubmit = !disabled && !isRunning && value.trim().length > 0;
-  const contentRequiresMultiline = hasAttachments || value.includes("\n");
+  const contentRequiresMultiline =
+    hasAttachments || hasQueue || value.includes("\n");
   const resolvedLayout = contentRequiresMultiline
     ? "multiline"
     : layout === "auto"
@@ -157,7 +166,7 @@ export const AgentComposer = forwardRef<
           measuredTextWidth > singleLineInputWidth);
 
       nextLayout =
-        hasAttachments || value.includes("\n") || textWouldOverflow
+        hasAttachments || hasQueue || value.includes("\n") || textWouldOverflow
           ? "multiline"
           : "single-line";
       setAutomaticLayout((current) =>
@@ -177,7 +186,7 @@ export const AgentComposer = forwardRef<
       textarea.scrollHeight,
     );
     textarea.style.height = nextHeight > 0 ? `${nextHeight}px` : "";
-  }, [contentRequiresMultiline, hasAttachments, layout, value]);
+  }, [contentRequiresMultiline, hasAttachments, hasQueue, layout, value]);
 
   useLayoutEffect(measureLayoutAndResize, [
     automaticLayout,
@@ -248,16 +257,21 @@ export const AgentComposer = forwardRef<
       data-disabled={disabled || undefined}
       data-layout={resolvedLayout}
       data-running={isRunning || undefined}
+      data-suggestions-open={hasSuggestions || undefined}
       ref={formRef}
       {...formProps}
       onClick={handleSurfaceClick}
       onSubmit={handleSubmit}
     >
+      {hasSuggestions ? (
+        <div className="codex-ui-composer__suggestions">{suggestions}</div>
+      ) : null}
       <fieldset
         className="codex-ui-composer__fieldset"
         disabled={disabled}
         ref={fieldsetRef}
       >
+        {hasQueue ? <div className="codex-ui-composer__queue">{queue}</div> : null}
         {hasAttachments ? (
           <div className="codex-ui-composer__attachments" aria-label="Attachments">
             {attachments}
@@ -338,37 +352,107 @@ export const AgentComposer = forwardRef<
 });
 
 export interface ComposerAttachmentProps
-  extends Omit<ComponentPropsWithoutRef<"span">, "children"> {
+  extends Omit<
+    ComponentPropsWithoutRef<"span">,
+    "children" | "onClick" | "onKeyDown"
+  > {
+  icon?: ReactNode;
+  kind?: "file" | "image" | "pasted-text" | "selection";
   label: string;
+  layout?: "card" | "image" | "pill";
   meta?: string;
+  onOpen?: () => void;
   onRemove?: () => void;
+  openLabel?: string;
+  previewSrc?: string;
   removeLabel?: string;
+  status?: "error" | "ready" | "uploading";
 }
 
 export function ComposerAttachment({
   className,
+  icon,
+  kind = "file",
   label,
+  layout = "pill",
   meta,
+  onOpen,
   onRemove,
+  openLabel = `Open ${label}`,
+  previewSrc,
   removeLabel = `Remove ${label}`,
+  status = "ready",
   ...props
 }: ComposerAttachmentProps) {
   const classes = ["codex-ui-composer-attachment", className]
     .filter(Boolean)
     .join(" ");
 
+  const content = (
+    <>
+      {previewSrc ? (
+        <img
+          alt=""
+          className="codex-ui-composer-attachment__preview"
+          src={previewSrc}
+        />
+      ) : (
+        <span aria-hidden="true" className="codex-ui-composer-attachment__icon">
+          {icon ??
+            (kind === "pasted-text"
+              ? "▤"
+              : kind === "selection"
+                ? "⌁"
+                : "□")}
+        </span>
+      )}
+      <span className="codex-ui-composer-attachment__copy">
+        <span className="codex-ui-composer-attachment__label">{label}</span>
+        {meta || status !== "ready" ? (
+          <span
+            className="codex-ui-composer-attachment__meta"
+            role={status === "ready" ? undefined : "status"}
+          >
+            {status === "uploading"
+              ? "Uploading…"
+              : status === "error"
+                ? "Upload failed"
+                : meta}
+          </span>
+        ) : null}
+      </span>
+    </>
+  );
+
   return (
     <span
       className={classes}
+      data-interactive={Boolean(onOpen) || undefined}
+      data-kind={kind}
+      data-layout={layout}
       data-removable={Boolean(onRemove) || undefined}
+      data-status={status}
       {...props}
     >
-      <span className="codex-ui-composer-attachment__label">{label}</span>
-      {meta ? (
-        <span className="codex-ui-composer-attachment__meta">{meta}</span>
-      ) : null}
+      {onOpen ? (
+        <button
+          aria-label={openLabel}
+          className="codex-ui-composer-attachment__open"
+          onClick={onOpen}
+          type="button"
+        >
+          {content}
+        </button>
+      ) : (
+        content
+      )}
       {onRemove ? (
-        <button aria-label={removeLabel} onClick={onRemove} type="button">
+        <button
+          aria-label={removeLabel}
+          className="codex-ui-composer-attachment__remove"
+          onClick={onRemove}
+          type="button"
+        >
           <span aria-hidden="true">×</span>
         </button>
       ) : null}

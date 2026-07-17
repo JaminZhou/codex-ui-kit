@@ -20,11 +20,14 @@ import {
   CommandExecution,
   CommandOutput,
   ComposerAttachment,
+  ComposerMentionMenu,
+  ComposerModeIndicator,
   FileChange,
   FileDiff,
   fileDiffToText,
   InlineNotice,
   ProposedPlan,
+  QueuedPromptList,
   SearchActivity,
   StatusIndicator,
   StatusBanner,
@@ -1178,7 +1181,9 @@ export function DesktopPlayground() {
             <div className="acceptance-card__body font-checks">
               <div>
                 <span>Sans</span>
-                <strong ref={sansRef}>Agent interface Aa 0123</strong>
+                <strong data-font-probe="sans" ref={sansRef}>
+                  Agent interface Aa 0123
+                </strong>
                 <code>{fontMetrics?.sansFamily ?? "measuring…"}</code>
                 <small>{fontMetrics?.sansWidth ?? "…"} px sample width</small>
               </div>
@@ -1276,6 +1281,7 @@ export function DesktopPlayground() {
             hasComposerAttachment ? (
               <ComposerAttachment
                 label="DesktopPlayground.tsx"
+                layout="card"
                 meta="Renderer"
                 onRemove={() => setHasComposerAttachment(false)}
               />
@@ -1283,6 +1289,12 @@ export function DesktopPlayground() {
           }
           controls={
             <>
+              <ComposerModeIndicator
+                clearLabel="Clear plan mode"
+                kind="plan"
+                label="Plan"
+                onClear={() => setComposerStatus("Plan mode cleared")}
+              />
               <select aria-label="Desktop execution mode" defaultValue="local">
                 <option value="local">Local</option>
                 <option value="remote">Remote</option>
@@ -1348,6 +1360,80 @@ export function DesktopPlayground() {
               onSubmit={() => undefined}
               onValueChange={() => undefined}
               value="Waiting for the active task"
+            />
+          </div>
+          <div className="desktop-composer-dock__sample desktop-composer-dock__sample--mentions">
+            <span>Mentions · expanded tray</span>
+            <AgentComposer
+              controls={
+                <ComposerModeIndicator
+                  clearLabel="Clear goal"
+                  kind="goal"
+                  label="Goal"
+                  onClear={() => undefined}
+                />
+              }
+              onSubmit={() => undefined}
+              onValueChange={() => undefined}
+              suggestions={
+                <ComposerMentionMenu
+                  groups={[
+                    {
+                      id: "desktop-files",
+                      label: "Files",
+                      options: [
+                        {
+                          description: "Renderer",
+                          icon: "TS",
+                          id: "desktop-playground",
+                          kind: "file",
+                          label: "DesktopPlayground.tsx",
+                        },
+                        {
+                          description: "Styles",
+                          icon: "#",
+                          id: "desktop-styles",
+                          kind: "file",
+                          label: "styles.css",
+                        },
+                      ],
+                    },
+                  ]}
+                  onSelect={() => undefined}
+                  query="@desktop"
+                />
+              }
+              value="@desktop"
+            />
+          </div>
+          <div className="desktop-composer-dock__sample">
+            <span>Queue · interrupted + paused</span>
+            <AgentComposer
+              isRunning
+              onStop={() => undefined}
+              onSubmit={() => undefined}
+              onValueChange={() => undefined}
+              queue={
+                <QueuedPromptList
+                  interrupted
+                  items={[
+                    { id: "desktop-one", text: "Validate system theme" },
+                    {
+                      attachmentSummary: "1 attachment",
+                      id: "desktop-two",
+                      status: "paused",
+                      text: "Retry compact geometry",
+                    },
+                  ]}
+                  onDelete={() => undefined}
+                  onEdit={() => undefined}
+                  onQueueingChange={() => undefined}
+                  onReorder={() => undefined}
+                  onResume={() => undefined}
+                  onSendNow={() => undefined}
+                />
+              }
+              value="Queue another desktop check"
             />
           </div>
         </div>

@@ -709,6 +709,14 @@ button {
   width: 100%;
 }
 
+.desktop-composer-dock__sample--mentions {
+  padding-top: 0;
+}
+
+.desktop-composer-dock__sample--mentions > .codex-ui-composer {
+  margin-top: 11.5rem;
+}
+
 .desktop-footer {
   align-items: center;
   background: color-mix(in srgb, var(--codex-ui-bg) 92%, transparent);

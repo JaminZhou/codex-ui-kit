@@ -13,12 +13,17 @@ import {
   CommandOutput,
   type CodeHighlighter,
   ComposerAttachment,
+  ComposerMentionMenu,
+  type ComposerMentionOption,
+  ComposerModeIndicator,
   type ComposerLayout,
   FileChange,
   FileDiff,
   InlineNotice,
   type NoticeTone,
   ProposedPlan,
+  type QueuedPrompt,
+  QueuedPromptList,
   SearchActivity,
   StatusBanner,
   type StatusBannerAction,
@@ -71,6 +76,14 @@ const noticeAction: StatusBannerAction = {
   variant: "primary",
 };
 const composerLayout: ComposerLayout = "auto";
+const mentionOption: ComposerMentionOption = {
+  id: "package-consumer",
+  label: "Package consumer",
+};
+const queuedPrompt: QueuedPrompt = {
+  id: "queued-package-consumer",
+  text: "Verify public types",
+};
 
 void FileChange;
 void FileDiff;
@@ -86,7 +99,10 @@ void CodeBlock;
 void CommandExecution;
 void CommandOutput;
 void ComposerAttachment;
+void ComposerMentionMenu;
+void ComposerModeIndicator;
 void ProposedPlan;
+void QueuedPromptList;
 void SearchActivity;
 void StatusBanner;
 void StreamNotice;
@@ -110,3 +126,5 @@ void approvalKind;
 void noticeTone;
 void noticeAction;
 void composerLayout;
+void mentionOption;
+void queuedPrompt;

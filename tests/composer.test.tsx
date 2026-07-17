@@ -91,6 +91,48 @@ describe("AgentComposer", () => {
     ).toBe("single-line");
   });
 
+  it("keeps queue content multiline and suggestion trays structural", () => {
+    const { container, rerender } = render(
+      <AgentComposer
+        onSubmit={() => undefined}
+        onValueChange={() => undefined}
+        queue={<span>Queued follow-up</span>}
+        suggestions={<span role="listbox">Mention results</span>}
+        value="Short"
+      />,
+    );
+
+    const composer = container.querySelector("form");
+    expect(composer?.getAttribute("data-layout")).toBe("multiline");
+    expect(composer?.getAttribute("data-suggestions-open")).toBe("true");
+    expect(
+      container.querySelector(".codex-ui-composer__queue")?.textContent,
+    ).toContain("Queued follow-up");
+
+    rerender(
+      <AgentComposer
+        onSubmit={() => undefined}
+        onValueChange={() => undefined}
+        queue={false}
+        value="Short"
+      />,
+    );
+    expect(composer?.getAttribute("data-layout")).toBe("single-line");
+    expect(composer?.hasAttribute("data-suggestions-open")).toBe(false);
+
+    rerender(
+      <AgentComposer
+        onSubmit={() => undefined}
+        onValueChange={() => undefined}
+        suggestions={<></>}
+        value="Short"
+      />,
+    );
+    expect(
+      container.querySelector(".codex-ui-composer__suggestions"),
+    ).toBeNull();
+  });
+
   it("treats empty attachment collections as absent", () => {
     const files: string[] = [];
     const { container, rerender } = render(
@@ -626,5 +668,29 @@ describe("AgentComposer", () => {
     expect(screen.getByText("12 KB")).toBeTruthy();
     fireEvent.click(screen.getByRole("button", { name: "Remove src/App.tsx" }));
     expect(onRemove).toHaveBeenCalledOnce();
+  });
+
+  it("keeps attachment open and remove actions as sibling controls", () => {
+    const onOpen = vi.fn();
+    const onRemove = vi.fn();
+    const { container } = render(
+      <ComposerAttachment
+        label="reference.png"
+        layout="image"
+        onOpen={onOpen}
+        onRemove={onRemove}
+      />,
+    );
+
+    const open = screen.getByRole("button", { name: "Open reference.png" });
+    const remove = screen.getByRole("button", { name: "Remove reference.png" });
+    expect(open.parentElement).toBe(remove.parentElement);
+    expect(open.contains(remove)).toBe(false);
+
+    fireEvent.click(open);
+    fireEvent.click(remove);
+    expect(onOpen).toHaveBeenCalledOnce();
+    expect(onRemove).toHaveBeenCalledOnce();
+    expect(container.querySelector('[role="button"]')).toBeNull();
   });
 });

@@ -100,7 +100,15 @@ the pnpm workspace. Electron is not a dependency of `codex-ui-kit`.
   behavior; shell-to-input focus transfer; and protocol-neutral slots.
   Attachments and explicit line breaks remain structurally multiline even when
   a host requests the compact layout.
-- `ComposerAttachment`: removable attachment metadata primitive.
+- `ComposerAttachment`: pill, card, and image attachment layouts with open,
+  remove, ready, uploading, and error states.
+- `ComposerMentionMenu`: grouped file, skill, app, agent, or custom mention
+  results with loading, empty, disabled, active, and keyboard-selection states.
+- `ComposerModeIndicator`: compact Plan, Goal, Review, or host-defined footer
+  mode with the observed hover-to-clear affordance.
+- `QueuedPromptList`: reorderable queued follow-ups with queued, editing,
+  paused, interrupted, retry/steer, edit, delete, resume, and queue-toggle
+  behavior.
 
 The default stylesheet supports light, dark, and system color schemes. Set
 `data-theme="light"` or `data-theme="dark"` on an ancestor to force a theme.

@@ -1,3 +1,4 @@
+import { mkdir, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import {
   app,
@@ -22,6 +23,79 @@ const defaultPreset: WindowPreset = "standard";
 const minimumSize = { height: 620, width: 720 };
 
 let mainWindow: BrowserWindow | null = null;
+
+async function captureAcceptance(browserWindow: BrowserWindow) {
+  const outputDirectory = process.env.CODEX_UI_KIT_ACCEPTANCE_DIR;
+  if (!outputDirectory) return;
+
+  await new Promise((resolve) => setTimeout(resolve, 500));
+  const metrics = await browserWindow.webContents.executeJavaScript(`(() => {
+    const rect = (element) => {
+      if (!element) return null;
+      const bounds = element.getBoundingClientRect();
+      return {
+        bottom: bounds.bottom,
+        height: bounds.height,
+        left: bounds.left,
+        right: bounds.right,
+        top: bounds.top,
+        width: bounds.width,
+      };
+    };
+    const overlaps = (first, second) => {
+      if (!first || !second) return null;
+      const a = first.getBoundingClientRect();
+      const b = second.getBoundingClientRect();
+      return !(
+        a.right <= b.left ||
+        a.left >= b.right ||
+        a.bottom <= b.top ||
+        a.top >= b.bottom
+      );
+    };
+    const mention = document.querySelector('.codex-ui-composer-mention-menu');
+    const mentionForm = mention?.closest('.codex-ui-composer');
+    const mentionFieldset = mentionForm?.querySelector('.codex-ui-composer__fieldset');
+    const mentionSample = mentionForm?.closest('.desktop-composer-dock__sample--mentions');
+    const mentionLabel = mentionSample?.querySelector(':scope > span');
+    const attachments = document.querySelector('.desktop-composer-dock .codex-ui-composer__attachments');
+    const queue = document.querySelector('.desktop-composer-dock .codex-ui-composer-queue');
+    const fontProbe = document.querySelector('[data-font-probe="sans"]');
+    return {
+      attachments: rect(attachments),
+      attachmentsOverflowX: attachments ? getComputedStyle(attachments).overflowX : null,
+      bodyScrollWidth: document.body.scrollWidth,
+      clientWidth: document.documentElement.clientWidth,
+      fontFamily: fontProbe ? getComputedStyle(fontProbe).fontFamily : null,
+      mention: rect(mention),
+      mentionFieldset: rect(mentionFieldset),
+      mentionForm: rect(mentionForm),
+      mentionLabel: rect(mentionLabel),
+      mentionLabelOverlapsTray: overlaps(mentionLabel, mention),
+      mentionMaxHeight: mention ? getComputedStyle(mention).maxHeight : null,
+      queue: rect(queue),
+      queueMaxHeight: queue ? getComputedStyle(queue).maxHeight : null,
+      queueRows: [...document.querySelectorAll('.desktop-composer-dock .codex-ui-composer-queue__row')].map(rect),
+      resolvedTheme: document.querySelector('.desktop-playground')?.getAttribute('data-theme'),
+      viewport: { height: window.innerHeight, width: window.innerWidth },
+    };
+  })()`);
+  const screenshot = await browserWindow.webContents.capturePage();
+
+  await mkdir(outputDirectory, { recursive: true });
+  await Promise.all([
+    writeFile(
+      join(outputDirectory, "composer-auxiliary-metrics.json"),
+      `${JSON.stringify(metrics, null, 2)}\n`,
+    ),
+    writeFile(
+      join(outputDirectory, "composer-auxiliary.png"),
+      screenshot.toPNG(),
+    ),
+  ]);
+  console.log(`acceptance capture: ${outputDirectory}`);
+  app.quit();
+}
 
 function getThemeState(): ThemeState {
   return {
@@ -128,6 +202,12 @@ async function createWindow() {
     if (!allowedUrl || new URL(url).origin !== new URL(allowedUrl).origin) {
       event.preventDefault();
     }
+  });
+  browserWindow.webContents.once("did-finish-load", () => {
+    void captureAcceptance(browserWindow).catch((error: unknown) => {
+      console.error("acceptance capture failed", error);
+      app.exit(1);
+    });
   });
   browserWindow.once("ready-to-show", () => browserWindow.show());
   browserWindow.on("closed", () => {
