@@ -4,6 +4,8 @@ import {
   AgentPlan,
   AgentReasoning,
   AgentComposer,
+  AgentThreadViewport,
+  AgentTurn,
   ArtifactList,
   ApprovalCommandPreview,
   ApprovalRequest,
@@ -25,6 +27,7 @@ import {
   ImagePreviewDialog,
   IconButton,
   InlineNotice,
+  LoadingShimmer,
   Menu,
   MenuCheckboxItem,
   MenuItem,
@@ -43,8 +46,13 @@ import {
   FloatingThreadPanel,
   ThreadFloatingButton,
   ThreadHeader,
+  ThreadLoadingState,
   ThreadMessageNavigationRail,
   ThreadNavigationControls,
+  ThreadRenderError,
+  ThreadSkeleton,
+  ThreadThinkingPlaceholder,
+  ThreadVirtualizedPlaceholder,
   type ThreadMessageNavigationItem,
   type StatusBannerAction,
   StreamNotice,
@@ -121,11 +129,14 @@ void FileDiff;
 void GeneratedImageGallery;
 void ImagePreviewDialog;
 void InlineNotice;
+void LoadingShimmer;
 void ActivityTimeline;
 void AgentMarkdown;
 void AgentPlan;
 void AgentReasoning;
 void AgentComposer;
+void AgentThreadViewport;
+void AgentTurn;
 void ArtifactList;
 void ApprovalCommandPreview;
 void ApprovalRequest;
@@ -145,8 +156,13 @@ void SourceList;
 void FloatingThreadPanel;
 void ThreadFloatingButton;
 void ThreadHeader;
+void ThreadLoadingState;
 void ThreadMessageNavigationRail;
 void ThreadNavigationControls;
+void ThreadRenderError;
+void ThreadSkeleton;
+void ThreadThinkingPlaceholder;
+void ThreadVirtualizedPlaceholder;
 void navigationItem;
 void StreamNotice;
 void SubagentActivity;

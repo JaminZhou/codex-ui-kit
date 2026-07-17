@@ -10,6 +10,8 @@ import {
   AgentPlan,
   AgentReasoning,
   AgentThread,
+  AgentThreadViewport,
+  AgentTurn,
   ApprovalCommandPreview,
   ApprovalRequest,
   ArtifactList,
@@ -27,6 +29,7 @@ import {
   ImagePreviewDialog,
   InlineNotice,
   IconButton,
+  LoadingShimmer,
   Menu,
   MenuCheckboxItem,
   MenuItem,
@@ -53,8 +56,13 @@ import {
   Tooltip,
   ThreadFloatingButton,
   ThreadHeader,
+  ThreadLoadingState,
   ThreadMessageNavigationRail,
   ThreadNavigationControls,
+  ThreadRenderError,
+  ThreadSkeleton,
+  ThreadThinkingPlaceholder,
+  ThreadVirtualizedPlaceholder,
   TurnDuration,
   type AgentItemStatus,
   type ApprovalDecision,
@@ -378,6 +386,7 @@ function Showcase() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [floatingPanelOpen, setFloatingPanelOpen] = useState(true);
   const [navigationStatus, setNavigationStatus] = useState("Navigation ready");
+  const [threadStatus, setThreadStatus] = useState("Thread states ready");
   const [activeNavigationMessageId, setActiveNavigationMessageId] = useState<string>(
     navigationMessages[2].id,
   );
@@ -440,54 +449,107 @@ function Showcase() {
             wide
           >
             <div className="thread-preview">
-              <AgentThread aria-label="Example coding agent thread">
-                <AgentMessage role="user">
-                  Add a compact activity timeline and verify the component tests.
-                </AgentMessage>
+              <AgentThreadViewport
+                followKey={threadStatus}
+                footer={
+                  <div className="thread-preview__footer">
+                    <span>Latest turn</span>
+                    <output aria-live="polite">{threadStatus}</output>
+                  </div>
+                }
+              >
+                <AgentThread aria-label="Example coding agent thread">
+                  <AgentMessage
+                    actions={
+                      <button
+                        className="thread-message-action"
+                        onClick={() => setThreadStatus("Copied user message")}
+                        type="button"
+                      >
+                        Copy
+                      </button>
+                    }
+                    highlighted
+                    metadata="You · now"
+                    onEdit={() => setThreadStatus("Editing user message")}
+                    role="user"
+                  >
+                    Add a compact activity timeline and verify the component tests.
+                  </AgentMessage>
 
-                <AgentMessage role="assistant">
-                  <p>
-                    I’ll inspect the component model, make the change, and run
-                    checks.
-                  </p>
-                </AgentMessage>
+                  <AgentMessage role="assistant">
+                    <p>
+                      I’ll inspect the component model, make the change, and run
+                      checks.
+                    </p>
+                  </AgentMessage>
 
-                <ActivityTimeline
-                  defaultOpen
-                  persistentContent={
-                    <ToolCallCard
-                      name="pnpm check"
-                      status="running"
-                      summary="Typechecking, testing, and building the package"
-                    />
-                  }
-                  shouldShowPersistentContentGap
-                  summary={<TurnDuration durationMs={4_200} status="working" />}
-                >
-                  <ActivityGroup aria-label="Previous agent activity">
-                    <AgentReasoning status="completed">
-                      <p>Inspected the existing component boundaries.</p>
-                    </AgentReasoning>
-                    <AgentActivity
+                  <AgentTurn spacing="grouped">
+                    <ActivityTimeline
                       defaultOpen
-                      detail="3 files"
-                      kind="file-change"
-                      status="completed"
-                      summary="Implemented thread primitives"
+                      persistentContent={
+                        <ToolCallCard
+                          name="pnpm check"
+                          status="running"
+                          summary="Typechecking, testing, and building the package"
+                        />
+                      }
+                      shouldShowPersistentContentGap
+                      summary={<TurnDuration durationMs={4_200} status="working" />}
                     >
-                      <ul>
-                        <li>Added an expandable activity primitive.</li>
-                        <li>Added responsive thread and grouping layout.</li>
-                        <li>Added semantic light and dark tokens.</li>
-                      </ul>
-                    </AgentActivity>
-                  </ActivityGroup>
-                </ActivityTimeline>
+                      <ActivityGroup aria-label="Previous agent activity">
+                        <AgentReasoning status="completed">
+                          <p>Inspected the existing component boundaries.</p>
+                        </AgentReasoning>
+                        <AgentActivity
+                          defaultOpen
+                          detail="3 files"
+                          kind="file-change"
+                          status="completed"
+                          summary="Implemented thread primitives"
+                        >
+                          <ul>
+                            <li>Added an expandable activity primitive.</li>
+                            <li>Added responsive thread and grouping layout.</li>
+                            <li>Added semantic light and dark tokens.</li>
+                          </ul>
+                        </AgentActivity>
+                      </ActivityGroup>
+                    </ActivityTimeline>
+                    <ThreadThinkingPlaceholder />
+                  </AgentTurn>
 
-                <AgentMessage role="assistant" status="running">
-                  The implementation is ready; I’m waiting for the final checks.
-                </AgentMessage>
-              </AgentThread>
+                  <AgentMessage role="assistant" status="running">
+                    <LoadingShimmer>Writing the final response…</LoadingShimmer>
+                  </AgentMessage>
+                </AgentThread>
+              </AgentThreadViewport>
+            </div>
+            <div className="thread-state-matrix">
+              <div>
+                <span>Task loading</span>
+                <ThreadLoadingState />
+              </div>
+              <div>
+                <span>Reconnect</span>
+                <ThreadLoadingState kind="reconnecting" />
+              </div>
+              <div>
+                <span>Skeleton</span>
+                <ThreadSkeleton />
+              </div>
+              <div>
+                <span>Turn render error</span>
+                <ThreadRenderError
+                  onRetry={() => setThreadStatus("Retried failed turn")}
+                >
+                  The response could not be rendered.
+                </ThreadRenderError>
+              </div>
+              <div className="thread-state-matrix__placeholder">
+                <span>Virtualized estimate · 280px</span>
+                <ThreadVirtualizedPlaceholder />
+              </div>
             </div>
           </GalleryCard>
 

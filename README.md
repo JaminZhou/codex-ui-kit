@@ -45,8 +45,19 @@ the pnpm workspace. Electron is not a dependency of `codex-ui-kit`.
 
 ## Components
 
-- `AgentThread`: responsive thread content column.
-- `AgentMessage`: user, assistant, and system message presentation.
+- `AgentThread`: measured `768px` responsive content column with `12px` turn
+  separation and container-query reflow.
+- `AgentThreadViewport`: focusable, follow-aware scroll surface with a `24px`
+  latest-turn threshold, reduced-motion-safe auto-follow, and sticky footer.
+- `AgentTurn`, `ActivityGroup`, and `ThreadVirtualizedPlaceholder`: explicit
+  `16px` standard, `4px` grouped, and `280px` virtualized turn contracts.
+- `AgentMessage`: user, assistant, and system presentation with measured user
+  bubble geometry, keyboard/double-click edit activation, hover/focus actions,
+  running ARIA state, and target highlighting.
+- `ThreadLoadingState`, `ThreadThinkingPlaceholder`, `LoadingShimmer`, and
+  `ThreadSkeleton`: exact task/reconnect language plus streaming-safe progress
+  surfaces and reduced-motion fallbacks.
+- `ThreadRenderError`: compact turn-level failure with a host-owned retry hook.
 - `AgentMarkdown`: safe GFM rendering with measured rich-text geometry and
   streaming stabilization plus viewport-aware lazy syntax highlighting.
 - `InlineCode`: standalone inline-code treatment.
@@ -190,37 +201,40 @@ import {
   AgentPlan,
   AgentReasoning,
   AgentThread,
+  AgentThreadViewport,
   TurnDuration,
 } from "codex-ui-kit";
 import "codex-ui-kit/styles.css";
 
 export function Example() {
   return (
-    <AgentThread aria-label="Coding agent thread">
-      <AgentMessage role="user">Run the checks.</AgentMessage>
-      <AgentMessage role="assistant">
-        <AgentMarkdown>{"**Running** `pnpm check`."}</AgentMarkdown>
-      </AgentMessage>
-      <ActivityTimeline
-        defaultOpen
-        persistentContent={
-          <AgentReasoning status="running">
-            Inspecting the test configuration.
-          </AgentReasoning>
-        }
-        shouldShowPersistentContentGap
-        summary={<TurnDuration durationMs={4_200} status="working" />}
-      >
-        <ActivityGroup>
-          <AgentPlan
-            steps={[
-              { status: "completed", step: "Inspect configuration" },
-              { status: "in_progress", step: "Run tests" },
-            ]}
-          />
-        </ActivityGroup>
-      </ActivityTimeline>
-    </AgentThread>
+    <AgentThreadViewport>
+      <AgentThread aria-label="Coding agent thread">
+        <AgentMessage role="user">Run the checks.</AgentMessage>
+        <AgentMessage role="assistant">
+          <AgentMarkdown>{"**Running** `pnpm check`."}</AgentMarkdown>
+        </AgentMessage>
+        <ActivityTimeline
+          defaultOpen
+          persistentContent={
+            <AgentReasoning status="running">
+              Inspecting the test configuration.
+            </AgentReasoning>
+          }
+          shouldShowPersistentContentGap
+          summary={<TurnDuration durationMs={4_200} status="working" />}
+        >
+          <ActivityGroup>
+            <AgentPlan
+              steps={[
+                { status: "completed", step: "Inspect configuration" },
+                { status: "in_progress", step: "Run tests" },
+              ]}
+            />
+          </ActivityGroup>
+        </ActivityTimeline>
+      </AgentThread>
+    </AgentThreadViewport>
   );
 }
 ```

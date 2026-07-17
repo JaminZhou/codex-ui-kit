@@ -30,9 +30,9 @@ A row is complete only when all applicable gates pass:
 | Surface | Component/API | Visual parity | H5 states | Electron | Tests | Status |
 | --- | --- | --- | --- | --- | --- | --- |
 | Global tokens and themes | Complete | Measured core | Complete | Complete | Good | Complete |
-| Thread layout and turn spacing | Foundation | Partial | Partial | Partial | Basic | Gap |
-| User, assistant, and system messages | Foundation | Partial | Partial | Partial | Basic | Gap |
-| Markdown, inline code, code blocks, tables, and links | GFM + lazy highlighting | Measured core + syntax | Complete | Complete | Good | Gap |
+| Thread layout and turn spacing | Complete | Measured | Complete | Complete | Good | Complete |
+| User, assistant, and system messages | Complete | Measured | Complete | Complete | Good | Complete |
+| Markdown, inline code, code blocks, tables, and links | Complete | Measured | Complete | Complete | Good | Complete |
 | Activity rows and grouped work | Complete | Measured | Complete | Complete | Good | Complete |
 | Reasoning and plan states | Complete | Measured | Complete | Complete | Good | Complete |
 | Command execution and output | Complete | Measured | Complete | Complete | Good | Complete |
@@ -46,9 +46,23 @@ A row is complete only when all applicable gates pass:
 | Buttons, icon buttons, menus, tooltips, popovers, and selects | Complete | Measured | Complete | Complete | Good | Complete |
 | Resource cards, citations, images, and artifacts | Complete | Measured | Complete | Complete | Good | Complete |
 | Thread header, floating controls, and navigation affordances | Complete | Measured | Complete | Complete | Good | Complete |
-| Loading, streaming, skeleton, hover, focus, and reduced motion | Partial + code-prefix retention | Partial | Expanded | Expanded | Good | Gap |
-| Responsive and narrow-window behavior | Partial | Partial | Partial | Partial | Basic | Gap |
-| Package tokens, CSS exports, documentation, and provenance | Foundation | Partial | N/A | N/A | Good | Gap |
+| Loading, streaming, skeleton, hover, focus, and reduced motion | Complete | Measured | Complete | Complete | Good | Complete |
+| Responsive and narrow-window behavior | Complete | Measured | Complete | Complete | Good | Complete |
+| Package tokens, CSS exports, documentation, and provenance | Complete | Measured | N/A | N/A | Good | Complete |
+
+## Code parity closure
+
+- The H5 showcase covers every public state represented in this matrix and is
+  acceptance-checked at `1280x720` without horizontal overflow.
+- The Electron playground captures standard dark `1180x820` and compact light
+  `820x680` windows. Thread acceptance records both top/message and
+  bottom/loading state positions; all capture output remains in `/private/tmp`.
+- The package contract checks root exports, stylesheet and token subpath
+  exports, generated declarations, packed file boundaries, and a standalone
+  TypeScript consumer.
+- `SOURCES.md`, `research/README.md`, and the sampled-build note preserve the
+  clean-room provenance and asset/IPC boundaries. No extracted Renderer files
+  are tracked.
 
 ## Stop rule
 

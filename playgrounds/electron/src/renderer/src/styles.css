@@ -732,11 +732,44 @@ button {
   background-size: 2rem 2rem;
 }
 
-.thread-surface .codex-ui-thread {
+.desktop-thread-viewport {
+  background: var(--codex-ui-bg);
   border: 1px solid var(--codex-ui-border);
   border-radius: var(--codex-ui-radius-xl);
   box-shadow: 0 0.75rem 2.5rem rgb(0 0 0 / 0.06);
+  height: 36rem;
+}
+
+.thread-surface .codex-ui-thread {
   min-height: 24rem;
+}
+
+.desktop-thread-footer {
+  align-items: center;
+  color: var(--codex-ui-text-tertiary);
+  display: flex;
+  font-size: var(--codex-ui-font-size-xs);
+  justify-content: space-between;
+  line-height: var(--codex-ui-line-height-xs);
+  padding: 2rem 1.5rem 0.25rem;
+}
+
+.desktop-thread-footer output {
+  font-family: var(--codex-ui-font-mono);
+}
+
+.desktop-thread-message-action {
+  appearance: none;
+  background: transparent;
+  border: 0;
+  color: inherit;
+  cursor: pointer;
+  font: inherit;
+  padding: 0;
+}
+
+.desktop-thread-message-action:hover {
+  color: var(--codex-ui-text);
 }
 
 .font-checks {
@@ -1041,7 +1074,11 @@ button {
   }
 
   .thread-surface .codex-ui-thread {
-    padding: 1rem;
+    --codex-ui-thread-content-inline-inset: 1rem;
+  }
+
+  .desktop-thread-viewport {
+    height: 32rem;
   }
 
   .desktop-composer-dock {

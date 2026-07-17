@@ -1,6 +1,17 @@
 @import "./tokens.css";
 
 .codex-ui-thread,
+.codex-ui-thread *,
+.codex-ui-thread-viewport,
+.codex-ui-thread-viewport *,
+.codex-ui-thread-loading,
+.codex-ui-thread-loading *,
+.codex-ui-thread-thinking,
+.codex-ui-thread-thinking *,
+.codex-ui-thread-skeleton,
+.codex-ui-thread-skeleton *,
+.codex-ui-thread-render-error,
+.codex-ui-thread-render-error *,
 .codex-ui-button,
 .codex-ui-button *,
 .codex-ui-icon-button,
@@ -944,15 +955,20 @@
 .codex-ui-thread {
   background: var(--codex-ui-bg);
   color: var(--codex-ui-text);
+  container-name: codex-ui-thread;
+  container-type: inline-size;
   display: flex;
   flex-direction: column;
   font-family: var(--codex-ui-font-sans);
   font-size: var(--codex-ui-font-size);
-  gap: var(--codex-ui-item-gap);
+  gap: var(--codex-ui-thread-turn-gap);
   line-height: var(--codex-ui-line-height);
   margin-inline: auto;
   max-width: var(--codex-ui-thread-content-max-width);
-  padding: 1.5rem;
+  padding:
+    var(--codex-ui-thread-content-top-inset)
+    var(--codex-ui-thread-content-inline-inset)
+    var(--codex-ui-thread-content-bottom-inset);
   width: 100%;
 }
 
@@ -962,6 +978,66 @@
 
 .codex-ui-thread[data-width="full"] {
   max-width: none;
+}
+
+.codex-ui-thread-viewport {
+  --codex-ui-thread-content-top-inset: var(
+    --codex-ui-thread-viewport-top-inset,
+    calc(var(--codex-ui-spacing) * 8)
+  );
+  background: var(--codex-ui-bg);
+  color: var(--codex-ui-text);
+  font-family: var(--codex-ui-font-sans);
+  height: 100%;
+  overflow-anchor: none;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  position: relative;
+  scroll-behavior: smooth;
+}
+
+.codex-ui-thread-viewport:focus-visible {
+  outline: 2px solid var(--codex-ui-focus);
+  outline-offset: -2px;
+}
+
+.codex-ui-thread-viewport__content {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+  min-width: 0;
+}
+
+.codex-ui-thread-viewport__footer {
+  background: linear-gradient(
+    to bottom,
+    transparent,
+    var(--codex-ui-background-surface) 35%
+  );
+  bottom: 0;
+  padding-bottom: var(--codex-ui-thread-footer-bottom-inset);
+  position: sticky;
+  z-index: 10;
+}
+
+.codex-ui-agent-turn {
+  display: flex;
+  flex-direction: column;
+  gap: var(--codex-ui-item-gap);
+  min-width: 0;
+}
+
+.codex-ui-agent-turn[data-spacing="grouped"] {
+  gap: var(--codex-ui-group-gap);
+}
+
+.codex-ui-thread-virtualized-placeholder {
+  contain: layout paint style;
+  content-visibility: auto;
+  flex: 0 0 auto;
+  min-width: 0;
+  contain-intrinsic-size: auto var(--codex-ui-thread-placeholder-height);
 }
 
 .codex-ui-activity-group {
@@ -1579,10 +1655,13 @@
 .codex-ui-agent-message {
   color: var(--codex-ui-text);
   display: flex;
+  flex-direction: column;
   min-width: 0;
 }
 
 .codex-ui-agent-message[data-role="user"] {
+  align-items: flex-end;
+  gap: var(--codex-ui-group-gap);
   justify-content: flex-end;
 }
 
@@ -1594,9 +1673,21 @@
   .codex-ui-agent-message__content {
   background: color-mix(in srgb, var(--codex-ui-text) 5%, transparent);
   border-radius: var(--codex-ui-radius-message);
-  max-width: 77%;
+  max-width: var(--codex-ui-user-message-max-width);
+  overflow: hidden;
   overflow-wrap: anywhere;
   padding: 0.5rem 0.75rem;
+}
+
+.codex-ui-agent-message[data-role="user"]
+  .codex-ui-agent-message__content:focus-visible {
+  outline: 2px solid var(--codex-ui-focus);
+  outline-offset: 2px;
+}
+
+.codex-ui-agent-message[data-role="user"]
+  .codex-ui-agent-message__content[data-editable] {
+  cursor: pointer;
 }
 
 .codex-ui-agent-message[data-role="assistant"]
@@ -1611,6 +1702,35 @@
   padding-left: 0.75rem;
 }
 
+.codex-ui-agent-message__accessories {
+  align-items: center;
+  color: var(--codex-ui-text-tertiary);
+  display: flex;
+  font-size: var(--codex-ui-font-size-xs);
+  gap: var(--codex-ui-group-gap);
+  line-height: var(--codex-ui-line-height-xs);
+  min-height: var(--codex-ui-line-height-xs);
+}
+
+.codex-ui-agent-message__actions {
+  align-items: center;
+  display: flex;
+  gap: var(--codex-ui-group-gap);
+  opacity: 0;
+  transition: opacity var(--codex-ui-transition-fast);
+}
+
+.codex-ui-agent-message:hover .codex-ui-agent-message__actions,
+.codex-ui-agent-message:focus-within .codex-ui-agent-message__actions {
+  opacity: 1;
+}
+
+.codex-ui-agent-message[data-highlighted]
+  .codex-ui-agent-message__content[data-user-message-bubble] {
+  animation: codex-ui-message-target-highlight
+    var(--codex-ui-message-highlight-duration) ease-out both;
+}
+
 .codex-ui-agent-message__content > :first-child,
 .codex-ui-activity__body > :first-child {
   margin-top: 0;
@@ -1622,7 +1742,119 @@
 }
 
 .codex-ui-agent-message[data-status="running"] {
-  animation: codex-ui-pulse 1.8s ease-in-out infinite;
+  contain: layout style;
+}
+
+.codex-ui-thread-loading {
+  align-items: center;
+  color: var(--codex-ui-text-secondary);
+  display: flex;
+  font-size: var(--codex-ui-font-size-sm);
+  gap: calc(var(--codex-ui-spacing) * 2);
+  line-height: var(--codex-ui-line-height-sm);
+  padding: var(--codex-ui-spacing) calc(var(--codex-ui-spacing) * 4);
+}
+
+.codex-ui-thread-loading__spinner {
+  animation: codex-ui-control-spin 800ms linear infinite;
+  border: 1.5px solid currentColor;
+  border-right-color: transparent;
+  border-radius: var(--codex-ui-radius-full);
+  flex: 0 0 auto;
+  height: var(--codex-ui-loading-spinner-size);
+  width: var(--codex-ui-loading-spinner-size);
+}
+
+.codex-ui-loading-shimmer {
+  animation: codex-ui-loading-shimmer
+    var(--codex-ui-loading-shimmer-duration) steps(48, end) infinite;
+  background-image: linear-gradient(
+    90deg,
+    var(--codex-ui-loading-shimmer-muted) 0%,
+    var(--codex-ui-loading-shimmer-highlight) 50%,
+    var(--codex-ui-loading-shimmer-muted) 100%
+  );
+  background-position: 100% 50%;
+  background-size: 50% 200%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.codex-ui-loading-shimmer:hover {
+  animation: none;
+  background: none;
+  color: var(--codex-ui-text);
+}
+
+.codex-ui-thread-thinking {
+  color: var(--codex-ui-text-secondary);
+  font-size: var(--codex-ui-font-size-sm);
+  line-height: var(--codex-ui-line-height-xs);
+  min-height: var(--codex-ui-line-height-xs);
+}
+
+.codex-ui-thread-skeleton {
+  display: grid;
+  gap: calc(var(--codex-ui-spacing) * 2);
+  min-width: 0;
+}
+
+.codex-ui-thread-skeleton__line {
+  animation: codex-ui-skeleton-shimmer
+    var(--codex-ui-loading-shimmer-duration) ease-in-out infinite;
+  background: linear-gradient(
+    90deg,
+    var(--codex-ui-background-elevated-secondary-opaque),
+    var(--codex-ui-background-button-secondary-hover),
+    var(--codex-ui-background-elevated-secondary-opaque)
+  );
+  background-size: 200% 100%;
+  border-radius: var(--codex-ui-radius-full);
+  display: block;
+  height: calc(var(--codex-ui-spacing) * 2);
+}
+
+.codex-ui-thread-render-error {
+  background: var(--codex-ui-background-surface);
+  border: 1px solid var(--codex-ui-border);
+  border-radius: var(--codex-ui-radius-md);
+  color: var(--codex-ui-text-secondary);
+  font-size: var(--codex-ui-font-size-sm);
+  line-height: var(--codex-ui-line-height-sm);
+  padding: calc(var(--codex-ui-spacing) * 3) calc(var(--codex-ui-spacing) * 4);
+}
+
+.codex-ui-thread-render-error__title {
+  color: var(--codex-ui-text);
+  font-weight: var(--codex-ui-font-weight-medium);
+  margin-bottom: calc(var(--codex-ui-spacing) * 2);
+}
+
+.codex-ui-thread-render-error__message {
+  margin-bottom: calc(var(--codex-ui-spacing) * 2);
+}
+
+.codex-ui-thread-render-error__retry {
+  appearance: none;
+  background: transparent;
+  border: 0;
+  border-radius: var(--codex-ui-radius-sm);
+  color: var(--codex-ui-text);
+  cursor: pointer;
+  font: inherit;
+  font-weight: var(--codex-ui-font-weight-medium);
+  margin: 0;
+  padding: 0;
+}
+
+.codex-ui-thread-render-error__retry:hover {
+  text-decoration: underline;
+}
+
+.codex-ui-thread-render-error__retry:focus-visible {
+  outline: 2px solid var(--codex-ui-focus);
+  outline-offset: 2px;
 }
 
 .codex-ui-activity {
@@ -5869,20 +6101,55 @@ button.codex-ui-subagent-panel__item:focus-visible {
   }
 }
 
+@keyframes codex-ui-loading-shimmer {
+  from {
+    background-position: 100% 50%;
+  }
+
+  to {
+    background-position: -100% 50%;
+  }
+}
+
+@keyframes codex-ui-skeleton-shimmer {
+  from {
+    background-position: 100% 0;
+  }
+
+  to {
+    background-position: -100% 0;
+  }
+}
+
+@keyframes codex-ui-message-target-highlight {
+  from {
+    background: color-mix(in srgb, var(--codex-ui-text) 14%, transparent);
+  }
+
+  to {
+    background: color-mix(in srgb, var(--codex-ui-text) 5%, transparent);
+  }
+}
+
+@container codex-ui-thread (max-width: 36rem) {
+  .codex-ui-agent-message[data-role="user"]
+    .codex-ui-agent-message__content {
+    max-width: var(--codex-ui-user-message-compact-max-width);
+  }
+}
+
 @media (max-width: 640px) {
   .codex-ui-thread {
-    padding: 1rem;
+    padding-inline: 1rem;
   }
 
   .codex-ui-agent-message[data-role="user"]
     .codex-ui-agent-message__content {
-    max-width: 88%;
+    max-width: var(--codex-ui-user-message-compact-max-width);
   }
-
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .codex-ui-agent-message[data-status="running"],
   .codex-ui-status-indicator[data-status="running"],
   .codex-ui-command-execution .codex-ui-activity__body,
   .codex-ui-file-change
@@ -5908,6 +6175,32 @@ button.codex-ui-subagent-panel__item:focus-visible {
   .codex-ui-stream-notice__details,
   .codex-ui-stream-notice__icon svg {
     animation: none;
+  }
+
+  .codex-ui-loading-shimmer {
+    animation: none;
+    background: none;
+    color: var(--codex-ui-text-secondary);
+  }
+
+  .codex-ui-thread-loading__spinner,
+  .codex-ui-thread-skeleton__line,
+  .codex-ui-agent-message[data-highlighted]
+    .codex-ui-agent-message__content[data-user-message-bubble] {
+    animation: none;
+  }
+
+  .codex-ui-agent-message[data-highlighted]
+    .codex-ui-agent-message__content[data-user-message-bubble] {
+    background: color-mix(in srgb, var(--codex-ui-text) 5%, transparent);
+  }
+
+  .codex-ui-thread-viewport {
+    scroll-behavior: auto;
+  }
+
+  .codex-ui-agent-message__actions {
+    transition: none;
   }
 
   .codex-ui-composer-queue__row {

@@ -15,6 +15,8 @@ import {
   AgentPlan,
   AgentReasoning,
   AgentThread,
+  AgentThreadViewport,
+  AgentTurn,
   ApprovalCommandPreview,
   ApprovalRequest,
   ArtifactList,
@@ -32,6 +34,7 @@ import {
   ImagePreviewDialog,
   InlineNotice,
   IconButton,
+  LoadingShimmer,
   Menu,
   MenuCheckboxItem,
   MenuItem,
@@ -58,8 +61,13 @@ import {
   Tooltip,
   ThreadFloatingButton,
   ThreadHeader,
+  ThreadLoadingState,
   ThreadMessageNavigationRail,
   ThreadNavigationControls,
+  ThreadRenderError,
+  ThreadSkeleton,
+  ThreadThinkingPlaceholder,
+  ThreadVirtualizedPlaceholder,
   TurnDuration,
   type ApprovalDecision,
   type FileDiffLine,
@@ -352,6 +360,7 @@ export function DesktopPlayground() {
   const [navigationSidebarOpen, setNavigationSidebarOpen] = useState(false);
   const [navigationPanelOpen, setNavigationPanelOpen] = useState(true);
   const [navigationStatus, setNavigationStatus] = useState("Desktop navigation ready");
+  const [threadStatus, setThreadStatus] = useState("Desktop thread ready");
   const [activeNavigationMessageId, setActiveNavigationMessageId] = useState<string>(
     desktopNavigationMessages[2].id,
   );
@@ -508,8 +517,35 @@ export function DesktopPlayground() {
               <span className="acceptance-badge">workspace package</span>
             </header>
             <div className="acceptance-card__body thread-surface">
-              <AgentThread aria-label="Desktop validation thread">
-                <AgentMessage role="user">
+              <AgentThreadViewport
+                className="desktop-thread-viewport"
+                followKey={threadStatus}
+                footer={
+                  <div className="desktop-thread-footer">
+                    <span>Latest turn</span>
+                    <output aria-live="polite">{threadStatus}</output>
+                  </div>
+                }
+              >
+                <AgentThread
+                  aria-label="Desktop validation thread"
+                  width={activePreset === "compact" ? "narrow" : "wide"}
+                >
+                <AgentMessage
+                  actions={
+                    <button
+                      className="desktop-thread-message-action"
+                      onClick={() => setThreadStatus("Copied user message")}
+                      type="button"
+                    >
+                      Copy
+                    </button>
+                  }
+                  highlighted
+                  metadata="You · now"
+                  onEdit={() => setThreadStatus("Editing user message")}
+                  role="user"
+                >
                   Validate this component library in a real desktop window.
                 </AgentMessage>
                 <AgentMessage role="assistant">
@@ -609,7 +645,23 @@ export function DesktopPlayground() {
                 >
                   <ApprovalCommandPreview command="pnpm --filter @codex-ui-kit/electron-playground check" />
                 </ApprovalRequest>
-              </AgentThread>
+                <AgentTurn spacing="grouped">
+                  <ThreadThinkingPlaceholder />
+                  <AgentMessage role="assistant" status="running">
+                    <LoadingShimmer>Writing the final desktop response…</LoadingShimmer>
+                  </AgentMessage>
+                </AgentTurn>
+                <ThreadLoadingState />
+                <ThreadLoadingState kind="reconnecting" />
+                <ThreadSkeleton />
+                <ThreadRenderError
+                  onRetry={() => setThreadStatus("Retried failed desktop turn")}
+                >
+                  The Renderer could not display this turn.
+                </ThreadRenderError>
+                <ThreadVirtualizedPlaceholder estimatedHeight="4rem" />
+                </AgentThread>
+              </AgentThreadViewport>
             </div>
           </article>
 

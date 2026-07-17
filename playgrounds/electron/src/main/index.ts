@@ -246,6 +246,94 @@ async function captureNavigationSurfaces(webContents: WebContents) {
   })()`);
 }
 
+async function captureThreadSurfaces(
+  webContents: WebContents,
+  position: "bottom" | "top" = "bottom",
+) {
+  return webContents.executeJavaScript(`(async () => {
+    const wait = (duration) => new Promise((resolve) => setTimeout(resolve, duration));
+    const rect = (element) => {
+      if (!element) return null;
+      const bounds = element.getBoundingClientRect();
+      return {
+        bottom: bounds.bottom,
+        height: bounds.height,
+        left: bounds.left,
+        right: bounds.right,
+        top: bounds.top,
+        width: bounds.width,
+      };
+    };
+    const dock = document.querySelector('.desktop-composer-dock');
+    if (dock instanceof HTMLElement) dock.style.display = 'none';
+    const card = document.querySelector('.acceptance-card--thread');
+    const scrollRegion = document.querySelector('.desktop-scroll-region');
+    if (card && scrollRegion instanceof HTMLElement) {
+      scrollRegion.style.scrollBehavior = 'auto';
+      const regionBounds = scrollRegion.getBoundingClientRect();
+      const cardBounds = card.getBoundingClientRect();
+      scrollRegion.scrollTop += cardBounds.top - regionBounds.top - 12;
+    }
+    await wait(120);
+    const viewport = card?.querySelector('.codex-ui-thread-viewport');
+    if (viewport instanceof HTMLElement) {
+      viewport.style.scrollBehavior = 'auto';
+      viewport.scrollTop = ${position === "top" ? "0" : "viewport.scrollHeight"};
+    }
+    await wait(120);
+    const thread = card?.querySelector('.codex-ui-thread');
+    const bubble = card?.querySelector('[data-user-message-bubble]');
+    const groupedTurn = card?.querySelector('.codex-ui-agent-turn[data-spacing="grouped"]');
+    const runningMessage = card?.querySelector('.codex-ui-agent-message[data-status="running"]');
+    const loadingStates = [...(card?.querySelectorAll('.codex-ui-thread-loading') ?? [])];
+    const spinner = card?.querySelector('.codex-ui-thread-loading__spinner');
+    const shimmer = card?.querySelector('.codex-ui-loading-shimmer');
+    const skeleton = card?.querySelector('.codex-ui-thread-skeleton');
+    const renderError = card?.querySelector('.codex-ui-thread-render-error');
+    const placeholder = card?.querySelector('.codex-ui-thread-virtualized-placeholder');
+    const footer = card?.querySelector('.codex-ui-thread-viewport__footer');
+    return {
+      bodyScrollWidth: document.body.scrollWidth,
+      bubble: rect(bubble),
+      bubbleMaxWidth: bubble ? getComputedStyle(bubble).maxWidth : null,
+      bubblePadding: bubble ? getComputedStyle(bubble).padding : null,
+      bubbleRadius: bubble ? getComputedStyle(bubble).borderRadius : null,
+      bubbleTabIndex: bubble?.tabIndex ?? null,
+      card: rect(card),
+      clientWidth: document.documentElement.clientWidth,
+      footer: rect(footer),
+      footerPosition: footer ? getComputedStyle(footer).position : null,
+      groupedTurnGap: groupedTurn ? getComputedStyle(groupedTurn).gap : null,
+      loadingStates: loadingStates.map((state) => ({
+        bounds: rect(state),
+        fontSize: getComputedStyle(state).fontSize,
+        gap: getComputedStyle(state).gap,
+        text: state.textContent,
+      })),
+      placeholder: rect(placeholder),
+      renderError: rect(renderError),
+      resolvedTheme: document.querySelector('.desktop-playground')?.getAttribute('data-theme'),
+      runningMessageBusy: runningMessage?.getAttribute('aria-busy'),
+      shimmerAnimationDuration: shimmer ? getComputedStyle(shimmer).animationDuration : null,
+      skeleton: rect(skeleton),
+      spinner: rect(spinner),
+      spinnerComputedSize: spinner ? {
+        height: getComputedStyle(spinner).height,
+        width: getComputedStyle(spinner).width,
+      } : null,
+      thread: rect(thread),
+      threadGap: thread ? getComputedStyle(thread).gap : null,
+      threadPadding: thread ? getComputedStyle(thread).padding : null,
+      threadWidthMode: thread?.getAttribute('data-width'),
+      viewport: rect(viewport),
+      viewportOverflowY: viewport ? getComputedStyle(viewport).overflowY : null,
+      viewportTabIndex: viewport?.tabIndex ?? null,
+      window: { height: window.innerHeight, width: window.innerWidth },
+      position: ${JSON.stringify(position)},
+    };
+  })()`);
+}
+
 async function captureAcceptance(browserWindow: BrowserWindow) {
   const outputDirectory = process.env.CODEX_UI_KIT_ACCEPTANCE_DIR;
   if (!outputDirectory) return;
@@ -303,6 +391,13 @@ async function captureAcceptance(browserWindow: BrowserWindow) {
     };
   })()`);
   const screenshot = await browserWindow.webContents.capturePage();
+  const threadTopMetrics = await captureThreadSurfaces(
+    browserWindow.webContents,
+    "top",
+  );
+  const threadTopScreenshot = await browserWindow.webContents.capturePage();
+  const threadMetrics = await captureThreadSurfaces(browserWindow.webContents);
+  const threadScreenshot = await browserWindow.webContents.capturePage();
   const navigationMetrics = await captureNavigationSurfaces(
     browserWindow.webContents,
   );
@@ -349,6 +444,17 @@ async function captureAcceptance(browserWindow: BrowserWindow) {
   );
   const compactNavigationScreenshot =
     await browserWindow.webContents.capturePage();
+  const compactThreadTopMetrics = await captureThreadSurfaces(
+    browserWindow.webContents,
+    "top",
+  );
+  const compactThreadTopScreenshot =
+    await browserWindow.webContents.capturePage();
+  const compactThreadMetrics = await captureThreadSurfaces(
+    browserWindow.webContents,
+  );
+  const compactThreadScreenshot =
+    await browserWindow.webContents.capturePage();
 
   await mkdir(outputDirectory, { recursive: true });
   await Promise.all([
@@ -367,6 +473,38 @@ async function captureAcceptance(browserWindow: BrowserWindow) {
     writeFile(
       join(outputDirectory, "navigation-surfaces.png"),
       navigationScreenshot.toPNG(),
+    ),
+    writeFile(
+      join(outputDirectory, "thread-surfaces-metrics.json"),
+      `${JSON.stringify(threadMetrics, null, 2)}\n`,
+    ),
+    writeFile(
+      join(outputDirectory, "thread-surfaces.png"),
+      threadScreenshot.toPNG(),
+    ),
+    writeFile(
+      join(outputDirectory, "thread-surfaces-top-metrics.json"),
+      `${JSON.stringify(threadTopMetrics, null, 2)}\n`,
+    ),
+    writeFile(
+      join(outputDirectory, "thread-surfaces-top.png"),
+      threadTopScreenshot.toPNG(),
+    ),
+    writeFile(
+      join(outputDirectory, "thread-surfaces-compact-light-metrics.json"),
+      `${JSON.stringify(compactThreadMetrics, null, 2)}\n`,
+    ),
+    writeFile(
+      join(outputDirectory, "thread-surfaces-compact-light.png"),
+      compactThreadScreenshot.toPNG(),
+    ),
+    writeFile(
+      join(outputDirectory, "thread-surfaces-compact-light-top-metrics.json"),
+      `${JSON.stringify(compactThreadTopMetrics, null, 2)}\n`,
+    ),
+    writeFile(
+      join(outputDirectory, "thread-surfaces-compact-light-top.png"),
+      compactThreadTopScreenshot.toPNG(),
     ),
     writeFile(
       join(outputDirectory, "navigation-surfaces-compact-light-metrics.json"),
