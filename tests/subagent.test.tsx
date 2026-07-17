@@ -139,6 +139,19 @@ describe("SubagentSummary", () => {
     expect(screen.queryByText("Researcher")).toBeNull();
   });
 
+  it("opens when active items arrive after an empty render", () => {
+    const { rerender } = render(<SubagentSummary items={[]} />);
+
+    rerender(<SubagentSummary items={[activeAgent]} />);
+
+    expect(
+      screen
+        .getByRole("button", { name: /Subagents/ })
+        .getAttribute("aria-expanded"),
+    ).toBe("true");
+    expect(screen.getByText("Researcher")).toBeTruthy();
+  });
+
   it("opens grouped agents individually when no overview action exists", () => {
     const onOpenSubagent = vi.fn();
     const groupedAgent = { ...activeAgent, presentation: "grouped" as const };
@@ -151,6 +164,21 @@ describe("SubagentSummary", () => {
 
     fireEvent.click(screen.getByRole("button", { name: "Researcher" }));
     expect(onOpenSubagent).toHaveBeenCalledWith(groupedAgent);
+  });
+
+  it("keeps working and completed grouped agents individually openable", () => {
+    const onOpenSubagent = vi.fn();
+    const workingAgent = { ...activeAgent, presentation: "grouped" as const };
+    const completedAgent = { ...doneAgent, presentation: "grouped" as const };
+    render(
+      <SubagentSummary
+        items={[workingAgent, completedAgent]}
+        onOpenSubagent={onOpenSubagent}
+      />,
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "Builder" }));
+    expect(onOpenSubagent).toHaveBeenCalledWith(completedAgent);
   });
 });
 

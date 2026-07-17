@@ -316,8 +316,17 @@ export function SubagentSummary({
   const [internalOpen, setInternalOpen] = useState(initialOpen);
   const resolvedOpen = open ?? internalOpen;
   const contentId = useId();
+  const hadItems = useRef(items.length > 0);
   const working = grouped.filter((item) => item.status !== "done");
   const done = grouped.filter((item) => item.status === "done");
+
+  useEffect(() => {
+    const itemsArrived = !hadItems.current && items.length > 0;
+    hadItems.current = items.length > 0;
+    if (open === undefined && itemsArrived && initialOpen) {
+      setInternalOpen(true);
+    }
+  }, [initialOpen, items.length, open]);
 
   if (items.length === 0) return null;
 
@@ -354,7 +363,7 @@ export function SubagentSummary({
             const content = (
               <>
                 <SummaryAvatarGroup
-                  items={working.length > 0 ? working : done}
+                  items={grouped}
                   onOpenItem={onOpenSummary ? undefined : onOpenSubagent}
                 />
                 <span>
