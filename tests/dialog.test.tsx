@@ -167,6 +167,68 @@ describe("modal dialog", () => {
     },
   );
 
+  it.each([
+    ["top preview first", true, false],
+    ["lower dialog first", false, true],
+  ])(
+    "restores focus through the modal stack when closing %s",
+    async (_, dialogOpenAfterFirstClose, previewOpenAfterFirstClose) => {
+      const image: GeneratedImageItem = {
+        alt: "Stack preview",
+        id: "stack-preview",
+        src: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'/%3E",
+      };
+      const renderStack = (dialogOpen: boolean, previewOpen: boolean) => (
+        <>
+          <button type="button">Outside trigger</button>
+          <Dialog
+            onOpenChange={vi.fn()}
+            open={dialogOpen}
+            showClose={false}
+            title="Stack dialog"
+          >
+            <button type="button">Preview trigger</button>
+          </Dialog>
+          <ImagePreviewDialog
+            images={[image]}
+            onOpenChange={vi.fn()}
+            open={previewOpen}
+          />
+        </>
+      );
+      const { rerender } = render(renderStack(false, false));
+      const outsideTrigger = screen.getByRole("button", {
+        name: "Outside trigger",
+      });
+      outsideTrigger.focus();
+      rerender(renderStack(true, false));
+      const previewTrigger = await screen.findByRole("button", {
+        name: "Preview trigger",
+      });
+      await waitFor(() => expect(document.activeElement).toBe(previewTrigger));
+      previewTrigger.focus();
+      rerender(renderStack(true, true));
+      const previewClose = await screen.findByRole("button", {
+        name: "Close image preview",
+      });
+      await waitFor(() => expect(document.activeElement).toBe(previewClose));
+
+      rerender(
+        renderStack(dialogOpenAfterFirstClose, previewOpenAfterFirstClose),
+      );
+      if (previewOpenAfterFirstClose) {
+        expect(document.activeElement).toBe(previewClose);
+      } else {
+        await waitFor(() => expect(document.activeElement).toBe(previewTrigger));
+      }
+      expect(document.body.style.overflow).toBe("hidden");
+
+      rerender(renderStack(false, false));
+      await waitFor(() => expect(document.activeElement).toBe(outsideTrigger));
+      expect(document.body.style.overflow).toBe("");
+    },
+  );
+
   it("preserves a scoped theme and elevates nested portalled overlays", async () => {
     function ThemedDialogHarness() {
       const [open, setOpen] = useState(false);
@@ -199,7 +261,15 @@ describe("modal dialog", () => {
     const menu = await screen.findByRole("menu");
     expect(menu.getAttribute("data-theme")).toBe("dark");
     expect(menu.getAttribute("data-codex-ui-overlay-layer")).toBe("dialog");
-    fireEvent.keyDown(menu, { key: "Escape" });
+    const rename = screen.getByRole("menuitem", { name: "Rename" });
+    rename.focus();
+    expect(fireEvent.keyDown(rename, { key: "Tab" })).toBe(true);
+    expect(screen.queryByRole("menu")).toBeNull();
+    expect(screen.getByRole("dialog", { name: "Themed dialog" })).toBeTruthy();
+
+    fireEvent.click(screen.getByRole("button", { name: "Open actions" }));
+    const reopenedMenu = await screen.findByRole("menu");
+    fireEvent.keyDown(reopenedMenu, { key: "Escape" });
     expect(screen.queryByRole("menu")).toBeNull();
     expect(screen.getByRole("dialog", { name: "Themed dialog" })).toBeTruthy();
   });

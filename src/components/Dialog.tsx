@@ -77,7 +77,9 @@ export function Dialog({
   useEffect(() => {
     if (!open || typeof document === "undefined") return;
     returnFocusRef.current = document.activeElement as HTMLElement | null;
-    const releaseDocumentScrollLock = acquireDocumentScrollLock();
+    const releaseDocumentScrollLock = acquireDocumentScrollLock(
+      returnFocusRef.current,
+    );
     const timer = window.setTimeout(() => {
       const surface = surfaceRef.current;
       if (!surface) return;
@@ -88,8 +90,7 @@ export function Dialog({
     });
     return () => {
       window.clearTimeout(timer);
-      releaseDocumentScrollLock();
-      if (returnFocusRef.current?.isConnected) returnFocusRef.current.focus();
+      releaseDocumentScrollLock()?.focus();
     };
   }, [initialFocusSelector, open]);
 
@@ -103,6 +104,12 @@ export function Dialog({
       return;
     }
     if (event.key !== "Tab") return;
+    if (
+      event.target instanceof Element &&
+      event.target.closest('[data-codex-ui-overlay-layer="dialog"]')
+    ) {
+      return;
+    }
     const surface = surfaceRef.current;
     if (!surface) return;
     const focusable = getDialogFocusableItems(surface);

@@ -1,27 +1,58 @@
-let activeDocumentScrollLocks = 0;
+interface ModalLockEntry {
+  returnFocus: HTMLElement | null;
+  token: symbol;
+}
+
+const activeModalLocks: ModalLockEntry[] = [];
+const deferredFocusTargets: HTMLElement[] = [];
 let overflowBeforeDocumentScrollLock = "";
 
 /**
- * Acquires the package-wide modal scroll lock and returns an idempotent release
- * callback. Modal surfaces must share this helper so closing one surface cannot
- * unlock the document while another surface remains open.
+ * Acquires the package-wide modal scroll lock and focus-stack position. The
+ * idempotent release callback returns the focus target that is safe to restore:
+ * top surfaces return to their connected trigger, while a lower surface closed
+ * beneath another modal defers its trigger as a fallback for the final surface.
  */
-export function acquireDocumentScrollLock() {
-  if (typeof document === "undefined") return () => undefined;
+export function acquireDocumentScrollLock(
+  returnFocus: HTMLElement | null = null,
+) {
+  if (typeof document === "undefined") return () => null;
 
-  if (activeDocumentScrollLocks === 0) {
+  if (activeModalLocks.length === 0) {
     overflowBeforeDocumentScrollLock = document.body.style.overflow;
     document.body.style.overflow = "hidden";
   }
-  activeDocumentScrollLocks += 1;
+  const entry: ModalLockEntry = { returnFocus, token: Symbol("modal-lock") };
+  activeModalLocks.push(entry);
 
   let released = false;
   return () => {
-    if (released) return;
+    if (released) return null;
     released = true;
-    activeDocumentScrollLocks = Math.max(0, activeDocumentScrollLocks - 1);
-    if (activeDocumentScrollLocks === 0) {
-      document.body.style.overflow = overflowBeforeDocumentScrollLock;
+    const entryIndex = activeModalLocks.findIndex(
+      (candidate) => candidate.token === entry.token,
+    );
+    if (entryIndex === -1) return null;
+    const wasTop = entryIndex === activeModalLocks.length - 1;
+    activeModalLocks.splice(entryIndex, 1);
+
+    if (!wasTop && entry.returnFocus?.isConnected) {
+      deferredFocusTargets.push(entry.returnFocus);
     }
+
+    let restoreFocus: HTMLElement | null = null;
+    if (wasTop) {
+      restoreFocus = entry.returnFocus?.isConnected ? entry.returnFocus : null;
+      while (!restoreFocus && deferredFocusTargets.length > 0) {
+        const candidate = deferredFocusTargets.pop();
+        if (candidate?.isConnected) restoreFocus = candidate;
+      }
+    }
+
+    if (activeModalLocks.length === 0) {
+      document.body.style.overflow = overflowBeforeDocumentScrollLock;
+      deferredFocusTargets.length = 0;
+    }
+    return restoreFocus;
   };
 }

@@ -583,11 +583,12 @@ export function ImagePreviewDialog({
   useEffect(() => {
     if (!open) return;
     returnFocusRef.current = document.activeElement as HTMLElement | null;
-    const releaseDocumentScrollLock = acquireDocumentScrollLock();
+    const releaseDocumentScrollLock = acquireDocumentScrollLock(
+      returnFocusRef.current,
+    );
     closeRef.current?.focus();
     return () => {
-      releaseDocumentScrollLock();
-      returnFocusRef.current?.focus();
+      releaseDocumentScrollLock()?.focus();
     };
   }, [open]);
 
