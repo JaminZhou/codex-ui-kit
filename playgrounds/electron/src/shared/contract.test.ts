@@ -1,3 +1,4 @@
+import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import {
   isThemeSource,
@@ -24,5 +25,17 @@ describe("desktop playground contract", () => {
       expect(preset.width).toBeGreaterThanOrEqual(720);
       expect(preset.height).toBeGreaterThanOrEqual(620);
     }
+  });
+
+  it("propagates interactive acceptance failures to the process boundary", () => {
+    const mainSource = readFileSync(
+      new URL("../main/index.ts", import.meta.url),
+      "utf8",
+    );
+    expect(mainSource).not.toContain("captureError");
+    expect(mainSource).toContain(
+      'console.error("acceptance capture failed", error)',
+    );
+    expect(mainSource).toContain("app.exit(1)");
   });
 });

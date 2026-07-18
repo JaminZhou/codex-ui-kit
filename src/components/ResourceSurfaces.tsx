@@ -583,12 +583,13 @@ export function ImagePreviewDialog({
   useEffect(() => {
     if (!open) return;
     returnFocusRef.current = document.activeElement as HTMLElement | null;
-    const releaseDocumentScrollLock = acquireDocumentScrollLock(
-      returnFocusRef.current,
-    );
-    closeRef.current?.focus();
+    const modalLock = acquireDocumentScrollLock({
+      priority: 1200,
+      returnFocus: returnFocusRef.current,
+    });
+    if (modalLock.isTop()) closeRef.current?.focus();
     return () => {
-      releaseDocumentScrollLock()?.focus();
+      modalLock.release()?.focus();
     };
   }, [open]);
 

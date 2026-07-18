@@ -9,6 +9,7 @@ import {
   ImagePreviewDialog,
   Menu,
   MenuItem,
+  Popover,
   type GeneratedImageItem,
 } from "../src";
 
@@ -229,6 +230,42 @@ describe("modal dialog", () => {
     },
   );
 
+  it("does not move focus behind a higher-priority preview", async () => {
+    const image: GeneratedImageItem = {
+      alt: "Priority preview",
+      id: "priority-preview",
+      src: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'/%3E",
+    };
+    const renderPriorityStack = (dialogOpen: boolean) => (
+      <>
+        <Dialog
+          onOpenChange={vi.fn()}
+          open={dialogOpen}
+          showClose={false}
+          title="Lower-priority dialog"
+        >
+          <button type="button">Lower dialog action</button>
+        </Dialog>
+        <ImagePreviewDialog
+          images={[image]}
+          onOpenChange={vi.fn()}
+          open
+        />
+      </>
+    );
+    const { rerender } = render(renderPriorityStack(false));
+    const previewClose = screen.getByRole("button", {
+      name: "Close image preview",
+    });
+    expect(document.activeElement).toBe(previewClose);
+
+    rerender(renderPriorityStack(true));
+    await waitFor(() => expect(document.activeElement).toBe(previewClose));
+    expect(
+      screen.getByRole("dialog", { name: "Lower-priority dialog" }),
+    ).toBeTruthy();
+  });
+
   it("preserves a scoped theme and elevates nested portalled overlays", async () => {
     function ThemedDialogHarness() {
       const [open, setOpen] = useState(false);
@@ -272,5 +309,31 @@ describe("modal dialog", () => {
     fireEvent.keyDown(reopenedMenu, { key: "Escape" });
     expect(screen.queryByRole("menu")).toBeNull();
     expect(screen.getByRole("dialog", { name: "Themed dialog" })).toBeTruthy();
+  });
+
+  it("keeps a dialog-owned popover inside the modal focus loop", () => {
+    render(
+      <Dialog onOpenChange={vi.fn()} open title="Parent dialog">
+        <Popover
+          defaultOpen
+          label="Nested details"
+          trigger={<button type="button">Details</button>}
+        >
+          <button type="button">First nested action</button>
+          <button type="button">Last nested action</button>
+        </Popover>
+      </Dialog>,
+    );
+
+    const close = screen.getByRole("button", { name: "Close dialog" });
+    const lastNested = screen.getByRole("button", {
+      name: "Last nested action",
+    });
+    lastNested.focus();
+    expect(fireEvent.keyDown(lastNested, { key: "Tab" })).toBe(false);
+    expect(document.activeElement).toBe(close);
+
+    expect(fireEvent.keyDown(close, { key: "Tab", shiftKey: true })).toBe(false);
+    expect(document.activeElement).toBe(lastNested);
   });
 });

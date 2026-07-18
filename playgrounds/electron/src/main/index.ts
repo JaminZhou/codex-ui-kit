@@ -26,7 +26,6 @@ let mainWindow: BrowserWindow | null = null;
 
 async function captureInteractivePrimitives(webContents: WebContents) {
   return webContents.executeJavaScript(`(async () => {
-    try {
     const wait = (duration) => new Promise((resolve) => setTimeout(resolve, duration));
     const rect = (element) => {
       if (!element) return null;
@@ -103,14 +102,6 @@ async function captureInteractivePrimitives(webContents: WebContents) {
       toolbarButton: rect(toolbarButton),
       viewport: { height: window.innerHeight, width: window.innerWidth },
     };
-    } catch (error) {
-      return {
-        captureError:
-          error instanceof Error
-            ? (error.stack ?? error.message)
-            : String(error),
-      };
-    }
   })()`);
 }
 

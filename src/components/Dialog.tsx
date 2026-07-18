@@ -40,6 +40,14 @@ function getDialogFocusableItems(container: HTMLElement) {
   ).filter((item) => item.getAttribute("aria-hidden") !== "true");
 }
 
+function getDialogOwnedPortalFocusableItems(dialogId: string) {
+  return Array.from(
+    document.querySelectorAll<HTMLElement>("[data-codex-ui-dialog-owner]"),
+  )
+    .filter((portal) => portal.dataset.codexUiDialogOwner === dialogId)
+    .flatMap(getDialogFocusableItems);
+}
+
 export function Dialog({
   children,
   className,
@@ -59,6 +67,7 @@ export function Dialog({
 }: DialogProps) {
   const titleId = useId();
   const descriptionId = useId();
+  const dialogId = useId();
   const surfaceRef = useRef<HTMLDivElement>(null);
   const returnFocusRef = useRef<HTMLElement | null>(null);
   const [inferredTheme, setInferredTheme] = useState<string>();
@@ -77,10 +86,12 @@ export function Dialog({
   useEffect(() => {
     if (!open || typeof document === "undefined") return;
     returnFocusRef.current = document.activeElement as HTMLElement | null;
-    const releaseDocumentScrollLock = acquireDocumentScrollLock(
-      returnFocusRef.current,
-    );
+    const modalLock = acquireDocumentScrollLock({
+      priority: 1100,
+      returnFocus: returnFocusRef.current,
+    });
     const timer = window.setTimeout(() => {
+      if (!modalLock.isTop()) return;
       const surface = surfaceRef.current;
       if (!surface) return;
       const requested = initialFocusSelector
@@ -90,7 +101,7 @@ export function Dialog({
     });
     return () => {
       window.clearTimeout(timer);
-      releaseDocumentScrollLock()?.focus();
+      modalLock.release()?.focus();
     };
   }, [initialFocusSelector, open]);
 
@@ -104,15 +115,24 @@ export function Dialog({
       return;
     }
     if (event.key !== "Tab") return;
+    const ownedPortal =
+      event.target instanceof Element
+        ? event.target.closest<HTMLElement>("[data-codex-ui-dialog-owner]")
+        : null;
+    const eventComesFromOwnedPortal =
+      ownedPortal?.dataset.codexUiDialogOwner === dialogId;
     if (
-      event.target instanceof Element &&
-      event.target.closest('[data-codex-ui-overlay-layer="dialog"]')
+      eventComesFromOwnedPortal &&
+      ownedPortal?.getAttribute("role") !== "dialog"
     ) {
       return;
     }
     const surface = surfaceRef.current;
     if (!surface) return;
-    const focusable = getDialogFocusableItems(surface);
+    const focusable = [
+      ...getDialogFocusableItems(surface),
+      ...getDialogOwnedPortalFocusableItems(dialogId),
+    ];
     const first = focusable[0];
     const last = focusable.at(-1);
     if (!first || !last) {
@@ -135,11 +155,12 @@ export function Dialog({
 
   return createPortal(
     <OverlayEnvironmentContext.Provider
-      value={{ layer: "dialog", theme: portalTheme }}
+      value={{ layer: "dialog", ownerId: dialogId, theme: portalTheme }}
     >
       <div
         className={["codex-ui-dialog", className].filter(Boolean).join(" ")}
         data-size={size}
+        data-codex-ui-dialog-id={dialogId}
         data-theme={portalTheme}
         onKeyDown={handleKeyDown}
         onPointerDown={(event) => {

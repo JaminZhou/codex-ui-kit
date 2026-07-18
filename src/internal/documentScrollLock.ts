@@ -1,39 +1,64 @@
 interface ModalLockEntry {
+  priority: number;
   returnFocus: HTMLElement | null;
   token: symbol;
+}
+
+export interface ModalLockOptions {
+  priority?: number;
+  returnFocus?: HTMLElement | null;
+}
+
+export interface ModalLockHandle {
+  isTop: () => boolean;
+  release: () => HTMLElement | null;
 }
 
 const activeModalLocks: ModalLockEntry[] = [];
 const deferredFocusTargets: HTMLElement[] = [];
 let overflowBeforeDocumentScrollLock = "";
 
+function getTopModalLock() {
+  return activeModalLocks.reduce<ModalLockEntry | undefined>((top, entry) => {
+    if (!top || entry.priority >= top.priority) return entry;
+    return top;
+  }, undefined);
+}
+
 /**
  * Acquires the package-wide modal scroll lock and focus-stack position. The
- * idempotent release callback returns the focus target that is safe to restore:
- * top surfaces return to their connected trigger, while a lower surface closed
- * beneath another modal defers its trigger as a fallback for the final surface.
+ * handle identifies the visual top surface and returns the focus target that is
+ * safe to restore: top surfaces return to their connected trigger, while a
+ * lower surface closed beneath another modal defers its trigger as a fallback.
  */
-export function acquireDocumentScrollLock(
-  returnFocus: HTMLElement | null = null,
-) {
-  if (typeof document === "undefined") return () => null;
+export function acquireDocumentScrollLock({
+  priority = 0,
+  returnFocus = null,
+}: ModalLockOptions = {}): ModalLockHandle {
+  if (typeof document === "undefined") {
+    return { isTop: () => false, release: () => null };
+  }
 
   if (activeModalLocks.length === 0) {
     overflowBeforeDocumentScrollLock = document.body.style.overflow;
     document.body.style.overflow = "hidden";
   }
-  const entry: ModalLockEntry = { returnFocus, token: Symbol("modal-lock") };
+  const entry: ModalLockEntry = {
+    priority,
+    returnFocus,
+    token: Symbol("modal-lock"),
+  };
   activeModalLocks.push(entry);
 
   let released = false;
-  return () => {
+  const release = () => {
     if (released) return null;
     released = true;
     const entryIndex = activeModalLocks.findIndex(
       (candidate) => candidate.token === entry.token,
     );
     if (entryIndex === -1) return null;
-    const wasTop = entryIndex === activeModalLocks.length - 1;
+    const wasTop = getTopModalLock()?.token === entry.token;
     activeModalLocks.splice(entryIndex, 1);
 
     if (!wasTop && entry.returnFocus?.isConnected) {
@@ -54,5 +79,9 @@ export function acquireDocumentScrollLock(
       deferredFocusTargets.length = 0;
     }
     return restoreFocus;
+  };
+  return {
+    isTop: () => !released && getTopModalLock()?.token === entry.token,
+    release,
   };
 }

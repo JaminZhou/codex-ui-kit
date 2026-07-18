@@ -397,6 +397,7 @@ function FloatingSurface({
       data-align={align}
       data-codex-ui-overlay-owner={ownerIds?.join(" ")}
       data-codex-ui-overlay-layer={overlayEnvironment.layer}
+      data-codex-ui-dialog-owner={overlayEnvironment.ownerId}
       data-side={position?.resolvedSide ?? side}
       data-state="open"
       data-theme={position?.theme}
