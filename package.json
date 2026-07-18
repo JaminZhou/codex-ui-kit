@@ -43,10 +43,10 @@
     }
   },
   "scripts": {
-    "dev": "vite demo",
+    "dev": "vite demo --config demo/vite.config.ts",
     "dev:electron": "pnpm build && pnpm --filter @codex-ui-kit/electron-playground dev",
     "build": "vite build && tsc -p tsconfig.build.json",
-    "build:demo": "vite build demo --base=/codex-ui-kit/",
+    "build:demo": "vite build demo --base=/codex-ui-kit/ --config demo/vite.config.ts && node scripts/check-demo-bundle.mjs",
     "build:electron": "pnpm --filter @codex-ui-kit/electron-playground build",
     "test": "vitest run tests",
     "typecheck": "tsc --noEmit",
@@ -69,7 +69,7 @@
     "react": "^19.2.7",
     "react-dom": "^19.2.7",
     "typescript": "^5.9.3",
-    "vite": "^8.1.4",
+    "vite": "^8.1.5",
     "vitest": "^4.1.10"
   },
   "dependencies": {
