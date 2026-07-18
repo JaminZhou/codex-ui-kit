@@ -11,6 +11,7 @@ import {
   useState,
 } from "react";
 import { createPortal } from "react-dom";
+import { acquireDocumentScrollLock } from "../internal/documentScrollLock";
 
 export type ResourceKind =
   | "app"
@@ -582,11 +583,10 @@ export function ImagePreviewDialog({
   useEffect(() => {
     if (!open) return;
     returnFocusRef.current = document.activeElement as HTMLElement | null;
-    const previousOverflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
+    const releaseDocumentScrollLock = acquireDocumentScrollLock();
     closeRef.current?.focus();
     return () => {
-      document.body.style.overflow = previousOverflow;
+      releaseDocumentScrollLock();
       returnFocusRef.current?.focus();
     };
   }, [open]);

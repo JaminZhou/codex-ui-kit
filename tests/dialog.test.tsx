@@ -3,7 +3,12 @@
 import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { useState } from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { Dialog, DialogChoice } from "../src";
+import {
+  Dialog,
+  DialogChoice,
+  ImagePreviewDialog,
+  type GeneratedImageItem,
+} from "../src";
 
 afterEach(cleanup);
 
@@ -120,4 +125,43 @@ describe("modal dialog", () => {
     );
     expect(onOpenChange).toHaveBeenCalledTimes(1);
   });
+
+  it.each([
+    ["choice dialog first", false, true],
+    ["image preview first", true, false],
+  ])(
+    "keeps document scroll locked when closing %s",
+    (_, choiceDialogOpenAfterClose, imagePreviewOpenAfterClose) => {
+      const image: GeneratedImageItem = {
+        alt: "Generated preview",
+        id: "generated-preview",
+        src: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'/%3E",
+      };
+      const renderModals = (choiceDialogOpen: boolean, imagePreviewOpen: boolean) => (
+        <>
+          <Dialog
+            onOpenChange={vi.fn()}
+            open={choiceDialogOpen}
+            title="Choice dialog"
+          >
+            <DialogChoice label="Choice" />
+          </Dialog>
+          <ImagePreviewDialog
+            images={[image]}
+            onOpenChange={vi.fn()}
+            open={imagePreviewOpen}
+          />
+        </>
+      );
+      const { rerender } = render(renderModals(true, true));
+
+      expect(document.body.style.overflow).toBe("hidden");
+      rerender(
+        renderModals(choiceDialogOpenAfterClose, imagePreviewOpenAfterClose),
+      );
+      expect(document.body.style.overflow).toBe("hidden");
+      rerender(renderModals(false, false));
+      expect(document.body.style.overflow).toBe("");
+    },
+  );
 });

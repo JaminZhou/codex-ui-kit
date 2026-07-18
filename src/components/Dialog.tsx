@@ -8,6 +8,7 @@ import {
   useRef,
 } from "react";
 import { createPortal } from "react-dom";
+import { acquireDocumentScrollLock } from "../internal/documentScrollLock";
 
 export type DialogSize = "compact" | "standard" | "wide";
 
@@ -25,24 +26,6 @@ export interface DialogProps
   showClose?: boolean;
   size?: DialogSize;
   title: ReactNode;
-}
-
-let openDialogCount = 0;
-let bodyOverflowBeforeDialogs = "";
-
-function lockDocumentScroll() {
-  if (openDialogCount === 0) {
-    bodyOverflowBeforeDialogs = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-  }
-  openDialogCount += 1;
-}
-
-function unlockDocumentScroll() {
-  openDialogCount = Math.max(0, openDialogCount - 1);
-  if (openDialogCount === 0) {
-    document.body.style.overflow = bodyOverflowBeforeDialogs;
-  }
 }
 
 function getDialogFocusableItems(container: HTMLElement) {
@@ -77,7 +60,7 @@ export function Dialog({
   useEffect(() => {
     if (!open || typeof document === "undefined") return;
     returnFocusRef.current = document.activeElement as HTMLElement | null;
-    lockDocumentScroll();
+    const releaseDocumentScrollLock = acquireDocumentScrollLock();
     const timer = window.setTimeout(() => {
       const surface = surfaceRef.current;
       if (!surface) return;
@@ -88,7 +71,7 @@ export function Dialog({
     });
     return () => {
       window.clearTimeout(timer);
-      unlockDocumentScroll();
+      releaseDocumentScrollLock();
       if (returnFocusRef.current?.isConnected) returnFocusRef.current.focus();
     };
   }, [initialFocusSelector, open]);
