@@ -11,6 +11,10 @@ describe("dialog visual contract", () => {
     expect(tokens).toContain("--codex-ui-dialog-choice-gap:");
     expect(styles).toContain("background: rgb(0 0 0 / 0.45)");
     expect(styles).toContain("z-index: 1100");
+    expect(styles).toContain(
+      '.codex-ui-popover[data-codex-ui-overlay-layer="dialog"]',
+    );
+    expect(styles).toContain("z-index: 1150");
     expect(styles).toContain("min-height: 3.5rem");
   });
 

@@ -7,6 +7,8 @@ import {
   Dialog,
   DialogChoice,
   ImagePreviewDialog,
+  Menu,
+  MenuItem,
   type GeneratedImageItem,
 } from "../src";
 
@@ -164,4 +166,38 @@ describe("modal dialog", () => {
       expect(document.body.style.overflow).toBe("");
     },
   );
+
+  it("preserves a scoped theme and elevates nested portalled overlays", async () => {
+    function ThemedDialogHarness() {
+      const [open, setOpen] = useState(false);
+      return (
+        <div data-theme="dark">
+          <button onClick={() => setOpen(true)} type="button">
+            Open themed dialog
+          </button>
+          <Dialog onOpenChange={setOpen} open={open} title="Themed dialog">
+            <Menu
+              defaultOpen
+              trigger={<button type="button">Open actions</button>}
+            >
+              <MenuItem>Rename</MenuItem>
+            </Menu>
+          </Dialog>
+        </div>
+      );
+    }
+
+    render(<ThemedDialogHarness />);
+    const trigger = screen.getByRole("button", { name: "Open themed dialog" });
+    trigger.focus();
+    fireEvent.click(trigger);
+
+    const dialogRoot = screen.getByRole("dialog", {
+      name: "Themed dialog",
+    }).parentElement!;
+    expect(dialogRoot.getAttribute("data-theme")).toBe("dark");
+    const menu = await screen.findByRole("menu");
+    expect(menu.getAttribute("data-theme")).toBe("dark");
+    expect(menu.getAttribute("data-codex-ui-overlay-layer")).toBe("dialog");
+  });
 });

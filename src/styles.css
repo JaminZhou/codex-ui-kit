@@ -677,6 +677,11 @@
   z-index: 1000;
 }
 
+.codex-ui-tooltip[data-codex-ui-overlay-layer="dialog"],
+.codex-ui-popover[data-codex-ui-overlay-layer="dialog"] {
+  z-index: 1150;
+}
+
 .codex-ui-tooltip {
   align-items: center;
   animation: codex-ui-overlay-enter 100ms ease-out both;

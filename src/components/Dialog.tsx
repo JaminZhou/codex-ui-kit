@@ -5,10 +5,13 @@ import {
   type ReactNode,
   useEffect,
   useId,
+  useLayoutEffect,
   useRef,
+  useState,
 } from "react";
 import { createPortal } from "react-dom";
 import { acquireDocumentScrollLock } from "../internal/documentScrollLock";
+import { OverlayEnvironmentContext } from "../internal/overlayEnvironment";
 
 export type DialogSize = "compact" | "standard" | "wide";
 
@@ -25,6 +28,7 @@ export interface DialogProps
   open: boolean;
   showClose?: boolean;
   size?: DialogSize;
+  theme?: string;
   title: ReactNode;
 }
 
@@ -49,6 +53,7 @@ export function Dialog({
   open,
   showClose = true,
   size = "standard",
+  theme,
   title,
   ...props
 }: DialogProps) {
@@ -56,6 +61,18 @@ export function Dialog({
   const descriptionId = useId();
   const surfaceRef = useRef<HTMLDivElement>(null);
   const returnFocusRef = useRef<HTMLElement | null>(null);
+  const [inferredTheme, setInferredTheme] = useState<string>();
+  const portalTheme = theme ?? inferredTheme;
+
+  useLayoutEffect(() => {
+    if (!open || theme !== undefined || typeof document === "undefined") return;
+    const activeElement = document.activeElement;
+    setInferredTheme(
+      activeElement instanceof Element
+        ? activeElement.closest<HTMLElement>("[data-theme]")?.dataset.theme
+        : undefined,
+    );
+  }, [open, theme]);
 
   useEffect(() => {
     if (!open || typeof document === "undefined") return;
@@ -109,52 +126,59 @@ export function Dialog({
   };
 
   return createPortal(
-    <div
-      className={["codex-ui-dialog", className].filter(Boolean).join(" ")}
-      data-size={size}
-      onKeyDown={handleKeyDown}
-      onPointerDown={(event) => {
-        if (closeOnBackdrop && event.target === event.currentTarget) {
-          onOpenChange(false);
-        }
-      }}
+    <OverlayEnvironmentContext.Provider
+      value={{ layer: "dialog", theme: portalTheme }}
     >
       <div
-        {...props}
-        aria-describedby={description ? descriptionId : undefined}
-        aria-labelledby={titleId}
-        aria-modal="true"
-        className="codex-ui-dialog__surface"
-        ref={surfaceRef}
-        role="dialog"
-        tabIndex={-1}
+        className={["codex-ui-dialog", className].filter(Boolean).join(" ")}
+        data-size={size}
+        data-theme={portalTheme}
+        onKeyDown={handleKeyDown}
+        onPointerDown={(event) => {
+          if (closeOnBackdrop && event.target === event.currentTarget) {
+            onOpenChange(false);
+          }
+        }}
       >
-        <header className="codex-ui-dialog__header">
-          <div className="codex-ui-dialog__heading">
-            <h2 className="codex-ui-dialog__title" id={titleId}>
-              {title}
-            </h2>
-            {description ? (
-              <div className="codex-ui-dialog__description" id={descriptionId}>
-                {description}
-              </div>
+        <div
+          {...props}
+          aria-describedby={description ? descriptionId : undefined}
+          aria-labelledby={titleId}
+          aria-modal="true"
+          className="codex-ui-dialog__surface"
+          ref={surfaceRef}
+          role="dialog"
+          tabIndex={-1}
+        >
+          <header className="codex-ui-dialog__header">
+            <div className="codex-ui-dialog__heading">
+              <h2 className="codex-ui-dialog__title" id={titleId}>
+                {title}
+              </h2>
+              {description ? (
+                <div className="codex-ui-dialog__description" id={descriptionId}>
+                  {description}
+                </div>
+              ) : null}
+            </div>
+            {showClose ? (
+              <button
+                aria-label={closeLabel}
+                className="codex-ui-dialog__close"
+                onClick={() => onOpenChange(false)}
+                type="button"
+              >
+                <span aria-hidden="true">×</span>
+              </button>
             ) : null}
-          </div>
-          {showClose ? (
-            <button
-              aria-label={closeLabel}
-              className="codex-ui-dialog__close"
-              onClick={() => onOpenChange(false)}
-              type="button"
-            >
-              <span aria-hidden="true">×</span>
-            </button>
+          </header>
+          <div className="codex-ui-dialog__body">{children}</div>
+          {footer ? (
+            <footer className="codex-ui-dialog__footer">{footer}</footer>
           ) : null}
-        </header>
-        <div className="codex-ui-dialog__body">{children}</div>
-        {footer ? <footer className="codex-ui-dialog__footer">{footer}</footer> : null}
+        </div>
       </div>
-    </div>,
+    </OverlayEnvironmentContext.Provider>,
     document.body,
   );
 }
