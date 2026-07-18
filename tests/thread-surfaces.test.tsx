@@ -8,6 +8,7 @@ import {
   AgentThreadViewport,
   AgentTurn,
   LoadingShimmer,
+  ThreadContextOptimization,
   ThreadLoadingState,
   ThreadRenderError,
   ThreadSkeleton,
@@ -94,7 +95,7 @@ describe("complete thread surfaces", () => {
 
   it("exposes exact loading, reconnecting, thinking, and skeleton states", () => {
     const { rerender } = render(<ThreadLoadingState />);
-    expect(screen.getByRole("status").textContent).toContain("Loading task…");
+    expect(screen.getByRole("status").textContent).toContain("Loading chat…");
     rerender(<ThreadLoadingState kind="reconnecting" />);
     expect(screen.getByRole("status").textContent).toContain(
       "Reconnecting to ChatGPT…",
@@ -106,6 +107,37 @@ describe("complete thread surfaces", () => {
     expect(document.querySelectorAll(".codex-ui-thread-skeleton__line")).toHaveLength(4);
     rerender(<LoadingShimmer>Working</LoadingShimmer>);
     expect(screen.getByText("Working").className).toContain("codex-ui-loading-shimmer");
+  });
+
+  it("covers manual, automatic, and Work context optimization states", () => {
+    const { container, rerender } = render(
+      <ThreadContextOptimization mode="manual" status="running" />,
+    );
+    const state = container.querySelector(
+      ".codex-ui-thread-context-optimization",
+    )!;
+    expect(screen.getByRole("status").textContent).toBe("Compacting context");
+    expect(state.getAttribute("aria-busy")).toBe("true");
+    expect(state.getAttribute("data-mode")).toBe("manual");
+
+    rerender(<ThreadContextOptimization mode="automatic" status="completed" />);
+    expect(state.textContent).toBe("Context automatically compacted");
+    expect(state.getAttribute("aria-busy")).toBeNull();
+    expect(state.getAttribute("role")).toBeNull();
+
+    rerender(<ThreadContextOptimization mode="work" status="running" />);
+    expect(screen.getByRole("status").textContent).toBe(
+      "Optimizing the conversation",
+    );
+
+    rerender(
+      <ThreadContextOptimization
+        label="Custom context label"
+        mode="work"
+        status="completed"
+      />,
+    );
+    expect(state.textContent).toBe("Custom context label");
   });
 
   it("renders a retryable turn error", () => {

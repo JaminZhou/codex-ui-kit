@@ -7,9 +7,14 @@ Electron parity against the locked sampled build.
 
 ## Baseline
 
-- Sample: Codex Desktop `26.707.72221` (`5307`).
-- Renderer archive hash: `b5da51e5df6e996076e4cb19045cec46dd4c08cf61c19cdbc5cb426b8413b73c`.
-- Runtime: Electron `42.1.0`, React Renderer, Vite build.
+- Current sample: Codex Desktop `26.715.21425` (`5488`).
+- Current Renderer archive hash:
+  `5db4c67090c0521fa717e83e46cb0a6175cb6c16fb89064223753bdf05cff0aa`.
+- Current runtime declaration: Electron `42.3.0`, React Renderer, Vite build,
+  packaged for the Owl production runtime.
+- The original measured geometry baseline remains `26.707.72221`; the shared
+  conversation stylesheet is byte-identical in the current sample. Current
+  terminology and lifecycle deltas are locked in `26.715.21425.md`.
 - Raw extracted files remain outside the repository.
 
 ## Completion gates
@@ -47,6 +52,7 @@ A row is complete only when all applicable gates pass:
 | Resource cards, citations, images, and artifacts | Complete | Measured | Complete | Complete | Good | Complete |
 | Thread header, floating controls, and navigation affordances | Complete | Measured | Complete | Complete | Good | Complete |
 | Loading, streaming, skeleton, hover, focus, and reduced motion | Complete | Measured | Complete | Complete | Good | Complete |
+| Context compaction, conversation optimization, and handoff warning | Complete | Measured core | Complete | Complete | Good | Complete |
 | Responsive and narrow-window behavior | Complete | Measured | Complete | Complete | Good | Complete |
 | Package tokens, CSS exports, documentation, and provenance | Complete | Measured | N/A | N/A | Good | Complete |
 
@@ -56,7 +62,8 @@ A row is complete only when all applicable gates pass:
   acceptance-checked at `1280x720` without horizontal overflow.
 - The Electron playground captures standard dark `1180x820` and compact light
   `820x680` windows. Thread acceptance records both top/message and
-  bottom/loading state positions; all capture output remains in `/private/tmp`.
+  bottom/loading state positions, including current context lifecycle states;
+  all capture output remains in `/private/tmp`.
 - The package contract checks root exports, stylesheet and token subpath
   exports, generated declarations, packed file boundaries, and a standalone
   TypeScript consumer.

@@ -36,7 +36,7 @@ export function ThreadLoadingState({
   ...props
 }: ThreadLoadingStateProps) {
   const resolvedLabel =
-    label ?? (kind === "reconnecting" ? "Reconnecting to ChatGPT…" : "Loading task…");
+    label ?? (kind === "reconnecting" ? "Reconnecting to ChatGPT…" : "Loading chat…");
   return (
     <div
       aria-busy="true"
@@ -50,6 +50,76 @@ export function ThreadLoadingState({
     >
       <span aria-hidden="true" className="codex-ui-thread-loading__spinner" />
       <span>{resolvedLabel}</span>
+    </div>
+  );
+}
+
+export type ThreadContextOptimizationMode = "automatic" | "manual" | "work";
+
+export type ThreadContextOptimizationStatus = "running" | "completed";
+
+export interface ThreadContextOptimizationProps
+  extends Omit<HTMLAttributes<HTMLDivElement>, "children"> {
+  icon?: ReactNode;
+  label?: ReactNode;
+  mode?: ThreadContextOptimizationMode;
+  status: ThreadContextOptimizationStatus;
+}
+
+const contextOptimizationLabels: Record<
+  ThreadContextOptimizationMode,
+  Record<ThreadContextOptimizationStatus, string>
+> = {
+  automatic: {
+    completed: "Context automatically compacted",
+    running: "Context automatically compacting",
+  },
+  manual: {
+    completed: "Context compacted",
+    running: "Compacting context",
+  },
+  work: {
+    completed: "Optimized the conversation",
+    running: "Optimizing the conversation",
+  },
+};
+
+export function ThreadContextOptimization({
+  className,
+  icon,
+  label,
+  mode = "automatic",
+  status,
+  ...props
+}: ThreadContextOptimizationProps) {
+  const resolvedLabel = label ?? contextOptimizationLabels[mode][status];
+  const running = status === "running";
+
+  return (
+    <div
+      aria-busy={running || undefined}
+      aria-live={running ? "polite" : undefined}
+      className={["codex-ui-thread-context-optimization", className]
+        .filter(Boolean)
+        .join(" ")}
+      data-mode={mode}
+      data-status={status}
+      role={running ? "status" : undefined}
+      {...props}
+    >
+      <span
+        aria-hidden="true"
+        className="codex-ui-thread-context-optimization__icon"
+      >
+        {icon}
+      </span>
+      {running ? (
+        <LoadingShimmer>{resolvedLabel}</LoadingShimmer>
+      ) : (
+        <span className="codex-ui-thread-context-optimization__label">
+          {resolvedLabel}
+        </span>
+      )}
     </div>
   );
 }

@@ -60,6 +60,7 @@ import {
   ToolCallCard,
   Tooltip,
   ThreadFloatingButton,
+  ThreadContextOptimization,
   ThreadHeader,
   ThreadLoadingState,
   ThreadMessageNavigationRail,
@@ -595,6 +596,11 @@ export function DesktopPlayground() {
                         <li>Electron remains a playground-only dependency.</li>
                       </ul>
                     </AgentActivity>
+                    <AgentActivity
+                      kind="generic"
+                      status="warning"
+                      summary="Handoff to worktree needs attention"
+                    />
                     <CommandExecution
                       command="pnpm --filter @codex-ui-kit/electron-playground check"
                       cwd="playgrounds/electron"
@@ -653,6 +659,8 @@ export function DesktopPlayground() {
                 </AgentTurn>
                 <ThreadLoadingState />
                 <ThreadLoadingState kind="reconnecting" />
+                <ThreadContextOptimization mode="manual" status="completed" />
+                <ThreadContextOptimization mode="work" status="running" />
                 <ThreadSkeleton />
                 <ThreadRenderError
                   onRetry={() => setThreadStatus("Retried failed desktop turn")}
@@ -926,7 +934,7 @@ export function DesktopPlayground() {
                       variant: "primary",
                     },
                   ]}
-                  heading="Task couldn’t continue"
+                  heading="Chat couldn’t continue"
                   layout="icon"
                   role="alert"
                   tone="error"
@@ -1428,8 +1436,8 @@ export function DesktopPlayground() {
             </header>
             <div className="acceptance-card__body primitive-state-matrix">
               <div className="primitive-state-matrix__toolbar">
-                <Tooltip content="Create a task" shortcut="⌘N">
-                  <IconButton icon={<span>＋</span>} label="Create a task" />
+                <Tooltip content="Create a chat" shortcut="⌘N">
+                  <IconButton icon={<span>＋</span>} label="Create a chat" />
                 </Tooltip>
                 <Tooltip content="Search files" shortcut="⌘P">
                   <IconButton icon={<span>⌕</span>} label="Search files" />

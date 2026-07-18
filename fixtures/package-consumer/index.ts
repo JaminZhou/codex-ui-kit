@@ -15,6 +15,7 @@ import {
   CodeBlock,
   CommandExecution,
   CommandOutput,
+  type CommandExecutionStatus,
   type CodeHighlighter,
   ComposerAttachment,
   ComposerMentionMenu,
@@ -22,6 +23,7 @@ import {
   ComposerModeIndicator,
   type ComposerLayout,
   FileChange,
+  type FileChangeStatus,
   FileDiff,
   GeneratedImageGallery,
   ImagePreviewDialog,
@@ -42,9 +44,11 @@ import {
   SearchActivity,
   Select,
   StatusBanner,
+  type StatusIndicatorStatus,
   SourceList,
   FloatingThreadPanel,
   ThreadFloatingButton,
+  ThreadContextOptimization,
   ThreadHeader,
   ThreadLoadingState,
   ThreadMessageNavigationRail,
@@ -118,6 +122,11 @@ const generatedImage: GeneratedImageItem = {
   id: "package-image",
   src: "https://example.com/image.png",
 };
+const warningStatus: StatusIndicatorStatus = "warning";
+// @ts-expect-error Warning is intentionally scoped to activity/status surfaces.
+const invalidFileChangeWarning: FileChangeStatus = "warning";
+// @ts-expect-error Warning is intentionally scoped to activity/status surfaces.
+const invalidCommandWarning: CommandExecutionStatus = "warning";
 const navigationItem: ThreadMessageNavigationItem = {
   id: "package-navigation-message",
   label: "Package consumer",
@@ -155,6 +164,7 @@ void StatusBanner;
 void SourceList;
 void FloatingThreadPanel;
 void ThreadFloatingButton;
+void ThreadContextOptimization;
 void ThreadHeader;
 void ThreadLoadingState;
 void ThreadMessageNavigationRail;
@@ -197,3 +207,6 @@ void composerLayout;
 void mentionOption;
 void queuedPrompt;
 void generatedImage;
+void warningStatus;
+void invalidFileChangeWarning;
+void invalidCommandWarning;

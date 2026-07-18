@@ -55,6 +55,7 @@ import {
   ToolCallCard,
   Tooltip,
   ThreadFloatingButton,
+  ThreadContextOptimization,
   ThreadHeader,
   ThreadLoadingState,
   ThreadMessageNavigationRail,
@@ -64,11 +65,11 @@ import {
   ThreadThinkingPlaceholder,
   ThreadVirtualizedPlaceholder,
   TurnDuration,
-  type AgentItemStatus,
   type ApprovalDecision,
   type FileDiffLine,
   type GeneratedImageItem,
   type QueuedPrompt,
+  type StatusIndicatorStatus,
   type SubagentActivityItem,
   type SubagentItem,
 } from "../src";
@@ -99,10 +100,11 @@ function GalleryCard({
   );
 }
 
-const statuses: Array<{ label: string; status: AgentItemStatus }> = [
+const statuses: Array<{ label: string; status: StatusIndicatorStatus }> = [
   { label: "Pending", status: "pending" },
   { label: "Running", status: "running" },
   { label: "Completed", status: "completed" },
+  { label: "Warning", status: "warning" },
   { label: "Failed", status: "failed" },
 ];
 
@@ -522,6 +524,11 @@ function Showcase() {
                             <li>Added semantic light and dark tokens.</li>
                           </ul>
                         </AgentActivity>
+                        <AgentActivity
+                          kind="generic"
+                          status="warning"
+                          summary="Handoff to worktree needs attention"
+                        />
                       </ActivityGroup>
                     </ActivityTimeline>
                     <ThreadThinkingPlaceholder />
@@ -535,7 +542,7 @@ function Showcase() {
             </div>
             <div className="thread-state-matrix">
               <div>
-                <span>Task loading</span>
+                <span>Chat loading</span>
                 <ThreadLoadingState />
               </div>
               <div>
@@ -545,6 +552,14 @@ function Showcase() {
               <div>
                 <span>Skeleton</span>
                 <ThreadSkeleton />
+              </div>
+              <div>
+                <span>Manual compaction</span>
+                <ThreadContextOptimization mode="manual" status="completed" />
+              </div>
+              <div>
+                <span>Work optimization</span>
+                <ThreadContextOptimization mode="work" status="running" />
               </div>
               <div>
                 <span>Turn render error</span>
@@ -842,8 +857,8 @@ function Showcase() {
           >
             <div className="primitive-preview">
               <div className="primitive-preview__toolbar">
-                <Tooltip content="Create a task" shortcut="⌘N">
-                  <IconButton icon={<span>＋</span>} label="Create a task" />
+                <Tooltip content="Create a chat" shortcut="⌘N">
+                  <IconButton icon={<span>＋</span>} label="Create a chat" />
                 </Tooltip>
                 <Tooltip content="Search files" shortcut="⌘P">
                   <IconButton icon={<span>⌕</span>} label="Search files" />
@@ -1789,7 +1804,7 @@ function Showcase() {
                           setNoticeActionStatus("Opened failure details"),
                       },
                     ]}
-                    heading="Task couldn’t continue"
+                    heading="Chat couldn’t continue"
                     layout="icon"
                     role="alert"
                     tone="error"

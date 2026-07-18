@@ -1,4 +1,8 @@
-export type AgentItemStatus = "pending" | "running" | "completed" | "failed";
+export type AgentItemStatus =
+  | "pending"
+  | "running"
+  | "completed"
+  | "failed";
 
 export type AgentMessageRole = "user" | "assistant" | "system";
 

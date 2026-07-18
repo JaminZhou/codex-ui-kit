@@ -10,6 +10,7 @@ Codex UI Kit exposes protocol-neutral React components. Hosts own data fetching,
 - `ThreadVirtualizedPlaceholder`: estimated-height placeholder for host-owned thread virtualization.
 - `AgentMessage`: user, assistant, and system presentation with user-bubble geometry, edit activation, actions, running ARIA state, and target highlighting.
 - `ThreadLoadingState` and `ThreadThinkingPlaceholder`: loading, reconnecting, and thinking states.
+- `ThreadContextOptimization`: manual compaction, automatic compaction, and Work-mode conversation optimization in running and completed states.
 - `LoadingShimmer` and `ThreadSkeleton`: streaming-safe progress surfaces with reduced-motion fallbacks.
 - `ThreadRenderError`: compact turn-level failure with a host-owned retry hook.
 
@@ -47,7 +48,7 @@ The built-in highlighter escapes untrusted code. A custom `CodeHighlighter` retu
 - `StatusBanner`: neutral, info, warning, and error shell with actions, dismissal, and compact reflow.
 - `InlineNotice`: transcript divider with tone, guidance, wrapping, and active shimmer.
 - `StreamNotice`: reconnecting, server-busy, failed, retry, progress, and additional-detail states.
-- `StatusIndicator`: compact visual state primitive.
+- `StatusIndicator`: compact pending, running, completed, warning, and failed state primitive.
 
 All privileged behavior remains host-owned. The components never auto-approve commands, file changes, network access, or permissions.
 

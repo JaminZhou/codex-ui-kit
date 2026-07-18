@@ -40,7 +40,7 @@ describe("interactive controls", () => {
 
   it("opens a tooltip immediately from keyboard focus and closes it with Escape", () => {
     render(
-      <Tooltip content="Create a task" shortcut="⌘N">
+      <Tooltip content="Create a chat" shortcut="⌘N">
         <button type="button">New</button>
       </Tooltip>,
     );
@@ -48,7 +48,7 @@ describe("interactive controls", () => {
     const trigger = screen.getByRole("button", { name: "New" });
     fireEvent.focusIn(trigger);
     const tooltip = screen.getByRole("tooltip");
-    expect(tooltip.textContent).toContain("Create a task");
+    expect(tooltip.textContent).toContain("Create a chat");
     expect(tooltip.textContent).toContain("⌘N");
     expect(trigger.getAttribute("aria-describedby")).toBe(tooltip.id);
 

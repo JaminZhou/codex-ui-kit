@@ -286,6 +286,7 @@ async function captureThreadSurfaces(
     const groupedTurn = card?.querySelector('.codex-ui-agent-turn[data-spacing="grouped"]');
     const runningMessage = card?.querySelector('.codex-ui-agent-message[data-status="running"]');
     const loadingStates = [...(card?.querySelectorAll('.codex-ui-thread-loading') ?? [])];
+    const contextOptimizationStates = [...(card?.querySelectorAll('.codex-ui-thread-context-optimization') ?? [])];
     const spinner = card?.querySelector('.codex-ui-thread-loading__spinner');
     const shimmer = card?.querySelector('.codex-ui-loading-shimmer');
     const skeleton = card?.querySelector('.codex-ui-thread-skeleton');
@@ -301,6 +302,14 @@ async function captureThreadSurfaces(
       bubbleTabIndex: bubble?.tabIndex ?? null,
       card: rect(card),
       clientWidth: document.documentElement.clientWidth,
+      contextOptimizationStates: contextOptimizationStates.map((state) => ({
+        bounds: rect(state),
+        fontSize: getComputedStyle(state).fontSize,
+        gap: getComputedStyle(state).gap,
+        mode: state.getAttribute('data-mode'),
+        status: state.getAttribute('data-status'),
+        text: state.textContent,
+      })),
       footer: rect(footer),
       footerPosition: footer ? getComputedStyle(footer).position : null,
       groupedTurnGap: groupedTurn ? getComputedStyle(groupedTurn).gap : null,

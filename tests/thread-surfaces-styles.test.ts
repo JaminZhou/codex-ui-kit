@@ -32,4 +32,20 @@ describe("complete thread visual contract", () => {
     expect(runningMessage).toContain("contain: layout style");
     expect(runningMessage).not.toContain("animation");
   });
+
+  it("locks current context optimization geometry and status treatments", () => {
+    expect(tokens).toContain(
+      "--codex-ui-context-optimization-icon-size: calc(var(--codex-ui-spacing) * 4)",
+    );
+    expect(tokens).toContain(
+      "--codex-ui-context-optimization-min-height: calc(var(--codex-ui-spacing) * 7)",
+    );
+    expect(styles).toContain(".codex-ui-thread-context-optimization {");
+    expect(styles).toContain(
+      '.codex-ui-activity[data-status="warning"] .codex-ui-activity__summary',
+    );
+    expect(styles).toContain(
+      '.codex-ui-status-indicator[data-status="warning"]',
+    );
+  });
 });

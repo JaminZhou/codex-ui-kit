@@ -1,6 +1,11 @@
 import { useState, type HTMLAttributes, type ReactNode } from "react";
-import type { AgentActivityKind, AgentItemStatus } from "../types";
-import { StatusIndicator } from "./StatusIndicator";
+import type { AgentActivityKind } from "../types";
+import {
+  StatusIndicator,
+  type StatusIndicatorStatus,
+} from "./StatusIndicator";
+
+export type AgentActivityStatus = StatusIndicatorStatus;
 
 export interface AgentActivityProps
   extends Omit<HTMLAttributes<HTMLDivElement>, "children"> {
@@ -12,7 +17,7 @@ export interface AgentActivityProps
   kind?: AgentActivityKind;
   onOpenChange?: (open: boolean) => void;
   open?: boolean;
-  status: AgentItemStatus;
+  status: AgentActivityStatus;
   summary: ReactNode;
 }
 

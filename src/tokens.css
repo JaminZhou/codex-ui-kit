@@ -147,6 +147,9 @@
   --codex-ui-user-message-compact-max-width: 88%;
   --codex-ui-loading-spinner-size: calc(var(--codex-ui-spacing) * 4);
   --codex-ui-loading-shimmer-duration: 2s;
+  --codex-ui-context-optimization-icon-size: calc(var(--codex-ui-spacing) * 4);
+  --codex-ui-context-optimization-gap: calc(var(--codex-ui-spacing) * 2);
+  --codex-ui-context-optimization-min-height: calc(var(--codex-ui-spacing) * 7);
   --codex-ui-message-highlight-duration: 1400ms;
   --codex-ui-markdown-block-gap: 0.6875rem;
   --codex-ui-markdown-inline-overhang: 1.5rem;
