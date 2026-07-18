@@ -333,9 +333,17 @@ describe("modal dialog", () => {
     );
 
     const close = screen.getByRole("button", { name: "Close dialog" });
+    const firstNested = screen.getByRole("button", {
+      name: "First nested action",
+    });
     const lastNested = screen.getByRole("button", {
       name: "Last nested action",
     });
+
+    firstNested.focus();
+    expect(fireEvent.keyDown(firstNested, { key: "Tab" })).toBe(true);
+    expect(document.activeElement).toBe(firstNested);
+
     lastNested.focus();
     expect(fireEvent.keyDown(lastNested, { key: "Tab" })).toBe(false);
     expect(document.activeElement).toBe(close);

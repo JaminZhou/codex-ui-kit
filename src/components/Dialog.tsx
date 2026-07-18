@@ -158,7 +158,10 @@ export function Dialog({
       surface.focus();
       return;
     }
-    const focusInside = surface.contains(document.activeElement);
+    const activeElement = document.activeElement;
+    const focusInside =
+      activeElement instanceof HTMLElement &&
+      dialogOwnsFocusTarget(dialogId, surface, activeElement);
     if (event.shiftKey && (!focusInside || document.activeElement === first)) {
       event.preventDefault();
       last.focus();
