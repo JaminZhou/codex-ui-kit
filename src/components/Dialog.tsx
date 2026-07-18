@@ -96,6 +96,7 @@ export function Dialog({
   if (!open || typeof document === "undefined") return null;
 
   const handleKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
+    if (event.defaultPrevented) return;
     if (event.key === "Escape" && closeOnEscape) {
       event.preventDefault();
       onOpenChange(false);

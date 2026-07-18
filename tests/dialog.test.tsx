@@ -199,5 +199,8 @@ describe("modal dialog", () => {
     const menu = await screen.findByRole("menu");
     expect(menu.getAttribute("data-theme")).toBe("dark");
     expect(menu.getAttribute("data-codex-ui-overlay-layer")).toBe("dialog");
+    fireEvent.keyDown(menu, { key: "Escape" });
+    expect(screen.queryByRole("menu")).toBeNull();
+    expect(screen.getByRole("dialog", { name: "Themed dialog" })).toBeTruthy();
   });
 });
