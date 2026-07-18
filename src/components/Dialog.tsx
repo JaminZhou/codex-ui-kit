@@ -48,6 +48,18 @@ function getDialogOwnedPortalFocusableItems(dialogId: string) {
     .flatMap(getDialogFocusableItems);
 }
 
+function dialogOwnsFocusTarget(
+  dialogId: string,
+  surface: HTMLElement | null,
+  target: HTMLElement,
+) {
+  if (surface?.contains(target)) return true;
+  const ownedPortal = target.closest<HTMLElement>(
+    "[data-codex-ui-dialog-owner]",
+  );
+  return ownedPortal?.dataset.codexUiDialogOwner === dialogId;
+}
+
 export function Dialog({
   children,
   className,
@@ -86,24 +98,30 @@ export function Dialog({
   useEffect(() => {
     if (!open || typeof document === "undefined") return;
     returnFocusRef.current = document.activeElement as HTMLElement | null;
+    const getInitialFocus = () => {
+      const surface = surfaceRef.current;
+      if (!surface) return null;
+      const requested = initialFocusSelector
+        ? surface.querySelector<HTMLElement>(initialFocusSelector)
+        : null;
+      return requested ?? getDialogFocusableItems(surface)[0] ?? surface;
+    };
     const modalLock = acquireDocumentScrollLock({
+      containsFocus: (target) =>
+        dialogOwnsFocusTarget(dialogId, surfaceRef.current, target),
+      getInitialFocus,
       priority: 1100,
       returnFocus: returnFocusRef.current,
     });
     const timer = window.setTimeout(() => {
       if (!modalLock.isTop()) return;
-      const surface = surfaceRef.current;
-      if (!surface) return;
-      const requested = initialFocusSelector
-        ? surface.querySelector<HTMLElement>(initialFocusSelector)
-        : null;
-      (requested ?? getDialogFocusableItems(surface)[0] ?? surface).focus();
+      getInitialFocus()?.focus();
     });
     return () => {
       window.clearTimeout(timer);
       modalLock.release()?.focus();
     };
-  }, [initialFocusSelector, open]);
+  }, [dialogId, initialFocusSelector, open]);
 
   if (!open || typeof document === "undefined") return null;
 

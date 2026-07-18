@@ -565,6 +565,7 @@ export function ImagePreviewDialog({
 }: ImagePreviewDialogProps) {
   const titleId = useId();
   const closeRef = useRef<HTMLButtonElement>(null);
+  const previewRef = useRef<HTMLDivElement>(null);
   const returnFocusRef = useRef<HTMLElement | null>(null);
   const requestedIndex = imageId ? images.findIndex((image) => image.id === imageId) : 0;
   const [activeIndex, setActiveIndex] = useState(Math.max(0, requestedIndex));
@@ -584,6 +585,8 @@ export function ImagePreviewDialog({
     if (!open) return;
     returnFocusRef.current = document.activeElement as HTMLElement | null;
     const modalLock = acquireDocumentScrollLock({
+      containsFocus: (target) => previewRef.current?.contains(target) ?? false,
+      getInitialFocus: () => closeRef.current,
       priority: 1200,
       returnFocus: returnFocusRef.current,
     });
@@ -636,6 +639,7 @@ export function ImagePreviewDialog({
       aria-modal="true"
       className="codex-ui-image-preview"
       onKeyDown={handleKeyDown}
+      ref={previewRef}
       role="dialog"
     >
       <button

@@ -236,7 +236,7 @@ describe("modal dialog", () => {
       id: "priority-preview",
       src: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'/%3E",
     };
-    const renderPriorityStack = (dialogOpen: boolean) => (
+    const renderPriorityStack = (dialogOpen: boolean, previewOpen = true) => (
       <>
         <Dialog
           onOpenChange={vi.fn()}
@@ -249,7 +249,7 @@ describe("modal dialog", () => {
         <ImagePreviewDialog
           images={[image]}
           onOpenChange={vi.fn()}
-          open
+          open={previewOpen}
         />
       </>
     );
@@ -264,6 +264,13 @@ describe("modal dialog", () => {
     expect(
       screen.getByRole("dialog", { name: "Lower-priority dialog" }),
     ).toBeTruthy();
+
+    rerender(renderPriorityStack(true, false));
+    await waitFor(() =>
+      expect(document.activeElement).toBe(
+        screen.getByRole("button", { name: "Lower dialog action" }),
+      ),
+    );
   });
 
   it("preserves a scoped theme and elevates nested portalled overlays", async () => {

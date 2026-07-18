@@ -1,10 +1,14 @@
 interface ModalLockEntry {
+  containsFocus: (target: HTMLElement) => boolean;
+  getInitialFocus: () => HTMLElement | null;
   priority: number;
   returnFocus: HTMLElement | null;
   token: symbol;
 }
 
 export interface ModalLockOptions {
+  containsFocus?: (target: HTMLElement) => boolean;
+  getInitialFocus?: () => HTMLElement | null;
   priority?: number;
   returnFocus?: HTMLElement | null;
 }
@@ -32,6 +36,8 @@ function getTopModalLock() {
  * lower surface closed beneath another modal defers its trigger as a fallback.
  */
 export function acquireDocumentScrollLock({
+  containsFocus = () => false,
+  getInitialFocus = () => null,
   priority = 0,
   returnFocus = null,
 }: ModalLockOptions = {}): ModalLockHandle {
@@ -44,6 +50,8 @@ export function acquireDocumentScrollLock({
     document.body.style.overflow = "hidden";
   }
   const entry: ModalLockEntry = {
+    containsFocus,
+    getInitialFocus,
     priority,
     returnFocus,
     token: Symbol("modal-lock"),
@@ -67,10 +75,25 @@ export function acquireDocumentScrollLock({
 
     let restoreFocus: HTMLElement | null = null;
     if (wasTop) {
-      restoreFocus = entry.returnFocus?.isConnected ? entry.returnFocus : null;
-      while (!restoreFocus && deferredFocusTargets.length > 0) {
-        const candidate = deferredFocusTargets.pop();
-        if (candidate?.isConnected) restoreFocus = candidate;
+      const nextTop = getTopModalLock();
+      if (nextTop) {
+        if (
+          entry.returnFocus?.isConnected &&
+          nextTop.containsFocus(entry.returnFocus)
+        ) {
+          restoreFocus = entry.returnFocus;
+        } else {
+          if (entry.returnFocus?.isConnected) {
+            deferredFocusTargets.push(entry.returnFocus);
+          }
+          restoreFocus = nextTop.getInitialFocus();
+        }
+      } else {
+        restoreFocus = entry.returnFocus?.isConnected ? entry.returnFocus : null;
+        while (!restoreFocus && deferredFocusTargets.length > 0) {
+          const candidate = deferredFocusTargets.pop();
+          if (candidate?.isConnected) restoreFocus = candidate;
+        }
       }
     }
 
