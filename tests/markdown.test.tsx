@@ -72,6 +72,10 @@ describe("AgentMarkdown", () => {
     expect(stabilizeStreamingMarkdown("See [docs](https://example.com")).toBe(
       "See [docs](https://example.com)",
     );
+    expect(stabilizeStreamingMarkdown("[]([)](")).toBe("[]([)]()");
+    expect(stabilizeStreamingMarkdown("[one](done) [two](done)")).toBe(
+      "[one](done) [two](done)",
+    );
     expect(stabilizeStreamingMarkdown("````md\n```\ncode")).toBe(
       "````md\n```\ncode\n````",
     );
@@ -80,6 +84,16 @@ describe("AgentMarkdown", () => {
     );
     expect(stabilizeStreamingMarkdown("````md\ncode\n`````")).toBe(
       "````md\ncode\n`````",
+    );
+
+    const manyOpeningBrackets = "[".repeat(100_000);
+    expect(stabilizeStreamingMarkdown(manyOpeningBrackets)).toBe(
+      manyOpeningBrackets,
+    );
+
+    const manyIncompleteLinks = "[](".repeat(25_000);
+    expect(stabilizeStreamingMarkdown(manyIncompleteLinks)).toBe(
+      `${manyIncompleteLinks})`,
     );
 
     const html = renderToStaticMarkup(
