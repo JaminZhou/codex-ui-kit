@@ -17,6 +17,8 @@ second component implementation and it is not published with the package.
   panels, and latest-message floating states.
 - Exercise portalled tooltips, popovers, menus, submenus, and selects inside the
   real BrowserWindow.
+- Exercise a compact modal dialog with focus trapping, focus restoration,
+  descriptive choices, and document scroll locking.
 - Keep `contextIsolation`, sandboxing, and a narrow preload API enabled.
 
 Electron is intentionally declared only in this workspace's development

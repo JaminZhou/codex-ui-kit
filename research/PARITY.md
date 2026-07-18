@@ -53,6 +53,7 @@ A row is complete only when all applicable gates pass:
 | Thread header, floating controls, and navigation affordances | Complete | Measured | Complete | Complete | Good | Complete |
 | Loading, streaming, skeleton, hover, focus, and reduced motion | Complete | Measured | Complete | Complete | Good | Complete |
 | Context compaction, conversation optimization, and handoff warning | Complete | Measured core | Complete | Complete | Good | Complete |
+| Compact modal continuation choice | Complete | Measured core | Complete | Complete | Good | Complete |
 | Responsive and narrow-window behavior | Complete | Measured | Complete | Complete | Good | Complete |
 | Package tokens, CSS exports, documentation, and provenance | Complete | Measured | N/A | N/A | Good | Complete |
 

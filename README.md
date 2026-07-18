@@ -98,7 +98,7 @@ export function Example() {
 | [Agent activity](docs/COMPONENTS.md#agent-activity) | `ActivityTimeline`, `AgentReasoning`, `AgentPlan`, subagent surfaces |
 | [Tools and approvals](docs/COMPONENTS.md#tools-approvals-and-status) | `ToolCallCard`, `CommandExecution`, `FileChange`, `ApprovalRequest` |
 | [Composer](docs/COMPONENTS.md#composer) | `AgentComposer`, attachments, mentions, modes, queued prompts |
-| [Interactive primitives](docs/COMPONENTS.md#interactive-primitives) | Buttons, menus, selects, popovers, tooltips |
+| [Interactive primitives](docs/COMPONENTS.md#interactive-primitives) | Buttons, dialogs, menus, selects, popovers, tooltips |
 | [Resources and media](docs/COMPONENTS.md#resources-and-media) | Resource cards, sources, artifacts, generated images |
 | [Navigation and shell](docs/COMPONENTS.md#navigation-and-shell) | Thread header, navigation rail, floating panels and controls |
 
@@ -139,7 +139,7 @@ pnpm install --frozen-lockfile
 pnpm check
 ```
 
-`pnpm check` runs type checking, 264 package tests, the library build, the package contract, the browser showcase build, and the Electron main/preload/Renderer checks.
+`pnpm check` runs type checking, the package test suite, the library build, the package contract, the browser showcase build, and the Electron main/preload/Renderer checks.
 
 - [`CONTRIBUTING.md`](CONTRIBUTING.md) covers development and visual-acceptance expectations.
 - [`CODE_OF_CONDUCT.md`](CODE_OF_CONDUCT.md) defines community expectations.
