@@ -3,6 +3,7 @@ import {
   type HTMLAttributes,
   type KeyboardEvent,
   type ReactNode,
+  type RefObject,
   useEffect,
   useId,
   useLayoutEffect,
@@ -26,6 +27,7 @@ export interface DialogProps
   initialFocusSelector?: string;
   onOpenChange: (open: boolean) => void;
   open: boolean;
+  returnFocusRef?: RefObject<HTMLElement | null>;
   showClose?: boolean;
   size?: DialogSize;
   theme?: string;
@@ -88,6 +90,7 @@ export function Dialog({
   initialFocusSelector,
   onOpenChange,
   open,
+  returnFocusRef,
   showClose = true,
   size = "standard",
   theme,
@@ -98,7 +101,7 @@ export function Dialog({
   const descriptionId = useId();
   const dialogId = useId();
   const surfaceRef = useRef<HTMLDivElement>(null);
-  const returnFocusRef = useRef<HTMLElement | null>(null);
+  const capturedReturnFocusRef = useRef<HTMLElement | null>(null);
   const [inferredTheme, setInferredTheme] = useState<string>();
   const portalTheme = theme ?? inferredTheme;
 
@@ -114,7 +117,9 @@ export function Dialog({
 
   useEffect(() => {
     if (!open || typeof document === "undefined") return;
-    returnFocusRef.current = document.activeElement as HTMLElement | null;
+    capturedReturnFocusRef.current =
+      returnFocusRef?.current ??
+      (document.activeElement as HTMLElement | null);
     const getInitialFocus = () => {
       const surface = surfaceRef.current;
       if (!surface) return null;
@@ -128,7 +133,7 @@ export function Dialog({
         dialogOwnsFocusTarget(dialogId, surfaceRef.current, target),
       getInitialFocus,
       priority: 1100,
-      returnFocus: returnFocusRef.current,
+      returnFocus: capturedReturnFocusRef.current,
     });
     const timer = window.setTimeout(() => {
       if (!modalLock.isTop()) return;
@@ -138,7 +143,7 @@ export function Dialog({
       window.clearTimeout(timer);
       modalLock.release()?.focus();
     };
-  }, [dialogId, initialFocusSelector, open]);
+  }, [dialogId, initialFocusSelector, open, returnFocusRef]);
 
   if (!open || typeof document === "undefined") return null;
 

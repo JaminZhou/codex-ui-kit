@@ -1,7 +1,7 @@
 // @vitest-environment happy-dom
 
 import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import {
   Dialog,
@@ -82,6 +82,50 @@ describe("modal dialog", () => {
 
     expect(screen.queryByRole("dialog")).toBeNull();
     expect(document.body.style.overflow).toBe("");
+    await waitFor(() => expect(document.activeElement).toBe(trigger));
+  });
+
+  it("restores a stable trigger when launched from a transient menu item", async () => {
+    function MenuLaunchedDialogHarness() {
+      const [open, setOpen] = useState(false);
+      const triggerRef = useRef<HTMLButtonElement>(null);
+      return (
+        <>
+          <Menu
+            defaultOpen
+            trigger={
+              <button ref={triggerRef} type="button">
+                More actions
+              </button>
+            }
+          >
+            <MenuItem onSelect={() => setOpen(true)}>Open dialog</MenuItem>
+          </Menu>
+          <Dialog
+            onOpenChange={setOpen}
+            open={open}
+            returnFocusRef={triggerRef}
+            title="Menu-launched dialog"
+          >
+            <button type="button">Dialog action</button>
+          </Dialog>
+        </>
+      );
+    }
+
+    render(<MenuLaunchedDialogHarness />);
+    const trigger = screen.getByRole("button", { name: "More actions" });
+    fireEvent.click(screen.getByRole("menuitem", { name: "Open dialog" }));
+    expect(screen.queryByRole("menu")).toBeNull();
+    const dialog = screen.getByRole("dialog", { name: "Menu-launched dialog" });
+    await waitFor(() =>
+      expect(document.activeElement).toBe(
+        screen.getByRole("button", { name: "Close dialog" }),
+      ),
+    );
+
+    fireEvent.keyDown(dialog, { key: "Escape" });
+    expect(screen.queryByRole("dialog")).toBeNull();
     await waitFor(() => expect(document.activeElement).toBe(trigger));
   });
 
