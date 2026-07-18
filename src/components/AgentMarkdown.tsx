@@ -317,6 +317,31 @@ export function CodeBlock({
   );
 }
 
+function hasIncompleteInlineLink(source: string) {
+  const line = source.slice(source.lastIndexOf("\n") + 1);
+  const lastDestinationEnd = line.lastIndexOf(")");
+  let labelStart = -1;
+
+  for (let index = 0; index < line.length; index += 1) {
+    if (line[index] === "[") {
+      labelStart = index;
+      continue;
+    }
+
+    if (line[index] !== "]" || labelStart === -1) continue;
+    if (line[index + 1] !== "(") {
+      labelStart = -1;
+      continue;
+    }
+
+    if (lastDestinationEnd < index + 2) return true;
+
+    labelStart = -1;
+  }
+
+  return false;
+}
+
 export function stabilizeStreamingMarkdown(source: string) {
   let stabilized = source;
   let openFence: { marker: "`" | "~"; length: number } | undefined;
@@ -347,7 +372,7 @@ export function stabilizeStreamingMarkdown(source: string) {
       : `\n${closingFence}`;
   }
 
-  if (/\[[^\]\n]*\]\([^\)\n]*$/.test(stabilized)) {
+  if (hasIncompleteInlineLink(stabilized)) {
     stabilized += ")";
   }
 
