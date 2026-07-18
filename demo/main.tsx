@@ -1561,6 +1561,7 @@ function Showcase() {
                     Terminal · interactive · three-line collapse
                   </span>
                   <ApprovalRequest
+                    autoFocus={false}
                     decision={approvalDecision}
                     kind="command"
                     onApprove={() => {
@@ -1595,6 +1596,7 @@ function Showcase() {
                 <div className="approval-preview__surface">
                   <span className="approval-preview__label">Edit files · patch</span>
                   <ApprovalRequest
+                    autoFocus={false}
                     disableHotkeys
                     kind="file"
                     onApprove={() =>
@@ -1616,6 +1618,7 @@ function Showcase() {
                 <div className="approval-preview__surface">
                   <span className="approval-preview__label">Internet access</span>
                   <ApprovalRequest
+                    autoFocus={false}
                     description="api.example.com isn't on the current network allowlist"
                     disableHotkeys
                     kind="network"
@@ -1639,6 +1642,7 @@ function Showcase() {
                 <div className="approval-preview__surface">
                   <span className="approval-preview__label">Permissions · session scope</span>
                   <ApprovalRequest
+                    autoFocus={false}
                     disableHotkeys
                     kind="permission"
                     onApprove={() =>
@@ -1660,6 +1664,7 @@ function Showcase() {
                 <div className="approval-preview__surface approval-preview__surface--narrow">
                   <span className="approval-preview__label">Loading · disabled</span>
                   <ApprovalRequest
+                    autoFocus={false}
                     disableHotkeys
                     kind="mcp"
                     leadingAction={{ onClick: () => undefined }}
