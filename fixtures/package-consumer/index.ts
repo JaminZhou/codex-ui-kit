@@ -22,6 +22,9 @@ import {
   type ComposerMentionOption,
   ComposerModeIndicator,
   type ComposerLayout,
+  Dialog,
+  DialogChoice,
+  type DialogSize,
   FileChange,
   type FileChangeStatus,
   FileDiff,
@@ -122,6 +125,7 @@ const generatedImage: GeneratedImageItem = {
   id: "package-image",
   src: "https://example.com/image.png",
 };
+const dialogSize: DialogSize = "compact";
 const warningStatus: StatusIndicatorStatus = "warning";
 // @ts-expect-error Warning is intentionally scoped to activity/status surfaces.
 const invalidFileChangeWarning: FileChangeStatus = "warning";
@@ -155,6 +159,8 @@ void CommandOutput;
 void ComposerAttachment;
 void ComposerMentionMenu;
 void ComposerModeIndicator;
+void Dialog;
+void DialogChoice;
 void ProposedPlan;
 void ResourceCard;
 void ResourceList;
@@ -207,6 +213,7 @@ void composerLayout;
 void mentionOption;
 void queuedPrompt;
 void generatedImage;
+void dialogSize;
 void warningStatus;
 void invalidFileChangeWarning;
 void invalidCommandWarning;

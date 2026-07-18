@@ -63,6 +63,7 @@ All privileged behavior remains host-owned. The components never auto-approve co
 ## Interactive primitives
 
 - `Button` and `IconButton`: primary, secondary, outline, ghost, danger, pressed, loading, disabled, toolbar, and size states.
+- `Dialog` and `DialogChoice`: controlled modal presentation with compact, standard, and wide sizes; focus trapping/restoration; an optional `returnFocusRef` for launchers that unmount before the modal commits; scroll locking; Escape/backdrop dismissal; and descriptive choice rows.
 - `Tooltip`: delayed pointer and immediate keyboard disclosure with shortcut, side, alignment, and collision support.
 - `Popover`: portalled dialog, menu, or listbox positioning with outside dismissal, focus restoration, and viewport collision handling.
 - `Menu`, `MenuItem`, `MenuCheckboxItem`, and `MenuSubmenu`: keyboard navigation, sections, separators, checked states, nested portals, shortcuts, descriptions, and destructive actions.

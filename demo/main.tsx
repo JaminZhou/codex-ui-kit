@@ -21,6 +21,8 @@ import {
   ComposerAttachment,
   ComposerMentionMenu,
   ComposerModeIndicator,
+  Dialog,
+  DialogChoice,
   FileChange,
   FileDiff,
   fileDiffToText,
@@ -384,6 +386,7 @@ function Showcase() {
   const [primitiveStatus, setPrimitiveStatus] = useState(
     "Interactive controls ready",
   );
+  const [continuationDialogOpen, setContinuationDialogOpen] = useState(false);
   const [previewImageId, setPreviewImageId] = useState<string | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [floatingPanelOpen, setFloatingPanelOpen] = useState(true);
@@ -851,7 +854,7 @@ function Showcase() {
           </GalleryCard>
 
           <GalleryCard
-            description="Shared button, toolbar, tooltip, popover, menu, submenu, checkbox, and listbox states with portal collision handling."
+            description="Shared button, toolbar, tooltip, popover, menu, submenu, checkbox, listbox, and modal dialog states with portal collision handling."
             title="Interactive controls and overlays"
             wide
           >
@@ -951,6 +954,19 @@ function Showcase() {
                   </div>
                 </div>
 
+                <div className="primitive-preview__sample">
+                  <span>Compact modal choice</span>
+                  <div className="primitive-preview__row">
+                    <Button
+                      data-choice-dialog-trigger="true"
+                      onClick={() => setContinuationDialogOpen(true)}
+                      tone="outline"
+                    >
+                      Continue from message
+                    </Button>
+                  </div>
+                </div>
+
                 <div className="primitive-preview__sample primitive-preview__sample--wide">
                   <span>Live state</span>
                   <output aria-live="polite">
@@ -959,6 +975,32 @@ function Showcase() {
                 </div>
               </div>
             </div>
+            <Dialog
+              onOpenChange={setContinuationDialogOpen}
+              open={continuationDialogOpen}
+              showClose={false}
+              size="compact"
+              title="Continue in a new chat"
+            >
+              <DialogChoice
+                description="Continue from this message in the current workspace"
+                icon={<span>◇</span>}
+                label="Use this workspace"
+                onSelect={() => {
+                  setPrimitiveStatus("Continued in workspace");
+                  setContinuationDialogOpen(false);
+                }}
+              />
+              <DialogChoice
+                description="Continue from this message in a new worktree"
+                icon={<span>◇</span>}
+                label="Use a new worktree"
+                onSelect={() => {
+                  setPrimitiveStatus("Continued in new worktree");
+                  setContinuationDialogOpen(false);
+                }}
+              />
+            </Dialog>
           </GalleryCard>
 
           <GalleryCard

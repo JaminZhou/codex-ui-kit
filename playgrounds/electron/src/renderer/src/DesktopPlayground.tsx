@@ -26,6 +26,8 @@ import {
   ComposerAttachment,
   ComposerMentionMenu,
   ComposerModeIndicator,
+  Dialog,
+  DialogChoice,
   FileChange,
   FileDiff,
   fileDiffToText,
@@ -357,6 +359,7 @@ export function DesktopPlayground() {
   const [primitiveStatus, setPrimitiveStatus] = useState(
     "Desktop controls ready",
   );
+  const [continuationDialogOpen, setContinuationDialogOpen] = useState(false);
   const [previewImageId, setPreviewImageId] = useState<string | null>(null);
   const [navigationSidebarOpen, setNavigationSidebarOpen] = useState(false);
   const [navigationPanelOpen, setNavigationPanelOpen] = useState(true);
@@ -1430,7 +1433,10 @@ export function DesktopPlayground() {
             <header>
               <div>
                 <h2>Interactive controls and overlays</h2>
-                <p>Portal placement, native focus, toolbar geometry, and menus.</p>
+                <p>
+                  Portal placement, native focus, toolbar geometry, menus, and
+                  modal choices.
+                </p>
               </div>
               <span className="acceptance-badge">desktop portal</span>
             </header>
@@ -1520,12 +1526,45 @@ export function DesktopPlayground() {
                   ]}
                   value={desktopExecutionMode}
                 />
+                <Button
+                  data-choice-dialog-trigger="true"
+                  onClick={() => setContinuationDialogOpen(true)}
+                  tone="outline"
+                >
+                  Continue from message
+                </Button>
               </div>
 
               <output aria-live="polite">
                 {primitiveStatus} · line numbers {desktopLineNumbers ? "on" : "off"}
               </output>
             </div>
+            <Dialog
+              onOpenChange={setContinuationDialogOpen}
+              open={continuationDialogOpen}
+              showClose={false}
+              size="compact"
+              title="Continue in a new chat"
+            >
+              <DialogChoice
+                description="Continue from this message in the current workspace"
+                icon={<span>◇</span>}
+                label="Use this workspace"
+                onSelect={() => {
+                  setPrimitiveStatus("Continued in workspace");
+                  setContinuationDialogOpen(false);
+                }}
+              />
+              <DialogChoice
+                description="Continue from this message in a new worktree"
+                icon={<span>◇</span>}
+                label="Use a new worktree"
+                onSelect={() => {
+                  setPrimitiveStatus("Continued in new worktree");
+                  setContinuationDialogOpen(false);
+                }}
+              />
+            </Dialog>
           </article>
 
           <article

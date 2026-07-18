@@ -11,6 +11,7 @@ import {
   useState,
 } from "react";
 import { createPortal } from "react-dom";
+import { acquireDocumentScrollLock } from "../internal/documentScrollLock";
 
 export type ResourceKind =
   | "app"
@@ -564,6 +565,7 @@ export function ImagePreviewDialog({
 }: ImagePreviewDialogProps) {
   const titleId = useId();
   const closeRef = useRef<HTMLButtonElement>(null);
+  const previewRef = useRef<HTMLDivElement>(null);
   const returnFocusRef = useRef<HTMLElement | null>(null);
   const requestedIndex = imageId ? images.findIndex((image) => image.id === imageId) : 0;
   const [activeIndex, setActiveIndex] = useState(Math.max(0, requestedIndex));
@@ -582,12 +584,15 @@ export function ImagePreviewDialog({
   useEffect(() => {
     if (!open) return;
     returnFocusRef.current = document.activeElement as HTMLElement | null;
-    const previousOverflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-    closeRef.current?.focus();
+    const modalLock = acquireDocumentScrollLock({
+      containsFocus: (target) => previewRef.current?.contains(target) ?? false,
+      getInitialFocus: () => closeRef.current,
+      priority: 1200,
+      returnFocus: returnFocusRef.current,
+    });
+    if (modalLock.isTop()) closeRef.current?.focus();
     return () => {
-      document.body.style.overflow = previousOverflow;
-      returnFocusRef.current?.focus();
+      modalLock.release()?.focus();
     };
   }, [open]);
 
@@ -634,6 +639,7 @@ export function ImagePreviewDialog({
       aria-modal="true"
       className="codex-ui-image-preview"
       onKeyDown={handleKeyDown}
+      ref={previewRef}
       role="dialog"
     >
       <button

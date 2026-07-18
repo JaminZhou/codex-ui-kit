@@ -23,6 +23,7 @@ import {
   type RefObject,
 } from "react";
 import { createPortal } from "react-dom";
+import { OverlayEnvironmentContext } from "../internal/overlayEnvironment";
 
 export type ControlTone =
   | "danger"
@@ -264,6 +265,7 @@ function FloatingSurface({
   style,
   width,
 }: FloatingSurfaceProps) {
+  const overlayEnvironment = useContext(OverlayEnvironmentContext);
   const internalRef = useRef<HTMLDivElement | null>(null);
   const [surfaceNode, setSurfaceNode] = useState<HTMLDivElement | null>(null);
   const [position, setPosition] = useState<{
@@ -340,7 +342,9 @@ function FloatingSurface({
       Math.max(edge, top),
       Math.max(edge, window.innerHeight - surfaceRect.height - edge),
     );
-    const theme = anchor.closest<HTMLElement>("[data-theme]")?.dataset.theme;
+    const theme =
+      overlayEnvironment.theme ??
+      anchor.closest<HTMLElement>("[data-theme]")?.dataset.theme;
     setPosition({
       left,
       maxHeight: window.innerHeight - edge * 2,
@@ -349,7 +353,7 @@ function FloatingSurface({
       top,
       triggerWidth: anchorRect.width,
     });
-  }, [align, anchorRef, side, sideOffset]);
+  }, [align, anchorRef, overlayEnvironment.theme, side, sideOffset]);
 
   useLayoutEffect(() => {
     if (!open) {
@@ -392,6 +396,8 @@ function FloatingSurface({
       className={className}
       data-align={align}
       data-codex-ui-overlay-owner={ownerIds?.join(" ")}
+      data-codex-ui-overlay-layer={overlayEnvironment.layer}
+      data-codex-ui-dialog-owner={overlayEnvironment.ownerId}
       data-side={position?.resolvedSide ?? side}
       data-state="open"
       data-theme={position?.theme}

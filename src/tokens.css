@@ -117,6 +117,14 @@
   --codex-ui-overlay-menu-wide-width: 18rem;
   --codex-ui-overlay-tooltip-max-width: 20rem;
   --codex-ui-overlay-max-height: calc(100dvh - 1rem);
+  --codex-ui-dialog-width-compact: 25rem;
+  --codex-ui-dialog-width-standard: 32rem;
+  --codex-ui-dialog-width-wide: 45rem;
+  --codex-ui-dialog-edge-inset: calc(var(--codex-ui-spacing) * 4);
+  --codex-ui-dialog-padding: calc(var(--codex-ui-spacing) * 4);
+  --codex-ui-dialog-choice-gap: calc(var(--codex-ui-spacing) * 3);
+  --codex-ui-dialog-choice-padding-x: calc(var(--codex-ui-spacing) * 3);
+  --codex-ui-dialog-choice-padding-y: calc(var(--codex-ui-spacing) * 2);
   --codex-ui-composer-control-gap: var(--codex-ui-spacing);
   --codex-ui-composer-compact-column-gap: calc(var(--codex-ui-spacing) * 2);
   --codex-ui-composer-compact-inline-padding: calc(

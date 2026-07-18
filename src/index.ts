@@ -9,6 +9,7 @@ export * from "./components/AgentComposer";
 export * from "./components/ComposerAuxiliary";
 export * from "./components/ApprovalRequest";
 export * from "./components/CommandExecution";
+export * from "./components/Dialog";
 export * from "./components/FileChange";
 export * from "./components/InteractivePrimitives";
 export * from "./components/Notices";

@@ -80,10 +80,21 @@ async function captureInteractivePrimitives(webContents: WebContents) {
     });
     const toolbarButton = card?.querySelector('.codex-ui-icon-button');
     const mediumButton = card?.querySelector('.codex-ui-button[data-size="medium"]');
+    document.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true }));
+    card?.querySelector('[data-choice-dialog-trigger]')?.click();
+    await wait(160);
+    const dialog = document.querySelector('.codex-ui-dialog');
+    const dialogSurface = dialog?.querySelector('.codex-ui-dialog__surface');
+    const dialogChoices = [...(dialog?.querySelectorAll('.codex-ui-dialog-choice') ?? [])];
     return {
       bodyScrollWidth: document.body.scrollWidth,
       clientWidth: document.documentElement.clientWidth,
       card: rect(card),
+      dialog: rect(dialog),
+      dialogChoiceRows: dialogChoices.map(rect),
+      dialogFirstChoiceFocused: document.activeElement === dialogChoices[0],
+      dialogSurface: rect(dialogSurface),
+      dialogSurfaceRadius: dialogSurface ? getComputedStyle(dialogSurface).borderRadius : null,
       mediumButton: rect(mediumButton),
       overlayOwnerCount: new Set(overlays.map((overlay) => overlay.owner)).size,
       overlays,
@@ -113,6 +124,10 @@ async function captureResourceSurfaces(
       };
     };
     document.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true }));
+    const openDialog = document.querySelector('.codex-ui-dialog');
+    if (openDialog instanceof HTMLElement) {
+      openDialog.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true }));
+    }
     const dock = document.querySelector('.desktop-composer-dock');
     if (dock instanceof HTMLElement) dock.style.display = 'none';
     await wait(80);
@@ -348,6 +363,7 @@ async function captureAcceptance(browserWindow: BrowserWindow) {
   if (!outputDirectory) return;
 
   await new Promise((resolve) => setTimeout(resolve, 500));
+  console.log("acceptance step: composer auxiliary");
   const metrics = await browserWindow.webContents.executeJavaScript(`(() => {
     const rect = (element) => {
       if (!element) return null;
@@ -400,17 +416,21 @@ async function captureAcceptance(browserWindow: BrowserWindow) {
     };
   })()`);
   const screenshot = await browserWindow.webContents.capturePage();
+  console.log("acceptance step: thread top");
   const threadTopMetrics = await captureThreadSurfaces(
     browserWindow.webContents,
     "top",
   );
   const threadTopScreenshot = await browserWindow.webContents.capturePage();
+  console.log("acceptance step: thread bottom");
   const threadMetrics = await captureThreadSurfaces(browserWindow.webContents);
   const threadScreenshot = await browserWindow.webContents.capturePage();
+  console.log("acceptance step: navigation");
   const navigationMetrics = await captureNavigationSurfaces(
     browserWindow.webContents,
   );
   const navigationScreenshot = await browserWindow.webContents.capturePage();
+  console.log("acceptance step: interactive primitives");
   const interactiveMetrics = await captureInteractivePrimitives(
     browserWindow.webContents,
   );
@@ -418,10 +438,12 @@ async function captureAcceptance(browserWindow: BrowserWindow) {
   await browserWindow.webContents.executeJavaScript(
     "document.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true }))",
   );
+  console.log("acceptance step: resources");
   const resourceMetrics = await captureResourceSurfaces(
     browserWindow.webContents,
   );
   const resourceScreenshot = await browserWindow.webContents.capturePage();
+  console.log("acceptance step: resource preview");
   const resourcePreviewMetrics = await captureResourceSurfaces(
     browserWindow.webContents,
     true,
@@ -439,26 +461,31 @@ async function captureAcceptance(browserWindow: BrowserWindow) {
       ?.click()`,
   );
   await new Promise((resolve) => setTimeout(resolve, 350));
+  console.log("acceptance step: compact interactive primitives");
   const compactInteractiveMetrics = await captureInteractivePrimitives(
     browserWindow.webContents,
   );
   const compactInteractiveScreenshot =
     await browserWindow.webContents.capturePage();
+  console.log("acceptance step: compact resources");
   const compactResourceMetrics = await captureResourceSurfaces(
     browserWindow.webContents,
   );
   const compactResourceScreenshot = await browserWindow.webContents.capturePage();
+  console.log("acceptance step: compact navigation");
   const compactNavigationMetrics = await captureNavigationSurfaces(
     browserWindow.webContents,
   );
   const compactNavigationScreenshot =
     await browserWindow.webContents.capturePage();
+  console.log("acceptance step: compact thread top");
   const compactThreadTopMetrics = await captureThreadSurfaces(
     browserWindow.webContents,
     "top",
   );
   const compactThreadTopScreenshot =
     await browserWindow.webContents.capturePage();
+  console.log("acceptance step: compact thread bottom");
   const compactThreadMetrics = await captureThreadSurfaces(
     browserWindow.webContents,
   );
