@@ -65,11 +65,11 @@ import {
   ThreadThinkingPlaceholder,
   ThreadVirtualizedPlaceholder,
   TurnDuration,
-  type AgentItemStatus,
   type ApprovalDecision,
   type FileDiffLine,
   type GeneratedImageItem,
   type QueuedPrompt,
+  type StatusIndicatorStatus,
   type SubagentActivityItem,
   type SubagentItem,
 } from "../src";
@@ -100,7 +100,7 @@ function GalleryCard({
   );
 }
 
-const statuses: Array<{ label: string; status: AgentItemStatus }> = [
+const statuses: Array<{ label: string; status: StatusIndicatorStatus }> = [
   { label: "Pending", status: "pending" },
   { label: "Running", status: "running" },
   { label: "Completed", status: "completed" },
