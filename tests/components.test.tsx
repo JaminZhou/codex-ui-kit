@@ -45,6 +45,15 @@ describe("components", () => {
     expect(html).toContain('data-status="running"');
   });
 
+  it("renders warning activities for handoff states that need attention", () => {
+    const html = renderToStaticMarkup(
+      <AgentActivity status="warning" summary="Handoff to worktree needs attention" />,
+    );
+
+    expect(html).toContain('data-status="warning"');
+    expect(html).toContain("Handoff to worktree needs attention");
+  });
+
   it("uses native disclosure semantics for activity details", () => {
     const html = renderToStaticMarkup(
       <AgentActivity

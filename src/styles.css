@@ -6,6 +6,8 @@
 .codex-ui-thread-viewport *,
 .codex-ui-thread-loading,
 .codex-ui-thread-loading *,
+.codex-ui-thread-context-optimization,
+.codex-ui-thread-context-optimization *,
 .codex-ui-thread-thinking,
 .codex-ui-thread-thinking *,
 .codex-ui-thread-skeleton,
@@ -1765,6 +1767,42 @@
   width: var(--codex-ui-loading-spinner-size);
 }
 
+.codex-ui-thread-context-optimization {
+  align-items: center;
+  color: var(--codex-ui-text-secondary);
+  display: flex;
+  font-size: var(--codex-ui-font-size-md);
+  gap: var(--codex-ui-context-optimization-gap);
+  line-height: var(--codex-ui-line-height-md);
+  min-height: var(--codex-ui-context-optimization-min-height);
+  min-width: 0;
+}
+
+.codex-ui-thread-context-optimization__icon {
+  border: 1.5px solid currentColor;
+  border-radius: var(--codex-ui-radius-full);
+  display: inline-grid;
+  flex: 0 0 var(--codex-ui-context-optimization-icon-size);
+  height: var(--codex-ui-context-optimization-icon-size);
+  place-items: center;
+  width: var(--codex-ui-context-optimization-icon-size);
+}
+
+.codex-ui-thread-context-optimization__icon:empty::before {
+  background: currentColor;
+  border-radius: var(--codex-ui-radius-full);
+  content: "";
+  height: calc(var(--codex-ui-spacing) * 1.5);
+  width: calc(var(--codex-ui-spacing) * 1.5);
+}
+
+.codex-ui-thread-context-optimization__label {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .codex-ui-loading-shimmer {
   animation: codex-ui-loading-shimmer
     var(--codex-ui-loading-shimmer-duration) steps(48, end) infinite;
@@ -1919,6 +1957,10 @@ summary.codex-ui-activity__header::after {
   color: var(--codex-ui-text);
 }
 
+.codex-ui-activity[data-status="warning"] .codex-ui-activity__summary {
+  color: var(--codex-ui-warning);
+}
+
 .codex-ui-activity__detail {
   color: var(--codex-ui-text-tertiary);
   font-size: 0.75rem;
@@ -1968,6 +2010,10 @@ summary.codex-ui-activity__header::after {
 
 .codex-ui-status-indicator[data-status="completed"] {
   background: var(--codex-ui-success);
+}
+
+.codex-ui-status-indicator[data-status="warning"] {
+  background: var(--codex-ui-warning);
 }
 
 .codex-ui-status-indicator[data-status="failed"] {

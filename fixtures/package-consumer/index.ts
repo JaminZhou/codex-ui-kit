@@ -45,6 +45,7 @@ import {
   SourceList,
   FloatingThreadPanel,
   ThreadFloatingButton,
+  ThreadContextOptimization,
   ThreadHeader,
   ThreadLoadingState,
   ThreadMessageNavigationRail,
@@ -155,6 +156,7 @@ void StatusBanner;
 void SourceList;
 void FloatingThreadPanel;
 void ThreadFloatingButton;
+void ThreadContextOptimization;
 void ThreadHeader;
 void ThreadLoadingState;
 void ThreadMessageNavigationRail;
