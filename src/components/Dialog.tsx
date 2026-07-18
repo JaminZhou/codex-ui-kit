@@ -60,6 +60,23 @@ function dialogOwnsFocusTarget(
   return ownedPortal?.dataset.codexUiDialogOwner === dialogId;
 }
 
+function getDialogOwnedPortalTrigger(
+  dialogId: string,
+  surface: HTMLElement,
+  portal: HTMLElement,
+) {
+  if (!portal.id) return null;
+  return (
+    Array.from(
+      document.querySelectorAll<HTMLElement>("[aria-controls]"),
+    ).find(
+      (candidate) =>
+        candidate.getAttribute("aria-controls") === portal.id &&
+        dialogOwnsFocusTarget(dialogId, surface, candidate),
+    ) ?? null
+  );
+}
+
 export function Dialog({
   children,
   className,
@@ -139,14 +156,21 @@ export function Dialog({
         : null;
     const eventComesFromOwnedPortal =
       ownedPortal?.dataset.codexUiDialogOwner === dialogId;
+    const surface = surfaceRef.current;
+    if (!surface) return;
     if (
       eventComesFromOwnedPortal &&
       ownedPortal?.getAttribute("role") !== "dialog"
     ) {
+      event.preventDefault();
+      const trigger = getDialogOwnedPortalTrigger(
+        dialogId,
+        surface,
+        ownedPortal,
+      );
+      (trigger ?? getDialogFocusableItems(surface)[0] ?? surface).focus();
       return;
     }
-    const surface = surfaceRef.current;
-    if (!surface) return;
     const focusable = [
       ...getDialogFocusableItems(surface),
       ...getDialogOwnedPortalFocusableItems(dialogId),

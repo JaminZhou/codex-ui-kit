@@ -305,10 +305,12 @@ describe("modal dialog", () => {
     const menu = await screen.findByRole("menu");
     expect(menu.getAttribute("data-theme")).toBe("dark");
     expect(menu.getAttribute("data-codex-ui-overlay-layer")).toBe("dialog");
+    const menuTrigger = screen.getByRole("button", { name: "Open actions" });
     const rename = screen.getByRole("menuitem", { name: "Rename" });
     rename.focus();
-    expect(fireEvent.keyDown(rename, { key: "Tab" })).toBe(true);
+    expect(fireEvent.keyDown(rename, { key: "Tab" })).toBe(false);
     expect(screen.queryByRole("menu")).toBeNull();
+    expect(document.activeElement).toBe(menuTrigger);
     expect(screen.getByRole("dialog", { name: "Themed dialog" })).toBeTruthy();
 
     fireEvent.click(screen.getByRole("button", { name: "Open actions" }));
