@@ -3,6 +3,7 @@
 Independently implemented React components for building high-fidelity coding-agent interfaces.
 
 [![CI](https://github.com/JaminZhou/codex-ui-kit/actions/workflows/ci.yml/badge.svg)](https://github.com/JaminZhou/codex-ui-kit/actions/workflows/ci.yml)
+[![CodeQL](https://github.com/JaminZhou/codex-ui-kit/actions/workflows/codeql.yml/badge.svg)](https://github.com/JaminZhou/codex-ui-kit/actions/workflows/codeql.yml)
 [![Demo](https://img.shields.io/badge/demo-GitHub%20Pages-181717)](https://jaminzhou.com/codex-ui-kit/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
@@ -33,7 +34,7 @@ Explore the [interactive component showcase](https://jaminzhou.com/codex-ui-kit/
 - Accessible menus, tooltips, popovers, selects, dialogs, and keyboard flows.
 - Resource cards, citations, generated-image galleries, and preview surfaces.
 - Light, dark, system, compact-window, reduced-motion, and focus states.
-- Browser and Electron acceptance harnesses backed by 261 package tests.
+- Package tests, React 18/19 consumer checks, CodeQL scanning, and browser and Electron acceptance harnesses.
 - Protocol-neutral APIs with standalone public CSS tokens.
 
 ## Quick start
