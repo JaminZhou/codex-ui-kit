@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  contrastRatio,
   isExpectedWcagIncomplete,
   partitionWcagIncomplete,
 } from "../scripts/accessibility-policy.mjs";
@@ -42,5 +43,17 @@ describe("accessibility incomplete-result policy", () => {
     const result = partitionWcagIncomplete([gradientContrast, targetSize]);
     expect(result.manualReview).toEqual([gradientContrast]);
     expect(result.unexpected).toEqual([targetSize]);
+  });
+});
+
+describe("theme-transition contrast policy", () => {
+  it("distinguishes accessible endpoints from the observed failing midpoint", () => {
+    expect(contrastRatio([186, 38, 35], [255, 217, 217])).toBeGreaterThanOrEqual(
+      4.5,
+    );
+    expect(contrastRatio([255, 103, 100], [77, 16, 14])).toBeGreaterThanOrEqual(
+      4.5,
+    );
+    expect(contrastRatio([249, 98, 95], [91, 32, 30])).toBeLessThan(4.5);
   });
 });

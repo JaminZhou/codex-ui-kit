@@ -594,6 +594,9 @@
     transparent
   );
   --codex-ui-control-color: var(--codex-ui-danger);
+  transition:
+    border-color var(--codex-ui-transition),
+    opacity var(--codex-ui-transition);
 }
 
 .codex-ui-button:hover:not(:disabled),
