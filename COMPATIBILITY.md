@@ -51,6 +51,10 @@ determine contrast through gradients or overlapping showcase surfaces remain a
 manual visual-review requirement rather than being treated as an automatic
 pass.
 
+Semantic foreground/background pairs switch atomically between themes when an
+intermediate animated color could fall below the contrast threshold. Preserve
+that behavior when extending danger controls or adding host-level transitions.
+
 Public hit targets and semantic colors may intentionally be more generous than
 the sampled product geometry. Hosts that override these tokens are responsible
 for preserving equivalent contrast, keyboard focus, and target-size behavior.

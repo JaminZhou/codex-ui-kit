@@ -30,6 +30,18 @@ describe("interactive primitive visual contract", () => {
     expect(styles).toContain("outline: 2px solid var(--codex-ui-focus)");
   });
 
+  it("switches danger foreground and background atomically between themes", () => {
+    const dangerControls = styles.match(
+      /\.codex-ui-button\[data-tone="danger"\],[\s\S]*?\.codex-ui-icon-button\[data-tone="danger"\] \{([\s\S]*?)\n\}/,
+    )?.[1];
+    expect(dangerControls).toContain(
+      "border-color var(--codex-ui-transition)",
+    );
+    expect(dangerControls).toContain("opacity var(--codex-ui-transition)");
+    expect(dangerControls).not.toContain("background-color");
+    expect(dangerControls).not.toMatch(/\n\s+color var\(--codex-ui-transition\)/);
+  });
+
   it("resets select trigger sizing without relying on a host stylesheet", () => {
     expect(styles).toContain(
       ".codex-ui-select-trigger,\n.codex-ui-select-trigger *,",
