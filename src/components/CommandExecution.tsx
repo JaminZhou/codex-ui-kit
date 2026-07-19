@@ -7,8 +7,8 @@ import {
   type KeyboardEvent,
   type ReactNode,
 } from "react";
-import type { AgentItemStatus } from "../types";
-import { AgentActivity } from "./AgentActivity";
+import type { AgentItemStatus } from "../types.js";
+import { AgentActivity } from "./AgentActivity.js";
 
 export type CommandExecutionStatus =
   | AgentItemStatus

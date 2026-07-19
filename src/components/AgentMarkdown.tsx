@@ -31,7 +31,7 @@ function getCodeHighlightClock() {
 }
 
 function loadDefaultCodeHighlighter() {
-  defaultCodeHighlighter ??= import("../highlightCode").then(
+  defaultCodeHighlighter ??= import("../highlightCode.js").then(
     ({ highlightCode }) => highlightCode,
   );
   return defaultCodeHighlighter;

@@ -1,5 +1,5 @@
 import type { HTMLAttributes, KeyboardEvent, ReactNode } from "react";
-import type { AgentMessageRole, AgentItemStatus } from "../types";
+import type { AgentMessageRole, AgentItemStatus } from "../types.js";
 
 export interface AgentMessageProps extends HTMLAttributes<HTMLElement> {
   actions?: ReactNode;

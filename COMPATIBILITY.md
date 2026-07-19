@@ -4,6 +4,10 @@
 
 `codex-ui-kit` is an ESM-only React package. It exports JavaScript and declarations from the package root, the complete stylesheet from `codex-ui-kit/styles.css`, and the standalone token contract from `codex-ui-kit/tokens.css`.
 
+The emitted declarations use explicit `.js` specifiers and are verified with
+both `Bundler` and `NodeNext` module resolution. Package linting also runs
+Publint and Are The Types Wrong before release.
+
 The package does not bundle React, React DOM, `react-markdown`, `remark-gfm`, or highlight.js language modules. npm installs runtime dependencies while React and React DOM remain peer dependencies.
 
 ## React

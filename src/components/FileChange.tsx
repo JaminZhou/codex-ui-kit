@@ -5,8 +5,8 @@ import {
   type HTMLAttributes,
   type ReactNode,
 } from "react";
-import type { AgentItemStatus } from "../types";
-import { AgentActivity } from "./AgentActivity";
+import type { AgentItemStatus } from "../types.js";
+import { AgentActivity } from "./AgentActivity.js";
 
 export type FileChangeKind = "added" | "modified" | "deleted" | "renamed";
 

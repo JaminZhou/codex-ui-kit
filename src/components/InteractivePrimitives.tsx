@@ -23,7 +23,7 @@ import {
   type RefObject,
 } from "react";
 import { createPortal } from "react-dom";
-import { OverlayEnvironmentContext } from "../internal/overlayEnvironment";
+import { OverlayEnvironmentContext } from "../internal/overlayEnvironment.js";
 
 export type ControlTone =
   | "danger"

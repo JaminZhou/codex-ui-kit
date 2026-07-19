@@ -10,8 +10,13 @@ import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { publicRuntimeExports } from "./public-runtime-exports.mjs";
 
-const [reactVersion, reactDomVersion, reactTypesVersion, reactDomTypesVersion] =
-  process.argv.slice(2);
+const [
+  reactVersion,
+  reactDomVersion,
+  reactTypesVersion,
+  reactDomTypesVersion,
+  moduleResolution = "Bundler",
+] = process.argv.slice(2);
 
 if (
   !reactVersion ||
@@ -20,8 +25,12 @@ if (
   !reactDomTypesVersion
 ) {
   throw new Error(
-    "usage: react-compatibility-smoke.mjs <react> <react-dom> <@types/react> <@types/react-dom>",
+    "usage: react-compatibility-smoke.mjs <react> <react-dom> <@types/react> <@types/react-dom> [Bundler|NodeNext]",
   );
+}
+
+if (moduleResolution !== "Bundler" && moduleResolution !== "NodeNext") {
+  throw new Error(`unsupported module resolution: ${moduleResolution}`);
 }
 
 const root = fileURLToPath(new URL("../", import.meta.url));
@@ -80,8 +89,8 @@ try {
       {
         compilerOptions: {
           jsx: "react-jsx",
-          module: "ESNext",
-          moduleResolution: "Bundler",
+          module: moduleResolution === "NodeNext" ? "NodeNext" : "ESNext",
+          moduleResolution,
           noEmit: true,
           skipLibCheck: false,
           strict: true,
@@ -148,7 +157,7 @@ if (!html.includes("Compatibility surface")) {
     ),
   );
   console.log(
-    `React ${reactVersion} compatibility ok: ${installedPackage.name}@${installedPackage.version}`,
+    `React ${reactVersion} / ${moduleResolution} compatibility ok: ${installedPackage.name}@${installedPackage.version}`,
   );
 } finally {
   rmSync(temporaryRoot, { force: true, recursive: true });

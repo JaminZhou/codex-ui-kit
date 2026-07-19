@@ -10,7 +10,7 @@ import {
   type PointerEventHandler,
   type ReactNode,
 } from "react";
-import { IconButton, Tooltip } from "./InteractivePrimitives";
+import { IconButton, Tooltip } from "./InteractivePrimitives.js";
 
 function SidebarOpenIcon() {
   return (

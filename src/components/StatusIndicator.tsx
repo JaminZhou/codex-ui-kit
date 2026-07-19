@@ -1,5 +1,5 @@
 import type { HTMLAttributes } from "react";
-import type { AgentItemStatus } from "../types";
+import type { AgentItemStatus } from "../types.js";
 
 export type StatusIndicatorStatus = AgentItemStatus | "warning";
 
