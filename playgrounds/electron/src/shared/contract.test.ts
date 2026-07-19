@@ -38,4 +38,24 @@ describe("desktop playground contract", () => {
     );
     expect(mainSource).toContain("app.exit(1)");
   });
+
+  it("locks both acceptance themes independently of the host system", () => {
+    const mainSource = readFileSync(
+      new URL("../main/index.ts", import.meta.url),
+      "utf8",
+    );
+    const darkThemeIndex = mainSource.indexOf(
+      'nativeTheme.themeSource = "dark"',
+    );
+    const standardCaptureIndex = mainSource.indexOf(
+      'console.log("acceptance step: composer auxiliary")',
+    );
+    const lightThemeIndex = mainSource.indexOf(
+      'nativeTheme.themeSource = "light"',
+    );
+
+    expect(darkThemeIndex).toBeGreaterThan(-1);
+    expect(darkThemeIndex).toBeLessThan(standardCaptureIndex);
+    expect(lightThemeIndex).toBeGreaterThan(standardCaptureIndex);
+  });
 });

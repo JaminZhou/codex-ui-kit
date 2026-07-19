@@ -49,5 +49,8 @@ build documented in `research/26.715.31925.md`.
 
 Set `CODEX_UI_KIT_ACCEPTANCE_DIR` while running `preview` to write package-safe
 geometry JSON and screenshots for the composer, interactive primitive,
-navigation, resource, generated-image, and preview surfaces. Acceptance output belongs in
-`/private/tmp`, never in the repository.
+navigation, resource, generated-image, and preview surfaces. The same run now
+asserts viewport overflow, theme, focus, overlay ownership, critical surfaces,
+and thread top/bottom positioning; a mismatch exits non-zero instead of merely
+writing a capture. Acceptance output belongs in `/private/tmp`, never in the
+repository.

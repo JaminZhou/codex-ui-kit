@@ -1,5 +1,6 @@
 import { spawnSync } from "node:child_process";
 import { existsSync, readFileSync } from "node:fs";
+import { publicRuntimeExports } from "./public-runtime-exports.mjs";
 
 const root = new URL("../", import.meta.url);
 const packageJson = JSON.parse(
@@ -52,6 +53,13 @@ const rootDeclaration = readFileSync(new URL("dist/index.d.ts", root), "utf8");
 assert(
   !rootDeclaration.includes(".css"),
   "root declarations must not retain a CSS side-effect import",
+);
+
+const runtimeModule = await import(new URL("dist/index.js", root));
+const runtimeExports = Object.keys(runtimeModule).sort();
+assert(
+  JSON.stringify(runtimeExports) === JSON.stringify(publicRuntimeExports),
+  `public runtime exports changed:\nexpected ${JSON.stringify(publicRuntimeExports)}\nreceived ${JSON.stringify(runtimeExports)}`,
 );
 
 const tokenStyles = readFileSync(new URL("dist/tokens.css", root), "utf8");

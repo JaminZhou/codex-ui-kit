@@ -8,6 +8,7 @@ import {
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
+import { publicRuntimeExports } from "./public-runtime-exports.mjs";
 
 const [reactVersion, reactDomVersion, reactTypesVersion, reactDomTypesVersion] =
   process.argv.slice(2);
@@ -109,10 +110,18 @@ export const surface = (
     join(temporaryRoot, "consumer.mjs"),
     `import { createElement } from "react";
 import { renderToString } from "react-dom/server";
-import { AgentMessage } from "codex-ui-kit";
+import * as uiKit from "codex-ui-kit";
+
+const expectedRuntimeExports = ${JSON.stringify(publicRuntimeExports)};
+const runtimeExports = Object.keys(uiKit).sort();
+if (JSON.stringify(runtimeExports) !== JSON.stringify(expectedRuntimeExports)) {
+  throw new Error(
+    \`runtime export mismatch:\\nexpected \${JSON.stringify(expectedRuntimeExports)}\\nreceived \${JSON.stringify(runtimeExports)}\`,
+  );
+}
 
 const html = renderToString(
-  createElement(AgentMessage, { role: "assistant" }, "Compatibility surface"),
+  createElement(uiKit.AgentMessage, { role: "assistant" }, "Compatibility surface"),
 );
 if (!html.includes("Compatibility surface")) {
   throw new Error("server render did not include the message content");

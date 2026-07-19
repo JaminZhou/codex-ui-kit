@@ -1,5 +1,6 @@
 import {
   useCallback,
+  useEffect,
   useLayoutEffect,
   useRef,
   useState,
@@ -86,6 +87,7 @@ export function AgentThreadViewport({
   const viewportRef = useRef<HTMLDivElement>(null);
   const [following, setFollowing] = useState(defaultFollowing);
   const followingRef = useRef(defaultFollowing);
+  const programmaticFollowTargetRef = useRef<number | null>(null);
 
   const updateFollowing = useCallback(
     (nextFollowing: boolean) => {
@@ -97,11 +99,37 @@ export function AgentThreadViewport({
     [onFollowingChange],
   );
 
+  useEffect(() => {
+    const viewport = viewportRef.current;
+    if (!viewport) return;
+    const cancelProgrammaticFollow = () => {
+      const wasProgrammaticallyFollowing =
+        programmaticFollowTargetRef.current !== null;
+      programmaticFollowTargetRef.current = null;
+      if (!wasProgrammaticallyFollowing) return;
+      viewport.scrollTo({ behavior: "auto", top: viewport.scrollTop });
+      const distanceFromLatest =
+        viewport.scrollHeight - viewport.clientHeight - viewport.scrollTop;
+      updateFollowing(distanceFromLatest <= followThreshold);
+    };
+    const inputEvents = ["keydown", "pointerdown", "touchstart", "wheel"];
+    for (const eventName of inputEvents) {
+      viewport.addEventListener(eventName, cancelProgrammaticFollow);
+    }
+    return () => {
+      for (const eventName of inputEvents) {
+        viewport.removeEventListener(eventName, cancelProgrammaticFollow);
+      }
+    };
+  }, [followThreshold, updateFollowing]);
+
   useLayoutEffect(() => {
     const viewport = viewportRef.current;
+    if (!viewport || !autoFollow) {
+      programmaticFollowTargetRef.current = null;
+      return;
+    }
     if (
-      !viewport ||
-      !autoFollow ||
       !followingRef.current ||
       typeof viewport.scrollTo !== "function"
     ) {
@@ -110,6 +138,7 @@ export function AgentThreadViewport({
     const reducedMotion = window.matchMedia?.(
       "(prefers-reduced-motion: reduce)",
     ).matches;
+    programmaticFollowTargetRef.current = viewport.scrollHeight;
     viewport.scrollTo({
       behavior: reducedMotion ? "auto" : "smooth",
       top: viewport.scrollHeight,
@@ -127,6 +156,17 @@ export function AgentThreadViewport({
         const viewport = event.currentTarget;
         const distanceFromLatest =
           viewport.scrollHeight - viewport.clientHeight - viewport.scrollTop;
+        const programmaticTarget = programmaticFollowTargetRef.current;
+        if (programmaticTarget !== null) {
+          const reachedTarget =
+            viewport.scrollTop + viewport.clientHeight >=
+            programmaticTarget - followThreshold;
+          if (!reachedTarget) {
+            onScroll?.(event);
+            return;
+          }
+          programmaticFollowTargetRef.current = null;
+        }
         updateFollowing(distanceFromLatest <= followThreshold);
         onScroll?.(event);
       }}

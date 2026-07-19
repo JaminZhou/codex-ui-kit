@@ -17,6 +17,7 @@ import {
   type ThemeState,
   type WindowPreset,
 } from "../shared/contract";
+import { assertAcceptanceMetric } from "../shared/acceptance";
 
 const appName = "Codex UI Kit Playground";
 const defaultPreset: WindowPreset = "standard";
@@ -41,6 +42,9 @@ async function captureInteractivePrimitives(webContents: WebContents) {
     };
     const dock = document.querySelector('.desktop-composer-dock');
     if (dock instanceof HTMLElement) dock.style.display = 'none';
+    const existingDialogChoice = document.querySelector('.codex-ui-dialog-choice');
+    if (existingDialogChoice instanceof HTMLElement) existingDialogChoice.click();
+    document.body.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true }));
     await wait(80);
     const card = document.querySelector('[data-acceptance-surface="interactive-primitives"]');
     const scrollRegion = document.querySelector('.desktop-scroll-region');
@@ -55,11 +59,20 @@ async function captureInteractivePrimitives(webContents: WebContents) {
     }
     await wait(180);
     const moreActions = card?.querySelector('[aria-label="More actions"]');
+    if (moreActions?.getAttribute('aria-expanded') === 'true') {
+      moreActions?.click();
+      await wait(80);
+    }
     moreActions?.click();
     await wait(140);
     const rootMenu = [...document.querySelectorAll('.codex-ui-popover[role="menu"]')]
       .find((element) => element.querySelector('.codex-ui-menu-submenu-trigger'));
-    rootMenu?.querySelector('.codex-ui-menu-submenu-trigger')?.click();
+    const submenuTrigger = rootMenu?.querySelector('.codex-ui-menu-submenu-trigger');
+    if (submenuTrigger?.getAttribute('aria-expanded') === 'true') {
+      submenuTrigger?.click();
+      await wait(80);
+    }
+    submenuTrigger?.click();
     await wait(160);
     const overlays = [...document.querySelectorAll('.codex-ui-popover')].map((element) => {
       const bounds = element.getBoundingClientRect();
@@ -80,13 +93,13 @@ async function captureInteractivePrimitives(webContents: WebContents) {
     });
     const toolbarButton = card?.querySelector('.codex-ui-icon-button');
     const mediumButton = card?.querySelector('.codex-ui-button[data-size="medium"]');
-    document.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true }));
+    document.body.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true }));
     card?.querySelector('[data-choice-dialog-trigger]')?.click();
     await wait(160);
     const dialog = document.querySelector('.codex-ui-dialog');
     const dialogSurface = dialog?.querySelector('.codex-ui-dialog__surface');
     const dialogChoices = [...(dialog?.querySelectorAll('.codex-ui-dialog-choice') ?? [])];
-    return {
+    const metrics = {
       bodyScrollWidth: document.body.scrollWidth,
       clientWidth: document.documentElement.clientWidth,
       card: rect(card),
@@ -102,6 +115,15 @@ async function captureInteractivePrimitives(webContents: WebContents) {
       toolbarButton: rect(toolbarButton),
       viewport: { height: window.innerHeight, width: window.innerWidth },
     };
+    return metrics;
+  })()`);
+}
+
+async function closeChoiceDialog(webContents: WebContents) {
+  await webContents.executeJavaScript(`(async () => {
+    const choice = document.querySelector('.codex-ui-dialog-choice');
+    if (choice instanceof HTMLElement) choice.click();
+    await new Promise((resolve) => setTimeout(resolve, 80));
   })()`);
 }
 
@@ -292,8 +314,12 @@ async function captureThreadSurfaces(
     await wait(120);
     const viewport = card?.querySelector('.codex-ui-thread-viewport');
     if (viewport instanceof HTMLElement) {
+      viewport.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true }));
       viewport.style.scrollBehavior = 'auto';
-      viewport.scrollTop = ${position === "top" ? "0" : "viewport.scrollHeight"};
+      viewport.scrollTo({
+        behavior: 'instant',
+        top: ${position === "top" ? "0" : "viewport.scrollHeight"},
+      });
     }
     await wait(120);
     const thread = card?.querySelector('.codex-ui-thread');
@@ -308,6 +334,9 @@ async function captureThreadSurfaces(
     const renderError = card?.querySelector('.codex-ui-thread-render-error');
     const placeholder = card?.querySelector('.codex-ui-thread-virtualized-placeholder');
     const footer = card?.querySelector('.codex-ui-thread-viewport__footer');
+    const viewportScrollMaximum = viewport instanceof HTMLElement
+      ? Math.max(0, viewport.scrollHeight - viewport.clientHeight)
+      : null;
     return {
       bodyScrollWidth: document.body.scrollWidth,
       bubble: rect(bubble),
@@ -351,6 +380,11 @@ async function captureThreadSurfaces(
       threadWidthMode: thread?.getAttribute('data-width'),
       viewport: rect(viewport),
       viewportOverflowY: viewport ? getComputedStyle(viewport).overflowY : null,
+      viewportPositionDelta: viewport instanceof HTMLElement
+        ? ${position === "top" ? "viewport.scrollTop" : "Math.abs(viewportScrollMaximum - viewport.scrollTop)"}
+        : null,
+      viewportScrollMaximum,
+      viewportScrollTop: viewport instanceof HTMLElement ? viewport.scrollTop : null,
       viewportTabIndex: viewport?.tabIndex ?? null,
       window: { height: window.innerHeight, width: window.innerWidth },
       position: ${JSON.stringify(position)},
@@ -362,6 +396,8 @@ async function captureAcceptance(browserWindow: BrowserWindow) {
   const outputDirectory = process.env.CODEX_UI_KIT_ACCEPTANCE_DIR;
   if (!outputDirectory) return;
 
+  nativeTheme.themeSource = "dark";
+  sendThemeState(browserWindow.webContents);
   await new Promise((resolve) => setTimeout(resolve, 500));
   console.log("acceptance step: composer auxiliary");
   const metrics = await browserWindow.webContents.executeJavaScript(`(() => {
@@ -435,6 +471,7 @@ async function captureAcceptance(browserWindow: BrowserWindow) {
     browserWindow.webContents,
   );
   const interactiveScreenshot = await browserWindow.webContents.capturePage();
+  await closeChoiceDialog(browserWindow.webContents);
   await browserWindow.webContents.executeJavaScript(
     "document.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true }))",
   );
@@ -467,6 +504,7 @@ async function captureAcceptance(browserWindow: BrowserWindow) {
   );
   const compactInteractiveScreenshot =
     await browserWindow.webContents.capturePage();
+  await closeChoiceDialog(browserWindow.webContents);
   console.log("acceptance step: compact resources");
   const compactResourceMetrics = await captureResourceSurfaces(
     browserWindow.webContents,
@@ -491,6 +529,99 @@ async function captureAcceptance(browserWindow: BrowserWindow) {
   );
   const compactThreadScreenshot =
     await browserWindow.webContents.capturePage();
+
+  assertAcceptanceMetric("composer auxiliary", metrics, {
+    equals: { mentionLabelOverlapsTray: false },
+    expectedTheme: "dark",
+    minimumItems: { queueRows: 2 },
+    requiredFields: ["attachments", "mention", "mentionForm", "queue"],
+  });
+  for (const [name, snapshot, expectedTheme, position] of [
+    ["thread top", threadTopMetrics, "dark", "top"],
+    ["thread bottom", threadMetrics, "dark", "bottom"],
+    ["compact thread top", compactThreadTopMetrics, "light", "top"],
+    ["compact thread bottom", compactThreadMetrics, "light", "bottom"],
+  ] as const) {
+    assertAcceptanceMetric(name, snapshot, {
+      equals: {
+        bubbleTabIndex: 0,
+        footerPosition: "sticky",
+        position,
+        runningMessageBusy: "true",
+        viewportOverflowY: "auto",
+        viewportTabIndex: 0,
+      },
+      expectedTheme,
+      maximumValues: { viewportPositionDelta: 32 },
+      minimumItems: { contextOptimizationStates: 2, loadingStates: 2 },
+      requiredFields: [
+        "bubble",
+        "footer",
+        "placeholder",
+        "renderError",
+        "skeleton",
+        "thread",
+        "viewport",
+      ],
+    });
+  }
+  for (const [name, snapshot, expectedTheme] of [
+    ["navigation", navigationMetrics, "dark"],
+    ["compact navigation", compactNavigationMetrics, "light"],
+  ] as const) {
+    assertAcceptanceMetric(name, snapshot, {
+      equals: { panelOpen: true, panelZIndex: "42" },
+      expectedTheme,
+      minimumItems: {
+        floatingButtons: 3,
+        messageRailMarkers: 4,
+        messageRailRows: 4,
+        navigationButtons: 3,
+      },
+      requiredFields: [
+        "header",
+        "messageRail",
+        "messageRailTooltip",
+        "panel",
+      ],
+    });
+  }
+  for (const [name, snapshot, expectedTheme] of [
+    ["interactive primitives", interactiveMetrics, "dark"],
+    ["compact interactive primitives", compactInteractiveMetrics, "light"],
+  ] as const) {
+    assertAcceptanceMetric(name, snapshot, {
+      allItemsEqual: { overlays: { field: "inViewport", value: true } },
+      allItemsHaveNonEmptyString: { overlays: "owner" },
+      equals: { dialogFirstChoiceFocused: true, overlayOwnerCount: 1 },
+      expectedTheme,
+      minimumItems: { dialogChoiceRows: 2, overlays: 2 },
+      requiredFields: ["card", "dialog", "dialogSurface", "mediumButton"],
+    });
+  }
+  for (const [name, snapshot, expectedTheme] of [
+    ["resources", resourceMetrics, "dark"],
+    ["compact resources", compactResourceMetrics, "light"],
+  ] as const) {
+    assertAcceptanceMetric(name, snapshot, {
+      equals: { pendingCount: 2, preview: null },
+      expectedTheme,
+      minimumItems: { resourceRows: 3 },
+      requiredFields: ["card", "gallery", "galleryImage", "sourceList"],
+    });
+  }
+  assertAcceptanceMetric("resource preview", resourcePreviewMetrics, {
+    equals: { focusedLabel: "Close image preview", pendingCount: 2 },
+    expectedTheme: "dark",
+    minimumItems: { resourceRows: 3 },
+    requiredFields: [
+      "gallery",
+      "preview",
+      "previewDialog",
+      "previewImage",
+      "sourceList",
+    ],
+  });
 
   await mkdir(outputDirectory, { recursive: true });
   await Promise.all([
