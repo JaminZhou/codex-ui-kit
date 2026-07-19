@@ -120,7 +120,7 @@ export function SearchActivity({
       </span>
     );
   const body = entries.length > 0 ? (
-    <ol className="codex-ui-search-activity__entries">
+    <ol className="codex-ui-search-activity__entries" tabIndex={0}>
       {entries.map((entry) => {
         const content = (
           <>

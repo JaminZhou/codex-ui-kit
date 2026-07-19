@@ -293,7 +293,7 @@ export function CodeBlock({
           </button>
         ) : null}
       </figcaption>
-      <pre className="codex-ui-code-block__body" dir="ltr">
+      <pre className="codex-ui-code-block__body" dir="ltr" tabIndex={0}>
         <code
           className={[
             compatibleHighlight ? "hljs" : undefined,
@@ -458,6 +458,29 @@ export function AgentMarkdown({
         },
         img({ alt = "", node: _node, ...imageProps }) {
           return <img alt={alt} loading="lazy" {...imageProps} />;
+        },
+        input({
+          "aria-label": inputAriaLabel,
+          checked,
+          node: _node,
+          type,
+          ...inputProps
+        }) {
+          return (
+            <input
+              {...inputProps}
+              aria-label={
+                inputAriaLabel ??
+                (type === "checkbox"
+                  ? checked
+                    ? "Completed task"
+                    : "Incomplete task"
+                  : undefined)
+              }
+              checked={checked}
+              type={type}
+            />
+          );
         },
         pre({ children: preChildren, node: _node, ...preProps }) {
           if (

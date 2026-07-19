@@ -42,6 +42,7 @@ describe("components", () => {
 
     expect(html).toContain('data-width="narrow"');
     expect(html).toContain("codex-ui-activity-group");
+    expect(html).toContain('role="group"');
     expect(html).toContain('data-status="running"');
   });
 

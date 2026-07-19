@@ -56,11 +56,14 @@ describe("AgentMarkdown", () => {
     expect(html).toContain("<blockquote>");
     expect(html).toContain('class="contains-task-list"');
     expect(html).toContain('type="checkbox"');
+    expect(html).toContain('aria-label="Completed task"');
+    expect(html).toContain('aria-label="Incomplete task"');
     expect(html).toContain('class="codex-ui-markdown__table-scroll"');
     expect(html).toContain('alt="Preview"');
     expect(html).toContain('loading="lazy"');
     expect(html).toContain('data-markdown-copy="code-block"');
     expect(html).toContain('data-language="ts"');
+    expect(html).toContain('class="codex-ui-code-block__body" dir="ltr" tabindex="0"');
     expect(html).toContain("const ready = true;");
     expect(html).not.toContain("node=");
   });

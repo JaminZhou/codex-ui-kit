@@ -132,6 +132,11 @@ describe("SearchActivity", () => {
       container.querySelector(".codex-ui-activity__summary")?.textContent,
     ).toBe("Searching the web for Codex TypeScript SDK");
     expect(screen.getAllByRole("listitem")).toHaveLength(2);
+    expect(
+      container
+        .querySelector(".codex-ui-search-activity__entries")
+        ?.getAttribute("tabindex"),
+    ).toBe("0");
     fireEvent.click(
       screen.getByRole("button", { name: "Codex app-server protocol" }),
     );

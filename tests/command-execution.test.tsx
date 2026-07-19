@@ -195,6 +195,8 @@ describe("CommandOutput", () => {
     const whitespace = renderToStaticMarkup(<CommandOutput>{"  \n"}</CommandOutput>);
 
     expect(empty).toContain('data-empty="true"');
+    expect(empty).toContain('role="region"');
+    expect(empty).toContain('tabindex="0"');
     expect(empty).toContain("No output");
     expect(whitespace).toContain('data-empty="true"');
     expect(whitespace).not.toContain("Copy output");

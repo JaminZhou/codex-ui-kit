@@ -48,11 +48,12 @@
     "build": "vite build && tsc -p tsconfig.build.json",
     "build:demo": "vite build demo --base=/codex-ui-kit/ --config demo/vite.config.ts && node scripts/check-demo-bundle.mjs",
     "build:electron": "pnpm --filter @codex-ui-kit/electron-playground build",
+    "check:a11y": "node scripts/check-accessibility.mjs",
     "prepack": "node scripts/prepack.mjs",
     "test": "vitest run tests",
     "typecheck": "tsc --noEmit",
     "check:package": "node scripts/check-package.mjs && tsc -p fixtures/package-consumer/tsconfig.json && tsc -p fixtures/package-consumer/tsconfig.nodenext.json && publint && attw --pack . --ignore-rules cjs-resolves-to-esm no-resolution",
-    "check": "pnpm typecheck && pnpm test && pnpm build && pnpm check:package && pnpm build:demo && pnpm --filter @codex-ui-kit/electron-playground check"
+    "check": "pnpm typecheck && pnpm test && pnpm build && pnpm check:package && pnpm build:demo && pnpm check:a11y && pnpm --filter @codex-ui-kit/electron-playground check"
   },
   "publishConfig": {
     "access": "public"
@@ -67,8 +68,10 @@
     "@testing-library/react": "^16.3.2",
     "@types/react": "^19.2.17",
     "@types/react-dom": "^19.2.3",
+    "axe-core": "4.12.1",
     "happy-dom": "^20.10.6",
     "publint": "0.3.21",
+    "puppeteer-core": "24.36.0",
     "react": "^19.2.7",
     "react-dom": "^19.2.7",
     "typescript": "^7.0.2",

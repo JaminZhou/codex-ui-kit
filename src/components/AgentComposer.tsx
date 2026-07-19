@@ -331,7 +331,11 @@ export const AgentComposer = forwardRef<
           </div>
         ) : null}
         {hasAttachments ? (
-          <div className="codex-ui-composer__attachments" aria-label="Attachments">
+          <div
+            aria-label="Attachments"
+            className="codex-ui-composer__attachments"
+            role="group"
+          >
             {attachments}
           </div>
         ) : null}

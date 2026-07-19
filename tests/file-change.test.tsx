@@ -188,6 +188,7 @@ describe("FileDiff", () => {
     const html = renderToStaticMarkup(<FileDiff lines={lines} />);
 
     expect(html).toContain('aria-label="File diff"');
+    expect(html).toContain('tabindex="0"');
     expect(html).toContain('data-line-kind="addition"');
     expect(html).toContain('data-line-kind="deletion"');
     expect(html).toContain('data-line-kind="hunk"');
@@ -245,6 +246,12 @@ describe("FileDiff", () => {
     expect(onScroll).toHaveBeenCalledOnce();
     expect(diff.hasAttribute("data-fade-top")).toBe(true);
     expect(diff.hasAttribute("data-fade-bottom")).toBe(true);
+  });
+
+  it("allows a caller to remove the default keyboard scroll target", () => {
+    const html = renderToStaticMarkup(<FileDiff lines={lines} tabIndex={-1} />);
+
+    expect(html).toContain('tabindex="-1"');
   });
 
   it("renders a useful empty diff state", () => {

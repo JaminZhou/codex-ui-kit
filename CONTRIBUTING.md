@@ -10,7 +10,12 @@ pnpm install --frozen-lockfile
 pnpm check
 ```
 
-`pnpm check` runs TypeScript checks, package tests, the library build, the npm package contract, the browser showcase build, and the Electron main/preload/Renderer checks.
+`pnpm check` runs TypeScript checks, package tests, the library build, the npm package contract, the browser showcase build, the headless-Chrome accessibility contract, and the Electron main/preload/Renderer checks.
+
+The accessibility contract checks the built showcase for labels, valid ARIA
+relationships, and keyboard-accessible scroll regions. Set
+`PUPPETEER_EXECUTABLE_PATH` when Chrome or Chromium is installed outside the
+standard macOS and Linux locations.
 
 The generated `dist/` directory is not tracked. `npm pack` runs `pnpm build`
 through the package `prepack` lifecycle before assembling a tarball; do not
