@@ -133,6 +133,30 @@ describe("resource surfaces", () => {
     expect(onTrailingAction).toHaveBeenCalledOnce();
   });
 
+  it("honors explicit link drag state independently of the card article", () => {
+    const { rerender } = render(
+      <ResourceCard
+        draggable={false}
+        href="https://example.com/artifact"
+        title="Linked artifact"
+      />,
+    );
+
+    const link = screen.getByRole("link", { name: "Open Linked artifact" });
+    expect(link.getAttribute("draggable")).toBe("false");
+    expect(link.closest("article")?.getAttribute("draggable")).toBe("false");
+
+    rerender(
+      <ResourceCard
+        draggable
+        href="https://example.com/artifact"
+        title="Linked artifact"
+      />,
+    );
+    expect(link.getAttribute("draggable")).toBe("true");
+    expect(link.closest("article")?.getAttribute("draggable")).toBe("true");
+  });
+
   it("shows three resource rows before expanding the remainder", () => {
     render(
       <ResourceList>

@@ -97,6 +97,7 @@ export function ResourceCard({
       {href && !disabled ? (
         <a
           {...commonProps}
+          draggable={draggable}
           href={href}
           rel={target === "_blank" ? "noreferrer" : undefined}
           target={target}
