@@ -34,7 +34,7 @@ Explore the [interactive component showcase](https://jaminzhou.com/codex-ui-kit/
 - Accessible menus, tooltips, popovers, selects, dialogs, and keyboard flows.
 - Resource cards, citations, generated-image galleries, and preview surfaces.
 - Light, dark, system, compact-window, reduced-motion, and focus states.
-- Package tests, full-export React 18/19 consumer checks, CodeQL scanning, and executable browser and Electron acceptance harnesses.
+- Package tests, full-export React 18/19 consumer checks, CodeQL scanning, a browser showcase build, and an executable Electron acceptance harness.
 - Protocol-neutral APIs with standalone public CSS tokens.
 
 ## Quick start
@@ -141,6 +141,10 @@ pnpm check
 ```
 
 `pnpm check` runs type checking, the package test suite, the library build, the package contract, the browser showcase build, and the Electron main/preload/Renderer checks.
+
+`npm pack` and a future `npm publish` run the library build first so the ignored
+`dist/` directory is always generated from the checked-out source. The package
+remains marked private until the first registry release is approved explicitly.
 
 - [`CONTRIBUTING.md`](CONTRIBUTING.md) covers development and visual-acceptance expectations.
 - [`CODE_OF_CONDUCT.md`](CODE_OF_CONDUCT.md) defines community expectations.
