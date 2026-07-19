@@ -42,6 +42,9 @@ async function captureInteractivePrimitives(webContents: WebContents) {
     };
     const dock = document.querySelector('.desktop-composer-dock');
     if (dock instanceof HTMLElement) dock.style.display = 'none';
+    const existingDialogChoice = document.querySelector('.codex-ui-dialog-choice');
+    if (existingDialogChoice instanceof HTMLElement) existingDialogChoice.click();
+    document.body.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true }));
     await wait(80);
     const card = document.querySelector('[data-acceptance-surface="interactive-primitives"]');
     const scrollRegion = document.querySelector('.desktop-scroll-region');
@@ -56,11 +59,16 @@ async function captureInteractivePrimitives(webContents: WebContents) {
     }
     await wait(180);
     const moreActions = card?.querySelector('[aria-label="More actions"]');
-    moreActions?.click();
+    if (moreActions?.getAttribute('aria-expanded') !== 'true') {
+      moreActions?.click();
+    }
     await wait(140);
     const rootMenu = [...document.querySelectorAll('.codex-ui-popover[role="menu"]')]
       .find((element) => element.querySelector('.codex-ui-menu-submenu-trigger'));
-    rootMenu?.querySelector('.codex-ui-menu-submenu-trigger')?.click();
+    const submenuTrigger = rootMenu?.querySelector('.codex-ui-menu-submenu-trigger');
+    if (submenuTrigger?.getAttribute('aria-expanded') !== 'true') {
+      submenuTrigger?.click();
+    }
     await wait(160);
     const overlays = [...document.querySelectorAll('.codex-ui-popover')].map((element) => {
       const bounds = element.getBoundingClientRect();
@@ -81,13 +89,13 @@ async function captureInteractivePrimitives(webContents: WebContents) {
     });
     const toolbarButton = card?.querySelector('.codex-ui-icon-button');
     const mediumButton = card?.querySelector('.codex-ui-button[data-size="medium"]');
-    document.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true }));
+    document.body.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true }));
     card?.querySelector('[data-choice-dialog-trigger]')?.click();
     await wait(160);
     const dialog = document.querySelector('.codex-ui-dialog');
     const dialogSurface = dialog?.querySelector('.codex-ui-dialog__surface');
     const dialogChoices = [...(dialog?.querySelectorAll('.codex-ui-dialog-choice') ?? [])];
-    return {
+    const metrics = {
       bodyScrollWidth: document.body.scrollWidth,
       clientWidth: document.documentElement.clientWidth,
       card: rect(card),
@@ -103,6 +111,9 @@ async function captureInteractivePrimitives(webContents: WebContents) {
       toolbarButton: rect(toolbarButton),
       viewport: { height: window.innerHeight, width: window.innerWidth },
     };
+    if (dialogChoices[0] instanceof HTMLElement) dialogChoices[0].click();
+    await wait(80);
+    return metrics;
   })()`);
 }
 
@@ -375,6 +386,8 @@ async function captureAcceptance(browserWindow: BrowserWindow) {
   const outputDirectory = process.env.CODEX_UI_KIT_ACCEPTANCE_DIR;
   if (!outputDirectory) return;
 
+  nativeTheme.themeSource = "dark";
+  sendThemeState(browserWindow.webContents);
   await new Promise((resolve) => setTimeout(resolve, 500));
   console.log("acceptance step: composer auxiliary");
   const metrics = await browserWindow.webContents.executeJavaScript(`(() => {
