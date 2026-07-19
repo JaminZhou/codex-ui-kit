@@ -16,7 +16,10 @@ import {
   ThreadVirtualizedPlaceholder,
 } from "../src";
 
-afterEach(cleanup);
+afterEach(() => {
+  cleanup();
+  vi.restoreAllMocks();
+});
 
 describe("complete thread surfaces", () => {
   it("renders measured turn grouping and virtualized placeholders", () => {
@@ -63,6 +66,88 @@ describe("complete thread surfaces", () => {
     fireEvent.scroll(viewport);
     expect(onFollowingChange).toHaveBeenLastCalledWith(true);
     expect(viewport.getAttribute("data-following")).toBe("true");
+  });
+
+  it("keeps following through intermediate smooth-scroll events until user input", () => {
+    const scrollTo = vi
+      .spyOn(HTMLElement.prototype, "scrollTo")
+      .mockImplementation(function (this: HTMLElement) {
+        this.scrollTop = 100;
+        this.dispatchEvent(new Event("scroll"));
+      });
+    vi.spyOn(HTMLElement.prototype, "scrollHeight", "get")
+      .mockImplementation(function (this: HTMLElement) {
+        return this.classList.contains("codex-ui-thread-viewport") ? 600 : 0;
+      });
+    vi.spyOn(HTMLElement.prototype, "clientHeight", "get")
+      .mockImplementation(function (this: HTMLElement) {
+        return this.classList.contains("codex-ui-thread-viewport") ? 200 : 0;
+      });
+    const onFollowingChange = vi.fn();
+    const { container, rerender } = render(
+      <AgentThreadViewport
+        followKey={1}
+        onFollowingChange={onFollowingChange}
+      >
+        First update
+      </AgentThreadViewport>,
+    );
+    const viewport = container.querySelector<HTMLDivElement>(
+      ".codex-ui-thread-viewport",
+    )!;
+
+    expect(scrollTo).toHaveBeenCalledOnce();
+    expect(viewport.getAttribute("data-following")).toBe("true");
+    expect(onFollowingChange).not.toHaveBeenCalled();
+
+    rerender(
+      <AgentThreadViewport
+        followKey={2}
+        onFollowingChange={onFollowingChange}
+      >
+        Second update
+      </AgentThreadViewport>,
+    );
+    expect(scrollTo).toHaveBeenCalledTimes(2);
+
+    fireEvent.pointerDown(viewport);
+    viewport.scrollTop = 100;
+    fireEvent.scroll(viewport);
+    expect(onFollowingChange).toHaveBeenCalledWith(false);
+    expect(viewport.hasAttribute("data-following")).toBe(false);
+  });
+
+  it("stops suppressing away-scroll events when auto-follow is disabled", () => {
+    vi.spyOn(HTMLElement.prototype, "scrollTo").mockImplementation(function (
+      this: HTMLElement,
+    ) {
+      this.scrollTop = 100;
+      this.dispatchEvent(new Event("scroll"));
+    });
+    vi.spyOn(HTMLElement.prototype, "scrollHeight", "get").mockReturnValue(600);
+    vi.spyOn(HTMLElement.prototype, "clientHeight", "get").mockReturnValue(200);
+    const onFollowingChange = vi.fn();
+    const { container, rerender } = render(
+      <AgentThreadViewport onFollowingChange={onFollowingChange}>
+        Following
+      </AgentThreadViewport>,
+    );
+    const viewport = container.querySelector<HTMLDivElement>(
+      ".codex-ui-thread-viewport",
+    )!;
+
+    rerender(
+      <AgentThreadViewport
+        autoFollow={false}
+        onFollowingChange={onFollowingChange}
+      >
+        Following disabled
+      </AgentThreadViewport>,
+    );
+    viewport.scrollTop = 100;
+    fireEvent.scroll(viewport);
+    expect(onFollowingChange).toHaveBeenCalledWith(false);
+    expect(viewport.hasAttribute("data-following")).toBe(false);
   });
 
   it("keeps user bubbles keyboard-focusable and activates editable messages", () => {

@@ -20,7 +20,20 @@ pnpm check
 4. Add desktop-specific geometry or interaction states to the Electron playground when relevant.
 5. Run `pnpm check` before opening a pull request.
 
-The package supports React 18 and React 19. CI installs the packed artifact into isolated consumers for both majors.
+For desktop visual or interaction changes, also run the executable Electron
+acceptance matrix with a temporary output directory:
+
+```bash
+CODEX_UI_KIT_ACCEPTANCE_DIR="$(mktemp -d)" \
+  pnpm --filter @codex-ui-kit/electron-playground preview
+```
+
+The command exits non-zero when a locked theme, overflow, focus, overlay,
+surface, or thread-position contract is violated.
+
+The package supports React 18 and React 19. CI installs the packed artifact into
+isolated consumers for both majors and verifies the complete public runtime
+export manifest before server rendering a representative component.
 
 ## Research and implementation boundaries
 

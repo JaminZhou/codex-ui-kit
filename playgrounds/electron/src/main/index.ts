@@ -17,6 +17,7 @@ import {
   type ThemeState,
   type WindowPreset,
 } from "../shared/contract";
+import { assertAcceptanceMetric } from "../shared/acceptance";
 
 const appName = "Codex UI Kit Playground";
 const defaultPreset: WindowPreset = "standard";
@@ -292,8 +293,12 @@ async function captureThreadSurfaces(
     await wait(120);
     const viewport = card?.querySelector('.codex-ui-thread-viewport');
     if (viewport instanceof HTMLElement) {
+      viewport.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true }));
       viewport.style.scrollBehavior = 'auto';
-      viewport.scrollTop = ${position === "top" ? "0" : "viewport.scrollHeight"};
+      viewport.scrollTo({
+        behavior: 'instant',
+        top: ${position === "top" ? "0" : "viewport.scrollHeight"},
+      });
     }
     await wait(120);
     const thread = card?.querySelector('.codex-ui-thread');
@@ -308,6 +313,9 @@ async function captureThreadSurfaces(
     const renderError = card?.querySelector('.codex-ui-thread-render-error');
     const placeholder = card?.querySelector('.codex-ui-thread-virtualized-placeholder');
     const footer = card?.querySelector('.codex-ui-thread-viewport__footer');
+    const viewportScrollMaximum = viewport instanceof HTMLElement
+      ? Math.max(0, viewport.scrollHeight - viewport.clientHeight)
+      : null;
     return {
       bodyScrollWidth: document.body.scrollWidth,
       bubble: rect(bubble),
@@ -351,6 +359,11 @@ async function captureThreadSurfaces(
       threadWidthMode: thread?.getAttribute('data-width'),
       viewport: rect(viewport),
       viewportOverflowY: viewport ? getComputedStyle(viewport).overflowY : null,
+      viewportPositionDelta: viewport instanceof HTMLElement
+        ? ${position === "top" ? "viewport.scrollTop" : "Math.abs(viewportScrollMaximum - viewport.scrollTop)"}
+        : null,
+      viewportScrollMaximum,
+      viewportScrollTop: viewport instanceof HTMLElement ? viewport.scrollTop : null,
       viewportTabIndex: viewport?.tabIndex ?? null,
       window: { height: window.innerHeight, width: window.innerWidth },
       position: ${JSON.stringify(position)},
@@ -491,6 +504,98 @@ async function captureAcceptance(browserWindow: BrowserWindow) {
   );
   const compactThreadScreenshot =
     await browserWindow.webContents.capturePage();
+
+  assertAcceptanceMetric("composer auxiliary", metrics, {
+    equals: { mentionLabelOverlapsTray: false },
+    expectedTheme: "dark",
+    minimumItems: { queueRows: 2 },
+    requiredFields: ["attachments", "mention", "mentionForm", "queue"],
+  });
+  for (const [name, snapshot, expectedTheme, position] of [
+    ["thread top", threadTopMetrics, "dark", "top"],
+    ["thread bottom", threadMetrics, "dark", "bottom"],
+    ["compact thread top", compactThreadTopMetrics, "light", "top"],
+    ["compact thread bottom", compactThreadMetrics, "light", "bottom"],
+  ] as const) {
+    assertAcceptanceMetric(name, snapshot, {
+      equals: {
+        bubbleTabIndex: 0,
+        footerPosition: "sticky",
+        position,
+        runningMessageBusy: "true",
+        viewportOverflowY: "auto",
+        viewportTabIndex: 0,
+      },
+      expectedTheme,
+      maximumValues: { viewportPositionDelta: 32 },
+      minimumItems: { contextOptimizationStates: 2, loadingStates: 2 },
+      requiredFields: [
+        "bubble",
+        "footer",
+        "placeholder",
+        "renderError",
+        "skeleton",
+        "thread",
+        "viewport",
+      ],
+    });
+  }
+  for (const [name, snapshot, expectedTheme] of [
+    ["navigation", navigationMetrics, "dark"],
+    ["compact navigation", compactNavigationMetrics, "light"],
+  ] as const) {
+    assertAcceptanceMetric(name, snapshot, {
+      equals: { panelOpen: true, panelZIndex: "42" },
+      expectedTheme,
+      minimumItems: {
+        floatingButtons: 3,
+        messageRailMarkers: 4,
+        messageRailRows: 4,
+        navigationButtons: 3,
+      },
+      requiredFields: [
+        "header",
+        "messageRail",
+        "messageRailTooltip",
+        "panel",
+      ],
+    });
+  }
+  for (const [name, snapshot, expectedTheme] of [
+    ["interactive primitives", interactiveMetrics, "dark"],
+    ["compact interactive primitives", compactInteractiveMetrics, "light"],
+  ] as const) {
+    assertAcceptanceMetric(name, snapshot, {
+      allItemsEqual: { overlays: { field: "inViewport", value: true } },
+      equals: { dialogFirstChoiceFocused: true, overlayOwnerCount: 1 },
+      expectedTheme,
+      minimumItems: { dialogChoiceRows: 2, overlays: 2 },
+      requiredFields: ["card", "dialog", "dialogSurface", "mediumButton"],
+    });
+  }
+  for (const [name, snapshot, expectedTheme] of [
+    ["resources", resourceMetrics, "dark"],
+    ["compact resources", compactResourceMetrics, "light"],
+  ] as const) {
+    assertAcceptanceMetric(name, snapshot, {
+      equals: { pendingCount: 2, preview: null },
+      expectedTheme,
+      minimumItems: { resourceRows: 3 },
+      requiredFields: ["card", "gallery", "galleryImage", "sourceList"],
+    });
+  }
+  assertAcceptanceMetric("resource preview", resourcePreviewMetrics, {
+    equals: { focusedLabel: "Close image preview", pendingCount: 2 },
+    expectedTheme: "dark",
+    minimumItems: { resourceRows: 3 },
+    requiredFields: [
+      "gallery",
+      "preview",
+      "previewDialog",
+      "previewImage",
+      "sourceList",
+    ],
+  });
 
   await mkdir(outputDirectory, { recursive: true });
   await Promise.all([
