@@ -377,7 +377,13 @@ export function CommandOutput({
       data-stream={stream}
       {...props}
     >
-      <pre aria-label={ariaLabel} onScroll={updateFade} ref={preRef}>
+      <pre
+        aria-label={ariaLabel}
+        onScroll={updateFade}
+        ref={preRef}
+        role="region"
+        tabIndex={0}
+      >
         <code>{hasOutput ? children : emptyLabel}</code>
       </pre>
       {hasOutput && rawOutputText !== undefined ? (

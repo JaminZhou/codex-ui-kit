@@ -470,7 +470,7 @@ export function ApprovalRequest({
                   {resolvedApproveLabel}
                 </button>
                 <button
-                  aria-controls={optionsId}
+                  aria-controls={optionsOpen ? optionsId : undefined}
                   aria-expanded={optionsOpen}
                   aria-haspopup="menu"
                   aria-label={approvalOptionsLabel}

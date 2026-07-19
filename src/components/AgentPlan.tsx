@@ -108,7 +108,7 @@ export function AgentPlan({
         hidden={!resolvedOpen}
         id={contentId}
       >
-        <ol className="codex-ui-plan__steps" ref={stepsRef}>
+        <ol className="codex-ui-plan__steps" ref={stepsRef} tabIndex={0}>
           {steps.map((item, index) => (
             <li
               aria-current={index === currentIndex ? "step" : undefined}

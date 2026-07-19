@@ -246,7 +246,11 @@ function DiffStats({
     .join(", ");
 
   return (
-    <span className="codex-ui-subagent-summary__diff" aria-label={label}>
+    <span
+      aria-label={label}
+      className="codex-ui-subagent-summary__diff"
+      role="img"
+    >
       {additions !== undefined ? (
         <span data-kind="addition">+{additions}</span>
       ) : null}

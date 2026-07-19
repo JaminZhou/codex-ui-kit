@@ -295,7 +295,11 @@ describe("ApprovalRequest", () => {
     );
 
     const toggle = screen.getByRole("button", { name: "Approval options" });
+    expect(toggle.getAttribute("aria-controls")).toBeNull();
     fireEvent.click(toggle);
+    expect(toggle.getAttribute("aria-controls")).toBe(
+      screen.getByRole("menu").id,
+    );
     const menu = screen.getByRole("menu");
     const items = screen.getAllByRole("menuitem");
 
@@ -309,6 +313,7 @@ describe("ApprovalRequest", () => {
     fireEvent.keyDown(document, { key: "Escape" });
     expect(document.activeElement).toBe(toggle);
     expect(screen.queryByRole("menu")).toBeNull();
+    expect(toggle.getAttribute("aria-controls")).toBeNull();
   });
 });
 

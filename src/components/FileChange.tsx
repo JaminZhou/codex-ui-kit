@@ -290,6 +290,7 @@ export function FileDiff({
   onScroll,
   renderContent,
   size = "default",
+  tabIndex = 0,
   wrapLines = false,
   "aria-label": ariaLabel = "File diff",
   ...props
@@ -343,6 +344,7 @@ export function FileDiff({
       }}
       ref={rootRef}
       role="list"
+      tabIndex={tabIndex}
       {...props}
     >
       {lines.length === 0 ? (

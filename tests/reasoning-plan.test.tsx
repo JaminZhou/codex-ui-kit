@@ -76,6 +76,9 @@ describe("AgentPlan", () => {
         ?.getAttribute("data-status"),
     ).toBe("completed");
     expect(container.querySelectorAll(".codex-ui-plan__step")).toHaveLength(3);
+    expect(
+      container.querySelector(".codex-ui-plan__steps")?.getAttribute("tabindex"),
+    ).toBe("0");
   });
 
   it("collapses and expands with a semantic button", () => {

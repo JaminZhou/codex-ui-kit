@@ -34,7 +34,7 @@ Explore the [interactive component showcase](https://jaminzhou.com/codex-ui-kit/
 - Accessible menus, tooltips, popovers, selects, dialogs, and keyboard flows.
 - Resource cards, citations, generated-image galleries, and preview surfaces.
 - Light, dark, system, compact-window, reduced-motion, and focus states.
-- Package tests, full-export React 18/19 consumer checks, CodeQL scanning, a browser showcase build, and an executable Electron acceptance harness.
+- Package tests, full-export React 18/19 consumer checks, headless-Chrome accessibility checks, CodeQL scanning, a browser showcase build, and an executable Electron acceptance harness.
 - Protocol-neutral APIs with standalone public CSS tokens.
 
 ## Quick start

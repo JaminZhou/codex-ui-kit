@@ -218,6 +218,7 @@ export interface ActivityGroupProps extends HTMLAttributes<HTMLDivElement> {
 export function ActivityGroup({
   children,
   className,
+  role = "group",
   ...props
 }: ActivityGroupProps) {
   const classes = ["codex-ui-activity-group", className]
@@ -225,7 +226,7 @@ export function ActivityGroup({
     .join(" ");
 
   return (
-    <div className={classes} {...props}>
+    <div className={classes} role={role} {...props}>
       {children}
     </div>
   );

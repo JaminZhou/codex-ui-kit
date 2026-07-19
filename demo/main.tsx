@@ -447,7 +447,11 @@ function Showcase() {
             the states between them. Designed from interaction research and
             implemented independently.
           </p>
-          <div className="showcase__hero-meta" aria-label="Package highlights">
+          <div
+            aria-label="Package highlights"
+            className="showcase__hero-meta"
+            role="group"
+          >
             <span>React 18+</span>
             <span>TypeScript</span>
             <span>Light + dark</span>
@@ -1735,6 +1739,7 @@ function Showcase() {
               <div
                 aria-label="Composer layout state matrix"
                 className="composer-preview__matrix"
+                role="group"
               >
                 <div className="composer-preview__sample">
                   <span>Auto · compact</span>
@@ -2054,7 +2059,7 @@ function Showcase() {
                       summary="Could not resolve design reference"
                     />
                     <AgentActivity
-                      indicator={<span aria-label="Stopped">■</span>}
+                      indicator={<span aria-hidden="true">■</span>}
                       kind="command"
                       status="failed"
                       summary="Stopped by the user"
@@ -2102,7 +2107,11 @@ function Showcase() {
                 <code>--codex-ui-focus</code>
               </div>
             </div>
-            <div className="theme-isolation" aria-label="Forced theme isolation">
+            <div
+              aria-label="Forced theme isolation"
+              className="theme-isolation"
+              role="group"
+            >
               <div data-theme="light">
                 <div className="theme-isolation__surface">
                   <span>Light ancestor</span>

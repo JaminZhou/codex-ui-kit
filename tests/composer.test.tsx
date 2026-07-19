@@ -70,7 +70,6 @@ describe("AgentComposer", () => {
     expect(
       container.querySelector("form")?.getAttribute("data-layout"),
     ).toBe("multiline");
-
     rerender(
       <AgentComposer
         attachments={<span>README.md</span>}
@@ -82,6 +81,11 @@ describe("AgentComposer", () => {
     expect(
       container.querySelector("form")?.getAttribute("data-layout"),
     ).toBe("multiline");
+    expect(
+      container
+        .querySelector(".codex-ui-composer__attachments")
+        ?.getAttribute("role"),
+    ).toBe("group");
 
     rerender(
       <AgentComposer
