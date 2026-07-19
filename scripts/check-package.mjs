@@ -18,6 +18,10 @@ assert(
   "package must remain private until the first registry release",
 );
 assert(packageJson.publishConfig?.access === "public", "package access must be public");
+assert(
+  packageJson.scripts?.prepack === "node scripts/prepack.mjs",
+  "npm pack and publish must build ignored package output first",
+);
 assert(packageJson.repository?.url, "repository metadata is required");
 assert(packageJson.homepage, "homepage metadata is required");
 assert(packageJson.bugs?.url, "bugs metadata is required");

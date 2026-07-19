@@ -48,6 +48,7 @@
     "build": "vite build && tsc -p tsconfig.build.json",
     "build:demo": "vite build demo --base=/codex-ui-kit/ --config demo/vite.config.ts && node scripts/check-demo-bundle.mjs",
     "build:electron": "pnpm --filter @codex-ui-kit/electron-playground build",
+    "prepack": "node scripts/prepack.mjs",
     "test": "vitest run tests",
     "typecheck": "tsc --noEmit",
     "check:package": "node scripts/check-package.mjs && tsc -p fixtures/package-consumer/tsconfig.json",

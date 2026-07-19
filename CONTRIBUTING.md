@@ -12,6 +12,10 @@ pnpm check
 
 `pnpm check` runs TypeScript checks, package tests, the library build, the npm package contract, the browser showcase build, and the Electron main/preload/Renderer checks.
 
+The generated `dist/` directory is not tracked. `npm pack` runs `pnpm build`
+through the package `prepack` lifecycle before assembling a tarball; do not
+commit generated package output.
+
 ## Component changes
 
 1. Add or update the public component API and types.
