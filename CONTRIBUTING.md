@@ -14,8 +14,13 @@ pnpm check
 
 The accessibility contract checks the built showcase for WCAG A/AA/2.2
 violations, labels, valid ARIA relationships, and keyboard-accessible scroll
-regions. Indeterminate gradient/overlap contrast results remain part of manual
-visual review. Set
+regions. It opens tooltips, nested menus, popovers, selects, choice dialogs,
+image previews, and approval menus in every checked viewport. Portalled
+`aria-controls` and `aria-describedby` targets must exist in the same document,
+carry the expected role, and keep modal focus inside dialogs. Axe's narrowly
+identified `controlsWithinPopup` uncertainty is accepted only after that DOM
+relationship is verified; unrelated ARIA uncertainty still fails. Indeterminate
+gradient/overlap contrast results remain part of manual visual review. Set
 `PUPPETEER_EXECUTABLE_PATH` when Chrome or Chromium is installed outside the
 standard macOS and Linux locations.
 

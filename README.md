@@ -141,8 +141,9 @@ pnpm check
 ```
 
 `pnpm check` runs type checking, the package test suite, the library build, the
-package contract, the browser showcase build, WCAG A/AA/2.2 browser checks, and
-the Electron main/preload/Renderer checks.
+package contract, the browser showcase build, WCAG A/AA/2.2 browser checks for
+the static page and open overlay states, and the Electron
+main/preload/Renderer checks.
 
 `npm pack` and a future `npm publish` run the library build first so the ignored
 `dist/` directory is always generated from the checked-out source. The package
