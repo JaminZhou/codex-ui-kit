@@ -3,6 +3,7 @@ import {
   type CSSProperties,
   type KeyboardEvent,
   type ReactNode,
+  useContext,
   useEffect,
   useId,
   useLayoutEffect,
@@ -12,6 +13,7 @@ import {
 } from "react";
 import { createPortal } from "react-dom";
 import { acquireDocumentScrollLock } from "../internal/documentScrollLock";
+import { OverlayEnvironmentContext } from "../internal/overlayEnvironment";
 
 export type ResourceKind =
   | "app"
@@ -35,6 +37,7 @@ export interface ResourceCardProps {
   kind?: ResourceKind;
   onDragStart?: React.DragEventHandler<HTMLElement>;
   onOpen?: () => void;
+  openLabel?: string;
   previewSrc?: string;
   subtitle?: ReactNode;
   target?: string;
@@ -64,6 +67,7 @@ export function ResourceCard({
   kind = "file",
   onDragStart,
   onOpen,
+  openLabel,
   previewSrc,
   subtitle,
   target,
@@ -72,9 +76,11 @@ export function ResourceCard({
   const classes = ["codex-ui-resource-card", className]
     .filter(Boolean)
     .join(" ");
-  const accessibleTitle = typeof title === "string" ? title : "resource";
+  const hasOpenAction = Boolean(href || onOpen);
+  const accessibleOpenLabel =
+    openLabel ?? (typeof title === "string" ? `Open ${title}` : "Open resource");
   const commonProps = {
-    "aria-label": `Open ${accessibleTitle}`,
+    "aria-label": accessibleOpenLabel,
     className: "codex-ui-resource-card__open",
     draggable,
     onClick: onOpen,
@@ -82,7 +88,12 @@ export function ResourceCard({
   };
 
   return (
-    <article className={classes} data-disabled={disabled || undefined} data-kind={kind}>
+    <article
+      className={classes}
+      data-disabled={disabled || undefined}
+      data-interactive={(hasOpenAction && !disabled) || undefined}
+      data-kind={kind}
+    >
       {href && !disabled ? (
         <a
           {...commonProps}
@@ -90,9 +101,9 @@ export function ResourceCard({
           rel={target === "_blank" ? "noreferrer" : undefined}
           target={target}
         />
-      ) : (
+      ) : hasOpenAction ? (
         <button {...commonProps} disabled={disabled} type="button" />
-      )}
+      ) : null}
       <span className="codex-ui-resource-card__visual" aria-hidden="true">
         {previewSrc ? (
           <img alt="" draggable={false} src={previewSrc} />
@@ -185,6 +196,7 @@ export interface SourceItem {
   kind?: SourceKind;
   meta?: ReactNode;
   onOpen?: () => void;
+  openLabel?: string;
   previewSrc?: string;
   title: ReactNode;
 }
@@ -232,6 +244,7 @@ export function SourceList({
       </div>
       <ol className="codex-ui-source-list__items">
         {visibleItems.map((item) => {
+          const interactive = Boolean(item.href || item.onOpen);
           const content = (
             <>
               <span className="codex-ui-source-list__visual" aria-hidden="true">
@@ -247,21 +260,33 @@ export function SourceList({
                   <span className="codex-ui-source-list__meta">{item.meta}</span>
                 ) : null}
               </span>
-              <span className="codex-ui-source-list__arrow" aria-hidden="true">
-                ↗
-              </span>
+              {interactive ? (
+                <span className="codex-ui-source-list__arrow" aria-hidden="true">
+                  ↗
+                </span>
+              ) : null}
             </>
           );
           return (
             <li key={item.id}>
               {item.href ? (
-                <a href={item.href} onClick={item.onOpen}>
+                <a
+                  aria-label={item.openLabel}
+                  href={item.href}
+                  onClick={item.onOpen}
+                >
                   {content}
                 </a>
-              ) : (
-                <button onClick={item.onOpen} type="button">
+              ) : item.onOpen ? (
+                <button
+                  aria-label={item.openLabel}
+                  onClick={item.onOpen}
+                  type="button"
+                >
                   {content}
                 </button>
+              ) : (
+                <div className="codex-ui-source-list__item">{content}</div>
               )}
             </li>
           );
@@ -458,21 +483,9 @@ export function GeneratedImageGallery({
     >
       <div className="codex-ui-generated-image-gallery__viewport">
         <div className="codex-ui-generated-image-gallery__track">
-          {images.map((image, index) => (
-            <button
-              aria-hidden={
-                index < startIndex || index >= startIndex + 4 || undefined
-              }
-              aria-label={image.alt ?? `Generated image ${index + 1}`}
-              className="codex-ui-generated-image-gallery__image"
-              data-square={layout.square || undefined}
-              inert={index < startIndex || index >= startIndex + 4}
-              key={image.id}
-              onClick={() => onOpenImage?.(image, index)}
-              style={{ width: layout.widths[index] }}
-              tabIndex={index < startIndex || index >= startIndex + 4 ? -1 : 0}
-              type="button"
-            >
+          {images.map((image, index) => {
+            const hidden = index < startIndex || index >= startIndex + 4;
+            const media = (
               <GeneratedImageMedia
                 alt={image.alt ?? `Generated image ${index + 1}`}
                 onDimensions={(naturalWidth, naturalHeight) => {
@@ -496,8 +509,32 @@ export function GeneratedImageGallery({
                 }}
                 src={image.src}
               />
-            </button>
-          ))}
+            );
+            const imageProps = {
+              "aria-hidden": hidden || undefined,
+              className: "codex-ui-generated-image-gallery__image",
+              "data-square": layout.square || undefined,
+              inert: hidden,
+              style: { width: layout.widths[index] },
+            };
+
+            return onOpenImage ? (
+              <button
+                {...imageProps}
+                aria-label={image.alt ?? `Generated image ${index + 1}`}
+                key={image.id}
+                onClick={() => onOpenImage(image, index)}
+                tabIndex={hidden ? -1 : 0}
+                type="button"
+              >
+                {media}
+              </button>
+            ) : (
+              <div {...imageProps} key={image.id}>
+                {media}
+              </div>
+            );
+          })}
           {Array.from({ length: placeholderCount }, (_, index) => (
             <span
               aria-label="Generating image"
@@ -564,11 +601,31 @@ export function ImagePreviewDialog({
   title = "Generated image",
 }: ImagePreviewDialogProps) {
   const titleId = useId();
+  const overlayEnvironment = useContext(OverlayEnvironmentContext);
   const closeRef = useRef<HTMLButtonElement>(null);
   const previewRef = useRef<HTMLDivElement>(null);
   const returnFocusRef = useRef<HTMLElement | null>(null);
+  const [inferredTheme, setInferredTheme] = useState<string>();
   const requestedIndex = imageId ? images.findIndex((image) => image.id === imageId) : 0;
   const [activeIndex, setActiveIndex] = useState(Math.max(0, requestedIndex));
+  const visible = open && images.length > 0;
+  const portalTheme = overlayEnvironment.theme ?? inferredTheme;
+
+  useLayoutEffect(() => {
+    if (
+      !visible ||
+      overlayEnvironment.theme !== undefined ||
+      typeof document === "undefined"
+    ) {
+      return;
+    }
+    const activeElement = document.activeElement;
+    setInferredTheme(
+      activeElement instanceof Element
+        ? activeElement.closest<HTMLElement>("[data-theme]")?.dataset.theme
+        : undefined,
+    );
+  }, [overlayEnvironment.theme, visible]);
 
   useEffect(() => {
     if (!open) return;
@@ -582,7 +639,7 @@ export function ImagePreviewDialog({
   }, [images.length]);
 
   useEffect(() => {
-    if (!open) return;
+    if (!visible || typeof document === "undefined") return;
     returnFocusRef.current = document.activeElement as HTMLElement | null;
     const modalLock = acquireDocumentScrollLock({
       containsFocus: (target) => previewRef.current?.contains(target) ?? false,
@@ -594,9 +651,9 @@ export function ImagePreviewDialog({
     return () => {
       modalLock.release()?.focus();
     };
-  }, [open]);
+  }, [visible]);
 
-  if (!open || images.length === 0 || typeof document === "undefined") return null;
+  if (!visible || typeof document === "undefined") return null;
   const activeImage = images[Math.min(activeIndex, images.length - 1)];
   if (!activeImage) return null;
 
@@ -638,6 +695,9 @@ export function ImagePreviewDialog({
       aria-labelledby={titleId}
       aria-modal="true"
       className="codex-ui-image-preview"
+      data-codex-ui-dialog-owner={overlayEnvironment.ownerId}
+      data-codex-ui-overlay-layer={overlayEnvironment.layer}
+      data-theme={portalTheme}
       onKeyDown={handleKeyDown}
       ref={previewRef}
       role="dialog"

@@ -7,14 +7,14 @@ Electron parity against the locked sampled build.
 
 ## Baseline
 
-- Current sample: Codex Desktop `26.715.21425` (`5488`).
+- Current sample: Codex Desktop `26.715.31925` (`5551`).
 - Current Renderer archive hash:
-  `5db4c67090c0521fa717e83e46cb0a6175cb6c16fb89064223753bdf05cff0aa`.
+  `0c9dd677134340cb944e7642b8bc2504c7b73c7dc334d9d756547858171eea41`.
 - Current runtime declaration: Electron `42.3.0`, React Renderer, Vite build,
   packaged for the Owl production runtime.
 - The original measured geometry baseline remains `26.707.72221`; the shared
   conversation stylesheet is byte-identical in the current sample. Current
-  terminology and lifecycle deltas are locked in `26.715.21425.md`.
+  terminology and lifecycle continuity are locked in `26.715.31925.md`.
 - Raw extracted files remain outside the repository.
 
 ## Completion gates

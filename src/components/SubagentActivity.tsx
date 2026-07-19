@@ -7,6 +7,7 @@ import {
   type HTMLAttributes,
   type ReactNode,
 } from "react";
+import { Menu, MenuItem } from "./InteractivePrimitives";
 
 export type SubagentStatus = "active" | "waiting" | "done";
 export type SubagentActivityStatus =
@@ -263,42 +264,9 @@ function SummaryAvatarGroup({
   items: SubagentItem[];
   onOpenItem?: (item: SubagentItem) => void;
 }) {
-  const [overflowOpen, setOverflowOpen] = useState(false);
-  const overflowId = useId();
-  const overflowRoot = useRef<HTMLSpanElement>(null);
   const overflowTrigger = useRef<HTMLButtonElement>(null);
   const visibleItems = items.slice(0, 4);
   const overflowItems = items.slice(4);
-
-  useEffect(() => {
-    if (!onOpenItem || overflowItems.length === 0) {
-      setOverflowOpen(false);
-    }
-  }, [onOpenItem, overflowItems.length]);
-
-  useEffect(() => {
-    if (!overflowOpen) return;
-
-    const dismissOutside = (event: PointerEvent) => {
-      if (
-        event.target instanceof Node &&
-        !overflowRoot.current?.contains(event.target)
-      ) {
-        setOverflowOpen(false);
-      }
-    };
-    const dismissOnEscape = (event: KeyboardEvent) => {
-      if (event.key !== "Escape") return;
-      setOverflowOpen(false);
-      overflowTrigger.current?.focus();
-    };
-    document.addEventListener("pointerdown", dismissOutside);
-    document.addEventListener("keydown", dismissOnEscape);
-    return () => {
-      document.removeEventListener("pointerdown", dismissOutside);
-      document.removeEventListener("keydown", dismissOnEscape);
-    };
-  }, [overflowOpen]);
 
   return (
     <span
@@ -332,52 +300,47 @@ function SummaryAvatarGroup({
         );
       })}
       {onOpenItem && overflowItems.length > 0 ? (
-        <span
-          className="codex-ui-subagent-summary__overflow"
-          ref={overflowRoot}
-        >
-          <button
-            aria-controls={overflowId}
-            aria-expanded={overflowOpen}
-            aria-haspopup="menu"
-            aria-label={`Open ${overflowItems.length} more ${
-              overflowItems.length === 1 ? "subagent" : "subagents"
-            }`}
-            className="codex-ui-subagent-summary__overflow-toggle"
-            onClick={() => setOverflowOpen((value) => !value)}
-            ref={overflowTrigger}
-            type="button"
+        <span className="codex-ui-subagent-summary__overflow">
+          <Menu
+            align="start"
+            className="codex-ui-subagent-summary__overflow-menu"
+            side="bottom"
+            trigger={
+              <button
+                aria-label={`Open ${overflowItems.length} more ${
+                  overflowItems.length === 1 ? "subagent" : "subagents"
+                }`}
+                className="codex-ui-subagent-summary__overflow-toggle"
+                ref={overflowTrigger}
+                type="button"
+              >
+                +{overflowItems.length}
+              </button>
+            }
           >
-            +{overflowItems.length}
-          </button>
-          {overflowOpen ? (
-            <span
-              className="codex-ui-subagent-summary__overflow-menu"
-              id={overflowId}
-              role="menu"
-            >
-              {overflowItems.map((item) => (
-                <button
-                  className="codex-ui-subagent-summary__overflow-item"
-                  key={item.id}
-                  onClick={() => {
-                    setOverflowOpen(false);
-                    onOpenItem(item);
-                  }}
-                  role="menuitem"
-                  type="button"
-                >
+            {overflowItems.map((item) => (
+              <MenuItem
+                className="codex-ui-subagent-summary__overflow-item"
+                key={item.id}
+                onSelect={() => {
+                  onOpenItem(item);
+                  if (typeof window !== "undefined") {
+                    window.setTimeout(() => overflowTrigger.current?.focus());
+                  }
+                }}
+                startIcon={
                   <SubagentAvatar
                     active={item.status !== "done"}
                     aria-hidden="true"
                     seed={item.id}
                     size="tiny"
                   />
-                  <span>{displayName(item.name)}</span>
-                </button>
-              ))}
-            </span>
-          ) : null}
+                }
+              >
+                {displayName(item.name)}
+              </MenuItem>
+            ))}
+          </Menu>
         </span>
       ) : null}
     </span>

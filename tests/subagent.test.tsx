@@ -1,6 +1,12 @@
 // @vitest-environment happy-dom
 
-import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import {
+  cleanup,
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+} from "@testing-library/react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import {
@@ -232,6 +238,61 @@ describe("SubagentSummary", () => {
     );
     fireEvent.click(screen.getByRole("menuitem", { name: "Agent 5" }));
     expect(onOpenSubagent).toHaveBeenCalledWith(groupedAgents[4]);
+  });
+
+  it("provides complete keyboard navigation and restores overflow trigger focus", async () => {
+    const onOpenSubagent = vi.fn();
+    const groupedAgents = Array.from({ length: 7 }, (_, index) => ({
+      ...activeAgent,
+      id: `keyboard-grouped-${index}`,
+      name: [
+        "Agent 1",
+        "Agent 2",
+        "Agent 3",
+        "Agent 4",
+        "Builder",
+        "Reviewer",
+        "Tester",
+      ][index],
+      presentation: "grouped" as const,
+    }));
+    render(
+      <SubagentSummary
+        items={groupedAgents}
+        onOpenSubagent={onOpenSubagent}
+      />,
+    );
+
+    const trigger = screen.getByRole("button", {
+      name: "Open 3 more subagents",
+    });
+    fireEvent.keyDown(trigger, { key: "ArrowDown" });
+
+    const menu = await screen.findByRole("menu");
+    const builder = screen.getByRole("menuitem", { name: "Builder" });
+    const reviewer = screen.getByRole("menuitem", { name: "Reviewer" });
+    const tester = screen.getByRole("menuitem", { name: "Tester" });
+    await waitFor(() => expect(document.activeElement).toBe(builder));
+
+    fireEvent.keyDown(menu, { key: "End" });
+    expect(document.activeElement).toBe(tester);
+    fireEvent.keyDown(menu, { key: "Home" });
+    expect(document.activeElement).toBe(builder);
+    fireEvent.keyDown(menu, { key: "ArrowDown" });
+    expect(document.activeElement).toBe(reviewer);
+    fireEvent.keyDown(menu, { key: "t" });
+    expect(document.activeElement).toBe(tester);
+
+    fireEvent.click(tester);
+    expect(onOpenSubagent).toHaveBeenCalledWith(groupedAgents[6]);
+    expect(screen.queryByRole("menu")).toBeNull();
+    await waitFor(() => expect(document.activeElement).toBe(trigger));
+
+    fireEvent.click(trigger);
+    await screen.findByRole("menu");
+    fireEvent.keyDown(screen.getByRole("menu"), { key: "Escape" });
+    expect(screen.queryByRole("menu")).toBeNull();
+    await waitFor(() => expect(document.activeElement).toBe(trigger));
   });
 
   it("includes grouped status counts in the overview button name", () => {

@@ -19,7 +19,7 @@ Codex UI Kit turns those interaction patterns into protocol-neutral React primit
 
 ## Status
 
-- Visual and behavioral parity is complete for the current Codex Desktop sample documented in [`research/26.715.21425.md`](research/26.715.21425.md), with the original measured geometry retained in [`research/26.707.72221.md`](research/26.707.72221.md).
+- Visual and behavioral parity is complete for the current Codex Desktop sample documented in [`research/26.715.31925.md`](research/26.715.31925.md), with the original measured geometry retained in [`research/26.707.72221.md`](research/26.707.72221.md).
 - The repository is public and the package baseline is `0.1.0`, but the npm package has **not** been published.
 - The API remains pre-1.0 and may change while public documentation and consumer feedback mature.
 - Extracted application files, private IPC, bundled fonts, and OpenAI brand assets are not included.

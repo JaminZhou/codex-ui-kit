@@ -5673,8 +5673,8 @@ button.codex-ui-subagent-panel__item:focus-visible {
   transition: background-color var(--codex-ui-transition);
 }
 
-.codex-ui-resource-card:hover::before,
-.codex-ui-resource-card:focus-within::before {
+.codex-ui-resource-card[data-interactive]:hover::before,
+.codex-ui-resource-card[data-interactive]:focus-within::before {
   background: color-mix(
     in oklab,
     var(--codex-ui-background-button-secondary-hover) 30%,
@@ -5879,14 +5879,14 @@ button.codex-ui-subagent-panel__item:focus-visible {
 }
 
 .codex-ui-source-list__items a,
-.codex-ui-source-list__items button {
+.codex-ui-source-list__items button,
+.codex-ui-source-list__item {
   align-items: center;
   appearance: none;
   background: transparent;
   border: 0;
   border-radius: var(--codex-ui-radius-sm);
   color: inherit;
-  cursor: pointer;
   display: flex;
   font: inherit;
   gap: 0.5rem;
@@ -5895,6 +5895,11 @@ button.codex-ui-subagent-panel__item:focus-visible {
   text-align: left;
   text-decoration: none;
   width: 100%;
+}
+
+.codex-ui-source-list__items a,
+.codex-ui-source-list__items button {
+  cursor: pointer;
 }
 
 .codex-ui-source-list__items a:hover,
@@ -5993,11 +5998,14 @@ button.codex-ui-subagent-panel__item:focus-visible {
   background: var(--codex-ui-background-surface);
   border: 0;
   border-radius: var(--codex-ui-generated-image-radius);
-  cursor: zoom-in;
   flex: 0 0 auto;
   height: 100%;
   overflow: hidden;
   padding: 0;
+}
+
+button.codex-ui-generated-image-gallery__image {
+  cursor: zoom-in;
 }
 
 .codex-ui-generated-image-gallery__image:focus-visible {
