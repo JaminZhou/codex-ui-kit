@@ -21,9 +21,9 @@ describe("thread navigation visual contract", () => {
     expect(styles).toContain("animation: none");
   });
 
-  it("locks the observed message-navigation rail geometry", () => {
+  it("locks the observed marker and accessible navigation hit geometry", () => {
     expect(tokens).toContain("--codex-ui-message-navigation-row-width: calc(var(--codex-ui-spacing) * 9)");
-    expect(tokens).toContain("--codex-ui-message-navigation-row-height: calc(var(--codex-ui-spacing) * 2.5)");
+    expect(tokens).toContain("--codex-ui-message-navigation-row-height: calc(var(--codex-ui-spacing) * 6)");
     expect(tokens).toContain("--codex-ui-message-navigation-marker-width: calc(var(--codex-ui-spacing) * 7.5)");
     expect(tokens).toContain("--codex-ui-message-navigation-marker-height: calc(var(--codex-ui-spacing) * 0.5)");
     expect(styles).toContain("max-height: min(70vh, 40rem)");

@@ -5,7 +5,7 @@ const tokens = readFileSync(new URL("../src/tokens.css", import.meta.url), "utf8
 const styles = readFileSync(new URL("../src/styles.css", import.meta.url), "utf8");
 
 describe("visual token contract", () => {
-  it("keeps the measured spacing, type, radius, and thread foundations", () => {
+  it("keeps measured foundations with accessible interactive target overrides", () => {
     expect(tokens).toContain("--codex-ui-spacing: 0.25rem");
     expect(tokens).toContain("--codex-ui-font-size-md: 1rem");
     expect(tokens).toContain("--codex-ui-radius-2xl: 1rem");
@@ -15,7 +15,7 @@ describe("visual token contract", () => {
       "--codex-ui-radius-composer-multiline: var(--codex-ui-radius-3xl)",
     );
     expect(tokens).toContain(
-      "--codex-ui-size-button-composer: calc(var(--codex-ui-spacing) * 7)",
+      "--codex-ui-size-button-composer: calc(var(--codex-ui-spacing) * 8)",
     );
     expect(tokens).toContain("--codex-ui-shadow-composer-prominent:");
     expect(tokens).toContain("--codex-ui-shadow-composer-electron:");
@@ -36,7 +36,31 @@ describe("visual token contract", () => {
     expect(tokens).toContain("--codex-ui-green-500: #00a240");
     expect(tokens).toContain("--codex-ui-red-400: #fa423e");
     expect(tokens).toContain("--codex-ui-background-surface: var(--codex-ui-gray-900)");
-    expect(tokens).toContain("--codex-ui-border-focus: var(--codex-ui-blue-300)");
+    expect(tokens).toContain("--codex-ui-border-focus: var(--codex-ui-blue-600)");
+    expect(tokens).toContain(
+      "--codex-ui-text-secondary: var(--codex-ui-gray-500)",
+    );
+    expect(tokens).toContain(
+      "--codex-ui-text-tertiary: var(--codex-ui-gray-450)",
+    );
+    expect(tokens).toContain(
+      "--codex-ui-text-success: var(--codex-ui-green-700)",
+    );
+    expect(tokens).toContain(
+      "--codex-ui-text-warning: var(--codex-ui-orange-700)",
+    );
+    expect(tokens).toContain(
+      "--codex-ui-text-error: var(--codex-ui-red-600)",
+    );
+    expect(tokens).toContain(
+      "--codex-ui-text-accent: var(--codex-ui-blue-600)",
+    );
+  });
+
+  it("keeps composer controls at an accessible minimum inline size", () => {
+    expect(styles).toMatch(
+      /\.codex-ui-composer__actions > button,[\s\S]*?min-height: var\(--codex-ui-size-button-composer\);[\s\S]*?min-width: var\(--codex-ui-size-button-composer\);/,
+    );
   });
 
   it("keeps the light editor surface opaque on arbitrary host backgrounds", () => {

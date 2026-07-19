@@ -53,4 +53,15 @@ describe("subagent visual contract", () => {
     );
     expect(styles).toContain("@media (prefers-reduced-motion: reduce)");
   });
+
+  it("animates working labels without reducing text opacity", () => {
+    const workingAnimation = styles.match(
+      /@keyframes codex-ui-subagent-working \{([\s\S]*?)\n\}/,
+    )?.[1];
+    expect(workingAnimation).toContain(
+      "color: var(--codex-ui-text-secondary)",
+    );
+    expect(workingAnimation).toContain("color: var(--codex-ui-text)");
+    expect(workingAnimation).not.toContain("opacity");
+  });
 });

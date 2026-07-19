@@ -35,7 +35,7 @@ describe("Markdown visual contract", () => {
     );
   });
 
-  it("maps the observed light and dark highlight roles", () => {
+  it("maps independently contrast-safe light and dark highlight roles", () => {
     expect(tokens).toContain(
       "--codex-ui-code-syntax-light-keyword: #a626a4",
     );
@@ -43,7 +43,7 @@ describe("Markdown visual contract", () => {
       "--codex-ui-code-syntax-dark-keyword: #2e95d3",
     );
     expect(tokens).toContain(
-      "--codex-ui-code-syntax-light-string: #50a14f",
+      "--codex-ui-code-syntax-light-string: #3f7f3e",
     );
     expect(tokens).toContain(
       "--codex-ui-code-syntax-dark-string: #00a67d",

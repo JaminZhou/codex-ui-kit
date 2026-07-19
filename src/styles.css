@@ -1811,11 +1811,11 @@
 @keyframes codex-ui-notice-shimmer {
   0%,
   100% {
-    opacity: 0.55;
+    text-shadow: 0 0 0 currentColor;
   }
 
   50% {
-    opacity: 1;
+    text-shadow: 0 0 0.35px currentColor;
   }
 }
 
@@ -2579,11 +2579,11 @@ summary.codex-ui-activity__header::after {
 @keyframes codex-ui-reasoning-thinking {
   0%,
   100% {
-    opacity: 0.58;
+    color: var(--codex-ui-text-secondary);
   }
 
   50% {
-    opacity: 1;
+    color: var(--codex-ui-text);
   }
 }
 
@@ -3362,7 +3362,7 @@ summary.codex-ui-activity__header::after {
 
 .codex-ui-file-diff__line-number,
 .codex-ui-file-diff__prefix {
-  color: var(--codex-ui-text-tertiary);
+  color: var(--codex-ui-text-secondary);
   font-variant-numeric: tabular-nums;
   padding: 0 0.375rem;
   text-align: right;
@@ -4584,6 +4584,7 @@ summary.codex-ui-activity__header::after {
   font: inherit;
   font-size: var(--codex-ui-font-size-sm);
   min-height: var(--codex-ui-size-button-composer);
+  min-width: var(--codex-ui-size-button-composer);
   padding: 0.25rem 0.45rem;
 }
 
@@ -6291,11 +6292,11 @@ button.codex-ui-generated-image-gallery__image {
 @keyframes codex-ui-subagent-working {
   0%,
   100% {
-    opacity: 0.52;
+    color: var(--codex-ui-text-secondary);
   }
 
   50% {
-    opacity: 1;
+    color: var(--codex-ui-text);
   }
 }
 

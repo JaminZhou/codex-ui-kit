@@ -29,6 +29,25 @@ A row is complete only when all applicable gates pass:
 5. The Electron playground verifies desktop theme, font fallback, scrolling,
    resizing, focus, and rendered geometry.
 6. Automated tests and package-consumer checks protect the contract.
+7. The browser showcase has no automated WCAG A/AA/2.2 violations at the
+   desktop light, desktop dark, and compact light acceptance viewports;
+   indeterminate gradient/overlap results receive manual visual review.
+
+## Accessibility overrides
+
+Parity describes the observed interaction model, states, and visual hierarchy;
+it does not require preserving sampled values that fail the public component
+library's accessibility contract. The independent implementation therefore
+uses two documented minimums:
+
+- Composer actions use a `32px` control target instead of the sampled `28px`.
+- User-message navigation keeps the sampled `30px × 2px` marker but expands
+  each invisible hit row from `10px` to `24px` high.
+
+Light-theme secondary, tertiary, status, accent, focus, and code-syntax colors
+also use independently selected solid values that preserve the sampled roles
+while meeting text or non-text contrast requirements. These values are public
+kit tokens, not extracted product assets.
 
 ## Surface matrix
 
