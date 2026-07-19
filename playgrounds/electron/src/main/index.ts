@@ -59,16 +59,20 @@ async function captureInteractivePrimitives(webContents: WebContents) {
     }
     await wait(180);
     const moreActions = card?.querySelector('[aria-label="More actions"]');
-    if (moreActions?.getAttribute('aria-expanded') !== 'true') {
+    if (moreActions?.getAttribute('aria-expanded') === 'true') {
       moreActions?.click();
+      await wait(80);
     }
+    moreActions?.click();
     await wait(140);
     const rootMenu = [...document.querySelectorAll('.codex-ui-popover[role="menu"]')]
       .find((element) => element.querySelector('.codex-ui-menu-submenu-trigger'));
     const submenuTrigger = rootMenu?.querySelector('.codex-ui-menu-submenu-trigger');
-    if (submenuTrigger?.getAttribute('aria-expanded') !== 'true') {
+    if (submenuTrigger?.getAttribute('aria-expanded') === 'true') {
       submenuTrigger?.click();
+      await wait(80);
     }
+    submenuTrigger?.click();
     await wait(160);
     const overlays = [...document.querySelectorAll('.codex-ui-popover')].map((element) => {
       const bounds = element.getBoundingClientRect();
@@ -111,9 +115,15 @@ async function captureInteractivePrimitives(webContents: WebContents) {
       toolbarButton: rect(toolbarButton),
       viewport: { height: window.innerHeight, width: window.innerWidth },
     };
-    if (dialogChoices[0] instanceof HTMLElement) dialogChoices[0].click();
-    await wait(80);
     return metrics;
+  })()`);
+}
+
+async function closeChoiceDialog(webContents: WebContents) {
+  await webContents.executeJavaScript(`(async () => {
+    const choice = document.querySelector('.codex-ui-dialog-choice');
+    if (choice instanceof HTMLElement) choice.click();
+    await new Promise((resolve) => setTimeout(resolve, 80));
   })()`);
 }
 
@@ -461,6 +471,7 @@ async function captureAcceptance(browserWindow: BrowserWindow) {
     browserWindow.webContents,
   );
   const interactiveScreenshot = await browserWindow.webContents.capturePage();
+  await closeChoiceDialog(browserWindow.webContents);
   await browserWindow.webContents.executeJavaScript(
     "document.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true }))",
   );
@@ -493,6 +504,7 @@ async function captureAcceptance(browserWindow: BrowserWindow) {
   );
   const compactInteractiveScreenshot =
     await browserWindow.webContents.capturePage();
+  await closeChoiceDialog(browserWindow.webContents);
   console.log("acceptance step: compact resources");
   const compactResourceMetrics = await captureResourceSurfaces(
     browserWindow.webContents,
