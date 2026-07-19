@@ -325,7 +325,7 @@ async function runAxe(page, wcagSelectors = []) {
           }))
           .filter((review) => review.messageKey || review.needsReview),
         target: node.target,
-      })).slice(0, 20),
+      })),
     });
     const semanticReport = await globalThis.axe.run(document, {
       runOnly: { type: "rule", values: rules },
@@ -462,6 +462,24 @@ function hasAccessibilityFailures(result) {
   );
 }
 
+function limitFailureResult(result) {
+  const limitEntries = (entries) =>
+    entries.map((entry) => ({
+      ...entry,
+      nodes: entry.nodes.slice(0, 20),
+    }));
+  return {
+    semantic: {
+      incomplete: limitEntries(result.semantic.incomplete),
+      violations: limitEntries(result.semantic.violations),
+    },
+    wcag: {
+      incomplete: limitEntries(result.wcag.incomplete),
+      violations: limitEntries(result.wcag.violations),
+    },
+  };
+}
+
 try {
   browser = await puppeteer.launch({
     executablePath: chrome,
@@ -498,7 +516,7 @@ try {
       failures.push({
         case: testCase.name,
         themeTransitionViolations,
-        ...result,
+        ...limitFailureResult(result),
       });
     }
 
@@ -539,7 +557,7 @@ try {
         failures.push({
           case: `${testCase.name} / ${overlayCase.name}`,
           overlayErrors: overlayValidation.errors,
-          ...overlayResult,
+          ...limitFailureResult(overlayResult),
         });
       }
     }

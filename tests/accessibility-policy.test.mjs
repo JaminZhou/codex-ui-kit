@@ -102,6 +102,33 @@ describe("portal control relationship policy", () => {
     expect(result.manualReview).toEqual([popupControlReview]);
     expect(result.unexpected).toEqual([unrelated]);
   });
+
+  it("checks every grouped Axe node instead of trusting the first 20", () => {
+    const unverifiedNode = {
+      ...popupControlReview.nodes[0],
+      reviews: [
+        {
+          messageKey: "controlsWithinPopup",
+          needsReview: 'aria-controls="unverified-menu-id"',
+        },
+      ],
+    };
+    const groupedReview = {
+      ...popupControlReview,
+      nodeCount: 21,
+      nodes: [
+        ...Array.from({ length: 20 }, () => popupControlReview.nodes[0]),
+        unverifiedNode,
+      ],
+    };
+
+    expect(
+      isExpectedPopupControlIncomplete(
+        groupedReview,
+        new Set(["menu-id"]),
+      ),
+    ).toBe(false);
+  });
 });
 
 describe("theme-transition contrast policy", () => {
