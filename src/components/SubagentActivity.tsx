@@ -7,7 +7,7 @@ import {
   type HTMLAttributes,
   type ReactNode,
 } from "react";
-import { Menu, MenuItem } from "./InteractivePrimitives";
+import { Menu, MenuItem } from "./InteractivePrimitives.js";
 
 export type SubagentStatus = "active" | "waiting" | "done";
 export type SubagentActivityStatus =

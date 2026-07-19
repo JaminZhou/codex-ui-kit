@@ -1,6 +1,6 @@
 import type { HTMLAttributes, ReactNode } from "react";
-import type { AgentItemStatus } from "../types";
-import { AgentActivity } from "./AgentActivity";
+import type { AgentItemStatus } from "../types.js";
+import { AgentActivity } from "./AgentActivity.js";
 
 export type SearchActivityKind = "code" | "web";
 

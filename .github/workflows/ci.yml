@@ -25,7 +25,7 @@ jobs:
       - run: pnpm check
 
   consumer:
-    name: React ${{ matrix.react }} consumer
+    name: React ${{ matrix.react }} / ${{ matrix.module-resolution }} consumer
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -36,11 +36,19 @@ jobs:
             react-dom-version: "18.3.1"
             react-types-version: "18.3.27"
             react-dom-types-version: "18.3.7"
+            module-resolution: Bundler
           - react: "19"
             react-version: "19.2.7"
             react-dom-version: "19.2.7"
             react-types-version: "19.2.17"
             react-dom-types-version: "19.2.3"
+            module-resolution: Bundler
+          - react: "19"
+            react-version: "19.2.7"
+            react-dom-version: "19.2.7"
+            react-types-version: "19.2.17"
+            react-dom-types-version: "19.2.3"
+            module-resolution: NodeNext
     steps:
       - uses: actions/checkout@v7
       - uses: pnpm/action-setup@v6
@@ -57,4 +65,5 @@ jobs:
             ${{ matrix.react-version }} \
             ${{ matrix.react-dom-version }} \
             ${{ matrix.react-types-version }} \
-            ${{ matrix.react-dom-types-version }}
+            ${{ matrix.react-dom-types-version }} \
+            ${{ matrix.module-resolution }}

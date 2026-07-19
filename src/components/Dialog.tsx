@@ -11,8 +11,8 @@ import {
   useState,
 } from "react";
 import { createPortal } from "react-dom";
-import { acquireDocumentScrollLock } from "../internal/documentScrollLock";
-import { OverlayEnvironmentContext } from "../internal/overlayEnvironment";
+import { acquireDocumentScrollLock } from "../internal/documentScrollLock.js";
+import { OverlayEnvironmentContext } from "../internal/overlayEnvironment.js";
 
 export type DialogSize = "compact" | "standard" | "wide";
 

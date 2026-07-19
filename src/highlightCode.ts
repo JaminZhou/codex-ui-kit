@@ -44,7 +44,7 @@ import vbnet from "highlight.js/lib/languages/vbnet";
 import wasm from "highlight.js/lib/languages/wasm";
 import xml from "highlight.js/lib/languages/xml";
 import yaml from "highlight.js/lib/languages/yaml";
-import type { CodeHighlightResult } from "./components/AgentMarkdown";
+import type { CodeHighlightResult } from "./components/AgentMarkdown.js";
 
 const languages = {
   arduino,

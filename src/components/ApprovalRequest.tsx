@@ -10,7 +10,7 @@ import {
   type ReactNode,
 } from "react";
 import { createPortal } from "react-dom";
-import type { ApprovalDecision } from "../types";
+import type { ApprovalDecision } from "../types.js";
 
 export type ApprovalRequestKind =
   | "generic"

@@ -1,9 +1,9 @@
 import { useState, type HTMLAttributes, type ReactNode } from "react";
-import type { AgentActivityKind } from "../types";
+import type { AgentActivityKind } from "../types.js";
 import {
   StatusIndicator,
   type StatusIndicatorStatus,
-} from "./StatusIndicator";
+} from "./StatusIndicator.js";
 
 export type AgentActivityStatus = StatusIndicatorStatus;
 
