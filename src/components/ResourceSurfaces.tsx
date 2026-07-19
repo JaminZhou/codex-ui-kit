@@ -82,9 +82,7 @@ export function ResourceCard({
   const commonProps = {
     "aria-label": accessibleOpenLabel,
     className: "codex-ui-resource-card__open",
-    draggable,
     onClick: onOpen,
-    onDragStart,
   };
 
   return (
@@ -93,6 +91,8 @@ export function ResourceCard({
       data-disabled={disabled || undefined}
       data-interactive={(hasOpenAction && !disabled) || undefined}
       data-kind={kind}
+      draggable={draggable}
+      onDragStart={onDragStart}
     >
       {href && !disabled ? (
         <a

@@ -93,6 +93,37 @@ describe("resource surfaces", () => {
     expect(onOpenSource).toHaveBeenCalledOnce();
   });
 
+  it("preserves dragging on static and openable resource cards", () => {
+    const onDragStatic = vi.fn();
+    const onDragOpenable = vi.fn();
+    render(
+      <>
+        <ResourceCard
+          draggable
+          onDragStart={onDragStatic}
+          title="Static draggable"
+        />
+        <ResourceCard
+          draggable
+          onDragStart={onDragOpenable}
+          onOpen={vi.fn()}
+          title="Openable draggable"
+        />
+      </>,
+    );
+
+    const staticCard = screen.getByText("Static draggable").closest("article")!;
+    const openableCard = screen
+      .getByText("Openable draggable")
+      .closest("article")!;
+    expect(staticCard.getAttribute("draggable")).toBe("true");
+    expect(openableCard.getAttribute("draggable")).toBe("true");
+    fireEvent.dragStart(staticCard);
+    fireEvent.dragStart(openableCard);
+    expect(onDragStatic).toHaveBeenCalledOnce();
+    expect(onDragOpenable).toHaveBeenCalledOnce();
+  });
+
   it("shows three resource rows before expanding the remainder", () => {
     render(
       <ResourceList>
