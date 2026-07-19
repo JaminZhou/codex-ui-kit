@@ -46,10 +46,14 @@ Portalled overlays and dialogs render only when a browser document is available.
 
 The built showcase is checked in desktop light, desktop dark, and compact light
 viewports. The gate covers WCAG A/AA/2.2 violations plus strict labels, ARIA
-relationships, and keyboard-accessible scroll regions. Axe results that cannot
-determine contrast through gradients or overlapping showcase surfaces remain a
-manual visual-review requirement rather than being treated as an automatic
-pass.
+relationships, and keyboard-accessible scroll regions. The same viewports also
+exercise open tooltip, nested-menu, popover, select, modal, image-preview, and
+approval-menu states. Portalled ID references, popup roles, modal state, and
+dialog focus containment are verified directly before Axe's
+`controlsWithinPopup` uncertainty can enter the manual-review path. Axe results
+that cannot determine contrast through gradients or overlapping showcase
+surfaces remain a manual visual-review requirement rather than being treated as
+an automatic pass.
 
 Semantic foreground/background pairs switch atomically between themes when an
 intermediate animated color could fall below the contrast threshold. Preserve

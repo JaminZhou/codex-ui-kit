@@ -8,6 +8,7 @@ import axe from "axe-core";
 import puppeteer from "puppeteer-core";
 import {
   contrastRatio,
+  partitionSemanticIncomplete,
   partitionWcagIncomplete,
 } from "./accessibility-policy.mjs";
 
@@ -100,8 +101,166 @@ const cases = [
   { dark: true, height: 1_000, name: "desktop dark", width: 1_440 },
   { dark: false, height: 680, name: "compact light", width: 820 },
 ];
+
+async function waitForFocusWithin(page, selector) {
+  await page.waitForFunction(
+    (targetSelector) => {
+      const target = document.querySelector(targetSelector);
+      return (
+        target instanceof HTMLElement &&
+        document.activeElement instanceof HTMLElement &&
+        target.contains(document.activeElement)
+      );
+    },
+    {},
+    selector,
+  );
+}
+
+const overlayCases = [
+  {
+    linkages: [
+      {
+        attribute: "aria-describedby",
+        role: "tooltip",
+        trigger: '.primitive-preview__toolbar button[aria-label="Create a chat"]',
+      },
+    ],
+    name: "tooltip",
+    open: async (page) => {
+      await page.focus(
+        '.primitive-preview__toolbar button[aria-label="Create a chat"]',
+      );
+      await page.waitForSelector('[role="tooltip"]');
+    },
+  },
+  {
+    linkages: [
+      {
+        attribute: "aria-controls",
+        role: "menu",
+        trigger: '.primitive-preview__toolbar button[aria-label="More actions"]',
+      },
+      {
+        attribute: "aria-controls",
+        role: "menu",
+        trigger: ".codex-ui-menu-submenu-trigger",
+      },
+    ],
+    name: "menu and submenu",
+    open: async (page) => {
+      await page.click(
+        '.primitive-preview__toolbar button[aria-label="More actions"]',
+      );
+      await page.waitForSelector(".codex-ui-menu-submenu-trigger");
+      await page.focus(".codex-ui-menu-submenu-trigger");
+      await page.keyboard.press("ArrowRight");
+      await page.waitForFunction(
+        () => document.querySelectorAll('.codex-ui-menu[role="menu"]').length >= 2,
+      );
+    },
+  },
+  {
+    linkages: [
+      {
+        attribute: "aria-controls",
+        role: "dialog",
+        trigger: '.primitive-preview__sample button[aria-haspopup="dialog"]',
+      },
+    ],
+    name: "popover",
+    open: async (page) => {
+      await page.evaluate(() => {
+        const trigger = Array.from(
+          document.querySelectorAll(".primitive-preview__sample button"),
+        ).find((element) => element.textContent?.trim() === "Workspace info");
+        if (!(trigger instanceof HTMLButtonElement)) {
+          throw new Error("workspace popover trigger is missing");
+        }
+        trigger.click();
+      });
+      await page.waitForSelector(
+        '.primitive-preview__sample button[aria-haspopup="dialog"][aria-controls]',
+      );
+    },
+  },
+  {
+    linkages: [
+      {
+        attribute: "aria-controls",
+        role: "listbox",
+        trigger: ".primitive-preview .codex-ui-select-trigger",
+      },
+    ],
+    name: "select",
+    open: async (page) => {
+      await page.click(".primitive-preview .codex-ui-select-trigger");
+      await page.waitForSelector(
+        ".primitive-preview .codex-ui-select-trigger[aria-controls]",
+      );
+    },
+  },
+  {
+    name: "choice dialog",
+    open: async (page) => {
+      await page.click('[data-choice-dialog-trigger="true"]');
+      await page.waitForSelector('.codex-ui-dialog__surface[role="dialog"]');
+      await waitForFocusWithin(
+        page,
+        '.codex-ui-dialog__surface[role="dialog"]',
+      );
+    },
+    targets: [
+      {
+        focusWithin: true,
+        modal: true,
+        role: "dialog",
+        selector: '.codex-ui-dialog__surface[role="dialog"]',
+      },
+    ],
+  },
+  {
+    name: "image preview dialog",
+    open: async (page) => {
+      await page.click(
+        '.resource-preview .codex-ui-generated-image-gallery__image',
+      );
+      await page.waitForSelector('.codex-ui-image-preview[role="dialog"]');
+      await waitForFocusWithin(
+        page,
+        '.codex-ui-image-preview[role="dialog"]',
+      );
+    },
+    targets: [
+      {
+        focusWithin: true,
+        modal: true,
+        role: "dialog",
+        selector: '.codex-ui-image-preview[role="dialog"]',
+      },
+    ],
+  },
+  {
+    linkages: [
+      {
+        attribute: "aria-controls",
+        role: "menu",
+        trigger: ".codex-ui-approval-request__options-toggle",
+      },
+    ],
+    name: "approval options menu",
+    open: async (page) => {
+      await page.click(".codex-ui-approval-request__options-toggle");
+      await page.waitForSelector(
+        ".codex-ui-approval-request__options-toggle[aria-controls]",
+      );
+    },
+  },
+];
 const failures = [];
 let incompleteWcagChecks = 0;
+let manualReviewSemanticChecks = 0;
+let overlayStateChecks = 0;
 let browser;
 
 function parseComputedRgb(value) {
@@ -147,6 +306,180 @@ async function sampleThemeTransitionContrast(page) {
   return samples;
 }
 
+async function addAxe(page) {
+  await page.addScriptTag({ content: axe.source });
+}
+
+async function runAxe(page, wcagSelectors = []) {
+  return page.evaluate(async ({ rules, tags, wcagSelectors }) => {
+    const simplify = (entry) => ({
+      id: entry.id,
+      impact: entry.impact,
+      nodeCount: entry.nodes.length,
+      nodes: entry.nodes.map((node) => ({
+        failureSummary: node.failureSummary,
+        reviews: [...node.any, ...node.all, ...node.none]
+          .map((check) => ({
+            messageKey: check.data?.messageKey,
+            needsReview: check.data?.needsReview,
+          }))
+          .filter((review) => review.messageKey || review.needsReview),
+        target: node.target,
+      })),
+    });
+    const semanticReport = await globalThis.axe.run(document, {
+      runOnly: { type: "rule", values: rules },
+    });
+    const wcagContext =
+      wcagSelectors.length > 0
+        ? { include: wcagSelectors.map((selector) => [selector]) }
+        : document;
+    const wcagReport = await globalThis.axe.run(
+      wcagContext,
+      { runOnly: { type: "tag", values: tags } },
+    );
+    return {
+      semantic: {
+        incomplete: semanticReport.incomplete.map(simplify),
+        violations: semanticReport.violations.map(simplify),
+      },
+      wcag: {
+        incomplete: wcagReport.incomplete.map(simplify),
+        violations: wcagReport.violations.map(simplify),
+      },
+    };
+  }, { rules: semanticRules, tags: wcagTags, wcagSelectors });
+}
+
+function applyIncompletePolicy(result, verifiedControlIds = new Set()) {
+  const semantic = partitionSemanticIncomplete(
+    result.semantic.incomplete,
+    verifiedControlIds,
+  );
+  const wcagPopupControls = partitionSemanticIncomplete(
+    result.wcag.incomplete,
+    verifiedControlIds,
+  );
+  const wcag = partitionWcagIncomplete(wcagPopupControls.unexpected);
+  result.semantic.incomplete = semantic.unexpected;
+  result.wcag.incomplete = wcag.unexpected;
+  manualReviewSemanticChecks += semantic.manualReview.reduce(
+    (total, entry) => total + entry.nodeCount,
+    0,
+  );
+  incompleteWcagChecks += wcag.manualReview.reduce(
+    (total, entry) => total + entry.nodeCount,
+    0,
+  );
+}
+
+async function validateOverlayState(page, overlayCase) {
+  return page.evaluate(({ linkages = [], targets = [] }) => {
+    const errors = [];
+    const scanSelectors = [];
+    const verifiedControlIds = [];
+
+    for (const linkage of linkages) {
+      const trigger = document.querySelector(linkage.trigger);
+      if (!(trigger instanceof HTMLElement)) {
+        errors.push(`missing trigger: ${linkage.trigger}`);
+        continue;
+      }
+      scanSelectors.push(linkage.trigger);
+      const id = trigger.getAttribute(linkage.attribute);
+      if (!id) {
+        errors.push(`missing ${linkage.attribute}: ${linkage.trigger}`);
+        continue;
+      }
+      const target = document.getElementById(id);
+      if (!target) {
+        errors.push(`missing referenced target: ${linkage.attribute}=${id}`);
+        continue;
+      }
+      if (target.getAttribute("role") !== linkage.role) {
+        errors.push(
+          `unexpected role for #${id}: ${target.getAttribute("role")} !== ${linkage.role}`,
+        );
+      }
+      if (!target.isConnected || target.getRootNode() !== trigger.getRootNode()) {
+        errors.push(`disconnected relationship: ${linkage.attribute}=${id}`);
+      }
+      const targetStyle = getComputedStyle(target);
+      if (
+        target.hidden ||
+        targetStyle.display === "none" ||
+        targetStyle.visibility === "hidden"
+      ) {
+        errors.push(`hidden relationship target: ${linkage.attribute}=${id}`);
+      }
+      if (
+        linkage.attribute === "aria-controls" &&
+        trigger.getAttribute("aria-expanded") !== "true"
+      ) {
+        errors.push(`closed popup trigger: ${linkage.attribute}=${id}`);
+      }
+      scanSelectors.push(`[id="${CSS.escape(id)}"]`);
+      if (linkage.attribute === "aria-controls") verifiedControlIds.push(id);
+    }
+
+    for (const expectation of targets) {
+      const target = document.querySelector(expectation.selector);
+      if (!(target instanceof HTMLElement)) {
+        errors.push(`missing overlay target: ${expectation.selector}`);
+        continue;
+      }
+      scanSelectors.push(expectation.selector);
+      if (target.getAttribute("role") !== expectation.role) {
+        errors.push(
+          `unexpected role for ${expectation.selector}: ${target.getAttribute("role")} !== ${expectation.role}`,
+        );
+      }
+      if (
+        expectation.modal &&
+        target.getAttribute("aria-modal") !== "true"
+      ) {
+        errors.push(`missing modal state: ${expectation.selector}`);
+      }
+      if (
+        expectation.focusWithin &&
+        (!(document.activeElement instanceof HTMLElement) ||
+          !target.contains(document.activeElement))
+      ) {
+        errors.push(`focus is outside overlay: ${expectation.selector}`);
+      }
+    }
+
+    return { errors, scanSelectors, verifiedControlIds };
+  }, overlayCase);
+}
+
+function hasAccessibilityFailures(result) {
+  return (
+    result.semantic.violations.length > 0 ||
+    result.semantic.incomplete.length > 0 ||
+    result.wcag.violations.length > 0 ||
+    result.wcag.incomplete.length > 0
+  );
+}
+
+function limitFailureResult(result) {
+  const limitEntries = (entries) =>
+    entries.map((entry) => ({
+      ...entry,
+      nodes: entry.nodes.slice(0, 20),
+    }));
+  return {
+    semantic: {
+      incomplete: limitEntries(result.semantic.incomplete),
+      violations: limitEntries(result.semantic.violations),
+    },
+    wcag: {
+      incomplete: limitEntries(result.wcag.incomplete),
+      violations: limitEntries(result.wcag.violations),
+    },
+  };
+}
+
 try {
   browser = await puppeteer.launch({
     executablePath: chrome,
@@ -171,56 +504,62 @@ try {
         (sample) => sample.ratio < 4.5,
       );
     }
-    await page.addScriptTag({ content: axe.source });
-    const result = await page.evaluate(async ({ rules, tags }) => {
-      const simplify = (entry) => ({
-        id: entry.id,
-        impact: entry.impact,
-        nodeCount: entry.nodes.length,
-        nodes: entry.nodes.map((node) => ({
-          failureSummary: node.failureSummary,
-          target: node.target,
-        })).slice(0, 20),
-      });
-      const semanticReport = await globalThis.axe.run(document, {
-        runOnly: { type: "rule", values: rules },
-      });
-      const wcagReport = await globalThis.axe.run(document, {
-        runOnly: { type: "tag", values: tags },
-      });
-      return {
-        semantic: {
-          incomplete: semanticReport.incomplete.map(simplify),
-          violations: semanticReport.violations.map(simplify),
-        },
-        wcag: {
-          incomplete: wcagReport.incomplete.map(simplify),
-          violations: wcagReport.violations.map(simplify),
-        },
-      };
-    }, { rules: semanticRules, tags: wcagTags });
+    await addAxe(page);
+    const result = await runAxe(page);
     await page.close();
 
-    const { manualReview, unexpected } = partitionWcagIncomplete(
-      result.wcag.incomplete,
-    );
-    result.wcag.incomplete = unexpected;
-    incompleteWcagChecks += manualReview.reduce(
-      (total, entry) => total + entry.nodeCount,
-      0,
-    );
+    applyIncompletePolicy(result);
     if (
-      result.semantic.violations.length > 0 ||
-      result.semantic.incomplete.length > 0 ||
-      result.wcag.violations.length > 0 ||
-      result.wcag.incomplete.length > 0 ||
+      hasAccessibilityFailures(result) ||
       themeTransitionViolations.length > 0
     ) {
       failures.push({
         case: testCase.name,
         themeTransitionViolations,
-        ...result,
+        ...limitFailureResult(result),
       });
+    }
+
+    for (const overlayCase of overlayCases) {
+      const overlayPage = await browser.newPage();
+      await overlayPage.setViewport({
+        height: testCase.height,
+        width: testCase.width,
+      });
+      await overlayPage.goto(
+        `http://127.0.0.1:${address.port}/codex-ui-kit/`,
+        { waitUntil: "networkidle0" },
+      );
+      if (testCase.dark) {
+        await overlayPage.click(".showcase__topbar-actions button");
+        await new Promise((resolve) => setTimeout(resolve, 200));
+      }
+      await overlayCase.open(overlayPage);
+      const overlayValidation = await validateOverlayState(
+        overlayPage,
+        overlayCase,
+      );
+      await addAxe(overlayPage);
+      const overlayResult = await runAxe(
+        overlayPage,
+        overlayValidation.scanSelectors,
+      );
+      await overlayPage.close();
+      applyIncompletePolicy(
+        overlayResult,
+        new Set(overlayValidation.verifiedControlIds),
+      );
+      overlayStateChecks += 1;
+      if (
+        overlayValidation.errors.length > 0 ||
+        hasAccessibilityFailures(overlayResult)
+      ) {
+        failures.push({
+          case: `${testCase.name} / ${overlayCase.name}`,
+          overlayErrors: overlayValidation.errors,
+          ...limitFailureResult(overlayResult),
+        });
+      }
     }
   }
 } finally {
@@ -234,5 +573,5 @@ if (failures.length > 0) {
 }
 
 console.log(
-  `accessibility contract ok: ${semanticRules.length} strict semantic rules and WCAG A/AA/2.2 across ${cases.length} viewports (${incompleteWcagChecks} manual-review nodes)`,
+  `accessibility contract ok: ${semanticRules.length} strict semantic rules and WCAG A/AA/2.2 across ${cases.length} viewports and ${overlayStateChecks} open overlay states (${incompleteWcagChecks} contrast and ${manualReviewSemanticChecks} verified popup-control manual-review nodes)`,
 );
