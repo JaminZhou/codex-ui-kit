@@ -111,10 +111,18 @@ describe("complete thread surfaces", () => {
     expect(scrollTo).toHaveBeenCalledTimes(2);
 
     fireEvent.pointerDown(viewport);
-    viewport.scrollTop = 100;
-    fireEvent.scroll(viewport);
     expect(onFollowingChange).toHaveBeenCalledWith(false);
     expect(viewport.hasAttribute("data-following")).toBe(false);
+
+    rerender(
+      <AgentThreadViewport
+        followKey={3}
+        onFollowingChange={onFollowingChange}
+      >
+        Third update
+      </AgentThreadViewport>,
+    );
+    expect(scrollTo).toHaveBeenCalledTimes(3);
   });
 
   it("stops suppressing away-scroll events when auto-follow is disabled", () => {

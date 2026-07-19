@@ -1,5 +1,6 @@
 export interface AcceptanceExpectations {
   allItemsEqual?: Record<string, { field: string; value: unknown }>;
+  allItemsHaveNonEmptyString?: Record<string, string>;
   equals?: Record<string, unknown>;
   expectedTheme: "dark" | "light";
   maximumValues?: Record<string, number>;
@@ -96,6 +97,24 @@ export function assertAcceptanceMetric(
       failures.push(
         `${field} did not keep ${itemExpectation.field}=${JSON.stringify(itemExpectation.value)}`,
       );
+    }
+  }
+
+  for (const [field, itemField] of Object.entries(
+    expectations.allItemsHaveNonEmptyString ?? {},
+  )) {
+    const items = value[field];
+    if (
+      !Array.isArray(items) ||
+      items.length === 0 ||
+      items.some(
+        (item) =>
+          !isRecord(item) ||
+          typeof item[itemField] !== "string" ||
+          item[itemField].trim().length === 0,
+      )
+    ) {
+      failures.push(`${field} did not keep a non-empty ${itemField}`);
     }
   }
 

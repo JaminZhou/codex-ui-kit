@@ -567,6 +567,7 @@ async function captureAcceptance(browserWindow: BrowserWindow) {
   ] as const) {
     assertAcceptanceMetric(name, snapshot, {
       allItemsEqual: { overlays: { field: "inViewport", value: true } },
+      allItemsHaveNonEmptyString: { overlays: "owner" },
       equals: { dialogFirstChoiceFocused: true, overlayOwnerCount: 1 },
       expectedTheme,
       minimumItems: { dialogChoiceRows: 2, overlays: 2 },

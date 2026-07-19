@@ -103,7 +103,14 @@ export function AgentThreadViewport({
     const viewport = viewportRef.current;
     if (!viewport) return;
     const cancelProgrammaticFollow = () => {
+      const wasProgrammaticallyFollowing =
+        programmaticFollowTargetRef.current !== null;
       programmaticFollowTargetRef.current = null;
+      if (!wasProgrammaticallyFollowing) return;
+      viewport.scrollTo({ behavior: "auto", top: viewport.scrollTop });
+      const distanceFromLatest =
+        viewport.scrollHeight - viewport.clientHeight - viewport.scrollTop;
+      updateFollowing(distanceFromLatest <= followThreshold);
     };
     const inputEvents = ["keydown", "pointerdown", "touchstart", "wheel"];
     for (const eventName of inputEvents) {
@@ -114,7 +121,7 @@ export function AgentThreadViewport({
         viewport.removeEventListener(eventName, cancelProgrammaticFollow);
       }
     };
-  }, []);
+  }, [followThreshold, updateFollowing]);
 
   useLayoutEffect(() => {
     const viewport = viewportRef.current;
