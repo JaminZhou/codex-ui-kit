@@ -38,6 +38,14 @@ describe("subagent visual contract", () => {
     );
   });
 
+  it("keeps overflow menus on the shared overlay layer", () => {
+    expect(styles).toContain(".codex-ui-popover {");
+    expect(styles).toContain("z-index: 1000");
+    expect(styles).not.toContain(
+      ".codex-ui-subagent-summary__overflow-menu",
+    );
+  });
+
   it("removes chip, active, and shimmer motion for reduced motion", () => {
     expect(styles).toContain(".codex-ui-subagent-avatar[data-active]::after");
     expect(styles).toContain(

@@ -5395,21 +5395,6 @@ button.codex-ui-subagent-activity-group__chip:focus-visible {
   outline-offset: 1px;
 }
 
-.codex-ui-subagent-summary__overflow-menu {
-  background: var(--codex-ui-bg-elevated);
-  border: 1px solid var(--codex-ui-border);
-  border-radius: var(--codex-ui-radius-md);
-  box-shadow: var(--codex-ui-shadow-xl);
-  display: flex;
-  flex-direction: column;
-  left: 0;
-  min-width: 10rem;
-  padding: 0.25rem;
-  position: absolute;
-  top: calc(100% + 0.25rem);
-  z-index: 20;
-}
-
 .codex-ui-subagent-summary__overflow-item {
   align-items: center;
   background: transparent;

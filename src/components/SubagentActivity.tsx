@@ -303,7 +303,6 @@ function SummaryAvatarGroup({
         <span className="codex-ui-subagent-summary__overflow">
           <Menu
             align="start"
-            className="codex-ui-subagent-summary__overflow-menu"
             side="bottom"
             trigger={
               <button
