@@ -17,12 +17,31 @@ describe("complete thread visual contract", () => {
 
   it("protects shimmer, target highlight, focus, and reduced motion", () => {
     expect(tokens).toContain("--codex-ui-loading-shimmer-duration: 2s");
+    expect(tokens).toContain(
+      "--codex-ui-loading-shimmer-muted: var(--codex-ui-text-secondary)",
+    );
+    expect(tokens).toContain(
+      "--codex-ui-loading-shimmer-muted: var(--codex-ui-gray-300)",
+    );
     expect(tokens).toContain("--codex-ui-message-highlight-duration: 1400ms");
     expect(styles).toContain("steps(48, end) infinite");
     expect(styles).toContain("@keyframes codex-ui-message-target-highlight");
     expect(styles).toContain(".codex-ui-agent-message__content:focus-visible");
     expect(styles).toContain(".codex-ui-loading-shimmer {\n    animation: none");
     expect(styles).toContain("scroll-behavior: auto");
+  });
+
+  it("keeps animated text at accessible opacity across Chromium platforms", () => {
+    const reasoningAnimation = styles.match(
+      /@keyframes codex-ui-reasoning-thinking \{([\s\S]*?)\n\}/,
+    )?.[1];
+    const noticeAnimation = styles.match(
+      /@keyframes codex-ui-notice-shimmer \{([\s\S]*?)\n\}/,
+    )?.[1];
+    expect(reasoningAnimation).toContain("color: var(--codex-ui-text-secondary)");
+    expect(reasoningAnimation).not.toContain("opacity");
+    expect(noticeAnimation).toContain("text-shadow");
+    expect(noticeAnimation).not.toContain("opacity");
   });
 
   it("does not pulse a complete running message", () => {

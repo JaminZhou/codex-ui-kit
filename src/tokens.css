@@ -278,16 +278,8 @@
   );
   --codex-ui-background-status-warning: var(--codex-ui-orange-50);
   --codex-ui-background-status-error: var(--codex-ui-red-50);
-  --codex-ui-loading-shimmer-muted: color-mix(
-    in srgb,
-    var(--codex-ui-text-secondary) 55%,
-    transparent
-  );
-  --codex-ui-loading-shimmer-highlight: color-mix(
-    in srgb,
-    var(--codex-ui-text-foreground) 75%,
-    white
-  );
+  --codex-ui-loading-shimmer-muted: var(--codex-ui-text-secondary);
+  --codex-ui-loading-shimmer-highlight: var(--codex-ui-text-foreground);
 
   --codex-ui-text-foreground: #1a1c1f;
   --codex-ui-text-secondary: var(--codex-ui-gray-500);
@@ -398,16 +390,8 @@
   );
   --codex-ui-background-status-warning: var(--codex-ui-orange-900);
   --codex-ui-background-status-error: var(--codex-ui-red-900);
-  --codex-ui-loading-shimmer-muted: color-mix(
-    in srgb,
-    var(--codex-ui-text-secondary) 45%,
-    transparent
-  );
-  --codex-ui-loading-shimmer-highlight: color-mix(
-    in srgb,
-    var(--codex-ui-text-foreground) 60%,
-    black
-  );
+  --codex-ui-loading-shimmer-muted: var(--codex-ui-gray-300);
+  --codex-ui-loading-shimmer-highlight: var(--codex-ui-text-foreground);
 
   --codex-ui-text-foreground: var(--codex-ui-gray-0);
   --codex-ui-text-secondary: color-mix(
@@ -527,16 +511,8 @@
     );
     --codex-ui-background-status-warning: var(--codex-ui-orange-900);
     --codex-ui-background-status-error: var(--codex-ui-red-900);
-    --codex-ui-loading-shimmer-muted: color-mix(
-      in srgb,
-      var(--codex-ui-text-secondary) 45%,
-      transparent
-    );
-    --codex-ui-loading-shimmer-highlight: color-mix(
-      in srgb,
-      var(--codex-ui-text-foreground) 60%,
-      black
-    );
+    --codex-ui-loading-shimmer-muted: var(--codex-ui-gray-300);
+    --codex-ui-loading-shimmer-highlight: var(--codex-ui-text-foreground);
     --codex-ui-text-foreground: var(--codex-ui-gray-0);
     --codex-ui-text-secondary: color-mix(
       in oklab,
