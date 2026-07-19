@@ -101,6 +101,22 @@ const cases = [
   { dark: true, height: 1_000, name: "desktop dark", width: 1_440 },
   { dark: false, height: 680, name: "compact light", width: 820 },
 ];
+
+async function waitForFocusWithin(page, selector) {
+  await page.waitForFunction(
+    (targetSelector) => {
+      const target = document.querySelector(targetSelector);
+      return (
+        target instanceof HTMLElement &&
+        document.activeElement instanceof HTMLElement &&
+        target.contains(document.activeElement)
+      );
+    },
+    {},
+    selector,
+  );
+}
+
 const overlayCases = [
   {
     linkages: [
@@ -189,6 +205,10 @@ const overlayCases = [
     open: async (page) => {
       await page.click('[data-choice-dialog-trigger="true"]');
       await page.waitForSelector('.codex-ui-dialog__surface[role="dialog"]');
+      await waitForFocusWithin(
+        page,
+        '.codex-ui-dialog__surface[role="dialog"]',
+      );
     },
     targets: [
       {
@@ -206,6 +226,10 @@ const overlayCases = [
         '.resource-preview .codex-ui-generated-image-gallery__image',
       );
       await page.waitForSelector('.codex-ui-image-preview[role="dialog"]');
+      await waitForFocusWithin(
+        page,
+        '.codex-ui-image-preview[role="dialog"]',
+      );
     },
     targets: [
       {
