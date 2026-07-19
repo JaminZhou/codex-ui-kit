@@ -71,7 +71,7 @@
     "axe-core": "4.12.1",
     "happy-dom": "^20.10.6",
     "publint": "0.3.21",
-    "puppeteer-core": "24.36.0",
+    "puppeteer-core": "25.3.0",
     "react": "^19.2.7",
     "react-dom": "^19.2.7",
     "typescript": "^7.0.2",

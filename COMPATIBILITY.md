@@ -42,6 +42,19 @@ Portalled overlays and dialogs render only when a browser document is available.
 - Set `data-theme="light"` or `data-theme="dark"` on an ancestor for an explicit theme.
 - Do not depend on private class structure; only `--codex-ui-*` custom properties are part of the theming contract.
 
+## Accessibility
+
+The built showcase is checked in desktop light, desktop dark, and compact light
+viewports. The gate covers WCAG A/AA/2.2 violations plus strict labels, ARIA
+relationships, and keyboard-accessible scroll regions. Axe results that cannot
+determine contrast through gradients or overlapping showcase surfaces remain a
+manual visual-review requirement rather than being treated as an automatic
+pass.
+
+Public hit targets and semantic colors may intentionally be more generous than
+the sampled product geometry. Hosts that override these tokens are responsible
+for preserving equivalent contrast, keyboard focus, and target-size behavior.
+
 ## Protocol boundary
 
 The package contains no Codex app-server client, authentication, Electron IPC, filesystem access, or privileged execution. Integrations should map protocol-specific data and actions into the public component props.

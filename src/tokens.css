@@ -7,6 +7,7 @@
   --codex-ui-gray-75: #f3f3f3;
   --codex-ui-gray-100: #ededed;
   --codex-ui-gray-300: #afafaf;
+  --codex-ui-gray-450: #626262;
   --codex-ui-gray-500: #5d5d5d;
   --codex-ui-gray-550: #4f4f4f;
   --codex-ui-gray-600: #414141;
@@ -20,6 +21,7 @@
   --codex-ui-blue-100: #99ceff;
   --codex-ui-blue-300: #339cff;
   --codex-ui-blue-400: #0285ff;
+  --codex-ui-blue-600: #0068c7;
   --codex-ui-blue-900: #00284d;
   --codex-ui-green-50: #d9f4e4;
   --codex-ui-green-300: #40c977;
@@ -43,15 +45,15 @@
   --codex-ui-yellow-400: #ffc300;
 
   --codex-ui-code-syntax-light-foreground: #383a42;
-  --codex-ui-code-syntax-light-comment: #a0a1a7;
-  --codex-ui-code-syntax-light-meta: #4078f2;
-  --codex-ui-code-syntax-light-builtin: #c18401;
+  --codex-ui-code-syntax-light-comment: #696c77;
+  --codex-ui-code-syntax-light-meta: #315dc4;
+  --codex-ui-code-syntax-light-builtin: #986801;
   --codex-ui-code-syntax-light-keyword: #a626a4;
-  --codex-ui-code-syntax-light-literal: #0184bb;
-  --codex-ui-code-syntax-light-section: #e45649;
-  --codex-ui-code-syntax-light-string: #50a14f;
+  --codex-ui-code-syntax-light-literal: #006f9f;
+  --codex-ui-code-syntax-light-section: #b53b32;
+  --codex-ui-code-syntax-light-string: #3f7f3e;
   --codex-ui-code-syntax-light-variable: #986801;
-  --codex-ui-code-syntax-light-title: #4078f2;
+  --codex-ui-code-syntax-light-title: #315dc4;
   --codex-ui-code-syntax-dark-foreground: #ffffff;
   --codex-ui-code-syntax-dark-comment: rgb(255 255 255 / 0.5);
   --codex-ui-code-syntax-dark-meta: rgb(255 255 255 / 0.6);
@@ -104,7 +106,7 @@
   --codex-ui-radius-composer: calc(var(--codex-ui-spacing) * 5.5);
   --codex-ui-radius-composer-single-line: var(--codex-ui-radius-composer);
   --codex-ui-radius-composer-multiline: var(--codex-ui-radius-3xl);
-  --codex-ui-size-button-composer: calc(var(--codex-ui-spacing) * 7);
+  --codex-ui-size-button-composer: calc(var(--codex-ui-spacing) * 8);
   --codex-ui-control-height-small: calc(var(--codex-ui-spacing) * 5);
   --codex-ui-control-height-medium: calc(var(--codex-ui-spacing) * 7);
   --codex-ui-control-height-large: calc(var(--codex-ui-spacing) * 9);
@@ -181,7 +183,7 @@
   --codex-ui-floating-panel-width: calc(var(--codex-ui-spacing) * 70);
   --codex-ui-message-navigation-inset: calc(var(--codex-ui-spacing) * 3);
   --codex-ui-message-navigation-row-width: calc(var(--codex-ui-spacing) * 9);
-  --codex-ui-message-navigation-row-height: calc(var(--codex-ui-spacing) * 2.5);
+  --codex-ui-message-navigation-row-height: calc(var(--codex-ui-spacing) * 6);
   --codex-ui-message-navigation-marker-width: calc(var(--codex-ui-spacing) * 7.5);
   --codex-ui-message-navigation-marker-height: calc(var(--codex-ui-spacing) * 0.5);
   --codex-ui-message-navigation-tooltip-width: 20rem;
@@ -288,21 +290,13 @@
   );
 
   --codex-ui-text-foreground: #1a1c1f;
-  --codex-ui-text-secondary: color-mix(
-    in oklab,
-    var(--codex-ui-text-foreground) 70%,
-    transparent
-  );
-  --codex-ui-text-tertiary: color-mix(
-    in oklab,
-    var(--codex-ui-text-foreground) 50%,
-    transparent
-  );
+  --codex-ui-text-secondary: var(--codex-ui-gray-500);
+  --codex-ui-text-tertiary: var(--codex-ui-gray-450);
   --codex-ui-text-button-primary: var(--codex-ui-gray-0);
-  --codex-ui-text-success: var(--codex-ui-green-500);
-  --codex-ui-text-warning: var(--codex-ui-orange-500);
-  --codex-ui-text-error: var(--codex-ui-red-500);
-  --codex-ui-text-accent: var(--codex-ui-blue-300);
+  --codex-ui-text-success: var(--codex-ui-green-700);
+  --codex-ui-text-warning: var(--codex-ui-orange-700);
+  --codex-ui-text-error: var(--codex-ui-red-600);
+  --codex-ui-text-accent: var(--codex-ui-blue-600);
 
   --codex-ui-border: color-mix(
     in oklab,
@@ -319,7 +313,7 @@
     var(--codex-ui-text-foreground) 12%,
     transparent
   );
-  --codex-ui-border-focus: var(--codex-ui-blue-300);
+  --codex-ui-border-focus: var(--codex-ui-blue-600);
   --codex-ui-border-warning: color-mix(
     in oklab,
     var(--codex-ui-orange-500) 15%,
@@ -447,11 +441,7 @@
     var(--codex-ui-gray-0) 16%,
     transparent
   );
-  --codex-ui-border-focus: color-mix(
-    in oklab,
-    var(--codex-ui-blue-300) 70%,
-    transparent
-  );
+  --codex-ui-border-focus: var(--codex-ui-blue-300);
   --codex-ui-border-warning: color-mix(
     in oklab,
     var(--codex-ui-orange-300) 40%,
@@ -578,11 +568,7 @@
       var(--codex-ui-gray-0) 16%,
       transparent
     );
-    --codex-ui-border-focus: color-mix(
-      in oklab,
-      var(--codex-ui-blue-300) 70%,
-      transparent
-    );
+    --codex-ui-border-focus: var(--codex-ui-blue-300);
     --codex-ui-border-warning: color-mix(
       in oklab,
       var(--codex-ui-orange-300) 40%,

@@ -15,6 +15,7 @@ const semanticRules = [
   "label",
   "scrollable-region-focusable",
 ];
+const wcagTags = ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"];
 const contentTypes = new Map([
   [".css", "text/css; charset=utf-8"],
   [".html", "text/html; charset=utf-8"],
@@ -70,6 +71,12 @@ function listen(server) {
   });
 }
 
+function closeServer(server) {
+  return new Promise((resolve, reject) => {
+    server.close((error) => (error ? reject(error) : resolve()));
+  });
+}
+
 const chrome = findChrome();
 if (!chrome) {
   throw new Error(
@@ -84,20 +91,21 @@ if (!address || typeof address === "string") {
   throw new Error("failed to start the accessibility fixture server");
 }
 
-const browser = await puppeteer.launch({
-  executablePath: chrome,
-  headless: true,
-  args: ["--no-sandbox"],
-});
-
 const cases = [
   { dark: false, height: 1_000, name: "desktop light", width: 1_440 },
   { dark: true, height: 1_000, name: "desktop dark", width: 1_440 },
   { dark: false, height: 680, name: "compact light", width: 820 },
 ];
 const failures = [];
+let incompleteWcagChecks = 0;
+let browser;
 
 try {
+  browser = await puppeteer.launch({
+    executablePath: chrome,
+    headless: true,
+    args: ["--disable-dev-shm-usage", "--no-sandbox"],
+  });
   for (const testCase of cases) {
     const page = await browser.newPage();
     await page.setViewport({
@@ -112,39 +120,57 @@ try {
       await page.click(".showcase__topbar-actions button");
     }
     await page.addScriptTag({ content: axe.source });
-    const result = await page.evaluate(async (rules) => {
-      const report = await globalThis.axe.run(document, {
-        runOnly: { type: "rule", values: rules },
-      });
+    const result = await page.evaluate(async ({ rules, tags }) => {
       const simplify = (entry) => ({
         id: entry.id,
         impact: entry.impact,
+        nodeCount: entry.nodes.length,
         nodes: entry.nodes.map((node) => ({
           failureSummary: node.failureSummary,
           target: node.target,
-        })),
+        })).slice(0, 20),
+      });
+      const semanticReport = await globalThis.axe.run(document, {
+        runOnly: { type: "rule", values: rules },
+      });
+      const wcagReport = await globalThis.axe.run(document, {
+        runOnly: { type: "tag", values: tags },
       });
       return {
-        incomplete: report.incomplete.map(simplify),
-        violations: report.violations.map(simplify),
+        semantic: {
+          incomplete: semanticReport.incomplete.map(simplify),
+          violations: semanticReport.violations.map(simplify),
+        },
+        wcag: {
+          incomplete: wcagReport.incomplete.map(simplify),
+          violations: wcagReport.violations.map(simplify),
+        },
       };
-    }, semanticRules);
+    }, { rules: semanticRules, tags: wcagTags });
     await page.close();
 
-    if (result.violations.length > 0 || result.incomplete.length > 0) {
+    incompleteWcagChecks += result.wcag.incomplete.reduce(
+      (total, entry) => total + entry.nodeCount,
+      0,
+    );
+    if (
+      result.semantic.violations.length > 0 ||
+      result.semantic.incomplete.length > 0 ||
+      result.wcag.violations.length > 0
+    ) {
       failures.push({ case: testCase.name, ...result });
     }
   }
 } finally {
-  await browser.close();
-  server.close();
+  await browser?.close();
+  await closeServer(server);
 }
 
 if (failures.length > 0) {
   console.error(JSON.stringify(failures, null, 2));
-  throw new Error("accessibility semantic contract failed");
+  throw new Error("accessibility contract failed");
 }
 
 console.log(
-  `accessibility semantic contract ok: ${semanticRules.length} rules across ${cases.length} viewports`,
+  `accessibility contract ok: ${semanticRules.length} strict semantic rules and WCAG A/AA/2.2 across ${cases.length} viewports (${incompleteWcagChecks} manual-review nodes)`,
 );
