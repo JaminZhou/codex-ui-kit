@@ -68,8 +68,13 @@ describe("composer auxiliary surfaces", () => {
 
     const listbox = screen.getByRole("listbox");
     const firstOption = screen.getByRole("option", { name: "src/App.tsx" });
+    const disabledOption = screen.getByRole("option", {
+      name: "src/private.ts",
+    });
     expect(firstOption.getAttribute("aria-selected")).toBe("true");
     expect(firstOption.tabIndex).toBe(-1);
+    expect(disabledOption.getAttribute("aria-disabled")).toBe("true");
+    expect(disabledOption.hasAttribute("disabled")).toBe(true);
     expect(listbox.getAttribute("aria-activedescendant")).toBe(firstOption.id);
     fireEvent.keyDown(listbox, { key: "ArrowDown" });
     const activeOption = screen.getByRole("option", { name: "browser" });

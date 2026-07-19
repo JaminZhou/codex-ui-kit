@@ -171,6 +171,7 @@ export function ComposerMentionMenu({
               </div>
               {group.options.map((option) => (
                 <button
+                  aria-disabled={option.disabled || undefined}
                   aria-selected={option.id === visibleActiveId}
                   className="codex-ui-composer-mention-menu__option"
                   data-active={option.id === visibleActiveId || undefined}

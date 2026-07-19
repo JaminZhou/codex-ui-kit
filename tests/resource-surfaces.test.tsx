@@ -5,6 +5,7 @@ import { useState } from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import {
   ArtifactList,
+  Dialog,
   GeneratedImageGallery,
   ImagePreviewDialog,
   ResourceCard,
@@ -46,6 +47,116 @@ describe("resource surfaces", () => {
     expect(screen.getByText("Open in editor")).toBeTruthy();
   });
 
+  it("uses static semantics without an open action and labels rich-title actions", () => {
+    const onOpenCard = vi.fn();
+    const onOpenSource = vi.fn();
+    render(
+      <>
+        <ResourceCard title={<strong>Static artifact</strong>} />
+        <ResourceCard
+          onOpen={onOpenCard}
+          openLabel="Open rich artifact"
+          title={<strong>Rich artifact</strong>}
+        />
+        <SourceList
+          items={[
+            {
+              id: "static-source",
+              title: <strong>Static source</strong>,
+            },
+            {
+              id: "rich-source",
+              onOpen: onOpenSource,
+              openLabel: "Open rich source",
+              title: <strong>Rich source</strong>,
+            },
+          ]}
+        />
+      </>,
+    );
+
+    const staticCard = screen.getByText("Static artifact").closest("article");
+    expect(staticCard?.querySelector("a, button")).toBeNull();
+    expect(staticCard?.hasAttribute("data-interactive")).toBe(false);
+    const staticSource = screen.getByText("Static source").closest("li");
+    expect(staticSource?.querySelector("a, button")).toBeNull();
+    expect(
+      staticSource?.querySelector(".codex-ui-source-list__item"),
+    ).toBeTruthy();
+    expect(
+      staticSource?.querySelector(".codex-ui-source-list__arrow"),
+    ).toBeNull();
+
+    fireEvent.click(screen.getByRole("button", { name: "Open rich artifact" }));
+    expect(onOpenCard).toHaveBeenCalledOnce();
+    fireEvent.click(screen.getByRole("button", { name: "Open rich source" }));
+    expect(onOpenSource).toHaveBeenCalledOnce();
+  });
+
+  it("preserves dragging on static and openable resource cards", () => {
+    const onDragStatic = vi.fn();
+    const onDragOpenable = vi.fn();
+    const onTrailingAction = vi.fn();
+    render(
+      <>
+        <ResourceCard
+          draggable
+          onDragStart={onDragStatic}
+          title="Static draggable"
+        />
+        <ResourceCard
+          action={<button onClick={onTrailingAction}>Share draggable</button>}
+          draggable
+          onDragStart={onDragOpenable}
+          onOpen={vi.fn()}
+          title="Openable draggable"
+        />
+      </>,
+    );
+
+    const staticCard = screen.getByText("Static draggable").closest("article")!;
+    const openableCard = screen
+      .getByText("Openable draggable")
+      .closest("article")!;
+    expect(staticCard.getAttribute("draggable")).toBe("true");
+    expect(openableCard.getAttribute("draggable")).toBe("true");
+    fireEvent.dragStart(staticCard);
+    fireEvent.dragStart(openableCard);
+    expect(onDragStatic).toHaveBeenCalledOnce();
+    expect(onDragOpenable).toHaveBeenCalledOnce();
+
+    fireEvent.dragStart(
+      screen.getByRole("button", { name: "Share draggable" }),
+    );
+    expect(onDragOpenable).toHaveBeenCalledOnce();
+    fireEvent.click(screen.getByRole("button", { name: "Share draggable" }));
+    expect(onTrailingAction).toHaveBeenCalledOnce();
+  });
+
+  it("honors explicit link drag state independently of the card article", () => {
+    const { rerender } = render(
+      <ResourceCard
+        draggable={false}
+        href="https://example.com/artifact"
+        title="Linked artifact"
+      />,
+    );
+
+    const link = screen.getByRole("link", { name: "Open Linked artifact" });
+    expect(link.getAttribute("draggable")).toBe("false");
+    expect(link.closest("article")?.getAttribute("draggable")).toBe("false");
+
+    rerender(
+      <ResourceCard
+        draggable
+        href="https://example.com/artifact"
+        title="Linked artifact"
+      />,
+    );
+    expect(link.getAttribute("draggable")).toBe("true");
+    expect(link.closest("article")?.getAttribute("draggable")).toBe("true");
+  });
+
   it("shows three resource rows before expanding the remainder", () => {
     render(
       <ResourceList>
@@ -55,9 +166,9 @@ describe("resource surfaces", () => {
       </ResourceList>,
     );
 
-    expect(screen.getAllByRole("button", { name: /Open Artifact/ })).toHaveLength(3);
+    expect(screen.getAllByText(/Artifact/)).toHaveLength(3);
     fireEvent.click(screen.getByRole("button", { name: "Show 2 more" }));
-    expect(screen.getAllByRole("button", { name: /Open Artifact/ })).toHaveLength(5);
+    expect(screen.getAllByText(/Artifact/)).toHaveLength(5);
   });
 
   it("preserves the observed artifact empty state", () => {
@@ -94,6 +205,24 @@ describe("resource surfaces", () => {
 });
 
 describe("generated images", () => {
+  it("renders images as static media when no open action is provided", () => {
+    const { rerender } = render(
+      <GeneratedImageGallery images={images.slice(0, 1)} />,
+    );
+
+    const staticImage = screen.getByRole("img", { name: "Preview 1" });
+    expect(staticImage.closest("button, a")).toBeNull();
+    expect(staticImage.parentElement?.tagName).toBe("DIV");
+
+    rerender(
+      <GeneratedImageGallery
+        images={images.slice(0, 1)}
+        onOpenImage={vi.fn()}
+      />,
+    );
+    expect(screen.getByRole("button", { name: "Preview 1" })).toBeTruthy();
+  });
+
   it("renders overflow paging, pending placeholders, and opens an image", () => {
     const onOpenImage = vi.fn();
     render(
@@ -191,5 +320,98 @@ describe("generated images", () => {
     expect(screen.queryByRole("dialog")).toBeNull();
     expect(document.body.style.overflow).toBe("");
     await waitFor(() => expect(document.activeElement).toBe(trigger));
+  });
+
+  it("releases the modal lock when an open preview loses all images", async () => {
+    const renderPreview = (previewImages: GeneratedImageItem[]) => (
+      <>
+        <button type="button">Preview trigger</button>
+        <ImagePreviewDialog
+          images={previewImages}
+          onOpenChange={vi.fn()}
+          open
+        />
+      </>
+    );
+    const { rerender } = render(renderPreview([]));
+    const trigger = screen.getByRole("button", { name: "Preview trigger" });
+    trigger.focus();
+    expect(document.body.style.overflow).toBe("");
+
+    rerender(renderPreview(images.slice(0, 1)));
+    expect(document.body.style.overflow).toBe("hidden");
+    expect(document.activeElement).toBe(
+      screen.getByRole("button", { name: "Close image preview" }),
+    );
+
+    rerender(renderPreview([]));
+    expect(screen.queryByRole("dialog")).toBeNull();
+    expect(document.body.style.overflow).toBe("");
+    await waitFor(() => expect(document.activeElement).toBe(trigger));
+  });
+
+  it("inherits the nearest theme and dialog overlay ownership", () => {
+    function Harness() {
+      const [previewOpen, setPreviewOpen] = useState(false);
+      return (
+        <Dialog
+          onOpenChange={vi.fn()}
+          open
+          theme="dark"
+          title="Preview container"
+        >
+          <button onClick={() => setPreviewOpen(true)} type="button">
+            Open nested preview
+          </button>
+          <ImagePreviewDialog
+            images={images.slice(0, 1)}
+            onOpenChange={setPreviewOpen}
+            open={previewOpen}
+          />
+        </Dialog>
+      );
+    }
+
+    render(<Harness />);
+    fireEvent.click(
+      screen.getByRole("button", { name: "Open nested preview" }),
+    );
+    const parentRoot = screen.getByRole("dialog", {
+      name: "Preview container",
+    }).parentElement!;
+    const preview = screen.getByRole("dialog", { name: "Generated image" });
+    expect(preview.getAttribute("data-theme")).toBe("dark");
+    expect(preview.getAttribute("data-codex-ui-overlay-layer")).toBe("dialog");
+    expect(preview.getAttribute("data-codex-ui-dialog-owner")).toBe(
+      parentRoot.getAttribute("data-codex-ui-dialog-id"),
+    );
+  });
+
+  it("inherits a scoped theme from the preview trigger", () => {
+    function Harness() {
+      const [open, setOpen] = useState(false);
+      return (
+        <div data-theme="light">
+          <button onClick={() => setOpen(true)} type="button">
+            Open themed preview
+          </button>
+          <ImagePreviewDialog
+            images={images.slice(0, 1)}
+            onOpenChange={setOpen}
+            open={open}
+          />
+        </div>
+      );
+    }
+
+    render(<Harness />);
+    const trigger = screen.getByRole("button", { name: "Open themed preview" });
+    trigger.focus();
+    fireEvent.click(trigger);
+    expect(
+      screen
+        .getByRole("dialog", { name: "Generated image" })
+        .getAttribute("data-theme"),
+    ).toBe("light");
   });
 });

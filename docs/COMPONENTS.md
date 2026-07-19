@@ -16,10 +16,10 @@ Codex UI Kit exposes protocol-neutral React components. Hosts own data fetching,
 
 ## Rich content
 
-- `AgentMarkdown`: GFM rendering without raw HTML, streaming stabilization, semantic renderer overrides, and viewport-aware lazy syntax highlighting.
+- `AgentMarkdown`: GFM rendering without raw HTML, streaming stabilization, semantic renderer overrides, and viewport-aware lazy syntax highlighting. `stabilizeStreamingMarkdown` exposes the package's standalone streaming helper; `CodeHighlighter` is the public contract for supplying a custom escaped-code highlighter.
 - `InlineCode`: standalone inline-code treatment.
 - `CodeBlock`: language header, copy feedback, syntax highlighting, and wrapped or unwrapped states.
-- `FileDiff`: structured context, hunk, metadata, addition, and deletion lines with optional wrapping, viewport modes, and scroll-edge fades.
+- `FileDiff`: structured context, hunk, metadata, addition, and deletion lines with optional wrapping, viewport modes, and scroll-edge fades. `fileDiffToText` converts the structured public line model into copyable plain text.
 
 The built-in highlighter escapes untrusted code. A custom `CodeHighlighter` returning `html` is treated as trusted markup, so hosts must escape untrusted input before returning it.
 
@@ -27,7 +27,7 @@ The built-in highlighter escapes untrusted code. A custom `CodeHighlighter` retu
 
 - `AgentActivity`: accessible expandable activity primitive.
 - `ActivityTimeline`: controlled or uncontrolled turn-level disclosure with persistent and historical content slots.
-- `TurnDuration`: working, completed, and user-stopped duration language.
+- `TurnDuration`: working, completed, and user-stopped duration language. `formatTurnDuration` exposes the same protocol-neutral formatter.
 - `AgentReasoning`: active and completed reasoning disclosure states.
 - `AgentPlan`: structured pending, in-progress, and completed plan steps.
 - `ProposedPlan`: writing and completed plan-card states with host-owned actions.
@@ -40,7 +40,7 @@ The built-in highlighter escapes untrusted code. A custom `CodeHighlighter` retu
 ## Tools, approvals, and status
 
 - `ToolCallCard`: generic MCP, connector, browser, and arbitrary tool-call row with structured, empty, error, and raw-output states.
-- `CommandExecution`: expandable command surface with duration, copy, background-terminal, success, failure, and interruption states.
+- `CommandExecution`: expandable command surface with duration, copy, background-terminal, success, failure, and interruption states. `formatCommandDuration` exposes its standalone duration formatter.
 - `CommandOutput`: labeled stdout/stderr with no-output, tail-following, overflow, fade, and copy behavior.
 - `FileChange`: create, apply, stop, reject, delete, and rename activities with disclosure, statistics, path opening, and copy hooks.
 - `ApprovalRequest`: command, patch, network, permission, and generic approval card with scoped actions, shortcuts, loading, and outcome states.
@@ -66,15 +66,15 @@ All privileged behavior remains host-owned. The components never auto-approve co
 - `Dialog` and `DialogChoice`: controlled modal presentation with compact, standard, and wide sizes; focus trapping/restoration; an optional `returnFocusRef` for launchers that unmount before the modal commits; scroll locking; Escape/backdrop dismissal; and descriptive choice rows.
 - `Tooltip`: delayed pointer and immediate keyboard disclosure with shortcut, side, alignment, and collision support.
 - `Popover`: portalled dialog, menu, or listbox positioning with outside dismissal, focus restoration, and viewport collision handling.
-- `Menu`, `MenuItem`, `MenuCheckboxItem`, and `MenuSubmenu`: keyboard navigation, sections, separators, checked states, nested portals, shortcuts, descriptions, and destructive actions.
+- `Menu`, `MenuItem`, `MenuCheckboxItem`, `MenuSubmenu`, `MenuSectionLabel`, and `MenuSeparator`: keyboard navigation, labelled sections, separators, checked states, nested portals, shortcuts, descriptions, and destructive actions.
 - `Select`: controlled listbox selection with descriptions, icons, disabled options, selected state, and empty fallback.
 
 ## Resources and media
 
-- `ResourceCard` and `ResourceList`: file, website, Drive, app, and image resources with previews, metadata, opening, trailing actions, and progressive reveal.
-- `SourceList`: compact file, web, tool, and external citation summaries with metadata and expansion.
+- `ResourceCard` and `ResourceList`: file, website, Drive, app, and image resources with previews, metadata, optional labelled opening actions, trailing actions, and progressive reveal. Cards without `href` or `onOpen` remain static content.
+- `SourceList`: compact file, web, tool, and external citation summaries with metadata, optional labelled opening actions, and expansion. Sources without `href` or `onOpen` remain static rows.
 - `ArtifactList`: resource-list composition with an explicit empty state.
-- `GeneratedImageGallery`: one-to-four-slot natural or square image geometry, pending placeholders, retry/error handling, overflow paging, and reduced-motion support.
+- `GeneratedImageGallery`: one-to-four-slot natural or square image geometry, pending placeholders, retry/error handling, overflow paging, and reduced-motion support. Images become focusable actions only when `onOpenImage` is provided.
 - `ImagePreviewDialog`: portalled lightbox with focus trapping/restoration, Escape and arrow navigation, download, backdrop dismissal, and previous/next controls.
 
 ## Navigation and shell
@@ -90,5 +90,5 @@ All privileged behavior remains host-owned. The components never auto-approve co
 - Keep protocol objects in adapters; pass normalized props into UI components.
 - Keep privileged actions explicit and host-owned.
 - Import `codex-ui-kit/styles.css` once at the application boundary.
-- Override public `--codex-ui-*` variables rather than targeting private element structure.
+- Override public `--codex-ui-*` variables rather than targeting private element structure. Declare overrides on `:root` or the portal host when they must also affect overlays mounted outside the local component subtree.
 - Use the controlled APIs when application state must survive remounts or coordinate across windows.
