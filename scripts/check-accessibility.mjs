@@ -6,6 +6,7 @@ import { extname, join, normalize, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 import axe from "axe-core";
 import puppeteer from "puppeteer-core";
+import { partitionWcagIncomplete } from "./accessibility-policy.mjs";
 
 const root = fileURLToPath(new URL("../", import.meta.url));
 const demoRoot = join(root, "demo/dist");
@@ -149,14 +150,19 @@ try {
     }, { rules: semanticRules, tags: wcagTags });
     await page.close();
 
-    incompleteWcagChecks += result.wcag.incomplete.reduce(
+    const { manualReview, unexpected } = partitionWcagIncomplete(
+      result.wcag.incomplete,
+    );
+    result.wcag.incomplete = unexpected;
+    incompleteWcagChecks += manualReview.reduce(
       (total, entry) => total + entry.nodeCount,
       0,
     );
     if (
       result.semantic.violations.length > 0 ||
       result.semantic.incomplete.length > 0 ||
-      result.wcag.violations.length > 0
+      result.wcag.violations.length > 0 ||
+      result.wcag.incomplete.length > 0
     ) {
       failures.push({ case: testCase.name, ...result });
     }
