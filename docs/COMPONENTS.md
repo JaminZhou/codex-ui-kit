@@ -16,7 +16,7 @@ Codex UI Kit exposes protocol-neutral React components. Hosts own data fetching,
 
 ## Rich content
 
-- `AgentMarkdown`: GFM rendering without raw HTML, streaming stabilization, semantic renderer overrides, and viewport-aware lazy syntax highlighting. `stabilizeStreamingMarkdown` and `highlightCode` expose the package's standalone streaming and escaped-code helpers.
+- `AgentMarkdown`: GFM rendering without raw HTML, streaming stabilization, semantic renderer overrides, and viewport-aware lazy syntax highlighting. `stabilizeStreamingMarkdown` exposes the package's standalone streaming helper; `CodeHighlighter` is the public contract for supplying a custom escaped-code highlighter.
 - `InlineCode`: standalone inline-code treatment.
 - `CodeBlock`: language header, copy feedback, syntax highlighting, and wrapped or unwrapped states.
 - `FileDiff`: structured context, hunk, metadata, addition, and deletion lines with optional wrapping, viewport modes, and scroll-edge fades. `fileDiffToText` converts the structured public line model into copyable plain text.

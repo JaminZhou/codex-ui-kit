@@ -126,7 +126,15 @@ export function ResourceCard({
           </span>
         ) : null}
       </span>
-      {action ? <span className="codex-ui-resource-card__action">{action}</span> : null}
+      {action ? (
+        <span
+          className="codex-ui-resource-card__action"
+          draggable={false}
+          onDragStart={(event) => event.stopPropagation()}
+        >
+          {action}
+        </span>
+      ) : null}
     </article>
   );
 }

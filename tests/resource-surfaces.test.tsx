@@ -96,6 +96,7 @@ describe("resource surfaces", () => {
   it("preserves dragging on static and openable resource cards", () => {
     const onDragStatic = vi.fn();
     const onDragOpenable = vi.fn();
+    const onTrailingAction = vi.fn();
     render(
       <>
         <ResourceCard
@@ -104,6 +105,7 @@ describe("resource surfaces", () => {
           title="Static draggable"
         />
         <ResourceCard
+          action={<button onClick={onTrailingAction}>Share draggable</button>}
           draggable
           onDragStart={onDragOpenable}
           onOpen={vi.fn()}
@@ -122,6 +124,13 @@ describe("resource surfaces", () => {
     fireEvent.dragStart(openableCard);
     expect(onDragStatic).toHaveBeenCalledOnce();
     expect(onDragOpenable).toHaveBeenCalledOnce();
+
+    fireEvent.dragStart(
+      screen.getByRole("button", { name: "Share draggable" }),
+    );
+    expect(onDragOpenable).toHaveBeenCalledOnce();
+    fireEvent.click(screen.getByRole("button", { name: "Share draggable" }));
+    expect(onTrailingAction).toHaveBeenCalledOnce();
   });
 
   it("shows three resource rows before expanding the remainder", () => {
