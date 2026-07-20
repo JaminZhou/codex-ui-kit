@@ -1,8 +1,19 @@
-import { readdirSync, statSync } from "node:fs";
+import { readFileSync, readdirSync, statSync } from "node:fs";
 import { resolve } from "node:path";
 
 const assetsDirectory = resolve("demo/dist/assets");
+const demoHtml = readFileSync(resolve("demo/dist/index.html"), "utf8");
 const maximumChunkBytes = 500_000;
+const canonicalMatches = demoHtml.match(
+  /<link\s+rel="canonical"\s+href="https:\/\/jaminzhou\.com\/codex-ui-kit\/"\s*\/?>/g,
+);
+
+if (canonicalMatches?.length !== 1) {
+  throw new Error(
+    "Demo build must contain exactly one canonical URL for https://jaminzhou.com/codex-ui-kit/.",
+  );
+}
+
 const javascriptChunks = readdirSync(assetsDirectory)
   .filter((fileName) => fileName.endsWith(".js"))
   .map((fileName) => ({
