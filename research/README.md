@@ -7,11 +7,15 @@ not contain extracted application files or copied source code.
 
 1. Identify the installed application version and hash the local `app.asar`.
 2. Extract the archive only to a temporary directory outside the repository.
-3. Inspect package structure, Renderer chunks, CSS token families, semantic DOM
-   attributes, interaction states, and representative layout measurements.
-4. Write a build note containing observations, not source snippets.
-5. Implement components independently against the build note and public API.
-6. Delete or replace the temporary extraction when the sampled app updates.
+3. Record package-level route and feature candidates without treating their
+   presence as runtime reachability.
+4. Observe the running application through an allowed method and record each
+   surface's owner, trigger, container, lifecycle, states, and transitions.
+5. Update `ui-inventory.json`; keep package evidence, runtime evidence,
+   implementation, H5 verification, and Electron verification separate.
+6. Write a build note containing observations, not source snippets.
+7. Implement components independently against the build note and public API.
+8. Delete or replace the temporary extraction when the sampled app updates.
 
 Raw inspection data belongs in `/private/tmp/codex-ui-kit-research` or a local
 `.research/` directory. Both locations are intentionally outside version
@@ -34,3 +38,7 @@ control.
 
 Each sampled build receives a separate note so observations can be compared
 without treating one proprietary build as permanent source of truth.
+
+`pnpm check:research` validates the inventory schema and prevents a surface
+from being marked browser- or Electron-verified without current runtime
+evidence.

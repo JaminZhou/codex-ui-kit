@@ -1,6 +1,7 @@
 interface ModalLockEntry {
   containsFocus: (target: HTMLElement) => boolean;
   getInitialFocus: () => HTMLElement | null;
+  lockDocumentScroll: boolean;
   priority: number;
   returnFocus: HTMLElement | null;
   token: symbol;
@@ -9,6 +10,7 @@ interface ModalLockEntry {
 export interface ModalLockOptions {
   containsFocus?: (target: HTMLElement) => boolean;
   getInitialFocus?: () => HTMLElement | null;
+  lockDocumentScroll?: boolean;
   priority?: number;
   returnFocus?: HTMLElement | null;
 }
@@ -20,6 +22,7 @@ export interface ModalLockHandle {
 
 const activeModalLocks: ModalLockEntry[] = [];
 const deferredFocusTargets: HTMLElement[] = [];
+let activeDocumentScrollLocks = 0;
 let overflowBeforeDocumentScrollLock = "";
 
 function getTopModalLock() {
@@ -29,15 +32,54 @@ function getTopModalLock() {
   }, undefined);
 }
 
+function focusTargetIsAvailable(
+  target: HTMLElement | null | undefined,
+): target is HTMLElement {
+  return Boolean(
+    target &&
+    target !== document.body &&
+    target.isConnected &&
+    !target.closest('[inert], [aria-hidden="true"]'),
+  );
+}
+
 /**
- * Acquires the package-wide modal scroll lock and focus-stack position. The
- * handle identifies the visual top surface and returns the focus target that is
- * safe to restore: top surfaces return to their connected trigger, while a
- * lower surface closed beneath another modal defers its trigger as a fallback.
+ * Retargets modal return focus when the surface that launched a modal becomes
+ * unavailable while the modal remains open.
+ */
+export function retargetModalReturnFocusWithin(
+  surface: HTMLElement | null,
+  returnFocus: HTMLElement | null,
+  ownsTarget: (target: HTMLElement) => boolean = (target) =>
+    surface?.contains(target) ?? false,
+) {
+  if (!surface || typeof document === "undefined") return;
+  for (let index = deferredFocusTargets.length - 1; index >= 0; index -= 1) {
+    if (!ownsTarget(deferredFocusTargets[index]!)) continue;
+    if (returnFocus) {
+      deferredFocusTargets[index] = returnFocus;
+    } else {
+      deferredFocusTargets.splice(index, 1);
+    }
+  }
+  for (const entry of activeModalLocks) {
+    if (entry.returnFocus && ownsTarget(entry.returnFocus)) {
+      entry.returnFocus = returnFocus;
+    }
+  }
+}
+
+/**
+ * Acquires the package-wide modal focus-stack position and, unless opted out,
+ * the document scroll lock. The handle identifies the visual top surface and
+ * returns the focus target that is safe to restore: top surfaces return to
+ * their connected trigger, while a lower surface closed beneath another modal
+ * defers its trigger as a fallback.
  */
 export function acquireDocumentScrollLock({
   containsFocus = () => false,
   getInitialFocus = () => null,
+  lockDocumentScroll = true,
   priority = 0,
   returnFocus = null,
 }: ModalLockOptions = {}): ModalLockHandle {
@@ -45,13 +87,15 @@ export function acquireDocumentScrollLock({
     return { isTop: () => false, release: () => null };
   }
 
-  if (activeModalLocks.length === 0) {
+  if (lockDocumentScroll && activeDocumentScrollLocks === 0) {
     overflowBeforeDocumentScrollLock = document.body.style.overflow;
     document.body.style.overflow = "hidden";
   }
+  if (lockDocumentScroll) activeDocumentScrollLocks += 1;
   const entry: ModalLockEntry = {
     containsFocus,
     getInitialFocus,
+    lockDocumentScroll,
     priority,
     returnFocus,
     token: Symbol("modal-lock"),
@@ -68,8 +112,17 @@ export function acquireDocumentScrollLock({
     if (entryIndex === -1) return null;
     const wasTop = getTopModalLock()?.token === entry.token;
     activeModalLocks.splice(entryIndex, 1);
+    if (entry.lockDocumentScroll) {
+      activeDocumentScrollLocks = Math.max(
+        0,
+        activeDocumentScrollLocks - 1,
+      );
+      if (activeDocumentScrollLocks === 0) {
+        document.body.style.overflow = overflowBeforeDocumentScrollLock;
+      }
+    }
 
-    if (!wasTop && entry.returnFocus?.isConnected) {
+    if (!wasTop && focusTargetIsAvailable(entry.returnFocus)) {
       deferredFocusTargets.push(entry.returnFocus);
     }
 
@@ -78,27 +131,31 @@ export function acquireDocumentScrollLock({
       const nextTop = getTopModalLock();
       if (nextTop) {
         if (
-          entry.returnFocus?.isConnected &&
+          focusTargetIsAvailable(entry.returnFocus) &&
           nextTop.containsFocus(entry.returnFocus)
         ) {
           restoreFocus = entry.returnFocus;
         } else {
-          if (entry.returnFocus?.isConnected) {
+          if (focusTargetIsAvailable(entry.returnFocus)) {
             deferredFocusTargets.push(entry.returnFocus);
           }
-          restoreFocus = nextTop.getInitialFocus();
+          const nextInitialFocus = nextTop.getInitialFocus();
+          restoreFocus = focusTargetIsAvailable(nextInitialFocus)
+            ? nextInitialFocus
+            : null;
         }
       } else {
-        restoreFocus = entry.returnFocus?.isConnected ? entry.returnFocus : null;
+        restoreFocus = focusTargetIsAvailable(entry.returnFocus)
+          ? entry.returnFocus
+          : null;
         while (!restoreFocus && deferredFocusTargets.length > 0) {
           const candidate = deferredFocusTargets.pop();
-          if (candidate?.isConnected) restoreFocus = candidate;
+          if (focusTargetIsAvailable(candidate)) restoreFocus = candidate;
         }
       }
     }
 
     if (activeModalLocks.length === 0) {
-      document.body.style.overflow = overflowBeforeDocumentScrollLock;
       deferredFocusTargets.length = 0;
     }
     return restoreFocus;

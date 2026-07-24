@@ -12,6 +12,10 @@ import {
   AgentThread,
   AgentThreadViewport,
   AgentTurn,
+  AppShell,
+  AppSidebar,
+  AppSidebarItem,
+  AppSidebarSection,
   ApprovalCommandPreview,
   ApprovalRequest,
   ArtifactList,
@@ -67,6 +71,7 @@ import {
   ThreadThinkingPlaceholder,
   ThreadVirtualizedPlaceholder,
   TurnDuration,
+  WorkspacePanel,
   type ApprovalDecision,
   type FileDiffLine,
   type GeneratedImageItem,
@@ -392,6 +397,13 @@ function Showcase() {
   const [floatingPanelOpen, setFloatingPanelOpen] = useState(true);
   const [navigationStatus, setNavigationStatus] = useState("Navigation ready");
   const [threadStatus, setThreadStatus] = useState("Thread states ready");
+  const [appSidebarOpen, setAppSidebarOpen] = useState(true);
+  const [appSidePanelOpen, setAppSidePanelOpen] = useState(true);
+  const [appBottomPanelOpen, setAppBottomPanelOpen] = useState(false);
+  const [appWorkspaceTab, setAppWorkspaceTab] = useState("sources");
+  const [appComposerValue, setAppComposerValue] = useState(
+    "Inspect the remaining P0 shell states.",
+  );
   const [activeNavigationMessageId, setActiveNavigationMessageId] = useState<string>(
     navigationMessages[2].id,
   );
@@ -423,7 +435,7 @@ function Showcase() {
           <span>codex-ui-kit</span>
         </a>
         <div className="showcase__topbar-actions">
-          <span className="showcase__version">parity preview</span>
+          <span className="showcase__version">coverage preview</span>
           <a
             className="showcase__source-link"
             href="https://github.com/JaminZhou/codex-ui-kit"
@@ -461,7 +473,191 @@ function Showcase() {
 
         <div className="gallery-grid">
           <GalleryCard
-            description="A complete conversation surface assembled from the primitives."
+            description="A protocol-neutral application skeleton with navigation, conversation, responsive side panels, and a bottom terminal surface."
+            title="Application and workspace shell"
+            wide
+          >
+            <div className="app-shell-preview">
+              <AppShell
+                bottomPanel={
+                  <WorkspacePanel
+                    activeTabId="terminal"
+                    label="Bottom panel"
+                    onActiveTabChange={() => undefined}
+                    onClose={() => setAppBottomPanelOpen(false)}
+                    onOpenTab={() => setAppBottomPanelOpen(true)}
+                    placement="bottom"
+                    tabs={[
+                      {
+                        content: (
+                          <div className="app-shell-preview__terminal">
+                            <code>codex-ui-kit %</code>
+                            <textarea
+                              aria-label="Terminal input"
+                              readOnly
+                              value=""
+                            />
+                          </div>
+                        ),
+                        id: "terminal",
+                        label: "codex-ui-kit",
+                      },
+                    ]}
+                  />
+                }
+                bottomPanelOpen={appBottomPanelOpen}
+                mainLabel="Application shell preview"
+                mainRole="region"
+                onSidePanelOpenChange={setAppSidePanelOpen}
+                onSidebarOpenChange={setAppSidebarOpen}
+                sidePanel={
+                  <WorkspacePanel
+                    activeTabId={appWorkspaceTab}
+                    label="Workspace"
+                    onActiveTabChange={setAppWorkspaceTab}
+                    onClose={() => setAppSidePanelOpen(false)}
+                    onCloseTab={() => setAppSidePanelOpen(false)}
+                    onOpenTab={() => setAppSidePanelOpen(true)}
+                    tabs={[
+                      {
+                        content: (
+                          <div className="app-shell-preview__panel-content">
+                            <SourceList
+                              items={[
+                                {
+                                  id: "conversation-source",
+                                  kind: "external",
+                                  meta: "Provided in the conversation",
+                                  title: "example.com",
+                                },
+                                {
+                                  id: "file-source",
+                                  kind: "file",
+                                  meta: "Attached to this thread",
+                                  title: "UI_INVENTORY.md",
+                                },
+                              ]}
+                            />
+                          </div>
+                        ),
+                        id: "sources",
+                        label: "Sources",
+                      },
+                      {
+                        content: (
+                          <div className="app-shell-preview__panel-content">
+                            <FileDiff lines={showcaseDiffLines} />
+                          </div>
+                        ),
+                        id: "review",
+                        label: "Review",
+                      },
+                    ]}
+                  />
+                }
+                sidePanelOpen={appSidePanelOpen}
+                sidebar={
+                  <AppSidebar
+                    footer={
+                      <AppSidebarItem description="Local account">
+                        Profile
+                      </AppSidebarItem>
+                    }
+                    header={<strong>Codex</strong>}
+                  >
+                    <AppSidebarSection>
+                      <AppSidebarItem selected>New chat</AppSidebarItem>
+                      <AppSidebarItem>Pull requests</AppSidebarItem>
+                      <AppSidebarItem>Sites</AppSidebarItem>
+                      <AppSidebarItem>Scheduled</AppSidebarItem>
+                      <AppSidebarItem>Plugins</AppSidebarItem>
+                    </AppSidebarSection>
+                    <AppSidebarSection title="codex-ui-kit">
+                      <AppSidebarItem badge="12">P0 shell parity</AppSidebarItem>
+                      <AppSidebarItem>Runtime inventory</AppSidebarItem>
+                    </AppSidebarSection>
+                  </AppSidebar>
+                }
+                sidebarOpen={appSidebarOpen}
+              >
+                <div className="app-shell-preview__conversation">
+                  <ThreadHeader
+                    endActions={
+                      <>
+                        <IconButton
+                          icon={<span>▥</span>}
+                          label="Toggle bottom panel"
+                          onClick={() =>
+                            setAppBottomPanelOpen((value) => !value)
+                          }
+                          pressed={appBottomPanelOpen}
+                        />
+                        <IconButton
+                          icon={<span>▤</span>}
+                          label="Toggle workspace panel"
+                          onClick={() =>
+                            setAppSidePanelOpen((value) => !value)
+                          }
+                          pressed={appSidePanelOpen}
+                        />
+                      </>
+                    }
+                    navigation={
+                      <ThreadNavigationControls
+                        historyControls={false}
+                        onToggleSidebar={() =>
+                          setAppSidebarOpen((value) => !value)
+                        }
+                        sidebarOpen={appSidebarOpen}
+                      />
+                    }
+                    position="static"
+                    subtitle="codex-ui-kit"
+                    title="P0 shell parity"
+                  />
+                  <AgentThreadViewport
+                    footer={
+                      <div className="app-shell-preview__composer">
+                        <AgentComposer
+                          controls={
+                            <>
+                              <button type="button">Local</button>
+                              <button type="button">Ask for approval</button>
+                            </>
+                          }
+                          onSubmit={() => setAppComposerValue("")}
+                          onValueChange={setAppComposerValue}
+                          value={appComposerValue}
+                        />
+                      </div>
+                    }
+                  >
+                    <AgentThread>
+                      <AgentMessage metadata="You · now" role="user">
+                        Restore the full application shell before visual polish.
+                      </AgentMessage>
+                      <AgentTurn spacing="grouped">
+                        <TurnDuration durationMs={11_000} status="worked" />
+                        <CommandExecution
+                          command="pnpm check"
+                          durationMs={11_000}
+                          exitCode={0}
+                          status="completed"
+                        />
+                      </AgentTurn>
+                      <AgentMessage role="assistant">
+                        The shell now coordinates navigation, thread content,
+                        Sources/Review tabs, and a bottom terminal panel.
+                      </AgentMessage>
+                    </AgentThread>
+                  </AgentThreadViewport>
+                </div>
+              </AppShell>
+            </div>
+          </GalleryCard>
+
+          <GalleryCard
+            description="A partial conversation composition assembled from the current primitives."
             title="Thread composition"
             wide
           >

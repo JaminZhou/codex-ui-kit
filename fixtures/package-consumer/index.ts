@@ -6,6 +6,10 @@ import {
   AgentComposer,
   AgentThreadViewport,
   AgentTurn,
+  AppShell,
+  AppSidebar,
+  AppSidebarItem,
+  AppSidebarSection,
   ArtifactList,
   ApprovalCommandPreview,
   ApprovalRequest,
@@ -70,6 +74,7 @@ import {
   SubagentTranscriptHeader,
   TurnDuration,
   Tooltip,
+  WorkspacePanel,
   formatCommandDuration,
   fileDiffToText,
   formatTurnDuration,
@@ -150,6 +155,10 @@ void AgentReasoning;
 void AgentComposer;
 void AgentThreadViewport;
 void AgentTurn;
+void AppShell;
+void AppSidebar;
+void AppSidebarItem;
+void AppSidebarSection;
 void ArtifactList;
 void ApprovalCommandPreview;
 void ApprovalRequest;
@@ -196,6 +205,7 @@ void MenuSubmenu;
 void Popover;
 void Select;
 void Tooltip;
+void WorkspacePanel;
 void formatCommandDuration;
 void fileDiffToText([line]);
 void formatTurnDuration;

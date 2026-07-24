@@ -174,6 +174,11 @@
   --codex-ui-generated-image-gap: calc(var(--codex-ui-spacing) * 2);
   --codex-ui-generated-image-control-size: 1.5rem;
   --codex-ui-toolbar-height: calc(var(--codex-ui-spacing) * 12);
+  --codex-ui-app-sidebar-width: 17.125rem;
+  --codex-ui-app-side-panel-width: 41.6875rem;
+  --codex-ui-app-bottom-panel-height: 15rem;
+  --codex-ui-workspace-panel-header-height: var(--codex-ui-toolbar-height);
+  --codex-ui-workspace-panel-tab-max-width: 12rem;
   --codex-ui-header-action-gap: calc(var(--codex-ui-spacing) * 1.5);
   --codex-ui-header-safe-inset-left: calc(var(--codex-ui-spacing) * 2);
   --codex-ui-floating-control-size: calc(var(--codex-ui-spacing) * 8);

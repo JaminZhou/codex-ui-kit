@@ -14,6 +14,9 @@ The project intentionally separates research from implementation:
 4. Verify the result against the recorded behavior and accessibility requirements.
 
 See [`research/README.md`](research/README.md) for the research policy and build notes.
+Current-build coverage candidates and runtime evidence requirements are tracked
+in [`research/UI_INVENTORY.md`](research/UI_INVENTORY.md) and
+[`research/RUNTIME_CAPTURE.md`](research/RUNTIME_CAPTURE.md).
 
 ## Boundaries
 

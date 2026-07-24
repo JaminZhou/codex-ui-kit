@@ -52,7 +52,13 @@ describe("interactive controls", () => {
     expect(tooltip.textContent).toContain("⌘N");
     expect(trigger.getAttribute("aria-describedby")).toBe(tooltip.id);
 
-    fireEvent.keyDown(trigger, { key: "Escape" });
+    const escape = new KeyboardEvent("keydown", {
+      bubbles: true,
+      cancelable: true,
+      key: "Escape",
+    });
+    expect(fireEvent(trigger, escape)).toBe(false);
+    expect(escape.defaultPrevented).toBe(true);
     expect(screen.queryByRole("tooltip")).toBeNull();
   });
 
@@ -106,6 +112,34 @@ describe("interactive controls", () => {
     });
     expect(screen.queryByRole("dialog", { name: "Details" })).toBeNull();
     await waitFor(() => expect(document.activeElement).toBe(trigger));
+  });
+
+  it("lets a focused open popover trigger consume Escape", () => {
+    render(
+      <Popover
+        label="Trigger escape"
+        trigger={<button type="button">Open trigger escape</button>}
+      >
+        Content
+      </Popover>,
+    );
+
+    const trigger = screen.getByRole("button", {
+      name: "Open trigger escape",
+    });
+    fireEvent.click(trigger);
+    trigger.focus();
+    const escape = new KeyboardEvent("keydown", {
+      bubbles: true,
+      cancelable: true,
+      key: "Escape",
+    });
+
+    expect(fireEvent(trigger, escape)).toBe(false);
+    expect(escape.defaultPrevented).toBe(true);
+    expect(
+      screen.queryByRole("dialog", { name: "Trigger escape" }),
+    ).toBeNull();
   });
 
   it("closes stale open state and ARIA references when disabled", () => {

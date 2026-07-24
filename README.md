@@ -19,16 +19,23 @@ Codex UI Kit turns those interaction patterns into protocol-neutral React primit
 
 ## Status
 
-- Visual and behavioral parity is complete for the current Codex Desktop sample documented in [`research/26.715.31925.md`](research/26.715.31925.md), with the original measured geometry retained in [`research/26.707.72221.md`](research/26.707.72221.md).
+- The current components are a partial coding-agent UI foundation, not a
+  complete Codex Desktop reconstruction.
+- The latest sampled package is `26.715.72359` (`5718`). Its seed candidate
+  surface and evidence status are tracked in
+  [`research/UI_INVENTORY.md`](research/UI_INVENTORY.md); current-build runtime
+  observation is still required.
 - The repository is public and the package baseline is `0.1.0`, but the npm package has **not** been published.
 - The API remains pre-1.0 and may change while public documentation and consumer feedback mature.
 - Extracted application files, private IPC, bundled fonts, and OpenAI brand assets are not included.
 
-Explore the [interactive component showcase](https://jaminzhou.com/codex-ui-kit/) or review the [parity matrix](research/PARITY.md).
+Explore the [interactive component showcase](https://jaminzhou.com/codex-ui-kit/) or review the [coverage policy](research/PARITY.md).
 
 ## Highlights
 
-- Complete thread, message, activity, reasoning, plan, and streaming surfaces.
+- Partial thread, message, activity, reasoning, plan, and streaming primitives.
+- Application/sidebar and side/bottom workspace-panel composition with
+  container-responsive overlay behavior.
 - Command execution, structured file diffs, tool calls, approvals, and notices.
 - Composer attachments, mentions, modes, queued prompts, and running states.
 - Accessible menus, tooltips, popovers, selects, dialogs, and keyboard flows.
@@ -101,7 +108,7 @@ export function Example() {
 | [Composer](docs/COMPONENTS.md#composer) | `AgentComposer`, attachments, mentions, modes, queued prompts |
 | [Interactive primitives](docs/COMPONENTS.md#interactive-primitives) | Buttons, dialogs, menus, selects, popovers, tooltips |
 | [Resources and media](docs/COMPONENTS.md#resources-and-media) | Resource cards, sources, artifacts, generated images |
-| [Navigation and shell](docs/COMPONENTS.md#navigation-and-shell) | Thread header, navigation rail, floating panels and controls |
+| [Navigation and shell](docs/COMPONENTS.md#navigation-and-shell) | Application/sidebar shell, workspace tabs, thread header, navigation rail, floating controls |
 
 See the [complete component reference](docs/COMPONENTS.md) for behavior, state, and composition details.
 
