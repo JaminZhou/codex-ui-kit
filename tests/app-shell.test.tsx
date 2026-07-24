@@ -1062,6 +1062,50 @@ describe("application shell", () => {
     ).toBe("-1");
   });
 
+  it("focuses a responsive side panel when no control is active", () => {
+    let resize: ((width: number) => void) | undefined;
+    class ResizeObserverMock {
+      constructor(
+        private readonly callback: ResizeObserverCallback,
+      ) {}
+
+      disconnect() {}
+
+      observe(target: Element) {
+        if (!target.classList.contains("codex-ui-app-shell")) return;
+        resize = (width) =>
+          this.callback(
+            [
+              {
+                contentRect: { width },
+                target,
+              } as ResizeObserverEntry,
+            ],
+            this as unknown as ResizeObserver,
+          );
+      }
+
+      unobserve() {}
+    }
+    vi.stubGlobal("ResizeObserver", ResizeObserverMock);
+
+    render(
+      <AppShell
+        sidePanel={<button type="button">Sources</button>}
+        sidePanelOpen
+      >
+        <button type="button">Composer</button>
+      </AppShell>,
+    );
+
+    expect(document.activeElement).toBe(document.body);
+    act(() => resize?.(1_000));
+
+    expect(document.activeElement).toBe(
+      screen.getByRole("button", { name: "Sources" }),
+    );
+  });
+
   it("makes backdrop-covered content inert at responsive breakpoints", () => {
     let resize: ((width: number) => void) | undefined;
     class ResizeObserverMock {

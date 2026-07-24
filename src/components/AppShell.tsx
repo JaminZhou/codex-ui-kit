@@ -408,6 +408,7 @@ export function AppShell({
     previouslySidebarModalOpenRef.current = sidebarModalOpen;
     const responsiveModalIsTop =
       responsiveModalLockRef.current?.isTop() ?? false;
+    const noActiveControl = activeElement === document.body;
     const focusBelongsToShell =
       shellRef.current?.contains(activeElement) ||
       surfaceOwnsActiveElement(sidebarRef.current, activeElement) ||
@@ -425,8 +426,9 @@ export function AppShell({
     if (
       responsiveModalIsTop &&
       sidebarModalOpen &&
-      focusBelongsToShell &&
-      !surfaceOwnsActiveElement(sidebarRef.current, activeElement)
+      (noActiveControl ||
+        (focusBelongsToShell &&
+          !surfaceOwnsActiveElement(sidebarRef.current, activeElement)))
     ) {
       focusFirstInSurface(sidebarRef.current);
       return;
@@ -434,7 +436,8 @@ export function AppShell({
     if (
       responsiveModalIsTop &&
       sidePanelModalOpen &&
-      (surfaceOwnsActiveElement(mainRef.current, activeElement) ||
+      (noActiveControl ||
+        surfaceOwnsActiveElement(mainRef.current, activeElement) ||
         sidePanelBackdropRef.current === activeElement)
     ) {
       focusFirstInSurface(sidePanelRef.current);
