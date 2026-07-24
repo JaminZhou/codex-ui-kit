@@ -462,7 +462,9 @@ export function WorkspacePanel({
             const selected = tab.id === activeTabId;
             return (
               <button
-                aria-controls={`${panelId}-panel-${index}`}
+                aria-controls={
+                  selected ? `${panelId}-panel-${index}` : undefined
+                }
                 aria-selected={selected}
                 className="codex-ui-workspace-panel__tab"
                 data-selected={selected || undefined}

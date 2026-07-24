@@ -188,6 +188,10 @@ describe("workspace panel", () => {
 
     const sourceTab = screen.getByRole("tab", { name: "Sources" });
     const reviewTab = screen.getByRole("tab", { name: "Review" });
+    expect(sourceTab.getAttribute("aria-controls")).toBe(
+      screen.getByRole("tabpanel").id,
+    );
+    expect(reviewTab.hasAttribute("aria-controls")).toBe(false);
     sourceTab.focus();
     fireEvent.keyDown(sourceTab, { key: "ArrowRight" });
     expect(document.activeElement).toBe(reviewTab);
