@@ -691,6 +691,11 @@ describe("application shell", () => {
             <button onClick={() => setDialogOpen(false)} type="button">
               Finish dialog
             </button>
+            <Select
+              label="Dialog model"
+              onValueChange={() => undefined}
+              options={[{ label: "Codex", value: "codex" }]}
+            />
           </Dialog>
         </AppShell>
       );
@@ -709,6 +714,14 @@ describe("application shell", () => {
     expect(document.activeElement).toBe(dialogAction);
     expect(document.body.style.overflow).toBe("hidden");
 
+    fireEvent.click(
+      screen.getByRole("button", { name: "Dialog model" }),
+    );
+    const dialogOption = await screen.findByRole("option", {
+      name: "Codex",
+    });
+    fireEvent.click(dialogOption);
+    dialogAction.focus();
     fireEvent.click(dialogAction);
     await waitFor(() =>
       expect(document.activeElement).toBe(
