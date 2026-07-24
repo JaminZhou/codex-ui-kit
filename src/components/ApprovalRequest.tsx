@@ -403,7 +403,9 @@ export function ApprovalRequest({
       className={classes}
       data-codex-approval-surface
       data-decision={decision}
-      data-hotkeys-disabled={disableHotkeys || undefined}
+      data-hotkeys-disabled={
+        disableHotkeys || surfaceBlocked || undefined
+      }
       data-kind={kind}
       ref={rootRef}
       {...props}

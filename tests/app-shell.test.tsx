@@ -224,29 +224,39 @@ describe("application shell", () => {
   });
 
   it("disables approval hotkeys in blocked surfaces", () => {
-    const onApprove = vi.fn();
-    const onReject = vi.fn();
+    const onHiddenApprove = vi.fn();
+    const onHiddenReject = vi.fn();
+    const onVisibleApprove = vi.fn();
+    const onVisibleReject = vi.fn();
     render(
       <AppShell
         sidePanel={
           <ApprovalRequest
             autoFocus={false}
             kind="permission"
-            onApprove={onApprove}
-            onReject={onReject}
+            onApprove={onHiddenApprove}
+            onReject={onHiddenReject}
             title="Hidden approval"
           />
         }
         sidePanelOpen={false}
       >
-        Thread
+        <ApprovalRequest
+          autoFocus={false}
+          kind="permission"
+          onApprove={onVisibleApprove}
+          onReject={onVisibleReject}
+          title="Visible approval"
+        />
       </AppShell>,
     );
 
     fireEvent.keyDown(document, { key: "Enter" });
     fireEvent.keyDown(document, { key: "Escape" });
-    expect(onApprove).not.toHaveBeenCalled();
-    expect(onReject).not.toHaveBeenCalled();
+    expect(onVisibleApprove).toHaveBeenCalledOnce();
+    expect(onVisibleReject).toHaveBeenCalledOnce();
+    expect(onHiddenApprove).not.toHaveBeenCalled();
+    expect(onHiddenReject).not.toHaveBeenCalled();
   });
 
   it("does not infer open state from panel callbacks", () => {
