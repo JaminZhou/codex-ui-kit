@@ -255,6 +255,7 @@ export function ApprovalRequest({
   useEffect(() => {
     if (
       !isPending ||
+      surfaceBlocked ||
       disableHotkeys ||
       actionsDisabled ||
       (!onApprove && !onReject)
@@ -306,6 +307,7 @@ export function ApprovalRequest({
     isPending,
     onApprove,
     onReject,
+    surfaceBlocked,
   ]);
 
   const optionsPortalTarget = optionsVisible

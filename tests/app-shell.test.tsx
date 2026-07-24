@@ -223,6 +223,32 @@ describe("application shell", () => {
     ).toBeNull();
   });
 
+  it("disables approval hotkeys in blocked surfaces", () => {
+    const onApprove = vi.fn();
+    const onReject = vi.fn();
+    render(
+      <AppShell
+        sidePanel={
+          <ApprovalRequest
+            autoFocus={false}
+            kind="permission"
+            onApprove={onApprove}
+            onReject={onReject}
+            title="Hidden approval"
+          />
+        }
+        sidePanelOpen={false}
+      >
+        Thread
+      </AppShell>,
+    );
+
+    fireEvent.keyDown(document, { key: "Enter" });
+    fireEvent.keyDown(document, { key: "Escape" });
+    expect(onApprove).not.toHaveBeenCalled();
+    expect(onReject).not.toHaveBeenCalled();
+  });
+
   it("does not infer open state from panel callbacks", () => {
     render(
       <AppShell
