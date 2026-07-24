@@ -259,9 +259,17 @@ describe("application shell", () => {
     act(() => resize?.(1_000));
     expect(document.activeElement).toBe(terminal);
 
-    screen
-      .getByRole("button", { name: "Close workspace panel" })
-      .focus();
+    const sidePanelBackdrop = screen.getByRole("button", {
+      name: "Close workspace panel",
+    });
+    sidePanelBackdrop.focus();
+    act(() => resize?.(1_600));
+    expect(document.activeElement).toBe(
+      screen.getByRole("button", { name: "Sources" }),
+    );
+
+    act(() => resize?.(1_000));
+    sidePanelBackdrop.focus();
     act(() => resize?.(700));
     expect(
       document
@@ -280,6 +288,13 @@ describe("application shell", () => {
     const sidebarBackdrop = screen.getByRole("button", {
       name: "Close navigation sidebar",
     });
+    sidebarBackdrop.focus();
+    act(() => resize?.(1_000));
+    expect(document.activeElement).toBe(
+      screen.getByRole("button", { name: "Projects" }),
+    );
+
+    act(() => resize?.(700));
     sidebarBackdrop.focus();
     fireEvent.click(sidebarBackdrop);
     expect(document.activeElement).toBe(

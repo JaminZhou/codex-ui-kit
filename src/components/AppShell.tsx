@@ -229,6 +229,8 @@ export function AppShell({
     Boolean(onSidePanelOpenChange) &&
     layoutMode !== "wide" &&
     !sidebarModalOpen;
+  const previouslySidePanelModalOpenRef = useRef(sidePanelModalOpen);
+  const previouslySidebarModalOpenRef = useRef(sidebarModalOpen);
   const mainBlocked = sidebarModalOpen || sidePanelModalOpen;
   const sidebarFocusFallbackRef = sidePanelModalOpen
     ? sidePanelRef
@@ -254,6 +256,11 @@ export function AppShell({
         ? document.activeElement
         : null;
     if (!activeElement) return;
+    const wasSidePanelModalOpen =
+      previouslySidePanelModalOpenRef.current;
+    const wasSidebarModalOpen = previouslySidebarModalOpenRef.current;
+    previouslySidePanelModalOpenRef.current = sidePanelModalOpen;
+    previouslySidebarModalOpenRef.current = sidebarModalOpen;
 
     if (
       sidebarModalOpen &&
@@ -268,8 +275,31 @@ export function AppShell({
         sidePanelBackdropRef.current === activeElement)
     ) {
       focusFirstInSurface(sidePanelRef.current);
+      return;
     }
-  }, [sidePanelModalOpen, sidebarModalOpen]);
+    if (
+      wasSidebarModalOpen &&
+      !sidebarModalOpen &&
+      sidebarOpen &&
+      sidebarBackdropRef.current === activeElement
+    ) {
+      focusFirstInSurface(sidebarRef.current);
+      return;
+    }
+    if (
+      wasSidePanelModalOpen &&
+      !sidePanelModalOpen &&
+      sidePanelOpen &&
+      sidePanelBackdropRef.current === activeElement
+    ) {
+      focusFirstInSurface(sidePanelRef.current);
+    }
+  }, [
+    sidePanelModalOpen,
+    sidePanelOpen,
+    sidebarModalOpen,
+    sidebarOpen,
+  ]);
 
   return (
     <div
