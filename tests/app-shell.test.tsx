@@ -385,6 +385,49 @@ describe("application shell", () => {
     );
   });
 
+  it("remembers the opener before panel content autofocuses", async () => {
+    function AutofocusPanelFixture() {
+      const [sidePanelOpen, setSidePanelOpen] = useState(false);
+      return (
+        <AppShell
+          sidePanel={
+            sidePanelOpen ? (
+              <button
+                autoFocus
+                onClick={() => setSidePanelOpen(false)}
+                type="button"
+              >
+                Close autofocused sources
+              </button>
+            ) : null
+          }
+          sidePanelOpen={sidePanelOpen}
+        >
+          <button
+            onClick={() => setSidePanelOpen(true)}
+            type="button"
+          >
+            Open autofocused sources
+          </button>
+        </AppShell>
+      );
+    }
+
+    render(<AutofocusPanelFixture />);
+    const opener = screen.getByRole("button", {
+      name: "Open autofocused sources",
+    });
+    opener.focus();
+    fireEvent.click(opener);
+    const closer = screen.getByRole("button", {
+      name: "Close autofocused sources",
+    });
+    await waitFor(() => expect(document.activeElement).toBe(closer));
+    fireEvent.click(closer);
+
+    expect(document.activeElement).toBe(opener);
+  });
+
   it("closes a topmost responsive workspace panel on Escape", () => {
     let resize: ((width: number) => void) | undefined;
     class ResizeObserverMock {
@@ -415,22 +458,34 @@ describe("application shell", () => {
     function EscapeFixture() {
       const [sidePanelOpen, setSidePanelOpen] = useState(true);
       return (
-        <AppShell
-          onSidePanelOpenChange={setSidePanelOpen}
-          sidePanel={<button type="button">Sources</button>}
-          sidePanelOpen={sidePanelOpen}
-        >
-          <button type="button">Composer</button>
-        </AppShell>
+        <>
+          <input aria-label="Host filter" />
+          <AppShell
+            onSidePanelOpenChange={setSidePanelOpen}
+            sidePanel={<button type="button">Sources</button>}
+            sidePanelOpen={sidePanelOpen}
+          >
+            <button type="button">Composer</button>
+          </AppShell>
+        </>
       );
     }
 
     render(<EscapeFixture />);
+    const hostFilter = screen.getByRole("textbox", { name: "Host filter" });
+    hostFilter.focus();
     act(() => resize?.(1_000));
-    expect(document.activeElement).toBe(
-      screen.getByRole("button", { name: "Sources" }),
-    );
-    fireEvent.keyDown(document, { key: "Escape" });
+    expect(document.activeElement).toBe(hostFilter);
+    fireEvent.keyDown(hostFilter, { key: "Escape" });
+    expect(
+      document
+        .querySelector('[aria-label="Workspace panel"]')
+        ?.getAttribute("aria-hidden"),
+    ).toBe("false");
+
+    const sources = screen.getByRole("button", { name: "Sources" });
+    sources.focus();
+    fireEvent.keyDown(sources, { key: "Escape" });
 
     expect(
       document

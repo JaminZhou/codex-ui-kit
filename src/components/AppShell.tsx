@@ -81,6 +81,37 @@ function useSurfaceFocusRestoration(
 ) {
   const previouslyOpenRef = useRef(open);
   const returnFocusRef = useRef<HTMLElement | null>(null);
+  const focusWasInSurfaceRef = useRef(false);
+
+  useEffect(() => {
+    if (typeof document === "undefined") return;
+    const rememberOutsideFocus = (target: EventTarget | null) => {
+      if (
+        !(target instanceof HTMLElement) ||
+        target === document.body ||
+        surfaceOwnsActiveElement(surfaceRef.current, target) ||
+        !shellFocusTargetIsVisible(target)
+      ) {
+        return;
+      }
+      returnFocusRef.current = target;
+    };
+    const trackFocus = (target: EventTarget | null) => {
+      if (open) {
+        focusWasInSurfaceRef.current =
+          target instanceof HTMLElement &&
+          (surfaceOwnsActiveElement(surfaceRef.current, target) ||
+            dismissRef?.current === target);
+        return;
+      }
+      rememberOutsideFocus(target);
+    };
+    if (open) trackFocus(document.activeElement);
+    const handleFocus = (event: FocusEvent) => trackFocus(event.target);
+    document.addEventListener("focusin", handleFocus, true);
+    return () =>
+      document.removeEventListener("focusin", handleFocus, true);
+  }, [dismissRef, open, surfaceRef]);
 
   useEffect(() => {
     if (typeof document === "undefined") return;
@@ -92,12 +123,14 @@ function useSurfaceFocusRestoration(
         : null;
 
     if (!wasOpen && open) {
-      returnFocusRef.current =
+      if (
         activeElement &&
         activeElement !== document.body &&
-        !surfaceRef.current?.contains(activeElement)
-          ? activeElement
-          : null;
+        !surfaceOwnsActiveElement(surfaceRef.current, activeElement) &&
+        shellFocusTargetIsVisible(activeElement)
+      ) {
+        returnFocusRef.current = activeElement;
+      }
     }
 
     const focusIsBeingHidden =
@@ -113,7 +146,11 @@ function useSurfaceFocusRestoration(
       );
       notifySurfaceBlocked(surface);
     }
-    if (wasOpen && !open && focusIsBeingHidden) {
+    if (
+      wasOpen &&
+      !open &&
+      (focusIsBeingHidden || focusWasInSurfaceRef.current)
+    ) {
       const returnFocus = returnFocusRef.current;
       const canTryReturnFocus =
         returnFocus?.isConnected &&
@@ -129,6 +166,7 @@ function useSurfaceFocusRestoration(
         const target = fallbackRef.current;
         focusFirstInSurface(target);
       }
+      focusWasInSurfaceRef.current = false;
     }
 
     previouslyOpenRef.current = open;
@@ -448,6 +486,21 @@ export function AppShell({
       ) {
         return;
       }
+      const eventTarget =
+        event.target instanceof HTMLElement
+          ? event.target
+          : document.activeElement instanceof HTMLElement
+            ? document.activeElement
+            : null;
+      const eventBelongsToShell =
+        eventTarget === document.body ||
+        (eventTarget !== null &&
+          (shellRef.current?.contains(eventTarget) ||
+            surfaceOwnsActiveElement(sidebarRef.current, eventTarget) ||
+            surfaceOwnsActiveElement(mainRef.current, eventTarget) ||
+            surfaceOwnsActiveElement(sidePanelRef.current, eventTarget) ||
+            surfaceOwnsActiveElement(bottomPanelRef.current, eventTarget)));
+      if (!eventBelongsToShell) return;
       const dismiss = sidebarModalOpen
         ? onSidebarOpenChange
         : sidePanelModalOpen
