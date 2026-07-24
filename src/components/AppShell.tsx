@@ -13,6 +13,7 @@ import {
 } from "react";
 import {
   acquireDocumentScrollLock,
+  retargetModalReturnFocusWithin,
   type ModalLockHandle,
 } from "../internal/documentScrollLock.js";
 import { inertWhen } from "../internal/inert.js";
@@ -102,6 +103,10 @@ function useSurfaceFocusRestoration(
       (surfaceOwnsActiveElement(surfaceRef.current, activeElement) ||
         dismissRef?.current === activeElement);
     if (!open) {
+      retargetModalReturnFocusWithin(
+        surfaceRef.current,
+        focusTargetInSurface(fallbackRef.current),
+      );
       notifySurfaceBlocked(surfaceRef.current);
     }
     if (wasOpen && !open && focusIsBeingHidden) {
@@ -183,11 +188,15 @@ function useAppShellLayoutMode(
 }
 
 function focusFirstInSurface(surface: HTMLElement | null) {
-  const target =
+  focusTargetInSurface(surface)?.focus();
+}
+
+function focusTargetInSurface(surface: HTMLElement | null) {
+  return (
     surface?.querySelector<HTMLElement>(
       'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',
-    ) ?? surface;
-  target?.focus();
+    ) ?? surface
+  );
 }
 
 function surfaceOwnsActiveElement(

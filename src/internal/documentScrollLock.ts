@@ -44,6 +44,22 @@ function focusTargetIsAvailable(
 }
 
 /**
+ * Retargets modal return focus when the surface that launched a modal becomes
+ * unavailable while the modal remains open.
+ */
+export function retargetModalReturnFocusWithin(
+  surface: HTMLElement | null,
+  returnFocus: HTMLElement | null,
+) {
+  if (!surface || typeof document === "undefined") return;
+  for (const entry of activeModalLocks) {
+    if (entry.returnFocus && surface.contains(entry.returnFocus)) {
+      entry.returnFocus = returnFocus;
+    }
+  }
+}
+
+/**
  * Acquires the package-wide modal focus-stack position and, unless opted out,
  * the document scroll lock. The handle identifies the visual top surface and
  * returns the focus target that is safe to restore: top surfaces return to

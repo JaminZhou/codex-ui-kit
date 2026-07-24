@@ -977,7 +977,15 @@ describe("application shell", () => {
     const closePanel = await screen.findByRole("button", {
       name: "Close panel behind dialog",
     });
+    await waitFor(() =>
+      expect(document.activeElement).toBe(closePanel),
+    );
     fireEvent.click(closePanel);
+    expect(
+      document
+        .querySelector('[aria-label="Workspace panel"]')
+        ?.getAttribute("aria-hidden"),
+    ).toBe("true");
     fireEvent.click(
       screen.getByRole("button", { name: "Finish panel dialog" }),
     );
