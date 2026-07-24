@@ -1,10 +1,13 @@
 import {
+  useEffect,
   useId,
+  useRef,
   type ButtonHTMLAttributes,
   type CSSProperties,
   type HTMLAttributes,
   type KeyboardEvent,
   type ReactNode,
+  type RefObject,
 } from "react";
 import { IconButton } from "./InteractivePrimitives.js";
 
@@ -58,6 +61,49 @@ function PlusIcon() {
   );
 }
 
+function useSurfaceFocusRestoration(
+  open: boolean,
+  surfaceRef: RefObject<HTMLElement | null>,
+  fallbackRef: RefObject<HTMLElement | null>,
+  dismissRef?: RefObject<HTMLElement | null>,
+) {
+  const previouslyOpenRef = useRef(open);
+  const returnFocusRef = useRef<HTMLElement | null>(null);
+
+  useEffect(() => {
+    if (typeof document === "undefined") return;
+
+    const wasOpen = previouslyOpenRef.current;
+    const activeElement =
+      document.activeElement instanceof HTMLElement
+        ? document.activeElement
+        : null;
+
+    if (!wasOpen && open) {
+      returnFocusRef.current =
+        activeElement && !surfaceRef.current?.contains(activeElement)
+          ? activeElement
+          : null;
+    }
+
+    const focusIsBeingHidden =
+      activeElement &&
+      (surfaceRef.current?.contains(activeElement) ||
+        dismissRef?.current === activeElement);
+    if (wasOpen && !open && focusIsBeingHidden) {
+      const returnFocus = returnFocusRef.current;
+      const target =
+        returnFocus?.isConnected &&
+        !returnFocus.closest('[inert], [aria-hidden="true"]')
+          ? returnFocus
+          : fallbackRef.current;
+      target?.focus();
+    }
+
+    previouslyOpenRef.current = open;
+  }, [dismissRef, fallbackRef, open, surfaceRef]);
+}
+
 export interface AppShellProps
   extends Omit<HTMLAttributes<HTMLDivElement>, "children"> {
   bottomPanel?: ReactNode;
@@ -94,6 +140,27 @@ export function AppShell({
   sidebarOpen = Boolean(sidebar),
   ...props
 }: AppShellProps) {
+  const bottomPanelRef = useRef<HTMLElement>(null);
+  const mainRef = useRef<HTMLDivElement>(null);
+  const sidePanelBackdropRef = useRef<HTMLButtonElement>(null);
+  const sidePanelRef = useRef<HTMLElement>(null);
+  const sidebarBackdropRef = useRef<HTMLButtonElement>(null);
+  const sidebarRef = useRef<HTMLElement>(null);
+
+  useSurfaceFocusRestoration(
+    sidebarOpen,
+    sidebarRef,
+    mainRef,
+    sidebarBackdropRef,
+  );
+  useSurfaceFocusRestoration(
+    sidePanelOpen,
+    sidePanelRef,
+    mainRef,
+    sidePanelBackdropRef,
+  );
+  useSurfaceFocusRestoration(bottomPanelOpen, bottomPanelRef, mainRef);
+
   return (
     <div
       className={["codex-ui-app-shell", className].filter(Boolean).join(" ")}
@@ -108,6 +175,7 @@ export function AppShell({
           aria-label={sidebarLabel}
           className="codex-ui-app-shell__sidebar"
           inert={!sidebarOpen ? true : undefined}
+          ref={sidebarRef}
         >
           {sidebar}
         </aside>
@@ -116,13 +184,16 @@ export function AppShell({
           className="codex-ui-app-shell__backdrop"
           data-backdrop="sidebar"
           onClick={() => onSidebarOpenChange?.(false)}
+          ref={sidebarBackdropRef}
           tabIndex={sidebarOpen ? 0 : -1}
           type="button"
         />
         <div
           aria-label={mainLabel}
           className="codex-ui-app-shell__main"
+          ref={mainRef}
           role={mainRole}
+          tabIndex={-1}
         >
           {children}
         </div>
@@ -131,6 +202,7 @@ export function AppShell({
           className="codex-ui-app-shell__backdrop"
           data-backdrop="side-panel"
           onClick={() => onSidePanelOpenChange?.(false)}
+          ref={sidePanelBackdropRef}
           tabIndex={sidePanelOpen ? 0 : -1}
           type="button"
         />
@@ -139,6 +211,7 @@ export function AppShell({
           aria-label={sidePanelLabel}
           className="codex-ui-app-shell__side-panel"
           inert={!sidePanelOpen ? true : undefined}
+          ref={sidePanelRef}
         >
           {sidePanel}
         </aside>
@@ -147,6 +220,7 @@ export function AppShell({
           aria-label={bottomPanelLabel}
           className="codex-ui-app-shell__bottom-panel"
           inert={!bottomPanelOpen ? true : undefined}
+          ref={bottomPanelRef}
         >
           {bottomPanel}
         </section>
@@ -412,7 +486,10 @@ export function WorkspacePanel({
               icon={<CloseIcon />}
               label={
                 activeTab.closeLabel ??
-                `Close ${String(activeTab.label)} tab`
+                (typeof activeTab.label === "string" ||
+                typeof activeTab.label === "number"
+                  ? `Close ${activeTab.label} tab`
+                  : "Close active tab")
               }
               onClick={() => onCloseTab(activeTab.id)}
               size="toolbar"

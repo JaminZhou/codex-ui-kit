@@ -1,6 +1,7 @@
 // @vitest-environment happy-dom
 
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import { useState } from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import {
   AppShell,
@@ -86,6 +87,48 @@ describe("application shell", () => {
     expect(onSidebarOpenChange).toHaveBeenCalledWith(false);
     expect(onSidePanelOpenChange).toHaveBeenCalledWith(false);
   });
+
+  it("restores focus when a shell surface hides the active control", () => {
+    function FocusRestorationFixture() {
+      const [sidePanelOpen, setSidePanelOpen] = useState(false);
+      return (
+        <AppShell
+          onSidePanelOpenChange={setSidePanelOpen}
+          sidePanel={
+            <button
+              onClick={() => setSidePanelOpen(false)}
+              type="button"
+            >
+              Close sources
+            </button>
+          }
+          sidePanelOpen={sidePanelOpen}
+        >
+          <button onClick={() => setSidePanelOpen(true)} type="button">
+            Open sources
+          </button>
+        </AppShell>
+      );
+    }
+
+    render(<FocusRestorationFixture />);
+    const opener = screen.getByRole("button", { name: "Open sources" });
+    opener.focus();
+    fireEvent.click(opener);
+
+    const closer = screen.getByRole("button", { name: "Close sources" });
+    closer.focus();
+    fireEvent.click(closer);
+    expect(document.activeElement).toBe(opener);
+
+    fireEvent.click(opener);
+    const backdrop = screen.getByRole("button", {
+      name: "Close workspace panel",
+    });
+    backdrop.focus();
+    fireEvent.click(backdrop);
+    expect(document.activeElement).toBe(opener);
+  });
 });
 
 describe("application sidebar", () => {
@@ -159,5 +202,27 @@ describe("workspace panel", () => {
     expect(onExpandedChange).toHaveBeenCalledWith(true);
     expect(onOpenTab).toHaveBeenCalledOnce();
     expect(onClose).toHaveBeenCalledOnce();
+  });
+
+  it("uses a stable close label for a rich tab label", () => {
+    render(
+      <WorkspacePanel
+        activeTabId="review"
+        label="Workspace"
+        onActiveTabChange={() => undefined}
+        onCloseTab={() => undefined}
+        tabs={[
+          {
+            content: "Review content",
+            id: "review",
+            label: <span>Review changes</span>,
+          },
+        ]}
+      />,
+    );
+
+    expect(
+      screen.getByRole("button", { name: "Close active tab" }),
+    ).toBeTruthy();
   });
 });
