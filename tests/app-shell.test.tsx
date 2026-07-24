@@ -15,6 +15,7 @@ import {
   AppSidebar,
   AppSidebarItem,
   AppSidebarSection,
+  ApprovalRequest,
   Select,
   WorkspacePanel,
 } from "../src";
@@ -323,6 +324,69 @@ describe("application shell", () => {
       expect(document.activeElement).toBe(
         screen.getByRole("button", { name: "Sources" }),
       ),
+    );
+  });
+
+  it("moves focus out of an aria-controlled approval menu portal", () => {
+    let resize: ((width: number) => void) | undefined;
+    class ResizeObserverMock {
+      constructor(
+        private readonly callback: ResizeObserverCallback,
+      ) {}
+
+      disconnect() {}
+
+      observe(target: Element) {
+        if (!target.classList.contains("codex-ui-app-shell")) return;
+        resize = (width) =>
+          this.callback(
+            [
+              {
+                contentRect: { width },
+                target,
+              } as ResizeObserverEntry,
+            ],
+            this as unknown as ResizeObserver,
+          );
+      }
+
+      unobserve() {}
+    }
+    vi.stubGlobal("ResizeObserver", ResizeObserverMock);
+
+    render(
+      <AppShell
+        onSidePanelOpenChange={() => undefined}
+        sidePanel={<button type="button">Sources</button>}
+        sidePanelOpen
+      >
+        <ApprovalRequest
+          autoFocus={false}
+          disableHotkeys
+          kind="network"
+          onApprove={() => undefined}
+          onReject={() => undefined}
+          scopedApproveAction={{ onClick: () => undefined }}
+          title="Connect?"
+        />
+      </AppShell>,
+    );
+
+    const toggle = screen.getByRole("button", {
+      name: "Approval options",
+    });
+    fireEvent.click(toggle);
+    const menu = screen.getByRole("menu");
+    const scopedItem = screen.getByRole("menuitem", {
+      name: "Allow this conversation",
+    });
+    expect(menu.hasAttribute("data-codex-ui-overlay-owner")).toBe(false);
+    expect(toggle.getAttribute("aria-controls")).toBe(menu.id);
+    scopedItem.focus();
+
+    act(() => resize?.(1_000));
+    expect(document.activeElement).toBe(
+      screen.getByRole("button", { name: "Sources" }),
     );
   });
 

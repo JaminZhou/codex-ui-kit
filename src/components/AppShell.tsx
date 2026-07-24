@@ -186,22 +186,23 @@ function surfaceOwnsActiveElement(
   if (!surface) return false;
   if (surface.contains(activeElement)) return true;
 
-  const portalledOverlay = activeElement.closest<HTMLElement>(
-    "[data-codex-ui-overlay-owner]",
+  const controlledIds = new Set(
+    [...surface.querySelectorAll<HTMLElement>("[aria-controls]")].flatMap(
+      (trigger) =>
+        trigger.getAttribute("aria-controls")?.split(/\s+/) ?? [],
+    ),
   );
-  const ownerIds =
-    portalledOverlay?.dataset.codexUiOverlayOwner
-      ?.split(/\s+/)
-      .filter(Boolean) ?? [];
-  if (ownerIds.length === 0) return false;
+  if (controlledIds.size === 0) return false;
 
-  return [...surface.querySelectorAll<HTMLElement>("[aria-controls]")].some(
-    (trigger) => {
-      const controlledIds =
-        trigger.getAttribute("aria-controls")?.split(/\s+/) ?? [];
-      return controlledIds.some((id) => ownerIds.includes(id));
-    },
-  );
+  let candidate: HTMLElement | null = activeElement;
+  while (candidate) {
+    if (candidate.id && controlledIds.has(candidate.id)) return true;
+    const overlayOwnerIds =
+      candidate.dataset.codexUiOverlayOwner?.split(/\s+/) ?? [];
+    if (overlayOwnerIds.some((id) => controlledIds.has(id))) return true;
+    candidate = candidate.parentElement;
+  }
+  return false;
 }
 
 export interface AppShellProps
