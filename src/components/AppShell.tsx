@@ -775,6 +775,11 @@ export function WorkspacePanel({
     activeIndex >= 0 ? `${panelId}-tab-${activeIndex}` : undefined;
   const activePanelDomId =
     activeIndex >= 0 ? `${panelId}-panel-${activeIndex}` : undefined;
+  const firstEnabledIndex = tabs.findIndex((tab) => !tab.disabled);
+  const tabbableTabIndex =
+    activeIndex >= 0 && !activeTab?.disabled
+      ? activeIndex
+      : firstEnabledIndex;
   const moveTabFocus = (
     event: KeyboardEvent<HTMLButtonElement>,
     currentIndex: number,
@@ -873,7 +878,7 @@ export function WorkspacePanel({
                 onClick={() => onActiveTabChange(tab.id)}
                 onKeyDown={(event) => moveTabFocus(event, index)}
                 role="tab"
-                tabIndex={selected ? 0 : -1}
+                tabIndex={index === tabbableTabIndex ? 0 : -1}
                 type="button"
               >
                 {tab.label}

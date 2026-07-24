@@ -1494,6 +1494,38 @@ describe("workspace panel", () => {
     ).toBeTruthy();
   });
 
+  it("keeps an enabled tab reachable when the active tab is disabled", () => {
+    const onActiveTabChange = vi.fn();
+    render(
+      <WorkspacePanel
+        activeTabId="sources"
+        label="Workspace"
+        onActiveTabChange={onActiveTabChange}
+        tabs={[
+          {
+            content: "Source content",
+            disabled: true,
+            id: "sources",
+            label: "Sources",
+          },
+          { content: "Review content", id: "review", label: "Review" },
+        ]}
+      />,
+    );
+
+    const sourcesTab = screen.getByRole("tab", { name: "Sources" });
+    const reviewTab = screen.getByRole("tab", { name: "Review" });
+    expect(sourcesTab.getAttribute("aria-selected")).toBe("true");
+    expect(sourcesTab.getAttribute("tabindex")).toBe("-1");
+    expect(reviewTab.getAttribute("aria-selected")).toBe("false");
+    expect(reviewTab.getAttribute("tabindex")).toBe("0");
+
+    reviewTab.focus();
+    fireEvent.keyDown(reviewTab, { key: "Home" });
+    expect(document.activeElement).toBe(reviewTab);
+    expect(onActiveTabChange).toHaveBeenCalledWith("review");
+  });
+
   it("restores focus after closing the active tab", async () => {
     function ClosableTabsFixture() {
       const [activeTabId, setActiveTabId] = useState("sources");
