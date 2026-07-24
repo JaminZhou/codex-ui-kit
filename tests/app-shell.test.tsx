@@ -576,6 +576,83 @@ describe("application shell", () => {
     ).toBe("true");
   });
 
+  it("lets a focused popover trigger consume Escape before its responsive panel", () => {
+    let resize: ((width: number) => void) | undefined;
+    class ResizeObserverMock {
+      constructor(
+        private readonly callback: ResizeObserverCallback,
+      ) {}
+
+      disconnect() {}
+
+      observe(target: Element) {
+        if (!target.classList.contains("codex-ui-app-shell")) return;
+        resize = (width) =>
+          this.callback(
+            [
+              {
+                contentRect: { width },
+                target,
+              } as ResizeObserverEntry,
+            ],
+            this as unknown as ResizeObserver,
+          );
+      }
+
+      unobserve() {}
+    }
+    vi.stubGlobal("ResizeObserver", ResizeObserverMock);
+
+    function PopoverEscapeFixture() {
+      const [sidePanelOpen, setSidePanelOpen] = useState(true);
+      return (
+        <AppShell
+          onSidePanelOpenChange={setSidePanelOpen}
+          sidePanel={
+            <Popover
+              label="Workspace actions"
+              trigger={<button type="button">Open workspace actions</button>}
+            >
+              <button type="button">Workspace action</button>
+            </Popover>
+          }
+          sidePanelOpen={sidePanelOpen}
+        >
+          <button type="button">Composer</button>
+        </AppShell>
+      );
+    }
+
+    render(<PopoverEscapeFixture />);
+    act(() => resize?.(1_000));
+
+    const trigger = screen.getByRole("button", {
+      name: "Open workspace actions",
+    });
+    fireEvent.click(trigger);
+    expect(
+      screen.getByRole("dialog", { name: "Workspace actions" }),
+    ).toBeTruthy();
+    trigger.focus();
+    fireEvent.keyDown(trigger, { key: "Escape" });
+
+    expect(
+      screen.queryByRole("dialog", { name: "Workspace actions" }),
+    ).toBeNull();
+    expect(
+      document
+        .querySelector('[aria-label="Workspace panel"]')
+        ?.getAttribute("aria-hidden"),
+    ).toBe("false");
+
+    fireEvent.keyDown(trigger, { key: "Escape" });
+    expect(
+      document
+        .querySelector('[aria-label="Workspace panel"]')
+        ?.getAttribute("aria-hidden"),
+    ).toBe("true");
+  });
+
   it("blocks content covered by an explicit handler-free overlay", () => {
     let resize: ((width: number) => void) | undefined;
     class ResizeObserverMock {

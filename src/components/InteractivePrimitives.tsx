@@ -521,7 +521,11 @@ export function Tooltip({
       }}
       onFocusCapture={() => show(0)}
       onKeyDown={(event) => {
-        if (event.key === "Escape") hide();
+        if (event.key === "Escape" && effectiveOpen) {
+          event.preventDefault();
+          event.stopPropagation();
+          hide();
+        }
       }}
       onPointerEnter={(event) => {
         if (event.pointerType !== "touch") show(delayMs);
@@ -713,7 +717,11 @@ export function Popover({
           event.key === "ArrowUp" ? "last" : "first";
         setOpen(true);
       }
-      if (event.key === "Escape") close();
+      if (event.key === "Escape" && effectiveOpen) {
+        event.preventDefault();
+        event.stopPropagation();
+        close();
+      }
     },
   });
 
