@@ -497,6 +497,85 @@ describe("application shell", () => {
     );
   });
 
+  it("lets an approval menu consume Escape before its responsive panel", () => {
+    let resize: ((width: number) => void) | undefined;
+    class ResizeObserverMock {
+      constructor(
+        private readonly callback: ResizeObserverCallback,
+      ) {}
+
+      disconnect() {}
+
+      observe(target: Element) {
+        if (!target.classList.contains("codex-ui-app-shell")) return;
+        resize = (width) =>
+          this.callback(
+            [
+              {
+                contentRect: { width },
+                target,
+              } as ResizeObserverEntry,
+            ],
+            this as unknown as ResizeObserver,
+          );
+      }
+
+      unobserve() {}
+    }
+    vi.stubGlobal("ResizeObserver", ResizeObserverMock);
+
+    function ApprovalMenuEscapeFixture() {
+      const [sidePanelOpen, setSidePanelOpen] = useState(true);
+      return (
+        <AppShell
+          onSidePanelOpenChange={setSidePanelOpen}
+          sidePanel={
+            <ApprovalRequest
+              autoFocus={false}
+              disableHotkeys
+              kind="network"
+              onApprove={() => undefined}
+              onReject={() => undefined}
+              scopedApproveAction={{ onClick: () => undefined }}
+              title="Connect?"
+            />
+          }
+          sidePanelOpen={sidePanelOpen}
+        >
+          <button type="button">Composer</button>
+        </AppShell>
+      );
+    }
+
+    render(<ApprovalMenuEscapeFixture />);
+    act(() => resize?.(1_000));
+
+    const toggle = screen.getByRole("button", {
+      name: "Approval options",
+    });
+    fireEvent.click(toggle);
+    const scopedItem = screen.getByRole("menuitem", {
+      name: "Allow this conversation",
+    });
+    scopedItem.focus();
+    fireEvent.keyDown(scopedItem, { key: "Escape" });
+
+    expect(screen.queryByRole("menu")).toBeNull();
+    expect(document.activeElement).toBe(toggle);
+    expect(
+      document
+        .querySelector('[aria-label="Workspace panel"]')
+        ?.getAttribute("aria-hidden"),
+    ).toBe("false");
+
+    fireEvent.keyDown(toggle, { key: "Escape" });
+    expect(
+      document
+        .querySelector('[aria-label="Workspace panel"]')
+        ?.getAttribute("aria-hidden"),
+    ).toBe("true");
+  });
+
   it("blocks content covered by an explicit handler-free overlay", () => {
     let resize: ((width: number) => void) | undefined;
     class ResizeObserverMock {

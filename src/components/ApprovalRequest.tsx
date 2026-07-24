@@ -188,6 +188,7 @@ export function ApprovalRequest({
     };
     const dismissOnEscape = (event: KeyboardEvent) => {
       if (event.key !== "Escape") return;
+      event.preventDefault();
       event.stopPropagation();
       setOptionsOpen(false);
       optionsToggleRef.current?.focus();
@@ -319,6 +320,13 @@ export function ApprovalRequest({
     ? rootRef.current?.closest<HTMLElement>("[data-theme]")?.dataset.theme
     : undefined;
   const handleOptionsKeyDown = (event: ReactKeyboardEvent<HTMLDivElement>) => {
+    if (event.key === "Escape") {
+      event.preventDefault();
+      event.stopPropagation();
+      setOptionsOpen(false);
+      optionsToggleRef.current?.focus();
+      return;
+    }
     if (event.key === "Tab") {
       setOptionsOpen(false);
       return;
