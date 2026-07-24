@@ -15,6 +15,7 @@ import {
   type MouseEvent as ReactMouseEvent,
   type ReactNode,
 } from "react";
+import { inertWhen } from "../internal/inert.js";
 
 function hasRenderableContent(children: ReactNode): boolean {
   return Children.toArray(children).some((child) => {
@@ -308,7 +309,7 @@ export const AgentComposer = forwardRef<
             className="codex-ui-composer__queue"
             data-disabled={disabled || undefined}
             hidden={!hasRenderedQueue}
-            inert={disabled || undefined}
+            inert={inertWhen(disabled)}
             onDragStartCapture={
               disabled
                 ? (event) => {

@@ -135,6 +135,27 @@ const html = renderToString(
 if (!html.includes("Compatibility surface")) {
   throw new Error("server render did not include the message content");
 }
+
+const shellHtml = renderToString(
+  createElement(
+    uiKit.AppShell,
+    {
+      bottomPanel: "Terminal",
+      bottomPanelOpen: false,
+      sidePanel: "Workspace",
+      sidePanelOpen: false,
+      sidebar: "Navigation",
+      sidebarOpen: false,
+    },
+    "Conversation",
+  ),
+);
+const inertAttributes = shellHtml.match(/\\sinert(?:=\\"(?:1)?\\")?/g) ?? [];
+if (inertAttributes.length !== 3) {
+  throw new Error(
+    \`expected three inert shell surfaces, received \${inertAttributes.length}: \${shellHtml}\`,
+  );
+}
 `,
   );
 

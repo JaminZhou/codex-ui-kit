@@ -11,6 +11,7 @@ import {
   type ReactNode,
   type RefObject,
 } from "react";
+import { inertWhen } from "../internal/inert.js";
 import { IconButton } from "./InteractivePrimitives.js";
 
 function CloseIcon() {
@@ -284,7 +285,7 @@ export function AppShell({
           aria-hidden={!sidebarOpen}
           aria-label={sidebarLabel}
           className="codex-ui-app-shell__sidebar"
-          inert={!sidebarOpen ? true : undefined}
+          inert={inertWhen(!sidebarOpen)}
           ref={sidebarRef}
           tabIndex={-1}
         >
@@ -304,7 +305,7 @@ export function AppShell({
         <div
           aria-label={mainLabel}
           className="codex-ui-app-shell__main"
-          inert={mainBlocked ? true : undefined}
+          inert={inertWhen(mainBlocked)}
           ref={mainRef}
           role={mainRole}
           tabIndex={-1}
@@ -326,7 +327,7 @@ export function AppShell({
           aria-hidden={!sidePanelOpen || sidebarModalOpen}
           aria-label={sidePanelLabel}
           className="codex-ui-app-shell__side-panel"
-          inert={!sidePanelOpen || sidebarModalOpen ? true : undefined}
+          inert={inertWhen(!sidePanelOpen || sidebarModalOpen)}
           ref={sidePanelRef}
           tabIndex={-1}
         >
@@ -336,7 +337,7 @@ export function AppShell({
           aria-hidden={!bottomPanelOpen || sidebarModalOpen}
           aria-label={bottomPanelLabel}
           className="codex-ui-app-shell__bottom-panel"
-          inert={!bottomPanelOpen || sidebarModalOpen ? true : undefined}
+          inert={inertWhen(!bottomPanelOpen || sidebarModalOpen)}
           ref={bottomPanelRef}
         >
           {bottomPanel}

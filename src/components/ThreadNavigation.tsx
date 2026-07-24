@@ -10,6 +10,7 @@ import {
   type PointerEventHandler,
   type ReactNode,
 } from "react";
+import { inertWhen } from "../internal/inert.js";
 import { IconButton, Tooltip } from "./InteractivePrimitives.js";
 
 function SidebarOpenIcon() {
@@ -492,7 +493,7 @@ export function FloatingThreadPanel({
       aria-label={label}
       className={["codex-ui-floating-thread-panel", className].filter(Boolean).join(" ")}
       data-open={open || undefined}
-      inert={!open ? true : undefined}
+      inert={inertWhen(!open)}
       ref={panelRef}
       style={{ ...style, top: topInset }}
       {...props}
