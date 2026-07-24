@@ -995,6 +995,73 @@ describe("application shell", () => {
     );
   });
 
+  it("focuses the selected roving tab in a responsive side panel", () => {
+    let resize: ((width: number) => void) | undefined;
+    class ResizeObserverMock {
+      constructor(
+        private readonly callback: ResizeObserverCallback,
+      ) {}
+
+      disconnect() {}
+
+      observe(target: Element) {
+        if (!target.classList.contains("codex-ui-app-shell")) return;
+        resize = (width) =>
+          this.callback(
+            [
+              {
+                contentRect: { width },
+                target,
+              } as ResizeObserverEntry,
+            ],
+            this as unknown as ResizeObserver,
+          );
+      }
+
+      unobserve() {}
+    }
+    vi.stubGlobal("ResizeObserver", ResizeObserverMock);
+
+    render(
+      <AppShell
+        sidePanel={
+          <WorkspacePanel
+            activeTabId="review"
+            label="Workspace"
+            onActiveTabChange={() => undefined}
+            tabs={[
+              {
+                content: "Source content",
+                id: "sources",
+                label: "Sources",
+              },
+              {
+                content: "Review content",
+                id: "review",
+                label: "Review",
+              },
+            ]}
+          />
+        }
+        sidePanelOpen
+      >
+        <button type="button">Composer</button>
+      </AppShell>,
+    );
+
+    const composer = screen.getByRole("button", { name: "Composer" });
+    composer.focus();
+    act(() => resize?.(1_000));
+
+    expect(document.activeElement).toBe(
+      screen.getByRole("tab", { name: "Review", selected: true }),
+    );
+    expect(
+      screen.getByRole("tab", { name: "Sources", selected: false })
+        .getAttribute("tabindex"),
+    ).toBe("-1");
+  });
+
   it("makes backdrop-covered content inert at responsive breakpoints", () => {
     let resize: ((width: number) => void) | undefined;
     class ResizeObserverMock {

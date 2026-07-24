@@ -194,7 +194,7 @@ function focusFirstInSurface(surface: HTMLElement | null) {
 function focusTargetInSurface(surface: HTMLElement | null) {
   return (
     surface?.querySelector<HTMLElement>(
-      'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',
+      'button:not([disabled]):not([tabindex="-1"]), [href]:not([tabindex="-1"]), input:not([disabled]):not([type="hidden"]):not([tabindex="-1"]), select:not([disabled]):not([tabindex="-1"]), textarea:not([disabled]):not([tabindex="-1"]), [tabindex]:not([tabindex="-1"])',
     ) ?? surface
   );
 }
@@ -359,12 +359,7 @@ export function AppShell({
           : sidePanelIsModal
             ? sidePanelRef.current
             : null;
-        return (
-          surface?.querySelector<HTMLElement>(
-            'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',
-          ) ??
-          surface
-        );
+        return focusTargetInSurface(surface);
       },
       lockDocumentScroll: false,
       priority: 80,
