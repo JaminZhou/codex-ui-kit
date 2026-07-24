@@ -24,6 +24,10 @@ import {
 } from "react";
 import { createPortal } from "react-dom";
 import { OverlayEnvironmentContext } from "../internal/overlayEnvironment.js";
+import {
+  getBlockedSurface,
+  surfaceBlockedEventName,
+} from "../internal/surfaceBlocked.js";
 
 export type ControlTone =
   | "danger"
@@ -626,10 +630,28 @@ export function Popover({
       }
     };
     const handleBlur = () => close();
+    const handleSurfaceBlocked = (event: Event) => {
+      const blockedSurface = getBlockedSurface(event);
+      if (
+        blockedSurface &&
+        anchorRef.current &&
+        blockedSurface.contains(anchorRef.current)
+      ) {
+        close();
+      }
+    };
     document.addEventListener("pointerdown", handlePointerDown, true);
+    document.addEventListener(
+      surfaceBlockedEventName,
+      handleSurfaceBlocked,
+    );
     window.addEventListener("blur", handleBlur);
     return () => {
       document.removeEventListener("pointerdown", handlePointerDown, true);
+      document.removeEventListener(
+        surfaceBlockedEventName,
+        handleSurfaceBlocked,
+      );
       window.removeEventListener("blur", handleBlur);
     };
   }, [close, effectiveOpen, id]);

@@ -10,6 +10,10 @@ import {
   type ReactNode,
 } from "react";
 import { createPortal } from "react-dom";
+import {
+  getBlockedSurface,
+  surfaceBlockedEventName,
+} from "../internal/surfaceBlocked.js";
 import type { ApprovalDecision } from "../types.js";
 
 export type ApprovalRequestKind =
@@ -180,11 +184,29 @@ export function ApprovalRequest({
       setOptionsOpen(false);
       optionsToggleRef.current?.focus();
     };
+    const dismissWhenOwnerBlocked = (event: Event) => {
+      const blockedSurface = getBlockedSurface(event);
+      if (
+        blockedSurface &&
+        rootRef.current &&
+        blockedSurface.contains(rootRef.current)
+      ) {
+        setOptionsOpen(false);
+      }
+    };
     document.addEventListener("pointerdown", dismissOutside);
     document.addEventListener("keydown", dismissOnEscape);
+    document.addEventListener(
+      surfaceBlockedEventName,
+      dismissWhenOwnerBlocked,
+    );
     return () => {
       document.removeEventListener("pointerdown", dismissOutside);
       document.removeEventListener("keydown", dismissOnEscape);
+      document.removeEventListener(
+        surfaceBlockedEventName,
+        dismissWhenOwnerBlocked,
+      );
     };
   }, [optionsOpen]);
 

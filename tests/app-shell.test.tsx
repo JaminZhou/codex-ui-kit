@@ -326,6 +326,11 @@ describe("application shell", () => {
         screen.getByRole("button", { name: "Sources" }),
       ),
     );
+    await waitFor(() =>
+      expect(
+        screen.queryByRole("option", { name: "Codex" }),
+      ).toBeNull(),
+    );
   });
 
   it("moves focus out of an aria-controlled approval menu portal", () => {
@@ -389,6 +394,62 @@ describe("application shell", () => {
     expect(document.activeElement).toBe(
       screen.getByRole("button", { name: "Sources" }),
     );
+    expect(screen.queryByRole("menu")).toBeNull();
+  });
+
+  it("preserves focus in a sidebar-owned portalled overlay", async () => {
+    let resize: ((width: number) => void) | undefined;
+    class ResizeObserverMock {
+      constructor(
+        private readonly callback: ResizeObserverCallback,
+      ) {}
+
+      disconnect() {}
+
+      observe(target: Element) {
+        if (!target.classList.contains("codex-ui-app-shell")) return;
+        resize = (width) =>
+          this.callback(
+            [
+              {
+                contentRect: { width },
+                target,
+              } as ResizeObserverEntry,
+            ],
+            this as unknown as ResizeObserver,
+          );
+      }
+
+      unobserve() {}
+    }
+    vi.stubGlobal("ResizeObserver", ResizeObserverMock);
+
+    render(
+      <AppShell
+        sidebar={
+          <Select
+            label="Workspace"
+            onValueChange={() => undefined}
+            options={[{ label: "Project", value: "project" }]}
+          />
+        }
+        sidebarOpen
+      >
+        Thread
+      </AppShell>,
+    );
+
+    fireEvent.click(
+      screen.getByRole("button", { name: "Workspace" }),
+    );
+    const option = screen.getByRole("option", { name: "Project" });
+    await waitFor(() => expect(document.activeElement).toBe(option));
+
+    act(() => resize?.(700));
+    expect(document.activeElement).toBe(option);
+    expect(
+      screen.getByRole("option", { name: "Project" }),
+    ).toBeTruthy();
   });
 
   it("preserves focus in a higher-priority dialog", async () => {

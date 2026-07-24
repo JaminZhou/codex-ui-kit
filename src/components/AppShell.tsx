@@ -16,6 +16,7 @@ import {
   type ModalLockHandle,
 } from "../internal/documentScrollLock.js";
 import { inertWhen } from "../internal/inert.js";
+import { notifySurfaceBlocked } from "../internal/surfaceBlocked.js";
 import { IconButton } from "./InteractivePrimitives.js";
 
 function CloseIcon() {
@@ -377,11 +378,14 @@ export function AppShell({
     previouslySidebarModalOpenRef.current = sidebarModalOpen;
     const responsiveModalIsTop =
       responsiveModalLockRef.current?.isTop() ?? false;
+    if (sidePanelModalOpen && !wasSidePanelModalOpen) {
+      notifySurfaceBlocked(mainRef.current);
+    }
 
     if (
       responsiveModalIsTop &&
       sidebarModalOpen &&
-      !sidebarRef.current?.contains(activeElement)
+      !surfaceOwnsActiveElement(sidebarRef.current, activeElement)
     ) {
       focusFirstInSurface(sidebarRef.current);
       return;
