@@ -50,10 +50,12 @@ function focusTargetIsAvailable(
 export function retargetModalReturnFocusWithin(
   surface: HTMLElement | null,
   returnFocus: HTMLElement | null,
+  ownsTarget: (target: HTMLElement) => boolean = (target) =>
+    surface?.contains(target) ?? false,
 ) {
   if (!surface || typeof document === "undefined") return;
   for (const entry of activeModalLocks) {
-    if (entry.returnFocus && surface.contains(entry.returnFocus)) {
+    if (entry.returnFocus && ownsTarget(entry.returnFocus)) {
       entry.returnFocus = returnFocus;
     }
   }

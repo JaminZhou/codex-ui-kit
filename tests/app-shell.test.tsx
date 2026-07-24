@@ -995,6 +995,95 @@ describe("application shell", () => {
     );
   });
 
+  it("retargets dialog return focus from a panel-owned portal", async () => {
+    function PortalDialogTriggerFixture() {
+      const [dialogOpen, setDialogOpen] = useState(false);
+      const [sidePanelOpen, setSidePanelOpen] = useState(true);
+      return (
+        <AppShell
+          sidePanel={
+            <>
+              <Popover
+                initialFocus="first"
+                label="Panel actions"
+                role="menu"
+                trigger={<button type="button">Open panel actions</button>}
+              >
+                <button
+                  onClick={() => setDialogOpen(true)}
+                  role="menuitem"
+                  tabIndex={-1}
+                  type="button"
+                >
+                  Open portalled dialog
+                </button>
+              </Popover>
+              <Dialog
+                onOpenChange={setDialogOpen}
+                open={dialogOpen}
+                showClose={false}
+                title="Portalled panel dialog"
+              >
+                <button
+                  onClick={() => setSidePanelOpen(false)}
+                  type="button"
+                >
+                  Hide panel behind dialog
+                </button>
+                <button
+                  onClick={() => setDialogOpen(false)}
+                  type="button"
+                >
+                  Finish portalled dialog
+                </button>
+              </Dialog>
+            </>
+          }
+          sidePanelOpen={sidePanelOpen}
+        >
+          <button type="button">Main portal fallback</button>
+        </AppShell>
+      );
+    }
+
+    render(<PortalDialogTriggerFixture />);
+    const mainFallback = screen.getByRole("button", {
+      name: "Main portal fallback",
+    });
+    fireEvent.click(
+      screen.getByRole("button", { name: "Open panel actions" }),
+    );
+    const portalItem = await screen.findByRole("menuitem", {
+      name: "Open portalled dialog",
+    });
+    await waitFor(() =>
+      expect(document.activeElement).toBe(portalItem),
+    );
+    fireEvent.click(portalItem);
+
+    const hidePanel = await screen.findByRole("button", {
+      name: "Hide panel behind dialog",
+    });
+    await waitFor(() =>
+      expect(document.activeElement).toBe(hidePanel),
+    );
+    fireEvent.click(hidePanel);
+    await waitFor(() =>
+      expect(
+        screen.queryByRole("menuitem", {
+          name: "Open portalled dialog",
+        }),
+      ).toBeNull(),
+    );
+    fireEvent.click(
+      screen.getByRole("button", { name: "Finish portalled dialog" }),
+    );
+
+    await waitFor(() =>
+      expect(document.activeElement).toBe(mainFallback),
+    );
+  });
+
   it("focuses the selected roving tab in a responsive side panel", () => {
     let resize: ((width: number) => void) | undefined;
     class ResizeObserverMock {

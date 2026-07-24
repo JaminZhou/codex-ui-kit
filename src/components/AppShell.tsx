@@ -103,11 +103,13 @@ function useSurfaceFocusRestoration(
       (surfaceOwnsActiveElement(surfaceRef.current, activeElement) ||
         dismissRef?.current === activeElement);
     if (!open) {
+      const surface = surfaceRef.current;
       retargetModalReturnFocusWithin(
-        surfaceRef.current,
+        surface,
         focusTargetInSurface(fallbackRef.current),
+        (target) => surfaceOwnsActiveElement(surface, target),
       );
-      notifySurfaceBlocked(surfaceRef.current);
+      notifySurfaceBlocked(surface);
     }
     if (wasOpen && !open && focusIsBeingHidden) {
       const returnFocus = returnFocusRef.current;
