@@ -893,6 +893,100 @@ describe("application shell", () => {
     expect(document.activeElement).toBe(trigger);
   });
 
+  it("rejects hidden panel controls as dialog return targets", async () => {
+    let resize: ((width: number) => void) | undefined;
+    class ResizeObserverMock {
+      constructor(
+        private readonly callback: ResizeObserverCallback,
+      ) {}
+
+      disconnect() {}
+
+      observe(target: Element) {
+        if (!target.classList.contains("codex-ui-app-shell")) return;
+        resize = (width) =>
+          this.callback(
+            [
+              {
+                contentRect: { width },
+                target,
+              } as ResizeObserverEntry,
+            ],
+            this as unknown as ResizeObserver,
+          );
+      }
+
+      unobserve() {}
+    }
+    vi.stubGlobal("ResizeObserver", ResizeObserverMock);
+
+    function HiddenDialogTriggerFixture() {
+      const [dialogOpen, setDialogOpen] = useState(false);
+      const [sidePanelOpen, setSidePanelOpen] = useState(true);
+      return (
+        <AppShell
+          sidePanel={
+            <>
+              <button
+                onClick={() => setDialogOpen(true)}
+                type="button"
+              >
+                Open panel dialog
+              </button>
+              <Dialog
+                onOpenChange={setDialogOpen}
+                open={dialogOpen}
+                showClose={false}
+                title="Panel dialog"
+              >
+                <button
+                  onClick={() => setSidePanelOpen(false)}
+                  type="button"
+                >
+                  Close panel behind dialog
+                </button>
+                <button
+                  onClick={() => setDialogOpen(false)}
+                  type="button"
+                >
+                  Finish panel dialog
+                </button>
+              </Dialog>
+            </>
+          }
+          sidePanelOpen={sidePanelOpen}
+        >
+          <button type="button">Main fallback</button>
+        </AppShell>
+      );
+    }
+
+    render(<HiddenDialogTriggerFixture />);
+    const mainFallback = screen.getByRole("button", {
+      name: "Main fallback",
+    });
+    mainFallback.focus();
+    act(() => resize?.(1_000));
+    const dialogTrigger = screen.getByRole("button", {
+      name: "Open panel dialog",
+    });
+    await waitFor(() =>
+      expect(document.activeElement).toBe(dialogTrigger),
+    );
+    fireEvent.click(dialogTrigger);
+    const closePanel = await screen.findByRole("button", {
+      name: "Close panel behind dialog",
+    });
+    fireEvent.click(closePanel);
+    fireEvent.click(
+      screen.getByRole("button", { name: "Finish panel dialog" }),
+    );
+
+    await waitFor(() =>
+      expect(document.activeElement).toBe(mainFallback),
+    );
+  });
+
   it("makes backdrop-covered content inert at responsive breakpoints", () => {
     let resize: ((width: number) => void) | undefined;
     class ResizeObserverMock {

@@ -32,6 +32,17 @@ function getTopModalLock() {
   }, undefined);
 }
 
+function focusTargetIsAvailable(
+  target: HTMLElement | null | undefined,
+): target is HTMLElement {
+  return Boolean(
+    target &&
+    target !== document.body &&
+    target.isConnected &&
+    !target.closest('[inert], [aria-hidden="true"]'),
+  );
+}
+
 /**
  * Acquires the package-wide modal focus-stack position and, unless opted out,
  * the document scroll lock. The handle identifies the visual top surface and
@@ -85,7 +96,7 @@ export function acquireDocumentScrollLock({
       }
     }
 
-    if (!wasTop && entry.returnFocus?.isConnected) {
+    if (!wasTop && focusTargetIsAvailable(entry.returnFocus)) {
       deferredFocusTargets.push(entry.returnFocus);
     }
 
@@ -94,21 +105,26 @@ export function acquireDocumentScrollLock({
       const nextTop = getTopModalLock();
       if (nextTop) {
         if (
-          entry.returnFocus?.isConnected &&
+          focusTargetIsAvailable(entry.returnFocus) &&
           nextTop.containsFocus(entry.returnFocus)
         ) {
           restoreFocus = entry.returnFocus;
         } else {
-          if (entry.returnFocus?.isConnected) {
+          if (focusTargetIsAvailable(entry.returnFocus)) {
             deferredFocusTargets.push(entry.returnFocus);
           }
-          restoreFocus = nextTop.getInitialFocus();
+          const nextInitialFocus = nextTop.getInitialFocus();
+          restoreFocus = focusTargetIsAvailable(nextInitialFocus)
+            ? nextInitialFocus
+            : null;
         }
       } else {
-        restoreFocus = entry.returnFocus?.isConnected ? entry.returnFocus : null;
+        restoreFocus = focusTargetIsAvailable(entry.returnFocus)
+          ? entry.returnFocus
+          : null;
         while (!restoreFocus && deferredFocusTargets.length > 0) {
           const candidate = deferredFocusTargets.pop();
-          if (candidate?.isConnected) restoreFocus = candidate;
+          if (focusTargetIsAvailable(candidate)) restoreFocus = candidate;
         }
       }
     }
