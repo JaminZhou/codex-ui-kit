@@ -361,8 +361,15 @@ export function AppShell({
       const focusIsOnShellBackdrop =
         activeElement === sidebarBackdropRef.current ||
         activeElement === sidePanelBackdropRef.current;
+      const focusRemainsAvailable =
+        activeElement !== null &&
+        activeElement !== document.body &&
+        activeElement.isConnected &&
+        !focusIsOnShellBackdrop &&
+        !activeElement.closest('[inert], [aria-hidden="true"]');
       const target = modalLock.release();
       if (
+        !focusRemainsAvailable &&
         !focusIsOnShellBackdrop &&
         target?.isConnected &&
         !target.closest('[inert], [aria-hidden="true"]')

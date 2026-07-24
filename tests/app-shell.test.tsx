@@ -878,6 +878,9 @@ describe("application shell", () => {
 
     const terminal = screen.getByRole("button", { name: "Terminal" });
     act(() => resize?.(1_600));
+    expect(document.activeElement).toBe(
+      screen.getByRole("button", { name: "Sources" }),
+    );
     terminal.focus();
     act(() => resize?.(1_000));
     expect(document.activeElement).toBe(terminal);
