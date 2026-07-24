@@ -1253,6 +1253,115 @@ describe("application shell", () => {
     );
   });
 
+  it("retargets main portal dialog focus across responsive blocking", async () => {
+    let resize: ((width: number) => void) | undefined;
+    class ResizeObserverMock {
+      constructor(
+        private readonly callback: ResizeObserverCallback,
+      ) {}
+
+      disconnect() {}
+
+      observe(target: Element) {
+        if (!target.classList.contains("codex-ui-app-shell")) return;
+        resize = (width) =>
+          this.callback(
+            [
+              {
+                contentRect: { width },
+                target,
+              } as ResizeObserverEntry,
+            ],
+            this as unknown as ResizeObserver,
+          );
+      }
+
+      unobserve() {}
+    }
+    vi.stubGlobal("ResizeObserver", ResizeObserverMock);
+
+    function ResponsivePortalDialogFixture() {
+      const [dialogOpen, setDialogOpen] = useState(false);
+      const [sidePanelOpen, setSidePanelOpen] = useState(true);
+      return (
+        <AppShell
+          onSidePanelOpenChange={setSidePanelOpen}
+          sidePanel={<button type="button">Sources</button>}
+          sidePanelOpen={sidePanelOpen}
+        >
+          <Popover
+            initialFocus="first"
+            label="Main actions"
+            role="menu"
+            trigger={<button type="button">Open main actions</button>}
+          >
+            <button
+              onClick={() => setDialogOpen(true)}
+              role="menuitem"
+              tabIndex={-1}
+              type="button"
+            >
+              Open main dialog
+            </button>
+          </Popover>
+          <Dialog
+            onOpenChange={setDialogOpen}
+            open={dialogOpen}
+            showClose={false}
+            title="Main portal dialog"
+          >
+            <button
+              onClick={() => setSidePanelOpen(false)}
+              type="button"
+            >
+              Close workspace behind dialog
+            </button>
+            <button
+              onClick={() => setDialogOpen(false)}
+              type="button"
+            >
+              Finish main dialog
+            </button>
+          </Dialog>
+        </AppShell>
+      );
+    }
+
+    render(<ResponsivePortalDialogFixture />);
+    const mainTrigger = screen.getByRole("button", {
+      name: "Open main actions",
+    });
+    fireEvent.click(mainTrigger);
+    const portalItem = await screen.findByRole("menuitem", {
+      name: "Open main dialog",
+    });
+    await waitFor(() =>
+      expect(document.activeElement).toBe(portalItem),
+    );
+    fireEvent.click(portalItem);
+
+    const closeWorkspace = await screen.findByRole("button", {
+      name: "Close workspace behind dialog",
+    });
+    await waitFor(() =>
+      expect(document.activeElement).toBe(closeWorkspace),
+    );
+    act(() => resize?.(1_000));
+    await waitFor(() =>
+      expect(
+        screen.queryByRole("menuitem", { name: "Open main dialog" }),
+      ).toBeNull(),
+    );
+    fireEvent.click(closeWorkspace);
+    fireEvent.click(
+      screen.getByRole("button", { name: "Finish main dialog" }),
+    );
+
+    await waitFor(() =>
+      expect(document.activeElement).toBe(mainTrigger),
+    );
+  });
+
   it("focuses the selected roving tab in a responsive side panel", () => {
     let resize: ((width: number) => void) | undefined;
     class ResizeObserverMock {

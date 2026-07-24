@@ -139,11 +139,7 @@ function useSurfaceFocusRestoration(
         dismissRef?.current === activeElement);
     if (!open) {
       const surface = surfaceRef.current;
-      retargetModalReturnFocusWithin(
-        surface,
-        focusTargetInSurface(fallbackRef.current),
-        (target) => surfaceOwnsActiveElement(surface, target),
-      );
+      retargetModalFocusFromSurface(surface, fallbackRef.current);
       notifySurfaceBlocked(surface);
     }
     if (
@@ -296,6 +292,17 @@ function surfaceOwnsActiveElement(
     candidate = candidate.parentElement;
   }
   return false;
+}
+
+function retargetModalFocusFromSurface(
+  surface: HTMLElement | null,
+  fallbackSurface: HTMLElement | null,
+) {
+  retargetModalReturnFocusWithin(
+    surface,
+    focusTargetInSurface(fallbackSurface),
+    (target) => surfaceOwnsActiveElement(surface, target),
+  );
 }
 
 export interface AppShellProps
@@ -541,12 +548,19 @@ export function AppShell({
       surfaceOwnsActiveElement(mainRef.current, activeElement) ||
       surfaceOwnsActiveElement(sidePanelRef.current, activeElement) ||
       surfaceOwnsActiveElement(bottomPanelRef.current, activeElement);
+    const blockSurface = (
+      surface: HTMLElement | null,
+      fallbackSurface: HTMLElement | null,
+    ) => {
+      retargetModalFocusFromSurface(surface, fallbackSurface);
+      notifySurfaceBlocked(surface);
+    };
     if (sidebarModalOpen && !wasSidebarModalOpen) {
-      notifySurfaceBlocked(mainRef.current);
-      notifySurfaceBlocked(sidePanelRef.current);
-      notifySurfaceBlocked(bottomPanelRef.current);
+      blockSurface(mainRef.current, sidebarRef.current);
+      blockSurface(sidePanelRef.current, sidebarRef.current);
+      blockSurface(bottomPanelRef.current, sidebarRef.current);
     } else if (sidePanelModalOpen && !wasSidePanelModalOpen) {
-      notifySurfaceBlocked(mainRef.current);
+      blockSurface(mainRef.current, sidePanelRef.current);
     }
 
     if (
