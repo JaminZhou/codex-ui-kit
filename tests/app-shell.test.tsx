@@ -121,6 +121,28 @@ describe("application shell", () => {
     expect(shell.hasAttribute("data-side-panel-open")).toBe(false);
   });
 
+  it("does not infer open state from panel callbacks", () => {
+    render(
+      <AppShell
+        onSidePanelOpenChange={() => undefined}
+        onSidebarOpenChange={() => undefined}
+        sidePanel={<button type="button">Sources</button>}
+        sidebar={<button type="button">Projects</button>}
+      >
+        Thread
+      </AppShell>,
+    );
+
+    for (const label of ["App navigation", "Workspace panel"]) {
+      const surface = document.querySelector(`[aria-label="${label}"]`)!;
+      expect(surface.getAttribute("aria-hidden")).toBe("true");
+      expect(surface.hasAttribute("inert")).toBe(true);
+    }
+    const shell = document.querySelector(".codex-ui-app-shell")!;
+    expect(shell.hasAttribute("data-sidebar-open")).toBe(false);
+    expect(shell.hasAttribute("data-side-panel-open")).toBe(false);
+  });
+
   it("restores focus when a shell surface hides the active control", () => {
     function FocusRestorationFixture() {
       const [sidePanelOpen, setSidePanelOpen] = useState(false);

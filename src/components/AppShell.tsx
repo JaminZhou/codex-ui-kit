@@ -206,10 +206,10 @@ export function AppShell({
   onSidebarOpenChange,
   sidePanel,
   sidePanelLabel = "Workspace panel",
-  sidePanelOpen = Boolean(sidePanel && onSidePanelOpenChange),
+  sidePanelOpen = false,
   sidebar,
   sidebarLabel = "App navigation",
-  sidebarOpen = Boolean(sidebar && onSidebarOpenChange),
+  sidebarOpen = false,
   ...props
 }: AppShellProps) {
   const bottomPanelRef = useRef<HTMLElement>(null);
