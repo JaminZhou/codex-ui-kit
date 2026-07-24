@@ -189,16 +189,46 @@ function useAppShellLayoutMode(
   return layoutMode;
 }
 
+const shellFocusableSelector =
+  'button:not([disabled]):not([tabindex="-1"]), [href]:not([tabindex="-1"]), input:not([disabled]):not([type="hidden"]):not([tabindex="-1"]), select:not([disabled]):not([tabindex="-1"]), textarea:not([disabled]):not([tabindex="-1"]), [tabindex]:not([tabindex="-1"])';
+
+function shellFocusTargetIsVisible(target: HTMLElement) {
+  if (target.closest('[hidden], [inert], [aria-hidden="true"]')) {
+    return false;
+  }
+  let candidate: HTMLElement | null = target;
+  while (candidate) {
+    const style = getComputedStyle(candidate);
+    if (
+      style.display === "none" ||
+      style.visibility === "hidden" ||
+      style.visibility === "collapse"
+    ) {
+      return false;
+    }
+    candidate = candidate.parentElement;
+  }
+  return true;
+}
+
+function focusTargetsInSurface(surface: HTMLElement | null) {
+  if (!surface) return [];
+  const targets = [
+    ...surface.querySelectorAll<HTMLElement>(shellFocusableSelector),
+  ].filter(shellFocusTargetIsVisible);
+  if (shellFocusTargetIsVisible(surface)) targets.push(surface);
+  return targets;
+}
+
 function focusFirstInSurface(surface: HTMLElement | null) {
-  focusTargetInSurface(surface)?.focus();
+  for (const target of focusTargetsInSurface(surface)) {
+    target.focus();
+    if (document.activeElement === target) return;
+  }
 }
 
 function focusTargetInSurface(surface: HTMLElement | null) {
-  return (
-    surface?.querySelector<HTMLElement>(
-      'button:not([disabled]):not([tabindex="-1"]), [href]:not([tabindex="-1"]), input:not([disabled]):not([type="hidden"]):not([tabindex="-1"]), select:not([disabled]):not([tabindex="-1"]), textarea:not([disabled]):not([tabindex="-1"]), [tabindex]:not([tabindex="-1"])',
-    ) ?? surface
-  );
+  return focusTargetsInSurface(surface)[0] ?? null;
 }
 
 function surfaceOwnsActiveElement(

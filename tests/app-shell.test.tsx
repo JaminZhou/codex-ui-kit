@@ -1180,7 +1180,17 @@ describe("application shell", () => {
 
     render(
       <AppShell
-        sidePanel={<button type="button">Sources</button>}
+        sidePanel={
+          <>
+            <button hidden type="button">
+              Hidden source
+            </button>
+            <div aria-hidden="true">
+              <button type="button">Aria-hidden source</button>
+            </div>
+            <button type="button">Sources</button>
+          </>
+        }
         sidePanelOpen
       >
         <button type="button">Composer</button>
