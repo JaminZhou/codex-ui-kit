@@ -294,6 +294,11 @@ export function AppShell({
   const sidebarFocusFallbackRef = sidePanelModalOpen
     ? sidePanelRef
     : mainRef;
+  const bottomPanelFocusFallbackRef = sidebarModalOpen
+    ? sidebarRef
+    : sidePanelModalOpen
+      ? sidePanelRef
+      : mainRef;
 
   useSurfaceFocusRestoration(
     sidebarOpen,
@@ -307,7 +312,11 @@ export function AppShell({
     mainRef,
     sidePanelBackdropRef,
   );
-  useSurfaceFocusRestoration(bottomPanelOpen, bottomPanelRef, mainRef);
+  useSurfaceFocusRestoration(
+    bottomPanelOpen,
+    bottomPanelRef,
+    bottomPanelFocusFallbackRef,
+  );
   useEffect(() => {
     if (!responsiveModalOpen || typeof document === "undefined") return;
 

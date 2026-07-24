@@ -1106,6 +1106,75 @@ describe("application shell", () => {
     );
   });
 
+  it("restores bottom-panel focus to an open responsive side panel", () => {
+    let resize: ((width: number) => void) | undefined;
+    class ResizeObserverMock {
+      constructor(
+        private readonly callback: ResizeObserverCallback,
+      ) {}
+
+      disconnect() {}
+
+      observe(target: Element) {
+        if (!target.classList.contains("codex-ui-app-shell")) return;
+        resize = (width) =>
+          this.callback(
+            [
+              {
+                contentRect: { width },
+                target,
+              } as ResizeObserverEntry,
+            ],
+            this as unknown as ResizeObserver,
+          );
+      }
+
+      unobserve() {}
+    }
+    vi.stubGlobal("ResizeObserver", ResizeObserverMock);
+
+    function BottomPanelFixture() {
+      const [bottomPanelOpen, setBottomPanelOpen] = useState(true);
+      return (
+        <AppShell
+          bottomPanel={
+            <button
+              onClick={() => setBottomPanelOpen(false)}
+              type="button"
+            >
+              Close terminal
+            </button>
+          }
+          bottomPanelOpen={bottomPanelOpen}
+          sidePanel={<button type="button">Sources</button>}
+          sidePanelOpen
+        >
+          <button type="button">Composer</button>
+        </AppShell>
+      );
+    }
+
+    render(<BottomPanelFixture />);
+    act(() => resize?.(1_000));
+    const sidePanelControl = screen.getByRole("button", {
+      name: "Sources",
+    });
+    expect(document.activeElement).toBe(sidePanelControl);
+
+    const closeBottomPanel = screen.getByRole("button", {
+      name: "Close terminal",
+    });
+    closeBottomPanel.focus();
+    fireEvent.click(closeBottomPanel);
+
+    expect(document.activeElement).toBe(sidePanelControl);
+    expect(
+      screen
+        .getByRole("main", { name: "Conversation" })
+        .hasAttribute("inert"),
+    ).toBe(true);
+  });
+
   it("makes backdrop-covered content inert at responsive breakpoints", () => {
     let resize: ((width: number) => void) | undefined;
     class ResizeObserverMock {
