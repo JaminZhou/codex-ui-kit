@@ -848,6 +848,8 @@ describe("application shell", () => {
           <AppShell
             sidePanel={<button type="button">Sources</button>}
             sidePanelOpen
+            sidebar={<button type="button">Projects</button>}
+            sidebarOpen
           >
             Thread
           </AppShell>
@@ -886,6 +888,9 @@ describe("application shell", () => {
     await waitFor(() =>
       expect(document.activeElement).toBe(trigger),
     );
+
+    act(() => resize?.(700));
+    expect(document.activeElement).toBe(trigger);
   });
 
   it("makes backdrop-covered content inert at responsive breakpoints", () => {
