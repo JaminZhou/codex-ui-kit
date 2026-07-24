@@ -169,20 +169,25 @@ describe("application shell", () => {
     }
     vi.stubGlobal("ResizeObserver", ResizeObserverMock);
 
-    render(
-      <AppShell
-        bottomPanel={<button type="button">Terminal</button>}
-        bottomPanelOpen
-        onSidePanelOpenChange={() => undefined}
-        onSidebarOpenChange={() => undefined}
-        sidePanel={<button type="button">Sources</button>}
-        sidePanelOpen
-        sidebar={<button type="button">Projects</button>}
-        sidebarOpen
-      >
-        <button type="button">Composer</button>
-      </AppShell>,
-    );
+    function ResponsiveFixture() {
+      const [sidebarOpen, setSidebarOpen] = useState(true);
+      return (
+        <AppShell
+          bottomPanel={<button type="button">Terminal</button>}
+          bottomPanelOpen
+          onSidePanelOpenChange={() => undefined}
+          onSidebarOpenChange={setSidebarOpen}
+          sidePanel={<button type="button">Sources</button>}
+          sidePanelOpen
+          sidebar={<button type="button">Projects</button>}
+          sidebarOpen={sidebarOpen}
+        >
+          <button type="button">Composer</button>
+        </AppShell>
+      );
+    }
+
+    render(<ResponsiveFixture />);
 
     const composer = screen.getByRole("button", { name: "Composer" });
     composer.focus();
@@ -219,6 +224,15 @@ describe("application shell", () => {
     ).toBe(true);
     expect(document.activeElement).toBe(
       screen.getByRole("button", { name: "Projects" }),
+    );
+
+    const sidebarBackdrop = screen.getByRole("button", {
+      name: "Close navigation sidebar",
+    });
+    sidebarBackdrop.focus();
+    fireEvent.click(sidebarBackdrop);
+    expect(document.activeElement).toBe(
+      screen.getByRole("button", { name: "Sources" }),
     );
   });
 });

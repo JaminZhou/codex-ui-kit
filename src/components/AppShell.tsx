@@ -100,7 +100,11 @@ function useSurfaceFocusRestoration(
         !returnFocus.closest('[inert], [aria-hidden="true"]')
           ? returnFocus
           : fallbackRef.current;
-      target?.focus();
+      if (target === fallbackRef.current) {
+        focusFirstInSurface(target);
+      } else {
+        target?.focus();
+      }
     }
 
     previouslyOpenRef.current = open;
@@ -226,11 +230,14 @@ export function AppShell({
     layoutMode !== "wide" &&
     !sidebarModalOpen;
   const mainBlocked = sidebarModalOpen || sidePanelModalOpen;
+  const sidebarFocusFallbackRef = sidePanelModalOpen
+    ? sidePanelRef
+    : mainRef;
 
   useSurfaceFocusRestoration(
     sidebarOpen,
     sidebarRef,
-    mainRef,
+    sidebarFocusFallbackRef,
     sidebarBackdropRef,
   );
   useSurfaceFocusRestoration(
