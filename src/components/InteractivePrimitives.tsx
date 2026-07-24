@@ -27,6 +27,7 @@ import { OverlayEnvironmentContext } from "../internal/overlayEnvironment.js";
 import {
   getBlockedSurface,
   surfaceBlockedEventName,
+  useSurfaceBlockState,
 } from "../internal/surfaceBlocked.js";
 
 export type ControlTone =
@@ -270,6 +271,8 @@ function FloatingSurface({
   width,
 }: FloatingSurfaceProps) {
   const overlayEnvironment = useContext(OverlayEnvironmentContext);
+  const { portalsBlocked } = useSurfaceBlockState();
+  const visible = open && !portalsBlocked;
   const internalRef = useRef<HTMLDivElement | null>(null);
   const [surfaceNode, setSurfaceNode] = useState<HTMLDivElement | null>(null);
   const [position, setPosition] = useState<{
@@ -360,27 +363,34 @@ function FloatingSurface({
   }, [align, anchorRef, overlayEnvironment.theme, side, sideOffset]);
 
   useLayoutEffect(() => {
-    if (!open) {
+    if (!visible) {
       setPosition(null);
       return;
     }
     updatePosition();
-  }, [children, open, position?.triggerWidth, surfaceNode, updatePosition, width]);
+  }, [
+    children,
+    position?.triggerWidth,
+    surfaceNode,
+    updatePosition,
+    visible,
+    width,
+  ]);
 
   useEffect(() => {
-    if (!open || typeof window === "undefined") return;
+    if (!visible || typeof window === "undefined") return;
     window.addEventListener("resize", updatePosition);
     window.addEventListener("scroll", updatePosition, true);
     return () => {
       window.removeEventListener("resize", updatePosition);
       window.removeEventListener("scroll", updatePosition, true);
     };
-  }, [open, updatePosition]);
+  }, [updatePosition, visible]);
 
   useEffect(() => {
     const anchor = anchorRef.current;
     if (
-      !open ||
+      !visible ||
       !anchor ||
       !surfaceNode ||
       typeof ResizeObserver === "undefined"
@@ -391,9 +401,9 @@ function FloatingSurface({
     observer.observe(anchor);
     observer.observe(surfaceNode);
     return () => observer.disconnect();
-  }, [anchorRef, open, surfaceNode, updatePosition]);
+  }, [anchorRef, surfaceNode, updatePosition, visible]);
 
-  if (!open || typeof document === "undefined") return null;
+  if (!visible || typeof document === "undefined") return null;
   return createPortal(
     <div
       aria-label={label}
@@ -464,14 +474,16 @@ export function Tooltip({
     onOpenChange,
     open,
   });
-  const effectiveOpen = resolvedOpen && !disabled;
+  const { blocked: surfaceBlocked, portalsBlocked } =
+    useSurfaceBlockState();
+  const effectiveOpen = resolvedOpen && !disabled && !portalsBlocked;
 
   useEffect(() => {
-    if (disabled && resolvedOpen) {
+    if ((disabled || surfaceBlocked) && resolvedOpen) {
       clearTimer();
       setOpen(false);
     }
-  }, [disabled, resolvedOpen, setOpen]);
+  }, [disabled, resolvedOpen, setOpen, surfaceBlocked]);
 
   const clearTimer = () => {
     if (timerRef.current !== null && typeof window !== "undefined") {
@@ -589,13 +601,16 @@ export function Popover({
     onOpenChange,
     open,
   });
+  const { blocked: surfaceBlocked, portalsBlocked } =
+    useSurfaceBlockState();
   const triggerNode = Children.only(trigger);
   const nativeDisabled = disabled || Boolean(triggerNode.props.disabled);
-  const effectiveOpen = resolvedOpen && !nativeDisabled;
+  const effectiveOpen =
+    resolvedOpen && !nativeDisabled && !portalsBlocked;
 
   useEffect(() => {
-    if (nativeDisabled && resolvedOpen) setOpen(false);
-  }, [nativeDisabled, resolvedOpen, setOpen]);
+    if ((nativeDisabled || surfaceBlocked) && resolvedOpen) setOpen(false);
+  }, [nativeDisabled, resolvedOpen, setOpen, surfaceBlocked]);
 
   const close = useCallback(
     (restoreFocus = false) => {
@@ -925,7 +940,9 @@ export function MenuSubmenu({
   const closeTimerRef = useRef<number | null>(null);
   const focusOnOpenRef = useRef(false);
   const [open, setOpen] = useState(false);
-  const effectiveOpen = open && !disabled;
+  const { blocked: surfaceBlocked, portalsBlocked } =
+    useSurfaceBlockState();
+  const effectiveOpen = open && !disabled && !portalsBlocked;
   const clearCloseTimer = () => {
     if (closeTimerRef.current !== null && typeof window !== "undefined") {
       window.clearTimeout(closeTimerRef.current);
@@ -939,12 +956,12 @@ export function MenuSubmenu({
   };
   useEffect(() => () => clearCloseTimer(), []);
   useEffect(() => {
-    if (disabled && open) {
+    if ((disabled || surfaceBlocked) && open) {
       clearCloseTimer();
       focusOnOpenRef.current = false;
       setOpen(false);
     }
-  }, [disabled, open]);
+  }, [disabled, open, surfaceBlocked]);
   useEffect(() => {
     if (!effectiveOpen || !focusOnOpenRef.current || typeof window === "undefined") {
       return;

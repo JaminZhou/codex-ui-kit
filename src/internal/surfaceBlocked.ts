@@ -1,3 +1,23 @@
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
+
+export const SurfaceBlockedContext = createContext(false);
+
+export function useSurfaceBlockState() {
+  const blocked = useContext(SurfaceBlockedContext);
+  const [portalsBlocked, setPortalsBlocked] = useState(blocked);
+
+  useEffect(() => {
+    setPortalsBlocked(blocked);
+  }, [blocked]);
+
+  return { blocked, portalsBlocked };
+}
+
 export const surfaceBlockedEventName = "codex-ui:surface-blocked";
 
 export function getBlockedSurface(event: Event) {

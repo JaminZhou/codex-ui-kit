@@ -152,6 +152,77 @@ describe("application shell", () => {
     );
   });
 
+  it("suppresses portals mounted after their surface is blocked", async () => {
+    let resize: ((width: number) => void) | undefined;
+    class ResizeObserverMock {
+      constructor(
+        private readonly callback: ResizeObserverCallback,
+      ) {}
+
+      disconnect() {}
+
+      observe(target: Element) {
+        if (!target.classList.contains("codex-ui-app-shell")) return;
+        resize = (width) =>
+          this.callback(
+            [
+              {
+                contentRect: { width },
+                target,
+              } as ResizeObserverEntry,
+            ],
+            this as unknown as ResizeObserver,
+          );
+      }
+
+      unobserve() {}
+    }
+    vi.stubGlobal("ResizeObserver", ResizeObserverMock);
+    const onOpenChange = vi.fn();
+
+    function LatePortalFixture() {
+      const [showPopover, setShowPopover] = useState(false);
+      return (
+        <>
+          <button
+            onClick={() => setShowPopover(true)}
+            type="button"
+          >
+            Mount main popover
+          </button>
+          <AppShell
+            sidePanel={<button type="button">Sources</button>}
+            sidePanelOpen
+          >
+            {showPopover ? (
+              <Popover
+                defaultOpen
+                label="Late actions"
+                onOpenChange={onOpenChange}
+                trigger={<button type="button">Late actions</button>}
+              >
+                <button type="button">Leaked action</button>
+              </Popover>
+            ) : null}
+          </AppShell>
+        </>
+      );
+    }
+
+    render(<LatePortalFixture />);
+    act(() => resize?.(1_000));
+    fireEvent.click(
+      screen.getByRole("button", { name: "Mount main popover" }),
+    );
+
+    await waitFor(() =>
+      expect(onOpenChange).toHaveBeenCalledWith(false),
+    );
+    expect(
+      screen.queryByRole("button", { name: "Leaked action" }),
+    ).toBeNull();
+  });
+
   it("does not infer open state from panel callbacks", () => {
     render(
       <AppShell

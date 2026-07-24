@@ -16,7 +16,10 @@ import {
   type ModalLockHandle,
 } from "../internal/documentScrollLock.js";
 import { inertWhen } from "../internal/inert.js";
-import { notifySurfaceBlocked } from "../internal/surfaceBlocked.js";
+import {
+  notifySurfaceBlocked,
+  SurfaceBlockedContext,
+} from "../internal/surfaceBlocked.js";
 import { IconButton } from "./InteractivePrimitives.js";
 
 function CloseIcon() {
@@ -450,7 +453,9 @@ export function AppShell({
           ref={sidebarRef}
           tabIndex={-1}
         >
-          {sidebar}
+          <SurfaceBlockedContext.Provider value={!sidebarOpen}>
+            {sidebar}
+          </SurfaceBlockedContext.Provider>
         </aside>
         {onSidebarOpenChange ? (
           <button
@@ -471,7 +476,9 @@ export function AppShell({
           role={mainRole}
           tabIndex={-1}
         >
-          {children}
+          <SurfaceBlockedContext.Provider value={mainBlocked}>
+            {children}
+          </SurfaceBlockedContext.Provider>
         </div>
         {onSidePanelOpenChange ? (
           <button
@@ -492,7 +499,11 @@ export function AppShell({
           ref={sidePanelRef}
           tabIndex={-1}
         >
-          {sidePanel}
+          <SurfaceBlockedContext.Provider
+            value={!sidePanelOpen || sidebarModalOpen}
+          >
+            {sidePanel}
+          </SurfaceBlockedContext.Provider>
         </aside>
         <section
           aria-hidden={!bottomPanelOpen || sidebarModalOpen}
@@ -501,7 +512,11 @@ export function AppShell({
           inert={inertWhen(!bottomPanelOpen || sidebarModalOpen)}
           ref={bottomPanelRef}
         >
-          {bottomPanel}
+          <SurfaceBlockedContext.Provider
+            value={!bottomPanelOpen || sidebarModalOpen}
+          >
+            {bottomPanel}
+          </SurfaceBlockedContext.Provider>
         </section>
       </div>
     </div>
