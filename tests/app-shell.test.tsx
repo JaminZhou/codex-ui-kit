@@ -385,6 +385,63 @@ describe("application shell", () => {
     );
   });
 
+  it("closes a topmost responsive workspace panel on Escape", () => {
+    let resize: ((width: number) => void) | undefined;
+    class ResizeObserverMock {
+      constructor(
+        private readonly callback: ResizeObserverCallback,
+      ) {}
+
+      disconnect() {}
+
+      observe(target: Element) {
+        if (!target.classList.contains("codex-ui-app-shell")) return;
+        resize = (width) =>
+          this.callback(
+            [
+              {
+                contentRect: { width },
+                target,
+              } as ResizeObserverEntry,
+            ],
+            this as unknown as ResizeObserver,
+          );
+      }
+
+      unobserve() {}
+    }
+    vi.stubGlobal("ResizeObserver", ResizeObserverMock);
+
+    function EscapeFixture() {
+      const [sidePanelOpen, setSidePanelOpen] = useState(true);
+      return (
+        <AppShell
+          onSidePanelOpenChange={setSidePanelOpen}
+          sidePanel={<button type="button">Sources</button>}
+          sidePanelOpen={sidePanelOpen}
+        >
+          <button type="button">Composer</button>
+        </AppShell>
+      );
+    }
+
+    render(<EscapeFixture />);
+    act(() => resize?.(1_000));
+    expect(document.activeElement).toBe(
+      screen.getByRole("button", { name: "Sources" }),
+    );
+    fireEvent.keyDown(document, { key: "Escape" });
+
+    expect(
+      document
+        .querySelector('[aria-label="Workspace panel"]')
+        ?.getAttribute("aria-hidden"),
+    ).toBe("true");
+    expect(document.activeElement).toBe(
+      screen.getByRole("button", { name: "Composer" }),
+    );
+  });
+
   it("blocks content covered by an explicit handler-free overlay", () => {
     let resize: ((width: number) => void) | undefined;
     class ResizeObserverMock {
@@ -749,10 +806,12 @@ describe("application shell", () => {
 
     function DialogFixture() {
       const [dialogOpen, setDialogOpen] = useState(true);
+      const [sidebarOpen, setSidebarOpen] = useState(true);
       return (
         <AppShell
+          onSidebarOpenChange={setSidebarOpen}
           sidebar={<button type="button">Projects</button>}
-          sidebarOpen
+          sidebarOpen={sidebarOpen}
         >
           <Dialog
             onOpenChange={setDialogOpen}
@@ -794,12 +853,31 @@ describe("application shell", () => {
     });
     fireEvent.click(dialogOption);
     dialogAction.focus();
-    fireEvent.click(dialogAction);
+    fireEvent.keyDown(dialogAction, { key: "Escape" });
+    await waitFor(() =>
+      expect(
+        screen.queryByRole("dialog", { name: "Confirm action" }),
+      ).toBeNull(),
+    );
+    expect(
+      document
+        .querySelector('[aria-label="App navigation"]')
+        ?.getAttribute("aria-hidden"),
+    ).toBe("false");
     await waitFor(() =>
       expect(document.activeElement).toBe(
         screen.getByRole("button", { name: "Projects" }),
       ),
     );
+    fireEvent.keyDown(
+      screen.getByRole("button", { name: "Projects" }),
+      { key: "Escape" },
+    );
+    expect(
+      document
+        .querySelector('[aria-label="App navigation"]')
+        ?.getAttribute("aria-hidden"),
+    ).toBe("true");
     expect(document.body.style.overflow).toBe("");
   });
 

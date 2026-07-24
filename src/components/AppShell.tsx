@@ -439,6 +439,35 @@ export function AppShell({
     };
   }, [responsiveModalOpen]);
   useEffect(() => {
+    if (!responsiveModalOpen || typeof document === "undefined") return;
+    const dismissResponsiveModal = (event: globalThis.KeyboardEvent) => {
+      if (
+        event.key !== "Escape" ||
+        event.defaultPrevented ||
+        !responsiveModalLockRef.current?.isTop()
+      ) {
+        return;
+      }
+      const dismiss = sidebarModalOpen
+        ? onSidebarOpenChange
+        : sidePanelModalOpen
+          ? onSidePanelOpenChange
+          : undefined;
+      if (!dismiss) return;
+      event.preventDefault();
+      dismiss(false);
+    };
+    document.addEventListener("keydown", dismissResponsiveModal);
+    return () =>
+      document.removeEventListener("keydown", dismissResponsiveModal);
+  }, [
+    onSidePanelOpenChange,
+    onSidebarOpenChange,
+    responsiveModalOpen,
+    sidePanelModalOpen,
+    sidebarModalOpen,
+  ]);
+  useEffect(() => {
     if (typeof document === "undefined") return;
     const activeElement =
       document.activeElement instanceof HTMLElement
