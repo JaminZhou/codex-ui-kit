@@ -208,6 +208,79 @@ code {
   padding: 1.5rem;
 }
 
+.app-shell-preview {
+  border: 1px solid var(--codex-ui-border);
+  border-radius: var(--codex-ui-radius-xl);
+  height: 40rem;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.app-shell-preview > .codex-ui-app-shell {
+  height: 100%;
+}
+
+.app-shell-preview .codex-ui-app-sidebar__header strong {
+  font-size: var(--codex-ui-font-size-sm);
+  padding-inline: calc(var(--codex-ui-spacing) * 2);
+}
+
+.app-shell-preview__conversation {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+}
+
+.app-shell-preview__conversation > .codex-ui-thread-header {
+  flex: 0 0 var(--codex-ui-toolbar-height);
+}
+
+.app-shell-preview__conversation > .codex-ui-thread-viewport {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.app-shell-preview__conversation .codex-ui-thread {
+  min-height: 18rem;
+}
+
+.app-shell-preview__composer {
+  background: linear-gradient(
+    to bottom,
+    transparent,
+    var(--codex-ui-background-surface) 1.5rem
+  );
+  padding: 1.5rem 1.5rem 1rem;
+}
+
+.app-shell-preview__panel-content {
+  min-height: 100%;
+  padding: calc(var(--codex-ui-spacing) * 4);
+}
+
+.app-shell-preview__terminal {
+  background: var(--codex-ui-background-surface-under);
+  color: var(--codex-ui-text);
+  display: grid;
+  font-family: var(--codex-ui-font-mono);
+  font-size: var(--codex-ui-font-size-xs);
+  grid-template-columns: max-content minmax(0, 1fr);
+  height: 100%;
+  line-height: var(--codex-ui-line-height-code);
+  padding: calc(var(--codex-ui-spacing) * 3);
+}
+
+.app-shell-preview__terminal textarea {
+  background: transparent;
+  border: 0;
+  color: inherit;
+  font: inherit;
+  min-height: 2rem;
+  outline: none;
+  resize: none;
+}
+
 .thread-preview {
   border: 1px solid var(--codex-ui-border);
   border-radius: var(--codex-ui-radius-xl);

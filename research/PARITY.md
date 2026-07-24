@@ -1,103 +1,65 @@
-# Codex component parity matrix
+# Coverage and parity policy
 
-This matrix defines completion for the component library. A foundation release,
-a passing build, or a locally complete primitive does not make the project
-complete. Each surface must reach component, state, visual-token, browser, and
-Electron parity against the locked sampled build.
+This document no longer claims that the repository has complete Codex Desktop
+parity. The previous matrix covered a selected conversation sample and could
+not establish full conversation, workspace, application, or product coverage.
 
-## Baseline
+The authoritative current-build inventory is:
 
-- Current sample: Codex Desktop `26.715.31925` (`5551`).
-- Current Renderer archive hash:
-  `0c9dd677134340cb944e7642b8bc2504c7b73c7dc334d9d756547858171eea41`.
-- Current runtime declaration: Electron `42.3.0`, React Renderer, Vite build,
-  packaged for the Owl production runtime.
-- The original measured geometry baseline remains `26.707.72221`; the shared
-  conversation stylesheet is byte-identical in the current sample. Current
-  terminology and lifecycle continuity are locked in `26.715.31925.md`.
-- Raw extracted files remain outside the repository.
+- [`26.715.72359.md`](26.715.72359.md) for the sampled package facts and
+  research boundary;
+- [`UI_INVENTORY.md`](UI_INVENTORY.md) for classification, evidence levels,
+  priorities, and delivery order;
+- [`ui-inventory.json`](ui-inventory.json) for machine-checked surface status;
+- [`RUNTIME_CAPTURE.md`](RUNTIME_CAPTURE.md) for the required runtime flow and
+  state evidence.
 
-## Completion gates
+## Current conclusion
 
-A row is complete only when all applicable gates pass:
+- Existing React primitives cover parts of the message, activity, composer,
+  resource, approval, overlay, and thread-navigation vocabulary.
+- The showcase proves only those implemented examples; it is not a complete
+  Codex conversation or application reconstruction.
+- The Electron playground validates the current package in a desktop
+  BrowserWindow; it does not prove parity with unobserved product routes,
+  panels, state transitions, or window types.
+- Computer Use exploration is blocked by the environment safety policy for
+  `com.openai.codex`. A user-authorized CDP sample provides scoped runtime
+  evidence for a blank project chat, command success/failure/long-output,
+  queue and stop states, Markdown content, Sources and terminal panels,
+  portalled menus, Review and Environment panels, global PR/Sites/Scheduled/
+  Plugins/Skills routes, and selected Settings sections; all other package
+  candidates remain runtime-unobserved.
+- Renderer viewport probing exposed a narrow-layout gap: the thread and
+  Composer shrink, but the fixed app sidebar remains and the right workspace
+  panel can be laid out beyond the simulated viewport. Native Electron window
+  resizing remains a separate acceptance requirement.
+- npm publication remains out of scope until the agreed P0/P1 coverage and
+  release acceptance surfaces are complete.
 
-1. Public React API covers every observed state without protocol coupling.
-2. DOM semantics and keyboard behavior match the observed interaction.
-3. Namespaced tokens reproduce measured light, dark, spacing, type, radius,
-   border, shadow, and motion roles.
-4. The H5 showcase demonstrates the full state matrix.
-5. The Electron playground verifies desktop theme, font fallback, scrolling,
-   resizing, focus, and rendered geometry.
-6. Automated tests and package-consumer checks protect the contract.
-7. The browser showcase has no automated WCAG A/AA/2.2 violations at the
-   desktop light, desktop dark, and compact light acceptance viewports;
-   indeterminate gradient/overlap results receive manual visual review.
+## Completion gate
 
-## Accessibility overrides
+A surface can be described as verified only when all applicable evidence
+exists:
 
-Parity describes the observed interaction model, states, and visual hierarchy;
-it does not require preserving sampled values that fail the public component
-library's accessibility contract. The independent implementation therefore
-uses two documented minimums:
+1. The current installed build and package fingerprint are recorded.
+2. The surface is reached in the running application through an allowed
+   observation method.
+3. Its ownership, trigger, lifecycle, composition, states, and responsive
+   behavior are recorded.
+4. A protocol-neutral implementation exists with behavioral and accessibility
+   tests.
+5. The H5 acceptance flow matches the observation.
+6. The Electron acceptance flow matches the observation.
+7. Related surfaces and cross-layer transitions have been checked together.
 
-- Composer actions use a `32px` control target instead of the sampled `28px`.
-- User-message navigation keeps the sampled `30px × 2px` marker but expands
-  each invisible hit row from `10px` to `24px` high.
+Passing `pnpm check` means the implemented repository contracts are healthy.
+It does not expand the observed product denominator and must not be reported as
+product-level parity.
 
-Light-theme secondary, tertiary, status, accent, focus, and code-syntax colors
-also use independently selected solid values that preserve the sampled roles
-while meeting text or non-text contrast requirements. These values are public
-kit tokens, not extracted product assets.
+## Visual optimization
 
-## Surface matrix
-
-| Surface | Component/API | Visual parity | H5 states | Electron | Tests | Status |
-| --- | --- | --- | --- | --- | --- | --- |
-| Global tokens and themes | Complete | Measured core | Complete | Complete | Good | Complete |
-| Thread layout and turn spacing | Complete | Measured | Complete | Complete | Good | Complete |
-| User, assistant, and system messages | Complete | Measured | Complete | Complete | Good | Complete |
-| Markdown, inline code, code blocks, tables, and links | Complete | Measured | Complete | Complete | Good | Complete |
-| Activity rows and grouped work | Complete | Measured | Complete | Complete | Good | Complete |
-| Reasoning and plan states | Complete | Measured | Complete | Complete | Good | Complete |
-| Command execution and output | Complete | Measured | Complete | Complete | Good | Complete |
-| File changes and structured diffs | Complete | Measured | Complete | Complete | Good | Complete |
-| Search, web, MCP, and connector calls | Complete | Measured | Complete | Complete | Good | Complete |
-| Subagent and delegated work | Complete | Measured | Complete | Complete | Good | Complete |
-| Approval and permission requests | Complete | Measured | Complete | Complete | Good | Complete |
-| Errors, warnings, notices, retry, and interruption | Complete | Measured | Complete | Complete | Good | Complete |
-| Composer shell and autosizing input | Complete | Measured | Complete | Complete | Good | Complete |
-| Composer attachments, mentions, modes, and queued prompts | Complete | Measured | Complete | Complete | Good | Complete |
-| Buttons, icon buttons, menus, tooltips, popovers, and selects | Complete | Measured | Complete | Complete | Good | Complete |
-| Resource cards, citations, images, and artifacts | Complete | Measured | Complete | Complete | Good | Complete |
-| Thread header, floating controls, and navigation affordances | Complete | Measured | Complete | Complete | Good | Complete |
-| Loading, streaming, skeleton, hover, focus, and reduced motion | Complete | Measured | Complete | Complete | Good | Complete |
-| Context compaction, conversation optimization, and handoff warning | Complete | Measured core | Complete | Complete | Good | Complete |
-| Compact modal continuation choice | Complete | Measured core | Complete | Complete | Good | Complete |
-| Responsive and narrow-window behavior | Complete | Measured | Complete | Complete | Good | Complete |
-| Package tokens, CSS exports, documentation, and provenance | Complete | Measured | N/A | N/A | Good | Complete |
-
-## Code parity closure
-
-- The H5 showcase covers every public state represented in this matrix and is
-  acceptance-checked at `1280x720` without horizontal overflow.
-- The Electron playground captures standard dark `1180x820` and compact light
-  `820x680` windows. Thread acceptance records both top/message and
-  bottom/loading state positions, including current context lifecycle states;
-  all capture output remains in `/private/tmp`.
-- The package contract checks root exports, stylesheet and token subpath
-  exports, generated declarations, packed file boundaries, and a standalone
-  TypeScript consumer.
-- `SOURCES.md`, `research/README.md`, and the sampled-build note preserve the
-  clean-room provenance and asset/IPC boundaries. No extracted Renderer files
-  are tracked.
-
-## Stop rule
-
-The implementation loop stops only when every in-scope row is complete, the
-showcase and Electron screenshots have no material visual discrepancy at the
-agreed viewport matrix, CI is green, review threads are resolved, and the
-public package/open-source release decision has been completed explicitly.
-
-Bundled OpenAI fonts, logos, sounds, illustrations, and private IPC are not
-redistributed. Those asset boundaries do not reduce the required parity of the
-independently implemented component geometry, tokens, states, or behavior.
+H5 and Electron are used continuously as functional acceptance surfaces.
+Final visual optimization is deliberately scheduled after the inventory,
+component contracts, page compositions, and state transitions stabilize.
+This avoids polishing a narrow or soon-to-be-replaced structure.
