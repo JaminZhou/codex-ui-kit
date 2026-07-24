@@ -93,7 +93,9 @@ function useSurfaceFocusRestoration(
 
     if (!wasOpen && open) {
       returnFocusRef.current =
-        activeElement && !surfaceRef.current?.contains(activeElement)
+        activeElement &&
+        activeElement !== document.body &&
+        !surfaceRef.current?.contains(activeElement)
           ? activeElement
           : null;
     }
@@ -115,6 +117,7 @@ function useSurfaceFocusRestoration(
       const returnFocus = returnFocusRef.current;
       const canTryReturnFocus =
         returnFocus?.isConnected &&
+        returnFocus !== document.body &&
         !returnFocus.closest('[inert], [aria-hidden="true"]')
           ? returnFocus
           : null;

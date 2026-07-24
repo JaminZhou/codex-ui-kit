@@ -349,6 +349,42 @@ describe("application shell", () => {
     );
   });
 
+  it("uses the fallback when a panel opens without a focusable opener", () => {
+    let openPanel: () => void = () => undefined;
+    function ProgrammaticPanelFixture() {
+      const [sidePanelOpen, setSidePanelOpen] = useState(false);
+      openPanel = () => setSidePanelOpen(true);
+      return (
+        <AppShell
+          sidePanel={
+            <button
+              onClick={() => setSidePanelOpen(false)}
+              type="button"
+            >
+              Close sources
+            </button>
+          }
+          sidePanelOpen={sidePanelOpen}
+        >
+          <button type="button">Composer</button>
+        </AppShell>
+      );
+    }
+
+    render(<ProgrammaticPanelFixture />);
+    expect(document.activeElement).toBe(document.body);
+    act(() => openPanel());
+    const closer = screen.getByRole("button", {
+      name: "Close sources",
+    });
+    closer.focus();
+    fireEvent.click(closer);
+
+    expect(document.activeElement).toBe(
+      screen.getByRole("button", { name: "Composer" }),
+    );
+  });
+
   it("blocks content covered by an explicit handler-free overlay", () => {
     let resize: ((width: number) => void) | undefined;
     class ResizeObserverMock {
