@@ -206,10 +206,10 @@ export function AppShell({
   onSidebarOpenChange,
   sidePanel,
   sidePanelLabel = "Workspace panel",
-  sidePanelOpen = Boolean(sidePanel),
+  sidePanelOpen = Boolean(sidePanel && onSidePanelOpenChange),
   sidebar,
   sidebarLabel = "App navigation",
-  sidebarOpen = Boolean(sidebar),
+  sidebarOpen = Boolean(sidebar && onSidebarOpenChange),
   ...props
 }: AppShellProps) {
   const bottomPanelRef = useRef<HTMLElement>(null);
@@ -264,7 +264,8 @@ export function AppShell({
     }
     if (
       sidePanelModalOpen &&
-      !sidePanelRef.current?.contains(activeElement)
+      (mainRef.current?.contains(activeElement) ||
+        sidePanelBackdropRef.current === activeElement)
     ) {
       focusFirstInSurface(sidePanelRef.current);
     }

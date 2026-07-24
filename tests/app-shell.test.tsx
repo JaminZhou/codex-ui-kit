@@ -101,6 +101,26 @@ describe("application shell", () => {
     expect(onSidePanelOpenChange).toHaveBeenCalledWith(false);
   });
 
+  it("defaults handler-free responsive panels closed", () => {
+    render(
+      <AppShell
+        sidePanel={<button type="button">Sources</button>}
+        sidebar={<button type="button">Projects</button>}
+      >
+        Thread
+      </AppShell>,
+    );
+
+    for (const label of ["App navigation", "Workspace panel"]) {
+      const surface = document.querySelector(`[aria-label="${label}"]`)!;
+      expect(surface.getAttribute("aria-hidden")).toBe("true");
+      expect(surface.hasAttribute("inert")).toBe(true);
+    }
+    const shell = document.querySelector(".codex-ui-app-shell")!;
+    expect(shell.hasAttribute("data-sidebar-open")).toBe(false);
+    expect(shell.hasAttribute("data-side-panel-open")).toBe(false);
+  });
+
   it("restores focus when a shell surface hides the active control", () => {
     function FocusRestorationFixture() {
       const [sidePanelOpen, setSidePanelOpen] = useState(false);
@@ -210,6 +230,12 @@ describe("application shell", () => {
     expect(document.activeElement).toBe(
       screen.getByRole("button", { name: "Sources" }),
     );
+
+    const terminal = screen.getByRole("button", { name: "Terminal" });
+    act(() => resize?.(1_600));
+    terminal.focus();
+    act(() => resize?.(1_000));
+    expect(document.activeElement).toBe(terminal);
 
     screen
       .getByRole("button", { name: "Close workspace panel" })
