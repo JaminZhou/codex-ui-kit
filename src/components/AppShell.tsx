@@ -257,14 +257,15 @@ export function AppShell({
 
     if (
       sidebarModalOpen &&
-      [mainRef.current, sidePanelRef.current, bottomPanelRef.current].some(
-        (surface) => surface?.contains(activeElement),
-      )
+      !sidebarRef.current?.contains(activeElement)
     ) {
       focusFirstInSurface(sidebarRef.current);
       return;
     }
-    if (sidePanelModalOpen && mainRef.current?.contains(activeElement)) {
+    if (
+      sidePanelModalOpen &&
+      !sidePanelRef.current?.contains(activeElement)
+    ) {
       focusFirstInSurface(sidePanelRef.current);
     }
   }, [sidePanelModalOpen, sidebarModalOpen]);

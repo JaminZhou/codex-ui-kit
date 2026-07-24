@@ -211,6 +211,9 @@ describe("application shell", () => {
       screen.getByRole("button", { name: "Sources" }),
     );
 
+    screen
+      .getByRole("button", { name: "Close workspace panel" })
+      .focus();
     act(() => resize?.(700));
     expect(
       document

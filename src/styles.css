@@ -1304,7 +1304,7 @@
 }
 
 .codex-ui-menu-item__shortcut {
-  color: var(--codex-ui-text-tertiary);
+  color: var(--codex-ui-text-secondary);
   flex: 0 0 auto;
   font-family: var(--codex-ui-font-mono);
   font-size: var(--codex-ui-font-size-xs);
