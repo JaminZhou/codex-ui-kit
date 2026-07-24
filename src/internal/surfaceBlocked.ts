@@ -1,7 +1,7 @@
 import {
   createContext,
   useContext,
-  useEffect,
+  useLayoutEffect,
   useState,
 } from "react";
 
@@ -11,7 +11,7 @@ export function useSurfaceBlockState() {
   const blocked = useContext(SurfaceBlockedContext);
   const [portalsBlocked, setPortalsBlocked] = useState(blocked);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     setPortalsBlocked(blocked);
   }, [blocked]);
 
