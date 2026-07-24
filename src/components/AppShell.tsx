@@ -179,15 +179,17 @@ export function AppShell({
         >
           {sidebar}
         </aside>
-        <button
-          aria-label="Close navigation sidebar"
-          className="codex-ui-app-shell__backdrop"
-          data-backdrop="sidebar"
-          onClick={() => onSidebarOpenChange?.(false)}
-          ref={sidebarBackdropRef}
-          tabIndex={sidebarOpen ? 0 : -1}
-          type="button"
-        />
+        {onSidebarOpenChange ? (
+          <button
+            aria-label="Close navigation sidebar"
+            className="codex-ui-app-shell__backdrop"
+            data-backdrop="sidebar"
+            onClick={() => onSidebarOpenChange(false)}
+            ref={sidebarBackdropRef}
+            tabIndex={sidebarOpen ? 0 : -1}
+            type="button"
+          />
+        ) : null}
         <div
           aria-label={mainLabel}
           className="codex-ui-app-shell__main"
@@ -197,15 +199,17 @@ export function AppShell({
         >
           {children}
         </div>
-        <button
-          aria-label="Close workspace panel"
-          className="codex-ui-app-shell__backdrop"
-          data-backdrop="side-panel"
-          onClick={() => onSidePanelOpenChange?.(false)}
-          ref={sidePanelBackdropRef}
-          tabIndex={sidePanelOpen ? 0 : -1}
-          type="button"
-        />
+        {onSidePanelOpenChange ? (
+          <button
+            aria-label="Close workspace panel"
+            className="codex-ui-app-shell__backdrop"
+            data-backdrop="side-panel"
+            onClick={() => onSidePanelOpenChange(false)}
+            ref={sidePanelBackdropRef}
+            tabIndex={sidePanelOpen ? 0 : -1}
+            type="button"
+          />
+        ) : null}
         <aside
           aria-hidden={!sidePanelOpen}
           aria-label={sidePanelLabel}

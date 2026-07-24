@@ -29,6 +29,9 @@ describe("application shell visual contract", () => {
       '.codex-ui-app-shell__backdrop[data-backdrop="sidebar"]',
     );
     expect(styles).toContain("max-width: calc(100% - 3rem)");
+    expect(styles).toMatch(
+      /@media \(prefers-reduced-motion: reduce\) \{[\s\S]*?\.codex-ui-app-shell__sidebar,[\s\S]*?\.codex-ui-app-shell__side-panel \{[\s\S]*?transition: none/,
+    );
   });
 
   it("keeps panel tabs, content, and focus semantics explicit", () => {

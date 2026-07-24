@@ -6920,6 +6920,11 @@ button.codex-ui-generated-image-gallery__image {
     transition: none;
   }
 
+  .codex-ui-app-shell__sidebar,
+  .codex-ui-app-shell__side-panel {
+    transition: none;
+  }
+
   .codex-ui-composer-queue__row {
     transition: none;
   }

@@ -38,6 +38,12 @@ describe("application shell", () => {
       screen.getByRole("complementary", { name: "Workspace panel" }),
     ).toBeTruthy();
     expect(screen.getByRole("region", { name: "Bottom panel" })).toBeTruthy();
+    expect(
+      screen.queryByRole("button", { name: "Close navigation sidebar" }),
+    ).toBeNull();
+    expect(
+      screen.queryByRole("button", { name: "Close workspace panel" }),
+    ).toBeNull();
 
     rerender(
       <AppShell
