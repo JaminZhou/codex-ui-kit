@@ -11,6 +11,10 @@ import {
   type ReactNode,
   type RefObject,
 } from "react";
+import {
+  acquireDocumentScrollLock,
+  type ModalLockHandle,
+} from "../internal/documentScrollLock.js";
 import { inertWhen } from "../internal/inert.js";
 import { IconButton } from "./InteractivePrimitives.js";
 
@@ -255,6 +259,19 @@ export function AppShell({
     sidePanelOpen &&
     layoutMode !== "wide" &&
     !sidebarModalOpen;
+  const responsiveModalOpen =
+    sidebarModalOpen || sidePanelModalOpen;
+  const responsiveModalStateRef = useRef({
+    sidePanelModalOpen,
+    sidebarModalOpen,
+  });
+  responsiveModalStateRef.current = {
+    sidePanelModalOpen,
+    sidebarModalOpen,
+  };
+  const responsiveModalLockRef = useRef<ModalLockHandle | null>(
+    null,
+  );
   const previouslySidePanelModalOpenRef = useRef(sidePanelModalOpen);
   const previouslySidebarModalOpenRef = useRef(sidebarModalOpen);
   const mainBlocked = sidebarModalOpen || sidePanelModalOpen;
@@ -276,6 +293,77 @@ export function AppShell({
   );
   useSurfaceFocusRestoration(bottomPanelOpen, bottomPanelRef, mainRef);
   useEffect(() => {
+    if (!responsiveModalOpen || typeof document === "undefined") return;
+
+    const returnFocus =
+      document.activeElement instanceof HTMLElement
+        ? document.activeElement
+        : null;
+    const modalLock = acquireDocumentScrollLock({
+      containsFocus: (target) => {
+        const {
+          sidePanelModalOpen: sidePanelIsModal,
+          sidebarModalOpen: sidebarIsModal,
+        } = responsiveModalStateRef.current;
+        if (sidebarIsModal) {
+          return (
+            surfaceOwnsActiveElement(sidebarRef.current, target) ||
+            sidebarBackdropRef.current === target
+          );
+        }
+        if (sidePanelIsModal) {
+          return (
+            surfaceOwnsActiveElement(sidePanelRef.current, target) ||
+            surfaceOwnsActiveElement(sidebarRef.current, target) ||
+            surfaceOwnsActiveElement(bottomPanelRef.current, target) ||
+            sidePanelBackdropRef.current === target
+          );
+        }
+        return false;
+      },
+      getInitialFocus: () => {
+        const {
+          sidePanelModalOpen: sidePanelIsModal,
+          sidebarModalOpen: sidebarIsModal,
+        } = responsiveModalStateRef.current;
+        const surface = sidebarIsModal
+          ? sidebarRef.current
+          : sidePanelIsModal
+            ? sidePanelRef.current
+            : null;
+        return (
+          surface?.querySelector<HTMLElement>(
+            'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',
+          ) ??
+          surface
+        );
+      },
+      priority: 80,
+      returnFocus,
+    });
+    responsiveModalLockRef.current = modalLock;
+    return () => {
+      if (responsiveModalLockRef.current === modalLock) {
+        responsiveModalLockRef.current = null;
+      }
+      const activeElement =
+        document.activeElement instanceof HTMLElement
+          ? document.activeElement
+          : null;
+      const focusIsOnShellBackdrop =
+        activeElement === sidebarBackdropRef.current ||
+        activeElement === sidePanelBackdropRef.current;
+      const target = modalLock.release();
+      if (
+        !focusIsOnShellBackdrop &&
+        target?.isConnected &&
+        !target.closest('[inert], [aria-hidden="true"]')
+      ) {
+        target.focus();
+      }
+    };
+  }, [responsiveModalOpen]);
+  useEffect(() => {
     if (typeof document === "undefined") return;
     const activeElement =
       document.activeElement instanceof HTMLElement
@@ -287,8 +375,11 @@ export function AppShell({
     const wasSidebarModalOpen = previouslySidebarModalOpenRef.current;
     previouslySidePanelModalOpenRef.current = sidePanelModalOpen;
     previouslySidebarModalOpenRef.current = sidebarModalOpen;
+    const responsiveModalIsTop =
+      responsiveModalLockRef.current?.isTop() ?? false;
 
     if (
+      responsiveModalIsTop &&
       sidebarModalOpen &&
       !sidebarRef.current?.contains(activeElement)
     ) {
@@ -296,6 +387,7 @@ export function AppShell({
       return;
     }
     if (
+      responsiveModalIsTop &&
       sidePanelModalOpen &&
       (surfaceOwnsActiveElement(mainRef.current, activeElement) ||
         sidePanelBackdropRef.current === activeElement)

@@ -16,6 +16,7 @@ import {
   AppSidebarItem,
   AppSidebarSection,
   ApprovalRequest,
+  Dialog,
   Select,
   WorkspacePanel,
 } from "../src";
@@ -387,6 +388,73 @@ describe("application shell", () => {
     act(() => resize?.(1_000));
     expect(document.activeElement).toBe(
       screen.getByRole("button", { name: "Sources" }),
+    );
+  });
+
+  it("preserves focus in a higher-priority dialog", async () => {
+    let resize: ((width: number) => void) | undefined;
+    class ResizeObserverMock {
+      constructor(
+        private readonly callback: ResizeObserverCallback,
+      ) {}
+
+      disconnect() {}
+
+      observe(target: Element) {
+        if (!target.classList.contains("codex-ui-app-shell")) return;
+        resize = (width) =>
+          this.callback(
+            [
+              {
+                contentRect: { width },
+                target,
+              } as ResizeObserverEntry,
+            ],
+            this as unknown as ResizeObserver,
+          );
+      }
+
+      unobserve() {}
+    }
+    vi.stubGlobal("ResizeObserver", ResizeObserverMock);
+
+    function DialogFixture() {
+      const [dialogOpen, setDialogOpen] = useState(true);
+      return (
+        <AppShell
+          sidebar={<button type="button">Projects</button>}
+          sidebarOpen
+        >
+          <Dialog
+            onOpenChange={setDialogOpen}
+            open={dialogOpen}
+            showClose={false}
+            title="Confirm action"
+          >
+            <button onClick={() => setDialogOpen(false)} type="button">
+              Finish dialog
+            </button>
+          </Dialog>
+        </AppShell>
+      );
+    }
+
+    render(<DialogFixture />);
+    const dialogAction = screen.getByRole("button", {
+      name: "Finish dialog",
+    });
+    await waitFor(() =>
+      expect(document.activeElement).toBe(dialogAction),
+    );
+
+    act(() => resize?.(700));
+    expect(document.activeElement).toBe(dialogAction);
+
+    fireEvent.click(dialogAction);
+    await waitFor(() =>
+      expect(document.activeElement).toBe(
+        screen.getByRole("button", { name: "Projects" }),
+      ),
     );
   });
 
