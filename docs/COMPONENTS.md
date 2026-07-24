@@ -32,6 +32,9 @@ The built-in highlighter escapes untrusted code. A custom `CodeHighlighter` retu
 - `AgentPlan`: structured pending, in-progress, and completed plan steps.
 - `ProposedPlan`: writing and completed plan-card states with host-owned actions.
 - `SearchActivity`: code-search and grouped web-search states with controlled disclosure and bounded results.
+- `ConversationEventList` and `ConversationEvent`: protocol-neutral ordering,
+  ownership (`turn` or `thread`), event-kind, progress, warning, failure, live
+  status, metadata, content, and action slots for mixed session timelines.
 - `SubagentActivity` and `SubagentActivityGroup`: delegated-work rows and compact grouped activity.
 - `SubagentSummary`: controlled working/done summary with agent metadata and diff statistics.
 - `SubagentPanel`: active and completed agent sections with pagination and selection hooks.
@@ -93,6 +96,29 @@ All privileged behavior remains host-owned. The components never auto-approve co
 - `ThreadMessageNavigationRail`: message overview with active markers, keyboard and pointer previews, click navigation, and pointer scrubbing.
 - `FloatingThreadPanel`: non-modal, inert-when-closed panel with host-controlled contents and inset.
 - `ThreadFloatingButton`: latest-message control with chevron, working dots, hidden-interaction removal, and reduced-motion behavior.
+
+## Workspace and pull-request workflow
+
+- `WorkspaceSelection`: responsive project-context composition with controlled
+  header, actions, field, footer, loading, ready, and error states.
+- `ProjectPicker`: controlled project selection with paths, descriptions,
+  availability, loading, repairing, disabled, and empty states.
+- `RunLocationMenu`: radio-menu composition for local, cloud, worktree, or
+  host-defined execution locations.
+- `WorktreePicker`: controlled worktree and branch selection with availability
+  and repair states.
+- `PullRequestPage` and `PullRequestList`: responsive split or stacked PR
+  workspace with toolbar, search/filter slots, selected route, status, check,
+  author, update, comment, and independent empty states.
+- `PullRequestDetails` and `PullRequestStatusBadge`: PR identity, branch,
+  actions, change statistics, navigation, state, and host-owned content.
+- `PullRequestCheckList`, `PullRequestReviewSummary`, and
+  `PullRequestReviewThread`: check progress, reviewer outcomes, inline file
+  threads, resolved/outdated states, and host-owned review actions.
+
+The workflow components do not fetch repositories, create worktrees, call
+GitHub, or merge changes. Hosts normalize those states and perform every
+privileged action.
 
 ## Composition rules
 

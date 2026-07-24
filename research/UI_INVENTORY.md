@@ -44,6 +44,7 @@ composition or state variant is covered.
 
 - Codex Desktop `26.715.72359` (`5718`)
 - Sampled on 2026-07-23
+- Installed package and ASAR hash reverified on 2026-07-24
 - `app.asar` SHA-256:
   `6c6528eb1e8450cdc506a59586f8caffe87576e200977e2a11bdea0cecf1c718`
 - Computer Use automation: blocked by the environment safety policy for
@@ -110,14 +111,29 @@ finished visual work.
 
 ## Current implementation slice
 
-The first P0 shell slice now provides independently implemented `AppShell`,
+The first P0 shell slice provides independently implemented `AppShell`,
 `AppSidebar`, and `WorkspacePanel` compositions. It covers the measured wide
-sidebar/side-panel/bottom-panel tracks, controlled landmarks and tab
-semantics, and container-responsive overlay transitions that keep the right
-panel inside medium and narrow viewports. The H5 showcase exercises the shell,
-Sources/Review tabs, and bottom terminal composition.
+sidebar/side-panel/bottom-panel tracks, controlled landmarks and tab semantics,
+and container-responsive overlay transitions that keep the right panel inside
+medium and narrow viewports.
 
-These entries remain `partial`: native Electron shell composition, real
-window-resize comparison, route persistence, panel resizing, and the remaining
-P0 conversation and workspace states have not passed current-build parity
-gates.
+The next workflow slice adds `ConversationEventList` and `ConversationEvent`
+for explicit turn/thread ownership and event kinds; `WorkspaceSelection`,
+`ProjectPicker`, `RunLocationMenu`, and `WorktreePicker` for session context;
+and PR list, detail, check, reviewer, and inline-thread compositions. The H5
+showcase exercises the same public package exports.
+
+The workflow slice also runs in the secure Electron playground's real
+`BrowserWindow`. Automated acceptance clicks all three portalled selectors,
+selects a PR, and checks event/live-region semantics, list/detail geometry, and
+horizontal overflow at 1180×820 dark and 820×680 light. The PR layout is split
+at the standard size and stacked at the compact size.
+
+All affected inventory entries remain `partial`. Project/worktree selection
+and the PR index are backed by current-build runtime evidence and now have
+browser/Electron verification. Exact current-build PR review-detail behavior
+remains `not_sampled`, so the generic review components do not establish
+product parity. Native application-shell composition, route persistence, panel
+resizing, and the remaining P0 conversation/workspace variants also remain
+open. Final H5/Electron visual unification is intentionally deferred until
+coverage stabilizes.

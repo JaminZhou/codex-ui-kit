@@ -281,6 +281,72 @@ code {
   resize: none;
 }
 
+.workflow-preview {
+  display: grid;
+  gap: 1rem;
+  min-width: 0;
+}
+
+.workflow-preview__grid {
+  align-items: stretch;
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  min-width: 0;
+}
+
+.workflow-preview__events {
+  border: 1px solid var(--codex-ui-border);
+  border-radius: var(--codex-ui-radius-xl);
+  min-width: 0;
+  overflow: hidden;
+}
+
+.workflow-preview__surface-heading {
+  align-items: baseline;
+  border-block-end: 1px solid var(--codex-ui-border-light);
+  display: flex;
+  gap: 1rem;
+  justify-content: space-between;
+  padding: 1rem;
+}
+
+.workflow-preview__surface-heading h3 {
+  font-size: var(--codex-ui-font-size-md);
+  margin: 0;
+}
+
+.workflow-preview__surface-heading span {
+  color: var(--codex-ui-text-secondary);
+  font-size: var(--codex-ui-font-size-xs);
+}
+
+.workflow-preview__events .codex-ui-conversation-event-list {
+  max-height: 24rem;
+  overflow: auto;
+  padding: 0.375rem;
+}
+
+.workflow-preview > .codex-ui-pull-request-page {
+  height: 36rem;
+}
+
+.workflow-preview .codex-ui-pull-request-list__toolbar input {
+  background: var(--codex-ui-background-surface);
+  border: 1px solid var(--codex-ui-border);
+  border-radius: var(--codex-ui-radius-md);
+  color: var(--codex-ui-text);
+  font: inherit;
+  min-width: 0;
+  padding: 0.5rem 0.625rem;
+  width: 100%;
+}
+
+.workflow-preview .codex-ui-pull-request-list__toolbar input:focus-visible {
+  outline: 2px solid var(--codex-ui-focus);
+  outline-offset: 1px;
+}
+
 .thread-preview {
   border: 1px solid var(--codex-ui-border);
   border-radius: var(--codex-ui-radius-xl);
@@ -1271,6 +1337,12 @@ code {
   min-height: 6rem;
 }
 
+@media (max-width: 980px) {
+  .workflow-preview__grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
 @media (max-width: 760px) {
   .showcase__topbar {
     padding: 0 1rem;
@@ -1318,6 +1390,11 @@ code {
   .gallery-card__body {
     padding-left: 1rem;
     padding-right: 1rem;
+  }
+
+  .workflow-preview > .codex-ui-pull-request-page {
+    height: auto;
+    max-height: none;
   }
 
   .thread-preview .codex-ui-thread {

@@ -247,7 +247,8 @@ button {
 .acceptance-card--primitives,
 .acceptance-card--resources,
 .acceptance-card--subagent,
-.acceptance-card--tool {
+.acceptance-card--tool,
+.acceptance-card--workflow {
   grid-column: 1 / -1;
 }
 
@@ -386,6 +387,60 @@ button {
 .primitive-state-matrix__popover-copy span {
   color: var(--codex-ui-text-secondary);
   font-size: var(--codex-ui-font-size-xs);
+}
+
+.workflow-state-matrix {
+  background: var(--codex-ui-bg-subtle);
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.workflow-state-matrix__events {
+  background: var(--codex-ui-bg);
+  border: 1px solid var(--codex-ui-border);
+  border-radius: var(--codex-ui-radius-xl);
+  min-width: 0;
+  overflow: hidden;
+}
+
+.workflow-state-matrix__events .codex-ui-conversation-event-list {
+  max-height: 24rem;
+  overflow: auto;
+  padding: 0.375rem;
+}
+
+.workflow-state-matrix__label {
+  border-block-end: 1px solid var(--codex-ui-border-light);
+  color: var(--codex-ui-text-tertiary);
+  display: block;
+  font-size: 0.625rem;
+  font-weight: 600;
+  padding: 1rem;
+  text-transform: uppercase;
+}
+
+.workflow-state-matrix > .codex-ui-pull-request-page {
+  grid-column: 1 / -1;
+  height: 42rem;
+}
+
+.workflow-state-matrix .codex-ui-pull-request-list__toolbar input {
+  background: var(--codex-ui-background-surface);
+  border: 1px solid var(--codex-ui-border);
+  border-radius: var(--codex-ui-radius-md);
+  color: var(--codex-ui-text);
+  font: inherit;
+  min-width: 0;
+  padding: 0.5rem 0.625rem;
+  width: 100%;
+}
+
+.workflow-state-matrix
+  .codex-ui-pull-request-list__toolbar
+  input:focus-visible {
+  outline: 2px solid var(--codex-ui-focus);
+  outline-offset: 1px;
 }
 
 .resource-state-matrix {
@@ -981,7 +1036,8 @@ button {
   .acceptance-card--primitives,
   .acceptance-card--resources,
   .acceptance-card--subagent,
-  .acceptance-card--tool {
+  .acceptance-card--tool,
+  .acceptance-card--workflow {
     grid-column: auto;
   }
 
@@ -1039,6 +1095,15 @@ button {
 
   .resource-state-matrix__wide {
     grid-column: auto;
+  }
+
+  .workflow-state-matrix {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .workflow-state-matrix > .codex-ui-pull-request-page {
+    grid-column: auto;
+    height: 50rem;
   }
 
   .activity-state-matrix,

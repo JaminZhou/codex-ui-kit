@@ -4,6 +4,7 @@
     "appVersion": "26.715.72359",
     "buildNumber": "5718",
     "sampledAt": "2026-07-23",
+    "reverifiedAt": "2026-07-24",
     "appAsarSha256": "6c6528eb1e8450cdc506a59586f8caffe87576e200977e2a11bdea0cecf1c718",
     "runtimeEvidence": "partial_cdp"
   },
@@ -251,9 +252,9 @@
         "cdp:local-cloud-worktree-location-menu",
         "cdp:branch-menu-current-and-create-actions"
       ],
-      "implementationStatus": "not_started",
-      "browserStatus": "not_started",
-      "electronStatus": "not_started",
+      "implementationStatus": "partial",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
       "priority": "p0"
     },
     {
@@ -341,9 +342,9 @@
       "packageEvidence": ["new-thread-panel-page", "select-workspace-page"],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": ["cdp:blank-new-chat-and-project-menu"],
-      "implementationStatus": "not_started",
-      "browserStatus": "not_started",
-      "electronStatus": "not_started",
+      "implementationStatus": "partial",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
       "priority": "p0"
     },
     {
@@ -417,9 +418,9 @@
       "packageEvidence": ["pull-request-route", "pull-request-actions"],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": ["cdp:pull-request-index-tabs-search-split-layout"],
-      "implementationStatus": "not_started",
-      "browserStatus": "not_started",
-      "electronStatus": "not_started",
+      "implementationStatus": "partial",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
       "priority": "p0"
     },
     {
@@ -428,7 +429,7 @@
       "ownership": "workspace",
       "packageEvidence": ["pull-request-code-review", "pull-request-reviewer-status-list", "pull-request-fix-button"],
       "runtimeStatus": "not_sampled",
-      "implementationStatus": "not_started",
+      "implementationStatus": "partial",
       "browserStatus": "not_started",
       "electronStatus": "not_started",
       "priority": "p0"

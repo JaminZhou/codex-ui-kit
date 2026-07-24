@@ -127,6 +127,128 @@ async function closeChoiceDialog(webContents: WebContents) {
   })()`);
 }
 
+async function captureWorkflowSurfaces(webContents: WebContents) {
+  return webContents.executeJavaScript(`(async () => {
+    const wait = (duration) => new Promise((resolve) => setTimeout(resolve, duration));
+    const rect = (element) => {
+      if (!element) return null;
+      const bounds = element.getBoundingClientRect();
+      return {
+        bottom: bounds.bottom,
+        height: bounds.height,
+        left: bounds.left,
+        right: bounds.right,
+        top: bounds.top,
+        width: bounds.width,
+      };
+    };
+    const inViewport = (element) => {
+      if (!element) return false;
+      const bounds = element.getBoundingClientRect();
+      return (
+        bounds.left >= 0 &&
+        bounds.top >= 0 &&
+        bounds.right <= window.innerWidth &&
+        bounds.bottom <= window.innerHeight
+      );
+    };
+    document.body.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true }));
+    const dock = document.querySelector('.desktop-composer-dock');
+    if (dock instanceof HTMLElement) dock.style.display = 'none';
+    const card = document.querySelector('[data-acceptance-surface="workflow-surfaces"]');
+    const scrollRegion = document.querySelector('.desktop-scroll-region');
+    if (card && scrollRegion instanceof HTMLElement) {
+      scrollRegion.style.scrollBehavior = 'auto';
+      const regionBounds = scrollRegion.getBoundingClientRect();
+      const cardBounds = card.getBoundingClientRect();
+      scrollRegion.scrollTop += cardBounds.top - regionBounds.top - 12;
+    }
+    await wait(180);
+
+    const selectorOverlays = [];
+    for (const selector of [
+      { label: 'Project', role: 'listbox' },
+      { label: 'Run location', role: 'menu' },
+      { label: 'Worktree', role: 'listbox' },
+    ]) {
+      const trigger = [...(card?.querySelectorAll('button') ?? [])]
+        .find((button) => button.getAttribute('aria-label') === selector.label);
+      trigger?.click();
+      await wait(140);
+      const overlay = [...document.querySelectorAll('.codex-ui-popover')]
+        .find((element) => element.getAttribute('role') === selector.role);
+      selectorOverlays.push({
+        bounds: rect(overlay),
+        disabledCount: overlay?.querySelectorAll('button:disabled').length ?? 0,
+        inViewport: inViewport(overlay),
+        label: selector.label,
+        optionCount:
+          overlay?.querySelectorAll('[role="option"], [role="menuitemradio"]').length ?? 0,
+        owner: overlay?.getAttribute('data-codex-ui-overlay-owner') ?? null,
+      });
+      document.body.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true }));
+      await wait(80);
+    }
+
+    const pullRequest50 = [...(card?.querySelectorAll('.codex-ui-pull-request-list__item') ?? [])]
+      .find((button) => button.getAttribute('aria-label')?.startsWith('Open pull request 50:'));
+    pullRequest50?.click();
+    await wait(120);
+
+    const workspace = card?.querySelector('.codex-ui-workspace-selection');
+    const eventList = card?.querySelector('.codex-ui-conversation-event-list');
+    const eventRows = [...(eventList?.querySelectorAll('.codex-ui-conversation-event') ?? [])];
+    const runningEvent = eventList?.querySelector('[data-status="running"] [role="status"]');
+    const pullRequestPage = card?.querySelector('.codex-ui-pull-request-page');
+    const pullRequestList = pullRequestPage?.querySelector('.codex-ui-pull-request-page__list');
+    const pullRequestDetail = pullRequestPage?.querySelector('.codex-ui-pull-request-page__detail');
+    const pullRequestListBounds = pullRequestList?.getBoundingClientRect();
+    const pullRequestDetailBounds = pullRequestDetail?.getBoundingClientRect();
+    const selectedPullRequest = pullRequestPage?.querySelector('[aria-current="page"]');
+    const reviewThread = pullRequestPage?.querySelector('.codex-ui-pull-request-review-thread');
+    const metrics = {
+      bodyScrollWidth: document.body.scrollWidth,
+      card: rect(card),
+      checkRows: [...(pullRequestPage?.querySelectorAll('.codex-ui-pull-request-checks li') ?? [])].map(rect),
+      clientWidth: document.documentElement.clientWidth,
+      eventList: rect(eventList),
+      eventRows: eventRows.map((row) => ({
+        bounds: rect(row),
+        kind: row.getAttribute('data-kind'),
+        ownership: row.getAttribute('data-ownership'),
+        status: row.getAttribute('data-status'),
+      })),
+      pullRequestDetail: rect(pullRequestDetail),
+      pullRequestLayout:
+        pullRequestListBounds && pullRequestDetailBounds &&
+        Math.abs(pullRequestListBounds.top - pullRequestDetailBounds.top) <= 2
+          ? 'split'
+          : 'stacked',
+      pullRequestList: rect(pullRequestList),
+      pullRequestPage: rect(pullRequestPage),
+      resolvedTheme: document.querySelector('.desktop-playground')?.getAttribute('data-theme'),
+      reviewRows: [...(pullRequestPage?.querySelectorAll('.codex-ui-pull-request-reviews li') ?? [])].map(rect),
+      reviewThread: rect(reviewThread),
+      runningEventBusy: runningEvent?.getAttribute('aria-busy') ?? null,
+      selectedPullRequest: selectedPullRequest?.getAttribute('aria-label') ?? null,
+      selectionText: card?.querySelector('[data-workflow-state="selection"]')?.textContent ?? null,
+      selectorOverlays,
+      threadEventCount: eventRows.filter((row) => row.getAttribute('data-ownership') === 'thread').length,
+      viewport: { height: window.innerHeight, width: window.innerWidth },
+      workspace: rect(workspace),
+      workspaceFields: [...(workspace?.querySelectorAll('.codex-ui-workspace-selection__fields > *') ?? [])].map(rect),
+    };
+
+    if (pullRequestPage && scrollRegion instanceof HTMLElement) {
+      const regionBounds = scrollRegion.getBoundingClientRect();
+      const pageBounds = pullRequestPage.getBoundingClientRect();
+      scrollRegion.scrollTop += pageBounds.top - regionBounds.top - 12;
+      await wait(140);
+    }
+    return metrics;
+  })()`);
+}
+
 async function captureResourceSurfaces(
   webContents: WebContents,
   openPreview = false,
@@ -490,6 +612,11 @@ async function captureAcceptance(browserWindow: BrowserWindow) {
   await browserWindow.webContents.executeJavaScript(
     "document.querySelector('[aria-label=\"Close image preview\"]')?.click()",
   );
+  console.log("acceptance step: workflow surfaces");
+  const workflowMetrics = await captureWorkflowSurfaces(
+    browserWindow.webContents,
+  );
+  const workflowScreenshot = await browserWindow.webContents.capturePage();
   nativeTheme.themeSource = "light";
   sendThemeState(browserWindow.webContents);
   await browserWindow.webContents.executeJavaScript(
@@ -510,6 +637,12 @@ async function captureAcceptance(browserWindow: BrowserWindow) {
     browserWindow.webContents,
   );
   const compactResourceScreenshot = await browserWindow.webContents.capturePage();
+  console.log("acceptance step: compact workflow surfaces");
+  const compactWorkflowMetrics = await captureWorkflowSurfaces(
+    browserWindow.webContents,
+  );
+  const compactWorkflowScreenshot =
+    await browserWindow.webContents.capturePage();
   console.log("acceptance step: compact navigation");
   const compactNavigationMetrics = await captureNavigationSurfaces(
     browserWindow.webContents,
@@ -608,6 +741,49 @@ async function captureAcceptance(browserWindow: BrowserWindow) {
       expectedTheme,
       minimumItems: { resourceRows: 3 },
       requiredFields: ["card", "gallery", "galleryImage", "sourceList"],
+    });
+  }
+  for (const [name, snapshot, expectedTheme, pullRequestLayout] of [
+    ["workflow surfaces", workflowMetrics, "dark", "split"],
+    [
+      "compact workflow surfaces",
+      compactWorkflowMetrics,
+      "light",
+      "stacked",
+    ],
+  ] as const) {
+    assertAcceptanceMetric(name, snapshot, {
+      allItemsEqual: {
+        selectorOverlays: { field: "inViewport", value: true },
+      },
+      allItemsHaveNonEmptyString: {
+        selectorOverlays: "owner",
+      },
+      equals: {
+        pullRequestLayout,
+        runningEventBusy: "true",
+        selectedPullRequest:
+          "Open pull request 50: Add current application shell",
+        selectionText: "ui-kit/worktree/feature",
+        threadEventCount: 2,
+      },
+      expectedTheme,
+      minimumItems: {
+        checkRows: 2,
+        eventRows: 6,
+        reviewRows: 1,
+        selectorOverlays: 3,
+        workspaceFields: 3,
+      },
+      requiredFields: [
+        "card",
+        "eventList",
+        "pullRequestDetail",
+        "pullRequestList",
+        "pullRequestPage",
+        "reviewThread",
+        "workspace",
+      ],
     });
   }
   assertAcceptanceMetric("resource preview", resourcePreviewMetrics, {
@@ -720,6 +896,22 @@ async function captureAcceptance(browserWindow: BrowserWindow) {
     writeFile(
       join(outputDirectory, "resource-surfaces-compact-light.png"),
       compactResourceScreenshot.toPNG(),
+    ),
+    writeFile(
+      join(outputDirectory, "workflow-surfaces-metrics.json"),
+      `${JSON.stringify(workflowMetrics, null, 2)}\n`,
+    ),
+    writeFile(
+      join(outputDirectory, "workflow-surfaces.png"),
+      workflowScreenshot.toPNG(),
+    ),
+    writeFile(
+      join(outputDirectory, "workflow-surfaces-compact-light-metrics.json"),
+      `${JSON.stringify(compactWorkflowMetrics, null, 2)}\n`,
+    ),
+    writeFile(
+      join(outputDirectory, "workflow-surfaces-compact-light.png"),
+      compactWorkflowScreenshot.toPNG(),
     ),
   ]);
   console.log(`acceptance capture: ${outputDirectory}`);

@@ -26,6 +26,8 @@ import {
   ComposerAttachment,
   ComposerMentionMenu,
   ComposerModeIndicator,
+  ConversationEvent,
+  ConversationEventList,
   Dialog,
   DialogChoice,
   FileChange,
@@ -45,9 +47,17 @@ import {
   MenuSubmenu,
   Popover,
   ProposedPlan,
+  ProjectPicker,
+  PullRequestCheckList,
+  PullRequestDetails,
+  PullRequestList,
+  PullRequestPage,
+  PullRequestReviewSummary,
+  PullRequestReviewThread,
   QueuedPromptList,
   ResourceCard,
   ResourceList,
+  RunLocationMenu,
   SearchActivity,
   Select,
   StatusIndicator,
@@ -72,6 +82,8 @@ import {
   ThreadThinkingPlaceholder,
   ThreadVirtualizedPlaceholder,
   TurnDuration,
+  WorkspaceSelection,
+  WorktreePicker,
   type ApprovalDecision,
   type FileDiffLine,
   type GeneratedImageItem,
@@ -365,6 +377,12 @@ export function DesktopPlayground() {
   const [navigationPanelOpen, setNavigationPanelOpen] = useState(true);
   const [navigationStatus, setNavigationStatus] = useState("Desktop navigation ready");
   const [threadStatus, setThreadStatus] = useState("Desktop thread ready");
+  const [workflowProject, setWorkflowProject] = useState("ui-kit");
+  const [workflowRunLocation, setWorkflowRunLocation] =
+    useState("worktree");
+  const [workflowWorktree, setWorkflowWorktree] =
+    useState("feature");
+  const [selectedPullRequest, setSelectedPullRequest] = useState("51");
   const [activeNavigationMessageId, setActiveNavigationMessageId] = useState<string>(
     desktopNavigationMessages[2].id,
   );
@@ -1565,6 +1583,271 @@ export function DesktopPlayground() {
                 }}
               />
             </Dialog>
+          </article>
+
+          <article
+            className="acceptance-card acceptance-card--workflow"
+            data-acceptance-surface="workflow-surfaces"
+          >
+            <header>
+              <div>
+                <h2>Workspace, conversation events, and pull requests</h2>
+                <p>
+                  Native BrowserWindow coverage for project context, run
+                  location, worktrees, session events, checks, and review
+                  threads.
+                </p>
+              </div>
+              <span className="acceptance-badge">desktop workflow</span>
+            </header>
+            <div className="acceptance-card__body workflow-state-matrix">
+              <WorkspaceSelection
+                description="Choose the repository context for this session."
+                footer={
+                  <output
+                    aria-live="polite"
+                    data-workflow-state="selection"
+                  >
+                    {workflowProject}/{workflowRunLocation}/{workflowWorktree}
+                  </output>
+                }
+                title="Session workspace"
+              >
+                <ProjectPicker
+                  onProjectChange={setWorkflowProject}
+                  projects={[
+                    {
+                      description: "Current project",
+                      id: "ui-kit",
+                      label: "codex-ui-kit",
+                      path: "/Developer/codex-ui-kit",
+                    },
+                    {
+                      description: "Desktop host",
+                      id: "desktop",
+                      label: "Codex desktop",
+                    },
+                  ]}
+                  value={workflowProject}
+                />
+                <RunLocationMenu
+                  onValueChange={setWorkflowRunLocation}
+                  options={[
+                    {
+                      description: "Use the current checkout",
+                      id: "local",
+                      label: "Local",
+                    },
+                    {
+                      description: "Keep changes isolated",
+                      id: "worktree",
+                      label: "Worktree",
+                    },
+                    {
+                      disabled: true,
+                      id: "cloud",
+                      label: "Cloud",
+                      status: "unavailable",
+                      statusLabel: "Unavailable",
+                    },
+                  ]}
+                  value={workflowRunLocation}
+                />
+                <WorktreePicker
+                  onWorktreeChange={setWorkflowWorktree}
+                  value={workflowWorktree}
+                  worktrees={[
+                    {
+                      branch: "feat/workflow-surfaces",
+                      id: "feature",
+                      label: "Workflow surfaces",
+                    },
+                    {
+                      branch: "main",
+                      id: "main",
+                      label: "Main checkout",
+                    },
+                    {
+                      branch: "fix/repairing",
+                      id: "repairing",
+                      label: "Repairing worktree",
+                      status: "repairing",
+                      statusLabel: "Repairing",
+                    },
+                  ]}
+                />
+              </WorkspaceSelection>
+
+              <div className="workflow-state-matrix__events">
+                <span className="workflow-state-matrix__label">
+                  Conversation event taxonomy
+                </span>
+                <ConversationEventList
+                  label="Desktop workflow events"
+                  tabIndex={0}
+                >
+                  <ConversationEvent
+                    description="Mapped the public workflow states."
+                    kind="reasoning"
+                    meta="4s"
+                    title="Reasoned about component boundaries"
+                  />
+                  <ConversationEvent
+                    description="Typecheck and component tests."
+                    kind="command"
+                    meta="running"
+                    status="running"
+                    title="Running Electron acceptance"
+                  />
+                  <ConversationEvent
+                    description="3 components · 1 stylesheet"
+                    kind="file-change"
+                    title="Changed workflow surfaces"
+                  />
+                  <ConversationEvent
+                    description="Waiting for host authorization."
+                    kind="approval"
+                    status="pending"
+                    title="Approval requested"
+                  />
+                  <ConversationEvent
+                    description="The delegated work returned its result."
+                    kind="subagent"
+                    ownership="thread"
+                    title="Subagent completed"
+                  />
+                  <ConversationEvent
+                    description="Replay is paused until the base branch is ready."
+                    kind="handoff"
+                    ownership="thread"
+                    status="warning"
+                    title="Worktree handoff paused"
+                  />
+                </ConversationEventList>
+              </div>
+
+              <PullRequestPage
+                label="Desktop pull request workflow"
+                list={
+                  <PullRequestList
+                    items={[
+                      {
+                        author: "Jamin",
+                        checkStatus: "passed",
+                        id: "50",
+                        number: 50,
+                        repository: "codex-ui-kit",
+                        state: "open",
+                        title: "Add current application shell",
+                      },
+                      {
+                        author: "Jamin",
+                        checkStatus: "running",
+                        commentCount: 1,
+                        id: "51",
+                        number: 51,
+                        repository: "codex-ui-kit",
+                        state: "draft",
+                        title: "Add workflow and review surfaces",
+                      },
+                    ]}
+                    onSelect={setSelectedPullRequest}
+                    selectedId={selectedPullRequest}
+                    toolbar={
+                      <input
+                        aria-label="Search desktop pull requests"
+                        placeholder="Search pull requests"
+                        type="search"
+                      />
+                    }
+                  />
+                }
+                toolbar={
+                  <>
+                    <strong>Pull requests</strong>
+                    <span>Open</span>
+                  </>
+                }
+              >
+                <PullRequestDetails
+                  actions={
+                    <Button size="small">
+                      {selectedPullRequest === "50"
+                        ? "Merge"
+                        : "Ready for review"}
+                    </Button>
+                  }
+                  additions={selectedPullRequest === "50" ? 284 : 428}
+                  author="Jamin"
+                  deletions={selectedPullRequest === "50" ? 18 : 32}
+                  filesChanged={selectedPullRequest === "50" ? 9 : 14}
+                  number={selectedPullRequest}
+                  repository="codex-ui-kit"
+                  sourceBranch={
+                    selectedPullRequest === "50"
+                      ? "feat/current-ui-inventory"
+                      : "feat/workflow-surfaces"
+                  }
+                  state={selectedPullRequest === "50" ? "open" : "draft"}
+                  targetBranch="main"
+                  title={
+                    selectedPullRequest === "50"
+                      ? "Add current application shell"
+                      : "Add workflow and review surfaces"
+                  }
+                >
+                  <PullRequestCheckList
+                    checks={[
+                      {
+                        duration: "1m 12s",
+                        id: "ci",
+                        name: "CI",
+                        status: "passed",
+                      },
+                      {
+                        description: "Automated review",
+                        id: "review",
+                        name: "Codex",
+                        status:
+                          selectedPullRequest === "50"
+                            ? "passed"
+                            : "running",
+                      },
+                    ]}
+                  />
+                  <PullRequestReviewSummary
+                    reviewers={[
+                      {
+                        id: "codex",
+                        name: "Codex",
+                        status:
+                          selectedPullRequest === "50"
+                            ? "approved"
+                            : "commented",
+                        summary:
+                          selectedPullRequest === "50"
+                            ? "No blocking findings"
+                            : "One suggestion",
+                      },
+                    ]}
+                  />
+                  <PullRequestReviewThread
+                    actions={
+                      <Button size="small" tone="ghost">
+                        Resolve
+                      </Button>
+                    }
+                    author="Codex"
+                    line={42}
+                    path="src/components/WorkspaceSelection.tsx"
+                    resolved={selectedPullRequest === "50"}
+                  >
+                    Keep the option state exposed to assistive technology while
+                    the workspace menu is open.
+                  </PullRequestReviewThread>
+                </PullRequestDetails>
+              </PullRequestPage>
+            </div>
           </article>
 
           <article
