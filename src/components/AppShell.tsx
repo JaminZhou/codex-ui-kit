@@ -95,15 +95,18 @@ function useSurfaceFocusRestoration(
         dismissRef?.current === activeElement);
     if (wasOpen && !open && focusIsBeingHidden) {
       const returnFocus = returnFocusRef.current;
-      const target =
+      const canTryReturnFocus =
         returnFocus?.isConnected &&
         !returnFocus.closest('[inert], [aria-hidden="true"]')
           ? returnFocus
-          : fallbackRef.current;
-      if (target === fallbackRef.current) {
+          : null;
+      canTryReturnFocus?.focus();
+      if (
+        !canTryReturnFocus ||
+        document.activeElement !== canTryReturnFocus
+      ) {
+        const target = fallbackRef.current;
         focusFirstInSurface(target);
-      } else {
-        target?.focus();
       }
     }
 
@@ -221,12 +224,9 @@ export function AppShell({
   const shellRef = useRef<HTMLDivElement>(null);
   const layoutMode = useAppShellLayoutMode(shellRef);
   const sidebarModalOpen =
-    sidebarOpen &&
-    Boolean(onSidebarOpenChange) &&
-    layoutMode === "narrow";
+    sidebarOpen && layoutMode === "narrow";
   const sidePanelModalOpen =
     sidePanelOpen &&
-    Boolean(onSidePanelOpenChange) &&
     layoutMode !== "wide" &&
     !sidebarModalOpen;
   const previouslySidePanelModalOpenRef = useRef(sidePanelModalOpen);

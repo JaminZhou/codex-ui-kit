@@ -145,21 +145,37 @@ describe("application shell", () => {
 
   it("restores focus when a shell surface hides the active control", () => {
     function FocusRestorationFixture() {
+      const [openerDisabled, setOpenerDisabled] = useState(false);
       const [sidePanelOpen, setSidePanelOpen] = useState(false);
       return (
         <AppShell
           onSidePanelOpenChange={setSidePanelOpen}
           sidePanel={
-            <button
-              onClick={() => setSidePanelOpen(false)}
-              type="button"
-            >
-              Close sources
-            </button>
+            <>
+              <button
+                onClick={() => setSidePanelOpen(false)}
+                type="button"
+              >
+                Close sources
+              </button>
+              <button
+                onClick={() => {
+                  setOpenerDisabled(true);
+                  setSidePanelOpen(false);
+                }}
+                type="button"
+              >
+                Disable opener and close
+              </button>
+            </>
           }
           sidePanelOpen={sidePanelOpen}
         >
-          <button onClick={() => setSidePanelOpen(true)} type="button">
+          <button
+            disabled={openerDisabled}
+            onClick={() => setSidePanelOpen(true)}
+            type="button"
+          >
             Open sources
           </button>
         </AppShell>
@@ -183,6 +199,67 @@ describe("application shell", () => {
     backdrop.focus();
     fireEvent.click(backdrop);
     expect(document.activeElement).toBe(opener);
+
+    fireEvent.click(opener);
+    const disabledCloser = screen.getByRole("button", {
+      name: "Disable opener and close",
+    });
+    disabledCloser.focus();
+    fireEvent.click(disabledCloser);
+    expect(document.activeElement).toBe(
+      screen.getByRole("main", { name: "Conversation" }),
+    );
+  });
+
+  it("blocks content covered by an explicit handler-free overlay", () => {
+    let resize: ((width: number) => void) | undefined;
+    class ResizeObserverMock {
+      constructor(
+        private readonly callback: ResizeObserverCallback,
+      ) {}
+
+      disconnect() {}
+
+      observe(target: Element) {
+        resize = (width) =>
+          this.callback(
+            [
+              {
+                contentRect: { width },
+                target,
+              } as ResizeObserverEntry,
+            ],
+            this as unknown as ResizeObserver,
+          );
+      }
+
+      unobserve() {}
+    }
+    vi.stubGlobal("ResizeObserver", ResizeObserverMock);
+
+    render(
+      <AppShell
+        sidePanel={<button type="button">Sources</button>}
+        sidePanelOpen
+      >
+        <button type="button">Composer</button>
+      </AppShell>,
+    );
+
+    const composer = screen.getByRole("button", { name: "Composer" });
+    composer.focus();
+    act(() => resize?.(1_000));
+    expect(
+      screen
+        .getByRole("main", { name: "Conversation" })
+        .hasAttribute("inert"),
+    ).toBe(true);
+    expect(document.activeElement).toBe(
+      screen.getByRole("button", { name: "Sources" }),
+    );
+    expect(
+      screen.queryByRole("button", { name: "Close workspace panel" }),
+    ).toBeNull();
   });
 
   it("makes backdrop-covered content inert at responsive breakpoints", () => {
