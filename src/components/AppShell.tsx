@@ -98,7 +98,7 @@ function useSurfaceFocusRestoration(
       activeElement &&
       (surfaceOwnsActiveElement(surfaceRef.current, activeElement) ||
         dismissRef?.current === activeElement);
-    if (wasOpen && !open) {
+    if (!open) {
       notifySurfaceBlocked(surfaceRef.current);
     }
     if (wasOpen && !open && focusIsBeingHidden) {
@@ -342,6 +342,7 @@ export function AppShell({
           surface
         );
       },
+      lockDocumentScroll: false,
       priority: 80,
       returnFocus,
     });

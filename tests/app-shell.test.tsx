@@ -17,12 +17,14 @@ import {
   AppSidebarSection,
   ApprovalRequest,
   Dialog,
+  Popover,
   Select,
   WorkspacePanel,
 } from "../src";
 
 afterEach(() => {
   cleanup();
+  document.body.style.overflow = "";
   vi.unstubAllGlobals();
 });
 
@@ -123,6 +125,31 @@ describe("application shell", () => {
     const shell = document.querySelector(".codex-ui-app-shell")!;
     expect(shell.hasAttribute("data-sidebar-open")).toBe(false);
     expect(shell.hasAttribute("data-side-panel-open")).toBe(false);
+  });
+
+  it("closes default-open portals in initially hidden panels", async () => {
+    render(
+      <AppShell
+        sidePanel={
+          <Popover
+            defaultOpen
+            label="Hidden actions"
+            trigger={<button type="button">Actions</button>}
+          >
+            <button type="button">Hidden action</button>
+          </Popover>
+        }
+        sidePanelOpen={false}
+      >
+        Thread
+      </AppShell>,
+    );
+
+    await waitFor(() =>
+      expect(
+        screen.queryByRole("button", { name: "Hidden action" }),
+      ).toBeNull(),
+    );
   });
 
   it("does not infer open state from panel callbacks", () => {
@@ -605,9 +632,11 @@ describe("application shell", () => {
     await waitFor(() =>
       expect(document.activeElement).toBe(dialogAction),
     );
+    expect(document.body.style.overflow).toBe("hidden");
 
     act(() => resize?.(700));
     expect(document.activeElement).toBe(dialogAction);
+    expect(document.body.style.overflow).toBe("hidden");
 
     fireEvent.click(dialogAction);
     await waitFor(() =>
@@ -615,6 +644,48 @@ describe("application shell", () => {
         screen.getByRole("button", { name: "Projects" }),
       ),
     );
+    expect(document.body.style.overflow).toBe("");
+  });
+
+  it("does not lock document scroll for shell-local overlays", () => {
+    let resize: ((width: number) => void) | undefined;
+    class ResizeObserverMock {
+      constructor(
+        private readonly callback: ResizeObserverCallback,
+      ) {}
+
+      disconnect() {}
+
+      observe(target: Element) {
+        if (!target.classList.contains("codex-ui-app-shell")) return;
+        resize = (width) =>
+          this.callback(
+            [
+              {
+                contentRect: { width },
+                target,
+              } as ResizeObserverEntry,
+            ],
+            this as unknown as ResizeObserver,
+          );
+      }
+
+      unobserve() {}
+    }
+    vi.stubGlobal("ResizeObserver", ResizeObserverMock);
+    document.body.style.overflow = "auto";
+
+    render(
+      <AppShell
+        sidePanel={<button type="button">Sources</button>}
+        sidePanelOpen
+      >
+        Thread
+      </AppShell>,
+    );
+
+    act(() => resize?.(1_000));
+    expect(document.body.style.overflow).toBe("auto");
   });
 
   it("makes backdrop-covered content inert at responsive breakpoints", () => {
