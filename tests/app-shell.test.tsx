@@ -1,6 +1,12 @@
 // @vitest-environment happy-dom
 
-import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import {
+  act,
+  cleanup,
+  fireEvent,
+  render,
+  screen,
+} from "@testing-library/react";
 import { useState } from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import {
@@ -13,6 +19,7 @@ import {
 
 afterEach(() => {
   cleanup();
+  vi.unstubAllGlobals();
 });
 
 describe("application shell", () => {
@@ -134,6 +141,85 @@ describe("application shell", () => {
     backdrop.focus();
     fireEvent.click(backdrop);
     expect(document.activeElement).toBe(opener);
+  });
+
+  it("makes backdrop-covered content inert at responsive breakpoints", () => {
+    let resize: ((width: number) => void) | undefined;
+    class ResizeObserverMock {
+      constructor(
+        private readonly callback: ResizeObserverCallback,
+      ) {}
+
+      disconnect() {}
+
+      observe(target: Element) {
+        resize = (width) =>
+          this.callback(
+            [
+              {
+                contentRect: { width },
+                target,
+              } as ResizeObserverEntry,
+            ],
+            this as unknown as ResizeObserver,
+          );
+      }
+
+      unobserve() {}
+    }
+    vi.stubGlobal("ResizeObserver", ResizeObserverMock);
+
+    render(
+      <AppShell
+        bottomPanel={<button type="button">Terminal</button>}
+        bottomPanelOpen
+        onSidePanelOpenChange={() => undefined}
+        onSidebarOpenChange={() => undefined}
+        sidePanel={<button type="button">Sources</button>}
+        sidePanelOpen
+        sidebar={<button type="button">Projects</button>}
+        sidebarOpen
+      >
+        <button type="button">Composer</button>
+      </AppShell>,
+    );
+
+    const composer = screen.getByRole("button", { name: "Composer" });
+    composer.focus();
+    act(() => resize?.(1_000));
+    expect(
+      screen
+        .getByRole("main", { name: "Conversation" })
+        .hasAttribute("inert"),
+    ).toBe(true);
+    expect(
+      screen
+        .getByRole("complementary", { name: "App navigation" })
+        .hasAttribute("inert"),
+    ).toBe(false);
+    expect(
+      screen
+        .getByRole("region", { name: "Bottom panel" })
+        .hasAttribute("inert"),
+    ).toBe(false);
+    expect(document.activeElement).toBe(
+      screen.getByRole("button", { name: "Sources" }),
+    );
+
+    act(() => resize?.(700));
+    expect(
+      document
+        .querySelector('[aria-label="Workspace panel"]')
+        ?.hasAttribute("inert"),
+    ).toBe(true);
+    expect(
+      document
+        .querySelector('[aria-label="Bottom panel"]')
+        ?.hasAttribute("inert"),
+    ).toBe(true);
+    expect(document.activeElement).toBe(
+      screen.getByRole("button", { name: "Projects" }),
+    );
   });
 });
 

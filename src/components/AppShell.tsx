@@ -1,7 +1,9 @@
 import {
   useEffect,
   useId,
+  useLayoutEffect,
   useRef,
+  useState,
   type ButtonHTMLAttributes,
   type CSSProperties,
   type HTMLAttributes,
@@ -104,6 +106,79 @@ function useSurfaceFocusRestoration(
   }, [dismissRef, fallbackRef, open, surfaceRef]);
 }
 
+type AppShellLayoutMode = "narrow" | "medium" | "wide";
+
+function readAppShellBreakpoint(
+  shell: HTMLElement,
+  property: string,
+  fallbackRem: number,
+) {
+  const shellStyles = getComputedStyle(shell);
+  const rootFontSize =
+    Number.parseFloat(
+      getComputedStyle(shell.ownerDocument.documentElement).fontSize,
+    ) || 16;
+  const value = shellStyles.getPropertyValue(property).trim();
+  const amount = Number.parseFloat(value);
+  if (Number.isFinite(amount)) {
+    if (value.endsWith("px")) return amount;
+    if (value.endsWith("rem")) return amount * rootFontSize;
+  }
+  return fallbackRem * rootFontSize;
+}
+
+function useAppShellLayoutMode(
+  shellRef: RefObject<HTMLDivElement | null>,
+): AppShellLayoutMode {
+  const [layoutMode, setLayoutMode] = useState<AppShellLayoutMode>("wide");
+
+  useLayoutEffect(() => {
+    const shell = shellRef.current;
+    if (!shell) return;
+
+    const update = (width: number) => {
+      if (width <= 0) return;
+      const mediumBreakpoint = readAppShellBreakpoint(
+        shell,
+        "--codex-ui-app-shell-medium-breakpoint",
+        92,
+      );
+      const narrowBreakpoint = readAppShellBreakpoint(
+        shell,
+        "--codex-ui-app-shell-narrow-breakpoint",
+        52,
+      );
+      const nextMode =
+        width <= narrowBreakpoint
+          ? "narrow"
+          : width <= mediumBreakpoint
+            ? "medium"
+            : "wide";
+      setLayoutMode((current) => (current === nextMode ? current : nextMode));
+    };
+
+    update(shell.getBoundingClientRect().width);
+    if (typeof ResizeObserver === "undefined") return;
+
+    const observer = new ResizeObserver((entries) => {
+      const entry = entries.find(({ target }) => target === shell);
+      if (entry) update(entry.contentRect.width);
+    });
+    observer.observe(shell);
+    return () => observer.disconnect();
+  }, [shellRef]);
+
+  return layoutMode;
+}
+
+function focusFirstInSurface(surface: HTMLElement | null) {
+  const target =
+    surface?.querySelector<HTMLElement>(
+      'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',
+    ) ?? surface;
+  target?.focus();
+}
+
 export interface AppShellProps
   extends Omit<HTMLAttributes<HTMLDivElement>, "children"> {
   bottomPanel?: ReactNode;
@@ -146,6 +221,18 @@ export function AppShell({
   const sidePanelRef = useRef<HTMLElement>(null);
   const sidebarBackdropRef = useRef<HTMLButtonElement>(null);
   const sidebarRef = useRef<HTMLElement>(null);
+  const shellRef = useRef<HTMLDivElement>(null);
+  const layoutMode = useAppShellLayoutMode(shellRef);
+  const sidebarModalOpen =
+    sidebarOpen &&
+    Boolean(onSidebarOpenChange) &&
+    layoutMode === "narrow";
+  const sidePanelModalOpen =
+    sidePanelOpen &&
+    Boolean(onSidePanelOpenChange) &&
+    layoutMode !== "wide" &&
+    !sidebarModalOpen;
+  const mainBlocked = sidebarModalOpen || sidePanelModalOpen;
 
   useSurfaceFocusRestoration(
     sidebarOpen,
@@ -160,6 +247,27 @@ export function AppShell({
     sidePanelBackdropRef,
   );
   useSurfaceFocusRestoration(bottomPanelOpen, bottomPanelRef, mainRef);
+  useEffect(() => {
+    if (typeof document === "undefined") return;
+    const activeElement =
+      document.activeElement instanceof HTMLElement
+        ? document.activeElement
+        : null;
+    if (!activeElement) return;
+
+    if (
+      sidebarModalOpen &&
+      [mainRef.current, sidePanelRef.current, bottomPanelRef.current].some(
+        (surface) => surface?.contains(activeElement),
+      )
+    ) {
+      focusFirstInSurface(sidebarRef.current);
+      return;
+    }
+    if (sidePanelModalOpen && mainRef.current?.contains(activeElement)) {
+      focusFirstInSurface(sidePanelRef.current);
+    }
+  }, [sidePanelModalOpen, sidebarModalOpen]);
 
   return (
     <div
@@ -167,6 +275,8 @@ export function AppShell({
       data-bottom-panel-open={bottomPanelOpen || undefined}
       data-side-panel-open={sidePanelOpen || undefined}
       data-sidebar-open={sidebarOpen || undefined}
+      data-layout-mode={layoutMode}
+      ref={shellRef}
       {...props}
     >
       <div className="codex-ui-app-shell__layout">
@@ -176,6 +286,7 @@ export function AppShell({
           className="codex-ui-app-shell__sidebar"
           inert={!sidebarOpen ? true : undefined}
           ref={sidebarRef}
+          tabIndex={-1}
         >
           {sidebar}
         </aside>
@@ -193,6 +304,7 @@ export function AppShell({
         <div
           aria-label={mainLabel}
           className="codex-ui-app-shell__main"
+          inert={mainBlocked ? true : undefined}
           ref={mainRef}
           role={mainRole}
           tabIndex={-1}
@@ -206,24 +318,25 @@ export function AppShell({
             data-backdrop="side-panel"
             onClick={() => onSidePanelOpenChange(false)}
             ref={sidePanelBackdropRef}
-            tabIndex={sidePanelOpen ? 0 : -1}
+            tabIndex={sidePanelOpen && !sidebarModalOpen ? 0 : -1}
             type="button"
           />
         ) : null}
         <aside
-          aria-hidden={!sidePanelOpen}
+          aria-hidden={!sidePanelOpen || sidebarModalOpen}
           aria-label={sidePanelLabel}
           className="codex-ui-app-shell__side-panel"
-          inert={!sidePanelOpen ? true : undefined}
+          inert={!sidePanelOpen || sidebarModalOpen ? true : undefined}
           ref={sidePanelRef}
+          tabIndex={-1}
         >
           {sidePanel}
         </aside>
         <section
-          aria-hidden={!bottomPanelOpen}
+          aria-hidden={!bottomPanelOpen || sidebarModalOpen}
           aria-label={bottomPanelLabel}
           className="codex-ui-app-shell__bottom-panel"
-          inert={!bottomPanelOpen ? true : undefined}
+          inert={!bottomPanelOpen || sidebarModalOpen ? true : undefined}
           ref={bottomPanelRef}
         >
           {bottomPanel}
