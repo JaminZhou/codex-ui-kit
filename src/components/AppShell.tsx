@@ -96,8 +96,11 @@ function useSurfaceFocusRestoration(
 
     const focusIsBeingHidden =
       activeElement &&
-      (surfaceRef.current?.contains(activeElement) ||
+      (surfaceOwnsActiveElement(surfaceRef.current, activeElement) ||
         dismissRef?.current === activeElement);
+    if (wasOpen && !open) {
+      notifySurfaceBlocked(surfaceRef.current);
+    }
     if (wasOpen && !open && focusIsBeingHidden) {
       const returnFocus = returnFocusRef.current;
       const canTryReturnFocus =
@@ -378,7 +381,11 @@ export function AppShell({
     previouslySidebarModalOpenRef.current = sidebarModalOpen;
     const responsiveModalIsTop =
       responsiveModalLockRef.current?.isTop() ?? false;
-    if (sidePanelModalOpen && !wasSidePanelModalOpen) {
+    if (sidebarModalOpen && !wasSidebarModalOpen) {
+      notifySurfaceBlocked(mainRef.current);
+      notifySurfaceBlocked(sidePanelRef.current);
+      notifySurfaceBlocked(bottomPanelRef.current);
+    } else if (sidePanelModalOpen && !wasSidePanelModalOpen) {
       notifySurfaceBlocked(mainRef.current);
     }
 

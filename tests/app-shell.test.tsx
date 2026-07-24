@@ -452,6 +452,104 @@ describe("application shell", () => {
     ).toBeTruthy();
   });
 
+  it("closes portals owned by surfaces hidden behind the sidebar", async () => {
+    let resize: ((width: number) => void) | undefined;
+    class ResizeObserverMock {
+      constructor(
+        private readonly callback: ResizeObserverCallback,
+      ) {}
+
+      disconnect() {}
+
+      observe(target: Element) {
+        if (!target.classList.contains("codex-ui-app-shell")) return;
+        resize = (width) =>
+          this.callback(
+            [
+              {
+                contentRect: { width },
+                target,
+              } as ResizeObserverEntry,
+            ],
+            this as unknown as ResizeObserver,
+          );
+      }
+
+      unobserve() {}
+    }
+    vi.stubGlobal("ResizeObserver", ResizeObserverMock);
+
+    render(
+      <AppShell
+        sidebar={<button type="button">Projects</button>}
+        sidebarOpen
+      >
+        <Select
+          label="Model"
+          onValueChange={() => undefined}
+          options={[{ label: "Codex", value: "codex" }]}
+        />
+      </AppShell>,
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "Model" }));
+    const option = screen.getByRole("option", { name: "Codex" });
+    await waitFor(() => expect(document.activeElement).toBe(option));
+
+    act(() => resize?.(700));
+    expect(document.activeElement).toBe(
+      screen.getByRole("button", { name: "Projects" }),
+    );
+    await waitFor(() =>
+      expect(
+        screen.queryByRole("option", { name: "Codex" }),
+      ).toBeNull(),
+    );
+  });
+
+  it("restores focus when closing a panel-owned portal", async () => {
+    function PanelPortalFixture() {
+      const [sidePanelOpen, setSidePanelOpen] = useState(true);
+      return (
+        <AppShell
+          sidePanel={
+            <Select
+              label="Source sort"
+              onValueChange={() => undefined}
+              options={[{ label: "Recent", value: "recent" }]}
+            />
+          }
+          sidePanelOpen={sidePanelOpen}
+        >
+          <button
+            onClick={() => setSidePanelOpen(false)}
+            type="button"
+          >
+            Close sources
+          </button>
+        </AppShell>
+      );
+    }
+
+    render(<PanelPortalFixture />);
+    fireEvent.click(
+      screen.getByRole("button", { name: "Source sort" }),
+    );
+    const option = screen.getByRole("option", { name: "Recent" });
+    await waitFor(() => expect(document.activeElement).toBe(option));
+
+    const fallback = screen.getByRole("button", {
+      name: "Close sources",
+    });
+    fireEvent.click(fallback);
+    expect(document.activeElement).toBe(fallback);
+    await waitFor(() =>
+      expect(
+        screen.queryByRole("option", { name: "Recent" }),
+      ).toBeNull(),
+    );
+  });
+
   it("preserves focus in a higher-priority dialog", async () => {
     let resize: ((width: number) => void) | undefined;
     class ResizeObserverMock {
