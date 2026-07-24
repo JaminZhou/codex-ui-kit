@@ -6,6 +6,7 @@ import {
   fireEvent,
   render,
   screen,
+  waitFor,
 } from "@testing-library/react";
 import { useState } from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
@@ -14,6 +15,7 @@ import {
   AppSidebar,
   AppSidebarItem,
   AppSidebarSection,
+  Select,
   WorkspacePanel,
 } from "../src";
 
@@ -221,6 +223,7 @@ describe("application shell", () => {
       disconnect() {}
 
       observe(target: Element) {
+        if (!target.classList.contains("codex-ui-app-shell")) return;
         resize = (width) =>
           this.callback(
             [
@@ -260,6 +263,67 @@ describe("application shell", () => {
     expect(
       screen.queryByRole("button", { name: "Close workspace panel" }),
     ).toBeNull();
+  });
+
+  it("moves focus out of a main-owned portalled overlay", async () => {
+    let resize: ((width: number) => void) | undefined;
+    class ResizeObserverMock {
+      constructor(
+        private readonly callback: ResizeObserverCallback,
+      ) {}
+
+      disconnect() {}
+
+      observe(target: Element) {
+        if (!target.classList.contains("codex-ui-app-shell")) return;
+        resize = (width) =>
+          this.callback(
+            [
+              {
+                contentRect: { width },
+                target,
+              } as ResizeObserverEntry,
+            ],
+            this as unknown as ResizeObserver,
+          );
+      }
+
+      unobserve() {}
+    }
+    vi.stubGlobal("ResizeObserver", ResizeObserverMock);
+
+    render(
+      <AppShell
+        onSidePanelOpenChange={() => undefined}
+        sidePanel={<button type="button">Sources</button>}
+        sidePanelOpen
+      >
+        <Select
+          label="Model"
+          onValueChange={() => undefined}
+          options={[{ label: "Codex", value: "codex" }]}
+        />
+      </AppShell>,
+    );
+
+    const trigger = screen.getByRole("button", { name: "Model" });
+    fireEvent.click(trigger);
+    const option = screen.getByRole("option", { name: "Codex" });
+    await waitFor(() => expect(document.activeElement).toBe(option));
+    const overlay = option.closest<HTMLElement>(
+      "[data-codex-ui-overlay-owner]",
+    );
+    expect(overlay).not.toBeNull();
+    expect(overlay?.dataset.codexUiOverlayOwner?.split(/\s+/)).toContain(
+      trigger.getAttribute("aria-controls"),
+    );
+
+    act(() => resize?.(1_000));
+    await waitFor(() =>
+      expect(document.activeElement).toBe(
+        screen.getByRole("button", { name: "Sources" }),
+      ),
+    );
   });
 
   it("makes backdrop-covered content inert at responsive breakpoints", () => {

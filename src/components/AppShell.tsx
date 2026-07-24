@@ -179,6 +179,31 @@ function focusFirstInSurface(surface: HTMLElement | null) {
   target?.focus();
 }
 
+function surfaceOwnsActiveElement(
+  surface: HTMLElement | null,
+  activeElement: HTMLElement,
+) {
+  if (!surface) return false;
+  if (surface.contains(activeElement)) return true;
+
+  const portalledOverlay = activeElement.closest<HTMLElement>(
+    "[data-codex-ui-overlay-owner]",
+  );
+  const ownerIds =
+    portalledOverlay?.dataset.codexUiOverlayOwner
+      ?.split(/\s+/)
+      .filter(Boolean) ?? [];
+  if (ownerIds.length === 0) return false;
+
+  return [...surface.querySelectorAll<HTMLElement>("[aria-controls]")].some(
+    (trigger) => {
+      const controlledIds =
+        trigger.getAttribute("aria-controls")?.split(/\s+/) ?? [];
+      return controlledIds.some((id) => ownerIds.includes(id));
+    },
+  );
+}
+
 export interface AppShellProps
   extends Omit<HTMLAttributes<HTMLDivElement>, "children"> {
   bottomPanel?: ReactNode;
@@ -271,7 +296,7 @@ export function AppShell({
     }
     if (
       sidePanelModalOpen &&
-      (mainRef.current?.contains(activeElement) ||
+      (surfaceOwnsActiveElement(mainRef.current, activeElement) ||
         sidePanelBackdropRef.current === activeElement)
     ) {
       focusFirstInSurface(sidePanelRef.current);
