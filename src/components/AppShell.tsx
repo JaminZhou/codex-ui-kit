@@ -102,53 +102,55 @@ export function AppShell({
       data-sidebar-open={sidebarOpen || undefined}
       {...props}
     >
-      <aside
-        aria-hidden={!sidebarOpen}
-        aria-label={sidebarLabel}
-        className="codex-ui-app-shell__sidebar"
-        inert={!sidebarOpen ? true : undefined}
-      >
-        {sidebar}
-      </aside>
-      <button
-        aria-label="Close navigation sidebar"
-        className="codex-ui-app-shell__backdrop"
-        data-backdrop="sidebar"
-        onClick={() => onSidebarOpenChange?.(false)}
-        tabIndex={sidebarOpen ? 0 : -1}
-        type="button"
-      />
-      <div
-        aria-label={mainLabel}
-        className="codex-ui-app-shell__main"
-        role={mainRole}
-      >
-        {children}
+      <div className="codex-ui-app-shell__layout">
+        <aside
+          aria-hidden={!sidebarOpen}
+          aria-label={sidebarLabel}
+          className="codex-ui-app-shell__sidebar"
+          inert={!sidebarOpen ? true : undefined}
+        >
+          {sidebar}
+        </aside>
+        <button
+          aria-label="Close navigation sidebar"
+          className="codex-ui-app-shell__backdrop"
+          data-backdrop="sidebar"
+          onClick={() => onSidebarOpenChange?.(false)}
+          tabIndex={sidebarOpen ? 0 : -1}
+          type="button"
+        />
+        <div
+          aria-label={mainLabel}
+          className="codex-ui-app-shell__main"
+          role={mainRole}
+        >
+          {children}
+        </div>
+        <button
+          aria-label="Close workspace panel"
+          className="codex-ui-app-shell__backdrop"
+          data-backdrop="side-panel"
+          onClick={() => onSidePanelOpenChange?.(false)}
+          tabIndex={sidePanelOpen ? 0 : -1}
+          type="button"
+        />
+        <aside
+          aria-hidden={!sidePanelOpen}
+          aria-label={sidePanelLabel}
+          className="codex-ui-app-shell__side-panel"
+          inert={!sidePanelOpen ? true : undefined}
+        >
+          {sidePanel}
+        </aside>
+        <section
+          aria-hidden={!bottomPanelOpen}
+          aria-label={bottomPanelLabel}
+          className="codex-ui-app-shell__bottom-panel"
+          inert={!bottomPanelOpen ? true : undefined}
+        >
+          {bottomPanel}
+        </section>
       </div>
-      <button
-        aria-label="Close workspace panel"
-        className="codex-ui-app-shell__backdrop"
-        data-backdrop="side-panel"
-        onClick={() => onSidePanelOpenChange?.(false)}
-        tabIndex={sidePanelOpen ? 0 : -1}
-        type="button"
-      />
-      <aside
-        aria-hidden={!sidePanelOpen}
-        aria-label={sidePanelLabel}
-        className="codex-ui-app-shell__side-panel"
-        inert={!sidePanelOpen ? true : undefined}
-      >
-        {sidePanel}
-      </aside>
-      <section
-        aria-hidden={!bottomPanelOpen}
-        aria-label={bottomPanelLabel}
-        className="codex-ui-app-shell__bottom-panel"
-        inert={!bottomPanelOpen ? true : undefined}
-      >
-        {bottomPanel}
-      </section>
     </div>
   );
 }

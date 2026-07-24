@@ -10,16 +10,17 @@ describe("application shell visual contract", () => {
     expect(tokens).toContain("--codex-ui-app-side-panel-width: 41.6875rem");
     expect(tokens).toContain("--codex-ui-app-bottom-panel-height: 15rem");
     expect(styles).toContain("container-name: codex-ui-app-shell");
+    expect(styles).toContain(".codex-ui-app-shell__layout");
     expect(styles).toContain("grid-template-columns:");
     expect(styles).toContain("grid-column: 2 / 4");
   });
 
   it("turns fixed columns into overlays before they can leave the viewport", () => {
     expect(styles).toContain(
-      "@container codex-ui-app-shell (max-width: 92rem)",
+      "@container codex-ui-app-shell (max-width: 92rem) {\n  .codex-ui-app-shell__layout {",
     );
     expect(styles).toContain(
-      "@container codex-ui-app-shell (max-width: 52rem)",
+      "@container codex-ui-app-shell (max-width: 52rem) {\n  .codex-ui-app-shell__layout {",
     );
     expect(styles).toContain(
       '.codex-ui-app-shell__backdrop[data-backdrop="side-panel"]',
