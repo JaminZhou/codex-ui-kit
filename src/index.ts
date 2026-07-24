@@ -22,4 +22,5 @@ export * from "./components/ToolCallCard.js";
 export * from "./components/TurnDuration.js";
 export * from "./components/ThreadNavigation.js";
 export * from "./components/ThreadState.js";
+export * from "./components/AppShell.js";
 export * from "./types.js";

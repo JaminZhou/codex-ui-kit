@@ -28,6 +28,9 @@ describe("interactive primitive visual contract", () => {
     expect(styles).toContain(".codex-ui-menu-item:focus-visible");
     expect(styles).toContain(".codex-ui-select-option[data-selected]");
     expect(styles).toContain("outline: 2px solid var(--codex-ui-focus)");
+    expect(styles).toMatch(
+      /\.codex-ui-menu-item__shortcut \{[\s\S]*?color: var\(--codex-ui-text-secondary\);/,
+    );
   });
 
   it("switches danger foreground and background atomically between themes", () => {

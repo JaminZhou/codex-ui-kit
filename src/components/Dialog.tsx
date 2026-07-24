@@ -13,6 +13,7 @@ import {
 import { createPortal } from "react-dom";
 import { acquireDocumentScrollLock } from "../internal/documentScrollLock.js";
 import { OverlayEnvironmentContext } from "../internal/overlayEnvironment.js";
+import { SurfaceBlockedContext } from "../internal/surfaceBlocked.js";
 
 export type DialogSize = "compact" | "standard" | "wide";
 
@@ -204,60 +205,65 @@ export function Dialog({
   };
 
   return createPortal(
-    <OverlayEnvironmentContext.Provider
-      value={{ layer: "dialog", ownerId: dialogId, theme: portalTheme }}
-    >
-      <div
-        className={["codex-ui-dialog", className].filter(Boolean).join(" ")}
-        data-size={size}
-        data-codex-ui-dialog-id={dialogId}
-        data-theme={portalTheme}
-        onKeyDown={handleKeyDown}
-        onPointerDown={(event) => {
-          if (closeOnBackdrop && event.target === event.currentTarget) {
-            onOpenChange(false);
-          }
-        }}
+    <SurfaceBlockedContext.Provider value={false}>
+      <OverlayEnvironmentContext.Provider
+        value={{ layer: "dialog", ownerId: dialogId, theme: portalTheme }}
       >
         <div
-          {...props}
-          aria-describedby={description ? descriptionId : undefined}
-          aria-labelledby={titleId}
-          aria-modal="true"
-          className="codex-ui-dialog__surface"
-          ref={surfaceRef}
-          role="dialog"
-          tabIndex={-1}
+          className={["codex-ui-dialog", className].filter(Boolean).join(" ")}
+          data-size={size}
+          data-codex-ui-dialog-id={dialogId}
+          data-theme={portalTheme}
+          onKeyDown={handleKeyDown}
+          onPointerDown={(event) => {
+            if (closeOnBackdrop && event.target === event.currentTarget) {
+              onOpenChange(false);
+            }
+          }}
         >
-          <header className="codex-ui-dialog__header">
-            <div className="codex-ui-dialog__heading">
-              <h2 className="codex-ui-dialog__title" id={titleId}>
-                {title}
-              </h2>
-              {description ? (
-                <div className="codex-ui-dialog__description" id={descriptionId}>
-                  {description}
-                </div>
+          <div
+            {...props}
+            aria-describedby={description ? descriptionId : undefined}
+            aria-labelledby={titleId}
+            aria-modal="true"
+            className="codex-ui-dialog__surface"
+            ref={surfaceRef}
+            role="dialog"
+            tabIndex={-1}
+          >
+            <header className="codex-ui-dialog__header">
+              <div className="codex-ui-dialog__heading">
+                <h2 className="codex-ui-dialog__title" id={titleId}>
+                  {title}
+                </h2>
+                {description ? (
+                  <div
+                    className="codex-ui-dialog__description"
+                    id={descriptionId}
+                  >
+                    {description}
+                  </div>
+                ) : null}
+              </div>
+              {showClose ? (
+                <button
+                  aria-label={closeLabel}
+                  className="codex-ui-dialog__close"
+                  onClick={() => onOpenChange(false)}
+                  type="button"
+                >
+                  <span aria-hidden="true">×</span>
+                </button>
               ) : null}
-            </div>
-            {showClose ? (
-              <button
-                aria-label={closeLabel}
-                className="codex-ui-dialog__close"
-                onClick={() => onOpenChange(false)}
-                type="button"
-              >
-                <span aria-hidden="true">×</span>
-              </button>
+            </header>
+            <div className="codex-ui-dialog__body">{children}</div>
+            {footer ? (
+              <footer className="codex-ui-dialog__footer">{footer}</footer>
             ) : null}
-          </header>
-          <div className="codex-ui-dialog__body">{children}</div>
-          {footer ? (
-            <footer className="codex-ui-dialog__footer">{footer}</footer>
-          ) : null}
+          </div>
         </div>
-      </div>
-    </OverlayEnvironmentContext.Provider>,
+      </OverlayEnvironmentContext.Provider>
+    </SurfaceBlockedContext.Provider>,
     document.body,
   );
 }

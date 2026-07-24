@@ -10,6 +10,11 @@ import {
   type ReactNode,
 } from "react";
 import { createPortal } from "react-dom";
+import {
+  getBlockedSurface,
+  surfaceBlockedEventName,
+  useSurfaceBlockState,
+} from "../internal/surfaceBlocked.js";
 import type { ApprovalDecision } from "../types.js";
 
 export type ApprovalRequestKind =
@@ -149,6 +154,9 @@ export function ApprovalRequest({
   const optionsToggleRef = useRef<HTMLButtonElement>(null);
   const [optionsOpen, setOptionsOpen] = useState(false);
   const [optionsPosition, setOptionsPosition] = useState<CSSProperties>();
+  const { blocked: surfaceBlocked, portalsBlocked } =
+    useSurfaceBlockState();
+  const optionsVisible = optionsOpen && !portalsBlocked;
   const isPending = decision === "pending";
   const actionsDisabled = disabled || loading;
   const primaryDisabled = actionsDisabled || approveDisabled || !onApprove;
@@ -163,7 +171,11 @@ export function ApprovalRequest({
   }, [isPending]);
 
   useEffect(() => {
-    if (!optionsOpen) return;
+    if (surfaceBlocked && optionsOpen) setOptionsOpen(false);
+  }, [optionsOpen, surfaceBlocked]);
+
+  useEffect(() => {
+    if (!optionsVisible) return;
 
     const dismissOutside = (event: PointerEvent) => {
       if (
@@ -180,16 +192,34 @@ export function ApprovalRequest({
       setOptionsOpen(false);
       optionsToggleRef.current?.focus();
     };
+    const dismissWhenOwnerBlocked = (event: Event) => {
+      const blockedSurface = getBlockedSurface(event);
+      if (
+        blockedSurface &&
+        rootRef.current &&
+        blockedSurface.contains(rootRef.current)
+      ) {
+        setOptionsOpen(false);
+      }
+    };
     document.addEventListener("pointerdown", dismissOutside);
     document.addEventListener("keydown", dismissOnEscape);
+    document.addEventListener(
+      surfaceBlockedEventName,
+      dismissWhenOwnerBlocked,
+    );
     return () => {
       document.removeEventListener("pointerdown", dismissOutside);
       document.removeEventListener("keydown", dismissOnEscape);
+      document.removeEventListener(
+        surfaceBlockedEventName,
+        dismissWhenOwnerBlocked,
+      );
     };
-  }, [optionsOpen]);
+  }, [optionsVisible]);
 
   useLayoutEffect(() => {
-    if (!optionsOpen) return;
+    if (!optionsVisible) return;
 
     const updatePosition = () => {
       const toggle = optionsToggleRef.current;
@@ -220,11 +250,12 @@ export function ApprovalRequest({
       window.removeEventListener("resize", updatePosition);
       window.removeEventListener("scroll", updatePosition, true);
     };
-  }, [optionsOpen]);
+  }, [optionsVisible]);
 
   useEffect(() => {
     if (
       !isPending ||
+      surfaceBlocked ||
       disableHotkeys ||
       actionsDisabled ||
       (!onApprove && !onReject)
@@ -276,14 +307,15 @@ export function ApprovalRequest({
     isPending,
     onApprove,
     onReject,
+    surfaceBlocked,
   ]);
 
-  const optionsPortalTarget = optionsOpen
+  const optionsPortalTarget = optionsVisible
     ? (rootRef.current?.parentElement?.closest<HTMLElement>(
         "[data-theme], [data-codex-ui]",
       ) ?? document.body)
     : null;
-  const optionsPortalTheme = optionsOpen
+  const optionsPortalTheme = optionsVisible
     ? rootRef.current?.closest<HTMLElement>("[data-theme]")?.dataset.theme
     : undefined;
   const handleOptionsKeyDown = (event: ReactKeyboardEvent<HTMLDivElement>) => {
@@ -317,7 +349,7 @@ export function ApprovalRequest({
     if (!primaryDisabled) onApprove?.();
   };
   const optionsMenu =
-    optionsOpen && isPending && scopedApproveAction && optionsPortalTarget
+    optionsVisible && isPending && scopedApproveAction && optionsPortalTarget
       ? createPortal(
           <div
             className="codex-ui-approval-request__options-menu"
@@ -371,7 +403,9 @@ export function ApprovalRequest({
       className={classes}
       data-codex-approval-surface
       data-decision={decision}
-      data-hotkeys-disabled={disableHotkeys || undefined}
+      data-hotkeys-disabled={
+        disableHotkeys || surfaceBlocked || undefined
+      }
       data-kind={kind}
       ref={rootRef}
       {...props}
@@ -470,8 +504,8 @@ export function ApprovalRequest({
                   {resolvedApproveLabel}
                 </button>
                 <button
-                  aria-controls={optionsOpen ? optionsId : undefined}
-                  aria-expanded={optionsOpen}
+                  aria-controls={optionsVisible ? optionsId : undefined}
+                  aria-expanded={optionsVisible}
                   aria-haspopup="menu"
                   aria-label={approvalOptionsLabel}
                   className="codex-ui-approval-request__button codex-ui-approval-request__button--primary codex-ui-approval-request__options-toggle"

@@ -1,0 +1,704 @@
+{
+  "schemaVersion": 1,
+  "baseline": {
+    "appVersion": "26.715.72359",
+    "buildNumber": "5718",
+    "sampledAt": "2026-07-23",
+    "appAsarSha256": "6c6528eb1e8450cdc506a59586f8caffe87576e200977e2a11bdea0cecf1c718",
+    "runtimeEvidence": "partial_cdp"
+  },
+  "surfaces": [
+    {
+      "id": "conversation.routing",
+      "area": "conversation",
+      "ownership": "app",
+      "packageEvidence": ["local-conversation-page", "remote-conversation-page", "chatgpt-conversation-page"],
+      "runtimeStatus": "not_sampled",
+      "implementationStatus": "not_started",
+      "browserStatus": "not_started",
+      "electronStatus": "not_started",
+      "priority": "p0"
+    },
+    {
+      "id": "thread.shell",
+      "area": "conversation",
+      "ownership": "thread",
+      "packageEvidence": ["thread-app-shell-chrome", "thread-scroll-layout"],
+      "runtimeStatus": "runtime_observed",
+      "runtimeEvidence": [
+        "cdp:new-chat-shell-dark-wide",
+        "cdp:renderer-viewport-2560-1180-820-layout-metrics"
+      ],
+      "implementationStatus": "partial",
+      "browserStatus": "partial_legacy",
+      "electronStatus": "partial_legacy",
+      "priority": "p0"
+    },
+    {
+      "id": "thread.virtualized-timeline",
+      "area": "conversation",
+      "ownership": "thread",
+      "packageEvidence": ["thread-virtualizer", "thread-scroll-controller-context-value"],
+      "runtimeStatus": "not_sampled",
+      "implementationStatus": "partial",
+      "browserStatus": "partial_legacy",
+      "electronStatus": "partial_legacy",
+      "priority": "p0"
+    },
+    {
+      "id": "thread.messages-markdown",
+      "area": "conversation",
+      "ownership": "turn",
+      "packageEvidence": ["conversation-markdown"],
+      "runtimeStatus": "runtime_observed",
+      "runtimeEvidence": [
+        "cdp:basic-user-and-assistant-turn",
+        "cdp:heading-lists-table-inline-code-code-block-quote-link-sample"
+      ],
+      "implementationStatus": "partial",
+      "browserStatus": "partial_legacy",
+      "electronStatus": "partial_legacy",
+      "priority": "p0"
+    },
+    {
+      "id": "thread.activity-reasoning-plan",
+      "area": "conversation",
+      "ownership": "turn",
+      "packageEvidence": ["is-plan-event-enabled", "plan-summary-page"],
+      "runtimeStatus": "runtime_observed",
+      "runtimeEvidence": [
+        "cdp:thinking-working-worked-activity",
+        "cdp:worked-activity-group-disclosure"
+      ],
+      "implementationStatus": "partial",
+      "browserStatus": "partial_legacy",
+      "electronStatus": "partial_legacy",
+      "priority": "p0"
+    },
+    {
+      "id": "thread.command-execution",
+      "area": "conversation",
+      "ownership": "turn",
+      "packageEvidence": ["run-command-animation"],
+      "runtimeStatus": "runtime_observed",
+      "runtimeEvidence": [
+        "cdp:collapsed-and-expanded-read-only-command",
+        "cdp:grouped-success-and-exit-code-7-command-rows",
+        "cdp:long-output-144px-scroll-fade-container",
+        "cdp:running-duration-stop-and-background-process-state"
+      ],
+      "implementationStatus": "partial",
+      "browserStatus": "partial_legacy",
+      "electronStatus": "partial_legacy",
+      "priority": "p0"
+    },
+    {
+      "id": "thread.file-change-diff",
+      "area": "conversation",
+      "ownership": "turn",
+      "packageEvidence": ["file-diff", "message-square-diff"],
+      "runtimeStatus": "not_sampled",
+      "implementationStatus": "partial",
+      "browserStatus": "partial_legacy",
+      "electronStatus": "partial_legacy",
+      "priority": "p0"
+    },
+    {
+      "id": "thread.search-tool-mcp-events",
+      "area": "conversation",
+      "ownership": "turn",
+      "packageEvidence": ["code-searching-icon", "web-search-icon"],
+      "runtimeStatus": "not_sampled",
+      "implementationStatus": "partial",
+      "browserStatus": "partial_legacy",
+      "electronStatus": "partial_legacy",
+      "priority": "p0"
+    },
+    {
+      "id": "thread.subagent-delegation",
+      "area": "conversation",
+      "ownership": "turn",
+      "packageEvidence": ["local-conversation-thread"],
+      "runtimeStatus": "not_sampled",
+      "implementationStatus": "partial",
+      "browserStatus": "partial_legacy",
+      "electronStatus": "partial_legacy",
+      "priority": "p0"
+    },
+    {
+      "id": "thread.approval-permission-events",
+      "area": "conversation",
+      "ownership": "turn",
+      "packageEvidence": ["auto-review-approval-nudge", "permissions-mode-dropdown"],
+      "runtimeStatus": "not_sampled",
+      "implementationStatus": "partial",
+      "browserStatus": "partial_legacy",
+      "electronStatus": "partial_legacy",
+      "priority": "p0"
+    },
+    {
+      "id": "thread.error-retry-recovery",
+      "area": "conversation",
+      "ownership": "thread",
+      "packageEvidence": ["local-conversation-page", "remote-conversation-page"],
+      "runtimeStatus": "not_sampled",
+      "implementationStatus": "partial",
+      "browserStatus": "partial_legacy",
+      "electronStatus": "partial_legacy",
+      "priority": "p0"
+    },
+    {
+      "id": "thread.interruption-stop",
+      "area": "conversation",
+      "ownership": "thread",
+      "packageEvidence": ["local-conversation-page", "run-command-animation"],
+      "runtimeStatus": "runtime_observed",
+      "runtimeEvidence": [
+        "cdp:stop-button-you-stopped-summary-and-stopped-command"
+      ],
+      "implementationStatus": "partial",
+      "browserStatus": "not_started",
+      "electronStatus": "not_started",
+      "priority": "p0"
+    },
+    {
+      "id": "thread.context-summary",
+      "area": "conversation",
+      "ownership": "thread",
+      "packageEvidence": ["toggle-thread-summary-panel", "use-thread-summary-panel"],
+      "runtimeStatus": "not_sampled",
+      "implementationStatus": "partial",
+      "browserStatus": "partial_legacy",
+      "electronStatus": "partial_legacy",
+      "priority": "p0"
+    },
+    {
+      "id": "thread.message-navigation",
+      "area": "conversation",
+      "ownership": "thread",
+      "packageEvidence": ["thread-user-message-navigation-rail"],
+      "runtimeStatus": "not_sampled",
+      "implementationStatus": "partial",
+      "browserStatus": "partial_legacy",
+      "electronStatus": "partial_legacy",
+      "priority": "p0"
+    },
+    {
+      "id": "thread.panel-system",
+      "area": "conversation",
+      "ownership": "thread",
+      "packageEvidence": ["thread-panel-toggle-button", "thread-side-panel-tabs", "thread-browser-panel-tabs"],
+      "runtimeStatus": "runtime_observed",
+      "runtimeEvidence": [
+        "cdp:right-review-panel-open-close-transition",
+        "cdp:right-environment-panel-visible",
+        "cdp:sources-side-tab-and-bottom-terminal-tab",
+        "cdp:floating-background-process-section"
+      ],
+      "implementationStatus": "partial",
+      "browserStatus": "not_started",
+      "electronStatus": "not_started",
+      "priority": "p0"
+    },
+    {
+      "id": "thread.sources-panel",
+      "area": "conversation",
+      "ownership": "thread",
+      "packageEvidence": ["conversation-markdown", "thread-side-panel-tabs"],
+      "runtimeStatus": "runtime_observed",
+      "runtimeEvidence": [
+        "cdp:source-summary-view-all-and-sources-tabpanel"
+      ],
+      "implementationStatus": "partial",
+      "browserStatus": "not_started",
+      "electronStatus": "not_started",
+      "priority": "p1"
+    },
+    {
+      "id": "thread.overflow-actions",
+      "area": "conversation",
+      "ownership": "thread",
+      "packageEvidence": ["thread-overflow-menu"],
+      "runtimeStatus": "not_sampled",
+      "implementationStatus": "not_started",
+      "browserStatus": "not_started",
+      "electronStatus": "not_started",
+      "priority": "p1"
+    },
+    {
+      "id": "composer.shell",
+      "area": "composer",
+      "ownership": "thread",
+      "packageEvidence": ["composer-utility-bar"],
+      "runtimeStatus": "runtime_observed",
+      "runtimeEvidence": [
+        "cdp:empty-submitting-and-completed-composer",
+        "cdp:composer-width-712-to-490-under-viewport-probe"
+      ],
+      "implementationStatus": "partial",
+      "browserStatus": "partial_legacy",
+      "electronStatus": "partial_legacy",
+      "priority": "p0"
+    },
+    {
+      "id": "composer.project-worktree-selection",
+      "area": "composer",
+      "ownership": "thread",
+      "packageEvidence": ["composer-project-selector", "worktree-environment-dropdown"],
+      "runtimeStatus": "runtime_observed",
+      "runtimeEvidence": [
+        "cdp:project-local-and-branch-controls",
+        "cdp:local-cloud-worktree-location-menu",
+        "cdp:branch-menu-current-and-create-actions"
+      ],
+      "implementationStatus": "not_started",
+      "browserStatus": "not_started",
+      "electronStatus": "not_started",
+      "priority": "p0"
+    },
+    {
+      "id": "composer.mode-permissions",
+      "area": "composer",
+      "ownership": "thread",
+      "packageEvidence": ["home-composer-mode-toggle", "permissions-mode-dropdown"],
+      "runtimeStatus": "runtime_observed",
+      "runtimeEvidence": [
+        "cdp:permission-menu-four-modes",
+        "cdp:model-effort-speed-menu"
+      ],
+      "implementationStatus": "partial",
+      "browserStatus": "partial_legacy",
+      "electronStatus": "partial_legacy",
+      "priority": "p0"
+    },
+    {
+      "id": "composer.queue",
+      "area": "composer",
+      "ownership": "thread",
+      "packageEvidence": ["queued-message-list"],
+      "runtimeStatus": "runtime_observed",
+      "runtimeEvidence": [
+        "cdp:queued-follow-up-card-delete-actions-and-sequential-run"
+      ],
+      "implementationStatus": "partial",
+      "browserStatus": "partial_legacy",
+      "electronStatus": "partial_legacy",
+      "priority": "p0"
+    },
+    {
+      "id": "composer.plugins-attachments-resources",
+      "area": "composer",
+      "ownership": "thread",
+      "packageEvidence": ["composer-work-home-plugins-control", "connect-plugins-submenu-item"],
+      "runtimeStatus": "not_sampled",
+      "implementationStatus": "partial",
+      "browserStatus": "partial_legacy",
+      "electronStatus": "partial_legacy",
+      "priority": "p1"
+    },
+    {
+      "id": "app.shell-navigation",
+      "area": "app-shell",
+      "ownership": "app",
+      "packageEvidence": ["app-main", "thread-app-shell-chrome"],
+      "runtimeStatus": "runtime_observed",
+      "runtimeEvidence": [
+        "cdp:global-sidebar-and-top-controls",
+        "cdp:pull-requests-sites-scheduled-plugins-routes"
+      ],
+      "implementationStatus": "partial",
+      "browserStatus": "not_started",
+      "electronStatus": "not_started",
+      "priority": "p0"
+    },
+    {
+      "id": "app.projects-index",
+      "area": "app-shell",
+      "ownership": "app",
+      "packageEvidence": ["projects-index-page"],
+      "runtimeStatus": "not_sampled",
+      "implementationStatus": "not_started",
+      "browserStatus": "not_started",
+      "electronStatus": "not_started",
+      "priority": "p0"
+    },
+    {
+      "id": "app.sites-index",
+      "area": "app-shell",
+      "ownership": "app",
+      "packageEvidence": ["app-main"],
+      "runtimeStatus": "runtime_observed",
+      "runtimeEvidence": ["cdp:sites-index-search-refresh-create-actions"],
+      "implementationStatus": "not_started",
+      "browserStatus": "not_started",
+      "electronStatus": "not_started",
+      "priority": "p1"
+    },
+    {
+      "id": "app.new-thread-workspace-selection",
+      "area": "app-shell",
+      "ownership": "app",
+      "packageEvidence": ["new-thread-panel-page", "select-workspace-page"],
+      "runtimeStatus": "runtime_observed",
+      "runtimeEvidence": ["cdp:blank-new-chat-and-project-menu"],
+      "implementationStatus": "not_started",
+      "browserStatus": "not_started",
+      "electronStatus": "not_started",
+      "priority": "p0"
+    },
+    {
+      "id": "app.onboarding-login",
+      "area": "app-shell",
+      "ownership": "app",
+      "packageEvidence": ["onboarding-page", "login-route", "first-run"],
+      "runtimeStatus": "not_sampled",
+      "implementationStatus": "not_started",
+      "browserStatus": "not_started",
+      "electronStatus": "not_started",
+      "priority": "p1"
+    },
+    {
+      "id": "app.quick-hotkey-windows",
+      "area": "app-shell",
+      "ownership": "app",
+      "packageEvidence": ["quick-chat-window-page", "hotkey-window-home-page", "hotkey-window-thread-page"],
+      "runtimeStatus": "not_sampled",
+      "implementationStatus": "not_started",
+      "browserStatus": "not_started",
+      "electronStatus": "not_started",
+      "priority": "p2"
+    },
+    {
+      "id": "workspace.side-panel-shell",
+      "area": "workspace",
+      "ownership": "workspace",
+      "packageEvidence": ["thread-side-panel-tabs", "inspection-panel"],
+      "runtimeStatus": "runtime_observed",
+      "runtimeEvidence": [
+        "cdp:right-review-panel-layout",
+        "cdp:right-environment-panel-layout",
+        "cdp:right-sources-tabpanel-layout"
+      ],
+      "implementationStatus": "partial",
+      "browserStatus": "not_started",
+      "electronStatus": "not_started",
+      "priority": "p0"
+    },
+    {
+      "id": "workspace.editor-diff",
+      "area": "workspace",
+      "ownership": "workspace",
+      "packageEvidence": ["editor-diff-page", "diff", "file-diff"],
+      "runtimeStatus": "runtime_observed",
+      "runtimeEvidence": ["cdp:review-panel-file-diff-list"],
+      "implementationStatus": "partial",
+      "browserStatus": "partial_legacy",
+      "electronStatus": "not_started",
+      "priority": "p0"
+    },
+    {
+      "id": "workspace.terminal",
+      "area": "workspace",
+      "ownership": "workspace",
+      "packageEvidence": ["terminal", "file-terminal", "shellsession"],
+      "runtimeStatus": "runtime_observed",
+      "runtimeEvidence": [
+        "cdp:bottom-terminal-tabpanel-header-and-terminal-input"
+      ],
+      "implementationStatus": "partial",
+      "browserStatus": "not_started",
+      "electronStatus": "not_started",
+      "priority": "p0"
+    },
+    {
+      "id": "workspace.pull-request-route",
+      "area": "workspace",
+      "ownership": "workspace",
+      "packageEvidence": ["pull-request-route", "pull-request-actions"],
+      "runtimeStatus": "runtime_observed",
+      "runtimeEvidence": ["cdp:pull-request-index-tabs-search-split-layout"],
+      "implementationStatus": "not_started",
+      "browserStatus": "not_started",
+      "electronStatus": "not_started",
+      "priority": "p0"
+    },
+    {
+      "id": "workspace.pull-request-review",
+      "area": "workspace",
+      "ownership": "workspace",
+      "packageEvidence": ["pull-request-code-review", "pull-request-reviewer-status-list", "pull-request-fix-button"],
+      "runtimeStatus": "not_sampled",
+      "implementationStatus": "not_started",
+      "browserStatus": "not_started",
+      "electronStatus": "not_started",
+      "priority": "p0"
+    },
+    {
+      "id": "workspace.browser",
+      "area": "workspace",
+      "ownership": "workspace",
+      "packageEvidence": ["browser", "thread-browser-panel-tabs"],
+      "runtimeStatus": "not_sampled",
+      "implementationStatus": "not_started",
+      "browserStatus": "not_started",
+      "electronStatus": "not_started",
+      "priority": "p1"
+    },
+    {
+      "id": "workspace.artifact-shell",
+      "area": "workspace",
+      "ownership": "workspace",
+      "packageEvidence": ["artifact-tab-content", "artifact-preview-status"],
+      "runtimeStatus": "not_sampled",
+      "implementationStatus": "partial",
+      "browserStatus": "partial_legacy",
+      "electronStatus": "not_started",
+      "priority": "p1"
+    },
+    {
+      "id": "workspace.document-previews",
+      "area": "workspace",
+      "ownership": "workspace",
+      "packageEvidence": ["notebook-preview-panel", "pdf-preview-panel", "docx-preview-panel", "PopcornElectronWorkbookPanel", "PopcornElectronPresentationPanel"],
+      "runtimeStatus": "not_sampled",
+      "implementationStatus": "not_started",
+      "browserStatus": "not_started",
+      "electronStatus": "not_started",
+      "priority": "p1"
+    },
+    {
+      "id": "workspace.media-generated-content",
+      "area": "workspace",
+      "ownership": "workspace",
+      "packageEvidence": ["artifact-file-preview-icon", "home-prefill-artifact-preview"],
+      "runtimeStatus": "not_sampled",
+      "implementationStatus": "partial",
+      "browserStatus": "partial_legacy",
+      "electronStatus": "not_started",
+      "priority": "p1"
+    },
+    {
+      "id": "workspace.environments",
+      "area": "workspace",
+      "ownership": "workspace",
+      "packageEvidence": ["local-environment-editor", "local-environments-settings-page", "cloud-environments-settings-page"],
+      "runtimeStatus": "runtime_observed",
+      "runtimeEvidence": ["cdp:environment-side-panel-and-settings-project-index"],
+      "implementationStatus": "not_started",
+      "browserStatus": "not_started",
+      "electronStatus": "not_started",
+      "priority": "p1"
+    },
+    {
+      "id": "workspace.worktrees",
+      "area": "workspace",
+      "ownership": "workspace",
+      "packageEvidence": ["worktrees-settings-page", "stable-worktree-status-dialog", "worktree-setup-auto-fix"],
+      "runtimeStatus": "runtime_observed",
+      "runtimeEvidence": ["cdp:worktree-settings-empty-state-and-retention-controls"],
+      "implementationStatus": "not_started",
+      "browserStatus": "not_started",
+      "electronStatus": "not_started",
+      "priority": "p0"
+    },
+    {
+      "id": "settings.shell-search",
+      "area": "settings",
+      "ownership": "app",
+      "packageEvidence": ["settings-page", "settings-command-menu-section-items", "virtual-settings-search-documents"],
+      "runtimeStatus": "runtime_observed",
+      "runtimeEvidence": ["cdp:settings-full-page-shell-sidebar-and-search"],
+      "implementationStatus": "not_started",
+      "browserStatus": "not_started",
+      "electronStatus": "not_started",
+      "priority": "p1"
+    },
+    {
+      "id": "settings.general-appearance",
+      "area": "settings",
+      "ownership": "app",
+      "packageEvidence": ["general-settings", "appearance-settings"],
+      "runtimeStatus": "runtime_observed",
+      "runtimeEvidence": ["cdp:general-form-and-appearance-theme-preferences"],
+      "implementationStatus": "not_started",
+      "browserStatus": "not_started",
+      "electronStatus": "not_started",
+      "priority": "p1"
+    },
+    {
+      "id": "settings.personalization",
+      "area": "settings",
+      "ownership": "app",
+      "packageEvidence": ["personalization-settings"],
+      "runtimeStatus": "not_sampled",
+      "implementationStatus": "not_started",
+      "browserStatus": "not_started",
+      "electronStatus": "not_started",
+      "priority": "p1"
+    },
+    {
+      "id": "settings.keyboard-voice-dictation",
+      "area": "settings",
+      "ownership": "app",
+      "packageEvidence": ["keyboard-shortcuts-settings", "voice-settings", "global-dictation-page"],
+      "runtimeStatus": "not_sampled",
+      "implementationStatus": "not_started",
+      "browserStatus": "not_started",
+      "electronStatus": "not_started",
+      "priority": "p2"
+    },
+    {
+      "id": "settings.usage-subscription",
+      "area": "settings",
+      "ownership": "app",
+      "packageEvidence": ["usage-settings", "upgrade-plan-dialog", "subscription-update-plan"],
+      "runtimeStatus": "not_sampled",
+      "implementationStatus": "not_started",
+      "browserStatus": "not_started",
+      "electronStatus": "not_started",
+      "priority": "p2"
+    },
+    {
+      "id": "settings.git-hooks-review",
+      "area": "settings",
+      "ownership": "app",
+      "packageEvidence": ["git-settings", "hooks-settings", "code-review-settings", "review-delivery-settings-row"],
+      "runtimeStatus": "runtime_observed",
+      "runtimeEvidence": ["cdp:git-branch-pr-review-delivery-and-hooks-settings"],
+      "implementationStatus": "not_started",
+      "browserStatus": "not_started",
+      "electronStatus": "not_started",
+      "priority": "p1"
+    },
+    {
+      "id": "settings.browser-computer-use",
+      "area": "settings",
+      "ownership": "app",
+      "packageEvidence": ["browser-use-settings", "computer-use-settings", "browser-profile-import-dialog"],
+      "runtimeStatus": "runtime_observed",
+      "runtimeEvidence": ["cdp:browser-and-computer-use-settings"],
+      "implementationStatus": "not_started",
+      "browserStatus": "not_started",
+      "electronStatus": "not_started",
+      "priority": "p2"
+    },
+    {
+      "id": "integrations.mcp",
+      "area": "integrations",
+      "ownership": "app",
+      "packageEvidence": ["mcp-settings", "mcp-capability-view-page"],
+      "runtimeStatus": "not_sampled",
+      "implementationStatus": "not_started",
+      "browserStatus": "not_started",
+      "electronStatus": "not_started",
+      "priority": "p1"
+    },
+    {
+      "id": "integrations.plugins",
+      "area": "integrations",
+      "ownership": "app",
+      "packageEvidence": ["plugins-page", "plugin-detail-page", "plugins-settings"],
+      "runtimeStatus": "runtime_observed",
+      "runtimeEvidence": ["cdp:plugins-index-search-categories-actions-and-settings"],
+      "implementationStatus": "not_started",
+      "browserStatus": "not_started",
+      "electronStatus": "not_started",
+      "priority": "p1"
+    },
+    {
+      "id": "integrations.skills",
+      "area": "integrations",
+      "ownership": "app",
+      "packageEvidence": ["skills-page", "skills-settings"],
+      "runtimeStatus": "runtime_observed",
+      "runtimeEvidence": ["cdp:skills-index-search-actions"],
+      "implementationStatus": "not_started",
+      "browserStatus": "not_started",
+      "electronStatus": "not_started",
+      "priority": "p1"
+    },
+    {
+      "id": "integrations.automations",
+      "area": "integrations",
+      "ownership": "app",
+      "packageEvidence": ["automations-page", "use-plugin-scheduled-tasks"],
+      "runtimeStatus": "runtime_observed",
+      "runtimeEvidence": ["cdp:scheduled-index-filters-search-suggestions"],
+      "implementationStatus": "not_started",
+      "browserStatus": "not_started",
+      "electronStatus": "not_started",
+      "priority": "p1"
+    },
+    {
+      "id": "integrations.remote-connections",
+      "area": "integrations",
+      "ownership": "app",
+      "packageEvidence": ["remote-connections-page", "remote-connections-settings"],
+      "runtimeStatus": "runtime_observed",
+      "runtimeEvidence": ["cdp:connections-device-ssh-and-connection-controls"],
+      "implementationStatus": "not_started",
+      "browserStatus": "not_started",
+      "electronStatus": "not_started",
+      "priority": "p2"
+    },
+    {
+      "id": "integrations.mobile-setup",
+      "area": "integrations",
+      "ownership": "app",
+      "packageEvidence": ["codex-mobile-page", "codex-mobile-setup-dialog"],
+      "runtimeStatus": "not_sampled",
+      "implementationStatus": "not_started",
+      "browserStatus": "not_started",
+      "electronStatus": "not_started",
+      "priority": "p2"
+    },
+    {
+      "id": "cross-layer.overlays",
+      "area": "cross-layer",
+      "ownership": "cross-layer",
+      "packageEvidence": ["business-checkout-switch-workspace-dialog", "stable-worktree-status-dialog", "debug-modal"],
+      "runtimeStatus": "runtime_observed",
+      "runtimeEvidence": [
+        "cdp:project-permission-model-location-and-branch-portalled-menus",
+        "cdp:profile-menu-to-settings-transition"
+      ],
+      "implementationStatus": "partial",
+      "browserStatus": "partial_legacy",
+      "electronStatus": "partial_legacy",
+      "priority": "p0"
+    },
+    {
+      "id": "cross-layer.oauth-connection",
+      "area": "cross-layer",
+      "ownership": "cross-layer",
+      "packageEvidence": ["app-connect-oauth-callback-page", "checkout-webview-page"],
+      "runtimeStatus": "not_sampled",
+      "implementationStatus": "not_started",
+      "browserStatus": "not_started",
+      "electronStatus": "not_started",
+      "priority": "p2"
+    },
+    {
+      "id": "scope-candidate.appgen-and-artifact-creation",
+      "area": "scope-candidate",
+      "ownership": "app",
+      "packageEvidence": ["appgen-library-page", "appgen-page", "artifact-creation-prompts"],
+      "runtimeStatus": "not_sampled",
+      "implementationStatus": "scope_pending",
+      "browserStatus": "not_started",
+      "electronStatus": "not_started",
+      "priority": "p2"
+    },
+    {
+      "id": "scope-candidate.device-pets-and-avatar",
+      "area": "scope-candidate",
+      "ownership": "app",
+      "packageEvidence": ["codex-micro-settings", "pets-settings", "avatar-overlay-page"],
+      "runtimeStatus": "not_sampled",
+      "implementationStatus": "scope_pending",
+      "browserStatus": "not_started",
+      "electronStatus": "not_started",
+      "priority": "p2"
+    }
+  ]
+}

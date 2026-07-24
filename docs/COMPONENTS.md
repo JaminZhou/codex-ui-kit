@@ -79,6 +79,15 @@ All privileged behavior remains host-owned. The components never auto-approve co
 
 ## Navigation and shell
 
+- `AppShell`: the application-level grid for a persistent navigation sidebar,
+  conversation main region, right workspace panel, and bottom panel. Wide mode
+  reserves measured tracks; medium and narrow containers switch side surfaces
+  to dismissible overlays before the conversation becomes unusably narrow.
+- `AppSidebar`, `AppSidebarSection`, and `AppSidebarItem`: grouped primary
+  navigation with selected-route state, descriptions, badges, header, and
+  footer slots.
+- `WorkspacePanel`: controlled side or bottom tab shell with tab semantics,
+  close/open/expand hooks, focusable content, and host-owned tab contents.
 - `ThreadHeader`: draggable desktop header with truncating identity, navigation, and independently aligned action slots.
 - `ThreadNavigationControls`: sidebar and optional Back/Forward toolbar controls with shortcuts, disabled states, and transient-navigation hover hooks.
 - `ThreadMessageNavigationRail`: message overview with active markers, keyboard and pointer previews, click navigation, and pointer scrubbing.

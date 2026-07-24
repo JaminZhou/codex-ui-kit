@@ -43,5 +43,13 @@ describe("file change visual contract", () => {
     );
     expect(styles).toContain(".codex-ui-file-change__action[data-streaming]");
     expect(styles).toContain("@media (prefers-reduced-motion: reduce)");
+    const streamingPulse = styles.match(
+      /@keyframes codex-ui-file-change-streaming \{([\s\S]*?)\n\}/,
+    )?.[1];
+    expect(streamingPulse).toContain(
+      "color: var(--codex-ui-text-secondary)",
+    );
+    expect(streamingPulse).toContain("color: var(--codex-ui-text)");
+    expect(streamingPulse).not.toContain("opacity");
   });
 });
