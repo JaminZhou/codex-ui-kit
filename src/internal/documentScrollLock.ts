@@ -54,6 +54,14 @@ export function retargetModalReturnFocusWithin(
     surface?.contains(target) ?? false,
 ) {
   if (!surface || typeof document === "undefined") return;
+  for (let index = deferredFocusTargets.length - 1; index >= 0; index -= 1) {
+    if (!ownsTarget(deferredFocusTargets[index]!)) continue;
+    if (returnFocus) {
+      deferredFocusTargets[index] = returnFocus;
+    } else {
+      deferredFocusTargets.splice(index, 1);
+    }
+  }
   for (const entry of activeModalLocks) {
     if (entry.returnFocus && ownsTarget(entry.returnFocus)) {
       entry.returnFocus = returnFocus;
