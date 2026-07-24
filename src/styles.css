@@ -3318,11 +3318,11 @@ summary.codex-ui-activity__header::after {
 @keyframes codex-ui-tool-activity-pulse {
   0%,
   100% {
-    opacity: 0.58;
+    color: var(--codex-ui-text-secondary);
   }
 
   50% {
-    opacity: 1;
+    color: var(--codex-ui-text);
   }
 }
 
@@ -3893,11 +3893,11 @@ summary.codex-ui-activity__header::after {
 @keyframes codex-ui-file-change-streaming {
   0%,
   100% {
-    opacity: 0.58;
+    color: var(--codex-ui-text-secondary);
   }
 
   50% {
-    opacity: 1;
+    color: var(--codex-ui-text);
   }
 }
 

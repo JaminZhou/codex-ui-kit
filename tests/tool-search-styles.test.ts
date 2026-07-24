@@ -30,5 +30,13 @@ describe("tool and search visual contract", () => {
     expect(styles).toContain("@keyframes codex-ui-tool-activity-enter");
     expect(styles).toContain(".codex-ui-tool-call__label[data-active]");
     expect(styles).toContain("@media (prefers-reduced-motion: reduce)");
+    const activePulse = styles.match(
+      /@keyframes codex-ui-tool-activity-pulse \{([\s\S]*?)\n\}/,
+    )?.[1];
+    expect(activePulse).toContain(
+      "color: var(--codex-ui-text-secondary)",
+    );
+    expect(activePulse).toContain("color: var(--codex-ui-text)");
+    expect(activePulse).not.toContain("opacity");
   });
 });
