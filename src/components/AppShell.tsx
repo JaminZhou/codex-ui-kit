@@ -109,23 +109,17 @@ function useSurfaceFocusRestoration(
 
 type AppShellLayoutMode = "narrow" | "medium" | "wide";
 
-function readAppShellBreakpoint(
-  shell: HTMLElement,
-  property: string,
-  fallbackRem: number,
-) {
-  const shellStyles = getComputedStyle(shell);
+// CSS container-query conditions cannot consume custom properties. Keep these
+// internal constants locked to the matching queries in styles.css.
+const appShellMediumBreakpointRem = 92;
+const appShellNarrowBreakpointRem = 52;
+
+function appShellRemToPixels(shell: HTMLElement, rem: number) {
   const rootFontSize =
     Number.parseFloat(
       getComputedStyle(shell.ownerDocument.documentElement).fontSize,
     ) || 16;
-  const value = shellStyles.getPropertyValue(property).trim();
-  const amount = Number.parseFloat(value);
-  if (Number.isFinite(amount)) {
-    if (value.endsWith("px")) return amount;
-    if (value.endsWith("rem")) return amount * rootFontSize;
-  }
-  return fallbackRem * rootFontSize;
+  return rem * rootFontSize;
 }
 
 function useAppShellLayoutMode(
@@ -139,15 +133,13 @@ function useAppShellLayoutMode(
 
     const update = (width: number) => {
       if (width <= 0) return;
-      const mediumBreakpoint = readAppShellBreakpoint(
+      const mediumBreakpoint = appShellRemToPixels(
         shell,
-        "--codex-ui-app-shell-medium-breakpoint",
-        92,
+        appShellMediumBreakpointRem,
       );
-      const narrowBreakpoint = readAppShellBreakpoint(
+      const narrowBreakpoint = appShellRemToPixels(
         shell,
-        "--codex-ui-app-shell-narrow-breakpoint",
-        52,
+        appShellNarrowBreakpointRem,
       );
       const nextMode =
         width <= narrowBreakpoint

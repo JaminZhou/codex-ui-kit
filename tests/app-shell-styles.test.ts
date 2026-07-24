@@ -3,6 +3,10 @@ import { describe, expect, it } from "vitest";
 
 const styles = readFileSync(new URL("../src/styles.css", import.meta.url), "utf8");
 const tokens = readFileSync(new URL("../src/tokens.css", import.meta.url), "utf8");
+const component = readFileSync(
+  new URL("../src/components/AppShell.tsx", import.meta.url),
+  "utf8",
+);
 
 describe("application shell visual contract", () => {
   it("locks the observed wide shell and workspace panel geometry", () => {
@@ -22,6 +26,10 @@ describe("application shell visual contract", () => {
     expect(styles).toContain(
       "@container codex-ui-app-shell (max-width: 52rem) {\n  .codex-ui-app-shell__layout {",
     );
+    expect(component).toContain("const appShellMediumBreakpointRem = 92");
+    expect(component).toContain("const appShellNarrowBreakpointRem = 52");
+    expect(tokens).not.toContain("--codex-ui-app-shell-medium-breakpoint");
+    expect(tokens).not.toContain("--codex-ui-app-shell-narrow-breakpoint");
     expect(styles).toContain(
       '.codex-ui-app-shell__backdrop[data-backdrop="side-panel"]',
     );
