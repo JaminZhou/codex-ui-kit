@@ -692,6 +692,7 @@ export function WorkspacePanel({
   ...props
 }: WorkspacePanelProps) {
   const panelId = useId();
+  const panelRef = useRef<HTMLElement>(null);
   const activeTab = tabs.find((tab) => tab.id === activeTabId);
   const activeIndex = activeTab
     ? tabs.findIndex((tab) => tab.id === activeTab.id)
@@ -728,6 +729,34 @@ export function WorkspacePanel({
     onActiveTabChange(tabs[nextIndex]!.id);
     document.getElementById(`${panelId}-tab-${nextIndex}`)?.focus();
   };
+  const closeActiveTab = () => {
+    if (!activeTab || !onCloseTab) return;
+    const closingIndex = activeIndex;
+    onCloseTab(activeTab.id);
+    if (typeof window === "undefined") return;
+    window.setTimeout(() => {
+      const panel = panelRef.current;
+      if (!panel) return;
+      const remainingTabs = [
+        ...panel.querySelectorAll<HTMLButtonElement>(
+          '[role="tab"]:not(:disabled)',
+        ),
+      ];
+      const selectedTab = remainingTabs.find(
+        (tab) => tab.getAttribute("aria-selected") === "true",
+      );
+      const nearestTab =
+        remainingTabs[
+          Math.min(Math.max(closingIndex, 0), remainingTabs.length - 1)
+        ];
+      const target =
+        selectedTab ??
+        nearestTab ??
+        panel.querySelector<HTMLElement>('[role="tabpanel"]') ??
+        panel;
+      target.focus();
+    });
+  };
 
   return (
     <section
@@ -737,12 +766,14 @@ export function WorkspacePanel({
         .join(" ")}
       data-expanded={expanded || undefined}
       data-placement={placement}
+      ref={panelRef}
       style={
         {
           ...style,
           "--codex-ui-workspace-tab-count": Math.max(tabs.length, 1),
         } as CSSProperties
       }
+      tabIndex={-1}
       {...props}
     >
       <header className="codex-ui-workspace-panel__header">
@@ -787,7 +818,7 @@ export function WorkspacePanel({
                   ? `Close ${activeTab.label} tab`
                   : "Close active tab")
               }
-              onClick={() => onCloseTab(activeTab.id)}
+              onClick={closeActiveTab}
               size="toolbar"
             />
           ) : null}

@@ -1024,4 +1024,65 @@ describe("workspace panel", () => {
       screen.getByRole("button", { name: "Close active tab" }),
     ).toBeTruthy();
   });
+
+  it("restores focus after closing the active tab", async () => {
+    function ClosableTabsFixture() {
+      const [activeTabId, setActiveTabId] = useState("sources");
+      const [tabs, setTabs] = useState([
+        { content: "Source content", id: "sources", label: "Sources" },
+        { content: "Review content", id: "review", label: "Review" },
+      ]);
+      const closeTab = (id: string) => {
+        setTabs((currentTabs) => {
+          const closingIndex = currentTabs.findIndex(
+            (tab) => tab.id === id,
+          );
+          const remainingTabs = currentTabs.filter(
+            (tab) => tab.id !== id,
+          );
+          const nextTab =
+            remainingTabs[
+              Math.min(
+                Math.max(closingIndex, 0),
+                remainingTabs.length - 1,
+              )
+            ];
+          setActiveTabId(nextTab?.id ?? "");
+          return remainingTabs;
+        });
+      };
+      return (
+        <WorkspacePanel
+          activeTabId={activeTabId}
+          label="Closable workspace"
+          onActiveTabChange={setActiveTabId}
+          onCloseTab={closeTab}
+          tabs={tabs}
+        />
+      );
+    }
+
+    render(<ClosableTabsFixture />);
+    const closeSources = screen.getByRole("button", {
+      name: "Close Sources tab",
+    });
+    closeSources.focus();
+    fireEvent.click(closeSources);
+    await waitFor(() =>
+      expect(document.activeElement).toBe(
+        screen.getByRole("tab", { name: "Review" }),
+      ),
+    );
+
+    const closeReview = screen.getByRole("button", {
+      name: "Close Review tab",
+    });
+    closeReview.focus();
+    fireEvent.click(closeReview);
+    await waitFor(() =>
+      expect(document.activeElement).toBe(
+        screen.getByRole("region", { name: "Closable workspace" }),
+      ),
+    );
+  });
 });
