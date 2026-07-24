@@ -808,6 +808,86 @@ describe("application shell", () => {
     expect(document.body.style.overflow).toBe("auto");
   });
 
+  it("restores focus outside an embedded shell after a dialog closes", async () => {
+    let resize: ((width: number) => void) | undefined;
+    class ResizeObserverMock {
+      constructor(
+        private readonly callback: ResizeObserverCallback,
+      ) {}
+
+      disconnect() {}
+
+      observe(target: Element) {
+        if (!target.classList.contains("codex-ui-app-shell")) return;
+        resize = (width) =>
+          this.callback(
+            [
+              {
+                contentRect: { width },
+                target,
+              } as ResizeObserverEntry,
+            ],
+            this as unknown as ResizeObserver,
+          );
+      }
+
+      unobserve() {}
+    }
+    vi.stubGlobal("ResizeObserver", ResizeObserverMock);
+
+    function ExternalDialogFixture() {
+      const [dialogOpen, setDialogOpen] = useState(false);
+      return (
+        <>
+          <button
+            onClick={() => setDialogOpen(true)}
+            type="button"
+          >
+            Open external dialog
+          </button>
+          <AppShell
+            sidePanel={<button type="button">Sources</button>}
+            sidePanelOpen
+          >
+            Thread
+          </AppShell>
+          <Dialog
+            onOpenChange={setDialogOpen}
+            open={dialogOpen}
+            showClose={false}
+            title="External dialog"
+          >
+            <button
+              onClick={() => setDialogOpen(false)}
+              type="button"
+            >
+              Finish external dialog
+            </button>
+          </Dialog>
+        </>
+      );
+    }
+
+    render(<ExternalDialogFixture />);
+    act(() => resize?.(1_000));
+    const trigger = screen.getByRole("button", {
+      name: "Open external dialog",
+    });
+    trigger.focus();
+    fireEvent.click(trigger);
+    const dialogAction = await screen.findByRole("button", {
+      name: "Finish external dialog",
+    });
+    await waitFor(() =>
+      expect(document.activeElement).toBe(dialogAction),
+    );
+
+    fireEvent.click(dialogAction);
+    await waitFor(() =>
+      expect(document.activeElement).toBe(trigger),
+    );
+  });
+
   it("makes backdrop-covered content inert at responsive breakpoints", () => {
     let resize: ((width: number) => void) | undefined;
     class ResizeObserverMock {

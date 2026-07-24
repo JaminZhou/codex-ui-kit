@@ -312,6 +312,18 @@ export function AppShell({
           sidePanelModalOpen: sidePanelIsModal,
           sidebarModalOpen: sidebarIsModal,
         } = responsiveModalStateRef.current;
+        const targetBelongsToShell =
+          shellRef.current?.contains(target) ||
+          surfaceOwnsActiveElement(sidebarRef.current, target) ||
+          surfaceOwnsActiveElement(mainRef.current, target) ||
+          surfaceOwnsActiveElement(sidePanelRef.current, target) ||
+          surfaceOwnsActiveElement(bottomPanelRef.current, target);
+        if (!targetBelongsToShell) {
+          return (
+            target !== document.body &&
+            !target.closest('[inert], [aria-hidden="true"]')
+          );
+        }
         if (sidebarIsModal) {
           return (
             surfaceOwnsActiveElement(sidebarRef.current, target) ||
