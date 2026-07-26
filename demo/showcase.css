@@ -354,30 +354,21 @@ code {
 .thread-preview {
   border: 1px solid var(--codex-ui-border);
   border-radius: var(--codex-ui-radius-xl);
-  height: 32rem;
+  height: 40rem;
   overflow: hidden;
 }
 
-.thread-preview .codex-ui-thread-viewport {
+.thread-preview .codex-ui-conversation-thread-shell {
   height: 100%;
 }
 
-.thread-preview .codex-ui-thread {
-  min-height: 26rem;
-}
-
-.thread-preview__footer {
-  align-items: center;
+.thread-preview__status {
   color: var(--codex-ui-text-tertiary);
-  display: flex;
+  display: block;
   font-size: var(--codex-ui-font-size-xs);
-  justify-content: space-between;
   line-height: var(--codex-ui-line-height-xs);
-  padding: 2rem 1.5rem 0.25rem;
-}
-
-.thread-preview__footer output {
   font-family: var(--codex-ui-font-mono);
+  padding-top: 0.5rem;
 }
 
 .thread-message-action {
@@ -1406,8 +1397,8 @@ code {
     max-height: none;
   }
 
-  .thread-preview .codex-ui-thread {
-    --codex-ui-thread-content-inline-inset: 1rem;
+  .thread-preview {
+    height: 34rem;
   }
 
   .thread-state-matrix {

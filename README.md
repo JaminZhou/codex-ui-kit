@@ -33,8 +33,8 @@ Explore the [interactive component showcase](https://jaminzhou.com/codex-ui-kit/
 
 ## Highlights
 
-- Partial thread, message, activity, reasoning, plan, streaming, and mixed
-  conversation-event primitives.
+- A current-build measured conversation shell plus partial message, activity,
+  reasoning, plan, streaming, and mixed conversation-event primitives.
 - Application/sidebar and side/bottom workspace-panel composition with
   container-responsive overlay behavior.
 - Project index, current new-chat destination/context setup, grouped local
@@ -105,7 +105,7 @@ export function Example() {
 
 | Area | Main exports |
 | --- | --- |
-| [Thread and messages](docs/COMPONENTS.md#thread-and-message-surfaces) | `AgentThread`, `AgentTurn`, `AgentMessage`, loading and error states |
+| [Thread and messages](docs/COMPONENTS.md#thread-and-message-surfaces) | `ConversationThreadShell`, `AgentThread`, `AgentTurn`, `AgentMessage`, loading and error states |
 | [Rich content](docs/COMPONENTS.md#rich-content) | `AgentMarkdown`, `InlineCode`, `CodeBlock`, `FileDiff` |
 | [Agent activity](docs/COMPONENTS.md#agent-activity) | `ActivityTimeline`, `AgentReasoning`, `AgentPlan`, subagent surfaces |
 | [Tools and approvals](docs/COMPONENTS.md#tools-approvals-and-status) | `ToolCallCard`, `CommandExecution`, `FileChange`, `ApprovalRequest` |

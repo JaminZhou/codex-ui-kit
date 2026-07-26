@@ -4,6 +4,10 @@ Codex UI Kit exposes protocol-neutral React components. Hosts own data fetching,
 
 ## Thread and message surfaces
 
+- `ConversationThreadShell`: current-build measured page composition that
+  combines a 46px header, centered follow-aware timeline, responsive 16px
+  insets, and overlay multiline Composer while keeping data and actions
+  host-owned.
 - `AgentThread`: responsive `768px` content column with turn separation and container-query reflow.
 - `AgentThreadViewport`: focusable, follow-aware scroll surface with latest-turn detection, reduced-motion-safe auto-follow, direct-input cancellation for programmatic following, and a sticky footer.
 - `AgentTurn` and `ActivityGroup`: explicit standard and grouped spacing contracts.

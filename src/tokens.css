@@ -151,6 +151,13 @@
   --codex-ui-thread-placeholder-height: 17.5rem;
   --codex-ui-thread-scroll-duration: 260ms;
   --codex-ui-thread-scroll-easing: cubic-bezier(0.22, 1, 0.36, 1);
+  --codex-ui-conversation-thread-header-height: 2.875rem;
+  --codex-ui-conversation-thread-content-max-width: 48rem;
+  --codex-ui-conversation-thread-content-inline-inset: 1rem;
+  --codex-ui-conversation-thread-composer-bottom-inset: 1rem;
+  --codex-ui-conversation-thread-composer-reserve: 7.125rem;
+  --codex-ui-conversation-thread-composer-control-size: 1.75rem;
+  --codex-ui-conversation-thread-user-turn-gap: 2rem;
   --codex-ui-item-gap: calc(var(--codex-ui-spacing) * 4);
   --codex-ui-group-gap: var(--codex-ui-spacing);
   --codex-ui-user-message-max-width: 77%;

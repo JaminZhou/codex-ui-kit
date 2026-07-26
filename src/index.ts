@@ -5,6 +5,7 @@ export * from "./components/AgentReasoning.js";
 export * from "./components/AgentActivity.js";
 export * from "./components/ActivityTimeline.js";
 export * from "./components/AgentThread.js";
+export * from "./components/ConversationThreadShell.js";
 export * from "./components/AgentComposer.js";
 export * from "./components/ComposerAuxiliary.js";
 export * from "./components/ApprovalRequest.js";

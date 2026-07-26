@@ -54,8 +54,8 @@ observation from a previous build remains historical evidence.
 - Scoped CDP automation: available through a user-authorized second process;
   the Chromium profile is separate, but Codex application data and navigation
   are not fully isolated
-- Current inventory: 57 surface groups; 32 have scoped runtime evidence, of
-  which 9 include current-build structural evidence and 23 are previous-build
+- Current inventory: 58 surface groups; 33 have scoped runtime evidence, of
+  which 12 include current-build structural evidence and 21 are previous-build
   only; another 25 remain `not_sampled`
 
 The current package exposes candidates far beyond the old transcript sample:
@@ -166,3 +166,19 @@ product parity. Native application-shell composition, panel resizing, and the
 remaining P0 conversation/workspace variants also remain open. Final
 H5/Electron visual unification is intentionally deferred until coverage
 stabilizes.
+
+The current-thread slice adds `ConversationThreadShell`, which composes the
+existing header, scroll-following timeline, messages, and Composer into one
+responsive public surface. Its current-build contract locks the 46px header,
+768px outer thread column, 736px wide Composer card, 16px responsive insets,
+98px multiline Composer, 28px submit/Stop control, user/assistant alignment,
+completed assistant actions, and the measured user-to-assistant turn gap.
+
+The H5 showcase verifies those relationships in Chromium at 1440×1000 light
+and dark plus 820×680 compact light. The Electron acceptance flow verifies the
+same composition in real 1180×820 and 820×680 BrowserWindows, including
+top/bottom timeline positioning and the running Stop state. This is a
+measurement-backed basic thread slice, not a claim that the whole application
+or every thread lifecycle is pixel-perfect. Markdown variants,
+virtualization, cancellation results, tool/approval flows, panels, and native
+window behavior retain their own inventory gates.

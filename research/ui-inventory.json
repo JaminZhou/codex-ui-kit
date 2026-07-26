@@ -51,11 +51,28 @@
       "runtimeEvidence": [
         "cdp:new-chat-shell-dark-wide",
         "cdp:renderer-viewport-2560-1180-820-layout-metrics",
-        "cdp-26.721:main-shell-target-2560x1326"
+        "cdp-26.721:main-shell-target-2560x1326",
+        "cdp-26.721:synthetic-thread-wide-2560x1410-header-timeline-composer-geometry",
+        "cdp-26.721:synthetic-thread-emulated-800x600-responsive-geometry"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "partial_legacy",
-      "electronStatus": "partial_legacy",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
+      "priority": "p0"
+    },
+    {
+      "id": "thread.messages-basic",
+      "area": "conversation",
+      "ownership": "turn",
+      "packageEvidence": ["conversation-markdown"],
+      "runtimeStatus": "runtime_observed",
+      "runtimeEvidence": [
+        "cdp:basic-user-and-assistant-turn",
+        "cdp-26.721:synthetic-user-bubble-assistant-flat-response-and-actions"
+      ],
+      "implementationStatus": "partial",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
       "priority": "p0"
     },
     {
@@ -76,7 +93,6 @@
       "packageEvidence": ["conversation-markdown"],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
-        "cdp:basic-user-and-assistant-turn",
         "cdp:heading-lists-table-inline-code-code-block-quote-link-sample"
       ],
       "implementationStatus": "partial",
@@ -178,11 +194,12 @@
       "packageEvidence": ["local-conversation-page", "run-command-animation"],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
-        "cdp:stop-button-you-stopped-summary-and-stopped-command"
+        "cdp:stop-button-you-stopped-summary-and-stopped-command",
+        "cdp-26.721:synthetic-submit-running-stop-control-completed-transition"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "not_started",
-      "electronStatus": "not_started",
+      "browserStatus": "partial_legacy",
+      "electronStatus": "partial_legacy",
       "priority": "p0"
     },
     {
@@ -257,11 +274,13 @@
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
         "cdp:empty-submitting-and-completed-composer",
-        "cdp:composer-width-712-to-490-under-viewport-probe"
+        "cdp:composer-width-712-to-490-under-viewport-probe",
+        "cdp-26.721:synthetic-composer-736x98-wide-494x98-compact",
+        "cdp-26.721:synthetic-composer-empty-running-completed-controls"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "partial_legacy",
-      "electronStatus": "partial_legacy",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
       "priority": "p0"
     },
     {

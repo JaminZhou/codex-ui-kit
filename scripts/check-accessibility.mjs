@@ -135,6 +135,104 @@ async function revealConversationContext(page) {
   );
 }
 
+async function validateCurrentThreadShell(page) {
+  return page.evaluate(() => {
+    const shell = document.querySelector(
+      ".thread-preview .codex-ui-conversation-thread-shell",
+    );
+    const shellBody = shell?.querySelector(
+      ".codex-ui-conversation-thread-shell__body",
+    );
+    const header = shell?.querySelector(
+      ".codex-ui-conversation-thread-shell__header",
+    );
+    const viewport = shell?.querySelector(".codex-ui-thread-viewport");
+    const thread = shell?.querySelector(".codex-ui-thread");
+    const composerRegion = shell?.querySelector(
+      ".codex-ui-conversation-thread-shell__composer",
+    );
+    const composer = composerRegion?.querySelector(".codex-ui-composer");
+    const composerPrimary = composer?.querySelector(
+      ".codex-ui-composer__primary",
+    );
+    const assistantActions = shell?.querySelector(
+      '.codex-ui-agent-message[data-role="assistant"] .codex-ui-agent-message__actions',
+    );
+    const errors = [];
+    if (
+      !(shell instanceof HTMLElement) ||
+      !(shellBody instanceof HTMLElement) ||
+      !(header instanceof HTMLElement) ||
+      !(viewport instanceof HTMLElement) ||
+      !(thread instanceof HTMLElement) ||
+      !(composerRegion instanceof HTMLElement) ||
+      !(composer instanceof HTMLElement) ||
+      !(composerPrimary instanceof HTMLElement) ||
+      !(assistantActions instanceof HTMLElement)
+    ) {
+      return ["current conversation shell is missing a required region"];
+    }
+
+    const near = (actual, expected, tolerance = 1) =>
+      Math.abs(actual - expected) <= tolerance;
+    const shellBounds = shell.getBoundingClientRect();
+    const bodyBounds = shellBody.getBoundingClientRect();
+    const headerBounds = header.getBoundingClientRect();
+    const threadBounds = thread.getBoundingClientRect();
+    const composerBounds = composer.getBoundingClientRect();
+    const composerRegionBounds = composerRegion.getBoundingClientRect();
+    const composerPrimaryBounds = composerPrimary.getBoundingClientRect();
+    const expectedThreadWidth = Math.min(768, bodyBounds.width);
+
+    if (!near(headerBounds.height, 46)) {
+      errors.push(`header height ${headerBounds.height} did not match 46px`);
+    }
+    if (!near(threadBounds.width, expectedThreadWidth)) {
+      errors.push(
+        `thread width ${threadBounds.width} did not match ${expectedThreadWidth}`,
+      );
+    }
+    if (!near(Number.parseFloat(getComputedStyle(thread).paddingLeft), 16)) {
+      errors.push("thread inline inset did not match 16px");
+    }
+    if (!near(composerRegionBounds.width, expectedThreadWidth - 32)) {
+      errors.push(
+        `composer width ${composerRegionBounds.width} did not preserve the 16px insets`,
+      );
+    }
+    if (
+      !near(
+        (composerBounds.left + composerBounds.right) / 2,
+        (shellBounds.left + shellBounds.right) / 2,
+      )
+    ) {
+      errors.push("composer was not centered in the conversation shell");
+    }
+    if (!near(shellBounds.bottom - composerBounds.bottom, 16)) {
+      errors.push("composer bottom inset did not match 16px");
+    }
+    if (
+      !near(composerPrimaryBounds.width, 28) ||
+      !near(composerPrimaryBounds.height, 28)
+    ) {
+      errors.push("composer primary control did not match 28px");
+    }
+    if (composer.getAttribute("data-layout") !== "multiline") {
+      errors.push("current conversation composer was not multiline");
+    }
+    if (getComputedStyle(assistantActions).opacity !== "1") {
+      errors.push("completed assistant actions were not visible");
+    }
+    if (getComputedStyle(viewport).overflowY !== "auto") {
+      errors.push("conversation timeline was not independently scrollable");
+    }
+    if (shell.scrollWidth > shell.clientWidth) {
+      errors.push("conversation shell overflowed horizontally");
+    }
+    return errors;
+  });
+}
+
 const overlayCases = [
   {
     linkages: [
@@ -370,6 +468,7 @@ const failures = [];
 let incompleteWcagChecks = 0;
 let manualReviewSemanticChecks = 0;
 let overlayStateChecks = 0;
+let threadShellChecks = 0;
 let browser;
 
 function parseComputedRgb(value) {
@@ -613,6 +712,8 @@ try {
         (sample) => sample.ratio < 4.5,
       );
     }
+    const threadShellErrors = await validateCurrentThreadShell(page);
+    threadShellChecks += 1;
     await addAxe(page);
     const result = await runAxe(page);
     await page.close();
@@ -620,10 +721,12 @@ try {
     applyIncompletePolicy(result);
     if (
       hasAccessibilityFailures(result) ||
-      themeTransitionViolations.length > 0
+      themeTransitionViolations.length > 0 ||
+      threadShellErrors.length > 0
     ) {
       failures.push({
         case: testCase.name,
+        threadShellErrors,
         themeTransitionViolations,
         ...limitFailureResult(result),
       });
@@ -682,5 +785,5 @@ if (failures.length > 0) {
 }
 
 console.log(
-  `accessibility contract ok: ${semanticRules.length} strict semantic rules and WCAG A/AA/2.2 across ${cases.length} viewports and ${overlayStateChecks} open overlay states (${incompleteWcagChecks} contrast and ${manualReviewSemanticChecks} verified popup-control manual-review nodes)`,
+  `accessibility contract ok: ${semanticRules.length} strict semantic rules and WCAG A/AA/2.2 across ${cases.length} viewports, ${threadShellChecks} current thread-shell checks, and ${overlayStateChecks} open overlay states (${incompleteWcagChecks} contrast and ${manualReviewSemanticChecks} verified popup-control manual-review nodes)`,
 );

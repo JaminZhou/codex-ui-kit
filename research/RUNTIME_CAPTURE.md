@@ -51,6 +51,11 @@ application's own single-instance policy can still reject or redirect it.
 The unique Chromium profile makes a successful second process more likely; it
 does not create a second Codex account or isolated task store.
 
+Submitting a prompt is outside the default read-only probe. Do it only when
+the user explicitly authorizes a disposable test task. Use synthetic,
+non-sensitive copy, never reuse existing task text, and limit the write to the
+minimum lifecycle transition being measured.
+
 Choose an unused loopback port first:
 
 ```bash

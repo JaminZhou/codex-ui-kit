@@ -35,6 +35,7 @@ import {
   ConversationRouteSelector,
   type ConversationRouteOption,
   type ConversationRouteSelectorProps,
+  ConversationThreadShell,
   Dialog,
   DialogChoice,
   type DialogSize,
@@ -228,6 +229,7 @@ void ConversationContextBar;
 void ConversationEvent;
 void ConversationEventList;
 void ConversationProjectListbox;
+void ConversationThreadShell;
 void ConversationRouteSelector;
 void conversationRouteSelectorAcceptsChildren;
 void Dialog;

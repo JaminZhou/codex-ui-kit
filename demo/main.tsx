@@ -26,6 +26,7 @@ import {
   ComposerMentionMenu,
   ComposerModeIndicator,
   ConversationContextBar,
+  ConversationThreadShell,
   ConversationProjectListbox,
   ConversationEvent,
   ConversationEventList,
@@ -436,6 +437,7 @@ function Showcase() {
   const [floatingPanelOpen, setFloatingPanelOpen] = useState(true);
   const [navigationStatus, setNavigationStatus] = useState("Navigation ready");
   const [threadStatus, setThreadStatus] = useState("Thread states ready");
+  const [threadComposerValue, setThreadComposerValue] = useState("");
   const [appSidebarOpen, setAppSidebarOpen] = useState(true);
   const [appSidePanelOpen, setAppSidePanelOpen] = useState(true);
   const [appBottomPanelOpen, setAppBottomPanelOpen] = useState(false);
@@ -1244,21 +1246,117 @@ function Showcase() {
           </GalleryCard>
 
           <GalleryCard
-            description="A partial conversation composition assembled from the current primitives."
-            title="Thread composition"
+            description="Current-build measured header, centered timeline, completed message actions, and overlay composer in one responsive composition."
+            title="Current conversation shell"
             wide
           >
             <div className="thread-preview">
-              <AgentThreadViewport
-                followKey={threadStatus}
-                footer={
-                  <div className="thread-preview__footer">
-                    <span>Latest turn</span>
-                    <output aria-live="polite">{threadStatus}</output>
-                  </div>
+              <ConversationThreadShell
+                composer={
+                  <AgentComposer
+                    actions={
+                      <button aria-label="Add attachment" type="button">
+                        +
+                      </button>
+                    }
+                    controls={
+                      <>
+                        <button type="button">Approve for me</button>
+                        <button type="button">Local</button>
+                      </>
+                    }
+                    layout="multiline"
+                    onSubmit={(value) => {
+                      setThreadStatus(`Submitted: ${value}`);
+                      setThreadComposerValue("");
+                    }}
+                    onValueChange={setThreadComposerValue}
+                    value={threadComposerValue}
+                  />
                 }
+                header={
+                  <ThreadHeader
+                    endActions={
+                      <>
+                        <IconButton
+                          icon={<span>⌘</span>}
+                          label="Open in editor"
+                        />
+                        <IconButton
+                          icon={<span>☷</span>}
+                          label="Open thread summary"
+                        />
+                        <IconButton
+                          icon={<span>▣</span>}
+                          label="Toggle bottom panel"
+                        />
+                        <IconButton
+                          icon={<span>◫</span>}
+                          label="Toggle workspace panel"
+                        />
+                      </>
+                    }
+                    navigation={
+                      <IconButton
+                        icon={<span>▱</span>}
+                        label="Open project"
+                      />
+                    }
+                    position="static"
+                    startActions={
+                      <IconButton
+                        icon={<span>•••</span>}
+                        label="More thread actions"
+                      />
+                    }
+                    title="Current conversation shell"
+                  />
+                }
+                label="Current conversation shell preview"
+                viewportProps={{ followKey: threadStatus }}
               >
-                <AgentThread aria-label="Example coding agent thread">
+                <AgentMessage role="user">
+                  Please verify the current conversation layout.
+                </AgentMessage>
+                <AgentMessage
+                  actions={
+                    <>
+                      <IconButton
+                        icon={<span>□</span>}
+                        label="Copy response"
+                        onClick={() => setThreadStatus("Copied response")}
+                      />
+                      <IconButton
+                        icon={<span>−</span>}
+                        label="Response was not helpful"
+                      />
+                      <IconButton
+                        icon={<span>+</span>}
+                        label="Response was helpful"
+                      />
+                      <IconButton
+                        icon={<span>↗</span>}
+                        label="Expand response"
+                      />
+                    </>
+                  }
+                  role="assistant"
+                >
+                  The measured header, timeline, and composer now share one
+                  responsive shell.
+                </AgentMessage>
+              </ConversationThreadShell>
+            </div>
+            <output
+              aria-live="polite"
+              className="thread-preview__status"
+            >
+              {threadStatus}
+            </output>
+            <div className="thread-state-matrix">
+              <div>
+                <span>Expanded activity timeline</span>
+                <AgentThread aria-label="Thread activity states">
                   <AgentMessage
                     actions={
                       <button
@@ -1328,9 +1426,7 @@ function Showcase() {
                     <LoadingShimmer>Writing the final response…</LoadingShimmer>
                   </AgentMessage>
                 </AgentThread>
-              </AgentThreadViewport>
-            </div>
-            <div className="thread-state-matrix">
+              </div>
               <div>
                 <span>Chat loading</span>
                 <ThreadLoadingState />
