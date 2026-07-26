@@ -121,6 +121,9 @@ describe("project conversation routing", () => {
               description: "Desktop application",
               id: "desktop",
               label: "Desktop",
+              meta: "1 task",
+              path: "/Applications/ChatGPT.app",
+              statusLabel: "Ready",
             },
             {
               id: "repair",
@@ -153,6 +156,15 @@ describe("project conversation routing", () => {
     expect(document.activeElement).toBe(desktop);
     expect(uiKit.tabIndex).toBe(-1);
     expect(desktop.tabIndex).toBe(0);
+    expect(accessibleDescriptionText(desktop)).toContain(
+      "Desktop application",
+    );
+    expect(accessibleDescriptionText(desktop)).toContain(
+      "/Applications/ChatGPT.app",
+    );
+    expect(accessibleDescriptionText(desktop)).toContain(
+      "1 task · Ready",
+    );
     fireEvent.keyDown(desktop, { key: "ArrowDown" });
     expect(document.activeElement).toBe(uiKit);
     fireEvent.keyDown(uiKit, { key: "End" });
@@ -162,6 +174,40 @@ describe("project conversation routing", () => {
 
     fireEvent.keyDown(desktop, { key: "Escape" });
     expect(onDismiss).toHaveBeenCalledTimes(1);
+  });
+
+  it("focuses a selected option when controlled items become enabled", () => {
+    const renderListbox = (disabled: boolean) => (
+      <>
+        <button id="dynamic-project-trigger" type="button">
+          Project
+        </button>
+        <ConversationProjectListbox
+          items={[
+            {
+              disabled,
+              id: "ui-kit",
+              label: "UI Kit",
+            },
+          ]}
+          onSelect={() => undefined}
+          selectedId="ui-kit"
+          triggerId="dynamic-project-trigger"
+        />
+      </>
+    );
+    const { rerender } = render(renderListbox(true));
+    const trigger = screen.getByRole("button", { name: "Project" });
+    trigger.focus();
+    expect(document.activeElement).toBe(trigger);
+
+    rerender(renderListbox(false));
+
+    const option = screen.getByRole("option", {
+      name: "Select project UI Kit",
+    });
+    expect(document.activeElement).toBe(option);
+    expect(option.tabIndex).toBe(0);
   });
 
   it("keeps a first-enabled tab stop without automatic focus", () => {

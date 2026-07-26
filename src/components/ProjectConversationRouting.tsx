@@ -903,10 +903,14 @@ export function ConversationProjectListbox({
   triggerId,
   ...props
 }: ConversationProjectListboxProps) {
+  const listboxId = useId();
   const listboxRef = useRef<HTMLDivElement | null>(null);
   const enabledItems = items.filter(
     (item) => !projectIndexItemDisabled(item),
   );
+  const enabledItemKey = enabledItems
+    .map((item) => item.id)
+    .join("\u0000");
   const fallbackActiveId =
     enabledItems.find((item) => item.id === selectedId)?.id ??
     enabledItems[0]?.id;
@@ -935,7 +939,7 @@ export function ConversationProjectListbox({
     ) {
       enabled[0]?.focus();
     }
-  }, [initialFocus]);
+  }, [enabledItemKey, initialFocus, selectedId]);
 
   useEffect(() => {
     if (!onDismiss || typeof document === "undefined") return;
@@ -974,11 +978,29 @@ export function ConversationProjectListbox({
       ref={listboxRef}
       role="listbox"
     >
-      {items.map((item) => {
+      {items.map((item, index) => {
         const disabled = projectIndexItemDisabled(item);
         const selected = item.id === selectedId;
+        const descriptionId = item.description
+          ? `${listboxId}-description-${index}`
+          : undefined;
+        const pathId = item.path
+          ? `${listboxId}-path-${index}`
+          : undefined;
+        const trailingId =
+          item.meta || item.statusLabel
+            ? `${listboxId}-trailing-${index}`
+            : undefined;
+        const describedBy = [
+          descriptionId,
+          pathId,
+          trailingId,
+        ]
+          .filter(Boolean)
+          .join(" ");
         return (
           <button
+            aria-describedby={describedBy || undefined}
             aria-label={`Select project ${itemTextValue(item)}`}
             aria-selected={selected}
             className="codex-ui-conversation-project-options__item"
@@ -1010,11 +1032,11 @@ export function ConversationProjectListbox({
           >
             <span>{item.label}</span>
             {item.description ? (
-              <small>{item.description}</small>
+              <small id={descriptionId}>{item.description}</small>
             ) : null}
-            {item.path ? <code>{item.path}</code> : null}
+            {item.path ? <code id={pathId}>{item.path}</code> : null}
             {item.meta || item.statusLabel ? (
-              <small>
+              <small id={trailingId}>
                 {item.meta}
                 {item.meta && item.statusLabel ? " · " : null}
                 {item.statusLabel}
