@@ -7714,25 +7714,29 @@ button.codex-ui-generated-image-gallery__image {
 }
 
 .codex-ui-new-conversation-start {
-  align-content: center;
   align-self: stretch;
   color: var(--codex-ui-text);
   container-name: codex-ui-new-conversation-start;
   container-type: inline-size;
-  display: grid;
   font-family: var(--codex-ui-font-sans);
-  gap: 1rem;
-  justify-items: center;
   margin-inline: auto;
   max-width: 37.5rem;
-  min-height: 24rem;
   min-width: 0;
-  padding: 1.5rem;
   width: 100%;
 }
 
 .codex-ui-new-conversation-start[data-status="error"] {
   color: var(--codex-ui-text-error);
+}
+
+.codex-ui-new-conversation-start__layout {
+  align-content: center;
+  display: grid;
+  gap: 1rem;
+  justify-items: center;
+  min-height: 24rem;
+  padding: 1.5rem;
+  width: 100%;
 }
 
 .codex-ui-new-conversation-start__prompt,
@@ -8063,7 +8067,7 @@ button.codex-ui-generated-image-gallery__image {
 }
 
 @container codex-ui-new-conversation-start (max-width: 30rem) {
-  .codex-ui-new-conversation-start {
+  .codex-ui-new-conversation-start__layout {
     min-height: 20rem;
     padding: 1rem;
   }

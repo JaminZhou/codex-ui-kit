@@ -117,6 +117,19 @@ async function waitForFocusWithin(page, selector) {
   );
 }
 
+async function revealConversationContext(page) {
+  const context = await page.$(
+    '[data-local-environment-context="true"]',
+  );
+  if (context) return;
+  await page.click(
+    ".codex-ui-new-conversation-start__prompt > button",
+  );
+  await page.waitForSelector(
+    '[data-local-environment-context="true"]',
+  );
+}
+
 const overlayCases = [
   {
     linkages: [
@@ -230,6 +243,7 @@ const overlayCases = [
     ],
     name: "local environment dialog",
     open: async (page) => {
+      await revealConversationContext(page);
       await page.click(
         '[data-local-environment-context="true"] [data-kind="environment"]',
       );
@@ -261,6 +275,7 @@ const overlayCases = [
     ],
     name: "worktree local environment dialog",
     open: async (page) => {
+      await revealConversationContext(page);
       await page.click(
         '[data-local-environment-context="true"] [data-kind="worktree"]',
       );

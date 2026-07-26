@@ -27,7 +27,10 @@ describe("project conversation routing visual contract", () => {
 
   it("centers new-conversation context and bounds the environment dialog", () => {
     expect(styles).toMatch(
-      /\.codex-ui-new-conversation-start \{[\s\S]*?container-name: codex-ui-new-conversation-start;[\s\S]*?max-width: 37\.5rem;[\s\S]*?min-height: 24rem/,
+      /\.codex-ui-new-conversation-start \{[\s\S]*?container-name: codex-ui-new-conversation-start;[\s\S]*?max-width: 37\.5rem/,
+    );
+    expect(styles).toMatch(
+      /\.codex-ui-new-conversation-start__layout \{[\s\S]*?min-height: 24rem;[\s\S]*?padding: 1\.5rem/,
     );
     expect(styles).toMatch(
       /\.codex-ui-conversation-context-bar \{[\s\S]*?display: flex;[\s\S]*?flex-wrap: wrap;[\s\S]*?justify-content: center/,
@@ -48,7 +51,7 @@ describe("project conversation routing visual contract", () => {
       /@container codex-ui-project-conversation-page \(max-width: 34rem\)[\s\S]*?\.codex-ui-conversation-route-selector__options \{[\s\S]*?grid-template-columns: minmax\(0, 1fr\)/,
     );
     expect(styles).toMatch(
-      /@container codex-ui-new-conversation-start \(max-width: 30rem\)[\s\S]*?\.codex-ui-conversation-context-bar \{[\s\S]*?grid-template-columns: repeat\(3, minmax\(0, 1fr\)\)/,
+      /@container codex-ui-new-conversation-start \(max-width: 30rem\)[\s\S]*?\.codex-ui-new-conversation-start__layout \{[\s\S]*?min-height: 20rem;[\s\S]*?padding: 1rem;[\s\S]*?\.codex-ui-conversation-context-bar \{[\s\S]*?grid-template-columns: repeat\(3, minmax\(0, 1fr\)\)/,
     );
   });
 

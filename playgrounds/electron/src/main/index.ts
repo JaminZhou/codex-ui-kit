@@ -165,6 +165,20 @@ async function captureWorkflowSurfaces(webContents: WebContents) {
     }
     await wait(180);
 
+    const routingPrompt = card?.querySelector(
+      '.codex-ui-new-conversation-start__prompt > button',
+    );
+    const routingPromptInitiallyVisible =
+      routingPrompt instanceof HTMLButtonElement;
+    routingPrompt?.click();
+    await wait(100);
+    const routingPromptTransitioned =
+      !card?.querySelector(
+        '.codex-ui-new-conversation-start__prompt',
+      ) &&
+      card?.querySelectorAll(
+        '.codex-ui-conversation-context-bar__item',
+      ).length === 3;
     const routingProject = card?.querySelector(
       '.codex-ui-project-index__item[aria-label="Open project Desktop"]',
     );
@@ -447,6 +461,8 @@ async function captureWorkflowSurfaces(webContents: WebContents) {
       routingNewConversation: rect(
         routingPage?.querySelector('.codex-ui-new-conversation-start'),
       ),
+      routingPromptInitiallyVisible,
+      routingPromptTransitioned,
       routingSetup: rect(routingSetup),
       routingSetupOverflowY: routingSetup
         ? getComputedStyle(routingSetup).overflowY
@@ -1065,14 +1081,23 @@ async function captureAcceptance(browserWindow: BrowserWindow) {
     expectedTheme,
     pullRequestLayout,
     routingLayout,
+    routingPromptInitiallyVisible,
   ] of [
-    ["workflow surfaces", workflowMetrics, "dark", "split", "split"],
+    [
+      "workflow surfaces",
+      workflowMetrics,
+      "dark",
+      "split",
+      "split",
+      true,
+    ],
     [
       "compact workflow surfaces",
       compactWorkflowMetrics,
       "light",
       "stacked",
       "stacked",
+      false,
     ],
   ] as const) {
     assertAcceptanceMetric(name, snapshot, {
@@ -1093,6 +1118,8 @@ async function captureAcceptance(browserWindow: BrowserWindow) {
         routingEnvironment: "Change environment: Local",
         routingLayout,
         routingProjectsOverflowY: "auto",
+        routingPromptInitiallyVisible,
+        routingPromptTransitioned: true,
         routingSetupOverflowY: "auto",
         routingComposerPrompt: "Acceptance new chat prompt",
         routingComposerSubmitEnabled: true,

@@ -671,25 +671,29 @@ export function NewConversationStart({
         .join(" ")}
       data-status={status}
     >
-      {prompt ? (
-        <div className="codex-ui-new-conversation-start__prompt">
-          {prompt}
-        </div>
-      ) : null}
-      <header className="codex-ui-new-conversation-start__header">
-        {eyebrow ? (
-          <span className="codex-ui-new-conversation-start__eyebrow">
-            {eyebrow}
-          </span>
+      <div className="codex-ui-new-conversation-start__layout">
+        {prompt ? (
+          <div className="codex-ui-new-conversation-start__prompt">
+            {prompt}
+          </div>
         ) : null}
-        <h3>{destination}</h3>
-        {description ? <p>{description}</p> : null}
-      </header>
-      <div className="codex-ui-new-conversation-start__composer">
-        {composer}
-      </div>
-      <div className="codex-ui-new-conversation-start__context">
-        {context}
+        <header className="codex-ui-new-conversation-start__header">
+          {eyebrow ? (
+            <span className="codex-ui-new-conversation-start__eyebrow">
+              {eyebrow}
+            </span>
+          ) : null}
+          <h3>{destination}</h3>
+          {description ? <p>{description}</p> : null}
+        </header>
+        <div className="codex-ui-new-conversation-start__composer">
+          {composer}
+        </div>
+        {context ? (
+          <div className="codex-ui-new-conversation-start__context">
+            {context}
+          </div>
+        ) : null}
       </div>
     </section>
   );

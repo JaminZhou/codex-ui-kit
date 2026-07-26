@@ -391,6 +391,8 @@ export function DesktopPlayground() {
   const [routingRoute, setRoutingRoute] = useState("local");
   const [routingWorktree, setRoutingWorktree] = useState("routing");
   const [routingComposerValue, setRoutingComposerValue] = useState("");
+  const [routingContextReady, setRoutingContextReady] =
+    useState(false);
   const [localEnvironmentDialogOpen, setLocalEnvironmentDialogOpen] =
     useState(false);
   const [
@@ -1700,68 +1702,79 @@ export function DesktopPlayground() {
                     />
                   }
                   context={
-                    <ConversationContextBar
-                      data-desktop-local-environment-context="true"
-                      expandedId={
-                        localEnvironmentDialogOpen
-                          ? localEnvironmentDialogOwner
-                          : undefined
-                      }
-                      items={[
-                        {
-                          icon: <span>▦</span>,
-                          id: "project",
-                          kind: "project",
-                          label: routingProject,
-                        },
-                        {
-                          controlsId: "desktop-local-environment-dialog",
-                          icon: <span>⌘</span>,
-                          id: "environment",
-                          kind: "environment",
-                          label:
-                            routingRoute === "local" ? "Local" : routingRoute,
-                        },
-                        {
-                          controlsId: "desktop-local-environment-dialog",
-                          icon: <span>⑂</span>,
-                          id: "worktree",
-                          kind: "worktree",
-                          label: routingWorktree,
-                        },
-                      ]}
-                      onSelect={(itemId) => {
-                        if (itemId === "project") {
-                          setRoutingStatus("Choose a project from the index");
-                          return;
+                    routingContextReady ? (
+                      <ConversationContextBar
+                        data-desktop-local-environment-context="true"
+                        expandedId={
+                          localEnvironmentDialogOpen
+                            ? localEnvironmentDialogOwner
+                            : undefined
                         }
-                        setLocalEnvironmentDialogOwner(
-                          itemId === "worktree"
-                            ? "worktree"
-                            : "environment",
-                        );
-                        setLocalEnvironmentDialogOpen(true);
-                        setRoutingStatus(
-                          itemId === "environment"
-                            ? "Choose an environment"
-                            : "Choose a worktree",
-                        );
-                      }}
-                    />
+                        items={[
+                          {
+                            icon: <span>▦</span>,
+                            id: "project",
+                            kind: "project",
+                            label: routingProject,
+                          },
+                          {
+                            controlsId:
+                              "desktop-local-environment-dialog",
+                            icon: <span>⌘</span>,
+                            id: "environment",
+                            kind: "environment",
+                            label:
+                              routingRoute === "local"
+                                ? "Local"
+                                : routingRoute,
+                          },
+                          {
+                            controlsId:
+                              "desktop-local-environment-dialog",
+                            icon: <span>⑂</span>,
+                            id: "worktree",
+                            kind: "worktree",
+                            label: routingWorktree,
+                          },
+                        ]}
+                        onSelect={(itemId) => {
+                          if (itemId === "project") {
+                            setRoutingStatus(
+                              "Choose a project from the index",
+                            );
+                            return;
+                          }
+                          setLocalEnvironmentDialogOwner(
+                            itemId === "worktree"
+                              ? "worktree"
+                              : "environment",
+                          );
+                          setLocalEnvironmentDialogOpen(true);
+                          setRoutingStatus(
+                            itemId === "environment"
+                              ? "Choose an environment"
+                              : "Choose a worktree",
+                          );
+                        }}
+                      />
+                    ) : null
                   }
                   description="Destination, project, execution environment, and worktree remain independent."
                   destination="ChatGPT"
                   prompt={
-                    <Button
-                      onClick={() =>
-                        setRoutingStatus(
-                          "Choose a project before creating a worktree",
-                        )
-                      }
-                      size="small"
-                    >
-                      Choose a project to use a worktree
-                    </Button>
+                    !routingContextReady ? (
+                      <Button
+                        onClick={() => {
+                          setRoutingContextReady(true);
+                          setRoutingStatus(
+                            "Choose project, environment, and worktree",
+                          );
+                        }}
+                        size="small"
+                      >
+                        Choose a project to use a worktree
+                      </Button>
+                    ) : undefined
                   }
                 />
               </ProjectConversationPage>

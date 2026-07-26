@@ -144,12 +144,13 @@ The current new-chat slice adds `NewConversationStart`,
 `ConversationContextBar`, and `LocalEnvironmentDialog`. It keeps the
 application-owned ChatGPT destination independent from project, execution
 environment, and worktree controls, and represents the local environment
-picker as a searchable, grouped, scrollable dialog. The H5 accessibility flow
-verifies both Environment and Worktree trigger/dialog relationships, modal
-semantics, and initial focus. The Electron acceptance flow selects a project,
-opens the dialog from both controls, checks grouping, search filtering, and
-repair-state disabling, selects a local environment, starts the conversation,
-and captures both wide and compact dialog screenshots.
+picker as a searchable, grouped, scrollable dialog. The H5 flow activates the
+worktree prompt before verifying both Environment and Worktree trigger/dialog
+relationships, modal semantics, and initial focus. The Electron acceptance
+flow asserts the prompt-to-context transition, selects a project, opens the
+dialog from both controls, checks grouping, search filtering, and repair-state
+disabling, selects a local environment, submits the real composer, and captures
+both wide and compact dialog screenshots.
 
 The narrow `conversation.destination`, `conversation.context-controls`, and
 `app.new-thread-workspace-selection` slices are current-build Browser and
