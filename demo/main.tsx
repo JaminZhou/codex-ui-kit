@@ -391,6 +391,189 @@ const resourceImages: GeneratedImageItem[] = [
   width: index % 2 === 0 ? 960 : 760,
 }));
 
+type PixelIconName =
+  | "approve"
+  | "chevron"
+  | "copy"
+  | "dislike"
+  | "expand"
+  | "folder"
+  | "like"
+  | "microphone"
+  | "more"
+  | "panel"
+  | "plus"
+  | "sliders"
+  | "workspace";
+
+function PixelIcon({ name }: { name: PixelIconName }) {
+  const common = {
+    fill: "none",
+    stroke: "currentColor",
+    strokeLinecap: "round" as const,
+    strokeLinejoin: "round" as const,
+    strokeWidth: 1.35,
+  };
+
+  return (
+    <svg aria-hidden="true" viewBox="0 0 16 16">
+      {name === "approve" ? (
+        <>
+          <path {...common} d="M8 2.25 12.5 4v3.4c0 2.7-1.8 4.9-4.5 6.35-2.7-1.45-4.5-3.65-4.5-6.35V4L8 2.25Z" />
+          <path {...common} d="m6.25 8 1.15 1.15 2.4-2.55" />
+        </>
+      ) : null}
+      {name === "chevron" ? <path {...common} d="m5 6.5 3 3 3-3" /> : null}
+      {name === "copy" ? (
+        <>
+          <rect {...common} height="8" rx="1.4" width="8" x="5" y="5" />
+          <path {...common} d="M3.25 10.75H3A1.25 1.25 0 0 1 1.75 9.5V3A1.25 1.25 0 0 1 3 1.75h6.5A1.25 1.25 0 0 1 10.75 3v.25" />
+        </>
+      ) : null}
+      {name === "dislike" ? <path {...common} d="M5.25 3.25h5.2c.7 0 1.25.55 1.25 1.25v4.25H8.4l.35 2.05c.15.85-.5 1.65-1.35 1.65H7L4.25 8.9V4.25l1-1ZM4.25 4.25H2.5v4.5h1.75" /> : null}
+      {name === "expand" ? (
+        <>
+          <path {...common} d="M6.25 3.25H3.5v2.75M9.75 12.75h2.75V10" />
+          <path {...common} d="m3.5 3.25 3.25 3.25M12.5 12.75 9.25 9.5" />
+        </>
+      ) : null}
+      {name === "folder" ? <path {...common} d="M1.75 4.5c0-.7.55-1.25 1.25-1.25h3l1.25 1.5H13c.7 0 1.25.55 1.25 1.25v5.25c0 .7-.55 1.25-1.25 1.25H3c-.7 0-1.25-.55-1.25-1.25V4.5Z" /> : null}
+      {name === "like" ? <path {...common} d="M5.25 12.75h5.2c.7 0 1.25-.55 1.25-1.25V7.25H8.4l.35-2.05c.15-.85-.5-1.65-1.35-1.65H7L4.25 7.1v4.65l1 1ZM4.25 11.75H2.5v-4.5h1.75" /> : null}
+      {name === "microphone" ? (
+        <>
+          <rect {...common} height="7" rx="2.25" width="4.5" x="5.75" y="2" />
+          <path {...common} d="M3.75 7.75A4.25 4.25 0 0 0 8 12a4.25 4.25 0 0 0 4.25-4.25M8 12v2.25M6 14.25h4" />
+        </>
+      ) : null}
+      {name === "more" ? (
+        <>
+          <circle cx="3.5" cy="8" fill="currentColor" r=".85" />
+          <circle cx="8" cy="8" fill="currentColor" r=".85" />
+          <circle cx="12.5" cy="8" fill="currentColor" r=".85" />
+        </>
+      ) : null}
+      {name === "panel" ? (
+        <>
+          <rect {...common} height="10" rx="1.75" width="12" x="2" y="3" />
+          <path {...common} d="M2.75 9.75h10.5" />
+        </>
+      ) : null}
+      {name === "plus" ? <path {...common} d="M8 3v10M3 8h10" /> : null}
+      {name === "sliders" ? (
+        <>
+          <path {...common} d="M3 4h10M3 8h10M3 12h10" />
+          <circle cx="6" cy="4" fill="currentColor" r="1.25" />
+          <circle cx="10" cy="8" fill="currentColor" r="1.25" />
+          <circle cx="7.5" cy="12" fill="currentColor" r="1.25" />
+        </>
+      ) : null}
+      {name === "workspace" ? (
+        <>
+          <rect {...common} height="10" rx="1.75" width="12" x="2" y="3" />
+          <path {...common} d="M10 3.75v8.5" />
+        </>
+      ) : null}
+    </svg>
+  );
+}
+
+function CurrentThreadPixelFixture() {
+  const messageActions: PixelIconName[] = [
+    "copy",
+    "like",
+    "dislike",
+    "expand",
+  ];
+
+  return (
+    <main className="current-thread-pixel-fixture" data-theme="dark">
+      <ConversationThreadShell
+        composer={
+          <AgentComposer
+            actions={
+              <>
+                <button aria-label="Add attachment" type="button">
+                  <PixelIcon name="plus" />
+                </button>
+                <button type="button">
+                  <PixelIcon name="approve" />
+                  <span>Approve for me</span>
+                </button>
+              </>
+            }
+            controls={
+              <>
+                <button type="button">
+                  <span className="current-thread-pixel-fixture__model">
+                    5.6 Sol <span>Extra High</span>
+                  </span>
+                  <PixelIcon name="chevron" />
+                </button>
+                <button aria-label="Voice input" type="button">
+                  <PixelIcon name="microphone" />
+                </button>
+              </>
+            }
+            layout="multiline"
+            onSubmit={() => undefined}
+            onValueChange={() => undefined}
+            placeholder="Do anything"
+            value=""
+          />
+        }
+        header={
+          <ThreadHeader
+            endActions={
+              <>
+                <button
+                  aria-label="Open in editor"
+                  className="current-thread-pixel-fixture__editor-control"
+                  type="button"
+                >
+                  <span aria-hidden="true">⌁</span>
+                  <PixelIcon name="chevron" />
+                </button>
+                <button aria-label="Thread controls" type="button">
+                  <PixelIcon name="sliders" />
+                </button>
+                <button aria-label="Toggle bottom panel" type="button">
+                  <PixelIcon name="panel" />
+                </button>
+                <button aria-label="Toggle workspace panel" type="button">
+                  <PixelIcon name="workspace" />
+                </button>
+              </>
+            }
+            position="static"
+            title={
+              <span className="current-thread-pixel-fixture__title">
+                <PixelIcon name="folder" />
+                <span>Confirm UI probe completion</span>
+                <PixelIcon name="more" />
+              </span>
+            }
+          />
+        }
+        label="Current conversation pixel fixture"
+      >
+        <AgentMessage role="user">
+          Please reply with exactly: UI probe complete.
+        </AgentMessage>
+        <AgentMessage
+          actions={messageActions.map((name) => (
+            <button aria-label={name} key={name} type="button">
+              <PixelIcon name={name} />
+            </button>
+          ))}
+          role="assistant"
+        >
+          UI probe complete.
+        </AgentMessage>
+      </ConversationThreadShell>
+    </main>
+  );
+}
+
 function Showcase() {
   const [dark, setDark] = useState(false);
   const [composerValue, setComposerValue] = useState(
@@ -3011,8 +3194,16 @@ function Showcase() {
   );
 }
 
+const captureMode =
+  new URLSearchParams(window.location.search).get("capture") ===
+  "current-thread";
+
 createRoot(document.getElementById("root")!).render(
-  <StrictMode>
-    <Showcase />
-  </StrictMode>,
+  captureMode ? (
+    <CurrentThreadPixelFixture />
+  ) : (
+    <StrictMode>
+      <Showcase />
+    </StrictMode>
+  ),
 );

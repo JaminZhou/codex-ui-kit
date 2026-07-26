@@ -157,6 +157,18 @@ package contract, the browser showcase build, WCAG A/AA/2.2 browser checks for
 the static page and open overlay states, and the Electron
 main/preload/Renderer checks.
 
+The completed dark conversation fixture also supports an explicit
+current-build raster gate without committing the proprietary reference:
+
+```bash
+CODEX_UI_KIT_THREAD_REFERENCE=/absolute/path/to/main-only-reference.png \
+  pnpm check:visual:current-thread
+```
+
+The script renders at the PNG dimensions and gates the full screenshot plus
+the header, message band, and Composer regions independently. Reference and
+diff images remain outside the package by default.
+
 `npm pack` and a future `npm publish` run the library build first so the ignored
 `dist/` directory is always generated from the checked-out source. The package
 remains marked private until the first registry release is approved explicitly.

@@ -66,7 +66,12 @@ product-level parity.
 
 ## Visual optimization
 
-H5 and Electron are used continuously as functional acceptance surfaces.
-Final visual optimization is deliberately scheduled after the inventory,
-component contracts, page compositions, and state transitions stabilize.
-This avoids polishing a narrow or soon-to-be-replaced structure.
+H5 and Electron are used continuously as functional acceptance surfaces. The
+current completed-thread slice now also has a main-only raster fixture and
+regional PNG diff thresholds, because its inventory row and composition have
+stabilized enough for targeted pixel work.
+
+Broader final visual optimization remains scheduled after the remaining
+inventory, page compositions, and state transitions stabilize. A passing
+single-thread raster gate must not be generalized to unobserved routes or
+states.

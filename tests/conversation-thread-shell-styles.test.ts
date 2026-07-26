@@ -16,13 +16,22 @@ describe("current conversation thread shell visual contract", () => {
       "--codex-ui-conversation-thread-content-inline-inset: 1rem",
     );
     expect(tokens).toContain(
+      "--codex-ui-conversation-thread-content-top-inset: 2.0625rem",
+    );
+    expect(tokens).toContain(
       "--codex-ui-conversation-thread-composer-bottom-inset: 1rem",
     );
     expect(tokens).toContain(
       "--codex-ui-conversation-thread-composer-control-size: 1.75rem",
     );
     expect(tokens).toContain(
-      "--codex-ui-conversation-thread-user-turn-gap: 2rem",
+      "--codex-ui-conversation-thread-user-turn-gap: 2.125rem",
+    );
+    expect(tokens).toContain(
+      "--codex-ui-conversation-thread-font-size: 0.884375rem",
+    );
+    expect(tokens).toContain(
+      "--codex-ui-conversation-thread-line-height: 1.375rem",
     );
     expect(styles).toContain(
       "grid-template-rows:\n    var(--codex-ui-conversation-thread-header-height)\n    minmax(0, 1fr)",
@@ -32,20 +41,20 @@ describe("current conversation thread shell visual contract", () => {
     );
   });
 
-  it("reserves the composer without making it part of the scroll flow", () => {
+  it("reserves the measured composer without making it part of the scroll flow", () => {
     expect(styles).toContain(
       ".codex-ui-conversation-thread-shell__composer-dock",
     );
     expect(styles).toContain("pointer-events: none");
     expect(styles).toContain("position: absolute");
     expect(styles).toContain(
-      "var(--codex-ui-conversation-thread-composer-reserve) +",
+      "--codex-ui-conversation-thread-composer-dock-height",
     );
   });
 
   it("keeps completed assistant actions visible like the sampled thread", () => {
     expect(styles).toContain(
-      '.codex-ui-agent-message[data-role="assistant"]\n  .codex-ui-agent-message__actions {\n  opacity: 1',
+      '.codex-ui-agent-message[data-role="assistant"][data-status="completed"]\n  .codex-ui-agent-message__actions {\n  opacity: 1',
     );
   });
 });

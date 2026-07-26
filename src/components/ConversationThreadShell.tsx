@@ -3,6 +3,10 @@ import type {
   ReactNode,
 } from "react";
 import {
+  useLayoutEffect,
+  useRef,
+} from "react";
+import {
   AgentThread,
   AgentThreadViewport,
   type AgentThreadProps,
@@ -37,6 +41,8 @@ export function ConversationThreadShell({
   viewportProps,
   ...props
 }: ConversationThreadShellProps) {
+  const bodyRef = useRef<HTMLDivElement>(null);
+  const composerDockRef = useRef<HTMLDivElement>(null);
   const {
     className: threadClassName,
     ...restThreadProps
@@ -45,6 +51,29 @@ export function ConversationThreadShell({
     className: viewportClassName,
     ...restViewportProps
   } = viewportProps ?? {};
+
+  useLayoutEffect(() => {
+    const body = bodyRef.current;
+    const composerDock = composerDockRef.current;
+    if (!body || !composerDock) return;
+
+    const updateComposerReserve = () => {
+      const height = composerDock.getBoundingClientRect().height;
+      if (height > 0) {
+        body.style.setProperty(
+          "--codex-ui-conversation-thread-composer-dock-height",
+          `${height}px`,
+        );
+      }
+    };
+
+    updateComposerReserve();
+    if (typeof ResizeObserver === "undefined") return;
+
+    const observer = new ResizeObserver(updateComposerReserve);
+    observer.observe(composerDock);
+    return () => observer.disconnect();
+  }, []);
 
   return (
     <section
@@ -60,7 +89,10 @@ export function ConversationThreadShell({
       <div className="codex-ui-conversation-thread-shell__header">
         {header}
       </div>
-      <div className="codex-ui-conversation-thread-shell__body">
+      <div
+        className="codex-ui-conversation-thread-shell__body"
+        ref={bodyRef}
+      >
         <AgentThreadViewport
           {...restViewportProps}
           className={[
@@ -84,7 +116,10 @@ export function ConversationThreadShell({
             {children}
           </AgentThread>
         </AgentThreadViewport>
-        <div className="codex-ui-conversation-thread-shell__composer-dock">
+        <div
+          className="codex-ui-conversation-thread-shell__composer-dock"
+          ref={composerDockRef}
+        >
           <div className="codex-ui-conversation-thread-shell__composer">
             {composer}
           </div>

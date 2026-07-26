@@ -177,8 +177,14 @@ completed assistant actions, and the measured user-to-assistant turn gap.
 The H5 showcase verifies those relationships in Chromium at 1440×1000 light
 and dark plus 820×680 compact light. The Electron acceptance flow verifies the
 same composition in real 1180×820 and 820×680 BrowserWindows, including
-top/bottom timeline positioning and the running Stop state. This is a
-measurement-backed basic thread slice, not a claim that the whole application
-or every thread lifecycle is pixel-perfect. Markdown variants,
-virtualization, cancellation results, tool/approval flows, panels, and native
-window behavior retain their own inventory gates.
+top/bottom timeline positioning and the running Stop state. A separate
+main-only dark fixture accepts a current-build PNG reference through
+`CODEX_UI_KIT_THREAD_REFERENCE` and gates the full image plus the header,
+message band, and Composer regions independently. The sampled completed state
+matches all measured region geometry and stays below a 0.5% full-image raster
+delta at the strict 0.05 pixel threshold.
+
+This is a measurement- and raster-backed basic thread slice, not a claim that
+the whole application or every thread lifecycle is pixel-perfect. Markdown
+variants, virtualization, cancellation results, tool/approval flows, panels,
+and native window behavior retain their own inventory gates.

@@ -111,4 +111,76 @@ describe("ConversationThreadShell", () => {
         ?.classList.contains("task-scroll"),
     ).toBe(true);
   });
+
+  it("updates the timeline reserve when the composer dock changes height", () => {
+    const originalResizeObserver = globalThis.ResizeObserver;
+    const originalGetBoundingClientRect =
+      HTMLElement.prototype.getBoundingClientRect;
+    const disconnect = vi.fn();
+    const observe = vi.fn();
+
+    HTMLElement.prototype.getBoundingClientRect = function () {
+      if (
+        this.classList.contains(
+          "codex-ui-conversation-thread-shell__composer-dock",
+        )
+      ) {
+        return {
+          bottom: 138,
+          height: 138,
+          left: 0,
+          right: 736,
+          top: 0,
+          width: 736,
+          x: 0,
+          y: 0,
+          toJSON: () => ({}),
+        };
+      }
+      return originalGetBoundingClientRect.call(this);
+    };
+
+    globalThis.ResizeObserver = class ResizeObserver {
+      constructor(callback: ResizeObserverCallback) {
+        this.callback = callback;
+      }
+
+      private readonly callback: ResizeObserverCallback;
+
+      disconnect = disconnect;
+      observe = (target: Element) => {
+        observe(target);
+        this.callback([], this);
+      };
+      unobserve = vi.fn();
+    };
+
+    try {
+      const { container, unmount } = render(
+        <ConversationThreadShell
+          composer={<span>Composer</span>}
+          header={<span>Header</span>}
+        >
+          Timeline
+        </ConversationThreadShell>,
+      );
+      const body = container.querySelector<HTMLElement>(
+        ".codex-ui-conversation-thread-shell__body",
+      )!;
+
+      expect(observe).toHaveBeenCalledOnce();
+      expect(
+        body.style.getPropertyValue(
+          "--codex-ui-conversation-thread-composer-dock-height",
+        ),
+      ).toBe("138px");
+
+      unmount();
+      expect(disconnect).toHaveBeenCalledOnce();
+    } finally {
+      globalThis.ResizeObserver = originalResizeObserver;
+      HTMLElement.prototype.getBoundingClientRect =
+        originalGetBoundingClientRect;
+    }
+  });
 });

@@ -154,10 +154,21 @@
   --codex-ui-conversation-thread-header-height: 2.875rem;
   --codex-ui-conversation-thread-content-max-width: 48rem;
   --codex-ui-conversation-thread-content-inline-inset: 1rem;
+  --codex-ui-conversation-thread-content-top-inset: 2.0625rem;
   --codex-ui-conversation-thread-composer-bottom-inset: 1rem;
   --codex-ui-conversation-thread-composer-reserve: 7.125rem;
   --codex-ui-conversation-thread-composer-control-size: 1.75rem;
-  --codex-ui-conversation-thread-user-turn-gap: 2rem;
+  --codex-ui-conversation-thread-background: var(
+    --codex-ui-background-surface
+  );
+  --codex-ui-conversation-thread-composer-background: var(
+    --codex-ui-background-elevated-primary-opaque
+  );
+  --codex-ui-conversation-thread-header-border: var(--codex-ui-border);
+  --codex-ui-conversation-thread-font-size: 0.884375rem;
+  --codex-ui-conversation-thread-line-height: 1.375rem;
+  --codex-ui-conversation-thread-assistant-actions-gap: 0.625rem;
+  --codex-ui-conversation-thread-user-turn-gap: 2.125rem;
   --codex-ui-item-gap: calc(var(--codex-ui-spacing) * 4);
   --codex-ui-group-gap: var(--codex-ui-spacing);
   --codex-ui-user-message-max-width: 77%;
@@ -347,6 +358,9 @@
 
 [data-theme="dark"] {
   color-scheme: dark;
+  --codex-ui-conversation-thread-background: #171717;
+  --codex-ui-conversation-thread-composer-background: #282828;
+  --codex-ui-conversation-thread-header-border: #3b3b3b;
   --codex-ui-code-syntax-comment-style: normal;
   --codex-ui-background-surface: var(--codex-ui-gray-900);
   --codex-ui-background-surface-under: #000000;
@@ -468,6 +482,9 @@
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     color-scheme: dark;
+    --codex-ui-conversation-thread-background: #171717;
+    --codex-ui-conversation-thread-composer-background: #282828;
+    --codex-ui-conversation-thread-header-border: #3b3b3b;
     --codex-ui-code-syntax-comment-style: normal;
     --codex-ui-background-surface: var(--codex-ui-gray-900);
     --codex-ui-background-surface-under: #000000;
