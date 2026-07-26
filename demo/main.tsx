@@ -165,6 +165,11 @@ const navigationMessages = [
     label: "Finish the complete parity matrix.",
     preview: "Every row requires component, visual, H5, Electron, and test gates.",
   },
+  ...Array.from({ length: 5 }, (_, index) => ({
+    id: `navigation-message-${index + 6}`,
+    label: `Inspect long-thread navigation turn ${index + 6}.`,
+    preview: "Keep the current ten-message threshold interactive in the showcase.",
+  })),
 ] as const;
 
 const showcaseConversationProjects = [

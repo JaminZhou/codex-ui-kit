@@ -53,6 +53,9 @@ describe("current conversation thread shell visual contract", () => {
     expect(styles).toContain(
       "--codex-ui-conversation-thread-composer-dock-height",
     );
+    expect(styles).toContain(
+      "bottom: var(\n    --codex-ui-conversation-thread-composer-dock-height,\n    var(--codex-ui-conversation-thread-composer-reserve)",
+    );
   });
 
   it("keeps completed assistant actions visible like the sampled thread", () => {
