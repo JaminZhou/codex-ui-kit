@@ -41,6 +41,9 @@ describe("project conversation routing visual contract", () => {
     expect(styles).toMatch(
       /\.codex-ui-local-environment-dialog__groups \{[\s\S]*?min-height: 0;[\s\S]*?overflow: auto/,
     );
+    expect(styles).toMatch(
+      /\.codex-ui-conversation-project-options \{[\s\S]*?max-height: min\(15\.625rem, calc\(100dvh - 2rem\)\);[\s\S]*?overflow-y: auto;[\s\S]*?overscroll-behavior: contain;/,
+    );
   });
 
   it("stacks routing and project selection at compact widths", () => {

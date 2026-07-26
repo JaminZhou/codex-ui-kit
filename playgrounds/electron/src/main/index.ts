@@ -238,6 +238,13 @@ async function captureWorkflowSurfaces(webContents: WebContents) {
       role: routingProjectListbox?.getAttribute('role') ?? null,
       rovingTabStopMoved:
         routingProjectRovingTabStopMoved,
+      scrollable:
+        routingProjectListbox instanceof HTMLElement &&
+        routingProjectListbox.scrollHeight >
+          routingProjectListbox.clientHeight,
+      heightBounded:
+        routingProjectListbox instanceof HTMLElement &&
+        routingProjectListbox.getBoundingClientRect().height <= 250,
       triggerControls:
         routingProjectContext?.getAttribute('aria-controls') ?? null,
       triggerExpanded:
@@ -254,18 +261,37 @@ async function captureWorkflowSurfaces(webContents: WebContents) {
         !card?.querySelector('#desktop-routing-project-options') &&
         document.activeElement?.getAttribute('data-kind') ===
           'environment' &&
-        routingProjectContext?.getAttribute('aria-expanded') === 'false',
+        card
+          ?.querySelector(
+            '[data-desktop-local-environment-context="true"] [data-kind="project"]',
+          )
+          ?.getAttribute('aria-expanded') === 'false',
     );
-    const routingProjectFocusDismissed =
-      !card?.querySelector('#desktop-routing-project-options') &&
+    const routingProjectListboxDismissed =
+      !card?.querySelector('#desktop-routing-project-options');
+    const routingProjectFocusDestinationPreserved =
       document.activeElement?.getAttribute('data-kind') ===
-        'environment' &&
-      routingProjectContext?.getAttribute('aria-expanded') === 'false';
+      'environment';
+    const routingProjectTriggerCollapsed =
+      card
+        ?.querySelector(
+          '[data-desktop-local-environment-context="true"] [data-kind="project"]',
+        )
+        ?.getAttribute('aria-expanded') === 'false';
+    const routingProjectFocusDismissed =
+      routingProjectListboxDismissed &&
+      routingProjectFocusDestinationPreserved &&
+      routingProjectTriggerCollapsed;
     const routingProjectContextAfterFocusDismiss = card?.querySelector(
       '[data-desktop-local-environment-context="true"] [data-kind="project"]',
     );
+    if (routingProjectContextAfterFocusDismiss instanceof HTMLElement) {
+      routingProjectContextAfterFocusDismiss.focus();
+    }
     routingProjectContextAfterFocusDismiss?.click();
-    await wait(100);
+    await waitFor(
+      () => Boolean(card?.querySelector('#desktop-routing-project-options')),
+    );
     const reopenedRoutingProjectListbox = card?.querySelector(
       '#desktop-routing-project-options',
     );
@@ -594,8 +620,15 @@ async function captureWorkflowSurfaces(webContents: WebContents) {
         routingProjectMetrics.initialFocusSelected,
       routingProjectRovingTabStopMoved:
         routingProjectMetrics.rovingTabStopMoved,
+      routingProjectListboxHeightBounded:
+        routingProjectMetrics.heightBounded,
+      routingProjectListboxScrollable:
+        routingProjectMetrics.scrollable,
       routingProjectFocusDismissed,
+      routingProjectFocusDestinationPreserved,
+      routingProjectListboxDismissed,
       routingProjectSelectionFocusRestored,
+      routingProjectTriggerCollapsed,
       routingProjectTriggerControls:
         routingProjectMetrics.triggerControls,
       routingProjectTriggerExpanded:
@@ -1260,13 +1293,18 @@ async function captureAcceptance(browserWindow: BrowserWindow) {
         routingPromptFocusTransferred: true,
         routingPromptTransitioned: true,
         routingProjectListboxInViewport: true,
+        routingProjectListboxHeightBounded: true,
         routingProjectListboxRole: "listbox",
-        routingProjectOptionCount: 2,
+        routingProjectListboxScrollable: true,
+        routingProjectOptionCount: 14,
         routingProjectArrowNavigationMoved: true,
         routingProjectInitialFocusSelected: true,
         routingProjectRovingTabStopMoved: true,
         routingProjectFocusDismissed: true,
+        routingProjectFocusDestinationPreserved: true,
+        routingProjectListboxDismissed: true,
         routingProjectSelectionFocusRestored: true,
+        routingProjectTriggerCollapsed: true,
         routingProjectTriggerControls:
           "desktop-routing-project-options",
         routingProjectTriggerExpanded: "true",

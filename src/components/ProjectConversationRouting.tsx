@@ -1,4 +1,5 @@
 import {
+  type FocusEvent,
   type HTMLAttributes,
   type KeyboardEvent,
   type ReactNode,
@@ -897,6 +898,7 @@ export function ConversationProjectListbox({
   initialFocus = "selected",
   items,
   label = "Conversation projects",
+  onBlur,
   onDismiss,
   onSelect,
   selectedId,
@@ -968,29 +970,13 @@ export function ConversationProjectListbox({
         onDismiss();
       }
     };
-    const handleFocusIn = (event: FocusEvent) => {
-      const target = event.target;
-      if (!(target instanceof Node)) return;
-      const trigger = triggerId
-        ? document.getElementById(triggerId)
-        : null;
-      if (
-        !listboxRef.current?.contains(target) &&
-        !trigger?.contains(target)
-      ) {
-        onDismiss();
-      }
-    };
     document.addEventListener("pointerdown", handlePointerDown, true);
-    document.addEventListener("focusin", handleFocusIn, true);
-    return () => {
+    return () =>
       document.removeEventListener(
         "pointerdown",
         handlePointerDown,
         true,
       );
-      document.removeEventListener("focusin", handleFocusIn, true);
-    };
   }, [onDismiss, triggerId]);
 
   return (
@@ -1003,6 +989,22 @@ export function ConversationProjectListbox({
       ]
         .filter(Boolean)
         .join(" ")}
+      onBlur={(event: FocusEvent<HTMLDivElement>) => {
+        onBlur?.(event);
+        if (!onDismiss || event.defaultPrevented) return;
+        const nextTarget = event.relatedTarget;
+        const trigger = triggerId
+          ? document.getElementById(triggerId)
+          : null;
+        if (
+          nextTarget instanceof Node &&
+          (listboxRef.current?.contains(nextTarget) ||
+            trigger?.contains(nextTarget))
+        ) {
+          return;
+        }
+        onDismiss();
+      }}
       ref={listboxRef}
       role="listbox"
     >

@@ -163,6 +163,27 @@ const navigationMessages = [
   },
 ] as const;
 
+const showcaseConversationProjects = [
+  {
+    description: "Component workspace",
+    id: "ui-kit",
+    label: "codex-ui-kit",
+  },
+  {
+    description: "Desktop application",
+    id: "desktop",
+    label: "Codex desktop",
+  },
+  ...Array.from({ length: 12 }, (_, index) => {
+    const number = String(index + 3).padStart(2, "0");
+    return {
+      description: "Available project",
+      id: `project-${number}`,
+      label: `Project ${number}`,
+    };
+  }),
+];
+
 const showcaseDiffLines: FileDiffLine[] = [
   { content: "@@ -12,3 +12,4 @@", kind: "hunk" },
   {
@@ -851,18 +872,7 @@ function Showcase() {
                         {routingProjectOptionsOpen ? (
                           <ConversationProjectListbox
                             id="showcase-routing-project-options"
-                            items={[
-                              {
-                                description: "Component workspace",
-                                id: "ui-kit",
-                                label: "codex-ui-kit",
-                              },
-                              {
-                                description: "Desktop application",
-                                id: "desktop",
-                                label: "Codex desktop",
-                              },
-                            ]}
+                            items={showcaseConversationProjects}
                             onDismiss={() =>
                               setRoutingProjectOptionsOpen(false)
                             }

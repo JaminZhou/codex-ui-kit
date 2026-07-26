@@ -281,11 +281,17 @@ describe("project conversation routing", () => {
         <textarea aria-label="Conversation composer" />
       </>,
     );
-    expect(document.activeElement).toBe(
-      screen.getByRole("option", {
-        name: "Select project UI Kit",
-      }),
-    );
+    const option = screen.getByRole("option", {
+      name: "Select project UI Kit",
+    });
+    expect(document.activeElement).toBe(option);
+
+    const trigger = screen.getByRole("button", {
+      name: "Project",
+    });
+    trigger.focus();
+    expect(onDismiss).not.toHaveBeenCalled();
+    option.focus();
 
     const composer = screen.getByRole("textbox", {
       name: "Conversation composer",

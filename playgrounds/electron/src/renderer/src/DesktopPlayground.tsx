@@ -130,6 +130,27 @@ const repeatedActivities = [
   "Built the isolated Renderer",
 ];
 
+const desktopConversationProjects = [
+  {
+    description: "Component workspace",
+    id: "ui-kit",
+    label: "UI Kit",
+  },
+  {
+    description: "Desktop application",
+    id: "desktop",
+    label: "Desktop",
+  },
+  ...Array.from({ length: 12 }, (_, index) => {
+    const number = String(index + 3).padStart(2, "0");
+    return {
+      description: "Available project",
+      id: `project-${number}`,
+      label: `Project ${number}`,
+    };
+  }),
+];
+
 const desktopDiffLines: FileDiffLine[] = [
   { content: "@@ -46,2 +46,3 @@", kind: "hunk" },
   {
@@ -1778,18 +1799,7 @@ export function DesktopPlayground() {
                         {routingProjectOptionsOpen ? (
                           <ConversationProjectListbox
                             id="desktop-routing-project-options"
-                            items={[
-                              {
-                                description: "Component workspace",
-                                id: "ui-kit",
-                                label: "UI Kit",
-                              },
-                              {
-                                description: "Desktop application",
-                                id: "desktop",
-                                label: "Desktop",
-                              },
-                            ]}
+                            items={desktopConversationProjects}
                             onDismiss={() =>
                               setRoutingProjectOptionsOpen(false)
                             }
