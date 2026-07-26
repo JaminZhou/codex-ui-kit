@@ -97,6 +97,12 @@
 .codex-ui-workspace-selection *,
 .codex-ui-project-conversation-page,
 .codex-ui-project-conversation-page *,
+.codex-ui-project-index,
+.codex-ui-project-index *,
+.codex-ui-conversation-route-selector,
+.codex-ui-conversation-route-selector *,
+.codex-ui-worktree-list,
+.codex-ui-worktree-list *,
 .codex-ui-pull-request-page,
 .codex-ui-pull-request-page * {
   box-sizing: border-box;

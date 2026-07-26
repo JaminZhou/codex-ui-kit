@@ -7,6 +7,12 @@ const styles = readFileSync(
 );
 
 describe("project conversation routing visual contract", () => {
+  it("resets box sizing when routing components are mounted independently", () => {
+    expect(styles).toMatch(
+      /\.codex-ui-project-index,\n\.codex-ui-project-index \*,\n\.codex-ui-conversation-route-selector,\n\.codex-ui-conversation-route-selector \*,\n\.codex-ui-worktree-list,\n\.codex-ui-worktree-list \*,[\s\S]*?\{\n  box-sizing: border-box;\n\}/,
+    );
+  });
+
   it("keeps the page bounded with independently scrolling columns", () => {
     expect(styles).toContain(
       "container-name: codex-ui-project-conversation-page",
