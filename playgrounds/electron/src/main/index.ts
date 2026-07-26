@@ -200,8 +200,11 @@ async function captureWorkflowSurfaces(webContents: WebContents) {
     const eventRows = [...(eventList?.querySelectorAll('.codex-ui-conversation-event') ?? [])];
     const runningEvent = eventList?.querySelector('[data-status="running"] [role="status"]');
     const pullRequestPage = card?.querySelector('.codex-ui-pull-request-page');
+    const pullRequestBody = pullRequestPage?.querySelector('.codex-ui-pull-request-page__body');
     const pullRequestList = pullRequestPage?.querySelector('.codex-ui-pull-request-page__list');
     const pullRequestDetail = pullRequestPage?.querySelector('.codex-ui-pull-request-page__detail');
+    const pullRequestPageBounds = pullRequestPage?.getBoundingClientRect();
+    const pullRequestBodyBounds = pullRequestBody?.getBoundingClientRect();
     const pullRequestListBounds = pullRequestList?.getBoundingClientRect();
     const pullRequestDetailBounds = pullRequestDetail?.getBoundingClientRect();
     const selectedPullRequest = pullRequestPage?.querySelector('[aria-current="page"]');
@@ -218,7 +221,22 @@ async function captureWorkflowSurfaces(webContents: WebContents) {
         ownership: row.getAttribute('data-ownership'),
         status: row.getAttribute('data-status'),
       })),
+      pullRequestBody: rect(pullRequestBody),
+      pullRequestBodyWithinPage:
+        Boolean(pullRequestPageBounds && pullRequestBodyBounds) &&
+        pullRequestBodyBounds.bottom <= pullRequestPageBounds.bottom + 1,
+      pullRequestChildrenWithinBody:
+        Boolean(
+          pullRequestBodyBounds &&
+          pullRequestListBounds &&
+          pullRequestDetailBounds,
+        ) &&
+        pullRequestListBounds.bottom <= pullRequestBodyBounds.bottom + 1 &&
+        pullRequestDetailBounds.bottom <= pullRequestBodyBounds.bottom + 1,
       pullRequestDetail: rect(pullRequestDetail),
+      pullRequestDetailOverflowY: pullRequestDetail
+        ? getComputedStyle(pullRequestDetail).overflowY
+        : null,
       pullRequestLayout:
         pullRequestListBounds && pullRequestDetailBounds &&
         Math.abs(pullRequestListBounds.top - pullRequestDetailBounds.top) <= 2
@@ -760,6 +778,9 @@ async function captureAcceptance(browserWindow: BrowserWindow) {
         selectorOverlays: "owner",
       },
       equals: {
+        pullRequestBodyWithinPage: true,
+        pullRequestChildrenWithinBody: true,
+        pullRequestDetailOverflowY: "auto",
         pullRequestLayout,
         runningEventBusy: "true",
         selectedPullRequest:
@@ -778,6 +799,7 @@ async function captureAcceptance(browserWindow: BrowserWindow) {
       requiredFields: [
         "card",
         "eventList",
+        "pullRequestBody",
         "pullRequestDetail",
         "pullRequestList",
         "pullRequestPage",

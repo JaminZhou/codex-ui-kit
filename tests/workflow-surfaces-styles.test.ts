@@ -30,7 +30,13 @@ describe("workflow surface visual contract", () => {
       "grid-template-columns: minmax(16rem, 22rem) minmax(0, 1fr)",
     );
     expect(styles).toMatch(
-      /@container codex-ui-pull-request-page \(max-width: 48rem\)[\s\S]*?\.codex-ui-pull-request-page__body \{[\s\S]*?grid-template-columns: minmax\(0, 1fr\)/,
+      /\.codex-ui-pull-request-page \{[\s\S]*?display: flex;[\s\S]*?flex-direction: column/,
+    );
+    expect(styles).toMatch(
+      /\.codex-ui-pull-request-page__body \{[\s\S]*?flex: 1 1 auto;[\s\S]*?grid-template-rows: minmax\(0, 1fr\)/,
+    );
+    expect(styles).toMatch(
+      /@container codex-ui-pull-request-page \(max-width: 48rem\)[\s\S]*?\.codex-ui-pull-request-page__body \{[\s\S]*?grid-template-columns: minmax\(0, 1fr\);[\s\S]*?grid-template-rows: auto minmax\(0, 1fr\)/,
     );
     expect(styles).toContain(
       '.codex-ui-pull-request-list__item[data-selected]',
@@ -38,6 +44,12 @@ describe("workflow surface visual contract", () => {
   });
 
   it("shows event and review states without motion dependency", () => {
+    expect(styles).toContain(
+      "container-name: codex-ui-conversation-event-list",
+    );
+    expect(styles).toMatch(
+      /@container codex-ui-conversation-event-list \(max-width: 34rem\)[\s\S]*?\.codex-ui-conversation-event__main \{[\s\S]*?flex-direction: column/,
+    );
     expect(styles).toContain(
       '.codex-ui-conversation-event[data-ownership="thread"]',
     );
