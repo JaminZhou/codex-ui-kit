@@ -104,8 +104,21 @@ All privileged behavior remains host-owned. The components never auto-approve co
 - `ProjectIndex`: controlled project navigation with selected, available,
   loading, unavailable, error, search-toolbar, metadata, path, and empty
   states.
+- `NewConversationStart`: centered new-chat composition with an independent
+  destination, composer, context controls, and optional worktree prompt.
+- `ConversationContextBar`: compact, controlled Project, environment, and
+  worktree buttons with optional listbox/menu/dialog linkage, expansion,
+  status, and disabled semantics.
+- `ConversationProjectListbox`: linked project options with selected/disabled
+  states, initial focus, arrow/Home/End navigation, Escape dismissal, and
+  outside-pointer dismissal.
+- `LocalEnvironmentDialog`: searchable, grouped local checkout/worktree
+  selection with branch, metadata, repair/loading states, scrolling, and a
+  host-owned create action.
 - `ConversationRouteSelector`: keyboard-navigable radio-card selection for
-  local, remote, ChatGPT, or host-defined conversation routes.
+  host-defined products that use one mutually exclusive route choice. It is
+  protocol-neutral and is not the current Codex new-chat destination/context
+  model.
 - `WorktreeList`: controlled workspace list with branch/path identity,
   selected, creating, repairing, unavailable, error, item-action, and empty
   states.

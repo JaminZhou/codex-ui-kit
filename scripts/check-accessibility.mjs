@@ -117,6 +117,24 @@ async function waitForFocusWithin(page, selector) {
   );
 }
 
+async function revealConversationContext(page) {
+  const context = await page.$(
+    '[data-local-environment-context="true"]',
+  );
+  if (context) return;
+  await page.click(
+    ".codex-ui-new-conversation-start__prompt > button",
+  );
+  await page.waitForSelector(
+    '[data-local-environment-context="true"]',
+  );
+  await page.waitForFunction(
+    () =>
+      document.activeElement?.id ===
+      "showcase-routing-project-trigger",
+  );
+}
+
 const overlayCases = [
   {
     linkages: [
@@ -133,6 +151,33 @@ const overlayCases = [
       );
       await page.waitForSelector('[role="tooltip"]');
     },
+  },
+  {
+    linkages: [
+      {
+        attribute: "aria-controls",
+        role: "listbox",
+        trigger:
+          '[data-local-environment-context="true"] [data-kind="project"]',
+      },
+    ],
+    name: "conversation project listbox",
+    open: async (page) => {
+      await revealConversationContext(page);
+      await page.click(
+        '[data-local-environment-context="true"] [data-kind="project"]',
+      );
+      await page.waitForSelector(
+        '#showcase-routing-project-options[role="listbox"]',
+      );
+    },
+    targets: [
+      {
+        focusWithin: true,
+        role: "listbox",
+        selector: "#showcase-routing-project-options",
+      },
+    ],
   },
   {
     linkages: [
@@ -216,6 +261,70 @@ const overlayCases = [
         modal: true,
         role: "dialog",
         selector: '.codex-ui-dialog__surface[role="dialog"]',
+      },
+    ],
+  },
+  {
+    linkages: [
+      {
+        attribute: "aria-controls",
+        role: "dialog",
+        trigger:
+          '[data-local-environment-context="true"] [data-kind="environment"]',
+      },
+    ],
+    name: "local environment dialog",
+    open: async (page) => {
+      await revealConversationContext(page);
+      await page.click(
+        '[data-local-environment-context="true"] [data-kind="environment"]',
+      );
+      await page.waitForSelector(
+        '#showcase-local-environment-dialog[role="dialog"]',
+      );
+      await waitForFocusWithin(
+        page,
+        "#showcase-local-environment-dialog",
+      );
+    },
+    targets: [
+      {
+        focusWithin: true,
+        modal: true,
+        role: "dialog",
+        selector: "#showcase-local-environment-dialog",
+      },
+    ],
+  },
+  {
+    linkages: [
+      {
+        attribute: "aria-controls",
+        role: "dialog",
+        trigger:
+          '[data-local-environment-context="true"] [data-kind="worktree"]',
+      },
+    ],
+    name: "worktree local environment dialog",
+    open: async (page) => {
+      await revealConversationContext(page);
+      await page.click(
+        '[data-local-environment-context="true"] [data-kind="worktree"]',
+      );
+      await page.waitForSelector(
+        '#showcase-local-environment-dialog[role="dialog"]',
+      );
+      await waitForFocusWithin(
+        page,
+        "#showcase-local-environment-dialog",
+      );
+    },
+    targets: [
+      {
+        focusWithin: true,
+        modal: true,
+        role: "dialog",
+        selector: "#showcase-local-environment-dialog",
       },
     ],
   },

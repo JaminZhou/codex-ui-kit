@@ -26,8 +26,11 @@ import {
   type ComposerMentionOption,
   ComposerModeIndicator,
   type ComposerLayout,
+  ConversationContextBar,
+  type ConversationContextItem,
   ConversationEvent,
   ConversationEventList,
+  ConversationProjectListbox,
   type ConversationEventKind,
   ConversationRouteSelector,
   type ConversationRouteOption,
@@ -43,11 +46,14 @@ import {
   IconButton,
   InlineNotice,
   LoadingShimmer,
+  LocalEnvironmentDialog,
+  type LocalEnvironmentGroup,
   Menu,
   MenuCheckboxItem,
   MenuItem,
   MenuSubmenu,
   type NoticeTone,
+  NewConversationStart,
   ProposedPlan,
   Popover,
   ProjectConversationPage,
@@ -145,6 +151,16 @@ const conversationRoute: ConversationRouteOption = {
   id: "local",
   label: "Local",
 };
+const conversationContextItem: ConversationContextItem = {
+  id: "local",
+  kind: "environment",
+  label: "Local",
+};
+const localEnvironmentGroup: LocalEnvironmentGroup = {
+  id: "package",
+  items: [{ id: "main", label: "Main" }],
+  label: "Package",
+};
 type ConversationRouteSelectorAcceptsChildren =
   "children" extends keyof ConversationRouteSelectorProps ? true : false;
 const conversationRouteSelectorAcceptsChildren: ConversationRouteSelectorAcceptsChildren =
@@ -187,6 +203,7 @@ void GeneratedImageGallery;
 void ImagePreviewDialog;
 void InlineNotice;
 void LoadingShimmer;
+void LocalEnvironmentDialog;
 void ActivityTimeline;
 void AgentMarkdown;
 void AgentPlan;
@@ -207,12 +224,15 @@ void CommandOutput;
 void ComposerAttachment;
 void ComposerMentionMenu;
 void ComposerModeIndicator;
+void ConversationContextBar;
 void ConversationEvent;
 void ConversationEventList;
+void ConversationProjectListbox;
 void ConversationRouteSelector;
 void conversationRouteSelectorAcceptsChildren;
 void Dialog;
 void DialogChoice;
+void NewConversationStart;
 void ProposedPlan;
 void ProjectConversationPage;
 void ProjectIndex;
@@ -279,6 +299,8 @@ void noticeAction;
 void composerLayout;
 void conversationEventKind;
 void conversationRoute;
+void conversationContextItem;
+void localEnvironmentGroup;
 void projectIndexItem;
 void worktreeListItem;
 void mentionOption;

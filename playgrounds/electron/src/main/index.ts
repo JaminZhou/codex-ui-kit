@@ -130,6 +130,14 @@ async function closeChoiceDialog(webContents: WebContents) {
 async function captureWorkflowSurfaces(webContents: WebContents) {
   return webContents.executeJavaScript(`(async () => {
     const wait = (duration) => new Promise((resolve) => setTimeout(resolve, duration));
+    const waitFor = async (predicate, timeout = 800) => {
+      const deadline = Date.now() + timeout;
+      while (Date.now() < deadline) {
+        if (predicate()) return true;
+        await wait(20);
+      }
+      return predicate();
+    };
     const rect = (element) => {
       if (!element) return null;
       const bounds = element.getBoundingClientRect();
@@ -165,24 +173,293 @@ async function captureWorkflowSurfaces(webContents: WebContents) {
     }
     await wait(180);
 
-    const routingProject = card?.querySelector(
-      '.codex-ui-project-index__item[aria-label="Open project Desktop"]',
+    const routingPrompt = card?.querySelector(
+      '.codex-ui-new-conversation-start__prompt > button',
+    );
+    const routingPromptInitiallyVisible =
+      routingPrompt instanceof HTMLButtonElement;
+    routingPrompt?.click();
+    await wait(100);
+    const routingPromptTransitioned =
+      !card?.querySelector(
+        '.codex-ui-new-conversation-start__prompt',
+      ) &&
+      card?.querySelectorAll(
+        '.codex-ui-conversation-context-bar__item',
+      ).length === 3;
+    const routingPromptFocusTransferred =
+      !routingPromptInitiallyVisible ||
+      document.activeElement?.id ===
+        'desktop-routing-project-trigger';
+    const routingProjectContext = card?.querySelector(
+      '[data-desktop-local-environment-context="true"] [data-kind="project"]',
+    );
+    routingProjectContext?.scrollIntoView({
+      block: 'center',
+      inline: 'nearest',
+    });
+    await wait(100);
+    routingProjectContext?.click();
+    await wait(100);
+    const routingProjectListbox = card?.querySelector(
+      '#desktop-routing-project-options',
+    );
+    const initiallyFocusedProjectOption =
+      document.activeElement instanceof HTMLElement &&
+      document.activeElement.getAttribute('role') === 'option'
+        ? document.activeElement
+        : null;
+    const routingProjectInitialFocusSelected =
+      initiallyFocusedProjectOption?.getAttribute('aria-selected') === 'true';
+    initiallyFocusedProjectOption?.dispatchEvent(
+      new KeyboardEvent('keydown', {
+        bubbles: true,
+        key: 'ArrowDown',
+      }),
+    );
+    await wait(80);
+    const routingProjectArrowNavigationMoved =
+      document.activeElement instanceof HTMLElement &&
+      document.activeElement.getAttribute('role') === 'option' &&
+      document.activeElement !== initiallyFocusedProjectOption;
+    const routingProjectRovingTabStopMoved =
+      document.activeElement instanceof HTMLElement &&
+      document.activeElement.getAttribute('role') === 'option' &&
+      document.activeElement.tabIndex === 0 &&
+      initiallyFocusedProjectOption?.tabIndex === -1;
+    const routingProjectMetrics = {
+      arrowNavigationMoved:
+        routingProjectArrowNavigationMoved,
+      inViewport: inViewport(routingProjectListbox),
+      initialFocusSelected:
+        routingProjectInitialFocusSelected,
+      optionCount:
+        routingProjectListbox?.querySelectorAll('[role="option"]').length ?? 0,
+      role: routingProjectListbox?.getAttribute('role') ?? null,
+      rovingTabStopMoved:
+        routingProjectRovingTabStopMoved,
+      scrollable:
+        routingProjectListbox instanceof HTMLElement &&
+        routingProjectListbox.scrollHeight >
+          routingProjectListbox.clientHeight,
+      heightBounded:
+        routingProjectListbox instanceof HTMLElement &&
+        routingProjectListbox.getBoundingClientRect().height <= 250,
+      triggerControls:
+        routingProjectContext?.getAttribute('aria-controls') ?? null,
+      triggerExpanded:
+        routingProjectContext?.getAttribute('aria-expanded') ?? null,
+    };
+    const routingProjectFocusDismissTarget = card?.querySelector(
+      '[data-desktop-local-environment-context="true"] [data-kind="environment"]',
+    );
+    if (routingProjectFocusDismissTarget instanceof HTMLElement) {
+      routingProjectFocusDismissTarget.focus();
+    }
+    await waitFor(
+      () =>
+        !card?.querySelector('#desktop-routing-project-options') &&
+        document.activeElement?.getAttribute('data-kind') ===
+          'environment' &&
+        card
+          ?.querySelector(
+            '[data-desktop-local-environment-context="true"] [data-kind="project"]',
+          )
+          ?.getAttribute('aria-expanded') === 'false',
+    );
+    const routingProjectListboxDismissed =
+      !card?.querySelector('#desktop-routing-project-options');
+    const routingProjectFocusDestinationPreserved =
+      document.activeElement?.getAttribute('data-kind') ===
+      'environment';
+    const routingProjectTriggerCollapsed =
+      card
+        ?.querySelector(
+          '[data-desktop-local-environment-context="true"] [data-kind="project"]',
+        )
+        ?.getAttribute('aria-expanded') === 'false';
+    const routingProjectFocusDismissed =
+      routingProjectListboxDismissed &&
+      routingProjectFocusDestinationPreserved &&
+      routingProjectTriggerCollapsed;
+    const routingProjectContextAfterFocusDismiss = card?.querySelector(
+      '[data-desktop-local-environment-context="true"] [data-kind="project"]',
+    );
+    if (routingProjectContextAfterFocusDismiss instanceof HTMLElement) {
+      routingProjectContextAfterFocusDismiss.focus();
+    }
+    routingProjectContextAfterFocusDismiss?.click();
+    await waitFor(
+      () => Boolean(card?.querySelector('#desktop-routing-project-options')),
+    );
+    const reopenedRoutingProjectListbox = card?.querySelector(
+      '#desktop-routing-project-options',
+    );
+    const routingProject = reopenedRoutingProjectListbox?.querySelector(
+      '[role="option"][data-project-id="desktop"]',
     );
     routingProject?.click();
-    await wait(80);
-    const routingRoute = card?.querySelector(
-      '.codex-ui-conversation-route-selector__option[data-route-id="chatgpt"]',
+    await waitFor(
+      () =>
+        document.activeElement?.id ===
+        'desktop-routing-project-trigger',
     );
-    routingRoute?.click();
-    await wait(80);
-    const routingWorktree = card?.querySelector(
-      '.codex-ui-worktree-list__item[aria-label="Open worktree Main checkout"]',
+    const routingProjectSelectionFocusRestored =
+      document.activeElement?.id ===
+      'desktop-routing-project-trigger';
+    const routingWorktreeContext = card?.querySelector(
+      '[data-desktop-local-environment-context="true"] [data-kind="worktree"]',
     );
-    routingWorktree?.click();
-    await wait(80);
-    const startConversation = [...(card?.querySelectorAll('button') ?? [])]
-      .find((button) => button.textContent?.trim() === 'Start conversation');
-    startConversation?.click();
+    routingWorktreeContext?.click();
+    await wait(140);
+    const worktreeEnvironmentDialog = document.querySelector(
+      '#desktop-local-environment-dialog',
+    );
+    const expandedRoutingWorktree = card?.querySelector(
+      '[data-desktop-local-environment-context="true"] [data-kind="worktree"]',
+    );
+    const worktreeEnvironmentMetrics = {
+      role: worktreeEnvironmentDialog?.getAttribute('role') ?? null,
+      triggerControls:
+        expandedRoutingWorktree?.getAttribute('aria-controls') ?? null,
+      triggerExpanded:
+        expandedRoutingWorktree?.getAttribute('aria-expanded') ?? null,
+    };
+    worktreeEnvironmentDialog
+      ?.querySelector('.codex-ui-dialog__close')
+      ?.click();
+    await wait(100);
+    const routingProjectContextBeforeEnvironment = card?.querySelector(
+      '[data-desktop-local-environment-context="true"] [data-kind="project"]',
+    );
+    routingProjectContextBeforeEnvironment?.click();
+    await wait(100);
+    const uiKitProject = card?.querySelector(
+      '#desktop-routing-project-options [role="option"][data-project-id="ui-kit"]',
+    );
+    uiKitProject?.click();
+    await wait(100);
+    const routingProjectBeforeEnvironment = card?.querySelector(
+      '.codex-ui-project-index__item[aria-current="page"]',
+    );
+    const routingEnvironment = card?.querySelector(
+      '[data-desktop-local-environment-context="true"] [data-kind="environment"]',
+    );
+    routingEnvironment?.click();
+    await wait(140);
+    const localEnvironmentDialog = document.querySelector(
+      '#desktop-local-environment-dialog',
+    );
+    const expandedRoutingEnvironment = card?.querySelector(
+      '[data-desktop-local-environment-context="true"] [data-kind="environment"]',
+    );
+    const localEnvironmentSearch = localEnvironmentDialog?.querySelector(
+      '.codex-ui-local-environment-dialog__search',
+    );
+    const localEnvironmentMetrics = {
+      bounds: rect(localEnvironmentDialog),
+      filteredGroupCount: null,
+      filteredItemCount: null,
+      groupCount:
+        localEnvironmentDialog?.querySelectorAll(
+          '.codex-ui-local-environment-dialog__group',
+        ).length ?? 0,
+      inViewport: inViewport(localEnvironmentDialog),
+      itemCount:
+        localEnvironmentDialog?.querySelectorAll(
+          '.codex-ui-local-environment-dialog__item',
+        ).length ?? 0,
+      repairingDisabledCount:
+        localEnvironmentDialog?.querySelectorAll(
+          '.codex-ui-local-environment-dialog__item[data-status="repairing"]:disabled',
+        ).length ?? 0,
+      role: localEnvironmentDialog?.getAttribute('role') ?? null,
+      searchFocused: document.activeElement === localEnvironmentSearch,
+      triggerControls:
+        expandedRoutingEnvironment?.getAttribute('aria-controls') ?? null,
+      triggerExpanded:
+        expandedRoutingEnvironment?.getAttribute('aria-expanded') ?? null,
+    };
+    if (localEnvironmentSearch instanceof HTMLInputElement) {
+      const setInputValue = Object.getOwnPropertyDescriptor(
+        HTMLInputElement.prototype,
+        'value',
+      )?.set;
+      setInputValue?.call(localEnvironmentSearch, 'desktop');
+      localEnvironmentSearch.dispatchEvent(
+        new Event('input', { bubbles: true }),
+      );
+      await wait(100);
+      const filteredDialog = document.querySelector(
+        '#desktop-local-environment-dialog',
+      );
+      localEnvironmentMetrics.filteredGroupCount =
+        filteredDialog?.querySelectorAll(
+          '.codex-ui-local-environment-dialog__group',
+        ).length ?? 0;
+      localEnvironmentMetrics.filteredItemCount =
+        filteredDialog?.querySelectorAll(
+          '.codex-ui-local-environment-dialog__item',
+        ).length ?? 0;
+      const filteredSearch = filteredDialog?.querySelector(
+        '.codex-ui-local-environment-dialog__search',
+      );
+      if (filteredSearch instanceof HTMLInputElement) {
+        setInputValue?.call(filteredSearch, '');
+        filteredSearch.dispatchEvent(
+          new Event('input', { bubbles: true }),
+        );
+        await wait(100);
+      }
+    }
+    const restoredLocalEnvironmentDialog = document.querySelector(
+      '#desktop-local-environment-dialog',
+    );
+    const desktopMainEnvironment =
+      restoredLocalEnvironmentDialog?.querySelector(
+        '[aria-label="Use local environment Desktop main"]',
+      );
+    desktopMainEnvironment?.click();
+    await wait(100);
+    const routingProjectAfterEnvironment = card?.querySelector(
+      '.codex-ui-project-index__item[aria-current="page"]',
+    );
+    const localEnvironmentProjectAligned =
+      routingProjectBeforeEnvironment?.getAttribute('aria-label') ===
+        'Open project UI Kit' &&
+      routingProjectAfterEnvironment?.getAttribute('aria-label') ===
+        'Open project Desktop';
+    const routingComposerInput = card?.querySelector(
+      '.codex-ui-new-conversation-start .codex-ui-composer__input',
+    );
+    if (routingComposerInput instanceof HTMLTextAreaElement) {
+      const setTextareaValue = Object.getOwnPropertyDescriptor(
+        HTMLTextAreaElement.prototype,
+        'value',
+      )?.set;
+      setTextareaValue?.call(
+        routingComposerInput,
+        'Acceptance new chat prompt',
+      );
+      routingComposerInput.dispatchEvent(
+        new Event('input', { bubbles: true }),
+      );
+    }
+    await wait(100);
+    const routingComposerSubmit = card?.querySelector(
+      '.codex-ui-new-conversation-start button[aria-label="Send message"]',
+    );
+    const routingComposerSubmitEnabled =
+      routingComposerSubmit instanceof HTMLButtonElement &&
+      !routingComposerSubmit.disabled;
+    const submittedRoutingInput = card?.querySelector(
+      '.codex-ui-new-conversation-start .codex-ui-composer__input',
+    );
+    const routingComposerPrompt =
+      submittedRoutingInput instanceof HTMLTextAreaElement
+        ? submittedRoutingInput.value
+        : null;
+    routingComposerSubmit?.click();
     await wait(120);
 
     const selectorOverlays = [];
@@ -282,6 +559,8 @@ async function captureWorkflowSurfaces(webContents: WebContents) {
       reviewRows: [...(pullRequestPage?.querySelectorAll('.codex-ui-pull-request-reviews li') ?? [])].map(rect),
       reviewThread: rect(reviewThread),
       routingBody: rect(routingBody),
+      routingComposerPrompt,
+      routingComposerSubmitEnabled,
       routingBodyWithinPage:
         Boolean(routingPageBounds && routingBodyBounds) &&
         routingBodyBounds.bottom <= routingPageBounds.bottom + 1,
@@ -302,39 +581,97 @@ async function captureWorkflowSurfaces(webContents: WebContents) {
       routingProjectsOverflowY: routingProjects
         ? getComputedStyle(routingProjects).overflowY
         : null,
-      routingRouteOptions: [
+      routingContextItems: [
         ...(routingPage?.querySelectorAll(
-          '.codex-ui-conversation-route-selector__option',
+          '.codex-ui-conversation-context-bar__item',
         ) ?? []),
-      ].map((option) => ({
-        bounds: rect(option),
-        checked: option.getAttribute('aria-checked'),
-        disabled: option.hasAttribute('disabled'),
-        routeId: option.getAttribute('data-route-id'),
+      ].map((item) => ({
+        bounds: rect(item),
+        controls: item.getAttribute('aria-controls'),
+        disabled: item.hasAttribute('disabled'),
+        kind: item.getAttribute('data-kind'),
+        label: item.getAttribute('aria-label'),
       })),
+      routingDestination:
+        routingPage?.querySelector(
+          '.codex-ui-new-conversation-start__header h3',
+        )?.textContent ?? null,
+      routingEnvironment:
+        routingPage
+          ?.querySelector(
+            '.codex-ui-conversation-context-bar__item[data-kind="environment"]',
+          )
+          ?.getAttribute('aria-label') ?? null,
+      routingNewConversation: rect(
+        routingPage?.querySelector('.codex-ui-new-conversation-start'),
+      ),
+      routingPromptInitiallyVisible,
+      routingPromptFocusTransferred,
+      routingPromptTransitioned,
+      routingProjectListboxInViewport:
+        routingProjectMetrics.inViewport,
+      routingProjectListboxRole:
+        routingProjectMetrics.role,
+      routingProjectOptionCount:
+        routingProjectMetrics.optionCount,
+      routingProjectArrowNavigationMoved:
+        routingProjectMetrics.arrowNavigationMoved,
+      routingProjectInitialFocusSelected:
+        routingProjectMetrics.initialFocusSelected,
+      routingProjectRovingTabStopMoved:
+        routingProjectMetrics.rovingTabStopMoved,
+      routingProjectListboxHeightBounded:
+        routingProjectMetrics.heightBounded,
+      routingProjectListboxScrollable:
+        routingProjectMetrics.scrollable,
+      routingProjectFocusDismissed,
+      routingProjectFocusDestinationPreserved,
+      routingProjectListboxDismissed,
+      routingProjectSelectionFocusRestored,
+      routingProjectTriggerCollapsed,
+      routingProjectTriggerControls:
+        routingProjectMetrics.triggerControls,
+      routingProjectTriggerExpanded:
+        routingProjectMetrics.triggerExpanded,
       routingSetup: rect(routingSetup),
       routingSetupOverflowY: routingSetup
         ? getComputedStyle(routingSetup).overflowY
         : null,
       routingState:
         card?.querySelector('[data-workflow-state="routing"]')?.textContent ?? null,
-      routingWorktreeItems: [
-        ...(routingPage?.querySelectorAll('.codex-ui-worktree-list__item') ?? []),
-      ].map(rect),
-      selectedConversationRoute:
-        routingPage
-          ?.querySelector(
-            '.codex-ui-conversation-route-selector__option[aria-checked="true"]',
-          )
-          ?.getAttribute('data-route-id') ?? null,
       selectedRoutingProject:
         routingPage
           ?.querySelector('.codex-ui-project-index__item[aria-current="page"]')
           ?.getAttribute('aria-label') ?? null,
       selectedRoutingWorktree:
         routingPage
-          ?.querySelector('.codex-ui-worktree-list__item[aria-current="location"]')
+          ?.querySelector(
+            '.codex-ui-conversation-context-bar__item[data-kind="worktree"]',
+          )
           ?.getAttribute('aria-label') ?? null,
+      localEnvironmentDialog: localEnvironmentMetrics.bounds,
+      localEnvironmentProjectAligned,
+      localEnvironmentFilteredGroupCount:
+        localEnvironmentMetrics.filteredGroupCount,
+      localEnvironmentFilteredItemCount:
+        localEnvironmentMetrics.filteredItemCount,
+      localEnvironmentGroupCount: localEnvironmentMetrics.groupCount,
+      localEnvironmentInViewport: localEnvironmentMetrics.inViewport,
+      localEnvironmentItemCount: localEnvironmentMetrics.itemCount,
+      localEnvironmentRepairingDisabledCount:
+        localEnvironmentMetrics.repairingDisabledCount,
+      localEnvironmentRole: localEnvironmentMetrics.role,
+      localEnvironmentSearchFocused: localEnvironmentMetrics.searchFocused,
+      localEnvironmentTriggerControls:
+        localEnvironmentMetrics.triggerControls,
+      localEnvironmentTriggerExpanded:
+        localEnvironmentMetrics.triggerExpanded,
+      worktreeEnvironmentRole:
+        worktreeEnvironmentMetrics.role,
+      worktreeEnvironmentTriggerControls:
+        worktreeEnvironmentMetrics.triggerControls,
+      worktreeEnvironmentTriggerExpanded:
+        worktreeEnvironmentMetrics.triggerExpanded,
       runningEventBusy: runningEvent?.getAttribute('aria-busy') ?? null,
       selectedPullRequest: selectedPullRequest?.getAttribute('aria-label') ?? null,
       selectionText: card?.querySelector('[data-workflow-state="selection"]')?.textContent ?? null,
@@ -372,6 +709,33 @@ async function focusProjectRoutingSurface(webContents: WebContents) {
     return true;
   })()`);
   await new Promise((resolve) => setTimeout(resolve, 180));
+}
+
+async function openLocalEnvironmentSurface(webContents: WebContents) {
+  await webContents.executeJavaScript(`(() => {
+    const card = document.querySelector(
+      '[data-acceptance-surface="workflow-surfaces"]',
+    );
+    card
+      ?.querySelector(
+        '[data-desktop-local-environment-context="true"] [data-kind="environment"]',
+      )
+      ?.click();
+  })()`);
+  await new Promise((resolve) => setTimeout(resolve, 180));
+}
+
+async function closeLocalEnvironmentSurface(webContents: WebContents) {
+  await webContents.executeJavaScript(`(() => {
+    const surface = document.querySelector(
+      '#desktop-local-environment-dialog',
+    );
+    const backdrop = surface?.closest('.codex-ui-dialog');
+    backdrop?.dispatchEvent(
+      new PointerEvent('pointerdown', { bubbles: true }),
+    );
+  })()`);
+  await new Promise((resolve) => setTimeout(resolve, 100));
 }
 
 async function captureResourceSurfaces(
@@ -745,6 +1109,10 @@ async function captureAcceptance(browserWindow: BrowserWindow) {
   await focusProjectRoutingSurface(browserWindow.webContents);
   const projectRoutingScreenshot =
     await browserWindow.webContents.capturePage();
+  await openLocalEnvironmentSurface(browserWindow.webContents);
+  const localEnvironmentScreenshot =
+    await browserWindow.webContents.capturePage();
+  await closeLocalEnvironmentSurface(browserWindow.webContents);
   nativeTheme.themeSource = "light";
   sendThemeState(browserWindow.webContents);
   await browserWindow.webContents.executeJavaScript(
@@ -774,6 +1142,10 @@ async function captureAcceptance(browserWindow: BrowserWindow) {
   await focusProjectRoutingSurface(browserWindow.webContents);
   const compactProjectRoutingScreenshot =
     await browserWindow.webContents.capturePage();
+  await openLocalEnvironmentSurface(browserWindow.webContents);
+  const compactLocalEnvironmentScreenshot =
+    await browserWindow.webContents.capturePage();
+  await closeLocalEnvironmentSurface(browserWindow.webContents);
   console.log("acceptance step: compact navigation");
   const compactNavigationMetrics = await captureNavigationSurfaces(
     browserWindow.webContents,
@@ -880,14 +1252,23 @@ async function captureAcceptance(browserWindow: BrowserWindow) {
     expectedTheme,
     pullRequestLayout,
     routingLayout,
+    routingPromptInitiallyVisible,
   ] of [
-    ["workflow surfaces", workflowMetrics, "dark", "split", "split"],
+    [
+      "workflow surfaces",
+      workflowMetrics,
+      "dark",
+      "split",
+      "split",
+      true,
+    ],
     [
       "compact workflow surfaces",
       compactWorkflowMetrics,
       "light",
       "stacked",
       "stacked",
+      false,
     ],
   ] as const) {
     assertAcceptanceMetric(name, snapshot, {
@@ -904,27 +1285,64 @@ async function captureAcceptance(browserWindow: BrowserWindow) {
         pullRequestLayout,
         routingBodyWithinPage: true,
         routingChildrenWithinBody: true,
+        routingDestination: "ChatGPT",
+        routingEnvironment: "Change environment: Local",
         routingLayout,
         routingProjectsOverflowY: "auto",
+        routingPromptInitiallyVisible,
+        routingPromptFocusTransferred: true,
+        routingPromptTransitioned: true,
+        routingProjectListboxInViewport: true,
+        routingProjectListboxHeightBounded: true,
+        routingProjectListboxRole: "listbox",
+        routingProjectListboxScrollable: true,
+        routingProjectOptionCount: 14,
+        routingProjectArrowNavigationMoved: true,
+        routingProjectInitialFocusSelected: true,
+        routingProjectRovingTabStopMoved: true,
+        routingProjectFocusDismissed: true,
+        routingProjectFocusDestinationPreserved: true,
+        routingProjectListboxDismissed: true,
+        routingProjectSelectionFocusRestored: true,
+        routingProjectTriggerCollapsed: true,
+        routingProjectTriggerControls:
+          "desktop-routing-project-options",
+        routingProjectTriggerExpanded: "true",
         routingSetupOverflowY: "auto",
-        routingState: "desktop/chatgpt/main",
+        routingComposerPrompt: "Acceptance new chat prompt",
+        routingComposerSubmitEnabled: true,
+        routingState: "Desktop conversation started",
         runningEventBusy: "true",
-        selectedConversationRoute: "chatgpt",
         selectedPullRequest:
           "Open pull request 50: Add current application shell",
         selectedRoutingProject: "Open project Desktop",
-        selectedRoutingWorktree: "Open worktree Main checkout",
+        selectedRoutingWorktree: "Change worktree: main",
         selectionText: "ui-kit/worktree/feature",
         threadEventCount: 2,
+        localEnvironmentGroupCount: 2,
+        localEnvironmentInViewport: true,
+        localEnvironmentItemCount: 4,
+        localEnvironmentProjectAligned: true,
+        localEnvironmentFilteredGroupCount: 1,
+        localEnvironmentFilteredItemCount: 1,
+        localEnvironmentRepairingDisabledCount: 1,
+        localEnvironmentRole: "dialog",
+        localEnvironmentSearchFocused: true,
+        localEnvironmentTriggerControls:
+          "desktop-local-environment-dialog",
+        localEnvironmentTriggerExpanded: "true",
+        worktreeEnvironmentRole: "dialog",
+        worktreeEnvironmentTriggerControls:
+          "desktop-local-environment-dialog",
+        worktreeEnvironmentTriggerExpanded: "true",
       },
       expectedTheme,
       minimumItems: {
         checkRows: 2,
         eventRows: 6,
         reviewRows: 1,
+        routingContextItems: 3,
         routingProjectItems: 3,
-        routingRouteOptions: 3,
-        routingWorktreeItems: 3,
         selectorOverlays: 3,
         workspaceFields: 3,
       },
@@ -937,6 +1355,8 @@ async function captureAcceptance(browserWindow: BrowserWindow) {
         "pullRequestPage",
         "reviewThread",
         "routingBody",
+        "localEnvironmentDialog",
+        "routingNewConversation",
         "routingPage",
         "routingProjects",
         "routingSetup",
@@ -1068,6 +1488,10 @@ async function captureAcceptance(browserWindow: BrowserWindow) {
       projectRoutingScreenshot.toPNG(),
     ),
     writeFile(
+      join(outputDirectory, "local-environment-dialog.png"),
+      localEnvironmentScreenshot.toPNG(),
+    ),
+    writeFile(
       join(outputDirectory, "workflow-surfaces-compact-light-metrics.json"),
       `${JSON.stringify(compactWorkflowMetrics, null, 2)}\n`,
     ),
@@ -1078,6 +1502,13 @@ async function captureAcceptance(browserWindow: BrowserWindow) {
     writeFile(
       join(outputDirectory, "project-routing-compact-light.png"),
       compactProjectRoutingScreenshot.toPNG(),
+    ),
+    writeFile(
+      join(
+        outputDirectory,
+        "local-environment-dialog-compact-light.png",
+      ),
+      compactLocalEnvironmentScreenshot.toPNG(),
     ),
   ]);
   console.log(`acceptance capture: ${outputDirectory}`);

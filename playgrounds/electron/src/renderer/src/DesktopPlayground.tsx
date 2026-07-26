@@ -26,9 +26,10 @@ import {
   ComposerAttachment,
   ComposerMentionMenu,
   ComposerModeIndicator,
+  ConversationContextBar,
+  ConversationProjectListbox,
   ConversationEvent,
   ConversationEventList,
-  ConversationRouteSelector,
   Dialog,
   DialogChoice,
   FileChange,
@@ -40,12 +41,14 @@ import {
   InlineNotice,
   IconButton,
   LoadingShimmer,
+  LocalEnvironmentDialog,
   Menu,
   MenuCheckboxItem,
   MenuItem,
   MenuSectionLabel,
   MenuSeparator,
   MenuSubmenu,
+  NewConversationStart,
   Popover,
   ProposedPlan,
   ProjectPicker,
@@ -87,7 +90,6 @@ import {
   TurnDuration,
   WorkspaceSelection,
   WorktreePicker,
-  WorktreeList,
   type ApprovalDecision,
   type FileDiffLine,
   type GeneratedImageItem,
@@ -126,6 +128,27 @@ const repeatedActivities = [
   "Checked standard window layout",
   "Checked wide window layout",
   "Built the isolated Renderer",
+];
+
+const desktopConversationProjects = [
+  {
+    description: "Component workspace",
+    id: "ui-kit",
+    label: "UI Kit",
+  },
+  {
+    description: "Desktop application",
+    id: "desktop",
+    label: "Desktop",
+  },
+  ...Array.from({ length: 12 }, (_, index) => {
+    const number = String(index + 3).padStart(2, "0");
+    return {
+      description: "Available project",
+      id: `project-${number}`,
+      label: `Project ${number}`,
+    };
+  }),
 ];
 
 const desktopDiffLines: FileDiffLine[] = [
@@ -389,6 +412,18 @@ export function DesktopPlayground() {
   const [routingProject, setRoutingProject] = useState("ui-kit");
   const [routingRoute, setRoutingRoute] = useState("local");
   const [routingWorktree, setRoutingWorktree] = useState("routing");
+  const [routingComposerValue, setRoutingComposerValue] = useState("");
+  const [routingContextReady, setRoutingContextReady] =
+    useState(false);
+  const [routingProjectOptionsOpen, setRoutingProjectOptionsOpen] =
+    useState(false);
+  const [localEnvironmentDialogOpen, setLocalEnvironmentDialogOpen] =
+    useState(false);
+  const [
+    localEnvironmentDialogOwner,
+    setLocalEnvironmentDialogOwner,
+  ] = useState<"environment" | "worktree">();
+  const [localEnvironmentQuery, setLocalEnvironmentQuery] = useState("");
   const [routingStatus, setRoutingStatus] = useState(
     "Desktop routing ready",
   );
@@ -399,6 +434,15 @@ export function DesktopPlayground() {
   const viewport = useViewportMetrics();
   const { metrics: fontMetrics, monoRef, sansRef } = useFontMetrics();
   const scrollRef = useRef<HTMLDivElement>(null);
+
+  const selectRoutingProject = (projectId: string) => {
+    setRoutingProject(projectId);
+    setRoutingWorktree(
+      projectId === "desktop" ? "main" : "routing",
+    );
+    setRoutingProjectOptionsOpen(false);
+    setRoutingStatus(`Selected ${projectId}`);
+  };
 
   useEffect(() => {
     let mounted = true;
@@ -1660,13 +1704,7 @@ export function DesktopPlayground() {
                         statusLabel: "Repair",
                       },
                     ]}
-                    onSelect={(projectId) => {
-                      setRoutingProject(projectId);
-                      setRoutingWorktree(
-                        projectId === "desktop" ? "main" : "routing",
-                      );
-                      setRoutingStatus(`Selected ${projectId}`);
-                    }}
+                    onSelect={selectRoutingProject}
                     selectedId={routingProject}
                     toolbar={
                       <input
@@ -1679,60 +1717,203 @@ export function DesktopPlayground() {
                 }
                 title="Project to conversation"
               >
-                <ConversationRouteSelector
-                  description="Choose a protocol-neutral route before creating the conversation."
-                  onValueChange={setRoutingRoute}
-                  options={[
-                    {
-                      description: "Use the selected checkout",
-                      id: "local",
-                      label: "Local",
-                    },
-                    {
-                      description: "Managed environment",
-                      id: "remote",
-                      label: "Remote",
-                      status: "unavailable",
-                      statusLabel: "Unavailable",
-                    },
-                    {
-                      description: "General conversation",
-                      id: "chatgpt",
-                      label: "ChatGPT",
-                    },
-                  ]}
-                  value={routingRoute}
-                />
-                <WorktreeList
-                  actions={<Button size="small">New worktree</Button>}
-                  description="Select the checkout that owns file and command state."
-                  items={[
-                    {
-                      branch: "feat/project-conversation-routing",
-                      id: "routing",
-                      label: "Routing surfaces",
-                      meta: "2 changes",
-                      path: "/worktrees/routing",
-                    },
-                    {
-                      branch: "main",
-                      id: "main",
-                      label: "Main checkout",
-                      meta: "clean",
-                      path: "/Developer/codex-ui-kit",
-                    },
-                    {
-                      branch: "fix/repair",
-                      id: "repairing",
-                      label: "Repairing checkout",
-                      status: "repairing",
-                      statusLabel: "Repairing",
-                    },
-                  ]}
-                  onSelect={setRoutingWorktree}
-                  selectedId={routingWorktree}
+                <NewConversationStart
+                  composer={
+                    <AgentComposer
+                      onSubmit={() => {
+                        setRoutingStatus("Desktop conversation started");
+                        setRoutingComposerValue("");
+                      }}
+                      onValueChange={setRoutingComposerValue}
+                      value={routingComposerValue}
+                    />
+                  }
+                  context={
+                    routingContextReady ? (
+                      <>
+                        <ConversationContextBar
+                          data-desktop-local-environment-context="true"
+                          expandedId={
+                            routingProjectOptionsOpen
+                              ? "project"
+                              : localEnvironmentDialogOpen
+                                ? localEnvironmentDialogOwner
+                                : undefined
+                          }
+                          items={[
+                            {
+                              controlsId:
+                                "desktop-routing-project-options",
+                              icon: <span>▦</span>,
+                              id: "project",
+                              kind: "project",
+                              label: routingProject,
+                              popupRole: "listbox",
+                              triggerId:
+                                "desktop-routing-project-trigger",
+                            },
+                            {
+                              controlsId:
+                                "desktop-local-environment-dialog",
+                              icon: <span>⌘</span>,
+                              id: "environment",
+                              kind: "environment",
+                              label:
+                                routingRoute === "local"
+                                  ? "Local"
+                                  : routingRoute,
+                            },
+                            {
+                              controlsId:
+                                "desktop-local-environment-dialog",
+                              icon: <span>⑂</span>,
+                              id: "worktree",
+                              kind: "worktree",
+                              label: routingWorktree,
+                            },
+                          ]}
+                          onSelect={(itemId) => {
+                            if (itemId === "project") {
+                              setLocalEnvironmentDialogOwner(undefined);
+                              setLocalEnvironmentDialogOpen(false);
+                              setRoutingProjectOptionsOpen(
+                                (open) => !open,
+                              );
+                              setRoutingStatus("Choose a project");
+                              return;
+                            }
+                            setRoutingProjectOptionsOpen(false);
+                            setLocalEnvironmentDialogOwner(
+                              itemId === "worktree"
+                                ? "worktree"
+                                : "environment",
+                            );
+                            setLocalEnvironmentDialogOpen(true);
+                            setRoutingStatus(
+                              itemId === "environment"
+                                ? "Choose an environment"
+                                : "Choose a worktree",
+                            );
+                          }}
+                        />
+                        {routingProjectOptionsOpen ? (
+                          <ConversationProjectListbox
+                            id="desktop-routing-project-options"
+                            items={desktopConversationProjects}
+                            onDismiss={() =>
+                              setRoutingProjectOptionsOpen(false)
+                            }
+                            onSelect={selectRoutingProject}
+                            selectedId={routingProject}
+                            triggerId="desktop-routing-project-trigger"
+                          />
+                        ) : null}
+                      </>
+                    ) : null
+                  }
+                  description="Destination, project, execution environment, and worktree remain independent."
+                  destination="ChatGPT"
+                  prompt={
+                    !routingContextReady ? (
+                      <Button
+                        onClick={() => {
+                          setRoutingContextReady(true);
+                          setRoutingProjectOptionsOpen(false);
+                          setRoutingStatus(
+                            "Choose project, environment, and worktree",
+                          );
+                          window.setTimeout(() =>
+                            document
+                              .getElementById(
+                                "desktop-routing-project-trigger",
+                              )
+                              ?.focus(),
+                          );
+                        }}
+                        size="small"
+                      >
+                        Choose a project to use a worktree
+                      </Button>
+                    ) : undefined
+                  }
                 />
               </ProjectConversationPage>
+              <LocalEnvironmentDialog
+                createAction={
+                  <Button
+                    onClick={() => {
+                      setRoutingStatus("Local environment creation requested");
+                      setLocalEnvironmentDialogOwner(undefined);
+                      setLocalEnvironmentDialogOpen(false);
+                    }}
+                    size="small"
+                    tone="primary"
+                  >
+                    Create environment
+                  </Button>
+                }
+                groups={[
+                  {
+                    description: "Current checkout and linked worktrees",
+                    id: "ui-kit",
+                    items: [
+                      {
+                        branch: "feat/new-chat-context",
+                        id: "routing",
+                        label: "New chat context",
+                        meta: "2 changes",
+                      },
+                      {
+                        branch: "main",
+                        id: "main",
+                        label: "Main",
+                        meta: "clean",
+                      },
+                      {
+                        branch: "fix/repair",
+                        id: "repairing",
+                        label: "Repairing checkout",
+                        status: "repairing",
+                        statusLabel: "Repairing",
+                      },
+                    ],
+                    label: "UI Kit",
+                  },
+                  {
+                    description: "Application environment",
+                    id: "desktop",
+                    items: [
+                      {
+                        branch: "main",
+                        id: "desktop-main",
+                        label: "Desktop main",
+                        meta: "clean",
+                      },
+                    ],
+                    label: "Codex desktop",
+                  },
+                ]}
+                id="desktop-local-environment-dialog"
+                onOpenChange={(open) => {
+                  setLocalEnvironmentDialogOpen(open);
+                  if (!open) {
+                    setLocalEnvironmentDialogOwner(undefined);
+                  }
+                }}
+                onQueryChange={setLocalEnvironmentQuery}
+                onSelect={(groupId, itemId) => {
+                  setRoutingProject(groupId);
+                  setRoutingRoute("local");
+                  setRoutingWorktree(
+                    itemId === "desktop-main" ? "main" : itemId,
+                  );
+                  setRoutingStatus(`Selected local/${itemId}`);
+                  setLocalEnvironmentDialogOwner(undefined);
+                  setLocalEnvironmentDialogOpen(false);
+                }}
+                open={localEnvironmentDialogOpen}
+                query={localEnvironmentQuery}
+              />
 
               <WorkspaceSelection
                 description="Choose the repository context for this session."
