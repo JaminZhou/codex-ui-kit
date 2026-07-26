@@ -26,6 +26,9 @@ import {
   type ComposerMentionOption,
   ComposerModeIndicator,
   type ComposerLayout,
+  ConversationEvent,
+  ConversationEventList,
+  type ConversationEventKind,
   Dialog,
   DialogChoice,
   type DialogSize,
@@ -44,8 +47,17 @@ import {
   type NoticeTone,
   ProposedPlan,
   Popover,
+  ProjectPicker,
+  PullRequestCheckList,
+  PullRequestDetails,
+  PullRequestList,
+  PullRequestPage,
+  PullRequestReviewSummary,
+  PullRequestReviewThread,
+  PullRequestStatusBadge,
   ResourceCard,
   ResourceList,
+  RunLocationMenu,
   type QueuedPrompt,
   QueuedPromptList,
   SearchActivity,
@@ -75,6 +87,8 @@ import {
   TurnDuration,
   Tooltip,
   WorkspacePanel,
+  WorkspaceSelection,
+  WorktreePicker,
   formatCommandDuration,
   fileDiffToText,
   formatTurnDuration,
@@ -118,6 +132,7 @@ const noticeAction: StatusBannerAction = {
   variant: "primary",
 };
 const composerLayout: ComposerLayout = "auto";
+const conversationEventKind: ConversationEventKind = "command";
 const mentionOption: ComposerMentionOption = {
   id: "package-consumer",
   label: "Package consumer",
@@ -168,11 +183,22 @@ void CommandOutput;
 void ComposerAttachment;
 void ComposerMentionMenu;
 void ComposerModeIndicator;
+void ConversationEvent;
+void ConversationEventList;
 void Dialog;
 void DialogChoice;
 void ProposedPlan;
+void ProjectPicker;
+void PullRequestCheckList;
+void PullRequestDetails;
+void PullRequestList;
+void PullRequestPage;
+void PullRequestReviewSummary;
+void PullRequestReviewThread;
+void PullRequestStatusBadge;
 void ResourceCard;
 void ResourceList;
+void RunLocationMenu;
 void QueuedPromptList;
 void SearchActivity;
 void StatusBanner;
@@ -206,6 +232,8 @@ void Popover;
 void Select;
 void Tooltip;
 void WorkspacePanel;
+void WorkspaceSelection;
+void WorktreePicker;
 void formatCommandDuration;
 void fileDiffToText([line]);
 void formatTurnDuration;
@@ -220,6 +248,7 @@ void approvalKind;
 void noticeTone;
 void noticeAction;
 void composerLayout;
+void conversationEventKind;
 void mentionOption;
 void queuedPrompt;
 void generatedImage;

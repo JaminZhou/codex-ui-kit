@@ -19,6 +19,9 @@ second component implementation and it is not published with the package.
   real BrowserWindow.
 - Exercise a compact modal dialog with focus trapping, focus restoration,
   descriptive choices, and document scroll locking.
+- Exercise project, run-location, and worktree selectors plus conversation
+  event ownership, PR list/detail, checks, reviewers, and inline review threads
+  at standard and compact sizes.
 - Keep `contextIsolation`, sandboxing, and a narrow preload API enabled.
 
 Electron is intentionally declared only in this workspace's development
@@ -45,12 +48,13 @@ pnpm build:electron
 ```
 
 The Electron version is pinned to `42.3.0` to match the sampled Codex desktop
-build documented in `research/26.715.31925.md`.
+build documented in `research/26.721.41059.md`.
 
 Set `CODEX_UI_KIT_ACCEPTANCE_DIR` while running `preview` to write package-safe
 geometry JSON and screenshots for the composer, interactive primitive,
-navigation, resource, generated-image, and preview surfaces. The same run now
-asserts viewport overflow, theme, focus, overlay ownership, critical surfaces,
-and thread top/bottom positioning; a mismatch exits non-zero instead of merely
-writing a capture. Acceptance output belongs in `/private/tmp`, never in the
-repository.
+navigation, resource, generated-image, preview, workspace-selection,
+conversation-event, and pull-request surfaces. The same run asserts viewport
+overflow, theme, focus, overlay ownership, selector availability, responsive
+PR geometry, critical surfaces, and thread top/bottom positioning; a mismatch
+exits non-zero instead of merely writing a capture. Acceptance output belongs
+in `/private/tmp`, never in the repository.

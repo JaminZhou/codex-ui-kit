@@ -1,11 +1,16 @@
 {
   "schemaVersion": 1,
   "baseline": {
-    "appVersion": "26.715.72359",
-    "buildNumber": "5718",
-    "sampledAt": "2026-07-23",
-    "appAsarSha256": "6c6528eb1e8450cdc506a59586f8caffe87576e200977e2a11bdea0cecf1c718",
-    "runtimeEvidence": "partial_cdp"
+    "appVersion": "26.721.41059",
+    "buildNumber": "5848",
+    "sampledAt": "2026-07-26",
+    "reverifiedAt": "2026-07-26",
+    "appAsarSha256": "da39a51b06fb4c728d418b8f0f05fc8fd8c6b1f74c4fb4d47c20c7914a798f45",
+    "runtimeEvidence": "partial_cdp",
+    "runtimeEvidenceBuilds": {
+      "cdp": "26.715.72359",
+      "cdp-26.721": "26.721.41059"
+    }
   },
   "surfaces": [
     {
@@ -27,7 +32,8 @@
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
         "cdp:new-chat-shell-dark-wide",
-        "cdp:renderer-viewport-2560-1180-820-layout-metrics"
+        "cdp:renderer-viewport-2560-1180-820-layout-metrics",
+        "cdp-26.721:main-shell-target-2560x1326"
       ],
       "implementationStatus": "partial",
       "browserStatus": "partial_legacy",
@@ -118,7 +124,7 @@
       "id": "thread.subagent-delegation",
       "area": "conversation",
       "ownership": "turn",
-      "packageEvidence": ["local-conversation-thread"],
+      "packageEvidence": ["local-conversation-thread", "subagent-panel"],
       "runtimeStatus": "not_sampled",
       "implementationStatus": "partial",
       "browserStatus": "partial_legacy",
@@ -251,9 +257,9 @@
         "cdp:local-cloud-worktree-location-menu",
         "cdp:branch-menu-current-and-create-actions"
       ],
-      "implementationStatus": "not_started",
-      "browserStatus": "not_started",
-      "electronStatus": "not_started",
+      "implementationStatus": "partial",
+      "browserStatus": "partial_legacy",
+      "electronStatus": "partial_legacy",
       "priority": "p0"
     },
     {
@@ -304,7 +310,8 @@
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
         "cdp:global-sidebar-and-top-controls",
-        "cdp:pull-requests-sites-scheduled-plugins-routes"
+        "cdp:pull-requests-sites-scheduled-plugins-routes",
+        "cdp-26.721:main-shell-landmarks-and-interactive-density"
       ],
       "implementationStatus": "partial",
       "browserStatus": "not_started",
@@ -341,9 +348,9 @@
       "packageEvidence": ["new-thread-panel-page", "select-workspace-page"],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": ["cdp:blank-new-chat-and-project-menu"],
-      "implementationStatus": "not_started",
-      "browserStatus": "not_started",
-      "electronStatus": "not_started",
+      "implementationStatus": "partial",
+      "browserStatus": "partial_legacy",
+      "electronStatus": "partial_legacy",
       "priority": "p0"
     },
     {
@@ -414,21 +421,21 @@
       "id": "workspace.pull-request-route",
       "area": "workspace",
       "ownership": "workspace",
-      "packageEvidence": ["pull-request-route", "pull-request-actions"],
+      "packageEvidence": ["pull-request-route", "pull-request-actions", "pull-request-detail-query", "pull-request-media"],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": ["cdp:pull-request-index-tabs-search-split-layout"],
-      "implementationStatus": "not_started",
-      "browserStatus": "not_started",
-      "electronStatus": "not_started",
+      "implementationStatus": "partial",
+      "browserStatus": "partial_legacy",
+      "electronStatus": "partial_legacy",
       "priority": "p0"
     },
     {
       "id": "workspace.pull-request-review",
       "area": "workspace",
       "ownership": "workspace",
-      "packageEvidence": ["pull-request-code-review", "pull-request-reviewer-status-list", "pull-request-fix-button"],
+      "packageEvidence": ["pull-request-code-review", "pull-request-reviewer-status-list", "pull-request-fix-button", "pull-request-detail-query", "pull-request-media"],
       "runtimeStatus": "not_sampled",
-      "implementationStatus": "not_started",
+      "implementationStatus": "partial",
       "browserStatus": "not_started",
       "electronStatus": "not_started",
       "priority": "p0"

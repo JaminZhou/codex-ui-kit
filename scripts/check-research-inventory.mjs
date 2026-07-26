@@ -2,6 +2,8 @@ import { readFile } from "node:fs/promises";
 
 const inventoryUrl = new URL("../research/ui-inventory.json", import.meta.url);
 const inventory = JSON.parse(await readFile(inventoryUrl, "utf8"));
+const currentRuntimeBuild = inventory.baseline?.appVersion;
+const runtimeEvidenceBuilds = inventory.baseline?.runtimeEvidenceBuilds;
 
 const allowedOwnership = new Set([
   "app",
@@ -33,6 +35,14 @@ if (inventory.schemaVersion !== 1) {
 
 if (!Array.isArray(inventory.surfaces) || inventory.surfaces.length === 0) {
   throw new Error("research inventory must contain surfaces");
+}
+
+if (
+  typeof currentRuntimeBuild !== "string" ||
+  !runtimeEvidenceBuilds ||
+  typeof runtimeEvidenceBuilds !== "object"
+) {
+  throw new Error("research inventory must map runtime evidence prefixes to builds");
 }
 
 const ids = new Set();
@@ -86,6 +96,16 @@ for (const surface of inventory.surfaces) {
   ) {
     throw new Error(`missing runtime evidence for ${surface.id}`);
   }
+  const runtimeBuilds = (surface.runtimeEvidence ?? []).map((evidence) => {
+    const prefix = evidence.split(":", 1)[0];
+    const build = runtimeEvidenceBuilds[prefix];
+    if (typeof build !== "string") {
+      throw new Error(
+        `unknown runtime evidence prefix for ${surface.id}: ${prefix}`,
+      );
+    }
+    return build;
+  });
 
   const serializedStatuses = [
     surface.runtimeStatus,
@@ -103,6 +123,15 @@ for (const surface of inventory.surfaces) {
   ) {
     throw new Error(
       `${surface.id} cannot be verified without current runtime evidence`,
+    );
+  }
+  if (
+    (surface.browserStatus === "verified" ||
+      surface.electronStatus === "verified") &&
+    !runtimeBuilds.includes(currentRuntimeBuild)
+  ) {
+    throw new Error(
+      `${surface.id} cannot be verified against a previous runtime build`,
     );
   }
 }

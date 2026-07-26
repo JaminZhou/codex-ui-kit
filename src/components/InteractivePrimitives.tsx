@@ -195,7 +195,7 @@ function useControllableOpen({
 
 function getFocusableItems(container: HTMLElement) {
   return [...container.querySelectorAll<HTMLElement>(
-    '[role="menuitem"]:not([aria-disabled="true"]), [role="menuitemcheckbox"]:not([aria-disabled="true"]), [role="option"]:not([aria-disabled="true"]), button:not(:disabled), input:not(:disabled)',
+    '[role="menuitem"]:not([aria-disabled="true"]), [role="menuitemcheckbox"]:not([aria-disabled="true"]), [role="menuitemradio"]:not([aria-disabled="true"]), [role="option"]:not([aria-disabled="true"]), button:not(:disabled), input:not(:disabled)',
   )].filter((item) => !item.hasAttribute("hidden"));
 }
 

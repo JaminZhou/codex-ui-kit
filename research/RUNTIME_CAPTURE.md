@@ -43,6 +43,61 @@ For CDP captures:
 - distinguish emulated Renderer viewport metrics from a real native-window
   resize and verify the latter separately.
 
+## Reproducible CDP double-open probe
+
+Use this only for an explicitly authorized, non-mutating Renderer observation.
+`open -na` asks macOS to start a new application instance, but an
+application's own single-instance policy can still reject or redirect it.
+The unique Chromium profile makes a successful second process more likely; it
+does not create a second Codex account or isolated task store.
+
+Choose an unused loopback port first:
+
+```bash
+codex_cdp_port=9339
+lsof -nP -iTCP:${codex_cdp_port} -sTCP:LISTEN
+codex_probe_dir=$(mktemp -d /private/tmp/codex-ui-kit-cdp.XXXXXX)
+open -na /Applications/ChatGPT.app --args \
+  --remote-debugging-address=127.0.0.1 \
+  --remote-debugging-port=${codex_cdp_port} \
+  --user-data-dir=${codex_probe_dir}
+```
+
+Confirm that the spawned process actually uses the unique profile and that the
+debugging socket is loopback-only:
+
+```bash
+ps -axo pid=,command= | grep -F -- "--user-data-dir=${codex_probe_dir}"
+lsof -nP -iTCP:${codex_cdp_port} -sTCP:LISTEN
+curl -fsS --max-time 5 \
+  "http://127.0.0.1:${codex_cdp_port}/json/version"
+curl -fsS --max-time 5 \
+  "http://127.0.0.1:${codex_cdp_port}/json/list"
+```
+
+Do not attach to the first returned `page`. The `26.721.41059` sample exposed
+two visible `app://-/index.html` targets, and neither had focus. Select with all
+of these signals:
+
+1. the target is a `page` whose URL starts with `app://-/index.html`;
+2. its viewport area matches the expected main window rather than a small
+   auxiliary window;
+3. its structural shell has the expected landmarks and interactive density;
+4. the heuristic is checked again after every application update.
+
+The target-selection probe should inspect only structural facts such as URL,
+viewport, landmark counts, and interactive-element counts. Do not use private
+thread text, project names, PR titles, account content, or repository content
+as selectors.
+
+For cleanup, resolve the exact main PID from the unique
+`--user-data-dir` argument, terminate only that spawned process, verify its
+children and listening port are gone, and then delete only the exact temporary
+profile directory. Never use a broad `pkill` or delete a shared profile.
+
+CDP evidence covers Renderer behavior only. Record native window, menu,
+system-dialog, and real resize behavior separately.
+
 ## Required flow matrix
 
 ### 1. Application entry and navigation
