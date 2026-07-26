@@ -10,7 +10,10 @@ import {
   ThreadNavigationControls,
 } from "../src";
 
-afterEach(cleanup);
+afterEach(() => {
+  cleanup();
+  vi.restoreAllMocks();
+});
 
 describe("thread navigation surfaces", () => {
   it("exposes sidebar and history navigation with observed labels and states", () => {
@@ -157,6 +160,52 @@ describe("thread navigation surfaces", () => {
     expect(screen.getByRole("tooltip").textContent).toContain("+1 more");
     fireEvent.click(first);
     expect(onNavigate).toHaveBeenCalledWith(items[0], "smooth");
+  });
+
+  it("clamps edge previews inside the navigation overlay boundary", () => {
+    const bounds = (
+      top: number,
+      height: number,
+      width = 36,
+    ): DOMRect => ({
+      bottom: top + height,
+      height,
+      left: 0,
+      right: width,
+      top,
+      width,
+      x: 0,
+      y: top,
+      toJSON: () => ({}),
+    });
+    vi.spyOn(HTMLElement.prototype, "getBoundingClientRect").mockImplementation(
+      function (this: HTMLElement) {
+        if (this.classList.contains("codex-ui-message-navigation-rail")) {
+          return bounds(100, 200);
+        }
+        if (
+          this.getAttribute("data-message-navigation-id") === "message-10"
+        ) {
+          return bounds(270, 24);
+        }
+        if (
+          this.classList.contains("codex-ui-message-navigation-rail__tooltip")
+        ) {
+          return bounds(0, 100, 320);
+        }
+        return bounds(100, 200, 400);
+      },
+    );
+    const items = Array.from({ length: 10 }, (_, index) => ({
+      id: `message-${index + 1}`,
+      label: `Message ${index + 1}`,
+    }));
+    render(<ThreadMessageNavigationRail items={items} />);
+
+    fireEvent.focus(
+      screen.getByRole("button", { name: "Jump to user message 10" }),
+    );
+    expect(screen.getByRole("tooltip").style.top).toBe("142px");
   });
 
   it("scrubs across captured markers with instant navigation", () => {

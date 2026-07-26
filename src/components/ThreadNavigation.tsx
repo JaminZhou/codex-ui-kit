@@ -169,6 +169,7 @@ export function ThreadMessageNavigationRail({
   const listRef = useRef<HTMLDivElement>(null);
   const navRef = useRef<HTMLElement>(null);
   const rowRefs = useRef(new Map<string, HTMLDivElement>());
+  const tooltipRef = useRef<HTMLDivElement>(null);
   const lastScrubbedIdRef = useRef<string | null>(null);
   const didScrubRef = useRef(false);
   const suppressClickRef = useRef(false);
@@ -185,7 +186,38 @@ export function ThreadMessageNavigationRail({
     if (!nav || !row) return;
     const navBounds = nav.getBoundingClientRect();
     const rowBounds = row.getBoundingClientRect();
-    setTooltipTop(rowBounds.top - navBounds.top + rowBounds.height / 2);
+    const desiredCenter =
+      rowBounds.top - navBounds.top + rowBounds.height / 2;
+    const tooltipBounds = tooltipRef.current?.getBoundingClientRect();
+    const boundaryBounds = nav.parentElement?.getBoundingClientRect();
+    if (
+      !tooltipBounds ||
+      tooltipBounds.height <= 0 ||
+      !boundaryBounds ||
+      boundaryBounds.height <= 0
+    ) {
+      setTooltipTop(desiredCenter);
+      return;
+    }
+
+    const boundaryInset = 8;
+    const minimumCenter =
+      boundaryBounds.top +
+      boundaryInset +
+      tooltipBounds.height / 2;
+    const maximumCenter =
+      boundaryBounds.bottom -
+      boundaryInset -
+      tooltipBounds.height / 2;
+    const desiredViewportCenter = navBounds.top + desiredCenter;
+    const resolvedViewportCenter =
+      maximumCenter >= minimumCenter
+        ? Math.min(
+            maximumCenter,
+            Math.max(minimumCenter, desiredViewportCenter),
+          )
+        : (boundaryBounds.top + boundaryBounds.bottom) / 2;
+    setTooltipTop(resolvedViewportCenter - navBounds.top);
   };
 
   useEffect(() => {
@@ -203,7 +235,23 @@ export function ThreadMessageNavigationRail({
     };
   }, [items.length, minItems]);
 
-  useLayoutEffect(updateTooltipPosition, [revealedId]);
+  useLayoutEffect(() => {
+    updateTooltipPosition();
+    if (!revealedId) return;
+
+    const update = () => updateTooltipPosition();
+    const observer =
+      typeof ResizeObserver === "undefined"
+        ? null
+        : new ResizeObserver(update);
+    if (navRef.current) observer?.observe(navRef.current);
+    if (tooltipRef.current) observer?.observe(tooltipRef.current);
+    window.addEventListener("resize", update);
+    return () => {
+      observer?.disconnect();
+      window.removeEventListener("resize", update);
+    };
+  }, [items.length, revealedId]);
 
   if (items.length < minItems) return null;
 
@@ -325,6 +373,7 @@ export function ThreadMessageNavigationRail({
         <div
           className="codex-ui-message-navigation-rail__tooltip"
           id={`${tooltipId}-${revealedIndex}`}
+          ref={tooltipRef}
           role="tooltip"
           style={{ top: tooltipTop }}
         >
