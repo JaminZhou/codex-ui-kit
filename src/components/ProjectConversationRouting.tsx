@@ -879,6 +879,30 @@ function localEnvironmentItemDisabled(item: LocalEnvironmentItem) {
   );
 }
 
+function localEnvironmentSearchValue(value: ReactNode) {
+  return typeof value === "string" || typeof value === "number"
+    ? String(value)
+    : "";
+}
+
+function localEnvironmentItemMatches(
+  item: LocalEnvironmentItem,
+  query: string,
+) {
+  return [
+    item.id,
+    item.textValue,
+    localEnvironmentSearchValue(item.label),
+    localEnvironmentSearchValue(item.branch),
+    localEnvironmentSearchValue(item.description),
+    localEnvironmentSearchValue(item.meta),
+    localEnvironmentSearchValue(item.statusLabel),
+  ]
+    .join(" ")
+    .toLocaleLowerCase()
+    .includes(query);
+}
+
 export function LocalEnvironmentDialog({
   className,
   createAction,
@@ -895,7 +919,35 @@ export function LocalEnvironmentDialog({
   ...props
 }: LocalEnvironmentDialogProps) {
   const environmentDialogId = useId();
-  const hasItems = groups.some((group) => group.items.length > 0);
+  const normalizedQuery = query.trim().toLocaleLowerCase();
+  const filteredGroups = normalizedQuery
+    ? groups
+        .map((group) => {
+          const groupMatches = [
+            group.id,
+            localEnvironmentSearchValue(group.label),
+            localEnvironmentSearchValue(group.description),
+          ]
+            .join(" ")
+            .toLocaleLowerCase()
+            .includes(normalizedQuery);
+          return {
+            ...group,
+            items: groupMatches
+              ? group.items
+              : group.items.filter((item) =>
+                  localEnvironmentItemMatches(
+                    item,
+                    normalizedQuery,
+                  ),
+                ),
+          };
+        })
+        .filter((group) => group.items.length > 0)
+    : groups;
+  const hasItems = filteredGroups.some(
+    (group) => group.items.length > 0,
+  );
 
   return (
     <Dialog
@@ -924,7 +976,7 @@ export function LocalEnvironmentDialog({
         />
         {hasItems ? (
           <div className="codex-ui-local-environment-dialog__groups">
-            {groups.map((group, groupIndex) => {
+            {filteredGroups.map((group, groupIndex) => {
               const headingId = `${environmentDialogId}-group-${groupIndex}`;
               return (
                 <section

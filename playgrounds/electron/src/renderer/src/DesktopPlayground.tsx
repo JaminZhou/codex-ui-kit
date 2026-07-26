@@ -393,6 +393,10 @@ export function DesktopPlayground() {
   const [routingComposerValue, setRoutingComposerValue] = useState("");
   const [localEnvironmentDialogOpen, setLocalEnvironmentDialogOpen] =
     useState(false);
+  const [
+    localEnvironmentDialogOwner,
+    setLocalEnvironmentDialogOwner,
+  ] = useState<"environment" | "worktree">();
   const [localEnvironmentQuery, setLocalEnvironmentQuery] = useState("");
   const [routingStatus, setRoutingStatus] = useState(
     "Desktop routing ready",
@@ -1700,7 +1704,7 @@ export function DesktopPlayground() {
                       data-desktop-local-environment-context="true"
                       expandedId={
                         localEnvironmentDialogOpen
-                          ? "environment"
+                          ? localEnvironmentDialogOwner
                           : undefined
                       }
                       items={[
@@ -1719,6 +1723,7 @@ export function DesktopPlayground() {
                             routingRoute === "local" ? "Local" : routingRoute,
                         },
                         {
+                          controlsId: "desktop-local-environment-dialog",
                           icon: <span>⑂</span>,
                           id: "worktree",
                           kind: "worktree",
@@ -1730,6 +1735,11 @@ export function DesktopPlayground() {
                           setRoutingStatus("Choose a project from the index");
                           return;
                         }
+                        setLocalEnvironmentDialogOwner(
+                          itemId === "worktree"
+                            ? "worktree"
+                            : "environment",
+                        );
                         setLocalEnvironmentDialogOpen(true);
                         setRoutingStatus(
                           itemId === "environment"
@@ -1760,6 +1770,7 @@ export function DesktopPlayground() {
                   <Button
                     onClick={() => {
                       setRoutingStatus("Local environment creation requested");
+                      setLocalEnvironmentDialogOwner(undefined);
                       setLocalEnvironmentDialogOpen(false);
                     }}
                     size="small"
@@ -1810,7 +1821,12 @@ export function DesktopPlayground() {
                   },
                 ]}
                 id="desktop-local-environment-dialog"
-                onOpenChange={setLocalEnvironmentDialogOpen}
+                onOpenChange={(open) => {
+                  setLocalEnvironmentDialogOpen(open);
+                  if (!open) {
+                    setLocalEnvironmentDialogOwner(undefined);
+                  }
+                }}
                 onQueryChange={setLocalEnvironmentQuery}
                 onSelect={(_groupId, itemId) => {
                   setRoutingRoute("local");
@@ -1818,6 +1834,7 @@ export function DesktopPlayground() {
                     itemId === "desktop-main" ? "main" : itemId,
                   );
                   setRoutingStatus(`Selected local/${itemId}`);
+                  setLocalEnvironmentDialogOwner(undefined);
                   setLocalEnvironmentDialogOpen(false);
                 }}
                 open={localEnvironmentDialogOpen}

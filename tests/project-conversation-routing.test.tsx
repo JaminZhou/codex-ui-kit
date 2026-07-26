@@ -162,6 +162,64 @@ describe("project conversation routing", () => {
     ).toBeTruthy();
   });
 
+  it("filters local environments from the controlled query", () => {
+    const groups = [
+      {
+        id: "ui-kit",
+        items: [
+          {
+            branch: "main",
+            id: "main",
+            label: "Main",
+          },
+          {
+            branch: "desktop",
+            id: "desktop",
+            label: "Desktop checkout",
+          },
+        ],
+        label: "UI Kit",
+      },
+    ];
+    const commonProps = {
+      groups,
+      onOpenChange: () => undefined,
+      onQueryChange: () => undefined,
+      onSelect: () => undefined,
+      open: true,
+    };
+    const { rerender } = render(
+      <LocalEnvironmentDialog
+        {...commonProps}
+        query="desktop"
+      />,
+    );
+
+    expect(
+      screen.getByRole("button", {
+        name: "Use local environment Desktop checkout",
+      }),
+    ).toBeTruthy();
+    expect(
+      screen.queryByRole("button", {
+        name: "Use local environment Main",
+      }),
+    ).toBeNull();
+
+    rerender(
+      <LocalEnvironmentDialog
+        {...commonProps}
+        query="missing"
+      />,
+    );
+    expect(screen.getByText("No local environments")).toBeTruthy();
+    expect(
+      screen.queryByRole("button", {
+        name: "Use local environment Desktop checkout",
+      }),
+    ).toBeNull();
+  });
+
   it("composes application projects with conversation and workspace setup", () => {
     render(
       <ProjectConversationPage

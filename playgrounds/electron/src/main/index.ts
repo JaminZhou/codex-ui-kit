@@ -170,6 +170,28 @@ async function captureWorkflowSurfaces(webContents: WebContents) {
     );
     routingProject?.click();
     await wait(80);
+    const routingWorktreeContext = card?.querySelector(
+      '[data-desktop-local-environment-context="true"] [data-kind="worktree"]',
+    );
+    routingWorktreeContext?.click();
+    await wait(140);
+    const worktreeEnvironmentDialog = document.querySelector(
+      '#desktop-local-environment-dialog',
+    );
+    const expandedRoutingWorktree = card?.querySelector(
+      '[data-desktop-local-environment-context="true"] [data-kind="worktree"]',
+    );
+    const worktreeEnvironmentMetrics = {
+      role: worktreeEnvironmentDialog?.getAttribute('role') ?? null,
+      triggerControls:
+        expandedRoutingWorktree?.getAttribute('aria-controls') ?? null,
+      triggerExpanded:
+        expandedRoutingWorktree?.getAttribute('aria-expanded') ?? null,
+    };
+    worktreeEnvironmentDialog
+      ?.querySelector('.codex-ui-dialog__close')
+      ?.click();
+    await wait(100);
     const routingEnvironment = card?.querySelector(
       '[data-desktop-local-environment-context="true"] [data-kind="environment"]',
     );
@@ -186,6 +208,8 @@ async function captureWorkflowSurfaces(webContents: WebContents) {
     );
     const localEnvironmentMetrics = {
       bounds: rect(localEnvironmentDialog),
+      filteredGroupCount: null,
+      filteredItemCount: null,
       groupCount:
         localEnvironmentDialog?.querySelectorAll(
           '.codex-ui-local-environment-dialog__group',
@@ -206,9 +230,45 @@ async function captureWorkflowSurfaces(webContents: WebContents) {
       triggerExpanded:
         expandedRoutingEnvironment?.getAttribute('aria-expanded') ?? null,
     };
-    const desktopMainEnvironment = localEnvironmentDialog?.querySelector(
-      '[aria-label="Use local environment Desktop main"]',
+    if (localEnvironmentSearch instanceof HTMLInputElement) {
+      const setInputValue = Object.getOwnPropertyDescriptor(
+        HTMLInputElement.prototype,
+        'value',
+      )?.set;
+      setInputValue?.call(localEnvironmentSearch, 'desktop');
+      localEnvironmentSearch.dispatchEvent(
+        new Event('input', { bubbles: true }),
+      );
+      await wait(100);
+      const filteredDialog = document.querySelector(
+        '#desktop-local-environment-dialog',
+      );
+      localEnvironmentMetrics.filteredGroupCount =
+        filteredDialog?.querySelectorAll(
+          '.codex-ui-local-environment-dialog__group',
+        ).length ?? 0;
+      localEnvironmentMetrics.filteredItemCount =
+        filteredDialog?.querySelectorAll(
+          '.codex-ui-local-environment-dialog__item',
+        ).length ?? 0;
+      const filteredSearch = filteredDialog?.querySelector(
+        '.codex-ui-local-environment-dialog__search',
+      );
+      if (filteredSearch instanceof HTMLInputElement) {
+        setInputValue?.call(filteredSearch, '');
+        filteredSearch.dispatchEvent(
+          new Event('input', { bubbles: true }),
+        );
+        await wait(100);
+      }
+    }
+    const restoredLocalEnvironmentDialog = document.querySelector(
+      '#desktop-local-environment-dialog',
     );
+    const desktopMainEnvironment =
+      restoredLocalEnvironmentDialog?.querySelector(
+        '[aria-label="Use local environment Desktop main"]',
+      );
     desktopMainEnvironment?.click();
     await wait(100);
     const startConversation = [...(card?.querySelectorAll('button') ?? [])]
@@ -374,6 +434,10 @@ async function captureWorkflowSurfaces(webContents: WebContents) {
           )
           ?.getAttribute('aria-label') ?? null,
       localEnvironmentDialog: localEnvironmentMetrics.bounds,
+      localEnvironmentFilteredGroupCount:
+        localEnvironmentMetrics.filteredGroupCount,
+      localEnvironmentFilteredItemCount:
+        localEnvironmentMetrics.filteredItemCount,
       localEnvironmentGroupCount: localEnvironmentMetrics.groupCount,
       localEnvironmentInViewport: localEnvironmentMetrics.inViewport,
       localEnvironmentItemCount: localEnvironmentMetrics.itemCount,
@@ -385,6 +449,12 @@ async function captureWorkflowSurfaces(webContents: WebContents) {
         localEnvironmentMetrics.triggerControls,
       localEnvironmentTriggerExpanded:
         localEnvironmentMetrics.triggerExpanded,
+      worktreeEnvironmentRole:
+        worktreeEnvironmentMetrics.role,
+      worktreeEnvironmentTriggerControls:
+        worktreeEnvironmentMetrics.triggerControls,
+      worktreeEnvironmentTriggerExpanded:
+        worktreeEnvironmentMetrics.triggerExpanded,
       runningEventBusy: runningEvent?.getAttribute('aria-busy') ?? null,
       selectedPullRequest: selectedPullRequest?.getAttribute('aria-label') ?? null,
       selectionText: card?.querySelector('[data-workflow-state="selection"]')?.textContent ?? null,
@@ -1005,12 +1075,18 @@ async function captureAcceptance(browserWindow: BrowserWindow) {
         localEnvironmentGroupCount: 2,
         localEnvironmentInViewport: true,
         localEnvironmentItemCount: 4,
+        localEnvironmentFilteredGroupCount: 1,
+        localEnvironmentFilteredItemCount: 1,
         localEnvironmentRepairingDisabledCount: 1,
         localEnvironmentRole: "dialog",
         localEnvironmentSearchFocused: true,
         localEnvironmentTriggerControls:
           "desktop-local-environment-dialog",
         localEnvironmentTriggerExpanded: "true",
+        worktreeEnvironmentRole: "dialog",
+        worktreeEnvironmentTriggerControls:
+          "desktop-local-environment-dialog",
+        worktreeEnvironmentTriggerExpanded: "true",
       },
       expectedTheme,
       minimumItems: {

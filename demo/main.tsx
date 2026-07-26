@@ -432,6 +432,10 @@ function Showcase() {
   const [routingComposerValue, setRoutingComposerValue] = useState("");
   const [localEnvironmentDialogOpen, setLocalEnvironmentDialogOpen] =
     useState(false);
+  const [
+    localEnvironmentDialogOwner,
+    setLocalEnvironmentDialogOwner,
+  ] = useState<"environment" | "worktree">();
   const [localEnvironmentQuery, setLocalEnvironmentQuery] = useState("");
   const [routingStatus, setRoutingStatus] = useState(
     "Choose a project route",
@@ -773,7 +777,7 @@ function Showcase() {
                       data-local-environment-context="true"
                       expandedId={
                         localEnvironmentDialogOpen
-                          ? "environment"
+                          ? localEnvironmentDialogOwner
                           : undefined
                       }
                       items={[
@@ -792,6 +796,7 @@ function Showcase() {
                             routingRoute === "local" ? "Local" : routingRoute,
                         },
                         {
+                          controlsId: "showcase-local-environment-dialog",
                           icon: <span>⑂</span>,
                           id: "worktree",
                           kind: "worktree",
@@ -803,6 +808,11 @@ function Showcase() {
                           setRoutingStatus("Choose a project from the index");
                           return;
                         }
+                        setLocalEnvironmentDialogOwner(
+                          itemId === "worktree"
+                            ? "worktree"
+                            : "environment",
+                        );
                         setLocalEnvironmentDialogOpen(true);
                         setRoutingStatus(
                           itemId === "environment"
@@ -833,6 +843,7 @@ function Showcase() {
                   <button
                     onClick={() => {
                       setRoutingStatus("Local environment creation requested");
+                      setLocalEnvironmentDialogOwner(undefined);
                       setLocalEnvironmentDialogOpen(false);
                     }}
                     type="button"
@@ -882,7 +893,12 @@ function Showcase() {
                   },
                 ]}
                 id="showcase-local-environment-dialog"
-                onOpenChange={setLocalEnvironmentDialogOpen}
+                onOpenChange={(open) => {
+                  setLocalEnvironmentDialogOpen(open);
+                  if (!open) {
+                    setLocalEnvironmentDialogOwner(undefined);
+                  }
+                }}
                 onQueryChange={setLocalEnvironmentQuery}
                 onSelect={(_groupId, itemId) => {
                   setRoutingRoute("local");
@@ -890,6 +906,7 @@ function Showcase() {
                     itemId === "desktop-main" ? "main" : itemId,
                   );
                   setRoutingStatus(`Selected local/${itemId}`);
+                  setLocalEnvironmentDialogOwner(undefined);
                   setLocalEnvironmentDialogOpen(false);
                 }}
                 open={localEnvironmentDialogOpen}
