@@ -26,16 +26,21 @@ The authoritative current-build inventory is:
   BrowserWindow; it does not prove parity with unobserved product routes,
   panels, state transitions, or window types.
 - Computer Use exploration is blocked by the environment safety policy for
-  `com.openai.codex`. A user-authorized CDP probe revalidated current-build
-  access, the main-shell target shape, and a de-identified Projects entry/list
-  structure. It did not expose project contents, Worktree controls, or the
-  separate local/remote/ChatGPT transitions. The broader blank-chat, command,
-  queue, Markdown, panel, menu, global-route, and Settings observations remain
-  historical evidence from `26.715.72359` until sampled again.
+  `com.openai.codex`. User-authorized CDP probes revalidated current-build
+  access, the main-shell target shape, a de-identified Projects entry/list,
+  the new-chat destination/context split, Project and Local environment
+  overlays, and a disposable synthetic task's basic thread lifecycle. They did
+  not expose private project contents, Remote behavior, real cancellation
+  results, or the broader command, queue, Markdown, panel, menu, global-route,
+  and Settings states; those remain historical evidence from `26.715.72359`
+  until sampled again.
 - Renderer viewport probing exposed a narrow-layout gap: the thread and
   Composer shrink, but the fixed app sidebar remains and the right workspace
-  panel can be laid out beyond the simulated viewport. Native Electron window
-  resizing remains a separate acceptance requirement.
+  panel can be laid out beyond the simulated viewport. The independently
+  implemented current-thread shell is now Browser- and Electron-verified at
+  its measured wide and compact geometry, but native Codex window behavior and
+  the remaining app-shell/panel interactions stay separate acceptance
+  requirements.
 - npm publication remains out of scope until the agreed P0/P1 coverage and
   release acceptance surfaces are complete.
 
@@ -61,7 +66,12 @@ product-level parity.
 
 ## Visual optimization
 
-H5 and Electron are used continuously as functional acceptance surfaces.
-Final visual optimization is deliberately scheduled after the inventory,
-component contracts, page compositions, and state transitions stabilize.
-This avoids polishing a narrow or soon-to-be-replaced structure.
+H5 and Electron are used continuously as functional acceptance surfaces. The
+current completed-thread slice now also has a main-only raster fixture and
+regional PNG diff thresholds, because its inventory row and composition have
+stabilized enough for targeted pixel work.
+
+Broader final visual optimization remains scheduled after the remaining
+inventory, page compositions, and state transitions stabilize. A passing
+single-thread raster gate must not be generalized to unobserved routes or
+states.

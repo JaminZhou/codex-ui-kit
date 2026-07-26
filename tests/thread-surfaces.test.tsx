@@ -158,6 +158,21 @@ describe("complete thread surfaces", () => {
     expect(viewport.hasAttribute("data-following")).toBe(false);
   });
 
+  it("preserves cleanup returned by a React 19 callback ref", () => {
+    const teardown = vi.fn();
+    const viewportRef = (viewport: HTMLDivElement | null) =>
+      viewport ? () => teardown() : undefined;
+    const { unmount } = render(
+      <AgentThreadViewport ref={viewportRef}>
+        Thread
+      </AgentThreadViewport>,
+    );
+
+    unmount();
+
+    expect(teardown).toHaveBeenCalledOnce();
+  });
+
   it("keeps user bubbles keyboard-focusable and activates editable messages", () => {
     const onEdit = vi.fn();
     render(

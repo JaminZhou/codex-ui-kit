@@ -820,6 +820,16 @@ async function captureNavigationSurfaces(webContents: WebContents) {
         width: bounds.width,
       };
     };
+    for (const selector of [
+      '.desktop-titlebar',
+      '.desktop-controls',
+      '.desktop-footer',
+    ]) {
+      const element = document.querySelector(selector);
+      if (element instanceof HTMLElement) {
+        element.style.removeProperty('display');
+      }
+    }
     document.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true }));
     const dock = document.querySelector('.desktop-composer-dock');
     if (dock instanceof HTMLElement) dock.style.display = 'none';
@@ -912,6 +922,14 @@ async function captureThreadSurfaces(
         width: bounds.width,
       };
     };
+    for (const selector of [
+      '.desktop-titlebar',
+      '.desktop-controls',
+      '.desktop-footer',
+    ]) {
+      const element = document.querySelector(selector);
+      if (element instanceof HTMLElement) element.style.display = 'none';
+    }
     const dock = document.querySelector('.desktop-composer-dock');
     if (dock instanceof HTMLElement) dock.style.display = 'none';
     const card = document.querySelector('.acceptance-card--thread');
@@ -931,9 +949,30 @@ async function captureThreadSurfaces(
         behavior: 'instant',
         top: ${position === "top" ? "0" : "viewport.scrollHeight"},
       });
+      viewport.scrollTop = ${
+        position === "top"
+          ? "0"
+          : "Math.max(0, viewport.scrollHeight - viewport.clientHeight)"
+      };
     }
     await wait(120);
     const thread = card?.querySelector('.codex-ui-thread');
+    const conversationShell = card?.querySelector(
+      '.codex-ui-conversation-thread-shell',
+    );
+    const shellHeader = card?.querySelector(
+      '.codex-ui-conversation-thread-shell__header',
+    );
+    const composerDock = card?.querySelector(
+      '.codex-ui-conversation-thread-shell__composer-dock',
+    );
+    const composerRegion = card?.querySelector(
+      '.codex-ui-conversation-thread-shell__composer',
+    );
+    const composer = composerRegion?.querySelector('.codex-ui-composer');
+    const composerPrimary = composer?.querySelector(
+      '.codex-ui-composer__primary',
+    );
     const bubble = card?.querySelector('[data-user-message-bubble]');
     const groupedTurn = card?.querySelector('.codex-ui-agent-turn[data-spacing="grouped"]');
     const runningMessage = card?.querySelector('.codex-ui-agent-message[data-status="running"]');
@@ -944,7 +983,18 @@ async function captureThreadSurfaces(
     const skeleton = card?.querySelector('.codex-ui-thread-skeleton');
     const renderError = card?.querySelector('.codex-ui-thread-render-error');
     const placeholder = card?.querySelector('.codex-ui-thread-virtualized-placeholder');
-    const footer = card?.querySelector('.codex-ui-thread-viewport__footer');
+    const shellBounds = conversationShell?.getBoundingClientRect();
+    const headerBounds = shellHeader?.getBoundingClientRect();
+    const threadBounds = thread?.getBoundingClientRect();
+    const composerRegionBounds = composerRegion?.getBoundingClientRect();
+    const composerBounds = composer?.getBoundingClientRect();
+    if (viewport instanceof HTMLElement) {
+      viewport.scrollTop = ${
+        position === "top"
+          ? "0"
+          : "Math.max(0, viewport.scrollHeight - viewport.clientHeight)"
+      };
+    }
     const viewportScrollMaximum = viewport instanceof HTMLElement
       ? Math.max(0, viewport.scrollHeight - viewport.clientHeight)
       : null;
@@ -957,6 +1007,33 @@ async function captureThreadSurfaces(
       bubbleTabIndex: bubble?.tabIndex ?? null,
       card: rect(card),
       clientWidth: document.documentElement.clientWidth,
+      composer: rect(composer),
+      composerBottomInset:
+        shellBounds && composerBounds
+          ? Math.abs(shellBounds.bottom - composerBounds.bottom)
+          : null,
+      composerCenteredDelta:
+        shellBounds && composerBounds
+          ? Math.abs(
+              (shellBounds.left + shellBounds.right) / 2 -
+                (composerBounds.left + composerBounds.right) / 2,
+            )
+          : null,
+      composerControl: rect(composerPrimary),
+      composerControlAction:
+        composerPrimary?.getAttribute('data-action') ?? null,
+      composerDock: rect(composerDock),
+      composerDockPosition: composerDock
+        ? getComputedStyle(composerDock).position
+        : null,
+      composerRegion: rect(composerRegion),
+      composerRegionInset:
+        threadBounds && composerRegionBounds
+          ? Math.abs(
+              (threadBounds.width - composerRegionBounds.width) / 2,
+            )
+          : null,
+      conversationShell: rect(conversationShell),
       contextOptimizationStates: contextOptimizationStates.map((state) => ({
         bounds: rect(state),
         fontSize: getComputedStyle(state).fontSize,
@@ -965,9 +1042,8 @@ async function captureThreadSurfaces(
         status: state.getAttribute('data-status'),
         text: state.textContent,
       })),
-      footer: rect(footer),
-      footerPosition: footer ? getComputedStyle(footer).position : null,
       groupedTurnGap: groupedTurn ? getComputedStyle(groupedTurn).gap : null,
+      headerHeight: headerBounds?.height ?? null,
       loadingStates: loadingStates.map((state) => ({
         bounds: rect(state),
         fontSize: getComputedStyle(state).fontSize,
@@ -986,6 +1062,17 @@ async function captureThreadSurfaces(
         width: getComputedStyle(spinner).width,
       } : null,
       thread: rect(thread),
+      threadCenteredDelta:
+        shellBounds && threadBounds
+          ? Math.abs(
+              (shellBounds.left + shellBounds.right) / 2 -
+                (threadBounds.left + threadBounds.right) / 2,
+            )
+          : null,
+      threadMaxWidth:
+        threadBounds && shellBounds
+          ? Math.min(768, shellBounds.width)
+          : null,
       threadGap: thread ? getComputedStyle(thread).gap : null,
       threadPadding: thread ? getComputedStyle(thread).padding : null,
       threadWidthMode: thread?.getAttribute('data-width'),
@@ -1181,18 +1268,30 @@ async function captureAcceptance(browserWindow: BrowserWindow) {
     assertAcceptanceMetric(name, snapshot, {
       equals: {
         bubbleTabIndex: 0,
-        footerPosition: "sticky",
+        composerControlAction: "stop",
+        composerDockPosition: "absolute",
+        headerHeight: 46,
         position,
         runningMessageBusy: "true",
         viewportOverflowY: "auto",
         viewportTabIndex: 0,
       },
       expectedTheme,
-      maximumValues: { viewportPositionDelta: 32 },
+      maximumValues: {
+        composerBottomInset: 16,
+        composerCenteredDelta: 1,
+        composerRegionInset: 16,
+        threadCenteredDelta: 1,
+        viewportPositionDelta: 1,
+      },
       minimumItems: { contextOptimizationStates: 2, loadingStates: 2 },
       requiredFields: [
         "bubble",
-        "footer",
+        "composer",
+        "composerControl",
+        "composerDock",
+        "composerRegion",
+        "conversationShell",
         "placeholder",
         "renderError",
         "skeleton",

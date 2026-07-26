@@ -158,6 +158,15 @@ describe("visual token contract", () => {
 
   it("inherits forced themes through nested kit scopes", () => {
     expect(tokens).toContain(':root,\n[data-theme="light"] {');
+    expect(tokens).toContain(
+      "--codex-ui-conversation-thread-background: var(\n    --codex-ui-background-surface\n  )",
+    );
+    expect(tokens).toContain(
+      "--codex-ui-conversation-thread-composer-background: var(\n    --codex-ui-background-elevated-primary-opaque\n  )",
+    );
+    expect(tokens).toContain(
+      "--codex-ui-conversation-thread-header-border: var(--codex-ui-border)",
+    );
     expect(tokens).not.toContain(
       ':root,\n[data-codex-ui],\n[data-theme="light"] {',
     );

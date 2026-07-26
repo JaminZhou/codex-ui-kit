@@ -15,7 +15,6 @@ import {
   AgentPlan,
   AgentReasoning,
   AgentThread,
-  AgentThreadViewport,
   AgentTurn,
   ApprovalCommandPreview,
   ApprovalRequest,
@@ -27,6 +26,7 @@ import {
   ComposerMentionMenu,
   ComposerModeIndicator,
   ConversationContextBar,
+  ConversationThreadShell,
   ConversationProjectListbox,
   ConversationEvent,
   ConversationEventList,
@@ -404,6 +404,8 @@ export function DesktopPlayground() {
   const [navigationPanelOpen, setNavigationPanelOpen] = useState(true);
   const [navigationStatus, setNavigationStatus] = useState("Desktop navigation ready");
   const [threadStatus, setThreadStatus] = useState("Desktop thread ready");
+  const [threadComposerValue, setThreadComposerValue] = useState("");
+  const [threadRunning, setThreadRunning] = useState(true);
   const [workflowProject, setWorkflowProject] = useState("ui-kit");
   const [workflowRunLocation, setWorkflowRunLocation] =
     useState("worktree");
@@ -593,38 +595,109 @@ export function DesktopPlayground() {
               <span className="acceptance-badge">workspace package</span>
             </header>
             <div className="acceptance-card__body thread-surface">
-              <AgentThreadViewport
-                className="desktop-thread-viewport"
-                followKey={threadStatus}
-                footer={
-                  <div className="desktop-thread-footer">
-                    <span>Latest turn</span>
-                    <output aria-live="polite">{threadStatus}</output>
-                  </div>
+              <ConversationThreadShell
+                className="desktop-conversation-thread-shell"
+                composer={
+                  <AgentComposer
+                    actions={
+                      <button aria-label="Add attachment" type="button">
+                        +
+                      </button>
+                    }
+                    controls={
+                      <button aria-label="Voice input" disabled type="button">
+                        ◦
+                      </button>
+                    }
+                    isRunning={threadRunning}
+                    layout="multiline"
+                    onStop={() => {
+                      setThreadRunning(false);
+                      setThreadStatus("Desktop generation stopped");
+                    }}
+                    onSubmit={(value) => {
+                      setThreadComposerValue("");
+                      setThreadRunning(true);
+                      setThreadStatus(`Desktop submitted: ${value}`);
+                    }}
+                    onValueChange={setThreadComposerValue}
+                    value={threadComposerValue}
+                  />
                 }
+                header={
+                  <ThreadHeader
+                    endActions={
+                      <>
+                        <IconButton
+                          icon={<span>⌘</span>}
+                          label="Open in editor"
+                        />
+                        <IconButton
+                          icon={<span>☷</span>}
+                          label="Open thread summary"
+                        />
+                        <IconButton
+                          icon={<span>▣</span>}
+                          label="Toggle bottom panel"
+                        />
+                        <IconButton
+                          icon={<span>◫</span>}
+                          label="Toggle workspace panel"
+                        />
+                      </>
+                    }
+                    navigation={
+                      <IconButton
+                        icon={<span>▱</span>}
+                        label="Open project"
+                      />
+                    }
+                    position="static"
+                    startActions={
+                      <IconButton
+                        icon={<span>•••</span>}
+                        label="More thread actions"
+                      />
+                    }
+                    title="Desktop validation"
+                  />
+                }
+                label="Desktop conversation shell"
+                threadLabel="Desktop validation thread"
+                viewportProps={{
+                  className: "desktop-thread-viewport",
+                  followKey: threadStatus,
+                }}
               >
-                <AgentThread
-                  aria-label="Desktop validation thread"
-                  width={activePreset === "compact" ? "narrow" : "wide"}
-                >
                 <AgentMessage
-                  actions={
-                    <button
-                      className="desktop-thread-message-action"
-                      onClick={() => setThreadStatus("Copied user message")}
-                      type="button"
-                    >
-                      Copy
-                    </button>
-                  }
-                  highlighted
-                  metadata="You · now"
-                  onEdit={() => setThreadStatus("Editing user message")}
                   role="user"
                 >
                   Validate this component library in a real desktop window.
                 </AgentMessage>
-                <AgentMessage role="assistant">
+                <AgentMessage
+                  actions={
+                    <>
+                      <IconButton
+                        icon={<span>□</span>}
+                        label="Copy response"
+                        onClick={() => setThreadStatus("Copied response")}
+                      />
+                      <IconButton
+                        icon={<span>−</span>}
+                        label="Response was not helpful"
+                      />
+                      <IconButton
+                        icon={<span>+</span>}
+                        label="Response was helpful"
+                      />
+                      <IconButton
+                        icon={<span>↗</span>}
+                        label="Expand response"
+                      />
+                    </>
+                  }
+                  role="assistant"
+                >
                   I’ll exercise the system theme, font stack, scroll container,
                   and responsive window presets.
                 </AgentMessage>
@@ -743,8 +816,7 @@ export function DesktopPlayground() {
                   The Renderer could not display this turn.
                 </ThreadRenderError>
                 <ThreadVirtualizedPlaceholder estimatedHeight="4rem" />
-                </AgentThread>
-              </AgentThreadViewport>
+              </ConversationThreadShell>
             </div>
           </article>
 

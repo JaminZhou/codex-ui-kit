@@ -33,8 +33,8 @@ Explore the [interactive component showcase](https://jaminzhou.com/codex-ui-kit/
 
 ## Highlights
 
-- Partial thread, message, activity, reasoning, plan, streaming, and mixed
-  conversation-event primitives.
+- A current-build measured conversation shell plus partial message, activity,
+  reasoning, plan, streaming, and mixed conversation-event primitives.
 - Application/sidebar and side/bottom workspace-panel composition with
   container-responsive overlay behavior.
 - Project index, current new-chat destination/context setup, grouped local
@@ -105,7 +105,7 @@ export function Example() {
 
 | Area | Main exports |
 | --- | --- |
-| [Thread and messages](docs/COMPONENTS.md#thread-and-message-surfaces) | `AgentThread`, `AgentTurn`, `AgentMessage`, loading and error states |
+| [Thread and messages](docs/COMPONENTS.md#thread-and-message-surfaces) | `ConversationThreadShell`, `AgentThread`, `AgentTurn`, `AgentMessage`, loading and error states |
 | [Rich content](docs/COMPONENTS.md#rich-content) | `AgentMarkdown`, `InlineCode`, `CodeBlock`, `FileDiff` |
 | [Agent activity](docs/COMPONENTS.md#agent-activity) | `ActivityTimeline`, `AgentReasoning`, `AgentPlan`, subagent surfaces |
 | [Tools and approvals](docs/COMPONENTS.md#tools-approvals-and-status) | `ToolCallCard`, `CommandExecution`, `FileChange`, `ApprovalRequest` |
@@ -156,6 +156,18 @@ pnpm check
 package contract, the browser showcase build, WCAG A/AA/2.2 browser checks for
 the static page and open overlay states, and the Electron
 main/preload/Renderer checks.
+
+The completed dark conversation fixture also supports an explicit
+current-build raster gate without committing the proprietary reference:
+
+```bash
+CODEX_UI_KIT_THREAD_REFERENCE=/absolute/path/to/main-only-reference.png \
+  pnpm check:visual:current-thread
+```
+
+The script renders at the PNG dimensions and gates the full screenshot plus
+the header, message band, and Composer regions independently. Reference and
+diff images remain outside the package by default.
 
 `npm pack` and a future `npm publish` run the library build first so the ignored
 `dist/` directory is always generated from the checked-out source. The package

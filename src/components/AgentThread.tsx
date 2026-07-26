@@ -1,4 +1,5 @@
 import {
+  forwardRef,
   useCallback,
   useEffect,
   useLayoutEffect,
@@ -7,6 +8,7 @@ import {
   type CSSProperties,
   type HTMLAttributes,
   type ReactNode,
+  type RefCallback,
   type UIEvent,
 } from "react";
 
@@ -69,25 +71,55 @@ export interface AgentThreadViewportProps
   topInset?: CSSProperties["paddingTop"];
 }
 
-export function AgentThreadViewport({
-  autoFollow = true,
-  children,
-  className,
-  defaultFollowing = true,
-  followKey,
-  followThreshold = 24,
-  footer,
-  onFollowingChange,
-  onScroll,
-  style,
-  tabIndex = 0,
-  topInset = "calc(var(--codex-ui-spacing) * 8)",
-  ...props
-}: AgentThreadViewportProps) {
+export const AgentThreadViewport = forwardRef<
+  HTMLDivElement,
+  AgentThreadViewportProps
+>(function AgentThreadViewport(
+  {
+    autoFollow = true,
+    children,
+    className,
+    defaultFollowing = true,
+    followKey,
+    followThreshold = 24,
+    footer,
+    onFollowingChange,
+    onScroll,
+    style,
+    tabIndex = 0,
+    topInset,
+    ...props
+  },
+  forwardedRef,
+) {
   const viewportRef = useRef<HTMLDivElement>(null);
   const [following, setFollowing] = useState(defaultFollowing);
   const followingRef = useRef(defaultFollowing);
   const programmaticFollowTargetRef = useRef<number | null>(null);
+  const setViewportRef = useCallback(
+    (viewport: HTMLDivElement | null) => {
+      viewportRef.current = viewport;
+      if (typeof forwardedRef === "function") {
+        const cleanup = (
+          forwardedRef as RefCallback<HTMLDivElement>
+        )(viewport);
+        if (typeof cleanup === "function") {
+          return () => {
+            try {
+              cleanup();
+            } finally {
+              if (viewportRef.current === viewport) {
+                viewportRef.current = null;
+              }
+            }
+          };
+        }
+      } else if (forwardedRef) {
+        forwardedRef.current = viewport;
+      }
+    },
+    [forwardedRef],
+  );
 
   const updateFollowing = useCallback(
     (nextFollowing: boolean) => {
@@ -170,11 +202,15 @@ export function AgentThreadViewport({
         updateFollowing(distanceFromLatest <= followThreshold);
         onScroll?.(event);
       }}
-      ref={viewportRef}
+      ref={setViewportRef}
       style={
         {
           ...style,
-          "--codex-ui-thread-viewport-top-inset": topInset,
+          ...(topInset === undefined
+            ? {}
+            : {
+                "--codex-ui-thread-viewport-top-inset": topInset,
+              }),
         } as CSSProperties
       }
       tabIndex={tabIndex}
@@ -185,7 +221,7 @@ export function AgentThreadViewport({
       ) : null}
     </div>
   );
-}
+});
 
 export interface ThreadVirtualizedPlaceholderProps
   extends HTMLAttributes<HTMLDivElement> {
