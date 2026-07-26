@@ -190,6 +190,23 @@ describe("ConversationThreadShell", () => {
           toJSON: () => ({}),
         };
       }
+      if (
+        this.classList.contains(
+          "codex-ui-conversation-thread-shell__body",
+        )
+      ) {
+        return {
+          bottom: 500,
+          height: 500,
+          left: 0,
+          right: 736,
+          top: 0,
+          width: 736,
+          x: 0,
+          y: 0,
+          toJSON: () => ({}),
+        };
+      }
       return originalGetBoundingClientRect.call(this);
     };
 
@@ -221,12 +238,17 @@ describe("ConversationThreadShell", () => {
         ".codex-ui-conversation-thread-shell__body",
       )!;
 
-      expect(observe).toHaveBeenCalledOnce();
+      expect(observe).toHaveBeenCalledTimes(2);
       expect(
         body.style.getPropertyValue(
           "--codex-ui-conversation-thread-composer-dock-height",
         ),
       ).toBe("138px");
+      expect(
+        body.style.getPropertyValue(
+          "--codex-ui-message-navigation-available-height",
+        ),
+      ).toBe("362px");
 
       unmount();
       expect(disconnect).toHaveBeenCalledOnce();

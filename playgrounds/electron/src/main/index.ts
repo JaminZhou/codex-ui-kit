@@ -1116,6 +1116,11 @@ async function captureAcceptance(browserWindow: BrowserWindow) {
   const outputDirectory = process.env.CODEX_UI_KIT_ACCEPTANCE_DIR;
   if (!outputDirectory) return;
 
+  browserWindow.show();
+  browserWindow.focus();
+  browserWindow.webContents.focus();
+  await new Promise((resolve) => setTimeout(resolve, 100));
+
   nativeTheme.themeSource = "dark";
   sendThemeState(browserWindow.webContents);
   await new Promise((resolve) => setTimeout(resolve, 500));

@@ -13,6 +13,7 @@ import {
 afterEach(() => {
   cleanup();
   vi.restoreAllMocks();
+  vi.unstubAllGlobals();
 });
 
 describe("thread navigation surfaces", () => {
@@ -163,6 +164,14 @@ describe("thread navigation surfaces", () => {
   });
 
   it("clamps edge previews inside the navigation overlay boundary", () => {
+    const observe = vi.fn();
+    vi.stubGlobal("ResizeObserver", class ResizeObserver {
+      constructor(_callback: ResizeObserverCallback) {}
+
+      disconnect = vi.fn();
+      observe = observe;
+      unobserve = vi.fn();
+    });
     const bounds = (
       top: number,
       height: number,
@@ -200,12 +209,17 @@ describe("thread navigation surfaces", () => {
       id: `message-${index + 1}`,
       label: `Message ${index + 1}`,
     }));
-    render(<ThreadMessageNavigationRail items={items} />);
+    const { unmount } = render(<ThreadMessageNavigationRail items={items} />);
 
     fireEvent.focus(
       screen.getByRole("button", { name: "Jump to user message 10" }),
     );
     expect(screen.getByRole("tooltip").style.top).toBe("142px");
+    const navigation = screen.getByRole("navigation", {
+      name: "User messages",
+    });
+    expect(observe).toHaveBeenCalledWith(navigation.parentElement);
+    unmount();
   });
 
   it("scrubs across captured markers with instant navigation", () => {

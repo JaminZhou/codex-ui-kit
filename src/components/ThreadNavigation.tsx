@@ -244,6 +244,8 @@ export function ThreadMessageNavigationRail({
       typeof ResizeObserver === "undefined"
         ? null
         : new ResizeObserver(update);
+    const boundary = navRef.current?.parentElement;
+    if (boundary) observer?.observe(boundary);
     if (navRef.current) observer?.observe(navRef.current);
     if (tooltipRef.current) observer?.observe(tooltipRef.current);
     window.addEventListener("resize", update);

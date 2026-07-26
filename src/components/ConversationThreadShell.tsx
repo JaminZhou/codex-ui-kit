@@ -66,6 +66,7 @@ export function ConversationThreadShell({
     const updateComposerReserve = () => {
       const height = composerDock.getBoundingClientRect().height;
       if (height > 0) {
+        const bodyHeight = body.getBoundingClientRect().height;
         const viewport = viewportRef.current;
         const shouldPinViewport =
           shouldAutoFollow &&
@@ -74,6 +75,12 @@ export function ConversationThreadShell({
           "--codex-ui-conversation-thread-composer-dock-height",
           `${height}px`,
         );
+        if (bodyHeight > 0) {
+          body.style.setProperty(
+            "--codex-ui-message-navigation-available-height",
+            `${Math.max(0, bodyHeight - height)}px`,
+          );
+        }
         if (
           shouldPinViewport &&
           viewport &&
@@ -92,6 +99,7 @@ export function ConversationThreadShell({
 
     const observer = new ResizeObserver(updateComposerReserve);
     observer.observe(composerDock);
+    observer.observe(body);
     return () => observer.disconnect();
   }, [shouldAutoFollow]);
 

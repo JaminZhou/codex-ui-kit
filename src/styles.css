@@ -699,7 +699,11 @@
 
 .codex-ui-message-navigation-rail {
   color: var(--codex-ui-text-secondary);
-  max-height: min(70vh, 40rem);
+  max-height: min(
+    70vh,
+    40rem,
+    var(--codex-ui-message-navigation-available-height, 100vh)
+  );
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
@@ -707,7 +711,11 @@
 }
 
 .codex-ui-message-navigation-rail__list {
-  max-height: min(70vh, 40rem);
+  max-height: min(
+    70vh,
+    40rem,
+    var(--codex-ui-message-navigation-available-height, 100vh)
+  );
   overscroll-behavior: contain;
   overflow-x: visible;
   overflow-y: auto;
