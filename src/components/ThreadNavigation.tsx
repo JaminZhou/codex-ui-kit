@@ -163,6 +163,9 @@ export function ThreadMessageNavigationRail({
   const tooltipId = useId();
   const [revealedId, setRevealedId] = useState<string | null>(null);
   const [listOverflow, setListOverflow] = useState(false);
+  const [tooltipMaxWidth, setTooltipMaxWidth] = useState<
+    number | undefined
+  >(undefined);
   const [tooltipTop, setTooltipTop] = useState(0);
   const activeIdSet = new Set(activeIds);
   const activePointerIdRef = useRef<number | null>(null);
@@ -190,6 +193,25 @@ export function ThreadMessageNavigationRail({
       rowBounds.top - navBounds.top + rowBounds.height / 2;
     const tooltipBounds = tooltipRef.current?.getBoundingClientRect();
     const boundaryBounds = nav.parentElement?.getBoundingClientRect();
+    if (
+      tooltipBounds &&
+      boundaryBounds &&
+      boundaryBounds.width > 0
+    ) {
+      const boundaryInset = 8;
+      const rightToLeft = getComputedStyle(nav).direction === "rtl";
+      const boundarySpace = rightToLeft
+        ? tooltipBounds.right - boundaryBounds.left - boundaryInset
+        : boundaryBounds.right - tooltipBounds.left - boundaryInset;
+      const viewportSpace = rightToLeft
+        ? tooltipBounds.right - boundaryInset
+        : window.innerWidth - tooltipBounds.left - boundaryInset;
+      setTooltipMaxWidth(
+        Math.max(0, Math.min(boundarySpace, viewportSpace)),
+      );
+    } else {
+      setTooltipMaxWidth(undefined);
+    }
     if (
       !tooltipBounds ||
       tooltipBounds.height <= 0 ||
@@ -377,7 +399,7 @@ export function ThreadMessageNavigationRail({
           id={`${tooltipId}-${revealedIndex}`}
           ref={tooltipRef}
           role="tooltip"
-          style={{ top: tooltipTop }}
+          style={{ maxWidth: tooltipMaxWidth, top: tooltipTop }}
         >
           <div className="codex-ui-message-navigation-rail__tooltip-label">
             {hasPreviewContent(revealedItem.label)

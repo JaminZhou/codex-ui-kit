@@ -176,14 +176,15 @@ describe("thread navigation surfaces", () => {
       top: number,
       height: number,
       width = 36,
+      left = 0,
     ): DOMRect => ({
       bottom: top + height,
       height,
-      left: 0,
-      right: width,
+      left,
+      right: left + width,
       top,
       width,
-      x: 0,
+      x: left,
       y: top,
       toJSON: () => ({}),
     });
@@ -200,9 +201,9 @@ describe("thread navigation surfaces", () => {
         if (
           this.classList.contains("codex-ui-message-navigation-rail__tooltip")
         ) {
-          return bounds(0, 100, 320);
+          return bounds(0, 100, 320, 52);
         }
-        return bounds(100, 200, 400);
+        return bounds(100, 200, 320);
       },
     );
     const items = Array.from({ length: 10 }, (_, index) => ({
@@ -214,7 +215,9 @@ describe("thread navigation surfaces", () => {
     fireEvent.focus(
       screen.getByRole("button", { name: "Jump to user message 10" }),
     );
-    expect(screen.getByRole("tooltip").style.top).toBe("142px");
+    const tooltip = screen.getByRole("tooltip");
+    expect(tooltip.style.maxWidth).toBe("260px");
+    expect(tooltip.style.top).toBe("142px");
     const navigation = screen.getByRole("navigation", {
       name: "User messages",
     });

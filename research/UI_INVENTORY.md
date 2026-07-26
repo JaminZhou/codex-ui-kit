@@ -241,12 +241,12 @@ Composer regional limits passing.
 Current runtime evidence also records that the product's long-thread viewport
 uses reverse-origin scrolling (`scrollTop = 0` at latest, negative away from
 latest). The public package keeps the actual windowing and scroll algorithm
-host-owned; its placeholder, navigation, and follow contracts therefore remain
-an intentionally partial implementation even though the sampled Browser and
-Electron acceptance surfaces are verified. The current error/retry state was
-not safely reached and remains a separate unpromoted gate. Manual compaction
-is likewise tracked independently as `thread.context-compaction`; it does not
-promote the still-unreached thread summary panel.
+host-owned. Browser and Electron acceptance exercise the placeholder,
+navigation, and follow contracts but not reverse scrolling or windowing, so
+the virtualization row remains `partial_legacy`. The current error/retry state
+was not safely reached and remains a separate unpromoted gate. Manual
+compaction is likewise tracked independently as `thread.context-compaction`;
+it does not promote the still-unreached thread summary panel.
 
 This is a measurement- and raster-backed basic thread slice, not a claim that
 the whole application or every thread lifecycle is pixel-perfect. Markdown
