@@ -22,14 +22,20 @@ describe("current-thread visual contract", () => {
     );
   });
 
-  it("registers completed and streaming states as independent scenarios", () => {
+  it("registers every sampled workflow state as an independent scenario", () => {
     expect(scenarios.version).toBe(1);
     expect(scenarios.scenarios.map((scenario) => scenario.id)).toEqual([
       "current-thread-completed",
       "current-thread-streaming",
+      "current-thread-tool-call",
+      "current-thread-approval",
+      "current-workspace-file-diff",
     ]);
     expect(packageJson.scripts["check:visual:streaming"]).toContain(
       "--scenes=current-thread-streaming",
+    );
+    expect(packageJson.scripts["check:visual:workflow"]).toContain(
+      "--scenes=current-thread-tool-call,current-thread-approval,current-workspace-file-diff",
     );
   });
 
@@ -69,8 +75,19 @@ describe("current-thread visual contract", () => {
         reason: expect.stringContaining("outside the thread scene"),
       }),
     ]);
+    const fileDiff = scenarios.scenarios.find(
+      (scenario) => scenario.id === "current-workspace-file-diff",
+    );
+    expect(fileDiff.regions).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ left: 0, name: "thread-turn", width: 666 }),
+        expect.objectContaining({ left: 666, name: "review", width: 406 }),
+      ]),
+    );
     expect(scenarioScript).toContain("process.env[scenario.referenceEnv]");
     expect(scenarioScript).toContain("applyMasks(reference, actual");
+    expect(scenarioScript).toContain("region.width ?? diff.width - left");
+    expect(scenarioScript).toContain("!Number.isInteger(left)");
     expect(scenarioScript).toContain("geometryContractViolations.length > 0");
   });
 });

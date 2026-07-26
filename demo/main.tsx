@@ -605,6 +605,391 @@ function CurrentThreadPixelFixture({
   );
 }
 
+type WorkflowPixelState = "approval" | "file-diff" | "tool-call";
+
+function WorkflowPixelHeader({
+  compact = false,
+  title,
+}: {
+  compact?: boolean;
+  title: string;
+}) {
+  return (
+    <ThreadHeader
+      endActions={
+        <>
+          <button
+            aria-label="Open in editor"
+            className="current-thread-pixel-fixture__editor-control"
+            type="button"
+          >
+            <span aria-hidden="true">⌁</span>
+            <PixelIcon name="chevron" />
+          </button>
+          <button aria-label="Thread controls" type="button">
+            <PixelIcon name="sliders" />
+          </button>
+          {!compact ? (
+            <>
+              <button aria-label="Toggle bottom panel" type="button">
+                <PixelIcon name="panel" />
+              </button>
+              <button aria-label="Toggle workspace panel" type="button">
+                <PixelIcon name="workspace" />
+              </button>
+            </>
+          ) : null}
+        </>
+      }
+      position="static"
+      title={
+        <span className="current-thread-pixel-fixture__title">
+          <PixelIcon name="folder" />
+          <span>{title}</span>
+          <PixelIcon name="more" />
+        </span>
+      }
+    />
+  );
+}
+
+function WorkflowPixelComposer() {
+  return (
+    <AgentComposer
+      actions={
+        <>
+          <button aria-label="Add attachment" type="button">
+            <PixelIcon name="plus" />
+          </button>
+          <button type="button">
+            <PixelIcon name="approve" />
+            <span>Ask for approval</span>
+          </button>
+        </>
+      }
+      controls={
+        <>
+          <button type="button">
+            <span className="current-thread-pixel-fixture__model">
+              5.6 Sol <span>Extra High</span>
+            </span>
+            <PixelIcon name="chevron" />
+          </button>
+          <button aria-label="Voice input" type="button">
+            <PixelIcon name="microphone" />
+          </button>
+        </>
+      }
+      layout="multiline"
+      onSubmit={() => undefined}
+      onValueChange={() => undefined}
+      placeholder="Do anything"
+      value=""
+    />
+  );
+}
+
+function WorkflowMessageActions() {
+  const messageActions: PixelIconName[] = [
+    "copy",
+    "like",
+    "dislike",
+    "expand",
+  ];
+  return messageActions.map((name) => (
+    <button aria-label={name} key={name} type="button">
+      <PixelIcon name={name} />
+    </button>
+  ));
+}
+
+function WorkflowToolCallFixture() {
+  return (
+    <main
+      className="current-thread-pixel-fixture workflow-pixel-fixture"
+      data-theme="dark"
+      data-visual-scene="current-thread-tool-call"
+    >
+      <ConversationThreadShell
+        composer={<WorkflowPixelComposer />}
+        header={<WorkflowPixelHeader title="Run workflow visual probe" />}
+        label="Tool call pixel fixture"
+      >
+        <AgentMessage role="user">
+          Run{" "}
+          <code className="workflow-pixel-fixture__inline-command">
+            printf &apos;workflow visual probe\n&apos;
+          </code>{" "}
+          as a single read-only shell command. Then reply exactly: Tool probe
+          complete.Run{" "}
+          <code className="workflow-pixel-fixture__inline-command">
+            printf &apos;workflow visual
+            <br />
+            probe\n&apos;
+          </code>{" "}
+          as a single read-only shell command. Then reply exactly: Tool probe
+          <br />
+          complete.
+        </AgentMessage>
+        <ActivityTimeline
+          className="workflow-pixel-fixture__timeline"
+          defaultOpen
+          summary="Worked for 8s"
+        >
+          <p className="workflow-pixel-fixture__commentary">
+            我会按要求执行这一条只读命令。
+          </p>
+          <CommandExecution
+            command={"printf 'workflow visual probe\\n'"}
+            hideRawCommand
+            status="completed"
+          />
+        </ActivityTimeline>
+        <AgentMessage
+          actions={<WorkflowMessageActions />}
+          role="assistant"
+        >
+          Tool probe complete.
+        </AgentMessage>
+      </ConversationThreadShell>
+    </main>
+  );
+}
+
+function WorkflowApprovalFixture() {
+  return (
+    <main
+      className="current-thread-pixel-fixture workflow-pixel-fixture"
+      data-theme="dark"
+      data-visual-scene="current-thread-approval"
+    >
+      <ConversationThreadShell
+        composer={
+          <ApprovalRequest
+            approveLabel="Allow once"
+            autoFocus={false}
+            className="workflow-pixel-fixture__approval"
+            kind="command"
+            onApprove={() => undefined}
+            onReject={() => undefined}
+            rejectLabel="Deny"
+            scopedApproveAction={{
+              label: "Allow this conversation",
+              onClick: () => undefined,
+            }}
+            title="是否允许打开“计算器”？这仅用于测试审批界面。"
+          >
+            <ApprovalCommandPreview
+              command="open -a Calculator"
+              forceCollapsible={false}
+            />
+          </ApprovalRequest>
+        }
+        header={
+          <WorkflowPixelHeader title="Calculator approval probe" />
+        }
+        label="Approval pixel fixture"
+      >
+        <AgentMessage role="user">
+          Attempt to run{" "}
+          <code className="workflow-pixel-fixture__inline-command">
+            open -a Calculator
+          </code>
+          , but do not take any other action. This is only an approval UI
+          probe.
+        </AgentMessage>
+        <ActivityTimeline
+          className="workflow-pixel-fixture__timeline"
+          defaultOpen
+          summary="Working for 14s"
+        >
+          <p className="workflow-pixel-fixture__commentary">
+            Jamin，我只会尝试执行这条命令，用于触发审批界面。
+          </p>
+          <CommandExecution
+            command="open -a Calculator"
+            hideRawCommand
+            status="running"
+            summary="Running open -a Calculator"
+          />
+        </ActivityTimeline>
+      </ConversationThreadShell>
+    </main>
+  );
+}
+
+function WorkflowFileChangeCard() {
+  const indicator = (
+    <span className="workflow-pixel-fixture__file-indicator">
+      <svg aria-hidden="true" viewBox="0 0 16 16">
+        <rect height="12" rx="2" width="12" x="2" y="2" />
+        <path d="M5 8h6M8 5v6" />
+      </svg>
+    </span>
+  );
+
+  return (
+    <FileChange
+      additions={1}
+      change="modified"
+      className="workflow-pixel-fixture__file-change"
+      detail={
+        <span className="workflow-pixel-fixture__file-actions">
+          <span className="workflow-pixel-fixture__file-stats">
+            <span>+1</span>
+            <span>−0</span>
+          </span>
+          <button type="button">
+            <span>Undo</span>
+            <span aria-hidden="true">↶</span>
+          </button>
+          <button type="button">Review</button>
+        </span>
+      }
+      indicator={indicator}
+      path="fixture.txt"
+      showDiffDetails={false}
+    />
+  );
+}
+
+function WorkflowReviewPanel() {
+  const lines: FileDiffLine[] = [
+    {
+      content: "workflow visual probe",
+      kind: "addition",
+      newLineNumber: 1,
+    },
+  ];
+
+  return (
+    <WorkspacePanel
+      activeTabId="review"
+      className="workflow-pixel-fixture__review-panel"
+      label="Review"
+      onActiveTabChange={() => undefined}
+      onClose={() => undefined}
+      onCloseTab={() => undefined}
+      onExpandedChange={() => undefined}
+      onOpenTab={() => undefined}
+      placement="side"
+      tabs={[
+        {
+          content: (
+            <div className="workflow-pixel-fixture__review-content">
+              <div className="workflow-pixel-fixture__review-toolbar">
+                <button type="button">
+                  Last Turn <PixelIcon name="chevron" />
+                </button>
+                <span className="workflow-pixel-fixture__file-stats">
+                  <span>+1</span>
+                  <span>−0</span>
+                </span>
+                <span className="workflow-pixel-fixture__review-toolbar-actions">
+                  <button aria-label="Review options" type="button">
+                    <PixelIcon name="more" />
+                  </button>
+                  <button aria-label="Diff settings" type="button">
+                    <PixelIcon name="sliders" />
+                  </button>
+                  <button aria-label="Open file" type="button">
+                    <PixelIcon name="copy" />
+                  </button>
+                  <button aria-label="Diff layout" type="button">
+                    <PixelIcon name="panel" />
+                  </button>
+                  <button aria-label="Review graph" type="button">
+                    <PixelIcon name="workspace" />
+                  </button>
+                  <button aria-label="Review layout" type="button">
+                    <PixelIcon name="panel" />
+                  </button>
+                </span>
+              </div>
+              <div className="workflow-pixel-fixture__review-file">
+                <div className="workflow-pixel-fixture__review-file-header">
+                  <span>
+                    <span
+                      aria-hidden="true"
+                      className="workflow-pixel-fixture__review-file-icon"
+                    >
+                      ▱
+                    </span>
+                    .research/workflow-cdp/fixture.txt
+                  </span>
+                  <span className="workflow-pixel-fixture__file-stats">
+                    <span>+1</span>
+                    <span>−0</span>
+                  </span>
+                </div>
+                <FileDiff lines={lines} />
+              </div>
+            </div>
+          ),
+          id: "review",
+          label: (
+            <span className="workflow-pixel-fixture__review-tab-label">
+              <span aria-hidden="true">↙</span>
+              <span>Review</span>
+              <span aria-hidden="true">×</span>
+              <span aria-hidden="true">＋</span>
+            </span>
+          ),
+        },
+      ]}
+    />
+  );
+}
+
+function WorkflowFileDiffFixture() {
+  return (
+    <main
+      className="current-thread-pixel-fixture workflow-pixel-fixture workflow-pixel-fixture--file-diff"
+      data-theme="dark"
+      data-visual-scene="current-workspace-file-diff"
+    >
+      <div className="workflow-pixel-fixture__split">
+        <ConversationThreadShell
+          composer={<WorkflowPixelComposer />}
+          header={
+            <WorkflowPixelHeader
+              compact
+              title="Create workflow probe fixture"
+            />
+          }
+          label="File change pixel fixture"
+        >
+          <AgentMessage role="user">
+            Use apply_patch to create{" "}
+            <code className="workflow-pixel-fixture__inline-command">
+              .research/workflow-cdp/fixture.txt
+            </code>{" "}
+            with exactly{" "}
+            <code className="workflow-pixel-fixture__inline-command">
+              workflow visual probe
+            </code>{" "}
+            followed by one newline. Do not change any other file. Then reply
+            exactly: File probe complete.
+          </AgentMessage>
+          <ActivityTimeline
+            className="workflow-pixel-fixture__timeline"
+            summary="Worked for 7s"
+          />
+          <AgentMessage role="assistant">File probe complete.</AgentMessage>
+          <WorkflowFileChangeCard />
+        </ConversationThreadShell>
+        <WorkflowReviewPanel />
+      </div>
+    </main>
+  );
+}
+
+function WorkflowPixelFixture({ state }: { state: WorkflowPixelState }) {
+  if (state === "approval") return <WorkflowApprovalFixture />;
+  if (state === "file-diff") return <WorkflowFileDiffFixture />;
+  return <WorkflowToolCallFixture />;
+}
+
 function Showcase() {
   const [dark, setDark] = useState(false);
   const [composerValue, setComposerValue] = useState(
@@ -3232,9 +3617,19 @@ const currentThreadCapture =
   capture === "current-thread-streaming";
 const currentThreadPixelState: CurrentThreadPixelState =
   capture === "current-thread-streaming" ? "streaming" : "completed";
+const workflowPixelState: WorkflowPixelState | undefined =
+  capture === "current-thread-tool-call"
+    ? "tool-call"
+    : capture === "current-thread-approval"
+      ? "approval"
+      : capture === "current-workspace-file-diff"
+        ? "file-diff"
+        : undefined;
 
 createRoot(document.getElementById("root")!).render(
-  currentThreadCapture ? (
+  workflowPixelState ? (
+    <WorkflowPixelFixture state={workflowPixelState} />
+  ) : currentThreadCapture ? (
     <CurrentThreadPixelFixture state={currentThreadPixelState} />
   ) : (
     <StrictMode>

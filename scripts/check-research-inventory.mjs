@@ -54,6 +54,14 @@ function positiveNumber(value) {
   return typeof value === "number" && Number.isFinite(value) && value > 0;
 }
 
+function nonNegativeInteger(value) {
+  return Number.isInteger(value) && value >= 0;
+}
+
+function positiveInteger(value) {
+  return Number.isInteger(value) && value > 0;
+}
+
 function ratio(value) {
   return (
     typeof value === "number" &&
@@ -163,7 +171,13 @@ for (const scenario of visualScenarios.scenarios) {
     scenario.regions.some(
       (region) =>
         typeof region.name !== "string" ||
-        !positiveNumber(region.height) ||
+        !positiveInteger(region.height) ||
+        (region.left !== undefined &&
+          !nonNegativeInteger(region.left)) ||
+        (region.width !== undefined && !positiveInteger(region.width)) ||
+        (region.top !== undefined && !nonNegativeInteger(region.top)) ||
+        (region.fromBottom !== undefined &&
+          !nonNegativeInteger(region.fromBottom)) ||
         !ratio(region.maximumDiffRatio) ||
         !optionalEnvironmentName(region.maximumDiffRatioEnv) ||
         (region.top === undefined && region.fromBottom === undefined),

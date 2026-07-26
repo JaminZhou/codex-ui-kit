@@ -126,11 +126,12 @@
         "cdp:collapsed-and-expanded-read-only-command",
         "cdp:grouped-success-and-exit-code-7-command-rows",
         "cdp:long-output-144px-scroll-fade-container",
-        "cdp:running-duration-stop-and-background-process-state"
+        "cdp:running-duration-stop-and-background-process-state",
+        "cdp-26.721:synthetic-expanded-read-only-command-timeline-1072x820"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "partial_legacy",
-      "electronStatus": "partial_legacy",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
       "priority": "p0"
     },
     {
@@ -138,9 +139,12 @@
       "area": "conversation",
       "ownership": "turn",
       "packageEvidence": ["file-diff", "message-square-diff"],
-      "runtimeStatus": "not_sampled",
+      "runtimeStatus": "runtime_observed",
+      "runtimeEvidence": [
+        "cdp-26.721:synthetic-applied-file-change-card-undo-review"
+      ],
       "implementationStatus": "partial",
-      "browserStatus": "partial_legacy",
+      "browserStatus": "verified",
       "electronStatus": "partial_legacy",
       "priority": "p0"
     },
@@ -171,10 +175,13 @@
       "area": "conversation",
       "ownership": "turn",
       "packageEvidence": ["auto-review-approval-nudge", "permissions-mode-dropdown"],
-      "runtimeStatus": "not_sampled",
+      "runtimeStatus": "runtime_observed",
+      "runtimeEvidence": [
+        "cdp-26.721:ask-for-approval-command-card-denied-without-execution"
+      ],
       "implementationStatus": "partial",
-      "browserStatus": "partial_legacy",
-      "electronStatus": "partial_legacy",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
       "priority": "p0"
     },
     {
@@ -433,11 +440,12 @@
       "runtimeEvidence": [
         "cdp:right-review-panel-layout",
         "cdp:right-environment-panel-layout",
-        "cdp:right-sources-tabpanel-layout"
+        "cdp:right-sources-tabpanel-layout",
+        "cdp-26.721:synthetic-review-panel-turn-file-diff-split-1072x820"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "not_started",
-      "electronStatus": "not_started",
+      "browserStatus": "verified",
+      "electronStatus": "partial_legacy",
       "priority": "p0"
     },
     {
@@ -446,10 +454,13 @@
       "ownership": "workspace",
       "packageEvidence": ["editor-diff-page", "diff", "file-diff"],
       "runtimeStatus": "runtime_observed",
-      "runtimeEvidence": ["cdp:review-panel-file-diff-list"],
+      "runtimeEvidence": [
+        "cdp:review-panel-file-diff-list",
+        "cdp-26.721:synthetic-review-panel-single-addition-diff"
+      ],
       "implementationStatus": "partial",
-      "browserStatus": "partial_legacy",
-      "electronStatus": "not_started",
+      "browserStatus": "verified",
+      "electronStatus": "partial_legacy",
       "priority": "p0"
     },
     {

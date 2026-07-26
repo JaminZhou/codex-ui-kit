@@ -29,11 +29,13 @@ The authoritative current-build inventory is:
   `com.openai.codex`. User-authorized CDP probes revalidated current-build
   access, the main-shell target shape, a de-identified Projects entry/list,
   the new-chat destination/context split, Project and Local environment
-  overlays, and a disposable synthetic task's basic thread lifecycle. They did
-  not expose private project contents, Remote behavior, real cancellation
-  results, or the broader command, queue, Markdown, panel, menu, global-route,
-  and Settings states; those remain historical evidence from `26.715.72359`
-  until sampled again.
+  overlays, a disposable synthetic task's basic thread lifecycle, an expanded
+  read-only command, a pending command approval, and the split between a
+  turn-owned file-change card and workspace-owned Review diff. They did not
+  expose private project contents, Remote behavior, real cancellation results,
+  search/MCP/browser tool variants, or the broader error, queue, Markdown,
+  menu, global-route, and Settings states; those remain historical evidence
+  from `26.715.72359` until sampled again.
 - Renderer viewport probing exposed a narrow-layout gap: the thread and
   Composer shrink, but the fixed app sidebar remains and the right workspace
   panel can be laid out beyond the simulated viewport. The independently
@@ -67,10 +69,11 @@ product-level parity.
 ## Visual optimization
 
 H5 and Electron are used continuously as functional acceptance surfaces. The
-current thread slice now has scenario-driven, main-only completed and
-streaming raster fixtures with independent selectors, ownership masks, and
-regional PNG diff thresholds. The references remain build-scoped external
-evidence rather than redistributed application assets.
+current thread slice now has scenario-driven, main-only completed, streaming,
+expanded-command, pending-approval, and file-review raster fixtures with
+independent selectors, ownership masks, horizontally scoped left/right
+regions, and regional PNG diff thresholds. The references remain build-scoped
+external evidence rather than redistributed application assets.
 
 Broader final visual optimization remains scheduled after the remaining
 inventory, page compositions, and state transitions stabilize. A passing

@@ -192,7 +192,26 @@ only the workspace-owned Environment control from the thread-owned
 comparison; the remaining full raster and header/message/Composer regions
 stay independently bounded.
 
+Three more current-build scenarios cover an expanded read-only command,
+a pending command approval, and an applied file card with the Review panel
+open. The command and approval remain turn-owned. The file scenario explicitly
+splits its 666px conversation region from the independent 406px
+workspace-owned Review panel, and its regional checker accepts optional
+horizontal bounds so those owners are gated separately.
+
+The workflow fixture extends `FileChange` with a host-owned leading indicator
+slot and composes the existing `ActivityTimeline`, `CommandExecution`,
+`ApprovalRequest`, `ConversationThreadShell`, `WorkspacePanel`, and `FileDiff`
+primitives. Current-build Browser evidence plus the existing real
+BrowserWindow acceptance promote the sampled command and approval states. The
+turn file card is Browser-verified but remains Electron-partial until its exact
+collapsed indicator and Undo/Review actions are exercised there. The Review
+side-panel/file-diff composition is likewise Browser-verified but remains
+Electron-partial until that exact cross-owner split is added to the Electron
+acceptance surface.
+
 This is a measurement- and raster-backed basic thread slice, not a claim that
 the whole application or every thread lifecycle is pixel-perfect. Markdown
-variants, virtualization, cancellation results, tool/approval flows, panels,
-and native window behavior retain their own inventory gates.
+variants, virtualization, cancellation results, search/MCP/browser tools,
+approval persistence and timeout, multi-file review, failure states, and
+native window behavior retain their own inventory gates.

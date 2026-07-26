@@ -175,6 +175,20 @@ describe("FileChange", () => {
     expect(html).toContain("Edited");
     expect(html).not.toContain("<details");
   });
+
+  it("accepts a host-owned leading indicator", () => {
+    const html = renderToStaticMarkup(
+      <FileChange
+        change="modified"
+        indicator={<span data-file-indicator>file</span>}
+        path="src/status.ts"
+        showDiffDetails={false}
+      />,
+    );
+
+    expect(html).toContain("data-file-indicator");
+    expect(html).toContain(">file</span>");
+  });
 });
 
 describe("FileDiff", () => {

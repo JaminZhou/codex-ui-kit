@@ -174,6 +174,328 @@
           "name": "composer"
         }
       ]
+    },
+    {
+      "capture": "current-thread-tool-call",
+      "colorScheme": "dark",
+      "geometry": {
+        "assistant": ".codex-ui-agent-message[data-role=\"assistant\"] .codex-ui-agent-message__content",
+        "command": ".codex-ui-command-execution .codex-ui-activity__header",
+        "commentary": ".workflow-pixel-fixture__commentary",
+        "composer": ".codex-ui-composer",
+        "header": ".codex-ui-conversation-thread-shell__header",
+        "thread": ".codex-ui-conversation-thread-shell__thread",
+        "timeline": ".workflow-pixel-fixture__timeline .codex-ui-activity-timeline__toggle > span:first-child",
+        "user": ".codex-ui-agent-message[data-role=\"user\"] .codex-ui-agent-message__content"
+      },
+      "expectedGeometry": {
+        "assistant": {
+          "height": 22,
+          "left": 168,
+          "top": {
+            "value": 357,
+            "tolerance": 2
+          },
+          "width": 736
+        },
+        "command": {
+          "height": 28,
+          "left": 168,
+          "top": {
+            "value": 307,
+            "tolerance": 1
+          },
+          "width": 736
+        },
+        "commentary": {
+          "height": 22,
+          "left": 168,
+          "top": {
+            "value": 272,
+            "tolerance": 1
+          },
+          "width": 736
+        },
+        "composer": {
+          "borderRadius": "20px",
+          "height": 98,
+          "left": 168,
+          "top": 706,
+          "width": 736
+        },
+        "header": {
+          "height": 46,
+          "left": 0,
+          "top": 0,
+          "width": 1072
+        },
+        "thread": {
+          "left": 152,
+          "top": 46,
+          "width": 768
+        },
+        "timeline": {
+          "height": 21,
+          "left": 169,
+          "top": {
+            "value": 232,
+            "tolerance": 1
+          }
+        },
+        "user": {
+          "borderRadius": "16px",
+          "height": 107,
+          "left": 337,
+          "top": {
+            "value": 80,
+            "tolerance": 1
+          },
+          "width": 567
+        }
+      },
+      "id": "current-thread-tool-call",
+      "masks": [],
+      "maximumDiffRatio": 0.02,
+      "pixelThreshold": 0.05,
+      "referenceEnv": "CODEX_UI_KIT_THREAD_TOOL_CALL_REFERENCE",
+      "regions": [
+        {
+          "height": 46,
+          "maximumDiffRatio": 0.04,
+          "name": "header",
+          "top": 0
+        },
+        {
+          "height": 390,
+          "maximumDiffRatio": 0.027,
+          "name": "turn",
+          "top": 46
+        },
+        {
+          "fromBottom": 130,
+          "height": 130,
+          "maximumDiffRatio": 0.015,
+          "name": "composer"
+        }
+      ]
+    },
+    {
+      "capture": "current-thread-approval",
+      "colorScheme": "dark",
+      "geometry": {
+        "approval": ".workflow-pixel-fixture__approval",
+        "command": ".codex-ui-command-execution .codex-ui-activity__header",
+        "commentary": ".workflow-pixel-fixture__commentary",
+        "header": ".codex-ui-conversation-thread-shell__header",
+        "thread": ".codex-ui-conversation-thread-shell__thread",
+        "timeline": ".workflow-pixel-fixture__timeline .codex-ui-activity-timeline__toggle > span:first-child",
+        "user": ".codex-ui-agent-message[data-role=\"user\"] .codex-ui-agent-message__content"
+      },
+      "expectedGeometry": {
+        "approval": {
+          "borderRadius": "20px",
+          "height": 162,
+          "left": 168,
+          "top": 642,
+          "width": 736
+        },
+        "command": {
+          "height": 28,
+          "left": 168,
+          "top": {
+            "value": 260,
+            "tolerance": 1
+          },
+          "width": 736
+        },
+        "commentary": {
+          "height": 22,
+          "left": 168,
+          "top": {
+            "value": 232,
+            "tolerance": 1
+          },
+          "width": 736
+        },
+        "header": {
+          "height": 46,
+          "left": 0,
+          "top": 0,
+          "width": 1072
+        },
+        "thread": {
+          "left": 152,
+          "top": 46,
+          "width": 768
+        },
+        "timeline": {
+          "height": 21,
+          "left": 169,
+          "top": {
+            "value": 188,
+            "tolerance": 1
+          }
+        },
+        "user": {
+          "borderRadius": "16px",
+          "height": 61,
+          "left": 337,
+          "top": {
+            "value": 80,
+            "tolerance": 1
+          },
+          "width": 567
+        }
+      },
+      "id": "current-thread-approval",
+      "masks": [],
+      "maximumDiffRatio": 0.02,
+      "pixelThreshold": 0.05,
+      "referenceEnv": "CODEX_UI_KIT_THREAD_APPROVAL_REFERENCE",
+      "regions": [
+        {
+          "height": 46,
+          "maximumDiffRatio": 0.04,
+          "name": "header",
+          "top": 0
+        },
+        {
+          "height": 300,
+          "maximumDiffRatio": 0.03,
+          "name": "turn",
+          "top": 46
+        },
+        {
+          "fromBottom": 194,
+          "height": 194,
+          "maximumDiffRatio": 0.03,
+          "name": "approval"
+        }
+      ]
+    },
+    {
+      "capture": "current-workspace-file-diff",
+      "colorScheme": "dark",
+      "geometry": {
+        "composer": ".codex-ui-composer",
+        "diff": ".workflow-pixel-fixture__review-file .codex-ui-file-diff",
+        "fileCard": ".workflow-pixel-fixture__file-change",
+        "reviewPanel": ".workflow-pixel-fixture__review-panel",
+        "reviewToolbar": ".workflow-pixel-fixture__review-toolbar",
+        "thread": ".workflow-pixel-fixture__split > .codex-ui-conversation-thread-shell",
+        "timeline": ".workflow-pixel-fixture__timeline .codex-ui-activity-timeline__toggle > span:first-child",
+        "user": ".codex-ui-agent-message[data-role=\"user\"] .codex-ui-agent-message__content"
+      },
+      "expectedGeometry": {
+        "composer": {
+          "borderRadius": "20px",
+          "height": 98,
+          "left": {
+            "value": 15,
+            "tolerance": 1
+          },
+          "top": 706,
+          "width": {
+            "value": 635,
+            "tolerance": 1
+          }
+        },
+        "diff": {
+          "height": 22,
+          "left": 666,
+          "top": 116,
+          "width": 406
+        },
+        "fileCard": {
+          "borderRadius": "12px",
+          "height": 66,
+          "left": {
+            "value": 15,
+            "tolerance": 1
+          },
+          "top": 286,
+          "width": {
+            "value": 636,
+            "tolerance": 1
+          }
+        },
+        "reviewPanel": {
+          "height": 820,
+          "left": 666,
+          "top": 0,
+          "width": 406
+        },
+        "reviewToolbar": {
+          "height": 38,
+          "left": 666,
+          "top": 46,
+          "width": 406
+        },
+        "thread": {
+          "height": 820,
+          "left": 0,
+          "top": 0,
+          "width": 666
+        },
+        "timeline": {
+          "height": 21,
+          "left": {
+            "value": 16,
+            "tolerance": 1
+          },
+          "top": {
+            "value": 209,
+            "tolerance": 1
+          }
+        },
+        "user": {
+          "borderRadius": "16px",
+          "height": 84,
+          "left": {
+            "value": 162,
+            "tolerance": 2
+          },
+          "top": {
+            "value": 80,
+            "tolerance": 1
+          },
+          "width": {
+            "value": 488,
+            "tolerance": 2
+          }
+        }
+      },
+      "id": "current-workspace-file-diff",
+      "masks": [],
+      "maximumDiffRatio": 0.025,
+      "pixelThreshold": 0.05,
+      "referenceEnv": "CODEX_UI_KIT_WORKSPACE_FILE_DIFF_REFERENCE",
+      "regions": [
+        {
+          "height": 405,
+          "left": 0,
+          "maximumDiffRatio": 0.045,
+          "name": "thread-turn",
+          "top": 0,
+          "width": 666
+        },
+        {
+          "height": 180,
+          "left": 666,
+          "maximumDiffRatio": 0.075,
+          "name": "review",
+          "top": 0,
+          "width": 406
+        },
+        {
+          "fromBottom": 130,
+          "height": 130,
+          "left": 0,
+          "maximumDiffRatio": 0.02,
+          "name": "composer",
+          "width": 666
+        }
+      ]
     }
   ]
 }

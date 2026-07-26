@@ -52,6 +52,7 @@
     "check:visual:scenarios": "pnpm build:demo && node scripts/check-visual-scenarios.mjs",
     "check:visual:current-thread": "pnpm build:demo && node scripts/check-current-thread-visual.mjs",
     "check:visual:streaming": "pnpm build:demo && node scripts/check-visual-scenarios.mjs --scenes=current-thread-streaming",
+    "check:visual:workflow": "pnpm build:demo && node scripts/check-visual-scenarios.mjs --scenes=current-thread-tool-call,current-thread-approval,current-workspace-file-diff",
     "check:research": "node scripts/check-research-inventory.mjs",
     "prepack": "node scripts/prepack.mjs",
     "test": "vitest run tests",
