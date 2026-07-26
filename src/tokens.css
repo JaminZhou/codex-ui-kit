@@ -242,6 +242,13 @@
 :root,
 [data-theme="light"] {
   color-scheme: light;
+  --codex-ui-conversation-thread-background: var(
+    --codex-ui-background-surface
+  );
+  --codex-ui-conversation-thread-composer-background: var(
+    --codex-ui-background-elevated-primary-opaque
+  );
+  --codex-ui-conversation-thread-header-border: var(--codex-ui-border);
   --codex-ui-code-syntax-comment-style: italic;
   --codex-ui-background-surface: var(--codex-ui-gray-0);
   --codex-ui-background-surface-under: var(--codex-ui-gray-50);

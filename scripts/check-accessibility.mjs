@@ -229,6 +229,39 @@ async function validateCurrentThreadShell(page) {
     if (shell.scrollWidth > shell.clientWidth) {
       errors.push("conversation shell overflowed horizontally");
     }
+
+    const originalShellTheme = shell.getAttribute("data-theme");
+    shell.setAttribute("data-theme", "light");
+    const lightStyles = getComputedStyle(shell);
+    const readToken = (name) =>
+      lightStyles.getPropertyValue(name).replace(/\s+/g, " ").trim();
+    const lightAliases = [
+      [
+        "--codex-ui-conversation-thread-background",
+        "--codex-ui-background-surface",
+      ],
+      [
+        "--codex-ui-conversation-thread-composer-background",
+        "--codex-ui-background-elevated-primary-opaque",
+      ],
+      [
+        "--codex-ui-conversation-thread-header-border",
+        "--codex-ui-border",
+      ],
+    ];
+    for (const [conversationToken, semanticToken] of lightAliases) {
+      if (readToken(conversationToken) !== readToken(semanticToken)) {
+        errors.push(
+          `${conversationToken} did not reset to ${semanticToken} in a forced light subtree`,
+        );
+      }
+    }
+    if (originalShellTheme === null) {
+      shell.removeAttribute("data-theme");
+    } else {
+      shell.setAttribute("data-theme", originalShellTheme);
+    }
+
     return errors;
   });
 }
