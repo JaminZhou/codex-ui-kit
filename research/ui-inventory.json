@@ -19,7 +19,7 @@
       "ownership": "app",
       "packageEvidence": ["local-conversation-page", "remote-conversation-page", "chatgpt-conversation-page"],
       "runtimeStatus": "not_sampled",
-      "implementationStatus": "not_started",
+      "implementationStatus": "partial",
       "browserStatus": "not_started",
       "electronStatus": "not_started",
       "priority": "p0"
@@ -323,8 +323,11 @@
       "area": "app-shell",
       "ownership": "app",
       "packageEvidence": ["projects-index-page"],
-      "runtimeStatus": "not_sampled",
-      "implementationStatus": "not_started",
+      "runtimeStatus": "runtime_observed",
+      "runtimeEvidence": [
+        "cdp-26.721:projects-entry-and-deidentified-list-structure"
+      ],
+      "implementationStatus": "partial",
       "browserStatus": "not_started",
       "electronStatus": "not_started",
       "priority": "p0"
@@ -503,9 +506,9 @@
       "packageEvidence": ["worktrees-settings-page", "stable-worktree-status-dialog", "worktree-setup-auto-fix"],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": ["cdp:worktree-settings-empty-state-and-retention-controls"],
-      "implementationStatus": "not_started",
-      "browserStatus": "not_started",
-      "electronStatus": "not_started",
+      "implementationStatus": "partial",
+      "browserStatus": "partial_legacy",
+      "electronStatus": "partial_legacy",
       "priority": "p0"
     },
     {

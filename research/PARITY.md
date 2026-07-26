@@ -27,7 +27,9 @@ The authoritative current-build inventory is:
   panels, state transitions, or window types.
 - Computer Use exploration is blocked by the environment safety policy for
   `com.openai.codex`. A user-authorized CDP probe revalidated current-build
-  access and the main-shell target shape. The broader blank-chat, command,
+  access, the main-shell target shape, and a de-identified Projects entry/list
+  structure. It did not expose project contents, Worktree controls, or the
+  separate local/remote/ChatGPT transitions. The broader blank-chat, command,
   queue, Markdown, panel, menu, global-route, and Settings observations remain
   historical evidence from `26.715.72359` until sampled again.
 - Renderer viewport probing exposed a narrow-layout gap: the thread and

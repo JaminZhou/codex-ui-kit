@@ -29,6 +29,8 @@ import {
   ConversationEvent,
   ConversationEventList,
   type ConversationEventKind,
+  ConversationRouteSelector,
+  type ConversationRouteOption,
   Dialog,
   DialogChoice,
   type DialogSize,
@@ -47,6 +49,9 @@ import {
   type NoticeTone,
   ProposedPlan,
   Popover,
+  ProjectConversationPage,
+  ProjectIndex,
+  type ProjectIndexItem,
   ProjectPicker,
   PullRequestCheckList,
   PullRequestDetails,
@@ -88,6 +93,8 @@ import {
   Tooltip,
   WorkspacePanel,
   WorkspaceSelection,
+  WorktreeList,
+  type WorktreeListItem,
   WorktreePicker,
   formatCommandDuration,
   fileDiffToText,
@@ -133,6 +140,18 @@ const noticeAction: StatusBannerAction = {
 };
 const composerLayout: ComposerLayout = "auto";
 const conversationEventKind: ConversationEventKind = "command";
+const conversationRoute: ConversationRouteOption = {
+  id: "local",
+  label: "Local",
+};
+const projectIndexItem: ProjectIndexItem = {
+  id: "package-project",
+  label: "Package project",
+};
+const worktreeListItem: WorktreeListItem = {
+  id: "package-worktree",
+  label: "Package worktree",
+};
 const mentionOption: ComposerMentionOption = {
   id: "package-consumer",
   label: "Package consumer",
@@ -185,9 +204,12 @@ void ComposerMentionMenu;
 void ComposerModeIndicator;
 void ConversationEvent;
 void ConversationEventList;
+void ConversationRouteSelector;
 void Dialog;
 void DialogChoice;
 void ProposedPlan;
+void ProjectConversationPage;
+void ProjectIndex;
 void ProjectPicker;
 void PullRequestCheckList;
 void PullRequestDetails;
@@ -233,6 +255,7 @@ void Select;
 void Tooltip;
 void WorkspacePanel;
 void WorkspaceSelection;
+void WorktreeList;
 void WorktreePicker;
 void formatCommandDuration;
 void fileDiffToText([line]);
@@ -249,6 +272,9 @@ void noticeTone;
 void noticeAction;
 void composerLayout;
 void conversationEventKind;
+void conversationRoute;
+void projectIndexItem;
+void worktreeListItem;
 void mentionOption;
 void queuedPrompt;
 void generatedImage;

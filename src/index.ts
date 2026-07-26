@@ -26,4 +26,5 @@ export * from "./components/AppShell.js";
 export * from "./components/ConversationEvents.js";
 export * from "./components/WorkspaceSelection.js";
 export * from "./components/PullRequestSurfaces.js";
+export * from "./components/ProjectConversationRouting.js";
 export * from "./types.js";

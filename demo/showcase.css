@@ -287,6 +287,10 @@ code {
   min-width: 0;
 }
 
+.workflow-preview > .codex-ui-project-conversation-page {
+  height: 36rem;
+}
+
 .workflow-preview__grid {
   align-items: stretch;
   display: grid;
@@ -1393,6 +1397,11 @@ code {
   }
 
   .workflow-preview > .codex-ui-pull-request-page {
+    height: auto;
+    max-height: none;
+  }
+
+  .workflow-preview > .codex-ui-project-conversation-page {
     height: auto;
     max-height: none;
   }

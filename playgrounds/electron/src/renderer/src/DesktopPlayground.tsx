@@ -28,6 +28,7 @@ import {
   ComposerModeIndicator,
   ConversationEvent,
   ConversationEventList,
+  ConversationRouteSelector,
   Dialog,
   DialogChoice,
   FileChange,
@@ -48,6 +49,8 @@ import {
   Popover,
   ProposedPlan,
   ProjectPicker,
+  ProjectConversationPage,
+  ProjectIndex,
   PullRequestCheckList,
   PullRequestDetails,
   PullRequestList,
@@ -84,6 +87,7 @@ import {
   TurnDuration,
   WorkspaceSelection,
   WorktreePicker,
+  WorktreeList,
   type ApprovalDecision,
   type FileDiffLine,
   type GeneratedImageItem,
@@ -382,6 +386,12 @@ export function DesktopPlayground() {
     useState("worktree");
   const [workflowWorktree, setWorkflowWorktree] =
     useState("feature");
+  const [routingProject, setRoutingProject] = useState("ui-kit");
+  const [routingRoute, setRoutingRoute] = useState("local");
+  const [routingWorktree, setRoutingWorktree] = useState("routing");
+  const [routingStatus, setRoutingStatus] = useState(
+    "Desktop routing ready",
+  );
   const [selectedPullRequest, setSelectedPullRequest] = useState("51");
   const [activeNavigationMessageId, setActiveNavigationMessageId] = useState<string>(
     desktopNavigationMessages[2].id,
@@ -1601,6 +1611,129 @@ export function DesktopPlayground() {
               <span className="acceptance-badge">desktop workflow</span>
             </header>
             <div className="acceptance-card__body workflow-state-matrix">
+              <ProjectConversationPage
+                actions={<Button size="small">Open folder</Button>}
+                description="Keep application, conversation, and workspace ownership explicit while entering a new task."
+                footer={
+                  <>
+                    <output
+                      aria-live="polite"
+                      data-workflow-state="routing"
+                    >
+                      {routingStatus}
+                    </output>
+                    <Button
+                      onClick={() =>
+                        setRoutingStatus(
+                          `${routingProject}/${routingRoute}/${routingWorktree}`,
+                        )
+                      }
+                      size="small"
+                      tone="primary"
+                    >
+                      Start conversation
+                    </Button>
+                  </>
+                }
+                projects={
+                  <ProjectIndex
+                    actions={<Button size="small">Add</Button>}
+                    items={[
+                      {
+                        description: "Component workspace",
+                        id: "ui-kit",
+                        label: "UI Kit",
+                        meta: "3 tasks",
+                        path: "/Developer/codex-ui-kit",
+                      },
+                      {
+                        description: "Desktop application",
+                        id: "desktop",
+                        label: "Desktop",
+                        meta: "1 task",
+                        path: "/Applications/ChatGPT.app",
+                      },
+                      {
+                        id: "repair",
+                        label: "Unavailable project",
+                        status: "unavailable",
+                        statusLabel: "Repair",
+                      },
+                    ]}
+                    onSelect={(projectId) => {
+                      setRoutingProject(projectId);
+                      setRoutingWorktree(
+                        projectId === "desktop" ? "main" : "routing",
+                      );
+                      setRoutingStatus(`Selected ${projectId}`);
+                    }}
+                    selectedId={routingProject}
+                    toolbar={
+                      <input
+                        aria-label="Search desktop projects"
+                        placeholder="Search projects"
+                        type="search"
+                      />
+                    }
+                  />
+                }
+                title="Project to conversation"
+              >
+                <ConversationRouteSelector
+                  description="Choose a protocol-neutral route before creating the conversation."
+                  onValueChange={setRoutingRoute}
+                  options={[
+                    {
+                      description: "Use the selected checkout",
+                      id: "local",
+                      label: "Local",
+                    },
+                    {
+                      description: "Managed environment",
+                      id: "remote",
+                      label: "Remote",
+                      status: "unavailable",
+                      statusLabel: "Unavailable",
+                    },
+                    {
+                      description: "General conversation",
+                      id: "chatgpt",
+                      label: "ChatGPT",
+                    },
+                  ]}
+                  value={routingRoute}
+                />
+                <WorktreeList
+                  actions={<Button size="small">New worktree</Button>}
+                  description="Select the checkout that owns file and command state."
+                  items={[
+                    {
+                      branch: "feat/project-conversation-routing",
+                      id: "routing",
+                      label: "Routing surfaces",
+                      meta: "2 changes",
+                      path: "/worktrees/routing",
+                    },
+                    {
+                      branch: "main",
+                      id: "main",
+                      label: "Main checkout",
+                      meta: "clean",
+                      path: "/Developer/codex-ui-kit",
+                    },
+                    {
+                      branch: "fix/repair",
+                      id: "repairing",
+                      label: "Repairing checkout",
+                      status: "repairing",
+                      statusLabel: "Repairing",
+                    },
+                  ]}
+                  onSelect={setRoutingWorktree}
+                  selectedId={routingWorktree}
+                />
+              </ProjectConversationPage>
+
               <WorkspaceSelection
                 description="Choose the repository context for this session."
                 footer={
