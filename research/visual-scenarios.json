@@ -496,6 +496,314 @@
           "width": 666
         }
       ]
+    },
+    {
+      "capture": "current-compact-search-tool",
+      "colorScheme": "dark",
+      "geometry": {
+        "assistant": ".codex-ui-agent-message[data-role=\"assistant\"] .codex-ui-agent-message__content",
+        "composer": ".codex-ui-composer",
+        "header": ".codex-ui-conversation-thread-shell__header",
+        "search": ".codex-ui-search-activity .codex-ui-activity__header",
+        "timeline": ".workflow-pixel-fixture__timeline .codex-ui-activity-timeline__toggle > span:first-child",
+        "user": ".codex-ui-agent-message[data-role=\"user\"] .codex-ui-agent-message__content"
+      },
+      "expectedGeometry": {
+        "assistant": {
+          "height": 22,
+          "left": 16,
+          "top": 349,
+          "width": 494
+        },
+        "composer": {
+          "borderRadius": "20px",
+          "height": 98,
+          "left": 16,
+          "top": 486,
+          "width": 494
+        },
+        "header": {
+          "height": 46,
+          "left": 0,
+          "top": 0,
+          "width": 526
+        },
+        "search": {
+          "height": 22,
+          "left": 16,
+          "top": 311,
+          "width": 494
+        },
+        "timeline": {
+          "height": 21,
+          "left": 17,
+          "top": 230,
+          "width": 99
+        },
+        "user": {
+          "borderRadius": "16px",
+          "height": 104,
+          "left": 130,
+          "top": 79,
+          "width": 380
+        }
+      },
+      "id": "current-compact-search-tool",
+      "masks": [],
+      "maximumDiffRatio": 0.037,
+      "pixelThreshold": 0.05,
+      "referenceEnv": "CODEX_UI_KIT_COMPACT_SEARCH_REFERENCE",
+      "regions": [
+        {
+          "height": 46,
+          "maximumDiffRatio": 0.065,
+          "name": "header",
+          "top": 0
+        },
+        {
+          "height": 400,
+          "maximumDiffRatio": 0.042,
+          "name": "turn",
+          "top": 46
+        },
+        {
+          "fromBottom": 114,
+          "height": 114,
+          "maximumDiffRatio": 0.024,
+          "name": "composer"
+        }
+      ]
+    },
+    {
+      "capture": "current-compact-browser-tool",
+      "colorScheme": "dark",
+      "geometry": {
+        "assistant": ".codex-ui-agent-message[data-role=\"assistant\"] .codex-ui-agent-message__content",
+        "browser": ".codex-ui-browser-activity .codex-ui-activity__header",
+        "browserSteps": ".codex-ui-browser-activity__steps",
+        "composer": ".codex-ui-composer",
+        "header": ".codex-ui-conversation-thread-shell__header",
+        "timeline": ".workflow-pixel-fixture__timeline .codex-ui-activity-timeline__toggle > span:first-child",
+        "user": ".codex-ui-agent-message[data-role=\"user\"] .codex-ui-agent-message__content"
+      },
+      "expectedGeometry": {
+        "assistant": {
+          "height": 22,
+          "left": 16,
+          "top": 407,
+          "width": 494
+        },
+        "browser": {
+          "height": 22,
+          "left": 16,
+          "top": 293,
+          "width": 494
+        },
+        "browserSteps": {
+          "height": 66,
+          "left": 16,
+          "top": 325,
+          "width": 494
+        },
+        "composer": {
+          "borderRadius": "20px",
+          "height": 98,
+          "left": 16,
+          "top": 486,
+          "width": 494
+        },
+        "header": {
+          "height": 46,
+          "left": 0,
+          "top": 0,
+          "width": 526
+        },
+        "timeline": {
+          "height": 21,
+          "left": 17,
+          "top": 156,
+          "width": 99
+        },
+        "user": {
+          "borderRadius": "16px",
+          "height": 104,
+          "left": 130,
+          "top": 5,
+          "width": 380
+        }
+      },
+      "id": "current-compact-browser-tool",
+      "masks": [],
+      "maximumDiffRatio": 0.062,
+      "pixelThreshold": 0.05,
+      "referenceEnv": "CODEX_UI_KIT_COMPACT_BROWSER_REFERENCE",
+      "regions": [
+        {
+          "height": 46,
+          "maximumDiffRatio": 0.068,
+          "name": "header",
+          "top": 0
+        },
+        {
+          "height": 440,
+          "maximumDiffRatio": 0.071,
+          "name": "turn",
+          "top": 46
+        },
+        {
+          "fromBottom": 114,
+          "height": 114,
+          "maximumDiffRatio": 0.024,
+          "name": "composer"
+        }
+      ]
+    },
+    {
+      "capture": "current-compact-mcp-unavailable",
+      "colorScheme": "dark",
+      "geometry": {
+        "assistant": ".codex-ui-agent-message[data-role=\"assistant\"] .codex-ui-agent-message__content",
+        "composer": ".codex-ui-composer",
+        "header": ".codex-ui-conversation-thread-shell__header",
+        "timeline": ".workflow-pixel-fixture__timeline .codex-ui-activity-timeline__toggle > span:first-child",
+        "user": ".codex-ui-agent-message[data-role=\"user\"] .codex-ui-agent-message__content"
+      },
+      "expectedGeometry": {
+        "assistant": {
+          "height": 22,
+          "left": 16,
+          "top": 295,
+          "width": 494
+        },
+        "composer": {
+          "borderRadius": "20px",
+          "height": 98,
+          "left": 16,
+          "top": 486,
+          "width": 494
+        },
+        "header": {
+          "height": 46,
+          "left": 0,
+          "top": 0,
+          "width": 526
+        },
+        "timeline": {
+          "height": 21,
+          "left": 17,
+          "top": 252,
+          "width": 121
+        },
+        "user": {
+          "borderRadius": "16px",
+          "height": 126,
+          "left": 130,
+          "top": 79,
+          "width": 380
+        }
+      },
+      "id": "current-compact-mcp-unavailable",
+      "masks": [],
+      "maximumDiffRatio": 0.035,
+      "pixelThreshold": 0.05,
+      "referenceEnv": "CODEX_UI_KIT_COMPACT_MCP_UNAVAILABLE_REFERENCE",
+      "regions": [
+        {
+          "height": 46,
+          "maximumDiffRatio": 0.067,
+          "name": "header",
+          "top": 0
+        },
+        {
+          "height": 400,
+          "maximumDiffRatio": 0.038,
+          "name": "turn",
+          "top": 46
+        },
+        {
+          "fromBottom": 114,
+          "height": 114,
+          "maximumDiffRatio": 0.024,
+          "name": "composer"
+        }
+      ]
+    },
+    {
+      "capture": "current-compact-command-failure",
+      "colorScheme": "dark",
+      "geometry": {
+        "assistant": ".codex-ui-agent-message[data-role=\"assistant\"] .codex-ui-agent-message__content",
+        "command": ".codex-ui-command-execution .codex-ui-activity__header",
+        "composer": ".codex-ui-composer",
+        "header": ".codex-ui-conversation-thread-shell__header",
+        "timeline": ".workflow-pixel-fixture__timeline .codex-ui-activity-timeline__toggle > span:first-child",
+        "user": ".codex-ui-agent-message[data-role=\"user\"] .codex-ui-agent-message__content"
+      },
+      "expectedGeometry": {
+        "assistant": {
+          "height": 22,
+          "left": 16,
+          "top": 327,
+          "width": 494
+        },
+        "command": {
+          "height": 22,
+          "left": 16,
+          "top": 289,
+          "width": 494
+        },
+        "composer": {
+          "borderRadius": "20px",
+          "height": 98,
+          "left": 16,
+          "top": 486,
+          "width": 494
+        },
+        "header": {
+          "height": 46,
+          "left": 0,
+          "top": 0,
+          "width": 526
+        },
+        "timeline": {
+          "height": 21,
+          "left": 17,
+          "top": 208,
+          "width": 89
+        },
+        "user": {
+          "borderRadius": "16px",
+          "height": 82,
+          "left": 130,
+          "top": 79,
+          "width": 380
+        }
+      },
+      "id": "current-compact-command-failure",
+      "masks": [],
+      "maximumDiffRatio": 0.032,
+      "pixelThreshold": 0.05,
+      "referenceEnv": "CODEX_UI_KIT_COMPACT_COMMAND_FAILURE_REFERENCE",
+      "regions": [
+        {
+          "height": 46,
+          "maximumDiffRatio": 0.061,
+          "name": "header",
+          "top": 0
+        },
+        {
+          "height": 400,
+          "maximumDiffRatio": 0.034,
+          "name": "turn",
+          "top": 46
+        },
+        {
+          "fromBottom": 114,
+          "height": 114,
+          "maximumDiffRatio": 0.024,
+          "name": "composer"
+        }
+      ]
     }
   ]
 }

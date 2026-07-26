@@ -54,9 +54,9 @@ observation from a previous build remains historical evidence.
 - Scoped CDP automation: available through a user-authorized second process;
   the Chromium profile is separate, but Codex application data and navigation
   are not fully isolated
-- Current inventory: 58 surface groups; 33 have scoped runtime evidence, of
-  which 12 include current-build structural evidence and 21 are previous-build
-  only; another 25 remain `not_sampled`
+- Current inventory: 61 surface groups; 38 have scoped runtime evidence, of
+  which 20 include current-build structural evidence and 18 are previous-build
+  only; another 23 remain `not_sampled`
 
 The current package exposes candidates far beyond the old transcript sample:
 application and thread shells, local/remote conversation routes, projects and
@@ -210,8 +210,27 @@ side-panel/file-diff composition is likewise Browser-verified but remains
 Electron-partial until that exact cross-owner split is added to the Electron
 acceptance surface.
 
+The compact tool/recovery slice splits the former combined
+`thread.search-tool-mcp-events` candidate into independent search, Browser, and
+MCP tool-event rows. Current-build CDP evidence promotes completed web search
+and Browser activity, while the unsuccessful GitHub request is tracked
+separately as `thread.tool-unavailable-recovery`: it proves the visible
+assistant recovery message, not an MCP call. `BrowserActivity` supplies a
+protocol-neutral completed/running/failed disclosure with ordered browser
+steps, and the Electron playground exercises that public component without
+claiming exact compact-window parity.
+
+Four external 526×600 main-only references now gate completed web search,
+expanded Browser steps, unavailable-MCP recovery, and a failed exit-code-7
+command. The Browser fixture explicitly represents the sampled
+auto-follow/scroll position. Search, unavailable recovery, and failed-command
+geometry remain independent, so a passing plain assistant fallback cannot
+promote MCP tool rendering and a failed command cannot promote thread-level
+render/retry recovery.
+
 This is a measurement- and raster-backed basic thread slice, not a claim that
 the whole application or every thread lifecycle is pixel-perfect. Markdown
-variants, virtualization, cancellation results, search/MCP/browser tools,
-approval persistence and timeout, multi-file review, failure states, and
-native window behavior retain their own inventory gates.
+variants, virtualization, cancellation results, code search, successful MCP
+and connector calls, thread-level retry recovery, approval persistence and
+timeout, multi-file review, and native window behavior retain their own
+inventory gates.

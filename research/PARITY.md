@@ -31,11 +31,15 @@ The authoritative current-build inventory is:
   the new-chat destination/context split, Project and Local environment
   overlays, a disposable synthetic task's basic thread lifecycle, an expanded
   read-only command, a pending command approval, and the split between a
-  turn-owned file-change card and workspace-owned Review diff. They did not
-  expose private project contents, Remote behavior, real cancellation results,
-  search/MCP/browser tool variants, or the broader error, queue, Markdown,
-  menu, global-route, and Settings states; those remain historical evidence
-  from `26.715.72359` until sampled again.
+  turn-owned file-change card and workspace-owned Review diff. A later compact
+  probe also reached completed web search, expanded Browser activity, a failed
+  exit-code-7 command, and the assistant fallback shown when no GitHub
+  connector/MCP tool is available. The fallback does not establish a real MCP
+  event. The probes did not expose private project contents, Remote behavior,
+  real cancellation results, code search, successful MCP/connector calls, or
+  the broader thread-error, queue, Markdown, menu, global-route, and Settings
+  states; those remain historical evidence from `26.715.72359` until sampled
+  again.
 - Renderer viewport probing exposed a narrow-layout gap: the thread and
   Composer shrink, but the fixed app sidebar remains and the right workspace
   panel can be laid out beyond the simulated viewport. The independently
@@ -70,10 +74,13 @@ product-level parity.
 
 H5 and Electron are used continuously as functional acceptance surfaces. The
 current thread slice now has scenario-driven, main-only completed, streaming,
-expanded-command, pending-approval, and file-review raster fixtures with
-independent selectors, ownership masks, horizontally scoped left/right
-regions, and regional PNG diff thresholds. The references remain build-scoped
-external evidence rather than redistributed application assets.
+expanded-command, pending-approval, file-review, web-search, Browser,
+unavailable-MCP, and failed-command raster fixtures with independent selectors,
+ownership masks, horizontally scoped left/right regions, and regional PNG diff
+thresholds. The references remain build-scoped external evidence rather than
+redistributed application assets. The 526×600 compact Browser scene locks the
+sampled follow-to-latest scroll position; it is not represented as a native
+window resize.
 
 Broader final visual optimization remains scheduled after the remaining
 inventory, page compositions, and state transitions stabilize. A passing

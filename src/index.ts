@@ -9,6 +9,7 @@ export * from "./components/ConversationThreadShell.js";
 export * from "./components/AgentComposer.js";
 export * from "./components/ComposerAuxiliary.js";
 export * from "./components/ApprovalRequest.js";
+export * from "./components/BrowserActivity.js";
 export * from "./components/CommandExecution.js";
 export * from "./components/Dialog.js";
 export * from "./components/FileChange.js";

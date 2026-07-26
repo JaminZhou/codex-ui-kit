@@ -30,12 +30,19 @@ describe("current-thread visual contract", () => {
       "current-thread-tool-call",
       "current-thread-approval",
       "current-workspace-file-diff",
+      "current-compact-search-tool",
+      "current-compact-browser-tool",
+      "current-compact-mcp-unavailable",
+      "current-compact-command-failure",
     ]);
     expect(packageJson.scripts["check:visual:streaming"]).toContain(
       "--scenes=current-thread-streaming",
     );
     expect(packageJson.scripts["check:visual:workflow"]).toContain(
       "--scenes=current-thread-tool-call,current-thread-approval,current-workspace-file-diff",
+    );
+    expect(packageJson.scripts["check:visual:tool-recovery"]).toContain(
+      "--scenes=current-compact-search-tool,current-compact-browser-tool,current-compact-mcp-unavailable,current-compact-command-failure",
     );
   });
 
