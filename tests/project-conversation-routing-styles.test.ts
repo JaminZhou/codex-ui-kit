@@ -25,12 +25,30 @@ describe("project conversation routing visual contract", () => {
     );
   });
 
+  it("centers new-conversation context and bounds the environment dialog", () => {
+    expect(styles).toMatch(
+      /\.codex-ui-new-conversation-start \{[\s\S]*?container-name: codex-ui-new-conversation-start;[\s\S]*?max-width: 37\.5rem;[\s\S]*?min-height: 24rem/,
+    );
+    expect(styles).toMatch(
+      /\.codex-ui-conversation-context-bar \{[\s\S]*?display: flex;[\s\S]*?flex-wrap: wrap;[\s\S]*?justify-content: center/,
+    );
+    expect(styles).toMatch(
+      /\.codex-ui-local-environment-dialog \.codex-ui-dialog__surface \{[\s\S]*?height: min\(37\.5rem,[\s\S]*?overflow: hidden;[\s\S]*?width: min\(37\.5rem, 100%\)/,
+    );
+    expect(styles).toMatch(
+      /\.codex-ui-local-environment-dialog__groups \{[\s\S]*?min-height: 0;[\s\S]*?overflow: auto/,
+    );
+  });
+
   it("stacks routing and project selection at compact widths", () => {
     expect(styles).toMatch(
       /@container codex-ui-project-conversation-page \(max-width: 48rem\)[\s\S]*?\.codex-ui-project-conversation-page__body \{[\s\S]*?grid-template-columns: minmax\(0, 1fr\);[\s\S]*?grid-template-rows: auto minmax\(0, 1fr\)/,
     );
     expect(styles).toMatch(
       /@container codex-ui-project-conversation-page \(max-width: 34rem\)[\s\S]*?\.codex-ui-conversation-route-selector__options \{[\s\S]*?grid-template-columns: minmax\(0, 1fr\)/,
+    );
+    expect(styles).toMatch(
+      /@container codex-ui-new-conversation-start \(max-width: 30rem\)[\s\S]*?\.codex-ui-conversation-context-bar \{[\s\S]*?grid-template-columns: repeat\(3, minmax\(0, 1fr\)\)/,
     );
   });
 

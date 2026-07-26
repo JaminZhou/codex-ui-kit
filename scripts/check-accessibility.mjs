@@ -220,6 +220,37 @@ const overlayCases = [
     ],
   },
   {
+    linkages: [
+      {
+        attribute: "aria-controls",
+        role: "dialog",
+        trigger:
+          '[data-local-environment-context="true"] [data-kind="environment"]',
+      },
+    ],
+    name: "local environment dialog",
+    open: async (page) => {
+      await page.click(
+        '[data-local-environment-context="true"] [data-kind="environment"]',
+      );
+      await page.waitForSelector(
+        '#showcase-local-environment-dialog[role="dialog"]',
+      );
+      await waitForFocusWithin(
+        page,
+        "#showcase-local-environment-dialog",
+      );
+    },
+    targets: [
+      {
+        focusWithin: true,
+        modal: true,
+        role: "dialog",
+        selector: "#showcase-local-environment-dialog",
+      },
+    ],
+  },
+  {
     name: "image preview dialog",
     open: async (page) => {
       await page.click(

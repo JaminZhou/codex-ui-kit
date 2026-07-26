@@ -14,14 +14,32 @@
   },
   "surfaces": [
     {
-      "id": "conversation.routing",
+      "id": "conversation.destination",
       "area": "conversation",
       "ownership": "app",
       "packageEvidence": ["local-conversation-page", "remote-conversation-page", "chatgpt-conversation-page"],
-      "runtimeStatus": "not_sampled",
+      "runtimeStatus": "runtime_observed",
+      "runtimeEvidence": [
+        "cdp-26.721:new-chat-chatgpt-destination-and-worktree-prompt"
+      ],
       "implementationStatus": "partial",
-      "browserStatus": "not_started",
-      "electronStatus": "not_started",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
+      "priority": "p0"
+    },
+    {
+      "id": "conversation.context-controls",
+      "area": "conversation",
+      "ownership": "cross-layer",
+      "packageEvidence": ["composer-project-selector", "worktree-environment-dropdown"],
+      "runtimeStatus": "runtime_observed",
+      "runtimeEvidence": [
+        "cdp-26.721:new-chat-project-local-main-context-controls",
+        "cdp-26.721:local-environment-dialog-600x600-scrollable-group-structure"
+      ],
+      "implementationStatus": "partial",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
       "priority": "p0"
     },
     {
@@ -255,7 +273,9 @@
       "runtimeEvidence": [
         "cdp:project-local-and-branch-controls",
         "cdp:local-cloud-worktree-location-menu",
-        "cdp:branch-menu-current-and-create-actions"
+        "cdp:branch-menu-current-and-create-actions",
+        "cdp-26.721:new-chat-project-local-main-context-controls",
+        "cdp-26.721:new-chat-project-popover-260x250-listbox-14-options"
       ],
       "implementationStatus": "partial",
       "browserStatus": "partial_legacy",
@@ -325,7 +345,8 @@
       "packageEvidence": ["projects-index-page"],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
-        "cdp-26.721:projects-entry-and-deidentified-list-structure"
+        "cdp-26.721:projects-entry-and-deidentified-list-structure",
+        "cdp-26.721:new-chat-project-popover-260x250-listbox-14-options"
       ],
       "implementationStatus": "partial",
       "browserStatus": "not_started",
@@ -350,10 +371,14 @@
       "ownership": "app",
       "packageEvidence": ["new-thread-panel-page", "select-workspace-page"],
       "runtimeStatus": "runtime_observed",
-      "runtimeEvidence": ["cdp:blank-new-chat-and-project-menu"],
+      "runtimeEvidence": [
+        "cdp:blank-new-chat-and-project-menu",
+        "cdp-26.721:new-chat-chatgpt-destination-and-worktree-prompt",
+        "cdp-26.721:new-chat-project-local-main-context-controls"
+      ],
       "implementationStatus": "partial",
-      "browserStatus": "partial_legacy",
-      "electronStatus": "partial_legacy",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
       "priority": "p0"
     },
     {
@@ -493,10 +518,13 @@
       "ownership": "workspace",
       "packageEvidence": ["local-environment-editor", "local-environments-settings-page", "cloud-environments-settings-page"],
       "runtimeStatus": "runtime_observed",
-      "runtimeEvidence": ["cdp:environment-side-panel-and-settings-project-index"],
-      "implementationStatus": "not_started",
-      "browserStatus": "not_started",
-      "electronStatus": "not_started",
+      "runtimeEvidence": [
+        "cdp:environment-side-panel-and-settings-project-index",
+        "cdp-26.721:local-environment-dialog-600x600-scrollable-group-structure"
+      ],
+      "implementationStatus": "partial",
+      "browserStatus": "partial_legacy",
+      "electronStatus": "partial_legacy",
       "priority": "p1"
     },
     {
@@ -505,7 +533,10 @@
       "ownership": "workspace",
       "packageEvidence": ["worktrees-settings-page", "stable-worktree-status-dialog", "worktree-setup-auto-fix"],
       "runtimeStatus": "runtime_observed",
-      "runtimeEvidence": ["cdp:worktree-settings-empty-state-and-retention-controls"],
+      "runtimeEvidence": [
+        "cdp:worktree-settings-empty-state-and-retention-controls",
+        "cdp-26.721:local-environment-worktree-groups-and-main-context"
+      ],
       "implementationStatus": "partial",
       "browserStatus": "partial_legacy",
       "electronStatus": "partial_legacy",

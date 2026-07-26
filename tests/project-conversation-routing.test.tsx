@@ -10,7 +10,10 @@ import {
 import { useState } from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import {
+  ConversationContextBar,
   ConversationRouteSelector,
+  LocalEnvironmentDialog,
+  NewConversationStart,
   ProjectConversationPage,
   ProjectIndex,
   WorktreeList,
@@ -27,6 +30,138 @@ function accessibleDescriptionText(element: Element) {
 }
 
 describe("project conversation routing", () => {
+  it("separates conversation destination from project, environment, and worktree context", () => {
+    const onSelect = vi.fn();
+    render(
+      <NewConversationStart
+        composer={<textarea aria-label="Conversation prompt" />}
+        context={
+          <ConversationContextBar
+            expandedId="project"
+            items={[
+              {
+                controlsId: "project-options",
+                id: "project",
+                kind: "project",
+                label: "Project",
+                popupRole: "listbox",
+              },
+              {
+                id: "local",
+                kind: "environment",
+                label: "Local",
+              },
+              {
+                id: "main",
+                kind: "worktree",
+                label: "Main",
+              },
+              {
+                id: "repairing",
+                kind: "worktree",
+                label: "Repairing",
+                status: "repairing",
+                statusLabel: "Repairing",
+              },
+            ]}
+            onSelect={onSelect}
+          />
+        }
+        destination="ChatGPT"
+        prompt={<button type="button">Choose a project for worktrees</button>}
+      />,
+    );
+
+    const setup = screen.getByRole("region", {
+      name: "New conversation setup",
+    });
+    expect(within(setup).getByText("ChatGPT")).toBeTruthy();
+    expect(
+      within(setup).getByRole("textbox", { name: "Conversation prompt" }),
+    ).toBeTruthy();
+    const project = within(setup).getByRole("button", {
+      name: "Change project: Project",
+    });
+    expect(project.getAttribute("aria-controls")).toBe(
+      "project-options",
+    );
+    expect(project.getAttribute("aria-expanded")).toBe("true");
+    expect(project.getAttribute("aria-haspopup")).toBe("listbox");
+    fireEvent.click(
+      within(setup).getByRole("button", {
+        name: "Change environment: Local",
+      }),
+    );
+    expect(onSelect).toHaveBeenCalledWith("local");
+    const repairing = within(setup).getByRole("button", {
+      name: "Change worktree: Repairing",
+    });
+    expect(repairing).toHaveProperty("disabled", true);
+    expect(accessibleDescriptionText(repairing)).toContain("Repairing");
+  });
+
+  it("renders grouped local environments in a controlled dialog", () => {
+    const onOpenChange = vi.fn();
+    const onQueryChange = vi.fn();
+    const onSelect = vi.fn();
+    render(
+      <LocalEnvironmentDialog
+        createAction={<button type="button">Create environment</button>}
+        groups={[
+          {
+            description: "Current checkout and linked worktrees",
+            id: "ui-kit",
+            items: [
+              {
+                branch: "main",
+                id: "main",
+                label: "Main",
+                meta: "clean",
+              },
+              {
+                branch: "fix/repair",
+                id: "repairing",
+                label: "Repairing",
+                status: "repairing",
+                statusLabel: "Repairing",
+              },
+            ],
+            label: "UI Kit",
+          },
+        ]}
+        onOpenChange={onOpenChange}
+        onQueryChange={onQueryChange}
+        onSelect={onSelect}
+        open
+        query=""
+      />,
+    );
+
+    const dialog = screen.getByRole("dialog", {
+      name: "Create local environment",
+    });
+    const search = within(dialog).getByRole("searchbox", {
+      name: "Search local environments",
+    });
+    fireEvent.change(search, { target: { value: "main" } });
+    expect(onQueryChange).toHaveBeenCalledWith("main");
+    const main = within(dialog).getByRole("button", {
+      name: "Use local environment Main",
+    });
+    expect(accessibleDescriptionText(main)).toContain("main");
+    expect(accessibleDescriptionText(main)).toContain("clean");
+    fireEvent.click(main);
+    expect(onSelect).toHaveBeenCalledWith("ui-kit", "main");
+    const repairing = within(dialog).getByRole("button", {
+      name: "Use local environment Repairing",
+    });
+    expect(repairing).toHaveProperty("disabled", true);
+    expect(accessibleDescriptionText(repairing)).toContain("Repairing");
+    expect(
+      within(dialog).getByRole("button", { name: "Create environment" }),
+    ).toBeTruthy();
+  });
+
   it("composes application projects with conversation and workspace setup", () => {
     render(
       <ProjectConversationPage

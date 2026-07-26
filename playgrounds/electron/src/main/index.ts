@@ -170,16 +170,47 @@ async function captureWorkflowSurfaces(webContents: WebContents) {
     );
     routingProject?.click();
     await wait(80);
-    const routingRoute = card?.querySelector(
-      '.codex-ui-conversation-route-selector__option[data-route-id="chatgpt"]',
+    const routingEnvironment = card?.querySelector(
+      '[data-desktop-local-environment-context="true"] [data-kind="environment"]',
     );
-    routingRoute?.click();
-    await wait(80);
-    const routingWorktree = card?.querySelector(
-      '.codex-ui-worktree-list__item[aria-label="Open worktree Main checkout"]',
+    routingEnvironment?.click();
+    await wait(140);
+    const localEnvironmentDialog = document.querySelector(
+      '#desktop-local-environment-dialog',
     );
-    routingWorktree?.click();
-    await wait(80);
+    const expandedRoutingEnvironment = card?.querySelector(
+      '[data-desktop-local-environment-context="true"] [data-kind="environment"]',
+    );
+    const localEnvironmentSearch = localEnvironmentDialog?.querySelector(
+      '.codex-ui-local-environment-dialog__search',
+    );
+    const localEnvironmentMetrics = {
+      bounds: rect(localEnvironmentDialog),
+      groupCount:
+        localEnvironmentDialog?.querySelectorAll(
+          '.codex-ui-local-environment-dialog__group',
+        ).length ?? 0,
+      inViewport: inViewport(localEnvironmentDialog),
+      itemCount:
+        localEnvironmentDialog?.querySelectorAll(
+          '.codex-ui-local-environment-dialog__item',
+        ).length ?? 0,
+      repairingDisabledCount:
+        localEnvironmentDialog?.querySelectorAll(
+          '.codex-ui-local-environment-dialog__item[data-status="repairing"]:disabled',
+        ).length ?? 0,
+      role: localEnvironmentDialog?.getAttribute('role') ?? null,
+      searchFocused: document.activeElement === localEnvironmentSearch,
+      triggerControls:
+        expandedRoutingEnvironment?.getAttribute('aria-controls') ?? null,
+      triggerExpanded:
+        expandedRoutingEnvironment?.getAttribute('aria-expanded') ?? null,
+    };
+    const desktopMainEnvironment = localEnvironmentDialog?.querySelector(
+      '[aria-label="Use local environment Desktop main"]',
+    );
+    desktopMainEnvironment?.click();
+    await wait(100);
     const startConversation = [...(card?.querySelectorAll('button') ?? [])]
       .find((button) => button.textContent?.trim() === 'Start conversation');
     startConversation?.click();
@@ -302,39 +333,58 @@ async function captureWorkflowSurfaces(webContents: WebContents) {
       routingProjectsOverflowY: routingProjects
         ? getComputedStyle(routingProjects).overflowY
         : null,
-      routingRouteOptions: [
+      routingContextItems: [
         ...(routingPage?.querySelectorAll(
-          '.codex-ui-conversation-route-selector__option',
+          '.codex-ui-conversation-context-bar__item',
         ) ?? []),
-      ].map((option) => ({
-        bounds: rect(option),
-        checked: option.getAttribute('aria-checked'),
-        disabled: option.hasAttribute('disabled'),
-        routeId: option.getAttribute('data-route-id'),
+      ].map((item) => ({
+        bounds: rect(item),
+        controls: item.getAttribute('aria-controls'),
+        disabled: item.hasAttribute('disabled'),
+        kind: item.getAttribute('data-kind'),
+        label: item.getAttribute('aria-label'),
       })),
+      routingDestination:
+        routingPage?.querySelector(
+          '.codex-ui-new-conversation-start__header h3',
+        )?.textContent ?? null,
+      routingEnvironment:
+        routingPage
+          ?.querySelector(
+            '.codex-ui-conversation-context-bar__item[data-kind="environment"]',
+          )
+          ?.getAttribute('aria-label') ?? null,
+      routingNewConversation: rect(
+        routingPage?.querySelector('.codex-ui-new-conversation-start'),
+      ),
       routingSetup: rect(routingSetup),
       routingSetupOverflowY: routingSetup
         ? getComputedStyle(routingSetup).overflowY
         : null,
       routingState:
         card?.querySelector('[data-workflow-state="routing"]')?.textContent ?? null,
-      routingWorktreeItems: [
-        ...(routingPage?.querySelectorAll('.codex-ui-worktree-list__item') ?? []),
-      ].map(rect),
-      selectedConversationRoute:
-        routingPage
-          ?.querySelector(
-            '.codex-ui-conversation-route-selector__option[aria-checked="true"]',
-          )
-          ?.getAttribute('data-route-id') ?? null,
       selectedRoutingProject:
         routingPage
           ?.querySelector('.codex-ui-project-index__item[aria-current="page"]')
           ?.getAttribute('aria-label') ?? null,
       selectedRoutingWorktree:
         routingPage
-          ?.querySelector('.codex-ui-worktree-list__item[aria-current="location"]')
+          ?.querySelector(
+            '.codex-ui-conversation-context-bar__item[data-kind="worktree"]',
+          )
           ?.getAttribute('aria-label') ?? null,
+      localEnvironmentDialog: localEnvironmentMetrics.bounds,
+      localEnvironmentGroupCount: localEnvironmentMetrics.groupCount,
+      localEnvironmentInViewport: localEnvironmentMetrics.inViewport,
+      localEnvironmentItemCount: localEnvironmentMetrics.itemCount,
+      localEnvironmentRepairingDisabledCount:
+        localEnvironmentMetrics.repairingDisabledCount,
+      localEnvironmentRole: localEnvironmentMetrics.role,
+      localEnvironmentSearchFocused: localEnvironmentMetrics.searchFocused,
+      localEnvironmentTriggerControls:
+        localEnvironmentMetrics.triggerControls,
+      localEnvironmentTriggerExpanded:
+        localEnvironmentMetrics.triggerExpanded,
       runningEventBusy: runningEvent?.getAttribute('aria-busy') ?? null,
       selectedPullRequest: selectedPullRequest?.getAttribute('aria-label') ?? null,
       selectionText: card?.querySelector('[data-workflow-state="selection"]')?.textContent ?? null,
@@ -372,6 +422,33 @@ async function focusProjectRoutingSurface(webContents: WebContents) {
     return true;
   })()`);
   await new Promise((resolve) => setTimeout(resolve, 180));
+}
+
+async function openLocalEnvironmentSurface(webContents: WebContents) {
+  await webContents.executeJavaScript(`(() => {
+    const card = document.querySelector(
+      '[data-acceptance-surface="workflow-surfaces"]',
+    );
+    card
+      ?.querySelector(
+        '[data-desktop-local-environment-context="true"] [data-kind="environment"]',
+      )
+      ?.click();
+  })()`);
+  await new Promise((resolve) => setTimeout(resolve, 180));
+}
+
+async function closeLocalEnvironmentSurface(webContents: WebContents) {
+  await webContents.executeJavaScript(`(() => {
+    const surface = document.querySelector(
+      '#desktop-local-environment-dialog',
+    );
+    const backdrop = surface?.closest('.codex-ui-dialog');
+    backdrop?.dispatchEvent(
+      new PointerEvent('pointerdown', { bubbles: true }),
+    );
+  })()`);
+  await new Promise((resolve) => setTimeout(resolve, 100));
 }
 
 async function captureResourceSurfaces(
@@ -745,6 +822,10 @@ async function captureAcceptance(browserWindow: BrowserWindow) {
   await focusProjectRoutingSurface(browserWindow.webContents);
   const projectRoutingScreenshot =
     await browserWindow.webContents.capturePage();
+  await openLocalEnvironmentSurface(browserWindow.webContents);
+  const localEnvironmentScreenshot =
+    await browserWindow.webContents.capturePage();
+  await closeLocalEnvironmentSurface(browserWindow.webContents);
   nativeTheme.themeSource = "light";
   sendThemeState(browserWindow.webContents);
   await browserWindow.webContents.executeJavaScript(
@@ -774,6 +855,10 @@ async function captureAcceptance(browserWindow: BrowserWindow) {
   await focusProjectRoutingSurface(browserWindow.webContents);
   const compactProjectRoutingScreenshot =
     await browserWindow.webContents.capturePage();
+  await openLocalEnvironmentSurface(browserWindow.webContents);
+  const compactLocalEnvironmentScreenshot =
+    await browserWindow.webContents.capturePage();
+  await closeLocalEnvironmentSurface(browserWindow.webContents);
   console.log("acceptance step: compact navigation");
   const compactNavigationMetrics = await captureNavigationSurfaces(
     browserWindow.webContents,
@@ -904,27 +989,36 @@ async function captureAcceptance(browserWindow: BrowserWindow) {
         pullRequestLayout,
         routingBodyWithinPage: true,
         routingChildrenWithinBody: true,
+        routingDestination: "ChatGPT",
+        routingEnvironment: "Change environment: Local",
         routingLayout,
         routingProjectsOverflowY: "auto",
         routingSetupOverflowY: "auto",
-        routingState: "desktop/chatgpt/main",
+        routingState: "desktop/local/main",
         runningEventBusy: "true",
-        selectedConversationRoute: "chatgpt",
         selectedPullRequest:
           "Open pull request 50: Add current application shell",
         selectedRoutingProject: "Open project Desktop",
-        selectedRoutingWorktree: "Open worktree Main checkout",
+        selectedRoutingWorktree: "Change worktree: main",
         selectionText: "ui-kit/worktree/feature",
         threadEventCount: 2,
+        localEnvironmentGroupCount: 2,
+        localEnvironmentInViewport: true,
+        localEnvironmentItemCount: 4,
+        localEnvironmentRepairingDisabledCount: 1,
+        localEnvironmentRole: "dialog",
+        localEnvironmentSearchFocused: true,
+        localEnvironmentTriggerControls:
+          "desktop-local-environment-dialog",
+        localEnvironmentTriggerExpanded: "true",
       },
       expectedTheme,
       minimumItems: {
         checkRows: 2,
         eventRows: 6,
         reviewRows: 1,
+        routingContextItems: 3,
         routingProjectItems: 3,
-        routingRouteOptions: 3,
-        routingWorktreeItems: 3,
         selectorOverlays: 3,
         workspaceFields: 3,
       },
@@ -937,6 +1031,8 @@ async function captureAcceptance(browserWindow: BrowserWindow) {
         "pullRequestPage",
         "reviewThread",
         "routingBody",
+        "localEnvironmentDialog",
+        "routingNewConversation",
         "routingPage",
         "routingProjects",
         "routingSetup",
@@ -1068,6 +1164,10 @@ async function captureAcceptance(browserWindow: BrowserWindow) {
       projectRoutingScreenshot.toPNG(),
     ),
     writeFile(
+      join(outputDirectory, "local-environment-dialog.png"),
+      localEnvironmentScreenshot.toPNG(),
+    ),
+    writeFile(
       join(outputDirectory, "workflow-surfaces-compact-light-metrics.json"),
       `${JSON.stringify(compactWorkflowMetrics, null, 2)}\n`,
     ),
@@ -1078,6 +1178,13 @@ async function captureAcceptance(browserWindow: BrowserWindow) {
     writeFile(
       join(outputDirectory, "project-routing-compact-light.png"),
       compactProjectRoutingScreenshot.toPNG(),
+    ),
+    writeFile(
+      join(
+        outputDirectory,
+        "local-environment-dialog-compact-light.png",
+      ),
+      compactLocalEnvironmentScreenshot.toPNG(),
     ),
   ]);
   console.log(`acceptance capture: ${outputDirectory}`);

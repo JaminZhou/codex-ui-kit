@@ -4,6 +4,7 @@ import {
   type ReactNode,
   useId,
 } from "react";
+import { Dialog } from "./Dialog.js";
 
 export type ProjectConversationPageStatus =
   | "error"
@@ -624,5 +625,421 @@ export function WorktreeList({
         <p className="codex-ui-worktree-list__empty">{emptyState}</p>
       )}
     </section>
+  );
+}
+
+export type NewConversationStartStatus =
+  | "error"
+  | "idle"
+  | "loading"
+  | "ready";
+
+export interface NewConversationStartProps
+  extends Omit<
+    HTMLAttributes<HTMLElement>,
+    "children" | "title"
+  > {
+  composer: ReactNode;
+  context: ReactNode;
+  description?: ReactNode;
+  destination: ReactNode;
+  eyebrow?: ReactNode;
+  label?: string;
+  prompt?: ReactNode;
+  status?: NewConversationStartStatus;
+}
+
+export function NewConversationStart({
+  className,
+  composer,
+  context,
+  description,
+  destination,
+  eyebrow = "New conversation",
+  label = "New conversation setup",
+  prompt,
+  status = "ready",
+  ...props
+}: NewConversationStartProps) {
+  return (
+    <section
+      {...props}
+      aria-busy={status === "loading" || undefined}
+      aria-label={label}
+      className={["codex-ui-new-conversation-start", className]
+        .filter(Boolean)
+        .join(" ")}
+      data-status={status}
+    >
+      {prompt ? (
+        <div className="codex-ui-new-conversation-start__prompt">
+          {prompt}
+        </div>
+      ) : null}
+      <header className="codex-ui-new-conversation-start__header">
+        {eyebrow ? (
+          <span className="codex-ui-new-conversation-start__eyebrow">
+            {eyebrow}
+          </span>
+        ) : null}
+        <h3>{destination}</h3>
+        {description ? <p>{description}</p> : null}
+      </header>
+      <div className="codex-ui-new-conversation-start__composer">
+        {composer}
+      </div>
+      <div className="codex-ui-new-conversation-start__context">
+        {context}
+      </div>
+    </section>
+  );
+}
+
+export type ConversationContextItemKind =
+  | "environment"
+  | "project"
+  | "worktree";
+
+export type ConversationContextItemStatus =
+  | "available"
+  | "loading"
+  | "repairing"
+  | "unavailable";
+
+export interface ConversationContextItem {
+  controlsId?: string;
+  disabled?: boolean;
+  icon?: ReactNode;
+  id: string;
+  kind: ConversationContextItemKind;
+  label: ReactNode;
+  popupRole?: "dialog" | "listbox" | "menu";
+  status?: ConversationContextItemStatus;
+  statusLabel?: ReactNode;
+  textValue?: string;
+}
+
+export interface ConversationContextBarProps
+  extends Omit<HTMLAttributes<HTMLDivElement>, "children" | "onSelect"> {
+  disabled?: boolean;
+  expandedId?: string;
+  items: readonly ConversationContextItem[];
+  label?: string;
+  onSelect: (itemId: string) => void;
+}
+
+function conversationContextItemDisabled(
+  item: ConversationContextItem,
+  groupDisabled: boolean,
+) {
+  return (
+    groupDisabled ||
+    item.disabled ||
+    item.status === "loading" ||
+    item.status === "repairing" ||
+    item.status === "unavailable"
+  );
+}
+
+export function ConversationContextBar({
+  className,
+  disabled = false,
+  expandedId,
+  items,
+  label = "Conversation context",
+  onSelect,
+  ...props
+}: ConversationContextBarProps) {
+  const contextBarId = useId();
+
+  return (
+    <div
+      {...props}
+      aria-label={label}
+      className={["codex-ui-conversation-context-bar", className]
+        .filter(Boolean)
+        .join(" ")}
+      role="group"
+    >
+      {items.map((item, index) => {
+        const itemDisabled = conversationContextItemDisabled(
+          item,
+          disabled,
+        );
+        const accessibleValue =
+          item.textValue ??
+          (typeof item.label === "string" ? item.label : item.id);
+        const statusId = item.statusLabel
+          ? `${contextBarId}-status-${index}`
+          : undefined;
+        return (
+          <button
+            aria-controls={
+              expandedId === item.id ? item.controlsId : undefined
+            }
+            aria-describedby={statusId}
+            aria-expanded={
+              item.controlsId
+                ? expandedId === item.id
+                : undefined
+            }
+            aria-haspopup={
+              item.controlsId
+                ? (item.popupRole ?? "dialog")
+                : undefined
+            }
+            aria-label={`Change ${item.kind}: ${accessibleValue}`}
+            className="codex-ui-conversation-context-bar__item"
+            data-expanded={expandedId === item.id || undefined}
+            data-kind={item.kind}
+            data-status={item.status}
+            disabled={itemDisabled}
+            key={item.id}
+            onClick={() => onSelect(item.id)}
+            type="button"
+          >
+            {item.icon ? (
+              <span
+                aria-hidden="true"
+                className="codex-ui-conversation-context-bar__icon"
+              >
+                {item.icon}
+              </span>
+            ) : null}
+            <span className="codex-ui-conversation-context-bar__label">
+              {item.label}
+            </span>
+            {item.statusLabel ? (
+              <span
+                className="codex-ui-conversation-context-bar__status"
+                data-status={item.status}
+                id={statusId}
+              >
+                {item.statusLabel}
+              </span>
+            ) : null}
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
+export type LocalEnvironmentItemStatus =
+  | "available"
+  | "creating"
+  | "error"
+  | "repairing"
+  | "unavailable";
+
+export interface LocalEnvironmentItem {
+  actions?: ReactNode;
+  branch?: ReactNode;
+  description?: ReactNode;
+  disabled?: boolean;
+  id: string;
+  label: ReactNode;
+  meta?: ReactNode;
+  status?: LocalEnvironmentItemStatus;
+  statusLabel?: ReactNode;
+  textValue?: string;
+}
+
+export interface LocalEnvironmentGroup {
+  description?: ReactNode;
+  id: string;
+  items: readonly LocalEnvironmentItem[];
+  label: ReactNode;
+}
+
+export interface LocalEnvironmentDialogProps
+  extends Omit<
+    HTMLAttributes<HTMLDivElement>,
+    "children" | "onSelect" | "title"
+  > {
+  createAction?: ReactNode;
+  description?: ReactNode;
+  emptyState?: ReactNode;
+  groups: readonly LocalEnvironmentGroup[];
+  onOpenChange: (open: boolean) => void;
+  onQueryChange: (query: string) => void;
+  onSelect: (groupId: string, itemId: string) => void;
+  open: boolean;
+  query: string;
+  searchLabel?: string;
+  title?: ReactNode;
+}
+
+function localEnvironmentItemDisabled(item: LocalEnvironmentItem) {
+  return (
+    item.disabled ||
+    item.status === "creating" ||
+    item.status === "repairing" ||
+    item.status === "unavailable"
+  );
+}
+
+export function LocalEnvironmentDialog({
+  className,
+  createAction,
+  description = "Choose a worktree or create a local environment.",
+  emptyState = "No local environments",
+  groups,
+  onOpenChange,
+  onQueryChange,
+  onSelect,
+  open,
+  query,
+  searchLabel = "Search local environments",
+  title = "Create local environment",
+  ...props
+}: LocalEnvironmentDialogProps) {
+  const environmentDialogId = useId();
+  const hasItems = groups.some((group) => group.items.length > 0);
+
+  return (
+    <Dialog
+      {...props}
+      className={[
+        "codex-ui-local-environment-dialog",
+        className,
+      ]
+        .filter(Boolean)
+        .join(" ")}
+      description={description}
+      footer={createAction}
+      initialFocusSelector=".codex-ui-local-environment-dialog__search"
+      onOpenChange={onOpenChange}
+      open={open}
+      size="standard"
+      title={title}
+    >
+      <div className="codex-ui-local-environment-dialog__content">
+        <input
+          aria-label={searchLabel}
+          className="codex-ui-local-environment-dialog__search"
+          onChange={(event) => onQueryChange(event.currentTarget.value)}
+          type="search"
+          value={query}
+        />
+        {hasItems ? (
+          <div className="codex-ui-local-environment-dialog__groups">
+            {groups.map((group, groupIndex) => {
+              const headingId = `${environmentDialogId}-group-${groupIndex}`;
+              return (
+                <section
+                  aria-labelledby={headingId}
+                  className="codex-ui-local-environment-dialog__group"
+                  key={group.id}
+                >
+                  <header>
+                    <h3 id={headingId}>{group.label}</h3>
+                    {group.description ? (
+                      <p>{group.description}</p>
+                    ) : null}
+                  </header>
+                  {group.items.length > 0 ? (
+                    <ul>
+                      {group.items.map((item, itemIndex) => {
+                        const itemDisabled =
+                          localEnvironmentItemDisabled(item);
+                        const accessibleValue =
+                          item.textValue ??
+                          (typeof item.label === "string"
+                            ? item.label
+                            : item.id);
+                        const descriptionId = item.description
+                          ? `${environmentDialogId}-description-${groupIndex}-${itemIndex}`
+                          : undefined;
+                        const branchId = item.branch
+                          ? `${environmentDialogId}-branch-${groupIndex}-${itemIndex}`
+                          : undefined;
+                        const trailingId =
+                          item.meta || item.statusLabel
+                            ? `${environmentDialogId}-trailing-${groupIndex}-${itemIndex}`
+                            : undefined;
+                        const describedBy = [
+                          descriptionId,
+                          branchId,
+                          trailingId,
+                        ]
+                          .filter(Boolean)
+                          .join(" ");
+                        return (
+                          <li key={item.id}>
+                            <div className="codex-ui-local-environment-dialog__row">
+                              <button
+                                aria-describedby={
+                                  describedBy || undefined
+                                }
+                                aria-label={`Use local environment ${accessibleValue}`}
+                                className="codex-ui-local-environment-dialog__item"
+                                data-status={item.status}
+                                disabled={itemDisabled}
+                                onClick={() =>
+                                  onSelect(group.id, item.id)
+                                }
+                                type="button"
+                              >
+                                <span className="codex-ui-local-environment-dialog__item-copy">
+                                  <span className="codex-ui-local-environment-dialog__item-label">
+                                    {item.label}
+                                  </span>
+                                  {item.description ? (
+                                    <span id={descriptionId}>
+                                      {item.description}
+                                    </span>
+                                  ) : null}
+                                  {item.branch ? (
+                                    <code id={branchId}>
+                                      {item.branch}
+                                    </code>
+                                  ) : null}
+                                </span>
+                                {item.meta || item.statusLabel ? (
+                                  <span
+                                    className="codex-ui-local-environment-dialog__trailing"
+                                    id={trailingId}
+                                  >
+                                    {item.meta ? (
+                                      <span>{item.meta}</span>
+                                    ) : null}
+                                    {item.statusLabel ? (
+                                      <span
+                                        className="codex-ui-local-environment-dialog__status"
+                                        data-status={item.status}
+                                      >
+                                        {item.statusLabel}
+                                      </span>
+                                    ) : null}
+                                  </span>
+                                ) : null}
+                              </button>
+                              {item.actions ? (
+                                <div className="codex-ui-local-environment-dialog__item-actions">
+                                  {item.actions}
+                                </div>
+                              ) : null}
+                            </div>
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  ) : (
+                    <p className="codex-ui-local-environment-dialog__group-empty">
+                      {emptyState}
+                    </p>
+                  )}
+                </section>
+              );
+            })}
+          </div>
+        ) : (
+          <p className="codex-ui-local-environment-dialog__empty">
+            {emptyState}
+          </p>
+        )}
+      </div>
+    </Dialog>
   );
 }

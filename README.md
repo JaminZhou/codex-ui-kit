@@ -37,8 +37,9 @@ Explore the [interactive component showcase](https://jaminzhou.com/codex-ui-kit/
   conversation-event primitives.
 - Application/sidebar and side/bottom workspace-panel composition with
   container-responsive overlay behavior.
-- Project index, local/remote/ChatGPT routing, worktree list and selector,
-  PR list/detail, check, reviewer, and inline review-thread compositions.
+- Project index, current new-chat destination/context setup, grouped local
+  environment dialog, protocol-neutral route/worktree selectors, PR
+  list/detail, checks, reviewers, and inline review-thread compositions.
 - Command execution, structured file diffs, tool calls, approvals, and notices.
 - Composer attachments, mentions, modes, queued prompts, and running states.
 - Accessible menus, tooltips, popovers, selects, dialogs, and keyboard flows.
@@ -112,7 +113,7 @@ export function Example() {
 | [Interactive primitives](docs/COMPONENTS.md#interactive-primitives) | Buttons, dialogs, menus, selects, popovers, tooltips |
 | [Resources and media](docs/COMPONENTS.md#resources-and-media) | Resource cards, sources, artifacts, generated images |
 | [Navigation and shell](docs/COMPONENTS.md#navigation-and-shell) | Application/sidebar shell, workspace tabs, thread header, navigation rail, floating controls |
-| [Workspace and PR workflow](docs/COMPONENTS.md#workspace-and-pull-request-workflow) | Project index, conversation routing, worktree lists and selectors, PR lists, details, checks, reviewers, and threads |
+| [Workspace and PR workflow](docs/COMPONENTS.md#workspace-and-pull-request-workflow) | Project index, new-chat destination/context, local environments, protocol-neutral routing/worktree selectors, PR lists, details, checks, reviewers, and threads |
 
 See the [complete component reference](docs/COMPONENTS.md) for behavior, state, and composition details.
 

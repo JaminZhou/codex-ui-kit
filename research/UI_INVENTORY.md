@@ -54,9 +54,9 @@ observation from a previous build remains historical evidence.
 - Scoped CDP automation: available through a user-authorized second process;
   the Chromium profile is separate, but Codex application data and navigation
   are not fully isolated
-- Current inventory: 56 surface groups; 30 have scoped runtime evidence, of
-  which 3 include current-build structural evidence and 27 are previous-build
-  only; another 26 remain `not_sampled`
+- Current inventory: 57 surface groups; 32 have scoped runtime evidence, of
+  which 9 include current-build structural evidence and 23 are previous-build
+  only; another 25 remain `not_sampled`
 
 The current package exposes candidates far beyond the old transcript sample:
 application and thread shells, local/remote conversation routes, projects and
@@ -64,15 +64,16 @@ workspace selection, PR review, editor diff, terminal, browser and artifact
 panels, document previews, settings, MCP, plugins, skills, automations, remote
 connections, and feature-gated surfaces.
 
-The current CDP probe confirms loopback access and distinguishes the main
-application-shell target from a second small application page. The broader
-blank-chat, command, queue, Markdown, Sources, terminal, Composer, Review,
-Environment, Pull requests, Sites, Scheduled tasks, Plugins, Skills, and
-Settings samples were recorded on `26.715.72359`. Those entries remain
-`runtime_observed` with build-scoped evidence, but they do not satisfy the
-current-build verification gate until reached again. The seed list is not an
-exhaustive denominator: newly observed routes, variants, and cross-layer
-transitions must add or split IDs.
+The current CDP probe confirms loopback access, distinguishes the main
+application-shell target from a second small application page, and reaches the
+new-chat destination/context setup plus the Project and Local environment
+dialogs. The broader command, queue, Markdown, Sources, terminal, Review, Pull
+requests, Sites, Scheduled tasks, Plugins, Skills, and Settings samples were
+recorded on `26.715.72359`. Those entries remain `runtime_observed` with
+build-scoped evidence, but they do not satisfy the current-build verification
+gate until reached again. The seed list is not an exhaustive denominator:
+newly observed routes, variants, and cross-layer transitions must add or split
+IDs.
 
 ## Priority
 
@@ -134,20 +135,30 @@ horizontal overflow at 1180×820 dark and 820×680 light. The PR layout is split
 at the standard size and stacked at the compact size.
 
 The project-entry slice adds `ProjectConversationPage`, `ProjectIndex`,
-`ConversationRouteSelector`, and `WorktreeList`. It composes the
-application-owned project list with an explicit local/remote/ChatGPT route
-choice and workspace-owned checkout selection. The controls remain
-protocol-neutral and every privileged operation stays host-owned. The H5 and
-Electron showcases exercise project, route, and worktree transitions in split
-and compact stacked layouts.
+`ConversationRouteSelector`, and `WorktreeList`. `ConversationRouteSelector`
+remains a protocol-neutral host composition for products that genuinely use a
+single route choice; it is no longer treated as the current Codex new-chat
+model.
 
-All affected inventory entries remain `partial`. The current-build probe
-establishes only the global Projects entry and de-identified list structure;
-it does not expose the exact project contents or local/remote/ChatGPT
-conversation transitions. Worktree comparison remains `partial_legacy`
-because its runtime evidence is from `26.715.72359`. Exact current-build PR
-review-detail behavior remains `not_sampled`, so the generic review components
-do not establish product parity. Native application-shell composition, route
-persistence, panel resizing, and the remaining P0 conversation/workspace
-variants also remain open. Final H5/Electron visual unification is
-intentionally deferred until coverage stabilizes.
+The current new-chat slice adds `NewConversationStart`,
+`ConversationContextBar`, and `LocalEnvironmentDialog`. It keeps the
+application-owned ChatGPT destination independent from project, execution
+environment, and worktree controls, and represents the local environment
+picker as a searchable, grouped, scrollable dialog. The H5 accessibility flow
+verifies the trigger/dialog relationship, modal semantics, and initial focus.
+The Electron acceptance flow selects a project, opens the dialog, checks
+grouping and repair-state disabling, selects a local environment, starts the
+conversation, and captures both wide and compact dialog screenshots.
+
+The narrow `conversation.destination`, `conversation.context-controls`, and
+`app.new-thread-workspace-selection` slices are current-build Browser and
+Electron verified. Their implementation remains `partial` because the probe
+does not establish Remote destination behavior, real project option contents,
+creation workflows, or persistence. The broader project index, environment
+settings, and worktree settings families remain partial, as does the legacy
+host-defined route selector. Exact current-build PR review-detail behavior
+remains `not_sampled`, so the generic review components do not establish
+product parity. Native application-shell composition, panel resizing, and the
+remaining P0 conversation/workspace variants also remain open. Final
+H5/Electron visual unification is intentionally deferred until coverage
+stabilizes.
