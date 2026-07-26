@@ -26,7 +26,9 @@ describe("ConversationThreadShell", () => {
             value=""
           />
         }
+        floatingControl={<button type="button">Latest</button>}
         header={<ThreadHeader position="static" title="Measured thread" />}
+        messageNavigation={<nav aria-label="Message jumps">Markers</nav>}
       >
         <AgentMessage role="user">Run the probe.</AgentMessage>
         <AgentMessage role="assistant">Probe complete.</AgentMessage>
@@ -41,6 +43,20 @@ describe("ConversationThreadShell", () => {
         .querySelector(".codex-ui-conversation-thread-shell__header")
         ?.contains(container.querySelector(".codex-ui-thread-header")),
     ).toBe(true);
+    expect(
+      container
+        .querySelector(
+          ".codex-ui-conversation-thread-shell__message-navigation",
+        )
+        ?.contains(container.querySelector("nav[aria-label='Message jumps']")),
+    ).toBe(true);
+    expect(
+      container
+        .querySelector(
+          ".codex-ui-conversation-thread-shell__floating-control",
+        )
+        ?.textContent,
+    ).toBe("Latest");
     expect(
       container
         .querySelector(".codex-ui-conversation-thread-shell__viewport")

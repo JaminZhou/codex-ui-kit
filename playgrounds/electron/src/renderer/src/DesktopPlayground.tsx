@@ -79,8 +79,10 @@ import {
   ToolCallCard,
   Tooltip,
   ThreadFloatingButton,
+  ThreadContextEvent,
   ThreadContextOptimization,
   ThreadHeader,
+  ThreadInterruptionSummary,
   ThreadLoadingState,
   ThreadMessageNavigationRail,
   ThreadNavigationControls,
@@ -324,6 +326,11 @@ const desktopNavigationMessages = [
     label: "Complete desktop acceptance.",
     preview: "No horizontal overflow at either verified window size.",
   },
+  ...Array.from({ length: 5 }, (_, index) => ({
+    id: `desktop-message-${index + 6}`,
+    label: `Continue the desktop thread, turn ${index + 6}.`,
+    preview: "Keep long-thread navigation available after the stable threshold.",
+  })),
 ] as const;
 
 function useViewportMetrics(): ViewportMetrics {
@@ -664,6 +671,22 @@ export function DesktopPlayground() {
                   />
                 }
                 label="Desktop conversation shell"
+                floatingControl={
+                  <ThreadFloatingButton
+                    onClick={() => setThreadStatus("Scrolled to latest desktop turn")}
+                    show
+                  />
+                }
+                messageNavigation={
+                  <ThreadMessageNavigationRail
+                    activeIds={[activeNavigationMessageId]}
+                    items={desktopNavigationMessages}
+                    onNavigate={(item) => {
+                      setActiveNavigationMessageId(item.id);
+                      setThreadStatus(`Jumped to ${item.id}`);
+                    }}
+                  />
+                }
                 threadLabel="Desktop validation thread"
                 viewportProps={{
                   className: "desktop-thread-viewport",
@@ -808,6 +831,9 @@ export function DesktopPlayground() {
                 </AgentTurn>
                 <ThreadLoadingState />
                 <ThreadLoadingState kind="reconnecting" />
+                <ThreadInterruptionSummary durationMs={2_000} />
+                <ThreadContextEvent status="running" />
+                <ThreadContextEvent status="completed" />
                 <ThreadContextOptimization mode="manual" status="completed" />
                 <ThreadContextOptimization mode="work" status="running" />
                 <ThreadSkeleton />

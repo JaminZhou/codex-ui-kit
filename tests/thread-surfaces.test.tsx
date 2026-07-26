@@ -8,7 +8,9 @@ import {
   AgentThreadViewport,
   AgentTurn,
   LoadingShimmer,
+  ThreadContextEvent,
   ThreadContextOptimization,
+  ThreadInterruptionSummary,
   ThreadLoadingState,
   ThreadRenderError,
   ThreadSkeleton,
@@ -246,6 +248,24 @@ describe("complete thread surfaces", () => {
       />,
     );
     expect(state.textContent).toBe("Custom context label");
+  });
+
+  it("composes current interruption and context-compaction lifecycle rows", () => {
+    const { container, rerender } = render(
+      <ThreadInterruptionSummary durationMs={2_000} />,
+    );
+    expect(screen.getByRole("status").textContent).toBe("You stopped after 2s");
+    expect(
+      container.querySelector(".codex-ui-thread-interruption-summary__rule"),
+    ).toBeTruthy();
+
+    rerender(<ThreadContextEvent status="running" />);
+    expect(screen.getByText("Working")).toBeTruthy();
+    expect(screen.getByRole("status").textContent).toBe("Compacting context");
+
+    rerender(<ThreadContextEvent status="completed" />);
+    expect(screen.queryByText("Working")).toBeNull();
+    expect(screen.getByText("Context compacted")).toBeTruthy();
   });
 
   it("renders a retryable turn error", () => {

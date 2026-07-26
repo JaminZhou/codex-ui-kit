@@ -18,8 +18,10 @@ export interface ConversationThreadShellProps
   extends Omit<HTMLAttributes<HTMLElement>, "children"> {
   children: ReactNode;
   composer: ReactNode;
+  floatingControl?: ReactNode;
   header: ReactNode;
   label?: string;
+  messageNavigation?: ReactNode;
   threadLabel?: string;
   threadProps?: Omit<AgentThreadProps, "children" | "width">;
   threadWidth?: AgentThreadWidth;
@@ -33,8 +35,10 @@ export function ConversationThreadShell({
   children,
   className,
   composer,
+  floatingControl,
   header,
   label = "Conversation",
+  messageNavigation,
   threadLabel = "Conversation timeline",
   threadProps,
   threadWidth = "wide",
@@ -109,6 +113,11 @@ export function ConversationThreadShell({
         className="codex-ui-conversation-thread-shell__body"
         ref={bodyRef}
       >
+        {messageNavigation ? (
+          <div className="codex-ui-conversation-thread-shell__message-navigation">
+            {messageNavigation}
+          </div>
+        ) : null}
         <AgentThreadViewport
           {...restViewportProps}
           className={[
@@ -133,6 +142,11 @@ export function ConversationThreadShell({
             {children}
           </AgentThread>
         </AgentThreadViewport>
+        {floatingControl ? (
+          <div className="codex-ui-conversation-thread-shell__floating-control">
+            {floatingControl}
+          </div>
+        ) : null}
         <div
           className="codex-ui-conversation-thread-shell__composer-dock"
           ref={composerDockRef}

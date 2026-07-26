@@ -114,22 +114,22 @@ describe("thread navigation surfaces", () => {
     expect(panel.hasAttribute("inert")).toBe(false);
   });
 
-  it("reveals the user-message rail only at the observed item threshold", () => {
-    const items = Array.from({ length: 4 }, (_, index) => ({
+  it("reveals the user-message rail only at the current stable item threshold", () => {
+    const items = Array.from({ length: 10 }, (_, index) => ({
       id: `message-${index + 1}`,
       label: `Message ${index + 1}`,
     }));
     const { rerender } = render(
-      <ThreadMessageNavigationRail items={items.slice(0, 3)} />,
+      <ThreadMessageNavigationRail items={items.slice(0, 9)} />,
     );
     expect(screen.queryByRole("navigation", { name: "User messages" })).toBeNull();
 
     rerender(
-      <ThreadMessageNavigationRail activeIds={["message-2"]} items={items} />,
+      <ThreadMessageNavigationRail activeIds={["message-10"]} items={items} />,
     );
     expect(screen.getByRole("navigation", { name: "User messages" })).toBeTruthy();
     expect(
-      screen.getByRole("button", { name: "Jump to user message 2" }).getAttribute(
+      screen.getByRole("button", { name: "Jump to user message 10" }).getAttribute(
         "aria-current",
       ),
     ).toBe("true");
@@ -144,7 +144,11 @@ describe("thread navigation surfaces", () => {
       preview: index === 0 ? "Inspect the complete thread surface." : undefined,
     }));
     render(
-      <ThreadMessageNavigationRail items={items} onNavigate={onNavigate} />,
+      <ThreadMessageNavigationRail
+        items={items}
+        minItems={4}
+        onNavigate={onNavigate}
+      />,
     );
 
     const first = screen.getByRole("button", { name: "Jump to user message 1" });
@@ -162,7 +166,11 @@ describe("thread navigation surfaces", () => {
       label: `Message ${index + 1}`,
     }));
     render(
-      <ThreadMessageNavigationRail items={items} onNavigate={onNavigate} />,
+      <ThreadMessageNavigationRail
+        items={items}
+        minItems={4}
+        onNavigate={onNavigate}
+      />,
     );
     const first = screen.getByRole("button", { name: "Jump to user message 1" });
     const third = screen

@@ -34,6 +34,11 @@ describe("current-thread visual contract", () => {
       "current-compact-browser-tool",
       "current-compact-mcp-unavailable",
       "current-compact-command-failure",
+      "current-medium-message-navigation",
+      "current-compact-scroll-away",
+      "current-compact-interrupted",
+      "current-compact-context-running",
+      "current-compact-context-completed",
     ]);
     expect(packageJson.scripts["check:visual:streaming"]).toContain(
       "--scenes=current-thread-streaming",
@@ -43,6 +48,9 @@ describe("current-thread visual contract", () => {
     );
     expect(packageJson.scripts["check:visual:tool-recovery"]).toContain(
       "--scenes=current-compact-search-tool,current-compact-browser-tool,current-compact-mcp-unavailable,current-compact-command-failure",
+    );
+    expect(packageJson.scripts["check:visual:continuity"]).toContain(
+      "--scenes=current-medium-message-navigation,current-compact-scroll-away,current-compact-interrupted,current-compact-context-running,current-compact-context-completed",
     );
   });
 

@@ -742,6 +742,94 @@ code {
   top: 0.5rem;
 }
 
+.continuity-pixel-fixture {
+  --codex-ui-conversation-thread-font-size: 0.875rem;
+  --codex-ui-conversation-thread-line-height: 1.375rem;
+  --codex-ui-message-navigation-inset: 1rem;
+  --codex-ui-message-navigation-row-height: 0.625rem;
+  --codex-ui-message-navigation-row-width: 2.25rem;
+  --codex-ui-message-navigation-marker-height: 0.125rem;
+  --codex-ui-message-navigation-marker-width: 1.875rem;
+}
+
+.continuity-pixel-fixture
+  .codex-ui-conversation-thread-shell__thread {
+  gap: 0;
+  padding-top: 0;
+}
+
+.continuity-pixel-fixture
+  .codex-ui-conversation-thread-shell
+  .codex-ui-agent-message[data-role="user"] {
+  margin-bottom: 0;
+}
+
+.continuity-pixel-fixture
+  .codex-ui-conversation-thread-shell__thread
+  > .codex-ui-agent-message[data-role="assistant"]
+  + .codex-ui-agent-message[data-role="user"] {
+  margin-top: 2.125rem;
+}
+
+.continuity-pixel-fixture
+  .codex-ui-conversation-thread-shell__thread
+  > .codex-ui-agent-message[data-role="user"]
+  + .codex-ui-agent-message[data-role="assistant"] {
+  margin-top: 2.875rem;
+}
+
+.continuity-pixel-fixture
+  .codex-ui-thread-interruption-summary {
+  margin-top: 2.125rem;
+}
+
+.continuity-pixel-fixture
+  .codex-ui-thread-context-event {
+  margin-top: 1rem;
+}
+
+.continuity-pixel-fixture[data-visual-scene="current-medium-message-navigation"]
+  .codex-ui-conversation-thread-shell__thread,
+.continuity-pixel-fixture[data-visual-scene="current-compact-context-running"]
+  .codex-ui-conversation-thread-shell__thread {
+  transform: translateY(0.5625rem);
+}
+
+.continuity-pixel-fixture[data-visual-scene="current-compact-interrupted"]
+  .codex-ui-conversation-thread-shell__thread {
+  transform: translateY(3.25rem);
+}
+
+.continuity-pixel-fixture[data-visual-scene="current-compact-context-completed"]
+  .codex-ui-conversation-thread-shell__thread {
+  transform: translateY(0.9375rem);
+}
+
+.continuity-pixel-fixture[data-visual-scene="current-compact-scroll-away"]
+  .codex-ui-conversation-thread-shell__thread {
+  transform: translateY(2.125rem);
+}
+
+.continuity-pixel-fixture[data-visual-scene="current-compact-scroll-away"]
+  .codex-ui-thread-floating-button {
+  bottom: 8.625rem;
+}
+
+.continuity-pixel-fixture
+  .codex-ui-thread-interruption-summary,
+.continuity-pixel-fixture
+  .codex-ui-thread-context-event,
+.continuity-pixel-fixture
+  .codex-ui-thread-context-optimization {
+  font-size: 0.875rem;
+  line-height: 1.375rem;
+}
+
+.continuity-pixel-fixture
+  .codex-ui-thread-context-optimization {
+  min-height: 1.75rem;
+}
+
 .workflow-pixel-fixture__approval {
   background: #272727;
   border-radius: 1.25rem;

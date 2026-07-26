@@ -1,4 +1,8 @@
 import type { HTMLAttributes, ReactNode } from "react";
+import {
+  TurnDuration,
+  type TurnDurationProps,
+} from "./TurnDuration.js";
 
 export interface LoadingShimmerProps extends HTMLAttributes<HTMLSpanElement> {
   children: ReactNode;
@@ -120,6 +124,95 @@ export function ThreadContextOptimization({
           {resolvedLabel}
         </span>
       )}
+    </div>
+  );
+}
+
+export interface ThreadInterruptionSummaryProps
+  extends Omit<HTMLAttributes<HTMLDivElement>, "children"> {
+  durationMs: number;
+  label?: ReactNode;
+  stoppedLabel?: TurnDurationProps["stoppedLabel"];
+}
+
+export function ThreadInterruptionSummary({
+  className,
+  durationMs,
+  label,
+  stoppedLabel,
+  ...props
+}: ThreadInterruptionSummaryProps) {
+  return (
+    <div
+      aria-live="polite"
+      className={["codex-ui-thread-interruption-summary", className]
+        .filter(Boolean)
+        .join(" ")}
+      data-status="stopped"
+      role="status"
+      {...props}
+    >
+      <span className="codex-ui-thread-interruption-summary__label">
+        {label ?? (
+          <TurnDuration
+            durationMs={durationMs}
+            status="stopped"
+            stoppedLabel={stoppedLabel}
+          />
+        )}
+      </span>
+      <span
+        aria-hidden="true"
+        className="codex-ui-thread-interruption-summary__rule"
+      />
+    </div>
+  );
+}
+
+export interface ThreadContextEventProps
+  extends Omit<HTMLAttributes<HTMLDivElement>, "children"> {
+  icon?: ReactNode;
+  label?: ReactNode;
+  mode?: ThreadContextOptimizationMode;
+  status: ThreadContextOptimizationStatus;
+  workingLabel?: ReactNode;
+}
+
+export function ThreadContextEvent({
+  className,
+  icon,
+  label,
+  mode = "manual",
+  status,
+  workingLabel = "Working",
+  ...props
+}: ThreadContextEventProps) {
+  const running = status === "running";
+  return (
+    <div
+      className={["codex-ui-thread-context-event", className]
+        .filter(Boolean)
+        .join(" ")}
+      data-status={status}
+      {...props}
+    >
+      {running ? (
+        <>
+          <span className="codex-ui-thread-context-event__working">
+            {workingLabel}
+          </span>
+          <span
+            aria-hidden="true"
+            className="codex-ui-thread-context-event__rule"
+          />
+        </>
+      ) : null}
+      <ThreadContextOptimization
+        icon={icon}
+        label={label}
+        mode={mode}
+        status={status}
+      />
     </div>
   );
 }

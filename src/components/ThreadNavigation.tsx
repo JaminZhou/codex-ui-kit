@@ -156,7 +156,7 @@ export function ThreadMessageNavigationRail({
   insetInlineStart = "var(--codex-ui-message-navigation-inset)",
   items,
   label = "User messages",
-  minItems = 4,
+  minItems = 10,
   onNavigate,
   style,
 }: ThreadMessageNavigationRailProps) {

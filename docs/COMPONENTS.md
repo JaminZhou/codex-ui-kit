@@ -6,8 +6,8 @@ Codex UI Kit exposes protocol-neutral React components. Hosts own data fetching,
 
 - `ConversationThreadShell`: current-build measured page composition that
   combines a 46px header, centered follow-aware timeline, responsive 16px
-  insets, and overlay multiline Composer while keeping data and actions
-  host-owned.
+  insets, an overlay multiline Composer, and host-owned message-navigation and
+  latest-message control slots while keeping data and actions host-owned.
 - `AgentThread`: responsive `768px` content column with turn separation and container-query reflow.
 - `AgentThreadViewport`: focusable, follow-aware scroll surface with latest-turn detection, reduced-motion-safe auto-follow, direct-input cancellation for programmatic following, and a sticky footer.
 - `AgentTurn` and `ActivityGroup`: explicit standard and grouped spacing contracts.
@@ -15,6 +15,10 @@ Codex UI Kit exposes protocol-neutral React components. Hosts own data fetching,
 - `AgentMessage`: user, assistant, and system presentation with user-bubble geometry, edit activation, actions, running ARIA state, and target highlighting.
 - `ThreadLoadingState` and `ThreadThinkingPlaceholder`: loading, reconnecting, and thinking states.
 - `ThreadContextOptimization`: manual compaction, automatic compaction, and Work-mode conversation optimization in running and completed states.
+- `ThreadInterruptionSummary`: current-build stop-result row with duration
+  language and the measured trailing divider.
+- `ThreadContextEvent`: current-build manual compaction composition, including
+  the running `Working` divider and running/completed optimization row.
 - `LoadingShimmer` and `ThreadSkeleton`: streaming-safe progress surfaces with reduced-motion fallbacks.
 - `ThreadRenderError`: compact turn-level failure with a host-owned retry hook.
 
@@ -99,7 +103,9 @@ All privileged behavior remains host-owned. The components never auto-approve co
   close/open/expand hooks, focusable content, and host-owned tab contents.
 - `ThreadHeader`: draggable desktop header with truncating identity, navigation, and independently aligned action slots.
 - `ThreadNavigationControls`: sidebar and optional Back/Forward toolbar controls with shortcuts, disabled states, and transient-navigation hover hooks.
-- `ThreadMessageNavigationRail`: message overview with active markers, keyboard and pointer previews, click navigation, and pointer scrubbing.
+- `ThreadMessageNavigationRail`: message overview with a current-build default
+  threshold of ten user messages, active markers, keyboard and pointer
+  previews, click navigation, and pointer scrubbing.
 - `FloatingThreadPanel`: non-modal, inert-when-closed panel with host-controlled contents and inset.
 - `ThreadFloatingButton`: latest-message control with chevron, working dots, hidden-interaction removal, and reduced-motion behavior.
 

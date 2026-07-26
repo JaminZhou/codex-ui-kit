@@ -54,9 +54,9 @@ observation from a previous build remains historical evidence.
 - Scoped CDP automation: available through a user-authorized second process;
   the Chromium profile is separate, but Codex application data and navigation
   are not fully isolated
-- Current inventory: 61 surface groups; 38 have scoped runtime evidence, of
-  which 20 include current-build structural evidence and 18 are previous-build
-  only; another 23 remain `not_sampled`
+- Current inventory: 61 surface groups; 41 have scoped runtime evidence, of
+  which 23 include current-build structural evidence and 18 are previous-build
+  only; another 20 remain `not_sampled`
 
 The current package exposes candidates far beyond the old transcript sample:
 application and thread shells, local/remote conversation routes, projects and
@@ -228,9 +228,27 @@ geometry remain independent, so a passing plain assistant fallback cannot
 promote MCP tool rendering and a failed command cannot promote thread-level
 render/retry recovery.
 
+The long-thread continuity slice adds the current-build default ten-message
+threshold and measured 36×10 rows to `ThreadMessageNavigationRail`, exposes
+the rail and 32×32 latest-message control as overlay slots on
+`ConversationThreadShell`, and adds `ThreadInterruptionSummary` plus
+`ThreadContextEvent`. Five external references independently gate medium
+message navigation and compact scroll-away, interrupted, context-running, and
+context-completed states. Their full-image deltas are 1.8139%, 2.9354%,
+3.2975%, 3.6442%, and 3.4328%, with all named geometry and header/thread/
+Composer regional limits passing.
+
+Current runtime evidence also records that the product's long-thread viewport
+uses reverse-origin scrolling (`scrollTop = 0` at latest, negative away from
+latest). The public package keeps the actual windowing and scroll algorithm
+host-owned; its placeholder, navigation, and follow contracts therefore remain
+an intentionally partial implementation even though the sampled Browser and
+Electron acceptance surfaces are verified. The current error/retry state was
+not safely reached and remains a separate unpromoted gate.
+
 This is a measurement- and raster-backed basic thread slice, not a claim that
 the whole application or every thread lifecycle is pixel-perfect. Markdown
-variants, virtualization, cancellation results, code search, successful MCP
-and connector calls, thread-level retry recovery, approval persistence and
+variants, the exact host virtualization algorithm, code search, successful
+MCP and connector calls, thread-level retry recovery, approval persistence and
 timeout, multi-file review, and native window behavior retain their own
 inventory gates.
