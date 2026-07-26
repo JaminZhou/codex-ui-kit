@@ -243,10 +243,13 @@ uses reverse-origin scrolling (`scrollTop = 0` at latest, negative away from
 latest). The public package keeps the actual windowing and scroll algorithm
 host-owned. Browser and Electron acceptance exercise the placeholder,
 navigation, and follow contracts but not reverse scrolling or windowing, so
-the virtualization row remains `partial_legacy`. The current error/retry state
-was not safely reached and remains a separate unpromoted gate. Manual
-compaction is likewise tracked independently as `thread.context-compaction`;
-it does not promote the still-unreached thread summary panel.
+the virtualization row remains `partial_legacy`. The interruption acceptance
+renders the observed summary statically rather than driving a host
+run-to-stop-to-summary transition, so that row also remains `partial_legacy`.
+The current error/retry state was not safely reached and remains a separate
+unpromoted gate. Manual compaction is likewise tracked independently as
+`thread.context-compaction`; it does not promote the still-unreached thread
+summary panel.
 
 This is a measurement- and raster-backed basic thread slice, not a claim that
 the whole application or every thread lifecycle is pixel-perfect. Markdown

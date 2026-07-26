@@ -254,8 +254,8 @@
         "cdp-26.721:synthetic-you-stopped-after-2s-divider-raster"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "verified",
-      "electronStatus": "verified",
+      "browserStatus": "partial_legacy",
+      "electronStatus": "partial_legacy",
       "priority": "p0"
     },
     {
