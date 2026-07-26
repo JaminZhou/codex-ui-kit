@@ -19,9 +19,10 @@ second component implementation and it is not published with the package.
   real BrowserWindow.
 - Exercise a compact modal dialog with focus trapping, focus restoration,
   descriptive choices, and document scroll locking.
-- Exercise project, run-location, and worktree selectors plus conversation
-  event ownership, PR list/detail, checks, reviewers, and inline review threads
-  at standard and compact sizes.
+- Exercise the project-index-to-conversation page, route radio selection,
+  worktree list, project/run-location/worktree selectors, conversation event
+  ownership, PR list/detail, checks, reviewers, and inline review threads at
+  standard and compact sizes.
 - Keep `contextIsolation`, sandboxing, and a narrow preload API enabled.
 
 Electron is intentionally declared only in this workspace's development
@@ -53,8 +54,9 @@ build documented in `research/26.721.41059.md`.
 Set `CODEX_UI_KIT_ACCEPTANCE_DIR` while running `preview` to write package-safe
 geometry JSON and screenshots for the composer, interactive primitive,
 navigation, resource, generated-image, preview, workspace-selection,
-conversation-event, and pull-request surfaces. The same run asserts viewport
-overflow, theme, focus, overlay ownership, selector availability, responsive
-PR geometry, critical surfaces, and thread top/bottom positioning; a mismatch
-exits non-zero instead of merely writing a capture. Acceptance output belongs
-in `/private/tmp`, never in the repository.
+project-routing, conversation-event, and pull-request surfaces. The same run
+asserts viewport overflow, theme, focus, overlay ownership, selector
+availability, responsive project-routing and PR geometry, critical surfaces,
+and thread top/bottom positioning; a mismatch exits non-zero instead of merely
+writing a capture. Acceptance output belongs in `/private/tmp`, never in the
+repository.

@@ -99,6 +99,16 @@ All privileged behavior remains host-owned. The components never auto-approve co
 
 ## Workspace and pull-request workflow
 
+- `ProjectConversationPage`: bounded split/stacked page composition connecting
+  an application-owned project index to conversation and workspace setup.
+- `ProjectIndex`: controlled project navigation with selected, available,
+  loading, unavailable, error, search-toolbar, metadata, path, and empty
+  states.
+- `ConversationRouteSelector`: keyboard-navigable radio-card selection for
+  local, remote, ChatGPT, or host-defined conversation routes.
+- `WorktreeList`: controlled workspace list with branch/path identity,
+  selected, creating, repairing, unavailable, error, item-action, and empty
+  states.
 - `WorkspaceSelection`: responsive project-context composition with controlled
   header, actions, field, footer, loading, ready, and error states.
 - `ProjectPicker`: controlled project selection with paths, descriptions,

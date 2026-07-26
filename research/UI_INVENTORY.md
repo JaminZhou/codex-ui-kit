@@ -54,9 +54,9 @@ observation from a previous build remains historical evidence.
 - Scoped CDP automation: available through a user-authorized second process;
   the Chromium profile is separate, but Codex application data and navigation
   are not fully isolated
-- Current inventory: 56 surface groups; 29 have scoped runtime evidence, of
-  which 2 include current-build structural evidence and 27 are previous-build
-  only; another 27 remain `not_sampled`
+- Current inventory: 56 surface groups; 30 have scoped runtime evidence, of
+  which 3 include current-build structural evidence and 27 are previous-build
+  only; another 26 remain `not_sampled`
 
 The current package exposes candidates far beyond the old transcript sample:
 application and thread shells, local/remote conversation routes, projects and
@@ -133,13 +133,21 @@ selects a PR, and checks event/live-region semantics, list/detail geometry, and
 horizontal overflow at 1180×820 dark and 820×680 light. The PR layout is split
 at the standard size and stacked at the compact size.
 
-All affected inventory entries remain `partial`. Project/worktree selection
-and the PR index have H5/Electron implementation acceptance and previous-build
-runtime evidence. After the installed application update, their comparison
-status is `partial_legacy` until the same flows are sampled on
-`26.721.41059`. Exact current-build PR review-detail behavior remains
-`not_sampled`, so the generic review components do not establish product
-parity. Native application-shell composition, route persistence, panel
-resizing, and the remaining P0 conversation/workspace variants also remain
-open. Final H5/Electron visual unification is intentionally deferred until
-coverage stabilizes.
+The project-entry slice adds `ProjectConversationPage`, `ProjectIndex`,
+`ConversationRouteSelector`, and `WorktreeList`. It composes the
+application-owned project list with an explicit local/remote/ChatGPT route
+choice and workspace-owned checkout selection. The controls remain
+protocol-neutral and every privileged operation stays host-owned. The H5 and
+Electron showcases exercise project, route, and worktree transitions in split
+and compact stacked layouts.
+
+All affected inventory entries remain `partial`. The current-build probe
+establishes only the global Projects entry and de-identified list structure;
+it does not expose the exact project contents or local/remote/ChatGPT
+conversation transitions. Worktree comparison remains `partial_legacy`
+because its runtime evidence is from `26.715.72359`. Exact current-build PR
+review-detail behavior remains `not_sampled`, so the generic review components
+do not establish product parity. Native application-shell composition, route
+persistence, panel resizing, and the remaining P0 conversation/workspace
+variants also remain open. Final H5/Electron visual unification is
+intentionally deferred until coverage stabilizes.

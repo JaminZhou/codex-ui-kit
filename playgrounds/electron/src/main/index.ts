@@ -165,6 +165,26 @@ async function captureWorkflowSurfaces(webContents: WebContents) {
     }
     await wait(180);
 
+    const routingProject = card?.querySelector(
+      '.codex-ui-project-index__item[aria-label="Open project Desktop"]',
+    );
+    routingProject?.click();
+    await wait(80);
+    const routingRoute = card?.querySelector(
+      '.codex-ui-conversation-route-selector__option[data-route-id="chatgpt"]',
+    );
+    routingRoute?.click();
+    await wait(80);
+    const routingWorktree = card?.querySelector(
+      '.codex-ui-worktree-list__item[aria-label="Open worktree Main checkout"]',
+    );
+    routingWorktree?.click();
+    await wait(80);
+    const startConversation = [...(card?.querySelectorAll('button') ?? [])]
+      .find((button) => button.textContent?.trim() === 'Start conversation');
+    startConversation?.click();
+    await wait(120);
+
     const selectorOverlays = [];
     for (const selector of [
       { label: 'Project', role: 'listbox' },
@@ -196,6 +216,20 @@ async function captureWorkflowSurfaces(webContents: WebContents) {
     await wait(120);
 
     const workspace = card?.querySelector('.codex-ui-workspace-selection');
+    const routingPage = card?.querySelector('.codex-ui-project-conversation-page');
+    const routingBody = routingPage?.querySelector(
+      '.codex-ui-project-conversation-page__body',
+    );
+    const routingProjects = routingPage?.querySelector(
+      '.codex-ui-project-conversation-page__projects',
+    );
+    const routingSetup = routingPage?.querySelector(
+      '.codex-ui-project-conversation-page__setup',
+    );
+    const routingPageBounds = routingPage?.getBoundingClientRect();
+    const routingBodyBounds = routingBody?.getBoundingClientRect();
+    const routingProjectsBounds = routingProjects?.getBoundingClientRect();
+    const routingSetupBounds = routingSetup?.getBoundingClientRect();
     const eventList = card?.querySelector('.codex-ui-conversation-event-list');
     const eventRows = [...(eventList?.querySelectorAll('.codex-ui-conversation-event') ?? [])];
     const runningEvent = eventList?.querySelector('[data-status="running"] [role="status"]');
@@ -247,6 +281,60 @@ async function captureWorkflowSurfaces(webContents: WebContents) {
       resolvedTheme: document.querySelector('.desktop-playground')?.getAttribute('data-theme'),
       reviewRows: [...(pullRequestPage?.querySelectorAll('.codex-ui-pull-request-reviews li') ?? [])].map(rect),
       reviewThread: rect(reviewThread),
+      routingBody: rect(routingBody),
+      routingBodyWithinPage:
+        Boolean(routingPageBounds && routingBodyBounds) &&
+        routingBodyBounds.bottom <= routingPageBounds.bottom + 1,
+      routingChildrenWithinBody:
+        Boolean(routingBodyBounds && routingProjectsBounds && routingSetupBounds) &&
+        routingProjectsBounds.bottom <= routingBodyBounds.bottom + 1 &&
+        routingSetupBounds.bottom <= routingBodyBounds.bottom + 1,
+      routingLayout:
+        routingProjectsBounds && routingSetupBounds &&
+        Math.abs(routingProjectsBounds.top - routingSetupBounds.top) <= 2
+          ? 'split'
+          : 'stacked',
+      routingPage: rect(routingPage),
+      routingProjectItems: [
+        ...(routingPage?.querySelectorAll('.codex-ui-project-index__item') ?? []),
+      ].map(rect),
+      routingProjects: rect(routingProjects),
+      routingProjectsOverflowY: routingProjects
+        ? getComputedStyle(routingProjects).overflowY
+        : null,
+      routingRouteOptions: [
+        ...(routingPage?.querySelectorAll(
+          '.codex-ui-conversation-route-selector__option',
+        ) ?? []),
+      ].map((option) => ({
+        bounds: rect(option),
+        checked: option.getAttribute('aria-checked'),
+        disabled: option.hasAttribute('disabled'),
+        routeId: option.getAttribute('data-route-id'),
+      })),
+      routingSetup: rect(routingSetup),
+      routingSetupOverflowY: routingSetup
+        ? getComputedStyle(routingSetup).overflowY
+        : null,
+      routingState:
+        card?.querySelector('[data-workflow-state="routing"]')?.textContent ?? null,
+      routingWorktreeItems: [
+        ...(routingPage?.querySelectorAll('.codex-ui-worktree-list__item') ?? []),
+      ].map(rect),
+      selectedConversationRoute:
+        routingPage
+          ?.querySelector(
+            '.codex-ui-conversation-route-selector__option[aria-checked="true"]',
+          )
+          ?.getAttribute('data-route-id') ?? null,
+      selectedRoutingProject:
+        routingPage
+          ?.querySelector('.codex-ui-project-index__item[aria-current="page"]')
+          ?.getAttribute('aria-label') ?? null,
+      selectedRoutingWorktree:
+        routingPage
+          ?.querySelector('.codex-ui-worktree-list__item[aria-current="location"]')
+          ?.getAttribute('aria-label') ?? null,
       runningEventBusy: runningEvent?.getAttribute('aria-busy') ?? null,
       selectedPullRequest: selectedPullRequest?.getAttribute('aria-label') ?? null,
       selectionText: card?.querySelector('[data-workflow-state="selection"]')?.textContent ?? null,
@@ -265,6 +353,25 @@ async function captureWorkflowSurfaces(webContents: WebContents) {
     }
     return metrics;
   })()`);
+}
+
+async function focusProjectRoutingSurface(webContents: WebContents) {
+  await webContents.executeJavaScript(`(() => {
+    const card = document.querySelector(
+      '[data-acceptance-surface="workflow-surfaces"]',
+    );
+    const page = card?.querySelector(
+      '.codex-ui-project-conversation-page',
+    );
+    const scrollRegion = document.querySelector('.desktop-scroll-region');
+    if (!page || !(scrollRegion instanceof HTMLElement)) return false;
+    scrollRegion.style.scrollBehavior = 'auto';
+    const regionBounds = scrollRegion.getBoundingClientRect();
+    const pageBounds = page.getBoundingClientRect();
+    scrollRegion.scrollTop += pageBounds.top - regionBounds.top - 12;
+    return true;
+  })()`);
+  await new Promise((resolve) => setTimeout(resolve, 180));
 }
 
 async function captureResourceSurfaces(
@@ -635,6 +742,9 @@ async function captureAcceptance(browserWindow: BrowserWindow) {
     browserWindow.webContents,
   );
   const workflowScreenshot = await browserWindow.webContents.capturePage();
+  await focusProjectRoutingSurface(browserWindow.webContents);
+  const projectRoutingScreenshot =
+    await browserWindow.webContents.capturePage();
   nativeTheme.themeSource = "light";
   sendThemeState(browserWindow.webContents);
   await browserWindow.webContents.executeJavaScript(
@@ -660,6 +770,9 @@ async function captureAcceptance(browserWindow: BrowserWindow) {
     browserWindow.webContents,
   );
   const compactWorkflowScreenshot =
+    await browserWindow.webContents.capturePage();
+  await focusProjectRoutingSurface(browserWindow.webContents);
+  const compactProjectRoutingScreenshot =
     await browserWindow.webContents.capturePage();
   console.log("acceptance step: compact navigation");
   const compactNavigationMetrics = await captureNavigationSurfaces(
@@ -761,12 +874,19 @@ async function captureAcceptance(browserWindow: BrowserWindow) {
       requiredFields: ["card", "gallery", "galleryImage", "sourceList"],
     });
   }
-  for (const [name, snapshot, expectedTheme, pullRequestLayout] of [
-    ["workflow surfaces", workflowMetrics, "dark", "split"],
+  for (const [
+    name,
+    snapshot,
+    expectedTheme,
+    pullRequestLayout,
+    routingLayout,
+  ] of [
+    ["workflow surfaces", workflowMetrics, "dark", "split", "split"],
     [
       "compact workflow surfaces",
       compactWorkflowMetrics,
       "light",
+      "stacked",
       "stacked",
     ],
   ] as const) {
@@ -782,9 +902,18 @@ async function captureAcceptance(browserWindow: BrowserWindow) {
         pullRequestChildrenWithinBody: true,
         pullRequestDetailOverflowY: "auto",
         pullRequestLayout,
+        routingBodyWithinPage: true,
+        routingChildrenWithinBody: true,
+        routingLayout,
+        routingProjectsOverflowY: "auto",
+        routingSetupOverflowY: "auto",
+        routingState: "desktop/chatgpt/main",
         runningEventBusy: "true",
+        selectedConversationRoute: "chatgpt",
         selectedPullRequest:
           "Open pull request 50: Add current application shell",
+        selectedRoutingProject: "Open project Desktop",
+        selectedRoutingWorktree: "Open worktree Main checkout",
         selectionText: "ui-kit/worktree/feature",
         threadEventCount: 2,
       },
@@ -793,6 +922,9 @@ async function captureAcceptance(browserWindow: BrowserWindow) {
         checkRows: 2,
         eventRows: 6,
         reviewRows: 1,
+        routingProjectItems: 3,
+        routingRouteOptions: 3,
+        routingWorktreeItems: 3,
         selectorOverlays: 3,
         workspaceFields: 3,
       },
@@ -804,6 +936,10 @@ async function captureAcceptance(browserWindow: BrowserWindow) {
         "pullRequestList",
         "pullRequestPage",
         "reviewThread",
+        "routingBody",
+        "routingPage",
+        "routingProjects",
+        "routingSetup",
         "workspace",
       ],
     });
@@ -928,12 +1064,20 @@ async function captureAcceptance(browserWindow: BrowserWindow) {
       workflowScreenshot.toPNG(),
     ),
     writeFile(
+      join(outputDirectory, "project-routing.png"),
+      projectRoutingScreenshot.toPNG(),
+    ),
+    writeFile(
       join(outputDirectory, "workflow-surfaces-compact-light-metrics.json"),
       `${JSON.stringify(compactWorkflowMetrics, null, 2)}\n`,
     ),
     writeFile(
       join(outputDirectory, "workflow-surfaces-compact-light.png"),
       compactWorkflowScreenshot.toPNG(),
+    ),
+    writeFile(
+      join(outputDirectory, "project-routing-compact-light.png"),
+      compactProjectRoutingScreenshot.toPNG(),
     ),
   ]);
   console.log(`acceptance capture: ${outputDirectory}`);

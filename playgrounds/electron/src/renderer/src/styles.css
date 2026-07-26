@@ -404,6 +404,11 @@ button {
   overflow: hidden;
 }
 
+.workflow-state-matrix > .codex-ui-project-conversation-page {
+  grid-column: 1 / -1;
+  height: 40rem;
+}
+
 .workflow-state-matrix__events .codex-ui-conversation-event-list {
   max-height: 24rem;
   overflow: auto;
@@ -1104,6 +1109,11 @@ button {
   .workflow-state-matrix > .codex-ui-pull-request-page {
     grid-column: auto;
     height: 50rem;
+  }
+
+  .workflow-state-matrix > .codex-ui-project-conversation-page {
+    grid-column: auto;
+    height: 48rem;
   }
 
   .activity-state-matrix,
