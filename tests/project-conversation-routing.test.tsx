@@ -222,6 +222,43 @@ describe("project conversation routing", () => {
     expect(option.tabIndex).toBe(0);
   });
 
+  it("does not steal focus after the initial listbox entry succeeds", () => {
+    const renderListbox = (selectedId: string, desktopDisabled: boolean) => (
+      <>
+        <textarea aria-label="Outside composer" />
+        <ConversationProjectListbox
+          items={[
+            {
+              id: "ui-kit",
+              label: "UI Kit",
+            },
+            {
+              disabled: desktopDisabled,
+              id: "desktop",
+              label: "Desktop",
+            },
+          ]}
+          onSelect={() => undefined}
+          selectedId={selectedId}
+        />
+      </>
+    );
+    const { rerender } = render(renderListbox("ui-kit", true));
+    expect(document.activeElement).toBe(
+      screen.getByRole("option", {
+        name: "Select project UI Kit",
+      }),
+    );
+    const composer = screen.getByRole("textbox", {
+      name: "Outside composer",
+    });
+    composer.focus();
+
+    rerender(renderListbox("desktop", false));
+
+    expect(document.activeElement).toBe(composer);
+  });
+
   it("keeps a first-enabled tab stop without automatic focus", () => {
     render(
       <ConversationProjectListbox

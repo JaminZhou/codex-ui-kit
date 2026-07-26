@@ -905,6 +905,7 @@ export function ConversationProjectListbox({
 }: ConversationProjectListboxProps) {
   const listboxId = useId();
   const listboxRef = useRef<HTMLDivElement | null>(null);
+  const initialFocusCompleteRef = useRef(initialFocus === "none");
   const enabledItems = items.filter(
     (item) => !projectIndexItemDisabled(item),
   );
@@ -922,7 +923,12 @@ export function ConversationProjectListbox({
     : fallbackActiveId;
 
   useEffect(() => {
-    if (initialFocus === "none") return;
+    if (
+      initialFocus === "none" ||
+      initialFocusCompleteRef.current
+    ) {
+      return;
+    }
     const listbox = listboxRef.current;
     if (!listbox) return;
     const enabled = projectListboxOptions(listbox);
@@ -938,6 +944,12 @@ export function ConversationProjectListbox({
       )
     ) {
       enabled[0]?.focus();
+    }
+    if (
+      typeof document !== "undefined" &&
+      listbox.contains(document.activeElement)
+    ) {
+      initialFocusCompleteRef.current = true;
     }
   }, [enabledItemKey, initialFocus, selectedId]);
 
