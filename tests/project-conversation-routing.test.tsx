@@ -151,6 +151,9 @@ describe("project conversation routing", () => {
     const group = screen.getByRole("radiogroup", {
       name: "Conversation route",
     });
+    expect(accessibleDescriptionText(group)).toBe(
+      "Choose where the conversation runs.",
+    );
     const local = within(group).getByRole("radio", { name: /Local/ });
     const remote = within(group).getByRole("radio", {
       name: /Remote/,

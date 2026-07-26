@@ -351,6 +351,10 @@ export function ConversationRouteSelector({
   value,
   ...props
 }: ConversationRouteSelectorProps) {
+  const routeSelectorId = useId();
+  const descriptionId = description
+    ? `${routeSelectorId}-description`
+    : undefined;
   const selectedIndex = options.findIndex(
     (option) =>
       option.id === value &&
@@ -374,9 +378,10 @@ export function ConversationRouteSelector({
     >
       <div className="codex-ui-conversation-route-selector__header">
         <span>{label}</span>
-        {description ? <p>{description}</p> : null}
+        {description ? <p id={descriptionId}>{description}</p> : null}
       </div>
       <div
+        aria-describedby={descriptionId}
         aria-label={label}
         className="codex-ui-conversation-route-selector__options"
         role="radiogroup"

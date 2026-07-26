@@ -31,6 +31,7 @@ import {
   type ConversationEventKind,
   ConversationRouteSelector,
   type ConversationRouteOption,
+  type ConversationRouteSelectorProps,
   Dialog,
   DialogChoice,
   type DialogSize,
@@ -144,6 +145,10 @@ const conversationRoute: ConversationRouteOption = {
   id: "local",
   label: "Local",
 };
+type ConversationRouteSelectorAcceptsChildren =
+  "children" extends keyof ConversationRouteSelectorProps ? true : false;
+const conversationRouteSelectorAcceptsChildren: ConversationRouteSelectorAcceptsChildren =
+  false;
 const projectIndexItem: ProjectIndexItem = {
   id: "package-project",
   label: "Package project",
@@ -205,6 +210,7 @@ void ComposerModeIndicator;
 void ConversationEvent;
 void ConversationEventList;
 void ConversationRouteSelector;
+void conversationRouteSelectorAcceptsChildren;
 void Dialog;
 void DialogChoice;
 void ProposedPlan;
