@@ -5,6 +5,7 @@ import {
   fireEvent,
   render,
   screen,
+  waitFor,
   within,
 } from "@testing-library/react";
 import { useState } from "react";
@@ -64,7 +65,7 @@ describe("conversation event surfaces", () => {
 });
 
 describe("workspace selection surfaces", () => {
-  it("coordinates project, run location, and worktree choices", () => {
+  it("coordinates project, run location, and worktree choices", async () => {
     function Fixture() {
       const [project, setProject] = useState("ui-kit");
       const [location, setLocation] = useState("local");
@@ -143,18 +144,28 @@ describe("workspace selection surfaces", () => {
       "Desktop",
     );
 
-    fireEvent.click(screen.getByRole("button", { name: "Run location" }));
+    fireEvent.keyDown(screen.getByRole("button", { name: "Run location" }), {
+      key: "ArrowDown",
+    });
     const menu = screen.getByRole("menu");
+    const localOption = within(menu).getByRole("menuitemradio", {
+      name: /Local/,
+    });
+    await waitFor(() => expect(document.activeElement).toBe(localOption));
     expect(
-      within(menu)
-        .getByRole("menuitemradio", { name: /Local/ })
-        .getAttribute("aria-checked"),
+      localOption.getAttribute("aria-checked"),
     ).toBe("true");
-    expect(
-      within(menu).getByRole("menuitemradio", { name: /Cloud/ }),
-    ).toHaveProperty("disabled", true);
+    const cloudOption = within(menu).getByRole("menuitemradio", {
+      name: "Cloud Unavailable",
+    });
+    expect(cloudOption).toHaveProperty("disabled", true);
+    fireEvent.keyDown(menu, { key: "ArrowDown" });
+    const worktreeOption = within(menu).getByRole("menuitemradio", {
+      name: /New worktree/,
+    });
+    expect(document.activeElement).toBe(worktreeOption);
     fireEvent.click(
-      within(menu).getByRole("menuitemradio", { name: /New worktree/ }),
+      worktreeOption,
     );
 
     fireEvent.click(screen.getByRole("button", { name: "Worktree" }));

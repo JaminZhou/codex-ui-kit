@@ -7256,19 +7256,23 @@ button.codex-ui-generated-image-gallery__image {
   gap: 0.5rem;
 }
 
-.codex-ui-run-location-menu__end[data-status="unavailable"],
+.codex-ui-run-location-menu__status[data-status="unavailable"],
 .codex-ui-project-picker__status[data-status="unavailable"],
 .codex-ui-worktree-picker__status[data-status="unavailable"] {
   color: var(--codex-ui-text-error);
 }
 
-.codex-ui-run-location-menu__end[data-status="loading"],
-.codex-ui-run-location-menu__end[data-status="repairing"],
+.codex-ui-run-location-menu__status[data-status="loading"],
+.codex-ui-run-location-menu__status[data-status="repairing"],
 .codex-ui-project-picker__status[data-status="loading"],
 .codex-ui-project-picker__status[data-status="repairing"],
 .codex-ui-worktree-picker__status[data-status="loading"],
 .codex-ui-worktree-picker__status[data-status="repairing"] {
   color: var(--codex-ui-text-warning);
+}
+
+.codex-ui-run-location-menu__status {
+  margin-inline-start: 0.5rem;
 }
 
 .codex-ui-run-location-menu__empty {

@@ -199,13 +199,7 @@ export function RunLocationMenu({
                 aria-checked={selectedOption}
                 disabled={unavailable}
                 endIcon={
-                  <span
-                    className="codex-ui-run-location-menu__end"
-                    data-status={option.status}
-                  >
-                    {option.statusLabel ? (
-                      <span>{option.statusLabel}</span>
-                    ) : null}
+                  <span className="codex-ui-run-location-menu__end">
                     <span>{selectedOption ? "✓" : ""}</span>
                   </span>
                 }
@@ -213,7 +207,23 @@ export function RunLocationMenu({
                 onSelect={() => onValueChange(option.id)}
                 role="menuitemradio"
                 startIcon={option.icon}
-                subText={option.description}
+                subText={
+                  option.description || option.statusLabel ? (
+                    <>
+                      {option.description ? (
+                        <span>{option.description}</span>
+                      ) : null}
+                      {option.statusLabel ? (
+                        <span
+                          className="codex-ui-run-location-menu__status"
+                          data-status={option.status}
+                        >
+                          {option.statusLabel}
+                        </span>
+                      ) : null}
+                    </>
+                  ) : undefined
+                }
               >
                 {option.label}
               </MenuItem>
