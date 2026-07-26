@@ -1008,7 +1008,14 @@ export function ConversationProjectListbox({
             data-status={item.status}
             disabled={disabled}
             key={item.id}
-            onClick={() => onSelect(item.id)}
+            onClick={() => {
+              onSelect(item.id);
+              if (triggerId && typeof window !== "undefined") {
+                window.setTimeout(() =>
+                  document.getElementById(triggerId)?.focus(),
+                );
+              }
+            }}
             onFocus={() => setActiveId(item.id)}
             onKeyDown={(event) => {
               if (event.key === "Escape" && onDismiss) {

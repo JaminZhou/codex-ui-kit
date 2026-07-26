@@ -1884,7 +1884,8 @@ export function DesktopPlayground() {
                   }
                 }}
                 onQueryChange={setLocalEnvironmentQuery}
-                onSelect={(_groupId, itemId) => {
+                onSelect={(groupId, itemId) => {
+                  setRoutingProject(groupId);
                   setRoutingRoute("local");
                   setRoutingWorktree(
                     itemId === "desktop-main" ? "main" : itemId,

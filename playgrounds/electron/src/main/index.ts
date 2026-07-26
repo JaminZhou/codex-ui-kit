@@ -236,6 +236,8 @@ async function captureWorkflowSurfaces(webContents: WebContents) {
     );
     routingProject?.click();
     await wait(80);
+    const routingProjectSelectionFocusRestored =
+      document.activeElement === routingProjectContext;
     const routingWorktreeContext = card?.querySelector(
       '[data-desktop-local-environment-context="true"] [data-kind="worktree"]',
     );
@@ -258,6 +260,19 @@ async function captureWorkflowSurfaces(webContents: WebContents) {
       ?.querySelector('.codex-ui-dialog__close')
       ?.click();
     await wait(100);
+    const routingProjectContextBeforeEnvironment = card?.querySelector(
+      '[data-desktop-local-environment-context="true"] [data-kind="project"]',
+    );
+    routingProjectContextBeforeEnvironment?.click();
+    await wait(100);
+    const uiKitProject = card?.querySelector(
+      '#desktop-routing-project-options [role="option"][data-project-id="ui-kit"]',
+    );
+    uiKitProject?.click();
+    await wait(100);
+    const routingProjectBeforeEnvironment = card?.querySelector(
+      '.codex-ui-project-index__item[aria-current="page"]',
+    );
     const routingEnvironment = card?.querySelector(
       '[data-desktop-local-environment-context="true"] [data-kind="environment"]',
     );
@@ -337,6 +352,14 @@ async function captureWorkflowSurfaces(webContents: WebContents) {
       );
     desktopMainEnvironment?.click();
     await wait(100);
+    const routingProjectAfterEnvironment = card?.querySelector(
+      '.codex-ui-project-index__item[aria-current="page"]',
+    );
+    const localEnvironmentProjectAligned =
+      routingProjectBeforeEnvironment?.getAttribute('aria-label') ===
+        'Open project UI Kit' &&
+      routingProjectAfterEnvironment?.getAttribute('aria-label') ===
+        'Open project Desktop';
     const routingComposerInput = card?.querySelector(
       '.codex-ui-new-conversation-start .codex-ui-composer__input',
     );
@@ -527,6 +550,7 @@ async function captureWorkflowSurfaces(webContents: WebContents) {
         routingProjectMetrics.initialFocusSelected,
       routingProjectRovingTabStopMoved:
         routingProjectMetrics.rovingTabStopMoved,
+      routingProjectSelectionFocusRestored,
       routingProjectTriggerControls:
         routingProjectMetrics.triggerControls,
       routingProjectTriggerExpanded:
@@ -548,6 +572,7 @@ async function captureWorkflowSurfaces(webContents: WebContents) {
           )
           ?.getAttribute('aria-label') ?? null,
       localEnvironmentDialog: localEnvironmentMetrics.bounds,
+      localEnvironmentProjectAligned,
       localEnvironmentFilteredGroupCount:
         localEnvironmentMetrics.filteredGroupCount,
       localEnvironmentFilteredItemCount:
@@ -1194,6 +1219,7 @@ async function captureAcceptance(browserWindow: BrowserWindow) {
         routingProjectArrowNavigationMoved: true,
         routingProjectInitialFocusSelected: true,
         routingProjectRovingTabStopMoved: true,
+        routingProjectSelectionFocusRestored: true,
         routingProjectTriggerControls:
           "desktop-routing-project-options",
         routingProjectTriggerExpanded: "true",
@@ -1211,6 +1237,7 @@ async function captureAcceptance(browserWindow: BrowserWindow) {
         localEnvironmentGroupCount: 2,
         localEnvironmentInViewport: true,
         localEnvironmentItemCount: 4,
+        localEnvironmentProjectAligned: true,
         localEnvironmentFilteredGroupCount: 1,
         localEnvironmentFilteredItemCount: 1,
         localEnvironmentRepairingDisabledCount: 1,

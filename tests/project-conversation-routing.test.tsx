@@ -5,6 +5,7 @@ import {
   fireEvent,
   render,
   screen,
+  waitFor,
   within,
 } from "@testing-library/react";
 import { useState } from "react";
@@ -101,7 +102,7 @@ describe("project conversation routing", () => {
     expect(accessibleDescriptionText(repairing)).toContain("Repairing");
   });
 
-  it("focuses and keyboard-navigates linked conversation project options", () => {
+  it("focuses and keyboard-navigates linked conversation project options", async () => {
     const onDismiss = vi.fn();
     const onSelect = vi.fn();
     render(
@@ -171,9 +172,20 @@ describe("project conversation routing", () => {
     expect(document.activeElement).toBe(desktop);
     fireEvent.click(desktop);
     expect(onSelect).toHaveBeenCalledWith("desktop");
+    await waitFor(() =>
+      expect(document.activeElement).toBe(
+        screen.getByRole("button", { name: "Project" }),
+      ),
+    );
 
+    desktop.focus();
     fireEvent.keyDown(desktop, { key: "Escape" });
     expect(onDismiss).toHaveBeenCalledTimes(1);
+    await waitFor(() =>
+      expect(document.activeElement).toBe(
+        screen.getByRole("button", { name: "Project" }),
+      ),
+    );
   });
 
   it("focuses a selected option when controlled items become enabled", () => {
