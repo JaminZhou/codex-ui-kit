@@ -26,7 +26,9 @@ describe("ConversationThreadShell", () => {
             value=""
           />
         }
+        floatingControl={<button type="button">Latest</button>}
         header={<ThreadHeader position="static" title="Measured thread" />}
+        messageNavigation={<nav aria-label="Message jumps">Markers</nav>}
       >
         <AgentMessage role="user">Run the probe.</AgentMessage>
         <AgentMessage role="assistant">Probe complete.</AgentMessage>
@@ -41,6 +43,20 @@ describe("ConversationThreadShell", () => {
         .querySelector(".codex-ui-conversation-thread-shell__header")
         ?.contains(container.querySelector(".codex-ui-thread-header")),
     ).toBe(true);
+    expect(
+      container
+        .querySelector(
+          ".codex-ui-conversation-thread-shell__message-navigation",
+        )
+        ?.contains(container.querySelector("nav[aria-label='Message jumps']")),
+    ).toBe(true);
+    expect(
+      container
+        .querySelector(
+          ".codex-ui-conversation-thread-shell__floating-control",
+        )
+        ?.textContent,
+    ).toBe("Latest");
     expect(
       container
         .querySelector(".codex-ui-conversation-thread-shell__viewport")
@@ -174,6 +190,23 @@ describe("ConversationThreadShell", () => {
           toJSON: () => ({}),
         };
       }
+      if (
+        this.classList.contains(
+          "codex-ui-conversation-thread-shell__body",
+        )
+      ) {
+        return {
+          bottom: 500,
+          height: 500,
+          left: 0,
+          right: 736,
+          top: 0,
+          width: 736,
+          x: 0,
+          y: 0,
+          toJSON: () => ({}),
+        };
+      }
       return originalGetBoundingClientRect.call(this);
     };
 
@@ -205,12 +238,17 @@ describe("ConversationThreadShell", () => {
         ".codex-ui-conversation-thread-shell__body",
       )!;
 
-      expect(observe).toHaveBeenCalledOnce();
+      expect(observe).toHaveBeenCalledTimes(2);
       expect(
         body.style.getPropertyValue(
           "--codex-ui-conversation-thread-composer-dock-height",
         ),
       ).toBe("138px");
+      expect(
+        body.style.getPropertyValue(
+          "--codex-ui-message-navigation-available-height",
+        ),
+      ).toBe("362px");
 
       unmount();
       expect(disconnect).toHaveBeenCalledOnce();

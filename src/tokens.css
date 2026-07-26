@@ -204,7 +204,7 @@
     var(--codex-ui-spacing) * 6
   );
   --codex-ui-floating-panel-width: calc(var(--codex-ui-spacing) * 70);
-  --codex-ui-message-navigation-inset: calc(var(--codex-ui-spacing) * 3);
+  --codex-ui-message-navigation-inset: calc(var(--codex-ui-spacing) * 4);
   --codex-ui-message-navigation-row-width: calc(var(--codex-ui-spacing) * 9);
   --codex-ui-message-navigation-row-height: calc(var(--codex-ui-spacing) * 6);
   --codex-ui-message-navigation-marker-width: calc(var(--codex-ui-spacing) * 7.5);

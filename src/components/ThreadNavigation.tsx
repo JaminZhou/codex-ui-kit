@@ -156,19 +156,23 @@ export function ThreadMessageNavigationRail({
   insetInlineStart = "var(--codex-ui-message-navigation-inset)",
   items,
   label = "User messages",
-  minItems = 4,
+  minItems = 10,
   onNavigate,
   style,
 }: ThreadMessageNavigationRailProps) {
   const tooltipId = useId();
   const [revealedId, setRevealedId] = useState<string | null>(null);
   const [listOverflow, setListOverflow] = useState(false);
+  const [tooltipMaxWidth, setTooltipMaxWidth] = useState<
+    number | undefined
+  >(undefined);
   const [tooltipTop, setTooltipTop] = useState(0);
   const activeIdSet = new Set(activeIds);
   const activePointerIdRef = useRef<number | null>(null);
   const listRef = useRef<HTMLDivElement>(null);
   const navRef = useRef<HTMLElement>(null);
   const rowRefs = useRef(new Map<string, HTMLDivElement>());
+  const tooltipRef = useRef<HTMLDivElement>(null);
   const lastScrubbedIdRef = useRef<string | null>(null);
   const didScrubRef = useRef(false);
   const suppressClickRef = useRef(false);
@@ -185,7 +189,57 @@ export function ThreadMessageNavigationRail({
     if (!nav || !row) return;
     const navBounds = nav.getBoundingClientRect();
     const rowBounds = row.getBoundingClientRect();
-    setTooltipTop(rowBounds.top - navBounds.top + rowBounds.height / 2);
+    const desiredCenter =
+      rowBounds.top - navBounds.top + rowBounds.height / 2;
+    const tooltipBounds = tooltipRef.current?.getBoundingClientRect();
+    const boundaryBounds = nav.parentElement?.getBoundingClientRect();
+    if (
+      tooltipBounds &&
+      boundaryBounds &&
+      boundaryBounds.width > 0
+    ) {
+      const boundaryInset = 8;
+      const rightToLeft = getComputedStyle(nav).direction === "rtl";
+      const boundarySpace = rightToLeft
+        ? tooltipBounds.right - boundaryBounds.left - boundaryInset
+        : boundaryBounds.right - tooltipBounds.left - boundaryInset;
+      const viewportSpace = rightToLeft
+        ? tooltipBounds.right - boundaryInset
+        : window.innerWidth - tooltipBounds.left - boundaryInset;
+      setTooltipMaxWidth(
+        Math.max(0, Math.min(boundarySpace, viewportSpace)),
+      );
+    } else {
+      setTooltipMaxWidth(undefined);
+    }
+    if (
+      !tooltipBounds ||
+      tooltipBounds.height <= 0 ||
+      !boundaryBounds ||
+      boundaryBounds.height <= 0
+    ) {
+      setTooltipTop(desiredCenter);
+      return;
+    }
+
+    const boundaryInset = 8;
+    const minimumCenter =
+      boundaryBounds.top +
+      boundaryInset +
+      tooltipBounds.height / 2;
+    const maximumCenter =
+      boundaryBounds.bottom -
+      boundaryInset -
+      tooltipBounds.height / 2;
+    const desiredViewportCenter = navBounds.top + desiredCenter;
+    const resolvedViewportCenter =
+      maximumCenter >= minimumCenter
+        ? Math.min(
+            maximumCenter,
+            Math.max(minimumCenter, desiredViewportCenter),
+          )
+        : (boundaryBounds.top + boundaryBounds.bottom) / 2;
+    setTooltipTop(resolvedViewportCenter - navBounds.top);
   };
 
   useEffect(() => {
@@ -203,7 +257,25 @@ export function ThreadMessageNavigationRail({
     };
   }, [items.length, minItems]);
 
-  useLayoutEffect(updateTooltipPosition, [revealedId]);
+  useLayoutEffect(() => {
+    updateTooltipPosition();
+    if (!revealedId) return;
+
+    const update = () => updateTooltipPosition();
+    const observer =
+      typeof ResizeObserver === "undefined"
+        ? null
+        : new ResizeObserver(update);
+    const boundary = navRef.current?.parentElement;
+    if (boundary) observer?.observe(boundary);
+    if (navRef.current) observer?.observe(navRef.current);
+    if (tooltipRef.current) observer?.observe(tooltipRef.current);
+    window.addEventListener("resize", update);
+    return () => {
+      observer?.disconnect();
+      window.removeEventListener("resize", update);
+    };
+  }, [items.length, revealedId]);
 
   if (items.length < minItems) return null;
 
@@ -325,8 +397,9 @@ export function ThreadMessageNavigationRail({
         <div
           className="codex-ui-message-navigation-rail__tooltip"
           id={`${tooltipId}-${revealedIndex}`}
+          ref={tooltipRef}
           role="tooltip"
-          style={{ top: tooltipTop }}
+          style={{ maxWidth: tooltipMaxWidth, top: tooltipTop }}
         >
           <div className="codex-ui-message-navigation-rail__tooltip-label">
             {hasPreviewContent(revealedItem.label)

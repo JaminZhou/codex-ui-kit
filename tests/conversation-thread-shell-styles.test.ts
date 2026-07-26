@@ -53,6 +53,16 @@ describe("current conversation thread shell visual contract", () => {
     expect(styles).toContain(
       "--codex-ui-conversation-thread-composer-dock-height",
     );
+    expect(styles).toContain(
+      "--codex-ui-floating-control-composer-offset: var(\n    --codex-ui-conversation-thread-composer-dock-height,\n    var(--codex-ui-conversation-thread-composer-reserve)",
+    );
+    expect(styles).toContain(
+      ".codex-ui-conversation-thread-shell__message-navigation > *,\n.codex-ui-conversation-thread-shell__floating-control > * {\n  pointer-events: auto",
+    );
+    expect(styles).toContain(
+      ".codex-ui-conversation-thread-shell__message-navigation {\n  bottom: var(\n    --codex-ui-conversation-thread-composer-dock-height",
+    );
+    expect(styles).toContain("overflow: clip");
   });
 
   it("keeps completed assistant actions visible like the sampled thread", () => {

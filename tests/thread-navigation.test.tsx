@@ -10,7 +10,11 @@ import {
   ThreadNavigationControls,
 } from "../src";
 
-afterEach(cleanup);
+afterEach(() => {
+  cleanup();
+  vi.restoreAllMocks();
+  vi.unstubAllGlobals();
+});
 
 describe("thread navigation surfaces", () => {
   it("exposes sidebar and history navigation with observed labels and states", () => {
@@ -114,22 +118,22 @@ describe("thread navigation surfaces", () => {
     expect(panel.hasAttribute("inert")).toBe(false);
   });
 
-  it("reveals the user-message rail only at the observed item threshold", () => {
-    const items = Array.from({ length: 4 }, (_, index) => ({
+  it("reveals the user-message rail only at the current stable item threshold", () => {
+    const items = Array.from({ length: 10 }, (_, index) => ({
       id: `message-${index + 1}`,
       label: `Message ${index + 1}`,
     }));
     const { rerender } = render(
-      <ThreadMessageNavigationRail items={items.slice(0, 3)} />,
+      <ThreadMessageNavigationRail items={items.slice(0, 9)} />,
     );
     expect(screen.queryByRole("navigation", { name: "User messages" })).toBeNull();
 
     rerender(
-      <ThreadMessageNavigationRail activeIds={["message-2"]} items={items} />,
+      <ThreadMessageNavigationRail activeIds={["message-10"]} items={items} />,
     );
     expect(screen.getByRole("navigation", { name: "User messages" })).toBeTruthy();
     expect(
-      screen.getByRole("button", { name: "Jump to user message 2" }).getAttribute(
+      screen.getByRole("button", { name: "Jump to user message 10" }).getAttribute(
         "aria-current",
       ),
     ).toBe("true");
@@ -144,7 +148,11 @@ describe("thread navigation surfaces", () => {
       preview: index === 0 ? "Inspect the complete thread surface." : undefined,
     }));
     render(
-      <ThreadMessageNavigationRail items={items} onNavigate={onNavigate} />,
+      <ThreadMessageNavigationRail
+        items={items}
+        minItems={4}
+        onNavigate={onNavigate}
+      />,
     );
 
     const first = screen.getByRole("button", { name: "Jump to user message 1" });
@@ -155,6 +163,68 @@ describe("thread navigation surfaces", () => {
     expect(onNavigate).toHaveBeenCalledWith(items[0], "smooth");
   });
 
+  it("clamps edge previews inside the navigation overlay boundary", () => {
+    const observe = vi.fn();
+    vi.stubGlobal("ResizeObserver", class ResizeObserver {
+      constructor(_callback: ResizeObserverCallback) {}
+
+      disconnect = vi.fn();
+      observe = observe;
+      unobserve = vi.fn();
+    });
+    const bounds = (
+      top: number,
+      height: number,
+      width = 36,
+      left = 0,
+    ): DOMRect => ({
+      bottom: top + height,
+      height,
+      left,
+      right: left + width,
+      top,
+      width,
+      x: left,
+      y: top,
+      toJSON: () => ({}),
+    });
+    vi.spyOn(HTMLElement.prototype, "getBoundingClientRect").mockImplementation(
+      function (this: HTMLElement) {
+        if (this.classList.contains("codex-ui-message-navigation-rail")) {
+          return bounds(100, 200);
+        }
+        if (
+          this.getAttribute("data-message-navigation-id") === "message-10"
+        ) {
+          return bounds(270, 24);
+        }
+        if (
+          this.classList.contains("codex-ui-message-navigation-rail__tooltip")
+        ) {
+          return bounds(0, 100, 320, 52);
+        }
+        return bounds(100, 200, 320);
+      },
+    );
+    const items = Array.from({ length: 10 }, (_, index) => ({
+      id: `message-${index + 1}`,
+      label: `Message ${index + 1}`,
+    }));
+    const { unmount } = render(<ThreadMessageNavigationRail items={items} />);
+
+    fireEvent.focus(
+      screen.getByRole("button", { name: "Jump to user message 10" }),
+    );
+    const tooltip = screen.getByRole("tooltip");
+    expect(tooltip.style.maxWidth).toBe("260px");
+    expect(tooltip.style.top).toBe("142px");
+    const navigation = screen.getByRole("navigation", {
+      name: "User messages",
+    });
+    expect(observe).toHaveBeenCalledWith(navigation.parentElement);
+    unmount();
+  });
+
   it("scrubs across captured markers with instant navigation", () => {
     const onNavigate = vi.fn();
     const items = Array.from({ length: 4 }, (_, index) => ({
@@ -162,7 +232,11 @@ describe("thread navigation surfaces", () => {
       label: `Message ${index + 1}`,
     }));
     render(
-      <ThreadMessageNavigationRail items={items} onNavigate={onNavigate} />,
+      <ThreadMessageNavigationRail
+        items={items}
+        minItems={4}
+        onNavigate={onNavigate}
+      />,
     );
     const first = screen.getByRole("button", { name: "Jump to user message 1" });
     const third = screen

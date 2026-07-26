@@ -26,7 +26,9 @@ describe("thread navigation visual contract", () => {
     expect(tokens).toContain("--codex-ui-message-navigation-row-height: calc(var(--codex-ui-spacing) * 6)");
     expect(tokens).toContain("--codex-ui-message-navigation-marker-width: calc(var(--codex-ui-spacing) * 7.5)");
     expect(tokens).toContain("--codex-ui-message-navigation-marker-height: calc(var(--codex-ui-spacing) * 0.5)");
-    expect(styles).toContain("max-height: min(70vh, 40rem)");
+    expect(styles).toContain(
+      "var(--codex-ui-message-navigation-available-height, 100vh)",
+    );
     expect(styles).toContain("opacity: 0.4");
     expect(styles).toContain("opacity: 0.6");
     expect(styles).toContain("-webkit-line-clamp: 3");

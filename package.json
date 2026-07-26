@@ -54,6 +54,7 @@
     "check:visual:streaming": "pnpm build:demo && node scripts/check-visual-scenarios.mjs --scenes=current-thread-streaming",
     "check:visual:workflow": "pnpm build:demo && node scripts/check-visual-scenarios.mjs --scenes=current-thread-tool-call,current-thread-approval,current-workspace-file-diff",
     "check:visual:tool-recovery": "pnpm build:demo && node scripts/check-visual-scenarios.mjs --scenes=current-compact-search-tool,current-compact-browser-tool,current-compact-mcp-unavailable,current-compact-command-failure",
+    "check:visual:continuity": "pnpm build:demo && node scripts/check-visual-scenarios.mjs --scenes=current-medium-message-navigation,current-compact-scroll-away,current-compact-interrupted,current-compact-context-running,current-compact-context-completed",
     "check:research": "node scripts/check-research-inventory.mjs",
     "prepack": "node scripts/prepack.mjs",
     "test": "vitest run tests",

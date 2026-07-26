@@ -81,7 +81,10 @@
       "area": "conversation",
       "ownership": "thread",
       "packageEvidence": ["thread-virtualizer", "thread-scroll-controller-context-value"],
-      "runtimeStatus": "not_sampled",
+      "runtimeStatus": "runtime_observed",
+      "runtimeEvidence": [
+        "cdp-26.721:ten-turn-reverse-scroll-windowed-thread"
+      ],
       "implementationStatus": "partial",
       "browserStatus": "partial_legacy",
       "electronStatus": "partial_legacy",
@@ -247,7 +250,8 @@
       "runtimeEvidence": [
         "cdp:stop-button-you-stopped-summary-and-stopped-command",
         "cdp-26.721:synthetic-submit-running-stop-control-completed-transition",
-        "cdp-26.721:synthetic-streaming-stop-28x28-frozen-raster-and-stop-action"
+        "cdp-26.721:synthetic-streaming-stop-28x28-frozen-raster-and-stop-action",
+        "cdp-26.721:synthetic-you-stopped-after-2s-divider-raster"
       ],
       "implementationStatus": "partial",
       "browserStatus": "partial_legacy",
@@ -266,14 +270,31 @@
       "priority": "p0"
     },
     {
+      "id": "thread.context-compaction",
+      "area": "conversation",
+      "ownership": "thread",
+      "packageEvidence": ["local-conversation-page"],
+      "runtimeStatus": "runtime_observed",
+      "runtimeEvidence": [
+        "cdp-26.721:slash-compact-running-and-completed-raster"
+      ],
+      "implementationStatus": "partial",
+      "browserStatus": "partial_legacy",
+      "electronStatus": "partial_legacy",
+      "priority": "p0"
+    },
+    {
       "id": "thread.message-navigation",
       "area": "conversation",
       "ownership": "thread",
       "packageEvidence": ["thread-user-message-navigation-rail"],
-      "runtimeStatus": "not_sampled",
+      "runtimeStatus": "runtime_observed",
+      "runtimeEvidence": [
+        "cdp-26.721:ten-user-message-36x10-navigation-rail"
+      ],
       "implementationStatus": "partial",
-      "browserStatus": "partial_legacy",
-      "electronStatus": "partial_legacy",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
       "priority": "p0"
     },
     {

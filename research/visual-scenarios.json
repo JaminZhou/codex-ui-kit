@@ -804,6 +804,287 @@
           "name": "composer"
         }
       ]
+    },
+    {
+      "capture": "current-medium-message-navigation",
+      "colorScheme": "dark",
+      "geometry": {
+        "composer": ".codex-ui-composer",
+        "firstMarker": ".codex-ui-message-navigation-rail__row:first-child .codex-ui-message-navigation-rail__button",
+        "header": ".codex-ui-conversation-thread-shell__header",
+        "lastMarker": ".codex-ui-message-navigation-rail__row:last-child .codex-ui-message-navigation-rail__button"
+      },
+      "expectedGeometry": {
+        "composer": {
+          "borderRadius": "20px",
+          "height": 98,
+          "left": 85,
+          "top": 706,
+          "width": 736
+        },
+        "firstMarker": {
+          "height": 10,
+          "left": 16,
+          "width": 36
+        },
+        "header": {
+          "height": 46,
+          "left": 0,
+          "top": 0,
+          "width": 906
+        },
+        "lastMarker": {
+          "height": 10,
+          "left": 16,
+          "width": 36
+        }
+      },
+      "id": "current-medium-message-navigation",
+      "masks": [],
+      "maximumDiffRatio": 0.025,
+      "pixelThreshold": 0.05,
+      "referenceEnv": "CODEX_UI_KIT_MEDIUM_MESSAGE_NAVIGATION_REFERENCE",
+      "regions": [
+        {
+          "height": 46,
+          "maximumDiffRatio": 0.04,
+          "name": "header",
+          "top": 0
+        },
+        {
+          "height": 660,
+          "maximumDiffRatio": 0.025,
+          "name": "thread",
+          "top": 46
+        },
+        {
+          "fromBottom": 114,
+          "height": 114,
+          "maximumDiffRatio": 0.02,
+          "name": "composer"
+        }
+      ]
+    },
+    {
+      "capture": "current-compact-scroll-away",
+      "colorScheme": "dark",
+      "geometry": {
+        "composer": ".codex-ui-composer",
+        "floating": ".codex-ui-thread-floating-button",
+        "header": ".codex-ui-conversation-thread-shell__header"
+      },
+      "expectedGeometry": {
+        "composer": {
+          "borderRadius": "20px",
+          "height": 98,
+          "left": 16,
+          "top": 486,
+          "width": 494
+        },
+        "floating": {
+          "height": 32,
+          "left": 247,
+          "width": 32
+        },
+        "header": {
+          "height": 46,
+          "left": 0,
+          "top": 0,
+          "width": 526
+        }
+      },
+      "id": "current-compact-scroll-away",
+      "masks": [],
+      "maximumDiffRatio": 0.035,
+      "pixelThreshold": 0.05,
+      "referenceEnv": "CODEX_UI_KIT_COMPACT_SCROLL_AWAY_REFERENCE",
+      "regions": [
+        {
+          "height": 46,
+          "maximumDiffRatio": 0.07,
+          "name": "header",
+          "top": 0
+        },
+        {
+          "height": 440,
+          "maximumDiffRatio": 0.035,
+          "name": "thread",
+          "top": 46
+        },
+        {
+          "fromBottom": 114,
+          "height": 114,
+          "maximumDiffRatio": 0.026,
+          "name": "composer"
+        }
+      ]
+    },
+    {
+      "capture": "current-compact-interrupted",
+      "colorScheme": "dark",
+      "geometry": {
+        "composer": ".codex-ui-composer",
+        "header": ".codex-ui-conversation-thread-shell__header",
+        "interruption": ".codex-ui-thread-interruption-summary"
+      },
+      "expectedGeometry": {
+        "composer": {
+          "borderRadius": "20px",
+          "height": 98,
+          "left": 16,
+          "top": 486,
+          "width": 494
+        },
+        "header": {
+          "height": 46,
+          "left": 0,
+          "top": 0,
+          "width": 526
+        },
+        "interruption": {
+          "left": 16,
+          "width": 494
+        }
+      },
+      "id": "current-compact-interrupted",
+      "masks": [],
+      "maximumDiffRatio": 0.04,
+      "pixelThreshold": 0.05,
+      "referenceEnv": "CODEX_UI_KIT_COMPACT_INTERRUPTED_REFERENCE",
+      "regions": [
+        {
+          "height": 46,
+          "maximumDiffRatio": 0.07,
+          "name": "header",
+          "top": 0
+        },
+        {
+          "height": 440,
+          "maximumDiffRatio": 0.04,
+          "name": "thread",
+          "top": 46
+        },
+        {
+          "fromBottom": 114,
+          "height": 114,
+          "maximumDiffRatio": 0.026,
+          "name": "composer"
+        }
+      ]
+    },
+    {
+      "capture": "current-compact-context-running",
+      "colorScheme": "dark",
+      "geometry": {
+        "composer": ".codex-ui-composer",
+        "context": ".codex-ui-thread-context-event",
+        "header": ".codex-ui-conversation-thread-shell__header",
+        "stop": ".codex-ui-composer__primary[data-action=\"stop\"]"
+      },
+      "expectedGeometry": {
+        "composer": {
+          "borderRadius": "20px",
+          "height": 98,
+          "left": 16,
+          "top": 486,
+          "width": 494
+        },
+        "context": {
+          "left": 16,
+          "width": 494
+        },
+        "header": {
+          "height": 46,
+          "left": 0,
+          "top": 0,
+          "width": 526
+        },
+        "stop": {
+          "borderRadius": "999px",
+          "height": 28,
+          "left": 474,
+          "top": 548,
+          "width": 28
+        }
+      },
+      "id": "current-compact-context-running",
+      "masks": [],
+      "maximumDiffRatio": 0.043,
+      "pixelThreshold": 0.05,
+      "referenceEnv": "CODEX_UI_KIT_COMPACT_CONTEXT_RUNNING_REFERENCE",
+      "regions": [
+        {
+          "height": 46,
+          "maximumDiffRatio": 0.07,
+          "name": "header",
+          "top": 0
+        },
+        {
+          "height": 440,
+          "maximumDiffRatio": 0.044,
+          "name": "thread",
+          "top": 46
+        },
+        {
+          "fromBottom": 114,
+          "height": 114,
+          "maximumDiffRatio": 0.027,
+          "name": "composer"
+        }
+      ]
+    },
+    {
+      "capture": "current-compact-context-completed",
+      "colorScheme": "dark",
+      "geometry": {
+        "composer": ".codex-ui-composer",
+        "context": ".codex-ui-thread-context-event",
+        "header": ".codex-ui-conversation-thread-shell__header"
+      },
+      "expectedGeometry": {
+        "composer": {
+          "borderRadius": "20px",
+          "height": 98,
+          "left": 16,
+          "top": 486,
+          "width": 494
+        },
+        "context": {
+          "left": 16,
+          "width": 494
+        },
+        "header": {
+          "height": 46,
+          "left": 0,
+          "top": 0,
+          "width": 526
+        }
+      },
+      "id": "current-compact-context-completed",
+      "masks": [],
+      "maximumDiffRatio": 0.042,
+      "pixelThreshold": 0.05,
+      "referenceEnv": "CODEX_UI_KIT_COMPACT_CONTEXT_COMPLETED_REFERENCE",
+      "regions": [
+        {
+          "height": 46,
+          "maximumDiffRatio": 0.07,
+          "name": "header",
+          "top": 0
+        },
+        {
+          "height": 440,
+          "maximumDiffRatio": 0.042,
+          "name": "thread",
+          "top": 46
+        },
+        {
+          "fromBottom": 114,
+          "height": 114,
+          "maximumDiffRatio": 0.026,
+          "name": "composer"
+        }
+      ]
     }
   ]
 }

@@ -978,6 +978,11 @@ async function captureThreadSurfaces(
     const runningMessage = card?.querySelector('.codex-ui-agent-message[data-status="running"]');
     const loadingStates = [...(card?.querySelectorAll('.codex-ui-thread-loading') ?? [])];
     const contextOptimizationStates = [...(card?.querySelectorAll('.codex-ui-thread-context-optimization') ?? [])];
+    const contextEvents = [...(card?.querySelectorAll('.codex-ui-thread-context-event') ?? [])];
+    const interruptionSummaries = [...(card?.querySelectorAll('.codex-ui-thread-interruption-summary') ?? [])];
+    const messageRailRows = [...(card?.querySelectorAll('.codex-ui-conversation-thread-shell__message-navigation .codex-ui-message-navigation-rail__row') ?? [])];
+    const messageNavigation = card?.querySelector('.codex-ui-conversation-thread-shell__message-navigation');
+    const floatingControl = card?.querySelector('.codex-ui-conversation-thread-shell__floating-control .codex-ui-thread-floating-button');
     const spinner = card?.querySelector('.codex-ui-thread-loading__spinner');
     const shimmer = card?.querySelector('.codex-ui-loading-shimmer');
     const skeleton = card?.querySelector('.codex-ui-thread-skeleton');
@@ -1042,6 +1047,12 @@ async function captureThreadSurfaces(
         status: state.getAttribute('data-status'),
         text: state.textContent,
       })),
+      contextEvents: contextEvents.map((state) => ({
+        busy: state.querySelector('[aria-busy="true"]')?.getAttribute('aria-busy') ?? null,
+        status: state.getAttribute('data-status'),
+        text: state.textContent,
+      })),
+      floatingControl: rect(floatingControl),
       groupedTurnGap: groupedTurn ? getComputedStyle(groupedTurn).gap : null,
       headerHeight: headerBounds?.height ?? null,
       loadingStates: loadingStates.map((state) => ({
@@ -1050,6 +1061,17 @@ async function captureThreadSurfaces(
         gap: getComputedStyle(state).gap,
         text: state.textContent,
       })),
+      interruptionSummaries: interruptionSummaries.map((state) => ({
+        status: state.getAttribute('data-status'),
+        text: state.textContent,
+      })),
+      messageNavigation: rect(messageNavigation),
+      messageRailOverlapsComposer: composerBounds
+        ? messageRailRows.some(
+            (row) => row.getBoundingClientRect().bottom > composerBounds.top,
+          )
+        : null,
+      messageRailRows: messageRailRows.map(rect),
       placeholder: rect(placeholder),
       renderError: rect(renderError),
       resolvedTheme: document.querySelector('.desktop-playground')?.getAttribute('data-theme'),
@@ -1093,6 +1115,11 @@ async function captureThreadSurfaces(
 async function captureAcceptance(browserWindow: BrowserWindow) {
   const outputDirectory = process.env.CODEX_UI_KIT_ACCEPTANCE_DIR;
   if (!outputDirectory) return;
+
+  browserWindow.show();
+  browserWindow.focus();
+  browserWindow.webContents.focus();
+  await new Promise((resolve) => setTimeout(resolve, 100));
 
   nativeTheme.themeSource = "dark";
   sendThemeState(browserWindow.webContents);
@@ -1271,6 +1298,7 @@ async function captureAcceptance(browserWindow: BrowserWindow) {
         composerControlAction: "stop",
         composerDockPosition: "absolute",
         headerHeight: 46,
+        messageRailOverlapsComposer: false,
         position,
         runningMessageBusy: "true",
         viewportOverflowY: "auto",
@@ -1284,7 +1312,13 @@ async function captureAcceptance(browserWindow: BrowserWindow) {
         threadCenteredDelta: 1,
         viewportPositionDelta: 1,
       },
-      minimumItems: { contextOptimizationStates: 2, loadingStates: 2 },
+      minimumItems: {
+        contextEvents: 2,
+        contextOptimizationStates: 4,
+        interruptionSummaries: 1,
+        loadingStates: 2,
+        messageRailRows: 10,
+      },
       requiredFields: [
         "bubble",
         "composer",
@@ -1292,6 +1326,8 @@ async function captureAcceptance(browserWindow: BrowserWindow) {
         "composerDock",
         "composerRegion",
         "conversationShell",
+        "floatingControl",
+        "messageNavigation",
         "placeholder",
         "renderError",
         "skeleton",

@@ -79,12 +79,14 @@ import {
   ToolCallCard,
   Tooltip,
   ThreadFloatingButton,
+  ThreadContextEvent,
   ThreadContextOptimization,
   ThreadHeader,
   ThreadLoadingState,
   ThreadMessageNavigationRail,
   ThreadNavigationControls,
   ThreadRenderError,
+  ThreadInterruptionSummary,
   ThreadSkeleton,
   ThreadThinkingPlaceholder,
   ThreadVirtualizedPlaceholder,
@@ -163,6 +165,11 @@ const navigationMessages = [
     label: "Finish the complete parity matrix.",
     preview: "Every row requires component, visual, H5, Electron, and test gates.",
   },
+  ...Array.from({ length: 5 }, (_, index) => ({
+    id: `navigation-message-${index + 6}`,
+    label: `Inspect long-thread navigation turn ${index + 6}.`,
+    preview: "Keep the current ten-message threshold interactive in the showcase.",
+  })),
 ] as const;
 
 const showcaseConversationProjects = [
@@ -661,8 +668,10 @@ function WorkflowPixelHeader({
 
 function WorkflowPixelComposer({
   approvalLabel = "Ask for approval",
+  running = false,
 }: {
   approvalLabel?: string;
+  running?: boolean;
 } = {}) {
   return (
     <AgentComposer
@@ -690,7 +699,9 @@ function WorkflowPixelComposer({
           </button>
         </>
       }
+      isRunning={running}
       layout="multiline"
+      onStop={() => undefined}
       onSubmit={() => undefined}
       onValueChange={() => undefined}
       placeholder="Do anything"
@@ -1183,6 +1194,154 @@ function ToolRecoveryPixelFixture({
         Search probe complete.
       </AgentMessage>
     </ToolRecoveryThread>
+  );
+}
+
+type ContinuityPixelState =
+  | "context-completed"
+  | "context-running"
+  | "interrupted"
+  | "navigation"
+  | "scroll-away";
+
+const continuityNavigationItems = Array.from({ length: 11 }, (_, index) => ({
+  id: `continuity-message-${index + 1}`,
+  label: `UI continuity message ${index + 1}`,
+}));
+
+function ContinuityUserActions() {
+  return (
+    <>
+      <button aria-label="copy" type="button">
+        <PixelIcon name="copy" />
+      </button>
+      <button aria-label="edit" type="button">
+        <span aria-hidden="true">⌁</span>
+      </button>
+    </>
+  );
+}
+
+function ContinuityPixelFixture({ state }: { state: ContinuityPixelState }) {
+  const navigation = state === "navigation";
+  const scrollAway = state === "scroll-away";
+  const contextRunning = state === "context-running";
+  const contextCompleted = state === "context-completed";
+  const scene = `current-${
+    navigation
+      ? "medium-message-navigation"
+      : scrollAway
+        ? "compact-scroll-away"
+        : state === "interrupted"
+          ? "compact-interrupted"
+          : state === "context-running"
+            ? "compact-context-running"
+            : "compact-context-completed"
+  }`;
+
+  return (
+    <main
+      className="current-thread-pixel-fixture workflow-pixel-fixture continuity-pixel-fixture"
+      data-theme="dark"
+      data-visual-scene={scene}
+    >
+      <ConversationThreadShell
+        composer={
+          <WorkflowPixelComposer
+            approvalLabel="Approve for me"
+            running={contextRunning}
+          />
+        }
+        floatingControl={
+          <ThreadFloatingButton
+            label="Scroll to bottom"
+            onClick={() => undefined}
+            show={scrollAway}
+          />
+        }
+        header={
+          <WorkflowPixelHeader title="Complete UI continuity probe" />
+        }
+        label="Conversation continuity pixel fixture"
+        messageNavigation={
+          navigation ? (
+            <ThreadMessageNavigationRail
+              items={continuityNavigationItems.slice(0, 10)}
+              onNavigate={() => undefined}
+            />
+          ) : null
+        }
+        viewportProps={{ autoFollow: false, tabIndex: -1 }}
+      >
+        {navigation ? (
+          <>
+            <AgentMessage role="assistant">Continuity 7 complete.</AgentMessage>
+            <AgentMessage role="user">
+              UI continuity sample 8. Reply with exactly: Continuity 8 complete.
+            </AgentMessage>
+            <AgentMessage role="assistant">Continuity 8 complete.</AgentMessage>
+            <AgentMessage role="user">
+              UI continuity sample 9. Reply with exactly: Continuity 9 complete.
+            </AgentMessage>
+            <AgentMessage role="assistant">Continuity 9 complete.</AgentMessage>
+            <AgentMessage role="user">
+              UI continuity sample 10. Reply with exactly: Continuity 10
+              complete.
+            </AgentMessage>
+            <AgentMessage
+              actions={<WorkflowMessageActions />}
+              role="assistant"
+            >
+              Continuity 10 complete.
+            </AgentMessage>
+          </>
+        ) : scrollAway ? (
+          <>
+            <AgentMessage role="user">
+              UI continuity probe turn 1. Reply with exactly: Probe 1 complete.
+            </AgentMessage>
+            <AgentMessage role="assistant">Probe 1 complete.</AgentMessage>
+            <AgentMessage role="user">
+              UI continuity probe turn 1. Reply with exactly: Probe 1 complete.
+            </AgentMessage>
+            <AgentMessage role="assistant">Probe 1 complete.</AgentMessage>
+            <AgentMessage role="user">
+              UI continuity probe turn 2. Reply with exactly: Probe 2 complete.
+            </AgentMessage>
+          </>
+        ) : (
+          <>
+            {!contextRunning ? (
+              <AgentMessage role="assistant">
+                Continuity 9 complete.
+              </AgentMessage>
+            ) : null}
+            <AgentMessage
+              actions={contextRunning ? <ContinuityUserActions /> : undefined}
+              role="user"
+            >
+              UI continuity sample 10. Reply with exactly: Continuity 10
+              complete.
+            </AgentMessage>
+            <AgentMessage role="assistant">Continuity 10 complete.</AgentMessage>
+            <AgentMessage
+              actions={<ContinuityUserActions />}
+              role="user"
+            >
+              UI interruption probe. Write 60 numbered short sentences, one per
+              line.
+            </AgentMessage>
+            <ThreadInterruptionSummary durationMs={2_000} />
+            {contextRunning ? (
+              <ThreadContextEvent status="running" />
+            ) : null}
+            {contextCompleted ? (
+              <ThreadContextEvent status="completed" />
+            ) : null}
+          </>
+        )}
+      </ConversationThreadShell>
+    </main>
   );
 }
 
@@ -3829,9 +3988,23 @@ const toolRecoveryPixelState: ToolRecoveryPixelState | undefined =
         : capture === "current-compact-command-failure"
           ? "command-failure"
           : undefined;
+const continuityPixelState: ContinuityPixelState | undefined =
+  capture === "current-medium-message-navigation"
+    ? "navigation"
+    : capture === "current-compact-scroll-away"
+      ? "scroll-away"
+      : capture === "current-compact-interrupted"
+        ? "interrupted"
+        : capture === "current-compact-context-running"
+          ? "context-running"
+          : capture === "current-compact-context-completed"
+            ? "context-completed"
+            : undefined;
 
 createRoot(document.getElementById("root")!).render(
-  toolRecoveryPixelState ? (
+  continuityPixelState ? (
+    <ContinuityPixelFixture state={continuityPixelState} />
+  ) : toolRecoveryPixelState ? (
     <ToolRecoveryPixelFixture state={toolRecoveryPixelState} />
   ) : workflowPixelState ? (
     <WorkflowPixelFixture state={workflowPixelState} />

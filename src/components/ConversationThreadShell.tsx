@@ -18,8 +18,10 @@ export interface ConversationThreadShellProps
   extends Omit<HTMLAttributes<HTMLElement>, "children"> {
   children: ReactNode;
   composer: ReactNode;
+  floatingControl?: ReactNode;
   header: ReactNode;
   label?: string;
+  messageNavigation?: ReactNode;
   threadLabel?: string;
   threadProps?: Omit<AgentThreadProps, "children" | "width">;
   threadWidth?: AgentThreadWidth;
@@ -33,8 +35,10 @@ export function ConversationThreadShell({
   children,
   className,
   composer,
+  floatingControl,
   header,
   label = "Conversation",
+  messageNavigation,
   threadLabel = "Conversation timeline",
   threadProps,
   threadWidth = "wide",
@@ -62,6 +66,7 @@ export function ConversationThreadShell({
     const updateComposerReserve = () => {
       const height = composerDock.getBoundingClientRect().height;
       if (height > 0) {
+        const bodyHeight = body.getBoundingClientRect().height;
         const viewport = viewportRef.current;
         const shouldPinViewport =
           shouldAutoFollow &&
@@ -70,6 +75,12 @@ export function ConversationThreadShell({
           "--codex-ui-conversation-thread-composer-dock-height",
           `${height}px`,
         );
+        if (bodyHeight > 0) {
+          body.style.setProperty(
+            "--codex-ui-message-navigation-available-height",
+            `${Math.max(0, bodyHeight - height)}px`,
+          );
+        }
         if (
           shouldPinViewport &&
           viewport &&
@@ -88,6 +99,7 @@ export function ConversationThreadShell({
 
     const observer = new ResizeObserver(updateComposerReserve);
     observer.observe(composerDock);
+    observer.observe(body);
     return () => observer.disconnect();
   }, [shouldAutoFollow]);
 
@@ -109,6 +121,11 @@ export function ConversationThreadShell({
         className="codex-ui-conversation-thread-shell__body"
         ref={bodyRef}
       >
+        {messageNavigation ? (
+          <div className="codex-ui-conversation-thread-shell__message-navigation">
+            {messageNavigation}
+          </div>
+        ) : null}
         <AgentThreadViewport
           {...restViewportProps}
           className={[
@@ -133,6 +150,11 @@ export function ConversationThreadShell({
             {children}
           </AgentThread>
         </AgentThreadViewport>
+        {floatingControl ? (
+          <div className="codex-ui-conversation-thread-shell__floating-control">
+            {floatingControl}
+          </div>
+        ) : null}
         <div
           className="codex-ui-conversation-thread-shell__composer-dock"
           ref={composerDockRef}
