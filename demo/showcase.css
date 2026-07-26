@@ -518,6 +518,12 @@ code {
   color: var(--codex-ui-text-tertiary);
 }
 
+.current-thread-pixel-fixture[data-visual-scene="current-thread-streaming"]
+  .codex-ui-conversation-thread-shell {
+  --codex-ui-conversation-thread-font-size: 0.875rem;
+  font-weight: 445;
+}
+
 .thread-message-action {
   appearance: none;
   background: transparent;

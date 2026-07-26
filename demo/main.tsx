@@ -477,7 +477,20 @@ function PixelIcon({ name }: { name: PixelIconName }) {
   );
 }
 
-function CurrentThreadPixelFixture() {
+type CurrentThreadPixelState = "completed" | "streaming";
+
+const streamingPixelPrompt =
+  'Write exactly 24 short plain-text sentences about pixel-level UI verification. Begin the first sentence with "Streaming probe:" and number no sentences. Do not use Markdown.';
+
+const streamingPixelReply =
+  "Streaming probe: compare each rendered frame against the reference.";
+
+function CurrentThreadPixelFixture({
+  state = "completed",
+}: {
+  state?: CurrentThreadPixelState;
+}) {
+  const streaming = state === "streaming";
   const messageActions: PixelIconName[] = [
     "copy",
     "like",
@@ -486,7 +499,11 @@ function CurrentThreadPixelFixture() {
   ];
 
   return (
-    <main className="current-thread-pixel-fixture" data-theme="dark">
+    <main
+      className="current-thread-pixel-fixture"
+      data-theme="dark"
+      data-visual-scene={`current-thread-${state}`}
+    >
       <ConversationThreadShell
         composer={
           <AgentComposer
@@ -514,10 +531,13 @@ function CurrentThreadPixelFixture() {
                 </button>
               </>
             }
+            isRunning={streaming}
             layout="multiline"
+            onStop={() => undefined}
             onSubmit={() => undefined}
             onValueChange={() => undefined}
             placeholder="Do anything"
+            stopLabel="Stop"
             value=""
           />
         }
@@ -548,7 +568,11 @@ function CurrentThreadPixelFixture() {
             title={
               <span className="current-thread-pixel-fixture__title">
                 <PixelIcon name="folder" />
-                <span>Confirm UI probe completion</span>
+                <span>
+                  {streaming
+                    ? "Write exactly 24 short plain-text sentences ab..."
+                    : "Confirm UI probe completion"}
+                </span>
                 <PixelIcon name="more" />
               </span>
             }
@@ -557,17 +581,24 @@ function CurrentThreadPixelFixture() {
         label="Current conversation pixel fixture"
       >
         <AgentMessage role="user">
-          Please reply with exactly: UI probe complete.
+          {streaming
+            ? streamingPixelPrompt
+            : "Please reply with exactly: UI probe complete."}
         </AgentMessage>
         <AgentMessage
-          actions={messageActions.map((name) => (
-            <button aria-label={name} key={name} type="button">
-              <PixelIcon name={name} />
-            </button>
-          ))}
+          actions={
+            streaming
+              ? undefined
+              : messageActions.map((name) => (
+                  <button aria-label={name} key={name} type="button">
+                    <PixelIcon name={name} />
+                  </button>
+                ))
+          }
           role="assistant"
+          status={streaming ? "running" : "completed"}
         >
-          UI probe complete.
+          {streaming ? streamingPixelReply : "UI probe complete."}
         </AgentMessage>
       </ConversationThreadShell>
     </main>
@@ -3194,13 +3225,17 @@ function Showcase() {
   );
 }
 
-const captureMode =
-  new URLSearchParams(window.location.search).get("capture") ===
-  "current-thread";
+const capture = new URLSearchParams(window.location.search).get("capture");
+const currentThreadCapture =
+  capture === "current-thread" ||
+  capture === "current-thread-completed" ||
+  capture === "current-thread-streaming";
+const currentThreadPixelState: CurrentThreadPixelState =
+  capture === "current-thread-streaming" ? "streaming" : "completed";
 
 createRoot(document.getElementById("root")!).render(
-  captureMode ? (
-    <CurrentThreadPixelFixture />
+  currentThreadCapture ? (
+    <CurrentThreadPixelFixture state={currentThreadPixelState} />
   ) : (
     <StrictMode>
       <Showcase />

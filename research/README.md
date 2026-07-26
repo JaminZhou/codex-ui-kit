@@ -17,6 +17,12 @@ not contain extracted application files or copied source code.
 7. Implement components independently against the build note and public API.
 8. Delete or replace the temporary extraction when the sampled app updates.
 
+Deterministic raster fixtures are declared in `visual-scenarios.json`. Current
+application PNG references stay outside the repository and are passed to the
+visual checker through each scenario's named environment variable. A mask
+requires an explicit ownership reason and may exclude only a surface that is
+outside the scenario being verified.
+
 Raw inspection data belongs in `/private/tmp/codex-ui-kit-research` or a local
 `.research/` directory. Both locations are intentionally outside version
 control.

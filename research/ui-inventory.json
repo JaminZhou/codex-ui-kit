@@ -68,7 +68,8 @@
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
         "cdp:basic-user-and-assistant-turn",
-        "cdp-26.721:synthetic-user-bubble-assistant-flat-response-and-actions"
+        "cdp-26.721:synthetic-user-bubble-assistant-flat-response-and-actions",
+        "cdp-26.721:synthetic-streaming-assistant-736x22-font-14-22"
       ],
       "implementationStatus": "partial",
       "browserStatus": "verified",
@@ -195,7 +196,8 @@
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
         "cdp:stop-button-you-stopped-summary-and-stopped-command",
-        "cdp-26.721:synthetic-submit-running-stop-control-completed-transition"
+        "cdp-26.721:synthetic-submit-running-stop-control-completed-transition",
+        "cdp-26.721:synthetic-streaming-stop-28x28-frozen-raster-and-stop-action"
       ],
       "implementationStatus": "partial",
       "browserStatus": "partial_legacy",
