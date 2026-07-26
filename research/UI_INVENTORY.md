@@ -29,7 +29,8 @@ The inventory deliberately has no `Complete` status.
 1. `package_observed`: a named route, page, panel, or feature family is present
    in the sampled installation package.
 2. `runtime_observed`: the surface was reached in the running application and
-   its trigger, container, and visible states were recorded.
+   its trigger, container, and visible states were recorded. Each evidence
+   prefix maps to the exact observed build in `ui-inventory.json`.
 3. `implemented`: an independent public API and composition exist in this
    repository.
 4. `browser_verified`: the H5 acceptance flow matches the recorded behavior.
@@ -38,22 +39,24 @@ The inventory deliberately has no `Complete` status.
 
 Static package evidence establishes candidates, not runtime reachability.
 Likewise, an implemented primitive is not evidence that every product
-composition or state variant is covered.
+composition or state variant is covered. Current-build verification requires
+at least one runtime evidence record mapped to the current baseline; an
+observation from a previous build remains historical evidence.
 
 ## Current baseline
 
-- Codex Desktop `26.715.72359` (`5718`)
-- Sampled on 2026-07-23
-- Installed package and ASAR hash reverified on 2026-07-24
+- Codex Desktop `26.721.41059` (`5848`)
+- Sampled and runtime-probed on 2026-07-26
 - `app.asar` SHA-256:
-  `6c6528eb1e8450cdc506a59586f8caffe87576e200977e2a11bdea0cecf1c718`
+  `da39a51b06fb4c728d418b8f0f05fc8fd8c6b1f74c4fb4d47c20c7914a798f45`
 - Computer Use automation: blocked by the environment safety policy for
   `com.openai.codex`
 - Scoped CDP automation: available through a user-authorized second process;
   the Chromium profile is separate, but Codex application data and navigation
   are not fully isolated
-- Current inventory: 56 surface groups; 29 have scoped runtime evidence and 27
-  remain `not_sampled`
+- Current inventory: 56 surface groups; 29 have scoped runtime evidence, of
+  which 2 include current-build structural evidence and 27 are previous-build
+  only; another 27 remain `not_sampled`
 
 The current package exposes candidates far beyond the old transcript sample:
 application and thread shells, local/remote conversation routes, projects and
@@ -61,12 +64,13 @@ workspace selection, PR review, editor diff, terminal, browser and artifact
 panels, document previews, settings, MCP, plugins, skills, automations, remote
 connections, and feature-gated surfaces.
 
-The current CDP sample covers a blank project chat, read-only command success,
-failure, long output, queue and stop states, Markdown content, Sources and
-terminal panels, Composer menus, the right Review and Environment panels, Pull
-requests, Sites, Scheduled tasks, Plugins, Skills, and selected Settings
-sections. Entries backed by that sample are marked `runtime_observed`; every
-other current-build candidate is `not_sampled`. The seed list is not an
+The current CDP probe confirms loopback access and distinguishes the main
+application-shell target from a second small application page. The broader
+blank-chat, command, queue, Markdown, Sources, terminal, Composer, Review,
+Environment, Pull requests, Sites, Scheduled tasks, Plugins, Skills, and
+Settings samples were recorded on `26.715.72359`. Those entries remain
+`runtime_observed` with build-scoped evidence, but they do not satisfy the
+current-build verification gate until reached again. The seed list is not an
 exhaustive denominator: newly observed routes, variants, and cross-layer
 transitions must add or split IDs.
 
@@ -130,10 +134,12 @@ horizontal overflow at 1180×820 dark and 820×680 light. The PR layout is split
 at the standard size and stacked at the compact size.
 
 All affected inventory entries remain `partial`. Project/worktree selection
-and the PR index are backed by current-build runtime evidence and now have
-browser/Electron verification. Exact current-build PR review-detail behavior
-remains `not_sampled`, so the generic review components do not establish
-product parity. Native application-shell composition, route persistence, panel
+and the PR index have H5/Electron implementation acceptance and previous-build
+runtime evidence. After the installed application update, their comparison
+status is `partial_legacy` until the same flows are sampled on
+`26.721.41059`. Exact current-build PR review-detail behavior remains
+`not_sampled`, so the generic review components do not establish product
+parity. Native application-shell composition, route persistence, panel
 resizing, and the remaining P0 conversation/workspace variants also remain
 open. Final H5/Electron visual unification is intentionally deferred until
 coverage stabilizes.

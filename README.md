@@ -21,7 +21,7 @@ Codex UI Kit turns those interaction patterns into protocol-neutral React primit
 
 - The current components are a partial coding-agent UI foundation, not a
   complete Codex Desktop reconstruction.
-- The latest sampled package is `26.715.72359` (`5718`). Its seed candidate
+- The latest sampled package is `26.721.41059` (`5848`). Its seed candidate
   surface and evidence status are tracked in
   [`research/UI_INVENTORY.md`](research/UI_INVENTORY.md); current-build runtime
   observation and verification remain partial.

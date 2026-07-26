@@ -6,8 +6,10 @@ not establish full conversation, workspace, application, or product coverage.
 
 The authoritative current-build inventory is:
 
-- [`26.715.72359.md`](26.715.72359.md) for the sampled package facts and
-  research boundary;
+- [`26.721.41059.md`](26.721.41059.md) for the current package facts, scoped
+  CDP revalidation, and research boundary;
+- [`26.715.72359.md`](26.715.72359.md) for the previous build's broader
+  historical runtime sample;
 - [`UI_INVENTORY.md`](UI_INVENTORY.md) for classification, evidence levels,
   priorities, and delivery order;
 - [`ui-inventory.json`](ui-inventory.json) for machine-checked surface status;
@@ -24,12 +26,10 @@ The authoritative current-build inventory is:
   BrowserWindow; it does not prove parity with unobserved product routes,
   panels, state transitions, or window types.
 - Computer Use exploration is blocked by the environment safety policy for
-  `com.openai.codex`. A user-authorized CDP sample provides scoped runtime
-  evidence for a blank project chat, command success/failure/long-output,
-  queue and stop states, Markdown content, Sources and terminal panels,
-  portalled menus, Review and Environment panels, global PR/Sites/Scheduled/
-  Plugins/Skills routes, and selected Settings sections; all other package
-  candidates remain runtime-unobserved.
+  `com.openai.codex`. A user-authorized CDP probe revalidated current-build
+  access and the main-shell target shape. The broader blank-chat, command,
+  queue, Markdown, panel, menu, global-route, and Settings observations remain
+  historical evidence from `26.715.72359` until sampled again.
 - Renderer viewport probing exposed a narrow-layout gap: the thread and
   Composer shrink, but the fixed app sidebar remains and the right workspace
   panel can be laid out beyond the simulated viewport. Native Electron window
