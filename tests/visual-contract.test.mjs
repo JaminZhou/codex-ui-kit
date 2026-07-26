@@ -86,7 +86,8 @@ describe("current-thread visual contract", () => {
     );
     expect(scenarioScript).toContain("process.env[scenario.referenceEnv]");
     expect(scenarioScript).toContain("applyMasks(reference, actual");
-    expect(scenarioScript).toContain("region.width ?? diff.width");
+    expect(scenarioScript).toContain("region.width ?? diff.width - left");
+    expect(scenarioScript).toContain("!Number.isInteger(left)");
     expect(scenarioScript).toContain("geometryContractViolations.length > 0");
   });
 });

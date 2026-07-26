@@ -234,16 +234,16 @@ function applyMasks(reference, actual, masks) {
 function mismatchRegions(diff, scenario) {
   return scenario.regions.map((region) => {
     const left = region.left ?? 0;
-    const width = region.width ?? diff.width;
+    const width = region.width ?? diff.width - left;
     const top =
       region.fromBottom === undefined
         ? region.top
         : diff.height - region.fromBottom;
     if (
-      !Number.isFinite(top) ||
-      !Number.isFinite(region.height) ||
-      !Number.isFinite(left) ||
-      !Number.isFinite(width) ||
+      !Number.isInteger(top) ||
+      !Number.isInteger(region.height) ||
+      !Number.isInteger(left) ||
+      !Number.isInteger(width) ||
       left < 0 ||
       width <= 0 ||
       left + width > diff.width ||
