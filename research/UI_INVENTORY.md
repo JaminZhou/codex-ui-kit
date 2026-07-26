@@ -54,9 +54,9 @@ observation from a previous build remains historical evidence.
 - Scoped CDP automation: available through a user-authorized second process;
   the Chromium profile is separate, but Codex application data and navigation
   are not fully isolated
-- Current inventory: 61 surface groups; 41 have scoped runtime evidence, of
+- Current inventory: 62 surface groups; 41 have scoped runtime evidence, of
   which 23 include current-build structural evidence and 18 are previous-build
-  only; another 20 remain `not_sampled`
+  only; another 21 remain `not_sampled`
 
 The current package exposes candidates far beyond the old transcript sample:
 application and thread shells, local/remote conversation routes, projects and
@@ -244,7 +244,9 @@ latest). The public package keeps the actual windowing and scroll algorithm
 host-owned; its placeholder, navigation, and follow contracts therefore remain
 an intentionally partial implementation even though the sampled Browser and
 Electron acceptance surfaces are verified. The current error/retry state was
-not safely reached and remains a separate unpromoted gate.
+not safely reached and remains a separate unpromoted gate. Manual compaction
+is likewise tracked independently as `thread.context-compaction`; it does not
+promote the still-unreached thread summary panel.
 
 This is a measurement- and raster-backed basic thread slice, not a claim that
 the whole application or every thread lifecycle is pixel-perfect. Markdown

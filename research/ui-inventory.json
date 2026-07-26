@@ -263,6 +263,17 @@
       "area": "conversation",
       "ownership": "thread",
       "packageEvidence": ["toggle-thread-summary-panel", "use-thread-summary-panel"],
+      "runtimeStatus": "not_sampled",
+      "implementationStatus": "partial",
+      "browserStatus": "partial_legacy",
+      "electronStatus": "partial_legacy",
+      "priority": "p0"
+    },
+    {
+      "id": "thread.context-compaction",
+      "area": "conversation",
+      "ownership": "thread",
+      "packageEvidence": ["local-conversation-page"],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
         "cdp-26.721:slash-compact-running-and-completed-raster"

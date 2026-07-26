@@ -54,7 +54,10 @@ describe("current conversation thread shell visual contract", () => {
       "--codex-ui-conversation-thread-composer-dock-height",
     );
     expect(styles).toContain(
-      "bottom: var(\n    --codex-ui-conversation-thread-composer-dock-height,\n    var(--codex-ui-conversation-thread-composer-reserve)",
+      "--codex-ui-floating-control-composer-offset: var(\n    --codex-ui-conversation-thread-composer-dock-height,\n    var(--codex-ui-conversation-thread-composer-reserve)",
+    );
+    expect(styles).toContain(
+      ".codex-ui-conversation-thread-shell__message-navigation > *,\n.codex-ui-conversation-thread-shell__floating-control > * {\n  pointer-events: auto",
     );
   });
 

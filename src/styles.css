@@ -742,16 +742,13 @@
   z-index: 20;
 }
 
-.codex-ui-conversation-thread-shell__message-navigation
-  > .codex-ui-message-navigation-rail,
-.codex-ui-conversation-thread-shell__floating-control
-  > .codex-ui-thread-floating-button {
+.codex-ui-conversation-thread-shell__message-navigation > *,
+.codex-ui-conversation-thread-shell__floating-control > * {
   pointer-events: auto;
 }
 
-.codex-ui-conversation-thread-shell__floating-control
-  > .codex-ui-thread-floating-button {
-  bottom: var(
+.codex-ui-conversation-thread-shell__floating-control {
+  --codex-ui-floating-control-composer-offset: var(
     --codex-ui-conversation-thread-composer-dock-height,
     var(--codex-ui-conversation-thread-composer-reserve)
   );
