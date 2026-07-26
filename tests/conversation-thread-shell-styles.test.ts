@@ -39,6 +39,9 @@ describe("current conversation thread shell visual contract", () => {
     expect(styles).toContain(
       "max-width: calc(\n    var(--codex-ui-conversation-thread-content-max-width) -",
     );
+    expect(styles).toContain(
+      "padding-top: var(\n    --codex-ui-thread-content-top-inset\n  )",
+    );
   });
 
   it("reserves the measured composer without making it part of the scroll flow", () => {

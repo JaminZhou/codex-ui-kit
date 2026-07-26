@@ -112,6 +112,43 @@ describe("ConversationThreadShell", () => {
     ).toBe(true);
   });
 
+  it("inherits the shell top inset by default and honors a viewport override", () => {
+    const { container, rerender } = render(
+      <ConversationThreadShell
+        composer={<span>Composer</span>}
+        header={<span>Header</span>}
+      >
+        Timeline
+      </ConversationThreadShell>,
+    );
+    const getViewport = () =>
+      container.querySelector<HTMLElement>(
+        ".codex-ui-conversation-thread-shell__viewport",
+      )!;
+
+    expect(
+      getViewport().style.getPropertyValue(
+        "--codex-ui-thread-viewport-top-inset",
+      ),
+    ).toBe("");
+
+    rerender(
+      <ConversationThreadShell
+        composer={<span>Composer</span>}
+        header={<span>Header</span>}
+        viewportProps={{ topInset: "5rem" }}
+      >
+        Timeline
+      </ConversationThreadShell>,
+    );
+
+    expect(
+      getViewport().style.getPropertyValue(
+        "--codex-ui-thread-viewport-top-inset",
+      ),
+    ).toBe("5rem");
+  });
+
   it("updates the timeline reserve when the composer dock changes height", () => {
     const originalResizeObserver = globalThis.ResizeObserver;
     const originalGetBoundingClientRect =

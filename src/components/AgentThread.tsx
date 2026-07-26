@@ -86,7 +86,7 @@ export const AgentThreadViewport = forwardRef<
     onScroll,
     style,
     tabIndex = 0,
-    topInset = "calc(var(--codex-ui-spacing) * 8)",
+    topInset,
     ...props
   },
   forwardedRef,
@@ -192,7 +192,11 @@ export const AgentThreadViewport = forwardRef<
       style={
         {
           ...style,
-          "--codex-ui-thread-viewport-top-inset": topInset,
+          ...(topInset === undefined
+            ? {}
+            : {
+                "--codex-ui-thread-viewport-top-inset": topInset,
+              }),
         } as CSSProperties
       }
       tabIndex={tabIndex}

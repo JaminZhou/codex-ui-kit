@@ -1785,7 +1785,7 @@
 .codex-ui-conversation-thread-shell__thread {
   min-height: 100%;
   padding-top: var(
-    --codex-ui-conversation-thread-content-top-inset
+    --codex-ui-thread-content-top-inset
   );
   padding-bottom: var(
     --codex-ui-conversation-thread-composer-dock-height,
