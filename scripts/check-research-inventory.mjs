@@ -1,7 +1,14 @@
 import { readFile } from "node:fs/promises";
 
 const inventoryUrl = new URL("../research/ui-inventory.json", import.meta.url);
+const visualScenariosUrl = new URL(
+  "../research/visual-scenarios.json",
+  import.meta.url,
+);
 const inventory = JSON.parse(await readFile(inventoryUrl, "utf8"));
+const visualScenarios = JSON.parse(
+  await readFile(visualScenariosUrl, "utf8"),
+);
 const currentRuntimeBuild = inventory.baseline?.appVersion;
 const runtimeEvidenceBuilds = inventory.baseline?.runtimeEvidenceBuilds;
 
@@ -29,12 +36,37 @@ const allowedVerification = new Set([
 ]);
 const allowedPriority = new Set(["p0", "p1", "p2"]);
 
+function positiveNumber(value) {
+  return typeof value === "number" && Number.isFinite(value) && value > 0;
+}
+
+function ratio(value) {
+  return (
+    typeof value === "number" &&
+    Number.isFinite(value) &&
+    value >= 0 &&
+    value <= 1
+  );
+}
+
+function optionalEnvironmentName(value) {
+  return value === undefined || /^[A-Z0-9_]+$/.test(value);
+}
+
 if (inventory.schemaVersion !== 1) {
   throw new Error("research inventory schemaVersion must be 1");
 }
 
 if (!Array.isArray(inventory.surfaces) || inventory.surfaces.length === 0) {
   throw new Error("research inventory must contain surfaces");
+}
+
+if (
+  visualScenarios.version !== 1 ||
+  !Array.isArray(visualScenarios.scenarios) ||
+  visualScenarios.scenarios.length === 0
+) {
+  throw new Error("visual scenarios must contain v1 scenarios");
 }
 
 if (
@@ -46,6 +78,69 @@ if (
 }
 
 const ids = new Set();
+const visualScenarioIds = new Set();
+
+for (const scenario of visualScenarios.scenarios) {
+  if (typeof scenario.id !== "string" || scenario.id.length === 0) {
+    throw new Error("visual scenario id must be a non-empty string");
+  }
+  if (visualScenarioIds.has(scenario.id)) {
+    throw new Error(`duplicate visual scenario id: ${scenario.id}`);
+  }
+  visualScenarioIds.add(scenario.id);
+  if (
+    typeof scenario.capture !== "string" ||
+    typeof scenario.referenceEnv !== "string" ||
+    !/^[A-Z0-9_]+$/.test(scenario.referenceEnv)
+  ) {
+    throw new Error(`invalid visual reference contract for ${scenario.id}`);
+  }
+  if (
+    !ratio(scenario.maximumDiffRatio) ||
+    !ratio(scenario.pixelThreshold) ||
+    !optionalEnvironmentName(scenario.maximumDiffRatioEnv) ||
+    !optionalEnvironmentName(scenario.pixelThresholdEnv)
+  ) {
+    throw new Error(`invalid visual thresholds for ${scenario.id}`);
+  }
+  if (
+    !scenario.geometry ||
+    Object.values(scenario.geometry).some(
+      (selector) => typeof selector !== "string" || selector.length === 0,
+    )
+  ) {
+    throw new Error(`missing visual geometry selectors for ${scenario.id}`);
+  }
+  if (
+    !Array.isArray(scenario.regions) ||
+    scenario.regions.length === 0 ||
+    scenario.regions.some(
+      (region) =>
+        typeof region.name !== "string" ||
+        !positiveNumber(region.height) ||
+        !ratio(region.maximumDiffRatio) ||
+        !optionalEnvironmentName(region.maximumDiffRatioEnv) ||
+        (region.top === undefined && region.fromBottom === undefined),
+    )
+  ) {
+    throw new Error(`invalid visual regions for ${scenario.id}`);
+  }
+  if (
+    !Array.isArray(scenario.masks) ||
+    scenario.masks.some(
+      (mask) =>
+        typeof mask.name !== "string" ||
+        typeof mask.reason !== "string" ||
+        mask.reason.trim().length === 0 ||
+        !positiveNumber(mask.height) ||
+        !positiveNumber(mask.width) ||
+        typeof mask.left !== "number" ||
+        typeof mask.top !== "number",
+    )
+  ) {
+    throw new Error(`invalid visual ownership masks for ${scenario.id}`);
+  }
+}
 
 for (const surface of inventory.surfaces) {
   if (typeof surface.id !== "string" || !surface.id.includes(".")) {

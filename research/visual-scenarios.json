@@ -1,0 +1,93 @@
+{
+  "version": 1,
+  "scenarios": [
+    {
+      "capture": "current-thread-completed",
+      "colorScheme": "dark",
+      "geometry": {
+        "assistant": ".codex-ui-agent-message[data-role=\"assistant\"] .codex-ui-agent-message__content",
+        "assistantActions": ".codex-ui-agent-message[data-role=\"assistant\"] .codex-ui-agent-message__actions",
+        "composer": ".codex-ui-composer",
+        "header": ".codex-ui-conversation-thread-shell__header",
+        "thread": ".codex-ui-conversation-thread-shell__thread",
+        "user": ".codex-ui-agent-message[data-role=\"user\"] .codex-ui-agent-message__content"
+      },
+      "id": "current-thread-completed",
+      "masks": [],
+      "maximumDiffRatio": 0.005,
+      "maximumDiffRatioEnv": "CODEX_UI_KIT_VISUAL_MAX_DIFF",
+      "pixelThreshold": 0.05,
+      "pixelThresholdEnv": "CODEX_UI_KIT_PIXEL_THRESHOLD",
+      "referenceEnv": "CODEX_UI_KIT_THREAD_REFERENCE",
+      "regions": [
+        {
+          "height": 46,
+          "maximumDiffRatio": 0.03,
+          "maximumDiffRatioEnv": "CODEX_UI_KIT_VISUAL_MAX_HEADER_DIFF",
+          "name": "header",
+          "top": 0
+        },
+        {
+          "height": 194,
+          "maximumDiffRatio": 0.006,
+          "maximumDiffRatioEnv": "CODEX_UI_KIT_VISUAL_MAX_MESSAGES_DIFF",
+          "name": "messages",
+          "top": 46
+        },
+        {
+          "fromBottom": 130,
+          "height": 130,
+          "maximumDiffRatio": 0.012,
+          "maximumDiffRatioEnv": "CODEX_UI_KIT_VISUAL_MAX_COMPOSER_DIFF",
+          "name": "composer"
+        }
+      ]
+    },
+    {
+      "capture": "current-thread-streaming",
+      "colorScheme": "dark",
+      "geometry": {
+        "assistant": ".codex-ui-agent-message[data-role=\"assistant\"] .codex-ui-agent-message__content",
+        "composer": ".codex-ui-composer",
+        "header": ".codex-ui-conversation-thread-shell__header",
+        "stop": ".codex-ui-composer__primary[data-action=\"stop\"]",
+        "thread": ".codex-ui-conversation-thread-shell__thread",
+        "user": ".codex-ui-agent-message[data-role=\"user\"] .codex-ui-agent-message__content"
+      },
+      "id": "current-thread-streaming",
+      "masks": [
+        {
+          "height": 54,
+          "name": "workspace-environment-control",
+          "reason": "Workspace-owned control is outside the thread scene.",
+          "top": 54,
+          "width": 322,
+          "left": 746
+        }
+      ],
+      "maximumDiffRatio": 0.011,
+      "pixelThreshold": 0.05,
+      "referenceEnv": "CODEX_UI_KIT_THREAD_STREAMING_REFERENCE",
+      "regions": [
+        {
+          "height": 46,
+          "maximumDiffRatio": 0.04,
+          "name": "header",
+          "top": 0
+        },
+        {
+          "height": 360,
+          "maximumDiffRatio": 0.015,
+          "name": "messages",
+          "top": 46
+        },
+        {
+          "fromBottom": 130,
+          "height": 130,
+          "maximumDiffRatio": 0.012,
+          "name": "composer"
+        }
+      ]
+    }
+  ]
+}

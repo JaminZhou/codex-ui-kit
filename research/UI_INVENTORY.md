@@ -184,6 +184,14 @@ message band, and Composer regions independently. The sampled completed state
 matches all measured region geometry and stays below a 0.5% full-image raster
 delta at the strict 0.05 pixel threshold.
 
+The visual gate is now scenario-driven. A second external reference supplied
+through `CODEX_UI_KIT_THREAD_STREAMING_REFERENCE` covers a current-build
+running reply and 28px `Stop` control. It locks 14/22px running text, the 736px
+reply/Composer columns, and the 736×98 Composer card. Its declared mask omits
+only the workspace-owned Environment control from the thread-owned
+comparison; the remaining full raster and header/message/Composer regions
+stay independently bounded.
+
 This is a measurement- and raster-backed basic thread slice, not a claim that
 the whole application or every thread lifecycle is pixel-perfect. Markdown
 variants, virtualization, cancellation results, tool/approval flows, panels,

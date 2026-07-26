@@ -67,11 +67,11 @@ product-level parity.
 ## Visual optimization
 
 H5 and Electron are used continuously as functional acceptance surfaces. The
-current completed-thread slice now also has a main-only raster fixture and
-regional PNG diff thresholds, because its inventory row and composition have
-stabilized enough for targeted pixel work.
+current thread slice now has scenario-driven, main-only completed and
+streaming raster fixtures with independent selectors, ownership masks, and
+regional PNG diff thresholds. The references remain build-scoped external
+evidence rather than redistributed application assets.
 
 Broader final visual optimization remains scheduled after the remaining
 inventory, page compositions, and state transitions stabilize. A passing
-single-thread raster gate must not be generalized to unobserved routes or
-states.
+thread scenario must not be generalized to unobserved routes or states.
