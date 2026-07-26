@@ -49,7 +49,7 @@
     "build:demo": "vite build demo --base=/codex-ui-kit/ --config demo/vite.config.ts && node scripts/check-demo-bundle.mjs",
     "build:electron": "pnpm --filter @codex-ui-kit/electron-playground build",
     "check:a11y": "node scripts/check-accessibility.mjs",
-    "check:visual:current-thread": "node scripts/check-current-thread-visual.mjs",
+    "check:visual:current-thread": "pnpm build:demo && node scripts/check-current-thread-visual.mjs",
     "check:research": "node scripts/check-research-inventory.mjs",
     "prepack": "node scripts/prepack.mjs",
     "test": "vitest run tests",
