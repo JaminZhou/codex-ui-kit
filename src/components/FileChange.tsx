@@ -78,6 +78,7 @@ export interface FileChangeProps
   detail?: ReactNode;
   diffText?: string;
   emptyLabel?: ReactNode;
+  indicator?: ReactNode;
   onCopyDiff?: (diff: string) => void | Promise<void>;
   onOpenChange?: (open: boolean) => void;
   onOpenFile?: (path: string) => void;
@@ -99,6 +100,7 @@ export function FileChange({
   detail,
   diffText,
   emptyLabel,
+  indicator,
   onCopyDiff,
   onOpenChange,
   onOpenFile,
@@ -222,7 +224,7 @@ export function FileChange({
       data-change={change}
       data-file-status={normalizedStatus}
       detail={resolvedDetail}
-      indicator={null}
+      indicator={indicator ?? null}
       kind="file-change"
       onOpenChange={setOpen}
       open={resolvedOpen}

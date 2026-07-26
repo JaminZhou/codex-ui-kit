@@ -233,6 +233,8 @@ function applyMasks(reference, actual, masks) {
 
 function mismatchRegions(diff, scenario) {
   return scenario.regions.map((region) => {
+    const left = region.left ?? 0;
+    const width = region.width ?? diff.width;
     const top =
       region.fromBottom === undefined
         ? region.top
@@ -240,6 +242,11 @@ function mismatchRegions(diff, scenario) {
     if (
       !Number.isFinite(top) ||
       !Number.isFinite(region.height) ||
+      !Number.isFinite(left) ||
+      !Number.isFinite(width) ||
+      left < 0 ||
+      width <= 0 ||
+      left + width > diff.width ||
       top < 0 ||
       region.height <= 0 ||
       top + region.height > diff.height
@@ -250,7 +257,7 @@ function mismatchRegions(diff, scenario) {
     }
     let mismatches = 0;
     for (let y = top; y < top + region.height; y += 1) {
-      for (let x = 0; x < diff.width; x += 1) {
+      for (let x = left; x < left + width; x += 1) {
         const index = (y * diff.width + x) * 4;
         if (
           diff.data[index] === 255 &&
@@ -261,7 +268,7 @@ function mismatchRegions(diff, scenario) {
         }
       }
     }
-    const pixels = region.height * diff.width;
+    const pixels = region.height * width;
     const maximumDiffRatio = configuredRatio(
       region.maximumDiffRatio,
       region.maximumDiffRatioEnv,
@@ -270,11 +277,13 @@ function mismatchRegions(diff, scenario) {
     return {
       diffRatio: Number((mismatches / pixels).toFixed(6)),
       height: region.height,
+      left,
       maximumDiffRatio,
       mismatches,
       name: region.name,
       pixels,
       top,
+      width,
     };
   });
 }

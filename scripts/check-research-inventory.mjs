@@ -164,6 +164,9 @@ for (const scenario of visualScenarios.scenarios) {
       (region) =>
         typeof region.name !== "string" ||
         !positiveNumber(region.height) ||
+        (region.left !== undefined &&
+          (!Number.isFinite(region.left) || region.left < 0)) ||
+        (region.width !== undefined && !positiveNumber(region.width)) ||
         !ratio(region.maximumDiffRatio) ||
         !optionalEnvironmentName(region.maximumDiffRatioEnv) ||
         (region.top === undefined && region.fromBottom === undefined),
