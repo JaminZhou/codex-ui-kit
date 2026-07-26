@@ -145,7 +145,7 @@
       ],
       "implementationStatus": "partial",
       "browserStatus": "verified",
-      "electronStatus": "verified",
+      "electronStatus": "partial_legacy",
       "priority": "p0"
     },
     {

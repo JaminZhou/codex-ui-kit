@@ -203,10 +203,12 @@ The workflow fixture extends `FileChange` with a host-owned leading indicator
 slot and composes the existing `ActivityTimeline`, `CommandExecution`,
 `ApprovalRequest`, `ConversationThreadShell`, `WorkspacePanel`, and `FileDiff`
 primitives. Current-build Browser evidence plus the existing real
-BrowserWindow acceptance promote the sampled command, approval, and turn file
-card states. The Review side-panel/file-diff composition is Browser-verified
-but remains Electron-partial until that exact cross-owner split is added to
-the Electron acceptance surface.
+BrowserWindow acceptance promote the sampled command and approval states. The
+turn file card is Browser-verified but remains Electron-partial until its exact
+collapsed indicator and Undo/Review actions are exercised there. The Review
+side-panel/file-diff composition is likewise Browser-verified but remains
+Electron-partial until that exact cross-owner split is added to the Electron
+acceptance surface.
 
 This is a measurement- and raster-backed basic thread slice, not a claim that
 the whole application or every thread lifecycle is pixel-perfect. Markdown
