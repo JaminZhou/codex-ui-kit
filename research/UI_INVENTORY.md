@@ -141,14 +141,16 @@ single route choice; it is no longer treated as the current Codex new-chat
 model.
 
 The current new-chat slice adds `NewConversationStart`,
-`ConversationContextBar`, and `LocalEnvironmentDialog`. It keeps the
+`ConversationContextBar`, `ConversationProjectListbox`, and
+`LocalEnvironmentDialog`. It keeps the
 application-owned ChatGPT destination independent from project, execution
 environment, and worktree controls, and represents the local environment
 picker as a searchable, grouped, scrollable dialog. The H5 flow activates the
 worktree prompt before verifying both Environment and Worktree trigger/dialog
 relationships, modal semantics, and initial focus. The Electron acceptance
-flow asserts the prompt-to-context transition, selects a project, opens the
-dialog from both controls, checks grouping, search filtering, and repair-state
+flow asserts the prompt-to-context transition, opens the linked project
+listbox from its context control, selects a project, opens the dialog from both
+remaining controls, checks grouping, search filtering, and repair-state
 disabling, selects a local environment, submits the real composer, and captures
 both wide and compact dialog screenshots.
 

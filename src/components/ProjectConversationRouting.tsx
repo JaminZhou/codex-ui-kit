@@ -2,7 +2,9 @@ import {
   type HTMLAttributes,
   type KeyboardEvent,
   type ReactNode,
+  useEffect,
   useId,
+  useRef,
 } from "react";
 import { Dialog } from "./Dialog.js";
 
@@ -721,6 +723,7 @@ export interface ConversationContextItem {
   status?: ConversationContextItemStatus;
   statusLabel?: ReactNode;
   textValue?: string;
+  triggerId?: string;
 }
 
 export interface ConversationContextBarProps
@@ -798,6 +801,7 @@ export function ConversationContextBar({
             data-kind={item.kind}
             data-status={item.status}
             disabled={itemDisabled}
+            id={item.triggerId}
             key={item.id}
             onClick={() => onSelect(item.id)}
             type="button"
@@ -821,6 +825,181 @@ export function ConversationContextBar({
               >
                 {item.statusLabel}
               </span>
+            ) : null}
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
+export interface ConversationProjectListboxProps
+  extends Omit<
+    HTMLAttributes<HTMLDivElement>,
+    "children" | "onSelect"
+  > {
+  initialFocus?: "first" | "none" | "selected";
+  items: readonly ProjectIndexItem[];
+  label?: string;
+  onDismiss?: () => void;
+  onSelect: (projectId: string) => void;
+  selectedId?: string;
+  triggerId?: string;
+}
+
+function projectListboxOptions(listbox: HTMLElement) {
+  return [
+    ...listbox.querySelectorAll<HTMLButtonElement>(
+      '[role="option"]:not(:disabled)',
+    ),
+  ];
+}
+
+function moveProjectListboxFocus(
+  event: KeyboardEvent<HTMLButtonElement>,
+) {
+  if (
+    ![
+      "ArrowDown",
+      "ArrowLeft",
+      "ArrowRight",
+      "ArrowUp",
+      "End",
+      "Home",
+    ].includes(event.key)
+  ) {
+    return;
+  }
+  const listbox = event.currentTarget.closest<HTMLElement>(
+    '[role="listbox"]',
+  );
+  if (!listbox) return;
+  const enabled = projectListboxOptions(listbox);
+  if (enabled.length === 0) return;
+  const currentIndex = enabled.indexOf(event.currentTarget);
+  const nextIndex =
+    event.key === "Home"
+      ? 0
+      : event.key === "End"
+        ? enabled.length - 1
+        : event.key === "ArrowLeft" || event.key === "ArrowUp"
+          ? (currentIndex - 1 + enabled.length) % enabled.length
+          : (currentIndex + 1) % enabled.length;
+  event.preventDefault();
+  enabled[nextIndex]?.focus();
+}
+
+export function ConversationProjectListbox({
+  className,
+  initialFocus = "selected",
+  items,
+  label = "Conversation projects",
+  onDismiss,
+  onSelect,
+  selectedId,
+  triggerId,
+  ...props
+}: ConversationProjectListboxProps) {
+  const listboxRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    if (initialFocus === "none") return;
+    const listbox = listboxRef.current;
+    if (!listbox) return;
+    const enabled = projectListboxOptions(listbox);
+    const selected = enabled.find(
+      (option) => option.getAttribute("aria-selected") === "true",
+    );
+    (initialFocus === "selected" ? selected : undefined)?.focus();
+    if (
+      !listbox.contains(
+        typeof document === "undefined"
+          ? null
+          : document.activeElement,
+      )
+    ) {
+      enabled[0]?.focus();
+    }
+  }, [initialFocus]);
+
+  useEffect(() => {
+    if (!onDismiss || typeof document === "undefined") return;
+    const handlePointerDown = (event: PointerEvent) => {
+      const target = event.target;
+      if (!(target instanceof Node)) return;
+      const trigger = triggerId
+        ? document.getElementById(triggerId)
+        : null;
+      if (
+        !listboxRef.current?.contains(target) &&
+        !trigger?.contains(target)
+      ) {
+        onDismiss();
+      }
+    };
+    document.addEventListener("pointerdown", handlePointerDown, true);
+    return () =>
+      document.removeEventListener(
+        "pointerdown",
+        handlePointerDown,
+        true,
+      );
+  }, [onDismiss, triggerId]);
+
+  return (
+    <div
+      {...props}
+      aria-label={label}
+      className={[
+        "codex-ui-conversation-project-options",
+        className,
+      ]
+        .filter(Boolean)
+        .join(" ")}
+      ref={listboxRef}
+      role="listbox"
+    >
+      {items.map((item) => {
+        const disabled = projectIndexItemDisabled(item);
+        const selected = item.id === selectedId;
+        return (
+          <button
+            aria-label={`Select project ${itemTextValue(item)}`}
+            aria-selected={selected}
+            className="codex-ui-conversation-project-options__item"
+            data-project-id={item.id}
+            data-status={item.status}
+            disabled={disabled}
+            key={item.id}
+            onClick={() => onSelect(item.id)}
+            onKeyDown={(event) => {
+              if (event.key === "Escape" && onDismiss) {
+                event.preventDefault();
+                onDismiss();
+                if (triggerId && typeof window !== "undefined") {
+                  window.setTimeout(() =>
+                    document.getElementById(triggerId)?.focus(),
+                  );
+                }
+                return;
+              }
+              moveProjectListboxFocus(event);
+            }}
+            role="option"
+            tabIndex={selected ? 0 : -1}
+            type="button"
+          >
+            <span>{item.label}</span>
+            {item.description ? (
+              <small>{item.description}</small>
+            ) : null}
+            {item.path ? <code>{item.path}</code> : null}
+            {item.meta || item.statusLabel ? (
+              <small>
+                {item.meta}
+                {item.meta && item.statusLabel ? " · " : null}
+                {item.statusLabel}
+              </small>
             ) : null}
           </button>
         );

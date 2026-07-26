@@ -192,8 +192,30 @@ async function captureWorkflowSurfaces(webContents: WebContents) {
     const routingProjectListbox = card?.querySelector(
       '#desktop-routing-project-options',
     );
+    const initiallyFocusedProjectOption =
+      document.activeElement instanceof HTMLElement &&
+      document.activeElement.getAttribute('role') === 'option'
+        ? document.activeElement
+        : null;
+    const routingProjectInitialFocusSelected =
+      initiallyFocusedProjectOption?.getAttribute('aria-selected') === 'true';
+    initiallyFocusedProjectOption?.dispatchEvent(
+      new KeyboardEvent('keydown', {
+        bubbles: true,
+        key: 'ArrowDown',
+      }),
+    );
+    await wait(80);
+    const routingProjectArrowNavigationMoved =
+      document.activeElement instanceof HTMLElement &&
+      document.activeElement.getAttribute('role') === 'option' &&
+      document.activeElement !== initiallyFocusedProjectOption;
     const routingProjectMetrics = {
+      arrowNavigationMoved:
+        routingProjectArrowNavigationMoved,
       inViewport: inViewport(routingProjectListbox),
+      initialFocusSelected:
+        routingProjectInitialFocusSelected,
       optionCount:
         routingProjectListbox?.querySelectorAll('[role="option"]').length ?? 0,
       role: routingProjectListbox?.getAttribute('role') ?? null,
@@ -492,6 +514,10 @@ async function captureWorkflowSurfaces(webContents: WebContents) {
         routingProjectMetrics.role,
       routingProjectOptionCount:
         routingProjectMetrics.optionCount,
+      routingProjectArrowNavigationMoved:
+        routingProjectMetrics.arrowNavigationMoved,
+      routingProjectInitialFocusSelected:
+        routingProjectMetrics.initialFocusSelected,
       routingProjectTriggerControls:
         routingProjectMetrics.triggerControls,
       routingProjectTriggerExpanded:
@@ -1156,6 +1182,8 @@ async function captureAcceptance(browserWindow: BrowserWindow) {
         routingProjectListboxInViewport: true,
         routingProjectListboxRole: "listbox",
         routingProjectOptionCount: 2,
+        routingProjectArrowNavigationMoved: true,
+        routingProjectInitialFocusSelected: true,
         routingProjectTriggerControls:
           "desktop-routing-project-options",
         routingProjectTriggerExpanded: "true",

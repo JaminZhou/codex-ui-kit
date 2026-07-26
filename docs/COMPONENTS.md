@@ -109,6 +109,9 @@ All privileged behavior remains host-owned. The components never auto-approve co
 - `ConversationContextBar`: compact, controlled Project, environment, and
   worktree buttons with optional listbox/menu/dialog linkage, expansion,
   status, and disabled semantics.
+- `ConversationProjectListbox`: linked project options with selected/disabled
+  states, initial focus, arrow/Home/End navigation, Escape dismissal, and
+  outside-pointer dismissal.
 - `LocalEnvironmentDialog`: searchable, grouped local checkout/worktree
   selection with branch, metadata, repair/loading states, scrolling, and a
   host-owned create action.

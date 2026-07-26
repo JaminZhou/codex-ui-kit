@@ -27,6 +27,7 @@ import {
   ComposerMentionMenu,
   ComposerModeIndicator,
   ConversationContextBar,
+  ConversationProjectListbox,
   ConversationEvent,
   ConversationEventList,
   Dialog,
@@ -1727,6 +1728,8 @@ export function DesktopPlayground() {
                               kind: "project",
                               label: routingProject,
                               popupRole: "listbox",
+                              triggerId:
+                                "desktop-routing-project-trigger",
                             },
                             {
                               controlsId:
@@ -1773,13 +1776,9 @@ export function DesktopPlayground() {
                           }}
                         />
                         {routingProjectOptionsOpen ? (
-                          <div
-                            aria-label="Conversation projects"
-                            className="codex-ui-conversation-project-options"
+                          <ConversationProjectListbox
                             id="desktop-routing-project-options"
-                            role="listbox"
-                          >
-                            {[
+                            items={[
                               {
                                 description: "Component workspace",
                                 id: "ui-kit",
@@ -1790,25 +1789,14 @@ export function DesktopPlayground() {
                                 id: "desktop",
                                 label: "Desktop",
                               },
-                            ].map((project) => (
-                              <button
-                                aria-selected={
-                                  routingProject === project.id
-                                }
-                                className="codex-ui-conversation-project-options__item"
-                                data-project-id={project.id}
-                                key={project.id}
-                                onClick={() =>
-                                  selectRoutingProject(project.id)
-                                }
-                                role="option"
-                                type="button"
-                              >
-                                <span>{project.label}</span>
-                                <small>{project.description}</small>
-                              </button>
-                            ))}
-                          </div>
+                            ]}
+                            onDismiss={() =>
+                              setRoutingProjectOptionsOpen(false)
+                            }
+                            onSelect={selectRoutingProject}
+                            selectedId={routingProject}
+                            triggerId="desktop-routing-project-trigger"
+                          />
                         ) : null}
                       </>
                     ) : null

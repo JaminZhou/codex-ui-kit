@@ -7925,6 +7925,11 @@ button.codex-ui-generated-image-gallery__image {
   background: var(--codex-ui-background-elevated-secondary);
 }
 
+.codex-ui-conversation-project-options__item:disabled {
+  cursor: default;
+  opacity: 0.52;
+}
+
 .codex-ui-conversation-project-options__item:focus-visible {
   outline: 2px solid var(--codex-ui-focus);
   outline-offset: -2px;
@@ -7933,6 +7938,13 @@ button.codex-ui-generated-image-gallery__image {
 .codex-ui-conversation-project-options__item small {
   color: var(--codex-ui-text-secondary);
   font-size: var(--codex-ui-font-size-xs);
+}
+
+.codex-ui-conversation-project-options__item code {
+  color: var(--codex-ui-text-secondary);
+  font-family: var(--codex-ui-font-mono);
+  font-size: var(--codex-ui-font-size-xs);
+  overflow-wrap: anywhere;
 }
 
 .codex-ui-local-environment-dialog .codex-ui-dialog__surface {

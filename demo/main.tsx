@@ -26,6 +26,7 @@ import {
   ComposerMentionMenu,
   ComposerModeIndicator,
   ConversationContextBar,
+  ConversationProjectListbox,
   ConversationEvent,
   ConversationEventList,
   Dialog,
@@ -800,6 +801,8 @@ function Showcase() {
                               kind: "project",
                               label: routingProject,
                               popupRole: "listbox",
+                              triggerId:
+                                "showcase-routing-project-trigger",
                             },
                             {
                               controlsId:
@@ -846,13 +849,9 @@ function Showcase() {
                           }}
                         />
                         {routingProjectOptionsOpen ? (
-                          <div
-                            aria-label="Conversation projects"
-                            className="codex-ui-conversation-project-options"
+                          <ConversationProjectListbox
                             id="showcase-routing-project-options"
-                            role="listbox"
-                          >
-                            {[
+                            items={[
                               {
                                 description: "Component workspace",
                                 id: "ui-kit",
@@ -863,25 +862,14 @@ function Showcase() {
                                 id: "desktop",
                                 label: "Codex desktop",
                               },
-                            ].map((project) => (
-                              <button
-                                aria-selected={
-                                  routingProject === project.id
-                                }
-                                className="codex-ui-conversation-project-options__item"
-                                data-project-id={project.id}
-                                key={project.id}
-                                onClick={() =>
-                                  selectRoutingProject(project.id)
-                                }
-                                role="option"
-                                type="button"
-                              >
-                                <span>{project.label}</span>
-                                <small>{project.description}</small>
-                              </button>
-                            ))}
-                          </div>
+                            ]}
+                            onDismiss={() =>
+                              setRoutingProjectOptionsOpen(false)
+                            }
+                            onSelect={selectRoutingProject}
+                            selectedId={routingProject}
+                            triggerId="showcase-routing-project-trigger"
+                          />
                         ) : null}
                       </>
                     ) : null

@@ -11,6 +11,7 @@ import { useState } from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import {
   ConversationContextBar,
+  ConversationProjectListbox,
   ConversationRouteSelector,
   LocalEnvironmentDialog,
   NewConversationStart,
@@ -98,6 +99,66 @@ describe("project conversation routing", () => {
     });
     expect(repairing).toHaveProperty("disabled", true);
     expect(accessibleDescriptionText(repairing)).toContain("Repairing");
+  });
+
+  it("focuses and keyboard-navigates linked conversation project options", () => {
+    const onDismiss = vi.fn();
+    const onSelect = vi.fn();
+    render(
+      <>
+        <button id="project-trigger" type="button">
+          Project
+        </button>
+        <ConversationProjectListbox
+          id="project-options"
+          items={[
+            {
+              description: "Component workspace",
+              id: "ui-kit",
+              label: "UI Kit",
+            },
+            {
+              description: "Desktop application",
+              id: "desktop",
+              label: "Desktop",
+            },
+            {
+              id: "repair",
+              label: "Repairing",
+              status: "unavailable",
+            },
+          ]}
+          onDismiss={onDismiss}
+          onSelect={onSelect}
+          selectedId="ui-kit"
+          triggerId="project-trigger"
+        />
+      </>,
+    );
+
+    const uiKit = screen.getByRole("option", {
+      name: "Select project UI Kit",
+    });
+    const desktop = screen.getByRole("option", {
+      name: "Select project Desktop",
+    });
+    const repair = screen.getByRole("option", {
+      name: "Select project Repairing",
+    });
+    expect(document.activeElement).toBe(uiKit);
+    expect(repair).toHaveProperty("disabled", true);
+
+    fireEvent.keyDown(uiKit, { key: "ArrowDown" });
+    expect(document.activeElement).toBe(desktop);
+    fireEvent.keyDown(desktop, { key: "ArrowDown" });
+    expect(document.activeElement).toBe(uiKit);
+    fireEvent.keyDown(uiKit, { key: "End" });
+    expect(document.activeElement).toBe(desktop);
+    fireEvent.click(desktop);
+    expect(onSelect).toHaveBeenCalledWith("desktop");
+
+    fireEvent.keyDown(desktop, { key: "Escape" });
+    expect(onDismiss).toHaveBeenCalledTimes(1);
   });
 
   it("renders grouped local environments in a controlled dialog", () => {

@@ -27,6 +27,7 @@ export const publicRuntimeExports = [
   "ConversationContextBar",
   "ConversationEvent",
   "ConversationEventList",
+  "ConversationProjectListbox",
   "ConversationRouteSelector",
   "Dialog",
   "DialogChoice",

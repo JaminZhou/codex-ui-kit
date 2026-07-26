@@ -168,6 +168,7 @@ const overlayCases = [
     },
     targets: [
       {
+        focusWithin: true,
         role: "listbox",
         selector: "#showcase-routing-project-options",
       },

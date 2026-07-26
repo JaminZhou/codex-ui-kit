@@ -30,6 +30,7 @@ import {
   type ConversationContextItem,
   ConversationEvent,
   ConversationEventList,
+  ConversationProjectListbox,
   type ConversationEventKind,
   ConversationRouteSelector,
   type ConversationRouteOption,
@@ -226,6 +227,7 @@ void ComposerModeIndicator;
 void ConversationContextBar;
 void ConversationEvent;
 void ConversationEventList;
+void ConversationProjectListbox;
 void ConversationRouteSelector;
 void conversationRouteSelectorAcceptsChildren;
 void Dialog;
