@@ -35,6 +35,20 @@ const allowedVerification = new Set([
   "verified",
 ]);
 const allowedPriority = new Set(["p0", "p1", "p2"]);
+const geometryResultProperties = new Set([
+  "backgroundColor",
+  "bottom",
+  "borderRadius",
+  "fontFamily",
+  "fontSize",
+  "fontWeight",
+  "height",
+  "left",
+  "lineHeight",
+  "padding",
+  "top",
+  "width",
+]);
 
 function positiveNumber(value) {
   return typeof value === "number" && Number.isFinite(value) && value > 0;
@@ -51,6 +65,18 @@ function ratio(value) {
 
 function optionalEnvironmentName(value) {
   return value === undefined || /^[A-Z0-9_]+$/.test(value);
+}
+
+function geometryExpectation(value) {
+  if (typeof value === "number") return Number.isFinite(value);
+  if (typeof value === "string") return value.length > 0;
+  return (
+    value &&
+    typeof value === "object" &&
+    Number.isFinite(value.value) &&
+    (value.tolerance === undefined ||
+      (Number.isFinite(value.tolerance) && value.tolerance >= 0))
+  );
 }
 
 if (inventory.schemaVersion !== 1) {
@@ -110,6 +136,26 @@ for (const scenario of visualScenarios.scenarios) {
     )
   ) {
     throw new Error(`missing visual geometry selectors for ${scenario.id}`);
+  }
+  const geometryNames = Object.keys(scenario.geometry);
+  if (
+    !scenario.expectedGeometry ||
+    Object.keys(scenario.expectedGeometry).length !== geometryNames.length ||
+    geometryNames.some((name) => {
+      const expected = scenario.expectedGeometry[name];
+      return (
+        !expected ||
+        typeof expected !== "object" ||
+        Object.keys(expected).length === 0 ||
+        Object.entries(expected).some(
+          ([property, value]) =>
+            !geometryResultProperties.has(property) ||
+            !geometryExpectation(value),
+        )
+      );
+    })
+  ) {
+    throw new Error(`invalid expected visual geometry for ${scenario.id}`);
   }
   if (
     !Array.isArray(scenario.regions) ||

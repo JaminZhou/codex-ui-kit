@@ -12,6 +12,46 @@
         "thread": ".codex-ui-conversation-thread-shell__thread",
         "user": ".codex-ui-agent-message[data-role=\"user\"] .codex-ui-agent-message__content"
       },
+      "expectedGeometry": {
+        "assistant": {
+          "height": 22,
+          "left": 168,
+          "lineHeight": "22px",
+          "top": 163,
+          "width": 736
+        },
+        "assistantActions": {
+          "height": 16,
+          "left": 168,
+          "top": 195,
+          "width": 94
+        },
+        "composer": {
+          "borderRadius": "20px",
+          "height": 98,
+          "left": 168,
+          "top": 706,
+          "width": 736
+        },
+        "header": {
+          "height": 46,
+          "left": 0,
+          "top": 0,
+          "width": 1072
+        },
+        "thread": {
+          "left": 152,
+          "top": 46,
+          "width": 768
+        },
+        "user": {
+          "borderRadius": "16px",
+          "height": 38,
+          "left": 587,
+          "top": 79,
+          "width": 317
+        }
+      },
       "id": "current-thread-completed",
       "masks": [],
       "maximumDiffRatio": 0.005,
@@ -53,6 +93,52 @@
         "stop": ".codex-ui-composer__primary[data-action=\"stop\"]",
         "thread": ".codex-ui-conversation-thread-shell__thread",
         "user": ".codex-ui-agent-message[data-role=\"user\"] .codex-ui-agent-message__content"
+      },
+      "expectedGeometry": {
+        "assistant": {
+          "fontSize": "14px",
+          "fontWeight": "445",
+          "height": 22,
+          "left": 168,
+          "lineHeight": "22px",
+          "top": {
+            "value": 206,
+            "tolerance": 1
+          },
+          "width": 736
+        },
+        "composer": {
+          "borderRadius": "20px",
+          "height": 98,
+          "left": 168,
+          "top": 706,
+          "width": 736
+        },
+        "header": {
+          "height": 46,
+          "left": 0,
+          "top": 0,
+          "width": 1072
+        },
+        "stop": {
+          "borderRadius": "999px",
+          "height": 28,
+          "left": 868,
+          "top": 768,
+          "width": 28
+        },
+        "thread": {
+          "left": 152,
+          "top": 46,
+          "width": 768
+        },
+        "user": {
+          "borderRadius": "16px",
+          "height": 82,
+          "left": 337,
+          "top": 79,
+          "width": 567
+        }
       },
       "id": "current-thread-streaming",
       "masks": [

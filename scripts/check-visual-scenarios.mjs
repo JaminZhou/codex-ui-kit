@@ -87,6 +87,47 @@ function configuredRatio(fallback, environment, label) {
   return value;
 }
 
+function geometryViolations(geometry, scenario) {
+  const violations = [];
+  for (const name of Object.keys(scenario.geometry)) {
+    const actual = geometry[name];
+    if (!actual) {
+      violations.push({
+        actual: null,
+        expected: "matching element",
+        name,
+        property: "selector",
+      });
+      continue;
+    }
+
+    for (const [property, declaration] of Object.entries(
+      scenario.expectedGeometry[name],
+    )) {
+      const expected =
+        typeof declaration === "object" ? declaration.value : declaration;
+      const tolerance =
+        typeof declaration === "object" ? declaration.tolerance ?? 0 : 0;
+      const actualValue = actual[property];
+      const matches =
+        typeof expected === "number"
+          ? typeof actualValue === "number" &&
+            Math.abs(actualValue - expected) <= tolerance
+          : actualValue === expected;
+      if (!matches) {
+        violations.push({
+          actual: actualValue,
+          expected,
+          name,
+          property,
+          tolerance,
+        });
+      }
+    }
+  }
+  return violations;
+}
+
 function findExecutable(command) {
   const result = spawnSync("which", [command], { encoding: "utf8" });
   if (result.status !== 0) return undefined;
@@ -335,6 +376,10 @@ try {
           ]),
         );
       }, scenario.geometry);
+      const geometryContractViolations = geometryViolations(
+        geometry,
+        scenario,
+      );
 
       const actualPath = join(outputDir, "actual.png");
       const diffPath = join(outputDir, "diff.png");
@@ -373,6 +418,7 @@ try {
       const diffRatio = mismatchedPixels / totalPixels;
       const regions = mismatchRegions(diff, scenario);
       const failed =
+        geometryContractViolations.length > 0 ||
         diffRatio > maximumDiffRatio ||
         regions.some(
           (region) => region.diffRatio > region.maximumDiffRatio,
@@ -384,6 +430,7 @@ try {
         diffRatio: Number(diffRatio.toFixed(6)),
         failed,
         geometry,
+        geometryContractViolations,
         id: scenario.id,
         masks,
         maximumDiffRatio,

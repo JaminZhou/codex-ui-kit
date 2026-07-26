@@ -55,6 +55,14 @@ describe("current-thread visual contract", () => {
     expect(streaming.referenceEnv).toBe(
       "CODEX_UI_KIT_THREAD_STREAMING_REFERENCE",
     );
+    expect(streaming.expectedGeometry.stop).toEqual(
+      expect.objectContaining({
+        height: 28,
+        left: 868,
+        top: 768,
+        width: 28,
+      }),
+    );
     expect(streaming.masks).toEqual([
       expect.objectContaining({
         name: "workspace-environment-control",
@@ -63,5 +71,6 @@ describe("current-thread visual contract", () => {
     ]);
     expect(scenarioScript).toContain("process.env[scenario.referenceEnv]");
     expect(scenarioScript).toContain("applyMasks(reference, actual");
+    expect(scenarioScript).toContain("geometryContractViolations.length > 0");
   });
 });
