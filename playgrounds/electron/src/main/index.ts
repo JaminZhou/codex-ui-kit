@@ -130,6 +130,14 @@ async function closeChoiceDialog(webContents: WebContents) {
 async function captureWorkflowSurfaces(webContents: WebContents) {
   return webContents.executeJavaScript(`(async () => {
     const wait = (duration) => new Promise((resolve) => setTimeout(resolve, duration));
+    const waitFor = async (predicate, timeout = 800) => {
+      const deadline = Date.now() + timeout;
+      while (Date.now() < deadline) {
+        if (predicate()) return true;
+        await wait(20);
+      }
+      return predicate();
+    };
     const rect = (element) => {
       if (!element) return null;
       const bounds = element.getBoundingClientRect();
@@ -235,13 +243,44 @@ async function captureWorkflowSurfaces(webContents: WebContents) {
       triggerExpanded:
         routingProjectContext?.getAttribute('aria-expanded') ?? null,
     };
-    const routingProject = routingProjectListbox?.querySelector(
+    const routingProjectFocusDismissTarget = card?.querySelector(
+      '[data-desktop-local-environment-context="true"] [data-kind="environment"]',
+    );
+    if (routingProjectFocusDismissTarget instanceof HTMLElement) {
+      routingProjectFocusDismissTarget.focus();
+    }
+    await waitFor(
+      () =>
+        !card?.querySelector('#desktop-routing-project-options') &&
+        document.activeElement?.getAttribute('data-kind') ===
+          'environment' &&
+        routingProjectContext?.getAttribute('aria-expanded') === 'false',
+    );
+    const routingProjectFocusDismissed =
+      !card?.querySelector('#desktop-routing-project-options') &&
+      document.activeElement?.getAttribute('data-kind') ===
+        'environment' &&
+      routingProjectContext?.getAttribute('aria-expanded') === 'false';
+    const routingProjectContextAfterFocusDismiss = card?.querySelector(
+      '[data-desktop-local-environment-context="true"] [data-kind="project"]',
+    );
+    routingProjectContextAfterFocusDismiss?.click();
+    await wait(100);
+    const reopenedRoutingProjectListbox = card?.querySelector(
+      '#desktop-routing-project-options',
+    );
+    const routingProject = reopenedRoutingProjectListbox?.querySelector(
       '[role="option"][data-project-id="desktop"]',
     );
     routingProject?.click();
-    await wait(80);
+    await waitFor(
+      () =>
+        document.activeElement?.id ===
+        'desktop-routing-project-trigger',
+    );
     const routingProjectSelectionFocusRestored =
-      document.activeElement === routingProjectContext;
+      document.activeElement?.id ===
+      'desktop-routing-project-trigger';
     const routingWorktreeContext = card?.querySelector(
       '[data-desktop-local-environment-context="true"] [data-kind="worktree"]',
     );
@@ -555,6 +594,7 @@ async function captureWorkflowSurfaces(webContents: WebContents) {
         routingProjectMetrics.initialFocusSelected,
       routingProjectRovingTabStopMoved:
         routingProjectMetrics.rovingTabStopMoved,
+      routingProjectFocusDismissed,
       routingProjectSelectionFocusRestored,
       routingProjectTriggerControls:
         routingProjectMetrics.triggerControls,
@@ -1225,6 +1265,7 @@ async function captureAcceptance(browserWindow: BrowserWindow) {
         routingProjectArrowNavigationMoved: true,
         routingProjectInitialFocusSelected: true,
         routingProjectRovingTabStopMoved: true,
+        routingProjectFocusDismissed: true,
         routingProjectSelectionFocusRestored: true,
         routingProjectTriggerControls:
           "desktop-routing-project-options",

@@ -968,13 +968,29 @@ export function ConversationProjectListbox({
         onDismiss();
       }
     };
+    const handleFocusIn = (event: FocusEvent) => {
+      const target = event.target;
+      if (!(target instanceof Node)) return;
+      const trigger = triggerId
+        ? document.getElementById(triggerId)
+        : null;
+      if (
+        !listboxRef.current?.contains(target) &&
+        !trigger?.contains(target)
+      ) {
+        onDismiss();
+      }
+    };
     document.addEventListener("pointerdown", handlePointerDown, true);
-    return () =>
+    document.addEventListener("focusin", handleFocusIn, true);
+    return () => {
       document.removeEventListener(
         "pointerdown",
         handlePointerDown,
         true,
       );
+      document.removeEventListener("focusin", handleFocusIn, true);
+    };
   }, [onDismiss, triggerId]);
 
   return (

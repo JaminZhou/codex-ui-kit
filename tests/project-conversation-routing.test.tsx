@@ -259,6 +259,43 @@ describe("project conversation routing", () => {
     expect(document.activeElement).toBe(composer);
   });
 
+  it("dismisses without stealing the destination when focus leaves", () => {
+    const onDismiss = vi.fn();
+    render(
+      <>
+        <button id="focus-project-trigger" type="button">
+          Project
+        </button>
+        <ConversationProjectListbox
+          items={[
+            {
+              id: "ui-kit",
+              label: "UI Kit",
+            },
+          ]}
+          onDismiss={onDismiss}
+          onSelect={() => undefined}
+          selectedId="ui-kit"
+          triggerId="focus-project-trigger"
+        />
+        <textarea aria-label="Conversation composer" />
+      </>,
+    );
+    expect(document.activeElement).toBe(
+      screen.getByRole("option", {
+        name: "Select project UI Kit",
+      }),
+    );
+
+    const composer = screen.getByRole("textbox", {
+      name: "Conversation composer",
+    });
+    composer.focus();
+
+    expect(onDismiss).toHaveBeenCalledTimes(1);
+    expect(document.activeElement).toBe(composer);
+  });
+
   it("keeps a first-enabled tab stop without automatic focus", () => {
     render(
       <ConversationProjectListbox
