@@ -146,10 +146,13 @@ describe("project conversation routing", () => {
       name: "Select project Repairing",
     });
     expect(document.activeElement).toBe(uiKit);
+    expect(uiKit.tabIndex).toBe(0);
     expect(repair).toHaveProperty("disabled", true);
 
     fireEvent.keyDown(uiKit, { key: "ArrowDown" });
     expect(document.activeElement).toBe(desktop);
+    expect(uiKit.tabIndex).toBe(-1);
+    expect(desktop.tabIndex).toBe(0);
     fireEvent.keyDown(desktop, { key: "ArrowDown" });
     expect(document.activeElement).toBe(uiKit);
     fireEvent.keyDown(uiKit, { key: "End" });
@@ -159,6 +162,47 @@ describe("project conversation routing", () => {
 
     fireEvent.keyDown(desktop, { key: "Escape" });
     expect(onDismiss).toHaveBeenCalledTimes(1);
+  });
+
+  it("keeps a first-enabled tab stop without automatic focus", () => {
+    render(
+      <ConversationProjectListbox
+        initialFocus="none"
+        items={[
+          {
+            id: "repair",
+            label: "Repairing",
+            status: "unavailable",
+          },
+          {
+            id: "ui-kit",
+            label: "UI Kit",
+          },
+          {
+            id: "desktop",
+            label: "Desktop",
+          },
+        ]}
+        onSelect={() => undefined}
+        selectedId="repair"
+      />,
+    );
+
+    expect(
+      screen.getByRole("option", {
+        name: "Select project Repairing",
+      }).tabIndex,
+    ).toBe(-1);
+    expect(
+      screen.getByRole("option", {
+        name: "Select project UI Kit",
+      }).tabIndex,
+    ).toBe(0);
+    expect(
+      screen.getByRole("option", {
+        name: "Select project Desktop",
+      }).tabIndex,
+    ).toBe(-1);
   });
 
   it("renders grouped local environments in a controlled dialog", () => {

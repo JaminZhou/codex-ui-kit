@@ -5,6 +5,7 @@ import {
   useEffect,
   useId,
   useRef,
+  useState,
 } from "react";
 import { Dialog } from "./Dialog.js";
 
@@ -868,14 +869,14 @@ function moveProjectListboxFocus(
       "Home",
     ].includes(event.key)
   ) {
-    return;
+    return undefined;
   }
   const listbox = event.currentTarget.closest<HTMLElement>(
     '[role="listbox"]',
   );
-  if (!listbox) return;
+  if (!listbox) return undefined;
   const enabled = projectListboxOptions(listbox);
-  if (enabled.length === 0) return;
+  if (enabled.length === 0) return undefined;
   const currentIndex = enabled.indexOf(event.currentTarget);
   const nextIndex =
     event.key === "Home"
@@ -886,7 +887,9 @@ function moveProjectListboxFocus(
           ? (currentIndex - 1 + enabled.length) % enabled.length
           : (currentIndex + 1) % enabled.length;
   event.preventDefault();
-  enabled[nextIndex]?.focus();
+  const next = enabled[nextIndex];
+  next?.focus();
+  return next?.dataset.projectId;
 }
 
 export function ConversationProjectListbox({
@@ -901,6 +904,18 @@ export function ConversationProjectListbox({
   ...props
 }: ConversationProjectListboxProps) {
   const listboxRef = useRef<HTMLDivElement | null>(null);
+  const enabledItems = items.filter(
+    (item) => !projectIndexItemDisabled(item),
+  );
+  const fallbackActiveId =
+    enabledItems.find((item) => item.id === selectedId)?.id ??
+    enabledItems[0]?.id;
+  const [activeId, setActiveId] = useState(fallbackActiveId);
+  const resolvedActiveId = enabledItems.some(
+    (item) => item.id === activeId,
+  )
+    ? activeId
+    : fallbackActiveId;
 
   useEffect(() => {
     if (initialFocus === "none") return;
@@ -972,6 +987,7 @@ export function ConversationProjectListbox({
             disabled={disabled}
             key={item.id}
             onClick={() => onSelect(item.id)}
+            onFocus={() => setActiveId(item.id)}
             onKeyDown={(event) => {
               if (event.key === "Escape" && onDismiss) {
                 event.preventDefault();
@@ -983,10 +999,13 @@ export function ConversationProjectListbox({
                 }
                 return;
               }
-              moveProjectListboxFocus(event);
+              const nextId = moveProjectListboxFocus(event);
+              if (nextId) setActiveId(nextId);
             }}
             role="option"
-            tabIndex={selected ? 0 : -1}
+            tabIndex={
+              !disabled && item.id === resolvedActiveId ? 0 : -1
+            }
             type="button"
           >
             <span>{item.label}</span>

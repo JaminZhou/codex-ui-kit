@@ -210,6 +210,11 @@ async function captureWorkflowSurfaces(webContents: WebContents) {
       document.activeElement instanceof HTMLElement &&
       document.activeElement.getAttribute('role') === 'option' &&
       document.activeElement !== initiallyFocusedProjectOption;
+    const routingProjectRovingTabStopMoved =
+      document.activeElement instanceof HTMLElement &&
+      document.activeElement.getAttribute('role') === 'option' &&
+      document.activeElement.tabIndex === 0 &&
+      initiallyFocusedProjectOption?.tabIndex === -1;
     const routingProjectMetrics = {
       arrowNavigationMoved:
         routingProjectArrowNavigationMoved,
@@ -219,6 +224,8 @@ async function captureWorkflowSurfaces(webContents: WebContents) {
       optionCount:
         routingProjectListbox?.querySelectorAll('[role="option"]').length ?? 0,
       role: routingProjectListbox?.getAttribute('role') ?? null,
+      rovingTabStopMoved:
+        routingProjectRovingTabStopMoved,
       triggerControls:
         routingProjectContext?.getAttribute('aria-controls') ?? null,
       triggerExpanded:
@@ -518,6 +525,8 @@ async function captureWorkflowSurfaces(webContents: WebContents) {
         routingProjectMetrics.arrowNavigationMoved,
       routingProjectInitialFocusSelected:
         routingProjectMetrics.initialFocusSelected,
+      routingProjectRovingTabStopMoved:
+        routingProjectMetrics.rovingTabStopMoved,
       routingProjectTriggerControls:
         routingProjectMetrics.triggerControls,
       routingProjectTriggerExpanded:
@@ -1184,6 +1193,7 @@ async function captureAcceptance(browserWindow: BrowserWindow) {
         routingProjectOptionCount: 2,
         routingProjectArrowNavigationMoved: true,
         routingProjectInitialFocusSelected: true,
+        routingProjectRovingTabStopMoved: true,
         routingProjectTriggerControls:
           "desktop-routing-project-options",
         routingProjectTriggerExpanded: "true",
