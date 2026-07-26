@@ -8,6 +8,7 @@ import {
   type CSSProperties,
   type HTMLAttributes,
   type ReactNode,
+  type RefCallback,
   type UIEvent,
 } from "react";
 
@@ -99,7 +100,20 @@ export const AgentThreadViewport = forwardRef<
     (viewport: HTMLDivElement | null) => {
       viewportRef.current = viewport;
       if (typeof forwardedRef === "function") {
-        forwardedRef(viewport);
+        const cleanup = (
+          forwardedRef as RefCallback<HTMLDivElement>
+        )(viewport);
+        if (typeof cleanup === "function") {
+          return () => {
+            try {
+              cleanup();
+            } finally {
+              if (viewportRef.current === viewport) {
+                viewportRef.current = null;
+              }
+            }
+          };
+        }
       } else if (forwardedRef) {
         forwardedRef.current = viewport;
       }
