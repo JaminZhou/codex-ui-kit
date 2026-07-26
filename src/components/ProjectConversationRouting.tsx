@@ -2,6 +2,7 @@ import {
   type HTMLAttributes,
   type KeyboardEvent,
   type ReactNode,
+  useId,
 } from "react";
 
 export type ProjectConversationPageStatus =
@@ -150,6 +151,8 @@ export function ProjectIndex({
   toolbar,
   ...props
 }: ProjectIndexProps) {
+  const projectIndexId = useId();
+
   return (
     <nav
       {...props}
@@ -176,13 +179,31 @@ export function ProjectIndex({
       ) : null}
       {items.length > 0 ? (
         <ul className="codex-ui-project-index__items">
-          {items.map((item) => {
+          {items.map((item, index) => {
             const selected = item.id === selectedId;
             const disabled = projectIndexItemDisabled(item);
+            const descriptionId = item.description
+              ? `${projectIndexId}-description-${index}`
+              : undefined;
+            const pathId = item.path
+              ? `${projectIndexId}-path-${index}`
+              : undefined;
+            const trailingId =
+              item.meta || item.statusLabel
+                ? `${projectIndexId}-trailing-${index}`
+                : undefined;
+            const describedBy = [
+              descriptionId,
+              pathId,
+              trailingId,
+            ]
+              .filter(Boolean)
+              .join(" ");
             return (
               <li data-status={item.status} key={item.id}>
                 <button
                   aria-current={selected ? "page" : undefined}
+                  aria-describedby={describedBy || undefined}
                   aria-label={`Open project ${itemTextValue(item)}`}
                   className="codex-ui-project-index__item"
                   data-selected={selected || undefined}
@@ -203,18 +224,27 @@ export function ProjectIndex({
                       {item.label}
                     </span>
                     {item.description ? (
-                      <span className="codex-ui-project-index__description">
+                      <span
+                        className="codex-ui-project-index__description"
+                        id={descriptionId}
+                      >
                         {item.description}
                       </span>
                     ) : null}
                     {item.path ? (
-                      <code className="codex-ui-project-index__path">
+                      <code
+                        className="codex-ui-project-index__path"
+                        id={pathId}
+                      >
                         {item.path}
                       </code>
                     ) : null}
                   </span>
                   {item.meta || item.statusLabel ? (
-                    <span className="codex-ui-project-index__trailing">
+                    <span
+                      className="codex-ui-project-index__trailing"
+                      id={trailingId}
+                    >
                       {item.meta ? <span>{item.meta}</span> : null}
                       {item.statusLabel ? (
                         <span
@@ -461,6 +491,8 @@ export function WorktreeList({
   title = "Worktrees",
   ...props
 }: WorktreeListProps) {
+  const worktreeListId = useId();
+
   return (
     <section
       {...props}
@@ -482,7 +514,7 @@ export function WorktreeList({
       </header>
       {items.length > 0 ? (
         <ul className="codex-ui-worktree-list__items">
-          {items.map((item) => {
+          {items.map((item, index) => {
             const selected = item.id === selectedId;
             const disabled = worktreeListItemDisabled(item);
             const accessibleName =
@@ -490,11 +522,33 @@ export function WorktreeList({
               (typeof item.label === "string"
                 ? item.label
                 : item.id);
+            const branchId = item.branch
+              ? `${worktreeListId}-branch-${index}`
+              : undefined;
+            const descriptionId = item.description
+              ? `${worktreeListId}-description-${index}`
+              : undefined;
+            const pathId = item.path
+              ? `${worktreeListId}-path-${index}`
+              : undefined;
+            const trailingId =
+              item.meta || item.statusLabel
+                ? `${worktreeListId}-trailing-${index}`
+                : undefined;
+            const describedBy = [
+              branchId,
+              descriptionId,
+              pathId,
+              trailingId,
+            ]
+              .filter(Boolean)
+              .join(" ");
             return (
               <li data-status={item.status} key={item.id}>
                 <div className="codex-ui-worktree-list__row">
                   <button
                     aria-current={selected ? "location" : undefined}
+                    aria-describedby={describedBy || undefined}
                     aria-label={`Open worktree ${accessibleName}`}
                     className="codex-ui-worktree-list__item"
                     data-selected={selected || undefined}
@@ -513,21 +567,32 @@ export function WorktreeList({
                     <span className="codex-ui-worktree-list__copy">
                       <span className="codex-ui-worktree-list__identity">
                         <span>{item.label}</span>
-                        {item.branch ? <code>{item.branch}</code> : null}
+                        {item.branch ? (
+                          <code id={branchId}>{item.branch}</code>
+                        ) : null}
                       </span>
                       {item.description ? (
-                        <span className="codex-ui-worktree-list__description">
+                        <span
+                          className="codex-ui-worktree-list__description"
+                          id={descriptionId}
+                        >
                           {item.description}
                         </span>
                       ) : null}
                       {item.path ? (
-                        <code className="codex-ui-worktree-list__path">
+                        <code
+                          className="codex-ui-worktree-list__path"
+                          id={pathId}
+                        >
                           {item.path}
                         </code>
                       ) : null}
                     </span>
                     {item.meta || item.statusLabel ? (
-                      <span className="codex-ui-worktree-list__trailing">
+                      <span
+                        className="codex-ui-worktree-list__trailing"
+                        id={trailingId}
+                      >
                         {item.meta ? <span>{item.meta}</span> : null}
                         {item.statusLabel ? (
                           <span

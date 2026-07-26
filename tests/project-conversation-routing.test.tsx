@@ -18,6 +18,14 @@ import {
 
 afterEach(cleanup);
 
+function accessibleDescriptionText(element: Element) {
+  return (element.getAttribute("aria-describedby") ?? "")
+    .split(/\s+/)
+    .filter(Boolean)
+    .map((id) => document.getElementById(id)?.textContent ?? "")
+    .join(" ");
+}
+
 describe("project conversation routing", () => {
   it("composes application projects with conversation and workspace setup", () => {
     render(
@@ -86,15 +94,22 @@ describe("project conversation routing", () => {
       />,
     );
 
-    fireEvent.click(
-      screen.getByRole("button", { name: "Open project UI Kit" }),
-    );
+    const currentProject = screen.getByRole("button", {
+      name: "Open project UI Kit",
+    });
+    fireEvent.click(currentProject);
     expect(onSelect).toHaveBeenCalledWith("ui-kit");
-    expect(
-      screen.getByRole("button", {
-        name: "Open project Missing project",
-      }),
-    ).toHaveProperty("disabled", true);
+    expect(accessibleDescriptionText(currentProject)).toContain(
+      "Current project",
+    );
+    expect(accessibleDescriptionText(currentProject)).toContain("3 tasks");
+    const missingProject = screen.getByRole("button", {
+      name: "Open project Missing project",
+    });
+    expect(missingProject).toHaveProperty("disabled", true);
+    expect(accessibleDescriptionText(missingProject)).toContain(
+      "Unavailable",
+    );
     expect(screen.getByRole("searchbox", { name: "Search projects" })).toBeTruthy();
   });
 
@@ -197,9 +212,12 @@ describe("project conversation routing", () => {
     fireEvent.click(routing);
     expect(onSelect).toHaveBeenCalledWith("routing");
 
-    expect(
-      screen.getByRole("button", { name: "Open worktree Repairing" }),
-    ).toHaveProperty("disabled", true);
+    const repairing = screen.getByRole("button", {
+      name: "Open worktree Repairing",
+    });
+    expect(repairing).toHaveProperty("disabled", true);
+    expect(accessibleDescriptionText(repairing)).toContain("fix/repair");
+    expect(accessibleDescriptionText(repairing)).toContain("Repairing");
     fireEvent.click(screen.getByRole("button", { name: "Details" }));
     expect(onInspect).toHaveBeenCalledTimes(1);
     expect(
