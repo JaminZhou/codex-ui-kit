@@ -1,4 +1,5 @@
 import { createServer } from "node:http";
+import { spawnSync } from "node:child_process";
 import {
   existsSync,
   mkdirSync,
@@ -64,11 +65,21 @@ function dominantColors(image, limit = 6) {
     .map(([rgba, pixels]) => ({ pixels, rgba }));
 }
 
+function findExecutable(command) {
+  const result = spawnSync("which", [command], { encoding: "utf8" });
+  if (result.status !== 0) return undefined;
+  return result.stdout.trim() || undefined;
+}
+
 function findChrome() {
   const candidates = [
     process.env.PUPPETEER_EXECUTABLE_PATH,
     "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
     "/Applications/Chromium.app/Contents/MacOS/Chromium",
+    findExecutable("google-chrome"),
+    findExecutable("google-chrome-stable"),
+    findExecutable("chromium"),
+    findExecutable("chromium-browser"),
   ];
   return candidates.find((candidate) => candidate && existsSync(candidate));
 }

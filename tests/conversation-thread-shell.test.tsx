@@ -1,6 +1,6 @@
 // @vitest-environment happy-dom
 
-import { cleanup, render } from "@testing-library/react";
+import { act, cleanup, render } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import {
   AgentComposer,
@@ -181,6 +181,85 @@ describe("ConversationThreadShell", () => {
       globalThis.ResizeObserver = originalResizeObserver;
       HTMLElement.prototype.getBoundingClientRect =
         originalGetBoundingClientRect;
+    }
+  });
+
+  it("pins a followed viewport when the composer reserve grows without pulling a scrolled-away viewport", () => {
+    const originalResizeObserver = globalThis.ResizeObserver;
+    let resizeCallback: ResizeObserverCallback | undefined;
+    let observerInstance: ResizeObserver | undefined;
+
+    globalThis.ResizeObserver = class ResizeObserver {
+      constructor(callback: ResizeObserverCallback) {
+        resizeCallback = callback;
+        observerInstance = this;
+      }
+
+      disconnect = vi.fn();
+      observe = vi.fn();
+      unobserve = vi.fn();
+    };
+
+    try {
+      const { container } = render(
+        <ConversationThreadShell
+          composer={<span>Composer</span>}
+          header={<span>Header</span>}
+        >
+          Timeline
+        </ConversationThreadShell>,
+      );
+      const composerDock = container.querySelector<HTMLElement>(
+        ".codex-ui-conversation-thread-shell__composer-dock",
+      )!;
+      const viewport = container.querySelector<HTMLDivElement>(
+        ".codex-ui-conversation-thread-shell__viewport",
+      )!;
+      Object.defineProperties(viewport, {
+        clientHeight: { configurable: true, value: 300 },
+        scrollHeight: { configurable: true, value: 900 },
+        scrollTop: { configurable: true, value: 600, writable: true },
+      });
+      vi.spyOn(composerDock, "getBoundingClientRect").mockReturnValue({
+        bottom: 180,
+        height: 180,
+        left: 0,
+        right: 736,
+        top: 0,
+        width: 736,
+        x: 0,
+        y: 0,
+        toJSON: () => ({}),
+      });
+      const scrollTo = vi.fn((options: ScrollToOptions) => {
+        viewport.scrollTop = Number(options.top ?? 0);
+      });
+      Object.defineProperty(viewport, "scrollTo", {
+        configurable: true,
+        value: scrollTo,
+      });
+
+      act(() => {
+        resizeCallback?.([], observerInstance!);
+      });
+      expect(scrollTo).toHaveBeenCalledWith({
+        behavior: "auto",
+        top: 900,
+      });
+
+      scrollTo.mockClear();
+      viewport.scrollTop = 300;
+      act(() => {
+        viewport.dispatchEvent(new Event("scroll", { bubbles: true }));
+      });
+      expect(viewport.hasAttribute("data-following")).toBe(false);
+
+      act(() => {
+        resizeCallback?.([], observerInstance!);
+      });
+      expect(scrollTo).not.toHaveBeenCalled();
+    } finally {
+      globalThis.ResizeObserver = originalResizeObserver;
     }
   });
 });

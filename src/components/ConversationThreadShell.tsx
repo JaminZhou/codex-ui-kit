@@ -43,6 +43,7 @@ export function ConversationThreadShell({
 }: ConversationThreadShellProps) {
   const bodyRef = useRef<HTMLDivElement>(null);
   const composerDockRef = useRef<HTMLDivElement>(null);
+  const viewportRef = useRef<HTMLDivElement>(null);
   const {
     className: threadClassName,
     ...restThreadProps
@@ -51,6 +52,7 @@ export function ConversationThreadShell({
     className: viewportClassName,
     ...restViewportProps
   } = viewportProps ?? {};
+  const shouldAutoFollow = restViewportProps.autoFollow ?? true;
 
   useLayoutEffect(() => {
     const body = bodyRef.current;
@@ -60,10 +62,24 @@ export function ConversationThreadShell({
     const updateComposerReserve = () => {
       const height = composerDock.getBoundingClientRect().height;
       if (height > 0) {
+        const viewport = viewportRef.current;
+        const shouldPinViewport =
+          shouldAutoFollow &&
+          viewport?.hasAttribute("data-following") === true;
         body.style.setProperty(
           "--codex-ui-conversation-thread-composer-dock-height",
           `${height}px`,
         );
+        if (
+          shouldPinViewport &&
+          viewport &&
+          typeof viewport.scrollTo === "function"
+        ) {
+          viewport.scrollTo({
+            behavior: "auto",
+            top: viewport.scrollHeight,
+          });
+        }
       }
     };
 
@@ -73,7 +89,7 @@ export function ConversationThreadShell({
     const observer = new ResizeObserver(updateComposerReserve);
     observer.observe(composerDock);
     return () => observer.disconnect();
-  }, []);
+  }, [shouldAutoFollow]);
 
   return (
     <section
@@ -101,6 +117,7 @@ export function ConversationThreadShell({
           ]
             .filter(Boolean)
             .join(" ")}
+          ref={viewportRef}
         >
           <AgentThread
             {...restThreadProps}
