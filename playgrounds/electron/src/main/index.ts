@@ -271,9 +271,37 @@ async function captureWorkflowSurfaces(webContents: WebContents) {
       );
     desktopMainEnvironment?.click();
     await wait(100);
-    const startConversation = [...(card?.querySelectorAll('button') ?? [])]
-      .find((button) => button.textContent?.trim() === 'Start conversation');
-    startConversation?.click();
+    const routingComposerInput = card?.querySelector(
+      '.codex-ui-new-conversation-start .codex-ui-composer__input',
+    );
+    if (routingComposerInput instanceof HTMLTextAreaElement) {
+      const setTextareaValue = Object.getOwnPropertyDescriptor(
+        HTMLTextAreaElement.prototype,
+        'value',
+      )?.set;
+      setTextareaValue?.call(
+        routingComposerInput,
+        'Acceptance new chat prompt',
+      );
+      routingComposerInput.dispatchEvent(
+        new Event('input', { bubbles: true }),
+      );
+    }
+    await wait(100);
+    const routingComposerSubmit = card?.querySelector(
+      '.codex-ui-new-conversation-start button[aria-label="Send message"]',
+    );
+    const routingComposerSubmitEnabled =
+      routingComposerSubmit instanceof HTMLButtonElement &&
+      !routingComposerSubmit.disabled;
+    const submittedRoutingInput = card?.querySelector(
+      '.codex-ui-new-conversation-start .codex-ui-composer__input',
+    );
+    const routingComposerPrompt =
+      submittedRoutingInput instanceof HTMLTextAreaElement
+        ? submittedRoutingInput.value
+        : null;
+    routingComposerSubmit?.click();
     await wait(120);
 
     const selectorOverlays = [];
@@ -373,6 +401,8 @@ async function captureWorkflowSurfaces(webContents: WebContents) {
       reviewRows: [...(pullRequestPage?.querySelectorAll('.codex-ui-pull-request-reviews li') ?? [])].map(rect),
       reviewThread: rect(reviewThread),
       routingBody: rect(routingBody),
+      routingComposerPrompt,
+      routingComposerSubmitEnabled,
       routingBodyWithinPage:
         Boolean(routingPageBounds && routingBodyBounds) &&
         routingBodyBounds.bottom <= routingPageBounds.bottom + 1,
@@ -1064,7 +1094,9 @@ async function captureAcceptance(browserWindow: BrowserWindow) {
         routingLayout,
         routingProjectsOverflowY: "auto",
         routingSetupOverflowY: "auto",
-        routingState: "desktop/local/main",
+        routingComposerPrompt: "Acceptance new chat prompt",
+        routingComposerSubmitEnabled: true,
+        routingState: "Desktop conversation started",
         runningEventBusy: "true",
         selectedPullRequest:
           "Open pull request 50: Add current application shell",
