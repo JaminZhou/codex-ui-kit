@@ -36,6 +36,8 @@ The built-in highlighter escapes untrusted code. A custom `CodeHighlighter` retu
 - `AgentPlan`: structured pending, in-progress, and completed plan steps.
 - `ProposedPlan`: writing and completed plan-card states with host-owned actions.
 - `SearchActivity`: code-search and grouped web-search states with controlled disclosure and bounded results.
+- `BrowserActivity`: running, completed, and failed Browser disclosures with
+  ordered instruction, connection, and navigation steps.
 - `ConversationEventList` and `ConversationEvent`: protocol-neutral ordering,
   ownership (`turn` or `thread`), event-kind, progress, warning, failure, live
   status, metadata, content, and action slots for mixed session timelines.
@@ -46,7 +48,7 @@ The built-in highlighter escapes untrusted code. A custom `CodeHighlighter` retu
 
 ## Tools, approvals, and status
 
-- `ToolCallCard`: generic MCP, connector, browser, and arbitrary tool-call row with structured, empty, error, and raw-output states.
+- `ToolCallCard`: generic MCP, connector, and arbitrary tool-call row with structured, empty, error, and raw-output states.
 - `CommandExecution`: expandable command surface with duration, copy, background-terminal, success, failure, and interruption states. `formatCommandDuration` exposes its standalone duration formatter.
 - `CommandOutput`: labeled stdout/stderr with no-output, tail-following, overflow, fade, and copy behavior.
 - `FileChange`: create, apply, stop, reject, delete, and rename activities with disclosure, statistics, path opening, and copy hooks.

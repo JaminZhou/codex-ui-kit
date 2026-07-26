@@ -127,7 +127,8 @@
         "cdp:grouped-success-and-exit-code-7-command-rows",
         "cdp:long-output-144px-scroll-fade-container",
         "cdp:running-duration-stop-and-background-process-state",
-        "cdp-26.721:synthetic-expanded-read-only-command-timeline-1072x820"
+        "cdp-26.721:synthetic-expanded-read-only-command-timeline-1072x820",
+        "cdp-26.721:synthetic-exit-code-7-failed-command-compact-526x600"
       ],
       "implementationStatus": "partial",
       "browserStatus": "verified",
@@ -149,13 +150,55 @@
       "priority": "p0"
     },
     {
-      "id": "thread.search-tool-mcp-events",
+      "id": "thread.search-tool-events",
       "area": "conversation",
       "ownership": "turn",
       "packageEvidence": ["code-searching-icon", "web-search-icon"],
+      "runtimeStatus": "runtime_observed",
+      "runtimeEvidence": [
+        "cdp-26.721:synthetic-web-search-completed-expanded-compact-526x600"
+      ],
+      "implementationStatus": "partial",
+      "browserStatus": "verified",
+      "electronStatus": "partial_legacy",
+      "priority": "p0"
+    },
+    {
+      "id": "thread.browser-tool-events",
+      "area": "conversation",
+      "ownership": "turn",
+      "packageEvidence": ["browser", "thread-browser-panel-tabs"],
+      "runtimeStatus": "runtime_observed",
+      "runtimeEvidence": [
+        "cdp-26.721:synthetic-browser-completed-expanded-compact-526x600"
+      ],
+      "implementationStatus": "partial",
+      "browserStatus": "verified",
+      "electronStatus": "partial_legacy",
+      "priority": "p0"
+    },
+    {
+      "id": "thread.mcp-tool-events",
+      "area": "conversation",
+      "ownership": "turn",
+      "packageEvidence": ["mcp-capability-view-page"],
       "runtimeStatus": "not_sampled",
       "implementationStatus": "partial",
       "browserStatus": "partial_legacy",
+      "electronStatus": "partial_legacy",
+      "priority": "p0"
+    },
+    {
+      "id": "thread.tool-unavailable-recovery",
+      "area": "conversation",
+      "ownership": "turn",
+      "packageEvidence": ["local-conversation-page", "mcp-capability-view-page"],
+      "runtimeStatus": "runtime_observed",
+      "runtimeEvidence": [
+        "cdp-26.721:synthetic-github-mcp-unavailable-assistant-recovery-compact-526x600"
+      ],
+      "implementationStatus": "partial",
+      "browserStatus": "verified",
       "electronStatus": "partial_legacy",
       "priority": "p0"
     },

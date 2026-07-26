@@ -13,6 +13,8 @@ import {
   ArtifactList,
   ApprovalCommandPreview,
   ApprovalRequest,
+  BrowserActivity,
+  type BrowserActivityStep,
   Button,
   type ApprovalAction,
   type ApprovalRequestKind,
@@ -127,6 +129,11 @@ const searchEntry: SearchActivityEntry = {
   detail: "package contract",
   id: "search-entry",
 };
+const browserStep: BrowserActivityStep = {
+  id: "browser-step",
+  kind: "navigation",
+  label: "Open the page",
+};
 const subagent: SubagentItem = {
   id: "package-consumer",
   name: "Consumer",
@@ -219,6 +226,8 @@ void AppSidebarSection;
 void ArtifactList;
 void ApprovalCommandPreview;
 void ApprovalRequest;
+void BrowserActivity;
+void browserStep;
 void CodeBlock;
 void CommandExecution;
 void CommandOutput;

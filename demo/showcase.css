@@ -658,6 +658,90 @@ code {
   margin-bottom: 0.1875rem;
 }
 
+.tool-recovery-pixel-fixture {
+  --codex-ui-conversation-thread-user-turn-gap: 2rem;
+}
+
+.tool-recovery-pixel-fixture
+  .codex-ui-agent-message[data-role="user"]
+  .codex-ui-agent-message__content {
+  max-width: 23.75rem;
+}
+
+.tool-recovery-pixel-fixture
+  .workflow-pixel-fixture__timeline {
+  margin-bottom: 0.25rem;
+}
+
+.tool-recovery-pixel-fixture
+  .workflow-pixel-fixture__timeline
+  .codex-ui-activity-timeline__content {
+  margin-top: 0.75rem;
+}
+
+.tool-recovery-pixel-fixture
+  .workflow-pixel-fixture__commentary {
+  margin-bottom: 0.75rem;
+}
+
+.tool-recovery-pixel-fixture[data-visual-scene="current-compact-browser-tool"]
+  .workflow-pixel-fixture__commentary {
+  margin-bottom: 0.5rem;
+}
+
+.tool-recovery-pixel-fixture[data-visual-scene="current-compact-browser-tool"]
+  .workflow-pixel-fixture__commentary
+  + .workflow-pixel-fixture__commentary {
+  margin-top: 0.75rem;
+}
+
+.tool-recovery-pixel-fixture[data-visual-scene="current-compact-browser-tool"]
+  .codex-ui-conversation-thread-shell__thread {
+  transform: translateY(-4.5625rem);
+}
+
+.tool-recovery-pixel-fixture[data-visual-scene="current-compact-browser-tool"]
+  .tool-recovery-pixel-fixture__browser {
+  margin-top: 1.25rem;
+}
+
+.tool-recovery-pixel-fixture[data-visual-scene="current-compact-browser-tool"]
+  .tool-recovery-pixel-fixture__browser
+  .codex-ui-activity__header {
+  min-height: 1.3125rem;
+  padding-block: 0;
+}
+
+.tool-recovery-pixel-fixture[data-visual-scene="current-compact-browser-tool"]
+  .tool-recovery-pixel-fixture__browser
+  .codex-ui-activity__body {
+  margin-top: 0.625rem;
+}
+
+.tool-recovery-pixel-fixture[data-visual-scene="current-compact-search-tool"]
+  .codex-ui-search-activity {
+  margin-bottom: 0.5rem;
+  position: relative;
+  top: 0.5rem;
+}
+
+.tool-recovery-pixel-fixture[data-visual-scene="current-compact-search-tool"]
+  .codex-ui-search-activity
+  .codex-ui-activity__header,
+.tool-recovery-pixel-fixture[data-visual-scene="current-compact-command-failure"]
+  .codex-ui-command-execution
+  .codex-ui-activity__header {
+  min-height: 1.3125rem;
+  padding-block: 0;
+}
+
+.tool-recovery-pixel-fixture[data-visual-scene="current-compact-command-failure"]
+  .codex-ui-command-execution {
+  margin-bottom: 0.5rem;
+  position: relative;
+  top: 0.5rem;
+}
+
 .workflow-pixel-fixture__approval {
   background: #272727;
   border-radius: 1.25rem;

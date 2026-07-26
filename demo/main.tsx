@@ -19,6 +19,7 @@ import {
   ApprovalCommandPreview,
   ApprovalRequest,
   ArtifactList,
+  BrowserActivity,
   Button,
   CommandExecution,
   CommandOutput,
@@ -606,6 +607,11 @@ function CurrentThreadPixelFixture({
 }
 
 type WorkflowPixelState = "approval" | "file-diff" | "tool-call";
+type ToolRecoveryPixelState =
+  | "browser"
+  | "command-failure"
+  | "mcp-unavailable"
+  | "search";
 
 function WorkflowPixelHeader({
   compact = false,
@@ -653,7 +659,11 @@ function WorkflowPixelHeader({
   );
 }
 
-function WorkflowPixelComposer() {
+function WorkflowPixelComposer({
+  approvalLabel = "Ask for approval",
+}: {
+  approvalLabel?: string;
+} = {}) {
   return (
     <AgentComposer
       actions={
@@ -663,7 +673,7 @@ function WorkflowPixelComposer() {
           </button>
           <button type="button">
             <PixelIcon name="approve" />
-            <span>Ask for approval</span>
+            <span>{approvalLabel}</span>
           </button>
         </>
       }
@@ -988,6 +998,192 @@ function WorkflowPixelFixture({ state }: { state: WorkflowPixelState }) {
   if (state === "approval") return <WorkflowApprovalFixture />;
   if (state === "file-diff") return <WorkflowFileDiffFixture />;
   return <WorkflowToolCallFixture />;
+}
+
+const browserProbeSteps = [
+  {
+    completed: true,
+    id: "instructions",
+    kind: "instruction" as const,
+    label: "读取应用内浏览器技能说明",
+  },
+  {
+    completed: true,
+    id: "connect",
+    kind: "connection" as const,
+    label: "连接应用内浏览器",
+  },
+  {
+    completed: true,
+    id: "open",
+    kind: "navigation" as const,
+    label: "打开页面并读取标题",
+  },
+];
+
+function ToolRecoveryThread({
+  children,
+  scene,
+  title,
+}: {
+  children: ReactNode;
+  scene: string;
+  title: string;
+}) {
+  return (
+    <main
+      className="current-thread-pixel-fixture workflow-pixel-fixture tool-recovery-pixel-fixture"
+      data-theme="dark"
+      data-visual-scene={scene}
+    >
+      <ConversationThreadShell
+        composer={<WorkflowPixelComposer approvalLabel="Approve for me" />}
+        header={<WorkflowPixelHeader title={title} />}
+        label={`${title} pixel fixture`}
+      >
+        {children}
+      </ConversationThreadShell>
+    </main>
+  );
+}
+
+function ToolRecoveryPixelFixture({
+  state,
+}: {
+  state: ToolRecoveryPixelState;
+}) {
+  if (state === "browser") {
+    return (
+      <ToolRecoveryThread
+        scene="current-compact-browser-tool"
+        title="Probe example.com page title"
+      >
+        <AgentMessage role="user">
+          Use the in-app browser tool, not web search or shell, to open{" "}
+          https://example.com and read only the page title. Do not click links
+          or submit forms. Then reply exactly: Browser probe complete.
+        </AgentMessage>
+        <ActivityTimeline
+          className="workflow-pixel-fixture__timeline"
+          defaultOpen
+          summary="Worked for 53s"
+        >
+          <p className="workflow-pixel-fixture__commentary">
+            我会按要求仅用应用内浏览器打开该网址并读取页面标题，不进行其他交互。
+          </p>
+          <p className="workflow-pixel-fixture__commentary">
+            我会依照{" "}
+            <code className="workflow-pixel-fixture__inline-command">
+              browser:control-in-app-browser
+            </code>{" "}
+            技能的限制执行这次只读页面检查。
+          </p>
+          <BrowserActivity
+            className="tool-recovery-pixel-fixture__browser"
+            defaultOpen
+            status="completed"
+            steps={browserProbeSteps}
+            summary="Used the browser, ran a command"
+          />
+        </ActivityTimeline>
+        <AgentMessage actions={<WorkflowMessageActions />} role="assistant">
+          Browser probe complete.
+        </AgentMessage>
+      </ToolRecoveryThread>
+    );
+  }
+
+  if (state === "mcp-unavailable") {
+    return (
+      <ToolRecoveryThread
+        scene="current-compact-mcp-unavailable"
+        title="Probe public repo description"
+      >
+        <AgentMessage role="user">
+          Use the GitHub connector or MCP tool, not shell or web search, to read
+          only the public repository description for
+          JaminZhou/codex-ui-kit. Do not access issues, pull requests, files, or
+          private repositories. Then reply exactly: MCP probe complete.
+        </AgentMessage>
+        <ActivityTimeline
+          className="workflow-pixel-fixture__timeline"
+          summary="Worked for 1m 26s"
+        />
+        <AgentMessage actions={<WorkflowMessageActions />} role="assistant">
+          无法完成：当前会话没有可用的 GitHub connector/MCP 工具。
+        </AgentMessage>
+      </ToolRecoveryThread>
+    );
+  }
+
+  if (state === "command-failure") {
+    return (
+      <ToolRecoveryThread
+        scene="current-compact-command-failure"
+        title="Run workflow failure probe"
+      >
+        <AgentMessage role="user">
+          Run{" "}
+          sh -c &apos;printf &quot;workflow failure probe\n&quot; &gt;&amp;2;
+          exit 7&apos; as one shell command. Do not retry it. Then reply
+          exactly: Failure probe complete.
+        </AgentMessage>
+        <ActivityTimeline
+          className="workflow-pixel-fixture__timeline"
+          defaultOpen
+          summary="Worked for 7s"
+        >
+          <p className="workflow-pixel-fixture__commentary">
+            我会按原命令执行一次，不重试。
+          </p>
+          <CommandExecution
+            command={`sh -c 'printf "workflow failure probe\\n" >&2; exit 7'`}
+            hideRawCommand
+            status="failed"
+          />
+        </ActivityTimeline>
+        <AgentMessage actions={<WorkflowMessageActions />} role="assistant">
+          Failure probe complete.
+        </AgentMessage>
+      </ToolRecoveryThread>
+    );
+  }
+
+  return (
+    <ToolRecoveryThread
+      scene="current-compact-search-tool"
+      title="Find OpenAI Codex docs title"
+    >
+      <AgentMessage role="user">
+        Use web search, not browser or shell, to find the title of the official
+        OpenAI Codex documentation landing page. Do not click unrelated results
+        or submit forms. Then reply exactly: Search probe complete.
+      </AgentMessage>
+      <ActivityTimeline
+        className="workflow-pixel-fixture__timeline"
+        defaultOpen
+        summary="Worked for 32s"
+      >
+        <p className="workflow-pixel-fixture__commentary">
+          我会仅用网页搜索核对 OpenAI 官方文档结果。
+        </p>
+        <SearchActivity
+          entries={[
+            {
+              completed: true,
+              detail: "Official OpenAI Codex documentation",
+              id: "official-codex-docs",
+            },
+          ]}
+          kind="web"
+          status="completed"
+        />
+      </ActivityTimeline>
+      <AgentMessage actions={<WorkflowMessageActions />} role="assistant">
+        Search probe complete.
+      </AgentMessage>
+    </ToolRecoveryThread>
+  );
 }
 
 function Showcase() {
@@ -2742,14 +2938,12 @@ function Showcase() {
                   />
                 </div>
                 <div className="tool-preview__surface">
-                  <span className="tool-preview__label">Browser · empty</span>
-                  <ToolCallCard
-                    completedLabel="Used the browser"
+                  <span className="tool-preview__label">Browser · completed</span>
+                  <BrowserActivity
                     defaultOpen
-                    icon={<span className="tool-preview__source-mark">B</span>}
-                    name="browser"
-                    source="browser-use"
                     status="completed"
+                    steps={browserProbeSteps}
+                    summary="Used the browser, ran a command"
                   />
                 </div>
                 <div className="tool-preview__surface">
@@ -3625,9 +3819,21 @@ const workflowPixelState: WorkflowPixelState | undefined =
       : capture === "current-workspace-file-diff"
         ? "file-diff"
         : undefined;
+const toolRecoveryPixelState: ToolRecoveryPixelState | undefined =
+  capture === "current-compact-search-tool"
+    ? "search"
+    : capture === "current-compact-browser-tool"
+      ? "browser"
+      : capture === "current-compact-mcp-unavailable"
+        ? "mcp-unavailable"
+        : capture === "current-compact-command-failure"
+          ? "command-failure"
+          : undefined;
 
 createRoot(document.getElementById("root")!).render(
-  workflowPixelState ? (
+  toolRecoveryPixelState ? (
+    <ToolRecoveryPixelFixture state={toolRecoveryPixelState} />
+  ) : workflowPixelState ? (
     <WorkflowPixelFixture state={workflowPixelState} />
   ) : currentThreadCapture ? (
     <CurrentThreadPixelFixture state={currentThreadPixelState} />

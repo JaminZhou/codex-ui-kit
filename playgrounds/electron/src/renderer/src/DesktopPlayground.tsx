@@ -19,6 +19,7 @@ import {
   ApprovalCommandPreview,
   ApprovalRequest,
   ArtifactList,
+  BrowserActivity,
   Button,
   CommandExecution,
   CommandOutput,
@@ -1394,14 +1395,31 @@ export function DesktopPlayground() {
                 />
               </div>
               <div>
-                <span className="tool-state-matrix__label">Browser · empty</span>
-                <ToolCallCard
-                  completedLabel="Used the browser"
+                <span className="tool-state-matrix__label">Browser · completed</span>
+                <BrowserActivity
                   defaultOpen
-                  icon={<span className="tool-state-matrix__source-mark">B</span>}
-                  name="browser"
-                  source="browser-use"
                   status="completed"
+                  steps={[
+                    {
+                      completed: true,
+                      id: "instructions",
+                      kind: "instruction",
+                      label: "Read browser instructions",
+                    },
+                    {
+                      completed: true,
+                      id: "connect",
+                      kind: "connection",
+                      label: "Connect to the browser",
+                    },
+                    {
+                      completed: true,
+                      id: "open",
+                      kind: "navigation",
+                      label: "Open the page and read its title",
+                    },
+                  ]}
+                  summary="Used the browser, ran a command"
                 />
               </div>
               <div>
