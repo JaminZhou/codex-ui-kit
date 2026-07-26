@@ -179,8 +179,31 @@ async function captureWorkflowSurfaces(webContents: WebContents) {
       card?.querySelectorAll(
         '.codex-ui-conversation-context-bar__item',
       ).length === 3;
-    const routingProject = card?.querySelector(
-      '.codex-ui-project-index__item[aria-label="Open project Desktop"]',
+    const routingProjectContext = card?.querySelector(
+      '[data-desktop-local-environment-context="true"] [data-kind="project"]',
+    );
+    routingProjectContext?.scrollIntoView({
+      block: 'center',
+      inline: 'nearest',
+    });
+    await wait(100);
+    routingProjectContext?.click();
+    await wait(100);
+    const routingProjectListbox = card?.querySelector(
+      '#desktop-routing-project-options',
+    );
+    const routingProjectMetrics = {
+      inViewport: inViewport(routingProjectListbox),
+      optionCount:
+        routingProjectListbox?.querySelectorAll('[role="option"]').length ?? 0,
+      role: routingProjectListbox?.getAttribute('role') ?? null,
+      triggerControls:
+        routingProjectContext?.getAttribute('aria-controls') ?? null,
+      triggerExpanded:
+        routingProjectContext?.getAttribute('aria-expanded') ?? null,
+    };
+    const routingProject = routingProjectListbox?.querySelector(
+      '[role="option"][data-project-id="desktop"]',
     );
     routingProject?.click();
     await wait(80);
@@ -463,6 +486,16 @@ async function captureWorkflowSurfaces(webContents: WebContents) {
       ),
       routingPromptInitiallyVisible,
       routingPromptTransitioned,
+      routingProjectListboxInViewport:
+        routingProjectMetrics.inViewport,
+      routingProjectListboxRole:
+        routingProjectMetrics.role,
+      routingProjectOptionCount:
+        routingProjectMetrics.optionCount,
+      routingProjectTriggerControls:
+        routingProjectMetrics.triggerControls,
+      routingProjectTriggerExpanded:
+        routingProjectMetrics.triggerExpanded,
       routingSetup: rect(routingSetup),
       routingSetupOverflowY: routingSetup
         ? getComputedStyle(routingSetup).overflowY
@@ -1120,6 +1153,12 @@ async function captureAcceptance(browserWindow: BrowserWindow) {
         routingProjectsOverflowY: "auto",
         routingPromptInitiallyVisible,
         routingPromptTransitioned: true,
+        routingProjectListboxInViewport: true,
+        routingProjectListboxRole: "listbox",
+        routingProjectOptionCount: 2,
+        routingProjectTriggerControls:
+          "desktop-routing-project-options",
+        routingProjectTriggerExpanded: "true",
         routingSetupOverflowY: "auto",
         routingComposerPrompt: "Acceptance new chat prompt",
         routingComposerSubmitEnabled: true,

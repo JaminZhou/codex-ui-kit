@@ -151,6 +151,32 @@ const overlayCases = [
     linkages: [
       {
         attribute: "aria-controls",
+        role: "listbox",
+        trigger:
+          '[data-local-environment-context="true"] [data-kind="project"]',
+      },
+    ],
+    name: "conversation project listbox",
+    open: async (page) => {
+      await revealConversationContext(page);
+      await page.click(
+        '[data-local-environment-context="true"] [data-kind="project"]',
+      );
+      await page.waitForSelector(
+        '#showcase-routing-project-options[role="listbox"]',
+      );
+    },
+    targets: [
+      {
+        role: "listbox",
+        selector: "#showcase-routing-project-options",
+      },
+    ],
+  },
+  {
+    linkages: [
+      {
+        attribute: "aria-controls",
         role: "menu",
         trigger: '.primitive-preview__toolbar button[aria-label="More actions"]',
       },

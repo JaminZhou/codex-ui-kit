@@ -393,6 +393,8 @@ export function DesktopPlayground() {
   const [routingComposerValue, setRoutingComposerValue] = useState("");
   const [routingContextReady, setRoutingContextReady] =
     useState(false);
+  const [routingProjectOptionsOpen, setRoutingProjectOptionsOpen] =
+    useState(false);
   const [localEnvironmentDialogOpen, setLocalEnvironmentDialogOpen] =
     useState(false);
   const [
@@ -410,6 +412,15 @@ export function DesktopPlayground() {
   const viewport = useViewportMetrics();
   const { metrics: fontMetrics, monoRef, sansRef } = useFontMetrics();
   const scrollRef = useRef<HTMLDivElement>(null);
+
+  const selectRoutingProject = (projectId: string) => {
+    setRoutingProject(projectId);
+    setRoutingWorktree(
+      projectId === "desktop" ? "main" : "routing",
+    );
+    setRoutingProjectOptionsOpen(false);
+    setRoutingStatus(`Selected ${projectId}`);
+  };
 
   useEffect(() => {
     let mounted = true;
@@ -1671,13 +1682,7 @@ export function DesktopPlayground() {
                         statusLabel: "Repair",
                       },
                     ]}
-                    onSelect={(projectId) => {
-                      setRoutingProject(projectId);
-                      setRoutingWorktree(
-                        projectId === "desktop" ? "main" : "routing",
-                      );
-                      setRoutingStatus(`Selected ${projectId}`);
-                    }}
+                    onSelect={selectRoutingProject}
                     selectedId={routingProject}
                     toolbar={
                       <input
@@ -1703,60 +1708,109 @@ export function DesktopPlayground() {
                   }
                   context={
                     routingContextReady ? (
-                      <ConversationContextBar
-                        data-desktop-local-environment-context="true"
-                        expandedId={
-                          localEnvironmentDialogOpen
-                            ? localEnvironmentDialogOwner
-                            : undefined
-                        }
-                        items={[
-                          {
-                            icon: <span>▦</span>,
-                            id: "project",
-                            kind: "project",
-                            label: routingProject,
-                          },
-                          {
-                            controlsId:
-                              "desktop-local-environment-dialog",
-                            icon: <span>⌘</span>,
-                            id: "environment",
-                            kind: "environment",
-                            label:
-                              routingRoute === "local"
-                                ? "Local"
-                                : routingRoute,
-                          },
-                          {
-                            controlsId:
-                              "desktop-local-environment-dialog",
-                            icon: <span>⑂</span>,
-                            id: "worktree",
-                            kind: "worktree",
-                            label: routingWorktree,
-                          },
-                        ]}
-                        onSelect={(itemId) => {
-                          if (itemId === "project") {
-                            setRoutingStatus(
-                              "Choose a project from the index",
-                            );
-                            return;
+                      <>
+                        <ConversationContextBar
+                          data-desktop-local-environment-context="true"
+                          expandedId={
+                            routingProjectOptionsOpen
+                              ? "project"
+                              : localEnvironmentDialogOpen
+                                ? localEnvironmentDialogOwner
+                                : undefined
                           }
-                          setLocalEnvironmentDialogOwner(
-                            itemId === "worktree"
-                              ? "worktree"
-                              : "environment",
-                          );
-                          setLocalEnvironmentDialogOpen(true);
-                          setRoutingStatus(
-                            itemId === "environment"
-                              ? "Choose an environment"
-                              : "Choose a worktree",
-                          );
-                        }}
-                      />
+                          items={[
+                            {
+                              controlsId:
+                                "desktop-routing-project-options",
+                              icon: <span>▦</span>,
+                              id: "project",
+                              kind: "project",
+                              label: routingProject,
+                              popupRole: "listbox",
+                            },
+                            {
+                              controlsId:
+                                "desktop-local-environment-dialog",
+                              icon: <span>⌘</span>,
+                              id: "environment",
+                              kind: "environment",
+                              label:
+                                routingRoute === "local"
+                                  ? "Local"
+                                  : routingRoute,
+                            },
+                            {
+                              controlsId:
+                                "desktop-local-environment-dialog",
+                              icon: <span>⑂</span>,
+                              id: "worktree",
+                              kind: "worktree",
+                              label: routingWorktree,
+                            },
+                          ]}
+                          onSelect={(itemId) => {
+                            if (itemId === "project") {
+                              setLocalEnvironmentDialogOwner(undefined);
+                              setLocalEnvironmentDialogOpen(false);
+                              setRoutingProjectOptionsOpen(
+                                (open) => !open,
+                              );
+                              setRoutingStatus("Choose a project");
+                              return;
+                            }
+                            setRoutingProjectOptionsOpen(false);
+                            setLocalEnvironmentDialogOwner(
+                              itemId === "worktree"
+                                ? "worktree"
+                                : "environment",
+                            );
+                            setLocalEnvironmentDialogOpen(true);
+                            setRoutingStatus(
+                              itemId === "environment"
+                                ? "Choose an environment"
+                                : "Choose a worktree",
+                            );
+                          }}
+                        />
+                        {routingProjectOptionsOpen ? (
+                          <div
+                            aria-label="Conversation projects"
+                            className="codex-ui-conversation-project-options"
+                            id="desktop-routing-project-options"
+                            role="listbox"
+                          >
+                            {[
+                              {
+                                description: "Component workspace",
+                                id: "ui-kit",
+                                label: "UI Kit",
+                              },
+                              {
+                                description: "Desktop application",
+                                id: "desktop",
+                                label: "Desktop",
+                              },
+                            ].map((project) => (
+                              <button
+                                aria-selected={
+                                  routingProject === project.id
+                                }
+                                className="codex-ui-conversation-project-options__item"
+                                data-project-id={project.id}
+                                key={project.id}
+                                onClick={() =>
+                                  selectRoutingProject(project.id)
+                                }
+                                role="option"
+                                type="button"
+                              >
+                                <span>{project.label}</span>
+                                <small>{project.description}</small>
+                              </button>
+                            ))}
+                          </div>
+                        ) : null}
+                      </>
                     ) : null
                   }
                   description="Destination, project, execution environment, and worktree remain independent."
@@ -1766,6 +1820,7 @@ export function DesktopPlayground() {
                       <Button
                         onClick={() => {
                           setRoutingContextReady(true);
+                          setRoutingProjectOptionsOpen(false);
                           setRoutingStatus(
                             "Choose project, environment, and worktree",
                           );
