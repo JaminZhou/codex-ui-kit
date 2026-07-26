@@ -1812,6 +1812,13 @@ export function DesktopPlayground() {
                           setRoutingStatus(
                             "Choose project, environment, and worktree",
                           );
+                          window.setTimeout(() =>
+                            document
+                              .getElementById(
+                                "desktop-routing-project-trigger",
+                              )
+                              ?.focus(),
+                          );
                         }}
                         size="small"
                       >

@@ -179,6 +179,10 @@ async function captureWorkflowSurfaces(webContents: WebContents) {
       card?.querySelectorAll(
         '.codex-ui-conversation-context-bar__item',
       ).length === 3;
+    const routingPromptFocusTransferred =
+      !routingPromptInitiallyVisible ||
+      document.activeElement?.id ===
+        'desktop-routing-project-trigger';
     const routingProjectContext = card?.querySelector(
       '[data-desktop-local-environment-context="true"] [data-kind="project"]',
     );
@@ -537,6 +541,7 @@ async function captureWorkflowSurfaces(webContents: WebContents) {
         routingPage?.querySelector('.codex-ui-new-conversation-start'),
       ),
       routingPromptInitiallyVisible,
+      routingPromptFocusTransferred,
       routingPromptTransitioned,
       routingProjectListboxInViewport:
         routingProjectMetrics.inViewport,
@@ -1212,6 +1217,7 @@ async function captureAcceptance(browserWindow: BrowserWindow) {
         routingLayout,
         routingProjectsOverflowY: "auto",
         routingPromptInitiallyVisible,
+        routingPromptFocusTransferred: true,
         routingPromptTransitioned: true,
         routingProjectListboxInViewport: true,
         routingProjectListboxRole: "listbox",

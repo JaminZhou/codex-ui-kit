@@ -885,6 +885,13 @@ function Showcase() {
                           setRoutingStatus(
                             "Choose project, environment, and worktree",
                           );
+                          window.setTimeout(() =>
+                            document
+                              .getElementById(
+                                "showcase-routing-project-trigger",
+                              )
+                              ?.focus(),
+                          );
                         }}
                         type="button"
                       >

@@ -128,6 +128,11 @@ async function revealConversationContext(page) {
   await page.waitForSelector(
     '[data-local-environment-context="true"]',
   );
+  await page.waitForFunction(
+    () =>
+      document.activeElement?.id ===
+      "showcase-routing-project-trigger",
+  );
 }
 
 const overlayCases = [
