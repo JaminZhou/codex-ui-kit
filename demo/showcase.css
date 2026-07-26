@@ -759,6 +759,11 @@ code {
 }
 
 .continuity-pixel-fixture
+  .codex-ui-conversation-thread-shell__message-navigation {
+  bottom: 0;
+}
+
+.continuity-pixel-fixture
   .codex-ui-conversation-thread-shell
   .codex-ui-agent-message[data-role="user"] {
   margin-bottom: 0;

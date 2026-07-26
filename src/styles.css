@@ -742,6 +742,14 @@
   z-index: 20;
 }
 
+.codex-ui-conversation-thread-shell__message-navigation {
+  bottom: var(
+    --codex-ui-conversation-thread-composer-dock-height,
+    var(--codex-ui-conversation-thread-composer-reserve)
+  );
+  overflow: clip;
+}
+
 .codex-ui-conversation-thread-shell__message-navigation > *,
 .codex-ui-conversation-thread-shell__floating-control > * {
   pointer-events: auto;

@@ -981,6 +981,7 @@ async function captureThreadSurfaces(
     const contextEvents = [...(card?.querySelectorAll('.codex-ui-thread-context-event') ?? [])];
     const interruptionSummaries = [...(card?.querySelectorAll('.codex-ui-thread-interruption-summary') ?? [])];
     const messageRailRows = [...(card?.querySelectorAll('.codex-ui-conversation-thread-shell__message-navigation .codex-ui-message-navigation-rail__row') ?? [])];
+    const messageNavigation = card?.querySelector('.codex-ui-conversation-thread-shell__message-navigation');
     const floatingControl = card?.querySelector('.codex-ui-conversation-thread-shell__floating-control .codex-ui-thread-floating-button');
     const spinner = card?.querySelector('.codex-ui-thread-loading__spinner');
     const shimmer = card?.querySelector('.codex-ui-loading-shimmer');
@@ -1064,6 +1065,12 @@ async function captureThreadSurfaces(
         status: state.getAttribute('data-status'),
         text: state.textContent,
       })),
+      messageNavigation: rect(messageNavigation),
+      messageRailOverlapsComposer: composerBounds
+        ? messageRailRows.some(
+            (row) => row.getBoundingClientRect().bottom > composerBounds.top,
+          )
+        : null,
       messageRailRows: messageRailRows.map(rect),
       placeholder: rect(placeholder),
       renderError: rect(renderError),
@@ -1286,6 +1293,7 @@ async function captureAcceptance(browserWindow: BrowserWindow) {
         composerControlAction: "stop",
         composerDockPosition: "absolute",
         headerHeight: 46,
+        messageRailOverlapsComposer: false,
         position,
         runningMessageBusy: "true",
         viewportOverflowY: "auto",
@@ -1314,6 +1322,7 @@ async function captureAcceptance(browserWindow: BrowserWindow) {
         "composerRegion",
         "conversationShell",
         "floatingControl",
+        "messageNavigation",
         "placeholder",
         "renderError",
         "skeleton",
