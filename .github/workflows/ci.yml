@@ -12,6 +12,8 @@ jobs:
   check:
     # Public pull requests must never execute untrusted code on a personal self-hosted runner.
     runs-on: ubuntu-latest
+    env:
+      pnpm_config_store_dir: ${{ runner.temp }}/pnpm-store
     steps:
       - uses: actions/checkout@v7
       - uses: pnpm/action-setup@v6
@@ -27,6 +29,8 @@ jobs:
   consumer:
     name: React ${{ matrix.react }} / ${{ matrix.module-resolution }} consumer
     runs-on: ubuntu-latest
+    env:
+      pnpm_config_store_dir: ${{ runner.temp }}/pnpm-store
     strategy:
       fail-fast: false
       matrix:
@@ -71,6 +75,8 @@ jobs:
   codex-app-acceptance:
     name: Codex app Electron acceptance
     runs-on: macos-15
+    env:
+      pnpm_config_store_dir: ${{ runner.temp }}/pnpm-store
     steps:
       - uses: actions/checkout@v7
       - uses: pnpm/action-setup@v6
