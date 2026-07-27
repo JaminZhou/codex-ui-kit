@@ -31,3 +31,4 @@ in [`research/UI_INVENTORY.md`](research/UI_INVENTORY.md) and
 - [OpenAI Codex documentation](https://developers.openai.com/codex/)
 - [OpenAI Codex repository](https://github.com/openai/codex)
 - [Codex app-server protocol](https://github.com/openai/codex/blob/main/codex-rs/app-server/README.md)
+- [Codex App Server Client](https://github.com/JaminZhou/codex-app-server-client)

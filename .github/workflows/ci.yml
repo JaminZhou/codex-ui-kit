@@ -67,3 +67,18 @@ jobs:
             ${{ matrix.react-types-version }} \
             ${{ matrix.react-dom-types-version }} \
             ${{ matrix.module-resolution }}
+
+  codex-app-acceptance:
+    name: Codex app Electron acceptance
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+        with:
+          version: 11.7.0
+          dest: ${{ runner.temp }}/setup-pnpm
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm check:codex-app:acceptance

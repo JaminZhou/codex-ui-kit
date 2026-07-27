@@ -1,0 +1,139 @@
+:root {
+  color-scheme: dark;
+  font-family:
+    -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", sans-serif;
+  background: #101010;
+  color: #f1f1f1;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root,
+.demo-root {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+}
+
+body {
+  background:
+    radial-gradient(circle at 65% 0%, rgba(90, 90, 90, 0.1), transparent 30%),
+    #101010;
+}
+
+button,
+input,
+textarea {
+  font: inherit;
+}
+
+.demo-root {
+  --codex-ui-shell-sidebar-width: 272px;
+  --codex-ui-thread-max-width: 760px;
+}
+
+.demo-root .codex-ui-app-shell,
+.demo-root .codex-ui-conversation-thread-shell {
+  height: 100%;
+}
+
+.demo-brand {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  min-height: 38px;
+  padding: 4px 8px;
+  color: #f5f5f5;
+  font-size: 13px;
+  font-weight: 650;
+  letter-spacing: -0.01em;
+}
+
+.demo-brand__mark {
+  display: grid;
+  width: 24px;
+  height: 24px;
+  place-items: center;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 7px;
+  background: rgba(255, 255, 255, 0.055);
+  color: #c9ff7a;
+}
+
+.demo-sidebar-footer {
+  display: grid;
+  gap: 4px;
+  padding: 10px 12px;
+  color: rgba(255, 255, 255, 0.42);
+  font-family: "SFMono-Regular", Consolas, monospace;
+  font-size: 10px;
+}
+
+.demo-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.demo-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: rgba(255, 255, 255, 0.55);
+  font-size: 11px;
+}
+
+.demo-status::before {
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: #7e7e7e;
+  content: "";
+}
+
+.demo-status[data-status="running"]::before,
+.demo-status[data-status="retrying"]::before {
+  background: #c9ff7a;
+  box-shadow: 0 0 0 3px rgba(201, 255, 122, 0.09);
+}
+
+.demo-status[data-status="failed"]::before {
+  background: #ff7b72;
+}
+
+.demo-playback {
+  position: fixed;
+  z-index: 20;
+  right: 18px;
+  bottom: 124px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  background: rgba(22, 22, 22, 0.9);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+  backdrop-filter: blur(16px);
+}
+
+.demo-playback input {
+  width: 118px;
+  accent-color: #c9ff7a;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.001ms !important;
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}

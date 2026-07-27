@@ -2,5 +2,6 @@ packages:
   - playgrounds/*
 
 allowBuilds:
+  "@jaminzhou/codex-app-server-client@https://codeload.github.com/JaminZhou/codex-app-server-client/tar.gz/aeea3576be453630eeeecd5b8e3701235e6bf372": true
   electron: true
   esbuild: true
