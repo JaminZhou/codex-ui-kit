@@ -208,7 +208,7 @@ export function App() {
 
   const composer = (
     <AgentComposer
-      isRunning={mode === "live" && isTurnActive(state.status)}
+      isRunning={isTurnActive(liveState.status)}
       onStop={stopLive}
       onSubmit={submitLive}
       onValueChange={setComposerValue}
