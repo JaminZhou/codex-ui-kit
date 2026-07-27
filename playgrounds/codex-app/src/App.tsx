@@ -112,9 +112,9 @@ export function App() {
     }
     setMode("live");
     setLiveError(null);
-    setComposerValue("");
     try {
       await window.codexDemo.startLive({ prompt });
+      setComposerValue((current) => (current === prompt ? "" : current));
     } catch (error) {
       setLiveError(error instanceof Error ? error.message : String(error));
     }
