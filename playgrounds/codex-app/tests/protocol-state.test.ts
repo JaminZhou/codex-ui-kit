@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  agentMessageStatus,
   initialProtocolState,
   isTurnActive,
   reduceProtocolNotification,
@@ -101,6 +102,50 @@ describe("protocol lifecycle reducer", () => {
     expect(isTurnActive("running")).toBe(true);
     expect(isTurnActive("retrying")).toBe(true);
     expect(isTurnActive("completed")).toBe(false);
+  });
+
+  it("preserves failed rendering after a follow-up turn starts", () => {
+    const running = [
+      {
+        method: "turn/started",
+        params: { threadId: "thread-demo", turn: { id: "turn-failed" } },
+      },
+      {
+        method: "item/started",
+        params: {
+          item: {
+            id: "assistant-failed",
+            phase: "final_answer",
+            text: "Partial response",
+            type: "agentMessage",
+          },
+          threadId: "thread-demo",
+          turnId: "turn-failed",
+        },
+      },
+    ].reduce(reduceProtocolNotification, initialProtocolState);
+    const failed = reduceProtocolNotification(running, {
+      method: "error",
+      params: {
+        error: { message: "Turn failed." },
+        threadId: "thread-demo",
+        turnId: "turn-failed",
+        willRetry: false,
+      },
+    });
+    const followUp = reduceProtocolNotification(failed, {
+      method: "turn/started",
+      params: {
+        threadId: "thread-demo",
+        turn: { id: "turn-follow-up" },
+      },
+    });
+    const failedMessage = followUp.messages.find(
+      ({ id }) => id === "assistant-failed",
+    );
+
+    expect(failedMessage?.status).toBe("failed");
+    expect(agentMessageStatus(failedMessage?.status ?? "idle")).toBe("failed");
   });
 
   it("resets the transcript when notifications switch to a new thread", () => {

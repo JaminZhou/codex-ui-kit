@@ -168,6 +168,13 @@ export function isTurnActive(status: DemoTurnStatus): boolean {
   return status === "running" || status === "retrying";
 }
 
+export function agentMessageStatus(
+  status: DemoTurnStatus,
+): "completed" | "failed" | "running" {
+  if (status === "running" || status === "failed") return status;
+  return "completed";
+}
+
 export function reduceProtocolNotification(
   state: DemoProtocolState,
   notification: JsonRpcNotification | ProtocolEventRecord,

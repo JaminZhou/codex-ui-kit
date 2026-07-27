@@ -18,6 +18,7 @@ import {
 import { Fragment, useEffect, useMemo, useReducer, useState } from "react";
 import type { JsonRpcNotification } from "@jaminzhou/codex-app-server-client";
 import {
+  agentMessageStatus,
   initialProtocolState,
   isTurnActive,
   reduceProtocolNotification,
@@ -255,9 +256,7 @@ export function App() {
                   <AgentMessage
                     data-item-id={message.id}
                     role={message.role}
-                    status={
-                      message.status === "running" ? "running" : "completed"
-                    }
+                    status={agentMessageStatus(message.status)}
                   >
                     {message.role === "assistant" ? (
                       <AgentMarkdown streaming={message.status === "running"}>
