@@ -8,14 +8,20 @@ import {
   app,
   BrowserWindow,
   ipcMain,
+  shell,
   type IpcMainInvokeEvent,
 } from "electron";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { LiveTurnStartGate } from "./live-turn-start-gate.js";
+import {
+  isAllowedExternalUrl,
+  isTrustedRendererUrl,
+} from "./navigation-policy.js";
 
 const currentDirectory = dirname(fileURLToPath(import.meta.url));
 const rendererDirectory = join(currentDirectory, "..", "dist");
+const rendererEntryPath = join(rendererDirectory, "index.html");
 const preloadPath = join(currentDirectory, "preload.cjs");
 const workspaceDirectory =
   process.env.CODEX_UI_KIT_WORKSPACE ?? resolve(currentDirectory, "../../..");
@@ -54,6 +60,27 @@ function broadcastNotification(notification: JsonRpcNotification) {
   }
 }
 
+function assertTrustedIpc(event: IpcMainInvokeEvent) {
+  const window = mainWindow;
+  const frame = event.senderFrame;
+  if (
+    !window ||
+    window.isDestroyed() ||
+    event.sender !== window.webContents ||
+    !frame ||
+    frame !== window.webContents.mainFrame ||
+    !isTrustedRendererUrl(frame.url, rendererEntryPath)
+  ) {
+    throw new Error("Rejected IPC from an untrusted renderer.");
+  }
+}
+
+function openAllowedExternalUrl(url: string) {
+  if (isAllowedExternalUrl(url)) {
+    void shell.openExternal(url).catch(() => undefined);
+  }
+}
+
 async function ensureClient() {
   if (client?.state === "connected") return client;
   liveThread = null;
@@ -77,9 +104,10 @@ async function ensureClient() {
 }
 
 async function startLive(
-  _event: IpcMainInvokeEvent,
+  event: IpcMainInvokeEvent,
   rawInput: unknown,
 ): Promise<{ threadId: string; turnId: string }> {
+  assertTrustedIpc(event);
   assertStartInput(rawInput);
   return liveTurnStartGate.run(() => activeTurn !== null, async () => {
     const connectedClient = await ensureClient();
@@ -117,6 +145,11 @@ async function stopLive() {
   await activeTurn.interrupt();
 }
 
+async function handleStopLive(event: IpcMainInvokeEvent) {
+  assertTrustedIpc(event);
+  await stopLive();
+}
+
 async function closeLive() {
   activeTurn = null;
   liveThread = null;
@@ -127,13 +160,18 @@ async function closeLive() {
   await closingClient?.close();
 }
 
+async function handleCloseLive(event: IpcMainInvokeEvent) {
+  assertTrustedIpc(event);
+  await closeLive();
+}
+
 function createWindow() {
   const scenario = process.env.CODEX_DEMO_SCENARIO ?? "streaming-recovery";
   const frame = process.env.CODEX_DEMO_FRAME ?? "recovered";
   const capture = process.env.CODEX_DEMO_CAPTURE ?? "0";
   const query = new URLSearchParams({ capture, frame, scenario }).toString();
 
-  mainWindow = new BrowserWindow({
+  const window = new BrowserWindow({
     backgroundColor: "#101010",
     height: 820,
     minHeight: 640,
@@ -150,19 +188,29 @@ function createWindow() {
     },
     width: 1180,
   });
+  mainWindow = window;
 
-  mainWindow.on("closed", () => {
-    mainWindow = null;
+  window.webContents.setWindowOpenHandler(({ url }) => {
+    openAllowedExternalUrl(url);
+    return { action: "deny" };
+  });
+  window.webContents.on("will-navigate", (event, url) => {
+    if (isTrustedRendererUrl(url, rendererEntryPath)) return;
+    event.preventDefault();
+    openAllowedExternalUrl(url);
+  });
+  window.on("closed", () => {
+    if (mainWindow === window) mainWindow = null;
     void closeLive().catch(() => undefined);
   });
-  void mainWindow.loadFile(join(rendererDirectory, "index.html"), {
+  void window.loadFile(rendererEntryPath, {
     query: Object.fromEntries(new URLSearchParams(query)),
   });
 }
 
 ipcMain.handle("demo:live:start", startLive);
-ipcMain.handle("demo:live:stop", stopLive);
-ipcMain.handle("demo:live:close", closeLive);
+ipcMain.handle("demo:live:stop", handleStopLive);
+ipcMain.handle("demo:live:close", handleCloseLive);
 
 app.whenReady().then(() => {
   createWindow();
