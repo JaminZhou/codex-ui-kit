@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   initialProtocolState,
+  isTurnActive,
   reduceProtocolNotification,
   reduceProtocolTrace,
 } from "../src/protocol-state";
@@ -28,6 +29,39 @@ describe("protocol lifecycle reducer", () => {
 
     expect(state.status).toBe("interrupted");
     expect(state.messages.at(-1)?.text).toContain("Electron acceptance");
+    expect(state.messages.at(-1)?.status).toBe("interrupted");
+  });
+
+  it("treats retrying as an active turn so Stop remains available", () => {
+    expect(isTurnActive("running")).toBe(true);
+    expect(isTurnActive("retrying")).toBe(true);
+    expect(isTurnActive("completed")).toBe(false);
+  });
+
+  it("resets the transcript when notifications switch to a new thread", () => {
+    const firstThread = reduceProtocolNotification(initialProtocolState, {
+      method: "thread/started",
+      params: { thread: { id: "thread-one" } },
+    });
+    const withMessage = reduceProtocolNotification(firstThread, {
+      method: "item/started",
+      params: {
+        item: {
+          content: [{ text: "First thread", type: "text" }],
+          id: "user-one",
+          type: "userMessage",
+        },
+      },
+    });
+    const secondThread = reduceProtocolNotification(withMessage, {
+      method: "thread/started",
+      params: { thread: { id: "thread-two" } },
+    });
+
+    expect(secondThread.threadId).toBe("thread-two");
+    expect(secondThread.messages).toEqual([]);
+    expect(secondThread.status).toBe("idle");
+    expect(secondThread.eventCount).toBe(3);
   });
 
   it("moves context compaction from running to completed", () => {

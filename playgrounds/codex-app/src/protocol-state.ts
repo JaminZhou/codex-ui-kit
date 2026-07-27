@@ -90,6 +90,15 @@ function appendAssistantDelta(
   });
 }
 
+function finalizeRunningMessages(
+  messages: DemoMessage[],
+  status: "completed" | "failed" | "interrupted",
+): DemoMessage[] {
+  return messages.map((message) =>
+    message.status === "running" ? { ...message, status } : message,
+  );
+}
+
 function textFromUserContent(content: unknown): string {
   if (!Array.isArray(content)) return "";
   return content
@@ -101,11 +110,17 @@ function textFromUserContent(content: unknown): string {
     .join("\n");
 }
 
-function turnStatus(value: unknown): DemoTurnStatus {
+function turnStatus(
+  value: unknown,
+): "completed" | "failed" | "interrupted" | "running" {
   if (value === "completed") return "completed";
   if (value === "interrupted") return "interrupted";
   if (value === "failed") return "failed";
   return "running";
+}
+
+export function isTurnActive(status: DemoTurnStatus): boolean {
+  return status === "running" || status === "retrying";
 }
 
 export function reduceProtocolNotification(
@@ -121,9 +136,18 @@ export function reduceProtocolNotification(
 
   if (notification.method === "thread/started") {
     const thread = isRecord(params.thread) ? params.thread : {};
+    const threadId = asString(thread.id);
+    if (threadId && state.threadId && threadId !== state.threadId) {
+      return {
+        ...initialProtocolState,
+        eventCount: next.eventCount,
+        lastMethod: next.lastMethod,
+        threadId,
+      };
+    }
     return {
       ...next,
-      threadId: asString(thread.id),
+      threadId,
     };
   }
 
@@ -208,6 +232,9 @@ export function reduceProtocolNotification(
     return {
       ...next,
       error: asString(error.message) ?? "The turn failed.",
+      messages: retrying
+        ? state.messages
+        : finalizeRunningMessages(state.messages, "failed"),
       retrying,
       status: retrying ? "retrying" : "failed",
     };
@@ -223,6 +250,11 @@ export function reduceProtocolNotification(
         status === "failed"
           ? asString(turnError.message) ?? state.error ?? "The turn failed."
           : null,
+      currentTurnId: null,
+      messages:
+        status === "running"
+          ? state.messages
+          : finalizeRunningMessages(state.messages, status),
       retrying: false,
       status,
     };

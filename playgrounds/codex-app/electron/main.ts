@@ -1,5 +1,6 @@
 import {
   CodexAppServerClient,
+  type CodexThread,
   type CodexTurn,
   type JsonRpcNotification,
 } from "@jaminzhou/codex-app-server-client";
@@ -25,6 +26,7 @@ app.commandLine.appendSwitch("disable-renderer-backgrounding");
 
 let mainWindow: BrowserWindow | null = null;
 let client: CodexAppServerClient | null = null;
+let liveThread: CodexThread | null = null;
 let activeTurn: CodexTurn | null = null;
 let unsubscribeNotifications: (() => void) | null = null;
 
@@ -52,6 +54,7 @@ function broadcastNotification(notification: JsonRpcNotification) {
 
 async function ensureClient() {
   if (client?.state === "connected") return client;
+  liveThread = null;
   if (client) {
     unsubscribeNotifications?.();
     unsubscribeNotifications = null;
@@ -81,13 +84,16 @@ async function startLive(
   }
 
   const connectedClient = await ensureClient();
-  const thread = await connectedClient.createThread({
-    approvalPolicy: "never",
-    cwd: workspaceDirectory,
-    ephemeral: true,
-    historyMode: "paginated",
-    sandbox: "read-only",
-  });
+  const thread =
+    liveThread ??
+    (await connectedClient.createThread({
+      approvalPolicy: "never",
+      cwd: workspaceDirectory,
+      ephemeral: true,
+      historyMode: "paginated",
+      sandbox: "read-only",
+    }));
+  liveThread = thread;
   const turn = await thread.startTurn(rawInput.prompt, {
     approvalPolicy: "never",
     cwd: workspaceDirectory,
@@ -113,6 +119,7 @@ async function stopLive() {
 
 async function closeLive() {
   activeTurn = null;
+  liveThread = null;
   unsubscribeNotifications?.();
   unsubscribeNotifications = null;
   const closingClient = client;

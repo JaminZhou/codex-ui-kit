@@ -19,6 +19,7 @@ import { useEffect, useMemo, useReducer, useState } from "react";
 import type { JsonRpcNotification } from "@jaminzhou/codex-app-server-client";
 import {
   initialProtocolState,
+  isTurnActive,
   reduceProtocolNotification,
   type DemoProtocolState,
   type ProtocolEventRecord,
@@ -206,7 +207,7 @@ export function App() {
 
   const composer = (
     <AgentComposer
-      isRunning={mode === "live" && state.status === "running"}
+      isRunning={mode === "live" && isTurnActive(state.status)}
       onStop={stopLive}
       onSubmit={submitLive}
       onValueChange={setComposerValue}
