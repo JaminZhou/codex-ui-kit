@@ -1,3 +1,4 @@
+import Ajv from "ajv";
 import { readFile, readdir } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import { join } from "node:path";
@@ -15,13 +16,62 @@ const notificationVariants =
 if (!Array.isArray(notificationVariants)) {
   throw new Error("Pinned client schema has no ServerNotification union.");
 }
-const notificationMethods = new Set(
+const notificationVariantsByMethod = new Map(
   notificationVariants.flatMap((variant) =>
     Array.isArray(variant?.properties?.method?.enum)
-      ? variant.properties.method.enum
+      ? variant.properties.method.enum.map((method) => [method, variant])
       : [],
   ),
 );
+const ajv = new Ajv({
+  allErrors: true,
+  allowUnionTypes: true,
+  strict: false,
+  validateFormats: true,
+});
+const integerFormats = {
+  int32: [-(2 ** 31), 2 ** 31 - 1],
+  int64: [Number.MIN_SAFE_INTEGER, Number.MAX_SAFE_INTEGER],
+  uint: [0, Number.MAX_SAFE_INTEGER],
+  uint16: [0, 2 ** 16 - 1],
+  uint32: [0, 2 ** 32 - 1],
+  uint64: [0, Number.MAX_SAFE_INTEGER],
+};
+for (const [format, [minimum, maximum]] of Object.entries(integerFormats)) {
+  ajv.addFormat(format, {
+    type: "number",
+    validate: (value) =>
+      Number.isSafeInteger(value) && value >= minimum && value <= maximum,
+  });
+}
+ajv.addFormat("double", {
+  type: "number",
+  validate: Number.isFinite,
+});
+const notificationValidators = new Map();
+function notificationValidator(method) {
+  const existing = notificationValidators.get(method);
+  if (existing) return existing;
+  const variant = notificationVariantsByMethod.get(method);
+  if (!variant) return null;
+  const validate = ajv.compile({
+    $schema: protocolSchema.$schema,
+    definitions: protocolSchema.definitions,
+    ...variant,
+  });
+  notificationValidators.set(method, validate);
+  return validate;
+}
+const itemStartedValidator = notificationValidator("item/started");
+if (
+  !itemStartedValidator ||
+  itemStartedValidator({
+    method: "item/started",
+    params: {},
+  })
+) {
+  throw new Error("Pinned schema validator accepted an incomplete notification.");
+}
 const files = (await readdir(traceDirectory))
   .filter((file) => file.endsWith(".jsonl"))
   .sort();
@@ -46,9 +96,23 @@ for (const file of files) {
     ) {
       throw new Error(`${file}:${index + 1} is not a valid ordered trace event.`);
     }
-    if (!notificationMethods.has(event.method)) {
+    const validateNotification = notificationValidator(event.method);
+    if (!validateNotification) {
       throw new Error(
         `${file}:${index + 1} uses a method absent from the pinned client: ${event.method}`,
+      );
+    }
+    if (
+      !validateNotification({
+        method: event.method,
+        params: event.params,
+      })
+    ) {
+      throw new Error(
+        `${file}:${index + 1} fails the pinned notification schema: ${ajv.errorsText(
+          validateNotification.errors,
+          { separator: "; " },
+        )}`,
       );
     }
     previousAt = event.atMs;
@@ -66,5 +130,5 @@ if (/app\.asar|Contents\/Resources|webpack:\/\//i.test(trackedSources)) {
 }
 
 console.log(
-  `Protocol traces valid: ${files.length} fixtures, ${eventCount} events, pinned app-server methods only.`,
+  `Protocol traces valid: ${files.length} fixtures, ${eventCount} schema-validated app-server notifications.`,
 );

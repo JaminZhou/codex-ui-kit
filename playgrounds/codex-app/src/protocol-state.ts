@@ -35,6 +35,7 @@ export interface DemoProtocolState {
   retrying: boolean;
   status: DemoTurnStatus;
   threadId: string | null;
+  turnDurationMs: number | null;
 }
 
 export const initialProtocolState: DemoProtocolState = {
@@ -47,6 +48,7 @@ export const initialProtocolState: DemoProtocolState = {
   retrying: false,
   status: "idle",
   threadId: null,
+  turnDurationMs: null,
 };
 
 type RecordValue = Record<string, unknown>;
@@ -57,6 +59,10 @@ function isRecord(value: unknown): value is RecordValue {
 
 function asString(value: unknown): string | null {
   return typeof value === "string" ? value : null;
+}
+
+function asNumber(value: unknown): number | null {
+  return typeof value === "number" && Number.isFinite(value) ? value : null;
 }
 
 function notificationParams(
@@ -160,6 +166,7 @@ export function reduceProtocolNotification(
       retrying: false,
       status: "running",
       threadId: asString(params.threadId) ?? state.threadId,
+      turnDurationMs: null,
     };
   }
 
@@ -257,6 +264,7 @@ export function reduceProtocolNotification(
           : finalizeRunningMessages(state.messages, status),
       retrying: false,
       status,
+      turnDurationMs: asNumber(turn.durationMs),
     };
   }
 

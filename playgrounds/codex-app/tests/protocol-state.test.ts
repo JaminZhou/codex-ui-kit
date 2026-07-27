@@ -30,6 +30,7 @@ describe("protocol lifecycle reducer", () => {
     expect(state.status).toBe("interrupted");
     expect(state.messages.at(-1)?.text).toContain("Electron acceptance");
     expect(state.messages.at(-1)?.status).toBe("interrupted");
+    expect(state.turnDurationMs).toBe(18_400);
   });
 
   it("treats retrying as an active turn so Stop remains available", () => {

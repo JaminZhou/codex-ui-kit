@@ -291,8 +291,15 @@ export function App() {
 
               {state.status === "interrupted" ? (
                 <ThreadInterruptionSummary
-                  durationMs={18_400}
-                  label="You stopped this response after 18s"
+                  durationMs={state.turnDurationMs ?? 0}
+                  label={
+                    state.turnDurationMs === null
+                      ? "You stopped this response"
+                      : undefined
+                  }
+                  stoppedLabel={(time) =>
+                    `You stopped this response after ${time}`
+                  }
                 />
               ) : null}
 
