@@ -25,7 +25,7 @@
     "check:all": "pnpm check && pnpm check:cdp && pnpm check:electron && pnpm check:visual"
   },
   "dependencies": {
-    "@jaminzhou/codex-app-server-client": "github:JaminZhou/codex-app-server-client#aeea3576be453630eeeecd5b8e3701235e6bf372",
+    "@jaminzhou/codex-app-server-client": "github:JaminZhou/codex-app-server-client#97ffcd496aa0aefdbdc868d13a5bce4e09a5afc5",
     "codex-ui-kit": "workspace:*",
     "react": "19.2.7",
     "react-dom": "19.2.7"

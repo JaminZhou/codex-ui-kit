@@ -132,7 +132,7 @@ export function App() {
       footer={
         <div className="demo-sidebar-footer">
           <span data-testid="dependency-ui-kit">UI Kit workspace</span>
-          <span data-testid="dependency-client">Client aeea357</span>
+          <span data-testid="dependency-client">Client 97ffcd4</span>
         </div>
       }
       header={
