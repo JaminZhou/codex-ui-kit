@@ -90,13 +90,12 @@ export function App() {
   }, []);
 
   useEffect(() => {
-    if (mode !== "replay") return;
     const root = document.documentElement;
     root.dataset.theme = "dark";
     return () => {
       delete root.dataset.theme;
     };
-  }, [mode]);
+  }, []);
 
   const selectScenario = (nextId: ReplayScenarioId) => {
     setMode("replay");

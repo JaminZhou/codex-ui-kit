@@ -42,6 +42,18 @@ try {
   const showSidebar = page.getByRole("button", { name: "Show sidebar" });
   await showSidebar.click();
   await page.waitForSelector(".codex-ui-app-shell[data-sidebar-open]");
+
+  await page.emulateMedia({ colorScheme: "light", reducedMotion: "reduce" });
+  await page.getByRole("button", { exact: true, name: "Live" }).click();
+  await page.waitForSelector('.demo-root[data-mode="live"]');
+  const liveTheme = await page.evaluate(
+    () => document.documentElement.dataset.theme,
+  );
+  if (liveTheme !== "dark") {
+    throw new Error(
+      `Electron live theme contract failed: ${JSON.stringify(liveTheme)}`,
+    );
+  }
 } finally {
   await app.close();
 }
