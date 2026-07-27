@@ -15,7 +15,14 @@ import {
   ThreadInterruptionSummary,
   ThreadThinkingPlaceholder,
 } from "codex-ui-kit";
-import { Fragment, useEffect, useMemo, useReducer, useState } from "react";
+import {
+  Fragment,
+  useEffect,
+  useMemo,
+  useReducer,
+  useRef,
+  useState,
+} from "react";
 import type { JsonRpcNotification } from "@jaminzhou/codex-app-server-client";
 import {
   agentMessageStatus,
@@ -77,8 +84,10 @@ export function App() {
   );
   const [mode, setMode] = useState<"live" | "replay">("replay");
   const [composerValue, setComposerValue] = useState("");
+  const [liveStartPending, setLiveStartPending] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [liveError, setLiveError] = useState<string | null>(null);
+  const liveStartPendingRef = useRef(false);
   const replay = replayState(scenario.events, replayCount);
   const state = mode === "live" ? liveState : replay;
 
@@ -109,6 +118,9 @@ export function App() {
       setLiveError("Live mode is available in the Electron app.");
       return;
     }
+    if (liveStartPendingRef.current) return;
+    liveStartPendingRef.current = true;
+    setLiveStartPending(true);
     setMode("live");
     setLiveError(null);
     try {
@@ -116,6 +128,9 @@ export function App() {
       setComposerValue((current) => (current === prompt ? "" : current));
     } catch (error) {
       setLiveError(error instanceof Error ? error.message : String(error));
+    } finally {
+      liveStartPendingRef.current = false;
+      setLiveStartPending(false);
     }
   };
 
@@ -207,6 +222,8 @@ export function App() {
 
   const composer = (
     <AgentComposer
+      aria-busy={liveStartPending || undefined}
+      disabled={liveStartPending}
       isRunning={isTurnActive(liveState.status)}
       onStop={stopLive}
       onSubmit={submitLive}
