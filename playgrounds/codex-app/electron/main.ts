@@ -153,6 +153,7 @@ function createWindow() {
 
   mainWindow.on("closed", () => {
     mainWindow = null;
+    void closeLive().catch(() => undefined);
   });
   void mainWindow.loadFile(join(rendererDirectory, "index.html"), {
     query: Object.fromEntries(new URLSearchParams(query)),

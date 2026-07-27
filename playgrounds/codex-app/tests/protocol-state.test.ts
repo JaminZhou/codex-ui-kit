@@ -139,6 +139,37 @@ describe("protocol lifecycle reducer", () => {
     expect(running.compaction).toBe("running");
     expect(completed.compaction).toBe("completed");
     expect(completed.status).toBe("completed");
+    expect(running.messages[0]?.compaction).toBe("running");
+    expect(completed.messages[0]?.compaction).toBe("completed");
+    expect(completed.messages.at(-1)?.compaction).toBeUndefined();
+  });
+
+  it("keeps completed compaction at its historical position on a follow-up turn", () => {
+    const compacted = reduceProtocolTrace(replayScenarios.compaction.events);
+    const followUp = reduceProtocolNotification(compacted, {
+      method: "turn/started",
+      params: {
+        threadId: "thread-demo",
+        turn: { id: "turn-after-compaction" },
+      },
+    });
+    const withFollowUpMessage = reduceProtocolNotification(followUp, {
+      method: "item/completed",
+      params: {
+        item: {
+          id: "assistant-after-compaction",
+          phase: "final_answer",
+          text: "Continued after compaction.",
+          type: "agentMessage",
+        },
+        threadId: "thread-demo",
+        turnId: "turn-after-compaction",
+      },
+    });
+
+    expect(withFollowUpMessage.compaction).toBe("idle");
+    expect(withFollowUpMessage.messages[0]?.compaction).toBe("completed");
+    expect(withFollowUpMessage.messages.at(-1)?.compaction).toBeUndefined();
   });
 
   it("keeps unknown notifications observable without corrupting state", () => {

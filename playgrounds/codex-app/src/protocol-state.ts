@@ -19,6 +19,7 @@ export interface ProtocolEventRecord {
 }
 
 export interface DemoMessage {
+  compaction?: "running" | "completed";
   id: string;
   interruptionDurationMs?: number | null;
   role: "assistant" | "user";
@@ -126,6 +127,23 @@ function recordTurnInterruption(
   return next;
 }
 
+function recordTurnCompaction(
+  messages: DemoMessage[],
+  turnId: string | null,
+  compaction: "running" | "completed",
+): DemoMessage[] {
+  if (!turnId) return messages;
+  let index = messages.length - 1;
+  while (index >= 0 && messages[index]?.turnId !== turnId) index -= 1;
+  if (index < 0) return messages;
+  const next = [...messages];
+  next[index] = {
+    ...next[index],
+    compaction,
+  };
+  return next;
+}
+
 function textFromUserContent(content: unknown): string {
   if (!Array.isArray(content)) return "";
   return content
@@ -183,6 +201,7 @@ export function reduceProtocolNotification(
     return {
       ...next,
       currentTurnId: asString(turn.id),
+      compaction: "idle",
       error: null,
       retrying: false,
       status: "running",
@@ -200,12 +219,16 @@ export function reduceProtocolNotification(
     const itemType = asString(item.type);
     const itemTurnId = asString(params.turnId) ?? state.currentTurnId;
     if (itemType === "contextCompaction") {
+      const compaction =
+        notification.method === "item/completed" ? "completed" : "running";
       return {
         ...next,
-        compaction:
-          notification.method === "item/completed"
-            ? "completed"
-            : "running",
+        compaction,
+        messages: recordTurnCompaction(
+          state.messages,
+          itemTurnId,
+          compaction,
+        ),
       };
     }
     if (!itemId) return next;
@@ -259,6 +282,11 @@ export function reduceProtocolNotification(
     return {
       ...next,
       compaction: "completed",
+      messages: recordTurnCompaction(
+        state.messages,
+        asString(params.turnId) ?? state.currentTurnId,
+        "completed",
+      ),
     };
   }
 

@@ -280,6 +280,12 @@ export function App() {
                       }
                     />
                   ) : null}
+                  {message.compaction ? (
+                    <ThreadContextEvent
+                      mode="automatic"
+                      status={message.compaction}
+                    />
+                  ) : null}
                 </Fragment>
               ))}
 
@@ -302,14 +308,6 @@ export function App() {
                   {state.error}
                 </StatusBanner>
               ) : null}
-
-              {state.compaction !== "idle" ? (
-                <ThreadContextEvent
-                  mode="automatic"
-                  status={state.compaction}
-                />
-              ) : null}
-
           </AgentTurn>
         </ConversationThreadShell>
 
