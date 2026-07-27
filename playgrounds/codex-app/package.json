@@ -28,7 +28,7 @@
     "@jaminzhou/codex-app-server-client": "github:JaminZhou/codex-app-server-client#97ffcd496aa0aefdbdc868d13a5bce4e09a5afc5",
     "codex-ui-kit": "workspace:*",
     "react": "19.2.7",
-    "react-dom": "19.2.7"
+    "react-dom": "19.2.8"
   },
   "devDependencies": {
     "ajv": "8.20.0",
