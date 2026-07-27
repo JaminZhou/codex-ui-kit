@@ -15,7 +15,7 @@ import {
   ThreadInterruptionSummary,
   ThreadThinkingPlaceholder,
 } from "codex-ui-kit";
-import { useEffect, useMemo, useReducer, useState } from "react";
+import { Fragment, useEffect, useMemo, useReducer, useState } from "react";
 import type { JsonRpcNotification } from "@jaminzhou/codex-app-server-client";
 import {
   initialProtocolState,
@@ -251,22 +251,36 @@ export function App() {
               ) : null}
 
               {state.messages.map((message) => (
-                <AgentMessage
-                  data-item-id={message.id}
-                  key={message.id}
-                  role={message.role}
-                  status={
-                    message.status === "running" ? "running" : "completed"
-                  }
-                >
-                  {message.role === "assistant" ? (
-                    <AgentMarkdown streaming={message.status === "running"}>
-                      {message.text || " "}
-                    </AgentMarkdown>
-                  ) : (
-                    message.text
-                  )}
-                </AgentMessage>
+                <Fragment key={message.id}>
+                  <AgentMessage
+                    data-item-id={message.id}
+                    role={message.role}
+                    status={
+                      message.status === "running" ? "running" : "completed"
+                    }
+                  >
+                    {message.role === "assistant" ? (
+                      <AgentMarkdown streaming={message.status === "running"}>
+                        {message.text || " "}
+                      </AgentMarkdown>
+                    ) : (
+                      message.text
+                    )}
+                  </AgentMessage>
+                  {message.interruptionDurationMs !== undefined ? (
+                    <ThreadInterruptionSummary
+                      durationMs={message.interruptionDurationMs ?? 0}
+                      label={
+                        message.interruptionDurationMs === null
+                          ? "You stopped this response"
+                          : undefined
+                      }
+                      stoppedLabel={(time) =>
+                        `You stopped this response after ${time}`
+                      }
+                    />
+                  ) : null}
+                </Fragment>
               ))}
 
               {state.status === "running" &&
@@ -287,20 +301,6 @@ export function App() {
                 <StatusBanner heading="Turn failed" tone="error">
                   {state.error}
                 </StatusBanner>
-              ) : null}
-
-              {state.status === "interrupted" ? (
-                <ThreadInterruptionSummary
-                  durationMs={state.turnDurationMs ?? 0}
-                  label={
-                    state.turnDurationMs === null
-                      ? "You stopped this response"
-                      : undefined
-                  }
-                  stoppedLabel={(time) =>
-                    `You stopped this response after ${time}`
-                  }
-                />
               ) : null}
 
               {state.compaction !== "idle" ? (

@@ -20,9 +20,11 @@ export interface ProtocolEventRecord {
 
 export interface DemoMessage {
   id: string;
+  interruptionDurationMs?: number | null;
   role: "assistant" | "user";
   status: DemoTurnStatus;
   text: string;
+  turnId: string | null;
 }
 
 export interface DemoProtocolState {
@@ -86,6 +88,7 @@ function appendAssistantDelta(
   messages: DemoMessage[],
   itemId: string,
   delta: string,
+  turnId: string | null,
 ): DemoMessage[] {
   const existing = messages.find(({ id }) => id === itemId);
   return upsertMessage(messages, {
@@ -93,6 +96,7 @@ function appendAssistantDelta(
     role: "assistant",
     status: "running",
     text: `${existing?.text ?? ""}${delta}`,
+    turnId,
   });
 }
 
@@ -103,6 +107,23 @@ function finalizeRunningMessages(
   return messages.map((message) =>
     message.status === "running" ? { ...message, status } : message,
   );
+}
+
+function recordTurnInterruption(
+  messages: DemoMessage[],
+  turnId: string | null,
+  durationMs: number | null,
+): DemoMessage[] {
+  if (!turnId) return messages;
+  let index = messages.length - 1;
+  while (index >= 0 && messages[index]?.turnId !== turnId) index -= 1;
+  if (index < 0) return messages;
+  const next = [...messages];
+  next[index] = {
+    ...next[index],
+    interruptionDurationMs: durationMs,
+  };
+  return next;
 }
 
 function textFromUserContent(content: unknown): string {
@@ -177,6 +198,7 @@ export function reduceProtocolNotification(
     const item = isRecord(params.item) ? params.item : {};
     const itemId = asString(item.id);
     const itemType = asString(item.type);
+    const itemTurnId = asString(params.turnId) ?? state.currentTurnId;
     if (itemType === "contextCompaction") {
       return {
         ...next,
@@ -195,6 +217,7 @@ export function reduceProtocolNotification(
           role: "user",
           status: "completed",
           text: textFromUserContent(item.content),
+          turnId: itemTurnId,
         }),
       };
     }
@@ -209,6 +232,7 @@ export function reduceProtocolNotification(
               ? "completed"
               : "running",
           text: asString(item.text) ?? "",
+          turnId: itemTurnId,
         }),
       };
     }
@@ -221,7 +245,12 @@ export function reduceProtocolNotification(
     if (!itemId || delta === null) return next;
     return {
       ...next,
-      messages: appendAssistantDelta(state.messages, itemId, delta),
+      messages: appendAssistantDelta(
+        state.messages,
+        itemId,
+        delta,
+        asString(params.turnId) ?? state.currentTurnId,
+      ),
       status: "running",
     };
   }
@@ -251,6 +280,12 @@ export function reduceProtocolNotification(
     const turn = isRecord(params.turn) ? params.turn : {};
     const status = turnStatus(turn.status);
     const turnError = isRecord(turn.error) ? turn.error : {};
+    const turnId = asString(turn.id) ?? state.currentTurnId;
+    const durationMs = asNumber(turn.durationMs);
+    const finalizedMessages =
+      status === "running"
+        ? state.messages
+        : finalizeRunningMessages(state.messages, status);
     return {
       ...next,
       error:
@@ -259,12 +294,12 @@ export function reduceProtocolNotification(
           : null,
       currentTurnId: null,
       messages:
-        status === "running"
-          ? state.messages
-          : finalizeRunningMessages(state.messages, status),
+        status === "interrupted"
+          ? recordTurnInterruption(finalizedMessages, turnId, durationMs)
+          : finalizedMessages,
       retrying: false,
       status,
-      turnDurationMs: asNumber(turn.durationMs),
+      turnDurationMs: durationMs,
     };
   }
 

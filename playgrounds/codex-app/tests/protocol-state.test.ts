@@ -30,7 +30,71 @@ describe("protocol lifecycle reducer", () => {
     expect(state.status).toBe("interrupted");
     expect(state.messages.at(-1)?.text).toContain("Electron acceptance");
     expect(state.messages.at(-1)?.status).toBe("interrupted");
+    expect(state.messages.at(-1)?.interruptionDurationMs).toBe(18_400);
     expect(state.turnDurationMs).toBe(18_400);
+  });
+
+  it("preserves an interruption summary after a follow-up turn completes", () => {
+    const interrupted = reduceProtocolTrace(
+      replayScenarios.interruption.events,
+    );
+    const followUpEvents = [
+      {
+        method: "turn/started",
+        params: {
+          threadId: "thread-demo",
+          turn: { id: "turn-follow-up" },
+        },
+      },
+      {
+        method: "item/started",
+        params: {
+          item: {
+            id: "assistant-follow-up",
+            phase: "final_answer",
+            text: "",
+            type: "agentMessage",
+          },
+          threadId: "thread-demo",
+          turnId: "turn-follow-up",
+        },
+      },
+      {
+        method: "item/completed",
+        params: {
+          item: {
+            id: "assistant-follow-up",
+            phase: "final_answer",
+            text: "Follow-up complete.",
+            type: "agentMessage",
+          },
+          threadId: "thread-demo",
+          turnId: "turn-follow-up",
+        },
+      },
+      {
+        method: "turn/completed",
+        params: {
+          threadId: "thread-demo",
+          turn: {
+            durationMs: 900,
+            id: "turn-follow-up",
+            status: "completed",
+          },
+        },
+      },
+    ] as const;
+    const completed = followUpEvents.reduce(
+      reduceProtocolNotification,
+      interrupted,
+    );
+
+    expect(completed.status).toBe("completed");
+    expect(
+      completed.messages.find(({ id }) => id === "assistant-interrupt")
+        ?.interruptionDurationMs,
+    ).toBe(18_400);
+    expect(completed.messages.at(-1)?.text).toBe("Follow-up complete.");
   });
 
   it("treats retrying as an active turn so Stop remains available", () => {
