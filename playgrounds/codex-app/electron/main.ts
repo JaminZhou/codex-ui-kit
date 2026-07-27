@@ -12,6 +12,7 @@ import {
 } from "electron";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import { LiveTurnStartGate } from "./live-turn-start-gate.js";
 
 const currentDirectory = dirname(fileURLToPath(import.meta.url));
 const rendererDirectory = join(currentDirectory, "..", "dist");
@@ -29,6 +30,7 @@ let client: CodexAppServerClient | null = null;
 let liveThread: CodexThread | null = null;
 let activeTurn: CodexTurn | null = null;
 let unsubscribeNotifications: (() => void) | null = null;
+const liveTurnStartGate = new LiveTurnStartGate();
 
 interface StartLiveInput {
   prompt: string;
@@ -79,37 +81,35 @@ async function startLive(
   rawInput: unknown,
 ): Promise<{ threadId: string; turnId: string }> {
   assertStartInput(rawInput);
-  if (activeTurn) {
-    throw new Error("A live turn is already running.");
-  }
-
-  const connectedClient = await ensureClient();
-  const thread =
-    liveThread ??
-    (await connectedClient.createThread({
+  return liveTurnStartGate.run(() => activeTurn !== null, async () => {
+    const connectedClient = await ensureClient();
+    const thread =
+      liveThread ??
+      (await connectedClient.createThread({
+        approvalPolicy: "never",
+        cwd: workspaceDirectory,
+        ephemeral: true,
+        historyMode: "paginated",
+        sandbox: "read-only",
+      }));
+    liveThread = thread;
+    const turn = await thread.startTurn(rawInput.prompt, {
       approvalPolicy: "never",
       cwd: workspaceDirectory,
-      ephemeral: true,
-      historyMode: "paginated",
-      sandbox: "read-only",
-    }));
-  liveThread = thread;
-  const turn = await thread.startTurn(rawInput.prompt, {
-    approvalPolicy: "never",
-    cwd: workspaceDirectory,
-    sandboxPolicy: {
-      networkAccess: false,
-      type: "readOnly",
-    },
-  });
-  activeTurn = turn;
-  void turn
-    .result()
-    .catch(() => undefined)
-    .finally(() => {
-      if (activeTurn === turn) activeTurn = null;
+      sandboxPolicy: {
+        networkAccess: false,
+        type: "readOnly",
+      },
     });
-  return { threadId: thread.id, turnId: turn.id };
+    activeTurn = turn;
+    void turn
+      .result()
+      .catch(() => undefined)
+      .finally(() => {
+        if (activeTurn === turn) activeTurn = null;
+      });
+    return { threadId: thread.id, turnId: turn.id };
+  });
 }
 
 async function stopLive() {
