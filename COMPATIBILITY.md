@@ -23,7 +23,11 @@ The declared peer range is `react >=18` and `react-dom >=18`. New major React ve
 
 The stylesheet and interaction primitives target current evergreen Chromium, Safari, and Firefox releases. Exact historical browser versions are not pinned before the first npm release.
 
-The Electron playground uses Electron 42 and validates the same public package in an isolated, sandboxed Renderer. Electron is not a package dependency.
+The component Electron playground uses Electron 42 and validates the same
+public package in an isolated, sandboxed Renderer. The private Codex app
+playground uses Electron 43 with a pinned public App Server client to validate
+protocol lifecycle, CDP geometry, native host behavior, and pixel baselines.
+Electron is not a package dependency.
 
 Features such as `ResizeObserver`, `MutationObserver`, `inert`, container queries, `color-mix()`, and modern focus selectors are expected. Hosts targeting older embedded browsers must provide appropriate platform support or fallbacks.
 
@@ -65,7 +69,11 @@ for preserving equivalent contrast, keyboard focus, and target-size behavior.
 
 ## Protocol boundary
 
-The package contains no Codex app-server client, authentication, Electron IPC, filesystem access, or privileged execution. Integrations should map protocol-specific data and actions into the public component props.
+The published package contains no Codex app-server client, authentication,
+Electron IPC, filesystem access, or privileged execution. Integrations should
+map protocol-specific data and actions into the public component props. The
+private `playgrounds/codex-app` workspace demonstrates that boundary without
+changing the package exports or runtime dependencies.
 
 ## Pre-1.0 policy
 

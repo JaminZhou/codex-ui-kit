@@ -5,3 +5,5 @@ coverage/
 .research/
 .DS_Store
 *.log
+playgrounds/codex-app/artifacts/
+playgrounds/codex-app/dist-electron/

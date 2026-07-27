@@ -47,6 +47,8 @@ Explore the [interactive component showcase](https://jaminzhou.com/codex-ui-kit/
 - Light, dark, system, compact-window, reduced-motion, and focus states.
 - Package tests, full-export React 18/19 consumer checks, headless-Chrome accessibility checks, CodeQL scanning, a browser showcase build, and an executable Electron acceptance harness.
 - Protocol-neutral APIs with standalone public CSS tokens.
+- A private protocol-backed Codex app playground that validates the UI Kit
+  together with the public App Server client.
 
 ## Quick start
 
@@ -154,8 +156,8 @@ pnpm check
 
 `pnpm check` runs type checking, the package test suite, the library build, the
 package contract, the browser showcase build, WCAG A/AA/2.2 browser checks for
-the static page and open overlay states, and the Electron
-main/preload/Renderer checks.
+the static page and open overlay states, the package Electron checks, and the
+deterministic protocol-backed Codex app checks.
 
 The completed dark conversation fixture also supports an explicit
 current-build raster gate without committing the proprietary reference:
@@ -177,6 +179,9 @@ remains marked private until the first registry release is approved explicitly.
 - [`CODE_OF_CONDUCT.md`](CODE_OF_CONDUCT.md) defines community expectations.
 - [`SECURITY.md`](SECURITY.md) explains private vulnerability reporting.
 - [`playgrounds/electron`](playgrounds/electron) validates the package in a real Electron Renderer.
+- [`playgrounds/codex-app`](playgrounds/codex-app) validates protocol lifecycle,
+  CDP geometry, Electron host behavior, and pixel baselines with the pinned
+  public App Server client.
 
 ## License
 
