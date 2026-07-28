@@ -205,6 +205,9 @@ describe("protocol lifecycle reducer", () => {
     const fileChanging = reduceProtocolTrace(
       scenario.events.slice(0, scenario.frames["file-changing"]),
     );
+    const fileApplied = reduceProtocolTrace(
+      scenario.events.slice(0, scenario.frames["file-applied"]),
+    );
     const completed = reduceProtocolTrace(scenario.events);
 
     expect(commandRunning.commands[0]).toMatchObject({
@@ -219,6 +222,8 @@ describe("protocol lifecycle reducer", () => {
     });
     expect(fileChanging.approvals[0]?.decision).toBe("approved");
     expect(hasActiveTurnWork(fileChanging)).toBe(true);
+    expect(fileApplied.status).toBe("running");
+    expect(hasActiveTurnWork(fileApplied)).toBe(false);
     expect(fileChanging.fileChanges[0]).toMatchObject({
       changes: [
         {

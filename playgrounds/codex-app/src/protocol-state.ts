@@ -330,8 +330,15 @@ export function agentMessageStatus(
 export function hasActiveTurnWork(state: DemoProtocolState) {
   if (!state.currentTurnId) return false;
   return (
-    state.commands.some(({ turnId }) => turnId === state.currentTurnId) ||
-    state.fileChanges.some(({ turnId }) => turnId === state.currentTurnId)
+    state.commands.some(
+      ({ status, turnId }) =>
+        turnId === state.currentTurnId &&
+        (status === "pending" || status === "running"),
+    ) ||
+    state.fileChanges.some(
+      ({ status, turnId }) =>
+        turnId === state.currentTurnId && status === "streaming",
+    )
   );
 }
 

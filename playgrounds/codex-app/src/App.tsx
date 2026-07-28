@@ -507,23 +507,25 @@ export function App() {
                 <span className="demo-file-actions__stats">
                   +{stats.additions} −{stats.deletions}
                 </span>
-                <button
-                  onClick={(event) => {
-                    event.stopPropagation();
-                    setUndoneFileIds((current) => {
-                      const next = new Set(current);
-                      next.add(fileChange.id);
-                      return next;
-                    });
-                    if (reviewSelection?.fileChangeId === fileChange.id) {
-                      setReviewOpen(false);
-                      setReviewSelection(null);
-                    }
-                  }}
-                  type="button"
-                >
-                  Undo
-                </button>
+                {mode === "replay" ? (
+                  <button
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      setUndoneFileIds((current) => {
+                        const next = new Set(current);
+                        next.add(fileChange.id);
+                        return next;
+                      });
+                      if (reviewSelection?.fileChangeId === fileChange.id) {
+                        setReviewOpen(false);
+                        setReviewSelection(null);
+                      }
+                    }}
+                    type="button"
+                  >
+                    Undo
+                  </button>
+                ) : null}
                 <button
                   onClick={(event) => {
                     event.stopPropagation();
