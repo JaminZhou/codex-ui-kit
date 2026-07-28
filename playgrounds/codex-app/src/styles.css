@@ -64,6 +64,10 @@ textarea {
   grid-column: 2 / 4;
 }
 
+.demo-root .codex-ui-app-shell__bottom-panel-resizer {
+  inset-inline-start: var(--codex-ui-app-shell-sidebar-track);
+}
+
 .demo-root .codex-ui-app-shell__sidebar {
   bottom: auto;
   box-shadow: none;

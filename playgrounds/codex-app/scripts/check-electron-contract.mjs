@@ -810,9 +810,18 @@ try {
     !compactTerminal.panelContent ||
     !compactTerminal.resizer?.rect ||
     Math.abs(compactTerminal.panel.width - 546) > 1 ||
+    Math.abs(compactTerminal.panel.left - 274) > 1 ||
     Math.abs(compactTerminal.panel.height - 272) > 1 ||
     Math.abs(compactTerminal.panelContent.height - 239) > 1 ||
     Math.abs(compactTerminal.resizer.rect.height - 16) > 0.5 ||
+    Math.abs(
+      compactTerminal.resizer.rect.left -
+        compactTerminal.panel.left,
+    ) > 1 ||
+    Math.abs(
+      compactTerminal.resizer.rect.right -
+        compactTerminal.panel.right,
+    ) > 1 ||
     compactTerminal.resizer.min !== "152" ||
     compactTerminal.resizer.max !== "332" ||
     compactTerminal.resizer.now !== "272"
