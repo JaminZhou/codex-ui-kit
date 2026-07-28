@@ -18,6 +18,11 @@ export const visualScenes = [
     scenario: "streaming-recovery",
   },
   {
+    frame: "markdown-complete",
+    id: "markdown-complete",
+    scenario: "markdown",
+  },
+  {
     frame: "interrupted",
     id: "interrupted",
     scenario: "interruption",

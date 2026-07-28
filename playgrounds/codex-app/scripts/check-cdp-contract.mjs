@@ -219,6 +219,9 @@ for (const scene of visualScenes) {
       const root = document.querySelector(".demo-root");
       const shell = document.querySelector(".codex-ui-app-shell");
       const viewport = document.querySelector(".codex-ui-thread-viewport");
+      const thread = document.querySelector(
+        ".codex-ui-conversation-thread-shell__thread",
+      );
       const composer = document.querySelector(
         ".codex-ui-conversation-thread-shell__composer-dock",
       );
@@ -236,6 +239,7 @@ for (const scene of visualScenes) {
         !root ||
         !shell ||
         !viewport ||
+        !thread ||
         !composer ||
         !header ||
         !sidebarResizer
@@ -286,6 +290,70 @@ for (const scene of visualScenes) {
           ];
         }),
       );
+      const markdownRoot = document.querySelector(
+        '[data-item-id="assistant-markdown"] .codex-ui-markdown',
+      );
+      const markdownStyle = (element) => {
+        if (!element) return null;
+        const style = getComputedStyle(element);
+        return {
+          backgroundColor: style.backgroundColor,
+          borderRadius: style.borderRadius,
+          fontSize: style.fontSize,
+          lineHeight: style.lineHeight,
+          marginBlockEnd: style.marginBlockEnd,
+          marginBlockStart: style.marginBlockStart,
+          padding: style.padding,
+          rect: rect(element),
+        };
+      };
+      const markdown = markdownRoot
+        ? {
+            actionCount: document.querySelectorAll(
+              '[aria-label="Markdown response actions"] button',
+            ).length,
+            blockquote: markdownStyle(
+              markdownRoot.querySelector("blockquote"),
+            ),
+            code: markdownStyle(
+              markdownRoot.querySelector(
+                ".codex-ui-code-block__body code",
+              ),
+            ),
+            codeBlock: markdownStyle(
+              markdownRoot.querySelector(".codex-ui-code-block"),
+            ),
+            copyLabel: markdownRoot
+              .querySelector(".codex-ui-code-block__copy")
+              ?.getAttribute("aria-label"),
+            heading: markdownStyle(markdownRoot.querySelector("h1")),
+            inlineCode: markdownStyle(
+              markdownRoot.querySelector(".codex-ui-inline-code"),
+            ),
+            linkTarget: markdownRoot
+              .querySelector('a[href^="https://example.com"]')
+              ?.getAttribute("target"),
+            paragraph: markdownStyle(markdownRoot.querySelector("p")),
+            root: markdownStyle(markdownRoot),
+            semantics: {
+              blockquotes: markdownRoot.querySelectorAll("blockquote").length,
+              codeBlocks: markdownRoot.querySelectorAll(
+                ".codex-ui-code-block",
+              ).length,
+              headings: markdownRoot.querySelectorAll("h1").length,
+              lists: markdownRoot.querySelectorAll("ul").length,
+              paragraphs: markdownRoot.querySelectorAll("p").length,
+              tables: markdownRoot.querySelectorAll("table").length,
+            },
+            table: markdownStyle(markdownRoot.querySelector("table")),
+            tableScroll: markdownStyle(
+              markdownRoot.querySelector(
+                ".codex-ui-markdown__table-scroll",
+              ),
+            ),
+            unorderedList: markdownStyle(markdownRoot.querySelector("ul")),
+          }
+        : null;
       return {
         composer: composerRect,
         frame: root.getAttribute("data-frame"),
@@ -294,6 +362,7 @@ for (const scene of visualScenes) {
           document.documentElement.scrollWidth -
           document.documentElement.clientWidth,
         mode: root.getAttribute("data-mode"),
+        markdown,
         namedSurfaces,
         review: {
           diffLabels: Array.from(
@@ -328,7 +397,13 @@ for (const scene of visualScenes) {
           composerPosition: getComputedStyle(composer).position,
           resizerCursor: getComputedStyle(sidebarResizer).cursor,
           shellDisplay: getComputedStyle(shell).display,
+          threadPaddingBottom: getComputedStyle(thread).paddingBottom,
           viewportOverflowY: getComputedStyle(viewport).overflowY,
+        },
+        viewportScroll: {
+          clientHeight: viewport.clientHeight,
+          scrollHeight: viewport.scrollHeight,
+          scrollTop: viewport.scrollTop,
         },
         sidebarResizer: {
           ariaMax: sidebarResizer.getAttribute("aria-valuemax"),
@@ -542,6 +617,61 @@ for (const scene of visualScenes) {
           workflow: contract.workflow,
         })}`,
       );
+    }
+
+    if (scene.id === "markdown-complete") {
+      const markdown = contract.markdown;
+      if (
+        !markdown ||
+        markdown.semantics.headings !== 1 ||
+        markdown.semantics.paragraphs !== 2 ||
+        markdown.semantics.blockquotes !== 1 ||
+        markdown.semantics.lists !== 1 ||
+        markdown.semantics.tables !== 1 ||
+        markdown.semantics.codeBlocks !== 1 ||
+        markdown.actionCount !== 4 ||
+        markdown.copyLabel !== "Copy code" ||
+        markdown.linkTarget !== "_blank" ||
+        Math.abs(markdown.root.rect.width - 736) > 1 ||
+        Math.abs(markdown.root.rect.top - 235) > 1 ||
+        Math.abs(markdown.root.rect.bottom - 592) > 1 ||
+        markdown.heading.fontSize !== "24px" ||
+        markdown.heading.lineHeight !== "30px" ||
+        markdown.heading.marginBlockEnd !== "10px" ||
+        markdown.heading.marginBlockStart !== "0px" ||
+        markdown.paragraph.fontSize !== "14px" ||
+        markdown.paragraph.lineHeight !== "22px" ||
+        markdown.paragraph.marginBlockEnd !== "11px" ||
+        markdown.blockquote.lineHeight !== "24px" ||
+        markdown.blockquote.marginBlockEnd !== "8px" ||
+        markdown.blockquote.padding !== "8px 0px 8px 24px" ||
+        markdown.unorderedList.marginBlockEnd !== "10px" ||
+        markdown.unorderedList.padding !== "0px 0px 0px 21px" ||
+        Math.abs(markdown.unorderedList.rect.height - 52) > 1 ||
+        Math.abs(markdown.table.rect.width - 640) > 1 ||
+        Math.abs(markdown.table.rect.height - 89) > 1 ||
+        Math.abs(markdown.table.rect.left - markdown.root.rect.left) > 1 ||
+        Math.abs(markdown.tableScroll.rect.left - 335) > 1 ||
+        markdown.inlineCode.fontSize !== "12.88px" ||
+        markdown.inlineCode.lineHeight !== "22px" ||
+        markdown.inlineCode.padding !== "1px 6px" ||
+        markdown.inlineCode.borderRadius !== "6px" ||
+        markdown.code.fontSize !== "14px" ||
+        markdown.code.lineHeight !== "22px" ||
+        Math.abs(markdown.codeBlock.rect.width - 736) > 1 ||
+        Math.abs(markdown.codeBlock.rect.height - 72) > 1 ||
+        Math.abs(markdown.codeBlock.rect.top - 520) > 1 ||
+        Math.abs(markdown.codeBlock.rect.bottom - 592) > 1 ||
+        markdown.codeBlock.borderRadius !== "12.5px" ||
+        markdown.codeBlock.marginBlockEnd !== "0px" ||
+        markdown.codeBlock.marginBlockStart !== "14px" ||
+        contract.styles.threadPaddingBottom !== "198px" ||
+        Math.abs(contract.viewportScroll.scrollTop - 38) > 1
+      ) {
+        throw new Error(
+          `${scene.id}: current-build Markdown contract failed: ${JSON.stringify(markdown)}`,
+        );
+      }
     }
 
     const expectedFocus = scene.surfaces?.includes("reviewPanel")

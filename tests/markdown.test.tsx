@@ -163,9 +163,9 @@ describe("AgentMarkdown", () => {
     fireEvent.click(screen.getByRole("button", { name: "Copy code" }));
 
     await waitFor(() => expect(screen.getByText("copied 19")).toBeTruthy());
-    expect(screen.getByRole("button", { name: "Copied" }).textContent).toBe(
-      "Copied",
-    );
+    expect(
+      screen.getByRole("button", { name: "Copied" }).querySelector("svg"),
+    ).toBeTruthy();
   });
 });
 
@@ -337,9 +337,9 @@ describe("CodeBlock", () => {
     await waitFor(() =>
       expect(onCopy).toHaveBeenCalledWith("const value = true;"),
     );
-    expect(screen.getByRole("button", { name: "Copied" }).textContent).toBe(
-      "Copied",
-    );
+    expect(
+      screen.getByRole("button", { name: "Copied" }).querySelector("svg"),
+    ).toBeTruthy();
   });
 
   it("supports wrapped and non-copyable code states", () => {
@@ -362,7 +362,9 @@ describe("CodeBlock", () => {
 
     const button = screen.getByRole("button", { name: "Copy code" });
     fireEvent.click(button);
-    await waitFor(() => expect(button.textContent).toBe("Copy code"));
+    await waitFor(() =>
+      expect(button.getAttribute("aria-label")).toBe("Copy code"),
+    );
     expect(button.getAttribute("data-copied")).toBeNull();
   });
 });

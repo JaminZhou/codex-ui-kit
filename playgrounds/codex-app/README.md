@@ -97,6 +97,19 @@ The sixth slice adds the current background Terminal workflow:
 - a fifteenth reviewed pixel frame plus an optional current-build Terminal
   panel/content comparison.
 
+## Seventh vertical slice
+
+The seventh slice adds current-build completed Markdown:
+
+- a public-protocol replay for heading, paragraph, external link, inline code,
+  quote, list, table, and fenced TypeScript;
+- exact CDP semantic counts, computed styles, 736×357 assistant geometry,
+  table alignment, and measured thread/Composer scroll clearance;
+- Electron code-copy interaction, external-link semantics, four persistent
+  response actions, and multiline Composer geometry;
+- a sixteenth reviewed pixel frame plus optional current-build assistant,
+  code-card, and Composer region comparisons.
+
 ## Development
 
 From the repository root:
@@ -143,6 +156,13 @@ different conversation text:
 
 ```bash
 CODEX_UI_KIT_TERMINAL_REFERENCE=/absolute/path/to/terminal-main-reference.png \
+  pnpm --filter @codex-ui-kit/codex-app-playground check:visual
+```
+
+The Markdown gate uses its own 906×820 main-only reference:
+
+```bash
+CODEX_UI_KIT_MARKDOWN_REFERENCE=/absolute/path/to/markdown-main-reference.png \
   pnpm --filter @codex-ui-kit/codex-app-playground check:visual
 ```
 

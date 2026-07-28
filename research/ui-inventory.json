@@ -4,7 +4,7 @@
     "appVersion": "26.721.41059",
     "buildNumber": "5848",
     "sampledAt": "2026-07-26",
-    "reverifiedAt": "2026-07-28",
+    "reverifiedAt": "2026-07-29",
     "appAsarSha256": "da39a51b06fb4c728d418b8f0f05fc8fd8c6b1f74c4fb4d47c20c7914a798f45",
     "runtimeEvidence": "partial_cdp",
     "runtimeEvidenceBuilds": {
@@ -97,11 +97,12 @@
       "packageEvidence": ["conversation-markdown"],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
-        "cdp:heading-lists-table-inline-code-code-block-quote-link-sample"
+        "cdp:heading-lists-table-inline-code-code-block-quote-link-sample",
+        "cdp-26.721:synthetic-heading-inline-code-link-quote-list-table-code-block-906x820"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "partial_legacy",
-      "electronStatus": "partial_legacy",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
       "priority": "p0"
     },
     {

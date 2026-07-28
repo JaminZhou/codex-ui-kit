@@ -27,6 +27,12 @@ const currentBuildTerminalReferenceSize = {
   height: 820,
   width: 906,
 };
+const currentBuildMarkdownReference =
+  process.env.CODEX_UI_KIT_MARKDOWN_REFERENCE;
+const currentBuildMarkdownReferenceSize = {
+  height: 820,
+  width: 906,
+};
 await mkdir(baselineDirectory, { recursive: true });
 await mkdir(artifactDirectory, { recursive: true });
 
@@ -417,6 +423,105 @@ for (const scene of visualScenes) {
         content: contentComparison.ratio,
         full: comparison.ratio,
         panel: panelComparison.ratio,
+      })}`,
+    );
+  }
+
+  if (scene.id === "markdown-complete" && currentBuildMarkdownReference) {
+    const reference = PNG.sync.read(
+      await readFile(currentBuildMarkdownReference),
+    );
+    if (
+      reference.width !== currentBuildMarkdownReferenceSize.width ||
+      reference.height !== currentBuildMarkdownReferenceSize.height
+    ) {
+      throw new Error(
+        `${scene.id}: current-build reference must be exactly ${currentBuildMarkdownReferenceSize.width}x${currentBuildMarkdownReferenceSize.height}, received ${reference.width}x${reference.height}.`,
+      );
+    }
+    if (
+      actual.height !== reference.height ||
+      actual.width < reference.width
+    ) {
+      throw new Error(
+        `${scene.id}: current-build reference ${reference.width}x${reference.height} cannot be aligned to ${actual.width}x${actual.height}.`,
+      );
+    }
+
+    const main = cropPng(
+      actual,
+      actual.width - reference.width,
+      0,
+      reference.width,
+      reference.height,
+    );
+    const currentBuildActualPath = join(
+      artifactDirectory,
+      `${scene.id}.current-build.png`,
+    );
+    const currentBuildDiffPath = join(
+      artifactDirectory,
+      `${scene.id}.current-build.diff.png`,
+    );
+    await writeFile(currentBuildActualPath, PNG.sync.write(main));
+
+    const comparison = comparePng(reference, main);
+    if (comparison.pixels > 0) {
+      await writeFile(
+        currentBuildDiffPath,
+        PNG.sync.write(comparison.diff),
+      );
+    }
+
+    const regions = {
+      assistant: { height: 389, left: 84, top: 235, width: 738 },
+      code: { height: 72, left: 84, top: 520, width: 738 },
+      composer: { height: 99, left: 84, top: 706, width: 738 },
+    };
+    const compareRegion = ({ height, left, top, width }) =>
+      comparePng(
+        cropPng(reference, left, top, width, height),
+        cropPng(main, left, top, width, height),
+      );
+    const assistantComparison = compareRegion(regions.assistant);
+    const codeComparison = compareRegion(regions.code);
+    const composerComparison = compareRegion(regions.composer);
+    const maximumAssistantRatio = environmentRatio(
+      "CODEX_UI_KIT_MARKDOWN_ASSISTANT_MAX_DIFF_RATIO",
+      0.02,
+    );
+    const maximumCodeRatio = environmentRatio(
+      "CODEX_UI_KIT_MARKDOWN_CODE_MAX_DIFF_RATIO",
+      0.02,
+    );
+    const maximumComposerRatio = environmentRatio(
+      "CODEX_UI_KIT_MARKDOWN_COMPOSER_MAX_DIFF_RATIO",
+      0.025,
+    );
+    if (
+      assistantComparison.ratio > maximumAssistantRatio ||
+      codeComparison.ratio > maximumCodeRatio ||
+      composerComparison.ratio > maximumComposerRatio
+    ) {
+      throw new Error(
+        `${scene.id}: current-build Markdown pixel ratios ${JSON.stringify({
+          assistant: assistantComparison.ratio,
+          code: codeComparison.ratio,
+          composer: composerComparison.ratio,
+          full: comparison.ratio,
+        })} exceed ${JSON.stringify({
+          assistant: maximumAssistantRatio,
+          code: maximumCodeRatio,
+          composer: maximumComposerRatio,
+        })}.`,
+      );
+    }
+    console.log(
+      `${scene.id}: current-build Markdown pixel ratios ${JSON.stringify({
+        assistant: assistantComparison.ratio,
+        code: codeComparison.ratio,
+        composer: composerComparison.ratio,
+        full: comparison.ratio,
       })}`,
     );
   }

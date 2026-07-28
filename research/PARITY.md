@@ -36,11 +36,14 @@ The authoritative current-build inventory is:
   exit-code-7 command, and the assistant fallback shown when no GitHub
   connector/MCP tool is available. A further synthetic long-thread probe
   reached the stable ten-message navigation rail, reverse-origin scroll-away
-  state, post-stop summary, and `/compact` running/completed lifecycle. The
+  state, post-stop summary, and `/compact` running/completed lifecycle. A
+  current-build synthetic Markdown probe also revalidated heading, inline
+  code, link, quote, list, table, fenced code, copy control, and completed
+  response actions. The
   unavailable-tool fallback does not establish a real MCP event. The probes
   did not expose private project contents, Remote behavior, code search,
   successful MCP/connector calls, or the broader thread-error, queue,
-  Markdown, menu, global-route, and Settings states; those remain historical
+  Markdown variants, menu, global-route, and Settings states; those remain historical
   evidence from `26.715.72359` until sampled again.
 - Renderer viewport probing exposed a narrow-layout gap: the thread and
   Composer shrink, but the fixed app sidebar remains and the right workspace
@@ -84,6 +87,11 @@ regional PNG diff thresholds. The references remain build-scoped external
 evidence rather than redistributed application assets. The 526×600 compact
 Browser scenes lock the sampled follow and scroll-away positions; they are not
 represented as native window resizes.
+
+The protocol-backed Electron playground adds a separate completed-Markdown
+frame. Its optional 906×820 current-build comparison gates the assistant,
+fenced-code, and Composer regions at the strict 0.05 pixel threshold, while
+CDP separately locks semantic counts and computed geometry.
 
 Broader final visual optimization remains scheduled after the remaining
 inventory, page compositions, and state transitions stabilize. A passing
