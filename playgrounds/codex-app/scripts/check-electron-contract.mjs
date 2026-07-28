@@ -64,7 +64,7 @@ const workflowScene = {
   scenario: "workspace-workflow",
 };
 const { app: workflowApp, page: workflowPage } =
-  await launchScene(workflowScene);
+  await launchScene(workflowScene, { capture: false });
 
 try {
   await workflowPage.waitForSelector(
@@ -76,6 +76,20 @@ try {
   await workflowPage.waitForSelector(
     ".codex-ui-app-shell:not([data-side-panel-open])",
   );
+  const commandDisclosure = workflowPage
+    .locator('[data-testid="command-execution"] details')
+    .first();
+  await commandDisclosure.locator("summary").click();
+  if (!(await commandDisclosure.evaluate((element) => element.open))) {
+    throw new Error("Electron command disclosure did not expand.");
+  }
+  const fileDisclosure = workflowPage
+    .locator('[data-testid="file-change"] details')
+    .first();
+  await fileDisclosure.locator("summary").click();
+  if (!(await fileDisclosure.evaluate((element) => element.open))) {
+    throw new Error("Electron file-change disclosure did not expand.");
+  }
   await workflowPage
     .getByRole("button", { exact: true, name: "Review" })
     .click();
@@ -102,5 +116,5 @@ try {
 }
 
 console.log(
-  "Electron host, native-window, and Review-panel interaction contracts passed.",
+  "Electron host, native-window, disclosure, and Review-panel interaction contracts passed.",
 );

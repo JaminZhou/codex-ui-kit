@@ -64,13 +64,13 @@ export const visualScenes = [
   },
 ];
 
-export async function launchScene(scene) {
+export async function launchScene(scene, { capture = true } = {}) {
   const app = await electron.launch({
     args: ["."],
     executablePath: electronPath,
     env: {
       ...process.env,
-      CODEX_DEMO_CAPTURE: "1",
+      CODEX_DEMO_CAPTURE: capture ? "1" : "0",
       CODEX_DEMO_FRAME: scene.frame,
       CODEX_DEMO_HEADLESS: "1",
       CODEX_DEMO_SCENARIO: scene.scenario,

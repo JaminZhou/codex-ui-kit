@@ -406,9 +406,10 @@ export function App() {
           exitCode={command.exitCode ?? undefined}
           key={`command:${command.id}`}
           open={
-            initialSelection.capture &&
-            initialSelection.frame === "command-running" &&
-            command.status === "running"
+            initialSelection.capture
+              ? initialSelection.frame === "command-running" &&
+                command.status === "running"
+              : undefined
           }
           status={command.status}
         >
@@ -455,9 +456,9 @@ export function App() {
       <Fragment key={`file-change:${fileChange.id}`}>
         {fileChange.changes.map((change) => {
           const stats = changeStats(change);
-          const open =
-            initialSelection.capture &&
-            initialSelection.frame === "file-changing";
+          const open = initialSelection.capture
+            ? initialSelection.frame === "file-changing"
+            : undefined;
           const indicator = (
             <svg
               aria-hidden="true"
