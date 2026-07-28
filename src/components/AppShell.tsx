@@ -377,6 +377,8 @@ export function AppShell({
   const sidePanelRef = useRef<HTMLElement>(null);
   const sidebarBackdropRef = useRef<HTMLButtonElement>(null);
   const sidebarRef = useRef<HTMLElement>(null);
+  const sidebarResizerFocusedRef = useRef(false);
+  const sidebarResizerRef = useRef<HTMLDivElement>(null);
   const sidebarResizeSessionRef = useRef<SidebarResizeSession | null>(null);
   const shellRef = useRef<HTMLDivElement>(null);
   const [internalSidebarWidth, setInternalSidebarWidth] = useState(
@@ -515,6 +517,26 @@ export function AppShell({
     sidePanelModalOpen,
     sidebarModalOpen,
   };
+  useLayoutEffect(() => {
+    if (!sidebarResizerVisible) return;
+    const resizer = sidebarResizerRef.current;
+    return () => {
+      const activeElement = document.activeElement;
+      const focusNeedsRestoration =
+        activeElement === resizer ||
+        (sidebarResizerFocusedRef.current &&
+          activeElement === document.body);
+      if (!resizer || !focusNeedsRestoration) return;
+      sidebarResizerFocusedRef.current = false;
+      const modalState = responsiveModalStateRef.current;
+      const fallbackSurface = modalState.sidebarModalOpen
+        ? sidebarRef.current
+        : modalState.sidePanelModalOpen
+          ? sidePanelRef.current
+          : mainRef.current;
+      focusFirstInSurface(fallbackSurface);
+    };
+  }, [sidebarResizerVisible]);
   const responsiveModalLockRef = useRef<ModalLockHandle | null>(
     null,
   );
@@ -792,12 +814,21 @@ export function AppShell({
             aria-valuenow={Math.round(resolvedSidebarWidth)}
             aria-valuetext={`${Math.round(resolvedSidebarWidth)} pixels`}
             className="codex-ui-app-shell__sidebar-resizer"
+            onBlur={(event) => {
+              if (event.relatedTarget instanceof HTMLElement) {
+                sidebarResizerFocusedRef.current = false;
+              }
+            }}
+            onFocus={() => {
+              sidebarResizerFocusedRef.current = true;
+            }}
             onKeyDown={handleSidebarResizeKeyDown}
             onLostPointerCapture={finishSidebarResize}
             onPointerCancel={finishSidebarResize}
             onPointerDown={handleSidebarResizePointerDown}
             onPointerMove={handleSidebarResizePointerMove}
             onPointerUp={finishSidebarResize}
+            ref={sidebarResizerRef}
             role="separator"
             tabIndex={0}
           />

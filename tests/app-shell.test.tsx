@@ -215,6 +215,40 @@ describe("application shell", () => {
     ).toBe(false);
   });
 
+  it("restores focus before a controlled host removes the resize separator", () => {
+    const { rerender } = render(
+      <AppShell
+        layoutMode="wide"
+        sidebar={<button type="button">Projects</button>}
+        sidebarOpen
+        sidebarResizable
+      >
+        <button type="button">Conversation action</button>
+      </AppShell>,
+    );
+
+    const separator = screen.getByRole("separator", {
+      name: "Resize navigation sidebar",
+    });
+    separator.focus();
+    expect(document.activeElement).toBe(separator);
+
+    rerender(
+      <AppShell
+        layoutMode="wide"
+        sidebar={<button type="button">Projects</button>}
+        sidebarOpen={false}
+        sidebarResizable
+      >
+        <button type="button">Conversation action</button>
+      </AppShell>,
+    );
+
+    expect(document.activeElement).toBe(
+      screen.getByRole("button", { name: "Conversation action" }),
+    );
+  });
+
   it("exposes controlled overlay dismissal", () => {
     const onSidebarOpenChange = vi.fn();
     const onSidePanelOpenChange = vi.fn();
