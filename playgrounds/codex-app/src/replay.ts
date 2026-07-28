@@ -1,5 +1,6 @@
 import compactionTrace from "../fixtures/traces/compaction.jsonl?raw";
 import interruptionTrace from "../fixtures/traces/interruption.jsonl?raw";
+import multiFileReviewTrace from "../fixtures/traces/multi-file-review.jsonl?raw";
 import recoveryTrace from "../fixtures/traces/streaming-recovery.jsonl?raw";
 import workflowTrace from "../fixtures/traces/workspace-workflow.jsonl?raw";
 import type { ProtocolEventRecord } from "./protocol-state";
@@ -8,6 +9,7 @@ export type ReplayScenarioId =
   | "streaming-recovery"
   | "interruption"
   | "compaction"
+  | "multi-file-review"
   | "workspace-workflow";
 
 export interface ReplayScenario {
@@ -68,6 +70,12 @@ export const replayScenarios: Record<ReplayScenarioId, ReplayScenario> = {
     "Context compaction",
     "Context optimization transitions from running to completed.",
     compactionTrace,
+  ),
+  "multi-file-review": scenario(
+    "multi-file-review",
+    "Create ignored probe files",
+    "One aggregated file card and a stacked two-file Review panel.",
+    multiFileReviewTrace,
   ),
   "workspace-workflow": scenario(
     "workspace-workflow",

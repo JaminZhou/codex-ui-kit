@@ -5,7 +5,9 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import {
   FileChange,
+  FileChangeGroup,
   FileDiff,
+  FileReview,
   fileDiffToText,
   type FileDiffLine,
 } from "../src";
@@ -191,6 +193,65 @@ describe("FileChange", () => {
   });
 });
 
+describe("FileChangeGroup", () => {
+  const changes = [
+    {
+      additions: 1,
+      change: "added" as const,
+      deletions: 0,
+      path: ".research/probe/alpha.txt",
+    },
+    {
+      additions: 1,
+      change: "added" as const,
+      deletions: 0,
+      path: ".research/probe/beta.txt",
+    },
+  ];
+
+  it("aggregates one protocol item into a single changed-files card", () => {
+    const html = renderToStaticMarkup(
+      <FileChangeGroup changes={changes} status="applied" />,
+    );
+
+    expect(html).toContain('data-kind="file-change-group"');
+    expect(html).toContain('data-file-count="2"');
+    expect(html).toContain("Edited 2 files");
+    expect(html).toContain("Review changes");
+    expect(html).toContain(".research/probe/alpha.txt");
+    expect(html).toContain(".research/probe/beta.txt");
+    expect(html.match(/role="listitem"/g)).toHaveLength(2);
+  });
+
+  it("exposes each file as an independent host-owned action", () => {
+    const onOpenFile = vi.fn();
+    render(
+      <FileChangeGroup changes={changes} onOpenFile={onOpenFile} />,
+    );
+
+    fireEvent.click(
+      screen.getByRole("button", {
+        name: "Open .research/probe/beta.txt",
+      }),
+    );
+
+    expect(onOpenFile).toHaveBeenCalledWith(changes[1], 1);
+  });
+
+  it("renders streaming and rejected group language", () => {
+    const streaming = renderToStaticMarkup(
+      <FileChangeGroup changes={changes} status="streaming" />,
+    );
+    const rejected = renderToStaticMarkup(
+      <FileChangeGroup changes={changes} status="rejected" />,
+    );
+
+    expect(streaming).toContain("Editing 2 files");
+    expect(streaming).not.toContain("Review changes");
+    expect(rejected).toContain("Rejected 2 files");
+  });
+});
+
 describe("FileDiff", () => {
   it("serializes structured lines with unified-diff prefixes", () => {
     expect(fileDiffToText(lines)).toBe(
@@ -274,5 +335,59 @@ describe("FileDiff", () => {
     expect(html).toContain("No diff lines");
     expect(html).toContain('role="list"');
     expect(html).toContain('role="listitem"');
+  });
+});
+
+describe("FileReview", () => {
+  const files = [
+    {
+      additions: 1,
+      change: "added" as const,
+      deletions: 0,
+      lines: [
+        {
+          content: "alpha probe",
+          kind: "addition" as const,
+          newLineNumber: 1,
+        },
+      ],
+      path: ".research/probe/alpha.txt",
+    },
+    {
+      additions: 1,
+      change: "added" as const,
+      deletions: 0,
+      lines: [
+        {
+          content: "beta probe",
+          kind: "addition" as const,
+          newLineNumber: 1,
+        },
+      ],
+      path: ".research/probe/beta.txt",
+    },
+  ];
+
+  it("stacks every file and gives each diff a distinct accessible name", () => {
+    render(<FileReview files={files} selectedPath={files[1].path} />);
+
+    expect(screen.getByRole("list", { name: "File review" })).toBeTruthy();
+    expect(
+      screen.getByRole("list", {
+        name: "Review diff for .research/probe/alpha.txt",
+      }),
+    ).toBeTruthy();
+    expect(
+      screen.getByRole("list", {
+        name: "Review diff for .research/probe/beta.txt",
+      }),
+    ).toBeTruthy();
+    expect(
+      screen
+        .getByRole("listitem", {
+          name: "Review file .research/probe/beta.txt",
+        })
+        .hasAttribute("data-selected"),
+    ).toBe(true);
   });
 });

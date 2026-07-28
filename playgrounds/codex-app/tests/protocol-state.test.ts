@@ -230,6 +230,10 @@ describe("protocol lifecycle reducer", () => {
           kind: "modified",
           path: "WORKFLOW.md",
         },
+        {
+          kind: "added",
+          path: "CHECKS.md",
+        },
       ],
       status: "streaming",
     });
@@ -240,6 +244,33 @@ describe("protocol lifecycle reducer", () => {
       "command",
       "command",
       "approval",
+      "fileChange",
+    ]);
+  });
+
+  it("preserves both files in the dedicated multi-file review trace", () => {
+    const completed = reduceProtocolTrace(
+      replayScenarios["multi-file-review"].events,
+    );
+
+    expect(completed.status).toBe("completed");
+    expect(completed.fileChanges).toHaveLength(1);
+    expect(completed.fileChanges[0]).toMatchObject({
+      changes: [
+        {
+          kind: "added",
+          path: ".research/ui-kit-multifile-probe/alpha.txt",
+        },
+        {
+          kind: "added",
+          path: ".research/ui-kit-multifile-probe/beta.txt",
+        },
+      ],
+      status: "applied",
+    });
+    expect(completed.timeline.map(({ kind }) => kind)).toEqual([
+      "message",
+      "message",
       "fileChange",
     ]);
   });

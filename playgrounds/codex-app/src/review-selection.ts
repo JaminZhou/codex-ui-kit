@@ -1,16 +1,16 @@
 import type {
   DemoFileChange,
-  DemoFileUpdateChange,
 } from "./protocol-state";
 
 export interface ReviewSelection {
   fileChangeId: string;
-  path: string;
+  path?: string;
 }
 
 export interface ResolvedReviewSelection {
-  change: DemoFileUpdateChange;
+  fileChange: DemoFileChange;
   fileChangeId: string;
+  selectedPath?: string;
 }
 
 export function resolveReviewSelection(
@@ -20,10 +20,15 @@ export function resolveReviewSelection(
   const fileChange = selection
     ? fileChanges.find(({ id }) => id === selection.fileChangeId)
     : fileChanges.at(-1);
-  const change = selection
-    ? fileChange?.changes.find(({ path }) => path === selection.path)
-    : fileChange?.changes.at(0);
-  return fileChange && change
-    ? { change, fileChangeId: fileChange.id }
-    : null;
+  if (!fileChange || fileChange.changes.length === 0) return null;
+  const selectedPath =
+    selection?.path &&
+    fileChange.changes.some(({ path }) => path === selection.path)
+      ? selection.path
+      : undefined;
+  return {
+    fileChange,
+    fileChangeId: fileChange.id,
+    ...(selectedPath ? { selectedPath } : {}),
+  };
 }

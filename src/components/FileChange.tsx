@@ -7,6 +7,7 @@ import {
 } from "react";
 import type { AgentItemStatus } from "../types.js";
 import { AgentActivity } from "./AgentActivity.js";
+import { StatusIndicator } from "./StatusIndicator.js";
 
 export type FileChangeKind = "added" | "modified" | "deleted" | "renamed";
 
@@ -65,6 +66,164 @@ function CopyIcon() {
 function copyWithClipboard(text: string) {
   if (typeof navigator === "undefined" || !navigator.clipboard) return;
   void navigator.clipboard.writeText(text).catch(() => undefined);
+}
+
+function FileChangeStats({
+  additions,
+  change,
+  deletions,
+}: {
+  additions?: number;
+  change: FileChangeKind;
+  deletions?: number;
+}) {
+  return (
+    <span className="codex-ui-file-change__stats">
+      {additions !== undefined ? (
+        <span data-stat="additions">+{additions}</span>
+      ) : null}
+      {deletions !== undefined ? (
+        <span data-stat="deletions">−{deletions}</span>
+      ) : null}
+      {change === "added" ? <span aria-hidden="true" data-dot="added" /> : null}
+      {change === "deleted" ? (
+        <span aria-hidden="true" data-dot="deleted" />
+      ) : null}
+    </span>
+  );
+}
+
+export interface FileChangeGroupItem {
+  additions?: number;
+  change: FileChangeKind;
+  deletions?: number;
+  path: string;
+  previousPath?: string;
+}
+
+export interface FileChangeGroupProps
+  extends Omit<HTMLAttributes<HTMLDivElement>, "children"> {
+  changes: readonly FileChangeGroupItem[];
+  description?: ReactNode;
+  detail?: ReactNode;
+  indicator?: ReactNode;
+  onOpenFile?: (change: FileChangeGroupItem, index: number) => void;
+  status?: FileChangeStatus;
+  summary?: ReactNode;
+}
+
+export function FileChangeGroup({
+  changes,
+  className,
+  description,
+  detail,
+  indicator,
+  onOpenFile,
+  status = "applied",
+  summary,
+  "aria-label": ariaLabel,
+  ...props
+}: FileChangeGroupProps) {
+  const normalizedStatus = normalizeStatus(status);
+  const count = changes.length;
+  const fileLabel = count === 1 ? "file" : "files";
+  const statusLabel =
+    normalizedStatus === "applied"
+      ? "Edited"
+      : normalizedStatus === "stopped"
+        ? "Stopped editing"
+        : normalizedStatus === "rejected"
+          ? "Rejected"
+          : "Editing";
+  const classes = ["codex-ui-file-change-group", className]
+    .filter(Boolean)
+    .join(" ");
+  const resolvedSummary = summary ?? `${statusLabel} ${count} ${fileLabel}`;
+  const resolvedDescription =
+    description === undefined && normalizedStatus === "applied"
+      ? "Review changes ↗"
+      : description;
+  const resolvedAriaLabel =
+    ariaLabel ??
+    (typeof resolvedSummary === "string" ||
+    typeof resolvedSummary === "number"
+      ? String(resolvedSummary)
+      : undefined);
+
+  return (
+    <div
+      aria-label={resolvedAriaLabel}
+      className={classes}
+      data-file-count={count}
+      data-file-status={normalizedStatus}
+      data-kind="file-change-group"
+      role="group"
+      {...props}
+    >
+      <div className="codex-ui-file-change-group__header">
+        <span className="codex-ui-file-change-group__indicator">
+          {indicator ?? <StatusIndicator status={toAgentStatus(status)} />}
+        </span>
+        <span className="codex-ui-file-change-group__identity">
+          <span className="codex-ui-file-change-group__summary">
+            {resolvedSummary}
+          </span>
+          {resolvedDescription ? (
+            <span className="codex-ui-file-change-group__description">
+              {resolvedDescription}
+            </span>
+          ) : null}
+        </span>
+        {detail ? (
+          <span className="codex-ui-file-change-group__detail">{detail}</span>
+        ) : null}
+      </div>
+      <div
+        aria-label={`${count} changed ${fileLabel}`}
+        className="codex-ui-file-change-group__files"
+        role="list"
+      >
+        {changes.map((change, index) => {
+          const pathContent = change.previousPath
+            ? `${change.previousPath} → ${change.path}`
+            : change.path;
+          const content = (
+            <>
+              <span className="codex-ui-file-change-group__path">
+                {pathContent}
+              </span>
+              <FileChangeStats
+                additions={change.additions}
+                change={change.change}
+                deletions={change.deletions}
+              />
+            </>
+          );
+
+          return (
+            <div
+              className="codex-ui-file-change-group__file"
+              data-change={change.change}
+              key={`${change.previousPath ?? ""}:${change.path}`}
+              role="listitem"
+            >
+              {onOpenFile ? (
+                <button
+                  aria-label={`Open ${change.path}`}
+                  onClick={() => onOpenFile(change, index)}
+                  type="button"
+                >
+                  {content}
+                </button>
+              ) : (
+                content
+              )}
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
 }
 
 export interface FileChangeProps
@@ -143,18 +302,11 @@ export function FileChange({
     </>
   );
   const stats = (
-    <span className="codex-ui-file-change__stats">
-      {additions !== undefined ? (
-        <span data-stat="additions">+{additions}</span>
-      ) : null}
-      {deletions !== undefined ? (
-        <span data-stat="deletions">−{deletions}</span>
-      ) : null}
-      {change === "added" ? <span aria-hidden="true" data-dot="added" /> : null}
-      {change === "deleted" ? (
-        <span aria-hidden="true" data-dot="deleted" />
-      ) : null}
-    </span>
+    <FileChangeStats
+      additions={additions}
+      change={change}
+      deletions={deletions}
+    />
   );
   const resolvedDetail =
     detail ??
@@ -379,6 +531,71 @@ export function FileDiff({
           </div>
         ))
       )}
+    </div>
+  );
+}
+
+export interface FileReviewItem extends FileChangeGroupItem {
+  lines: readonly FileDiffLine[];
+}
+
+export interface FileReviewProps
+  extends Omit<HTMLAttributes<HTMLDivElement>, "children"> {
+  files: readonly FileReviewItem[];
+  selectedPath?: string;
+  wrapLines?: boolean;
+}
+
+export function FileReview({
+  className,
+  files,
+  selectedPath,
+  wrapLines = true,
+  "aria-label": ariaLabel = "File review",
+  ...props
+}: FileReviewProps) {
+  const classes = ["codex-ui-file-review", className]
+    .filter(Boolean)
+    .join(" ");
+
+  return (
+    <div
+      aria-label={ariaLabel}
+      className={classes}
+      data-file-count={files.length}
+      role="list"
+      {...props}
+    >
+      {files.map((file) => {
+        const pathContent = file.previousPath
+          ? `${file.previousPath} → ${file.path}`
+          : file.path;
+        return (
+          <section
+            aria-label={`Review file ${file.path}`}
+            className="codex-ui-file-review__file"
+            data-change={file.change}
+            data-selected={selectedPath === file.path || undefined}
+            key={`${file.previousPath ?? ""}:${file.path}`}
+            role="listitem"
+          >
+            <div className="codex-ui-file-review__header">
+              <code>{pathContent}</code>
+              <FileChangeStats
+                additions={file.additions}
+                change={file.change}
+                deletions={file.deletions}
+              />
+            </div>
+            <FileDiff
+              aria-label={`Review diff for ${file.path}`}
+              lines={file.lines}
+              tabIndex={0}
+              wrapLines={wrapLines}
+            />
+          </section>
+        );
+      })}
     </div>
   );
 }

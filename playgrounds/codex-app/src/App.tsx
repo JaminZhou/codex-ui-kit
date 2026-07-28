@@ -1,4 +1,5 @@
 import {
+  ActivityTimeline,
   AgentComposer,
   AgentMarkdown,
   AgentMessage,
@@ -12,13 +13,14 @@ import {
   CommandExecution,
   CommandOutput,
   ConversationThreadShell,
-  FileChange,
-  FileDiff,
+  FileChangeGroup,
+  FileReview,
   StatusBanner,
   ThreadContextEvent,
   ThreadHeader,
   ThreadInterruptionSummary,
   ThreadThinkingPlaceholder,
+  TurnDuration,
   WorkspacePanel,
 } from "codex-ui-kit";
 import {
@@ -294,14 +296,41 @@ export function App() {
 
   const composer = (
     <AgentComposer
+      actions={
+        mode === "replay" && scenarioId === "multi-file-review" ? (
+          <span className="demo-composer-controls">
+            <button aria-label="Add context" type="button">
+              +
+            </button>
+            <span>◉ Approve for me</span>
+          </span>
+        ) : undefined
+      }
       aria-busy={liveStartPending || undefined}
+      controls={
+        mode === "replay" && scenarioId === "multi-file-review" ? (
+          <span className="demo-composer-actions">
+            <span>5.6 Sol Extra High⌄</span>
+            <button aria-label="Voice input" type="button">
+              ♫
+            </button>
+          </span>
+        ) : undefined
+      }
       disabled={liveStartPending}
       isRunning={isTurnActive(liveState.status)}
+      layout={
+        mode === "replay" && scenarioId === "multi-file-review"
+          ? "multiline"
+          : "auto"
+      }
       onStop={stopLive}
       onSubmit={submitLive}
       onValueChange={setComposerValue}
       placeholder={
-        mode === "live"
+        mode === "replay" && scenarioId === "multi-file-review"
+          ? "Do anything"
+          : mode === "live"
           ? "Ask Codex to inspect this repository…"
           : "Switch to Live to send a real local turn…"
       }
@@ -314,9 +343,28 @@ export function App() {
     state.fileChanges,
     reviewSelection,
   );
-  const reviewChange = resolvedReview?.change;
-  const reviewStats = reviewChange ? changeStats(reviewChange) : null;
-  const reviewPanel = reviewChange ? (
+  const reviewFileChange = resolvedReview?.fileChange;
+  const reviewFiles =
+    reviewFileChange?.changes.map((change) => {
+      const stats = changeStats(change);
+      return {
+        ...change,
+        ...stats,
+        change: change.kind,
+        lines:
+          change.kind === "added"
+            ? stats.lines.filter(({ kind }) => kind !== "hunk")
+            : stats.lines,
+      };
+    }) ?? [];
+  const reviewTotals = reviewFiles.reduce(
+    (totals, file) => ({
+      additions: totals.additions + file.additions,
+      deletions: totals.deletions + file.deletions,
+    }),
+    { additions: 0, deletions: 0 },
+  );
+  const reviewPanel = reviewFileChange ? (
     <WorkspacePanel
       activeTabId="review"
       label="Review"
@@ -331,17 +379,19 @@ export function App() {
               <div className="demo-review-panel__toolbar">
                 <div>
                   <strong>Last turn</strong>
-                  <span>{reviewChange.path}</span>
+                  <span>
+                    {reviewFiles.length}{" "}
+                    {reviewFiles.length === 1 ? "file" : "files"}
+                  </span>
                 </div>
                 <span className="demo-review-panel__stats">
-                  +{reviewStats?.additions ?? 0} −
-                  {reviewStats?.deletions ?? 0}
+                  +{reviewTotals.additions} −{reviewTotals.deletions}
                 </span>
               </div>
-              <FileDiff
-                aria-label={`Review diff for ${reviewChange.path}`}
-                lines={reviewStats?.lines ?? []}
-                wrapLines
+              <FileReview
+                aria-label="Last turn file review"
+                files={reviewFiles}
+                selectedPath={resolvedReview?.selectedPath}
               />
             </div>
           ),
@@ -387,6 +437,13 @@ export function App() {
             <ThreadContextEvent
               mode="automatic"
               status={message.compaction}
+            />
+          ) : null}
+          {mode === "replay" &&
+          scenarioId === "multi-file-review" &&
+          message.id === "user-multi-file" ? (
+            <ActivityTimeline
+              summary={<TurnDuration durationMs={24_000} status="worked" />}
             />
           ) : null}
         </Fragment>
@@ -452,87 +509,98 @@ export function App() {
 
     const fileChange = state.fileChanges.find(({ id }) => id === entry.id);
     if (!fileChange || undoneFileIds.has(fileChange.id)) return null;
+    const changes = fileChange.changes.map((change) => {
+      const stats = changeStats(change);
+      return {
+        additions: stats.additions,
+        change: change.kind,
+        deletions: stats.deletions,
+        path: change.path,
+        previousPath: change.previousPath,
+      };
+    });
+    const indicator = (
+      <svg
+        aria-hidden="true"
+        className="demo-file-indicator"
+        viewBox="0 0 16 16"
+      >
+        <rect height="12" rx="2" width="12" x="2" y="2" />
+        <path d="M5 8h6M8 5v6" />
+      </svg>
+    );
+    const detail =
+      fileChange.status === "applied" ? (
+        <span className="demo-file-actions">
+          {mode === "replay" ? (
+            <button
+              onClick={() => {
+                setUndoneFileIds((current) => {
+                  const next = new Set(current);
+                  next.add(fileChange.id);
+                  return next;
+                });
+                if (resolvedReview?.fileChangeId === fileChange.id) {
+                  setReviewOpen(false);
+                  setReviewSelection(null);
+                }
+              }}
+              type="button"
+            >
+              Undo <span aria-hidden="true">↶</span>
+            </button>
+          ) : null}
+          <button
+            onClick={() => {
+              setReviewSelection({
+                fileChangeId: fileChange.id,
+              });
+              setReviewOpen(true);
+            }}
+            type="button"
+          >
+            Review
+          </button>
+        </span>
+      ) : undefined;
     return (
       <Fragment key={`file-change:${fileChange.id}`}>
-        {fileChange.changes.map((change) => {
-          const stats = changeStats(change);
-          const open = initialSelection.capture
-            ? initialSelection.frame === "file-changing"
-            : undefined;
-          const indicator = (
-            <svg
-              aria-hidden="true"
-              className="demo-file-indicator"
-              viewBox="0 0 16 16"
-            >
-              <path d="M3 2.5h6l4 4v7H3z" />
-              <path d="M9 2.5v4h4M5.5 9h5M5.5 11.5h3.5" />
-            </svg>
-          );
-          const detail =
-            fileChange.status === "applied" ? (
-              <span className="demo-file-actions">
-                <span className="demo-file-actions__stats">
-                  +{stats.additions} −{stats.deletions}
-                </span>
-                {mode === "replay" ? (
-                  <button
-                    onClick={(event) => {
-                      event.stopPropagation();
-                      setUndoneFileIds((current) => {
-                        const next = new Set(current);
-                        next.add(fileChange.id);
-                        return next;
-                      });
-                      if (resolvedReview?.fileChangeId === fileChange.id) {
-                        setReviewOpen(false);
-                        setReviewSelection(null);
-                      }
-                    }}
-                    type="button"
-                  >
-                    Undo
-                  </button>
-                ) : null}
-                <button
-                  onClick={(event) => {
-                    event.stopPropagation();
-                    setReviewSelection({
-                      fileChangeId: fileChange.id,
-                      path: change.path,
-                    });
-                    setReviewOpen(true);
-                  }}
-                  type="button"
-                >
-                  Review
-                </button>
-              </span>
-            ) : undefined;
-          return (
-            <FileChange
-              additions={stats.additions}
-              change={change.kind}
-              data-item-id={fileChange.id}
-              data-testid="file-change"
-              deletions={stats.deletions}
-              detail={detail}
-              diffText={change.diff}
-              indicator={indicator}
-              key={change.path}
-              open={open}
-              path={change.path}
-              previousPath={change.previousPath}
-              status={fileChange.status}
-            >
-              <FileDiff
-                aria-label={`Inline diff for ${change.path}`}
-                lines={stats.lines}
-                wrapLines
-              />
-            </FileChange>
-          );
-        })}
+        <FileChangeGroup
+          changes={changes}
+          data-item-id={fileChange.id}
+          data-testid="file-change-group"
+          detail={detail}
+          indicator={indicator}
+          onOpenFile={(change) => {
+            setReviewSelection({
+              fileChangeId: fileChange.id,
+              path: change.path,
+            });
+            setReviewOpen(true);
+          }}
+          status={fileChange.status}
+        />
+        {mode === "replay" && fileChange.id === "file-multi-file" ? (
+          <div
+            aria-label="Turn actions"
+            className="demo-turn-actions"
+            role="toolbar"
+          >
+            <button aria-label="Copy response" type="button">
+              ▣
+            </button>
+            <button aria-label="Good response" type="button">
+              ♡
+            </button>
+            <button aria-label="Bad response" type="button">
+              ♢
+            </button>
+            <button aria-label="Share response" type="button">
+              ↗
+            </button>
+            <time dateTime="14:39">2:39 PM</time>
+          </div>
+        ) : null}
       </Fragment>
     );
   });
