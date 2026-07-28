@@ -382,13 +382,11 @@ describe("FileReview", () => {
         name: "Review diff for .research/probe/beta.txt",
       }),
     ).toBeTruthy();
-    expect(
-      screen
-        .getByRole("listitem", {
-          name: "Review file .research/probe/beta.txt",
-        })
-        .hasAttribute("data-selected"),
-    ).toBe(true);
+    const selectedFile = screen.getByRole("listitem", {
+      name: "Review file .research/probe/beta.txt",
+    });
+    expect(selectedFile.hasAttribute("data-selected")).toBe(true);
+    expect(selectedFile.getAttribute("aria-current")).toBe("true");
   });
 
   it("scrolls a newly selected file into the visible review region", () => {

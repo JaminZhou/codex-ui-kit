@@ -611,14 +611,16 @@ export function FileReview({
         const pathContent = file.previousPath
           ? `${file.previousPath} → ${file.path}`
           : file.path;
+        const selected = selectedPath === file.path;
         return (
           <section
+            aria-current={selected || undefined}
             aria-label={`Review file ${file.path}`}
             className="codex-ui-file-review__file"
             data-change={file.change}
-            data-selected={selectedPath === file.path || undefined}
+            data-selected={selected || undefined}
             key={`${file.previousPath ?? ""}:${file.path}`}
-            ref={selectedPath === file.path ? selectedFileRef : undefined}
+            ref={selected ? selectedFileRef : undefined}
             role="listitem"
           >
             <div className="codex-ui-file-review__header">
