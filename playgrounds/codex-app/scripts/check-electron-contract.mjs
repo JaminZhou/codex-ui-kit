@@ -252,6 +252,27 @@ try {
     .getByRole("button", { exact: true, name: "Close review" })
     .click();
   await workflowPage
+    .getByRole("button", { exact: true, name: "Open terminal" })
+    .first()
+    .click();
+  await workflowPage.waitForSelector(
+    '.codex-ui-app-shell[data-bottom-panel-open] [data-testid="terminal-panel"]',
+  );
+  const selectedTerminalText = await workflowPage
+    .getByRole("log", { name: "Terminal output" })
+    .textContent();
+  if (
+    !selectedTerminalText?.includes("pnpm test -- protocol-state") ||
+    selectedTerminalText.includes("apply_patch WORKFLOW.md")
+  ) {
+    throw new Error(
+      `Electron command-specific Terminal selection failed: ${selectedTerminalText}`,
+    );
+  }
+  await workflowPage
+    .getByRole("button", { exact: true, name: "Close terminal" })
+    .click();
+  await workflowPage
     .getByRole("button", { exact: true, name: "Review" })
     .click();
   if (

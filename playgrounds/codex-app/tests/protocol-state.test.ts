@@ -305,6 +305,72 @@ describe("protocol lifecycle reducer", () => {
     });
   });
 
+  it("coalesces adjacent terminal chunks without crossing stdin boundaries", () => {
+    const started = reduceProtocolNotification(initialProtocolState, {
+      method: "item/started",
+      params: {
+        item: {
+          aggregatedOutput: null,
+          command: "pnpm dev",
+          cwd: "/workspace/codex-ui-kit",
+          id: "command-dev",
+          processId: "process-dev",
+          status: "inProgress",
+          type: "commandExecution",
+        },
+        threadId: "thread-demo",
+        turnId: "turn-terminal",
+      },
+    });
+    const events = [
+      {
+        method: "item/commandExecution/outputDelta",
+        params: {
+          delta: "foo",
+          itemId: "command-dev",
+          threadId: "thread-demo",
+          turnId: "turn-terminal",
+        },
+      },
+      {
+        method: "item/commandExecution/outputDelta",
+        params: {
+          delta: "bar\n",
+          itemId: "command-dev",
+          threadId: "thread-demo",
+          turnId: "turn-terminal",
+        },
+      },
+      {
+        method: "item/commandExecution/terminalInteraction",
+        params: {
+          itemId: "command-dev",
+          processId: "process-dev",
+          stdin: "q\n",
+          threadId: "thread-demo",
+          turnId: "turn-terminal",
+        },
+      },
+      {
+        method: "item/commandExecution/outputDelta",
+        params: {
+          delta: "stopped\n",
+          itemId: "command-dev",
+          threadId: "thread-demo",
+          turnId: "turn-terminal",
+        },
+      },
+    ] as const;
+    const state = events.reduce(reduceProtocolNotification, started);
+
+    expect(state.commands[0]?.output).toBe("foobar\nstopped\n");
+    expect(state.commands[0]?.terminalEvents).toEqual([
+      { kind: "stdout", text: "foobar\n" },
+      { kind: "stdin", text: "q\n" },
+      { kind: "stdout", text: "stopped\n" },
+    ]);
+  });
+
   it("preserves both files in the dedicated multi-file review trace", () => {
     const completed = reduceProtocolTrace(
       replayScenarios["multi-file-review"].events,

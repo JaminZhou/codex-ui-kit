@@ -189,6 +189,9 @@ export function App() {
   const [terminalOpen, setTerminalOpen] = useState(
     initialSelection.scenarioId === "background-terminal",
   );
+  const [terminalCommandId, setTerminalCommandId] = useState<string | null>(
+    null,
+  );
   const [terminalHeight, setTerminalHeight] = useState(272);
   const [terminalValue, setTerminalValue] = useState("");
   const [terminalHistory, setTerminalHistory] = useState<TerminalEntry[]>([]);
@@ -255,6 +258,7 @@ export function App() {
     setReviewOpen(false);
     setReviewSelection(null);
     setTerminalOpen(nextId === "background-terminal");
+    setTerminalCommandId(null);
     setTerminalHeight(272);
     setTerminalValue("");
     setTerminalHistory([]);
@@ -839,7 +843,10 @@ export function App() {
             command.processId ? (
               <button
                 className="demo-command-terminal"
-                onClick={() => setTerminalOpen(true)}
+                onClick={() => {
+                  setTerminalCommandId(command.id);
+                  setTerminalOpen(true);
+                }}
                 type="button"
               >
                 Open terminal
@@ -993,9 +1000,12 @@ export function App() {
     );
   });
   const activeTurnHasWork = hasActiveTurnWork(state);
-  const terminalCommand = state.commands
-    .filter(({ processId }) => Boolean(processId))
-    .at(-1);
+  const terminalCommands = state.commands.filter(({ processId }) =>
+    Boolean(processId),
+  );
+  const terminalCommand =
+    terminalCommands.find(({ id }) => id === terminalCommandId) ??
+    terminalCommands.at(-1);
   const terminalEntries = useMemo<TerminalEntry[]>(() => {
     if (!terminalCommand) return terminalHistory;
     const protocolEntries =

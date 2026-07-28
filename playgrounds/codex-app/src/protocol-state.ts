@@ -187,6 +187,23 @@ function appendTimeline(
     : [...timeline, entry];
 }
 
+function appendTerminalEvent(
+  events: DemoTerminalEvent[],
+  event: DemoTerminalEvent,
+): DemoTerminalEvent[] {
+  const previous = events.at(-1);
+  if (!previous || previous.kind !== event.kind) {
+    return [...events, event];
+  }
+  return [
+    ...events.slice(0, -1),
+    {
+      kind: previous.kind,
+      text: `${previous.text}${event.text}`,
+    },
+  ];
+}
+
 function commandStatus(
   value: unknown,
 ): DemoCommandExecution["status"] {
@@ -588,10 +605,10 @@ export function reduceProtocolNotification(
         ...command,
         output: `${command.output}${delta}`,
         status: "running",
-        terminalEvents: [
-          ...command.terminalEvents,
-          { kind: "stdout", text: delta },
-        ],
+        terminalEvents: appendTerminalEvent(command.terminalEvents, {
+          kind: "stdout",
+          text: delta,
+        }),
       }),
       status: "running",
       timeline: appendTimeline(state.timeline, {
@@ -615,10 +632,10 @@ export function reduceProtocolNotification(
       ...next,
       commands: upsertById(state.commands, {
         ...command,
-        terminalEvents: [
-          ...command.terminalEvents,
-          { kind: "stdin", text: stdin },
-        ],
+        terminalEvents: appendTerminalEvent(command.terminalEvents, {
+          kind: "stdin",
+          text: stdin,
+        }),
         terminalInput: `${command.terminalInput}${stdin}`,
       }),
       timeline: appendTimeline(state.timeline, {
