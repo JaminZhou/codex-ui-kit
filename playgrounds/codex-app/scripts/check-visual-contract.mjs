@@ -83,6 +83,19 @@ for (const scene of visualScenes) {
         if (active instanceof HTMLElement) active.blur();
       });
     }
+    if (scene.id === "markdown-complete") {
+      await page.addStyleTag({
+        content: `
+          .codex-ui-conversation-thread-shell__viewport {
+            scrollbar-width: none;
+          }
+
+          .codex-ui-conversation-thread-shell__viewport::-webkit-scrollbar {
+            display: none;
+          }
+        `,
+      });
+    }
     await page.screenshot({
       animations: "disabled",
       path: actualPath,

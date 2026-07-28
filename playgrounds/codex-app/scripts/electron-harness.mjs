@@ -20,6 +20,7 @@ export const visualScenes = [
   {
     frame: "markdown-complete",
     id: "markdown-complete",
+    maxPixelRatio: 0.01,
     scenario: "markdown",
   },
   {
