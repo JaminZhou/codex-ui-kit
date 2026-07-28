@@ -64,9 +64,23 @@ The fourth slice makes the shell and Review workspace resilient under load:
 - exact last-file reveal in CDP and Electron without horizontal overflow;
 - a thirteenth reviewed pixel-regression frame for the large Review state.
 
-The current-build observation establishes application-navigation resizing. It
-does not claim that the independent Review side panel is resizable; that
-behavior still needs separate runtime evidence.
+That observation establishes application-navigation resizing. Review-panel
+resizing is covered by the next current-build slice.
+
+## Fifth vertical slice
+
+The fifth slice reaches the current public Pull request detail and completes
+the resizable workspace contract:
+
+- a 16px Review/PR separator with a measured 320px panel minimum and 352px
+  retained main track;
+- pointer plus Arrow/Home/End resizing and focus restoration;
+- a 352/554px PR index/detail split at 1180×820;
+- Summary, Timeline, and Code tabs with public PR summary and file-review
+  components;
+- full-main expansion and exact panel-width restoration;
+- a fourteenth reviewed pixel frame plus an optional external current-build
+  index/detail comparison.
 
 ## Development
 
@@ -97,6 +111,13 @@ application reference outside the repository and provide its absolute path:
 
 ```bash
 CODEX_UI_KIT_MULTI_FILE_REVIEW_REFERENCE=/absolute/path/to/main-only-reference.png \
+  pnpm --filter @codex-ui-kit/codex-app-playground check:visual
+```
+
+The Pull request detail gate uses a separate 906×820 current-build reference:
+
+```bash
+CODEX_UI_KIT_PULL_REQUEST_REFERENCE=/absolute/path/to/pr-main-reference.png \
   pnpm --filter @codex-ui-kit/codex-app-playground check:visual
 ```
 

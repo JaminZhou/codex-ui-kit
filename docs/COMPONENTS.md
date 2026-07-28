@@ -104,11 +104,15 @@ All privileged behavior remains host-owned. The components never auto-approve co
   current-build measured 16px separator with 240–520px pointer clamps,
   accessible value metadata, and Arrow/Home/End keyboard control; hosts can
   use `sidebarWidth` and `onSidebarWidthChange` for controlled persistence.
+  `sidePanelResizable` applies the same accessible interaction contract to the
+  right workspace, with configurable panel/main minima, responsive clamping,
+  controlled persistence, focus restoration, and an expanded full-main mode.
 - `AppSidebar`, `AppSidebarSection`, and `AppSidebarItem`: grouped primary
   navigation with selected-route state, descriptions, badges, header, and
   footer slots.
-- `WorkspacePanel`: controlled side or bottom tab shell with tab semantics,
-  close/open/expand hooks, focusable content, and host-owned tab contents.
+- `WorkspacePanel`: controlled side or bottom tab shell with labelled tab
+  semantics, host action slots, close/open/expand hooks and labels, focusable
+  content, and host-owned tab contents.
 - `ThreadHeader`: draggable desktop header with truncating identity, navigation, and independently aligned action slots.
 - `ThreadNavigationControls`: sidebar and optional Back/Forward toolbar controls with shortcuts, disabled states, and transient-navigation hover hooks.
 - `ThreadMessageNavigationRail`: message overview with a current-build default
@@ -152,9 +156,13 @@ All privileged behavior remains host-owned. The components never auto-approve co
   and repair states.
 - `PullRequestPage` and `PullRequestList`: responsive split or stacked PR
   workspace with toolbar, search/filter slots, selected route, status, check,
-  author, update, comment, and independent empty states.
+  author, update, comment, optional leading indicator, and independent empty
+  states.
 - `PullRequestDetails` and `PullRequestStatusBadge`: PR identity, branch,
   actions, change statistics, navigation, state, and host-owned content.
+- `PullRequestPanelSummary`: current resizable-panel Summary composition with
+  a level-one title, metadata, fact rows, Description and Checks regions,
+  edit actions, and a host-owned comment composer.
 - `PullRequestCheckList`, `PullRequestReviewSummary`, and
   `PullRequestReviewThread`: check progress, reviewer outcomes, inline file
   threads, resolved/outdated states, and host-owned review actions.

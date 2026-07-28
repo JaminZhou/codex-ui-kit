@@ -15,6 +15,9 @@ import {
   ConversationThreadShell,
   FileChangeGroup,
   FileReview,
+  PullRequestCheckList,
+  PullRequestList,
+  PullRequestPanelSummary,
   StatusBanner,
   ThreadContextEvent,
   ThreadHeader,
@@ -53,6 +56,8 @@ import {
   type ReviewSelection,
 } from "./review-selection";
 
+type DemoView = "conversation" | "pull-request";
+
 function querySelection() {
   const params = new URLSearchParams(window.location.search);
   const requested = params.get("scenario");
@@ -61,7 +66,11 @@ function querySelection() {
     : "streaming-recovery";
   const frame = params.get("frame");
   const capture = params.get("capture") === "1";
-  return { capture, frame, scenarioId };
+  const view: DemoView =
+    params.get("view") === "pull-request"
+      ? "pull-request"
+      : "conversation";
+  return { capture, frame, scenarioId, view };
 }
 
 function replayState(
@@ -82,6 +91,76 @@ function statusLabel(state: DemoProtocolState) {
   return "Ready";
 }
 
+const pullRequestFiles = [
+  {
+    additions: 3,
+    change: "modified" as const,
+    deletions: 1,
+    lines: [
+      {
+        content: "@@ -318,6 +318,8 @@ export interface AppShellProps",
+        kind: "hunk" as const,
+      },
+      {
+        content: "sidePanelOpen?: boolean;",
+        kind: "context" as const,
+        newLineNumber: 329,
+        oldLineNumber: 329,
+      },
+      {
+        content: "sidePanelResizable?: boolean;",
+        kind: "addition" as const,
+        newLineNumber: 330,
+      },
+      {
+        content: "sidePanelResizeLabel?: string;",
+        kind: "addition" as const,
+        newLineNumber: 331,
+      },
+    ],
+    path: "src/components/AppShell.tsx",
+  },
+  {
+    additions: 5,
+    change: "modified" as const,
+    deletions: 0,
+    lines: [
+      {
+        content: "@@ -243,6 +243,11 @@",
+        kind: "hunk" as const,
+      },
+      {
+        content: ".codex-ui-app-shell__side-panel-resizer {",
+        kind: "addition" as const,
+        newLineNumber: 245,
+      },
+      {
+        content: "  cursor: col-resize;",
+        kind: "addition" as const,
+        newLineNumber: 246,
+      },
+    ],
+    path: "src/styles.css",
+  },
+  {
+    additions: 8,
+    change: "modified" as const,
+    deletions: 0,
+    lines: [
+      {
+        content: "@@ -262,6 +262,14 @@ describe(\"application shell\", () => {",
+        kind: "hunk" as const,
+      },
+      {
+        content: "it(\"resizes the workspace track\", () => {",
+        kind: "addition" as const,
+        newLineNumber: 265,
+      },
+    ],
+    path: "tests/app-shell.test.tsx",
+  },
+];
+
 export function App() {
   const initialSelection = useMemo(querySelection, []);
   const [scenarioId, setScenarioId] = useState<ReplayScenarioId>(
@@ -98,6 +177,7 @@ export function App() {
     initialProtocolState,
   );
   const [mode, setMode] = useState<"live" | "replay">("replay");
+  const [view, setView] = useState<DemoView>(initialSelection.view);
   const [composerValue, setComposerValue] = useState("");
   const [liveStartPending, setLiveStartPending] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -107,6 +187,14 @@ export function App() {
   const [reviewSelection, setReviewSelection] =
     useState<ReviewSelection | null>(null);
   const [reviewSelectionKey, setReviewSelectionKey] = useState(0);
+  const [pullRequestExpanded, setPullRequestExpanded] = useState(false);
+  const [pullRequestOpen, setPullRequestOpen] = useState(
+    initialSelection.view === "pull-request",
+  );
+  const [pullRequestWidth, setPullRequestWidth] = useState(554);
+  const [pullRequestTab, setPullRequestTab] = useState<
+    "code" | "summary" | "timeline"
+  >("summary");
   const [undoneFileIds, setUndoneFileIds] = useState<Set<string>>(
     () => new Set(),
   );
@@ -152,6 +240,7 @@ export function App() {
   }, [liveState.approvals]);
 
   const selectScenario = (nextId: ReplayScenarioId) => {
+    setView("conversation");
     setMode("replay");
     setScenarioId(nextId);
     setReplayCount(replayScenarios[nextId].events.length);
@@ -250,12 +339,28 @@ export function App() {
           </AppSidebarItem>
         ))}
       </AppSidebarSection>
+      <AppSidebarSection title="Workspace">
+        <AppSidebarItem
+          description="Summary, Timeline, Code, checks, and review"
+          onClick={() => {
+            setMode("replay");
+            setView("pull-request");
+            setPullRequestOpen(true);
+          }}
+          selected={view === "pull-request"}
+        >
+          Pull requests
+        </AppSidebarItem>
+      </AppSidebarSection>
       <AppSidebarSection title="Connection">
         <AppSidebarItem
           description="Local stdio app-server"
           disabled={!window.codexDemo}
-          onClick={() => setMode("live")}
-          selected={mode === "live"}
+          onClick={() => {
+            setView("conversation");
+            setMode("live");
+          }}
+          selected={view === "conversation" && mode === "live"}
         >
           Live local
         </AppSidebarItem>
@@ -409,6 +514,245 @@ export function App() {
       ]}
     />
   ) : null;
+  const pullRequestSummary = (
+    <PullRequestPanelSummary
+      checks={
+        <PullRequestCheckList
+          checks={[
+            {
+              id: "electron",
+              name: "Codex app Electron acceptance",
+              status: "passed",
+            },
+            { id: "check", name: "check", status: "passed" },
+            { id: "codeql", name: "CodeQL", status: "passed" },
+            {
+              id: "react-nodenext",
+              name: "React 19 / NodeNext consumer",
+              status: "passed",
+            },
+          ]}
+        />
+      }
+      className="demo-pr-panel__summary"
+      commentComposer={
+        <label className="demo-pr-comment">
+          <span>Comment</span>
+          <textarea
+            aria-label="Pull request comment"
+            placeholder="Leave a comment"
+          />
+          <button aria-label="Post comment" type="button">
+            ↑
+          </button>
+        </label>
+      }
+      description={
+        <div className="demo-pr-description">
+          <h3>Summary</h3>
+          <ul>
+            <li>Add controlled and uncontrolled Review workspace resizing.</li>
+            <li>Preserve the measured panel and conversation constraints.</li>
+            <li>Gate pointer, keyboard, compact, Electron, and pixels.</li>
+          </ul>
+          <h3>Verification</h3>
+          <ul>
+            <li>Focused component and accessibility tests.</li>
+            <li>CDP, Electron, and pixel acceptance.</li>
+          </ul>
+        </div>
+      }
+      descriptionAction={
+        <button aria-label="Edit description" type="button">
+          ✎
+        </button>
+      }
+      facts={[
+        {
+          id: "branch",
+          indicator: "⑂",
+          label: "Branch",
+          value: (
+            <>
+              feat/review-panel-workspace → main{" "}
+              <span className="demo-pr-additions">+637</span>{" "}
+              <span className="demo-pr-deletions">−14</span>
+            </>
+          ),
+        },
+        {
+          id: "reviewers",
+          indicator: "◎",
+          label: "Reviewers",
+          value: "1 reviewer",
+        },
+        {
+          id: "comments",
+          indicator: "◌",
+          label: "Comments",
+          value: "3 comments",
+        },
+        {
+          id: "checks",
+          indicator: "○",
+          label: "Checks",
+          tone: "success",
+          value: "Successful",
+        },
+      ]}
+      meta={
+        <>
+          <span className="demo-pr-avatar demo-pr-avatar--small">J</span>
+          <span>JaminZhou</span>
+          <span>·</span>
+          <span>now</span>
+          <span>·</span>
+          <span>Ready for review</span>
+        </>
+      }
+      title="feat: add resizable review workspace"
+      titleAction={
+        <button aria-label="Edit title" type="button">
+          ✎
+        </button>
+      }
+    />
+  );
+  const pullRequestTimeline = (
+    <div className="demo-pr-panel__timeline">
+      <article>
+        <span aria-hidden="true" className="demo-pr-avatar">
+          J
+        </span>
+        <div>
+          <strong>JaminZhou opened this pull request</strong>
+          <time dateTime="PT1M">now</time>
+        </div>
+      </article>
+      <label className="demo-pr-comment">
+        <span>Comment</span>
+        <textarea
+          aria-label="Timeline comment"
+          placeholder="Leave a comment"
+        />
+        <button aria-label="Post timeline comment" type="button">
+          ↑
+        </button>
+      </label>
+    </div>
+  );
+  const pullRequestCode = (
+    <div className="demo-pr-panel__code">
+      <div aria-label="Code review controls" className="demo-pr-code-toolbar">
+        <span>
+          <strong>feat/review-panel-workspace</strong>
+          <small>into main</small>
+        </span>
+        <button aria-label="Review options" type="button">
+          ⋯
+        </button>
+        <button aria-label="Collapse all diffs" type="button">
+          −
+        </button>
+        <button aria-label="Switch to split diff" type="button">
+          ◫
+        </button>
+        <button aria-label="Show file tree" type="button">
+          ☷
+        </button>
+      </div>
+      <FileReview
+        aria-label="Pull request code review"
+        files={pullRequestFiles}
+        selectedPath={pullRequestFiles[0].path}
+      />
+    </div>
+  );
+  const pullRequestPanel = (
+    <WorkspacePanel
+      actions={
+        <>
+          <button aria-label="Open in browser" type="button">
+            ↗
+          </button>
+          <button aria-label="More pull request actions" type="button">
+            ⋯
+          </button>
+          <button disabled type="button">
+            Merge
+          </button>
+        </>
+      }
+      activeTabId={pullRequestTab}
+      className="demo-pr-panel"
+      data-testid="pull-request-panel"
+      expanded={pullRequestExpanded}
+      label="Pull request"
+      onActiveTabChange={(id) =>
+        setPullRequestTab(id as typeof pullRequestTab)
+      }
+      onExpandedChange={setPullRequestExpanded}
+      placement="side"
+      restorePanelLabel="Restore panel width"
+      tabs={[
+        { content: pullRequestSummary, id: "summary", label: "Summary" },
+        { content: pullRequestTimeline, id: "timeline", label: "Timeline" },
+        { content: pullRequestCode, id: "code", label: "Code" },
+      ]}
+      tabsLabel="Pull request view"
+    />
+  );
+  const pullRequestIndex = (
+    <section aria-label="Pull requests" className="demo-pr-index">
+      <header>
+        <div role="tablist" aria-label="Pull request filters">
+          <button aria-selected="true" role="tab" type="button">
+            All
+          </button>
+          <button aria-selected="false" role="tab" type="button">
+            Reviewing
+          </button>
+          <button aria-selected="false" role="tab" type="button">
+            Authored
+          </button>
+        </div>
+      </header>
+      <div className="demo-pr-index__search">
+        <input
+          aria-label="Search pull requests"
+          defaultValue="69"
+          placeholder="Search pull requests"
+          type="search"
+        />
+        <button aria-label="Filter pull requests" type="button">
+          ≡
+        </button>
+      </div>
+      <h2>Authored</h2>
+      <PullRequestList
+        items={[
+          {
+            author: "JaminZhou",
+            checkStatus: "passed",
+            commentCount: 3,
+            id: "69",
+            indicator: (
+              <span className="demo-pr-branch-indicator">
+                ⑂<i />
+              </span>
+            ),
+            number: 69,
+            repository: "codex-ui-kit",
+            state: "open",
+            title: "feat: add resizable review workspace",
+            updatedAt: "11m",
+          },
+        ]}
+        onSelect={() => setPullRequestOpen(true)}
+        selectedId={pullRequestOpen ? "69" : undefined}
+      />
+    </section>
+  );
   const timelineContent = state.timeline.map((entry) => {
     if (entry.kind === "message") {
       const message = state.messages.find(({ id }) => id === entry.id);
@@ -625,91 +969,122 @@ export function App() {
       data-mode={mode}
       data-scenario={scenarioId}
       data-status={state.status}
+      data-view={view}
     >
       <AppShell
         layoutMode="wide"
         onSidebarOpenChange={setSidebarOpen}
-        onSidePanelOpenChange={setReviewOpen}
-        sidePanel={reviewPanel}
-        sidePanelLabel="Review"
-        sidePanelOpen={reviewOpen && Boolean(reviewPanel)}
+        onSidePanelOpenChange={
+          view === "pull-request" ? setPullRequestOpen : setReviewOpen
+        }
+        onSidePanelWidthChange={
+          view === "pull-request" ? setPullRequestWidth : undefined
+        }
+        sidePanel={
+          view === "pull-request" ? pullRequestPanel : reviewPanel
+        }
+        sidePanelExpanded={
+          view === "pull-request" && pullRequestExpanded
+        }
+        sidePanelLabel={
+          view === "pull-request" ? "Pull request details" : "Review"
+        }
+        sidePanelOpen={
+          view === "pull-request"
+            ? pullRequestOpen
+            : reviewOpen && Boolean(reviewPanel)
+        }
+        sidePanelResizable
+        sidePanelWidth={
+          view === "pull-request" ? pullRequestWidth : undefined
+        }
         sidebar={sidebar}
         sidebarOpen={sidebarOpen}
         sidebarResizable
       >
-        <ConversationThreadShell
-          composer={composer}
-          header={header}
-          label="Codex client demo conversation"
-          threadWidth="wide"
-          viewportProps={{ followKey: state.eventCount }}
-        >
-          <AgentTurn aria-label="Protocol-backed conversation">
-              {liveError ? (
-                <StatusBanner heading="Live connection failed" tone="error">
-                  {liveError}
-                </StatusBanner>
-              ) : null}
-
-              {timelineContent}
-
-              {state.status === "running" &&
-              !activeTurnHasWork &&
-              !state.messages.some(
-                ({ role, status, turnId }) =>
-                  role === "assistant" &&
-                  status === "running" &&
-                  turnId === state.currentTurnId,
-              ) ? (
-                <ThreadThinkingPlaceholder />
-              ) : null}
-
-              {state.status === "retrying" ? (
-                <StatusBanner heading="Connection interrupted" tone="warning">
-                  {state.error} Retrying the active turn…
-                </StatusBanner>
-              ) : null}
-
-              {state.status === "failed" ? (
-                <StatusBanner heading="Turn failed" tone="error">
-                  {state.error}
-                </StatusBanner>
-              ) : null}
-          </AgentTurn>
-        </ConversationThreadShell>
-
-        {mode === "replay" && !initialSelection.capture ? (
-          <div className="demo-playback" aria-label="Replay controls">
-            <Button
-              disabled={replayCount <= 1}
-              onClick={() => setReplayCount((count) => Math.max(1, count - 1))}
-              size="small"
-              tone="ghost"
+        {view === "pull-request" ? (
+          pullRequestIndex
+        ) : (
+          <>
+            <ConversationThreadShell
+              composer={composer}
+              header={header}
+              label="Codex client demo conversation"
+              threadWidth="wide"
+              viewportProps={{ followKey: state.eventCount }}
             >
-              Previous
-            </Button>
-            <input
-              aria-label="Protocol event position"
-              max={scenario.events.length}
-              min={1}
-              onChange={(event) => setReplayCount(Number(event.target.value))}
-              type="range"
-              value={replayCount}
-            />
-            <Button
-              disabled={replayCount >= scenario.events.length}
-              onClick={() =>
-                setReplayCount((count) =>
-                  Math.min(scenario.events.length, count + 1),
-                )
-              }
-              size="small"
-              tone="ghost"
-            >
-              Next
-            </Button>
-          </div>
-        ) : null}
+              <AgentTurn aria-label="Protocol-backed conversation">
+                {liveError ? (
+                  <StatusBanner heading="Live connection failed" tone="error">
+                    {liveError}
+                  </StatusBanner>
+                ) : null}
+
+                {timelineContent}
+
+                {state.status === "running" &&
+                !activeTurnHasWork &&
+                !state.messages.some(
+                  ({ role, status, turnId }) =>
+                    role === "assistant" &&
+                    status === "running" &&
+                    turnId === state.currentTurnId,
+                ) ? (
+                  <ThreadThinkingPlaceholder />
+                ) : null}
+
+                {state.status === "retrying" ? (
+                  <StatusBanner heading="Connection interrupted" tone="warning">
+                    {state.error} Retrying the active turn…
+                  </StatusBanner>
+                ) : null}
+
+                {state.status === "failed" ? (
+                  <StatusBanner heading="Turn failed" tone="error">
+                    {state.error}
+                  </StatusBanner>
+                ) : null}
+              </AgentTurn>
+            </ConversationThreadShell>
+
+            {mode === "replay" && !initialSelection.capture ? (
+              <div className="demo-playback" aria-label="Replay controls">
+                <Button
+                  disabled={replayCount <= 1}
+                  onClick={() =>
+                    setReplayCount((count) => Math.max(1, count - 1))
+                  }
+                  size="small"
+                  tone="ghost"
+                >
+                  Previous
+                </Button>
+                <input
+                  aria-label="Protocol event position"
+                  max={scenario.events.length}
+                  min={1}
+                  onChange={(event) =>
+                    setReplayCount(Number(event.target.value))
+                  }
+                  type="range"
+                  value={replayCount}
+                />
+                <Button
+                  disabled={replayCount >= scenario.events.length}
+                  onClick={() =>
+                    setReplayCount((count) =>
+                      Math.min(scenario.events.length, count + 1),
+                    )
+                  }
+                  size="small"
+                  tone="ghost"
+                >
+                  Next
+                </Button>
+              </div>
+            ) : null}
+          </>
+        )}
       </AppShell>
     </div>
   );

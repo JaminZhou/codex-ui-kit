@@ -79,6 +79,7 @@ export interface PullRequestListItem {
   checkStatus?: PullRequestCheckStatus;
   commentCount?: number;
   id: string;
+  indicator?: ReactNode;
   number: number | string;
   openLabel?: string;
   repository?: ReactNode;
@@ -136,10 +137,19 @@ export function PullRequestList({
                   aria-current={selected ? "page" : undefined}
                   aria-label={accessibleLabel}
                   className="codex-ui-pull-request-list__item"
+                  data-has-indicator={item.indicator ? true : undefined}
                   data-selected={selected || undefined}
                   onClick={() => onSelect?.(item.id)}
                   type="button"
                 >
+                  {item.indicator ? (
+                    <span
+                      aria-hidden="true"
+                      className="codex-ui-pull-request-list__indicator"
+                    >
+                      {item.indicator}
+                    </span>
+                  ) : null}
                   <span className="codex-ui-pull-request-list__item-topline">
                     <span className="codex-ui-pull-request-list__repository">
                       {item.repository}
@@ -240,6 +250,7 @@ export interface PullRequestDetailsProps
   children?: ReactNode;
   deletions?: number;
   filesChanged?: number;
+  headingLevel?: "h1" | "h2" | "h3";
   navigation?: ReactNode;
   number: number | string;
   repository?: ReactNode;
@@ -258,6 +269,7 @@ export function PullRequestDetails({
   className,
   deletions,
   filesChanged,
+  headingLevel = "h2",
   navigation,
   number,
   repository,
@@ -268,6 +280,7 @@ export function PullRequestDetails({
   updatedAt,
   ...props
 }: PullRequestDetailsProps) {
+  const Heading = headingLevel;
   const hasChangeSummary =
     additions !== undefined ||
     deletions !== undefined ||
@@ -288,7 +301,9 @@ export function PullRequestDetails({
             <span>#{number}</span>
             <PullRequestStatusBadge state={state} />
           </div>
-          <h2>{title}</h2>
+          <Heading className="codex-ui-pull-request-details__title">
+            {title}
+          </Heading>
           <div className="codex-ui-pull-request-details__meta">
             {author ? <span>{author}</span> : null}
             {sourceBranch || targetBranch ? (
@@ -333,6 +348,116 @@ export function PullRequestDetails({
       {children ? (
         <div className="codex-ui-pull-request-details__content">
           {children}
+        </div>
+      ) : null}
+    </article>
+  );
+}
+
+export interface PullRequestPanelFact {
+  id: string;
+  indicator?: ReactNode;
+  label: ReactNode;
+  tone?: "danger" | "muted" | "success" | "warning";
+  value: ReactNode;
+}
+
+export interface PullRequestPanelSummaryProps
+  extends Omit<HTMLAttributes<HTMLElement>, "children" | "title"> {
+  checks?: ReactNode;
+  checksHeading?: ReactNode;
+  commentComposer?: ReactNode;
+  description?: ReactNode;
+  descriptionAction?: ReactNode;
+  descriptionHeading?: ReactNode;
+  facts?: readonly PullRequestPanelFact[];
+  meta?: ReactNode;
+  title: ReactNode;
+  titleAction?: ReactNode;
+}
+
+export function PullRequestPanelSummary({
+  checks,
+  checksHeading = "Checks",
+  className,
+  commentComposer,
+  description,
+  descriptionAction,
+  descriptionHeading = "Description",
+  facts = [],
+  meta,
+  title,
+  titleAction,
+  ...props
+}: PullRequestPanelSummaryProps) {
+  const descriptionHeadingId = useId();
+  const checksHeadingId = useId();
+  return (
+    <article
+      {...props}
+      className={["codex-ui-pull-request-panel-summary", className]
+        .filter(Boolean)
+        .join(" ")}
+    >
+      <header className="codex-ui-pull-request-panel-summary__identity">
+        <div>
+          <h1>{title}</h1>
+          {meta ? (
+            <div className="codex-ui-pull-request-panel-summary__meta">
+              {meta}
+            </div>
+          ) : null}
+        </div>
+        {titleAction ? (
+          <div className="codex-ui-pull-request-panel-summary__action">
+            {titleAction}
+          </div>
+        ) : null}
+      </header>
+      {facts.length > 0 ? (
+        <dl className="codex-ui-pull-request-panel-summary__facts">
+          {facts.map((fact) => (
+            <div data-tone={fact.tone} key={fact.id}>
+              <dt>
+                {fact.indicator ? (
+                  <span
+                    aria-hidden="true"
+                    className="codex-ui-pull-request-panel-summary__indicator"
+                  >
+                    {fact.indicator}
+                  </span>
+                ) : null}
+                {fact.label}
+              </dt>
+              <dd>{fact.value}</dd>
+            </div>
+          ))}
+        </dl>
+      ) : null}
+      {description ? (
+        <section
+          aria-labelledby={descriptionHeadingId}
+          className="codex-ui-pull-request-panel-summary__description"
+        >
+          <header>
+            <h2 id={descriptionHeadingId}>{descriptionHeading}</h2>
+            {descriptionAction}
+          </header>
+          <div>{description}</div>
+        </section>
+      ) : null}
+      {checks ? (
+        <section
+          aria-labelledby={checksHeadingId}
+          className="codex-ui-pull-request-panel-summary__checks"
+        >
+          <h2 id={checksHeadingId}>{checksHeading}</h2>
+          {checks}
+        </section>
+      ) : null}
+      {commentComposer ? (
+        <div className="codex-ui-pull-request-panel-summary__comment">
+          {commentComposer}
         </div>
       ) : null}
     </article>

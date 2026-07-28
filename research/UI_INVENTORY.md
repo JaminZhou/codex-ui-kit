@@ -54,10 +54,10 @@ observation from a previous build remains historical evidence.
 - Scoped CDP automation: available through a user-authorized second process;
   the Chromium profile is separate, but Codex application data and navigation
   are not fully isolated
-- Current inventory: 63 surface groups; 42 have scoped runtime evidence, of
-  which 25 include current-build structural evidence and 17 are previous-build
-  only; another 21 remain `not_sampled`. Browser verification covers 17
-  groups and Electron verification covers 14.
+- Current inventory: 63 surface groups; 43 have scoped runtime evidence, of
+  which 26 include current-build structural evidence and 17 are previous-build
+  only; another 20 remain `not_sampled`. Browser verification covers 19
+  groups and Electron verification covers 16.
 
 The current package exposes candidates far beyond the old transcript sample:
 application and thread shells, local/remote conversation routes, projects and
@@ -70,8 +70,8 @@ application-shell target from a second small application page, reaches the
 new-chat destination/context setup plus the Project and Local environment
 dialogs, and now revalidates the Pull requests index plus an aggregate
 multi-file change/Review flow. It also measures the application-navigation
-resize handle and its 240–520px range. It still does not reach a selectable PR
-detail, so `workspace.pull-request-review` remains `not_sampled`. The broader
+resize handle and its 240–520px range, the independent Review-panel resize
+track, and one public PR's Summary, Timeline, and Code views. The broader
 queue, Markdown, Sources, terminal, Sites, Scheduled tasks, Plugins, Skills,
 and Settings samples were recorded on `26.715.72359`. Those entries remain
 `runtime_observed` with build-scoped evidence, but they do not satisfy the
@@ -218,8 +218,8 @@ surface geometry and computed layout, Electron acceptance closes and reopens
 the Review panel, and reviewed pixels gate the five workflow frames. Paired
 with the existing current-build captures, this promotes the sampled file card,
 Review side-panel, and editor diff to Electron-verified. They remain
-implementation-partial because broader variants, resizing, and current-build
-PR review behavior are still open.
+implementation-partial because broader content and error variants remain
+open.
 
 The multi-file slice adds public `FileChangeGroup` and `FileReview`
 components. A protocol-backed two-file trace renders one aggregate
@@ -231,8 +231,8 @@ Undo, then repeats the geometry assertions in a real 800×600 BrowserWindow.
 An optional 906×820 current-build raster gate compares the whole main region
 and its 536px conversation/370px Review ownership regions separately. This
 promotes `workspace.multi-file-review` to Browser- and Electron-verified while
-remaining implementation-partial for mixed change kinds, Review-panel
-resizing, and real PR-review integration.
+remaining implementation-partial for mixed change kinds and broader real
+PR-review variants.
 
 The large-Review acceptance slice expands the deterministic public-protocol
 fixture to eight files and 96 addition lines. Its Review region must overflow
@@ -241,6 +241,19 @@ into view in both CDP and a real `BrowserWindow`. A thirteenth reviewed
 full-frame pixel baseline guards the resulting layout. This validates large
 file-set rendering and selection scrolling in the independent implementation;
 it is not current-build evidence for an eight-file product state.
+
+The Pull request detail slice adds a controlled, resizable workspace panel
+with a public `PullRequestPanelSummary`, an icon-capable PR list row, and
+Summary, Timeline, and Code tabs. CDP asserts the measured 352px index, 554px
+detail, 16px separator, 320px panel minimum, 352px retained main track, and
+expand/restore lifecycle. Electron drives pointer and keyboard resizing,
+tab changes, comment entry, and full-panel expansion in a real
+`BrowserWindow`. A fourteenth reviewed baseline covers the whole integration,
+while an optional 906×820 current-build gate compares the index and detail
+regions separately. This promotes `workspace.pull-request-route` and
+`workspace.pull-request-review` to Browser- and Electron-verified for the
+sampled public PR path; merge execution, review submission, loading/failure
+states, and broader PR variants remain outside this slice.
 
 The compact tool/recovery slice splits the former combined
 `thread.search-tool-mcp-events` candidate into independent search, Browser, and

@@ -8,6 +8,213 @@ await mkdir(artifactDirectory, { recursive: true });
 for (const scene of visualScenes) {
   const { app, page } = await launchScene(scene);
   try {
+    if (scene.view === "pull-request") {
+      const initial = await page.evaluate(() => {
+        const rect = (element) => {
+          const value = element.getBoundingClientRect();
+          return {
+            bottom: value.bottom,
+            height: value.height,
+            left: value.left,
+            right: value.right,
+            top: value.top,
+            width: value.width,
+          };
+        };
+        const root = document.querySelector(".demo-root");
+        const shell = document.querySelector(".codex-ui-app-shell");
+        const main = document.querySelector(".codex-ui-app-shell__main");
+        const panel = document.querySelector(
+          ".codex-ui-app-shell__side-panel",
+        );
+        const resizer = document.querySelector(
+          ".codex-ui-app-shell__side-panel-resizer",
+        );
+        const tablist = document.querySelector(
+          '[role="tablist"][aria-label="Pull request view"]',
+        );
+        if (!root || !shell || !main || !panel || !resizer || !tablist) {
+          throw new Error("Pull request integration surfaces are missing.");
+        }
+        return {
+          actions: Array.from(
+            panel.querySelectorAll("button"),
+            (button) =>
+              button.getAttribute("aria-label") ??
+              button.textContent?.trim(),
+          ),
+          checkCount: panel.querySelectorAll(
+            ".codex-ui-pull-request-checks li",
+          ).length,
+          heading:
+            panel.querySelector("h1")?.textContent?.trim() ?? null,
+          horizontalOverflow:
+            document.documentElement.scrollWidth -
+            document.documentElement.clientWidth,
+          listItems: document.querySelectorAll(
+            ".demo-pr-index .codex-ui-pull-request-list__item",
+          ).length,
+          main: rect(main),
+          panel: rect(panel),
+          resizer: {
+            ariaMax: resizer.getAttribute("aria-valuemax"),
+            ariaMin: resizer.getAttribute("aria-valuemin"),
+            ariaNow: resizer.getAttribute("aria-valuenow"),
+            cursor: getComputedStyle(resizer).cursor,
+            rect: rect(resizer),
+          },
+          rootView: root.getAttribute("data-view"),
+          selectedTab:
+            tablist.querySelector('[role="tab"][aria-selected="true"]')
+              ?.textContent?.trim() ?? null,
+          shell: rect(shell),
+          tabCount: tablist.querySelectorAll('[role="tab"]').length,
+        };
+      });
+      if (
+        initial.rootView !== "pull-request" ||
+        initial.horizontalOverflow > 1 ||
+        initial.listItems !== 1 ||
+        initial.tabCount !== 3 ||
+        initial.selectedTab !== "Summary" ||
+        initial.heading !== "feat: add resizable review workspace" ||
+        initial.checkCount !== 4 ||
+        Math.abs(initial.main.width - 352) > 1 ||
+        Math.abs(initial.panel.width - 554) > 1 ||
+        initial.resizer.cursor !== "col-resize" ||
+        Math.abs(initial.resizer.rect.width - 16) > 0.5 ||
+        initial.resizer.ariaMin !== "320" ||
+        initial.resizer.ariaMax !== "554" ||
+        initial.resizer.ariaNow !== "554" ||
+        !initial.actions.includes("Open in browser") ||
+        !initial.actions.includes("More pull request actions") ||
+        !initial.actions.includes("Expand panel")
+      ) {
+        throw new Error(
+          `${scene.id}: pull request summary contract failed: ${JSON.stringify(initial)}`,
+        );
+      }
+
+      await page.getByRole("tab", { name: "Timeline" }).click();
+      if (
+        (await page.getByRole("tab", { name: "Timeline" }).getAttribute(
+          "aria-selected",
+        )) !== "true" ||
+        (await page.getByRole("textbox", { name: "Timeline comment" }).count()) !==
+          1
+      ) {
+        throw new Error(`${scene.id}: Timeline tab did not activate.`);
+      }
+
+      await page.getByRole("tab", { name: "Code" }).click();
+      if (
+        (await page.getByRole("tab", { name: "Code" }).getAttribute(
+          "aria-selected",
+        )) !== "true" ||
+        (await page
+          .getByRole("list", { name: "Pull request code review" })
+          .getAttribute("data-file-count")) !== "3" ||
+        (await page.getByRole("button", { name: "Show file tree" }).count()) !==
+          1
+      ) {
+        throw new Error(`${scene.id}: Code tab did not activate.`);
+      }
+
+      await page.getByRole("button", { name: "Expand panel" }).click();
+      const expanded = await page.evaluate(() => {
+        const shell = document.querySelector(".codex-ui-app-shell");
+        const panel = document.querySelector(
+          ".codex-ui-app-shell__side-panel",
+        );
+        const main = document.querySelector(".codex-ui-app-shell__main");
+        return {
+          expanded: shell?.hasAttribute("data-side-panel-expanded"),
+          mainWidth: main?.getBoundingClientRect().width,
+          panelWidth: panel?.getBoundingClientRect().width,
+          resizer: Boolean(
+            document.querySelector(
+              ".codex-ui-app-shell__side-panel-resizer",
+            ),
+          ),
+        };
+      });
+      if (
+        !expanded.expanded ||
+        expanded.resizer ||
+        Math.abs((expanded.panelWidth ?? 0) - 906) > 1 ||
+        Math.abs(expanded.mainWidth ?? 0) > 1
+      ) {
+        throw new Error(
+          `${scene.id}: expanded pull request panel failed: ${JSON.stringify(expanded)}`,
+        );
+      }
+      await page
+        .getByRole("button", { name: "Restore panel width" })
+        .click();
+      await page.getByRole("tab", { name: "Summary" }).click();
+      const restored = await page.evaluate(() => ({
+        expanded: document
+          .querySelector(".codex-ui-app-shell")
+          ?.hasAttribute("data-side-panel-expanded"),
+        panelWidth: document
+          .querySelector(".codex-ui-app-shell__side-panel")
+          ?.getBoundingClientRect().width,
+        resizer: Boolean(
+          document.querySelector(
+            ".codex-ui-app-shell__side-panel-resizer",
+          ),
+        ),
+      }));
+      if (
+        restored.expanded ||
+        !restored.resizer ||
+        Math.abs((restored.panelWidth ?? 0) - 554) > 1
+      ) {
+        throw new Error(
+          `${scene.id}: restored pull request panel failed: ${JSON.stringify(restored)}`,
+        );
+      }
+      await page.getByRole("button", { name: "Live local" }).click();
+      await page.waitForSelector(
+        '.demo-root[data-view="conversation"][data-mode="live"]',
+      );
+      const liveNavigation = await page.evaluate(() => {
+        const button = (name) =>
+          Array.from(
+            document.querySelectorAll(".codex-ui-app-sidebar__item"),
+          ).find((item) => item.textContent?.includes(name));
+        return {
+          liveSelected:
+            button("Live local")?.getAttribute("aria-current") ===
+            "page",
+          pullRequestSelected:
+            button("Pull requests")?.getAttribute("aria-current") ===
+            "page",
+          view: document
+            .querySelector(".demo-root")
+            ?.getAttribute("data-view"),
+        };
+      });
+      if (
+        liveNavigation.view !== "conversation" ||
+        !liveNavigation.liveSelected ||
+        liveNavigation.pullRequestSelected
+      ) {
+        throw new Error(
+          `${scene.id}: Live local navigation did not leave the pull request view: ${JSON.stringify(liveNavigation)}`,
+        );
+      }
+      await writeFile(
+        join(artifactDirectory, `${scene.id}.json`),
+        `${JSON.stringify(
+          { expanded, initial, liveNavigation, restored },
+          null,
+          2,
+        )}\n`,
+      );
+      continue;
+    }
+
     const contract = await page.evaluate(() => {
       const root = document.querySelector(".demo-root");
       const shell = document.querySelector(".codex-ui-app-shell");
@@ -18,6 +225,9 @@ for (const scene of visualScenes) {
       const header = document.querySelector(".codex-ui-thread-header");
       const sidebarResizer = document.querySelector(
         '.codex-ui-app-shell__sidebar-resizer[role="separator"]',
+      );
+      const sidePanelResizer = document.querySelector(
+        '.codex-ui-app-shell__side-panel-resizer[role="separator"]',
       );
       if (
         !root ||
@@ -120,6 +330,15 @@ for (const scene of visualScenes) {
           ariaNow: sidebarResizer.getAttribute("aria-valuenow"),
           rect: rect(sidebarResizer),
         },
+        sidePanelResizer: sidePanelResizer
+          ? {
+              ariaMax: sidePanelResizer.getAttribute("aria-valuemax"),
+              ariaMin: sidePanelResizer.getAttribute("aria-valuemin"),
+              ariaNow: sidePanelResizer.getAttribute("aria-valuenow"),
+              cursor: getComputedStyle(sidePanelResizer).cursor,
+              rect: rect(sidePanelResizer),
+            }
+          : null,
         viewport: viewportRect,
         workflow: {
           fileGroupCount: document.querySelectorAll(
@@ -188,6 +407,35 @@ for (const scene of visualScenes) {
           contract.header.left)
     ) {
       throw new Error(`${scene.id}: Review panel split geometry is invalid.`);
+    }
+    if (
+      scene.surfaces?.includes("reviewPanel") &&
+      (!contract.sidePanelResizer ||
+        contract.sidePanelResizer.cursor !== "col-resize" ||
+        Math.abs(contract.sidePanelResizer.rect.width - 16) > 0.5 ||
+        contract.sidePanelResizer.ariaMin !== "320" ||
+        contract.sidePanelResizer.ariaMax !== "554" ||
+        contract.sidePanelResizer.ariaNow !== "370" ||
+        Math.abs(
+          contract.sidePanelResizer.rect.left +
+            contract.sidePanelResizer.rect.width / 2 -
+            contract.namedSurfaces.reviewPanel.rect.left,
+        ) > 1)
+    ) {
+      throw new Error(
+        `${scene.id}: Review resizer contract failed: ${JSON.stringify({
+          panel: contract.namedSurfaces.reviewPanel,
+          resizer: contract.sidePanelResizer,
+        })}`,
+      );
+    }
+    if (
+      !scene.surfaces?.includes("reviewPanel") &&
+      contract.sidePanelResizer
+    ) {
+      throw new Error(
+        `${scene.id}: hidden Review panel retained its resize separator.`,
+      );
     }
     if (
       scene.surfaces?.includes("reviewPanel") &&

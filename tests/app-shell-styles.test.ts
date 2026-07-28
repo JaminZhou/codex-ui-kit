@@ -62,4 +62,25 @@ describe("application shell visual contract", () => {
     expect(component).toContain('role="separator"');
     expect(component).toContain('aria-orientation="vertical"');
   });
+
+  it("locks the current-build workspace resize affordance", () => {
+    expect(styles).toContain(
+      "--codex-ui-app-shell-side-panel-track: var(\n    --codex-ui-app-side-panel-width\n  );",
+    );
+    expect(styles).not.toContain(
+      "--codex-ui-app-shell-side-panel-track: min(",
+    );
+    expect(styles).toMatch(
+      /\.codex-ui-app-shell__side-panel-resizer \{[\s\S]*?cursor: col-resize;[\s\S]*?width: 1rem;/,
+    );
+    expect(styles).toContain(
+      "inset-block-end: var(--codex-ui-app-shell-bottom-panel-track);",
+    );
+    expect(styles).toContain(
+      ".codex-ui-app-shell__side-panel-resizer:focus-visible",
+    );
+    expect(component).toContain("sidePanelMinWidth = 320");
+    expect(component).toContain("sidePanelMinMainWidth = 352");
+    expect(component).toContain('sidePanelResizeLabel = "Resize workspace panel"');
+  });
 });

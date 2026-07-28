@@ -118,6 +118,92 @@ try {
   await workflowPage.waitForSelector(
     '.codex-ui-app-shell[data-side-panel-open] [data-testid="review-panel"]',
   );
+  const reviewResizer = workflowPage.getByRole("separator", {
+    name: "Resize workspace panel",
+  });
+  const initialReviewWidth = await workflowPage
+    .locator(".codex-ui-app-shell__side-panel")
+    .evaluate((element) => element.getBoundingClientRect().width);
+  const initialReviewResizerBox = await reviewResizer.boundingBox();
+  if (
+    !initialReviewResizerBox ||
+    Math.abs(initialReviewWidth - 370) > 1 ||
+    (await reviewResizer.getAttribute("aria-valuemin")) !== "320" ||
+    (await reviewResizer.getAttribute("aria-valuemax")) !== "554"
+  ) {
+    throw new Error(
+      `Electron Review resizer baseline failed: ${JSON.stringify({
+        initialReviewResizerBox,
+        initialReviewWidth,
+      })}`,
+    );
+  }
+  await workflowPage.mouse.move(
+    initialReviewResizerBox.x + initialReviewResizerBox.width / 2,
+    initialReviewResizerBox.y + 200,
+  );
+  await workflowPage.mouse.down();
+  await workflowPage.mouse.move(
+    initialReviewResizerBox.x + initialReviewResizerBox.width / 2 - 64,
+    initialReviewResizerBox.y + 200,
+    { steps: 8 },
+  );
+  await workflowPage.mouse.up();
+  const draggedReviewWidth = await workflowPage
+    .locator(".codex-ui-app-shell__side-panel")
+    .evaluate((element) => element.getBoundingClientRect().width);
+  if (Math.abs(draggedReviewWidth - 434) > 1) {
+    throw new Error(
+      `Electron Review pointer resize failed: ${draggedReviewWidth}`,
+    );
+  }
+  await reviewResizer.press("End");
+  const maximumReviewGeometry = await workflowPage.evaluate(() => {
+    const shell = document
+      .querySelector(".codex-ui-app-shell")
+      ?.getBoundingClientRect();
+    const header = document
+      .querySelector(".codex-ui-thread-header")
+      ?.getBoundingClientRect();
+    const resizer = document
+      .querySelector(".codex-ui-app-shell__side-panel-resizer")
+      ?.getBoundingClientRect();
+    return {
+      ariaMax: document
+        .querySelector(".codex-ui-app-shell__side-panel-resizer")
+        ?.getAttribute("aria-valuemax"),
+      ariaNow: document
+        .querySelector(".codex-ui-app-shell__side-panel-resizer")
+        ?.getAttribute("aria-valuenow"),
+      mainWidth: header?.width,
+      trackWidth:
+        shell && resizer
+          ? shell.right - (resizer.left + resizer.width / 2)
+          : null,
+    };
+  });
+  if (
+    maximumReviewGeometry.ariaMax !== "554" ||
+    maximumReviewGeometry.ariaNow !== "554" ||
+    Math.abs((maximumReviewGeometry.mainWidth ?? 0) - 352) > 1 ||
+    Math.abs((maximumReviewGeometry.trackWidth ?? 0) - 554) > 1
+  ) {
+    throw new Error(
+      `Electron Review maximum track failed: ${JSON.stringify(maximumReviewGeometry)}`,
+    );
+  }
+  await reviewResizer.press("Home");
+  for (let index = 0; index < 6; index += 1) {
+    await reviewResizer.press("ArrowLeft");
+  }
+  const restoredReviewWidth = await workflowPage
+    .locator(".codex-ui-app-shell__side-panel")
+    .evaluate((element) => element.getBoundingClientRect().width);
+  if (Math.abs(restoredReviewWidth - 368) > 1) {
+    throw new Error(
+      `Electron Review keyboard resize failed: ${restoredReviewWidth}`,
+    );
+  }
   await workflowPage
     .getByRole("button", { exact: true, name: "Close review" })
     .click();
@@ -187,6 +273,134 @@ try {
   await workflowApp.close();
 }
 
+const pullRequestScene = {
+  frame: "review-open",
+  id: "electron-pull-request-detail",
+  scenario: "workspace-workflow",
+  view: "pull-request",
+};
+const { app: pullRequestApp, page: pullRequestPage } = await launchScene(
+  pullRequestScene,
+  { capture: false },
+);
+
+try {
+  await pullRequestPage.waitForSelector(
+    '.demo-root[data-view="pull-request"] [data-testid="pull-request-panel"]',
+  );
+  const pullRequestGeometry = await pullRequestPage.evaluate(() => {
+    const bounds = (selector) =>
+      document.querySelector(selector)?.getBoundingClientRect().toJSON() ??
+      null;
+    return {
+      main: bounds(".codex-ui-app-shell__main"),
+      panel: bounds(".codex-ui-app-shell__side-panel"),
+      resizer: bounds(".codex-ui-app-shell__side-panel-resizer"),
+      selectedTab: document
+        .querySelector('[aria-label="Pull request view"] [aria-selected="true"]')
+        ?.textContent?.trim(),
+    };
+  });
+  if (
+    !pullRequestGeometry.main ||
+    !pullRequestGeometry.panel ||
+    !pullRequestGeometry.resizer ||
+    Math.abs(pullRequestGeometry.main.width - 352) > 1 ||
+    Math.abs(pullRequestGeometry.panel.width - 554) > 1 ||
+    Math.abs(pullRequestGeometry.resizer.width - 16) > 0.5 ||
+    pullRequestGeometry.selectedTab !== "Summary"
+  ) {
+    throw new Error(
+      `Electron pull request baseline failed: ${JSON.stringify(pullRequestGeometry)}`,
+    );
+  }
+
+  await pullRequestPage.getByRole("tab", { name: "Timeline" }).click();
+  await pullRequestPage.getByRole("textbox", { name: "Timeline comment" }).fill(
+    "Synthetic local comment",
+  );
+  await pullRequestPage.getByRole("tab", { name: "Code" }).click();
+  if (
+    (await pullRequestPage
+      .getByRole("list", { name: "Pull request code review" })
+      .getAttribute("data-file-count")) !== "3"
+  ) {
+    throw new Error("Electron pull request Code tab did not render three files.");
+  }
+
+  const pullRequestResizer = pullRequestPage.getByRole("separator", {
+    name: "Resize workspace panel",
+  });
+  const pullRequestResizerBox = await pullRequestResizer.boundingBox();
+  if (!pullRequestResizerBox) {
+    throw new Error("Electron pull request resize separator is missing.");
+  }
+  await pullRequestPage.mouse.move(
+    pullRequestResizerBox.x + pullRequestResizerBox.width / 2,
+    pullRequestResizerBox.y + 200,
+  );
+  await pullRequestPage.mouse.down();
+  await pullRequestPage.mouse.move(
+    pullRequestResizerBox.x + pullRequestResizerBox.width / 2 + 64,
+    pullRequestResizerBox.y + 200,
+    { steps: 8 },
+  );
+  await pullRequestPage.mouse.up();
+  const narrowedPullRequestWidth = await pullRequestPage
+    .locator(".codex-ui-app-shell__side-panel")
+    .evaluate((element) => element.getBoundingClientRect().width);
+  if (Math.abs(narrowedPullRequestWidth - 490) > 1) {
+    throw new Error(
+      `Electron pull request pointer resize failed: ${narrowedPullRequestWidth}`,
+    );
+  }
+  await pullRequestResizer.press("End");
+
+  await pullRequestPage.getByRole("button", { name: "Expand panel" }).click();
+  const expandedPullRequest = await pullRequestPage.evaluate(() => ({
+    expanded: document
+      .querySelector(".codex-ui-app-shell")
+      ?.hasAttribute("data-side-panel-expanded"),
+    panelWidth: document
+      .querySelector(".codex-ui-app-shell__side-panel")
+      ?.getBoundingClientRect().width,
+    resizer: Boolean(
+      document.querySelector(".codex-ui-app-shell__side-panel-resizer"),
+    ),
+  }));
+  if (
+    !expandedPullRequest.expanded ||
+    expandedPullRequest.resizer ||
+    Math.abs((expandedPullRequest.panelWidth ?? 0) - 906) > 1
+  ) {
+    throw new Error(
+      `Electron pull request expansion failed: ${JSON.stringify(expandedPullRequest)}`,
+    );
+  }
+  await pullRequestPage
+    .getByRole("button", { name: "Restore panel width" })
+    .click();
+  await pullRequestPage.getByRole("tab", { name: "Summary" }).click();
+  await pullRequestPage.getByRole("button", { name: "Live local" }).click();
+  await pullRequestPage.waitForSelector(
+    '.demo-root[data-view="conversation"][data-mode="live"]',
+  );
+  if (
+    (await pullRequestPage
+      .getByRole("button", { name: "Live local" })
+      .getAttribute("aria-current")) !== "page" ||
+    (await pullRequestPage
+      .getByRole("button", { name: "Pull requests" })
+      .getAttribute("aria-current")) !== null
+  ) {
+    throw new Error(
+      "Electron Live local navigation did not leave the pull request view.",
+    );
+  }
+} finally {
+  await pullRequestApp.close();
+}
+
 const compactScene = {
   frame: "review-open",
   id: "electron-multi-file-compact",
@@ -240,6 +454,19 @@ try {
       reviewDiffs: document.querySelectorAll(
         ".codex-ui-file-review .codex-ui-file-diff",
       ).length,
+      sidePanelResizer: (() => {
+        const element = document.querySelector(
+          ".codex-ui-app-shell__side-panel-resizer",
+        );
+        if (!element) return null;
+        const bounds = element.getBoundingClientRect();
+        return {
+          ariaMax: element.getAttribute("aria-valuemax"),
+          ariaMin: element.getAttribute("aria-valuemin"),
+          ariaNow: element.getAttribute("aria-valuenow"),
+          width: bounds.width,
+        };
+      })(),
       sidePanel: rect(".codex-ui-app-shell__side-panel"),
       sidePanelAriaHidden: document
         .querySelector(".codex-ui-app-shell__side-panel")
@@ -266,9 +493,14 @@ try {
     !compactContract.sidebar ||
     !compactContract.main ||
     !compactContract.sidePanel ||
+    !compactContract.sidePanelResizer ||
     Math.abs(compactContract.sidebar.width - 274) > 1 ||
     compactContract.main.width < 200 ||
     compactContract.sidePanel.width < 315 ||
+    Math.abs(compactContract.sidePanelResizer.width - 16) > 0.5 ||
+    compactContract.sidePanelResizer.ariaMin !== "320" ||
+    compactContract.sidePanelResizer.ariaMax !== "320" ||
+    compactContract.sidePanelResizer.ariaNow !== "320" ||
     compactContract.sidePanel.right > 801
   ) {
     throw new Error(
@@ -412,5 +644,5 @@ try {
 }
 
 console.log(
-  "Electron host, native-window, resizable navigation, multi-file Review, large diff scrolling, and compact geometry contracts passed.",
+  "Electron host, native-window, resizable navigation/Review/PR detail, PR tabs and expansion, multi-file Review, large diff scrolling, and compact geometry contracts passed.",
 );

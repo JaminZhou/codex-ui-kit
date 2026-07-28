@@ -177,6 +177,22 @@ export type AppShellLayoutMode = "narrow" | "medium" | "wide";
 const appShellMediumBreakpointRem = 92;
 const appShellNarrowBreakpointRem = 52;
 
+function appShellContentBoxWidth(shell: HTMLElement) {
+  const borderBoxWidth = shell.getBoundingClientRect().width;
+  if (borderBoxWidth <= 0) return 0;
+  const style = getComputedStyle(shell);
+  const inlineInsets = [
+    style.borderLeftWidth,
+    style.borderRightWidth,
+    style.paddingLeft,
+    style.paddingRight,
+  ].reduce(
+    (total, value) => total + (Number.parseFloat(value) || 0),
+    0,
+  );
+  return Math.max(0, borderBoxWidth - inlineInsets);
+}
+
 function appShellRemToPixels(shell: HTMLElement, rem: number) {
   const rootFontSize =
     Number.parseFloat(
@@ -185,10 +201,18 @@ function appShellRemToPixels(shell: HTMLElement, rem: number) {
   return rem * rootFontSize;
 }
 
-function useAppShellLayoutMode(
+interface AppShellLayoutMetrics {
+  mode: AppShellLayoutMode;
+  width: number | null;
+}
+
+function useAppShellLayoutMetrics(
   shellRef: RefObject<HTMLDivElement | null>,
-): AppShellLayoutMode {
-  const [layoutMode, setLayoutMode] = useState<AppShellLayoutMode>("wide");
+): AppShellLayoutMetrics {
+  const [layout, setLayout] = useState<AppShellLayoutMetrics>({
+    mode: "wide",
+    width: null,
+  });
 
   useLayoutEffect(() => {
     const shell = shellRef.current;
@@ -210,10 +234,14 @@ function useAppShellLayoutMode(
           : width <= mediumBreakpoint
             ? "medium"
             : "wide";
-      setLayoutMode((current) => (current === nextMode ? current : nextMode));
+      setLayout((current) =>
+        current.mode === nextMode && current.width === width
+          ? current
+          : { mode: nextMode, width },
+      );
     };
 
-    update(shell.getBoundingClientRect().width);
+    update(appShellContentBoxWidth(shell));
     if (typeof ResizeObserver === "undefined") return;
 
     const observer = new ResizeObserver((entries) => {
@@ -224,7 +252,51 @@ function useAppShellLayoutMode(
     return () => observer.disconnect();
   }, [shellRef]);
 
-  return layoutMode;
+  return layout;
+}
+
+function useObservedElementWidth(
+  elementRef: RefObject<HTMLElement | null>,
+  enabled: boolean,
+) {
+  const [width, setWidth] = useState<number | null>(null);
+
+  useLayoutEffect(() => {
+    const element = elementRef.current;
+    if (!enabled || !element) {
+      setWidth((current) => (current === null ? current : null));
+      return;
+    }
+
+    const update = (nextWidth: number) => {
+      if (nextWidth <= 0) return;
+      setWidth((current) =>
+        current === nextWidth ? current : nextWidth,
+      );
+    };
+
+    update(element.getBoundingClientRect().width);
+    if (typeof ResizeObserver === "undefined") return;
+
+    const observer = new ResizeObserver((entries) => {
+      const entry = entries.find(({ target }) => target === element);
+      if (!entry) return;
+      const renderedWidth = element.getBoundingClientRect().width;
+      const borderBoxWidth =
+        entry.borderBoxSize?.[0]?.inlineSize ?? 0;
+      update(
+        renderedWidth > 0
+          ? renderedWidth
+          : borderBoxWidth > 0
+            ? borderBoxWidth
+            : entry.contentRect.width,
+      );
+    });
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, [elementRef, enabled]);
+
+  return width;
 }
 
 const shellFocusableSelector =
@@ -312,16 +384,25 @@ export interface AppShellProps
   bottomPanelLabel?: string;
   bottomPanelOpen?: boolean;
   children: ReactNode;
+  defaultSidePanelWidth?: number;
   defaultSidebarWidth?: number;
   mainLabel?: string;
   mainRole?: "main" | "region";
   layoutMode?: AppShellLayoutMode;
   onSidePanelOpenChange?: (open: boolean) => void;
+  onSidePanelWidthChange?: (width: number) => void;
   onSidebarOpenChange?: (open: boolean) => void;
   onSidebarWidthChange?: (width: number) => void;
   sidePanel?: ReactNode;
+  sidePanelExpanded?: boolean;
   sidePanelLabel?: string;
+  sidePanelMaxWidth?: number;
+  sidePanelMinMainWidth?: number;
+  sidePanelMinWidth?: number;
   sidePanelOpen?: boolean;
+  sidePanelResizable?: boolean;
+  sidePanelResizeLabel?: string;
+  sidePanelWidth?: number;
   sidebar?: ReactNode;
   sidebarLabel?: string;
   sidebarMaxWidth?: number;
@@ -344,22 +425,39 @@ interface SidebarResizeSession {
   pointerId: number;
 }
 
+interface SidePanelResizeSession {
+  direction: 1 | -1;
+  lastWidth: number;
+  originClientX: number;
+  originWidth: number;
+  pointerId: number;
+}
+
 export function AppShell({
   bottomPanel,
   bottomPanelLabel = "Bottom panel",
   bottomPanelOpen = Boolean(bottomPanel),
   children,
   className,
+  defaultSidePanelWidth = 370,
   defaultSidebarWidth = 274,
   layoutMode: layoutModeOverride,
   mainLabel = "Conversation",
   mainRole = "main",
   onSidePanelOpenChange,
+  onSidePanelWidthChange,
   onSidebarOpenChange,
   onSidebarWidthChange,
   sidePanel,
+  sidePanelExpanded = false,
   sidePanelLabel = "Workspace panel",
+  sidePanelMaxWidth = Number.POSITIVE_INFINITY,
+  sidePanelMinMainWidth = 352,
+  sidePanelMinWidth = 320,
   sidePanelOpen = false,
+  sidePanelResizable = false,
+  sidePanelResizeLabel = "Resize workspace panel",
+  sidePanelWidth,
   sidebar,
   sidebarLabel = "App navigation",
   sidebarMaxWidth = 520,
@@ -374,19 +472,35 @@ export function AppShell({
   const bottomPanelRef = useRef<HTMLElement>(null);
   const mainRef = useRef<HTMLDivElement>(null);
   const sidePanelBackdropRef = useRef<HTMLButtonElement>(null);
+  const sidePanelOpenRef = useRef(sidePanelOpen);
+  sidePanelOpenRef.current = sidePanelOpen;
   const sidePanelRef = useRef<HTMLElement>(null);
+  const sidePanelResizerFocusedRef = useRef(false);
+  const sidePanelResizerRef = useRef<HTMLDivElement>(null);
+  const sidePanelResizeSessionRef =
+    useRef<SidePanelResizeSession | null>(null);
   const sidebarBackdropRef = useRef<HTMLButtonElement>(null);
   const sidebarRef = useRef<HTMLElement>(null);
   const sidebarResizerFocusedRef = useRef(false);
   const sidebarResizerRef = useRef<HTMLDivElement>(null);
   const sidebarResizeSessionRef = useRef<SidebarResizeSession | null>(null);
   const shellRef = useRef<HTMLDivElement>(null);
+  const [internalSidePanelWidth, setInternalSidePanelWidth] = useState(
+    Number.isFinite(defaultSidePanelWidth) ? defaultSidePanelWidth : 370,
+  );
   const [internalSidebarWidth, setInternalSidebarWidth] = useState(
     Number.isFinite(defaultSidebarWidth) ? defaultSidebarWidth : 274,
   );
+  const [sidePanelResizing, setSidePanelResizing] = useState(false);
   const [sidebarResizing, setSidebarResizing] = useState(false);
-  const automaticLayoutMode = useAppShellLayoutMode(shellRef);
-  const layoutMode = layoutModeOverride ?? automaticLayoutMode;
+  const sidebarIsVisible =
+    sidebarOpen && sidebar !== undefined && sidebar !== null;
+  const observedSidebarWidth = useObservedElementWidth(
+    sidebarRef,
+    sidebarIsVisible,
+  );
+  const automaticLayout = useAppShellLayoutMetrics(shellRef);
+  const layoutMode = layoutModeOverride ?? automaticLayout.mode;
   const normalizedSidebarMinWidth = Math.max(
     0,
     Number.isFinite(sidebarMinWidth) ? sidebarMinWidth : 240,
@@ -405,12 +519,83 @@ export function AppShell({
     normalizedSidebarMinWidth,
     normalizedSidebarMaxWidth,
   );
-  const shellStyle = sidebarResizable
-    ? ({
-        ...style,
-        "--codex-ui-app-sidebar-width": `${resolvedSidebarWidth}px`,
-      } as CSSProperties)
-    : style;
+  const normalizedSidePanelMinWidth = Math.max(
+    0,
+    Number.isFinite(sidePanelMinWidth) ? sidePanelMinWidth : 320,
+  );
+  const normalizedSidePanelMinMainWidth = Math.max(
+    0,
+    Number.isFinite(sidePanelMinMainWidth) ? sidePanelMinMainWidth : 352,
+  );
+  const normalizedSidePanelMaxWidth = Math.max(
+    normalizedSidePanelMinWidth,
+    Number.isFinite(sidePanelMaxWidth)
+      ? sidePanelMaxWidth
+      : Number.POSITIVE_INFINITY,
+  );
+  const sidePanelWidthIsControlled =
+    sidePanelWidth !== undefined && Number.isFinite(sidePanelWidth);
+  const requestedSidePanelWidth = sidePanelWidthIsControlled
+    ? sidePanelWidth
+    : internalSidePanelWidth;
+  const unmeasuredSidePanelMaxWidth = Number.isFinite(
+    normalizedSidePanelMaxWidth,
+  )
+    ? normalizedSidePanelMaxWidth
+    : Math.max(
+        normalizedSidePanelMinWidth,
+        requestedSidePanelWidth,
+      );
+  const shellWidth = automaticLayout.width;
+  const occupiedSidebarWidth = sidebarIsVisible
+    ? (observedSidebarWidth ?? resolvedSidebarWidth)
+    : 0;
+  const responsiveSidePanelMaxWidth =
+    shellWidth === null
+      ? unmeasuredSidePanelMaxWidth
+      : Math.max(
+          normalizedSidePanelMinWidth,
+          shellWidth -
+            occupiedSidebarWidth -
+            normalizedSidePanelMinMainWidth,
+        );
+  const resolvedSidePanelMaxWidth = Math.min(
+    normalizedSidePanelMaxWidth,
+    responsiveSidePanelMaxWidth,
+  );
+  const resolvedSidePanelExpanded =
+    sidePanelExpanded &&
+    sidePanelOpen &&
+    sidePanel !== undefined &&
+    sidePanel !== null &&
+    layoutMode === "wide";
+  const expandedSidePanelWidth =
+    shellWidth === null
+      ? requestedSidePanelWidth
+      : Math.max(0, shellWidth - occupiedSidebarWidth);
+  const resolvedSidePanelWidth = resolvedSidePanelExpanded
+    ? expandedSidePanelWidth
+    : clampShellTrack(
+        requestedSidePanelWidth,
+        normalizedSidePanelMinWidth,
+        resolvedSidePanelMaxWidth,
+      );
+  const shellStyle =
+    sidebarResizable || sidePanelResizable || resolvedSidePanelExpanded
+      ? ({
+          ...style,
+          ...(sidebarResizable
+            ? {
+                "--codex-ui-app-sidebar-width": `${resolvedSidebarWidth}px`,
+              }
+            : {}),
+          ...(sidePanelResizable || resolvedSidePanelExpanded
+            ? {
+                "--codex-ui-app-side-panel-width": `${resolvedSidePanelWidth}px`,
+              }
+            : {}),
+        } as CSSProperties)
+      : style;
   const sidebarModalOpen =
     sidebarOpen && layoutMode === "narrow";
   const sidePanelModalOpen =
@@ -425,6 +610,130 @@ export function AppShell({
     sidebar !== undefined &&
     sidebar !== null &&
     layoutMode !== "narrow";
+  const sidePanelResizerVisible =
+    sidePanelResizable &&
+    sidePanelOpen &&
+    sidePanel !== undefined &&
+    sidePanel !== null &&
+    !resolvedSidePanelExpanded &&
+    layoutMode === "wide";
+  const resolveSidePanelWidth = (nextWidth: number) => {
+    const measuredLiveShellWidth =
+      shellRef.current === null
+        ? 0
+        : appShellContentBoxWidth(shellRef.current);
+    const liveShellWidth =
+      measuredLiveShellWidth > 0
+        ? measuredLiveShellWidth
+        : shellWidth !== null && shellWidth > 0
+          ? shellWidth
+          : null;
+    const liveSidebarWidth =
+      sidebarOpen && sidebar !== undefined && sidebar !== null
+        ? sidebarRef.current?.getBoundingClientRect().width ||
+          observedSidebarWidth ||
+          resolvedSidebarWidth
+        : 0;
+    const liveResponsiveMaximum =
+      liveShellWidth === null
+        ? unmeasuredSidePanelMaxWidth
+        : Math.max(
+            normalizedSidePanelMinWidth,
+            liveShellWidth -
+              liveSidebarWidth -
+              normalizedSidePanelMinMainWidth,
+          );
+    const maximum = Math.min(
+      normalizedSidePanelMaxWidth,
+      liveResponsiveMaximum,
+    );
+    return clampShellTrack(
+      nextWidth,
+      normalizedSidePanelMinWidth,
+      maximum,
+    );
+  };
+  const commitResolvedSidePanelWidth = (normalizedWidth: number) => {
+    if (!sidePanelWidthIsControlled) {
+      setInternalSidePanelWidth(normalizedWidth);
+    }
+    onSidePanelWidthChange?.(normalizedWidth);
+    return normalizedWidth;
+  };
+  const commitSidePanelWidth = (nextWidth: number) =>
+    commitResolvedSidePanelWidth(resolveSidePanelWidth(nextWidth));
+  const handleSidePanelResizePointerDown = (
+    event: ReactPointerEvent<HTMLDivElement>,
+  ) => {
+    if (event.button !== 0) return;
+    const direction =
+      getComputedStyle(shellRef.current ?? event.currentTarget).direction ===
+      "rtl"
+        ? 1
+        : -1;
+    sidePanelResizeSessionRef.current = {
+      direction,
+      lastWidth: resolvedSidePanelWidth,
+      originClientX: event.clientX,
+      originWidth: resolvedSidePanelWidth,
+      pointerId: event.pointerId,
+    };
+    event.currentTarget.setPointerCapture?.(event.pointerId);
+    setSidePanelResizing(true);
+    event.preventDefault();
+  };
+  const handleSidePanelResizePointerMove = (
+    event: ReactPointerEvent<HTMLDivElement>,
+  ) => {
+    const session = sidePanelResizeSessionRef.current;
+    if (!session || session.pointerId !== event.pointerId) return;
+    const nextWidth = resolveSidePanelWidth(
+      session.originWidth +
+        (event.clientX - session.originClientX) * session.direction,
+    );
+    if (nextWidth === session.lastWidth) return;
+    session.lastWidth = commitResolvedSidePanelWidth(nextWidth);
+  };
+  const finishSidePanelResize = (
+    event: ReactPointerEvent<HTMLDivElement>,
+  ) => {
+    const session = sidePanelResizeSessionRef.current;
+    if (!session || session.pointerId !== event.pointerId) return;
+    if (event.currentTarget.hasPointerCapture?.(event.pointerId)) {
+      event.currentTarget.releasePointerCapture(event.pointerId);
+    }
+    sidePanelResizeSessionRef.current = null;
+    setSidePanelResizing(false);
+  };
+  const handleSidePanelResizeKeyDown = (
+    event: KeyboardEvent<HTMLDivElement>,
+  ) => {
+    const direction =
+      getComputedStyle(shellRef.current ?? event.currentTarget).direction ===
+      "rtl"
+        ? 1
+        : -1;
+    const step = event.shiftKey ? 32 : 8;
+    let nextWidth: number | undefined;
+    if (event.key === "Home") nextWidth = normalizedSidePanelMinWidth;
+    if (event.key === "End") nextWidth = resolvedSidePanelMaxWidth;
+    if (event.key === "ArrowLeft") {
+      nextWidth = resolvedSidePanelWidth - step * direction;
+    }
+    if (event.key === "ArrowRight") {
+      nextWidth = resolvedSidePanelWidth + step * direction;
+    }
+    if (nextWidth === undefined) return;
+    event.preventDefault();
+    const resolvedNextWidth = resolveSidePanelWidth(nextWidth);
+    if (resolvedNextWidth === resolvedSidePanelWidth) return;
+    commitResolvedSidePanelWidth(resolvedNextWidth);
+  };
+  useEffect(() => {
+    if (sidePanelResizerVisible) return;
+    sidePanelResizeSessionRef.current = null;
+    setSidePanelResizing(false);
+  }, [sidePanelResizerVisible]);
   const commitSidebarWidth = (nextWidth: number) => {
     const normalizedWidth = clampShellTrack(
       nextWidth,
@@ -537,6 +846,23 @@ export function AppShell({
       focusFirstInSurface(fallbackSurface);
     };
   }, [sidebarResizerVisible]);
+  useLayoutEffect(() => {
+    if (!sidePanelResizerVisible) return;
+    const resizer = sidePanelResizerRef.current;
+    return () => {
+      const activeElement = document.activeElement;
+      const focusNeedsRestoration =
+        activeElement === resizer ||
+        (sidePanelResizerFocusedRef.current &&
+          activeElement === document.body);
+      if (!resizer || !focusNeedsRestoration) return;
+      sidePanelResizerFocusedRef.current = false;
+      const fallbackSurface = sidePanelOpenRef.current
+        ? sidePanelRef.current
+        : mainRef.current;
+      focusFirstInSurface(fallbackSurface);
+    };
+  }, [sidePanelResizerVisible]);
   const responsiveModalLockRef = useRef<ModalLockHandle | null>(
     null,
   );
@@ -783,7 +1109,10 @@ export function AppShell({
     <div
       className={["codex-ui-app-shell", className].filter(Boolean).join(" ")}
       data-bottom-panel-open={bottomPanelOpen || undefined}
+      data-side-panel-expanded={resolvedSidePanelExpanded || undefined}
       data-side-panel-open={sidePanelOpen || undefined}
+      data-side-panel-resizable={sidePanelResizable || undefined}
+      data-side-panel-resizing={sidePanelResizing || undefined}
       data-sidebar-resizable={sidebarResizable || undefined}
       data-sidebar-resizing={sidebarResizing || undefined}
       data-sidebar-open={sidebarOpen || undefined}
@@ -856,6 +1185,38 @@ export function AppShell({
             {children}
           </SurfaceBlockedContext.Provider>
         </div>
+        {sidePanelResizerVisible ? (
+          <div
+            aria-label={sidePanelResizeLabel}
+            aria-orientation="vertical"
+            aria-valuemax={Math.round(
+              Number.isFinite(resolvedSidePanelMaxWidth)
+                ? resolvedSidePanelMaxWidth
+                : resolvedSidePanelWidth,
+            )}
+            aria-valuemin={Math.round(normalizedSidePanelMinWidth)}
+            aria-valuenow={Math.round(resolvedSidePanelWidth)}
+            aria-valuetext={`${Math.round(resolvedSidePanelWidth)} pixels`}
+            className="codex-ui-app-shell__side-panel-resizer"
+            onBlur={(event) => {
+              if (event.relatedTarget instanceof HTMLElement) {
+                sidePanelResizerFocusedRef.current = false;
+              }
+            }}
+            onFocus={() => {
+              sidePanelResizerFocusedRef.current = true;
+            }}
+            onKeyDown={handleSidePanelResizeKeyDown}
+            onLostPointerCapture={finishSidePanelResize}
+            onPointerCancel={finishSidePanelResize}
+            onPointerDown={handleSidePanelResizePointerDown}
+            onPointerMove={handleSidePanelResizePointerMove}
+            onPointerUp={finishSidePanelResize}
+            ref={sidePanelResizerRef}
+            role="separator"
+            tabIndex={0}
+          />
+        ) : null}
         {onSidePanelOpenChange ? (
           <button
             aria-label="Close workspace panel"
@@ -1037,7 +1398,9 @@ export type WorkspacePanelPlacement = "bottom" | "side";
 export interface WorkspacePanelProps
   extends Omit<HTMLAttributes<HTMLElement>, "children" | "title"> {
   activeTabId: string;
+  actions?: ReactNode;
   emptyState?: ReactNode;
+  expandPanelLabel?: string;
   expanded?: boolean;
   label: string;
   onActiveTabChange: (id: string) => void;
@@ -1047,13 +1410,17 @@ export interface WorkspacePanelProps
   onOpenTab?: () => void;
   openTabLabel?: string;
   placement?: WorkspacePanelPlacement;
+  restorePanelLabel?: string;
   tabs: readonly WorkspacePanelTab[];
+  tabsLabel?: string;
 }
 
 export function WorkspacePanel({
   activeTabId,
+  actions,
   className,
   emptyState = "No open tabs",
+  expandPanelLabel = "Expand panel",
   expanded = false,
   label,
   onActiveTabChange,
@@ -1063,8 +1430,10 @@ export function WorkspacePanel({
   onOpenTab,
   openTabLabel = "Open panel tab",
   placement = "side",
+  restorePanelLabel = "Restore panel",
   style,
   tabs,
+  tabsLabel,
   ...props
 }: WorkspacePanelProps) {
   const panelId = useId();
@@ -1159,7 +1528,7 @@ export function WorkspacePanel({
     >
       <header className="codex-ui-workspace-panel__header">
         <div
-          aria-label={`${label} tabs`}
+          aria-label={tabsLabel ?? `${label} tabs`}
           aria-orientation="horizontal"
           className="codex-ui-workspace-panel__tabs"
           role="tablist"
@@ -1189,6 +1558,7 @@ export function WorkspacePanel({
           })}
         </div>
         <div className="codex-ui-workspace-panel__actions">
+          {actions}
           {onCloseTab && activeTab ? (
             <IconButton
               icon={<CloseIcon />}
@@ -1214,7 +1584,9 @@ export function WorkspacePanel({
           {onExpandedChange ? (
             <IconButton
               icon={<ExpandIcon expanded={expanded} />}
-              label={expanded ? "Restore panel" : "Expand panel"}
+              label={
+                expanded ? restorePanelLabel : expandPanelLabel
+              }
               onClick={() => onExpandedChange(!expanded)}
               pressed={expanded}
               size="toolbar"

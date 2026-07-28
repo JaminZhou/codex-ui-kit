@@ -8,7 +8,7 @@ import {
   screen,
   waitFor,
 } from "@testing-library/react";
-import { useState } from "react";
+import { useState, type CSSProperties } from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import {
   AppShell,
@@ -239,6 +239,446 @@ describe("application shell", () => {
         sidebar={<button type="button">Projects</button>}
         sidebarOpen={false}
         sidebarResizable
+      >
+        <button type="button">Conversation action</button>
+      </AppShell>,
+    );
+
+    expect(document.activeElement).toBe(
+      screen.getByRole("button", { name: "Conversation action" }),
+    );
+  });
+
+  it("exposes a measured, pointer-resizable workspace track", () => {
+    const onSidePanelWidthChange = vi.fn();
+    const { container } = render(
+      <AppShell
+        defaultSidePanelWidth={370}
+        layoutMode="wide"
+        onSidePanelWidthChange={onSidePanelWidthChange}
+        sidePanel={<button type="button">Review files</button>}
+        sidePanelMaxWidth={554}
+        sidePanelOpen
+        sidePanelResizable
+      >
+        Thread
+      </AppShell>,
+    );
+
+    const shell = container.querySelector(
+      ".codex-ui-app-shell",
+    ) as HTMLDivElement;
+    const separator = screen.getByRole("separator", {
+      name: "Resize workspace panel",
+    });
+
+    expect(separator.getAttribute("aria-orientation")).toBe("vertical");
+    expect(separator.getAttribute("aria-valuemin")).toBe("320");
+    expect(separator.getAttribute("aria-valuemax")).toBe("554");
+    expect(separator.getAttribute("aria-valuenow")).toBe("370");
+
+    fireEvent.pointerDown(separator, {
+      button: 0,
+      clientX: 810,
+      pointerId: 17,
+    });
+    expect(shell.hasAttribute("data-side-panel-resizing")).toBe(true);
+    fireEvent.pointerMove(separator, { clientX: 710, pointerId: 17 });
+    expect(separator.getAttribute("aria-valuenow")).toBe("470");
+    expect(
+      shell.style.getPropertyValue("--codex-ui-app-side-panel-width"),
+    ).toBe("470px");
+
+    fireEvent.pointerMove(separator, { clientX: -1_000, pointerId: 17 });
+    expect(separator.getAttribute("aria-valuenow")).toBe("554");
+    fireEvent.pointerMove(separator, { clientX: -1_200, pointerId: 17 });
+    fireEvent.pointerMove(separator, { clientX: 2_000, pointerId: 17 });
+    expect(separator.getAttribute("aria-valuenow")).toBe("320");
+    fireEvent.pointerMove(separator, { clientX: 2_200, pointerId: 17 });
+    fireEvent.pointerUp(separator, { clientX: 2_000, pointerId: 17 });
+
+    expect(shell.hasAttribute("data-side-panel-resizing")).toBe(false);
+    expect(onSidePanelWidthChange).toHaveBeenCalledTimes(3);
+    expect(onSidePanelWidthChange).toHaveBeenLastCalledWith(320);
+  });
+
+  it("supports workspace keyboard resizing and omits its handle in overlays", () => {
+    const { container, rerender } = render(
+      <AppShell
+        layoutMode="wide"
+        sidePanel="Review"
+        sidePanelMaxWidth={554}
+        sidePanelOpen
+        sidePanelResizable
+      >
+        Thread
+      </AppShell>,
+    );
+
+    const separator = screen.getByRole("separator", {
+      name: "Resize workspace panel",
+    });
+    fireEvent.keyDown(separator, { key: "ArrowLeft" });
+    expect(separator.getAttribute("aria-valuenow")).toBe("378");
+    fireEvent.keyDown(separator, { key: "ArrowRight", shiftKey: true });
+    expect(separator.getAttribute("aria-valuenow")).toBe("346");
+    fireEvent.keyDown(separator, { key: "End" });
+    expect(separator.getAttribute("aria-valuenow")).toBe("554");
+    fireEvent.keyDown(separator, { key: "Home" });
+    expect(separator.getAttribute("aria-valuenow")).toBe("320");
+    fireEvent.pointerDown(separator, {
+      button: 0,
+      clientX: 860,
+      pointerId: 18,
+    });
+    expect(
+      container
+        .querySelector(".codex-ui-app-shell")
+        ?.hasAttribute("data-side-panel-resizing"),
+    ).toBe(true);
+
+    rerender(
+      <AppShell
+        layoutMode="medium"
+        sidePanel="Review"
+        sidePanelMaxWidth={554}
+        sidePanelOpen
+        sidePanelResizable
+      >
+        Thread
+      </AppShell>,
+    );
+
+    expect(
+      screen.queryByRole("separator", {
+        name: "Resize workspace panel",
+      }),
+    ).toBeNull();
+    expect(
+      container
+        .querySelector(".codex-ui-app-shell")
+        ?.hasAttribute("data-side-panel-resizing"),
+    ).toBe(false);
+  });
+
+  it("keeps an unmeasured unbounded workspace width finite", () => {
+    const onSidePanelWidthChange = vi.fn();
+    const { container } = render(
+      <AppShell
+        layoutMode="wide"
+        onSidePanelWidthChange={onSidePanelWidthChange}
+        sidePanel="Review"
+        sidePanelOpen
+        sidePanelResizable
+      >
+        Thread
+      </AppShell>,
+    );
+
+    const separator = screen.getByRole("separator", {
+      name: "Resize workspace panel",
+    });
+    expect(separator.getAttribute("aria-valuemax")).toBe("370");
+    expect(separator.getAttribute("aria-valuenow")).toBe("370");
+    fireEvent.keyDown(separator, { key: "End" });
+    expect(onSidePanelWidthChange).not.toHaveBeenCalled();
+    expect(
+      (
+        container.querySelector(
+          ".codex-ui-app-shell",
+        ) as HTMLDivElement
+      ).style.getPropertyValue("--codex-ui-app-side-panel-width"),
+    ).toBe("370px");
+  });
+
+  it("keeps a measured main track while resolving the workspace maximum", () => {
+    let resizeShell: ((width: number) => void) | undefined;
+    let resizeSidebar: ((width: number) => void) | undefined;
+    class ResizeObserverMock {
+      constructor(
+        private readonly callback: ResizeObserverCallback,
+      ) {}
+
+      disconnect() {}
+
+      observe(target: Element) {
+        const resize = (width: number) =>
+          this.callback(
+            [
+              {
+                contentRect: { width },
+                target,
+              } as ResizeObserverEntry,
+            ],
+            this as unknown as ResizeObserver,
+          );
+        if (target.classList.contains("codex-ui-app-shell")) {
+          resizeShell = resize;
+        } else if (
+          target.classList.contains("codex-ui-app-shell__sidebar")
+        ) {
+          resizeSidebar = resize;
+        }
+      }
+
+      unobserve() {}
+    }
+    vi.stubGlobal("ResizeObserver", ResizeObserverMock);
+
+    render(
+      <AppShell
+        layoutMode="wide"
+        sidePanel="Review"
+        sidePanelOpen
+        sidePanelResizable
+        sidebar="Navigation"
+        sidebarOpen
+        style={
+          {
+            "--codex-ui-app-sidebar-width": "400px",
+          } as CSSProperties
+        }
+      >
+        Thread
+      </AppShell>,
+    );
+
+    act(() => resizeShell?.(1_180));
+    const separator = screen.getByRole("separator", {
+      name: "Resize workspace panel",
+    });
+    expect(separator.getAttribute("aria-valuemax")).toBe("554");
+    expect(separator.getAttribute("aria-valuenow")).toBe("370");
+
+    const sidebarElement = screen.getByRole("complementary", {
+      name: "App navigation",
+    });
+    const sidebarRect = vi
+      .spyOn(sidebarElement, "getBoundingClientRect")
+      .mockReturnValue(new DOMRect(0, 0, 400, 820));
+    act(() => resizeSidebar?.(399));
+    expect(separator.getAttribute("aria-valuemax")).toBe("428");
+    sidebarRect.mockRestore();
+
+    act(() => resizeSidebar?.(274));
+    act(() => resizeShell?.(1_480));
+    expect(separator.getAttribute("aria-valuemax")).toBe("854");
+    fireEvent.keyDown(separator, { key: "End" });
+    expect(separator.getAttribute("aria-valuenow")).toBe("854");
+
+    act(() => resizeShell?.(800));
+    expect(separator.getAttribute("aria-valuemax")).toBe("320");
+    expect(separator.getAttribute("aria-valuenow")).toBe("320");
+  });
+
+  it("uses the shell content box for live workspace clamping", () => {
+    let resizeShell: ((width: number) => void) | undefined;
+    class ResizeObserverMock {
+      constructor(
+        private readonly callback: ResizeObserverCallback,
+      ) {}
+
+      disconnect() {}
+
+      observe(target: Element) {
+        if (!target.classList.contains("codex-ui-app-shell")) return;
+        resizeShell = (width: number) =>
+          this.callback(
+            [
+              {
+                contentRect: { width },
+                target,
+              } as ResizeObserverEntry,
+            ],
+            this as unknown as ResizeObserver,
+          );
+      }
+
+      unobserve() {}
+    }
+    vi.stubGlobal("ResizeObserver", ResizeObserverMock);
+    const onSidePanelWidthChange = vi.fn();
+    const { container } = render(
+      <AppShell
+        layoutMode="wide"
+        onSidePanelWidthChange={onSidePanelWidthChange}
+        sidePanel="Review"
+        sidePanelOpen
+        sidePanelResizable
+        style={{
+          borderLeft: "4px solid transparent",
+          borderRight: "4px solid transparent",
+          paddingLeft: "20px",
+          paddingRight: "20px",
+        }}
+      >
+        Thread
+      </AppShell>,
+    );
+
+    const shell = container.querySelector(
+      ".codex-ui-app-shell",
+    ) as HTMLDivElement;
+    vi.spyOn(shell, "getBoundingClientRect").mockReturnValue(
+      new DOMRect(0, 0, 1_228, 820),
+    );
+    act(() => resizeShell?.(1_180));
+    const separator = screen.getByRole("separator", {
+      name: "Resize workspace panel",
+    });
+    expect(separator.getAttribute("aria-valuemax")).toBe("828");
+
+    fireEvent.pointerDown(separator, {
+      button: 0,
+      clientX: 810,
+      pointerId: 23,
+    });
+    fireEvent.pointerMove(separator, { clientX: -1_000, pointerId: 23 });
+    fireEvent.pointerMove(separator, { clientX: -1_200, pointerId: 23 });
+
+    expect(separator.getAttribute("aria-valuenow")).toBe("828");
+    expect(onSidePanelWidthChange).toHaveBeenCalledTimes(1);
+    expect(onSidePanelWidthChange).toHaveBeenLastCalledWith(828);
+  });
+
+  it("lets an expanded workspace panel consume the available main track", () => {
+    let resizeShell: ((width: number) => void) | undefined;
+    let resizeSidebar: ((width: number) => void) | undefined;
+    class ResizeObserverMock {
+      constructor(
+        private readonly callback: ResizeObserverCallback,
+      ) {}
+
+      disconnect() {}
+
+      observe(target: Element) {
+        const resize = (width: number) =>
+          this.callback(
+            [
+              {
+                contentRect: { width },
+                target,
+              } as ResizeObserverEntry,
+            ],
+            this as unknown as ResizeObserver,
+          );
+        if (target.classList.contains("codex-ui-app-shell")) {
+          resizeShell = resize;
+        } else if (
+          target.classList.contains("codex-ui-app-shell__sidebar")
+        ) {
+          resizeSidebar = resize;
+        }
+      }
+
+      unobserve() {}
+    }
+    vi.stubGlobal("ResizeObserver", ResizeObserverMock);
+
+    const { container, rerender } = render(
+      <AppShell
+        layoutMode="wide"
+        sidePanel="Review"
+        sidePanelExpanded
+        sidePanelOpen
+        sidebar="Navigation"
+        sidebarOpen
+        style={
+          {
+            "--codex-ui-app-sidebar-width": "400px",
+          } as CSSProperties
+        }
+      >
+        Thread
+      </AppShell>,
+    );
+
+    act(() => resizeShell?.(1_180));
+    const shell = container.querySelector(
+      ".codex-ui-app-shell",
+    ) as HTMLDivElement;
+    expect(
+      shell.style.getPropertyValue("--codex-ui-app-side-panel-width"),
+    ).toBe("906px");
+    expect(shell.hasAttribute("data-side-panel-expanded")).toBe(true);
+    expect(
+      screen.queryByRole("separator", {
+        name: "Resize workspace panel",
+      }),
+    ).toBeNull();
+
+    act(() => resizeSidebar?.(400));
+    expect(
+      shell.style.getPropertyValue("--codex-ui-app-side-panel-width"),
+    ).toBe("780px");
+
+    rerender(
+      <AppShell
+        layoutMode="wide"
+        sidePanel="Review"
+        sidePanelOpen
+        sidePanelResizable
+        sidebar="Navigation"
+        sidebarOpen
+        style={
+          {
+            "--codex-ui-app-sidebar-width": "400px",
+          } as CSSProperties
+        }
+      >
+        Thread
+      </AppShell>,
+    );
+    expect(
+      shell.style.getPropertyValue("--codex-ui-app-side-panel-width"),
+    ).toBe("370px");
+    expect(shell.hasAttribute("data-side-panel-expanded")).toBe(false);
+
+    rerender(
+      <AppShell
+        layoutMode="wide"
+        sidePanel="Review"
+        sidePanelExpanded
+        sidePanelOpen={false}
+        sidePanelResizable
+        sidebar="Navigation"
+        sidebarOpen
+        style={
+          {
+            "--codex-ui-app-sidebar-width": "400px",
+          } as CSSProperties
+        }
+      >
+        Thread
+      </AppShell>,
+    );
+    expect(shell.hasAttribute("data-side-panel-expanded")).toBe(false);
+  });
+
+  it("restores focus before a controlled host removes the workspace separator", () => {
+    const { rerender } = render(
+      <AppShell
+        layoutMode="wide"
+        sidePanel={<button type="button">Review files</button>}
+        sidePanelOpen
+        sidePanelResizable
+      >
+        <button type="button">Conversation action</button>
+      </AppShell>,
+    );
+
+    const separator = screen.getByRole("separator", {
+      name: "Resize workspace panel",
+    });
+    separator.focus();
+    expect(document.activeElement).toBe(separator);
+
+    rerender(
+      <AppShell
+        layoutMode="wide"
+        sidePanel={<button type="button">Review files</button>}
+        sidePanelOpen={false}
+        sidePanelResizable
       >
         <button type="button">Conversation action</button>
       </AppShell>,
@@ -2034,6 +2474,7 @@ describe("workspace panel", () => {
     const onOpenTab = vi.fn();
     render(
       <WorkspacePanel
+        actions={<button type="button">Open in browser</button>}
         activeTabId="sources"
         label="Workspace"
         onActiveTabChange={onActiveTabChange}
@@ -2041,6 +2482,7 @@ describe("workspace panel", () => {
         onCloseTab={onCloseTab}
         onExpandedChange={onExpandedChange}
         onOpenTab={onOpenTab}
+        tabsLabel="Workspace view"
         tabs={[
           { content: "Source content", id: "sources", label: "Sources" },
           { content: "Review content", id: "review", label: "Review" },
@@ -2054,6 +2496,12 @@ describe("workspace panel", () => {
       ),
     ).toBe("true");
     expect(screen.getByRole("tabpanel").textContent).toBe("Source content");
+    expect(
+      screen.getByRole("tablist", { name: "Workspace view" }),
+    ).toBeTruthy();
+    expect(
+      screen.getByRole("button", { name: "Open in browser" }),
+    ).toBeTruthy();
 
     const sourceTab = screen.getByRole("tab", { name: "Sources" });
     const reviewTab = screen.getByRole("tab", { name: "Review" });

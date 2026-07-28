@@ -160,9 +160,8 @@
 }
 
 .codex-ui-app-shell[data-side-panel-open] .codex-ui-app-shell__layout {
-  --codex-ui-app-shell-side-panel-track: min(
-    var(--codex-ui-app-side-panel-width),
-    42cqw
+  --codex-ui-app-shell-side-panel-track: var(
+    --codex-ui-app-side-panel-width
   );
 }
 
@@ -238,6 +237,52 @@
 
 .codex-ui-app-shell[data-sidebar-resizing],
 .codex-ui-app-shell[data-sidebar-resizing] * {
+  cursor: col-resize !important;
+  user-select: none !important;
+}
+
+.codex-ui-app-shell__side-panel-resizer {
+  background: transparent;
+  cursor: col-resize;
+  inset-block-end: var(--codex-ui-app-shell-bottom-panel-track);
+  inset-block-start: 0;
+  inset-inline-end: var(--codex-ui-app-shell-side-panel-track);
+  outline: none;
+  position: absolute;
+  touch-action: none;
+  transform: translateX(50%);
+  width: 1rem;
+  z-index: 65;
+}
+
+.codex-ui-app-shell__side-panel-resizer::after {
+  background: transparent;
+  content: "";
+  inset-block: 0;
+  inset-inline-start: calc(50% - 0.5px);
+  position: absolute;
+  transition: background-color var(--codex-ui-transition-fast);
+  width: 1px;
+}
+
+.codex-ui-app-shell__side-panel-resizer:hover::after,
+.codex-ui-app-shell__side-panel-resizer:focus-visible::after,
+.codex-ui-app-shell[data-side-panel-resizing]
+  .codex-ui-app-shell__side-panel-resizer::after {
+  background: var(--codex-ui-focus);
+}
+
+.codex-ui-app-shell__side-panel-resizer:focus-visible {
+  box-shadow: inset 0 0 0 2px
+    color-mix(in srgb, var(--codex-ui-focus) 55%, transparent);
+}
+
+.codex-ui-app-shell__side-panel-resizer:dir(rtl) {
+  transform: translateX(-50%);
+}
+
+.codex-ui-app-shell[data-side-panel-resizing],
+.codex-ui-app-shell[data-side-panel-resizing] * {
   cursor: col-resize !important;
   user-select: none !important;
 }
@@ -8738,6 +8783,24 @@ button.codex-ui-generated-image-gallery__image {
   width: 100%;
 }
 
+.codex-ui-pull-request-list__item[data-has-indicator] {
+  grid-template-columns: auto minmax(0, 1fr);
+}
+
+.codex-ui-pull-request-list__indicator {
+  align-items: center;
+  color: var(--codex-ui-text-secondary);
+  display: inline-flex;
+  grid-row: 1 / span 3;
+  justify-content: center;
+  min-height: 1.25rem;
+}
+
+.codex-ui-pull-request-list__item[data-has-indicator]
+  > :not(.codex-ui-pull-request-list__indicator) {
+  grid-column: 2;
+}
+
 .codex-ui-pull-request-list__item:hover {
   background: var(--codex-ui-background-elevated-secondary);
 }
@@ -8861,7 +8924,7 @@ button.codex-ui-generated-image-gallery__image {
   gap: 0.5rem;
 }
 
-.codex-ui-pull-request-details h2 {
+.codex-ui-pull-request-details__title {
   font-size: var(--codex-ui-font-size-lg);
   line-height: 1.35;
   margin: 0.5rem 0 0.375rem;
@@ -8908,6 +8971,143 @@ button.codex-ui-generated-image-gallery__image {
   gap: 1rem;
   margin-block-start: 1rem;
   min-width: 0;
+}
+
+.codex-ui-pull-request-panel-summary {
+  color: var(--codex-ui-text);
+  font-family: var(--codex-ui-font-sans);
+  min-width: 0;
+  padding: 1rem 1.75rem 2rem;
+}
+
+.codex-ui-pull-request-panel-summary__identity,
+.codex-ui-pull-request-panel-summary__description > header {
+  align-items: flex-start;
+  display: flex;
+  gap: 0.75rem;
+  justify-content: space-between;
+  min-width: 0;
+}
+
+.codex-ui-pull-request-panel-summary__identity > div:first-child {
+  min-width: 0;
+}
+
+.codex-ui-pull-request-panel-summary__identity h1 {
+  font-size: 1.375rem;
+  line-height: 1.35;
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.codex-ui-pull-request-panel-summary__meta {
+  align-items: center;
+  color: var(--codex-ui-text-secondary);
+  display: flex;
+  flex-wrap: wrap;
+  font-size: var(--codex-ui-font-size-sm);
+  gap: 0.375rem;
+  margin-top: 0.25rem;
+}
+
+.codex-ui-pull-request-panel-summary__action {
+  flex: 0 0 auto;
+}
+
+.codex-ui-pull-request-panel-summary__facts {
+  display: grid;
+  gap: 0.625rem;
+  margin: 1.75rem 0 0;
+}
+
+.codex-ui-pull-request-panel-summary__facts > div {
+  align-items: baseline;
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: minmax(6.5rem, 7.5rem) minmax(0, 1fr);
+}
+
+.codex-ui-pull-request-panel-summary__facts dt,
+.codex-ui-pull-request-panel-summary__facts dd {
+  margin: 0;
+  min-width: 0;
+}
+
+.codex-ui-pull-request-panel-summary__facts dt {
+  align-items: center;
+  color: var(--codex-ui-text-secondary);
+  display: flex;
+  font-size: var(--codex-ui-font-size-sm);
+  gap: 0.5rem;
+}
+
+.codex-ui-pull-request-panel-summary__facts dd {
+  font-size: var(--codex-ui-font-size-sm);
+  overflow-wrap: anywhere;
+}
+
+.codex-ui-pull-request-panel-summary__indicator {
+  align-items: center;
+  color: var(--codex-ui-text-tertiary);
+  display: inline-flex;
+  flex: 0 0 1rem;
+  justify-content: center;
+  width: 1rem;
+}
+
+.codex-ui-pull-request-panel-summary__facts [data-tone="success"] dd,
+.codex-ui-pull-request-panel-summary__facts [data-tone="success"]
+  .codex-ui-pull-request-panel-summary__indicator {
+  color: var(--codex-ui-text-success);
+}
+
+.codex-ui-pull-request-panel-summary__facts [data-tone="danger"] dd,
+.codex-ui-pull-request-panel-summary__facts [data-tone="danger"]
+  .codex-ui-pull-request-panel-summary__indicator {
+  color: var(--codex-ui-text-error);
+}
+
+.codex-ui-pull-request-panel-summary__facts [data-tone="warning"] dd,
+.codex-ui-pull-request-panel-summary__facts [data-tone="warning"]
+  .codex-ui-pull-request-panel-summary__indicator {
+  color: var(--codex-ui-text-warning);
+}
+
+.codex-ui-pull-request-panel-summary__facts [data-tone="muted"] dd {
+  color: var(--codex-ui-text-secondary);
+}
+
+.codex-ui-pull-request-panel-summary__description,
+.codex-ui-pull-request-panel-summary__checks {
+  border-block-end: 1px solid var(--codex-ui-border-light);
+  margin-top: 2.5rem;
+  padding-bottom: 1rem;
+}
+
+.codex-ui-pull-request-panel-summary__description > header {
+  align-items: center;
+  border-block-end: 1px solid var(--codex-ui-border-light);
+  padding-bottom: 0.75rem;
+}
+
+.codex-ui-pull-request-panel-summary__description h2,
+.codex-ui-pull-request-panel-summary__checks > h2 {
+  font-size: var(--codex-ui-font-size-md);
+  font-weight: var(--codex-ui-font-weight-medium);
+  margin: 0;
+}
+
+.codex-ui-pull-request-panel-summary__description > div {
+  line-height: 1.5;
+  padding-top: 0.75rem;
+}
+
+.codex-ui-pull-request-panel-summary__checks > h2 {
+  padding-bottom: 0.75rem;
+}
+
+.codex-ui-pull-request-panel-summary__comment {
+  margin-top: 1rem;
 }
 
 .codex-ui-pull-request-checks,

@@ -15,6 +15,12 @@ const currentBuildMultiFileReferenceSize = {
   height: 820,
   width: 906,
 };
+const currentBuildPullRequestReference =
+  process.env.CODEX_UI_KIT_PULL_REQUEST_REFERENCE;
+const currentBuildPullRequestReferenceSize = {
+  height: 820,
+  width: 906,
+};
 await mkdir(baselineDirectory, { recursive: true });
 await mkdir(artifactDirectory, { recursive: true });
 
@@ -207,6 +213,104 @@ for (const scene of visualScenes) {
         conversation: conversationComparison.ratio,
         full: comparison.ratio,
         review: reviewComparison.ratio,
+      })}`,
+    );
+  }
+
+  if (scene.id === "pull-request-detail" && currentBuildPullRequestReference) {
+    const reference = PNG.sync.read(
+      await readFile(currentBuildPullRequestReference),
+    );
+    if (
+      reference.width !== currentBuildPullRequestReferenceSize.width ||
+      reference.height !== currentBuildPullRequestReferenceSize.height
+    ) {
+      throw new Error(
+        `${scene.id}: current-build reference must be exactly ${currentBuildPullRequestReferenceSize.width}x${currentBuildPullRequestReferenceSize.height}, received ${reference.width}x${reference.height}.`,
+      );
+    }
+    if (
+      actual.height !== reference.height ||
+      actual.width < reference.width
+    ) {
+      throw new Error(
+        `${scene.id}: current-build reference ${reference.width}x${reference.height} cannot be aligned to ${actual.width}x${actual.height}.`,
+      );
+    }
+    const main = cropPng(
+      actual,
+      actual.width - reference.width,
+      0,
+      reference.width,
+      reference.height,
+    );
+    const currentBuildActualPath = join(
+      artifactDirectory,
+      `${scene.id}.current-build.png`,
+    );
+    const currentBuildDiffPath = join(
+      artifactDirectory,
+      `${scene.id}.current-build.diff.png`,
+    );
+    await writeFile(currentBuildActualPath, PNG.sync.write(main));
+
+    const comparison = comparePng(reference, main);
+    if (comparison.pixels > 0) {
+      await writeFile(
+        currentBuildDiffPath,
+        PNG.sync.write(comparison.diff),
+      );
+    }
+
+    const split = 353;
+    const indexComparison = comparePng(
+      cropPng(reference, 0, 0, split, reference.height),
+      cropPng(main, 0, 0, split, reference.height),
+    );
+    const detailComparison = comparePng(
+      cropPng(
+        reference,
+        split,
+        0,
+        reference.width - split,
+        reference.height,
+      ),
+      cropPng(main, split, 0, reference.width - split, reference.height),
+    );
+    const maximumRatio = environmentRatio(
+      "CODEX_UI_KIT_PULL_REQUEST_MAX_DIFF_RATIO",
+      0.065,
+    );
+    const maximumIndexRatio = environmentRatio(
+      "CODEX_UI_KIT_PULL_REQUEST_INDEX_MAX_DIFF_RATIO",
+      0.055,
+    );
+    const maximumDetailRatio = environmentRatio(
+      "CODEX_UI_KIT_PULL_REQUEST_DETAIL_MAX_DIFF_RATIO",
+      0.07,
+    );
+    if (
+      comparison.ratio > maximumRatio ||
+      indexComparison.ratio > maximumIndexRatio ||
+      detailComparison.ratio > maximumDetailRatio
+    ) {
+      throw new Error(
+        `${scene.id}: current-build pixel ratios ${JSON.stringify({
+          detail: detailComparison.ratio,
+          full: comparison.ratio,
+          index: indexComparison.ratio,
+        })} exceed ${JSON.stringify({
+          detail: maximumDetailRatio,
+          full: maximumRatio,
+          index: maximumIndexRatio,
+        })}.`,
+      );
+    }
+    console.log(
+      `${scene.id}: current-build pixel ratios ${JSON.stringify({
+        detail: detailComparison.ratio,
+        full: comparison.ratio,
+        index: indexComparison.ratio,
       })}`,
     );
   }
