@@ -51,6 +51,23 @@ The third slice extends the file workflow to the current multi-file shape:
 - wide and real 800×600 Electron split geometry;
 - an optional external current-build main-only pixel comparison.
 
+## Fourth vertical slice
+
+The fourth slice makes the shell and Review workspace resilient under load:
+
+- a 16px navigation separator measured from the current desktop build;
+- pointer resizing plus accessible Arrow/Home/End keyboard control;
+- 240–520px navigation clamps, exercised through CDP and a real
+  `BrowserWindow`;
+- an eight-file, 96-line protocol trace whose Review panel overflows
+  internally;
+- exact last-file reveal in CDP and Electron without horizontal overflow;
+- a thirteenth reviewed pixel-regression frame for the large Review state.
+
+The current-build observation establishes application-navigation resizing. It
+does not claim that the independent Review side panel is resizable; that
+behavior still needs separate runtime evidence.
+
 ## Development
 
 From the repository root:

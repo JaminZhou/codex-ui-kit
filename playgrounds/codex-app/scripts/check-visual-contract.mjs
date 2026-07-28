@@ -106,9 +106,10 @@ for (const scene of visualScenes) {
   );
   const ratio = pixels / (actual.width * actual.height);
   if (pixels > 0) await writeFile(diffPath, PNG.sync.write(diff));
-  if (ratio > 0.0025) {
+  const maximumRatio = scene.maxPixelRatio ?? 0.0025;
+  if (ratio > maximumRatio) {
     throw new Error(
-      `${scene.id}: pixel drift ${(ratio * 100).toFixed(4)}% exceeds 0.25%.`,
+      `${scene.id}: pixel drift ${(ratio * 100).toFixed(4)}% exceeds ${(maximumRatio * 100).toFixed(2)}%.`,
     );
   }
 

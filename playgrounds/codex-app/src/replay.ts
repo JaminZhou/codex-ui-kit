@@ -1,5 +1,6 @@
 import compactionTrace from "../fixtures/traces/compaction.jsonl?raw";
 import interruptionTrace from "../fixtures/traces/interruption.jsonl?raw";
+import largeFileReviewTrace from "../fixtures/traces/large-file-review.jsonl?raw";
 import multiFileReviewTrace from "../fixtures/traces/multi-file-review.jsonl?raw";
 import recoveryTrace from "../fixtures/traces/streaming-recovery.jsonl?raw";
 import workflowTrace from "../fixtures/traces/workspace-workflow.jsonl?raw";
@@ -9,6 +10,7 @@ export type ReplayScenarioId =
   | "streaming-recovery"
   | "interruption"
   | "compaction"
+  | "large-file-review"
   | "multi-file-review"
   | "workspace-workflow";
 
@@ -82,6 +84,12 @@ export const replayScenarios: Record<ReplayScenarioId, ReplayScenario> = {
     "Command to review",
     "Command execution, approval, file change, and the Review panel.",
     workflowTrace,
+  ),
+  "large-file-review": scenario(
+    "large-file-review",
+    "Large Review workspace",
+    "Eight files and long diffs exercise panel scrolling and exact file reveal.",
+    largeFileReviewTrace,
   ),
 };
 

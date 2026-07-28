@@ -5,10 +5,12 @@ Every deterministic scenario has one ID and produces four evidence layers:
 1. **Protocol** — ordered App Server notifications, server requests, and
    request responses checked against the pinned generated schemas.
 2. **CDP** — DOM identity, computed layout, focus, scrolling, and named-surface
-   geometry.
+   geometry, including the 16px navigation separator and large-Review
+   overflow/reveal contract.
 3. **Electron host** — real `BrowserWindow` bounds, renderer isolation,
-   sidebar interaction, Review-panel close/reopen behavior, and compact
-   800×600 multi-file geometry.
+   pointer and keyboard navigation resizing, Review-panel close/reopen
+   behavior, compact 800×600 multi-file geometry, and an eight-file
+   scroll-to-selection flow.
 4. **Pixels** — full-frame regression screenshots after the structural gates
    pass. The multi-file scenario can additionally compare a separately
    captured 906×820 current-build main region through
@@ -27,3 +29,9 @@ The checked-in screenshot baselines guard the integration demo. External
 Codex references remain untracked; their full, conversation, and Review
 region thresholds are enforced separately so a passing internal baseline
 cannot be mistaken for current-build parity.
+
+The 12 standard lifecycle frames keep the 0.25% internal raster limit. The
+large-Review frame uses a scoped 0.40% limit because its 96 dense monospace
+lines amplify macOS text-rasterization differences; CDP and Electron still
+gate file counts, overflow, split geometry, and exact last-file visibility
+independently.

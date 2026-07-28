@@ -424,11 +424,12 @@
       "runtimeEvidence": [
         "cdp:global-sidebar-and-top-controls",
         "cdp:pull-requests-sites-scheduled-plugins-routes",
-        "cdp-26.721:main-shell-landmarks-and-interactive-density"
+        "cdp-26.721:main-shell-landmarks-and-interactive-density",
+        "cdp-26.721:navigation-resizer-16px-pointer-track-240-to-520"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "not_started",
-      "electronStatus": "not_started",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
       "priority": "p0"
     },
     {

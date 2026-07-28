@@ -20,6 +20,7 @@ body,
   overflow: hidden;
 }
 
+.demo-root[data-scenario="large-file-review"],
 .demo-root[data-scenario="multi-file-review"] {
   --codex-ui-app-sidebar-width: 274px;
   --codex-ui-user-message-compact-max-width: 77%;

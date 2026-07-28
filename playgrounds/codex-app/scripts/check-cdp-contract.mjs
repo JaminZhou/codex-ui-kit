@@ -16,7 +16,17 @@ for (const scene of visualScenes) {
         ".codex-ui-conversation-thread-shell__composer-dock",
       );
       const header = document.querySelector(".codex-ui-thread-header");
-      if (!root || !shell || !viewport || !composer || !header) {
+      const sidebarResizer = document.querySelector(
+        '.codex-ui-app-shell__sidebar-resizer[role="separator"]',
+      );
+      if (
+        !root ||
+        !shell ||
+        !viewport ||
+        !composer ||
+        !header ||
+        !sidebarResizer
+      ) {
         throw new Error("Required integration surfaces are missing.");
       }
       const rect = (element) => {
@@ -84,14 +94,31 @@ for (const scene of visualScenes) {
               '.codex-ui-file-review .codex-ui-file-diff[aria-label]',
             )
             ?.getAttribute("aria-label"),
+          scroll: (() => {
+            const element = document.querySelector(".codex-ui-file-review");
+            return element
+              ? {
+                  clientHeight: element.clientHeight,
+                  scrollHeight: element.scrollHeight,
+                  scrollTop: element.scrollTop,
+                }
+              : null;
+          })(),
         },
         rootStatus: root.getAttribute("data-status"),
         scenario: root.getAttribute("data-scenario"),
         shell: shellRect,
         styles: {
           composerPosition: getComputedStyle(composer).position,
+          resizerCursor: getComputedStyle(sidebarResizer).cursor,
           shellDisplay: getComputedStyle(shell).display,
           viewportOverflowY: getComputedStyle(viewport).overflowY,
+        },
+        sidebarResizer: {
+          ariaMax: sidebarResizer.getAttribute("aria-valuemax"),
+          ariaMin: sidebarResizer.getAttribute("aria-valuemin"),
+          ariaNow: sidebarResizer.getAttribute("aria-valuenow"),
+          rect: rect(sidebarResizer),
         },
         viewport: viewportRect,
         workflow: {
@@ -126,6 +153,20 @@ for (const scene of visualScenes) {
     if (contract.styles.viewportOverflowY !== "auto") {
       throw new Error(`${scene.id}: conversation viewport is not scrollable.`);
     }
+    if (
+      contract.styles.resizerCursor !== "col-resize" ||
+      Math.abs(contract.sidebarResizer.rect.width - 16) > 0.5 ||
+      contract.sidebarResizer.ariaMin !== "240" ||
+      contract.sidebarResizer.ariaMax !== "520" ||
+      contract.sidebarResizer.ariaNow !== "274"
+    ) {
+      throw new Error(
+        `${scene.id}: navigation resizer contract failed: ${JSON.stringify({
+          resizer: contract.sidebarResizer,
+          styles: contract.styles,
+        })}`,
+      );
+    }
     for (const surfaceName of scene.surfaces ?? []) {
       const surface = contract.namedSurfaces[surfaceName];
       if (
@@ -151,9 +192,9 @@ for (const scene of visualScenes) {
     if (
       scene.surfaces?.includes("reviewPanel") &&
       (contract.workflow.fileGroupCount !== 1 ||
-        contract.workflow.fileRowCount !== 2 ||
-        contract.review.fileCount !== 2 ||
-        contract.review.diffLabels.length !== 2)
+        contract.workflow.fileRowCount !== (scene.fileCount ?? 2) ||
+        contract.review.fileCount !== (scene.fileCount ?? 2) ||
+        contract.review.diffLabels.length !== (scene.fileCount ?? 2))
     ) {
       throw new Error(
         `${scene.id}: multi-file aggregation contract failed: ${JSON.stringify({
@@ -178,6 +219,52 @@ for (const scene of visualScenes) {
     );
     if (focusContract !== expectedFocus) {
       throw new Error(`${scene.id}: named focus contract failed.`);
+    }
+
+    if (scene.selectPath) {
+      if (
+        !contract.review.scroll ||
+        contract.review.scroll.scrollHeight <=
+          contract.review.scroll.clientHeight
+      ) {
+        throw new Error(
+          `${scene.id}: large Review fixture does not overflow its panel.`,
+        );
+      }
+      await page
+        .getByRole("button", { name: `Open ${scene.selectPath}` })
+        .click();
+      const selectedScroll = await page.evaluate((selectedPath) => {
+        const review = document.querySelector(".codex-ui-file-review");
+        const selected = document.querySelector(
+          '.codex-ui-file-review__file[data-selected]',
+        );
+        if (!review || !selected) return null;
+        const reviewRect = review.getBoundingClientRect();
+        const selectedRect = selected.getBoundingClientRect();
+        return {
+          current:
+            selected.getAttribute("aria-label") ===
+            `Review file ${selectedPath}`,
+          reviewBottom: reviewRect.bottom,
+          reviewTop: reviewRect.top,
+          scrollTop: review.scrollTop,
+          selectedBottom: selectedRect.bottom,
+          selectedTop: selectedRect.top,
+        };
+      }, scene.selectPath);
+      if (
+        !selectedScroll?.current ||
+        selectedScroll.scrollTop <= 0 ||
+        selectedScroll.selectedBottom > selectedScroll.reviewBottom + 1 ||
+        selectedScroll.selectedTop < selectedScroll.reviewTop - 1
+      ) {
+        throw new Error(
+          `${scene.id}: selected long diff was not revealed: ${JSON.stringify(
+            selectedScroll,
+          )}`,
+        );
+      }
     }
 
     await writeFile(

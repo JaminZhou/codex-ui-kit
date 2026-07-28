@@ -635,6 +635,7 @@ export function App() {
         sidePanelOpen={reviewOpen && Boolean(reviewPanel)}
         sidebar={sidebar}
         sidebarOpen={sidebarOpen}
+        sidebarResizable
       >
         <ConversationThreadShell
           composer={composer}

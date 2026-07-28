@@ -1607,6 +1607,7 @@ function Showcase() {
                   </AppSidebar>
                 }
                 sidebarOpen={appSidebarOpen}
+                sidebarResizable
               >
                 <div className="app-shell-preview__conversation">
                   <ThreadHeader

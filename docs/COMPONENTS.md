@@ -100,7 +100,10 @@ All privileged behavior remains host-owned. The components never auto-approve co
   to dismissible overlays before the conversation becomes unusably narrow.
   Hosts that intentionally replace those responsive styles can pass the
   matching `layoutMode` so inert, focus, dismissal, and `aria-hidden`
-  behavior stays aligned with the rendered layout.
+  behavior stays aligned with the rendered layout. `sidebarResizable` adds a
+  current-build measured 16px separator with 240–520px pointer clamps,
+  accessible value metadata, and Arrow/Home/End keyboard control; hosts can
+  use `sidebarWidth` and `onSidebarWidthChange` for controlled persistence.
 - `AppSidebar`, `AppSidebarSection`, and `AppSidebarItem`: grouped primary
   navigation with selected-route state, descriptions, badges, header, and
   footer slots.

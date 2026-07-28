@@ -109,6 +109,146 @@ describe("application shell", () => {
     ).toBeTruthy();
   });
 
+  it("exposes a measured, pointer-resizable navigation track", () => {
+    const onSidebarWidthChange = vi.fn();
+    const { container } = render(
+      <AppShell
+        defaultSidebarWidth={274}
+        layoutMode="wide"
+        onSidebarWidthChange={onSidebarWidthChange}
+        sidebar={<button type="button">Projects</button>}
+        sidebarOpen
+        sidebarResizable
+      >
+        Thread
+      </AppShell>,
+    );
+
+    const shell = container.querySelector(
+      ".codex-ui-app-shell",
+    ) as HTMLDivElement;
+    const separator = screen.getByRole("separator", {
+      name: "Resize navigation sidebar",
+    });
+
+    expect(separator.getAttribute("aria-orientation")).toBe("vertical");
+    expect(separator.getAttribute("aria-valuemin")).toBe("240");
+    expect(separator.getAttribute("aria-valuemax")).toBe("520");
+    expect(separator.getAttribute("aria-valuenow")).toBe("274");
+
+    fireEvent.pointerDown(separator, {
+      button: 0,
+      clientX: 274,
+      pointerId: 7,
+    });
+    expect(shell.hasAttribute("data-sidebar-resizing")).toBe(true);
+    fireEvent.pointerMove(separator, { clientX: 370, pointerId: 7 });
+    expect(separator.getAttribute("aria-valuenow")).toBe("370");
+    expect(shell.style.getPropertyValue("--codex-ui-app-sidebar-width")).toBe(
+      "370px",
+    );
+
+    fireEvent.pointerMove(separator, { clientX: 1_000, pointerId: 7 });
+    expect(separator.getAttribute("aria-valuenow")).toBe("520");
+    fireEvent.pointerMove(separator, { clientX: -1_000, pointerId: 7 });
+    expect(separator.getAttribute("aria-valuenow")).toBe("240");
+    fireEvent.pointerUp(separator, { clientX: -1_000, pointerId: 7 });
+
+    expect(shell.hasAttribute("data-sidebar-resizing")).toBe(false);
+    expect(onSidebarWidthChange).toHaveBeenLastCalledWith(240);
+  });
+
+  it("supports keyboard resizing and omits the handle in narrow overlays", () => {
+    const { container, rerender } = render(
+      <AppShell
+        layoutMode="wide"
+        sidebar="Navigation"
+        sidebarOpen
+        sidebarResizable
+      >
+        Thread
+      </AppShell>,
+    );
+
+    const separator = screen.getByRole("separator", {
+      name: "Resize navigation sidebar",
+    });
+    fireEvent.keyDown(separator, { key: "ArrowRight" });
+    expect(separator.getAttribute("aria-valuenow")).toBe("282");
+    fireEvent.keyDown(separator, { key: "ArrowLeft", shiftKey: true });
+    expect(separator.getAttribute("aria-valuenow")).toBe("250");
+    fireEvent.keyDown(separator, { key: "End" });
+    expect(separator.getAttribute("aria-valuenow")).toBe("520");
+    fireEvent.keyDown(separator, { key: "Home" });
+    expect(separator.getAttribute("aria-valuenow")).toBe("240");
+    fireEvent.pointerDown(separator, {
+      button: 0,
+      clientX: 240,
+      pointerId: 8,
+    });
+    expect(
+      container
+        .querySelector(".codex-ui-app-shell")
+        ?.hasAttribute("data-sidebar-resizing"),
+    ).toBe(true);
+
+    rerender(
+      <AppShell
+        layoutMode="narrow"
+        sidebar="Navigation"
+        sidebarOpen
+        sidebarResizable
+      >
+        Thread
+      </AppShell>,
+    );
+
+    expect(
+      screen.queryByRole("separator", {
+        name: "Resize navigation sidebar",
+      }),
+    ).toBeNull();
+    expect(
+      container
+        .querySelector(".codex-ui-app-shell")
+        ?.hasAttribute("data-sidebar-resizing"),
+    ).toBe(false);
+  });
+
+  it("restores focus before a controlled host removes the resize separator", () => {
+    const { rerender } = render(
+      <AppShell
+        layoutMode="wide"
+        sidebar={<button type="button">Projects</button>}
+        sidebarOpen
+        sidebarResizable
+      >
+        <button type="button">Conversation action</button>
+      </AppShell>,
+    );
+
+    const separator = screen.getByRole("separator", {
+      name: "Resize navigation sidebar",
+    });
+    separator.focus();
+    expect(document.activeElement).toBe(separator);
+
+    rerender(
+      <AppShell
+        layoutMode="wide"
+        sidebar={<button type="button">Projects</button>}
+        sidebarOpen={false}
+        sidebarResizable
+      >
+        <button type="button">Conversation action</button>
+      </AppShell>,
+    );
+
+    expect(document.activeElement).toBe(
+      screen.getByRole("button", { name: "Conversation action" }),
+    );
+  });
+
   it("exposes controlled overlay dismissal", () => {
     const onSidebarOpenChange = vi.fn();
     const onSidePanelOpenChange = vi.fn();
