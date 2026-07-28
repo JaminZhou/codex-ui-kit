@@ -6065,7 +6065,7 @@ summary.codex-ui-activity__header::after {
   padding: 0 0.1875rem;
 }
 
-.codex-ui-code-block__copy svg {
+.codex-ui-code-block__copy-icon {
   fill: none;
   height: 1rem;
   stroke: currentColor;

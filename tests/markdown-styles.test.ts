@@ -39,6 +39,8 @@ describe("Markdown visual contract", () => {
     expect(styles).toContain("text-decoration: underline");
     expect(styles).toContain("min-width: 1.375rem");
     expect(styles).toContain("padding: 0 0.1875rem");
+    expect(styles).toContain(".codex-ui-code-block__copy-icon");
+    expect(styles).not.toContain(".codex-ui-code-block__copy svg");
   });
 
   it("resets only a top-level final code block margin", () => {

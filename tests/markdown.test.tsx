@@ -181,6 +181,21 @@ describe("CodeBlock", () => {
     expect(html).toContain(">Copy source</button>");
   });
 
+  it("does not opt a custom copy SVG into built-in glyph styling", () => {
+    const html = renderToStaticMarkup(
+      <CodeBlock
+        copyLabel={
+          <svg data-custom-copy-icon="true" fill="currentColor" />
+        }
+      >
+        const ready = true;
+      </CodeBlock>,
+    );
+
+    expect(html).toContain('data-custom-copy-icon="true"');
+    expect(html).not.toContain("codex-ui-code-block__copy-icon");
+  });
+
   it("defers highlighting until code is near the viewport", async () => {
     let intersect: IntersectionObserverCallback | undefined;
     const observe = vi.fn();
