@@ -179,10 +179,22 @@ try {
         document.documentElement.scrollWidth -
         document.documentElement.clientWidth,
       main: rect(".codex-ui-app-shell__main"),
+      mainAriaHidden: document
+        .querySelector(".codex-ui-app-shell__main")
+        ?.getAttribute("aria-hidden"),
+      mainInert: document
+        .querySelector(".codex-ui-app-shell__main")
+        ?.hasAttribute("inert"),
       reviewDiffs: document.querySelectorAll(
         ".codex-ui-file-review .codex-ui-file-diff",
       ).length,
       sidePanel: rect(".codex-ui-app-shell__side-panel"),
+      sidePanelAriaHidden: document
+        .querySelector(".codex-ui-app-shell__side-panel")
+        ?.getAttribute("aria-hidden"),
+      sidePanelInert: document
+        .querySelector(".codex-ui-app-shell__side-panel")
+        ?.hasAttribute("inert"),
       sidebar: rect(".codex-ui-app-shell__sidebar"),
     };
   });
@@ -194,6 +206,10 @@ try {
     compactContract.fileGroups !== 1 ||
     compactContract.fileRows !== 2 ||
     compactContract.reviewDiffs !== 2 ||
+    compactContract.mainAriaHidden !== null ||
+    compactContract.mainInert ||
+    compactContract.sidePanelAriaHidden !== "false" ||
+    compactContract.sidePanelInert ||
     !compactContract.sidebar ||
     !compactContract.main ||
     !compactContract.sidePanel ||
@@ -207,6 +223,37 @@ try {
         native: compactNativeState,
         renderer: compactContract,
       })}`,
+    );
+  }
+
+  await compactPage
+    .getByRole("button", { exact: true, name: "Close review" })
+    .click();
+  await compactPage.waitForSelector(
+    ".codex-ui-app-shell:not([data-side-panel-open])",
+  );
+  await compactPage
+    .getByRole("button", {
+      name: "Open .research/ui-kit-multifile-probe/beta.txt",
+    })
+    .click();
+  await compactPage.waitForSelector(
+    '.codex-ui-app-shell[data-side-panel-open] [data-testid="review-panel"]',
+  );
+  if (
+    !(await compactPage
+      .getByRole("list", {
+        name: "Review diff for .research/ui-kit-multifile-probe/alpha.txt",
+      })
+      .isVisible()) ||
+    !(await compactPage
+      .getByRole("list", {
+        name: "Review diff for .research/ui-kit-multifile-probe/beta.txt",
+      })
+      .isVisible())
+  ) {
+    throw new Error(
+      "Compact Electron split did not keep conversation and Review interactive.",
     );
   }
 } finally {

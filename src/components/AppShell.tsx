@@ -169,7 +169,7 @@ function useSurfaceFocusRestoration(
   }, [dismissRef, fallbackRef, open, surfaceRef]);
 }
 
-type AppShellLayoutMode = "narrow" | "medium" | "wide";
+export type AppShellLayoutMode = "narrow" | "medium" | "wide";
 
 // CSS container-query conditions cannot consume custom properties. Keep these
 // internal constants locked to the matching queries in styles.css.
@@ -313,6 +313,7 @@ export interface AppShellProps
   children: ReactNode;
   mainLabel?: string;
   mainRole?: "main" | "region";
+  layoutMode?: AppShellLayoutMode;
   onSidePanelOpenChange?: (open: boolean) => void;
   onSidebarOpenChange?: (open: boolean) => void;
   sidePanel?: ReactNode;
@@ -329,6 +330,7 @@ export function AppShell({
   bottomPanelOpen = Boolean(bottomPanel),
   children,
   className,
+  layoutMode: layoutModeOverride,
   mainLabel = "Conversation",
   mainRole = "main",
   onSidePanelOpenChange,
@@ -348,7 +350,8 @@ export function AppShell({
   const sidebarBackdropRef = useRef<HTMLButtonElement>(null);
   const sidebarRef = useRef<HTMLElement>(null);
   const shellRef = useRef<HTMLDivElement>(null);
-  const layoutMode = useAppShellLayoutMode(shellRef);
+  const automaticLayoutMode = useAppShellLayoutMode(shellRef);
+  const layoutMode = layoutModeOverride ?? automaticLayoutMode;
   const sidebarModalOpen =
     sidebarOpen && layoutMode === "narrow";
   const sidePanelModalOpen =

@@ -617,6 +617,7 @@ export function App() {
       data-status={state.status}
     >
       <AppShell
+        layoutMode="wide"
         onSidebarOpenChange={setSidebarOpen}
         onSidePanelOpenChange={setReviewOpen}
         sidePanel={reviewPanel}
