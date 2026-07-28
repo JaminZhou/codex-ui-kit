@@ -651,7 +651,10 @@ for (const scene of visualScenes) {
         Math.abs(markdown.table.rect.width - 640) > 1 ||
         Math.abs(markdown.table.rect.height - 89) > 1 ||
         Math.abs(markdown.table.rect.left - markdown.root.rect.left) > 1 ||
-        Math.abs(markdown.tableScroll.rect.left - 335) > 1 ||
+        Math.abs(
+          markdown.tableScroll.rect.left -
+            (markdown.root.rect.left - 24),
+        ) > 1 ||
         markdown.inlineCode.fontSize !== "12.88px" ||
         markdown.inlineCode.lineHeight !== "22px" ||
         markdown.inlineCode.padding !== "1px 6px" ||
