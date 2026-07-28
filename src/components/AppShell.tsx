@@ -177,6 +177,22 @@ export type AppShellLayoutMode = "narrow" | "medium" | "wide";
 const appShellMediumBreakpointRem = 92;
 const appShellNarrowBreakpointRem = 52;
 
+function appShellContentBoxWidth(shell: HTMLElement) {
+  const borderBoxWidth = shell.getBoundingClientRect().width;
+  if (borderBoxWidth <= 0) return 0;
+  const style = getComputedStyle(shell);
+  const inlineInsets = [
+    style.borderLeftWidth,
+    style.borderRightWidth,
+    style.paddingLeft,
+    style.paddingRight,
+  ].reduce(
+    (total, value) => total + (Number.parseFloat(value) || 0),
+    0,
+  );
+  return Math.max(0, borderBoxWidth - inlineInsets);
+}
+
 function appShellRemToPixels(shell: HTMLElement, rem: number) {
   const rootFontSize =
     Number.parseFloat(
@@ -225,7 +241,7 @@ function useAppShellLayoutMetrics(
       );
     };
 
-    update(shell.getBoundingClientRect().width);
+    update(appShellContentBoxWidth(shell));
     if (typeof ResizeObserver === "undefined") return;
 
     const observer = new ResizeObserver((entries) => {
@@ -603,7 +619,9 @@ export function AppShell({
     layoutMode === "wide";
   const resolveSidePanelWidth = (nextWidth: number) => {
     const measuredLiveShellWidth =
-      shellRef.current?.getBoundingClientRect().width ?? 0;
+      shellRef.current === null
+        ? 0
+        : appShellContentBoxWidth(shellRef.current);
     const liveShellWidth =
       measuredLiveShellWidth > 0
         ? measuredLiveShellWidth

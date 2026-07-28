@@ -471,6 +471,76 @@ describe("application shell", () => {
     expect(separator.getAttribute("aria-valuenow")).toBe("320");
   });
 
+  it("uses the shell content box for live workspace clamping", () => {
+    let resizeShell: ((width: number) => void) | undefined;
+    class ResizeObserverMock {
+      constructor(
+        private readonly callback: ResizeObserverCallback,
+      ) {}
+
+      disconnect() {}
+
+      observe(target: Element) {
+        if (!target.classList.contains("codex-ui-app-shell")) return;
+        resizeShell = (width: number) =>
+          this.callback(
+            [
+              {
+                contentRect: { width },
+                target,
+              } as ResizeObserverEntry,
+            ],
+            this as unknown as ResizeObserver,
+          );
+      }
+
+      unobserve() {}
+    }
+    vi.stubGlobal("ResizeObserver", ResizeObserverMock);
+    const onSidePanelWidthChange = vi.fn();
+    const { container } = render(
+      <AppShell
+        layoutMode="wide"
+        onSidePanelWidthChange={onSidePanelWidthChange}
+        sidePanel="Review"
+        sidePanelOpen
+        sidePanelResizable
+        style={{
+          borderLeft: "4px solid transparent",
+          borderRight: "4px solid transparent",
+          paddingLeft: "20px",
+          paddingRight: "20px",
+        }}
+      >
+        Thread
+      </AppShell>,
+    );
+
+    const shell = container.querySelector(
+      ".codex-ui-app-shell",
+    ) as HTMLDivElement;
+    vi.spyOn(shell, "getBoundingClientRect").mockReturnValue(
+      new DOMRect(0, 0, 1_228, 820),
+    );
+    act(() => resizeShell?.(1_180));
+    const separator = screen.getByRole("separator", {
+      name: "Resize workspace panel",
+    });
+    expect(separator.getAttribute("aria-valuemax")).toBe("828");
+
+    fireEvent.pointerDown(separator, {
+      button: 0,
+      clientX: 810,
+      pointerId: 23,
+    });
+    fireEvent.pointerMove(separator, { clientX: -1_000, pointerId: 23 });
+    fireEvent.pointerMove(separator, { clientX: -1_200, pointerId: 23 });
+
+    expect(separator.getAttribute("aria-valuenow")).toBe("828");
+    expect(onSidePanelWidthChange).toHaveBeenCalledTimes(1);
+    expect(onSidePanelWidthChange).toHaveBeenLastCalledWith(828);
+  });
+
   it("lets an expanded workspace panel consume the available main track", () => {
     let resizeShell: ((width: number) => void) | undefined;
     let resizeSidebar: ((width: number) => void) | undefined;
