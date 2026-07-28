@@ -5,10 +5,12 @@ Every deterministic scenario has one ID and produces four evidence layers:
 1. **Protocol** — ordered App Server notifications, server requests, and
    request responses checked against the pinned generated schemas.
 2. **CDP** — DOM identity, computed layout, focus, scrolling, and named-surface
-   geometry.
+   geometry, including the 16px navigation separator and large-Review
+   overflow/reveal contract.
 3. **Electron host** — real `BrowserWindow` bounds, renderer isolation,
-   sidebar interaction, Review-panel close/reopen behavior, and compact
-   800×600 multi-file geometry.
+   pointer and keyboard navigation resizing, Review-panel close/reopen
+   behavior, compact 800×600 multi-file geometry, and an eight-file
+   scroll-to-selection flow.
 4. **Pixels** — full-frame regression screenshots after the structural gates
    pass. The multi-file scenario can additionally compare a separately
    captured 906×820 current-build main region through

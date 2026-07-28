@@ -68,6 +68,14 @@ export const visualScenes = [
     scenario: "multi-file-review",
     surfaces: ["fileChange", "reviewPanel"],
   },
+  {
+    fileCount: 8,
+    frame: "review-open",
+    id: "large-file-review",
+    scenario: "large-file-review",
+    selectPath: ".research/large-review/08.ts",
+    surfaces: ["fileChange", "reviewPanel"],
+  },
 ];
 
 export async function launchScene(

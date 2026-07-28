@@ -49,4 +49,17 @@ describe("application shell visual contract", () => {
     expect(styles).toContain("-webkit-app-region: drag");
     expect(styles).toContain("-webkit-app-region: no-drag");
   });
+
+  it("locks the current-build navigation resize affordance", () => {
+    expect(styles).toMatch(
+      /\.codex-ui-app-shell__sidebar-resizer \{[\s\S]*?cursor: col-resize;[\s\S]*?width: 1rem;/,
+    );
+    expect(styles).toContain(
+      ".codex-ui-app-shell__sidebar-resizer:focus-visible",
+    );
+    expect(component).toContain("sidebarMinWidth = 240");
+    expect(component).toContain("sidebarMaxWidth = 520");
+    expect(component).toContain('role="separator"');
+    expect(component).toContain('aria-orientation="vertical"');
+  });
 });

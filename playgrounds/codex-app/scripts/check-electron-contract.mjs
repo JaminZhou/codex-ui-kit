@@ -43,6 +43,54 @@ try {
   await showSidebar.click();
   await page.waitForSelector(".codex-ui-app-shell[data-sidebar-open]");
 
+  const sidebarResizer = page.getByRole("separator", {
+    name: "Resize navigation sidebar",
+  });
+  const initialSidebarWidth = await page
+    .locator(".codex-ui-app-shell__sidebar")
+    .evaluate((element) => element.getBoundingClientRect().width);
+  const initialResizerBox = await sidebarResizer.boundingBox();
+  if (!initialResizerBox || Math.abs(initialSidebarWidth - 274) > 1) {
+    throw new Error(
+      `Electron navigation resizer baseline failed: ${JSON.stringify({
+        initialResizerBox,
+        initialSidebarWidth,
+      })}`,
+    );
+  }
+  await page.mouse.move(
+    initialResizerBox.x + initialResizerBox.width / 2,
+    initialResizerBox.y + 200,
+  );
+  await page.mouse.down();
+  await page.mouse.move(
+    initialResizerBox.x + initialResizerBox.width / 2 + 64,
+    initialResizerBox.y + 200,
+    { steps: 8 },
+  );
+  await page.mouse.up();
+  const draggedSidebarWidth = await page
+    .locator(".codex-ui-app-shell__sidebar")
+    .evaluate((element) => element.getBoundingClientRect().width);
+  if (Math.abs(draggedSidebarWidth - 338) > 1) {
+    throw new Error(
+      `Electron navigation pointer resize failed: ${draggedSidebarWidth}`,
+    );
+  }
+  await sidebarResizer.press("Home");
+  await sidebarResizer.press("ArrowRight");
+  await sidebarResizer.press("ArrowRight");
+  await sidebarResizer.press("ArrowRight");
+  await sidebarResizer.press("ArrowRight");
+  const restoredSidebarWidth = await page
+    .locator(".codex-ui-app-shell__sidebar")
+    .evaluate((element) => element.getBoundingClientRect().width);
+  if (Math.abs(restoredSidebarWidth - 272) > 1) {
+    throw new Error(
+      `Electron navigation keyboard resize failed: ${restoredSidebarWidth}`,
+    );
+  }
+
   await page.emulateMedia({ colorScheme: "light", reducedMotion: "reduce" });
   await page.getByRole("button", { exact: true, name: "Live" }).click();
   await page.waitForSelector('.demo-root[data-mode="live"]');
@@ -292,6 +340,77 @@ try {
   await compactApp.close();
 }
 
+const largeReviewScene = {
+  frame: "review-open",
+  id: "electron-large-file-review",
+  scenario: "large-file-review",
+};
+const { app: largeReviewApp, page: largeReviewPage } = await launchScene(
+  largeReviewScene,
+  { capture: false },
+);
+
+try {
+  const reviewBefore = await largeReviewPage.evaluate(() => {
+    const review = document.querySelector(".codex-ui-file-review");
+    return review
+      ? {
+          clientHeight: review.clientHeight,
+          fileCount: review.querySelectorAll(
+            ".codex-ui-file-review__file",
+          ).length,
+          horizontalOverflow:
+            document.documentElement.scrollWidth -
+            document.documentElement.clientWidth,
+          scrollHeight: review.scrollHeight,
+          scrollTop: review.scrollTop,
+        }
+      : null;
+  });
+  if (
+    !reviewBefore ||
+    reviewBefore.fileCount !== 8 ||
+    reviewBefore.horizontalOverflow > 1 ||
+    reviewBefore.scrollHeight <= reviewBefore.clientHeight
+  ) {
+    throw new Error(
+      `Electron large Review overflow failed: ${JSON.stringify(reviewBefore)}`,
+    );
+  }
+
+  const selectedPath = ".research/large-review/08.ts";
+  await largeReviewPage
+    .getByRole("button", { name: `Open ${selectedPath}` })
+    .click();
+  const reviewAfter = await largeReviewPage.evaluate((path) => {
+    const review = document.querySelector(".codex-ui-file-review");
+    const selected = document.querySelector(
+      '.codex-ui-file-review__file[data-selected]',
+    );
+    if (!review || !selected) return null;
+    const reviewRect = review.getBoundingClientRect();
+    const selectedRect = selected.getBoundingClientRect();
+    return {
+      current: selected.getAttribute("aria-label") === `Review file ${path}`,
+      fullyVisible:
+        selectedRect.top >= reviewRect.top - 1 &&
+        selectedRect.bottom <= reviewRect.bottom + 1,
+      scrollTop: review.scrollTop,
+    };
+  }, selectedPath);
+  if (
+    !reviewAfter?.current ||
+    !reviewAfter.fullyVisible ||
+    reviewAfter.scrollTop <= 0
+  ) {
+    throw new Error(
+      `Electron large Review selection failed: ${JSON.stringify(reviewAfter)}`,
+    );
+  }
+} finally {
+  await largeReviewApp.close();
+}
+
 console.log(
-  "Electron host, native-window, disclosure, multi-file Review, and compact geometry contracts passed.",
+  "Electron host, native-window, resizable navigation, multi-file Review, large diff scrolling, and compact geometry contracts passed.",
 );

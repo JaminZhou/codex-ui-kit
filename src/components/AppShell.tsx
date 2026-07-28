@@ -8,6 +8,7 @@ import {
   type CSSProperties,
   type HTMLAttributes,
   type KeyboardEvent,
+  type PointerEvent as ReactPointerEvent,
   type ReactNode,
   type RefObject,
 } from "react";
@@ -311,17 +312,36 @@ export interface AppShellProps
   bottomPanelLabel?: string;
   bottomPanelOpen?: boolean;
   children: ReactNode;
+  defaultSidebarWidth?: number;
   mainLabel?: string;
   mainRole?: "main" | "region";
   layoutMode?: AppShellLayoutMode;
   onSidePanelOpenChange?: (open: boolean) => void;
   onSidebarOpenChange?: (open: boolean) => void;
+  onSidebarWidthChange?: (width: number) => void;
   sidePanel?: ReactNode;
   sidePanelLabel?: string;
   sidePanelOpen?: boolean;
   sidebar?: ReactNode;
   sidebarLabel?: string;
+  sidebarMaxWidth?: number;
+  sidebarMinWidth?: number;
   sidebarOpen?: boolean;
+  sidebarResizable?: boolean;
+  sidebarResizeLabel?: string;
+  sidebarWidth?: number;
+}
+
+function clampShellTrack(value: number, minimum: number, maximum: number) {
+  return Math.min(maximum, Math.max(minimum, value));
+}
+
+interface SidebarResizeSession {
+  direction: 1 | -1;
+  lastWidth: number;
+  originClientX: number;
+  originWidth: number;
+  pointerId: number;
 }
 
 export function AppShell({
@@ -330,17 +350,25 @@ export function AppShell({
   bottomPanelOpen = Boolean(bottomPanel),
   children,
   className,
+  defaultSidebarWidth = 274,
   layoutMode: layoutModeOverride,
   mainLabel = "Conversation",
   mainRole = "main",
   onSidePanelOpenChange,
   onSidebarOpenChange,
+  onSidebarWidthChange,
   sidePanel,
   sidePanelLabel = "Workspace panel",
   sidePanelOpen = false,
   sidebar,
   sidebarLabel = "App navigation",
+  sidebarMaxWidth = 520,
+  sidebarMinWidth = 240,
   sidebarOpen = false,
+  sidebarResizable = false,
+  sidebarResizeLabel = "Resize navigation sidebar",
+  sidebarWidth,
+  style,
   ...props
 }: AppShellProps) {
   const bottomPanelRef = useRef<HTMLElement>(null);
@@ -349,9 +377,38 @@ export function AppShell({
   const sidePanelRef = useRef<HTMLElement>(null);
   const sidebarBackdropRef = useRef<HTMLButtonElement>(null);
   const sidebarRef = useRef<HTMLElement>(null);
+  const sidebarResizeSessionRef = useRef<SidebarResizeSession | null>(null);
   const shellRef = useRef<HTMLDivElement>(null);
+  const [internalSidebarWidth, setInternalSidebarWidth] = useState(
+    Number.isFinite(defaultSidebarWidth) ? defaultSidebarWidth : 274,
+  );
+  const [sidebarResizing, setSidebarResizing] = useState(false);
   const automaticLayoutMode = useAppShellLayoutMode(shellRef);
   const layoutMode = layoutModeOverride ?? automaticLayoutMode;
+  const normalizedSidebarMinWidth = Math.max(
+    0,
+    Number.isFinite(sidebarMinWidth) ? sidebarMinWidth : 240,
+  );
+  const normalizedSidebarMaxWidth = Math.max(
+    normalizedSidebarMinWidth,
+    Number.isFinite(sidebarMaxWidth) ? sidebarMaxWidth : 520,
+  );
+  const sidebarWidthIsControlled =
+    sidebarWidth !== undefined && Number.isFinite(sidebarWidth);
+  const requestedSidebarWidth = sidebarWidthIsControlled
+    ? sidebarWidth
+    : internalSidebarWidth;
+  const resolvedSidebarWidth = clampShellTrack(
+    requestedSidebarWidth,
+    normalizedSidebarMinWidth,
+    normalizedSidebarMaxWidth,
+  );
+  const shellStyle = sidebarResizable
+    ? ({
+        ...style,
+        "--codex-ui-app-sidebar-width": `${resolvedSidebarWidth}px`,
+      } as CSSProperties)
+    : style;
   const sidebarModalOpen =
     sidebarOpen && layoutMode === "narrow";
   const sidePanelModalOpen =
@@ -360,6 +417,96 @@ export function AppShell({
     !sidebarModalOpen;
   const responsiveModalOpen =
     sidebarModalOpen || sidePanelModalOpen;
+  const sidebarResizerVisible =
+    sidebarResizable &&
+    sidebarOpen &&
+    sidebar !== undefined &&
+    sidebar !== null &&
+    layoutMode !== "narrow";
+  const commitSidebarWidth = (nextWidth: number) => {
+    const normalizedWidth = clampShellTrack(
+      nextWidth,
+      normalizedSidebarMinWidth,
+      normalizedSidebarMaxWidth,
+    );
+    if (!sidebarWidthIsControlled) {
+      setInternalSidebarWidth(normalizedWidth);
+    }
+    onSidebarWidthChange?.(normalizedWidth);
+    return normalizedWidth;
+  };
+  const handleSidebarResizePointerDown = (
+    event: ReactPointerEvent<HTMLDivElement>,
+  ) => {
+    if (event.button !== 0) return;
+    const direction =
+      getComputedStyle(shellRef.current ?? event.currentTarget).direction ===
+      "rtl"
+        ? -1
+        : 1;
+    sidebarResizeSessionRef.current = {
+      direction,
+      lastWidth: resolvedSidebarWidth,
+      originClientX: event.clientX,
+      originWidth: resolvedSidebarWidth,
+      pointerId: event.pointerId,
+    };
+    event.currentTarget.setPointerCapture?.(event.pointerId);
+    setSidebarResizing(true);
+    event.preventDefault();
+  };
+  const handleSidebarResizePointerMove = (
+    event: ReactPointerEvent<HTMLDivElement>,
+  ) => {
+    const session = sidebarResizeSessionRef.current;
+    if (!session || session.pointerId !== event.pointerId) return;
+    const nextWidth = clampShellTrack(
+      session.originWidth +
+        (event.clientX - session.originClientX) * session.direction,
+      normalizedSidebarMinWidth,
+      normalizedSidebarMaxWidth,
+    );
+    if (nextWidth === session.lastWidth) return;
+    session.lastWidth = commitSidebarWidth(nextWidth);
+  };
+  const finishSidebarResize = (
+    event: ReactPointerEvent<HTMLDivElement>,
+  ) => {
+    const session = sidebarResizeSessionRef.current;
+    if (!session || session.pointerId !== event.pointerId) return;
+    if (event.currentTarget.hasPointerCapture?.(event.pointerId)) {
+      event.currentTarget.releasePointerCapture(event.pointerId);
+    }
+    sidebarResizeSessionRef.current = null;
+    setSidebarResizing(false);
+  };
+  const handleSidebarResizeKeyDown = (
+    event: KeyboardEvent<HTMLDivElement>,
+  ) => {
+    const direction =
+      getComputedStyle(shellRef.current ?? event.currentTarget).direction ===
+      "rtl"
+        ? -1
+        : 1;
+    const step = event.shiftKey ? 32 : 8;
+    let nextWidth: number | undefined;
+    if (event.key === "Home") nextWidth = normalizedSidebarMinWidth;
+    if (event.key === "End") nextWidth = normalizedSidebarMaxWidth;
+    if (event.key === "ArrowLeft") {
+      nextWidth = resolvedSidebarWidth - step * direction;
+    }
+    if (event.key === "ArrowRight") {
+      nextWidth = resolvedSidebarWidth + step * direction;
+    }
+    if (nextWidth === undefined) return;
+    event.preventDefault();
+    commitSidebarWidth(nextWidth);
+  };
+  useEffect(() => {
+    if (sidebarResizerVisible) return;
+    sidebarResizeSessionRef.current = null;
+    setSidebarResizing(false);
+  }, [sidebarResizerVisible]);
   const responsiveModalStateRef = useRef({
     sidePanelModalOpen,
     sidebarModalOpen,
@@ -615,9 +762,12 @@ export function AppShell({
       className={["codex-ui-app-shell", className].filter(Boolean).join(" ")}
       data-bottom-panel-open={bottomPanelOpen || undefined}
       data-side-panel-open={sidePanelOpen || undefined}
+      data-sidebar-resizable={sidebarResizable || undefined}
+      data-sidebar-resizing={sidebarResizing || undefined}
       data-sidebar-open={sidebarOpen || undefined}
       data-layout-mode={layoutMode}
       ref={shellRef}
+      style={shellStyle}
       {...props}
     >
       <div className="codex-ui-app-shell__layout">
@@ -633,6 +783,25 @@ export function AppShell({
             {sidebar}
           </SurfaceBlockedContext.Provider>
         </aside>
+        {sidebarResizerVisible ? (
+          <div
+            aria-label={sidebarResizeLabel}
+            aria-orientation="vertical"
+            aria-valuemax={Math.round(normalizedSidebarMaxWidth)}
+            aria-valuemin={Math.round(normalizedSidebarMinWidth)}
+            aria-valuenow={Math.round(resolvedSidebarWidth)}
+            aria-valuetext={`${Math.round(resolvedSidebarWidth)} pixels`}
+            className="codex-ui-app-shell__sidebar-resizer"
+            onKeyDown={handleSidebarResizeKeyDown}
+            onLostPointerCapture={finishSidebarResize}
+            onPointerCancel={finishSidebarResize}
+            onPointerDown={handleSidebarResizePointerDown}
+            onPointerMove={handleSidebarResizePointerMove}
+            onPointerUp={finishSidebarResize}
+            role="separator"
+            tabIndex={0}
+          />
+        ) : null}
         {onSidebarOpenChange ? (
           <button
             aria-label="Close navigation sidebar"

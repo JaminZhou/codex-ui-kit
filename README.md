@@ -35,8 +35,9 @@ Explore the [interactive component showcase](https://jaminzhou.com/codex-ui-kit/
 
 - A current-build measured conversation shell plus partial message, activity,
   reasoning, plan, streaming, and mixed conversation-event primitives.
-- Application/sidebar and side/bottom workspace-panel composition with
-  container-responsive overlay behavior.
+- Application/sidebar and side/bottom workspace-panel composition with a
+  current-build measured, pointer- and keyboard-resizable navigation track
+  plus container-responsive overlay behavior.
 - Project index, current new-chat destination/context setup, grouped local
   environment dialog, protocol-neutral route/worktree selectors, PR
   list/detail, checks, reviewers, and inline review-thread compositions.

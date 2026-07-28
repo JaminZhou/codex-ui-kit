@@ -56,8 +56,8 @@ observation from a previous build remains historical evidence.
   are not fully isolated
 - Current inventory: 63 surface groups; 42 have scoped runtime evidence, of
   which 25 include current-build structural evidence and 17 are previous-build
-  only; another 21 remain `not_sampled`. Browser verification covers 16
-  groups and Electron verification covers 13.
+  only; another 21 remain `not_sampled`. Browser verification covers 17
+  groups and Electron verification covers 14.
 
 The current package exposes candidates far beyond the old transcript sample:
 application and thread shells, local/remote conversation routes, projects and
@@ -69,10 +69,11 @@ The current CDP probe confirms loopback access, distinguishes the main
 application-shell target from a second small application page, reaches the
 new-chat destination/context setup plus the Project and Local environment
 dialogs, and now revalidates the Pull requests index plus an aggregate
-multi-file change/Review flow. It still does not reach a selectable PR detail,
-so `workspace.pull-request-review` remains `not_sampled`. The broader queue,
-Markdown, Sources, terminal, Sites, Scheduled tasks, Plugins, Skills, and
-Settings samples were recorded on `26.715.72359`. Those entries remain
+multi-file change/Review flow. It also measures the application-navigation
+resize handle and its 240–520px range. It still does not reach a selectable PR
+detail, so `workspace.pull-request-review` remains `not_sampled`. The broader
+queue, Markdown, Sources, terminal, Sites, Scheduled tasks, Plugins, Skills,
+and Settings samples were recorded on `26.715.72359`. Those entries remain
 `runtime_observed` with build-scoped evidence, but they do not satisfy the
 current-build verification gate until reached again. The seed list is not an
 exhaustive denominator: newly observed routes, variants, and cross-layer
@@ -122,8 +123,9 @@ finished visual work.
 The first P0 shell slice provides independently implemented `AppShell`,
 `AppSidebar`, and `WorkspacePanel` compositions. It covers the measured wide
 sidebar/side-panel/bottom-panel tracks, controlled landmarks and tab semantics,
-and container-responsive overlay transitions that keep the right panel inside
-medium and narrow viewports.
+an accessible 16px pointer/keyboard navigation resizer with current-build
+240–520px clamps, and container-responsive overlay transitions that keep the
+right panel inside medium and narrow viewports.
 
 The next workflow slice adds `ConversationEventList` and `ConversationEvent`
 for explicit turn/thread ownership and event kinds; `WorkspaceSelection`,
@@ -165,8 +167,9 @@ creation workflows, or persistence. The broader project index, environment
 settings, and worktree settings families remain partial, as does the legacy
 host-defined route selector. Exact current-build PR review-detail behavior
 remains `not_sampled`, so the generic review components do not establish
-product parity. Native application-shell composition, panel resizing, and the
-remaining P0 conversation/workspace variants also remain open. Final
+product parity. Native application-shell composition, Review/side-panel
+resizing, and the remaining P0 conversation/workspace variants also remain
+open. Final
 H5/Electron visual unification is intentionally deferred until coverage
 stabilizes.
 
@@ -228,8 +231,16 @@ Undo, then repeats the geometry assertions in a real 800×600 BrowserWindow.
 An optional 906×820 current-build raster gate compares the whole main region
 and its 536px conversation/370px Review ownership regions separately. This
 promotes `workspace.multi-file-review` to Browser- and Electron-verified while
-remaining implementation-partial for larger file sets, mixed change kinds,
-selection scrolling, resizing, and real PR-review integration.
+remaining implementation-partial for mixed change kinds, Review-panel
+resizing, and real PR-review integration.
+
+The large-Review acceptance slice expands the deterministic public-protocol
+fixture to eight files and 96 addition lines. Its Review region must overflow
+internally, and selecting the eighth file must scroll that exact section fully
+into view in both CDP and a real `BrowserWindow`. A thirteenth reviewed
+full-frame pixel baseline guards the resulting layout. This validates large
+file-set rendering and selection scrolling in the independent implementation;
+it is not current-build evidence for an eight-file product state.
 
 The compact tool/recovery slice splits the former combined
 `thread.search-tool-mcp-events` candidate into independent search, Browser, and
@@ -277,6 +288,6 @@ This is a measurement- and raster-backed basic thread/workspace slice, not a
 claim that the whole application or every lifecycle is pixel-perfect.
 Markdown variants, the exact host virtualization algorithm, code search,
 successful MCP and connector calls, thread-level retry recovery, approval
-persistence and timeout, current-build PR-review detail, mixed/large
-multi-file sets, and native Codex window behavior retain their own inventory
-gates.
+persistence and timeout, current-build PR-review detail, mixed multi-file
+change kinds, Review-panel resizing, and native Codex window behavior retain
+their own inventory gates.
