@@ -361,6 +361,36 @@ describe("application shell", () => {
     ).toBe(false);
   });
 
+  it("keeps an unmeasured unbounded workspace width finite", () => {
+    const onSidePanelWidthChange = vi.fn();
+    const { container } = render(
+      <AppShell
+        layoutMode="wide"
+        onSidePanelWidthChange={onSidePanelWidthChange}
+        sidePanel="Review"
+        sidePanelOpen
+        sidePanelResizable
+      >
+        Thread
+      </AppShell>,
+    );
+
+    const separator = screen.getByRole("separator", {
+      name: "Resize workspace panel",
+    });
+    expect(separator.getAttribute("aria-valuemax")).toBe("370");
+    expect(separator.getAttribute("aria-valuenow")).toBe("370");
+    fireEvent.keyDown(separator, { key: "End" });
+    expect(onSidePanelWidthChange).not.toHaveBeenCalled();
+    expect(
+      (
+        container.querySelector(
+          ".codex-ui-app-shell",
+        ) as HTMLDivElement
+      ).style.getPropertyValue("--codex-ui-app-side-panel-width"),
+    ).toBe("370px");
+  });
+
   it("keeps a measured main track while resolving the workspace maximum", () => {
     let resizeShell: ((width: number) => void) | undefined;
     let resizeSidebar: ((width: number) => void) | undefined;

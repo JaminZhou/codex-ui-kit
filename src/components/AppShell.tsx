@@ -517,13 +517,26 @@ export function AppShell({
       ? sidePanelMaxWidth
       : Number.POSITIVE_INFINITY,
   );
+  const sidePanelWidthIsControlled =
+    sidePanelWidth !== undefined && Number.isFinite(sidePanelWidth);
+  const requestedSidePanelWidth = sidePanelWidthIsControlled
+    ? sidePanelWidth
+    : internalSidePanelWidth;
+  const unmeasuredSidePanelMaxWidth = Number.isFinite(
+    normalizedSidePanelMaxWidth,
+  )
+    ? normalizedSidePanelMaxWidth
+    : Math.max(
+        normalizedSidePanelMinWidth,
+        requestedSidePanelWidth,
+      );
   const shellWidth = automaticLayout.width;
   const occupiedSidebarWidth = sidebarIsVisible
     ? (observedSidebarWidth ?? resolvedSidebarWidth)
     : 0;
   const responsiveSidePanelMaxWidth =
     shellWidth === null
-      ? normalizedSidePanelMaxWidth
+      ? unmeasuredSidePanelMaxWidth
       : Math.max(
           normalizedSidePanelMinWidth,
           shellWidth -
@@ -534,11 +547,6 @@ export function AppShell({
     normalizedSidePanelMaxWidth,
     responsiveSidePanelMaxWidth,
   );
-  const sidePanelWidthIsControlled =
-    sidePanelWidth !== undefined && Number.isFinite(sidePanelWidth);
-  const requestedSidePanelWidth = sidePanelWidthIsControlled
-    ? sidePanelWidth
-    : internalSidePanelWidth;
   const resolvedSidePanelExpanded =
     sidePanelExpanded &&
     sidePanelOpen &&
@@ -595,19 +603,22 @@ export function AppShell({
     layoutMode === "wide";
   const resolveSidePanelWidth = (nextWidth: number) => {
     const measuredLiveShellWidth =
-      shellRef.current?.getBoundingClientRect().width ?? shellWidth;
+      shellRef.current?.getBoundingClientRect().width ?? 0;
     const liveShellWidth =
-      measuredLiveShellWidth !== null && measuredLiveShellWidth > 0
+      measuredLiveShellWidth > 0
         ? measuredLiveShellWidth
-        : null;
+        : shellWidth !== null && shellWidth > 0
+          ? shellWidth
+          : null;
     const liveSidebarWidth =
       sidebarOpen && sidebar !== undefined && sidebar !== null
         ? sidebarRef.current?.getBoundingClientRect().width ||
+          observedSidebarWidth ||
           resolvedSidebarWidth
         : 0;
     const liveResponsiveMaximum =
       liveShellWidth === null
-        ? normalizedSidePanelMaxWidth
+        ? unmeasuredSidePanelMaxWidth
         : Math.max(
             normalizedSidePanelMinWidth,
             liveShellWidth -
@@ -696,7 +707,9 @@ export function AppShell({
     }
     if (nextWidth === undefined) return;
     event.preventDefault();
-    commitSidePanelWidth(nextWidth);
+    const resolvedNextWidth = resolveSidePanelWidth(nextWidth);
+    if (resolvedNextWidth === resolvedSidePanelWidth) return;
+    commitResolvedSidePanelWidth(resolvedNextWidth);
   };
   useEffect(() => {
     if (sidePanelResizerVisible) return;
