@@ -229,6 +229,9 @@ for (const scene of visualScenes) {
       const sidePanelResizer = document.querySelector(
         '.codex-ui-app-shell__side-panel-resizer[role="separator"]',
       );
+      const bottomPanelResizer = document.querySelector(
+        '.codex-ui-app-shell__bottom-panel-resizer[role="separator"]',
+      );
       if (
         !root ||
         !shell ||
@@ -260,6 +263,9 @@ for (const scene of visualScenes) {
         fileChange: ".codex-ui-file-change-group",
         reviewPanel:
           '.codex-ui-workspace-panel[data-placement="side"]',
+        bottomPanel:
+          '.codex-ui-workspace-panel[data-placement="bottom"]',
+        terminal: ".codex-ui-terminal-session",
       };
       const namedSurfaces = Object.fromEntries(
         Object.entries(namedSurfaceSelectors).map(([name, selector]) => {
@@ -339,6 +345,57 @@ for (const scene of visualScenes) {
               rect: rect(sidePanelResizer),
             }
           : null,
+        bottomPanelResizer: bottomPanelResizer
+          ? {
+              ariaMax: bottomPanelResizer.getAttribute("aria-valuemax"),
+              ariaMin: bottomPanelResizer.getAttribute("aria-valuemin"),
+              ariaNow: bottomPanelResizer.getAttribute("aria-valuenow"),
+              cursor: getComputedStyle(bottomPanelResizer).cursor,
+              rect: rect(bottomPanelResizer),
+            }
+          : null,
+        terminal: (() => {
+          const panel = document.querySelector(
+            '.codex-ui-workspace-panel[data-placement="bottom"]',
+          );
+          const panelContent = panel?.querySelector(
+            ".codex-ui-workspace-panel__content",
+          );
+          const panelHeader = panel?.querySelector(
+            ".codex-ui-workspace-panel__header",
+          );
+          const selectedTab = panel?.querySelector(
+            '[role="tab"][aria-selected="true"]',
+          );
+          const tabPanel = panel?.querySelector('[role="tabpanel"]');
+          const terminalInput = panel?.querySelector(
+            'input[aria-label="Terminal input"]',
+          );
+          const transcript = panel?.querySelector(
+            '[role="log"][aria-label="Terminal output"]',
+          );
+          return panel &&
+            panelContent &&
+            panelHeader &&
+            selectedTab &&
+            tabPanel &&
+            terminalInput &&
+            transcript
+            ? {
+                entryKinds: Array.from(
+                  transcript.querySelectorAll("[data-kind]"),
+                  (entry) => entry.getAttribute("data-kind"),
+                ),
+                inputLabel: terminalInput.getAttribute("aria-label"),
+                panel: rect(panel),
+                panelContent: rect(panelContent),
+                panelHeader: rect(panelHeader),
+                selectedTab: selectedTab.textContent?.trim(),
+                tabPanelLabelledBy: tabPanel.getAttribute("aria-labelledby"),
+                transcriptLive: transcript.getAttribute("aria-live"),
+              }
+            : null;
+        })(),
         viewport: viewportRect,
         workflow: {
           fileGroupCount: document.querySelectorAll(
@@ -435,6 +492,41 @@ for (const scene of visualScenes) {
     ) {
       throw new Error(
         `${scene.id}: hidden Review panel retained its resize separator.`,
+      );
+    }
+    if (scene.surfaces?.includes("bottomPanel")) {
+      const terminal = contract.terminal;
+      const resizer = contract.bottomPanelResizer;
+      if (
+        !terminal ||
+        !resizer ||
+        resizer.cursor !== "row-resize" ||
+        Math.abs(resizer.rect.height - 16) > 0.5 ||
+        resizer.ariaMin !== "152" ||
+        resizer.ariaMax !== "402" ||
+        resizer.ariaNow !== "272" ||
+        Math.abs(terminal.panel.width - 906) > 1 ||
+        Math.abs(terminal.panel.height - 272) > 1 ||
+        Math.abs(terminal.panelHeader.height - 33) > 1 ||
+        Math.abs(terminal.panelContent.height - 239) > 1 ||
+        Math.abs(resizer.rect.bottom - terminal.panel.top) > 1 ||
+        !terminal.selectedTab?.includes("codex-ui-kit") ||
+        terminal.inputLabel !== "Terminal input" ||
+        terminal.transcriptLive !== "polite" ||
+        !terminal.tabPanelLabelledBy ||
+        !terminal.entryKinds.includes("command") ||
+        !terminal.entryKinds.includes("stdout")
+      ) {
+        throw new Error(
+          `${scene.id}: Terminal panel contract failed: ${JSON.stringify({
+            resizer,
+            terminal,
+          })}`,
+        );
+      }
+    } else if (contract.bottomPanelResizer) {
+      throw new Error(
+        `${scene.id}: hidden Terminal panel retained its resize separator.`,
       );
     }
     if (

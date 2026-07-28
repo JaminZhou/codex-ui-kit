@@ -44,8 +44,16 @@ export interface DemoCommandExecution {
   exitCode: number | null;
   id: string;
   output: string;
+  processId: string | null;
   status: "completed" | "failed" | "pending" | "running";
+  terminalEvents: DemoTerminalEvent[];
+  terminalInput: string;
   turnId: string | null;
+}
+
+export interface DemoTerminalEvent {
+  kind: "stdin" | "stdout";
+  text: string;
 }
 
 export interface DemoApprovalRequest {
@@ -476,7 +484,11 @@ export function reduceProtocolNotification(
         id: itemId,
         output:
           asString(item.aggregatedOutput) ?? command?.output ?? "",
+        processId:
+          asString(item.processId) ?? command?.processId ?? null,
         status,
+        terminalEvents: command?.terminalEvents ?? [],
+        terminalInput: command?.terminalInput ?? "",
         turnId: itemTurnId,
       });
       return {
@@ -576,8 +588,39 @@ export function reduceProtocolNotification(
         ...command,
         output: `${command.output}${delta}`,
         status: "running",
+        terminalEvents: [
+          ...command.terminalEvents,
+          { kind: "stdout", text: delta },
+        ],
       }),
       status: "running",
+      timeline: appendTimeline(state.timeline, {
+        id: itemId,
+        kind: "command",
+      }),
+    };
+  }
+
+  if (
+    notification.method ===
+    "item/commandExecution/terminalInteraction"
+  ) {
+    const itemId = asString(params.itemId);
+    const processId = asString(params.processId);
+    const stdin = asString(params.stdin);
+    if (!itemId || !processId || stdin === null) return next;
+    const command = state.commands.find(({ id }) => id === itemId);
+    if (!command || command.processId !== processId) return next;
+    return {
+      ...next,
+      commands: upsertById(state.commands, {
+        ...command,
+        terminalEvents: [
+          ...command.terminalEvents,
+          { kind: "stdin", text: stdin },
+        ],
+        terminalInput: `${command.terminalInput}${stdin}`,
+      }),
       timeline: appendTimeline(state.timeline, {
         id: itemId,
         kind: "command",

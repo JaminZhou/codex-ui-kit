@@ -1619,6 +1619,17 @@ code {
   padding: 1rem;
 }
 
+.command-preview__surface--terminal {
+  display: grid;
+  grid-column: 1 / -1;
+  grid-template-rows: auto minmax(0, 1fr);
+  height: 20rem;
+}
+
+.command-preview__surface--terminal .codex-ui-terminal-session {
+  min-height: 0;
+}
+
 .command-preview__label {
   color: var(--codex-ui-text-tertiary);
   display: block;
@@ -2307,6 +2318,10 @@ code {
 
   .command-preview__grid {
     grid-template-columns: 1fr;
+  }
+
+  .command-preview__surface--terminal {
+    grid-column: auto;
   }
 
   .file-preview {

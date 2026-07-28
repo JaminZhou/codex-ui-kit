@@ -308,11 +308,12 @@
         "cdp:right-review-panel-open-close-transition",
         "cdp:right-environment-panel-visible",
         "cdp:sources-side-tab-and-bottom-terminal-tab",
-        "cdp:floating-background-process-section"
+        "cdp:floating-background-process-section",
+        "cdp-26.721:bottom-panel-toggle-resize-close-restore"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "not_started",
-      "electronStatus": "not_started",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
       "priority": "p0"
     },
     {
@@ -554,11 +555,12 @@
       "packageEvidence": ["terminal", "file-terminal", "shellsession"],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
-        "cdp:bottom-terminal-tabpanel-header-and-terminal-input"
+        "cdp:bottom-terminal-tabpanel-header-and-terminal-input",
+        "cdp-26.721:terminal-tabpanel-input-default-compact-and-bounds"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "not_started",
-      "electronStatus": "not_started",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
       "priority": "p0"
     },
     {

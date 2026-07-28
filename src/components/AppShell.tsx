@@ -193,6 +193,22 @@ function appShellContentBoxWidth(shell: HTMLElement) {
   return Math.max(0, borderBoxWidth - inlineInsets);
 }
 
+function appShellContentBoxHeight(shell: HTMLElement) {
+  const borderBoxHeight = shell.getBoundingClientRect().height;
+  if (borderBoxHeight <= 0) return 0;
+  const style = getComputedStyle(shell);
+  const blockInsets = [
+    style.borderTopWidth,
+    style.borderBottomWidth,
+    style.paddingTop,
+    style.paddingBottom,
+  ].reduce(
+    (total, value) => total + (Number.parseFloat(value) || 0),
+    0,
+  );
+  return Math.max(0, borderBoxHeight - blockInsets);
+}
+
 function appShellRemToPixels(shell: HTMLElement, rem: number) {
   const rootFontSize =
     Number.parseFloat(
@@ -202,6 +218,7 @@ function appShellRemToPixels(shell: HTMLElement, rem: number) {
 }
 
 interface AppShellLayoutMetrics {
+  height: number | null;
   mode: AppShellLayoutMode;
   width: number | null;
 }
@@ -210,6 +227,7 @@ function useAppShellLayoutMetrics(
   shellRef: RefObject<HTMLDivElement | null>,
 ): AppShellLayoutMetrics {
   const [layout, setLayout] = useState<AppShellLayoutMetrics>({
+    height: null,
     mode: "wide",
     width: null,
   });
@@ -218,35 +236,49 @@ function useAppShellLayoutMetrics(
     const shell = shellRef.current;
     if (!shell) return;
 
-    const update = (width: number) => {
-      if (width <= 0) return;
-      const mediumBreakpoint = appShellRemToPixels(
-        shell,
-        appShellMediumBreakpointRem,
-      );
-      const narrowBreakpoint = appShellRemToPixels(
-        shell,
-        appShellNarrowBreakpointRem,
-      );
-      const nextMode =
-        width <= narrowBreakpoint
-          ? "narrow"
-          : width <= mediumBreakpoint
-            ? "medium"
-            : "wide";
-      setLayout((current) =>
-        current.mode === nextMode && current.width === width
+    const update = (width: number, height: number) => {
+      setLayout((current) => {
+        const nextWidth =
+          Number.isFinite(width) && width > 0 ? width : current.width;
+        const nextHeight =
+          Number.isFinite(height) && height > 0
+            ? height
+            : current.height;
+        const mediumBreakpoint = appShellRemToPixels(
+          shell,
+          appShellMediumBreakpointRem,
+        );
+        const narrowBreakpoint = appShellRemToPixels(
+          shell,
+          appShellNarrowBreakpointRem,
+        );
+        const nextMode =
+          nextWidth === null
+            ? current.mode
+            : nextWidth <= narrowBreakpoint
+              ? "narrow"
+              : nextWidth <= mediumBreakpoint
+                ? "medium"
+                : "wide";
+        return current.mode === nextMode &&
+          current.width === nextWidth &&
+          current.height === nextHeight
           ? current
-          : { mode: nextMode, width },
-      );
+          : { height: nextHeight, mode: nextMode, width: nextWidth };
+      });
     };
 
-    update(appShellContentBoxWidth(shell));
+    update(
+      appShellContentBoxWidth(shell),
+      appShellContentBoxHeight(shell),
+    );
     if (typeof ResizeObserver === "undefined") return;
 
     const observer = new ResizeObserver((entries) => {
       const entry = entries.find(({ target }) => target === shell);
-      if (entry) update(entry.contentRect.width);
+      if (entry) {
+        update(entry.contentRect.width, entry.contentRect.height);
+      }
     });
     observer.observe(shell);
     return () => observer.disconnect();
@@ -381,14 +413,21 @@ function retargetModalFocusFromSurface(
 export interface AppShellProps
   extends Omit<HTMLAttributes<HTMLDivElement>, "children"> {
   bottomPanel?: ReactNode;
+  bottomPanelHeight?: number;
   bottomPanelLabel?: string;
+  bottomPanelMaxHeight?: number;
+  bottomPanelMinHeight?: number;
   bottomPanelOpen?: boolean;
+  bottomPanelResizable?: boolean;
+  bottomPanelResizeLabel?: string;
   children: ReactNode;
+  defaultBottomPanelHeight?: number;
   defaultSidePanelWidth?: number;
   defaultSidebarWidth?: number;
   mainLabel?: string;
   mainRole?: "main" | "region";
   layoutMode?: AppShellLayoutMode;
+  onBottomPanelHeightChange?: (height: number) => void;
   onSidePanelOpenChange?: (open: boolean) => void;
   onSidePanelWidthChange?: (width: number) => void;
   onSidebarOpenChange?: (open: boolean) => void;
@@ -433,17 +472,31 @@ interface SidePanelResizeSession {
   pointerId: number;
 }
 
+interface BottomPanelResizeSession {
+  lastHeight: number;
+  originClientY: number;
+  originHeight: number;
+  pointerId: number;
+}
+
 export function AppShell({
   bottomPanel,
+  bottomPanelHeight,
   bottomPanelLabel = "Bottom panel",
+  bottomPanelMaxHeight = Number.POSITIVE_INFINITY,
+  bottomPanelMinHeight = 152,
   bottomPanelOpen = Boolean(bottomPanel),
+  bottomPanelResizable = false,
+  bottomPanelResizeLabel = "Resize bottom panel",
   children,
   className,
+  defaultBottomPanelHeight = 272,
   defaultSidePanelWidth = 370,
   defaultSidebarWidth = 274,
   layoutMode: layoutModeOverride,
   mainLabel = "Conversation",
   mainRole = "main",
+  onBottomPanelHeightChange,
   onSidePanelOpenChange,
   onSidePanelWidthChange,
   onSidebarOpenChange,
@@ -469,7 +522,13 @@ export function AppShell({
   style,
   ...props
 }: AppShellProps) {
+  const bottomPanelOpenRef = useRef(bottomPanelOpen);
+  bottomPanelOpenRef.current = bottomPanelOpen;
   const bottomPanelRef = useRef<HTMLElement>(null);
+  const bottomPanelResizerFocusedRef = useRef(false);
+  const bottomPanelResizerRef = useRef<HTMLDivElement>(null);
+  const bottomPanelResizeSessionRef =
+    useRef<BottomPanelResizeSession | null>(null);
   const mainRef = useRef<HTMLDivElement>(null);
   const sidePanelBackdropRef = useRef<HTMLButtonElement>(null);
   const sidePanelOpenRef = useRef(sidePanelOpen);
@@ -485,12 +544,19 @@ export function AppShell({
   const sidebarResizerRef = useRef<HTMLDivElement>(null);
   const sidebarResizeSessionRef = useRef<SidebarResizeSession | null>(null);
   const shellRef = useRef<HTMLDivElement>(null);
+  const [internalBottomPanelHeight, setInternalBottomPanelHeight] =
+    useState(
+      Number.isFinite(defaultBottomPanelHeight)
+        ? defaultBottomPanelHeight
+        : 272,
+    );
   const [internalSidePanelWidth, setInternalSidePanelWidth] = useState(
     Number.isFinite(defaultSidePanelWidth) ? defaultSidePanelWidth : 370,
   );
   const [internalSidebarWidth, setInternalSidebarWidth] = useState(
     Number.isFinite(defaultSidebarWidth) ? defaultSidebarWidth : 274,
   );
+  const [bottomPanelResizing, setBottomPanelResizing] = useState(false);
   const [sidePanelResizing, setSidePanelResizing] = useState(false);
   const [sidebarResizing, setSidebarResizing] = useState(false);
   const sidebarIsVisible =
@@ -501,6 +567,43 @@ export function AppShell({
   );
   const automaticLayout = useAppShellLayoutMetrics(shellRef);
   const layoutMode = layoutModeOverride ?? automaticLayout.mode;
+  const normalizedBottomPanelMinHeight = Math.max(
+    0,
+    Number.isFinite(bottomPanelMinHeight) ? bottomPanelMinHeight : 152,
+  );
+  const normalizedBottomPanelMaxHeight = Math.max(
+    normalizedBottomPanelMinHeight,
+    Number.isFinite(bottomPanelMaxHeight)
+      ? bottomPanelMaxHeight
+      : Number.POSITIVE_INFINITY,
+  );
+  const bottomPanelHeightIsControlled =
+    bottomPanelHeight !== undefined && Number.isFinite(bottomPanelHeight);
+  const requestedBottomPanelHeight = bottomPanelHeightIsControlled
+    ? bottomPanelHeight
+    : internalBottomPanelHeight;
+  const unmeasuredBottomPanelMaxHeight = Number.isFinite(
+    normalizedBottomPanelMaxHeight,
+  )
+    ? normalizedBottomPanelMaxHeight
+    : Math.max(normalizedBottomPanelMinHeight, requestedBottomPanelHeight);
+  const shellHeight = automaticLayout.height;
+  const responsiveBottomPanelMaxHeight =
+    shellHeight === null
+      ? unmeasuredBottomPanelMaxHeight
+      : Math.max(
+          normalizedBottomPanelMinHeight,
+          (shellHeight - 16) / 2,
+        );
+  const resolvedBottomPanelMaxHeight = Math.min(
+    normalizedBottomPanelMaxHeight,
+    responsiveBottomPanelMaxHeight,
+  );
+  const resolvedBottomPanelHeight = clampShellTrack(
+    requestedBottomPanelHeight,
+    normalizedBottomPanelMinHeight,
+    resolvedBottomPanelMaxHeight,
+  );
   const normalizedSidebarMinWidth = Math.max(
     0,
     Number.isFinite(sidebarMinWidth) ? sidebarMinWidth : 240,
@@ -581,9 +684,18 @@ export function AppShell({
         resolvedSidePanelMaxWidth,
       );
   const shellStyle =
-    sidebarResizable || sidePanelResizable || resolvedSidePanelExpanded
+    bottomPanelResizable ||
+    bottomPanelHeightIsControlled ||
+    sidebarResizable ||
+    sidePanelResizable ||
+    resolvedSidePanelExpanded
       ? ({
           ...style,
+          ...(bottomPanelResizable || bottomPanelHeightIsControlled
+            ? {
+                "--codex-ui-app-bottom-panel-height": `${resolvedBottomPanelHeight}px`,
+              }
+            : {}),
           ...(sidebarResizable
             ? {
                 "--codex-ui-app-sidebar-width": `${resolvedSidebarWidth}px`,
@@ -617,6 +729,107 @@ export function AppShell({
     sidePanel !== null &&
     !resolvedSidePanelExpanded &&
     layoutMode === "wide";
+  const bottomPanelResizerVisible =
+    bottomPanelResizable &&
+    bottomPanelOpen &&
+    bottomPanel !== undefined &&
+    bottomPanel !== null &&
+    !sidebarModalOpen;
+  const resolveBottomPanelHeight = (nextHeight: number) => {
+    const measuredLiveShellHeight =
+      shellRef.current === null
+        ? 0
+        : appShellContentBoxHeight(shellRef.current);
+    const liveShellHeight =
+      measuredLiveShellHeight > 0
+        ? measuredLiveShellHeight
+        : shellHeight !== null && shellHeight > 0
+          ? shellHeight
+          : null;
+    const liveResponsiveMaximum =
+      liveShellHeight === null
+        ? unmeasuredBottomPanelMaxHeight
+        : Math.max(
+            normalizedBottomPanelMinHeight,
+            (liveShellHeight - 16) / 2,
+          );
+    const maximum = Math.min(
+      normalizedBottomPanelMaxHeight,
+      liveResponsiveMaximum,
+    );
+    return clampShellTrack(
+      nextHeight,
+      normalizedBottomPanelMinHeight,
+      maximum,
+    );
+  };
+  const commitResolvedBottomPanelHeight = (normalizedHeight: number) => {
+    if (!bottomPanelHeightIsControlled) {
+      setInternalBottomPanelHeight(normalizedHeight);
+    }
+    onBottomPanelHeightChange?.(normalizedHeight);
+    return normalizedHeight;
+  };
+  const handleBottomPanelResizePointerDown = (
+    event: ReactPointerEvent<HTMLDivElement>,
+  ) => {
+    if (event.button !== 0) return;
+    bottomPanelResizeSessionRef.current = {
+      lastHeight: resolvedBottomPanelHeight,
+      originClientY: event.clientY,
+      originHeight: resolvedBottomPanelHeight,
+      pointerId: event.pointerId,
+    };
+    event.currentTarget.setPointerCapture?.(event.pointerId);
+    setBottomPanelResizing(true);
+    event.preventDefault();
+  };
+  const handleBottomPanelResizePointerMove = (
+    event: ReactPointerEvent<HTMLDivElement>,
+  ) => {
+    const session = bottomPanelResizeSessionRef.current;
+    if (!session || session.pointerId !== event.pointerId) return;
+    const nextHeight = resolveBottomPanelHeight(
+      session.originHeight + session.originClientY - event.clientY,
+    );
+    if (nextHeight === session.lastHeight) return;
+    session.lastHeight = commitResolvedBottomPanelHeight(nextHeight);
+  };
+  const finishBottomPanelResize = (
+    event: ReactPointerEvent<HTMLDivElement>,
+  ) => {
+    const session = bottomPanelResizeSessionRef.current;
+    if (!session || session.pointerId !== event.pointerId) return;
+    if (event.currentTarget.hasPointerCapture?.(event.pointerId)) {
+      event.currentTarget.releasePointerCapture(event.pointerId);
+    }
+    bottomPanelResizeSessionRef.current = null;
+    setBottomPanelResizing(false);
+  };
+  const handleBottomPanelResizeKeyDown = (
+    event: KeyboardEvent<HTMLDivElement>,
+  ) => {
+    const step = event.shiftKey ? 32 : 8;
+    let nextHeight: number | undefined;
+    if (event.key === "Home") nextHeight = normalizedBottomPanelMinHeight;
+    if (event.key === "End") nextHeight = resolvedBottomPanelMaxHeight;
+    if (event.key === "ArrowUp") {
+      nextHeight = resolvedBottomPanelHeight + step;
+    }
+    if (event.key === "ArrowDown") {
+      nextHeight = resolvedBottomPanelHeight - step;
+    }
+    if (nextHeight === undefined) return;
+    event.preventDefault();
+    const resolvedNextHeight = resolveBottomPanelHeight(nextHeight);
+    if (resolvedNextHeight === resolvedBottomPanelHeight) return;
+    commitResolvedBottomPanelHeight(resolvedNextHeight);
+  };
+  useEffect(() => {
+    if (bottomPanelResizerVisible) return;
+    bottomPanelResizeSessionRef.current = null;
+    setBottomPanelResizing(false);
+  }, [bottomPanelResizerVisible]);
   const resolveSidePanelWidth = (nextWidth: number) => {
     const measuredLiveShellWidth =
       shellRef.current === null
@@ -863,6 +1076,23 @@ export function AppShell({
       focusFirstInSurface(fallbackSurface);
     };
   }, [sidePanelResizerVisible]);
+  useLayoutEffect(() => {
+    if (!bottomPanelResizerVisible) return;
+    const resizer = bottomPanelResizerRef.current;
+    return () => {
+      const activeElement = document.activeElement;
+      const focusNeedsRestoration =
+        activeElement === resizer ||
+        (bottomPanelResizerFocusedRef.current &&
+          activeElement === document.body);
+      if (!resizer || !focusNeedsRestoration) return;
+      bottomPanelResizerFocusedRef.current = false;
+      const fallbackSurface = bottomPanelOpenRef.current
+        ? bottomPanelRef.current
+        : mainRef.current;
+      focusFirstInSurface(fallbackSurface);
+    };
+  }, [bottomPanelResizerVisible]);
   const responsiveModalLockRef = useRef<ModalLockHandle | null>(
     null,
   );
@@ -1109,6 +1339,8 @@ export function AppShell({
     <div
       className={["codex-ui-app-shell", className].filter(Boolean).join(" ")}
       data-bottom-panel-open={bottomPanelOpen || undefined}
+      data-bottom-panel-resizable={bottomPanelResizable || undefined}
+      data-bottom-panel-resizing={bottomPanelResizing || undefined}
       data-side-panel-expanded={resolvedSidePanelExpanded || undefined}
       data-side-panel-open={sidePanelOpen || undefined}
       data-side-panel-resizable={sidePanelResizable || undefined}
@@ -1242,6 +1474,34 @@ export function AppShell({
             {sidePanel}
           </SurfaceBlockedContext.Provider>
         </aside>
+        {bottomPanelResizerVisible ? (
+          <div
+            aria-label={bottomPanelResizeLabel}
+            aria-orientation="horizontal"
+            aria-valuemax={Math.round(resolvedBottomPanelMaxHeight)}
+            aria-valuemin={Math.round(normalizedBottomPanelMinHeight)}
+            aria-valuenow={Math.round(resolvedBottomPanelHeight)}
+            aria-valuetext={`${Math.round(resolvedBottomPanelHeight)} pixels`}
+            className="codex-ui-app-shell__bottom-panel-resizer"
+            onBlur={(event) => {
+              if (event.relatedTarget instanceof HTMLElement) {
+                bottomPanelResizerFocusedRef.current = false;
+              }
+            }}
+            onFocus={() => {
+              bottomPanelResizerFocusedRef.current = true;
+            }}
+            onKeyDown={handleBottomPanelResizeKeyDown}
+            onLostPointerCapture={finishBottomPanelResize}
+            onPointerCancel={finishBottomPanelResize}
+            onPointerDown={handleBottomPanelResizePointerDown}
+            onPointerMove={handleBottomPanelResizePointerMove}
+            onPointerUp={finishBottomPanelResize}
+            ref={bottomPanelResizerRef}
+            role="separator"
+            tabIndex={0}
+          />
+        ) : null}
         <section
           aria-hidden={!bottomPanelOpen || sidebarModalOpen}
           aria-label={bottomPanelLabel}

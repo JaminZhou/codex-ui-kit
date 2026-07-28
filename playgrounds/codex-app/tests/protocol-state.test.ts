@@ -212,7 +212,15 @@ describe("protocol lifecycle reducer", () => {
 
     expect(commandRunning.commands[0]).toMatchObject({
       output: "✓ protocol-state.test.ts (10 tests)\n",
+      processId: "process-check",
       status: "running",
+      terminalEvents: [
+        {
+          kind: "stdout",
+          text: "✓ protocol-state.test.ts (10 tests)\n",
+        },
+      ],
+      terminalInput: "",
     });
     expect(approvalPending.approvals[0]).toMatchObject({
       command: "apply_patch WORKFLOW.md",
@@ -246,6 +254,55 @@ describe("protocol lifecycle reducer", () => {
       "approval",
       "fileChange",
     ]);
+  });
+
+  it("keeps terminal interaction attached to the matching process", () => {
+    const scenario = replayScenarios["background-terminal"];
+    const terminalOpen = reduceProtocolTrace(
+      scenario.events.slice(0, scenario.frames["terminal-open"]),
+    );
+    const completed = reduceProtocolTrace(scenario.events);
+
+    expect(terminalOpen.commands).toHaveLength(1);
+    expect(terminalOpen.commands[0]).toMatchObject({
+      command: "pnpm dev",
+      cwd: "/workspace/codex-ui-kit",
+      output: "VITE ready in 438 ms\nLocal: http://localhost:5173/\n",
+      processId: "process-dev",
+      status: "running",
+      terminalEvents: [
+        {
+          kind: "stdout",
+          text: "VITE ready in 438 ms\nLocal: http://localhost:5173/\n",
+        },
+        {
+          kind: "stdin",
+          text: "q\n",
+        },
+      ],
+      terminalInput: "q\n",
+    });
+    expect(completed.commands[0]).toMatchObject({
+      exitCode: 0,
+      output:
+        "VITE ready in 438 ms\nLocal: http://localhost:5173/\nServer stopped.\n",
+      status: "completed",
+      terminalEvents: [
+        {
+          kind: "stdout",
+          text: "VITE ready in 438 ms\nLocal: http://localhost:5173/\n",
+        },
+        {
+          kind: "stdin",
+          text: "q\n",
+        },
+        {
+          kind: "stdout",
+          text: "Server stopped.\n",
+        },
+      ],
+      terminalInput: "q\n",
+    });
   });
 
   it("preserves both files in the dedicated multi-file review trace", () => {

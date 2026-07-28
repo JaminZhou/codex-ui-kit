@@ -107,12 +107,20 @@ All privileged behavior remains host-owned. The components never auto-approve co
   `sidePanelResizable` applies the same accessible interaction contract to the
   right workspace, with configurable panel/main minima, responsive clamping,
   controlled persistence, focus restoration, and an expanded full-main mode.
+  `bottomPanelResizable` adds the current-build measured 16px horizontal
+  separator, a 152px minimum, a responsive half-height maximum, pointer and
+  Arrow/Home/End control, accessible values, and controlled or uncontrolled
+  height persistence.
 - `AppSidebar`, `AppSidebarSection`, and `AppSidebarItem`: grouped primary
   navigation with selected-route state, descriptions, badges, header, and
   footer slots.
 - `WorkspacePanel`: controlled side or bottom tab shell with labelled tab
   semantics, host action slots, close/open/expand hooks and labels, focusable
   content, and host-owned tab contents.
+- `TerminalTranscript`, `TerminalPrompt`, and `TerminalSession`: terminal
+  output, controlled input, and process-status composition with typed output
+  rows, polite follow output, named log/input regions, and explicit
+  host-owned submission. They never start a shell or execute input.
 - `ThreadHeader`: draggable desktop header with truncating identity, navigation, and independently aligned action slots.
 - `ThreadNavigationControls`: sidebar and optional Back/Forward toolbar controls with shortcuts, disabled states, and transient-navigation hover hooks.
 - `ThreadMessageNavigationRail`: message overview with a current-build default

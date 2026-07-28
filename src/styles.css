@@ -100,6 +100,12 @@
 .codex-ui-app-sidebar *,
 .codex-ui-workspace-panel,
 .codex-ui-workspace-panel *,
+.codex-ui-terminal-session,
+.codex-ui-terminal-session *,
+.codex-ui-terminal-transcript,
+.codex-ui-terminal-transcript *,
+.codex-ui-terminal-prompt,
+.codex-ui-terminal-prompt *,
 .codex-ui-conversation-event-list,
 .codex-ui-conversation-event-list *,
 .codex-ui-workspace-selection,
@@ -168,7 +174,7 @@
 .codex-ui-app-shell[data-bottom-panel-open] .codex-ui-app-shell__layout {
   --codex-ui-app-shell-bottom-panel-track: min(
     var(--codex-ui-app-bottom-panel-height),
-    42%
+    calc((100% - 1rem) / 2)
   );
 }
 
@@ -284,6 +290,47 @@
 .codex-ui-app-shell[data-side-panel-resizing],
 .codex-ui-app-shell[data-side-panel-resizing] * {
   cursor: col-resize !important;
+  user-select: none !important;
+}
+
+.codex-ui-app-shell__bottom-panel-resizer {
+  background: transparent;
+  cursor: row-resize;
+  height: 1rem;
+  inset-block-end: var(--codex-ui-app-shell-bottom-panel-track);
+  inset-inline-end: 0;
+  inset-inline-start: var(--codex-ui-app-shell-sidebar-track);
+  outline: none;
+  position: absolute;
+  touch-action: none;
+  z-index: 65;
+}
+
+.codex-ui-app-shell__bottom-panel-resizer::after {
+  background: transparent;
+  content: "";
+  height: 1px;
+  inset-block-end: 0;
+  inset-inline: 0;
+  position: absolute;
+  transition: background-color var(--codex-ui-transition-fast);
+}
+
+.codex-ui-app-shell__bottom-panel-resizer:hover::after,
+.codex-ui-app-shell__bottom-panel-resizer:focus-visible::after,
+.codex-ui-app-shell[data-bottom-panel-resizing]
+  .codex-ui-app-shell__bottom-panel-resizer::after {
+  background: var(--codex-ui-focus);
+}
+
+.codex-ui-app-shell__bottom-panel-resizer:focus-visible {
+  box-shadow: inset 0 0 0 2px
+    color-mix(in srgb, var(--codex-ui-focus) 55%, transparent);
+}
+
+.codex-ui-app-shell[data-bottom-panel-resizing],
+.codex-ui-app-shell[data-bottom-panel-resizing] * {
+  cursor: row-resize !important;
   user-select: none !important;
 }
 
@@ -495,6 +542,10 @@
   min-width: 0;
 }
 
+.codex-ui-workspace-panel[data-placement="bottom"] {
+  --codex-ui-workspace-panel-header-height: 2.0625rem;
+}
+
 .codex-ui-workspace-panel__header {
   -webkit-app-region: drag;
   align-items: center;
@@ -588,6 +639,88 @@
   text-align: center;
 }
 
+.codex-ui-terminal-session {
+  background: var(--codex-ui-background-surface);
+  color: var(--codex-ui-text);
+  display: flex;
+  flex-direction: column;
+  font-family: var(--codex-ui-font-mono);
+  font-size: var(--codex-ui-font-size-xs);
+  height: 100%;
+  line-height: 1.125rem;
+  min-height: 0;
+  min-width: 0;
+}
+
+.codex-ui-terminal-transcript {
+  flex: 1 1 auto;
+  min-height: 0;
+  outline: none;
+  overflow: auto;
+  overscroll-behavior: contain;
+  padding: calc(var(--codex-ui-spacing) * 2)
+    calc(var(--codex-ui-spacing) * 4) 0;
+  scrollbar-gutter: stable;
+}
+
+.codex-ui-terminal-transcript:focus-visible {
+  box-shadow: inset 0 0 0 2px var(--codex-ui-focus);
+}
+
+.codex-ui-terminal-transcript__entry {
+  min-height: 1.125rem;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}
+
+.codex-ui-terminal-transcript__entry[data-kind="stderr"] {
+  color: var(--codex-ui-text-error);
+}
+
+.codex-ui-terminal-transcript__entry[data-kind="system"] {
+  color: var(--codex-ui-text-secondary);
+}
+
+.codex-ui-terminal-prompt {
+  align-items: baseline;
+  display: flex;
+  flex: 0 0 auto;
+  gap: calc(var(--codex-ui-spacing) * 2);
+  min-width: 0;
+  padding: 0 calc(var(--codex-ui-spacing) * 4)
+    calc(var(--codex-ui-spacing) * 2);
+}
+
+.codex-ui-terminal-prompt__prefix {
+  color: var(--codex-ui-text);
+  flex: 0 0 auto;
+  user-select: none;
+}
+
+.codex-ui-terminal-prompt__input {
+  appearance: none;
+  background: transparent;
+  border: 0;
+  border-radius: var(--codex-ui-radius-xs);
+  caret-color: var(--codex-ui-text);
+  color: inherit;
+  flex: 1 1 auto;
+  font: inherit;
+  line-height: inherit;
+  min-width: 0;
+  outline: none;
+  padding: 0;
+}
+
+.codex-ui-terminal-prompt__input:focus-visible {
+  box-shadow: 0 1px 0 var(--codex-ui-focus);
+}
+
+.codex-ui-terminal-prompt__input:disabled {
+  color: var(--codex-ui-text-secondary);
+  cursor: not-allowed;
+}
+
 @container codex-ui-app-shell (max-width: 92rem) {
   .codex-ui-app-shell__layout {
     grid-template-columns:
@@ -644,6 +777,10 @@
   .codex-ui-app-shell__main,
   .codex-ui-app-shell__bottom-panel {
     grid-column: 1;
+  }
+
+  .codex-ui-app-shell__bottom-panel-resizer {
+    inset-inline-start: 0;
   }
 
   .codex-ui-app-shell__sidebar {

@@ -76,6 +76,7 @@ import {
   SubagentPanel,
   SubagentSummary,
   SubagentTranscriptHeader,
+  TerminalSession,
   ToolCallCard,
   Tooltip,
   ThreadFloatingButton,
@@ -1390,6 +1391,8 @@ function Showcase() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [floatingPanelOpen, setFloatingPanelOpen] = useState(true);
   const [navigationStatus, setNavigationStatus] = useState("Navigation ready");
+  const [terminalValue, setTerminalValue] = useState("");
+  const [terminalCommands, setTerminalCommands] = useState<string[]>([]);
   const [threadStatus, setThreadStatus] = useState("Thread states ready");
   const [threadComposerValue, setThreadComposerValue] = useState("");
   const [appSidebarOpen, setAppSidebarOpen] = useState(true);
@@ -3366,6 +3369,49 @@ function Showcase() {
                     durationMs={900}
                     exitCode={0}
                     status="completed"
+                  />
+                </div>
+
+                <div className="command-preview__surface command-preview__surface--terminal">
+                  <span className="command-preview__label">
+                    Background terminal · controlled input
+                  </span>
+                  <TerminalSession
+                    entries={[
+                      {
+                        id: "terminal-command",
+                        kind: "command",
+                        text: "/workspace/codex-ui-kit % pnpm dev",
+                      },
+                      {
+                        id: "terminal-output",
+                        kind: "stdout",
+                        text: "VITE ready in 438 ms\nLocal: http://localhost:5173/",
+                      },
+                      ...terminalCommands.flatMap((command, index) => [
+                        {
+                          id: `terminal-local-${index}`,
+                          kind: "command" as const,
+                          text: `/workspace/codex-ui-kit % ${command}`,
+                        },
+                        {
+                          id: `terminal-local-${index}-status`,
+                          kind: "system" as const,
+                          text: "Submission returned to the host.",
+                        },
+                      ]),
+                    ]}
+                    label="Showcase terminal"
+                    onCommandSubmit={(command) => {
+                      setTerminalCommands((commands) => [
+                        ...commands,
+                        command,
+                      ]);
+                      setTerminalValue("");
+                    }}
+                    onValueChange={setTerminalValue}
+                    status="running"
+                    value={terminalValue}
                   />
                 </div>
               </div>

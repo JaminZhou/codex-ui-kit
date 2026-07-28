@@ -82,6 +82,21 @@ the resizable workspace contract:
 - a fourteenth reviewed pixel frame plus an optional external current-build
   index/detail comparison.
 
+## Sixth vertical slice
+
+The sixth slice adds the current background Terminal workflow:
+
+- a schema-validated command `processId`, output stream, and
+  `item/commandExecution/terminalInteraction`;
+- protocol-neutral `TerminalTranscript`, `TerminalPrompt`, and
+  `TerminalSession` composition;
+- a 272px bottom panel, 16px pointer/keyboard separator, 152px minimum, and
+  responsive half-height maximum;
+- close/restore, host-owned input submission, and real 820×680 compact
+  Electron geometry;
+- a fifteenth reviewed pixel frame plus an optional current-build Terminal
+  panel/content comparison.
+
 ## Development
 
 From the repository root:
@@ -118,6 +133,16 @@ The Pull request detail gate uses a separate 906×820 current-build reference:
 
 ```bash
 CODEX_UI_KIT_PULL_REQUEST_REFERENCE=/absolute/path/to/pr-main-reference.png \
+  pnpm --filter @codex-ui-kit/codex-app-playground check:visual
+```
+
+The Terminal gate also uses a 906×820 main-only reference. It reports the
+whole-main difference but gates only the shared 272px panel and 239px content
+regions, because the protocol replay and observed task intentionally have
+different conversation text:
+
+```bash
+CODEX_UI_KIT_TERMINAL_REFERENCE=/absolute/path/to/terminal-main-reference.png \
   pnpm --filter @codex-ui-kit/codex-app-playground check:visual
 ```
 

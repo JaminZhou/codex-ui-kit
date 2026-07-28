@@ -12,7 +12,7 @@ describe("application shell visual contract", () => {
   it("locks the observed wide shell and workspace panel geometry", () => {
     expect(tokens).toContain("--codex-ui-app-sidebar-width: 17.125rem");
     expect(tokens).toContain("--codex-ui-app-side-panel-width: 41.6875rem");
-    expect(tokens).toContain("--codex-ui-app-bottom-panel-height: 15rem");
+    expect(tokens).toContain("--codex-ui-app-bottom-panel-height: 17rem");
     expect(styles).toContain("container-name: codex-ui-app-shell");
     expect(styles).toContain(".codex-ui-app-shell__layout");
     expect(styles).toContain("grid-template-columns:");
@@ -82,5 +82,26 @@ describe("application shell visual contract", () => {
     expect(component).toContain("sidePanelMinWidth = 320");
     expect(component).toContain("sidePanelMinMainWidth = 352");
     expect(component).toContain('sidePanelResizeLabel = "Resize workspace panel"');
+  });
+
+  it("locks the current-build bottom panel resize affordance", () => {
+    expect(styles).toContain(
+      "calc((100% - 1rem) / 2)",
+    );
+    expect(styles).toMatch(
+      /\.codex-ui-app-shell__bottom-panel-resizer \{[\s\S]*?cursor: row-resize;[\s\S]*?height: 1rem;/,
+    );
+    expect(styles).toContain(
+      ".codex-ui-app-shell__bottom-panel-resizer:focus-visible",
+    );
+    expect(styles).toContain(
+      '.codex-ui-workspace-panel[data-placement="bottom"]',
+    );
+    expect(component).toContain("bottomPanelMinHeight = 152");
+    expect(component).toContain("defaultBottomPanelHeight = 272");
+    expect(component).toContain(
+      'bottomPanelResizeLabel = "Resize bottom panel"',
+    );
+    expect(component).toContain('aria-orientation="horizontal"');
   });
 });

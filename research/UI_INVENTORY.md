@@ -55,9 +55,9 @@ observation from a previous build remains historical evidence.
   the Chromium profile is separate, but Codex application data and navigation
   are not fully isolated
 - Current inventory: 63 surface groups; 43 have scoped runtime evidence, of
-  which 26 include current-build structural evidence and 17 are previous-build
-  only; another 20 remain `not_sampled`. Browser verification covers 19
-  groups and Electron verification covers 16.
+  which 28 include current-build structural evidence and 15 are previous-build
+  only; another 20 remain `not_sampled`. Browser verification covers 21
+  groups and Electron verification covers 18.
 
 The current package exposes candidates far beyond the old transcript sample:
 application and thread shells, local/remote conversation routes, projects and
@@ -72,7 +72,7 @@ dialogs, and now revalidates the Pull requests index plus an aggregate
 multi-file change/Review flow. It also measures the application-navigation
 resize handle and its 240–520px range, the independent Review-panel resize
 track, and one public PR's Summary, Timeline, and Code views. The broader
-queue, Markdown, Sources, terminal, Sites, Scheduled tasks, Plugins, Skills,
+queue, Markdown, Sources, Sites, Scheduled tasks, Plugins, Skills,
 and Settings samples were recorded on `26.715.72359`. Those entries remain
 `runtime_observed` with build-scoped evidence, but they do not satisfy the
 current-build verification gate until reached again. The seed list is not an
@@ -167,9 +167,8 @@ creation workflows, or persistence. The broader project index, environment
 settings, and worktree settings families remain partial, as does the legacy
 host-defined route selector. Exact current-build PR review-detail behavior
 remains `not_sampled`, so the generic review components do not establish
-product parity. Native application-shell composition, Review/side-panel
-resizing, and the remaining P0 conversation/workspace variants also remain
-open. Final
+product parity. Native application-shell composition and the remaining P0
+conversation/workspace variants also remain open. Final
 H5/Electron visual unification is intentionally deferred until coverage
 stabilizes.
 
@@ -255,6 +254,28 @@ regions separately. This promotes `workspace.pull-request-route` and
 sampled public PR path; merge execution, review submission, loading/failure
 states, and broader PR variants remain outside this slice.
 
+The Terminal slice completes the bottom-panel interaction contract for the
+sampled current build. Scoped CDP measured a 272px default bottom panel, 152px
+minimum, half-height responsive maximum, 16px drag strip, 33px tab header,
+239px content region, named tab/tabpanel, and `Terminal input`. The independent
+`AppShell` adds controlled or uncontrolled pointer and Arrow/Home/End resizing
+with accessible separator values, while `TerminalTranscript`,
+`TerminalPrompt`, and `TerminalSession` keep output, input, and process status
+protocol-neutral and host-owned.
+
+The pinned public App Server client supplies `processId`, command output, and
+`item/commandExecution/terminalInteraction` to a deterministic background
+terminal trace. CDP gates the standard geometry and semantics across 15
+frames. Electron drives pointer and keyboard resizing, local input submission,
+close/restore, and 820×680 compact geometry. The reviewed pixel baseline also
+accepts an optional 906×820 current-build reference; the accepted sample
+differs by 1.2791% in the full Terminal panel and 0.7288% in its content at the
+strict 0.05 threshold. Whole-main pixels are reported but not promoted because
+the synthetic protocol conversation intentionally differs from the observed
+product conversation. Multi-tab lifecycle, shell creation/termination,
+background-process enumeration, failure recovery, and persisted panel state
+remain outside this slice.
+
 The compact tool/recovery slice splits the former combined
 `thread.search-tool-mcp-events` candidate into independent search, Browser, and
 MCP tool-event rows. Current-build CDP evidence promotes completed web search
@@ -301,6 +322,7 @@ This is a measurement- and raster-backed basic thread/workspace slice, not a
 claim that the whole application or every lifecycle is pixel-perfect.
 Markdown variants, the exact host virtualization algorithm, code search,
 successful MCP and connector calls, thread-level retry recovery, approval
-persistence and timeout, current-build PR-review detail, mixed multi-file
-change kinds, Review-panel resizing, and native Codex window behavior retain
-their own inventory gates.
+persistence and timeout, mixed multi-file change kinds, PR
+merge/review-submission states, Terminal multi-tab and
+process-creation/termination lifecycles, and native Codex window behavior
+retain their own inventory gates.
