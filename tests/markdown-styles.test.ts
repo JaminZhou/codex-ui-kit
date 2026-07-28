@@ -41,6 +41,15 @@ describe("Markdown visual contract", () => {
     expect(styles).toContain("padding: 0 0.1875rem");
   });
 
+  it("resets only a top-level final code block margin", () => {
+    expect(styles).toContain(
+      ".codex-ui-markdown > pre:last-child > .codex-ui-code-block:only-child",
+    );
+    expect(styles).not.toContain(
+      ".codex-ui-markdown .codex-ui-code-block:last-child",
+    );
+  });
+
   it("does not rely on a host box-sizing reset for table overhangs", () => {
     expect(styles).toMatch(
       /\.codex-ui-markdown,\s*\.codex-ui-markdown \* \{\s*box-sizing: border-box;/,

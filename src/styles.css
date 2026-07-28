@@ -6185,7 +6185,7 @@ summary.codex-ui-activity__header::after {
   word-break: break-word;
 }
 
-.codex-ui-markdown .codex-ui-code-block:last-child {
+.codex-ui-markdown > pre:last-child > .codex-ui-code-block:only-child {
   margin-bottom: 0;
 }
 

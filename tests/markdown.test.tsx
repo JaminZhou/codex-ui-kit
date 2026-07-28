@@ -63,6 +63,7 @@ describe("AgentMarkdown", () => {
     expect(html).toContain('loading="lazy"');
     expect(html).toContain('data-markdown-copy="code-block"');
     expect(html).toContain('data-language="ts"');
+    expect(html).toContain('<pre><figure class="codex-ui-code-block"');
     expect(html).toContain('class="codex-ui-code-block__body" dir="ltr" tabindex="0"');
     expect(html).toContain("const ready = true;");
     expect(html).not.toContain("node=");
