@@ -13,6 +13,7 @@ import {
 } from "electron";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import { LiveApprovalGate } from "./live-approval-gate.js";
 import { LiveTurnStartGate } from "./live-turn-start-gate.js";
 import {
   isAllowedExternalUrl,
@@ -36,10 +37,17 @@ let client: CodexAppServerClient | null = null;
 let liveThread: CodexThread | null = null;
 let activeTurn: CodexTurn | null = null;
 let unsubscribeNotifications: (() => void) | null = null;
+let unsubscribeServerRequests: (() => void)[] = [];
 const liveTurnStartGate = new LiveTurnStartGate();
+const liveApprovalGate = new LiveApprovalGate();
 
 interface StartLiveInput {
   prompt: string;
+}
+
+interface ApprovalResponseInput {
+  decision: "accept" | "decline";
+  requestId: number | string;
 }
 
 function assertStartInput(value: unknown): asserts value is StartLiveInput {
@@ -53,11 +61,47 @@ function assertStartInput(value: unknown): asserts value is StartLiveInput {
   }
 }
 
+function assertApprovalResponseInput(
+  value: unknown,
+): asserts value is ApprovalResponseInput {
+  if (
+    typeof value !== "object" ||
+    value === null ||
+    (typeof (value as ApprovalResponseInput).requestId !== "string" &&
+      typeof (value as ApprovalResponseInput).requestId !== "number") ||
+    !["accept", "decline"].includes(
+      (value as ApprovalResponseInput).decision,
+    )
+  ) {
+    throw new TypeError("A valid approval response is required.");
+  }
+}
+
 function broadcastNotification(notification: JsonRpcNotification) {
   const window = mainWindow;
   if (window && !window.isDestroyed()) {
     window.webContents.send("demo:notification", notification);
   }
+}
+
+function requestRendererApproval(
+  method:
+    | "item/commandExecution/requestApproval"
+    | "item/fileChange/requestApproval",
+  params: unknown,
+  requestId: number | string,
+) {
+  const window = mainWindow;
+  if (!window || window.isDestroyed()) {
+    return Promise.resolve({ decision: "decline" as const });
+  }
+  window.webContents.send("demo:server-request", {
+    id: requestId,
+    kind: "request",
+    method,
+    params,
+  });
+  return liveApprovalGate.request(requestId);
 }
 
 function assertTrustedIpc(event: IpcMainInvokeEvent) {
@@ -87,6 +131,8 @@ async function ensureClient() {
   if (client) {
     unsubscribeNotifications?.();
     unsubscribeNotifications = null;
+    unsubscribeServerRequests.forEach((unsubscribe) => unsubscribe());
+    unsubscribeServerRequests = [];
     await client.close().catch(() => undefined);
   }
 
@@ -99,6 +145,18 @@ async function ensureClient() {
     protocolValidation: "strict",
   });
   unsubscribeNotifications = client.onNotification(broadcastNotification);
+  unsubscribeServerRequests = [
+    client.onServerRequest(
+      "item/commandExecution/requestApproval",
+      (params, request) =>
+        requestRendererApproval(request.method, params, request.id),
+    ),
+    client.onServerRequest(
+      "item/fileChange/requestApproval",
+      (params, request) =>
+        requestRendererApproval(request.method, params, request.id),
+    ),
+  ];
   await client.connect();
   return client;
 }
@@ -114,7 +172,7 @@ async function startLive(
     const thread =
       liveThread ??
       (await connectedClient.createThread({
-        approvalPolicy: "never",
+        approvalPolicy: "on-request",
         cwd: workspaceDirectory,
         ephemeral: true,
         historyMode: "paginated",
@@ -122,7 +180,7 @@ async function startLive(
       }));
     liveThread = thread;
     const turn = await thread.startTurn(rawInput.prompt, {
-      approvalPolicy: "never",
+      approvalPolicy: "on-request",
       cwd: workspaceDirectory,
       sandboxPolicy: {
         networkAccess: false,
@@ -150,11 +208,27 @@ async function handleStopLive(event: IpcMainInvokeEvent) {
   await stopLive();
 }
 
+async function handleApprovalResponse(
+  event: IpcMainInvokeEvent,
+  rawInput: unknown,
+) {
+  assertTrustedIpc(event);
+  assertApprovalResponseInput(rawInput);
+  if (
+    !liveApprovalGate.resolve(rawInput.requestId, rawInput.decision)
+  ) {
+    throw new Error("The approval request is no longer pending.");
+  }
+}
+
 async function closeLive() {
   activeTurn = null;
   liveThread = null;
   unsubscribeNotifications?.();
   unsubscribeNotifications = null;
+  unsubscribeServerRequests.forEach((unsubscribe) => unsubscribe());
+  unsubscribeServerRequests = [];
+  liveApprovalGate.declineAll();
   const closingClient = client;
   client = null;
   await closingClient?.close();
@@ -211,6 +285,7 @@ function createWindow() {
 ipcMain.handle("demo:live:start", startLive);
 ipcMain.handle("demo:live:stop", handleStopLive);
 ipcMain.handle("demo:live:close", handleCloseLive);
+ipcMain.handle("demo:approval:respond", handleApprovalResponse);
 
 app.whenReady().then(() => {
   createWindow();

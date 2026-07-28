@@ -1,12 +1,14 @@
 import compactionTrace from "../fixtures/traces/compaction.jsonl?raw";
 import interruptionTrace from "../fixtures/traces/interruption.jsonl?raw";
 import recoveryTrace from "../fixtures/traces/streaming-recovery.jsonl?raw";
+import workflowTrace from "../fixtures/traces/workspace-workflow.jsonl?raw";
 import type { ProtocolEventRecord } from "./protocol-state";
 
 export type ReplayScenarioId =
   | "streaming-recovery"
   | "interruption"
-  | "compaction";
+  | "compaction"
+  | "workspace-workflow";
 
 export interface ReplayScenario {
   description: string;
@@ -66,6 +68,12 @@ export const replayScenarios: Record<ReplayScenarioId, ReplayScenario> = {
     "Context compaction",
     "Context optimization transitions from running to completed.",
     compactionTrace,
+  ),
+  "workspace-workflow": scenario(
+    "workspace-workflow",
+    "Command to review",
+    "Command execution, approval, file change, and the Review panel.",
+    workflowTrace,
   ),
 };
 

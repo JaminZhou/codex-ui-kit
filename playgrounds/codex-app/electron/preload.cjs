@@ -10,6 +10,16 @@ contextBridge.exposeInMainWorld("codexDemo", {
     ipcRenderer.on("demo:notification", listener);
     return () => ipcRenderer.removeListener("demo:notification", listener);
   },
+  onServerRequest: (handler) => {
+    if (typeof handler !== "function") {
+      throw new TypeError("Server-request handler must be a function.");
+    }
+    const listener = (_event, request) => handler(request);
+    ipcRenderer.on("demo:server-request", listener);
+    return () => ipcRenderer.removeListener("demo:server-request", listener);
+  },
+  respondToApproval: (input) =>
+    ipcRenderer.invoke("demo:approval:respond", input),
   startLive: (input) => ipcRenderer.invoke("demo:live:start", input),
   stopLive: () => ipcRenderer.invoke("demo:live:stop"),
 });

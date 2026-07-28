@@ -32,6 +32,36 @@ export const visualScenes = [
     id: "compacted",
     scenario: "compaction",
   },
+  {
+    frame: "command-running",
+    id: "command-running",
+    scenario: "workspace-workflow",
+    surfaces: ["command"],
+  },
+  {
+    frame: "approval-pending",
+    id: "approval-pending",
+    scenario: "workspace-workflow",
+    surfaces: ["approval", "command"],
+  },
+  {
+    frame: "file-changing",
+    id: "file-changing",
+    scenario: "workspace-workflow",
+    surfaces: ["approval", "command", "fileChange"],
+  },
+  {
+    frame: "file-applied",
+    id: "file-applied",
+    scenario: "workspace-workflow",
+    surfaces: ["approval", "command", "fileChange"],
+  },
+  {
+    frame: "review-open",
+    id: "review-open",
+    scenario: "workspace-workflow",
+    surfaces: ["approval", "command", "fileChange", "reviewPanel"],
+  },
 ];
 
 export async function launchScene(scene) {

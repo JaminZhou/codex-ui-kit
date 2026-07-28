@@ -34,6 +34,32 @@ for (const scene of visualScenes) {
       const composerRect = rect(composer);
       const shellRect = rect(shell);
       const headerRect = rect(header);
+      const namedSurfaceSelectors = {
+        approval: ".codex-ui-approval-request",
+        command: ".codex-ui-command-execution",
+        fileChange: ".codex-ui-file-change",
+        reviewPanel:
+          '.codex-ui-workspace-panel[data-placement="side"]',
+      };
+      const namedSurfaces = Object.fromEntries(
+        Object.entries(namedSurfaceSelectors).map(([name, selector]) => {
+          const element = document.querySelector(selector);
+          if (!element) return [name, null];
+          const style = getComputedStyle(element);
+          return [
+            name,
+            {
+              rect: rect(element),
+              styles: {
+                display: style.display,
+                fontFamily: style.fontFamily,
+                overflow: style.overflow,
+                position: style.position,
+              },
+            },
+          ];
+        }),
+      );
       return {
         composer: composerRect,
         frame: root.getAttribute("data-frame"),
@@ -42,6 +68,7 @@ for (const scene of visualScenes) {
           document.documentElement.scrollWidth -
           document.documentElement.clientWidth,
         mode: root.getAttribute("data-mode"),
+        namedSurfaces,
         rootStatus: root.getAttribute("data-status"),
         scenario: root.getAttribute("data-scenario"),
         shell: shellRect,
@@ -75,14 +102,41 @@ for (const scene of visualScenes) {
     if (contract.styles.viewportOverflowY !== "auto") {
       throw new Error(`${scene.id}: conversation viewport is not scrollable.`);
     }
+    for (const surfaceName of scene.surfaces ?? []) {
+      const surface = contract.namedSurfaces[surfaceName];
+      if (
+        !surface ||
+        surface.rect.width < 160 ||
+        surface.rect.height < 20 ||
+        surface.styles.display === "none"
+      ) {
+        throw new Error(
+          `${scene.id}: named ${surfaceName} surface is missing or collapsed.`,
+        );
+      }
+    }
+    if (
+      scene.surfaces?.includes("reviewPanel") &&
+      (contract.namedSurfaces.reviewPanel.rect.right >
+        contract.shell.right + 1 ||
+        contract.namedSurfaces.reviewPanel.rect.left <=
+          contract.header.left)
+    ) {
+      throw new Error(`${scene.id}: Review panel split geometry is invalid.`);
+    }
 
-    const input = page.getByRole("textbox", { name: "Message composer" });
-    await input.click();
+    const expectedFocus = scene.surfaces?.includes("reviewPanel")
+      ? "Review diff for WORKFLOW.md"
+      : "Message composer";
+    const focusTarget = scene.surfaces?.includes("reviewPanel")
+      ? page.getByRole("list", { name: expectedFocus })
+      : page.getByRole("textbox", { name: expectedFocus });
+    await focusTarget.click();
     const focusContract = await page.evaluate(
       () => document.activeElement?.getAttribute("aria-label"),
     );
-    if (focusContract !== "Message composer") {
-      throw new Error(`${scene.id}: composer focus contract failed.`);
+    if (focusContract !== expectedFocus) {
+      throw new Error(`${scene.id}: named focus contract failed.`);
     }
 
     await writeFile(

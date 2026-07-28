@@ -7,13 +7,20 @@ import {
   AppSidebar,
   AppSidebarItem,
   AppSidebarSection,
+  ApprovalRequest,
   Button,
+  CommandExecution,
+  CommandOutput,
   ConversationThreadShell,
+  FileChange,
+  FileDiff,
   StatusBanner,
   ThreadContextEvent,
   ThreadHeader,
   ThreadInterruptionSummary,
   ThreadThinkingPlaceholder,
+  WorkspacePanel,
+  type FileDiffLine,
 } from "codex-ui-kit";
 import {
   Fragment,
@@ -30,6 +37,7 @@ import {
   isTurnActive,
   reduceProtocolNotification,
   type DemoProtocolState,
+  type DemoFileUpdateChange,
   type ProtocolEventRecord,
 } from "./protocol-state";
 import {
@@ -67,6 +75,63 @@ function statusLabel(state: DemoProtocolState) {
   return "Ready";
 }
 
+function diffLines(change: DemoFileUpdateChange): FileDiffLine[] {
+  let oldLine = 0;
+  let newLine = 0;
+  return change.diff.split(/\r?\n/).flatMap<FileDiffLine>((line) => {
+    if (!line) return [];
+    if (line.startsWith("@@")) {
+      const match = /@@ -(\d+)(?:,\d+)? \+(\d+)(?:,\d+)? @@/.exec(line);
+      oldLine = Number(match?.[1] ?? 0);
+      newLine = Number(match?.[2] ?? 0);
+      return [{ content: line, kind: "hunk" as const }];
+    }
+    if (
+      line.startsWith("---") ||
+      line.startsWith("+++") ||
+      line.startsWith("\\ ")
+    ) {
+      return [{ content: line, kind: "meta" as const }];
+    }
+    if (line.startsWith("+") && !line.startsWith("+++")) {
+      const next = {
+        content: line.slice(1),
+        kind: "addition" as const,
+        newLineNumber: newLine,
+      };
+      newLine += 1;
+      return [next];
+    }
+    if (line.startsWith("-") && !line.startsWith("---")) {
+      const next = {
+        content: line.slice(1),
+        kind: "deletion" as const,
+        oldLineNumber: oldLine,
+      };
+      oldLine += 1;
+      return [next];
+    }
+    const next = {
+      content: line.startsWith(" ") ? line.slice(1) : line,
+      kind: "context" as const,
+      newLineNumber: newLine,
+      oldLineNumber: oldLine,
+    };
+    newLine += 1;
+    oldLine += 1;
+    return [next];
+  });
+}
+
+function changeStats(change: DemoFileUpdateChange) {
+  const lines = diffLines(change);
+  return {
+    additions: lines.filter(({ kind }) => kind === "addition").length,
+    deletions: lines.filter(({ kind }) => kind === "deletion").length,
+    lines,
+  };
+}
+
 export function App() {
   const initialSelection = useMemo(querySelection, []);
   const [scenarioId, setScenarioId] = useState<ReplayScenarioId>(
@@ -86,6 +151,12 @@ export function App() {
   const [composerValue, setComposerValue] = useState("");
   const [liveStartPending, setLiveStartPending] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [reviewOpen, setReviewOpen] = useState(
+    initialSelection.frame === "review-open",
+  );
+  const [undoneFileIds, setUndoneFileIds] = useState<Set<string>>(
+    () => new Set(),
+  );
   const [liveError, setLiveError] = useState<string | null>(null);
   const liveStartPendingRef = useRef(false);
   const replay = replayState(scenario.events, replayCount);
@@ -93,9 +164,16 @@ export function App() {
 
   useEffect(() => {
     if (!window.codexDemo) return;
-    return window.codexDemo.onNotification((notification) => {
+    const removeNotification = window.codexDemo.onNotification((notification) => {
       dispatchLive(notification);
     });
+    const removeServerRequest = window.codexDemo.onServerRequest((request) => {
+      dispatchLive(request);
+    });
+    return () => {
+      removeNotification();
+      removeServerRequest();
+    };
   }, []);
 
   useEffect(() => {
@@ -110,7 +188,26 @@ export function App() {
     setMode("replay");
     setScenarioId(nextId);
     setReplayCount(replayScenarios[nextId].events.length);
+    setReviewOpen(false);
+    setUndoneFileIds(new Set());
     setLiveError(null);
+  };
+
+  const respondToApproval = async (
+    requestId: number | string,
+    decision: "accept" | "decline",
+  ) => {
+    if (mode !== "live") return;
+    try {
+      await window.codexDemo?.respondToApproval({ decision, requestId });
+      dispatchLive({
+        decision: decision === "accept" ? "approved" : "rejected",
+        kind: "approval-resolution",
+        requestId,
+      });
+    } catch (error) {
+      setLiveError(error instanceof Error ? error.message : String(error));
+    }
   };
 
   const submitLive = async (prompt: string) => {
@@ -238,6 +335,218 @@ export function App() {
     />
   );
 
+  const reviewChange = state.fileChanges.at(-1)?.changes.at(0);
+  const reviewStats = reviewChange ? changeStats(reviewChange) : null;
+  const reviewPanel = reviewChange ? (
+    <WorkspacePanel
+      activeTabId="review"
+      label="Review"
+      onActiveTabChange={() => undefined}
+      onClose={() => setReviewOpen(false)}
+      onCloseTab={() => setReviewOpen(false)}
+      placement="side"
+      tabs={[
+        {
+          content: (
+            <div className="demo-review-panel" data-testid="review-panel">
+              <div className="demo-review-panel__toolbar">
+                <div>
+                  <strong>Last turn</strong>
+                  <span>{reviewChange.path}</span>
+                </div>
+                <span className="demo-review-panel__stats">
+                  +{reviewStats?.additions ?? 0} −
+                  {reviewStats?.deletions ?? 0}
+                </span>
+              </div>
+              <FileDiff
+                aria-label={`Review diff for ${reviewChange.path}`}
+                lines={reviewStats?.lines ?? []}
+                wrapLines
+              />
+            </div>
+          ),
+          id: "review",
+          label: "Review",
+        },
+      ]}
+    />
+  ) : null;
+  const timelineContent = state.timeline.map((entry) => {
+    if (entry.kind === "message") {
+      const message = state.messages.find(({ id }) => id === entry.id);
+      if (!message) return null;
+      return (
+        <Fragment key={`message:${message.id}`}>
+          <AgentMessage
+            data-item-id={message.id}
+            role={message.role}
+            status={agentMessageStatus(message.status)}
+          >
+            {message.role === "assistant" ? (
+              <AgentMarkdown streaming={message.status === "running"}>
+                {message.text || " "}
+              </AgentMarkdown>
+            ) : (
+              message.text
+            )}
+          </AgentMessage>
+          {message.interruptionDurationMs !== undefined ? (
+            <ThreadInterruptionSummary
+              durationMs={message.interruptionDurationMs ?? 0}
+              label={
+                message.interruptionDurationMs === null
+                  ? "You stopped this response"
+                  : undefined
+              }
+              stoppedLabel={(time) =>
+                `You stopped this response after ${time}`
+              }
+            />
+          ) : null}
+          {message.compaction ? (
+            <ThreadContextEvent
+              mode="automatic"
+              status={message.compaction}
+            />
+          ) : null}
+        </Fragment>
+      );
+    }
+
+    if (entry.kind === "command") {
+      const command = state.commands.find(({ id }) => id === entry.id);
+      if (!command) return null;
+      return (
+        <CommandExecution
+          command={command.command}
+          cwd={command.cwd}
+          data-item-id={command.id}
+          data-testid="command-execution"
+          durationMs={command.durationMs ?? undefined}
+          exitCode={command.exitCode ?? undefined}
+          key={`command:${command.id}`}
+          open={
+            initialSelection.capture &&
+            initialSelection.frame === "command-running" &&
+            command.status === "running"
+          }
+          status={command.status}
+        >
+          <CommandOutput copyText={command.output}>
+            {command.output}
+          </CommandOutput>
+        </CommandExecution>
+      );
+    }
+
+    if (entry.kind === "approval") {
+      const approval = state.approvals.find(
+        ({ requestId }) =>
+          `${typeof requestId}:${requestId}` === entry.id,
+      );
+      if (!approval) return null;
+      return (
+        <ApprovalRequest
+          data-item-id={approval.itemId}
+          data-testid="approval-request"
+          decision={approval.decision}
+          description={approval.command}
+          kind={approval.kind}
+          key={`approval:${entry.id}`}
+          onApprove={() =>
+            respondToApproval(approval.requestId, "accept")
+          }
+          onReject={() =>
+            respondToApproval(approval.requestId, "decline")
+          }
+          reason={approval.reason}
+          title={
+            approval.kind === "command"
+              ? "Run this command?"
+              : "Apply these file changes?"
+          }
+        />
+      );
+    }
+
+    const fileChange = state.fileChanges.find(({ id }) => id === entry.id);
+    if (!fileChange || undoneFileIds.has(fileChange.id)) return null;
+    return (
+      <Fragment key={`file-change:${fileChange.id}`}>
+        {fileChange.changes.map((change) => {
+          const stats = changeStats(change);
+          const open =
+            initialSelection.capture &&
+            initialSelection.frame === "file-changing";
+          const indicator = (
+            <svg
+              aria-hidden="true"
+              className="demo-file-indicator"
+              viewBox="0 0 16 16"
+            >
+              <path d="M3 2.5h6l4 4v7H3z" />
+              <path d="M9 2.5v4h4M5.5 9h5M5.5 11.5h3.5" />
+            </svg>
+          );
+          const detail =
+            fileChange.status === "applied" ? (
+              <span className="demo-file-actions">
+                <span className="demo-file-actions__stats">
+                  +{stats.additions} −{stats.deletions}
+                </span>
+                <button
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    setUndoneFileIds((current) => {
+                      const next = new Set(current);
+                      next.add(fileChange.id);
+                      return next;
+                    });
+                  }}
+                  type="button"
+                >
+                  Undo
+                </button>
+                <button
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    setReviewOpen(true);
+                  }}
+                  type="button"
+                >
+                  Review
+                </button>
+              </span>
+            ) : undefined;
+          return (
+            <FileChange
+              additions={stats.additions}
+              change={change.kind}
+              data-item-id={fileChange.id}
+              data-testid="file-change"
+              deletions={stats.deletions}
+              detail={detail}
+              diffText={change.diff}
+              indicator={indicator}
+              key={change.path}
+              open={open}
+              path={change.path}
+              previousPath={change.previousPath}
+              status={fileChange.status}
+            >
+              <FileDiff
+                aria-label={`Inline diff for ${change.path}`}
+                lines={stats.lines}
+                wrapLines
+              />
+            </FileChange>
+          );
+        })}
+      </Fragment>
+    );
+  });
+
   return (
     <div
       className="demo-root"
@@ -250,6 +559,10 @@ export function App() {
     >
       <AppShell
         onSidebarOpenChange={setSidebarOpen}
+        onSidePanelOpenChange={setReviewOpen}
+        sidePanel={reviewPanel}
+        sidePanelLabel="Review"
+        sidePanelOpen={reviewOpen && Boolean(reviewPanel)}
         sidebar={sidebar}
         sidebarOpen={sidebarOpen}
       >
@@ -267,44 +580,11 @@ export function App() {
                 </StatusBanner>
               ) : null}
 
-              {state.messages.map((message) => (
-                <Fragment key={message.id}>
-                  <AgentMessage
-                    data-item-id={message.id}
-                    role={message.role}
-                    status={agentMessageStatus(message.status)}
-                  >
-                    {message.role === "assistant" ? (
-                      <AgentMarkdown streaming={message.status === "running"}>
-                        {message.text || " "}
-                      </AgentMarkdown>
-                    ) : (
-                      message.text
-                    )}
-                  </AgentMessage>
-                  {message.interruptionDurationMs !== undefined ? (
-                    <ThreadInterruptionSummary
-                      durationMs={message.interruptionDurationMs ?? 0}
-                      label={
-                        message.interruptionDurationMs === null
-                          ? "You stopped this response"
-                          : undefined
-                      }
-                      stoppedLabel={(time) =>
-                        `You stopped this response after ${time}`
-                      }
-                    />
-                  ) : null}
-                  {message.compaction ? (
-                    <ThreadContextEvent
-                      mode="automatic"
-                      status={message.compaction}
-                    />
-                  ) : null}
-                </Fragment>
-              ))}
+              {timelineContent}
 
               {state.status === "running" &&
+              state.commands.length === 0 &&
+              state.fileChanges.length === 0 &&
               !state.messages.some(
                 ({ role, status }) =>
                   role === "assistant" && status === "running",

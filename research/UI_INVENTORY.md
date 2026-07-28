@@ -203,12 +203,17 @@ The workflow fixture extends `FileChange` with a host-owned leading indicator
 slot and composes the existing `ActivityTimeline`, `CommandExecution`,
 `ApprovalRequest`, `ConversationThreadShell`, `WorkspacePanel`, and `FileDiff`
 primitives. Current-build Browser evidence plus the existing real
-BrowserWindow acceptance promote the sampled command and approval states. The
-turn file card is Browser-verified but remains Electron-partial until its exact
-collapsed indicator and Undo/Review actions are exercised there. The Review
-side-panel/file-diff composition is likewise Browser-verified but remains
-Electron-partial until that exact cross-owner split is added to the Electron
-acceptance surface.
+BrowserWindow acceptance promote the sampled command and approval states.
+
+The protocol-backed Codex App playground now exercises command execution, a
+real App Server approval request/response, the applied turn-owned file card,
+and the host-owned Review split in a real BrowserWindow. CDP locks the named
+surface geometry and computed layout, Electron acceptance closes and reopens
+the Review panel, and reviewed pixels gate the five workflow frames. Paired
+with the existing current-build captures, this promotes the sampled file card,
+Review side-panel, and editor diff to Electron-verified. They remain
+implementation-partial because broader variants, resizing, multi-file state,
+and current-build PR review behavior are still open.
 
 The compact tool/recovery slice splits the former combined
 `thread.search-tool-mcp-events` candidate into independent search, Browser, and
