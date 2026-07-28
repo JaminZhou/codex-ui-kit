@@ -37,6 +37,7 @@ describe("Markdown visual contract", () => {
 
   it("keeps links identifiable and lets custom copy labels size to content", () => {
     expect(styles).toContain("text-decoration: underline");
+    expect(styles).toContain("font: inherit");
     expect(styles).toContain("min-width: 1.375rem");
     expect(styles).toContain("padding: 0 0.1875rem");
     expect(styles).toContain(".codex-ui-code-block__copy-icon");
