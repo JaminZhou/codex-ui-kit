@@ -342,6 +342,37 @@ describe("protocol lifecycle reducer", () => {
     expect(completed.approvals[0]?.decision).toBe("approved");
   });
 
+  it("falls back when a file approval has no known paths", () => {
+    const started = reduceProtocolNotification(initialProtocolState, {
+      method: "item/started",
+      params: {
+        item: {
+          changes: [],
+          id: "file-without-paths",
+          status: "inProgress",
+          type: "fileChange",
+        },
+        threadId: "thread-live",
+        turnId: "turn-live",
+      },
+    });
+    const pending = reduceProtocolNotification(started, {
+      atMs: 10,
+      id: "file-approval-without-paths",
+      kind: "request",
+      method: "item/fileChange/requestApproval",
+      params: {
+        itemId: "file-without-paths",
+        reason: "Apply the patch.",
+        startedAtMs: 10,
+        threadId: "thread-live",
+        turnId: "turn-live",
+      },
+    });
+
+    expect(pending.approvals[0]?.command).toBe("File changes");
+  });
+
   it("keeps completed compaction at its historical position on a follow-up turn", () => {
     const compacted = reduceProtocolTrace(replayScenarios.compaction.events);
     const followUp = reduceProtocolNotification(compacted, {

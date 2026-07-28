@@ -382,6 +382,10 @@ export function reduceProtocolNotification(
     if (requestId === undefined || !itemId) return next;
     const command = state.commands.find(({ id }) => id === itemId);
     const fileChange = state.fileChanges.find(({ id }) => id === itemId);
+    const fileChangePaths = fileChange?.changes
+      .map(({ path }) => path)
+      .filter(Boolean)
+      .join(", ");
     const kind =
       notification.method === "item/fileChange/requestApproval"
         ? "file"
@@ -392,8 +396,7 @@ export function reduceProtocolNotification(
         command:
           asString(params.command) ??
           command?.command ??
-          fileChange?.changes.map(({ path }) => path).join(", ") ??
-          "File changes",
+          (fileChangePaths || "File changes"),
         decision: "pending",
         itemId,
         kind,
