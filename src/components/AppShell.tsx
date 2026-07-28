@@ -593,7 +593,7 @@ export function AppShell({
     sidePanel !== null &&
     !resolvedSidePanelExpanded &&
     layoutMode === "wide";
-  const commitSidePanelWidth = (nextWidth: number) => {
+  const resolveSidePanelWidth = (nextWidth: number) => {
     const measuredLiveShellWidth =
       shellRef.current?.getBoundingClientRect().width ?? shellWidth;
     const liveShellWidth =
@@ -618,17 +618,21 @@ export function AppShell({
       normalizedSidePanelMaxWidth,
       liveResponsiveMaximum,
     );
-    const normalizedWidth = clampShellTrack(
+    return clampShellTrack(
       nextWidth,
       normalizedSidePanelMinWidth,
       maximum,
     );
+  };
+  const commitResolvedSidePanelWidth = (normalizedWidth: number) => {
     if (!sidePanelWidthIsControlled) {
       setInternalSidePanelWidth(normalizedWidth);
     }
     onSidePanelWidthChange?.(normalizedWidth);
     return normalizedWidth;
   };
+  const commitSidePanelWidth = (nextWidth: number) =>
+    commitResolvedSidePanelWidth(resolveSidePanelWidth(nextWidth));
   const handleSidePanelResizePointerDown = (
     event: ReactPointerEvent<HTMLDivElement>,
   ) => {
@@ -654,11 +658,12 @@ export function AppShell({
   ) => {
     const session = sidePanelResizeSessionRef.current;
     if (!session || session.pointerId !== event.pointerId) return;
-    const nextWidth =
+    const nextWidth = resolveSidePanelWidth(
       session.originWidth +
-      (event.clientX - session.originClientX) * session.direction;
+        (event.clientX - session.originClientX) * session.direction,
+    );
     if (nextWidth === session.lastWidth) return;
-    session.lastWidth = commitSidePanelWidth(nextWidth);
+    session.lastWidth = commitResolvedSidePanelWidth(nextWidth);
   };
   const finishSidePanelResize = (
     event: ReactPointerEvent<HTMLDivElement>,

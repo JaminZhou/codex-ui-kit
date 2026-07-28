@@ -291,11 +291,14 @@ describe("application shell", () => {
 
     fireEvent.pointerMove(separator, { clientX: -1_000, pointerId: 17 });
     expect(separator.getAttribute("aria-valuenow")).toBe("554");
+    fireEvent.pointerMove(separator, { clientX: -1_200, pointerId: 17 });
     fireEvent.pointerMove(separator, { clientX: 2_000, pointerId: 17 });
     expect(separator.getAttribute("aria-valuenow")).toBe("320");
+    fireEvent.pointerMove(separator, { clientX: 2_200, pointerId: 17 });
     fireEvent.pointerUp(separator, { clientX: 2_000, pointerId: 17 });
 
     expect(shell.hasAttribute("data-side-panel-resizing")).toBe(false);
+    expect(onSidePanelWidthChange).toHaveBeenCalledTimes(3);
     expect(onSidePanelWidthChange).toHaveBeenLastCalledWith(320);
   });
 
