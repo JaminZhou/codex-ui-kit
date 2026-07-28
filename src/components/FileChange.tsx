@@ -542,6 +542,8 @@ export interface FileReviewItem extends FileChangeGroupItem {
 export interface FileReviewProps
   extends Omit<HTMLAttributes<HTMLDivElement>, "children"> {
   files: readonly FileReviewItem[];
+  /** Change this key to reveal the selected path again after repeated activation. */
+  selectionKey?: number | string;
   selectedPath?: string;
   wrapLines?: boolean;
 }
@@ -549,6 +551,7 @@ export interface FileReviewProps
 export function FileReview({
   className,
   files,
+  selectionKey,
   selectedPath,
   wrapLines = true,
   "aria-label": ariaLabel = "File review",
@@ -569,7 +572,7 @@ export function FileReview({
       return;
     }
     selectedFile.scrollIntoView({ block: "nearest", inline: "nearest" });
-  }, [selectedPath]);
+  }, [selectedPath, selectionKey]);
 
   return (
     <div

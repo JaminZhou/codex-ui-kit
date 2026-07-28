@@ -106,6 +106,7 @@ export function App() {
   );
   const [reviewSelection, setReviewSelection] =
     useState<ReviewSelection | null>(null);
+  const [reviewSelectionKey, setReviewSelectionKey] = useState(0);
   const [undoneFileIds, setUndoneFileIds] = useState<Set<string>>(
     () => new Set(),
   );
@@ -391,6 +392,7 @@ export function App() {
               <FileReview
                 aria-label="Last turn file review"
                 files={reviewFiles}
+                selectionKey={reviewSelectionKey}
                 selectedPath={resolvedReview?.selectedPath}
               />
             </div>
@@ -552,6 +554,7 @@ export function App() {
           ) : null}
           <button
             onClick={() => {
+              setReviewSelectionKey((current) => current + 1);
               setReviewSelection({
                 fileChangeId: fileChange.id,
               });
@@ -572,6 +575,7 @@ export function App() {
           detail={detail}
           indicator={indicator}
           onOpenFile={(change) => {
+            setReviewSelectionKey((current) => current + 1);
             setReviewSelection({
               fileChangeId: fileChange.id,
               path: change.path,

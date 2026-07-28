@@ -261,6 +261,33 @@ try {
       "Compact Electron split did not keep conversation and Review interactive.",
     );
   }
+
+  await compactPage.evaluate(() => {
+    HTMLElement.prototype.scrollIntoView = function (options) {
+      if (this.matches(".codex-ui-file-review__file[data-selected]")) {
+        this.dataset.scrollRequest = JSON.stringify(options);
+      }
+    };
+  });
+  await compactPage
+    .getByRole("button", {
+      name: "Open .research/ui-kit-multifile-probe/beta.txt",
+    })
+    .click();
+  const repeatedScrollRequest = await compactPage
+    .getByRole("listitem", {
+      name: "Review file .research/ui-kit-multifile-probe/beta.txt",
+    })
+    .getAttribute("data-scroll-request");
+  if (
+    !repeatedScrollRequest ||
+    JSON.parse(repeatedScrollRequest).block !== "nearest" ||
+    JSON.parse(repeatedScrollRequest).inline !== "nearest"
+  ) {
+    throw new Error(
+      `Repeated file activation did not reveal the selected diff: ${repeatedScrollRequest}`,
+    );
+  }
 } finally {
   await compactApp.close();
 }

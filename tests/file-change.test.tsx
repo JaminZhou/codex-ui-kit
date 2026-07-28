@@ -404,11 +404,21 @@ describe("FileReview", () => {
 
     try {
       const { rerender } = render(
-        <FileReview files={files} selectedPath={files[0].path} />,
+        <FileReview
+          files={files}
+          selectedPath={files[0].path}
+          selectionKey={0}
+        />,
       );
       scrollIntoView.mockClear();
 
-      rerender(<FileReview files={files} selectedPath={files[1].path} />);
+      rerender(
+        <FileReview
+          files={files}
+          selectedPath={files[1].path}
+          selectionKey={1}
+        />,
+      );
 
       const selectedFile = screen.getByRole("listitem", {
         name: "Review file .research/probe/beta.txt",
@@ -419,6 +429,18 @@ describe("FileReview", () => {
         block: "nearest",
         inline: "nearest",
       });
+
+      scrollIntoView.mockClear();
+      rerender(
+        <FileReview
+          files={files}
+          selectedPath={files[1].path}
+          selectionKey={2}
+        />,
+      );
+
+      expect(scrollIntoView).toHaveBeenCalledOnce();
+      expect(scrollIntoView.mock.instances[0]).toBe(selectedFile);
     } finally {
       if (originalScrollIntoView) {
         Object.defineProperty(
