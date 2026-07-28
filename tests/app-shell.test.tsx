@@ -25,6 +25,7 @@ import {
 afterEach(() => {
   cleanup();
   document.body.style.overflow = "";
+  document.documentElement.style.fontSize = "";
   vi.unstubAllGlobals();
 });
 
@@ -247,6 +248,216 @@ describe("application shell", () => {
     expect(document.activeElement).toBe(
       screen.getByRole("button", { name: "Conversation action" }),
     );
+  });
+
+  it("exposes a pointer-resizable bottom panel track", () => {
+    const onBottomPanelHeightChange = vi.fn();
+    const { container } = render(
+      <AppShell
+        bottomPanel="Terminal"
+        bottomPanelMaxHeight={402}
+        bottomPanelOpen
+        bottomPanelResizable
+        defaultBottomPanelHeight={272}
+        layoutMode="wide"
+        onBottomPanelHeightChange={onBottomPanelHeightChange}
+      >
+        Thread
+      </AppShell>,
+    );
+
+    const shell = container.querySelector(
+      ".codex-ui-app-shell",
+    ) as HTMLDivElement;
+    const separator = screen.getByRole("separator", {
+      name: "Resize bottom panel",
+    });
+    expect(separator.getAttribute("aria-orientation")).toBe("horizontal");
+    expect(separator.getAttribute("aria-valuemin")).toBe("152");
+    expect(separator.getAttribute("aria-valuemax")).toBe("402");
+    expect(separator.getAttribute("aria-valuenow")).toBe("272");
+
+    fireEvent.pointerDown(separator, {
+      button: 0,
+      clientY: 548,
+      pointerId: 27,
+    });
+    expect(shell.hasAttribute("data-bottom-panel-resizing")).toBe(true);
+    fireEvent.pointerMove(separator, { clientY: 448, pointerId: 27 });
+    expect(separator.getAttribute("aria-valuenow")).toBe("372");
+    expect(
+      shell.style.getPropertyValue("--codex-ui-app-bottom-panel-height"),
+    ).toBe("372px");
+    fireEvent.pointerMove(separator, { clientY: 0, pointerId: 27 });
+    fireEvent.pointerMove(separator, { clientY: -100, pointerId: 27 });
+    expect(separator.getAttribute("aria-valuenow")).toBe("402");
+    fireEvent.pointerMove(separator, { clientY: 1_000, pointerId: 27 });
+    fireEvent.pointerMove(separator, { clientY: 1_200, pointerId: 27 });
+    fireEvent.pointerUp(separator, { clientY: 1_200, pointerId: 27 });
+
+    expect(separator.getAttribute("aria-valuenow")).toBe("152");
+    expect(shell.hasAttribute("data-bottom-panel-resizing")).toBe(false);
+    expect(onBottomPanelHeightChange).toHaveBeenCalledTimes(3);
+    expect(onBottomPanelHeightChange).toHaveBeenLastCalledWith(152);
+  });
+
+  it("supports bottom panel keyboard resizing and restores focus", () => {
+    const { rerender } = render(
+      <AppShell
+        bottomPanel={<button type="button">Terminal input</button>}
+        bottomPanelMaxHeight={402}
+        bottomPanelOpen
+        bottomPanelResizable
+        layoutMode="wide"
+      >
+        <button type="button">Conversation action</button>
+      </AppShell>,
+    );
+
+    const separator = screen.getByRole("separator", {
+      name: "Resize bottom panel",
+    });
+    fireEvent.keyDown(separator, { key: "ArrowUp" });
+    expect(separator.getAttribute("aria-valuenow")).toBe("280");
+    fireEvent.keyDown(separator, { key: "ArrowDown", shiftKey: true });
+    expect(separator.getAttribute("aria-valuenow")).toBe("248");
+    fireEvent.keyDown(separator, { key: "End" });
+    expect(separator.getAttribute("aria-valuenow")).toBe("402");
+    fireEvent.keyDown(separator, { key: "Home" });
+    expect(separator.getAttribute("aria-valuenow")).toBe("152");
+    separator.focus();
+
+    rerender(
+      <AppShell
+        bottomPanel={<button type="button">Terminal input</button>}
+        bottomPanelOpen={false}
+        bottomPanelResizable
+        layoutMode="wide"
+      >
+        <button type="button">Conversation action</button>
+      </AppShell>,
+    );
+
+    expect(
+      screen.queryByRole("separator", { name: "Resize bottom panel" }),
+    ).toBeNull();
+    expect(document.activeElement).toBe(
+      screen.getByRole("button", { name: "Conversation action" }),
+    );
+  });
+
+  it("uses the measured shell height for the bottom panel maximum", () => {
+    let resizeShell: ((width: number, height: number) => void) | undefined;
+    class ResizeObserverMock {
+      constructor(
+        private readonly callback: ResizeObserverCallback,
+      ) {}
+
+      disconnect() {}
+
+      observe(target: Element) {
+        if (!target.classList.contains("codex-ui-app-shell")) return;
+        resizeShell = (width: number, height: number) =>
+          this.callback(
+            [
+              {
+                contentRect: { height, width },
+                target,
+              } as ResizeObserverEntry,
+            ],
+            this as unknown as ResizeObserver,
+          );
+      }
+
+      unobserve() {}
+    }
+    vi.stubGlobal("ResizeObserver", ResizeObserverMock);
+    const { container } = render(
+      <AppShell
+        bottomPanel="Terminal"
+        bottomPanelOpen
+        bottomPanelResizable
+        layoutMode="wide"
+        style={{
+          borderBottom: "4px solid transparent",
+          borderTop: "4px solid transparent",
+          paddingBottom: "20px",
+          paddingTop: "20px",
+        }}
+      >
+        Thread
+      </AppShell>,
+    );
+    const shell = container.querySelector(
+      ".codex-ui-app-shell",
+    ) as HTMLDivElement;
+    vi.spyOn(shell, "getBoundingClientRect").mockReturnValue(
+      new DOMRect(0, 0, 1_180, 868),
+    );
+    act(() => resizeShell?.(1_180, 820));
+    const separator = screen.getByRole("separator", {
+      name: "Resize bottom panel",
+    });
+    expect(separator.getAttribute("aria-valuemax")).toBe("402");
+    fireEvent.keyDown(separator, { key: "End" });
+    expect(separator.getAttribute("aria-valuenow")).toBe("402");
+  });
+
+  it("keeps the bottom panel minimum within the responsive height cap", () => {
+    document.documentElement.style.fontSize = "20px";
+    let resizeShell: ((width: number, height: number) => void) | undefined;
+    class ResizeObserverMock {
+      constructor(
+        private readonly callback: ResizeObserverCallback,
+      ) {}
+
+      disconnect() {}
+
+      observe(target: Element) {
+        if (!target.classList.contains("codex-ui-app-shell")) return;
+        resizeShell = (width: number, height: number) =>
+          this.callback(
+            [
+              {
+                contentRect: { height, width },
+                target,
+              } as ResizeObserverEntry,
+            ],
+            this as unknown as ResizeObserver,
+          );
+      }
+
+      unobserve() {}
+    }
+    vi.stubGlobal("ResizeObserver", ResizeObserverMock);
+    const { container } = render(
+      <AppShell
+        bottomPanel="Terminal"
+        bottomPanelMinHeight={500}
+        bottomPanelOpen
+        bottomPanelResizable
+        layoutMode="wide"
+      >
+        Thread
+      </AppShell>,
+    );
+    const shell = container.querySelector(
+      ".codex-ui-app-shell",
+    ) as HTMLDivElement;
+    vi.spyOn(shell, "getBoundingClientRect").mockReturnValue(
+      new DOMRect(0, 0, 1_180, 820),
+    );
+    act(() => resizeShell?.(1_180, 820));
+    const separator = screen.getByRole("separator", {
+      name: "Resize bottom panel",
+    });
+
+    expect(separator.getAttribute("aria-valuemin")).toBe("400");
+    expect(separator.getAttribute("aria-valuemax")).toBe("400");
+    expect(separator.getAttribute("aria-valuenow")).toBe("400");
+    expect(
+      shell.style.getPropertyValue("--codex-ui-app-bottom-panel-height"),
+    ).toBe("400px");
   });
 
   it("exposes a measured, pointer-resizable workspace track", () => {

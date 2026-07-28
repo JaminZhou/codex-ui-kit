@@ -36,8 +36,8 @@ Explore the [interactive component showcase](https://jaminzhou.com/codex-ui-kit/
 - A current-build measured conversation shell plus partial message, activity,
   reasoning, plan, streaming, and mixed conversation-event primitives.
 - Application/sidebar and side/bottom workspace-panel composition with a
-  current-build measured, pointer- and keyboard-resizable navigation track
-  plus container-responsive overlay behavior.
+  current-build measured, pointer- and keyboard-resizable navigation and
+  bottom-panel tracks plus container-responsive overlay behavior.
 - Project index, current new-chat destination/context setup, grouped local
   environment dialog, protocol-neutral route/worktree selectors, PR
   list/detail, checks, reviewers, and inline review-thread compositions.
@@ -116,7 +116,7 @@ export function Example() {
 | [Interactive primitives](docs/COMPONENTS.md#interactive-primitives) | Buttons, dialogs, menus, selects, popovers, tooltips |
 | [Resources and media](docs/COMPONENTS.md#resources-and-media) | Resource cards, sources, artifacts, generated images |
 | [Navigation and shell](docs/COMPONENTS.md#navigation-and-shell) | Application/sidebar shell, workspace tabs, thread header, navigation rail, floating controls |
-| [Workspace and PR workflow](docs/COMPONENTS.md#workspace-and-pull-request-workflow) | Project index, new-chat destination/context, local environments, protocol-neutral routing/worktree selectors, PR lists, details, checks, reviewers, and threads |
+| [Workspace and PR workflow](docs/COMPONENTS.md#workspace-and-pull-request-workflow) | Terminal session primitives, project index, new-chat destination/context, local environments, protocol-neutral routing/worktree selectors, PR lists, details, checks, reviewers, and threads |
 
 See the [complete component reference](docs/COMPONENTS.md) for behavior, state, and composition details.
 
@@ -173,8 +173,8 @@ the header, message band, and Composer regions independently. Reference and
 diff images remain outside the package by default.
 
 The protocol-backed Codex App playground also accepts independent,
-untracked current-build references for multi-file Review and Pull request
-detail:
+untracked current-build references for multi-file Review, Pull request detail,
+and Terminal:
 
 ```bash
 CODEX_UI_KIT_PULL_REQUEST_REFERENCE=/absolute/path/to/pr-main-reference.png \
@@ -184,6 +184,14 @@ CODEX_UI_KIT_PULL_REQUEST_REFERENCE=/absolute/path/to/pr-main-reference.png \
 That PR gate compares the 906×820 main region and its index/detail ownership
 regions separately; CDP and Electron still gate geometry and interaction
 independently.
+
+The Terminal gate uses its own 906×820 reference and applies hard pixel
+thresholds only to the shared 272px bottom-panel and 239px content regions:
+
+```bash
+CODEX_UI_KIT_TERMINAL_REFERENCE=/absolute/path/to/terminal-main-reference.png \
+  pnpm --filter @codex-ui-kit/codex-app-playground check:visual
+```
 
 `npm pack` and a future `npm publish` run the library build first so the ignored
 `dist/` directory is always generated from the checked-out source. The package

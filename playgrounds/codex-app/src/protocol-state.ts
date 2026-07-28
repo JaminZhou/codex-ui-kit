@@ -44,8 +44,34 @@ export interface DemoCommandExecution {
   exitCode: number | null;
   id: string;
   output: string;
+  processId: string | null;
   status: "completed" | "failed" | "pending" | "running";
+  terminalEvents: DemoTerminalEvent[];
+  terminalInput: string;
   turnId: string | null;
+}
+
+export interface DemoTerminalEvent {
+  kind: "stdin" | "stdout";
+  text: string;
+}
+
+export function terminalTranscriptEvents(
+  events: readonly DemoTerminalEvent[],
+): DemoTerminalEvent[] {
+  return events.reduce<DemoTerminalEvent[]>((transcript, event) => {
+    const previous = transcript.at(-1);
+    if (!previous || previous.text.endsWith("\n")) {
+      return [...transcript, { ...event }];
+    }
+    return [
+      ...transcript.slice(0, -1),
+      {
+        kind: previous.kind,
+        text: `${previous.text}${event.text}`,
+      },
+    ];
+  }, []);
 }
 
 export interface DemoApprovalRequest {
@@ -177,6 +203,54 @@ function appendTimeline(
   )
     ? timeline
     : [...timeline, entry];
+}
+
+function appendTerminalEvent(
+  events: DemoTerminalEvent[],
+  event: DemoTerminalEvent,
+): DemoTerminalEvent[] {
+  const previous = events.at(-1);
+  if (!previous || previous.kind !== event.kind) {
+    return [...events, event];
+  }
+  return [
+    ...events.slice(0, -1),
+    {
+      kind: previous.kind,
+      text: `${previous.text}${event.text}`,
+    },
+  ];
+}
+
+function terminalEventsFromAggregate(
+  command: DemoCommandExecution | undefined,
+  aggregatedOutput: string | null,
+): DemoTerminalEvent[] {
+  const events = command?.terminalEvents ?? [];
+  if (aggregatedOutput === null) return events;
+  if (events.length === 0) {
+    return aggregatedOutput
+      ? [{ kind: "stdout", text: aggregatedOutput }]
+      : [];
+  }
+  if (command && aggregatedOutput.startsWith(command.output)) {
+    const unobservedOutput = aggregatedOutput.slice(
+      command.output.length,
+    );
+    return unobservedOutput
+      ? appendTerminalEvent(events, {
+          kind: "stdout",
+          text: unobservedOutput,
+        })
+      : events;
+  }
+  const preservedInput = events.filter(({ kind }) => kind === "stdin");
+  return [
+    ...(aggregatedOutput
+      ? [{ kind: "stdout" as const, text: aggregatedOutput }]
+      : []),
+    ...preservedInput,
+  ];
 }
 
 function commandStatus(
@@ -468,15 +542,23 @@ export function reduceProtocolNotification(
     if (itemType === "commandExecution") {
       const status = commandStatus(item.status);
       const command = state.commands.find(({ id }) => id === itemId);
+      const aggregatedOutput = asString(item.aggregatedOutput);
+      const terminalEvents = terminalEventsFromAggregate(
+        command,
+        aggregatedOutput,
+      );
       const commands = upsertById(state.commands, {
         command: asString(item.command) ?? command?.command ?? "",
         cwd: asString(item.cwd) ?? command?.cwd ?? "",
         durationMs: asNumber(item.durationMs),
         exitCode: asNumber(item.exitCode),
         id: itemId,
-        output:
-          asString(item.aggregatedOutput) ?? command?.output ?? "",
+        output: aggregatedOutput ?? command?.output ?? "",
+        processId:
+          asString(item.processId) ?? command?.processId ?? null,
         status,
+        terminalEvents,
+        terminalInput: command?.terminalInput ?? "",
         turnId: itemTurnId,
       });
       return {
@@ -576,8 +658,39 @@ export function reduceProtocolNotification(
         ...command,
         output: `${command.output}${delta}`,
         status: "running",
+        terminalEvents: appendTerminalEvent(command.terminalEvents, {
+          kind: "stdout",
+          text: delta,
+        }),
       }),
       status: "running",
+      timeline: appendTimeline(state.timeline, {
+        id: itemId,
+        kind: "command",
+      }),
+    };
+  }
+
+  if (
+    notification.method ===
+    "item/commandExecution/terminalInteraction"
+  ) {
+    const itemId = asString(params.itemId);
+    const processId = asString(params.processId);
+    const stdin = asString(params.stdin);
+    if (!itemId || !processId || stdin === null) return next;
+    const command = state.commands.find(({ id }) => id === itemId);
+    if (!command || command.processId !== processId) return next;
+    return {
+      ...next,
+      commands: upsertById(state.commands, {
+        ...command,
+        terminalEvents: appendTerminalEvent(command.terminalEvents, {
+          kind: "stdin",
+          text: stdin,
+        }),
+        terminalInput: `${command.terminalInput}${stdin}`,
+      }),
       timeline: appendTimeline(state.timeline, {
         id: itemId,
         kind: "command",

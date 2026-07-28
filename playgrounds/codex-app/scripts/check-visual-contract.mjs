@@ -21,6 +21,12 @@ const currentBuildPullRequestReferenceSize = {
   height: 820,
   width: 906,
 };
+const currentBuildTerminalReference =
+  process.env.CODEX_UI_KIT_TERMINAL_REFERENCE;
+const currentBuildTerminalReferenceSize = {
+  height: 820,
+  width: 906,
+};
 await mkdir(baselineDirectory, { recursive: true });
 await mkdir(artifactDirectory, { recursive: true });
 
@@ -311,6 +317,106 @@ for (const scene of visualScenes) {
         detail: detailComparison.ratio,
         full: comparison.ratio,
         index: indexComparison.ratio,
+      })}`,
+    );
+  }
+
+  if (scene.id === "background-terminal" && currentBuildTerminalReference) {
+    const reference = PNG.sync.read(
+      await readFile(currentBuildTerminalReference),
+    );
+    if (
+      reference.width !== currentBuildTerminalReferenceSize.width ||
+      reference.height !== currentBuildTerminalReferenceSize.height
+    ) {
+      throw new Error(
+        `${scene.id}: current-build reference must be exactly ${currentBuildTerminalReferenceSize.width}x${currentBuildTerminalReferenceSize.height}, received ${reference.width}x${reference.height}.`,
+      );
+    }
+    if (
+      actual.height !== reference.height ||
+      actual.width < reference.width
+    ) {
+      throw new Error(
+        `${scene.id}: current-build reference ${reference.width}x${reference.height} cannot be aligned to ${actual.width}x${actual.height}.`,
+      );
+    }
+    const main = cropPng(
+      actual,
+      actual.width - reference.width,
+      0,
+      reference.width,
+      reference.height,
+    );
+    const currentBuildActualPath = join(
+      artifactDirectory,
+      `${scene.id}.current-build.png`,
+    );
+    const currentBuildDiffPath = join(
+      artifactDirectory,
+      `${scene.id}.current-build.diff.png`,
+    );
+    await writeFile(currentBuildActualPath, PNG.sync.write(main));
+
+    const comparison = comparePng(reference, main);
+    if (comparison.pixels > 0) {
+      await writeFile(
+        currentBuildDiffPath,
+        PNG.sync.write(comparison.diff),
+      );
+    }
+
+    const terminalTop = 548;
+    const terminalHeaderHeight = 33;
+    const terminalHeight = 272;
+    const panelComparison = comparePng(
+      cropPng(reference, 0, terminalTop, reference.width, terminalHeight),
+      cropPng(main, 0, terminalTop, main.width, terminalHeight),
+    );
+    const contentComparison = comparePng(
+      cropPng(
+        reference,
+        0,
+        terminalTop + terminalHeaderHeight,
+        reference.width,
+        terminalHeight - terminalHeaderHeight,
+      ),
+      cropPng(
+        main,
+        0,
+        terminalTop + terminalHeaderHeight,
+        main.width,
+        terminalHeight - terminalHeaderHeight,
+      ),
+    );
+    const maximumPanelRatio = environmentRatio(
+      "CODEX_UI_KIT_TERMINAL_PANEL_MAX_DIFF_RATIO",
+      0.02,
+    );
+    const maximumContentRatio = environmentRatio(
+      "CODEX_UI_KIT_TERMINAL_CONTENT_MAX_DIFF_RATIO",
+      0.01,
+    );
+    if (
+      panelComparison.ratio > maximumPanelRatio ||
+      contentComparison.ratio > maximumContentRatio
+    ) {
+      throw new Error(
+        `${scene.id}: current-build Terminal pixel ratios ${JSON.stringify({
+          content: contentComparison.ratio,
+          full: comparison.ratio,
+          panel: panelComparison.ratio,
+        })} exceed ${JSON.stringify({
+          content: maximumContentRatio,
+          panel: maximumPanelRatio,
+        })}.`,
+      );
+    }
+    console.log(
+      `${scene.id}: current-build Terminal pixel ratios ${JSON.stringify({
+        content: contentComparison.ratio,
+        full: comparison.ratio,
+        panel: panelComparison.ratio,
       })}`,
     );
   }

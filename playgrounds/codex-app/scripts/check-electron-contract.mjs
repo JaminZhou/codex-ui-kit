@@ -252,6 +252,60 @@ try {
     .getByRole("button", { exact: true, name: "Close review" })
     .click();
   await workflowPage
+    .getByRole("button", { exact: true, name: "Open terminal" })
+    .first()
+    .click();
+  await workflowPage.waitForSelector(
+    '.codex-ui-app-shell[data-bottom-panel-open] [data-testid="terminal-panel"]',
+  );
+  const selectedTerminalText = await workflowPage
+    .getByRole("log", { name: "Terminal output" })
+    .textContent();
+  if (
+    !selectedTerminalText?.includes("pnpm test -- protocol-state") ||
+    selectedTerminalText.includes("apply_patch WORKFLOW.md")
+  ) {
+    throw new Error(
+      `Electron command-specific Terminal selection failed: ${selectedTerminalText}`,
+    );
+  }
+  const workflowTerminalInput = workflowPage.getByRole("textbox", {
+    name: "Terminal input",
+  });
+  await workflowTerminalInput.fill("first-terminal-only");
+  await workflowTerminalInput.press("Enter");
+  await workflowPage
+    .getByRole("button", { exact: true, name: "Open terminal" })
+    .nth(1)
+    .click();
+  const secondTerminalText = await workflowPage
+    .getByRole("log", { name: "Terminal output" })
+    .textContent();
+  if (
+    !secondTerminalText?.includes("apply_patch WORKFLOW.md") ||
+    secondTerminalText.includes("first-terminal-only")
+  ) {
+    throw new Error(
+      `Electron Terminal local-history isolation failed: ${secondTerminalText}`,
+    );
+  }
+  await workflowPage
+    .getByRole("button", { exact: true, name: "Open terminal" })
+    .first()
+    .click();
+  if (
+    !(await workflowPage
+      .getByRole("log", { name: "Terminal output" })
+      .textContent())?.includes("first-terminal-only")
+  ) {
+    throw new Error(
+      "Electron Terminal did not restore command-specific local history.",
+    );
+  }
+  await workflowPage
+    .getByRole("button", { exact: true, name: "Close terminal" })
+    .click();
+  await workflowPage
     .getByRole("button", { exact: true, name: "Review" })
     .click();
   if (
@@ -271,6 +325,137 @@ try {
   });
 } finally {
   await workflowApp.close();
+}
+
+const terminalScene = {
+  frame: "terminal-open",
+  id: "electron-background-terminal",
+  scenario: "background-terminal",
+};
+const { app: terminalApp, page: terminalPage } = await launchScene(
+  terminalScene,
+  { capture: false },
+);
+
+try {
+  await terminalPage.waitForSelector(
+    '.codex-ui-app-shell[data-bottom-panel-open] [data-testid="terminal-panel"]',
+  );
+  const terminalResizer = terminalPage.getByRole("separator", {
+    name: "Resize bottom panel",
+  });
+  const initialTerminal = await terminalPage.evaluate(() => ({
+    height: document
+      .querySelector(".codex-ui-app-shell__bottom-panel")
+      ?.getBoundingClientRect().height,
+    input: Boolean(
+      document.querySelector('input[aria-label="Terminal input"]'),
+    ),
+    max: document
+      .querySelector(".codex-ui-app-shell__bottom-panel-resizer")
+      ?.getAttribute("aria-valuemax"),
+    min: document
+      .querySelector(".codex-ui-app-shell__bottom-panel-resizer")
+      ?.getAttribute("aria-valuemin"),
+    now: document
+      .querySelector(".codex-ui-app-shell__bottom-panel-resizer")
+      ?.getAttribute("aria-valuenow"),
+    transcriptText: document
+      .querySelector('[role="log"][aria-label="Terminal output"]')
+      ?.textContent,
+  }));
+  const terminalResizerBox = await terminalResizer.boundingBox();
+  if (
+    !terminalResizerBox ||
+    Math.abs((initialTerminal.height ?? 0) - 272) > 1 ||
+    initialTerminal.min !== "152" ||
+    initialTerminal.max !== "402" ||
+    initialTerminal.now !== "272" ||
+    !initialTerminal.input ||
+    !initialTerminal.transcriptText?.includes("VITE ready in 438 ms") ||
+    !initialTerminal.transcriptText.includes("q")
+  ) {
+    throw new Error(
+      `Electron Terminal baseline failed: ${JSON.stringify(initialTerminal)}`,
+    );
+  }
+
+  await terminalPage.mouse.move(
+    terminalResizerBox.x + terminalResizerBox.width / 2,
+    terminalResizerBox.y + terminalResizerBox.height / 2,
+  );
+  await terminalPage.mouse.down();
+  await terminalPage.mouse.move(
+    terminalResizerBox.x + terminalResizerBox.width / 2,
+    terminalResizerBox.y + terminalResizerBox.height / 2 - 64,
+    { steps: 8 },
+  );
+  await terminalPage.mouse.up();
+  const draggedTerminalHeight = await terminalPage
+    .locator(".codex-ui-app-shell__bottom-panel")
+    .evaluate((element) => element.getBoundingClientRect().height);
+  if (Math.abs(draggedTerminalHeight - 336) > 1) {
+    throw new Error(
+      `Electron Terminal pointer resize failed: ${draggedTerminalHeight}`,
+    );
+  }
+
+  await terminalResizer.press("Home");
+  for (let index = 0; index < 15; index += 1) {
+    await terminalResizer.press("ArrowUp");
+  }
+  const keyboardTerminalHeight = await terminalPage
+    .locator(".codex-ui-app-shell__bottom-panel")
+    .evaluate((element) => element.getBoundingClientRect().height);
+  if (Math.abs(keyboardTerminalHeight - 272) > 1) {
+    throw new Error(
+      `Electron Terminal keyboard resize failed: ${keyboardTerminalHeight}`,
+    );
+  }
+
+  const terminalInput = terminalPage.getByRole("textbox", {
+    name: "Terminal input",
+  });
+  await terminalInput.fill("pwd");
+  await terminalInput.press("Enter");
+  if (
+    (await terminalInput.inputValue()) !== "" ||
+    !(await terminalPage
+      .getByRole("log", { name: "Terminal output" })
+      .textContent())?.includes(
+      "Replay input is host-owned and was not executed.",
+    )
+  ) {
+    throw new Error("Electron Terminal input did not stay host-owned.");
+  }
+
+  await terminalPage
+    .getByRole("button", { exact: true, name: "Close terminal" })
+    .click();
+  await terminalPage.waitForSelector(
+    ".codex-ui-app-shell:not([data-bottom-panel-open])",
+  );
+  const terminalToggle = terminalPage.getByRole("button", {
+    name: "Toggle bottom panel",
+  });
+  if ((await terminalToggle.getAttribute("aria-pressed")) !== "false") {
+    throw new Error("Electron Terminal close did not update the toggle.");
+  }
+  await terminalToggle.click();
+  await terminalPage.waitForSelector(
+    ".codex-ui-app-shell[data-bottom-panel-open]",
+  );
+  if (
+    Math.abs(
+      (await terminalPage
+        .locator(".codex-ui-app-shell__bottom-panel")
+        .evaluate((element) => element.getBoundingClientRect().height)) - 272,
+    ) > 1
+  ) {
+    throw new Error("Electron Terminal did not restore its last height.");
+  }
+} finally {
+  await terminalApp.close();
 }
 
 const pullRequestScene = {
@@ -572,6 +757,83 @@ try {
   await compactApp.close();
 }
 
+const compactTerminalScene = {
+  frame: "terminal-open",
+  id: "electron-background-terminal-compact",
+  scenario: "background-terminal",
+};
+const {
+  app: compactTerminalApp,
+  page: compactTerminalPage,
+} = await launchScene(compactTerminalScene, {
+  capture: false,
+  windowSize: { height: 680, width: 820 },
+});
+
+try {
+  const compactTerminal = await compactTerminalPage.evaluate(() => {
+    const rect = (selector) => {
+      const element = document.querySelector(selector);
+      if (!element) return null;
+      const bounds = element.getBoundingClientRect();
+      return {
+        height: bounds.height,
+        left: bounds.left,
+        right: bounds.right,
+        width: bounds.width,
+      };
+    };
+    const resizer = document.querySelector(
+      ".codex-ui-app-shell__bottom-panel-resizer",
+    );
+    return {
+      horizontalOverflow:
+        document.documentElement.scrollWidth -
+        document.documentElement.clientWidth,
+      panel: rect(".codex-ui-app-shell__bottom-panel"),
+      panelContent: rect(
+        '.codex-ui-workspace-panel[data-placement="bottom"] [role="tabpanel"]',
+      ),
+      resizer: resizer
+        ? {
+            max: resizer.getAttribute("aria-valuemax"),
+            min: resizer.getAttribute("aria-valuemin"),
+            now: resizer.getAttribute("aria-valuenow"),
+            rect: rect(".codex-ui-app-shell__bottom-panel-resizer"),
+          }
+        : null,
+    };
+  });
+  if (
+    compactTerminal.horizontalOverflow > 1 ||
+    !compactTerminal.panel ||
+    !compactTerminal.panelContent ||
+    !compactTerminal.resizer?.rect ||
+    Math.abs(compactTerminal.panel.width - 546) > 1 ||
+    Math.abs(compactTerminal.panel.left - 274) > 1 ||
+    Math.abs(compactTerminal.panel.height - 272) > 1 ||
+    Math.abs(compactTerminal.panelContent.height - 239) > 1 ||
+    Math.abs(compactTerminal.resizer.rect.height - 16) > 0.5 ||
+    Math.abs(
+      compactTerminal.resizer.rect.left -
+        compactTerminal.panel.left,
+    ) > 1 ||
+    Math.abs(
+      compactTerminal.resizer.rect.right -
+        compactTerminal.panel.right,
+    ) > 1 ||
+    compactTerminal.resizer.min !== "152" ||
+    compactTerminal.resizer.max !== "332" ||
+    compactTerminal.resizer.now !== "272"
+  ) {
+    throw new Error(
+      `Compact Electron Terminal geometry failed: ${JSON.stringify(compactTerminal)}`,
+    );
+  }
+} finally {
+  await compactTerminalApp.close();
+}
+
 const largeReviewScene = {
   frame: "review-open",
   id: "electron-large-file-review",
@@ -644,5 +906,5 @@ try {
 }
 
 console.log(
-  "Electron host, native-window, resizable navigation/Review/PR detail, PR tabs and expansion, multi-file Review, large diff scrolling, and compact geometry contracts passed.",
+  "Electron host, native-window, resizable navigation/Review/Terminal/PR detail, PR tabs and expansion, multi-file Review, large diff scrolling, and compact geometry contracts passed.",
 );

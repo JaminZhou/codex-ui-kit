@@ -19,12 +19,14 @@ import {
   PullRequestList,
   PullRequestPanelSummary,
   StatusBanner,
+  TerminalSession,
   ThreadContextEvent,
   ThreadHeader,
   ThreadInterruptionSummary,
   ThreadThinkingPlaceholder,
   TurnDuration,
   WorkspacePanel,
+  type TerminalEntry,
 } from "codex-ui-kit";
 import {
   Fragment,
@@ -41,6 +43,7 @@ import {
   initialProtocolState,
   isTurnActive,
   reduceProtocolNotification,
+  terminalTranscriptEvents,
   type DemoProtocolState,
   type ProtocolEventRecord,
 } from "./protocol-state";
@@ -184,6 +187,17 @@ export function App() {
   const [reviewOpen, setReviewOpen] = useState(
     initialSelection.frame === "review-open",
   );
+  const [terminalOpen, setTerminalOpen] = useState(
+    initialSelection.scenarioId === "background-terminal",
+  );
+  const [terminalCommandId, setTerminalCommandId] = useState<string | null>(
+    null,
+  );
+  const [terminalHeight, setTerminalHeight] = useState(272);
+  const [terminalValue, setTerminalValue] = useState("");
+  const [terminalHistoryByCommand, setTerminalHistoryByCommand] = useState<
+    Record<string, TerminalEntry[]>
+  >({});
   const [reviewSelection, setReviewSelection] =
     useState<ReviewSelection | null>(null);
   const [reviewSelectionKey, setReviewSelectionKey] = useState(0);
@@ -246,6 +260,11 @@ export function App() {
     setReplayCount(replayScenarios[nextId].events.length);
     setReviewOpen(false);
     setReviewSelection(null);
+    setTerminalOpen(nextId === "background-terminal");
+    setTerminalCommandId(null);
+    setTerminalHeight(272);
+    setTerminalValue("");
+    setTerminalHistoryByCommand({});
     setUndoneFileIds(new Set());
     setLiveError(null);
   };
@@ -375,6 +394,17 @@ export function App() {
           <span className="demo-status" data-status={state.status}>
             {statusLabel(state)}
           </span>
+          {scenarioId === "background-terminal" ? (
+            <Button
+              aria-label="Toggle bottom panel"
+              aria-pressed={terminalOpen}
+              onClick={() => setTerminalOpen((open) => !open)}
+              size="small"
+              tone="ghost"
+            >
+              ▱
+            </Button>
+          ) : null}
           <Button
             onClick={() => setMode(mode === "replay" ? "live" : "replay")}
             size="small"
@@ -812,6 +842,21 @@ export function App() {
           data-item-id={command.id}
           data-testid="command-execution"
           durationMs={command.durationMs ?? undefined}
+          detail={
+            command.processId ? (
+              <button
+                className="demo-command-terminal"
+                onClick={() => {
+                  setTerminalCommandId(command.id);
+                  setTerminalValue("");
+                  setTerminalOpen(true);
+                }}
+                type="button"
+              >
+                Open terminal
+              </button>
+            ) : undefined
+          }
           exitCode={command.exitCode ?? undefined}
           key={`command:${command.id}`}
           open={
@@ -959,6 +1004,126 @@ export function App() {
     );
   });
   const activeTurnHasWork = hasActiveTurnWork(state);
+  const terminalCommands = state.commands.filter(({ processId }) =>
+    Boolean(processId),
+  );
+  const terminalCommand =
+    terminalCommands.find(({ id }) => id === terminalCommandId) ??
+    terminalCommands.at(-1);
+  const terminalHistoryKey = terminalCommand?.id ?? "unbound";
+  const terminalHistory =
+    terminalHistoryByCommand[terminalHistoryKey] ?? [];
+  const terminalEntries = useMemo<TerminalEntry[]>(() => {
+    if (!terminalCommand) return terminalHistory;
+    const protocolEntries =
+      terminalCommand.terminalEvents.length > 0
+        ? terminalTranscriptEvents(terminalCommand.terminalEvents).map(
+            (entry, index) => ({
+              id: `${terminalCommand.id}:event:${index}`,
+              kind:
+                entry.kind === "stdin"
+                  ? ("command" as const)
+                  : ("stdout" as const),
+              text: entry.text.replace(/\n$/, ""),
+            }),
+          )
+        : [
+            ...(terminalCommand.output
+              ? [
+                  {
+                    id: `${terminalCommand.id}:output`,
+                    kind: "stdout" as const,
+                    text: terminalCommand.output.replace(/\n$/, ""),
+                  },
+                ]
+              : []),
+            ...(terminalCommand.terminalInput
+              ? [
+                  {
+                    id: `${terminalCommand.id}:stdin`,
+                    kind: "command" as const,
+                    text: terminalCommand.terminalInput.replace(/\n$/, ""),
+                  },
+                ]
+              : []),
+          ];
+    return [
+      {
+        id: `${terminalCommand.id}:command`,
+        kind: "command",
+        text: `${terminalCommand.cwd} % ${terminalCommand.command}`,
+      },
+      ...protocolEntries,
+      ...terminalHistory,
+    ];
+  }, [terminalCommand, terminalHistory]);
+  const terminalPanel = (
+    <WorkspacePanel
+      activeTabId="terminal"
+      className="demo-terminal-panel"
+      data-testid="terminal-panel"
+      label="Terminal"
+      onActiveTabChange={() => undefined}
+      onClose={() => setTerminalOpen(false)}
+      onOpenTab={() => setTerminalOpen(true)}
+      openTabLabel="New terminal"
+      placement="bottom"
+      tabs={[
+        {
+          content: (
+            <TerminalSession
+              data-testid="terminal-session"
+              entries={terminalEntries}
+              label="Background terminal"
+              onCommandSubmit={(command) => {
+                setTerminalHistoryByCommand((historyByCommand) => {
+                  const entries =
+                    historyByCommand[terminalHistoryKey] ?? [];
+                  return {
+                    ...historyByCommand,
+                    [terminalHistoryKey]: [
+                      ...entries,
+                      {
+                        id: `${terminalHistoryKey}:local:${entries.length}:command`,
+                        kind: "command",
+                        text: `/workspace/codex-ui-kit % ${command}`,
+                      },
+                      {
+                        id: `${terminalHistoryKey}:local:${entries.length}:system`,
+                        kind: "system",
+                        text: "Replay input is host-owned and was not executed.",
+                      },
+                    ],
+                  };
+                });
+                setTerminalValue("");
+              }}
+              onValueChange={setTerminalValue}
+              status={
+                terminalCommand?.status === "running"
+                  ? "running"
+                  : terminalCommand?.status === "failed"
+                    ? "failed"
+                    : terminalCommand?.status === "completed"
+                      ? "exited"
+                      : "idle"
+              }
+              value={terminalValue}
+            />
+          ),
+          id: "terminal",
+          label: (
+            <span className="demo-terminal-tab-label">
+              <span aria-hidden="true">▣</span>
+              <span>codex-ui-kit</span>
+              <span aria-hidden="true">×</span>
+            </span>
+          ),
+        },
+      ]}
+      tabsLabel="Terminal tabs"
+    />
+  );
 
   return (
     <div
@@ -972,6 +1137,13 @@ export function App() {
       data-view={view}
     >
       <AppShell
+        bottomPanel={terminalPanel}
+        bottomPanelHeight={terminalHeight}
+        bottomPanelLabel="Terminal"
+        bottomPanelOpen={terminalOpen}
+        bottomPanelResizable
+        bottomPanelResizeLabel="Resize bottom panel"
+        onBottomPanelHeightChange={setTerminalHeight}
         layoutMode="wide"
         onSidebarOpenChange={setSidebarOpen}
         onSidePanelOpenChange={

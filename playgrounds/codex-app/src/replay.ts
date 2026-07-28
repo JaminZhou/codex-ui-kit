@@ -1,4 +1,5 @@
 import compactionTrace from "../fixtures/traces/compaction.jsonl?raw";
+import backgroundTerminalTrace from "../fixtures/traces/background-terminal.jsonl?raw";
 import interruptionTrace from "../fixtures/traces/interruption.jsonl?raw";
 import largeFileReviewTrace from "../fixtures/traces/large-file-review.jsonl?raw";
 import multiFileReviewTrace from "../fixtures/traces/multi-file-review.jsonl?raw";
@@ -7,6 +8,7 @@ import workflowTrace from "../fixtures/traces/workspace-workflow.jsonl?raw";
 import type { ProtocolEventRecord } from "./protocol-state";
 
 export type ReplayScenarioId =
+  | "background-terminal"
   | "streaming-recovery"
   | "interruption"
   | "compaction"
@@ -55,6 +57,12 @@ function scenario(
 }
 
 export const replayScenarios: Record<ReplayScenarioId, ReplayScenario> = {
+  "background-terminal": scenario(
+    "background-terminal",
+    "Background terminal",
+    "Process output, terminal interaction, resize, close, and restore.",
+    backgroundTerminalTrace,
+  ),
   "streaming-recovery": scenario(
     "streaming-recovery",
     "Streaming and retry",

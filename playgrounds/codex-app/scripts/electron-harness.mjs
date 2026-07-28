@@ -33,6 +33,12 @@ export const visualScenes = [
     scenario: "compaction",
   },
   {
+    frame: "terminal-open",
+    id: "background-terminal",
+    scenario: "background-terminal",
+    surfaces: ["bottomPanel", "command", "terminal"],
+  },
+  {
     frame: "command-running",
     id: "command-running",
     scenario: "workspace-workflow",

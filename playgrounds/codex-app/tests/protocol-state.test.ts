@@ -6,6 +6,7 @@ import {
   isTurnActive,
   reduceProtocolNotification,
   reduceProtocolTrace,
+  terminalTranscriptEvents,
 } from "../src/protocol-state";
 import { replayScenarios } from "../src/replay";
 
@@ -212,7 +213,15 @@ describe("protocol lifecycle reducer", () => {
 
     expect(commandRunning.commands[0]).toMatchObject({
       output: "✓ protocol-state.test.ts (10 tests)\n",
+      processId: "process-check",
       status: "running",
+      terminalEvents: [
+        {
+          kind: "stdout",
+          text: "✓ protocol-state.test.ts (10 tests)\n",
+        },
+      ],
+      terminalInput: "",
     });
     expect(approvalPending.approvals[0]).toMatchObject({
       command: "apply_patch WORKFLOW.md",
@@ -245,6 +254,217 @@ describe("protocol lifecycle reducer", () => {
       "command",
       "approval",
       "fileChange",
+    ]);
+  });
+
+  it("keeps terminal interaction attached to the matching process", () => {
+    const scenario = replayScenarios["background-terminal"];
+    const terminalOpen = reduceProtocolTrace(
+      scenario.events.slice(0, scenario.frames["terminal-open"]),
+    );
+    const completed = reduceProtocolTrace(scenario.events);
+
+    expect(terminalOpen.commands).toHaveLength(1);
+    expect(terminalOpen.commands[0]).toMatchObject({
+      command: "pnpm dev",
+      cwd: "/workspace/codex-ui-kit",
+      output: "VITE ready in 438 ms\nLocal: http://localhost:5173/\n",
+      processId: "process-dev",
+      status: "running",
+      terminalEvents: [
+        {
+          kind: "stdout",
+          text: "VITE ready in 438 ms\nLocal: http://localhost:5173/\n",
+        },
+        {
+          kind: "stdin",
+          text: "q\n",
+        },
+      ],
+      terminalInput: "q\n",
+    });
+    expect(completed.commands[0]).toMatchObject({
+      exitCode: 0,
+      output:
+        "VITE ready in 438 ms\nLocal: http://localhost:5173/\nServer stopped.\n",
+      status: "completed",
+      terminalEvents: [
+        {
+          kind: "stdout",
+          text: "VITE ready in 438 ms\nLocal: http://localhost:5173/\n",
+        },
+        {
+          kind: "stdin",
+          text: "q\n",
+        },
+        {
+          kind: "stdout",
+          text: "Server stopped.\n",
+        },
+      ],
+      terminalInput: "q\n",
+    });
+  });
+
+  it("coalesces adjacent terminal chunks without crossing stdin boundaries", () => {
+    const started = reduceProtocolNotification(initialProtocolState, {
+      method: "item/started",
+      params: {
+        item: {
+          aggregatedOutput: null,
+          command: "pnpm dev",
+          cwd: "/workspace/codex-ui-kit",
+          id: "command-dev",
+          processId: "process-dev",
+          status: "inProgress",
+          type: "commandExecution",
+        },
+        threadId: "thread-demo",
+        turnId: "turn-terminal",
+      },
+    });
+    const events = [
+      {
+        method: "item/commandExecution/outputDelta",
+        params: {
+          delta: "foo",
+          itemId: "command-dev",
+          threadId: "thread-demo",
+          turnId: "turn-terminal",
+        },
+      },
+      {
+        method: "item/commandExecution/outputDelta",
+        params: {
+          delta: "bar\n",
+          itemId: "command-dev",
+          threadId: "thread-demo",
+          turnId: "turn-terminal",
+        },
+      },
+      {
+        method: "item/commandExecution/terminalInteraction",
+        params: {
+          itemId: "command-dev",
+          processId: "process-dev",
+          stdin: "q\n",
+          threadId: "thread-demo",
+          turnId: "turn-terminal",
+        },
+      },
+      {
+        method: "item/commandExecution/outputDelta",
+        params: {
+          delta: "stopped\n",
+          itemId: "command-dev",
+          threadId: "thread-demo",
+          turnId: "turn-terminal",
+        },
+      },
+    ] as const;
+    const state = events.reduce(reduceProtocolNotification, started);
+
+    expect(state.commands[0]?.output).toBe("foobar\nstopped\n");
+    expect(state.commands[0]?.terminalEvents).toEqual([
+      { kind: "stdout", text: "foobar\n" },
+      { kind: "stdin", text: "q\n" },
+      { kind: "stdout", text: "stopped\n" },
+    ]);
+    expect(
+      terminalTranscriptEvents([
+        { kind: "stdout", text: "Choice: " },
+        { kind: "stdin", text: "q\n" },
+        { kind: "stdout", text: "Stopped.\n" },
+      ]),
+    ).toEqual([
+      { kind: "stdout", text: "Choice: q\n" },
+      { kind: "stdout", text: "Stopped.\n" },
+    ]);
+  });
+
+  it("seeds resumed terminal output before appending live deltas", () => {
+    const started = reduceProtocolNotification(initialProtocolState, {
+      method: "item/started",
+      params: {
+        item: {
+          aggregatedOutput: "existing\n",
+          command: "pnpm dev",
+          id: "command-resumed",
+          processId: "process-resumed",
+          status: "inProgress",
+          type: "commandExecution",
+        },
+        threadId: "thread-demo",
+        turnId: "turn-terminal",
+      },
+    });
+    const withDelta = reduceProtocolNotification(started, {
+      method: "item/commandExecution/outputDelta",
+      params: {
+        delta: "new\n",
+        itemId: "command-resumed",
+        threadId: "thread-demo",
+        turnId: "turn-terminal",
+      },
+    });
+    const completed = reduceProtocolNotification(withDelta, {
+      method: "item/completed",
+      params: {
+        item: {
+          aggregatedOutput: "existing\nnew\nfinished\n",
+          command: "pnpm dev",
+          id: "command-resumed",
+          processId: "process-resumed",
+          status: "completed",
+          type: "commandExecution",
+        },
+        threadId: "thread-demo",
+        turnId: "turn-terminal",
+      },
+    });
+
+    expect(withDelta.commands[0]?.output).toBe("existing\nnew\n");
+    expect(withDelta.commands[0]?.terminalEvents).toEqual([
+      { kind: "stdout", text: "existing\nnew\n" },
+    ]);
+    expect(completed.commands[0]?.output).toBe(
+      "existing\nnew\nfinished\n",
+    );
+    expect(completed.commands[0]?.terminalEvents).toEqual([
+      { kind: "stdout", text: "existing\nnew\nfinished\n" },
+    ]);
+
+    const withInput = reduceProtocolNotification(completed, {
+      method: "item/commandExecution/terminalInteraction",
+      params: {
+        itemId: "command-resumed",
+        processId: "process-resumed",
+        stdin: "q\n",
+        threadId: "thread-demo",
+        turnId: "turn-terminal",
+      },
+    });
+    const reconnected = reduceProtocolNotification(withInput, {
+      method: "item/completed",
+      params: {
+        item: {
+          aggregatedOutput: "authoritative after reconnect\n",
+          command: "pnpm dev",
+          id: "command-resumed",
+          processId: "process-resumed",
+          status: "completed",
+          type: "commandExecution",
+        },
+        threadId: "thread-demo",
+        turnId: "turn-terminal",
+      },
+    });
+    expect(reconnected.commands[0]?.terminalEvents).toEqual([
+      {
+        kind: "stdout",
+        text: "authoritative after reconnect\n",
+      },
+      { kind: "stdin", text: "q\n" },
     ]);
   });
 
