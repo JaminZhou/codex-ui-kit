@@ -276,6 +276,45 @@ describe("protocol lifecycle reducer", () => {
     expect(resolved.approvals[0]?.decision).toBe("rejected");
   });
 
+  it("rejects a pending live approval when the server request resolves", () => {
+    const pending = reduceProtocolNotification(initialProtocolState, {
+      atMs: 10,
+      id: "live-approval",
+      kind: "request",
+      method: "item/fileChange/requestApproval",
+      params: {
+        itemId: "file-racing-with-stop",
+        threadId: "thread-live",
+        turnId: "turn-live",
+      },
+    });
+    const resolved = reduceProtocolNotification(pending, {
+      method: "serverRequest/resolved",
+      params: {
+        requestId: "live-approval",
+        threadId: "thread-live",
+      },
+    });
+    const explicitlyApproved = reduceProtocolNotification(pending, {
+      decision: "approved",
+      kind: "approval-resolution",
+      requestId: "live-approval",
+    });
+    const resolvedAfterApproval = reduceProtocolNotification(
+      explicitlyApproved,
+      {
+        method: "serverRequest/resolved",
+        params: {
+          requestId: "live-approval",
+          threadId: "thread-live",
+        },
+      },
+    );
+
+    expect(resolved.approvals[0]?.decision).toBe("rejected");
+    expect(resolvedAfterApproval.approvals[0]?.decision).toBe("approved");
+  });
+
   it("renders file approval requests and resolves them with file lifecycle", () => {
     const started = reduceProtocolNotification(initialProtocolState, {
       method: "item/started",

@@ -614,8 +614,11 @@ export function reduceProtocolNotification(
     return {
       ...next,
       approvals: state.approvals.map((approval) =>
-        approval.requestId === requestId && approval.responseDecision
-          ? { ...approval, decision: approval.responseDecision }
+        approval.requestId === requestId && approval.decision === "pending"
+          ? {
+              ...approval,
+              decision: approval.responseDecision ?? "rejected",
+            }
           : approval,
       ),
     };
