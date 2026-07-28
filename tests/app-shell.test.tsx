@@ -249,6 +249,201 @@ describe("application shell", () => {
     );
   });
 
+  it("exposes a measured, pointer-resizable workspace track", () => {
+    const onSidePanelWidthChange = vi.fn();
+    const { container } = render(
+      <AppShell
+        defaultSidePanelWidth={370}
+        layoutMode="wide"
+        onSidePanelWidthChange={onSidePanelWidthChange}
+        sidePanel={<button type="button">Review files</button>}
+        sidePanelMaxWidth={554}
+        sidePanelOpen
+        sidePanelResizable
+      >
+        Thread
+      </AppShell>,
+    );
+
+    const shell = container.querySelector(
+      ".codex-ui-app-shell",
+    ) as HTMLDivElement;
+    const separator = screen.getByRole("separator", {
+      name: "Resize workspace panel",
+    });
+
+    expect(separator.getAttribute("aria-orientation")).toBe("vertical");
+    expect(separator.getAttribute("aria-valuemin")).toBe("320");
+    expect(separator.getAttribute("aria-valuemax")).toBe("554");
+    expect(separator.getAttribute("aria-valuenow")).toBe("370");
+
+    fireEvent.pointerDown(separator, {
+      button: 0,
+      clientX: 810,
+      pointerId: 17,
+    });
+    expect(shell.hasAttribute("data-side-panel-resizing")).toBe(true);
+    fireEvent.pointerMove(separator, { clientX: 710, pointerId: 17 });
+    expect(separator.getAttribute("aria-valuenow")).toBe("470");
+    expect(
+      shell.style.getPropertyValue("--codex-ui-app-side-panel-width"),
+    ).toBe("470px");
+
+    fireEvent.pointerMove(separator, { clientX: -1_000, pointerId: 17 });
+    expect(separator.getAttribute("aria-valuenow")).toBe("554");
+    fireEvent.pointerMove(separator, { clientX: 2_000, pointerId: 17 });
+    expect(separator.getAttribute("aria-valuenow")).toBe("320");
+    fireEvent.pointerUp(separator, { clientX: 2_000, pointerId: 17 });
+
+    expect(shell.hasAttribute("data-side-panel-resizing")).toBe(false);
+    expect(onSidePanelWidthChange).toHaveBeenLastCalledWith(320);
+  });
+
+  it("supports workspace keyboard resizing and omits its handle in overlays", () => {
+    const { container, rerender } = render(
+      <AppShell
+        layoutMode="wide"
+        sidePanel="Review"
+        sidePanelMaxWidth={554}
+        sidePanelOpen
+        sidePanelResizable
+      >
+        Thread
+      </AppShell>,
+    );
+
+    const separator = screen.getByRole("separator", {
+      name: "Resize workspace panel",
+    });
+    fireEvent.keyDown(separator, { key: "ArrowLeft" });
+    expect(separator.getAttribute("aria-valuenow")).toBe("378");
+    fireEvent.keyDown(separator, { key: "ArrowRight", shiftKey: true });
+    expect(separator.getAttribute("aria-valuenow")).toBe("346");
+    fireEvent.keyDown(separator, { key: "End" });
+    expect(separator.getAttribute("aria-valuenow")).toBe("554");
+    fireEvent.keyDown(separator, { key: "Home" });
+    expect(separator.getAttribute("aria-valuenow")).toBe("320");
+    fireEvent.pointerDown(separator, {
+      button: 0,
+      clientX: 860,
+      pointerId: 18,
+    });
+    expect(
+      container
+        .querySelector(".codex-ui-app-shell")
+        ?.hasAttribute("data-side-panel-resizing"),
+    ).toBe(true);
+
+    rerender(
+      <AppShell
+        layoutMode="medium"
+        sidePanel="Review"
+        sidePanelMaxWidth={554}
+        sidePanelOpen
+        sidePanelResizable
+      >
+        Thread
+      </AppShell>,
+    );
+
+    expect(
+      screen.queryByRole("separator", {
+        name: "Resize workspace panel",
+      }),
+    ).toBeNull();
+    expect(
+      container
+        .querySelector(".codex-ui-app-shell")
+        ?.hasAttribute("data-side-panel-resizing"),
+    ).toBe(false);
+  });
+
+  it("keeps a measured main track while resolving the workspace maximum", () => {
+    let resize: ((width: number) => void) | undefined;
+    class ResizeObserverMock {
+      constructor(
+        private readonly callback: ResizeObserverCallback,
+      ) {}
+
+      disconnect() {}
+
+      observe(target: Element) {
+        if (!target.classList.contains("codex-ui-app-shell")) return;
+        resize = (width) =>
+          this.callback(
+            [
+              {
+                contentRect: { width },
+                target,
+              } as ResizeObserverEntry,
+            ],
+            this as unknown as ResizeObserver,
+          );
+      }
+
+      unobserve() {}
+    }
+    vi.stubGlobal("ResizeObserver", ResizeObserverMock);
+
+    render(
+      <AppShell
+        layoutMode="wide"
+        sidePanel="Review"
+        sidePanelOpen
+        sidePanelResizable
+        sidebar="Navigation"
+        sidebarOpen
+      >
+        Thread
+      </AppShell>,
+    );
+
+    act(() => resize?.(1_180));
+    const separator = screen.getByRole("separator", {
+      name: "Resize workspace panel",
+    });
+    expect(separator.getAttribute("aria-valuemax")).toBe("554");
+    expect(separator.getAttribute("aria-valuenow")).toBe("370");
+
+    act(() => resize?.(800));
+    expect(separator.getAttribute("aria-valuemax")).toBe("320");
+    expect(separator.getAttribute("aria-valuenow")).toBe("320");
+  });
+
+  it("restores focus before a controlled host removes the workspace separator", () => {
+    const { rerender } = render(
+      <AppShell
+        layoutMode="wide"
+        sidePanel={<button type="button">Review files</button>}
+        sidePanelOpen
+        sidePanelResizable
+      >
+        <button type="button">Conversation action</button>
+      </AppShell>,
+    );
+
+    const separator = screen.getByRole("separator", {
+      name: "Resize workspace panel",
+    });
+    separator.focus();
+    expect(document.activeElement).toBe(separator);
+
+    rerender(
+      <AppShell
+        layoutMode="wide"
+        sidePanel={<button type="button">Review files</button>}
+        sidePanelOpen={false}
+        sidePanelResizable
+      >
+        <button type="button">Conversation action</button>
+      </AppShell>,
+    );
+
+    expect(document.activeElement).toBe(
+      screen.getByRole("button", { name: "Conversation action" }),
+    );
+  });
+
   it("exposes controlled overlay dismissal", () => {
     const onSidebarOpenChange = vi.fn();
     const onSidePanelOpenChange = vi.fn();

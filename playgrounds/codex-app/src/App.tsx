@@ -633,6 +633,7 @@ export function App() {
         sidePanel={reviewPanel}
         sidePanelLabel="Review"
         sidePanelOpen={reviewOpen && Boolean(reviewPanel)}
+        sidePanelResizable
         sidebar={sidebar}
         sidebarOpen={sidebarOpen}
         sidebarResizable

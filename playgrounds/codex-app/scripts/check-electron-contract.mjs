@@ -118,6 +118,57 @@ try {
   await workflowPage.waitForSelector(
     '.codex-ui-app-shell[data-side-panel-open] [data-testid="review-panel"]',
   );
+  const reviewResizer = workflowPage.getByRole("separator", {
+    name: "Resize workspace panel",
+  });
+  const initialReviewWidth = await workflowPage
+    .locator(".codex-ui-app-shell__side-panel")
+    .evaluate((element) => element.getBoundingClientRect().width);
+  const initialReviewResizerBox = await reviewResizer.boundingBox();
+  if (
+    !initialReviewResizerBox ||
+    Math.abs(initialReviewWidth - 370) > 1 ||
+    (await reviewResizer.getAttribute("aria-valuemin")) !== "320" ||
+    (await reviewResizer.getAttribute("aria-valuemax")) !== "554"
+  ) {
+    throw new Error(
+      `Electron Review resizer baseline failed: ${JSON.stringify({
+        initialReviewResizerBox,
+        initialReviewWidth,
+      })}`,
+    );
+  }
+  await workflowPage.mouse.move(
+    initialReviewResizerBox.x + initialReviewResizerBox.width / 2,
+    initialReviewResizerBox.y + 200,
+  );
+  await workflowPage.mouse.down();
+  await workflowPage.mouse.move(
+    initialReviewResizerBox.x + initialReviewResizerBox.width / 2 - 64,
+    initialReviewResizerBox.y + 200,
+    { steps: 8 },
+  );
+  await workflowPage.mouse.up();
+  const draggedReviewWidth = await workflowPage
+    .locator(".codex-ui-app-shell__side-panel")
+    .evaluate((element) => element.getBoundingClientRect().width);
+  if (Math.abs(draggedReviewWidth - 434) > 1) {
+    throw new Error(
+      `Electron Review pointer resize failed: ${draggedReviewWidth}`,
+    );
+  }
+  await reviewResizer.press("Home");
+  for (let index = 0; index < 6; index += 1) {
+    await reviewResizer.press("ArrowLeft");
+  }
+  const restoredReviewWidth = await workflowPage
+    .locator(".codex-ui-app-shell__side-panel")
+    .evaluate((element) => element.getBoundingClientRect().width);
+  if (Math.abs(restoredReviewWidth - 368) > 1) {
+    throw new Error(
+      `Electron Review keyboard resize failed: ${restoredReviewWidth}`,
+    );
+  }
   await workflowPage
     .getByRole("button", { exact: true, name: "Close review" })
     .click();
@@ -240,6 +291,19 @@ try {
       reviewDiffs: document.querySelectorAll(
         ".codex-ui-file-review .codex-ui-file-diff",
       ).length,
+      sidePanelResizer: (() => {
+        const element = document.querySelector(
+          ".codex-ui-app-shell__side-panel-resizer",
+        );
+        if (!element) return null;
+        const bounds = element.getBoundingClientRect();
+        return {
+          ariaMax: element.getAttribute("aria-valuemax"),
+          ariaMin: element.getAttribute("aria-valuemin"),
+          ariaNow: element.getAttribute("aria-valuenow"),
+          width: bounds.width,
+        };
+      })(),
       sidePanel: rect(".codex-ui-app-shell__side-panel"),
       sidePanelAriaHidden: document
         .querySelector(".codex-ui-app-shell__side-panel")
@@ -266,9 +330,14 @@ try {
     !compactContract.sidebar ||
     !compactContract.main ||
     !compactContract.sidePanel ||
+    !compactContract.sidePanelResizer ||
     Math.abs(compactContract.sidebar.width - 274) > 1 ||
     compactContract.main.width < 200 ||
     compactContract.sidePanel.width < 315 ||
+    Math.abs(compactContract.sidePanelResizer.width - 16) > 0.5 ||
+    compactContract.sidePanelResizer.ariaMin !== "320" ||
+    compactContract.sidePanelResizer.ariaMax !== "320" ||
+    compactContract.sidePanelResizer.ariaNow !== "320" ||
     compactContract.sidePanel.right > 801
   ) {
     throw new Error(
@@ -412,5 +481,5 @@ try {
 }
 
 console.log(
-  "Electron host, native-window, resizable navigation, multi-file Review, large diff scrolling, and compact geometry contracts passed.",
+  "Electron host, native-window, resizable navigation and Review, multi-file Review, large diff scrolling, and compact geometry contracts passed.",
 );

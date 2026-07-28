@@ -19,6 +19,9 @@ for (const scene of visualScenes) {
       const sidebarResizer = document.querySelector(
         '.codex-ui-app-shell__sidebar-resizer[role="separator"]',
       );
+      const sidePanelResizer = document.querySelector(
+        '.codex-ui-app-shell__side-panel-resizer[role="separator"]',
+      );
       if (
         !root ||
         !shell ||
@@ -120,6 +123,15 @@ for (const scene of visualScenes) {
           ariaNow: sidebarResizer.getAttribute("aria-valuenow"),
           rect: rect(sidebarResizer),
         },
+        sidePanelResizer: sidePanelResizer
+          ? {
+              ariaMax: sidePanelResizer.getAttribute("aria-valuemax"),
+              ariaMin: sidePanelResizer.getAttribute("aria-valuemin"),
+              ariaNow: sidePanelResizer.getAttribute("aria-valuenow"),
+              cursor: getComputedStyle(sidePanelResizer).cursor,
+              rect: rect(sidePanelResizer),
+            }
+          : null,
         viewport: viewportRect,
         workflow: {
           fileGroupCount: document.querySelectorAll(
@@ -188,6 +200,35 @@ for (const scene of visualScenes) {
           contract.header.left)
     ) {
       throw new Error(`${scene.id}: Review panel split geometry is invalid.`);
+    }
+    if (
+      scene.surfaces?.includes("reviewPanel") &&
+      (!contract.sidePanelResizer ||
+        contract.sidePanelResizer.cursor !== "col-resize" ||
+        Math.abs(contract.sidePanelResizer.rect.width - 16) > 0.5 ||
+        contract.sidePanelResizer.ariaMin !== "320" ||
+        contract.sidePanelResizer.ariaMax !== "554" ||
+        contract.sidePanelResizer.ariaNow !== "370" ||
+        Math.abs(
+          contract.sidePanelResizer.rect.left +
+            contract.sidePanelResizer.rect.width / 2 -
+            contract.namedSurfaces.reviewPanel.rect.left,
+        ) > 1)
+    ) {
+      throw new Error(
+        `${scene.id}: Review resizer contract failed: ${JSON.stringify({
+          panel: contract.namedSurfaces.reviewPanel,
+          resizer: contract.sidePanelResizer,
+        })}`,
+      );
+    }
+    if (
+      !scene.surfaces?.includes("reviewPanel") &&
+      contract.sidePanelResizer
+    ) {
+      throw new Error(
+        `${scene.id}: hidden Review panel retained its resize separator.`,
+      );
     }
     if (
       scene.surfaces?.includes("reviewPanel") &&
