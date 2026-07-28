@@ -32,15 +32,45 @@ export const visualScenes = [
     id: "compacted",
     scenario: "compaction",
   },
+  {
+    frame: "command-running",
+    id: "command-running",
+    scenario: "workspace-workflow",
+    surfaces: ["command"],
+  },
+  {
+    frame: "approval-pending",
+    id: "approval-pending",
+    scenario: "workspace-workflow",
+    surfaces: ["approval", "command"],
+  },
+  {
+    frame: "file-changing",
+    id: "file-changing",
+    scenario: "workspace-workflow",
+    surfaces: ["approval", "command", "fileChange"],
+  },
+  {
+    frame: "file-applied",
+    id: "file-applied",
+    scenario: "workspace-workflow",
+    surfaces: ["approval", "command", "fileChange"],
+  },
+  {
+    frame: "review-open",
+    id: "review-open",
+    scenario: "workspace-workflow",
+    surfaces: ["approval", "command", "fileChange", "reviewPanel"],
+  },
 ];
 
-export async function launchScene(scene) {
+export async function launchScene(scene, { capture = true } = {}) {
   const app = await electron.launch({
     args: ["."],
     executablePath: electronPath,
     env: {
       ...process.env,
-      CODEX_DEMO_CAPTURE: "1",
+      CODEX_DEMO_CAPTURE: capture ? "1" : "0",
       CODEX_DEMO_FRAME: scene.frame,
       CODEX_DEMO_HEADLESS: "1",
       CODEX_DEMO_SCENARIO: scene.scenario,

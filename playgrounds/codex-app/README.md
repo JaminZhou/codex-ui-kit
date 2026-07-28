@@ -24,10 +24,21 @@ The first slice covers:
 - replay and local stdio App Server modes;
 - protocol, CDP, Electron-host, and pixel regression gates.
 
-The renderer is protocol-neutral. App Server notifications are reduced into a
-small UI state contract before they reach `codex-ui-kit`. The Electron main
-process owns `CodexAppServerClient`; the sandboxed renderer receives sanitized
-events through preload IPC.
+## Second vertical slice
+
+The second slice follows a coding workflow end to end:
+
+- running and completed command execution;
+- a schema-validated command approval request and response;
+- streaming and applied file changes;
+- the host-owned Review side panel and file diff;
+- live approval IPC between the sandboxed renderer and Electron main process.
+
+The renderer is protocol-neutral. App Server notifications and server requests
+are reduced into a small UI state contract before they reach `codex-ui-kit`.
+The Electron main process owns `CodexAppServerClient`; the sandboxed renderer
+receives sanitized events and returns explicit approval decisions through
+preload IPC.
 
 ## Development
 
@@ -40,9 +51,10 @@ pnpm dev:codex-app:electron
 ```
 
 `Live local` uses the pinned Codex runtime from
-`@jaminzhou/codex-app-server-client`, with read-only sandboxing, no approvals,
-and no required account-backed CI. It opens the repository root by default;
-set `CODEX_UI_KIT_WORKSPACE` to an absolute path to inspect another workspace.
+`@jaminzhou/codex-app-server-client`, with read-only sandboxing and explicit
+on-request approvals. It opens the repository root by default; set
+`CODEX_UI_KIT_WORKSPACE` to an absolute path to inspect another workspace.
+Live turns can use the signed-in Codex account and are never required by CI.
 Replay mode is deterministic and is the default test path.
 
 The macOS Electron acceptance suite combines CDP geometry and computed styles,

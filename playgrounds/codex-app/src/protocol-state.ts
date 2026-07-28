@@ -14,8 +14,17 @@ export type DemoTurnStatus =
 export interface ProtocolEventRecord {
   atMs: number;
   frame?: string;
+  id?: number | string;
+  kind?: "notification" | "request";
   method: string;
   params: JsonValue;
+  response?: JsonValue;
+}
+
+export interface ProtocolApprovalResolution {
+  decision: "approved" | "rejected";
+  kind: "approval-resolution";
+  requestId: number | string;
 }
 
 export interface DemoMessage {
@@ -28,29 +37,78 @@ export interface DemoMessage {
   turnId: string | null;
 }
 
+export interface DemoCommandExecution {
+  command: string;
+  cwd: string;
+  durationMs: number | null;
+  exitCode: number | null;
+  id: string;
+  output: string;
+  status: "completed" | "failed" | "pending" | "running";
+  turnId: string | null;
+}
+
+export interface DemoApprovalRequest {
+  command: string;
+  decision: "approved" | "pending" | "rejected";
+  itemId: string;
+  kind: "command" | "file";
+  reason: string | null;
+  requestId: number | string;
+  responseDecision?: "approved" | "rejected";
+  turnId: string | null;
+}
+
+export interface DemoFileUpdateChange {
+  diff: string;
+  kind: "added" | "deleted" | "modified" | "renamed";
+  path: string;
+  previousPath?: string;
+}
+
+export interface DemoFileChange {
+  changes: DemoFileUpdateChange[];
+  id: string;
+  status: "applied" | "rejected" | "streaming";
+  turnId: string | null;
+}
+
+export interface DemoTimelineEntry {
+  id: string;
+  kind: "approval" | "command" | "fileChange" | "message";
+}
+
 export interface DemoProtocolState {
+  approvals: DemoApprovalRequest[];
+  commands: DemoCommandExecution[];
   compaction: "idle" | "running" | "completed";
   currentTurnId: string | null;
   error: string | null;
   eventCount: number;
+  fileChanges: DemoFileChange[];
   lastMethod: string | null;
   messages: DemoMessage[];
   retrying: boolean;
   status: DemoTurnStatus;
   threadId: string | null;
+  timeline: DemoTimelineEntry[];
   turnDurationMs: number | null;
 }
 
 export const initialProtocolState: DemoProtocolState = {
+  approvals: [],
+  commands: [],
   compaction: "idle",
   currentTurnId: null,
   error: null,
   eventCount: 0,
+  fileChanges: [],
   lastMethod: null,
   messages: [],
   retrying: false,
   status: "idle",
   threadId: null,
+  timeline: [],
   turnDurationMs: null,
 };
 
@@ -83,6 +141,100 @@ function upsertMessage(
   const next = [...messages];
   next[index] = { ...next[index], ...message };
   return next;
+}
+
+function upsertById<T extends { id: string }>(items: T[], item: T): T[] {
+  const index = items.findIndex(({ id }) => id === item.id);
+  if (index === -1) return [...items, item];
+  const next = [...items];
+  next[index] = { ...next[index], ...item };
+  return next;
+}
+
+function upsertApproval(
+  approvals: DemoApprovalRequest[],
+  approval: DemoApprovalRequest,
+): DemoApprovalRequest[] {
+  const index = approvals.findIndex(
+    ({ requestId }) => requestId === approval.requestId,
+  );
+  if (index === -1) return [...approvals, approval];
+  const next = [...approvals];
+  next[index] = { ...next[index], ...approval };
+  return next;
+}
+
+function approvalTimelineId(requestId: number | string) {
+  return `${typeof requestId}:${requestId}`;
+}
+
+function appendTimeline(
+  timeline: DemoTimelineEntry[],
+  entry: DemoTimelineEntry,
+): DemoTimelineEntry[] {
+  return timeline.some(
+    ({ id, kind }) => id === entry.id && kind === entry.kind,
+  )
+    ? timeline
+    : [...timeline, entry];
+}
+
+function commandStatus(
+  value: unknown,
+): DemoCommandExecution["status"] {
+  if (value === "completed") return "completed";
+  if (value === "failed" || value === "declined") return "failed";
+  if (value === "inProgress") return "running";
+  return "pending";
+}
+
+function fileChangeStatus(value: unknown): DemoFileChange["status"] {
+  if (value === "completed") return "applied";
+  if (value === "failed" || value === "declined") return "rejected";
+  return "streaming";
+}
+
+function patchKind(value: unknown): DemoFileUpdateChange["kind"] {
+  if (!isRecord(value)) return "modified";
+  if (value.type === "add") return "added";
+  if (value.type === "delete") return "deleted";
+  if (value.type === "update" && typeof value.move_path === "string") {
+    return "renamed";
+  }
+  return "modified";
+}
+
+function fileChangesFrom(value: unknown): DemoFileUpdateChange[] {
+  if (!Array.isArray(value)) return [];
+  return value.flatMap((entry) => {
+    if (!isRecord(entry)) return [];
+    const path = asString(entry.path);
+    const diff = asString(entry.diff);
+    if (!path || diff === null) return [];
+    const kind = patchKind(entry.kind);
+    const patchChange = isRecord(entry.kind) ? entry.kind : {};
+    const movedPath =
+      kind === "renamed" ? asString(patchChange.move_path) : null;
+    return [
+      {
+        diff,
+        kind,
+        path: movedPath ?? path,
+        ...(movedPath ? { previousPath: path } : {}),
+      },
+    ];
+  });
+}
+
+function approvalResponseDecision(
+  value: unknown,
+): "approved" | "rejected" | undefined {
+  if (!isRecord(value)) return undefined;
+  if (value.decision === "decline" || value.decision === "cancel") {
+    return "rejected";
+  }
+  if (value.decision !== undefined) return "approved";
+  return undefined;
 }
 
 function appendAssistantDelta(
@@ -175,16 +327,90 @@ export function agentMessageStatus(
   return "completed";
 }
 
+export function hasActiveTurnWork(state: DemoProtocolState) {
+  if (!state.currentTurnId) return false;
+  return (
+    state.commands.some(
+      ({ status, turnId }) =>
+        turnId === state.currentTurnId &&
+        (status === "pending" || status === "running"),
+    ) ||
+    state.fileChanges.some(
+      ({ status, turnId }) =>
+        turnId === state.currentTurnId && status === "streaming",
+    )
+  );
+}
+
 export function reduceProtocolNotification(
   state: DemoProtocolState,
-  notification: JsonRpcNotification | ProtocolEventRecord,
+  notification:
+    | JsonRpcNotification
+    | ProtocolApprovalResolution
+    | ProtocolEventRecord,
 ): DemoProtocolState {
+  if (
+    "kind" in notification &&
+    notification.kind === "approval-resolution"
+  ) {
+    return {
+      ...state,
+      approvals: state.approvals.map((approval) =>
+        approval.requestId === notification.requestId
+          ? { ...approval, decision: notification.decision }
+          : approval,
+      ),
+      eventCount: state.eventCount + 1,
+    };
+  }
+
   const params = notificationParams(notification);
   const next: DemoProtocolState = {
     ...state,
     eventCount: state.eventCount + 1,
     lastMethod: notification.method,
   };
+
+  if (
+    "kind" in notification &&
+    notification.kind === "request" &&
+    (notification.method === "item/commandExecution/requestApproval" ||
+      notification.method === "item/fileChange/requestApproval")
+  ) {
+    const requestId = notification.id;
+    const itemId = asString(params.itemId);
+    if (requestId === undefined || !itemId) return next;
+    const command = state.commands.find(({ id }) => id === itemId);
+    const fileChange = state.fileChanges.find(({ id }) => id === itemId);
+    const fileChangePaths = fileChange?.changes
+      .map(({ path }) => path)
+      .filter(Boolean)
+      .join(", ");
+    const kind =
+      notification.method === "item/fileChange/requestApproval"
+        ? "file"
+        : "command";
+    return {
+      ...next,
+      approvals: upsertApproval(state.approvals, {
+        command:
+          asString(params.command) ??
+          command?.command ??
+          (fileChangePaths || "File changes"),
+        decision: "pending",
+        itemId,
+        kind,
+        reason: asString(params.reason),
+        requestId,
+        responseDecision: approvalResponseDecision(notification.response),
+        turnId: asString(params.turnId) ?? state.currentTurnId,
+      }),
+      timeline: appendTimeline(state.timeline, {
+        id: approvalTimelineId(requestId),
+        kind: "approval",
+      }),
+    };
+  }
 
   if (notification.method === "thread/started") {
     const thread = isRecord(params.thread) ? params.thread : {};
@@ -239,6 +465,47 @@ export function reduceProtocolNotification(
       };
     }
     if (!itemId) return next;
+    if (itemType === "commandExecution") {
+      const status = commandStatus(item.status);
+      const command = state.commands.find(({ id }) => id === itemId);
+      const commands = upsertById(state.commands, {
+        command: asString(item.command) ?? command?.command ?? "",
+        cwd: asString(item.cwd) ?? command?.cwd ?? "",
+        durationMs: asNumber(item.durationMs),
+        exitCode: asNumber(item.exitCode),
+        id: itemId,
+        output:
+          asString(item.aggregatedOutput) ?? command?.output ?? "",
+        status,
+        turnId: itemTurnId,
+      });
+      return {
+        ...next,
+        commands,
+        timeline: appendTimeline(state.timeline, {
+          id: itemId,
+          kind: "command",
+        }),
+      };
+    }
+    if (itemType === "fileChange") {
+      const fileChange = state.fileChanges.find(({ id }) => id === itemId);
+      const changes = fileChangesFrom(item.changes);
+      const status = fileChangeStatus(item.status);
+      return {
+        ...next,
+        fileChanges: upsertById(state.fileChanges, {
+          changes: changes.length > 0 ? changes : (fileChange?.changes ?? []),
+          id: itemId,
+          status,
+          turnId: itemTurnId,
+        }),
+        timeline: appendTimeline(state.timeline, {
+          id: itemId,
+          kind: "fileChange",
+        }),
+      };
+    }
     if (itemType === "userMessage") {
       return {
         ...next,
@@ -248,6 +515,10 @@ export function reduceProtocolNotification(
           status: "completed",
           text: textFromUserContent(item.content),
           turnId: itemTurnId,
+        }),
+        timeline: appendTimeline(state.timeline, {
+          id: itemId,
+          kind: "message",
         }),
       };
     }
@@ -263,6 +534,10 @@ export function reduceProtocolNotification(
               : "running",
           text: asString(item.text) ?? "",
           turnId: itemTurnId,
+        }),
+        timeline: appendTimeline(state.timeline, {
+          id: itemId,
+          kind: "message",
         }),
       };
     }
@@ -282,6 +557,70 @@ export function reduceProtocolNotification(
         asString(params.turnId) ?? state.currentTurnId,
       ),
       status: "running",
+      timeline: appendTimeline(state.timeline, {
+        id: itemId,
+        kind: "message",
+      }),
+    };
+  }
+
+  if (notification.method === "item/commandExecution/outputDelta") {
+    const itemId = asString(params.itemId);
+    const delta = asString(params.delta);
+    if (!itemId || delta === null) return next;
+    const command = state.commands.find(({ id }) => id === itemId);
+    if (!command) return next;
+    return {
+      ...next,
+      commands: upsertById(state.commands, {
+        ...command,
+        output: `${command.output}${delta}`,
+        status: "running",
+      }),
+      status: "running",
+      timeline: appendTimeline(state.timeline, {
+        id: itemId,
+        kind: "command",
+      }),
+    };
+  }
+
+  if (notification.method === "item/fileChange/patchUpdated") {
+    const itemId = asString(params.itemId);
+    if (!itemId) return next;
+    const fileChange = state.fileChanges.find(({ id }) => id === itemId);
+    if (!fileChange) return next;
+    const changes = fileChangesFrom(params.changes);
+    return {
+      ...next,
+      fileChanges: upsertById(state.fileChanges, {
+        ...fileChange,
+        changes: changes.length > 0 ? changes : fileChange.changes,
+        status: "streaming",
+      }),
+      status: "running",
+      timeline: appendTimeline(state.timeline, {
+        id: itemId,
+        kind: "fileChange",
+      }),
+    };
+  }
+
+  if (notification.method === "serverRequest/resolved") {
+    const requestId = params.requestId;
+    if (typeof requestId !== "string" && typeof requestId !== "number") {
+      return next;
+    }
+    return {
+      ...next,
+      approvals: state.approvals.map((approval) =>
+        approval.requestId === requestId && approval.decision === "pending"
+          ? {
+              ...approval,
+              decision: approval.responseDecision ?? "rejected",
+            }
+          : approval,
+      ),
     };
   }
 

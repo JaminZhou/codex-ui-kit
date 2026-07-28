@@ -11,6 +11,36 @@ const protocolSchemaPath = fileURLToPath(
   ),
 );
 const protocolSchema = JSON.parse(await readFile(protocolSchemaPath, "utf8"));
+const serverRequestSchema = JSON.parse(
+  await readFile(
+    fileURLToPath(
+      import.meta.resolve(
+        "@jaminzhou/codex-app-server-client/schemas/ServerRequest.json",
+      ),
+    ),
+    "utf8",
+  ),
+);
+const commandApprovalResponseSchema = JSON.parse(
+  await readFile(
+    fileURLToPath(
+      import.meta.resolve(
+        "@jaminzhou/codex-app-server-client/schemas/CommandExecutionRequestApprovalResponse.json",
+      ),
+    ),
+    "utf8",
+  ),
+);
+const fileApprovalResponseSchema = JSON.parse(
+  await readFile(
+    fileURLToPath(
+      import.meta.resolve(
+        "@jaminzhou/codex-app-server-client/schemas/FileChangeRequestApprovalResponse.json",
+      ),
+    ),
+    "utf8",
+  ),
+);
 const notificationVariants =
   protocolSchema.definitions?.ServerNotification?.oneOf;
 if (!Array.isArray(notificationVariants)) {
@@ -62,6 +92,17 @@ function notificationValidator(method) {
   notificationValidators.set(method, validate);
   return validate;
 }
+const serverRequestValidator = ajv.compile(serverRequestSchema);
+const serverRequestResponseValidators = new Map([
+  [
+    "item/commandExecution/requestApproval",
+    ajv.compile(commandApprovalResponseSchema),
+  ],
+  [
+    "item/fileChange/requestApproval",
+    ajv.compile(fileApprovalResponseSchema),
+  ],
+]);
 const itemStartedValidator = notificationValidator("item/started");
 if (
   !itemStartedValidator ||
@@ -72,6 +113,15 @@ if (
 ) {
   throw new Error("Pinned schema validator accepted an incomplete notification.");
 }
+if (
+  serverRequestValidator({
+    id: "incomplete-request",
+    method: "item/commandExecution/requestApproval",
+    params: {},
+  })
+) {
+  throw new Error("Pinned schema validator accepted an incomplete server request.");
+}
 const files = (await readdir(traceDirectory))
   .filter((file) => file.endsWith(".jsonl"))
   .sort();
@@ -79,6 +129,8 @@ const files = (await readdir(traceDirectory))
 if (files.length === 0) throw new Error("No protocol trace fixtures found.");
 
 let eventCount = 0;
+let notificationCount = 0;
+let requestCount = 0;
 for (const file of files) {
   const raw = await readFile(join(traceDirectory, file), "utf8");
   const lines = raw.split(/\r?\n/).filter((line) => line.trim());
@@ -96,24 +148,52 @@ for (const file of files) {
     ) {
       throw new Error(`${file}:${index + 1} is not a valid ordered trace event.`);
     }
-    const validateNotification = notificationValidator(event.method);
-    if (!validateNotification) {
-      throw new Error(
-        `${file}:${index + 1} uses a method absent from the pinned client: ${event.method}`,
-      );
-    }
-    if (
-      !validateNotification({
-        method: event.method,
-        params: event.params,
-      })
-    ) {
-      throw new Error(
-        `${file}:${index + 1} fails the pinned notification schema: ${ajv.errorsText(
-          validateNotification.errors,
-          { separator: "; " },
-        )}`,
-      );
+    if (event.kind === "request") {
+      if (
+        !serverRequestValidator({
+          id: event.id,
+          method: event.method,
+          params: event.params,
+        })
+      ) {
+        throw new Error(
+          `${file}:${index + 1} fails the pinned server-request schema: ${ajv.errorsText(
+            serverRequestValidator.errors,
+            { separator: "; " },
+          )}`,
+        );
+      }
+      const validateResponse = serverRequestResponseValidators.get(event.method);
+      if (!validateResponse || !validateResponse(event.response)) {
+        throw new Error(
+          `${file}:${index + 1} fails the pinned server-response schema: ${ajv.errorsText(
+            validateResponse?.errors,
+            { separator: "; " },
+          )}`,
+        );
+      }
+      requestCount += 1;
+    } else {
+      const validateNotification = notificationValidator(event.method);
+      if (!validateNotification) {
+        throw new Error(
+          `${file}:${index + 1} uses a method absent from the pinned client: ${event.method}`,
+        );
+      }
+      if (
+        !validateNotification({
+          method: event.method,
+          params: event.params,
+        })
+      ) {
+        throw new Error(
+          `${file}:${index + 1} fails the pinned notification schema: ${ajv.errorsText(
+            validateNotification.errors,
+            { separator: "; " },
+          )}`,
+        );
+      }
+      notificationCount += 1;
     }
     previousAt = event.atMs;
     eventCount += 1;
@@ -130,5 +210,5 @@ if (/app\.asar|Contents\/Resources|webpack:\/\//i.test(trackedSources)) {
 }
 
 console.log(
-  `Protocol traces valid: ${files.length} fixtures, ${eventCount} schema-validated app-server notifications.`,
+  `Protocol traces valid: ${files.length} fixtures, ${eventCount} events (${notificationCount} notifications, ${requestCount} server requests with responses).`,
 );

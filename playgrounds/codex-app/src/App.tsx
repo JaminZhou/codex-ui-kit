@@ -7,13 +7,19 @@ import {
   AppSidebar,
   AppSidebarItem,
   AppSidebarSection,
+  ApprovalRequest,
   Button,
+  CommandExecution,
+  CommandOutput,
   ConversationThreadShell,
+  FileChange,
+  FileDiff,
   StatusBanner,
   ThreadContextEvent,
   ThreadHeader,
   ThreadInterruptionSummary,
   ThreadThinkingPlaceholder,
+  WorkspacePanel,
 } from "codex-ui-kit";
 import {
   Fragment,
@@ -26,17 +32,24 @@ import {
 import type { JsonRpcNotification } from "@jaminzhou/codex-app-server-client";
 import {
   agentMessageStatus,
+  hasActiveTurnWork,
   initialProtocolState,
   isTurnActive,
   reduceProtocolNotification,
   type DemoProtocolState,
   type ProtocolEventRecord,
 } from "./protocol-state";
+import { changeStats } from "./diff-lines";
+import { LiveApprovalSubmissionGate } from "./live-approval-submission-gate";
 import {
   isScenarioId,
   replayScenarios,
   type ReplayScenarioId,
 } from "./replay";
+import {
+  resolveReviewSelection,
+  type ReviewSelection,
+} from "./review-selection";
 
 function querySelection() {
   const params = new URLSearchParams(window.location.search);
@@ -86,16 +99,34 @@ export function App() {
   const [composerValue, setComposerValue] = useState("");
   const [liveStartPending, setLiveStartPending] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [reviewOpen, setReviewOpen] = useState(
+    initialSelection.frame === "review-open",
+  );
+  const [reviewSelection, setReviewSelection] =
+    useState<ReviewSelection | null>(null);
+  const [undoneFileIds, setUndoneFileIds] = useState<Set<string>>(
+    () => new Set(),
+  );
   const [liveError, setLiveError] = useState<string | null>(null);
   const liveStartPendingRef = useRef(false);
+  const liveApprovalSubmissionGateRef = useRef(
+    new LiveApprovalSubmissionGate(),
+  );
   const replay = replayState(scenario.events, replayCount);
   const state = mode === "live" ? liveState : replay;
 
   useEffect(() => {
     if (!window.codexDemo) return;
-    return window.codexDemo.onNotification((notification) => {
+    const removeNotification = window.codexDemo.onNotification((notification) => {
       dispatchLive(notification);
     });
+    const removeServerRequest = window.codexDemo.onServerRequest((request) => {
+      dispatchLive(request);
+    });
+    return () => {
+      removeNotification();
+      removeServerRequest();
+    };
   }, []);
 
   useEffect(() => {
@@ -106,11 +137,42 @@ export function App() {
     };
   }, []);
 
+  useEffect(() => {
+    liveApprovalSubmissionGateRef.current.retainPending(
+      liveState.approvals
+        .filter(({ decision }) => decision === "pending")
+        .map(({ requestId }) => requestId),
+    );
+  }, [liveState.approvals]);
+
   const selectScenario = (nextId: ReplayScenarioId) => {
     setMode("replay");
     setScenarioId(nextId);
     setReplayCount(replayScenarios[nextId].events.length);
+    setReviewOpen(false);
+    setReviewSelection(null);
+    setUndoneFileIds(new Set());
     setLiveError(null);
+  };
+
+  const respondToApproval = async (
+    requestId: number | string,
+    decision: "accept" | "decline",
+  ) => {
+    if (mode !== "live") return;
+    const submissionGate = liveApprovalSubmissionGateRef.current;
+    if (!submissionGate.begin(requestId)) return;
+    try {
+      await window.codexDemo?.respondToApproval({ decision, requestId });
+      dispatchLive({
+        decision: decision === "accept" ? "approved" : "rejected",
+        kind: "approval-resolution",
+        requestId,
+      });
+    } catch (error) {
+      submissionGate.finish(requestId);
+      setLiveError(error instanceof Error ? error.message : String(error));
+    }
   };
 
   const submitLive = async (prompt: string) => {
@@ -139,6 +201,16 @@ export function App() {
       await window.codexDemo?.stopLive();
     } catch (error) {
       setLiveError(error instanceof Error ? error.message : String(error));
+    } finally {
+      liveState.approvals
+        .filter(({ decision }) => decision === "pending")
+        .forEach(({ requestId }) => {
+          dispatchLive({
+            decision: "rejected",
+            kind: "approval-resolution",
+            requestId,
+          });
+        });
     }
   };
 
@@ -238,6 +310,234 @@ export function App() {
     />
   );
 
+  const resolvedReview = resolveReviewSelection(
+    state.fileChanges,
+    reviewSelection,
+  );
+  const reviewChange = resolvedReview?.change;
+  const reviewStats = reviewChange ? changeStats(reviewChange) : null;
+  const reviewPanel = reviewChange ? (
+    <WorkspacePanel
+      activeTabId="review"
+      label="Review"
+      onActiveTabChange={() => undefined}
+      onClose={() => setReviewOpen(false)}
+      onCloseTab={() => setReviewOpen(false)}
+      placement="side"
+      tabs={[
+        {
+          content: (
+            <div className="demo-review-panel" data-testid="review-panel">
+              <div className="demo-review-panel__toolbar">
+                <div>
+                  <strong>Last turn</strong>
+                  <span>{reviewChange.path}</span>
+                </div>
+                <span className="demo-review-panel__stats">
+                  +{reviewStats?.additions ?? 0} −
+                  {reviewStats?.deletions ?? 0}
+                </span>
+              </div>
+              <FileDiff
+                aria-label={`Review diff for ${reviewChange.path}`}
+                lines={reviewStats?.lines ?? []}
+                wrapLines
+              />
+            </div>
+          ),
+          id: "review",
+          label: "Review",
+        },
+      ]}
+    />
+  ) : null;
+  const timelineContent = state.timeline.map((entry) => {
+    if (entry.kind === "message") {
+      const message = state.messages.find(({ id }) => id === entry.id);
+      if (!message) return null;
+      return (
+        <Fragment key={`message:${message.id}`}>
+          <AgentMessage
+            data-item-id={message.id}
+            role={message.role}
+            status={agentMessageStatus(message.status)}
+          >
+            {message.role === "assistant" ? (
+              <AgentMarkdown streaming={message.status === "running"}>
+                {message.text || " "}
+              </AgentMarkdown>
+            ) : (
+              message.text
+            )}
+          </AgentMessage>
+          {message.interruptionDurationMs !== undefined ? (
+            <ThreadInterruptionSummary
+              durationMs={message.interruptionDurationMs ?? 0}
+              label={
+                message.interruptionDurationMs === null
+                  ? "You stopped this response"
+                  : undefined
+              }
+              stoppedLabel={(time) =>
+                `You stopped this response after ${time}`
+              }
+            />
+          ) : null}
+          {message.compaction ? (
+            <ThreadContextEvent
+              mode="automatic"
+              status={message.compaction}
+            />
+          ) : null}
+        </Fragment>
+      );
+    }
+
+    if (entry.kind === "command") {
+      const command = state.commands.find(({ id }) => id === entry.id);
+      if (!command) return null;
+      return (
+        <CommandExecution
+          command={command.command}
+          cwd={command.cwd}
+          data-item-id={command.id}
+          data-testid="command-execution"
+          durationMs={command.durationMs ?? undefined}
+          exitCode={command.exitCode ?? undefined}
+          key={`command:${command.id}`}
+          open={
+            initialSelection.capture
+              ? initialSelection.frame === "command-running" &&
+                command.status === "running"
+              : undefined
+          }
+          status={command.status}
+        >
+          <CommandOutput copyText={command.output}>
+            {command.output}
+          </CommandOutput>
+        </CommandExecution>
+      );
+    }
+
+    if (entry.kind === "approval") {
+      const approval = state.approvals.find(
+        ({ requestId }) =>
+          `${typeof requestId}:${requestId}` === entry.id,
+      );
+      if (!approval) return null;
+      return (
+        <ApprovalRequest
+          data-item-id={approval.itemId}
+          data-testid="approval-request"
+          decision={approval.decision}
+          description={approval.command}
+          kind={approval.kind}
+          key={`approval:${entry.id}`}
+          onApprove={() =>
+            respondToApproval(approval.requestId, "accept")
+          }
+          onReject={() =>
+            respondToApproval(approval.requestId, "decline")
+          }
+          reason={approval.reason}
+          title={
+            approval.kind === "command"
+              ? "Run this command?"
+              : "Apply these file changes?"
+          }
+        />
+      );
+    }
+
+    const fileChange = state.fileChanges.find(({ id }) => id === entry.id);
+    if (!fileChange || undoneFileIds.has(fileChange.id)) return null;
+    return (
+      <Fragment key={`file-change:${fileChange.id}`}>
+        {fileChange.changes.map((change) => {
+          const stats = changeStats(change);
+          const open = initialSelection.capture
+            ? initialSelection.frame === "file-changing"
+            : undefined;
+          const indicator = (
+            <svg
+              aria-hidden="true"
+              className="demo-file-indicator"
+              viewBox="0 0 16 16"
+            >
+              <path d="M3 2.5h6l4 4v7H3z" />
+              <path d="M9 2.5v4h4M5.5 9h5M5.5 11.5h3.5" />
+            </svg>
+          );
+          const detail =
+            fileChange.status === "applied" ? (
+              <span className="demo-file-actions">
+                <span className="demo-file-actions__stats">
+                  +{stats.additions} −{stats.deletions}
+                </span>
+                {mode === "replay" ? (
+                  <button
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      setUndoneFileIds((current) => {
+                        const next = new Set(current);
+                        next.add(fileChange.id);
+                        return next;
+                      });
+                      if (resolvedReview?.fileChangeId === fileChange.id) {
+                        setReviewOpen(false);
+                        setReviewSelection(null);
+                      }
+                    }}
+                    type="button"
+                  >
+                    Undo
+                  </button>
+                ) : null}
+                <button
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    setReviewSelection({
+                      fileChangeId: fileChange.id,
+                      path: change.path,
+                    });
+                    setReviewOpen(true);
+                  }}
+                  type="button"
+                >
+                  Review
+                </button>
+              </span>
+            ) : undefined;
+          return (
+            <FileChange
+              additions={stats.additions}
+              change={change.kind}
+              data-item-id={fileChange.id}
+              data-testid="file-change"
+              deletions={stats.deletions}
+              detail={detail}
+              diffText={change.diff}
+              indicator={indicator}
+              key={change.path}
+              open={open}
+              path={change.path}
+              previousPath={change.previousPath}
+              status={fileChange.status}
+            >
+              <FileDiff
+                aria-label={`Inline diff for ${change.path}`}
+                lines={stats.lines}
+                wrapLines
+              />
+            </FileChange>
+          );
+        })}
+      </Fragment>
+    );
+  });
+  const activeTurnHasWork = hasActiveTurnWork(state);
+
   return (
     <div
       className="demo-root"
@@ -250,6 +550,10 @@ export function App() {
     >
       <AppShell
         onSidebarOpenChange={setSidebarOpen}
+        onSidePanelOpenChange={setReviewOpen}
+        sidePanel={reviewPanel}
+        sidePanelLabel="Review"
+        sidePanelOpen={reviewOpen && Boolean(reviewPanel)}
         sidebar={sidebar}
         sidebarOpen={sidebarOpen}
       >
@@ -267,47 +571,15 @@ export function App() {
                 </StatusBanner>
               ) : null}
 
-              {state.messages.map((message) => (
-                <Fragment key={message.id}>
-                  <AgentMessage
-                    data-item-id={message.id}
-                    role={message.role}
-                    status={agentMessageStatus(message.status)}
-                  >
-                    {message.role === "assistant" ? (
-                      <AgentMarkdown streaming={message.status === "running"}>
-                        {message.text || " "}
-                      </AgentMarkdown>
-                    ) : (
-                      message.text
-                    )}
-                  </AgentMessage>
-                  {message.interruptionDurationMs !== undefined ? (
-                    <ThreadInterruptionSummary
-                      durationMs={message.interruptionDurationMs ?? 0}
-                      label={
-                        message.interruptionDurationMs === null
-                          ? "You stopped this response"
-                          : undefined
-                      }
-                      stoppedLabel={(time) =>
-                        `You stopped this response after ${time}`
-                      }
-                    />
-                  ) : null}
-                  {message.compaction ? (
-                    <ThreadContextEvent
-                      mode="automatic"
-                      status={message.compaction}
-                    />
-                  ) : null}
-                </Fragment>
-              ))}
+              {timelineContent}
 
               {state.status === "running" &&
+              !activeTurnHasWork &&
               !state.messages.some(
-                ({ role, status }) =>
-                  role === "assistant" && status === "running",
+                ({ role, status, turnId }) =>
+                  role === "assistant" &&
+                  status === "running" &&
+                  turnId === state.currentTurnId,
               ) ? (
                 <ThreadThinkingPlaceholder />
               ) : null}

@@ -149,7 +149,7 @@
       ],
       "implementationStatus": "partial",
       "browserStatus": "verified",
-      "electronStatus": "partial_legacy",
+      "electronStatus": "verified",
       "priority": "p0"
     },
     {
@@ -509,7 +509,7 @@
       ],
       "implementationStatus": "partial",
       "browserStatus": "verified",
-      "electronStatus": "partial_legacy",
+      "electronStatus": "verified",
       "priority": "p0"
     },
     {
@@ -524,7 +524,7 @@
       ],
       "implementationStatus": "partial",
       "browserStatus": "verified",
-      "electronStatus": "partial_legacy",
+      "electronStatus": "verified",
       "priority": "p0"
     },
     {

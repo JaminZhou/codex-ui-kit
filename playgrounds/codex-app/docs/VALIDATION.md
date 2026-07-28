@@ -2,12 +2,12 @@
 
 Every deterministic scenario has one ID and produces four evidence layers:
 
-1. **Protocol** — ordered App Server notifications checked against the pinned
-   generated notification union.
+1. **Protocol** — ordered App Server notifications, server requests, and
+   request responses checked against the pinned generated schemas.
 2. **CDP** — DOM identity, computed layout, focus, scrolling, and named-surface
    geometry.
-3. **Electron host** — real `BrowserWindow` bounds, renderer isolation, and
-   sidebar interaction.
+3. **Electron host** — real `BrowserWindow` bounds, renderer isolation,
+   sidebar interaction, and Review-panel close/reopen behavior.
 4. **Pixels** — full-frame regression screenshots after the structural gates
    pass.
 

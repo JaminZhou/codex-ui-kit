@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   agentMessageStatus,
+  hasActiveTurnWork,
   initialProtocolState,
   isTurnActive,
   reduceProtocolNotification,
@@ -170,6 +171,10 @@ describe("protocol lifecycle reducer", () => {
 
     expect(secondThread.threadId).toBe("thread-two");
     expect(secondThread.messages).toEqual([]);
+    expect(secondThread.commands).toEqual([]);
+    expect(secondThread.approvals).toEqual([]);
+    expect(secondThread.fileChanges).toEqual([]);
+    expect(secondThread.timeline).toEqual([]);
     expect(secondThread.status).toBe("idle");
     expect(secondThread.eventCount).toBe(3);
   });
@@ -187,6 +192,224 @@ describe("protocol lifecycle reducer", () => {
     expect(running.messages[0]?.compaction).toBe("running");
     expect(completed.messages[0]?.compaction).toBe("completed");
     expect(completed.messages.at(-1)?.compaction).toBeUndefined();
+  });
+
+  it("reduces command output, approval requests, and file patches", () => {
+    const scenario = replayScenarios["workspace-workflow"];
+    const commandRunning = reduceProtocolTrace(
+      scenario.events.slice(0, scenario.frames["command-running"]),
+    );
+    const approvalPending = reduceProtocolTrace(
+      scenario.events.slice(0, scenario.frames["approval-pending"]),
+    );
+    const fileChanging = reduceProtocolTrace(
+      scenario.events.slice(0, scenario.frames["file-changing"]),
+    );
+    const fileApplied = reduceProtocolTrace(
+      scenario.events.slice(0, scenario.frames["file-applied"]),
+    );
+    const completed = reduceProtocolTrace(scenario.events);
+
+    expect(commandRunning.commands[0]).toMatchObject({
+      output: "✓ protocol-state.test.ts (10 tests)\n",
+      status: "running",
+    });
+    expect(approvalPending.approvals[0]).toMatchObject({
+      command: "apply_patch WORKFLOW.md",
+      decision: "pending",
+      itemId: "command-write",
+      kind: "command",
+    });
+    expect(fileChanging.approvals[0]?.decision).toBe("approved");
+    expect(hasActiveTurnWork(fileChanging)).toBe(true);
+    expect(fileApplied.status).toBe("running");
+    expect(hasActiveTurnWork(fileApplied)).toBe(false);
+    expect(fileChanging.fileChanges[0]).toMatchObject({
+      changes: [
+        {
+          kind: "modified",
+          path: "WORKFLOW.md",
+        },
+      ],
+      status: "streaming",
+    });
+    expect(completed.fileChanges[0]?.status).toBe("applied");
+    expect(completed.status).toBe("completed");
+    expect(completed.timeline.map(({ kind }) => kind)).toEqual([
+      "message",
+      "command",
+      "command",
+      "approval",
+      "fileChange",
+    ]);
+  });
+
+  it("does not treat historical command and file items as active turn work", () => {
+    const completed = reduceProtocolTrace(
+      replayScenarios["workspace-workflow"].events,
+    );
+    const followUp = reduceProtocolNotification(completed, {
+      method: "turn/started",
+      params: {
+        threadId: "thread-demo",
+        turn: { id: "turn-follow-up" },
+      },
+    });
+
+    expect(hasActiveTurnWork(completed)).toBe(false);
+    expect(hasActiveTurnWork(followUp)).toBe(false);
+    expect(followUp.commands.length).toBeGreaterThan(0);
+    expect(followUp.fileChanges.length).toBeGreaterThan(0);
+  });
+
+  it("applies an explicit renderer approval resolution in live state", () => {
+    const scenario = replayScenarios["workspace-workflow"];
+    const pending = reduceProtocolTrace(
+      scenario.events.slice(0, scenario.frames["approval-pending"]),
+    );
+    const resolved = reduceProtocolNotification(pending, {
+      decision: "rejected",
+      kind: "approval-resolution",
+      requestId: "approval-command-write",
+    });
+
+    expect(resolved.approvals[0]?.decision).toBe("rejected");
+  });
+
+  it("rejects a pending live approval when the server request resolves", () => {
+    const pending = reduceProtocolNotification(initialProtocolState, {
+      atMs: 10,
+      id: "live-approval",
+      kind: "request",
+      method: "item/fileChange/requestApproval",
+      params: {
+        itemId: "file-racing-with-stop",
+        threadId: "thread-live",
+        turnId: "turn-live",
+      },
+    });
+    const resolved = reduceProtocolNotification(pending, {
+      method: "serverRequest/resolved",
+      params: {
+        requestId: "live-approval",
+        threadId: "thread-live",
+      },
+    });
+    const explicitlyApproved = reduceProtocolNotification(pending, {
+      decision: "approved",
+      kind: "approval-resolution",
+      requestId: "live-approval",
+    });
+    const resolvedAfterApproval = reduceProtocolNotification(
+      explicitlyApproved,
+      {
+        method: "serverRequest/resolved",
+        params: {
+          requestId: "live-approval",
+          threadId: "thread-live",
+        },
+      },
+    );
+
+    expect(resolved.approvals[0]?.decision).toBe("rejected");
+    expect(resolvedAfterApproval.approvals[0]?.decision).toBe("approved");
+  });
+
+  it("renders file approval requests and resolves them with file lifecycle", () => {
+    const started = reduceProtocolNotification(initialProtocolState, {
+      method: "item/started",
+      params: {
+        item: {
+          changes: [
+            {
+              diff: "+new line",
+              kind: { type: "update" },
+              path: "WORKFLOW.md",
+            },
+          ],
+          id: "file-live",
+          status: "inProgress",
+          type: "fileChange",
+        },
+        threadId: "thread-live",
+        turnId: "turn-live",
+      },
+    });
+    const pending = reduceProtocolNotification(started, {
+      atMs: 10,
+      id: "file-approval",
+      kind: "request",
+      method: "item/fileChange/requestApproval",
+      params: {
+        itemId: "file-live",
+        reason: "Apply the patch.",
+        startedAtMs: 10,
+        threadId: "thread-live",
+        turnId: "turn-live",
+      },
+    });
+    const accepted = reduceProtocolNotification(pending, {
+      decision: "approved",
+      kind: "approval-resolution",
+      requestId: "file-approval",
+    });
+    const completed = reduceProtocolNotification(accepted, {
+      method: "item/completed",
+      params: {
+        item: {
+          changes: [
+            {
+              diff: "+new line",
+              kind: { type: "update" },
+              path: "WORKFLOW.md",
+            },
+          ],
+          id: "file-live",
+          status: "completed",
+          type: "fileChange",
+        },
+        threadId: "thread-live",
+        turnId: "turn-live",
+      },
+    });
+
+    expect(pending.approvals[0]).toMatchObject({
+      command: "WORKFLOW.md",
+      decision: "pending",
+      kind: "file",
+    });
+    expect(completed.approvals[0]?.decision).toBe("approved");
+  });
+
+  it("falls back when a file approval has no known paths", () => {
+    const started = reduceProtocolNotification(initialProtocolState, {
+      method: "item/started",
+      params: {
+        item: {
+          changes: [],
+          id: "file-without-paths",
+          status: "inProgress",
+          type: "fileChange",
+        },
+        threadId: "thread-live",
+        turnId: "turn-live",
+      },
+    });
+    const pending = reduceProtocolNotification(started, {
+      atMs: 10,
+      id: "file-approval-without-paths",
+      kind: "request",
+      method: "item/fileChange/requestApproval",
+      params: {
+        itemId: "file-without-paths",
+        reason: "Apply the patch.",
+        startedAtMs: 10,
+        threadId: "thread-live",
+        turnId: "turn-live",
+      },
+    });
+
+    expect(pending.approvals[0]?.command).toBe("File changes");
   });
 
   it("keeps completed compaction at its historical position on a follow-up turn", () => {
