@@ -516,7 +516,7 @@ export function AppShell({
                 "--codex-ui-app-sidebar-width": `${resolvedSidebarWidth}px`,
               }
             : {}),
-          ...(sidePanelResizable
+          ...(sidePanelResizable || resolvedSidePanelExpanded
             ? {
                 "--codex-ui-app-side-panel-width": `${resolvedSidePanelWidth}px`,
               }

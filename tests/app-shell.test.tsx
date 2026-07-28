@@ -448,7 +448,6 @@ describe("application shell", () => {
         sidePanel="Review"
         sidePanelExpanded
         sidePanelOpen
-        sidePanelResizable
         sidebar="Navigation"
         sidebarOpen
       >
