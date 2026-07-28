@@ -1,5 +1,6 @@
 import {
   useLayoutEffect,
+  useMemo,
   useRef,
   useState,
   type HTMLAttributes,
@@ -561,11 +562,11 @@ export function FileReview({
     .filter(Boolean)
     .join(" ");
   const selectedFileRef = useRef<HTMLElement | null>(null);
-  const selectedFileIndex = selectedPath
-    ? files.findIndex(({ path }) => path === selectedPath)
-    : -1;
-  const selectedFileLayoutKey =
-    selectedFileIndex < 0
+  const selectedFileLayoutKey = useMemo(() => {
+    const selectedFileIndex = selectedPath
+      ? files.findIndex(({ path }) => path === selectedPath)
+      : -1;
+    return selectedFileIndex < 0
       ? "missing"
       : JSON.stringify(
           files
@@ -584,6 +585,7 @@ export function FileReview({
               previousPath,
             })),
         );
+  }, [files, selectedPath]);
 
   useLayoutEffect(() => {
     const selectedFile = selectedFileRef.current;

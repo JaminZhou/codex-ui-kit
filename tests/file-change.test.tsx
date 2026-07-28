@@ -476,4 +476,32 @@ describe("FileReview", () => {
       }
     }
   });
+
+  it("memoizes the selected-file layout signature across unrelated renders", () => {
+    const stringify = vi.spyOn(JSON, "stringify");
+
+    try {
+      const { rerender } = render(
+        <FileReview
+          className="before"
+          files={files}
+          selectedPath={files[1].path}
+        />,
+      );
+      const initialCalls = stringify.mock.calls.length;
+      expect(initialCalls).toBeGreaterThan(0);
+
+      rerender(
+        <FileReview
+          className="after"
+          files={files}
+          selectedPath={files[1].path}
+        />,
+      );
+
+      expect(stringify).toHaveBeenCalledTimes(initialCalls);
+    } finally {
+      stringify.mockRestore();
+    }
+  });
 });
