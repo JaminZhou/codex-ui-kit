@@ -195,7 +195,9 @@ export function App() {
   );
   const [terminalHeight, setTerminalHeight] = useState(272);
   const [terminalValue, setTerminalValue] = useState("");
-  const [terminalHistory, setTerminalHistory] = useState<TerminalEntry[]>([]);
+  const [terminalHistoryByCommand, setTerminalHistoryByCommand] = useState<
+    Record<string, TerminalEntry[]>
+  >({});
   const [reviewSelection, setReviewSelection] =
     useState<ReviewSelection | null>(null);
   const [reviewSelectionKey, setReviewSelectionKey] = useState(0);
@@ -262,7 +264,7 @@ export function App() {
     setTerminalCommandId(null);
     setTerminalHeight(272);
     setTerminalValue("");
-    setTerminalHistory([]);
+    setTerminalHistoryByCommand({});
     setUndoneFileIds(new Set());
     setLiveError(null);
   };
@@ -846,6 +848,7 @@ export function App() {
                 className="demo-command-terminal"
                 onClick={() => {
                   setTerminalCommandId(command.id);
+                  setTerminalValue("");
                   setTerminalOpen(true);
                 }}
                 type="button"
@@ -1007,6 +1010,9 @@ export function App() {
   const terminalCommand =
     terminalCommands.find(({ id }) => id === terminalCommandId) ??
     terminalCommands.at(-1);
+  const terminalHistoryKey = terminalCommand?.id ?? "unbound";
+  const terminalHistory =
+    terminalHistoryByCommand[terminalHistoryKey] ?? [];
   const terminalEntries = useMemo<TerminalEntry[]>(() => {
     if (!terminalCommand) return terminalHistory;
     const protocolEntries =
@@ -1070,19 +1076,26 @@ export function App() {
               entries={terminalEntries}
               label="Background terminal"
               onCommandSubmit={(command) => {
-                setTerminalHistory((entries) => [
-                  ...entries,
-                  {
-                    id: `local:${entries.length}:command`,
-                    kind: "command",
-                    text: `/workspace/codex-ui-kit % ${command}`,
-                  },
-                  {
-                    id: `local:${entries.length}:system`,
-                    kind: "system",
-                    text: "Replay input is host-owned and was not executed.",
-                  },
-                ]);
+                setTerminalHistoryByCommand((historyByCommand) => {
+                  const entries =
+                    historyByCommand[terminalHistoryKey] ?? [];
+                  return {
+                    ...historyByCommand,
+                    [terminalHistoryKey]: [
+                      ...entries,
+                      {
+                        id: `${terminalHistoryKey}:local:${entries.length}:command`,
+                        kind: "command",
+                        text: `/workspace/codex-ui-kit % ${command}`,
+                      },
+                      {
+                        id: `${terminalHistoryKey}:local:${entries.length}:system`,
+                        kind: "system",
+                        text: "Replay input is host-owned and was not executed.",
+                      },
+                    ],
+                  };
+                });
                 setTerminalValue("");
               }}
               onValueChange={setTerminalValue}

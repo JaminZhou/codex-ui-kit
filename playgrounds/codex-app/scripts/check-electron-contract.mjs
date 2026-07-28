@@ -269,6 +269,39 @@ try {
       `Electron command-specific Terminal selection failed: ${selectedTerminalText}`,
     );
   }
+  const workflowTerminalInput = workflowPage.getByRole("textbox", {
+    name: "Terminal input",
+  });
+  await workflowTerminalInput.fill("first-terminal-only");
+  await workflowTerminalInput.press("Enter");
+  await workflowPage
+    .getByRole("button", { exact: true, name: "Open terminal" })
+    .nth(1)
+    .click();
+  const secondTerminalText = await workflowPage
+    .getByRole("log", { name: "Terminal output" })
+    .textContent();
+  if (
+    !secondTerminalText?.includes("apply_patch WORKFLOW.md") ||
+    secondTerminalText.includes("first-terminal-only")
+  ) {
+    throw new Error(
+      `Electron Terminal local-history isolation failed: ${secondTerminalText}`,
+    );
+  }
+  await workflowPage
+    .getByRole("button", { exact: true, name: "Open terminal" })
+    .first()
+    .click();
+  if (
+    !(await workflowPage
+      .getByRole("log", { name: "Terminal output" })
+      .textContent())?.includes("first-terminal-only")
+  ) {
+    throw new Error(
+      "Electron Terminal did not restore command-specific local history.",
+    );
+  }
   await workflowPage
     .getByRole("button", { exact: true, name: "Close terminal" })
     .click();
