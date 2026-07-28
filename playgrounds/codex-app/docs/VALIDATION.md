@@ -38,6 +38,9 @@ The 12 standard lifecycle frames keep the 0.25% internal raster limit. The
 large-Review frame uses a scoped 0.40% limit because its 96 dense monospace
 lines amplify macOS text-rasterization differences; CDP and Electron still
 gate file counts, overflow, split geometry, and exact last-file visibility
-independently. The fourteenth PR frame uses the standard internal limit; its
-optional current-build gate allows at most 6.5% full-main, 5.5% index, and 7%
-detail difference at the stricter 0.05 pixel threshold.
+independently. The fourteenth PR frame uses a scoped 1% internal limit because
+its dense full-page text produces a measured 0.8161% macOS-runner
+rasterization delta; CDP and Electron still lock the split, tabs, actions,
+resizing, and expansion independently. Its optional current-build gate allows
+at most 6.5% full-main, 5.5% index, and 7% detail difference at the stricter
+0.05 pixel threshold.
