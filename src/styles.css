@@ -5902,13 +5902,13 @@ summary.codex-ui-activity__header::after {
 
 .codex-ui-markdown a {
   color: var(--codex-ui-link);
-  text-decoration: none;
+  text-decoration: underline;
   text-decoration-thickness: 1px;
   text-underline-offset: 0.15em;
 }
 
 .codex-ui-markdown a:hover {
-  text-decoration: underline;
+  text-decoration-thickness: 2px;
 }
 
 .codex-ui-markdown ul,
@@ -6061,8 +6061,8 @@ summary.codex-ui-activity__header::after {
   height: 1.375rem;
   justify-content: center;
   margin-inline-start: 0.75rem;
-  padding: 0;
-  width: 1.375rem;
+  min-width: 1.375rem;
+  padding: 0 0.1875rem;
 }
 
 .codex-ui-code-block__copy svg {

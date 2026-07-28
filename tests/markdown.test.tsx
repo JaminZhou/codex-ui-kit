@@ -170,6 +170,16 @@ describe("AgentMarkdown", () => {
 });
 
 describe("CodeBlock", () => {
+  it("preserves custom visible copy labels", () => {
+    const html = renderToStaticMarkup(
+      <CodeBlock copiedLabel="Copied source" copyLabel="Copy source">
+        const ready = true;
+      </CodeBlock>,
+    );
+
+    expect(html).toContain(">Copy source</button>");
+  });
+
   it("defers highlighting until code is near the viewport", async () => {
     let intersect: IntersectionObserverCallback | undefined;
     const observe = vi.fn();

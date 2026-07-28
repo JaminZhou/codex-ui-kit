@@ -35,6 +35,12 @@ describe("Markdown visual contract", () => {
     expect(styles).toContain("padding-inline-end: 1.5rem");
   });
 
+  it("keeps links identifiable and lets custom copy labels size to content", () => {
+    expect(styles).toContain("text-decoration: underline");
+    expect(styles).toContain("min-width: 1.375rem");
+    expect(styles).toContain("padding: 0 0.1875rem");
+  });
+
   it("does not rely on a host box-sizing reset for table overhangs", () => {
     expect(styles).toMatch(
       /\.codex-ui-markdown,\s*\.codex-ui-markdown \* \{\s*box-sizing: border-box;/,
