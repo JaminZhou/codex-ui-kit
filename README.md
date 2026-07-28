@@ -172,6 +172,19 @@ The script renders at the PNG dimensions and gates the full screenshot plus
 the header, message band, and Composer regions independently. Reference and
 diff images remain outside the package by default.
 
+The protocol-backed Codex App playground also accepts independent,
+untracked current-build references for multi-file Review and Pull request
+detail:
+
+```bash
+CODEX_UI_KIT_PULL_REQUEST_REFERENCE=/absolute/path/to/pr-main-reference.png \
+  pnpm --filter @codex-ui-kit/codex-app-playground check:visual
+```
+
+That PR gate compares the 906×820 main region and its index/detail ownership
+regions separately; CDP and Electron still gate geometry and interaction
+independently.
+
 `npm pack` and a future `npm publish` run the library build first so the ignored
 `dist/` directory is always generated from the checked-out source. The package
 remains marked private until the first registry release is approved explicitly.

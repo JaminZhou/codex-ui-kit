@@ -508,7 +508,8 @@
         "cdp:right-environment-panel-layout",
         "cdp:right-sources-tabpanel-layout",
         "cdp-26.721:synthetic-review-panel-turn-file-diff-split-1072x820",
-        "cdp-26.721:synthetic-multi-file-review-split-800x600-and-1180x820"
+        "cdp-26.721:synthetic-multi-file-review-split-800x600-and-1180x820",
+        "cdp-26.721:review-panel-16px-resizer-320px-min-352px-main-and-expand-restore"
       ],
       "implementationStatus": "partial",
       "browserStatus": "verified",
@@ -571,8 +572,8 @@
         "cdp-26.721:pull-request-index-all-search-lists-800x600"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "partial_legacy",
-      "electronStatus": "partial_legacy",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
       "priority": "p0"
     },
     {
@@ -580,10 +581,13 @@
       "area": "workspace",
       "ownership": "workspace",
       "packageEvidence": ["pull-request-code-review", "pull-request-reviewer-status-list", "pull-request-fix-button", "pull-request-detail-query", "pull-request-media"],
-      "runtimeStatus": "not_sampled",
+      "runtimeStatus": "runtime_observed",
+      "runtimeEvidence": [
+        "cdp-26.721:public-pr-69-summary-timeline-code-resize-expand-restore"
+      ],
       "implementationStatus": "partial",
-      "browserStatus": "not_started",
-      "electronStatus": "not_started",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
       "priority": "p0"
     },
     {

@@ -334,6 +334,7 @@ export interface AppShellProps
   onSidebarOpenChange?: (open: boolean) => void;
   onSidebarWidthChange?: (width: number) => void;
   sidePanel?: ReactNode;
+  sidePanelExpanded?: boolean;
   sidePanelLabel?: string;
   sidePanelMaxWidth?: number;
   sidePanelMinMainWidth?: number;
@@ -388,6 +389,7 @@ export function AppShell({
   onSidebarOpenChange,
   onSidebarWidthChange,
   sidePanel,
+  sidePanelExpanded = false,
   sidePanelLabel = "Workspace panel",
   sidePanelMaxWidth = Number.POSITIVE_INFINITY,
   sidePanelMinMainWidth = 352,
@@ -488,13 +490,25 @@ export function AppShell({
   const requestedSidePanelWidth = sidePanelWidthIsControlled
     ? sidePanelWidth
     : internalSidePanelWidth;
-  const resolvedSidePanelWidth = clampShellTrack(
-    requestedSidePanelWidth,
-    normalizedSidePanelMinWidth,
-    resolvedSidePanelMaxWidth,
-  );
+  const resolvedSidePanelExpanded =
+    sidePanelExpanded &&
+    sidePanelOpen &&
+    sidePanel !== undefined &&
+    sidePanel !== null &&
+    layoutMode === "wide";
+  const expandedSidePanelWidth =
+    shellWidth === null
+      ? requestedSidePanelWidth
+      : Math.max(0, shellWidth - occupiedSidebarWidth);
+  const resolvedSidePanelWidth = resolvedSidePanelExpanded
+    ? expandedSidePanelWidth
+    : clampShellTrack(
+        requestedSidePanelWidth,
+        normalizedSidePanelMinWidth,
+        resolvedSidePanelMaxWidth,
+      );
   const shellStyle =
-    sidebarResizable || sidePanelResizable
+    sidebarResizable || sidePanelResizable || resolvedSidePanelExpanded
       ? ({
           ...style,
           ...(sidebarResizable
@@ -528,6 +542,7 @@ export function AppShell({
     sidePanelOpen &&
     sidePanel !== undefined &&
     sidePanel !== null &&
+    !resolvedSidePanelExpanded &&
     layoutMode === "wide";
   const commitSidePanelWidth = (nextWidth: number) => {
     const measuredLiveShellWidth =
@@ -1009,6 +1024,7 @@ export function AppShell({
     <div
       className={["codex-ui-app-shell", className].filter(Boolean).join(" ")}
       data-bottom-panel-open={bottomPanelOpen || undefined}
+      data-side-panel-expanded={resolvedSidePanelExpanded || undefined}
       data-side-panel-open={sidePanelOpen || undefined}
       data-side-panel-resizable={sidePanelResizable || undefined}
       data-side-panel-resizing={sidePanelResizing || undefined}
@@ -1297,7 +1313,9 @@ export type WorkspacePanelPlacement = "bottom" | "side";
 export interface WorkspacePanelProps
   extends Omit<HTMLAttributes<HTMLElement>, "children" | "title"> {
   activeTabId: string;
+  actions?: ReactNode;
   emptyState?: ReactNode;
+  expandPanelLabel?: string;
   expanded?: boolean;
   label: string;
   onActiveTabChange: (id: string) => void;
@@ -1307,13 +1325,17 @@ export interface WorkspacePanelProps
   onOpenTab?: () => void;
   openTabLabel?: string;
   placement?: WorkspacePanelPlacement;
+  restorePanelLabel?: string;
   tabs: readonly WorkspacePanelTab[];
+  tabsLabel?: string;
 }
 
 export function WorkspacePanel({
   activeTabId,
+  actions,
   className,
   emptyState = "No open tabs",
+  expandPanelLabel = "Expand panel",
   expanded = false,
   label,
   onActiveTabChange,
@@ -1323,8 +1345,10 @@ export function WorkspacePanel({
   onOpenTab,
   openTabLabel = "Open panel tab",
   placement = "side",
+  restorePanelLabel = "Restore panel",
   style,
   tabs,
+  tabsLabel,
   ...props
 }: WorkspacePanelProps) {
   const panelId = useId();
@@ -1419,7 +1443,7 @@ export function WorkspacePanel({
     >
       <header className="codex-ui-workspace-panel__header">
         <div
-          aria-label={`${label} tabs`}
+          aria-label={tabsLabel ?? `${label} tabs`}
           aria-orientation="horizontal"
           className="codex-ui-workspace-panel__tabs"
           role="tablist"
@@ -1449,6 +1473,7 @@ export function WorkspacePanel({
           })}
         </div>
         <div className="codex-ui-workspace-panel__actions">
+          {actions}
           {onCloseTab && activeTab ? (
             <IconButton
               icon={<CloseIcon />}
@@ -1474,7 +1499,9 @@ export function WorkspacePanel({
           {onExpandedChange ? (
             <IconButton
               icon={<ExpandIcon expanded={expanded} />}
-              label={expanded ? "Restore panel" : "Expand panel"}
+              label={
+                expanded ? restorePanelLabel : expandPanelLabel
+              }
               onClick={() => onExpandedChange(!expanded)}
               pressed={expanded}
               size="toolbar"

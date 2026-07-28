@@ -238,6 +238,118 @@ try {
   await workflowApp.close();
 }
 
+const pullRequestScene = {
+  frame: "review-open",
+  id: "electron-pull-request-detail",
+  scenario: "workspace-workflow",
+  view: "pull-request",
+};
+const { app: pullRequestApp, page: pullRequestPage } = await launchScene(
+  pullRequestScene,
+  { capture: false },
+);
+
+try {
+  await pullRequestPage.waitForSelector(
+    '.demo-root[data-view="pull-request"] [data-testid="pull-request-panel"]',
+  );
+  const pullRequestGeometry = await pullRequestPage.evaluate(() => {
+    const bounds = (selector) =>
+      document.querySelector(selector)?.getBoundingClientRect().toJSON() ??
+      null;
+    return {
+      main: bounds(".codex-ui-app-shell__main"),
+      panel: bounds(".codex-ui-app-shell__side-panel"),
+      resizer: bounds(".codex-ui-app-shell__side-panel-resizer"),
+      selectedTab: document
+        .querySelector('[aria-label="Pull request view"] [aria-selected="true"]')
+        ?.textContent?.trim(),
+    };
+  });
+  if (
+    !pullRequestGeometry.main ||
+    !pullRequestGeometry.panel ||
+    !pullRequestGeometry.resizer ||
+    Math.abs(pullRequestGeometry.main.width - 352) > 1 ||
+    Math.abs(pullRequestGeometry.panel.width - 554) > 1 ||
+    Math.abs(pullRequestGeometry.resizer.width - 16) > 0.5 ||
+    pullRequestGeometry.selectedTab !== "Summary"
+  ) {
+    throw new Error(
+      `Electron pull request baseline failed: ${JSON.stringify(pullRequestGeometry)}`,
+    );
+  }
+
+  await pullRequestPage.getByRole("tab", { name: "Timeline" }).click();
+  await pullRequestPage.getByRole("textbox", { name: "Timeline comment" }).fill(
+    "Synthetic local comment",
+  );
+  await pullRequestPage.getByRole("tab", { name: "Code" }).click();
+  if (
+    (await pullRequestPage
+      .getByRole("list", { name: "Pull request code review" })
+      .getAttribute("data-file-count")) !== "3"
+  ) {
+    throw new Error("Electron pull request Code tab did not render three files.");
+  }
+
+  const pullRequestResizer = pullRequestPage.getByRole("separator", {
+    name: "Resize workspace panel",
+  });
+  const pullRequestResizerBox = await pullRequestResizer.boundingBox();
+  if (!pullRequestResizerBox) {
+    throw new Error("Electron pull request resize separator is missing.");
+  }
+  await pullRequestPage.mouse.move(
+    pullRequestResizerBox.x + pullRequestResizerBox.width / 2,
+    pullRequestResizerBox.y + 200,
+  );
+  await pullRequestPage.mouse.down();
+  await pullRequestPage.mouse.move(
+    pullRequestResizerBox.x + pullRequestResizerBox.width / 2 + 64,
+    pullRequestResizerBox.y + 200,
+    { steps: 8 },
+  );
+  await pullRequestPage.mouse.up();
+  const narrowedPullRequestWidth = await pullRequestPage
+    .locator(".codex-ui-app-shell__side-panel")
+    .evaluate((element) => element.getBoundingClientRect().width);
+  if (Math.abs(narrowedPullRequestWidth - 490) > 1) {
+    throw new Error(
+      `Electron pull request pointer resize failed: ${narrowedPullRequestWidth}`,
+    );
+  }
+  await pullRequestResizer.press("End");
+
+  await pullRequestPage.getByRole("button", { name: "Expand panel" }).click();
+  const expandedPullRequest = await pullRequestPage.evaluate(() => ({
+    expanded: document
+      .querySelector(".codex-ui-app-shell")
+      ?.hasAttribute("data-side-panel-expanded"),
+    panelWidth: document
+      .querySelector(".codex-ui-app-shell__side-panel")
+      ?.getBoundingClientRect().width,
+    resizer: Boolean(
+      document.querySelector(".codex-ui-app-shell__side-panel-resizer"),
+    ),
+  }));
+  if (
+    !expandedPullRequest.expanded ||
+    expandedPullRequest.resizer ||
+    Math.abs((expandedPullRequest.panelWidth ?? 0) - 906) > 1
+  ) {
+    throw new Error(
+      `Electron pull request expansion failed: ${JSON.stringify(expandedPullRequest)}`,
+    );
+  }
+  await pullRequestPage
+    .getByRole("button", { name: "Restore panel width" })
+    .click();
+  await pullRequestPage.getByRole("tab", { name: "Summary" }).click();
+} finally {
+  await pullRequestApp.close();
+}
+
 const compactScene = {
   frame: "review-open",
   id: "electron-multi-file-compact",
@@ -481,5 +593,5 @@ try {
 }
 
 console.log(
-  "Electron host, native-window, resizable navigation and Review, multi-file Review, large diff scrolling, and compact geometry contracts passed.",
+  "Electron host, native-window, resizable navigation/Review/PR detail, PR tabs and expansion, multi-file Review, large diff scrolling, and compact geometry contracts passed.",
 );

@@ -244,6 +244,7 @@ function createWindow() {
   const scenario = process.env.CODEX_DEMO_SCENARIO ?? "streaming-recovery";
   const frame = process.env.CODEX_DEMO_FRAME ?? "recovered";
   const capture = process.env.CODEX_DEMO_CAPTURE ?? "0";
+  const view = process.env.CODEX_DEMO_VIEW ?? "conversation";
   const requestedWidth = Number(process.env.CODEX_DEMO_WINDOW_WIDTH);
   const requestedHeight = Number(process.env.CODEX_DEMO_WINDOW_HEIGHT);
   const width =
@@ -254,7 +255,12 @@ function createWindow() {
     Number.isInteger(requestedHeight) && requestedHeight > 0
       ? requestedHeight
       : 820;
-  const query = new URLSearchParams({ capture, frame, scenario }).toString();
+  const query = new URLSearchParams({
+    capture,
+    frame,
+    scenario,
+    view,
+  }).toString();
 
   const window = new BrowserWindow({
     backgroundColor: "#101010",

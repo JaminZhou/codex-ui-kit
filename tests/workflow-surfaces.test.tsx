@@ -17,6 +17,7 @@ import {
   PullRequestCheckList,
   PullRequestDetails,
   PullRequestList,
+  PullRequestPanelSummary,
   PullRequestPage,
   PullRequestReviewSummary,
   PullRequestReviewThread,
@@ -226,6 +227,7 @@ describe("pull request workspace surfaces", () => {
               {
                 checkStatus: "passed",
                 id: "50",
+                indicator: <span data-testid="pr-indicator">⑂</span>,
                 number: 50,
                 repository: "ui-kit",
                 state: "open",
@@ -251,6 +253,7 @@ describe("pull request workspace surfaces", () => {
           author="Jamin"
           deletions={12}
           filesChanged={8}
+          headingLevel="h1"
           number={50}
           repository="ui-kit"
           sourceBranch="feat/workflow"
@@ -309,6 +312,17 @@ describe("pull request workspace surfaces", () => {
     expect(screen.getByText("src/example.ts:42")).toBeTruthy();
     expect(screen.getByRole("button", { name: "Merge" })).toBeTruthy();
     expect(screen.getByRole("button", { name: "Resolve" })).toBeTruthy();
+    expect(
+      screen.getByTestId("pr-indicator").parentElement?.getAttribute(
+        "aria-hidden",
+      ),
+    ).toBe("true");
+    expect(
+      screen.getByRole("heading", {
+        level: 1,
+        name: "Add workflow surfaces",
+      }),
+    ).toBeTruthy();
   });
 
   it("renders independent list and detail empty states", () => {
@@ -320,5 +334,51 @@ describe("pull request workspace surfaces", () => {
     );
     expect(screen.getByText("No pull requests")).toBeTruthy();
     expect(screen.getByText("Choose a review")).toBeTruthy();
+  });
+
+  it("renders the current pull request panel summary structure", () => {
+    render(
+      <PullRequestPanelSummary
+        checks={<span>CI passed</span>}
+        commentComposer={<textarea aria-label="Pull request comment" />}
+        description={<p>Add the current review workspace.</p>}
+        descriptionAction={<button type="button">Edit description</button>}
+        facts={[
+          {
+            id: "branch",
+            indicator: "⑂",
+            label: "Branch",
+            value: "feat/review → main",
+          },
+          {
+            id: "checks",
+            label: "Checks",
+            tone: "success",
+            value: "Successful",
+          },
+        ]}
+        meta="Jamin · Ready for review"
+        title="Add review workspace"
+        titleAction={<button type="button">Edit title</button>}
+      />,
+    );
+
+    expect(
+      screen.getByRole("heading", {
+        level: 1,
+        name: "Add review workspace",
+      }),
+    ).toBeTruthy();
+    expect(screen.getByText("feat/review → main")).toBeTruthy();
+    expect(screen.getByText("Successful")).toBeTruthy();
+    expect(screen.getByRole("heading", { name: "Description" })).toBeTruthy();
+    expect(screen.getByRole("heading", { name: "Checks" })).toBeTruthy();
+    expect(screen.getByRole("button", { name: "Edit title" })).toBeTruthy();
+    expect(
+      screen.getByRole("button", { name: "Edit description" }),
+    ).toBeTruthy();
+    expect(
+      screen.getByRole("textbox", { name: "Pull request comment" }),
+    ).toBeTruthy();
   });
 });

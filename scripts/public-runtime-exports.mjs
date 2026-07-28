@@ -61,6 +61,7 @@ export const publicRuntimeExports = [
   "PullRequestDetails",
   "PullRequestList",
   "PullRequestPage",
+  "PullRequestPanelSummary",
   "PullRequestReviewSummary",
   "PullRequestReviewThread",
   "PullRequestStatusBadge",

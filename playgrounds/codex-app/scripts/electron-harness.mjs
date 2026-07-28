@@ -77,6 +77,12 @@ export const visualScenes = [
     selectPath: ".research/large-review/08.ts",
     surfaces: ["fileChange", "reviewPanel"],
   },
+  {
+    frame: "review-open",
+    id: "pull-request-detail",
+    scenario: "workspace-workflow",
+    view: "pull-request",
+  },
 ];
 
 export async function launchScene(
@@ -92,6 +98,7 @@ export async function launchScene(
       CODEX_DEMO_FRAME: scene.frame,
       CODEX_DEMO_HEADLESS: "1",
       CODEX_DEMO_SCENARIO: scene.scenario,
+      CODEX_DEMO_VIEW: scene.view ?? "conversation",
       ...(windowSize
         ? {
             CODEX_DEMO_WINDOW_HEIGHT: String(windowSize.height),

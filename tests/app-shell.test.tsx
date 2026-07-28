@@ -410,6 +410,94 @@ describe("application shell", () => {
     expect(separator.getAttribute("aria-valuenow")).toBe("320");
   });
 
+  it("lets an expanded workspace panel consume the available main track", () => {
+    let resize: ((width: number) => void) | undefined;
+    class ResizeObserverMock {
+      constructor(
+        private readonly callback: ResizeObserverCallback,
+      ) {}
+
+      disconnect() {}
+
+      observe(target: Element) {
+        if (!target.classList.contains("codex-ui-app-shell")) return;
+        resize = (width) =>
+          this.callback(
+            [
+              {
+                contentRect: { width },
+                target,
+              } as ResizeObserverEntry,
+            ],
+            this as unknown as ResizeObserver,
+          );
+      }
+
+      unobserve() {}
+    }
+    vi.stubGlobal("ResizeObserver", ResizeObserverMock);
+
+    const { container, rerender } = render(
+      <AppShell
+        layoutMode="wide"
+        sidePanel="Review"
+        sidePanelExpanded
+        sidePanelOpen
+        sidePanelResizable
+        sidebar="Navigation"
+        sidebarOpen
+      >
+        Thread
+      </AppShell>,
+    );
+
+    act(() => resize?.(1_180));
+    const shell = container.querySelector(
+      ".codex-ui-app-shell",
+    ) as HTMLDivElement;
+    expect(
+      shell.style.getPropertyValue("--codex-ui-app-side-panel-width"),
+    ).toBe("906px");
+    expect(shell.hasAttribute("data-side-panel-expanded")).toBe(true);
+    expect(
+      screen.queryByRole("separator", {
+        name: "Resize workspace panel",
+      }),
+    ).toBeNull();
+
+    rerender(
+      <AppShell
+        layoutMode="wide"
+        sidePanel="Review"
+        sidePanelOpen
+        sidePanelResizable
+        sidebar="Navigation"
+        sidebarOpen
+      >
+        Thread
+      </AppShell>,
+    );
+    expect(
+      shell.style.getPropertyValue("--codex-ui-app-side-panel-width"),
+    ).toBe("370px");
+    expect(shell.hasAttribute("data-side-panel-expanded")).toBe(false);
+
+    rerender(
+      <AppShell
+        layoutMode="wide"
+        sidePanel="Review"
+        sidePanelExpanded
+        sidePanelOpen={false}
+        sidePanelResizable
+        sidebar="Navigation"
+        sidebarOpen
+      >
+        Thread
+      </AppShell>,
+    );
+    expect(shell.hasAttribute("data-side-panel-expanded")).toBe(false);
+  });
+
   it("restores focus before a controlled host removes the workspace separator", () => {
     const { rerender } = render(
       <AppShell
@@ -2229,6 +2317,7 @@ describe("workspace panel", () => {
     const onOpenTab = vi.fn();
     render(
       <WorkspacePanel
+        actions={<button type="button">Open in browser</button>}
         activeTabId="sources"
         label="Workspace"
         onActiveTabChange={onActiveTabChange}
@@ -2236,6 +2325,7 @@ describe("workspace panel", () => {
         onCloseTab={onCloseTab}
         onExpandedChange={onExpandedChange}
         onOpenTab={onOpenTab}
+        tabsLabel="Workspace view"
         tabs={[
           { content: "Source content", id: "sources", label: "Sources" },
           { content: "Review content", id: "review", label: "Review" },
@@ -2249,6 +2339,12 @@ describe("workspace panel", () => {
       ),
     ).toBe("true");
     expect(screen.getByRole("tabpanel").textContent).toBe("Source content");
+    expect(
+      screen.getByRole("tablist", { name: "Workspace view" }),
+    ).toBeTruthy();
+    expect(
+      screen.getByRole("button", { name: "Open in browser" }),
+    ).toBeTruthy();
 
     const sourceTab = screen.getByRole("tab", { name: "Sources" });
     const reviewTab = screen.getByRole("tab", { name: "Review" });
