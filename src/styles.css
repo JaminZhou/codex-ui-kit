@@ -160,9 +160,8 @@
 }
 
 .codex-ui-app-shell[data-side-panel-open] .codex-ui-app-shell__layout {
-  --codex-ui-app-shell-side-panel-track: min(
-    var(--codex-ui-app-side-panel-width),
-    42cqw
+  --codex-ui-app-shell-side-panel-track: var(
+    --codex-ui-app-side-panel-width
   );
 }
 
@@ -245,7 +244,8 @@
 .codex-ui-app-shell__side-panel-resizer {
   background: transparent;
   cursor: col-resize;
-  inset-block: 0;
+  inset-block-end: var(--codex-ui-app-shell-bottom-panel-track);
+  inset-block-start: 0;
   inset-inline-end: var(--codex-ui-app-shell-side-panel-track);
   outline: none;
   position: absolute;

@@ -405,6 +405,11 @@ describe("application shell", () => {
     expect(separator.getAttribute("aria-valuemax")).toBe("554");
     expect(separator.getAttribute("aria-valuenow")).toBe("370");
 
+    act(() => resize?.(1_480));
+    expect(separator.getAttribute("aria-valuemax")).toBe("854");
+    fireEvent.keyDown(separator, { key: "End" });
+    expect(separator.getAttribute("aria-valuenow")).toBe("854");
+
     act(() => resize?.(800));
     expect(separator.getAttribute("aria-valuemax")).toBe("320");
     expect(separator.getAttribute("aria-valuenow")).toBe("320");
