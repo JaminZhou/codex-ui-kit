@@ -25,6 +25,7 @@ import {
 afterEach(() => {
   cleanup();
   document.body.style.overflow = "";
+  document.documentElement.style.fontSize = "";
   vi.unstubAllGlobals();
 });
 
@@ -403,6 +404,7 @@ describe("application shell", () => {
   });
 
   it("keeps the bottom panel minimum within the responsive height cap", () => {
+    document.documentElement.style.fontSize = "20px";
     let resizeShell: ((width: number, height: number) => void) | undefined;
     class ResizeObserverMock {
       constructor(
@@ -450,12 +452,12 @@ describe("application shell", () => {
       name: "Resize bottom panel",
     });
 
-    expect(separator.getAttribute("aria-valuemin")).toBe("402");
-    expect(separator.getAttribute("aria-valuemax")).toBe("402");
-    expect(separator.getAttribute("aria-valuenow")).toBe("402");
+    expect(separator.getAttribute("aria-valuemin")).toBe("400");
+    expect(separator.getAttribute("aria-valuemax")).toBe("400");
+    expect(separator.getAttribute("aria-valuenow")).toBe("400");
     expect(
       shell.style.getPropertyValue("--codex-ui-app-bottom-panel-height"),
-    ).toBe("402px");
+    ).toBe("400px");
   });
 
   it("exposes a measured, pointer-resizable workspace track", () => {

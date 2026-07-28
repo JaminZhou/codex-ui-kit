@@ -433,6 +433,39 @@ describe("protocol lifecycle reducer", () => {
     expect(completed.commands[0]?.terminalEvents).toEqual([
       { kind: "stdout", text: "existing\nnew\nfinished\n" },
     ]);
+
+    const withInput = reduceProtocolNotification(completed, {
+      method: "item/commandExecution/terminalInteraction",
+      params: {
+        itemId: "command-resumed",
+        processId: "process-resumed",
+        stdin: "q\n",
+        threadId: "thread-demo",
+        turnId: "turn-terminal",
+      },
+    });
+    const reconnected = reduceProtocolNotification(withInput, {
+      method: "item/completed",
+      params: {
+        item: {
+          aggregatedOutput: "authoritative after reconnect\n",
+          command: "pnpm dev",
+          id: "command-resumed",
+          processId: "process-resumed",
+          status: "completed",
+          type: "commandExecution",
+        },
+        threadId: "thread-demo",
+        turnId: "turn-terminal",
+      },
+    });
+    expect(reconnected.commands[0]?.terminalEvents).toEqual([
+      {
+        kind: "stdout",
+        text: "authoritative after reconnect\n",
+      },
+      { kind: "stdin", text: "q\n" },
+    ]);
   });
 
   it("preserves both files in the dedicated multi-file review trace", () => {

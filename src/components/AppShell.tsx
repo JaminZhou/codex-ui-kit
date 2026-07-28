@@ -588,10 +588,17 @@ export function AppShell({
     ? normalizedBottomPanelMaxHeight
     : Math.max(normalizedBottomPanelMinHeight, requestedBottomPanelHeight);
   const shellHeight = automaticLayout.height;
+  const bottomPanelSeparatorHeight =
+    shellRef.current === null
+      ? 16
+      : appShellRemToPixels(shellRef.current, 1);
   const responsiveBottomPanelHeightCap =
     shellHeight === null
       ? unmeasuredBottomPanelMaxHeight
-      : Math.max(0, (shellHeight - 16) / 2);
+      : Math.max(
+          0,
+          (shellHeight - bottomPanelSeparatorHeight) / 2,
+        );
   const resolvedBottomPanelMinHeight = Math.min(
     normalizedBottomPanelMinHeight,
     responsiveBottomPanelHeightCap,
@@ -750,10 +757,17 @@ export function AppShell({
         : shellHeight !== null && shellHeight > 0
           ? shellHeight
           : null;
+    const liveBottomPanelSeparatorHeight =
+      shellRef.current === null
+        ? bottomPanelSeparatorHeight
+        : appShellRemToPixels(shellRef.current, 1);
     const liveResponsiveHeightCap =
       liveShellHeight === null
         ? unmeasuredBottomPanelMaxHeight
-        : Math.max(0, (liveShellHeight - 16) / 2);
+        : Math.max(
+            0,
+            (liveShellHeight - liveBottomPanelSeparatorHeight) / 2,
+          );
     const minimum = Math.min(
       normalizedBottomPanelMinHeight,
       liveResponsiveHeightCap,

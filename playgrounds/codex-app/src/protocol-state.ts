@@ -227,20 +227,30 @@ function terminalEventsFromAggregate(
   aggregatedOutput: string | null,
 ): DemoTerminalEvent[] {
   const events = command?.terminalEvents ?? [];
-  if (!aggregatedOutput) return events;
+  if (aggregatedOutput === null) return events;
   if (events.length === 0) {
-    return [{ kind: "stdout", text: aggregatedOutput }];
+    return aggregatedOutput
+      ? [{ kind: "stdout", text: aggregatedOutput }]
+      : [];
   }
-  if (!command || !aggregatedOutput.startsWith(command.output)) {
-    return events;
+  if (command && aggregatedOutput.startsWith(command.output)) {
+    const unobservedOutput = aggregatedOutput.slice(
+      command.output.length,
+    );
+    return unobservedOutput
+      ? appendTerminalEvent(events, {
+          kind: "stdout",
+          text: unobservedOutput,
+        })
+      : events;
   }
-  const unobservedOutput = aggregatedOutput.slice(command.output.length);
-  return unobservedOutput
-    ? appendTerminalEvent(events, {
-        kind: "stdout",
-        text: unobservedOutput,
-      })
-    : events;
+  const preservedInput = events.filter(({ kind }) => kind === "stdin");
+  return [
+    ...(aggregatedOutput
+      ? [{ kind: "stdout" as const, text: aggregatedOutput }]
+      : []),
+    ...preservedInput,
+  ];
 }
 
 function commandStatus(
