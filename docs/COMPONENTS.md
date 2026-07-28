@@ -108,9 +108,9 @@ All privileged behavior remains host-owned. The components never auto-approve co
   right workspace, with configurable panel/main minima, responsive clamping,
   controlled persistence, focus restoration, and an expanded full-main mode.
   `bottomPanelResizable` adds the current-build measured 16px horizontal
-  separator, a 152px minimum, a responsive half-height maximum, pointer and
-  Arrow/Home/End control, accessible values, and controlled or uncontrolled
-  height persistence.
+  separator, a preferred 152px minimum (reduced only when the responsive
+  half-height cap is smaller), pointer and Arrow/Home/End control, accessible
+  values, and controlled or uncontrolled height persistence.
 - `AppSidebar`, `AppSidebarSection`, and `AppSidebarItem`: grouped primary
   navigation with selected-route state, descriptions, badges, header, and
   footer slots.

@@ -86,7 +86,7 @@ describe("application shell visual contract", () => {
 
   it("locks the current-build bottom panel resize affordance", () => {
     expect(styles).toContain(
-      "calc((100% - 1rem) / 2)",
+      "max(0px, calc((100% - 1rem) / 2))",
     );
     expect(styles).toMatch(
       /\.codex-ui-app-shell__bottom-panel-resizer \{[\s\S]*?cursor: row-resize;[\s\S]*?height: 1rem;/,

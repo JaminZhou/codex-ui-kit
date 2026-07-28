@@ -6,6 +6,7 @@ import {
   isTurnActive,
   reduceProtocolNotification,
   reduceProtocolTrace,
+  terminalTranscriptEvents,
 } from "../src/protocol-state";
 import { replayScenarios } from "../src/replay";
 
@@ -368,6 +369,16 @@ describe("protocol lifecycle reducer", () => {
       { kind: "stdout", text: "foobar\n" },
       { kind: "stdin", text: "q\n" },
       { kind: "stdout", text: "stopped\n" },
+    ]);
+    expect(
+      terminalTranscriptEvents([
+        { kind: "stdout", text: "Choice: " },
+        { kind: "stdin", text: "q\n" },
+        { kind: "stdout", text: "Stopped.\n" },
+      ]),
+    ).toEqual([
+      { kind: "stdout", text: "Choice: q\n" },
+      { kind: "stdout", text: "Stopped.\n" },
     ]);
   });
 

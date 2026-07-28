@@ -402,6 +402,62 @@ describe("application shell", () => {
     expect(separator.getAttribute("aria-valuenow")).toBe("402");
   });
 
+  it("keeps the bottom panel minimum within the responsive height cap", () => {
+    let resizeShell: ((width: number, height: number) => void) | undefined;
+    class ResizeObserverMock {
+      constructor(
+        private readonly callback: ResizeObserverCallback,
+      ) {}
+
+      disconnect() {}
+
+      observe(target: Element) {
+        if (!target.classList.contains("codex-ui-app-shell")) return;
+        resizeShell = (width: number, height: number) =>
+          this.callback(
+            [
+              {
+                contentRect: { height, width },
+                target,
+              } as ResizeObserverEntry,
+            ],
+            this as unknown as ResizeObserver,
+          );
+      }
+
+      unobserve() {}
+    }
+    vi.stubGlobal("ResizeObserver", ResizeObserverMock);
+    const { container } = render(
+      <AppShell
+        bottomPanel="Terminal"
+        bottomPanelMinHeight={500}
+        bottomPanelOpen
+        bottomPanelResizable
+        layoutMode="wide"
+      >
+        Thread
+      </AppShell>,
+    );
+    const shell = container.querySelector(
+      ".codex-ui-app-shell",
+    ) as HTMLDivElement;
+    vi.spyOn(shell, "getBoundingClientRect").mockReturnValue(
+      new DOMRect(0, 0, 1_180, 820),
+    );
+    act(() => resizeShell?.(1_180, 820));
+    const separator = screen.getByRole("separator", {
+      name: "Resize bottom panel",
+    });
+
+    expect(separator.getAttribute("aria-valuemin")).toBe("402");
+    expect(separator.getAttribute("aria-valuemax")).toBe("402");
+    expect(separator.getAttribute("aria-valuenow")).toBe("402");
+    expect(
+      shell.style.getPropertyValue("--codex-ui-app-bottom-panel-height"),
+    ).toBe("402px");
+  });
+
   it("exposes a measured, pointer-resizable workspace track", () => {
     const onSidePanelWidthChange = vi.fn();
     const { container } = render(

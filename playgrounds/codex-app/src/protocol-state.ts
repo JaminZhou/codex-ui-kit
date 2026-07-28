@@ -56,6 +56,24 @@ export interface DemoTerminalEvent {
   text: string;
 }
 
+export function terminalTranscriptEvents(
+  events: readonly DemoTerminalEvent[],
+): DemoTerminalEvent[] {
+  return events.reduce<DemoTerminalEvent[]>((transcript, event) => {
+    const previous = transcript.at(-1);
+    if (!previous || previous.text.endsWith("\n")) {
+      return [...transcript, { ...event }];
+    }
+    return [
+      ...transcript.slice(0, -1),
+      {
+        kind: previous.kind,
+        text: `${previous.text}${event.text}`,
+      },
+    ];
+  }, []);
+}
+
 export interface DemoApprovalRequest {
   command: string;
   decision: "approved" | "pending" | "rejected";

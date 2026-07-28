@@ -588,20 +588,24 @@ export function AppShell({
     ? normalizedBottomPanelMaxHeight
     : Math.max(normalizedBottomPanelMinHeight, requestedBottomPanelHeight);
   const shellHeight = automaticLayout.height;
-  const responsiveBottomPanelMaxHeight =
+  const responsiveBottomPanelHeightCap =
     shellHeight === null
       ? unmeasuredBottomPanelMaxHeight
-      : Math.max(
-          normalizedBottomPanelMinHeight,
-          (shellHeight - 16) / 2,
-        );
-  const resolvedBottomPanelMaxHeight = Math.min(
-    normalizedBottomPanelMaxHeight,
-    responsiveBottomPanelMaxHeight,
+      : Math.max(0, (shellHeight - 16) / 2);
+  const resolvedBottomPanelMinHeight = Math.min(
+    normalizedBottomPanelMinHeight,
+    responsiveBottomPanelHeightCap,
+  );
+  const resolvedBottomPanelMaxHeight = Math.max(
+    resolvedBottomPanelMinHeight,
+    Math.min(
+      normalizedBottomPanelMaxHeight,
+      responsiveBottomPanelHeightCap,
+    ),
   );
   const resolvedBottomPanelHeight = clampShellTrack(
     requestedBottomPanelHeight,
-    normalizedBottomPanelMinHeight,
+    resolvedBottomPanelMinHeight,
     resolvedBottomPanelMaxHeight,
   );
   const normalizedSidebarMinWidth = Math.max(
@@ -746,22 +750,22 @@ export function AppShell({
         : shellHeight !== null && shellHeight > 0
           ? shellHeight
           : null;
-    const liveResponsiveMaximum =
+    const liveResponsiveHeightCap =
       liveShellHeight === null
         ? unmeasuredBottomPanelMaxHeight
-        : Math.max(
-            normalizedBottomPanelMinHeight,
-            (liveShellHeight - 16) / 2,
-          );
-    const maximum = Math.min(
-      normalizedBottomPanelMaxHeight,
-      liveResponsiveMaximum,
-    );
-    return clampShellTrack(
-      nextHeight,
+        : Math.max(0, (liveShellHeight - 16) / 2);
+    const minimum = Math.min(
       normalizedBottomPanelMinHeight,
-      maximum,
+      liveResponsiveHeightCap,
     );
+    const maximum = Math.max(
+      minimum,
+      Math.min(
+        normalizedBottomPanelMaxHeight,
+        liveResponsiveHeightCap,
+      ),
+    );
+    return clampShellTrack(nextHeight, minimum, maximum);
   };
   const commitResolvedBottomPanelHeight = (normalizedHeight: number) => {
     if (!bottomPanelHeightIsControlled) {
@@ -811,7 +815,7 @@ export function AppShell({
   ) => {
     const step = event.shiftKey ? 32 : 8;
     let nextHeight: number | undefined;
-    if (event.key === "Home") nextHeight = normalizedBottomPanelMinHeight;
+    if (event.key === "Home") nextHeight = resolvedBottomPanelMinHeight;
     if (event.key === "End") nextHeight = resolvedBottomPanelMaxHeight;
     if (event.key === "ArrowUp") {
       nextHeight = resolvedBottomPanelHeight + step;
@@ -1479,7 +1483,7 @@ export function AppShell({
             aria-label={bottomPanelResizeLabel}
             aria-orientation="horizontal"
             aria-valuemax={Math.round(resolvedBottomPanelMaxHeight)}
-            aria-valuemin={Math.round(normalizedBottomPanelMinHeight)}
+            aria-valuemin={Math.round(resolvedBottomPanelMinHeight)}
             aria-valuenow={Math.round(resolvedBottomPanelHeight)}
             aria-valuetext={`${Math.round(resolvedBottomPanelHeight)} pixels`}
             className="codex-ui-app-shell__bottom-panel-resizer"

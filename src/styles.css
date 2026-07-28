@@ -174,7 +174,7 @@
 .codex-ui-app-shell[data-bottom-panel-open] .codex-ui-app-shell__layout {
   --codex-ui-app-shell-bottom-panel-track: min(
     var(--codex-ui-app-bottom-panel-height),
-    calc((100% - 1rem) / 2)
+    max(0px, calc((100% - 1rem) / 2))
   );
 }
 

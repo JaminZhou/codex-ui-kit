@@ -43,6 +43,7 @@ import {
   initialProtocolState,
   isTurnActive,
   reduceProtocolNotification,
+  terminalTranscriptEvents,
   type DemoProtocolState,
   type ProtocolEventRecord,
 } from "./protocol-state";
@@ -1010,11 +1011,16 @@ export function App() {
     if (!terminalCommand) return terminalHistory;
     const protocolEntries =
       terminalCommand.terminalEvents.length > 0
-        ? terminalCommand.terminalEvents.map((entry, index) => ({
-            id: `${terminalCommand.id}:event:${index}`,
-            kind: entry.kind === "stdin" ? "command" as const : "stdout" as const,
-            text: entry.text.replace(/\n$/, ""),
-          }))
+        ? terminalTranscriptEvents(terminalCommand.terminalEvents).map(
+            (entry, index) => ({
+              id: `${terminalCommand.id}:event:${index}`,
+              kind:
+                entry.kind === "stdin"
+                  ? ("command" as const)
+                  : ("stdout" as const),
+              text: entry.text.replace(/\n$/, ""),
+            }),
+          )
         : [
             ...(terminalCommand.output
               ? [
