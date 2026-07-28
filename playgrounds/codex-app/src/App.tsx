@@ -244,6 +244,16 @@ export function App() {
       await window.codexDemo?.stopLive();
     } catch (error) {
       setLiveError(error instanceof Error ? error.message : String(error));
+    } finally {
+      liveState.approvals
+        .filter(({ decision }) => decision === "pending")
+        .forEach(({ requestId }) => {
+          dispatchLive({
+            decision: "rejected",
+            kind: "approval-resolution",
+            requestId,
+          });
+        });
     }
   };
 
@@ -516,7 +526,7 @@ export function App() {
                         next.add(fileChange.id);
                         return next;
                       });
-                      if (reviewSelection?.fileChangeId === fileChange.id) {
+                      if (resolvedReview?.fileChangeId === fileChange.id) {
                         setReviewOpen(false);
                         setReviewSelection(null);
                       }

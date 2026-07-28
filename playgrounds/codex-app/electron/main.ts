@@ -200,6 +200,7 @@ async function startLive(
 
 async function stopLive() {
   if (!activeTurn) return;
+  liveApprovalGate.declineAll();
   await activeTurn.interrupt();
 }
 
