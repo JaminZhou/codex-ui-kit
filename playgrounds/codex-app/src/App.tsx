@@ -20,7 +20,6 @@ import {
   ThreadInterruptionSummary,
   ThreadThinkingPlaceholder,
   WorkspacePanel,
-  type FileDiffLine,
 } from "codex-ui-kit";
 import {
   Fragment,
@@ -38,9 +37,10 @@ import {
   isTurnActive,
   reduceProtocolNotification,
   type DemoProtocolState,
-  type DemoFileUpdateChange,
   type ProtocolEventRecord,
 } from "./protocol-state";
+import { changeStats } from "./diff-lines";
+import { LiveApprovalSubmissionGate } from "./live-approval-submission-gate";
 import {
   isScenarioId,
   replayScenarios,
@@ -80,63 +80,6 @@ function statusLabel(state: DemoProtocolState) {
   return "Ready";
 }
 
-function diffLines(change: DemoFileUpdateChange): FileDiffLine[] {
-  let oldLine = 0;
-  let newLine = 0;
-  return change.diff.split(/\r?\n/).flatMap<FileDiffLine>((line) => {
-    if (!line) return [];
-    if (line.startsWith("@@")) {
-      const match = /@@ -(\d+)(?:,\d+)? \+(\d+)(?:,\d+)? @@/.exec(line);
-      oldLine = Number(match?.[1] ?? 0);
-      newLine = Number(match?.[2] ?? 0);
-      return [{ content: line, kind: "hunk" as const }];
-    }
-    if (
-      line.startsWith("---") ||
-      line.startsWith("+++") ||
-      line.startsWith("\\ ")
-    ) {
-      return [{ content: line, kind: "meta" as const }];
-    }
-    if (line.startsWith("+") && !line.startsWith("+++")) {
-      const next = {
-        content: line.slice(1),
-        kind: "addition" as const,
-        newLineNumber: newLine,
-      };
-      newLine += 1;
-      return [next];
-    }
-    if (line.startsWith("-") && !line.startsWith("---")) {
-      const next = {
-        content: line.slice(1),
-        kind: "deletion" as const,
-        oldLineNumber: oldLine,
-      };
-      oldLine += 1;
-      return [next];
-    }
-    const next = {
-      content: line.startsWith(" ") ? line.slice(1) : line,
-      kind: "context" as const,
-      newLineNumber: newLine,
-      oldLineNumber: oldLine,
-    };
-    newLine += 1;
-    oldLine += 1;
-    return [next];
-  });
-}
-
-function changeStats(change: DemoFileUpdateChange) {
-  const lines = diffLines(change);
-  return {
-    additions: lines.filter(({ kind }) => kind === "addition").length,
-    deletions: lines.filter(({ kind }) => kind === "deletion").length,
-    lines,
-  };
-}
-
 export function App() {
   const initialSelection = useMemo(querySelection, []);
   const [scenarioId, setScenarioId] = useState<ReplayScenarioId>(
@@ -166,6 +109,9 @@ export function App() {
   );
   const [liveError, setLiveError] = useState<string | null>(null);
   const liveStartPendingRef = useRef(false);
+  const liveApprovalSubmissionGateRef = useRef(
+    new LiveApprovalSubmissionGate(),
+  );
   const replay = replayState(scenario.events, replayCount);
   const state = mode === "live" ? liveState : replay;
 
@@ -191,6 +137,14 @@ export function App() {
     };
   }, []);
 
+  useEffect(() => {
+    liveApprovalSubmissionGateRef.current.retainPending(
+      liveState.approvals
+        .filter(({ decision }) => decision === "pending")
+        .map(({ requestId }) => requestId),
+    );
+  }, [liveState.approvals]);
+
   const selectScenario = (nextId: ReplayScenarioId) => {
     setMode("replay");
     setScenarioId(nextId);
@@ -206,6 +160,8 @@ export function App() {
     decision: "accept" | "decline",
   ) => {
     if (mode !== "live") return;
+    const submissionGate = liveApprovalSubmissionGateRef.current;
+    if (!submissionGate.begin(requestId)) return;
     try {
       await window.codexDemo?.respondToApproval({ decision, requestId });
       dispatchLive({
@@ -214,6 +170,7 @@ export function App() {
         requestId,
       });
     } catch (error) {
+      submissionGate.finish(requestId);
       setLiveError(error instanceof Error ? error.message : String(error));
     }
   };
