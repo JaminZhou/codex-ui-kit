@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   agentMessageStatus,
+  hasActiveTurnWork,
   initialProtocolState,
   isTurnActive,
   reduceProtocolNotification,
@@ -217,6 +218,7 @@ describe("protocol lifecycle reducer", () => {
       kind: "command",
     });
     expect(fileChanging.approvals[0]?.decision).toBe("approved");
+    expect(hasActiveTurnWork(fileChanging)).toBe(true);
     expect(fileChanging.fileChanges[0]).toMatchObject({
       changes: [
         {
@@ -235,6 +237,24 @@ describe("protocol lifecycle reducer", () => {
       "approval",
       "fileChange",
     ]);
+  });
+
+  it("does not treat historical command and file items as active turn work", () => {
+    const completed = reduceProtocolTrace(
+      replayScenarios["workspace-workflow"].events,
+    );
+    const followUp = reduceProtocolNotification(completed, {
+      method: "turn/started",
+      params: {
+        threadId: "thread-demo",
+        turn: { id: "turn-follow-up" },
+      },
+    });
+
+    expect(hasActiveTurnWork(completed)).toBe(false);
+    expect(hasActiveTurnWork(followUp)).toBe(false);
+    expect(followUp.commands.length).toBeGreaterThan(0);
+    expect(followUp.fileChanges.length).toBeGreaterThan(0);
   });
 
   it("applies an explicit renderer approval resolution in live state", () => {

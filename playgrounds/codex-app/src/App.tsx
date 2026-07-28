@@ -33,6 +33,7 @@ import {
 import type { JsonRpcNotification } from "@jaminzhou/codex-app-server-client";
 import {
   agentMessageStatus,
+  hasActiveTurnWork,
   initialProtocolState,
   isTurnActive,
   reduceProtocolNotification,
@@ -45,6 +46,10 @@ import {
   replayScenarios,
   type ReplayScenarioId,
 } from "./replay";
+import {
+  resolveReviewSelection,
+  type ReviewSelection,
+} from "./review-selection";
 
 function querySelection() {
   const params = new URLSearchParams(window.location.search);
@@ -154,6 +159,8 @@ export function App() {
   const [reviewOpen, setReviewOpen] = useState(
     initialSelection.frame === "review-open",
   );
+  const [reviewSelection, setReviewSelection] =
+    useState<ReviewSelection | null>(null);
   const [undoneFileIds, setUndoneFileIds] = useState<Set<string>>(
     () => new Set(),
   );
@@ -189,6 +196,7 @@ export function App() {
     setScenarioId(nextId);
     setReplayCount(replayScenarios[nextId].events.length);
     setReviewOpen(false);
+    setReviewSelection(null);
     setUndoneFileIds(new Set());
     setLiveError(null);
   };
@@ -335,7 +343,11 @@ export function App() {
     />
   );
 
-  const reviewChange = state.fileChanges.at(-1)?.changes.at(0);
+  const resolvedReview = resolveReviewSelection(
+    state.fileChanges,
+    reviewSelection,
+  );
+  const reviewChange = resolvedReview?.change;
   const reviewStats = reviewChange ? changeStats(reviewChange) : null;
   const reviewPanel = reviewChange ? (
     <WorkspacePanel
@@ -503,6 +515,10 @@ export function App() {
                       next.add(fileChange.id);
                       return next;
                     });
+                    if (reviewSelection?.fileChangeId === fileChange.id) {
+                      setReviewOpen(false);
+                      setReviewSelection(null);
+                    }
                   }}
                   type="button"
                 >
@@ -511,6 +527,10 @@ export function App() {
                 <button
                   onClick={(event) => {
                     event.stopPropagation();
+                    setReviewSelection({
+                      fileChangeId: fileChange.id,
+                      path: change.path,
+                    });
                     setReviewOpen(true);
                   }}
                   type="button"
@@ -546,6 +566,7 @@ export function App() {
       </Fragment>
     );
   });
+  const activeTurnHasWork = hasActiveTurnWork(state);
 
   return (
     <div
@@ -583,11 +604,12 @@ export function App() {
               {timelineContent}
 
               {state.status === "running" &&
-              state.commands.length === 0 &&
-              state.fileChanges.length === 0 &&
+              !activeTurnHasWork &&
               !state.messages.some(
-                ({ role, status }) =>
-                  role === "assistant" && status === "running",
+                ({ role, status, turnId }) =>
+                  role === "assistant" &&
+                  status === "running" &&
+                  turnId === state.currentTurnId,
               ) ? (
                 <ThreadThinkingPlaceholder />
               ) : null}

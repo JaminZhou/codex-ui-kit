@@ -327,6 +327,14 @@ export function agentMessageStatus(
   return "completed";
 }
 
+export function hasActiveTurnWork(state: DemoProtocolState) {
+  if (!state.currentTurnId) return false;
+  return (
+    state.commands.some(({ turnId }) => turnId === state.currentTurnId) ||
+    state.fileChanges.some(({ turnId }) => turnId === state.currentTurnId)
+  );
+}
+
 export function reduceProtocolNotification(
   state: DemoProtocolState,
   notification:
