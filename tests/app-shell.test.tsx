@@ -8,7 +8,7 @@ import {
   screen,
   waitFor,
 } from "@testing-library/react";
-import { useState } from "react";
+import { useState, type CSSProperties } from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import {
   AppShell,
@@ -359,7 +359,8 @@ describe("application shell", () => {
   });
 
   it("keeps a measured main track while resolving the workspace maximum", () => {
-    let resize: ((width: number) => void) | undefined;
+    let resizeShell: ((width: number) => void) | undefined;
+    let resizeSidebar: ((width: number) => void) | undefined;
     class ResizeObserverMock {
       constructor(
         private readonly callback: ResizeObserverCallback,
@@ -368,8 +369,7 @@ describe("application shell", () => {
       disconnect() {}
 
       observe(target: Element) {
-        if (!target.classList.contains("codex-ui-app-shell")) return;
-        resize = (width) =>
+        const resize = (width: number) =>
           this.callback(
             [
               {
@@ -379,6 +379,13 @@ describe("application shell", () => {
             ],
             this as unknown as ResizeObserver,
           );
+        if (target.classList.contains("codex-ui-app-shell")) {
+          resizeShell = resize;
+        } else if (
+          target.classList.contains("codex-ui-app-shell__sidebar")
+        ) {
+          resizeSidebar = resize;
+        }
       }
 
       unobserve() {}
@@ -393,30 +400,47 @@ describe("application shell", () => {
         sidePanelResizable
         sidebar="Navigation"
         sidebarOpen
+        style={
+          {
+            "--codex-ui-app-sidebar-width": "400px",
+          } as CSSProperties
+        }
       >
         Thread
       </AppShell>,
     );
 
-    act(() => resize?.(1_180));
+    act(() => resizeShell?.(1_180));
     const separator = screen.getByRole("separator", {
       name: "Resize workspace panel",
     });
     expect(separator.getAttribute("aria-valuemax")).toBe("554");
     expect(separator.getAttribute("aria-valuenow")).toBe("370");
 
-    act(() => resize?.(1_480));
+    const sidebarElement = screen.getByRole("complementary", {
+      name: "App navigation",
+    });
+    const sidebarRect = vi
+      .spyOn(sidebarElement, "getBoundingClientRect")
+      .mockReturnValue(new DOMRect(0, 0, 400, 820));
+    act(() => resizeSidebar?.(399));
+    expect(separator.getAttribute("aria-valuemax")).toBe("428");
+    sidebarRect.mockRestore();
+
+    act(() => resizeSidebar?.(274));
+    act(() => resizeShell?.(1_480));
     expect(separator.getAttribute("aria-valuemax")).toBe("854");
     fireEvent.keyDown(separator, { key: "End" });
     expect(separator.getAttribute("aria-valuenow")).toBe("854");
 
-    act(() => resize?.(800));
+    act(() => resizeShell?.(800));
     expect(separator.getAttribute("aria-valuemax")).toBe("320");
     expect(separator.getAttribute("aria-valuenow")).toBe("320");
   });
 
   it("lets an expanded workspace panel consume the available main track", () => {
-    let resize: ((width: number) => void) | undefined;
+    let resizeShell: ((width: number) => void) | undefined;
+    let resizeSidebar: ((width: number) => void) | undefined;
     class ResizeObserverMock {
       constructor(
         private readonly callback: ResizeObserverCallback,
@@ -425,8 +449,7 @@ describe("application shell", () => {
       disconnect() {}
 
       observe(target: Element) {
-        if (!target.classList.contains("codex-ui-app-shell")) return;
-        resize = (width) =>
+        const resize = (width: number) =>
           this.callback(
             [
               {
@@ -436,6 +459,13 @@ describe("application shell", () => {
             ],
             this as unknown as ResizeObserver,
           );
+        if (target.classList.contains("codex-ui-app-shell")) {
+          resizeShell = resize;
+        } else if (
+          target.classList.contains("codex-ui-app-shell__sidebar")
+        ) {
+          resizeSidebar = resize;
+        }
       }
 
       unobserve() {}
@@ -450,12 +480,17 @@ describe("application shell", () => {
         sidePanelOpen
         sidebar="Navigation"
         sidebarOpen
+        style={
+          {
+            "--codex-ui-app-sidebar-width": "400px",
+          } as CSSProperties
+        }
       >
         Thread
       </AppShell>,
     );
 
-    act(() => resize?.(1_180));
+    act(() => resizeShell?.(1_180));
     const shell = container.querySelector(
       ".codex-ui-app-shell",
     ) as HTMLDivElement;
@@ -469,6 +504,11 @@ describe("application shell", () => {
       }),
     ).toBeNull();
 
+    act(() => resizeSidebar?.(400));
+    expect(
+      shell.style.getPropertyValue("--codex-ui-app-side-panel-width"),
+    ).toBe("780px");
+
     rerender(
       <AppShell
         layoutMode="wide"
@@ -477,6 +517,11 @@ describe("application shell", () => {
         sidePanelResizable
         sidebar="Navigation"
         sidebarOpen
+        style={
+          {
+            "--codex-ui-app-sidebar-width": "400px",
+          } as CSSProperties
+        }
       >
         Thread
       </AppShell>,
@@ -495,6 +540,11 @@ describe("application shell", () => {
         sidePanelResizable
         sidebar="Navigation"
         sidebarOpen
+        style={
+          {
+            "--codex-ui-app-sidebar-width": "400px",
+          } as CSSProperties
+        }
       >
         Thread
       </AppShell>,

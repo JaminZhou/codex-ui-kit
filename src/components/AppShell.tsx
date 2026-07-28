@@ -239,6 +239,50 @@ function useAppShellLayoutMetrics(
   return layout;
 }
 
+function useObservedElementWidth(
+  elementRef: RefObject<HTMLElement | null>,
+  enabled: boolean,
+) {
+  const [width, setWidth] = useState<number | null>(null);
+
+  useLayoutEffect(() => {
+    const element = elementRef.current;
+    if (!enabled || !element) {
+      setWidth((current) => (current === null ? current : null));
+      return;
+    }
+
+    const update = (nextWidth: number) => {
+      if (nextWidth <= 0) return;
+      setWidth((current) =>
+        current === nextWidth ? current : nextWidth,
+      );
+    };
+
+    update(element.getBoundingClientRect().width);
+    if (typeof ResizeObserver === "undefined") return;
+
+    const observer = new ResizeObserver((entries) => {
+      const entry = entries.find(({ target }) => target === element);
+      if (!entry) return;
+      const renderedWidth = element.getBoundingClientRect().width;
+      const borderBoxWidth =
+        entry.borderBoxSize?.[0]?.inlineSize ?? 0;
+      update(
+        renderedWidth > 0
+          ? renderedWidth
+          : borderBoxWidth > 0
+            ? borderBoxWidth
+            : entry.contentRect.width,
+      );
+    });
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, [elementRef, enabled]);
+
+  return width;
+}
+
 const shellFocusableSelector =
   'button:not([disabled]):not([tabindex="-1"]), [href]:not([tabindex="-1"]), input:not([disabled]):not([type="hidden"]):not([tabindex="-1"]), select:not([disabled]):not([tabindex="-1"]), textarea:not([disabled]):not([tabindex="-1"]), [tabindex]:not([tabindex="-1"])';
 
@@ -433,6 +477,12 @@ export function AppShell({
   );
   const [sidePanelResizing, setSidePanelResizing] = useState(false);
   const [sidebarResizing, setSidebarResizing] = useState(false);
+  const sidebarIsVisible =
+    sidebarOpen && sidebar !== undefined && sidebar !== null;
+  const observedSidebarWidth = useObservedElementWidth(
+    sidebarRef,
+    sidebarIsVisible,
+  );
   const automaticLayout = useAppShellLayoutMetrics(shellRef);
   const layoutMode = layoutModeOverride ?? automaticLayout.mode;
   const normalizedSidebarMinWidth = Math.max(
@@ -468,10 +518,9 @@ export function AppShell({
       : Number.POSITIVE_INFINITY,
   );
   const shellWidth = automaticLayout.width;
-  const occupiedSidebarWidth =
-    sidebarOpen && sidebar !== undefined && sidebar !== null
-      ? resolvedSidebarWidth
-      : 0;
+  const occupiedSidebarWidth = sidebarIsVisible
+    ? (observedSidebarWidth ?? resolvedSidebarWidth)
+    : 0;
   const responsiveSidePanelMaxWidth =
     shellWidth === null
       ? normalizedSidePanelMaxWidth
