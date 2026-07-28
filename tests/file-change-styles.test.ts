@@ -1,7 +1,10 @@
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 
-const styles = readFileSync(new URL("../src/styles.css", import.meta.url), "utf8");
+const styles = readFileSync(
+  new URL("../src/styles.css", import.meta.url),
+  "utf8",
+);
 
 describe("file change visual contract", () => {
   it("keeps the measured shell geometry", () => {
@@ -51,5 +54,20 @@ describe("file change visual contract", () => {
     );
     expect(streamingPulse).toContain("color: var(--codex-ui-text)");
     expect(streamingPulse).not.toContain("opacity");
+  });
+
+  it("resets box sizing on every public file-workflow root and descendant", () => {
+    for (const selector of [
+      ".codex-ui-file-change,",
+      ".codex-ui-file-change *,",
+      ".codex-ui-file-change-group,",
+      ".codex-ui-file-change-group *,",
+      ".codex-ui-file-diff,",
+      ".codex-ui-file-diff *,",
+      ".codex-ui-file-review,",
+      ".codex-ui-file-review *,",
+    ]) {
+      expect(styles).toContain(selector);
+    }
   });
 });

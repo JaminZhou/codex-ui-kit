@@ -11,6 +11,10 @@ const baselineDirectory = join(root, "tests", "visual", "baselines");
 const artifactDirectory = join(root, "artifacts", "visual");
 const currentBuildMultiFileReference =
   process.env.CODEX_UI_KIT_MULTI_FILE_REVIEW_REFERENCE;
+const currentBuildMultiFileReferenceSize = {
+  height: 820,
+  width: 906,
+};
 await mkdir(baselineDirectory, { recursive: true });
 await mkdir(artifactDirectory, { recursive: true });
 
@@ -112,6 +116,14 @@ for (const scene of visualScenes) {
     const reference = PNG.sync.read(
       await readFile(currentBuildMultiFileReference),
     );
+    if (
+      reference.width !== currentBuildMultiFileReferenceSize.width ||
+      reference.height !== currentBuildMultiFileReferenceSize.height
+    ) {
+      throw new Error(
+        `${scene.id}: current-build reference must be exactly ${currentBuildMultiFileReferenceSize.width}x${currentBuildMultiFileReferenceSize.height}, received ${reference.width}x${reference.height}.`,
+      );
+    }
     if (
       actual.height !== reference.height ||
       actual.width < reference.width
