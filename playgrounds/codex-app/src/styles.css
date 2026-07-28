@@ -281,7 +281,8 @@ textarea {
   font-size: 1.25rem;
 }
 
-.demo-root[data-scenario="multi-file-review"] .demo-header-actions {
+.demo-root[data-capture][data-scenario="multi-file-review"]
+  .demo-header-actions {
   visibility: hidden;
 }
 

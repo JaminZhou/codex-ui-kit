@@ -168,6 +168,7 @@ try {
         width: bounds.width,
       };
     };
+    const headerActions = document.querySelector(".demo-header-actions");
     return {
       fileGroups: document.querySelectorAll(
         ".codex-ui-file-change-group",
@@ -178,6 +179,9 @@ try {
       horizontalOverflow:
         document.documentElement.scrollWidth -
         document.documentElement.clientWidth,
+      headerActionsVisible:
+        headerActions !== null &&
+        window.getComputedStyle(headerActions).visibility === "visible",
       main: rect(".codex-ui-app-shell__main"),
       mainAriaHidden: document
         .querySelector(".codex-ui-app-shell__main")
@@ -206,6 +210,7 @@ try {
     compactContract.fileGroups !== 1 ||
     compactContract.fileRows !== 2 ||
     compactContract.reviewDiffs !== 2 ||
+    !compactContract.headerActionsVisible ||
     compactContract.mainAriaHidden !== null ||
     compactContract.mainInert ||
     compactContract.sidePanelAriaHidden !== "false" ||

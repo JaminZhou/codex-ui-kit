@@ -557,6 +557,19 @@ export function FileReview({
   const classes = ["codex-ui-file-review", className]
     .filter(Boolean)
     .join(" ");
+  const selectedFileRef = useRef<HTMLElement | null>(null);
+
+  useLayoutEffect(() => {
+    const selectedFile = selectedFileRef.current;
+    if (
+      !selectedPath ||
+      !selectedFile ||
+      typeof selectedFile.scrollIntoView !== "function"
+    ) {
+      return;
+    }
+    selectedFile.scrollIntoView({ block: "nearest", inline: "nearest" });
+  }, [selectedPath]);
 
   return (
     <div
@@ -577,6 +590,7 @@ export function FileReview({
             data-change={file.change}
             data-selected={selectedPath === file.path || undefined}
             key={`${file.previousPath ?? ""}:${file.path}`}
+            ref={selectedPath === file.path ? selectedFileRef : undefined}
             role="listitem"
           >
             <div className="codex-ui-file-review__header">
