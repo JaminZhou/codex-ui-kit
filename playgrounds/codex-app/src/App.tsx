@@ -356,8 +356,11 @@ export function App() {
         <AppSidebarItem
           description="Local stdio app-server"
           disabled={!window.codexDemo}
-          onClick={() => setMode("live")}
-          selected={mode === "live"}
+          onClick={() => {
+            setView("conversation");
+            setMode("live");
+          }}
+          selected={view === "conversation" && mode === "live"}
         >
           Live local
         </AppSidebarItem>

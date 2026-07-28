@@ -174,9 +174,43 @@ for (const scene of visualScenes) {
           `${scene.id}: restored pull request panel failed: ${JSON.stringify(restored)}`,
         );
       }
+      await page.getByRole("button", { name: "Live local" }).click();
+      await page.waitForSelector(
+        '.demo-root[data-view="conversation"][data-mode="live"]',
+      );
+      const liveNavigation = await page.evaluate(() => {
+        const button = (name) =>
+          Array.from(
+            document.querySelectorAll(".codex-ui-app-sidebar__item"),
+          ).find((item) => item.textContent?.includes(name));
+        return {
+          liveSelected:
+            button("Live local")?.getAttribute("aria-current") ===
+            "page",
+          pullRequestSelected:
+            button("Pull requests")?.getAttribute("aria-current") ===
+            "page",
+          view: document
+            .querySelector(".demo-root")
+            ?.getAttribute("data-view"),
+        };
+      });
+      if (
+        liveNavigation.view !== "conversation" ||
+        !liveNavigation.liveSelected ||
+        liveNavigation.pullRequestSelected
+      ) {
+        throw new Error(
+          `${scene.id}: Live local navigation did not leave the pull request view: ${JSON.stringify(liveNavigation)}`,
+        );
+      }
       await writeFile(
         join(artifactDirectory, `${scene.id}.json`),
-        `${JSON.stringify({ expanded, initial, restored }, null, 2)}\n`,
+        `${JSON.stringify(
+          { expanded, initial, liveNavigation, restored },
+          null,
+          2,
+        )}\n`,
       );
       continue;
     }

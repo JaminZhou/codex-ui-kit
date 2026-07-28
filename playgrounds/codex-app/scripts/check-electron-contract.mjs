@@ -157,6 +157,41 @@ try {
       `Electron Review pointer resize failed: ${draggedReviewWidth}`,
     );
   }
+  await reviewResizer.press("End");
+  const maximumReviewGeometry = await workflowPage.evaluate(() => {
+    const shell = document
+      .querySelector(".codex-ui-app-shell")
+      ?.getBoundingClientRect();
+    const header = document
+      .querySelector(".codex-ui-thread-header")
+      ?.getBoundingClientRect();
+    const resizer = document
+      .querySelector(".codex-ui-app-shell__side-panel-resizer")
+      ?.getBoundingClientRect();
+    return {
+      ariaMax: document
+        .querySelector(".codex-ui-app-shell__side-panel-resizer")
+        ?.getAttribute("aria-valuemax"),
+      ariaNow: document
+        .querySelector(".codex-ui-app-shell__side-panel-resizer")
+        ?.getAttribute("aria-valuenow"),
+      mainWidth: header?.width,
+      trackWidth:
+        shell && resizer
+          ? shell.right - (resizer.left + resizer.width / 2)
+          : null,
+    };
+  });
+  if (
+    maximumReviewGeometry.ariaMax !== "554" ||
+    maximumReviewGeometry.ariaNow !== "554" ||
+    Math.abs((maximumReviewGeometry.mainWidth ?? 0) - 352) > 1 ||
+    Math.abs((maximumReviewGeometry.trackWidth ?? 0) - 554) > 1
+  ) {
+    throw new Error(
+      `Electron Review maximum track failed: ${JSON.stringify(maximumReviewGeometry)}`,
+    );
+  }
   await reviewResizer.press("Home");
   for (let index = 0; index < 6; index += 1) {
     await reviewResizer.press("ArrowLeft");
@@ -346,6 +381,22 @@ try {
     .getByRole("button", { name: "Restore panel width" })
     .click();
   await pullRequestPage.getByRole("tab", { name: "Summary" }).click();
+  await pullRequestPage.getByRole("button", { name: "Live local" }).click();
+  await pullRequestPage.waitForSelector(
+    '.demo-root[data-view="conversation"][data-mode="live"]',
+  );
+  if (
+    (await pullRequestPage
+      .getByRole("button", { name: "Live local" })
+      .getAttribute("aria-current")) !== "page" ||
+    (await pullRequestPage
+      .getByRole("button", { name: "Pull requests" })
+      .getAttribute("aria-current")) !== null
+  ) {
+    throw new Error(
+      "Electron Live local navigation did not leave the pull request view.",
+    );
+  }
 } finally {
   await pullRequestApp.close();
 }
