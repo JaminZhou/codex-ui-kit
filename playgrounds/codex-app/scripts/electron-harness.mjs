@@ -72,6 +72,7 @@ export const visualScenes = [
     fileCount: 8,
     frame: "review-open",
     id: "large-file-review",
+    maxPixelRatio: 0.004,
     scenario: "large-file-review",
     selectPath: ".research/large-review/08.ts",
     surfaces: ["fileChange", "reviewPanel"],

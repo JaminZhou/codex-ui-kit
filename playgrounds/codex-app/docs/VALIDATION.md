@@ -29,3 +29,9 @@ The checked-in screenshot baselines guard the integration demo. External
 Codex references remain untracked; their full, conversation, and Review
 region thresholds are enforced separately so a passing internal baseline
 cannot be mistaken for current-build parity.
+
+The 12 standard lifecycle frames keep the 0.25% internal raster limit. The
+large-Review frame uses a scoped 0.40% limit because its 96 dense monospace
+lines amplify macOS text-rasterization differences; CDP and Electron still
+gate file counts, overflow, split geometry, and exact last-file visibility
+independently.
