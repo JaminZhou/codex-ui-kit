@@ -749,4 +749,44 @@ for (const scene of visualScenes) {
   }
 }
 
+const markdownStartedScene = {
+  frame: "markdown-started",
+  id: "markdown-started",
+  scenario: "markdown",
+};
+const { app: markdownStartedApp, page: markdownStartedPage } =
+  await launchScene(markdownStartedScene, { capture: false });
+try {
+  const markdownStarted = await markdownStartedPage.evaluate(() => ({
+    actionCount: document.querySelectorAll(
+      '[aria-label="Markdown response actions"] button',
+    ).length,
+    frame: document
+      .querySelector(".demo-root")
+      ?.getAttribute("data-frame"),
+    messageStatus: document
+      .querySelector('[data-item-id="assistant-markdown"]')
+      ?.getAttribute("data-status"),
+    rootStatus: document
+      .querySelector(".demo-root")
+      ?.getAttribute("data-status"),
+    toolbarCount: document.querySelectorAll(
+      '[aria-label="Markdown response actions"]',
+    ).length,
+  }));
+  if (
+    markdownStarted.actionCount !== 0 ||
+    markdownStarted.frame !== "markdown-started" ||
+    markdownStarted.messageStatus !== "running" ||
+    markdownStarted.rootStatus !== "running" ||
+    markdownStarted.toolbarCount !== 0
+  ) {
+    throw new Error(
+      `markdown-started: running response actions were exposed: ${JSON.stringify(markdownStarted)}`,
+    );
+  }
+} finally {
+  await markdownStartedApp.close();
+}
+
 console.log(`CDP contracts passed for ${visualScenes.length} lifecycle frames.`);

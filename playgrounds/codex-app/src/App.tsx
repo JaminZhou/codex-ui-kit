@@ -792,7 +792,8 @@ export function App() {
             actions={
               mode === "replay" &&
               scenarioId === "markdown" &&
-              message.id === "assistant-markdown" ? (
+              message.id === "assistant-markdown" &&
+              message.status === "completed" ? (
                 <span
                   aria-label="Markdown response actions"
                   className="demo-turn-actions"
