@@ -561,6 +561,29 @@ export function FileReview({
     .filter(Boolean)
     .join(" ");
   const selectedFileRef = useRef<HTMLElement | null>(null);
+  const selectedFileIndex = selectedPath
+    ? files.findIndex(({ path }) => path === selectedPath)
+    : -1;
+  const selectedFileLayoutKey =
+    selectedFileIndex < 0
+      ? "missing"
+      : JSON.stringify(
+          files
+            .slice(0, selectedFileIndex + 1)
+            .map(({ change, lines, path, previousPath }) => ({
+              change,
+              lines: lines.map(
+                ({ content, kind, newLineNumber, oldLineNumber }) => ({
+                  content,
+                  kind,
+                  newLineNumber,
+                  oldLineNumber,
+                }),
+              ),
+              path,
+              previousPath,
+            })),
+        );
 
   useLayoutEffect(() => {
     const selectedFile = selectedFileRef.current;
@@ -572,7 +595,7 @@ export function FileReview({
       return;
     }
     selectedFile.scrollIntoView({ block: "nearest", inline: "nearest" });
-  }, [files, selectedPath, selectionKey]);
+  }, [selectedFileLayoutKey, selectedPath, selectionKey, wrapLines]);
 
   return (
     <div

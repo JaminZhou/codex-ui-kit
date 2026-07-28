@@ -453,6 +453,17 @@ describe("FileReview", () => {
 
       expect(scrollIntoView).toHaveBeenCalledOnce();
       expect(scrollIntoView.mock.instances[0]).toBe(selectedFile);
+
+      scrollIntoView.mockClear();
+      rerender(
+        <FileReview
+          files={[files[1], files[0]]}
+          selectedPath={files[1].path}
+          selectionKey={2}
+        />,
+      );
+
+      expect(scrollIntoView).not.toHaveBeenCalled();
     } finally {
       if (originalScrollIntoView) {
         Object.defineProperty(

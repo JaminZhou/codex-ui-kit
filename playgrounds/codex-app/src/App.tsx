@@ -115,7 +115,10 @@ export function App() {
   const liveApprovalSubmissionGateRef = useRef(
     new LiveApprovalSubmissionGate(),
   );
-  const replay = replayState(scenario.events, replayCount);
+  const replay = useMemo(
+    () => replayState(scenario.events, replayCount),
+    [replayCount, scenario.events],
+  );
   const state = mode === "live" ? liveState : replay;
 
   useEffect(() => {
