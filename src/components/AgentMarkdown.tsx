@@ -67,6 +67,27 @@ export interface CodeBlockProps
   wrap?: boolean;
 }
 
+function CodeCopyIcon({ copied = false }: { copied?: boolean }) {
+  return copied ? (
+    <svg
+      aria-hidden="true"
+      className="codex-ui-code-block__copy-icon"
+      viewBox="0 0 16 16"
+    >
+      <path d="m3.5 8.25 2.75 2.75 6.25-6.25" />
+    </svg>
+  ) : (
+    <svg
+      aria-hidden="true"
+      className="codex-ui-code-block__copy-icon"
+      viewBox="0 0 16 16"
+    >
+      <rect height="8.5" rx="1.5" width="8.5" x="5" y="2.5" />
+      <path d="M10.5 11v1A1.5 1.5 0 0 1 9 13.5H4A1.5 1.5 0 0 1 2.5 12V7A1.5 1.5 0 0 1 4 5.5h1" />
+    </svg>
+  );
+}
+
 async function copyText(value: string) {
   if (typeof navigator === "undefined" || !navigator.clipboard?.writeText) {
     return false;
@@ -80,8 +101,8 @@ export function CodeBlock({
   children,
   className,
   codeHighlighter,
-  copiedLabel = "Copied",
-  copyLabel = "Copy code",
+  copiedLabel = <CodeCopyIcon copied />,
+  copyLabel = <CodeCopyIcon />,
   copyable = true,
   deferHighlightUntilVisible = true,
   language,

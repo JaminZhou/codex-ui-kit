@@ -2,6 +2,7 @@ import compactionTrace from "../fixtures/traces/compaction.jsonl?raw";
 import backgroundTerminalTrace from "../fixtures/traces/background-terminal.jsonl?raw";
 import interruptionTrace from "../fixtures/traces/interruption.jsonl?raw";
 import largeFileReviewTrace from "../fixtures/traces/large-file-review.jsonl?raw";
+import markdownTrace from "../fixtures/traces/markdown.jsonl?raw";
 import multiFileReviewTrace from "../fixtures/traces/multi-file-review.jsonl?raw";
 import recoveryTrace from "../fixtures/traces/streaming-recovery.jsonl?raw";
 import workflowTrace from "../fixtures/traces/workspace-workflow.jsonl?raw";
@@ -13,6 +14,7 @@ export type ReplayScenarioId =
   | "interruption"
   | "compaction"
   | "large-file-review"
+  | "markdown"
   | "multi-file-review"
   | "workspace-workflow";
 
@@ -98,6 +100,12 @@ export const replayScenarios: Record<ReplayScenarioId, ReplayScenario> = {
     "Large Review workspace",
     "Eight files and long diffs exercise panel scrolling and exact file reveal.",
     largeFileReviewTrace,
+  ),
+  markdown: scenario(
+    "markdown",
+    "Markdown response",
+    "Heading, inline semantics, quote, list, table, code, and response actions.",
+    markdownTrace,
   ),
 };
 

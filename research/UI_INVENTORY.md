@@ -46,7 +46,7 @@ observation from a previous build remains historical evidence.
 ## Current baseline
 
 - Codex Desktop `26.721.41059` (`5848`)
-- Sampled on 2026-07-26 and reverified on 2026-07-28
+- Sampled on 2026-07-26 and reverified on 2026-07-29
 - `app.asar` SHA-256:
   `da39a51b06fb4c728d418b8f0f05fc8fd8c6b1f74c4fb4d47c20c7914a798f45`
 - Computer Use automation: blocked by the environment safety policy for
@@ -55,9 +55,9 @@ observation from a previous build remains historical evidence.
   the Chromium profile is separate, but Codex application data and navigation
   are not fully isolated
 - Current inventory: 63 surface groups; 43 have scoped runtime evidence, of
-  which 28 include current-build structural evidence and 15 are previous-build
-  only; another 20 remain `not_sampled`. Browser verification covers 21
-  groups and Electron verification covers 18.
+  which 29 include current-build structural evidence and 14 are previous-build
+  only; another 20 remain `not_sampled`. Browser verification covers 22
+  groups and Electron verification covers 19.
 
 The current package exposes candidates far beyond the old transcript sample:
 application and thread shells, local/remote conversation routes, projects and
@@ -72,7 +72,7 @@ dialogs, and now revalidates the Pull requests index plus an aggregate
 multi-file change/Review flow. It also measures the application-navigation
 resize handle and its 240–520px range, the independent Review-panel resize
 track, and one public PR's Summary, Timeline, and Code views. The broader
-queue, Markdown, Sources, Sites, Scheduled tasks, Plugins, Skills,
+queue, Sources, Sites, Scheduled tasks, Plugins, Skills,
 and Settings samples were recorded on `26.715.72359`. Those entries remain
 `runtime_observed` with build-scoped evidence, but they do not satisfy the
 current-build verification gate until reached again. The seed list is not an
@@ -319,10 +319,22 @@ and completed states rather than driving their host transition, so
 the still-unreached thread summary panel.
 
 This is a measurement- and raster-backed basic thread/workspace slice, not a
-claim that the whole application or every lifecycle is pixel-perfect.
+claim that the whole application or every lifecycle is pixel-perfect. Broader
 Markdown variants, the exact host virtualization algorithm, code search,
 successful MCP and connector calls, thread-level retry recovery, approval
 persistence and timeout, mixed multi-file change kinds, PR
 merge/review-submission states, Terminal multi-tab and
 process-creation/termination lifecycles, and native Codex window behavior
 retain their own inventory gates.
+
+The current Markdown slice revalidates one synthetic completed response on
+build `26.721.41059`. CDP records semantic heading, paragraph, link, inline
+code, quote, list, table, fenced-code, and action/copy controls together with
+their computed styles. The protocol replay adds a sixteenth deterministic
+frame; Browser and Electron gates verify external-link semantics, code-copy
+behavior, the four completed-response actions, 736px content geometry, and
+the measured scroll clearance above the 736px Composer. A main-only 906×820
+reference compares assistant, code-card, and Composer ownership regions
+independently. This promotes only the sampled completed Markdown vocabulary;
+nested lists, task lists, images, math, citations/sources, very large tables,
+streaming Markdown mutation, and error variants remain open.

@@ -18,6 +18,12 @@ export const visualScenes = [
     scenario: "streaming-recovery",
   },
   {
+    frame: "markdown-complete",
+    id: "markdown-complete",
+    maxPixelRatio: 0.01,
+    scenario: "markdown",
+  },
+  {
     frame: "interrupted",
     id: "interrupted",
     scenario: "interruption",

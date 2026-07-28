@@ -63,6 +63,7 @@ describe("AgentMarkdown", () => {
     expect(html).toContain('loading="lazy"');
     expect(html).toContain('data-markdown-copy="code-block"');
     expect(html).toContain('data-language="ts"');
+    expect(html).toContain('<pre><figure class="codex-ui-code-block"');
     expect(html).toContain('class="codex-ui-code-block__body" dir="ltr" tabindex="0"');
     expect(html).toContain("const ready = true;");
     expect(html).not.toContain("node=");
@@ -163,13 +164,38 @@ describe("AgentMarkdown", () => {
     fireEvent.click(screen.getByRole("button", { name: "Copy code" }));
 
     await waitFor(() => expect(screen.getByText("copied 19")).toBeTruthy());
-    expect(screen.getByRole("button", { name: "Copied" }).textContent).toBe(
-      "Copied",
-    );
+    expect(
+      screen.getByRole("button", { name: "Copied" }).querySelector("svg"),
+    ).toBeTruthy();
   });
 });
 
 describe("CodeBlock", () => {
+  it("preserves custom visible copy labels", () => {
+    const html = renderToStaticMarkup(
+      <CodeBlock copiedLabel="Copied source" copyLabel="Copy source">
+        const ready = true;
+      </CodeBlock>,
+    );
+
+    expect(html).toContain(">Copy source</button>");
+  });
+
+  it("does not opt a custom copy SVG into built-in glyph styling", () => {
+    const html = renderToStaticMarkup(
+      <CodeBlock
+        copyLabel={
+          <svg data-custom-copy-icon="true" fill="currentColor" />
+        }
+      >
+        const ready = true;
+      </CodeBlock>,
+    );
+
+    expect(html).toContain('data-custom-copy-icon="true"');
+    expect(html).not.toContain("codex-ui-code-block__copy-icon");
+  });
+
   it("defers highlighting until code is near the viewport", async () => {
     let intersect: IntersectionObserverCallback | undefined;
     const observe = vi.fn();
@@ -337,9 +363,9 @@ describe("CodeBlock", () => {
     await waitFor(() =>
       expect(onCopy).toHaveBeenCalledWith("const value = true;"),
     );
-    expect(screen.getByRole("button", { name: "Copied" }).textContent).toBe(
-      "Copied",
-    );
+    expect(
+      screen.getByRole("button", { name: "Copied" }).querySelector("svg"),
+    ).toBeTruthy();
   });
 
   it("supports wrapped and non-copyable code states", () => {
@@ -362,7 +388,9 @@ describe("CodeBlock", () => {
 
     const button = screen.getByRole("button", { name: "Copy code" });
     fireEvent.click(button);
-    await waitFor(() => expect(button.textContent).toBe("Copy code"));
+    await waitFor(() =>
+      expect(button.getAttribute("aria-label")).toBe("Copy code"),
+    );
     expect(button.getAttribute("data-copied")).toBeNull();
   });
 });

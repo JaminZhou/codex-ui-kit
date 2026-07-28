@@ -433,10 +433,13 @@ export function App() {
     />
   );
 
+  const showMeasuredComposer =
+    mode === "replay" &&
+    (scenarioId === "multi-file-review" || scenarioId === "markdown");
   const composer = (
     <AgentComposer
       actions={
-        mode === "replay" && scenarioId === "multi-file-review" ? (
+        showMeasuredComposer ? (
           <span className="demo-composer-controls">
             <button aria-label="Add context" type="button">
               +
@@ -447,7 +450,7 @@ export function App() {
       }
       aria-busy={liveStartPending || undefined}
       controls={
-        mode === "replay" && scenarioId === "multi-file-review" ? (
+        showMeasuredComposer ? (
           <span className="demo-composer-actions">
             <span>5.6 Sol Extra High⌄</span>
             <button aria-label="Voice input" type="button">
@@ -458,16 +461,12 @@ export function App() {
       }
       disabled={liveStartPending}
       isRunning={isTurnActive(liveState.status)}
-      layout={
-        mode === "replay" && scenarioId === "multi-file-review"
-          ? "multiline"
-          : "auto"
-      }
+      layout={showMeasuredComposer ? "multiline" : "auto"}
       onStop={stopLive}
       onSubmit={submitLive}
       onValueChange={setComposerValue}
       placeholder={
-        mode === "replay" && scenarioId === "multi-file-review"
+        showMeasuredComposer
           ? "Do anything"
           : mode === "live"
           ? "Ask Codex to inspect this repository…"
@@ -790,12 +789,40 @@ export function App() {
       return (
         <Fragment key={`message:${message.id}`}>
           <AgentMessage
+            actions={
+              mode === "replay" &&
+              scenarioId === "markdown" &&
+              message.id === "assistant-markdown" &&
+              message.status === "completed" ? (
+                <span
+                  aria-label="Markdown response actions"
+                  className="demo-turn-actions"
+                  role="toolbar"
+                >
+                  <button aria-label="Copy response" type="button">
+                    ▣
+                  </button>
+                  <button aria-label="Good response" type="button">
+                    ♡
+                  </button>
+                  <button aria-label="Bad response" type="button">
+                    ♢
+                  </button>
+                  <button aria-label="Share response" type="button">
+                    ↗
+                  </button>
+                </span>
+              ) : undefined
+            }
             data-item-id={message.id}
             role={message.role}
             status={agentMessageStatus(message.status)}
           >
             {message.role === "assistant" ? (
-              <AgentMarkdown streaming={message.status === "running"}>
+              <AgentMarkdown
+                linkTarget="_blank"
+                streaming={message.status === "running"}
+              >
                 {message.text || " "}
               </AgentMarkdown>
             ) : (

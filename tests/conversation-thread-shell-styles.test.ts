@@ -22,6 +22,9 @@ describe("current conversation thread shell visual contract", () => {
       "--codex-ui-conversation-thread-composer-bottom-inset: 1rem",
     );
     expect(tokens).toContain(
+      "--codex-ui-conversation-thread-composer-scroll-clearance: 3.75rem",
+    );
+    expect(tokens).toContain(
       "--codex-ui-conversation-thread-composer-control-size: 1.75rem",
     );
     expect(tokens).toContain(
@@ -52,6 +55,9 @@ describe("current conversation thread shell visual contract", () => {
     expect(styles).toContain("position: absolute");
     expect(styles).toContain(
       "--codex-ui-conversation-thread-composer-dock-height",
+    );
+    expect(styles).toContain(
+      "--codex-ui-conversation-thread-composer-scroll-clearance",
     );
     expect(styles).toContain(
       "--codex-ui-floating-control-composer-offset: var(\n    --codex-ui-conversation-thread-composer-dock-height,\n    var(--codex-ui-conversation-thread-composer-reserve)",

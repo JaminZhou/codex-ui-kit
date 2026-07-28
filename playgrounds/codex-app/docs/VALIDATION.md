@@ -23,7 +23,9 @@ Every deterministic scenario has one ID and produces four evidence layers:
    its own 906×820 reference through
    `CODEX_UI_KIT_PULL_REQUEST_REFERENCE`; the Terminal scenario accepts a
    906×820 reference through `CODEX_UI_KIT_TERMINAL_REFERENCE` and gates the
-   shared panel and content regions separately.
+   shared panel and content regions separately; the completed-Markdown
+   scenario accepts `CODEX_UI_KIT_MARKDOWN_REFERENCE` and gates assistant,
+   fenced-code, and Composer regions separately.
 
 The layers do not vote on the same claim. Protocol proves lifecycle behavior;
 CDP explains layout; Electron proves the desktop host; pixels catch final
@@ -53,4 +55,10 @@ resizing, and expansion independently. Its optional current-build gate allows
 at most 6.5% full-main, 5.5% index, and 7% detail difference at the stricter
 0.05 pixel threshold. The fifteenth Terminal frame keeps the standard 0.25%
 internal limit; its optional current-build gate allows at most 2% panel and 1%
-content difference at the same 0.05 threshold.
+content difference at the same 0.05 threshold. The sixteenth completed-Markdown
+frame uses a scoped 1% internal limit for dense text rasterization and hides
+only the capture-time scrollbar so overlay and space-consuming macOS scrollbar
+settings cannot shift the centered content by 7.5px. CDP still checks the real
+scroll container and geometry. Its optional current-build gate allows at most
+2% assistant, 2% fenced-code, and 2.5% Composer-region difference at the same
+threshold.

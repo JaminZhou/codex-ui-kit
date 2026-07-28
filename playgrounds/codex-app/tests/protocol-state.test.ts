@@ -25,6 +25,29 @@ describe("protocol lifecycle reducer", () => {
     expect(finalState.messages.at(-1)?.text).toContain("across retries");
   });
 
+  it("replays the fixed Markdown response from public protocol messages", () => {
+    const scenario = replayScenarios.markdown;
+    const runningState = reduceProtocolTrace(
+      scenario.events.slice(0, scenario.frames["markdown-started"]),
+    );
+    const state = reduceProtocolTrace(scenario.events);
+    const assistant = state.messages.find(
+      ({ id }) => id === "assistant-markdown",
+    );
+
+    expect(runningState.status).toBe("running");
+    expect(
+      runningState.messages.find(({ id }) => id === "assistant-markdown")
+        ?.status,
+    ).toBe("running");
+    expect(state.status).toBe("completed");
+    expect(assistant?.status).toBe("completed");
+    expect(assistant?.text).toContain("# Current-build Markdown sample");
+    expect(assistant?.text).toContain("| Markdown | Ready |");
+    expect(assistant?.text).toContain("```ts");
+    expect(scenario.frames["markdown-complete"]).toBe(scenario.events.length);
+  });
+
   it("preserves an interrupted assistant partial and exposes the stop state", () => {
     const state = reduceProtocolTrace(
       replayScenarios.interruption.events,

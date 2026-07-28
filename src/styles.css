@@ -2059,12 +2059,15 @@
   padding-top: var(
     --codex-ui-thread-content-top-inset
   );
-  padding-bottom: var(
-    --codex-ui-conversation-thread-composer-dock-height,
-    calc(
-      var(--codex-ui-conversation-thread-composer-reserve) +
-        var(--codex-ui-thread-content-bottom-inset)
-    )
+  padding-bottom: calc(
+    var(
+        --codex-ui-conversation-thread-composer-dock-height,
+        calc(
+          var(--codex-ui-conversation-thread-composer-reserve) +
+            var(--codex-ui-thread-content-bottom-inset)
+        )
+      ) +
+      var(--codex-ui-conversation-thread-composer-scroll-clearance)
   );
 }
 
@@ -5840,8 +5843,8 @@ summary.codex-ui-activity__header::after {
 
 .codex-ui-markdown {
   color: var(--codex-ui-text);
-  font-size: var(--codex-ui-font-size-chat);
-  line-height: var(--codex-ui-line-height-chat);
+  font-size: var(--codex-ui-markdown-font-size);
+  line-height: var(--codex-ui-markdown-line-height);
   min-width: 0;
   overflow-wrap: anywhere;
 }
@@ -5916,6 +5919,7 @@ summary.codex-ui-activity__header::after {
 
 .codex-ui-markdown ul {
   list-style-type: disc;
+  margin-bottom: 0.625rem;
 }
 
 .codex-ui-markdown ol {
@@ -5973,6 +5977,7 @@ summary.codex-ui-activity__header::after {
 
 .codex-ui-markdown blockquote {
   line-height: 1.5rem;
+  margin-bottom: 0.5rem;
   padding-block: 0.5rem;
   padding-inline-start: 1.5rem;
   position: relative;
@@ -5993,6 +5998,10 @@ summary.codex-ui-activity__header::after {
   margin-bottom: 0;
 }
 
+.codex-ui-markdown blockquote p {
+  line-height: var(--codex-ui-markdown-line-height);
+}
+
 .codex-ui-markdown hr {
   border: 0;
   border-top: 1px solid var(--codex-ui-border-strong);
@@ -6000,7 +6009,7 @@ summary.codex-ui-activity__header::after {
 }
 
 .codex-ui-inline-code {
-  background: var(--codex-ui-inline-code-bg);
+  background: var(--codex-ui-markdown-inline-code-bg);
   border-radius: var(--codex-ui-radius-sm);
   box-decoration-break: clone;
   display: inline;
@@ -6014,7 +6023,7 @@ summary.codex-ui-activity__header::after {
 
 .codex-ui-code-block {
   background: var(--codex-ui-code-block-bg);
-  border-radius: var(--codex-ui-radius-md);
+  border-radius: var(--codex-ui-markdown-code-block-radius);
   margin: 0.875rem 0;
   min-width: 0;
   overflow: clip;
@@ -6025,10 +6034,10 @@ summary.codex-ui-activity__header::after {
   color: var(--codex-ui-text-secondary);
   display: flex;
   font-family: var(--codex-ui-font-sans);
-  font-size: var(--codex-ui-font-size-sm);
+  font-size: var(--codex-ui-font-size-xs);
   justify-content: space-between;
   line-height: var(--codex-ui-line-height-sm);
-  min-height: 1.625rem;
+  min-height: var(--codex-ui-markdown-code-block-header-height);
   padding: 0.25rem 0.5rem;
   user-select: none;
 }
@@ -6041,14 +6050,30 @@ summary.codex-ui-activity__header::after {
 }
 
 .codex-ui-code-block__copy {
+  align-items: center;
   background: transparent;
   border: 0;
   border-radius: var(--codex-ui-radius-sm);
   color: inherit;
   cursor: pointer;
+  display: inline-flex;
+  flex: 0 0 auto;
   font: inherit;
+  height: 1.375rem;
+  justify-content: center;
   margin-inline-start: 0.75rem;
-  padding: 0.1875rem 0.375rem;
+  min-width: 1.375rem;
+  padding: 0 0.1875rem;
+}
+
+.codex-ui-code-block__copy-icon {
+  fill: none;
+  height: 1rem;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.25;
+  width: 1rem;
 }
 
 .codex-ui-code-block__copy:hover,
@@ -6065,11 +6090,11 @@ summary.codex-ui-activity__header::after {
 .codex-ui-code-block__body {
   direction: ltr;
   font-family: var(--codex-ui-font-mono);
-  font-size: var(--codex-ui-font-size-code);
-  line-height: var(--codex-ui-line-height-code);
+  font-size: var(--codex-ui-markdown-code-font-size);
+  line-height: var(--codex-ui-markdown-code-line-height);
   margin: 0;
   overflow-x: auto;
-  padding: 0.5rem;
+  padding: var(--codex-ui-markdown-code-block-body-padding-block) 0.5rem;
   text-align: left;
 }
 
@@ -6161,7 +6186,11 @@ summary.codex-ui-activity__header::after {
   word-break: break-word;
 }
 
-.codex-ui-markdown__table-scroll {
+.codex-ui-markdown > pre:last-child > .codex-ui-code-block:only-child {
+  margin-bottom: 0;
+}
+
+.codex-ui-markdown .codex-ui-markdown__table-scroll {
   margin-inline: calc(-1 * var(--codex-ui-markdown-inline-overhang));
   overflow-x: auto;
   padding-inline: var(--codex-ui-markdown-inline-overhang);

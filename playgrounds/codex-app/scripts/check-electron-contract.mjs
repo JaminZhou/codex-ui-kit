@@ -106,6 +106,81 @@ try {
   await app.close();
 }
 
+const markdownScene = {
+  frame: "markdown-complete",
+  id: "electron-markdown",
+  scenario: "markdown",
+};
+const { app: markdownApp, page: markdownPage } = await launchScene(
+  markdownScene,
+  { capture: false },
+);
+
+try {
+  const markdownNativeState = await markdownApp.evaluate(
+    ({ BrowserWindow }) => BrowserWindow.getAllWindows()[0]?.getContentBounds(),
+  );
+  if (
+    markdownNativeState?.width !== 1180 ||
+    markdownNativeState?.height !== 820
+  ) {
+    throw new Error(
+      `Electron Markdown native bounds failed: ${JSON.stringify(markdownNativeState)}`,
+    );
+  }
+
+  await markdownPage.evaluate(() => {
+    Object.defineProperty(navigator, "clipboard", {
+      configurable: true,
+      value: {
+        writeText: async (value) => {
+          window.__codexMarkdownCopiedText = value;
+        },
+      },
+    });
+  });
+  const markdownCopy = markdownPage.getByRole("button", {
+    name: "Copy code",
+  });
+  await markdownCopy.click();
+  await markdownPage.getByRole("button", { name: "Copied" }).waitFor();
+  const markdownInteraction = await markdownPage.evaluate(() => {
+    const tableScroll = document.querySelector(
+      ".codex-ui-markdown__table-scroll",
+    );
+    tableScroll?.focus();
+    return {
+      actionCount: document.querySelectorAll(
+        '[aria-label="Markdown response actions"] button',
+      ).length,
+      copiedText: window.__codexMarkdownCopiedText,
+      copyFocused:
+        document
+          .querySelector(".codex-ui-code-block__copy")
+          ?.getAttribute("data-copied") === "true",
+      linkTarget: document
+        .querySelector(
+          '[data-item-id="assistant-markdown"] a[href^="https://example.com"]',
+        )
+        ?.getAttribute("target"),
+      tableFocused: document.activeElement === tableScroll,
+    };
+  });
+  if (
+    markdownInteraction.actionCount !== 4 ||
+    markdownInteraction.copiedText !== "const ready = true;" ||
+    !markdownInteraction.copyFocused ||
+    markdownInteraction.linkTarget !== "_blank" ||
+    !markdownInteraction.tableFocused
+  ) {
+    throw new Error(
+      `Electron Markdown interaction failed: ${JSON.stringify(markdownInteraction)}`,
+    );
+  }
+} finally {
+  await markdownApp.close();
+}
+
 const workflowScene = {
   frame: "review-open",
   id: "electron-workflow",

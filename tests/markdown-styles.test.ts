@@ -7,26 +7,50 @@ const tokens = readFileSync(new URL("../src/tokens.css", import.meta.url), "utf8
 describe("Markdown visual contract", () => {
   it("keeps the measured chat and code typography", () => {
     expect(tokens).toContain(
-      "--codex-ui-font-size-chat: var(--codex-ui-font-size-md)",
+      "--codex-ui-markdown-font-size: var(--codex-ui-font-size-sm)",
+    );
+    expect(tokens).toContain("--codex-ui-markdown-line-height: 1.375rem");
+    expect(tokens).toContain(
+      "--codex-ui-markdown-code-font-size: var(--codex-ui-font-size-sm)",
     );
     expect(tokens).toContain(
-      "--codex-ui-font-size-code: var(--codex-ui-font-size-xs)",
+      "--codex-ui-markdown-code-line-height: 1.375rem",
     );
-    expect(tokens).toContain(
-      "--codex-ui-line-height-chat: calc(var(--codex-ui-font-size-chat) + 0.5rem)",
-    );
-    expect(tokens).toContain("--codex-ui-line-height-code: 1.25rem");
     expect(styles).toContain("padding: 0.0625rem 0.375rem");
   });
 
   it("keeps the measured block, quote, code, and table geometry", () => {
     expect(tokens).toContain("--codex-ui-markdown-block-gap: 0.6875rem");
     expect(tokens).toContain("--codex-ui-markdown-table-max-width: 40rem");
+    expect(tokens).toContain(
+      "--codex-ui-markdown-code-block-radius: 0.78125rem",
+    );
+    expect(tokens).toContain(
+      "--codex-ui-markdown-code-block-header-height: 1.875rem",
+    );
     expect(styles).toContain("padding-inline-start: 1.3125rem");
     expect(styles).toContain("padding-inline-start: 1.5rem");
     expect(styles).toContain("width: 0.25rem");
     expect(styles).toContain("margin: 0.875rem 0");
     expect(styles).toContain("padding-inline-end: 1.5rem");
+  });
+
+  it("keeps links identifiable and lets custom copy labels size to content", () => {
+    expect(styles).toContain("text-decoration: underline");
+    expect(styles).toContain("font: inherit");
+    expect(styles).toContain("min-width: 1.375rem");
+    expect(styles).toContain("padding: 0 0.1875rem");
+    expect(styles).toContain(".codex-ui-code-block__copy-icon");
+    expect(styles).not.toContain(".codex-ui-code-block__copy svg");
+  });
+
+  it("resets only a top-level final code block margin", () => {
+    expect(styles).toContain(
+      ".codex-ui-markdown > pre:last-child > .codex-ui-code-block:only-child",
+    );
+    expect(styles).not.toContain(
+      ".codex-ui-markdown .codex-ui-code-block:last-child",
+    );
   });
 
   it("does not rely on a host box-sizing reset for table overhangs", () => {
