@@ -222,6 +222,27 @@ function appendTerminalEvent(
   ];
 }
 
+function terminalEventsFromAggregate(
+  command: DemoCommandExecution | undefined,
+  aggregatedOutput: string | null,
+): DemoTerminalEvent[] {
+  const events = command?.terminalEvents ?? [];
+  if (!aggregatedOutput) return events;
+  if (events.length === 0) {
+    return [{ kind: "stdout", text: aggregatedOutput }];
+  }
+  if (!command || !aggregatedOutput.startsWith(command.output)) {
+    return events;
+  }
+  const unobservedOutput = aggregatedOutput.slice(command.output.length);
+  return unobservedOutput
+    ? appendTerminalEvent(events, {
+        kind: "stdout",
+        text: unobservedOutput,
+      })
+    : events;
+}
+
 function commandStatus(
   value: unknown,
 ): DemoCommandExecution["status"] {
@@ -511,18 +532,22 @@ export function reduceProtocolNotification(
     if (itemType === "commandExecution") {
       const status = commandStatus(item.status);
       const command = state.commands.find(({ id }) => id === itemId);
+      const aggregatedOutput = asString(item.aggregatedOutput);
+      const terminalEvents = terminalEventsFromAggregate(
+        command,
+        aggregatedOutput,
+      );
       const commands = upsertById(state.commands, {
         command: asString(item.command) ?? command?.command ?? "",
         cwd: asString(item.cwd) ?? command?.cwd ?? "",
         durationMs: asNumber(item.durationMs),
         exitCode: asNumber(item.exitCode),
         id: itemId,
-        output:
-          asString(item.aggregatedOutput) ?? command?.output ?? "",
+        output: aggregatedOutput ?? command?.output ?? "",
         processId:
           asString(item.processId) ?? command?.processId ?? null,
         status,
-        terminalEvents: command?.terminalEvents ?? [],
+        terminalEvents,
         terminalInput: command?.terminalInput ?? "",
         turnId: itemTurnId,
       });

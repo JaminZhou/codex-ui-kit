@@ -382,6 +382,59 @@ describe("protocol lifecycle reducer", () => {
     ]);
   });
 
+  it("seeds resumed terminal output before appending live deltas", () => {
+    const started = reduceProtocolNotification(initialProtocolState, {
+      method: "item/started",
+      params: {
+        item: {
+          aggregatedOutput: "existing\n",
+          command: "pnpm dev",
+          id: "command-resumed",
+          processId: "process-resumed",
+          status: "inProgress",
+          type: "commandExecution",
+        },
+        threadId: "thread-demo",
+        turnId: "turn-terminal",
+      },
+    });
+    const withDelta = reduceProtocolNotification(started, {
+      method: "item/commandExecution/outputDelta",
+      params: {
+        delta: "new\n",
+        itemId: "command-resumed",
+        threadId: "thread-demo",
+        turnId: "turn-terminal",
+      },
+    });
+    const completed = reduceProtocolNotification(withDelta, {
+      method: "item/completed",
+      params: {
+        item: {
+          aggregatedOutput: "existing\nnew\nfinished\n",
+          command: "pnpm dev",
+          id: "command-resumed",
+          processId: "process-resumed",
+          status: "completed",
+          type: "commandExecution",
+        },
+        threadId: "thread-demo",
+        turnId: "turn-terminal",
+      },
+    });
+
+    expect(withDelta.commands[0]?.output).toBe("existing\nnew\n");
+    expect(withDelta.commands[0]?.terminalEvents).toEqual([
+      { kind: "stdout", text: "existing\nnew\n" },
+    ]);
+    expect(completed.commands[0]?.output).toBe(
+      "existing\nnew\nfinished\n",
+    );
+    expect(completed.commands[0]?.terminalEvents).toEqual([
+      { kind: "stdout", text: "existing\nnew\nfinished\n" },
+    ]);
+  });
+
   it("preserves both files in the dedicated multi-file review trace", () => {
     const completed = reduceProtocolTrace(
       replayScenarios["multi-file-review"].events,
