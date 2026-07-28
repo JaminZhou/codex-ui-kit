@@ -4,7 +4,7 @@
     "appVersion": "26.721.41059",
     "buildNumber": "5848",
     "sampledAt": "2026-07-26",
-    "reverifiedAt": "2026-07-26",
+    "reverifiedAt": "2026-07-28",
     "appAsarSha256": "da39a51b06fb4c728d418b8f0f05fc8fd8c6b1f74c4fb4d47c20c7914a798f45",
     "runtimeEvidence": "partial_cdp",
     "runtimeEvidenceBuilds": {
@@ -145,7 +145,8 @@
       "packageEvidence": ["file-diff", "message-square-diff"],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
-        "cdp-26.721:synthetic-applied-file-change-card-undo-review"
+        "cdp-26.721:synthetic-applied-file-change-card-undo-review",
+        "cdp-26.721:synthetic-two-file-change-group-undo-review-800x600"
       ],
       "implementationStatus": "partial",
       "browserStatus": "verified",
@@ -505,7 +506,8 @@
         "cdp:right-review-panel-layout",
         "cdp:right-environment-panel-layout",
         "cdp:right-sources-tabpanel-layout",
-        "cdp-26.721:synthetic-review-panel-turn-file-diff-split-1072x820"
+        "cdp-26.721:synthetic-review-panel-turn-file-diff-split-1072x820",
+        "cdp-26.721:synthetic-multi-file-review-split-800x600-and-1180x820"
       ],
       "implementationStatus": "partial",
       "browserStatus": "verified",
@@ -520,7 +522,23 @@
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
         "cdp:review-panel-file-diff-list",
-        "cdp-26.721:synthetic-review-panel-single-addition-diff"
+        "cdp-26.721:synthetic-review-panel-single-addition-diff",
+        "cdp-26.721:synthetic-two-file-stacked-review-diffs"
+      ],
+      "implementationStatus": "partial",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
+      "priority": "p0"
+    },
+    {
+      "id": "workspace.multi-file-review",
+      "area": "workspace",
+      "ownership": "workspace",
+      "packageEvidence": ["editor-diff-page", "file-diff", "message-square-diff"],
+      "runtimeStatus": "runtime_observed",
+      "runtimeEvidence": [
+        "cdp-26.721:synthetic-two-file-change-group-and-stacked-review",
+        "cdp-26.721:synthetic-multi-file-review-close-reopen-lifecycle"
       ],
       "implementationStatus": "partial",
       "browserStatus": "verified",
@@ -547,7 +565,10 @@
       "ownership": "workspace",
       "packageEvidence": ["pull-request-route", "pull-request-actions", "pull-request-detail-query", "pull-request-media"],
       "runtimeStatus": "runtime_observed",
-      "runtimeEvidence": ["cdp:pull-request-index-tabs-search-split-layout"],
+      "runtimeEvidence": [
+        "cdp:pull-request-index-tabs-search-split-layout",
+        "cdp-26.721:pull-request-index-all-search-lists-800x600"
+      ],
       "implementationStatus": "partial",
       "browserStatus": "partial_legacy",
       "electronStatus": "partial_legacy",

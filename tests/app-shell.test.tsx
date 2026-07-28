@@ -78,6 +78,37 @@ describe("application shell", () => {
     }
   });
 
+  it("lets host-specific split CSS keep matching non-modal behavior", () => {
+    const { container } = render(
+      <AppShell
+        layoutMode="wide"
+        sidePanel={<button type="button">Review files</button>}
+        sidePanelOpen
+        sidebar={<button type="button">Projects</button>}
+        sidebarOpen
+      >
+        <button type="button">Conversation action</button>
+      </AppShell>,
+    );
+
+    const shell = container.querySelector(".codex-ui-app-shell")!;
+    const main = container.querySelector(".codex-ui-app-shell__main")!;
+    const sidePanel = container.querySelector(
+      ".codex-ui-app-shell__side-panel",
+    )!;
+
+    expect(shell.getAttribute("data-layout-mode")).toBe("wide");
+    expect(main.hasAttribute("inert")).toBe(false);
+    expect(sidePanel.hasAttribute("inert")).toBe(false);
+    expect(sidePanel.getAttribute("aria-hidden")).toBe("false");
+    expect(
+      screen.getByRole("button", { name: "Conversation action" }),
+    ).toBeTruthy();
+    expect(
+      screen.getByRole("button", { name: "Review files" }),
+    ).toBeTruthy();
+  });
+
   it("exposes controlled overlay dismissal", () => {
     const onSidebarOpenChange = vi.fn();
     const onSidePanelOpenChange = vi.fn();

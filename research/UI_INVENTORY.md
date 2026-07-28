@@ -46,7 +46,7 @@ observation from a previous build remains historical evidence.
 ## Current baseline
 
 - Codex Desktop `26.721.41059` (`5848`)
-- Sampled and runtime-probed on 2026-07-26
+- Sampled on 2026-07-26 and reverified on 2026-07-28
 - `app.asar` SHA-256:
   `da39a51b06fb4c728d418b8f0f05fc8fd8c6b1f74c4fb4d47c20c7914a798f45`
 - Computer Use automation: blocked by the environment safety policy for
@@ -54,9 +54,10 @@ observation from a previous build remains historical evidence.
 - Scoped CDP automation: available through a user-authorized second process;
   the Chromium profile is separate, but Codex application data and navigation
   are not fully isolated
-- Current inventory: 62 surface groups; 41 have scoped runtime evidence, of
-  which 23 include current-build structural evidence and 18 are previous-build
-  only; another 21 remain `not_sampled`
+- Current inventory: 63 surface groups; 42 have scoped runtime evidence, of
+  which 25 include current-build structural evidence and 17 are previous-build
+  only; another 21 remain `not_sampled`. Browser verification covers 16
+  groups and Electron verification covers 13.
 
 The current package exposes candidates far beyond the old transcript sample:
 application and thread shells, local/remote conversation routes, projects and
@@ -65,15 +66,17 @@ panels, document previews, settings, MCP, plugins, skills, automations, remote
 connections, and feature-gated surfaces.
 
 The current CDP probe confirms loopback access, distinguishes the main
-application-shell target from a second small application page, and reaches the
+application-shell target from a second small application page, reaches the
 new-chat destination/context setup plus the Project and Local environment
-dialogs. The broader command, queue, Markdown, Sources, terminal, Review, Pull
-requests, Sites, Scheduled tasks, Plugins, Skills, and Settings samples were
-recorded on `26.715.72359`. Those entries remain `runtime_observed` with
-build-scoped evidence, but they do not satisfy the current-build verification
-gate until reached again. The seed list is not an exhaustive denominator:
-newly observed routes, variants, and cross-layer transitions must add or split
-IDs.
+dialogs, and now revalidates the Pull requests index plus an aggregate
+multi-file change/Review flow. It still does not reach a selectable PR detail,
+so `workspace.pull-request-review` remains `not_sampled`. The broader queue,
+Markdown, Sources, terminal, Sites, Scheduled tasks, Plugins, Skills, and
+Settings samples were recorded on `26.715.72359`. Those entries remain
+`runtime_observed` with build-scoped evidence, but they do not satisfy the
+current-build verification gate until reached again. The seed list is not an
+exhaustive denominator: newly observed routes, variants, and cross-layer
+transitions must add or split IDs.
 
 ## Priority
 
@@ -212,8 +215,21 @@ surface geometry and computed layout, Electron acceptance closes and reopens
 the Review panel, and reviewed pixels gate the five workflow frames. Paired
 with the existing current-build captures, this promotes the sampled file card,
 Review side-panel, and editor diff to Electron-verified. They remain
-implementation-partial because broader variants, resizing, multi-file state,
-and current-build PR review behavior are still open.
+implementation-partial because broader variants, resizing, and current-build
+PR review behavior are still open.
+
+The multi-file slice adds public `FileChangeGroup` and `FileReview`
+components. A protocol-backed two-file trace renders one aggregate
+`Edited 2 files` card with group-level Undo/Review and stacks both independent
+diffs in the workspace panel. CDP requires one card, two file rows, two Review
+sections, exact focus labels, valid split geometry, and no horizontal
+overflow. Electron drives close, file-specific reopen, group reopen, and
+Undo, then repeats the geometry assertions in a real 800×600 BrowserWindow.
+An optional 906×820 current-build raster gate compares the whole main region
+and its 536px conversation/370px Review ownership regions separately. This
+promotes `workspace.multi-file-review` to Browser- and Electron-verified while
+remaining implementation-partial for larger file sets, mixed change kinds,
+selection scrolling, resizing, and real PR-review integration.
 
 The compact tool/recovery slice splits the former combined
 `thread.search-tool-mcp-events` candidate into independent search, Browser, and
@@ -257,9 +273,10 @@ and completed states rather than driving their host transition, so
 `thread.context-compaction` also remains `partial_legacy`; it does not promote
 the still-unreached thread summary panel.
 
-This is a measurement- and raster-backed basic thread slice, not a claim that
-the whole application or every thread lifecycle is pixel-perfect. Markdown
-variants, the exact host virtualization algorithm, code search, successful
-MCP and connector calls, thread-level retry recovery, approval persistence and
-timeout, multi-file review, and native window behavior retain their own
-inventory gates.
+This is a measurement- and raster-backed basic thread/workspace slice, not a
+claim that the whole application or every lifecycle is pixel-perfect.
+Markdown variants, the exact host virtualization algorithm, code search,
+successful MCP and connector calls, thread-level retry recovery, approval
+persistence and timeout, current-build PR-review detail, mixed/large
+multi-file sets, and native Codex window behavior retain their own inventory
+gates.

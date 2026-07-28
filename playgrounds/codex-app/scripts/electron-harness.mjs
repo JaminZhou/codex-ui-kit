@@ -62,9 +62,18 @@ export const visualScenes = [
     scenario: "workspace-workflow",
     surfaces: ["approval", "command", "fileChange", "reviewPanel"],
   },
+  {
+    frame: "review-open",
+    id: "multi-file-review",
+    scenario: "multi-file-review",
+    surfaces: ["fileChange", "reviewPanel"],
+  },
 ];
 
-export async function launchScene(scene, { capture = true } = {}) {
+export async function launchScene(
+  scene,
+  { capture = true, windowSize } = {},
+) {
   const app = await electron.launch({
     args: ["."],
     executablePath: electronPath,
@@ -74,6 +83,12 @@ export async function launchScene(scene, { capture = true } = {}) {
       CODEX_DEMO_FRAME: scene.frame,
       CODEX_DEMO_HEADLESS: "1",
       CODEX_DEMO_SCENARIO: scene.scenario,
+      ...(windowSize
+        ? {
+            CODEX_DEMO_WINDOW_HEIGHT: String(windowSize.height),
+            CODEX_DEMO_WINDOW_WIDTH: String(windowSize.width),
+          }
+        : {}),
     },
   });
   const page = await app.firstWindow();

@@ -55,7 +55,9 @@ The built-in highlighter escapes untrusted code. A custom `CodeHighlighter` retu
 - `ToolCallCard`: generic MCP, connector, and arbitrary tool-call row with structured, empty, error, and raw-output states.
 - `CommandExecution`: expandable command surface with duration, copy, background-terminal, success, failure, and interruption states. `formatCommandDuration` exposes its standalone duration formatter.
 - `CommandOutput`: labeled stdout/stderr with no-output, tail-following, overflow, fade, and copy behavior.
-- `FileChange`: create, apply, stop, reject, delete, and rename activities with disclosure, statistics, path opening, and copy hooks.
+- `FileChange`: one-file create, apply, stop, reject, delete, and rename activities with disclosure, statistics, path opening, and copy hooks.
+- `FileChangeGroup`: one protocol item's aggregate changed-files card with group status/actions, independent file rows, statistics, rename paths, and host-owned file opening.
+- `FileReview`: a scrollable workspace composition that stacks every changed file with an independent header, statistics, focusable diff, and optional selected-file marker.
 - `ApprovalRequest`: command, patch, network, permission, and generic approval card with scoped actions, shortcuts, loading, and outcome states.
 - `ApprovalCommandPreview`: bounded command preview with explicit expansion controls.
 - `StatusBanner`: neutral, info, warning, and error shell with actions, dismissal, and compact reflow.
@@ -96,6 +98,9 @@ All privileged behavior remains host-owned. The components never auto-approve co
   conversation main region, right workspace panel, and bottom panel. Wide mode
   reserves measured tracks; medium and narrow containers switch side surfaces
   to dismissible overlays before the conversation becomes unusably narrow.
+  Hosts that intentionally replace those responsive styles can pass the
+  matching `layoutMode` so inert, focus, dismissal, and `aria-hidden`
+  behavior stays aligned with the rendered layout.
 - `AppSidebar`, `AppSidebarSection`, and `AppSidebarItem`: grouped primary
   navigation with selected-route state, descriptions, badges, header, and
   footer slots.

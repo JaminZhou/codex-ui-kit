@@ -7,9 +7,12 @@ Every deterministic scenario has one ID and produces four evidence layers:
 2. **CDP** — DOM identity, computed layout, focus, scrolling, and named-surface
    geometry.
 3. **Electron host** — real `BrowserWindow` bounds, renderer isolation,
-   sidebar interaction, and Review-panel close/reopen behavior.
+   sidebar interaction, Review-panel close/reopen behavior, and compact
+   800×600 multi-file geometry.
 4. **Pixels** — full-frame regression screenshots after the structural gates
-   pass.
+   pass. The multi-file scenario can additionally compare a separately
+   captured 906×820 current-build main region through
+   `CODEX_UI_KIT_MULTI_FILE_REVIEW_REFERENCE`.
 
 The layers do not vote on the same claim. Protocol proves lifecycle behavior;
 CDP explains layout; Electron proves the desktop host; pixels catch final
@@ -20,6 +23,7 @@ focus, menu, multi-window, and OS integration checks. It is intentionally not a
 headless CI requirement. A run should record the scenario, app commit, macOS
 version, display scale, theme, locale, window size, and reduced-motion state.
 
-The screenshot baselines in this playground guard the integration demo. The
-upstream UI Kit owns measured reference parity against the separately observed
-Codex desktop build.
+The checked-in screenshot baselines guard the integration demo. External
+Codex references remain untracked; their full, conversation, and Review
+region thresholds are enforced separately so a passing internal baseline
+cannot be mistaken for current-build parity.

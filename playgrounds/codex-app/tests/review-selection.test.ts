@@ -35,21 +35,38 @@ const fileChanges: DemoFileChange[] = [
 ];
 
 describe("Review selection", () => {
-  it("defaults to the newest file-change item's first file", () => {
+  it("defaults to the newest file-change item as a complete group", () => {
     expect(resolveReviewSelection(fileChanges, null)).toMatchObject({
-      change: { path: "LATEST.md" },
+      fileChange: {
+        changes: [{ path: "LATEST.md" }],
+      },
       fileChangeId: "files-two",
     });
   });
 
-  it("keeps the exact file selected from an older multi-file item", () => {
+  it("keeps an exact file focus without dropping sibling diffs", () => {
     expect(
       resolveReviewSelection(fileChanges, {
         fileChangeId: "files-one",
         path: "SECOND.md",
       }),
     ).toMatchObject({
-      change: { path: "SECOND.md" },
+      fileChange: {
+        changes: [{ path: "FIRST.md" }, { path: "SECOND.md" }],
+      },
+      fileChangeId: "files-one",
+      selectedPath: "SECOND.md",
+    });
+  });
+
+  it("ignores a stale path while preserving the selected group", () => {
+    expect(
+      resolveReviewSelection(fileChanges, {
+        fileChangeId: "files-one",
+        path: "MISSING.md",
+      }),
+    ).toEqual({
+      fileChange: fileChanges[0],
       fileChangeId: "files-one",
     });
   });

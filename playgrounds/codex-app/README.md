@@ -40,6 +40,17 @@ The Electron main process owns `CodexAppServerClient`; the sandboxed renderer
 receives sanitized events and returns explicit approval decisions through
 preload IPC.
 
+## Third vertical slice
+
+The third slice extends the file workflow to the current multi-file shape:
+
+- one aggregate `Edited 2 files` card per protocol file-change item;
+- independent file rows with group-level Undo and Review;
+- every file diff stacked in the same Review panel;
+- file-specific focus without dropping sibling diffs;
+- wide and real 800×600 Electron split geometry;
+- an optional external current-build main-only pixel comparison.
+
 ## Development
 
 From the repository root:
@@ -62,6 +73,14 @@ native-window contracts, and reviewed pixel baselines:
 
 ```bash
 pnpm check:codex-app:acceptance
+```
+
+To run the optional current-build multi-file pixel gate, keep the raw
+application reference outside the repository and provide its absolute path:
+
+```bash
+CODEX_UI_KIT_MULTI_FILE_REVIEW_REFERENCE=/absolute/path/to/main-only-reference.png \
+  pnpm --filter @codex-ui-kit/codex-app-playground check:visual
 ```
 
 See [docs/VALIDATION.md](docs/VALIDATION.md) for the evidence model.

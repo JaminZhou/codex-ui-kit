@@ -37,7 +37,7 @@ for (const scene of visualScenes) {
       const namedSurfaceSelectors = {
         approval: ".codex-ui-approval-request",
         command: ".codex-ui-command-execution",
-        fileChange: ".codex-ui-file-change",
+        fileChange: ".codex-ui-file-change-group",
         reviewPanel:
           '.codex-ui-workspace-panel[data-placement="side"]',
       };
@@ -69,6 +69,22 @@ for (const scene of visualScenes) {
           document.documentElement.clientWidth,
         mode: root.getAttribute("data-mode"),
         namedSurfaces,
+        review: {
+          diffLabels: Array.from(
+            document.querySelectorAll(
+              '.codex-ui-file-review .codex-ui-file-diff[aria-label]',
+            ),
+            (element) => element.getAttribute("aria-label"),
+          ),
+          fileCount: document.querySelectorAll(
+            ".codex-ui-file-review__file",
+          ).length,
+          firstDiffLabel: document
+            .querySelector(
+              '.codex-ui-file-review .codex-ui-file-diff[aria-label]',
+            )
+            ?.getAttribute("aria-label"),
+        },
         rootStatus: root.getAttribute("data-status"),
         scenario: root.getAttribute("data-scenario"),
         shell: shellRect,
@@ -78,6 +94,14 @@ for (const scene of visualScenes) {
           viewportOverflowY: getComputedStyle(viewport).overflowY,
         },
         viewport: viewportRect,
+        workflow: {
+          fileGroupCount: document.querySelectorAll(
+            ".codex-ui-file-change-group",
+          ).length,
+          fileRowCount: document.querySelectorAll(
+            ".codex-ui-file-change-group__file",
+          ).length,
+        },
       };
     });
 
@@ -124,10 +148,27 @@ for (const scene of visualScenes) {
     ) {
       throw new Error(`${scene.id}: Review panel split geometry is invalid.`);
     }
+    if (
+      scene.surfaces?.includes("reviewPanel") &&
+      (contract.workflow.fileGroupCount !== 1 ||
+        contract.workflow.fileRowCount !== 2 ||
+        contract.review.fileCount !== 2 ||
+        contract.review.diffLabels.length !== 2)
+    ) {
+      throw new Error(
+        `${scene.id}: multi-file aggregation contract failed: ${JSON.stringify({
+          review: contract.review,
+          workflow: contract.workflow,
+        })}`,
+      );
+    }
 
     const expectedFocus = scene.surfaces?.includes("reviewPanel")
-      ? "Review diff for WORKFLOW.md"
+      ? contract.review.firstDiffLabel
       : "Message composer";
+    if (!expectedFocus) {
+      throw new Error(`${scene.id}: expected focus target is missing.`);
+    }
     const focusTarget = scene.surfaces?.includes("reviewPanel")
       ? page.getByRole("list", { name: expectedFocus })
       : page.getByRole("textbox", { name: expectedFocus });

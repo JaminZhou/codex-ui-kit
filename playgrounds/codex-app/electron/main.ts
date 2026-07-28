@@ -244,13 +244,23 @@ function createWindow() {
   const scenario = process.env.CODEX_DEMO_SCENARIO ?? "streaming-recovery";
   const frame = process.env.CODEX_DEMO_FRAME ?? "recovered";
   const capture = process.env.CODEX_DEMO_CAPTURE ?? "0";
+  const requestedWidth = Number(process.env.CODEX_DEMO_WINDOW_WIDTH);
+  const requestedHeight = Number(process.env.CODEX_DEMO_WINDOW_HEIGHT);
+  const width =
+    Number.isInteger(requestedWidth) && requestedWidth > 0
+      ? requestedWidth
+      : 1180;
+  const height =
+    Number.isInteger(requestedHeight) && requestedHeight > 0
+      ? requestedHeight
+      : 820;
   const query = new URLSearchParams({ capture, frame, scenario }).toString();
 
   const window = new BrowserWindow({
     backgroundColor: "#101010",
-    height: 820,
-    minHeight: 640,
-    minWidth: 760,
+    height,
+    minHeight: Math.min(640, height),
+    minWidth: Math.min(760, width),
     show: process.env.CODEX_DEMO_HEADLESS !== "1",
     title: "Codex App Playground",
     titleBarStyle: "hiddenInset",
@@ -261,7 +271,7 @@ function createWindow() {
       preload: preloadPath,
       sandbox: true,
     },
-    width: 1180,
+    width,
   });
   mainWindow = window;
 
