@@ -345,19 +345,22 @@ export function App() {
     reviewSelection,
   );
   const reviewFileChange = resolvedReview?.fileChange;
-  const reviewFiles =
-    reviewFileChange?.changes.map((change) => {
-      const stats = changeStats(change);
-      return {
-        ...change,
-        ...stats,
-        change: change.kind,
-        lines:
-          change.kind === "added"
-            ? stats.lines.filter(({ kind }) => kind !== "hunk")
-            : stats.lines,
-      };
-    }) ?? [];
+  const reviewFiles = useMemo(
+    () =>
+      reviewFileChange?.changes.map((change) => {
+        const stats = changeStats(change);
+        return {
+          ...change,
+          ...stats,
+          change: change.kind,
+          lines:
+            change.kind === "added"
+              ? stats.lines.filter(({ kind }) => kind !== "hunk")
+              : stats.lines,
+        };
+      }) ?? [],
+    [reviewFileChange],
+  );
   const reviewTotals = reviewFiles.reduce(
     (totals, file) => ({
       additions: totals.additions + file.additions,

@@ -572,7 +572,7 @@ export function FileReview({
       return;
     }
     selectedFile.scrollIntoView({ block: "nearest", inline: "nearest" });
-  }, [selectedPath, selectionKey]);
+  }, [files, selectedPath, selectionKey]);
 
   return (
     <div
