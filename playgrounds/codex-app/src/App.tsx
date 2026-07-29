@@ -61,6 +61,10 @@ import {
   resolveReviewSelection,
   type ReviewSelection,
 } from "./review-selection";
+import {
+  mcpToolCallGroupForEntry,
+  mcpToolCallPresentation,
+} from "./mcp-tool-call-view";
 
 type DemoView = "conversation" | "pull-request";
 
@@ -95,22 +99,6 @@ function statusLabel(state: DemoProtocolState) {
   if (state.status === "interrupted") return "Stopped";
   if (state.status === "failed") return "Failed";
   return "Ready";
-}
-
-function mcpResultText(content: readonly unknown[]) {
-  return content
-    .flatMap((entry) => {
-      if (
-        typeof entry === "object" &&
-        entry !== null &&
-        "text" in entry &&
-        typeof entry.text === "string"
-      ) {
-        return [entry.text];
-      }
-      return [];
-    })
-    .join("\n");
 }
 
 function McpAnswer({ text }: { text: string }) {
@@ -939,27 +927,9 @@ export function App() {
     }
 
     if (entry.kind === "mcpToolCall") {
-      const toolCall = state.mcpToolCalls.find(({ id }) => id === entry.id);
-      if (!toolCall) return null;
-      const previousEntry = state.timeline[entryIndex - 1];
-      const previousToolCall =
-        previousEntry?.kind === "mcpToolCall"
-          ? state.mcpToolCalls.find(({ id }) => id === previousEntry.id)
-          : null;
-      if (
-        previousToolCall?.turnId === toolCall.turnId &&
-        previousToolCall.server === toolCall.server
-      ) {
-        return null;
-      }
-      const calls = state.timeline.flatMap((candidate) => {
-        if (candidate.kind !== "mcpToolCall") return [];
-        const call = state.mcpToolCalls.find(({ id }) => id === candidate.id);
-        return call?.turnId === toolCall.turnId &&
-          call.server === toolCall.server
-          ? [call]
-          : [];
-      });
+      const calls = mcpToolCallGroupForEntry(state, entryIndex);
+      if (!calls) return null;
+      const toolCall = calls[0];
       const groupStatus = calls.some(
         ({ status }) => status === "running" || status === "pending",
       )
@@ -998,29 +968,20 @@ export function App() {
             status={groupStatus}
           >
             {calls.map((call) => {
-              const result = mcpResultText(call.content);
+              const presentation = mcpToolCallPresentation(call);
               return (
                 <ToolCallCard
                   data-item-id={call.id}
+                  error={presentation.error}
                   key={call.id}
                   icon={<McpToolIcon />}
                   name={call.toolLabel}
-                  result={
-                    call.structuredContent === null
-                      ? (result || undefined)
-                      : undefined
-                  }
+                  result={presentation.result}
                   role="listitem"
                   source={call.server}
                   status={call.status}
-                  structuredContent={
-                    call.structuredContent ?? undefined
-                  }
-                  summary={
-                    call.status === "running" || call.status === "pending"
-                      ? call.progress.at(-1)
-                      : undefined
-                  }
+                  structuredContent={presentation.structuredContent}
+                  summary={presentation.summary}
                 />
               );
             })}
