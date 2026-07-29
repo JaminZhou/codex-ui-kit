@@ -203,9 +203,11 @@ describe("application shell", () => {
       unobserve() {}
     }
     vi.stubGlobal("ResizeObserver", ResizeObserverMock);
+    const onSidebarWidthChange = vi.fn();
     const { container } = render(
       <AppShell
         defaultSidebarWidth={520}
+        onSidebarWidthChange={onSidebarWidthChange}
         sidebar="Navigation"
         sidebarOpen
         sidebarResizable
@@ -227,6 +229,9 @@ describe("application shell", () => {
     expect(shell.style.getPropertyValue("--codex-ui-app-sidebar-width")).toBe(
       "468px",
     );
+    fireEvent.keyDown(separator, { key: "End" });
+    fireEvent.keyDown(separator, { key: "ArrowRight" });
+    expect(onSidebarWidthChange).not.toHaveBeenCalled();
 
     act(() => resize?.(721));
     expect(separator.getAttribute("aria-valuemax")).toBe("369");

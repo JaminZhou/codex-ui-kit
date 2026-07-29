@@ -1029,8 +1029,11 @@ export function AppShell({
     onSidebarWidthChange?.(normalizedWidth);
     return normalizedWidth;
   };
-  const commitSidebarWidth = (nextWidth: number) =>
-    commitResolvedSidebarWidth(resolveSidebarWidth(nextWidth));
+  const commitSidebarWidth = (nextWidth: number) => {
+    const normalizedWidth = resolveSidebarWidth(nextWidth);
+    if (normalizedWidth === resolvedSidebarWidth) return normalizedWidth;
+    return commitResolvedSidebarWidth(normalizedWidth);
+  };
   const handleSidebarResizePointerDown = (
     event: ReactPointerEvent<HTMLDivElement>,
   ) => {
