@@ -263,6 +263,15 @@ for (const surface of inventory.surfaces) {
   ) {
     throw new Error(`missing runtime evidence for ${surface.id}`);
   }
+  if (
+    surface.runtimeStatus !== "runtime_observed" &&
+    Array.isArray(surface.runtimeEvidence) &&
+    surface.runtimeEvidence.length > 0
+  ) {
+    throw new Error(
+      `${surface.id} cannot retain runtime evidence while ${surface.runtimeStatus}`,
+    );
+  }
   const runtimeBuilds = (surface.runtimeEvidence ?? []).map((evidence) => {
     const prefix = evidence.split(":", 1)[0];
     const build = runtimeEvidenceBuilds[prefix];
