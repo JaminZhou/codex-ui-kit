@@ -76,7 +76,7 @@ slot. It is split into:
 
 - `app.sidebar-shell`: width, resize, collapse, overlay, focus restoration,
   scroll ownership, and wide/medium/narrow transitions;
-- `app.sidebar-primary-navigation`: New task and global destinations, active
+- `app.sidebar-primary-navigation`: New chat and global destinations, active
   route, badges, and route restoration;
 - `app.sidebar-project-navigation`: project/workspace sections, expansion,
   selection, long names, overflow, and worktree context;

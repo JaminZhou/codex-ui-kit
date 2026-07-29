@@ -2855,7 +2855,7 @@ describe("application sidebar", () => {
           collapsible
           kind="projects"
           onExpandedChange={onExpandedChange}
-          title="Projects"
+          title={<span>Projects</span>}
           toggleLabel="Toggle projects"
         >
           <AppSidebarItem depth={1}>codex-ui-kit</AppSidebarItem>

@@ -279,23 +279,8 @@ for (const scene of visualScenes) {
       );
     }
 
-    const topMasks = [
-      { height: 46, left: 0, top: 0, width: 274 },
-      { height: 34, left: 8, top: 46, width: 258 },
-      { height: 30, left: 12, top: 84, width: 250 },
-      { height: 26, left: 12, top: 118, width: 196 },
-      { height: 26, left: 12, top: 149, width: 196 },
-      { height: 26, left: 12, top: 180, width: 196 },
-      { height: 26, left: 12, top: 211, width: 196 },
-    ];
-    const referenceTop = maskPng(
-      cropPng(referenceFull, 0, 0, 274, 250),
-      topMasks,
-    );
-    const actualTop = maskPng(
-      cropPng(actual, 0, 0, 274, 250),
-      topMasks,
-    );
+    const referenceTop = cropPng(referenceFull, 0, 0, 274, 250);
+    const actualTop = cropPng(actual, 0, 0, 274, 250);
     const topComparison = comparePng(referenceTop, actualTop);
 
     const selectedMasks = [

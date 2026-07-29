@@ -21,6 +21,7 @@ describe("lifecycle visual policy", () => {
     expect(contract).toContain(
       "sidebarComparison.ratio > defaultLifecycleSidebarPixelRatio",
     );
+    expect(contract).not.toContain("const topMasks");
     expect(contract).not.toContain("defaultLifecyclePixelRatio");
   });
 });

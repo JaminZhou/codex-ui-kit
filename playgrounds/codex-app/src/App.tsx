@@ -504,7 +504,7 @@ export function App() {
             leading={<SidebarGlyph name="new" />}
             onClick={() => selectScenario("streaming-recovery")}
           >
-            New task
+            New chat
           </AppSidebarItem>
         </div>
       }

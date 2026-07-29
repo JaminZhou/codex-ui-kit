@@ -1669,6 +1669,7 @@ export function AppSidebarSection({
   ...props
 }: AppSidebarSectionProps) {
   const headingId = useId();
+  const titleId = useId();
   const contentId = useId();
   const [internalExpanded, setInternalExpanded] = useState(defaultExpanded);
   const canCollapse = collapsible && Boolean(title);
@@ -1693,9 +1694,7 @@ export function AppSidebarSection({
           {title ? (
             canCollapse ? (
               <h2
-                aria-label={
-                  typeof title === "string" ? title : undefined
-                }
+                aria-labelledby={titleId}
                 id={headingId}
               >
                 <button
@@ -1706,7 +1705,10 @@ export function AppSidebarSection({
                   onClick={() => setExpanded(!isExpanded)}
                   type="button"
                 >
-                  <span className="codex-ui-app-sidebar__section-title">
+                  <span
+                    className="codex-ui-app-sidebar__section-title"
+                    id={titleId}
+                  >
                     {title}
                   </span>
                   <span className="codex-ui-app-sidebar__section-chevron">
