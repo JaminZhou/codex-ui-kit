@@ -48,8 +48,9 @@ pnpm build
 pnpm build:electron
 ```
 
-The Electron version is pinned to `42.3.0` to match the sampled Codex desktop
-build documented in `research/26.721.41059.md`.
+The Electron version is pinned to `42.3.0` to match the last runtime-sampled
+Codex desktop build documented in `research/26.721.41059.md`. The newer
+installed package is tracked separately until its runtime is re-sampled.
 
 Set `CODEX_UI_KIT_ACCEPTANCE_DIR` while running `preview` to write package-safe
 geometry JSON and screenshots for the composer, interactive primitive,

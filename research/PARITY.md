@@ -6,8 +6,10 @@ not establish full conversation, workspace, application, or product coverage.
 
 The authoritative current-build inventory is:
 
-- [`26.721.41059.md`](26.721.41059.md) for the current package facts, scoped
-  CDP revalidation, and research boundary;
+- [`26.721.81911.md`](26.721.81911.md) for the current package fingerprint and
+  pending runtime-capture boundary;
+- [`26.721.41059.md`](26.721.41059.md) for the previous runtime-sampled build,
+  scoped CDP evidence, and research boundary;
 - [`26.715.72359.md`](26.715.72359.md) for the previous build's broader
   historical runtime sample;
 - [`UI_INVENTORY.md`](UI_INVENTORY.md) for classification, evidence levels,
@@ -26,7 +28,7 @@ The authoritative current-build inventory is:
   BrowserWindow; it does not prove parity with unobserved product routes,
   panels, state transitions, or window types.
 - Computer Use exploration is blocked by the environment safety policy for
-  `com.openai.codex`. User-authorized CDP probes revalidated current-build
+  `com.openai.codex`. User-authorized CDP probes on `26.721.41059` revalidated
   access, the main-shell target shape, a de-identified Projects entry/list,
   the new-chat destination/context split, Project and Local environment
   overlays, a disposable synthetic task's basic thread lifecycle, an expanded
@@ -37,21 +39,26 @@ The authoritative current-build inventory is:
   connector/MCP tool is available. A further synthetic long-thread probe
   reached the stable ten-message navigation rail, reverse-origin scroll-away
   state, post-stop summary, and `/compact` running/completed lifecycle. A
-  current-build synthetic Markdown probe also revalidated heading, inline
+  synthetic Markdown probe on that build also revalidated heading, inline
   code, link, quote, list, table, fenced code, copy control, and completed
-  response actions. The
-  unavailable-tool fallback does not establish a real MCP event. The probes
-  did not expose private project contents, Remote behavior, code search,
-  successful MCP/connector calls, or the broader thread-error, queue,
-  Markdown variants, menu, global-route, and Settings states; those remain historical
-  evidence from `26.715.72359` until sampled again.
+  response actions. A later real read-only `openaiDeveloperDocs` run reached a
+  successful five-call MCP group and completed linked answer. The unavailable-
+  tool fallback remains a separate recovery state and does not establish an
+  MCP call. The probes did not expose private project contents, Remote
+  behavior, code search, broader connectors, or the wider thread-error, queue,
+  Markdown variants, menu, global-route, and Settings states; those remain
+  historical evidence from `26.715.72359` until sampled again.
+- Codex Desktop has since updated to `26.721.81911` (`5973`). Its package
+  fingerprint is recorded, but a fresh main-Renderer capture is pending.
+  Browser and Electron results tied to older observations are therefore
+  `partial_legacy`, not current-build verification.
 - Renderer viewport probing exposed a narrow-layout gap: the thread and
   Composer shrink, but the fixed app sidebar remains and the right workspace
   panel can be laid out beyond the simulated viewport. The independently
-  implemented current-thread shell is now Browser- and Electron-verified at
-  its measured wide and compact geometry, but native Codex window behavior and
-  the remaining app-shell/panel interactions stay separate acceptance
-  requirements.
+  implemented current-thread shell retains Browser and Electron regression
+  coverage at its measured wide and compact geometry, but native Codex window
+  behavior, the updated build, and the remaining app-shell/panel interactions
+  stay separate acceptance requirements.
 - npm publication remains out of scope until the agreed P0/P1 coverage and
   release acceptance surfaces are complete.
 

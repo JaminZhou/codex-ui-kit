@@ -21,15 +21,17 @@ Codex UI Kit turns those interaction patterns into protocol-neutral React primit
 
 - The current components are a partial coding-agent UI foundation, not a
   complete Codex Desktop reconstruction.
-- The latest sampled package is `26.721.41059` (`5848`). Its seed candidate
+- The latest sampled package is `26.721.81911` (`5973`). Its seed candidate
   surface and evidence status are tracked in
   [`research/UI_INVENTORY.md`](research/UI_INVENTORY.md); current-build runtime
-  observation and verification remain partial.
+  observation and verification are pending after the package update.
 - The repository is public and the package baseline is `0.1.0`, but the npm package has **not** been published.
 - The API remains pre-1.0 and may change while public documentation and consumer feedback mature.
 - Extracted application files, private IPC, bundled fonts, and OpenAI brand assets are not included.
 
-Explore the [interactive component showcase](https://jaminzhou.com/codex-ui-kit/) or review the [coverage policy](research/PARITY.md).
+Explore the [interactive component showcase](https://jaminzhou.com/codex-ui-kit/),
+review the [coverage policy](research/PARITY.md), or follow the
+[delivery plan](research/DELIVERY_PLAN.md).
 
 ## Highlights
 

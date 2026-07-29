@@ -45,19 +45,23 @@ observation from a previous build remains historical evidence.
 
 ## Current baseline
 
-- Codex Desktop `26.721.41059` (`5848`)
-- Sampled on 2026-07-26 and reverified on 2026-07-29
+- Codex Desktop `26.721.81911` (`5973`)
+- Package sampled and reverified on 2026-07-29
 - `app.asar` SHA-256:
-  `da39a51b06fb4c728d418b8f0f05fc8fd8c6b1f74c4fb4d47c20c7914a798f45`
+  `3c9a101d9beec3718b0fcfc19e427c644a934045f48b3fe0e16b68b0b3f23e61`
 - Computer Use automation: blocked by the environment safety policy for
   `com.openai.codex`
 - Scoped CDP automation: available through a user-authorized second process;
   the Chromium profile is separate, but Codex application data and navigation
   are not fully isolated
-- Current inventory: 63 surface groups; 43 have scoped runtime evidence, of
-  which 29 include current-build structural evidence and 14 are previous-build
-  only; another 20 remain `not_sampled`. Browser verification covers 22
-  groups and Electron verification covers 19.
+- Fresh current-build Renderer capture: pending; the package fingerprint is
+  current, while all recorded runtime evidence remains tied to earlier builds
+
+<!-- inventory-summary: total=68 runtime_observed=46 not_sampled=22 browser_verified=0 electron_verified=0 -->
+Current inventory: 68 surface groups; 46 have scoped runtime evidence from
+earlier builds and 22 remain `not_sampled`. No group is yet Browser- or
+Electron-verified against `26.721.81911`; prior acceptance remains recorded as
+`partial_legacy` until current-build re-observation.
 
 The current package exposes candidates far beyond the old transcript sample:
 application and thread shells, local/remote conversation routes, projects and
@@ -65,7 +69,7 @@ workspace selection, PR review, editor diff, terminal, browser and artifact
 panels, document previews, settings, MCP, plugins, skills, automations, remote
 connections, and feature-gated surfaces.
 
-The current CDP probe confirms loopback access, distinguishes the main
+The previous-build CDP probe confirms loopback access, distinguishes the main
 application-shell target from a second small application page, reaches the
 new-chat destination/context setup plus the Project and Local environment
 dialogs, and now revalidates the Pull requests index plus an aggregate
@@ -74,8 +78,8 @@ resize handle and its 240–520px range, the independent Review-panel resize
 track, and one public PR's Summary, Timeline, and Code views. The broader
 queue, Sources, Sites, Scheduled tasks, Plugins, Skills,
 and Settings samples were recorded on `26.715.72359`. Those entries remain
-`runtime_observed` with build-scoped evidence, but they do not satisfy the
-current-build verification gate until reached again. The seed list is not an
+`runtime_observed` with build-scoped evidence, but none satisfy the
+`26.721.81911` verification gate until reached again. The seed list is not an
 exhaustive denominator: newly observed routes, variants, and cross-layer
 transitions must add or split IDs.
 
@@ -84,6 +88,8 @@ transitions must add or split IDs.
 ### P0: establish the real product skeleton
 
 - Application shell, projects index, new-thread and workspace selection.
+- Left sidebar shell, primary routes, project navigation, thread history,
+  item actions/status, and footer/account/settings behavior.
 - Local, remote, and ChatGPT conversation routing.
 - Thread shell, virtualized timeline, composer, queue, panel system, summary,
   navigation, approvals, interruption/recovery, and worktree transitions.
@@ -118,7 +124,16 @@ H5 and Electron remain acceptance surfaces throughout implementation, but
 polish is intentionally last so component and layout churn does not invalidate
 finished visual work.
 
+The complete workstream order, sidebar acceptance matrix, exit gates, and
+planned PR sequence are defined in [`DELIVERY_PLAN.md`](DELIVERY_PLAN.md).
+
 ## Current implementation slice
+
+Historical terminology note: descriptions below that call a reference
+"current-build" refer to the build current when that slice was captured,
+primarily `26.721.41059`. After the update to `26.721.81911`, those references
+are previous-build evidence and their Browser/Electron status is
+`partial_legacy` until re-observed.
 
 The first P0 shell slice provides independently implemented `AppShell`,
 `AppSidebar`, and `WorkspacePanel` compositions. It covers the measured wide
@@ -294,8 +309,8 @@ geometry remain independent, so a passing plain assistant fallback cannot
 promote MCP tool rendering and a failed command cannot promote thread-level
 render/retry recovery.
 
-The successful-MCP slice now samples a real read-only
-`openaiDeveloperDocs` run on build `26.721.41059`. Current-build CDP records
+The successful-MCP slice samples a real read-only `openaiDeveloperDocs` run on
+build `26.721.41059`. That build's CDP evidence records
 the completed answer, the `Worked for 54s` disclosure, the
 `Used OpenAI Developer Docs integration` group, and its three Search plus two
 Fetch calls. The public App Server trace uses only schema-validated
@@ -343,14 +358,15 @@ merge/review-submission states, Terminal multi-tab and
 process-creation/termination lifecycles, and native Codex window behavior
 retain their own inventory gates.
 
-The current Markdown slice revalidates one synthetic completed response on
-build `26.721.41059`. CDP records semantic heading, paragraph, link, inline
-code, quote, list, table, fenced-code, and action/copy controls together with
-their computed styles. The protocol replay adds a sixteenth deterministic
-frame; Browser and Electron gates verify external-link semantics, code-copy
-behavior, the four completed-response actions, 736px content geometry, and
-the measured scroll clearance above the 736px Composer. A main-only 906×820
-reference compares assistant, code-card, and Composer ownership regions
-independently. This promotes only the sampled completed Markdown vocabulary;
-nested lists, task lists, images, math, citations/sources, very large tables,
-streaming Markdown mutation, and error variants remain open.
+The Markdown slice revalidates one synthetic completed response on build
+`26.721.41059`. That build's CDP evidence records semantic heading, paragraph,
+link, inline code, quote, list, table, fenced-code, and action/copy controls
+together with their computed styles. The protocol replay adds a sixteenth
+deterministic frame; Browser and Electron gates verify external-link
+semantics, code-copy behavior, the four completed-response actions, 736px
+content geometry, and the measured scroll clearance above the 736px Composer.
+A main-only 906×820 reference compares assistant, code-card, and Composer
+ownership regions independently. This promotes only the sampled completed
+Markdown vocabulary; nested lists, task lists, images, math, citations/sources,
+very large tables, streaming Markdown mutation, and error variants remain
+open.

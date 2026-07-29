@@ -1,11 +1,16 @@
 import { readFile } from "node:fs/promises";
 
 const inventoryUrl = new URL("../research/ui-inventory.json", import.meta.url);
+const inventoryMarkdownUrl = new URL(
+  "../research/UI_INVENTORY.md",
+  import.meta.url,
+);
 const visualScenariosUrl = new URL(
   "../research/visual-scenarios.json",
   import.meta.url,
 );
 const inventory = JSON.parse(await readFile(inventoryUrl, "utf8"));
+const inventoryMarkdown = await readFile(inventoryMarkdownUrl, "utf8");
 const visualScenarios = JSON.parse(
   await readFile(visualScenariosUrl, "utf8"),
 );
@@ -298,6 +303,35 @@ const priorities = inventory.surfaces.reduce(
   },
   { p0: 0, p1: 0, p2: 0 },
 );
+
+const statuses = inventory.surfaces.reduce(
+  (counts, surface) => {
+    counts.runtime[surface.runtimeStatus] += 1;
+    counts.browser[surface.browserStatus] += 1;
+    counts.electron[surface.electronStatus] += 1;
+    return counts;
+  },
+  {
+    runtime: { blocked_by_policy: 0, not_sampled: 0, runtime_observed: 0 },
+    browser: { not_started: 0, partial_legacy: 0, verified: 0 },
+    electron: { not_started: 0, partial_legacy: 0, verified: 0 },
+  },
+);
+const markdownSummary = [
+  "<!-- inventory-summary:",
+  `total=${inventory.surfaces.length}`,
+  `runtime_observed=${statuses.runtime.runtime_observed}`,
+  `not_sampled=${statuses.runtime.not_sampled}`,
+  `browser_verified=${statuses.browser.verified}`,
+  `electron_verified=${statuses.electron.verified}`,
+  "-->",
+].join(" ");
+
+if (!inventoryMarkdown.includes(markdownSummary)) {
+  throw new Error(
+    `UI_INVENTORY.md summary is stale; expected ${markdownSummary}`,
+  );
+}
 
 console.log(
   `research inventory ok: ${inventory.surfaces.length} surfaces (${priorities.p0} P0, ${priorities.p1} P1, ${priorities.p2} P2)`,
