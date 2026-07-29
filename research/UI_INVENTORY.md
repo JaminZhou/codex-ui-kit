@@ -57,11 +57,10 @@ observation from a previous build remains historical evidence.
 - Fresh current-build Renderer capture: pending; the package fingerprint is
   current, while all recorded runtime evidence remains tied to earlier builds
 
-<!-- inventory-summary: total=68 runtime_observed=46 not_sampled=22 browser_verified=0 electron_verified=0 -->
 Current inventory: 68 surface groups; 46 have scoped runtime evidence from
-earlier builds and 22 remain `not_sampled`. No group is yet Browser- or
-Electron-verified against `26.721.81911`; prior acceptance remains recorded as
-`partial_legacy` until current-build re-observation.
+earlier builds and 22 remain `not_sampled`. Current-build Browser verification
+covers 0 groups and Electron verification covers 0. Prior acceptance remains
+recorded as `partial_legacy` until current-build re-observation.
 
 The current package exposes candidates far beyond the old transcript sample:
 application and thread shells, local/remote conversation routes, projects and

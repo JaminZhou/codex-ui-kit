@@ -317,19 +317,19 @@ const statuses = inventory.surfaces.reduce(
     electron: { not_started: 0, partial_legacy: 0, verified: 0 },
   },
 );
-const markdownSummary = [
-  "<!-- inventory-summary:",
-  `total=${inventory.surfaces.length}`,
-  `runtime_observed=${statuses.runtime.runtime_observed}`,
-  `not_sampled=${statuses.runtime.not_sampled}`,
-  `browser_verified=${statuses.browser.verified}`,
-  `electron_verified=${statuses.electron.verified}`,
-  "-->",
+const visibleMarkdownSummary = [
+  `Current inventory: ${inventory.surfaces.length} surface groups;`,
+  `${statuses.runtime.runtime_observed} have scoped runtime evidence from`,
+  `earlier builds and ${statuses.runtime.not_sampled} remain \`not_sampled\`.`,
+  "Current-build Browser verification covers",
+  `${statuses.browser.verified} groups and Electron verification covers`,
+  `${statuses.electron.verified}.`,
 ].join(" ");
+const normalizedInventoryMarkdown = inventoryMarkdown.replace(/\s+/g, " ");
 
-if (!inventoryMarkdown.includes(markdownSummary)) {
+if (!normalizedInventoryMarkdown.includes(visibleMarkdownSummary)) {
   throw new Error(
-    `UI_INVENTORY.md summary is stale; expected ${markdownSummary}`,
+    `UI_INVENTORY.md visible summary is stale; expected ${visibleMarkdownSummary}`,
   );
 }
 

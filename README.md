@@ -35,13 +35,15 @@ review the [coverage policy](research/PARITY.md), or follow the
 
 ## Highlights
 
-- A current-build measured conversation shell plus partial message, activity,
-  reasoning, plan, streaming, and mixed conversation-event primitives.
+- A conversation shell measured against the previous runtime build
+  `26.721.41059`, plus partial message, activity, reasoning, plan, streaming,
+  and mixed conversation-event primitives; current-build revalidation is
+  pending.
 - Application/sidebar and side/bottom workspace-panel composition with a
-  current-build measured, pointer- and keyboard-resizable navigation and
+  previously measured, pointer- and keyboard-resizable navigation and
   bottom-panel tracks plus container-responsive overlay behavior.
-- Project index, current new-chat destination/context setup, grouped local
-  environment dialog, protocol-neutral route/worktree selectors, PR
+- Project index, previous-build new-chat destination/context setup, grouped
+  local environment dialog, protocol-neutral route/worktree selectors, PR
   list/detail, checks, reviewers, and inline review-thread compositions.
 - Command execution, structured file diffs, tool calls, approvals, and notices.
 - Composer attachments, mentions, modes, queued prompts, and running states.
