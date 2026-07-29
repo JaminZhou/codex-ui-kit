@@ -460,10 +460,7 @@
       "area": "app-shell",
       "ownership": "app",
       "packageEvidence": ["app-main", "projects-index-page"],
-      "runtimeStatus": "runtime_observed",
-      "runtimeEvidence": [
-        "cdp-26.721:projects-entry-and-deidentified-list-structure"
-      ],
+      "runtimeStatus": "not_sampled",
       "implementationStatus": "partial",
       "browserStatus": "not_started",
       "electronStatus": "not_started",
