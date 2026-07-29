@@ -219,25 +219,36 @@ try {
     throw new Error("Electron MCP integration did not reveal all calls.");
   }
   await calls.first().locator("summary").click();
-  const mcpInteraction = await mcpPage.evaluate(() => ({
-    groupExpanded:
-      document
-        .querySelector(".codex-ui-mcp-tool-call-group details")
-        ?.hasAttribute("open") ?? false,
-    resultContainsCanonicalUrl:
-      document
-        .querySelector(".codex-ui-tool-call__structured")
-        ?.textContent?.includes(
-          "https://learn.chatgpt.com/docs/extend/mcp",
-        ) ?? false,
-    timelineExpanded:
-      document
-        .querySelector(".codex-ui-activity-timeline")
-        ?.hasAttribute("data-expanded") ?? false,
-  }));
+  const mcpInteraction = await mcpPage.evaluate(() => {
+    const structuredText = document.querySelector(
+      ".codex-ui-tool-call__structured",
+    )?.textContent;
+    let resultHasCanonicalUrl = false;
+    try {
+      const structuredResult = JSON.parse(structuredText ?? "null");
+      resultHasCanonicalUrl =
+        typeof structuredResult === "object" &&
+        structuredResult !== null &&
+        structuredResult.url ===
+          "https://learn.chatgpt.com/docs/extend/mcp";
+    } catch {
+      resultHasCanonicalUrl = false;
+    }
+    return {
+      groupExpanded:
+        document
+          .querySelector(".codex-ui-mcp-tool-call-group details")
+          ?.hasAttribute("open") ?? false,
+      resultHasCanonicalUrl,
+      timelineExpanded:
+        document
+          .querySelector(".codex-ui-activity-timeline")
+          ?.hasAttribute("data-expanded") ?? false,
+    };
+  });
   if (
     !mcpInteraction.groupExpanded ||
-    !mcpInteraction.resultContainsCanonicalUrl ||
+    !mcpInteraction.resultHasCanonicalUrl ||
     !mcpInteraction.timelineExpanded
   ) {
     throw new Error(

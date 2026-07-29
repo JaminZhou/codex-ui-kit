@@ -34,7 +34,7 @@ export const visualScenes = [
   {
     frame: "mcp-tool-calls",
     id: "mcp-tool-calls",
-    maxPixelRatio: 0.01,
+    maxPixelRatio: 0.02,
     scenario: "mcp-tool-call",
     scrollTop: 72,
     surfaces: ["mcpGroup"],
