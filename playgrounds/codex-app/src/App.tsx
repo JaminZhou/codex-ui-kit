@@ -62,6 +62,7 @@ import {
   type ReviewSelection,
 } from "./review-selection";
 import {
+  mcpToolCallGroupDurationMs,
   mcpToolCallGroupForEntry,
   mcpToolCallPresentation,
 } from "./mcp-tool-call-view";
@@ -942,12 +943,7 @@ export function App() {
         (initialSelection.frame === "mcp-running" ||
           initialSelection.frame === "mcp-progress" ||
           initialSelection.frame === "mcp-tool-calls");
-      const durationMs =
-        state.turnDurationMs ??
-        calls.reduce(
-          (total, call) => total + (call.durationMs ?? 0),
-          0,
-        );
+      const durationMs = mcpToolCallGroupDurationMs(state, calls);
       return (
         <ActivityTimeline
           key={`mcp-group:${toolCall.turnId}:${toolCall.server}`}

@@ -136,6 +136,7 @@ export interface DemoProtocolState {
   threadId: string | null;
   timeline: DemoTimelineEntry[];
   turnDurationMs: number | null;
+  turnDurationsMs: Record<string, number>;
 }
 
 export const initialProtocolState: DemoProtocolState = {
@@ -154,6 +155,7 @@ export const initialProtocolState: DemoProtocolState = {
   threadId: null,
   timeline: [],
   turnDurationMs: null,
+  turnDurationsMs: {},
 };
 
 type RecordValue = Record<string, unknown>;
@@ -895,6 +897,10 @@ export function reduceProtocolNotification(
       retrying: false,
       status,
       turnDurationMs: durationMs,
+      turnDurationsMs:
+        turnId && durationMs !== null
+          ? { ...state.turnDurationsMs, [turnId]: durationMs }
+          : state.turnDurationsMs,
     };
   }
 

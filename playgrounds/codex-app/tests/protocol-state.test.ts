@@ -86,6 +86,7 @@ describe("protocol lifecycle reducer", () => {
       "message",
     ]);
     expect(completed.turnDurationMs).toBe(54_000);
+    expect(completed.turnDurationsMs["turn-mcp"]).toBe(54_000);
     expect(completed.messages.at(-1)?.text).toContain(
       "https://learn.chatgpt.com/docs/extend/mcp",
     );

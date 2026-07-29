@@ -1,9 +1,13 @@
 import { describe, expect, it } from "vitest";
 import {
+  mcpToolCallGroupDurationMs,
   mcpToolCallGroupForEntry,
   mcpToolCallPresentation,
 } from "../src/mcp-tool-call-view";
-import { reduceProtocolTrace } from "../src/protocol-state";
+import {
+  reduceProtocolNotification,
+  reduceProtocolTrace,
+} from "../src/protocol-state";
 import { replayScenarios } from "../src/replay";
 
 describe("MCP tool-call view model", () => {
@@ -26,6 +30,41 @@ describe("MCP tool-call view model", () => {
 
     expect(mcpToolCallGroupForEntry(interleaved, 1)).toHaveLength(5);
     expect(mcpToolCallGroupForEntry(interleaved, 3)).toBeNull();
+  });
+
+  it("keeps a historical group duration scoped to its own turn", () => {
+    const completed = reduceProtocolTrace(
+      replayScenarios["mcp-tool-call"].events,
+    );
+    const afterFollowUp = [
+      {
+        method: "turn/started",
+        params: {
+          threadId: "thread-demo",
+          turn: { id: "turn-follow-up" },
+        },
+      },
+      {
+        method: "turn/completed",
+        params: {
+          threadId: "thread-demo",
+          turn: {
+            durationMs: 900,
+            id: "turn-follow-up",
+            status: "completed",
+          },
+        },
+      },
+    ].reduce(reduceProtocolNotification, completed);
+    const calls = mcpToolCallGroupForEntry(afterFollowUp, 1);
+
+    expect(calls).not.toBeNull();
+    expect(mcpToolCallGroupDurationMs(afterFollowUp, calls!)).toBe(54_000);
+    expect(afterFollowUp.turnDurationMs).toBe(900);
+    expect(afterFollowUp.turnDurationsMs).toMatchObject({
+      "turn-follow-up": 900,
+      "turn-mcp": 54_000,
+    });
   });
 
   it("passes a failed MCP diagnostic through to the tool card", () => {

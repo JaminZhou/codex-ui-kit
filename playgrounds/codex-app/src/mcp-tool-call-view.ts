@@ -40,6 +40,20 @@ export function mcpToolCallGroupForEntry(
   return calls[0]?.id === toolCall.id ? calls : null;
 }
 
+export function mcpToolCallGroupDurationMs(
+  state: DemoProtocolState,
+  calls: readonly DemoMcpToolCall[],
+) {
+  const turnId = calls[0]?.turnId;
+  return (
+    (turnId ? state.turnDurationsMs[turnId] : undefined) ??
+    calls.reduce(
+      (total, call) => total + (call.durationMs ?? 0),
+      0,
+    )
+  );
+}
+
 export function mcpToolCallPresentation(call: DemoMcpToolCall) {
   const result = mcpResultText(call.content);
   return {
