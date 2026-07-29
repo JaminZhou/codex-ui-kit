@@ -382,6 +382,10 @@ export function App() {
     );
   }, [liveState.approvals]);
 
+  const dismissSidebarAfterNavigation = () => {
+    if (sidebarNarrowRef.current) setSidebarOpen(false);
+  };
+
   const selectScenario = (nextId: ReplayScenarioId) => {
     setView("conversation");
     setMode("replay");
@@ -396,6 +400,7 @@ export function App() {
     setTerminalHistoryByCommand({});
     setUndoneFileIds(new Set());
     setLiveError(null);
+    dismissSidebarAfterNavigation();
   };
 
   const respondToApproval = async (
@@ -510,7 +515,8 @@ export function App() {
             onClick={() => {
               setMode("replay");
               setView("pull-request");
-              setPullRequestOpen(true);
+              setPullRequestOpen(!sidebarNarrowRef.current);
+              dismissSidebarAfterNavigation();
             }}
             selected={view === "pull-request"}
           >
@@ -651,6 +657,7 @@ export function App() {
           onClick={() => {
             setView("conversation");
             setMode("live");
+            dismissSidebarAfterNavigation();
           }}
           selected={view === "conversation" && mode === "live"}
         >

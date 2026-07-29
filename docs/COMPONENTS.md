@@ -117,7 +117,8 @@ All privileged behavior remains host-owned. The components never auto-approve co
   `AppSidebarFooter`: grouped primary navigation with one selected route,
   heading-preserving collapsible collections, lifecycle status, measured
   action columns, and an in-flow footer slot that cannot cover navigation.
-  A titleless section remains expanded because it has no operable toggle.
+  A titleless section remains expanded because it has no operable toggle;
+  chevron and action visibility transitions respect reduced motion.
 - `WorkspacePanel`: controlled side or bottom tab shell with labelled tab
   semantics, host action slots, close/open/expand hooks and labels, focusable
   content, and host-owned tab contents.

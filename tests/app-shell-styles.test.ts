@@ -115,6 +115,9 @@ describe("application shell visual contract", () => {
     expect(styles).toContain(
       ".codex-ui-app-sidebar-footer__account",
     );
+    expect(styles).toContain(
+      ".codex-ui-agent-message__actions,\n  .codex-ui-app-sidebar__item-actions,\n  .codex-ui-app-sidebar__section-chevron {\n    transition: none;",
+    );
     expect(component).toContain(
       'kind?: "custom" | "pinned" | "projects" | "threads"',
     );

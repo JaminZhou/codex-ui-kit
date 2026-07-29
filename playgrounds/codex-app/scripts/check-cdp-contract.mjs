@@ -1072,6 +1072,14 @@ try {
       projectEllipsis:
         projectLabel &&
         projectLabel.scrollWidth > projectLabel.clientWidth,
+      reducedMotion: {
+        actions: getComputedStyle(activeToolbar).transitionDuration,
+        chevron: getComputedStyle(
+          document.querySelector(
+            ".codex-ui-app-sidebar__section-chevron",
+          ),
+        ).transitionDuration,
+      },
       resizer: Boolean(
         document.querySelector(
           '.codex-ui-app-shell__sidebar-resizer[role="separator"]',
@@ -1095,6 +1103,8 @@ try {
     !compact.resizer ||
     !compact.projectEllipsis ||
     !compact.activeAction ||
+    Number.parseFloat(compact.reducedMotion.actions) > 0.001 ||
+    Number.parseFloat(compact.reducedMotion.chevron) > 0.001 ||
     !compact.footer ||
     compact.footer.height < 100 ||
     !compact.footerInFlow ||
@@ -1222,6 +1232,35 @@ try {
     );
   }
 
+  await sidebarNarrowPage
+    .getByRole("button", { exact: true, name: "Pull requests" })
+    .click();
+  const navigated = await sidebarNarrowPage.evaluate(() => {
+    const shell = document.querySelector(".codex-ui-app-shell");
+    const main = document.querySelector(".codex-ui-app-shell__main");
+    return {
+      mainInert: main?.hasAttribute("inert"),
+      sidebarOpen: shell?.hasAttribute("data-sidebar-open"),
+      view: document
+        .querySelector(".demo-root")
+        ?.getAttribute("data-view"),
+    };
+  });
+  if (
+    navigated.sidebarOpen ||
+    navigated.mainInert ||
+    navigated.view !== "pull-request"
+  ) {
+    throw new Error(
+      `sidebar-current-narrow: navigation did not dismiss the overlay: ${JSON.stringify(navigated)}`,
+    );
+  }
+
+  await sidebarNarrowPage.reload();
+  await sidebarNarrowPage.waitForSelector(
+    '.demo-root[data-scenario="streaming-recovery"][data-frame="streaming"]',
+  );
+  await showSidebar.click();
   await sidebarNarrowPage.keyboard.press("Escape");
   const dismissed = {
     focusReturned: await showSidebar.evaluate(

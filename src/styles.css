@@ -8003,7 +8003,9 @@ button.codex-ui-generated-image-gallery__image {
     scroll-behavior: auto;
   }
 
-  .codex-ui-agent-message__actions {
+  .codex-ui-agent-message__actions,
+  .codex-ui-app-sidebar__item-actions,
+  .codex-ui-app-sidebar__section-chevron {
     transition: none;
   }
 
