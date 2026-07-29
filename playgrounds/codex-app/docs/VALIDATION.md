@@ -33,7 +33,10 @@ Every deterministic scenario has one ID and produces four evidence layers:
    tool-call, answer, and Composer regions separately; the current sidebar
    accepts a full 1180×820 external reference through
    `CODEX_UI_KIT_SIDEBAR_REFERENCE` and gates the owned top controls, selected
-   row, and footer regions separately.
+   row, and footer regions separately. Transparent Electron/CDP reference
+   pixels are composited onto the observed `#181818` window background before
+   comparison, and the independent UI's unique current row is located from
+   its DOM contract rather than a hard-coded vertical offset.
 
 The layers do not vote on the same claim. Protocol proves lifecycle behavior;
 CDP explains layout; Electron proves the desktop host; pixels catch final

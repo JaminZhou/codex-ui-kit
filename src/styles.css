@@ -570,7 +570,8 @@
   padding-inline-start: calc(var(--codex-ui-spacing) * 12);
 }
 
-.codex-ui-app-sidebar__item-row .codex-ui-app-sidebar__item {
+.codex-ui-app-sidebar__item-row:not([data-status="idle"])
+  .codex-ui-app-sidebar__item {
   padding-inline-end: calc(var(--codex-ui-spacing) * 6);
 }
 

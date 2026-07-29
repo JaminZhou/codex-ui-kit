@@ -2849,6 +2849,43 @@ describe("application sidebar", () => {
     fireEvent.click(task);
     expect(onOpen).toHaveBeenCalledTimes(1);
   });
+
+  it("preserves the focused navigation button across lifecycle status changes", () => {
+    const { rerender } = render(
+      <AppSidebar>
+        <AppSidebarSection kind="threads" title="Recents">
+          <AppSidebarItem status="idle">Parity task</AppSidebarItem>
+        </AppSidebarSection>
+      </AppSidebar>,
+    );
+    const task = screen.getByRole("button", { name: "Parity task" });
+    task.focus();
+
+    rerender(
+      <AppSidebar>
+        <AppSidebarSection kind="threads" title="Recents">
+          <AppSidebarItem
+            status="running"
+            statusLabel="Task is running"
+          >
+            Parity task
+          </AppSidebarItem>
+        </AppSidebarSection>
+      </AppSidebar>,
+    );
+    expect(screen.getByRole("button", { name: "Parity task" })).toBe(task);
+    expect(document.activeElement).toBe(task);
+
+    rerender(
+      <AppSidebar>
+        <AppSidebarSection kind="threads" title="Recents">
+          <AppSidebarItem status="idle">Parity task</AppSidebarItem>
+        </AppSidebarSection>
+      </AppSidebar>,
+    );
+    expect(screen.getByRole("button", { name: "Parity task" })).toBe(task);
+    expect(document.activeElement).toBe(task);
+  });
 });
 
 describe("workspace panel", () => {

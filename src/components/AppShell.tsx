@@ -1765,8 +1765,6 @@ export function AppSidebarItem({
     </button>
   );
 
-  if (!actions && resolvedStatus === "idle") return item;
-
   return (
     <div
       className="codex-ui-app-sidebar__item-row"

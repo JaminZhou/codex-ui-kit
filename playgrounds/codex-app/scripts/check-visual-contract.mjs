@@ -75,6 +75,25 @@ function comparePng(reference, actual, threshold = 0.05) {
   };
 }
 
+function flattenPng(image, background) {
+  for (let index = 0; index < image.data.length; index += 4) {
+    const alpha = image.data[index + 3] / 255;
+    if (alpha >= 1) continue;
+    image.data[index] = Math.round(
+      image.data[index] * alpha + background.red * (1 - alpha),
+    );
+    image.data[index + 1] = Math.round(
+      image.data[index + 1] * alpha +
+        background.green * (1 - alpha),
+    );
+    image.data[index + 2] = Math.round(
+      image.data[index + 2] * alpha + background.blue * (1 - alpha),
+    );
+    image.data[index + 3] = 255;
+  }
+  return image;
+}
+
 function maskPng(image, masks) {
   for (const { height, left, top, width } of masks) {
     for (let y = top; y < top + height; y += 1) {
@@ -103,8 +122,24 @@ for (const scene of visualScenes) {
   const actualPath = join(artifactDirectory, `${scene.id}.png`);
   const baselinePath = join(baselineDirectory, `${scene.id}.png`);
   const diffPath = join(artifactDirectory, `${scene.id}.diff.png`);
+  let sidebarSelectedTop;
 
   try {
+    if (scene.id === "streaming") {
+      sidebarSelectedTop = await page.evaluate(() => {
+        const current = Array.from(
+          document.querySelectorAll(
+            ".codex-ui-app-sidebar [aria-current=\"page\"]",
+          ),
+        );
+        if (current.length !== 1) {
+          throw new Error(
+            `Expected one current sidebar page, received ${current.length}.`,
+          );
+        }
+        return Math.round(current[0].getBoundingClientRect().top);
+      });
+    }
     if (scene.id === "multi-file-review") {
       await page.evaluate(() => {
         const active = document.activeElement;
@@ -174,8 +209,14 @@ for (const scene of visualScenes) {
   }
 
   if (scene.id === "streaming" && currentBuildSidebarReference) {
-    const referenceFull = PNG.sync.read(
-      await readFile(currentBuildSidebarReference),
+    if (!Number.isInteger(sidebarSelectedTop)) {
+      throw new Error(
+        `${scene.id}: current sidebar row position was not captured.`,
+      );
+    }
+    const referenceFull = flattenPng(
+      PNG.sync.read(await readFile(currentBuildSidebarReference)),
+      { blue: 24, green: 24, red: 24 },
     );
     if (
       referenceFull.width !== currentBuildSidebarReferenceSize.width ||
@@ -221,7 +262,7 @@ for (const scene of visualScenes) {
       selectedMasks,
     );
     const actualSelected = maskPng(
-      cropPng(actual, 8, 278, 258, 30),
+      cropPng(actual, 8, sidebarSelectedTop, 258, 30),
       selectedMasks,
     );
     const selectedComparison = comparePng(

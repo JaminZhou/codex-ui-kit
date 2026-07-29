@@ -1007,6 +1007,15 @@ try {
       accountPopup: document
         .querySelector(".codex-ui-app-sidebar-footer__account")
         ?.getAttribute("aria-haspopup"),
+      currentPages: Array.from(
+        document.querySelectorAll(
+          ".codex-ui-app-sidebar [aria-current=\"page\"]",
+        ),
+        (item) =>
+          item
+            .querySelector(".codex-ui-app-sidebar__item-label")
+            ?.textContent?.trim() ?? item.textContent?.trim(),
+      ),
       layoutMode: shell?.getAttribute("data-layout-mode"),
       main: main ? rect(main) : null,
       projectEllipsis:
@@ -1036,6 +1045,8 @@ try {
     !compact.projectEllipsis ||
     !compact.activeAction ||
     compact.accountPopup !== "menu" ||
+    JSON.stringify(compact.currentPages) !==
+      JSON.stringify(["Streaming and retry"]) ||
     !compact.settingsAction
   ) {
     throw new Error(

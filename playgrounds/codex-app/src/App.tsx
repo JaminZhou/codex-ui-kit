@@ -548,7 +548,6 @@ export function App() {
           }
           actionsLabel="Current task actions"
           leading={<SidebarGlyph name="folder" />}
-          selected={view === "conversation" && mode === "replay"}
           status={hasActiveTurnWork(state) ? "running" : "idle"}
           statusLabel="Current task is running"
         >
@@ -564,11 +563,6 @@ export function App() {
           depth={1}
           leading={<SidebarGlyph name="thread" />}
           onClick={() => selectScenario("mcp-tool-call")}
-          selected={
-            view === "conversation" &&
-            mode === "replay" &&
-            scenarioId === "mcp-tool-call"
-          }
           status="unread"
           statusLabel="Unread update"
         >
@@ -622,7 +616,11 @@ export function App() {
             key={item.id}
             leading={<SidebarGlyph name="thread" />}
             onClick={() => selectScenario(item.id)}
-            selected={mode === "replay" && scenarioId === item.id}
+            selected={
+              view === "conversation" &&
+              mode === "replay" &&
+              scenarioId === item.id
+            }
             status={
               index === 1
                 ? "queued"
