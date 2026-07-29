@@ -45,19 +45,23 @@ observation from a previous build remains historical evidence.
 
 ## Current baseline
 
-- Codex Desktop `26.721.41059` (`5848`)
-- Sampled on 2026-07-26 and reverified on 2026-07-29
+- Codex Desktop `26.721.81911` (`5973`)
+- Package sampled and reverified on 2026-07-29
 - `app.asar` SHA-256:
-  `da39a51b06fb4c728d418b8f0f05fc8fd8c6b1f74c4fb4d47c20c7914a798f45`
+  `3c9a101d9beec3718b0fcfc19e427c644a934045f48b3fe0e16b68b0b3f23e61`
 - Computer Use automation: blocked by the environment safety policy for
   `com.openai.codex`
 - Scoped CDP automation: available through a user-authorized second process;
   the Chromium profile is separate, but Codex application data and navigation
   are not fully isolated
-- Current inventory: 63 surface groups; 43 have scoped runtime evidence, of
-  which 29 include current-build structural evidence and 14 are previous-build
-  only; another 20 remain `not_sampled`. Browser verification covers 22
-  groups and Electron verification covers 19.
+- Fresh current-build Renderer capture: pending; the package fingerprint is
+  current, while all recorded runtime evidence remains tied to earlier builds
+
+Current inventory: 68 surface groups; 0 have current-build runtime evidence,
+45 have previous-build-only runtime evidence, 23 remain `not_sampled`, and 0
+are `blocked_by_policy`. Current-build Browser verification covers 0 groups
+and Electron verification covers 0. Prior acceptance remains recorded as
+`partial_legacy` until current-build re-observation.
 
 The current package exposes candidates far beyond the old transcript sample:
 application and thread shells, local/remote conversation routes, projects and
@@ -65,7 +69,7 @@ workspace selection, PR review, editor diff, terminal, browser and artifact
 panels, document previews, settings, MCP, plugins, skills, automations, remote
 connections, and feature-gated surfaces.
 
-The current CDP probe confirms loopback access, distinguishes the main
+The previous-build CDP probe confirms loopback access, distinguishes the main
 application-shell target from a second small application page, reaches the
 new-chat destination/context setup plus the Project and Local environment
 dialogs, and now revalidates the Pull requests index plus an aggregate
@@ -74,8 +78,8 @@ resize handle and its 240–520px range, the independent Review-panel resize
 track, and one public PR's Summary, Timeline, and Code views. The broader
 queue, Sources, Sites, Scheduled tasks, Plugins, Skills,
 and Settings samples were recorded on `26.715.72359`. Those entries remain
-`runtime_observed` with build-scoped evidence, but they do not satisfy the
-current-build verification gate until reached again. The seed list is not an
+`runtime_observed` with build-scoped evidence, but none satisfy the
+`26.721.81911` verification gate until reached again. The seed list is not an
 exhaustive denominator: newly observed routes, variants, and cross-layer
 transitions must add or split IDs.
 
@@ -84,6 +88,8 @@ transitions must add or split IDs.
 ### P0: establish the real product skeleton
 
 - Application shell, projects index, new-thread and workspace selection.
+- Left sidebar shell, primary routes, project navigation, thread history,
+  item actions/status, and footer/account/settings behavior.
 - Local, remote, and ChatGPT conversation routing.
 - Thread shell, virtualized timeline, composer, queue, panel system, summary,
   navigation, approvals, interruption/recovery, and worktree transitions.
@@ -118,14 +124,22 @@ H5 and Electron remain acceptance surfaces throughout implementation, but
 polish is intentionally last so component and layout churn does not invalidate
 finished visual work.
 
+The complete workstream order, sidebar acceptance matrix, exit gates, and
+planned PR sequence are defined in [`DELIVERY_PLAN.md`](DELIVERY_PLAN.md).
+
 ## Current implementation slice
+
+The implementation history below names the exact observed build. Acceptance
+that previously matched `26.721.41059` remains regression coverage, but every
+affected inventory row is now `partial_legacy` until it is re-observed on
+`26.721.81911`.
 
 The first P0 shell slice provides independently implemented `AppShell`,
 `AppSidebar`, and `WorkspacePanel` compositions. It covers the measured wide
 sidebar/side-panel/bottom-panel tracks, controlled landmarks and tab semantics,
-an accessible 16px pointer/keyboard navigation resizer with current-build
-240–520px clamps, and container-responsive overlay transitions that keep the
-right panel inside medium and narrow viewports.
+an accessible 16px pointer/keyboard navigation resizer with the
+`26.721.41059` 240–520px clamps, and container-responsive overlay transitions
+that keep the right panel inside medium and narrow viewports.
 
 The next workflow slice adds `ConversationEventList` and `ConversationEvent`
 for explicit turn/thread ownership and event kinds; `WorkspaceSelection`,
@@ -145,7 +159,7 @@ remains a protocol-neutral host composition for products that genuinely use a
 single route choice; it is no longer treated as the current Codex new-chat
 model.
 
-The current new-chat slice adds `NewConversationStart`,
+The `26.721.41059`-backed new-chat slice adds `NewConversationStart`,
 `ConversationContextBar`, `ConversationProjectListbox`, and
 `LocalEnvironmentDialog`. It keeps the
 application-owned ChatGPT destination independent from project, execution
@@ -160,46 +174,48 @@ disabling, selects a local environment, submits the real composer, and captures
 both wide and compact dialog screenshots.
 
 The narrow `conversation.destination`, `conversation.context-controls`, and
-`app.new-thread-workspace-selection` slices are current-build Browser and
-Electron verified. Their implementation remains `partial` because the probe
-does not establish Remote destination behavior, real project option contents,
-creation workflows, or persistence. The broader project index, environment
-settings, and worktree settings families remain partial, as does the legacy
-host-defined route selector. Exact current-build PR review-detail behavior
-remains `not_sampled`, so the generic review components do not establish
-product parity. Native application-shell composition and the remaining P0
-conversation/workspace variants also remain open. Final
-H5/Electron visual unification is intentionally deferred until coverage
-stabilizes.
+`app.new-thread-workspace-selection` slices were Browser- and
+Electron-verified against `26.721.41059`; they are now `partial_legacy`.
+Their implementation remains `partial` because the probe does not establish
+Remote destination behavior, real project option contents, creation
+workflows, or persistence. The broader project index, environment settings,
+and worktree settings families remain partial, as does the legacy host-defined
+route selector. Exact `26.721.81911` PR review-detail behavior remains
+`not_sampled`, so the generic review components do not establish product
+parity. Native application-shell composition and the remaining P0
+conversation/workspace variants also remain open. Final H5/Electron visual
+unification is intentionally deferred until coverage stabilizes.
 
 The current-thread slice adds `ConversationThreadShell`, which composes the
 existing header, scroll-following timeline, messages, and Composer into one
-responsive public surface. Its current-build contract locks the 46px header,
-768px outer thread column, 736px wide Composer card, 16px responsive insets,
-98px multiline Composer, 28px submit/Stop control, user/assistant alignment,
-completed assistant actions, and the measured user-to-assistant turn gap.
+responsive public surface. Its `26.721.41059`-derived contract locks the 46px
+header, 768px outer thread column, 736px wide Composer card, 16px responsive
+insets, 98px multiline Composer, 28px submit/Stop control, user/assistant
+alignment, completed assistant actions, and the measured user-to-assistant
+turn gap.
 
-The H5 showcase verifies those relationships in Chromium at 1440×1000 light
-and dark plus 820×680 compact light. The Electron acceptance flow verifies the
-same composition in real 1180×820 and 820×680 BrowserWindows, including
-top/bottom timeline positioning and the running Stop state. A separate
-main-only dark fixture accepts a current-build PNG reference through
+The H5 showcase retains regression coverage for those relationships in
+Chromium at 1440×1000 light and dark plus 820×680 compact light. The Electron
+acceptance flow retains the same composition coverage in real 1180×820 and
+820×680 BrowserWindows, including top/bottom timeline positioning and the
+running Stop state. A separate main-only dark fixture accepts a `26.721.41059`
+PNG reference through
 `CODEX_UI_KIT_THREAD_REFERENCE` and gates the full image plus the header,
 message band, and Composer regions independently. The sampled completed state
 matches all measured region geometry and stays below a 0.5% full-image raster
 delta at the strict 0.05 pixel threshold.
 
 The visual gate is now scenario-driven. A second external reference supplied
-through `CODEX_UI_KIT_THREAD_STREAMING_REFERENCE` covers a current-build
-running reply and 28px `Stop` control. It locks 14/22px running text, the 736px
-reply/Composer columns, and the 736×98 Composer card. Its declared mask omits
-only the workspace-owned Environment control from the thread-owned
+through `CODEX_UI_KIT_THREAD_STREAMING_REFERENCE` covers a `26.721.41059`
+running reply and 28px `Stop` control. It locks 14/22px running text, the
+736px reply/Composer columns, and the 736×98 Composer card. Its declared mask
+omits only the workspace-owned Environment control from the thread-owned
 comparison; the remaining full raster and header/message/Composer regions
 stay independently bounded.
 
-Three more current-build scenarios cover an expanded read-only command,
-a pending command approval, and an applied file card with the Review panel
-open. The command and approval remain turn-owned. The file scenario explicitly
+Three more `26.721.41059` scenarios cover an expanded read-only command, a
+pending command approval, and an applied file card with the Review panel open.
+The command and approval remain turn-owned. The file scenario explicitly
 splits its 666px conversation region from the independent 406px
 workspace-owned Review panel, and its regional checker accepts optional
 horizontal bounds so those owners are gated separately.
@@ -207,18 +223,19 @@ horizontal bounds so those owners are gated separately.
 The workflow fixture extends `FileChange` with a host-owned leading indicator
 slot and composes the existing `ActivityTimeline`, `CommandExecution`,
 `ApprovalRequest`, `ConversationThreadShell`, `WorkspacePanel`, and `FileDiff`
-primitives. Current-build Browser evidence plus the existing real
-BrowserWindow acceptance promote the sampled command and approval states.
+primitives. Browser evidence and real `BrowserWindow` acceptance previously
+verified the sampled command and approval states against `26.721.41059`; their
+current inventory status is `partial_legacy`.
 
 The protocol-backed Codex App playground now exercises command execution, a
 real App Server approval request/response, the applied turn-owned file card,
 and the host-owned Review split in a real BrowserWindow. CDP locks the named
 surface geometry and computed layout, Electron acceptance closes and reopens
 the Review panel, and reviewed pixels gate the five workflow frames. Paired
-with the existing current-build captures, this promotes the sampled file card,
-Review side-panel, and editor diff to Electron-verified. They remain
-implementation-partial because broader content and error variants remain
-open.
+with the `26.721.41059` captures, this previously verified the sampled file
+card, Review side-panel, and editor diff in Electron. Their current status is
+`partial_legacy`, and they remain implementation-partial because broader
+content and error variants remain open.
 
 The multi-file slice adds public `FileChangeGroup` and `FileReview`
 components. A protocol-backed two-file trace renders one aggregate
@@ -227,11 +244,11 @@ diffs in the workspace panel. CDP requires one card, two file rows, two Review
 sections, exact focus labels, valid split geometry, and no horizontal
 overflow. Electron drives close, file-specific reopen, group reopen, and
 Undo, then repeats the geometry assertions in a real 800×600 BrowserWindow.
-An optional 906×820 current-build raster gate compares the whole main region
+An optional 906×820 `26.721.41059` raster gate compares the whole main region
 and its 536px conversation/370px Review ownership regions separately. This
-promotes `workspace.multi-file-review` to Browser- and Electron-verified while
-remaining implementation-partial for mixed change kinds and broader real
-PR-review variants.
+previously verified `workspace.multi-file-review` in Browser and Electron; its
+current status is `partial_legacy`, and implementation remains partial for
+mixed change kinds and broader real PR-review variants.
 
 The large-Review acceptance slice expands the deterministic public-protocol
 fixture to eight files and 96 addition lines. Its Review region must overflow
@@ -239,7 +256,7 @@ internally, and selecting the eighth file must scroll that exact section fully
 into view in both CDP and a real `BrowserWindow`. A thirteenth reviewed
 full-frame pixel baseline guards the resulting layout. This validates large
 file-set rendering and selection scrolling in the independent implementation;
-it is not current-build evidence for an eight-file product state.
+it is not product evidence for an eight-file state on any observed build.
 
 The Pull request detail slice adds a controlled, resizable workspace panel
 with a public `PullRequestPanelSummary`, an icon-capable PR list row, and
@@ -248,14 +265,15 @@ detail, 16px separator, 320px panel minimum, 352px retained main track, and
 expand/restore lifecycle. Electron drives pointer and keyboard resizing,
 tab changes, comment entry, and full-panel expansion in a real
 `BrowserWindow`. A fourteenth reviewed baseline covers the whole integration,
-while an optional 906×820 current-build gate compares the index and detail
-regions separately. This promotes `workspace.pull-request-route` and
-`workspace.pull-request-review` to Browser- and Electron-verified for the
-sampled public PR path; merge execution, review submission, loading/failure
-states, and broader PR variants remain outside this slice.
+while an optional 906×820 `26.721.41059` gate compares the index and detail
+regions separately. This previously verified `workspace.pull-request-route`
+and `workspace.pull-request-review` in Browser and Electron for the sampled
+public PR path; both are now `partial_legacy`. Merge execution, review
+submission, loading/failure states, and broader PR variants remain outside
+this slice.
 
-The Terminal slice completes the bottom-panel interaction contract for the
-sampled current build. Scoped CDP measured a 272px default bottom panel, 152px
+The Terminal slice completes the bottom-panel interaction contract for
+`26.721.41059`. Scoped CDP measured a 272px default bottom panel, 152px
 minimum, half-height responsive maximum, 16px drag strip, 33px tab header,
 239px content region, named tab/tabpanel, and `Terminal input`. The independent
 `AppShell` adds controlled or uncontrolled pointer and Arrow/Home/End resizing
@@ -268,7 +286,7 @@ The pinned public App Server client supplies `processId`, command output, and
 terminal trace. CDP gates the standard geometry and semantics across 15
 frames. Electron drives pointer and keyboard resizing, local input submission,
 close/restore, and 820×680 compact geometry. The reviewed pixel baseline also
-accepts an optional 906×820 current-build reference; the accepted sample
+accepts an optional 906×820 `26.721.41059` reference; the accepted sample
 differs by 1.2791% in the full Terminal panel and 0.7288% in its content at the
 strict 0.05 threshold. Whole-main pixels are reported but not promoted because
 the synthetic protocol conversation intentionally differs from the observed
@@ -278,13 +296,14 @@ remain outside this slice.
 
 The compact tool/recovery slice splits the former combined
 `thread.search-tool-mcp-events` candidate into independent search, Browser, and
-MCP tool-event rows. Current-build CDP evidence promotes completed web search
-and Browser activity, while the unsuccessful GitHub request is tracked
-separately as `thread.tool-unavailable-recovery`: it proves the visible
-assistant recovery message, not an MCP call. `BrowserActivity` supplies a
-protocol-neutral completed/running/failed disclosure with ordered browser
-steps, and the Electron playground exercises that public component without
-claiming exact compact-window parity.
+MCP tool-event rows. `26.721.41059` CDP evidence previously verified completed
+web search and Browser activity in the Browser gate; both are now
+`partial_legacy`. The unsuccessful GitHub request is tracked separately as
+`thread.tool-unavailable-recovery`: it proves the visible assistant recovery
+message, not an MCP call. `BrowserActivity` supplies a protocol-neutral
+completed/running/failed disclosure with ordered browser steps, and the
+Electron playground exercises that public component without claiming exact
+compact-window parity.
 
 Four external 526×600 main-only references now gate completed web search,
 expanded Browser steps, unavailable-MCP recovery, and a failed exit-code-7
@@ -294,8 +313,8 @@ geometry remain independent, so a passing plain assistant fallback cannot
 promote MCP tool rendering and a failed command cannot promote thread-level
 render/retry recovery.
 
-The successful-MCP slice now samples a real read-only
-`openaiDeveloperDocs` run on build `26.721.41059`. Current-build CDP records
+The successful-MCP slice samples a real read-only `openaiDeveloperDocs` run on
+build `26.721.41059`. That build's CDP evidence records
 the completed answer, the `Worked for 54s` disclosure, the
 `Used OpenAI Developer Docs integration` group, and its three Search plus two
 Fetch calls. The public App Server trace uses only schema-validated
@@ -304,13 +323,13 @@ Fetch calls. The public App Server trace uses only schema-validated
 `ToolCallCard` renders each call. CDP locks the 14px/21px hierarchy and 25px
 call rows; Electron expands the duration, group, and structured result; two
 reviewed lifecycle frames cover running and completed states. An optional
-906×820 current-build pixel gate limits the full main region to 3%, the tool
+906×820 `26.721.41059` pixel gate limits the full main region to 3%, the tool
 region to 4%, the answer region to 4%, and the Composer region to 2.5%. This
-promotes only the sampled public-docs success path; authentication,
-elicitation, approvals, failures, other connectors, and mixed MCP results
-remain open.
+previously verified only the sampled public-docs success path; its current
+status is `partial_legacy`, and authentication, elicitation, approvals,
+failures, other connectors, and mixed MCP results remain open.
 
-The long-thread continuity slice adds the current-build default ten-message
+The long-thread continuity slice adds the `26.721.41059` default ten-message
 threshold and measured 36×10 rows to `ThreadMessageNavigationRail`, exposes
 the rail and 32×32 latest-message control as overlay slots on
 `ConversationThreadShell`, and adds `ThreadInterruptionSummary` plus
@@ -320,19 +339,20 @@ context-completed states. Their full-image deltas are 1.8139%, 2.9354%,
 3.2975%, 3.6442%, and 3.4328%, with all named geometry and header/thread/
 Composer regional limits passing.
 
-Current runtime evidence also records that the product's long-thread viewport
-uses reverse-origin scrolling (`scrollTop = 0` at latest, negative away from
-latest). The public package keeps the actual windowing and scroll algorithm
-host-owned. Browser and Electron acceptance exercise the placeholder,
-navigation, and follow contracts but not reverse scrolling or windowing, so
-the virtualization row remains `partial_legacy`. The interruption acceptance
-renders the observed summary statically rather than driving a host
-run-to-stop-to-summary transition, so that row also remains `partial_legacy`.
-The current error/retry state was not safely reached and remains a separate
-unpromoted gate. Compaction acceptance statically renders the observed running
-and completed states rather than driving their host transition, so
-`thread.context-compaction` also remains `partial_legacy`; it does not promote
-the still-unreached thread summary panel.
+The `26.721.41059` runtime evidence also records that the product's long-thread
+viewport uses reverse-origin scrolling (`scrollTop = 0` at latest, negative
+away from latest). The public package keeps the actual windowing and scroll
+algorithm host-owned. Browser and Electron acceptance exercise the
+placeholder, navigation, and follow contracts but not reverse scrolling or
+windowing, so the virtualization row remains `partial_legacy`. The
+interruption acceptance renders the observed summary statically rather than
+driving a host run-to-stop-to-summary transition, so that row also remains
+`partial_legacy`. The `26.721.81911` error/retry state has not been safely
+reached and remains a separate unpromoted gate. Compaction acceptance
+statically renders the observed running and completed states rather than
+driving their host transition, so `thread.context-compaction` also remains
+`partial_legacy`; it does not promote the still-unreached thread summary
+panel.
 
 This is a measurement- and raster-backed basic thread/workspace slice, not a
 claim that the whole application or every lifecycle is pixel-perfect. Broader
@@ -343,14 +363,16 @@ merge/review-submission states, Terminal multi-tab and
 process-creation/termination lifecycles, and native Codex window behavior
 retain their own inventory gates.
 
-The current Markdown slice revalidates one synthetic completed response on
-build `26.721.41059`. CDP records semantic heading, paragraph, link, inline
-code, quote, list, table, fenced-code, and action/copy controls together with
-their computed styles. The protocol replay adds a sixteenth deterministic
-frame; Browser and Electron gates verify external-link semantics, code-copy
-behavior, the four completed-response actions, 736px content geometry, and
-the measured scroll clearance above the 736px Composer. A main-only 906×820
-reference compares assistant, code-card, and Composer ownership regions
-independently. This promotes only the sampled completed Markdown vocabulary;
-nested lists, task lists, images, math, citations/sources, very large tables,
-streaming Markdown mutation, and error variants remain open.
+The Markdown slice revalidates one synthetic completed response on build
+`26.721.41059`. That build's CDP evidence records semantic heading, paragraph,
+link, inline code, quote, list, table, fenced-code, and action/copy controls
+together with their computed styles. The protocol replay adds a sixteenth
+deterministic frame; Browser and Electron gates retain regression coverage for
+external-link semantics, code-copy behavior, the four completed-response
+actions, 736px content geometry, and the measured scroll clearance above the
+736px Composer. A main-only 906×820 reference compares assistant, code-card,
+and Composer ownership regions independently. This previously verified only
+the sampled completed Markdown vocabulary against `26.721.41059`; its current
+status is `partial_legacy`. Nested lists, task lists, images, math,
+citations/sources, very large tables, streaming Markdown mutation, and error
+variants remain open.

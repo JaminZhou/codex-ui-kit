@@ -21,25 +21,29 @@ Codex UI Kit turns those interaction patterns into protocol-neutral React primit
 
 - The current components are a partial coding-agent UI foundation, not a
   complete Codex Desktop reconstruction.
-- The latest sampled package is `26.721.41059` (`5848`). Its seed candidate
+- The latest sampled package is `26.721.81911` (`5973`). Its seed candidate
   surface and evidence status are tracked in
   [`research/UI_INVENTORY.md`](research/UI_INVENTORY.md); current-build runtime
-  observation and verification remain partial.
+  observation and verification are pending after the package update.
 - The repository is public and the package baseline is `0.1.0`, but the npm package has **not** been published.
 - The API remains pre-1.0 and may change while public documentation and consumer feedback mature.
 - Extracted application files, private IPC, bundled fonts, and OpenAI brand assets are not included.
 
-Explore the [interactive component showcase](https://jaminzhou.com/codex-ui-kit/) or review the [coverage policy](research/PARITY.md).
+Explore the [interactive component showcase](https://jaminzhou.com/codex-ui-kit/),
+review the [coverage policy](research/PARITY.md), or follow the
+[delivery plan](research/DELIVERY_PLAN.md).
 
 ## Highlights
 
-- A current-build measured conversation shell plus partial message, activity,
-  reasoning, plan, streaming, and mixed conversation-event primitives.
+- A conversation shell measured against the previous runtime build
+  `26.721.41059`, plus partial message, activity, reasoning, plan, streaming,
+  and mixed conversation-event primitives; current-build revalidation is
+  pending.
 - Application/sidebar and side/bottom workspace-panel composition with a
-  current-build measured, pointer- and keyboard-resizable navigation and
+  previously measured, pointer- and keyboard-resizable navigation and
   bottom-panel tracks plus container-responsive overlay behavior.
-- Project index, current new-chat destination/context setup, grouped local
-  environment dialog, protocol-neutral route/worktree selectors, PR
+- Project index, previous-build new-chat destination/context setup, grouped
+  local environment dialog, protocol-neutral route/worktree selectors, PR
   list/detail, checks, reviewers, and inline review-thread compositions.
 - Command execution, structured file diffs, tool calls, approvals, and notices.
 - Composer attachments, mentions, modes, queued prompts, and running states.

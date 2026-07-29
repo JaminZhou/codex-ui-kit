@@ -48,3 +48,8 @@ without treating one proprietary build as permanent source of truth.
 `pnpm check:research` validates the inventory schema and prevents a surface
 from being marked browser- or Electron-verified without current runtime
 evidence.
+
+[`DELIVERY_PLAN.md`](DELIVERY_PLAN.md) defines the ordered workstreams,
+application-shell and sidebar coverage, per-surface exit gate, and planned PR
+sequence. [`UI_INVENTORY.md`](UI_INVENTORY.md) remains the human-readable
+status view, backed by `ui-inventory.json`.

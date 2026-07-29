@@ -1,11 +1,21 @@
 import { readFile } from "node:fs/promises";
 
 const inventoryUrl = new URL("../research/ui-inventory.json", import.meta.url);
+const inventoryMarkdownUrl = new URL(
+  "../research/UI_INVENTORY.md",
+  import.meta.url,
+);
+const deliveryPlanUrl = new URL(
+  "../research/DELIVERY_PLAN.md",
+  import.meta.url,
+);
 const visualScenariosUrl = new URL(
   "../research/visual-scenarios.json",
   import.meta.url,
 );
 const inventory = JSON.parse(await readFile(inventoryUrl, "utf8"));
+const inventoryMarkdown = await readFile(inventoryMarkdownUrl, "utf8");
+const deliveryPlan = await readFile(deliveryPlanUrl, "utf8");
 const visualScenarios = JSON.parse(
   await readFile(visualScenariosUrl, "utf8"),
 );
@@ -112,6 +122,8 @@ if (
 }
 
 const ids = new Set();
+const currentRuntimeEvidenceIds = new Set();
+const previousRuntimeEvidenceIds = new Set();
 const visualScenarioIds = new Set();
 
 for (const scenario of visualScenarios.scenarios) {
@@ -251,6 +263,15 @@ for (const surface of inventory.surfaces) {
   ) {
     throw new Error(`missing runtime evidence for ${surface.id}`);
   }
+  if (
+    surface.runtimeStatus !== "runtime_observed" &&
+    Array.isArray(surface.runtimeEvidence) &&
+    surface.runtimeEvidence.length > 0
+  ) {
+    throw new Error(
+      `${surface.id} cannot retain runtime evidence while ${surface.runtimeStatus}`,
+    );
+  }
   const runtimeBuilds = (surface.runtimeEvidence ?? []).map((evidence) => {
     const prefix = evidence.split(":", 1)[0];
     const build = runtimeEvidenceBuilds[prefix];
@@ -261,6 +282,13 @@ for (const surface of inventory.surfaces) {
     }
     return build;
   });
+  if (surface.runtimeStatus === "runtime_observed") {
+    if (runtimeBuilds.includes(currentRuntimeBuild)) {
+      currentRuntimeEvidenceIds.add(surface.id);
+    } else {
+      previousRuntimeEvidenceIds.add(surface.id);
+    }
+  }
 
   const serializedStatuses = [
     surface.runtimeStatus,
@@ -298,6 +326,59 @@ const priorities = inventory.surfaces.reduce(
   },
   { p0: 0, p1: 0, p2: 0 },
 );
+
+const statuses = inventory.surfaces.reduce(
+  (counts, surface) => {
+    counts.runtime[surface.runtimeStatus] += 1;
+    counts.browser[surface.browserStatus] += 1;
+    counts.electron[surface.electronStatus] += 1;
+    return counts;
+  },
+  {
+    runtime: { blocked_by_policy: 0, not_sampled: 0, runtime_observed: 0 },
+    browser: { not_started: 0, partial_legacy: 0, verified: 0 },
+    electron: { not_started: 0, partial_legacy: 0, verified: 0 },
+  },
+);
+const visibleMarkdownSummary = [
+  `Current inventory: ${inventory.surfaces.length} surface groups;`,
+  `${currentRuntimeEvidenceIds.size} have current-build runtime evidence,`,
+  `${previousRuntimeEvidenceIds.size} have previous-build-only runtime`,
+  `evidence, ${statuses.runtime.not_sampled} remain \`not_sampled\`, and`,
+  `${statuses.runtime.blocked_by_policy} are \`blocked_by_policy\`.`,
+  "Current-build Browser verification covers",
+  `${statuses.browser.verified} groups and Electron verification covers`,
+  `${statuses.electron.verified}.`,
+].join(" ");
+const normalizedInventoryMarkdown = inventoryMarkdown.replace(/\s+/g, " ");
+
+if (!normalizedInventoryMarkdown.includes(visibleMarkdownSummary)) {
+  throw new Error(
+    `UI_INVENTORY.md visible summary is stale; expected ${visibleMarkdownSummary}`,
+  );
+}
+
+const visibleRoadmapPrioritySummary = [
+  `The inventory contains ${inventory.surfaces.length} surface groups:`,
+  `${priorities.p0} P0, ${priorities.p1} P1, and ${priorities.p2} P2.`,
+].join(" ");
+const visibleRoadmapRuntimeSummary = [
+  `${currentRuntimeEvidenceIds.size} groups have current-build runtime`,
+  `evidence, ${previousRuntimeEvidenceIds.size} have previous-build-only`,
+  `runtime evidence, and ${statuses.runtime.not_sampled} have not been sampled.`,
+].join(" ");
+const normalizedDeliveryPlan = deliveryPlan.replace(/\s+/g, " ");
+
+for (const summary of [
+  visibleRoadmapPrioritySummary,
+  visibleRoadmapRuntimeSummary,
+]) {
+  if (!normalizedDeliveryPlan.includes(summary)) {
+    throw new Error(
+      `DELIVERY_PLAN.md visible summary is stale; expected ${summary}`,
+    );
+  }
+}
 
 console.log(
   `research inventory ok: ${inventory.surfaces.length} surfaces (${priorities.p0} P0, ${priorities.p1} P1, ${priorities.p2} P2)`,
