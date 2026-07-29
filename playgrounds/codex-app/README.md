@@ -125,6 +125,23 @@ The eighth slice adds a real successful public MCP workflow:
 - an optional 906×820 current-build comparison for full-main, tool-call,
   answer, and Composer regions.
 
+## Ninth vertical slice
+
+The ninth slice completes the first current-build application-sidebar
+contract:
+
+- the 274px shell, 46px titlebar-safe inset, 70px header, 30px rows, and fixed
+  46px footer measured on Codex Desktop `26.721.81911`;
+- primary routes, collapsible Pinned/Projects/Recents sections, long names,
+  dense history, status indicators, keyboard-accessible row actions, account,
+  and settings composition;
+- normal responsive behavior with an 820×680 split and a default-hidden,
+  focus-managed 720px modal sidebar;
+- an explicit wide capture mode so pixel fixtures do not override normal
+  responsive behavior;
+- Browser and Electron interaction gates plus an optional current-build
+  regional sidebar comparison.
+
 ## Development
 
 From the repository root:
@@ -185,6 +202,14 @@ The successful MCP gate uses the expanded 906×820 main-only reference:
 
 ```bash
 CODEX_UI_KIT_MCP_TOOL_CALL_REFERENCE=/absolute/path/to/mcp-main-reference.png \
+  pnpm --filter @codex-ui-kit/codex-app-playground check:visual
+```
+
+The sidebar gate uses a full 1180×820 current-build reference and compares
+only application-owned regions:
+
+```bash
+CODEX_UI_KIT_SIDEBAR_REFERENCE=/absolute/path/to/sidebar-reference.png \
   pnpm --filter @codex-ui-kit/codex-app-playground check:visual
 ```
 

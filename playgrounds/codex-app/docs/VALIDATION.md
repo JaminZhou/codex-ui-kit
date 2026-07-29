@@ -5,7 +5,10 @@ Every deterministic scenario has one ID and produces four evidence layers:
 1. **Protocol** — ordered App Server notifications, server requests, and
    request responses checked against the pinned generated schemas.
 2. **CDP** — DOM identity, computed layout, focus, scrolling, and named-surface
-   geometry, including the 16px navigation separator and large-Review
+   geometry, including the current 274px sidebar, 46px titlebar inset, 70px
+   header, 30px rows, fixed footer, collapsible groups, focusable row actions,
+   and 820px split/720px modal transition; the 16px navigation separator and
+   large-Review
    overflow/reveal contract, plus the 16px PR/Review separator, responsive
    limits, tab states, and expand/restore lifecycle, and the 16px Terminal
    separator, 272px default panel, responsive bounds, named tab/tabpanel, and
@@ -27,7 +30,10 @@ Every deterministic scenario has one ID and produces four evidence layers:
    scenario accepts `CODEX_UI_KIT_MARKDOWN_REFERENCE` and gates assistant,
    fenced-code, and Composer regions separately; the successful-MCP scenario
    accepts `CODEX_UI_KIT_MCP_TOOL_CALL_REFERENCE` and gates full-main,
-   tool-call, answer, and Composer regions separately.
+   tool-call, answer, and Composer regions separately; the current sidebar
+   accepts a full 1180×820 external reference through
+   `CODEX_UI_KIT_SIDEBAR_REFERENCE` and gates the owned top controls, selected
+   row, and footer regions separately.
 
 The layers do not vote on the same claim. Protocol proves lifecycle behavior;
 CDP explains layout; Electron proves the desktop host; pixels catch final

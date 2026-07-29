@@ -8,6 +8,7 @@ import {
   AgentTurn,
   AppShell,
   AppSidebar,
+  AppSidebarFooter,
   AppSidebarItem,
   AppSidebarSection,
   ArtifactList,
@@ -223,6 +224,7 @@ void AgentThreadViewport;
 void AgentTurn;
 void AppShell;
 void AppSidebar;
+void AppSidebarFooter;
 void AppSidebarItem;
 void AppSidebarSection;
 void ArtifactList;

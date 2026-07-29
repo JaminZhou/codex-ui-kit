@@ -74,6 +74,20 @@ function PlusIcon() {
   );
 }
 
+function SidebarChevronIcon() {
+  return (
+    <svg aria-hidden="true" fill="none" viewBox="0 0 16 16">
+      <path
+        d="m6 4 4 4-4 4"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="1.25"
+      />
+    </svg>
+  );
+}
+
 function useSurfaceFocusRestoration(
   open: boolean,
   surfaceRef: RefObject<HTMLElement | null>,
@@ -175,7 +189,7 @@ export type AppShellLayoutMode = "narrow" | "medium" | "wide";
 // CSS container-query conditions cannot consume custom properties. Keep these
 // internal constants locked to the matching queries in styles.css.
 const appShellMediumBreakpointRem = 92;
-const appShellNarrowBreakpointRem = 52;
+const appShellNarrowBreakpointRem = 45;
 
 function appShellContentBoxWidth(shell: HTMLElement) {
   const borderBoxWidth = shell.getBoundingClientRect().width;
@@ -1414,12 +1428,14 @@ export function AppShell({
         ) : null}
         {onSidebarOpenChange ? (
           <button
+            aria-hidden={!sidebarModalOpen}
             aria-label="Close navigation sidebar"
             className="codex-ui-app-shell__backdrop"
             data-backdrop="sidebar"
+            hidden={!sidebarModalOpen}
             onClick={() => onSidebarOpenChange(false)}
             ref={sidebarBackdropRef}
-            tabIndex={sidebarOpen ? 0 : -1}
+            tabIndex={sidebarModalOpen ? 0 : -1}
             type="button"
           />
         ) : null}
@@ -1544,6 +1560,8 @@ export interface AppSidebarProps
   footer?: ReactNode;
   header?: ReactNode;
   navigationLabel?: string;
+  primaryNavigation?: ReactNode;
+  titlebarInset?: boolean;
 }
 
 export function AppSidebar({
@@ -1552,11 +1570,14 @@ export function AppSidebar({
   footer,
   header,
   navigationLabel = "Primary",
+  primaryNavigation,
+  titlebarInset = false,
   ...props
 }: AppSidebarProps) {
   return (
     <div
       className={["codex-ui-app-sidebar", className].filter(Boolean).join(" ")}
+      data-titlebar-inset={titlebarInset || undefined}
       {...props}
     >
       {header ? (
@@ -1566,6 +1587,11 @@ export function AppSidebar({
         aria-label={navigationLabel}
         className="codex-ui-app-sidebar__navigation"
       >
+        {primaryNavigation ? (
+          <div className="codex-ui-app-sidebar__primary">
+            {primaryNavigation}
+          </div>
+        ) : null}
         {children}
       </nav>
       {footer ? (
@@ -1579,64 +1605,141 @@ export interface AppSidebarSectionProps
   extends Omit<HTMLAttributes<HTMLElement>, "children" | "title"> {
   actions?: ReactNode;
   children: ReactNode;
+  collapsible?: boolean;
+  defaultExpanded?: boolean;
+  expanded?: boolean;
+  kind?: "custom" | "pinned" | "projects" | "threads";
+  onExpandedChange?: (expanded: boolean) => void;
   title?: ReactNode;
+  toggleLabel?: string;
 }
 
 export function AppSidebarSection({
   actions,
   children,
   className,
+  collapsible = false,
+  defaultExpanded = true,
+  expanded,
+  kind = "custom",
+  onExpandedChange,
   title,
+  toggleLabel,
   ...props
 }: AppSidebarSectionProps) {
   const headingId = useId();
+  const contentId = useId();
+  const [internalExpanded, setInternalExpanded] = useState(defaultExpanded);
+  const isExpanded = expanded ?? internalExpanded;
+  const setExpanded = (nextExpanded: boolean) => {
+    if (expanded === undefined) setInternalExpanded(nextExpanded);
+    onExpandedChange?.(nextExpanded);
+  };
   return (
     <section
       aria-labelledby={title ? headingId : undefined}
       className={["codex-ui-app-sidebar__section", className]
         .filter(Boolean)
         .join(" ")}
+      data-collapsible={collapsible || undefined}
+      data-expanded={collapsible ? isExpanded : undefined}
+      data-kind={kind}
       {...props}
     >
       {title || actions ? (
         <div className="codex-ui-app-sidebar__section-header">
-          {title ? <h2 id={headingId}>{title}</h2> : <span />}
+          {title ? (
+            collapsible ? (
+              <button
+                aria-controls={contentId}
+                aria-expanded={isExpanded}
+                aria-label={toggleLabel}
+                className="codex-ui-app-sidebar__section-toggle"
+                onClick={() => setExpanded(!isExpanded)}
+                type="button"
+              >
+                <h2 id={headingId}>{title}</h2>
+                <span className="codex-ui-app-sidebar__section-chevron">
+                  <SidebarChevronIcon />
+                </span>
+              </button>
+            ) : (
+              <h2 id={headingId}>{title}</h2>
+            )
+          ) : (
+            <span />
+          )}
           {actions}
         </div>
       ) : null}
-      <div className="codex-ui-app-sidebar__items">{children}</div>
+      <div
+        className="codex-ui-app-sidebar__items"
+        hidden={collapsible && !isExpanded}
+        id={contentId}
+      >
+        {children}
+      </div>
     </section>
   );
 }
 
+export type AppSidebarItemStatus =
+  | "error"
+  | "idle"
+  | "queued"
+  | "running"
+  | "unread";
+
 export interface AppSidebarItemProps
   extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, "children"> {
+  actions?: ReactNode;
+  actionsLabel?: string;
   badge?: ReactNode;
   children: ReactNode;
+  depth?: 0 | 1 | 2;
   description?: ReactNode;
   leading?: ReactNode;
+  pinned?: boolean;
   selected?: boolean;
+  status?: AppSidebarItemStatus;
+  statusLabel?: string;
   trailing?: ReactNode;
+  unread?: boolean;
 }
 
 export function AppSidebarItem({
+  actions,
+  actionsLabel = "Item actions",
   badge,
   children,
   className,
+  depth = 0,
   description,
   leading,
+  pinned = false,
   selected = false,
+  status = "idle",
+  statusLabel,
   trailing,
   type = "button",
+  unread = false,
   ...props
 }: AppSidebarItemProps) {
-  return (
+  const statusId = useId();
+  const resolvedStatus = unread && status === "idle" ? "unread" : status;
+  const item = (
     <button
       aria-current={selected ? "page" : undefined}
+      aria-describedby={
+        resolvedStatus !== "idle" ? statusId : undefined
+      }
       className={["codex-ui-app-sidebar__item", className]
         .filter(Boolean)
         .join(" ")}
+      data-depth={depth}
+      data-pinned={pinned || undefined}
       data-selected={selected || undefined}
+      data-status={resolvedStatus}
       type={type}
       {...props}
     >
@@ -1660,6 +1763,113 @@ export function AppSidebarItem({
         <span className="codex-ui-app-sidebar__item-trailing">{trailing}</span>
       ) : null}
     </button>
+  );
+
+  if (!actions && resolvedStatus === "idle") return item;
+
+  return (
+    <div
+      className="codex-ui-app-sidebar__item-row"
+      data-depth={depth}
+      data-has-actions={Boolean(actions) || undefined}
+      data-selected={selected || undefined}
+      data-status={resolvedStatus}
+    >
+      {item}
+      {resolvedStatus !== "idle" ? (
+        <span
+          aria-label={statusLabel ?? resolvedStatus}
+          className="codex-ui-app-sidebar__item-status"
+          data-status={resolvedStatus}
+          id={statusId}
+          role="status"
+        />
+      ) : null}
+      {actions ? (
+        <span
+          aria-label={actionsLabel}
+          className="codex-ui-app-sidebar__item-actions"
+          role="toolbar"
+        >
+          {actions}
+        </span>
+      ) : null}
+    </div>
+  );
+}
+
+export interface AppSidebarFooterProps
+  extends Omit<HTMLAttributes<HTMLDivElement>, "children"> {
+  account: ReactNode;
+  accountAvatar?: ReactNode;
+  accountButtonProps?: Omit<
+    ButtonHTMLAttributes<HTMLButtonElement>,
+    "children"
+  >;
+  actions?: ReactNode;
+  status?: ReactNode;
+}
+
+export function AppSidebarFooter({
+  account,
+  accountAvatar,
+  accountButtonProps,
+  actions,
+  className,
+  status,
+  ...props
+}: AppSidebarFooterProps) {
+  const {
+    className: accountClassName,
+    type: accountType = "button",
+    ...resolvedAccountButtonProps
+  } = accountButtonProps ?? {};
+  return (
+    <div
+      className={["codex-ui-app-sidebar-footer", className]
+        .filter(Boolean)
+        .join(" ")}
+      {...props}
+    >
+      <button
+        className={[
+          "codex-ui-app-sidebar-footer__account",
+          accountClassName,
+        ]
+          .filter(Boolean)
+          .join(" ")}
+        type={accountType}
+        {...resolvedAccountButtonProps}
+      >
+        {accountAvatar ? (
+          <span
+            aria-hidden="true"
+            className="codex-ui-app-sidebar-footer__avatar"
+          >
+            {accountAvatar}
+          </span>
+        ) : null}
+        <span className="codex-ui-app-sidebar-footer__identity">
+          <span className="codex-ui-app-sidebar-footer__account-label">
+            {account}
+          </span>
+          {status ? (
+            <span className="codex-ui-app-sidebar-footer__status">
+              {status}
+            </span>
+          ) : null}
+        </span>
+      </button>
+      {actions ? (
+        <span
+          aria-label="Sidebar footer actions"
+          className="codex-ui-app-sidebar-footer__actions"
+          role="toolbar"
+        >
+          {actions}
+        </span>
+      ) : null}
+    </div>
   );
 }
 

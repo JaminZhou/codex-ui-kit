@@ -54,14 +54,15 @@ observation from a previous build remains historical evidence.
 - Scoped CDP automation: available through a user-authorized second process;
   the Chromium profile is separate, but Codex application data and navigation
   are not fully isolated
-- Fresh current-build Renderer capture: pending; the package fingerprint is
-  current, while all recorded runtime evidence remains tied to earlier builds
+- Fresh current-build Renderer capture: recorded for the dark 1180×820 main
+  application target and the six left-sidebar groups; light-theme and
+  unrelated surface evidence remain pending
 
-Current inventory: 68 surface groups; 0 have current-build runtime evidence,
-45 have previous-build-only runtime evidence, 23 remain `not_sampled`, and 0
-are `blocked_by_policy`. Current-build Browser verification covers 0 groups
-and Electron verification covers 0. Prior acceptance remains recorded as
-`partial_legacy` until current-build re-observation.
+Current inventory: 68 surface groups; 6 have current-build runtime evidence,
+43 have previous-build-only runtime evidence, 19 remain `not_sampled`, and 0
+are `blocked_by_policy`. Current-build Browser verification covers 6 groups
+and Electron verification covers 6. Prior acceptance outside the sidebar
+remains recorded as `partial_legacy` until current-build re-observation.
 
 The current package exposes candidates far beyond the old transcript sample:
 application and thread shells, local/remote conversation routes, projects and
@@ -133,6 +134,19 @@ The implementation history below names the exact observed build. Acceptance
 that previously matched `26.721.41059` remains regression coverage, but every
 affected inventory row is now `partial_legacy` until it is re-observed on
 `26.721.81911`.
+
+The current sidebar slice re-observes all six application-sidebar groups on
+`26.721.81911`. It independently implements the 274px shell, 46px
+traffic-light-safe titlebar inset, 70px header, 30px rows, collapsible
+Projects/Pinned/Recents sections, dense thread status/action rows, and fixed
+46px account/settings footer. The normal H5 and Electron compositions remain
+split at 820×680, default to a hidden sidebar at the 720px narrow gate, and
+reopen it as a focus-managed modal overlay. Deterministic capture mode remains
+explicitly wide so regional pixel fixtures do not disable the real
+responsive contract. Browser, Electron, and the current-build dark regional
+pixel comparison pass for this sampled sidebar contract; implementation stays
+`partial` because light-theme runtime evidence, native current-app resize, and
+broader route/state continuity are still separate work.
 
 The first P0 shell slice provides independently implemented `AppShell`,
 `AppSidebar`, and `WorkspacePanel` compositions. It covers the measured wide

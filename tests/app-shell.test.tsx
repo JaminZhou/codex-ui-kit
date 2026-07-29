@@ -13,6 +13,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import {
   AppShell,
   AppSidebar,
+  AppSidebarFooter,
   AppSidebarItem,
   AppSidebarSection,
   ApprovalRequest,
@@ -107,6 +108,72 @@ describe("application shell", () => {
     ).toBeTruthy();
     expect(
       screen.getByRole("button", { name: "Review files" }),
+    ).toBeTruthy();
+  });
+
+  it("keeps the current 820px split and enters modal navigation at 720px", () => {
+    let resize: ((width: number) => void) | undefined;
+    class ResizeObserverMock {
+      constructor(
+        private readonly callback: ResizeObserverCallback,
+      ) {}
+
+      disconnect() {}
+
+      observe(target: Element) {
+        if (!target.classList.contains("codex-ui-app-shell")) return;
+        resize = (width) =>
+          this.callback(
+            [
+              {
+                contentRect: { height: 680, width },
+                target,
+              } as ResizeObserverEntry,
+            ],
+            this as unknown as ResizeObserver,
+          );
+      }
+
+      unobserve() {}
+    }
+    vi.stubGlobal("ResizeObserver", ResizeObserverMock);
+    const onSidebarOpenChange = vi.fn();
+    const { container } = render(
+      <AppShell
+        onSidebarOpenChange={onSidebarOpenChange}
+        sidebar={<button type="button">Projects</button>}
+        sidebarOpen
+        sidebarResizable
+      >
+        <button type="button">Conversation</button>
+      </AppShell>,
+    );
+    const shell = container.querySelector(".codex-ui-app-shell")!;
+
+    act(() => resize?.(820));
+    expect(shell.getAttribute("data-layout-mode")).toBe("medium");
+    expect(
+      screen.getByRole("separator", {
+        name: "Resize navigation sidebar",
+      }),
+    ).toBeTruthy();
+    expect(
+      screen.queryByRole("button", {
+        name: "Close navigation sidebar",
+      }),
+    ).toBeNull();
+
+    act(() => resize?.(720));
+    expect(shell.getAttribute("data-layout-mode")).toBe("narrow");
+    expect(
+      screen.queryByRole("separator", {
+        name: "Resize navigation sidebar",
+      }),
+    ).toBeNull();
+    expect(
+      screen.getByRole("button", {
+        name: "Close navigation sidebar",
+      }),
     ).toBeTruthy();
   });
 
@@ -903,14 +970,13 @@ describe("application shell", () => {
   it("exposes controlled overlay dismissal", () => {
     const onSidebarOpenChange = vi.fn();
     const onSidePanelOpenChange = vi.fn();
-    render(
+    const { rerender } = render(
       <AppShell
         bottomPanel="Terminal"
         bottomPanelOpen
+        layoutMode="narrow"
         onSidePanelOpenChange={onSidePanelOpenChange}
         onSidebarOpenChange={onSidebarOpenChange}
-        sidePanel="Sources"
-        sidePanelOpen
         sidebar="Navigation"
         sidebarOpen
       >
@@ -920,6 +986,19 @@ describe("application shell", () => {
 
     fireEvent.click(
       screen.getByRole("button", { name: "Close navigation sidebar" }),
+    );
+    rerender(
+      <AppShell
+        layoutMode="medium"
+        onSidePanelOpenChange={onSidePanelOpenChange}
+        onSidebarOpenChange={onSidebarOpenChange}
+        sidePanel="Sources"
+        sidePanelOpen
+        sidebar="Navigation"
+        sidebarOpen={false}
+      >
+        Thread
+      </AppShell>,
     );
     fireEvent.click(
       screen.getByRole("button", { name: "Close workspace panel" }),
@@ -2673,6 +2752,102 @@ describe("application sidebar", () => {
     ).toBe("page");
     expect(screen.getByText("Open reviews")).toBeTruthy();
     expect(screen.getByText("3")).toBeTruthy();
+  });
+
+  it("models fixed primary navigation, collapsible collections, and footer account actions", () => {
+    const onExpandedChange = vi.fn();
+    render(
+      <AppSidebar
+        footer={
+          <AppSidebarFooter
+            account="Demo account"
+            accountAvatar="D"
+            accountButtonProps={{
+              "aria-expanded": false,
+              "aria-haspopup": "menu",
+            }}
+            actions={<button type="button">Settings</button>}
+            status="Connected"
+          />
+        }
+        header="Codex"
+        primaryNavigation={
+          <AppSidebarItem leading="＋">New task</AppSidebarItem>
+        }
+        titlebarInset
+      >
+        <AppSidebarSection
+          collapsible
+          kind="projects"
+          onExpandedChange={onExpandedChange}
+          title="Projects"
+          toggleLabel="Toggle projects"
+        >
+          <AppSidebarItem depth={1}>codex-ui-kit</AppSidebarItem>
+        </AppSidebarSection>
+      </AppSidebar>,
+    );
+
+    expect(screen.getByRole("button", { name: "New task" })).toBeTruthy();
+    expect(
+      document
+        .querySelector(".codex-ui-app-sidebar")
+        ?.hasAttribute("data-titlebar-inset"),
+    ).toBe(true);
+    const toggle = screen.getByRole("button", {
+      name: "Toggle projects",
+    });
+    expect(toggle.getAttribute("aria-expanded")).toBe("true");
+    fireEvent.click(toggle);
+    expect(toggle.getAttribute("aria-expanded")).toBe("false");
+    expect(screen.queryByRole("button", { name: "codex-ui-kit" })).toBeNull();
+    expect(onExpandedChange).toHaveBeenCalledWith(false);
+    expect(
+      screen.getByRole("button", { name: "Demo account Connected" }),
+    ).toBeTruthy();
+    expect(
+      screen.getByRole("button", { name: "Settings" }),
+    ).toBeTruthy();
+  });
+
+  it("keeps row actions separate from navigation activation and exposes lifecycle status", () => {
+    const onOpen = vi.fn();
+    const onRename = vi.fn();
+    render(
+      <AppSidebar>
+        <AppSidebarSection kind="threads" title="Recents">
+          <AppSidebarItem
+            actions={
+              <button onClick={onRename} type="button">
+                Rename
+              </button>
+            }
+            actionsLabel="Parity task actions"
+            depth={1}
+            onClick={onOpen}
+            selected
+            status="running"
+            statusLabel="Task is running"
+          >
+            Parity task
+          </AppSidebarItem>
+        </AppSidebarSection>
+      </AppSidebar>,
+    );
+
+    const task = screen.getByRole("button", { name: "Parity task" });
+    expect(task.getAttribute("aria-current")).toBe("page");
+    expect(task.getAttribute("data-depth")).toBe("1");
+    expect(task.getAttribute("data-status")).toBe("running");
+    expect(screen.getByRole("status", { name: "Task is running" })).toBeTruthy();
+    expect(
+      screen.getByRole("toolbar", { name: "Parity task actions" }),
+    ).toBeTruthy();
+    fireEvent.click(screen.getByRole("button", { name: "Rename" }));
+    expect(onRename).toHaveBeenCalledTimes(1);
+    expect(onOpen).not.toHaveBeenCalled();
+    fireEvent.click(task);
+    expect(onOpen).toHaveBeenCalledTimes(1);
   });
 });
 

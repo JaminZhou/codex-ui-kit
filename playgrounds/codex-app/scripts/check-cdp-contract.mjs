@@ -429,6 +429,60 @@ for (const scene of visualScenes) {
         rootStatus: root.getAttribute("data-status"),
         scenario: root.getAttribute("data-scenario"),
         shell: shellRect,
+        sidebar: (() => {
+          const sidebar = document.querySelector(
+            ".codex-ui-app-sidebar",
+          );
+          const sidebarHeader = sidebar?.querySelector(
+            ".codex-ui-app-sidebar__header",
+          );
+          const navigation = sidebar?.querySelector(
+            ".codex-ui-app-sidebar__navigation",
+          );
+          const footer = sidebar?.querySelector(
+            ".codex-ui-app-sidebar__footer",
+          );
+          const selected = sidebar?.querySelectorAll(
+            '.codex-ui-app-sidebar__item[aria-current="page"]',
+          );
+          if (!sidebar || !sidebarHeader || !navigation || !footer) {
+            return null;
+          }
+          return {
+            actionToolbars: sidebar.querySelectorAll(
+              ".codex-ui-app-sidebar__item-actions[role=\"toolbar\"]",
+            ).length,
+            footer: rect(footer),
+            header: rect(sidebarHeader),
+            navigation: {
+              clientHeight: navigation.clientHeight,
+              rect: rect(navigation),
+              scrollHeight: navigation.scrollHeight,
+            },
+            projectToggleExpanded: sidebar
+              .querySelector(
+                '.codex-ui-app-sidebar__section[data-kind="projects"] .codex-ui-app-sidebar__section-toggle',
+              )
+              ?.getAttribute("aria-expanded"),
+            rect: rect(sidebar),
+            selectedCount: selected?.length ?? 0,
+            statusCounts: {
+              error: sidebar.querySelectorAll(
+                '.codex-ui-app-sidebar__item-status[data-status="error"]',
+              ).length,
+              queued: sidebar.querySelectorAll(
+                '.codex-ui-app-sidebar__item-status[data-status="queued"]',
+              ).length,
+              running: sidebar.querySelectorAll(
+                '.codex-ui-app-sidebar__item-status[data-status="running"]',
+              ).length,
+              unread: sidebar.querySelectorAll(
+                '.codex-ui-app-sidebar__item-status[data-status="unread"]',
+              ).length,
+            },
+            titlebarInset: sidebar.hasAttribute("data-titlebar-inset"),
+          };
+        })(),
         styles: {
           composerPosition: getComputedStyle(composer).position,
           resizerCursor: getComputedStyle(sidebarResizer).cursor,
@@ -539,6 +593,30 @@ for (const scene of visualScenes) {
     }
     if (contract.styles.viewportOverflowY !== "auto") {
       throw new Error(`${scene.id}: conversation viewport is not scrollable.`);
+    }
+    if (
+      !contract.sidebar ||
+      !contract.sidebar.titlebarInset ||
+      Math.abs(contract.sidebar.rect.width - 274) > 1 ||
+      Math.abs(contract.sidebar.rect.height - 820) > 1 ||
+      Math.abs(contract.sidebar.header.top - 46) > 1 ||
+      Math.abs(contract.sidebar.header.height - 70) > 1 ||
+      Math.abs(contract.sidebar.navigation.top - 116) > 1 ||
+      Math.abs(contract.sidebar.navigation.bottom - 820) > 1 ||
+      Math.abs(contract.sidebar.footer.height - 46) > 1 ||
+      Math.abs(contract.sidebar.footer.bottom - 820) > 1 ||
+      contract.sidebar.navigation.scrollHeight <=
+        contract.sidebar.navigation.clientHeight ||
+      contract.sidebar.projectToggleExpanded !== "false" ||
+      contract.sidebar.actionToolbars < 8 ||
+      contract.sidebar.statusCounts.error !== 1 ||
+      contract.sidebar.statusCounts.queued < 1 ||
+      contract.sidebar.statusCounts.unread < 2 ||
+      contract.sidebar.selectedCount < 1
+    ) {
+      throw new Error(
+        `${scene.id}: current-build sidebar contract failed: ${JSON.stringify(contract.sidebar)}`,
+      );
     }
     if (
       contract.styles.resizerCursor !== "col-resize" ||
@@ -866,6 +944,233 @@ try {
   }
 } finally {
   await markdownStartedApp.close();
+}
+
+const sidebarScene = {
+  frame: "streaming",
+  id: "sidebar-current",
+  scenario: "streaming-recovery",
+};
+const { app: sidebarApp, page: sidebarPage } = await launchScene(
+  sidebarScene,
+  {
+    capture: false,
+    windowSize: { height: 680, width: 820 },
+  },
+);
+try {
+  const projectsToggle = sidebarPage.getByRole("button", {
+    name: "Toggle projects",
+  });
+  if ((await projectsToggle.getAttribute("aria-expanded")) !== "false") {
+    throw new Error("sidebar-current: Projects did not start collapsed.");
+  }
+  await projectsToggle.click();
+  const longProject = sidebarPage.getByRole("button", {
+    name: "protocol-client-with-an-intentionally-long-worktree-name",
+  });
+  await longProject.waitFor({ state: "visible" });
+  const taskActions = sidebarPage.getByRole("toolbar", {
+    name: /Sidebar task actions for/,
+  });
+  const firstAction = taskActions.first().getByRole("button");
+  await firstAction.focus();
+  const compact = await sidebarPage.evaluate(() => {
+    const rect = (element) => {
+      const value = element.getBoundingClientRect();
+      return {
+        height: value.height,
+        left: value.left,
+        width: value.width,
+      };
+    };
+    const sidebar = document.querySelector(".codex-ui-app-sidebar");
+    const main = document.querySelector(".codex-ui-app-shell__main");
+    const shell = document.querySelector(".codex-ui-app-shell");
+    const project = Array.from(
+      document.querySelectorAll(".codex-ui-app-sidebar__item"),
+    ).find((item) =>
+      item.textContent?.includes(
+        "protocol-client-with-an-intentionally-long-worktree-name",
+      ),
+    );
+    const projectLabel = project?.querySelector(
+      ".codex-ui-app-sidebar__item-label",
+    );
+    const active = document.activeElement;
+    return {
+      activeAction:
+        active instanceof HTMLButtonElement &&
+        active.closest(
+          ".codex-ui-app-sidebar__item-actions[role=\"toolbar\"]",
+        ) !== null,
+      accountPopup: document
+        .querySelector(".codex-ui-app-sidebar-footer__account")
+        ?.getAttribute("aria-haspopup"),
+      layoutMode: shell?.getAttribute("data-layout-mode"),
+      main: main ? rect(main) : null,
+      projectEllipsis:
+        projectLabel &&
+        projectLabel.scrollWidth > projectLabel.clientWidth,
+      resizer: Boolean(
+        document.querySelector(
+          '.codex-ui-app-shell__sidebar-resizer[role="separator"]',
+        ),
+      ),
+      settingsAction: Boolean(
+        document.querySelector(
+          '.codex-ui-app-sidebar-footer__actions button[aria-label="Open settings"]',
+        ),
+      ),
+      sidebar: sidebar ? rect(sidebar) : null,
+    };
+  });
+  if (
+    compact.layoutMode !== "medium" ||
+    !compact.sidebar ||
+    !compact.main ||
+    Math.abs(compact.sidebar.width - 274) > 1 ||
+    Math.abs(compact.main.left - 274) > 1 ||
+    Math.abs(compact.main.width - 546) > 1 ||
+    !compact.resizer ||
+    !compact.projectEllipsis ||
+    !compact.activeAction ||
+    compact.accountPopup !== "menu" ||
+    !compact.settingsAction
+  ) {
+    throw new Error(
+      `sidebar-current: compact interaction contract failed: ${JSON.stringify(compact)}`,
+    );
+  }
+  await projectsToggle.click();
+  const collapsed = {
+    expanded: await projectsToggle.getAttribute("aria-expanded"),
+    focusRetained: await projectsToggle.evaluate(
+      (element) => document.activeElement === element,
+    ),
+    projectVisible: await longProject.isVisible(),
+  };
+  if (
+    collapsed.expanded !== "false" ||
+    collapsed.projectVisible ||
+    !collapsed.focusRetained
+  ) {
+    throw new Error(
+      `sidebar-current: collapsing Projects did not hide content and retain focus: ${JSON.stringify(collapsed)}`,
+    );
+  }
+  await writeFile(
+    join(artifactDirectory, "sidebar-current.json"),
+    `${JSON.stringify(compact, null, 2)}\n`,
+  );
+} finally {
+  await sidebarApp.close();
+}
+
+const sidebarNarrowScene = {
+  frame: "streaming",
+  id: "sidebar-current-narrow",
+  scenario: "streaming-recovery",
+};
+const { app: sidebarNarrowApp, page: sidebarNarrowPage } =
+  await launchScene(sidebarNarrowScene, {
+    capture: false,
+    windowSize: { height: 680, width: 720 },
+  });
+try {
+  const showSidebar = sidebarNarrowPage.getByRole("button", {
+    name: "Show sidebar",
+  });
+  const initial = await sidebarNarrowPage.evaluate(() => {
+    const rect = (element) => {
+      const value = element.getBoundingClientRect();
+      return {
+        height: value.height,
+        left: value.left,
+        width: value.width,
+      };
+    };
+    const shell = document.querySelector(".codex-ui-app-shell");
+    const sidebar = document.querySelector(".codex-ui-app-shell__sidebar");
+    const main = document.querySelector(".codex-ui-app-shell__main");
+    const backdrop = document.querySelector(
+      '.codex-ui-app-shell__backdrop[data-backdrop="sidebar"]',
+    );
+    return {
+      backdropHidden: backdrop?.hasAttribute("hidden"),
+      layoutMode: shell?.getAttribute("data-layout-mode"),
+      main: main ? rect(main) : null,
+      resizer: Boolean(
+        document.querySelector(
+          '.codex-ui-app-shell__sidebar-resizer[role="separator"]',
+        ),
+      ),
+      sidebar: sidebar ? rect(sidebar) : null,
+      sidebarAriaHidden: sidebar?.getAttribute("aria-hidden"),
+      sidebarOpen: shell?.hasAttribute("data-sidebar-open"),
+    };
+  });
+  if (
+    initial.layoutMode !== "narrow" ||
+    initial.sidebarOpen ||
+    initial.sidebarAriaHidden !== "true" ||
+    !initial.sidebar ||
+    initial.sidebar.left > -273 ||
+    !initial.main ||
+    Math.abs(initial.main.left) > 1 ||
+    Math.abs(initial.main.width - 720) > 1 ||
+    initial.resizer ||
+    initial.backdropHidden !== true
+  ) {
+    throw new Error(
+      `sidebar-current-narrow: initial overlay contract failed: ${JSON.stringify(initial)}`,
+    );
+  }
+
+  await showSidebar.click();
+  const opened = await sidebarNarrowPage.evaluate(() => {
+    const shell = document.querySelector(".codex-ui-app-shell");
+    const sidebar = document.querySelector(".codex-ui-app-shell__sidebar");
+    const main = document.querySelector(".codex-ui-app-shell__main");
+    const backdrop = document.querySelector(
+      '.codex-ui-app-shell__backdrop[data-backdrop="sidebar"]',
+    );
+    return {
+      backdropHidden: backdrop?.hasAttribute("hidden"),
+      mainInert: main?.hasAttribute("inert"),
+      sidebarAriaHidden: sidebar?.getAttribute("aria-hidden"),
+      sidebarLeft: sidebar?.getBoundingClientRect().left,
+      sidebarOpen: shell?.hasAttribute("data-sidebar-open"),
+    };
+  });
+  if (
+    !opened.sidebarOpen ||
+    opened.sidebarAriaHidden !== "false" ||
+    Math.abs(opened.sidebarLeft ?? -274) > 1 ||
+    !opened.mainInert ||
+    opened.backdropHidden !== false
+  ) {
+    throw new Error(
+      `sidebar-current-narrow: opened overlay contract failed: ${JSON.stringify(opened)}`,
+    );
+  }
+
+  await sidebarNarrowPage.keyboard.press("Escape");
+  const dismissed = {
+    focusReturned: await showSidebar.evaluate(
+      (element) => document.activeElement === element,
+    ),
+    sidebarOpen: await sidebarNarrowPage
+      .locator(".codex-ui-app-shell")
+      .evaluate((element) => element.hasAttribute("data-sidebar-open")),
+  };
+  if (dismissed.sidebarOpen || !dismissed.focusReturned) {
+    throw new Error(
+      `sidebar-current-narrow: Escape dismissal failed: ${JSON.stringify(dismissed)}`,
+    );
+  }
+} finally {
+  await sidebarNarrowApp.close();
 }
 
 console.log(`CDP contracts passed for ${visualScenes.length} lifecycle frames.`);

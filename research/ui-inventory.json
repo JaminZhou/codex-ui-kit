@@ -9,7 +9,8 @@
     "runtimeEvidence": "package_only",
     "runtimeEvidenceBuilds": {
       "cdp": "26.715.72359",
-      "cdp-26.721": "26.721.41059"
+      "cdp-26.721": "26.721.41059",
+      "cdp-26.721.81911": "26.721.81911"
     }
   },
   "surfaces": [
@@ -432,11 +433,12 @@
       "runtimeEvidence": [
         "cdp:global-sidebar-and-top-controls",
         "cdp-26.721:main-shell-landmarks-and-interactive-density",
-        "cdp-26.721:navigation-resizer-16px-pointer-track-240-to-520"
+        "cdp-26.721:navigation-resizer-16px-pointer-track-240-to-520",
+        "cdp-26.721.81911:main-renderer-sidebar-274-titlebar-46-header-70-footer-46-and-720-overlay"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "partial_legacy",
-      "electronStatus": "partial_legacy",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
       "priority": "p0"
     },
     {
@@ -448,11 +450,12 @@
       "runtimeEvidence": [
         "cdp:global-sidebar-and-top-controls",
         "cdp:pull-requests-sites-scheduled-plugins-routes",
-        "cdp-26.721:main-shell-landmarks-and-interactive-density"
+        "cdp-26.721:main-shell-landmarks-and-interactive-density",
+        "cdp-26.721.81911:codex-search-new-task-primary-route-stack"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "partial_legacy",
-      "electronStatus": "partial_legacy",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
       "priority": "p0"
     },
     {
@@ -460,10 +463,13 @@
       "area": "app-shell",
       "ownership": "app",
       "packageEvidence": ["app-main", "projects-index-page"],
-      "runtimeStatus": "not_sampled",
+      "runtimeStatus": "runtime_observed",
+      "runtimeEvidence": [
+        "cdp-26.721.81911:projects-collapsible-section-long-name-and-nested-task"
+      ],
       "implementationStatus": "partial",
-      "browserStatus": "not_started",
-      "electronStatus": "not_started",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
       "priority": "p0"
     },
     {
@@ -471,10 +477,13 @@
       "area": "app-shell",
       "ownership": "app",
       "packageEvidence": ["app-main", "thread-app-shell-chrome"],
-      "runtimeStatus": "not_sampled",
-      "implementationStatus": "not_started",
-      "browserStatus": "not_started",
-      "electronStatus": "not_started",
+      "runtimeStatus": "runtime_observed",
+      "runtimeEvidence": [
+        "cdp-26.721.81911:recents-dense-scroll-history-running-queued-unread-error"
+      ],
+      "implementationStatus": "partial",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
       "priority": "p0"
     },
     {
@@ -482,10 +491,13 @@
       "area": "app-shell",
       "ownership": "app",
       "packageEvidence": ["app-main", "thread-app-shell-chrome"],
-      "runtimeStatus": "not_sampled",
+      "runtimeStatus": "runtime_observed",
+      "runtimeEvidence": [
+        "cdp-26.721.81911:hover-focus-actions-and-sibling-status-indicators"
+      ],
       "implementationStatus": "partial",
-      "browserStatus": "not_started",
-      "electronStatus": "not_started",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
       "priority": "p0"
     },
     {
@@ -493,10 +505,13 @@
       "area": "app-shell",
       "ownership": "app",
       "packageEvidence": ["app-main"],
-      "runtimeStatus": "not_sampled",
-      "implementationStatus": "not_started",
-      "browserStatus": "not_started",
-      "electronStatus": "not_started",
+      "runtimeStatus": "runtime_observed",
+      "runtimeEvidence": [
+        "cdp-26.721.81911:fixed-footer-account-avatar-settings-and-bottom-scroll-padding"
+      ],
+      "implementationStatus": "partial",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
       "priority": "p0"
     },
     {

@@ -39,6 +39,12 @@ const currentBuildMcpReferenceSize = {
   height: 820,
   width: 906,
 };
+const currentBuildSidebarReference =
+  process.env.CODEX_UI_KIT_SIDEBAR_REFERENCE;
+const currentBuildSidebarReferenceSize = {
+  height: 820,
+  width: 1180,
+};
 await mkdir(baselineDirectory, { recursive: true });
 await mkdir(artifactDirectory, { recursive: true });
 
@@ -66,6 +72,21 @@ function comparePng(reference, actual, threshold = 0.05) {
     pixels,
     ratio: pixels / (actual.width * actual.height),
   };
+}
+
+function maskPng(image, masks) {
+  for (const { height, left, top, width } of masks) {
+    for (let y = top; y < top + height; y += 1) {
+      for (let x = left; x < left + width; x += 1) {
+        const index = (y * image.width + x) * 4;
+        image.data[index] = 0;
+        image.data[index + 1] = 0;
+        image.data[index + 2] = 0;
+        image.data[index + 3] = 0;
+      }
+    }
+  }
+  return image;
 }
 
 function environmentRatio(name, fallback) {
@@ -147,6 +168,115 @@ for (const scene of visualScenes) {
   if (ratio > maximumRatio) {
     throw new Error(
       `${scene.id}: pixel drift ${(ratio * 100).toFixed(4)}% exceeds ${(maximumRatio * 100).toFixed(2)}%.`,
+    );
+  }
+
+  if (scene.id === "streaming" && currentBuildSidebarReference) {
+    const referenceFull = PNG.sync.read(
+      await readFile(currentBuildSidebarReference),
+    );
+    if (
+      referenceFull.width !== currentBuildSidebarReferenceSize.width ||
+      referenceFull.height !== currentBuildSidebarReferenceSize.height
+    ) {
+      throw new Error(
+        `${scene.id}: current-build sidebar reference must be exactly ${currentBuildSidebarReferenceSize.width}x${currentBuildSidebarReferenceSize.height}, received ${referenceFull.width}x${referenceFull.height}.`,
+      );
+    }
+    if (
+      actual.width !== referenceFull.width ||
+      actual.height !== referenceFull.height
+    ) {
+      throw new Error(
+        `${scene.id}: sidebar comparison requires matching ${referenceFull.width}x${referenceFull.height} frames.`,
+      );
+    }
+
+    const topMasks = [
+      { height: 46, left: 0, top: 0, width: 274 },
+      { height: 34, left: 8, top: 46, width: 258 },
+      { height: 30, left: 12, top: 84, width: 250 },
+      { height: 26, left: 12, top: 118, width: 196 },
+      { height: 26, left: 12, top: 149, width: 196 },
+      { height: 26, left: 12, top: 180, width: 196 },
+      { height: 26, left: 12, top: 211, width: 196 },
+    ];
+    const referenceTop = maskPng(
+      cropPng(referenceFull, 0, 0, 274, 250),
+      topMasks,
+    );
+    const actualTop = maskPng(
+      cropPng(actual, 0, 0, 274, 250),
+      topMasks,
+    );
+    const topComparison = comparePng(referenceTop, actualTop);
+
+    const selectedMasks = [
+      { height: 22, left: 8, top: 4, width: 242 },
+    ];
+    const referenceSelected = maskPng(
+      cropPng(referenceFull, 8, 426, 258, 30),
+      selectedMasks,
+    );
+    const actualSelected = maskPng(
+      cropPng(actual, 8, 278, 258, 30),
+      selectedMasks,
+    );
+    const selectedComparison = comparePng(
+      referenceSelected,
+      actualSelected,
+    );
+
+    const footerMasks = [
+      { height: 32, left: 8, top: 7, width: 258 },
+    ];
+    const referenceFooter = maskPng(
+      cropPng(referenceFull, 0, 774, 274, 46),
+      footerMasks,
+    );
+    const actualFooter = maskPng(
+      cropPng(actual, 0, 774, 274, 46),
+      footerMasks,
+    );
+    const footerComparison = comparePng(
+      referenceFooter,
+      actualFooter,
+    );
+    const maximumTopRatio = environmentRatio(
+      "CODEX_UI_KIT_SIDEBAR_TOP_MAX_DIFF_RATIO",
+      0.07,
+    );
+    const maximumSelectedRatio = environmentRatio(
+      "CODEX_UI_KIT_SIDEBAR_SELECTED_MAX_DIFF_RATIO",
+      0.05,
+    );
+    const maximumFooterRatio = environmentRatio(
+      "CODEX_UI_KIT_SIDEBAR_FOOTER_MAX_DIFF_RATIO",
+      0.05,
+    );
+    if (
+      topComparison.ratio > maximumTopRatio ||
+      selectedComparison.ratio > maximumSelectedRatio ||
+      footerComparison.ratio > maximumFooterRatio
+    ) {
+      throw new Error(
+        `${scene.id}: current-build sidebar pixel ratios ${JSON.stringify({
+          footer: footerComparison.ratio,
+          selected: selectedComparison.ratio,
+          top: topComparison.ratio,
+        })} exceed ${JSON.stringify({
+          footer: maximumFooterRatio,
+          selected: maximumSelectedRatio,
+          top: maximumTopRatio,
+        })}.`,
+      );
+    }
+    console.log(
+      `${scene.id}: current-build sidebar pixel ratios ${JSON.stringify({
+        footer: footerComparison.ratio,
+        selected: selectedComparison.ratio,
+        top: topComparison.ratio,
+      })}`,
     );
   }
 

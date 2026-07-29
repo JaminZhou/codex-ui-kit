@@ -24,10 +24,10 @@ describe("application shell visual contract", () => {
       "@container codex-ui-app-shell (max-width: 92rem) {\n  .codex-ui-app-shell__layout {",
     );
     expect(styles).toContain(
-      "@container codex-ui-app-shell (max-width: 52rem) {\n  .codex-ui-app-shell__layout {",
+      "@container codex-ui-app-shell (max-width: 45rem) {\n  .codex-ui-app-shell__layout {",
     );
     expect(component).toContain("const appShellMediumBreakpointRem = 92");
-    expect(component).toContain("const appShellNarrowBreakpointRem = 52");
+    expect(component).toContain("const appShellNarrowBreakpointRem = 45");
     expect(tokens).not.toContain("--codex-ui-app-shell-medium-breakpoint");
     expect(tokens).not.toContain("--codex-ui-app-shell-narrow-breakpoint");
     expect(styles).toContain(
@@ -61,6 +61,38 @@ describe("application shell visual contract", () => {
     expect(component).toContain("sidebarMaxWidth = 520");
     expect(component).toContain('role="separator"');
     expect(component).toContain('aria-orientation="vertical"');
+  });
+
+  it("locks the current-build sidebar regions and row geometry", () => {
+    expect(tokens).toContain("--codex-ui-app-sidebar-width: 17.125rem");
+    expect(styles).toContain(
+      ".codex-ui-app-sidebar[data-titlebar-inset]",
+    );
+    expect(styles).toContain("padding-block-start: 2.875rem");
+    expect(styles).toContain("min-height: 4.375rem");
+    expect(styles).toContain("min-height: 1.875rem");
+    expect(styles).toContain("border-radius: 0.78125rem");
+    expect(styles).toContain(
+      "background: color-mix(\n    in srgb,\n    var(--codex-ui-text-foreground) 8%",
+    );
+    expect(styles).toContain(
+      ".codex-ui-app-sidebar__section-toggle",
+    );
+    expect(styles).toContain(
+      ".codex-ui-app-sidebar__items[hidden]",
+    );
+    expect(styles).toContain(
+      ".codex-ui-app-sidebar__item-actions",
+    );
+    expect(styles).toContain(
+      ".codex-ui-app-sidebar-footer__account",
+    );
+    expect(component).toContain(
+      'kind?: "custom" | "pinned" | "projects" | "threads"',
+    );
+    expect(component).toContain(
+      'export type AppSidebarItemStatus =',
+    );
   });
 
   it("locks the current-build workspace resize affordance", () => {

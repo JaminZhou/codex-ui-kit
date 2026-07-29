@@ -12,6 +12,7 @@ export const publicRuntimeExports = [
   "AgentTurn",
   "AppShell",
   "AppSidebar",
+  "AppSidebarFooter",
   "AppSidebarItem",
   "AppSidebarSection",
   "ApprovalCommandPreview",
