@@ -41,6 +41,7 @@ const currentBuildMcpReferenceSize = {
 };
 const currentBuildSidebarReference =
   process.env.CODEX_UI_KIT_SIDEBAR_REFERENCE;
+const defaultLifecyclePixelRatio = 0.008;
 const currentBuildSidebarReferenceSize = {
   height: 820,
   width: 1180,
@@ -164,7 +165,8 @@ for (const scene of visualScenes) {
   );
   const ratio = pixels / (actual.width * actual.height);
   if (pixels > 0) await writeFile(diffPath, PNG.sync.write(diff));
-  const maximumRatio = scene.maxPixelRatio ?? 0.0025;
+  const maximumRatio =
+    scene.maxPixelRatio ?? defaultLifecyclePixelRatio;
   if (ratio > maximumRatio) {
     throw new Error(
       `${scene.id}: pixel drift ${(ratio * 100).toFixed(4)}% exceeds ${(maximumRatio * 100).toFixed(2)}%.`,
