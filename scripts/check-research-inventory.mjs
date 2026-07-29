@@ -5,12 +5,17 @@ const inventoryMarkdownUrl = new URL(
   "../research/UI_INVENTORY.md",
   import.meta.url,
 );
+const deliveryPlanUrl = new URL(
+  "../research/DELIVERY_PLAN.md",
+  import.meta.url,
+);
 const visualScenariosUrl = new URL(
   "../research/visual-scenarios.json",
   import.meta.url,
 );
 const inventory = JSON.parse(await readFile(inventoryUrl, "utf8"));
 const inventoryMarkdown = await readFile(inventoryMarkdownUrl, "utf8");
+const deliveryPlan = await readFile(deliveryPlanUrl, "utf8");
 const visualScenarios = JSON.parse(
   await readFile(visualScenariosUrl, "utf8"),
 );
@@ -342,6 +347,28 @@ if (!normalizedInventoryMarkdown.includes(visibleMarkdownSummary)) {
   throw new Error(
     `UI_INVENTORY.md visible summary is stale; expected ${visibleMarkdownSummary}`,
   );
+}
+
+const visibleRoadmapPrioritySummary = [
+  `The inventory contains ${inventory.surfaces.length} surface groups:`,
+  `${priorities.p0} P0, ${priorities.p1} P1, and ${priorities.p2} P2.`,
+].join(" ");
+const visibleRoadmapRuntimeSummary = [
+  `${currentRuntimeEvidenceIds.size} groups have current-build runtime`,
+  `evidence, ${previousRuntimeEvidenceIds.size} have previous-build-only`,
+  `runtime evidence, and ${statuses.runtime.not_sampled} have not been sampled.`,
+].join(" ");
+const normalizedDeliveryPlan = deliveryPlan.replace(/\s+/g, " ");
+
+for (const summary of [
+  visibleRoadmapPrioritySummary,
+  visibleRoadmapRuntimeSummary,
+]) {
+  if (!normalizedDeliveryPlan.includes(summary)) {
+    throw new Error(
+      `DELIVERY_PLAN.md visible summary is stale; expected ${summary}`,
+    );
+  }
 }
 
 console.log(
