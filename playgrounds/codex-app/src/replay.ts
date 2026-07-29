@@ -3,6 +3,7 @@ import backgroundTerminalTrace from "../fixtures/traces/background-terminal.json
 import interruptionTrace from "../fixtures/traces/interruption.jsonl?raw";
 import largeFileReviewTrace from "../fixtures/traces/large-file-review.jsonl?raw";
 import markdownTrace from "../fixtures/traces/markdown.jsonl?raw";
+import mcpToolCallTrace from "../fixtures/traces/mcp-tool-call.jsonl?raw";
 import multiFileReviewTrace from "../fixtures/traces/multi-file-review.jsonl?raw";
 import recoveryTrace from "../fixtures/traces/streaming-recovery.jsonl?raw";
 import workflowTrace from "../fixtures/traces/workspace-workflow.jsonl?raw";
@@ -15,6 +16,7 @@ export type ReplayScenarioId =
   | "compaction"
   | "large-file-review"
   | "markdown"
+  | "mcp-tool-call"
   | "multi-file-review"
   | "workspace-workflow";
 
@@ -106,6 +108,12 @@ export const replayScenarios: Record<ReplayScenarioId, ReplayScenario> = {
     "Markdown response",
     "Heading, inline semantics, quote, list, table, code, and response actions.",
     markdownTrace,
+  ),
+  "mcp-tool-call": scenario(
+    "mcp-tool-call",
+    "Find Codex MCP support docs",
+    "A real public docs integration sequence with five successful MCP calls.",
+    mcpToolCallTrace,
   ),
 };
 

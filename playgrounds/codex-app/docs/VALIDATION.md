@@ -25,7 +25,9 @@ Every deterministic scenario has one ID and produces four evidence layers:
    906×820 reference through `CODEX_UI_KIT_TERMINAL_REFERENCE` and gates the
    shared panel and content regions separately; the completed-Markdown
    scenario accepts `CODEX_UI_KIT_MARKDOWN_REFERENCE` and gates assistant,
-   fenced-code, and Composer regions separately.
+   fenced-code, and Composer regions separately; the successful-MCP scenario
+   accepts `CODEX_UI_KIT_MCP_TOOL_CALL_REFERENCE` and gates full-main,
+   tool-call, answer, and Composer regions separately.
 
 The layers do not vote on the same claim. Protocol proves lifecycle behavior;
 CDP explains layout; Electron proves the desktop host; pixels catch final
@@ -61,4 +63,11 @@ only the capture-time scrollbar so overlay and space-consuming macOS scrollbar
 settings cannot shift the centered content by 7.5px. CDP still checks the real
 scroll container and geometry. Its optional current-build gate allows at most
 2% assistant, 2% fenced-code, and 2.5% Composer-region difference at the same
-threshold.
+threshold. The seventeenth running-MCP frame uses a scoped 1% internal limit.
+The denser eighteenth completed-MCP frame uses a scoped 2% internal limit to
+cover the measured 1.5924% macOS-runner text-rasterization delta. It replays
+the observed 72px expanded-follow scroll state, while CDP independently
+verifies that exact scroll position, 14px/21px group typography, 25px call
+rows, and five-call count. Its optional current-build gate remains stricter
+and region-specific: at most 3% full-main, 4% tool-call, 4% answer, and 2.5%
+Composer difference at the strict 0.05 pixel threshold.

@@ -3544,6 +3544,81 @@ summary.codex-ui-activity__header::after {
   white-space: pre-wrap;
 }
 
+.codex-ui-mcp-tool-call-group__icon {
+  color: var(--codex-ui-text-secondary);
+  fill: none;
+  flex: 0 0 auto;
+  height: 1rem;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.15;
+  width: 1rem;
+}
+
+.codex-ui-mcp-tool-call-group__label[data-active] {
+  animation: codex-ui-tool-activity-pulse 1.8s ease-in-out infinite;
+  color: var(--codex-ui-text);
+}
+
+.codex-ui-mcp-tool-call-group
+  > .codex-ui-activity__disclosure
+  > .codex-ui-activity__header {
+  font-size: 14px;
+  font-weight: 445;
+  gap: 6px;
+  line-height: 21px;
+  min-height: 21px;
+  padding: 0;
+}
+
+.codex-ui-mcp-tool-call-group > .codex-ui-activity__disclosure > .codex-ui-activity__body {
+  border-left: 0;
+  margin: 0.25rem 0 0;
+  padding: 0;
+}
+
+.codex-ui-mcp-tool-call-group__calls {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  min-width: 0;
+}
+
+.codex-ui-mcp-tool-call-group__calls > .codex-ui-tool-call {
+  min-height: 25px;
+}
+
+.codex-ui-mcp-tool-call-group__calls
+  > .codex-ui-tool-call
+  > .codex-ui-activity__disclosure
+  > .codex-ui-activity__header,
+.codex-ui-mcp-tool-call-group__calls
+  > .codex-ui-tool-call
+  > .codex-ui-activity__header {
+  font-size: 14px;
+  font-weight: 445;
+  gap: 6px;
+  line-height: 21px;
+  min-height: 25px;
+  padding: 2px 0;
+}
+
+.codex-ui-mcp-tool-call-group__calls
+  > .codex-ui-tool-call
+  summary.codex-ui-activity__header::after {
+  opacity: 0;
+}
+
+.codex-ui-mcp-tool-call-group__calls
+  > .codex-ui-tool-call
+  summary.codex-ui-activity__header:hover::after,
+.codex-ui-mcp-tool-call-group__calls
+  > .codex-ui-tool-call
+  summary.codex-ui-activity__header:focus-visible::after {
+  opacity: 0.55;
+}
+
 .codex-ui-browser-activity__icon,
 .codex-ui-browser-activity__steps svg,
 .codex-ui-tool-call__icon,

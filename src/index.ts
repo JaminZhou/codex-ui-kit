@@ -20,6 +20,7 @@ export * from "./components/ResourceSurfaces.js";
 export * from "./components/SearchActivity.js";
 export * from "./components/StatusIndicator.js";
 export * from "./components/SubagentActivity.js";
+export * from "./components/McpToolCallGroup.js";
 export * from "./components/ToolCallCard.js";
 export * from "./components/TurnDuration.js";
 export * from "./components/ThreadNavigation.js";

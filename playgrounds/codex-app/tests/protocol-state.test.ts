@@ -48,6 +48,51 @@ describe("protocol lifecycle reducer", () => {
     expect(scenario.frames["markdown-complete"]).toBe(scenario.events.length);
   });
 
+  it("replays a successful public MCP integration lifecycle", () => {
+    const scenario = replayScenarios["mcp-tool-call"];
+    const runningState = reduceProtocolTrace(
+      scenario.events.slice(0, scenario.frames["mcp-progress"]),
+    );
+    const completed = reduceProtocolTrace(scenario.events);
+
+    expect(runningState.status).toBe("running");
+    expect(runningState.mcpToolCalls).toEqual([
+      expect.objectContaining({
+        appName: "OpenAI Developer Docs",
+        progress: ["Searching official OpenAI documentation"],
+        server: "openaiDeveloperDocs",
+        status: "running",
+        toolLabel: "Search OpenAI docs",
+      }),
+    ]);
+    expect(hasActiveTurnWork(runningState)).toBe(true);
+    expect(completed.mcpToolCalls).toHaveLength(5);
+    expect(completed.mcpToolCalls.every(({ status }) => status === "completed"))
+      .toBe(true);
+    expect(completed.mcpToolCalls[0]).toMatchObject({
+      durationMs: 520,
+      structuredContent: {
+        title: "Model Context Protocol",
+        url: "https://learn.chatgpt.com/docs/extend/mcp",
+      },
+    });
+    expect(completed.timeline.map(({ kind }) => kind)).toEqual([
+      "message",
+      "mcpToolCall",
+      "mcpToolCall",
+      "mcpToolCall",
+      "mcpToolCall",
+      "mcpToolCall",
+      "message",
+    ]);
+    expect(completed.turnDurationMs).toBe(54_000);
+    expect(completed.turnDurationsMs["turn-mcp"]).toBe(54_000);
+    expect(completed.messages.at(-1)?.text).toContain(
+      "https://learn.chatgpt.com/docs/extend/mcp",
+    );
+    expect(hasActiveTurnWork(completed)).toBe(false);
+  });
+
   it("preserves an interrupted assistant partial and exposes the stop state", () => {
     const state = reduceProtocolTrace(
       replayScenarios.interruption.events,
@@ -198,6 +243,7 @@ describe("protocol lifecycle reducer", () => {
     expect(secondThread.commands).toEqual([]);
     expect(secondThread.approvals).toEqual([]);
     expect(secondThread.fileChanges).toEqual([]);
+    expect(secondThread.mcpToolCalls).toEqual([]);
     expect(secondThread.timeline).toEqual([]);
     expect(secondThread.status).toBe("idle");
     expect(secondThread.eventCount).toBe(3);

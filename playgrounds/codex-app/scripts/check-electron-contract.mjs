@@ -181,6 +181,84 @@ try {
   await markdownApp.close();
 }
 
+const mcpScene = {
+  frame: "mcp-tool-calls",
+  id: "electron-mcp",
+  scenario: "mcp-tool-call",
+};
+const { app: mcpApp, page: mcpPage } = await launchScene(mcpScene, {
+  capture: false,
+});
+
+try {
+  const timelineToggle = mcpPage.getByRole("button", {
+    name: "Worked for 54s",
+  });
+  if ((await timelineToggle.getAttribute("aria-expanded")) !== "false") {
+    throw new Error("Electron MCP timeline should start collapsed.");
+  }
+  await timelineToggle.click();
+  const group = mcpPage.getByTestId("mcp-tool-call-group");
+  const groupToggle = group.locator(
+    ":scope > details > summary",
+  );
+  if (
+    (await groupToggle.getAttribute("aria-expanded")) !== "false" ||
+    (await group.getAttribute("data-source")) !== "openaiDeveloperDocs"
+  ) {
+    throw new Error("Electron MCP integration group baseline is invalid.");
+  }
+  await groupToggle.click();
+  const calls = group.locator(".codex-ui-tool-call");
+  if (
+    (await calls.count()) !== 5 ||
+    (await group.getByText("Search OpenAI docs", { exact: true }).count()) !==
+      3 ||
+    (await group.getByText("Fetch OpenAI doc", { exact: true }).count()) !== 2
+  ) {
+    throw new Error("Electron MCP integration did not reveal all calls.");
+  }
+  await calls.first().locator("summary").click();
+  const mcpInteraction = await mcpPage.evaluate(() => {
+    const structuredText = document.querySelector(
+      ".codex-ui-tool-call__structured",
+    )?.textContent;
+    let resultHasCanonicalUrl = false;
+    try {
+      const structuredResult = JSON.parse(structuredText ?? "null");
+      resultHasCanonicalUrl =
+        typeof structuredResult === "object" &&
+        structuredResult !== null &&
+        structuredResult.url ===
+          "https://learn.chatgpt.com/docs/extend/mcp";
+    } catch {
+      resultHasCanonicalUrl = false;
+    }
+    return {
+      groupExpanded:
+        document
+          .querySelector(".codex-ui-mcp-tool-call-group details")
+          ?.hasAttribute("open") ?? false,
+      resultHasCanonicalUrl,
+      timelineExpanded:
+        document
+          .querySelector(".codex-ui-activity-timeline")
+          ?.hasAttribute("data-expanded") ?? false,
+    };
+  });
+  if (
+    !mcpInteraction.groupExpanded ||
+    !mcpInteraction.resultHasCanonicalUrl ||
+    !mcpInteraction.timelineExpanded
+  ) {
+    throw new Error(
+      `Electron MCP interaction failed: ${JSON.stringify(mcpInteraction)}`,
+    );
+  }
+} finally {
+  await mcpApp.close();
+}
+
 const workflowScene = {
   frame: "review-open",
   id: "electron-workflow",
@@ -981,5 +1059,5 @@ try {
 }
 
 console.log(
-  "Electron host, native-window, resizable navigation/Review/Terminal/PR detail, PR tabs and expansion, multi-file Review, large diff scrolling, and compact geometry contracts passed.",
+  "Electron host, native-window, resizable navigation/Review/Terminal/PR detail, PR tabs and expansion, MCP disclosure/result, multi-file Review, large diff scrolling, and compact geometry contracts passed.",
 );

@@ -110,6 +110,21 @@ The seventh slice adds current-build completed Markdown:
 - a sixteenth reviewed pixel frame plus optional current-build assistant,
   code-card, and Composer region comparisons.
 
+## Eighth vertical slice
+
+The eighth slice adds a real successful public MCP workflow:
+
+- a read-only `openaiDeveloperDocs` run observed in the current Codex build;
+- schema-validated `mcpToolCall` start, progress, result, and completion items;
+- `McpToolCallGroup` composition for one integration and five Search/Fetch
+  calls;
+- completed-answer link semantics and structured-result disclosure;
+- CDP computed-style and scroll-state gates plus real Electron expansion
+  interactions;
+- seventeenth and eighteenth reviewed frames for running and completed MCP;
+- an optional 906×820 current-build comparison for full-main, tool-call,
+  answer, and Composer regions.
+
 ## Development
 
 From the repository root:
@@ -163,6 +178,13 @@ The Markdown gate uses its own 906×820 main-only reference:
 
 ```bash
 CODEX_UI_KIT_MARKDOWN_REFERENCE=/absolute/path/to/markdown-main-reference.png \
+  pnpm --filter @codex-ui-kit/codex-app-playground check:visual
+```
+
+The successful MCP gate uses the expanded 906×820 main-only reference:
+
+```bash
+CODEX_UI_KIT_MCP_TOOL_CALL_REFERENCE=/absolute/path/to/mcp-main-reference.png \
   pnpm --filter @codex-ui-kit/codex-app-playground check:visual
 ```
 

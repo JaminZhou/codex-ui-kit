@@ -186,11 +186,17 @@
       "id": "thread.mcp-tool-events",
       "area": "conversation",
       "ownership": "turn",
-      "packageEvidence": ["mcp-capability-view-page"],
-      "runtimeStatus": "not_sampled",
+      "packageEvidence": [
+        "mcp-capability-view-page",
+        "mcp-tool-call-group"
+      ],
+      "runtimeStatus": "runtime_observed",
+      "runtimeEvidence": [
+        "cdp-26.721:synthetic-openai-developer-docs-mcp-success-expanded-1180x820"
+      ],
       "implementationStatus": "partial",
-      "browserStatus": "partial_legacy",
-      "electronStatus": "partial_legacy",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
       "priority": "p0"
     },
     {

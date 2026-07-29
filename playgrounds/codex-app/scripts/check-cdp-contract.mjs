@@ -269,6 +269,7 @@ for (const scene of visualScenes) {
           '.codex-ui-workspace-panel[data-placement="side"]',
         bottomPanel:
           '.codex-ui-workspace-panel[data-placement="bottom"]',
+        mcpGroup: ".codex-ui-mcp-tool-call-group",
         terminal: ".codex-ui-terminal-session",
       };
       const namedSurfaces = Object.fromEntries(
@@ -354,6 +355,40 @@ for (const scene of visualScenes) {
             unorderedList: markdownStyle(markdownRoot.querySelector("ul")),
           }
         : null;
+      const mcpGroup = document.querySelector(
+        ".codex-ui-mcp-tool-call-group",
+      );
+      const mcp = mcpGroup
+        ? {
+            callLabels: Array.from(
+              mcpGroup.querySelectorAll(".codex-ui-tool-call__label"),
+              (element) => element.textContent?.trim(),
+            ),
+            groupExpanded:
+              mcpGroup.querySelector(".codex-ui-activity__disclosure")
+                ?.open ?? false,
+            groupLabel: mcpGroup
+              .querySelector(".codex-ui-mcp-tool-call-group__label")
+              ?.textContent?.trim(),
+            groupSource: mcpGroup.getAttribute("data-source"),
+            groupStyle: markdownStyle(
+              mcpGroup.querySelector(
+                ":scope > .codex-ui-activity__disclosure > .codex-ui-activity__header",
+              ),
+            ),
+            timelineExpanded:
+              mcpGroup
+                .closest(".codex-ui-activity-timeline")
+                ?.hasAttribute("data-expanded") ?? false,
+            timelineLabel: mcpGroup
+              .closest(".codex-ui-activity-timeline")
+              ?.querySelector(".codex-ui-activity-timeline__toggle")
+              ?.textContent?.trim(),
+            toolCount: mcpGroup.querySelectorAll(
+              ".codex-ui-tool-call",
+            ).length,
+          }
+        : null;
       return {
         composer: composerRect,
         frame: root.getAttribute("data-frame"),
@@ -363,6 +398,7 @@ for (const scene of visualScenes) {
           document.documentElement.clientWidth,
         mode: root.getAttribute("data-mode"),
         markdown,
+        mcp,
         namedSurfaces,
         review: {
           diffLabels: Array.from(
@@ -617,6 +653,49 @@ for (const scene of visualScenes) {
           workflow: contract.workflow,
         })}`,
       );
+    }
+    if (scene.toolCount !== undefined) {
+      const expectedGroupLabel =
+        scene.frame === "mcp-running"
+          ? "Using OpenAI Developer Docs integration"
+          : "Used OpenAI Developer Docs integration";
+      const expectedTimelineLabel =
+        scene.frame === "mcp-running" ? "Working" : "Worked for 54s";
+      if (
+        !contract.mcp ||
+        contract.mcp.toolCount !== scene.toolCount ||
+        !contract.mcp.groupExpanded ||
+        !contract.mcp.timelineExpanded ||
+        contract.mcp.groupSource !== "openaiDeveloperDocs" ||
+        contract.mcp.groupLabel !== expectedGroupLabel ||
+        contract.mcp.timelineLabel !== expectedTimelineLabel ||
+        contract.mcp.groupStyle.fontSize !== "14px" ||
+        contract.mcp.groupStyle.lineHeight !== "21px" ||
+        contract.mcp.callLabels[0] !== "Search OpenAI docs"
+      ) {
+        throw new Error(
+          `${scene.id}: MCP integration contract failed: ${JSON.stringify(contract.mcp)}`,
+        );
+      }
+      if (
+        scene.scrollTop !== undefined &&
+        Math.abs(contract.viewportScroll.scrollTop - scene.scrollTop) > 1
+      ) {
+        throw new Error(
+          `${scene.id}: MCP capture scroll state drifted: ${JSON.stringify(contract.viewportScroll)}`,
+        );
+      }
+      if (
+        scene.frame === "mcp-tool-calls" &&
+        (!contract.mcp.callLabels.includes("Fetch OpenAI doc") ||
+          contract.mcp.callLabels.filter(
+            (label) => label === "Search OpenAI docs",
+          ).length !== 3)
+      ) {
+        throw new Error(
+          `${scene.id}: completed MCP call sequence is incomplete: ${JSON.stringify(contract.mcp.callLabels)}`,
+        );
+      }
     }
 
     if (scene.id === "markdown-complete") {

@@ -24,6 +24,23 @@ export const visualScenes = [
     scenario: "markdown",
   },
   {
+    frame: "mcp-running",
+    id: "mcp-running",
+    maxPixelRatio: 0.01,
+    scenario: "mcp-tool-call",
+    surfaces: ["mcpGroup"],
+    toolCount: 1,
+  },
+  {
+    frame: "mcp-tool-calls",
+    id: "mcp-tool-calls",
+    maxPixelRatio: 0.02,
+    scenario: "mcp-tool-call",
+    scrollTop: 72,
+    surfaces: ["mcpGroup"],
+    toolCount: 5,
+  },
+  {
     frame: "interrupted",
     id: "interrupted",
     scenario: "interruption",
@@ -128,5 +145,12 @@ export async function launchScene(
   await page.evaluate(async () => {
     await document.fonts.ready;
   });
+  if (scene.scrollTop !== undefined) {
+    await page
+      .locator(".codex-ui-conversation-thread-shell__viewport")
+      .evaluate((element, scrollTop) => {
+        element.scrollTop = scrollTop;
+      }, scene.scrollTop);
+  }
   return { app, page };
 }

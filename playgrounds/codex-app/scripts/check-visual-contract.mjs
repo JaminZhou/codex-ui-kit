@@ -33,6 +33,12 @@ const currentBuildMarkdownReferenceSize = {
   height: 820,
   width: 906,
 };
+const currentBuildMcpReference =
+  process.env.CODEX_UI_KIT_MCP_TOOL_CALL_REFERENCE;
+const currentBuildMcpReferenceSize = {
+  height: 820,
+  width: 906,
+};
 await mkdir(baselineDirectory, { recursive: true });
 await mkdir(artifactDirectory, { recursive: true });
 
@@ -535,6 +541,111 @@ for (const scene of visualScenes) {
         code: codeComparison.ratio,
         composer: composerComparison.ratio,
         full: comparison.ratio,
+      })}`,
+    );
+  }
+
+  if (scene.id === "mcp-tool-calls" && currentBuildMcpReference) {
+    const reference = PNG.sync.read(
+      await readFile(currentBuildMcpReference),
+    );
+    if (
+      reference.width !== currentBuildMcpReferenceSize.width ||
+      reference.height !== currentBuildMcpReferenceSize.height
+    ) {
+      throw new Error(
+        `${scene.id}: current-build reference must be exactly ${currentBuildMcpReferenceSize.width}x${currentBuildMcpReferenceSize.height}, received ${reference.width}x${reference.height}.`,
+      );
+    }
+    if (
+      actual.height !== reference.height ||
+      actual.width < reference.width
+    ) {
+      throw new Error(
+        `${scene.id}: current-build reference ${reference.width}x${reference.height} cannot be aligned to ${actual.width}x${actual.height}.`,
+      );
+    }
+
+    const main = cropPng(
+      actual,
+      actual.width - reference.width,
+      0,
+      reference.width,
+      reference.height,
+    );
+    const currentBuildActualPath = join(
+      artifactDirectory,
+      `${scene.id}.current-build.png`,
+    );
+    const currentBuildDiffPath = join(
+      artifactDirectory,
+      `${scene.id}.current-build.diff.png`,
+    );
+    await writeFile(currentBuildActualPath, PNG.sync.write(main));
+
+    const comparison = comparePng(reference, main);
+    if (comparison.pixels > 0) {
+      await writeFile(
+        currentBuildDiffPath,
+        PNG.sync.write(comparison.diff),
+      );
+    }
+
+    const regions = {
+      answer: { height: 76, left: 84, top: 344, width: 738 },
+      composer: { height: 99, left: 84, top: 706, width: 738 },
+      toolCalls: { height: 214, left: 84, top: 135, width: 738 },
+    };
+    const compareRegion = ({ height, left, top, width }) =>
+      comparePng(
+        cropPng(reference, left, top, width, height),
+        cropPng(main, left, top, width, height),
+      );
+    const answerComparison = compareRegion(regions.answer);
+    const composerComparison = compareRegion(regions.composer);
+    const toolCallsComparison = compareRegion(regions.toolCalls);
+    const maximumAnswerRatio = environmentRatio(
+      "CODEX_UI_KIT_MCP_ANSWER_MAX_DIFF_RATIO",
+      0.04,
+    );
+    const maximumComposerRatio = environmentRatio(
+      "CODEX_UI_KIT_MCP_COMPOSER_MAX_DIFF_RATIO",
+      0.025,
+    );
+    const maximumToolCallsRatio = environmentRatio(
+      "CODEX_UI_KIT_MCP_TOOL_CALLS_MAX_DIFF_RATIO",
+      0.04,
+    );
+    const maximumRatio = environmentRatio(
+      "CODEX_UI_KIT_MCP_MAX_DIFF_RATIO",
+      0.03,
+    );
+    if (
+      answerComparison.ratio > maximumAnswerRatio ||
+      composerComparison.ratio > maximumComposerRatio ||
+      comparison.ratio > maximumRatio ||
+      toolCallsComparison.ratio > maximumToolCallsRatio
+    ) {
+      throw new Error(
+        `${scene.id}: current-build MCP pixel ratios ${JSON.stringify({
+          answer: answerComparison.ratio,
+          composer: composerComparison.ratio,
+          full: comparison.ratio,
+          toolCalls: toolCallsComparison.ratio,
+        })} exceed ${JSON.stringify({
+          answer: maximumAnswerRatio,
+          composer: maximumComposerRatio,
+          full: maximumRatio,
+          toolCalls: maximumToolCallsRatio,
+        })}.`,
+      );
+    }
+    console.log(
+      `${scene.id}: current-build MCP pixel ratios ${JSON.stringify({
+        answer: answerComparison.ratio,
+        composer: composerComparison.ratio,
+        full: comparison.ratio,
+        toolCalls: toolCallsComparison.ratio,
       })}`,
     );
   }
