@@ -79,6 +79,12 @@ describe("application shell visual contract", () => {
       ".codex-ui-app-sidebar__section-toggle",
     );
     expect(styles).toContain(
+      '.codex-ui-app-sidebar__section[data-expanded="true"]',
+    );
+    expect(styles).not.toContain(
+      ".codex-ui-app-sidebar__section[data-expanded]\n",
+    );
+    expect(styles).toContain(
       ".codex-ui-app-sidebar__items[hidden]",
     );
     expect(styles).toContain(

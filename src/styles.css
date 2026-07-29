@@ -516,7 +516,7 @@
   width: 100%;
 }
 
-.codex-ui-app-sidebar__section[data-expanded]
+.codex-ui-app-sidebar__section[data-expanded="true"]
   .codex-ui-app-sidebar__section-chevron {
   transform: rotate(90deg);
 }
