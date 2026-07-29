@@ -91,6 +91,15 @@ describe("application shell visual contract", () => {
     expect(styles).toContain(
       ".codex-ui-app-sidebar__items[hidden]",
     );
+    expect(styles).toMatch(
+      /\.codex-ui-app-sidebar__footer \{[^}]*min-height: 2\.875rem;[^}]*\}/,
+    );
+    expect(styles).not.toMatch(
+      /\.codex-ui-app-sidebar__footer \{[^}]*position: absolute;[^}]*\}/,
+    );
+    expect(styles).toMatch(
+      /\.codex-ui-app-sidebar__navigation \{[^}]*padding: 0;[^}]*\}/,
+    );
     expect(styles).toContain(
       ".codex-ui-app-sidebar__item-actions",
     );
@@ -111,6 +120,12 @@ describe("application shell visual contract", () => {
     );
     expect(component).toContain(
       'export type AppSidebarItemStatus =',
+    );
+    expect(component).toContain(
+      "const canCollapse = collapsible && Boolean(title)",
+    );
+    expect(component).toContain(
+      "hidden={canCollapse && !isExpanded}",
     );
   });
 

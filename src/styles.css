@@ -421,10 +421,6 @@
   border-block-start: 1px solid var(--codex-ui-border-light);
   min-height: 2.875rem;
   padding: 0 calc(var(--codex-ui-spacing) * 2);
-  inset-block-end: 0;
-  inset-inline: 0;
-  position: absolute;
-  z-index: 2;
 }
 
 .codex-ui-app-sidebar__navigation {
@@ -436,7 +432,7 @@
   overflow-x: hidden;
   overflow-y: auto;
   overscroll-behavior: contain;
-  padding: 0 0 3.375rem;
+  padding: 0;
 }
 
 .codex-ui-app-sidebar__primary {
@@ -469,10 +465,12 @@
 }
 
 .codex-ui-app-sidebar__section-header h2 {
+  flex: 1 1 auto;
   font-size: var(--codex-ui-font-size-sm);
   font-weight: var(--codex-ui-font-weight-medium);
   line-height: 1.3125rem;
   margin: 0;
+  min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -494,6 +492,14 @@
   padding: calc(var(--codex-ui-spacing) / 2) var(--codex-ui-spacing)
     calc(var(--codex-ui-spacing) / 2) 0;
   text-align: start;
+  width: 100%;
+}
+
+.codex-ui-app-sidebar__section-title {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .codex-ui-app-sidebar__section-toggle:focus-visible {

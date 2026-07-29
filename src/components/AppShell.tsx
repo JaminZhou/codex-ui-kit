@@ -1668,6 +1668,7 @@ export function AppSidebarSection({
   const headingId = useId();
   const contentId = useId();
   const [internalExpanded, setInternalExpanded] = useState(defaultExpanded);
+  const canCollapse = collapsible && Boolean(title);
   const isExpanded = expanded ?? internalExpanded;
   const setExpanded = (nextExpanded: boolean) => {
     if (expanded === undefined) setInternalExpanded(nextExpanded);
@@ -1679,28 +1680,37 @@ export function AppSidebarSection({
       className={["codex-ui-app-sidebar__section", className]
         .filter(Boolean)
         .join(" ")}
-      data-collapsible={collapsible || undefined}
-      data-expanded={collapsible ? isExpanded : undefined}
+      data-collapsible={canCollapse || undefined}
+      data-expanded={canCollapse ? isExpanded : undefined}
       data-kind={kind}
       {...props}
     >
       {title || actions ? (
         <div className="codex-ui-app-sidebar__section-header">
           {title ? (
-            collapsible ? (
-              <button
-                aria-controls={contentId}
-                aria-expanded={isExpanded}
-                aria-label={toggleLabel}
-                className="codex-ui-app-sidebar__section-toggle"
-                onClick={() => setExpanded(!isExpanded)}
-                type="button"
+            canCollapse ? (
+              <h2
+                aria-label={
+                  typeof title === "string" ? title : undefined
+                }
+                id={headingId}
               >
-                <h2 id={headingId}>{title}</h2>
-                <span className="codex-ui-app-sidebar__section-chevron">
-                  <SidebarChevronIcon />
-                </span>
-              </button>
+                <button
+                  aria-controls={contentId}
+                  aria-expanded={isExpanded}
+                  aria-label={toggleLabel}
+                  className="codex-ui-app-sidebar__section-toggle"
+                  onClick={() => setExpanded(!isExpanded)}
+                  type="button"
+                >
+                  <span className="codex-ui-app-sidebar__section-title">
+                    {title}
+                  </span>
+                  <span className="codex-ui-app-sidebar__section-chevron">
+                    <SidebarChevronIcon />
+                  </span>
+                </button>
+              </h2>
             ) : (
               <h2 id={headingId}>{title}</h2>
             )
@@ -1712,7 +1722,7 @@ export function AppSidebarSection({
       ) : null}
       <div
         className="codex-ui-app-sidebar__items"
-        hidden={collapsible && !isExpanded}
+        hidden={canCollapse && !isExpanded}
         id={contentId}
       >
         {children}

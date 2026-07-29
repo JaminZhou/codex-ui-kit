@@ -113,9 +113,11 @@ All privileged behavior remains host-owned. The components never auto-approve co
   separator, a preferred 152px minimum (reduced only when the responsive
   half-height cap is smaller), pointer and Arrow/Home/End control, accessible
   values, and controlled or uncontrolled height persistence.
-- `AppSidebar`, `AppSidebarSection`, and `AppSidebarItem`: grouped primary
-  navigation with selected-route state, descriptions, badges, header, and
-  footer slots.
+- `AppSidebar`, `AppSidebarSection`, `AppSidebarItem`, and
+  `AppSidebarFooter`: grouped primary navigation with one selected route,
+  heading-preserving collapsible collections, lifecycle status, measured
+  action columns, and an in-flow footer slot that cannot cover navigation.
+  A titleless section remains expanded because it has no operable toggle.
 - `WorkspacePanel`: controlled side or bottom tab shell with labelled tab
   semantics, host action slots, close/open/expand hooks and labels, focusable
   content, and host-owned tab contents.

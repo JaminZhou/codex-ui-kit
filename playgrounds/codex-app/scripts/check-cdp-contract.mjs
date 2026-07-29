@@ -602,10 +602,13 @@ for (const scene of visualScenes) {
       Math.abs(contract.sidebar.header.top - 46) > 1 ||
       Math.abs(contract.sidebar.header.height - 70) > 1 ||
       Math.abs(contract.sidebar.navigation.top - 116) > 1 ||
-      Math.abs(contract.sidebar.navigation.bottom - 820) > 1 ||
+      Math.abs(
+        contract.sidebar.navigation.bottom -
+          contract.sidebar.footer.top,
+      ) > 1 ||
       Math.abs(contract.sidebar.footer.height - 46) > 1 ||
       Math.abs(contract.sidebar.footer.bottom - 820) > 1 ||
-      contract.sidebar.navigation.scrollHeight <=
+      contract.sidebar.navigation.scrollHeight <
         contract.sidebar.navigation.clientHeight ||
       contract.sidebar.projectToggleExpanded !== "false" ||
       contract.sidebar.actionToolbars < 8 ||
@@ -979,12 +982,23 @@ try {
     const rect = (element) => {
       const value = element.getBoundingClientRect();
       return {
+        bottom: value.bottom,
         height: value.height,
         left: value.left,
+        top: value.top,
         width: value.width,
       };
     };
     const sidebar = document.querySelector(".codex-ui-app-sidebar");
+    const navigation = sidebar?.querySelector(
+      ".codex-ui-app-sidebar__navigation",
+    );
+    const footer = sidebar?.querySelector(
+      ".codex-ui-app-sidebar__footer",
+    );
+    if (footer instanceof HTMLElement) {
+      footer.style.minHeight = "100px";
+    }
     const main = document.querySelector(".codex-ui-app-shell__main");
     const shell = document.querySelector(".codex-ui-app-shell");
     const project = Array.from(
@@ -1043,6 +1057,17 @@ try {
             ?.textContent?.trim() ?? item.textContent?.trim(),
       ),
       layoutMode: shell?.getAttribute("data-layout-mode"),
+      footer: footer ? rect(footer) : null,
+      footerInFlow:
+        navigation !== null &&
+        navigation !== undefined &&
+        footer !== null &&
+        footer !== undefined &&
+        sidebar !== null &&
+        navigation.getBoundingClientRect().bottom <=
+          footer.getBoundingClientRect().top + 0.5 &&
+        footer.getBoundingClientRect().bottom <=
+          sidebar.getBoundingClientRect().bottom + 0.5,
       main: main ? rect(main) : null,
       projectEllipsis:
         projectLabel &&
@@ -1070,6 +1095,9 @@ try {
     !compact.resizer ||
     !compact.projectEllipsis ||
     !compact.activeAction ||
+    !compact.footer ||
+    compact.footer.height < 100 ||
+    !compact.footerInFlow ||
     compact.actionCount !== 3 ||
     !compact.actionsReserved ||
     compact.accountPopup !== "menu" ||

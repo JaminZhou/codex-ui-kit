@@ -2867,6 +2867,11 @@ describe("application sidebar", () => {
     const toggle = screen.getByRole("button", {
       name: "Toggle projects",
     });
+    const heading = screen.getByRole("heading", {
+      level: 2,
+      name: "Projects",
+    });
+    expect(heading.contains(toggle)).toBe(true);
     expect(toggle.getAttribute("aria-expanded")).toBe("true");
     fireEvent.click(toggle);
     expect(toggle.getAttribute("aria-expanded")).toBe("false");
@@ -2878,6 +2883,30 @@ describe("application sidebar", () => {
     expect(
       screen.getByRole("button", { name: "Settings" }),
     ).toBeTruthy();
+  });
+
+  it("keeps titleless collapsible content reachable", () => {
+    const { container } = render(
+      <AppSidebar>
+        <AppSidebarSection collapsible defaultExpanded={false}>
+          <AppSidebarItem>Reachable task</AppSidebarItem>
+        </AppSidebarSection>
+      </AppSidebar>,
+    );
+
+    expect(
+      screen.getByRole("button", { name: "Reachable task" }),
+    ).toBeTruthy();
+    expect(
+      container
+        .querySelector(".codex-ui-app-sidebar__section")
+        ?.hasAttribute("data-collapsible"),
+    ).toBe(false);
+    expect(
+      container
+        .querySelector(".codex-ui-app-sidebar__items")
+        ?.hasAttribute("hidden"),
+    ).toBe(false);
   });
 
   it("keeps row actions separate from navigation activation and exposes lifecycle status", () => {
