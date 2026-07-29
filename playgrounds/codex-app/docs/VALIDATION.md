@@ -55,11 +55,13 @@ current-build parity. The Terminal comparison deliberately reports but does
 not gate the whole-main ratio when the observed and replayed conversation
 content differ.
 
-The 13 standard lifecycle frames keep a 0.8% internal raster limit. The
-previous 0.25% limit was recalibrated after the shared 13px sidebar text and
-glyph density produced a measured 0.6874% cross-machine macOS runner delta;
-the ownership-scoped current-build sidebar gate retains its separate hard
-regional thresholds. The large-Review frame uses a scoped 0.40% limit because
+The 13 standard lifecycle frames keep the original 0.25% internal raster limit
+for the 906px main region. Their 274px sidebar is gated separately at 0.8%
+because its shared 13px text and glyph density produced a measured 0.6874%
+cross-machine macOS runner delta. This prevents sidebar raster variance from
+loosening the conversation gate, while the ownership-scoped current-build
+sidebar comparison retains its separate hard regional thresholds. The
+large-Review frame uses a scoped 0.40% full-frame limit because
 its 96 dense monospace
 lines amplify macOS text-rasterization differences; CDP and Electron still
 gate file counts, overflow, split geometry, and exact last-file visibility
@@ -68,9 +70,10 @@ its dense full-page text produces a measured 0.8161% macOS-runner
 rasterization delta; CDP and Electron still lock the split, tabs, actions,
 resizing, and expansion independently. Its optional current-build gate allows
 at most 6.5% full-main, 5.5% index, and 7% detail difference at the stricter
-0.05 pixel threshold. The fifteenth Terminal frame keeps the standard 0.8%
-internal limit; its optional current-build gate allows at most 2% panel and 1%
-content difference at the same 0.05 threshold. The sixteenth completed-Markdown
+0.05 pixel threshold. The fifteenth Terminal frame keeps the standard
+0.25%-main/0.8%-sidebar regional limits; its optional current-build gate allows
+at most 2% panel and 1% content difference at the same 0.05 threshold. The
+sixteenth completed-Markdown
 frame uses a scoped 1% internal limit for dense text rasterization and hides
 only the capture-time scrollbar so overlay and space-consuming macOS scrollbar
 settings cannot shift the centered content by 7.5px. CDP still checks the real
