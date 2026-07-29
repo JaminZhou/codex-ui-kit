@@ -268,7 +268,7 @@ function createWindow() {
     backgroundColor: "#101010",
     height,
     minHeight: Math.min(640, height),
-    minWidth: Math.min(760, width),
+    minWidth: Math.min(720, width),
     show: process.env.CODEX_DEMO_HEADLESS !== "1",
     title: "Codex App Playground",
     titleBarStyle: "hiddenInset",

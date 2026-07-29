@@ -106,6 +106,65 @@ try {
   await app.close();
 }
 
+const narrowReachabilityScene = {
+  frame: "recovered",
+  id: "electron-narrow-reachability",
+  scenario: "streaming-recovery",
+};
+const { app: narrowApp, page: narrowPage } = await launchScene(
+  narrowReachabilityScene,
+  { capture: false },
+);
+
+try {
+  const defaultMinimum = await narrowApp.evaluate(({ BrowserWindow }) =>
+    BrowserWindow.getAllWindows()[0]?.getMinimumSize(),
+  );
+  if (defaultMinimum?.[0] !== 720) {
+    throw new Error(
+      `Electron default minimum width does not reach narrow mode: ${JSON.stringify(defaultMinimum)}`,
+    );
+  }
+  await narrowApp.evaluate(({ BrowserWindow }) => {
+    BrowserWindow.getAllWindows()[0]?.setContentSize(720, 680);
+  });
+  await narrowPage.waitForFunction(
+    () =>
+      window.innerWidth === 720 &&
+      document
+        .querySelector(".codex-ui-app-shell")
+        ?.getAttribute("data-layout-mode") === "narrow" &&
+      !document
+        .querySelector(".codex-ui-app-shell")
+        ?.hasAttribute("data-sidebar-open"),
+  );
+  const narrowedState = await narrowApp.evaluate(({ BrowserWindow }) => ({
+    bounds: BrowserWindow.getAllWindows()[0]?.getContentBounds(),
+    minimum: BrowserWindow.getAllWindows()[0]?.getMinimumSize(),
+  }));
+  if (
+    narrowedState.bounds?.width !== 720 ||
+    narrowedState.bounds?.height !== 680
+  ) {
+    throw new Error(
+      `Electron default window did not resize into narrow mode: ${JSON.stringify(narrowedState)}`,
+    );
+  }
+  const showNarrowSidebar = narrowPage.getByRole("button", {
+    name: "Show sidebar",
+  });
+  await showNarrowSidebar.click();
+  await narrowPage.waitForSelector(
+    ".codex-ui-app-shell[data-layout-mode=\"narrow\"][data-sidebar-open] .codex-ui-app-shell__main[inert]",
+  );
+  await narrowPage.keyboard.press("Escape");
+  await narrowPage.waitForSelector(
+    ".codex-ui-app-shell[data-layout-mode=\"narrow\"]:not([data-sidebar-open]) .codex-ui-app-shell__main:not([inert])",
+  );
+} finally {
+  await narrowApp.close();
+}
+
 const markdownScene = {
   frame: "markdown-complete",
   id: "electron-markdown",
@@ -1090,5 +1149,5 @@ try {
 }
 
 console.log(
-  "Electron host, native-window, resizable navigation/Review/Terminal/PR detail, PR tabs and expansion, MCP disclosure/result, multi-file Review, large diff scrolling, and compact geometry contracts passed.",
+  "Electron host, native-window, default 720px narrow reachability, resizable navigation/Review/Terminal/PR detail, PR tabs and expansion, MCP disclosure/result, multi-file Review, large diff scrolling, and compact geometry contracts passed.",
 );
