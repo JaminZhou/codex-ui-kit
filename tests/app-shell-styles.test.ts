@@ -24,10 +24,10 @@ describe("application shell visual contract", () => {
       "@container codex-ui-app-shell (max-width: 92rem) {\n  .codex-ui-app-shell__layout {",
     );
     expect(styles).toContain(
-      "@container codex-ui-app-shell (max-width: 52rem) {\n  .codex-ui-app-shell__layout {",
+      "@container codex-ui-app-shell (max-width: 45rem) {\n  .codex-ui-app-shell__layout {",
     );
     expect(component).toContain("const appShellMediumBreakpointRem = 92");
-    expect(component).toContain("const appShellNarrowBreakpointRem = 52");
+    expect(component).toContain("const appShellNarrowBreakpointRem = 45");
     expect(tokens).not.toContain("--codex-ui-app-shell-medium-breakpoint");
     expect(tokens).not.toContain("--codex-ui-app-shell-narrow-breakpoint");
     expect(styles).toContain(
@@ -59,8 +59,77 @@ describe("application shell visual contract", () => {
     );
     expect(component).toContain("sidebarMinWidth = 240");
     expect(component).toContain("sidebarMaxWidth = 520");
+    expect(component).toContain("sidebarMinMainWidth = 352");
+    expect(component).toContain(
+      "shellWidth - normalizedSidebarMinMainWidth",
+    );
     expect(component).toContain('role="separator"');
     expect(component).toContain('aria-orientation="vertical"');
+  });
+
+  it("locks the current-build sidebar regions and row geometry", () => {
+    expect(tokens).toContain("--codex-ui-app-sidebar-width: 17.125rem");
+    expect(styles).toContain(
+      ".codex-ui-app-sidebar[data-titlebar-inset]",
+    );
+    expect(styles).toContain("padding-block-start: 2.875rem");
+    expect(styles).toContain("min-height: 4.375rem");
+    expect(styles).toContain("min-height: 1.875rem");
+    expect(styles).toContain("border-radius: 0.78125rem");
+    expect(styles).toContain(
+      "background: color-mix(\n    in srgb,\n    var(--codex-ui-text-foreground) 8%",
+    );
+    expect(styles).toContain(
+      ".codex-ui-app-sidebar__section-toggle",
+    );
+    expect(styles).toContain(
+      '.codex-ui-app-sidebar__section[data-expanded="true"]',
+    );
+    expect(styles).not.toContain(
+      ".codex-ui-app-sidebar__section[data-expanded]\n",
+    );
+    expect(styles).toContain(
+      ".codex-ui-app-sidebar__items[hidden]",
+    );
+    expect(styles).toMatch(
+      /\.codex-ui-app-sidebar__footer \{[^}]*min-height: 2\.875rem;[^}]*\}/,
+    );
+    expect(styles).not.toMatch(
+      /\.codex-ui-app-sidebar__footer \{[^}]*position: absolute;[^}]*\}/,
+    );
+    expect(styles).toMatch(
+      /\.codex-ui-app-sidebar__navigation \{[^}]*padding: 0;[^}]*\}/,
+    );
+    expect(styles).toContain(
+      ".codex-ui-app-sidebar__item-actions",
+    );
+    expect(styles).toMatch(
+      /\.codex-ui-app-sidebar__item-row \{[\s\S]*?display: grid;[\s\S]*?grid-template-columns: minmax\(0, 1fr\) auto auto;/,
+    );
+    expect(styles).toMatch(
+      /\.codex-ui-app-sidebar__item-actions \{[\s\S]*?grid-column: 3;[\s\S]*?position: relative;/,
+    );
+    expect(styles).not.toContain(
+      ".codex-ui-app-sidebar__item-row[data-has-actions]\n  .codex-ui-app-sidebar__item {\n  padding-inline-end:",
+    );
+    expect(styles).toContain(
+      ".codex-ui-app-sidebar-footer__account",
+    );
+    expect(styles).toContain(
+      ".codex-ui-agent-message__actions,\n  .codex-ui-app-sidebar__item-actions,\n  .codex-ui-app-sidebar__section-chevron {\n    transition: none;",
+    );
+    expect(component).toContain(
+      'kind?: "custom" | "pinned" | "projects" | "threads"',
+    );
+    expect(component).toContain(
+      'export type AppSidebarItemStatus =',
+    );
+    expect(component).toContain(
+      "const canCollapse = collapsible && Boolean(title)",
+    );
+    expect(component).toContain(
+      "hidden={canCollapse && !isExpanded}",
+    );
   });
 
   it("locks the current-build workspace resize affordance", () => {

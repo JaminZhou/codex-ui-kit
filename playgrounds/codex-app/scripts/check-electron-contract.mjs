@@ -106,6 +106,65 @@ try {
   await app.close();
 }
 
+const narrowReachabilityScene = {
+  frame: "recovered",
+  id: "electron-narrow-reachability",
+  scenario: "streaming-recovery",
+};
+const { app: narrowApp, page: narrowPage } = await launchScene(
+  narrowReachabilityScene,
+  { capture: false },
+);
+
+try {
+  const defaultMinimum = await narrowApp.evaluate(({ BrowserWindow }) =>
+    BrowserWindow.getAllWindows()[0]?.getMinimumSize(),
+  );
+  if (defaultMinimum?.[0] !== 720) {
+    throw new Error(
+      `Electron default minimum width does not reach narrow mode: ${JSON.stringify(defaultMinimum)}`,
+    );
+  }
+  await narrowApp.evaluate(({ BrowserWindow }) => {
+    BrowserWindow.getAllWindows()[0]?.setContentSize(720, 680);
+  });
+  await narrowPage.waitForFunction(
+    () =>
+      window.innerWidth === 720 &&
+      document
+        .querySelector(".codex-ui-app-shell")
+        ?.getAttribute("data-layout-mode") === "narrow" &&
+      !document
+        .querySelector(".codex-ui-app-shell")
+        ?.hasAttribute("data-sidebar-open"),
+  );
+  const narrowedState = await narrowApp.evaluate(({ BrowserWindow }) => ({
+    bounds: BrowserWindow.getAllWindows()[0]?.getContentBounds(),
+    minimum: BrowserWindow.getAllWindows()[0]?.getMinimumSize(),
+  }));
+  if (
+    narrowedState.bounds?.width !== 720 ||
+    narrowedState.bounds?.height !== 680
+  ) {
+    throw new Error(
+      `Electron default window did not resize into narrow mode: ${JSON.stringify(narrowedState)}`,
+    );
+  }
+  const showNarrowSidebar = narrowPage.getByRole("button", {
+    name: "Show sidebar",
+  });
+  await showNarrowSidebar.click();
+  await narrowPage.waitForSelector(
+    ".codex-ui-app-shell[data-layout-mode=\"narrow\"][data-sidebar-open] .codex-ui-app-shell__main[inert]",
+  );
+  await narrowPage.keyboard.press("Escape");
+  await narrowPage.waitForSelector(
+    ".codex-ui-app-shell[data-layout-mode=\"narrow\"]:not([data-sidebar-open]) .codex-ui-app-shell__main:not([inert])",
+  );
+} finally {
+  await narrowApp.close();
+}
+
 const markdownScene = {
   frame: "markdown-complete",
   id: "electron-markdown",
@@ -265,7 +324,10 @@ const workflowScene = {
   scenario: "workspace-workflow",
 };
 const { app: workflowApp, page: workflowPage } =
-  await launchScene(workflowScene, { capture: false });
+  await launchScene(workflowScene, {
+    capture: false,
+    layoutMode: "wide",
+  });
 
 try {
   await workflowPage.waitForSelector(
@@ -619,7 +681,7 @@ const pullRequestScene = {
 };
 const { app: pullRequestApp, page: pullRequestPage } = await launchScene(
   pullRequestScene,
-  { capture: false },
+  { capture: false, layoutMode: "wide" },
 );
 
 try {
@@ -770,6 +832,12 @@ try {
     };
     const headerActions = document.querySelector(".demo-header-actions");
     return {
+      backdropVisible:
+        window.getComputedStyle(
+          document.querySelector(
+            '.codex-ui-app-shell__backdrop[data-backdrop="side-panel"]',
+          ),
+        ).display !== "none",
       fileGroups: document.querySelectorAll(
         ".codex-ui-file-change-group",
       ).length,
@@ -782,6 +850,9 @@ try {
       headerActionsVisible:
         headerActions !== null &&
         window.getComputedStyle(headerActions).visibility === "visible",
+      layoutMode: document
+        .querySelector(".codex-ui-app-shell")
+        ?.getAttribute("data-layout-mode"),
       main: rect(".codex-ui-app-shell__main"),
       mainAriaHidden: document
         .querySelector(".codex-ui-app-shell__main")
@@ -824,21 +895,19 @@ try {
     compactContract.fileRows !== 2 ||
     compactContract.reviewDiffs !== 2 ||
     !compactContract.headerActionsVisible ||
+    compactContract.layoutMode !== "medium" ||
+    !compactContract.backdropVisible ||
     compactContract.mainAriaHidden !== null ||
-    compactContract.mainInert ||
+    !compactContract.mainInert ||
     compactContract.sidePanelAriaHidden !== "false" ||
     compactContract.sidePanelInert ||
     !compactContract.sidebar ||
     !compactContract.main ||
     !compactContract.sidePanel ||
-    !compactContract.sidePanelResizer ||
+    compactContract.sidePanelResizer !== null ||
     Math.abs(compactContract.sidebar.width - 274) > 1 ||
-    compactContract.main.width < 200 ||
-    compactContract.sidePanel.width < 315 ||
-    Math.abs(compactContract.sidePanelResizer.width - 16) > 0.5 ||
-    compactContract.sidePanelResizer.ariaMin !== "320" ||
-    compactContract.sidePanelResizer.ariaMax !== "320" ||
-    compactContract.sidePanelResizer.ariaNow !== "320" ||
+    Math.abs(compactContract.main.width - 526) > 1 ||
+    Math.abs(compactContract.sidePanel.width - 320) > 1 ||
     compactContract.sidePanel.right > 801
   ) {
     throw new Error(
@@ -854,6 +923,9 @@ try {
     .click();
   await compactPage.waitForSelector(
     ".codex-ui-app-shell:not([data-side-panel-open])",
+  );
+  await compactPage.waitForSelector(
+    ".codex-ui-app-shell__main:not([inert])",
   );
   await compactPage
     .getByRole("button", {
@@ -876,10 +948,19 @@ try {
       .isVisible())
   ) {
     throw new Error(
-      "Compact Electron split did not keep conversation and Review interactive.",
+      "Compact Electron Review overlay did not preserve both file diffs.",
     );
   }
 
+  await compactPage
+    .getByRole("button", { exact: true, name: "Close review" })
+    .click();
+  await compactPage.waitForSelector(
+    ".codex-ui-app-shell:not([data-side-panel-open])",
+  );
+  await compactPage.waitForSelector(
+    ".codex-ui-app-shell__main:not([inert])",
+  );
   await compactPage.evaluate(() => {
     HTMLElement.prototype.scrollIntoView = function (options) {
       if (this.matches(".codex-ui-file-review__file[data-selected]")) {
@@ -1025,6 +1106,15 @@ try {
     );
   }
 
+  await largeReviewPage
+    .getByRole("button", { exact: true, name: "Close review" })
+    .click();
+  await largeReviewPage.waitForSelector(
+    ".codex-ui-app-shell:not([data-side-panel-open])",
+  );
+  await largeReviewPage.waitForSelector(
+    ".codex-ui-app-shell__main:not([inert])",
+  );
   const selectedPath = ".research/large-review/08.ts";
   await largeReviewPage
     .getByRole("button", { name: `Open ${selectedPath}` })
@@ -1059,5 +1149,5 @@ try {
 }
 
 console.log(
-  "Electron host, native-window, resizable navigation/Review/Terminal/PR detail, PR tabs and expansion, MCP disclosure/result, multi-file Review, large diff scrolling, and compact geometry contracts passed.",
+  "Electron host, native-window, default 720px narrow reachability, resizable navigation/Review/Terminal/PR detail, PR tabs and expansion, MCP disclosure/result, multi-file Review, large diff scrolling, and compact geometry contracts passed.",
 );

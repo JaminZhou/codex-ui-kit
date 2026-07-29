@@ -117,7 +117,7 @@ export const visualScenes = [
 
 export async function launchScene(
   scene,
-  { capture = true, windowSize } = {},
+  { capture = true, layoutMode, windowSize } = {},
 ) {
   const app = await electron.launch({
     args: ["."],
@@ -127,6 +127,7 @@ export async function launchScene(
       CODEX_DEMO_CAPTURE: capture ? "1" : "0",
       CODEX_DEMO_FRAME: scene.frame,
       CODEX_DEMO_HEADLESS: "1",
+      ...(layoutMode ? { CODEX_DEMO_LAYOUT: layoutMode } : {}),
       CODEX_DEMO_SCENARIO: scene.scenario,
       CODEX_DEMO_VIEW: scene.view ?? "conversation",
       ...(windowSize

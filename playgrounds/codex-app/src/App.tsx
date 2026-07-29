@@ -6,6 +6,7 @@ import {
   AgentTurn,
   AppShell,
   AppSidebar,
+  AppSidebarFooter,
   AppSidebarItem,
   AppSidebarSection,
   ApprovalRequest,
@@ -69,6 +70,47 @@ import {
 
 type DemoView = "conversation" | "pull-request";
 
+type SidebarGlyphName =
+  | "automation"
+  | "folder"
+  | "more"
+  | "new"
+  | "pin"
+  | "plugins"
+  | "pull-request"
+  | "search"
+  | "settings"
+  | "sites"
+  | "thread";
+
+function SidebarGlyph({ name }: { name: SidebarGlyphName }) {
+  const path = {
+    automation:
+      "M8 2.25a5.75 5.75 0 1 1-4.07 1.68M8 4.75V8l2.15 1.45",
+    folder:
+      "M1.75 4.5h4l1.2 1.5h7.3v6.25a1.5 1.5 0 0 1-1.5 1.5H3.25a1.5 1.5 0 0 1-1.5-1.5V4.5Zm0 2h12.5",
+    more: "M3.25 8h.01M8 8h.01M12.75 8h.01",
+    new: "M3 13l.55-3.1L10.9 2.55a1.55 1.55 0 0 1 2.2 2.2L5.75 12.1 3 13Zm6.9-9.45 2.55 2.55",
+    pin: "m5.25 2.5 5.5 5.5M9.6 1.6l4.8 4.8-2.15 1.05-3.7 3.7-1.05 2.15-4.8-4.8 2.15-1.05 3.7-3.7L9.6 1.6ZM8 11l-3 3",
+    plugins:
+      "M6.25 1.75v3M9.75 1.75v3M4.5 4.75h7v2.5A3.5 3.5 0 0 1 8 10.75v3.5M2 7.25h12",
+    "pull-request":
+      "M4 3.25v8.5M4 3.25a1.25 1.25 0 1 0 0 .01M4 11.75a1.25 1.25 0 1 0 0 .01M12 4.5a1.25 1.25 0 1 0 0 .01M12 5.75v2a4 4 0 0 1-4 4H6.5",
+    search: "m11.5 11.5 2.75 2.75M13 7.25A5.75 5.75 0 1 1 1.5 7.25 5.75 5.75 0 0 1 13 7.25Z",
+    settings:
+      "M8 5.5A2.5 2.5 0 1 1 8 10.5 2.5 2.5 0 0 1 8 5.5Zm0-3.75.8 1.3 1.55.35 1.2-.95 2 2-.95 1.2.35 1.55 1.3.8-1.3.8-.35 1.55.95 1.2-2 2-1.2-.95-1.55.35L8 14.25l-.8-1.3-1.55-.35-1.2.95-2-2 .95-1.2-.35-1.55L1.75 8l1.3-.8.35-1.55-.95-1.2 2-2 1.2.95 1.55-.35L8 1.75Z",
+    sites:
+      "M2.25 2.25h4.5v4.5h-4.5v-4.5Zm7 0h4.5v4.5h-4.5v-4.5Zm-7 7h4.5v4.5h-4.5v-4.5Zm7 0h4.5v4.5h-4.5v-4.5Z",
+    thread:
+      "M2.25 3.25h11.5v7.5H7L3.25 13.5v-2.75h-1V3.25Z",
+  }[name];
+  return (
+    <svg aria-hidden="true" className="demo-sidebar-glyph" viewBox="0 0 16 16">
+      <path d={path} />
+    </svg>
+  );
+}
+
 function querySelection() {
   const params = new URLSearchParams(window.location.search);
   const requested = params.get("scenario");
@@ -77,11 +119,21 @@ function querySelection() {
     : "streaming-recovery";
   const frame = params.get("frame");
   const capture = params.get("capture") === "1";
+  const layoutMode =
+    params.get("layout") === "wide" ? ("wide" as const) : undefined;
   const view: DemoView =
     params.get("view") === "pull-request"
       ? "pull-request"
       : "conversation";
-  return { capture, frame, scenarioId, view };
+  return { capture, frame, layoutMode, scenarioId, view };
+}
+
+function isNarrowDemoWindow() {
+  const rootFontSize =
+    Number.parseFloat(
+      window.getComputedStyle(document.documentElement).fontSize,
+    ) || 16;
+  return window.innerWidth <= 45 * rootFontSize;
 }
 
 function replayState(
@@ -239,7 +291,9 @@ export function App() {
   const [view, setView] = useState<DemoView>(initialSelection.view);
   const [composerValue, setComposerValue] = useState("");
   const [liveStartPending, setLiveStartPending] = useState(false);
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [sidebarOpen, setSidebarOpen] = useState(
+    () => initialSelection.capture || !isNarrowDemoWindow(),
+  );
   const [reviewOpen, setReviewOpen] = useState(
     initialSelection.frame === "review-open",
   );
@@ -273,6 +327,25 @@ export function App() {
   const liveApprovalSubmissionGateRef = useRef(
     new LiveApprovalSubmissionGate(),
   );
+  const sidebarNarrowRef = useRef(
+    !initialSelection.capture && isNarrowDemoWindow(),
+  );
+
+  useEffect(() => {
+    if (initialSelection.capture) return;
+
+    const handleResize = () => {
+      const nextNarrow = isNarrowDemoWindow();
+      if (!sidebarNarrowRef.current && nextNarrow) {
+        setSidebarOpen(false);
+      }
+      sidebarNarrowRef.current = nextNarrow;
+    };
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, [initialSelection.capture]);
+
   const replay = useMemo(
     () => replayState(scenario.events, replayCount),
     [replayCount, scenario.events],
@@ -309,6 +382,10 @@ export function App() {
     );
   }, [liveState.approvals]);
 
+  const dismissSidebarAfterNavigation = () => {
+    if (sidebarNarrowRef.current) setSidebarOpen(false);
+  };
+
   const selectScenario = (nextId: ReplayScenarioId) => {
     setView("conversation");
     setMode("replay");
@@ -323,6 +400,7 @@ export function App() {
     setTerminalHistoryByCommand({});
     setUndoneFileIds(new Set());
     setLiveError(null);
+    dismissSidebarAfterNavigation();
   };
 
   const respondToApproval = async (
@@ -388,52 +466,198 @@ export function App() {
   const sidebar = (
     <AppSidebar
       footer={
-        <div className="demo-sidebar-footer">
-          <span data-testid="dependency-ui-kit">UI Kit workspace</span>
-          <span data-testid="dependency-client">Client 97ffcd4</span>
-        </div>
+        <AppSidebarFooter
+          account="Demo account"
+          accountAvatar={<span className="demo-sidebar-avatar">D</span>}
+          accountButtonProps={{
+            "aria-expanded": false,
+            "aria-haspopup": "menu",
+          }}
+          actions={
+            <button aria-label="Open settings" type="button">
+              <SidebarGlyph name="settings" />
+            </button>
+          }
+        />
       }
       header={
-        <div className="demo-brand">
-          <span aria-hidden="true" className="demo-brand__mark">
-            ◈
-          </span>
-          <span>Codex App Playground</span>
+        <div className="demo-sidebar-header">
+          <div className="demo-sidebar-brand-row">
+            <button
+              aria-expanded={false}
+              aria-haspopup="menu"
+              className="demo-sidebar-brand"
+              type="button"
+            >
+              Codex
+              <span aria-hidden="true">⌄</span>
+            </button>
+            <button
+              aria-label="Search"
+              className="demo-sidebar-header-action"
+              type="button"
+            >
+              <SidebarGlyph name="search" />
+            </button>
+          </div>
+          <AppSidebarItem
+            leading={<SidebarGlyph name="new" />}
+            onClick={() => selectScenario("streaming-recovery")}
+          >
+            New chat
+          </AppSidebarItem>
         </div>
       }
-    >
-      <AppSidebarSection title="Lifecycle scenarios">
-        {(Object.values(replayScenarios) as ReplayScenario[]).map((item) => (
+      primaryNavigation={
+        <>
           <AppSidebarItem
-            description={item.description}
+            leading={<SidebarGlyph name="pull-request" />}
+            onClick={() => {
+              setMode("replay");
+              setView("pull-request");
+              setPullRequestOpen(!sidebarNarrowRef.current);
+              dismissSidebarAfterNavigation();
+            }}
+            selected={view === "pull-request"}
+          >
+            Pull requests
+          </AppSidebarItem>
+          <AppSidebarItem leading={<SidebarGlyph name="sites" />}>
+            Sites
+          </AppSidebarItem>
+          <AppSidebarItem leading={<SidebarGlyph name="automation" />}>
+            Scheduled
+          </AppSidebarItem>
+          <AppSidebarItem leading={<SidebarGlyph name="plugins" />}>
+            Plugins
+          </AppSidebarItem>
+        </>
+      }
+      titlebarInset
+    >
+      <AppSidebarSection
+        collapsible
+        kind="pinned"
+        title="Pinned"
+        toggleLabel="Toggle pinned tasks"
+      >
+        <AppSidebarItem
+          actions={
+            <>
+              <button aria-label="Pin current task" type="button">
+                <SidebarGlyph name="pin" />
+              </button>
+              <button aria-label="Current task actions" type="button">
+                <SidebarGlyph name="more" />
+              </button>
+            </>
+          }
+          actionsLabel="Current task actions"
+          leading={<SidebarGlyph name="folder" />}
+          status={hasActiveTurnWork(state) ? "running" : "idle"}
+          statusLabel="Current task is running"
+        >
+          codex-ui-kit
+        </AppSidebarItem>
+        <AppSidebarItem
+          actions={
+            <button aria-label="Pinned task actions" type="button">
+              <SidebarGlyph name="more" />
+            </button>
+          }
+          actionsLabel="Pinned task actions"
+          depth={1}
+          leading={<SidebarGlyph name="thread" />}
+          onClick={() => selectScenario("mcp-tool-call")}
+          status="unread"
+          statusLabel="Unread update"
+        >
+          MCP tool validation
+        </AppSidebarItem>
+      </AppSidebarSection>
+      <AppSidebarSection
+        actions={
+          <button
+            aria-label="New project"
+            className="demo-sidebar-section-action"
+            type="button"
+          >
+            +
+          </button>
+        }
+        collapsible
+        defaultExpanded={false}
+        kind="projects"
+        title="Projects"
+        toggleLabel="Toggle projects"
+      >
+        <AppSidebarItem
+          leading={<SidebarGlyph name="folder" />}
+          status="queued"
+          statusLabel="Project task queued"
+        >
+          protocol-client-with-an-intentionally-long-worktree-name
+        </AppSidebarItem>
+        <AppSidebarItem depth={1} leading={<SidebarGlyph name="thread" />}>
+          Public protocol baseline
+        </AppSidebarItem>
+      </AppSidebarSection>
+      <AppSidebarSection
+        collapsible
+        kind="threads"
+        title="Recents"
+        toggleLabel="Toggle recent tasks"
+      >
+        {(Object.values(replayScenarios) as ReplayScenario[]).map((item, index) => (
+          <AppSidebarItem
+            actions={
+              <button
+                aria-label={`Sidebar actions for ${item.label}`}
+                type="button"
+              >
+                <SidebarGlyph name="more" />
+              </button>
+            }
+            actionsLabel={`Sidebar task actions for ${item.label}`}
             key={item.id}
+            leading={<SidebarGlyph name="thread" />}
             onClick={() => selectScenario(item.id)}
-            selected={mode === "replay" && scenarioId === item.id}
+            selected={
+              view === "conversation" &&
+              mode === "replay" &&
+              scenarioId === item.id
+            }
+            status={
+              index === 1
+                ? "queued"
+                : index === 2
+                  ? "error"
+                  : index === 3
+                    ? "unread"
+                    : "idle"
+            }
+            statusLabel={
+              index === 1
+                ? "Task queued"
+                : index === 2
+                  ? "Task failed"
+                  : index === 3
+                    ? "Unread update"
+                    : undefined
+            }
           >
             {item.label}
           </AppSidebarItem>
         ))}
       </AppSidebarSection>
-      <AppSidebarSection title="Workspace">
-        <AppSidebarItem
-          description="Summary, Timeline, Code, checks, and review"
-          onClick={() => {
-            setMode("replay");
-            setView("pull-request");
-            setPullRequestOpen(true);
-          }}
-          selected={view === "pull-request"}
-        >
-          Pull requests
-        </AppSidebarItem>
-      </AppSidebarSection>
       <AppSidebarSection title="Connection">
         <AppSidebarItem
-          description="Local stdio app-server"
           disabled={!window.codexDemo}
+          leading={<SidebarGlyph name="plugins" />}
           onClick={() => {
             setView("conversation");
             setMode("live");
+            dismissSidebarAfterNavigation();
           }}
           selected={view === "conversation" && mode === "live"}
         >
@@ -1284,6 +1508,7 @@ export function App() {
       className="demo-root"
       data-capture={initialSelection.capture || undefined}
       data-frame={initialSelection.frame ?? lastEvent?.frame ?? "final"}
+      data-layout={initialSelection.layoutMode}
       data-last-method={state.lastMethod ?? undefined}
       data-mode={mode}
       data-scenario={scenarioId}
@@ -1298,7 +1523,12 @@ export function App() {
         bottomPanelResizable
         bottomPanelResizeLabel="Resize bottom panel"
         onBottomPanelHeightChange={setTerminalHeight}
-        layoutMode="wide"
+        layoutMode={
+          initialSelection.capture ||
+          initialSelection.layoutMode === "wide"
+            ? "wide"
+            : undefined
+        }
         onSidebarOpenChange={setSidebarOpen}
         onSidePanelOpenChange={
           view === "pull-request" ? setPullRequestOpen : setReviewOpen

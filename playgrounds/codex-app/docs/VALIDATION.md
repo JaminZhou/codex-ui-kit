@@ -5,7 +5,10 @@ Every deterministic scenario has one ID and produces four evidence layers:
 1. **Protocol** — ordered App Server notifications, server requests, and
    request responses checked against the pinned generated schemas.
 2. **CDP** — DOM identity, computed layout, focus, scrolling, and named-surface
-   geometry, including the 16px navigation separator and large-Review
+   geometry, including the current 274px sidebar, 46px titlebar inset, 70px
+   header, 30px rows, fixed footer, collapsible groups, focusable row actions,
+   and 820px split/720px modal transition; the 16px navigation separator and
+   large-Review
    overflow/reveal contract, plus the 16px PR/Review separator, responsive
    limits, tab states, and expand/restore lifecycle, and the 16px Terminal
    separator, 272px default panel, responsive bounds, named tab/tabpanel, and
@@ -27,7 +30,13 @@ Every deterministic scenario has one ID and produces four evidence layers:
    scenario accepts `CODEX_UI_KIT_MARKDOWN_REFERENCE` and gates assistant,
    fenced-code, and Composer regions separately; the successful-MCP scenario
    accepts `CODEX_UI_KIT_MCP_TOOL_CALL_REFERENCE` and gates full-main,
-   tool-call, answer, and Composer regions separately.
+   tool-call, answer, and Composer regions separately; the current sidebar
+   accepts a full 1180×820 external reference through
+   `CODEX_UI_KIT_SIDEBAR_REFERENCE` and gates the owned top controls, selected
+   row, and footer regions separately. Transparent Electron/CDP reference
+   pixels are composited onto the observed `#181818` window background before
+   comparison, and the independent UI's unique current row is located from
+   its DOM contract rather than a hard-coded vertical offset.
 
 The layers do not vote on the same claim. Protocol proves lifecycle behavior;
 CDP explains layout; Electron proves the desktop host; pixels catch final
@@ -46,8 +55,14 @@ current-build parity. The Terminal comparison deliberately reports but does
 not gate the whole-main ratio when the observed and replayed conversation
 content differ.
 
-The 13 standard lifecycle frames keep the 0.25% internal raster limit. The
-large-Review frame uses a scoped 0.40% limit because its 96 dense monospace
+The 13 standard lifecycle frames keep the original 0.25% internal raster limit
+for the 906px main region. Their 274px sidebar is gated separately at 0.8%
+because its shared 13px text and glyph density produced a measured 0.6874%
+cross-machine macOS runner delta. This prevents sidebar raster variance from
+loosening the conversation gate, while the ownership-scoped current-build
+sidebar comparison retains its separate hard regional thresholds. The
+large-Review frame uses a scoped 0.40% full-frame limit because
+its 96 dense monospace
 lines amplify macOS text-rasterization differences; CDP and Electron still
 gate file counts, overflow, split geometry, and exact last-file visibility
 independently. The fourteenth PR frame uses a scoped 1% internal limit because
@@ -55,9 +70,10 @@ its dense full-page text produces a measured 0.8161% macOS-runner
 rasterization delta; CDP and Electron still lock the split, tabs, actions,
 resizing, and expansion independently. Its optional current-build gate allows
 at most 6.5% full-main, 5.5% index, and 7% detail difference at the stricter
-0.05 pixel threshold. The fifteenth Terminal frame keeps the standard 0.25%
-internal limit; its optional current-build gate allows at most 2% panel and 1%
-content difference at the same 0.05 threshold. The sixteenth completed-Markdown
+0.05 pixel threshold. The fifteenth Terminal frame keeps the standard
+0.25%-main/0.8%-sidebar regional limits; its optional current-build gate allows
+at most 2% panel and 1% content difference at the same 0.05 threshold. The
+sixteenth completed-Markdown
 frame uses a scoped 1% internal limit for dense text rasterization and hides
 only the capture-time scrollbar so overlay and space-consuming macOS scrollbar
 settings cannot shift the centered content by 7.5px. CDP still checks the real

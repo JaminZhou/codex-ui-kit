@@ -49,26 +49,36 @@ textarea {
   height: 100%;
 }
 
-.demo-root .codex-ui-app-shell__layout {
+.demo-root:is([data-capture], [data-layout="wide"])
+  .codex-ui-app-shell__layout {
   grid-template-columns:
     var(--codex-ui-app-shell-sidebar-track)
     minmax(0, 1fr)
     var(--codex-ui-app-shell-side-panel-track);
 }
 
-.demo-root .codex-ui-app-shell__main {
+.demo-root:is([data-capture], [data-layout="wide"])
+  .codex-ui-app-shell__main {
   grid-column: 2;
 }
 
-.demo-root .codex-ui-app-shell__bottom-panel {
+.demo-root:is([data-capture], [data-layout="wide"])
+  .codex-ui-app-shell__bottom-panel {
   grid-column: 2 / 4;
 }
 
-.demo-root .codex-ui-app-shell__bottom-panel-resizer {
+.demo-root:is([data-capture], [data-layout="wide"])
+  .codex-ui-app-shell__bottom-panel-resizer {
   inset-inline-start: var(--codex-ui-app-shell-sidebar-track);
 }
 
 .demo-root .codex-ui-app-shell__sidebar {
+  background: color(srgb 0.156863 0.156863 0.156863 / 0.7);
+  border-inline-end: 0;
+}
+
+.demo-root:is([data-capture], [data-layout="wide"])
+  .codex-ui-app-shell__sidebar {
   bottom: auto;
   box-shadow: none;
   grid-column: 1;
@@ -81,7 +91,21 @@ textarea {
   width: auto;
 }
 
-.demo-root .codex-ui-app-shell__side-panel {
+.demo-root .codex-ui-app-shell__main {
+  background: #181818;
+  box-shadow:
+    rgba(255, 255, 255, 0.157) 0 0 0 0.5px,
+    rgba(0, 0, 0, 0.04) 0 3px 7.5px,
+    rgba(0, 0, 0, 0.05) 0 0 20px;
+}
+
+.demo-root .codex-ui-app-sidebar__footer {
+  background: transparent;
+  border-block-start-color: rgba(255, 255, 255, 0.12);
+}
+
+.demo-root:is([data-capture], [data-layout="wide"])
+  .codex-ui-app-shell__side-panel {
   bottom: auto;
   box-shadow: none;
   grid-column: 3;
@@ -94,45 +118,103 @@ textarea {
   width: auto;
 }
 
-.demo-root
+.demo-root:is([data-capture], [data-layout="wide"])
   .codex-ui-app-shell[data-side-panel-open]
   .codex-ui-app-shell__backdrop[data-backdrop="side-panel"],
-.demo-root
+.demo-root:is([data-capture], [data-layout="wide"])
   .codex-ui-app-shell[data-sidebar-open]
   .codex-ui-app-shell__backdrop[data-backdrop="sidebar"] {
   display: none;
 }
 
-.demo-brand {
-  display: flex;
-  align-items: center;
-  gap: 9px;
-  min-height: 38px;
-  padding: 4px 8px;
-  color: #f5f5f5;
-  font-size: 13px;
-  font-weight: 650;
-  letter-spacing: -0.01em;
-}
-
-.demo-brand__mark {
-  display: grid;
-  width: 24px;
-  height: 24px;
-  place-items: center;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 7px;
-  background: rgba(255, 255, 255, 0.055);
-  color: #c9ff7a;
-}
-
-.demo-sidebar-footer {
+.demo-sidebar-header {
   display: grid;
   gap: 4px;
-  padding: 10px 12px;
-  color: rgba(255, 255, 255, 0.42);
-  font-family: "SFMono-Regular", Consolas, monospace;
-  font-size: 10px;
+  width: 100%;
+}
+
+.demo-sidebar-brand-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  justify-content: space-between;
+  min-height: 32px;
+}
+
+.demo-sidebar-brand,
+.demo-sidebar-header-action,
+.demo-sidebar-section-action,
+.codex-ui-app-sidebar-footer__actions > button {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  font: inherit;
+}
+
+.demo-sidebar-brand {
+  align-items: center;
+  border-radius: 15px;
+  color: #f5f5f5;
+  display: inline-flex;
+  font-size: 17px;
+  font-weight: 500;
+  gap: 4px;
+  min-height: 32px;
+  padding: 2px 8px;
+}
+
+.demo-sidebar-brand:hover,
+.demo-sidebar-brand:focus-visible,
+.demo-sidebar-header-action:hover,
+.demo-sidebar-header-action:focus-visible,
+.demo-sidebar-section-action:hover,
+.demo-sidebar-section-action:focus-visible,
+.codex-ui-app-sidebar-footer__actions > button:hover,
+.codex-ui-app-sidebar-footer__actions > button:focus-visible {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.demo-sidebar-header-action,
+.demo-sidebar-section-action,
+.codex-ui-app-sidebar-footer__actions > button {
+  align-items: center;
+  border-radius: 10px;
+  color: rgba(255, 255, 255, 0.5);
+  display: inline-flex;
+  height: 26px;
+  justify-content: center;
+  padding: 4px;
+  width: 26px;
+}
+
+.demo-sidebar-section-action {
+  font-size: 18px;
+  height: 24px;
+  line-height: 16px;
+  width: 24px;
+}
+
+.demo-sidebar-glyph {
+  fill: none;
+  height: 16px;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.2;
+  width: 16px;
+}
+
+.demo-sidebar-avatar {
+  align-items: center;
+  background: #1687bd;
+  border-radius: 999px;
+  color: #fff;
+  display: inline-flex;
+  font-size: 9px;
+  height: 18px;
+  justify-content: center;
+  width: 18px;
 }
 
 .demo-header-actions {

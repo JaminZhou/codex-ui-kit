@@ -39,6 +39,15 @@ const currentBuildMcpReferenceSize = {
   height: 820,
   width: 906,
 };
+const currentBuildSidebarReference =
+  process.env.CODEX_UI_KIT_SIDEBAR_REFERENCE;
+const defaultLifecycleMainPixelRatio = 0.0025;
+const defaultLifecycleSidebarPixelRatio = 0.008;
+const internalSidebarWidth = 274;
+const currentBuildSidebarReferenceSize = {
+  height: 820,
+  width: 1180,
+};
 await mkdir(baselineDirectory, { recursive: true });
 await mkdir(artifactDirectory, { recursive: true });
 
@@ -68,6 +77,40 @@ function comparePng(reference, actual, threshold = 0.05) {
   };
 }
 
+function flattenPng(image, background) {
+  for (let index = 0; index < image.data.length; index += 4) {
+    const alpha = image.data[index + 3] / 255;
+    if (alpha >= 1) continue;
+    image.data[index] = Math.round(
+      image.data[index] * alpha + background.red * (1 - alpha),
+    );
+    image.data[index + 1] = Math.round(
+      image.data[index + 1] * alpha +
+        background.green * (1 - alpha),
+    );
+    image.data[index + 2] = Math.round(
+      image.data[index + 2] * alpha + background.blue * (1 - alpha),
+    );
+    image.data[index + 3] = 255;
+  }
+  return image;
+}
+
+function maskPng(image, masks) {
+  for (const { height, left, top, width } of masks) {
+    for (let y = top; y < top + height; y += 1) {
+      for (let x = left; x < left + width; x += 1) {
+        const index = (y * image.width + x) * 4;
+        image.data[index] = 0;
+        image.data[index + 1] = 0;
+        image.data[index + 2] = 0;
+        image.data[index + 3] = 0;
+      }
+    }
+  }
+  return image;
+}
+
 function environmentRatio(name, fallback) {
   const value = Number(process.env[name] ?? fallback);
   if (!Number.isFinite(value) || value < 0 || value > 1) {
@@ -81,8 +124,24 @@ for (const scene of visualScenes) {
   const actualPath = join(artifactDirectory, `${scene.id}.png`);
   const baselinePath = join(baselineDirectory, `${scene.id}.png`);
   const diffPath = join(artifactDirectory, `${scene.id}.diff.png`);
+  let sidebarSelectedTop;
 
   try {
+    if (scene.id === "streaming") {
+      sidebarSelectedTop = await page.evaluate(() => {
+        const current = Array.from(
+          document.querySelectorAll(
+            ".codex-ui-app-sidebar [aria-current=\"page\"]",
+          ),
+        );
+        if (current.length !== 1) {
+          throw new Error(
+            `Expected one current sidebar page, received ${current.length}.`,
+          );
+        }
+        return Math.round(current[0].getBoundingClientRect().top);
+      });
+    }
     if (scene.id === "multi-file-review") {
       await page.evaluate(() => {
         const active = document.activeElement;
@@ -143,10 +202,153 @@ for (const scene of visualScenes) {
   );
   const ratio = pixels / (actual.width * actual.height);
   if (pixels > 0) await writeFile(diffPath, PNG.sync.write(diff));
-  const maximumRatio = scene.maxPixelRatio ?? 0.0025;
-  if (ratio > maximumRatio) {
-    throw new Error(
-      `${scene.id}: pixel drift ${(ratio * 100).toFixed(4)}% exceeds ${(maximumRatio * 100).toFixed(2)}%.`,
+  if (scene.maxPixelRatio !== undefined) {
+    if (ratio > scene.maxPixelRatio) {
+      throw new Error(
+        `${scene.id}: pixel drift ${(ratio * 100).toFixed(4)}% exceeds ${(scene.maxPixelRatio * 100).toFixed(2)}%.`,
+      );
+    }
+  } else {
+    if (actual.width <= internalSidebarWidth) {
+      throw new Error(
+        `${scene.id}: frame width ${actual.width}px cannot be split at the ${internalSidebarWidth}px sidebar boundary.`,
+      );
+    }
+    const mainComparison = comparePng(
+      cropPng(
+        baseline,
+        internalSidebarWidth,
+        0,
+        baseline.width - internalSidebarWidth,
+        baseline.height,
+      ),
+      cropPng(
+        actual,
+        internalSidebarWidth,
+        0,
+        actual.width - internalSidebarWidth,
+        actual.height,
+      ),
+      0.12,
+    );
+    const sidebarComparison = comparePng(
+      cropPng(baseline, 0, 0, internalSidebarWidth, baseline.height),
+      cropPng(actual, 0, 0, internalSidebarWidth, actual.height),
+      0.12,
+    );
+    if (
+      mainComparison.ratio > defaultLifecycleMainPixelRatio ||
+      sidebarComparison.ratio > defaultLifecycleSidebarPixelRatio
+    ) {
+      throw new Error(
+        `${scene.id}: regional pixel drift ${JSON.stringify({
+          main: mainComparison.ratio,
+          sidebar: sidebarComparison.ratio,
+        })} exceeds ${JSON.stringify({
+          main: defaultLifecycleMainPixelRatio,
+          sidebar: defaultLifecycleSidebarPixelRatio,
+        })}.`,
+      );
+    }
+  }
+
+  if (scene.id === "streaming" && currentBuildSidebarReference) {
+    if (!Number.isInteger(sidebarSelectedTop)) {
+      throw new Error(
+        `${scene.id}: current sidebar row position was not captured.`,
+      );
+    }
+    const referenceFull = flattenPng(
+      PNG.sync.read(await readFile(currentBuildSidebarReference)),
+      { blue: 24, green: 24, red: 24 },
+    );
+    if (
+      referenceFull.width !== currentBuildSidebarReferenceSize.width ||
+      referenceFull.height !== currentBuildSidebarReferenceSize.height
+    ) {
+      throw new Error(
+        `${scene.id}: current-build sidebar reference must be exactly ${currentBuildSidebarReferenceSize.width}x${currentBuildSidebarReferenceSize.height}, received ${referenceFull.width}x${referenceFull.height}.`,
+      );
+    }
+    if (
+      actual.width !== referenceFull.width ||
+      actual.height !== referenceFull.height
+    ) {
+      throw new Error(
+        `${scene.id}: sidebar comparison requires matching ${referenceFull.width}x${referenceFull.height} frames.`,
+      );
+    }
+
+    const referenceTop = cropPng(referenceFull, 0, 0, 274, 250);
+    const actualTop = cropPng(actual, 0, 0, 274, 250);
+    const topComparison = comparePng(referenceTop, actualTop);
+
+    const selectedMasks = [
+      { height: 22, left: 8, top: 4, width: 242 },
+    ];
+    const referenceSelected = maskPng(
+      cropPng(referenceFull, 8, 426, 258, 30),
+      selectedMasks,
+    );
+    const actualSelected = maskPng(
+      cropPng(actual, 8, sidebarSelectedTop, 258, 30),
+      selectedMasks,
+    );
+    const selectedComparison = comparePng(
+      referenceSelected,
+      actualSelected,
+    );
+
+    const footerMasks = [
+      { height: 32, left: 8, top: 7, width: 258 },
+    ];
+    const referenceFooter = maskPng(
+      cropPng(referenceFull, 0, 774, 274, 46),
+      footerMasks,
+    );
+    const actualFooter = maskPng(
+      cropPng(actual, 0, 774, 274, 46),
+      footerMasks,
+    );
+    const footerComparison = comparePng(
+      referenceFooter,
+      actualFooter,
+    );
+    const maximumTopRatio = environmentRatio(
+      "CODEX_UI_KIT_SIDEBAR_TOP_MAX_DIFF_RATIO",
+      0.07,
+    );
+    const maximumSelectedRatio = environmentRatio(
+      "CODEX_UI_KIT_SIDEBAR_SELECTED_MAX_DIFF_RATIO",
+      0.05,
+    );
+    const maximumFooterRatio = environmentRatio(
+      "CODEX_UI_KIT_SIDEBAR_FOOTER_MAX_DIFF_RATIO",
+      0.05,
+    );
+    if (
+      topComparison.ratio > maximumTopRatio ||
+      selectedComparison.ratio > maximumSelectedRatio ||
+      footerComparison.ratio > maximumFooterRatio
+    ) {
+      throw new Error(
+        `${scene.id}: current-build sidebar pixel ratios ${JSON.stringify({
+          footer: footerComparison.ratio,
+          selected: selectedComparison.ratio,
+          top: topComparison.ratio,
+        })} exceed ${JSON.stringify({
+          footer: maximumFooterRatio,
+          selected: maximumSelectedRatio,
+          top: maximumTopRatio,
+        })}.`,
+      );
+    }
+    console.log(
+      `${scene.id}: current-build sidebar pixel ratios ${JSON.stringify({
+        footer: footerComparison.ratio,
+        selected: selectedComparison.ratio,
+        top: topComparison.ratio,
+      })}`,
     );
   }
 

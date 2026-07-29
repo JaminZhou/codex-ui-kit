@@ -244,6 +244,7 @@ function createWindow() {
   const scenario = process.env.CODEX_DEMO_SCENARIO ?? "streaming-recovery";
   const frame = process.env.CODEX_DEMO_FRAME ?? "recovered";
   const capture = process.env.CODEX_DEMO_CAPTURE ?? "0";
+  const layout = process.env.CODEX_DEMO_LAYOUT ?? "";
   const view = process.env.CODEX_DEMO_VIEW ?? "conversation";
   const requestedWidth = Number(process.env.CODEX_DEMO_WINDOW_WIDTH);
   const requestedHeight = Number(process.env.CODEX_DEMO_WINDOW_HEIGHT);
@@ -258,6 +259,7 @@ function createWindow() {
   const query = new URLSearchParams({
     capture,
     frame,
+    layout,
     scenario,
     view,
   }).toString();
@@ -266,7 +268,7 @@ function createWindow() {
     backgroundColor: "#101010",
     height,
     minHeight: Math.min(640, height),
-    minWidth: Math.min(760, width),
+    minWidth: Math.min(720, width),
     show: process.env.CODEX_DEMO_HEADLESS !== "1",
     title: "Codex App Playground",
     titleBarStyle: "hiddenInset",
