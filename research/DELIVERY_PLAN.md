@@ -12,8 +12,8 @@ exit gates; it does not replace the inventory.
 
 - The current installed package is Codex Desktop `26.721.81911` (`5973`).
 - The inventory contains 68 surface groups: 41 P0, 18 P1, and 9 P2.
-- 45 groups have runtime evidence from earlier sampled builds; 23 have not
-  been sampled.
+- 0 groups have current-build runtime evidence, 45 have previous-build-only
+  runtime evidence, and 23 have not been sampled.
 - Existing Browser and Electron results remain useful regression evidence, but
   they are `partial_legacy` until the affected surface is re-observed on the
   current build.

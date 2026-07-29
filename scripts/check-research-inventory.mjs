@@ -117,6 +117,8 @@ if (
 }
 
 const ids = new Set();
+const currentRuntimeEvidenceIds = new Set();
+const previousRuntimeEvidenceIds = new Set();
 const visualScenarioIds = new Set();
 
 for (const scenario of visualScenarios.scenarios) {
@@ -266,6 +268,13 @@ for (const surface of inventory.surfaces) {
     }
     return build;
   });
+  if (surface.runtimeStatus === "runtime_observed") {
+    if (runtimeBuilds.includes(currentRuntimeBuild)) {
+      currentRuntimeEvidenceIds.add(surface.id);
+    } else {
+      previousRuntimeEvidenceIds.add(surface.id);
+    }
+  }
 
   const serializedStatuses = [
     surface.runtimeStatus,
@@ -319,8 +328,10 @@ const statuses = inventory.surfaces.reduce(
 );
 const visibleMarkdownSummary = [
   `Current inventory: ${inventory.surfaces.length} surface groups;`,
-  `${statuses.runtime.runtime_observed} have scoped runtime evidence from`,
-  `earlier builds and ${statuses.runtime.not_sampled} remain \`not_sampled\`.`,
+  `${currentRuntimeEvidenceIds.size} have current-build runtime evidence,`,
+  `${previousRuntimeEvidenceIds.size} have previous-build-only runtime`,
+  `evidence, ${statuses.runtime.not_sampled} remain \`not_sampled\`, and`,
+  `${statuses.runtime.blocked_by_policy} are \`blocked_by_policy\`.`,
   "Current-build Browser verification covers",
   `${statuses.browser.verified} groups and Electron verification covers`,
   `${statuses.electron.verified}.`,
