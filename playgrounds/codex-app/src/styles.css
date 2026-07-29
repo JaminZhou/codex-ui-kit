@@ -192,6 +192,79 @@ textarea {
   gap: 12px;
 }
 
+.demo-root[data-scenario="mcp-tool-call"]
+  .codex-ui-activity-timeline__toggle {
+  font-size: 14px;
+  font-weight: 445;
+  line-height: 21px;
+}
+
+.demo-root[data-capture][data-frame="mcp-tool-calls"][data-scenario="mcp-tool-call"]
+  .codex-ui-thread-viewport__content {
+  height: calc(100% + 72px);
+  min-height: calc(100% + 72px);
+}
+
+.demo-mcp-answer {
+  display: flex;
+  flex-direction: column;
+  font-size: 14px;
+  font-weight: 445;
+  line-height: 22px;
+}
+
+.demo-mcp-answer a {
+  align-items: center;
+  align-self: flex-start;
+  color: #9bcfff;
+  display: inline-flex;
+  font-weight: 500;
+  gap: 4px;
+  text-decoration: none;
+}
+
+.demo-mcp-answer a:hover {
+  text-decoration: underline;
+}
+
+.demo-mcp-answer svg {
+  fill: none;
+  height: 16px;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.1;
+  width: 16px;
+}
+
+.demo-mcp-turn-actions {
+  gap: 2px;
+  margin-left: -4px;
+}
+
+.demo-mcp-turn-actions button {
+  align-items: center;
+  border-radius: 10px;
+  display: inline-flex;
+  height: 26px;
+  justify-content: center;
+  width: 26px;
+}
+
+.demo-mcp-turn-actions button:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.demo-mcp-turn-actions svg {
+  fill: none;
+  height: 16px;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.15;
+  width: 16px;
+}
+
 .demo-root .codex-ui-command-execution,
 .demo-root .codex-ui-approval-request,
 .demo-root .codex-ui-file-change,

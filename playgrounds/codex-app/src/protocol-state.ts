@@ -99,9 +99,25 @@ export interface DemoFileChange {
   turnId: string | null;
 }
 
+export interface DemoMcpToolCall {
+  appName: string;
+  arguments: JsonValue;
+  content: JsonValue[];
+  durationMs: number | null;
+  error: string | null;
+  id: string;
+  progress: string[];
+  server: string;
+  status: "completed" | "failed" | "pending" | "running";
+  structuredContent: JsonValue | null;
+  tool: string;
+  toolLabel: string;
+  turnId: string | null;
+}
+
 export interface DemoTimelineEntry {
   id: string;
-  kind: "approval" | "command" | "fileChange" | "message";
+  kind: "approval" | "command" | "fileChange" | "mcpToolCall" | "message";
 }
 
 export interface DemoProtocolState {
@@ -113,6 +129,7 @@ export interface DemoProtocolState {
   eventCount: number;
   fileChanges: DemoFileChange[];
   lastMethod: string | null;
+  mcpToolCalls: DemoMcpToolCall[];
   messages: DemoMessage[];
   retrying: boolean;
   status: DemoTurnStatus;
@@ -130,6 +147,7 @@ export const initialProtocolState: DemoProtocolState = {
   eventCount: 0,
   fileChanges: [],
   lastMethod: null,
+  mcpToolCalls: [],
   messages: [],
   retrying: false,
   status: "idle",
@@ -150,6 +168,10 @@ function asString(value: unknown): string | null {
 
 function asNumber(value: unknown): number | null {
   return typeof value === "number" && Number.isFinite(value) ? value : null;
+}
+
+function asJsonValue(value: unknown, fallback: JsonValue = null): JsonValue {
+  return value === undefined ? fallback : (value as JsonValue);
 }
 
 function notificationParams(
@@ -266,6 +288,22 @@ function fileChangeStatus(value: unknown): DemoFileChange["status"] {
   if (value === "completed") return "applied";
   if (value === "failed" || value === "declined") return "rejected";
   return "streaming";
+}
+
+function mcpToolCallStatus(value: unknown): DemoMcpToolCall["status"] {
+  if (value === "completed") return "completed";
+  if (value === "failed") return "failed";
+  if (value === "inProgress") return "running";
+  return "pending";
+}
+
+function mcpToolLabel(tool: string, actionName: string | null) {
+  if (actionName) return actionName;
+  return tool
+    .split(/[_\-/]+/)
+    .filter(Boolean)
+    .map((part) => `${part.slice(0, 1).toUpperCase()}${part.slice(1)}`)
+    .join(" ");
 }
 
 function patchKind(value: unknown): DemoFileUpdateChange["kind"] {
@@ -412,6 +450,11 @@ export function hasActiveTurnWork(state: DemoProtocolState) {
     state.fileChanges.some(
       ({ status, turnId }) =>
         turnId === state.currentTurnId && status === "streaming",
+    ) ||
+    state.mcpToolCalls.some(
+      ({ status, turnId }) =>
+        turnId === state.currentTurnId &&
+        (status === "pending" || status === "running"),
     )
   );
 }
@@ -588,6 +631,50 @@ export function reduceProtocolNotification(
         }),
       };
     }
+    if (itemType === "mcpToolCall") {
+      const existing = state.mcpToolCalls.find(({ id }) => id === itemId);
+      const appContext = isRecord(item.appContext) ? item.appContext : {};
+      const result = isRecord(item.result) ? item.result : {};
+      const error = isRecord(item.error) ? item.error : {};
+      const server = asString(item.server) ?? existing?.server ?? "mcp";
+      const tool = asString(item.tool) ?? existing?.tool ?? "tool";
+      const actionName = asString(appContext.actionName);
+      const resultContent = Array.isArray(result.content)
+        ? result.content.map((value) => asJsonValue(value))
+        : (existing?.content ?? []);
+      return {
+        ...next,
+        mcpToolCalls: upsertById(state.mcpToolCalls, {
+          appName:
+            asString(appContext.appName) ?? existing?.appName ?? server,
+          arguments: asJsonValue(
+            item.arguments,
+            existing?.arguments ?? null,
+          ),
+          content: resultContent,
+          durationMs: asNumber(item.durationMs),
+          error: asString(error.message),
+          id: itemId,
+          progress: existing?.progress ?? [],
+          server,
+          status: mcpToolCallStatus(item.status),
+          structuredContent:
+            result.structuredContent === undefined
+              ? (existing?.structuredContent ?? null)
+              : asJsonValue(result.structuredContent),
+          tool,
+          toolLabel: mcpToolLabel(
+            tool,
+            actionName ?? existing?.toolLabel ?? null,
+          ),
+          turnId: itemTurnId,
+        }),
+        timeline: appendTimeline(state.timeline, {
+          id: itemId,
+          kind: "mcpToolCall",
+        }),
+      };
+    }
     if (itemType === "userMessage") {
       return {
         ...next,
@@ -624,6 +711,27 @@ export function reduceProtocolNotification(
       };
     }
     return next;
+  }
+
+  if (notification.method === "item/mcpToolCall/progress") {
+    const itemId = asString(params.itemId);
+    const message = asString(params.message);
+    if (!itemId || message === null) return next;
+    const toolCall = state.mcpToolCalls.find(({ id }) => id === itemId);
+    if (!toolCall) return next;
+    return {
+      ...next,
+      mcpToolCalls: upsertById(state.mcpToolCalls, {
+        ...toolCall,
+        progress: [...toolCall.progress, message],
+        status: "running",
+      }),
+      status: "running",
+      timeline: appendTimeline(state.timeline, {
+        id: itemId,
+        kind: "mcpToolCall",
+      }),
+    };
   }
 
   if (notification.method === "item/agentMessage/delta") {

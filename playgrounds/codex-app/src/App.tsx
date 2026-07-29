@@ -15,6 +15,8 @@ import {
   ConversationThreadShell,
   FileChangeGroup,
   FileReview,
+  McpToolCallGroup,
+  McpToolIcon,
   PullRequestCheckList,
   PullRequestList,
   PullRequestPanelSummary,
@@ -24,6 +26,7 @@ import {
   ThreadHeader,
   ThreadInterruptionSummary,
   ThreadThinkingPlaceholder,
+  ToolCallCard,
   TurnDuration,
   WorkspacePanel,
   type TerminalEntry,
@@ -92,6 +95,70 @@ function statusLabel(state: DemoProtocolState) {
   if (state.status === "interrupted") return "Stopped";
   if (state.status === "failed") return "Failed";
   return "Ready";
+}
+
+function mcpResultText(content: readonly unknown[]) {
+  return content
+    .flatMap((entry) => {
+      if (
+        typeof entry === "object" &&
+        entry !== null &&
+        "text" in entry &&
+        typeof entry.text === "string"
+      ) {
+        return [entry.text];
+      }
+      return [];
+    })
+    .join("\n");
+}
+
+function McpAnswer({ text }: { text: string }) {
+  const [title = "", url = ""] = text.split(/\r?\n/, 2);
+  return (
+    <div className="demo-mcp-answer">
+      <span>{title}</span>
+      <a href={url} rel="noreferrer" target="_blank">
+        <svg aria-hidden="true" viewBox="0 0 16 16">
+          <circle cx="8" cy="8" r="6.5" />
+          <path d="M1.8 8h12.4M8 1.5a10 10 0 0 1 0 13M8 1.5a10 10 0 0 0 0 13" />
+        </svg>
+        <span>{url}</span>
+      </a>
+    </div>
+  );
+}
+
+function McpResponseActions() {
+  return (
+    <span
+      aria-label="MCP response actions"
+      className="demo-mcp-turn-actions demo-turn-actions"
+      role="toolbar"
+    >
+      <button aria-label="Copy response" type="button">
+        <svg aria-hidden="true" viewBox="0 0 16 16">
+          <rect height="9" rx="1.5" width="8" x="5" y="2" />
+          <path d="M10.5 13.5h-7a1 1 0 0 1-1-1v-7" />
+        </svg>
+      </button>
+      <button aria-label="Good response" type="button">
+        <svg aria-hidden="true" viewBox="0 0 16 16">
+          <path d="M5.2 13H3.5a1 1 0 0 1-1-1V7.5a1 1 0 0 1 1-1h1.7M5.2 13V6.5L8 2.8c.6-.8 1.8-.3 1.7.7l-.3 2h2.5a1.5 1.5 0 0 1 1.4 2L11.8 12a1.5 1.5 0 0 1-1.4 1H5.2Z" />
+        </svg>
+      </button>
+      <button aria-label="Bad response" type="button">
+        <svg aria-hidden="true" viewBox="0 0 16 16">
+          <path d="M5.2 3H3.5a1 1 0 0 0-1 1v4.5a1 1 0 0 0 1 1h1.7M5.2 3v6.5L8 13.2c.6.8 1.8.3 1.7-.7l-.3-2h2.5a1.5 1.5 0 0 0 1.4-2L11.8 4a1.5 1.5 0 0 0-1.4-1H5.2Z" />
+        </svg>
+      </button>
+      <button aria-label="Share response" type="button">
+        <svg aria-hidden="true" viewBox="0 0 16 16">
+          <path d="M5 3H3.5a1 1 0 0 0-1 1v8.5a1 1 0 0 0 1 1H12a1 1 0 0 0 1-1V11M8 8l5.5-5.5M9.5 2.5h4v4" />
+        </svg>
+      </button>
+    </span>
+  );
 }
 
 const pullRequestFiles = [
@@ -435,7 +502,9 @@ export function App() {
 
   const showMeasuredComposer =
     mode === "replay" &&
-    (scenarioId === "multi-file-review" || scenarioId === "markdown");
+    (scenarioId === "multi-file-review" ||
+      scenarioId === "markdown" ||
+      scenarioId === "mcp-tool-call");
   const composer = (
     <AgentComposer
       actions={
@@ -782,7 +851,7 @@ export function App() {
       />
     </section>
   );
-  const timelineContent = state.timeline.map((entry) => {
+  const timelineContent = state.timeline.map((entry, entryIndex) => {
     if (entry.kind === "message") {
       const message = state.messages.find(({ id }) => id === entry.id);
       if (!message) return null;
@@ -791,34 +860,44 @@ export function App() {
           <AgentMessage
             actions={
               mode === "replay" &&
-              scenarioId === "markdown" &&
-              message.id === "assistant-markdown" &&
+              ((scenarioId === "markdown" &&
+                message.id === "assistant-markdown") ||
+                (scenarioId === "mcp-tool-call" &&
+                  message.id === "assistant-mcp")) &&
               message.status === "completed" ? (
-                <span
-                  aria-label="Markdown response actions"
-                  className="demo-turn-actions"
-                  role="toolbar"
-                >
-                  <button aria-label="Copy response" type="button">
-                    ▣
-                  </button>
-                  <button aria-label="Good response" type="button">
-                    ♡
-                  </button>
-                  <button aria-label="Bad response" type="button">
-                    ♢
-                  </button>
-                  <button aria-label="Share response" type="button">
-                    ↗
-                  </button>
-                </span>
+                scenarioId === "mcp-tool-call" ? (
+                  <McpResponseActions />
+                ) : (
+                  <span
+                    aria-label="Markdown response actions"
+                    className="demo-turn-actions"
+                    role="toolbar"
+                  >
+                    <button aria-label="Copy response" type="button">
+                      ▣
+                    </button>
+                    <button aria-label="Good response" type="button">
+                      ♡
+                    </button>
+                    <button aria-label="Bad response" type="button">
+                      ♢
+                    </button>
+                    <button aria-label="Share response" type="button">
+                      ↗
+                    </button>
+                  </span>
+                )
               ) : undefined
             }
             data-item-id={message.id}
             role={message.role}
             status={agentMessageStatus(message.status)}
           >
-            {message.role === "assistant" ? (
+            {message.role === "assistant" &&
+            scenarioId === "mcp-tool-call" &&
+            message.id === "assistant-mcp" ? (
+              <McpAnswer text={message.text} />
+            ) : message.role === "assistant" ? (
               <AgentMarkdown
                 linkTarget="_blank"
                 streaming={message.status === "running"}
@@ -856,6 +935,97 @@ export function App() {
             />
           ) : null}
         </Fragment>
+      );
+    }
+
+    if (entry.kind === "mcpToolCall") {
+      const toolCall = state.mcpToolCalls.find(({ id }) => id === entry.id);
+      if (!toolCall) return null;
+      const previousEntry = state.timeline[entryIndex - 1];
+      const previousToolCall =
+        previousEntry?.kind === "mcpToolCall"
+          ? state.mcpToolCalls.find(({ id }) => id === previousEntry.id)
+          : null;
+      if (
+        previousToolCall?.turnId === toolCall.turnId &&
+        previousToolCall.server === toolCall.server
+      ) {
+        return null;
+      }
+      const calls = state.timeline.flatMap((candidate) => {
+        if (candidate.kind !== "mcpToolCall") return [];
+        const call = state.mcpToolCalls.find(({ id }) => id === candidate.id);
+        return call?.turnId === toolCall.turnId &&
+          call.server === toolCall.server
+          ? [call]
+          : [];
+      });
+      const groupStatus = calls.some(
+        ({ status }) => status === "running" || status === "pending",
+      )
+        ? "running"
+        : calls.some(({ status }) => status === "failed")
+          ? "failed"
+          : "completed";
+      const captureOpen =
+        initialSelection.capture &&
+        (initialSelection.frame === "mcp-running" ||
+          initialSelection.frame === "mcp-progress" ||
+          initialSelection.frame === "mcp-tool-calls");
+      const durationMs =
+        state.turnDurationMs ??
+        calls.reduce(
+          (total, call) => total + (call.durationMs ?? 0),
+          0,
+        );
+      return (
+        <ActivityTimeline
+          key={`mcp-group:${toolCall.turnId}:${toolCall.server}`}
+          open={initialSelection.capture ? captureOpen : undefined}
+          summary={
+            <TurnDuration
+              durationMs={durationMs}
+              status={groupStatus === "running" ? "working" : "worked"}
+            />
+          }
+        >
+          <McpToolCallGroup
+            data-testid="mcp-tool-call-group"
+            defaultOpen={false}
+            name={toolCall.appName}
+            open={initialSelection.capture ? captureOpen : undefined}
+            source={toolCall.server}
+            status={groupStatus}
+          >
+            {calls.map((call) => {
+              const result = mcpResultText(call.content);
+              return (
+                <ToolCallCard
+                  data-item-id={call.id}
+                  key={call.id}
+                  icon={<McpToolIcon />}
+                  name={call.toolLabel}
+                  result={
+                    call.structuredContent === null
+                      ? (result || undefined)
+                      : undefined
+                  }
+                  role="listitem"
+                  source={call.server}
+                  status={call.status}
+                  structuredContent={
+                    call.structuredContent ?? undefined
+                  }
+                  summary={
+                    call.status === "running" || call.status === "pending"
+                      ? call.progress.at(-1)
+                      : undefined
+                  }
+                />
+              );
+            })}
+          </McpToolCallGroup>
+        </ActivityTimeline>
       );
     }
 

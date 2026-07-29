@@ -4,6 +4,7 @@ import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import {
+  McpToolCallGroup,
   SearchActivity,
   ToolCallCard,
   type SearchActivityEntry,
@@ -112,6 +113,45 @@ describe("ToolCallCard", () => {
 
     expect(onOpenChange).toHaveBeenCalledWith(true);
     expect(container.querySelector("details")?.open).toBe(false);
+  });
+});
+
+describe("McpToolCallGroup", () => {
+  it("groups public MCP calls under the integration lifecycle", () => {
+    const html = renderToStaticMarkup(
+      <McpToolCallGroup
+        defaultOpen
+        name="OpenAI Developer Docs"
+        source="openaiDeveloperDocs"
+        status="completed"
+      >
+        <ToolCallCard
+          name="Search OpenAI docs"
+          status="completed"
+          structuredContent={{ query: "Codex MCP support" }}
+        />
+        <ToolCallCard name="Fetch OpenAI doc" status="completed" />
+      </McpToolCallGroup>,
+    );
+
+    expect(html).toContain("Used OpenAI Developer Docs integration");
+    expect(html).toContain('data-source="openaiDeveloperDocs"');
+    expect(html).toContain('aria-label="OpenAI Developer Docs tool calls"');
+    expect(html).toContain("Search OpenAI docs");
+    expect(html).toContain("Fetch OpenAI doc");
+  });
+
+  it("announces active and failed integration states", () => {
+    const active = renderToStaticMarkup(
+      <McpToolCallGroup name="Docs" status="running" />,
+    );
+    const failed = renderToStaticMarkup(
+      <McpToolCallGroup name="Docs" status="failed" />,
+    );
+
+    expect(active).toContain("Using Docs integration");
+    expect(active).toContain('data-active="true"');
+    expect(failed).toContain("Docs integration failed");
   });
 });
 

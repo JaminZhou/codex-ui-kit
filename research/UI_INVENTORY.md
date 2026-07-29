@@ -294,6 +294,22 @@ geometry remain independent, so a passing plain assistant fallback cannot
 promote MCP tool rendering and a failed command cannot promote thread-level
 render/retry recovery.
 
+The successful-MCP slice now samples a real read-only
+`openaiDeveloperDocs` run on build `26.721.41059`. Current-build CDP records
+the completed answer, the `Worked for 54s` disclosure, the
+`Used OpenAI Developer Docs integration` group, and its three Search plus two
+Fetch calls. The public App Server trace uses only schema-validated
+`mcpToolCall` start, progress, result, and completion fields.
+`McpToolCallGroup` composes the integration disclosure while
+`ToolCallCard` renders each call. CDP locks the 14px/21px hierarchy and 25px
+call rows; Electron expands the duration, group, and structured result; two
+reviewed lifecycle frames cover running and completed states. An optional
+906×820 current-build pixel gate limits the full main region to 3%, the tool
+region to 4%, the answer region to 4%, and the Composer region to 2.5%. This
+promotes only the sampled public-docs success path; authentication,
+elicitation, approvals, failures, other connectors, and mixed MCP results
+remain open.
+
 The long-thread continuity slice adds the current-build default ten-message
 threshold and measured 36×10 rows to `ThreadMessageNavigationRail`, exposes
 the rail and 32×32 latest-message control as overlay slots on
@@ -321,7 +337,7 @@ the still-unreached thread summary panel.
 This is a measurement- and raster-backed basic thread/workspace slice, not a
 claim that the whole application or every lifecycle is pixel-perfect. Broader
 Markdown variants, the exact host virtualization algorithm, code search,
-successful MCP and connector calls, thread-level retry recovery, approval
+other MCP and connector variants, thread-level retry recovery, approval
 persistence and timeout, mixed multi-file change kinds, PR
 merge/review-submission states, Terminal multi-tab and
 process-creation/termination lifecycles, and native Codex window behavior
