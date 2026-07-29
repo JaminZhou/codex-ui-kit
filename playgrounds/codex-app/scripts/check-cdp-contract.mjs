@@ -998,6 +998,27 @@ try {
       ".codex-ui-app-sidebar__item-label",
     );
     const active = document.activeElement;
+    const activeToolbar =
+      active instanceof HTMLElement
+        ? active.closest(
+            ".codex-ui-app-sidebar__item-actions[role=\"toolbar\"]",
+          )
+        : null;
+    for (
+      let index = activeToolbar?.querySelectorAll("button").length ?? 0;
+      index < 3;
+      index += 1
+    ) {
+      const action = document.createElement("button");
+      action.setAttribute("aria-label", `Injected action ${index + 1}`);
+      action.type = "button";
+      activeToolbar?.append(action);
+    }
+    const actionItem = activeToolbar
+      ?.closest(".codex-ui-app-sidebar__item-row")
+      ?.querySelector(".codex-ui-app-sidebar__item");
+    const actionItemRect = actionItem?.getBoundingClientRect();
+    const actionToolbarRect = activeToolbar?.getBoundingClientRect();
     return {
       activeAction:
         active instanceof HTMLButtonElement &&
@@ -1007,6 +1028,11 @@ try {
       accountPopup: document
         .querySelector(".codex-ui-app-sidebar-footer__account")
         ?.getAttribute("aria-haspopup"),
+      actionCount: activeToolbar?.querySelectorAll("button").length,
+      actionsReserved:
+        actionItemRect !== undefined &&
+        actionToolbarRect !== undefined &&
+        actionItemRect.right <= actionToolbarRect.left + 0.5,
       currentPages: Array.from(
         document.querySelectorAll(
           ".codex-ui-app-sidebar [aria-current=\"page\"]",
@@ -1044,6 +1070,8 @@ try {
     !compact.resizer ||
     !compact.projectEllipsis ||
     !compact.activeAction ||
+    compact.actionCount !== 3 ||
+    !compact.actionsReserved ||
     compact.accountPopup !== "menu" ||
     JSON.stringify(compact.currentPages) !==
       JSON.stringify(["Streaming and retry"]) ||

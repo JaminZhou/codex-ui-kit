@@ -102,8 +102,10 @@ All privileged behavior remains host-owned. The components never auto-approve co
   matching `layoutMode` so inert, focus, dismissal, and `aria-hidden`
   behavior stays aligned with the rendered layout. `sidebarResizable` adds a
   current-build measured 16px separator with 240–520px pointer clamps,
-  accessible value metadata, and Arrow/Home/End keyboard control; hosts can
-  use `sidebarWidth` and `onSidebarWidthChange` for controlled persistence.
+  accessible value metadata, and Arrow/Home/End keyboard control. Split mode
+  also caps the track against `sidebarMinMainWidth` (352px by default), while
+  narrow overlay mode retains the persisted preference; hosts can use
+  `sidebarWidth` and `onSidebarWidthChange` for controlled persistence.
   `sidePanelResizable` applies the same accessible interaction contract to the
   right workspace, with configurable panel/main minima, responsive clamping,
   controlled persistence, focus restoration, and an expanded full-main mode.

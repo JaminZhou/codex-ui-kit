@@ -59,6 +59,10 @@ describe("application shell visual contract", () => {
     );
     expect(component).toContain("sidebarMinWidth = 240");
     expect(component).toContain("sidebarMaxWidth = 520");
+    expect(component).toContain("sidebarMinMainWidth = 352");
+    expect(component).toContain(
+      "shellWidth - normalizedSidebarMinMainWidth",
+    );
     expect(component).toContain('role="separator"');
     expect(component).toContain('aria-orientation="vertical"');
   });
@@ -89,6 +93,15 @@ describe("application shell visual contract", () => {
     );
     expect(styles).toContain(
       ".codex-ui-app-sidebar__item-actions",
+    );
+    expect(styles).toMatch(
+      /\.codex-ui-app-sidebar__item-row \{[\s\S]*?display: grid;[\s\S]*?grid-template-columns: minmax\(0, 1fr\) auto auto;/,
+    );
+    expect(styles).toMatch(
+      /\.codex-ui-app-sidebar__item-actions \{[\s\S]*?grid-column: 3;[\s\S]*?position: relative;/,
+    );
+    expect(styles).not.toContain(
+      ".codex-ui-app-sidebar__item-row[data-has-actions]\n  .codex-ui-app-sidebar__item {\n  padding-inline-end:",
     );
     expect(styles).toContain(
       ".codex-ui-app-sidebar-footer__account",

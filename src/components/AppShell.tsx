@@ -459,6 +459,7 @@ export interface AppShellProps
   sidebar?: ReactNode;
   sidebarLabel?: string;
   sidebarMaxWidth?: number;
+  sidebarMinMainWidth?: number;
   sidebarMinWidth?: number;
   sidebarOpen?: boolean;
   sidebarResizable?: boolean;
@@ -528,6 +529,7 @@ export function AppShell({
   sidebar,
   sidebarLabel = "App navigation",
   sidebarMaxWidth = 520,
+  sidebarMinMainWidth = 352,
   sidebarMinWidth = 240,
   sidebarOpen = false,
   sidebarResizable = false,
@@ -581,6 +583,7 @@ export function AppShell({
   );
   const automaticLayout = useAppShellLayoutMetrics(shellRef);
   const layoutMode = layoutModeOverride ?? automaticLayout.mode;
+  const shellWidth = automaticLayout.width;
   const normalizedBottomPanelMinHeight = Math.max(
     0,
     Number.isFinite(bottomPanelMinHeight) ? bottomPanelMinHeight : 152,
@@ -637,15 +640,32 @@ export function AppShell({
     normalizedSidebarMinWidth,
     Number.isFinite(sidebarMaxWidth) ? sidebarMaxWidth : 520,
   );
+  const normalizedSidebarMinMainWidth = Math.max(
+    0,
+    Number.isFinite(sidebarMinMainWidth)
+      ? sidebarMinMainWidth
+      : 352,
+  );
   const sidebarWidthIsControlled =
     sidebarWidth !== undefined && Number.isFinite(sidebarWidth);
   const requestedSidebarWidth = sidebarWidthIsControlled
     ? sidebarWidth
     : internalSidebarWidth;
+  const responsiveSidebarMaxWidth =
+    layoutMode === "narrow" || shellWidth === null
+      ? normalizedSidebarMaxWidth
+      : Math.max(
+          normalizedSidebarMinWidth,
+          shellWidth - normalizedSidebarMinMainWidth,
+        );
+  const resolvedSidebarMaxWidth = Math.min(
+    normalizedSidebarMaxWidth,
+    responsiveSidebarMaxWidth,
+  );
   const resolvedSidebarWidth = clampShellTrack(
     requestedSidebarWidth,
     normalizedSidebarMinWidth,
-    normalizedSidebarMaxWidth,
+    resolvedSidebarMaxWidth,
   );
   const normalizedSidePanelMinWidth = Math.max(
     0,
@@ -674,7 +694,6 @@ export function AppShell({
         normalizedSidePanelMinWidth,
         requestedSidePanelWidth,
       );
-  const shellWidth = automaticLayout.width;
   const occupiedSidebarWidth = sidebarIsVisible
     ? (observedSidebarWidth ?? resolvedSidebarWidth)
     : 0;
@@ -979,18 +998,39 @@ export function AppShell({
     sidePanelResizeSessionRef.current = null;
     setSidePanelResizing(false);
   }, [sidePanelResizerVisible]);
-  const commitSidebarWidth = (nextWidth: number) => {
-    const normalizedWidth = clampShellTrack(
+  const resolveSidebarWidth = (nextWidth: number) => {
+    const measuredLiveShellWidth =
+      shellRef.current === null
+        ? 0
+        : appShellContentBoxWidth(shellRef.current);
+    const liveShellWidth =
+      measuredLiveShellWidth > 0
+        ? measuredLiveShellWidth
+        : shellWidth !== null && shellWidth > 0
+          ? shellWidth
+          : null;
+    const liveResponsiveMaximum =
+      layoutMode === "narrow" || liveShellWidth === null
+        ? normalizedSidebarMaxWidth
+        : Math.max(
+            normalizedSidebarMinWidth,
+            liveShellWidth - normalizedSidebarMinMainWidth,
+          );
+    return clampShellTrack(
       nextWidth,
       normalizedSidebarMinWidth,
-      normalizedSidebarMaxWidth,
+      Math.min(normalizedSidebarMaxWidth, liveResponsiveMaximum),
     );
+  };
+  const commitResolvedSidebarWidth = (normalizedWidth: number) => {
     if (!sidebarWidthIsControlled) {
       setInternalSidebarWidth(normalizedWidth);
     }
     onSidebarWidthChange?.(normalizedWidth);
     return normalizedWidth;
   };
+  const commitSidebarWidth = (nextWidth: number) =>
+    commitResolvedSidebarWidth(resolveSidebarWidth(nextWidth));
   const handleSidebarResizePointerDown = (
     event: ReactPointerEvent<HTMLDivElement>,
   ) => {
@@ -1016,14 +1056,12 @@ export function AppShell({
   ) => {
     const session = sidebarResizeSessionRef.current;
     if (!session || session.pointerId !== event.pointerId) return;
-    const nextWidth = clampShellTrack(
+    const nextWidth = resolveSidebarWidth(
       session.originWidth +
         (event.clientX - session.originClientX) * session.direction,
-      normalizedSidebarMinWidth,
-      normalizedSidebarMaxWidth,
     );
     if (nextWidth === session.lastWidth) return;
-    session.lastWidth = commitSidebarWidth(nextWidth);
+    session.lastWidth = commitResolvedSidebarWidth(nextWidth);
   };
   const finishSidebarResize = (
     event: ReactPointerEvent<HTMLDivElement>,
@@ -1047,7 +1085,7 @@ export function AppShell({
     const step = event.shiftKey ? 32 : 8;
     let nextWidth: number | undefined;
     if (event.key === "Home") nextWidth = normalizedSidebarMinWidth;
-    if (event.key === "End") nextWidth = normalizedSidebarMaxWidth;
+    if (event.key === "End") nextWidth = resolvedSidebarMaxWidth;
     if (event.key === "ArrowLeft") {
       nextWidth = resolvedSidebarWidth - step * direction;
     }
@@ -1402,7 +1440,7 @@ export function AppShell({
           <div
             aria-label={sidebarResizeLabel}
             aria-orientation="vertical"
-            aria-valuemax={Math.round(normalizedSidebarMaxWidth)}
+            aria-valuemax={Math.round(resolvedSidebarMaxWidth)}
             aria-valuemin={Math.round(normalizedSidebarMinWidth)}
             aria-valuenow={Math.round(resolvedSidebarWidth)}
             aria-valuetext={`${Math.round(resolvedSidebarWidth)} pixels`}
