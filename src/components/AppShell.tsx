@@ -726,6 +726,13 @@ export function AppShell({
           normalizedSidePanelMinMainWidth,
         )
       : normalizedSidebarMinMainWidth;
+  const responsiveSidePanelMinMainWidth =
+    layoutMode === "wide" && sidebarIsVisible
+      ? Math.max(
+          normalizedSidebarMinMainWidth,
+          normalizedSidePanelMinMainWidth,
+        )
+      : normalizedSidePanelMinMainWidth;
   const sidebarWidthIsControlled =
     sidebarWidth !== undefined && Number.isFinite(sidebarWidth);
   const requestedSidebarWidth = sidebarWidthIsControlled
@@ -778,7 +785,7 @@ export function AppShell({
           normalizedSidePanelMinWidth,
           shellWidth -
             occupiedSidebarWidth -
-            normalizedSidePanelMinMainWidth,
+            responsiveSidePanelMinMainWidth,
         );
   const resolvedSidePanelMaxWidth = Math.min(
     normalizedSidePanelMaxWidth,
@@ -1687,7 +1694,10 @@ export function AppShell({
       {...props}
     >
       {windowChrome ? (
-        <div className="codex-ui-app-shell__window-chrome">
+        <div
+          className="codex-ui-app-shell__window-chrome"
+          inert={inertWhen(responsiveModalOpen)}
+        >
           {windowChrome}
         </div>
       ) : null}

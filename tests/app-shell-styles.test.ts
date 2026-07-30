@@ -38,6 +38,9 @@ describe("application shell visual contract", () => {
     );
     expect(styles).toContain("max-width: calc(100% - 3rem)");
     expect(styles).toMatch(
+      /@container codex-ui-app-shell \(max-width: 60rem\) \{[\s\S]*?\.codex-ui-app-shell:dir\(rtl\) \.codex-ui-app-shell__side-panel \{[\s\S]*?transform: translateX\(-100%\);[\s\S]*?\.codex-ui-app-shell\[data-side-panel-open\][\s\S]*?\.codex-ui-app-shell__side-panel \{[\s\S]*?transform: translateX\(0\);/,
+    );
+    expect(styles).toMatch(
       /@media \(prefers-reduced-motion: reduce\) \{[\s\S]*?\.codex-ui-app-shell__sidebar,[\s\S]*?\.codex-ui-app-shell__side-panel \{[\s\S]*?transition: none/,
     );
   });

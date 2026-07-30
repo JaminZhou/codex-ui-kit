@@ -570,6 +570,57 @@ describe("application shell", () => {
     ).toBe("320px");
   });
 
+  it("applies the larger main minimum to both persistent tracks", () => {
+    let resize: ((width: number) => void) | undefined;
+    class ResizeObserverMock {
+      constructor(
+        private readonly callback: ResizeObserverCallback,
+      ) {}
+
+      disconnect() {}
+
+      observe(target: Element) {
+        if (!target.classList.contains("codex-ui-app-shell")) return;
+        resize = (width) =>
+          this.callback(
+            [
+              {
+                contentRect: { height: 680, width },
+                target,
+              } as ResizeObserverEntry,
+            ],
+            this as unknown as ResizeObserver,
+          );
+      }
+
+      unobserve() {}
+    }
+    vi.stubGlobal("ResizeObserver", ResizeObserverMock);
+    const { container } = render(
+      <AppShell
+        sidePanel={<button type="button">Review files</button>}
+        sidePanelOpen
+        sidebar={<button type="button">Projects</button>}
+        sidebarMinMainWidth={500}
+        sidebarOpen
+      >
+        Conversation
+      </AppShell>,
+    );
+    const shell = container.querySelector(
+      ".codex-ui-app-shell",
+    ) as HTMLDivElement;
+
+    act(() => resize?.(1_100));
+    expect(shell.getAttribute("data-layout-mode")).toBe("wide");
+    expect(
+      shell.style.getPropertyValue("--codex-ui-app-sidebar-width"),
+    ).toBe("");
+    expect(
+      shell.style.getPropertyValue("--codex-ui-app-side-panel-width"),
+    ).toBe("326px");
+  });
+
   it("supports current-build narrow edge preview and explicit pinning", async () => {
     function CurrentBuildNarrowFixture() {
       const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -3175,6 +3226,7 @@ describe("application shell", () => {
           sidePanelOpen
           sidebar={<button type="button">Projects</button>}
           sidebarOpen={sidebarOpen}
+          windowChrome={<button type="button">Chrome navigation</button>}
         >
           <button type="button">Composer</button>
         </AppShell>
@@ -3183,6 +3235,9 @@ describe("application shell", () => {
 
     render(<ResponsiveFixture />);
 
+    const windowChrome = document.querySelector(
+      ".codex-ui-app-shell__window-chrome",
+    )!;
     const composer = screen.getByRole("button", { name: "Composer" });
     composer.focus();
     act(() => resize?.(960));
@@ -3201,12 +3256,14 @@ describe("application shell", () => {
         .getByRole("region", { name: "Bottom panel" })
         .hasAttribute("inert"),
     ).toBe(false);
+    expect(windowChrome.hasAttribute("inert")).toBe(true);
     expect(document.activeElement).toBe(
       screen.getByRole("button", { name: "Sources" }),
     );
 
     const terminal = screen.getByRole("button", { name: "Terminal" });
     act(() => resize?.(1_600));
+    expect(windowChrome.hasAttribute("inert")).toBe(false);
     expect(document.activeElement).toBe(
       screen.getByRole("button", { name: "Sources" }),
     );
@@ -3236,6 +3293,7 @@ describe("application shell", () => {
         .querySelector('[aria-label="Bottom panel"]')
         ?.hasAttribute("inert"),
     ).toBe(true);
+    expect(windowChrome.hasAttribute("inert")).toBe(true);
     expect(document.activeElement).toBe(
       screen.getByRole("button", { name: "Projects" }),
     );
