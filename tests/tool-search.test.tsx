@@ -114,7 +114,26 @@ describe("ToolCallCard", () => {
     expect(html).toContain("plaintext");
     expect(html).toContain("<code>Invalid URL</code>");
     expect(html).toContain(">Fetch OpenAI doc<");
-    expect(html).not.toContain("Fetch OpenAI doc failed");
+    expect(html).toContain(
+      'aria-label="Fetch OpenAI doc failed"',
+    );
+    expect(html).not.toContain(">Fetch OpenAI doc failed<");
+  });
+
+  it("supports a localized failed-call accessible name", () => {
+    const html = renderToStaticMarkup(
+      <ToolCallCard
+        error="Invalid URL"
+        failedAriaLabel="获取 OpenAI 文档失败"
+        failedLabel="获取 OpenAI 文档"
+        name="Fetch OpenAI doc"
+        status="failed"
+      />,
+    );
+
+    expect(html).toContain(
+      'aria-label="获取 OpenAI 文档失败"',
+    );
   });
 
   it("keeps controlled disclosure state stable", () => {

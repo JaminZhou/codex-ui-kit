@@ -389,6 +389,11 @@ for (const scene of visualScenes) {
                   ?.hasAttribute("open"),
               )
               .map((element) => element.getAttribute("data-item-id")),
+            failedCallAccessibleLabel: mcpGroup
+              .querySelector(
+                '[data-item-id="mcp-fetch-invalid"] .codex-ui-tool-call__label',
+              )
+              ?.getAttribute("aria-label"),
             groupExpanded:
               mcpGroup.querySelector(".codex-ui-activity__disclosure")
                 ?.open ?? false,
@@ -795,6 +800,8 @@ for (const scene of visualScenes) {
           contract.mcp.errorOutput.rect.width < 600 ||
           contract.mcp.errorOutput.rect.height < 64 ||
           contract.mcp.callStatuses[0] !== "failed" ||
+          contract.mcp.failedCallAccessibleLabel !==
+            "Fetch OpenAI doc failed" ||
           !contract.mcp.expandedCallIds.includes("mcp-fetch-invalid"))
       ) {
         throw new Error(

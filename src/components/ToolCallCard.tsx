@@ -45,6 +45,7 @@ export interface ToolCallCardProps
   error?: ReactNode;
   errorLanguage?: ReactNode;
   errorPresentation?: "alert" | "output";
+  failedAriaLabel?: string;
   failedLabel?: ReactNode;
   icon?: ReactNode;
   name: string;
@@ -71,6 +72,7 @@ export function ToolCallCard({
   error,
   errorLanguage,
   errorPresentation = "alert",
+  failedAriaLabel,
   failedLabel,
   icon,
   name,
@@ -174,6 +176,11 @@ export function ToolCallCard({
       status={status}
       summary={
         <span
+          aria-label={
+            status === "failed"
+              ? (failedAriaLabel ?? `${name} failed`)
+              : undefined
+          }
           className="codex-ui-tool-call__label"
           data-active={status === "running" || undefined}
         >
