@@ -108,6 +108,32 @@ describe("AppRouteOutlet", () => {
     expect(reconnecting.closest("[aria-busy]")).toBeNull();
     expect(cachedRoute.getAttribute("aria-busy")).toBe("true");
   });
+
+  it("keeps the ready route subtree mounted through continuity states", () => {
+    const { rerender } = render(
+      <AppRouteOutlet status="ready">
+        <input aria-label="Draft" defaultValue="Preserve me" />
+      </AppRouteOutlet>,
+    );
+    const draft = screen.getByRole("textbox", { name: "Draft" });
+    draft.focus();
+
+    rerender(
+      <AppRouteOutlet status="stale">
+        <input aria-label="Draft" defaultValue="Preserve me" />
+      </AppRouteOutlet>,
+    );
+    expect(screen.getByRole("textbox", { name: "Draft" })).toBe(draft);
+    expect(document.activeElement).toBe(draft);
+
+    rerender(
+      <AppRouteOutlet status="reconnecting">
+        <input aria-label="Draft" defaultValue="Preserve me" />
+      </AppRouteOutlet>,
+    );
+    expect(screen.getByRole("textbox", { name: "Draft" })).toBe(draft);
+    expect(document.activeElement).toBe(draft);
+  });
 });
 
 describe("AppNotificationRegion", () => {

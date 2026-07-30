@@ -103,18 +103,11 @@ export function AppRouteOutlet({
   const classes = ["codex-ui-app-route-outlet", className]
     .filter(Boolean)
     .join(" ");
-  if (status === "ready") {
-    return (
-      <section className={classes} data-status={status} {...props}>
-        {children}
-      </section>
-    );
-  }
-
-  const copy = defaultCopy[status];
-  const resolvedHeading = heading ?? copy.heading;
-  const resolvedDescription = description ?? copy.description;
   const preservesContent = status === "stale" || status === "reconnecting";
+  const showsContent = status === "ready" || preservesContent;
+  const copy = status === "ready" ? undefined : defaultCopy[status];
+  const resolvedHeading = heading ?? copy?.heading;
+  const resolvedDescription = description ?? copy?.description;
   const liveRole =
     status === "error" || status === "offline" ? "alert" : "status";
 
@@ -125,35 +118,37 @@ export function AppRouteOutlet({
       data-status={status}
       {...props}
     >
-      <div
-        aria-atomic="true"
-        aria-live={liveRole === "status" ? "polite" : undefined}
-        className="codex-ui-app-route-outlet__state"
-        role={liveRole}
-      >
-        <RouteStateIcon status={status} />
-        <div className="codex-ui-app-route-outlet__copy">
-          <h2>{resolvedHeading}</h2>
-          {resolvedDescription ? <p>{resolvedDescription}</p> : null}
-        </div>
-        {actions.length > 0 ? (
-          <div className="codex-ui-app-route-outlet__actions">
-            {actions.map((action, index) => (
-              <button
-                className="codex-ui-app-route-outlet__action"
-                data-primary={action.primary || undefined}
-                disabled={action.disabled}
-                key={action.id ?? index}
-                onClick={action.onClick}
-                type="button"
-              >
-                {action.label}
-              </button>
-            ))}
+      {status !== "ready" ? (
+        <div
+          aria-atomic="true"
+          aria-live={liveRole === "status" ? "polite" : undefined}
+          className="codex-ui-app-route-outlet__state"
+          role={liveRole}
+        >
+          <RouteStateIcon status={status} />
+          <div className="codex-ui-app-route-outlet__copy">
+            <h2>{resolvedHeading}</h2>
+            {resolvedDescription ? <p>{resolvedDescription}</p> : null}
           </div>
-        ) : null}
-      </div>
-      {preservesContent ? (
+          {actions.length > 0 ? (
+            <div className="codex-ui-app-route-outlet__actions">
+              {actions.map((action, index) => (
+                <button
+                  className="codex-ui-app-route-outlet__action"
+                  data-primary={action.primary || undefined}
+                  disabled={action.disabled}
+                  key={action.id ?? index}
+                  onClick={action.onClick}
+                  type="button"
+                >
+                  {action.label}
+                </button>
+              ))}
+            </div>
+          ) : null}
+        </div>
+      ) : null}
+      {showsContent ? (
         <div
           aria-busy={status === "reconnecting" || undefined}
           className="codex-ui-app-route-outlet__content"
