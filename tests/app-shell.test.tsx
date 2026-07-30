@@ -680,6 +680,9 @@ describe("application shell", () => {
       screen.getByRole("button", { name: "Close workspace panel" }).tabIndex,
     ).toBe(0);
 
+    act(() => resize?.(1_065));
+    expect(shell.hasAttribute("data-side-panel-overlay")).toBe(true);
+
     act(() => resize?.(1_100));
     expect(shell.hasAttribute("data-side-panel-overlay")).toBe(false);
     expect(

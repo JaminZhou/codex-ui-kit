@@ -701,6 +701,11 @@ export function AppShell({
       ? sidebarMinMainWidth
       : 352,
   );
+  const sidebarWidthIsControlled =
+    sidebarWidth !== undefined && Number.isFinite(sidebarWidth);
+  const requestedSidebarWidth = sidebarWidthIsControlled
+    ? sidebarWidth
+    : internalSidebarWidth;
   const sidePanelHasOpenContent =
     sidePanelOpen &&
     sidePanel !== undefined &&
@@ -717,10 +722,15 @@ export function AppShell({
     normalizedSidebarMinMainWidth,
     normalizedSidePanelMinMainWidth,
   );
+  const minimumPersistentSidebarWidth = sidebarIsVisible
+    ? sidebarResizable || sidebarWidthIsControlled
+      ? normalizedSidebarMinWidth
+      : (observedSidebarWidth ?? requestedSidebarWidth)
+    : 0;
   const wideSidePanelMinimaFit =
     shellWidth === null ||
     shellWidth >=
-      (sidebarIsVisible ? normalizedSidebarMinWidth : 0) +
+      minimumPersistentSidebarWidth +
         normalizedSidePanelMinWidth +
         coordinatedPersistentMainMinWidth;
   const sidePanelOverlay =
@@ -742,11 +752,6 @@ export function AppShell({
     layoutMode === "wide" && sidebarIsVisible && !sidePanelOverlay
       ? coordinatedPersistentMainMinWidth
       : normalizedSidePanelMinMainWidth;
-  const sidebarWidthIsControlled =
-    sidebarWidth !== undefined && Number.isFinite(sidebarWidth);
-  const requestedSidebarWidth = sidebarWidthIsControlled
-    ? sidebarWidth
-    : internalSidebarWidth;
   const responsiveSidebarMaxWidth =
     layoutMode === "narrow" || shellWidth === null
       ? normalizedSidebarMaxWidth
