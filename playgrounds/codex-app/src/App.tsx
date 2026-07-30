@@ -64,6 +64,7 @@ import {
   type ReviewSelection,
 } from "./review-selection";
 import {
+  hasMcpToolCallGroupForTurn,
   mcpToolCallGroupDurationMs,
   mcpToolCallGroupForEntry,
   mcpToolCallGroupStatus,
@@ -172,10 +173,14 @@ function McpAnswer({ text }: { text: string }) {
   );
 }
 
-function McpResponseActions() {
+function McpResponseActions({
+  label = "MCP response actions",
+}: {
+  label?: string;
+}) {
   return (
     <span
-      aria-label="MCP response actions"
+      aria-label={label}
       className="demo-mcp-turn-actions demo-turn-actions"
       role="toolbar"
     >
@@ -1078,7 +1083,8 @@ export function App() {
       if (!message) return null;
       if (
         scenarioId === "mcp-recovery-mixed-thread" &&
-        message.id === "assistant-recovery-intro"
+        message.id === "assistant-recovery-intro" &&
+        hasMcpToolCallGroupForTurn(state, message.turnId)
       ) {
         return null;
       }
@@ -1097,7 +1103,13 @@ export function App() {
               message.status === "completed" ? (
                 scenarioId === "mcp-tool-call" ||
                 scenarioId === "mcp-recovery-mixed-thread" ? (
-                  <McpResponseActions />
+                  <McpResponseActions
+                    label={
+                      message.id === "assistant-workflow"
+                        ? "Response actions"
+                        : undefined
+                    }
+                  />
                 ) : (
                   <span
                     aria-label="Markdown response actions"

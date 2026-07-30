@@ -378,6 +378,10 @@ try {
         ),
       ),
       toolCount: group?.querySelectorAll(".codex-ui-tool-call").length,
+      responseActionLabels: Array.from(
+        document.querySelectorAll(".demo-turn-actions"),
+        (element) => element.getAttribute("aria-label"),
+      ),
       userCount: document.querySelectorAll(
         '.codex-ui-agent-message[data-role="user"]',
       ).length,
@@ -395,6 +399,8 @@ try {
     recoveryInteraction.groupStatus !== "completed" ||
     recoveryInteraction.reviewFileCount !== 1 ||
     !recoveryInteraction.reviewPanelOpen ||
+    JSON.stringify(recoveryInteraction.responseActionLabels) !==
+      JSON.stringify(["MCP response actions", "Response actions"]) ||
     recoveryInteraction.toolCount !== 3 ||
     recoveryInteraction.userCount !== 2
   ) {

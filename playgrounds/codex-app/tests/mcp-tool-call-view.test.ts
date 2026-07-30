@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  hasMcpToolCallGroupForTurn,
   mcpToolCallGroupDurationMs,
   mcpToolCallGroupForEntry,
   mcpToolCallGroupStatus,
@@ -121,5 +122,19 @@ describe("MCP tool-call view model", () => {
         },
       ]),
     ).toBe("running");
+  });
+
+  it("only reparents the recovery intro after its MCP group exists", () => {
+    const events =
+      replayScenarios["mcp-recovery-mixed-thread"].events;
+    const introOnly = reduceProtocolTrace(events.slice(0, 4));
+    const firstCallStarted = reduceProtocolTrace(events.slice(0, 5));
+
+    expect(
+      hasMcpToolCallGroupForTurn(introOnly, "turn-recovery"),
+    ).toBe(false);
+    expect(
+      hasMcpToolCallGroupForTurn(firstCallStarted, "turn-recovery"),
+    ).toBe(true);
   });
 });
