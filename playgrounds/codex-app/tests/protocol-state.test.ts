@@ -407,6 +407,38 @@ describe("protocol lifecycle reducer", () => {
     ]);
   });
 
+  it("preserves rename, delete, binary, and conflict patch evidence", () => {
+    const state = reduceProtocolTrace(
+      replayScenarios["mixed-file-review"].events,
+    );
+
+    expect(state.fileChanges).toHaveLength(1);
+    expect(state.fileChanges[0]).toMatchObject({
+      changes: [
+        {
+          kind: "renamed",
+          path: ".research/mixed-review/new-name.ts",
+          previousPath: ".research/mixed-review/old-name.ts",
+        },
+        {
+          kind: "deleted",
+          path: ".research/mixed-review/obsolete.ts",
+        },
+        {
+          kind: "modified",
+          path: ".research/mixed-review/preview.png",
+        },
+        {
+          kind: "modified",
+          path: ".research/mixed-review/conflicted.ts",
+        },
+      ],
+      status: "applied",
+    });
+    expect(state.fileChanges[0]?.changes[2]?.diff).toContain("Binary files");
+    expect(state.fileChanges[0]?.changes[3]?.diff).toContain("<<<<<<< HEAD");
+  });
+
   it("keeps terminal interaction attached to the matching process", () => {
     const scenario = replayScenarios["background-terminal"];
     const terminalOpen = reduceProtocolTrace(

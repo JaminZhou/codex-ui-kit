@@ -1294,6 +1294,118 @@ try {
   await compactTerminalApp.close();
 }
 
+const mixedReviewScene = {
+  frame: "review-open",
+  id: "electron-mixed-file-review",
+  scenario: "mixed-file-review",
+};
+const { app: mixedReviewApp, page: mixedReviewPage } = await launchScene(
+  mixedReviewScene,
+  { capture: false, layoutMode: "wide" },
+);
+
+try {
+  await mixedReviewPage.waitForSelector(
+    '.codex-ui-app-shell[data-side-panel-open] [data-testid="review-panel"]',
+  );
+  const initialMixedReview = await mixedReviewPage.evaluate(() => ({
+    changeKinds: Array.from(
+      document.querySelectorAll(".codex-ui-file-change-group__file"),
+      (element) => element.getAttribute("data-change"),
+    ),
+    diffCount: document.querySelectorAll(
+      ".codex-ui-file-review .codex-ui-file-diff",
+    ).length,
+    fileCount: document.querySelectorAll(
+      ".codex-ui-file-review__file",
+    ).length,
+    noticeKinds: Array.from(
+      document.querySelectorAll(".codex-ui-file-review-notice"),
+      (element) => element.getAttribute("data-kind"),
+    ),
+    renamedPath: document
+      .querySelector(
+        '.codex-ui-file-review__file[data-change="renamed"] .codex-ui-file-review__header',
+      )
+      ?.textContent?.replace(/\s+/g, " ")
+      .trim(),
+  }));
+  if (
+    JSON.stringify(initialMixedReview.changeKinds) !==
+      JSON.stringify(["renamed", "deleted", "modified", "modified"]) ||
+    initialMixedReview.diffCount !== 2 ||
+    initialMixedReview.fileCount !== 4 ||
+    JSON.stringify(initialMixedReview.noticeKinds) !==
+      JSON.stringify(["binary", "conflict"]) ||
+    !initialMixedReview.renamedPath?.includes(
+      ".research/mixed-review/old-name.ts → .research/mixed-review/new-name.ts",
+    )
+  ) {
+    throw new Error(
+      `Electron mixed Review content failed: ${JSON.stringify(initialMixedReview)}`,
+    );
+  }
+
+  const binaryPath = ".research/mixed-review/preview.png";
+  await mixedReviewPage
+    .getByRole("button", { name: `Select review for ${binaryPath}` })
+    .click();
+  if (
+    (await mixedReviewPage
+      .getByRole("listitem", { name: `Review file ${binaryPath}` })
+      .getAttribute("data-selected")) !== "true" ||
+    !(await mixedReviewPage
+      .getByRole("group", {
+        name: `Review binary change for ${binaryPath}`,
+      })
+      .isVisible())
+  ) {
+    throw new Error(
+      "Electron mixed Review did not synchronize binary-file selection.",
+    );
+  }
+
+  await mixedReviewPage
+    .getByRole("button", { exact: true, name: "Close review" })
+    .click();
+  await mixedReviewPage.waitForSelector(
+    ".codex-ui-app-shell:not([data-side-panel-open])",
+  );
+  await mixedReviewPage
+    .getByRole("button", {
+      name: "Open .research/mixed-review/new-name.ts",
+    })
+    .click();
+  if (
+    (await mixedReviewPage
+      .getByRole("listitem", {
+        name: "Review file .research/mixed-review/new-name.ts",
+      })
+      .getAttribute("data-selected")) !== "true" ||
+    (await mixedReviewPage
+      .getByRole("list", {
+        name: "Review diff for .research/mixed-review/obsolete.ts",
+      })
+      .count()) !== 1
+  ) {
+    throw new Error(
+      "Electron mixed Review did not preserve siblings on row reopen.",
+    );
+  }
+
+  await mixedReviewPage
+    .getByRole("button", { exact: true, name: "Undo" })
+    .click();
+  await mixedReviewPage.waitForSelector('[data-testid="file-change-group"]', {
+    state: "detached",
+  });
+  await mixedReviewPage.waitForSelector(
+    ".codex-ui-app-shell:not([data-side-panel-open])",
+  );
+} finally {
+  await mixedReviewApp.close();
+}
+
 const largeReviewScene = {
   frame: "review-open",
   id: "electron-large-file-review",
@@ -2183,5 +2295,5 @@ try {
 }
 
 console.log(
-  "Electron host, native-window, coding-workspace routing, conversation/Composer lifecycle, default 720px narrow reachability, resizable navigation/Review/Terminal/PR detail, PR tabs and expansion, MCP disclosure/result, multi-file Review, large diff scrolling, and compact geometry contracts passed.",
+  "Electron host, native-window, coding-workspace routing, conversation/Composer lifecycle, default 720px narrow reachability, resizable navigation/Review/Terminal/PR detail, PR tabs and expansion, MCP disclosure/result, multi-file and mixed-content Review, selection/Undo, large diff scrolling, and compact geometry contracts passed.",
 );

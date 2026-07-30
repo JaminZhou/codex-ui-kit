@@ -76,7 +76,7 @@ import {
   type DemoProtocolState,
   type ProtocolEventRecord,
 } from "./protocol-state";
-import { changeStats } from "./diff-lines";
+import { changeStats, reviewContent } from "./diff-lines";
 import { LiveApprovalSubmissionGate } from "./live-approval-submission-gate";
 import {
   isScenarioId,
@@ -1381,6 +1381,7 @@ export function App() {
   const showMeasuredComposer =
     mode === "replay" &&
     (scenarioId === "multi-file-review" ||
+      scenarioId === "mixed-file-review" ||
       scenarioId === "markdown" ||
       scenarioId === "mcp-tool-call" ||
       scenarioId === "mcp-recovery-mixed-thread");
@@ -1934,8 +1935,15 @@ export function App() {
     </div>
   );
 
+  const reviewableFileChanges = useMemo(
+    () =>
+      state.fileChanges.filter(
+        (fileChange) => !undoneFileIds.has(fileChange.id),
+      ),
+    [state.fileChanges, undoneFileIds],
+  );
   const resolvedReview = resolveReviewSelection(
-    state.fileChanges,
+    reviewableFileChanges,
     reviewSelection,
   );
   const reviewFileChange = resolvedReview?.fileChange;
@@ -1943,14 +1951,22 @@ export function App() {
     () =>
       reviewFileChange?.changes.map((change) => {
         const stats = changeStats(change);
+        const content = reviewContent(change);
         return {
           ...change,
-          ...stats,
+          additions: stats.additions,
           change: change.kind,
-          lines:
-            change.kind === "added"
-              ? stats.lines.filter(({ kind }) => kind !== "hunk")
-              : stats.lines,
+          content:
+            content.kind === "diff"
+              ? {
+                  kind: "diff" as const,
+                  lines:
+                    change.kind === "added"
+                      ? content.lines.filter(({ kind }) => kind !== "hunk")
+                      : content.lines,
+                }
+              : content,
+          deletions: stats.deletions,
         };
       }) ?? [],
     [reviewFileChange],
@@ -1989,6 +2005,13 @@ export function App() {
               <FileReview
                 aria-label="Last turn file review"
                 files={reviewFiles}
+                onSelectFile={(file) => {
+                  setReviewSelectionKey((current) => current + 1);
+                  setReviewSelection({
+                    fileChangeId: reviewFileChange.id,
+                    path: file.path,
+                  });
+                }}
                 selectionKey={reviewSelectionKey}
                 selectedPath={resolvedReview?.selectedPath}
               />

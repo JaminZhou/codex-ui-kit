@@ -51,6 +51,8 @@ import {
   FileChange,
   type FileChangeStatus,
   FileDiff,
+  type FileReviewContent,
+  FileReviewNotice,
   GeneratedImageGallery,
   ImagePreviewDialog,
   IconButton,
@@ -134,6 +136,10 @@ const line: FileDiffLine = {
 };
 const highlighter: CodeHighlighter = (code) => ({ code, html: code });
 const diffSize: FileDiffSize = "short";
+const fileReviewContent: FileReviewContent = {
+  kind: "binary",
+  title: "Binary file changed",
+};
 const searchEntry: SearchActivityEntry = {
   detail: "package contract",
   id: "search-entry",
@@ -234,6 +240,8 @@ void appRouteOutletAction;
 void appWindowChromeAction;
 void FileChange;
 void FileDiff;
+void FileReviewNotice;
+void fileReviewContent;
 void GeneratedImageGallery;
 void ImagePreviewDialog;
 void InlineNotice;

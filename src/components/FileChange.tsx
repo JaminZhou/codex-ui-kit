@@ -536,8 +536,89 @@ export function FileDiff({
   );
 }
 
-export interface FileReviewItem extends FileChangeGroupItem {
-  lines: readonly FileDiffLine[];
+export type FileReviewNoticeKind = "binary" | "conflict";
+
+export type FileReviewContent =
+  | {
+      kind: "diff";
+      lines: readonly FileDiffLine[];
+    }
+  | {
+      description?: string;
+      kind: FileReviewNoticeKind;
+      title?: string;
+    };
+
+export type FileReviewItem = FileChangeGroupItem &
+  (
+    | {
+        content: FileReviewContent;
+        lines?: never;
+      }
+    | {
+        content?: never;
+        /** Backwards-compatible shorthand for diff content. */
+        lines: readonly FileDiffLine[];
+      }
+  );
+
+export interface FileReviewNoticeProps
+  extends Omit<HTMLAttributes<HTMLDivElement>, "children"> {
+  description?: string;
+  kind: FileReviewNoticeKind;
+  title?: string;
+}
+
+const fileReviewNoticeDefaults: Record<
+  FileReviewNoticeKind,
+  { description: string; title: string }
+> = {
+  binary: {
+    description: "This binary change cannot be displayed as text.",
+    title: "Binary file changed",
+  },
+  conflict: {
+    description: "Resolve the conflict markers before merging.",
+    title: "Merge conflict detected",
+  },
+};
+
+export function FileReviewNotice({
+  className,
+  description,
+  kind,
+  title,
+  "aria-label": ariaLabel,
+  ...props
+}: FileReviewNoticeProps) {
+  const fallback = fileReviewNoticeDefaults[kind];
+  const resolvedTitle = title ?? fallback.title;
+  const resolvedDescription = description ?? fallback.description;
+  const classes = ["codex-ui-file-review-notice", className]
+    .filter(Boolean)
+    .join(" ");
+
+  return (
+    <div
+      aria-label={ariaLabel ?? resolvedTitle}
+      className={classes}
+      data-kind={kind}
+      role="group"
+      tabIndex={0}
+      {...props}
+    >
+      <span
+        aria-hidden="true"
+        className="codex-ui-file-review-notice__indicator"
+      >
+        {kind === "binary" ? "◫" : "!"}
+      </span>
+      <span className="codex-ui-file-review-notice__identity">
+        <strong>{resolvedTitle}</strong>
+        <span>{resolvedDescription}</span>
+      </span>
+    </div>
+  );
 }
 
 export interface FileReviewProps
@@ -545,6 +626,7 @@ export interface FileReviewProps
   files: readonly FileReviewItem[];
   /** Change this key to reveal the selected path again after repeated activation. */
   selectionKey?: number | string;
+  onSelectFile?: (file: FileReviewItem, index: number) => void;
   selectedPath?: string;
   wrapLines?: boolean;
 }
@@ -553,6 +635,7 @@ export function FileReview({
   className,
   files,
   selectionKey,
+  onSelectFile,
   selectedPath,
   wrapLines = true,
   "aria-label": ariaLabel = "File review",
@@ -571,19 +654,35 @@ export function FileReview({
       : JSON.stringify(
           files
             .slice(0, selectedFileIndex + 1)
-            .map(({ change, lines, path, previousPath }) => ({
-              change,
-              lines: lines.map(
-                ({ content, kind, newLineNumber, oldLineNumber }) => ({
-                  content,
-                  kind,
-                  newLineNumber,
-                  oldLineNumber,
-                }),
-              ),
-              path,
-              previousPath,
-            })),
+            .map((file) => {
+              const content =
+                file.content ??
+                ({ kind: "diff", lines: file.lines } as const);
+              return {
+                change: file.change,
+                content:
+                  content.kind === "diff"
+                    ? {
+                        kind: content.kind,
+                        lines: content.lines.map(
+                          ({
+                            content: lineContent,
+                            kind,
+                            newLineNumber,
+                            oldLineNumber,
+                          }) => ({
+                            content: lineContent,
+                            kind,
+                            newLineNumber,
+                            oldLineNumber,
+                          }),
+                        ),
+                      }
+                    : content,
+                path: file.path,
+                previousPath: file.previousPath,
+              };
+            }),
         );
   }, [files, selectedPath]);
 
@@ -607,11 +706,13 @@ export function FileReview({
       role="list"
       {...props}
     >
-      {files.map((file) => {
+      {files.map((file, index) => {
         const pathContent = file.previousPath
           ? `${file.previousPath} → ${file.path}`
           : file.path;
         const selected = selectedPath === file.path;
+        const content =
+          file.content ?? ({ kind: "diff", lines: file.lines } as const);
         return (
           <section
             aria-current={selected || undefined}
@@ -624,19 +725,41 @@ export function FileReview({
             role="listitem"
           >
             <div className="codex-ui-file-review__header">
-              <code>{pathContent}</code>
+              {onSelectFile ? (
+                <button
+                  aria-label={`Select review for ${file.path}`}
+                  onClick={() => onSelectFile(file, index)}
+                  type="button"
+                >
+                  <code>{pathContent}</code>
+                </button>
+              ) : (
+                <code>{pathContent}</code>
+              )}
               <FileChangeStats
                 additions={file.additions}
                 change={file.change}
                 deletions={file.deletions}
               />
             </div>
-            <FileDiff
-              aria-label={`Review diff for ${file.path}`}
-              lines={file.lines}
-              tabIndex={0}
-              wrapLines={wrapLines}
-            />
+            {content.kind === "diff" ? (
+              <FileDiff
+                aria-label={`Review diff for ${file.path}`}
+                className="codex-ui-file-review__content"
+                emptyLabel="No content"
+                lines={content.lines}
+                tabIndex={0}
+                wrapLines={wrapLines}
+              />
+            ) : (
+              <FileReviewNotice
+                aria-label={`Review ${content.kind} change for ${file.path}`}
+                className="codex-ui-file-review__content"
+                description={content.description}
+                kind={content.kind}
+                title={content.title}
+              />
+            )}
           </section>
         );
       })}

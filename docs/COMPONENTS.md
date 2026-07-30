@@ -60,7 +60,11 @@ The built-in highlighter escapes untrusted code. A custom `CodeHighlighter` retu
 - `CommandOutput`: labeled stdout/stderr with no-output, tail-following, overflow, fade, and copy behavior.
 - `FileChange`: one-file create, apply, stop, reject, delete, and rename activities with disclosure, statistics, path opening, and copy hooks.
 - `FileChangeGroup`: one protocol item's aggregate changed-files card with group status/actions, independent file rows, statistics, rename paths, and host-owned file opening.
-- `FileReview`: a scrollable workspace composition that stacks every changed file with an independent header, statistics, focusable diff, and optional selected-file marker.
+- `FileReview`: a scrollable workspace composition that stacks every changed
+  file with an independent header, statistics, focusable text/binary/conflict
+  content, optional controlled file selection, and a selected-file marker.
+  Existing `lines` items remain supported; `FileReviewContent` makes non-text
+  states explicit, and `FileReviewNotice` can also be composed independently.
 - `ApprovalRequest`: command, patch, network, permission, and generic approval card with scoped actions, shortcuts, loading, and outcome states.
 - `ApprovalCommandPreview`: bounded command preview with explicit expansion controls.
 - `StatusBanner`: neutral, info, warning, and error shell with actions, dismissal, and compact reflow.

@@ -210,6 +210,20 @@ new-chat entry:
 - six reviewed workspace frames and optional current-build main/listbox pixel
   comparisons.
 
+## Fourteenth vertical slice
+
+The fourteenth slice broadens Review content and synchronization:
+
+- current-build delete-card, Undo/Review, side-panel, and deletion-diff
+  evidence plus the observed rename-as-zero-line-items boundary;
+- an explicit `FileReviewContent` contract for text diff, binary, and conflict
+  presentation while retaining the public protocol `move_path` semantic;
+- a schema-validated four-file trace covering rename, delete, binary patch
+  text, and host-derived conflict markers;
+- Review-header selection, exact row reopen, sibling preservation, and
+  group-Undo lifecycle in a real Electron window;
+- a forty-third CDP/pixel frame with ordered change/content-kind gates.
+
 ## Development
 
 From the repository root:

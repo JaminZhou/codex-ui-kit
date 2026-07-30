@@ -389,6 +389,77 @@ describe("FileReview", () => {
     expect(selectedFile.getAttribute("aria-current")).toBe("true");
   });
 
+  it("renders explicit binary and conflict review content", () => {
+    render(
+      <FileReview
+        files={[
+          {
+            change: "modified",
+            content: { kind: "binary" },
+            path: "assets/screenshot.png",
+          },
+          {
+            change: "modified",
+            content: {
+              description: "Choose the intended branch content.",
+              kind: "conflict",
+            },
+            path: "src/conflicted.ts",
+          },
+        ]}
+      />,
+    );
+
+    expect(
+      screen
+        .getByRole("group", {
+          name: "Review binary change for assets/screenshot.png",
+        })
+        .getAttribute("data-kind"),
+    ).toBe("binary");
+    expect(
+      screen.getByRole("group", {
+        name: "Review conflict change for src/conflicted.ts",
+      }).textContent,
+    ).toContain("Choose the intended branch content.");
+    expect(screen.queryByRole("list", { name: /Review diff for/ })).toBeNull();
+  });
+
+  it("uses the current-build empty Review label for text changes", () => {
+    render(
+      <FileReview
+        files={[
+          {
+            change: "renamed",
+            lines: [],
+            path: "src/new-name.ts",
+            previousPath: "src/old-name.ts",
+          },
+        ]}
+      />,
+    );
+
+    expect(screen.getByText("No content")).toBeTruthy();
+  });
+
+  it("reports review-header selection without hiding sibling files", () => {
+    const onSelectFile = vi.fn();
+    render(<FileReview files={files} onSelectFile={onSelectFile} />);
+
+    fireEvent.click(
+      screen.getByRole("button", {
+        name: "Select review for .research/probe/beta.txt",
+      }),
+    );
+
+    expect(onSelectFile).toHaveBeenCalledWith(files[1], 1);
+    expect(
+      screen.getByRole("list", {
+        name: "Review diff for .research/probe/alpha.txt",
+      }),
+    ).toBeTruthy();
+  });
+
   it("scrolls a newly selected file into the visible review region", () => {
     const originalScrollIntoView = Object.getOwnPropertyDescriptor(
       HTMLElement.prototype,
