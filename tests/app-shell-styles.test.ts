@@ -37,6 +37,12 @@ describe("application shell visual contract", () => {
       '.codex-ui-app-shell__backdrop[data-backdrop="sidebar"]',
     );
     expect(styles).toContain("max-width: calc(100% - 3rem)");
+    expect(styles).toContain(
+      ".codex-ui-app-shell[data-side-panel-overlay][data-side-panel-open]",
+    );
+    expect(styles).toMatch(
+      /\[data-side-panel-overlay\]\[data-side-panel-open\][\s\S]*?\.codex-ui-app-shell__layout \{[\s\S]*?--codex-ui-app-shell-side-panel-track: 0rem;/,
+    );
     expect(styles).toMatch(
       /@container codex-ui-app-shell \(max-width: 60rem\) \{[\s\S]*?\.codex-ui-app-shell:dir\(rtl\) \.codex-ui-app-shell__side-panel \{[\s\S]*?transform: translateX\(-100%\);[\s\S]*?\.codex-ui-app-shell\[data-side-panel-open\][\s\S]*?\.codex-ui-app-shell__side-panel \{[\s\S]*?transform: translateX\(0\);/,
     );

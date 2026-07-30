@@ -713,25 +713,34 @@ export function AppShell({
     0,
     Number.isFinite(sidePanelMinMainWidth) ? sidePanelMinMainWidth : 352,
   );
+  const coordinatedPersistentMainMinWidth = Math.max(
+    normalizedSidebarMinMainWidth,
+    normalizedSidePanelMinMainWidth,
+  );
+  const wideSidePanelMinimaFit =
+    shellWidth === null ||
+    shellWidth >=
+      (sidebarIsVisible ? normalizedSidebarMinWidth : 0) +
+        normalizedSidePanelMinWidth +
+        coordinatedPersistentMainMinWidth;
+  const sidePanelOverlay =
+    sidePanelHasOpenContent &&
+    !sidePanelExpanded &&
+    (layoutMode !== "wide" || !wideSidePanelMinimaFit);
   const persistentSidePanelMinWidth =
     layoutMode === "wide" &&
     sidePanelHasOpenContent &&
-    !sidePanelExpanded
+    !sidePanelExpanded &&
+    !sidePanelOverlay
       ? normalizedSidePanelMinWidth
       : 0;
   const responsiveSidebarMinMainWidth =
     persistentSidePanelMinWidth > 0
-      ? Math.max(
-          normalizedSidebarMinMainWidth,
-          normalizedSidePanelMinMainWidth,
-        )
+      ? coordinatedPersistentMainMinWidth
       : normalizedSidebarMinMainWidth;
   const responsiveSidePanelMinMainWidth =
-    layoutMode === "wide" && sidebarIsVisible
-      ? Math.max(
-          normalizedSidebarMinMainWidth,
-          normalizedSidePanelMinMainWidth,
-        )
+    layoutMode === "wide" && sidebarIsVisible && !sidePanelOverlay
+      ? coordinatedPersistentMainMinWidth
       : normalizedSidePanelMinMainWidth;
   const sidebarWidthIsControlled =
     sidebarWidth !== undefined && Number.isFinite(sidebarWidth);
@@ -841,7 +850,7 @@ export function AppShell({
     narrowSidebarBehavior === "modal";
   const sidePanelModalOpen =
     sidePanelOpen &&
-    layoutMode !== "wide" &&
+    sidePanelOverlay &&
     !sidebarModalOpen;
   const responsiveModalOpen =
     sidebarModalOpen || sidePanelModalOpen;
@@ -857,7 +866,8 @@ export function AppShell({
     sidePanel !== undefined &&
     sidePanel !== null &&
     !resolvedSidePanelExpanded &&
-    layoutMode === "wide";
+    layoutMode === "wide" &&
+    !sidePanelOverlay;
   const bottomPanelResizerVisible =
     bottomPanelResizable &&
     bottomPanelOpen &&
@@ -1678,6 +1688,7 @@ export function AppShell({
       data-bottom-panel-resizing={bottomPanelResizing || undefined}
       data-side-panel-expanded={resolvedSidePanelExpanded || undefined}
       data-side-panel-open={sidePanelOpen || undefined}
+      data-side-panel-overlay={sidePanelOverlay || undefined}
       data-side-panel-resizable={sidePanelResizable || undefined}
       data-side-panel-resizing={sidePanelResizing || undefined}
       data-narrow-sidebar-behavior={narrowSidebarBehavior}
@@ -1806,7 +1817,7 @@ export function AppShell({
             data-backdrop="side-panel"
             onClick={() => onSidePanelOpenChange(false)}
             ref={sidePanelBackdropRef}
-            tabIndex={sidePanelOpen && !sidebarModalOpen ? 0 : -1}
+            tabIndex={sidePanelModalOpen ? 0 : -1}
             type="button"
           />
         ) : null}

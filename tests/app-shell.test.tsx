@@ -621,6 +621,74 @@ describe("application shell", () => {
     ).toBe("326px");
   });
 
+  it("overlays the side panel when all persistent minima cannot fit", () => {
+    let resize: ((width: number) => void) | undefined;
+    class ResizeObserverMock {
+      constructor(
+        private readonly callback: ResizeObserverCallback,
+      ) {}
+
+      disconnect() {}
+
+      observe(target: Element) {
+        if (!target.classList.contains("codex-ui-app-shell")) return;
+        resize = (width) =>
+          this.callback(
+            [
+              {
+                contentRect: { height: 680, width },
+                target,
+              } as ResizeObserverEntry,
+            ],
+            this as unknown as ResizeObserver,
+          );
+      }
+
+      unobserve() {}
+    }
+    vi.stubGlobal("ResizeObserver", ResizeObserverMock);
+    const { container } = render(
+      <AppShell
+        onSidePanelOpenChange={() => undefined}
+        sidePanel={<button type="button">Review files</button>}
+        sidePanelOpen
+        sidebar={<button type="button">Projects</button>}
+        sidebarMinMainWidth={500}
+        sidebarOpen
+      >
+        Conversation
+      </AppShell>,
+    );
+    const shell = container.querySelector(
+      ".codex-ui-app-shell",
+    ) as HTMLDivElement;
+
+    act(() => resize?.(961));
+    expect(shell.getAttribute("data-layout-mode")).toBe("wide");
+    expect(shell.hasAttribute("data-side-panel-overlay")).toBe(true);
+    expect(
+      screen.queryByRole("separator", {
+        name: "Resize workspace panel",
+      }),
+    ).toBeNull();
+    expect(
+      screen
+        .getByRole("main", { name: "Conversation" })
+        .hasAttribute("inert"),
+    ).toBe(true);
+    expect(
+      screen.getByRole("button", { name: "Close workspace panel" }).tabIndex,
+    ).toBe(0);
+
+    act(() => resize?.(1_100));
+    expect(shell.hasAttribute("data-side-panel-overlay")).toBe(false);
+    expect(
+      screen
+        .getByRole("main", { name: "Conversation" })
+        .hasAttribute("inert"),
+    ).toBe(false);
+  });
+
   it("supports current-build narrow edge preview and explicit pinning", async () => {
     function CurrentBuildNarrowFixture() {
       const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -1282,7 +1350,7 @@ describe("application shell", () => {
     }
     vi.stubGlobal("ResizeObserver", ResizeObserverMock);
 
-    render(
+    const { container } = render(
       <AppShell
         layoutMode="wide"
         sidePanel="Review"
@@ -1324,8 +1392,16 @@ describe("application shell", () => {
     expect(separator.getAttribute("aria-valuenow")).toBe("854");
 
     act(() => resizeShell?.(800));
-    expect(separator.getAttribute("aria-valuemax")).toBe("320");
-    expect(separator.getAttribute("aria-valuenow")).toBe("320");
+    expect(
+      screen.queryByRole("separator", {
+        name: "Resize workspace panel",
+      }),
+    ).toBeNull();
+    expect(
+      container
+        .querySelector(".codex-ui-app-shell")
+        ?.hasAttribute("data-side-panel-overlay"),
+    ).toBe(true);
   });
 
   it("uses the shell content box for live workspace clamping", () => {
