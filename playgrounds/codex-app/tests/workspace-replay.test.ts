@@ -34,6 +34,14 @@ describe("workspace replay routing", () => {
     ).toBe("/cloud/codex-ui-kit");
     expect(
       workspaceExecutionCwd({
+        environmentId: "cloud",
+        projectPath: "/workspace/codex-ui-kit",
+        worktreeBranch: "feat/cloud review",
+        worktreeId: "feature",
+      }),
+    ).toBe("/cloud/codex-ui-kit/.worktrees/feat-cloud-review");
+    expect(
+      workspaceExecutionCwd({
         environmentId: "local",
         projectPath: "/workspace/codex-ui-kit",
         worktreeBranch: `${"-".repeat(10_000)}feature / review${"-".repeat(10_000)}`,

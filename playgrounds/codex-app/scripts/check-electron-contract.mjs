@@ -1851,6 +1851,67 @@ try {
   await codingWorkspaceApp.close();
 }
 
+const cloudWorkspaceScene = {
+  frame: "workspace-ready",
+  id: "electron-cloud-coding-workspace",
+  scenario: "workspace-workflow",
+  view: "workspace",
+};
+const {
+  app: cloudWorkspaceApp,
+  page: cloudWorkspacePage,
+} = await launchScene(cloudWorkspaceScene, { capture: false });
+try {
+  await cloudWorkspacePage
+    .getByRole("button", { name: "Change environment: Local" })
+    .click();
+  await cloudWorkspacePage
+    .getByRole("menu", { name: "Start in" })
+    .getByRole("menuitemradio", { name: "Connect Codex web" })
+    .click();
+  await cloudWorkspacePage.waitForSelector(
+    'button[aria-label="Change environment: Codex web"]',
+  );
+  await cloudWorkspacePage
+    .getByRole("button", { name: "Change worktree: main" })
+    .click();
+  await cloudWorkspacePage
+    .getByRole("menu", { name: "Branches" })
+    .getByRole("menuitemradio", {
+      name: "feat/coding-workspace-lifecycle",
+    })
+    .click();
+  await cloudWorkspacePage
+    .getByRole("textbox", { name: "Workspace message composer" })
+    .fill("Run the cloud worktree lifecycle.");
+  await cloudWorkspacePage
+    .getByRole("textbox", { name: "Workspace message composer" })
+    .press("Enter");
+  await cloudWorkspacePage.waitForSelector(
+    '.demo-root[data-view="conversation"][data-scenario="workspace-workflow"][data-frame="approval-pending"]',
+  );
+  const cloudWorkspaceCommandCwds = await cloudWorkspacePage
+    .locator(
+      '[data-testid="command-execution"] .codex-ui-command-execution__shell',
+    )
+    .evaluateAll((elements) =>
+      elements.map((element) => element.getAttribute("title")),
+    );
+  if (
+    cloudWorkspaceCommandCwds.some(
+      (cwd) =>
+        cwd !==
+        "cwd\n/cloud/codex-ui-kit/.worktrees/feat-coding-workspace-lifecycle",
+    )
+  ) {
+    throw new Error(
+      `Electron cloud coding workspace discarded the selected worktree: ${JSON.stringify(cloudWorkspaceCommandCwds)}.`,
+    );
+  }
+} finally {
+  await cloudWorkspaceApp.close();
+}
+
 const rejectedApprovalScene = {
   frame: "approval-pending",
   id: "electron-workspace-approval-rejected",

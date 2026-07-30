@@ -47,7 +47,10 @@ export function workspaceExecutionCwd({
     const project = workspacePathSegment(
       basePath.split("/").filter(Boolean).at(-1) ?? "workspace",
     );
-    return `/cloud/${project || "workspace"}`;
+    const cloudProjectPath = `/cloud/${project || "workspace"}`;
+    if (worktreeId === "main") return cloudProjectPath;
+    const branch = workspacePathSegment(worktreeBranch ?? worktreeId);
+    return `${cloudProjectPath}/.worktrees/${branch || worktreeId}`;
   }
   if (environmentId === "worktree") {
     return `${basePath}/.worktrees/new-worktree`;
