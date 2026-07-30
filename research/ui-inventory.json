@@ -280,11 +280,12 @@
         "cdp:stop-button-you-stopped-summary-and-stopped-command",
         "cdp-26.721:synthetic-submit-running-stop-control-completed-transition",
         "cdp-26.721:synthetic-streaming-stop-28x28-frozen-raster-and-stop-action",
-        "cdp-26.721:synthetic-you-stopped-after-2s-divider-raster"
+        "cdp-26.721:synthetic-you-stopped-after-2s-divider-raster",
+        "cdp-26.721.81911:real-running-turn-stop-input-clear-and-focus-restore"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "partial_legacy",
-      "electronStatus": "partial_legacy",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
       "priority": "p0"
     },
     {
@@ -379,11 +380,12 @@
         "cdp:empty-submitting-and-completed-composer",
         "cdp:composer-width-712-to-490-under-viewport-probe",
         "cdp-26.721:synthetic-composer-736x98-wide-494x98-compact",
-        "cdp-26.721:synthetic-composer-empty-running-completed-controls"
+        "cdp-26.721:synthetic-composer-empty-running-completed-controls",
+        "cdp-26.721.81911:empty-focused-multiline-running-stop-and-completed-composer"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "partial_legacy",
-      "electronStatus": "partial_legacy",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
       "priority": "p0"
     },
     {
@@ -397,7 +399,8 @@
         "cdp:local-cloud-worktree-location-menu",
         "cdp:branch-menu-current-and-create-actions",
         "cdp-26.721:new-chat-project-local-main-context-controls",
-        "cdp-26.721:new-chat-project-popover-260x250-listbox-14-options"
+        "cdp-26.721:new-chat-project-popover-260x250-listbox-14-options",
+        "cdp-26.721.81911:project-local-and-main-context-controls"
       ],
       "implementationStatus": "partial",
       "browserStatus": "partial_legacy",
@@ -412,7 +415,8 @@
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
         "cdp:permission-menu-four-modes",
-        "cdp:model-effort-speed-menu"
+        "cdp:model-effort-speed-menu",
+        "cdp-26.721.81911:ask-approve-full-custom-permission-menu"
       ],
       "implementationStatus": "partial",
       "browserStatus": "partial_legacy",
@@ -426,11 +430,12 @@
       "packageEvidence": ["queued-message-list"],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
-        "cdp:queued-follow-up-card-delete-actions-and-sequential-run"
+        "cdp:queued-follow-up-card-delete-actions-and-sequential-run",
+        "cdp-26.721.81911:real-queue-steer-delete-actions-stop-paused-and-resume"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "partial_legacy",
-      "electronStatus": "partial_legacy",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
       "priority": "p0"
     },
     {
@@ -438,7 +443,10 @@
       "area": "composer",
       "ownership": "thread",
       "packageEvidence": ["composer-work-home-plugins-control", "connect-plugins-submenu-item"],
-      "runtimeStatus": "not_sampled",
+      "runtimeStatus": "runtime_observed",
+      "runtimeEvidence": [
+        "cdp-26.721.81911:add-files-goal-plan-skill-and-plugins-menu"
+      ],
       "implementationStatus": "partial",
       "browserStatus": "partial_legacy",
       "electronStatus": "partial_legacy",

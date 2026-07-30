@@ -14,14 +14,18 @@ Every deterministic scenario has one ID and produces four evidence layers:
    overflow/reveal contract, plus the 16px PR/Review separator, responsive
    limits, tab states, and expand/restore lifecycle, and the 16px Terminal
    separator, 272px default panel, responsive bounds, named tab/tabpanel, and
-   terminal log/input semantics.
+   terminal log/input semantics; plus Composer context/queue/input ownership,
+   running Enter-to-queue behavior, interruption/Resume, long-thread message
+   navigation, scroll-away recovery, and deterministic windowing.
 3. **Electron host** — real `BrowserWindow` bounds, renderer isolation,
    pointer and keyboard navigation/PR-panel resizing, Review-panel
    close/reopen behavior, compact 800×600 multi-file geometry, an eight-file
    scroll-to-selection flow, PR tab/comment/expansion interactions, and
    Terminal pointer/keyboard resizing, host-owned input, close/restore,
    compact 820×680 geometry, and App shell offline → retry → restored
-   notification plus native 1180×820 → 720×680 → 1180×820 continuity.
+   notification plus native 1180×820 → 720×680 → 1180×820 continuity; the
+   conversation host also drives submit → queue → Stop → paused → Resume and
+   return-to-latest in a real 1180×820 window.
 4. **Pixels** — full-frame regression screenshots after the structural gates
    pass. The multi-file scenario can additionally compare a separately
    captured 906×820 current-build main region through
@@ -41,7 +45,10 @@ Every deterministic scenario has one ID and produces four evidence layers:
    `CODEX_UI_KIT_MCP_RECOVERY_REFERENCE` and gates the full main, recovered
    call group, user prompt, and Composer regions separately; the App shell
    accepts a 120×46 ownership-scoped reference through
-   `CODEX_UI_KIT_WINDOW_CHROME_REFERENCE`. Transparent
+   `CODEX_UI_KIT_WINDOW_CHROME_REFERENCE`. Queued and paused Composer states
+   accept separate 792×320 current-build crops through
+   `CODEX_UI_KIT_COMPOSER_QUEUED_REFERENCE` and
+   `CODEX_UI_KIT_COMPOSER_PAUSED_REFERENCE`. Transparent
    Electron/CDP reference pixels are composited onto the observed `#181818`
    window background before comparison, and independently implemented UI
    regions are located from their DOM contracts rather than hard-coded
@@ -56,6 +63,12 @@ the 120×46 window-chrome crop at the strict 0.05 pixel threshold, under its
 0.05 hard limit. Only loading and in-session Pull requests selection were
 observed in Codex Desktop `26.721.81911`; offline/error/reconnecting/stale and
 restored-notification frames are explicitly synthetic coverage.
+
+The queued and paused Composer references measured `0.002722538` and
+`0.004478378` changed-pixel ratios at the same strict 0.05 pixel threshold.
+Their ownership masks exclude unrelated transcript text and fixture-specific
+labels, while preserving the queue and card silhouettes, 13px queue inset,
+controls, backgrounds, radii, and spacing.
 
 Computer Use remains an optional macOS acceptance layer for real pointer,
 focus, menu, multi-window, and OS integration checks. It is intentionally not a
@@ -120,3 +133,11 @@ to cover its measured 1.1716% macOS-runner delta. The optional current-build
 recovery gate allows at most 4.5% full-main, 7% recovery, 5% user, and 3%
 Composer difference at the strict 0.05 pixel threshold. The accepted sample
 measured 2.9202337%, 5.1956799%, 4.7369405%, and 1.5698995% respectively.
+
+The twenty-third through twenty-sixth frames cover App shell loading, offline,
+stale, and restored states. The twenty-seventh through thirty-sixth frames
+cover conversation ready, multiline, running, queued, queue-paused, disabled,
+attachment, scroll-away, windowed history, and completion. The new frames use
+a scoped 1% internal main-region limit for their dense 20/22-message thread,
+while CDP independently locks the 736×98 Composer, 28px controls, 13px queue
+inset, 10/11 navigation markers, disabled semantics, and windowed placeholder.

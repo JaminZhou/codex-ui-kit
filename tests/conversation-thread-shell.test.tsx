@@ -96,6 +96,39 @@ describe("ConversationThreadShell", () => {
     expect(onFollowingChange).toHaveBeenCalledWith(false);
   });
 
+  it("exposes the owned viewport without replacing its internal measurement ref", () => {
+    const viewportRef = { current: null as HTMLDivElement | null };
+    const callbackRef = vi.fn();
+    const { container, rerender, unmount } = render(
+      <ConversationThreadShell
+        composer={<span>Composer</span>}
+        header={<span>Header</span>}
+        viewportRef={viewportRef}
+      >
+        Timeline
+      </ConversationThreadShell>,
+    );
+    const viewport = container.querySelector<HTMLDivElement>(
+      ".codex-ui-conversation-thread-shell__viewport",
+    );
+
+    expect(viewportRef.current).toBe(viewport);
+
+    rerender(
+      <ConversationThreadShell
+        composer={<span>Composer</span>}
+        header={<span>Header</span>}
+        viewportRef={callbackRef}
+      >
+        Timeline
+      </ConversationThreadShell>,
+    );
+    expect(callbackRef).toHaveBeenCalledWith(viewport);
+
+    unmount();
+    expect(callbackRef).toHaveBeenLastCalledWith(null);
+  });
+
   it("keeps public labels and custom classes on their owning regions", () => {
     const { container, getByRole } = render(
       <ConversationThreadShell

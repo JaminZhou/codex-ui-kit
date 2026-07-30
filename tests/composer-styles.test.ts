@@ -38,6 +38,15 @@ describe("composer visual contract", () => {
     expect(styles).toContain(
       '.codex-ui-composer-attachment[data-layout="card"]',
     );
+    expect(styles).toMatch(
+      /\.codex-ui-composer-dock__queue \{[\s\S]*?var\(--codex-ui-composer-queue-inline-inset\)[\s\S]*?overflow: hidden;/,
+    );
+    expect(styles).toMatch(
+      /\.codex-ui-composer-context__control \{[\s\S]*?height: var\(--codex-ui-composer-context-control-height\);/,
+    );
+    expect(styles).toContain(
+      ".codex-ui-composer-dock__surface",
+    );
   });
 
   it("keeps queue actions discoverable from hover and keyboard focus", () => {

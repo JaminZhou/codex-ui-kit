@@ -7,7 +7,9 @@ Codex UI Kit exposes protocol-neutral React components. Hosts own data fetching,
 - `ConversationThreadShell`: current-build measured page composition that
   combines a 46px header, centered follow-aware timeline, responsive 16px
   insets, an overlay multiline Composer, and host-owned message-navigation and
-  latest-message control slots while keeping data and actions host-owned.
+  latest-message control slots while keeping data and actions host-owned. Its
+  `viewportRef` exposes the owned scroll element for host navigation and
+  return-to-latest behavior without replacing internal measurement.
 - `AgentThread`: responsive `768px` content column with turn separation and container-query reflow.
 - `AgentThreadViewport`: focusable, follow-aware scroll surface with latest-turn detection, reduced-motion-safe auto-follow, direct-input cancellation for programmatic following, and a sticky footer.
 - `AgentTurn` and `ActivityGroup`: explicit standard and grouped spacing contracts.
@@ -70,7 +72,11 @@ All privileged behavior remains host-owned. The components never auto-approve co
 
 ## Composer
 
-- `AgentComposer`: controlled autosizing input with automatic, single-line, and multiline layouts; submit/stop behavior; focus transfer; and protocol-neutral slots.
+- `AgentComposer`: controlled autosizing input with automatic, single-line, and multiline layouts; submit/stop behavior; focus transfer; and protocol-neutral slots. `allowSubmitWhileRunning` lets Enter route a follow-up to a host-owned queue while Stop remains the visible primary action.
+- `ComposerDock`: current-build composition that keeps context controls,
+  external queue state, and the input card in distinct ownership slots.
+- `ComposerContextBar` and `ComposerContextControl`: accessible project,
+  environment, branch, or host-defined context controls above the Composer.
 - `ComposerAttachment`: pill, card, and image layouts with ready, uploading, error, open, and remove states.
 - `ComposerMentionMenu`: grouped file, skill, app, agent, or custom mentions with loading, empty, disabled, active, and keyboard-selection states.
 - `ComposerModeIndicator`: Plan, Goal, Review, or host-defined footer mode with a clear affordance.

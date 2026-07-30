@@ -35,6 +35,7 @@ export type ComposerLayout = "auto" | "single-line" | "multiline";
 export interface AgentComposerProps
   extends Omit<FormHTMLAttributes<HTMLFormElement>, "children" | "onSubmit"> {
   actions?: ReactNode;
+  allowSubmitWhileRunning?: boolean;
   attachments?: ReactNode;
   controls?: ReactNode;
   disabled?: boolean;
@@ -62,6 +63,7 @@ export const AgentComposer = forwardRef<
 >(function AgentComposer(
   {
     actions,
+    allowSubmitWhileRunning = false,
     attachments,
     className,
     controls,
@@ -111,7 +113,10 @@ export const AgentComposer = forwardRef<
     onKeyDown,
     ...restTextareaProps
   } = textareaProps ?? {};
-  const canSubmit = !disabled && !isRunning && value.trim().length > 0;
+  const canSubmit =
+    !disabled &&
+    (!isRunning || allowSubmitWhileRunning) &&
+    value.trim().length > 0;
   const contentRequiresMultiline =
     hasAttachments || hasRenderedQueue || value.includes("\n");
   const resolvedLayout = contentRequiresMultiline

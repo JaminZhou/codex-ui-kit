@@ -173,10 +173,25 @@ The eleventh slice completes the first application-shell continuity contract:
 - exact 961/960 and 721/720 boundary gates, current-build narrow edge preview
   versus explicit pinning, and structural 1920×1080/2560×1440 checks;
 - a body-portalled global notification region;
-- Browser CDP coverage across 26 lifecycle frames and real Electron
+- Browser CDP coverage across the shared lifecycle matrix and real Electron
   offline → retry → ready plus 1180×820 → 720×680 → 1180×820 acceptance;
 - four deterministic pixel frames and an optional 120×46 current-build
   window-chrome comparison.
+
+## Twelfth vertical slice
+
+The twelfth slice adds current-build conversation and Composer lifecycle:
+
+- a real `26.721.81911` empty/focused/multiline Composer, submit/Stop,
+  completion, interruption, queue, pause, Resume, permissions, and Add files
+  menu observation;
+- public `ComposerDock`, context controls, host-owned queue submission while
+  Stop remains primary, and an exposed timeline viewport ref;
+- an 11-turn, 46-event protocol replay with message navigation,
+  return-to-latest, and a deterministic windowed-history placeholder;
+- ten reviewed lifecycle frames, shared 36-frame CDP acceptance, and a real
+  Electron submit → queue → Stop → Resume flow;
+- optional external 792×320 queued and paused Composer pixel comparisons.
 
 ## Development
 
@@ -260,6 +275,15 @@ The App shell gate uses only the 120×46 application-owned titlebar crop:
 
 ```bash
 CODEX_UI_KIT_WINDOW_CHROME_REFERENCE=/absolute/path/to/window-chrome.png \
+  pnpm --filter @codex-ui-kit/codex-app-playground check:visual
+```
+
+The current Composer gates accept the two untracked 792×320 crops captured
+from the same 1180×820 current-build Renderer:
+
+```bash
+CODEX_UI_KIT_COMPOSER_QUEUED_REFERENCE=/absolute/path/to/composer-queued.png \
+CODEX_UI_KIT_COMPOSER_PAUSED_REFERENCE=/absolute/path/to/composer-paused.png \
   pnpm --filter @codex-ui-kit/codex-app-playground check:visual
 ```
 

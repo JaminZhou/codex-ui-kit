@@ -12,18 +12,22 @@ exit gates; it does not replace the inventory.
 
 - The current installed package is Codex Desktop `26.721.81911` (`5973`).
 - The inventory contains 73 surface groups: 46 P0, 18 P1, and 9 P2.
-- 11 groups have current-build runtime evidence, 42 have previous-build-only
-  runtime evidence, and 20 have not been sampled.
-- The first three current-build vertical slices cover all six left-sidebar
+- 17 groups have current-build runtime evidence, 37 have previous-build-only
+  runtime evidence, and 19 have not been sampled.
+- The first four current-build vertical slices cover all six left-sidebar
   groups, a real MCP failed-Fetch → Search → successful-Fetch recovery, and
   App shell window/loading/selection continuity through CDP, Browser,
   Electron, and regional pixel gates. The shell slice locks the 960/720px
   transitions, narrow edge preview versus explicit pinning, and structural
   behavior at 1920×1080 and 2560×1440. The recovery replay continues into a
-  second command/approval/file/Review turn. Global notification runtime
-  evidence, light-theme shell evidence, and the remaining
-  conversation/Composer, Review, Terminal, and Markdown rows remain on their
-  recorded evidence levels until separately re-observed.
+  second command/approval/file/Review turn. The conversation slice adds real
+  empty/focused/multiline/submit/Stop/completed Composer evidence, real
+  queue/interrupt/Resume and permission/add-menu evidence, host-owned
+  long-thread replay, 36 CDP frames, Electron interaction, and current-build
+  queue-region pixel gates. Global notification runtime evidence, light-theme
+  shell evidence, exact current-build long-thread virtualization, and the
+  remaining Review, Terminal, Markdown, tool, and attachment variants remain
+  on their recorded evidence levels until separately re-observed.
 - Existing Browser and Electron results remain useful regression evidence, but
   they are `partial_legacy` until the affected surface is re-observed on the
   current build.
@@ -228,7 +232,12 @@ without confusing package readiness with full product reconstruction.
    gates are implemented; current-build evidence covers window chrome,
    loading, and in-session route restoration, while unsafely unreachable
    recovery/notification states remain explicitly synthetic.
-5. Continue through workstreams 3–7 in inventory priority order.
+5. **Conversation and Composer lifecycle**: real current-build Composer,
+   Stop, queue/pause/Resume, permissions/add-menu evidence; deterministic
+   long-thread navigation/windowing; Browser/CDP, Electron, and regional
+   current-build pixels.
+6. Continue the remaining workstream-2 turn/tool gaps, then workstreams 3–7
+   in inventory priority order.
 
 Each PR uses the same merge gate: current-head CI green, a fresh clean bot
 result after the latest push, zero unresolved review threads, squash merge,

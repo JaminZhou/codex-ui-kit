@@ -129,6 +129,35 @@ and terminates only the PID bearing the unique profile, verifies its children
 and loopback listener are gone, and removes only that exact profile and the
 external screenshot.
 
+### Current conversation and Composer capture
+
+The `26.721.81911` conversation probe used a second exact process with a unique
+`/private/tmp/codex-ui-kit-conversation-cdp.XXXXXX` profile and loopback port.
+It selected the 1180×820 `app://-/index.html` main Renderer by area and
+Composer landmarks. The user-authorized task used only synthetic prompts.
+
+The bounded sequence was:
+
+1. sample empty, focused, and three/four-line input geometry;
+2. submit one synthetic turn and record the send → 28px Stop → completed
+   transition, value clearing, and focus behavior;
+3. submit a second long synthetic turn, interrupt it, and record the stopped
+   input state;
+4. run again, submit one queued synthetic follow-up, record Steer/Delete/more,
+   Stop the active turn, and record the paused header and Resume;
+5. open the permission menu and record only its visible option labels and
+   outer bounds;
+6. open Add files and more, record the Goal/Plan/skill/plugin groups, and
+   dismiss it without selecting, uploading, or connecting anything;
+7. capture only the 792×320 bottom-main Composer crops used by the optional
+   regional pixel gates.
+
+The exact spawned PID was resolved from its unique profile argument. Cleanup
+terminated only that PID, verified its child/service process and loopback
+listener were gone, and deleted only the exact temporary profile. The main
+Codex process remained running. The untracked screenshots are external gate
+inputs, not repository assets.
+
 ## Required flow matrix
 
 ### 1. Application entry and navigation

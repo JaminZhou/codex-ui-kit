@@ -742,6 +742,267 @@ for (const scene of visualScenes) {
     if (contract.horizontalOverflow > 1) {
       throw new Error(`${scene.id}: horizontal overflow ${contract.horizontalOverflow}px.`);
     }
+    if (scene.scenario === "conversation-lifecycle") {
+      const conversation = await page.evaluate(() => {
+        const rect = (element) => {
+          if (!element) return null;
+          const value = element.getBoundingClientRect();
+          return {
+            bottom: value.bottom,
+            height: value.height,
+            left: value.left,
+            right: value.right,
+            top: value.top,
+            width: value.width,
+          };
+        };
+        const root = document.querySelector(".demo-root");
+        const dock = document.querySelector(".codex-ui-composer-dock");
+        const context = document.querySelector(".codex-ui-composer-context");
+        const surface = document.querySelector(
+          ".codex-ui-composer-dock__surface",
+        );
+        const composer = surface?.querySelector(".codex-ui-composer");
+        const textarea = composer?.querySelector("textarea");
+        const queue = document.querySelector(
+          ".codex-ui-composer-dock__queue",
+        );
+        const navigation = document.querySelector(
+          ".codex-ui-message-navigation-rail",
+        );
+        const floating = document.querySelector(
+          ".codex-ui-thread-floating-button",
+        );
+        if (
+          !root ||
+          !dock ||
+          !surface ||
+          !composer ||
+          !textarea ||
+          !navigation ||
+          !floating
+        ) {
+          throw new Error("Conversation lifecycle surfaces are missing.");
+        }
+        return {
+          attachmentCount: composer.querySelectorAll(
+            ".codex-ui-composer-attachment",
+          ).length,
+          composer: {
+            busy: composer.getAttribute("aria-busy"),
+            disabled: composer.hasAttribute("data-disabled"),
+            layout: composer.getAttribute("data-layout"),
+            rect: rect(composer),
+          },
+          context: context
+            ? {
+                controls: Array.from(
+                  context.querySelectorAll("button"),
+                  (button) => ({
+                    height: button.getBoundingClientRect().height,
+                    label: button.textContent?.replace(/\s+/g, " ").trim(),
+                  }),
+                ),
+                rect: rect(context),
+                role: context.getAttribute("role"),
+              }
+            : null,
+          dock: {
+            hasContext: dock.getAttribute("data-has-context"),
+            hasQueue: dock.getAttribute("data-has-queue"),
+            rect: rect(dock),
+          },
+          floating: {
+            hidden: floating.getAttribute("aria-hidden"),
+            show: floating.hasAttribute("data-show"),
+          },
+          messageCount: document.querySelectorAll(
+            ".codex-ui-agent-message",
+          ).length,
+          navigation: {
+            buttonCount: navigation.querySelectorAll("button").length,
+            label: navigation.getAttribute("aria-label"),
+          },
+          phase: root.getAttribute("data-composer-phase"),
+          placeholder: {
+            count: document.querySelectorAll(
+              ".codex-ui-thread-virtualized-placeholder",
+            ).length,
+            hiddenEntryCount:
+              document
+                .querySelector(".codex-ui-thread-virtualized-placeholder")
+                ?.getAttribute("data-hidden-entry-count") ?? null,
+          },
+          queue: queue
+            ? {
+                interrupted: Boolean(
+                  queue.querySelector(
+                    ".codex-ui-composer-queue[data-interrupted]",
+                  ),
+                ),
+                labels: Array.from(
+                  queue.querySelectorAll("button, summary"),
+                  (element) =>
+                    element.getAttribute("aria-label") ??
+                    element.textContent?.replace(/\s+/g, " ").trim(),
+                ),
+                rect: rect(queue),
+                rowCount: queue.querySelectorAll(
+                  ".codex-ui-composer-queue__row",
+                ).length,
+                statusText:
+                  queue
+                    .querySelector('[role="status"]')
+                    ?.textContent?.replace(/\s+/g, " ").trim() ?? null,
+              }
+            : null,
+          queueCount: root.getAttribute("data-queue-count"),
+          stopCount: composer.querySelectorAll(
+            'button[aria-label="Stop"]',
+          ).length,
+          surface: rect(surface),
+          textarea: {
+            disabled: textarea.disabled,
+            lineCount: textarea.value.split("\n").length,
+            rect: rect(textarea),
+            value: textarea.value,
+          },
+          threadFollowing: root.getAttribute("data-thread-following"),
+        };
+      });
+      contract.conversation = conversation;
+      const expectsContext = ![
+        "composer-running",
+        "composer-queued",
+        "composer-queue-paused",
+      ].includes(scene.id);
+      if (
+        (expectsContext
+          ? conversation.dock.hasContext !== "true" ||
+            conversation.context?.role !== "toolbar" ||
+            conversation.context.controls.length !== 3 ||
+            JSON.stringify(
+              conversation.context.controls.map(({ label }) => label),
+            ) !== JSON.stringify(["□codex-ui-kit", "◉Local", "⑂main"]) ||
+            conversation.context.controls.some(
+              ({ height }) => Math.abs(height - 28) > 1,
+            )
+          : conversation.dock.hasContext !== null ||
+            conversation.context !== null) ||
+        conversation.navigation.label !== "User messages" ||
+        conversation.navigation.buttonCount < 10 ||
+        !conversation.dock.rect ||
+        conversation.dock.rect.width < 700 ||
+        conversation.dock.rect.width > 740
+      ) {
+        throw new Error(
+          `${scene.id}: conversation shell contract failed: ${JSON.stringify(conversation)}`,
+        );
+      }
+      if (
+        scene.id === "composer-multiline" &&
+        (conversation.phase !== "multiline" ||
+          conversation.composer.layout !== "multiline" ||
+          conversation.textarea.lineCount !== 3 ||
+          conversation.textarea.rect.height < 60)
+      ) {
+        throw new Error(
+          `${scene.id}: multiline Composer contract failed: ${JSON.stringify(conversation)}`,
+        );
+      }
+      if (
+        (scene.id === "composer-running" ||
+          scene.id === "composer-queued") &&
+        (conversation.stopCount !== 1 ||
+          conversation.composer.disabled ||
+          !["running", "queued"].includes(conversation.phase))
+      ) {
+        throw new Error(
+          `${scene.id}: running Composer contract failed: ${JSON.stringify(conversation)}`,
+        );
+      }
+      if (
+        scene.id === "composer-queued" &&
+        (!conversation.queue ||
+          conversation.dock.hasQueue !== "true" ||
+          conversation.queue.rowCount !== 1 ||
+          conversation.queueCount !== "1" ||
+          !conversation.queue.labels.includes("Steer") ||
+          !conversation.queue.labels.includes("Delete queued prompt") ||
+          !conversation.queue.labels.includes("Queued prompt actions") ||
+          Math.abs(
+            conversation.queue.rect.left -
+              conversation.surface.left -
+              13,
+          ) > 1 ||
+          Math.abs(
+            conversation.surface.right -
+              conversation.queue.rect.right -
+              13,
+          ) > 1)
+      ) {
+        throw new Error(
+          `${scene.id}: queued Composer contract failed: ${JSON.stringify(conversation)}`,
+        );
+      }
+      if (
+        scene.id === "composer-queue-paused" &&
+        (!conversation.queue?.interrupted ||
+          conversation.phase !== "queue-paused" ||
+          conversation.stopCount !== 0 ||
+          !conversation.queue.labels.includes("Resume") ||
+          !conversation.queue.labels.includes("Steer") ||
+          !conversation.queue.statusText?.includes(
+            "Queue paused because you interrupted",
+          ))
+      ) {
+        throw new Error(
+          `${scene.id}: paused queue contract failed: ${JSON.stringify(conversation)}`,
+        );
+      }
+      if (
+        scene.id === "composer-disabled" &&
+        (!conversation.composer.disabled ||
+          conversation.composer.busy !== "true" ||
+          !conversation.textarea.disabled ||
+          conversation.phase !== "submitting")
+      ) {
+        throw new Error(
+          `${scene.id}: disabled Composer contract failed: ${JSON.stringify(conversation)}`,
+        );
+      }
+      if (
+        scene.id === "composer-attachment" &&
+        (conversation.attachmentCount !== 1 ||
+          conversation.phase !== "attachment" ||
+          conversation.composer.layout !== "multiline")
+      ) {
+        throw new Error(
+          `${scene.id}: attachment Composer contract failed: ${JSON.stringify(conversation)}`,
+        );
+      }
+      if (
+        scene.id === "thread-scroll-away" &&
+        (conversation.threadFollowing !== "false" ||
+          !conversation.floating.show ||
+          conversation.floating.hidden !== "false")
+      ) {
+        throw new Error(
+          `${scene.id}: scroll-away recovery contract failed: ${JSON.stringify(conversation)}`,
+        );
+      }
+      if (
+        scene.id === "thread-windowed" &&
+        (conversation.placeholder.count !== 1 ||
+          Number(conversation.placeholder.hiddenEntryCount) <= 0 ||
+          conversation.messageCount >=
+            conversation.navigation.buttonCount * 2)
+      ) {
+        throw new Error(
+          `${scene.id}: virtualized window contract failed: ${JSON.stringify(conversation)}`,
+        );
+      }
+    }
     if (
       contract.header.bottom > contract.viewport.bottom ||
       contract.composer.top < contract.header.bottom ||
@@ -1010,21 +1271,23 @@ for (const scene of visualScenes) {
       }
     }
 
-    const expectedFocus = scene.surfaces?.includes("reviewPanel")
-      ? contract.review.firstDiffLabel
-      : "Message composer";
-    if (!expectedFocus) {
-      throw new Error(`${scene.id}: expected focus target is missing.`);
-    }
-    const focusTarget = scene.surfaces?.includes("reviewPanel")
-      ? page.getByRole("list", { name: expectedFocus })
-      : page.getByRole("textbox", { name: expectedFocus });
-    await focusTarget.click();
-    const focusContract = await page.evaluate(
-      () => document.activeElement?.getAttribute("aria-label"),
-    );
-    if (focusContract !== expectedFocus) {
-      throw new Error(`${scene.id}: named focus contract failed.`);
+    if (scene.id !== "composer-disabled") {
+      const expectedFocus = scene.surfaces?.includes("reviewPanel")
+        ? contract.review.firstDiffLabel
+        : "Message composer";
+      if (!expectedFocus) {
+        throw new Error(`${scene.id}: expected focus target is missing.`);
+      }
+      const focusTarget = scene.surfaces?.includes("reviewPanel")
+        ? page.getByRole("list", { name: expectedFocus })
+        : page.getByRole("textbox", { name: expectedFocus });
+      await focusTarget.click();
+      const focusContract = await page.evaluate(
+        () => document.activeElement?.getAttribute("aria-label"),
+      );
+      if (focusContract !== expectedFocus) {
+        throw new Error(`${scene.id}: named focus contract failed.`);
+      }
     }
 
     if (scene.selectPath) {
@@ -1704,6 +1967,108 @@ try {
   );
 } finally {
   await responsiveContinuityApp.close();
+}
+
+const conversationLifecycleScene = {
+  frame: "conversation-thread-ready",
+  id: "conversation-lifecycle-interaction",
+  scenario: "conversation-lifecycle",
+};
+const {
+  app: conversationLifecycleApp,
+  page: conversationLifecyclePage,
+} = await launchScene(conversationLifecycleScene, { capture: false });
+try {
+  const composer = conversationLifecyclePage.getByRole("textbox", {
+    name: "Message composer",
+  });
+  await composer.fill("Start the deterministic lifecycle.");
+  await composer.press("Enter");
+  await conversationLifecyclePage.waitForSelector(
+    '.demo-root[data-composer-phase="running"]',
+  );
+
+  await composer.fill("Queue this follow-up while the turn is running.");
+  await composer.press("Enter");
+  await conversationLifecyclePage.waitForSelector(
+    '.demo-root[data-composer-phase="queued"][data-queue-count="1"]',
+  );
+  await conversationLifecyclePage
+    .getByRole("button", { exact: true, name: "Stop" })
+    .click();
+  await conversationLifecyclePage.waitForSelector(
+    '.demo-root[data-composer-phase="queue-paused"]',
+  );
+  await conversationLifecyclePage.getByRole("button", { name: "Resume" }).click();
+  await conversationLifecyclePage.waitForSelector(
+    '.demo-root[data-composer-phase="queued"][data-status="running"]',
+  );
+  await conversationLifecyclePage
+    .getByRole("button", { name: "Delete queued prompt" })
+    .click();
+  await conversationLifecyclePage.waitForSelector(
+    '.demo-root[data-composer-phase="running"][data-queue-count="0"]',
+  );
+
+  await conversationLifecyclePage
+    .getByRole("button", {
+      exact: true,
+      name: "Jump to user message 1",
+    })
+    .click();
+  await conversationLifecyclePage.waitForSelector(
+    '.demo-root[data-thread-following="false"] .codex-ui-thread-floating-button[data-show]',
+  );
+  await conversationLifecyclePage
+    .getByRole("button", { name: "Scroll to bottom" })
+    .click();
+  await conversationLifecyclePage.waitForSelector(
+    '.demo-root[data-thread-following="true"]',
+  );
+  await conversationLifecyclePage
+    .getByRole("button", {
+      exact: true,
+      name: "Jump to user message 1",
+    })
+    .click();
+  await conversationLifecyclePage.waitForSelector(
+    '.demo-root[data-thread-following="false"]',
+  );
+
+  const interaction = await conversationLifecyclePage.evaluate(() => {
+    const root = document.querySelector(".demo-root");
+    const queue = document.querySelector(".codex-ui-composer-queue");
+    return {
+      composerPhase: root?.getAttribute("data-composer-phase"),
+      navigationCount: document.querySelectorAll(
+        ".codex-ui-message-navigation-rail button",
+      ).length,
+      queueCount: root?.getAttribute("data-queue-count"),
+      queueRendered: Boolean(queue),
+      stopCount: document.querySelectorAll(
+        '.codex-ui-composer button[aria-label="Stop"]',
+      ).length,
+      threadFollowing: root?.getAttribute("data-thread-following"),
+    };
+  });
+  if (
+    interaction.composerPhase !== "running" ||
+    interaction.navigationCount !== 11 ||
+    interaction.queueCount !== "0" ||
+    interaction.queueRendered ||
+    interaction.stopCount !== 1 ||
+    interaction.threadFollowing !== "false"
+  ) {
+    throw new Error(
+      `Conversation lifecycle interaction failed: ${JSON.stringify(interaction)}`,
+    );
+  }
+  await writeFile(
+    join(artifactDirectory, "conversation-lifecycle-interaction.json"),
+    `${JSON.stringify(interaction, null, 2)}\n`,
+  );
+} finally {
+  await conversationLifecycleApp.close();
 }
 
 console.log(`CDP contracts passed for ${visualScenes.length} lifecycle frames.`);

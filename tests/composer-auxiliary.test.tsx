@@ -4,6 +4,9 @@ import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import {
   ComposerAttachment,
+  ComposerContextBar,
+  ComposerContextControl,
+  ComposerDock,
   ComposerMentionMenu,
   ComposerModeIndicator,
   QueuedPromptList,
@@ -12,6 +15,47 @@ import {
 afterEach(cleanup);
 
 describe("composer auxiliary surfaces", () => {
+  it("composes context, queue, and the input surface without merging ownership", () => {
+    const onContext = vi.fn();
+    const { container, rerender } = render(
+      <ComposerDock
+        composer={<div>Input surface</div>}
+        context={
+          <ComposerContextBar>
+            <ComposerContextControl icon="□" onClick={onContext}>
+              Local
+            </ComposerContextControl>
+            <ComposerContextControl aria-label="No project" compact icon="⌁" />
+          </ComposerContextBar>
+        }
+        queue={<QueuedPromptList items={[{ id: "one", text: "Run checks" }]} />}
+      />,
+    );
+
+    const dock = screen.getByRole("group", { name: "Composer dock" });
+    expect(dock.getAttribute("data-has-context")).toBe("true");
+    expect(dock.getAttribute("data-has-queue")).toBe("true");
+    expect(screen.getByRole("toolbar", { name: "Composer context" })).not.toBeNull();
+    expect(screen.getByRole("list", { name: "Queued prompts" })).not.toBeNull();
+    fireEvent.click(screen.getByRole("button", { name: "Local" }));
+    expect(onContext).toHaveBeenCalledTimes(1);
+    expect(
+      container.querySelector(
+        ".codex-ui-composer-context__control[data-compact]",
+      ),
+    ).not.toBeNull();
+
+    rerender(
+      <ComposerDock
+        composer={<div>Input surface</div>}
+        context={<></>}
+        queue={false}
+      />,
+    );
+    expect(dock.hasAttribute("data-has-context")).toBe(false);
+    expect(dock.hasAttribute("data-has-queue")).toBe(false);
+  });
+
   it("models attachment layouts, upload states, opening, and removal", () => {
     const onOpen = vi.fn();
     const onRemove = vi.fn();
