@@ -94,16 +94,19 @@ describe("AppRouteOutlet", () => {
     expect(onRetry).toHaveBeenCalledOnce();
   });
 
-  it("marks loading and reconnecting routes busy", () => {
+  it("keeps live route status outside reconnecting busy content", () => {
     const { rerender } = render(<AppRouteOutlet status="loading" />);
-    const loading = document.querySelector(".codex-ui-app-route-outlet");
-    expect(loading?.getAttribute("aria-busy")).toBe("true");
+    const loading = screen.getByRole("status");
+    expect(loading.textContent).toContain("Loading");
+    expect(loading.closest("[aria-busy]")).toBeNull();
 
     rerender(
       <AppRouteOutlet status="reconnecting">Cached route</AppRouteOutlet>,
     );
-    expect(loading?.getAttribute("aria-busy")).toBe("true");
-    expect(screen.getByText("Cached route")).toBeTruthy();
+    const reconnecting = screen.getByRole("status");
+    const cachedRoute = screen.getByText("Cached route");
+    expect(reconnecting.closest("[aria-busy]")).toBeNull();
+    expect(cachedRoute.getAttribute("aria-busy")).toBe("true");
   });
 });
 

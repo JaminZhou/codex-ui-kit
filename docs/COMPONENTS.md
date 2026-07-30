@@ -102,7 +102,8 @@ All privileged behavior remains host-owned. The components never auto-approve co
 - `AppRouteOutlet`: ready, loading, empty, error, offline, reconnecting, and
   stale-data presentation. Stale and reconnecting variants can preserve
   host-owned content while alert/live-region and busy semantics remain
-  explicit.
+  explicit; reconnecting marks only the refreshed content busy so the sibling
+  live status remains announceable.
 - `AppNotificationRegion`: body-portalled top- or bottom-end application
   feedback with neutral, success, warning, and error tones, optional action,
   dismissal, alert/status semantics, and explicit or trigger-inferred theme
@@ -136,7 +137,9 @@ All privileged behavior remains host-owned. The components never auto-approve co
   `responsivePanelContinuity` can auto-collapse side surfaces at the measured
   960/720px layout transitions and restore only surfaces that it closed;
   disabling continuity or changing `responsivePanelContinuityKey` resets that
-  restoration intent for a new route or workspace.
+  restoration intent for a new route or workspace. Controlled-host callbacks
+  must acknowledge the requested state before the surface becomes eligible
+  for later restoration.
   `narrowSidebarBehavior="current-build"` separates
   a transient 12px edge preview from explicitly pinning the normal sidebar
   track, and restores focus before that preview becomes inert.

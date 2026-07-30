@@ -120,9 +120,6 @@ export function AppRouteOutlet({
 
   return (
     <section
-      aria-busy={
-        status === "loading" || status === "reconnecting" || undefined
-      }
       className={classes}
       data-preserves-content={preservesContent || undefined}
       data-status={status}
@@ -157,7 +154,12 @@ export function AppRouteOutlet({
         ) : null}
       </div>
       {preservesContent ? (
-        <div className="codex-ui-app-route-outlet__content">{children}</div>
+        <div
+          aria-busy={status === "reconnecting" || undefined}
+          className="codex-ui-app-route-outlet__content"
+        >
+          {children}
+        </div>
       ) : null}
     </section>
   );

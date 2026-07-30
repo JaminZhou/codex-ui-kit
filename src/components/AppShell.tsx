@@ -480,6 +480,25 @@ function clampShellTrack(value: number, minimum: number, maximum: number) {
   return Math.min(maximum, Math.max(minimum, value));
 }
 
+function stageResponsiveOpenExpectation(
+  expectedRef: { current: boolean | null },
+  requestTokenRef: { current: symbol | null },
+  autoCollapsedRef: { current: boolean },
+  expectedOpen: boolean,
+) {
+  const requestToken = Symbol("responsive-open-expectation");
+  expectedRef.current = expectedOpen;
+  requestTokenRef.current = requestToken;
+  void Promise.resolve().then(() => {
+    if (requestTokenRef.current !== requestToken) return;
+    requestTokenRef.current = null;
+    if (expectedRef.current === expectedOpen) {
+      expectedRef.current = null;
+    }
+    autoCollapsedRef.current = false;
+  });
+}
+
 interface SidebarResizeSession {
   direction: 1 | -1;
   lastWidth: number;
@@ -617,6 +636,8 @@ export function AppShell({
   const sidePanelAutoCollapsedRef = useRef(false);
   const expectedResponsiveSidebarOpenRef = useRef<boolean | null>(null);
   const expectedResponsiveSidePanelOpenRef = useRef<boolean | null>(null);
+  const responsiveSidebarRequestTokenRef = useRef<symbol | null>(null);
+  const responsiveSidePanelRequestTokenRef = useRef<symbol | null>(null);
   const shellWidth = automaticLayout.width;
   const normalizedBottomPanelMinHeight = Math.max(
     0,
@@ -847,12 +868,16 @@ export function AppShell({
       sidePanelAutoCollapsedRef.current = false;
       expectedResponsiveSidebarOpenRef.current = null;
       expectedResponsiveSidePanelOpenRef.current = null;
+      responsiveSidebarRequestTokenRef.current = null;
+      responsiveSidePanelRequestTokenRef.current = null;
     }
     if (!responsivePanelContinuity) {
       sidebarAutoCollapsedRef.current = false;
       sidePanelAutoCollapsedRef.current = false;
       expectedResponsiveSidebarOpenRef.current = null;
       expectedResponsiveSidePanelOpenRef.current = null;
+      responsiveSidebarRequestTokenRef.current = null;
+      responsiveSidePanelRequestTokenRef.current = null;
     }
 
     const previousMode = previousLayoutModeRef.current;
@@ -866,8 +891,12 @@ export function AppShell({
     const leftNarrow =
       previousMode === "narrow" && layoutMode !== "narrow";
     if (enteredNarrow && sidebarOpen && onSidebarOpenChange) {
-      sidebarAutoCollapsedRef.current = true;
-      expectedResponsiveSidebarOpenRef.current = false;
+      stageResponsiveOpenExpectation(
+        expectedResponsiveSidebarOpenRef,
+        responsiveSidebarRequestTokenRef,
+        sidebarAutoCollapsedRef,
+        false,
+      );
       onSidebarOpenChange(false);
     } else if (
       leftNarrow &&
@@ -875,12 +904,17 @@ export function AppShell({
       !sidebarOpen &&
       onSidebarOpenChange
     ) {
-      sidebarAutoCollapsedRef.current = false;
-      expectedResponsiveSidebarOpenRef.current = true;
+      stageResponsiveOpenExpectation(
+        expectedResponsiveSidebarOpenRef,
+        responsiveSidebarRequestTokenRef,
+        sidebarAutoCollapsedRef,
+        true,
+      );
       onSidebarOpenChange(true);
     } else if (leftNarrow) {
       sidebarAutoCollapsedRef.current = false;
       expectedResponsiveSidebarOpenRef.current = null;
+      responsiveSidebarRequestTokenRef.current = null;
     }
 
     const enteredConstrained =
@@ -888,8 +922,12 @@ export function AppShell({
     const leftConstrained =
       previousMode !== "wide" && layoutMode === "wide";
     if (enteredConstrained && sidePanelOpen && onSidePanelOpenChange) {
-      sidePanelAutoCollapsedRef.current = true;
-      expectedResponsiveSidePanelOpenRef.current = false;
+      stageResponsiveOpenExpectation(
+        expectedResponsiveSidePanelOpenRef,
+        responsiveSidePanelRequestTokenRef,
+        sidePanelAutoCollapsedRef,
+        false,
+      );
       onSidePanelOpenChange(false);
     } else if (
       leftConstrained &&
@@ -897,12 +935,17 @@ export function AppShell({
       !sidePanelOpen &&
       onSidePanelOpenChange
     ) {
-      sidePanelAutoCollapsedRef.current = false;
-      expectedResponsiveSidePanelOpenRef.current = true;
+      stageResponsiveOpenExpectation(
+        expectedResponsiveSidePanelOpenRef,
+        responsiveSidePanelRequestTokenRef,
+        sidePanelAutoCollapsedRef,
+        true,
+      );
       onSidePanelOpenChange(true);
     } else if (leftConstrained) {
       sidePanelAutoCollapsedRef.current = false;
       expectedResponsiveSidePanelOpenRef.current = null;
+      responsiveSidePanelRequestTokenRef.current = null;
     }
   }, [
     layoutMode,
@@ -920,7 +963,9 @@ export function AppShell({
       expectedSidebarOpen !== null &&
       sidebarOpen === expectedSidebarOpen
     ) {
+      responsiveSidebarRequestTokenRef.current = null;
       expectedResponsiveSidebarOpenRef.current = null;
+      sidebarAutoCollapsedRef.current = !expectedSidebarOpen;
     } else if (
       expectedSidebarOpen === null &&
       sidebarAutoCollapsedRef.current &&
@@ -936,7 +981,9 @@ export function AppShell({
       expectedSidePanelOpen !== null &&
       sidePanelOpen === expectedSidePanelOpen
     ) {
+      responsiveSidePanelRequestTokenRef.current = null;
       expectedResponsiveSidePanelOpenRef.current = null;
+      sidePanelAutoCollapsedRef.current = !expectedSidePanelOpen;
     } else if (
       expectedSidePanelOpen === null &&
       sidePanelAutoCollapsedRef.current &&

@@ -199,7 +199,7 @@ try {
   }
   await shellPage.getByRole("button", { name: "Try again" }).click();
   await shellPage.waitForSelector(
-    '.demo-root[data-shell-state="loading"] .codex-ui-app-route-outlet[aria-busy="true"]',
+    '.demo-root[data-shell-state="loading"] .codex-ui-app-route-outlet[data-status="loading"]:not([aria-busy]) > .codex-ui-app-route-outlet__state[role="status"]',
   );
   await shellPage.waitForFunction(
     () =>

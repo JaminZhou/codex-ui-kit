@@ -68,6 +68,10 @@ for (const scene of visualScenes) {
             : null,
           outlet: {
             busy: outlet.getAttribute("aria-busy"),
+            contentBusy:
+              outlet
+                .querySelector(".codex-ui-app-route-outlet__content")
+                ?.getAttribute("aria-busy") ?? null,
             preserved: outlet.hasAttribute("data-preserves-content"),
             rect: rect(outlet),
             role: liveState?.getAttribute("role") ?? null,
@@ -113,8 +117,11 @@ for (const scene of visualScenes) {
         );
       }
       if (
-        (scene.shellState === "loading" &&
-          contract.outlet.busy !== "true") ||
+        contract.outlet.busy !== null ||
+        (scene.shellState === "reconnecting" &&
+          contract.outlet.contentBusy !== "true") ||
+        (scene.shellState !== "reconnecting" &&
+          contract.outlet.contentBusy !== null) ||
         ((scene.shellState === "stale") !== contract.outlet.preserved) ||
         ((scene.id === "shell-restored") !== Boolean(contract.notification))
       ) {

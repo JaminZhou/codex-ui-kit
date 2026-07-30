@@ -385,6 +385,82 @@ describe("application shell", () => {
     expect(sidePanel.getAttribute("aria-hidden")).toBe("true");
   });
 
+  it("does not restore auto-collapse requests ignored by a controlled host", async () => {
+    let resize: ((width: number) => void) | undefined;
+    class ResizeObserverMock {
+      constructor(
+        private readonly callback: ResizeObserverCallback,
+      ) {}
+
+      disconnect() {}
+
+      observe(target: Element) {
+        if (!target.classList.contains("codex-ui-app-shell")) return;
+        resize = (width) =>
+          this.callback(
+            [
+              {
+                contentRect: { height: 900, width },
+                target,
+              } as ResizeObserverEntry,
+            ],
+            this as unknown as ResizeObserver,
+          );
+      }
+
+      unobserve() {}
+    }
+    vi.stubGlobal("ResizeObserver", ResizeObserverMock);
+    const onSidebarOpenChange = vi.fn();
+    const onSidePanelOpenChange = vi.fn();
+
+    function IgnoredRequestFixture() {
+      const [sidePanelOpen, setSidePanelOpen] = useState(true);
+      const [sidebarOpen, setSidebarOpen] = useState(true);
+      return (
+        <>
+          <button
+            onClick={() => {
+              setSidebarOpen(false);
+              setSidePanelOpen(false);
+            }}
+            type="button"
+          >
+            Host closes panels
+          </button>
+          <AppShell
+            onSidePanelOpenChange={onSidePanelOpenChange}
+            onSidebarOpenChange={onSidebarOpenChange}
+            responsivePanelContinuity
+            sidePanel={<button type="button">Review files</button>}
+            sidePanelOpen={sidePanelOpen}
+            sidebar={<button type="button">Projects</button>}
+            sidebarOpen={sidebarOpen}
+          >
+            Conversation
+          </AppShell>
+        </>
+      );
+    }
+
+    render(<IgnoredRequestFixture />);
+    act(() => resize?.(1_180));
+    act(() => resize?.(720));
+    expect(onSidebarOpenChange.mock.calls).toEqual([[false]]);
+    expect(onSidePanelOpenChange.mock.calls).toEqual([[false]]);
+
+    await act(async () => {
+      await Promise.resolve();
+    });
+    fireEvent.click(
+      screen.getByRole("button", { name: "Host closes panels" }),
+    );
+    act(() => resize?.(961));
+
+    expect(onSidebarOpenChange.mock.calls).toEqual([[false]]);
+    expect(onSidePanelOpenChange.mock.calls).toEqual([[false]]);
+  });
+
   it("clamps a non-resizable side panel before it consumes the main track", () => {
     let resize: ((width: number) => void) | undefined;
     class ResizeObserverMock {
