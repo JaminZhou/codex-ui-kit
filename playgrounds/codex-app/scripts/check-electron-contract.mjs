@@ -1716,15 +1716,48 @@ try {
       document.activeElement?.getAttribute("aria-label") ===
       "Search branches",
   );
+  const appServerWorktreeLabels = await worktreeMenu
+    .getByRole("menuitemradio")
+    .allTextContents();
   if (
-    (await worktreeMenu.getByRole("menuitemradio").allTextContents()).some(
-      (label) => label.includes("Repairing"),
+    appServerWorktreeLabels.some(
+      (label) =>
+        label.includes("Repairing") ||
+        label.includes("feat/coding-workspace-lifecycle"),
     )
   ) {
     throw new Error(
-      "Electron coding workspace exposed a repairing worktree as selectable.",
+      `Electron coding workspace exposed another project's worktree: ${JSON.stringify(appServerWorktreeLabels)}.`,
     );
   }
+  await worktreeMenu
+    .getByRole("menuitem", {
+      name: "Create and checkout new branch…",
+    })
+    .click();
+  await codingWorkspacePage.waitForFunction(
+    () =>
+      document.activeElement?.getAttribute("aria-label") ===
+      "Search local environments",
+  );
+  await localEnvironmentSearch.press("Escape");
+  await localEnvironmentDialog.waitFor({ state: "hidden" });
+  await codingWorkspacePage.waitForTimeout(50);
+  if (
+    (await codingWorkspacePage.evaluate(
+      () => document.activeElement?.getAttribute("aria-label"),
+    )) !== "Change worktree: main"
+  ) {
+    throw new Error(
+      "Electron coding workspace did not restore focus to the worktree launcher.",
+    );
+  }
+  await codingWorkspacePage
+    .getByRole("button", {
+      name: "Change worktree: main",
+    })
+    .click();
+  await codingWorkspacePage.waitForTimeout(50);
   await branchSearch.fill("main");
   await worktreeMenu
     .getByRole("menuitemradio", {

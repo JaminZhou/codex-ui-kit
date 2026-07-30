@@ -493,6 +493,16 @@ const workspaceEnvironmentGroups = [
   },
 ];
 
+const workspaceWorktreesByProject: Record<
+  string,
+  (typeof workspaceEnvironmentGroups)[number]["items"]
+> = {
+  "app-server-client": [workspaceEnvironmentGroups[0].items[0]],
+  "codex-ui-kit": workspaceEnvironmentGroups[0].items,
+  "desktop-shell": [workspaceEnvironmentGroups[0].items[0]],
+  tooling: [workspaceEnvironmentGroups[0].items[0]],
+};
+
 export function App() {
   const initialSelection = useMemo(querySelection, []);
   const [scenarioId, setScenarioId] = useState<ReplayScenarioId>(
@@ -626,6 +636,9 @@ export function App() {
   const liveStartPendingRef = useRef(false);
   const workspaceEnvironmentTriggerRef =
     useRef<HTMLButtonElement>(null);
+  const workspaceWorktreeTriggerRef = useRef<HTMLButtonElement>(null);
+  const [workspaceEnvironmentLauncher, setWorkspaceEnvironmentLauncher] =
+    useState<"environment" | "worktree">("environment");
   const queuedPromptCounterRef = useRef(1);
   const replaySubmitTimerRef = useRef<number | null>(null);
   const pendingMessageNavigationRef = useRef<{
@@ -1452,10 +1465,14 @@ export function App() {
       : (workspaceProjects.find(
           ({ id }) => id === workspaceProjectId,
         ) ?? workspaceProjects[0]);
+  const workspaceWorktrees =
+    (workspaceProjectId
+      ? workspaceWorktreesByProject[workspaceProjectId]
+      : undefined) ?? [workspaceEnvironmentGroups[0].items[0]];
   const workspaceWorktree =
-    workspaceEnvironmentGroups[0].items.find(
+    workspaceWorktrees.find(
       ({ id }) => id === workspaceWorktreeId,
-    ) ?? workspaceEnvironmentGroups[0].items[0];
+    ) ?? workspaceWorktrees[0];
   const currentWorkspaceCwd = workspaceExecutionCwd({
     environmentId: workspaceEnvironmentId,
     projectPath: workspaceProject?.path,
@@ -1468,7 +1485,7 @@ export function App() {
       .includes(workspaceProjectQuery.trim().toLocaleLowerCase()),
   );
   const filteredWorkspaceWorktrees =
-    workspaceEnvironmentGroups[0].items.filter(
+    workspaceWorktrees.filter(
       ({ branch, label, status }) =>
         status !== "repairing" &&
         `${branch} ${label}`
@@ -1495,7 +1512,10 @@ export function App() {
             : "workspace-ready",
     );
   };
-  const openWorkspaceLocalEnvironment = () => {
+  const openWorkspaceLocalEnvironment = (
+    launcher: "environment" | "worktree",
+  ) => {
+    setWorkspaceEnvironmentLauncher(launcher);
     setWorkspaceOverlay(null);
     setWorkspaceEnvironmentQuery("");
     setWorkspaceLocalEnvironmentOpen(true);
@@ -1603,7 +1623,7 @@ export function App() {
                     workspaceEnvironmentId === "worktree" ? "✓" : undefined
                   }
                   onSelect={() => {
-                    openWorkspaceLocalEnvironment();
+                    openWorkspaceLocalEnvironment("environment");
                   }}
                   role="menuitemradio"
                   startIcon="↗"
@@ -1632,6 +1652,9 @@ export function App() {
             );
           }
           if (item.id === "worktree") {
+            const worktreeTrigger = cloneElement(trigger, {
+              ref: workspaceWorktreeTriggerRef,
+            });
             return (
               <Menu
                 align="start"
@@ -1644,7 +1667,7 @@ export function App() {
                 open={workspaceOverlay === "worktree"}
                 side="top"
                 sideOffset={1}
-                trigger={trigger}
+                trigger={worktreeTrigger}
                 width="auto"
               >
                 <input
@@ -1677,7 +1700,9 @@ export function App() {
                 />
                 <MenuSeparator />
                 <MenuItem
-                  onSelect={openWorkspaceLocalEnvironment}
+                  onSelect={() =>
+                    openWorkspaceLocalEnvironment("worktree")
+                  }
                   startIcon="＋"
                 >
                   Create and checkout new branch…
@@ -1858,7 +1883,11 @@ export function App() {
         }}
         open={workspaceLocalEnvironmentOpen}
         query={workspaceEnvironmentQuery}
-        returnFocusRef={workspaceEnvironmentTriggerRef}
+        returnFocusRef={
+          workspaceEnvironmentLauncher === "worktree"
+            ? workspaceWorktreeTriggerRef
+            : workspaceEnvironmentTriggerRef
+        }
         title="Select local environment"
       />
     </div>
