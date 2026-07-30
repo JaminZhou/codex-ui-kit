@@ -66,11 +66,11 @@ because its expanded 13px navigation/history text density produced a measured
 0%. This prevents sidebar raster variance from loosening the conversation
 gate, while CDP locks the row contract and the ownership-scoped current-build
 sidebar comparison retains its separate hard regional thresholds. The
-large-Review frame uses a scoped 0.40% full-frame limit because
+large-Review frame uses a scoped 0.40% main-region limit because
 its 96 dense monospace
 lines amplify macOS text-rasterization differences; CDP and Electron still
 gate file counts, overflow, split geometry, and exact last-file visibility
-independently. The fourteenth PR frame uses a scoped 1% internal limit because
+independently. The fourteenth PR frame uses a scoped 1% main-region limit because
 its dense full-page text produces a measured 0.8161% macOS-runner
 rasterization delta; CDP and Electron still lock the split, tabs, actions,
 resizing, and expansion independently. Its optional current-build gate allows
@@ -79,13 +79,13 @@ at most 6.5% full-main, 5.5% index, and 7% detail difference at the stricter
 0.25%-main/3%-sidebar regional limits; its optional current-build gate allows
 at most 2% panel and 1% content difference at the same 0.05 threshold. The
 sixteenth completed-Markdown
-frame uses a scoped 1% internal limit for dense text rasterization and hides
+frame uses a scoped 1% main-region limit for dense text rasterization and hides
 only the capture-time scrollbar so overlay and space-consuming macOS scrollbar
 settings cannot shift the centered content by 7.5px. CDP still checks the real
 scroll container and geometry. Its optional current-build gate allows at most
 2% assistant, 2% fenced-code, and 2.5% Composer-region difference at the same
-threshold. The seventeenth running-MCP frame uses a scoped 1% internal limit.
-The denser eighteenth completed-MCP frame uses a scoped 2% internal limit to
+threshold. The seventeenth running-MCP frame uses a scoped 1% main-region limit.
+The denser eighteenth completed-MCP frame uses a scoped 2% main-region limit to
 cover the measured 1.5924% macOS-runner text-rasterization delta. It replays
 the observed 72px expanded-follow scroll state, while CDP independently
 verifies that exact scroll position, 14px/21px group typography, 25px call

@@ -16,7 +16,10 @@ describe("lifecycle visual policy", () => {
     );
     expect(contract).toContain("const internalSidebarWidth = 274");
     expect(contract).toContain(
-      "mainComparison.ratio > defaultLifecycleMainPixelRatio",
+      "scene.maxPixelRatio ?? defaultLifecycleMainPixelRatio",
+    );
+    expect(contract).toContain(
+      "mainComparison.ratio > maximumMainPixelRatio",
     );
     expect(contract).toContain(
       "sidebarComparison.ratio > defaultLifecycleSidebarPixelRatio",

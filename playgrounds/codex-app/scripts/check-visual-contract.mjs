@@ -206,56 +206,49 @@ for (const scene of visualScenes) {
       threshold: 0.12,
     },
   );
-  const ratio = pixels / (actual.width * actual.height);
   if (pixels > 0) await writeFile(diffPath, PNG.sync.write(diff));
-  if (scene.maxPixelRatio !== undefined) {
-    if (ratio > scene.maxPixelRatio) {
-      throw new Error(
-        `${scene.id}: pixel drift ${(ratio * 100).toFixed(4)}% exceeds ${(scene.maxPixelRatio * 100).toFixed(2)}%.`,
-      );
-    }
-  } else {
-    if (actual.width <= internalSidebarWidth) {
-      throw new Error(
-        `${scene.id}: frame width ${actual.width}px cannot be split at the ${internalSidebarWidth}px sidebar boundary.`,
-      );
-    }
-    const mainComparison = comparePng(
-      cropPng(
-        baseline,
-        internalSidebarWidth,
-        0,
-        baseline.width - internalSidebarWidth,
-        baseline.height,
-      ),
-      cropPng(
-        actual,
-        internalSidebarWidth,
-        0,
-        actual.width - internalSidebarWidth,
-        actual.height,
-      ),
-      0.12,
+  if (actual.width <= internalSidebarWidth) {
+    throw new Error(
+      `${scene.id}: frame width ${actual.width}px cannot be split at the ${internalSidebarWidth}px sidebar boundary.`,
     );
-    const sidebarComparison = comparePng(
-      cropPng(baseline, 0, 0, internalSidebarWidth, baseline.height),
-      cropPng(actual, 0, 0, internalSidebarWidth, actual.height),
-      0.12,
+  }
+  const mainComparison = comparePng(
+    cropPng(
+      baseline,
+      internalSidebarWidth,
+      0,
+      baseline.width - internalSidebarWidth,
+      baseline.height,
+    ),
+    cropPng(
+      actual,
+      internalSidebarWidth,
+      0,
+      actual.width - internalSidebarWidth,
+      actual.height,
+    ),
+    0.12,
+  );
+  const sidebarComparison = comparePng(
+    cropPng(baseline, 0, 0, internalSidebarWidth, baseline.height),
+    cropPng(actual, 0, 0, internalSidebarWidth, actual.height),
+    0.12,
+  );
+  const maximumMainPixelRatio =
+    scene.maxPixelRatio ?? defaultLifecycleMainPixelRatio;
+  if (
+    mainComparison.ratio > maximumMainPixelRatio ||
+    sidebarComparison.ratio > defaultLifecycleSidebarPixelRatio
+  ) {
+    throw new Error(
+      `${scene.id}: regional pixel drift ${JSON.stringify({
+        main: mainComparison.ratio,
+        sidebar: sidebarComparison.ratio,
+      })} exceeds ${JSON.stringify({
+        main: maximumMainPixelRatio,
+        sidebar: defaultLifecycleSidebarPixelRatio,
+      })}.`,
     );
-    if (
-      mainComparison.ratio > defaultLifecycleMainPixelRatio ||
-      sidebarComparison.ratio > defaultLifecycleSidebarPixelRatio
-    ) {
-      throw new Error(
-        `${scene.id}: regional pixel drift ${JSON.stringify({
-          main: mainComparison.ratio,
-          sidebar: sidebarComparison.ratio,
-        })} exceeds ${JSON.stringify({
-          main: defaultLifecycleMainPixelRatio,
-          sidebar: defaultLifecycleSidebarPixelRatio,
-        })}.`,
-      );
-    }
   }
 
   if (scene.id === "streaming" && currentBuildSidebarReference) {
