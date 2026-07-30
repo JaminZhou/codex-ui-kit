@@ -23,7 +23,8 @@ Every deterministic scenario has one ID and produces four evidence layers:
    interaction state, including leaving the disabled fixture frame. Scenario
    selection also resets the owned viewport before the scroll callback
    confirms following, while submission/navigation consume fixture-only
-   Composer attachments and completed replay positions reconcile queued work.
+   Composer attachments, final-row removal leaves paused queue state, and
+   completed replay positions reconcile queued work.
 3. **Electron host** — real `BrowserWindow` bounds, renderer isolation,
    pointer and keyboard navigation/PR-panel resizing, Review-panel
    close/reopen behavior, compact 800×600 multi-file geometry, an eight-file

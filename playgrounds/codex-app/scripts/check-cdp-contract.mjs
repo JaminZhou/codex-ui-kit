@@ -2286,6 +2286,33 @@ try {
   await pausedSteerApp.close();
 }
 
+const pausedDeleteScene = {
+  frame: "composer-queue-paused",
+  id: "paused-queue-delete-interaction",
+  scenario: "conversation-lifecycle",
+};
+const {
+  app: pausedDeleteApp,
+  page: pausedDeletePage,
+} = await launchScene(pausedDeleteScene, { capture: false });
+try {
+  await pausedDeletePage
+    .getByRole("button", { name: "Delete queued prompt" })
+    .click();
+  await pausedDeletePage.waitForFunction(() => {
+    const root = document.querySelector(".demo-root");
+    return (
+      root?.getAttribute("data-composer-phase") === "idle" &&
+      root.getAttribute("data-queue-count") === "0" &&
+      !document.querySelector(".codex-ui-composer-dock__queue") &&
+      document.querySelectorAll(".codex-ui-composer-context button").length ===
+        3
+    );
+  });
+} finally {
+  await pausedDeleteApp.close();
+}
+
 const longQueueScene = {
   frame: "composer-running",
   id: "long-queue-menu-interaction",

@@ -735,16 +735,20 @@ export function App() {
     );
   };
 
-  const deleteQueuedPrompt = (id: string) => {
-    setQueuedPrompts((items) => items.filter((item) => item.id !== id));
+  const removeQueuedPrompt = (id: string) => {
+    const nextItems = queuedPrompts.filter((item) => item.id !== id);
+    setQueuedPrompts(nextItems);
+    if (nextItems.length === 0) {
+      setQueueInterrupted(false);
+    }
   };
+
+  const deleteQueuedPrompt = removeQueuedPrompt;
 
   const editQueuedPrompt = (id: string) => {
     const item = queuedPrompts.find((candidate) => candidate.id === id);
     if (item && typeof item.text === "string") setComposerValue(item.text);
-    setQueuedPrompts((items) =>
-      items.filter((candidate) => candidate.id !== id),
-    );
+    removeQueuedPrompt(id);
   };
 
   const sendQueuedPromptNow = (id: string) => {
