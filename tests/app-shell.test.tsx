@@ -692,6 +692,37 @@ describe("application shell", () => {
     ).toBe(false);
   });
 
+  it("treats expanded side panels as modal overlays below wide mode", () => {
+    const { container } = render(
+      <AppShell
+        layoutMode="medium"
+        onSidePanelOpenChange={() => undefined}
+        sidePanel={<button type="button">Review files</button>}
+        sidePanelExpanded
+        sidePanelOpen
+        windowChrome={<button type="button">Chrome navigation</button>}
+      >
+        Conversation
+      </AppShell>,
+    );
+    const shell = container.querySelector(".codex-ui-app-shell")!;
+    const chrome = container.querySelector(
+      ".codex-ui-app-shell__window-chrome",
+    )!;
+
+    expect(shell.hasAttribute("data-side-panel-expanded")).toBe(false);
+    expect(shell.hasAttribute("data-side-panel-overlay")).toBe(true);
+    expect(
+      screen
+        .getByRole("main", { name: "Conversation" })
+        .hasAttribute("inert"),
+    ).toBe(true);
+    expect(chrome.hasAttribute("inert")).toBe(true);
+    expect(
+      screen.getByRole("button", { name: "Close workspace panel" }).tabIndex,
+    ).toBe(0);
+  });
+
   it("supports current-build narrow edge preview and explicit pinning", async () => {
     function CurrentBuildNarrowFixture() {
       const [sidebarOpen, setSidebarOpen] = useState(false);

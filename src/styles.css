@@ -201,6 +201,19 @@
   );
 }
 
+.codex-ui-app-window-chrome:dir(rtl)
+  .codex-ui-app-window-chrome__navigation {
+  padding-inline-start: 0;
+}
+
+.codex-ui-app-window-chrome:dir(rtl)
+  .codex-ui-app-window-chrome__end-actions {
+  padding-left: calc(
+    var(--codex-ui-app-window-chrome-safe-inset-left) +
+      calc(var(--codex-ui-spacing) * 1.5)
+  );
+}
+
 .codex-ui-app-window-chrome__end-actions {
   justify-self: end;
 }

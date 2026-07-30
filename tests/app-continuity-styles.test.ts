@@ -27,6 +27,12 @@ describe("application continuity visual contract", () => {
     expect(styles).toContain("height: 1.75rem");
     expect(styles).toContain("border-radius: 0.78125rem");
     expect(styles).toMatch(
+      /\.codex-ui-app-window-chrome:dir\(rtl\)[\s\S]*?\.codex-ui-app-window-chrome__navigation \{[\s\S]*?padding-inline-start: 0;/,
+    );
+    expect(styles).toMatch(
+      /\.codex-ui-app-window-chrome:dir\(rtl\)[\s\S]*?\.codex-ui-app-window-chrome__end-actions \{[\s\S]*?padding-left: calc\([\s\S]*?--codex-ui-app-window-chrome-safe-inset-left/,
+    );
+    expect(styles).toMatch(
       /\[data-window-chrome\]\[data-side-panel-open\][\s\S]*?\.codex-ui-app-shell__window-chrome \{[\s\S]*?inset-inline-end: var\(--codex-ui-app-side-panel-width\);/,
     );
     expect(styles).toMatch(

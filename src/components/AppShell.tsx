@@ -735,8 +735,8 @@ export function AppShell({
         coordinatedPersistentMainMinWidth;
   const sidePanelOverlay =
     sidePanelHasOpenContent &&
-    !sidePanelExpanded &&
-    (layoutMode !== "wide" || !wideSidePanelMinimaFit);
+    (layoutMode !== "wide" ||
+      (!sidePanelExpanded && !wideSidePanelMinimaFit));
   const persistentSidePanelMinWidth =
     layoutMode === "wide" &&
     sidePanelHasOpenContent &&
