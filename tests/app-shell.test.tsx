@@ -783,6 +783,52 @@ describe("application shell", () => {
     expect((backdrop as HTMLButtonElement).hidden).toBe(true);
   });
 
+  it("keeps current-build sidebar previews open across owned portals", () => {
+    const onSelect = vi.fn();
+    const { container } = render(
+      <AppShell
+        layoutMode="narrow"
+        narrowSidebarBehavior="current-build"
+        onSidebarOpenChange={() => undefined}
+        sidebar={
+          <Popover
+            label="Project actions"
+            trigger={<button type="button">Project menu</button>}
+          >
+            <button onClick={onSelect} type="button">
+              Open project
+            </button>
+          </Popover>
+        }
+        sidebarOpen={false}
+      >
+        Conversation
+      </AppShell>,
+    );
+    const shell = container.querySelector(".codex-ui-app-shell")!;
+
+    fireEvent.pointerMove(shell, { clientX: 1 });
+    expect(shell.hasAttribute("data-sidebar-preview-open")).toBe(true);
+    fireEvent.click(
+      screen.getByRole("button", { name: "Project menu" }),
+    );
+    const popover = screen.getByRole("dialog", {
+      name: "Project actions",
+    });
+    expect(popover.dataset.codexUiSurfaceOwner).toBeTruthy();
+
+    const action = screen.getByRole("button", {
+      name: "Open project",
+    });
+    fireEvent.pointerMove(action, { clientX: 400 });
+    expect(shell.hasAttribute("data-sidebar-preview-open")).toBe(true);
+    expect(screen.getByRole("dialog", { name: "Project actions" })).toBe(
+      popover,
+    );
+    fireEvent.click(action);
+    expect(onSelect).toHaveBeenCalledOnce();
+  });
+
   it("caps a resized split sidebar before it can consume the main track", () => {
     let resize: ((width: number) => void) | undefined;
     class ResizeObserverMock {

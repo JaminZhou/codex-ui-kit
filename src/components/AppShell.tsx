@@ -22,6 +22,7 @@ import {
   notifySurfaceBlocked,
   SurfaceBlockedContext,
 } from "../internal/surfaceBlocked.js";
+import { SurfacePortalOwnerContext } from "../internal/surfacePortalOwner.js";
 import { IconButton } from "./InteractivePrimitives.js";
 
 function CloseIcon() {
@@ -590,6 +591,7 @@ export function AppShell({
   const sidePanelResizeSessionRef =
     useRef<SidePanelResizeSession | null>(null);
   const sidebarBackdropRef = useRef<HTMLButtonElement>(null);
+  const sidebarPortalOwnerId = useId();
   const sidebarRef = useRef<HTMLElement>(null);
   const sidebarResizerFocusedRef = useRef(false);
   const sidebarResizerRef = useRef<HTMLDivElement>(null);
@@ -1663,6 +1665,13 @@ export function AppShell({
     }
     const shell = shellRef.current;
     if (!shell) return;
+    const portalOwner =
+      event.target instanceof Element
+        ? event.target.closest<HTMLElement>(
+            "[data-codex-ui-surface-owner]",
+          )?.dataset.codexUiSurfaceOwner
+        : undefined;
+    if (portalOwner === sidebarPortalOwnerId) return;
     const bounds = shell.getBoundingClientRect();
     const direction = getComputedStyle(shell).direction;
     const inlineStartDistance =
@@ -1729,7 +1738,11 @@ export function AppShell({
           tabIndex={-1}
         >
           <SurfaceBlockedContext.Provider value={!sidebarSurfaceVisible}>
-            {sidebar}
+            <SurfacePortalOwnerContext.Provider
+              value={sidebarPortalOwnerId}
+            >
+              {sidebar}
+            </SurfacePortalOwnerContext.Provider>
           </SurfaceBlockedContext.Provider>
         </aside>
         {sidebarResizerVisible ? (

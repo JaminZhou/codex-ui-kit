@@ -24,6 +24,7 @@ import {
 } from "react";
 import { createPortal } from "react-dom";
 import { OverlayEnvironmentContext } from "../internal/overlayEnvironment.js";
+import { SurfacePortalOwnerContext } from "../internal/surfacePortalOwner.js";
 import {
   getBlockedSurface,
   surfaceBlockedEventName,
@@ -271,6 +272,7 @@ function FloatingSurface({
   width,
 }: FloatingSurfaceProps) {
   const overlayEnvironment = useContext(OverlayEnvironmentContext);
+  const surfacePortalOwner = useContext(SurfacePortalOwnerContext);
   const { portalsBlocked } = useSurfaceBlockState();
   const visible = open && !portalsBlocked;
   const internalRef = useRef<HTMLDivElement | null>(null);
@@ -412,6 +414,7 @@ function FloatingSurface({
       data-codex-ui-overlay-owner={ownerIds?.join(" ")}
       data-codex-ui-overlay-layer={overlayEnvironment.layer}
       data-codex-ui-dialog-owner={overlayEnvironment.ownerId}
+      data-codex-ui-surface-owner={surfacePortalOwner}
       data-side={position?.resolvedSide ?? side}
       data-state="open"
       data-theme={position?.theme}
