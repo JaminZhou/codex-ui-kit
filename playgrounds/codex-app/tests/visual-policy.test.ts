@@ -12,7 +12,7 @@ describe("lifecycle visual policy", () => {
       "const defaultLifecycleMainPixelRatio = 0.0025",
     );
     expect(contract).toContain(
-      "const defaultLifecycleSidebarPixelRatio = 0.03",
+      "const defaultLifecycleSidebarPixelRatio = 0.05",
     );
     expect(contract).toContain("const internalSidebarWidth = 274");
     expect(contract).toContain(

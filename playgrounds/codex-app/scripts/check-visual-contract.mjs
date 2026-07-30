@@ -81,7 +81,7 @@ const currentBuildSidebarReference =
 const currentBuildWindowChromeReference =
   process.env.CODEX_UI_KIT_WINDOW_CHROME_REFERENCE;
 const defaultLifecycleMainPixelRatio = 0.0025;
-const defaultLifecycleSidebarPixelRatio = 0.03;
+const defaultLifecycleSidebarPixelRatio = 0.05;
 const internalSidebarWidth = 274;
 const currentBuildSidebarReferenceSize = {
   height: 820,

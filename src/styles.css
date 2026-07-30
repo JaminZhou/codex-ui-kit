@@ -5943,6 +5943,13 @@ summary.codex-ui-activity__header::after {
   padding-block: 0.125rem;
 }
 
+.codex-ui-composer-dock__queue:has(
+    .codex-ui-composer-queue__more[open]
+  ) {
+  overflow: visible;
+  z-index: 2;
+}
+
 .codex-ui-composer-dock__surface {
   min-width: 0;
   position: relative;
@@ -6479,6 +6486,10 @@ summary.codex-ui-activity__header::after {
   display: none;
 }
 
+.codex-ui-composer-queue:has(.codex-ui-composer-queue__more[open]) {
+  overflow: visible;
+}
+
 .codex-ui-composer-queue__interrupted,
 .codex-ui-composer-queue__row {
   align-items: center;
@@ -6524,7 +6535,14 @@ summary.codex-ui-activity__header::after {
 .codex-ui-composer-queue__row {
   gap: 0.375rem;
   padding: 0.125rem 0.25rem;
+  position: relative;
   transition: opacity var(--codex-ui-transition);
+}
+
+.codex-ui-composer-queue__row:has(
+    .codex-ui-composer-queue__more[open]
+  ) {
+  z-index: 1;
 }
 
 .codex-ui-composer-queue__row:hover,

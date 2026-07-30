@@ -653,6 +653,17 @@ export function App() {
     }
   };
 
+  const restoreConversationRunningReplay = () => {
+    setReplayComposerStopped(false);
+    setQueueInterrupted(false);
+    setReplayComposerRunning(true);
+    setReplayCount(
+      replayScenarios["conversation-lifecycle"].frames[
+        "conversation-running"
+      ] ?? replayScenarios["conversation-lifecycle"].events.length,
+    );
+  };
+
   const submitComposer = (prompt: string) => {
     if (!isConversationLifecycle) {
       void submitLive(prompt);
@@ -668,6 +679,9 @@ export function App() {
             text: prompt,
           },
         ]);
+        setComposerValue("");
+      } else {
+        restoreConversationRunningReplay();
         setComposerValue("");
       }
       return;
@@ -704,14 +718,7 @@ export function App() {
   };
 
   const resumeQueue = () => {
-    setReplayComposerStopped(false);
-    setQueueInterrupted(false);
-    setReplayComposerRunning(true);
-    setReplayCount(
-      replayScenarios["conversation-lifecycle"].frames[
-        "conversation-running"
-      ] ?? replayScenarios["conversation-lifecycle"].events.length,
-    );
+    restoreConversationRunningReplay();
     setQueuedPrompts((items) =>
       items.map((item) => ({ ...item, status: "queued" })),
     );
@@ -731,9 +738,7 @@ export function App() {
 
   const sendQueuedPromptNow = (id: string) => {
     deleteQueuedPrompt(id);
-    setQueueInterrupted(false);
-    setReplayComposerStopped(false);
-    setReplayComposerRunning(true);
+    restoreConversationRunningReplay();
   };
 
   const reorderQueuedPrompts = (activeId: string, overId: string) => {
@@ -2100,6 +2105,9 @@ export function App() {
       data-composer-phase={isConversationLifecycle ? composerPhase : undefined}
       data-queue-count={
         isConversationLifecycle ? queuedPrompts.length : undefined
+      }
+      data-queueing-enabled={
+        isConversationLifecycle ? queueingEnabled : undefined
       }
       data-scenario={scenarioId}
       data-status={displayedStatus}

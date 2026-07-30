@@ -2030,12 +2030,38 @@ try {
   await conversationLifecyclePage.waitForSelector(
     '.demo-root[data-composer-phase="queued"][data-status="running"]',
   );
+  const queuedPromptActions = conversationLifecyclePage.locator(
+    'summary[aria-label="Queued prompt actions"]',
+  );
+  await queuedPromptActions.click();
+  await conversationLifecyclePage
+    .getByRole("menuitem", { name: "Turn off queueing" })
+    .click();
+  await conversationLifecyclePage.waitForSelector(
+    '.demo-root[data-queueing-enabled="false"]',
+  );
+  await queuedPromptActions.click();
   await conversationLifecyclePage
     .getByRole("button", { name: "Delete queued prompt" })
     .click();
   await conversationLifecyclePage.waitForSelector(
     '.demo-root[data-composer-phase="running"][data-queue-count="0"]',
   );
+  await composer.fill("Steer this prompt while queueing is disabled.");
+  await composer.press("Enter");
+  await conversationLifecyclePage.waitForFunction(() => {
+    const root = document.querySelector(".demo-root");
+    const textarea = document.querySelector(
+      'textarea[aria-label="Message composer"]',
+    );
+    return (
+      root?.getAttribute("data-composer-phase") === "running" &&
+      root?.getAttribute("data-queue-count") === "0" &&
+      root?.getAttribute("data-queueing-enabled") === "false" &&
+      textarea instanceof HTMLTextAreaElement &&
+      textarea.value === ""
+    );
+  });
 
   await conversationLifecyclePage
     .getByRole("button", {
@@ -2082,6 +2108,7 @@ try {
         ".codex-ui-message-navigation-rail button",
       ).length,
       queueCount: root?.getAttribute("data-queue-count"),
+      queueingEnabled: root?.getAttribute("data-queueing-enabled"),
       queueRendered: Boolean(queue),
       stopCount: document.querySelectorAll(
         '.codex-ui-composer button[aria-label="Stop"]',
@@ -2094,6 +2121,7 @@ try {
     interaction.dockHasQueue !== false ||
     interaction.navigationCount !== 11 ||
     interaction.queueCount !== "0" ||
+    interaction.queueingEnabled !== "false" ||
     interaction.queueRendered ||
     interaction.stopCount !== 1 ||
     interaction.threadFollowing !== "false"
@@ -2162,6 +2190,40 @@ try {
   }
 } finally {
   await windowedNavigationApp.close();
+}
+
+const pausedSteerScene = {
+  frame: "composer-queue-paused",
+  id: "paused-queue-steer-interaction",
+  scenario: "conversation-lifecycle",
+};
+const {
+  app: pausedSteerApp,
+  page: pausedSteerPage,
+} = await launchScene(pausedSteerScene, { capture: false });
+try {
+  await pausedSteerPage.getByRole("button", { name: "Steer" }).click();
+  await pausedSteerPage.waitForSelector(
+    '.demo-root[data-composer-phase="running"][data-status="running"][data-queue-count="0"] [data-item-id="assistant-11"][data-status="running"]',
+  );
+  const pausedSteerState = await pausedSteerPage.evaluate(() => ({
+    queueRendered: Boolean(
+      document.querySelector(".codex-ui-composer-dock__queue"),
+    ),
+    replayMethod: document
+      .querySelector(".demo-root")
+      ?.getAttribute("data-last-method"),
+  }));
+  if (
+    pausedSteerState.queueRendered ||
+    pausedSteerState.replayMethod !== "item/agentMessage/delta"
+  ) {
+    throw new Error(
+      `Paused queue Steer did not restore the running replay: ${JSON.stringify(pausedSteerState)}`,
+    );
+  }
+} finally {
+  await pausedSteerApp.close();
 }
 
 console.log(`CDP contracts passed for ${visualScenes.length} lifecycle frames.`);
