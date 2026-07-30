@@ -1474,6 +1474,10 @@
     z-index: 80;
   }
 
+  .codex-ui-app-shell:dir(rtl) .codex-ui-app-shell__sidebar {
+    transform: translateX(100%);
+  }
+
   .codex-ui-app-shell[data-sidebar-open] .codex-ui-app-shell__sidebar {
     transform: translateX(0);
   }

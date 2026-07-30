@@ -49,6 +49,9 @@ describe("application shell visual contract", () => {
     expect(styles).toContain(
       '.codex-ui-app-shell[data-narrow-sidebar-behavior="current-build"][data-sidebar-preview-open]:not([data-sidebar-open])',
     );
+    expect(styles).toMatch(
+      /@container codex-ui-app-shell \(max-width: 45rem\) \{[\s\S]*?\.codex-ui-app-shell:dir\(rtl\) \.codex-ui-app-shell__sidebar \{[\s\S]*?transform: translateX\(100%\);[\s\S]*?\.codex-ui-app-shell\[data-sidebar-open\] \.codex-ui-app-shell__sidebar \{[\s\S]*?transform: translateX\(0\);/,
+    );
     expect(component).toContain(
       'export type AppShellNarrowSidebarBehavior = "current-build" | "modal"',
     );
