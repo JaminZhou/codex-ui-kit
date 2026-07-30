@@ -58,14 +58,15 @@ observation from a previous build remains historical evidence.
   application target, the six left-sidebar groups, 46px window navigation,
   Pull requests loading/selection continuity, and a real OpenAI Developer Docs
   failed-Fetch → Search → successful-Fetch recovery, plus real
-  Composer submit/Stop, queue/pause/Resume, permissions, and add-menu states;
+  Composer submit/Stop, queue/pause/Resume, permissions, add-menu states, and
+  the new-chat workspace entry plus project picker;
   light-theme, global notifications, current-build long-thread
   virtualization, and unrelated surface evidence remain pending
 
-Current inventory: 73 surface groups; 17 have current-build runtime evidence,
-37 have previous-build-only runtime evidence, 19 remain `not_sampled`, and 0
-are `blocked_by_policy`. Current-build Browser verification covers 14 groups
-and Electron verification covers 14. Prior acceptance outside the sampled
+Current inventory: 74 surface groups; 20 have current-build runtime evidence,
+35 have previous-build-only runtime evidence, 19 remain `not_sampled`, and 0
+are `blocked_by_policy`. Current-build Browser verification covers 17 groups
+and Electron verification covers 17. Prior acceptance outside the sampled
 shell, sidebar, recovered MCP, and Composer lifecycle slices remains recorded
 as `partial_legacy` until current-build re-observation.
 
@@ -218,17 +219,17 @@ remaining controls, checks grouping, search filtering, and repair-state
 disabling, selects a local environment, submits the real composer, and captures
 both wide and compact dialog screenshots.
 
-The narrow `conversation.destination`, `conversation.context-controls`, and
-`app.new-thread-workspace-selection` slices were Browser- and
-Electron-verified against `26.721.41059`; they are now `partial_legacy`.
-Their implementation remains `partial` because the probe does not establish
-Remote destination behavior, real project option contents, creation
-workflows, or persistence. The broader project index, environment settings,
-and worktree settings families remain partial, as does the legacy host-defined
-route selector. Exact `26.721.81911` PR review-detail behavior remains
-`not_sampled`, so the generic review components do not establish product
-parity. The remaining P0 conversation/workspace variants remain open. Global
-notification runtime
+The current `conversation.context-controls`,
+`conversation.project-picker`, and
+`app.new-thread-workspace-selection` slices are Browser- and
+Electron-verified against `26.721.81911`. Their implementation remains
+`partial` because the current probe does not establish Remote destination
+behavior, real project selection, creation workflows, or persistence. The
+broader project index, environment settings, and worktree settings families
+remain partial/legacy, as does the legacy host-defined route selector. Exact
+`26.721.81911` PR review-detail behavior remains `not_sampled`, so the generic
+review components do not establish product parity. The remaining P0
+conversation/workspace variants remain open. Global notification runtime
 observation and light-theme shell evidence also remain open. Final
 H5/Electron visual unification is intentionally deferred until coverage
 stabilizes.
@@ -296,12 +297,12 @@ Optional 792×320 current-build references are accepted through
 the accepted ownership-masked changed-pixel ratios are `0.002722538` and
 `0.004478378`. This promotes `composer.shell`, `composer.queue`, and
 `thread.interruption-stop` to current-build Browser/Electron verification.
-Project/worktree controls and permission modes retain current runtime evidence
-but remain partial because their full menus and persistence are not exercised
-independently. Message navigation and windowing now have strong independent
+The context row and project picker now have current-build Browser/Electron
+verification. Environment/worktree menus and permission modes remain partial
+because the current product's full menu lifecycle and persistence were not
+re-observed. Message navigation and windowing now have strong independent
 Browser/Electron regression coverage, but stay `partial_legacy` because the
-current build's exact long-thread virtualization algorithm was not
-re-observed.
+current build's exact long-thread virtualization algorithm was not re-observed.
 
 Three more `26.721.41059` scenarios cover an expanded read-only command, a
 pending command approval, and an applied file card with the Review panel open.

@@ -1,7 +1,9 @@
 import {
+  Fragment,
   type FocusEvent,
   type HTMLAttributes,
   type KeyboardEvent,
+  type ReactElement,
   type ReactNode,
   useEffect,
   useId,
@@ -676,11 +678,6 @@ export function NewConversationStart({
       data-status={status}
     >
       <div className="codex-ui-new-conversation-start__layout">
-        {prompt ? (
-          <div className="codex-ui-new-conversation-start__prompt">
-            {prompt}
-          </div>
-        ) : null}
         <header className="codex-ui-new-conversation-start__header">
           {eyebrow ? (
             <span className="codex-ui-new-conversation-start__eyebrow">
@@ -690,14 +687,19 @@ export function NewConversationStart({
           <h3>{destination}</h3>
           {description ? <p>{description}</p> : null}
         </header>
-        <div className="codex-ui-new-conversation-start__composer">
-          {composer}
-        </div>
+        {prompt ? (
+          <div className="codex-ui-new-conversation-start__prompt">
+            {prompt}
+          </div>
+        ) : null}
         {context ? (
           <div className="codex-ui-new-conversation-start__context">
             {context}
           </div>
         ) : null}
+        <div className="codex-ui-new-conversation-start__composer">
+          {composer}
+        </div>
       </div>
     </section>
   );
@@ -735,6 +737,10 @@ export interface ConversationContextBarProps
   items: readonly ConversationContextItem[];
   label?: string;
   onSelect: (itemId: string) => void;
+  renderItem?: (
+    item: ConversationContextItem,
+    trigger: ReactElement<any>,
+  ) => ReactNode;
 }
 
 function conversationContextItemDisabled(
@@ -757,6 +763,7 @@ export function ConversationContextBar({
   items,
   label = "Conversation context",
   onSelect,
+  renderItem,
   ...props
 }: ConversationContextBarProps) {
   const contextBarId = useId();
@@ -781,7 +788,7 @@ export function ConversationContextBar({
         const statusId = item.statusLabel
           ? `${contextBarId}-status-${index}`
           : undefined;
-        return (
+        const trigger = (
           <button
             aria-controls={
               expandedId === item.id ? item.controlsId : undefined
@@ -804,7 +811,6 @@ export function ConversationContextBar({
             data-status={item.status}
             disabled={itemDisabled}
             id={item.triggerId}
-            key={item.id}
             onClick={() => onSelect(item.id)}
             type="button"
           >
@@ -829,6 +835,11 @@ export function ConversationContextBar({
               </span>
             ) : null}
           </button>
+        );
+        return (
+          <Fragment key={item.id}>
+            {renderItem ? renderItem(item, trigger) : trigger}
+          </Fragment>
         );
       })}
     </div>
@@ -1067,7 +1078,17 @@ export function ConversationProjectListbox({
             }
             type="button"
           >
-            <span>{item.label}</span>
+            {item.icon ? (
+              <span
+                aria-hidden="true"
+                className="codex-ui-conversation-project-options__icon"
+              >
+                {item.icon}
+              </span>
+            ) : null}
+            <span className="codex-ui-conversation-project-options__label">
+              {item.label}
+            </span>
             {item.description ? (
               <small id={descriptionId}>{item.description}</small>
             ) : null}
@@ -1079,6 +1100,12 @@ export function ConversationProjectListbox({
                 {item.statusLabel}
               </small>
             ) : null}
+            <span
+              aria-hidden="true"
+              className="codex-ui-conversation-project-options__check"
+            >
+              {selected ? "✓" : ""}
+            </span>
           </button>
         );
       })}

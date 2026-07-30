@@ -36,11 +36,27 @@
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
         "cdp-26.721:new-chat-project-local-main-context-controls",
-        "cdp-26.721:local-environment-dialog-600x600-scrollable-group-structure"
+        "cdp-26.721:local-environment-dialog-600x600-scrollable-group-structure",
+        "cdp-26.721.81911:new-chat-context-bar-736x28-project-local-main"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "partial_legacy",
-      "electronStatus": "partial_legacy",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
+      "priority": "p0"
+    },
+    {
+      "id": "conversation.project-picker",
+      "area": "conversation",
+      "ownership": "cross-layer",
+      "packageEvidence": ["composer-project-selector", "project-selector-items"],
+      "runtimeStatus": "runtime_observed",
+      "runtimeEvidence": [
+        "cdp-26.721:new-chat-project-popover-260x250-listbox-14-options",
+        "cdp-26.721.81911:new-chat-project-dialog-260x250-listbox-252x142.81-14-options"
+      ],
+      "implementationStatus": "partial",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
       "priority": "p0"
     },
     {
@@ -602,8 +618,7 @@
       "packageEvidence": ["projects-index-page"],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
-        "cdp-26.721:projects-entry-and-deidentified-list-structure",
-        "cdp-26.721:new-chat-project-popover-260x250-listbox-14-options"
+        "cdp-26.721:projects-entry-and-deidentified-list-structure"
       ],
       "implementationStatus": "partial",
       "browserStatus": "not_started",
@@ -631,11 +646,12 @@
       "runtimeEvidence": [
         "cdp:blank-new-chat-and-project-menu",
         "cdp-26.721:new-chat-chatgpt-destination-and-worktree-prompt",
-        "cdp-26.721:new-chat-project-local-main-context-controls"
+        "cdp-26.721:new-chat-project-local-main-context-controls",
+        "cdp-26.721.81911:new-chat-1180x820-project-picker-entry"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "partial_legacy",
-      "electronStatus": "partial_legacy",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
       "priority": "p0"
     },
     {

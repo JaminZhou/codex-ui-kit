@@ -15,6 +15,8 @@ import {
   ConversationProjectListbox,
   ConversationRouteSelector,
   LocalEnvironmentDialog,
+  Menu,
+  MenuItem,
   NewConversationStart,
   ProjectConversationPage,
   ProjectIndex,
@@ -81,6 +83,20 @@ describe("project conversation routing", () => {
     expect(
       within(setup).getByRole("textbox", { name: "Conversation prompt" }),
     ).toBeTruthy();
+    const context = setup.querySelector(
+      ".codex-ui-new-conversation-start__context",
+    );
+    const composer = setup.querySelector(
+      ".codex-ui-new-conversation-start__composer",
+    );
+    expect(
+      context &&
+        composer &&
+        Boolean(
+          context.compareDocumentPosition(composer) &
+            Node.DOCUMENT_POSITION_FOLLOWING,
+        ),
+    ).toBe(true);
     const project = within(setup).getByRole("button", {
       name: "Change project: Project",
     });
@@ -102,6 +118,53 @@ describe("project conversation routing", () => {
     expect(accessibleDescriptionText(repairing)).toContain("Repairing");
   });
 
+  it("lets a controlled menu wrap a context trigger without losing its semantics", () => {
+    function ContextMenuHarness() {
+      const [open, setOpen] = useState(false);
+      return (
+        <ConversationContextBar
+          expandedId={open ? "environment" : undefined}
+          items={[
+            {
+              controlsId: "start-in-menu",
+              id: "environment",
+              kind: "environment",
+              label: "Local",
+              popupRole: "menu",
+            },
+          ]}
+          onSelect={() => setOpen((value) => !value)}
+          renderItem={(_item, trigger) => (
+            <Menu
+              label="Start in"
+              onOpenChange={setOpen}
+              open={open}
+              trigger={trigger}
+            >
+              <MenuItem>Work locally</MenuItem>
+            </Menu>
+          )}
+        />
+      );
+    }
+
+    render(<ContextMenuHarness />);
+    const trigger = screen.getByRole("button", {
+      name: "Change environment: Local",
+    });
+    expect(trigger.getAttribute("aria-haspopup")).toBe("menu");
+    expect(trigger.getAttribute("aria-expanded")).toBe("false");
+
+    fireEvent.click(trigger);
+
+    expect(screen.getByRole("menu", { name: "Start in" })).toBeTruthy();
+    expect(trigger.getAttribute("aria-controls")).toBeTruthy();
+    expect(trigger.getAttribute("aria-expanded")).toBe("true");
+    expect(
+      screen.getByRole("menuitem", { name: "Work locally" }),
+    ).toBeTruthy();
+  });
+
   it("focuses and keyboard-navigates linked conversation project options", async () => {
     const onDismiss = vi.fn();
     const onSelect = vi.fn();
@@ -115,6 +178,7 @@ describe("project conversation routing", () => {
           items={[
             {
               description: "Component workspace",
+              icon: <span data-testid="ui-kit-project-icon">□</span>,
               id: "ui-kit",
               label: "UI Kit",
             },
@@ -150,6 +214,12 @@ describe("project conversation routing", () => {
       name: "Select project Repairing",
     });
     expect(document.activeElement).toBe(uiKit);
+    expect(screen.getByTestId("ui-kit-project-icon")).toBeTruthy();
+    expect(
+      uiKit.querySelector(
+        ".codex-ui-conversation-project-options__check",
+      )?.textContent,
+    ).toBe("✓");
     expect(uiKit.tabIndex).toBe(0);
     expect(repair).toHaveProperty("disabled", true);
 

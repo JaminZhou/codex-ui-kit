@@ -76,6 +76,22 @@ const currentBuildComposerReferenceSize = {
   height: 320,
   width: 792,
 };
+const currentBuildWorkspaceReference =
+  process.env.CODEX_UI_KIT_WORKSPACE_REFERENCE;
+const currentBuildWorkspaceReferenceSize = {
+  height: 820,
+  width: 1180,
+};
+const currentBuildWorkspaceProjectReference =
+  process.env.CODEX_UI_KIT_WORKSPACE_PROJECT_REFERENCE;
+const currentBuildWorkspaceProjectReferenceSize = {
+  height: 144,
+  width: 252,
+};
+const currentBuildWorkspaceEnvironmentReference =
+  process.env.CODEX_UI_KIT_WORKSPACE_ENVIRONMENT_REFERENCE;
+const currentBuildWorkspaceWorktreeReference =
+  process.env.CODEX_UI_KIT_WORKSPACE_WORKTREE_REFERENCE;
 const currentBuildSidebarReference =
   process.env.CODEX_UI_KIT_SIDEBAR_REFERENCE;
 const currentBuildWindowChromeReference =
@@ -162,12 +178,91 @@ function environmentRatio(name, fallback) {
   return value;
 }
 
+async function compareCurrentBuildOverlay({
+  actual,
+  actualBounds,
+  defaultMaximumRatio,
+  masks,
+  maximumRatioName,
+  referenceCrop,
+  referencePath,
+  sceneId,
+}) {
+  const referenceFull = flattenPng(
+    PNG.sync.read(await readFile(referencePath)),
+    { blue: 24, green: 24, red: 24 },
+  );
+  if (
+    referenceFull.width !== currentBuildWorkspaceReferenceSize.width ||
+    referenceFull.height !== currentBuildWorkspaceReferenceSize.height
+  ) {
+    throw new Error(
+      `${sceneId}: current-build overlay reference must be exactly ${currentBuildWorkspaceReferenceSize.width}x${currentBuildWorkspaceReferenceSize.height}, received ${referenceFull.width}x${referenceFull.height}.`,
+    );
+  }
+  if (
+    !actualBounds ||
+    actualBounds.width !== referenceCrop.width ||
+    actualBounds.height !== referenceCrop.height
+  ) {
+    throw new Error(
+      `${sceneId}: current-build overlay bounds do not match ${referenceCrop.width}x${referenceCrop.height}: ${JSON.stringify(actualBounds)}.`,
+    );
+  }
+  const reference = cropPng(
+    referenceFull,
+    referenceCrop.left,
+    referenceCrop.top,
+    referenceCrop.width,
+    referenceCrop.height,
+  );
+  const overlayActual = cropPng(
+    actual,
+    actualBounds.left,
+    actualBounds.top,
+    actualBounds.width,
+    actualBounds.height,
+  );
+  const comparison = comparePng(
+    maskPng(reference, masks),
+    maskPng(overlayActual, masks),
+  );
+  const maximumRatio = environmentRatio(
+    maximumRatioName,
+    defaultMaximumRatio,
+  );
+  await writeFile(
+    join(artifactDirectory, `${sceneId}.current-build.png`),
+    PNG.sync.write(overlayActual),
+  );
+  if (comparison.pixels > 0) {
+    await writeFile(
+      join(
+        artifactDirectory,
+        `${sceneId}.current-build.diff.png`,
+      ),
+      PNG.sync.write(comparison.diff),
+    );
+  }
+  if (comparison.ratio > maximumRatio) {
+    throw new Error(
+      `${sceneId}: current-build overlay pixel ratio ${comparison.ratio} exceeds ${maximumRatio}.`,
+    );
+  }
+  console.log(
+    `${sceneId}: current-build overlay pixel ratio ${comparison.ratio}`,
+  );
+}
+
 for (const scene of selectedScenes) {
   const { app, page } = await launchScene(scene);
   const actualPath = join(artifactDirectory, `${scene.id}.png`);
   const baselinePath = join(baselineDirectory, `${scene.id}.png`);
   const diffPath = join(artifactDirectory, `${scene.id}.diff.png`);
   let sidebarSelectedTop;
+  let workspaceEnvironmentMenuBounds;
+  let workspaceProjectListboxBounds;
+  let workspaceWorktreeMenuBounds;
 
   try {
     if (scene.id === "streaming") {
@@ -190,6 +285,51 @@ for (const scene of selectedScenes) {
         const active = document.activeElement;
         if (active instanceof HTMLElement) active.blur();
       });
+    }
+    if (scene.id === "workspace-project-menu") {
+      workspaceProjectListboxBounds = await page
+        .locator(
+          ".demo-workspace-project-dialog .codex-ui-conversation-project-options",
+        )
+        .evaluate((element) => {
+          const value = element.getBoundingClientRect();
+          return {
+            height: Math.ceil(value.height),
+            left: Math.round(value.left),
+            top: Math.round(value.top),
+            width: Math.round(value.width),
+          };
+        });
+    }
+    if (scene.id === "workspace-environment-menu") {
+      await page.evaluate(() => {
+        const active = document.activeElement;
+        if (active instanceof HTMLElement) active.blur();
+      });
+      workspaceEnvironmentMenuBounds = await page
+        .locator(".demo-workspace-environment-menu[role=\"menu\"]")
+        .evaluate((element) => {
+          const value = element.getBoundingClientRect();
+          return {
+            height: Math.round(value.height),
+            left: Math.round(value.left),
+            top: Math.round(value.top),
+            width: Math.round(value.width),
+          };
+        });
+    }
+    if (scene.id === "workspace-worktree-menu") {
+      workspaceWorktreeMenuBounds = await page
+        .locator(".demo-workspace-worktree-menu[role=\"menu\"]")
+        .evaluate((element) => {
+          const value = element.getBoundingClientRect();
+          return {
+            height: Math.round(value.height),
+            left: Math.round(value.left),
+            top: Math.round(value.top),
+            width: Math.round(value.width),
+          };
+        });
     }
     if (scene.id === "markdown-complete") {
       await page.addStyleTag({
@@ -285,6 +425,187 @@ for (const scene of selectedScenes) {
         main: maximumMainPixelRatio,
         sidebar: defaultLifecycleSidebarPixelRatio,
       })}.`,
+    );
+  }
+
+  if (scene.id === "workspace-ready" && currentBuildWorkspaceReference) {
+    const referenceFull = flattenPng(
+      PNG.sync.read(await readFile(currentBuildWorkspaceReference)),
+      { blue: 24, green: 24, red: 24 },
+    );
+    if (
+      referenceFull.width !== currentBuildWorkspaceReferenceSize.width ||
+      referenceFull.height !== currentBuildWorkspaceReferenceSize.height
+    ) {
+      throw new Error(
+        `${scene.id}: current-build workspace reference must be exactly ${currentBuildWorkspaceReferenceSize.width}x${currentBuildWorkspaceReferenceSize.height}, received ${referenceFull.width}x${referenceFull.height}.`,
+      );
+    }
+    if (
+      actual.width !== referenceFull.width ||
+      actual.height !== referenceFull.height
+    ) {
+      throw new Error(
+        `${scene.id}: current-build workspace comparison requires matching ${referenceFull.width}x${referenceFull.height} frames.`,
+      );
+    }
+    const reference = cropPng(
+      referenceFull,
+      internalSidebarWidth,
+      0,
+      referenceFull.width - internalSidebarWidth,
+      referenceFull.height,
+    );
+    const workspaceActual = cropPng(
+      actual,
+      internalSidebarWidth,
+      0,
+      actual.width - internalSidebarWidth,
+      actual.height,
+    );
+    const masks = [
+      {
+        height: 72,
+        left: 170,
+        top: 350,
+        width: 620,
+      },
+      {
+        height: 54,
+        left: 100,
+        top: 596,
+        width: 706,
+      },
+      {
+        height: 22,
+        left: 132,
+        top: 676,
+        width: 96,
+      },
+      {
+        height: 22,
+        left: 236,
+        top: 676,
+        width: 54,
+      },
+      {
+        height: 22,
+        left: 314,
+        top: 676,
+        width: 190,
+      },
+      {
+        height: 24,
+        left: 136,
+        top: 768,
+        width: 168,
+      },
+      {
+        height: 24,
+        left: 606,
+        top: 768,
+        width: 176,
+      },
+    ];
+    const comparison = comparePng(
+      maskPng(reference, masks),
+      maskPng(workspaceActual, masks),
+    );
+    const maximumRatio = environmentRatio(
+      "CODEX_UI_KIT_WORKSPACE_MAX_DIFF_RATIO",
+      0.075,
+    );
+    await writeFile(
+      join(artifactDirectory, `${scene.id}.current-build.png`),
+      PNG.sync.write(workspaceActual),
+    );
+    if (comparison.pixels > 0) {
+      await writeFile(
+        join(artifactDirectory, `${scene.id}.current-build.diff.png`),
+        PNG.sync.write(comparison.diff),
+      );
+    }
+    if (comparison.ratio > maximumRatio) {
+      throw new Error(
+        `${scene.id}: current-build workspace pixel ratio ${comparison.ratio} exceeds ${maximumRatio}.`,
+      );
+    }
+    console.log(
+      `${scene.id}: current-build workspace pixel ratio ${comparison.ratio}`,
+    );
+  }
+
+  if (
+    scene.id === "workspace-project-menu" &&
+    currentBuildWorkspaceProjectReference
+  ) {
+    const reference = flattenPng(
+      PNG.sync.read(
+        await readFile(currentBuildWorkspaceProjectReference),
+      ),
+      { blue: 48, green: 48, red: 48 },
+    );
+    if (
+      reference.width !== currentBuildWorkspaceProjectReferenceSize.width ||
+      reference.height !== currentBuildWorkspaceProjectReferenceSize.height
+    ) {
+      throw new Error(
+        `${scene.id}: current-build project reference must be exactly ${currentBuildWorkspaceProjectReferenceSize.width}x${currentBuildWorkspaceProjectReferenceSize.height}, received ${reference.width}x${reference.height}.`,
+      );
+    }
+    if (
+      !workspaceProjectListboxBounds ||
+      workspaceProjectListboxBounds.width !== reference.width ||
+      workspaceProjectListboxBounds.height !== reference.height
+    ) {
+      throw new Error(
+        `${scene.id}: project listbox bounds do not match the current-build reference: ${JSON.stringify(workspaceProjectListboxBounds)}.`,
+      );
+    }
+    const projectActual = cropPng(
+      actual,
+      workspaceProjectListboxBounds.left,
+      workspaceProjectListboxBounds.top,
+      workspaceProjectListboxBounds.width,
+      workspaceProjectListboxBounds.height,
+    );
+    const masks = Array.from({ length: 5 }, (_, index) => ({
+      height: 20,
+      left: 25,
+      top: Math.round(index * 28.5 + 4),
+      width: 190,
+    }));
+    const comparison = comparePng(
+      maskPng(reference, masks),
+      maskPng(projectActual, masks),
+    );
+    const maximumRatio = environmentRatio(
+      "CODEX_UI_KIT_WORKSPACE_PROJECT_MAX_DIFF_RATIO",
+      0.08,
+    );
+    await writeFile(
+      join(
+        artifactDirectory,
+        `${scene.id}.current-build.png`,
+      ),
+      PNG.sync.write(projectActual),
+    );
+    if (comparison.pixels > 0) {
+      await writeFile(
+        join(
+          artifactDirectory,
+          `${scene.id}.current-build.diff.png`,
+        ),
+        PNG.sync.write(comparison.diff),
+      );
+    }
+    if (comparison.ratio > maximumRatio) {
+      throw new Error(
+        `${scene.id}: current-build project list pixel ratio ${comparison.ratio} exceeds ${maximumRatio}.`,
+      );
+    }
+    console.log(
+      `${scene.id}: current-build project list pixel ratio ${comparison.ratio}`,
     );
   }
 

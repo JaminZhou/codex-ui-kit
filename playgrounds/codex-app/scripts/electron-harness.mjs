@@ -3,6 +3,48 @@ import { _electron as electron } from "playwright-core";
 
 export const visualScenes = [
   {
+    frame: "workspace-ready",
+    id: "workspace-ready",
+    maxPixelRatio: 0.01,
+    scenario: "workspace-workflow",
+    view: "workspace",
+  },
+  {
+    frame: "workspace-project-menu",
+    id: "workspace-project-menu",
+    maxPixelRatio: 0.01,
+    scenario: "workspace-workflow",
+    view: "workspace",
+  },
+  {
+    frame: "workspace-environment-menu",
+    id: "workspace-environment-menu",
+    maxPixelRatio: 0.01,
+    scenario: "workspace-workflow",
+    view: "workspace",
+  },
+  {
+    frame: "workspace-environment",
+    id: "workspace-environment",
+    maxPixelRatio: 0.01,
+    scenario: "workspace-workflow",
+    view: "workspace",
+  },
+  {
+    frame: "workspace-worktree-menu",
+    id: "workspace-worktree-menu",
+    maxPixelRatio: 0.01,
+    scenario: "workspace-workflow",
+    view: "workspace",
+  },
+  {
+    frame: "workspace-repairing",
+    id: "workspace-repairing",
+    maxPixelRatio: 0.01,
+    scenario: "workspace-workflow",
+    view: "workspace",
+  },
+  {
     frame: "conversation-thread-ready",
     id: "conversation-thread-ready",
     maxPixelRatio: 0.0225,
