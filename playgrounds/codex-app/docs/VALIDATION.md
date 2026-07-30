@@ -7,8 +7,10 @@ Every deterministic scenario has one ID and produces four evidence layers:
 2. **CDP** — DOM identity, computed layout, focus, scrolling, and named-surface
    geometry, including the current 274px sidebar, 46px titlebar inset, 70px
    header, 30px rows, fixed footer, collapsible groups, focusable row actions,
-   and 820px split/720px modal transition; the 16px navigation separator and
-   large-Review
+   and 820px split/720px modal transition; application-shell window controls,
+   route loading/empty/error/offline/reconnecting/stale states, selected-route
+   continuity, and responsive surface restoration; the 16px navigation
+   separator and large-Review
    overflow/reveal contract, plus the 16px PR/Review separator, responsive
    limits, tab states, and expand/restore lifecycle, and the 16px Terminal
    separator, 272px default panel, responsive bounds, named tab/tabpanel, and
@@ -17,8 +19,9 @@ Every deterministic scenario has one ID and produces four evidence layers:
    pointer and keyboard navigation/PR-panel resizing, Review-panel
    close/reopen behavior, compact 800×600 multi-file geometry, an eight-file
    scroll-to-selection flow, PR tab/comment/expansion interactions, and
-   Terminal pointer/keyboard resizing, host-owned input, close/restore, and
-   compact 820×680 geometry.
+   Terminal pointer/keyboard resizing, host-owned input, close/restore,
+   compact 820×680 geometry, and App shell offline → retry → restored
+   notification plus native 1180×820 → 720×680 → 1180×820 continuity.
 4. **Pixels** — full-frame regression screenshots after the structural gates
    pass. The multi-file scenario can additionally compare a separately
    captured 906×820 current-build main region through
@@ -36,7 +39,9 @@ Every deterministic scenario has one ID and produces four evidence layers:
    row, and footer regions separately; the current MCP recovery scenario
    accepts a 906×820 main reference through
    `CODEX_UI_KIT_MCP_RECOVERY_REFERENCE` and gates the full main, recovered
-   call group, user prompt, and Composer regions separately. Transparent
+   call group, user prompt, and Composer regions separately; the App shell
+   accepts a 120×46 ownership-scoped reference through
+   `CODEX_UI_KIT_WINDOW_CHROME_REFERENCE`. Transparent
    Electron/CDP reference pixels are composited onto the observed `#181818`
    window background before comparison, and independently implemented UI
    regions are located from their DOM contracts rather than hard-coded
@@ -45,6 +50,12 @@ Every deterministic scenario has one ID and produces four evidence layers:
 The layers do not vote on the same claim. Protocol proves lifecycle behavior;
 CDP explains layout; Electron proves the desktop host; pixels catch final
 visual drift.
+
+The current App shell sample measured a `0.039311594` changed-pixel ratio for
+the 120×46 window-chrome crop at the strict 0.05 pixel threshold, under its
+0.05 hard limit. Only loading and in-session Pull requests selection were
+observed in Codex Desktop `26.721.81911`; offline/error/reconnecting/stale and
+restored-notification frames are explicitly synthetic coverage.
 
 Computer Use remains an optional macOS acceptance layer for real pointer,
 focus, menu, multi-window, and OS integration checks. It is intentionally not a

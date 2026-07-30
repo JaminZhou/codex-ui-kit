@@ -200,6 +200,8 @@
   --codex-ui-generated-image-gap: calc(var(--codex-ui-spacing) * 2);
   --codex-ui-generated-image-control-size: 1.5rem;
   --codex-ui-toolbar-height: calc(var(--codex-ui-spacing) * 12);
+  --codex-ui-app-window-chrome-height: 2.875rem;
+  --codex-ui-app-window-chrome-safe-inset-left: 5.125rem;
   --codex-ui-app-sidebar-width: 17.125rem;
   --codex-ui-app-side-panel-width: 41.6875rem;
   --codex-ui-app-bottom-panel-height: 17rem;

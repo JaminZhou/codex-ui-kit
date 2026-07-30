@@ -22,6 +22,7 @@ import {
   notifySurfaceBlocked,
   SurfaceBlockedContext,
 } from "../internal/surfaceBlocked.js";
+import { SurfacePortalOwnerContext } from "../internal/surfacePortalOwner.js";
 import { IconButton } from "./InteractivePrimitives.js";
 
 function CloseIcon() {
@@ -185,10 +186,11 @@ function useSurfaceFocusRestoration(
 }
 
 export type AppShellLayoutMode = "narrow" | "medium" | "wide";
+export type AppShellNarrowSidebarBehavior = "current-build" | "modal";
 
 // CSS container-query conditions cannot consume custom properties. Keep these
 // internal constants locked to the matching queries in styles.css.
-const appShellMediumBreakpointRem = 92;
+const appShellMediumBreakpointRem = 60;
 const appShellNarrowBreakpointRem = 45;
 
 function appShellContentBoxWidth(shell: HTMLElement) {
@@ -441,7 +443,12 @@ export interface AppShellProps
   mainLabel?: string;
   mainRole?: "main" | "region";
   layoutMode?: AppShellLayoutMode;
+  narrowSidebarBehavior?: AppShellNarrowSidebarBehavior;
   onBottomPanelHeightChange?: (height: number) => void;
+  onLayoutModeChange?: (
+    mode: AppShellLayoutMode,
+    previousMode: AppShellLayoutMode,
+  ) => void;
   onSidePanelOpenChange?: (open: boolean) => void;
   onSidePanelWidthChange?: (width: number) => void;
   onSidebarOpenChange?: (open: boolean) => void;
@@ -456,6 +463,8 @@ export interface AppShellProps
   sidePanelResizable?: boolean;
   sidePanelResizeLabel?: string;
   sidePanelWidth?: number;
+  responsivePanelContinuity?: boolean;
+  responsivePanelContinuityKey?: string | number;
   sidebar?: ReactNode;
   sidebarLabel?: string;
   sidebarMaxWidth?: number;
@@ -465,10 +474,30 @@ export interface AppShellProps
   sidebarResizable?: boolean;
   sidebarResizeLabel?: string;
   sidebarWidth?: number;
+  windowChrome?: ReactNode;
 }
 
 function clampShellTrack(value: number, minimum: number, maximum: number) {
   return Math.min(maximum, Math.max(minimum, value));
+}
+
+function stageResponsiveOpenExpectation(
+  expectedRef: { current: boolean | null },
+  requestTokenRef: { current: symbol | null },
+  autoCollapsedRef: { current: boolean },
+  expectedOpen: boolean,
+) {
+  const requestToken = Symbol("responsive-open-expectation");
+  expectedRef.current = expectedOpen;
+  requestTokenRef.current = requestToken;
+  void Promise.resolve().then(() => {
+    if (requestTokenRef.current !== requestToken) return;
+    requestTokenRef.current = null;
+    if (expectedRef.current === expectedOpen) {
+      expectedRef.current = null;
+    }
+    autoCollapsedRef.current = false;
+  });
 }
 
 interface SidebarResizeSession {
@@ -511,7 +540,11 @@ export function AppShell({
   layoutMode: layoutModeOverride,
   mainLabel = "Conversation",
   mainRole = "main",
+  narrowSidebarBehavior = "modal",
   onBottomPanelHeightChange,
+  onLayoutModeChange,
+  onPointerLeave,
+  onPointerMoveCapture,
   onSidePanelOpenChange,
   onSidePanelWidthChange,
   onSidebarOpenChange,
@@ -526,6 +559,8 @@ export function AppShell({
   sidePanelResizable = false,
   sidePanelResizeLabel = "Resize workspace panel",
   sidePanelWidth,
+  responsivePanelContinuity = false,
+  responsivePanelContinuityKey,
   sidebar,
   sidebarLabel = "App navigation",
   sidebarMaxWidth = 520,
@@ -536,6 +571,7 @@ export function AppShell({
   sidebarResizeLabel = "Resize navigation sidebar",
   sidebarWidth,
   style,
+  windowChrome,
   ...props
 }: AppShellProps) {
   const bottomPanelOpenRef = useRef(bottomPanelOpen);
@@ -555,6 +591,7 @@ export function AppShell({
   const sidePanelResizeSessionRef =
     useRef<SidePanelResizeSession | null>(null);
   const sidebarBackdropRef = useRef<HTMLButtonElement>(null);
+  const sidebarPortalOwnerId = useId();
   const sidebarRef = useRef<HTMLElement>(null);
   const sidebarResizerFocusedRef = useRef(false);
   const sidebarResizerRef = useRef<HTMLDivElement>(null);
@@ -575,6 +612,7 @@ export function AppShell({
   const [bottomPanelResizing, setBottomPanelResizing] = useState(false);
   const [sidePanelResizing, setSidePanelResizing] = useState(false);
   const [sidebarResizing, setSidebarResizing] = useState(false);
+  const [sidebarPreviewOpen, setSidebarPreviewOpen] = useState(false);
   const sidebarIsVisible =
     sidebarOpen && sidebar !== undefined && sidebar !== null;
   const observedSidebarWidth = useObservedElementWidth(
@@ -583,6 +621,25 @@ export function AppShell({
   );
   const automaticLayout = useAppShellLayoutMetrics(shellRef);
   const layoutMode = layoutModeOverride ?? automaticLayout.mode;
+  const currentBuildNarrowSidebar =
+    narrowSidebarBehavior === "current-build" && layoutMode === "narrow";
+  const sidebarPreviewVisible =
+    currentBuildNarrowSidebar &&
+    !sidebarOpen &&
+    sidebarPreviewOpen &&
+    sidebar !== undefined &&
+    sidebar !== null;
+  const sidebarSurfaceVisible = sidebarOpen || sidebarPreviewVisible;
+  const previousLayoutModeRef = useRef(layoutMode);
+  const responsivePanelContinuityKeyRef = useRef(
+    responsivePanelContinuityKey,
+  );
+  const sidebarAutoCollapsedRef = useRef(false);
+  const sidePanelAutoCollapsedRef = useRef(false);
+  const expectedResponsiveSidebarOpenRef = useRef<boolean | null>(null);
+  const expectedResponsiveSidePanelOpenRef = useRef<boolean | null>(null);
+  const responsiveSidebarRequestTokenRef = useRef<symbol | null>(null);
+  const responsiveSidePanelRequestTokenRef = useRef<symbol | null>(null);
   const shellWidth = automaticLayout.width;
   const normalizedBottomPanelMinHeight = Math.max(
     0,
@@ -651,12 +708,60 @@ export function AppShell({
   const requestedSidebarWidth = sidebarWidthIsControlled
     ? sidebarWidth
     : internalSidebarWidth;
+  const sidePanelHasOpenContent =
+    sidePanelOpen &&
+    sidePanel !== undefined &&
+    sidePanel !== null;
+  const normalizedSidePanelMinWidth = Math.max(
+    0,
+    Number.isFinite(sidePanelMinWidth) ? sidePanelMinWidth : 320,
+  );
+  const normalizedSidePanelMinMainWidth = Math.max(
+    0,
+    Number.isFinite(sidePanelMinMainWidth) ? sidePanelMinMainWidth : 352,
+  );
+  const coordinatedPersistentMainMinWidth = Math.max(
+    normalizedSidebarMinMainWidth,
+    normalizedSidePanelMinMainWidth,
+  );
+  const minimumPersistentSidebarWidth = sidebarIsVisible
+    ? sidebarResizable || sidebarWidthIsControlled
+      ? normalizedSidebarMinWidth
+      : (observedSidebarWidth ?? requestedSidebarWidth)
+    : 0;
+  const wideSidePanelMinimaFit =
+    shellWidth === null ||
+    shellWidth >=
+      minimumPersistentSidebarWidth +
+        normalizedSidePanelMinWidth +
+        coordinatedPersistentMainMinWidth;
+  const sidePanelOverlay =
+    sidePanelHasOpenContent &&
+    (layoutMode !== "wide" ||
+      (!sidePanelExpanded && !wideSidePanelMinimaFit));
+  const persistentSidePanelMinWidth =
+    layoutMode === "wide" &&
+    sidePanelHasOpenContent &&
+    !sidePanelExpanded &&
+    !sidePanelOverlay
+      ? normalizedSidePanelMinWidth
+      : 0;
+  const responsiveSidebarMinMainWidth =
+    persistentSidePanelMinWidth > 0
+      ? coordinatedPersistentMainMinWidth
+      : normalizedSidebarMinMainWidth;
+  const responsiveSidePanelMinMainWidth =
+    layoutMode === "wide" && sidebarIsVisible && !sidePanelOverlay
+      ? coordinatedPersistentMainMinWidth
+      : normalizedSidePanelMinMainWidth;
   const responsiveSidebarMaxWidth =
     layoutMode === "narrow" || shellWidth === null
       ? normalizedSidebarMaxWidth
       : Math.max(
           normalizedSidebarMinWidth,
-          shellWidth - normalizedSidebarMinMainWidth,
+          shellWidth -
+            responsiveSidebarMinMainWidth -
+            persistentSidePanelMinWidth,
         );
   const resolvedSidebarMaxWidth = Math.min(
     normalizedSidebarMaxWidth,
@@ -666,14 +771,6 @@ export function AppShell({
     requestedSidebarWidth,
     normalizedSidebarMinWidth,
     resolvedSidebarMaxWidth,
-  );
-  const normalizedSidePanelMinWidth = Math.max(
-    0,
-    Number.isFinite(sidePanelMinWidth) ? sidePanelMinWidth : 320,
-  );
-  const normalizedSidePanelMinMainWidth = Math.max(
-    0,
-    Number.isFinite(sidePanelMinMainWidth) ? sidePanelMinMainWidth : 352,
   );
   const normalizedSidePanelMaxWidth = Math.max(
     normalizedSidePanelMinWidth,
@@ -704,7 +801,7 @@ export function AppShell({
           normalizedSidePanelMinWidth,
           shellWidth -
             occupiedSidebarWidth -
-            normalizedSidePanelMinMainWidth,
+            responsiveSidePanelMinMainWidth,
         );
   const resolvedSidePanelMaxWidth = Math.min(
     normalizedSidePanelMaxWidth,
@@ -731,6 +828,8 @@ export function AppShell({
     bottomPanelResizable ||
     bottomPanelHeightIsControlled ||
     sidebarResizable ||
+    sidebarWidthIsControlled ||
+    sidePanelHasOpenContent ||
     sidePanelResizable ||
     resolvedSidePanelExpanded
       ? ({
@@ -740,23 +839,32 @@ export function AppShell({
                 "--codex-ui-app-bottom-panel-height": `${resolvedBottomPanelHeight}px`,
               }
             : {}),
-          ...(sidebarResizable
+          ...(sidebarResizable || sidebarWidthIsControlled
             ? {
                 "--codex-ui-app-sidebar-width": `${resolvedSidebarWidth}px`,
               }
             : {}),
-          ...(sidePanelResizable || resolvedSidePanelExpanded
+          ...(sidePanelHasOpenContent
             ? {
                 "--codex-ui-app-side-panel-width": `${resolvedSidePanelWidth}px`,
               }
             : {}),
         } as CSSProperties)
       : style;
+  const currentBuildNarrowSidebarPinned =
+    currentBuildNarrowSidebar &&
+    sidebarOpen &&
+    (shellWidth === null ||
+      shellWidth >=
+        resolvedSidebarWidth + normalizedSidebarMinMainWidth);
   const sidebarModalOpen =
-    sidebarOpen && layoutMode === "narrow";
+    sidebarOpen &&
+    layoutMode === "narrow" &&
+    (narrowSidebarBehavior === "modal" ||
+      !currentBuildNarrowSidebarPinned);
   const sidePanelModalOpen =
     sidePanelOpen &&
-    layoutMode !== "wide" &&
+    sidePanelOverlay &&
     !sidebarModalOpen;
   const responsiveModalOpen =
     sidebarModalOpen || sidePanelModalOpen;
@@ -772,13 +880,155 @@ export function AppShell({
     sidePanel !== undefined &&
     sidePanel !== null &&
     !resolvedSidePanelExpanded &&
-    layoutMode === "wide";
+    layoutMode === "wide" &&
+    !sidePanelOverlay;
   const bottomPanelResizerVisible =
     bottomPanelResizable &&
     bottomPanelOpen &&
     bottomPanel !== undefined &&
     bottomPanel !== null &&
     !sidebarModalOpen;
+  useLayoutEffect(() => {
+    if (
+      responsivePanelContinuityKeyRef.current !==
+      responsivePanelContinuityKey
+    ) {
+      responsivePanelContinuityKeyRef.current =
+        responsivePanelContinuityKey;
+      sidebarAutoCollapsedRef.current = false;
+      sidePanelAutoCollapsedRef.current = false;
+      expectedResponsiveSidebarOpenRef.current = null;
+      expectedResponsiveSidePanelOpenRef.current = null;
+      responsiveSidebarRequestTokenRef.current = null;
+      responsiveSidePanelRequestTokenRef.current = null;
+    }
+    if (!responsivePanelContinuity) {
+      sidebarAutoCollapsedRef.current = false;
+      sidePanelAutoCollapsedRef.current = false;
+      expectedResponsiveSidebarOpenRef.current = null;
+      expectedResponsiveSidePanelOpenRef.current = null;
+      responsiveSidebarRequestTokenRef.current = null;
+      responsiveSidePanelRequestTokenRef.current = null;
+    }
+
+    const previousMode = previousLayoutModeRef.current;
+    if (previousMode === layoutMode) return;
+    previousLayoutModeRef.current = layoutMode;
+    onLayoutModeChange?.(layoutMode, previousMode);
+    if (!responsivePanelContinuity) return;
+
+    const enteredNarrow =
+      previousMode !== "narrow" && layoutMode === "narrow";
+    const leftNarrow =
+      previousMode === "narrow" && layoutMode !== "narrow";
+    if (enteredNarrow && sidebarOpen && onSidebarOpenChange) {
+      stageResponsiveOpenExpectation(
+        expectedResponsiveSidebarOpenRef,
+        responsiveSidebarRequestTokenRef,
+        sidebarAutoCollapsedRef,
+        false,
+      );
+      onSidebarOpenChange(false);
+    } else if (
+      leftNarrow &&
+      sidebarAutoCollapsedRef.current &&
+      !sidebarOpen &&
+      onSidebarOpenChange
+    ) {
+      stageResponsiveOpenExpectation(
+        expectedResponsiveSidebarOpenRef,
+        responsiveSidebarRequestTokenRef,
+        sidebarAutoCollapsedRef,
+        true,
+      );
+      onSidebarOpenChange(true);
+    } else if (leftNarrow) {
+      sidebarAutoCollapsedRef.current = false;
+      expectedResponsiveSidebarOpenRef.current = null;
+      responsiveSidebarRequestTokenRef.current = null;
+    }
+
+    const enteredConstrained =
+      previousMode === "wide" && layoutMode !== "wide";
+    const leftConstrained =
+      previousMode !== "wide" && layoutMode === "wide";
+    if (enteredConstrained && sidePanelOpen && onSidePanelOpenChange) {
+      stageResponsiveOpenExpectation(
+        expectedResponsiveSidePanelOpenRef,
+        responsiveSidePanelRequestTokenRef,
+        sidePanelAutoCollapsedRef,
+        false,
+      );
+      onSidePanelOpenChange(false);
+    } else if (
+      leftConstrained &&
+      sidePanelAutoCollapsedRef.current &&
+      !sidePanelOpen &&
+      onSidePanelOpenChange
+    ) {
+      stageResponsiveOpenExpectation(
+        expectedResponsiveSidePanelOpenRef,
+        responsiveSidePanelRequestTokenRef,
+        sidePanelAutoCollapsedRef,
+        true,
+      );
+      onSidePanelOpenChange(true);
+    } else if (leftConstrained) {
+      sidePanelAutoCollapsedRef.current = false;
+      expectedResponsiveSidePanelOpenRef.current = null;
+      responsiveSidePanelRequestTokenRef.current = null;
+    }
+  }, [
+    layoutMode,
+    onLayoutModeChange,
+    onSidePanelOpenChange,
+    onSidebarOpenChange,
+    responsivePanelContinuity,
+    responsivePanelContinuityKey,
+    sidePanelOpen,
+    sidebarOpen,
+  ]);
+  useLayoutEffect(() => {
+    const expectedSidebarOpen = expectedResponsiveSidebarOpenRef.current;
+    if (
+      expectedSidebarOpen !== null &&
+      sidebarOpen === expectedSidebarOpen
+    ) {
+      responsiveSidebarRequestTokenRef.current = null;
+      expectedResponsiveSidebarOpenRef.current = null;
+      sidebarAutoCollapsedRef.current = !expectedSidebarOpen;
+    } else if (
+      expectedSidebarOpen === null &&
+      sidebarAutoCollapsedRef.current &&
+      layoutMode === "narrow" &&
+      sidebarOpen
+    ) {
+      sidebarAutoCollapsedRef.current = false;
+    }
+
+    const expectedSidePanelOpen =
+      expectedResponsiveSidePanelOpenRef.current;
+    if (
+      expectedSidePanelOpen !== null &&
+      sidePanelOpen === expectedSidePanelOpen
+    ) {
+      responsiveSidePanelRequestTokenRef.current = null;
+      expectedResponsiveSidePanelOpenRef.current = null;
+      sidePanelAutoCollapsedRef.current = !expectedSidePanelOpen;
+    } else if (
+      expectedSidePanelOpen === null &&
+      sidePanelAutoCollapsedRef.current &&
+      layoutMode !== "wide" &&
+      sidePanelOpen
+    ) {
+      sidePanelAutoCollapsedRef.current = false;
+    }
+  }, [layoutMode, sidePanelOpen, sidebarOpen]);
+  useLayoutEffect(() => {
+    if (!currentBuildNarrowSidebar || sidebarOpen) {
+      setSidebarPreviewOpen(false);
+    }
+  }, [currentBuildNarrowSidebar, sidebarOpen]);
   const resolveBottomPanelHeight = (nextHeight: number) => {
     const measuredLiveShellHeight =
       shellRef.current === null
@@ -905,7 +1155,7 @@ export function AppShell({
             normalizedSidePanelMinWidth,
             liveShellWidth -
               liveSidebarWidth -
-              normalizedSidePanelMinMainWidth,
+              responsiveSidePanelMinMainWidth,
           );
     const maximum = Math.min(
       normalizedSidePanelMaxWidth,
@@ -1014,7 +1264,9 @@ export function AppShell({
         ? normalizedSidebarMaxWidth
         : Math.max(
             normalizedSidebarMinWidth,
-            liveShellWidth - normalizedSidebarMinMainWidth,
+            liveShellWidth -
+              responsiveSidebarMinMainWidth -
+              persistentSidePanelMinWidth,
           );
     return clampShellTrack(
       nextWidth,
@@ -1182,7 +1434,7 @@ export function AppShell({
       : mainRef;
 
   useSurfaceFocusRestoration(
-    sidebarOpen,
+    sidebarSurfaceVisible,
     sidebarRef,
     sidebarFocusFallbackRef,
     sidebarBackdropRef,
@@ -1407,6 +1659,47 @@ export function AppShell({
     sidebarModalOpen,
     sidebarOpen,
   ]);
+  const handleShellPointerMoveCapture = (
+    event: ReactPointerEvent<HTMLDivElement>,
+  ) => {
+    onPointerMoveCapture?.(event);
+    if (
+      event.defaultPrevented ||
+      !currentBuildNarrowSidebar ||
+      sidebarOpen
+    ) {
+      return;
+    }
+    const shell = shellRef.current;
+    if (!shell) return;
+    const portalOwner =
+      event.target instanceof Element
+        ? event.target.closest<HTMLElement>(
+            "[data-codex-ui-surface-owner]",
+          )?.dataset.codexUiSurfaceOwner
+        : undefined;
+    if (portalOwner === sidebarPortalOwnerId) return;
+    const bounds = shell.getBoundingClientRect();
+    const direction = getComputedStyle(shell).direction;
+    const inlineStartDistance =
+      direction === "rtl"
+        ? bounds.right - event.clientX
+        : event.clientX - bounds.left;
+    if (inlineStartDistance <= 12) {
+      setSidebarPreviewOpen(true);
+    } else if (
+      sidebarPreviewOpen &&
+      inlineStartDistance > resolvedSidebarWidth
+    ) {
+      setSidebarPreviewOpen(false);
+    }
+  };
+  const handleShellPointerLeave = (
+    event: ReactPointerEvent<HTMLDivElement>,
+  ) => {
+    onPointerLeave?.(event);
+    if (!event.defaultPrevented) setSidebarPreviewOpen(false);
+  };
 
   return (
     <div
@@ -1416,27 +1709,48 @@ export function AppShell({
       data-bottom-panel-resizing={bottomPanelResizing || undefined}
       data-side-panel-expanded={resolvedSidePanelExpanded || undefined}
       data-side-panel-open={sidePanelOpen || undefined}
+      data-side-panel-overlay={sidePanelOverlay || undefined}
       data-side-panel-resizable={sidePanelResizable || undefined}
       data-side-panel-resizing={sidePanelResizing || undefined}
+      data-narrow-sidebar-behavior={narrowSidebarBehavior}
+      data-sidebar-pinned={currentBuildNarrowSidebarPinned || undefined}
+      data-sidebar-preview-open={sidebarPreviewVisible || undefined}
       data-sidebar-resizable={sidebarResizable || undefined}
       data-sidebar-resizing={sidebarResizing || undefined}
       data-sidebar-open={sidebarOpen || undefined}
       data-layout-mode={layoutMode}
+      data-window-chrome={windowChrome ? true : undefined}
+      onPointerLeave={handleShellPointerLeave}
+      onPointerMoveCapture={handleShellPointerMoveCapture}
       ref={shellRef}
       style={shellStyle}
       {...props}
     >
+      {windowChrome ? (
+        <div
+          className="codex-ui-app-shell__window-chrome"
+          inert={inertWhen(responsiveModalOpen)}
+        >
+          <SurfaceBlockedContext.Provider value={responsiveModalOpen}>
+            {windowChrome}
+          </SurfaceBlockedContext.Provider>
+        </div>
+      ) : null}
       <div className="codex-ui-app-shell__layout">
         <aside
-          aria-hidden={!sidebarOpen}
+          aria-hidden={!sidebarSurfaceVisible}
           aria-label={sidebarLabel}
           className="codex-ui-app-shell__sidebar"
-          inert={inertWhen(!sidebarOpen)}
+          inert={inertWhen(!sidebarSurfaceVisible)}
           ref={sidebarRef}
           tabIndex={-1}
         >
-          <SurfaceBlockedContext.Provider value={!sidebarOpen}>
-            {sidebar}
+          <SurfaceBlockedContext.Provider value={!sidebarSurfaceVisible}>
+            <SurfacePortalOwnerContext.Provider
+              value={sidebarPortalOwnerId}
+            >
+              {sidebar}
+            </SurfacePortalOwnerContext.Provider>
           </SurfaceBlockedContext.Provider>
         </aside>
         {sidebarResizerVisible ? (
@@ -1531,7 +1845,7 @@ export function AppShell({
             data-backdrop="side-panel"
             onClick={() => onSidePanelOpenChange(false)}
             ref={sidePanelBackdropRef}
-            tabIndex={sidePanelOpen && !sidebarModalOpen ? 0 : -1}
+            tabIndex={sidePanelModalOpen ? 0 : -1}
             type="button"
           />
         ) : null}

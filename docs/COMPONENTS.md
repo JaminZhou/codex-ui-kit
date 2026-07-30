@@ -95,6 +95,21 @@ All privileged behavior remains host-owned. The components never auto-approve co
 
 ## Navigation and shell
 
+- `AppWindowChrome`: 46px application-owned window navigation with
+  traffic-light-safe Sidebar, Back, and Forward controls plus host-owned title
+  and trailing slots. Hosts retain history, routing, and native-window
+  behavior.
+- `AppRouteOutlet`: ready, loading, empty, error, offline, reconnecting, and
+  stale-data presentation. Stale and reconnecting variants can preserve
+  host-owned content while alert/live-region and busy semantics remain
+  explicit; reconnecting marks only the refreshed content busy so the sibling
+  live status remains announceable.
+- `AppNotificationRegion`: body-portalled top- or bottom-end application
+  feedback with neutral, success, warning, and error tones, optional action,
+  dismissal, alert/status semantics, and explicit or trigger-inferred theme
+  propagation across the portal boundary. Inferred theme ownership is
+  recomputed when the visible notification set changes, including one-for-one
+  replacement.
 - `AppShell`: the application-level grid for a persistent navigation sidebar,
   conversation main region, right workspace panel, and bottom panel. Wide mode
   reserves measured tracks; medium and narrow containers switch side surfaces
@@ -110,10 +125,24 @@ All privileged behavior remains host-owned. The components never auto-approve co
   `sidePanelResizable` applies the same accessible interaction contract to the
   right workspace, with configurable panel/main minima, responsive clamping,
   controlled persistence, focus restoration, and an expanded full-main mode.
+  Responsive width clamping also applies when the panel has no resize
+  affordance, and a wider sidebar is coordinated with the persistent panel
+  minimum so both fixed tracks cannot consume the main route.
   `bottomPanelResizable` adds the current-build measured 16px horizontal
   separator, a preferred 152px minimum (reduced only when the responsive
   half-height cap is smaller), pointer and Arrow/Home/End control, accessible
-  values, and controlled or uncontrolled height persistence.
+  values, and controlled or uncontrolled height persistence. `windowChrome`
+  places the application-owned titlebar above the main track and keeps its
+  trailing actions before a persistent right panel.
+  `responsivePanelContinuity` can auto-collapse side surfaces at the measured
+  960/720px layout transitions and restore only surfaces that it closed;
+  disabling continuity or changing `responsivePanelContinuityKey` resets that
+  restoration intent for a new route or workspace. Controlled-host callbacks
+  must acknowledge the requested state before the surface becomes eligible
+  for later restoration.
+  `narrowSidebarBehavior="current-build"` separates
+  a transient 12px edge preview from explicitly pinning the normal sidebar
+  track, and restores focus before that preview becomes inert.
 - `AppSidebar`, `AppSidebarSection`, `AppSidebarItem`, and
   `AppSidebarFooter`: grouped primary navigation with one selected route,
   heading-preserving collapsible collections, lifecycle status, measured

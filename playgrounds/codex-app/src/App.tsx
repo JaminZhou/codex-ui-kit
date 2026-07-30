@@ -5,10 +5,13 @@ import {
   AgentMessage,
   AgentTurn,
   AppShell,
+  AppNotificationRegion,
+  AppRouteOutlet,
   AppSidebar,
   AppSidebarFooter,
   AppSidebarItem,
   AppSidebarSection,
+  AppWindowChrome,
   ApprovalRequest,
   Button,
   CommandExecution,
@@ -32,6 +35,7 @@ import {
   TurnDuration,
   WorkspacePanel,
   type TerminalEntry,
+  type AppRouteOutletStatus,
 } from "codex-ui-kit";
 import {
   Fragment,
@@ -71,7 +75,7 @@ import {
   mcpToolCallPresentation,
 } from "./mcp-tool-call-view";
 
-type DemoView = "conversation" | "pull-request";
+type DemoView = "conversation" | "pull-request" | "shell";
 
 type SidebarGlyphName =
   | "automation"
@@ -127,8 +131,22 @@ function querySelection() {
   const view: DemoView =
     params.get("view") === "pull-request"
       ? "pull-request"
-      : "conversation";
-  return { capture, frame, layoutMode, scenarioId, view };
+      : params.get("view") === "shell"
+        ? "shell"
+        : "conversation";
+  const requestedShellState = params.get("shellState");
+  const shellState: AppRouteOutletStatus = [
+    "ready",
+    "loading",
+    "empty",
+    "error",
+    "offline",
+    "reconnecting",
+    "stale",
+  ].includes(requestedShellState ?? "")
+    ? (requestedShellState as AppRouteOutletStatus)
+    : "ready";
+  return { capture, frame, layoutMode, scenarioId, shellState, view };
 }
 
 function isNarrowDemoWindow() {
@@ -296,6 +314,13 @@ export function App() {
   );
   const [mode, setMode] = useState<"live" | "replay">("replay");
   const [view, setView] = useState<DemoView>(initialSelection.view);
+  const [shellState, setShellState] = useState<AppRouteOutletStatus>(
+    initialSelection.shellState,
+  );
+  const [shellNotificationVisible, setShellNotificationVisible] = useState(
+    initialSelection.shellState === "ready" &&
+      initialSelection.frame === "shell-restored",
+  );
   const [composerValue, setComposerValue] = useState("");
   const [liveStartPending, setLiveStartPending] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(
@@ -339,25 +364,6 @@ export function App() {
   const liveApprovalSubmissionGateRef = useRef(
     new LiveApprovalSubmissionGate(),
   );
-  const sidebarNarrowRef = useRef(
-    !initialSelection.capture && isNarrowDemoWindow(),
-  );
-
-  useEffect(() => {
-    if (initialSelection.capture) return;
-
-    const handleResize = () => {
-      const nextNarrow = isNarrowDemoWindow();
-      if (!sidebarNarrowRef.current && nextNarrow) {
-        setSidebarOpen(false);
-      }
-      sidebarNarrowRef.current = nextNarrow;
-    };
-
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, [initialSelection.capture]);
-
   const replay = useMemo(
     () => replayState(scenario.events, replayCount),
     [replayCount, scenario.events],
@@ -395,7 +401,7 @@ export function App() {
   }, [liveState.approvals]);
 
   const dismissSidebarAfterNavigation = () => {
-    if (sidebarNarrowRef.current) setSidebarOpen(false);
+    if (isNarrowDemoWindow()) setSidebarOpen(false);
   };
 
   const selectScenario = (nextId: ReplayScenarioId) => {
@@ -412,6 +418,7 @@ export function App() {
     setTerminalHistoryByCommand({});
     setUndoneFileIds(new Set());
     setLiveError(null);
+    setShellNotificationVisible(false);
     dismissSidebarAfterNavigation();
   };
 
@@ -527,10 +534,10 @@ export function App() {
             onClick={() => {
               setMode("replay");
               setView("pull-request");
-              setPullRequestOpen(!sidebarNarrowRef.current);
+              setPullRequestOpen(!isNarrowDemoWindow());
               dismissSidebarAfterNavigation();
             }}
-            selected={view === "pull-request"}
+            selected={view === "pull-request" || view === "shell"}
           >
             Pull requests
           </AppSidebarItem>
@@ -1077,6 +1084,66 @@ export function App() {
       />
     </section>
   );
+  const shellRouteContent = (
+    <div className="demo-shell-route-content">
+      <header>
+        <div>
+          <span className="demo-shell-route-eyebrow">Workspace</span>
+          <h1>Pull requests</h1>
+        </div>
+        <button type="button">New pull request</button>
+      </header>
+      <div className="demo-shell-route-toolbar">
+        <input
+          aria-label="Search restored pull requests"
+          placeholder="Search pull requests"
+          type="search"
+        />
+        <button type="button">All repositories</button>
+      </div>
+      <article>
+        <span aria-hidden="true" className="demo-shell-route-status">✓</span>
+        <div>
+          <strong>App shell continuity</strong>
+          <span>codex-ui-kit · ready for review</span>
+        </div>
+        <time dateTime="PT2M">2m</time>
+      </article>
+    </div>
+  );
+  const shellRoute = (
+    <AppRouteOutlet
+      actions={
+        shellState === "offline" || shellState === "error"
+          ? [
+              {
+                label: "Try again",
+                onClick: () => {
+                  setShellState("loading");
+                  window.setTimeout(() => {
+                    setShellState("ready");
+                    setShellNotificationVisible(true);
+                  }, 240);
+                },
+                primary: true,
+              },
+            ]
+          : []
+      }
+      aria-label="Pull requests route"
+      description={
+        shellState === "loading"
+          ? "Refreshing pull requests…"
+          : undefined
+      }
+      heading={
+        shellState === "loading" ? "Loading pull requests" : undefined
+      }
+      status={shellState}
+    >
+      {shellRouteContent}
+    </AppRouteOutlet>
+  );
   const timelineContent = state.timeline.map((entry, entryIndex) => {
     if (entry.kind === "message") {
       const message = state.messages.find(({ id }) => id === entry.id);
@@ -1598,8 +1665,25 @@ export function App() {
       data-mode={mode}
       data-scenario={scenarioId}
       data-status={state.status}
+      data-shell-state={view === "shell" ? shellState : undefined}
       data-view={view}
     >
+      <AppNotificationRegion
+        notifications={
+          view === "shell" && shellNotificationVisible
+            ? [
+                {
+                  description: "Pull requests are up to date.",
+                  heading: "Connection restored",
+                  id: "shell-restored",
+                  onDismiss: () => setShellNotificationVisible(false),
+                  tone: "info",
+                },
+              ]
+            : []
+        }
+        position="bottom-end"
+      />
       <AppShell
         bottomPanel={terminalPanel}
         bottomPanelHeight={terminalHeight}
@@ -1614,6 +1698,7 @@ export function App() {
             ? "wide"
             : undefined
         }
+        narrowSidebarBehavior="current-build"
         onSidebarOpenChange={setSidebarOpen}
         onSidePanelOpenChange={
           view === "pull-request" ? setPullRequestOpen : setReviewOpen
@@ -1621,6 +1706,8 @@ export function App() {
         onSidePanelWidthChange={
           view === "pull-request" ? setPullRequestWidth : undefined
         }
+        responsivePanelContinuity={!initialSelection.capture}
+        responsivePanelContinuityKey={`${mode}:${view}:${scenarioId}`}
         sidePanel={
           view === "pull-request" ? pullRequestPanel : reviewPanel
         }
@@ -1642,9 +1729,24 @@ export function App() {
         sidebar={sidebar}
         sidebarOpen={sidebarOpen}
         sidebarResizable
+        windowChrome={
+          view === "shell" ? (
+            <AppWindowChrome
+              backAction={{ label: "Back" }}
+              forwardAction={{ disabled: true, label: "Forward" }}
+              sidebarAction={{
+                "aria-expanded": sidebarOpen,
+                label: sidebarOpen ? "Hide sidebar" : "Show sidebar",
+                onClick: () => setSidebarOpen((open) => !open),
+              }}
+            />
+          ) : undefined
+        }
       >
         {view === "pull-request" ? (
           pullRequestIndex
+        ) : view === "shell" ? (
+          shellRoute
         ) : (
           <>
             <ConversationThreadShell

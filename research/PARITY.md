@@ -54,12 +54,16 @@ The authoritative current-build inventory is:
   failed-Fetch → Search → successful-Fetch recovery. Target selection uses the
   `app://-/index.html` URL plus application-shell landmarks and excludes the
   small auxiliary page. The independent Browser and Electron flows verify the
-  sidebar at 1180×820, 820×680, and the 720px modal transition, plus the MCP
-  recovery and its following command/approval/file/Review turn across 22
-  deterministic frames. External regional gates verify the sidebar top
-  controls, selected row, and footer, and separately the MCP full-main,
-  recovery, user, and Composer regions. Older observations outside these
-  sampled slices remain `partial_legacy`, not current-build verification.
+  sidebar at 1180×820, the 961/960 and 721/720 boundaries, 1920×1080, and
+  2560×1440. Narrow behavior distinguishes the 12px edge preview from an
+  explicit pinned sidebar. The shell flow additionally covers window chrome,
+  loading/offline/stale/restored route states, in-session selection
+  restoration, and global feedback, while the MCP recovery continues through
+  its following command/approval/file/Review turn. External regional gates
+  verify the sidebar, window chrome, and MCP-owned regions. Offline/error/
+  reconnecting/stale and global-notification runtime states remain synthetic
+  independent coverage, not current-build observations. Older evidence
+  outside these sampled slices remains `partial_legacy`.
 - Renderer viewport probing exposed a narrow-layout gap: the thread and
   Composer shrink, but the fixed app sidebar remains and the right workspace
   panel can be laid out beyond the simulated viewport. The independently

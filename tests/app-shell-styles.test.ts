@@ -20,13 +20,13 @@ describe("application shell visual contract", () => {
   });
 
   it("turns fixed columns into overlays before they can leave the viewport", () => {
-    expect(styles).toContain(
-      "@container codex-ui-app-shell (max-width: 92rem) {\n  .codex-ui-app-shell__layout {",
+    expect(styles).toMatch(
+      /@container codex-ui-app-shell \(max-width: 60rem\) \{[\s\S]*?\.codex-ui-app-shell__layout \{/,
     );
     expect(styles).toContain(
       "@container codex-ui-app-shell (max-width: 45rem) {\n  .codex-ui-app-shell__layout {",
     );
-    expect(component).toContain("const appShellMediumBreakpointRem = 92");
+    expect(component).toContain("const appShellMediumBreakpointRem = 60");
     expect(component).toContain("const appShellNarrowBreakpointRem = 45");
     expect(tokens).not.toContain("--codex-ui-app-shell-medium-breakpoint");
     expect(tokens).not.toContain("--codex-ui-app-shell-narrow-breakpoint");
@@ -37,9 +37,37 @@ describe("application shell visual contract", () => {
       '.codex-ui-app-shell__backdrop[data-backdrop="sidebar"]',
     );
     expect(styles).toContain("max-width: calc(100% - 3rem)");
+    expect(styles).toContain(
+      ".codex-ui-app-shell[data-side-panel-overlay][data-side-panel-open]",
+    );
+    expect(styles).toMatch(
+      /\[data-side-panel-overlay\]\[data-side-panel-open\][\s\S]*?\.codex-ui-app-shell__layout \{[\s\S]*?--codex-ui-app-shell-side-panel-track: 0rem;/,
+    );
+    expect(styles).toMatch(
+      /@container codex-ui-app-shell \(max-width: 60rem\) \{[\s\S]*?\.codex-ui-app-shell:dir\(rtl\) \.codex-ui-app-shell__side-panel \{[\s\S]*?transform: translateX\(-100%\);[\s\S]*?\.codex-ui-app-shell\[data-side-panel-open\][\s\S]*?\.codex-ui-app-shell__side-panel \{[\s\S]*?transform: translateX\(0\);/,
+    );
     expect(styles).toMatch(
       /@media \(prefers-reduced-motion: reduce\) \{[\s\S]*?\.codex-ui-app-shell__sidebar,[\s\S]*?\.codex-ui-app-shell__side-panel \{[\s\S]*?transition: none/,
     );
+  });
+
+  it("keeps current-build narrow preview distinct from modal fallback", () => {
+    expect(styles).toContain(
+      '.codex-ui-app-shell[data-narrow-sidebar-behavior="current-build"][data-sidebar-pinned]',
+    );
+    expect(styles).toMatch(
+      /\[data-narrow-sidebar-behavior="current-build"\]\[data-sidebar-pinned\][\s\S]*?grid-template-columns:[\s\S]*?calc\(100% - 3rem\)[\s\S]*?minmax\(3rem, 1fr\);/,
+    );
+    expect(styles).toContain(
+      '.codex-ui-app-shell[data-narrow-sidebar-behavior="current-build"][data-sidebar-preview-open]:not([data-sidebar-open])',
+    );
+    expect(styles).toMatch(
+      /@container codex-ui-app-shell \(max-width: 45rem\) \{[\s\S]*?\.codex-ui-app-shell:dir\(rtl\) \.codex-ui-app-shell__sidebar \{[\s\S]*?transform: translateX\(100%\);[\s\S]*?\.codex-ui-app-shell\[data-sidebar-open\] \.codex-ui-app-shell__sidebar \{[\s\S]*?transform: translateX\(0\);/,
+    );
+    expect(component).toContain(
+      'export type AppShellNarrowSidebarBehavior = "current-build" | "modal"',
+    );
+    expect(component).toContain("inlineStartDistance <= 12");
   });
 
   it("keeps panel tabs, content, and focus semantics explicit", () => {
@@ -60,9 +88,8 @@ describe("application shell visual contract", () => {
     expect(component).toContain("sidebarMinWidth = 240");
     expect(component).toContain("sidebarMaxWidth = 520");
     expect(component).toContain("sidebarMinMainWidth = 352");
-    expect(component).toContain(
-      "shellWidth - normalizedSidebarMinMainWidth",
-    );
+    expect(component).toContain("responsiveSidebarMinMainWidth");
+    expect(component).toContain("persistentSidePanelMinWidth");
     expect(component).toContain('role="separator"');
     expect(component).toContain('aria-orientation="vertical"');
   });

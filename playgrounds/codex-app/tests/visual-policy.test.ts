@@ -27,4 +27,16 @@ describe("lifecycle visual policy", () => {
     expect(contract).not.toContain("const topMasks");
     expect(contract).not.toContain("defaultLifecyclePixelRatio");
   });
+
+  it("keeps the current-build window chrome comparison ownership-scoped", () => {
+    expect(contract).toContain(
+      "CODEX_UI_KIT_WINDOW_CHROME_REFERENCE",
+    );
+    expect(contract).toContain(
+      "const actualChrome = cropPng(actual, 80, 0, 120, 46)",
+    );
+    expect(contract).toContain(
+      "CODEX_UI_KIT_WINDOW_CHROME_MAX_DIFF_RATIO",
+    );
+  });
 });

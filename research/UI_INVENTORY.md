@@ -46,7 +46,7 @@ observation from a previous build remains historical evidence.
 ## Current baseline
 
 - Codex Desktop `26.721.81911` (`5973`)
-- Package sampled and reverified on 2026-07-29
+- Package sampled on 2026-07-29 and reverified on 2026-07-30
 - `app.asar` SHA-256:
   `3c9a101d9beec3718b0fcfc19e427c644a934045f48b3fe0e16b68b0b3f23e61`
 - Computer Use automation: blocked by the environment safety policy for
@@ -55,16 +55,17 @@ observation from a previous build remains historical evidence.
   the Chromium profile is separate, but Codex application data and navigation
   are not fully isolated
 - Fresh current-build Renderer capture: recorded for the dark 1180×820 main
-  application target, the six left-sidebar groups, and a real
-  OpenAI Developer Docs failed-Fetch → Search → successful-Fetch recovery;
-  light-theme and unrelated surface evidence remain pending
+  application target, the six left-sidebar groups, 46px window navigation,
+  Pull requests loading/selection continuity, and a real OpenAI Developer Docs
+  failed-Fetch → Search → successful-Fetch recovery; light-theme, global
+  notifications, and unrelated surface evidence remain pending
 
-Current inventory: 69 surface groups; 8 have current-build runtime evidence,
-42 have previous-build-only runtime evidence, 19 remain `not_sampled`, and 0
-are `blocked_by_policy`. Current-build Browser verification covers 8 groups
-and Electron verification covers 8. Prior acceptance outside the sidebar and
-recovered MCP slice remains recorded as `partial_legacy` until current-build
-re-observation.
+Current inventory: 73 surface groups; 11 have current-build runtime evidence,
+42 have previous-build-only runtime evidence, 20 remain `not_sampled`, and 0
+are `blocked_by_policy`. Current-build Browser verification covers 11 groups
+and Electron verification covers 11. Prior acceptance outside the sampled
+shell, sidebar, and recovered MCP slices remains recorded as `partial_legacy`
+until current-build re-observation.
 
 The current package exposes candidates far beyond the old transcript sample:
 application and thread shells, local/remote conversation routes, projects and
@@ -141,14 +142,40 @@ The current sidebar slice re-observes all six application-sidebar groups on
 `26.721.81911`. It independently implements the 274px shell, 46px
 traffic-light-safe titlebar inset, 70px header, 30px rows, collapsible
 Projects/Pinned/Recents sections, dense thread status/action rows, and fixed
-46px account/settings footer. The normal H5 and Electron compositions remain
-split at 820×680, default to a hidden sidebar at the 720px narrow gate, and
-reopen it as a focus-managed modal overlay. Deterministic capture mode remains
-explicitly wide so regional pixel fixtures do not disable the real
-responsive contract. Browser, Electron, and the current-build dark regional
-pixel comparison pass for this sampled sidebar contract; implementation stays
-`partial` because light-theme runtime evidence, native current-app resize, and
-broader route/state continuity are still separate work.
+46px account/settings footer. The normal H5 and Electron composition now uses
+the current 960px right-panel coordination boundary and 720px sidebar collapse
+boundary. A closed narrow sidebar exposes the observed 12px edge preview;
+clicking Show sidebar pins the regular 274px column and leaves the remaining
+main width in flow. The reusable `AppShell` retains its focus-managed modal
+mode as an explicit fallback rather than describing it as the current Codex
+behavior. Deterministic capture mode remains explicitly wide so regional
+pixel fixtures do not disable the real responsive contract. Implementation
+stays `partial` because light-theme runtime evidence, native current-app
+resize, dynamic right-panel sizing, and broader route coverage remain
+separate work.
+
+The application-shell continuity slice splits window navigation, route
+lifecycle feedback, route selection/restoration, and global notifications
+into independently owned inventory rows. Current-build CDP records the 46px
+chrome, 28px Sidebar/Back/Forward controls at x=88/120/152, Pull requests
+loading status, and selection continuity through the 1180, 961/960, 721/720,
+1920×1080, and 2560×1440 matrix plus a first-use dialog dismissal. The 960px
+transition auto-collapses and later restores the right panel; the 720px
+transition does the same for the sidebar. Hard Renderer reload returns to the
+default route and is not claimed as persistence.
+
+The public `AppWindowChrome`, `AppRouteOutlet`, and `AppNotificationRegion`
+contracts cover host-owned navigation, ready/loading/empty/error/offline/
+reconnecting/stale outlet states, and portalled global feedback. Browser CDP
+passes 26 lifecycle frames. Real Electron acceptance drives offline → retry →
+loading → ready → restored notification and the native 1180×820 → 720×680 →
+1180×820 responsive transition while preserving the selected route and
+restoring only auto-collapsed surfaces. Four deterministic App shell pixel
+frames pass, and the current-build 120×46 window-chrome comparison measures a
+3.93% changed-pixel ratio. Offline/error/reconnecting/stale and global
+notification runtime evidence is still missing, so the implementation remains
+`partial`. Its independent Browser/Electron regression tests do not promote
+`cross-layer.global-notifications` to current-build parity.
 
 The first P0 shell slice provides independently implemented `AppShell`,
 `AppSidebar`, and `WorkspacePanel` compositions. It covers the measured wide
@@ -198,9 +225,11 @@ workflows, or persistence. The broader project index, environment settings,
 and worktree settings families remain partial, as does the legacy host-defined
 route selector. Exact `26.721.81911` PR review-detail behavior remains
 `not_sampled`, so the generic review components do not establish product
-parity. Native application-shell composition and the remaining P0
-conversation/workspace variants also remain open. Final H5/Electron visual
-unification is intentionally deferred until coverage stabilizes.
+parity. The remaining P0 conversation/workspace variants remain open. Global
+notification runtime
+observation and light-theme shell evidence also remain open. Final
+H5/Electron visual unification is intentionally deferred until coverage
+stabilizes.
 
 The current-thread slice adds `ConversationThreadShell`, which composes the
 existing header, scroll-following timeline, messages, and Composer into one

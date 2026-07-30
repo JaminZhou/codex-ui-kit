@@ -8,6 +8,134 @@ await mkdir(artifactDirectory, { recursive: true });
 for (const scene of visualScenes) {
   const { app, page } = await launchScene(scene);
   try {
+    if (scene.view === "shell") {
+      await page.waitForTimeout(50);
+      const contract = await page.evaluate(() => {
+        const rect = (element) => {
+          const value = element.getBoundingClientRect();
+          return {
+            bottom: value.bottom,
+            height: value.height,
+            left: value.left,
+            right: value.right,
+            top: value.top,
+            width: value.width,
+          };
+        };
+        const root = document.querySelector(".demo-root");
+        const shell = document.querySelector(".codex-ui-app-shell");
+        const chrome = document.querySelector(".codex-ui-app-window-chrome");
+        const main = document.querySelector(".codex-ui-app-shell__main");
+        const outlet = document.querySelector(".codex-ui-app-route-outlet");
+        const controls = Array.from(
+          chrome?.querySelectorAll("button") ?? [],
+          (button) => ({
+            disabled: button.disabled,
+            label: button.getAttribute("aria-label"),
+            rect: rect(button),
+          }),
+        );
+        if (!root || !shell || !chrome || !main || !outlet) {
+          throw new Error("App shell continuity surfaces are missing.");
+        }
+        const liveState = outlet.querySelector(
+          ':scope > [role="status"], :scope > [role="alert"]',
+        );
+        const notification = document.querySelector(
+          ".codex-ui-app-notification",
+        );
+        return {
+          chrome: {
+            rect: rect(chrome),
+            style: {
+              appRegion: getComputedStyle(chrome).getPropertyValue(
+                "-webkit-app-region",
+              ),
+              borderColor: getComputedStyle(chrome).borderBottomColor,
+              display: getComputedStyle(chrome).display,
+            },
+          },
+          controls,
+          horizontalOverflow:
+            document.documentElement.scrollWidth -
+            document.documentElement.clientWidth,
+          main: rect(main),
+          notification: notification
+            ? {
+                role: notification.getAttribute("role"),
+                text: notification.textContent?.replace(/\s+/g, " ").trim(),
+              }
+            : null,
+          outlet: {
+            busy: outlet.getAttribute("aria-busy"),
+            contentBusy:
+              outlet
+                .querySelector(".codex-ui-app-route-outlet__content")
+                ?.getAttribute("aria-busy") ?? null,
+            preserved: outlet.hasAttribute("data-preserves-content"),
+            rect: rect(outlet),
+            role: liveState?.getAttribute("role") ?? null,
+            status: outlet.getAttribute("data-status"),
+          },
+          selectedRoutes: Array.from(
+            document.querySelectorAll(
+              '.codex-ui-app-sidebar__item[aria-current="page"]',
+            ),
+            (element) => element.textContent?.trim(),
+          ),
+          shell: rect(shell),
+          shellState: root.getAttribute("data-shell-state"),
+          view: root.getAttribute("data-view"),
+        };
+      });
+      const expectedRole =
+        scene.shellState === "offline" ? "alert" :
+        scene.shellState === "ready" ? null : "status";
+      if (
+        contract.view !== "shell" ||
+        contract.shellState !== scene.shellState ||
+        contract.outlet.status !== scene.shellState ||
+        contract.outlet.role !== expectedRole ||
+        contract.horizontalOverflow > 1 ||
+        contract.selectedRoutes.length !== 1 ||
+        contract.selectedRoutes[0] !== "Pull requests" ||
+        Math.abs(contract.chrome.rect.height - 46) > 1 ||
+        Math.abs(contract.outlet.rect.top - 46) > 1 ||
+        Math.abs(contract.outlet.rect.bottom - contract.shell.bottom) > 1 ||
+        contract.controls.length !== 3 ||
+        contract.controls[0].label !== "Hide sidebar" ||
+        contract.controls[1].label !== "Back" ||
+        contract.controls[2].label !== "Forward" ||
+        Math.abs(contract.controls[0].rect.left - 88) > 1 ||
+        Math.abs(contract.controls[1].rect.left - 120) > 1 ||
+        Math.abs(contract.controls[2].rect.left - 152) > 1 ||
+        !contract.controls[2].disabled ||
+        contract.chrome.style.display !== "grid"
+      ) {
+        throw new Error(
+          `${scene.id}: app shell continuity contract failed: ${JSON.stringify(contract)}`,
+        );
+      }
+      if (
+        contract.outlet.busy !== null ||
+        (scene.shellState === "reconnecting" &&
+          contract.outlet.contentBusy !== "true") ||
+        (scene.shellState !== "reconnecting" &&
+          contract.outlet.contentBusy !== null) ||
+        ((scene.shellState === "stale") !== contract.outlet.preserved) ||
+        ((scene.id === "shell-restored") !== Boolean(contract.notification))
+      ) {
+        throw new Error(
+          `${scene.id}: route lifecycle state failed: ${JSON.stringify(contract)}`,
+        );
+      }
+      await writeFile(
+        join(artifactDirectory, `${scene.id}.json`),
+        `${JSON.stringify(contract, null, 2)}\n`,
+      );
+      continue;
+    }
+
     if (scene.view === "pull-request") {
       const initial = await page.evaluate(() => {
         const rect = (element) => {
@@ -652,15 +780,19 @@ for (const scene of visualScenes) {
         `${scene.id}: current-build sidebar contract failed: ${JSON.stringify(contract.sidebar)}`,
       );
     }
+    const expectedSidebarMax = scene.surfaces?.includes("reviewPanel")
+      ? "508"
+      : "520";
     if (
       contract.styles.resizerCursor !== "col-resize" ||
       Math.abs(contract.sidebarResizer.rect.width - 16) > 0.5 ||
       contract.sidebarResizer.ariaMin !== "240" ||
-      contract.sidebarResizer.ariaMax !== "520" ||
+      contract.sidebarResizer.ariaMax !== expectedSidebarMax ||
       contract.sidebarResizer.ariaNow !== "274"
     ) {
       throw new Error(
         `${scene.id}: navigation resizer contract failed: ${JSON.stringify({
+          expectedSidebarMax,
           resizer: contract.sidebarResizer,
           styles: contract.styles,
         })}`,
@@ -824,8 +956,8 @@ for (const scene of visualScenes) {
         markdown.copyLabel !== "Copy code" ||
         markdown.linkTarget !== "_blank" ||
         Math.abs(markdown.root.rect.width - 736) > 1 ||
-        Math.abs(markdown.root.rect.top - 235) > 1 ||
-        Math.abs(markdown.root.rect.bottom - 592) > 1 ||
+        Math.abs(markdown.root.rect.height - 357) > 1 ||
+        Math.abs(markdown.heading.rect.top - markdown.root.rect.top) > 1 ||
         markdown.heading.fontSize !== "24px" ||
         markdown.heading.lineHeight !== "30px" ||
         markdown.heading.marginBlockEnd !== "10px" ||
@@ -854,13 +986,23 @@ for (const scene of visualScenes) {
         markdown.code.lineHeight !== "22px" ||
         Math.abs(markdown.codeBlock.rect.width - 736) > 1 ||
         Math.abs(markdown.codeBlock.rect.height - 72) > 1 ||
-        Math.abs(markdown.codeBlock.rect.top - 520) > 1 ||
-        Math.abs(markdown.codeBlock.rect.bottom - 592) > 1 ||
+        Math.abs(
+          markdown.codeBlock.rect.top -
+            markdown.root.rect.top -
+            285,
+        ) > 1 ||
+        Math.abs(
+          markdown.codeBlock.rect.bottom - markdown.root.rect.bottom,
+        ) > 1 ||
         markdown.codeBlock.borderRadius !== "12.5px" ||
         markdown.codeBlock.marginBlockEnd !== "0px" ||
         markdown.codeBlock.marginBlockStart !== "14px" ||
         contract.styles.threadPaddingBottom !== "198px" ||
-        Math.abs(contract.viewportScroll.scrollTop - 38) > 1
+        Math.abs(
+          contract.viewportScroll.scrollHeight -
+            contract.viewportScroll.clientHeight -
+            contract.viewportScroll.scrollTop,
+        ) > 1
       ) {
         throw new Error(
           `${scene.id}: current-build Markdown contract failed: ${JSON.stringify(markdown)}`,
@@ -1231,7 +1373,7 @@ try {
     initial.backdropHidden !== true
   ) {
     throw new Error(
-      `sidebar-current-narrow: initial overlay contract failed: ${JSON.stringify(initial)}`,
+      `sidebar-current-narrow: initial collapsed contract failed: ${JSON.stringify(initial)}`,
     );
   }
 
@@ -1245,7 +1387,13 @@ try {
     );
     return {
       backdropHidden: backdrop?.hasAttribute("hidden"),
-      mainInert: main?.hasAttribute("inert"),
+      main: main
+        ? {
+            inert: main.hasAttribute("inert"),
+            left: main.getBoundingClientRect().left,
+            width: main.getBoundingClientRect().width,
+          }
+        : null,
       sidebarAriaHidden: sidebar?.getAttribute("aria-hidden"),
       sidebarLeft: sidebar?.getBoundingClientRect().left,
       sidebarOpen: shell?.hasAttribute("data-sidebar-open"),
@@ -1255,11 +1403,14 @@ try {
     !opened.sidebarOpen ||
     opened.sidebarAriaHidden !== "false" ||
     Math.abs(opened.sidebarLeft ?? -274) > 1 ||
-    !opened.mainInert ||
-    opened.backdropHidden !== false
+    !opened.main ||
+    opened.main.inert ||
+    Math.abs(opened.main.left - 274) > 1 ||
+    Math.abs(opened.main.width - 446) > 1 ||
+    opened.backdropHidden !== true
   ) {
     throw new Error(
-      `sidebar-current-narrow: opened overlay contract failed: ${JSON.stringify(opened)}`,
+      `sidebar-current-narrow: explicit pin contract failed: ${JSON.stringify(opened)}`,
     );
   }
 
@@ -1291,23 +1442,268 @@ try {
   await sidebarNarrowPage.waitForSelector(
     '.demo-root[data-scenario="streaming-recovery"][data-frame="streaming"]',
   );
-  await showSidebar.click();
-  await sidebarNarrowPage.keyboard.press("Escape");
-  const dismissed = {
-    focusReturned: await showSidebar.evaluate(
-      (element) => document.activeElement === element,
-    ),
-    sidebarOpen: await sidebarNarrowPage
-      .locator(".codex-ui-app-shell")
-      .evaluate((element) => element.hasAttribute("data-sidebar-open")),
-  };
-  if (dismissed.sidebarOpen || !dismissed.focusReturned) {
+  await sidebarNarrowPage.mouse.move(1, 200);
+  await sidebarNarrowPage.waitForSelector(
+    '.codex-ui-app-shell[data-sidebar-preview-open]:not([data-sidebar-open])',
+  );
+  const preview = await sidebarNarrowPage.evaluate(() => {
+    const shell = document.querySelector(".codex-ui-app-shell");
+    const sidebar = document.querySelector(".codex-ui-app-shell__sidebar");
+    const main = document.querySelector(".codex-ui-app-shell__main");
+    const backdrop = document.querySelector(
+      '.codex-ui-app-shell__backdrop[data-backdrop="sidebar"]',
+    );
+    return {
+      backdropHidden: backdrop?.hasAttribute("hidden"),
+      mainInert: main?.hasAttribute("inert"),
+      mainWidth: main?.getBoundingClientRect().width,
+      position: sidebar ? getComputedStyle(sidebar).position : null,
+      previewOpen: shell?.hasAttribute("data-sidebar-preview-open"),
+      sidebarLeft: sidebar?.getBoundingClientRect().left,
+      sidebarOpen: shell?.hasAttribute("data-sidebar-open"),
+    };
+  });
+  if (
+    !preview.previewOpen ||
+    preview.sidebarOpen ||
+    preview.mainInert ||
+    Math.abs((preview.mainWidth ?? 0) - 720) > 1 ||
+    Math.abs(preview.sidebarLeft ?? -274) > 1 ||
+    preview.position !== "absolute" ||
+    preview.backdropHidden !== true
+  ) {
     throw new Error(
-      `sidebar-current-narrow: Escape dismissal failed: ${JSON.stringify(dismissed)}`,
+      `sidebar-current-narrow: edge preview failed: ${JSON.stringify(preview)}`,
     );
   }
+  await sidebarNarrowPage.mouse.move(500, 200);
+  await sidebarNarrowPage.waitForSelector(
+    '.codex-ui-app-shell:not([data-sidebar-preview-open])',
+  );
 } finally {
   await sidebarNarrowApp.close();
+}
+
+const responsiveContinuityScene = {
+  frame: "pull-request",
+  id: "app-shell-responsive-continuity",
+  scenario: "workspace-workflow",
+  view: "pull-request",
+};
+const {
+  app: responsiveContinuityApp,
+  page: responsiveContinuityPage,
+} = await launchScene(responsiveContinuityScene, {
+  capture: false,
+  windowSize: { height: 820, width: 1180 },
+});
+
+try {
+  const resizeAndRead = async (width, height, expected) => {
+    await responsiveContinuityApp.evaluate(
+      ({ BrowserWindow }, size) => {
+        BrowserWindow.getAllWindows()[0]?.setContentSize(
+          size.width,
+          size.height,
+        );
+      },
+      { height, width },
+    );
+    await responsiveContinuityPage.waitForFunction(
+      (target) => {
+        const shell = document.querySelector(".codex-ui-app-shell");
+        return (
+          window.innerWidth === target.width &&
+          window.innerHeight === target.height &&
+          shell?.getAttribute("data-layout-mode") === target.layoutMode &&
+          shell.hasAttribute("data-sidebar-open") === target.sidebarOpen &&
+          shell.hasAttribute("data-side-panel-open") === target.sidePanelOpen
+        );
+      },
+      { height, width, ...expected },
+      { timeout: 5_000 },
+    );
+    return responsiveContinuityPage.evaluate(() => {
+      const shell = document.querySelector(".codex-ui-app-shell");
+      const main = document.querySelector(".codex-ui-app-shell__main");
+      const sidePanel = document.querySelector(
+        ".codex-ui-app-shell__side-panel",
+      );
+      const sidebar = document.querySelector(
+        ".codex-ui-app-shell__sidebar",
+      );
+      return {
+        horizontalOverflow:
+          document.documentElement.scrollWidth -
+          document.documentElement.clientWidth,
+        layoutMode: shell?.getAttribute("data-layout-mode"),
+        mainWidth: main?.getBoundingClientRect().width,
+        selectedRoutes: Array.from(
+          document.querySelectorAll(
+            '.codex-ui-app-sidebar__item[aria-current="page"]',
+          ),
+          (element) => element.textContent?.trim(),
+        ),
+        sidePanelOpen: shell?.hasAttribute("data-side-panel-open"),
+        sidePanelWidth: sidePanel?.getBoundingClientRect().width,
+        sidebarOpen: shell?.hasAttribute("data-sidebar-open"),
+        sidebarWidth: sidebar?.getBoundingClientRect().width,
+        viewport: {
+          height: window.innerHeight,
+          width: window.innerWidth,
+        },
+      };
+    });
+  };
+
+  const responsiveMatrix = [];
+  for (const { expected, ...viewport } of [
+    {
+      expected: {
+        layoutMode: "wide",
+        sidePanelOpen: true,
+        sidebarOpen: true,
+      },
+      height: 820,
+      width: 1180,
+    },
+    {
+      expected: {
+        layoutMode: "wide",
+        sidePanelOpen: true,
+        sidebarOpen: true,
+      },
+      height: 680,
+      width: 961,
+    },
+    {
+      expected: {
+        layoutMode: "medium",
+        sidePanelOpen: false,
+        sidebarOpen: true,
+      },
+      height: 680,
+      width: 960,
+    },
+    {
+      expected: {
+        layoutMode: "medium",
+        sidePanelOpen: false,
+        sidebarOpen: true,
+      },
+      height: 680,
+      width: 721,
+    },
+    {
+      expected: {
+        layoutMode: "narrow",
+        sidePanelOpen: false,
+        sidebarOpen: false,
+      },
+      height: 680,
+      width: 720,
+    },
+    {
+      expected: {
+        layoutMode: "medium",
+        sidePanelOpen: false,
+        sidebarOpen: true,
+      },
+      height: 680,
+      width: 721,
+    },
+    {
+      expected: {
+        layoutMode: "wide",
+        sidePanelOpen: true,
+        sidebarOpen: true,
+      },
+      height: 680,
+      width: 961,
+    },
+    {
+      expected: {
+        layoutMode: "wide",
+        sidePanelOpen: true,
+        sidebarOpen: true,
+      },
+      height: 1080,
+      width: 1920,
+    },
+    {
+      expected: {
+        layoutMode: "wide",
+        sidePanelOpen: true,
+        sidebarOpen: true,
+      },
+      height: 1440,
+      width: 2560,
+    },
+  ]) {
+    responsiveMatrix.push({
+      ...viewport,
+      state: await resizeAndRead(
+        viewport.width,
+        viewport.height,
+        expected,
+      ),
+    });
+  }
+
+  const [
+    wide1180,
+    wide961,
+    medium960,
+    medium721,
+    narrow720,
+    restored721,
+    restored961,
+    fullHd,
+    twoK,
+  ] = responsiveMatrix.map(({ state }) => state);
+  const everyViewportIsStable = responsiveMatrix.every(
+    ({ state, width }) =>
+      state.viewport.width === width &&
+      state.horizontalOverflow <= 1 &&
+      JSON.stringify(state.selectedRoutes) ===
+        JSON.stringify(["Pull requests"]),
+  );
+  if (
+    !everyViewportIsStable ||
+    wide1180.layoutMode !== "wide" ||
+    !wide1180.sidebarOpen ||
+    !wide1180.sidePanelOpen ||
+    wide961.layoutMode !== "wide" ||
+    !wide961.sidePanelOpen ||
+    medium960.layoutMode !== "medium" ||
+    !medium960.sidebarOpen ||
+    medium960.sidePanelOpen ||
+    medium721.layoutMode !== "medium" ||
+    !medium721.sidebarOpen ||
+    narrow720.layoutMode !== "narrow" ||
+    narrow720.sidebarOpen ||
+    narrow720.sidePanelOpen ||
+    restored721.layoutMode !== "medium" ||
+    !restored721.sidebarOpen ||
+    restored721.sidePanelOpen ||
+    restored961.layoutMode !== "wide" ||
+    !restored961.sidebarOpen ||
+    !restored961.sidePanelOpen ||
+    fullHd.layoutMode !== "wide" ||
+    twoK.layoutMode !== "wide" ||
+    Math.abs((fullHd.sidebarWidth ?? 0) - 274) > 1 ||
+    Math.abs((twoK.sidebarWidth ?? 0) - 274) > 1
+  ) {
+    throw new Error(
+      `App shell responsive continuity failed: ${JSON.stringify(responsiveMatrix)}`,
+    );
+  }
+  await writeFile(
+    join(artifactDirectory, "app-shell-responsive-continuity.json"),
+    `${JSON.stringify(responsiveMatrix, null, 2)}\n`,
+  );
+} finally {
+  await responsiveContinuityApp.close();
 }
 
 console.log(`CDP contracts passed for ${visualScenes.length} lifecycle frames.`);
