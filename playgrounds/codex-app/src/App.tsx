@@ -590,6 +590,8 @@ export function App() {
   const [workspaceRunPrompt, setWorkspaceRunPrompt] = useState<
     string | undefined
   >(undefined);
+  const [workspaceRunProjectLabel, setWorkspaceRunProjectLabel] =
+    useState("codex-ui-kit");
   const [threadFollowing, setThreadFollowing] = useState(
     initialSelection.frame !== "thread-scroll-away",
   );
@@ -788,15 +790,21 @@ export function App() {
     workspaceContext?: {
       cwd: string;
       prompt: string;
+      projectLabel: string;
     },
   ) => {
     cancelReplaySubmitTimer();
-    if (nextId === "workspace-workflow") {
-      setWorkspaceRunCwd(
-        workspaceContext?.cwd ?? "/workspace/codex-ui-kit",
-      );
-      setWorkspaceRunPrompt(workspaceContext?.prompt);
-    }
+    setWorkspaceRunCwd(
+      workspaceContext?.cwd ?? "/workspace/codex-ui-kit",
+    );
+    setWorkspaceRunPrompt(
+      nextId === "workspace-workflow"
+        ? workspaceContext?.prompt
+        : undefined,
+    );
+    setWorkspaceRunProjectLabel(
+      workspaceContext?.projectLabel ?? "codex-ui-kit",
+    );
     setView("conversation");
     setMode("replay");
     setScenarioId(nextId);
@@ -853,20 +861,16 @@ export function App() {
     decision: "accept" | "decline",
   ) => {
     if (mode === "replay") {
-      if (scenario.id === "workspace-workflow" && decision === "accept") {
+      if (decision === "accept") {
         setReplayApprovalResolution(null);
         setReplayCount(scenario.events.length);
         setActiveFrame(null);
       } else {
         setReplayApprovalResolution({
-          decision: decision === "accept" ? "approved" : "rejected",
+          decision: "rejected",
           requestId,
         });
-        setActiveFrame(
-          decision === "accept"
-            ? "approval-approved"
-            : "approval-rejected",
-        );
+        setActiveFrame("approval-rejected");
       }
       return;
     }
@@ -1545,7 +1549,12 @@ export function App() {
   const workspaceContext = (
     <>
       <ConversationContextBar
-        expandedId={workspaceOverlay ?? undefined}
+        expandedId={
+          workspaceOverlay === "project" &&
+          workspaceProjectTriggerId !== "demo-workspace-project-trigger"
+            ? undefined
+            : (workspaceOverlay ?? undefined)
+        }
         items={[
           {
             controlsId: "demo-workspace-project-dialog",
@@ -1823,6 +1832,7 @@ export function App() {
         selectScenario("workspace-workflow", "approval-pending", {
           cwd: currentWorkspaceCwd,
           prompt,
+          projectLabel: workspaceProject?.label ?? "Workspace",
         });
       }}
       onValueChange={setComposerValue}
@@ -1841,6 +1851,13 @@ export function App() {
           <>
             What should we build in{" "}
             <button
+              aria-controls="demo-workspace-project-dialog"
+              aria-expanded={
+                workspaceOverlay === "project" &&
+                workspaceProjectTriggerId ===
+                  "demo-workspace-destination-trigger"
+              }
+              aria-haspopup="dialog"
               className="demo-workspace-destination"
               id="demo-workspace-destination-trigger"
               onClick={() => {
@@ -2801,7 +2818,7 @@ export function App() {
           label: (
             <span className="demo-terminal-tab-label">
               <span aria-hidden="true">▣</span>
-              <span>codex-ui-kit</span>
+              <span>{workspaceRunProjectLabel}</span>
               <span aria-hidden="true">×</span>
             </span>
           ),

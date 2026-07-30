@@ -1526,6 +1526,30 @@ try {
     name: "Search projects",
   });
   await projectDestination.click();
+  const destinationPopupState = await codingWorkspacePage.evaluate(() => {
+    const destination = document.querySelector(
+      "#demo-workspace-destination-trigger",
+    );
+    const contextTrigger = document.querySelector(
+      "#demo-workspace-project-trigger",
+    );
+    return {
+      contextExpanded: contextTrigger?.getAttribute("aria-expanded"),
+      controls: destination?.getAttribute("aria-controls"),
+      destinationExpanded: destination?.getAttribute("aria-expanded"),
+      hasPopup: destination?.getAttribute("aria-haspopup"),
+    };
+  });
+  if (
+    destinationPopupState.contextExpanded === "true" ||
+    destinationPopupState.controls !== "demo-workspace-project-dialog" ||
+    destinationPopupState.destinationExpanded !== "true" ||
+    destinationPopupState.hasPopup !== "dialog"
+  ) {
+    throw new Error(
+      `Electron coding workspace destination popup semantics are invalid: ${JSON.stringify(destinationPopupState)}.`,
+    );
+  }
   await projectSearch.press("Escape");
   await projectDialog.waitFor({ state: "hidden" });
   await codingWorkspacePage.waitForTimeout(50);
@@ -1891,6 +1915,16 @@ try {
   await codingWorkspacePage.waitForSelector(
     '.codex-ui-app-shell[data-bottom-panel-open] [data-testid="terminal-panel"]',
   );
+  const workspaceTerminalLabel = (
+    await codingWorkspacePage
+      .locator(".demo-terminal-tab-label")
+      .textContent()
+  )?.replace("×", "").trim();
+  if (workspaceTerminalLabel !== "▣codex-app-server-client") {
+    throw new Error(
+      `Electron coding workspace terminal tab did not use the routed project: ${JSON.stringify(workspaceTerminalLabel)}.`,
+    );
+  }
   await codingWorkspacePage
     .getByRole("button", { exact: true, name: "Close terminal" })
     .click();
@@ -1992,6 +2026,42 @@ try {
   }
 } finally {
   await rejectedApprovalApp.close();
+}
+
+const acceptedMixedApprovalScene = {
+  frame: "mixed-approval-pending",
+  id: "electron-mixed-approval-accepted",
+  scenario: "mcp-recovery-mixed-thread",
+};
+const {
+  app: acceptedMixedApprovalApp,
+  page: acceptedMixedApprovalPage,
+} = await launchScene(acceptedMixedApprovalScene, { capture: false });
+try {
+  const acceptedMixedApproval =
+    acceptedMixedApprovalPage.getByTestId("approval-request");
+  await acceptedMixedApproval
+    .getByRole("button", { name: "Allow once" })
+    .click();
+  await acceptedMixedApprovalPage.waitForSelector(
+    '.demo-root[data-frame="mixed-review-open"][data-status="completed"] [data-testid="file-change-group"]',
+  );
+  if (
+    (await acceptedMixedApproval.getAttribute("data-decision")) !==
+      "approved" ||
+    (await acceptedMixedApprovalPage
+      .getByText(
+        "The recovery check passed and RECOVERY.md is ready for review.",
+        { exact: true },
+      )
+      .count()) !== 1
+  ) {
+    throw new Error(
+      "Electron accepted mixed replay approval did not advance through completion.",
+    );
+  }
+} finally {
+  await acceptedMixedApprovalApp.close();
 }
 
 const conversationLifecycleScene = {
