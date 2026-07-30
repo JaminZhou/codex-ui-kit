@@ -5,6 +5,7 @@ import {
   type KeyboardEvent,
   type ReactElement,
   type ReactNode,
+  type RefObject,
   useEffect,
   useId,
   useRef,
@@ -1202,6 +1203,7 @@ export interface LocalEnvironmentDialogProps
   onSelect: (groupId: string, itemId: string) => void;
   open: boolean;
   query: string;
+  returnFocusRef?: RefObject<HTMLElement | null>;
   searchLabel?: string;
   title?: ReactNode;
 }
@@ -1250,6 +1252,7 @@ export function LocalEnvironmentDialog({
   onSelect,
   open,
   query,
+  returnFocusRef,
   searchLabel = "Search local environments",
   title = "Create local environment",
   ...props
@@ -1299,6 +1302,7 @@ export function LocalEnvironmentDialog({
       initialFocusSelector=".codex-ui-local-environment-dialog__search"
       onOpenChange={onOpenChange}
       open={open}
+      returnFocusRef={returnFocusRef}
       size="standard"
       title={title}
     >

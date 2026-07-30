@@ -1642,6 +1642,34 @@ try {
       "Electron coding workspace exposed a repairing environment as selectable.",
     );
   }
+  await localEnvironmentSearch.press("Escape");
+  await localEnvironmentDialog.waitFor({ state: "hidden" });
+  await codingWorkspacePage.waitForTimeout(50);
+  const canceledWorktreeState = await codingWorkspacePage.evaluate(() => ({
+    activeLabel: document.activeElement?.getAttribute("aria-label"),
+    environmentLabel: document
+      .querySelector('[data-kind="environment"]')
+      ?.getAttribute("aria-label"),
+  }));
+  if (
+    canceledWorktreeState.activeLabel !== "Change environment: Local" ||
+    canceledWorktreeState.environmentLabel !== "Change environment: Local"
+  ) {
+    throw new Error(
+      `Electron coding workspace did not preserve and refocus the local environment after canceling New worktree: ${JSON.stringify(canceledWorktreeState)}.`,
+    );
+  }
+  await codingWorkspacePage
+    .getByRole("button", { name: "Change environment: Local" })
+    .press("ArrowDown");
+  await environmentMenu
+    .getByRole("menuitemradio", { name: "New worktree" })
+    .click();
+  await codingWorkspacePage.waitForFunction(
+    () =>
+      document.activeElement?.getAttribute("aria-label") ===
+      "Search local environments",
+  );
   await localEnvironmentSearch.fill("coding");
   await localEnvironmentDialog
     .getByRole("button", {
@@ -1656,8 +1684,24 @@ try {
   );
 
   await codingWorkspacePage
+    .getByRole("button", { name: "Change project: codex-ui-kit" })
+    .click();
+  await projectSearch.fill("app-server");
+  await projectDialog
+    .getByRole("option", {
+      name: "Select project codex-app-server-client",
+    })
+    .click();
+  await codingWorkspacePage.waitForSelector(
+    'button[aria-label="Change environment: Local"]',
+  );
+  await codingWorkspacePage.waitForSelector(
+    'button[aria-label="Change worktree: main"]',
+  );
+
+  await codingWorkspacePage
     .getByRole("button", {
-      name: "Change worktree: feat/coding-workspace-lifecycle",
+      name: "Change worktree: main",
     })
     .click();
   await codingWorkspacePage.waitForTimeout(50);

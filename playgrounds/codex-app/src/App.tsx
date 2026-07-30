@@ -55,6 +55,7 @@ import {
   type QueuedPrompt,
 } from "codex-ui-kit";
 import {
+  cloneElement,
   Fragment,
   useCallback,
   useEffect,
@@ -611,6 +612,8 @@ export function App() {
   );
   const [liveError, setLiveError] = useState<string | null>(null);
   const liveStartPendingRef = useRef(false);
+  const workspaceEnvironmentTriggerRef =
+    useRef<HTMLButtonElement>(null);
   const queuedPromptCounterRef = useRef(1);
   const replaySubmitTimerRef = useRef<number | null>(null);
   const pendingMessageNavigationRef = useRef<{
@@ -723,6 +726,8 @@ export function App() {
     setMode("replay");
     setView("workspace");
     setWorkspaceProjectId(projectId);
+    setWorkspaceEnvironmentId("local");
+    setWorkspaceWorktreeId("main");
     setWorkspaceLocalEnvironmentOpen(false);
     setWorkspaceOverlay(null);
     setWorkspaceBranchQuery("");
@@ -1538,6 +1543,9 @@ export function App() {
         }}
         renderItem={(item, trigger) => {
           if (item.id === "environment") {
+            const environmentTrigger = cloneElement(trigger, {
+              ref: workspaceEnvironmentTriggerRef,
+            });
             return (
               <Menu
                 align="start"
@@ -1549,7 +1557,7 @@ export function App() {
                 open={workspaceOverlay === "environment"}
                 side="top"
                 sideOffset={1}
-                trigger={trigger}
+                trigger={environmentTrigger}
                 width="auto"
               >
                 <MenuSectionLabel>Start in</MenuSectionLabel>
@@ -1570,7 +1578,6 @@ export function App() {
                     workspaceEnvironmentId === "worktree" ? "✓" : undefined
                   }
                   onSelect={() => {
-                    setWorkspaceEnvironmentId("worktree");
                     openWorkspaceLocalEnvironment();
                   }}
                   role="menuitemradio"
@@ -1683,6 +1690,8 @@ export function App() {
             }}
             onSelect={(projectId) => {
               setWorkspaceProjectId(projectId);
+              setWorkspaceEnvironmentId("local");
+              setWorkspaceWorktreeId("main");
               setWorkspaceOverlayState(null);
               setWorkspaceProjectQuery("");
             }}
@@ -1697,6 +1706,8 @@ export function App() {
             <button
               onClick={() => {
                 setWorkspaceProjectId(null);
+                setWorkspaceEnvironmentId("local");
+                setWorkspaceWorktreeId("main");
                 setWorkspaceOverlayState(null);
                 setWorkspaceProjectQuery("");
                 window.setTimeout(() =>
@@ -1793,7 +1804,10 @@ export function App() {
       <LocalEnvironmentDialog
         createAction={
           <Button
-            onClick={closeWorkspaceLocalEnvironment}
+            onClick={() => {
+              setWorkspaceEnvironmentId("worktree");
+              closeWorkspaceLocalEnvironment();
+            }}
             size="small"
             tone="primary"
           >
@@ -1818,6 +1832,7 @@ export function App() {
         }}
         open={workspaceLocalEnvironmentOpen}
         query={workspaceEnvironmentQuery}
+        returnFocusRef={workspaceEnvironmentTriggerRef}
         title="Select local environment"
       />
     </div>

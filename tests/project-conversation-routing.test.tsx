@@ -8,7 +8,7 @@ import {
   waitFor,
   within,
 } from "@testing-library/react";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import {
   ConversationContextBar,
@@ -626,6 +626,43 @@ describe("project conversation routing", () => {
         name: "Use local environment Desktop checkout",
       }),
     ).toBeNull();
+  });
+
+  it("returns focus to the environment trigger when the dialog closes", async () => {
+    function Fixture() {
+      const [open, setOpen] = useState(true);
+      const triggerRef = useRef<HTMLButtonElement>(null);
+      return (
+        <>
+          <button ref={triggerRef} type="button">
+            Environment
+          </button>
+          <LocalEnvironmentDialog
+            groups={[]}
+            onOpenChange={setOpen}
+            onQueryChange={() => undefined}
+            onSelect={() => undefined}
+            open={open}
+            query=""
+            returnFocusRef={triggerRef}
+          />
+        </>
+      );
+    }
+    render(<Fixture />);
+
+    fireEvent.keyDown(
+      screen.getByRole("dialog", {
+        name: "Create local environment",
+      }),
+      { key: "Escape" },
+    );
+
+    await waitFor(() =>
+      expect(document.activeElement).toBe(
+        screen.getByRole("button", { name: "Environment" }),
+      ),
+    );
   });
 
   it("composes application projects with conversation and workspace setup", () => {
