@@ -2317,6 +2317,18 @@ try {
       "Composer did not follow the replay into a running protocol position.",
     );
   }
+  const replayComposer = replayPositionPage.getByRole("textbox", {
+    name: "Message composer",
+  });
+  await replayComposer.fill("Keep this queued prompt while replaying.");
+  await replayComposer.press("Enter");
+  await replayPositionPage.waitForSelector(
+    '.demo-root[data-composer-phase="queued"][data-queue-count="1"]',
+  );
+  await stopReplay.click();
+  await replayPositionPage.waitForSelector(
+    '.demo-root[data-composer-phase="queue-paused"][data-status="interrupted"]',
+  );
 
   const replayPosition = replayPositionPage.getByRole("slider", {
     name: "Protocol event position",

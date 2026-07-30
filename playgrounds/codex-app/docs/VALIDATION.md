@@ -19,8 +19,8 @@ Every deterministic scenario has one ID and produces four evidence layers:
    navigation, scroll-away recovery, and deterministic windowing. A 12-row
    queue proves that its action menu is portaled without disabling bounded
    vertical scrolling, and replay controls prove that the Composer follows
-   protocol running/completed positions instead of retaining a second state
-   copy.
+   protocol running/completed positions while clearing stale Stop and paused
+   interaction state.
 3. **Electron host** — real `BrowserWindow` bounds, renderer isolation,
    pointer and keyboard navigation/PR-panel resizing, Review-panel
    close/reopen behavior, compact 800×600 multi-file geometry, an eight-file

@@ -558,6 +558,14 @@ export function App() {
     replaySubmitTimerRef.current = null;
   };
 
+  const selectReplayPosition = (nextCount: number) => {
+    cancelReplaySubmitTimer();
+    setReplayComposerSubmitting(false);
+    setReplayComposerStopped(false);
+    setQueueInterrupted(false);
+    setReplayCount(nextCount);
+  };
+
   const dismissSidebarAfterNavigation = () => {
     if (isNarrowDemoWindow()) setSidebarOpen(false);
   };
@@ -2260,7 +2268,7 @@ export function App() {
                 <Button
                   disabled={replayCount <= 1}
                   onClick={() =>
-                    setReplayCount((count) => Math.max(1, count - 1))
+                    selectReplayPosition(Math.max(1, replayCount - 1))
                   }
                   size="small"
                   tone="ghost"
@@ -2272,7 +2280,7 @@ export function App() {
                   max={scenario.events.length}
                   min={1}
                   onChange={(event) =>
-                    setReplayCount(Number(event.target.value))
+                    selectReplayPosition(Number(event.target.value))
                   }
                   type="range"
                   value={replayCount}
@@ -2280,8 +2288,8 @@ export function App() {
                 <Button
                   disabled={replayCount >= scenario.events.length}
                   onClick={() =>
-                    setReplayCount((count) =>
-                      Math.min(scenario.events.length, count + 1),
+                    selectReplayPosition(
+                      Math.min(scenario.events.length, replayCount + 1),
                     )
                   }
                   size="small"
