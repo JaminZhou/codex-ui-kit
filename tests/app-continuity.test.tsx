@@ -128,4 +128,34 @@ describe("AppNotificationRegion", () => {
     );
     expect(onDismiss).toHaveBeenCalledOnce();
   });
+
+  it("carries the triggering application theme into the body portal", async () => {
+    const { rerender } = render(
+      <div data-theme="dark">
+        <button type="button">Show update</button>
+        <AppNotificationRegion notifications={[]} />
+      </div>,
+    );
+    screen.getByRole("button", { name: "Show update" }).focus();
+
+    rerender(
+      <div data-theme="dark">
+        <button type="button">Show update</button>
+        <AppNotificationRegion
+          notifications={[
+            {
+              heading: "Connection restored",
+              id: "restored",
+            },
+          ]}
+        />
+      </div>,
+    );
+
+    expect(
+      (await screen.findByRole("region", {
+        name: "Notifications",
+      })).getAttribute("data-theme"),
+    ).toBe("dark");
+  });
 });

@@ -314,6 +314,58 @@ describe("application shell", () => {
     expect(sidePanel.getAttribute("aria-hidden")).toBe("true");
   });
 
+  it("clamps a non-resizable side panel before it consumes the main track", () => {
+    let resize: ((width: number) => void) | undefined;
+    class ResizeObserverMock {
+      constructor(
+        private readonly callback: ResizeObserverCallback,
+      ) {}
+
+      disconnect() {}
+
+      observe(target: Element) {
+        if (!target.classList.contains("codex-ui-app-shell")) return;
+        resize = (width) =>
+          this.callback(
+            [
+              {
+                contentRect: { height: 680, width },
+                target,
+              } as ResizeObserverEntry,
+            ],
+            this as unknown as ResizeObserver,
+          );
+      }
+
+      unobserve() {}
+    }
+    vi.stubGlobal("ResizeObserver", ResizeObserverMock);
+    const { container } = render(
+      <AppShell
+        sidePanel={<button type="button">Review files</button>}
+        sidePanelOpen
+        sidebar={<button type="button">Projects</button>}
+        sidebarOpen
+      >
+        Conversation
+      </AppShell>,
+    );
+    const shell = container.querySelector(
+      ".codex-ui-app-shell",
+    ) as HTMLDivElement;
+
+    act(() => resize?.(961));
+    expect(shell.getAttribute("data-layout-mode")).toBe("wide");
+    expect(
+      screen.queryByRole("separator", {
+        name: "Resize workspace panel",
+      }),
+    ).toBeNull();
+    expect(
+      shell.style.getPropertyValue("--codex-ui-app-side-panel-width"),
+    ).toBe("335px");
+  });
+
   it("supports current-build narrow edge preview and explicit pinning", () => {
     function CurrentBuildNarrowFixture() {
       const [sidebarOpen, setSidebarOpen] = useState(false);

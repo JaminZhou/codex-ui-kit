@@ -761,10 +761,15 @@ export function AppShell({
         normalizedSidePanelMinWidth,
         resolvedSidePanelMaxWidth,
       );
+  const sidePanelHasOpenContent =
+    sidePanelOpen &&
+    sidePanel !== undefined &&
+    sidePanel !== null;
   const shellStyle =
     bottomPanelResizable ||
     bottomPanelHeightIsControlled ||
     sidebarResizable ||
+    sidePanelHasOpenContent ||
     sidePanelResizable ||
     resolvedSidePanelExpanded
       ? ({
@@ -779,7 +784,7 @@ export function AppShell({
                 "--codex-ui-app-sidebar-width": `${resolvedSidebarWidth}px`,
               }
             : {}),
-          ...(sidePanelResizable || resolvedSidePanelExpanded
+          ...(sidePanelHasOpenContent
             ? {
                 "--codex-ui-app-side-panel-width": `${resolvedSidePanelWidth}px`,
               }

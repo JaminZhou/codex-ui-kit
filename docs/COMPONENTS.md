@@ -105,7 +105,8 @@ All privileged behavior remains host-owned. The components never auto-approve co
   explicit.
 - `AppNotificationRegion`: body-portalled top- or bottom-end application
   feedback with neutral, success, warning, and error tones, optional action,
-  dismissal, and alert/status semantics.
+  dismissal, alert/status semantics, and explicit or trigger-inferred theme
+  propagation across the portal boundary.
 - `AppShell`: the application-level grid for a persistent navigation sidebar,
   conversation main region, right workspace panel, and bottom panel. Wide mode
   reserves measured tracks; medium and narrow containers switch side surfaces
@@ -121,6 +122,8 @@ All privileged behavior remains host-owned. The components never auto-approve co
   `sidePanelResizable` applies the same accessible interaction contract to the
   right workspace, with configurable panel/main minima, responsive clamping,
   controlled persistence, focus restoration, and an expanded full-main mode.
+  Responsive width clamping also applies when the panel has no resize
+  affordance, so both fixed tracks cannot consume the main route.
   `bottomPanelResizable` adds the current-build measured 16px horizontal
   separator, a preferred 152px minimum (reduced only when the responsive
   half-height cap is smaller), pointer and Arrow/Home/End control, accessible

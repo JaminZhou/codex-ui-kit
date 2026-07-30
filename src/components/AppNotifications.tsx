@@ -1,11 +1,14 @@
 import {
+  useContext,
   useEffect,
+  useLayoutEffect,
   useState,
   type HTMLAttributes,
   type MouseEventHandler,
   type ReactNode,
 } from "react";
 import { createPortal } from "react-dom";
+import { OverlayEnvironmentContext } from "../internal/overlayEnvironment.js";
 import type { NoticeTone } from "./Notices.js";
 
 export interface AppNotification {
@@ -24,6 +27,7 @@ export interface AppNotificationRegionProps
   notifications: readonly AppNotification[];
   position?: "top-end" | "bottom-end";
   portalRoot?: Element | DocumentFragment | null;
+  theme?: string;
 }
 
 function DismissIcon() {
@@ -44,10 +48,31 @@ export function AppNotificationRegion({
   notifications,
   portalRoot,
   position = "top-end",
+  theme,
   ...props
 }: AppNotificationRegionProps) {
+  const overlayEnvironment = useContext(OverlayEnvironmentContext);
   const [mounted, setMounted] = useState(false);
+  const [inferredTheme, setInferredTheme] = useState<string>();
+  const portalTheme =
+    theme ?? overlayEnvironment.theme ?? inferredTheme;
   useEffect(() => setMounted(true), []);
+  useLayoutEffect(() => {
+    if (
+      notifications.length === 0 ||
+      theme !== undefined ||
+      overlayEnvironment.theme !== undefined ||
+      typeof document === "undefined"
+    ) {
+      return;
+    }
+    const activeElement = document.activeElement;
+    setInferredTheme(
+      activeElement instanceof Element
+        ? activeElement.closest<HTMLElement>("[data-theme]")?.dataset.theme
+        : undefined,
+    );
+  }, [notifications.length, overlayEnvironment.theme, theme]);
   if (!mounted || notifications.length === 0) return null;
   const resolvedPortalRoot = portalRoot ?? document.body;
 
@@ -61,6 +86,7 @@ export function AppNotificationRegion({
         .filter(Boolean)
         .join(" ")}
       data-position={position}
+      data-theme={portalTheme}
       role="region"
       {...props}
     >
