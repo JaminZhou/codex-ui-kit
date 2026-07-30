@@ -956,8 +956,8 @@ for (const scene of visualScenes) {
         markdown.copyLabel !== "Copy code" ||
         markdown.linkTarget !== "_blank" ||
         Math.abs(markdown.root.rect.width - 736) > 1 ||
-        Math.abs(markdown.root.rect.top - 235) > 1 ||
-        Math.abs(markdown.root.rect.bottom - 592) > 1 ||
+        Math.abs(markdown.root.rect.height - 357) > 1 ||
+        Math.abs(markdown.heading.rect.top - markdown.root.rect.top) > 1 ||
         markdown.heading.fontSize !== "24px" ||
         markdown.heading.lineHeight !== "30px" ||
         markdown.heading.marginBlockEnd !== "10px" ||
@@ -986,13 +986,23 @@ for (const scene of visualScenes) {
         markdown.code.lineHeight !== "22px" ||
         Math.abs(markdown.codeBlock.rect.width - 736) > 1 ||
         Math.abs(markdown.codeBlock.rect.height - 72) > 1 ||
-        Math.abs(markdown.codeBlock.rect.top - 520) > 1 ||
-        Math.abs(markdown.codeBlock.rect.bottom - 592) > 1 ||
+        Math.abs(
+          markdown.codeBlock.rect.top -
+            markdown.root.rect.top -
+            285,
+        ) > 1 ||
+        Math.abs(
+          markdown.codeBlock.rect.bottom - markdown.root.rect.bottom,
+        ) > 1 ||
         markdown.codeBlock.borderRadius !== "12.5px" ||
         markdown.codeBlock.marginBlockEnd !== "0px" ||
         markdown.codeBlock.marginBlockStart !== "14px" ||
         contract.styles.threadPaddingBottom !== "198px" ||
-        Math.abs(contract.viewportScroll.scrollTop - 38) > 1
+        Math.abs(
+          contract.viewportScroll.scrollHeight -
+            contract.viewportScroll.clientHeight -
+            contract.viewportScroll.scrollTop,
+        ) > 1
       ) {
         throw new Error(
           `${scene.id}: current-build Markdown contract failed: ${JSON.stringify(markdown)}`,
