@@ -411,7 +411,9 @@
   gap: calc(var(--codex-ui-spacing) * 2);
   inset-inline-end: calc(var(--codex-ui-spacing) * 4);
   max-width: min(24rem, calc(100vw - calc(var(--codex-ui-spacing) * 8)));
-  pointer-events: none;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  pointer-events: auto;
   position: fixed;
   z-index: 1200;
 }
@@ -421,10 +423,17 @@
     var(--codex-ui-app-window-chrome-height) +
       calc(var(--codex-ui-spacing) * 3)
   );
+  max-block-size: calc(
+    100dvh - var(--codex-ui-app-window-chrome-height) -
+      calc(var(--codex-ui-spacing) * 7)
+  );
 }
 
 .codex-ui-app-notification-region[data-position="bottom-end"] {
   inset-block-end: calc(var(--codex-ui-spacing) * 4);
+  max-block-size: calc(
+    100dvh - calc(var(--codex-ui-spacing) * 8)
+  );
 }
 
 .codex-ui-app-notification {

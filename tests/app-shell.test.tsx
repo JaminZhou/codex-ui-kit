@@ -1508,6 +1508,91 @@ describe("application shell", () => {
     expect(onSidePanelWidthChange).toHaveBeenLastCalledWith(828);
   });
 
+  it("uses the coordinated main minimum for live workspace resizing", () => {
+    let resizeShell: ((width: number) => void) | undefined;
+    let resizeSidebar: ((width: number) => void) | undefined;
+    class ResizeObserverMock {
+      constructor(
+        private readonly callback: ResizeObserverCallback,
+      ) {}
+
+      disconnect() {}
+
+      observe(target: Element) {
+        const resize = (width: number) =>
+          this.callback(
+            [
+              {
+                contentRect: { width },
+                target,
+              } as ResizeObserverEntry,
+            ],
+            this as unknown as ResizeObserver,
+          );
+        if (target.classList.contains("codex-ui-app-shell")) {
+          resizeShell = resize;
+        } else if (
+          target.classList.contains("codex-ui-app-shell__sidebar")
+        ) {
+          resizeSidebar = resize;
+        }
+      }
+
+      unobserve() {}
+    }
+    vi.stubGlobal("ResizeObserver", ResizeObserverMock);
+    const onSidePanelWidthChange = vi.fn();
+    const { container } = render(
+      <AppShell
+        layoutMode="wide"
+        onSidePanelWidthChange={onSidePanelWidthChange}
+        sidePanel="Review"
+        sidePanelOpen
+        sidePanelResizable
+        sidebar="Navigation"
+        sidebarMinMainWidth={600}
+        sidebarOpen
+      >
+        Thread
+      </AppShell>,
+    );
+
+    const shell = container.querySelector(
+      ".codex-ui-app-shell",
+    ) as HTMLDivElement;
+    const sidebar = screen.getByRole("complementary", {
+      name: "App navigation",
+    });
+    vi.spyOn(shell, "getBoundingClientRect").mockReturnValue(
+      new DOMRect(0, 0, 1_400, 820),
+    );
+    vi.spyOn(sidebar, "getBoundingClientRect").mockReturnValue(
+      new DOMRect(0, 0, 274, 820),
+    );
+    act(() => resizeSidebar?.(274));
+    act(() => resizeShell?.(1_400));
+
+    const separator = screen.getByRole("separator", {
+      name: "Resize workspace panel",
+    });
+    expect(separator.getAttribute("aria-valuemax")).toBe("526");
+    fireEvent.pointerDown(separator, {
+      button: 0,
+      clientX: 1_000,
+      pointerId: 29,
+    });
+    fireEvent.pointerMove(separator, {
+      clientX: 0,
+      pointerId: 29,
+    });
+
+    expect(separator.getAttribute("aria-valuenow")).toBe("526");
+    expect(onSidePanelWidthChange).toHaveBeenLastCalledWith(526);
+    expect(
+      shell.style.getPropertyValue("--codex-ui-app-side-panel-width"),
+    ).toBe("526px");
+  });
+
   it("lets an expanded workspace panel consume the available main track", () => {
     let resizeShell: ((width: number) => void) | undefined;
     let resizeSidebar: ((width: number) => void) | undefined;

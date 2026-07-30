@@ -1146,7 +1146,7 @@ export function AppShell({
             normalizedSidePanelMinWidth,
             liveShellWidth -
               liveSidebarWidth -
-              normalizedSidePanelMinMainWidth,
+              responsiveSidePanelMinMainWidth,
           );
     const maximum = Math.min(
       normalizedSidePanelMaxWidth,

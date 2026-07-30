@@ -46,6 +46,15 @@ describe("application continuity visual contract", () => {
     );
     expect(styles).toContain(".codex-ui-app-route-outlet__state");
     expect(styles).toContain(".codex-ui-app-notification-region");
+    expect(styles).toMatch(
+      /\.codex-ui-app-notification-region\s*\{[^}]*overflow-y:\s*auto;[^}]*overscroll-behavior:\s*contain;/s,
+    );
+    expect(styles).toMatch(
+      /\.codex-ui-app-notification-region\[data-position="top-end"\]\s*\{[^}]*max-block-size:\s*calc\(\s*100dvh - var\(--codex-ui-app-window-chrome-height\)/s,
+    );
+    expect(styles).toMatch(
+      /\.codex-ui-app-notification-region\[data-position="bottom-end"\]\s*\{[^}]*max-block-size:\s*calc\(\s*100dvh - calc\(var\(--codex-ui-spacing\) \* 8\)/s,
+    );
     expect(styles).toContain("z-index: 1200");
     expect(styles).toContain("@keyframes codex-ui-route-spinner");
   });
