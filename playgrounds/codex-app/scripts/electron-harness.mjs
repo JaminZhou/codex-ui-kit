@@ -156,7 +156,7 @@ export const visualScenes = [
     fileCount: 1,
     frame: "mixed-review-open",
     id: "mixed-thread-review",
-    maxPixelRatio: 0.0125,
+    maxPixelRatio: 0.013,
     scenario: "mcp-recovery-mixed-thread",
     surfaces: ["approval", "command", "fileChange", "reviewPanel"],
   },

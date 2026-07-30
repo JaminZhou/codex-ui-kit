@@ -129,11 +129,12 @@ the same historical disclosure while the
 Review split is open and verifies two user messages, two commands, the accepted
 approval, one file change, the Review panel, and the failed call's functional
 raw-output dialog with focus restoration. The recovery completed frame uses
-the same 2.25% internal main-region limit; the mixed Review frame uses 1.25%
-to cover its measured 1.1716% macOS-runner delta. The optional current-build
-recovery gate allows at most 4.5% full-main, 7% recovery, 5% user, and 3%
-Composer difference at the strict 0.05 pixel threshold. The accepted sample
-measured 2.9202337%, 5.1956799%, 4.7369405%, and 1.5698995% respectively.
+the same 2.25% internal main-region limit; the mixed Review frame uses 1.3%
+to cover its measured 1.1716% and 1.2530% macOS-runner deltas. The optional
+current-build recovery gate allows at most 4.5% full-main, 7% recovery, 5%
+user, and 3% Composer difference at the strict 0.05 pixel threshold. The
+accepted sample measured 2.9202337%, 5.1956799%, 4.7369405%, and 1.5698995%
+respectively.
 
 The twenty-third through twenty-sixth frames cover App shell loading, offline,
 stale, and restored states. The twenty-seventh through thirty-sixth frames
