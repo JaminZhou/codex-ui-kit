@@ -237,6 +237,23 @@ describe("menus and selects", () => {
     );
   });
 
+  it("leaves editable menu content in control of its own keyboard input", async () => {
+    render(
+      <Menu defaultOpen trigger={<button type="button">Branches</button>}>
+        <input aria-label="Search branches" />
+        <MenuItem>Main</MenuItem>
+        <MenuItem>Feature</MenuItem>
+      </Menu>,
+    );
+
+    const search = screen.getByRole("textbox", {
+      name: "Search branches",
+    });
+    await waitFor(() => expect(document.activeElement).toBe(search));
+    expect(fireEvent.keyDown(search, { key: "m" })).toBe(true);
+    expect(document.activeElement).toBe(search);
+  });
+
   it("keeps a parent menu open while interacting with its portalled submenu", async () => {
     render(
       <Menu defaultOpen trigger={<button type="button">View</button>}>

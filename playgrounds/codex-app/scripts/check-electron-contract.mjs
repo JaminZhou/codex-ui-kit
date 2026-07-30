@@ -1758,7 +1758,40 @@ try {
     })
     .click();
   await codingWorkspacePage.waitForTimeout(50);
-  await branchSearch.fill("main");
+  await worktreeMenu
+    .getByRole("menuitem", {
+      name: "Create and checkout new branch…",
+    })
+    .click();
+  await localEnvironmentDialog
+    .getByRole("button", { name: "Create worktree" })
+    .click();
+  await codingWorkspacePage.waitForSelector(
+    'button[aria-label="Change environment: New worktree"]',
+  );
+  await codingWorkspacePage
+    .getByRole("button", {
+      name: "Change worktree: main",
+    })
+    .click();
+  await codingWorkspacePage.waitForTimeout(50);
+  await branchSearch.press("m");
+  const branchSearchKeyboardState = await codingWorkspacePage.evaluate(() => ({
+    activeLabel: document.activeElement?.getAttribute("aria-label"),
+    value: (
+      document.querySelector(
+        '.demo-workspace-worktree-menu input[aria-label="Search branches"]',
+      )
+    )?.value,
+  }));
+  if (
+    branchSearchKeyboardState.activeLabel !== "Search branches" ||
+    branchSearchKeyboardState.value !== "m"
+  ) {
+    throw new Error(
+      `Electron worktree search lost typed input to menu typeahead: ${JSON.stringify(branchSearchKeyboardState)}.`,
+    );
+  }
   await worktreeMenu
     .getByRole("menuitemradio", {
       name: "main",
@@ -1766,6 +1799,9 @@ try {
     .click();
   await codingWorkspacePage.waitForSelector(
     'button[aria-label="Change worktree: main"]',
+  );
+  await codingWorkspacePage.waitForSelector(
+    'button[aria-label="Change environment: Local"]',
   );
 
   const workspaceComposer = codingWorkspacePage.getByRole("textbox", {

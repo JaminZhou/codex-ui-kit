@@ -201,6 +201,14 @@ function getFocusableItems(container: HTMLElement) {
 }
 
 function focusByKey(event: KeyboardEvent<HTMLElement>) {
+  const target = event.target;
+  if (
+    target instanceof HTMLElement &&
+    (target.isContentEditable ||
+      target.matches("input, textarea, select"))
+  ) {
+    return;
+  }
   const items = getFocusableItems(event.currentTarget);
   if (items.length === 0) return;
   const currentIndex = items.findIndex((item) => item === document.activeElement);

@@ -1687,7 +1687,12 @@ export function App() {
                       worktree.id === workspaceWorktreeId ? "✓" : undefined
                     }
                     key={worktree.id}
-                    onSelect={() => setWorkspaceWorktreeId(worktree.id)}
+                    onSelect={() => {
+                      if (workspaceEnvironmentId === "worktree") {
+                        setWorkspaceEnvironmentId("local");
+                      }
+                      setWorkspaceWorktreeId(worktree.id);
+                    }}
                     role="menuitemradio"
                     startIcon="⑂"
                   >
