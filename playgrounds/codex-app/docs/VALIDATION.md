@@ -100,7 +100,8 @@ Fetch rows, the expanded neutral `plaintext` error output, and the rule that an
 earlier failed call followed by a successful final call leaves the historical
 group completed. Electron expands the same historical disclosure while the
 Review split is open and verifies two user messages, two commands, the accepted
-approval, one file change, and the Review panel. The optional current-build
-recovery gate allows at most 4.5% full-main, 7% recovery, 5% user, and 3%
+approval, one file change, the Review panel, and the failed call's functional
+raw-output dialog with focus restoration. The optional current-build recovery
+gate allows at most 4.5% full-main, 7% recovery, 5% user, and 3%
 Composer difference at the strict 0.05 pixel threshold. The accepted sample
 measured 2.9202337%, 5.1956799%, 4.7369405%, and 1.5698995% respectively.

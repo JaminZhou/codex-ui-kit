@@ -402,6 +402,27 @@ try {
       `Electron MCP recovery and mixed-thread interaction failed: ${JSON.stringify(recoveryInteraction)}`,
     );
   }
+
+  await recoveryPage.getByRole("button", {
+    name: "Show raw tool call output",
+  }).click();
+  const rawOutputDialog = recoveryPage.getByRole("dialog", {
+    name: "Fetch OpenAI doc raw output",
+  });
+  await rawOutputDialog.waitFor({ state: "visible" });
+  const rawOutputText = await rawOutputDialog.textContent();
+  if (
+    !rawOutputText?.includes("not-a-valid-url") ||
+    !rawOutputText.includes("Invalid URL")
+  ) {
+    throw new Error(
+      `Electron MCP raw-output dialog omitted the call payload: ${rawOutputText}`,
+    );
+  }
+  await rawOutputDialog.getByRole("button", {
+    name: "Close dialog",
+  }).click();
+  await rawOutputDialog.waitFor({ state: "hidden" });
 } finally {
   await recoveryApp.close();
 }

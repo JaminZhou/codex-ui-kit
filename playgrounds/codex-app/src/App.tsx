@@ -14,6 +14,7 @@ import {
   CommandExecution,
   CommandOutput,
   ConversationThreadShell,
+  Dialog,
   FileChangeGroup,
   FileReview,
   McpToolCallGroup,
@@ -313,6 +314,10 @@ export function App() {
   const [reviewSelection, setReviewSelection] =
     useState<ReviewSelection | null>(null);
   const [reviewSelectionKey, setReviewSelectionKey] = useState(0);
+  const [rawToolOutput, setRawToolOutput] = useState<{
+    name: string;
+    value: unknown;
+  } | null>(null);
   const [pullRequestExpanded, setPullRequestExpanded] = useState(false);
   const [pullRequestOpen, setPullRequestOpen] = useState(
     initialSelection.view === "pull-request",
@@ -1244,7 +1249,11 @@ export function App() {
                   }
                   onViewRawOutput={
                     call.status === "failed"
-                      ? () => undefined
+                      ? (value) =>
+                          setRawToolOutput({
+                            name: call.toolLabel,
+                            value,
+                          })
                       : undefined
                   }
                   rawOutput={
@@ -1701,6 +1710,23 @@ export function App() {
           </>
         )}
       </AppShell>
+      <Dialog
+        className="demo-raw-tool-output-dialog"
+        description="Arguments and error returned by the integration."
+        onOpenChange={(open) => {
+          if (!open) setRawToolOutput(null);
+        }}
+        open={rawToolOutput !== null}
+        title={
+          rawToolOutput
+            ? `${rawToolOutput.name} raw output`
+            : "Raw tool call output"
+        }
+      >
+        <pre className="demo-raw-tool-output">
+          <code>{JSON.stringify(rawToolOutput?.value, null, 2)}</code>
+        </pre>
+      </Dialog>
     </div>
   );
 }

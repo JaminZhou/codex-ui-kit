@@ -287,6 +287,21 @@ textarea {
   margin-bottom: 12px;
 }
 
+.demo-raw-tool-output {
+  background: var(--codex-ui-code-block-bg);
+  border: 1px solid var(--codex-ui-border);
+  border-radius: var(--codex-ui-radius-md);
+  color: var(--codex-ui-text-secondary);
+  font-family: var(--codex-ui-font-mono);
+  font-size: var(--codex-ui-font-size-sm);
+  line-height: var(--codex-ui-line-height-sm);
+  margin: 0;
+  max-height: 50vh;
+  overflow: auto;
+  padding: 0.75rem;
+  white-space: pre-wrap;
+}
+
 .demo-root[data-capture][data-frame="mcp-tool-calls"][data-scenario="mcp-tool-call"]
   .codex-ui-thread-viewport__content {
   height: calc(100% + 72px);
