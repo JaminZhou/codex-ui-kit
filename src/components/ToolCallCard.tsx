@@ -176,11 +176,7 @@ export function ToolCallCard({
       status={status}
       summary={
         <span
-          aria-label={
-            status === "failed"
-              ? (failedAriaLabel ?? `${name} failed`)
-              : undefined
-          }
+          aria-label={status === "failed" ? failedAriaLabel : undefined}
           className="codex-ui-tool-call__label"
           data-active={status === "running" || undefined}
         >

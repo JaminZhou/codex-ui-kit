@@ -94,6 +94,8 @@ describe("ToolCallCard", () => {
 
     expect(html).toContain('role="alert"');
     expect(html).toContain("Connector authorization expired");
+    expect(html).toContain(">GitHub search failed<");
+    expect(html).not.toContain('aria-label="search_issues failed"');
     expect(html).not.toContain("This result should not render");
   });
 
@@ -104,6 +106,7 @@ describe("ToolCallCard", () => {
         error="Invalid URL"
         errorLanguage="plaintext"
         errorPresentation="output"
+        failedAriaLabel="Fetch OpenAI doc failed"
         failedLabel="Fetch OpenAI doc"
         name="Fetch OpenAI doc"
         status="failed"

@@ -1247,6 +1247,11 @@ export function App() {
                   errorPresentation={
                     call.status === "failed" ? "output" : undefined
                   }
+                  failedAriaLabel={
+                    call.status === "failed"
+                      ? `${call.toolLabel} failed`
+                      : undefined
+                  }
                   failedLabel={call.toolLabel}
                   key={call.id}
                   icon={<McpToolIcon />}
