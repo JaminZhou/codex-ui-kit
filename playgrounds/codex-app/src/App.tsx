@@ -568,6 +568,9 @@ export function App() {
     setReplayComposerSubmitting(false);
     setReplayComposerStopped(false);
     setQueueInterrupted(false);
+    if (!isTurnActive(replayState(scenario.events, nextCount).status)) {
+      setQueuedPrompts([]);
+    }
     setReplayCount(nextCount);
   };
 
@@ -678,6 +681,7 @@ export function App() {
       void submitLive(prompt);
       return;
     }
+    setActiveFrame(null);
     if (replayComposerRunning) {
       if (queueingEnabled) {
         queuedPromptCounterRef.current += 1;

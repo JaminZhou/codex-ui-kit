@@ -2390,11 +2390,15 @@ try {
   await replayPosition.focus();
   await replayPosition.press("End");
   await replayPositionPage.waitForSelector(
-    '.demo-root[data-composer-phase="idle"][data-status="completed"]',
+    '.demo-root[data-composer-phase="idle"][data-status="completed"][data-queue-count="0"]',
   );
-  if ((await stopReplay.count()) !== 0) {
+  if (
+    (await stopReplay.count()) !== 0 ||
+    (await replayPositionPage.locator(".codex-ui-composer-queue").count()) !==
+      0
+  ) {
     throw new Error(
-      "Composer remained running after the replay reached completion.",
+      "Composer retained running or queued work after replay completion.",
     );
   }
 } finally {
@@ -2424,6 +2428,39 @@ try {
   );
 } finally {
   await disabledReplayApp.close();
+}
+
+const attachmentSubmitScene = {
+  frame: "composer-attachment",
+  id: "attachment-submit-interaction",
+  scenario: "conversation-lifecycle",
+};
+const {
+  app: attachmentSubmitApp,
+  page: attachmentSubmitPage,
+} = await launchScene(attachmentSubmitScene, { capture: false });
+try {
+  const attachmentSubmitComposer = attachmentSubmitPage.getByRole(
+    "textbox",
+    { name: "Message composer" },
+  );
+  await attachmentSubmitPage.waitForSelector(
+    '.demo-root[data-composer-phase="attachment"] .codex-ui-composer-attachment',
+  );
+  await attachmentSubmitComposer.fill("Use the attached evidence.");
+  await attachmentSubmitComposer.press("Enter");
+  await attachmentSubmitPage.waitForSelector(
+    '.demo-root[data-composer-phase="running"]',
+  );
+  if (
+    (await attachmentSubmitPage
+      .locator(".codex-ui-composer-attachment")
+      .count()) !== 0
+  ) {
+    throw new Error("Successful submission retained the attachment fixture.");
+  }
+} finally {
+  await attachmentSubmitApp.close();
 }
 
 const attachmentNavigationScene = {
