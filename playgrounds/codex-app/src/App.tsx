@@ -1658,6 +1658,11 @@ export function App() {
                 setWorkspaceProjectId(null);
                 setWorkspaceOverlayState(null);
                 setWorkspaceProjectQuery("");
+                window.setTimeout(() =>
+                  document
+                    .getElementById("demo-workspace-project-trigger")
+                    ?.focus(),
+                );
               }}
               type="button"
             >

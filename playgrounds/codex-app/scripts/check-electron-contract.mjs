@@ -1544,6 +1544,16 @@ try {
   await codingWorkspacePage.waitForSelector(
     'button[aria-label="Change project: No project"]',
   );
+  await codingWorkspacePage.waitForTimeout(50);
+  if (
+    (await codingWorkspacePage.evaluate(
+      () => document.activeElement?.getAttribute("aria-label"),
+    )) !== "Change project: No project"
+  ) {
+    throw new Error(
+      "Electron coding workspace did not restore project-trigger focus after clearing the project.",
+    );
+  }
   const noProjectDestination = (
     await codingWorkspacePage
       .locator(".demo-workspace-destination")
