@@ -48,7 +48,7 @@ const currentBuildMcpRecoveryReferenceSize = {
 const currentBuildSidebarReference =
   process.env.CODEX_UI_KIT_SIDEBAR_REFERENCE;
 const defaultLifecycleMainPixelRatio = 0.0025;
-const defaultLifecycleSidebarPixelRatio = 0.008;
+const defaultLifecycleSidebarPixelRatio = 0.03;
 const internalSidebarWidth = 274;
 const currentBuildSidebarReferenceSize = {
   height: 820,

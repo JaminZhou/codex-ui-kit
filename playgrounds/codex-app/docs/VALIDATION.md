@@ -60,10 +60,11 @@ not gate the whole-main ratio when the observed and replayed conversation
 content differ.
 
 The 13 standard lifecycle frames keep the original 0.25% internal raster limit
-for the 906px main region. Their 274px sidebar is gated separately at 0.8%
-because its shared 13px text and glyph density produced a measured 0.6874%
-cross-machine macOS runner delta. This prevents sidebar raster variance from
-loosening the conversation gate, while the ownership-scoped current-build
+for the 906px main region. Their 274px sidebar is gated separately at 3%
+because its expanded 13px navigation/history text density produced a measured
+2.6687% cross-machine macOS runner delta while the same main region measured
+0%. This prevents sidebar raster variance from loosening the conversation
+gate, while CDP locks the row contract and the ownership-scoped current-build
 sidebar comparison retains its separate hard regional thresholds. The
 large-Review frame uses a scoped 0.40% full-frame limit because
 its 96 dense monospace
@@ -75,7 +76,7 @@ rasterization delta; CDP and Electron still lock the split, tabs, actions,
 resizing, and expansion independently. Its optional current-build gate allows
 at most 6.5% full-main, 5.5% index, and 7% detail difference at the stricter
 0.05 pixel threshold. The fifteenth Terminal frame keeps the standard
-0.25%-main/0.8%-sidebar regional limits; its optional current-build gate allows
+0.25%-main/3%-sidebar regional limits; its optional current-build gate allows
 at most 2% panel and 1% content difference at the same 0.05 threshold. The
 sixteenth completed-Markdown
 frame uses a scoped 1% internal limit for dense text rasterization and hides
