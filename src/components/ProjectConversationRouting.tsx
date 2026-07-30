@@ -1,8 +1,11 @@
 import {
+  Fragment,
   type FocusEvent,
   type HTMLAttributes,
   type KeyboardEvent,
+  type ReactElement,
   type ReactNode,
+  type RefObject,
   useEffect,
   useId,
   useRef,
@@ -676,11 +679,6 @@ export function NewConversationStart({
       data-status={status}
     >
       <div className="codex-ui-new-conversation-start__layout">
-        {prompt ? (
-          <div className="codex-ui-new-conversation-start__prompt">
-            {prompt}
-          </div>
-        ) : null}
         <header className="codex-ui-new-conversation-start__header">
           {eyebrow ? (
             <span className="codex-ui-new-conversation-start__eyebrow">
@@ -690,14 +688,19 @@ export function NewConversationStart({
           <h3>{destination}</h3>
           {description ? <p>{description}</p> : null}
         </header>
-        <div className="codex-ui-new-conversation-start__composer">
-          {composer}
-        </div>
+        {prompt ? (
+          <div className="codex-ui-new-conversation-start__prompt">
+            {prompt}
+          </div>
+        ) : null}
         {context ? (
           <div className="codex-ui-new-conversation-start__context">
             {context}
           </div>
         ) : null}
+        <div className="codex-ui-new-conversation-start__composer">
+          {composer}
+        </div>
       </div>
     </section>
   );
@@ -735,6 +738,10 @@ export interface ConversationContextBarProps
   items: readonly ConversationContextItem[];
   label?: string;
   onSelect: (itemId: string) => void;
+  renderItem?: (
+    item: ConversationContextItem,
+    trigger: ReactElement<any>,
+  ) => ReactNode;
 }
 
 function conversationContextItemDisabled(
@@ -757,6 +764,7 @@ export function ConversationContextBar({
   items,
   label = "Conversation context",
   onSelect,
+  renderItem,
   ...props
 }: ConversationContextBarProps) {
   const contextBarId = useId();
@@ -781,7 +789,7 @@ export function ConversationContextBar({
         const statusId = item.statusLabel
           ? `${contextBarId}-status-${index}`
           : undefined;
-        return (
+        const trigger = (
           <button
             aria-controls={
               expandedId === item.id ? item.controlsId : undefined
@@ -804,7 +812,6 @@ export function ConversationContextBar({
             data-status={item.status}
             disabled={itemDisabled}
             id={item.triggerId}
-            key={item.id}
             onClick={() => onSelect(item.id)}
             type="button"
           >
@@ -830,6 +837,11 @@ export function ConversationContextBar({
             ) : null}
           </button>
         );
+        return (
+          <Fragment key={item.id}>
+            {renderItem ? renderItem(item, trigger) : trigger}
+          </Fragment>
+        );
       })}
     </div>
   );
@@ -840,6 +852,7 @@ export interface ConversationProjectListboxProps
     HTMLAttributes<HTMLDivElement>,
     "children" | "onSelect"
   > {
+  dismissBoundaryId?: string;
   initialFocus?: "first" | "none" | "selected";
   items: readonly ProjectIndexItem[];
   label?: string;
@@ -895,6 +908,7 @@ function moveProjectListboxFocus(
 
 export function ConversationProjectListbox({
   className,
+  dismissBoundaryId,
   initialFocus = "selected",
   items,
   label = "Conversation projects",
@@ -957,27 +971,89 @@ export function ConversationProjectListbox({
 
   useEffect(() => {
     if (!onDismiss || typeof document === "undefined") return;
+    const dismissBoundary = dismissBoundaryId
+      ? document.getElementById(dismissBoundaryId)
+      : null;
+    const trigger = triggerId
+      ? document.getElementById(triggerId)
+      : null;
     const handlePointerDown = (event: PointerEvent) => {
       const target = event.target;
       if (!(target instanceof Node)) return;
-      const trigger = triggerId
-        ? document.getElementById(triggerId)
-        : null;
       if (
         !listboxRef.current?.contains(target) &&
-        !trigger?.contains(target)
+        !trigger?.contains(target) &&
+        !dismissBoundary?.contains(target)
       ) {
         onDismiss();
       }
     };
+    const handleBoundaryFocusOut = (
+      event: globalThis.FocusEvent,
+    ) => {
+      const nextTarget = event.relatedTarget;
+      if (
+        nextTarget instanceof Node &&
+        (dismissBoundary?.contains(nextTarget) ||
+          trigger?.contains(nextTarget))
+      ) {
+        return;
+      }
+      onDismiss();
+    };
+    const handleBoundaryKeyDown = (
+      event: globalThis.KeyboardEvent,
+    ) => {
+      if (event.key !== "Escape") return;
+      event.preventDefault();
+      event.stopPropagation();
+      onDismiss();
+      if (trigger && typeof window !== "undefined") {
+        window.setTimeout(() => trigger.focus());
+      }
+    };
     document.addEventListener("pointerdown", handlePointerDown, true);
-    return () =>
+    dismissBoundary?.addEventListener(
+      "focusout",
+      handleBoundaryFocusOut,
+    );
+    if (
+      dismissBoundary &&
+      trigger &&
+      !dismissBoundary.contains(trigger)
+    ) {
+      trigger.addEventListener("focusout", handleBoundaryFocusOut);
+    }
+    dismissBoundary?.addEventListener(
+      "keydown",
+      handleBoundaryKeyDown,
+    );
+    return () => {
       document.removeEventListener(
         "pointerdown",
         handlePointerDown,
         true,
       );
-  }, [onDismiss, triggerId]);
+      dismissBoundary?.removeEventListener(
+        "focusout",
+        handleBoundaryFocusOut,
+      );
+      if (
+        dismissBoundary &&
+        trigger &&
+        !dismissBoundary.contains(trigger)
+      ) {
+        trigger.removeEventListener(
+          "focusout",
+          handleBoundaryFocusOut,
+        );
+      }
+      dismissBoundary?.removeEventListener(
+        "keydown",
+        handleBoundaryKeyDown,
+      );
+    };
+  }, [dismissBoundaryId, onDismiss, triggerId]);
 
   return (
     <div
@@ -992,6 +1068,7 @@ export function ConversationProjectListbox({
       onBlur={(event: FocusEvent<HTMLDivElement>) => {
         onBlur?.(event);
         if (!onDismiss || event.defaultPrevented) return;
+        if (dismissBoundaryId) return;
         const nextTarget = event.relatedTarget;
         const trigger = triggerId
           ? document.getElementById(triggerId)
@@ -1067,7 +1144,17 @@ export function ConversationProjectListbox({
             }
             type="button"
           >
-            <span>{item.label}</span>
+            {item.icon ? (
+              <span
+                aria-hidden="true"
+                className="codex-ui-conversation-project-options__icon"
+              >
+                {item.icon}
+              </span>
+            ) : null}
+            <span className="codex-ui-conversation-project-options__label">
+              {item.label}
+            </span>
             {item.description ? (
               <small id={descriptionId}>{item.description}</small>
             ) : null}
@@ -1079,6 +1166,12 @@ export function ConversationProjectListbox({
                 {item.statusLabel}
               </small>
             ) : null}
+            <span
+              aria-hidden="true"
+              className="codex-ui-conversation-project-options__check"
+            >
+              {selected ? "✓" : ""}
+            </span>
           </button>
         );
       })}
@@ -1127,6 +1220,7 @@ export interface LocalEnvironmentDialogProps
   onSelect: (groupId: string, itemId: string) => void;
   open: boolean;
   query: string;
+  returnFocusRef?: RefObject<HTMLElement | null>;
   searchLabel?: string;
   title?: ReactNode;
 }
@@ -1175,6 +1269,7 @@ export function LocalEnvironmentDialog({
   onSelect,
   open,
   query,
+  returnFocusRef,
   searchLabel = "Search local environments",
   title = "Create local environment",
   ...props
@@ -1224,6 +1319,7 @@ export function LocalEnvironmentDialog({
       initialFocusSelector=".codex-ui-local-environment-dialog__search"
       onOpenChange={onOpenChange}
       open={open}
+      returnFocusRef={returnFocusRef}
       size="standard"
       title={title}
     >

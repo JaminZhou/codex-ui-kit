@@ -201,6 +201,11 @@ function getFocusableItems(container: HTMLElement) {
 }
 
 function focusByKey(event: KeyboardEvent<HTMLElement>) {
+  const target = event.target;
+  const editableTarget =
+    target instanceof HTMLElement &&
+    (target.isContentEditable ||
+      target.matches("input, textarea, select"));
   const items = getFocusableItems(event.currentTarget);
   if (items.length === 0) return;
   const currentIndex = items.findIndex((item) => item === document.activeElement);
@@ -210,6 +215,7 @@ function focusByKey(event: KeyboardEvent<HTMLElement>) {
     !event.ctrlKey &&
     !event.metaKey
   ) {
+    if (editableTarget) return;
     const query = event.key.toLocaleLowerCase();
     const orderedItems = [
       ...items.slice(currentIndex + 1),

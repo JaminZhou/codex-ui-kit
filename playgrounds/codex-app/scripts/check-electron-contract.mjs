@@ -1374,6 +1374,706 @@ try {
   await largeReviewApp.close();
 }
 
+const codingWorkspaceScene = {
+  frame: "workspace-ready",
+  id: "electron-coding-workspace",
+  scenario: "workspace-workflow",
+  view: "workspace",
+};
+const {
+  app: codingWorkspaceApp,
+  page: codingWorkspacePage,
+} = await launchScene(codingWorkspaceScene, { capture: false });
+try {
+  const nativeWindow = await codingWorkspaceApp.evaluate(
+    ({ BrowserWindow }) => {
+      const window = BrowserWindow.getAllWindows()[0];
+      return window
+        ? {
+            destroyed: window.isDestroyed(),
+            size: window.getContentSize(),
+            visible: window.isVisible(),
+          }
+        : null;
+    },
+  );
+  if (
+    !nativeWindow ||
+    nativeWindow.destroyed ||
+    JSON.stringify(nativeWindow.size) !== JSON.stringify([1180, 820])
+  ) {
+    throw new Error(
+      `Electron coding workspace window failed: ${JSON.stringify(nativeWindow)}`,
+    );
+  }
+
+  for (const expected of [
+    {
+      composerWidth: 736,
+      height: 820,
+      layoutMode: "wide",
+      rootWidth: 768,
+      sidebarOpen: true,
+      width: 1180,
+    },
+    {
+      composerWidth: 654,
+      height: 680,
+      layoutMode: "medium",
+      rootWidth: 686,
+      sidebarOpen: true,
+      width: 960,
+    },
+    {
+      composerWidth: 514,
+      height: 680,
+      layoutMode: "medium",
+      rootWidth: 546,
+      sidebarOpen: true,
+      width: 820,
+    },
+    {
+      composerWidth: 648,
+      height: 680,
+      layoutMode: "narrow",
+      rootWidth: 680,
+      sidebarOpen: false,
+      width: 720,
+    },
+    {
+      composerWidth: 736,
+      height: 1080,
+      layoutMode: "wide",
+      rootWidth: 768,
+      sidebarOpen: true,
+      width: 1920,
+    },
+    {
+      composerWidth: 736,
+      height: 1326,
+      layoutMode: "wide",
+      rootWidth: 768,
+      sidebarOpen: true,
+      width: 2560,
+    },
+    {
+      composerWidth: 736,
+      height: 820,
+      layoutMode: "wide",
+      rootWidth: 768,
+      sidebarOpen: true,
+      width: 1180,
+    },
+  ]) {
+    await codingWorkspaceApp.evaluate(
+      ({ BrowserWindow }, size) => {
+        BrowserWindow.getAllWindows()[0]?.setContentSize(
+          size.width,
+          size.height,
+        );
+      },
+      expected,
+    );
+    await codingWorkspacePage.waitForFunction(
+      (target) => {
+        const shell = document.querySelector(".codex-ui-app-shell");
+        return (
+          window.innerWidth === target.width &&
+          window.innerHeight === target.height &&
+          shell?.getAttribute("data-layout-mode") ===
+            target.layoutMode &&
+          shell.hasAttribute("data-sidebar-open") ===
+            target.sidebarOpen
+        );
+      },
+      expected,
+      { timeout: 5_000 },
+    );
+    const geometry = await codingWorkspacePage.evaluate(() => ({
+      composerWidth: document
+        .querySelector(".demo-workspace-start .codex-ui-composer")
+        ?.getBoundingClientRect().width,
+      horizontalOverflow:
+        document.documentElement.scrollWidth -
+        document.documentElement.clientWidth,
+      rootWidth: document
+        .querySelector(".demo-workspace-start")
+        ?.getBoundingClientRect().width,
+    }));
+    if (
+      Math.abs((geometry.rootWidth ?? 0) - expected.rootWidth) > 1 ||
+      Math.abs(
+        (geometry.composerWidth ?? 0) - expected.composerWidth,
+      ) > 1 ||
+      geometry.horizontalOverflow > 1
+    ) {
+      throw new Error(
+        `Electron coding workspace responsive geometry failed at ${expected.width}x${expected.height}: ${JSON.stringify(geometry)}`,
+      );
+    }
+  }
+
+  const projectDestination = codingWorkspacePage.locator(
+    "#demo-workspace-destination-trigger",
+  );
+  const projectTrigger = codingWorkspacePage.getByRole("button", {
+    name: "Change project: codex-ui-kit",
+  });
+  const projectDialog = codingWorkspacePage.getByRole("dialog", {
+    name: "Choose a project",
+  });
+  const projectSearch = projectDialog.getByRole("searchbox", {
+    name: "Search projects",
+  });
+  await projectDestination.click();
+  const destinationPopupState = await codingWorkspacePage.evaluate(() => {
+    const destination = document.querySelector(
+      "#demo-workspace-destination-trigger",
+    );
+    const contextTrigger = document.querySelector(
+      "#demo-workspace-project-trigger",
+    );
+    return {
+      contextExpanded: contextTrigger?.getAttribute("aria-expanded"),
+      controls: destination?.getAttribute("aria-controls"),
+      destinationExpanded: destination?.getAttribute("aria-expanded"),
+      hasPopup: destination?.getAttribute("aria-haspopup"),
+    };
+  });
+  if (
+    destinationPopupState.contextExpanded === "true" ||
+    destinationPopupState.controls !== "demo-workspace-project-dialog" ||
+    destinationPopupState.destinationExpanded !== "true" ||
+    destinationPopupState.hasPopup !== "dialog"
+  ) {
+    throw new Error(
+      `Electron coding workspace destination popup semantics are invalid: ${JSON.stringify(destinationPopupState)}.`,
+    );
+  }
+  await projectSearch.press("Escape");
+  await projectDialog.waitFor({ state: "hidden" });
+  await codingWorkspacePage.waitForTimeout(50);
+  if (
+    (await codingWorkspacePage.evaluate(
+      () => document.activeElement?.id,
+    )) !== "demo-workspace-destination-trigger"
+  ) {
+    throw new Error(
+      "Electron coding workspace did not restore destination focus after Escape.",
+    );
+  }
+  await projectTrigger.click();
+  await projectSearch.press("Escape");
+  await projectDialog.waitFor({ state: "hidden" });
+  await codingWorkspacePage.waitForTimeout(50);
+  if (
+    (await codingWorkspacePage.evaluate(
+      () => document.activeElement?.getAttribute("aria-label"),
+    )) !== "Change project: codex-ui-kit"
+  ) {
+    throw new Error(
+      "Electron coding workspace did not restore project-trigger focus after Escape.",
+    );
+  }
+  await projectTrigger.click();
+  await projectTrigger.focus();
+  await codingWorkspacePage
+    .getByRole("textbox", { name: "Workspace message composer" })
+    .focus();
+  await projectDialog.waitFor({ state: "hidden" });
+  await projectTrigger.click();
+  await projectDialog
+    .getByRole("button", {
+      name: "Don't work in a project",
+    })
+    .click();
+  await codingWorkspacePage.waitForSelector(
+    'button[aria-label="Change project: No project"]',
+  );
+  await codingWorkspacePage.waitForTimeout(50);
+  if (
+    (await codingWorkspacePage.evaluate(
+      () => document.activeElement?.getAttribute("aria-label"),
+    )) !== "Change project: No project"
+  ) {
+    throw new Error(
+      "Electron coding workspace did not restore project-trigger focus after clearing the project.",
+    );
+  }
+  const noProjectDestination = (
+    await codingWorkspacePage
+      .locator(".demo-workspace-destination")
+      .textContent()
+  )?.trim();
+  if (noProjectDestination !== "No project?") {
+    throw new Error(
+      `Electron coding workspace did not enter the no-project state: ${JSON.stringify(noProjectDestination)}.`,
+    );
+  }
+  await codingWorkspacePage
+    .getByRole("button", { name: "Change project: No project" })
+    .click();
+  await codingWorkspacePage.waitForTimeout(50);
+  await projectSearch.fill("app-server");
+  await projectDialog
+    .getByRole("option", {
+      name: "Select project codex-app-server-client",
+    })
+    .click();
+  await codingWorkspacePage.waitForSelector(
+    'button[aria-label="Change project: codex-app-server-client"]',
+  );
+  await codingWorkspacePage.waitForTimeout(50);
+
+  await codingWorkspacePage
+    .getByRole("button", { name: "Change environment: Local" })
+    .press("ArrowDown");
+  await codingWorkspacePage.waitForTimeout(50);
+  const environmentMenu = codingWorkspacePage.getByRole("menu", {
+    name: "Start in",
+  });
+  const localEnvironment = environmentMenu.getByRole("menuitemradio", {
+    name: "Work locally",
+  });
+  await codingWorkspacePage.waitForFunction(
+    () =>
+      document.activeElement?.matches(
+        ".demo-workspace-environment-menu .codex-ui-menu-item:first-of-type",
+      ) ?? false,
+  );
+  if ((await localEnvironment.getAttribute("aria-checked")) !== "true") {
+    throw new Error(
+      "Electron coding workspace did not preserve the local environment selection.",
+    );
+  }
+  await environmentMenu
+    .getByRole("menuitemradio", { name: "New worktree" })
+    .click();
+  await codingWorkspacePage.waitForTimeout(50);
+  const localEnvironmentDialog = codingWorkspacePage.getByRole("dialog", {
+    name: "Select local environment",
+  });
+  const localEnvironmentSearch = localEnvironmentDialog.getByRole(
+    "searchbox",
+    {
+      name: "Search local environments",
+    },
+  );
+  await codingWorkspacePage.waitForFunction(
+    () =>
+      document.activeElement?.getAttribute("aria-label") ===
+      "Search local environments",
+  );
+  const repairing = localEnvironmentDialog.getByRole("button", {
+    name: "Use local environment Repairing worktree",
+  });
+  if (!(await repairing.isDisabled())) {
+    throw new Error(
+      "Electron coding workspace exposed a repairing environment as selectable.",
+    );
+  }
+  await localEnvironmentSearch.press("Escape");
+  await localEnvironmentDialog.waitFor({ state: "hidden" });
+  await codingWorkspacePage.waitForTimeout(50);
+  const canceledWorktreeState = await codingWorkspacePage.evaluate(() => ({
+    activeLabel: document.activeElement?.getAttribute("aria-label"),
+    environmentLabel: document
+      .querySelector('[data-kind="environment"]')
+      ?.getAttribute("aria-label"),
+  }));
+  if (
+    canceledWorktreeState.activeLabel !== "Change environment: Local" ||
+    canceledWorktreeState.environmentLabel !== "Change environment: Local"
+  ) {
+    throw new Error(
+      `Electron coding workspace did not preserve and refocus the local environment after canceling New worktree: ${JSON.stringify(canceledWorktreeState)}.`,
+    );
+  }
+  await codingWorkspacePage
+    .getByRole("button", { name: "Change environment: Local" })
+    .press("ArrowDown");
+  await environmentMenu
+    .getByRole("menuitemradio", { name: "New worktree" })
+    .click();
+  await codingWorkspacePage.waitForFunction(
+    () =>
+      document.activeElement?.getAttribute("aria-label") ===
+      "Search local environments",
+  );
+  await localEnvironmentSearch.fill("coding");
+  await localEnvironmentDialog
+    .getByRole("button", {
+      name: "Use local environment Coding workspace",
+    })
+    .click();
+  await codingWorkspacePage.waitForSelector(
+    'button[aria-label="Change environment: Local"]',
+  );
+  await codingWorkspacePage.waitForSelector(
+    'button[aria-label="Change worktree: feat/coding-workspace-lifecycle"]',
+  );
+
+  await codingWorkspacePage
+    .getByRole("button", { name: "Change project: codex-ui-kit" })
+    .click();
+  await projectSearch.fill("app-server");
+  await projectDialog
+    .getByRole("option", {
+      name: "Select project codex-app-server-client",
+    })
+    .click();
+  await codingWorkspacePage.waitForSelector(
+    'button[aria-label="Change environment: Local"]',
+  );
+  await codingWorkspacePage.waitForSelector(
+    'button[aria-label="Change worktree: main"]',
+  );
+
+  await codingWorkspacePage
+    .getByRole("button", {
+      name: "Change worktree: main",
+    })
+    .click();
+  await codingWorkspacePage.waitForTimeout(50);
+  const worktreeMenu = codingWorkspacePage.getByRole("menu", {
+    name: "Branches",
+  });
+  const branchSearch = worktreeMenu.getByRole("searchbox", {
+    name: "Search branches",
+  });
+  await codingWorkspacePage.waitForFunction(
+    () =>
+      document.activeElement?.getAttribute("aria-label") ===
+      "Search branches",
+  );
+  const appServerWorktreeLabels = await worktreeMenu
+    .getByRole("menuitemradio")
+    .allTextContents();
+  if (
+    appServerWorktreeLabels.some(
+      (label) =>
+        label.includes("Repairing") ||
+        label.includes("feat/coding-workspace-lifecycle"),
+    )
+  ) {
+    throw new Error(
+      `Electron coding workspace exposed another project's worktree: ${JSON.stringify(appServerWorktreeLabels)}.`,
+    );
+  }
+  await worktreeMenu
+    .getByRole("menuitem", {
+      name: "Create and checkout new branch…",
+    })
+    .click();
+  await codingWorkspacePage.waitForFunction(
+    () =>
+      document.activeElement?.getAttribute("aria-label") ===
+      "Search local environments",
+  );
+  await localEnvironmentSearch.press("Escape");
+  await localEnvironmentDialog.waitFor({ state: "hidden" });
+  await codingWorkspacePage.waitForTimeout(50);
+  if (
+    (await codingWorkspacePage.evaluate(
+      () => document.activeElement?.getAttribute("aria-label"),
+    )) !== "Change worktree: main"
+  ) {
+    throw new Error(
+      "Electron coding workspace did not restore focus to the worktree launcher.",
+    );
+  }
+  await codingWorkspacePage
+    .getByRole("button", {
+      name: "Change worktree: main",
+    })
+    .click();
+  await codingWorkspacePage.waitForTimeout(50);
+  await worktreeMenu
+    .getByRole("menuitem", {
+      name: "Create and checkout new branch…",
+    })
+    .click();
+  await localEnvironmentDialog
+    .getByRole("button", { name: "Create worktree" })
+    .click();
+  await codingWorkspacePage.waitForSelector(
+    'button[aria-label="Change environment: New worktree"]',
+  );
+  await codingWorkspacePage
+    .getByRole("button", {
+      name: "Change worktree: main",
+    })
+    .click();
+  await codingWorkspacePage.waitForTimeout(50);
+  await branchSearch.press("m");
+  const branchSearchKeyboardState = await codingWorkspacePage.evaluate(() => ({
+    activeLabel: document.activeElement?.getAttribute("aria-label"),
+    value: (
+      document.querySelector(
+        '.demo-workspace-worktree-menu input[aria-label="Search branches"]',
+      )
+    )?.value,
+  }));
+  if (
+    branchSearchKeyboardState.activeLabel !== "Search branches" ||
+    branchSearchKeyboardState.value !== "m"
+  ) {
+    throw new Error(
+      `Electron worktree search lost typed input to menu typeahead: ${JSON.stringify(branchSearchKeyboardState)}.`,
+    );
+  }
+  await branchSearch.press("ArrowDown");
+  if (
+    (await codingWorkspacePage.evaluate(
+      () => document.activeElement?.getAttribute("role"),
+    )) !== "menuitemradio"
+  ) {
+    throw new Error(
+      "Electron worktree search did not retain arrow navigation into filtered branches.",
+    );
+  }
+  await worktreeMenu
+    .getByRole("menuitemradio", {
+      name: "main",
+    })
+    .click();
+  await codingWorkspacePage.waitForSelector(
+    'button[aria-label="Change worktree: main"]',
+  );
+  await codingWorkspacePage.waitForSelector(
+    'button[aria-label="Change environment: Local"]',
+  );
+
+  const workspaceComposer = codingWorkspacePage.getByRole("textbox", {
+    name: "Workspace message composer",
+  });
+  await workspaceComposer.fill(
+    "Run the protocol-backed coding workspace lifecycle.",
+  );
+  await workspaceComposer.press("Enter");
+  await codingWorkspacePage.waitForSelector(
+    '.demo-root[data-view="conversation"][data-scenario="workspace-workflow"][data-frame="approval-pending"]',
+  );
+  if (
+    (await codingWorkspacePage
+      .getByText("Run the protocol-backed coding workspace lifecycle.", {
+        exact: true,
+      })
+      .count()) !== 1
+  ) {
+    throw new Error(
+      "Electron coding workspace discarded the submitted prompt.",
+    );
+  }
+  if (
+    (await codingWorkspacePage
+      .getByTestId("command-execution")
+      .count()) !== 2
+  ) {
+    throw new Error(
+      "Electron coding workspace did not reach command execution.",
+    );
+  }
+  const workspaceCommandCwds = await codingWorkspacePage
+    .locator(
+      '[data-testid="command-execution"] .codex-ui-command-execution__shell',
+    )
+    .evaluateAll((elements) =>
+      elements.map((element) => element.getAttribute("title")),
+    );
+  if (
+    workspaceCommandCwds.some(
+      (cwd) => cwd !== "cwd\n/workspace/codex-app-server-client",
+    )
+  ) {
+    throw new Error(
+      `Electron coding workspace did not route commands through the selected project: ${JSON.stringify(workspaceCommandCwds)}.`,
+    );
+  }
+  await codingWorkspacePage
+    .getByTestId("approval-request")
+    .getByRole("button", { name: "Allow once" })
+    .click();
+  await codingWorkspacePage.waitForSelector(
+    '.demo-root[data-view="conversation"][data-scenario="workspace-workflow"] [data-testid="file-change-group"]',
+  );
+  const fileGroup = codingWorkspacePage.locator(
+    '[data-testid="file-change-group"]',
+  );
+  if (
+    (await fileGroup.count()) !== 1 ||
+    (await fileGroup.locator(".codex-ui-file-change-group__file").count()) !==
+      2
+  ) {
+    throw new Error(
+      "Electron coding workspace did not reach protocol-backed file changes.",
+    );
+  }
+  await codingWorkspacePage
+    .getByRole("button", { name: "Open CHECKS.md" })
+    .click();
+  await codingWorkspacePage.waitForSelector(
+    '.codex-ui-app-shell[data-side-panel-open] [data-testid="review-panel"]',
+  );
+  await codingWorkspacePage
+    .getByRole("button", { exact: true, name: "Close review" })
+    .click();
+  await codingWorkspacePage
+    .getByRole("button", { exact: true, name: "Open terminal" })
+    .first()
+    .click();
+  await codingWorkspacePage.waitForSelector(
+    '.codex-ui-app-shell[data-bottom-panel-open] [data-testid="terminal-panel"]',
+  );
+  const workspaceTerminalLabel = (
+    await codingWorkspacePage
+      .locator(".demo-terminal-tab-label")
+      .textContent()
+  )?.replace("×", "").trim();
+  if (workspaceTerminalLabel !== "▣codex-app-server-client") {
+    throw new Error(
+      `Electron coding workspace terminal tab did not use the routed project: ${JSON.stringify(workspaceTerminalLabel)}.`,
+    );
+  }
+  await codingWorkspacePage
+    .getByRole("button", { exact: true, name: "Close terminal" })
+    .click();
+  await codingWorkspacePage
+    .getByRole("button", { exact: true, name: "Pull requests" })
+    .click();
+  await codingWorkspacePage.waitForSelector(
+    '.demo-root[data-view="pull-request"] [data-testid="pull-request-panel"]',
+  );
+} finally {
+  await codingWorkspaceApp.close();
+}
+
+const cloudWorkspaceScene = {
+  frame: "workspace-ready",
+  id: "electron-cloud-coding-workspace",
+  scenario: "workspace-workflow",
+  view: "workspace",
+};
+const {
+  app: cloudWorkspaceApp,
+  page: cloudWorkspacePage,
+} = await launchScene(cloudWorkspaceScene, { capture: false });
+try {
+  await cloudWorkspacePage
+    .getByRole("button", { name: "Change environment: Local" })
+    .click();
+  await cloudWorkspacePage
+    .getByRole("menu", { name: "Start in" })
+    .getByRole("menuitemradio", { name: "Connect Codex web" })
+    .click();
+  await cloudWorkspacePage.waitForSelector(
+    'button[aria-label="Change environment: Codex web"]',
+  );
+  await cloudWorkspacePage
+    .getByRole("button", { name: "Change worktree: main" })
+    .click();
+  await cloudWorkspacePage
+    .getByRole("menu", { name: "Branches" })
+    .getByRole("menuitemradio", {
+      name: "feat/coding-workspace-lifecycle",
+    })
+    .click();
+  await cloudWorkspacePage
+    .getByRole("textbox", { name: "Workspace message composer" })
+    .fill("Run the cloud worktree lifecycle.");
+  await cloudWorkspacePage
+    .getByRole("textbox", { name: "Workspace message composer" })
+    .press("Enter");
+  await cloudWorkspacePage.waitForSelector(
+    '.demo-root[data-view="conversation"][data-scenario="workspace-workflow"][data-frame="approval-pending"]',
+  );
+  const cloudWorkspaceCommandCwds = await cloudWorkspacePage
+    .locator(
+      '[data-testid="command-execution"] .codex-ui-command-execution__shell',
+    )
+    .evaluateAll((elements) =>
+      elements.map((element) => element.getAttribute("title")),
+    );
+  if (
+    cloudWorkspaceCommandCwds.some(
+      (cwd) =>
+        cwd !==
+        "cwd\n/cloud/codex-ui-kit/.worktrees/feat-coding-workspace-lifecycle",
+    )
+  ) {
+    throw new Error(
+      `Electron cloud coding workspace discarded the selected worktree: ${JSON.stringify(cloudWorkspaceCommandCwds)}.`,
+    );
+  }
+} finally {
+  await cloudWorkspaceApp.close();
+}
+
+const rejectedApprovalScene = {
+  frame: "approval-pending",
+  id: "electron-workspace-approval-rejected",
+  scenario: "workspace-workflow",
+};
+const {
+  app: rejectedApprovalApp,
+  page: rejectedApprovalPage,
+} = await launchScene(rejectedApprovalScene, { capture: false });
+try {
+  const rejectedApproval = rejectedApprovalPage.getByTestId(
+    "approval-request",
+  );
+  await rejectedApproval.getByRole("button", { name: "Deny" }).click();
+  await rejectedApprovalPage.waitForSelector(
+    '.demo-root[data-frame="approval-rejected"] [data-testid="approval-request"][data-decision="rejected"]',
+  );
+  if (
+    (await rejectedApproval.getByRole("button", { name: "Deny" }).count()) !==
+    0
+  ) {
+    throw new Error(
+      "Electron workspace approval remained actionable after rejection.",
+    );
+  }
+} finally {
+  await rejectedApprovalApp.close();
+}
+
+const acceptedMixedApprovalScene = {
+  frame: "mixed-approval-pending",
+  id: "electron-mixed-approval-accepted",
+  scenario: "mcp-recovery-mixed-thread",
+};
+const {
+  app: acceptedMixedApprovalApp,
+  page: acceptedMixedApprovalPage,
+} = await launchScene(acceptedMixedApprovalScene, { capture: false });
+try {
+  const acceptedMixedApproval =
+    acceptedMixedApprovalPage.getByTestId("approval-request");
+  await acceptedMixedApproval
+    .getByRole("button", { name: "Allow once" })
+    .click();
+  await acceptedMixedApprovalPage.waitForSelector(
+    '.demo-root[data-frame="mixed-review-open"][data-status="completed"] [data-testid="file-change-group"]',
+  );
+  if (
+    (await acceptedMixedApproval.getAttribute("data-decision")) !==
+      "approved" ||
+    (await acceptedMixedApprovalPage
+      .getByText(
+        "The recovery check passed and RECOVERY.md is ready for review.",
+        { exact: true },
+      )
+      .count()) !== 1
+  ) {
+    throw new Error(
+      "Electron accepted mixed replay approval did not advance through completion.",
+    );
+  }
+} finally {
+  await acceptedMixedApprovalApp.close();
+}
+
 const conversationLifecycleScene = {
   frame: "conversation-thread-ready",
   id: "electron-conversation-lifecycle",
@@ -1483,5 +2183,5 @@ try {
 }
 
 console.log(
-  "Electron host, native-window, conversation/Composer lifecycle, default 720px narrow reachability, resizable navigation/Review/Terminal/PR detail, PR tabs and expansion, MCP disclosure/result, multi-file Review, large diff scrolling, and compact geometry contracts passed.",
+  "Electron host, native-window, coding-workspace routing, conversation/Composer lifecycle, default 720px narrow reachability, resizable navigation/Review/Terminal/PR detail, PR tabs and expansion, MCP disclosure/result, multi-file Review, large diff scrolling, and compact geometry contracts passed.",
 );

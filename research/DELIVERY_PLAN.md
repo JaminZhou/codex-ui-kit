@@ -11,10 +11,10 @@ exit gates; it does not replace the inventory.
 ## Current position
 
 - The current installed package is Codex Desktop `26.721.81911` (`5973`).
-- The inventory contains 73 surface groups: 46 P0, 18 P1, and 9 P2.
-- 17 groups have current-build runtime evidence, 37 have previous-build-only
+- The inventory contains 74 surface groups: 47 P0, 18 P1, and 9 P2.
+- 20 groups have current-build runtime evidence, 35 have previous-build-only
   runtime evidence, and 19 have not been sampled.
-- The first four current-build vertical slices cover all six left-sidebar
+- The first five current-build vertical slices cover all six left-sidebar
   groups, a real MCP failed-Fetch → Search → successful-Fetch recovery, and
   App shell window/loading/selection continuity through CDP, Browser,
   Electron, and regional pixel gates. The shell slice locks the 960/720px
@@ -23,11 +23,15 @@ exit gates; it does not replace the inventory.
   second command/approval/file/Review turn. The conversation slice adds real
   empty/focused/multiline/submit/Stop/completed Composer evidence, real
   queue/interrupt/Resume and permission/add-menu evidence, host-owned
-  long-thread replay, 36 CDP frames, Electron interaction, and current-build
-  queue-region pixel gates. Global notification runtime evidence, light-theme
-  shell evidence, exact current-build long-thread virtualization, and the
-  remaining Review, Terminal, Markdown, tool, and attachment variants remain
-  on their recorded evidence levels until separately re-observed.
+  long-thread replay, Electron interaction, and current-build queue-region
+  pixel gates. The coding-workspace entry slice adds the current
+  project/context surface plus an independent project → environment/worktree →
+  command → approval → two-file Review → Terminal → PR path. Together the
+  current playground gates cover 42 CDP/pixel frames. Global notification
+  runtime evidence, light-theme shell evidence, exact current-build
+  long-thread virtualization, and the remaining Review, Terminal, Markdown,
+  tool, and attachment variants remain on their recorded evidence levels until
+  separately re-observed.
 - Existing Browser and Electron results remain useful regression evidence, but
   they are `partial_legacy` until the affected surface is re-observed on the
   current build.

@@ -20,12 +20,20 @@ import {
   ComposerContextBar,
   ComposerContextControl,
   ComposerDock,
+  ConversationContextBar,
+  ConversationProjectListbox,
   ConversationThreadShell,
   Dialog,
   FileChangeGroup,
   FileReview,
+  LocalEnvironmentDialog,
+  Menu,
+  MenuItem,
+  MenuSectionLabel,
+  MenuSeparator,
   McpToolCallGroup,
   McpToolIcon,
+  NewConversationStart,
   PullRequestCheckList,
   PullRequestList,
   PullRequestPanelSummary,
@@ -47,6 +55,7 @@ import {
   type QueuedPrompt,
 } from "codex-ui-kit";
 import {
+  cloneElement,
   Fragment,
   useCallback,
   useEffect,
@@ -80,6 +89,10 @@ import {
   type ReviewSelection,
 } from "./review-selection";
 import {
+  contextualizeWorkspaceReplay,
+  workspaceExecutionCwd,
+} from "./workspace-replay";
+import {
   hasMcpToolCallGroupForTurn,
   mcpToolCallGroupDurationMs,
   mcpToolCallGroupForEntry,
@@ -87,7 +100,7 @@ import {
   mcpToolCallPresentation,
 } from "./mcp-tool-call-view";
 
-type DemoView = "conversation" | "pull-request" | "shell";
+type DemoView = "conversation" | "pull-request" | "shell" | "workspace";
 
 type SidebarGlyphName =
   | "automation"
@@ -145,7 +158,9 @@ function querySelection() {
       ? "pull-request"
       : params.get("view") === "shell"
         ? "shell"
-        : "conversation";
+        : params.get("view") === "workspace"
+          ? "workspace"
+          : "conversation";
   const requestedShellState = params.get("shellState");
   const shellState: AppRouteOutletStatus = [
     "ready",
@@ -403,6 +418,91 @@ const pullRequestFiles = [
   },
 ];
 
+const workspaceProjects = [
+  {
+    icon: <SidebarGlyph name="folder" />,
+    id: "codex-ui-kit",
+    label: "codex-ui-kit",
+    path: "/workspace/codex-ui-kit",
+    status: "available" as const,
+  },
+  {
+    icon: <SidebarGlyph name="folder" />,
+    id: "app-server-client",
+    label: "codex-app-server-client",
+    path: "/workspace/codex-app-server-client",
+    status: "available" as const,
+  },
+  {
+    icon: <SidebarGlyph name="folder" />,
+    id: "desktop-shell",
+    label: "desktop-shell",
+    path: "/workspace/desktop-shell",
+    status: "available" as const,
+  },
+  {
+    icon: <SidebarGlyph name="folder" />,
+    id: "tooling",
+    label: "tooling",
+    path: "/workspace/tooling",
+    status: "available" as const,
+  },
+  {
+    icon: <SidebarGlyph name="folder" />,
+    id: "unavailable",
+    label: "archived-workspace",
+    path: "/workspace/archived-workspace",
+    status: "unavailable" as const,
+    statusLabel: "Unavailable",
+  },
+];
+
+const workspaceEnvironmentGroups = [
+  {
+    description: "Current checkout and linked worktrees",
+    id: "codex-ui-kit",
+    items: [
+      {
+        branch: "main",
+        id: "main",
+        label: "Main",
+        meta: "clean",
+        status: "available" as const,
+      },
+      {
+        branch: "feat/coding-workspace-lifecycle",
+        id: "feature",
+        label: "Coding workspace",
+        meta: "ready",
+        status: "available" as const,
+      },
+      {
+        actions: (
+          <button aria-label="Inspect repairing worktree" type="button">
+            Details
+          </button>
+        ),
+        branch: "fix/repair",
+        id: "repairing",
+        label: "Repairing worktree",
+        status: "repairing" as const,
+        statusLabel: "Repairing",
+      },
+    ],
+    label: "codex-ui-kit",
+  },
+];
+
+const workspaceWorktreesByProject: Record<
+  string,
+  (typeof workspaceEnvironmentGroups)[number]["items"]
+> = {
+  "app-server-client": [workspaceEnvironmentGroups[0].items[0]],
+  "codex-ui-kit": workspaceEnvironmentGroups[0].items,
+  "desktop-shell": [workspaceEnvironmentGroups[0].items[0]],
+  tooling: [workspaceEnvironmentGroups[0].items[0]],
+};
+
 export function App() {
   const initialSelection = useMemo(querySelection, []);
   const [scenarioId, setScenarioId] = useState<ReplayScenarioId>(
@@ -420,6 +520,42 @@ export function App() {
   );
   const [mode, setMode] = useState<"live" | "replay">("replay");
   const [view, setView] = useState<DemoView>(initialSelection.view);
+  const [workspaceProjectId, setWorkspaceProjectId] = useState<
+    string | null
+  >("codex-ui-kit");
+  const [workspaceEnvironmentId, setWorkspaceEnvironmentId] =
+    useState("local");
+  const [workspaceWorktreeId, setWorkspaceWorktreeId] = useState(
+    initialSelection.view === "workspace" &&
+      initialSelection.frame === "workspace-repairing"
+      ? "repairing"
+      : "main",
+  );
+  const [workspaceLocalEnvironmentOpen, setWorkspaceLocalEnvironmentOpen] =
+    useState(
+      initialSelection.view === "workspace" &&
+        initialSelection.frame === "workspace-environment",
+    );
+  const [workspaceOverlay, setWorkspaceOverlay] = useState<
+    "environment" | "project" | "worktree" | null
+  >(
+    initialSelection.view === "workspace" &&
+      initialSelection.frame === "workspace-project-menu"
+      ? "project"
+      : initialSelection.view === "workspace" &&
+          initialSelection.frame === "workspace-environment-menu"
+        ? "environment"
+        : initialSelection.view === "workspace" &&
+            initialSelection.frame === "workspace-worktree-menu"
+          ? "worktree"
+        : null,
+  );
+  const [workspaceBranchQuery, setWorkspaceBranchQuery] = useState("");
+  const [workspaceEnvironmentQuery, setWorkspaceEnvironmentQuery] =
+    useState("");
+  const [workspaceProjectQuery, setWorkspaceProjectQuery] = useState("");
+  const [workspaceProjectTriggerId, setWorkspaceProjectTriggerId] =
+    useState("demo-workspace-project-trigger");
   const [shellState, setShellState] = useState<AppRouteOutletStatus>(
     initialSelection.shellState,
   );
@@ -443,6 +579,19 @@ export function App() {
   const [replayComposerStopped, setReplayComposerStopped] = useState(
     initialSelection.frame === "composer-queue-paused",
   );
+  const [replayApprovalResolution, setReplayApprovalResolution] =
+    useState<{
+      decision: "approved" | "rejected";
+      requestId: number | string;
+    } | null>(null);
+  const [workspaceRunCwd, setWorkspaceRunCwd] = useState(
+    "/workspace/codex-ui-kit",
+  );
+  const [workspaceRunPrompt, setWorkspaceRunPrompt] = useState<
+    string | undefined
+  >(undefined);
+  const [workspaceRunProjectLabel, setWorkspaceRunProjectLabel] =
+    useState("codex-ui-kit");
   const [threadFollowing, setThreadFollowing] = useState(
     initialSelection.frame !== "thread-scroll-away",
   );
@@ -490,6 +639,11 @@ export function App() {
   );
   const [liveError, setLiveError] = useState<string | null>(null);
   const liveStartPendingRef = useRef(false);
+  const workspaceEnvironmentTriggerRef =
+    useRef<HTMLButtonElement>(null);
+  const workspaceWorktreeTriggerRef = useRef<HTMLButtonElement>(null);
+  const [workspaceEnvironmentLauncher, setWorkspaceEnvironmentLauncher] =
+    useState<"environment" | "worktree">("environment");
   const queuedPromptCounterRef = useRef(1);
   const replaySubmitTimerRef = useRef<number | null>(null);
   const pendingMessageNavigationRef = useRef<{
@@ -500,9 +654,20 @@ export function App() {
   const liveApprovalSubmissionGateRef = useRef(
     new LiveApprovalSubmissionGate(),
   );
+  const scenarioEvents = useMemo(
+    () =>
+      scenario.id === "workspace-workflow"
+        ? contextualizeWorkspaceReplay(
+            scenario.events,
+            workspaceRunCwd,
+            workspaceRunPrompt,
+          )
+        : scenario.events,
+    [scenario, workspaceRunCwd, workspaceRunPrompt],
+  );
   const replay = useMemo(
-    () => replayState(scenario.events, replayCount),
-    [replayCount, scenario.events],
+    () => replayState(scenarioEvents, replayCount),
+    [replayCount, scenarioEvents],
   );
   const isConversationLifecycle =
     mode === "replay" && scenarioId === "conversation-lifecycle";
@@ -513,7 +678,23 @@ export function App() {
         : replay,
     [isConversationLifecycle, replay, replayComposerStopped],
   );
-  const state = mode === "live" ? liveState : lifecycleReplay;
+  const state = useMemo(
+    () =>
+      mode === "live"
+        ? liveState
+        : replayApprovalResolution
+          ? reduceProtocolNotification(lifecycleReplay, {
+              ...replayApprovalResolution,
+              kind: "approval-resolution",
+            })
+          : lifecycleReplay,
+    [
+      lifecycleReplay,
+      liveState,
+      mode,
+      replayApprovalResolution,
+    ],
+  );
   const replayComposerRunning =
     isConversationLifecycle && state.status === "running";
 
@@ -567,8 +748,9 @@ export function App() {
     setActiveFrame(null);
     setReplayComposerSubmitting(false);
     setReplayComposerStopped(false);
+    setReplayApprovalResolution(null);
     setQueueInterrupted(false);
-    if (!isTurnActive(replayState(scenario.events, nextCount).status)) {
+    if (!isTurnActive(replayState(scenarioEvents, nextCount).status)) {
       setQueuedPrompts([]);
     }
     setReplayCount(nextCount);
@@ -578,19 +760,65 @@ export function App() {
     if (isNarrowDemoWindow()) setSidebarOpen(false);
   };
 
-  const selectScenario = (nextId: ReplayScenarioId) => {
+  const openWorkspace = (
+    projectId: string | null = workspaceProjectId,
+  ) => {
     cancelReplaySubmitTimer();
+    setMode("replay");
+    setView("workspace");
+    setWorkspaceProjectId(projectId);
+    setWorkspaceEnvironmentId("local");
+    setWorkspaceWorktreeId("main");
+    setWorkspaceLocalEnvironmentOpen(false);
+    setWorkspaceOverlay(null);
+    setWorkspaceBranchQuery("");
+    setWorkspaceEnvironmentQuery("");
+    setWorkspaceProjectQuery("");
+    setWorkspaceProjectTriggerId("demo-workspace-project-trigger");
+    setComposerValue("");
+    setReplayApprovalResolution(null);
+    setActiveFrame("workspace-ready");
+    setReviewOpen(false);
+    setTerminalOpen(false);
+    setPullRequestOpen(false);
+    dismissSidebarAfterNavigation();
+  };
+
+  const selectScenario = (
+    nextId: ReplayScenarioId,
+    frame: string | null = null,
+    workspaceContext?: {
+      cwd: string;
+      prompt: string;
+      projectLabel: string;
+    },
+  ) => {
+    cancelReplaySubmitTimer();
+    setWorkspaceRunCwd(
+      workspaceContext?.cwd ?? "/workspace/codex-ui-kit",
+    );
+    setWorkspaceRunPrompt(
+      nextId === "workspace-workflow"
+        ? workspaceContext?.prompt
+        : undefined,
+    );
+    setWorkspaceRunProjectLabel(
+      workspaceContext?.projectLabel ?? "codex-ui-kit",
+    );
     setView("conversation");
     setMode("replay");
     setScenarioId(nextId);
-    setReplayCount(replayScenarios[nextId].events.length);
+    setReplayCount(
+      replayCountForSelection(replayScenarios[nextId], frame),
+    );
     setComposerValue("");
     setQueuedPrompts([]);
     setQueueingEnabled(true);
     setQueueInterrupted(false);
     setReplayComposerSubmitting(false);
     setReplayComposerStopped(false);
-    setActiveFrame(null);
+    setReplayApprovalResolution(null);
+    setActiveFrame(frame);
     setScenarioSelectionVersion((version) => version + 1);
     setWindowedTimelineExpanded(false);
     pendingMessageNavigationRef.current = null;
@@ -604,6 +832,11 @@ export function App() {
     setUndoneFileIds(new Set());
     setLiveError(null);
     setShellNotificationVisible(false);
+    setWorkspaceOverlay(null);
+    setWorkspaceLocalEnvironmentOpen(false);
+    setWorkspaceProjectQuery("");
+    setWorkspaceBranchQuery("");
+    setWorkspaceEnvironmentQuery("");
     dismissSidebarAfterNavigation();
   };
 
@@ -618,13 +851,29 @@ export function App() {
     setQueueInterrupted(false);
     setReplayComposerSubmitting(false);
     setReplayComposerStopped(false);
+    setReplayApprovalResolution(null);
+    setWorkspaceOverlay(null);
+    setWorkspaceLocalEnvironmentOpen(false);
   };
 
   const respondToApproval = async (
     requestId: number | string,
     decision: "accept" | "decline",
   ) => {
-    if (mode !== "live") return;
+    if (mode === "replay") {
+      if (decision === "accept") {
+        setReplayApprovalResolution(null);
+        setReplayCount(scenario.events.length);
+        setActiveFrame(null);
+      } else {
+        setReplayApprovalResolution({
+          decision: "rejected",
+          requestId,
+        });
+        setActiveFrame("approval-rejected");
+      }
+      return;
+    }
     const submissionGate = liveApprovalSubmissionGateRef.current;
     if (!submissionGate.begin(requestId)) return;
     try {
@@ -872,7 +1121,7 @@ export function App() {
           </div>
           <AppSidebarItem
             leading={<SidebarGlyph name="new" />}
-            onClick={() => selectScenario("streaming-recovery")}
+            onClick={() => openWorkspace()}
           >
             New chat
           </AppSidebarItem>
@@ -963,13 +1212,30 @@ export function App() {
       >
         <AppSidebarItem
           leading={<SidebarGlyph name="folder" />}
+          onClick={() => openWorkspace("codex-ui-kit")}
+          selected={
+            view === "workspace" &&
+            workspaceProjectId === "codex-ui-kit"
+          }
+        >
+          codex-ui-kit
+        </AppSidebarItem>
+        <AppSidebarItem
+          leading={<SidebarGlyph name="folder" />}
+          onClick={() => openWorkspace("app-server-client")}
+          selected={
+            view === "workspace" &&
+            workspaceProjectId === "app-server-client"
+          }
+        >
+          codex-app-server-client
+        </AppSidebarItem>
+        <AppSidebarItem
+          leading={<SidebarGlyph name="folder" />}
           status="queued"
           statusLabel="Project task queued"
         >
           protocol-client-with-an-intentionally-long-worktree-name
-        </AppSidebarItem>
-        <AppSidebarItem depth={1} leading={<SidebarGlyph name="thread" />}>
-          Public protocol baseline
         </AppSidebarItem>
       </AppSidebarSection>
       <AppSidebarSection
@@ -1212,6 +1478,460 @@ export function App() {
     />
   ) : (
     composerSurface
+  );
+
+  const workspaceProject =
+    workspaceProjectId === null
+      ? undefined
+      : (workspaceProjects.find(
+          ({ id }) => id === workspaceProjectId,
+        ) ?? workspaceProjects[0]);
+  const workspaceWorktrees =
+    (workspaceProjectId
+      ? workspaceWorktreesByProject[workspaceProjectId]
+      : undefined) ?? [workspaceEnvironmentGroups[0].items[0]];
+  const workspaceWorktree =
+    workspaceWorktrees.find(
+      ({ id }) => id === workspaceWorktreeId,
+    ) ?? workspaceWorktrees[0];
+  const currentWorkspaceCwd = workspaceExecutionCwd({
+    environmentId: workspaceEnvironmentId,
+    projectPath: workspaceProject?.path,
+    worktreeBranch: workspaceWorktree.branch,
+    worktreeId: workspaceWorktreeId,
+  });
+  const filteredWorkspaceProjects = workspaceProjects.filter(({ label }) =>
+    label
+      .toLocaleLowerCase()
+      .includes(workspaceProjectQuery.trim().toLocaleLowerCase()),
+  );
+  const filteredWorkspaceWorktrees =
+    workspaceWorktrees.filter(
+      ({ branch, label, status }) =>
+        status !== "repairing" &&
+        `${branch} ${label}`
+          .toLocaleLowerCase()
+          .includes(workspaceBranchQuery.trim().toLocaleLowerCase()),
+    );
+  useEffect(() => {
+    if (view === "workspace" && workspaceLocalEnvironmentOpen) {
+      setActiveFrame("workspace-environment");
+    }
+  }, [view, workspaceLocalEnvironmentOpen]);
+  const setWorkspaceOverlayState = (
+    overlay: "environment" | "project" | "worktree" | null,
+  ) => {
+    if (overlay) setWorkspaceLocalEnvironmentOpen(false);
+    setWorkspaceOverlay(overlay);
+    setActiveFrame(
+      overlay === "project"
+        ? "workspace-project-menu"
+        : overlay === "environment"
+          ? "workspace-environment-menu"
+          : overlay === "worktree"
+            ? "workspace-worktree-menu"
+            : "workspace-ready",
+    );
+  };
+  const openWorkspaceLocalEnvironment = (
+    launcher: "environment" | "worktree",
+  ) => {
+    setWorkspaceEnvironmentLauncher(launcher);
+    setWorkspaceOverlay(null);
+    setWorkspaceEnvironmentQuery("");
+    setWorkspaceLocalEnvironmentOpen(true);
+  };
+  const closeWorkspaceLocalEnvironment = () => {
+    setWorkspaceEnvironmentQuery("");
+    setWorkspaceLocalEnvironmentOpen(false);
+    setActiveFrame("workspace-ready");
+  };
+  const workspaceContext = (
+    <>
+      <ConversationContextBar
+        expandedId={
+          workspaceOverlay === "project" &&
+          workspaceProjectTriggerId !== "demo-workspace-project-trigger"
+            ? undefined
+            : (workspaceOverlay ?? undefined)
+        }
+        items={[
+          {
+            controlsId: "demo-workspace-project-dialog",
+            icon: <SidebarGlyph name="folder" />,
+            id: "project",
+            kind: "project",
+            label: workspaceProject?.label ?? "No project",
+            popupRole: "dialog",
+            textValue: workspaceProject?.label ?? "No project",
+            triggerId: "demo-workspace-project-trigger",
+          },
+          {
+            controlsId: "demo-workspace-environment-menu",
+            icon: "▱",
+            id: "environment",
+            kind: "environment",
+            label:
+              workspaceEnvironmentId === "local"
+                ? "Local"
+                : workspaceEnvironmentId === "worktree"
+                  ? "New worktree"
+                  : "Codex web",
+            popupRole: "menu",
+          },
+          {
+            controlsId: "demo-workspace-worktree-menu",
+            icon: "⑂",
+            id: "worktree",
+            kind: "worktree",
+            label: workspaceWorktree.branch,
+            popupRole: "menu",
+            status: workspaceWorktree.status,
+            statusLabel: workspaceWorktree.statusLabel,
+          },
+        ]}
+        onSelect={(itemId) => {
+          if (itemId === "project") {
+            const nextOverlay =
+              workspaceOverlay === "project" ? null : "project";
+            if (nextOverlay) {
+              setWorkspaceProjectTriggerId(
+                "demo-workspace-project-trigger",
+              );
+            }
+            setWorkspaceOverlayState(nextOverlay);
+            return;
+          }
+          if (itemId === "environment") {
+            setWorkspaceOverlayState(
+              workspaceOverlay === "environment" ? null : "environment",
+            );
+            return;
+          }
+          setWorkspaceOverlayState(
+            workspaceOverlay === "worktree" ? null : "worktree",
+          );
+        }}
+        renderItem={(item, trigger) => {
+          if (item.id === "environment") {
+            const environmentTrigger = cloneElement(trigger, {
+              ref: workspaceEnvironmentTriggerRef,
+            });
+            return (
+              <Menu
+                align="start"
+                className="demo-workspace-context-menu demo-workspace-environment-menu"
+                label="Start in"
+                onOpenChange={(open) =>
+                  setWorkspaceOverlayState(open ? "environment" : null)
+                }
+                open={workspaceOverlay === "environment"}
+                side="top"
+                sideOffset={1}
+                trigger={environmentTrigger}
+                width="auto"
+              >
+                <MenuSectionLabel>Start in</MenuSectionLabel>
+                <MenuItem
+                  aria-checked={workspaceEnvironmentId === "local"}
+                  endIcon={
+                    workspaceEnvironmentId === "local" ? "✓" : undefined
+                  }
+                  onSelect={() => setWorkspaceEnvironmentId("local")}
+                  role="menuitemradio"
+                  startIcon="▱"
+                >
+                  Work locally
+                </MenuItem>
+                <MenuItem
+                  aria-checked={workspaceEnvironmentId === "worktree"}
+                  endIcon={
+                    workspaceEnvironmentId === "worktree" ? "✓" : undefined
+                  }
+                  onSelect={() => {
+                    openWorkspaceLocalEnvironment("environment");
+                  }}
+                  role="menuitemradio"
+                  startIcon="↗"
+                >
+                  New worktree
+                </MenuItem>
+                <MenuItem
+                  aria-checked={workspaceEnvironmentId === "cloud"}
+                  endIcon={
+                    workspaceEnvironmentId === "cloud" ? "✓" : "↗"
+                  }
+                  onSelect={() => setWorkspaceEnvironmentId("cloud")}
+                  role="menuitemradio"
+                  startIcon="◌"
+                >
+                  Connect Codex web
+                </MenuItem>
+                <MenuItem disabled startIcon="⌁">
+                  Send to cloud
+                </MenuItem>
+                <MenuSeparator />
+                <MenuItem endIcon="›" startIcon="◔">
+                  Usage remaining
+                </MenuItem>
+              </Menu>
+            );
+          }
+          if (item.id === "worktree") {
+            const worktreeTrigger = cloneElement(trigger, {
+              ref: workspaceWorktreeTriggerRef,
+            });
+            return (
+              <Menu
+                align="start"
+                className="demo-workspace-context-menu demo-workspace-worktree-menu"
+                label="Branches"
+                onOpenChange={(open) => {
+                  if (!open) setWorkspaceBranchQuery("");
+                  setWorkspaceOverlayState(open ? "worktree" : null);
+                }}
+                open={workspaceOverlay === "worktree"}
+                side="top"
+                sideOffset={1}
+                trigger={worktreeTrigger}
+                width="auto"
+              >
+                <input
+                  aria-label="Search branches"
+                  onChange={(event) =>
+                    setWorkspaceBranchQuery(event.currentTarget.value)
+                  }
+                  placeholder="Search branches"
+                  type="search"
+                  value={workspaceBranchQuery}
+                />
+                <MenuSectionLabel>Branches</MenuSectionLabel>
+                {filteredWorkspaceWorktrees.map((worktree) => (
+                  <MenuItem
+                    aria-checked={worktree.id === workspaceWorktreeId}
+                    endIcon={
+                      worktree.id === workspaceWorktreeId ? "✓" : undefined
+                    }
+                    key={worktree.id}
+                    onSelect={() => {
+                      if (workspaceEnvironmentId === "worktree") {
+                        setWorkspaceEnvironmentId("local");
+                      }
+                      setWorkspaceWorktreeId(worktree.id);
+                    }}
+                    role="menuitemradio"
+                    startIcon="⑂"
+                  >
+                    {worktree.branch}
+                  </MenuItem>
+                ))}
+                <span
+                  aria-hidden="true"
+                  className="demo-workspace-worktree-menu__spacer"
+                />
+                <MenuSeparator />
+                <MenuItem
+                  onSelect={() =>
+                    openWorkspaceLocalEnvironment("worktree")
+                  }
+                  startIcon="＋"
+                >
+                  Create and checkout new branch…
+                </MenuItem>
+              </Menu>
+            );
+          }
+          return trigger;
+        }}
+      />
+      {workspaceOverlay === "project" ? (
+        <div
+          aria-label="Choose a project"
+          className="demo-workspace-project-dialog"
+          id="demo-workspace-project-dialog"
+          role="dialog"
+        >
+          <input
+            aria-label="Search projects"
+            autoFocus
+            onChange={(event) =>
+              setWorkspaceProjectQuery(event.currentTarget.value)
+            }
+            placeholder="Search projects"
+            type="search"
+            value={workspaceProjectQuery}
+          />
+          <ConversationProjectListbox
+            dismissBoundaryId="demo-workspace-project-dialog"
+            initialFocus="none"
+            items={filteredWorkspaceProjects}
+            label="Suggestions"
+            onDismiss={() => {
+              setWorkspaceOverlayState(null);
+            }}
+            onSelect={(projectId) => {
+              setWorkspaceProjectId(projectId);
+              setWorkspaceEnvironmentId("local");
+              setWorkspaceWorktreeId("main");
+              setWorkspaceOverlayState(null);
+              setWorkspaceProjectQuery("");
+            }}
+            selectedId={workspaceProjectId ?? undefined}
+            triggerId={workspaceProjectTriggerId}
+          />
+          <div className="demo-workspace-project-dialog__actions">
+            <button type="button">
+              <span aria-hidden="true">＋</span>
+              New project
+            </button>
+            <button
+              onClick={() => {
+                setWorkspaceProjectId(null);
+                setWorkspaceEnvironmentId("local");
+                setWorkspaceWorktreeId("main");
+                setWorkspaceOverlayState(null);
+                setWorkspaceProjectQuery("");
+                window.setTimeout(() =>
+                  document
+                    .getElementById(workspaceProjectTriggerId)
+                    ?.focus(),
+                );
+              }}
+              type="button"
+            >
+              <span aria-hidden="true">⊘</span>
+              Don&apos;t work in a project
+            </button>
+          </div>
+        </div>
+      ) : null}
+    </>
+  );
+  const workspaceComposer = (
+    <AgentComposer
+      actions={
+        <span className="demo-composer-controls">
+          <button aria-label="Add files and more" type="button">
+            +
+          </button>
+          <button aria-label="Change permissions" type="button">
+            ◉ Approve for me
+          </button>
+        </span>
+      }
+      controls={
+        <span className="demo-composer-actions">
+          <span>5.6 Sol Extra High⌄</span>
+          <button aria-label="Dictate" type="button">
+            ♫
+          </button>
+        </span>
+      }
+      layout="multiline"
+      onSubmit={(prompt) => {
+        selectScenario("workspace-workflow", "approval-pending", {
+          cwd: currentWorkspaceCwd,
+          prompt,
+          projectLabel: workspaceProject?.label ?? "Workspace",
+        });
+      }}
+      onValueChange={setComposerValue}
+      placeholder="Do anything"
+      textareaLabel="Workspace message composer"
+      value={composerValue}
+    />
+  );
+  const workspaceRoute = (
+    <div className="demo-workspace-route">
+      <NewConversationStart
+        className="demo-workspace-start"
+        composer={workspaceComposer}
+        context={workspaceContext}
+        destination={
+          <>
+            What should we build in{" "}
+            <button
+              aria-controls="demo-workspace-project-dialog"
+              aria-expanded={
+                workspaceOverlay === "project" &&
+                workspaceProjectTriggerId ===
+                  "demo-workspace-destination-trigger"
+              }
+              aria-haspopup="dialog"
+              className="demo-workspace-destination"
+              id="demo-workspace-destination-trigger"
+              onClick={() => {
+                setWorkspaceProjectTriggerId(
+                  "demo-workspace-destination-trigger",
+                );
+                setWorkspaceOverlayState("project");
+              }}
+              type="button"
+            >
+              {workspaceProject?.label ?? "No project"}?
+            </button>
+          </>
+        }
+        eyebrow={
+          <span aria-hidden="true" className="demo-workspace-mark">
+            ⌁
+          </span>
+        }
+        label="New coding workspace"
+        prompt={
+          <button
+            onClick={() =>
+              setComposerValue(
+                "Review the current workspace changes and prepare delivery.",
+              )
+            }
+            type="button"
+          >
+            <span aria-hidden="true">◌</span>
+            <span>Review the current workspace changes</span>
+            <span aria-hidden="true">→</span>
+          </button>
+        }
+      />
+      <LocalEnvironmentDialog
+        createAction={
+          <Button
+            onClick={() => {
+              setWorkspaceEnvironmentId("worktree");
+              closeWorkspaceLocalEnvironment();
+            }}
+            size="small"
+            tone="primary"
+          >
+            Create worktree
+          </Button>
+        }
+        groups={workspaceEnvironmentGroups}
+        id="demo-workspace-local-environment-dialog"
+        onOpenChange={(open) => {
+          if (open) {
+            setWorkspaceLocalEnvironmentOpen(true);
+            return;
+          }
+          closeWorkspaceLocalEnvironment();
+        }}
+        onQueryChange={setWorkspaceEnvironmentQuery}
+        onSelect={(groupId, itemId) => {
+          setWorkspaceProjectId(groupId);
+          setWorkspaceEnvironmentId("local");
+          setWorkspaceWorktreeId(itemId);
+          closeWorkspaceLocalEnvironment();
+        }}
+        open={workspaceLocalEnvironmentOpen}
+        query={workspaceEnvironmentQuery}
+        returnFocusRef={
+          workspaceEnvironmentLauncher === "worktree"
+            ? workspaceWorktreeTriggerRef
+            : workspaceEnvironmentTriggerRef
+        }
+        title="Select local environment"
+      />
+    </div>
   );
 
   const resolvedReview = resolveReviewSelection(
@@ -2069,7 +2789,7 @@ export function App() {
                       {
                         id: `${terminalHistoryKey}:local:${entries.length}:command`,
                         kind: "command",
-                        text: `/workspace/codex-ui-kit % ${command}`,
+                        text: `${terminalCommand?.cwd ?? workspaceRunCwd} % ${command}`,
                       },
                       {
                         id: `${terminalHistoryKey}:local:${entries.length}:system`,
@@ -2098,7 +2818,7 @@ export function App() {
           label: (
             <span className="demo-terminal-tab-label">
               <span aria-hidden="true">▣</span>
-              <span>codex-ui-kit</span>
+              <span>{workspaceRunProjectLabel}</span>
               <span aria-hidden="true">×</span>
             </span>
           ),
@@ -2224,7 +2944,7 @@ export function App() {
         sidebarOpen={sidebarOpen}
         sidebarResizable
         windowChrome={
-          view === "shell" ? (
+          view === "shell" || view === "workspace" ? (
             <AppWindowChrome
               backAction={{ label: "Back" }}
               forwardAction={{ disabled: true, label: "Forward" }}
@@ -2241,6 +2961,8 @@ export function App() {
           pullRequestIndex
         ) : view === "shell" ? (
           shellRoute
+        ) : view === "workspace" ? (
+          workspaceRoute
         ) : (
           <>
             <ConversationThreadShell

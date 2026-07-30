@@ -158,6 +158,38 @@ listener were gone, and deleted only the exact temporary profile. The main
 Codex process remained running. The untracked screenshots are external gate
 inputs, not repository assets.
 
+### Current coding-workspace entry capture
+
+The `26.721.81911` workspace-entry probe used an exact second process with a
+unique `/private/tmp/codex-ui-kit-workspace-cdp.XXXXXX` profile and a
+loopback-only port. It selected the 1180×820 `app://-/index.html` main Renderer
+by area, shell landmarks, and the new-chat Composer rather than target order.
+
+The safe, non-mutating sequence was:
+
+1. activate New chat and record the 768px start column, 736×98 Composer, and
+   the 736×28 project/environment/worktree context row;
+2. open the project control, record its dialog and listbox bounds, computed
+   row styles, option count, selected state, folder icons, and selected check;
+3. capture the full main Renderer and only the project listbox for optional
+   ownership-scoped pixel comparisons;
+4. dismiss the project dialog without selecting an option, creating a
+   worktree, or changing the active project.
+
+This current-build observation establishes workspace-entry layout and the
+project picker only. The independent Electron acceptance additionally selects
+synthetic projects and worktrees, verifies environment-menu focus, exercises
+the searchable local-environment dialog and repairing-disabled state, submits
+the protocol-backed Composer, and continues through command, approval, file
+Review, Terminal, and Pull request surfaces. Those synthetic transitions are
+not evidence that current-product persistence or real worktree mutation was
+observed.
+
+Cleanup resolved and terminated only the exact main PID bearing the unique
+profile, verified its child processes and loopback listener were gone, and
+deleted the profile plus the three external screenshots. The original Codex
+main process remained running.
+
 ## Required flow matrix
 
 ### 1. Application entry and navigation

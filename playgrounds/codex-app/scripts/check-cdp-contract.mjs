@@ -8,6 +8,251 @@ await mkdir(artifactDirectory, { recursive: true });
 for (const scene of visualScenes) {
   const { app, page } = await launchScene(scene);
   try {
+    if (scene.view === "workspace") {
+      await page.waitForTimeout(50);
+      const contract = await page.evaluate(() => {
+        const rect = (element) => {
+          if (!element) return null;
+          const value = element.getBoundingClientRect();
+          return {
+            bottom: value.bottom,
+            height: value.height,
+            left: value.left,
+            right: value.right,
+            top: value.top,
+            width: value.width,
+          };
+        };
+        const root = document.querySelector(".demo-root");
+        const start = document.querySelector(
+          ".codex-ui-new-conversation-start",
+        );
+        const composer = document.querySelector(
+          ".demo-workspace-start .codex-ui-composer",
+        );
+        const heading = document.querySelector(
+          ".demo-workspace-start .codex-ui-new-conversation-start__header h3",
+        );
+        const prompt = document.querySelector(
+          ".demo-workspace-start .codex-ui-new-conversation-start__prompt > button",
+        );
+        const context = document.querySelector(
+          ".demo-workspace-start .codex-ui-conversation-context-bar",
+        );
+        const contextButtons = Array.from(
+          context?.querySelectorAll("button") ?? [],
+          (button) => ({
+            disabled: button.disabled,
+            expanded: button.getAttribute("aria-expanded"),
+            haspopup: button.getAttribute("aria-haspopup"),
+            kind: button.getAttribute("data-kind"),
+            rect: rect(button),
+          }),
+        );
+        const projectDialog = document.querySelector(
+          ".demo-workspace-project-dialog",
+        );
+        const projectListbox = projectDialog?.querySelector(
+          '[role="listbox"]',
+        );
+        const environmentMenu = document.querySelector(
+          ".demo-workspace-environment-menu[role=\"menu\"]",
+        );
+        const environmentButtons = Array.from(
+          environmentMenu?.querySelectorAll(".codex-ui-menu-item") ?? [],
+          (button) => ({
+            disabled: button.disabled,
+            role: button.getAttribute("role"),
+          }),
+        );
+        const localEnvironmentDialog = document.querySelector(
+          ".codex-ui-local-environment-dialog",
+        );
+        const localEnvironmentSurface =
+          localEnvironmentDialog?.querySelector('[role="dialog"]');
+        const localEnvironmentItems = Array.from(
+          localEnvironmentDialog?.querySelectorAll(
+            ".codex-ui-local-environment-dialog__item",
+          ) ?? [],
+          (button) => ({
+            disabled: button.disabled,
+            status: button.getAttribute("data-status"),
+          }),
+        );
+        const worktreeMenu = document.querySelector(
+          ".demo-workspace-worktree-menu[role=\"menu\"]",
+        );
+        const worktreeButtons = Array.from(
+          worktreeMenu?.querySelectorAll(".codex-ui-menu-item") ?? [],
+          (button) => ({
+            checked: button.getAttribute("aria-checked"),
+            role: button.getAttribute("role"),
+          }),
+        );
+        return {
+          activeElement:
+            document.activeElement?.getAttribute("aria-label") ?? null,
+          composer: rect(composer),
+          context: rect(context),
+          contextButtons,
+          environment: environmentMenu
+            ? {
+                buttons: environmentButtons,
+                rect: rect(environmentMenu),
+              }
+            : null,
+          localEnvironment: localEnvironmentDialog
+            ? {
+                groupCount: localEnvironmentDialog.querySelectorAll(
+                  ".codex-ui-local-environment-dialog__group",
+                ).length,
+                items: localEnvironmentItems,
+                rect: rect(localEnvironmentSurface),
+              }
+            : null,
+          frame: root?.getAttribute("data-frame"),
+          heading: rect(heading),
+          horizontalOverflow:
+            document.documentElement.scrollWidth -
+            document.documentElement.clientWidth,
+          project: projectDialog
+            ? {
+                optionCount:
+                  projectListbox?.querySelectorAll('[role="option"]')
+                    .length ?? 0,
+                rect: rect(projectDialog),
+                selectedCount:
+                  projectListbox?.querySelectorAll(
+                    '[role="option"][aria-selected="true"]',
+                  ).length ?? 0,
+                listbox: rect(projectListbox),
+              }
+            : null,
+          prompt: rect(prompt),
+          start: rect(start),
+          view: root?.getAttribute("data-view"),
+          worktree: worktreeMenu
+            ? {
+                buttons: worktreeButtons,
+                rect: rect(worktreeMenu),
+              }
+            : null,
+        };
+      });
+      const projectExpected = scene.frame === "workspace-project-menu";
+      const environmentExpected =
+        scene.frame === "workspace-environment-menu";
+      const localEnvironmentExpected =
+        scene.frame === "workspace-environment";
+      const worktreeExpected = scene.frame === "workspace-worktree-menu";
+      const repairingExpected = scene.frame === "workspace-repairing";
+      const worktreeTrigger = contract.contextButtons.find(
+        ({ kind }) => kind === "worktree",
+      );
+      if (
+        contract.view !== "workspace" ||
+        contract.frame !== scene.frame ||
+        contract.horizontalOverflow > 1 ||
+        !contract.start ||
+        !contract.composer ||
+        !contract.context ||
+        !contract.heading ||
+        !contract.prompt ||
+        contract.contextButtons.length !== 3 ||
+        Math.abs(contract.composer.width - 736) > 1 ||
+        Math.abs(contract.composer.height - 98) > 1 ||
+        Math.abs(contract.composer.left - 358) > 1 ||
+        Math.abs(contract.composer.bottom - 804) > 1 ||
+        Math.abs(contract.heading.top - 363) > 1 ||
+        Math.abs(contract.heading.height - 33.6) > 1 ||
+        Math.abs(contract.prompt.width - 654) > 1 ||
+        Math.abs(contract.prompt.height - 40) > 1 ||
+        contract.contextButtons.some(
+          ({ rect: value }) => !value || Math.abs(value.height - 28) > 1,
+        ) ||
+        Boolean(contract.project) !== projectExpected ||
+        Boolean(contract.environment) !== environmentExpected ||
+        Boolean(contract.localEnvironment) !==
+          localEnvironmentExpected ||
+        Boolean(contract.worktree) !== worktreeExpected ||
+        Boolean(worktreeTrigger?.disabled) !== repairingExpected
+      ) {
+        throw new Error(
+          `${scene.id}: workspace entry contract failed: ${JSON.stringify(contract)}`,
+        );
+      }
+      if (
+        projectExpected &&
+        (!contract.project ||
+          Math.abs(contract.project.rect.width - 260) > 1 ||
+          Math.abs(contract.project.rect.height - 250) > 1 ||
+          Math.abs(contract.project.listbox.width - 252) > 1 ||
+          contract.project.optionCount !== 5 ||
+          contract.project.selectedCount !== 1 ||
+          contract.activeElement !== "Search projects" ||
+          contract.contextButtons[0]?.expanded !== "true" ||
+          contract.contextButtons[0]?.haspopup !== "dialog")
+      ) {
+        throw new Error(
+          `${scene.id}: workspace project dialog failed: ${JSON.stringify(contract)}`,
+        );
+      }
+      if (
+        environmentExpected &&
+        (!contract.environment ||
+          Math.abs(contract.environment.rect.width - 216) > 1 ||
+          Math.abs(contract.environment.rect.height - 189) > 1 ||
+          contract.environment.buttons.length !== 5 ||
+          contract.environment.buttons.filter(({ disabled }) => disabled)
+            .length !== 1)
+      ) {
+        throw new Error(
+          `${scene.id}: workspace environment dialog failed: ${JSON.stringify(contract)}`,
+        );
+      }
+      if (
+        localEnvironmentExpected &&
+        (!contract.localEnvironment ||
+          Math.abs(contract.localEnvironment.rect.width - 600) > 1 ||
+          Math.abs(contract.localEnvironment.rect.height - 600) > 1 ||
+          contract.localEnvironment.groupCount !== 1 ||
+          contract.localEnvironment.items.length !== 3 ||
+          contract.localEnvironment.items.filter(({ disabled }) => disabled)
+            .length !== 1 ||
+          contract.localEnvironment.items.filter(
+            ({ status }) => status === "repairing",
+          ).length !== 1 ||
+          contract.activeElement !== "Search local environments")
+      ) {
+        throw new Error(
+          `${scene.id}: workspace local environment dialog failed: ${JSON.stringify(contract)}`,
+        );
+      }
+      if (
+        worktreeExpected &&
+        (!contract.worktree ||
+          Math.abs(contract.worktree.rect.width - 296) > 1 ||
+          Math.abs(contract.worktree.rect.height - 280) > 1 ||
+          contract.worktree.buttons.length !== 3 ||
+          contract.worktree.buttons.filter(
+            ({ role }) => role === "menuitemradio",
+          ).length !== 2 ||
+          contract.worktree.buttons.filter(
+            ({ checked }) => checked === "true",
+          ).length !== 1 ||
+          contract.activeElement !== "Search branches")
+      ) {
+        throw new Error(
+          `${scene.id}: workspace worktree menu failed: ${JSON.stringify(contract)}`,
+        );
+      }
+      await writeFile(
+        join(artifactDirectory, `${scene.id}.json`),
+        `${JSON.stringify(contract, null, 2)}\n`,
+      );
+      continue;
+    }
+
     if (scene.view === "shell") {
       await page.waitForTimeout(50);
       const contract = await page.evaluate(() => {
@@ -1349,6 +1594,203 @@ for (const scene of visualScenes) {
   } finally {
     await app.close();
   }
+}
+
+const workspaceResponsiveScene = {
+  frame: "workspace-ready",
+  id: "workspace-responsive",
+  scenario: "workspace-workflow",
+  view: "workspace",
+};
+const {
+  app: workspaceResponsiveApp,
+  page: workspaceResponsivePage,
+} = await launchScene(workspaceResponsiveScene, {
+  capture: false,
+  windowSize: { height: 820, width: 1180 },
+});
+try {
+  const workspaceResponsiveMatrix = [];
+  for (const expected of [
+    {
+      composerLeft: 359,
+      composerWidth: 736,
+      height: 820,
+      layoutMode: "wide",
+      mainLeft: 274,
+      mainWidth: 906,
+      rootLeft: 343,
+      rootWidth: 768,
+      sidebarOpen: true,
+      width: 1180,
+    },
+    {
+      composerLeft: 290,
+      composerWidth: 654,
+      height: 680,
+      layoutMode: "medium",
+      mainLeft: 274,
+      mainWidth: 686,
+      rootLeft: 274,
+      rootWidth: 686,
+      sidebarOpen: true,
+      width: 960,
+    },
+    {
+      composerLeft: 290,
+      composerWidth: 514,
+      height: 680,
+      layoutMode: "medium",
+      mainLeft: 274,
+      mainWidth: 546,
+      rootLeft: 274,
+      rootWidth: 546,
+      sidebarOpen: true,
+      width: 820,
+    },
+    {
+      composerLeft: 56,
+      composerWidth: 648,
+      height: 680,
+      layoutMode: "narrow",
+      mainLeft: 0,
+      mainWidth: 720,
+      rootLeft: 40,
+      rootWidth: 680,
+      sidebarOpen: false,
+      width: 720,
+    },
+    {
+      composerLeft: 729,
+      composerWidth: 736,
+      height: 1080,
+      layoutMode: "wide",
+      mainLeft: 274,
+      mainWidth: 1646,
+      rootLeft: 713,
+      rootWidth: 768,
+      sidebarOpen: true,
+      width: 1920,
+    },
+    {
+      composerLeft: 1049,
+      composerWidth: 736,
+      height: 1326,
+      layoutMode: "wide",
+      mainLeft: 274,
+      mainWidth: 2286,
+      rootLeft: 1033,
+      rootWidth: 768,
+      sidebarOpen: true,
+      width: 2560,
+    },
+  ]) {
+    await workspaceResponsiveApp.evaluate(
+      ({ BrowserWindow }, size) => {
+        BrowserWindow.getAllWindows()[0]?.setContentSize(
+          size.width,
+          size.height,
+        );
+      },
+      expected,
+    );
+    await workspaceResponsivePage.waitForFunction(
+      (target) => {
+        const shell = document.querySelector(".codex-ui-app-shell");
+        return (
+          window.innerWidth === target.width &&
+          window.innerHeight === target.height &&
+          shell?.getAttribute("data-layout-mode") ===
+            target.layoutMode &&
+          shell.hasAttribute("data-sidebar-open") ===
+            target.sidebarOpen
+        );
+      },
+      expected,
+      { timeout: 5_000 },
+    );
+    const state = await workspaceResponsivePage.evaluate(() => {
+      const rect = (selector) => {
+        const element = document.querySelector(selector);
+        if (!element) return null;
+        const value = element.getBoundingClientRect();
+        return {
+          bottom: value.bottom,
+          height: value.height,
+          left: value.left,
+          top: value.top,
+          width: value.width,
+        };
+      };
+      const shell = document.querySelector(".codex-ui-app-shell");
+      return {
+        composer: rect(
+          ".demo-workspace-start .codex-ui-composer",
+        ),
+        context: rect(
+          ".demo-workspace-start .codex-ui-conversation-context-bar",
+        ),
+        heading: rect(
+          ".demo-workspace-start .codex-ui-new-conversation-start__header h3",
+        ),
+        horizontalOverflow:
+          document.documentElement.scrollWidth -
+          document.documentElement.clientWidth,
+        layoutMode: shell?.getAttribute("data-layout-mode"),
+        main: rect(".codex-ui-app-shell__main"),
+        prompt: rect(
+          ".demo-workspace-start .codex-ui-new-conversation-start__prompt > button",
+        ),
+        root: rect(".demo-workspace-start"),
+        sidebarOpen: shell?.hasAttribute("data-sidebar-open"),
+        viewport: {
+          height: window.innerHeight,
+          width: window.innerWidth,
+        },
+      };
+    });
+    const near = (actual, target) =>
+      typeof actual === "number" && Math.abs(actual - target) <= 1;
+    if (
+      state.layoutMode !== expected.layoutMode ||
+      state.sidebarOpen !== expected.sidebarOpen ||
+      state.horizontalOverflow > 1 ||
+      !state.main ||
+      !state.root ||
+      !state.composer ||
+      !state.context ||
+      !state.heading ||
+      !state.prompt ||
+      !near(state.main.left, expected.mainLeft) ||
+      !near(state.main.width, expected.mainWidth) ||
+      !near(state.root.left, expected.rootLeft) ||
+      !near(state.root.top, 46) ||
+      !near(state.root.width, expected.rootWidth) ||
+      !near(state.root.height, expected.height - 46) ||
+      !near(state.composer.left, expected.composerLeft) ||
+      !near(state.composer.width, expected.composerWidth) ||
+      !near(state.composer.height, 98) ||
+      !near(state.composer.bottom, expected.height - 16) ||
+      !near(state.context.left, expected.composerLeft) ||
+      !near(state.context.width, expected.composerWidth) ||
+      !near(state.context.height, 28) ||
+      !near(state.heading.top, expected.height / 2 - 47) ||
+      !near(state.heading.height, 33.6) ||
+      !near(state.prompt.width, expected.rootWidth - 114) ||
+      !near(state.prompt.height, 40)
+    ) {
+      throw new Error(
+        `workspace-responsive ${expected.width}x${expected.height} failed: ${JSON.stringify(state)}`,
+      );
+    }
+    workspaceResponsiveMatrix.push(state);
+  }
+  await writeFile(
+    join(artifactDirectory, "workspace-responsive.json"),
+    `${JSON.stringify(workspaceResponsiveMatrix, null, 2)}\n`,
+  );
+} finally {
+  await workspaceResponsiveApp.close();
 }
 
 const markdownStartedScene = {

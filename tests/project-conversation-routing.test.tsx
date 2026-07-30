@@ -8,13 +8,15 @@ import {
   waitFor,
   within,
 } from "@testing-library/react";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import {
   ConversationContextBar,
   ConversationProjectListbox,
   ConversationRouteSelector,
   LocalEnvironmentDialog,
+  Menu,
+  MenuItem,
   NewConversationStart,
   ProjectConversationPage,
   ProjectIndex,
@@ -81,6 +83,20 @@ describe("project conversation routing", () => {
     expect(
       within(setup).getByRole("textbox", { name: "Conversation prompt" }),
     ).toBeTruthy();
+    const context = setup.querySelector(
+      ".codex-ui-new-conversation-start__context",
+    );
+    const composer = setup.querySelector(
+      ".codex-ui-new-conversation-start__composer",
+    );
+    expect(
+      context &&
+        composer &&
+        Boolean(
+          context.compareDocumentPosition(composer) &
+            Node.DOCUMENT_POSITION_FOLLOWING,
+        ),
+    ).toBe(true);
     const project = within(setup).getByRole("button", {
       name: "Change project: Project",
     });
@@ -102,6 +118,53 @@ describe("project conversation routing", () => {
     expect(accessibleDescriptionText(repairing)).toContain("Repairing");
   });
 
+  it("lets a controlled menu wrap a context trigger without losing its semantics", () => {
+    function ContextMenuHarness() {
+      const [open, setOpen] = useState(false);
+      return (
+        <ConversationContextBar
+          expandedId={open ? "environment" : undefined}
+          items={[
+            {
+              controlsId: "start-in-menu",
+              id: "environment",
+              kind: "environment",
+              label: "Local",
+              popupRole: "menu",
+            },
+          ]}
+          onSelect={() => setOpen((value) => !value)}
+          renderItem={(_item, trigger) => (
+            <Menu
+              label="Start in"
+              onOpenChange={setOpen}
+              open={open}
+              trigger={trigger}
+            >
+              <MenuItem>Work locally</MenuItem>
+            </Menu>
+          )}
+        />
+      );
+    }
+
+    render(<ContextMenuHarness />);
+    const trigger = screen.getByRole("button", {
+      name: "Change environment: Local",
+    });
+    expect(trigger.getAttribute("aria-haspopup")).toBe("menu");
+    expect(trigger.getAttribute("aria-expanded")).toBe("false");
+
+    fireEvent.click(trigger);
+
+    expect(screen.getByRole("menu", { name: "Start in" })).toBeTruthy();
+    expect(trigger.getAttribute("aria-controls")).toBeTruthy();
+    expect(trigger.getAttribute("aria-expanded")).toBe("true");
+    expect(
+      screen.getByRole("menuitem", { name: "Work locally" }),
+    ).toBeTruthy();
+  });
+
   it("focuses and keyboard-navigates linked conversation project options", async () => {
     const onDismiss = vi.fn();
     const onSelect = vi.fn();
@@ -115,6 +178,7 @@ describe("project conversation routing", () => {
           items={[
             {
               description: "Component workspace",
+              icon: <span data-testid="ui-kit-project-icon">□</span>,
               id: "ui-kit",
               label: "UI Kit",
             },
@@ -150,6 +214,12 @@ describe("project conversation routing", () => {
       name: "Select project Repairing",
     });
     expect(document.activeElement).toBe(uiKit);
+    expect(screen.getByTestId("ui-kit-project-icon")).toBeTruthy();
+    expect(
+      uiKit.querySelector(
+        ".codex-ui-conversation-project-options__check",
+      )?.textContent,
+    ).toBe("✓");
     expect(uiKit.tabIndex).toBe(0);
     expect(repair).toHaveProperty("disabled", true);
 
@@ -300,6 +370,138 @@ describe("project conversation routing", () => {
 
     expect(onDismiss).toHaveBeenCalledTimes(1);
     expect(document.activeElement).toBe(composer);
+  });
+
+  it("keeps sibling controls inside an explicit dismissal boundary", () => {
+    const onDismiss = vi.fn();
+    render(
+      <>
+        <button id="bounded-project-trigger" type="button">
+          Project
+        </button>
+        <div id="bounded-project-dialog">
+          <input aria-label="Search projects" />
+          <ConversationProjectListbox
+            dismissBoundaryId="bounded-project-dialog"
+            items={[
+              {
+                id: "ui-kit",
+                label: "UI Kit",
+              },
+            ]}
+            onDismiss={onDismiss}
+            onSelect={() => undefined}
+            selectedId="ui-kit"
+            triggerId="bounded-project-trigger"
+          />
+          <button type="button">New project</button>
+        </div>
+        <textarea aria-label="Conversation composer" />
+      </>,
+    );
+    const option = screen.getByRole("option", {
+      name: "Select project UI Kit",
+    });
+    expect(document.activeElement).toBe(option);
+
+    const search = screen.getByRole("textbox", {
+      name: "Search projects",
+    });
+    fireEvent.pointerDown(search);
+    search.focus();
+    expect(onDismiss).not.toHaveBeenCalled();
+
+    const action = screen.getByRole("button", {
+      name: "New project",
+    });
+    fireEvent.pointerDown(action);
+    action.focus();
+    expect(onDismiss).not.toHaveBeenCalled();
+
+    screen
+      .getByRole("textbox", {
+        name: "Conversation composer",
+      })
+      .focus();
+    expect(onDismiss).toHaveBeenCalledTimes(1);
+  });
+
+  it("dismisses after focus leaves an allowed trigger outside the boundary", () => {
+    const onDismiss = vi.fn();
+    render(
+      <>
+        <button id="observed-project-trigger" type="button">
+          Project
+        </button>
+        <div id="observed-project-dialog">
+          <input aria-label="Search projects" />
+          <ConversationProjectListbox
+            dismissBoundaryId="observed-project-dialog"
+            initialFocus="none"
+            items={[{ id: "ui-kit", label: "UI Kit" }]}
+            onDismiss={onDismiss}
+            onSelect={() => undefined}
+            selectedId="ui-kit"
+            triggerId="observed-project-trigger"
+          />
+        </div>
+        <textarea aria-label="Conversation composer" />
+      </>,
+    );
+
+    const search = screen.getByRole("textbox", {
+      name: "Search projects",
+    });
+    const trigger = screen.getByRole("button", { name: "Project" });
+    const composer = screen.getByRole("textbox", {
+      name: "Conversation composer",
+    });
+    search.focus();
+    trigger.focus();
+    expect(onDismiss).not.toHaveBeenCalled();
+    composer.focus();
+    expect(onDismiss).toHaveBeenCalledTimes(1);
+  });
+
+  it("dismisses an explicit boundary with Escape from a sibling control", async () => {
+    const onDismiss = vi.fn();
+    render(
+      <>
+        <button id="escape-project-trigger" type="button">
+          Project
+        </button>
+        <div id="escape-project-dialog">
+          <input aria-label="Search projects" />
+          <ConversationProjectListbox
+            dismissBoundaryId="escape-project-dialog"
+            initialFocus="none"
+            items={[
+              {
+                id: "ui-kit",
+                label: "UI Kit",
+              },
+            ]}
+            onDismiss={onDismiss}
+            onSelect={() => undefined}
+            selectedId="ui-kit"
+            triggerId="escape-project-trigger"
+          />
+        </div>
+      </>,
+    );
+    const search = screen.getByRole("textbox", {
+      name: "Search projects",
+    });
+    search.focus();
+
+    fireEvent.keyDown(search, { key: "Escape" });
+
+    expect(onDismiss).toHaveBeenCalledTimes(1);
+    await waitFor(() =>
+      expect(document.activeElement).toBe(
+        screen.getByRole("button", { name: "Project" }),
+      ),
+    );
   });
 
   it("keeps a first-enabled tab stop without automatic focus", () => {
@@ -461,6 +663,43 @@ describe("project conversation routing", () => {
         name: "Use local environment Desktop checkout",
       }),
     ).toBeNull();
+  });
+
+  it("returns focus to the environment trigger when the dialog closes", async () => {
+    function Fixture() {
+      const [open, setOpen] = useState(true);
+      const triggerRef = useRef<HTMLButtonElement>(null);
+      return (
+        <>
+          <button ref={triggerRef} type="button">
+            Environment
+          </button>
+          <LocalEnvironmentDialog
+            groups={[]}
+            onOpenChange={setOpen}
+            onQueryChange={() => undefined}
+            onSelect={() => undefined}
+            open={open}
+            query=""
+            returnFocusRef={triggerRef}
+          />
+        </>
+      );
+    }
+    render(<Fixture />);
+
+    fireEvent.keyDown(
+      screen.getByRole("dialog", {
+        name: "Create local environment",
+      }),
+      { key: "Escape" },
+    );
+
+    await waitFor(() =>
+      expect(document.activeElement).toBe(
+        screen.getByRole("button", { name: "Environment" }),
+      ),
+    );
   });
 
   it("composes application projects with conversation and workspace setup", () => {

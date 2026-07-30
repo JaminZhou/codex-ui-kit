@@ -237,6 +237,27 @@ describe("menus and selects", () => {
     );
   });
 
+  it("keeps text editing in the input while retaining menu arrow navigation", async () => {
+    render(
+      <Menu defaultOpen trigger={<button type="button">Branches</button>}>
+        <input aria-label="Search branches" />
+        <MenuItem>Main</MenuItem>
+        <MenuItem>Feature</MenuItem>
+      </Menu>,
+    );
+
+    const search = screen.getByRole("textbox", {
+      name: "Search branches",
+    });
+    await waitFor(() => expect(document.activeElement).toBe(search));
+    expect(fireEvent.keyDown(search, { key: "m" })).toBe(true);
+    expect(document.activeElement).toBe(search);
+    expect(fireEvent.keyDown(search, { key: "ArrowDown" })).toBe(false);
+    expect(document.activeElement).toBe(
+      screen.getByRole("menuitem", { name: "Main" }),
+    );
+  });
+
   it("keeps a parent menu open while interacting with its portalled submenu", async () => {
     render(
       <Menu defaultOpen trigger={<button type="button">View</button>}>

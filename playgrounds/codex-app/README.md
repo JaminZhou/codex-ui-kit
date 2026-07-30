@@ -193,6 +193,23 @@ The twelfth slice adds current-build conversation and Composer lifecycle:
   Electron submit → queue → Stop → Resume flow;
 - optional external 792×320 queued and paused Composer pixel comparisons.
 
+## Thirteenth vertical slice
+
+The thirteenth slice starts the coding-workspace lifecycle from the current
+new-chat entry:
+
+- the `26.721.81911` 768px start column, 736×98 Composer, and 736×28
+  project/environment/worktree context row;
+- a 260×250 project dialog with a 252×143 listbox, searchable synthetic
+  projects, selected-row icons/check, and focus return;
+- `Start in` and searchable branch menus plus a 600×600 grouped local
+  environment dialog whose repairing checkout remains inspectable but cannot
+  be selected;
+- one real Electron route from project and worktree selection through command,
+  approval, two-file Review, Terminal, and Pull request navigation;
+- six reviewed workspace frames and optional current-build main/listbox pixel
+  comparisons.
+
 ## Development
 
 From the repository root:
