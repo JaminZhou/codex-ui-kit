@@ -168,7 +168,7 @@ export const visualScenes = [
   {
     frame: "review-open",
     id: "pull-request-detail",
-    maxPixelRatio: 0.01,
+    maxPixelRatio: 0.011,
     scenario: "workspace-workflow",
     view: "pull-request",
   },

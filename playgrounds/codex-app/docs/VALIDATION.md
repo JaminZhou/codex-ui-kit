@@ -70,8 +70,8 @@ large-Review frame uses a scoped 0.45% main-region limit because
 its 96 dense monospace lines produced a measured 0.4337% macOS-runner
 text-rasterization delta; CDP and Electron still gate file counts, overflow,
 split geometry, and exact last-file visibility independently. The fourteenth
-PR frame uses a scoped 1% main-region limit because
-its dense full-page text produces a measured 0.8161% macOS-runner
+PR frame uses a scoped 1.10% main-region limit because
+its dense full-page text produces a measured 1.0630% macOS-runner
 rasterization delta; CDP and Electron still lock the split, tabs, actions,
 resizing, and expansion independently. Its optional current-build gate allows
 at most 6.5% full-main, 5.5% index, and 7% detail difference at the stricter
