@@ -534,6 +534,8 @@ export function App() {
   const [workspaceEnvironmentQuery, setWorkspaceEnvironmentQuery] =
     useState("");
   const [workspaceProjectQuery, setWorkspaceProjectQuery] = useState("");
+  const [workspaceProjectTriggerId, setWorkspaceProjectTriggerId] =
+    useState("demo-workspace-project-trigger");
   const [shellState, setShellState] = useState<AppRouteOutletStatus>(
     initialSelection.shellState,
   );
@@ -557,6 +559,11 @@ export function App() {
   const [replayComposerStopped, setReplayComposerStopped] = useState(
     initialSelection.frame === "composer-queue-paused",
   );
+  const [replayApprovalResolution, setReplayApprovalResolution] =
+    useState<{
+      decision: "approved" | "rejected";
+      requestId: number | string;
+    } | null>(null);
   const [threadFollowing, setThreadFollowing] = useState(
     initialSelection.frame !== "thread-scroll-away",
   );
@@ -627,7 +634,23 @@ export function App() {
         : replay,
     [isConversationLifecycle, replay, replayComposerStopped],
   );
-  const state = mode === "live" ? liveState : lifecycleReplay;
+  const state = useMemo(
+    () =>
+      mode === "live"
+        ? liveState
+        : replayApprovalResolution
+          ? reduceProtocolNotification(lifecycleReplay, {
+              ...replayApprovalResolution,
+              kind: "approval-resolution",
+            })
+          : lifecycleReplay,
+    [
+      lifecycleReplay,
+      liveState,
+      mode,
+      replayApprovalResolution,
+    ],
+  );
   const replayComposerRunning =
     isConversationLifecycle && state.status === "running";
 
@@ -681,6 +704,7 @@ export function App() {
     setActiveFrame(null);
     setReplayComposerSubmitting(false);
     setReplayComposerStopped(false);
+    setReplayApprovalResolution(null);
     setQueueInterrupted(false);
     if (!isTurnActive(replayState(scenario.events, nextCount).status)) {
       setQueuedPrompts([]);
@@ -704,7 +728,9 @@ export function App() {
     setWorkspaceBranchQuery("");
     setWorkspaceEnvironmentQuery("");
     setWorkspaceProjectQuery("");
+    setWorkspaceProjectTriggerId("demo-workspace-project-trigger");
     setComposerValue("");
+    setReplayApprovalResolution(null);
     setActiveFrame("workspace-ready");
     setReviewOpen(false);
     setTerminalOpen(false);
@@ -729,6 +755,7 @@ export function App() {
     setQueueInterrupted(false);
     setReplayComposerSubmitting(false);
     setReplayComposerStopped(false);
+    setReplayApprovalResolution(null);
     setActiveFrame(frame);
     setScenarioSelectionVersion((version) => version + 1);
     setWindowedTimelineExpanded(false);
@@ -762,6 +789,7 @@ export function App() {
     setQueueInterrupted(false);
     setReplayComposerSubmitting(false);
     setReplayComposerStopped(false);
+    setReplayApprovalResolution(null);
     setWorkspaceOverlay(null);
     setWorkspaceLocalEnvironmentOpen(false);
   };
@@ -771,12 +799,20 @@ export function App() {
     decision: "accept" | "decline",
   ) => {
     if (mode === "replay") {
-      if (
-        scenario.id === "workspace-workflow" &&
-        decision === "accept"
-      ) {
+      if (scenario.id === "workspace-workflow" && decision === "accept") {
+        setReplayApprovalResolution(null);
         setReplayCount(scenario.events.length);
         setActiveFrame(null);
+      } else {
+        setReplayApprovalResolution({
+          decision: decision === "accept" ? "approved" : "rejected",
+          requestId,
+        });
+        setActiveFrame(
+          decision === "accept"
+            ? "approval-approved"
+            : "approval-rejected",
+        );
       }
       return;
     }
@@ -1482,6 +1518,11 @@ export function App() {
           if (itemId === "project") {
             const nextOverlay =
               workspaceOverlay === "project" ? null : "project";
+            if (nextOverlay) {
+              setWorkspaceProjectTriggerId(
+                "demo-workspace-project-trigger",
+              );
+            }
             setWorkspaceOverlayState(nextOverlay);
             return;
           }
@@ -1646,7 +1687,7 @@ export function App() {
               setWorkspaceProjectQuery("");
             }}
             selectedId={workspaceProjectId ?? undefined}
-            triggerId="demo-workspace-project-trigger"
+            triggerId={workspaceProjectTriggerId}
           />
           <div className="demo-workspace-project-dialog__actions">
             <button type="button">
@@ -1660,7 +1701,7 @@ export function App() {
                 setWorkspaceProjectQuery("");
                 window.setTimeout(() =>
                   document
-                    .getElementById("demo-workspace-project-trigger")
+                    .getElementById(workspaceProjectTriggerId)
                     ?.focus(),
                 );
               }}
@@ -1715,7 +1756,11 @@ export function App() {
             What should we build in{" "}
             <button
               className="demo-workspace-destination"
+              id="demo-workspace-destination-trigger"
               onClick={() => {
+                setWorkspaceProjectTriggerId(
+                  "demo-workspace-destination-trigger",
+                );
                 setWorkspaceOverlayState("project");
               }}
               type="button"

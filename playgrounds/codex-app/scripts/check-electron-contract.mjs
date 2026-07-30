@@ -1513,16 +1513,32 @@ try {
     }
   }
 
+  const projectDestination = codingWorkspacePage.locator(
+    "#demo-workspace-destination-trigger",
+  );
   const projectTrigger = codingWorkspacePage.getByRole("button", {
     name: "Change project: codex-ui-kit",
   });
-  await projectTrigger.click();
   const projectDialog = codingWorkspacePage.getByRole("dialog", {
     name: "Choose a project",
   });
   const projectSearch = projectDialog.getByRole("searchbox", {
     name: "Search projects",
   });
+  await projectDestination.click();
+  await projectSearch.press("Escape");
+  await projectDialog.waitFor({ state: "hidden" });
+  await codingWorkspacePage.waitForTimeout(50);
+  if (
+    (await codingWorkspacePage.evaluate(
+      () => document.activeElement?.id,
+    )) !== "demo-workspace-destination-trigger"
+  ) {
+    throw new Error(
+      "Electron coding workspace did not restore destination focus after Escape.",
+    );
+  }
+  await projectTrigger.click();
   await projectSearch.press("Escape");
   await projectDialog.waitFor({ state: "hidden" });
   await codingWorkspacePage.waitForTimeout(50);
@@ -1740,6 +1756,35 @@ try {
   );
 } finally {
   await codingWorkspaceApp.close();
+}
+
+const rejectedApprovalScene = {
+  frame: "approval-pending",
+  id: "electron-workspace-approval-rejected",
+  scenario: "workspace-workflow",
+};
+const {
+  app: rejectedApprovalApp,
+  page: rejectedApprovalPage,
+} = await launchScene(rejectedApprovalScene, { capture: false });
+try {
+  const rejectedApproval = rejectedApprovalPage.getByTestId(
+    "approval-request",
+  );
+  await rejectedApproval.getByRole("button", { name: "Deny" }).click();
+  await rejectedApprovalPage.waitForSelector(
+    '.demo-root[data-frame="approval-rejected"] [data-testid="approval-request"][data-decision="rejected"]',
+  );
+  if (
+    (await rejectedApproval.getByRole("button", { name: "Deny" }).count()) !==
+    0
+  ) {
+    throw new Error(
+      "Electron workspace approval remained actionable after rejection.",
+    );
+  }
+} finally {
+  await rejectedApprovalApp.close();
 }
 
 const conversationLifecycleScene = {

@@ -609,6 +609,64 @@ for (const scene of selectedScenes) {
     );
   }
 
+  if (
+    scene.id === "workspace-environment-menu" &&
+    currentBuildWorkspaceEnvironmentReference
+  ) {
+    await compareCurrentBuildOverlay({
+      actual,
+      actualBounds: workspaceEnvironmentMenuBounds,
+      defaultMaximumRatio: 0.08,
+      masks: [
+        { height: 18, left: 12, top: 10, width: 96 },
+        ...[39, 68, 97, 126, 163].map((top) => ({
+          height: 18,
+          left: 34,
+          top,
+          width: 142,
+        })),
+      ],
+      maximumRatioName:
+        "CODEX_UI_KIT_WORKSPACE_ENVIRONMENT_MAX_DIFF_RATIO",
+      referenceCrop: {
+        height: 189,
+        left: 495,
+        top: 483,
+        width: 216,
+      },
+      referencePath: currentBuildWorkspaceEnvironmentReference,
+      sceneId: scene.id,
+    });
+  }
+
+  if (
+    scene.id === "workspace-worktree-menu" &&
+    currentBuildWorkspaceWorktreeReference
+  ) {
+    await compareCurrentBuildOverlay({
+      actual,
+      actualBounds: workspaceWorktreeMenuBounds,
+      defaultMaximumRatio: 0.08,
+      masks: [
+        { height: 18, left: 14, top: 11, width: 170 },
+        { height: 18, left: 14, top: 55, width: 90 },
+        { height: 18, left: 36, top: 83, width: 210 },
+        { height: 18, left: 36, top: 112, width: 210 },
+        { height: 20, left: 36, top: 250, width: 230 },
+      ],
+      maximumRatioName:
+        "CODEX_UI_KIT_WORKSPACE_WORKTREE_MAX_DIFF_RATIO",
+      referenceCrop: {
+        height: 280,
+        left: 569,
+        top: 392,
+        width: 296,
+      },
+      referencePath: currentBuildWorkspaceWorktreeReference,
+      sceneId: scene.id,
+    });
+  }
+
   if (scene.id === "streaming" && currentBuildSidebarReference) {
     if (!Number.isInteger(sidebarSelectedTop)) {
       throw new Error(
