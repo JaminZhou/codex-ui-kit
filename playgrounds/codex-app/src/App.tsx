@@ -500,8 +500,9 @@ export function App() {
   );
   const [mode, setMode] = useState<"live" | "replay">("replay");
   const [view, setView] = useState<DemoView>(initialSelection.view);
-  const [workspaceProjectId, setWorkspaceProjectId] =
-    useState("codex-ui-kit");
+  const [workspaceProjectId, setWorkspaceProjectId] = useState<
+    string | null
+  >("codex-ui-kit");
   const [workspaceEnvironmentId, setWorkspaceEnvironmentId] =
     useState("local");
   const [workspaceWorktreeId, setWorkspaceWorktreeId] = useState(
@@ -691,7 +692,9 @@ export function App() {
     if (isNarrowDemoWindow()) setSidebarOpen(false);
   };
 
-  const openWorkspace = (projectId = workspaceProjectId) => {
+  const openWorkspace = (
+    projectId: string | null = workspaceProjectId,
+  ) => {
     cancelReplaySubmitTimer();
     setMode("replay");
     setView("workspace");
@@ -1384,8 +1387,11 @@ export function App() {
   );
 
   const workspaceProject =
-    workspaceProjects.find(({ id }) => id === workspaceProjectId) ??
-    workspaceProjects[0];
+    workspaceProjectId === null
+      ? undefined
+      : (workspaceProjects.find(
+          ({ id }) => id === workspaceProjectId,
+        ) ?? workspaceProjects[0]);
   const workspaceWorktree =
     workspaceEnvironmentGroups[0].items.find(
       ({ id }) => id === workspaceWorktreeId,
@@ -1627,6 +1633,7 @@ export function App() {
             value={workspaceProjectQuery}
           />
           <ConversationProjectListbox
+            dismissBoundaryId="demo-workspace-project-dialog"
             initialFocus="none"
             items={filteredWorkspaceProjects}
             label="Suggestions"
@@ -1638,7 +1645,7 @@ export function App() {
               setWorkspaceOverlayState(null);
               setWorkspaceProjectQuery("");
             }}
-            selectedId={workspaceProjectId}
+            selectedId={workspaceProjectId ?? undefined}
             triggerId="demo-workspace-project-trigger"
           />
           <div className="demo-workspace-project-dialog__actions">
@@ -1648,7 +1655,7 @@ export function App() {
             </button>
             <button
               onClick={() => {
-                setWorkspaceProjectId("codex-ui-kit");
+                setWorkspaceProjectId(null);
                 setWorkspaceOverlayState(null);
                 setWorkspaceProjectQuery("");
               }}
@@ -1708,7 +1715,7 @@ export function App() {
               }}
               type="button"
             >
-              {workspaceProject?.label ?? "this project"}?
+              {workspaceProject?.label ?? "No project"}?
             </button>
           </>
         }

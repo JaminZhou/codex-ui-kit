@@ -851,6 +851,7 @@ export interface ConversationProjectListboxProps
     HTMLAttributes<HTMLDivElement>,
     "children" | "onSelect"
   > {
+  dismissBoundaryId?: string;
   initialFocus?: "first" | "none" | "selected";
   items: readonly ProjectIndexItem[];
   label?: string;
@@ -906,6 +907,7 @@ function moveProjectListboxFocus(
 
 export function ConversationProjectListbox({
   className,
+  dismissBoundaryId,
   initialFocus = "selected",
   items,
   label = "Conversation projects",
@@ -974,9 +976,13 @@ export function ConversationProjectListbox({
       const trigger = triggerId
         ? document.getElementById(triggerId)
         : null;
+      const dismissBoundary = dismissBoundaryId
+        ? document.getElementById(dismissBoundaryId)
+        : null;
       if (
         !listboxRef.current?.contains(target) &&
-        !trigger?.contains(target)
+        !trigger?.contains(target) &&
+        !dismissBoundary?.contains(target)
       ) {
         onDismiss();
       }
@@ -988,7 +994,7 @@ export function ConversationProjectListbox({
         handlePointerDown,
         true,
       );
-  }, [onDismiss, triggerId]);
+  }, [dismissBoundaryId, onDismiss, triggerId]);
 
   return (
     <div
@@ -1007,10 +1013,14 @@ export function ConversationProjectListbox({
         const trigger = triggerId
           ? document.getElementById(triggerId)
           : null;
+        const dismissBoundary = dismissBoundaryId
+          ? document.getElementById(dismissBoundaryId)
+          : null;
         if (
           nextTarget instanceof Node &&
           (listboxRef.current?.contains(nextTarget) ||
-            trigger?.contains(nextTarget))
+            trigger?.contains(nextTarget) ||
+            dismissBoundary?.contains(nextTarget))
         ) {
           return;
         }

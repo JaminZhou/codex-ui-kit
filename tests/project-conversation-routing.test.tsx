@@ -372,6 +372,60 @@ describe("project conversation routing", () => {
     expect(document.activeElement).toBe(composer);
   });
 
+  it("keeps sibling controls inside an explicit dismissal boundary", () => {
+    const onDismiss = vi.fn();
+    render(
+      <>
+        <button id="bounded-project-trigger" type="button">
+          Project
+        </button>
+        <div id="bounded-project-dialog">
+          <input aria-label="Search projects" />
+          <ConversationProjectListbox
+            dismissBoundaryId="bounded-project-dialog"
+            items={[
+              {
+                id: "ui-kit",
+                label: "UI Kit",
+              },
+            ]}
+            onDismiss={onDismiss}
+            onSelect={() => undefined}
+            selectedId="ui-kit"
+            triggerId="bounded-project-trigger"
+          />
+          <button type="button">New project</button>
+        </div>
+        <textarea aria-label="Conversation composer" />
+      </>,
+    );
+    const option = screen.getByRole("option", {
+      name: "Select project UI Kit",
+    });
+    expect(document.activeElement).toBe(option);
+
+    const search = screen.getByRole("textbox", {
+      name: "Search projects",
+    });
+    fireEvent.pointerDown(search);
+    search.focus();
+    expect(onDismiss).not.toHaveBeenCalled();
+
+    const action = screen.getByRole("button", {
+      name: "New project",
+    });
+    fireEvent.pointerDown(action);
+    action.focus();
+    expect(onDismiss).not.toHaveBeenCalled();
+
+    fireEvent.pointerDown(
+      screen.getByRole("textbox", {
+        name: "Conversation composer",
+      }),
+    );
+    expect(onDismiss).toHaveBeenCalledTimes(1);
+  });
+
   it("keeps a first-enabled tab stop without automatic focus", () => {
     render(
       <ConversationProjectListbox

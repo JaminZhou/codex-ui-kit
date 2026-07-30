@@ -1523,6 +1523,28 @@ try {
   const projectSearch = projectDialog.getByRole("searchbox", {
     name: "Search projects",
   });
+  await projectDialog
+    .getByRole("button", {
+      name: "Don't work in a project",
+    })
+    .click();
+  await codingWorkspacePage.waitForSelector(
+    'button[aria-label="Change project: No project"]',
+  );
+  const noProjectDestination = (
+    await codingWorkspacePage
+      .locator(".demo-workspace-destination")
+      .textContent()
+  )?.trim();
+  if (noProjectDestination !== "No project?") {
+    throw new Error(
+      `Electron coding workspace did not enter the no-project state: ${JSON.stringify(noProjectDestination)}.`,
+    );
+  }
+  await codingWorkspacePage
+    .getByRole("button", { name: "Change project: No project" })
+    .click();
+  await codingWorkspacePage.waitForTimeout(50);
   await projectSearch.fill("app-server");
   await projectDialog
     .getByRole("option", {
