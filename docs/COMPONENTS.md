@@ -95,6 +95,17 @@ All privileged behavior remains host-owned. The components never auto-approve co
 
 ## Navigation and shell
 
+- `AppWindowChrome`: 46px application-owned window navigation with
+  traffic-light-safe Sidebar, Back, and Forward controls plus host-owned title
+  and trailing slots. Hosts retain history, routing, and native-window
+  behavior.
+- `AppRouteOutlet`: ready, loading, empty, error, offline, reconnecting, and
+  stale-data presentation. Stale and reconnecting variants can preserve
+  host-owned content while alert/live-region and busy semantics remain
+  explicit.
+- `AppNotificationRegion`: body-portalled top- or bottom-end application
+  feedback with neutral, success, warning, and error tones, optional action,
+  dismissal, and alert/status semantics.
 - `AppShell`: the application-level grid for a persistent navigation sidebar,
   conversation main region, right workspace panel, and bottom panel. Wide mode
   reserves measured tracks; medium and narrow containers switch side surfaces
@@ -113,7 +124,14 @@ All privileged behavior remains host-owned. The components never auto-approve co
   `bottomPanelResizable` adds the current-build measured 16px horizontal
   separator, a preferred 152px minimum (reduced only when the responsive
   half-height cap is smaller), pointer and Arrow/Home/End control, accessible
-  values, and controlled or uncontrolled height persistence.
+  values, and controlled or uncontrolled height persistence. `windowChrome`
+  places the application-owned titlebar above the main and right-panel tracks.
+  `responsivePanelContinuity` can auto-collapse side surfaces at the measured
+  960/720px layout transitions and restore only surfaces that it closed;
+  changing `responsivePanelContinuityKey` resets that restoration intent for
+  a new route or workspace. `narrowSidebarBehavior="current-build"` separates
+  a transient 12px edge preview from explicitly pinning the normal sidebar
+  track.
 - `AppSidebar`, `AppSidebarSection`, `AppSidebarItem`, and
   `AppSidebarFooter`: grouped primary navigation with one selected route,
   heading-preserving collapsible collections, lifecycle status, measured

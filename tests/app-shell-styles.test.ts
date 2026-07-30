@@ -21,12 +21,12 @@ describe("application shell visual contract", () => {
 
   it("turns fixed columns into overlays before they can leave the viewport", () => {
     expect(styles).toContain(
-      "@container codex-ui-app-shell (max-width: 92rem) {\n  .codex-ui-app-shell__layout {",
+      "@container codex-ui-app-shell (max-width: 60rem) {\n  .codex-ui-app-shell__layout {",
     );
     expect(styles).toContain(
       "@container codex-ui-app-shell (max-width: 45rem) {\n  .codex-ui-app-shell__layout {",
     );
-    expect(component).toContain("const appShellMediumBreakpointRem = 92");
+    expect(component).toContain("const appShellMediumBreakpointRem = 60");
     expect(component).toContain("const appShellNarrowBreakpointRem = 45");
     expect(tokens).not.toContain("--codex-ui-app-shell-medium-breakpoint");
     expect(tokens).not.toContain("--codex-ui-app-shell-narrow-breakpoint");
@@ -40,6 +40,19 @@ describe("application shell visual contract", () => {
     expect(styles).toMatch(
       /@media \(prefers-reduced-motion: reduce\) \{[\s\S]*?\.codex-ui-app-shell__sidebar,[\s\S]*?\.codex-ui-app-shell__side-panel \{[\s\S]*?transition: none/,
     );
+  });
+
+  it("keeps current-build narrow preview distinct from modal fallback", () => {
+    expect(styles).toContain(
+      '.codex-ui-app-shell[data-narrow-sidebar-behavior="current-build"][data-sidebar-open]',
+    );
+    expect(styles).toContain(
+      '.codex-ui-app-shell[data-narrow-sidebar-behavior="current-build"][data-sidebar-preview-open]:not([data-sidebar-open])',
+    );
+    expect(component).toContain(
+      'export type AppShellNarrowSidebarBehavior = "current-build" | "modal"',
+    );
+    expect(component).toContain("inlineStartDistance <= 12");
   });
 
   it("keeps panel tabs, content, and focus semantics explicit", () => {

@@ -246,6 +246,7 @@ function createWindow() {
   const capture = process.env.CODEX_DEMO_CAPTURE ?? "0";
   const layout = process.env.CODEX_DEMO_LAYOUT ?? "";
   const view = process.env.CODEX_DEMO_VIEW ?? "conversation";
+  const shellState = process.env.CODEX_DEMO_SHELL_STATE ?? "ready";
   const requestedWidth = Number(process.env.CODEX_DEMO_WINDOW_WIDTH);
   const requestedHeight = Number(process.env.CODEX_DEMO_WINDOW_HEIGHT);
   const width =
@@ -261,6 +262,7 @@ function createWindow() {
     frame,
     layout,
     scenario,
+    shellState,
     view,
   }).toString();
 

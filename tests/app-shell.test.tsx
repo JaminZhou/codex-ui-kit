@@ -177,6 +177,197 @@ describe("application shell", () => {
     ).toBeTruthy();
   });
 
+  it("uses the current-build 960px and 720px shell thresholds", () => {
+    let resize: ((width: number) => void) | undefined;
+    class ResizeObserverMock {
+      constructor(
+        private readonly callback: ResizeObserverCallback,
+      ) {}
+
+      disconnect() {}
+
+      observe(target: Element) {
+        if (!target.classList.contains("codex-ui-app-shell")) return;
+        resize = (width) =>
+          this.callback(
+            [
+              {
+                contentRect: { height: 900, width },
+                target,
+              } as ResizeObserverEntry,
+            ],
+            this as unknown as ResizeObserver,
+          );
+      }
+
+      unobserve() {}
+    }
+    vi.stubGlobal("ResizeObserver", ResizeObserverMock);
+    const onLayoutModeChange = vi.fn();
+    const { container } = render(
+      <AppShell onLayoutModeChange={onLayoutModeChange}>
+        Conversation
+      </AppShell>,
+    );
+    const shell = container.querySelector(".codex-ui-app-shell")!;
+
+    act(() => resize?.(1_180));
+    expect(shell.getAttribute("data-layout-mode")).toBe("wide");
+    act(() => resize?.(961));
+    expect(shell.getAttribute("data-layout-mode")).toBe("wide");
+    act(() => resize?.(960));
+    expect(shell.getAttribute("data-layout-mode")).toBe("medium");
+    act(() => resize?.(721));
+    expect(shell.getAttribute("data-layout-mode")).toBe("medium");
+    act(() => resize?.(720));
+    expect(shell.getAttribute("data-layout-mode")).toBe("narrow");
+
+    expect(onLayoutModeChange.mock.calls).toEqual([
+      ["medium", "wide"],
+      ["narrow", "medium"],
+    ]);
+  });
+
+  it("restores only panels auto-collapsed by responsive continuity", () => {
+    let resize: ((width: number) => void) | undefined;
+    class ResizeObserverMock {
+      constructor(
+        private readonly callback: ResizeObserverCallback,
+      ) {}
+
+      disconnect() {}
+
+      observe(target: Element) {
+        if (!target.classList.contains("codex-ui-app-shell")) return;
+        resize = (width) =>
+          this.callback(
+            [
+              {
+                contentRect: { height: 900, width },
+                target,
+              } as ResizeObserverEntry,
+            ],
+            this as unknown as ResizeObserver,
+          );
+      }
+
+      unobserve() {}
+    }
+    vi.stubGlobal("ResizeObserver", ResizeObserverMock);
+
+    function ResponsiveFixture() {
+      const [continuityKey, setContinuityKey] = useState("thread-a");
+      const [sidePanelOpen, setSidePanelOpen] = useState(true);
+      const [sidebarOpen, setSidebarOpen] = useState(true);
+      return (
+        <AppShell
+          onSidePanelOpenChange={setSidePanelOpen}
+          onSidebarOpenChange={setSidebarOpen}
+          responsivePanelContinuity
+          responsivePanelContinuityKey={continuityKey}
+          sidePanel={<button type="button">Review files</button>}
+          sidePanelOpen={sidePanelOpen}
+          sidebar={<button type="button">Projects</button>}
+          sidebarOpen={sidebarOpen}
+        >
+          <button
+            onClick={() => setContinuityKey("thread-b")}
+            type="button"
+          >
+            Change route
+          </button>
+        </AppShell>
+      );
+    }
+
+    render(<ResponsiveFixture />);
+    const sidebar = screen.getByRole("complementary", {
+      name: "App navigation",
+    });
+    const sidePanel = screen.getByRole("complementary", {
+      name: "Workspace panel",
+    });
+
+    act(() => resize?.(1_180));
+    expect(sidebar.getAttribute("aria-hidden")).toBe("false");
+    expect(sidePanel.getAttribute("aria-hidden")).toBe("false");
+
+    act(() => resize?.(960));
+    expect(sidebar.getAttribute("aria-hidden")).toBe("false");
+    expect(sidePanel.getAttribute("aria-hidden")).toBe("true");
+
+    act(() => resize?.(720));
+    expect(sidebar.getAttribute("aria-hidden")).toBe("true");
+    expect(sidePanel.getAttribute("aria-hidden")).toBe("true");
+
+    act(() => resize?.(721));
+    expect(sidebar.getAttribute("aria-hidden")).toBe("false");
+    expect(sidePanel.getAttribute("aria-hidden")).toBe("true");
+
+    act(() => resize?.(961));
+    expect(sidePanel.getAttribute("aria-hidden")).toBe("false");
+
+    act(() => resize?.(960));
+    expect(sidePanel.getAttribute("aria-hidden")).toBe("true");
+    fireEvent.click(screen.getByRole("button", { name: "Change route" }));
+    act(() => resize?.(961));
+    expect(sidePanel.getAttribute("aria-hidden")).toBe("true");
+  });
+
+  it("supports current-build narrow edge preview and explicit pinning", () => {
+    function CurrentBuildNarrowFixture() {
+      const [sidebarOpen, setSidebarOpen] = useState(false);
+      return (
+        <AppShell
+          layoutMode="narrow"
+          narrowSidebarBehavior="current-build"
+          onSidebarOpenChange={setSidebarOpen}
+          sidebar={<button type="button">Projects</button>}
+          sidebarOpen={sidebarOpen}
+        >
+          <button
+            onClick={() => setSidebarOpen(true)}
+            type="button"
+          >
+            Show sidebar
+          </button>
+        </AppShell>
+      );
+    }
+
+    const { container } = render(<CurrentBuildNarrowFixture />);
+    const shell = container.querySelector(".codex-ui-app-shell")!;
+    const sidebar = container.querySelector(
+      '.codex-ui-app-shell__sidebar[aria-label="App navigation"]',
+    )!;
+    const main = screen.getByRole("main", { name: "Conversation" });
+    const backdrop = container.querySelector(
+      '.codex-ui-app-shell__backdrop[data-backdrop="sidebar"]',
+    )!;
+
+    expect(
+      shell.getAttribute("data-narrow-sidebar-behavior"),
+    ).toBe("current-build");
+    expect(sidebar.getAttribute("aria-hidden")).toBe("true");
+    expect(main.hasAttribute("inert")).toBe(false);
+
+    fireEvent.pointerMove(shell, { clientX: 1 });
+    expect(shell.hasAttribute("data-sidebar-preview-open")).toBe(true);
+    expect(sidebar.getAttribute("aria-hidden")).toBe("false");
+    expect(main.hasAttribute("inert")).toBe(false);
+    expect((backdrop as HTMLButtonElement).hidden).toBe(true);
+
+    fireEvent.pointerMove(shell, { clientX: 400 });
+    expect(shell.hasAttribute("data-sidebar-preview-open")).toBe(false);
+    expect(sidebar.getAttribute("aria-hidden")).toBe("true");
+
+    fireEvent.click(screen.getByRole("button", { name: "Show sidebar" }));
+    expect(shell.hasAttribute("data-sidebar-open")).toBe(true);
+    expect(sidebar.getAttribute("aria-hidden")).toBe("false");
+    expect(main.hasAttribute("inert")).toBe(false);
+    expect((backdrop as HTMLButtonElement).hidden).toBe(true);
+  });
+
   it("caps a resized split sidebar before it can consume the main track", () => {
     let resize: ((width: number) => void) | undefined;
     class ResizeObserverMock {
@@ -1186,7 +1377,7 @@ describe("application shell", () => {
     }
 
     render(<LatePortalFixture />);
-    act(() => resize?.(1_000));
+    act(() => resize?.(960));
     fireEvent.click(
       screen.getByRole("button", { name: "Mount main popover" }),
     );
@@ -1450,7 +1641,7 @@ describe("application shell", () => {
     render(<EscapeFixture />);
     const hostFilter = screen.getByRole("textbox", { name: "Host filter" });
     hostFilter.focus();
-    act(() => resize?.(1_000));
+    act(() => resize?.(960));
     expect(document.activeElement).toBe(hostFilter);
     fireEvent.keyDown(hostFilter, { key: "Escape" });
     expect(
@@ -1524,7 +1715,7 @@ describe("application shell", () => {
     }
 
     render(<ApprovalMenuEscapeFixture />);
-    act(() => resize?.(1_000));
+    act(() => resize?.(960));
 
     const toggle = screen.getByRole("button", {
       name: "Approval options",
@@ -1600,7 +1791,7 @@ describe("application shell", () => {
     }
 
     render(<PopoverEscapeFixture />);
-    act(() => resize?.(1_000));
+    act(() => resize?.(960));
 
     const trigger = screen.getByRole("button", {
       name: "Open workspace actions",
@@ -1667,7 +1858,7 @@ describe("application shell", () => {
 
     const composer = screen.getByRole("button", { name: "Composer" });
     composer.focus();
-    act(() => resize?.(1_000));
+    act(() => resize?.(960));
     expect(
       screen
         .getByRole("main", { name: "Conversation" })
@@ -1734,7 +1925,7 @@ describe("application shell", () => {
       trigger.getAttribute("aria-controls"),
     );
 
-    act(() => resize?.(1_000));
+    act(() => resize?.(960));
     await waitFor(() =>
       expect(document.activeElement).toBe(
         screen.getByRole("button", { name: "Sources" }),
@@ -1804,7 +1995,7 @@ describe("application shell", () => {
     expect(toggle.getAttribute("aria-controls")).toBe(menu.id);
     scopedItem.focus();
 
-    act(() => resize?.(1_000));
+    act(() => resize?.(960));
     expect(document.activeElement).toBe(
       screen.getByRole("button", { name: "Sources" }),
     );
@@ -2105,7 +2296,7 @@ describe("application shell", () => {
       </AppShell>,
     );
 
-    act(() => resize?.(1_000));
+    act(() => resize?.(960));
     expect(document.body.style.overflow).toBe("auto");
   });
 
@@ -2172,7 +2363,7 @@ describe("application shell", () => {
     }
 
     render(<ExternalDialogFixture />);
-    act(() => resize?.(1_000));
+    act(() => resize?.(960));
     const trigger = screen.getByRole("button", {
       name: "Open external dialog",
     });
@@ -2267,7 +2458,7 @@ describe("application shell", () => {
       name: "Main fallback",
     });
     mainFallback.focus();
-    act(() => resize?.(1_000));
+    act(() => resize?.(960));
     const dialogTrigger = screen.getByRole("button", {
       name: "Open panel dialog",
     });
@@ -2478,7 +2669,7 @@ describe("application shell", () => {
     await waitFor(() =>
       expect(document.activeElement).toBe(closeWorkspace),
     );
-    act(() => resize?.(1_000));
+    act(() => resize?.(960));
     await waitFor(() =>
       expect(
         screen.queryByRole("menuitem", { name: "Open main dialog" }),
@@ -2550,7 +2741,7 @@ describe("application shell", () => {
 
     const composer = screen.getByRole("button", { name: "Composer" });
     composer.focus();
-    act(() => resize?.(1_000));
+    act(() => resize?.(960));
 
     expect(document.activeElement).toBe(
       screen.getByRole("tab", { name: "Review", selected: true }),
@@ -2608,7 +2799,7 @@ describe("application shell", () => {
     );
 
     expect(document.activeElement).toBe(document.body);
-    act(() => resize?.(1_000));
+    act(() => resize?.(960));
 
     expect(document.activeElement).toBe(
       screen.getByRole("button", { name: "Sources" }),
@@ -2664,7 +2855,7 @@ describe("application shell", () => {
     }
 
     render(<BottomPanelFixture />);
-    act(() => resize?.(1_000));
+    act(() => resize?.(960));
     const sidePanelControl = screen.getByRole("button", {
       name: "Sources",
     });
@@ -2732,7 +2923,7 @@ describe("application shell", () => {
 
     const composer = screen.getByRole("button", { name: "Composer" });
     composer.focus();
-    act(() => resize?.(1_000));
+    act(() => resize?.(960));
     expect(
       screen
         .getByRole("main", { name: "Conversation" })
@@ -2758,7 +2949,7 @@ describe("application shell", () => {
       screen.getByRole("button", { name: "Sources" }),
     );
     terminal.focus();
-    act(() => resize?.(1_000));
+    act(() => resize?.(960));
     expect(document.activeElement).toBe(terminal);
 
     const sidePanelBackdrop = screen.getByRole("button", {
@@ -2770,7 +2961,7 @@ describe("application shell", () => {
       screen.getByRole("button", { name: "Sources" }),
     );
 
-    act(() => resize?.(1_000));
+    act(() => resize?.(960));
     sidePanelBackdrop.focus();
     act(() => resize?.(700));
     expect(
@@ -2791,7 +2982,7 @@ describe("application shell", () => {
       name: "Close navigation sidebar",
     });
     sidebarBackdrop.focus();
-    act(() => resize?.(1_000));
+    act(() => resize?.(960));
     expect(document.activeElement).toBe(
       screen.getByRole("button", { name: "Projects" }),
     );

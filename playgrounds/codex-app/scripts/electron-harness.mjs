@@ -172,6 +172,38 @@ export const visualScenes = [
     scenario: "workspace-workflow",
     view: "pull-request",
   },
+  {
+    frame: "shell-loading",
+    id: "shell-loading",
+    maxPixelRatio: 0.005,
+    scenario: "streaming-recovery",
+    shellState: "loading",
+    view: "shell",
+  },
+  {
+    frame: "shell-offline",
+    id: "shell-offline",
+    maxPixelRatio: 0.005,
+    scenario: "streaming-recovery",
+    shellState: "offline",
+    view: "shell",
+  },
+  {
+    frame: "shell-stale",
+    id: "shell-stale",
+    maxPixelRatio: 0.005,
+    scenario: "streaming-recovery",
+    shellState: "stale",
+    view: "shell",
+  },
+  {
+    frame: "shell-restored",
+    id: "shell-restored",
+    maxPixelRatio: 0.005,
+    scenario: "streaming-recovery",
+    shellState: "ready",
+    view: "shell",
+  },
 ];
 
 export async function launchScene(
@@ -188,6 +220,7 @@ export async function launchScene(
       CODEX_DEMO_HEADLESS: "1",
       ...(layoutMode ? { CODEX_DEMO_LAYOUT: layoutMode } : {}),
       CODEX_DEMO_SCENARIO: scene.scenario,
+      CODEX_DEMO_SHELL_STATE: scene.shellState ?? "ready",
       CODEX_DEMO_VIEW: scene.view ?? "conversation",
       ...(windowSize
         ? {

@@ -155,14 +155,114 @@ try {
   });
   await showNarrowSidebar.click();
   await narrowPage.waitForSelector(
-    ".codex-ui-app-shell[data-layout-mode=\"narrow\"][data-sidebar-open] .codex-ui-app-shell__main[inert]",
+    ".codex-ui-app-shell[data-layout-mode=\"narrow\"][data-narrow-sidebar-behavior=\"current-build\"][data-sidebar-open] .codex-ui-app-shell__main:not([inert])",
   );
-  await narrowPage.keyboard.press("Escape");
+  const pinnedMainWidth = await narrowPage
+    .locator(".codex-ui-app-shell__main")
+    .evaluate((element) => element.getBoundingClientRect().width);
+  if (Math.abs(pinnedMainWidth - 446) > 1) {
+    throw new Error(
+      `Electron current-build pinned sidebar geometry failed: ${pinnedMainWidth}`,
+    );
+  }
+  await narrowPage.getByRole("button", { name: "Hide sidebar" }).click();
   await narrowPage.waitForSelector(
     ".codex-ui-app-shell[data-layout-mode=\"narrow\"]:not([data-sidebar-open]) .codex-ui-app-shell__main:not([inert])",
   );
 } finally {
   await narrowApp.close();
+}
+
+const shellScene = {
+  frame: "shell-offline",
+  id: "electron-shell-continuity",
+  scenario: "streaming-recovery",
+  shellState: "offline",
+  view: "shell",
+};
+const { app: shellApp, page: shellPage } = await launchScene(shellScene, {
+  capture: false,
+});
+
+try {
+  const shellBounds = await shellApp.evaluate(({ BrowserWindow }) =>
+    BrowserWindow.getAllWindows()[0]?.getContentBounds(),
+  );
+  if (shellBounds?.width !== 1180 || shellBounds?.height !== 820) {
+    throw new Error(
+      `Electron shell native bounds failed: ${JSON.stringify(shellBounds)}`,
+    );
+  }
+  const shellOffline = shellPage.getByRole("alert");
+  if (!(await shellOffline.textContent())?.includes("You’re offline")) {
+    throw new Error("Electron shell did not expose the offline route state.");
+  }
+  await shellPage.getByRole("button", { name: "Try again" }).click();
+  await shellPage.waitForSelector(
+    '.demo-root[data-shell-state="loading"] .codex-ui-app-route-outlet[aria-busy="true"]',
+  );
+  await shellPage.waitForFunction(
+    () =>
+      document
+        .querySelector(".demo-root")
+        ?.getAttribute("data-shell-state") === "ready" &&
+      document.querySelector(".codex-ui-app-notification") !== null,
+  );
+  const restored = await shellPage.evaluate(() => ({
+    notification: document
+      .querySelector(".codex-ui-app-notification")
+      ?.textContent?.replace(/\s+/g, " ").trim(),
+    selected: Array.from(
+      document.querySelectorAll(
+        '.codex-ui-app-sidebar__item[aria-current="page"]',
+      ),
+      (item) => item.textContent?.trim(),
+    ),
+  }));
+  if (
+    !restored.notification?.includes("Connection restored") ||
+    restored.selected.length !== 1 ||
+    restored.selected[0] !== "Pull requests"
+  ) {
+    throw new Error(
+      `Electron shell retry did not restore route continuity: ${JSON.stringify(restored)}`,
+    );
+  }
+
+  await shellApp.evaluate(({ BrowserWindow }) => {
+    BrowserWindow.getAllWindows()[0]?.setContentSize(720, 680);
+  });
+  await shellPage.waitForSelector(
+    '.codex-ui-app-shell[data-layout-mode="narrow"]:not([data-sidebar-open])',
+  );
+  await shellApp.evaluate(({ BrowserWindow }) => {
+    BrowserWindow.getAllWindows()[0]?.setContentSize(1180, 820);
+  });
+  await shellPage.waitForSelector(
+    '.codex-ui-app-shell[data-layout-mode="wide"][data-sidebar-open]',
+  );
+  const resizedSelection = await shellPage.evaluate(() => ({
+    overflow:
+      document.documentElement.scrollWidth -
+      document.documentElement.clientWidth,
+    selected: Array.from(
+      document.querySelectorAll(
+        '.codex-ui-app-sidebar__item[aria-current="page"]',
+      ),
+      (item) => item.textContent?.trim(),
+    ),
+  }));
+  if (
+    resizedSelection.overflow > 1 ||
+    resizedSelection.selected.length !== 1 ||
+    resizedSelection.selected[0] !== "Pull requests"
+  ) {
+    throw new Error(
+      `Electron shell resize lost route selection: ${JSON.stringify(resizedSelection)}`,
+    );
+  }
+} finally {
+  await shellApp.close();
 }
 
 const markdownScene = {
@@ -932,6 +1032,17 @@ const { app: compactApp, page: compactPage } = await launchScene(
 try {
   const compactNativeState = await compactApp.evaluate(
     ({ BrowserWindow }) => BrowserWindow.getAllWindows()[0]?.getContentBounds(),
+  );
+  await compactPage.waitForSelector(
+    ".codex-ui-app-shell:not([data-side-panel-open])",
+  );
+  await compactPage
+    .getByRole("button", {
+      name: "Open .research/ui-kit-multifile-probe/alpha.txt",
+    })
+    .click();
+  await compactPage.waitForSelector(
+    '.codex-ui-app-shell[data-side-panel-open] [data-testid="review-panel"]',
   );
   const compactContract = await compactPage.evaluate(() => {
     const rect = (selector) => {

@@ -6,6 +6,29 @@ import { PNG } from "pngjs";
 import { launchScene, visualScenes } from "./electron-harness.mjs";
 
 const update = process.argv.includes("--update");
+const requestedScenesArgument = process.argv.find((argument) =>
+  argument.startsWith("--scenes="),
+);
+const requestedSceneIds = requestedScenesArgument
+  ? new Set(
+      requestedScenesArgument
+        .slice("--scenes=".length)
+        .split(",")
+        .map((value) => value.trim())
+        .filter(Boolean),
+    )
+  : null;
+const selectedScenes = requestedSceneIds
+  ? visualScenes.filter(({ id }) => requestedSceneIds.has(id))
+  : visualScenes;
+if (
+  requestedSceneIds &&
+  selectedScenes.length !== requestedSceneIds.size
+) {
+  const knownIds = new Set(visualScenes.map(({ id }) => id));
+  const unknownIds = [...requestedSceneIds].filter((id) => !knownIds.has(id));
+  throw new Error(`Unknown visual scenes: ${unknownIds.join(", ")}`);
+}
 const root = process.cwd();
 const baselineDirectory = join(root, "tests", "visual", "baselines");
 const artifactDirectory = join(root, "artifacts", "visual");
@@ -47,12 +70,18 @@ const currentBuildMcpRecoveryReferenceSize = {
 };
 const currentBuildSidebarReference =
   process.env.CODEX_UI_KIT_SIDEBAR_REFERENCE;
+const currentBuildWindowChromeReference =
+  process.env.CODEX_UI_KIT_WINDOW_CHROME_REFERENCE;
 const defaultLifecycleMainPixelRatio = 0.0025;
 const defaultLifecycleSidebarPixelRatio = 0.03;
 const internalSidebarWidth = 274;
 const currentBuildSidebarReferenceSize = {
   height: 820,
   width: 1180,
+};
+const currentBuildWindowChromeReferenceSize = {
+  height: 46,
+  width: 120,
 };
 await mkdir(baselineDirectory, { recursive: true });
 await mkdir(artifactDirectory, { recursive: true });
@@ -125,7 +154,7 @@ function environmentRatio(name, fallback) {
   return value;
 }
 
-for (const scene of visualScenes) {
+for (const scene of selectedScenes) {
   const { app, page } = await launchScene(scene);
   const actualPath = join(artifactDirectory, `${scene.id}.png`);
   const baselinePath = join(baselineDirectory, `${scene.id}.png`);
@@ -348,6 +377,38 @@ for (const scene of visualScenes) {
         selected: selectedComparison.ratio,
         top: topComparison.ratio,
       })}`,
+    );
+  }
+
+  if (
+    scene.id === "shell-loading" &&
+    currentBuildWindowChromeReference
+  ) {
+    const reference = flattenPng(
+      PNG.sync.read(await readFile(currentBuildWindowChromeReference)),
+      { blue: 24, green: 24, red: 24 },
+    );
+    if (
+      reference.width !== currentBuildWindowChromeReferenceSize.width ||
+      reference.height !== currentBuildWindowChromeReferenceSize.height
+    ) {
+      throw new Error(
+        `${scene.id}: current-build window chrome reference must be exactly ${currentBuildWindowChromeReferenceSize.width}x${currentBuildWindowChromeReferenceSize.height}, received ${reference.width}x${reference.height}.`,
+      );
+    }
+    const actualChrome = cropPng(actual, 80, 0, 120, 46);
+    const comparison = comparePng(reference, actualChrome);
+    const maximumRatio = environmentRatio(
+      "CODEX_UI_KIT_WINDOW_CHROME_MAX_DIFF_RATIO",
+      0.05,
+    );
+    if (comparison.ratio > maximumRatio) {
+      throw new Error(
+        `${scene.id}: current-build window chrome pixel ratio ${comparison.ratio} exceeds ${maximumRatio}.`,
+      );
+    }
+    console.log(
+      `${scene.id}: current-build window chrome pixel ratio ${comparison.ratio}`,
     );
   }
 
@@ -962,6 +1023,6 @@ for (const scene of visualScenes) {
 
 console.log(
   update
-    ? `Updated ${visualScenes.length} reviewed visual baselines.`
-    : `Pixel contracts passed for ${visualScenes.length} lifecycle frames.`,
+    ? `Updated ${selectedScenes.length} reviewed visual baselines.`
+    : `Pixel contracts passed for ${selectedScenes.length} lifecycle frames.`,
 );

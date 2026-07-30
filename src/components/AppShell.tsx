@@ -185,10 +185,11 @@ function useSurfaceFocusRestoration(
 }
 
 export type AppShellLayoutMode = "narrow" | "medium" | "wide";
+export type AppShellNarrowSidebarBehavior = "current-build" | "modal";
 
 // CSS container-query conditions cannot consume custom properties. Keep these
 // internal constants locked to the matching queries in styles.css.
-const appShellMediumBreakpointRem = 92;
+const appShellMediumBreakpointRem = 60;
 const appShellNarrowBreakpointRem = 45;
 
 function appShellContentBoxWidth(shell: HTMLElement) {
@@ -441,7 +442,12 @@ export interface AppShellProps
   mainLabel?: string;
   mainRole?: "main" | "region";
   layoutMode?: AppShellLayoutMode;
+  narrowSidebarBehavior?: AppShellNarrowSidebarBehavior;
   onBottomPanelHeightChange?: (height: number) => void;
+  onLayoutModeChange?: (
+    mode: AppShellLayoutMode,
+    previousMode: AppShellLayoutMode,
+  ) => void;
   onSidePanelOpenChange?: (open: boolean) => void;
   onSidePanelWidthChange?: (width: number) => void;
   onSidebarOpenChange?: (open: boolean) => void;
@@ -456,6 +462,8 @@ export interface AppShellProps
   sidePanelResizable?: boolean;
   sidePanelResizeLabel?: string;
   sidePanelWidth?: number;
+  responsivePanelContinuity?: boolean;
+  responsivePanelContinuityKey?: string | number;
   sidebar?: ReactNode;
   sidebarLabel?: string;
   sidebarMaxWidth?: number;
@@ -465,6 +473,7 @@ export interface AppShellProps
   sidebarResizable?: boolean;
   sidebarResizeLabel?: string;
   sidebarWidth?: number;
+  windowChrome?: ReactNode;
 }
 
 function clampShellTrack(value: number, minimum: number, maximum: number) {
@@ -511,7 +520,11 @@ export function AppShell({
   layoutMode: layoutModeOverride,
   mainLabel = "Conversation",
   mainRole = "main",
+  narrowSidebarBehavior = "modal",
   onBottomPanelHeightChange,
+  onLayoutModeChange,
+  onPointerLeave,
+  onPointerMoveCapture,
   onSidePanelOpenChange,
   onSidePanelWidthChange,
   onSidebarOpenChange,
@@ -526,6 +539,8 @@ export function AppShell({
   sidePanelResizable = false,
   sidePanelResizeLabel = "Resize workspace panel",
   sidePanelWidth,
+  responsivePanelContinuity = false,
+  responsivePanelContinuityKey,
   sidebar,
   sidebarLabel = "App navigation",
   sidebarMaxWidth = 520,
@@ -536,6 +551,7 @@ export function AppShell({
   sidebarResizeLabel = "Resize navigation sidebar",
   sidebarWidth,
   style,
+  windowChrome,
   ...props
 }: AppShellProps) {
   const bottomPanelOpenRef = useRef(bottomPanelOpen);
@@ -575,6 +591,7 @@ export function AppShell({
   const [bottomPanelResizing, setBottomPanelResizing] = useState(false);
   const [sidePanelResizing, setSidePanelResizing] = useState(false);
   const [sidebarResizing, setSidebarResizing] = useState(false);
+  const [sidebarPreviewOpen, setSidebarPreviewOpen] = useState(false);
   const sidebarIsVisible =
     sidebarOpen && sidebar !== undefined && sidebar !== null;
   const observedSidebarWidth = useObservedElementWidth(
@@ -583,6 +600,23 @@ export function AppShell({
   );
   const automaticLayout = useAppShellLayoutMetrics(shellRef);
   const layoutMode = layoutModeOverride ?? automaticLayout.mode;
+  const currentBuildNarrowSidebar =
+    narrowSidebarBehavior === "current-build" && layoutMode === "narrow";
+  const sidebarPreviewVisible =
+    currentBuildNarrowSidebar &&
+    !sidebarOpen &&
+    sidebarPreviewOpen &&
+    sidebar !== undefined &&
+    sidebar !== null;
+  const sidebarSurfaceVisible = sidebarOpen || sidebarPreviewVisible;
+  const previousLayoutModeRef = useRef(layoutMode);
+  const responsivePanelContinuityKeyRef = useRef(
+    responsivePanelContinuityKey,
+  );
+  const sidebarAutoCollapsedRef = useRef(false);
+  const sidePanelAutoCollapsedRef = useRef(false);
+  const expectedResponsiveSidebarOpenRef = useRef<boolean | null>(null);
+  const expectedResponsiveSidePanelOpenRef = useRef<boolean | null>(null);
   const shellWidth = automaticLayout.width;
   const normalizedBottomPanelMinHeight = Math.max(
     0,
@@ -753,7 +787,9 @@ export function AppShell({
         } as CSSProperties)
       : style;
   const sidebarModalOpen =
-    sidebarOpen && layoutMode === "narrow";
+    sidebarOpen &&
+    layoutMode === "narrow" &&
+    narrowSidebarBehavior === "modal";
   const sidePanelModalOpen =
     sidePanelOpen &&
     layoutMode !== "wide" &&
@@ -779,6 +815,115 @@ export function AppShell({
     bottomPanel !== undefined &&
     bottomPanel !== null &&
     !sidebarModalOpen;
+  useLayoutEffect(() => {
+    if (
+      responsivePanelContinuityKeyRef.current !==
+      responsivePanelContinuityKey
+    ) {
+      responsivePanelContinuityKeyRef.current =
+        responsivePanelContinuityKey;
+      sidebarAutoCollapsedRef.current = false;
+      sidePanelAutoCollapsedRef.current = false;
+      expectedResponsiveSidebarOpenRef.current = null;
+      expectedResponsiveSidePanelOpenRef.current = null;
+    }
+
+    const previousMode = previousLayoutModeRef.current;
+    if (previousMode === layoutMode) return;
+    previousLayoutModeRef.current = layoutMode;
+    onLayoutModeChange?.(layoutMode, previousMode);
+    if (!responsivePanelContinuity) return;
+
+    const enteredNarrow =
+      previousMode !== "narrow" && layoutMode === "narrow";
+    const leftNarrow =
+      previousMode === "narrow" && layoutMode !== "narrow";
+    if (enteredNarrow && sidebarOpen && onSidebarOpenChange) {
+      sidebarAutoCollapsedRef.current = true;
+      expectedResponsiveSidebarOpenRef.current = false;
+      onSidebarOpenChange(false);
+    } else if (
+      leftNarrow &&
+      sidebarAutoCollapsedRef.current &&
+      !sidebarOpen &&
+      onSidebarOpenChange
+    ) {
+      sidebarAutoCollapsedRef.current = false;
+      expectedResponsiveSidebarOpenRef.current = true;
+      onSidebarOpenChange(true);
+    } else if (leftNarrow) {
+      sidebarAutoCollapsedRef.current = false;
+      expectedResponsiveSidebarOpenRef.current = null;
+    }
+
+    const enteredConstrained =
+      previousMode === "wide" && layoutMode !== "wide";
+    const leftConstrained =
+      previousMode !== "wide" && layoutMode === "wide";
+    if (enteredConstrained && sidePanelOpen && onSidePanelOpenChange) {
+      sidePanelAutoCollapsedRef.current = true;
+      expectedResponsiveSidePanelOpenRef.current = false;
+      onSidePanelOpenChange(false);
+    } else if (
+      leftConstrained &&
+      sidePanelAutoCollapsedRef.current &&
+      !sidePanelOpen &&
+      onSidePanelOpenChange
+    ) {
+      sidePanelAutoCollapsedRef.current = false;
+      expectedResponsiveSidePanelOpenRef.current = true;
+      onSidePanelOpenChange(true);
+    } else if (leftConstrained) {
+      sidePanelAutoCollapsedRef.current = false;
+      expectedResponsiveSidePanelOpenRef.current = null;
+    }
+  }, [
+    layoutMode,
+    onLayoutModeChange,
+    onSidePanelOpenChange,
+    onSidebarOpenChange,
+    responsivePanelContinuity,
+    responsivePanelContinuityKey,
+    sidePanelOpen,
+    sidebarOpen,
+  ]);
+  useLayoutEffect(() => {
+    const expectedSidebarOpen = expectedResponsiveSidebarOpenRef.current;
+    if (
+      expectedSidebarOpen !== null &&
+      sidebarOpen === expectedSidebarOpen
+    ) {
+      expectedResponsiveSidebarOpenRef.current = null;
+    } else if (
+      expectedSidebarOpen === null &&
+      sidebarAutoCollapsedRef.current &&
+      layoutMode === "narrow" &&
+      sidebarOpen
+    ) {
+      sidebarAutoCollapsedRef.current = false;
+    }
+
+    const expectedSidePanelOpen =
+      expectedResponsiveSidePanelOpenRef.current;
+    if (
+      expectedSidePanelOpen !== null &&
+      sidePanelOpen === expectedSidePanelOpen
+    ) {
+      expectedResponsiveSidePanelOpenRef.current = null;
+    } else if (
+      expectedSidePanelOpen === null &&
+      sidePanelAutoCollapsedRef.current &&
+      layoutMode !== "wide" &&
+      sidePanelOpen
+    ) {
+      sidePanelAutoCollapsedRef.current = false;
+    }
+  }, [layoutMode, sidePanelOpen, sidebarOpen]);
+  useLayoutEffect(() => {
+    if (!currentBuildNarrowSidebar || sidebarOpen) {
+      setSidebarPreviewOpen(false);
+    }
+  }, [currentBuildNarrowSidebar, sidebarOpen]);
   const resolveBottomPanelHeight = (nextHeight: number) => {
     const measuredLiveShellHeight =
       shellRef.current === null
@@ -1407,6 +1552,40 @@ export function AppShell({
     sidebarModalOpen,
     sidebarOpen,
   ]);
+  const handleShellPointerMoveCapture = (
+    event: ReactPointerEvent<HTMLDivElement>,
+  ) => {
+    onPointerMoveCapture?.(event);
+    if (
+      event.defaultPrevented ||
+      !currentBuildNarrowSidebar ||
+      sidebarOpen
+    ) {
+      return;
+    }
+    const shell = shellRef.current;
+    if (!shell) return;
+    const bounds = shell.getBoundingClientRect();
+    const direction = getComputedStyle(shell).direction;
+    const inlineStartDistance =
+      direction === "rtl"
+        ? bounds.right - event.clientX
+        : event.clientX - bounds.left;
+    if (inlineStartDistance <= 12) {
+      setSidebarPreviewOpen(true);
+    } else if (
+      sidebarPreviewOpen &&
+      inlineStartDistance > resolvedSidebarWidth
+    ) {
+      setSidebarPreviewOpen(false);
+    }
+  };
+  const handleShellPointerLeave = (
+    event: ReactPointerEvent<HTMLDivElement>,
+  ) => {
+    onPointerLeave?.(event);
+    if (!event.defaultPrevented) setSidebarPreviewOpen(false);
+  };
 
   return (
     <div
@@ -1418,24 +1597,34 @@ export function AppShell({
       data-side-panel-open={sidePanelOpen || undefined}
       data-side-panel-resizable={sidePanelResizable || undefined}
       data-side-panel-resizing={sidePanelResizing || undefined}
+      data-narrow-sidebar-behavior={narrowSidebarBehavior}
+      data-sidebar-preview-open={sidebarPreviewVisible || undefined}
       data-sidebar-resizable={sidebarResizable || undefined}
       data-sidebar-resizing={sidebarResizing || undefined}
       data-sidebar-open={sidebarOpen || undefined}
       data-layout-mode={layoutMode}
+      data-window-chrome={windowChrome ? true : undefined}
+      onPointerLeave={handleShellPointerLeave}
+      onPointerMoveCapture={handleShellPointerMoveCapture}
       ref={shellRef}
       style={shellStyle}
       {...props}
     >
+      {windowChrome ? (
+        <div className="codex-ui-app-shell__window-chrome">
+          {windowChrome}
+        </div>
+      ) : null}
       <div className="codex-ui-app-shell__layout">
         <aside
-          aria-hidden={!sidebarOpen}
+          aria-hidden={!sidebarSurfaceVisible}
           aria-label={sidebarLabel}
           className="codex-ui-app-shell__sidebar"
-          inert={inertWhen(!sidebarOpen)}
+          inert={inertWhen(!sidebarSurfaceVisible)}
           ref={sidebarRef}
           tabIndex={-1}
         >
-          <SurfaceBlockedContext.Provider value={!sidebarOpen}>
+          <SurfaceBlockedContext.Provider value={!sidebarSurfaceVisible}>
             {sidebar}
           </SurfaceBlockedContext.Provider>
         </aside>

@@ -135,8 +135,8 @@ contract:
 - primary routes, collapsible Pinned/Projects/Recents sections, long names,
   dense history, status indicators, keyboard-accessible row actions, account,
   and settings composition;
-- normal responsive behavior with an 820×680 split and a default-hidden,
-  focus-managed 720px modal sidebar;
+- normal responsive behavior with an 820×680 split, a default-hidden 720px
+  sidebar, a 12px edge preview, and explicit pinning into the regular column;
 - an explicit wide capture mode so pixel fixtures do not override normal
   responsive behavior;
 - Browser and Electron interaction gates plus an optional current-build
@@ -159,6 +159,24 @@ turn:
   Review states;
 - an optional 906×820 current-build comparison for full-main, recovery, user,
   and Composer regions.
+
+## Eleventh vertical slice
+
+The eleventh slice completes the first application-shell continuity contract:
+
+- a current-build 46px window chrome with 28px Sidebar, Back, and Forward
+  controls at x=88/120/152;
+- protocol-neutral ready, loading, empty, error, offline, reconnecting, and
+  stale route-outlet states;
+- responsive side-surface auto-collapse and restoration that does not reopen a
+  surface the user closed manually;
+- exact 961/960 and 721/720 boundary gates, current-build narrow edge preview
+  versus explicit pinning, and structural 1920×1080/2560×1440 checks;
+- a body-portalled global notification region;
+- Browser CDP coverage across 26 lifecycle frames and real Electron
+  offline → retry → ready plus 1180×820 → 720×680 → 1180×820 acceptance;
+- four deterministic pixel frames and an optional 120×46 current-build
+  window-chrome comparison.
 
 ## Development
 
@@ -235,6 +253,13 @@ only application-owned regions:
 
 ```bash
 CODEX_UI_KIT_SIDEBAR_REFERENCE=/absolute/path/to/sidebar-reference.png \
+  pnpm --filter @codex-ui-kit/codex-app-playground check:visual
+```
+
+The App shell gate uses only the 120×46 application-owned titlebar crop:
+
+```bash
+CODEX_UI_KIT_WINDOW_CHROME_REFERENCE=/absolute/path/to/window-chrome.png \
   pnpm --filter @codex-ui-kit/codex-app-playground check:visual
 ```
 

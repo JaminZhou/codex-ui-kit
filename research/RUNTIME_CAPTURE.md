@@ -103,6 +103,32 @@ profile directory. Never use a broad `pkill` or delete a shared profile.
 CDP evidence covers Renderer behavior only. Record native window, menu,
 system-dialog, and real resize behavior separately.
 
+### Current application-shell capture
+
+The `26.721.81911` App shell capture used an exact second main process with a
+unique `/private/tmp/codex-ui-kit-shell-cdp.XXXXXX` profile and loopback port.
+The main `app://-/index.html` target was selected by 1180×820 area and shell
+landmarks; an auxiliary 480×340 target was excluded.
+
+The safe, non-mutating route sequence was:
+
+1. record the 46px titlebar and Sidebar/Back/Forward control bounds;
+2. activate Pull requests and sample its loading status and selected state;
+3. emulate 1180→820→720→1180 and recheck selection, overflow, sidebar, and
+   workspace-panel ownership;
+4. open Sites only far enough to inspect and dismiss the first-use terms
+   dialog without accepting it;
+5. return to Pull requests and verify selection;
+6. crop only x=80…199, y=0…45 for the external window-chrome pixel gate.
+
+A hard Renderer reload returned the app to its default route. That result is a
+negative persistence boundary, not a failed selection-continuity check.
+Explicit offline/reconnect/error UI could not be reached safely from the
+non-mutating route and remains synthetic acceptance evidence. Cleanup resolves
+and terminates only the PID bearing the unique profile, verifies its children
+and loopback listener are gone, and removes only that exact profile and the
+external screenshot.
+
 ## Required flow matrix
 
 ### 1. Application entry and navigation

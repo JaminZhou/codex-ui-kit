@@ -6,11 +6,17 @@ import {
   AgentComposer,
   AgentThreadViewport,
   AgentTurn,
+  AppNotificationRegion,
+  type AppNotification,
+  AppRouteOutlet,
+  type AppRouteOutletAction,
   AppShell,
   AppSidebar,
   AppSidebarFooter,
   AppSidebarItem,
   AppSidebarSection,
+  AppWindowChrome,
+  type AppWindowChromeAction,
   ArtifactList,
   ApprovalCommandPreview,
   ApprovalRequest,
@@ -207,7 +213,25 @@ const navigationItem: ThreadMessageNavigationItem = {
   label: "Package consumer",
   preview: "Public navigation rail type",
 };
+const appWindowChromeAction: AppWindowChromeAction = {
+  label: "Back",
+};
+const appRouteOutletAction: AppRouteOutletAction = {
+  label: "Try again",
+  primary: true,
+};
+const appNotification: AppNotification = {
+  heading: "Connection restored",
+  id: "package-notification",
+  tone: "info",
+};
 
+void AppNotificationRegion;
+void AppRouteOutlet;
+void AppWindowChrome;
+void appNotification;
+void appRouteOutletAction;
+void appWindowChromeAction;
 void FileChange;
 void FileDiff;
 void GeneratedImageGallery;
