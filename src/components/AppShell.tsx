@@ -680,6 +680,31 @@ export function AppShell({
       ? sidebarMinMainWidth
       : 352,
   );
+  const sidePanelHasOpenContent =
+    sidePanelOpen &&
+    sidePanel !== undefined &&
+    sidePanel !== null;
+  const normalizedSidePanelMinWidth = Math.max(
+    0,
+    Number.isFinite(sidePanelMinWidth) ? sidePanelMinWidth : 320,
+  );
+  const normalizedSidePanelMinMainWidth = Math.max(
+    0,
+    Number.isFinite(sidePanelMinMainWidth) ? sidePanelMinMainWidth : 352,
+  );
+  const persistentSidePanelMinWidth =
+    layoutMode === "wide" &&
+    sidePanelHasOpenContent &&
+    !sidePanelExpanded
+      ? normalizedSidePanelMinWidth
+      : 0;
+  const responsiveSidebarMinMainWidth =
+    persistentSidePanelMinWidth > 0
+      ? Math.max(
+          normalizedSidebarMinMainWidth,
+          normalizedSidePanelMinMainWidth,
+        )
+      : normalizedSidebarMinMainWidth;
   const sidebarWidthIsControlled =
     sidebarWidth !== undefined && Number.isFinite(sidebarWidth);
   const requestedSidebarWidth = sidebarWidthIsControlled
@@ -690,7 +715,9 @@ export function AppShell({
       ? normalizedSidebarMaxWidth
       : Math.max(
           normalizedSidebarMinWidth,
-          shellWidth - normalizedSidebarMinMainWidth,
+          shellWidth -
+            responsiveSidebarMinMainWidth -
+            persistentSidePanelMinWidth,
         );
   const resolvedSidebarMaxWidth = Math.min(
     normalizedSidebarMaxWidth,
@@ -700,14 +727,6 @@ export function AppShell({
     requestedSidebarWidth,
     normalizedSidebarMinWidth,
     resolvedSidebarMaxWidth,
-  );
-  const normalizedSidePanelMinWidth = Math.max(
-    0,
-    Number.isFinite(sidePanelMinWidth) ? sidePanelMinWidth : 320,
-  );
-  const normalizedSidePanelMinMainWidth = Math.max(
-    0,
-    Number.isFinite(sidePanelMinMainWidth) ? sidePanelMinMainWidth : 352,
   );
   const normalizedSidePanelMaxWidth = Math.max(
     normalizedSidePanelMinWidth,
@@ -761,14 +780,11 @@ export function AppShell({
         normalizedSidePanelMinWidth,
         resolvedSidePanelMaxWidth,
       );
-  const sidePanelHasOpenContent =
-    sidePanelOpen &&
-    sidePanel !== undefined &&
-    sidePanel !== null;
   const shellStyle =
     bottomPanelResizable ||
     bottomPanelHeightIsControlled ||
     sidebarResizable ||
+    sidebarWidthIsControlled ||
     sidePanelHasOpenContent ||
     sidePanelResizable ||
     resolvedSidePanelExpanded
@@ -779,7 +795,7 @@ export function AppShell({
                 "--codex-ui-app-bottom-panel-height": `${resolvedBottomPanelHeight}px`,
               }
             : {}),
-          ...(sidebarResizable
+          ...(sidebarResizable || sidebarWidthIsControlled
             ? {
                 "--codex-ui-app-sidebar-width": `${resolvedSidebarWidth}px`,
               }
@@ -827,6 +843,12 @@ export function AppShell({
     ) {
       responsivePanelContinuityKeyRef.current =
         responsivePanelContinuityKey;
+      sidebarAutoCollapsedRef.current = false;
+      sidePanelAutoCollapsedRef.current = false;
+      expectedResponsiveSidebarOpenRef.current = null;
+      expectedResponsiveSidePanelOpenRef.current = null;
+    }
+    if (!responsivePanelContinuity) {
       sidebarAutoCollapsedRef.current = false;
       sidePanelAutoCollapsedRef.current = false;
       expectedResponsiveSidebarOpenRef.current = null;
@@ -1164,7 +1186,9 @@ export function AppShell({
         ? normalizedSidebarMaxWidth
         : Math.max(
             normalizedSidebarMinWidth,
-            liveShellWidth - normalizedSidebarMinMainWidth,
+            liveShellWidth -
+              responsiveSidebarMinMainWidth -
+              persistentSidePanelMinWidth,
           );
     return clampShellTrack(
       nextWidth,

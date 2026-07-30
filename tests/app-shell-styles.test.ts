@@ -73,9 +73,8 @@ describe("application shell visual contract", () => {
     expect(component).toContain("sidebarMinWidth = 240");
     expect(component).toContain("sidebarMaxWidth = 520");
     expect(component).toContain("sidebarMinMainWidth = 352");
-    expect(component).toContain(
-      "shellWidth - normalizedSidebarMinMainWidth",
-    );
+    expect(component).toContain("responsiveSidebarMinMainWidth");
+    expect(component).toContain("persistentSidePanelMinWidth");
     expect(component).toContain('role="separator"');
     expect(component).toContain('aria-orientation="vertical"');
   });

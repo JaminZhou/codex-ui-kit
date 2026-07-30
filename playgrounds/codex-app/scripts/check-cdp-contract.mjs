@@ -773,15 +773,19 @@ for (const scene of visualScenes) {
         `${scene.id}: current-build sidebar contract failed: ${JSON.stringify(contract.sidebar)}`,
       );
     }
+    const expectedSidebarMax = scene.surfaces?.includes("reviewPanel")
+      ? "508"
+      : "520";
     if (
       contract.styles.resizerCursor !== "col-resize" ||
       Math.abs(contract.sidebarResizer.rect.width - 16) > 0.5 ||
       contract.sidebarResizer.ariaMin !== "240" ||
-      contract.sidebarResizer.ariaMax !== "520" ||
+      contract.sidebarResizer.ariaMax !== expectedSidebarMax ||
       contract.sidebarResizer.ariaNow !== "274"
     ) {
       throw new Error(
         `${scene.id}: navigation resizer contract failed: ${JSON.stringify({
+          expectedSidebarMax,
           resizer: contract.sidebarResizer,
           styles: contract.styles,
         })}`,

@@ -1,6 +1,12 @@
 // @vitest-environment happy-dom
 
-import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import {
+  cleanup,
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+} from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import {
   AppNotificationRegion,
@@ -131,16 +137,26 @@ describe("AppNotificationRegion", () => {
 
   it("carries the triggering application theme into the body portal", async () => {
     const { rerender } = render(
-      <div data-theme="dark">
-        <button type="button">Show update</button>
+      <div>
+        <div data-theme="dark">
+          <button type="button">Show update</button>
+        </div>
+        <div data-theme="light">
+          <button type="button">Show warning</button>
+        </div>
         <AppNotificationRegion notifications={[]} />
       </div>,
     );
     screen.getByRole("button", { name: "Show update" }).focus();
 
     rerender(
-      <div data-theme="dark">
-        <button type="button">Show update</button>
+      <div>
+        <div data-theme="dark">
+          <button type="button">Show update</button>
+        </div>
+        <div data-theme="light">
+          <button type="button">Show warning</button>
+        </div>
         <AppNotificationRegion
           notifications={[
             {
@@ -157,5 +173,33 @@ describe("AppNotificationRegion", () => {
         name: "Notifications",
       })).getAttribute("data-theme"),
     ).toBe("dark");
+
+    screen.getByRole("button", { name: "Show warning" }).focus();
+    rerender(
+      <div>
+        <div data-theme="dark">
+          <button type="button">Show update</button>
+        </div>
+        <div data-theme="light">
+          <button type="button">Show warning</button>
+        </div>
+        <AppNotificationRegion
+          notifications={[
+            {
+              heading: "Connection interrupted",
+              id: "warning",
+            },
+          ]}
+        />
+      </div>,
+    );
+
+    await waitFor(() =>
+      expect(
+        screen
+          .getByRole("region", { name: "Notifications" })
+          .getAttribute("data-theme"),
+      ).toBe("light"),
+    );
   });
 });

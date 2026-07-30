@@ -314,6 +314,77 @@ describe("application shell", () => {
     expect(sidePanel.getAttribute("aria-hidden")).toBe("true");
   });
 
+  it("clears responsive restoration intent while continuity is disabled", () => {
+    let resize: ((width: number) => void) | undefined;
+    class ResizeObserverMock {
+      constructor(
+        private readonly callback: ResizeObserverCallback,
+      ) {}
+
+      disconnect() {}
+
+      observe(target: Element) {
+        if (!target.classList.contains("codex-ui-app-shell")) return;
+        resize = (width) =>
+          this.callback(
+            [
+              {
+                contentRect: { height: 900, width },
+                target,
+              } as ResizeObserverEntry,
+            ],
+            this as unknown as ResizeObserver,
+          );
+      }
+
+      unobserve() {}
+    }
+    vi.stubGlobal("ResizeObserver", ResizeObserverMock);
+
+    function ResponsiveFixture() {
+      const [continuity, setContinuity] = useState(true);
+      const [sidePanelOpen, setSidePanelOpen] = useState(true);
+      return (
+        <AppShell
+          onSidePanelOpenChange={setSidePanelOpen}
+          responsivePanelContinuity={continuity}
+          sidePanel={<button type="button">Review files</button>}
+          sidePanelOpen={sidePanelOpen}
+        >
+          <button
+            onClick={() => setContinuity((current) => !current)}
+            type="button"
+          >
+            {continuity ? "Disable continuity" : "Enable continuity"}
+          </button>
+        </AppShell>
+      );
+    }
+
+    render(<ResponsiveFixture />);
+    const sidePanel = screen.getByRole("complementary", {
+      name: "Workspace panel",
+    });
+
+    act(() => resize?.(1_180));
+    expect(sidePanel.getAttribute("aria-hidden")).toBe("false");
+    act(() => resize?.(960));
+    expect(sidePanel.getAttribute("aria-hidden")).toBe("true");
+
+    fireEvent.click(
+      screen.getByRole("button", { name: "Disable continuity" }),
+    );
+    act(() => resize?.(961));
+    expect(sidePanel.getAttribute("aria-hidden")).toBe("true");
+
+    fireEvent.click(
+      screen.getByRole("button", { name: "Enable continuity" }),
+    );
+    act(() => resize?.(960));
+    act(() => resize?.(961));
+    expect(sidePanel.getAttribute("aria-hidden")).toBe("true");
+  });
+
   it("clamps a non-resizable side panel before it consumes the main track", () => {
     let resize: ((width: number) => void) | undefined;
     class ResizeObserverMock {
@@ -364,6 +435,63 @@ describe("application shell", () => {
     expect(
       shell.style.getPropertyValue("--codex-ui-app-side-panel-width"),
     ).toBe("335px");
+  });
+
+  it("coordinates wider sidebar and side-panel minima at the wide boundary", () => {
+    let resize: ((width: number) => void) | undefined;
+    class ResizeObserverMock {
+      constructor(
+        private readonly callback: ResizeObserverCallback,
+      ) {}
+
+      disconnect() {}
+
+      observe(target: Element) {
+        if (!target.classList.contains("codex-ui-app-shell")) return;
+        resize = (width) =>
+          this.callback(
+            [
+              {
+                contentRect: { height: 680, width },
+                target,
+              } as ResizeObserverEntry,
+            ],
+            this as unknown as ResizeObserver,
+          );
+      }
+
+      unobserve() {}
+    }
+    vi.stubGlobal("ResizeObserver", ResizeObserverMock);
+    const { container } = render(
+      <AppShell
+        sidePanel={<button type="button">Review files</button>}
+        sidePanelOpen
+        sidebar={<button type="button">Projects</button>}
+        sidebarOpen
+        sidebarResizable
+        sidebarWidth={520}
+      >
+        Conversation
+      </AppShell>,
+    );
+    const shell = container.querySelector(
+      ".codex-ui-app-shell",
+    ) as HTMLDivElement;
+
+    act(() => resize?.(961));
+    expect(shell.getAttribute("data-layout-mode")).toBe("wide");
+    expect(
+      screen
+        .getByRole("separator", { name: "Resize navigation sidebar" })
+        .getAttribute("aria-valuemax"),
+    ).toBe("289");
+    expect(
+      shell.style.getPropertyValue("--codex-ui-app-sidebar-width"),
+    ).toBe("289px");
+    expect(
+      shell.style.getPropertyValue("--codex-ui-app-side-panel-width"),
+    ).toBe("320px");
   });
 
   it("supports current-build narrow edge preview and explicit pinning", async () => {

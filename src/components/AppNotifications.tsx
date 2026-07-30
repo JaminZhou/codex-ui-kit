@@ -72,7 +72,7 @@ export function AppNotificationRegion({
         ? activeElement.closest<HTMLElement>("[data-theme]")?.dataset.theme
         : undefined,
     );
-  }, [notifications.length, overlayEnvironment.theme, theme]);
+  }, [notifications, overlayEnvironment.theme, theme]);
   if (!mounted || notifications.length === 0) return null;
   const resolvedPortalRoot = portalRoot ?? document.body;
 

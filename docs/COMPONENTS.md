@@ -106,7 +106,9 @@ All privileged behavior remains host-owned. The components never auto-approve co
 - `AppNotificationRegion`: body-portalled top- or bottom-end application
   feedback with neutral, success, warning, and error tones, optional action,
   dismissal, alert/status semantics, and explicit or trigger-inferred theme
-  propagation across the portal boundary.
+  propagation across the portal boundary. Inferred theme ownership is
+  recomputed when the visible notification set changes, including one-for-one
+  replacement.
 - `AppShell`: the application-level grid for a persistent navigation sidebar,
   conversation main region, right workspace panel, and bottom panel. Wide mode
   reserves measured tracks; medium and narrow containers switch side surfaces
@@ -123,7 +125,8 @@ All privileged behavior remains host-owned. The components never auto-approve co
   right workspace, with configurable panel/main minima, responsive clamping,
   controlled persistence, focus restoration, and an expanded full-main mode.
   Responsive width clamping also applies when the panel has no resize
-  affordance, so both fixed tracks cannot consume the main route.
+  affordance, and a wider sidebar is coordinated with the persistent panel
+  minimum so both fixed tracks cannot consume the main route.
   `bottomPanelResizable` adds the current-build measured 16px horizontal
   separator, a preferred 152px minimum (reduced only when the responsive
   half-height cap is smaller), pointer and Arrow/Home/End control, accessible
@@ -132,8 +135,9 @@ All privileged behavior remains host-owned. The components never auto-approve co
   trailing actions before a persistent right panel.
   `responsivePanelContinuity` can auto-collapse side surfaces at the measured
   960/720px layout transitions and restore only surfaces that it closed;
-  changing `responsivePanelContinuityKey` resets that restoration intent for
-  a new route or workspace. `narrowSidebarBehavior="current-build"` separates
+  disabling continuity or changing `responsivePanelContinuityKey` resets that
+  restoration intent for a new route or workspace.
+  `narrowSidebarBehavior="current-build"` separates
   a transient 12px edge preview from explicitly pinning the normal sidebar
   track, and restores focus before that preview becomes inert.
 - `AppSidebar`, `AppSidebarSection`, `AppSidebarItem`, and
