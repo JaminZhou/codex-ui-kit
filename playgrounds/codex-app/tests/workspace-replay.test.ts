@@ -36,10 +36,10 @@ describe("workspace replay routing", () => {
       workspaceExecutionCwd({
         environmentId: "local",
         projectPath: "/workspace/codex-ui-kit",
-        worktreeBranch: `${"-".repeat(10_000)}feature${"-".repeat(10_000)}`,
+        worktreeBranch: `${"-".repeat(10_000)}feature / review${"-".repeat(10_000)}`,
         worktreeId: "feature",
       }),
-    ).toBe("/workspace/codex-ui-kit/.worktrees/feature");
+    ).toBe("/workspace/codex-ui-kit/.worktrees/feature-review");
   });
 
   it("rewrites every protocol cwd without mutating the fixture", () => {

@@ -9,11 +9,31 @@ export interface WorkspaceExecutionSelection {
 }
 
 function workspacePathSegment(value: string) {
-  return value
-    .trim()
-    .replace(/[^a-zA-Z0-9._-]+/g, "-")
-    .replace(/^-+/, "")
-    .replace(/-+$/, "");
+  const characters: string[] = [];
+  let replacingInvalidRun = false;
+  for (const character of value.trim()) {
+    const codePoint = character.codePointAt(0) ?? -1;
+    const allowed =
+      (codePoint >= 48 && codePoint <= 57) ||
+      (codePoint >= 65 && codePoint <= 90) ||
+      (codePoint >= 97 && codePoint <= 122) ||
+      character === "." ||
+      character === "_" ||
+      character === "-";
+    if (allowed) {
+      characters.push(character);
+      replacingInvalidRun = false;
+    } else if (!replacingInvalidRun) {
+      characters.push("-");
+      replacingInvalidRun = true;
+    }
+  }
+
+  let start = 0;
+  let end = characters.length;
+  while (start < end && characters[start] === "-") start += 1;
+  while (end > start && characters[end - 1] === "-") end -= 1;
+  return characters.slice(start, end).join("");
 }
 
 export function workspaceExecutionCwd({
