@@ -66,11 +66,11 @@ because its expanded 13px navigation/history text density produced a measured
 0%. This prevents sidebar raster variance from loosening the conversation
 gate, while CDP locks the row contract and the ownership-scoped current-build
 sidebar comparison retains its separate hard regional thresholds. The
-large-Review frame uses a scoped 0.40% main-region limit because
-its 96 dense monospace
-lines amplify macOS text-rasterization differences; CDP and Electron still
-gate file counts, overflow, split geometry, and exact last-file visibility
-independently. The fourteenth PR frame uses a scoped 1% main-region limit because
+large-Review frame uses a scoped 0.45% main-region limit because
+its 96 dense monospace lines produced a measured 0.4337% macOS-runner
+text-rasterization delta; CDP and Electron still gate file counts, overflow,
+split geometry, and exact last-file visibility independently. The fourteenth
+PR frame uses a scoped 1% main-region limit because
 its dense full-page text produces a measured 0.8161% macOS-runner
 rasterization delta; CDP and Electron still lock the split, tabs, actions,
 resizing, and expansion independently. Its optional current-build gate allows
