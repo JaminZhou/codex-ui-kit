@@ -1822,6 +1822,16 @@ try {
       `Electron worktree search lost typed input to menu typeahead: ${JSON.stringify(branchSearchKeyboardState)}.`,
     );
   }
+  await branchSearch.press("ArrowDown");
+  if (
+    (await codingWorkspacePage.evaluate(
+      () => document.activeElement?.getAttribute("role"),
+    )) !== "menuitemradio"
+  ) {
+    throw new Error(
+      "Electron worktree search did not retain arrow navigation into filtered branches.",
+    );
+  }
   await worktreeMenu
     .getByRole("menuitemradio", {
       name: "main",
