@@ -3424,6 +3424,46 @@ describe("application shell", () => {
       screen.getByRole("button", { name: "Sources" }),
     );
   });
+
+  it("closes window chrome portals when a responsive modal takes over", async () => {
+    const renderShell = (layoutMode: "wide" | "medium") => (
+      <AppShell
+        layoutMode={layoutMode}
+        onSidePanelOpenChange={() => undefined}
+        sidePanel={<button type="button">Sources</button>}
+        sidePanelOpen
+        sidebar={<button type="button">Projects</button>}
+        sidebarOpen
+        windowChrome={
+          <Popover
+            defaultOpen
+            label="Chrome history"
+            trigger={<button type="button">History</button>}
+          >
+            <button type="button">Previous route</button>
+          </Popover>
+        }
+      >
+        <button type="button">Composer</button>
+      </AppShell>
+    );
+    const { rerender } = render(renderShell("wide"));
+
+    expect(
+      screen.getByRole("dialog", { name: "Chrome history" }),
+    ).toBeTruthy();
+    rerender(renderShell("medium"));
+    await waitFor(() =>
+      expect(
+        screen.queryByRole("dialog", { name: "Chrome history" }),
+      ).toBeNull(),
+    );
+    expect(
+      screen.getByRole("button", { name: "History" }).getAttribute(
+        "aria-expanded",
+      ),
+    ).toBe("false");
+  });
 });
 
 describe("application sidebar", () => {

@@ -13,6 +13,7 @@ import {
   AppRouteOutlet,
   AppShell,
   AppWindowChrome,
+  Dialog,
 } from "../src";
 
 afterEach(cleanup);
@@ -229,6 +230,47 @@ describe("AppNotificationRegion", () => {
           .getByRole("region", { name: "Notifications" })
           .getAttribute("data-theme"),
       ).toBe("light"),
+    );
+  });
+
+  it("keeps dialog-owned notification actions inside the focus trap", async () => {
+    render(
+      <Dialog
+        onOpenChange={() => undefined}
+        open
+        title="Connection settings"
+      >
+        <button type="button">Save settings</button>
+        <AppNotificationRegion
+          notifications={[
+            {
+              heading: "Connection restored",
+              id: "restored",
+              onDismiss: () => undefined,
+            },
+          ]}
+        />
+      </Dialog>,
+    );
+
+    const dialog = screen.getByRole("dialog", {
+      name: "Connection settings",
+    });
+    const dialogId = dialog
+      .closest<HTMLElement>("[data-codex-ui-dialog-id]")
+      ?.dataset.codexUiDialogId;
+    const region = await screen.findByRole("region", {
+      name: "Notifications",
+    });
+    expect(region.dataset.codexUiDialogOwner).toBe(dialogId);
+
+    const dismiss = screen.getByRole("button", {
+      name: "Dismiss notification",
+    });
+    dismiss.focus();
+    fireEvent.keyDown(dismiss, { key: "Tab" });
+    expect(document.activeElement).toBe(
+      screen.getByRole("button", { name: "Close dialog" }),
     );
   });
 });

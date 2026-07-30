@@ -1714,7 +1714,9 @@ export function AppShell({
           className="codex-ui-app-shell__window-chrome"
           inert={inertWhen(responsiveModalOpen)}
         >
-          {windowChrome}
+          <SurfaceBlockedContext.Provider value={responsiveModalOpen}>
+            {windowChrome}
+          </SurfaceBlockedContext.Provider>
         </div>
       ) : null}
       <div className="codex-ui-app-shell__layout">

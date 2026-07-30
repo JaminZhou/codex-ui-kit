@@ -86,6 +86,7 @@ export function AppNotificationRegion({
         .filter(Boolean)
         .join(" ")}
       data-position={position}
+      data-codex-ui-dialog-owner={overlayEnvironment.ownerId}
       data-theme={portalTheme}
       role="region"
       {...props}
