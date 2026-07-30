@@ -5943,13 +5943,6 @@ summary.codex-ui-activity__header::after {
   padding-block: 0.125rem;
 }
 
-.codex-ui-composer-dock__queue:has(
-    .codex-ui-composer-queue__more[open]
-  ) {
-  overflow: visible;
-  z-index: 2;
-}
-
 .codex-ui-composer-dock__surface {
   min-width: 0;
   position: relative;
@@ -6486,10 +6479,6 @@ summary.codex-ui-activity__header::after {
   display: none;
 }
 
-.codex-ui-composer-queue:has(.codex-ui-composer-queue__more[open]) {
-  overflow: visible;
-}
-
 .codex-ui-composer-queue__interrupted,
 .codex-ui-composer-queue__row {
   align-items: center;
@@ -6539,12 +6528,6 @@ summary.codex-ui-activity__header::after {
   transition: opacity var(--codex-ui-transition);
 }
 
-.codex-ui-composer-queue__row:has(
-    .codex-ui-composer-queue__more[open]
-  ) {
-  z-index: 1;
-}
-
 .codex-ui-composer-queue__row:hover,
 .codex-ui-composer-queue__row:focus-within {
   background: var(--codex-ui-bg-subtle);
@@ -6557,7 +6540,7 @@ summary.codex-ui-activity__header::after {
 
 .codex-ui-composer-queue__handle,
 .codex-ui-composer-queue__icon-button,
-.codex-ui-composer-queue__more > summary {
+.codex-ui-composer-queue__more {
   align-items: center;
   background: transparent;
   border: 0;
@@ -6641,13 +6624,14 @@ summary.codex-ui-activity__header::after {
 .codex-ui-composer-queue__row:focus-within .codex-ui-composer-queue__send-now,
 .codex-ui-composer-queue__row:focus-within .codex-ui-composer-queue__icon-button,
 .codex-ui-composer-queue__row:focus-within .codex-ui-composer-queue__more,
+.codex-ui-composer-queue__more[data-state="open"],
 .codex-ui-composer-queue__row[data-status="paused"]
   .codex-ui-composer-queue__send-now {
   opacity: 1;
 }
 
 .codex-ui-composer-queue__icon-button:hover,
-.codex-ui-composer-queue__more > summary:hover {
+.codex-ui-composer-queue__more:hover {
   background: var(--codex-ui-background-button-secondary-hover);
   color: var(--codex-ui-text);
 }
@@ -6655,37 +6639,19 @@ summary.codex-ui-activity__header::after {
 .codex-ui-composer-queue__handle:focus-visible,
 .codex-ui-composer-queue__icon-button:focus-visible,
 .codex-ui-composer-queue__send-now:focus-visible,
-.codex-ui-composer-queue__more > summary:focus-visible,
+.codex-ui-composer-queue__more:focus-visible,
 .codex-ui-composer-queue__menu button:focus-visible {
   outline: 2px solid var(--codex-ui-focus);
   outline-offset: 1px;
-}
-
-.codex-ui-composer-queue__more {
-  position: relative;
-}
-
-.codex-ui-composer-queue__more > summary {
-  list-style: none;
-}
-
-.codex-ui-composer-queue__more > summary::-webkit-details-marker {
-  display: none;
 }
 
 .codex-ui-composer-queue__menu {
   background: var(--codex-ui-bg-elevated);
   border: 1px solid var(--codex-ui-border);
   border-radius: var(--codex-ui-radius-lg);
-  bottom: calc(100% + 0.25rem);
   box-shadow: var(--codex-ui-shadow-lg);
-  display: flex;
-  flex-direction: column;
   min-width: 10rem;
   padding: 0.25rem;
-  position: absolute;
-  right: 0;
-  z-index: 4;
 }
 
 .codex-ui-composer-queue__menu button {

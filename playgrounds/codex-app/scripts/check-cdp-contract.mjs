@@ -2031,7 +2031,7 @@ try {
     '.demo-root[data-composer-phase="queued"][data-status="running"]',
   );
   const queuedPromptActions = conversationLifecyclePage.locator(
-    'summary[aria-label="Queued prompt actions"]',
+    'button[aria-label="Queued prompt actions"]',
   );
   await queuedPromptActions.click();
   await conversationLifecyclePage
@@ -2224,6 +2224,115 @@ try {
   }
 } finally {
   await pausedSteerApp.close();
+}
+
+const longQueueScene = {
+  frame: "composer-running",
+  id: "long-queue-menu-interaction",
+  scenario: "conversation-lifecycle",
+};
+const {
+  app: longQueueApp,
+  page: longQueuePage,
+} = await launchScene(longQueueScene, { capture: false });
+try {
+  const longQueueComposer = longQueuePage.getByRole("textbox", {
+    name: "Message composer",
+  });
+  for (let index = 1; index <= 12; index += 1) {
+    await longQueueComposer.fill(`Queued prompt ${index}`);
+    await longQueueComposer.press("Enter");
+  }
+  await longQueuePage.waitForSelector(
+    '.demo-root[data-queue-count="12"] .codex-ui-composer-queue',
+  );
+  const longQueue = longQueuePage.locator(".codex-ui-composer-queue");
+  const lastQueueActions = longQueuePage
+    .getByRole("button", { name: "Queued prompt actions" })
+    .last();
+  await lastQueueActions.click();
+  const longQueueMenu = longQueuePage.getByRole("menu");
+  await longQueueMenu.waitFor({ state: "visible" });
+  const longQueueContract = await longQueuePage.evaluate(() => {
+    const queue = document.querySelector(".codex-ui-composer-queue");
+    const menu = document.querySelector(".codex-ui-composer-queue__menu");
+    if (!(queue instanceof HTMLElement) || !(menu instanceof HTMLElement)) {
+      throw new Error("Long queue or its action menu is missing.");
+    }
+    return {
+      menuPortaled: menu.parentElement === document.body,
+      menuPosition: getComputedStyle(menu).position,
+      overflowY: getComputedStyle(queue).overflowY,
+      queueClientHeight: queue.clientHeight,
+      queueScrollHeight: queue.scrollHeight,
+      queueScrollTop: queue.scrollTop,
+    };
+  });
+  if (
+    !longQueueContract.menuPortaled ||
+    longQueueContract.menuPosition !== "fixed" ||
+    longQueueContract.overflowY !== "auto" ||
+    longQueueContract.queueClientHeight >=
+      longQueueContract.queueScrollHeight ||
+    longQueueContract.queueScrollTop <= 0
+  ) {
+    throw new Error(
+      `Long queue lost its bounded scroll contract: ${JSON.stringify(longQueueContract)}`,
+    );
+  }
+} finally {
+  await longQueueApp.close();
+}
+
+const replayPositionScene = {
+  frame: "conversation-completed",
+  id: "conversation-replay-position-interaction",
+  scenario: "conversation-lifecycle",
+};
+const {
+  app: replayPositionApp,
+  page: replayPositionPage,
+} = await launchScene(replayPositionScene, { capture: false });
+try {
+  const previousReplayEvent = replayPositionPage.getByRole("button", {
+    name: "Previous",
+  });
+  const stopReplay = replayPositionPage.getByRole("button", {
+    exact: true,
+    name: "Stop",
+  });
+  const replayRoot = replayPositionPage.locator(".demo-root");
+  for (let attempt = 0; attempt < 50; attempt += 1) {
+    if ((await replayRoot.getAttribute("data-status")) === "running") {
+      break;
+    }
+    if (await previousReplayEvent.isDisabled()) break;
+    await previousReplayEvent.click();
+  }
+  await replayPositionPage.waitForSelector(
+    '.demo-root[data-composer-phase="running"][data-status="running"]',
+  );
+  if ((await stopReplay.count()) !== 1) {
+    throw new Error(
+      "Composer did not follow the replay into a running protocol position.",
+    );
+  }
+
+  const replayPosition = replayPositionPage.getByRole("slider", {
+    name: "Protocol event position",
+  });
+  await replayPosition.focus();
+  await replayPosition.press("End");
+  await replayPositionPage.waitForSelector(
+    '.demo-root[data-composer-phase="idle"][data-status="completed"]',
+  );
+  if ((await stopReplay.count()) !== 0) {
+    throw new Error(
+      "Composer remained running after the replay reached completion.",
+    );
+  }
+} finally {
+  await replayPositionApp.close();
 }
 
 console.log(`CDP contracts passed for ${visualScenes.length} lifecycle frames.`);

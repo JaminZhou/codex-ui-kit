@@ -436,11 +436,6 @@ export function App() {
   const [queueInterrupted, setQueueInterrupted] = useState(
     initialSelection.frame === "composer-queue-paused",
   );
-  const [replayComposerRunning, setReplayComposerRunning] = useState(
-    initialSelection.frame === "composer-running" ||
-      initialSelection.frame === "composer-queued" ||
-      initialSelection.frame === "conversation-running",
-  );
   const [replayComposerSubmitting, setReplayComposerSubmitting] = useState(
     initialSelection.frame === "composer-disabled",
   );
@@ -515,6 +510,8 @@ export function App() {
     [isConversationLifecycle, replay, replayComposerStopped],
   );
   const state = mode === "live" ? liveState : lifecycleReplay;
+  const replayComposerRunning =
+    isConversationLifecycle && state.status === "running";
 
   useEffect(() => {
     if (!window.codexDemo) return;
@@ -575,7 +572,6 @@ export function App() {
     setQueuedPrompts([]);
     setQueueingEnabled(true);
     setQueueInterrupted(false);
-    setReplayComposerRunning(false);
     setReplayComposerSubmitting(false);
     setReplayComposerStopped(false);
     setThreadFollowing(true);
@@ -656,7 +652,6 @@ export function App() {
   const restoreConversationRunningReplay = () => {
     setReplayComposerStopped(false);
     setQueueInterrupted(false);
-    setReplayComposerRunning(true);
     setReplayCount(
       replayScenarios["conversation-lifecycle"].frames[
         "conversation-running"
@@ -698,7 +693,6 @@ export function App() {
         ] ?? replayScenarios["conversation-lifecycle"].events.length,
       );
       setReplayComposerSubmitting(false);
-      setReplayComposerRunning(true);
       setComposerValue((current) => (current === prompt ? "" : current));
     }, 160);
   };
@@ -710,7 +704,6 @@ export function App() {
     }
     cancelReplaySubmitTimer();
     setReplayComposerSubmitting(false);
-    setReplayComposerRunning(false);
     setReplayComposerStopped(true);
     if (queuedPrompts.length > 0) {
       setQueueInterrupted(true);

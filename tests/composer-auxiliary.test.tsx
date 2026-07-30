@@ -227,10 +227,21 @@ describe("composer auxiliary surfaces", () => {
       screen.getAllByRole("button", { name: "Delete queued prompt" })[0]!,
     );
     expect(onDelete).toHaveBeenCalledWith("a");
-    fireEvent.click(screen.getAllByRole("menuitem", { name: "Edit prompt" })[0]!);
+    const firstActions = screen.getAllByRole("button", {
+      name: "Queued prompt actions",
+    })[0]!;
+    fireEvent.click(firstActions);
+    const actionMenu = screen.getByRole("menu");
+    expect(document.body.contains(actionMenu)).toBe(true);
+    expect(
+      container.querySelector(".codex-ui-composer-queue__menu"),
+    ).toBeNull();
+    fireEvent.click(screen.getByRole("menuitem", { name: "Edit prompt" }));
     expect(onEdit).toHaveBeenCalledWith("a");
+    expect(screen.queryByRole("menu")).toBeNull();
+    fireEvent.click(firstActions);
     fireEvent.click(
-      screen.getAllByRole("menuitem", { name: "Turn off queueing" })[0]!,
+      screen.getByRole("menuitem", { name: "Turn off queueing" }),
     );
     expect(onQueueingChange).toHaveBeenCalledWith(false);
 

@@ -57,10 +57,16 @@ describe("composer visual contract", () => {
       ".codex-ui-composer-queue__handle:focus-visible",
     );
     expect(styles).toContain(
-      ".codex-ui-composer-queue:has(.codex-ui-composer-queue__more[open])",
+      '.codex-ui-composer-queue__more[data-state="open"]',
     );
     expect(styles).toMatch(
-      /\.codex-ui-composer-dock__queue:has\([\s\S]*?\.codex-ui-composer-queue__more\[open\][\s\S]*?\) \{[\s\S]*?overflow: visible;[\s\S]*?z-index: 2;/,
+      /\.codex-ui-composer-queue \{[\s\S]*?overflow-x: hidden;[\s\S]*?overflow-y: auto;/,
+    );
+    expect(styles).not.toContain(
+      ".codex-ui-composer-queue:has(.codex-ui-composer-queue__more",
+    );
+    expect(styles).not.toContain(
+      ".codex-ui-composer-dock__queue:has(",
     );
   });
 });

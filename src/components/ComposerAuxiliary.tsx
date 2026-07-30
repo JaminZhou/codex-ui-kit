@@ -12,6 +12,7 @@ import {
   type KeyboardEvent,
   type ReactNode,
 } from "react";
+import { Menu, MenuItem } from "./InteractivePrimitives.js";
 
 function hasRenderableNode(children: ReactNode): boolean {
   return Children.toArray(children).some((child) => {
@@ -525,25 +526,35 @@ export function QueuedPromptList({
                 </button>
               ) : null}
               {onEdit || onQueueingChange ? (
-                <details className="codex-ui-composer-queue__more">
-                  <summary aria-label="Queued prompt actions">•••</summary>
-                  <div className="codex-ui-composer-queue__menu" role="menu">
-                    {onEdit ? (
-                      <button onClick={() => onEdit(item.id)} role="menuitem" type="button">
-                        Edit prompt
-                      </button>
-                    ) : null}
-                    {onQueueingChange ? (
-                      <button
-                        onClick={() => onQueueingChange(!queueingEnabled)}
-                        role="menuitem"
-                        type="button"
-                      >
-                        Turn {queueingEnabled ? "off" : "on"} queueing
-                      </button>
-                    ) : null}
-                  </div>
-                </details>
+                <Menu
+                  align="end"
+                  className="codex-ui-composer-queue__menu"
+                  side="top"
+                  trigger={
+                    <button
+                      aria-label="Queued prompt actions"
+                      className="codex-ui-composer-queue__more"
+                      type="button"
+                    >
+                      •••
+                    </button>
+                  }
+                >
+                  {onEdit ? (
+                    <MenuItem onSelect={() => onEdit(item.id)}>
+                      Edit prompt
+                    </MenuItem>
+                  ) : null}
+                  {onQueueingChange ? (
+                    <MenuItem
+                      onSelect={() =>
+                        onQueueingChange(!queueingEnabled)
+                      }
+                    >
+                      Turn {queueingEnabled ? "off" : "on"} queueing
+                    </MenuItem>
+                  ) : null}
+                </Menu>
               ) : null}
             </article>
           );
