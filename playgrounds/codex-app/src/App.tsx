@@ -446,6 +446,7 @@ export function App() {
   const [threadFollowing, setThreadFollowing] = useState(
     initialSelection.frame !== "thread-scroll-away",
   );
+  const [activeFrame, setActiveFrame] = useState(initialSelection.frame);
   const [scenarioSelectionVersion, setScenarioSelectionVersion] =
     useState(0);
   const [windowedTimelineExpanded, setWindowedTimelineExpanded] =
@@ -563,6 +564,7 @@ export function App() {
 
   const selectReplayPosition = (nextCount: number) => {
     cancelReplaySubmitTimer();
+    setActiveFrame(null);
     setReplayComposerSubmitting(false);
     setReplayComposerStopped(false);
     setQueueInterrupted(false);
@@ -585,6 +587,7 @@ export function App() {
     setQueueInterrupted(false);
     setReplayComposerSubmitting(false);
     setReplayComposerStopped(false);
+    setActiveFrame(null);
     setScenarioSelectionVersion((version) => version + 1);
     setWindowedTimelineExpanded(false);
     pendingMessageNavigationRef.current = null;
@@ -1034,7 +1037,7 @@ export function App() {
         : "running"
       : queueInterrupted
         ? "queue-paused"
-        : initialSelection.frame === "composer-attachment"
+        : activeFrame === "composer-attachment"
           ? "attachment"
           : composerValue.includes("\n")
             ? "multiline"
@@ -1118,14 +1121,14 @@ export function App() {
       aria-busy={composerIsDisabled || undefined}
       attachments={
         showLifecycleComposer &&
-        initialSelection.frame === "composer-attachment" ? (
+        activeFrame === "composer-attachment" ? (
           <ComposerAttachment
             kind="file"
             label="current-build-composer-notes.md"
             layout="card"
             meta="Markdown · 4 KB"
             onOpen={() => undefined}
-            onRemove={() => undefined}
+            onRemove={() => setActiveFrame(null)}
           />
         ) : undefined
       }
@@ -1569,7 +1572,7 @@ export function App() {
     }));
   const windowedTimeline =
     isConversationLifecycle &&
-    initialSelection.frame === "thread-windowed" &&
+    activeFrame === "thread-windowed" &&
     !windowedTimelineExpanded;
   const indexedTimeline = state.timeline.map((entry, entryIndex) => ({
     entry,
@@ -1696,12 +1699,12 @@ export function App() {
       const groupStatus = mcpToolCallGroupStatus(calls);
       const captureOpen =
         initialSelection.capture &&
-        (initialSelection.frame === "mcp-running" ||
-          initialSelection.frame === "mcp-progress" ||
-          initialSelection.frame === "mcp-tool-calls" ||
-          initialSelection.frame === "mcp-recovery-failed" ||
-          initialSelection.frame === "mcp-recovery-retrying" ||
-          initialSelection.frame === "mcp-recovery-completed");
+        (activeFrame === "mcp-running" ||
+          activeFrame === "mcp-progress" ||
+          activeFrame === "mcp-tool-calls" ||
+          activeFrame === "mcp-recovery-failed" ||
+          activeFrame === "mcp-recovery-retrying" ||
+          activeFrame === "mcp-recovery-completed");
       const durationMs = mcpToolCallGroupDurationMs(state, calls);
       return (
         <ActivityTimeline
@@ -1761,8 +1764,8 @@ export function App() {
                   open={
                     initialSelection.capture &&
                     call.id === "mcp-fetch-invalid" &&
-                    (initialSelection.frame === "mcp-recovery-failed" ||
-                      initialSelection.frame === "mcp-recovery-completed")
+                    (activeFrame === "mcp-recovery-failed" ||
+                      activeFrame === "mcp-recovery-completed")
                       ? true
                       : undefined
                   }
@@ -1826,7 +1829,7 @@ export function App() {
           key={`command:${command.id}`}
           open={
             initialSelection.capture
-              ? initialSelection.frame === "command-running" &&
+              ? activeFrame === "command-running" &&
                 command.status === "running"
               : undefined
           }
@@ -2117,7 +2120,7 @@ export function App() {
     <div
       className="demo-root"
       data-capture={initialSelection.capture || undefined}
-      data-frame={initialSelection.frame ?? lastEvent?.frame ?? "final"}
+      data-frame={activeFrame ?? lastEvent?.frame ?? "final"}
       data-layout={initialSelection.layoutMode}
       data-last-method={state.lastMethod ?? undefined}
       data-mode={mode}
@@ -2135,7 +2138,7 @@ export function App() {
       }
       data-windowed-timeline={
         isConversationLifecycle &&
-        initialSelection.frame === "thread-windowed"
+        activeFrame === "thread-windowed"
           ? windowedTimeline
             ? "trimmed"
             : "expanded"
@@ -2234,7 +2237,7 @@ export function App() {
               threadWidth="wide"
               viewportProps={{
                 defaultFollowing:
-                  initialSelection.frame !== "thread-scroll-away",
+                  activeFrame !== "thread-scroll-away",
                 followKey: state.eventCount,
                 onFollowingChange: setThreadFollowing,
               }}

@@ -2426,4 +2426,44 @@ try {
   await disabledReplayApp.close();
 }
 
+const attachmentNavigationScene = {
+  frame: "composer-attachment",
+  id: "attachment-scenario-navigation-interaction",
+  scenario: "conversation-lifecycle",
+};
+const {
+  app: attachmentNavigationApp,
+  page: attachmentNavigationPage,
+} = await launchScene(attachmentNavigationScene, { capture: false });
+try {
+  await attachmentNavigationPage.waitForSelector(
+    '.demo-root[data-composer-phase="attachment"] .codex-ui-composer-attachment',
+  );
+  await attachmentNavigationPage
+    .locator(".codex-ui-app-sidebar__item", {
+      hasText: "Streaming and retry",
+    })
+    .click();
+  await attachmentNavigationPage.waitForSelector(
+    '.demo-root[data-scenario="streaming-recovery"]',
+  );
+  await attachmentNavigationPage
+    .locator(".codex-ui-app-sidebar__item", {
+      hasText: "Conversation and Composer lifecycle",
+    })
+    .click();
+  await attachmentNavigationPage.waitForSelector(
+    '.demo-root[data-scenario="conversation-lifecycle"][data-composer-phase="idle"]',
+  );
+  if (
+    (await attachmentNavigationPage
+      .locator(".codex-ui-composer-attachment")
+      .count()) !== 0
+  ) {
+    throw new Error("Scenario navigation retained the attachment fixture.");
+  }
+} finally {
+  await attachmentNavigationApp.close();
+}
+
 console.log(`CDP contracts passed for ${visualScenes.length} lifecycle frames.`);

@@ -22,7 +22,7 @@ Every deterministic scenario has one ID and produces four evidence layers:
    protocol running/completed positions while clearing stale Stop and paused
    interaction state, including leaving the disabled fixture frame. Scenario
    selection also resets the owned viewport before the scroll callback
-   confirms following.
+   confirms following and clears fixture-only Composer attachments.
 3. **Electron host** — real `BrowserWindow` bounds, renderer isolation,
    pointer and keyboard navigation/PR-panel resizing, Review-panel
    close/reopen behavior, compact 800×600 multi-file geometry, an eight-file
