@@ -3,15 +3,72 @@
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import {
+  AgentComposer,
   ComposerAttachment,
+  ComposerContextBar,
+  ComposerContextControl,
+  ComposerDock,
   ComposerMentionMenu,
   ComposerModeIndicator,
   QueuedPromptList,
 } from "../src";
+import { SurfaceBlockedContext } from "../src/internal/surfaceBlocked";
 
 afterEach(cleanup);
 
 describe("composer auxiliary surfaces", () => {
+  it("composes context, queue, and the input surface without merging ownership", () => {
+    const onContext = vi.fn();
+    const { container, rerender } = render(
+      <ComposerDock
+        composer={<div>Input surface</div>}
+        context={
+          <ComposerContextBar>
+            <ComposerContextControl icon="□" onClick={onContext}>
+              Local
+            </ComposerContextControl>
+            <ComposerContextControl aria-label="No project" compact icon="⌁" />
+          </ComposerContextBar>
+        }
+        queue={<QueuedPromptList items={[{ id: "one", text: "Run checks" }]} />}
+      />,
+    );
+
+    const dock = screen.getByRole("group", { name: "Composer dock" });
+    expect(dock.getAttribute("data-has-context")).toBe("true");
+    expect(dock.getAttribute("data-has-queue")).toBe("true");
+    expect(screen.getByRole("toolbar", { name: "Composer context" })).not.toBeNull();
+    expect(screen.getByRole("list", { name: "Queued prompts" })).not.toBeNull();
+    fireEvent.click(screen.getByRole("button", { name: "Local" }));
+    expect(onContext).toHaveBeenCalledTimes(1);
+    expect(
+      container.querySelector(
+        ".codex-ui-composer-context__control[data-compact]",
+      ),
+    ).not.toBeNull();
+
+    rerender(
+      <ComposerDock
+        composer={<div>Input surface</div>}
+        context={<></>}
+        queue={false}
+      />,
+    );
+    expect(dock.hasAttribute("data-has-context")).toBe(false);
+    expect(dock.hasAttribute("data-has-queue")).toBe(false);
+
+    rerender(
+      <ComposerDock
+        composer={<div>Input surface</div>}
+        queue={<QueuedPromptList items={[]} />}
+      />,
+    );
+    expect(dock.hasAttribute("data-has-queue")).toBe(false);
+    expect(
+      container.querySelector(".codex-ui-composer-dock__queue"),
+    ).toBeNull();
+  });
+
   it("models attachment layouts, upload states, opening, and removal", () => {
     const onOpen = vi.fn();
     const onRemove = vi.fn();
@@ -183,10 +240,21 @@ describe("composer auxiliary surfaces", () => {
       screen.getAllByRole("button", { name: "Delete queued prompt" })[0]!,
     );
     expect(onDelete).toHaveBeenCalledWith("a");
-    fireEvent.click(screen.getAllByRole("menuitem", { name: "Edit prompt" })[0]!);
+    const firstActions = screen.getAllByRole("button", {
+      name: "Queued prompt actions",
+    })[0]!;
+    fireEvent.click(firstActions);
+    const actionMenu = screen.getByRole("menu");
+    expect(document.body.contains(actionMenu)).toBe(true);
+    expect(
+      container.querySelector(".codex-ui-composer-queue__menu"),
+    ).toBeNull();
+    fireEvent.click(screen.getByRole("menuitem", { name: "Edit prompt" }));
     expect(onEdit).toHaveBeenCalledWith("a");
+    expect(screen.queryByRole("menu")).toBeNull();
+    fireEvent.click(firstActions);
     fireEvent.click(
-      screen.getAllByRole("menuitem", { name: "Turn off queueing" })[0]!,
+      screen.getByRole("menuitem", { name: "Turn off queueing" }),
     );
     expect(onQueueingChange).toHaveBeenCalledWith(false);
 
@@ -204,5 +272,67 @@ describe("composer auxiliary surfaces", () => {
   it("renders nothing for an empty queue", () => {
     const { container } = render(<QueuedPromptList items={[]} />);
     expect(container.childElementCount).toBe(0);
+  });
+
+  it("closes a portaled queue menu when its Composer becomes disabled", () => {
+    const onEdit = vi.fn();
+    const queue = (
+      <QueuedPromptList
+        items={[{ id: "one", text: "Run checks" }]}
+        onEdit={onEdit}
+      />
+    );
+    const { rerender } = render(
+      <AgentComposer
+        onSubmit={() => undefined}
+        onValueChange={() => undefined}
+        queue={queue}
+        value=""
+      />,
+    );
+    const trigger = screen.getByRole("button", {
+      name: "Queued prompt actions",
+    });
+    fireEvent.click(trigger);
+    expect(screen.getByRole("menu")).not.toBeNull();
+
+    rerender(
+      <AgentComposer
+        disabled
+        onSubmit={() => undefined}
+        onValueChange={() => undefined}
+        queue={queue}
+        value=""
+      />,
+    );
+    expect(screen.queryByRole("menu")).toBeNull();
+    fireEvent.click(trigger);
+    expect(screen.queryByRole("menu")).toBeNull();
+    expect(onEdit).not.toHaveBeenCalled();
+  });
+
+  it("preserves inherited blocking for portaled Composer descendants", () => {
+    const onEdit = vi.fn();
+    render(
+      <SurfaceBlockedContext.Provider value>
+        <AgentComposer
+          onSubmit={() => undefined}
+          onValueChange={() => undefined}
+          queue={
+            <QueuedPromptList
+              items={[{ id: "one", text: "Run checks" }]}
+              onEdit={onEdit}
+            />
+          }
+          value=""
+        />
+      </SurfaceBlockedContext.Provider>,
+    );
+
+    fireEvent.click(
+      screen.getByRole("button", { name: "Queued prompt actions" }),
+    );
+    expect(screen.queryByRole("menu")).toBeNull();
+    expect(onEdit).not.toHaveBeenCalled();
   });
 });

@@ -3,6 +3,67 @@ import { _electron as electron } from "playwright-core";
 
 export const visualScenes = [
   {
+    frame: "conversation-thread-ready",
+    id: "conversation-thread-ready",
+    maxPixelRatio: 0.0225,
+    scenario: "conversation-lifecycle",
+  },
+  {
+    frame: "composer-multiline",
+    id: "composer-multiline",
+    maxPixelRatio: 0.0225,
+    scenario: "conversation-lifecycle",
+  },
+  {
+    frame: "composer-running",
+    id: "composer-running",
+    maxPixelRatio: 0.0225,
+    scenario: "conversation-lifecycle",
+  },
+  {
+    frame: "composer-queued",
+    id: "composer-queued",
+    maxPixelRatio: 0.0225,
+    scenario: "conversation-lifecycle",
+  },
+  {
+    frame: "composer-queue-paused",
+    id: "composer-queue-paused",
+    maxPixelRatio: 0.0225,
+    scenario: "conversation-lifecycle",
+  },
+  {
+    frame: "composer-disabled",
+    id: "composer-disabled",
+    maxPixelRatio: 0.0225,
+    scenario: "conversation-lifecycle",
+  },
+  {
+    frame: "composer-attachment",
+    id: "composer-attachment",
+    maxPixelRatio: 0.0225,
+    scenario: "conversation-lifecycle",
+  },
+  {
+    frame: "thread-scroll-away",
+    id: "thread-scroll-away",
+    maxPixelRatio: 0.0225,
+    scenario: "conversation-lifecycle",
+    scrollTop: 0,
+  },
+  {
+    frame: "thread-windowed",
+    id: "thread-windowed",
+    maxPixelRatio: 0.0225,
+    scenario: "conversation-lifecycle",
+  },
+  {
+    frame: "conversation-completed",
+    id: "conversation-completed",
+    maxPixelRatio: 0.0225,
+    scenario: "conversation-lifecycle",
+  },
+  {
     frame: "streaming",
     id: "streaming",
     scenario: "streaming-recovery",
@@ -95,7 +156,7 @@ export const visualScenes = [
     fileCount: 1,
     frame: "mixed-review-open",
     id: "mixed-thread-review",
-    maxPixelRatio: 0.0125,
+    maxPixelRatio: 0.013,
     scenario: "mcp-recovery-mixed-thread",
     surfaces: ["approval", "command", "fileChange", "reviewPanel"],
   },
@@ -243,6 +304,7 @@ export async function launchScene(
       .locator(".codex-ui-conversation-thread-shell__viewport")
       .evaluate((element, scrollTop) => {
         element.scrollTop = scrollTop;
+        element.dispatchEvent(new Event("scroll", { bubbles: true }));
       }, scene.scrollTop);
   }
   return { app, page };

@@ -742,6 +742,273 @@ for (const scene of visualScenes) {
     if (contract.horizontalOverflow > 1) {
       throw new Error(`${scene.id}: horizontal overflow ${contract.horizontalOverflow}px.`);
     }
+    if (scene.scenario === "conversation-lifecycle") {
+      const conversation = await page.evaluate(() => {
+        const rect = (element) => {
+          if (!element) return null;
+          const value = element.getBoundingClientRect();
+          return {
+            bottom: value.bottom,
+            height: value.height,
+            left: value.left,
+            right: value.right,
+            top: value.top,
+            width: value.width,
+          };
+        };
+        const root = document.querySelector(".demo-root");
+        const dock = document.querySelector(".codex-ui-composer-dock");
+        const context = document.querySelector(".codex-ui-composer-context");
+        const surface = document.querySelector(
+          ".codex-ui-composer-dock__surface",
+        );
+        const composer = surface?.querySelector(".codex-ui-composer");
+        const textarea = composer?.querySelector("textarea");
+        const queue = document.querySelector(
+          ".codex-ui-composer-dock__queue",
+        );
+        const navigation = document.querySelector(
+          ".codex-ui-message-navigation-rail",
+        );
+        const floating = document.querySelector(
+          ".codex-ui-thread-floating-button",
+        );
+        if (
+          !root ||
+          !dock ||
+          !surface ||
+          !composer ||
+          !textarea ||
+          !navigation ||
+          !floating
+        ) {
+          throw new Error("Conversation lifecycle surfaces are missing.");
+        }
+        return {
+          attachmentCount: composer.querySelectorAll(
+            ".codex-ui-composer-attachment",
+          ).length,
+          composer: {
+            backgroundColor: getComputedStyle(composer).backgroundColor,
+            busy: composer.getAttribute("aria-busy"),
+            disabled: composer.hasAttribute("data-disabled"),
+            layout: composer.getAttribute("data-layout"),
+            rect: rect(composer),
+          },
+          context: context
+            ? {
+                controls: Array.from(
+                  context.querySelectorAll("button"),
+                  (button) => ({
+                    height: button.getBoundingClientRect().height,
+                    label: button.textContent?.replace(/\s+/g, " ").trim(),
+                  }),
+                ),
+                rect: rect(context),
+                role: context.getAttribute("role"),
+              }
+            : null,
+          dock: {
+            hasContext: dock.getAttribute("data-has-context"),
+            hasQueue: dock.getAttribute("data-has-queue"),
+            rect: rect(dock),
+          },
+          floating: {
+            hidden: floating.getAttribute("aria-hidden"),
+            show: floating.hasAttribute("data-show"),
+          },
+          messageCount: document.querySelectorAll(
+            ".codex-ui-agent-message",
+          ).length,
+          navigation: {
+            buttonCount: navigation.querySelectorAll("button").length,
+            label: navigation.getAttribute("aria-label"),
+          },
+          phase: root.getAttribute("data-composer-phase"),
+          placeholder: {
+            count: document.querySelectorAll(
+              ".codex-ui-thread-virtualized-placeholder",
+            ).length,
+            hiddenEntryCount:
+              document
+                .querySelector(".codex-ui-thread-virtualized-placeholder")
+                ?.getAttribute("data-hidden-entry-count") ?? null,
+          },
+          queue: queue
+            ? {
+                backgroundColor: getComputedStyle(queue).backgroundColor,
+                interrupted: Boolean(
+                  queue.querySelector(
+                    ".codex-ui-composer-queue[data-interrupted]",
+                  ),
+                ),
+                labels: Array.from(
+                  queue.querySelectorAll("button, summary"),
+                  (element) =>
+                    element.getAttribute("aria-label") ??
+                    element.textContent?.replace(/\s+/g, " ").trim(),
+                ),
+                rect: rect(queue),
+                rowCount: queue.querySelectorAll(
+                  ".codex-ui-composer-queue__row",
+                ).length,
+                statusText:
+                  queue
+                    .querySelector('[role="status"]')
+                    ?.textContent?.replace(/\s+/g, " ").trim() ?? null,
+              }
+            : null,
+          queueCount: root.getAttribute("data-queue-count"),
+          stopCount: composer.querySelectorAll(
+            'button[aria-label="Stop"]',
+          ).length,
+          surface: rect(surface),
+          textarea: {
+            disabled: textarea.disabled,
+            lineCount: textarea.value.split("\n").length,
+            rect: rect(textarea),
+            value: textarea.value,
+          },
+          threadFollowing: root.getAttribute("data-thread-following"),
+        };
+      });
+      contract.conversation = conversation;
+      const expectsContext = ![
+        "composer-running",
+        "composer-queued",
+        "composer-queue-paused",
+      ].includes(scene.id);
+      if (
+        (expectsContext
+          ? conversation.dock.hasContext !== "true" ||
+            conversation.context?.role !== "toolbar" ||
+            conversation.context.controls.length !== 3 ||
+            JSON.stringify(
+              conversation.context.controls.map(({ label }) => label),
+            ) !== JSON.stringify(["□codex-ui-kit", "◉Local", "⑂main"]) ||
+            conversation.context.controls.some(
+              ({ height }) => Math.abs(height - 28) > 1,
+            )
+          : conversation.dock.hasContext !== null ||
+            conversation.context !== null) ||
+        conversation.navigation.label !== "User messages" ||
+        conversation.navigation.buttonCount < 10 ||
+        !conversation.dock.rect ||
+        conversation.dock.rect.width < 700 ||
+        conversation.dock.rect.width > 740
+      ) {
+        throw new Error(
+          `${scene.id}: conversation shell contract failed: ${JSON.stringify(conversation)}`,
+        );
+      }
+      if (
+        scene.id === "composer-multiline" &&
+        (conversation.phase !== "multiline" ||
+          conversation.composer.layout !== "multiline" ||
+          conversation.textarea.lineCount !== 3 ||
+          conversation.textarea.rect.height < 60)
+      ) {
+        throw new Error(
+          `${scene.id}: multiline Composer contract failed: ${JSON.stringify(conversation)}`,
+        );
+      }
+      if (
+        (scene.id === "composer-running" ||
+          scene.id === "composer-queued") &&
+        (conversation.stopCount !== 1 ||
+          conversation.composer.disabled ||
+          !["running", "queued"].includes(conversation.phase))
+      ) {
+        throw new Error(
+          `${scene.id}: running Composer contract failed: ${JSON.stringify(conversation)}`,
+        );
+      }
+      if (
+        scene.id === "composer-queued" &&
+        (!conversation.queue ||
+          conversation.dock.hasQueue !== "true" ||
+          conversation.queue.backgroundColor !==
+            conversation.composer.backgroundColor ||
+          conversation.queue.rowCount !== 1 ||
+          conversation.queueCount !== "1" ||
+          !conversation.queue.labels.includes("Steer") ||
+          !conversation.queue.labels.includes("Delete queued prompt") ||
+          !conversation.queue.labels.includes("Queued prompt actions") ||
+          Math.abs(
+            conversation.queue.rect.left -
+              conversation.surface.left -
+              13,
+          ) > 1 ||
+          Math.abs(
+            conversation.surface.right -
+              conversation.queue.rect.right -
+              13,
+          ) > 1)
+      ) {
+        throw new Error(
+          `${scene.id}: queued Composer contract failed: ${JSON.stringify(conversation)}`,
+        );
+      }
+      if (
+        scene.id === "composer-queue-paused" &&
+        (!conversation.queue?.interrupted ||
+          conversation.queue.backgroundColor !==
+            conversation.composer.backgroundColor ||
+          conversation.phase !== "queue-paused" ||
+          conversation.stopCount !== 0 ||
+          !conversation.queue.labels.includes("Resume") ||
+          !conversation.queue.labels.includes("Steer") ||
+          !conversation.queue.statusText?.includes(
+            "Queue paused because you interrupted",
+          ))
+      ) {
+        throw new Error(
+          `${scene.id}: paused queue contract failed: ${JSON.stringify(conversation)}`,
+        );
+      }
+      if (
+        scene.id === "composer-disabled" &&
+        (!conversation.composer.disabled ||
+          conversation.composer.busy !== "true" ||
+          !conversation.textarea.disabled ||
+          conversation.phase !== "submitting")
+      ) {
+        throw new Error(
+          `${scene.id}: disabled Composer contract failed: ${JSON.stringify(conversation)}`,
+        );
+      }
+      if (
+        scene.id === "composer-attachment" &&
+        (conversation.attachmentCount !== 1 ||
+          conversation.phase !== "attachment" ||
+          conversation.composer.layout !== "multiline")
+      ) {
+        throw new Error(
+          `${scene.id}: attachment Composer contract failed: ${JSON.stringify(conversation)}`,
+        );
+      }
+      if (
+        scene.id === "thread-scroll-away" &&
+        (conversation.threadFollowing !== "false" ||
+          !conversation.floating.show ||
+          conversation.floating.hidden !== "false")
+      ) {
+        throw new Error(
+          `${scene.id}: scroll-away recovery contract failed: ${JSON.stringify(conversation)}`,
+        );
+      }
+      if (
+        scene.id === "thread-windowed" &&
+        (conversation.placeholder.count !== 1 ||
+          Number(conversation.placeholder.hiddenEntryCount) <= 0 ||
+          conversation.messageCount >=
+            conversation.navigation.buttonCount * 2)
+      ) {
+        throw new Error(
+          `${scene.id}: virtualized window contract failed: ${JSON.stringify(conversation)}`,
+        );
+      }
+    }
     if (
       contract.header.bottom > contract.viewport.bottom ||
       contract.composer.top < contract.header.bottom ||
@@ -1010,21 +1277,23 @@ for (const scene of visualScenes) {
       }
     }
 
-    const expectedFocus = scene.surfaces?.includes("reviewPanel")
-      ? contract.review.firstDiffLabel
-      : "Message composer";
-    if (!expectedFocus) {
-      throw new Error(`${scene.id}: expected focus target is missing.`);
-    }
-    const focusTarget = scene.surfaces?.includes("reviewPanel")
-      ? page.getByRole("list", { name: expectedFocus })
-      : page.getByRole("textbox", { name: expectedFocus });
-    await focusTarget.click();
-    const focusContract = await page.evaluate(
-      () => document.activeElement?.getAttribute("aria-label"),
-    );
-    if (focusContract !== expectedFocus) {
-      throw new Error(`${scene.id}: named focus contract failed.`);
+    if (scene.id !== "composer-disabled") {
+      const expectedFocus = scene.surfaces?.includes("reviewPanel")
+        ? contract.review.firstDiffLabel
+        : "Message composer";
+      if (!expectedFocus) {
+        throw new Error(`${scene.id}: expected focus target is missing.`);
+      }
+      const focusTarget = scene.surfaces?.includes("reviewPanel")
+        ? page.getByRole("list", { name: expectedFocus })
+        : page.getByRole("textbox", { name: expectedFocus });
+      await focusTarget.click();
+      const focusContract = await page.evaluate(
+        () => document.activeElement?.getAttribute("aria-label"),
+      );
+      if (focusContract !== expectedFocus) {
+        throw new Error(`${scene.id}: named focus contract failed.`);
+      }
     }
 
     if (scene.selectPath) {
@@ -1704,6 +1973,621 @@ try {
   );
 } finally {
   await responsiveContinuityApp.close();
+}
+
+const conversationLifecycleScene = {
+  frame: "conversation-thread-ready",
+  id: "conversation-lifecycle-interaction",
+  scenario: "conversation-lifecycle",
+};
+const {
+  app: conversationLifecycleApp,
+  page: conversationLifecyclePage,
+} = await launchScene(conversationLifecycleScene, { capture: false });
+try {
+  const composer = conversationLifecyclePage.getByRole("textbox", {
+    name: "Message composer",
+  });
+  await composer.fill("Start the deterministic lifecycle.");
+  await composer.press("Enter");
+  await conversationLifecyclePage.waitForSelector(
+    '.demo-root[data-composer-phase="running"]',
+  );
+
+  await composer.fill("Queue this follow-up while the turn is running.");
+  await composer.press("Enter");
+  await conversationLifecyclePage.waitForSelector(
+    '.demo-root[data-composer-phase="queued"][data-queue-count="1"]',
+  );
+  await conversationLifecyclePage
+    .getByRole("button", { exact: true, name: "Stop" })
+    .click();
+  await conversationLifecyclePage.waitForSelector(
+    '.demo-root[data-composer-phase="queue-paused"]',
+  );
+  const stoppedState = await conversationLifecyclePage.evaluate(() => {
+    const currentTask = [
+      ...document.querySelectorAll(".codex-ui-app-sidebar__item-row"),
+    ].find(
+      (row) =>
+        row.querySelector(".codex-ui-app-sidebar__item-label")?.textContent ===
+        "codex-ui-kit",
+    );
+    return {
+      assistantStatus: document
+        .querySelector('[data-item-id="assistant-11"]')
+        ?.getAttribute("data-status"),
+      currentTaskStatus: currentTask?.getAttribute("data-status"),
+      rootStatus: document
+        .querySelector(".demo-root")
+        ?.getAttribute("data-status"),
+    };
+  });
+  if (
+    stoppedState.assistantStatus !== "completed" ||
+    stoppedState.currentTaskStatus !== "idle" ||
+    stoppedState.rootStatus !== "interrupted"
+  ) {
+    throw new Error(
+      `Conversation stop state diverged: ${JSON.stringify(stoppedState)}`,
+    );
+  }
+  await conversationLifecyclePage.getByRole("button", { name: "Resume" }).click();
+  await conversationLifecyclePage.waitForSelector(
+    '.demo-root[data-composer-phase="queued"][data-status="running"]',
+  );
+  const queuedPromptActions = conversationLifecyclePage.locator(
+    'button[aria-label="Queued prompt actions"]',
+  );
+  await queuedPromptActions.click();
+  await conversationLifecyclePage
+    .getByRole("menuitem", { name: "Turn off queueing" })
+    .click();
+  await conversationLifecyclePage.waitForSelector(
+    '.demo-root[data-queueing-enabled="false"]',
+  );
+  await queuedPromptActions.click();
+  await conversationLifecyclePage
+    .getByRole("button", { name: "Delete queued prompt" })
+    .click();
+  await conversationLifecyclePage.waitForSelector(
+    '.demo-root[data-composer-phase="running"][data-queue-count="0"]',
+  );
+  await composer.fill("Steer this prompt while queueing is disabled.");
+  await composer.press("Enter");
+  await conversationLifecyclePage.waitForFunction(() => {
+    const root = document.querySelector(".demo-root");
+    const textarea = document.querySelector(
+      'textarea[aria-label="Message composer"]',
+    );
+    return (
+      root?.getAttribute("data-composer-phase") === "running" &&
+      root?.getAttribute("data-queue-count") === "0" &&
+      root?.getAttribute("data-queueing-enabled") === "false" &&
+      textarea instanceof HTMLTextAreaElement &&
+      textarea.value === ""
+    );
+  });
+
+  const firstMessageNavigation = conversationLifecyclePage.getByRole(
+    "button",
+    {
+      exact: true,
+      name: "Jump to user message 1",
+    },
+  );
+  await firstMessageNavigation.focus();
+  await conversationLifecyclePage.waitForSelector(
+    ".codex-ui-message-navigation-rail__tooltip",
+  );
+  if (
+    (await conversationLifecyclePage
+      .locator(".codex-ui-message-navigation-rail__tooltip-preview")
+      .count()) !== 0
+  ) {
+    throw new Error("Message navigation duplicated its label as a preview.");
+  }
+  await firstMessageNavigation.click();
+  await conversationLifecyclePage.waitForSelector(
+    '.demo-root[data-thread-following="false"] .codex-ui-thread-floating-button[data-show]',
+  );
+  await conversationLifecyclePage
+    .getByRole("button", { name: "Scroll to bottom" })
+    .click();
+  await conversationLifecyclePage.waitForFunction(() => {
+    const root = document.querySelector(".demo-root");
+    const viewport = document.querySelector(
+      ".codex-ui-conversation-thread-shell__viewport",
+    );
+    return (
+      root?.getAttribute("data-thread-following") === "true" &&
+      viewport instanceof HTMLElement &&
+      viewport.scrollHeight -
+        viewport.clientHeight -
+        viewport.scrollTop <=
+        1
+    );
+  });
+  await conversationLifecyclePage
+    .getByRole("button", {
+      exact: true,
+      name: "Jump to user message 1",
+    })
+    .click();
+  await conversationLifecyclePage.waitForSelector(
+    '.demo-root[data-thread-following="false"]',
+  );
+  await conversationLifecyclePage
+    .locator(".codex-ui-conversation-thread-shell__viewport")
+    .evaluate((viewport) => {
+      viewport.scrollTo = () => undefined;
+    });
+  await conversationLifecyclePage
+    .getByRole("button", { name: "Scroll to bottom" })
+    .click();
+  await conversationLifecyclePage.waitForTimeout(100);
+
+  const interaction = await conversationLifecyclePage.evaluate(() => {
+    const dock = document.querySelector(".codex-ui-composer-dock");
+    const root = document.querySelector(".demo-root");
+    const queue = document.querySelector(".codex-ui-composer-queue");
+    return {
+      composerPhase: root?.getAttribute("data-composer-phase"),
+      dockHasQueue: dock?.hasAttribute("data-has-queue"),
+      navigationCount: document.querySelectorAll(
+        ".codex-ui-message-navigation-rail button",
+      ).length,
+      queueCount: root?.getAttribute("data-queue-count"),
+      queueingEnabled: root?.getAttribute("data-queueing-enabled"),
+      queueRendered: Boolean(queue),
+      stopCount: document.querySelectorAll(
+        '.codex-ui-composer button[aria-label="Stop"]',
+      ).length,
+      threadFollowing: root?.getAttribute("data-thread-following"),
+    };
+  });
+  if (
+    interaction.composerPhase !== "running" ||
+    interaction.dockHasQueue !== false ||
+    interaction.navigationCount !== 11 ||
+    interaction.queueCount !== "0" ||
+    interaction.queueingEnabled !== "false" ||
+    interaction.queueRendered ||
+    interaction.stopCount !== 1 ||
+    interaction.threadFollowing !== "false"
+  ) {
+    throw new Error(
+      `Conversation lifecycle interaction failed: ${JSON.stringify(interaction)}`,
+    );
+  }
+  await writeFile(
+    join(artifactDirectory, "conversation-lifecycle-interaction.json"),
+    `${JSON.stringify(interaction, null, 2)}\n`,
+  );
+  await conversationLifecyclePage.evaluate(() => {
+    const scenarioLabel = [
+      ...document.querySelectorAll(
+        ".codex-ui-app-sidebar__item-label",
+      ),
+    ].find(
+      (label) =>
+        label.textContent?.trim() ===
+        "Conversation and Composer lifecycle",
+    );
+    const scenarioButton = scenarioLabel?.closest(
+      ".codex-ui-app-sidebar__item",
+    );
+    if (!(scenarioButton instanceof HTMLButtonElement)) {
+      throw new Error("Conversation lifecycle scenario button is missing.");
+    }
+    scenarioButton.click();
+  });
+  await conversationLifecyclePage.waitForFunction(() => {
+    const root = document.querySelector(".demo-root");
+    const viewport = document.querySelector(
+      ".codex-ui-conversation-thread-shell__viewport",
+    );
+    if (!(viewport instanceof HTMLElement)) return false;
+    const distance =
+      viewport.scrollHeight - viewport.clientHeight - viewport.scrollTop;
+    return root?.getAttribute("data-thread-following") === "true" &&
+      distance <= 1;
+  });
+  const scenarioResetDistance =
+    await conversationLifecyclePage
+      .locator(".codex-ui-conversation-thread-shell__viewport")
+      .evaluate(
+        (viewport) =>
+          viewport.scrollHeight -
+          viewport.clientHeight -
+          viewport.scrollTop,
+      );
+  if (scenarioResetDistance > 1) {
+    throw new Error(
+      `Scenario selection claimed following before resetting the viewport: ${scenarioResetDistance}`,
+    );
+  }
+} finally {
+  await conversationLifecycleApp.close();
+}
+
+const windowedNavigationScene = {
+  frame: "thread-windowed",
+  id: "windowed-message-navigation-interaction",
+  scenario: "conversation-lifecycle",
+};
+const {
+  app: windowedNavigationApp,
+  page: windowedNavigationPage,
+} = await launchScene(windowedNavigationScene, { capture: false });
+try {
+  await windowedNavigationPage.waitForSelector(
+    '.demo-root[data-windowed-timeline="trimmed"]',
+  );
+  if (
+    (await windowedNavigationPage.locator('[data-item-id="user-01"]').count()) !==
+    0
+  ) {
+    throw new Error("Windowed navigation mounted the hidden target too early.");
+  }
+  await windowedNavigationPage
+    .getByRole("button", {
+      exact: true,
+      name: "Jump to user message 1",
+    })
+    .click();
+  await windowedNavigationPage.waitForSelector(
+    '.demo-root[data-windowed-timeline="expanded"][data-thread-following="false"] [data-item-id="user-01"]',
+  );
+  const materializedNavigation = await windowedNavigationPage.evaluate(() => ({
+    hiddenPlaceholderCount: document.querySelectorAll(
+      ".codex-ui-thread-virtualized-placeholder",
+    ).length,
+    targetCount: document.querySelectorAll('[data-item-id="user-01"]').length,
+    threadFollowing: document
+      .querySelector(".demo-root")
+      ?.getAttribute("data-thread-following"),
+    windowedTimeline: document
+      .querySelector(".demo-root")
+      ?.getAttribute("data-windowed-timeline"),
+  }));
+  if (
+    materializedNavigation.hiddenPlaceholderCount !== 0 ||
+    materializedNavigation.targetCount !== 1 ||
+    materializedNavigation.threadFollowing !== "false" ||
+    materializedNavigation.windowedTimeline !== "expanded"
+  ) {
+    throw new Error(
+      `Windowed message navigation failed: ${JSON.stringify(materializedNavigation)}`,
+    );
+  }
+} finally {
+  await windowedNavigationApp.close();
+}
+
+const pausedSteerScene = {
+  frame: "composer-queue-paused",
+  id: "paused-queue-steer-interaction",
+  scenario: "conversation-lifecycle",
+};
+const {
+  app: pausedSteerApp,
+  page: pausedSteerPage,
+} = await launchScene(pausedSteerScene, { capture: false });
+try {
+  await pausedSteerPage.getByRole("button", { name: "Steer" }).click();
+  await pausedSteerPage.waitForSelector(
+    '.demo-root[data-composer-phase="running"][data-status="running"][data-queue-count="0"] [data-item-id="assistant-11"][data-status="running"]',
+  );
+  const pausedSteerState = await pausedSteerPage.evaluate(() => ({
+    queueRendered: Boolean(
+      document.querySelector(".codex-ui-composer-dock__queue"),
+    ),
+    replayMethod: document
+      .querySelector(".demo-root")
+      ?.getAttribute("data-last-method"),
+  }));
+  if (
+    pausedSteerState.queueRendered ||
+    pausedSteerState.replayMethod !== "item/agentMessage/delta"
+  ) {
+    throw new Error(
+      `Paused queue Steer did not restore the running replay: ${JSON.stringify(pausedSteerState)}`,
+    );
+  }
+} finally {
+  await pausedSteerApp.close();
+}
+
+const pausedDeleteScene = {
+  frame: "composer-queue-paused",
+  id: "paused-queue-delete-interaction",
+  scenario: "conversation-lifecycle",
+};
+const {
+  app: pausedDeleteApp,
+  page: pausedDeletePage,
+} = await launchScene(pausedDeleteScene, { capture: false });
+try {
+  await pausedDeletePage
+    .getByRole("button", { name: "Delete queued prompt" })
+    .click();
+  await pausedDeletePage.waitForFunction(() => {
+    const root = document.querySelector(".demo-root");
+    return (
+      root?.getAttribute("data-composer-phase") === "idle" &&
+      root.getAttribute("data-queue-count") === "0" &&
+      !document.querySelector(".codex-ui-composer-dock__queue") &&
+      document.querySelectorAll(".codex-ui-composer-context button").length ===
+        3
+    );
+  });
+} finally {
+  await pausedDeleteApp.close();
+}
+
+const longQueueScene = {
+  frame: "composer-running",
+  id: "long-queue-menu-interaction",
+  scenario: "conversation-lifecycle",
+};
+const {
+  app: longQueueApp,
+  page: longQueuePage,
+} = await launchScene(longQueueScene, { capture: false });
+try {
+  const longQueueComposer = longQueuePage.getByRole("textbox", {
+    name: "Message composer",
+  });
+  for (let index = 1; index <= 12; index += 1) {
+    await longQueueComposer.fill(`Queued prompt ${index}`);
+    await longQueueComposer.press("Enter");
+  }
+  await longQueuePage.waitForSelector(
+    '.demo-root[data-queue-count="12"] .codex-ui-composer-queue',
+  );
+  const longQueue = longQueuePage.locator(".codex-ui-composer-queue");
+  const lastQueueActions = longQueuePage
+    .getByRole("button", { name: "Queued prompt actions" })
+    .last();
+  await lastQueueActions.click();
+  const longQueueMenu = longQueuePage.getByRole("menu");
+  await longQueueMenu.waitFor({ state: "visible" });
+  const longQueueContract = await longQueuePage.evaluate(() => {
+    const queue = document.querySelector(".codex-ui-composer-queue");
+    const menu = document.querySelector(".codex-ui-composer-queue__menu");
+    if (!(queue instanceof HTMLElement) || !(menu instanceof HTMLElement)) {
+      throw new Error("Long queue or its action menu is missing.");
+    }
+    return {
+      menuPortaled: menu.parentElement === document.body,
+      menuPosition: getComputedStyle(menu).position,
+      overflowY: getComputedStyle(queue).overflowY,
+      queueClientHeight: queue.clientHeight,
+      queueScrollHeight: queue.scrollHeight,
+      queueScrollTop: queue.scrollTop,
+    };
+  });
+  if (
+    !longQueueContract.menuPortaled ||
+    longQueueContract.menuPosition !== "fixed" ||
+    longQueueContract.overflowY !== "auto" ||
+    longQueueContract.queueClientHeight >=
+      longQueueContract.queueScrollHeight ||
+    longQueueContract.queueScrollTop <= 0
+  ) {
+    throw new Error(
+      `Long queue lost its bounded scroll contract: ${JSON.stringify(longQueueContract)}`,
+    );
+  }
+} finally {
+  await longQueueApp.close();
+}
+
+const replayPositionScene = {
+  frame: "conversation-completed",
+  id: "conversation-replay-position-interaction",
+  scenario: "conversation-lifecycle",
+};
+const {
+  app: replayPositionApp,
+  page: replayPositionPage,
+} = await launchScene(replayPositionScene, { capture: false });
+try {
+  const previousReplayEvent = replayPositionPage.getByRole("button", {
+    name: "Previous",
+  });
+  const stopReplay = replayPositionPage.getByRole("button", {
+    exact: true,
+    name: "Stop",
+  });
+  const replayRoot = replayPositionPage.locator(".demo-root");
+  for (let attempt = 0; attempt < 50; attempt += 1) {
+    if ((await replayRoot.getAttribute("data-status")) === "running") {
+      break;
+    }
+    if (await previousReplayEvent.isDisabled()) break;
+    await previousReplayEvent.click();
+  }
+  await replayPositionPage.waitForSelector(
+    '.demo-root[data-composer-phase="running"][data-status="running"]',
+  );
+  if ((await stopReplay.count()) !== 1) {
+    throw new Error(
+      "Composer did not follow the replay into a running protocol position.",
+    );
+  }
+  const replayComposer = replayPositionPage.getByRole("textbox", {
+    name: "Message composer",
+  });
+  await replayComposer.fill("Keep this queued prompt while replaying.");
+  await replayComposer.press("Enter");
+  await replayPositionPage.waitForSelector(
+    '.demo-root[data-composer-phase="queued"][data-queue-count="1"]',
+  );
+  await stopReplay.click();
+  await replayPositionPage.waitForSelector(
+    '.demo-root[data-composer-phase="queue-paused"][data-status="interrupted"]',
+  );
+
+  const replayPosition = replayPositionPage.getByRole("slider", {
+    name: "Protocol event position",
+  });
+  await replayPosition.focus();
+  await replayPosition.press("End");
+  await replayPositionPage.waitForSelector(
+    '.demo-root[data-composer-phase="idle"][data-status="completed"][data-queue-count="0"]',
+  );
+  if (
+    (await stopReplay.count()) !== 0 ||
+    (await replayPositionPage.locator(".codex-ui-composer-queue").count()) !==
+      0
+  ) {
+    throw new Error(
+      "Composer retained running or queued work after replay completion.",
+    );
+  }
+} finally {
+  await replayPositionApp.close();
+}
+
+const disabledReplayScene = {
+  frame: "composer-disabled",
+  id: "disabled-replay-position-interaction",
+  scenario: "conversation-lifecycle",
+};
+const {
+  app: disabledReplayApp,
+  page: disabledReplayPage,
+} = await launchScene(disabledReplayScene, { capture: false });
+try {
+  await disabledReplayPage.waitForSelector(
+    '.demo-root[data-composer-phase="submitting"] textarea:disabled',
+  );
+  const disabledReplayPosition = disabledReplayPage.getByRole("slider", {
+    name: "Protocol event position",
+  });
+  await disabledReplayPosition.focus();
+  await disabledReplayPosition.press("End");
+  await disabledReplayPage.waitForSelector(
+    '.demo-root[data-composer-phase="idle"][data-status="completed"] textarea:not(:disabled)',
+  );
+} finally {
+  await disabledReplayApp.close();
+}
+
+const disabledModeScene = {
+  frame: "composer-disabled",
+  id: "disabled-mode-switch-interaction",
+  scenario: "conversation-lifecycle",
+};
+const {
+  app: disabledModeApp,
+  page: disabledModePage,
+} = await launchScene(disabledModeScene, { capture: false });
+try {
+  await disabledModePage.getByRole("button", { exact: true, name: "Live" }).click();
+  await disabledModePage.waitForSelector('.demo-root[data-mode="live"]');
+  await disabledModePage
+    .getByRole("button", { exact: true, name: "Replay" })
+    .click();
+  await disabledModePage.waitForSelector(
+    '.demo-root[data-mode="replay"][data-composer-phase="idle"] textarea:not(:disabled)',
+  );
+  const disabledModeState = await disabledModePage.evaluate(() => {
+    const root = document.querySelector(".demo-root");
+    const textarea = document.querySelector(
+      'textarea[aria-label="Message composer"]',
+    );
+    return {
+      frame: root?.getAttribute("data-frame"),
+      value:
+        textarea instanceof HTMLTextAreaElement ? textarea.value : null,
+    };
+  });
+  if (
+    disabledModeState.frame === "composer-disabled" ||
+    disabledModeState.value !== ""
+  ) {
+    throw new Error(
+      `Mode switching retained the disabled fixture: ${JSON.stringify(disabledModeState)}`,
+    );
+  }
+} finally {
+  await disabledModeApp.close();
+}
+
+const attachmentSubmitScene = {
+  frame: "composer-attachment",
+  id: "attachment-submit-interaction",
+  scenario: "conversation-lifecycle",
+};
+const {
+  app: attachmentSubmitApp,
+  page: attachmentSubmitPage,
+} = await launchScene(attachmentSubmitScene, { capture: false });
+try {
+  const attachmentSubmitComposer = attachmentSubmitPage.getByRole(
+    "textbox",
+    { name: "Message composer" },
+  );
+  await attachmentSubmitPage.waitForSelector(
+    '.demo-root[data-composer-phase="attachment"] .codex-ui-composer-attachment',
+  );
+  await attachmentSubmitComposer.fill("Use the attached evidence.");
+  await attachmentSubmitComposer.press("Enter");
+  await attachmentSubmitPage.waitForSelector(
+    '.demo-root[data-composer-phase="running"]',
+  );
+  if (
+    (await attachmentSubmitPage
+      .locator(".codex-ui-composer-attachment")
+      .count()) !== 0
+  ) {
+    throw new Error("Successful submission retained the attachment fixture.");
+  }
+} finally {
+  await attachmentSubmitApp.close();
+}
+
+const attachmentNavigationScene = {
+  frame: "composer-attachment",
+  id: "attachment-scenario-navigation-interaction",
+  scenario: "conversation-lifecycle",
+};
+const {
+  app: attachmentNavigationApp,
+  page: attachmentNavigationPage,
+} = await launchScene(attachmentNavigationScene, { capture: false });
+try {
+  await attachmentNavigationPage.waitForSelector(
+    '.demo-root[data-composer-phase="attachment"] .codex-ui-composer-attachment',
+  );
+  await attachmentNavigationPage
+    .locator(".codex-ui-app-sidebar__item", {
+      hasText: "Streaming and retry",
+    })
+    .click();
+  await attachmentNavigationPage.waitForSelector(
+    '.demo-root[data-scenario="streaming-recovery"]',
+  );
+  await attachmentNavigationPage
+    .locator(".codex-ui-app-sidebar__item", {
+      hasText: "Conversation and Composer lifecycle",
+    })
+    .click();
+  await attachmentNavigationPage.waitForSelector(
+    '.demo-root[data-scenario="conversation-lifecycle"][data-composer-phase="idle"]',
+  );
+  if (
+    (await attachmentNavigationPage
+      .locator(".codex-ui-composer-attachment")
+      .count()) !== 0
+  ) {
+    throw new Error("Scenario navigation retained the attachment fixture.");
+  }
+} finally {
+  await attachmentNavigationApp.close();
 }
 
 console.log(`CDP contracts passed for ${visualScenes.length} lifecycle frames.`);

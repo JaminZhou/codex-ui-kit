@@ -335,8 +335,8 @@ textarea {
 .demo-playback {
   position: fixed;
   z-index: 20;
+  top: 58px;
   right: 18px;
-  bottom: 124px;
   display: flex;
   align-items: center;
   gap: 6px;
@@ -587,6 +587,11 @@ textarea {
   font-size: 0.6875rem;
   gap: 0.625rem;
   white-space: nowrap;
+}
+
+.demo-root[data-scenario="conversation-lifecycle"] .demo-composer-actions,
+.demo-root[data-scenario="conversation-lifecycle"] .demo-composer-controls {
+  font-size: 0.8125rem;
 }
 
 .demo-composer-controls button {

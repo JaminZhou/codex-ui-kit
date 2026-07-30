@@ -4,6 +4,7 @@ import {
   forwardRef,
   isValidElement,
   useCallback,
+  useContext,
   useEffect,
   useLayoutEffect,
   useRef,
@@ -16,6 +17,7 @@ import {
   type ReactNode,
 } from "react";
 import { inertWhen } from "../internal/inert.js";
+import { SurfaceBlockedContext } from "../internal/surfaceBlocked.js";
 
 function hasRenderableContent(children: ReactNode): boolean {
   return Children.toArray(children).some((child) => {
@@ -35,6 +37,7 @@ export type ComposerLayout = "auto" | "single-line" | "multiline";
 export interface AgentComposerProps
   extends Omit<FormHTMLAttributes<HTMLFormElement>, "children" | "onSubmit"> {
   actions?: ReactNode;
+  allowSubmitWhileRunning?: boolean;
   attachments?: ReactNode;
   controls?: ReactNode;
   disabled?: boolean;
@@ -62,6 +65,7 @@ export const AgentComposer = forwardRef<
 >(function AgentComposer(
   {
     actions,
+    allowSubmitWhileRunning = false,
     attachments,
     className,
     controls,
@@ -92,6 +96,8 @@ export const AgentComposer = forwardRef<
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
   const formRef = useRef<HTMLFormElement | null>(null);
   const fieldsetRef = useRef<HTMLFieldSetElement | null>(null);
+  const inheritedSurfaceBlocked = useContext(SurfaceBlockedContext);
+  const surfaceBlocked = inheritedSurfaceBlocked || disabled;
   const queueRef = useRef<HTMLDivElement | null>(null);
   const actionsRef = useRef<HTMLDivElement | null>(null);
   const controlsRef = useRef<HTMLDivElement | null>(null);
@@ -111,7 +117,10 @@ export const AgentComposer = forwardRef<
     onKeyDown,
     ...restTextareaProps
   } = textareaProps ?? {};
-  const canSubmit = !disabled && !isRunning && value.trim().length > 0;
+  const canSubmit =
+    !disabled &&
+    (!isRunning || allowSubmitWhileRunning) &&
+    value.trim().length > 0;
   const contentRequiresMultiline =
     hasAttachments || hasRenderedQueue || value.includes("\n");
   const resolvedLayout = contentRequiresMultiline
@@ -296,11 +305,12 @@ export const AgentComposer = forwardRef<
       onClick={handleSurfaceClick}
       onSubmit={handleSubmit}
     >
-      <fieldset
-        className="codex-ui-composer__fieldset"
-        disabled={disabled}
-        ref={fieldsetRef}
-      >
+      <SurfaceBlockedContext.Provider value={surfaceBlocked}>
+        <fieldset
+          className="codex-ui-composer__fieldset"
+          disabled={disabled}
+          ref={fieldsetRef}
+        >
         {showsSuggestions ? (
           <div className="codex-ui-composer__suggestions">{suggestions}</div>
         ) : null}
@@ -409,7 +419,8 @@ export const AgentComposer = forwardRef<
             )}
           </div>
         </div>
-      </fieldset>
+        </fieldset>
+      </SurfaceBlockedContext.Provider>
     </form>
   );
 });

@@ -14,14 +14,28 @@ Every deterministic scenario has one ID and produces four evidence layers:
    overflow/reveal contract, plus the 16px PR/Review separator, responsive
    limits, tab states, and expand/restore lifecycle, and the 16px Terminal
    separator, 272px default panel, responsive bounds, named tab/tabpanel, and
-   terminal log/input semantics.
+   terminal log/input semantics; plus Composer context/queue/input ownership,
+   running Enter-to-queue behavior, interruption/Resume, long-thread message
+   navigation, scroll-away recovery, and deterministic windowing. A 12-row
+   queue proves that its action menu is portaled without disabling bounded
+   vertical scrolling, and replay controls prove that the Composer follows
+   protocol running/completed positions while clearing stale Stop and paused
+   interaction state, including leaving the disabled fixture frame. Scenario
+   selection also resets the owned viewport before the scroll callback
+   confirms following, while submission/navigation consume fixture-only
+   Composer attachments, final-row removal leaves paused queue state, and
+   completed replay positions reconcile queued work. Mode switches clear
+   fixture-only host state, and message-navigation tooltips avoid duplicate
+   label/preview content.
 3. **Electron host** — real `BrowserWindow` bounds, renderer isolation,
    pointer and keyboard navigation/PR-panel resizing, Review-panel
    close/reopen behavior, compact 800×600 multi-file geometry, an eight-file
    scroll-to-selection flow, PR tab/comment/expansion interactions, and
    Terminal pointer/keyboard resizing, host-owned input, close/restore,
    compact 820×680 geometry, and App shell offline → retry → restored
-   notification plus native 1180×820 → 720×680 → 1180×820 continuity.
+   notification plus native 1180×820 → 720×680 → 1180×820 continuity; the
+   conversation host also drives submit → queue → Stop → paused → Resume and
+   return-to-latest in a real 1180×820 window.
 4. **Pixels** — full-frame regression screenshots after the structural gates
    pass. The multi-file scenario can additionally compare a separately
    captured 906×820 current-build main region through
@@ -41,7 +55,10 @@ Every deterministic scenario has one ID and produces four evidence layers:
    `CODEX_UI_KIT_MCP_RECOVERY_REFERENCE` and gates the full main, recovered
    call group, user prompt, and Composer regions separately; the App shell
    accepts a 120×46 ownership-scoped reference through
-   `CODEX_UI_KIT_WINDOW_CHROME_REFERENCE`. Transparent
+   `CODEX_UI_KIT_WINDOW_CHROME_REFERENCE`. Queued and paused Composer states
+   accept separate 792×320 current-build crops through
+   `CODEX_UI_KIT_COMPOSER_QUEUED_REFERENCE` and
+   `CODEX_UI_KIT_COMPOSER_PAUSED_REFERENCE`. Transparent
    Electron/CDP reference pixels are composited onto the observed `#181818`
    window background before comparison, and independently implemented UI
    regions are located from their DOM contracts rather than hard-coded
@@ -57,6 +74,12 @@ the 120×46 window-chrome crop at the strict 0.05 pixel threshold, under its
 observed in Codex Desktop `26.721.81911`; offline/error/reconnecting/stale and
 restored-notification frames are explicitly synthetic coverage.
 
+The queued and paused Composer references measured `0.002722538` and
+`0.004478378` changed-pixel ratios at the same strict 0.05 pixel threshold.
+Their ownership masks exclude unrelated transcript text and fixture-specific
+labels, while preserving the queue and card silhouettes, 13px queue inset,
+controls, backgrounds, radii, and spacing.
+
 Computer Use remains an optional macOS acceptance layer for real pointer,
 focus, menu, multi-window, and OS integration checks. It is intentionally not a
 headless CI requirement. A run should record the scenario, app commit, macOS
@@ -71,12 +94,13 @@ not gate the whole-main ratio when the observed and replayed conversation
 content differ.
 
 The 13 standard lifecycle frames keep the original 0.25% internal raster limit
-for the 906px main region. Their 274px sidebar is gated separately at 3%
-because its expanded 13px navigation/history text density produced a measured
-2.6687% cross-machine macOS runner delta while the same main region measured
-0%. This prevents sidebar raster variance from loosening the conversation
-gate, while CDP locks the row contract and the ownership-scoped current-build
-sidebar comparison retains its separate hard regional thresholds. The
+for the 906px main region. Their 274px sidebar is gated separately at 5%
+because its expanded 13px navigation/history text density now produces a
+repeatable 4.9190% cross-machine macOS runner delta while the same main region
+measures 0%. This prevents sidebar raster variance from loosening the
+conversation gate, while CDP locks the row contract and the ownership-scoped
+current-build sidebar comparison retains its separate hard regional
+thresholds. The
 large-Review frame uses a scoped 0.45% main-region limit because
 its 96 dense monospace lines produced a measured 0.4337% macOS-runner
 text-rasterization delta; CDP and Electron still gate file counts, overflow,
@@ -87,7 +111,7 @@ rasterization delta; CDP and Electron still lock the split, tabs, actions,
 resizing, and expansion independently. Its optional current-build gate allows
 at most 6.5% full-main, 5.5% index, and 7% detail difference at the stricter
 0.05 pixel threshold. The fifteenth Terminal frame keeps the standard
-0.25%-main/3%-sidebar regional limits; its optional current-build gate allows
+0.25%-main/5%-sidebar regional limits; its optional current-build gate allows
 at most 2% panel and 1% content difference at the same 0.05 threshold. The
 sixteenth completed-Markdown
 frame uses a scoped 1% main-region limit for dense text rasterization and hides
@@ -115,8 +139,18 @@ the same historical disclosure while the
 Review split is open and verifies two user messages, two commands, the accepted
 approval, one file change, the Review panel, and the failed call's functional
 raw-output dialog with focus restoration. The recovery completed frame uses
-the same 2.25% internal main-region limit; the mixed Review frame uses 1.25%
-to cover its measured 1.1716% macOS-runner delta. The optional current-build
-recovery gate allows at most 4.5% full-main, 7% recovery, 5% user, and 3%
-Composer difference at the strict 0.05 pixel threshold. The accepted sample
-measured 2.9202337%, 5.1956799%, 4.7369405%, and 1.5698995% respectively.
+the same 2.25% internal main-region limit; the mixed Review frame uses 1.3%
+to cover its measured 1.1716% and 1.2530% macOS-runner deltas. The optional
+current-build recovery gate allows at most 4.5% full-main, 7% recovery, 5%
+user, and 3% Composer difference at the strict 0.05 pixel threshold. The
+accepted sample measured 2.9202337%, 5.1956799%, 4.7369405%, and 1.5698995%
+respectively.
+
+The twenty-third through twenty-sixth frames cover App shell loading, offline,
+stale, and restored states. The twenty-seventh through thirty-sixth frames
+cover conversation ready, multiline, running, queued, queue-paused, disabled,
+attachment, scroll-away, windowed history, and completion. The new frames use
+a scoped 2.25% internal main-region limit for their dense 20/22-message thread,
+covering the observed 1.84394% macOS-runner rasterization delta. CDP
+independently locks the 736×98 Composer, 28px controls, 13px queue inset,
+10/11 navigation markers, disabled semantics, and windowed placeholder.

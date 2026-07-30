@@ -1,13 +1,139 @@
 import {
+  Children,
+  Fragment,
+  isValidElement,
   useEffect,
   useId,
   useMemo,
   useState,
   type ComponentPropsWithoutRef,
   type DragEvent,
+  type HTMLAttributes,
   type KeyboardEvent,
   type ReactNode,
 } from "react";
+import { Menu, MenuItem } from "./InteractivePrimitives.js";
+
+function hasRenderableNode(children: ReactNode): boolean {
+  return Children.toArray(children).some((child) => {
+    if (typeof child === "string") return child.trim().length > 0;
+    if (
+      isValidElement<QueuedPromptListProps>(child) &&
+      child.type === QueuedPromptList
+    ) {
+      return child.props.items.length > 0;
+    }
+    if (
+      isValidElement<{ children?: ReactNode }>(child) &&
+      child.type === Fragment
+    ) {
+      return hasRenderableNode(child.props.children);
+    }
+    return true;
+  });
+}
+
+export interface ComposerDockProps
+  extends Omit<HTMLAttributes<HTMLDivElement>, "children"> {
+  composer: ReactNode;
+  context?: ReactNode;
+  label?: string;
+  queue?: ReactNode;
+}
+
+export function ComposerDock({
+  className,
+  composer,
+  context,
+  label = "Composer dock",
+  queue,
+  ...props
+}: ComposerDockProps) {
+  const hasContext = hasRenderableNode(context);
+  const hasQueue = hasRenderableNode(queue);
+
+  return (
+    <div
+      aria-label={label}
+      className={["codex-ui-composer-dock", className]
+        .filter(Boolean)
+        .join(" ")}
+      data-has-context={hasContext || undefined}
+      data-has-queue={hasQueue || undefined}
+      role="group"
+      {...props}
+    >
+      {hasContext ? (
+        <div className="codex-ui-composer-dock__context">{context}</div>
+      ) : null}
+      {hasQueue ? (
+        <div className="codex-ui-composer-dock__queue">{queue}</div>
+      ) : null}
+      <div className="codex-ui-composer-dock__surface">{composer}</div>
+    </div>
+  );
+}
+
+export interface ComposerContextBarProps
+  extends Omit<HTMLAttributes<HTMLDivElement>, "children"> {
+  children: ReactNode;
+  label?: string;
+}
+
+export function ComposerContextBar({
+  children,
+  className,
+  label = "Composer context",
+  ...props
+}: ComposerContextBarProps) {
+  return (
+    <div
+      aria-label={label}
+      className={["codex-ui-composer-context", className]
+        .filter(Boolean)
+        .join(" ")}
+      role="toolbar"
+      {...props}
+    >
+      {children}
+    </div>
+  );
+}
+
+export interface ComposerContextControlProps
+  extends ComponentPropsWithoutRef<"button"> {
+  compact?: boolean;
+  icon?: ReactNode;
+}
+
+export function ComposerContextControl({
+  children,
+  className,
+  compact = false,
+  icon,
+  type = "button",
+  ...props
+}: ComposerContextControlProps) {
+  return (
+    <button
+      className={["codex-ui-composer-context__control", className]
+        .filter(Boolean)
+        .join(" ")}
+      data-compact={compact || undefined}
+      type={type}
+      {...props}
+    >
+      {icon ? (
+        <span aria-hidden="true" className="codex-ui-composer-context__icon">
+          {icon}
+        </span>
+      ) : null}
+      {children ? (
+        <span className="codex-ui-composer-context__label">{children}</span>
+      ) : null}
+    </button>
+  );
+}
 
 export interface ComposerMentionOption {
   description?: ReactNode;
@@ -406,25 +532,35 @@ export function QueuedPromptList({
                 </button>
               ) : null}
               {onEdit || onQueueingChange ? (
-                <details className="codex-ui-composer-queue__more">
-                  <summary aria-label="Queued prompt actions">•••</summary>
-                  <div className="codex-ui-composer-queue__menu" role="menu">
-                    {onEdit ? (
-                      <button onClick={() => onEdit(item.id)} role="menuitem" type="button">
-                        Edit prompt
-                      </button>
-                    ) : null}
-                    {onQueueingChange ? (
-                      <button
-                        onClick={() => onQueueingChange(!queueingEnabled)}
-                        role="menuitem"
-                        type="button"
-                      >
-                        Turn {queueingEnabled ? "off" : "on"} queueing
-                      </button>
-                    ) : null}
-                  </div>
-                </details>
+                <Menu
+                  align="end"
+                  className="codex-ui-composer-queue__menu"
+                  side="top"
+                  trigger={
+                    <button
+                      aria-label="Queued prompt actions"
+                      className="codex-ui-composer-queue__more"
+                      type="button"
+                    >
+                      •••
+                    </button>
+                  }
+                >
+                  {onEdit ? (
+                    <MenuItem onSelect={() => onEdit(item.id)}>
+                      Edit prompt
+                    </MenuItem>
+                  ) : null}
+                  {onQueueingChange ? (
+                    <MenuItem
+                      onSelect={() =>
+                        onQueueingChange(!queueingEnabled)
+                      }
+                    >
+                      Turn {queueingEnabled ? "off" : "on"} queueing
+                    </MenuItem>
+                  ) : null}
+                </Menu>
               ) : null}
             </article>
           );

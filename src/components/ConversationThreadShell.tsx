@@ -1,8 +1,11 @@
 import type {
   HTMLAttributes,
   ReactNode,
+  Ref,
+  RefCallback,
 } from "react";
 import {
+  useCallback,
   useLayoutEffect,
   useRef,
 } from "react";
@@ -25,6 +28,7 @@ export interface ConversationThreadShellProps
   threadLabel?: string;
   threadProps?: Omit<AgentThreadProps, "children" | "width">;
   threadWidth?: AgentThreadWidth;
+  viewportRef?: Ref<HTMLDivElement>;
   viewportProps?: Omit<
     AgentThreadViewportProps,
     "children" | "footer"
@@ -42,12 +46,37 @@ export function ConversationThreadShell({
   threadLabel = "Conversation timeline",
   threadProps,
   threadWidth = "wide",
+  viewportRef: forwardedViewportRef,
   viewportProps,
   ...props
 }: ConversationThreadShellProps) {
   const bodyRef = useRef<HTMLDivElement>(null);
   const composerDockRef = useRef<HTMLDivElement>(null);
   const viewportRef = useRef<HTMLDivElement>(null);
+  const setViewportRef = useCallback(
+    (node: HTMLDivElement | null) => {
+      viewportRef.current = node;
+      if (typeof forwardedViewportRef === "function") {
+        const cleanup = (
+          forwardedViewportRef as RefCallback<HTMLDivElement>
+        )(node);
+        if (typeof cleanup === "function") {
+          return () => {
+            try {
+              cleanup();
+            } finally {
+              if (viewportRef.current === node) {
+                viewportRef.current = null;
+              }
+            }
+          };
+        }
+      } else if (forwardedViewportRef) {
+        forwardedViewportRef.current = node;
+      }
+    },
+    [forwardedViewportRef],
+  );
   const {
     className: threadClassName,
     ...restThreadProps
@@ -134,7 +163,7 @@ export function ConversationThreadShell({
           ]
             .filter(Boolean)
             .join(" ")}
-          ref={viewportRef}
+          ref={setViewportRef}
         >
           <AgentThread
             {...restThreadProps}

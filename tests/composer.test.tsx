@@ -16,12 +16,14 @@ afterEach(() => {
 });
 
 interface ComposerHarnessProps {
+  allowSubmitWhileRunning?: boolean;
   isRunning?: boolean;
   onStop?: () => void;
   onSubmit: (value: string) => void;
 }
 
 function ComposerHarness({
+  allowSubmitWhileRunning = false,
   isRunning = false,
   onStop,
   onSubmit,
@@ -30,6 +32,7 @@ function ComposerHarness({
 
   return (
     <AgentComposer
+      allowSubmitWhileRunning={allowSubmitWhileRunning}
       isRunning={isRunning}
       onStop={onStop}
       onSubmit={onSubmit}
@@ -781,6 +784,31 @@ describe("AgentComposer", () => {
 
     expect(onStop).toHaveBeenCalledOnce();
     expect(onSubmit).not.toHaveBeenCalled();
+  });
+
+  it("can route Enter to a host-owned queue while Stop remains primary", () => {
+    const onStop = vi.fn();
+    const onSubmit = vi.fn();
+    render(
+      <ComposerHarness
+        allowSubmitWhileRunning
+        isRunning
+        onStop={onStop}
+        onSubmit={onSubmit}
+      />,
+    );
+    const textarea = screen.getByRole("textbox", { name: "Message" });
+
+    fireEvent.change(textarea, {
+      target: { value: "Queue this follow-up" },
+    });
+    fireEvent.keyDown(textarea, { key: "Enter" });
+
+    expect(onSubmit).toHaveBeenCalledWith("Queue this follow-up");
+    expect(
+      screen.getByRole("button", { name: "Stop generation" }),
+    ).toBeTruthy();
+    expect(onStop).not.toHaveBeenCalled();
   });
 
   it("renders removable attachment metadata", () => {

@@ -1,4 +1,5 @@
 import compactionTrace from "../fixtures/traces/compaction.jsonl?raw";
+import conversationLifecycleTrace from "../fixtures/traces/conversation-lifecycle.jsonl?raw";
 import backgroundTerminalTrace from "../fixtures/traces/background-terminal.jsonl?raw";
 import interruptionTrace from "../fixtures/traces/interruption.jsonl?raw";
 import largeFileReviewTrace from "../fixtures/traces/large-file-review.jsonl?raw";
@@ -12,6 +13,7 @@ import type { ProtocolEventRecord } from "./protocol-state";
 
 export type ReplayScenarioId =
   | "background-terminal"
+  | "conversation-lifecycle"
   | "streaming-recovery"
   | "interruption"
   | "compaction"
@@ -63,6 +65,12 @@ function scenario(
 }
 
 export const replayScenarios: Record<ReplayScenarioId, ReplayScenario> = {
+  "conversation-lifecycle": scenario(
+    "conversation-lifecycle",
+    "Conversation and Composer lifecycle",
+    "Long-thread navigation, follow recovery, Composer growth, queueing, interruption, and resume.",
+    conversationLifecycleTrace,
+  ),
   "background-terminal": scenario(
     "background-terminal",
     "Background terminal",

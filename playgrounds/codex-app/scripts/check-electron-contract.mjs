@@ -1374,6 +1374,114 @@ try {
   await largeReviewApp.close();
 }
 
+const conversationLifecycleScene = {
+  frame: "conversation-thread-ready",
+  id: "electron-conversation-lifecycle",
+  scenario: "conversation-lifecycle",
+};
+const {
+  app: conversationLifecycleApp,
+  page: conversationLifecyclePage,
+} = await launchScene(conversationLifecycleScene, { capture: false });
+try {
+  const nativeWindow = await conversationLifecycleApp.evaluate(
+    ({ BrowserWindow }) => {
+      const window = BrowserWindow.getAllWindows()[0];
+      return window
+        ? {
+            destroyed: window.isDestroyed(),
+            size: window.getContentSize(),
+            visible: window.isVisible(),
+          }
+        : null;
+    },
+  );
+  if (
+    !nativeWindow ||
+    nativeWindow.destroyed ||
+    JSON.stringify(nativeWindow.size) !== JSON.stringify([1180, 820])
+  ) {
+    throw new Error(
+      `Electron conversation window contract failed: ${JSON.stringify(nativeWindow)}`,
+    );
+  }
+
+  const composer = conversationLifecyclePage.getByRole("textbox", {
+    name: "Message composer",
+  });
+  await composer.fill("Start the Electron lifecycle.");
+  await composer.press("Enter");
+  await conversationLifecyclePage.waitForSelector(
+    '.demo-root[data-composer-phase="running"]',
+  );
+  await composer.fill("Queue the Electron follow-up.");
+  await composer.press("Enter");
+  await conversationLifecyclePage.waitForSelector(
+    '.demo-root[data-composer-phase="queued"][data-queue-count="1"]',
+  );
+  await conversationLifecyclePage
+    .getByRole("button", { exact: true, name: "Stop" })
+    .click();
+  await conversationLifecyclePage.waitForSelector(
+    '.demo-root[data-composer-phase="queue-paused"]',
+  );
+  await conversationLifecyclePage.getByRole("button", { name: "Resume" }).click();
+  await conversationLifecyclePage.waitForSelector(
+    '.demo-root[data-composer-phase="queued"][data-status="running"]',
+  );
+
+  await conversationLifecyclePage
+    .getByRole("button", {
+      exact: true,
+      name: "Jump to user message 1",
+    })
+    .click();
+  await conversationLifecyclePage.waitForSelector(
+    ".codex-ui-thread-floating-button[data-show]",
+  );
+  await conversationLifecyclePage
+    .getByRole("button", { name: "Scroll to bottom" })
+    .click();
+  await conversationLifecyclePage.waitForSelector(
+    '.demo-root[data-thread-following="true"]',
+  );
+
+  const lifecycle = await conversationLifecyclePage.evaluate(() => ({
+    contextControls: document.querySelectorAll(
+      ".codex-ui-composer-context button",
+    ).length,
+    navigationButtons: document.querySelectorAll(
+      ".codex-ui-message-navigation-rail button",
+    ).length,
+    queueRows: document.querySelectorAll(
+      ".codex-ui-composer-queue__row",
+    ).length,
+    status: document
+      .querySelector(".demo-root")
+      ?.getAttribute("data-status"),
+    stopButtons: document.querySelectorAll(
+      '.codex-ui-composer button[aria-label="Stop"]',
+    ).length,
+    threadFollowing: document
+      .querySelector(".demo-root")
+      ?.getAttribute("data-thread-following"),
+  }));
+  if (
+    lifecycle.contextControls !== 0 ||
+    lifecycle.navigationButtons !== 11 ||
+    lifecycle.queueRows !== 1 ||
+    lifecycle.status !== "running" ||
+    lifecycle.stopButtons !== 1 ||
+    lifecycle.threadFollowing !== "true"
+  ) {
+    throw new Error(
+      `Electron conversation lifecycle failed: ${JSON.stringify(lifecycle)}`,
+    );
+  }
+} finally {
+  await conversationLifecycleApp.close();
+}
+
 console.log(
-  "Electron host, native-window, default 720px narrow reachability, resizable navigation/Review/Terminal/PR detail, PR tabs and expansion, MCP disclosure/result, multi-file Review, large diff scrolling, and compact geometry contracts passed.",
+  "Electron host, native-window, conversation/Composer lifecycle, default 720px narrow reachability, resizable navigation/Review/Terminal/PR detail, PR tabs and expansion, MCP disclosure/result, multi-file Review, large diff scrolling, and compact geometry contracts passed.",
 );

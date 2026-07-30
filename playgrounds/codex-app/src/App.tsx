@@ -16,6 +16,10 @@ import {
   Button,
   CommandExecution,
   CommandOutput,
+  ComposerAttachment,
+  ComposerContextBar,
+  ComposerContextControl,
+  ComposerDock,
   ConversationThreadShell,
   Dialog,
   FileChangeGroup,
@@ -25,21 +29,28 @@ import {
   PullRequestCheckList,
   PullRequestList,
   PullRequestPanelSummary,
+  QueuedPromptList,
   StatusBanner,
   TerminalSession,
   ThreadContextEvent,
   ThreadHeader,
   ThreadInterruptionSummary,
+  ThreadFloatingButton,
+  ThreadMessageNavigationRail,
   ThreadThinkingPlaceholder,
+  ThreadVirtualizedPlaceholder,
   ToolCallCard,
   TurnDuration,
   WorkspacePanel,
   type TerminalEntry,
   type AppRouteOutletStatus,
+  type QueuedPrompt,
 } from "codex-ui-kit";
 import {
   Fragment,
+  useCallback,
   useEffect,
+  useLayoutEffect,
   useMemo,
   useReducer,
   useRef,
@@ -61,6 +72,7 @@ import { LiveApprovalSubmissionGate } from "./live-approval-submission-gate";
 import {
   isScenarioId,
   replayScenarios,
+  type ReplayScenario,
   type ReplayScenarioId,
 } from "./replay";
 import {
@@ -164,6 +176,100 @@ function replayState(
   return events
     .slice(0, count)
     .reduce(reduceProtocolNotification, initialProtocolState);
+}
+
+const conversationHostFrames = new Set([
+  "composer-attachment",
+  "composer-disabled",
+  "composer-idle",
+  "composer-multiline",
+  "composer-queue-paused",
+  "composer-queued",
+  "composer-running",
+  "thread-scroll-away",
+  "thread-windowed",
+]);
+
+function replayCountForSelection(
+  scenario: ReplayScenario,
+  frame: string | null,
+) {
+  if (frame && scenario.frames[frame]) return scenario.frames[frame];
+  if (scenario.id !== "conversation-lifecycle" || !frame) {
+    return scenario.events.length;
+  }
+  if (!conversationHostFrames.has(frame)) return scenario.events.length;
+  if (frame === "composer-running" || frame === "composer-queued") {
+    return scenario.frames["conversation-running"] ?? scenario.events.length;
+  }
+  return (
+    scenario.frames["conversation-thread-ready"] ?? scenario.events.length
+  );
+}
+
+function initialComposerValue(frame: string | null) {
+  if (frame === "composer-multiline") {
+    return [
+      "Please compare the current runtime evidence,",
+      "the computed Composer geometry,",
+      "and the regional pixel gate.",
+    ].join("\n");
+  }
+  if (frame === "composer-disabled") {
+    return "Starting a deterministic lifecycle turn…";
+  }
+  return "";
+}
+
+function initialQueuedPrompts(frame: string | null): QueuedPrompt[] {
+  if (frame !== "composer-queued" && frame !== "composer-queue-paused") {
+    return [];
+  }
+  return [
+    {
+      id: "queued-lifecycle-1",
+      status: "queued",
+      text: "Verify the queued Composer lifecycle.",
+    },
+  ];
+}
+
+function replayStatusLabel(
+  status: DemoProtocolState["status"],
+  running: boolean,
+  stopped: boolean,
+) {
+  if (running) return "Working";
+  if (stopped) return "Stopped";
+  if (status === "retrying") return "Retrying";
+  if (status === "running") return "Working";
+  if (status === "completed") return "Completed";
+  if (status === "interrupted") return "Stopped";
+  if (status === "failed") return "Failed";
+  return "Ready";
+}
+
+function interruptConversationReplay(
+  state: DemoProtocolState,
+): DemoProtocolState {
+  if (!state.currentTurnId) return state;
+  return reduceProtocolNotification(state, {
+    atMs: state.eventCount,
+    method: "turn/completed",
+    params: {
+      threadId: state.threadId,
+      turn: {
+        completedAt: null,
+        durationMs: null,
+        error: null,
+        id: state.currentTurnId,
+        items: [],
+        itemsView: "full",
+        startedAt: null,
+        status: "interrupted",
+      },
+    },
+  });
 }
 
 function statusLabel(state: DemoProtocolState) {
@@ -303,10 +409,10 @@ export function App() {
     initialSelection.scenarioId,
   );
   const scenario = replayScenarios[scenarioId];
-  const initialCount =
-    initialSelection.frame && scenario.frames[initialSelection.frame]
-      ? scenario.frames[initialSelection.frame]
-      : scenario.events.length;
+  const initialCount = replayCountForSelection(
+    scenario,
+    initialSelection.frame,
+  );
   const [replayCount, setReplayCount] = useState(initialCount);
   const [liveState, dispatchLive] = useReducer(
     reduceProtocolNotification,
@@ -321,7 +427,30 @@ export function App() {
     initialSelection.shellState === "ready" &&
       initialSelection.frame === "shell-restored",
   );
-  const [composerValue, setComposerValue] = useState("");
+  const [composerValue, setComposerValue] = useState(() =>
+    initialComposerValue(initialSelection.frame),
+  );
+  const [queuedPrompts, setQueuedPrompts] = useState<QueuedPrompt[]>(() =>
+    initialQueuedPrompts(initialSelection.frame),
+  );
+  const [queueingEnabled, setQueueingEnabled] = useState(true);
+  const [queueInterrupted, setQueueInterrupted] = useState(
+    initialSelection.frame === "composer-queue-paused",
+  );
+  const [replayComposerSubmitting, setReplayComposerSubmitting] = useState(
+    initialSelection.frame === "composer-disabled",
+  );
+  const [replayComposerStopped, setReplayComposerStopped] = useState(
+    initialSelection.frame === "composer-queue-paused",
+  );
+  const [threadFollowing, setThreadFollowing] = useState(
+    initialSelection.frame !== "thread-scroll-away",
+  );
+  const [activeFrame, setActiveFrame] = useState(initialSelection.frame);
+  const [scenarioSelectionVersion, setScenarioSelectionVersion] =
+    useState(0);
+  const [windowedTimelineExpanded, setWindowedTimelineExpanded] =
+    useState(false);
   const [liveStartPending, setLiveStartPending] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(
     () => initialSelection.capture || !isNarrowDemoWindow(),
@@ -361,6 +490,13 @@ export function App() {
   );
   const [liveError, setLiveError] = useState<string | null>(null);
   const liveStartPendingRef = useRef(false);
+  const queuedPromptCounterRef = useRef(1);
+  const replaySubmitTimerRef = useRef<number | null>(null);
+  const pendingMessageNavigationRef = useRef<{
+    behavior: "instant" | "smooth";
+    id: string;
+  } | null>(null);
+  const threadViewportRef = useRef<HTMLDivElement>(null);
   const liveApprovalSubmissionGateRef = useRef(
     new LiveApprovalSubmissionGate(),
   );
@@ -368,7 +504,18 @@ export function App() {
     () => replayState(scenario.events, replayCount),
     [replayCount, scenario.events],
   );
-  const state = mode === "live" ? liveState : replay;
+  const isConversationLifecycle =
+    mode === "replay" && scenarioId === "conversation-lifecycle";
+  const lifecycleReplay = useMemo(
+    () =>
+      isConversationLifecycle && replayComposerStopped
+        ? interruptConversationReplay(replay)
+        : replay,
+    [isConversationLifecycle, replay, replayComposerStopped],
+  );
+  const state = mode === "live" ? liveState : lifecycleReplay;
+  const replayComposerRunning =
+    isConversationLifecycle && state.status === "running";
 
   useEffect(() => {
     if (!window.codexDemo) return;
@@ -400,15 +547,53 @@ export function App() {
     );
   }, [liveState.approvals]);
 
+  useEffect(
+    () => () => {
+      if (replaySubmitTimerRef.current !== null) {
+        window.clearTimeout(replaySubmitTimerRef.current);
+      }
+    },
+    [],
+  );
+
+  const cancelReplaySubmitTimer = () => {
+    if (replaySubmitTimerRef.current === null) return;
+    window.clearTimeout(replaySubmitTimerRef.current);
+    replaySubmitTimerRef.current = null;
+  };
+
+  const selectReplayPosition = (nextCount: number) => {
+    cancelReplaySubmitTimer();
+    setActiveFrame(null);
+    setReplayComposerSubmitting(false);
+    setReplayComposerStopped(false);
+    setQueueInterrupted(false);
+    if (!isTurnActive(replayState(scenario.events, nextCount).status)) {
+      setQueuedPrompts([]);
+    }
+    setReplayCount(nextCount);
+  };
+
   const dismissSidebarAfterNavigation = () => {
     if (isNarrowDemoWindow()) setSidebarOpen(false);
   };
 
   const selectScenario = (nextId: ReplayScenarioId) => {
+    cancelReplaySubmitTimer();
     setView("conversation");
     setMode("replay");
     setScenarioId(nextId);
     setReplayCount(replayScenarios[nextId].events.length);
+    setComposerValue("");
+    setQueuedPrompts([]);
+    setQueueingEnabled(true);
+    setQueueInterrupted(false);
+    setReplayComposerSubmitting(false);
+    setReplayComposerStopped(false);
+    setActiveFrame(null);
+    setScenarioSelectionVersion((version) => version + 1);
+    setWindowedTimelineExpanded(false);
+    pendingMessageNavigationRef.current = null;
     setReviewOpen(false);
     setReviewSelection(null);
     setTerminalOpen(nextId === "background-terminal");
@@ -420,6 +605,19 @@ export function App() {
     setLiveError(null);
     setShellNotificationVisible(false);
     dismissSidebarAfterNavigation();
+  };
+
+  const selectMode = (nextMode: "live" | "replay") => {
+    cancelReplaySubmitTimer();
+    setView("conversation");
+    setMode(nextMode);
+    setActiveFrame(null);
+    setComposerValue("");
+    setQueuedPrompts([]);
+    setQueueingEnabled(true);
+    setQueueInterrupted(false);
+    setReplayComposerSubmitting(false);
+    setReplayComposerStopped(false);
   };
 
   const respondToApproval = async (
@@ -480,6 +678,159 @@ export function App() {
         });
     }
   };
+
+  const restoreConversationRunningReplay = () => {
+    setReplayComposerStopped(false);
+    setQueueInterrupted(false);
+    setReplayCount(
+      replayScenarios["conversation-lifecycle"].frames[
+        "conversation-running"
+      ] ?? replayScenarios["conversation-lifecycle"].events.length,
+    );
+  };
+
+  const submitComposer = (prompt: string) => {
+    if (!isConversationLifecycle) {
+      void submitLive(prompt);
+      return;
+    }
+    setActiveFrame(null);
+    if (replayComposerRunning) {
+      if (queueingEnabled) {
+        queuedPromptCounterRef.current += 1;
+        setQueuedPrompts((items) => [
+          ...items,
+          {
+            id: `queued-lifecycle-${queuedPromptCounterRef.current}`,
+            text: prompt,
+          },
+        ]);
+        setComposerValue("");
+      } else {
+        restoreConversationRunningReplay();
+        setComposerValue("");
+      }
+      return;
+    }
+    cancelReplaySubmitTimer();
+    setReplayComposerSubmitting(true);
+    setReplayComposerStopped(false);
+    setQueueInterrupted(false);
+    replaySubmitTimerRef.current = window.setTimeout(() => {
+      replaySubmitTimerRef.current = null;
+      setReplayCount(
+        replayScenarios["conversation-lifecycle"].frames[
+          "conversation-running"
+        ] ?? replayScenarios["conversation-lifecycle"].events.length,
+      );
+      setReplayComposerSubmitting(false);
+      setComposerValue((current) => (current === prompt ? "" : current));
+    }, 160);
+  };
+
+  const stopComposer = () => {
+    if (!isConversationLifecycle) {
+      void stopLive();
+      return;
+    }
+    cancelReplaySubmitTimer();
+    setReplayComposerSubmitting(false);
+    setReplayComposerStopped(true);
+    if (queuedPrompts.length > 0) {
+      setQueueInterrupted(true);
+    }
+  };
+
+  const resumeQueue = () => {
+    restoreConversationRunningReplay();
+    setQueuedPrompts((items) =>
+      items.map((item) => ({ ...item, status: "queued" })),
+    );
+  };
+
+  const removeQueuedPrompt = (id: string) => {
+    const nextItems = queuedPrompts.filter((item) => item.id !== id);
+    setQueuedPrompts(nextItems);
+    if (nextItems.length === 0) {
+      setQueueInterrupted(false);
+    }
+  };
+
+  const deleteQueuedPrompt = removeQueuedPrompt;
+
+  const editQueuedPrompt = (id: string) => {
+    const item = queuedPrompts.find((candidate) => candidate.id === id);
+    if (item && typeof item.text === "string") setComposerValue(item.text);
+    removeQueuedPrompt(id);
+  };
+
+  const sendQueuedPromptNow = (id: string) => {
+    deleteQueuedPrompt(id);
+    restoreConversationRunningReplay();
+  };
+
+  const reorderQueuedPrompts = (activeId: string, overId: string) => {
+    setQueuedPrompts((items) => {
+      const activeIndex = items.findIndex(({ id }) => id === activeId);
+      const overIndex = items.findIndex(({ id }) => id === overId);
+      if (activeIndex < 0 || overIndex < 0) return items;
+      const next = [...items];
+      const [active] = next.splice(activeIndex, 1);
+      if (!active) return items;
+      next.splice(overIndex, 0, active);
+      return next;
+    });
+  };
+
+  const returnToLatest = useCallback(() => {
+    const viewport = threadViewportRef.current;
+    if (!viewport) return;
+    viewport.scrollTo({
+      behavior: "smooth",
+      top: viewport.scrollHeight,
+    });
+  }, []);
+
+  useLayoutEffect(() => {
+    if (scenarioSelectionVersion === 0) return;
+    const viewport = threadViewportRef.current;
+    if (!viewport) return;
+    let resetFrame = 0;
+    const layoutFrame = window.requestAnimationFrame(() => {
+      resetFrame = window.requestAnimationFrame(() => {
+        viewport.scrollTop = viewport.scrollHeight;
+        viewport.dispatchEvent(new Event("scroll", { bubbles: true }));
+      });
+    });
+    return () => {
+      window.cancelAnimationFrame(layoutFrame);
+      window.cancelAnimationFrame(resetFrame);
+    };
+  }, [scenarioSelectionVersion]);
+
+  const scrollToMessage = useCallback(
+    (id: string, behavior: "instant" | "smooth") => {
+      const viewport = threadViewportRef.current;
+      const target = viewport
+        ? [...viewport.querySelectorAll<HTMLElement>("[data-item-id]")].find(
+            (candidate) => candidate.dataset.itemId === id,
+          )
+        : undefined;
+      if (!target) return false;
+      viewport?.dispatchEvent(new Event("pointerdown"));
+      target.scrollIntoView({ behavior, block: "center" });
+      return true;
+    },
+    [],
+  );
+
+  useEffect(() => {
+    if (!windowedTimelineExpanded) return;
+    const pendingNavigation = pendingMessageNavigationRef.current;
+    if (!pendingNavigation) return;
+    pendingMessageNavigationRef.current = null;
+    scrollToMessage(pendingNavigation.id, pendingNavigation.behavior);
+  }, [scrollToMessage, windowedTimelineExpanded]);
 
   const lastEvent = scenario.events[Math.max(0, replayCount - 1)];
   const sidebar = (
@@ -674,8 +1025,7 @@ export function App() {
           disabled={!window.codexDemo}
           leading={<SidebarGlyph name="plugins" />}
           onClick={() => {
-            setView("conversation");
-            setMode("live");
+            selectMode("live");
             dismissSidebarAfterNavigation();
           }}
           selected={view === "conversation" && mode === "live"}
@@ -686,12 +1036,42 @@ export function App() {
     </AppSidebar>
   );
 
+  const composerIsRunning =
+    mode === "live"
+      ? isTurnActive(liveState.status)
+      : isConversationLifecycle && replayComposerRunning;
+  const composerIsDisabled =
+    liveStartPending ||
+    (isConversationLifecycle && replayComposerSubmitting);
+  const displayedStatus =
+    isConversationLifecycle && replayComposerStopped
+      ? "interrupted"
+      : composerIsRunning
+        ? "running"
+        : state.status;
+  const composerPhase = composerIsDisabled
+    ? "submitting"
+    : composerIsRunning
+      ? queuedPrompts.length > 0
+        ? "queued"
+        : "running"
+      : queueInterrupted
+        ? "queue-paused"
+        : activeFrame === "composer-attachment"
+          ? "attachment"
+          : composerValue.includes("\n")
+            ? "multiline"
+            : "idle";
   const header = (
     <ThreadHeader
       endActions={
         <div className="demo-header-actions">
-          <span className="demo-status" data-status={state.status}>
-            {statusLabel(state)}
+          <span className="demo-status" data-status={displayedStatus}>
+            {replayStatusLabel(
+              state.status,
+              composerIsRunning,
+              isConversationLifecycle && replayComposerStopped,
+            )}
           </span>
           {scenarioId === "background-terminal" ? (
             <Button
@@ -705,7 +1085,7 @@ export function App() {
             </Button>
           ) : null}
           <Button
-            onClick={() => setMode(mode === "replay" ? "live" : "replay")}
+            onClick={() => selectMode(mode === "replay" ? "live" : "replay")}
             size="small"
             tone="ghost"
           >
@@ -738,45 +1118,100 @@ export function App() {
       scenarioId === "markdown" ||
       scenarioId === "mcp-tool-call" ||
       scenarioId === "mcp-recovery-mixed-thread");
-  const composer = (
+  const showLifecycleComposer = isConversationLifecycle;
+  const composerSurface = (
     <AgentComposer
       actions={
-        showMeasuredComposer ? (
+        showMeasuredComposer || showLifecycleComposer ? (
           <span className="demo-composer-controls">
-            <button aria-label="Add context" type="button">
+            <button aria-label="Add files and more" type="button">
               +
             </button>
-            <span>◉ Approve for me</span>
+            <button aria-label="Change permissions" type="button">
+              ◉ Approve for me
+            </button>
           </span>
         ) : undefined
       }
-      aria-busy={liveStartPending || undefined}
+      allowSubmitWhileRunning={showLifecycleComposer}
+      aria-busy={composerIsDisabled || undefined}
+      attachments={
+        showLifecycleComposer &&
+        activeFrame === "composer-attachment" ? (
+          <ComposerAttachment
+            kind="file"
+            label="current-build-composer-notes.md"
+            layout="card"
+            meta="Markdown · 4 KB"
+            onOpen={() => undefined}
+            onRemove={() => setActiveFrame(null)}
+          />
+        ) : undefined
+      }
       controls={
-        showMeasuredComposer ? (
+        showMeasuredComposer || showLifecycleComposer ? (
           <span className="demo-composer-actions">
             <span>5.6 Sol Extra High⌄</span>
-            <button aria-label="Voice input" type="button">
+            <button aria-label="Dictate" type="button">
               ♫
             </button>
           </span>
         ) : undefined
       }
-      disabled={liveStartPending}
-      isRunning={isTurnActive(liveState.status)}
-      layout={showMeasuredComposer ? "multiline" : "auto"}
-      onStop={stopLive}
-      onSubmit={submitLive}
+      disabled={composerIsDisabled}
+      isRunning={composerIsRunning}
+      layout={
+        showMeasuredComposer || showLifecycleComposer
+          ? "multiline"
+          : "auto"
+      }
+      onStop={stopComposer}
+      onSubmit={submitComposer}
       onValueChange={setComposerValue}
       placeholder={
-        showMeasuredComposer
+        showMeasuredComposer || showLifecycleComposer
           ? "Do anything"
           : mode === "live"
           ? "Ask Codex to inspect this repository…"
           : "Switch to Live to send a real local turn…"
       }
+      stopLabel="Stop"
       textareaLabel="Message composer"
       value={composerValue}
     />
+  );
+  const composer = showLifecycleComposer ? (
+    <ComposerDock
+      composer={composerSurface}
+      context={
+        !composerIsRunning && !queueInterrupted ? (
+          <ComposerContextBar>
+            <ComposerContextControl icon="□">
+              codex-ui-kit
+            </ComposerContextControl>
+            <ComposerContextControl icon="◉">Local</ComposerContextControl>
+            <ComposerContextControl icon="⑂">main</ComposerContextControl>
+          </ComposerContextBar>
+        ) : undefined
+      }
+      queue={
+        queuedPrompts.length > 0 ? (
+          <QueuedPromptList
+            interrupted={queueInterrupted}
+            items={queuedPrompts}
+            onDelete={deleteQueuedPrompt}
+            onEdit={editQueuedPrompt}
+            onQueueingChange={setQueueingEnabled}
+            onReorder={reorderQueuedPrompts}
+            onResume={resumeQueue}
+            onSendNow={sendQueuedPromptNow}
+            queueingEnabled={queueingEnabled}
+          />
+        ) : undefined
+      }
+    />
+  ) : (
+    composerSurface
   );
 
   const resolvedReview = resolveReviewSelection(
@@ -1144,7 +1579,25 @@ export function App() {
       {shellRouteContent}
     </AppRouteOutlet>
   );
-  const timelineContent = state.timeline.map((entry, entryIndex) => {
+  const messageNavigationItems = state.messages
+    .filter(({ role }) => role === "user")
+    .map((message) => ({
+      id: message.id,
+      label: message.text,
+    }));
+  const windowedTimeline =
+    isConversationLifecycle &&
+    activeFrame === "thread-windowed" &&
+    !windowedTimelineExpanded;
+  const indexedTimeline = state.timeline.map((entry, entryIndex) => ({
+    entry,
+    entryIndex,
+  }));
+  const hiddenTimelineEntryCount = windowedTimeline
+    ? Math.max(0, indexedTimeline.length - 8)
+    : 0;
+  const visibleTimeline = indexedTimeline.slice(hiddenTimelineEntryCount);
+  const timelineContent = visibleTimeline.map(({ entry, entryIndex }) => {
     if (entry.kind === "message") {
       const message = state.messages.find(({ id }) => id === entry.id);
       if (!message) return null;
@@ -1261,12 +1714,12 @@ export function App() {
       const groupStatus = mcpToolCallGroupStatus(calls);
       const captureOpen =
         initialSelection.capture &&
-        (initialSelection.frame === "mcp-running" ||
-          initialSelection.frame === "mcp-progress" ||
-          initialSelection.frame === "mcp-tool-calls" ||
-          initialSelection.frame === "mcp-recovery-failed" ||
-          initialSelection.frame === "mcp-recovery-retrying" ||
-          initialSelection.frame === "mcp-recovery-completed");
+        (activeFrame === "mcp-running" ||
+          activeFrame === "mcp-progress" ||
+          activeFrame === "mcp-tool-calls" ||
+          activeFrame === "mcp-recovery-failed" ||
+          activeFrame === "mcp-recovery-retrying" ||
+          activeFrame === "mcp-recovery-completed");
       const durationMs = mcpToolCallGroupDurationMs(state, calls);
       return (
         <ActivityTimeline
@@ -1326,8 +1779,8 @@ export function App() {
                   open={
                     initialSelection.capture &&
                     call.id === "mcp-fetch-invalid" &&
-                    (initialSelection.frame === "mcp-recovery-failed" ||
-                      initialSelection.frame === "mcp-recovery-completed")
+                    (activeFrame === "mcp-recovery-failed" ||
+                      activeFrame === "mcp-recovery-completed")
                       ? true
                       : undefined
                   }
@@ -1391,7 +1844,7 @@ export function App() {
           key={`command:${command.id}`}
           open={
             initialSelection.capture
-              ? initialSelection.frame === "command-running" &&
+              ? activeFrame === "command-running" &&
                 command.status === "running"
               : undefined
           }
@@ -1654,17 +2107,58 @@ export function App() {
       tabsLabel="Terminal tabs"
     />
   );
+  const messageNavigation = isConversationLifecycle ? (
+    <ThreadMessageNavigationRail
+      items={messageNavigationItems}
+      minItems={10}
+      onNavigate={(item, behavior) => {
+        if (scrollToMessage(item.id, behavior)) return;
+        if (windowedTimeline) {
+          pendingMessageNavigationRef.current = {
+            behavior,
+            id: item.id,
+          };
+          setWindowedTimelineExpanded(true);
+        }
+      }}
+    />
+  ) : undefined;
+  const floatingControl = isConversationLifecycle ? (
+    <ThreadFloatingButton
+      onClick={returnToLatest}
+      show={!threadFollowing}
+      working={composerIsRunning}
+    />
+  ) : undefined;
 
   return (
     <div
       className="demo-root"
       data-capture={initialSelection.capture || undefined}
-      data-frame={initialSelection.frame ?? lastEvent?.frame ?? "final"}
+      data-frame={activeFrame ?? lastEvent?.frame ?? "final"}
       data-layout={initialSelection.layoutMode}
       data-last-method={state.lastMethod ?? undefined}
       data-mode={mode}
+      data-composer-phase={isConversationLifecycle ? composerPhase : undefined}
+      data-queue-count={
+        isConversationLifecycle ? queuedPrompts.length : undefined
+      }
+      data-queueing-enabled={
+        isConversationLifecycle ? queueingEnabled : undefined
+      }
       data-scenario={scenarioId}
-      data-status={state.status}
+      data-status={displayedStatus}
+      data-thread-following={
+        isConversationLifecycle ? threadFollowing : undefined
+      }
+      data-windowed-timeline={
+        isConversationLifecycle &&
+        activeFrame === "thread-windowed"
+          ? windowedTimeline
+            ? "trimmed"
+            : "expanded"
+          : undefined
+      }
       data-shell-state={view === "shell" ? shellState : undefined}
       data-view={view}
     >
@@ -1751,16 +2245,31 @@ export function App() {
           <>
             <ConversationThreadShell
               composer={composer}
+              floatingControl={floatingControl}
               header={header}
               label="Codex client demo conversation"
+              messageNavigation={messageNavigation}
               threadWidth="wide"
-              viewportProps={{ followKey: state.eventCount }}
+              viewportProps={{
+                defaultFollowing:
+                  activeFrame !== "thread-scroll-away",
+                followKey: state.eventCount,
+                onFollowingChange: setThreadFollowing,
+              }}
+              viewportRef={threadViewportRef}
             >
               <AgentTurn aria-label="Protocol-backed conversation">
                 {liveError ? (
                   <StatusBanner heading="Live connection failed" tone="error">
                     {liveError}
                   </StatusBanner>
+                ) : null}
+
+                {hiddenTimelineEntryCount > 0 ? (
+                  <ThreadVirtualizedPlaceholder
+                    data-hidden-entry-count={hiddenTimelineEntryCount}
+                    estimatedHeight={`${hiddenTimelineEntryCount * 3.5}rem`}
+                  />
                 ) : null}
 
                 {timelineContent}
@@ -1795,7 +2304,7 @@ export function App() {
                 <Button
                   disabled={replayCount <= 1}
                   onClick={() =>
-                    setReplayCount((count) => Math.max(1, count - 1))
+                    selectReplayPosition(Math.max(1, replayCount - 1))
                   }
                   size="small"
                   tone="ghost"
@@ -1807,7 +2316,7 @@ export function App() {
                   max={scenario.events.length}
                   min={1}
                   onChange={(event) =>
-                    setReplayCount(Number(event.target.value))
+                    selectReplayPosition(Number(event.target.value))
                   }
                   type="range"
                   value={replayCount}
@@ -1815,8 +2324,8 @@ export function App() {
                 <Button
                   disabled={replayCount >= scenario.events.length}
                   onClick={() =>
-                    setReplayCount((count) =>
-                      Math.min(scenario.events.length, count + 1),
+                    selectReplayPosition(
+                      Math.min(scenario.events.length, replayCount + 1),
                     )
                   }
                   size="small"
@@ -1848,10 +2357,4 @@ export function App() {
       </Dialog>
     </div>
   );
-}
-
-interface ReplayScenario {
-  description: string;
-  id: ReplayScenarioId;
-  label: string;
 }

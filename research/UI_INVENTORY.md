@@ -57,15 +57,17 @@ observation from a previous build remains historical evidence.
 - Fresh current-build Renderer capture: recorded for the dark 1180×820 main
   application target, the six left-sidebar groups, 46px window navigation,
   Pull requests loading/selection continuity, and a real OpenAI Developer Docs
-  failed-Fetch → Search → successful-Fetch recovery; light-theme, global
-  notifications, and unrelated surface evidence remain pending
+  failed-Fetch → Search → successful-Fetch recovery, plus real
+  Composer submit/Stop, queue/pause/Resume, permissions, and add-menu states;
+  light-theme, global notifications, current-build long-thread
+  virtualization, and unrelated surface evidence remain pending
 
-Current inventory: 73 surface groups; 11 have current-build runtime evidence,
-42 have previous-build-only runtime evidence, 20 remain `not_sampled`, and 0
-are `blocked_by_policy`. Current-build Browser verification covers 11 groups
-and Electron verification covers 11. Prior acceptance outside the sampled
-shell, sidebar, and recovered MCP slices remains recorded as `partial_legacy`
-until current-build re-observation.
+Current inventory: 73 surface groups; 17 have current-build runtime evidence,
+37 have previous-build-only runtime evidence, 19 remain `not_sampled`, and 0
+are `blocked_by_policy`. Current-build Browser verification covers 14 groups
+and Electron verification covers 14. Prior acceptance outside the sampled
+shell, sidebar, recovered MCP, and Composer lifecycle slices remains recorded
+as `partial_legacy` until current-build re-observation.
 
 The current package exposes candidates far beyond the old transcript sample:
 application and thread shells, local/remote conversation routes, projects and
@@ -167,7 +169,7 @@ default route and is not claimed as persistence.
 The public `AppWindowChrome`, `AppRouteOutlet`, and `AppNotificationRegion`
 contracts cover host-owned navigation, ready/loading/empty/error/offline/
 reconnecting/stale outlet states, and portalled global feedback. Browser CDP
-passes 26 lifecycle frames. Real Electron acceptance drives offline → retry →
+passes the shared 36-frame matrix. Real Electron acceptance drives offline → retry →
 loading → ready → restored notification and the native 1180×820 → 720×680 →
 1180×820 responsive transition while preserving the selected route and
 restoring only auto-collapsed surfaces. Four deterministic App shell pixel
@@ -257,6 +259,49 @@ running reply and 28px `Stop` control. It locks 14/22px running text, the
 omits only the workspace-owned Environment control from the thread-owned
 comparison; the remaining full raster and header/message/Composer regions
 stay independently bounded.
+
+The current conversation/Composer slice re-observes build `26.721.81911` in a
+disposable second process using synthetic prompts only. At 1180×820, the main
+region remains 906px wide and the Composer column is 736px. The current
+Composer uses a 712×44 empty/focused input inside a 736×98 card, grows to an
+80px input and 134px card for three/four lines, exposes a 28×28 Stop control
+while a real turn runs, clears the submitted value, and retains/restores input
+focus after completion or interruption.
+
+A real running turn also accepted a queued follow-up. Its tray is inset 13px
+from the Composer card and exposes Steer, Delete queued prompt, and queued
+message actions. Stop retained the row while adding `Queue paused because you
+interrupted` and Resume; resuming restored the running state. The current
+permissions menu measured 454.38×224.5 and exposed Ask for approval, Approve
+for me, Full access, Custom (`config.toml`), and Learn more. The Add files and
+more menu exposed Goal, Plan mode, Record a skill, and Plugins. Opening that
+menu is current-build evidence; no upload was performed, so attachment
+transport remains P1-partial.
+
+The independent public contract adds `ComposerDock`,
+`ComposerContextBar`, and `ComposerContextControl`, keeps context, queue, and
+input ownership separate, and lets a running `AgentComposer` route Enter to a
+host-owned queue while Stop remains the primary control. The 46-event
+conversation replay contains 11 turns and covers multiline, disabled,
+attachment, running, queued, queue-paused, completed, scroll-away,
+message-navigation, and windowed-history frames. CDP drives
+submit → running → queue → Stop → paused → Resume → delete, then message
+navigation and return-to-latest. Real Electron repeats the lifecycle in an
+1180×820 `BrowserWindow`; ten reviewed internal pixels guard its deterministic
+states.
+
+Optional 792×320 current-build references are accepted through
+`CODEX_UI_KIT_COMPOSER_QUEUED_REFERENCE` and
+`CODEX_UI_KIT_COMPOSER_PAUSED_REFERENCE`. At the strict 0.05 pixel threshold,
+the accepted ownership-masked changed-pixel ratios are `0.002722538` and
+`0.004478378`. This promotes `composer.shell`, `composer.queue`, and
+`thread.interruption-stop` to current-build Browser/Electron verification.
+Project/worktree controls and permission modes retain current runtime evidence
+but remain partial because their full menus and persistence are not exercised
+independently. Message navigation and windowing now have strong independent
+Browser/Electron regression coverage, but stay `partial_legacy` because the
+current build's exact long-thread virtualization algorithm was not
+re-observed.
 
 Three more `26.721.41059` scenarios cover an expanded read-only command, a
 pending command approval, and an applied file card with the Review panel open.

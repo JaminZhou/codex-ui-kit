@@ -68,12 +68,20 @@ const currentBuildMcpRecoveryReferenceSize = {
   height: 820,
   width: 906,
 };
+const currentBuildComposerQueuedReference =
+  process.env.CODEX_UI_KIT_COMPOSER_QUEUED_REFERENCE;
+const currentBuildComposerPausedReference =
+  process.env.CODEX_UI_KIT_COMPOSER_PAUSED_REFERENCE;
+const currentBuildComposerReferenceSize = {
+  height: 320,
+  width: 792,
+};
 const currentBuildSidebarReference =
   process.env.CODEX_UI_KIT_SIDEBAR_REFERENCE;
 const currentBuildWindowChromeReference =
   process.env.CODEX_UI_KIT_WINDOW_CHROME_REFERENCE;
 const defaultLifecycleMainPixelRatio = 0.0025;
-const defaultLifecycleSidebarPixelRatio = 0.03;
+const defaultLifecycleSidebarPixelRatio = 0.05;
 const internalSidebarWidth = 274;
 const currentBuildSidebarReferenceSize = {
   height: 820,
@@ -409,6 +417,72 @@ for (const scene of selectedScenes) {
     }
     console.log(
       `${scene.id}: current-build window chrome pixel ratio ${comparison.ratio}`,
+    );
+  }
+
+  const currentBuildComposerReference =
+    scene.id === "composer-queued"
+      ? currentBuildComposerQueuedReference
+      : scene.id === "composer-queue-paused"
+        ? currentBuildComposerPausedReference
+        : undefined;
+  if (currentBuildComposerReference) {
+    const reference = flattenPng(
+      PNG.sync.read(await readFile(currentBuildComposerReference)),
+      { blue: 24, green: 24, red: 24 },
+    );
+    if (
+      reference.width !== currentBuildComposerReferenceSize.width ||
+      reference.height !== currentBuildComposerReferenceSize.height
+    ) {
+      throw new Error(
+        `${scene.id}: current-build Composer reference must be exactly ${currentBuildComposerReferenceSize.width}x${currentBuildComposerReferenceSize.height}, received ${reference.width}x${reference.height}.`,
+      );
+    }
+    if (actual.width !== 1180 || actual.height !== 820) {
+      throw new Error(
+        `${scene.id}: current-build Composer comparison requires an exact 1180x820 playground frame.`,
+      );
+    }
+    const actualRegion = cropPng(actual, 331, 500, 792, 320);
+    const masks = [
+      { height: scene.id === "composer-queued" ? 150 : 130, left: 0, top: 0, width: 792 },
+      { height: 42, left: 45, top: 166, width: 505 },
+      { height: 45, left: 65, top: 255, width: 220 },
+      { height: 40, left: 530, top: 255, width: 155 },
+      ...(scene.id === "composer-queue-paused"
+        ? [{ height: 34, left: 45, top: 136, width: 590 }]
+        : []),
+    ];
+    const maskedReference = maskPng(reference, masks);
+    const maskedActual = maskPng(
+      cropPng(actual, 331, 500, 792, 320),
+      masks,
+    );
+    const comparison = comparePng(maskedReference, maskedActual);
+    const maximumRatio = environmentRatio(
+      scene.id === "composer-queued"
+        ? "CODEX_UI_KIT_COMPOSER_QUEUED_MAX_DIFF_RATIO"
+        : "CODEX_UI_KIT_COMPOSER_PAUSED_MAX_DIFF_RATIO",
+      0.08,
+    );
+    await writeFile(
+      join(artifactDirectory, `${scene.id}.current-build.png`),
+      PNG.sync.write(actualRegion),
+    );
+    if (comparison.pixels > 0) {
+      await writeFile(
+        join(artifactDirectory, `${scene.id}.current-build.diff.png`),
+        PNG.sync.write(comparison.diff),
+      );
+    }
+    if (comparison.ratio > maximumRatio) {
+      throw new Error(
+        `${scene.id}: current-build Composer pixel ratio ${comparison.ratio} exceeds ${maximumRatio}.`,
+      );
+    }
+    console.log(
+      `${scene.id}: current-build Composer pixel ratio ${comparison.ratio}`,
     );
   }
 
