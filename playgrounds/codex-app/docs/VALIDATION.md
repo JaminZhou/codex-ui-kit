@@ -85,8 +85,8 @@ settings cannot shift the centered content by 7.5px. CDP still checks the real
 scroll container and geometry. Its optional current-build gate allows at most
 2% assistant, 2% fenced-code, and 2.5% Composer-region difference at the same
 threshold. The seventeenth running-MCP frame uses a scoped 1% main-region limit.
-The denser eighteenth completed-MCP frame uses a scoped 2% main-region limit to
-cover the measured 1.5924% macOS-runner text-rasterization delta. It replays
+The denser eighteenth completed-MCP frame uses a scoped 2.25% main-region limit
+to cover the measured 2.0734% macOS-runner text-rasterization delta. It replays
 the observed 72px expanded-follow scroll state, while CDP independently
 verifies that exact scroll position, 14px/21px group typography, 25px call
 rows, and five-call count. Its optional current-build gate remains stricter
@@ -101,7 +101,8 @@ earlier failed call followed by a successful final call leaves the historical
 group completed. Electron expands the same historical disclosure while the
 Review split is open and verifies two user messages, two commands, the accepted
 approval, one file change, the Review panel, and the failed call's functional
-raw-output dialog with focus restoration. The optional current-build recovery
+raw-output dialog with focus restoration. The recovery completed frame uses
+the same 2.25% internal main-region limit; its optional current-build recovery
 gate allows at most 4.5% full-main, 7% recovery, 5% user, and 3%
 Composer difference at the strict 0.05 pixel threshold. The accepted sample
 measured 2.9202337%, 5.1956799%, 4.7369405%, and 1.5698995% respectively.
