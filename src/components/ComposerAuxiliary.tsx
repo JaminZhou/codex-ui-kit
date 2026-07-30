@@ -18,6 +18,12 @@ function hasRenderableNode(children: ReactNode): boolean {
   return Children.toArray(children).some((child) => {
     if (typeof child === "string") return child.trim().length > 0;
     if (
+      isValidElement<QueuedPromptListProps>(child) &&
+      child.type === QueuedPromptList
+    ) {
+      return child.props.items.length > 0;
+    }
+    if (
       isValidElement<{ children?: ReactNode }>(child) &&
       child.type === Fragment
     ) {

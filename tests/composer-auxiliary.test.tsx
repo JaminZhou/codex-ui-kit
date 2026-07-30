@@ -12,6 +12,7 @@ import {
   ComposerModeIndicator,
   QueuedPromptList,
 } from "../src";
+import { SurfaceBlockedContext } from "../src/internal/surfaceBlocked";
 
 afterEach(cleanup);
 
@@ -55,6 +56,17 @@ describe("composer auxiliary surfaces", () => {
     );
     expect(dock.hasAttribute("data-has-context")).toBe(false);
     expect(dock.hasAttribute("data-has-queue")).toBe(false);
+
+    rerender(
+      <ComposerDock
+        composer={<div>Input surface</div>}
+        queue={<QueuedPromptList items={[]} />}
+      />,
+    );
+    expect(dock.hasAttribute("data-has-queue")).toBe(false);
+    expect(
+      container.querySelector(".codex-ui-composer-dock__queue"),
+    ).toBeNull();
   });
 
   it("models attachment layouts, upload states, opening, and removal", () => {
@@ -295,6 +307,31 @@ describe("composer auxiliary surfaces", () => {
     );
     expect(screen.queryByRole("menu")).toBeNull();
     fireEvent.click(trigger);
+    expect(screen.queryByRole("menu")).toBeNull();
+    expect(onEdit).not.toHaveBeenCalled();
+  });
+
+  it("preserves inherited blocking for portaled Composer descendants", () => {
+    const onEdit = vi.fn();
+    render(
+      <SurfaceBlockedContext.Provider value>
+        <AgentComposer
+          onSubmit={() => undefined}
+          onValueChange={() => undefined}
+          queue={
+            <QueuedPromptList
+              items={[{ id: "one", text: "Run checks" }]}
+              onEdit={onEdit}
+            />
+          }
+          value=""
+        />
+      </SurfaceBlockedContext.Provider>,
+    );
+
+    fireEvent.click(
+      screen.getByRole("button", { name: "Queued prompt actions" }),
+    );
     expect(screen.queryByRole("menu")).toBeNull();
     expect(onEdit).not.toHaveBeenCalled();
   });

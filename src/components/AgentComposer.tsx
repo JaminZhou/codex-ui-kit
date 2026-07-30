@@ -4,6 +4,7 @@ import {
   forwardRef,
   isValidElement,
   useCallback,
+  useContext,
   useEffect,
   useLayoutEffect,
   useRef,
@@ -95,6 +96,8 @@ export const AgentComposer = forwardRef<
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
   const formRef = useRef<HTMLFormElement | null>(null);
   const fieldsetRef = useRef<HTMLFieldSetElement | null>(null);
+  const inheritedSurfaceBlocked = useContext(SurfaceBlockedContext);
+  const surfaceBlocked = inheritedSurfaceBlocked || disabled;
   const queueRef = useRef<HTMLDivElement | null>(null);
   const actionsRef = useRef<HTMLDivElement | null>(null);
   const controlsRef = useRef<HTMLDivElement | null>(null);
@@ -302,7 +305,7 @@ export const AgentComposer = forwardRef<
       onClick={handleSurfaceClick}
       onSubmit={handleSubmit}
     >
-      <SurfaceBlockedContext.Provider value={disabled}>
+      <SurfaceBlockedContext.Provider value={surfaceBlocked}>
         <fieldset
           className="codex-ui-composer__fieldset"
           disabled={disabled}
