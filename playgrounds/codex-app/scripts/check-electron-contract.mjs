@@ -1754,6 +1754,22 @@ try {
       "Electron coding workspace did not reach command execution.",
     );
   }
+  const workspaceCommandCwds = await codingWorkspacePage
+    .locator(
+      '[data-testid="command-execution"] .codex-ui-command-execution__shell',
+    )
+    .evaluateAll((elements) =>
+      elements.map((element) => element.getAttribute("title")),
+    );
+  if (
+    workspaceCommandCwds.some(
+      (cwd) => cwd !== "cwd\n/workspace/codex-app-server-client",
+    )
+  ) {
+    throw new Error(
+      `Electron coding workspace did not route commands through the selected project: ${JSON.stringify(workspaceCommandCwds)}.`,
+    );
+  }
   await codingWorkspacePage
     .getByTestId("approval-request")
     .getByRole("button", { name: "Allow once" })

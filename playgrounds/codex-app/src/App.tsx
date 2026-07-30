@@ -89,6 +89,10 @@ import {
   type ReviewSelection,
 } from "./review-selection";
 import {
+  contextualizeWorkspaceReplay,
+  workspaceExecutionCwd,
+} from "./workspace-replay";
+import {
   hasMcpToolCallGroupForTurn,
   mcpToolCallGroupDurationMs,
   mcpToolCallGroupForEntry,
@@ -419,30 +423,35 @@ const workspaceProjects = [
     icon: <SidebarGlyph name="folder" />,
     id: "codex-ui-kit",
     label: "codex-ui-kit",
+    path: "/workspace/codex-ui-kit",
     status: "available" as const,
   },
   {
     icon: <SidebarGlyph name="folder" />,
     id: "app-server-client",
     label: "codex-app-server-client",
+    path: "/workspace/codex-app-server-client",
     status: "available" as const,
   },
   {
     icon: <SidebarGlyph name="folder" />,
     id: "desktop-shell",
     label: "desktop-shell",
+    path: "/workspace/desktop-shell",
     status: "available" as const,
   },
   {
     icon: <SidebarGlyph name="folder" />,
     id: "tooling",
     label: "tooling",
+    path: "/workspace/tooling",
     status: "available" as const,
   },
   {
     icon: <SidebarGlyph name="folder" />,
     id: "unavailable",
     label: "archived-workspace",
+    path: "/workspace/archived-workspace",
     status: "unavailable" as const,
     statusLabel: "Unavailable",
   },
@@ -565,6 +574,9 @@ export function App() {
       decision: "approved" | "rejected";
       requestId: number | string;
     } | null>(null);
+  const [workspaceRunCwd, setWorkspaceRunCwd] = useState(
+    "/workspace/codex-ui-kit",
+  );
   const [threadFollowing, setThreadFollowing] = useState(
     initialSelection.frame !== "thread-scroll-away",
   );
@@ -624,9 +636,16 @@ export function App() {
   const liveApprovalSubmissionGateRef = useRef(
     new LiveApprovalSubmissionGate(),
   );
+  const scenarioEvents = useMemo(
+    () =>
+      scenario.id === "workspace-workflow"
+        ? contextualizeWorkspaceReplay(scenario.events, workspaceRunCwd)
+        : scenario.events,
+    [scenario, workspaceRunCwd],
+  );
   const replay = useMemo(
-    () => replayState(scenario.events, replayCount),
-    [replayCount, scenario.events],
+    () => replayState(scenarioEvents, replayCount),
+    [replayCount, scenarioEvents],
   );
   const isConversationLifecycle =
     mode === "replay" && scenarioId === "conversation-lifecycle";
@@ -709,7 +728,7 @@ export function App() {
     setReplayComposerStopped(false);
     setReplayApprovalResolution(null);
     setQueueInterrupted(false);
-    if (!isTurnActive(replayState(scenario.events, nextCount).status)) {
+    if (!isTurnActive(replayState(scenarioEvents, nextCount).status)) {
       setQueuedPrompts([]);
     }
     setReplayCount(nextCount);
@@ -1437,6 +1456,12 @@ export function App() {
     workspaceEnvironmentGroups[0].items.find(
       ({ id }) => id === workspaceWorktreeId,
     ) ?? workspaceEnvironmentGroups[0].items[0];
+  const currentWorkspaceCwd = workspaceExecutionCwd({
+    environmentId: workspaceEnvironmentId,
+    projectPath: workspaceProject?.path,
+    worktreeBranch: workspaceWorktree.branch,
+    worktreeId: workspaceWorktreeId,
+  });
   const filteredWorkspaceProjects = workspaceProjects.filter(({ label }) =>
     label
       .toLocaleLowerCase()
@@ -1747,9 +1772,10 @@ export function App() {
         </span>
       }
       layout="multiline"
-      onSubmit={() =>
+      onSubmit={() => {
+        setWorkspaceRunCwd(currentWorkspaceCwd);
         selectScenario("workspace-workflow", "approval-pending")
-      }
+      }}
       onValueChange={setComposerValue}
       placeholder="Do anything"
       textareaLabel="Workspace message composer"
@@ -2693,7 +2719,7 @@ export function App() {
                       {
                         id: `${terminalHistoryKey}:local:${entries.length}:command`,
                         kind: "command",
-                        text: `/workspace/codex-ui-kit % ${command}`,
+                        text: `${terminalCommand?.cwd ?? workspaceRunCwd} % ${command}`,
                       },
                       {
                         id: `${terminalHistoryKey}:local:${entries.length}:system`,
