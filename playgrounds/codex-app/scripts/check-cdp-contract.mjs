@@ -2075,9 +2075,20 @@ try {
   await conversationLifecyclePage
     .getByRole("button", { name: "Scroll to bottom" })
     .click();
-  await conversationLifecyclePage.waitForSelector(
-    '.demo-root[data-thread-following="true"]',
-  );
+  await conversationLifecyclePage.waitForFunction(() => {
+    const root = document.querySelector(".demo-root");
+    const viewport = document.querySelector(
+      ".codex-ui-conversation-thread-shell__viewport",
+    );
+    return (
+      root?.getAttribute("data-thread-following") === "true" &&
+      viewport instanceof HTMLElement &&
+      viewport.scrollHeight -
+        viewport.clientHeight -
+        viewport.scrollTop <=
+        1
+    );
+  });
   await conversationLifecyclePage
     .getByRole("button", {
       exact: true,
@@ -2134,6 +2145,49 @@ try {
     join(artifactDirectory, "conversation-lifecycle-interaction.json"),
     `${JSON.stringify(interaction, null, 2)}\n`,
   );
+  await conversationLifecyclePage.evaluate(() => {
+    const scenarioLabel = [
+      ...document.querySelectorAll(
+        ".codex-ui-app-sidebar__item-label",
+      ),
+    ].find(
+      (label) =>
+        label.textContent?.trim() ===
+        "Conversation and Composer lifecycle",
+    );
+    const scenarioButton = scenarioLabel?.closest(
+      ".codex-ui-app-sidebar__item",
+    );
+    if (!(scenarioButton instanceof HTMLButtonElement)) {
+      throw new Error("Conversation lifecycle scenario button is missing.");
+    }
+    scenarioButton.click();
+  });
+  await conversationLifecyclePage.waitForFunction(() => {
+    const root = document.querySelector(".demo-root");
+    const viewport = document.querySelector(
+      ".codex-ui-conversation-thread-shell__viewport",
+    );
+    if (!(viewport instanceof HTMLElement)) return false;
+    const distance =
+      viewport.scrollHeight - viewport.clientHeight - viewport.scrollTop;
+    return root?.getAttribute("data-thread-following") === "true" &&
+      distance <= 1;
+  });
+  const scenarioResetDistance =
+    await conversationLifecyclePage
+      .locator(".codex-ui-conversation-thread-shell__viewport")
+      .evaluate(
+        (viewport) =>
+          viewport.scrollHeight -
+          viewport.clientHeight -
+          viewport.scrollTop,
+      );
+  if (scenarioResetDistance > 1) {
+    throw new Error(
+      `Scenario selection claimed following before resetting the viewport: ${scenarioResetDistance}`,
+    );
+  }
 } finally {
   await conversationLifecycleApp.close();
 }
@@ -2345,6 +2399,31 @@ try {
   }
 } finally {
   await replayPositionApp.close();
+}
+
+const disabledReplayScene = {
+  frame: "composer-disabled",
+  id: "disabled-replay-position-interaction",
+  scenario: "conversation-lifecycle",
+};
+const {
+  app: disabledReplayApp,
+  page: disabledReplayPage,
+} = await launchScene(disabledReplayScene, { capture: false });
+try {
+  await disabledReplayPage.waitForSelector(
+    '.demo-root[data-composer-phase="submitting"] textarea:disabled',
+  );
+  const disabledReplayPosition = disabledReplayPage.getByRole("slider", {
+    name: "Protocol event position",
+  });
+  await disabledReplayPosition.focus();
+  await disabledReplayPosition.press("End");
+  await disabledReplayPage.waitForSelector(
+    '.demo-root[data-composer-phase="idle"][data-status="completed"] textarea:not(:disabled)',
+  );
+} finally {
+  await disabledReplayApp.close();
 }
 
 console.log(`CDP contracts passed for ${visualScenes.length} lifecycle frames.`);

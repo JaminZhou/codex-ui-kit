@@ -50,6 +50,7 @@ import {
   Fragment,
   useCallback,
   useEffect,
+  useLayoutEffect,
   useMemo,
   useReducer,
   useRef,
@@ -445,6 +446,8 @@ export function App() {
   const [threadFollowing, setThreadFollowing] = useState(
     initialSelection.frame !== "thread-scroll-away",
   );
+  const [scenarioSelectionVersion, setScenarioSelectionVersion] =
+    useState(0);
   const [windowedTimelineExpanded, setWindowedTimelineExpanded] =
     useState(false);
   const [liveStartPending, setLiveStartPending] = useState(false);
@@ -582,7 +585,7 @@ export function App() {
     setQueueInterrupted(false);
     setReplayComposerSubmitting(false);
     setReplayComposerStopped(false);
-    setThreadFollowing(true);
+    setScenarioSelectionVersion((version) => version + 1);
     setWindowedTimelineExpanded(false);
     pendingMessageNavigationRef.current = null;
     setReviewOpen(false);
@@ -763,6 +766,23 @@ export function App() {
       top: viewport.scrollHeight,
     });
   }, []);
+
+  useLayoutEffect(() => {
+    if (scenarioSelectionVersion === 0) return;
+    const viewport = threadViewportRef.current;
+    if (!viewport) return;
+    let resetFrame = 0;
+    const layoutFrame = window.requestAnimationFrame(() => {
+      resetFrame = window.requestAnimationFrame(() => {
+        viewport.scrollTop = viewport.scrollHeight;
+        viewport.dispatchEvent(new Event("scroll", { bubbles: true }));
+      });
+    });
+    return () => {
+      window.cancelAnimationFrame(layoutFrame);
+      window.cancelAnimationFrame(resetFrame);
+    };
+  }, [scenarioSelectionVersion]);
 
   const scrollToMessage = useCallback(
     (id: string, behavior: "instant" | "smooth") => {
@@ -999,9 +1019,7 @@ export function App() {
       : isConversationLifecycle && replayComposerRunning;
   const composerIsDisabled =
     liveStartPending ||
-    (isConversationLifecycle &&
-      (replayComposerSubmitting ||
-        initialSelection.frame === "composer-disabled"));
+    (isConversationLifecycle && replayComposerSubmitting);
   const displayedStatus =
     isConversationLifecycle && replayComposerStopped
       ? "interrupted"

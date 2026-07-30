@@ -3,6 +3,7 @@
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import {
+  AgentComposer,
   ComposerAttachment,
   ComposerContextBar,
   ComposerContextControl,
@@ -259,5 +260,42 @@ describe("composer auxiliary surfaces", () => {
   it("renders nothing for an empty queue", () => {
     const { container } = render(<QueuedPromptList items={[]} />);
     expect(container.childElementCount).toBe(0);
+  });
+
+  it("closes a portaled queue menu when its Composer becomes disabled", () => {
+    const onEdit = vi.fn();
+    const queue = (
+      <QueuedPromptList
+        items={[{ id: "one", text: "Run checks" }]}
+        onEdit={onEdit}
+      />
+    );
+    const { rerender } = render(
+      <AgentComposer
+        onSubmit={() => undefined}
+        onValueChange={() => undefined}
+        queue={queue}
+        value=""
+      />,
+    );
+    const trigger = screen.getByRole("button", {
+      name: "Queued prompt actions",
+    });
+    fireEvent.click(trigger);
+    expect(screen.getByRole("menu")).not.toBeNull();
+
+    rerender(
+      <AgentComposer
+        disabled
+        onSubmit={() => undefined}
+        onValueChange={() => undefined}
+        queue={queue}
+        value=""
+      />,
+    );
+    expect(screen.queryByRole("menu")).toBeNull();
+    fireEvent.click(trigger);
+    expect(screen.queryByRole("menu")).toBeNull();
+    expect(onEdit).not.toHaveBeenCalled();
   });
 });

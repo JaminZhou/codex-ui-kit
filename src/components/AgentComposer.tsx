@@ -16,6 +16,7 @@ import {
   type ReactNode,
 } from "react";
 import { inertWhen } from "../internal/inert.js";
+import { SurfaceBlockedContext } from "../internal/surfaceBlocked.js";
 
 function hasRenderableContent(children: ReactNode): boolean {
   return Children.toArray(children).some((child) => {
@@ -301,11 +302,12 @@ export const AgentComposer = forwardRef<
       onClick={handleSurfaceClick}
       onSubmit={handleSubmit}
     >
-      <fieldset
-        className="codex-ui-composer__fieldset"
-        disabled={disabled}
-        ref={fieldsetRef}
-      >
+      <SurfaceBlockedContext.Provider value={disabled}>
+        <fieldset
+          className="codex-ui-composer__fieldset"
+          disabled={disabled}
+          ref={fieldsetRef}
+        >
         {showsSuggestions ? (
           <div className="codex-ui-composer__suggestions">{suggestions}</div>
         ) : null}
@@ -414,7 +416,8 @@ export const AgentComposer = forwardRef<
             )}
           </div>
         </div>
-      </fieldset>
+        </fieldset>
+      </SurfaceBlockedContext.Provider>
     </form>
   );
 });
