@@ -26,6 +26,12 @@ describe("application continuity visual contract", () => {
     expect(styles).toContain("-webkit-app-region: no-drag");
     expect(styles).toContain("height: 1.75rem");
     expect(styles).toContain("border-radius: 0.78125rem");
+    expect(styles).toMatch(
+      /\[data-window-chrome\]\[data-side-panel-open\][\s\S]*?\.codex-ui-app-shell__window-chrome \{[\s\S]*?inset-inline-end: var\(--codex-ui-app-side-panel-width\);/,
+    );
+    expect(styles).toMatch(
+      /@container codex-ui-app-shell \(max-width: 60rem\) \{[\s\S]*?\[data-window-chrome\]\[data-side-panel-open\][\s\S]*?inset-inline-end: 0;/,
+    );
   });
 
   it("keeps route lifecycle and global feedback ownership explicit", () => {

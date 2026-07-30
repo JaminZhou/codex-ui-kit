@@ -167,6 +167,11 @@
   z-index: 40;
 }
 
+.codex-ui-app-shell[data-window-chrome][data-side-panel-open]
+  .codex-ui-app-shell__window-chrome {
+  inset-inline-end: var(--codex-ui-app-side-panel-width);
+}
+
 .codex-ui-app-window-chrome {
   -webkit-app-region: drag;
   align-items: center;
@@ -1386,6 +1391,11 @@
 }
 
 @container codex-ui-app-shell (max-width: 60rem) {
+  .codex-ui-app-shell[data-window-chrome][data-side-panel-open]
+    .codex-ui-app-shell__window-chrome {
+    inset-inline-end: 0;
+  }
+
   .codex-ui-app-shell__layout {
     grid-template-columns:
       var(--codex-ui-app-shell-sidebar-track)

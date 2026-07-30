@@ -20,8 +20,8 @@ describe("application shell visual contract", () => {
   });
 
   it("turns fixed columns into overlays before they can leave the viewport", () => {
-    expect(styles).toContain(
-      "@container codex-ui-app-shell (max-width: 60rem) {\n  .codex-ui-app-shell__layout {",
+    expect(styles).toMatch(
+      /@container codex-ui-app-shell \(max-width: 60rem\) \{[\s\S]*?\.codex-ui-app-shell__layout \{/,
     );
     expect(styles).toContain(
       "@container codex-ui-app-shell (max-width: 45rem) {\n  .codex-ui-app-shell__layout {",

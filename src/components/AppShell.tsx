@@ -1332,7 +1332,7 @@ export function AppShell({
       : mainRef;
 
   useSurfaceFocusRestoration(
-    sidebarOpen,
+    sidebarSurfaceVisible,
     sidebarRef,
     sidebarFocusFallbackRef,
     sidebarBackdropRef,

@@ -366,7 +366,7 @@ describe("application shell", () => {
     ).toBe("335px");
   });
 
-  it("supports current-build narrow edge preview and explicit pinning", () => {
+  it("supports current-build narrow edge preview and explicit pinning", async () => {
     function CurrentBuildNarrowFixture() {
       const [sidebarOpen, setSidebarOpen] = useState(false);
       return (
@@ -403,17 +403,23 @@ describe("application shell", () => {
     expect(sidebar.getAttribute("aria-hidden")).toBe("true");
     expect(main.hasAttribute("inert")).toBe(false);
 
+    const showSidebar = screen.getByRole("button", {
+      name: "Show sidebar",
+    });
+    showSidebar.focus();
     fireEvent.pointerMove(shell, { clientX: 1 });
     expect(shell.hasAttribute("data-sidebar-preview-open")).toBe(true);
     expect(sidebar.getAttribute("aria-hidden")).toBe("false");
     expect(main.hasAttribute("inert")).toBe(false);
     expect((backdrop as HTMLButtonElement).hidden).toBe(true);
+    screen.getByRole("button", { name: "Projects" }).focus();
 
     fireEvent.pointerMove(shell, { clientX: 400 });
     expect(shell.hasAttribute("data-sidebar-preview-open")).toBe(false);
     expect(sidebar.getAttribute("aria-hidden")).toBe("true");
+    await waitFor(() => expect(document.activeElement).toBe(showSidebar));
 
-    fireEvent.click(screen.getByRole("button", { name: "Show sidebar" }));
+    fireEvent.click(showSidebar);
     expect(shell.hasAttribute("data-sidebar-open")).toBe(true);
     expect(sidebar.getAttribute("aria-hidden")).toBe("false");
     expect(main.hasAttribute("inert")).toBe(false);

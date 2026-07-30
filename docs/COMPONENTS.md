@@ -128,13 +128,14 @@ All privileged behavior remains host-owned. The components never auto-approve co
   separator, a preferred 152px minimum (reduced only when the responsive
   half-height cap is smaller), pointer and Arrow/Home/End control, accessible
   values, and controlled or uncontrolled height persistence. `windowChrome`
-  places the application-owned titlebar above the main and right-panel tracks.
+  places the application-owned titlebar above the main track and keeps its
+  trailing actions before a persistent right panel.
   `responsivePanelContinuity` can auto-collapse side surfaces at the measured
   960/720px layout transitions and restore only surfaces that it closed;
   changing `responsivePanelContinuityKey` resets that restoration intent for
   a new route or workspace. `narrowSidebarBehavior="current-build"` separates
   a transient 12px edge preview from explicitly pinning the normal sidebar
-  track.
+  track, and restores focus before that preview becomes inert.
 - `AppSidebar`, `AppSidebarSection`, `AppSidebarItem`, and
   `AppSidebarFooter`: grouped primary navigation with one selected route,
   heading-preserving collapsible collections, lifecycle status, measured
