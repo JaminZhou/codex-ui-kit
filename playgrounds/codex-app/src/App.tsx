@@ -248,6 +248,29 @@ function replayStatusLabel(
   return "Ready";
 }
 
+function interruptConversationReplay(
+  state: DemoProtocolState,
+): DemoProtocolState {
+  if (!state.currentTurnId) return state;
+  return reduceProtocolNotification(state, {
+    atMs: state.eventCount,
+    method: "turn/completed",
+    params: {
+      threadId: state.threadId,
+      turn: {
+        completedAt: null,
+        durationMs: null,
+        error: null,
+        id: state.currentTurnId,
+        items: [],
+        itemsView: "full",
+        startedAt: null,
+        status: "interrupted",
+      },
+    },
+  });
+}
+
 function statusLabel(state: DemoProtocolState) {
   if (state.status === "retrying") return "Retrying";
   if (state.status === "running") return "Working";
@@ -482,9 +505,16 @@ export function App() {
     () => replayState(scenario.events, replayCount),
     [replayCount, scenario.events],
   );
-  const state = mode === "live" ? liveState : replay;
   const isConversationLifecycle =
     mode === "replay" && scenarioId === "conversation-lifecycle";
+  const lifecycleReplay = useMemo(
+    () =>
+      isConversationLifecycle && replayComposerStopped
+        ? interruptConversationReplay(replay)
+        : replay,
+    [isConversationLifecycle, replay, replayComposerStopped],
+  );
+  const state = mode === "live" ? liveState : lifecycleReplay;
 
   useEffect(() => {
     if (!window.codexDemo) return;
@@ -726,7 +756,6 @@ export function App() {
       behavior: "smooth",
       top: viewport.scrollHeight,
     });
-    setThreadFollowing(true);
   }, []);
 
   const scrollToMessage = useCallback(
@@ -738,8 +767,8 @@ export function App() {
           )
         : undefined;
       if (!target) return false;
+      viewport?.dispatchEvent(new Event("pointerdown"));
       target.scrollIntoView({ behavior, block: "center" });
-      setThreadFollowing(false);
       return true;
     },
     [],
@@ -1123,17 +1152,19 @@ export function App() {
         ) : undefined
       }
       queue={
-        <QueuedPromptList
-          interrupted={queueInterrupted}
-          items={queuedPrompts}
-          onDelete={deleteQueuedPrompt}
-          onEdit={editQueuedPrompt}
-          onQueueingChange={setQueueingEnabled}
-          onReorder={reorderQueuedPrompts}
-          onResume={resumeQueue}
-          onSendNow={sendQueuedPromptNow}
-          queueingEnabled={queueingEnabled}
-        />
+        queuedPrompts.length > 0 ? (
+          <QueuedPromptList
+            interrupted={queueInterrupted}
+            items={queuedPrompts}
+            onDelete={deleteQueuedPrompt}
+            onEdit={editQueuedPrompt}
+            onQueueingChange={setQueueingEnabled}
+            onReorder={reorderQueuedPrompts}
+            onResume={resumeQueue}
+            onSendNow={sendQueuedPromptNow}
+            queueingEnabled={queueingEnabled}
+          />
+        ) : undefined
       }
     />
   ) : (

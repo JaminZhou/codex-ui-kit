@@ -1999,6 +1999,33 @@ try {
   await conversationLifecyclePage.waitForSelector(
     '.demo-root[data-composer-phase="queue-paused"]',
   );
+  const stoppedState = await conversationLifecyclePage.evaluate(() => {
+    const currentTask = [
+      ...document.querySelectorAll(".codex-ui-app-sidebar__item-row"),
+    ].find(
+      (row) =>
+        row.querySelector(".codex-ui-app-sidebar__item-label")?.textContent ===
+        "codex-ui-kit",
+    );
+    return {
+      assistantStatus: document
+        .querySelector('[data-item-id="assistant-11"]')
+        ?.getAttribute("data-status"),
+      currentTaskStatus: currentTask?.getAttribute("data-status"),
+      rootStatus: document
+        .querySelector(".demo-root")
+        ?.getAttribute("data-status"),
+    };
+  });
+  if (
+    stoppedState.assistantStatus !== "completed" ||
+    stoppedState.currentTaskStatus !== "idle" ||
+    stoppedState.rootStatus !== "interrupted"
+  ) {
+    throw new Error(
+      `Conversation stop state diverged: ${JSON.stringify(stoppedState)}`,
+    );
+  }
   await conversationLifecyclePage.getByRole("button", { name: "Resume" }).click();
   await conversationLifecyclePage.waitForSelector(
     '.demo-root[data-composer-phase="queued"][data-status="running"]',
@@ -2034,12 +2061,23 @@ try {
   await conversationLifecyclePage.waitForSelector(
     '.demo-root[data-thread-following="false"]',
   );
+  await conversationLifecyclePage
+    .locator(".codex-ui-conversation-thread-shell__viewport")
+    .evaluate((viewport) => {
+      viewport.scrollTo = () => undefined;
+    });
+  await conversationLifecyclePage
+    .getByRole("button", { name: "Scroll to bottom" })
+    .click();
+  await conversationLifecyclePage.waitForTimeout(100);
 
   const interaction = await conversationLifecyclePage.evaluate(() => {
+    const dock = document.querySelector(".codex-ui-composer-dock");
     const root = document.querySelector(".demo-root");
     const queue = document.querySelector(".codex-ui-composer-queue");
     return {
       composerPhase: root?.getAttribute("data-composer-phase"),
+      dockHasQueue: dock?.hasAttribute("data-has-queue"),
       navigationCount: document.querySelectorAll(
         ".codex-ui-message-navigation-rail button",
       ).length,
@@ -2053,6 +2091,7 @@ try {
   });
   if (
     interaction.composerPhase !== "running" ||
+    interaction.dockHasQueue !== false ||
     interaction.navigationCount !== 11 ||
     interaction.queueCount !== "0" ||
     interaction.queueRendered ||
