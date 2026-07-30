@@ -54,6 +54,9 @@ export function AppNotificationRegion({
   const overlayEnvironment = useContext(OverlayEnvironmentContext);
   const [mounted, setMounted] = useState(false);
   const [inferredTheme, setInferredTheme] = useState<string>();
+  const notificationIdentity = JSON.stringify(
+    notifications.map(({ id }) => id),
+  );
   const portalTheme =
     theme ?? overlayEnvironment.theme ?? inferredTheme;
   useEffect(() => setMounted(true), []);
@@ -72,7 +75,7 @@ export function AppNotificationRegion({
         ? activeElement.closest<HTMLElement>("[data-theme]")?.dataset.theme
         : undefined,
     );
-  }, [notifications, overlayEnvironment.theme, theme]);
+  }, [notificationIdentity, overlayEnvironment.theme, theme]);
   if (!mounted || notifications.length === 0) return null;
   const resolvedPortalRoot = portalRoot ?? document.body;
 

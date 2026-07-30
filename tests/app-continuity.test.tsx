@@ -216,6 +216,31 @@ describe("AppNotificationRegion", () => {
         <AppNotificationRegion
           notifications={[
             {
+              description: "No visual replacement occurred.",
+              heading: "Connection restored",
+              id: "restored",
+            },
+          ]}
+        />
+      </div>,
+    );
+    expect(
+      screen
+        .getByRole("region", { name: "Notifications" })
+        .getAttribute("data-theme"),
+    ).toBe("dark");
+
+    rerender(
+      <div>
+        <div data-theme="dark">
+          <button type="button">Show update</button>
+        </div>
+        <div data-theme="light">
+          <button type="button">Show warning</button>
+        </div>
+        <AppNotificationRegion
+          notifications={[
+            {
               heading: "Connection interrupted",
               id: "warning",
             },
@@ -223,7 +248,6 @@ describe("AppNotificationRegion", () => {
         />
       </div>,
     );
-
     await waitFor(() =>
       expect(
         screen
