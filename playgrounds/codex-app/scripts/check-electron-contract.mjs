@@ -1552,6 +1552,12 @@ try {
     );
   }
   await projectTrigger.click();
+  await projectTrigger.focus();
+  await codingWorkspacePage
+    .getByRole("textbox", { name: "Workspace message composer" })
+    .focus();
+  await projectDialog.waitFor({ state: "hidden" });
+  await projectTrigger.click();
   await projectDialog
     .getByRole("button", {
       name: "Don't work in a project",

@@ -1017,6 +1017,13 @@ export function ConversationProjectListbox({
       "focusout",
       handleBoundaryFocusOut,
     );
+    if (
+      dismissBoundary &&
+      trigger &&
+      !dismissBoundary.contains(trigger)
+    ) {
+      trigger.addEventListener("focusout", handleBoundaryFocusOut);
+    }
     dismissBoundary?.addEventListener(
       "keydown",
       handleBoundaryKeyDown,
@@ -1031,6 +1038,16 @@ export function ConversationProjectListbox({
         "focusout",
         handleBoundaryFocusOut,
       );
+      if (
+        dismissBoundary &&
+        trigger &&
+        !dismissBoundary.contains(trigger)
+      ) {
+        trigger.removeEventListener(
+          "focusout",
+          handleBoundaryFocusOut,
+        );
+      }
       dismissBoundary?.removeEventListener(
         "keydown",
         handleBoundaryKeyDown,

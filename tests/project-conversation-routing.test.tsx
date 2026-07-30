@@ -426,6 +426,43 @@ describe("project conversation routing", () => {
     expect(onDismiss).toHaveBeenCalledTimes(1);
   });
 
+  it("dismisses after focus leaves an allowed trigger outside the boundary", () => {
+    const onDismiss = vi.fn();
+    render(
+      <>
+        <button id="observed-project-trigger" type="button">
+          Project
+        </button>
+        <div id="observed-project-dialog">
+          <input aria-label="Search projects" />
+          <ConversationProjectListbox
+            dismissBoundaryId="observed-project-dialog"
+            initialFocus="none"
+            items={[{ id: "ui-kit", label: "UI Kit" }]}
+            onDismiss={onDismiss}
+            onSelect={() => undefined}
+            selectedId="ui-kit"
+            triggerId="observed-project-trigger"
+          />
+        </div>
+        <textarea aria-label="Conversation composer" />
+      </>,
+    );
+
+    const search = screen.getByRole("textbox", {
+      name: "Search projects",
+    });
+    const trigger = screen.getByRole("button", { name: "Project" });
+    const composer = screen.getByRole("textbox", {
+      name: "Conversation composer",
+    });
+    search.focus();
+    trigger.focus();
+    expect(onDismiss).not.toHaveBeenCalled();
+    composer.focus();
+    expect(onDismiss).toHaveBeenCalledTimes(1);
+  });
+
   it("dismisses an explicit boundary with Escape from a sibling control", async () => {
     const onDismiss = vi.fn();
     render(
