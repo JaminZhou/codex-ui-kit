@@ -607,6 +607,19 @@ export function App() {
     dismissSidebarAfterNavigation();
   };
 
+  const selectMode = (nextMode: "live" | "replay") => {
+    cancelReplaySubmitTimer();
+    setView("conversation");
+    setMode(nextMode);
+    setActiveFrame(null);
+    setComposerValue("");
+    setQueuedPrompts([]);
+    setQueueingEnabled(true);
+    setQueueInterrupted(false);
+    setReplayComposerSubmitting(false);
+    setReplayComposerStopped(false);
+  };
+
   const respondToApproval = async (
     requestId: number | string,
     decision: "accept" | "decline",
@@ -1012,8 +1025,7 @@ export function App() {
           disabled={!window.codexDemo}
           leading={<SidebarGlyph name="plugins" />}
           onClick={() => {
-            setView("conversation");
-            setMode("live");
+            selectMode("live");
             dismissSidebarAfterNavigation();
           }}
           selected={view === "conversation" && mode === "live"}
@@ -1073,11 +1085,7 @@ export function App() {
             </Button>
           ) : null}
           <Button
-            onClick={() => {
-              cancelReplaySubmitTimer();
-              setReplayComposerSubmitting(false);
-              setMode(mode === "replay" ? "live" : "replay");
-            }}
+            onClick={() => selectMode(mode === "replay" ? "live" : "replay")}
             size="small"
             tone="ghost"
           >
@@ -1576,7 +1584,6 @@ export function App() {
     .map((message) => ({
       id: message.id,
       label: message.text,
-      preview: message.text,
     }));
   const windowedTimeline =
     isConversationLifecycle &&

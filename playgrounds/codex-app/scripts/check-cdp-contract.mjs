@@ -2069,12 +2069,25 @@ try {
     );
   });
 
-  await conversationLifecyclePage
-    .getByRole("button", {
+  const firstMessageNavigation = conversationLifecyclePage.getByRole(
+    "button",
+    {
       exact: true,
       name: "Jump to user message 1",
-    })
-    .click();
+    },
+  );
+  await firstMessageNavigation.focus();
+  await conversationLifecyclePage.waitForSelector(
+    ".codex-ui-message-navigation-rail__tooltip",
+  );
+  if (
+    (await conversationLifecyclePage
+      .locator(".codex-ui-message-navigation-rail__tooltip-preview")
+      .count()) !== 0
+  ) {
+    throw new Error("Message navigation duplicated its label as a preview.");
+  }
+  await firstMessageNavigation.click();
   await conversationLifecyclePage.waitForSelector(
     '.demo-root[data-thread-following="false"] .codex-ui-thread-floating-button[data-show]',
   );
@@ -2461,6 +2474,47 @@ try {
   );
 } finally {
   await disabledReplayApp.close();
+}
+
+const disabledModeScene = {
+  frame: "composer-disabled",
+  id: "disabled-mode-switch-interaction",
+  scenario: "conversation-lifecycle",
+};
+const {
+  app: disabledModeApp,
+  page: disabledModePage,
+} = await launchScene(disabledModeScene, { capture: false });
+try {
+  await disabledModePage.getByRole("button", { exact: true, name: "Live" }).click();
+  await disabledModePage.waitForSelector('.demo-root[data-mode="live"]');
+  await disabledModePage
+    .getByRole("button", { exact: true, name: "Replay" })
+    .click();
+  await disabledModePage.waitForSelector(
+    '.demo-root[data-mode="replay"][data-composer-phase="idle"] textarea:not(:disabled)',
+  );
+  const disabledModeState = await disabledModePage.evaluate(() => {
+    const root = document.querySelector(".demo-root");
+    const textarea = document.querySelector(
+      'textarea[aria-label="Message composer"]',
+    );
+    return {
+      frame: root?.getAttribute("data-frame"),
+      value:
+        textarea instanceof HTMLTextAreaElement ? textarea.value : null,
+    };
+  });
+  if (
+    disabledModeState.frame === "composer-disabled" ||
+    disabledModeState.value !== ""
+  ) {
+    throw new Error(
+      `Mode switching retained the disabled fixture: ${JSON.stringify(disabledModeState)}`,
+    );
+  }
+} finally {
+  await disabledModeApp.close();
 }
 
 const attachmentSubmitScene = {

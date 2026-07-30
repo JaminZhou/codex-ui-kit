@@ -24,7 +24,9 @@ Every deterministic scenario has one ID and produces four evidence layers:
    selection also resets the owned viewport before the scroll callback
    confirms following, while submission/navigation consume fixture-only
    Composer attachments, final-row removal leaves paused queue state, and
-   completed replay positions reconcile queued work.
+   completed replay positions reconcile queued work. Mode switches clear
+   fixture-only host state, and message-navigation tooltips avoid duplicate
+   label/preview content.
 3. **Electron host** — real `BrowserWindow` bounds, renderer isolation,
    pointer and keyboard navigation/PR-panel resizing, Review-panel
    close/reopen behavior, compact 800×600 multi-file geometry, an eight-file
