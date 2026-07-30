@@ -129,6 +129,27 @@ describe("ConversationThreadShell", () => {
     expect(callbackRef).toHaveBeenLastCalledWith(null);
   });
 
+  it("preserves React 19 callback-ref cleanup for the exposed viewport", () => {
+    const cleanupRef = vi.fn();
+    const callbackRef = vi.fn(() => cleanupRef);
+    const { container, unmount } = render(
+      <ConversationThreadShell
+        composer={<span>Composer</span>}
+        header={<span>Header</span>}
+        viewportRef={callbackRef}
+      >
+        Timeline
+      </ConversationThreadShell>,
+    );
+    const viewport = container.querySelector<HTMLDivElement>(
+      ".codex-ui-conversation-thread-shell__viewport",
+    );
+
+    expect(callbackRef).toHaveBeenCalledWith(viewport);
+    unmount();
+    expect(cleanupRef).toHaveBeenCalledTimes(1);
+  });
+
   it("keeps public labels and custom classes on their owning regions", () => {
     const { container, getByRole } = render(
       <ConversationThreadShell

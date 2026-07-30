@@ -138,6 +138,7 @@ The twenty-third through twenty-sixth frames cover App shell loading, offline,
 stale, and restored states. The twenty-seventh through thirty-sixth frames
 cover conversation ready, multiline, running, queued, queue-paused, disabled,
 attachment, scroll-away, windowed history, and completion. The new frames use
-a scoped 1% internal main-region limit for their dense 20/22-message thread,
-while CDP independently locks the 736×98 Composer, 28px controls, 13px queue
-inset, 10/11 navigation markers, disabled semantics, and windowed placeholder.
+a scoped 2.25% internal main-region limit for their dense 20/22-message thread,
+covering the observed 1.84394% macOS-runner rasterization delta. CDP
+independently locks the 736×98 Composer, 28px controls, 13px queue inset,
+10/11 navigation markers, disabled semantics, and windowed placeholder.

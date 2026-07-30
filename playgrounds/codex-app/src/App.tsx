@@ -427,6 +427,8 @@ export function App() {
   const [threadFollowing, setThreadFollowing] = useState(
     initialSelection.frame !== "thread-scroll-away",
   );
+  const [windowedTimelineExpanded, setWindowedTimelineExpanded] =
+    useState(false);
   const [liveStartPending, setLiveStartPending] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(
     () => initialSelection.capture || !isNarrowDemoWindow(),
@@ -468,6 +470,10 @@ export function App() {
   const liveStartPendingRef = useRef(false);
   const queuedPromptCounterRef = useRef(1);
   const replaySubmitTimerRef = useRef<number | null>(null);
+  const pendingMessageNavigationRef = useRef<{
+    behavior: "instant" | "smooth";
+    id: string;
+  } | null>(null);
   const threadViewportRef = useRef<HTMLDivElement>(null);
   const liveApprovalSubmissionGateRef = useRef(
     new LiveApprovalSubmissionGate(),
@@ -543,6 +549,8 @@ export function App() {
     setReplayComposerSubmitting(false);
     setReplayComposerStopped(false);
     setThreadFollowing(true);
+    setWindowedTimelineExpanded(false);
+    pendingMessageNavigationRef.current = null;
     setReviewOpen(false);
     setReviewSelection(null);
     setTerminalOpen(nextId === "background-terminal");
@@ -720,6 +728,30 @@ export function App() {
     });
     setThreadFollowing(true);
   }, []);
+
+  const scrollToMessage = useCallback(
+    (id: string, behavior: "instant" | "smooth") => {
+      const viewport = threadViewportRef.current;
+      const target = viewport
+        ? [...viewport.querySelectorAll<HTMLElement>("[data-item-id]")].find(
+            (candidate) => candidate.dataset.itemId === id,
+          )
+        : undefined;
+      if (!target) return false;
+      target.scrollIntoView({ behavior, block: "center" });
+      setThreadFollowing(false);
+      return true;
+    },
+    [],
+  );
+
+  useEffect(() => {
+    if (!windowedTimelineExpanded) return;
+    const pendingNavigation = pendingMessageNavigationRef.current;
+    if (!pendingNavigation) return;
+    pendingMessageNavigationRef.current = null;
+    scrollToMessage(pendingNavigation.id, pendingNavigation.behavior);
+  }, [scrollToMessage, windowedTimelineExpanded]);
 
   const lastEvent = scenario.events[Math.max(0, replayCount - 1)];
   const sidebar = (
@@ -1482,7 +1514,8 @@ export function App() {
     }));
   const windowedTimeline =
     isConversationLifecycle &&
-    initialSelection.frame === "thread-windowed";
+    initialSelection.frame === "thread-windowed" &&
+    !windowedTimelineExpanded;
   const indexedTimeline = state.timeline.map((entry, entryIndex) => ({
     entry,
     entryIndex,
@@ -2006,14 +2039,14 @@ export function App() {
       items={messageNavigationItems}
       minItems={10}
       onNavigate={(item, behavior) => {
-        const viewport = threadViewportRef.current;
-        const target = viewport
-          ? [...viewport.querySelectorAll<HTMLElement>("[data-item-id]")].find(
-              (candidate) => candidate.dataset.itemId === item.id,
-            )
-          : undefined;
-        target?.scrollIntoView({ behavior, block: "center" });
-        setThreadFollowing(false);
+        if (scrollToMessage(item.id, behavior)) return;
+        if (windowedTimeline) {
+          pendingMessageNavigationRef.current = {
+            behavior,
+            id: item.id,
+          };
+          setWindowedTimelineExpanded(true);
+        }
       }}
     />
   ) : undefined;
@@ -2041,6 +2074,14 @@ export function App() {
       data-status={displayedStatus}
       data-thread-following={
         isConversationLifecycle ? threadFollowing : undefined
+      }
+      data-windowed-timeline={
+        isConversationLifecycle &&
+        initialSelection.frame === "thread-windowed"
+          ? windowedTimeline
+            ? "trimmed"
+            : "expanded"
+          : undefined
       }
       data-shell-state={view === "shell" ? shellState : undefined}
       data-view={view}

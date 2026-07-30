@@ -2,6 +2,7 @@ import type {
   HTMLAttributes,
   ReactNode,
   Ref,
+  RefCallback,
 } from "react";
 import {
   useCallback,
@@ -56,7 +57,20 @@ export function ConversationThreadShell({
     (node: HTMLDivElement | null) => {
       viewportRef.current = node;
       if (typeof forwardedViewportRef === "function") {
-        forwardedViewportRef(node);
+        const cleanup = (
+          forwardedViewportRef as RefCallback<HTMLDivElement>
+        )(node);
+        if (typeof cleanup === "function") {
+          return () => {
+            try {
+              cleanup();
+            } finally {
+              if (viewportRef.current === node) {
+                viewportRef.current = null;
+              }
+            }
+          };
+        }
       } else if (forwardedViewportRef) {
         forwardedViewportRef.current = node;
       }

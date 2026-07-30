@@ -2071,4 +2071,58 @@ try {
   await conversationLifecycleApp.close();
 }
 
+const windowedNavigationScene = {
+  frame: "thread-windowed",
+  id: "windowed-message-navigation-interaction",
+  scenario: "conversation-lifecycle",
+};
+const {
+  app: windowedNavigationApp,
+  page: windowedNavigationPage,
+} = await launchScene(windowedNavigationScene, { capture: false });
+try {
+  await windowedNavigationPage.waitForSelector(
+    '.demo-root[data-windowed-timeline="trimmed"]',
+  );
+  if (
+    (await windowedNavigationPage.locator('[data-item-id="user-01"]').count()) !==
+    0
+  ) {
+    throw new Error("Windowed navigation mounted the hidden target too early.");
+  }
+  await windowedNavigationPage
+    .getByRole("button", {
+      exact: true,
+      name: "Jump to user message 1",
+    })
+    .click();
+  await windowedNavigationPage.waitForSelector(
+    '.demo-root[data-windowed-timeline="expanded"][data-thread-following="false"] [data-item-id="user-01"]',
+  );
+  const materializedNavigation = await windowedNavigationPage.evaluate(() => ({
+    hiddenPlaceholderCount: document.querySelectorAll(
+      ".codex-ui-thread-virtualized-placeholder",
+    ).length,
+    targetCount: document.querySelectorAll('[data-item-id="user-01"]').length,
+    threadFollowing: document
+      .querySelector(".demo-root")
+      ?.getAttribute("data-thread-following"),
+    windowedTimeline: document
+      .querySelector(".demo-root")
+      ?.getAttribute("data-windowed-timeline"),
+  }));
+  if (
+    materializedNavigation.hiddenPlaceholderCount !== 0 ||
+    materializedNavigation.targetCount !== 1 ||
+    materializedNavigation.threadFollowing !== "false" ||
+    materializedNavigation.windowedTimeline !== "expanded"
+  ) {
+    throw new Error(
+      `Windowed message navigation failed: ${JSON.stringify(materializedNavigation)}`,
+    );
+  }
+} finally {
+  await windowedNavigationApp.close();
+}
+
 console.log(`CDP contracts passed for ${visualScenes.length} lifecycle frames.`);
