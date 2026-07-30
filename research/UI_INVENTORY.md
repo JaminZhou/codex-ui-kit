@@ -349,6 +349,27 @@ full-frame pixel baseline guards the resulting layout. This validates large
 file-set rendering and selection scrolling in the independent implementation;
 it is not product evidence for an eight-file state on any observed build.
 
+The mixed-Review slice adds explicit public `FileReviewContent` variants for
+text diffs, binary changes, and merge conflicts. A pinned public-protocol trace
+maps `move_path` to a renamed row, preserves a deleted diff, and lets the host
+derive binary/conflict presentation only from patch content. Review headers
+drive exact selection without dropping sibling files; group Undo closes the
+panel and removes the undone group from the reviewable set. CDP now checks four
+rows, two diffs, two notices, their ordered kinds, focus, and split geometry;
+Electron repeats selection, close/reopen, sibling preservation, and Undo. A
+reviewed full-frame pixel baseline covers the integrated state.
+
+A separate `26.721.81911` disposable ignored-file probe observed the current
+delete card, its 28px Undo/Review actions, a 370px Last Turn Review panel, and
+the deletion diff. A rename-only `apply_patch` run was rendered by the current
+product as separate `+0 −0` entries with `No content`, not a single
+rename-arrow row. The independent mapper therefore retains the public
+`move_path` semantic while documenting that it is not the current-product
+presentation observed in this run. Binary and conflict notices remain
+synthetic host-state coverage, so the broader Review family remains
+implementation-partial rather than being promoted to product-level
+completion.
+
 The Pull request detail slice adds a controlled, resizable workspace panel
 with a public `PullRequestPanelSummary`, an icon-capable PR list row, and
 Summary, Timeline, and Code tabs. CDP asserts the measured 352px index, 554px
@@ -465,7 +486,7 @@ This is a measurement- and raster-backed basic thread/workspace slice, not a
 claim that the whole application or every lifecycle is pixel-perfect. Broader
 Markdown variants, the exact host virtualization algorithm, code search,
 other MCP and connector variants, thread-level retry recovery, approval
-persistence and timeout, mixed multi-file change kinds, PR
+persistence and timeout, current-product binary/conflict reachability, PR
 merge/review-submission states, Terminal multi-tab and
 process-creation/termination lifecycles, and native Codex window behavior
 retain their own inventory gates.

@@ -260,6 +260,17 @@ export const visualScenes = [
     surfaces: ["fileChange", "reviewPanel"],
   },
   {
+    changeKinds: ["renamed", "deleted", "modified", "modified"],
+    diffCount: 2,
+    fileCount: 4,
+    frame: "review-open",
+    id: "mixed-file-review",
+    maxPixelRatio: 0.01,
+    noticeKinds: ["binary", "conflict"],
+    scenario: "mixed-file-review",
+    surfaces: ["fileChange", "reviewPanel"],
+  },
+  {
     fileCount: 8,
     frame: "review-open",
     id: "large-file-review",

@@ -6,6 +6,7 @@ import largeFileReviewTrace from "../fixtures/traces/large-file-review.jsonl?raw
 import markdownTrace from "../fixtures/traces/markdown.jsonl?raw";
 import mcpToolCallTrace from "../fixtures/traces/mcp-tool-call.jsonl?raw";
 import mcpRecoveryMixedThreadTrace from "../fixtures/traces/mcp-recovery-mixed-thread.jsonl?raw";
+import mixedFileReviewTrace from "../fixtures/traces/mixed-file-review.jsonl?raw";
 import multiFileReviewTrace from "../fixtures/traces/multi-file-review.jsonl?raw";
 import recoveryTrace from "../fixtures/traces/streaming-recovery.jsonl?raw";
 import workflowTrace from "../fixtures/traces/workspace-workflow.jsonl?raw";
@@ -21,6 +22,7 @@ export type ReplayScenarioId =
   | "markdown"
   | "mcp-tool-call"
   | "mcp-recovery-mixed-thread"
+  | "mixed-file-review"
   | "multi-file-review"
   | "workspace-workflow";
 
@@ -100,6 +102,12 @@ export const replayScenarios: Record<ReplayScenarioId, ReplayScenario> = {
     "Create ignored probe files",
     "One aggregated file card and a stacked two-file Review panel.",
     multiFileReviewTrace,
+  ),
+  "mixed-file-review": scenario(
+    "mixed-file-review",
+    "Mixed file Review",
+    "Rename, delete, binary, and host-inferred conflict presentation with synchronized Review selection.",
+    mixedFileReviewTrace,
   ),
   "workspace-workflow": scenario(
     "workspace-workflow",

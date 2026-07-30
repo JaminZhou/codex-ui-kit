@@ -26,11 +26,15 @@ Every deterministic scenario has one ID and produces four evidence layers:
    Composer attachments, final-row removal leaves paused queue state, and
    completed replay positions reconcile queued work. Mode switches clear
    fixture-only host state, and message-navigation tooltips avoid duplicate
-   label/preview content.
+   label/preview content. Mixed Review acceptance additionally requires
+   ordered rename/delete/modified rows, two text diffs, explicit
+   binary/conflict notices, focusable content, and synchronized file
+   selection.
 3. **Electron host** — real `BrowserWindow` bounds, renderer isolation,
    pointer and keyboard navigation/PR-panel resizing, Review-panel
    close/reopen behavior, compact 800×600 multi-file geometry, an eight-file
-   scroll-to-selection flow, PR tab/comment/expansion interactions, and
+   scroll-to-selection flow, mixed-content selection/sibling/Undo lifecycle,
+   PR tab/comment/expansion interactions, and
    Terminal pointer/keyboard resizing, host-owned input, close/restore,
    compact 820×680 geometry, and App shell offline → retry → restored
    notification plus native 1180×820 → 720×680 → 1180×820 continuity; the

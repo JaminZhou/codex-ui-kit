@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { changeStats } from "../src/diff-lines";
+import { changeStats, reviewContent } from "../src/diff-lines";
 import type { DemoFileUpdateChange } from "../src/protocol-state";
 
 function change(diff: string): DemoFileUpdateChange {
@@ -65,5 +65,44 @@ describe("diff lines", () => {
       newLineNumber: 11,
       oldLineNumber: 11,
     });
+  });
+
+  it("classifies binary patch text as an explicit non-text review", () => {
+    expect(
+      reviewContent(
+        change("Binary files a/assets/logo.png and b/assets/logo.png differ"),
+      ),
+    ).toMatchObject({
+      kind: "binary",
+      title: "Binary file changed",
+    });
+  });
+
+  it("classifies conflict markers as a host-derived conflict review", () => {
+    expect(
+      reviewContent(
+        change(
+          [
+            "@@ -1 +1,5 @@",
+            "+<<<<<<< HEAD",
+            "+const source = 'main';",
+            "+=======",
+            "+const source = 'branch';",
+            "+>>>>>>> feat/review",
+          ].join("\n"),
+        ),
+      ),
+    ).toMatchObject({
+      kind: "conflict",
+      title: "Merge conflict detected",
+    });
+  });
+
+  it("does not treat a standalone separator line as a merge conflict", () => {
+    expect(
+      reviewContent(
+        change(["@@ -1 +1 @@", "-=======", "+updated"].join("\n")),
+      ).kind,
+    ).toBe("diff");
   });
 });

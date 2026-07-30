@@ -190,6 +190,36 @@ profile, verified its child processes and loopback listener were gone, and
 deleted the profile plus the three external screenshots. The original Codex
 main process remained running.
 
+### Current Review rename/delete capture
+
+The `26.721.81911` Review probe used an exact second process, the loopback-only
+port `9471`, and a unique
+`/private/tmp/codex-ui-kit-review-cdp.XXXXXX` profile. The selected
+`app://-/index.html` Renderer measured 1180×820; the 480×340 avatar target was
+excluded by area. Two disposable tasks operated only on ignored
+`.research/current-review-probe` text files with `apply_patch`.
+
+The delete task exposed the current turn-owned card as a 28px-action
+`Edited …` row with `+0 −1`, `Undo`, and `Review`. Opening Review produced the
+independent 370px side region, a `Last Turn` toolbar, the deleted path, and a
+single deletion line. The rename-only task exposed an important backend/UI
+boundary: the current product represented the move as separate zero-line file
+entries and rendered `No content`; it did not expose one merged rename-arrow
+row in this run. The public App Server `move_path` mapping remains implemented
+independently, but it must not be described as observed current-product
+presentation.
+
+CDP recorded the action and panel geometry plus computed font, color, padding,
+radius, and overflow styles. External 906×774 Renderer crops were visually
+reviewed and then removed; they are not repository assets. Binary and conflict
+states were not safely reached in the current product. Their deterministic
+fixtures are explicitly host-derived coverage, not runtime evidence.
+
+Cleanup terminated only the exact main PID bearing the temporary profile,
+verified that its children and `127.0.0.1:9471` listener were gone, removed the
+exact profile, and deleted the disposable ignored files. The original Codex
+process remained running.
+
 ## Required flow matrix
 
 ### 1. Application entry and navigation

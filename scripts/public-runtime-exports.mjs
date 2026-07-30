@@ -44,6 +44,7 @@ export const publicRuntimeExports = [
   "FileChangeGroup",
   "FileDiff",
   "FileReview",
+  "FileReviewNotice",
   "FloatingThreadPanel",
   "GeneratedImageGallery",
   "IconButton",

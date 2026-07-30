@@ -805,6 +805,12 @@ for (const scene of visualScenes) {
         mcp,
         namedSurfaces,
         review: {
+          contentLabels: Array.from(
+            document.querySelectorAll(
+              ".codex-ui-file-review .codex-ui-file-review__content[aria-label]",
+            ),
+            (element) => element.getAttribute("aria-label"),
+          ),
           diffLabels: Array.from(
             document.querySelectorAll(
               '.codex-ui-file-review .codex-ui-file-diff[aria-label]',
@@ -819,6 +825,17 @@ for (const scene of visualScenes) {
               '.codex-ui-file-review .codex-ui-file-diff[aria-label]',
             )
             ?.getAttribute("aria-label"),
+          firstContentLabel: document
+            .querySelector(
+              ".codex-ui-file-review .codex-ui-file-review__content[aria-label]",
+            )
+            ?.getAttribute("aria-label"),
+          noticeKinds: Array.from(
+            document.querySelectorAll(
+              ".codex-ui-file-review .codex-ui-file-review-notice",
+            ),
+            (element) => element.getAttribute("data-kind"),
+          ),
           scroll: (() => {
             const element = document.querySelector(".codex-ui-file-review");
             return element
@@ -967,6 +984,12 @@ for (const scene of visualScenes) {
         })(),
         viewport: viewportRect,
         workflow: {
+          changeKinds: Array.from(
+            document.querySelectorAll(
+              ".codex-ui-file-change-group__file",
+            ),
+            (element) => element.getAttribute("data-change"),
+          ),
           fileGroupCount: document.querySelectorAll(
             ".codex-ui-file-change-group",
           ).length,
@@ -1401,7 +1424,15 @@ for (const scene of visualScenes) {
       (contract.workflow.fileGroupCount !== 1 ||
         contract.workflow.fileRowCount !== (scene.fileCount ?? 2) ||
         contract.review.fileCount !== (scene.fileCount ?? 2) ||
-        contract.review.diffLabels.length !== (scene.fileCount ?? 2))
+        contract.review.contentLabels.length !== (scene.fileCount ?? 2) ||
+        contract.review.diffLabels.length !==
+          (scene.diffCount ?? scene.fileCount ?? 2) ||
+        (scene.noticeKinds !== undefined &&
+          JSON.stringify(contract.review.noticeKinds) !==
+            JSON.stringify(scene.noticeKinds)) ||
+        (scene.changeKinds !== undefined &&
+          JSON.stringify(contract.workflow.changeKinds) !==
+            JSON.stringify(scene.changeKinds)))
     ) {
       throw new Error(
         `${scene.id}: multi-file aggregation contract failed: ${JSON.stringify({
@@ -1524,13 +1555,13 @@ for (const scene of visualScenes) {
 
     if (scene.id !== "composer-disabled") {
       const expectedFocus = scene.surfaces?.includes("reviewPanel")
-        ? contract.review.firstDiffLabel
+        ? contract.review.firstContentLabel
         : "Message composer";
       if (!expectedFocus) {
         throw new Error(`${scene.id}: expected focus target is missing.`);
       }
       const focusTarget = scene.surfaces?.includes("reviewPanel")
-        ? page.getByRole("list", { name: expectedFocus })
+        ? page.getByLabel(expectedFocus)
         : page.getByRole("textbox", { name: expectedFocus });
       await focusTarget.click();
       const focusContract = await page.evaluate(

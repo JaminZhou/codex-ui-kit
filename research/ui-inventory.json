@@ -163,8 +163,11 @@
       "packageEvidence": ["file-diff", "message-square-diff"],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
+        "cdp-26.721:current-build-delete-card-undo-review-1180x820",
+        "cdp-26.721:current-build-rename-move-zero-line-file-group",
         "cdp-26.721:synthetic-applied-file-change-card-undo-review",
-        "cdp-26.721:synthetic-two-file-change-group-undo-review-800x600"
+        "cdp-26.721:synthetic-two-file-change-group-undo-review-800x600",
+        "cdp-26.721:synthetic-mixed-rename-delete-binary-conflict-review"
       ],
       "implementationStatus": "partial",
       "browserStatus": "partial_legacy",
@@ -703,8 +706,10 @@
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
         "cdp:review-panel-file-diff-list",
+        "cdp-26.721:current-build-delete-diff-and-rename-no-content",
         "cdp-26.721:synthetic-review-panel-single-addition-diff",
-        "cdp-26.721:synthetic-two-file-stacked-review-diffs"
+        "cdp-26.721:synthetic-two-file-stacked-review-diffs",
+        "cdp-26.721:synthetic-binary-and-conflict-review-notices"
       ],
       "implementationStatus": "partial",
       "browserStatus": "partial_legacy",
@@ -718,8 +723,10 @@
       "packageEvidence": ["editor-diff-page", "file-diff", "message-square-diff"],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
+        "cdp-26.721:current-build-rename-move-separate-zero-line-items",
         "cdp-26.721:synthetic-two-file-change-group-and-stacked-review",
-        "cdp-26.721:synthetic-multi-file-review-close-reopen-lifecycle"
+        "cdp-26.721:synthetic-multi-file-review-close-reopen-lifecycle",
+        "cdp-26.721:synthetic-mixed-file-review-selection-and-undo"
       ],
       "implementationStatus": "partial",
       "browserStatus": "partial_legacy",

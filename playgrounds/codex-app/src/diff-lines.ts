@@ -1,5 +1,16 @@
-import type { FileDiffLine } from "codex-ui-kit";
+import type {
+  FileDiffLine,
+  FileReviewContent,
+} from "codex-ui-kit";
 import type { DemoFileUpdateChange } from "./protocol-state";
+
+const binaryDiffPattern =
+  /^(?:Binary files? .+ differ|GIT binary patch|Binary file .+)$/im;
+const conflictMarkerPatterns = [
+  /^(?:[ +\-])?<{7}(?: .+)?$/m,
+  /^(?:[ +\-])?={7}$/m,
+  /^(?:[ +\-])?>{7}(?: .+)?$/m,
+] as const;
 
 export function diffLines(change: DemoFileUpdateChange): FileDiffLine[] {
   let oldLine = 0;
@@ -66,5 +77,28 @@ export function changeStats(change: DemoFileUpdateChange) {
     additions: lines.filter(({ kind }) => kind === "addition").length,
     deletions: lines.filter(({ kind }) => kind === "deletion").length,
     lines,
+  };
+}
+
+export function reviewContent(
+  change: DemoFileUpdateChange,
+): FileReviewContent {
+  if (binaryDiffPattern.test(change.diff)) {
+    return {
+      description: "Text preview is unavailable for this binary patch.",
+      kind: "binary",
+      title: "Binary file changed",
+    };
+  }
+  if (conflictMarkerPatterns.every((pattern) => pattern.test(change.diff))) {
+    return {
+      description: "Resolve the conflict markers before merging.",
+      kind: "conflict",
+      title: "Merge conflict detected",
+    };
+  }
+  return {
+    kind: "diff",
+    lines: diffLines(change),
   };
 }

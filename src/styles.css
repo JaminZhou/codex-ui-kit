@@ -5264,7 +5264,8 @@ summary.codex-ui-activity__header::after {
   padding: 0.1875rem 0.625rem;
 }
 
-.codex-ui-file-review__header code {
+.codex-ui-file-review__header code,
+.codex-ui-file-review__header button {
   color: var(--codex-ui-text-tertiary);
   flex: 1;
   font: inherit;
@@ -5274,10 +5275,85 @@ summary.codex-ui-activity__header::after {
   white-space: nowrap;
 }
 
+.codex-ui-file-review__header button {
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  padding: 0;
+  text-align: left;
+}
+
+.codex-ui-file-review__header button code {
+  display: block;
+}
+
+.codex-ui-file-review__header button:hover code {
+  color: var(--codex-ui-text);
+}
+
+.codex-ui-file-review__header button:focus-visible {
+  border-radius: var(--codex-ui-radius-sm);
+  outline: 2px solid var(--codex-ui-focus);
+  outline-offset: 1px;
+}
+
 .codex-ui-file-review__file > .codex-ui-file-diff {
   border: 0;
   border-radius: 0;
   max-height: none;
+}
+
+.codex-ui-file-review-notice {
+  align-items: center;
+  background: var(--codex-ui-code-block-bg);
+  color: var(--codex-ui-text-secondary);
+  display: flex;
+  gap: 0.75rem;
+  min-height: 7rem;
+  padding: 1rem;
+}
+
+.codex-ui-file-review-notice:focus-visible {
+  outline: 2px solid var(--codex-ui-focus);
+  outline-offset: -2px;
+}
+
+.codex-ui-file-review-notice__indicator {
+  align-items: center;
+  background: var(--codex-ui-background-elevated-secondary);
+  border: 1px solid var(--codex-ui-border-heavy);
+  border-radius: 50%;
+  color: var(--codex-ui-text-tertiary);
+  display: inline-flex;
+  flex: 0 0 auto;
+  font-family: var(--codex-ui-font-mono);
+  font-size: var(--codex-ui-font-size-md);
+  height: 2rem;
+  justify-content: center;
+  width: 2rem;
+}
+
+.codex-ui-file-review-notice[data-kind="conflict"]
+  .codex-ui-file-review-notice__indicator {
+  color: var(--codex-ui-warning);
+}
+
+.codex-ui-file-review-notice__identity {
+  display: grid;
+  gap: 0.1875rem;
+  min-width: 0;
+}
+
+.codex-ui-file-review-notice__identity strong {
+  color: var(--codex-ui-text);
+  font-size: var(--codex-ui-font-size-sm);
+  font-weight: var(--codex-ui-font-weight-medium);
+}
+
+.codex-ui-file-review-notice__identity span {
+  color: var(--codex-ui-text-tertiary);
+  font-size: var(--codex-ui-font-size-xs);
+  line-height: var(--codex-ui-line-height-sm);
 }
 
 .codex-ui-file-change .codex-ui-activity__body {

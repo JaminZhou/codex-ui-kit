@@ -26,12 +26,14 @@ exit gates; it does not replace the inventory.
   long-thread replay, Electron interaction, and current-build queue-region
   pixel gates. The coding-workspace entry slice adds the current
   project/context surface plus an independent project → environment/worktree →
-  command → approval → two-file Review → Terminal → PR path. Together the
-  current playground gates cover 42 CDP/pixel frames. Global notification
-  runtime evidence, light-theme shell evidence, exact current-build
-  long-thread virtualization, and the remaining Review, Terminal, Markdown,
-  tool, and attachment variants remain on their recorded evidence levels until
-  separately re-observed.
+  command → approval → two-file Review → Terminal → PR path. The next Review
+  slice adds current-build delete and rename/no-content evidence plus
+  deterministic rename/delete/binary/conflict, selection, and Undo coverage.
+  Together the current playground gates cover 43 CDP/pixel frames. Global
+  notification runtime evidence, light-theme shell evidence, exact
+  current-build long-thread virtualization, and the remaining Terminal, PR,
+  Markdown, tool, and attachment variants remain on their recorded evidence
+  levels until separately re-observed.
 - Existing Browser and Electron results remain useful regression evidence, but
   they are `partial_legacy` until the affected surface is re-observed on the
   current build.
