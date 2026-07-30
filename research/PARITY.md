@@ -7,7 +7,8 @@ not establish full conversation, workspace, application, or product coverage.
 The authoritative current-build inventory is:
 
 - [`26.721.81911.md`](26.721.81911.md) for the current package fingerprint,
-  main-Renderer sidebar capture, and remaining runtime-capture boundary;
+  main-Renderer sidebar and MCP recovery captures, and remaining
+  runtime-capture boundary;
 - [`26.721.41059.md`](26.721.41059.md) for the previous runtime-sampled build,
   scoped CDP evidence, and research boundary;
 - [`26.715.72359.md`](26.715.72359.md) for the previous build's broader
@@ -48,14 +49,17 @@ The authoritative current-build inventory is:
   behavior, code search, broader connectors, or the wider thread-error, queue,
   Markdown variants, menu, global-route, and Settings states; those remain
   historical evidence from `26.715.72359` until sampled again.
-- Codex Desktop `26.721.81911` (`5973`) now has a fresh dark main-Renderer
-  capture for all six left-sidebar groups. Target selection uses the
+- Codex Desktop `26.721.81911` (`5973`) now has fresh dark main-Renderer
+  captures for all six left-sidebar groups and a real OpenAI Developer Docs
+  failed-Fetch → Search → successful-Fetch recovery. Target selection uses the
   `app://-/index.html` URL plus application-shell landmarks and excludes the
-  small auxiliary page. The independent Browser and Electron flows verify
-  1180×820, 820×680, and the 720px modal transition; the external regional
-  pixel gate verifies the top controls, selected row, and footer. Older
-  observations outside this sidebar slice remain `partial_legacy`, not
-  current-build verification.
+  small auxiliary page. The independent Browser and Electron flows verify the
+  sidebar at 1180×820, 820×680, and the 720px modal transition, plus the MCP
+  recovery and its following command/approval/file/Review turn across 22
+  deterministic frames. External regional gates verify the sidebar top
+  controls, selected row, and footer, and separately the MCP full-main,
+  recovery, user, and Composer regions. Older observations outside these
+  sampled slices remain `partial_legacy`, not current-build verification.
 - Renderer viewport probing exposed a narrow-layout gap: the thread and
   Composer shrink, but the fixed app sidebar remains and the right workspace
   panel can be laid out beyond the simulated viewport. The independently
@@ -103,6 +107,12 @@ The protocol-backed Electron playground adds a separate completed-Markdown
 frame. Its optional 906×820 current-build comparison gates the assistant,
 fenced-code, and Composer regions at the strict 0.05 pixel threshold, while
 CDP separately locks semantic counts and computed geometry.
+
+The current-build MCP recovery adds four further frames for failure, retry,
+completion, and a mixed follow-up turn. Its optional 906×820 comparison gates
+the full main, recovered tool group, user prompt, and Composer independently
+at the same strict threshold. CDP locks call order, labels, expansion, error
+semantics, and group recovery; Electron locks the mixed Review composition.
 
 Broader final visual optimization remains scheduled after the remaining
 inventory, page compositions, and state transitions stabilize. A passing

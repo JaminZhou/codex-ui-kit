@@ -55,14 +55,16 @@ observation from a previous build remains historical evidence.
   the Chromium profile is separate, but Codex application data and navigation
   are not fully isolated
 - Fresh current-build Renderer capture: recorded for the dark 1180×820 main
-  application target and the six left-sidebar groups; light-theme and
-  unrelated surface evidence remain pending
+  application target, the six left-sidebar groups, and a real
+  OpenAI Developer Docs failed-Fetch → Search → successful-Fetch recovery;
+  light-theme and unrelated surface evidence remain pending
 
-Current inventory: 68 surface groups; 6 have current-build runtime evidence,
-43 have previous-build-only runtime evidence, 19 remain `not_sampled`, and 0
-are `blocked_by_policy`. Current-build Browser verification covers 6 groups
-and Electron verification covers 6. Prior acceptance outside the sidebar
-remains recorded as `partial_legacy` until current-build re-observation.
+Current inventory: 69 surface groups; 8 have current-build runtime evidence,
+42 have previous-build-only runtime evidence, 19 remain `not_sampled`, and 0
+are `blocked_by_policy`. Current-build Browser verification covers 8 groups
+and Electron verification covers 8. Prior acceptance outside the sidebar and
+recovered MCP slice remains recorded as `partial_legacy` until current-build
+re-observation.
 
 The current package exposes candidates far beyond the old transcript sample:
 application and thread shells, local/remote conversation routes, projects and
@@ -327,21 +329,36 @@ geometry remain independent, so a passing plain assistant fallback cannot
 promote MCP tool rendering and a failed command cannot promote thread-level
 render/retry recovery.
 
-The successful-MCP slice samples a real read-only `openaiDeveloperDocs` run on
-build `26.721.41059`. That build's CDP evidence records
-the completed answer, the `Worked for 54s` disclosure, the
+The original successful-MCP slice samples a real read-only
+`openaiDeveloperDocs` run on build `26.721.41059`. That build's CDP evidence
+records the completed answer, the `Worked for 54s` disclosure, the
 `Used OpenAI Developer Docs integration` group, and its three Search plus two
-Fetch calls. The public App Server trace uses only schema-validated
-`mcpToolCall` start, progress, result, and completion fields.
-`McpToolCallGroup` composes the integration disclosure while
-`ToolCallCard` renders each call. CDP locks the 14px/21px hierarchy and 25px
-call rows; Electron expands the duration, group, and structured result; two
-reviewed lifecycle frames cover running and completed states. An optional
-906×820 `26.721.41059` pixel gate limits the full main region to 3%, the tool
-region to 4%, the answer region to 4%, and the Composer region to 2.5%. This
-previously verified only the sampled public-docs success path; its current
-status is `partial_legacy`, and authentication, elicitation, approvals,
-failures, other connectors, and mixed MCP results remain open.
+Fetch calls.
+
+Build `26.721.81911` now adds a separate real recovery path. A disposable
+task deliberately calls `fetch_openai_doc` with `not-a-valid-url`, exposes the
+expanded neutral `plaintext / Invalid URL` output, retries with
+`search_openai_docs`, and finishes with a valid `fetch_openai_doc`. The
+current Renderer groups the three rows under `Worked for 28s` and
+`Used OpenAI Developer Docs integration`; an earlier failed call therefore
+does not make the recovered group itself failed. The independent replay tracks
+terminal-event order so overlapping calls cannot be misclassified from their
+start order.
+
+The public App Server traces use only schema-validated `mcpToolCall` start,
+progress, result, error, and completion fields. The new deterministic scenario
+continues into a second turn containing two commands, an accepted approval,
+one file change, and the Review panel. CDP gates 22 lifecycle frames and the
+real `BrowserWindow` acceptance expands the historical recovery group while
+the Review split remains open. The current-build 906×820 regional gate passed
+at the strict 0.05 pixel threshold with changed-pixel ratios of 0.029202337
+for the full main region, 0.051956799 for the recovery region, 0.047369405
+for the user region, and 0.015698995 for the Composer region.
+
+This promotes `thread.mcp-tool-events` and the newly split
+`thread.mcp-tool-failure-retry` gate for the sampled current-build path.
+Authentication, elicitation, MCP approvals, unavailable connectors, other
+integrations, cancellation, and thread-transport retry remain open.
 
 The long-thread continuity slice adds the `26.721.41059` default ten-message
 threshold and measured 36×10 rows to `ThreadMessageNavigationRail`, exposes
@@ -361,8 +378,9 @@ placeholder, navigation, and follow contracts but not reverse scrolling or
 windowing, so the virtualization row remains `partial_legacy`. The
 interruption acceptance renders the observed summary statically rather than
 driving a host run-to-stop-to-summary transition, so that row also remains
-`partial_legacy`. The `26.721.81911` error/retry state has not been safely
-reached and remains a separate unpromoted gate. Compaction acceptance
+`partial_legacy`. The `26.721.81911` MCP tool-call error/retry state is now
+captured separately; the broader thread-transport error/retry state has not
+been safely reached and remains an unpromoted gate. Compaction acceptance
 statically renders the observed running and completed states rather than
 driving their host transition, so `thread.context-compaction` also remains
 `partial_legacy`; it does not promote the still-unreached thread summary

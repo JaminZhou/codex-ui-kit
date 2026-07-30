@@ -364,6 +364,36 @@ for (const scene of visualScenes) {
               mcpGroup.querySelectorAll(".codex-ui-tool-call__label"),
               (element) => element.textContent?.trim(),
             ),
+            callStatuses: Array.from(
+              mcpGroup.querySelectorAll(".codex-ui-tool-call"),
+              (element) => element.getAttribute("data-status"),
+            ),
+            errorOutput: (() => {
+              const element = mcpGroup.querySelector(
+                '.codex-ui-tool-call__error[data-presentation="output"]',
+              );
+              return element
+                ? {
+                    rect: rect(element),
+                    role: element.getAttribute("role"),
+                    text: element.textContent?.replace(/\s+/g, " ").trim(),
+                  }
+                : null;
+            })(),
+            expandedCallIds: Array.from(
+              mcpGroup.querySelectorAll(".codex-ui-tool-call"),
+            )
+              .filter((element) =>
+                element
+                  .querySelector(".codex-ui-activity__disclosure")
+                  ?.hasAttribute("open"),
+              )
+              .map((element) => element.getAttribute("data-item-id")),
+            failedCallAccessibleLabel: mcpGroup
+              .querySelector(
+                '[data-item-id="mcp-fetch-invalid"] .codex-ui-tool-call__label',
+              )
+              ?.getAttribute("aria-label"),
             groupExpanded:
               mcpGroup.querySelector(".codex-ui-activity__disclosure")
                 ?.open ?? false,
@@ -371,6 +401,7 @@ for (const scene of visualScenes) {
               .querySelector(".codex-ui-mcp-tool-call-group__label")
               ?.textContent?.trim(),
             groupSource: mcpGroup.getAttribute("data-source"),
+            groupStatus: mcpGroup.getAttribute("data-status"),
             groupStyle: markdownStyle(
               mcpGroup.querySelector(
                 ":scope > .codex-ui-activity__disclosure > .codex-ui-activity__header",
@@ -736,23 +767,18 @@ for (const scene of visualScenes) {
       );
     }
     if (scene.toolCount !== undefined) {
-      const expectedGroupLabel =
-        scene.frame === "mcp-running"
-          ? "Using OpenAI Developer Docs integration"
-          : "Used OpenAI Developer Docs integration";
-      const expectedTimelineLabel =
-        scene.frame === "mcp-running" ? "Working" : "Worked for 54s";
       if (
         !contract.mcp ||
         contract.mcp.toolCount !== scene.toolCount ||
         !contract.mcp.groupExpanded ||
         !contract.mcp.timelineExpanded ||
         contract.mcp.groupSource !== "openaiDeveloperDocs" ||
-        contract.mcp.groupLabel !== expectedGroupLabel ||
-        contract.mcp.timelineLabel !== expectedTimelineLabel ||
+        contract.mcp.groupLabel !== scene.groupLabel ||
+        contract.mcp.timelineLabel !== scene.timelineLabel ||
         contract.mcp.groupStyle.fontSize !== "14px" ||
         contract.mcp.groupStyle.lineHeight !== "21px" ||
-        contract.mcp.callLabels[0] !== "Search OpenAI docs"
+        JSON.stringify(contract.mcp.callLabels) !==
+          JSON.stringify(scene.callLabels)
       ) {
         throw new Error(
           `${scene.id}: MCP integration contract failed: ${JSON.stringify(contract.mcp)}`,
@@ -767,14 +793,19 @@ for (const scene of visualScenes) {
         );
       }
       if (
-        scene.frame === "mcp-tool-calls" &&
-        (!contract.mcp.callLabels.includes("Fetch OpenAI doc") ||
-          contract.mcp.callLabels.filter(
-            (label) => label === "Search OpenAI docs",
-          ).length !== 3)
+        scene.errorOutput !== undefined &&
+        (!contract.mcp.errorOutput ||
+          contract.mcp.errorOutput.role !== "alert" ||
+          !contract.mcp.errorOutput.text?.includes(scene.errorOutput) ||
+          contract.mcp.errorOutput.rect.width < 600 ||
+          contract.mcp.errorOutput.rect.height < 64 ||
+          contract.mcp.callStatuses[0] !== "failed" ||
+          contract.mcp.failedCallAccessibleLabel !==
+            "Fetch OpenAI doc failed" ||
+          !contract.mcp.expandedCallIds.includes("mcp-fetch-invalid"))
       ) {
         throw new Error(
-          `${scene.id}: completed MCP call sequence is incomplete: ${JSON.stringify(contract.mcp.callLabels)}`,
+          `${scene.id}: recovered MCP error output contract failed: ${JSON.stringify(contract.mcp)}`,
         );
       }
     }

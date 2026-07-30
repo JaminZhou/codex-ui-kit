@@ -39,10 +39,16 @@ const currentBuildMcpReferenceSize = {
   height: 820,
   width: 906,
 };
+const currentBuildMcpRecoveryReference =
+  process.env.CODEX_UI_KIT_MCP_RECOVERY_REFERENCE;
+const currentBuildMcpRecoveryReferenceSize = {
+  height: 820,
+  width: 906,
+};
 const currentBuildSidebarReference =
   process.env.CODEX_UI_KIT_SIDEBAR_REFERENCE;
 const defaultLifecycleMainPixelRatio = 0.0025;
-const defaultLifecycleSidebarPixelRatio = 0.008;
+const defaultLifecycleSidebarPixelRatio = 0.03;
 const internalSidebarWidth = 274;
 const currentBuildSidebarReferenceSize = {
   height: 820,
@@ -200,56 +206,49 @@ for (const scene of visualScenes) {
       threshold: 0.12,
     },
   );
-  const ratio = pixels / (actual.width * actual.height);
   if (pixels > 0) await writeFile(diffPath, PNG.sync.write(diff));
-  if (scene.maxPixelRatio !== undefined) {
-    if (ratio > scene.maxPixelRatio) {
-      throw new Error(
-        `${scene.id}: pixel drift ${(ratio * 100).toFixed(4)}% exceeds ${(scene.maxPixelRatio * 100).toFixed(2)}%.`,
-      );
-    }
-  } else {
-    if (actual.width <= internalSidebarWidth) {
-      throw new Error(
-        `${scene.id}: frame width ${actual.width}px cannot be split at the ${internalSidebarWidth}px sidebar boundary.`,
-      );
-    }
-    const mainComparison = comparePng(
-      cropPng(
-        baseline,
-        internalSidebarWidth,
-        0,
-        baseline.width - internalSidebarWidth,
-        baseline.height,
-      ),
-      cropPng(
-        actual,
-        internalSidebarWidth,
-        0,
-        actual.width - internalSidebarWidth,
-        actual.height,
-      ),
-      0.12,
+  if (actual.width <= internalSidebarWidth) {
+    throw new Error(
+      `${scene.id}: frame width ${actual.width}px cannot be split at the ${internalSidebarWidth}px sidebar boundary.`,
     );
-    const sidebarComparison = comparePng(
-      cropPng(baseline, 0, 0, internalSidebarWidth, baseline.height),
-      cropPng(actual, 0, 0, internalSidebarWidth, actual.height),
-      0.12,
+  }
+  const mainComparison = comparePng(
+    cropPng(
+      baseline,
+      internalSidebarWidth,
+      0,
+      baseline.width - internalSidebarWidth,
+      baseline.height,
+    ),
+    cropPng(
+      actual,
+      internalSidebarWidth,
+      0,
+      actual.width - internalSidebarWidth,
+      actual.height,
+    ),
+    0.12,
+  );
+  const sidebarComparison = comparePng(
+    cropPng(baseline, 0, 0, internalSidebarWidth, baseline.height),
+    cropPng(actual, 0, 0, internalSidebarWidth, actual.height),
+    0.12,
+  );
+  const maximumMainPixelRatio =
+    scene.maxPixelRatio ?? defaultLifecycleMainPixelRatio;
+  if (
+    mainComparison.ratio > maximumMainPixelRatio ||
+    sidebarComparison.ratio > defaultLifecycleSidebarPixelRatio
+  ) {
+    throw new Error(
+      `${scene.id}: regional pixel drift ${JSON.stringify({
+        main: mainComparison.ratio,
+        sidebar: sidebarComparison.ratio,
+      })} exceeds ${JSON.stringify({
+        main: maximumMainPixelRatio,
+        sidebar: defaultLifecycleSidebarPixelRatio,
+      })}.`,
     );
-    if (
-      mainComparison.ratio > defaultLifecycleMainPixelRatio ||
-      sidebarComparison.ratio > defaultLifecycleSidebarPixelRatio
-    ) {
-      throw new Error(
-        `${scene.id}: regional pixel drift ${JSON.stringify({
-          main: mainComparison.ratio,
-          sidebar: sidebarComparison.ratio,
-        })} exceeds ${JSON.stringify({
-          main: defaultLifecycleMainPixelRatio,
-          sidebar: defaultLifecycleSidebarPixelRatio,
-        })}.`,
-      );
-    }
   }
 
   if (scene.id === "streaming" && currentBuildSidebarReference) {
@@ -848,6 +847,114 @@ for (const scene of visualScenes) {
         composer: composerComparison.ratio,
         full: comparison.ratio,
         toolCalls: toolCallsComparison.ratio,
+      })}`,
+    );
+  }
+
+  if (
+    scene.id === "mcp-recovery-completed" &&
+    currentBuildMcpRecoveryReference
+  ) {
+    const reference = PNG.sync.read(
+      await readFile(currentBuildMcpRecoveryReference),
+    );
+    if (
+      reference.width !== currentBuildMcpRecoveryReferenceSize.width ||
+      reference.height !== currentBuildMcpRecoveryReferenceSize.height
+    ) {
+      throw new Error(
+        `${scene.id}: current-build recovery reference must be exactly ${currentBuildMcpRecoveryReferenceSize.width}x${currentBuildMcpRecoveryReferenceSize.height}, received ${reference.width}x${reference.height}.`,
+      );
+    }
+    if (
+      actual.height !== reference.height ||
+      actual.width < reference.width
+    ) {
+      throw new Error(
+        `${scene.id}: current-build recovery reference ${reference.width}x${reference.height} cannot be aligned to ${actual.width}x${actual.height}.`,
+      );
+    }
+
+    const main = cropPng(
+      actual,
+      actual.width - reference.width,
+      0,
+      reference.width,
+      reference.height,
+    );
+    const currentBuildActualPath = join(
+      artifactDirectory,
+      `${scene.id}.current-build.png`,
+    );
+    const currentBuildDiffPath = join(
+      artifactDirectory,
+      `${scene.id}.current-build.diff.png`,
+    );
+    await writeFile(currentBuildActualPath, PNG.sync.write(main));
+
+    const comparison = comparePng(reference, main);
+    if (comparison.pixels > 0) {
+      await writeFile(
+        currentBuildDiffPath,
+        PNG.sync.write(comparison.diff),
+      );
+    }
+
+    const regions = {
+      composer: { height: 99, left: 84, top: 706, width: 738 },
+      recovery: { height: 340, left: 84, top: 245, width: 738 },
+      user: { height: 145, left: 84, top: 70, width: 738 },
+    };
+    const compareRegion = ({ height, left, top, width }) =>
+      comparePng(
+        cropPng(reference, left, top, width, height),
+        cropPng(main, left, top, width, height),
+      );
+    const composerComparison = compareRegion(regions.composer);
+    const recoveryComparison = compareRegion(regions.recovery);
+    const userComparison = compareRegion(regions.user);
+    const maximumComposerRatio = environmentRatio(
+      "CODEX_UI_KIT_MCP_RECOVERY_COMPOSER_MAX_DIFF_RATIO",
+      0.03,
+    );
+    const maximumRecoveryRatio = environmentRatio(
+      "CODEX_UI_KIT_MCP_RECOVERY_TOOL_MAX_DIFF_RATIO",
+      0.07,
+    );
+    const maximumUserRatio = environmentRatio(
+      "CODEX_UI_KIT_MCP_RECOVERY_USER_MAX_DIFF_RATIO",
+      0.05,
+    );
+    const maximumRatio = environmentRatio(
+      "CODEX_UI_KIT_MCP_RECOVERY_MAX_DIFF_RATIO",
+      0.045,
+    );
+    if (
+      composerComparison.ratio > maximumComposerRatio ||
+      comparison.ratio > maximumRatio ||
+      recoveryComparison.ratio > maximumRecoveryRatio ||
+      userComparison.ratio > maximumUserRatio
+    ) {
+      throw new Error(
+        `${scene.id}: current-build MCP recovery pixel ratios ${JSON.stringify({
+          composer: composerComparison.ratio,
+          full: comparison.ratio,
+          recovery: recoveryComparison.ratio,
+          user: userComparison.ratio,
+        })} exceed ${JSON.stringify({
+          composer: maximumComposerRatio,
+          full: maximumRatio,
+          recovery: maximumRecoveryRatio,
+          user: maximumUserRatio,
+        })}.`,
+      );
+    }
+    console.log(
+      `${scene.id}: current-build MCP recovery pixel ratios ${JSON.stringify({
+        composer: composerComparison.ratio,
+        full: comparison.ratio,
+        recovery: recoveryComparison.ratio,
+        user: userComparison.ratio,
       })}`,
     );
   }

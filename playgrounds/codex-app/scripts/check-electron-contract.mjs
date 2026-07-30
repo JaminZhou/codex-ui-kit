@@ -318,6 +318,121 @@ try {
   await mcpApp.close();
 }
 
+const recoveryScene = {
+  frame: "mixed-review-open",
+  id: "electron-mcp-recovery-mixed-thread",
+  scenario: "mcp-recovery-mixed-thread",
+};
+const { app: recoveryApp, page: recoveryPage } = await launchScene(
+  recoveryScene,
+  { capture: false, layoutMode: "wide" },
+);
+
+try {
+  const recoveryTimeline = recoveryPage.getByRole("button", {
+    name: "Worked for 28s",
+  });
+  await recoveryTimeline.click();
+  const recoveryGroup = recoveryPage.getByTestId("mcp-tool-call-group");
+  await recoveryGroup.locator(":scope > details > summary").click();
+  const recoveryCalls = recoveryGroup.locator(".codex-ui-tool-call");
+  const failedCall = recoveryCalls.first();
+  await failedCall.locator("summary").click();
+
+  const recoveryInteraction = await recoveryPage.evaluate(() => {
+    const group = document.querySelector(
+      ".codex-ui-mcp-tool-call-group",
+    );
+    const failed = document.querySelector(
+      '[data-item-id="mcp-fetch-invalid"]',
+    );
+    return {
+      approvalDecision: document
+        .querySelector(
+          '.codex-ui-approval-request[data-item-id="command-recovery-note"]',
+        )
+        ?.getAttribute("data-decision"),
+      commandCount: document.querySelectorAll(
+        ".codex-ui-command-execution",
+      ).length,
+      errorPresentation: failed
+        ?.querySelector(".codex-ui-tool-call__error")
+        ?.getAttribute("data-presentation"),
+      errorText: failed
+        ?.querySelector(".codex-ui-tool-call__error")
+        ?.textContent?.replace(/\s+/g, " ")
+        .trim(),
+      fileCount: document.querySelectorAll(
+        ".codex-ui-file-change-group__file",
+      ).length,
+      groupLabel: group
+        ?.querySelector(".codex-ui-mcp-tool-call-group__label")
+        ?.textContent?.trim(),
+      groupStatus: group?.getAttribute("data-status"),
+      reviewFileCount: document.querySelectorAll(
+        ".codex-ui-file-review__file",
+      ).length,
+      reviewPanelOpen: Boolean(
+        document.querySelector(
+          '.codex-ui-workspace-panel[data-placement="side"]',
+        ),
+      ),
+      toolCount: group?.querySelectorAll(".codex-ui-tool-call").length,
+      responseActionLabels: Array.from(
+        document.querySelectorAll(".demo-turn-actions"),
+        (element) => element.getAttribute("aria-label"),
+      ),
+      userCount: document.querySelectorAll(
+        '.codex-ui-agent-message[data-role="user"]',
+      ).length,
+    };
+  });
+  if (
+    recoveryInteraction.approvalDecision !== "approved" ||
+    recoveryInteraction.commandCount !== 2 ||
+    recoveryInteraction.errorPresentation !== "output" ||
+    !recoveryInteraction.errorText?.includes("plaintext") ||
+    !recoveryInteraction.errorText?.includes("Invalid URL") ||
+    recoveryInteraction.fileCount !== 1 ||
+    recoveryInteraction.groupLabel !==
+      "Used OpenAI Developer Docs integration" ||
+    recoveryInteraction.groupStatus !== "completed" ||
+    recoveryInteraction.reviewFileCount !== 1 ||
+    !recoveryInteraction.reviewPanelOpen ||
+    JSON.stringify(recoveryInteraction.responseActionLabels) !==
+      JSON.stringify(["MCP response actions", "Response actions"]) ||
+    recoveryInteraction.toolCount !== 3 ||
+    recoveryInteraction.userCount !== 2
+  ) {
+    throw new Error(
+      `Electron MCP recovery and mixed-thread interaction failed: ${JSON.stringify(recoveryInteraction)}`,
+    );
+  }
+
+  await recoveryPage.getByRole("button", {
+    name: "Show raw tool call output",
+  }).click();
+  const rawOutputDialog = recoveryPage.getByRole("dialog", {
+    name: "Fetch OpenAI doc raw output",
+  });
+  await rawOutputDialog.waitFor({ state: "visible" });
+  const rawOutputText = await rawOutputDialog.textContent();
+  if (
+    !rawOutputText?.includes("not-a-valid-url") ||
+    !rawOutputText.includes("Invalid URL")
+  ) {
+    throw new Error(
+      `Electron MCP raw-output dialog omitted the call payload: ${rawOutputText}`,
+    );
+  }
+  await rawOutputDialog.getByRole("button", {
+    name: "Close dialog",
+  }).click();
+  await rawOutputDialog.waitFor({ state: "hidden" });
+} finally {
+  await recoveryApp.close();
+}
+
 const workflowScene = {
   frame: "review-open",
   id: "electron-workflow",

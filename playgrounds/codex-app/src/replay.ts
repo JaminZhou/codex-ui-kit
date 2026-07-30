@@ -4,6 +4,7 @@ import interruptionTrace from "../fixtures/traces/interruption.jsonl?raw";
 import largeFileReviewTrace from "../fixtures/traces/large-file-review.jsonl?raw";
 import markdownTrace from "../fixtures/traces/markdown.jsonl?raw";
 import mcpToolCallTrace from "../fixtures/traces/mcp-tool-call.jsonl?raw";
+import mcpRecoveryMixedThreadTrace from "../fixtures/traces/mcp-recovery-mixed-thread.jsonl?raw";
 import multiFileReviewTrace from "../fixtures/traces/multi-file-review.jsonl?raw";
 import recoveryTrace from "../fixtures/traces/streaming-recovery.jsonl?raw";
 import workflowTrace from "../fixtures/traces/workspace-workflow.jsonl?raw";
@@ -17,6 +18,7 @@ export type ReplayScenarioId =
   | "large-file-review"
   | "markdown"
   | "mcp-tool-call"
+  | "mcp-recovery-mixed-thread"
   | "multi-file-review"
   | "workspace-workflow";
 
@@ -114,6 +116,12 @@ export const replayScenarios: Record<ReplayScenarioId, ReplayScenario> = {
     "Find Codex MCP support docs",
     "A real public docs integration sequence with five successful MCP calls.",
     mcpToolCallTrace,
+  ),
+  "mcp-recovery-mixed-thread": scenario(
+    "mcp-recovery-mixed-thread",
+    "Verify Codex MCP docs recovery",
+    "A failed fetch recovers through search, then a second turn runs a command, approval, and file review.",
+    mcpRecoveryMixedThreadTrace,
   ),
 };
 

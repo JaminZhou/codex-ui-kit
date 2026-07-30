@@ -14,6 +14,7 @@ import {
   CommandExecution,
   CommandOutput,
   ConversationThreadShell,
+  Dialog,
   FileChangeGroup,
   FileReview,
   McpToolCallGroup,
@@ -63,8 +64,10 @@ import {
   type ReviewSelection,
 } from "./review-selection";
 import {
+  hasMcpToolCallGroupForTurn,
   mcpToolCallGroupDurationMs,
   mcpToolCallGroupForEntry,
+  mcpToolCallGroupStatus,
   mcpToolCallPresentation,
 } from "./mcp-tool-call-view";
 
@@ -170,10 +173,14 @@ function McpAnswer({ text }: { text: string }) {
   );
 }
 
-function McpResponseActions() {
+function McpResponseActions({
+  label = "MCP response actions",
+}: {
+  label?: string;
+}) {
   return (
     <span
-      aria-label="MCP response actions"
+      aria-label={label}
       className="demo-mcp-turn-actions demo-turn-actions"
       role="toolbar"
     >
@@ -295,7 +302,8 @@ export function App() {
     () => initialSelection.capture || !isNarrowDemoWindow(),
   );
   const [reviewOpen, setReviewOpen] = useState(
-    initialSelection.frame === "review-open",
+    initialSelection.frame === "review-open" ||
+      initialSelection.frame === "mixed-review-open",
   );
   const [terminalOpen, setTerminalOpen] = useState(
     initialSelection.scenarioId === "background-terminal",
@@ -311,6 +319,10 @@ export function App() {
   const [reviewSelection, setReviewSelection] =
     useState<ReviewSelection | null>(null);
   const [reviewSelectionKey, setReviewSelectionKey] = useState(0);
+  const [rawToolOutput, setRawToolOutput] = useState<{
+    name: string;
+    value: unknown;
+  } | null>(null);
   const [pullRequestExpanded, setPullRequestExpanded] = useState(false);
   const [pullRequestOpen, setPullRequestOpen] = useState(
     initialSelection.view === "pull-request",
@@ -717,7 +729,8 @@ export function App() {
     mode === "replay" &&
     (scenarioId === "multi-file-review" ||
       scenarioId === "markdown" ||
-      scenarioId === "mcp-tool-call");
+      scenarioId === "mcp-tool-call" ||
+      scenarioId === "mcp-recovery-mixed-thread");
   const composer = (
     <AgentComposer
       actions={
@@ -1068,6 +1081,13 @@ export function App() {
     if (entry.kind === "message") {
       const message = state.messages.find(({ id }) => id === entry.id);
       if (!message) return null;
+      if (
+        scenarioId === "mcp-recovery-mixed-thread" &&
+        message.id === "assistant-recovery-intro" &&
+        hasMcpToolCallGroupForTurn(state, message.turnId)
+      ) {
+        return null;
+      }
       return (
         <Fragment key={`message:${message.id}`}>
           <AgentMessage
@@ -1076,10 +1096,20 @@ export function App() {
               ((scenarioId === "markdown" &&
                 message.id === "assistant-markdown") ||
                 (scenarioId === "mcp-tool-call" &&
-                  message.id === "assistant-mcp")) &&
+                  message.id === "assistant-mcp") ||
+                (scenarioId === "mcp-recovery-mixed-thread" &&
+                  (message.id === "assistant-recovery" ||
+                    message.id === "assistant-workflow"))) &&
               message.status === "completed" ? (
-                scenarioId === "mcp-tool-call" ? (
-                  <McpResponseActions />
+                scenarioId === "mcp-tool-call" ||
+                scenarioId === "mcp-recovery-mixed-thread" ? (
+                  <McpResponseActions
+                    label={
+                      message.id === "assistant-workflow"
+                        ? "Response actions"
+                        : undefined
+                    }
+                  />
                 ) : (
                   <span
                     aria-label="Markdown response actions"
@@ -1155,18 +1185,21 @@ export function App() {
       const calls = mcpToolCallGroupForEntry(state, entryIndex);
       if (!calls) return null;
       const toolCall = calls[0];
-      const groupStatus = calls.some(
-        ({ status }) => status === "running" || status === "pending",
-      )
-        ? "running"
-        : calls.some(({ status }) => status === "failed")
-          ? "failed"
-          : "completed";
+      const recoveryIntro =
+        scenarioId === "mcp-recovery-mixed-thread"
+          ? state.messages.find(
+              ({ id }) => id === "assistant-recovery-intro",
+            )
+          : undefined;
+      const groupStatus = mcpToolCallGroupStatus(calls);
       const captureOpen =
         initialSelection.capture &&
         (initialSelection.frame === "mcp-running" ||
           initialSelection.frame === "mcp-progress" ||
-          initialSelection.frame === "mcp-tool-calls");
+          initialSelection.frame === "mcp-tool-calls" ||
+          initialSelection.frame === "mcp-recovery-failed" ||
+          initialSelection.frame === "mcp-recovery-retrying" ||
+          initialSelection.frame === "mcp-recovery-completed");
       const durationMs = mcpToolCallGroupDurationMs(state, calls);
       return (
         <ActivityTimeline
@@ -1175,10 +1208,25 @@ export function App() {
           summary={
             <TurnDuration
               durationMs={durationMs}
-              status={groupStatus === "running" ? "working" : "worked"}
+              status={
+                groupStatus === "running" ||
+                state.currentTurnId === toolCall.turnId
+                  ? "working"
+                  : "worked"
+              }
             />
           }
         >
+          {recoveryIntro ? (
+            <AgentMessage
+              className="demo-mcp-recovery-intro"
+              data-item-id={recoveryIntro.id}
+              role="assistant"
+              status={agentMessageStatus(recoveryIntro.status)}
+            >
+              <AgentMarkdown>{recoveryIntro.text}</AgentMarkdown>
+            </AgentMessage>
+          ) : null}
           <McpToolCallGroup
             data-testid="mcp-tool-call-group"
             defaultOpen={false}
@@ -1193,9 +1241,46 @@ export function App() {
                 <ToolCallCard
                   data-item-id={call.id}
                   error={presentation.error}
+                  errorLanguage={
+                    call.status === "failed" ? "plaintext" : undefined
+                  }
+                  errorPresentation={
+                    call.status === "failed" ? "output" : undefined
+                  }
+                  failedAriaLabel={
+                    call.status === "failed"
+                      ? `${call.toolLabel} failed`
+                      : undefined
+                  }
+                  failedLabel={call.toolLabel}
                   key={call.id}
                   icon={<McpToolIcon />}
                   name={call.toolLabel}
+                  open={
+                    initialSelection.capture &&
+                    call.id === "mcp-fetch-invalid" &&
+                    (initialSelection.frame === "mcp-recovery-failed" ||
+                      initialSelection.frame === "mcp-recovery-completed")
+                      ? true
+                      : undefined
+                  }
+                  onViewRawOutput={
+                    call.status === "failed"
+                      ? (value) =>
+                          setRawToolOutput({
+                            name: call.toolLabel,
+                            value,
+                          })
+                      : undefined
+                  }
+                  rawOutput={
+                    call.status === "failed"
+                      ? {
+                          arguments: call.arguments,
+                          error: call.error,
+                        }
+                      : undefined
+                  }
                   result={presentation.result}
                   role="listitem"
                   source={call.server}
@@ -1642,6 +1727,23 @@ export function App() {
           </>
         )}
       </AppShell>
+      <Dialog
+        className="demo-raw-tool-output-dialog"
+        description="Arguments and error returned by the integration."
+        onOpenChange={(open) => {
+          if (!open) setRawToolOutput(null);
+        }}
+        open={rawToolOutput !== null}
+        title={
+          rawToolOutput
+            ? `${rawToolOutput.name} raw output`
+            : "Raw tool call output"
+        }
+      >
+        <pre className="demo-raw-tool-output">
+          <code>{JSON.stringify(rawToolOutput?.value, null, 2)}</code>
+        </pre>
+      </Dialog>
     </div>
   );
 }

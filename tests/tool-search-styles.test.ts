@@ -23,6 +23,21 @@ describe("tool and search visual contract", () => {
     expect(styles).toMatch(
       /\.codex-ui-search-activity__entries img,[\s\S]*?height: 0\.875rem;[\s\S]*?width: 0\.875rem/,
     );
+    expect(styles).toMatch(
+      /\.codex-ui-mcp-tool-call-group__calls[\s\S]*?\.codex-ui-activity__body \{[\s\S]*?margin-left: 0/,
+    );
+  });
+
+  it("supports the neutral output treatment used by recovered MCP failures", () => {
+    expect(styles).toMatch(
+      /\.codex-ui-tool-call__error\[data-presentation="output"\] \{[\s\S]*?background: var\(--codex-ui-code-block-bg\);[\s\S]*?min-height: 4\.25rem/,
+    );
+    expect(styles).toMatch(
+      /\.codex-ui-tool-call__error-output \{[\s\S]*?font-family: var\(--codex-ui-font-mono\)/,
+    );
+    expect(styles).toMatch(
+      /\.codex-ui-tool-call__error\[data-presentation="output"\][\s\S]*?\+ \.codex-ui-tool-call__raw-output \{[\s\S]*?opacity: 1;[\s\S]*?position: static/,
+    );
   });
 
   it("protects active and disclosure motion under reduced motion", () => {

@@ -1,7 +1,9 @@
 import { describe, expect, it } from "vitest";
 import {
+  hasMcpToolCallGroupForTurn,
   mcpToolCallGroupDurationMs,
   mcpToolCallGroupForEntry,
+  mcpToolCallGroupStatus,
   mcpToolCallPresentation,
 } from "../src/mcp-tool-call-view";
 import {
@@ -88,5 +90,92 @@ describe("MCP tool-call view model", () => {
       structuredContent: undefined,
       summary: undefined,
     });
+  });
+
+  it("treats an earlier failed call followed by success as a recovered group", () => {
+    const completed = reduceProtocolTrace(
+      replayScenarios["mcp-recovery-mixed-thread"].events.slice(
+        0,
+        replayScenarios["mcp-recovery-mixed-thread"].frames[
+          "mcp-recovery-completed"
+        ],
+      ),
+    );
+    const calls = completed.mcpToolCalls;
+
+    expect(mcpToolCallGroupStatus(calls)).toBe("completed");
+    expect(
+      mcpToolCallGroupStatus([
+        {
+          ...calls[0]!,
+          status: "failed",
+        },
+      ]),
+    ).toBe("failed");
+    expect(
+      mcpToolCallGroupStatus([
+        ...calls,
+        {
+          ...calls.at(-1)!,
+          id: "pending-retry",
+          status: "pending",
+        },
+      ]),
+    ).toBe("running");
+  });
+
+  it("uses terminal-event order when overlapping calls finish out of order", () => {
+    const completed = reduceProtocolTrace(
+      replayScenarios["mcp-recovery-mixed-thread"].events.slice(
+        0,
+        replayScenarios["mcp-recovery-mixed-thread"].frames[
+          "mcp-recovery-completed"
+        ],
+      ),
+    );
+    const [first, second] = completed.mcpToolCalls;
+
+    expect(
+      mcpToolCallGroupStatus([
+        {
+          ...first!,
+          status: "failed",
+          terminalEventSequence: 10,
+        },
+        {
+          ...second!,
+          status: "completed",
+          terminalEventSequence: 9,
+        },
+      ]),
+    ).toBe("failed");
+    expect(
+      mcpToolCallGroupStatus([
+        {
+          ...first!,
+          status: "failed",
+          terminalEventSequence: 9,
+        },
+        {
+          ...second!,
+          status: "completed",
+          terminalEventSequence: 10,
+        },
+      ]),
+    ).toBe("completed");
+  });
+
+  it("only reparents the recovery intro after its MCP group exists", () => {
+    const events =
+      replayScenarios["mcp-recovery-mixed-thread"].events;
+    const introOnly = reduceProtocolTrace(events.slice(0, 4));
+    const firstCallStarted = reduceProtocolTrace(events.slice(0, 5));
+
+    expect(
+      hasMcpToolCallGroupForTurn(introOnly, "turn-recovery"),
+    ).toBe(false);
+    expect(
+      hasMcpToolCallGroupForTurn(firstCallStarted, "turn-recovery"),
+    ).toBe(true);
   });
 });

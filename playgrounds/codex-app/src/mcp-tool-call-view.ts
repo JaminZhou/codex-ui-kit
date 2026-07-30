@@ -40,6 +40,16 @@ export function mcpToolCallGroupForEntry(
   return calls[0]?.id === toolCall.id ? calls : null;
 }
 
+export function hasMcpToolCallGroupForTurn(
+  state: DemoProtocolState,
+  turnId: string | null,
+) {
+  return (
+    turnId !== null &&
+    state.mcpToolCalls.some((call) => call.turnId === turnId)
+  );
+}
+
 export function mcpToolCallGroupDurationMs(
   state: DemoProtocolState,
   calls: readonly DemoMcpToolCall[],
@@ -52,6 +62,31 @@ export function mcpToolCallGroupDurationMs(
       0,
     )
   );
+}
+
+export function mcpToolCallGroupStatus(
+  calls: readonly DemoMcpToolCall[],
+): DemoMcpToolCall["status"] {
+  if (
+    calls.some(
+      ({ status }) => status === "running" || status === "pending",
+    )
+  ) {
+    return "running";
+  }
+  const lastTerminalCall = calls
+    .filter(
+      ({ status }) => status === "completed" || status === "failed",
+    )
+    .reduce<DemoMcpToolCall | undefined>((latest, call) => {
+      if (!latest) return call;
+      const latestSequence = latest.terminalEventSequence ?? -1;
+      const callSequence = call.terminalEventSequence ?? -1;
+      return callSequence >= latestSequence ? call : latest;
+    }, undefined);
+  return lastTerminalCall?.status === "failed"
+    ? "failed"
+    : "completed";
 }
 
 export function mcpToolCallPresentation(call: DemoMcpToolCall) {
