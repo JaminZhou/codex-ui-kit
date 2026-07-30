@@ -1822,6 +1822,17 @@ try {
   );
   if (
     (await codingWorkspacePage
+      .getByText("Run the protocol-backed coding workspace lifecycle.", {
+        exact: true,
+      })
+      .count()) !== 1
+  ) {
+    throw new Error(
+      "Electron coding workspace discarded the submitted prompt.",
+    );
+  }
+  if (
+    (await codingWorkspacePage
       .getByTestId("command-execution")
       .count()) !== 2
   ) {

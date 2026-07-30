@@ -87,4 +87,53 @@ describe("workspace replay routing", () => {
       cwd: "/workspace/codex-ui-kit",
     });
   });
+
+  it("preserves the submitted prompt in the contextualized user message", () => {
+    const events: ProtocolEventRecord[] = [
+      {
+        atMs: 1,
+        method: "item/started",
+        params: {
+          item: {
+            content: [
+              {
+                text: "Static fixture prompt",
+                text_elements: [],
+                type: "text",
+              },
+            ],
+            id: "user-workflow",
+            type: "userMessage",
+          },
+        },
+      },
+    ];
+
+    const contextualized = contextualizeWorkspaceReplay(
+      events,
+      "/workspace/codex-ui-kit",
+      "Review my selected workspace.",
+    );
+
+    expect(contextualized[0]?.params).toMatchObject({
+      item: {
+        content: [
+          {
+            text: "Review my selected workspace.",
+            type: "text",
+          },
+        ],
+        type: "userMessage",
+      },
+    });
+    expect(events[0]?.params).toMatchObject({
+      item: {
+        content: [
+          {
+            text: "Static fixture prompt",
+          },
+        ],
+      },
+    });
+  });
 });

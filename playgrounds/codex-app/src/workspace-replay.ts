@@ -79,16 +79,64 @@ function replaceCwd(value: JsonValue, cwd: string): JsonValue {
   return value;
 }
 
+function isJsonObject(value: JsonValue): value is Record<string, JsonValue> {
+  return value !== null && typeof value === "object" && !Array.isArray(value);
+}
+
+function replaceWorkspacePrompt(value: JsonValue, prompt: string): JsonValue {
+  if (!isJsonObject(value)) return value;
+  const item = value.item;
+  if (
+    !isJsonObject(item) ||
+    item.type !== "userMessage" ||
+    !Array.isArray(item.content)
+  ) {
+    return value;
+  }
+
+  let replaced = false;
+  const content = item.content.map((part) => {
+    if (
+      replaced ||
+      !isJsonObject(part) ||
+      part.type !== "text"
+    ) {
+      return part;
+    }
+    replaced = true;
+    return {
+      ...part,
+      text: prompt,
+    };
+  });
+  return replaced
+    ? {
+        ...value,
+        item: {
+          ...item,
+          content,
+        },
+      }
+    : value;
+}
+
 export function contextualizeWorkspaceReplay(
   events: readonly ProtocolEventRecord[],
   cwd: string,
+  prompt?: string,
 ): ProtocolEventRecord[] {
-  return events.map((event) => ({
-    ...event,
-    params: replaceCwd(event.params, cwd),
-    response:
-      event.response === undefined
-        ? undefined
-        : replaceCwd(event.response, cwd),
-  }));
+  return events.map((event) => {
+    const params = replaceCwd(event.params, cwd);
+    return {
+      ...event,
+      params:
+        prompt === undefined
+          ? params
+          : replaceWorkspacePrompt(params, prompt),
+      response:
+        event.response === undefined
+          ? undefined
+          : replaceCwd(event.response, cwd),
+    };
+  });
 }

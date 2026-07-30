@@ -587,6 +587,9 @@ export function App() {
   const [workspaceRunCwd, setWorkspaceRunCwd] = useState(
     "/workspace/codex-ui-kit",
   );
+  const [workspaceRunPrompt, setWorkspaceRunPrompt] = useState<
+    string | undefined
+  >(undefined);
   const [threadFollowing, setThreadFollowing] = useState(
     initialSelection.frame !== "thread-scroll-away",
   );
@@ -652,9 +655,13 @@ export function App() {
   const scenarioEvents = useMemo(
     () =>
       scenario.id === "workspace-workflow"
-        ? contextualizeWorkspaceReplay(scenario.events, workspaceRunCwd)
+        ? contextualizeWorkspaceReplay(
+            scenario.events,
+            workspaceRunCwd,
+            workspaceRunPrompt,
+          )
         : scenario.events,
-    [scenario, workspaceRunCwd],
+    [scenario, workspaceRunCwd, workspaceRunPrompt],
   );
   const replay = useMemo(
     () => replayState(scenarioEvents, replayCount),
@@ -778,8 +785,18 @@ export function App() {
   const selectScenario = (
     nextId: ReplayScenarioId,
     frame: string | null = null,
+    workspaceContext?: {
+      cwd: string;
+      prompt: string;
+    },
   ) => {
     cancelReplaySubmitTimer();
+    if (nextId === "workspace-workflow") {
+      setWorkspaceRunCwd(
+        workspaceContext?.cwd ?? "/workspace/codex-ui-kit",
+      );
+      setWorkspaceRunPrompt(workspaceContext?.prompt);
+    }
     setView("conversation");
     setMode("replay");
     setScenarioId(nextId);
@@ -1802,9 +1819,11 @@ export function App() {
         </span>
       }
       layout="multiline"
-      onSubmit={() => {
-        setWorkspaceRunCwd(currentWorkspaceCwd);
-        selectScenario("workspace-workflow", "approval-pending")
+      onSubmit={(prompt) => {
+        selectScenario("workspace-workflow", "approval-pending", {
+          cwd: currentWorkspaceCwd,
+          prompt,
+        });
       }}
       onValueChange={setComposerValue}
       placeholder="Do anything"
