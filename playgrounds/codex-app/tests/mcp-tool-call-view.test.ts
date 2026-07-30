@@ -124,6 +124,47 @@ describe("MCP tool-call view model", () => {
     ).toBe("running");
   });
 
+  it("uses terminal-event order when overlapping calls finish out of order", () => {
+    const completed = reduceProtocolTrace(
+      replayScenarios["mcp-recovery-mixed-thread"].events.slice(
+        0,
+        replayScenarios["mcp-recovery-mixed-thread"].frames[
+          "mcp-recovery-completed"
+        ],
+      ),
+    );
+    const [first, second] = completed.mcpToolCalls;
+
+    expect(
+      mcpToolCallGroupStatus([
+        {
+          ...first!,
+          status: "failed",
+          terminalEventSequence: 10,
+        },
+        {
+          ...second!,
+          status: "completed",
+          terminalEventSequence: 9,
+        },
+      ]),
+    ).toBe("failed");
+    expect(
+      mcpToolCallGroupStatus([
+        {
+          ...first!,
+          status: "failed",
+          terminalEventSequence: 9,
+        },
+        {
+          ...second!,
+          status: "completed",
+          terminalEventSequence: 10,
+        },
+      ]),
+    ).toBe("completed");
+  });
+
   it("only reparents the recovery intro after its MCP group exists", () => {
     const events =
       replayScenarios["mcp-recovery-mixed-thread"].events;

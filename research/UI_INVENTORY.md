@@ -341,7 +341,9 @@ expanded neutral `plaintext / Invalid URL` output, retries with
 `search_openai_docs`, and finishes with a valid `fetch_openai_doc`. The
 current Renderer groups the three rows under `Worked for 28s` and
 `Used OpenAI Developer Docs integration`; an earlier failed call therefore
-does not make the recovered group itself failed.
+does not make the recovered group itself failed. The independent replay tracks
+terminal-event order so overlapping calls cannot be misclassified from their
+start order.
 
 The public App Server traces use only schema-validated `mcpToolCall` start,
 progress, result, error, and completion fields. The new deterministic scenario

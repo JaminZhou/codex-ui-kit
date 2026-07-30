@@ -74,7 +74,19 @@ export function mcpToolCallGroupStatus(
   ) {
     return "running";
   }
-  return calls.at(-1)?.status === "failed" ? "failed" : "completed";
+  const lastTerminalCall = calls
+    .filter(
+      ({ status }) => status === "completed" || status === "failed",
+    )
+    .reduce<DemoMcpToolCall | undefined>((latest, call) => {
+      if (!latest) return call;
+      const latestSequence = latest.terminalEventSequence ?? -1;
+      const callSequence = call.terminalEventSequence ?? -1;
+      return callSequence >= latestSequence ? call : latest;
+    }, undefined);
+  return lastTerminalCall?.status === "failed"
+    ? "failed"
+    : "completed";
 }
 
 export function mcpToolCallPresentation(call: DemoMcpToolCall) {

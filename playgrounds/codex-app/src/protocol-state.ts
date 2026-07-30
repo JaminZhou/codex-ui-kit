@@ -110,6 +110,7 @@ export interface DemoMcpToolCall {
   server: string;
   status: "completed" | "failed" | "pending" | "running";
   structuredContent: JsonValue | null;
+  terminalEventSequence: number | null;
   tool: string;
   toolLabel: string;
   turnId: string | null;
@@ -644,6 +645,7 @@ export function reduceProtocolNotification(
       const resultContent = Array.isArray(result.content)
         ? result.content.map((value) => asJsonValue(value))
         : (existing?.content ?? []);
+      const status = mcpToolCallStatus(item.status);
       return {
         ...next,
         mcpToolCalls: upsertById(state.mcpToolCalls, {
@@ -659,11 +661,16 @@ export function reduceProtocolNotification(
           id: itemId,
           progress: existing?.progress ?? [],
           server,
-          status: mcpToolCallStatus(item.status),
+          status,
           structuredContent:
             result.structuredContent === undefined
               ? (existing?.structuredContent ?? null)
               : asJsonValue(result.structuredContent),
+          terminalEventSequence:
+            notification.method === "item/completed" &&
+            (status === "completed" || status === "failed")
+              ? next.eventCount
+              : null,
           tool,
           toolLabel: mcpToolLabel(
             tool,

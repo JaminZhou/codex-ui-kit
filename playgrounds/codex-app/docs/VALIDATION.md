@@ -98,7 +98,9 @@ retry, a recovered group, and the recovered thread followed by a
 command/approval/file/Review turn. CDP verifies the ordered Fetch, Search, and
 Fetch rows, the expanded neutral `plaintext` error output, and the rule that an
 earlier failed call followed by a successful final call leaves the historical
-group completed. Electron expands the same historical disclosure while the
+group completed. The reducer records terminal-event sequence so overlapping
+calls are judged by completion order rather than start order. Electron expands
+the same historical disclosure while the
 Review split is open and verifies two user messages, two commands, the accepted
 approval, one file change, the Review panel, and the failed call's functional
 raw-output dialog with focus restoration. The recovery completed frame uses
