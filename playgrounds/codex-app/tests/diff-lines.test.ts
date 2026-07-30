@@ -105,4 +105,22 @@ describe("diff lines", () => {
       ).kind,
     ).toBe("diff");
   });
+
+  it("does not report conflict markers that the patch removes", () => {
+    expect(
+      reviewContent(
+        change(
+          [
+            "@@ -1,5 +1 @@",
+            "-<<<<<<< HEAD",
+            "-const source = 'main';",
+            "-=======",
+            "-const source = 'branch';",
+            "->>>>>>> feat/review",
+            "+const source = 'resolved';",
+          ].join("\n"),
+        ),
+      ).kind,
+    ).toBe("diff");
+  });
 });

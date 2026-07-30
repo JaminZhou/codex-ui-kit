@@ -7,9 +7,9 @@ import type { DemoFileUpdateChange } from "./protocol-state";
 const binaryDiffPattern =
   /^(?:Binary files? .+ differ|GIT binary patch|Binary file .+)$/im;
 const conflictMarkerPatterns = [
-  /^(?:[ +\-])?<{7}(?: .+)?$/m,
-  /^(?:[ +\-])?={7}$/m,
-  /^(?:[ +\-])?>{7}(?: .+)?$/m,
+  /^(?:[ +])?<{7}(?: .+)?$/m,
+  /^(?:[ +])?={7}$/m,
+  /^(?:[ +])?>{7}(?: .+)?$/m,
 ] as const;
 
 export function diffLines(change: DemoFileUpdateChange): FileDiffLine[] {
