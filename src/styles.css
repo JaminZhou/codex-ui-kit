@@ -6070,6 +6070,10 @@ summary.codex-ui-activity__header::after {
 }
 
 .codex-ui-conversation-thread-shell__composer
+  > .codex-ui-composer,
+.codex-ui-conversation-thread-shell__composer
+  > .codex-ui-composer-dock
+  > .codex-ui-composer-dock__surface
   > .codex-ui-composer {
   --codex-ui-composer-background: var(
     --codex-ui-conversation-thread-composer-background

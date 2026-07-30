@@ -789,6 +789,7 @@ for (const scene of visualScenes) {
             ".codex-ui-composer-attachment",
           ).length,
           composer: {
+            backgroundColor: getComputedStyle(composer).backgroundColor,
             busy: composer.getAttribute("aria-busy"),
             disabled: composer.hasAttribute("data-disabled"),
             layout: composer.getAttribute("data-layout"),
@@ -835,6 +836,7 @@ for (const scene of visualScenes) {
           },
           queue: queue
             ? {
+                backgroundColor: getComputedStyle(queue).backgroundColor,
                 interrupted: Boolean(
                   queue.querySelector(
                     ".codex-ui-composer-queue[data-interrupted]",
@@ -925,6 +927,8 @@ for (const scene of visualScenes) {
         scene.id === "composer-queued" &&
         (!conversation.queue ||
           conversation.dock.hasQueue !== "true" ||
+          conversation.queue.backgroundColor !==
+            conversation.composer.backgroundColor ||
           conversation.queue.rowCount !== 1 ||
           conversation.queueCount !== "1" ||
           !conversation.queue.labels.includes("Steer") ||
@@ -948,6 +952,8 @@ for (const scene of visualScenes) {
       if (
         scene.id === "composer-queue-paused" &&
         (!conversation.queue?.interrupted ||
+          conversation.queue.backgroundColor !==
+            conversation.composer.backgroundColor ||
           conversation.phase !== "queue-paused" ||
           conversation.stopCount !== 0 ||
           !conversation.queue.labels.includes("Resume") ||
