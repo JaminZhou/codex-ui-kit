@@ -53,7 +53,10 @@ describe("application shell visual contract", () => {
 
   it("keeps current-build narrow preview distinct from modal fallback", () => {
     expect(styles).toContain(
-      '.codex-ui-app-shell[data-narrow-sidebar-behavior="current-build"][data-sidebar-open]',
+      '.codex-ui-app-shell[data-narrow-sidebar-behavior="current-build"][data-sidebar-pinned]',
+    );
+    expect(styles).toMatch(
+      /\[data-narrow-sidebar-behavior="current-build"\]\[data-sidebar-pinned\][\s\S]*?grid-template-columns:[\s\S]*?calc\(100% - 3rem\)[\s\S]*?minmax\(3rem, 1fr\);/,
     );
     expect(styles).toContain(
       '.codex-ui-app-shell[data-narrow-sidebar-behavior="current-build"][data-sidebar-preview-open]:not([data-sidebar-open])',

@@ -1572,21 +1572,24 @@
     inset-inline-start: 0;
   }
 
-  .codex-ui-app-shell[data-narrow-sidebar-behavior="current-build"][data-sidebar-open]
+  .codex-ui-app-shell[data-narrow-sidebar-behavior="current-build"][data-sidebar-pinned]
     .codex-ui-app-shell__layout {
     grid-template-columns:
-      var(--codex-ui-app-shell-sidebar-track)
-      minmax(0, 1fr);
+      min(
+        var(--codex-ui-app-shell-sidebar-track),
+        calc(100% - 3rem)
+      )
+      minmax(3rem, 1fr);
   }
 
-  .codex-ui-app-shell[data-narrow-sidebar-behavior="current-build"][data-sidebar-open]
+  .codex-ui-app-shell[data-narrow-sidebar-behavior="current-build"][data-sidebar-pinned]
     .codex-ui-app-shell__main,
-  .codex-ui-app-shell[data-narrow-sidebar-behavior="current-build"][data-sidebar-open]
+  .codex-ui-app-shell[data-narrow-sidebar-behavior="current-build"][data-sidebar-pinned]
     .codex-ui-app-shell__bottom-panel {
     grid-column: 2;
   }
 
-  .codex-ui-app-shell[data-narrow-sidebar-behavior="current-build"][data-sidebar-open]
+  .codex-ui-app-shell[data-narrow-sidebar-behavior="current-build"][data-sidebar-pinned]
     .codex-ui-app-shell__sidebar {
     bottom: auto;
     box-shadow: none;
@@ -1600,7 +1603,7 @@
     width: auto;
   }
 
-  .codex-ui-app-shell[data-narrow-sidebar-behavior="current-build"][data-sidebar-open]
+  .codex-ui-app-shell[data-narrow-sidebar-behavior="current-build"][data-sidebar-pinned]
     .codex-ui-app-shell__backdrop[data-backdrop="sidebar"] {
     display: none;
     opacity: 0;
@@ -1613,12 +1616,12 @@
     visibility: visible;
   }
 
-  .codex-ui-app-shell[data-narrow-sidebar-behavior="current-build"][data-sidebar-open]
+  .codex-ui-app-shell[data-narrow-sidebar-behavior="current-build"][data-sidebar-pinned]
     .codex-ui-app-shell__side-panel {
     max-width: calc(100% - var(--codex-ui-app-shell-sidebar-track));
   }
 
-  .codex-ui-app-shell[data-narrow-sidebar-behavior="current-build"][data-sidebar-open][data-side-panel-open]
+  .codex-ui-app-shell[data-narrow-sidebar-behavior="current-build"][data-sidebar-pinned][data-side-panel-open]
     .codex-ui-app-shell__backdrop[data-backdrop="side-panel"] {
     inset-inline-start: var(--codex-ui-app-shell-sidebar-track);
   }

@@ -829,6 +829,61 @@ describe("application shell", () => {
     expect(onSelect).toHaveBeenCalledOnce();
   });
 
+  it("falls back to a modal when a pinned narrow sidebar cannot fit", () => {
+    let resize: ((width: number) => void) | undefined;
+    class ResizeObserverMock {
+      constructor(
+        private readonly callback: ResizeObserverCallback,
+      ) {}
+
+      disconnect() {}
+
+      observe(target: Element) {
+        if (!target.classList.contains("codex-ui-app-shell")) return;
+        resize = (width) =>
+          this.callback(
+            [
+              {
+                contentRect: { height: 680, width },
+                target,
+              } as ResizeObserverEntry,
+            ],
+            this as unknown as ResizeObserver,
+          );
+      }
+
+      unobserve() {}
+    }
+    vi.stubGlobal("ResizeObserver", ResizeObserverMock);
+    const { container } = render(
+      <AppShell
+        layoutMode="narrow"
+        narrowSidebarBehavior="current-build"
+        onSidebarOpenChange={() => undefined}
+        sidebar="Navigation"
+        sidebarOpen
+        sidebarWidth={520}
+      >
+        Conversation
+      </AppShell>,
+    );
+    const shell = container.querySelector(".codex-ui-app-shell")!;
+    const main = screen.getByRole("main", { name: "Conversation" });
+    const backdrop = container.querySelector(
+      '.codex-ui-app-shell__backdrop[data-backdrop="sidebar"]',
+    ) as HTMLButtonElement;
+
+    act(() => resize?.(400));
+    expect(shell.hasAttribute("data-sidebar-pinned")).toBe(false);
+    expect(main.hasAttribute("inert")).toBe(true);
+    expect(backdrop.tabIndex).toBe(0);
+
+    act(() => resize?.(900));
+    expect(shell.hasAttribute("data-sidebar-pinned")).toBe(true);
+    expect(main.hasAttribute("inert")).toBe(false);
+    expect(backdrop.tabIndex).toBe(-1);
+  });
+
   it("caps a resized split sidebar before it can consume the main track", () => {
     let resize: ((width: number) => void) | undefined;
     class ResizeObserverMock {

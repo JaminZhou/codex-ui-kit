@@ -851,10 +851,17 @@ export function AppShell({
             : {}),
         } as CSSProperties)
       : style;
+  const currentBuildNarrowSidebarPinned =
+    currentBuildNarrowSidebar &&
+    sidebarOpen &&
+    (shellWidth === null ||
+      shellWidth >=
+        resolvedSidebarWidth + normalizedSidebarMinMainWidth);
   const sidebarModalOpen =
     sidebarOpen &&
     layoutMode === "narrow" &&
-    narrowSidebarBehavior === "modal";
+    (narrowSidebarBehavior === "modal" ||
+      !currentBuildNarrowSidebarPinned);
   const sidePanelModalOpen =
     sidePanelOpen &&
     sidePanelOverlay &&
@@ -1706,6 +1713,7 @@ export function AppShell({
       data-side-panel-resizable={sidePanelResizable || undefined}
       data-side-panel-resizing={sidePanelResizing || undefined}
       data-narrow-sidebar-behavior={narrowSidebarBehavior}
+      data-sidebar-pinned={currentBuildNarrowSidebarPinned || undefined}
       data-sidebar-preview-open={sidebarPreviewVisible || undefined}
       data-sidebar-resizable={sidebarResizable || undefined}
       data-sidebar-resizing={sidebarResizing || undefined}
