@@ -1478,7 +1478,7 @@ const {
 });
 
 try {
-  const resizeAndRead = async (width, height) => {
+  const resizeAndRead = async (width, height, expected) => {
     await responsiveContinuityApp.evaluate(
       ({ BrowserWindow }, size) => {
         BrowserWindow.getAllWindows()[0]?.setContentSize(
@@ -1489,10 +1489,19 @@ try {
       { height, width },
     );
     await responsiveContinuityPage.waitForFunction(
-      (expectedWidth) => window.innerWidth === expectedWidth,
-      width,
+      (target) => {
+        const shell = document.querySelector(".codex-ui-app-shell");
+        return (
+          window.innerWidth === target.width &&
+          window.innerHeight === target.height &&
+          shell?.getAttribute("data-layout-mode") === target.layoutMode &&
+          shell.hasAttribute("data-sidebar-open") === target.sidebarOpen &&
+          shell.hasAttribute("data-side-panel-open") === target.sidePanelOpen
+        );
+      },
+      { height, width, ...expected },
+      { timeout: 5_000 },
     );
-    await responsiveContinuityPage.waitForTimeout(80);
     return responsiveContinuityPage.evaluate(() => {
       const shell = document.querySelector(".codex-ui-app-shell");
       const main = document.querySelector(".codex-ui-app-shell__main");
@@ -1527,20 +1536,96 @@ try {
   };
 
   const responsiveMatrix = [];
-  for (const viewport of [
-    { height: 820, width: 1180 },
-    { height: 680, width: 961 },
-    { height: 680, width: 960 },
-    { height: 680, width: 721 },
-    { height: 680, width: 720 },
-    { height: 680, width: 721 },
-    { height: 680, width: 961 },
-    { height: 1080, width: 1920 },
-    { height: 1440, width: 2560 },
+  for (const { expected, ...viewport } of [
+    {
+      expected: {
+        layoutMode: "wide",
+        sidePanelOpen: true,
+        sidebarOpen: true,
+      },
+      height: 820,
+      width: 1180,
+    },
+    {
+      expected: {
+        layoutMode: "wide",
+        sidePanelOpen: true,
+        sidebarOpen: true,
+      },
+      height: 680,
+      width: 961,
+    },
+    {
+      expected: {
+        layoutMode: "medium",
+        sidePanelOpen: false,
+        sidebarOpen: true,
+      },
+      height: 680,
+      width: 960,
+    },
+    {
+      expected: {
+        layoutMode: "medium",
+        sidePanelOpen: false,
+        sidebarOpen: true,
+      },
+      height: 680,
+      width: 721,
+    },
+    {
+      expected: {
+        layoutMode: "narrow",
+        sidePanelOpen: false,
+        sidebarOpen: false,
+      },
+      height: 680,
+      width: 720,
+    },
+    {
+      expected: {
+        layoutMode: "medium",
+        sidePanelOpen: false,
+        sidebarOpen: true,
+      },
+      height: 680,
+      width: 721,
+    },
+    {
+      expected: {
+        layoutMode: "wide",
+        sidePanelOpen: true,
+        sidebarOpen: true,
+      },
+      height: 680,
+      width: 961,
+    },
+    {
+      expected: {
+        layoutMode: "wide",
+        sidePanelOpen: true,
+        sidebarOpen: true,
+      },
+      height: 1080,
+      width: 1920,
+    },
+    {
+      expected: {
+        layoutMode: "wide",
+        sidePanelOpen: true,
+        sidebarOpen: true,
+      },
+      height: 1440,
+      width: 2560,
+    },
   ]) {
     responsiveMatrix.push({
       ...viewport,
-      state: await resizeAndRead(viewport.width, viewport.height),
+      state: await resizeAndRead(
+        viewport.width,
+        viewport.height,
+        expected,
+      ),
     });
   }
 
