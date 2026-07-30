@@ -1523,6 +1523,19 @@ try {
   const projectSearch = projectDialog.getByRole("searchbox", {
     name: "Search projects",
   });
+  await projectSearch.press("Escape");
+  await projectDialog.waitFor({ state: "hidden" });
+  await codingWorkspacePage.waitForTimeout(50);
+  if (
+    (await codingWorkspacePage.evaluate(
+      () => document.activeElement?.getAttribute("aria-label"),
+    )) !== "Change project: codex-ui-kit"
+  ) {
+    throw new Error(
+      "Electron coding workspace did not restore project-trigger focus after Escape.",
+    );
+  }
+  await projectTrigger.click();
   await projectDialog
     .getByRole("button", {
       name: "Don't work in a project",

@@ -970,15 +970,15 @@ export function ConversationProjectListbox({
 
   useEffect(() => {
     if (!onDismiss || typeof document === "undefined") return;
+    const dismissBoundary = dismissBoundaryId
+      ? document.getElementById(dismissBoundaryId)
+      : null;
+    const trigger = triggerId
+      ? document.getElementById(triggerId)
+      : null;
     const handlePointerDown = (event: PointerEvent) => {
       const target = event.target;
       if (!(target instanceof Node)) return;
-      const trigger = triggerId
-        ? document.getElementById(triggerId)
-        : null;
-      const dismissBoundary = dismissBoundaryId
-        ? document.getElementById(dismissBoundaryId)
-        : null;
       if (
         !listboxRef.current?.contains(target) &&
         !trigger?.contains(target) &&
@@ -987,13 +987,54 @@ export function ConversationProjectListbox({
         onDismiss();
       }
     };
+    const handleBoundaryFocusOut = (
+      event: globalThis.FocusEvent,
+    ) => {
+      const nextTarget = event.relatedTarget;
+      if (
+        nextTarget instanceof Node &&
+        (dismissBoundary?.contains(nextTarget) ||
+          trigger?.contains(nextTarget))
+      ) {
+        return;
+      }
+      onDismiss();
+    };
+    const handleBoundaryKeyDown = (
+      event: globalThis.KeyboardEvent,
+    ) => {
+      if (event.key !== "Escape") return;
+      event.preventDefault();
+      event.stopPropagation();
+      onDismiss();
+      if (trigger && typeof window !== "undefined") {
+        window.setTimeout(() => trigger.focus());
+      }
+    };
     document.addEventListener("pointerdown", handlePointerDown, true);
-    return () =>
+    dismissBoundary?.addEventListener(
+      "focusout",
+      handleBoundaryFocusOut,
+    );
+    dismissBoundary?.addEventListener(
+      "keydown",
+      handleBoundaryKeyDown,
+    );
+    return () => {
       document.removeEventListener(
         "pointerdown",
         handlePointerDown,
         true,
       );
+      dismissBoundary?.removeEventListener(
+        "focusout",
+        handleBoundaryFocusOut,
+      );
+      dismissBoundary?.removeEventListener(
+        "keydown",
+        handleBoundaryKeyDown,
+      );
+    };
   }, [dismissBoundaryId, onDismiss, triggerId]);
 
   return (
@@ -1009,18 +1050,15 @@ export function ConversationProjectListbox({
       onBlur={(event: FocusEvent<HTMLDivElement>) => {
         onBlur?.(event);
         if (!onDismiss || event.defaultPrevented) return;
+        if (dismissBoundaryId) return;
         const nextTarget = event.relatedTarget;
         const trigger = triggerId
           ? document.getElementById(triggerId)
           : null;
-        const dismissBoundary = dismissBoundaryId
-          ? document.getElementById(dismissBoundaryId)
-          : null;
         if (
           nextTarget instanceof Node &&
           (listboxRef.current?.contains(nextTarget) ||
-            trigger?.contains(nextTarget) ||
-            dismissBoundary?.contains(nextTarget))
+            trigger?.contains(nextTarget))
         ) {
           return;
         }

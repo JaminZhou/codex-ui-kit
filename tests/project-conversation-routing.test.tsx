@@ -418,12 +418,53 @@ describe("project conversation routing", () => {
     action.focus();
     expect(onDismiss).not.toHaveBeenCalled();
 
-    fireEvent.pointerDown(
-      screen.getByRole("textbox", {
+    screen
+      .getByRole("textbox", {
         name: "Conversation composer",
-      }),
-    );
+      })
+      .focus();
     expect(onDismiss).toHaveBeenCalledTimes(1);
+  });
+
+  it("dismisses an explicit boundary with Escape from a sibling control", async () => {
+    const onDismiss = vi.fn();
+    render(
+      <>
+        <button id="escape-project-trigger" type="button">
+          Project
+        </button>
+        <div id="escape-project-dialog">
+          <input aria-label="Search projects" />
+          <ConversationProjectListbox
+            dismissBoundaryId="escape-project-dialog"
+            initialFocus="none"
+            items={[
+              {
+                id: "ui-kit",
+                label: "UI Kit",
+              },
+            ]}
+            onDismiss={onDismiss}
+            onSelect={() => undefined}
+            selectedId="ui-kit"
+            triggerId="escape-project-trigger"
+          />
+        </div>
+      </>,
+    );
+    const search = screen.getByRole("textbox", {
+      name: "Search projects",
+    });
+    search.focus();
+
+    fireEvent.keyDown(search, { key: "Escape" });
+
+    expect(onDismiss).toHaveBeenCalledTimes(1);
+    await waitFor(() =>
+      expect(document.activeElement).toBe(
+        screen.getByRole("button", { name: "Project" }),
+      ),
+    );
   });
 
   it("keeps a first-enabled tab stop without automatic focus", () => {
