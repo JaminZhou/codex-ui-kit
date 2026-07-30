@@ -142,6 +142,24 @@ contract:
 - Browser and Electron interaction gates plus an optional current-build
   regional sidebar comparison.
 
+## Tenth vertical slice
+
+The tenth slice adds current-build MCP failure recovery and a mixed second
+turn:
+
+- a real OpenAI Developer Docs invalid-URL failure followed by Search and a
+  valid Fetch in Codex Desktop `26.721.81911`;
+- a recovered integration group whose earlier failed call remains expandable
+  as neutral `plaintext / Invalid URL` output;
+- a schema-validated two-turn replay that continues through two commands, one
+  accepted approval, one file change, and Review;
+- CDP computed-style and geometry gates plus a real Electron disclosure and
+  mixed-thread interaction flow;
+- four additional reviewed frames for failed, retrying, recovered, and mixed
+  Review states;
+- an optional 906×820 current-build comparison for full-main, recovery, user,
+  and Composer regions.
+
 ## Development
 
 From the repository root:
@@ -202,6 +220,13 @@ The successful MCP gate uses the expanded 906×820 main-only reference:
 
 ```bash
 CODEX_UI_KIT_MCP_TOOL_CALL_REFERENCE=/absolute/path/to/mcp-main-reference.png \
+  pnpm --filter @codex-ui-kit/codex-app-playground check:visual
+```
+
+The recovered MCP gate uses a separate expanded 906×820 main-only reference:
+
+```bash
+CODEX_UI_KIT_MCP_RECOVERY_REFERENCE=/absolute/path/to/mcp-recovery-main-reference.png \
   pnpm --filter @codex-ui-kit/codex-app-playground check:visual
 ```
 

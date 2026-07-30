@@ -193,11 +193,31 @@
       ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
-        "cdp-26.721:synthetic-openai-developer-docs-mcp-success-expanded-1180x820"
+        "cdp-26.721:synthetic-openai-developer-docs-mcp-success-expanded-1180x820",
+        "cdp-26.721.81911:real-openai-developer-docs-invalid-url-search-fetch-recovery-expanded-1180x820",
+        "cdp-26.721.81911:real-mcp-recovery-computed-styles-and-906x820-regional-pixel-gate"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "partial_legacy",
-      "electronStatus": "partial_legacy",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
+      "priority": "p0"
+    },
+    {
+      "id": "thread.mcp-tool-failure-retry",
+      "area": "conversation",
+      "ownership": "turn",
+      "packageEvidence": [
+        "mcp-capability-view-page",
+        "mcp-tool-call-group"
+      ],
+      "runtimeStatus": "runtime_observed",
+      "runtimeEvidence": [
+        "cdp-26.721.81911:real-openai-developer-docs-invalid-url-search-fetch-recovery-expanded-1180x820",
+        "cdp-26.721.81911:real-failed-fetch-plaintext-output-and-recovered-integration-group"
+      ],
+      "implementationStatus": "partial",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
       "priority": "p0"
     },
     {

@@ -93,6 +93,87 @@ describe("protocol lifecycle reducer", () => {
     expect(hasActiveTurnWork(completed)).toBe(false);
   });
 
+  it("replays MCP failure recovery followed by a mixed workflow turn", () => {
+    const scenario = replayScenarios["mcp-recovery-mixed-thread"];
+    const failed = reduceProtocolTrace(
+      scenario.events.slice(0, scenario.frames["mcp-recovery-failed"]),
+    );
+    const retrying = reduceProtocolTrace(
+      scenario.events.slice(0, scenario.frames["mcp-recovery-retrying"]),
+    );
+    const recovered = reduceProtocolTrace(
+      scenario.events.slice(0, scenario.frames["mcp-recovery-completed"]),
+    );
+    const completed = reduceProtocolTrace(scenario.events);
+
+    expect(failed.mcpToolCalls).toEqual([
+      expect.objectContaining({
+        error: "Invalid URL",
+        status: "failed",
+        toolLabel: "Fetch OpenAI doc",
+      }),
+    ]);
+    expect(retrying.mcpToolCalls).toEqual([
+      expect.objectContaining({ status: "failed" }),
+      expect.objectContaining({
+        progress: ["Searching official OpenAI documentation"],
+        status: "running",
+        toolLabel: "Search OpenAI docs",
+      }),
+    ]);
+    expect(hasActiveTurnWork(retrying)).toBe(true);
+    expect(recovered.status).toBe("completed");
+    expect(recovered.mcpToolCalls.map(({ status }) => status)).toEqual([
+      "failed",
+      "completed",
+      "completed",
+    ]);
+    expect(recovered.turnDurationsMs["turn-recovery"]).toBe(28_000);
+    expect(recovered.messages.at(-1)?.text).toContain("恢复成功");
+
+    expect(completed.status).toBe("completed");
+    expect(completed.commands).toHaveLength(2);
+    expect(completed.commands[0]).toMatchObject({
+      exitCode: 0,
+      status: "completed",
+    });
+    expect(completed.approvals).toEqual([
+      expect.objectContaining({
+        decision: "approved",
+        itemId: "command-recovery-note",
+      }),
+    ]);
+    expect(completed.fileChanges).toEqual([
+      expect.objectContaining({
+        changes: [
+          expect.objectContaining({
+            kind: "added",
+            path: "RECOVERY.md",
+          }),
+        ],
+        status: "applied",
+      }),
+    ]);
+    expect(completed.turnDurationsMs).toMatchObject({
+      "turn-recovery": 28_000,
+      "turn-workflow": 1_520,
+    });
+    expect(completed.timeline.map(({ kind }) => kind)).toEqual([
+      "message",
+      "message",
+      "mcpToolCall",
+      "mcpToolCall",
+      "mcpToolCall",
+      "message",
+      "message",
+      "command",
+      "command",
+      "approval",
+      "fileChange",
+      "message",
+    ]);
+  });
+
   it("preserves an interrupted assistant partial and exposes the stop state", () => {
     const state = reduceProtocolTrace(
       replayScenarios.interruption.events,

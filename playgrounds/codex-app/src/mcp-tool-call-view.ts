@@ -54,6 +54,19 @@ export function mcpToolCallGroupDurationMs(
   );
 }
 
+export function mcpToolCallGroupStatus(
+  calls: readonly DemoMcpToolCall[],
+): DemoMcpToolCall["status"] {
+  if (
+    calls.some(
+      ({ status }) => status === "running" || status === "pending",
+    )
+  ) {
+    return "running";
+  }
+  return calls.at(-1)?.status === "failed" ? "failed" : "completed";
+}
+
 export function mcpToolCallPresentation(call: DemoMcpToolCall) {
   const result = mcpResultText(call.content);
   return {

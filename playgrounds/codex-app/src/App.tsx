@@ -65,6 +65,7 @@ import {
 import {
   mcpToolCallGroupDurationMs,
   mcpToolCallGroupForEntry,
+  mcpToolCallGroupStatus,
   mcpToolCallPresentation,
 } from "./mcp-tool-call-view";
 
@@ -295,7 +296,8 @@ export function App() {
     () => initialSelection.capture || !isNarrowDemoWindow(),
   );
   const [reviewOpen, setReviewOpen] = useState(
-    initialSelection.frame === "review-open",
+    initialSelection.frame === "review-open" ||
+      initialSelection.frame === "mixed-review-open",
   );
   const [terminalOpen, setTerminalOpen] = useState(
     initialSelection.scenarioId === "background-terminal",
@@ -717,7 +719,8 @@ export function App() {
     mode === "replay" &&
     (scenarioId === "multi-file-review" ||
       scenarioId === "markdown" ||
-      scenarioId === "mcp-tool-call");
+      scenarioId === "mcp-tool-call" ||
+      scenarioId === "mcp-recovery-mixed-thread");
   const composer = (
     <AgentComposer
       actions={
@@ -1068,6 +1071,12 @@ export function App() {
     if (entry.kind === "message") {
       const message = state.messages.find(({ id }) => id === entry.id);
       if (!message) return null;
+      if (
+        scenarioId === "mcp-recovery-mixed-thread" &&
+        message.id === "assistant-recovery-intro"
+      ) {
+        return null;
+      }
       return (
         <Fragment key={`message:${message.id}`}>
           <AgentMessage
@@ -1076,9 +1085,13 @@ export function App() {
               ((scenarioId === "markdown" &&
                 message.id === "assistant-markdown") ||
                 (scenarioId === "mcp-tool-call" &&
-                  message.id === "assistant-mcp")) &&
+                  message.id === "assistant-mcp") ||
+                (scenarioId === "mcp-recovery-mixed-thread" &&
+                  (message.id === "assistant-recovery" ||
+                    message.id === "assistant-workflow"))) &&
               message.status === "completed" ? (
-                scenarioId === "mcp-tool-call" ? (
+                scenarioId === "mcp-tool-call" ||
+                scenarioId === "mcp-recovery-mixed-thread" ? (
                   <McpResponseActions />
                 ) : (
                   <span
@@ -1155,18 +1168,21 @@ export function App() {
       const calls = mcpToolCallGroupForEntry(state, entryIndex);
       if (!calls) return null;
       const toolCall = calls[0];
-      const groupStatus = calls.some(
-        ({ status }) => status === "running" || status === "pending",
-      )
-        ? "running"
-        : calls.some(({ status }) => status === "failed")
-          ? "failed"
-          : "completed";
+      const recoveryIntro =
+        scenarioId === "mcp-recovery-mixed-thread"
+          ? state.messages.find(
+              ({ id }) => id === "assistant-recovery-intro",
+            )
+          : undefined;
+      const groupStatus = mcpToolCallGroupStatus(calls);
       const captureOpen =
         initialSelection.capture &&
         (initialSelection.frame === "mcp-running" ||
           initialSelection.frame === "mcp-progress" ||
-          initialSelection.frame === "mcp-tool-calls");
+          initialSelection.frame === "mcp-tool-calls" ||
+          initialSelection.frame === "mcp-recovery-failed" ||
+          initialSelection.frame === "mcp-recovery-retrying" ||
+          initialSelection.frame === "mcp-recovery-completed");
       const durationMs = mcpToolCallGroupDurationMs(state, calls);
       return (
         <ActivityTimeline
@@ -1175,10 +1191,25 @@ export function App() {
           summary={
             <TurnDuration
               durationMs={durationMs}
-              status={groupStatus === "running" ? "working" : "worked"}
+              status={
+                groupStatus === "running" ||
+                state.currentTurnId === toolCall.turnId
+                  ? "working"
+                  : "worked"
+              }
             />
           }
         >
+          {recoveryIntro ? (
+            <AgentMessage
+              className="demo-mcp-recovery-intro"
+              data-item-id={recoveryIntro.id}
+              role="assistant"
+              status={agentMessageStatus(recoveryIntro.status)}
+            >
+              <AgentMarkdown>{recoveryIntro.text}</AgentMarkdown>
+            </AgentMessage>
+          ) : null}
           <McpToolCallGroup
             data-testid="mcp-tool-call-group"
             defaultOpen={false}
@@ -1193,9 +1224,37 @@ export function App() {
                 <ToolCallCard
                   data-item-id={call.id}
                   error={presentation.error}
+                  errorLanguage={
+                    call.status === "failed" ? "plaintext" : undefined
+                  }
+                  errorPresentation={
+                    call.status === "failed" ? "output" : undefined
+                  }
+                  failedLabel={call.toolLabel}
                   key={call.id}
                   icon={<McpToolIcon />}
                   name={call.toolLabel}
+                  open={
+                    initialSelection.capture &&
+                    call.id === "mcp-fetch-invalid" &&
+                    (initialSelection.frame === "mcp-recovery-failed" ||
+                      initialSelection.frame === "mcp-recovery-completed")
+                      ? true
+                      : undefined
+                  }
+                  onViewRawOutput={
+                    call.status === "failed"
+                      ? () => undefined
+                      : undefined
+                  }
+                  rawOutput={
+                    call.status === "failed"
+                      ? {
+                          arguments: call.arguments,
+                          error: call.error,
+                        }
+                      : undefined
+                  }
                   result={presentation.result}
                   role="listitem"
                   source={call.server}

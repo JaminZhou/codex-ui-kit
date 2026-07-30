@@ -33,10 +33,14 @@ Every deterministic scenario has one ID and produces four evidence layers:
    tool-call, answer, and Composer regions separately; the current sidebar
    accepts a full 1180×820 external reference through
    `CODEX_UI_KIT_SIDEBAR_REFERENCE` and gates the owned top controls, selected
-   row, and footer regions separately. Transparent Electron/CDP reference
-   pixels are composited onto the observed `#181818` window background before
-   comparison, and the independent UI's unique current row is located from
-   its DOM contract rather than a hard-coded vertical offset.
+   row, and footer regions separately; the current MCP recovery scenario
+   accepts a 906×820 main reference through
+   `CODEX_UI_KIT_MCP_RECOVERY_REFERENCE` and gates the full main, recovered
+   call group, user prompt, and Composer regions separately. Transparent
+   Electron/CDP reference pixels are composited onto the observed `#181818`
+   window background before comparison, and independently implemented UI
+   regions are located from their DOM contracts rather than hard-coded
+   vertical offsets.
 
 The layers do not vote on the same claim. Protocol proves lifecycle behavior;
 CDP explains layout; Electron proves the desktop host; pixels catch final
@@ -87,3 +91,15 @@ verifies that exact scroll position, 14px/21px group typography, 25px call
 rows, and five-call count. Its optional current-build gate remains stricter
 and region-specific: at most 3% full-main, 4% tool-call, 4% answer, and 2.5%
 Composer difference at the strict 0.05 pixel threshold.
+
+The nineteenth through twenty-second frames cover a failed MCP call, an active
+retry, a recovered group, and the recovered thread followed by a
+command/approval/file/Review turn. CDP verifies the ordered Fetch, Search, and
+Fetch rows, the expanded neutral `plaintext` error output, and the rule that an
+earlier failed call followed by a successful final call leaves the historical
+group completed. Electron expands the same historical disclosure while the
+Review split is open and verifies two user messages, two commands, the accepted
+approval, one file change, and the Review panel. The optional current-build
+recovery gate allows at most 4.5% full-main, 7% recovery, 5% user, and 3%
+Composer difference at the strict 0.05 pixel threshold. The accepted sample
+measured 2.9202337%, 5.1956799%, 4.7369405%, and 1.5698995% respectively.

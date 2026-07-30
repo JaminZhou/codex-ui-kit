@@ -97,6 +97,26 @@ describe("ToolCallCard", () => {
     expect(html).not.toContain("This result should not render");
   });
 
+  it("can render a failed tool as neutral raw output", () => {
+    const html = renderToStaticMarkup(
+      <ToolCallCard
+        defaultOpen
+        error="Invalid URL"
+        errorLanguage="plaintext"
+        errorPresentation="output"
+        failedLabel="Fetch OpenAI doc"
+        name="Fetch OpenAI doc"
+        status="failed"
+      />,
+    );
+
+    expect(html).toContain('data-presentation="output"');
+    expect(html).toContain("plaintext");
+    expect(html).toContain("<code>Invalid URL</code>");
+    expect(html).toContain(">Fetch OpenAI doc<");
+    expect(html).not.toContain("Fetch OpenAI doc failed");
+  });
+
   it("keeps controlled disclosure state stable", () => {
     const onOpenChange = vi.fn();
     const { container } = render(

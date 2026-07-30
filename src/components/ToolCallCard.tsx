@@ -43,6 +43,8 @@ export interface ToolCallCardProps
   defaultOpen?: boolean;
   emptyLabel?: ReactNode;
   error?: ReactNode;
+  errorLanguage?: ReactNode;
+  errorPresentation?: "alert" | "output";
   failedLabel?: ReactNode;
   icon?: ReactNode;
   name: string;
@@ -67,6 +69,8 @@ export function ToolCallCard({
   defaultOpen = false,
   emptyLabel = "Tool returned no content",
   error,
+  errorLanguage,
+  errorPresentation = "alert",
   failedLabel,
   icon,
   name,
@@ -111,8 +115,25 @@ export function ToolCallCard({
   const body = canExpand ? (
     <div className="codex-ui-tool-call__result">
       {hasError ? (
-        <div className="codex-ui-tool-call__error" role="alert">
-          {error}
+        <div
+          className="codex-ui-tool-call__error"
+          data-presentation={errorPresentation}
+          role="alert"
+        >
+          {errorPresentation === "output" ? (
+            <>
+              {errorLanguage ? (
+                <span className="codex-ui-tool-call__error-language">
+                  {errorLanguage}
+                </span>
+              ) : null}
+              <pre className="codex-ui-tool-call__error-output">
+                <code>{error}</code>
+              </pre>
+            </>
+          ) : (
+            error
+          )}
         </div>
       ) : hasContent ? (
         <div className="codex-ui-tool-call__content">{resolvedContent}</div>

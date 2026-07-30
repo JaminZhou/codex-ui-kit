@@ -11,13 +11,16 @@ exit gates; it does not replace the inventory.
 ## Current position
 
 - The current installed package is Codex Desktop `26.721.81911` (`5973`).
-- The inventory contains 68 surface groups: 41 P0, 18 P1, and 9 P2.
-- 6 groups have current-build runtime evidence, 43 have previous-build-only
+- The inventory contains 69 surface groups: 42 P0, 18 P1, and 9 P2.
+- 8 groups have current-build runtime evidence, 42 have previous-build-only
   runtime evidence, and 19 have not been sampled.
-- The first current-build vertical slice now covers all six left-sidebar
-  groups through CDP, Browser, Electron, and regional pixel gates. The wider
-  shell, conversation, Composer, Review, Terminal, Markdown, and MCP rows
-  remain on their recorded evidence levels until separately re-observed.
+- The first two current-build vertical slices cover all six left-sidebar
+  groups plus a real MCP failed-Fetch → Search → successful-Fetch recovery
+  through CDP, Browser, Electron, and regional pixel gates. The recovery
+  replay continues into a second command/approval/file/Review turn. The wider
+  shell, remaining conversation/Composer lifecycle, Review, Terminal, and
+  Markdown rows remain on their recorded evidence levels until separately
+  re-observed.
 - Existing Browser and Electron results remain useful regression evidence, but
   they are `partial_legacy` until the affected surface is re-observed on the
   current build.

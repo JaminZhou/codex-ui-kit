@@ -281,6 +281,12 @@ textarea {
   line-height: 21px;
 }
 
+.demo-root[data-scenario="mcp-recovery-mixed-thread"]
+  .codex-ui-activity-timeline__content
+  > .demo-mcp-recovery-intro {
+  margin-bottom: 12px;
+}
+
 .demo-root[data-capture][data-frame="mcp-tool-calls"][data-scenario="mcp-tool-call"]
   .codex-ui-thread-viewport__content {
   height: calc(100% + 72px);

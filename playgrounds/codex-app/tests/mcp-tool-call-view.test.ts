@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   mcpToolCallGroupDurationMs,
   mcpToolCallGroupForEntry,
+  mcpToolCallGroupStatus,
   mcpToolCallPresentation,
 } from "../src/mcp-tool-call-view";
 import {
@@ -88,5 +89,37 @@ describe("MCP tool-call view model", () => {
       structuredContent: undefined,
       summary: undefined,
     });
+  });
+
+  it("treats an earlier failed call followed by success as a recovered group", () => {
+    const completed = reduceProtocolTrace(
+      replayScenarios["mcp-recovery-mixed-thread"].events.slice(
+        0,
+        replayScenarios["mcp-recovery-mixed-thread"].frames[
+          "mcp-recovery-completed"
+        ],
+      ),
+    );
+    const calls = completed.mcpToolCalls;
+
+    expect(mcpToolCallGroupStatus(calls)).toBe("completed");
+    expect(
+      mcpToolCallGroupStatus([
+        {
+          ...calls[0]!,
+          status: "failed",
+        },
+      ]),
+    ).toBe("failed");
+    expect(
+      mcpToolCallGroupStatus([
+        ...calls,
+        {
+          ...calls.at(-1)!,
+          id: "pending-retry",
+          status: "pending",
+        },
+      ]),
+    ).toBe("running");
   });
 });

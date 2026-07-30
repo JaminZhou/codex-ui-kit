@@ -52,7 +52,8 @@ The built-in highlighter escapes untrusted code. A custom `CodeHighlighter` retu
 
 ## Tools, approvals, and status
 
-- `ToolCallCard`: generic MCP, connector, and arbitrary tool-call row with structured, empty, error, and raw-output states.
+- `McpToolCallGroup`: expandable integration-owned group for ordered MCP calls with running, recovered, and failed labels.
+- `ToolCallCard`: generic MCP, connector, and arbitrary tool-call row with structured, empty, danger-alert, neutral language/output-error, and host-owned raw-output states.
 - `CommandExecution`: expandable command surface with duration, copy, background-terminal, success, failure, and interruption states. `formatCommandDuration` exposes its standalone duration formatter.
 - `CommandOutput`: labeled stdout/stderr with no-output, tail-following, overflow, fade, and copy behavior.
 - `FileChange`: one-file create, apply, stop, reject, delete, and rename activities with disclosure, statistics, path opening, and copy hooks.
