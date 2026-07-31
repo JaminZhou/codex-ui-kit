@@ -39,4 +39,22 @@ describe("lifecycle visual policy", () => {
       "CODEX_UI_KIT_WINDOW_CHROME_MAX_DIFF_RATIO",
     );
   });
+
+  it("gates current multiline, permission, and resource Composer regions", () => {
+    expect(contract).toContain(
+      "CODEX_UI_KIT_COMPOSER_MULTILINE_REFERENCE",
+    );
+    expect(contract).toContain(
+      "CODEX_UI_KIT_COMPOSER_PERMISSIONS_REFERENCE",
+    );
+    expect(contract).toContain(
+      "CODEX_UI_KIT_COMPOSER_RESOURCES_REFERENCE",
+    );
+    expect(contract).toContain(
+      'scene.id === "composer-resources-menu" ? 0.008 : 0.005',
+    );
+    expect(contract).toContain(
+      "current-build Composer lifecycle pixel ratio",
+    );
+  });
 });

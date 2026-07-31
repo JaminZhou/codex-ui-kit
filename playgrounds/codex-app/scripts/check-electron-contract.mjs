@@ -2571,6 +2571,236 @@ try {
   await conversationLifecycleApp.close();
 }
 
+const composerMenusScene = {
+  frame: "composer-multiline",
+  id: "electron-composer-current-menus",
+  scenario: "conversation-lifecycle",
+};
+const {
+  app: composerMenusApp,
+  page: composerMenusPage,
+} = await launchScene(composerMenusScene, { capture: false });
+try {
+  const composerInput = composerMenusPage.getByRole("textbox", {
+    name: "Message composer",
+  });
+  const initialComposerGeometry = await composerMenusPage.evaluate(() => {
+    const measure = (selector) => {
+      const element = document.querySelector(selector);
+      if (!element) return null;
+      const rect = element.getBoundingClientRect();
+      const style = getComputedStyle(element);
+      return {
+        height: rect.height,
+        left: rect.left,
+        lineHeight: style.lineHeight,
+        overflowY: style.overflowY,
+        top: rect.top,
+        width: rect.width,
+      };
+    };
+    return {
+      input: measure(".codex-ui-composer__input"),
+      surface: measure(".codex-ui-composer"),
+    };
+  });
+  if (
+    !initialComposerGeometry.surface ||
+    !initialComposerGeometry.input ||
+    Math.abs(initialComposerGeometry.surface.left - 359) > 1 ||
+    Math.abs(initialComposerGeometry.surface.top - 670) > 1 ||
+    Math.abs(initialComposerGeometry.surface.width - 736) > 1 ||
+    Math.abs(initialComposerGeometry.surface.height - 134) > 1 ||
+    Math.abs(initialComposerGeometry.input.left - 371) > 1 ||
+    Math.abs(initialComposerGeometry.input.top - 684) > 1 ||
+    Math.abs(initialComposerGeometry.input.width - 712) > 1 ||
+    Math.abs(initialComposerGeometry.input.height - 80) > 1 ||
+    initialComposerGeometry.input.lineHeight !== "20px"
+  ) {
+    throw new Error(
+      `Electron current Composer multiline geometry failed: ${JSON.stringify(initialComposerGeometry)}`,
+    );
+  }
+
+  const permissionTrigger = composerMenusPage.getByRole("button", {
+    name: "Change permissions",
+  });
+  await permissionTrigger.click();
+  await composerMenusPage.waitForSelector(
+    '.demo-root[data-composer-overlay="permissions"] .codex-ui-composer',
+  );
+  const permissionGeometry = await composerMenusPage.evaluate(() => {
+    const menu = document.querySelector(
+      ".codex-ui-composer-permission-menu",
+    );
+    const items = [
+      ...document.querySelectorAll(
+        ".codex-ui-composer-permission-menu__option",
+      ),
+    ];
+    if (!menu) return null;
+    const rect = menu.getBoundingClientRect();
+    return {
+      height: rect.height,
+      itemHeights: items.map(
+        (item) => item.getBoundingClientRect().height,
+      ),
+      left: rect.left,
+      top: rect.top,
+      width: rect.width,
+    };
+  });
+  if (
+    !permissionGeometry ||
+    Math.abs(permissionGeometry.left - 401) > 1 ||
+    Math.abs(permissionGeometry.top - 544) > 1 ||
+    Math.abs(permissionGeometry.width - 480.375) > 1 ||
+    Math.abs(permissionGeometry.height - 222.5) > 1 ||
+    permissionGeometry.itemHeights.length !== 4 ||
+    permissionGeometry.itemHeights.some(
+      (height) => Math.abs(height - 47.125) > 1,
+    )
+  ) {
+    throw new Error(
+      `Electron current Composer permission menu geometry failed: ${JSON.stringify(permissionGeometry)}`,
+    );
+  }
+  await composerMenusPage
+    .getByRole("menuitemradio", { name: /Approve for me/ })
+    .click();
+  if (
+    (await permissionTrigger.textContent())?.includes("Approve for me") !==
+    true
+  ) {
+    throw new Error(
+      "Electron Composer permission selection did not update the trigger.",
+    );
+  }
+  await permissionTrigger.click();
+  await composerMenusPage.keyboard.press("Escape");
+  await composerMenusPage.waitForSelector(
+    '.demo-root:not([data-composer-overlay])',
+  );
+  const permissionFocus = await composerMenusPage.evaluate(
+    () => document.activeElement?.getAttribute("aria-label"),
+  );
+  if (permissionFocus !== "Change permissions") {
+    throw new Error(
+      `Electron Composer permission Escape focus failed: ${JSON.stringify(permissionFocus)}`,
+    );
+  }
+
+  const resourceTrigger = composerMenusPage.getByRole("button", {
+    name: "Add files and more",
+  });
+  await resourceTrigger.click();
+  await composerMenusPage.waitForSelector(
+    '.demo-root[data-composer-overlay="resources"] .codex-ui-composer-resource-picker',
+  );
+  const resourceGeometry = await composerMenusPage.evaluate(() => {
+    const measure = (selector) => {
+      const element = document.querySelector(selector);
+      if (!element) return null;
+      const rect = element.getBoundingClientRect();
+      return {
+        clientHeight: element.clientHeight,
+        height: rect.height,
+        left: rect.left,
+        scrollHeight: element.scrollHeight,
+        top: rect.top,
+        width: rect.width,
+      };
+    };
+    return {
+      picker: measure(".codex-ui-composer-resource-picker"),
+      scroller: measure(".codex-ui-composer-resource-picker__scroller"),
+      visibleOptions: [
+        ...document.querySelectorAll(
+          ".codex-ui-composer-resource-picker__option",
+        ),
+      ].filter((option) => option.getBoundingClientRect().top < 666)
+        .length,
+    };
+  });
+  if (
+    !resourceGeometry.picker ||
+    !resourceGeometry.scroller ||
+    Math.abs(resourceGeometry.picker.left - 359) > 1 ||
+    Math.abs(resourceGeometry.picker.top - 346) > 1 ||
+    Math.abs(resourceGeometry.picker.width - 736) > 1 ||
+    Math.abs(resourceGeometry.picker.height - 320) > 1 ||
+    Math.abs(resourceGeometry.scroller.left - 364) > 1 ||
+    Math.abs(resourceGeometry.scroller.top - 351) > 1 ||
+    Math.abs(resourceGeometry.scroller.width - 726) > 1 ||
+    resourceGeometry.scroller.clientHeight !== 310 ||
+    resourceGeometry.scroller.scrollHeight < 990 ||
+    resourceGeometry.visibleOptions < 9
+  ) {
+    throw new Error(
+      `Electron current Composer resource picker geometry failed: ${JSON.stringify(resourceGeometry)}`,
+    );
+  }
+  const resourcePicker = composerMenusPage.getByRole("listbox", {
+    name: "Composer resources",
+  });
+  await resourcePicker.focus();
+  await resourcePicker.press("End");
+  await resourcePicker.press("Enter");
+  await composerMenusPage.waitForSelector(
+    '.demo-root:not([data-composer-overlay])',
+  );
+  await composerMenusPage.waitForFunction(
+    () =>
+      document.activeElement?.getAttribute("aria-label") ===
+      "Message composer",
+  );
+
+  await composerInput.fill(
+    Array.from(
+      { length: 20 },
+      (_, index) => `Current Composer line ${index + 1}.`,
+    ).join("\n"),
+  );
+  const longComposerGeometry = await composerMenusPage.evaluate(() => {
+    const input = document.querySelector(
+      ".codex-ui-composer__input",
+    );
+    const surface = document.querySelector(".codex-ui-composer");
+    if (!input || !surface) return null;
+    const inputRect = input.getBoundingClientRect();
+    const surfaceRect = surface.getBoundingClientRect();
+    return {
+      input: {
+        height: inputRect.height,
+        left: inputRect.left,
+        scrollHeight: input.scrollHeight,
+        top: inputRect.top,
+        width: inputRect.width,
+      },
+      surface: {
+        height: surfaceRect.height,
+        top: surfaceRect.top,
+      },
+    };
+  });
+  if (
+    !longComposerGeometry ||
+    Math.abs(longComposerGeometry.input.left - 371) > 1 ||
+    Math.abs(longComposerGeometry.input.top - 559) > 1 ||
+    Math.abs(longComposerGeometry.input.width - 712) > 1 ||
+    Math.abs(longComposerGeometry.input.height - 205) > 1 ||
+    longComposerGeometry.input.scrollHeight < 400 ||
+    Math.abs(longComposerGeometry.surface.top - 545) > 1 ||
+    Math.abs(longComposerGeometry.surface.height - 259) > 1
+  ) {
+    throw new Error(
+      `Electron current Composer long-input geometry failed: ${JSON.stringify(longComposerGeometry)}`,
+    );
+  }
+} finally {
+  await composerMenusApp.close();
+}
+
 console.log(
-  "Electron host, native-window, coding-workspace routing, conversation/Composer lifecycle, default 720px narrow reachability, resizable navigation/Review/Terminal/PR detail, PR tabs and expansion, MCP disclosure/result, multi-file and mixed-content Review, selection/Undo, large diff scrolling, and compact geometry contracts passed.",
+  "Electron host, native-window, coding-workspace routing, conversation/Composer lifecycle and current menus, default 720px narrow reachability, resizable navigation/Review/Terminal/PR detail, PR tabs and expansion, MCP disclosure/result, multi-file and mixed-content Review, selection/Undo, large diff scrolling, and compact geometry contracts passed.",
 );

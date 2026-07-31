@@ -20,6 +20,8 @@ import {
   ComposerContextBar,
   ComposerContextControl,
   ComposerDock,
+  ComposerPermissionMenu,
+  ComposerResourcePicker,
   ConversationContextBar,
   ConversationProjectListbox,
   ConversationThreadShell,
@@ -58,6 +60,8 @@ import {
   WorkspacePanel,
   type TerminalEntry,
   type AppRouteOutletStatus,
+  type ComposerPermissionOption,
+  type ComposerResourceGroup,
   type QueuedPrompt,
 } from "codex-ui-kit";
 import {
@@ -210,8 +214,10 @@ const conversationHostFrames = new Set([
   "composer-disabled",
   "composer-idle",
   "composer-multiline",
+  "composer-permissions-menu",
   "composer-queue-paused",
   "composer-queued",
+  "composer-resources-menu",
   "composer-running",
   "thread-scroll-away",
   "thread-windowed",
@@ -239,11 +245,16 @@ function replayCountForSelection(
 }
 
 function initialComposerValue(frame: string | null) {
-  if (frame === "composer-multiline") {
+  if (
+    frame === "composer-multiline" ||
+    frame === "composer-permissions-menu" ||
+    frame === "composer-resources-menu"
+  ) {
     return [
-      "Please compare the current runtime evidence,",
-      "the computed Composer geometry,",
-      "and the regional pixel gate.",
+      "First current-build Composer line.",
+      "Second line checks automatic growth.",
+      "Third line keeps the draft unsubmitted.",
+      "Fourth line reaches the measured expanded state.",
     ].join("\n");
   }
   if (frame === "composer-disabled") {
@@ -251,6 +262,153 @@ function initialComposerValue(frame: string | null) {
   }
   return "";
 }
+
+type ComposerOverlay = "permissions" | "resources" | null;
+
+function initialComposerOverlay(frame: string | null): ComposerOverlay {
+  if (frame === "composer-permissions-menu") return "permissions";
+  if (frame === "composer-resources-menu") return "resources";
+  return null;
+}
+
+const composerPermissionOptions: readonly ComposerPermissionOption[] = [
+  {
+    description:
+      "Always ask to edit external files and use the internet",
+    icon: "○",
+    id: "ask",
+    label: "Ask for approval",
+  },
+  {
+    description:
+      "Only ask for actions detected as potentially unsafe",
+    icon: "○",
+    id: "approve",
+    label: "Approve for me",
+  },
+  {
+    description:
+      "Unrestricted access to the internet and any file on your computer",
+    icon: "◉",
+    id: "full",
+    label: "Full access",
+  },
+  {
+    description: "Uses permissions defined in config.toml",
+    icon: "○",
+    id: "custom",
+    label: "Custom (config.toml)",
+  },
+];
+
+const composerResourceGroups: readonly ComposerResourceGroup[] = [
+  {
+    id: "add",
+    options: [
+      {
+        icon: "＋",
+        id: "files",
+        label: "Files and folders",
+      },
+      {
+        icon: "▣",
+        id: "active-app",
+        label: "Attach active app",
+      },
+      {
+        description: "Choose project for new chats",
+        icon: "□",
+        id: "project",
+        label: "Work in a project",
+      },
+      {
+        description: "Set a goal to keep pursuing",
+        icon: "◎",
+        id: "goal",
+        label: "Goal",
+      },
+      {
+        description: "Turn plan mode on",
+        icon: "◇",
+        id: "plan",
+        label: "Plan mode",
+      },
+      {
+        icon: "◌",
+        id: "record-skill",
+        label: "Record a skill",
+      },
+    ],
+  },
+  {
+    id: "plugins",
+    label: "Plugins",
+    options: [
+      {
+        description: "Create and edit document artifacts",
+        icon: "▤",
+        id: "documents",
+        label: "Documents",
+      },
+      {
+        description: "Read, create, and verify PDF files",
+        icon: "▧",
+        id: "pdf",
+        label: "PDF",
+      },
+      {
+        description: "Create and edit spreadsheet files",
+        icon: "▦",
+        id: "spreadsheets",
+        label: "Spreadsheets",
+      },
+      {
+        description: "Create and edit presentations",
+        icon: "▥",
+        id: "presentations",
+        label: "Presentations",
+      },
+    ],
+  },
+  {
+    id: "skills",
+    label: "Skills",
+    options: [
+      { icon: "◎", id: "browser-control", label: "Browser control" },
+      { icon: "◎", id: "chrome-control", label: "Chrome control" },
+      { icon: "◎", id: "computer-use", label: "Computer use" },
+      { icon: "◎", id: "image-generation", label: "Image generation" },
+      { icon: "◎", id: "openai-docs", label: "OpenAI docs" },
+      { icon: "◎", id: "watch-pr", label: "Watch pull request" },
+      { icon: "◎", id: "visualize", label: "Visualize" },
+      { icon: "◎", id: "site-builder", label: "Site builder" },
+    ],
+  },
+  {
+    id: "apps",
+    label: "Apps",
+    options: [
+      { icon: "◫", id: "browser-app", label: "Browser" },
+      { icon: "◫", id: "chrome-app", label: "Chrome" },
+      { icon: "◫", id: "tasks-app", label: "Codex tasks" },
+      { icon: "◫", id: "files-app", label: "Local files" },
+      { icon: "◫", id: "terminal-app", label: "Terminal" },
+      { icon: "◫", id: "electron-app", label: "Electron" },
+      { icon: "◫", id: "github-app", label: "GitHub" },
+    ],
+  },
+  {
+    id: "context",
+    label: "Context",
+    options: [
+      { icon: "⊕", id: "current-task", label: "Current task" },
+      { icon: "⊕", id: "current-repository", label: "Current repository" },
+      { icon: "⊕", id: "browser-tab", label: "Open browser tab" },
+      { icon: "⊕", id: "recent-screenshot", label: "Recent screenshot" },
+      { icon: "⊕", id: "clipboard", label: "Clipboard" },
+    ],
+  },
+];
 
 function initialQueuedPrompts(frame: string | null): QueuedPrompt[] {
   if (frame !== "composer-queued" && frame !== "composer-queue-paused") {
@@ -694,6 +852,14 @@ export function App() {
   const [composerValue, setComposerValue] = useState(() =>
     initialComposerValue(initialSelection.frame),
   );
+  const [composerOverlay, setComposerOverlay] =
+    useState<ComposerOverlay>(() =>
+      initialComposerOverlay(initialSelection.frame),
+    );
+  const [composerPermissionId, setComposerPermissionId] =
+    useState("full");
+  const [composerResourceActiveId, setComposerResourceActiveId] =
+    useState("files");
   const [queuedPrompts, setQueuedPrompts] = useState<QueuedPrompt[]>(() =>
     initialQueuedPrompts(initialSelection.frame),
   );
@@ -812,6 +978,8 @@ export function App() {
   );
   const [liveError, setLiveError] = useState<string | null>(null);
   const liveStartPendingRef = useRef(false);
+  const composerInputRef = useRef<HTMLTextAreaElement>(null);
+  const composerResourceTriggerRef = useRef<HTMLButtonElement>(null);
   const workspaceEnvironmentTriggerRef =
     useRef<HTMLButtonElement>(null);
   const workspaceWorktreeTriggerRef = useRef<HTMLButtonElement>(null);
@@ -954,6 +1122,7 @@ export function App() {
   const selectReplayPosition = (nextCount: number) => {
     cancelReplaySubmitTimer();
     setActiveFrame(null);
+    setComposerOverlay(null);
     setReplayComposerSubmitting(false);
     setReplayComposerStopped(false);
     setReplayQueuedContinuation(null);
@@ -985,6 +1154,7 @@ export function App() {
     setWorkspaceProjectQuery("");
     setWorkspaceProjectTriggerId("demo-workspace-project-trigger");
     setComposerValue("");
+    setComposerOverlay(null);
     setReplayApprovalResolution(null);
     setActiveFrame("workspace-ready");
     setReviewOpen(false);
@@ -1032,7 +1202,9 @@ export function App() {
     setReplayCount(
       replayCountForSelection(replayScenarios[nextId], frame),
     );
-    setComposerValue("");
+    setComposerValue(initialComposerValue(frame));
+    setComposerOverlay(initialComposerOverlay(frame));
+    setComposerResourceActiveId("files");
     setQueuedPrompts([]);
     setQueueingEnabled(true);
     setQueueInterrupted(false);
@@ -1074,6 +1246,7 @@ export function App() {
     setMode(nextMode);
     setActiveFrame(null);
     setComposerValue("");
+    setComposerOverlay(null);
     setQueuedPrompts([]);
     setQueueingEnabled(true);
     setQueueInterrupted(false);
@@ -1083,6 +1256,12 @@ export function App() {
     setReplayApprovalResolution(null);
     setWorkspaceOverlay(null);
     setWorkspaceLocalEnvironmentOpen(false);
+  };
+
+  const dismissComposerResources = () => {
+    setComposerOverlay(null);
+    setActiveFrame(null);
+    window.setTimeout(() => composerInputRef.current?.focus());
   };
 
   const respondToApproval = async (
@@ -1174,6 +1353,7 @@ export function App() {
       return;
     }
     setActiveFrame(null);
+    setComposerOverlay(null);
     if (replayComposerRunning) {
       if (queueingEnabled) {
         queuedPromptCounterRef.current += 1;
@@ -1577,6 +1757,10 @@ export function App() {
     mode === "replay" &&
     (scenarioId === "mcp-tool-call" ||
       scenarioId === "mcp-recovery-mixed-thread");
+  const selectedComposerPermission =
+    composerPermissionOptions.find(
+      ({ id }) => id === composerPermissionId,
+    ) ?? composerPermissionOptions[2]!;
   const header = (
     <ThreadHeader
       endActions={
@@ -1668,15 +1852,66 @@ export function App() {
       actions={
         showMeasuredComposer || showLifecycleComposer ? (
           <span className="demo-composer-controls">
-            <button aria-label="Add files and more" type="button">
+            <button
+              aria-expanded={composerOverlay === "resources"}
+              aria-label="Add files and more"
+              onClick={() => {
+                setActiveFrame(null);
+                setComposerOverlay((current) =>
+                  current === "resources" ? null : "resources",
+                );
+              }}
+              onKeyDown={(event) => {
+                if (
+                  event.key === "Escape" &&
+                  composerOverlay === "resources"
+                ) {
+                  event.preventDefault();
+                  dismissComposerResources();
+                }
+              }}
+              ref={composerResourceTriggerRef}
+              type="button"
+            >
               +
             </button>
-            <button aria-label="Change permissions" type="button">
-              ◉{" "}
-              {currentMcpReplay || showLifecycleComposer
-                ? "Full access"
-                : "Approve for me"}
-            </button>
+            <ComposerPermissionMenu
+              align="start"
+              heading="How should ChatGPT actions be approved?"
+              learnMore="Learn more"
+              onOpenChange={(open) => {
+                setActiveFrame(null);
+                setComposerOverlay((current) =>
+                  open
+                    ? "permissions"
+                    : current === "permissions"
+                      ? null
+                      : current,
+                );
+              }}
+              onSelect={(option) => {
+                setComposerPermissionId(option.id);
+                setComposerOverlay(null);
+                setActiveFrame(null);
+              }}
+              open={composerOverlay === "permissions"}
+              options={composerPermissionOptions}
+              selectedId={selectedComposerPermission.id}
+              side="top"
+              sideOffset={1.5}
+              trigger={
+                <button
+                  aria-label="Change permissions"
+                  className="demo-composer-permission-trigger"
+                  type="button"
+                >
+                  <span aria-hidden="true">◉</span>
+                  {currentMcpReplay || showLifecycleComposer
+                    ? selectedComposerPermission.label
+                    : "Approve for me"}
+                </button>
+              }
+            />
           </span>
         ) : undefined
       }
@@ -1723,7 +1958,23 @@ export function App() {
           : "Switch to Live to send a real local turn…"
       }
       stopLabel="Stop"
+      suggestions={
+        (showMeasuredComposer || showLifecycleComposer) &&
+        composerOverlay === "resources" ? (
+          <ComposerResourcePicker
+            activeId={composerResourceActiveId}
+            groups={composerResourceGroups}
+            onActiveIdChange={setComposerResourceActiveId}
+            onDismiss={dismissComposerResources}
+            onSelect={(option) => {
+              setComposerResourceActiveId(option.id);
+              dismissComposerResources();
+            }}
+          />
+        ) : undefined
+      }
       textareaLabel="Message composer"
+      ref={composerInputRef}
       value={composerValue}
     />
   );
@@ -3713,6 +3964,9 @@ export function App() {
       data-last-method={state.lastMethod ?? undefined}
       data-mode={mode}
       data-composer-phase={isConversationLifecycle ? composerPhase : undefined}
+      data-composer-overlay={
+        isConversationLifecycle ? composerOverlay ?? undefined : undefined
+      }
       data-queue-count={
         isConversationLifecycle ? queuedPrompts.length : undefined
       }

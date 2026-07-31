@@ -78,6 +78,16 @@ const currentBuildComposerReferenceSize = {
   height: 320,
   width: 792,
 };
+const currentBuildComposerMultilineReference =
+  process.env.CODEX_UI_KIT_COMPOSER_MULTILINE_REFERENCE;
+const currentBuildComposerPermissionsReference =
+  process.env.CODEX_UI_KIT_COMPOSER_PERMISSIONS_REFERENCE;
+const currentBuildComposerResourcesReference =
+  process.env.CODEX_UI_KIT_COMPOSER_RESOURCES_REFERENCE;
+const currentBuildComposerMenuReferenceSize = {
+  height: 820,
+  width: 906,
+};
 const currentBuildWorkspaceReference =
   process.env.CODEX_UI_KIT_WORKSPACE_REFERENCE;
 const currentBuildWorkspaceReferenceSize = {
@@ -886,6 +896,102 @@ for (const scene of selectedScenes) {
     }
     console.log(
       `${scene.id}: current-build Composer pixel ratio ${comparison.ratio}`,
+    );
+  }
+
+  const currentBuildComposerLifecycleReference =
+    scene.id === "composer-multiline"
+      ? currentBuildComposerMultilineReference
+      : scene.id === "composer-permissions-menu"
+        ? currentBuildComposerPermissionsReference
+        : scene.id === "composer-resources-menu"
+          ? currentBuildComposerResourcesReference
+          : undefined;
+  if (currentBuildComposerLifecycleReference) {
+    const reference = flattenPng(
+      PNG.sync.read(
+        await readFile(currentBuildComposerLifecycleReference),
+      ),
+      { blue: 24, green: 24, red: 24 },
+    );
+    const isMultiline = scene.id === "composer-multiline";
+    const expectedSize = isMultiline
+      ? currentBuildComposerReferenceSize
+      : currentBuildComposerMenuReferenceSize;
+    if (
+      reference.width !== expectedSize.width ||
+      reference.height !== expectedSize.height
+    ) {
+      throw new Error(
+        `${scene.id}: current-build Composer lifecycle reference must be exactly ${expectedSize.width}x${expectedSize.height}, received ${reference.width}x${reference.height}.`,
+      );
+    }
+    if (actual.width !== 1180 || actual.height !== 820) {
+      throw new Error(
+        `${scene.id}: current-build Composer lifecycle comparison requires an exact 1180x820 playground frame.`,
+      );
+    }
+    const actualRegion = isMultiline
+      ? cropPng(actual, 331, 500, 792, 320)
+      : cropPng(actual, 274, 0, 906, 820);
+    const masks = isMultiline
+      ? [
+          { height: 165, left: 0, top: 0, width: 792 },
+          { height: 88, left: 38, top: 177, width: 570 },
+          { height: 40, left: 38, top: 270, width: 610 },
+        ]
+      : scene.id === "composer-permissions-menu"
+        ? [
+            { height: 535, left: 0, top: 0, width: 906 },
+            { height: 240, left: 0, top: 535, width: 120 },
+            { height: 240, left: 615, top: 535, width: 291 },
+            { height: 210, left: 140, top: 550, width: 455 },
+            { height: 45, left: 0, top: 775, width: 80 },
+            { height: 45, left: 825, top: 775, width: 81 },
+            { height: 90, left: 95, top: 675, width: 600 },
+            { height: 45, left: 95, top: 765, width: 710 },
+          ]
+        : [
+            { height: 335, left: 0, top: 0, width: 906 },
+            { height: 335, left: 0, top: 335, width: 80 },
+            { height: 335, left: 825, top: 335, width: 81 },
+            { height: 300, left: 100, top: 360, width: 710 },
+            { height: 45, left: 0, top: 775, width: 80 },
+            { height: 45, left: 825, top: 775, width: 81 },
+            { height: 90, left: 95, top: 675, width: 600 },
+            { height: 45, left: 95, top: 765, width: 710 },
+          ];
+    const maskedReference = maskPng(clonePng(reference), masks);
+    const maskedActual = maskPng(clonePng(actualRegion), masks);
+    const comparison = comparePng(maskedReference, maskedActual);
+    const maximumRatio = environmentRatio(
+      scene.id === "composer-multiline"
+        ? "CODEX_UI_KIT_COMPOSER_MULTILINE_MAX_DIFF_RATIO"
+        : scene.id === "composer-permissions-menu"
+          ? "CODEX_UI_KIT_COMPOSER_PERMISSIONS_MAX_DIFF_RATIO"
+          : "CODEX_UI_KIT_COMPOSER_RESOURCES_MAX_DIFF_RATIO",
+      scene.id === "composer-resources-menu" ? 0.008 : 0.005,
+    );
+    await writeFile(
+      join(artifactDirectory, `${scene.id}.current-build.png`),
+      PNG.sync.write(actualRegion),
+    );
+    if (comparison.pixels > 0) {
+      await writeFile(
+        join(
+          artifactDirectory,
+          `${scene.id}.current-build.diff.png`,
+        ),
+        PNG.sync.write(comparison.diff),
+      );
+    }
+    if (comparison.ratio > maximumRatio) {
+      throw new Error(
+        `${scene.id}: current-build Composer lifecycle pixel ratio ${comparison.ratio} exceeds ${maximumRatio}.`,
+      );
+    }
+    console.log(
+      `${scene.id}: current-build Composer lifecycle pixel ratio ${comparison.ratio}`,
     );
   }
 

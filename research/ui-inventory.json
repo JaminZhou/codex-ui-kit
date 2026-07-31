@@ -438,15 +438,30 @@
       "priority": "p0"
     },
     {
-      "id": "composer.mode-permissions",
+      "id": "composer.permissions",
       "area": "composer",
       "ownership": "thread",
-      "packageEvidence": ["home-composer-mode-toggle", "permissions-mode-dropdown"],
+      "packageEvidence": ["permissions-mode-dropdown"],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
         "cdp:permission-menu-four-modes",
+        "cdp-26.721.81911:ask-approve-full-custom-permission-menu",
+        "cdp-26.727.40816:ask-approve-full-custom-permission-menu-480x222"
+      ],
+      "implementationStatus": "partial",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
+      "priority": "p0"
+    },
+    {
+      "id": "composer.modes",
+      "area": "composer",
+      "ownership": "thread",
+      "packageEvidence": ["home-composer-mode-toggle"],
+      "runtimeStatus": "runtime_observed",
+      "runtimeEvidence": [
         "cdp:model-effort-speed-menu",
-        "cdp-26.721.81911:ask-approve-full-custom-permission-menu"
+        "cdp-26.721.81911:add-files-goal-plan-skill-and-plugins-menu"
       ],
       "implementationStatus": "partial",
       "browserStatus": "partial_legacy",
@@ -470,10 +485,25 @@
       "priority": "p0"
     },
     {
-      "id": "composer.plugins-attachments-resources",
+      "id": "composer.resources",
       "area": "composer",
       "ownership": "thread",
       "packageEvidence": ["composer-work-home-plugins-control", "connect-plugins-submenu-item"],
+      "runtimeStatus": "runtime_observed",
+      "runtimeEvidence": [
+        "cdp-26.721.81911:add-files-goal-plan-skill-and-plugins-menu",
+        "cdp-26.727.40816:add-files-inline-resource-picker-736x320-scrollable-groups"
+      ],
+      "implementationStatus": "partial",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
+      "priority": "p1"
+    },
+    {
+      "id": "composer.attachments-plugins",
+      "area": "composer",
+      "ownership": "thread",
+      "packageEvidence": ["composer-work-home-plugins-control"],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
         "cdp-26.721.81911:add-files-goal-plan-skill-and-plugins-menu"

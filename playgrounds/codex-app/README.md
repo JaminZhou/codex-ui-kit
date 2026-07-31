@@ -274,7 +274,7 @@ The sixteenth slice refreshes Pull request behavior against
   compact states;
 - real Electron review/comment/merge interaction against deterministic local
   state, without GitHub side effects;
-- nine additional reviewed visual frames and a shared 59-frame CDP/pixel
+- nine additional reviewed visual frames and a shared 61-frame CDP/pixel
   matrix;
 - a current 906×820 regional comparison passing at 5.75% full-main, 4.68%
   index, and 6.44% detail difference without relaxing the existing thresholds.
@@ -331,8 +331,23 @@ The nineteenth slice refreshes the Composer queue and Stop lifecycle against
 - deterministic Browser/CDP and real Electron acceptance for that default
   state machine, while the former paused/Resume frame remains available as
   explicit legacy compatibility;
-- two current 792×320 regional gates passing at 0.45% queued and 0.62%
+- two current 792×320 regional gates passing at 0.35% queued and 0.51%
   automatic-continuation difference under a 2% hard limit.
+
+## Twentieth vertical slice
+
+The twentieth slice refreshes current multiline, permission, and Add-resource
+Composer behavior against `26.727.40816`:
+
+- exact 736×134 four-line and 736×259 long-input Composer geometry, including
+  the 712×80 draft area and 205px `25dvh` clamp;
+- a public `ComposerPermissionMenu` for the current Ask/Approve/Full/Custom
+  choices and a public, data-driven `ComposerResourcePicker` for the new
+  736×320 inline Add surface;
+- 61-frame CDP coverage plus real Electron selection, Escape/focus, scrolling,
+  and keyboard acceptance;
+- strict ownership-masked current regional gates passing at 0.10% multiline,
+  0.13% permissions, and 0.34% resources difference.
 
 ## Development
 
@@ -419,8 +434,8 @@ CODEX_UI_KIT_WINDOW_CHROME_REFERENCE=/absolute/path/to/window-chrome.png \
   pnpm --filter @codex-ui-kit/codex-app-playground check:visual
 ```
 
-The current Composer gates accept the two untracked 792×320 crops captured
-from the same 1180×820 current-build Renderer:
+The current queue gates accept two untracked 792×320 crops captured from the
+same 1180×820 current-build Renderer:
 
 ```bash
 CODEX_UI_KIT_COMPOSER_QUEUED_REFERENCE=/absolute/path/to/composer-queued.png \
@@ -430,5 +445,15 @@ CODEX_UI_KIT_COMPOSER_CONTINUED_REFERENCE=/absolute/path/to/composer-continued.p
 
 `CODEX_UI_KIT_COMPOSER_PAUSED_REFERENCE` remains available only for the
 previous-build paused/Resume compatibility frame.
+
+The current multiline/menu gates accept one 792×320 Composer crop and two
+906×820 main-only crops:
+
+```bash
+CODEX_UI_KIT_COMPOSER_MULTILINE_REFERENCE=/absolute/path/to/composer-multiline.png \
+CODEX_UI_KIT_COMPOSER_PERMISSIONS_REFERENCE=/absolute/path/to/composer-permissions-main.png \
+CODEX_UI_KIT_COMPOSER_RESOURCES_REFERENCE=/absolute/path/to/composer-resources-main.png \
+  pnpm --filter @codex-ui-kit/codex-app-playground check:visual
+```
 
 See [docs/VALIDATION.md](docs/VALIDATION.md) for the evidence model.

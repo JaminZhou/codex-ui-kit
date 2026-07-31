@@ -61,14 +61,15 @@ observation from a previous build remains historical evidence.
   PR Summary/Code with integrated Timeline and responsive detail restoration;
   successful Code content, successful and recovered OpenAI Developer Docs
   calls, and the current Composer queue/Stop automatic-continuation lifecycle
+  plus multiline input, permission choices, and the inline Add-resource picker
   are observed, while mutating review/comment/merge,
   light-theme, global notifications, current-build long-thread
   virtualization, and unrelated surface evidence remain pending
 
-Current inventory: 75 surface groups; 25 have current-build runtime evidence,
+Current inventory: 77 surface groups; 27 have current-build runtime evidence,
 31 have previous-build-only runtime evidence, 19 remain `not_sampled`, and 0
-are `blocked_by_policy`. Current-build Browser verification covers 21 groups
-and Electron verification covers 21. Prior acceptance outside the sampled
+are `blocked_by_policy`. Current-build Browser verification covers 23 groups
+and Electron verification covers 23. Prior acceptance outside the sampled
 shell, sidebar, New chat, and Pull request slices remains recorded as
 `partial_legacy` until current-build re-observation.
 
@@ -264,8 +265,7 @@ stay independently bounded.
 
 The previous full conversation/Composer probe observed build `26.721.81911`
 in a disposable second process using synthetic prompts only. It remains the
-historical source for multiline, permission, Add-files, attachment, and
-paused/Resume variants.
+historical source for attachment, active mode, and paused/Resume variants.
 
 The current `26.727.40816` text-only probe re-observed the 736px Composer
 column, 712×44 textbox, 28×28 Stop button, and a real queued follow-up. The
@@ -276,10 +276,23 @@ Delete queued message, and queued message actions. Stop produced
 started the next turn automatically. The current product did not expose the
 old paused header or Resume action.
 
+A second exact current-build Composer probe reached four-line and long-input
+states without submitting the draft. The four-line Composer measures 736×134
+at x=359/y=670 with a 712×80 textbox at x=371/y=684. Twenty lines clamp the
+textbox to the current 205px `25dvh` maximum and grow the surface to 736×259.
+The permission trigger measures 101.06×28 and opens the four current choices
+in a 480.36×222.44 menu: Ask for approval, Approve for me, Full access, and
+Custom (`config.toml`). `Add files and more` now opens a 736×320 inline,
+scrollable resource picker rather than the previous simple menu. Its visible
+top groups cover files/folders, active-app attachment, project, Goal, Plan
+mode, skill recording, and plugin resources. Lower installed entries are
+host-provided data and are not copied into the public fixture.
+
 The independent public contract adds `ComposerDock`,
-`ComposerContextBar`, and `ComposerContextControl`, keeps context, queue, and
-input ownership separate, and lets a running `AgentComposer` route Enter to a
-host-owned queue while Stop remains the primary control. The 46-event
+`ComposerContextBar`, `ComposerContextControl`, `ComposerPermissionMenu`, and
+`ComposerResourcePicker`, keeps context, queue, overlays, and input ownership
+separate, and lets a running `AgentComposer` route Enter to a host-owned queue
+while Stop remains the primary control. The 46-event
 conversation replay contains 11 turns and covers multiline, disabled,
 attachment, running, queued, queue-paused, completed, scroll-away,
 message-navigation, and windowed-history frames. Its default interaction now
@@ -292,10 +305,15 @@ Optional 792×320 `26.727.40816` references are accepted through
 `CODEX_UI_KIT_COMPOSER_QUEUED_REFERENCE` and
 `CODEX_UI_KIT_COMPOSER_CONTINUED_REFERENCE`. At the strict 0.05 pixel
 threshold and 2% hard ratio limit, the accepted ownership-masked
-changed-pixel ratios are `0.004505997` and `0.006182923`. Queue and
+changed-pixel ratios are `0.003480114` and `0.005105745`. Queue and
 Stop/interruption are therefore current-build Browser/Electron verified.
-Permission, attachment, and full multiline lifecycle evidence remains
-`partial_legacy`. Message navigation and windowing retain strong independent
+The four-line, permission, and Add-resource frames add two more reviewed
+Browser/CDP/pixel frames and real Electron interaction. Their strict
+ownership-masked changed-pixel ratios are `0.000994318`, `0.001280084`, and
+`0.003352986`, under hard 0.5%, 0.5%, and 0.8% limits respectively.
+Permissions, Add resources, and multiline growth are therefore current-build
+verified; attachments and active modes remain `partial_legacy`. Message
+navigation and windowing retain strong independent
 Browser/Electron regression coverage, but stay `partial_legacy` because the
 current build's exact long-thread virtualization algorithm was not re-observed.
 
@@ -382,7 +400,7 @@ checks, reviewer, and thread surfaces. The deterministic state machine covers
 index/detail loading, failure and retry; running/failed/passed checks; comment
 failure/recovery; review submission; blocked/ready/merging/merged requirements;
 compact layout; and route restoration. Browser/CDP, real Electron, and
-reviewed pixels verify the resulting 59-frame matrix, so
+reviewed pixels verify the resulting 61-frame matrix, so
 `workspace.pull-request-route` and `workspace.pull-request-review` are now
 independently Browser/Electron verified.
 
@@ -487,7 +505,7 @@ progress, result, error, and completion fields. The new deterministic scenario
 continues into a second turn containing two commands, an accepted approval,
 one file change, and the Review panel. CDP and real `BrowserWindow`
 acceptance cover the standalone failure, recovered four-call group,
-raw-output dialog, and mixed Review split within the 59-frame lifecycle
+raw-output dialog, and mixed Review split within the 61-frame lifecycle
 matrix. The current-build masked 906×820 regional gate passes at the strict
 0.05 pixel threshold with changed-pixel ratios of 0.016253432 for the full
 main region, 0.028989319 for the recovery region, 0.010849453 for the upper

@@ -402,14 +402,51 @@ automatic-continuation state by default while retaining paused/Resume as a
 legacy compatibility frame.
 
 At the strict 0.05 pixel threshold and 2% hard changed-pixel limit, the queued
-and automatic-continuation crops pass at `0.004505997` and `0.006182923`.
-CDP covers 59 lifecycle frames and real Electron repeats the default
+and automatic-continuation crops pass at `0.003480114` and `0.005105745`.
+CDP covers 61 lifecycle frames and real Electron repeats the default
 transition.
 
 Cleanup stopped only PID `78399`, verified the exact profile process set and
 port `9514` were gone, and moved the profile and screenshots into
 `/Users/JaminZhou/.Trash/codex-ui-kit-composer-cleanup.FE0SB8`. The original
 Codex process remained running.
+
+### Current 26.727.40816 Composer menus and long-input capture
+
+The current menu refresh used exact process PID `89666`, loopback port `9515`,
+and unique profile
+`/private/tmp/codex-ui-kit-composer-menus-cdp.8CjIBw`. It selected the
+1180×820 main Renderer, entered only an unsubmitted synthetic draft, and did
+not select a permission/resource option, submit a turn, or use any tool.
+
+The bounded sequence was:
+
+1. record three-line, four-line, and 20-line textbox/surface geometry and
+   computed overflow styles, then restore the four-line draft;
+2. open the permission menu and record its heading, four labels, selected
+   state, 47px rows, outer geometry, and computed styles;
+3. dismiss with Escape, open `Add files and more`, and record the current
+   736×320 inline picker, visible top groups, 726×310 scroller, and
+   approximately 1010px content height without copying lower
+   user/environment-specific labels;
+4. dismiss without uploading, connecting, changing permission, or activating
+   Goal/Plan;
+5. capture one 792×320 Composer crop and two 906×820 main-only crops for
+   ownership-scoped pixel gates.
+
+The four-line Composer measured 736×134 with a 712×80 textbox; 20 lines
+clamped the textbox to 205px and grew the surface to 736×259. The permission
+menu measured 480.36×222.44 and the Add-resource picker 736×320. Public,
+data-driven permission and resource components now pass 61-frame CDP,
+Electron selection/Escape/focus/scroll/keyboard acceptance, and strict
+regional gates at `0.000994318`, `0.001280084`, and `0.003352986`.
+
+Cleanup stopped the exact main process and app-server child, verified port
+`9515` was gone, and moved the unique profile into
+`/Users/JaminZhou/.Trash/codex-ui-kit-composer-menus-cleanup.NV2plx` with the
+external reference images.
+Attachment lifecycle and active Goal/Plan transitions remain pending current
+capture.
 
 ## Required flow matrix
 

@@ -11,8 +11,8 @@ exit gates; it does not replace the inventory.
 ## Current position
 
 - The current installed package is Codex Desktop `26.727.40816` (`6067`).
-- The inventory contains 75 surface groups: 48 P0, 18 P1, and 9 P2.
-- 25 groups have current-build runtime evidence, 31 have previous-build-only
+- The inventory contains 77 surface groups: 49 P0, 19 P1, and 9 P2.
+- 27 groups have current-build runtime evidence, 31 have previous-build-only
   runtime evidence, and 19 have not been sampled.
 - The current-build refresh covers all six left-sidebar groups, window
   navigation, route loading/restoration, the New chat Composer and project
@@ -22,7 +22,7 @@ exit gates; it does not replace the inventory.
   responsive detail restoration. Its independent state machine adds
   index/detail loading and failure, checks, comments, review submission,
   merge-readiness, merge completion, compact layout, and route restoration.
-  Together the playground gates cover 59 CDP/pixel frames, and the refreshed
+  Together the playground gates cover 61 CDP/pixel frames, and the refreshed
   PR detail passes the current 906×820 regional pixel gate. The refreshed
   real MCP success path now matches Search → Fetch, the integrated activity
   disclosure, computed typography, and a current regional pixel gate. The
@@ -31,8 +31,11 @@ exit gates; it does not replace the inventory.
   answer, and current regional pixel gate. The current Composer queue/Stop
   probe now locks its 710×39 tray, 28×28 Stop control, `You stopped after 2s`
   summary, and automatic queued continuation in Browser, Electron, and two
-  regional pixel gates. Permission/Add-files/multiline Composer variants,
-  Terminal
+  regional pixel gates. A second current probe and independent public
+  components now lock four-line/20-line growth, all four permission choices,
+  and the 736×320 inline Add-resource picker through CDP, real Electron, and
+  three additional regional pixel gates. Attachment and active-mode Composer
+  variants, Terminal
   multi-tab/process behavior,
   Review rename/delete variants, and broader shell evidence from
   `26.721.81911` remain historical regression evidence until re-observed. The
@@ -249,10 +252,11 @@ without confusing package readiness with full product reconstruction.
    recovery/notification states remain explicitly synthetic.
 5. **Conversation and Composer lifecycle**: current queue/Stop automatic
    continuation is delivered through real current-build evidence,
-   Browser/CDP, Electron, and regional pixels. Continue with current
-   permissions/add-menu, multiline/attachment, and long-thread
-   navigation/windowing evidence; retain queue pause/Resume only as a legacy
-   compatibility fixture.
+   Browser/CDP, Electron, and regional pixels. Current permissions, Add
+   resources, and multiline/long-input geometry are also delivered. Continue
+   with attachment, active-mode, and long-thread navigation/windowing
+   evidence; retain queue pause/Resume only as a legacy compatibility
+   fixture.
 6. **Coding workspace entry**: current project/context entry plus independent
    project → environment/worktree → command → approval → Review → Terminal →
    PR acceptance.

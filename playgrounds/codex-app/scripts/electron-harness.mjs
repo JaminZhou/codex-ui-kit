@@ -57,6 +57,18 @@ export const visualScenes = [
     scenario: "conversation-lifecycle",
   },
   {
+    frame: "composer-permissions-menu",
+    id: "composer-permissions-menu",
+    maxPixelRatio: 0.0225,
+    scenario: "conversation-lifecycle",
+  },
+  {
+    frame: "composer-resources-menu",
+    id: "composer-resources-menu",
+    maxPixelRatio: 0.0225,
+    scenario: "conversation-lifecycle",
+  },
+  {
     frame: "composer-running",
     id: "composer-running",
     maxPixelRatio: 0.0225,

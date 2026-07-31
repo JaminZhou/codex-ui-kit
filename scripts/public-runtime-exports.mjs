@@ -32,6 +32,8 @@ export const publicRuntimeExports = [
   "ComposerDock",
   "ComposerMentionMenu",
   "ComposerModeIndicator",
+  "ComposerPermissionMenu",
+  "ComposerResourcePicker",
   "ConversationContextBar",
   "ConversationEvent",
   "ConversationEventList",

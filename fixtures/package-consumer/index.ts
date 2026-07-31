@@ -34,6 +34,10 @@ import {
   ComposerMentionMenu,
   type ComposerMentionOption,
   ComposerModeIndicator,
+  ComposerPermissionMenu,
+  type ComposerPermissionOption,
+  ComposerResourcePicker,
+  type ComposerResourceGroup,
   type ComposerLayout,
   ConversationContextBar,
   type ConversationContextItem,
@@ -211,6 +215,14 @@ const mentionOption: ComposerMentionOption = {
   id: "package-consumer",
   label: "Package consumer",
 };
+const permissionOption: ComposerPermissionOption = {
+  id: "approve",
+  label: "Approve for me",
+};
+const resourceGroup: ComposerResourceGroup = {
+  id: "files",
+  options: [{ id: "file", label: "File" }],
+};
 const queuedPrompt: QueuedPrompt = {
   id: "queued-package-consumer",
   text: "Verify public types",
@@ -282,6 +294,8 @@ void CommandOutput;
 void ComposerAttachment;
 void ComposerMentionMenu;
 void ComposerModeIndicator;
+void ComposerPermissionMenu;
+void ComposerResourcePicker;
 void ConversationContextBar;
 void ConversationEvent;
 void ConversationEventList;
@@ -375,6 +389,8 @@ void localEnvironmentGroup;
 void projectIndexItem;
 void worktreeListItem;
 void mentionOption;
+void permissionOption;
+void resourceGroup;
 void queuedPrompt;
 void generatedImage;
 void dialogSize;

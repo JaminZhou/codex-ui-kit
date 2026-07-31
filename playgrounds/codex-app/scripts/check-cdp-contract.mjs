@@ -1468,6 +1468,15 @@ for (const scene of visualScenes) {
         const floating = document.querySelector(
           ".codex-ui-thread-floating-button",
         );
+        const permissionMenu = document.querySelector(
+          ".codex-ui-composer-permission-menu",
+        );
+        const resourcePicker = document.querySelector(
+          ".codex-ui-composer-resource-picker",
+        );
+        const resourceScroller = resourcePicker?.querySelector(
+          ".codex-ui-composer-resource-picker__scroller",
+        );
         if (
           !root ||
           !dock ||
@@ -1519,6 +1528,7 @@ for (const scene of visualScenes) {
             buttonCount: navigation.querySelectorAll("button").length,
             label: navigation.getAttribute("aria-label"),
           },
+          overlay: root.getAttribute("data-composer-overlay"),
           phase: root.getAttribute("data-composer-phase"),
           placeholder: {
             count: document.querySelectorAll(
@@ -1554,6 +1564,50 @@ for (const scene of visualScenes) {
               }
             : null,
           queueCount: root.getAttribute("data-queue-count"),
+          permissionMenu: permissionMenu
+            ? {
+                checkedCount: permissionMenu.querySelectorAll(
+                  '[role="menuitemradio"][aria-checked="true"]',
+                ).length,
+                labels: Array.from(
+                  permissionMenu.querySelectorAll(
+                    '[role="menuitemradio"]',
+                  ),
+                  (item) =>
+                    item.textContent?.replace(/\s+/g, " ").trim(),
+                ),
+                optionRects: Array.from(
+                  permissionMenu.querySelectorAll(
+                    ".codex-ui-composer-permission-menu__option",
+                  ),
+                  (item) => rect(item),
+                ),
+                rect: rect(permissionMenu),
+              }
+            : null,
+          resourcePicker: resourcePicker
+            ? {
+                activeId:
+                  resourcePicker.getAttribute("aria-activedescendant"),
+                groupCount: resourcePicker.querySelectorAll(
+                  ".codex-ui-composer-resource-picker__group",
+                ).length,
+                optionCount: resourcePicker.querySelectorAll(
+                  '[role="option"]',
+                ).length,
+                rect: rect(resourcePicker),
+                scroller: resourceScroller
+                  ? {
+                      clientHeight: resourceScroller.clientHeight,
+                      rect: rect(resourceScroller),
+                      scrollHeight: resourceScroller.scrollHeight,
+                    }
+                  : null,
+                selectedCount: resourcePicker.querySelectorAll(
+                  '[role="option"][aria-selected="true"]',
+                ).length,
+              }
+            : null,
           interruptionText:
             document
               .querySelector(".codex-ui-thread-interruption-summary")
@@ -1602,14 +1656,81 @@ for (const scene of visualScenes) {
         );
       }
       if (
-        scene.id === "composer-multiline" &&
+        [
+          "composer-multiline",
+          "composer-permissions-menu",
+          "composer-resources-menu",
+        ].includes(scene.id) &&
         (conversation.phase !== "multiline" ||
           conversation.composer.layout !== "multiline" ||
-          conversation.textarea.lineCount !== 3 ||
-          conversation.textarea.rect.height < 60)
+          conversation.textarea.lineCount !== 4 ||
+          Math.abs(conversation.composer.rect.left - 359) > 1 ||
+          Math.abs(conversation.composer.rect.top - 670) > 1 ||
+          Math.abs(conversation.composer.rect.width - 736) > 1 ||
+          Math.abs(conversation.composer.rect.height - 134) > 1 ||
+          Math.abs(conversation.textarea.rect.left - 371) > 1 ||
+          Math.abs(conversation.textarea.rect.top - 684) > 1 ||
+          Math.abs(conversation.textarea.rect.width - 712) > 1 ||
+          Math.abs(conversation.textarea.rect.height - 80) > 1)
       ) {
         throw new Error(
           `${scene.id}: multiline Composer contract failed: ${JSON.stringify(conversation)}`,
+        );
+      }
+      if (
+        scene.id === "composer-permissions-menu" &&
+        (conversation.overlay !== "permissions" ||
+          !conversation.permissionMenu ||
+          conversation.resourcePicker !== null ||
+          conversation.permissionMenu.checkedCount !== 1 ||
+          conversation.permissionMenu.labels.length !== 4 ||
+          !conversation.permissionMenu.labels[0]?.includes(
+            "Ask for approval",
+          ) ||
+          !conversation.permissionMenu.labels[3]?.includes(
+            "Custom (config.toml)",
+          ) ||
+          Math.abs(conversation.permissionMenu.rect.left - 401) > 1 ||
+          Math.abs(conversation.permissionMenu.rect.top - 544) > 1 ||
+          Math.abs(conversation.permissionMenu.rect.width - 480.375) > 1 ||
+          Math.abs(conversation.permissionMenu.rect.height - 222.5) > 1 ||
+          conversation.permissionMenu.optionRects.some(
+            (option) =>
+              !option || Math.abs(option.height - 47.125) > 1,
+          ))
+      ) {
+        throw new Error(
+          `${scene.id}: current permission menu contract failed: ${JSON.stringify(conversation)}`,
+        );
+      }
+      if (
+        scene.id === "composer-resources-menu" &&
+        (conversation.overlay !== "resources" ||
+          conversation.permissionMenu !== null ||
+          !conversation.resourcePicker ||
+          !conversation.resourcePicker.scroller ||
+          conversation.resourcePicker.groupCount !== 5 ||
+          conversation.resourcePicker.optionCount !== 30 ||
+          conversation.resourcePicker.selectedCount !== 1 ||
+          !conversation.resourcePicker.activeId ||
+          Math.abs(conversation.resourcePicker.rect.left - 359) > 1 ||
+          Math.abs(conversation.resourcePicker.rect.top - 346) > 1 ||
+          Math.abs(conversation.resourcePicker.rect.width - 736) > 1 ||
+          Math.abs(conversation.resourcePicker.rect.height - 320) > 1 ||
+          Math.abs(
+            conversation.resourcePicker.scroller.rect.left - 364,
+          ) > 1 ||
+          Math.abs(
+            conversation.resourcePicker.scroller.rect.top - 351,
+          ) > 1 ||
+          Math.abs(
+            conversation.resourcePicker.scroller.rect.width - 726,
+          ) > 1 ||
+          conversation.resourcePicker.scroller.clientHeight !== 310 ||
+          conversation.resourcePicker.scroller.scrollHeight < 990)
+      ) {
+        throw new Error(
+          `${scene.id}: current resource picker contract failed: ${JSON.stringify(conversation)}`,
         );
       }
       if (
@@ -1718,6 +1839,20 @@ for (const scene of visualScenes) {
       ) {
         throw new Error(
           `${scene.id}: virtualized window contract failed: ${JSON.stringify(conversation)}`,
+        );
+      }
+      if (scene.id === "composer-permissions-menu") {
+        await page.getByRole("menu").press("Escape");
+        await page.waitForSelector(
+          '.demo-root:not([data-composer-overlay])',
+        );
+      }
+      if (scene.id === "composer-resources-menu") {
+        await page
+          .getByRole("listbox", { name: "Composer resources" })
+          .press("Escape");
+        await page.waitForSelector(
+          '.demo-root:not([data-composer-overlay])',
         );
       }
     }

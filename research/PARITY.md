@@ -64,14 +64,20 @@ The authoritative current-build inventory is:
   The current PR changed to Summary/Code tabs with
   Timeline integrated into Summary, loaded real multi-file Code content, and
   exposed a display-only Review options menu. The independent Browser and
-  Electron flows verify the matched shell/New chat/PR structures and all 59
+  Electron flows verify the matched shell/New chat/PR structures and all 61
   deterministic lifecycle frames. The refreshed PR regional gate passes at
   5.75% full-main, 4.68% index, and 6.44% detail difference. A third
   text-only current probe verifies the 710×39 Composer queue, visible
   Steer/Delete/message-actions controls, 28×28 Stop, `You stopped after 2s`,
   and automatic queued continuation. Browser, Electron, and 792×320 regional
-  gates pass at 0.45% queued and 0.62% continued difference; the previous
+  gates pass at 0.35% queued and 0.51% continued difference; the previous
   paused/Resume behavior is retained only as legacy compatibility.
+  A fourth current probe verifies the 736×134 four-line Composer, 205px
+  long-input clamp, four-choice 480×222 permission menu, and the new 736×320
+  inline Add-resource picker. Public `ComposerPermissionMenu` and
+  `ComposerResourcePicker` contracts, CDP, real Electron, and three regional
+  gates pass at 0.10%, 0.13%, and 0.34% changed pixels. Attachments and active
+  modes remain historical rather than being inferred from the resource menu.
   Terminal multi-tab/process lifecycle, Review variants, broader
   shell matrices, and their external pixels remain `26.721.81911` historical
   evidence. The current project-named single Terminal tab and close/add
@@ -91,7 +97,7 @@ The authoritative current-build inventory is:
   explicit row reopen after responsive auto-hide. The
   independent public state machine adds list/detail loading and failure,
   checks, comments, review submission, merge readiness/completion, and compact
-  recovery through 59 Browser/CDP, Electron, and reviewed-pixel frames. No
+  recovery through 61 Browser/CDP, Electron, and reviewed-pixel frames. No
   review, comment, or merge was sent to the real PR, and successful
   review submission remains synthetic because the current Review options menu
   contains display settings only; those mutating states must not be reported

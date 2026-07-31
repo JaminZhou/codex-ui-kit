@@ -12,7 +12,11 @@ import {
   type KeyboardEvent,
   type ReactNode,
 } from "react";
-import { Menu, MenuItem } from "./InteractivePrimitives.js";
+import {
+  Menu,
+  MenuItem,
+  type MenuProps,
+} from "./InteractivePrimitives.js";
 
 function hasRenderableNode(children: ReactNode): boolean {
   return Children.toArray(children).some((child) => {
@@ -132,6 +136,278 @@ export function ComposerContextControl({
         <span className="codex-ui-composer-context__label">{children}</span>
       ) : null}
     </button>
+  );
+}
+
+export interface ComposerPermissionOption {
+  description?: ReactNode;
+  disabled?: boolean;
+  icon?: ReactNode;
+  id: string;
+  label: ReactNode;
+}
+
+export interface ComposerPermissionMenuProps
+  extends Omit<MenuProps, "children" | "trigger"> {
+  heading?: ReactNode;
+  learnMore?: ReactNode;
+  onSelect: (option: ComposerPermissionOption) => void;
+  options: readonly ComposerPermissionOption[];
+  selectedId?: string;
+  trigger: MenuProps["trigger"];
+}
+
+export function ComposerPermissionMenu({
+  className,
+  heading = "How should actions be approved?",
+  learnMore,
+  onSelect,
+  options,
+  selectedId,
+  trigger,
+  ...props
+}: ComposerPermissionMenuProps) {
+  return (
+    <Menu
+      {...props}
+      className={["codex-ui-composer-permission-menu", className]
+        .filter(Boolean)
+        .join(" ")}
+      trigger={trigger}
+      width="auto"
+    >
+      <div className="codex-ui-composer-permission-menu__header">
+        <span>{heading}</span>
+        {learnMore ? (
+          <span className="codex-ui-composer-permission-menu__learn-more">
+            {learnMore}
+          </span>
+        ) : null}
+      </div>
+      {options.map((option) => {
+        const selected = option.id === selectedId;
+        return (
+          <MenuItem
+            aria-checked={selected}
+            className="codex-ui-composer-permission-menu__option"
+            data-selected={selected || undefined}
+            disabled={option.disabled}
+            endIcon={selected ? <span>✓</span> : undefined}
+            key={option.id}
+            onSelect={() => onSelect(option)}
+            role="menuitemradio"
+            startIcon={option.icon}
+            subText={option.description}
+          >
+            {option.label}
+          </MenuItem>
+        );
+      })}
+    </Menu>
+  );
+}
+
+export interface ComposerResourceOption {
+  description?: ReactNode;
+  disabled?: boolean;
+  icon?: ReactNode;
+  id: string;
+  label: ReactNode;
+}
+
+export interface ComposerResourceGroup {
+  id: string;
+  label?: ReactNode;
+  options: readonly ComposerResourceOption[];
+}
+
+export interface ComposerResourcePickerProps
+  extends Omit<ComponentPropsWithoutRef<"div">, "children" | "onSelect"> {
+  activeId?: string;
+  groups: readonly ComposerResourceGroup[];
+  heading?: ReactNode;
+  onActiveIdChange?: (id: string) => void;
+  onDismiss?: () => void;
+  onSelect: (option: ComposerResourceOption) => void;
+}
+
+export function ComposerResourcePicker({
+  activeId,
+  className,
+  groups,
+  heading = "Add",
+  onActiveIdChange,
+  onDismiss,
+  onKeyDown,
+  onSelect,
+  ...props
+}: ComposerResourcePickerProps) {
+  const instanceId = useId();
+  const getOptionDomId = (id: string) =>
+    `${instanceId}-resource-${encodeURIComponent(id)}`;
+  const availableOptions = useMemo(
+    () =>
+      groups
+        .flatMap((group) => group.options)
+        .filter((option) => !option.disabled),
+    [groups],
+  );
+  const [internalActiveId, setInternalActiveId] = useState(
+    () => availableOptions[0]?.id,
+  );
+  const resolvedActiveId = activeId ?? internalActiveId;
+  const visibleActiveId = availableOptions.some(
+    (option) => option.id === resolvedActiveId,
+  )
+    ? resolvedActiveId
+    : availableOptions[0]?.id;
+  const setActiveId = (id: string) => {
+    if (activeId === undefined) setInternalActiveId(id);
+    onActiveIdChange?.(id);
+  };
+
+  useEffect(() => {
+    if (
+      activeId === undefined &&
+      !availableOptions.some((option) => option.id === internalActiveId)
+    ) {
+      setInternalActiveId(availableOptions[0]?.id);
+    }
+  }, [activeId, availableOptions, internalActiveId]);
+
+  const moveActive = (offset: number) => {
+    if (availableOptions.length === 0) return;
+    const currentIndex = availableOptions.findIndex(
+      (option) => option.id === visibleActiveId,
+    );
+    const nextIndex =
+      currentIndex < 0
+        ? 0
+        : (currentIndex + offset + availableOptions.length) %
+          availableOptions.length;
+    const nextOption = availableOptions[nextIndex];
+    if (nextOption) setActiveId(nextOption.id);
+  };
+
+  const handleKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
+    onKeyDown?.(event);
+    if (event.defaultPrevented) return;
+
+    if (event.key === "ArrowDown" || event.key === "ArrowUp") {
+      event.preventDefault();
+      moveActive(event.key === "ArrowDown" ? 1 : -1);
+      return;
+    }
+    if (event.key === "Home" || event.key === "End") {
+      event.preventDefault();
+      const nextOption =
+        event.key === "Home"
+          ? availableOptions[0]
+          : availableOptions[availableOptions.length - 1];
+      if (nextOption) setActiveId(nextOption.id);
+      return;
+    }
+    if (event.key === "Enter") {
+      const selectedOption = availableOptions.find(
+        (option) => option.id === visibleActiveId,
+      );
+      if (selectedOption) {
+        event.preventDefault();
+        onSelect(selectedOption);
+      }
+      return;
+    }
+    if (event.key === "Escape") {
+      event.preventDefault();
+      onDismiss?.();
+    }
+  };
+
+  return (
+    <div
+      aria-activedescendant={
+        visibleActiveId ? getOptionDomId(visibleActiveId) : undefined
+      }
+      aria-label="Composer resources"
+      aria-orientation="vertical"
+      className={["codex-ui-composer-resource-picker", className]
+        .filter(Boolean)
+        .join(" ")}
+      onKeyDown={handleKeyDown}
+      role="listbox"
+      tabIndex={0}
+      {...props}
+    >
+      <div className="codex-ui-composer-resource-picker__scroller">
+        <div className="codex-ui-composer-resource-picker__heading">
+          {heading}
+        </div>
+        {groups.map((group) =>
+          group.options.length > 0 ? (
+            <section
+              aria-labelledby={
+                group.label
+                  ? `${instanceId}-resource-group-${encodeURIComponent(group.id)}`
+                  : undefined
+              }
+              className="codex-ui-composer-resource-picker__group"
+              key={group.id}
+              role="group"
+            >
+              {group.label ? (
+                <div
+                  className="codex-ui-composer-resource-picker__group-label"
+                  id={`${instanceId}-resource-group-${encodeURIComponent(group.id)}`}
+                >
+                  {group.label}
+                </div>
+              ) : null}
+              {group.options.map((option) => {
+                const selected = option.id === visibleActiveId;
+                return (
+                  <button
+                    aria-disabled={option.disabled || undefined}
+                    aria-selected={selected}
+                    className="codex-ui-composer-resource-picker__option"
+                    data-active={selected || undefined}
+                    disabled={option.disabled}
+                    id={getOptionDomId(option.id)}
+                    key={option.id}
+                    onClick={() => onSelect(option)}
+                    onMouseEnter={() => {
+                      if (!option.disabled) setActiveId(option.id);
+                    }}
+                    role="option"
+                    tabIndex={-1}
+                    type="button"
+                  >
+                    {option.icon ? (
+                      <span
+                        aria-hidden="true"
+                        className="codex-ui-composer-resource-picker__icon"
+                      >
+                        {option.icon}
+                      </span>
+                    ) : null}
+                    <span className="codex-ui-composer-resource-picker__copy">
+                      <span className="codex-ui-composer-resource-picker__label">
+                        {option.label}
+                      </span>
+                      {option.description ? (
+                        <span className="codex-ui-composer-resource-picker__description">
+                          {" — "}
+                          {option.description}
+                        </span>
+                      ) : null}
+                    </span>
+                  </button>
+                );
+              })}
+            </section>
+          ) : null,
+        )}
+      </div>
+    </div>
   );
 }
 
