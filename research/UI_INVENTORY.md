@@ -63,10 +63,10 @@ observation from a previous build remains historical evidence.
   light-theme, global notifications, current-build long-thread
   virtualization, and unrelated surface evidence remain pending
 
-Current inventory: 75 surface groups; 21 have current-build runtime evidence,
-35 have previous-build-only runtime evidence, 19 remain `not_sampled`, and 0
-are `blocked_by_policy`. Current-build Browser verification covers 17 groups
-and Electron verification covers 17. Prior acceptance outside the sampled
+Current inventory: 75 surface groups; 22 have current-build runtime evidence,
+34 have previous-build-only runtime evidence, 19 remain `not_sampled`, and 0
+are `blocked_by_policy`. Current-build Browser verification covers 18 groups
+and Electron verification covers 18. Prior acceptance outside the sampled
 shell, sidebar, New chat, and Pull request slices remains recorded as
 `partial_legacy` until current-build re-observation.
 
@@ -460,6 +460,19 @@ The original successful-MCP slice samples a real read-only
 records the completed answer, the `Worked for 54s` disclosure, the
 `Used OpenAI Developer Docs integration` group, and its three Search plus two
 Fetch calls.
+
+Build `26.727.40816` refreshes the primary successful path with one real
+Search followed by one real Fetch, a `Worked for 31s` disclosure, an
+intermediate assistant explanation inside the activity timeline, and a linked
+Markdown answer. The independent two-call replay now matches the current
+group order, 14/21px typography, system font, 445 weight, 0.6 secondary color,
+and response layout. Its current 906×820 gate passes at 2.03% full-main,
+0.05% tool-structure, 1.87% answer, and 1.92% Composer difference without
+changing the existing limits. Dynamic header/task/intermediate/group-label
+glyphs and the non-owning scrollbar are masked; the answer stays unmasked,
+and CDP separately gates the masked typography and disclosure properties.
+`thread.mcp-tool-events` is therefore current-build
+Browser/Electron verified.
 
 Build `26.721.81911` now adds a separate real recovery path. A disposable
 task deliberately calls `fetch_openai_doc` with `not-a-valid-url`, exposes the

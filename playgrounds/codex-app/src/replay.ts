@@ -137,8 +137,8 @@ export const replayScenarios: Record<ReplayScenarioId, ReplayScenario> = {
   ),
   "mcp-tool-call": scenario(
     "mcp-tool-call",
-    "Find Codex MCP support docs",
-    "A real public docs integration sequence with five successful MCP calls.",
+    "Find Codex MCP guidance",
+    "A current public docs integration sequence with successful Search and Fetch calls.",
     mcpToolCallTrace,
   ),
   "mcp-recovery-mixed-thread": scenario(

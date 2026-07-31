@@ -66,7 +66,7 @@ describe("protocol lifecycle reducer", () => {
       }),
     ]);
     expect(hasActiveTurnWork(runningState)).toBe(true);
-    expect(completed.mcpToolCalls).toHaveLength(5);
+    expect(completed.mcpToolCalls).toHaveLength(2);
     expect(completed.mcpToolCalls.every(({ status }) => status === "completed"))
       .toBe(true);
     expect(completed.mcpToolCalls[0]).toMatchObject({
@@ -78,15 +78,13 @@ describe("protocol lifecycle reducer", () => {
     });
     expect(completed.timeline.map(({ kind }) => kind)).toEqual([
       "message",
-      "mcpToolCall",
-      "mcpToolCall",
-      "mcpToolCall",
+      "message",
       "mcpToolCall",
       "mcpToolCall",
       "message",
     ]);
-    expect(completed.turnDurationMs).toBe(54_000);
-    expect(completed.turnDurationsMs["turn-mcp"]).toBe(54_000);
+    expect(completed.turnDurationMs).toBe(31_000);
+    expect(completed.turnDurationsMs["turn-mcp"]).toBe(31_000);
     expect(completed.messages.at(-1)?.text).toContain(
       "https://learn.chatgpt.com/docs/extend/mcp",
     );

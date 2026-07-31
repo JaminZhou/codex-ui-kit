@@ -339,22 +339,6 @@ function statusLabel(state: DemoProtocolState) {
   return "Ready";
 }
 
-function McpAnswer({ text }: { text: string }) {
-  const [title = "", url = ""] = text.split(/\r?\n/, 2);
-  return (
-    <div className="demo-mcp-answer">
-      <span>{title}</span>
-      <a href={url} rel="noreferrer" target="_blank">
-        <svg aria-hidden="true" viewBox="0 0 16 16">
-          <circle cx="8" cy="8" r="6.5" />
-          <path d="M1.8 8h12.4M8 1.5a10 10 0 0 1 0 13M8 1.5a10 10 0 0 0 0 13" />
-        </svg>
-        <span>{url}</span>
-      </a>
-    </div>
-  );
-}
-
 function McpResponseActions({
   label = "MCP response actions",
 }: {
@@ -1467,50 +1451,79 @@ export function App() {
           : composerValue.includes("\n")
             ? "multiline"
             : "idle";
+  const currentMcpReplay =
+    mode === "replay" && scenarioId === "mcp-tool-call";
   const header = (
     <ThreadHeader
       endActions={
-        <div className="demo-header-actions">
-          <span className="demo-status" data-status={displayedStatus}>
-            {replayStatusLabel(
-              state.status,
-              composerIsRunning,
-              isConversationLifecycle && replayComposerStopped,
-            )}
-          </span>
-          {scenarioId === "background-terminal" ||
-          scenarioId === "terminal-lifecycle" ? (
+        currentMcpReplay ? (
+          <div className="demo-current-mcp-header-actions">
+            <button aria-label="Open integration menu" type="button">
+              ◈⌄
+            </button>
+            <button aria-label="Thread settings" type="button">
+              ☷
+            </button>
+            <button aria-label="Toggle bottom panel" type="button">
+              ▱
+            </button>
+            <button aria-label="Toggle side panel" type="button">
+              ▯
+            </button>
+          </div>
+        ) : (
+          <div className="demo-header-actions">
+            <span className="demo-status" data-status={displayedStatus}>
+              {replayStatusLabel(
+                state.status,
+                composerIsRunning,
+                isConversationLifecycle && replayComposerStopped,
+              )}
+            </span>
+            {scenarioId === "background-terminal" ||
+            scenarioId === "terminal-lifecycle" ? (
+              <Button
+                aria-label="Toggle bottom panel"
+                aria-pressed={terminalOpen}
+                onClick={() => setTerminalOpen((open) => !open)}
+                size="small"
+                tone="ghost"
+              >
+                ▱
+              </Button>
+            ) : null}
             <Button
-              aria-label="Toggle bottom panel"
-              aria-pressed={terminalOpen}
-              onClick={() => setTerminalOpen((open) => !open)}
+              onClick={() =>
+                selectMode(mode === "replay" ? "live" : "replay")
+              }
               size="small"
               tone="ghost"
             >
-              ▱
+              {mode === "replay" ? "Live" : "Replay"}
             </Button>
-          ) : null}
+          </div>
+        )
+      }
+      navigation={
+        currentMcpReplay ? (
+          <span aria-hidden="true" className="demo-current-mcp-folder">
+            ▱
+          </span>
+        ) : (
           <Button
-            onClick={() => selectMode(mode === "replay" ? "live" : "replay")}
+            aria-label={sidebarOpen ? "Hide sidebar" : "Show sidebar"}
+            onClick={() => setSidebarOpen(!sidebarOpen)}
             size="small"
             tone="ghost"
           >
-            {mode === "replay" ? "Live" : "Replay"}
+            ☰
           </Button>
-        </div>
-      }
-      navigation={
-        <Button
-          aria-label={sidebarOpen ? "Hide sidebar" : "Show sidebar"}
-          onClick={() => setSidebarOpen(!sidebarOpen)}
-          size="small"
-          tone="ghost"
-        >
-          ☰
-        </Button>
+        )
       }
       subtitle={
-        mode === "replay"
+        currentMcpReplay
+          ? undefined
+          : mode === "replay"
           ? `${scenario.id} · ${replayCount}/${scenario.events.length} events`
           : state.threadId ?? "Local app-server"
       }
@@ -1535,7 +1548,7 @@ export function App() {
               +
             </button>
             <button aria-label="Change permissions" type="button">
-              ◉ Approve for me
+              ◉ {currentMcpReplay ? "Full access" : "Approve for me"}
             </button>
           </span>
         ) : undefined
@@ -2780,8 +2793,10 @@ export function App() {
       const message = state.messages.find(({ id }) => id === entry.id);
       if (!message) return null;
       if (
-        scenarioId === "mcp-recovery-mixed-thread" &&
-        message.id === "assistant-recovery-intro" &&
+        ((scenarioId === "mcp-recovery-mixed-thread" &&
+          message.id === "assistant-recovery-intro") ||
+          (scenarioId === "mcp-tool-call" &&
+            message.id === "assistant-mcp-intro")) &&
         hasMcpToolCallGroupForTurn(state, message.turnId)
       ) {
         return null;
@@ -2834,11 +2849,7 @@ export function App() {
             role={message.role}
             status={agentMessageStatus(message.status)}
           >
-            {message.role === "assistant" &&
-            scenarioId === "mcp-tool-call" &&
-            message.id === "assistant-mcp" ? (
-              <McpAnswer text={message.text} />
-            ) : message.role === "assistant" ? (
+            {message.role === "assistant" ? (
               <AgentMarkdown
                 linkTarget="_blank"
                 streaming={message.status === "running"}
@@ -2883,12 +2894,15 @@ export function App() {
       const calls = mcpToolCallGroupForEntry(state, entryIndex);
       if (!calls) return null;
       const toolCall = calls[0];
-      const recoveryIntro =
-        scenarioId === "mcp-recovery-mixed-thread"
-          ? state.messages.find(
-              ({ id }) => id === "assistant-recovery-intro",
-            )
-          : undefined;
+      const toolIntro = state.messages.find(
+        ({ id }) =>
+          id ===
+          (scenarioId === "mcp-recovery-mixed-thread"
+            ? "assistant-recovery-intro"
+            : scenarioId === "mcp-tool-call"
+              ? "assistant-mcp-intro"
+              : ""),
+      );
       const groupStatus = mcpToolCallGroupStatus(calls);
       const captureOpen =
         initialSelection.capture &&
@@ -2915,14 +2929,18 @@ export function App() {
             />
           }
         >
-          {recoveryIntro ? (
+          {toolIntro ? (
             <AgentMessage
-              className="demo-mcp-recovery-intro"
-              data-item-id={recoveryIntro.id}
+              className={
+                scenarioId === "mcp-tool-call"
+                  ? "demo-mcp-recovery-intro demo-mcp-current-intro"
+                  : "demo-mcp-recovery-intro"
+              }
+              data-item-id={toolIntro.id}
               role="assistant"
-              status={agentMessageStatus(recoveryIntro.status)}
+              status={agentMessageStatus(toolIntro.status)}
             >
-              <AgentMarkdown>{recoveryIntro.text}</AgentMarkdown>
+              <AgentMarkdown>{toolIntro.text}</AgentMarkdown>
             </AgentMessage>
           ) : null}
           <McpToolCallGroup

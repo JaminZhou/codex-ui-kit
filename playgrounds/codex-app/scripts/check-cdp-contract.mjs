@@ -1031,7 +1031,10 @@ for (const scene of visualScenes) {
         return {
           backgroundColor: style.backgroundColor,
           borderRadius: style.borderRadius,
+          color: style.color,
+          fontFamily: style.fontFamily,
           fontSize: style.fontSize,
+          fontWeight: style.fontWeight,
           lineHeight: style.lineHeight,
           marginBlockEnd: style.marginBlockEnd,
           marginBlockStart: style.marginBlockStart,
@@ -1916,6 +1919,11 @@ for (const scene of visualScenes) {
         contract.mcp.timelineLabel !== scene.timelineLabel ||
         contract.mcp.groupStyle.fontSize !== "14px" ||
         contract.mcp.groupStyle.lineHeight !== "21px" ||
+        (scene.id === "mcp-tool-calls" &&
+          (contract.mcp.groupStyle.fontFamily !==
+            '-apple-system, "system-ui", "Segoe UI", sans-serif' ||
+            contract.mcp.groupStyle.fontWeight !== "445" ||
+            !contract.mcp.groupStyle.color.includes("0.6"))) ||
         JSON.stringify(contract.mcp.callLabels) !==
           JSON.stringify(scene.callLabels)
       ) {

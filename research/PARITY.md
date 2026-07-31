@@ -53,9 +53,12 @@ The authoritative current-build inventory is:
   historical evidence from `26.715.72359` until sampled again.
 - Codex Desktop `26.727.40816` (`6067`) now has fresh dark main-Renderer
   captures for all six left-sidebar groups, the New chat Composer/project
-  picker, the read-only Terminal shell, and public PR `#80`. Target selection uses the
+  picker, the read-only Terminal shell, a real successful OpenAI Developer
+  Docs Search → Fetch turn, and public PR `#80`. Target selection uses the
   `app://-/index.html` URL plus application-shell landmarks and excludes the
-  small auxiliary page. The current PR changed to Summary/Code tabs with
+  small auxiliary page. The successful MCP path now matches its two-call
+  integrated activity disclosure and passes a current regional pixel gate.
+  The current PR changed to Summary/Code tabs with
   Timeline integrated into Summary, loaded real multi-file Code content, and
   exposed a display-only Review options menu. The independent Browser and
   Electron flows verify the matched shell/New chat/PR structures and all 58

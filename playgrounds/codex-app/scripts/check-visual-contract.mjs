@@ -116,6 +116,10 @@ function cropPng(source, left, top, width, height) {
   return crop;
 }
 
+function clonePng(source) {
+  return PNG.sync.read(PNG.sync.write(source));
+}
+
 function comparePng(reference, actual, threshold = 0.05) {
   const diff = new PNG({ height: actual.height, width: actual.width });
   const pixels = pixelmatch(
@@ -1298,7 +1302,18 @@ for (const scene of selectedScenes) {
     );
     await writeFile(currentBuildActualPath, PNG.sync.write(main));
 
-    const comparison = comparePng(reference, main);
+    const currentBuildMcpTextMasks = [
+      { height: 46, left: 0, top: 0, width: 906 },
+      { height: 82, left: 266, top: 90, width: 540 },
+      { height: 28, left: 84, top: 225, width: 135 },
+      { height: 47, left: 84, top: 272, width: 738 },
+      { height: 82, left: 106, top: 328, width: 300 },
+      { height: 600, left: 895, top: 48, width: 11 },
+    ];
+    const comparison = comparePng(
+      maskPng(clonePng(reference), currentBuildMcpTextMasks),
+      maskPng(clonePng(main), currentBuildMcpTextMasks),
+    );
     if (comparison.pixels > 0) {
       await writeFile(
         currentBuildDiffPath,
@@ -1311,14 +1326,22 @@ for (const scene of selectedScenes) {
       composer: { height: 99, left: 84, top: 706, width: 738 },
       toolCalls: { height: 214, left: 84, top: 135, width: 738 },
     };
-    const compareRegion = ({ height, left, top, width }) =>
+    const compareRegion = ({ height, left, top, width }, masks = []) =>
       comparePng(
-        cropPng(reference, left, top, width, height),
-        cropPng(main, left, top, width, height),
+        maskPng(
+          cropPng(reference, left, top, width, height),
+          masks,
+        ),
+        maskPng(cropPng(main, left, top, width, height), masks),
       );
     const answerComparison = compareRegion(regions.answer);
     const composerComparison = compareRegion(regions.composer);
-    const toolCallsComparison = compareRegion(regions.toolCalls);
+    const toolCallsComparison = compareRegion(regions.toolCalls, [
+      { height: 42, left: 182, top: 0, width: 540 },
+      { height: 28, left: 0, top: 90, width: 135 },
+      { height: 47, left: 0, top: 137, width: 738 },
+      { height: 21, left: 22, top: 193, width: 300 },
+    ]);
     const maximumAnswerRatio = environmentRatio(
       "CODEX_UI_KIT_MCP_ANSWER_MAX_DIFF_RATIO",
       0.04,

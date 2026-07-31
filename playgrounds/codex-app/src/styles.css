@@ -663,6 +663,44 @@ textarea {
   gap: 8px;
 }
 
+.demo-current-mcp-folder {
+  align-items: center;
+  display: inline-flex;
+  font-size: 1rem;
+  height: 1.75rem;
+  justify-content: center;
+  width: 1.75rem;
+}
+
+.demo-current-mcp-header-actions {
+  align-items: center;
+  display: flex;
+  gap: 0.25rem;
+}
+
+.demo-current-mcp-header-actions button {
+  appearance: none;
+  background: transparent;
+  border: 0;
+  border-radius: 0.5rem;
+  color: rgba(255, 255, 255, 0.62);
+  font: inherit;
+  height: 1.75rem;
+  padding: 0;
+  width: 1.75rem;
+}
+
+.demo-current-mcp-header-actions button:first-child {
+  background: rgba(255, 255, 255, 0.06);
+  width: 3.25rem;
+}
+
+.demo-root[data-scenario="mcp-tool-call"]
+  .demo-composer-controls
+  button:last-child {
+  color: #ff8b37;
+}
+
 .demo-status {
   display: inline-flex;
   align-items: center;
@@ -742,47 +780,40 @@ textarea {
   white-space: pre-wrap;
 }
 
-.demo-root[data-capture][data-frame="mcp-tool-calls"][data-scenario="mcp-tool-call"]
-  .codex-ui-thread-viewport__content {
-  height: calc(100% + 72px);
-  min-height: calc(100% + 72px);
-}
-
-.demo-mcp-answer {
-  display: flex;
-  flex-direction: column;
-  font-size: 14px;
-  font-weight: 445;
-  line-height: 22px;
-}
-
-.demo-mcp-answer a {
-  align-items: center;
-  align-self: flex-start;
-  color: #9bcfff;
-  display: inline-flex;
-  font-weight: 500;
-  gap: 4px;
-  text-decoration: none;
-}
-
-.demo-mcp-answer a:hover {
-  text-decoration: underline;
-}
-
-.demo-mcp-answer svg {
-  fill: none;
-  height: 16px;
-  stroke: currentColor;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  stroke-width: 1.1;
-  width: 16px;
-}
-
 .demo-mcp-turn-actions {
   gap: 2px;
   margin-left: -4px;
+}
+
+.demo-mcp-current-intro + .codex-ui-mcp-tool-call-group {
+  margin-top: 16px;
+  transform: translateY(-2px);
+}
+
+.demo-root[data-scenario="mcp-tool-call"],
+.demo-root[data-scenario="mcp-tool-call"]
+  *:not(code):not(kbd):not(pre) {
+  font-family: -apple-system, "system-ui", "Segoe UI", sans-serif;
+}
+
+.demo-root[data-scenario="mcp-tool-call"]
+  .codex-ui-mcp-tool-call-group,
+.demo-root[data-scenario="mcp-tool-call"]
+  .codex-ui-mcp-tool-call-group
+  * {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.demo-root[data-scenario="mcp-tool-call"]
+  .codex-ui-turn-duration {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.demo-root[data-scenario="mcp-tool-call"]
+  .codex-ui-thread-viewport__content,
+.demo-root[data-scenario="mcp-tool-call"]
+  .codex-ui-conversation-thread-shell__composer {
+  transform: translateX(0.046875px);
 }
 
 .demo-mcp-turn-actions button {

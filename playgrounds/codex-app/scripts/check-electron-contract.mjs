@@ -351,7 +351,7 @@ const { app: mcpApp, page: mcpPage } = await launchScene(mcpScene, {
 
 try {
   const timelineToggle = mcpPage.getByRole("button", {
-    name: "Worked for 54s",
+    name: "Worked for 31s",
   });
   if ((await timelineToggle.getAttribute("aria-expanded")) !== "false") {
     throw new Error("Electron MCP timeline should start collapsed.");
@@ -370,10 +370,10 @@ try {
   await groupToggle.click();
   const calls = group.locator(".codex-ui-tool-call");
   if (
-    (await calls.count()) !== 5 ||
+    (await calls.count()) !== 2 ||
     (await group.getByText("Search OpenAI docs", { exact: true }).count()) !==
-      3 ||
-    (await group.getByText("Fetch OpenAI doc", { exact: true }).count()) !== 2
+      1 ||
+    (await group.getByText("Fetch OpenAI doc", { exact: true }).count()) !== 1
   ) {
     throw new Error("Electron MCP integration did not reveal all calls.");
   }

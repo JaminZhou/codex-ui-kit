@@ -317,6 +317,32 @@ Cleanup resolved and terminated only PID `38608`, verified
 temporary profile and external screenshots into one recoverable Trash
 directory. The original Codex process remained running.
 
+### Current 26.727.40816 successful MCP capture
+
+The successful MCP refresh used exact process PID `59950`, loopback port
+`9512`, and unique profile
+`/private/tmp/codex-ui-kit-mcp-cdp.u8Gd3C`. In a disposable New chat task it
+submitted one synthetic prompt authorizing only OpenAI Developer Docs Search
+and Fetch. The task performed no shell, browser, or file action.
+
+The completed 1180×820 Renderer exposed `Worked for 31s`, an intermediate
+assistant explanation, `Used OpenAI Developer Docs integration`, and exactly
+two successful ordered rows: Search OpenAI docs and Fetch OpenAI doc. The
+expanded group measured 736×75px; the title and call rows used 14/21px
+typography, the current system-font stack, 445 weight, and 0.6 secondary
+color. The linked final answer remained in the same turn.
+
+The current 906×820 pixel gate passes at 2.03% full-main, 0.05%
+tool-structure, 1.87% answer, and 1.92% Composer difference. Dynamic
+header/task/intermediate/group-label glyphs and the scrollbar are masked; the
+answer remains unmasked, while CDP separately locks masked text style,
+ordered labels, disclosure state, and geometry.
+
+Cleanup terminated only PID `59950`, verified the exact profile children and
+`127.0.0.1:9512` listener were gone, and moved the unique profile plus exact
+temporary reference images into one recoverable Trash directory. The
+original Codex process remained running.
+
 ## Required flow matrix
 
 ### 1. Application entry and navigation

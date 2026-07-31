@@ -283,6 +283,28 @@ Its Review options menu contains word-wrap, rich-preview, and word-diff
 display settings rather than review submission. Mutating states therefore
 remain independent acceptance rather than promoted runtime evidence.
 
+## Seventeenth vertical slice
+
+The seventeenth slice refreshes the successful MCP/tool-call path against
+`26.727.40816`:
+
+- a real disposable OpenAI Developer Docs Search → Fetch turn with no shell,
+  browser, or file action;
+- a two-call schema-validated replay with the current 31-second disclosure,
+  intermediate assistant explanation, integrated group, and linked Markdown
+  answer;
+- CDP gates for ordered labels, expanded state, 14/21px typography, system
+  font, 445 weight, and 0.6 secondary color;
+- a current 906×820 comparison passing at 2.03% masked full-main, 0.05%
+  masked tool structure, 1.87% answer, and 1.92% Composer difference without
+  relaxing the existing thresholds.
+
+The pixel masks exclude dynamic header/task/intermediate/group-label glyphs
+and the non-owning scrollbar only; the answer remains unmasked. CDP separately
+verifies the masked regions' surrounding geometry and computed typography.
+Failure/retry remains the prior-build recovery slice until it is re-observed
+on the installed build.
+
 ## Development
 
 From the repository root:

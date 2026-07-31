@@ -12,7 +12,7 @@ exit gates; it does not replace the inventory.
 
 - The current installed package is Codex Desktop `26.727.40816` (`6067`).
 - The inventory contains 75 surface groups: 48 P0, 18 P1, and 9 P2.
-- 21 groups have current-build runtime evidence, 35 have previous-build-only
+- 22 groups have current-build runtime evidence, 34 have previous-build-only
   runtime evidence, and 19 have not been sampled.
 - The current-build refresh covers all six left-sidebar groups, window
   navigation, route loading/restoration, the New chat Composer and project
@@ -23,8 +23,11 @@ exit gates; it does not replace the inventory.
   index/detail loading and failure, checks, comments, review submission,
   merge-readiness, merge completion, compact layout, and route restoration.
   Together the playground gates cover 58 CDP/pixel frames, and the refreshed
-  PR detail passes the current 906×820 regional pixel gate. Real MCP recovery,
-  full Composer queue/Stop lifecycle, Terminal multi-tab/process behavior,
+  PR detail passes the current 906×820 regional pixel gate. The refreshed
+  real MCP success path now matches Search → Fetch, the integrated activity
+  disclosure, computed typography, and a current regional pixel gate. MCP
+  failure recovery, full Composer queue/Stop lifecycle, Terminal
+  multi-tab/process behavior,
   Review rename/delete variants, and broader shell evidence from
   `26.721.81911` remain historical regression evidence until re-observed. The
   current project-named single Terminal tab and close/add controls now pass
