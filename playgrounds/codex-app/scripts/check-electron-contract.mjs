@@ -1132,10 +1132,14 @@ try {
     );
   }
 
-  await pullRequestPage.getByRole("tab", { name: "Timeline" }).click();
-  await pullRequestPage.getByRole("textbox", { name: "Timeline comment" }).fill(
-    "Synthetic local comment",
-  );
+  if (
+    (await pullRequestPage
+      .getByLabel("Pull request timeline")
+      .locator("article")
+      .count()) !== 2
+  ) {
+    throw new Error("Electron pull request integrated timeline is missing.");
+  }
   await pullRequestPage.getByRole("tab", { name: "Code" }).click();
   if (
     (await pullRequestPage
@@ -1144,6 +1148,12 @@ try {
   ) {
     throw new Error("Electron pull request Code tab did not render three files.");
   }
+  await pullRequestPage
+    .getByRole("button", { name: "Review options" })
+    .click();
+  await pullRequestPage
+    .getByRole("menuitem", { name: "Open synthetic review" })
+    .click();
   await pullRequestPage
     .getByRole("textbox", { name: "Review summary" })
     .fill("Current-head review is clean.");
@@ -1154,6 +1164,7 @@ try {
     '.codex-ui-pull-request-review-composer[data-status="submitted"]',
   );
   const mergePullRequest = pullRequestPage.getByRole("button", {
+    exact: true,
     name: "Merge",
   });
   if (!(await mergePullRequest.isEnabled())) {
@@ -1162,7 +1173,9 @@ try {
     );
   }
   await mergePullRequest.click();
-  await pullRequestPage.getByRole("button", { name: "Merged" }).waitFor();
+  await pullRequestPage
+    .getByRole("button", { exact: true, name: "Merged" })
+    .waitFor();
 
   const pullRequestResizer = pullRequestPage.getByRole("separator", {
     name: "Resize workspace panel",

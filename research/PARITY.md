@@ -6,9 +6,11 @@ not establish full conversation, workspace, application, or product coverage.
 
 The authoritative current-build inventory is:
 
-- [`26.721.81911.md`](26.721.81911.md) for the current package fingerprint,
-  main-Renderer sidebar and MCP recovery captures, and remaining
+- [`26.727.40816.md`](26.727.40816.md) for the current package fingerprint,
+  main-Renderer shell/New chat/Terminal/PR captures, and remaining
   runtime-capture boundary;
+- [`26.721.81911.md`](26.721.81911.md) for the previous sidebar, Composer,
+  MCP recovery, Review, Terminal, and PR runtime sample;
 - [`26.721.41059.md`](26.721.41059.md) for the previous runtime-sampled build,
   scoped CDP evidence, and research boundary;
 - [`26.715.72359.md`](26.715.72359.md) for the previous build's broader
@@ -49,21 +51,21 @@ The authoritative current-build inventory is:
   behavior, code search, broader connectors, or the wider thread-error, queue,
   Markdown variants, menu, global-route, and Settings states; those remain
   historical evidence from `26.715.72359` until sampled again.
-- Codex Desktop `26.721.81911` (`5973`) now has fresh dark main-Renderer
-  captures for all six left-sidebar groups and a real OpenAI Developer Docs
-  failed-Fetch → Search → successful-Fetch recovery. Target selection uses the
+- Codex Desktop `26.727.40816` (`6067`) now has fresh dark main-Renderer
+  captures for all six left-sidebar groups, the New chat Composer/project
+  picker, the read-only Terminal shell, and public PR `#80`. Target selection uses the
   `app://-/index.html` URL plus application-shell landmarks and excludes the
-  small auxiliary page. The independent Browser and Electron flows verify the
-  sidebar at 1180×820, the 961/960 and 721/720 boundaries, 1920×1080, and
-  2560×1440. Narrow behavior distinguishes the 12px edge preview from an
-  explicit pinned sidebar. The shell flow additionally covers window chrome,
-  loading/offline/stale/restored route states, in-session selection
-  restoration, and global feedback, while the MCP recovery continues through
-  its following command/approval/file/Review turn. External regional gates
-  verify the sidebar, window chrome, and MCP-owned regions. Offline/error/
-  reconnecting/stale and global-notification runtime states remain synthetic
-  independent coverage, not current-build observations. Older evidence
-  outside these sampled slices remains `partial_legacy`.
+  small auxiliary page. The current PR changed to Summary/Code tabs with
+  Timeline integrated into Summary, loaded real multi-file Code content, and
+  exposed a display-only Review options menu. The independent Browser and
+  Electron flows verify the matched shell/New chat/PR structures and all 58
+  deterministic lifecycle frames. The refreshed PR regional gate passes at
+  5.75% full-main, 4.68% index, and 6.44% detail difference. Full queue/Stop,
+  MCP recovery, Terminal multi-tab/process, Review variants, broader shell
+  matrices, and their external pixels remain `26.721.81911` historical
+  evidence. Offline/error/reconnecting/stale and global-notification runtime
+  states remain synthetic independent coverage, not current-build
+  observations.
 - Renderer viewport probing exposed a narrow-layout gap: the thread and
   Composer shrink, but the fixed app sidebar remains and the right workspace
   panel can be laid out beyond the simulated viewport. The independently
@@ -71,15 +73,17 @@ The authoritative current-build inventory is:
   coverage at its measured wide and compact geometry, but native Codex window
   behavior, the updated build, and the remaining app-shell/panel interactions
   stay separate acceptance requirements.
-- A later read-only `26.721.81911` public-PR probe establishes the current
-  non-modal PR overlay, Summary/Timeline content, responsive
-  1180/960/820/720px geometry, expand/restore, and Back/Forward behavior. The
+- A later read-only `26.727.40816` public-PR probe establishes the current
+  non-modal PR overlay, Summary/Code content with integrated Timeline,
+  successful Code loading, responsive 1180/960/820/720px geometry, and
+  explicit row reopen after responsive auto-hide. The
   independent public state machine adds list/detail loading and failure,
   checks, comments, review submission, merge readiness/completion, and compact
   recovery through 58 Browser/CDP, Electron, and reviewed-pixel frames. No
   review, comment, or merge was sent to the real PR, and successful
-  current-product Code content was not reached; those states must not be
-  reported as current-product runtime parity.
+  review submission remains synthetic because the current Review options menu
+  contains display settings only; those mutating states must not be reported
+  as current-product runtime parity.
 - npm publication remains out of scope until the agreed P0/P1 coverage and
   release acceptance surfaces are complete.
 

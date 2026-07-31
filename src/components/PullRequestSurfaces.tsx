@@ -372,6 +372,7 @@ export interface PullRequestPanelSummaryProps
   descriptionHeading?: ReactNode;
   facts?: readonly PullRequestPanelFact[];
   meta?: ReactNode;
+  timeline?: ReactNode;
   title: ReactNode;
   titleAction?: ReactNode;
 }
@@ -386,6 +387,7 @@ export function PullRequestPanelSummary({
   descriptionHeading = "Description",
   facts = [],
   meta,
+  timeline,
   title,
   titleAction,
   ...props
@@ -427,7 +429,9 @@ export function PullRequestPanelSummary({
                     {fact.indicator}
                   </span>
                 ) : null}
-                {fact.label}
+                <span className="codex-ui-pull-request-panel-summary__label">
+                  {fact.label}
+                </span>
               </dt>
               <dd>{fact.value}</dd>
             </div>
@@ -458,6 +462,11 @@ export function PullRequestPanelSummary({
       {commentComposer ? (
         <div className="codex-ui-pull-request-panel-summary__comment">
           {commentComposer}
+        </div>
+      ) : null}
+      {timeline ? (
+        <div className="codex-ui-pull-request-panel-summary__timeline">
+          {timeline}
         </div>
       ) : null}
     </article>

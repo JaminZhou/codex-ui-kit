@@ -225,7 +225,8 @@ All privileged behavior remains host-owned. The components never auto-approve co
   actions, change statistics, navigation, state, and host-owned content.
 - `PullRequestPanelSummary`: current resizable-panel Summary composition with
   a level-one title, metadata, fact rows, Description and Checks regions,
-  edit actions, and a host-owned comment composer.
+  edit actions, a host-owned comment composer, and an optional integrated
+  Timeline region.
 - `PullRequestCheckList`, `PullRequestReviewSummary`, and
   `PullRequestReviewThread`: check progress, reviewer outcomes, inline file
   threads, resolved/outdated states, and host-owned review actions.

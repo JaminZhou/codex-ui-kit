@@ -10,38 +10,28 @@ exit gates; it does not replace the inventory.
 
 ## Current position
 
-- The current installed package is Codex Desktop `26.721.81911` (`5973`).
+- The current installed package is Codex Desktop `26.727.40816` (`6067`).
 - The inventory contains 75 surface groups: 48 P0, 18 P1, and 9 P2.
-- 23 groups have current-build runtime evidence, 33 have previous-build-only
+- 21 groups have current-build runtime evidence, 35 have previous-build-only
   runtime evidence, and 19 have not been sampled.
-- The first five current-build vertical slices cover all six left-sidebar
-  groups, a real MCP failed-Fetch → Search → successful-Fetch recovery, and
-  App shell window/loading/selection continuity through CDP, Browser,
-  Electron, and regional pixel gates. The shell slice locks the 960/720px
-  transitions, narrow edge preview versus explicit pinning, and structural
-  behavior at 1920×1080 and 2560×1440. The recovery replay continues into a
-  second command/approval/file/Review turn. The conversation slice adds real
-  empty/focused/multiline/submit/Stop/completed Composer evidence, real
-  queue/interrupt/Resume and permission/add-menu evidence, host-owned
-  long-thread replay, Electron interaction, and current-build queue-region
-  pixel gates. The coding-workspace entry slice adds the current
-  project/context surface plus an independent project → environment/worktree →
-  command → approval → two-file Review → Terminal → PR path. The Review
-  slice adds current-build delete and rename/no-content evidence plus
-  deterministic rename/delete/binary/conflict, selection, and Undo coverage.
-  The Terminal expansion adds current-build multi-tab, per-tab close, picker,
-  and compact evidence plus independent running/failed/exited process replay,
-  close/restore, and 820×680 acceptance. The Pull request lifecycle adds a
-  current public PR Summary/Timeline/responsive-panel contract plus independent
+- The current-build refresh covers all six left-sidebar groups, window
+  navigation, route loading/restoration, the New chat Composer and project
+  picker, the read-only Terminal shell, and the public Pull request route.
+  The PR lifecycle now follows the two-tab Summary/Code contract with Timeline
+  integrated into Summary, successful read-only Code content, Auto-merge, and
+  responsive detail restoration. Its independent state machine adds
   index/detail loading and failure, checks, comments, review submission,
   merge-readiness, merge completion, compact layout, and route restoration.
-  Together the current playground gates cover 58 CDP/pixel frames. Global
-  notification runtime evidence, light-theme shell evidence, exact
+  Together the playground gates cover 58 CDP/pixel frames, and the refreshed
+  PR detail passes the current 906×820 regional pixel gate. Real MCP recovery,
+  full Composer queue/Stop lifecycle, Terminal multi-tab/process behavior,
+  Review rename/delete variants, and broader shell evidence from
+  `26.721.81911` remain historical regression evidence until re-observed.
+  Global notification runtime evidence, light-theme shell evidence, exact
   current-build long-thread virtualization, real current-product Terminal
-  process execution/persistence, successful current-product PR Code content
-  and mutating review/comment/merge transitions, and the remaining Markdown,
-  tool, and attachment variants remain on their recorded evidence levels until
-  separately re-observed.
+  process execution/persistence, current-product review submission and
+  mutating comment/merge transitions, and the remaining Markdown, tool, and
+  attachment variants remain on their recorded evidence levels.
 - Existing Browser and Electron results remain useful regression evidence, but
   they are `partial_legacy` until the affected surface is re-observed on the
   current build.
@@ -87,7 +77,7 @@ new parity claims:
 - re-observe the shell, left sidebar, conversation, Composer, Review, Terminal,
   Markdown, and MCP anchors;
 - retain previous-build results as regression fixtures while promoting only
-  surfaces re-observed on `26.721.81911`;
+  surfaces re-observed on `26.727.40816`;
 - update inventory evidence prefixes and the current build note.
 
 Exit: the current build has a reproducible CDP capture recipe and no

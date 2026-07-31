@@ -547,6 +547,7 @@ describe("pull request workspace surfaces", () => {
           },
         ]}
         meta="Jamin · Ready for review"
+        timeline={<article>Codex reviewed the latest push.</article>}
         title="Add review workspace"
         titleAction={<button type="button">Edit title</button>}
       />,
@@ -569,5 +570,6 @@ describe("pull request workspace surfaces", () => {
     expect(
       screen.getByRole("textbox", { name: "Pull request comment" }),
     ).toBeTruthy();
+    expect(screen.getByText("Codex reviewed the latest push.")).toBeTruthy();
   });
 });

@@ -281,6 +281,42 @@ and failure transitions against deterministic public host state, not GitHub.
 Cleanup terminated only the exact temporary-profile process, verified its
 listener was gone, and removed its external screenshots and profile.
 
+### Current 26.727.40816 refresh capture
+
+The `26.727.40816` refresh used exact process PID `38608`, loopback port
+`9511`, and unique profile
+`/private/tmp/codex-ui-kit-turn-cdp.ovwKlU`. It selected the 1180×820
+`app://-/index.html` main Renderer by URL, area, and shell landmarks. The
+installed package fingerprint, Chromium `150.0.7871.182`, and ASAR hash are
+recorded in [`26.727.40816.md`](26.727.40816.md).
+
+The bounded read-only sequence was:
+
+1. record the 46px titlebar, 274.11px sidebar, primary navigation, section
+   expansion, item actions/status, and footer;
+2. open New chat, measure the 712×44 `Do anything` input and context row, then
+   open/dismiss the 260×249.5 project dialog without selecting a project;
+3. open the bottom Terminal panel without submitting input and record the
+   project-named tab plus close/add controls;
+4. open public PR `#80`, inspect Summary and its integrated Timeline, wait for
+   successful Code content, inspect the three display-only Review options,
+   and measure responsive panel geometry at 1180, 960, 820, and 720px;
+5. capture only external current-build references needed for the optional
+   ownership-scoped PR pixel gate.
+
+The PR detail auto-hid after each responsive transition, so the selected row
+was explicitly reopened before measuring. Code reached real multi-file diff
+content with an 81492px scroller. No prompt, command, project selection,
+comment, review, auto-merge, or merge action was submitted. The independent
+review composer remains host-owned synthetic acceptance because the observed
+Review options menu contains only word-wrap, rich-preview, and word-diff
+display settings.
+
+Cleanup resolved and terminated only PID `38608`, verified
+`127.0.0.1:9511` and its children were gone, and moved only the exact
+temporary profile and external screenshots into one recoverable Trash
+directory. The original Codex process remained running.
+
 ## Required flow matrix
 
 ### 1. Application entry and navigation

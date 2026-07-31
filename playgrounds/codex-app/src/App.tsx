@@ -722,12 +722,17 @@ export function App() {
   );
   const [pullRequestWidth, setPullRequestWidth] = useState(370);
   const [pullRequestTab, setPullRequestTab] = useState<
-    "code" | "summary" | "timeline"
+    "code" | "summary"
   >(
     initialSelection.frame?.startsWith("pr-review-")
       ? "code"
       : "summary",
   );
+  const [pullRequestReviewOpen, setPullRequestReviewOpen] = useState(
+    initialSelection.frame?.startsWith("pr-review-") ?? false,
+  );
+  const [pullRequestReviewMenuOpen, setPullRequestReviewMenuOpen] =
+    useState(false);
   const [undoneFileIds, setUndoneFileIds] = useState<Set<string>>(
     () => new Set(),
   );
@@ -2202,64 +2207,98 @@ export function App() {
     ) : pullRequestState.reviewRequirement !== "passed" &&
       pullRequestState.mergeStatus !== "checking" ? (
       <button
-        onClick={() => setPullRequestTab("code")}
+        onClick={() => {
+          setPullRequestTab("code");
+          setPullRequestReviewOpen(true);
+        }}
         type="button"
       >
         Open review
       </button>
     ) : undefined;
+  const showPullRequestLifecycleDetails =
+    initialSelection.capture &&
+    (activeFrame === "pr-checks-running" ||
+      activeFrame === "pr-checks-failed" ||
+      activeFrame === "pr-merge-blocked" ||
+      activeFrame === "pr-merge-ready" ||
+      activeFrame === "pr-merged");
+  const pullRequestTimeline = (
+    <div aria-label="Pull request timeline" className="demo-pr-panel__timeline">
+      <article>
+        <span aria-hidden="true" className="demo-pr-avatar">
+          J
+        </span>
+        <div>
+          <strong>JaminZhou opened this pull request</strong>
+          <time dateTime="PT2H">2h</time>
+        </div>
+      </article>
+      <article>
+        <span aria-hidden="true" className="demo-pr-avatar">
+          C
+        </span>
+        <div>
+          <strong>chatgpt-codex-connector reviewed the latest push</strong>
+          <time dateTime="PT1H">1h</time>
+        </div>
+      </article>
+    </div>
+  );
   const pullRequestSummaryReady = (
     <PullRequestPanelSummary
       checks={
-        <div className="demo-pr-checks">
-          <PullRequestCheckList checks={pullRequestChecks} />
-          <PullRequestMergeReadiness
-            action={pullRequestMergeAction}
-            description={
-              pullRequestState.mergeStatus === "blocked"
-                ? "All current-head gates must pass before merging."
-                : pullRequestState.mergeStatus === "ready"
-                  ? "Current-head checks, review, and threads are clean."
-                  : undefined
-            }
-            requirements={[
-              {
-                description:
-                  pullRequestState.checkStatus === "passed"
-                    ? "7 checks successful"
-                    : pullRequestState.checkStatus === "running"
-                      ? "Current-head checks are running"
-                      : "A current-head check failed",
-                id: "checks",
-                label: "Checks",
-                status:
-                  pullRequestState.checkStatus === "passed"
-                    ? "passed"
-                    : pullRequestState.checkStatus === "failed"
-                      ? "failed"
-                      : "pending",
-              },
-              {
-                description:
-                  pullRequestState.reviewRequirement === "passed"
-                    ? "Fresh review after the latest push"
-                    : pullRequestState.reviewRequirement === "failed"
-                      ? "Review submission failed"
-                      : "Waiting for a fresh current-head review",
-                id: "review",
-                label: "Review",
-                status: pullRequestState.reviewRequirement,
-              },
-              {
-                description: "No unresolved bot threads",
-                id: "threads",
-                label: "Review threads",
-                status: "passed",
-              },
-            ]}
-            status={pullRequestState.mergeStatus}
-          />
-        </div>
+        showPullRequestLifecycleDetails ? (
+          <div className="demo-pr-checks">
+            <PullRequestCheckList checks={pullRequestChecks} />
+            <PullRequestMergeReadiness
+              action={pullRequestMergeAction}
+              description={
+                pullRequestState.mergeStatus === "blocked"
+                  ? "All current-head gates must pass before merging."
+                  : pullRequestState.mergeStatus === "ready"
+                    ? "Current-head checks, review, and threads are clean."
+                    : undefined
+              }
+              requirements={[
+                {
+                  description:
+                    pullRequestState.checkStatus === "passed"
+                      ? "7 checks successful"
+                      : pullRequestState.checkStatus === "running"
+                        ? "Current-head checks are running"
+                        : "A current-head check failed",
+                  id: "checks",
+                  label: "Checks",
+                  status:
+                    pullRequestState.checkStatus === "passed"
+                      ? "passed"
+                      : pullRequestState.checkStatus === "failed"
+                        ? "failed"
+                        : "pending",
+                },
+                {
+                  description:
+                    pullRequestState.reviewRequirement === "passed"
+                      ? "Fresh review after the latest push"
+                      : pullRequestState.reviewRequirement === "failed"
+                        ? "Review submission failed"
+                        : "Waiting for a fresh current-head review",
+                  id: "review",
+                  label: "Review",
+                  status: pullRequestState.reviewRequirement,
+                },
+                {
+                  description: "No unresolved bot threads",
+                  id: "threads",
+                  label: "Review threads",
+                  status: "passed",
+                },
+              ]}
+              status={pullRequestState.mergeStatus}
+            />
+          </div>
+        ) : undefined
       }
       className="demo-pr-panel__summary"
       commentComposer={
@@ -2282,14 +2321,31 @@ export function App() {
         <div className="demo-pr-description">
           <h3>Summary</h3>
           <ul>
-            <li>Add terminal tabs, lifecycle states, and process history.</li>
-            <li>Preserve compact and wide workspace continuity.</li>
-            <li>Gate pointer, keyboard, Electron, and regional pixels.</li>
+            <li>
+              add controlled multi-session TerminalPanel tabs, per-tab close,
+              restore hooks, and TerminalProcessList
+            </li>
+            <li>
+              add a 15-event terminal lifecycle replay with running, failed,
+              exited, picker, close/restore, and compact states
+            </li>
+            <li>
+              gate 49 lifecycle scenes through CDP, real Electron interactions,
+              and reviewed pixels
+            </li>
+            <li>
+              refresh current-build terminal evidence and split session UI from
+              process lifecycle <span className="demo-pr-final-word">claims</span>
+            </li>
           </ul>
           <h3>Verification</h3>
           <ul>
-            <li>531 package and playground tests.</li>
-            <li>CDP, Electron, accessibility, and pixel acceptance.</li>
+            <li>pnpm check</li>
+            <li>pnpm check:codex-app:acceptance</li>
+            <li>
+              pnpm --filter @codex-ui-kit/codex-app-playground typecheck
+            </li>
+            <li>pnpm --filter @codex-ui-kit/codex-app-playground test</li>
           </ul>
         </div>
       }
@@ -2298,30 +2354,44 @@ export function App() {
           ✎
         </button>
       }
+      descriptionHeading={
+        <>
+          Description <span aria-hidden="true">⌄</span>
+        </>
+      }
       facts={[
         {
           id: "branch",
           indicator: "⑂",
           label: "Branch",
           value: (
-            <>
-              feat/terminal-session-lifecycle → main{" "}
-              <span className="demo-pr-additions">+1,743</span>{" "}
+            <span className="demo-pr-branch">
+              <span>feat/terminal-sessi…</span>
+              <span aria-hidden="true">›</span>
+              <span>m…</span>
+              <span className="demo-pr-additions">+1,743</span>
               <span className="demo-pr-deletions">−231</span>
-            </>
+            </span>
           ),
         },
         {
           id: "reviewers",
           indicator: "◎",
           label: "Reviewers",
-          value: "1 reviewer",
+          value: (
+            <span className="demo-pr-reviewers">
+              <span aria-hidden="true" className="demo-pr-reviewer-status" />
+              <button aria-label="Request reviewers" type="button">
+                +
+              </button>
+            </span>
+          ),
         },
         {
           id: "comments",
           indicator: "◌",
           label: "Comments",
-          value: "6 comments",
+          value: "17 comments",
         },
         {
           id: "checks",
@@ -2340,17 +2410,22 @@ export function App() {
                 ? "Failed"
                 : "In progress",
         },
+        {
+          id: "status",
+          indicator: "⑂",
+          label: "Status",
+          value: "Ready for review⌄",
+        },
       ]}
       meta={
         <>
           <span className="demo-pr-avatar demo-pr-avatar--small">J</span>
           <span>JaminZhou</span>
           <span>·</span>
-          <span>now</span>
-          <span>·</span>
-          <span>Ready for review</span>
+          <span>2h</span>
         </>
       }
+      timeline={pullRequestTimeline}
       title="feat: add terminal session lifecycle"
       titleAction={
         <button aria-label="Edit title" type="button">
@@ -2380,7 +2455,7 @@ export function App() {
         description={
           pullRequestState.detailStatus === "error"
             ? "The pull request detail could not be loaded."
-            : "Fetching the latest summary, timeline, and diff."
+            : "Fetching the latest summary and diff."
         }
         heading={
           pullRequestState.detailStatus === "error"
@@ -2394,37 +2469,19 @@ export function App() {
     );
   const pullRequestSummary =
     pullRequestDetailState ?? pullRequestSummaryReady;
-  const pullRequestTimeline = (
-    <div className="demo-pr-panel__timeline">
-      <article>
-        <span aria-hidden="true" className="demo-pr-avatar">
-          J
-        </span>
-        <div>
-          <strong>JaminZhou opened this pull request</strong>
-          <time dateTime="PT1M">now</time>
-        </div>
-      </article>
-      <label className="demo-pr-comment">
-        <span>Comment</span>
-        <textarea
-          aria-label="Timeline comment"
-          placeholder="Leave a comment"
-        />
-        <button aria-label="Post timeline comment" type="button">
-          ↑
-        </button>
-      </label>
-    </div>
-  );
   const pullRequestCode = (
-    <div className="demo-pr-panel__code">
+    <div
+      className="demo-pr-panel__code"
+      data-review-open={pullRequestReviewOpen || undefined}
+    >
       <div aria-label="Code review controls" className="demo-pr-code-toolbar">
-        <span>
-          <strong>feat/terminal-session-lifecycle</strong>
-          <small>into main</small>
-        </span>
-        <button aria-label="Review options" type="button">
+        <button
+          aria-expanded={pullRequestReviewMenuOpen}
+          aria-haspopup="menu"
+          aria-label="Review options"
+          onClick={() => setPullRequestReviewMenuOpen((open) => !open)}
+          type="button"
+        >
           ⋯
         </button>
         <button aria-label="Collapse all diffs" type="button">
@@ -2436,25 +2493,54 @@ export function App() {
         <button aria-label="Show file tree" type="button">
           ☷
         </button>
+        {pullRequestReviewMenuOpen ? (
+          <div
+            aria-label="Review options"
+            className="demo-pr-review-menu"
+            role="menu"
+          >
+            <button role="menuitem" type="button">
+              Enable word wrap
+            </button>
+            <button role="menuitem" type="button">
+              Enable rich preview
+            </button>
+            <button role="menuitem" type="button">
+              Enable word diffs
+            </button>
+            <button
+              onClick={() => {
+                setPullRequestReviewMenuOpen(false);
+                setPullRequestReviewOpen(true);
+              }}
+              role="menuitem"
+              type="button"
+            >
+              Open synthetic review
+            </button>
+          </div>
+        ) : null}
       </div>
-      <PullRequestReviewComposer
-        body={pullRequestState.reviewBody}
-        error={pullRequestState.reviewError}
-        kind={pullRequestState.reviewKind}
-        onBodyChange={(body) =>
-          dispatchPullRequest({ body, type: "review/body" })
-        }
-        onKindChange={(kind) =>
-          dispatchPullRequest({ kind, type: "review/kind" })
-        }
-        onSubmit={() =>
-          schedulePullRequestTransition(
-            { type: "review/submit" },
-            { type: "review/succeed" },
-          )
-        }
-        status={pullRequestState.reviewStatus}
-      />
+      {pullRequestReviewOpen ? (
+        <PullRequestReviewComposer
+          body={pullRequestState.reviewBody}
+          error={pullRequestState.reviewError}
+          kind={pullRequestState.reviewKind}
+          onBodyChange={(body) =>
+            dispatchPullRequest({ body, type: "review/body" })
+          }
+          onKindChange={(kind) =>
+            dispatchPullRequest({ kind, type: "review/kind" })
+          }
+          onSubmit={() =>
+            schedulePullRequestTransition(
+              { type: "review/submit" },
+              { type: "review/succeed" },
+            )
+          }
+          status={pullRequestState.reviewStatus}
+        />
+      ) : null}
       <FileReview
         aria-label="Pull request code review"
         files={pullRequestFiles}
@@ -2469,8 +2555,8 @@ export function App() {
           <button aria-label="Open in browser" type="button">
             ↗
           </button>
-          <button aria-label="More pull request actions" type="button">
-            ⋯
+          <button type="button">
+            Auto-merge
           </button>
           <button
             disabled={pullRequestState.mergeStatus !== "ready"}
@@ -2503,11 +2589,6 @@ export function App() {
       restorePanelLabel="Restore panel width"
       tabs={[
         { content: pullRequestSummary, id: "summary", label: "Summary" },
-        {
-          content: pullRequestDetailState ?? pullRequestTimeline,
-          id: "timeline",
-          label: "Timeline",
-        },
         {
           content: pullRequestDetailState ?? pullRequestCode,
           id: "code",

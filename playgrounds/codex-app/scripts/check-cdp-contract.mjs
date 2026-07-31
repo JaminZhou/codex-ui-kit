@@ -679,10 +679,10 @@ for (const scene of visualScenes) {
         initial.rootView !== "pull-request" ||
         initial.horizontalOverflow > 1 ||
         initial.listItems !== 1 ||
-        initial.tabCount !== 3 ||
+        initial.tabCount !== 2 ||
         initial.selectedTab !== "Summary" ||
         initial.heading !== "feat: add terminal session lifecycle" ||
-        initial.checkCount !== 4 ||
+        initial.checkCount !== 0 ||
         Math.abs(initial.main.width - 906) > 1 ||
         Math.abs(initial.panel.width - 370) > 1 ||
         initial.resizer.cursor !== "col-resize" ||
@@ -691,7 +691,7 @@ for (const scene of visualScenes) {
         initial.resizer.ariaMax !== "516" ||
         initial.resizer.ariaNow !== "370" ||
         !initial.actions.includes("Open in browser") ||
-        !initial.actions.includes("More pull request actions") ||
+        !initial.actions.includes("Auto-merge") ||
         !initial.actions.includes("Expand panel")
       ) {
         throw new Error(
@@ -699,15 +699,14 @@ for (const scene of visualScenes) {
         );
       }
 
-      await page.getByRole("tab", { name: "Timeline" }).click();
       if (
-        (await page.getByRole("tab", { name: "Timeline" }).getAttribute(
-          "aria-selected",
-        )) !== "true" ||
-        (await page.getByRole("textbox", { name: "Timeline comment" }).count()) !==
-          1
+        (await page.getByLabel("Pull request timeline").count()) !== 1 ||
+        (await page
+          .getByLabel("Pull request timeline")
+          .locator("article")
+          .count()) !== 2
       ) {
-        throw new Error(`${scene.id}: Timeline tab did not activate.`);
+        throw new Error(`${scene.id}: integrated timeline is missing.`);
       }
 
       await page.getByRole("tab", { name: "Code" }).click();
@@ -723,6 +722,10 @@ for (const scene of visualScenes) {
       ) {
         throw new Error(`${scene.id}: Code tab did not activate.`);
       }
+      await page.getByRole("button", { name: "Review options" }).click();
+      await page
+        .getByRole("menuitem", { name: "Open synthetic review" })
+        .click();
       await page
         .getByRole("textbox", { name: "Review summary" })
         .fill("Current-head review is clean.");
@@ -732,14 +735,19 @@ for (const scene of visualScenes) {
       await page.waitForSelector(
         '.codex-ui-pull-request-review-composer[data-status="submitted"]',
       );
-      const mergeAction = page.getByRole("button", { name: "Merge" });
+      const mergeAction = page.getByRole("button", {
+        exact: true,
+        name: "Merge",
+      });
       if (!(await mergeAction.isEnabled())) {
         throw new Error(
           `${scene.id}: submitted review did not unlock merge.`,
         );
       }
       await mergeAction.click();
-      await page.getByRole("button", { name: "Merged" }).waitFor();
+      await page
+        .getByRole("button", { exact: true, name: "Merged" })
+        .waitFor();
       const reviewSubmission = await page.evaluate(() => ({
         mergeLabel:
           Array.from(

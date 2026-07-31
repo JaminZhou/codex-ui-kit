@@ -82,10 +82,10 @@ const basePullRequestLifecycleState: PullRequestLifecycleState = {
   commentStatus: "idle",
   detailStatus: "ready",
   indexStatus: "ready",
-  mergeStatus: "blocked",
+  mergeStatus: "ready",
   reviewBody: "",
   reviewKind: "comment",
-  reviewRequirement: "pending",
+  reviewRequirement: "passed",
   reviewStatus: "idle",
   selectedId: "80",
 };
@@ -134,12 +134,16 @@ export function initialPullRequestLifecycleState(
     case "pr-review-draft":
       return {
         ...state,
+        mergeStatus: "blocked",
         reviewBody: "The interaction and responsive behavior match.",
+        reviewRequirement: "pending",
       };
     case "pr-review-submitting":
       return {
         ...state,
+        mergeStatus: "checking",
         reviewBody: "The interaction and responsive behavior match.",
+        reviewRequirement: "pending",
         reviewStatus: "submitting",
       };
     case "pr-review-submitted":

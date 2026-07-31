@@ -10646,6 +10646,12 @@ button.codex-ui-generated-image-gallery__image {
   margin-top: 1rem;
 }
 
+.codex-ui-pull-request-panel-summary__timeline {
+  border-top: 1px solid var(--codex-ui-border-light);
+  margin-top: 1rem;
+  padding-top: 1rem;
+}
+
 .codex-ui-pull-request-checks,
 .codex-ui-pull-request-reviews,
 .codex-ui-pull-request-review-thread {

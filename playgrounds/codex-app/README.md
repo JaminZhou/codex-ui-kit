@@ -230,8 +230,8 @@ The fourteenth slice broadens Review content and synchronization:
 
 ## Fifteenth vertical slice
 
-The fifteenth slice expands Terminal from one background session into a
-current-build session-tab contract and an independent process lifecycle:
+The fifteenth slice expanded Terminal from one background session into the
+`26.721.81911` session-tab contract and an independent process lifecycle:
 
 - `26.721.81911` CDP evidence for three auto-numbered tabs, per-tab close
   buttons, nearest-tab selection, the Review/Terminal/Browser/Files picker,
@@ -249,16 +249,20 @@ current-build session-tab contract and an independent process lifecycle:
 
 The current-product probe did not execute a shell process. Running, failed,
 exited, and restore states are deterministic public-host acceptance rather
-than promoted current-product lifecycle evidence.
+than promoted current-product lifecycle evidence. The later
+`26.727.40816` read-only probe found a project-named tab instead of the
+auto-numbered presentation, so this slice is retained as `partial_legacy`
+until that current tab model is refreshed.
 
 ## Sixteenth vertical slice
 
 The sixteenth slice refreshes Pull request behavior against
-`26.721.81911` and expands it into a deterministic host-owned lifecycle:
+`26.727.40816` and expands it into a deterministic host-owned lifecycle:
 
-- read-only current-product evidence for Summary, Timeline, Code loading,
-  non-modal overlay geometry, responsive 1180/960/820/720px behavior,
-  expand/restore, and Back/Forward restoration;
+- read-only current-product evidence for Summary/Code tabs, Timeline integrated
+  into Summary, successful multi-file Code content, display options,
+  Auto-merge, non-modal overlay geometry, and responsive
+  1180/960/820/720px auto-hide/reopen behavior;
 - public `PullRequestQueryState`, `PullRequestMergeReadiness`,
   `PullRequestReviewComposer`, and `PullRequestCommentComposer` contracts;
 - index/detail loading and failure/retry, running/failed/passed checks, comment
@@ -267,11 +271,14 @@ The sixteenth slice refreshes Pull request behavior against
 - real Electron review/comment/merge interaction against deterministic local
   state, without GitHub side effects;
 - nine additional reviewed visual frames and a shared 58-frame CDP/pixel
-  matrix.
+  matrix;
+- a current 906×820 regional comparison passing at 5.75% full-main, 4.68%
+  index, and 6.44% detail difference without relaxing the existing thresholds.
 
 The current-product probe did not submit a real comment, review, or merge.
-Successful Code content also remained outside the bounded capture, so these
-states are independent acceptance rather than promoted runtime evidence.
+Its Review options menu contains word-wrap, rich-preview, and word-diff
+display settings rather than review submission. Mutating states therefore
+remain independent acceptance rather than promoted runtime evidence.
 
 ## Development
 
