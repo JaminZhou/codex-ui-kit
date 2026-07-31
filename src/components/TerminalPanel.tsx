@@ -140,6 +140,28 @@ export type TerminalSessionStatus =
   | "restoring"
   | "running";
 
+const terminalSessionStatusIcon: Record<
+  TerminalSessionStatus,
+  string
+> = {
+  exited: "□",
+  failed: "!",
+  idle: "▣",
+  restoring: "↻",
+  running: "●",
+};
+
+const terminalSessionStatusLabel: Record<
+  TerminalSessionStatus,
+  string
+> = {
+  exited: "Exited",
+  failed: "Failed",
+  idle: "Idle",
+  restoring: "Restoring",
+  running: "Running",
+};
+
 export interface TerminalSessionProps
   extends Omit<HTMLAttributes<HTMLElement>, "children"> {
   entries: readonly TerminalEntry[];
@@ -286,38 +308,44 @@ export function TerminalPanel({
       openTabLabel={openSessionLabel}
       placement="bottom"
       tabCloseButtons
-      tabs={sessions.map((session) => ({
-        closeLabel:
-          session.closeLabel ?? `Close ${session.label} tab`,
-        content: (
-          <TerminalSession
-            entries={session.entries}
-            inputDisabled={session.inputDisabled}
-            inputLabel={session.inputLabel}
-            label={session.label}
-            onCommandSubmit={(command) =>
-              onCommandSubmit?.(session.id, command)
-            }
-            onValueChange={(value) =>
-              onSessionValueChange?.(session.id, value)
-            }
-            outputLabel={session.outputLabel}
-            prompt={session.prompt}
-            status={session.status}
-            value={session.value}
-          />
-        ),
-        id: session.id,
-        label: (
-          <span
-            className="codex-ui-terminal-panel__tab-label"
-            data-status={session.status ?? "idle"}
-          >
-            <span aria-hidden="true">▣</span>
-            <span>{session.label}</span>
-          </span>
-        ),
-      }))}
+      tabs={sessions.map((session) => {
+        const status = session.status ?? "idle";
+        return {
+          ariaLabel: `${session.label}, ${terminalSessionStatusLabel[status]}`,
+          closeLabel:
+            session.closeLabel ?? `Close ${session.label} tab`,
+          content: (
+            <TerminalSession
+              entries={session.entries}
+              inputDisabled={session.inputDisabled}
+              inputLabel={session.inputLabel}
+              label={session.label}
+              onCommandSubmit={(command) =>
+                onCommandSubmit?.(session.id, command)
+              }
+              onValueChange={(value) =>
+                onSessionValueChange?.(session.id, value)
+              }
+              outputLabel={session.outputLabel}
+              prompt={session.prompt}
+              status={status}
+              value={session.value}
+            />
+          ),
+          id: session.id,
+          label: (
+            <span
+              className="codex-ui-terminal-panel__tab-label"
+              data-status={status}
+            >
+              <span aria-hidden="true">
+                {terminalSessionStatusIcon[status]}
+              </span>
+              <span>{session.label}</span>
+            </span>
+          ),
+        };
+      })}
       tabsLabel={tabsLabel}
     />
   );
@@ -337,17 +365,6 @@ export interface TerminalProcessListProps
   onOpenProcess?: (id: string) => void;
   processes: readonly TerminalProcessSummary[];
 }
-
-const terminalProcessStatusLabel: Record<
-  TerminalSessionStatus,
-  string
-> = {
-  exited: "Exited",
-  failed: "Failed",
-  idle: "Idle",
-  restoring: "Restoring",
-  running: "Running",
-};
 
 export function TerminalProcessList({
   className,
@@ -385,7 +402,7 @@ export function TerminalProcessList({
                   className="codex-ui-terminal-process-list__status"
                   data-status={process.status}
                 >
-                  {terminalProcessStatusLabel[process.status]}
+                  {terminalSessionStatusLabel[process.status]}
                 </span>
               </>
             );

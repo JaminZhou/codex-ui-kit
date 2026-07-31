@@ -127,18 +127,30 @@ describe("terminal panel", () => {
 
     expect(
       screen.getByRole("tab", {
-        name: "codex-ui-kit 1",
+        name: "codex-ui-kit 1, Running",
         selected: true,
       }),
     ).toBeTruthy();
     expect(
       screen.getByRole("tab", {
-        name: "codex-ui-kit 2",
+        name: "codex-ui-kit 2, Failed",
         selected: false,
       }),
     ).toBeTruthy();
+    expect(
+      screen
+        .getByRole("tab", { name: "codex-ui-kit 1, Running" })
+        .textContent?.startsWith("●"),
+    ).toBe(true);
+    expect(
+      screen
+        .getByRole("tab", { name: "codex-ui-kit 2, Failed" })
+        .textContent?.startsWith("!"),
+    ).toBe(true);
     fireEvent.click(
-      screen.getByRole("tab", { name: "codex-ui-kit 2" }),
+      screen.getByRole("tab", {
+        name: "codex-ui-kit 2, Failed",
+      }),
     );
     fireEvent.click(
       screen.getByRole("button", {

@@ -2239,6 +2239,7 @@ export function AppSidebarFooter({
 }
 
 export interface WorkspacePanelTab {
+  ariaLabel?: string;
   closeLabel?: string;
   closable?: boolean;
   content: ReactNode;
@@ -2395,6 +2396,7 @@ export function WorkspacePanel({
                 aria-controls={
                   selected ? `${panelId}-panel-${index}` : undefined
                 }
+                aria-label={tab.ariaLabel}
                 aria-selected={selected}
                 className="codex-ui-workspace-panel__tab"
                 data-selected={selected || undefined}

@@ -902,12 +902,18 @@ try {
   const terminalTabs = terminalLifecyclePage.getByRole("tab");
   if (
     (await terminalTabs.count()) !== 3 ||
+    (await terminalTabs.nth(0).getAttribute("aria-label")) !==
+      "codex-ui-kit 1, Running" ||
+    (await terminalTabs.nth(1).getAttribute("aria-label")) !==
+      "codex-ui-kit 2, Failed" ||
+    (await terminalTabs.nth(2).getAttribute("aria-label")) !==
+      "codex-ui-kit 3, Exited" ||
     (await terminalTabs.nth(0).textContent())?.trim() !==
-      "▣codex-ui-kit 1" ||
+      "●codex-ui-kit 1" ||
     (await terminalTabs.nth(1).textContent())?.trim() !==
-      "▣codex-ui-kit 2" ||
+      "!codex-ui-kit 2" ||
     (await terminalTabs.nth(2).textContent())?.trim() !==
-      "▣codex-ui-kit 3" ||
+      "□codex-ui-kit 3" ||
     (await terminalTabs.nth(2).getAttribute("aria-selected")) !== "true"
   ) {
     throw new Error("Electron multi-terminal tab baseline failed.");
@@ -929,14 +935,14 @@ try {
   await terminalTabs.nth(2).focus();
   await terminalTabs.nth(2).press("ArrowLeft");
   const failedTab = terminalLifecyclePage.getByRole("tab", {
-    name: "codex-ui-kit 2",
+    name: "codex-ui-kit 2, Failed",
     selected: true,
   });
   if (
     !(await failedTab.isVisible()) ||
     (await terminalLifecyclePage.evaluate(
-      () => document.activeElement?.textContent?.trim(),
-    )) !== "▣codex-ui-kit 2"
+      () => document.activeElement?.getAttribute("aria-label"),
+    )) !== "codex-ui-kit 2, Failed"
   ) {
     throw new Error("Electron Terminal ArrowLeft navigation failed.");
   }
@@ -946,11 +952,11 @@ try {
   });
   await terminalInput.fill("retry");
   await terminalLifecyclePage
-    .getByRole("tab", { name: "codex-ui-kit 1" })
+    .getByRole("tab", { name: "codex-ui-kit 1, Running" })
     .click();
   await terminalInput.fill("status");
   await terminalLifecyclePage
-    .getByRole("tab", { name: "codex-ui-kit 2" })
+    .getByRole("tab", { name: "codex-ui-kit 2, Failed" })
     .click();
   if ((await terminalInput.inputValue()) !== "retry") {
     throw new Error(
@@ -994,7 +1000,7 @@ try {
     .getByRole("button", { name: "Close codex-ui-kit 2 tab" })
     .click();
   const selectedAfterClose = terminalLifecyclePage.getByRole("tab", {
-    name: "codex-ui-kit 3",
+    name: "codex-ui-kit 3, Exited",
     selected: true,
   });
   if (
@@ -1025,7 +1031,7 @@ try {
     (await terminalLifecyclePage.getByRole("tab").count()) !== 3 ||
     !(await terminalLifecyclePage
       .getByRole("tab", {
-        name: "codex-ui-kit 4",
+        name: "codex-ui-kit 4, Idle",
         selected: true,
       })
       .isVisible())
@@ -1037,7 +1043,10 @@ try {
     const selected = terminalLifecyclePage.locator(
       '[role="tab"][aria-selected="true"]',
     );
-    const label = (await selected.textContent())?.replace(/^▣/, "").trim();
+    const label = (await selected.getAttribute("aria-label"))?.replace(
+      /, (Exited|Failed|Idle|Restoring|Running)$/,
+      "",
+    );
     if (!label) {
       throw new Error("Electron Terminal selected tab lost its label.");
     }
@@ -1055,7 +1064,7 @@ try {
   if (
     !(await terminalLifecyclePage
       .getByRole("tab", {
-        name: "codex-ui-kit",
+        name: "codex-ui-kit, Running",
         selected: true,
       })
       .isVisible())
@@ -2230,12 +2239,16 @@ try {
   await codingWorkspacePage.waitForSelector(
     '.codex-ui-app-shell[data-bottom-panel-open] [data-testid="terminal-panel"]',
   );
+  const workspaceTerminalTab = codingWorkspacePage.getByRole("tab", {
+    name: "codex-app-server-client, Exited",
+  });
   const workspaceTerminalLabel = (
-    await codingWorkspacePage
-      .locator(".codex-ui-terminal-panel__tab-label")
-      .textContent()
+    await workspaceTerminalTab.textContent()
   )?.trim();
-  if (workspaceTerminalLabel !== "▣codex-app-server-client") {
+  if (
+    !(await workspaceTerminalTab.isVisible()) ||
+    workspaceTerminalLabel !== "□codex-app-server-client"
+  ) {
     throw new Error(
       `Electron coding workspace terminal tab did not use the routed project: ${JSON.stringify(workspaceTerminalLabel)}.`,
     );
