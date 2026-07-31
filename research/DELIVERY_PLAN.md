@@ -26,7 +26,9 @@ exit gates; it does not replace the inventory.
   PR detail passes the current 906×820 regional pixel gate. Real MCP recovery,
   full Composer queue/Stop lifecycle, Terminal multi-tab/process behavior,
   Review rename/delete variants, and broader shell evidence from
-  `26.721.81911` remain historical regression evidence until re-observed.
+  `26.721.81911` remain historical regression evidence until re-observed. The
+  current project-named single Terminal tab and close/add controls now pass
+  independent Browser, Electron, and regional pixel gates.
   Global notification runtime evidence, light-theme shell evidence, exact
   current-build long-thread virtualization, real current-product Terminal
   process execution/persistence, current-product review submission and

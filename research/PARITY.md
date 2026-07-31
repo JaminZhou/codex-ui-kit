@@ -61,11 +61,12 @@ The authoritative current-build inventory is:
   Electron flows verify the matched shell/New chat/PR structures and all 58
   deterministic lifecycle frames. The refreshed PR regional gate passes at
   5.75% full-main, 4.68% index, and 6.44% detail difference. Full queue/Stop,
-  MCP recovery, Terminal multi-tab/process, Review variants, broader shell
-  matrices, and their external pixels remain `26.721.81911` historical
-  evidence. Offline/error/reconnecting/stale and global-notification runtime
-  states remain synthetic independent coverage, not current-build
-  observations.
+  MCP recovery, Terminal multi-tab/process lifecycle, Review variants, broader
+  shell matrices, and their external pixels remain `26.721.81911` historical
+  evidence. The current project-named single Terminal tab and close/add
+  controls independently pass Browser, Electron, and regional pixel gates.
+  Offline/error/reconnecting/stale and global-notification runtime states
+  remain synthetic independent coverage, not current-build observations.
 - Renderer viewport probing exposed a narrow-layout gap: the thread and
   Composer shrink, but the fixed app sidebar remains and the right workspace
   panel can be laid out beyond the simulated viewport. The independently

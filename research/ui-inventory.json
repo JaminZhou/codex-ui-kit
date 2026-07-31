@@ -765,8 +765,8 @@
         "cdp-26.727.40816:project-named-terminal-tab-bottom-panel-shell-read-only"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "partial_legacy",
-      "electronStatus": "partial_legacy",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
       "priority": "p0"
     },
     {

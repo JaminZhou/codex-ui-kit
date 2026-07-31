@@ -251,8 +251,11 @@ The current-product probe did not execute a shell process. Running, failed,
 exited, and restore states are deterministic public-host acceptance rather
 than promoted current-product lifecycle evidence. The later
 `26.727.40816` read-only probe found a project-named tab instead of the
-auto-numbered presentation, so this slice is retained as `partial_legacy`
-until that current tab model is refreshed.
+auto-numbered presentation. The independent single-session model already
+uses the project name plus close/add controls and now passes the current
+Terminal regional gate at 1.79% panel and 0.73% content difference, so the
+session shell is current-build verified while process lifecycle remains
+`partial_legacy`.
 
 ## Sixteenth vertical slice
 

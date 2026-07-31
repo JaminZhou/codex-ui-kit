@@ -65,8 +65,8 @@ observation from a previous build remains historical evidence.
 
 Current inventory: 75 surface groups; 21 have current-build runtime evidence,
 35 have previous-build-only runtime evidence, 19 remain `not_sampled`, and 0
-are `blocked_by_policy`. Current-build Browser verification covers 16 groups
-and Electron verification covers 16. Prior acceptance outside the sampled
+are `blocked_by_policy`. Current-build Browser verification covers 17 groups
+and Electron verification covers 17. Prior acceptance outside the sampled
 shell, sidebar, New chat, and Pull request slices remains recorded as
 `partial_legacy` until current-build re-observation.
 
@@ -425,9 +425,11 @@ the picker, closes all sessions, restores the latest one, and reopens a failed
 process.
 
 The current `26.727.40816` shell instead presented one project-named
-`codex-ui-kit` tab in the bounded read-only observation. That drift demotes
-`workspace.terminal` to `partial_legacy` until the independent tab model is
-refreshed. The independently implemented process list and
+`codex-ui-kit` tab in the bounded read-only observation. The independent
+single-session model matches that label plus the close/add controls and passes
+the current-build regional pixel gate at 1.79% for the panel and 0.73% for its
+content, so `workspace.terminal` is current-build Browser/Electron verified.
+The independently implemented process list and
 running/failed/exited replay are deliberately split into
 `workspace.terminal-process-lifecycle`: the installed build's real process
 lifecycle was not safely exercised in this refresh, so that row retains
