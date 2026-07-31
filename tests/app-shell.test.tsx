@@ -3921,6 +3921,86 @@ describe("workspace panel", () => {
     ).toBeTruthy();
   });
 
+  it("exposes a close control for every closable tab", async () => {
+    function PerTabCloseFixture() {
+      const [activeTabId, setActiveTabId] = useState("terminal-2");
+      const [tabs, setTabs] = useState([
+        {
+          content: "First terminal",
+          id: "terminal-1",
+          label: "Workspace 1",
+        },
+        {
+          content: "Second terminal",
+          id: "terminal-2",
+          label: "Workspace 2",
+        },
+        {
+          closable: false,
+          content: "Pinned terminal",
+          id: "terminal-pinned",
+          label: "Pinned",
+        },
+      ]);
+      return (
+        <WorkspacePanel
+          activeTabId={activeTabId}
+          label="Terminal"
+          onActiveTabChange={setActiveTabId}
+          onCloseTab={(id) => {
+            setTabs((currentTabs) => {
+              const closingIndex = currentTabs.findIndex(
+                (tab) => tab.id === id,
+              );
+              const remainingTabs = currentTabs.filter(
+                (tab) => tab.id !== id,
+              );
+              if (id === activeTabId) {
+                setActiveTabId(
+                  remainingTabs[
+                    Math.min(
+                      Math.max(closingIndex, 0),
+                      remainingTabs.length - 1,
+                    )
+                  ]?.id ?? "",
+                );
+              }
+              return remainingTabs;
+            });
+          }}
+          tabCloseButtons
+          tabs={tabs}
+        />
+      );
+    }
+
+    render(<PerTabCloseFixture />);
+    expect(
+      screen.getByRole("button", { name: "Close Workspace 1 tab" }),
+    ).toBeTruthy();
+    expect(
+      screen.getByRole("button", { name: "Close Workspace 2 tab" }),
+    ).toBeTruthy();
+    expect(
+      screen.queryByRole("button", { name: "Close Pinned tab" }),
+    ).toBeNull();
+    expect(
+      screen.queryByRole("button", { name: "Close active tab" }),
+    ).toBeNull();
+
+    fireEvent.click(
+      screen.getByRole("button", { name: "Close Workspace 2 tab" }),
+    );
+    await waitFor(() =>
+      expect(
+        screen.getByRole("tab", {
+          name: "Pinned",
+          selected: true,
+        }),
+      ).toBeTruthy(),
+    );
+  });
+
   it("keeps an enabled tab reachable when the active tab is disabled", () => {
     const onActiveTabChange = vi.fn();
     render(

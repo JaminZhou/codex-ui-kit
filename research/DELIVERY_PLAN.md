@@ -11,8 +11,8 @@ exit gates; it does not replace the inventory.
 ## Current position
 
 - The current installed package is Codex Desktop `26.721.81911` (`5973`).
-- The inventory contains 74 surface groups: 47 P0, 18 P1, and 9 P2.
-- 20 groups have current-build runtime evidence, 35 have previous-build-only
+- The inventory contains 75 surface groups: 48 P0, 18 P1, and 9 P2.
+- 21 groups have current-build runtime evidence, 35 have previous-build-only
   runtime evidence, and 19 have not been sampled.
 - The first five current-build vertical slices cover all six left-sidebar
   groups, a real MCP failed-Fetch → Search → successful-Fetch recovery, and
@@ -26,14 +26,18 @@ exit gates; it does not replace the inventory.
   long-thread replay, Electron interaction, and current-build queue-region
   pixel gates. The coding-workspace entry slice adds the current
   project/context surface plus an independent project → environment/worktree →
-  command → approval → two-file Review → Terminal → PR path. The next Review
+  command → approval → two-file Review → Terminal → PR path. The Review
   slice adds current-build delete and rename/no-content evidence plus
   deterministic rename/delete/binary/conflict, selection, and Undo coverage.
-  Together the current playground gates cover 43 CDP/pixel frames. Global
+  The Terminal expansion adds current-build multi-tab, per-tab close, picker,
+  and compact evidence plus independent running/failed/exited process replay,
+  close/restore, and 820×680 acceptance. Together the current playground gates
+  cover 49 CDP/pixel frames. Global
   notification runtime evidence, light-theme shell evidence, exact
-  current-build long-thread virtualization, and the remaining Terminal, PR,
-  Markdown, tool, and attachment variants remain on their recorded evidence
-  levels until separately re-observed.
+  current-build long-thread virtualization, real current-product Terminal
+  process execution/persistence, and the remaining PR, Markdown, tool, and
+  attachment variants remain on their recorded evidence levels until
+  separately re-observed.
 - Existing Browser and Electron results remain useful regression evidence, but
   they are `partial_legacy` until the affected surface is re-observed on the
   current build.
@@ -242,8 +246,28 @@ without confusing package readiness with full product reconstruction.
    Stop, queue/pause/Resume, permissions/add-menu evidence; deterministic
    long-thread navigation/windowing; Browser/CDP, Electron, and regional
    current-build pixels.
-6. Continue the remaining workstream-2 turn/tool gaps, then workstreams 3–7
-   in inventory priority order.
+6. **Coding workspace entry**: current project/context entry plus independent
+   project → environment/worktree → command → approval → Review → Terminal →
+   PR acceptance.
+7. **Review content variants**: current delete and rename/no-content evidence,
+   public rename/delete/binary/conflict replay, selection synchronization, and
+   Undo.
+8. **Terminal session lifecycle**: current multi-tab/close/picker/compact
+   evidence plus independent running/failed/exited processes, per-session
+   input, close-all/restore, and process reopening.
+9. **Pull request lifecycle**: index/detail loading and failure, checks,
+   reviewers, comments, review submission, merge-readiness, responsive panel
+   composition, and route restoration.
+10. **Remaining P0 turn/tool gaps**: long command output and truncation,
+    approval denial/timeout/persistence, attachment lifecycle, Markdown
+    mutation/large content, subagents, and transport recovery.
+11. **P1 resources and integrations**: Browser/artifact/document previews,
+    environments, remote connections, Settings, MCP, plugins, skills, and
+    automations, each with one end-to-end vertical slice.
+12. **Full-app validation and global convergence**: replay/live App Server
+    attribution, dark/light and wide/compact matrices, current-build regional
+    pixels, public contract freeze, compatibility matrix, and release
+    checklist.
 
 Each PR uses the same merge gate: current-head CI green, a fresh clean bot
 result after the latest push, zero unresolved review threads, squash merge,

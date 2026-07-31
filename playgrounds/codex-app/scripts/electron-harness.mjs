@@ -224,6 +224,49 @@ export const visualScenes = [
     surfaces: ["bottomPanel", "command", "terminal"],
   },
   {
+    frame: "terminal-running",
+    id: "terminal-running",
+    maxPixelRatio: 0.01,
+    scenario: "terminal-lifecycle",
+    surfaces: ["bottomPanel", "command", "terminal", "terminalProcesses"],
+  },
+  {
+    frame: "terminal-failed",
+    id: "terminal-failed",
+    maxPixelRatio: 0.01,
+    scenario: "terminal-lifecycle",
+    surfaces: ["bottomPanel", "command", "terminal", "terminalProcesses"],
+  },
+  {
+    frame: "terminal-multi-tab",
+    id: "terminal-multi-tab",
+    maxPixelRatio: 0.01,
+    scenario: "terminal-lifecycle",
+    surfaces: ["bottomPanel", "command", "terminal", "terminalProcesses"],
+  },
+  {
+    frame: "terminal-picker",
+    id: "terminal-picker",
+    maxPixelRatio: 0.01,
+    scenario: "terminal-lifecycle",
+    surfaces: ["bottomPanel", "command", "terminal", "terminalProcesses"],
+  },
+  {
+    frame: "terminal-closed",
+    id: "terminal-closed",
+    maxPixelRatio: 0.01,
+    scenario: "terminal-lifecycle",
+    surfaces: ["bottomPanel", "command", "terminalProcesses"],
+  },
+  {
+    frame: "terminal-multi-tab",
+    id: "terminal-compact",
+    maxPixelRatio: 0.01,
+    scenario: "terminal-lifecycle",
+    surfaces: ["bottomPanel", "command", "terminal", "terminalProcesses"],
+    windowSize: { height: 680, width: 820 },
+  },
+  {
     frame: "command-running",
     id: "command-running",
     scenario: "workspace-workflow",
@@ -324,6 +367,7 @@ export async function launchScene(
   scene,
   { capture = true, layoutMode, windowSize } = {},
 ) {
+  const resolvedWindowSize = windowSize ?? scene.windowSize;
   const app = await electron.launch({
     args: ["."],
     executablePath: electronPath,
@@ -336,10 +380,14 @@ export async function launchScene(
       CODEX_DEMO_SCENARIO: scene.scenario,
       CODEX_DEMO_SHELL_STATE: scene.shellState ?? "ready",
       CODEX_DEMO_VIEW: scene.view ?? "conversation",
-      ...(windowSize
+      ...(resolvedWindowSize
         ? {
-            CODEX_DEMO_WINDOW_HEIGHT: String(windowSize.height),
-            CODEX_DEMO_WINDOW_WIDTH: String(windowSize.width),
+            CODEX_DEMO_WINDOW_HEIGHT: String(
+              resolvedWindowSize.height,
+            ),
+            CODEX_DEMO_WINDOW_WIDTH: String(
+              resolvedWindowSize.width,
+            ),
           }
         : {}),
     },

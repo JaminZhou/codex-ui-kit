@@ -220,6 +220,36 @@ verified that its children and `127.0.0.1:9471` listener were gone, removed the
 exact profile, and deleted the disposable ignored files. The original Codex
 process remained running.
 
+### Current Terminal session capture
+
+The `26.721.81911` Terminal probe used an exact second process, loopback port
+`9481`, and a unique
+`/private/tmp/codex-ui-kit-terminal-cdp.XXXXXX` profile. It selected the
+1180×820 `app://-/index.html` main Renderer by area and shell landmarks.
+The probe only opened UI-owned Terminal sessions; it did not submit a command
+or mutate a workspace.
+
+The bounded sequence was:
+
+1. open the bottom-panel plus menu and record Review, Terminal, Browser, and
+   Files;
+2. activate Terminal repeatedly to create three auto-numbered tabs;
+3. record tab/tabpanel roles, `aria-selected`, each named close button,
+   `Terminal input`, tab typography, gap, and bounds;
+4. close the active third tab and verify that the second tab becomes active;
+5. emulate 820×680 and verify three tabs fit without horizontal overflow.
+
+The current outer panel measured 279px including its resize affordance, the
+visible tab strip measured 28px, and the tabpanel remained 239px. Tabs measured
+140px at 1180×820 and about 136px at 820×680. A final product-level ArrowLeft
+probe was not retained because the temporary CDP process exited before that
+check; keyboard tab movement is therefore asserted only by the independent
+Browser/Electron acceptance, not claimed as current-product evidence.
+
+Cleanup confirmed the exact spawned process and `127.0.0.1:9481` listener were
+gone, removed only the unique profile, and deleted all six external
+screenshots. The original Codex process remained running.
+
 ## Required flow matrix
 
 ### 1. Application entry and navigation

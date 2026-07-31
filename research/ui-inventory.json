@@ -741,7 +741,22 @@
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
         "cdp:bottom-terminal-tabpanel-header-and-terminal-input",
-        "cdp-26.721:terminal-tabpanel-input-default-compact-and-bounds"
+        "cdp-26.721:terminal-tabpanel-input-default-compact-and-bounds",
+        "cdp-26.721.81911:three-terminal-tabs-per-tab-close-140px-tab-1180-and-820-compact-picker-four-items"
+      ],
+      "implementationStatus": "partial",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
+      "priority": "p0"
+    },
+    {
+      "id": "workspace.terminal-process-lifecycle",
+      "area": "workspace",
+      "ownership": "cross-layer",
+      "packageEvidence": ["terminal", "run-command-animation", "background-process"],
+      "runtimeStatus": "runtime_observed",
+      "runtimeEvidence": [
+        "cdp:running-duration-stop-and-background-process-state"
       ],
       "implementationStatus": "partial",
       "browserStatus": "partial_legacy",

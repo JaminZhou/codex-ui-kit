@@ -26,6 +26,7 @@ import {
   Dialog,
   FileChangeGroup,
   FileReview,
+  IconButton,
   LocalEnvironmentDialog,
   Menu,
   MenuItem,
@@ -39,7 +40,8 @@ import {
   PullRequestPanelSummary,
   QueuedPromptList,
   StatusBanner,
-  TerminalSession,
+  TerminalPanel,
+  TerminalProcessList,
   ThreadContextEvent,
   ThreadHeader,
   ThreadInterruptionSummary,
@@ -247,6 +249,28 @@ function initialQueuedPrompts(frame: string | null): QueuedPrompt[] {
       text: "Verify the queued Composer lifecycle.",
     },
   ];
+}
+
+const terminalLifecycleCommandIds = [
+  "command-terminal-dev",
+  "command-terminal-test",
+  "command-terminal-docs",
+] as const;
+
+function initialTerminalSessionIds(
+  scenarioId: ReplayScenarioId,
+  frame: string | null,
+) {
+  if (scenarioId === "background-terminal") return ["command-dev"];
+  if (scenarioId !== "terminal-lifecycle") return [];
+  if (frame === "terminal-running") {
+    return terminalLifecycleCommandIds.slice(0, 1);
+  }
+  if (frame === "terminal-failed") {
+    return terminalLifecycleCommandIds.slice(0, 2);
+  }
+  if (frame === "terminal-closed") return [];
+  return [...terminalLifecycleCommandIds];
 }
 
 function replayStatusLabel(
@@ -609,13 +633,31 @@ export function App() {
       initialSelection.frame === "mixed-review-open",
   );
   const [terminalOpen, setTerminalOpen] = useState(
-    initialSelection.scenarioId === "background-terminal",
+    initialSelection.scenarioId === "background-terminal" ||
+      initialSelection.scenarioId === "terminal-lifecycle",
+  );
+  const [terminalSessionIds, setTerminalSessionIds] = useState<string[]>(() =>
+    initialTerminalSessionIds(
+      initialSelection.scenarioId,
+      initialSelection.frame,
+    ),
+  );
+  const [closedTerminalSessionIds, setClosedTerminalSessionIds] =
+    useState<string[]>([]);
+  const [terminalTabPickerOpen, setTerminalTabPickerOpen] = useState(
+    initialSelection.frame === "terminal-picker",
   );
   const [terminalCommandId, setTerminalCommandId] = useState<string | null>(
-    null,
+    () =>
+      initialTerminalSessionIds(
+        initialSelection.scenarioId,
+        initialSelection.frame,
+      ).at(-1) ?? null,
   );
   const [terminalHeight, setTerminalHeight] = useState(272);
-  const [terminalValue, setTerminalValue] = useState("");
+  const [terminalValuesByCommand, setTerminalValuesByCommand] = useState<
+    Record<string, string>
+  >({});
   const [terminalHistoryByCommand, setTerminalHistoryByCommand] = useState<
     Record<string, TerminalEntry[]>
   >({});
@@ -645,6 +687,7 @@ export function App() {
   const [workspaceEnvironmentLauncher, setWorkspaceEnvironmentLauncher] =
     useState<"environment" | "worktree">("environment");
   const queuedPromptCounterRef = useRef(1);
+  const terminalSessionCounterRef = useRef(1);
   const replaySubmitTimerRef = useRef<number | null>(null);
   const pendingMessageNavigationRef = useRef<{
     behavior: "instant" | "smooth";
@@ -780,6 +823,12 @@ export function App() {
     setActiveFrame("workspace-ready");
     setReviewOpen(false);
     setTerminalOpen(false);
+    setTerminalSessionIds([]);
+    setClosedTerminalSessionIds([]);
+    setTerminalTabPickerOpen(false);
+    setTerminalCommandId(null);
+    setTerminalValuesByCommand({});
+    setTerminalHistoryByCommand({});
     setPullRequestOpen(false);
     dismissSidebarAfterNavigation();
   };
@@ -794,6 +843,10 @@ export function App() {
     },
   ) => {
     cancelReplaySubmitTimer();
+    const nextTerminalSessionIds = initialTerminalSessionIds(
+      nextId,
+      frame,
+    );
     setWorkspaceRunCwd(
       workspaceContext?.cwd ?? "/workspace/codex-ui-kit",
     );
@@ -824,10 +877,16 @@ export function App() {
     pendingMessageNavigationRef.current = null;
     setReviewOpen(false);
     setReviewSelection(null);
-    setTerminalOpen(nextId === "background-terminal");
-    setTerminalCommandId(null);
+    setTerminalOpen(
+      nextId === "background-terminal" ||
+        nextId === "terminal-lifecycle",
+    );
+    setTerminalSessionIds([...nextTerminalSessionIds]);
+    setClosedTerminalSessionIds([]);
+    setTerminalTabPickerOpen(frame === "terminal-picker");
+    setTerminalCommandId(nextTerminalSessionIds.at(-1) ?? null);
     setTerminalHeight(272);
-    setTerminalValue("");
+    setTerminalValuesByCommand({});
     setTerminalHistoryByCommand({});
     setUndoneFileIds(new Set());
     setLiveError(null);
@@ -1339,7 +1398,8 @@ export function App() {
               isConversationLifecycle && replayComposerStopped,
             )}
           </span>
-          {scenarioId === "background-terminal" ? (
+          {scenarioId === "background-terminal" ||
+          scenarioId === "terminal-lifecycle" ? (
             <Button
               aria-label="Toggle bottom panel"
               aria-pressed={terminalOpen}
@@ -2573,8 +2633,15 @@ export function App() {
               <button
                 className="demo-command-terminal"
                 onClick={() => {
+                  setTerminalSessionIds((sessionIds) =>
+                    sessionIds.includes(command.id)
+                      ? sessionIds
+                      : [...sessionIds, command.id],
+                  );
+                  setClosedTerminalSessionIds((sessionIds) =>
+                    sessionIds.filter((id) => id !== command.id),
+                  );
                   setTerminalCommandId(command.id);
-                  setTerminalValue("");
                   setTerminalOpen(true);
                 }}
                 type="button"
@@ -2733,13 +2800,21 @@ export function App() {
   const terminalCommands = state.commands.filter(({ processId }) =>
     Boolean(processId),
   );
-  const terminalCommand =
-    terminalCommands.find(({ id }) => id === terminalCommandId) ??
-    terminalCommands.at(-1);
-  const terminalHistoryKey = terminalCommand?.id ?? "unbound";
-  const terminalHistory =
-    terminalHistoryByCommand[terminalHistoryKey] ?? [];
-  const terminalEntries = useMemo<TerminalEntry[]>(() => {
+  const visibleTerminalSessionIds = terminalSessionIds.filter(
+    (id) =>
+      id.startsWith("local-terminal-") ||
+      terminalCommands.some((command) => command.id === id),
+  );
+  const activeTerminalSessionId =
+    visibleTerminalSessionIds.includes(terminalCommandId ?? "")
+      ? (terminalCommandId ?? "")
+      : (visibleTerminalSessionIds.at(-1) ?? "");
+  const terminalEntriesFor = (sessionId: string): TerminalEntry[] => {
+    const terminalCommand = terminalCommands.find(
+      ({ id }) => id === sessionId,
+    );
+    const terminalHistory =
+      terminalHistoryByCommand[sessionId] ?? [];
     if (!terminalCommand) return terminalHistory;
     const protocolEntries =
       terminalCommand.terminalEvents.length > 0
@@ -2782,72 +2857,174 @@ export function App() {
       ...protocolEntries,
       ...terminalHistory,
     ];
-  }, [terminalCommand, terminalHistory]);
+  };
+  const terminalSessions = visibleTerminalSessionIds.map(
+    (sessionId) => {
+      const terminalCommand = terminalCommands.find(
+        ({ id }) => id === sessionId,
+      );
+      const localSessionNumber = sessionId.startsWith("local-terminal-")
+        ? Number(sessionId.slice("local-terminal-".length))
+        : null;
+      const commandSessionIndex = terminalCommands.findIndex(
+        ({ id }) => id === sessionId,
+      );
+      const sessionNumber =
+        localSessionNumber !== null &&
+        Number.isInteger(localSessionNumber)
+          ? terminalCommands.length + localSessionNumber
+          : commandSessionIndex + 1;
+      const label =
+        visibleTerminalSessionIds.length > 1
+          ? `${workspaceRunProjectLabel} ${sessionNumber}`
+          : workspaceRunProjectLabel;
+      return {
+        entries: terminalEntriesFor(sessionId),
+        id: sessionId,
+        label,
+        status:
+          terminalCommand?.status === "running"
+            ? ("running" as const)
+            : terminalCommand?.status === "failed"
+              ? ("failed" as const)
+              : terminalCommand?.status === "completed"
+                ? ("exited" as const)
+                : ("idle" as const),
+        value: terminalValuesByCommand[sessionId] ?? "",
+      };
+    },
+  );
+  const createTerminalSession = () => {
+    const sessionId = `local-terminal-${terminalSessionCounterRef.current}`;
+    terminalSessionCounterRef.current += 1;
+    setTerminalSessionIds((sessionIds) => [
+      ...sessionIds,
+      sessionId,
+    ]);
+    setTerminalCommandId(sessionId);
+    setTerminalOpen(true);
+    setTerminalTabPickerOpen(false);
+  };
   const terminalPanel = (
-    <WorkspacePanel
-      activeTabId="terminal"
+    <TerminalPanel
+      activeSessionId={activeTerminalSessionId}
       className="demo-terminal-panel"
       data-testid="terminal-panel"
       label="Terminal"
-      onActiveTabChange={() => undefined}
+      onActiveSessionChange={setTerminalCommandId}
       onClose={() => setTerminalOpen(false)}
-      onOpenTab={() => setTerminalOpen(true)}
-      openTabLabel="New terminal"
-      placement="bottom"
-      tabs={[
-        {
-          content: (
-            <TerminalSession
-              data-testid="terminal-session"
-              entries={terminalEntries}
-              label="Background terminal"
-              onCommandSubmit={(command) => {
-                setTerminalHistoryByCommand((historyByCommand) => {
-                  const entries =
-                    historyByCommand[terminalHistoryKey] ?? [];
-                  return {
-                    ...historyByCommand,
-                    [terminalHistoryKey]: [
-                      ...entries,
-                      {
-                        id: `${terminalHistoryKey}:local:${entries.length}:command`,
-                        kind: "command",
-                        text: `${terminalCommand?.cwd ?? workspaceRunCwd} % ${command}`,
-                      },
-                      {
-                        id: `${terminalHistoryKey}:local:${entries.length}:system`,
-                        kind: "system",
-                        text: "Replay input is host-owned and was not executed.",
-                      },
-                    ],
-                  };
-                });
-                setTerminalValue("");
-              }}
-              onValueChange={setTerminalValue}
-              status={
-                terminalCommand?.status === "running"
-                  ? "running"
-                  : terminalCommand?.status === "failed"
-                    ? "failed"
-                    : terminalCommand?.status === "completed"
-                      ? "exited"
-                      : "idle"
-              }
-              value={terminalValue}
+      onCloseSession={(sessionId) => {
+        setTerminalSessionIds((sessionIds) => {
+          const closingIndex = sessionIds.indexOf(sessionId);
+          const remaining = sessionIds.filter((id) => id !== sessionId);
+          if (terminalCommandId === sessionId) {
+            setTerminalCommandId(
+              remaining[
+                Math.min(
+                  Math.max(closingIndex, 0),
+                  remaining.length - 1,
+                )
+              ] ?? null,
+            );
+          }
+          return remaining;
+        });
+        setClosedTerminalSessionIds((sessionIds) => [
+          ...sessionIds.filter((id) => id !== sessionId),
+          sessionId,
+        ]);
+      }}
+      onCommandSubmit={(sessionId, command) => {
+        const terminalCommand = terminalCommands.find(
+          ({ id }) => id === sessionId,
+        );
+        setTerminalHistoryByCommand((historyByCommand) => {
+          const entries = historyByCommand[sessionId] ?? [];
+          return {
+            ...historyByCommand,
+            [sessionId]: [
+              ...entries,
+              {
+                id: `${sessionId}:local:${entries.length}:command`,
+                kind: "command",
+                text: `${terminalCommand?.cwd ?? workspaceRunCwd} % ${command}`,
+              },
+              {
+                id: `${sessionId}:local:${entries.length}:system`,
+                kind: "system",
+                text: "Replay input is host-owned and was not executed.",
+              },
+            ],
+          };
+        });
+        setTerminalValuesByCommand((values) => ({
+          ...values,
+          [sessionId]: "",
+        }));
+      }}
+      onCreateSession={createTerminalSession}
+      onRestoreSession={() => {
+        const sessionId = closedTerminalSessionIds.at(-1);
+        if (!sessionId) return;
+        setClosedTerminalSessionIds((sessionIds) =>
+          sessionIds.slice(0, -1),
+        );
+        setTerminalSessionIds((sessionIds) => [
+          ...sessionIds,
+          sessionId,
+        ]);
+        setTerminalCommandId(sessionId);
+      }}
+      onSessionValueChange={(sessionId, value) =>
+        setTerminalValuesByCommand((values) => ({
+          ...values,
+          [sessionId]: value,
+        }))
+      }
+      openSessionAction={
+        <Menu
+          align="start"
+          className="demo-terminal-tab-menu"
+          label="Open bottom panel tab"
+          onOpenChange={setTerminalTabPickerOpen}
+          open={terminalTabPickerOpen}
+          side="bottom"
+          sideOffset={4}
+          trigger={
+            <IconButton
+              icon="+"
+              label="Open bottom panel tab"
+              size="toolbar"
             />
-          ),
-          id: "terminal",
-          label: (
-            <span className="demo-terminal-tab-label">
-              <span aria-hidden="true">▣</span>
-              <span>{workspaceRunProjectLabel}</span>
-              <span aria-hidden="true">×</span>
-            </span>
-          ),
-        },
-      ]}
-      tabsLabel="Terminal tabs"
+          }
+          width="auto"
+        >
+          <MenuItem
+            disabled={!reviewPanel}
+            endIcon="⌃⇧G"
+            onSelect={() => {
+              setReviewOpen(true);
+              setTerminalTabPickerOpen(false);
+            }}
+            startIcon="▣"
+          >
+            Review
+          </MenuItem>
+          <MenuItem
+            onSelect={createTerminalSession}
+            startIcon="▣"
+          >
+            Terminal
+          </MenuItem>
+          <MenuItem disabled endIcon="⌘T" startIcon="◎">
+            Browser
+          </MenuItem>
+          <MenuItem disabled endIcon="⌘P" startIcon="□">
+            Files
+          </MenuItem>
+        </Menu>
+      }
+      sessions={terminalSessions}
     />
   );
   const messageNavigation = isConversationLifecycle ? (
@@ -3018,6 +3195,42 @@ export function App() {
                 ) : null}
 
                 {timelineContent}
+
+                {scenarioId === "terminal-lifecycle" &&
+                terminalCommands.length > 0 ? (
+                  <TerminalProcessList
+                    className="demo-terminal-processes"
+                    data-testid="terminal-process-list"
+                    onOpenProcess={(sessionId) => {
+                      setTerminalSessionIds((sessionIds) =>
+                        sessionIds.includes(sessionId)
+                          ? sessionIds
+                          : [...sessionIds, sessionId],
+                      );
+                      setClosedTerminalSessionIds((sessionIds) =>
+                        sessionIds.filter((id) => id !== sessionId),
+                      );
+                      setTerminalCommandId(sessionId);
+                      setTerminalOpen(true);
+                    }}
+                    processes={terminalCommands.map((command) => ({
+                      detail: command.command,
+                      id: command.id,
+                      label:
+                        command.status === "running"
+                          ? "Development process"
+                          : command.status === "failed"
+                            ? "Failed process"
+                            : "Completed process",
+                      status:
+                        command.status === "completed"
+                          ? "exited"
+                          : command.status === "pending"
+                            ? "idle"
+                            : command.status,
+                    }))}
+                  />
+                ) : null}
 
                 {state.status === "running" &&
                 !activeTurnHasWork &&

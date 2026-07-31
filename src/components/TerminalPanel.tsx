@@ -7,6 +7,7 @@ import {
   type InputHTMLAttributes,
   type ReactNode,
 } from "react";
+import { WorkspacePanel } from "./AppShell.js";
 
 export type TerminalEntryKind =
   | "command"
@@ -136,6 +137,7 @@ export type TerminalSessionStatus =
   | "exited"
   | "failed"
   | "idle"
+  | "restoring"
   | "running";
 
 export interface TerminalSessionProps
@@ -190,6 +192,228 @@ export function TerminalSession({
         prompt={prompt}
         value={value}
       />
+    </section>
+  );
+}
+
+export interface TerminalPanelSession {
+  closeLabel?: string;
+  entries: readonly TerminalEntry[];
+  id: string;
+  inputDisabled?: boolean;
+  inputLabel?: string;
+  label: string;
+  outputLabel?: string;
+  prompt?: ReactNode;
+  status?: TerminalSessionStatus;
+  value: string;
+}
+
+export interface TerminalPanelProps
+  extends Omit<HTMLAttributes<HTMLElement>, "children"> {
+  activeSessionId: string;
+  actions?: ReactNode;
+  emptyState?: ReactNode;
+  label?: string;
+  onActiveSessionChange: (id: string) => void;
+  onClose?: () => void;
+  onCloseSession?: (id: string) => void;
+  onCommandSubmit?: (id: string, command: string) => void;
+  onCreateSession?: () => void;
+  onRestoreSession?: () => void;
+  onSessionValueChange?: (id: string, value: string) => void;
+  openSessionAction?: ReactNode;
+  openSessionLabel?: string;
+  restoreSessionLabel?: string;
+  sessions: readonly TerminalPanelSession[];
+  tabsLabel?: string;
+}
+
+export function TerminalPanel({
+  actions,
+  activeSessionId,
+  className,
+  emptyState,
+  label = "Terminal",
+  onActiveSessionChange,
+  onClose,
+  onCloseSession,
+  onCommandSubmit,
+  onCreateSession,
+  onRestoreSession,
+  onSessionValueChange,
+  openSessionAction,
+  openSessionLabel = "Open bottom panel tab",
+  restoreSessionLabel = "Restore last terminal",
+  sessions,
+  tabsLabel = "Terminal tabs",
+  ...props
+}: TerminalPanelProps) {
+  const resolvedEmptyState =
+    emptyState ??
+    (onRestoreSession ? (
+      <div className="codex-ui-terminal-panel__empty">
+        <span>No terminal sessions</span>
+        <button onClick={onRestoreSession} type="button">
+          {restoreSessionLabel}
+        </button>
+      </div>
+    ) : (
+      "No terminal sessions"
+    ));
+
+  return (
+    <WorkspacePanel
+      {...props}
+      activeTabId={activeSessionId}
+      actions={
+        actions || openSessionAction ? (
+          <>
+            {actions}
+            {openSessionAction}
+          </>
+        ) : undefined
+      }
+      className={["codex-ui-terminal-panel", className]
+        .filter(Boolean)
+        .join(" ")}
+      emptyState={resolvedEmptyState}
+      label={label}
+      onActiveTabChange={onActiveSessionChange}
+      onClose={onClose}
+      onCloseTab={onCloseSession}
+      onOpenTab={openSessionAction ? undefined : onCreateSession}
+      openTabLabel={openSessionLabel}
+      placement="bottom"
+      tabCloseButtons
+      tabs={sessions.map((session) => ({
+        closeLabel:
+          session.closeLabel ?? `Close ${session.label} tab`,
+        content: (
+          <TerminalSession
+            entries={session.entries}
+            inputDisabled={session.inputDisabled}
+            inputLabel={session.inputLabel}
+            label={session.label}
+            onCommandSubmit={(command) =>
+              onCommandSubmit?.(session.id, command)
+            }
+            onValueChange={(value) =>
+              onSessionValueChange?.(session.id, value)
+            }
+            outputLabel={session.outputLabel}
+            prompt={session.prompt}
+            status={session.status}
+            value={session.value}
+          />
+        ),
+        id: session.id,
+        label: (
+          <span
+            className="codex-ui-terminal-panel__tab-label"
+            data-status={session.status ?? "idle"}
+          >
+            <span aria-hidden="true">▣</span>
+            <span>{session.label}</span>
+          </span>
+        ),
+      }))}
+      tabsLabel={tabsLabel}
+    />
+  );
+}
+
+export interface TerminalProcessSummary {
+  detail?: ReactNode;
+  id: string;
+  label: ReactNode;
+  status: TerminalSessionStatus;
+}
+
+export interface TerminalProcessListProps
+  extends Omit<HTMLAttributes<HTMLElement>, "children"> {
+  emptyState?: ReactNode;
+  label?: string;
+  onOpenProcess?: (id: string) => void;
+  processes: readonly TerminalProcessSummary[];
+}
+
+const terminalProcessStatusLabel: Record<
+  TerminalSessionStatus,
+  string
+> = {
+  exited: "Exited",
+  failed: "Failed",
+  idle: "Idle",
+  restoring: "Restoring",
+  running: "Running",
+};
+
+export function TerminalProcessList({
+  className,
+  emptyState = "No background processes",
+  label = "Background processes",
+  onOpenProcess,
+  processes,
+  ...props
+}: TerminalProcessListProps) {
+  return (
+    <section
+      aria-label={label}
+      className={["codex-ui-terminal-process-list", className]
+        .filter(Boolean)
+        .join(" ")}
+      {...props}
+    >
+      <h3 className="codex-ui-terminal-process-list__title">{label}</h3>
+      {processes.length > 0 ? (
+        <ul className="codex-ui-terminal-process-list__items">
+          {processes.map((process) => {
+            const content = (
+              <>
+                <span className="codex-ui-terminal-process-list__identity">
+                  <span className="codex-ui-terminal-process-list__label">
+                    {process.label}
+                  </span>
+                  {process.detail ? (
+                    <span className="codex-ui-terminal-process-list__detail">
+                      {process.detail}
+                    </span>
+                  ) : null}
+                </span>
+                <span
+                  className="codex-ui-terminal-process-list__status"
+                  data-status={process.status}
+                >
+                  {terminalProcessStatusLabel[process.status]}
+                </span>
+              </>
+            );
+            return (
+              <li
+                className="codex-ui-terminal-process-list__item"
+                data-status={process.status}
+                key={process.id}
+              >
+                {onOpenProcess ? (
+                  <button
+                    onClick={() => onOpenProcess(process.id)}
+                    type="button"
+                  >
+                    {content}
+                  </button>
+                ) : (
+                  <div>{content}</div>
+                )}
+              </li>
+            );
+          })}
+        </ul>
+      ) : (
+        <div className="codex-ui-terminal-process-list__empty">
+          {emptyState}
+        </div>
+      )}
     </section>
   );
 }

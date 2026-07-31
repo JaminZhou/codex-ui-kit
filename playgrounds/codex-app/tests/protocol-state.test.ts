@@ -488,6 +488,50 @@ describe("protocol lifecycle reducer", () => {
     });
   });
 
+  it("replays running, failed, and exited terminal processes independently", () => {
+    const scenario = replayScenarios["terminal-lifecycle"];
+    const running = reduceProtocolTrace(
+      scenario.events.slice(0, scenario.frames["terminal-running"]),
+    );
+    const failed = reduceProtocolTrace(
+      scenario.events.slice(0, scenario.frames["terminal-failed"]),
+    );
+    const multiTab = reduceProtocolTrace(
+      scenario.events.slice(0, scenario.frames["terminal-multi-tab"]),
+    );
+    const completed = reduceProtocolTrace(scenario.events);
+
+    expect(running.commands).toMatchObject([
+      {
+        id: "command-terminal-dev",
+        processId: "process-terminal-dev",
+        status: "running",
+      },
+    ]);
+    expect(failed.commands).toMatchObject([
+      { id: "command-terminal-dev", status: "running" },
+      {
+        exitCode: 1,
+        id: "command-terminal-test",
+        status: "failed",
+      },
+    ]);
+    expect(multiTab.commands).toMatchObject([
+      { id: "command-terminal-dev", status: "running" },
+      { id: "command-terminal-test", status: "failed" },
+      { id: "command-terminal-docs", status: "completed" },
+    ]);
+    expect(completed.commands).toMatchObject([
+      {
+        id: "command-terminal-dev",
+        status: "completed",
+        terminalInput: "q\n",
+      },
+      { id: "command-terminal-test", status: "failed" },
+      { id: "command-terminal-docs", status: "completed" },
+    ]);
+  });
+
   it("coalesces adjacent terminal chunks without crossing stdin boundaries", () => {
     const started = reduceProtocolNotification(initialProtocolState, {
       method: "item/started",

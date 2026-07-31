@@ -2240,6 +2240,7 @@ export function AppSidebarFooter({
 
 export interface WorkspacePanelTab {
   closeLabel?: string;
+  closable?: boolean;
   content: ReactNode;
   disabled?: boolean;
   id: string;
@@ -2264,6 +2265,7 @@ export interface WorkspacePanelProps
   openTabLabel?: string;
   placement?: WorkspacePanelPlacement;
   restorePanelLabel?: string;
+  tabCloseButtons?: boolean;
   tabs: readonly WorkspacePanelTab[];
   tabsLabel?: string;
 }
@@ -2285,6 +2287,7 @@ export function WorkspacePanel({
   placement = "side",
   restorePanelLabel = "Restore panel",
   style,
+  tabCloseButtons = false,
   tabs,
   tabsLabel,
   ...props
@@ -2332,10 +2335,9 @@ export function WorkspacePanel({
     onActiveTabChange(tabs[nextIndex]!.id);
     document.getElementById(`${panelId}-tab-${nextIndex}`)?.focus();
   };
-  const closeActiveTab = () => {
-    if (!activeTab || !onCloseTab) return;
-    const closingIndex = activeIndex;
-    onCloseTab(activeTab.id);
+  const closeTab = (tab: WorkspacePanelTab, closingIndex: number) => {
+    if (!onCloseTab || tab.closable === false) return;
+    onCloseTab(tab.id);
     if (typeof window === "undefined") return;
     window.setTimeout(() => {
       const panel = panelRef.current;
@@ -2388,7 +2390,7 @@ export function WorkspacePanel({
         >
           {tabs.map((tab, index) => {
             const selected = tab.id === activeTabId;
-            return (
+            const tabButton = (
               <button
                 aria-controls={
                   selected ? `${panelId}-panel-${index}` : undefined
@@ -2408,11 +2410,40 @@ export function WorkspacePanel({
                 {tab.label}
               </button>
             );
+            if (!tabCloseButtons || !onCloseTab) return tabButton;
+            return (
+              <span
+                className="codex-ui-workspace-panel__tab-item"
+                data-selected={selected || undefined}
+                key={tab.id}
+                role="presentation"
+              >
+                {tabButton}
+                {tab.closable === false ? null : (
+                  <IconButton
+                    className="codex-ui-workspace-panel__tab-close"
+                    icon={<CloseIcon />}
+                    label={
+                      tab.closeLabel ??
+                      (typeof tab.label === "string" ||
+                      typeof tab.label === "number"
+                        ? `Close ${tab.label} tab`
+                        : "Close tab")
+                    }
+                    onClick={() => closeTab(tab, index)}
+                    size="toolbar"
+                  />
+                )}
+              </span>
+            );
           })}
         </div>
         <div className="codex-ui-workspace-panel__actions">
           {actions}
-          {onCloseTab && activeTab ? (
+          {onCloseTab &&
+          activeTab &&
+          activeTab.closable !== false &&
+          !tabCloseButtons ? (
             <IconButton
               icon={<CloseIcon />}
               label={
@@ -2422,7 +2453,7 @@ export function WorkspacePanel({
                   ? `Close ${activeTab.label} tab`
                   : "Close active tab")
               }
-              onClick={closeActiveTab}
+              onClick={() => closeTab(activeTab, activeIndex)}
               size="toolbar"
             />
           ) : null}
