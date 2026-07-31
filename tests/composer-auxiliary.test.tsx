@@ -281,7 +281,7 @@ describe("composer auxiliary surfaces", () => {
 
   it("clears an active composer mode without exposing product state", () => {
     const onClear = vi.fn();
-    render(
+    const { container, rerender } = render(
       <ComposerModeIndicator
         clearLabel="Clear plan mode"
         kind="plan"
@@ -292,6 +292,25 @@ describe("composer auxiliary surfaces", () => {
 
     fireEvent.click(screen.getByRole("button", { name: "Clear plan mode" }));
     expect(onClear).toHaveBeenCalledTimes(1);
+    expect(
+      container.querySelector(
+        '.codex-ui-composer-mode[data-kind="plan"] svg',
+      ),
+    ).not.toBeNull();
+
+    rerender(
+      <ComposerModeIndicator
+        clearLabel="Clear goal"
+        kind="goal"
+        label="Goal"
+        onClear={onClear}
+      />,
+    );
+    expect(
+      container.querySelector(
+        '.codex-ui-composer-mode[data-kind="goal"] svg',
+      ),
+    ).not.toBeNull();
   });
 
   it("covers interrupted, paused, queued, and editing prompt actions", () => {

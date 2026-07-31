@@ -6898,16 +6898,18 @@ summary.codex-ui-activity__header::after {
 .codex-ui-composer-mode {
   align-items: center;
   background: transparent;
-  border: 0;
-  border-radius: var(--codex-ui-radius-sm);
+  border: 1px solid transparent;
+  border-radius: 9999px;
   color: var(--codex-ui-text-tertiary);
   display: inline-flex;
   font: inherit;
   font-size: var(--codex-ui-font-size-sm);
   gap: 0.25rem;
   height: var(--codex-ui-size-button-composer);
+  line-height: 1.125rem;
   max-width: 12rem;
-  padding: 0.25rem 0.45rem;
+  padding: 0 0.5rem;
+  white-space: nowrap;
 }
 
 .codex-ui-composer-mode[data-clearable] {
@@ -6935,6 +6937,16 @@ summary.codex-ui-activity__header::after {
   flex: 0 0 auto;
   height: 1rem;
   justify-content: center;
+  width: 1rem;
+}
+
+.codex-ui-composer-mode__icon svg {
+  fill: none;
+  height: 1rem;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.2;
   width: 1rem;
 }
 

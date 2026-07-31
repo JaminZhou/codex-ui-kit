@@ -2755,6 +2755,88 @@ try {
       "Message composer",
   );
 
+  await resourceTrigger.click();
+  await composerMenusPage
+    .getByRole("option", { name: /Goal/ })
+    .click();
+  await composerMenusPage.waitForSelector(
+    '.demo-root[data-composer-mode="goal"][data-composer-phase="goal"]',
+  );
+  const goalMode = await composerMenusPage.evaluate(() => {
+    const mode = document.querySelector(".codex-ui-composer-mode");
+    const input = document.querySelector(".codex-ui-composer__input");
+    if (!mode || !input) return null;
+    const rect = mode.getBoundingClientRect();
+    return {
+      clearLabel: mode.getAttribute("aria-label"),
+      height: rect.height,
+      inputLabel: input.getAttribute("aria-label"),
+      kind: mode.getAttribute("data-kind"),
+      left: rect.left,
+      top: rect.top,
+    };
+  });
+  if (
+    !goalMode ||
+    goalMode.kind !== "goal" ||
+    goalMode.clearLabel !== "Clear goal" ||
+    goalMode.inputLabel !==
+      "Describe your goal, define measurable outcomes for best results" ||
+    Math.abs(goalMode.left - 512) > 1 ||
+    Math.abs(goalMode.top - 768) > 1 ||
+    Math.abs(goalMode.height - 28) > 1
+  ) {
+    throw new Error(
+      `Electron current Composer Goal mode failed: ${JSON.stringify(goalMode)}`,
+    );
+  }
+  await composerMenusPage
+    .getByRole("button", { name: "Clear goal" })
+    .click();
+  await composerMenusPage.waitForFunction(
+    () =>
+      !document
+        .querySelector(".demo-root")
+        ?.hasAttribute("data-composer-mode") &&
+      document.activeElement?.getAttribute("aria-label") ===
+        "Message composer",
+  );
+
+  await resourceTrigger.click();
+  await composerMenusPage
+    .getByRole("option", { name: /Plan mode/ })
+    .click();
+  await composerMenusPage.waitForSelector(
+    '.demo-root[data-composer-mode="plan"][data-composer-phase="plan"]',
+  );
+  const planMode = await composerMenusPage.evaluate(() => ({
+    buttonCount: document.querySelectorAll(
+      '.codex-ui-composer-mode[data-kind="plan"][aria-label="Plan"]',
+    ).length,
+    inputLabel: document
+      .querySelector(".codex-ui-composer__input")
+      ?.getAttribute("aria-label"),
+  }));
+  if (
+    planMode.buttonCount !== 1 ||
+    planMode.inputLabel !== "Describe your task to generate a plan..."
+  ) {
+    throw new Error(
+      `Electron current Composer Plan mode failed: ${JSON.stringify(planMode)}`,
+    );
+  }
+  await composerMenusPage
+    .getByRole("button", { exact: true, name: "Plan" })
+    .click();
+  await composerMenusPage.waitForFunction(
+    () =>
+      !document
+        .querySelector(".demo-root")
+        ?.hasAttribute("data-composer-mode") &&
+      document.activeElement?.getAttribute("aria-label") ===
+        "Message composer",
+  );
+
   await composerInput.fill(
     Array.from(
       { length: 20 },

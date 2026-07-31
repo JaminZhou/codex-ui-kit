@@ -61,15 +61,15 @@ observation from a previous build remains historical evidence.
   PR Summary/Code with integrated Timeline and responsive detail restoration;
   successful Code content, successful and recovered OpenAI Developer Docs
   calls, and the current Composer queue/Stop automatic-continuation lifecycle
-  plus multiline input, permission choices, and the inline Add-resource picker
-  are observed, while mutating review/comment/merge,
+  plus multiline input, permission choices, the inline Add-resource picker,
+  and active Goal/Plan modes are observed, while mutating review/comment/merge,
   light-theme, global notifications, current-build long-thread
   virtualization, and unrelated surface evidence remain pending
 
-Current inventory: 77 surface groups; 27 have current-build runtime evidence,
-31 have previous-build-only runtime evidence, 19 remain `not_sampled`, and 0
-are `blocked_by_policy`. Current-build Browser verification covers 23 groups
-and Electron verification covers 23. Prior acceptance outside the sampled
+Current inventory: 77 surface groups; 28 have current-build runtime evidence,
+30 have previous-build-only runtime evidence, 19 remain `not_sampled`, and 0
+are `blocked_by_policy`. Current-build Browser verification covers 24 groups
+and Electron verification covers 24. Prior acceptance outside the sampled
 shell, sidebar, New chat, and Pull request slices remains recorded as
 `partial_legacy` until current-build re-observation.
 
@@ -312,8 +312,12 @@ Browser/CDP/pixel frames and real Electron interaction. Their strict
 ownership-masked changed-pixel ratios are `0.000994318`, `0.001280084`, and
 `0.003352986`, under hard 0.5%, 0.5%, and 0.8% limits respectively.
 Permissions, Add resources, and multiline growth are therefore current-build
-verified; attachments and active modes remain `partial_legacy`. Message
-navigation and windowing retain strong independent
+verified. A separate unsubmitted-draft probe verifies active Goal and Plan
+labels, prompts, 736×98 geometry, 28px clear controls, and focus restoration.
+Their 906×820 regional gates pass at `0.003763528` and `0.003486243`, so
+`composer.modes` is current-build Browser/Electron verified. The native
+file-panel attachment lifecycle remains `partial_legacy`. Message navigation
+and windowing retain strong independent
 Browser/Electron regression coverage, but stay `partial_legacy` because the
 current build's exact long-thread virtualization algorithm was not re-observed.
 

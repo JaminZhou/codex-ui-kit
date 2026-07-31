@@ -97,11 +97,17 @@ The authoritative current-build inventory is:
   explicit row reopen after responsive auto-hide. The
   independent public state machine adds list/detail loading and failure,
   checks, comments, review submission, merge readiness/completion, and compact
-  recovery through 61 Browser/CDP, Electron, and reviewed-pixel frames. No
+  recovery through 63 Browser/CDP, Electron, and reviewed-pixel frames. No
   review, comment, or merge was sent to the real PR, and successful
   review submission remains synthetic because the current Review options menu
   contains display settings only; those mutating states must not be reported
   as current-product runtime parity.
+- The current-build Composer mode slice independently observes unsubmitted
+  Goal and Plan drafts. Both preserve the measured 736×98 shell, expose
+  mode-specific accessible prompts, and clear back to the default focused
+  input. Browser/CDP, real Electron, and masked regional pixels pass at 0.38%
+  and 0.35%. The native attachment panel was not automated and remains
+  outside current-build parity.
 - npm publication remains out of scope until the agreed P0/P1 coverage and
   release acceptance surfaces are complete.
 

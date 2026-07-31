@@ -40,7 +40,7 @@ describe("lifecycle visual policy", () => {
     );
   });
 
-  it("gates current multiline, permission, and resource Composer regions", () => {
+  it("gates current multiline, permission, resource, and mode Composer regions", () => {
     expect(contract).toContain(
       "CODEX_UI_KIT_COMPOSER_MULTILINE_REFERENCE",
     );
@@ -49,6 +49,12 @@ describe("lifecycle visual policy", () => {
     );
     expect(contract).toContain(
       "CODEX_UI_KIT_COMPOSER_RESOURCES_REFERENCE",
+    );
+    expect(contract).toContain(
+      "CODEX_UI_KIT_COMPOSER_GOAL_REFERENCE",
+    );
+    expect(contract).toContain(
+      "CODEX_UI_KIT_COMPOSER_PLAN_REFERENCE",
     );
     expect(contract).toContain(
       'scene.id === "composer-resources-menu" ? 0.008 : 0.005',

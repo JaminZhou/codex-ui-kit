@@ -461,11 +461,12 @@
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
         "cdp:model-effort-speed-menu",
-        "cdp-26.721.81911:add-files-goal-plan-skill-and-plugins-menu"
+        "cdp-26.721.81911:add-files-goal-plan-skill-and-plugins-menu",
+        "cdp-26.727.40816:goal-plan-active-mode-label-placeholder-clear-and-focus"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "partial_legacy",
-      "electronStatus": "partial_legacy",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
       "priority": "p0"
     },
     {

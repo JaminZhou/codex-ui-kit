@@ -663,10 +663,36 @@ export function ComposerModeIndicator({
 }
 
 function ComposerModeGlyph({ kind }: { kind: ComposerModeKind }) {
-  if (kind === "goal") return <span>◎</span>;
-  if (kind === "plan") return <span>◇</span>;
-  if (kind === "review") return <span>⌕</span>;
-  return <span>•</span>;
+  if (kind === "goal") {
+    return (
+      <svg aria-hidden="true" viewBox="0 0 20 20">
+        <circle cx="9.5" cy="10.5" r="6.75" />
+        <circle cx="9.5" cy="10.5" r="3.5" />
+        <path d="m10.75 9.25 5.5-5.5m-2.75.25 3-.25-.25 3" />
+      </svg>
+    );
+  }
+  if (kind === "plan") {
+    return (
+      <svg aria-hidden="true" viewBox="0 0 20 20">
+        <path d="M6.25 9a3.75 3.75 0 1 1 7.5 0c0 1.45-.72 2.35-1.55 3.2-.42.43-.7.88-.7 1.3h-3c0-.42-.28-.87-.7-1.3C6.97 11.35 6.25 10.45 6.25 9Z" />
+        <path d="M8.75 15.75h2.5M10 1.75V.75M4.9 3.9l-.7-.7M15.1 3.9l.7-.7M3 9H2M18 9h-1" />
+      </svg>
+    );
+  }
+  if (kind === "review") {
+    return (
+      <svg aria-hidden="true" viewBox="0 0 20 20">
+        <circle cx="8.75" cy="8.75" r="5.25" />
+        <path d="m12.75 12.75 3.75 3.75M6.5 8.75h4.5M8.75 6.5V11" />
+      </svg>
+    );
+  }
+  return (
+    <svg aria-hidden="true" viewBox="0 0 20 20">
+      <circle cx="10" cy="10" r="2.25" />
+    </svg>
+  );
 }
 
 export type QueuedPromptStatus = "editing" | "paused" | "queued";

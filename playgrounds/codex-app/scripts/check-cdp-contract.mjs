@@ -1477,6 +1477,9 @@ for (const scene of visualScenes) {
         const resourceScroller = resourcePicker?.querySelector(
           ".codex-ui-composer-resource-picker__scroller",
         );
+        const modeIndicator = composer?.querySelector(
+          ".codex-ui-composer-mode",
+        );
         if (
           !root ||
           !dock ||
@@ -1529,6 +1532,19 @@ for (const scene of visualScenes) {
             label: navigation.getAttribute("aria-label"),
           },
           overlay: root.getAttribute("data-composer-overlay"),
+          mode: root.getAttribute("data-composer-mode"),
+          modeIndicator: modeIndicator
+            ? {
+                clearLabel: modeIndicator.getAttribute("aria-label"),
+                kind: modeIndicator.getAttribute("data-kind"),
+                label:
+                  modeIndicator
+                    .querySelector(".codex-ui-composer-mode__label")
+                    ?.textContent?.trim() ?? null,
+                rect: rect(modeIndicator),
+                svgCount: modeIndicator.querySelectorAll("svg").length,
+              }
+            : null,
           phase: root.getAttribute("data-composer-phase"),
           placeholder: {
             count: document.querySelectorAll(
@@ -1617,6 +1633,7 @@ for (const scene of visualScenes) {
           ).length,
           surface: rect(surface),
           textarea: {
+            label: textarea.getAttribute("aria-label"),
             disabled: textarea.disabled,
             lineCount: textarea.value.split("\n").length,
             rect: rect(textarea),
@@ -1675,6 +1692,40 @@ for (const scene of visualScenes) {
       ) {
         throw new Error(
           `${scene.id}: multiline Composer contract failed: ${JSON.stringify(conversation)}`,
+        );
+      }
+      if (
+        (scene.id === "composer-goal" || scene.id === "composer-plan") &&
+        (conversation.phase !==
+          (scene.id === "composer-goal" ? "goal" : "plan") ||
+          conversation.mode !==
+            (scene.id === "composer-goal" ? "goal" : "plan") ||
+          conversation.composer.layout !== "multiline" ||
+          !conversation.modeIndicator ||
+          conversation.modeIndicator.kind !== conversation.mode ||
+          conversation.modeIndicator.label !==
+            (scene.id === "composer-goal" ? "Goal" : "Plan") ||
+          conversation.modeIndicator.clearLabel !==
+            (scene.id === "composer-goal" ? "Clear goal" : "Plan") ||
+          conversation.modeIndicator.svgCount !== 1 ||
+          Math.abs(conversation.composer.rect.left - 359) > 1 ||
+          Math.abs(conversation.composer.rect.top - 706) > 1 ||
+          Math.abs(conversation.composer.rect.width - 736) > 1 ||
+          Math.abs(conversation.composer.rect.height - 98) > 1 ||
+          Math.abs(conversation.textarea.rect.left - 371) > 1 ||
+          Math.abs(conversation.textarea.rect.top - 720) > 1 ||
+          Math.abs(conversation.textarea.rect.width - 712) > 1 ||
+          Math.abs(conversation.textarea.rect.height - 44) > 1 ||
+          conversation.textarea.label !==
+            (scene.id === "composer-goal"
+              ? "Describe your goal, define measurable outcomes for best results"
+              : "Describe your task to generate a plan...") ||
+          Math.abs(conversation.modeIndicator.rect.left - 512) > 1 ||
+          Math.abs(conversation.modeIndicator.rect.top - 768) > 1 ||
+          Math.abs(conversation.modeIndicator.rect.height - 28) > 1)
+      ) {
+        throw new Error(
+          `${scene.id}: current Composer mode contract failed: ${JSON.stringify(conversation)}`,
         );
       }
       if (
@@ -1854,6 +1905,23 @@ for (const scene of visualScenes) {
         await page.waitForSelector(
           '.demo-root:not([data-composer-overlay])',
         );
+      }
+      if (scene.id === "composer-goal" || scene.id === "composer-plan") {
+        await page
+          .getByRole("button", {
+            name: scene.id === "composer-goal" ? "Clear goal" : "Plan",
+          })
+          .click();
+        await page.waitForSelector(".demo-root:not([data-composer-mode])");
+        if (
+          !(await page
+            .getByRole("textbox", { name: "Message composer" })
+            .evaluate((element) => element === document.activeElement))
+        ) {
+          throw new Error(
+            `${scene.id}: clearing the Composer mode did not restore input focus.`,
+          );
+        }
       }
     }
     if (

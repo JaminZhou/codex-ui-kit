@@ -445,8 +445,21 @@ Cleanup stopped the exact main process and app-server child, verified port
 `9515` was gone, and moved the unique profile into
 `/Users/JaminZhou/.Trash/codex-ui-kit-composer-menus-cleanup.NV2plx` with the
 external reference images.
-Attachment lifecycle and active Goal/Plan transitions remain pending current
-capture.
+Active Goal and Plan transitions were then sampled independently in a fifth
+exact process on port `9516`. Both kept the 736×98 Composer and 712×44 input;
+their clearable 28px controls changed the input accessibility label and
+placeholder, then restored default mode and focus without submitting. CDP now
+covers 63 frames, Electron drives both transitions, and the masked current
+pixel ratios are `0.003763528` and `0.003486243`.
+
+`Files and folders` opened a native macOS panel instead of a Renderer file
+input. Computer Use intentionally disallowed Codex control, so no workaround
+was used and no attachment was added. Attachment lifecycle remains pending
+current capture. Cleanup stopped the exact process, closed port `9516`,
+removed the ignored synthetic probe file, and moved the profile and external
+evidence to the recoverable
+`/Users/JaminZhou/.Trash/codex-ui-kit-composer-modes-cleanup.CJuP6u`
+directory.
 
 ## Required flow matrix
 

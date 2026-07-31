@@ -1077,6 +1077,15 @@ textarea {
   width: 1.75rem;
 }
 
+.demo-root[data-scenario="conversation-lifecycle"]
+  .demo-composer-controls
+  > .codex-ui-composer-mode {
+  font-size: 0.8125rem;
+  justify-content: flex-start;
+  margin-left: 0.5625rem;
+  width: auto;
+}
+
 .demo-composer-controls .codex-ui-popover-anchor {
   flex: 0 0 auto;
 }

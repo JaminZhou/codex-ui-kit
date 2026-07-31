@@ -54,6 +54,12 @@ describe("composer visual contract", () => {
       /\.codex-ui-composer-resource-picker \{[\s\S]*?height: 20rem;[\s\S]*?padding: 0\.25rem;[\s\S]*?width: 100%;/,
     );
     expect(styles).toMatch(
+      /\.codex-ui-composer-mode \{[\s\S]*?border-radius: 9999px;[\s\S]*?height: var\(--codex-ui-size-button-composer\);[\s\S]*?padding: 0 0\.5rem;/,
+    );
+    expect(styles).toMatch(
+      /\.codex-ui-composer-mode__icon svg \{[\s\S]*?height: 1rem;[\s\S]*?stroke-width: 1\.2;[\s\S]*?width: 1rem;/,
+    );
+    expect(styles).toMatch(
       /\.codex-ui-composer__suggestions:has\([\s\S]*?> \.codex-ui-composer-resource-picker[\s\S]*?\) \{[\s\S]*?bottom: calc\(100% \+ 0\.25rem\);/,
     );
     expect(styles).toMatch(

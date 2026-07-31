@@ -349,6 +349,24 @@ Composer behavior against `26.727.40816`:
 - strict ownership-masked current regional gates passing at 0.10% multiline,
   0.13% permissions, and 0.34% resources difference.
 
+## Twenty-first vertical slice
+
+The twenty-first slice refreshes active Goal and Plan Composer modes against
+`26.727.40816`:
+
+- an unsubmitted new-chat draft records each mode's accessible prompt,
+  736×98 Composer, 712×44 input, and 28px clearable footer control;
+- the public `ComposerModeIndicator` uses independently drawn SVG geometry and
+  current pill sizing;
+- shared CDP/pixel coverage increases to 63 frames, while Electron selects and
+  clears both modes through the Add-resource path and verifies focus recovery;
+- strict ownership-masked current regional gates pass at 0.38% for Goal and
+  0.35% for Plan under a 0.5% hard limit.
+
+The native macOS file panel is outside Renderer CDP and Computer Use blocks
+Codex control, so no attachment was added and attachment lifecycle remains
+historical.
+
 ## Development
 
 From the repository root:
@@ -446,13 +464,15 @@ CODEX_UI_KIT_COMPOSER_CONTINUED_REFERENCE=/absolute/path/to/composer-continued.p
 `CODEX_UI_KIT_COMPOSER_PAUSED_REFERENCE` remains available only for the
 previous-build paused/Resume compatibility frame.
 
-The current multiline/menu gates accept one 792×320 Composer crop and two
-906×820 main-only crops:
+The current multiline/menu/mode gates accept one 792×320 Composer crop and
+four 906×820 main-only crops:
 
 ```bash
 CODEX_UI_KIT_COMPOSER_MULTILINE_REFERENCE=/absolute/path/to/composer-multiline.png \
 CODEX_UI_KIT_COMPOSER_PERMISSIONS_REFERENCE=/absolute/path/to/composer-permissions-main.png \
 CODEX_UI_KIT_COMPOSER_RESOURCES_REFERENCE=/absolute/path/to/composer-resources-main.png \
+CODEX_UI_KIT_COMPOSER_GOAL_REFERENCE=/absolute/path/to/composer-goal-main.png \
+CODEX_UI_KIT_COMPOSER_PLAN_REFERENCE=/absolute/path/to/composer-plan-main.png \
   pnpm --filter @codex-ui-kit/codex-app-playground check:visual
 ```
 

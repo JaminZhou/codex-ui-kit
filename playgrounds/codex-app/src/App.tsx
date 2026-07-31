@@ -20,6 +20,7 @@ import {
   ComposerContextBar,
   ComposerContextControl,
   ComposerDock,
+  ComposerModeIndicator,
   ComposerPermissionMenu,
   ComposerResourcePicker,
   ConversationContextBar,
@@ -61,6 +62,7 @@ import {
   type TerminalEntry,
   type AppRouteOutletStatus,
   type ComposerPermissionOption,
+  type ComposerModeKind,
   type ComposerResourceGroup,
   type QueuedPrompt,
 } from "codex-ui-kit";
@@ -213,7 +215,9 @@ const conversationHostFrames = new Set([
   "composer-auto-continued",
   "composer-disabled",
   "composer-idle",
+  "composer-goal",
   "composer-multiline",
+  "composer-plan",
   "composer-permissions-menu",
   "composer-queue-paused",
   "composer-queued",
@@ -264,10 +268,17 @@ function initialComposerValue(frame: string | null) {
 }
 
 type ComposerOverlay = "permissions" | "resources" | null;
+type ComposerMode = Extract<ComposerModeKind, "goal" | "plan"> | null;
 
 function initialComposerOverlay(frame: string | null): ComposerOverlay {
   if (frame === "composer-permissions-menu") return "permissions";
   if (frame === "composer-resources-menu") return "resources";
+  return null;
+}
+
+function initialComposerMode(frame: string | null): ComposerMode {
+  if (frame === "composer-goal") return "goal";
+  if (frame === "composer-plan") return "plan";
   return null;
 }
 
@@ -856,6 +867,9 @@ export function App() {
     useState<ComposerOverlay>(() =>
       initialComposerOverlay(initialSelection.frame),
     );
+  const [composerMode, setComposerMode] = useState<ComposerMode>(() =>
+    initialComposerMode(initialSelection.frame),
+  );
   const [composerPermissionId, setComposerPermissionId] =
     useState("full");
   const [composerResourceActiveId, setComposerResourceActiveId] =
@@ -1750,9 +1764,11 @@ export function App() {
         ? "queue-paused"
         : activeFrame === "composer-attachment"
           ? "attachment"
-          : composerValue.includes("\n")
-            ? "multiline"
-            : "idle";
+          : composerMode
+            ? composerMode
+            : composerValue.includes("\n")
+              ? "multiline"
+              : "idle";
   const currentMcpReplay =
     mode === "replay" &&
     (scenarioId === "mcp-tool-call" ||
@@ -1912,6 +1928,20 @@ export function App() {
                 </button>
               }
             />
+            {composerMode ? (
+              <ComposerModeIndicator
+                clearLabel={
+                  composerMode === "goal" ? "Clear goal" : "Plan"
+                }
+                kind={composerMode}
+                label={composerMode === "goal" ? "Goal" : "Plan"}
+                onClear={() => {
+                  setComposerMode(null);
+                  setActiveFrame(null);
+                  requestAnimationFrame(() => composerInputRef.current?.focus());
+                }}
+              />
+            ) : null}
           </span>
         ) : undefined
       }
@@ -1951,11 +1981,15 @@ export function App() {
       onSubmit={submitComposer}
       onValueChange={setComposerValue}
       placeholder={
-        showMeasuredComposer || showLifecycleComposer
-          ? "Do anything"
-          : mode === "live"
-          ? "Ask Codex to inspect this repository…"
-          : "Switch to Live to send a real local turn…"
+        composerMode === "goal"
+          ? "Describe your goal, define measurable outcomes for best results"
+          : composerMode === "plan"
+            ? "Describe your task to generate a plan..."
+            : showMeasuredComposer || showLifecycleComposer
+              ? "Do anything"
+              : mode === "live"
+                ? "Ask Codex to inspect this repository…"
+                : "Switch to Live to send a real local turn…"
       }
       stopLabel="Stop"
       suggestions={
@@ -1968,12 +2002,22 @@ export function App() {
             onDismiss={dismissComposerResources}
             onSelect={(option) => {
               setComposerResourceActiveId(option.id);
+              if (option.id === "goal" || option.id === "plan") {
+                setComposerMode(option.id);
+                setComposerValue("");
+              }
               dismissComposerResources();
             }}
           />
         ) : undefined
       }
-      textareaLabel="Message composer"
+      textareaLabel={
+        composerMode === "goal"
+          ? "Describe your goal, define measurable outcomes for best results"
+          : composerMode === "plan"
+            ? "Describe your task to generate a plan..."
+            : "Message composer"
+      }
       ref={composerInputRef}
       value={composerValue}
     />
@@ -3966,6 +4010,9 @@ export function App() {
       data-composer-phase={isConversationLifecycle ? composerPhase : undefined}
       data-composer-overlay={
         isConversationLifecycle ? composerOverlay ?? undefined : undefined
+      }
+      data-composer-mode={
+        isConversationLifecycle ? composerMode ?? undefined : undefined
       }
       data-queue-count={
         isConversationLifecycle ? queuedPrompts.length : undefined

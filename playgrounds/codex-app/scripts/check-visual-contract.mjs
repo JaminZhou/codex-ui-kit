@@ -84,6 +84,10 @@ const currentBuildComposerPermissionsReference =
   process.env.CODEX_UI_KIT_COMPOSER_PERMISSIONS_REFERENCE;
 const currentBuildComposerResourcesReference =
   process.env.CODEX_UI_KIT_COMPOSER_RESOURCES_REFERENCE;
+const currentBuildComposerGoalReference =
+  process.env.CODEX_UI_KIT_COMPOSER_GOAL_REFERENCE;
+const currentBuildComposerPlanReference =
+  process.env.CODEX_UI_KIT_COMPOSER_PLAN_REFERENCE;
 const currentBuildComposerMenuReferenceSize = {
   height: 820,
   width: 906,
@@ -906,6 +910,10 @@ for (const scene of selectedScenes) {
         ? currentBuildComposerPermissionsReference
         : scene.id === "composer-resources-menu"
           ? currentBuildComposerResourcesReference
+          : scene.id === "composer-goal"
+            ? currentBuildComposerGoalReference
+            : scene.id === "composer-plan"
+              ? currentBuildComposerPlanReference
           : undefined;
   if (currentBuildComposerLifecycleReference) {
     const reference = flattenPng(
@@ -951,7 +959,8 @@ for (const scene of selectedScenes) {
             { height: 90, left: 95, top: 675, width: 600 },
             { height: 45, left: 95, top: 765, width: 710 },
           ]
-        : [
+        : scene.id === "composer-resources-menu"
+          ? [
             { height: 335, left: 0, top: 0, width: 906 },
             { height: 335, left: 0, top: 335, width: 80 },
             { height: 335, left: 825, top: 335, width: 81 },
@@ -960,7 +969,13 @@ for (const scene of selectedScenes) {
             { height: 45, left: 825, top: 775, width: 81 },
             { height: 90, left: 95, top: 675, width: 600 },
             { height: 45, left: 95, top: 765, width: 710 },
-          ];
+            ]
+          : [
+              { height: 665, left: 0, top: 0, width: 906 },
+              { height: 155, left: 0, top: 665, width: 75 },
+              { height: 155, left: 835, top: 665, width: 71 },
+              { height: 55, left: 600, top: 765, width: 235 },
+            ];
     const maskedReference = maskPng(clonePng(reference), masks);
     const maskedActual = maskPng(clonePng(actualRegion), masks);
     const comparison = comparePng(maskedReference, maskedActual);
@@ -969,7 +984,11 @@ for (const scene of selectedScenes) {
         ? "CODEX_UI_KIT_COMPOSER_MULTILINE_MAX_DIFF_RATIO"
         : scene.id === "composer-permissions-menu"
           ? "CODEX_UI_KIT_COMPOSER_PERMISSIONS_MAX_DIFF_RATIO"
-          : "CODEX_UI_KIT_COMPOSER_RESOURCES_MAX_DIFF_RATIO",
+          : scene.id === "composer-resources-menu"
+            ? "CODEX_UI_KIT_COMPOSER_RESOURCES_MAX_DIFF_RATIO"
+            : scene.id === "composer-goal"
+              ? "CODEX_UI_KIT_COMPOSER_GOAL_MAX_DIFF_RATIO"
+              : "CODEX_UI_KIT_COMPOSER_PLAN_MAX_DIFF_RATIO",
       scene.id === "composer-resources-menu" ? 0.008 : 0.005,
     );
     await writeFile(
