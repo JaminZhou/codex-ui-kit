@@ -2814,8 +2814,9 @@ export function App() {
     );
   });
   const activeTurnHasWork = hasActiveTurnWork(state);
-  const terminalCommands = state.commands.filter(({ processId }) =>
-    Boolean(processId),
+  const terminalCommands = useMemo(
+    () => state.commands.filter(({ processId }) => Boolean(processId)),
+    [state.commands],
   );
   const visibleTerminalSessionIds = terminalSessionIds.filter(
     (id) =>
@@ -2826,55 +2827,69 @@ export function App() {
     visibleTerminalSessionIds.includes(terminalCommandId ?? "")
       ? (terminalCommandId ?? "")
       : (visibleTerminalSessionIds.at(-1) ?? "");
-  const terminalEntriesFor = (sessionId: string): TerminalEntry[] => {
-    const terminalCommand = terminalCommands.find(
-      ({ id }) => id === sessionId,
-    );
-    const terminalHistory =
-      terminalHistoryByCommand[sessionId] ?? [];
-    if (!terminalCommand) return terminalHistory;
-    const protocolEntries =
-      terminalCommand.terminalEvents.length > 0
-        ? terminalTranscriptEvents(terminalCommand.terminalEvents).map(
-            (entry, index) => ({
-              id: `${terminalCommand.id}:event:${index}`,
-              kind:
-                entry.kind === "stdin"
-                  ? ("command" as const)
-                  : ("stdout" as const),
-              text: entry.text.replace(/\n$/, ""),
-            }),
-          )
-        : [
-            ...(terminalCommand.output
-              ? [
-                  {
-                    id: `${terminalCommand.id}:output`,
-                    kind: "stdout" as const,
-                    text: terminalCommand.output.replace(/\n$/, ""),
-                  },
-                ]
-              : []),
-            ...(terminalCommand.terminalInput
-              ? [
-                  {
-                    id: `${terminalCommand.id}:stdin`,
-                    kind: "command" as const,
-                    text: terminalCommand.terminalInput.replace(/\n$/, ""),
-                  },
-                ]
-              : []),
-          ];
-    return [
-      {
-        id: `${terminalCommand.id}:command`,
-        kind: "command",
-        text: `${terminalCommand.cwd} % ${terminalCommand.command}`,
-      },
-      ...protocolEntries,
-      ...terminalHistory,
-    ];
-  };
+  const terminalEntriesBySession = useMemo(() => {
+    const entriesBySession: Record<string, TerminalEntry[]> = {};
+    for (const sessionId of terminalSessionIds) {
+      const terminalCommand = terminalCommands.find(
+        ({ id }) => id === sessionId,
+      );
+      const terminalHistory =
+        terminalHistoryByCommand[sessionId] ?? [];
+      if (!terminalCommand) {
+        entriesBySession[sessionId] = terminalHistory;
+        continue;
+      }
+      const protocolEntries =
+        terminalCommand.terminalEvents.length > 0
+          ? terminalTranscriptEvents(terminalCommand.terminalEvents).map(
+              (entry, index) => ({
+                id: `${terminalCommand.id}:event:${index}`,
+                kind:
+                  entry.kind === "stdin"
+                    ? ("command" as const)
+                    : ("stdout" as const),
+                text: entry.text.replace(/\n$/, ""),
+              }),
+            )
+          : [
+              ...(terminalCommand.output
+                ? [
+                    {
+                      id: `${terminalCommand.id}:output`,
+                      kind: "stdout" as const,
+                      text: terminalCommand.output.replace(/\n$/, ""),
+                    },
+                  ]
+                : []),
+              ...(terminalCommand.terminalInput
+                ? [
+                    {
+                      id: `${terminalCommand.id}:stdin`,
+                      kind: "command" as const,
+                      text: terminalCommand.terminalInput.replace(
+                        /\n$/,
+                        "",
+                      ),
+                    },
+                  ]
+                : []),
+            ];
+      entriesBySession[sessionId] = [
+        {
+          id: `${terminalCommand.id}:command`,
+          kind: "command",
+          text: `${terminalCommand.cwd} % ${terminalCommand.command}`,
+        },
+        ...protocolEntries,
+        ...terminalHistory,
+      ];
+    }
+    return entriesBySession;
+  }, [
+    terminalCommands,
+    terminalHistoryByCommand,
+    terminalSessionIds,
+  ]);
   const terminalSessions = visibleTerminalSessionIds.map(
     (sessionId) => {
       const terminalCommand = terminalCommands.find(
@@ -2896,7 +2911,7 @@ export function App() {
           ? `${workspaceRunProjectLabel} ${sessionNumber}`
           : workspaceRunProjectLabel;
       return {
-        entries: terminalEntriesFor(sessionId),
+        entries: terminalEntriesBySession[sessionId]!,
         id: sessionId,
         label,
         status:

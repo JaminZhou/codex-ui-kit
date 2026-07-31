@@ -957,6 +957,38 @@ try {
       "Electron Terminal did not preserve per-session controlled input.",
     );
   }
+  for (let index = 0; index < 10; index += 1) {
+    await terminalInput.fill(`history-${index}`);
+    await terminalInput.press("Enter");
+  }
+  const terminalTranscript = terminalLifecyclePage.locator(
+    ".codex-ui-terminal-transcript",
+  );
+  const terminalScrollRange = await terminalTranscript.evaluate(
+    (element) => ({
+      clientHeight: element.clientHeight,
+      scrollHeight: element.scrollHeight,
+    }),
+  );
+  if (
+    terminalScrollRange.scrollHeight <= terminalScrollRange.clientHeight
+  ) {
+    throw new Error(
+      "Electron Terminal history did not become scrollable.",
+    );
+  }
+  await terminalTranscript.evaluate((element) => {
+    element.scrollTop = 0;
+  });
+  await terminalInput.fill("draft while reviewing history");
+  if (
+    (await terminalTranscript.evaluate((element) => element.scrollTop)) >
+    1
+  ) {
+    throw new Error(
+      "Electron Terminal typing changed the reviewed transcript position.",
+    );
+  }
 
   await terminalLifecyclePage
     .getByRole("button", { name: "Close codex-ui-kit 2 tab" })
