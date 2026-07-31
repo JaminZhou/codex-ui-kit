@@ -59,14 +59,15 @@ observation from a previous build remains historical evidence.
   Pull requests loading/selection continuity, the New chat Composer/context
   row and project picker, the read-only project-named Terminal tab, and public
   PR Summary/Code with integrated Timeline and responsive detail restoration;
-  successful Code content is observed, while mutating review/comment/merge,
+  successful Code content plus successful and recovered OpenAI Developer Docs
+  calls are observed, while mutating review/comment/merge,
   light-theme, global notifications, current-build long-thread
   virtualization, and unrelated surface evidence remain pending
 
-Current inventory: 75 surface groups; 22 have current-build runtime evidence,
-34 have previous-build-only runtime evidence, 19 remain `not_sampled`, and 0
-are `blocked_by_policy`. Current-build Browser verification covers 18 groups
-and Electron verification covers 18. Prior acceptance outside the sampled
+Current inventory: 75 surface groups; 23 have current-build runtime evidence,
+33 have previous-build-only runtime evidence, 19 remain `not_sampled`, and 0
+are `blocked_by_policy`. Current-build Browser verification covers 19 groups
+and Electron verification covers 19. Prior acceptance outside the sampled
 shell, sidebar, New chat, and Pull request slices remains recorded as
 `partial_legacy` until current-build re-observation.
 
@@ -474,25 +475,29 @@ and CDP separately gates the masked typography and disclosure properties.
 `thread.mcp-tool-events` is therefore current-build
 Browser/Electron verified.
 
-Build `26.721.81911` now adds a separate real recovery path. A disposable
-task deliberately calls `fetch_openai_doc` with `not-a-valid-url`, exposes the
-expanded neutral `plaintext / Invalid URL` output, retries with
-`search_openai_docs`, and finishes with a valid `fetch_openai_doc`. The
-current Renderer groups the three rows under `Worked for 28s` and
-`Used OpenAI Developer Docs integration`; an earlier failed call therefore
-does not make the recovered group itself failed. The independent replay tracks
-terminal-event order so overlapping calls cannot be misclassified from their
-start order.
+Build `26.721.81911` first established a separate real recovery path. Build
+`26.727.40816` now refreshes it with a disposable task that deliberately calls
+Fetch OpenAI doc with `not-a-valid-url`, exposes the expanded neutral
+`plaintext / Invalid URL` output, explains the retry, then performs three
+Search OpenAI docs calls and a successful Fetch OpenAI doc call. The current
+Renderer keeps the failed Fetch as a standalone activity row and groups the
+four recovery calls under `Worked for 51s` and
+`Used OpenAI Developer Docs integration`. The independent replay tracks that
+separation and terminal-event order so an earlier failed call cannot make the
+later recovered group itself failed.
 
 The public App Server traces use only schema-validated `mcpToolCall` start,
 progress, result, error, and completion fields. The new deterministic scenario
 continues into a second turn containing two commands, an accepted approval,
-one file change, and the Review panel. CDP gates 22 lifecycle frames and the
-real `BrowserWindow` acceptance expands the historical recovery group while
-the Review split remains open. The current-build 906×820 regional gate passed
-at the strict 0.05 pixel threshold with changed-pixel ratios of 0.029202337
-for the full main region, 0.051956799 for the recovery region, 0.047369405
-for the user region, and 0.015698995 for the Composer region.
+one file change, and the Review panel. CDP and real `BrowserWindow`
+acceptance cover the standalone failure, recovered four-call group,
+raw-output dialog, and mixed Review split within the 58-frame lifecycle
+matrix. The current-build masked 906×820 regional gate passes at the strict
+0.05 pixel threshold with changed-pixel ratios of 0.016253432 for the full
+main region, 0.028989319 for the recovery region, 0.010849453 for the upper
+activity/failure region, and 0.019065999 for the Composer region. The final
+answer remains unmasked; CDP independently locks masked labels and computed
+styles.
 
 This promotes `thread.mcp-tool-events` and the newly split
 `thread.mcp-tool-failure-retry` gate for the sampled current-build path.

@@ -151,18 +151,19 @@ contract:
 The tenth slice adds current-build MCP failure recovery and a mixed second
 turn:
 
-- a real OpenAI Developer Docs invalid-URL failure followed by Search and a
-  valid Fetch in Codex Desktop `26.721.81911`;
-- a recovered integration group whose earlier failed call remains expandable
-  as neutral `plaintext / Invalid URL` output;
+- a refreshed real OpenAI Developer Docs invalid-URL failure followed by three
+  Search calls and a valid Fetch in Codex Desktop `26.727.40816`;
+- a standalone failed Fetch whose neutral `plaintext / Invalid URL` output
+  remains expandable before the later recovered integration group;
 - a schema-validated two-turn replay that continues through two commands, one
   accepted approval, one file change, and Review;
 - CDP computed-style and geometry gates plus a real Electron disclosure and
   mixed-thread interaction flow;
 - four additional reviewed frames for failed, retrying, recovered, and mixed
   Review states;
-- an optional 906×820 current-build comparison for full-main, recovery, user,
-  and Composer regions.
+- an optional masked 906×820 current-build comparison for full-main, recovery,
+  upper activity/failure, and Composer regions while leaving the final answer
+  unmasked.
 
 ## Eleventh vertical slice
 

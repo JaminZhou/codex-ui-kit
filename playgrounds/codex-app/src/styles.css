@@ -697,6 +697,9 @@ textarea {
 
 .demo-root[data-scenario="mcp-tool-call"]
   .demo-composer-controls
+  button:last-child,
+.demo-root[data-scenario="mcp-recovery-mixed-thread"]
+  .demo-composer-controls
   button:last-child {
   color: #ff8b37;
 }
@@ -753,6 +756,8 @@ textarea {
 }
 
 .demo-root[data-scenario="mcp-tool-call"]
+  .codex-ui-activity-timeline__toggle,
+.demo-root[data-scenario="mcp-recovery-mixed-thread"]
   .codex-ui-activity-timeline__toggle {
   font-size: 14px;
   font-weight: 445;
@@ -763,6 +768,80 @@ textarea {
   .codex-ui-activity-timeline__content
   > .demo-mcp-recovery-intro {
   margin-bottom: 12px;
+}
+
+.demo-root[data-scenario="mcp-recovery-mixed-thread"]
+  .demo-mcp-recovery-status {
+  margin-block: 16px 15px;
+}
+
+.demo-root[data-scenario="mcp-recovery-mixed-thread"]
+  .demo-mcp-recovery-failed-call
+  .codex-ui-activity__body {
+  margin-left: 0;
+}
+
+.demo-root[data-scenario="mcp-recovery-mixed-thread"]
+  .demo-mcp-recovery-failed-call
+  .codex-ui-tool-call__error[data-presentation="output"] {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.157);
+  border-radius: 12.5px;
+  min-height: 67.3125px;
+}
+
+.demo-root[data-scenario="mcp-recovery-mixed-thread"]
+  .demo-mcp-recovery-failed-call
+  .codex-ui-activity__header {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 14px;
+  font-weight: 445;
+  line-height: 21px;
+}
+
+.demo-root[data-scenario="mcp-recovery-mixed-thread"]
+  .demo-mcp-recovery-failed-call
+  .codex-ui-tool-call__error-language {
+  font-size: 13px;
+  line-height: 18.5714px;
+}
+
+.demo-root[data-scenario="mcp-recovery-mixed-thread"]
+  .demo-mcp-recovery-failed-call
+  .codex-ui-tool-call__error-output {
+  font-size: 14px;
+  font-weight: 445;
+  line-height: 22.75px;
+}
+
+.demo-root[data-scenario="mcp-recovery-mixed-thread"]
+  .codex-ui-activity-timeline:has(
+    [data-item-id="mcp-fetch-invalid"]
+  ) {
+  transform: translateY(2px);
+}
+
+.demo-root[data-scenario="mcp-recovery-mixed-thread"]
+  .codex-ui-thread-viewport {
+  scrollbar-width: none;
+}
+
+.demo-root[data-scenario="mcp-recovery-mixed-thread"]
+  .codex-ui-thread-viewport::-webkit-scrollbar {
+  display: none;
+}
+
+.demo-root[data-scenario="mcp-recovery-mixed-thread"]
+  [data-item-id="assistant-recovery"] {
+  gap: 3px;
+}
+
+.demo-root[data-scenario="mcp-recovery-mixed-thread"]
+  [data-item-id="assistant-recovery"]
+  .codex-ui-markdown
+  ol
+  + p {
+  margin-top: 11px;
 }
 
 .demo-raw-tool-output {
@@ -791,20 +870,30 @@ textarea {
 }
 
 .demo-root[data-scenario="mcp-tool-call"],
+.demo-root[data-scenario="mcp-recovery-mixed-thread"],
 .demo-root[data-scenario="mcp-tool-call"]
+  *:not(code):not(kbd):not(pre),
+.demo-root[data-scenario="mcp-recovery-mixed-thread"]
   *:not(code):not(kbd):not(pre) {
   font-family: -apple-system, "system-ui", "Segoe UI", sans-serif;
 }
 
 .demo-root[data-scenario="mcp-tool-call"]
   .codex-ui-mcp-tool-call-group,
+.demo-root[data-scenario="mcp-recovery-mixed-thread"]
+  .codex-ui-mcp-tool-call-group,
 .demo-root[data-scenario="mcp-tool-call"]
+  .codex-ui-mcp-tool-call-group
+  *,
+.demo-root[data-scenario="mcp-recovery-mixed-thread"]
   .codex-ui-mcp-tool-call-group
   * {
   color: rgba(255, 255, 255, 0.6);
 }
 
 .demo-root[data-scenario="mcp-tool-call"]
+  .codex-ui-turn-duration,
+.demo-root[data-scenario="mcp-recovery-mixed-thread"]
   .codex-ui-turn-duration {
   color: rgba(255, 255, 255, 0.6);
 }
@@ -812,6 +901,10 @@ textarea {
 .demo-root[data-scenario="mcp-tool-call"]
   .codex-ui-thread-viewport__content,
 .demo-root[data-scenario="mcp-tool-call"]
+  .codex-ui-conversation-thread-shell__composer,
+.demo-root[data-scenario="mcp-recovery-mixed-thread"]
+  .codex-ui-thread-viewport__content,
+.demo-root[data-scenario="mcp-recovery-mixed-thread"]
   .codex-ui-conversation-thread-shell__composer {
   transform: translateX(0.046875px);
 }

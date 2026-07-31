@@ -1452,7 +1452,9 @@ export function App() {
             ? "multiline"
             : "idle";
   const currentMcpReplay =
-    mode === "replay" && scenarioId === "mcp-tool-call";
+    mode === "replay" &&
+    (scenarioId === "mcp-tool-call" ||
+      scenarioId === "mcp-recovery-mixed-thread");
   const header = (
     <ThreadHeader
       endActions={
@@ -2794,7 +2796,8 @@ export function App() {
       if (!message) return null;
       if (
         ((scenarioId === "mcp-recovery-mixed-thread" &&
-          message.id === "assistant-recovery-intro") ||
+          (message.id === "assistant-recovery-intro" ||
+            message.id === "assistant-recovery-status")) ||
           (scenarioId === "mcp-tool-call" &&
             message.id === "assistant-mcp-intro")) &&
         hasMcpToolCallGroupForTurn(state, message.turnId)
@@ -2894,24 +2897,147 @@ export function App() {
       const calls = mcpToolCallGroupForEntry(state, entryIndex);
       if (!calls) return null;
       const toolCall = calls[0];
+      if (scenarioId === "mcp-recovery-mixed-thread") {
+        const failedCall = calls.find(
+          ({ id }) => id === "mcp-fetch-invalid",
+        );
+        if (!failedCall || entry.id !== failedCall.id) return null;
+
+        const recoveryCalls = calls.filter(
+          ({ id }) => id !== failedCall.id,
+        );
+        const toolIntro = state.messages.find(
+          ({ id }) => id === "assistant-recovery-intro",
+        );
+        const recoveryStatus = state.messages.find(
+          ({ id }) => id === "assistant-recovery-status",
+        );
+        const failedPresentation =
+          mcpToolCallPresentation(failedCall);
+        const recoveryGroupStatus =
+          recoveryCalls.length > 0
+            ? mcpToolCallGroupStatus(recoveryCalls)
+            : undefined;
+        const captureOpen =
+          initialSelection.capture &&
+          (activeFrame === "mcp-running" ||
+            activeFrame === "mcp-progress" ||
+            activeFrame === "mcp-tool-calls" ||
+            activeFrame === "mcp-recovery-failed" ||
+            activeFrame === "mcp-recovery-retrying" ||
+            activeFrame === "mcp-recovery-completed");
+        const durationMs = mcpToolCallGroupDurationMs(state, calls);
+
+        return (
+          <ActivityTimeline
+            key={`mcp-recovery:${failedCall.turnId}:${failedCall.server}`}
+            open={initialSelection.capture ? captureOpen : undefined}
+            summary={
+              <TurnDuration
+                durationMs={durationMs}
+                status={
+                  state.currentTurnId === failedCall.turnId
+                    ? "working"
+                    : "worked"
+                }
+              />
+            }
+          >
+            {toolIntro ? (
+              <AgentMessage
+                className="demo-mcp-recovery-intro"
+                data-item-id={toolIntro.id}
+                role="assistant"
+                status={agentMessageStatus(toolIntro.status)}
+              >
+                <AgentMarkdown>{toolIntro.text}</AgentMarkdown>
+              </AgentMessage>
+            ) : null}
+            <ToolCallCard
+              className="demo-mcp-recovery-failed-call"
+              data-item-id={failedCall.id}
+              error={failedPresentation.error}
+              errorLanguage="plaintext"
+              errorPresentation="output"
+              failedAriaLabel={`${failedCall.toolLabel} failed`}
+              failedLabel={failedCall.toolLabel}
+              icon={<McpToolIcon />}
+              name={failedCall.toolLabel}
+              open={
+                initialSelection.capture &&
+                (activeFrame === "mcp-recovery-failed" ||
+                  activeFrame === "mcp-recovery-completed")
+                  ? true
+                  : undefined
+              }
+              onViewRawOutput={(value) =>
+                setRawToolOutput({
+                  name: failedCall.toolLabel,
+                  value,
+                })
+              }
+              rawOutput={{
+                arguments: failedCall.arguments,
+                error: failedCall.error,
+              }}
+              result={failedPresentation.result}
+              role="listitem"
+              source={failedCall.server}
+              status={failedCall.status}
+              structuredContent={failedPresentation.structuredContent}
+              summary={failedPresentation.summary}
+            />
+            {recoveryStatus ? (
+              <AgentMessage
+                className="demo-mcp-recovery-status"
+                data-item-id={recoveryStatus.id}
+                role="assistant"
+                status={agentMessageStatus(recoveryStatus.status)}
+              >
+                <AgentMarkdown>{recoveryStatus.text}</AgentMarkdown>
+              </AgentMessage>
+            ) : null}
+            {recoveryCalls.length > 0 && recoveryGroupStatus ? (
+              <McpToolCallGroup
+                data-testid="mcp-tool-call-group"
+                defaultOpen={false}
+                name={recoveryCalls[0]?.appName ?? failedCall.appName}
+                open={initialSelection.capture ? captureOpen : undefined}
+                source={recoveryCalls[0]?.server ?? failedCall.server}
+                status={recoveryGroupStatus}
+              >
+                {recoveryCalls.map((call) => {
+                  const presentation = mcpToolCallPresentation(call);
+                  return (
+                    <ToolCallCard
+                      data-item-id={call.id}
+                      error={presentation.error}
+                      icon={<McpToolIcon />}
+                      key={call.id}
+                      name={call.toolLabel}
+                      result={presentation.result}
+                      role="listitem"
+                      source={call.server}
+                      status={call.status}
+                      structuredContent={presentation.structuredContent}
+                      summary={presentation.summary}
+                    />
+                  );
+                })}
+              </McpToolCallGroup>
+            ) : null}
+          </ActivityTimeline>
+        );
+      }
       const toolIntro = state.messages.find(
-        ({ id }) =>
-          id ===
-          (scenarioId === "mcp-recovery-mixed-thread"
-            ? "assistant-recovery-intro"
-            : scenarioId === "mcp-tool-call"
-              ? "assistant-mcp-intro"
-              : ""),
+        ({ id }) => id === "assistant-mcp-intro",
       );
       const groupStatus = mcpToolCallGroupStatus(calls);
       const captureOpen =
         initialSelection.capture &&
         (activeFrame === "mcp-running" ||
           activeFrame === "mcp-progress" ||
-          activeFrame === "mcp-tool-calls" ||
-          activeFrame === "mcp-recovery-failed" ||
-          activeFrame === "mcp-recovery-retrying" ||
-          activeFrame === "mcp-recovery-completed");
+          activeFrame === "mcp-tool-calls");
       const durationMs = mcpToolCallGroupDurationMs(state, calls);
       return (
         <ActivityTimeline
@@ -2931,11 +3057,7 @@ export function App() {
         >
           {toolIntro ? (
             <AgentMessage
-              className={
-                scenarioId === "mcp-tool-call"
-                  ? "demo-mcp-recovery-intro demo-mcp-current-intro"
-                  : "demo-mcp-recovery-intro"
-              }
+              className="demo-mcp-recovery-intro demo-mcp-current-intro"
               data-item-id={toolIntro.id}
               role="assistant"
               status={agentMessageStatus(toolIntro.status)}

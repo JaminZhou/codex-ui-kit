@@ -1154,6 +1154,41 @@ for (const scene of visualScenes) {
             ).length,
           }
         : null;
+      const failedMcpCall = document.querySelector(
+        '[data-item-id="mcp-fetch-invalid"]',
+      );
+      const mcpFailure = failedMcpCall
+        ? {
+            accessibleLabel: failedMcpCall
+              .querySelector(".codex-ui-tool-call__label")
+              ?.getAttribute("aria-label"),
+            errorOutput: (() => {
+              const element = failedMcpCall.querySelector(
+                '.codex-ui-tool-call__error[data-presentation="output"]',
+              );
+              return element
+                ? {
+                    rect: rect(element),
+                    role: element.getAttribute("role"),
+                    text: element.textContent?.replace(/\s+/g, " ").trim(),
+                  }
+                : null;
+            })(),
+            expanded:
+              failedMcpCall
+                .querySelector(".codex-ui-activity__disclosure")
+                ?.hasAttribute("open") ?? false,
+            status: failedMcpCall.getAttribute("data-status"),
+            timelineExpanded:
+              failedMcpCall
+                .closest(".codex-ui-activity-timeline")
+                ?.hasAttribute("data-expanded") ?? false,
+            timelineLabel: failedMcpCall
+              .closest(".codex-ui-activity-timeline")
+              ?.querySelector(".codex-ui-activity-timeline__toggle")
+              ?.textContent?.trim(),
+          }
+        : null;
       return {
         composer: composerRect,
         frame: root.getAttribute("data-frame"),
@@ -1164,6 +1199,7 @@ for (const scene of visualScenes) {
         mode: root.getAttribute("data-mode"),
         markdown,
         mcp,
+        mcpFailure,
         namedSurfaces,
         review: {
           contentLabels: Array.from(
@@ -1919,7 +1955,8 @@ for (const scene of visualScenes) {
         contract.mcp.timelineLabel !== scene.timelineLabel ||
         contract.mcp.groupStyle.fontSize !== "14px" ||
         contract.mcp.groupStyle.lineHeight !== "21px" ||
-        (scene.id === "mcp-tool-calls" &&
+        ((scene.id === "mcp-tool-calls" ||
+          scene.id === "mcp-recovery-completed") &&
           (contract.mcp.groupStyle.fontFamily !==
             '-apple-system, "system-ui", "Segoe UI", sans-serif' ||
             contract.mcp.groupStyle.fontWeight !== "445" ||
@@ -1939,22 +1976,26 @@ for (const scene of visualScenes) {
           `${scene.id}: MCP capture scroll state drifted: ${JSON.stringify(contract.viewportScroll)}`,
         );
       }
-      if (
-        scene.errorOutput !== undefined &&
-        (!contract.mcp.errorOutput ||
-          contract.mcp.errorOutput.role !== "alert" ||
-          !contract.mcp.errorOutput.text?.includes(scene.errorOutput) ||
-          contract.mcp.errorOutput.rect.width < 600 ||
-          contract.mcp.errorOutput.rect.height < 64 ||
-          contract.mcp.callStatuses[0] !== "failed" ||
-          contract.mcp.failedCallAccessibleLabel !==
-            "Fetch OpenAI doc failed" ||
-          !contract.mcp.expandedCallIds.includes("mcp-fetch-invalid"))
-      ) {
-        throw new Error(
-          `${scene.id}: recovered MCP error output contract failed: ${JSON.stringify(contract.mcp)}`,
-        );
-      }
+    }
+    if (
+      scene.errorOutput !== undefined &&
+      (!contract.mcpFailure ||
+        contract.mcpFailure.errorOutput?.role !== "alert" ||
+        !contract.mcpFailure.errorOutput.text?.includes(
+          scene.errorOutput,
+        ) ||
+        contract.mcpFailure.errorOutput.rect.width < 600 ||
+        contract.mcpFailure.errorOutput.rect.height < 64 ||
+        contract.mcpFailure.status !== "failed" ||
+        contract.mcpFailure.accessibleLabel !==
+          "Fetch OpenAI doc failed" ||
+        !contract.mcpFailure.expanded ||
+        !contract.mcpFailure.timelineExpanded ||
+        contract.mcpFailure.timelineLabel !== scene.timelineLabel)
+    ) {
+      throw new Error(
+        `${scene.id}: recovered MCP error output contract failed: ${JSON.stringify(contract.mcpFailure)}`,
+      );
     }
 
     if (scene.id === "markdown-complete") {

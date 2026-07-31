@@ -58,13 +58,16 @@ The authoritative current-build inventory is:
   `app://-/index.html` URL plus application-shell landmarks and excludes the
   small auxiliary page. The successful MCP path now matches its two-call
   integrated activity disclosure and passes a current regional pixel gate.
+  The failure/recovery path now matches a standalone invalid-URL Fetch,
+  intermediate explanation, three Search rows, successful Fetch, linked
+  answer, and a second current regional pixel gate.
   The current PR changed to Summary/Code tabs with
   Timeline integrated into Summary, loaded real multi-file Code content, and
   exposed a display-only Review options menu. The independent Browser and
   Electron flows verify the matched shell/New chat/PR structures and all 58
   deterministic lifecycle frames. The refreshed PR regional gate passes at
   5.75% full-main, 4.68% index, and 6.44% detail difference. Full queue/Stop,
-  MCP recovery, Terminal multi-tab/process lifecycle, Review variants, broader
+  Terminal multi-tab/process lifecycle, Review variants, broader
   shell matrices, and their external pixels remain `26.721.81911` historical
   evidence. The current project-named single Terminal tab and close/add
   controls independently pass Browser, Electron, and regional pixel gates.

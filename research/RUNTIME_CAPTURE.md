@@ -343,6 +343,35 @@ Cleanup terminated only PID `59950`, verified the exact profile children and
 temporary reference images into one recoverable Trash directory. The
 original Codex process remained running.
 
+### Current 26.727.40816 MCP failure/recovery capture
+
+The recovery refresh used exact process PID `67251`, loopback port `9513`,
+and unique profile
+`/private/tmp/codex-ui-kit-mcp-recovery-cdp.7ztEiz`. In a disposable New chat
+task it authorized only OpenAI Developer Docs calls. The first Fetch used
+`not-a-valid-url` and failed with `Invalid URL`; recovery then used three
+Search calls and one valid Fetch. No shell, browser-navigation, or file action
+was requested or performed.
+
+The expanded 1180×820 Renderer exposed `Worked for 51s`, a standalone failed
+Fetch with 736×67.3125px neutral `plaintext / Invalid URL` output, an
+intermediate explanation, a later `Used OpenAI Developer Docs integration`
+group with four successful rows, and a linked final Markdown answer. Computed
+styles recorded the 12.5px failed-card radius, 0.05 white background, 0.157
+white border, 13/18.5714px language label, 14/22.75px 445-weight monospace
+output, and the existing 14/21px system-font integration rows.
+
+The masked 906×820 pixel gate passes at 1.63% full-main, 2.90% recovery,
+1.08% upper activity/failure, and 1.91% Composer difference. The final answer
+remains unmasked; CDP separately gates dynamic labels, disclosure ownership,
+status, accessibility, typography, and geometry.
+
+Cleanup terminated only PID `67251` plus the two exact Crashpad helpers left
+with that profile, verified the listener and all exact-profile processes were
+gone, and moved the profile and reference images into
+`/Users/JaminZhou/.Trash/codex-ui-kit-mcp-recovery-cleanup.yS1xY9`. The
+original Codex process remained running.
+
 ## Required flow matrix
 
 ### 1. Application entry and navigation

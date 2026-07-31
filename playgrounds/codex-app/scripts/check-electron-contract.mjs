@@ -430,13 +430,15 @@ const { app: recoveryApp, page: recoveryPage } = await launchScene(
 
 try {
   const recoveryTimeline = recoveryPage.getByRole("button", {
-    name: "Worked for 28s",
+    name: "Worked for 51s",
   });
   await recoveryTimeline.click();
   const recoveryGroup = recoveryPage.getByTestId("mcp-tool-call-group");
   await recoveryGroup.locator(":scope > details > summary").click();
   const recoveryCalls = recoveryGroup.locator(".codex-ui-tool-call");
-  const failedCall = recoveryCalls.first();
+  const failedCall = recoveryPage.locator(
+    '[data-item-id="mcp-fetch-invalid"]',
+  );
   await failedCall.locator("summary").click();
 
   const recoveryInteraction = await recoveryPage.evaluate(() => {
@@ -501,7 +503,7 @@ try {
     !recoveryInteraction.reviewPanelOpen ||
     JSON.stringify(recoveryInteraction.responseActionLabels) !==
       JSON.stringify(["MCP response actions", "Response actions"]) ||
-    recoveryInteraction.toolCount !== 3 ||
+    recoveryInteraction.toolCount !== 4 ||
     recoveryInteraction.userCount !== 2
   ) {
     throw new Error(

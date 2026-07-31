@@ -57,7 +57,8 @@ Every deterministic scenario has one ID and produces four evidence layers:
    row, and footer regions separately; the current MCP recovery scenario
    accepts a 906×820 main reference through
    `CODEX_UI_KIT_MCP_RECOVERY_REFERENCE` and gates the full main, recovered
-   call group, user prompt, and Composer regions separately; the App shell
+   call/answer region, upper activity/failure region, and Composer separately
+   while leaving the final answer unmasked; the App shell
    accepts a 120×46 ownership-scoped reference through
    `CODEX_UI_KIT_WINDOW_CHROME_REFERENCE`. Queued and paused Composer states
    accept separate 792×320 current-build crops through

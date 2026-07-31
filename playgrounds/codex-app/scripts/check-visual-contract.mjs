@@ -1429,7 +1429,20 @@ for (const scene of selectedScenes) {
     );
     await writeFile(currentBuildActualPath, PNG.sync.write(main));
 
-    const comparison = comparePng(reference, main);
+    const currentBuildRecoveryTextMasks = [
+      { height: 46, left: 0, top: 0, width: 906 },
+      { height: 18, left: 84, top: 46, width: 160 },
+      { height: 45, left: 84, top: 76, width: 738 },
+      { height: 25, left: 106, top: 134, width: 170 },
+      { height: 60, left: 92, top: 163, width: 180 },
+      { height: 28, left: 84, top: 272, width: 738 },
+      { height: 120, left: 106, top: 313, width: 310 },
+      { height: 600, left: 895, top: 48, width: 11 },
+    ];
+    const comparison = comparePng(
+      maskPng(clonePng(reference), currentBuildRecoveryTextMasks),
+      maskPng(clonePng(main), currentBuildRecoveryTextMasks),
+    );
     if (comparison.pixels > 0) {
       await writeFile(
         currentBuildDiffPath,
@@ -1440,16 +1453,26 @@ for (const scene of selectedScenes) {
     const regions = {
       composer: { height: 99, left: 84, top: 706, width: 738 },
       recovery: { height: 340, left: 84, top: 245, width: 738 },
-      user: { height: 145, left: 84, top: 70, width: 738 },
+      upper: { height: 145, left: 84, top: 70, width: 738 },
     };
-    const compareRegion = ({ height, left, top, width }) =>
+    const compareRegion = ({ height, left, top, width }, masks = []) =>
       comparePng(
-        cropPng(reference, left, top, width, height),
-        cropPng(main, left, top, width, height),
+        maskPng(
+          cropPng(reference, left, top, width, height),
+          masks,
+        ),
+        maskPng(cropPng(main, left, top, width, height), masks),
       );
     const composerComparison = compareRegion(regions.composer);
-    const recoveryComparison = compareRegion(regions.recovery);
-    const userComparison = compareRegion(regions.user);
+    const recoveryComparison = compareRegion(regions.recovery, [
+      { height: 35, left: 0, top: 25, width: 738 },
+      { height: 125, left: 22, top: 65, width: 310 },
+    ]);
+    const upperComparison = compareRegion(regions.upper, [
+      { height: 47, left: 0, top: 6, width: 738 },
+      { height: 30, left: 22, top: 60, width: 170 },
+      { height: 55, left: 8, top: 90, width: 180 },
+    ]);
     const maximumComposerRatio = environmentRatio(
       "CODEX_UI_KIT_MCP_RECOVERY_COMPOSER_MAX_DIFF_RATIO",
       0.03,
@@ -1458,9 +1481,12 @@ for (const scene of selectedScenes) {
       "CODEX_UI_KIT_MCP_RECOVERY_TOOL_MAX_DIFF_RATIO",
       0.07,
     );
-    const maximumUserRatio = environmentRatio(
-      "CODEX_UI_KIT_MCP_RECOVERY_USER_MAX_DIFF_RATIO",
-      0.05,
+    const maximumUpperRatio = environmentRatio(
+      "CODEX_UI_KIT_MCP_RECOVERY_UPPER_MAX_DIFF_RATIO",
+      Number(
+        process.env.CODEX_UI_KIT_MCP_RECOVERY_USER_MAX_DIFF_RATIO ??
+          0.05,
+      ),
     );
     const maximumRatio = environmentRatio(
       "CODEX_UI_KIT_MCP_RECOVERY_MAX_DIFF_RATIO",
@@ -1470,19 +1496,19 @@ for (const scene of selectedScenes) {
       composerComparison.ratio > maximumComposerRatio ||
       comparison.ratio > maximumRatio ||
       recoveryComparison.ratio > maximumRecoveryRatio ||
-      userComparison.ratio > maximumUserRatio
+      upperComparison.ratio > maximumUpperRatio
     ) {
       throw new Error(
         `${scene.id}: current-build MCP recovery pixel ratios ${JSON.stringify({
           composer: composerComparison.ratio,
           full: comparison.ratio,
           recovery: recoveryComparison.ratio,
-          user: userComparison.ratio,
+          upper: upperComparison.ratio,
         })} exceed ${JSON.stringify({
           composer: maximumComposerRatio,
           full: maximumRatio,
           recovery: maximumRecoveryRatio,
-          user: maximumUserRatio,
+          upper: maximumUpperRatio,
         })}.`,
       );
     }
@@ -1491,7 +1517,7 @@ for (const scene of selectedScenes) {
         composer: composerComparison.ratio,
         full: comparison.ratio,
         recovery: recoveryComparison.ratio,
-        user: userComparison.ratio,
+        upper: upperComparison.ratio,
       })}`,
     );
   }

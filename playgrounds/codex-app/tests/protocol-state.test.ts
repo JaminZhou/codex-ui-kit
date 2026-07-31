@@ -125,9 +125,11 @@ describe("protocol lifecycle reducer", () => {
       "failed",
       "completed",
       "completed",
+      "completed",
+      "completed",
     ]);
-    expect(recovered.turnDurationsMs["turn-recovery"]).toBe(28_000);
-    expect(recovered.messages.at(-1)?.text).toContain("恢复成功");
+    expect(recovered.turnDurationsMs["turn-recovery"]).toBe(51_000);
+    expect(recovered.messages.at(-1)?.text).toContain("恢复测试成功");
 
     expect(completed.status).toBe("completed");
     expect(completed.commands).toHaveLength(2);
@@ -153,12 +155,15 @@ describe("protocol lifecycle reducer", () => {
       }),
     ]);
     expect(completed.turnDurationsMs).toMatchObject({
-      "turn-recovery": 28_000,
+      "turn-recovery": 51_000,
       "turn-workflow": 1_520,
     });
     expect(completed.timeline.map(({ kind }) => kind)).toEqual([
       "message",
       "message",
+      "mcpToolCall",
+      "message",
+      "mcpToolCall",
       "mcpToolCall",
       "mcpToolCall",
       "mcpToolCall",

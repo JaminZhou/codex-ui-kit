@@ -143,7 +143,7 @@ export const replayScenarios: Record<ReplayScenarioId, ReplayScenario> = {
   ),
   "mcp-recovery-mixed-thread": scenario(
     "mcp-recovery-mixed-thread",
-    "Verify Codex MCP docs recovery",
+    "Recover Codex MCP docs lookup",
     "A failed fetch recovers through search, then a second turn runs a command, approval, and file review.",
     mcpRecoveryMixedThreadTrace,
   ),

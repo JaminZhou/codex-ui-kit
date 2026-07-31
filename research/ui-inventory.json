@@ -237,11 +237,13 @@
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
         "cdp-26.721.81911:real-openai-developer-docs-invalid-url-search-fetch-recovery-expanded-1180x820",
-        "cdp-26.721.81911:real-failed-fetch-plaintext-output-and-recovered-integration-group"
+        "cdp-26.721.81911:real-failed-fetch-plaintext-output-and-recovered-integration-group",
+        "cdp-26.727.40816:real-openai-developer-docs-invalid-url-three-search-fetch-recovery-expanded-1180x820",
+        "cdp-26.727.40816:real-mcp-recovery-computed-styles-and-masked-906x820-regional-pixel-gate"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "partial_legacy",
-      "electronStatus": "partial_legacy",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
       "priority": "p0"
     },
     {
