@@ -2571,6 +2571,121 @@ try {
   await conversationLifecycleApp.close();
 }
 
+const currentWindowedScene = {
+  frame: "thread-windowed",
+  id: "electron-current-windowed-thread",
+  scenario: "conversation-lifecycle",
+};
+const {
+  app: currentWindowedApp,
+  page: currentWindowedPage,
+} = await launchScene(currentWindowedScene, { capture: false });
+try {
+  await currentWindowedPage.waitForSelector(
+    '.demo-root[data-windowed-timeline="current"][data-thread-following="false"] [data-selected-message-index="40"]',
+  );
+  const currentWindowedGeometry = await currentWindowedPage.evaluate(() => {
+    const viewport = document.querySelector(
+      ".codex-ui-conversation-thread-shell__viewport",
+    );
+    const list = document.querySelector(
+      ".codex-ui-message-navigation-rail__list",
+    );
+    const selected = document.querySelector(
+      '.codex-ui-message-navigation-rail__button[aria-current="true"]',
+    );
+    const marker = selected?.querySelector(
+      ".codex-ui-message-navigation-rail__marker",
+    );
+    if (!viewport || !list || !selected || !marker) return null;
+    const listRect = list.getBoundingClientRect();
+    const selectedRect = selected.getBoundingClientRect();
+    const markerRect = marker.getBoundingClientRect();
+    return {
+      list: {
+        clientHeight: list.clientHeight,
+        height: listRect.height,
+        left: listRect.left,
+        scrollHeight: list.scrollHeight,
+        top: listRect.top,
+        width: listRect.width,
+      },
+      marker: {
+        height: markerRect.height,
+        opacity: getComputedStyle(marker).opacity,
+        width: markerRect.width,
+      },
+      mountedTurns: document.querySelectorAll("[data-windowed-turn]")
+        .length,
+      mountedUserBubbles: document.querySelectorAll(
+        '[data-mounted-turn-count] .codex-ui-agent-message[data-role="user"]',
+      ).length,
+      navigationButtons: document.querySelectorAll(
+        ".codex-ui-message-navigation-rail__button",
+      ).length,
+      selectedButton: {
+        height: selectedRect.height,
+        width: selectedRect.width,
+      },
+      viewport: {
+        flexDirection: getComputedStyle(viewport).flexDirection,
+        latestOrigin: viewport.getAttribute("data-latest-origin"),
+        scrollHeight: viewport.scrollHeight,
+        scrollTop: viewport.scrollTop,
+      },
+    };
+  });
+  if (
+    !currentWindowedGeometry ||
+    currentWindowedGeometry.navigationButtons !== 82 ||
+    currentWindowedGeometry.mountedTurns !== 7 ||
+    currentWindowedGeometry.mountedUserBubbles !== 7 ||
+    currentWindowedGeometry.viewport.latestOrigin !== "start" ||
+    currentWindowedGeometry.viewport.flexDirection !== "column-reverse" ||
+    currentWindowedGeometry.viewport.scrollTop >= -10_000 ||
+    currentWindowedGeometry.viewport.scrollHeight < 40_000 ||
+    currentWindowedGeometry.list.clientHeight !== 574 ||
+    currentWindowedGeometry.list.scrollHeight !== 820 ||
+    Math.abs(currentWindowedGeometry.list.left - 290) > 1 ||
+    Math.abs(currentWindowedGeometry.list.top - 146.5) > 1 ||
+    Math.abs(currentWindowedGeometry.list.width - 36) > 1 ||
+    Math.abs(currentWindowedGeometry.list.height - 574) > 1 ||
+    Math.abs(currentWindowedGeometry.selectedButton.width - 36) > 1 ||
+    Math.abs(currentWindowedGeometry.selectedButton.height - 10) > 1 ||
+    Math.abs(currentWindowedGeometry.marker.width - 26) > 1 ||
+    Math.abs(currentWindowedGeometry.marker.height - 2) > 1 ||
+    currentWindowedGeometry.marker.opacity !== "1"
+  ) {
+    throw new Error(
+      `Electron current windowed-thread geometry failed: ${JSON.stringify(currentWindowedGeometry)}`,
+    );
+  }
+
+  await currentWindowedPage
+    .getByRole("button", { name: "Jump to user message 20" })
+    .click();
+  await currentWindowedPage.waitForSelector(
+    '[data-selected-message-index="20"] [data-item-id="current-windowed-user-20"]',
+  );
+  await currentWindowedPage
+    .getByRole("button", { name: "Scroll to bottom" })
+    .click();
+  await currentWindowedPage.waitForFunction(
+    () =>
+      document
+        .querySelector(".demo-root")
+        ?.getAttribute("data-thread-following") === "true" &&
+      document
+        .querySelector("[data-selected-message-index]")
+        ?.getAttribute("data-selected-message-index") === "82" &&
+      document.querySelector(
+        ".codex-ui-conversation-thread-shell__viewport",
+      )?.scrollTop === 0,
+  );
+} finally {
+  await currentWindowedApp.close();
+}
+
 const composerMenusScene = {
   frame: "composer-multiline",
   id: "electron-composer-current-menus",

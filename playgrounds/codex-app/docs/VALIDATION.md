@@ -44,6 +44,9 @@ Every deterministic scenario has one ID and produces four evidence layers:
    continuation and return-to-latest in a real 1180×820 window. A separate
    current Composer flow verifies permission selection, Escape/focus
    restoration, resource keyboard selection, and the 205px long-input clamp.
+   A current long-thread flow verifies compact navigation selection, a
+   seven-turn mounted window, negative away-from-latest scrolling, and
+   return-to-latest at scroll origin zero.
 4. **Pixels** — full-frame regression screenshots after the structural gates
    pass. The multi-file scenario can additionally compare a separately
    captured 906×820 current-build main region through
@@ -75,7 +78,13 @@ Every deterministic scenario has one ID and produces four evidence layers:
    `CODEX_UI_KIT_COMPOSER_MULTILINE_REFERENCE`,
    `CODEX_UI_KIT_COMPOSER_PERMISSIONS_REFERENCE`, and
    `CODEX_UI_KIT_COMPOSER_RESOURCES_REFERENCE`; their ownership masks retain
-   geometry/boundaries and use hard 0.5%, 0.5%, and 0.8% limits. Transparent
+   geometry/boundaries and use hard 0.5%, 0.5%, and 0.8% limits. Goal and Plan
+   main-region references use `CODEX_UI_KIT_COMPOSER_GOAL_REFERENCE` and
+   `CODEX_UI_KIT_COMPOSER_PLAN_REFERENCE` with 0.5% limits. The current
+   long-thread main-region reference uses
+   `CODEX_UI_KIT_LONG_THREAD_REFERENCE`; its mask excludes all conversation
+   content and retains the compact rail and floating control under a 1% hard
+   limit. Transparent
    Electron/CDP reference pixels are composited onto the observed `#181818`
    window background before comparison, and independently implemented UI
    regions are located from their DOM contracts rather than hard-coded
@@ -97,7 +106,8 @@ threshold. The current multiline, permissions, and resource references
 measured `0.000994318`, `0.001280084`, and `0.003352986`. Their ownership
 masks exclude unrelated transcript text and fixture-specific labels while
 preserving the queue, overlay, Composer silhouettes, controls, backgrounds,
-radii, and spacing.
+radii, and spacing. Goal and Plan measured `0.003763528` and `0.003486243`.
+The current long-thread rail/control comparison measured `0.005937382`.
 
 Computer Use remains an optional macOS acceptance layer for real pointer,
 focus, menu, multi-window, and OS integration checks. It is intentionally not a

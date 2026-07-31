@@ -60,11 +60,13 @@ The authoritative current-build inventory is:
   integrated activity disclosure and passes a current regional pixel gate.
   The failure/recovery path now matches a standalone invalid-URL Fetch,
   intermediate explanation, three Search rows, successful Fetch, linked
-  answer, and a second current regional pixel gate.
+  answer, and a second current regional pixel gate. A read-only 82-message
+  thread additionally establishes compact navigation, seven mounted nearby
+  turns, reverse-origin scrolling, and return-to-latest behavior.
   The current PR changed to Summary/Code tabs with
   Timeline integrated into Summary, loaded real multi-file Code content, and
   exposed a display-only Review options menu. The independent Browser and
-  Electron flows verify the matched shell/New chat/PR structures and all 61
+  Electron flows verify the matched shell/New chat/PR structures and all 63
   deterministic lifecycle frames. The refreshed PR regional gate passes at
   5.75% full-main, 4.68% index, and 6.44% detail difference. A third
   text-only current probe verifies the 710×39 Composer queue, visible
@@ -76,8 +78,9 @@ The authoritative current-build inventory is:
   long-input clamp, four-choice 480×222 permission menu, and the new 736×320
   inline Add-resource picker. Public `ComposerPermissionMenu` and
   `ComposerResourcePicker` contracts, CDP, real Electron, and three regional
-  gates pass at 0.10%, 0.13%, and 0.34% changed pixels. Attachments and active
-  modes remain historical rather than being inferred from the resource menu.
+  gates pass at 0.10%, 0.13%, and 0.34% changed pixels. Active Goal/Plan modes
+  are independently current-observed; only native attachment selection
+  remains historical rather than being inferred from the resource menu.
   Terminal multi-tab/process lifecycle, Review variants, broader
   shell matrices, and their external pixels remain `26.721.81911` historical
   evidence. The current project-named single Terminal tab and close/add
@@ -108,6 +111,12 @@ The authoritative current-build inventory is:
   input. Browser/CDP, real Electron, and masked regional pixels pass at 0.38%
   and 0.35%. The native attachment panel was not automated and remains
   outside current-build parity.
+- The current-build long-thread slice observes 82 compact navigation buttons,
+  a seven-turn mounted window around message 40, negative away-from-latest
+  scrolling, and a 32×32px return control. Browser/CDP and Electron reproduce
+  selection and restoration with synthetic content, while a masked regional
+  gate compares only the rail and floating control at 0.59%. Host eviction
+  policy outside this sampled state remains an open product boundary.
 - npm publication remains out of scope until the agreed P0/P1 coverage and
   release acceptance surfaces are complete.
 
@@ -160,6 +169,12 @@ previous 49-frame matrix. Its independent gates cover index/detail loading and
 failure, running checks, review submission, comment failure, merge readiness,
 and 720×680 compact composition. The current-product comparison remains
 ownership-scoped and read-only.
+
+The current-build long-thread comparison uses an external 906×820 main crop,
+keeps all real and synthetic transcript content outside the pixel denominator,
+and gates only the compact navigation rail and floating return control under a
+1% hard limit. CDP separately checks 82 navigation entries, seven mounted
+turns, reverse scroll origin, and the return-to-latest transition.
 
 Broader final visual optimization remains scheduled after the remaining
 inventory, page compositions, and state transitions stabilize. A passing

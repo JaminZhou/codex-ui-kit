@@ -62,14 +62,15 @@ observation from a previous build remains historical evidence.
   successful Code content, successful and recovered OpenAI Developer Docs
   calls, and the current Composer queue/Stop automatic-continuation lifecycle
   plus multiline input, permission choices, the inline Add-resource picker,
-  and active Goal/Plan modes are observed, while mutating review/comment/merge,
-  light-theme, global notifications, current-build long-thread
-  virtualization, and unrelated surface evidence remain pending
+  active Goal/Plan modes, and the sampled 82-message long-thread navigation/
+  windowing state are observed, while mutating review/comment/merge,
+  light-theme, global notifications, and unrelated surface evidence remain
+  pending
 
-Current inventory: 77 surface groups; 28 have current-build runtime evidence,
-30 have previous-build-only runtime evidence, 19 remain `not_sampled`, and 0
-are `blocked_by_policy`. Current-build Browser verification covers 24 groups
-and Electron verification covers 24. Prior acceptance outside the sampled
+Current inventory: 77 surface groups; 29 have current-build runtime evidence,
+29 have previous-build-only runtime evidence, 19 remain `not_sampled`, and 0
+are `blocked_by_policy`. Current-build Browser verification covers 25 groups
+and Electron verification covers 25. Prior acceptance outside the sampled
 shell, sidebar, New chat, and Pull request slices remains recorded as
 `partial_legacy` until current-build re-observation.
 
@@ -316,10 +317,19 @@ verified. A separate unsubmitted-draft probe verifies active Goal and Plan
 labels, prompts, 736×98 geometry, 28px clear controls, and focus restoration.
 Their 906×820 regional gates pass at `0.003763528` and `0.003486243`, so
 `composer.modes` is current-build Browser/Electron verified. The native
-file-panel attachment lifecycle remains `partial_legacy`. Message navigation
-and windowing retain strong independent
-Browser/Electron regression coverage, but stay `partial_legacy` because the
-current build's exact long-thread virtualization algorithm was not re-observed.
+file-panel attachment lifecycle remains `partial_legacy`.
+
+The current long-thread probe re-observes an 82-message compact navigation
+rail, its 36×10px buttons and 26×2px selected marker, a seven-turn mounted
+window around message 40, reverse-origin scrolling, and the 32×32px
+return-to-latest control. The independent fixture keeps labels synthetic and
+the host responsible for choosing which turns stay mounted. Browser/CDP and
+real Electron jump to message 20, retain seven mounted turns, and return to
+message 82 at `scrollTop = 0`. Its ownership-masked 906×820 gate retains only
+the rail and floating control and passes at `0.005937382` under a 1% hard
+limit. `thread.virtualized-timeline` is therefore current-build
+Browser/Electron verified for this sampled contract; unobserved window sizes
+and host eviction heuristics do not become product-level claims.
 
 Three more `26.721.41059` scenarios cover an expanded read-only command, a
 pending command approval, and an applied file card with the Review panel open.
@@ -522,8 +532,8 @@ This promotes `thread.mcp-tool-events` and the newly split
 Authentication, elicitation, MCP approvals, unavailable connectors, other
 integrations, cancellation, and thread-transport retry remain open.
 
-The long-thread continuity slice adds the `26.721.41059` default ten-message
-threshold and measured 36×10 rows to `ThreadMessageNavigationRail`, exposes
+The long-thread continuity slice adds the default ten-message threshold and
+measured 36×10 rows to `ThreadMessageNavigationRail`, exposes
 the rail and 32×32 latest-message control as overlay slots on
 `ConversationThreadShell`, and adds `ThreadInterruptionSummary` plus
 `ThreadContextEvent`. Five external references independently gate medium
@@ -532,12 +542,14 @@ context-completed states. Their full-image deltas are 1.8139%, 2.9354%,
 3.2975%, 3.6442%, and 3.4328%, with all named geometry and header/thread/
 Composer regional limits passing.
 
-The `26.721.41059` runtime evidence also records that the product's long-thread
-viewport uses reverse-origin scrolling (`scrollTop = 0` at latest, negative
-away from latest). The public package keeps the actual windowing and scroll
-algorithm host-owned. Browser and Electron acceptance exercise the
-placeholder, navigation, and follow contracts but not reverse scrolling or
-windowing, so the virtualization row remains `partial_legacy`. The
+The `26.727.40816` refresh confirms that the product's long-thread viewport
+uses reverse-origin scrolling (`scrollTop = 0` at latest, negative away from
+latest) and samples 82 navigation items with seven nearby turns mounted. The
+public package keeps the actual eviction policy host-owned while exposing
+reverse-origin viewport and compact-rail contracts. Browser and Electron now
+exercise selection, reverse scrolling, the seven-turn window, and return to
+latest, so the virtualization row is verified for the sampled current
+contract. The
 interruption acceptance renders the observed summary statically rather than
 driving a host run-to-stop-to-summary transition, so that row also remains
 `partial_legacy`. The `26.721.81911` MCP tool-call error/retry state is now
@@ -550,7 +562,7 @@ panel.
 
 This is a measurement- and raster-backed basic thread/workspace slice, not a
 claim that the whole application or every lifecycle is pixel-perfect. Broader
-Markdown variants, the exact host virtualization algorithm, code search,
+Markdown variants, unsampled host eviction heuristics and window sizes, code search,
 other MCP and connector variants, thread-level retry recovery, approval
 persistence and timeout, current-product binary/conflict reachability, PR
 merge/review-submission states, current-product Terminal process lifecycle and

@@ -1989,6 +1989,18 @@
   width: var(--codex-ui-message-navigation-row-width);
 }
 
+.codex-ui-message-navigation-rail[data-density="compact"] {
+  --codex-ui-message-navigation-row-height: 0.625rem;
+  --codex-ui-message-navigation-row-width: 2.25rem;
+  --codex-ui-message-navigation-marker-height: 0.125rem;
+  --codex-ui-message-navigation-marker-width: 1.875rem;
+}
+
+.codex-ui-message-navigation-rail[data-density="compact"]
+  .codex-ui-message-navigation-rail__marker {
+  width: 1.625rem;
+}
+
 .codex-ui-conversation-thread-shell__message-navigation,
 .codex-ui-conversation-thread-shell__floating-control {
   inset: 0;
@@ -2053,6 +2065,12 @@
 .codex-ui-message-navigation-rail__button[data-active]
   .codex-ui-message-navigation-rail__marker {
   opacity: 0.6;
+}
+
+.codex-ui-message-navigation-rail[data-density="compact"]
+  .codex-ui-message-navigation-rail__button[data-active]
+  .codex-ui-message-navigation-rail__marker {
+  opacity: 1;
 }
 
 .codex-ui-message-navigation-rail__button:hover
@@ -2981,6 +2999,16 @@
   overscroll-behavior: contain;
   position: relative;
   scroll-behavior: smooth;
+}
+
+.codex-ui-thread-viewport[data-latest-origin="start"] {
+  display: flex;
+  flex-direction: column-reverse;
+}
+
+.codex-ui-thread-viewport[data-latest-origin="start"]
+  > .codex-ui-thread-viewport__content {
+  flex: 0 0 auto;
 }
 
 .codex-ui-thread-viewport:focus-visible {

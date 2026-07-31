@@ -92,6 +92,12 @@ const currentBuildComposerMenuReferenceSize = {
   height: 820,
   width: 906,
 };
+const currentBuildLongThreadReference =
+  process.env.CODEX_UI_KIT_LONG_THREAD_REFERENCE;
+const currentBuildLongThreadReferenceSize = {
+  height: 820,
+  width: 906,
+};
 const currentBuildWorkspaceReference =
   process.env.CODEX_UI_KIT_WORKSPACE_REFERENCE;
 const currentBuildWorkspaceReferenceSize = {
@@ -1011,6 +1017,64 @@ for (const scene of selectedScenes) {
     }
     console.log(
       `${scene.id}: current-build Composer lifecycle pixel ratio ${comparison.ratio}`,
+    );
+  }
+
+  if (scene.id === "thread-windowed" && currentBuildLongThreadReference) {
+    const reference = flattenPng(
+      PNG.sync.read(await readFile(currentBuildLongThreadReference)),
+      { blue: 24, green: 24, red: 24 },
+    );
+    if (
+      reference.width !== currentBuildLongThreadReferenceSize.width ||
+      reference.height !== currentBuildLongThreadReferenceSize.height
+    ) {
+      throw new Error(
+        `${scene.id}: current-build long-thread reference must be exactly ${currentBuildLongThreadReferenceSize.width}x${currentBuildLongThreadReferenceSize.height}, received ${reference.width}x${reference.height}.`,
+      );
+    }
+    if (actual.width !== 1180 || actual.height !== 820) {
+      throw new Error(
+        `${scene.id}: current-build long-thread comparison requires an exact 1180x820 playground frame.`,
+      );
+    }
+    const actualRegion = cropPng(actual, 274, 0, 906, 820);
+    const masks = [
+      { height: 140, left: 0, top: 0, width: 906 },
+      { height: 430, left: 60, top: 140, width: 846 },
+      { height: 100, left: 60, top: 570, width: 360 },
+      { height: 100, left: 490, top: 570, width: 416 },
+      { height: 60, left: 60, top: 670, width: 846 },
+      { height: 90, left: 0, top: 730, width: 906 },
+    ];
+    const comparison = comparePng(
+      maskPng(clonePng(reference), masks),
+      maskPng(clonePng(actualRegion), masks),
+    );
+    const maximumRatio = environmentRatio(
+      "CODEX_UI_KIT_LONG_THREAD_MAX_DIFF_RATIO",
+      0.01,
+    );
+    await writeFile(
+      join(artifactDirectory, `${scene.id}.current-build.png`),
+      PNG.sync.write(actualRegion),
+    );
+    if (comparison.pixels > 0) {
+      await writeFile(
+        join(
+          artifactDirectory,
+          `${scene.id}.current-build.diff.png`,
+        ),
+        PNG.sync.write(comparison.diff),
+      );
+    }
+    if (comparison.ratio > maximumRatio) {
+      throw new Error(
+        `${scene.id}: current-build long-thread pixel ratio ${comparison.ratio} exceeds ${maximumRatio}.`,
+      );
+    }
+    console.log(
+      `${scene.id}: current-build long-thread pixel ratio ${comparison.ratio}`,
     );
   }
 

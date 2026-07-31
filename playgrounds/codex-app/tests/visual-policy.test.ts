@@ -63,4 +63,19 @@ describe("lifecycle visual policy", () => {
       "current-build Composer lifecycle pixel ratio",
     );
   });
+
+  it("gates the current long-thread navigation and return control", () => {
+    expect(contract).toContain(
+      "CODEX_UI_KIT_LONG_THREAD_REFERENCE",
+    );
+    expect(contract).toContain(
+      "CODEX_UI_KIT_LONG_THREAD_MAX_DIFF_RATIO",
+    );
+    expect(contract).toContain(
+      "current-build long-thread pixel ratio",
+    );
+    expect(contract).toContain(
+      'const actualRegion = cropPng(actual, 274, 0, 906, 820)',
+    );
+  });
 });

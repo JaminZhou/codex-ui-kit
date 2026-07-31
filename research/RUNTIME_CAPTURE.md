@@ -461,6 +461,38 @@ evidence to the recoverable
 `/Users/JaminZhou/.Trash/codex-ui-kit-composer-modes-cleanup.CJuP6u`
 directory.
 
+### Current 26.727.40816 long-thread capture
+
+The long-thread refresh used exact process PID `6481`, child `6523`, loopback
+port `9517`, and unique profile
+`/private/tmp/codex-ui-kit-long-thread-cdp.aAzATz`. It selected the 1180×820
+main Renderer and opened an existing conversation read-only. No message,
+command, edit, deletion, or other content mutation was performed.
+
+The bounded sequence was:
+
+1. wait for historical content and message navigation to stabilize;
+2. record the reverse-origin viewport at latest and the compact navigation
+   list;
+3. activate `Jump to user message 40`, record the selected marker, mounted
+   turn count, negative scroll position, and floating return control;
+4. move farther into history, then activate `Scroll to bottom` and verify
+   message 82 at `scrollTop = 0`;
+5. capture one external 906×820 main-only reference for an ownership-scoped
+   rail/control pixel gate.
+
+The current product exposed 82 navigation buttons, a 36×574px list with
+36×10px buttons, a 26×2px selected marker, seven mounted nearby turns at
+message 40, `scrollTop = -28484`, and a 32×32px return control. The public
+fixture uses synthetic labels, keeps eviction host-owned, and passes 63-frame
+CDP, real Electron interaction, and a masked regional comparison at
+`0.005937382` under a 1% limit.
+
+Cleanup restored the observed task to latest, stopped only the exact process
+and child, verified port `9517` was gone, and moved the profile and reference
+images to
+`/Users/JaminZhou/.Trash/codex-ui-kit-long-thread-cleanup.XSqBZw`.
+
 ## Required flow matrix
 
 ### 1. Application entry and navigation

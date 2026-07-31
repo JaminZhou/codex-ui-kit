@@ -227,6 +227,10 @@ const conversationHostFrames = new Set([
   "thread-windowed",
 ]);
 
+const currentWindowedHistorySize = 82;
+const currentWindowedTurnWindowSize = 7;
+const currentWindowedInitialIndex = 39;
+
 function replayCountForSelection(
   scenario: ReplayScenario,
   frame: string | null,
@@ -905,13 +909,14 @@ export function App() {
   const [workspaceRunProjectLabel, setWorkspaceRunProjectLabel] =
     useState("codex-ui-kit");
   const [threadFollowing, setThreadFollowing] = useState(
-    initialSelection.frame !== "thread-scroll-away",
+    initialSelection.frame !== "thread-scroll-away" &&
+      initialSelection.frame !== "thread-windowed",
   );
   const [activeFrame, setActiveFrame] = useState(initialSelection.frame);
   const [scenarioSelectionVersion, setScenarioSelectionVersion] =
     useState(0);
-  const [windowedTimelineExpanded, setWindowedTimelineExpanded] =
-    useState(false);
+  const [windowedSelectedMessageIndex, setWindowedSelectedMessageIndex] =
+    useState(currentWindowedInitialIndex);
   const [liveStartPending, setLiveStartPending] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(
     () =>
@@ -1003,10 +1008,6 @@ export function App() {
   const terminalSessionCounterRef = useRef(1);
   const replaySubmitTimerRef = useRef<number | null>(null);
   const pullRequestTransitionTimerRef = useRef<number | null>(null);
-  const pendingMessageNavigationRef = useRef<{
-    behavior: "instant" | "smooth";
-    id: string;
-  } | null>(null);
   const threadViewportRef = useRef<HTMLDivElement>(null);
   const liveApprovalSubmissionGateRef = useRef(
     new LiveApprovalSubmissionGate(),
@@ -1218,6 +1219,7 @@ export function App() {
     );
     setComposerValue(initialComposerValue(frame));
     setComposerOverlay(initialComposerOverlay(frame));
+    setComposerMode(initialComposerMode(frame));
     setComposerResourceActiveId("files");
     setQueuedPrompts([]);
     setQueueingEnabled(true);
@@ -1228,8 +1230,7 @@ export function App() {
     setReplayApprovalResolution(null);
     setActiveFrame(frame);
     setScenarioSelectionVersion((version) => version + 1);
-    setWindowedTimelineExpanded(false);
-    pendingMessageNavigationRef.current = null;
+    setWindowedSelectedMessageIndex(currentWindowedInitialIndex);
     setReviewOpen(false);
     setReviewSelection(null);
     setTerminalOpen(
@@ -1466,14 +1467,20 @@ export function App() {
     });
   };
 
+  const currentWindowedFrame =
+    isConversationLifecycle && activeFrame === "thread-windowed";
+
   const returnToLatest = useCallback(() => {
     const viewport = threadViewportRef.current;
     if (!viewport) return;
+    if (currentWindowedFrame) {
+      setWindowedSelectedMessageIndex(currentWindowedHistorySize - 1);
+    }
     viewport.scrollTo({
       behavior: "smooth",
-      top: viewport.scrollHeight,
+      top: currentWindowedFrame ? 0 : viewport.scrollHeight,
     });
-  }, []);
+  }, [currentWindowedFrame]);
 
   useLayoutEffect(() => {
     if (scenarioSelectionVersion === 0) return;
@@ -1482,7 +1489,8 @@ export function App() {
     let resetFrame = 0;
     const layoutFrame = window.requestAnimationFrame(() => {
       resetFrame = window.requestAnimationFrame(() => {
-        viewport.scrollTop = viewport.scrollHeight;
+        viewport.scrollTop =
+          activeFrame === "thread-windowed" ? -28_484 : viewport.scrollHeight;
         viewport.dispatchEvent(new Event("scroll", { bubbles: true }));
       });
     });
@@ -1490,7 +1498,7 @@ export function App() {
       window.cancelAnimationFrame(layoutFrame);
       window.cancelAnimationFrame(resetFrame);
     };
-  }, [scenarioSelectionVersion]);
+  }, [activeFrame, scenarioSelectionVersion]);
 
   const scrollToMessage = useCallback(
     (id: string, behavior: "instant" | "smooth") => {
@@ -1508,13 +1516,40 @@ export function App() {
     [],
   );
 
-  useEffect(() => {
-    if (!windowedTimelineExpanded) return;
-    const pendingNavigation = pendingMessageNavigationRef.current;
-    if (!pendingNavigation) return;
-    pendingMessageNavigationRef.current = null;
-    scrollToMessage(pendingNavigation.id, pendingNavigation.behavior);
-  }, [scrollToMessage, windowedTimelineExpanded]);
+  useLayoutEffect(() => {
+    if (!currentWindowedFrame) return;
+    const viewport = threadViewportRef.current;
+    if (!viewport) return;
+    let alignmentFrame = 0;
+    let scrollFrame = window.requestAnimationFrame(() => {
+      scrollFrame = window.requestAnimationFrame(() => {
+        const messagesAfter =
+          currentWindowedHistorySize - 1 - windowedSelectedMessageIndex;
+        const distanceFromLatest =
+          messagesAfter === 0 ? 0 : messagesAfter * 672 + 320;
+        viewport.scrollTop = -Math.min(
+          viewport.scrollHeight - viewport.clientHeight,
+          distanceFromLatest,
+        );
+        alignmentFrame = window.requestAnimationFrame(() => {
+          const selectedTurn = viewport.querySelector<HTMLElement>(
+            `[data-windowed-turn="${windowedSelectedMessageIndex + 1}"]`,
+          );
+          if (selectedTurn && messagesAfter > 0) {
+            const viewportBounds = viewport.getBoundingClientRect();
+            const selectedBounds = selectedTurn.getBoundingClientRect();
+            viewport.scrollTop +=
+              selectedBounds.top - (viewportBounds.top + 180);
+          }
+          viewport.dispatchEvent(new Event("scroll", { bubbles: true }));
+        });
+      });
+    });
+    return () => {
+      window.cancelAnimationFrame(scrollFrame);
+      window.cancelAnimationFrame(alignmentFrame);
+    };
+  }, [currentWindowedFrame, windowedSelectedMessageIndex]);
 
   const lastEvent = scenario.events[Math.max(0, replayCount - 1)];
   const sidebar = (
@@ -3192,25 +3227,28 @@ export function App() {
       {shellRouteContent}
     </AppRouteOutlet>
   );
-  const messageNavigationItems = state.messages
-    .filter(({ role }) => role === "user")
-    .map((message) => ({
-      id: message.id,
-      label: message.text,
-    }));
-  const windowedTimeline =
-    isConversationLifecycle &&
-    activeFrame === "thread-windowed" &&
-    !windowedTimelineExpanded;
-  const indexedTimeline = state.timeline.map((entry, entryIndex) => ({
-    entry,
-    entryIndex,
-  }));
-  const hiddenTimelineEntryCount = windowedTimeline
-    ? Math.max(0, indexedTimeline.length - 8)
-    : 0;
-  const visibleTimeline = indexedTimeline.slice(hiddenTimelineEntryCount);
-  const timelineContent = visibleTimeline.map(({ entry, entryIndex }) => {
+  const messageNavigationItems = currentWindowedFrame
+    ? Array.from({ length: currentWindowedHistorySize }, (_, index) => ({
+        id: `current-windowed-user-${index + 1}`,
+        label: `Synthetic user checkpoint ${index + 1}`,
+      }))
+    : state.messages
+        .filter(({ role }) => role === "user")
+        .map((message) => ({
+          id: message.id,
+          label: message.text,
+        }));
+  const currentWindowStart = Math.min(
+    currentWindowedHistorySize - currentWindowedTurnWindowSize,
+    Math.max(
+      0,
+      windowedSelectedMessageIndex -
+        Math.floor(currentWindowedTurnWindowSize / 2),
+    ),
+  );
+  const currentWindowEnd =
+    currentWindowStart + currentWindowedTurnWindowSize;
+  const timelineContent = state.timeline.map((entry, entryIndex) => {
     if (entry.kind === "message") {
       const message = state.messages.find(({ id }) => id === entry.id);
       if (!message) return null;
@@ -3729,6 +3767,55 @@ export function App() {
       </Fragment>
     );
   });
+  const currentWindowedContent = currentWindowedFrame ? (
+    <div
+      data-mounted-turn-count={currentWindowedTurnWindowSize}
+      data-selected-message-index={windowedSelectedMessageIndex + 1}
+      data-total-message-count={currentWindowedHistorySize}
+    >
+      {currentWindowStart > 0 ? (
+        <ThreadVirtualizedPlaceholder
+          data-hidden-entry-count={currentWindowStart}
+          data-window-side="before"
+          estimatedHeight={`${currentWindowStart * 42}rem`}
+        />
+      ) : null}
+      {Array.from(
+        { length: currentWindowedTurnWindowSize },
+        (_, offset) => {
+          const messageIndex = currentWindowStart + offset;
+          return (
+            <AgentTurn
+              data-windowed-turn={messageIndex + 1}
+              key={`current-windowed-turn-${messageIndex + 1}`}
+              spacing="grouped"
+            >
+              <AgentMessage
+                data-item-id={`current-windowed-user-${messageIndex + 1}`}
+                role="user"
+              >
+                Synthetic user checkpoint {messageIndex + 1}
+              </AgentMessage>
+              <AgentMessage role="assistant">
+                The host keeps only the nearby deterministic turn window mounted.
+              </AgentMessage>
+            </AgentTurn>
+          );
+        },
+      )}
+      {currentWindowEnd < currentWindowedHistorySize ? (
+        <ThreadVirtualizedPlaceholder
+          data-hidden-entry-count={
+            currentWindowedHistorySize - currentWindowEnd
+          }
+          data-window-side="after"
+          estimatedHeight={`${
+            (currentWindowedHistorySize - currentWindowEnd) * 42
+          }rem`}
+        />
+      ) : null}
+    </div>
+  ) : null;
   const activeTurnHasWork = hasActiveTurnWork(state);
   const terminalCommands = useMemo(
     () => state.commands.filter(({ processId }) => Boolean(processId)),
@@ -3977,17 +4064,36 @@ export function App() {
   );
   const messageNavigation = isConversationLifecycle ? (
     <ThreadMessageNavigationRail
+      activeIds={
+        currentWindowedFrame
+          ? [
+              `current-windowed-user-${
+                windowedSelectedMessageIndex + 1
+              }`,
+            ]
+          : undefined
+      }
+      density={currentWindowedFrame ? "compact" : "regular"}
+      initialScroll={currentWindowedFrame ? "end" : "start"}
       items={messageNavigationItems}
       minItems={10}
       onNavigate={(item, behavior) => {
-        if (scrollToMessage(item.id, behavior)) return;
-        if (windowedTimeline) {
-          pendingMessageNavigationRef.current = {
-            behavior,
-            id: item.id,
-          };
-          setWindowedTimelineExpanded(true);
+        if (currentWindowedFrame) {
+          const nextIndex =
+            Number(item.id.replace("current-windowed-user-", "")) - 1;
+          if (
+            Number.isInteger(nextIndex) &&
+            nextIndex >= 0 &&
+            nextIndex < currentWindowedHistorySize
+          ) {
+            setWindowedSelectedMessageIndex(nextIndex);
+            setThreadFollowing(
+              nextIndex === currentWindowedHistorySize - 1,
+            );
+          }
+          return;
         }
+        if (scrollToMessage(item.id, behavior)) return;
       }}
     />
   ) : undefined;
@@ -4028,9 +4134,7 @@ export function App() {
       data-windowed-timeline={
         isConversationLifecycle &&
         activeFrame === "thread-windowed"
-          ? windowedTimeline
-            ? "trimmed"
-            : "expanded"
+          ? "current"
           : undefined
       }
       data-shell-state={view === "shell" ? shellState : undefined}
@@ -4136,27 +4240,28 @@ export function App() {
               threadWidth="wide"
               viewportProps={{
                 defaultFollowing:
-                  activeFrame !== "thread-scroll-away",
+                  activeFrame !== "thread-scroll-away" &&
+                  activeFrame !== "thread-windowed",
                 followKey: state.eventCount,
+                latestOrigin: currentWindowedFrame ? "start" : "end",
                 onFollowingChange: setThreadFollowing,
               }}
               viewportRef={threadViewportRef}
             >
-              <AgentTurn aria-label="Protocol-backed conversation">
+              <AgentTurn
+                aria-label="Protocol-backed conversation"
+                data-current-windowed-history={
+                  currentWindowedFrame || undefined
+                }
+              >
                 {liveError ? (
                   <StatusBanner heading="Live connection failed" tone="error">
                     {liveError}
                   </StatusBanner>
                 ) : null}
 
-                {hiddenTimelineEntryCount > 0 ? (
-                  <ThreadVirtualizedPlaceholder
-                    data-hidden-entry-count={hiddenTimelineEntryCount}
-                    estimatedHeight={`${hiddenTimelineEntryCount * 3.5}rem`}
-                  />
-                ) : null}
-
-                {timelineContent}
+                {currentWindowedContent}
+                {currentWindowedFrame ? null : timelineContent}
 
                 {scenarioId === "terminal-lifecycle" &&
                 terminalCommands.length > 0 ? (

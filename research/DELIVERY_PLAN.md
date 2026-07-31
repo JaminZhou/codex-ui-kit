@@ -12,7 +12,7 @@ exit gates; it does not replace the inventory.
 
 - The current installed package is Codex Desktop `26.727.40816` (`6067`).
 - The inventory contains 77 surface groups: 49 P0, 19 P1, and 9 P2.
-- 28 groups have current-build runtime evidence, 30 have previous-build-only
+- 29 groups have current-build runtime evidence, 29 have previous-build-only
   runtime evidence, and 19 have not been sampled.
 - The current-build refresh covers all six left-sidebar groups, window
   navigation, route loading/restoration, the New chat Composer and project
@@ -36,14 +36,17 @@ exit gates; it does not replace the inventory.
   and the 736×320 inline Add-resource picker through CDP, real Electron, and
   three additional regional pixel gates. A third read-only probe locks active
   Goal and Plan labels, prompts, 736×98 geometry, clear/focus restoration,
-  and two sub-0.5% regional pixel gates. Attachment variants, Terminal
+  and two sub-0.5% regional pixel gates. A fourth read-only slice locks the
+  82-message compact navigation rail, seven-turn mounted window,
+  reverse-origin scrolling, return-to-latest interaction, and a sub-1%
+  ownership-masked regional gate. Attachment variants, Terminal
   multi-tab/process behavior,
   Review rename/delete variants, and broader shell evidence from
   `26.721.81911` remain historical regression evidence until re-observed. The
   current project-named single Terminal tab and close/add controls now pass
   independent Browser, Electron, and regional pixel gates.
-  Global notification runtime evidence, light-theme shell evidence, exact
-  current-build long-thread virtualization, real current-product Terminal
+  Global notification runtime evidence, light-theme shell evidence, unsampled
+  long-thread window sizes/eviction heuristics, real current-product Terminal
   process execution/persistence, current-product review submission and
   mutating comment/merge transitions, and the remaining Markdown, tool, and
   attachment variants remain on their recorded evidence levels.
@@ -254,10 +257,10 @@ without confusing package readiness with full product reconstruction.
 5. **Conversation and Composer lifecycle**: current queue/Stop automatic
    continuation is delivered through real current-build evidence,
    Browser/CDP, Electron, and regional pixels. Current permissions, Add
-   resources, and multiline/long-input geometry are also delivered. Continue
-   with attachment, active-mode, and long-thread navigation/windowing
-   evidence; retain queue pause/Resume only as a legacy compatibility
-   fixture.
+   resources, multiline/long-input geometry, active Goal/Plan modes, and the
+   sampled long-thread navigation/windowing contract are also delivered.
+   Continue with attachment evidence; retain queue pause/Resume only as a
+   legacy compatibility fixture.
 6. **Coding workspace entry**: current project/context entry plus independent
    project → environment/worktree → command → approval → Review → Terminal →
    PR acceptance.

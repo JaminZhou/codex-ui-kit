@@ -70,6 +70,35 @@ describe("complete thread surfaces", () => {
     expect(viewport.getAttribute("data-following")).toBe("true");
   });
 
+  it("supports a column-reverse latest origin with zero as the follow point", () => {
+    const onFollowingChange = vi.fn();
+    const { container } = render(
+      <AgentThreadViewport
+        autoFollow={false}
+        latestOrigin="start"
+        onFollowingChange={onFollowingChange}
+      >
+        <AgentThread>Thread</AgentThread>
+      </AgentThreadViewport>,
+    );
+    const viewport = container.querySelector<HTMLDivElement>(
+      ".codex-ui-thread-viewport",
+    )!;
+    Object.defineProperties(viewport, {
+      clientHeight: { configurable: true, value: 200 },
+      scrollHeight: { configurable: true, value: 600 },
+      scrollTop: { configurable: true, value: -120, writable: true },
+    });
+
+    expect(viewport.getAttribute("data-latest-origin")).toBe("start");
+    fireEvent.scroll(viewport);
+    expect(onFollowingChange).toHaveBeenLastCalledWith(false);
+    viewport.scrollTop = -12;
+    fireEvent.scroll(viewport);
+    expect(onFollowingChange).toHaveBeenLastCalledWith(true);
+    expect(viewport.getAttribute("data-following")).toBe("true");
+  });
+
   it("keeps following through intermediate smooth-scroll events until user input", () => {
     const scrollTo = vi
       .spyOn(HTMLElement.prototype, "scrollTo")

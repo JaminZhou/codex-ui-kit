@@ -367,6 +367,23 @@ The native macOS file panel is outside Renderer CDP and Computer Use blocks
 Codex control, so no attachment was added and attachment lifecycle remains
 historical.
 
+## Twenty-second vertical slice
+
+The twenty-second slice refreshes long-conversation navigation against
+`26.727.40816`:
+
+- a read-only current thread establishes an 82-message compact navigation
+  rail, a seven-turn mounted window, reverse-origin scrolling, and a floating
+  return-to-latest control;
+- public viewport and navigation contracts expose reverse latest-origin,
+  compact 36×10px navigation rows, active 26×2px markers, and initial
+  end-positioning without owning host virtualization;
+- synthetic Browser/CDP and Electron acceptance jumps to message 20, keeps
+  seven turns mounted, then returns to message 82 at scroll origin zero;
+- the current 906×820 regional gate compares only the navigation rail and
+  floating return control, excluding all real and synthetic conversation
+  content.
+
 ## Development
 
 From the repository root:
@@ -473,6 +490,14 @@ CODEX_UI_KIT_COMPOSER_PERMISSIONS_REFERENCE=/absolute/path/to/composer-permissio
 CODEX_UI_KIT_COMPOSER_RESOURCES_REFERENCE=/absolute/path/to/composer-resources-main.png \
 CODEX_UI_KIT_COMPOSER_GOAL_REFERENCE=/absolute/path/to/composer-goal-main.png \
 CODEX_UI_KIT_COMPOSER_PLAN_REFERENCE=/absolute/path/to/composer-plan-main.png \
+  pnpm --filter @codex-ui-kit/codex-app-playground check:visual
+```
+
+The current long-thread gate accepts one 906×820 main-only crop and masks all
+conversation content:
+
+```bash
+CODEX_UI_KIT_LONG_THREAD_REFERENCE=/absolute/path/to/long-thread-main.png \
   pnpm --filter @codex-ui-kit/codex-app-playground check:visual
 ```
 

@@ -1086,6 +1086,11 @@ textarea {
   width: auto;
 }
 
+.demo-root[data-frame="thread-windowed"]
+  .codex-ui-conversation-thread-shell__message-navigation {
+  bottom: 0;
+}
+
 .demo-composer-controls .codex-ui-popover-anchor {
   flex: 0 0 auto;
 }

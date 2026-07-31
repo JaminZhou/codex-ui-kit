@@ -1465,8 +1465,17 @@ for (const scene of visualScenes) {
         const navigation = document.querySelector(
           ".codex-ui-message-navigation-rail",
         );
+        const navigationList = navigation?.querySelector(
+          ".codex-ui-message-navigation-rail__list",
+        );
         const floating = document.querySelector(
           ".codex-ui-thread-floating-button",
+        );
+        const viewport = document.querySelector(
+          ".codex-ui-conversation-thread-shell__viewport",
+        );
+        const currentWindowedHistory = document.querySelector(
+          "[data-mounted-turn-count]",
         );
         const permissionMenu = document.querySelector(
           ".codex-ui-composer-permission-menu",
@@ -1528,8 +1537,34 @@ for (const scene of visualScenes) {
             ".codex-ui-agent-message",
           ).length,
           navigation: {
+            activeCount: navigation.querySelectorAll(
+              'button[aria-current="true"]',
+            ).length,
             buttonCount: navigation.querySelectorAll("button").length,
+            density: navigation.getAttribute("data-density"),
             label: navigation.getAttribute("aria-label"),
+            list: navigationList
+              ? {
+                  clientHeight: navigationList.clientHeight,
+                  rect: rect(navigationList),
+                  scrollHeight: navigationList.scrollHeight,
+                }
+              : null,
+            selectedMarker: (() => {
+              const selected = navigation.querySelector(
+                'button[aria-current="true"]',
+              );
+              const marker = selected?.querySelector(
+                ".codex-ui-message-navigation-rail__marker",
+              );
+              return selected && marker
+                ? {
+                    button: rect(selected),
+                    marker: rect(marker),
+                    opacity: getComputedStyle(marker).opacity,
+                  }
+                : null;
+            })(),
           },
           overlay: root.getAttribute("data-composer-overlay"),
           mode: root.getAttribute("data-composer-mode"),
@@ -1640,6 +1675,35 @@ for (const scene of visualScenes) {
             value: textarea.value,
           },
           threadFollowing: root.getAttribute("data-thread-following"),
+          viewport: viewport
+            ? {
+                clientHeight: viewport.clientHeight,
+                flexDirection: getComputedStyle(viewport).flexDirection,
+                latestOrigin: viewport.getAttribute("data-latest-origin"),
+                rect: rect(viewport),
+                scrollHeight: viewport.scrollHeight,
+                scrollTop: viewport.scrollTop,
+              }
+            : null,
+          windowed: currentWindowedHistory
+            ? {
+                mountedTurnCount: document.querySelectorAll(
+                  "[data-windowed-turn]",
+                ).length,
+                mountedUserBubbleCount: currentWindowedHistory.querySelectorAll(
+                  '.codex-ui-agent-message[data-role="user"]',
+                ).length,
+                placeholderCount: currentWindowedHistory.querySelectorAll(
+                  ".codex-ui-thread-virtualized-placeholder",
+                ).length,
+                selectedMessageIndex: currentWindowedHistory.getAttribute(
+                  "data-selected-message-index",
+                ),
+                totalMessageCount: currentWindowedHistory.getAttribute(
+                  "data-total-message-count",
+                ),
+              }
+            : null,
         };
       });
       contract.conversation = conversation;
@@ -1883,10 +1947,42 @@ for (const scene of visualScenes) {
       }
       if (
         scene.id === "thread-windowed" &&
-        (conversation.placeholder.count !== 1 ||
-          Number(conversation.placeholder.hiddenEntryCount) <= 0 ||
-          conversation.messageCount >=
-            conversation.navigation.buttonCount * 2)
+        (conversation.placeholder.count !== 2 ||
+          Number(conversation.placeholder.hiddenEntryCount) !== 36 ||
+          conversation.navigation.buttonCount !== 82 ||
+          conversation.navigation.activeCount !== 1 ||
+          conversation.navigation.density !== "compact" ||
+          !conversation.navigation.list ||
+          conversation.navigation.list.clientHeight !== 574 ||
+          conversation.navigation.list.scrollHeight !== 820 ||
+          !conversation.navigation.selectedMarker ||
+          conversation.navigation.selectedMarker.opacity !== "1" ||
+          Math.abs(
+            conversation.navigation.selectedMarker.button.width - 36,
+          ) > 1 ||
+          Math.abs(
+            conversation.navigation.selectedMarker.button.height - 10,
+          ) > 1 ||
+          Math.abs(
+            conversation.navigation.selectedMarker.marker.width - 26,
+          ) > 1 ||
+          Math.abs(
+            conversation.navigation.selectedMarker.marker.height - 2,
+          ) > 1 ||
+          !conversation.viewport ||
+          conversation.viewport.latestOrigin !== "start" ||
+          conversation.viewport.flexDirection !== "column-reverse" ||
+          conversation.viewport.scrollTop >= -10_000 ||
+          conversation.viewport.scrollHeight < 40_000 ||
+          !conversation.windowed ||
+          conversation.windowed.mountedTurnCount !== 7 ||
+          conversation.windowed.mountedUserBubbleCount !== 7 ||
+          conversation.windowed.placeholderCount !== 2 ||
+          conversation.windowed.selectedMessageIndex !== "40" ||
+          conversation.windowed.totalMessageCount !== "82" ||
+          conversation.threadFollowing !== "false" ||
+          !conversation.floating.show ||
+          conversation.floating.hidden !== "false")
       ) {
         throw new Error(
           `${scene.id}: virtualized window contract failed: ${JSON.stringify(conversation)}`,
@@ -3441,10 +3537,12 @@ const {
 } = await launchScene(windowedNavigationScene, { capture: false });
 try {
   await windowedNavigationPage.waitForSelector(
-    '.demo-root[data-windowed-timeline="trimmed"]',
+    '.demo-root[data-windowed-timeline="current"][data-thread-following="false"] [data-selected-message-index="40"]',
   );
   if (
-    (await windowedNavigationPage.locator('[data-item-id="user-01"]').count()) !==
+    (await windowedNavigationPage
+      .locator('[data-item-id="current-windowed-user-20"]')
+      .count()) !==
     0
   ) {
     throw new Error("Windowed navigation mounted the hidden target too early.");
@@ -3452,17 +3550,24 @@ try {
   await windowedNavigationPage
     .getByRole("button", {
       exact: true,
-      name: "Jump to user message 1",
+      name: "Jump to user message 20",
     })
     .click();
   await windowedNavigationPage.waitForSelector(
-    '.demo-root[data-windowed-timeline="expanded"][data-thread-following="false"] [data-item-id="user-01"]',
+    '.demo-root[data-windowed-timeline="current"][data-thread-following="false"] [data-selected-message-index="20"] [data-item-id="current-windowed-user-20"]',
   );
   const materializedNavigation = await windowedNavigationPage.evaluate(() => ({
     hiddenPlaceholderCount: document.querySelectorAll(
       ".codex-ui-thread-virtualized-placeholder",
     ).length,
-    targetCount: document.querySelectorAll('[data-item-id="user-01"]').length,
+    mountedTurnCount: document.querySelectorAll("[data-windowed-turn]")
+      .length,
+    navigationCount: document.querySelectorAll(
+      ".codex-ui-message-navigation-rail__button",
+    ).length,
+    targetCount: document.querySelectorAll(
+      '[data-item-id="current-windowed-user-20"]',
+    ).length,
     threadFollowing: document
       .querySelector(".demo-root")
       ?.getAttribute("data-thread-following"),
@@ -3471,15 +3576,35 @@ try {
       ?.getAttribute("data-windowed-timeline"),
   }));
   if (
-    materializedNavigation.hiddenPlaceholderCount !== 0 ||
+    materializedNavigation.hiddenPlaceholderCount !== 2 ||
+    materializedNavigation.mountedTurnCount !== 7 ||
+    materializedNavigation.navigationCount !== 82 ||
     materializedNavigation.targetCount !== 1 ||
     materializedNavigation.threadFollowing !== "false" ||
-    materializedNavigation.windowedTimeline !== "expanded"
+    materializedNavigation.windowedTimeline !== "current"
   ) {
     throw new Error(
       `Windowed message navigation failed: ${JSON.stringify(materializedNavigation)}`,
     );
   }
+  await windowedNavigationPage
+    .getByRole("button", { name: "Scroll to bottom" })
+    .click();
+  await windowedNavigationPage.waitForFunction(
+    () => {
+      const root = document.querySelector(".demo-root");
+      const viewport = document.querySelector(
+        ".codex-ui-conversation-thread-shell__viewport",
+      );
+      return (
+        root?.getAttribute("data-thread-following") === "true" &&
+        document
+          .querySelector("[data-selected-message-index]")
+          ?.getAttribute("data-selected-message-index") === "82" &&
+        viewport?.scrollTop === 0
+      );
+    },
+  );
 } finally {
   await windowedNavigationApp.close();
 }

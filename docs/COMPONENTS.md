@@ -11,7 +11,7 @@ Codex UI Kit exposes protocol-neutral React components. Hosts own data fetching,
   `viewportRef` exposes the owned scroll element for host navigation and
   return-to-latest behavior without replacing internal measurement.
 - `AgentThread`: responsive `768px` content column with turn separation and container-query reflow.
-- `AgentThreadViewport`: focusable, follow-aware scroll surface with latest-turn detection, reduced-motion-safe auto-follow, direct-input cancellation for programmatic following, and a sticky footer.
+- `AgentThreadViewport`: focusable, follow-aware scroll surface with latest-turn detection, normal or reverse latest-origin scrolling, reduced-motion-safe auto-follow, direct-input cancellation for programmatic following, and a sticky footer.
 - `AgentTurn` and `ActivityGroup`: explicit standard and grouped spacing contracts.
 - `ThreadVirtualizedPlaceholder`: estimated-height placeholder for host-owned thread virtualization.
 - `AgentMessage`: user, assistant, and system presentation with user-bubble geometry, edit activation, actions, running ARIA state, and target highlighting.
@@ -180,7 +180,8 @@ All privileged behavior remains host-owned. The components never auto-approve co
 - `ThreadNavigationControls`: sidebar and optional Back/Forward toolbar controls with shortcuts, disabled states, and transient-navigation hover hooks.
 - `ThreadMessageNavigationRail`: message overview with a current-build default
   threshold of ten user messages, active markers, keyboard and pointer
-  previews, click navigation, and pointer scrubbing.
+  previews, click navigation, pointer scrubbing, regular or compact row
+  density, and optional initial end positioning for long histories.
 - `FloatingThreadPanel`: non-modal, inert-when-closed panel with host-controlled contents and inset.
 - `ThreadFloatingButton`: latest-message control with chevron, working dots, hidden-interaction removal, and reduced-motion behavior.
 

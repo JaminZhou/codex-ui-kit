@@ -31,6 +31,9 @@ describe("thread navigation visual contract", () => {
     );
     expect(styles).toContain("opacity: 0.4");
     expect(styles).toContain("opacity: 0.6");
+    expect(styles).toMatch(
+      /\.codex-ui-message-navigation-rail\[data-density="compact"\] \{[\s\S]*?--codex-ui-message-navigation-row-height: 0\.625rem;[\s\S]*?--codex-ui-message-navigation-marker-width: 1\.875rem;/,
+    );
     expect(styles).toContain("-webkit-line-clamp: 3");
   });
 });

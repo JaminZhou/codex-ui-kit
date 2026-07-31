@@ -103,11 +103,12 @@
       "packageEvidence": ["thread-virtualizer", "thread-scroll-controller-context-value"],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
-        "cdp-26.721:ten-turn-reverse-scroll-windowed-thread"
+        "cdp-26.721:ten-turn-reverse-scroll-windowed-thread",
+        "cdp-26.727.40816:real-82-message-compact-navigation-seven-mounted-turns-reverse-scroll-and-return"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "partial_legacy",
-      "electronStatus": "partial_legacy",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
       "priority": "p0"
     },
     {
