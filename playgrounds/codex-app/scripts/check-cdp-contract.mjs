@@ -382,6 +382,237 @@ for (const scene of visualScenes) {
     }
 
     if (scene.view === "pull-request") {
+      if (scene.id !== "pull-request-detail") {
+        const lifecycle = await page.evaluate(() => {
+          const rect = (element) => {
+            if (!element) return null;
+            const value = element.getBoundingClientRect();
+            return {
+              height: value.height,
+              left: value.left,
+              top: value.top,
+              width: value.width,
+            };
+          };
+          const root = document.querySelector(".demo-root");
+          const shell = document.querySelector(".codex-ui-app-shell");
+          const indexState = document.querySelector(
+            ".demo-pr-index > .codex-ui-pull-request-query-state",
+          );
+          const detailState = document.querySelector(
+            ".demo-pr-panel .codex-ui-pull-request-query-state",
+          );
+          const merge = document.querySelector(
+            ".codex-ui-pull-request-merge-readiness",
+          );
+          const review = document.querySelector(
+            ".codex-ui-pull-request-review-composer",
+          );
+          const comment = document.querySelector(
+            ".codex-ui-pull-request-comment-composer",
+          );
+          const mergeButton = Array.from(
+            document.querySelectorAll(
+              ".demo-pr-panel .codex-ui-workspace-panel__actions > button",
+            ),
+          ).find((button) =>
+            ["Merge", "Merged", "Merging…"].includes(
+              button.textContent?.trim() ?? "",
+            ),
+          );
+          return {
+            comment: comment
+              ? {
+                  busy: comment.getAttribute("aria-busy"),
+                  feedback:
+                    comment.querySelector(
+                      ".codex-ui-pull-request-submission-feedback",
+                    )?.textContent ?? null,
+                  status: comment.getAttribute("data-status"),
+                }
+              : null,
+            detail: detailState
+              ? {
+                  busy: detailState.getAttribute("aria-busy"),
+                  role: detailState.getAttribute("role"),
+                  status: detailState.getAttribute("data-status"),
+                }
+              : null,
+            frame: root?.getAttribute("data-frame"),
+            horizontalOverflow:
+              document.documentElement.scrollWidth -
+              document.documentElement.clientWidth,
+            index: indexState
+              ? {
+                  busy: indexState.getAttribute("aria-busy"),
+                  skeletons: indexState.querySelectorAll(
+                    ".codex-ui-pull-request-query-state__skeleton",
+                  ).length,
+                  status: indexState.getAttribute("data-status"),
+                }
+              : null,
+            layoutMode: shell?.getAttribute("data-layout-mode"),
+            main: rect(
+              document.querySelector(".codex-ui-app-shell__main"),
+            ),
+            mainInert: document
+              .querySelector(".codex-ui-app-shell__main")
+              ?.hasAttribute("inert"),
+            merge: merge?.getAttribute("data-status") ?? null,
+            mergeButton: mergeButton
+              ? {
+                  disabled: mergeButton.disabled,
+                  label: mergeButton.textContent?.trim() ?? null,
+                }
+              : null,
+            panel: rect(
+              document.querySelector(
+                ".codex-ui-app-shell__side-panel",
+              ),
+            ),
+            panelOpen: shell?.hasAttribute("data-side-panel-open"),
+            resizer: rect(
+              document.querySelector(
+                ".codex-ui-app-shell__side-panel-resizer",
+              ),
+            ),
+            review: review
+              ? {
+                  busy: review.getAttribute("aria-busy"),
+                  feedback:
+                    review.querySelector(
+                      ".codex-ui-pull-request-submission-feedback",
+                    )?.textContent ?? null,
+                  status: review.getAttribute("data-status"),
+                }
+              : null,
+            runningChecks: document.querySelectorAll(
+              '.codex-ui-pull-request-checks li[data-status="running"]',
+            ).length,
+            selectedTab:
+              document
+                .querySelector(
+                  '[aria-label="Pull request view"] [aria-selected="true"]',
+                )
+                ?.textContent?.trim() ?? null,
+            sidebar: rect(
+              document.querySelector(".codex-ui-app-shell__sidebar"),
+            ),
+            sidebarHidden:
+              document
+                .querySelector(".codex-ui-app-shell__sidebar")
+                ?.getAttribute("aria-hidden") === "true",
+          };
+        });
+        const failed =
+          lifecycle.frame !== scene.frame ||
+          lifecycle.horizontalOverflow > 1 ||
+          (scene.frame === "pr-index-loading" &&
+            (lifecycle.index?.status !== "loading" ||
+              lifecycle.index.busy !== "true" ||
+              lifecycle.index.skeletons !== 5 ||
+              lifecycle.panelOpen)) ||
+          (scene.frame === "pr-index-failed" &&
+            (lifecycle.index?.status !== "error" ||
+              lifecycle.index.busy !== null ||
+              lifecycle.index.skeletons !== 0 ||
+              lifecycle.panelOpen)) ||
+          (scene.frame === "pr-detail-loading" &&
+            (lifecycle.detail?.status !== "loading" ||
+              lifecycle.detail.busy !== "true")) ||
+          (scene.frame === "pr-detail-failed" &&
+            (lifecycle.detail?.status !== "error" ||
+              lifecycle.detail.role !== "alert")) ||
+          (scene.frame === "pr-checks-running" &&
+            (lifecycle.merge !== "checking" ||
+              lifecycle.runningChecks !== 2)) ||
+          (scene.frame === "pr-review-submitting" &&
+            (lifecycle.selectedTab !== "Code" ||
+              lifecycle.review?.status !== "submitting" ||
+              lifecycle.review.busy !== "true")) ||
+          (scene.frame === "pr-comment-failed" &&
+            (lifecycle.comment?.status !== "error" ||
+              lifecycle.comment.feedback !==
+                "The comment was not posted. Try again.")) ||
+          (scene.frame === "pr-merge-ready" &&
+            (lifecycle.merge !== "ready" ||
+              lifecycle.mergeButton?.disabled !== false)) ||
+          (scene.frame === "pr-compact-detail" &&
+            (lifecycle.layoutMode !== "narrow" ||
+              !lifecycle.sidebarHidden ||
+              lifecycle.mainInert ||
+              Math.abs((lifecycle.main?.width ?? 0) - 720) > 1 ||
+              Math.abs((lifecycle.panel?.left ?? 0) - 390) > 1 ||
+              Math.abs((lifecycle.panel?.width ?? 0) - 330) > 1 ||
+              Math.abs((lifecycle.resizer?.left ?? 0) - 382) > 1 ||
+              Math.abs((lifecycle.resizer?.width ?? 0) - 16) > 0.5));
+        if (failed) {
+          throw new Error(
+            `${scene.id}: pull request lifecycle contract failed: ${JSON.stringify(lifecycle)}`,
+          );
+        }
+        let retry = null;
+        if (scene.frame === "pr-index-failed") {
+          await page
+            .getByRole("button", { exact: true, name: "Retry" })
+            .click();
+          const pending = await page
+            .locator(
+              '.demo-pr-index > .codex-ui-pull-request-query-state[data-status="loading"]',
+            )
+            .getAttribute("aria-busy");
+          await page.waitForSelector(
+            ".demo-pr-index .codex-ui-pull-request-list__item",
+          );
+          retry = {
+            pending,
+            readyItems: await page
+              .locator(
+                ".demo-pr-index .codex-ui-pull-request-list__item",
+              )
+              .count(),
+          };
+          if (retry.pending !== "true" || retry.readyItems !== 1) {
+            throw new Error(
+              `${scene.id}: index retry failed: ${JSON.stringify(retry)}`,
+            );
+          }
+        }
+        if (scene.frame === "pr-detail-failed") {
+          await page
+            .getByRole("button", { exact: true, name: "Retry" })
+            .click();
+          const pending = await page
+            .locator(
+              '.demo-pr-panel .codex-ui-pull-request-query-state[data-status="loading"]',
+            )
+            .getAttribute("aria-busy");
+          await page.waitForSelector(
+            ".demo-pr-panel .codex-ui-pull-request-panel-summary",
+          );
+          retry = {
+            heading: await page
+              .locator(".demo-pr-panel h1")
+              .textContent(),
+            pending,
+          };
+          if (
+            retry.pending !== "true" ||
+            retry.heading?.trim() !==
+              "feat: add terminal session lifecycle"
+          ) {
+            throw new Error(
+              `${scene.id}: detail retry failed: ${JSON.stringify(retry)}`,
+            );
+          }
+        }
+        await writeFile(
+          join(artifactDirectory, `${scene.id}.json`),
+          `${JSON.stringify({ ...lifecycle, retry }, null, 2)}\n`,
+        );
+        continue;
+      }
+
       const initial = await page.evaluate(() => {
         const rect = (element) => {
           const value = element.getBoundingClientRect();
@@ -450,15 +681,15 @@ for (const scene of visualScenes) {
         initial.listItems !== 1 ||
         initial.tabCount !== 3 ||
         initial.selectedTab !== "Summary" ||
-        initial.heading !== "feat: add resizable review workspace" ||
+        initial.heading !== "feat: add terminal session lifecycle" ||
         initial.checkCount !== 4 ||
-        Math.abs(initial.main.width - 352) > 1 ||
-        Math.abs(initial.panel.width - 554) > 1 ||
+        Math.abs(initial.main.width - 906) > 1 ||
+        Math.abs(initial.panel.width - 370) > 1 ||
         initial.resizer.cursor !== "col-resize" ||
         Math.abs(initial.resizer.rect.width - 16) > 0.5 ||
-        initial.resizer.ariaMin !== "320" ||
-        initial.resizer.ariaMax !== "554" ||
-        initial.resizer.ariaNow !== "554" ||
+        initial.resizer.ariaMin !== "322" ||
+        initial.resizer.ariaMax !== "516" ||
+        initial.resizer.ariaNow !== "370" ||
         !initial.actions.includes("Open in browser") ||
         !initial.actions.includes("More pull request actions") ||
         !initial.actions.includes("Expand panel")
@@ -492,6 +723,50 @@ for (const scene of visualScenes) {
       ) {
         throw new Error(`${scene.id}: Code tab did not activate.`);
       }
+      await page
+        .getByRole("textbox", { name: "Review summary" })
+        .fill("Current-head review is clean.");
+      await page
+        .getByRole("button", { name: "Submit review" })
+        .click();
+      await page.waitForSelector(
+        '.codex-ui-pull-request-review-composer[data-status="submitted"]',
+      );
+      const mergeAction = page.getByRole("button", { name: "Merge" });
+      if (!(await mergeAction.isEnabled())) {
+        throw new Error(
+          `${scene.id}: submitted review did not unlock merge.`,
+        );
+      }
+      await mergeAction.click();
+      await page.getByRole("button", { name: "Merged" }).waitFor();
+      const reviewSubmission = await page.evaluate(() => ({
+        mergeLabel:
+          Array.from(
+            document.querySelectorAll(
+              ".demo-pr-panel .codex-ui-workspace-panel__actions > button",
+            ),
+          )
+            .find((button) => button.textContent?.trim() === "Merged")
+            ?.textContent?.trim() ?? null,
+        reviewFeedback:
+          document.querySelector(
+            ".codex-ui-pull-request-review-composer .codex-ui-pull-request-submission-feedback",
+          )?.textContent ?? null,
+        reviewStatus:
+          document
+            .querySelector(".codex-ui-pull-request-review-composer")
+            ?.getAttribute("data-status") ?? null,
+      }));
+      if (
+        reviewSubmission.reviewStatus !== "submitted" ||
+        reviewSubmission.reviewFeedback !== "Review submitted." ||
+        reviewSubmission.mergeLabel !== "Merged"
+      ) {
+        throw new Error(
+          `${scene.id}: review and merge lifecycle failed: ${JSON.stringify(reviewSubmission)}`,
+        );
+      }
 
       await page.getByRole("button", { name: "Expand panel" }).click();
       const expanded = await page.evaluate(() => {
@@ -515,7 +790,7 @@ for (const scene of visualScenes) {
         !expanded.expanded ||
         expanded.resizer ||
         Math.abs((expanded.panelWidth ?? 0) - 906) > 1 ||
-        Math.abs(expanded.mainWidth ?? 0) > 1
+        Math.abs((expanded.mainWidth ?? 0) - 906) > 1
       ) {
         throw new Error(
           `${scene.id}: expanded pull request panel failed: ${JSON.stringify(expanded)}`,
@@ -541,10 +816,42 @@ for (const scene of visualScenes) {
       if (
         restored.expanded ||
         !restored.resizer ||
-        Math.abs((restored.panelWidth ?? 0) - 554) > 1
+        Math.abs((restored.panelWidth ?? 0) - 370) > 1
       ) {
         throw new Error(
           `${scene.id}: restored pull request panel failed: ${JSON.stringify(restored)}`,
+        );
+      }
+      await page
+        .getByRole("textbox", { name: "Comment" })
+        .fill("Current-head checks are green.");
+      await page
+        .getByRole("button", { name: "Post comment" })
+        .click();
+      await page.waitForSelector(
+        '.codex-ui-pull-request-comment-composer[data-status="submitted"]',
+      );
+      const commentSubmission = await page.evaluate(() => ({
+        feedback:
+          document.querySelector(
+            ".codex-ui-pull-request-comment-composer .codex-ui-pull-request-submission-feedback",
+          )?.textContent ?? null,
+        status:
+          document
+            .querySelector(".codex-ui-pull-request-comment-composer")
+            ?.getAttribute("data-status") ?? null,
+        value:
+          document.querySelector(
+            ".codex-ui-pull-request-comment-composer textarea",
+          )?.value ?? null,
+      }));
+      if (
+        commentSubmission.status !== "submitted" ||
+        commentSubmission.feedback !== "Comment posted." ||
+        commentSubmission.value !== ""
+      ) {
+        throw new Error(
+          `${scene.id}: comment lifecycle failed: ${JSON.stringify(commentSubmission)}`,
         );
       }
       await page.getByRole("button", { name: "Live local" }).click();
@@ -577,10 +884,52 @@ for (const scene of visualScenes) {
           `${scene.id}: Live local navigation did not leave the pull request view: ${JSON.stringify(liveNavigation)}`,
         );
       }
+      await page.getByRole("button", { name: "Pull requests" }).click();
+      await page.waitForSelector(
+        '.demo-root[data-view="pull-request"] [data-testid="pull-request-panel"]',
+      );
+      const routeRestored = await page.evaluate(() => ({
+        panelOpen: document
+          .querySelector(".codex-ui-app-shell")
+          ?.hasAttribute("data-side-panel-open"),
+        selectedItem:
+          document
+            .querySelector(
+              ".demo-pr-index .codex-ui-pull-request-list__item[data-selected]",
+            )
+            ?.textContent?.trim() ?? null,
+        selectedTab:
+          document
+            .querySelector(
+              '[aria-label="Pull request view"] [aria-selected="true"]',
+            )
+            ?.textContent?.trim() ?? null,
+        view: document
+          .querySelector(".demo-root")
+          ?.getAttribute("data-view"),
+      }));
+      if (
+        routeRestored.view !== "pull-request" ||
+        !routeRestored.panelOpen ||
+        !routeRestored.selectedItem?.includes("#80") ||
+        routeRestored.selectedTab !== "Summary"
+      ) {
+        throw new Error(
+          `${scene.id}: pull request route restoration failed: ${JSON.stringify(routeRestored)}`,
+        );
+      }
       await writeFile(
         join(artifactDirectory, `${scene.id}.json`),
         `${JSON.stringify(
-          { expanded, initial, liveNavigation, restored },
+          {
+            expanded,
+            commentSubmission,
+            initial,
+            liveNavigation,
+            restored,
+            reviewSubmission,
+            routeRestored,
+          },
           null,
           2,
         )}\n`,

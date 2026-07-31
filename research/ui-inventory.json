@@ -4,7 +4,7 @@
     "appVersion": "26.721.81911",
     "buildNumber": "5973",
     "sampledAt": "2026-07-29",
-    "reverifiedAt": "2026-07-30",
+    "reverifiedAt": "2026-07-31",
     "appAsarSha256": "3c9a101d9beec3718b0fcfc19e427c644a934045f48b3fe0e16b68b0b3f23e61",
     "runtimeEvidence": "scoped_cdp",
     "runtimeEvidenceBuilds": {
@@ -771,11 +771,12 @@
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
         "cdp:pull-request-index-tabs-search-split-layout",
-        "cdp-26.721:pull-request-index-all-search-lists-800x600"
+        "cdp-26.721:pull-request-index-all-search-lists-800x600",
+        "cdp-26.721.81911:public-pr-80-summary-timeline-responsive-overlay-history"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "partial_legacy",
-      "electronStatus": "partial_legacy",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
       "priority": "p0"
     },
     {
@@ -785,11 +786,12 @@
       "packageEvidence": ["pull-request-code-review", "pull-request-reviewer-status-list", "pull-request-fix-button", "pull-request-detail-query", "pull-request-media"],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
-        "cdp-26.721:public-pr-69-summary-timeline-code-resize-expand-restore"
+        "cdp-26.721:public-pr-69-summary-timeline-code-resize-expand-restore",
+        "cdp-26.721.81911:public-pr-80-checks-reviewers-comments-code-loading-boundary"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "partial_legacy",
-      "electronStatus": "partial_legacy",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
       "priority": "p0"
     },
     {

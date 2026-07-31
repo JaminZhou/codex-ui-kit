@@ -71,6 +71,15 @@ The authoritative current-build inventory is:
   coverage at its measured wide and compact geometry, but native Codex window
   behavior, the updated build, and the remaining app-shell/panel interactions
   stay separate acceptance requirements.
+- A later read-only `26.721.81911` public-PR probe establishes the current
+  non-modal PR overlay, Summary/Timeline content, responsive
+  1180/960/820/720px geometry, expand/restore, and Back/Forward behavior. The
+  independent public state machine adds list/detail loading and failure,
+  checks, comments, review submission, merge readiness/completion, and compact
+  recovery through 58 Browser/CDP, Electron, and reviewed-pixel frames. No
+  review, comment, or merge was sent to the real PR, and successful
+  current-product Code content was not reached; those states must not be
+  reported as current-product runtime parity.
 - npm publication remains out of scope until the agreed P0/P1 coverage and
   release acceptance surfaces are complete.
 
@@ -117,6 +126,12 @@ completion, and a mixed follow-up turn. Its optional 906×820 comparison gates
 the full main, recovered tool group, user prompt, and Composer independently
 at the same strict threshold. CDP locks call order, labels, expansion, error
 semantics, and group recovery; Electron locks the mixed Review composition.
+
+The current-build Pull request slice adds nine lifecycle frames beyond the
+previous 49-frame matrix. Its independent gates cover index/detail loading and
+failure, running checks, review submission, comment failure, merge readiness,
+and 720×680 compact composition. The current-product comparison remains
+ownership-scoped and read-only.
 
 Broader final visual optimization remains scheduled after the remaining
 inventory, page compositions, and state transitions stabilize. A passing

@@ -59,17 +59,18 @@ observation from a previous build remains historical evidence.
   Pull requests loading/selection continuity, and a real OpenAI Developer Docs
   failed-Fetch → Search → successful-Fetch recovery, plus real
   Composer submit/Stop, queue/pause/Resume, permissions, add-menu states, and
-  the new-chat workspace entry plus project picker, and the bottom Terminal's
-  three-tab, per-tab close, picker, and compact states;
+  the new-chat workspace entry plus project picker, the bottom Terminal's
+  three-tab, per-tab close, picker, and compact states, and the public-PR
+  Summary/Timeline/responsive-panel lifecycle;
   light-theme, global notifications, current-build long-thread
   virtualization, and unrelated surface evidence remain pending
 
-Current inventory: 75 surface groups; 21 have current-build runtime evidence,
-35 have previous-build-only runtime evidence, 19 remain `not_sampled`, and 0
-are `blocked_by_policy`. Current-build Browser verification covers 18 groups
-and Electron verification covers 18. Prior acceptance outside the sampled
-shell, sidebar, recovered MCP, and Composer lifecycle slices remains recorded
-as `partial_legacy` until current-build re-observation.
+Current inventory: 75 surface groups; 23 have current-build runtime evidence,
+33 have previous-build-only runtime evidence, 19 remain `not_sampled`, and 0
+are `blocked_by_policy`. Current-build Browser verification covers 20 groups
+and Electron verification covers 20. Prior acceptance outside the sampled
+shell, sidebar, recovered MCP, Composer, Terminal, and Pull request lifecycle
+slices remains recorded as `partial_legacy` until current-build re-observation.
 
 The current package exposes candidates far beyond the old transcript sample:
 application and thread shells, local/remote conversation routes, projects and
@@ -371,19 +372,30 @@ synthetic host-state coverage, so the broader Review family remains
 implementation-partial rather than being promoted to product-level
 completion.
 
-The Pull request detail slice adds a controlled, resizable workspace panel
-with a public `PullRequestPanelSummary`, an icon-capable PR list row, and
-Summary, Timeline, and Code tabs. CDP asserts the measured 352px index, 554px
-detail, 16px separator, 320px panel minimum, 352px retained main track, and
-expand/restore lifecycle. Electron drives pointer and keyboard resizing,
-tab changes, comment entry, and full-panel expansion in a real
-`BrowserWindow`. A fourteenth reviewed baseline covers the whole integration,
-while an optional 906×820 `26.721.41059` gate compares the index and detail
-regions separately. This previously verified `workspace.pull-request-route`
-and `workspace.pull-request-review` in Browser and Electron for the sampled
-public PR path; both are now `partial_legacy`. Merge execution, review
-submission, loading/failure states, and broader PR variants remain outside
-this slice.
+The refreshed Pull request lifecycle keeps the controlled, resizable workspace
+panel but follows the current `26.721.81911` non-modal overlay geometry. The
+read-only public-PR probe measured a 369.28px detail panel over the 906px main
+route at 1180×820, a 321.97px panel at 960×720, about 319px at 820×680, and a
+329.31px panel at 720×680 after the sidebar collapsed. The 16px resize target
+sits on the panel edge; the underlying main route remains interactive. Expand,
+Restore, Back, and Forward preserve the expected route and panel state.
+
+The public contract now includes `PullRequestQueryState`,
+`PullRequestMergeReadiness`, `PullRequestReviewComposer`, and
+`PullRequestCommentComposer` in addition to the PR list, details, summary,
+checks, reviewer, and thread surfaces. The deterministic state machine covers
+index/detail loading, failure and retry; running/failed/passed checks; comment
+failure/recovery; review submission; blocked/ready/merging/merged requirements;
+compact layout; and route restoration. Browser/CDP, real Electron, and
+reviewed pixels verify the resulting 58-frame matrix, so
+`workspace.pull-request-route` and `workspace.pull-request-review` are now
+independently Browser/Electron verified.
+
+The current-product evidence remains narrower: Summary and Timeline content,
+responsive geometry, a Code loading boundary, and navigation were observed
+read-only. No real comment, review, or merge was submitted, and successful
+current-product Code content was not reached. Those host-owned transitions
+remain independent acceptance rather than promoted runtime claims.
 
 The original Terminal slice established the bottom-panel interaction contract
 on `26.721.41059`: a 272px panel track, 152px minimum, half-height responsive

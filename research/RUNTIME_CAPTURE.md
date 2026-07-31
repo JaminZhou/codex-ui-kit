@@ -250,6 +250,37 @@ Cleanup confirmed the exact spawned process and `127.0.0.1:9481` listener were
 gone, removed only the unique profile, and deleted all six external
 screenshots. The original Codex process remained running.
 
+### Current Pull request lifecycle capture
+
+The `26.721.81911` Pull request probe used an exact second process with a unique
+temporary Chromium profile and loopback-only debugging port. It selected the
+1180×820 `app://-/index.html` main Renderer by area and application-shell
+landmarks, then opened public PR `#80` read-only.
+
+The bounded sequence was:
+
+1. record the PR index and open the detail without changing repository state;
+2. inspect Summary facts, checks, reviewers, description, comment-action
+   disabled state, and sampled merge readiness;
+3. inspect Timeline public comments and bot-review entries;
+4. open Code only long enough to record its loading boundary;
+5. measure the panel and separator at 1180×820, 960×720, 820×680, and
+   720×680, including sidebar collapse at the compact width;
+6. expand and restore the detail, then use Back and Forward to verify route,
+   tab, and geometry restoration.
+
+At 1180×820 the panel measured x=810.72/w=369.28 with a 16px separator
+beginning at x=801.72 over the 906px main route. At 960×720, 820×680, and
+720×680 the panel was respectively 321.97px, about 319px, and 329.31px wide.
+The detail remained non-modal and did not inert the underlying main route.
+
+No real comment, review, rerun, or merge action was activated. Successful Code
+content was not reached within the bounded capture, so only its loading state
+is recorded. The independent Browser/Electron replay exercises those mutating
+and failure transitions against deterministic public host state, not GitHub.
+Cleanup terminated only the exact temporary-profile process, verified its
+listener was gone, and removed its external screenshots and profile.
+
 ## Required flow matrix
 
 ### 1. Application entry and navigation

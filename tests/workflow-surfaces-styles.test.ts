@@ -63,4 +63,22 @@ describe("workflow surface visual contract", () => {
       /@media \(prefers-reduced-motion: reduce\)[\s\S]*?\.codex-ui-conversation-event\[data-status="running"\][\s\S]*?animation: none/,
     );
   });
+
+  it("keeps pull request lifecycle states responsive and motion-safe", () => {
+    expect(styles).toContain(
+      "container-name: codex-ui-pull-request-composer",
+    );
+    expect(styles).toContain(
+      "@container codex-ui-pull-request-composer (max-width: 20rem)",
+    );
+    expect(styles).toContain(
+      '.codex-ui-pull-request-merge-readiness[data-status="blocked"]',
+    );
+    expect(styles).toContain(
+      '.codex-ui-pull-request-submission-feedback[data-status="error"]',
+    );
+    expect(styles).toMatch(
+      /@media \(prefers-reduced-motion: reduce\)[\s\S]*?\.codex-ui-pull-request-query-state__skeleton > span,[\s\S]*?animation: none/,
+    );
+  });
 });

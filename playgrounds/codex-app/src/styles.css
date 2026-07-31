@@ -542,7 +542,9 @@ textarea {
   border-block-start-color: rgba(255, 255, 255, 0.12);
 }
 
-.demo-root:is([data-capture], [data-layout="wide"])
+.demo-root:is([data-capture], [data-layout="wide"]):not(
+    [data-view="pull-request"]
+  )
   .codex-ui-app-shell__side-panel {
   bottom: auto;
   box-shadow: none;
@@ -1083,6 +1085,11 @@ textarea {
   overflow: auto;
 }
 
+.demo-pr-index > .codex-ui-pull-request-query-state {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
 .demo-pr-index > h2 {
   color: rgba(255, 255, 255, 0.48);
   font-size: 12px;
@@ -1204,6 +1211,11 @@ textarea {
   padding-inline: 0.5rem;
 }
 
+.demo-pr-checks {
+  display: grid;
+  gap: 1rem;
+}
+
 .demo-pr-description h3 {
   font-size: 16px;
   margin: 0.25rem 0 0.5rem;
@@ -1287,7 +1299,7 @@ textarea {
 
 .demo-pr-panel__code {
   display: grid;
-  grid-template-rows: auto minmax(0, 1fr);
+  grid-template-rows: auto auto minmax(0, 1fr);
 }
 
 .demo-pr-code-toolbar {
@@ -1319,6 +1331,10 @@ textarea {
 .demo-pr-panel__code .codex-ui-file-review {
   height: 100%;
   min-height: 0;
+}
+
+.demo-pr-panel__code .codex-ui-pull-request-review-composer {
+  margin: 12px;
 }
 
 @media (prefers-reduced-motion: reduce) {

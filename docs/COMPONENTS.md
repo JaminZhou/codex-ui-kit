@@ -135,6 +135,10 @@ All privileged behavior remains host-owned. The components never auto-approve co
   `sidePanelResizable` applies the same accessible interaction contract to the
   right workspace, with configurable panel/main minima, responsive clamping,
   controlled persistence, focus restoration, and an expanded full-main mode.
+  `sidePanelOverlay` lets a host explicitly preserve the main route beneath a
+  responsive panel; `sidePanelOverlayModal` separately controls backdrop,
+  inertness, focus trapping, and dismissal so a current-build non-modal PR
+  overlay can remain resizable without disabling the route.
   Responsive width clamping also applies when the panel has no resize
   affordance, and a wider sidebar is coordinated with the persistent panel
   minimum so both fixed tracks cannot consume the main route.
@@ -225,6 +229,15 @@ All privileged behavior remains host-owned. The components never auto-approve co
 - `PullRequestCheckList`, `PullRequestReviewSummary`, and
   `PullRequestReviewThread`: check progress, reviewer outcomes, inline file
   threads, resolved/outdated states, and host-owned review actions.
+- `PullRequestQueryState`: accessible list/detail loading, refreshing, empty,
+  and retryable failure presentation with reduced-motion-safe skeletons.
+- `PullRequestMergeReadiness`: blocked, checking, conflicted, ready, merging,
+  and merged presentation with explicit passed, pending, and failed
+  requirements that do not rely on color alone.
+- `PullRequestReviewComposer` and `PullRequestCommentComposer`: controlled,
+  host-submitted review/comment forms with nonblank guards, submitting,
+  success, and failure feedback. Request changes additionally requires review
+  body content.
 
 The workflow components do not fetch repositories, create worktrees, call
 GitHub, or merge changes. Hosts normalize those states and perform every

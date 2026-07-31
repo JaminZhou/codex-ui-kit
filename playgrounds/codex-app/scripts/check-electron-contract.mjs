@@ -1091,7 +1091,7 @@ try {
 }
 
 const pullRequestScene = {
-  frame: "review-open",
+  frame: "pr-summary-ready",
   id: "electron-pull-request-detail",
   scenario: "workspace-workflow",
   view: "pull-request",
@@ -1122,8 +1122,8 @@ try {
     !pullRequestGeometry.main ||
     !pullRequestGeometry.panel ||
     !pullRequestGeometry.resizer ||
-    Math.abs(pullRequestGeometry.main.width - 352) > 1 ||
-    Math.abs(pullRequestGeometry.panel.width - 554) > 1 ||
+    Math.abs(pullRequestGeometry.main.width - 906) > 1 ||
+    Math.abs(pullRequestGeometry.panel.width - 370) > 1 ||
     Math.abs(pullRequestGeometry.resizer.width - 16) > 0.5 ||
     pullRequestGeometry.selectedTab !== "Summary"
   ) {
@@ -1144,6 +1144,25 @@ try {
   ) {
     throw new Error("Electron pull request Code tab did not render three files.");
   }
+  await pullRequestPage
+    .getByRole("textbox", { name: "Review summary" })
+    .fill("Current-head review is clean.");
+  await pullRequestPage
+    .getByRole("button", { name: "Submit review" })
+    .click();
+  await pullRequestPage.waitForSelector(
+    '.codex-ui-pull-request-review-composer[data-status="submitted"]',
+  );
+  const mergePullRequest = pullRequestPage.getByRole("button", {
+    name: "Merge",
+  });
+  if (!(await mergePullRequest.isEnabled())) {
+    throw new Error(
+      "Electron pull request review did not unlock the merge action.",
+    );
+  }
+  await mergePullRequest.click();
+  await pullRequestPage.getByRole("button", { name: "Merged" }).waitFor();
 
   const pullRequestResizer = pullRequestPage.getByRole("separator", {
     name: "Resize workspace panel",
@@ -1166,7 +1185,7 @@ try {
   const narrowedPullRequestWidth = await pullRequestPage
     .locator(".codex-ui-app-shell__side-panel")
     .evaluate((element) => element.getBoundingClientRect().width);
-  if (Math.abs(narrowedPullRequestWidth - 490) > 1) {
+  if (Math.abs(narrowedPullRequestWidth - 322) > 1) {
     throw new Error(
       `Electron pull request pointer resize failed: ${narrowedPullRequestWidth}`,
     );
@@ -1198,6 +1217,15 @@ try {
     .getByRole("button", { name: "Restore panel width" })
     .click();
   await pullRequestPage.getByRole("tab", { name: "Summary" }).click();
+  await pullRequestPage
+    .getByRole("textbox", { name: "Comment" })
+    .fill("Current-head checks are green.");
+  await pullRequestPage
+    .getByRole("button", { name: "Post comment" })
+    .click();
+  await pullRequestPage.waitForSelector(
+    '.codex-ui-pull-request-comment-composer[data-status="submitted"]',
+  );
   await pullRequestPage.getByRole("button", { name: "Live local" }).click();
   await pullRequestPage.waitForSelector(
     '.demo-root[data-view="conversation"][data-mode="live"]',
@@ -1212,6 +1240,26 @@ try {
   ) {
     throw new Error(
       "Electron Live local navigation did not leave the pull request view.",
+    );
+  }
+  await pullRequestPage
+    .getByRole("button", { name: "Pull requests" })
+    .click();
+  await pullRequestPage.waitForSelector(
+    '.demo-root[data-view="pull-request"] [data-testid="pull-request-panel"]',
+  );
+  if (
+    (await pullRequestPage
+      .getByRole("button", {
+        name: "Open pull request 80: feat: add terminal session lifecycle",
+      })
+      .getAttribute("aria-current")) !== "page" ||
+    (await pullRequestPage
+      .getByRole("tab", { name: "Summary" })
+      .getAttribute("aria-selected")) !== "true"
+  ) {
+    throw new Error(
+      "Electron pull request route did not restore its selected detail.",
     );
   }
 } finally {

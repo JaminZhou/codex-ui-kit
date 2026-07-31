@@ -692,6 +692,84 @@ describe("application shell", () => {
     ).toBe(false);
   });
 
+  it("supports an explicit wide overlay without consuming the main track", () => {
+    const { container } = render(
+      <AppShell
+        layoutMode="wide"
+        onSidePanelOpenChange={() => undefined}
+        sidePanel={<button type="button">Pull request summary</button>}
+        sidePanelOpen
+        sidePanelOverlay
+        sidePanelResizable
+        sidebar={<button type="button">Projects</button>}
+        sidebarOpen
+      >
+        Pull request index
+      </AppShell>,
+    );
+    const shell = container.querySelector(
+      ".codex-ui-app-shell",
+    ) as HTMLDivElement;
+
+    expect(shell.hasAttribute("data-side-panel-overlay")).toBe(true);
+    expect(
+      screen.queryByRole("separator", {
+        name: "Resize workspace panel",
+      }),
+    ).toBeNull();
+    expect(
+      screen
+        .getByRole("main", { name: "Conversation" })
+        .hasAttribute("inert"),
+    ).toBe(true);
+    expect(
+      screen.getByRole("complementary", {
+        name: "Workspace panel",
+      }).getAttribute("aria-hidden"),
+    ).toBe("false");
+  });
+
+  it("keeps a non-modal overlay resizable and the main track active", () => {
+    const { container } = render(
+      <AppShell
+        layoutMode="wide"
+        onSidePanelOpenChange={() => undefined}
+        sidePanel={<button type="button">Pull request summary</button>}
+        sidePanelOpen
+        sidePanelOverlay
+        sidePanelOverlayModal={false}
+        sidePanelResizable
+        sidebar={<button type="button">Projects</button>}
+        sidebarOpen
+      >
+        Pull request index
+      </AppShell>,
+    );
+    const shell = container.querySelector(
+      ".codex-ui-app-shell",
+    ) as HTMLDivElement;
+
+    expect(shell.hasAttribute("data-side-panel-overlay")).toBe(true);
+    expect(
+      shell.hasAttribute("data-side-panel-overlay-modal"),
+    ).toBe(false);
+    expect(
+      screen.getByRole("separator", {
+        name: "Resize workspace panel",
+      }),
+    ).toBeTruthy();
+    expect(
+      screen
+        .getByRole("main", { name: "Conversation" })
+        .hasAttribute("inert"),
+    ).toBe(false);
+    expect(
+      screen.getByRole("button", {
+        name: "Close workspace panel",
+      }).tabIndex,
+    ).toBe(-1);
+  });
+
   it("treats expanded side panels as modal overlays below wide mode", () => {
     const { container } = render(
       <AppShell

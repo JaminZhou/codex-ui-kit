@@ -69,8 +69,8 @@ resizing is covered by the next current-build slice.
 
 ## Fifth vertical slice
 
-The fifth slice reaches the current public Pull request detail and completes
-the resizable workspace contract:
+The fifth slice established the previous-build public Pull request detail and
+the first resizable workspace contract:
 
 - a 16px Review/PR separator with a measured 320px panel minimum and 352px
   retained main track;
@@ -81,6 +81,10 @@ the resizable workspace contract:
 - full-main expansion and exact panel-width restoration;
 - a fourteenth reviewed pixel frame plus an optional external current-build
   index/detail comparison.
+
+Its 352/554px split remains a regression fixture for `26.721.41059`; the
+current-build overlay and complete deterministic lifecycle are described in
+the sixteenth slice below.
 
 ## Sixth vertical slice
 
@@ -246,6 +250,28 @@ current-build session-tab contract and an independent process lifecycle:
 The current-product probe did not execute a shell process. Running, failed,
 exited, and restore states are deterministic public-host acceptance rather
 than promoted current-product lifecycle evidence.
+
+## Sixteenth vertical slice
+
+The sixteenth slice refreshes Pull request behavior against
+`26.721.81911` and expands it into a deterministic host-owned lifecycle:
+
+- read-only current-product evidence for Summary, Timeline, Code loading,
+  non-modal overlay geometry, responsive 1180/960/820/720px behavior,
+  expand/restore, and Back/Forward restoration;
+- public `PullRequestQueryState`, `PullRequestMergeReadiness`,
+  `PullRequestReviewComposer`, and `PullRequestCommentComposer` contracts;
+- index/detail loading and failure/retry, running/failed/passed checks, comment
+  failure/recovery, review submission, merge blocked/ready/merging/merged, and
+  compact states;
+- real Electron review/comment/merge interaction against deterministic local
+  state, without GitHub side effects;
+- nine additional reviewed visual frames and a shared 58-frame CDP/pixel
+  matrix.
+
+The current-product probe did not submit a real comment, review, or merge.
+Successful Code content also remained outside the bounded capture, so these
+states are independent acceptance rather than promoted runtime evidence.
 
 ## Development
 

@@ -36,8 +36,12 @@ import {
   McpToolIcon,
   NewConversationStart,
   PullRequestCheckList,
+  PullRequestCommentComposer,
   PullRequestList,
+  PullRequestMergeReadiness,
   PullRequestPanelSummary,
+  PullRequestQueryState,
+  PullRequestReviewComposer,
   QueuedPromptList,
   StatusBanner,
   TerminalPanel,
@@ -101,6 +105,11 @@ import {
   mcpToolCallGroupStatus,
   mcpToolCallPresentation,
 } from "./mcp-tool-call-view";
+import {
+  initialPullRequestLifecycleState,
+  reducePullRequestLifecycle,
+  type PullRequestLifecycleAction,
+} from "./pull-request-lifecycle";
 
 type DemoView = "conversation" | "pull-request" | "shell" | "workspace";
 
@@ -384,71 +393,86 @@ function McpResponseActions({
 
 const pullRequestFiles = [
   {
-    additions: 3,
+    additions: 31,
     change: "modified" as const,
-    deletions: 1,
+    deletions: 0,
     lines: [
       {
-        content: "@@ -318,6 +318,8 @@ export interface AppShellProps",
+        content:
+          "@@ -136,8 +137,31 @@ export type TerminalSessionStatus",
         kind: "hunk" as const,
       },
       {
-        content: "sidePanelOpen?: boolean;",
+        content: '| "idle"',
         kind: "context" as const,
-        newLineNumber: 329,
-        oldLineNumber: 329,
+        newLineNumber: 140,
+        oldLineNumber: 140,
       },
       {
-        content: "sidePanelResizable?: boolean;",
+        content: '| "restoring"',
         kind: "addition" as const,
-        newLineNumber: 330,
+        newLineNumber: 141,
       },
       {
-        content: "sidePanelResizeLabel?: string;",
+        content: '| "running";',
+        kind: "context" as const,
+        newLineNumber: 142,
+        oldLineNumber: 141,
+      },
+      {
+        content: "const terminalSessionStatusLabel = {",
         kind: "addition" as const,
-        newLineNumber: 331,
+        newLineNumber: 144,
       },
     ],
-    path: "src/components/AppShell.tsx",
+    path: "src/components/TerminalPanel.tsx",
   },
   {
-    additions: 5,
+    additions: 7,
     change: "modified" as const,
     deletions: 0,
     lines: [
       {
-        content: "@@ -243,6 +243,11 @@",
+        content: "@@ -16,6 +17,7 @@ export type ReplayScenarioId",
         kind: "hunk" as const,
       },
       {
-        content: ".codex-ui-app-shell__side-panel-resizer {",
+        content: '| "terminal-lifecycle"',
         kind: "addition" as const,
-        newLineNumber: 245,
+        newLineNumber: 20,
       },
       {
-        content: "  cursor: col-resize;",
+        content: '| "interruption"',
+        kind: "context" as const,
+        newLineNumber: 21,
+        oldLineNumber: 20,
+      },
+      {
+        content: '"terminal-lifecycle": scenario(',
         kind: "addition" as const,
-        newLineNumber: 246,
+        newLineNumber: 84,
       },
     ],
-    path: "src/styles.css",
+    path: "playgrounds/codex-app/src/replay.ts",
   },
   {
-    additions: 8,
+    additions: 140,
     change: "modified" as const,
     deletions: 0,
     lines: [
       {
-        content: "@@ -262,6 +262,14 @@ describe(\"application shell\", () => {",
+        content:
+          '@@ -87,4 +89,140 @@ describe("terminal panel", () => {',
         kind: "hunk" as const,
       },
       {
-        content: "it(\"resizes the workspace track\", () => {",
+        content:
+          'it("coordinates multiple controlled sessions, close, create, and restore", () => {',
         kind: "addition" as const,
-        newLineNumber: 265,
+        newLineNumber: 92,
       },
     ],
-    path: "tests/app-shell.test.tsx",
+    path: "tests/terminal-panel.test.tsx",
   },
 ];
 
@@ -636,7 +660,10 @@ export function App() {
     useState(false);
   const [liveStartPending, setLiveStartPending] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(
-    () => initialSelection.capture || !isNarrowDemoWindow(),
+    () =>
+      (initialSelection.capture &&
+        initialSelection.frame !== "pr-compact-detail") ||
+      !isNarrowDemoWindow(),
   );
   const [reviewOpen, setReviewOpen] = useState(
     initialSelection.frame === "review-open" ||
@@ -683,14 +710,24 @@ export function App() {
     name: string;
     value: unknown;
   } | null>(null);
+  const [pullRequestState, dispatchPullRequest] = useReducer(
+    reducePullRequestLifecycle,
+    initialSelection.frame,
+    initialPullRequestLifecycleState,
+  );
   const [pullRequestExpanded, setPullRequestExpanded] = useState(false);
   const [pullRequestOpen, setPullRequestOpen] = useState(
-    initialSelection.view === "pull-request",
+    initialSelection.view === "pull-request" &&
+      pullRequestState.selectedId !== null,
   );
-  const [pullRequestWidth, setPullRequestWidth] = useState(554);
+  const [pullRequestWidth, setPullRequestWidth] = useState(370);
   const [pullRequestTab, setPullRequestTab] = useState<
     "code" | "summary" | "timeline"
-  >("summary");
+  >(
+    initialSelection.frame?.startsWith("pr-review-")
+      ? "code"
+      : "summary",
+  );
   const [undoneFileIds, setUndoneFileIds] = useState<Set<string>>(
     () => new Set(),
   );
@@ -704,6 +741,7 @@ export function App() {
   const queuedPromptCounterRef = useRef(1);
   const terminalSessionCounterRef = useRef(1);
   const replaySubmitTimerRef = useRef<number | null>(null);
+  const pullRequestTransitionTimerRef = useRef<number | null>(null);
   const pendingMessageNavigationRef = useRef<{
     behavior: "instant" | "smooth";
     id: string;
@@ -791,6 +829,9 @@ export function App() {
       if (replaySubmitTimerRef.current !== null) {
         window.clearTimeout(replaySubmitTimerRef.current);
       }
+      if (pullRequestTransitionTimerRef.current !== null) {
+        window.clearTimeout(pullRequestTransitionTimerRef.current);
+      }
     },
     [],
   );
@@ -800,6 +841,23 @@ export function App() {
     window.clearTimeout(replaySubmitTimerRef.current);
     replaySubmitTimerRef.current = null;
   };
+
+  const schedulePullRequestTransition = useCallback(
+    (
+      pending: PullRequestLifecycleAction,
+      settled: PullRequestLifecycleAction,
+    ) => {
+      if (pullRequestTransitionTimerRef.current !== null) {
+        window.clearTimeout(pullRequestTransitionTimerRef.current);
+      }
+      dispatchPullRequest(pending);
+      pullRequestTransitionTimerRef.current = window.setTimeout(() => {
+        dispatchPullRequest(settled);
+        pullRequestTransitionTimerRef.current = null;
+      }, 420);
+    },
+    [],
+  );
 
   const selectReplayPosition = (nextCount: number) => {
     cancelReplaySubmitTimer();
@@ -2100,51 +2158,138 @@ export function App() {
       ]}
     />
   ) : null;
-  const pullRequestSummary = (
+  const pullRequestChecks = [
+    {
+      id: "electron",
+      name: "Codex app Electron acceptance",
+      status:
+        pullRequestState.checkStatus === "passed"
+          ? ("passed" as const)
+          : pullRequestState.checkStatus === "failed"
+            ? ("failed" as const)
+            : ("running" as const),
+    },
+    {
+      id: "check",
+      name: "check",
+      status:
+        pullRequestState.checkStatus === "failed"
+          ? ("failed" as const)
+          : pullRequestState.checkStatus === "running"
+            ? ("running" as const)
+            : ("passed" as const),
+    },
+    { id: "codeql", name: "CodeQL", status: "passed" as const },
+    {
+      id: "react-nodenext",
+      name: "React 19 / NodeNext consumer",
+      status: "passed" as const,
+    },
+  ];
+  const pullRequestMergeAction =
+    pullRequestState.checkStatus === "failed" ? (
+      <button
+        onClick={() =>
+          schedulePullRequestTransition(
+            { type: "checks/run" },
+            { type: "checks/pass" },
+          )
+        }
+        type="button"
+      >
+        Re-run checks
+      </button>
+    ) : pullRequestState.reviewRequirement !== "passed" &&
+      pullRequestState.mergeStatus !== "checking" ? (
+      <button
+        onClick={() => setPullRequestTab("code")}
+        type="button"
+      >
+        Open review
+      </button>
+    ) : undefined;
+  const pullRequestSummaryReady = (
     <PullRequestPanelSummary
       checks={
-        <PullRequestCheckList
-          checks={[
-            {
-              id: "electron",
-              name: "Codex app Electron acceptance",
-              status: "passed",
-            },
-            { id: "check", name: "check", status: "passed" },
-            { id: "codeql", name: "CodeQL", status: "passed" },
-            {
-              id: "react-nodenext",
-              name: "React 19 / NodeNext consumer",
-              status: "passed",
-            },
-          ]}
-        />
+        <div className="demo-pr-checks">
+          <PullRequestCheckList checks={pullRequestChecks} />
+          <PullRequestMergeReadiness
+            action={pullRequestMergeAction}
+            description={
+              pullRequestState.mergeStatus === "blocked"
+                ? "All current-head gates must pass before merging."
+                : pullRequestState.mergeStatus === "ready"
+                  ? "Current-head checks, review, and threads are clean."
+                  : undefined
+            }
+            requirements={[
+              {
+                description:
+                  pullRequestState.checkStatus === "passed"
+                    ? "7 checks successful"
+                    : pullRequestState.checkStatus === "running"
+                      ? "Current-head checks are running"
+                      : "A current-head check failed",
+                id: "checks",
+                label: "Checks",
+                status:
+                  pullRequestState.checkStatus === "passed"
+                    ? "passed"
+                    : pullRequestState.checkStatus === "failed"
+                      ? "failed"
+                      : "pending",
+              },
+              {
+                description:
+                  pullRequestState.reviewRequirement === "passed"
+                    ? "Fresh review after the latest push"
+                    : pullRequestState.reviewRequirement === "failed"
+                      ? "Review submission failed"
+                      : "Waiting for a fresh current-head review",
+                id: "review",
+                label: "Review",
+                status: pullRequestState.reviewRequirement,
+              },
+              {
+                description: "No unresolved bot threads",
+                id: "threads",
+                label: "Review threads",
+                status: "passed",
+              },
+            ]}
+            status={pullRequestState.mergeStatus}
+          />
+        </div>
       }
       className="demo-pr-panel__summary"
       commentComposer={
-        <label className="demo-pr-comment">
-          <span>Comment</span>
-          <textarea
-            aria-label="Pull request comment"
-            placeholder="Leave a comment"
-          />
-          <button aria-label="Post comment" type="button">
-            ↑
-          </button>
-        </label>
+        <PullRequestCommentComposer
+          error={pullRequestState.commentError}
+          onSubmit={() =>
+            schedulePullRequestTransition(
+              { type: "comment/submit" },
+              { type: "comment/succeed" },
+            )
+          }
+          onValueChange={(body) =>
+            dispatchPullRequest({ body, type: "comment/change" })
+          }
+          status={pullRequestState.commentStatus}
+          value={pullRequestState.commentBody}
+        />
       }
       description={
         <div className="demo-pr-description">
           <h3>Summary</h3>
           <ul>
-            <li>Add controlled and uncontrolled Review workspace resizing.</li>
-            <li>Preserve the measured panel and conversation constraints.</li>
-            <li>Gate pointer, keyboard, compact, Electron, and pixels.</li>
+            <li>Add terminal tabs, lifecycle states, and process history.</li>
+            <li>Preserve compact and wide workspace continuity.</li>
+            <li>Gate pointer, keyboard, Electron, and regional pixels.</li>
           </ul>
           <h3>Verification</h3>
           <ul>
-            <li>Focused component and accessibility tests.</li>
-            <li>CDP, Electron, and pixel acceptance.</li>
+            <li>531 package and playground tests.</li>
+            <li>CDP, Electron, accessibility, and pixel acceptance.</li>
           </ul>
         </div>
       }
@@ -2160,9 +2305,9 @@ export function App() {
           label: "Branch",
           value: (
             <>
-              feat/review-panel-workspace → main{" "}
-              <span className="demo-pr-additions">+637</span>{" "}
-              <span className="demo-pr-deletions">−14</span>
+              feat/terminal-session-lifecycle → main{" "}
+              <span className="demo-pr-additions">+1,743</span>{" "}
+              <span className="demo-pr-deletions">−231</span>
             </>
           ),
         },
@@ -2176,14 +2321,24 @@ export function App() {
           id: "comments",
           indicator: "◌",
           label: "Comments",
-          value: "3 comments",
+          value: "6 comments",
         },
         {
           id: "checks",
           indicator: "○",
           label: "Checks",
-          tone: "success",
-          value: "Successful",
+          tone:
+            pullRequestState.checkStatus === "passed"
+              ? "success"
+              : pullRequestState.checkStatus === "failed"
+                ? "danger"
+                : undefined,
+          value:
+            pullRequestState.checkStatus === "passed"
+              ? "Successful"
+              : pullRequestState.checkStatus === "failed"
+                ? "Failed"
+                : "In progress",
         },
       ]}
       meta={
@@ -2196,7 +2351,7 @@ export function App() {
           <span>Ready for review</span>
         </>
       }
-      title="feat: add resizable review workspace"
+      title="feat: add terminal session lifecycle"
       titleAction={
         <button aria-label="Edit title" type="button">
           ✎
@@ -2204,6 +2359,41 @@ export function App() {
       }
     />
   );
+  const pullRequestDetailState =
+    pullRequestState.detailStatus === "ready" ? null : (
+      <PullRequestQueryState
+        action={
+          pullRequestState.detailStatus === "error" ? (
+            <button
+              onClick={() =>
+                schedulePullRequestTransition(
+                  { type: "detail/load" },
+                  { type: "detail/ready" },
+                )
+              }
+              type="button"
+            >
+              Retry
+            </button>
+          ) : undefined
+        }
+        description={
+          pullRequestState.detailStatus === "error"
+            ? "The pull request detail could not be loaded."
+            : "Fetching the latest summary, timeline, and diff."
+        }
+        heading={
+          pullRequestState.detailStatus === "error"
+            ? "Pull request unavailable"
+            : pullRequestState.detailStatus === "empty"
+              ? "Pull request not found"
+              : "Loading pull request"
+        }
+        status={pullRequestState.detailStatus}
+      />
+    );
+  const pullRequestSummary =
+    pullRequestDetailState ?? pullRequestSummaryReady;
   const pullRequestTimeline = (
     <div className="demo-pr-panel__timeline">
       <article>
@@ -2231,7 +2421,7 @@ export function App() {
     <div className="demo-pr-panel__code">
       <div aria-label="Code review controls" className="demo-pr-code-toolbar">
         <span>
-          <strong>feat/review-panel-workspace</strong>
+          <strong>feat/terminal-session-lifecycle</strong>
           <small>into main</small>
         </span>
         <button aria-label="Review options" type="button">
@@ -2247,6 +2437,24 @@ export function App() {
           ☷
         </button>
       </div>
+      <PullRequestReviewComposer
+        body={pullRequestState.reviewBody}
+        error={pullRequestState.reviewError}
+        kind={pullRequestState.reviewKind}
+        onBodyChange={(body) =>
+          dispatchPullRequest({ body, type: "review/body" })
+        }
+        onKindChange={(kind) =>
+          dispatchPullRequest({ kind, type: "review/kind" })
+        }
+        onSubmit={() =>
+          schedulePullRequestTransition(
+            { type: "review/submit" },
+            { type: "review/succeed" },
+          )
+        }
+        status={pullRequestState.reviewStatus}
+      />
       <FileReview
         aria-label="Pull request code review"
         files={pullRequestFiles}
@@ -2264,8 +2472,21 @@ export function App() {
           <button aria-label="More pull request actions" type="button">
             ⋯
           </button>
-          <button disabled type="button">
-            Merge
+          <button
+            disabled={pullRequestState.mergeStatus !== "ready"}
+            onClick={() =>
+              schedulePullRequestTransition(
+                { type: "merge/start" },
+                { type: "merge/succeed" },
+              )
+            }
+            type="button"
+          >
+            {pullRequestState.mergeStatus === "merged"
+              ? "Merged"
+              : pullRequestState.mergeStatus === "merging"
+                ? "Merging…"
+                : "Merge"}
           </button>
         </>
       }
@@ -2282,8 +2503,16 @@ export function App() {
       restorePanelLabel="Restore panel width"
       tabs={[
         { content: pullRequestSummary, id: "summary", label: "Summary" },
-        { content: pullRequestTimeline, id: "timeline", label: "Timeline" },
-        { content: pullRequestCode, id: "code", label: "Code" },
+        {
+          content: pullRequestDetailState ?? pullRequestTimeline,
+          id: "timeline",
+          label: "Timeline",
+        },
+        {
+          content: pullRequestDetailState ?? pullRequestCode,
+          id: "code",
+          label: "Code",
+        },
       ]}
       tabsLabel="Pull request view"
     />
@@ -2306,7 +2535,7 @@ export function App() {
       <div className="demo-pr-index__search">
         <input
           aria-label="Search pull requests"
-          defaultValue="69"
+          defaultValue="80"
           placeholder="Search pull requests"
           type="search"
         />
@@ -2315,28 +2544,76 @@ export function App() {
         </button>
       </div>
       <h2>Authored</h2>
-      <PullRequestList
-        items={[
-          {
-            author: "JaminZhou",
-            checkStatus: "passed",
-            commentCount: 3,
-            id: "69",
-            indicator: (
-              <span className="demo-pr-branch-indicator">
-                ⑂<i />
-              </span>
-            ),
-            number: 69,
-            repository: "codex-ui-kit",
-            state: "open",
-            title: "feat: add resizable review workspace",
-            updatedAt: "11m",
-          },
-        ]}
-        onSelect={() => setPullRequestOpen(true)}
-        selectedId={pullRequestOpen ? "69" : undefined}
-      />
+      {pullRequestState.indexStatus === "ready" ? (
+        <PullRequestList
+          items={[
+            {
+              author: "JaminZhou",
+              checkStatus:
+                pullRequestState.checkStatus === "passed"
+                  ? "passed"
+                  : pullRequestState.checkStatus === "failed"
+                    ? "failed"
+                    : "running",
+              commentCount: 6,
+              id: "80",
+              indicator: (
+                <span className="demo-pr-branch-indicator">
+                  ⑂<i />
+                </span>
+              ),
+              number: 80,
+              repository: "codex-ui-kit",
+              state: "open",
+              title: "feat: add terminal session lifecycle",
+              updatedAt: "now",
+            },
+          ]}
+          onSelect={(id) => {
+            dispatchPullRequest({ id, type: "select" });
+            setPullRequestOpen(true);
+            schedulePullRequestTransition(
+              { type: "detail/load" },
+              { type: "detail/ready" },
+            );
+          }}
+          selectedId={
+            pullRequestOpen
+              ? (pullRequestState.selectedId ?? undefined)
+              : undefined
+          }
+        />
+      ) : (
+        <PullRequestQueryState
+          action={
+            pullRequestState.indexStatus === "error" ||
+            pullRequestState.indexStatus === "empty" ? (
+              <button
+                onClick={() =>
+                  schedulePullRequestTransition(
+                    { type: "index/load" },
+                    { type: "index/ready" },
+                  )
+                }
+                type="button"
+              >
+                {pullRequestState.indexStatus === "empty"
+                  ? "Refresh"
+                  : "Retry"}
+              </button>
+            ) : undefined
+          }
+          description={
+            pullRequestState.indexStatus === "error"
+              ? "Check the connection and try again."
+              : pullRequestState.indexStatus === "empty"
+                ? "No pull requests match the current filters."
+                : undefined
+          }
+          status={pullRequestState.indexStatus}
+          variant="list"
+        />
+      )}
     </section>
   );
   const shellRouteContent = (
@@ -3139,7 +3416,8 @@ export function App() {
         bottomPanelResizeLabel="Resize bottom panel"
         onBottomPanelHeightChange={setTerminalHeight}
         layoutMode={
-          initialSelection.capture ||
+          (initialSelection.capture &&
+            activeFrame !== "pr-compact-detail") ||
           initialSelection.layoutMode === "wide"
             ? "wide"
             : undefined
@@ -3152,7 +3430,10 @@ export function App() {
         onSidePanelWidthChange={
           view === "pull-request" ? setPullRequestWidth : undefined
         }
-        responsivePanelContinuity={!initialSelection.capture}
+        responsivePanelContinuity={
+          !initialSelection.capture &&
+          activeFrame !== "pr-compact-detail"
+        }
         responsivePanelContinuityKey={`${mode}:${view}:${scenarioId}`}
         sidePanel={
           view === "pull-request" ? pullRequestPanel : reviewPanel
@@ -3163,11 +3444,15 @@ export function App() {
         sidePanelLabel={
           view === "pull-request" ? "Pull request details" : "Review"
         }
+        sidePanelMinMainWidth={view === "pull-request" ? 390 : undefined}
+        sidePanelMinWidth={view === "pull-request" ? 322 : undefined}
         sidePanelOpen={
           view === "pull-request"
             ? pullRequestOpen
             : reviewOpen && Boolean(reviewPanel)
         }
+        sidePanelOverlay={view === "pull-request"}
+        sidePanelOverlayModal={view !== "pull-request"}
         sidePanelResizable
         sidePanelWidth={
           view === "pull-request" ? pullRequestWidth : undefined

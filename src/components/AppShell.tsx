@@ -460,6 +460,8 @@ export interface AppShellProps
   sidePanelMinMainWidth?: number;
   sidePanelMinWidth?: number;
   sidePanelOpen?: boolean;
+  sidePanelOverlay?: boolean;
+  sidePanelOverlayModal?: boolean;
   sidePanelResizable?: boolean;
   sidePanelResizeLabel?: string;
   sidePanelWidth?: number;
@@ -556,6 +558,8 @@ export function AppShell({
   sidePanelMinMainWidth = 352,
   sidePanelMinWidth = 320,
   sidePanelOpen = false,
+  sidePanelOverlay: sidePanelOverlayOverride = false,
+  sidePanelOverlayModal = true,
   sidePanelResizable = false,
   sidePanelResizeLabel = "Resize workspace panel",
   sidePanelWidth,
@@ -737,7 +741,8 @@ export function AppShell({
         coordinatedPersistentMainMinWidth;
   const sidePanelOverlay =
     sidePanelHasOpenContent &&
-    (layoutMode !== "wide" ||
+    (sidePanelOverlayOverride ||
+      layoutMode !== "wide" ||
       (!sidePanelExpanded && !wideSidePanelMinimaFit));
   const persistentSidePanelMinWidth =
     layoutMode === "wide" &&
@@ -865,6 +870,7 @@ export function AppShell({
   const sidePanelModalOpen =
     sidePanelOpen &&
     sidePanelOverlay &&
+    sidePanelOverlayModal &&
     !sidebarModalOpen;
   const responsiveModalOpen =
     sidebarModalOpen || sidePanelModalOpen;
@@ -880,8 +886,8 @@ export function AppShell({
     sidePanel !== undefined &&
     sidePanel !== null &&
     !resolvedSidePanelExpanded &&
-    layoutMode === "wide" &&
-    !sidePanelOverlay;
+    ((layoutMode === "wide" && !sidePanelOverlay) ||
+      (sidePanelOverlay && !sidePanelOverlayModal));
   const bottomPanelResizerVisible =
     bottomPanelResizable &&
     bottomPanelOpen &&
@@ -1710,6 +1716,11 @@ export function AppShell({
       data-side-panel-expanded={resolvedSidePanelExpanded || undefined}
       data-side-panel-open={sidePanelOpen || undefined}
       data-side-panel-overlay={sidePanelOverlay || undefined}
+      data-side-panel-overlay-modal={
+        sidePanelOverlay && sidePanelOverlayModal
+          ? true
+          : undefined
+      }
       data-side-panel-resizable={sidePanelResizable || undefined}
       data-side-panel-resizing={sidePanelResizing || undefined}
       data-narrow-sidebar-behavior={narrowSidebarBehavior}

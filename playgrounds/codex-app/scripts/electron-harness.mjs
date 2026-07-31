@@ -323,11 +323,78 @@ export const visualScenes = [
     surfaces: ["fileChange", "reviewPanel"],
   },
   {
-    frame: "review-open",
+    frame: "pr-summary-ready",
     id: "pull-request-detail",
     maxPixelRatio: 0.011,
     scenario: "workspace-workflow",
     view: "pull-request",
+  },
+  {
+    frame: "pr-index-loading",
+    id: "pr-index-loading",
+    maxPixelRatio: 0.011,
+    scenario: "workspace-workflow",
+    view: "pull-request",
+  },
+  {
+    frame: "pr-index-failed",
+    id: "pr-index-failed",
+    maxPixelRatio: 0.011,
+    scenario: "workspace-workflow",
+    view: "pull-request",
+  },
+  {
+    frame: "pr-detail-loading",
+    id: "pr-detail-loading",
+    maxPixelRatio: 0.011,
+    scenario: "workspace-workflow",
+    view: "pull-request",
+  },
+  {
+    frame: "pr-detail-failed",
+    id: "pr-detail-failed",
+    maxPixelRatio: 0.011,
+    scenario: "workspace-workflow",
+    view: "pull-request",
+  },
+  {
+    frame: "pr-checks-running",
+    id: "pr-checks-running",
+    maxPixelRatio: 0.011,
+    panelScrollTop: 760,
+    scenario: "workspace-workflow",
+    view: "pull-request",
+  },
+  {
+    frame: "pr-review-submitting",
+    id: "pr-review-submitting",
+    maxPixelRatio: 0.011,
+    scenario: "workspace-workflow",
+    view: "pull-request",
+  },
+  {
+    frame: "pr-comment-failed",
+    id: "pr-comment-failed",
+    maxPixelRatio: 0.011,
+    panelScrollTop: 1_100,
+    scenario: "workspace-workflow",
+    view: "pull-request",
+  },
+  {
+    frame: "pr-merge-ready",
+    id: "pr-merge-ready",
+    maxPixelRatio: 0.011,
+    panelScrollTop: 760,
+    scenario: "workspace-workflow",
+    view: "pull-request",
+  },
+  {
+    frame: "pr-compact-detail",
+    id: "pr-compact-detail",
+    maxPixelRatio: 0.011,
+    scenario: "workspace-workflow",
+    view: "pull-request",
+    windowSize: { height: 680, width: 720 },
   },
   {
     frame: "shell-loading",
@@ -400,6 +467,23 @@ export async function launchScene(
   await page.evaluate(async () => {
     await document.fonts.ready;
   });
+  if (
+    scene.view === "pull-request" &&
+    !scene.frame.startsWith("pr-index-")
+  ) {
+    await page.waitForFunction(() => {
+      const panel = document.querySelector(
+        ".codex-ui-app-shell__side-panel",
+      );
+      if (!panel) return false;
+      const bounds = panel.getBoundingClientRect();
+      return (
+        getComputedStyle(panel).visibility === "visible" &&
+        bounds.width >= 320 &&
+        bounds.right <= window.innerWidth + 1
+      );
+    });
+  }
   if (scene.scrollTop !== undefined) {
     await page
       .locator(".codex-ui-conversation-thread-shell__viewport")
@@ -407,6 +491,13 @@ export async function launchScene(
         element.scrollTop = scrollTop;
         element.dispatchEvent(new Event("scroll", { bubbles: true }));
       }, scene.scrollTop);
+  }
+  if (scene.panelScrollTop !== undefined) {
+    await page
+      .locator(".demo-pr-panel__summary")
+      .evaluate((element, scrollTop) => {
+        element.scrollTop = scrollTop;
+      }, scene.panelScrollTop);
   }
   return { app, page };
 }

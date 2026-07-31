@@ -12,7 +12,7 @@ exit gates; it does not replace the inventory.
 
 - The current installed package is Codex Desktop `26.721.81911` (`5973`).
 - The inventory contains 75 surface groups: 48 P0, 18 P1, and 9 P2.
-- 21 groups have current-build runtime evidence, 35 have previous-build-only
+- 23 groups have current-build runtime evidence, 33 have previous-build-only
   runtime evidence, and 19 have not been sampled.
 - The first five current-build vertical slices cover all six left-sidebar
   groups, a real MCP failed-Fetch → Search → successful-Fetch recovery, and
@@ -31,12 +31,16 @@ exit gates; it does not replace the inventory.
   deterministic rename/delete/binary/conflict, selection, and Undo coverage.
   The Terminal expansion adds current-build multi-tab, per-tab close, picker,
   and compact evidence plus independent running/failed/exited process replay,
-  close/restore, and 820×680 acceptance. Together the current playground gates
-  cover 49 CDP/pixel frames. Global
+  close/restore, and 820×680 acceptance. The Pull request lifecycle adds a
+  current public PR Summary/Timeline/responsive-panel contract plus independent
+  index/detail loading and failure, checks, comments, review submission,
+  merge-readiness, merge completion, compact layout, and route restoration.
+  Together the current playground gates cover 58 CDP/pixel frames. Global
   notification runtime evidence, light-theme shell evidence, exact
   current-build long-thread virtualization, real current-product Terminal
-  process execution/persistence, and the remaining PR, Markdown, tool, and
-  attachment variants remain on their recorded evidence levels until
+  process execution/persistence, successful current-product PR Code content
+  and mutating review/comment/merge transitions, and the remaining Markdown,
+  tool, and attachment variants remain on their recorded evidence levels until
   separately re-observed.
 - Existing Browser and Electron results remain useful regression evidence, but
   they are `partial_legacy` until the affected surface is re-observed on the
@@ -255,9 +259,11 @@ without confusing package readiness with full product reconstruction.
 8. **Terminal session lifecycle**: current multi-tab/close/picker/compact
    evidence plus independent running/failed/exited processes, per-session
    input, close-all/restore, and process reopening.
-9. **Pull request lifecycle**: index/detail loading and failure, checks,
-   reviewers, comments, review submission, merge-readiness, responsive panel
-   composition, and route restoration.
+9. **Pull request lifecycle**: delivered for the public component contract and
+   deterministic Browser/Electron/pixel gates: index/detail loading and
+   failure, checks, reviewers, comments, review submission, merge-readiness,
+   merge completion, responsive non-modal panel composition, and route
+   restoration. Current-product evidence remains deliberately read-only.
 10. **Remaining P0 turn/tool gaps**: long command output and truncation,
     approval denial/timeout/persistence, attachment lifecycle, Markdown
     mutation/large content, subagents, and transport recovery.

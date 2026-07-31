@@ -73,9 +73,14 @@ import {
   type ProjectIndexItem,
   ProjectPicker,
   PullRequestCheckList,
+  PullRequestCommentComposer,
   PullRequestDetails,
   PullRequestList,
+  PullRequestMergeReadiness,
   PullRequestPage,
+  PullRequestPanelSummary,
+  PullRequestQueryState,
+  PullRequestReviewComposer,
   PullRequestReviewSummary,
   PullRequestReviewThread,
   PullRequestStatusBadge,
@@ -292,9 +297,14 @@ void ProjectConversationPage;
 void ProjectIndex;
 void ProjectPicker;
 void PullRequestCheckList;
+void PullRequestCommentComposer;
 void PullRequestDetails;
 void PullRequestList;
+void PullRequestMergeReadiness;
 void PullRequestPage;
+void PullRequestPanelSummary;
+void PullRequestQueryState;
+void PullRequestReviewComposer;
 void PullRequestReviewSummary;
 void PullRequestReviewThread;
 void PullRequestStatusBadge;
