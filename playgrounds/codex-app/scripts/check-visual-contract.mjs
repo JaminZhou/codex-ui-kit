@@ -98,6 +98,14 @@ const currentBuildLongThreadReferenceSize = {
   height: 820,
   width: 906,
 };
+const currentBuildApprovalPendingReference =
+  process.env.CODEX_UI_KIT_APPROVAL_PENDING_REFERENCE;
+const currentBuildApprovalDeniedReference =
+  process.env.CODEX_UI_KIT_APPROVAL_DENIED_REFERENCE;
+const currentBuildApprovalReferenceSize = {
+  height: 820,
+  width: 906,
+};
 const currentBuildWorkspaceReference =
   process.env.CODEX_UI_KIT_WORKSPACE_REFERENCE;
 const currentBuildWorkspaceReferenceSize = {
@@ -1075,6 +1083,81 @@ for (const scene of selectedScenes) {
     }
     console.log(
       `${scene.id}: current-build long-thread pixel ratio ${comparison.ratio}`,
+    );
+  }
+
+  const currentBuildApprovalReference =
+    scene.id === "approval-current-pending"
+      ? currentBuildApprovalPendingReference
+      : scene.id === "approval-current-denied"
+        ? currentBuildApprovalDeniedReference
+        : undefined;
+  if (currentBuildApprovalReference) {
+    const reference = flattenPng(
+      PNG.sync.read(await readFile(currentBuildApprovalReference)),
+      { blue: 24, green: 24, red: 24 },
+    );
+    if (
+      reference.width !== currentBuildApprovalReferenceSize.width ||
+      reference.height !== currentBuildApprovalReferenceSize.height
+    ) {
+      throw new Error(
+        `${scene.id}: current-build approval reference must be exactly ${currentBuildApprovalReferenceSize.width}x${currentBuildApprovalReferenceSize.height}, received ${reference.width}x${reference.height}.`,
+      );
+    }
+    if (actual.width !== 1180 || actual.height !== 820) {
+      throw new Error(
+        `${scene.id}: current-build approval comparison requires an exact 1180x820 playground frame.`,
+      );
+    }
+    const actualRegion = cropPng(actual, 274, 0, 906, 820);
+    const masks =
+      scene.id === "approval-current-pending"
+        ? [
+            { height: 55, left: 0, top: 0, width: 906 },
+            { height: 48, left: 264, top: 70, width: 548 },
+            { height: 25, left: 80, top: 168, width: 135 },
+            { height: 26, left: 104, top: 215, width: 260 },
+            { height: 29, left: 94, top: 682, width: 700 },
+            { height: 750, left: 890, top: 55, width: 16 },
+          ]
+        : [
+            { height: 55, left: 0, top: 0, width: 906 },
+            { height: 26, left: 80, top: 139, width: 550 },
+            { height: 120, left: 500, top: 470, width: 260 },
+            { height: 82, left: 95, top: 714, width: 710 },
+            { height: 750, left: 890, top: 55, width: 16 },
+          ];
+    const comparison = comparePng(
+      maskPng(clonePng(reference), masks),
+      maskPng(clonePng(actualRegion), masks),
+    );
+    const maximumRatio = environmentRatio(
+      scene.id === "approval-current-pending"
+        ? "CODEX_UI_KIT_APPROVAL_PENDING_MAX_DIFF_RATIO"
+        : "CODEX_UI_KIT_APPROVAL_DENIED_MAX_DIFF_RATIO",
+      0.015,
+    );
+    await writeFile(
+      join(artifactDirectory, `${scene.id}.current-build.png`),
+      PNG.sync.write(actualRegion),
+    );
+    if (comparison.pixels > 0) {
+      await writeFile(
+        join(
+          artifactDirectory,
+          `${scene.id}.current-build.diff.png`,
+        ),
+        PNG.sync.write(comparison.diff),
+      );
+    }
+    if (comparison.ratio > maximumRatio) {
+      throw new Error(
+        `${scene.id}: current-build approval pixel ratio ${comparison.ratio} exceeds ${maximumRatio}.`,
+      );
+    }
+    console.log(
+      `${scene.id}: current-build approval pixel ratio ${comparison.ratio}`,
     );
   }
 

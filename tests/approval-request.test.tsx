@@ -58,6 +58,27 @@ describe("ApprovalRequest", () => {
     expect(onReject).toHaveBeenCalledOnce();
   });
 
+  it("exposes the current Composer-dock presentation", () => {
+    render(
+      <ApprovalRequest
+        autoFocus={false}
+        description="open -a Calculator"
+        kind="command"
+        onApprove={() => undefined}
+        onReject={() => undefined}
+        presentation="composer"
+        scopedApproveAction={{ onClick: () => undefined }}
+        title="Allow opening the requested local application?"
+      />,
+    );
+
+    const request = screen.getByRole("region", { name: "Approval request" });
+    expect(request.getAttribute("data-presentation")).toBe("composer");
+    expect(
+      screen.getByRole("button", { name: "Approval options" }),
+    ).toBeTruthy();
+  });
+
   it("keeps the generic approve and reject labels compatible", () => {
     render(
       <ApprovalRequest

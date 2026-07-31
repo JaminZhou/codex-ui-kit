@@ -1066,6 +1066,8 @@ export function App() {
       replayApprovalResolution,
     ],
   );
+  const isCurrentApprovalReplay =
+    mode === "replay" && scenarioId === "approval-denied";
   const replayComposerRunning =
     isConversationLifecycle && state.status === "running";
 
@@ -1284,6 +1286,20 @@ export function App() {
     decision: "accept" | "decline",
   ) => {
     if (mode === "replay") {
+      if (isCurrentApprovalReplay) {
+        if (decision === "decline") {
+          setReplayApprovalResolution(null);
+          setReplayCount(scenario.events.length);
+          setActiveFrame("approval-current-denied");
+        } else {
+          setReplayApprovalResolution({
+            decision: "approved",
+            requestId,
+          });
+          setActiveFrame(null);
+        }
+        return;
+      }
       if (decision === "accept") {
         setReplayApprovalResolution(null);
         setReplayCount(scenario.events.length);
@@ -1809,9 +1825,11 @@ export function App() {
     (scenarioId === "mcp-tool-call" ||
       scenarioId === "mcp-recovery-mixed-thread");
   const selectedComposerPermission =
-    composerPermissionOptions.find(
-      ({ id }) => id === composerPermissionId,
-    ) ?? composerPermissionOptions[2]!;
+    (isCurrentApprovalReplay
+      ? composerPermissionOptions[0]
+      : composerPermissionOptions.find(
+          ({ id }) => id === composerPermissionId,
+        )) ?? composerPermissionOptions[2]!;
   const header = (
     <ThreadHeader
       endActions={
@@ -1896,7 +1914,8 @@ export function App() {
       scenarioId === "mixed-file-review" ||
       scenarioId === "markdown" ||
       scenarioId === "mcp-tool-call" ||
-      scenarioId === "mcp-recovery-mixed-thread");
+      scenarioId === "mcp-recovery-mixed-thread" ||
+      scenarioId === "approval-denied");
   const showLifecycleComposer = isConversationLifecycle;
   const composerSurface = (
     <AgentComposer
@@ -1957,7 +1976,9 @@ export function App() {
                   type="button"
                 >
                   <span aria-hidden="true">◉</span>
-                  {currentMcpReplay || showLifecycleComposer
+                  {currentMcpReplay ||
+                  showLifecycleComposer ||
+                  isCurrentApprovalReplay
                     ? selectedComposerPermission.label
                     : "Approve for me"}
                 </button>
@@ -2057,7 +2078,7 @@ export function App() {
       value={composerValue}
     />
   );
-  const composer = showLifecycleComposer ? (
+  const regularComposer = showLifecycleComposer ? (
     <ComposerDock
       composer={composerSurface}
       context={
@@ -2089,6 +2110,34 @@ export function App() {
     />
   ) : (
     composerSurface
+  );
+  const currentPendingApproval = isCurrentApprovalReplay
+    ? state.approvals.find(({ decision }) => decision === "pending")
+    : undefined;
+  const composer = currentPendingApproval ? (
+    <ApprovalRequest
+      autoFocus={false}
+      data-item-id={currentPendingApproval.itemId}
+      data-testid="current-approval-request"
+      description={currentPendingApproval.command}
+      identity="Terminal"
+      kind="command"
+      onApprove={() =>
+        respondToApproval(currentPendingApproval.requestId, "accept")
+      }
+      onReject={() =>
+        respondToApproval(currentPendingApproval.requestId, "decline")
+      }
+      presentation="composer"
+      scopedApproveAction={{
+        label: "Allow this conversation",
+        onClick: () =>
+          respondToApproval(currentPendingApproval.requestId, "accept"),
+      }}
+      title="Allow opening the requested local application?"
+    />
+  ) : (
+    regularComposer
   );
 
   const workspaceProject =
@@ -3273,13 +3322,17 @@ export function App() {
                   message.id === "assistant-mcp") ||
                 (scenarioId === "mcp-recovery-mixed-thread" &&
                   (message.id === "assistant-recovery" ||
-                    message.id === "assistant-workflow"))) &&
+                    message.id === "assistant-workflow")) ||
+                (scenarioId === "approval-denied" &&
+                  message.id === "assistant-approval-denied")) &&
               message.status === "completed" ? (
                 scenarioId === "mcp-tool-call" ||
-                scenarioId === "mcp-recovery-mixed-thread" ? (
+                scenarioId === "mcp-recovery-mixed-thread" ||
+                scenarioId === "approval-denied" ? (
                   <McpResponseActions
                     label={
-                      message.id === "assistant-workflow"
+                      message.id === "assistant-workflow" ||
+                      message.id === "assistant-approval-denied"
                         ? "Response actions"
                         : undefined
                     }
@@ -3592,6 +3645,34 @@ export function App() {
     if (entry.kind === "command") {
       const command = state.commands.find(({ id }) => id === entry.id);
       if (!command) return null;
+      if (
+        isCurrentApprovalReplay &&
+        command.id === "command-open-calculator"
+      ) {
+        const pending = command.status === "running";
+        return (
+          <ActivityTimeline
+            key={`command:${command.id}`}
+            open={initialSelection.capture ? pending : undefined}
+            summary={
+              <TurnDuration
+                durationMs={pending ? 14_000 : (state.turnDurationMs ?? 23_000)}
+                status={pending ? "working" : "worked"}
+              />
+            }
+          >
+            <CommandExecution
+              command={command.command}
+              cwd={command.cwd}
+              data-item-id={command.id}
+              data-testid="command-execution"
+              hideRawCommand
+              status={command.status}
+              summary={<>Running {command.command}</>}
+            />
+          </ActivityTimeline>
+        );
+      }
       return (
         <CommandExecution
           command={command.command}
@@ -3644,6 +3725,7 @@ export function App() {
           `${typeof requestId}:${requestId}` === entry.id,
       );
       if (!approval) return null;
+      if (isCurrentApprovalReplay) return null;
       return (
         <ApprovalRequest
           data-item-id={approval.itemId}

@@ -410,6 +410,39 @@ describe("protocol lifecycle reducer", () => {
     ]);
   });
 
+  it("reduces the current denied approval without executing the command", () => {
+    const scenario = replayScenarios["approval-denied"];
+    const pending = reduceProtocolTrace(
+      scenario.events.slice(
+        0,
+        scenario.frames["approval-current-pending"],
+      ),
+    );
+    const completed = reduceProtocolTrace(scenario.events);
+
+    expect(pending.approvals[0]).toMatchObject({
+      command: "open -a Calculator",
+      decision: "pending",
+      itemId: "command-open-calculator",
+      kind: "command",
+    });
+    expect(pending.commands[0]).toMatchObject({
+      command: "open -a Calculator",
+      output: "",
+      status: "running",
+    });
+    expect(completed.approvals[0]?.decision).toBe("rejected");
+    expect(completed.commands[0]).toMatchObject({
+      exitCode: null,
+      output: "",
+      status: "failed",
+    });
+    expect(completed.messages.at(-1)?.text).toBe(
+      "Approval was not granted, so the command was not run.",
+    );
+    expect(completed.status).toBe("completed");
+  });
+
   it("preserves rename, delete, binary, and conflict patch evidence", () => {
     const state = reduceProtocolTrace(
       replayScenarios["mixed-file-review"].events,

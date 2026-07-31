@@ -1437,6 +1437,108 @@ for (const scene of visualScenes) {
     if (contract.horizontalOverflow > 1) {
       throw new Error(`${scene.id}: horizontal overflow ${contract.horizontalOverflow}px.`);
     }
+    if (scene.scenario === "approval-denied") {
+      const approvalContract = await page.evaluate(() => {
+        const rect = (element) => {
+          if (!element) return null;
+          const value = element.getBoundingClientRect();
+          return {
+            height: value.height,
+            left: value.left,
+            top: value.top,
+            width: value.width,
+          };
+        };
+        const approval = document.querySelector(
+          ".codex-ui-approval-request",
+        );
+        const composer = document.querySelector(".codex-ui-composer");
+        const permissionTrigger = document.querySelector(
+          ".demo-composer-permission-trigger",
+        );
+        return {
+          activitySummary:
+            document
+              .querySelector(".codex-ui-activity-timeline__toggle")
+              ?.textContent?.replace(/\s+/g, " ")
+              .trim() ?? null,
+          approval: approval
+            ? {
+                actionLabels: [...approval.querySelectorAll("button")].map(
+                  (button) => ({
+                    ariaLabel: button.getAttribute("aria-label"),
+                    text: button.textContent?.replace(/\s+/g, " ").trim(),
+                  }),
+                ),
+                decision: approval.getAttribute("data-decision"),
+                presentation: approval.getAttribute("data-presentation"),
+                rect: rect(approval),
+              }
+            : null,
+          assistantText:
+            [...document.querySelectorAll(
+              '.codex-ui-agent-message[data-role="assistant"]',
+            )]
+              .at(-1)
+              ?.textContent?.replace(/\s+/g, " ")
+              .trim() ?? null,
+          commandSummary:
+            document
+              .querySelector(
+                ".codex-ui-command-execution .codex-ui-activity__summary",
+              )
+              ?.textContent?.replace(/\s+/g, " ")
+              .trim() ?? null,
+          composer: composer ? rect(composer) : null,
+          permissionLabel:
+            permissionTrigger?.textContent?.replace(/^◉/, "").trim() ?? null,
+        };
+      });
+      if (
+        scene.id === "approval-current-pending" &&
+        (!approvalContract.approval ||
+          approvalContract.approval.decision !== "pending" ||
+          approvalContract.approval.presentation !== "composer" ||
+          Math.abs(approvalContract.approval.rect.left - 359) > 1 ||
+          Math.abs(approvalContract.approval.rect.top - 642) > 1 ||
+          Math.abs(approvalContract.approval.rect.width - 736) > 1 ||
+          Math.abs(approvalContract.approval.rect.height - 162) > 1 ||
+          approvalContract.activitySummary !== "Working for 14s" ||
+          approvalContract.commandSummary !==
+            "Running open -a Calculator" ||
+          approvalContract.composer !== null ||
+          !approvalContract.approval.actionLabels.some(
+            ({ text }) => text === "Deny",
+          ) ||
+          !approvalContract.approval.actionLabels.some(
+            ({ text }) => text === "Allow once",
+          ) ||
+          !approvalContract.approval.actionLabels.some(
+            ({ ariaLabel }) => ariaLabel === "Approval options",
+          ))
+      ) {
+        throw new Error(
+          `${scene.id}: current pending approval contract failed: ${JSON.stringify(approvalContract)}`,
+        );
+      }
+      if (
+        scene.id === "approval-current-denied" &&
+        (approvalContract.approval !== null ||
+          approvalContract.activitySummary !== "Worked for 23s" ||
+          approvalContract.assistantText !==
+            "Approval was not granted, so the command was not run." ||
+          !approvalContract.composer ||
+          Math.abs(approvalContract.composer.left - 359) > 1 ||
+          Math.abs(approvalContract.composer.top - 706) > 1 ||
+          Math.abs(approvalContract.composer.width - 736) > 1 ||
+          Math.abs(approvalContract.composer.height - 98) > 1 ||
+          approvalContract.permissionLabel !== "Ask for approval")
+      ) {
+        throw new Error(
+          `${scene.id}: current denied approval contract failed: ${JSON.stringify(approvalContract)}`,
+        );
+      }
+    }
     if (scene.scenario === "conversation-lifecycle") {
       const conversation = await page.evaluate(() => {
         const rect = (element) => {
@@ -2009,15 +2111,11 @@ for (const scene of visualScenes) {
           })
           .click();
         await page.waitForSelector(".demo-root:not([data-composer-mode])");
-        if (
-          !(await page
-            .getByRole("textbox", { name: "Message composer" })
-            .evaluate((element) => element === document.activeElement))
-        ) {
-          throw new Error(
-            `${scene.id}: clearing the Composer mode did not restore input focus.`,
-          );
-        }
+        await page.waitForFunction(
+          () =>
+            document.activeElement?.getAttribute("aria-label") ===
+            "Message composer",
+        );
       }
     }
     if (
@@ -2382,7 +2480,10 @@ for (const scene of visualScenes) {
       }
     }
 
-    if (scene.id !== "composer-disabled") {
+    if (
+      scene.id !== "composer-disabled" &&
+      scene.id !== "approval-current-pending"
+    ) {
       const expectedFocus = scene.surfaces?.includes("reviewPanel")
         ? contract.review.firstContentLabel
         : "Message composer";

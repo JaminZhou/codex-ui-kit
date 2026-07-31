@@ -63,14 +63,16 @@ observation from a previous build remains historical evidence.
   calls, and the current Composer queue/Stop automatic-continuation lifecycle
   plus multiline input, permission choices, the inline Add-resource picker,
   active Goal/Plan modes, and the sampled 82-message long-thread navigation/
-  windowing state are observed, while mutating review/comment/merge,
+  windowing state plus a real command approval pending → denied lifecycle
+  with confirmed non-execution are observed, while mutating
+  review/comment/merge,
   light-theme, global notifications, and unrelated surface evidence remain
   pending
 
-Current inventory: 77 surface groups; 29 have current-build runtime evidence,
-29 have previous-build-only runtime evidence, 19 remain `not_sampled`, and 0
-are `blocked_by_policy`. Current-build Browser verification covers 25 groups
-and Electron verification covers 25. Prior acceptance outside the sampled
+Current inventory: 77 surface groups; 30 have current-build runtime evidence,
+28 have previous-build-only runtime evidence, 19 remain `not_sampled`, and 0
+are `blocked_by_policy`. Current-build Browser verification covers 26 groups
+and Electron verification covers 26. Prior acceptance outside the sampled
 shell, sidebar, New chat, and Pull request slices remains recorded as
 `partial_legacy` until current-build re-observation.
 
@@ -342,8 +344,9 @@ The workflow fixture extends `FileChange` with a host-owned leading indicator
 slot and composes the existing `ActivityTimeline`, `CommandExecution`,
 `ApprovalRequest`, `ConversationThreadShell`, `WorkspacePanel`, and `FileDiff`
 primitives. Browser evidence and real `BrowserWindow` acceptance previously
-verified the sampled command and approval states against `26.721.41059`; their
-current inventory status is `partial_legacy`.
+verified the sampled command and approval states against `26.721.41059`. The
+expanded read-only command remains `partial_legacy`; the command-approval
+denial path is refreshed against `26.727.40816` below.
 
 The protocol-backed Codex App playground now exercises command execution, a
 real App Server approval request/response, the applied turn-owned file card,
@@ -549,8 +552,27 @@ public package keeps the actual eviction policy host-owned while exposing
 reverse-origin viewport and compact-rail contracts. Browser and Electron now
 exercise selection, reverse scrolling, the seven-turn window, and return to
 latest, so the virtualization row is verified for the sampled current
-contract. The
-interruption acceptance renders the observed summary statically rather than
+contract.
+
+The current command-approval slice uses a dedicated disposable task and
+requests only `open -a Calculator`. The 736×162 turn-owned pending surface
+appears at x=359/y=642 with `Terminal`, the command preview, `Deny`,
+`Allow once`, and a split `Approval options` menu. Selecting `Deny` removes
+the card, completes the activity as `Worked for 23s`, restores the 736×98
+Composer with `Ask for approval`, and produces a final response while the
+command retains empty output, no exit code, and no Calculator process.
+
+The independent protocol trace records the request/decline/resolution order
+without executing the command. CDP now covers 65 frames and locks the card,
+activity, command, Composer, and permission geometry; Electron drives
+options-menu Escape/focus restoration and denial. Ownership-masked 906×820
+current-build comparisons pass at `0.008493512` pending and `0.001214128`
+denied under separate 1.5% hard limits. This promotes
+`thread.approval-permission-events` for the sampled current denial contract.
+Allow-once completion, persistent approval, timeout, repeated denial, and
+non-command approval kinds remain open.
+
+The interruption acceptance renders the observed summary statically rather than
 driving a host run-to-stop-to-summary transition, so that row also remains
 `partial_legacy`. The `26.721.81911` MCP tool-call error/retry state is now
 captured separately; the broader thread-transport error/retry state has not

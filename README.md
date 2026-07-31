@@ -37,10 +37,10 @@ review the [coverage policy](research/PARITY.md), or follow the
 
 ## Highlights
 
-- A conversation shell measured against the previous runtime build
-  `26.721.41059`, plus partial message, activity, reasoning, plan, streaming,
-  and mixed conversation-event primitives; current-build revalidation is
-  pending.
+- A conversation shell with build-scoped current evidence from
+  `26.727.40816` for Composer lifecycle, successful and recovered MCP calls,
+  long-thread navigation/windowing, and command-approval denial, plus partial
+  message, activity, reasoning, plan, streaming, and mixed event primitives.
 - Application/sidebar and side/bottom workspace-panel composition with
   current-build window navigation, route lifecycle feedback, portalled global
   notifications, responsive restoration rules, and pointer- and
@@ -198,6 +198,18 @@ thresholds only to the shared 272px bottom-panel and 239px content regions:
 ```bash
 CODEX_UI_KIT_TERMINAL_REFERENCE=/absolute/path/to/terminal-main-reference.png \
   pnpm --filter @codex-ui-kit/codex-app-playground check:visual
+```
+
+Current command approval accepts separate untracked pending and denied
+906×820 main references. CDP and Electron independently gate the request,
+options-menu focus, rejection, confirmed non-execution, final response, and
+Composer restoration:
+
+```bash
+CODEX_UI_KIT_APPROVAL_PENDING_REFERENCE=/absolute/path/to/pending.png \
+CODEX_UI_KIT_APPROVAL_DENIED_REFERENCE=/absolute/path/to/denied.png \
+  pnpm --filter @codex-ui-kit/codex-app-playground check:visual \
+  -- --scenes=approval-current-pending,approval-current-denied
 ```
 
 `npm pack` and a future `npm publish` run the library build first so the ignored

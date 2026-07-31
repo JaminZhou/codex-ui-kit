@@ -78,4 +78,22 @@ describe("lifecycle visual policy", () => {
       'const actualRegion = cropPng(actual, 274, 0, 906, 820)',
     );
   });
+
+  it("gates current pending and denied command approval regions", () => {
+    expect(contract).toContain(
+      "CODEX_UI_KIT_APPROVAL_PENDING_REFERENCE",
+    );
+    expect(contract).toContain(
+      "CODEX_UI_KIT_APPROVAL_DENIED_REFERENCE",
+    );
+    expect(contract).toContain(
+      "CODEX_UI_KIT_APPROVAL_PENDING_MAX_DIFF_RATIO",
+    );
+    expect(contract).toContain(
+      "CODEX_UI_KIT_APPROVAL_DENIED_MAX_DIFF_RATIO",
+    );
+    expect(contract).toContain(
+      "current-build approval pixel ratio",
+    );
+  });
 });

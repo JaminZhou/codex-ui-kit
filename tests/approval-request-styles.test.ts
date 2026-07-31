@@ -17,6 +17,15 @@ describe("approval visual contract", () => {
     );
   });
 
+  it("locks the 162px current Composer-dock presentation", () => {
+    expect(styles).toMatch(
+      /\.codex-ui-approval-request\[data-presentation="composer"\] \{[\s\S]*?border-radius: 1\.5625rem;[\s\S]*?min-height: 10\.125rem;/,
+    );
+    expect(styles).toMatch(
+      /\.codex-ui-approval-request\[data-presentation="composer"\][\s\S]*?\.codex-ui-approval-request__description \{[\s\S]*?border-radius: var\(--codex-ui-radius-md\);/,
+    );
+  });
+
   it("locks the 320px command viewport and three-line clamp contract", () => {
     expect(tokens).toContain("--codex-ui-approval-command-max-height: 20rem");
     expect(styles).toContain(

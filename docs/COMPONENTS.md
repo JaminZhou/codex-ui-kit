@@ -65,7 +65,9 @@ The built-in highlighter escapes untrusted code. A custom `CodeHighlighter` retu
   content, optional controlled file selection, and a selected-file marker.
   Existing `lines` items remain supported; `FileReviewContent` makes non-text
   states explicit, and `FileReviewNotice` can also be composed independently.
-- `ApprovalRequest`: command, patch, network, permission, and generic approval card with scoped actions, shortcuts, loading, and outcome states.
+- `ApprovalRequest`: command, patch, network, permission, and generic approval
+  card with scoped actions, shortcuts, loading, outcome states, and default or
+  current Composer-dock presentation.
 - `ApprovalCommandPreview`: bounded command preview with explicit expansion controls.
 - `StatusBanner`: neutral, info, warning, and error shell with actions, dismissal, and compact reflow.
 - `InlineNotice`: transcript divider with tone, guidance, wrapping, and active shimmer.

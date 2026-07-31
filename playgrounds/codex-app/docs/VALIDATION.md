@@ -84,7 +84,11 @@ Every deterministic scenario has one ID and produces four evidence layers:
    long-thread main-region reference uses
    `CODEX_UI_KIT_LONG_THREAD_REFERENCE`; its mask excludes all conversation
    content and retains the compact rail and floating control under a 1% hard
-   limit. Transparent
+   limit. Current command approval uses separate 906×820
+   `CODEX_UI_KIT_APPROVAL_PENDING_REFERENCE` and
+   `CODEX_UI_KIT_APPROVAL_DENIED_REFERENCE` inputs; their masks retain the
+   approval/Composer silhouettes, actions, activity structure, and spacing
+   under independent 1.5% hard limits. Transparent
    Electron/CDP reference pixels are composited onto the observed `#181818`
    window background before comparison, and independently implemented UI
    regions are located from their DOM contracts rather than hard-coded
@@ -108,6 +112,8 @@ masks exclude unrelated transcript text and fixture-specific labels while
 preserving the queue, overlay, Composer silhouettes, controls, backgrounds,
 radii, and spacing. Goal and Plan measured `0.003763528` and `0.003486243`.
 The current long-thread rail/control comparison measured `0.005937382`.
+Current approval pending and denied comparisons measured `0.008493512` and
+`0.001214128`.
 
 Computer Use remains an optional macOS acceptance layer for real pointer,
 focus, menu, multi-window, and OS integration checks. It is intentionally not a
@@ -182,3 +188,10 @@ use a scoped 2.25% internal main-region limit for their dense thread, while
 CDP independently locks the current 736×134/736×259 Composer geometry,
 480×222 permission menu, 736×320 resource picker, 28px controls, 13px queue
 inset, navigation markers, disabled semantics, and windowed placeholder.
+
+The matrix now totals 65 frames. Its two command-approval frames cover the
+current 736×162 pending Composer-dock card and the denied completion with
+response actions and restored 736×98 Composer. CDP verifies request state,
+command/activity labels, dimensions, and permission restoration. Electron
+opens and dismisses the scoped menu with focus restoration, then drives
+`Deny` and confirms the approval disappears before the final response.

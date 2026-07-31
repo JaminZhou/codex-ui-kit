@@ -300,6 +300,20 @@ export const visualScenes = [
     surfaces: ["approval", "command"],
   },
   {
+    frame: "approval-current-pending",
+    id: "approval-current-pending",
+    maxPixelRatio: 0.0225,
+    scenario: "approval-denied",
+    surfaces: ["approval", "command"],
+  },
+  {
+    frame: "approval-current-denied",
+    id: "approval-current-denied",
+    maxPixelRatio: 0.0225,
+    scenario: "approval-denied",
+    scrollTop: 72,
+  },
+  {
     frame: "file-changing",
     id: "file-changing",
     scenario: "workspace-workflow",

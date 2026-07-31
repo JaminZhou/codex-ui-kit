@@ -2419,6 +2419,84 @@ try {
   await rejectedApprovalApp.close();
 }
 
+const currentDeniedApprovalScene = {
+  frame: "approval-current-pending",
+  id: "electron-current-approval-denied",
+  scenario: "approval-denied",
+};
+const {
+  app: currentDeniedApprovalApp,
+  page: currentDeniedApprovalPage,
+} = await launchScene(currentDeniedApprovalScene, { capture: false });
+try {
+  const currentApproval = currentDeniedApprovalPage.getByTestId(
+    "current-approval-request",
+  );
+  if (
+    (await currentApproval.getAttribute("data-presentation")) !==
+      "composer" ||
+    (await currentApproval.getByRole("button", { name: "Deny" }).count()) !==
+      1 ||
+    (await currentApproval
+      .getByRole("button", { name: "Allow once" })
+      .count()) !== 1
+  ) {
+    throw new Error(
+      "Electron current approval did not expose the pending Composer-dock actions.",
+    );
+  }
+  const options = currentApproval.getByRole("button", {
+    name: "Approval options",
+  });
+  await options.click();
+  await currentDeniedApprovalPage
+    .getByRole("menuitem", { name: "Allow this conversation" })
+    .waitFor();
+  await currentDeniedApprovalPage.keyboard.press("Escape");
+  if (
+    !(await options.evaluate(
+      (element) => element === document.activeElement,
+    ))
+  ) {
+    throw new Error(
+      "Electron current approval options did not restore trigger focus.",
+    );
+  }
+  await currentApproval.getByRole("button", { name: "Deny" }).click();
+  await currentDeniedApprovalPage.waitForSelector(
+    '.demo-root[data-frame="approval-current-denied"]',
+  );
+  const currentApprovalCount = await currentDeniedApprovalPage
+    .getByTestId("current-approval-request")
+    .count();
+  const assistantFinalCount = await currentDeniedApprovalPage
+    .getByText(
+      "Approval was not granted, so the command was not run.",
+      { exact: true },
+    )
+    .count();
+  const permissionLabel = (await currentDeniedApprovalPage
+    .locator(".demo-composer-permission-trigger")
+    .textContent())
+    ?.replace(/^◉/, "")
+    .trim();
+  if (
+    currentApprovalCount !== 0 ||
+    assistantFinalCount !== 1 ||
+    permissionLabel !== "Ask for approval"
+  ) {
+    throw new Error(
+      `Electron current approval rejection did not remove the card and complete without execution: ${JSON.stringify({
+        assistantFinalCount,
+        currentApprovalCount,
+        permissionLabel,
+      })}`,
+    );
+  }
+} finally {
+  await currentDeniedApprovalApp.close();
+}
+
 const acceptedMixedApprovalScene = {
   frame: "mixed-approval-pending",
   id: "electron-mixed-approval-accepted",

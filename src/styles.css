@@ -5901,6 +5901,46 @@ summary.codex-ui-activity__header::after {
     box-shadow var(--codex-ui-transition);
 }
 
+.codex-ui-approval-request[data-presentation="composer"] {
+  background: color-mix(
+    in srgb,
+    var(--codex-ui-bg-elevated) 96%,
+    transparent
+  );
+  border-radius: 1.5625rem;
+  box-shadow: none;
+  min-height: 10.125rem;
+}
+
+.codex-ui-approval-request[data-presentation="composer"]
+  .codex-ui-approval-request__header {
+  gap: 0.5rem;
+  padding: 1rem 0.75rem 0.5rem;
+}
+
+.codex-ui-approval-request[data-presentation="composer"]
+  .codex-ui-approval-request__heading {
+  gap: 0.5rem;
+}
+
+.codex-ui-approval-request[data-presentation="composer"]
+  .codex-ui-approval-request__description {
+  background: color-mix(
+    in srgb,
+    var(--codex-ui-background-surface) 58%,
+    transparent
+  );
+  border-radius: var(--codex-ui-radius-md);
+  color: var(--codex-ui-text-secondary);
+  padding: 0.375rem 0.5rem;
+}
+
+.codex-ui-approval-request[data-presentation="composer"]
+  .codex-ui-approval-request__actions {
+  margin-top: auto;
+  padding: 0 1rem 0.875rem;
+}
+
 .codex-ui-approval-request__header {
   display: flex;
   flex-direction: column;

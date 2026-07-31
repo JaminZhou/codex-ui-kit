@@ -12,7 +12,7 @@ exit gates; it does not replace the inventory.
 
 - The current installed package is Codex Desktop `26.727.40816` (`6067`).
 - The inventory contains 77 surface groups: 49 P0, 19 P1, and 9 P2.
-- 29 groups have current-build runtime evidence, 29 have previous-build-only
+- 30 groups have current-build runtime evidence, 28 have previous-build-only
   runtime evidence, and 19 have not been sampled.
 - The current-build refresh covers all six left-sidebar groups, window
   navigation, route loading/restoration, the New chat Composer and project
@@ -22,7 +22,7 @@ exit gates; it does not replace the inventory.
   responsive detail restoration. Its independent state machine adds
   index/detail loading and failure, checks, comments, review submission,
   merge-readiness, merge completion, compact layout, and route restoration.
-  Together the playground gates cover 63 CDP/pixel frames, and the refreshed
+  Together the playground gates cover 65 CDP/pixel frames, and the refreshed
   PR detail passes the current 906×820 regional pixel gate. The refreshed
   real MCP success path now matches Search → Fetch, the integrated activity
   disclosure, computed typography, and a current regional pixel gate. The
@@ -39,7 +39,10 @@ exit gates; it does not replace the inventory.
   and two sub-0.5% regional pixel gates. A fourth read-only slice locks the
   82-message compact navigation rail, seven-turn mounted window,
   reverse-origin scrolling, return-to-latest interaction, and a sub-1%
-  ownership-masked regional gate. Attachment variants, Terminal
+  ownership-masked regional gate. A fifth disposable-task slice locks the
+  736×162 command-approval card, denial without execution, response actions,
+  and restored 736×98 Composer through CDP, Electron, and sub-1% regional
+  gates. Attachment variants, Terminal
   multi-tab/process behavior,
   Review rename/delete variants, and broader shell evidence from
   `26.721.81911` remain historical regression evidence until re-observed. The
@@ -258,9 +261,11 @@ without confusing package readiness with full product reconstruction.
    continuation is delivered through real current-build evidence,
    Browser/CDP, Electron, and regional pixels. Current permissions, Add
    resources, multiline/long-input geometry, active Goal/Plan modes, and the
-   sampled long-thread navigation/windowing contract are also delivered.
-   Continue with attachment evidence; retain queue pause/Resume only as a
-   legacy compatibility fixture.
+   sampled long-thread navigation/windowing contract are also delivered. A
+   real command approval pending → denied path now additionally confirms
+   non-execution and restores the current Composer. Continue with attachment,
+   approval allow-once/persistence/timeout, and broader recovery evidence;
+   retain queue pause/Resume only as a legacy compatibility fixture.
 6. **Coding workspace entry**: current project/context entry plus independent
    project → environment/worktree → command → approval → Review → Terminal →
    PR acceptance.
@@ -276,7 +281,7 @@ without confusing package readiness with full product reconstruction.
    merge completion, responsive non-modal panel composition, and route
    restoration. Current-product evidence remains deliberately read-only.
 10. **Remaining P0 turn/tool gaps**: long command output and truncation,
-    approval denial/timeout/persistence, attachment lifecycle, Markdown
+    approval allow-once/timeout/persistence, attachment lifecycle, Markdown
     mutation/large content, subagents, and transport recovery.
 11. **P1 resources and integrations**: Browser/artifact/document previews,
     environments, remote connections, Settings, MCP, plugins, skills, and

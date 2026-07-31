@@ -66,7 +66,7 @@ The authoritative current-build inventory is:
   The current PR changed to Summary/Code tabs with
   Timeline integrated into Summary, loaded real multi-file Code content, and
   exposed a display-only Review options menu. The independent Browser and
-  Electron flows verify the matched shell/New chat/PR structures and all 63
+  Electron flows verify the matched shell/New chat/PR structures and all 65
   deterministic lifecycle frames. The refreshed PR regional gate passes at
   5.75% full-main, 4.68% index, and 6.44% detail difference. A third
   text-only current probe verifies the 710×39 Composer queue, visible
@@ -100,7 +100,7 @@ The authoritative current-build inventory is:
   explicit row reopen after responsive auto-hide. The
   independent public state machine adds list/detail loading and failure,
   checks, comments, review submission, merge readiness/completion, and compact
-  recovery through 63 Browser/CDP, Electron, and reviewed-pixel frames. No
+  recovery through 65 Browser/CDP, Electron, and reviewed-pixel frames. No
   review, comment, or merge was sent to the real PR, and successful
   review submission remains synthetic because the current Review options menu
   contains display settings only; those mutating states must not be reported
@@ -117,6 +117,13 @@ The authoritative current-build inventory is:
   selection and restoration with synthetic content, while a masked regional
   gate compares only the rail and floating control at 0.59%. Host eviction
   policy outside this sampled state remains an open product boundary.
+- The current-build approval slice observes a real 736×162 command approval,
+  drives `Deny`, confirms the command did not execute, and verifies the
+  completed activity, final response, response actions, restored 736×98
+  Composer, and `Ask for approval` permission mode. The public declined trace,
+  CDP, Electron, and ownership-masked current pixels pass at 0.85% pending and
+  0.12% denied. Allow-once completion, persistent approval, timeout, repeated
+  denial, and other approval kinds remain open.
 - npm publication remains out of scope until the agreed P0/P1 coverage and
   release acceptance surfaces are complete.
 
@@ -175,6 +182,13 @@ keeps all real and synthetic transcript content outside the pixel denominator,
 and gates only the compact navigation rail and floating return control under a
 1% hard limit. CDP separately checks 82 navigation entries, seven mounted
 turns, reverse scroll origin, and the return-to-latest transition.
+
+The current-build approval comparison uses separate pending and denied
+906×820 references. Ownership masks exclude task/header text, localized or
+synthetic response glyphs, and the non-owning scrollbar while preserving the
+approval/Composer silhouettes, activity and command structure, approval
+actions, response actions, and spacing. Both gates use a 1.5% hard limit;
+CDP and Electron independently verify decision semantics and focus.
 
 Broader final visual optimization remains scheduled after the remaining
 inventory, page compositions, and state transitions stabilize. A passing

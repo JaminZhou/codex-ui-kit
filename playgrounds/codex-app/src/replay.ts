@@ -1,3 +1,4 @@
+import approvalDeniedTrace from "../fixtures/traces/approval-denied.jsonl?raw";
 import compactionTrace from "../fixtures/traces/compaction.jsonl?raw";
 import conversationLifecycleTrace from "../fixtures/traces/conversation-lifecycle.jsonl?raw";
 import backgroundTerminalTrace from "../fixtures/traces/background-terminal.jsonl?raw";
@@ -14,6 +15,7 @@ import workflowTrace from "../fixtures/traces/workspace-workflow.jsonl?raw";
 import type { ProtocolEventRecord } from "./protocol-state";
 
 export type ReplayScenarioId =
+  | "approval-denied"
   | "background-terminal"
   | "conversation-lifecycle"
   | "streaming-recovery"
@@ -69,6 +71,12 @@ function scenario(
 }
 
 export const replayScenarios: Record<ReplayScenarioId, ReplayScenario> = {
+  "approval-denied": scenario(
+    "approval-denied",
+    "Approval denied",
+    "A current command approval is denied, the command is not executed, and the turn completes.",
+    approvalDeniedTrace,
+  ),
   "conversation-lifecycle": scenario(
     "conversation-lifecycle",
     "Conversation and Composer lifecycle",

@@ -758,6 +758,17 @@ textarea {
   gap: 12px;
 }
 
+.demo-root[data-scenario="approval-denied"] {
+  --codex-ui-conversation-thread-content-top-inset: 1.0625rem;
+}
+
+.demo-root[data-frame="approval-current-denied"]
+  .codex-ui-conversation-thread-shell__thread {
+  min-height: calc(
+    100dvh - var(--codex-ui-conversation-thread-header-height) + 4.5rem
+  );
+}
+
 .demo-root[data-scenario="mcp-tool-call"]
   .codex-ui-activity-timeline__toggle,
 .demo-root[data-scenario="mcp-recovery-mixed-thread"]

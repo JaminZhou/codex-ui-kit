@@ -493,6 +493,37 @@ and child, verified port `9517` was gone, and moved the profile and reference
 images to
 `/Users/JaminZhou/.Trash/codex-ui-kit-long-thread-cleanup.XSqBZw`.
 
+### Current 26.727.40816 command-approval denial
+
+The approval probe used exact main PID `13129`, loopback port `9518`, and
+unique profile `/private/tmp/codex-ui-kit-approval-cdp.7bt4qn`. It created one
+disposable task and requested only `open -a Calculator`, then waited at the
+approval boundary. The pending card measured x=359.05/y=642, 736×162px and
+exposed `Terminal`, the command, `Deny`, `Allow once`, and
+`Approval options`.
+
+The bounded sequence was:
+
+1. confirm the pending card remained stable without executing;
+2. capture its DOM, computed styles, geometry, and 906×820 main-only image;
+3. activate `Deny`;
+4. verify the card disappeared, `Worked for 23s` and the final non-execution
+   response appeared, and the 736×98 Composer returned with
+   `Ask for approval`;
+5. verify no Calculator process existed.
+
+The independent replay records the declined request/resolution event order
+with empty command output and no exit code. Browser/CDP covers 65 frames,
+Electron drives the split options menu and rejection transition, and masked
+current-build comparisons pass at `0.008493512` pending and `0.001214128`
+denied. This captures one command-denial path only; allow once, persistence,
+timeout, repeated denial, and other permission kinds remain required.
+
+Cleanup stopped only the exact second-process tree and its profile-specific
+Crashpad helpers, closed port `9518`, removed the ignored probe, and moved
+the profile and external screenshots to
+`/Users/JaminZhou/.Trash/codex-ui-kit-approval-cleanup.byVfmp`.
+
 ## Required flow matrix
 
 ### 1. Application entry and navigation
