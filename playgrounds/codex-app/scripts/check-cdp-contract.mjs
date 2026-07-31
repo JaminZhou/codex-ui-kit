@@ -1497,6 +1497,30 @@ for (const scene of visualScenes) {
           `${scene.id}: Terminal picker contract failed: ${JSON.stringify(contract.terminalPicker)}`,
         );
       }
+      if (scene.id === "terminal-closed") {
+        await page
+          .getByRole("button", { name: "Restore last terminal" })
+          .click();
+        await page.waitForSelector('[role="tab"][aria-selected="true"]');
+        const restoredTerminal = await page.evaluate(() => ({
+          inputLabel: document
+            .querySelector(".codex-ui-terminal-prompt__input")
+            ?.getAttribute("aria-label"),
+          selectedTab: document
+            .querySelector('[role="tab"][aria-selected="true"]')
+            ?.textContent?.trim(),
+          tabCount: document.querySelectorAll('[role="tab"]').length,
+        }));
+        if (
+          restoredTerminal.tabCount !== 1 ||
+          !restoredTerminal.selectedTab?.includes("codex-ui-kit") ||
+          restoredTerminal.inputLabel !== "Terminal input"
+        ) {
+          throw new Error(
+            `${scene.id}: Terminal restore action failed: ${JSON.stringify(restoredTerminal)}`,
+          );
+        }
+      }
     } else if (contract.bottomPanelResizer) {
       throw new Error(
         `${scene.id}: hidden Terminal panel retained its resize separator.`,

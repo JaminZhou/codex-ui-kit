@@ -1438,7 +1438,8 @@
   border-radius: var(--codex-ui-radius-md);
   font-size: 0.8125rem;
   line-height: 1.1607rem;
-  padding: 0 2rem 0 0.5rem;
+  padding-block: 0;
+  padding-inline: 0.5rem 2rem;
 }
 
 .codex-ui-terminal-panel
@@ -8931,6 +8932,8 @@ button.codex-ui-generated-image-gallery__image {
   .codex-ui-inline-notice__message[data-shimmering],
   .codex-ui-composer-mention-menu__spinner,
   .codex-ui-notice-action__spinner,
+  .codex-ui-terminal-panel__tab-label[data-status="restoring"]
+    > :first-child,
   .codex-ui-stream-notice__details,
   .codex-ui-stream-notice__icon svg {
     animation: none;

@@ -273,6 +273,16 @@ function initialTerminalSessionIds(
   return [...terminalLifecycleCommandIds];
 }
 
+function initialClosedTerminalSessionIds(
+  scenarioId: ReplayScenarioId,
+  frame: string | null,
+) {
+  return scenarioId === "terminal-lifecycle" &&
+    frame === "terminal-closed"
+    ? [...terminalLifecycleCommandIds]
+    : [];
+}
+
 function replayStatusLabel(
   status: DemoProtocolState["status"],
   running: boolean,
@@ -643,7 +653,12 @@ export function App() {
     ),
   );
   const [closedTerminalSessionIds, setClosedTerminalSessionIds] =
-    useState<string[]>([]);
+    useState<string[]>(() =>
+      initialClosedTerminalSessionIds(
+        initialSelection.scenarioId,
+        initialSelection.frame,
+      ),
+    );
   const [terminalTabPickerOpen, setTerminalTabPickerOpen] = useState(
     initialSelection.frame === "terminal-picker",
   );
@@ -847,6 +862,8 @@ export function App() {
       nextId,
       frame,
     );
+    const nextClosedTerminalSessionIds =
+      initialClosedTerminalSessionIds(nextId, frame);
     setWorkspaceRunCwd(
       workspaceContext?.cwd ?? "/workspace/codex-ui-kit",
     );
@@ -882,7 +899,7 @@ export function App() {
         nextId === "terminal-lifecycle",
     );
     setTerminalSessionIds([...nextTerminalSessionIds]);
-    setClosedTerminalSessionIds([]);
+    setClosedTerminalSessionIds([...nextClosedTerminalSessionIds]);
     setTerminalTabPickerOpen(frame === "terminal-picker");
     setTerminalCommandId(nextTerminalSessionIds.at(-1) ?? null);
     setTerminalHeight(272);
