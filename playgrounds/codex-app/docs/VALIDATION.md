@@ -60,10 +60,13 @@ Every deterministic scenario has one ID and produces four evidence layers:
    call/answer region, upper activity/failure region, and Composer separately
    while leaving the final answer unmasked; the App shell
    accepts a 120×46 ownership-scoped reference through
-   `CODEX_UI_KIT_WINDOW_CHROME_REFERENCE`. Queued and paused Composer states
+   `CODEX_UI_KIT_WINDOW_CHROME_REFERENCE`. Queued and automatic-continuation
+   Composer states
    accept separate 792×320 current-build crops through
    `CODEX_UI_KIT_COMPOSER_QUEUED_REFERENCE` and
-   `CODEX_UI_KIT_COMPOSER_PAUSED_REFERENCE`. Transparent
+   `CODEX_UI_KIT_COMPOSER_CONTINUED_REFERENCE`; both use a 2% hard
+   changed-pixel limit. `CODEX_UI_KIT_COMPOSER_PAUSED_REFERENCE` is retained
+   only for the previous-build paused/Resume compatibility frame. Transparent
    Electron/CDP reference pixels are composited onto the observed `#181818`
    window background before comparison, and independently implemented UI
    regions are located from their DOM contracts rather than hard-coded

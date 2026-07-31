@@ -274,7 +274,7 @@ The sixteenth slice refreshes Pull request behavior against
   compact states;
 - real Electron review/comment/merge interaction against deterministic local
   state, without GitHub side effects;
-- nine additional reviewed visual frames and a shared 58-frame CDP/pixel
+- nine additional reviewed visual frames and a shared 59-frame CDP/pixel
   matrix;
 - a current 906×820 regional comparison passing at 5.75% full-main, 4.68%
   index, and 6.44% detail difference without relaxing the existing thresholds.
@@ -303,8 +303,36 @@ The seventeenth slice refreshes the successful MCP/tool-call path against
 The pixel masks exclude dynamic header/task/intermediate/group-label glyphs
 and the non-owning scrollbar only; the answer remains unmasked. CDP separately
 verifies the masked regions' surrounding geometry and computed typography.
-Failure/retry remains the prior-build recovery slice until it is re-observed
-on the installed build.
+Failure/retry is refreshed in the next slice.
+
+## Eighteenth vertical slice
+
+The eighteenth slice refreshes MCP failure/recovery against `26.727.40816`:
+
+- a real invalid-URL Fetch failure followed by three Search calls and one
+  successful Fetch, with no shell, browser-navigation, or file action;
+- the current standalone failed row and neutral 736×67.3125px
+  `plaintext / Invalid URL` output before the recovered integration group;
+- Browser and Electron contracts for ordering, disclosure ownership,
+  accessibility, typography, and failed-card geometry;
+- a current regional gate passing at 1.63% full-main, 2.90% recovery, 1.08%
+  upper activity/failure, and 1.91% Composer difference.
+
+## Nineteenth vertical slice
+
+The nineteenth slice refreshes the Composer queue and Stop lifecycle against
+`26.727.40816`:
+
+- a real 710×39px queued tray with a 684×28px row, 14/16px typography, and
+  Steer/Delete queued message/queued message actions;
+- the current 28×28 Stop transition to `You stopped after 2s`;
+- automatic promotion and execution of the queued follow-up, replacing the
+  previous paused header and Resume behavior;
+- deterministic Browser/CDP and real Electron acceptance for that default
+  state machine, while the former paused/Resume frame remains available as
+  explicit legacy compatibility;
+- two current 792×320 regional gates passing at 0.45% queued and 0.62%
+  automatic-continuation difference under a 2% hard limit.
 
 ## Development
 
@@ -396,8 +424,11 @@ from the same 1180×820 current-build Renderer:
 
 ```bash
 CODEX_UI_KIT_COMPOSER_QUEUED_REFERENCE=/absolute/path/to/composer-queued.png \
-CODEX_UI_KIT_COMPOSER_PAUSED_REFERENCE=/absolute/path/to/composer-paused.png \
+CODEX_UI_KIT_COMPOSER_CONTINUED_REFERENCE=/absolute/path/to/composer-continued.png \
   pnpm --filter @codex-ui-kit/codex-app-playground check:visual
 ```
+
+`CODEX_UI_KIT_COMPOSER_PAUSED_REFERENCE` remains available only for the
+previous-build paused/Resume compatibility frame.
 
 See [docs/VALIDATION.md](docs/VALIDATION.md) for the evidence model.

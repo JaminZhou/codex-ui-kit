@@ -1554,6 +1554,10 @@ for (const scene of visualScenes) {
               }
             : null,
           queueCount: root.getAttribute("data-queue-count"),
+          interruptionText:
+            document
+              .querySelector(".codex-ui-thread-interruption-summary")
+              ?.textContent?.replace(/\s+/g, " ").trim() ?? null,
           stopCount: composer.querySelectorAll(
             'button[aria-label="Stop"]',
           ).length,
@@ -1571,6 +1575,7 @@ for (const scene of visualScenes) {
       const expectsContext = ![
         "composer-running",
         "composer-queued",
+        "composer-auto-continued",
         "composer-queue-paused",
       ].includes(scene.id);
       if (
@@ -1627,8 +1632,8 @@ for (const scene of visualScenes) {
           conversation.queue.rowCount !== 1 ||
           conversation.queueCount !== "1" ||
           !conversation.queue.labels.includes("Steer") ||
-          !conversation.queue.labels.includes("Delete queued prompt") ||
-          !conversation.queue.labels.includes("Queued prompt actions") ||
+          !conversation.queue.labels.includes("Delete queued message") ||
+          !conversation.queue.labels.includes("Queued message actions") ||
           Math.abs(
             conversation.queue.rect.left -
               conversation.surface.left -
@@ -1642,6 +1647,18 @@ for (const scene of visualScenes) {
       ) {
         throw new Error(
           `${scene.id}: queued Composer contract failed: ${JSON.stringify(conversation)}`,
+        );
+      }
+      if (
+        scene.id === "composer-auto-continued" &&
+        (conversation.queue !== null ||
+          conversation.queueCount !== "0" ||
+          conversation.phase !== "running" ||
+          conversation.stopCount !== 1 ||
+          conversation.interruptionText !== "You stopped after 2s")
+      ) {
+        throw new Error(
+          `${scene.id}: automatic queued continuation contract failed: ${JSON.stringify(conversation)}`,
         );
       }
       if (
@@ -2989,7 +3006,7 @@ try {
     .getByRole("button", { exact: true, name: "Stop" })
     .click();
   await conversationLifecyclePage.waitForSelector(
-    '.demo-root[data-composer-phase="queue-paused"]',
+    '.demo-root[data-composer-phase="running"][data-queue-count="0"]',
   );
   const stoppedState = await conversationLifecyclePage.evaluate(() => {
     const currentTask = [
@@ -3011,19 +3028,32 @@ try {
   });
   if (
     stoppedState.assistantStatus !== "completed" ||
-    stoppedState.currentTaskStatus !== "idle" ||
-    stoppedState.rootStatus !== "interrupted"
+    stoppedState.currentTaskStatus !== "running" ||
+    stoppedState.rootStatus !== "running"
   ) {
     throw new Error(
       `Conversation stop state diverged: ${JSON.stringify(stoppedState)}`,
     );
   }
-  await conversationLifecyclePage.getByRole("button", { name: "Resume" }).click();
+  if (
+    (await conversationLifecyclePage
+      .getByText("You stopped after 2s", { exact: true })
+      .count()) !== 1 ||
+    (await conversationLifecyclePage
+      .getByText("Queue this follow-up while the turn is running.", {
+        exact: true,
+      })
+      .count()) !== 1
+  ) {
+    throw new Error("Stop did not promote the queued follow-up automatically.");
+  }
+  await composer.fill("Queue action controls while continuation runs.");
+  await composer.press("Enter");
   await conversationLifecyclePage.waitForSelector(
-    '.demo-root[data-composer-phase="queued"][data-status="running"]',
+    '.demo-root[data-composer-phase="queued"][data-queue-count="1"]',
   );
   const queuedPromptActions = conversationLifecyclePage.locator(
-    'button[aria-label="Queued prompt actions"]',
+    'button[aria-label="Queued message actions"]',
   );
   await queuedPromptActions.click();
   await conversationLifecyclePage
@@ -3034,7 +3064,7 @@ try {
   );
   await queuedPromptActions.click();
   await conversationLifecyclePage
-    .getByRole("button", { name: "Delete queued prompt" })
+    .getByRole("button", { name: "Delete queued message" })
     .click();
   await conversationLifecyclePage.waitForSelector(
     '.demo-root[data-composer-phase="running"][data-queue-count="0"]',
@@ -3296,7 +3326,7 @@ const {
 } = await launchScene(pausedDeleteScene, { capture: false });
 try {
   await pausedDeletePage
-    .getByRole("button", { name: "Delete queued prompt" })
+    .getByRole("button", { name: "Delete queued message" })
     .click();
   await pausedDeletePage.waitForFunction(() => {
     const root = document.querySelector(".demo-root");
@@ -3334,7 +3364,7 @@ try {
   );
   const longQueue = longQueuePage.locator(".codex-ui-composer-queue");
   const lastQueueActions = longQueuePage
-    .getByRole("button", { name: "Queued prompt actions" })
+    .getByRole("button", { name: "Queued message actions" })
     .last();
   await lastQueueActions.click();
   const longQueueMenu = longQueuePage.getByRole("menu");
@@ -3413,8 +3443,17 @@ try {
   );
   await stopReplay.click();
   await replayPositionPage.waitForSelector(
-    '.demo-root[data-composer-phase="queue-paused"][data-status="interrupted"]',
+    '.demo-root[data-composer-phase="running"][data-status="running"][data-queue-count="0"]',
   );
+  if (
+    (await replayPositionPage
+      .getByText("You stopped after 2s", { exact: true })
+      .count()) !== 1
+  ) {
+    throw new Error(
+      "Replay stop did not preserve the interruption summary while continuing the queue.",
+    );
+  }
 
   const replayPosition = replayPositionPage.getByRole("slider", {
     name: "Protocol event position",

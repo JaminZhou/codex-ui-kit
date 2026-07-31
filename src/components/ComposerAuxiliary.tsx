@@ -491,7 +491,7 @@ export function QueuedPromptList({
                 title="Drag to reorder · Alt+Arrow to move"
                 type="button"
               >
-                <span aria-hidden="true">⠿</span>
+                <span aria-hidden="true">↳</span>
               </button>
               {paused ? (
                 <span
@@ -513,17 +513,19 @@ export function QueuedPromptList({
               </span>
               {onSendNow ? (
                 <button
+                  aria-label={paused ? "Retry" : "Steer"}
                   className="codex-ui-composer-queue__send-now"
                   onClick={() => onSendNow(item.id)}
                   title={paused ? "Try sending this queued prompt again" : "Submit without interrupting the agent"}
                   type="button"
                 >
+                  <span aria-hidden="true">↪</span>
                   {paused ? "Retry" : "Steer"}
                 </button>
               ) : null}
               {onDelete ? (
                 <button
-                  aria-label="Delete queued prompt"
+                  aria-label="Delete queued message"
                   className="codex-ui-composer-queue__icon-button"
                   onClick={() => onDelete(item.id)}
                   type="button"
@@ -538,7 +540,7 @@ export function QueuedPromptList({
                   side="top"
                   trigger={
                     <button
-                      aria-label="Queued prompt actions"
+                      aria-label="Queued message actions"
                       className="codex-ui-composer-queue__more"
                       type="button"
                     >

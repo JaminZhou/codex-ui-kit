@@ -52,7 +52,10 @@ describe("composer visual contract", () => {
     );
   });
 
-  it("keeps queue actions discoverable from hover and keyboard focus", () => {
+  it("keeps current queue actions persistently visible and keyboard reachable", () => {
+    expect(styles).toMatch(
+      /\.codex-ui-composer-queue__send-now,[\s\S]*?\.codex-ui-composer-queue__more \{[\s\S]*?opacity: 1;/,
+    );
     expect(styles).toContain(
       ".codex-ui-composer-queue__row:focus-within .codex-ui-composer-queue__send-now",
     );

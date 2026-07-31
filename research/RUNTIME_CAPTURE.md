@@ -129,7 +129,7 @@ and terminates only the PID bearing the unique profile, verifies its children
 and loopback listener are gone, and removes only that exact profile and the
 external screenshot.
 
-### Current conversation and Composer capture
+### Previous 26.721.81911 conversation and Composer capture
 
 The `26.721.81911` conversation probe used a second exact process with a unique
 `/private/tmp/codex-ui-kit-conversation-cdp.XXXXXX` profile and loopback port.
@@ -371,6 +371,45 @@ with that profile, verified the listener and all exact-profile processes were
 gone, and moved the profile and reference images into
 `/Users/JaminZhou/.Trash/codex-ui-kit-mcp-recovery-cleanup.yS1xY9`. The
 original Codex process remained running.
+
+### Current 26.727.40816 Composer queue and Stop capture
+
+The current Composer refresh used exact process PID `78399`, loopback port
+`9514`, and unique profile
+`/private/tmp/codex-ui-kit-composer-cdp.Ma9hyd`. It selected the 1180×820 main
+Renderer and created one disposable text-only task. The prompts explicitly
+forbade tools, commands, browser navigation, and file access.
+
+The bounded sequence was:
+
+1. start a long synthetic response and wait for the 28×28 Stop control;
+2. enter a second prompt while the first response remains active;
+3. record the queued tray, its computed ancestor chain, and
+   Steer/Delete/message-actions controls;
+4. Stop after two seconds, record `You stopped after 2s`, and verify that the
+   queue row disappears;
+5. verify that the queued prompt becomes the next user turn and starts
+   automatically, with no paused header or Resume action;
+6. repeat the transition after active output to exclude a zero-second timing
+   branch;
+7. capture only the two 792×320 bottom-main crops used by the optional
+   current-build regional gates.
+
+The current tray measured 710×39px at x=372.05/y=667. Its inner scroll region
+measured 708×38px and its row measured 684×28px at x=385.05/y=673. The text
+used 14/16px system typography. The independent replay now uses the current
+automatic-continuation state by default while retaining paused/Resume as a
+legacy compatibility frame.
+
+At the strict 0.05 pixel threshold and 2% hard changed-pixel limit, the queued
+and automatic-continuation crops pass at `0.004505997` and `0.006182923`.
+CDP covers 59 lifecycle frames and real Electron repeats the default
+transition.
+
+Cleanup stopped only PID `78399`, verified the exact profile process set and
+port `9514` were gone, and moved the profile and screenshots into
+`/Users/JaminZhou/.Trash/codex-ui-kit-composer-cleanup.FE0SB8`. The original
+Codex process remained running.
 
 ## Required flow matrix
 

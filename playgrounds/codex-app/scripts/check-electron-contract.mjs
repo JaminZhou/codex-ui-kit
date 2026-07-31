@@ -2504,12 +2504,20 @@ try {
     .getByRole("button", { exact: true, name: "Stop" })
     .click();
   await conversationLifecyclePage.waitForSelector(
-    '.demo-root[data-composer-phase="queue-paused"]',
+    '.demo-root[data-composer-phase="running"][data-status="running"][data-queue-count="0"]',
   );
-  await conversationLifecyclePage.getByRole("button", { name: "Resume" }).click();
-  await conversationLifecyclePage.waitForSelector(
-    '.demo-root[data-composer-phase="queued"][data-status="running"]',
-  );
+  if (
+    (await conversationLifecyclePage
+      .getByText("You stopped after 2s", { exact: true })
+      .count()) !== 1 ||
+    (await conversationLifecyclePage
+      .getByText("Queue the Electron follow-up.", { exact: true })
+      .count()) !== 1
+  ) {
+    throw new Error(
+      "Electron Stop did not promote the queued follow-up automatically.",
+    );
+  }
 
   await conversationLifecyclePage
     .getByRole("button", {
@@ -2549,8 +2557,8 @@ try {
   }));
   if (
     lifecycle.contextControls !== 0 ||
-    lifecycle.navigationButtons !== 11 ||
-    lifecycle.queueRows !== 1 ||
+    lifecycle.navigationButtons !== 12 ||
+    lifecycle.queueRows !== 0 ||
     lifecycle.status !== "running" ||
     lifecycle.stopButtons !== 1 ||
     lifecycle.threadFollowing !== "true"

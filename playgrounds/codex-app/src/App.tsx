@@ -206,6 +206,7 @@ function replayState(
 
 const conversationHostFrames = new Set([
   "composer-attachment",
+  "composer-auto-continued",
   "composer-disabled",
   "composer-idle",
   "composer-multiline",
@@ -225,7 +226,11 @@ function replayCountForSelection(
     return scenario.events.length;
   }
   if (!conversationHostFrames.has(frame)) return scenario.events.length;
-  if (frame === "composer-running" || frame === "composer-queued") {
+  if (
+    frame === "composer-running" ||
+    frame === "composer-queued" ||
+    frame === "composer-auto-continued"
+  ) {
     return scenario.frames["conversation-running"] ?? scenario.events.length;
   }
   return (
@@ -258,6 +263,12 @@ function initialQueuedPrompts(frame: string | null): QueuedPrompt[] {
       text: "Verify the queued Composer lifecycle.",
     },
   ];
+}
+
+function initialQueuedContinuation(frame: string | null) {
+  return frame === "composer-auto-continued"
+    ? "Verify the queued Composer lifecycle."
+    : null;
 }
 
 const terminalLifecycleCommandIds = [
@@ -317,17 +328,92 @@ function interruptConversationReplay(
     params: {
       threadId: state.threadId,
       turn: {
-        completedAt: null,
-        durationMs: null,
+        completedAt: 13,
+        durationMs: 2_000,
         error: null,
         id: state.currentTurnId,
         items: [],
         itemsView: "full",
-        startedAt: null,
+        startedAt: 11,
         status: "interrupted",
       },
     },
   });
+}
+
+function continueQueuedConversationReplay(
+  state: DemoProtocolState,
+  prompt: string,
+): DemoProtocolState {
+  const interrupted = interruptConversationReplay(state);
+  const threadId =
+    interrupted.threadId ?? "thread-conversation-lifecycle";
+  const turnId = "turn-queued-continuation";
+  const startAt = interrupted.eventCount;
+  const continuationEvents: ProtocolEventRecord[] = [
+    {
+      atMs: startAt,
+      method: "item/started",
+      params: {
+        item: {
+          clientId: "demo-queued-continuation",
+          content: [{ text: prompt, text_elements: [], type: "text" }],
+          id: "user-queued-continuation",
+          type: "userMessage",
+        },
+        startedAtMs: 13_000,
+        threadId,
+        turnId,
+      },
+    },
+    {
+      atMs: startAt + 1,
+      method: "turn/started",
+      params: {
+        threadId,
+        turn: {
+          completedAt: null,
+          durationMs: null,
+          error: null,
+          id: turnId,
+          items: [],
+          itemsView: "full",
+          startedAt: 13,
+          status: "inProgress",
+        },
+      },
+    },
+    {
+      atMs: startAt + 2,
+      method: "item/started",
+      params: {
+        item: {
+          id: "assistant-queued-continuation",
+          memoryCitation: null,
+          phase: "final_answer",
+          text: "",
+          type: "agentMessage",
+        },
+        startedAtMs: 13_020,
+        threadId,
+        turnId,
+      },
+    },
+    {
+      atMs: startAt + 3,
+      method: "item/agentMessage/delta",
+      params: {
+        delta: "Working on the queued follow-up…",
+        itemId: "assistant-queued-continuation",
+        threadId,
+        turnId,
+      },
+    },
+  ];
+  return continuationEvents.reduce(
+    reduceProtocolNotification,
+    interrupted,
+  );
 }
 
 function statusLabel(state: DemoProtocolState) {
@@ -621,6 +707,10 @@ export function App() {
   const [replayComposerStopped, setReplayComposerStopped] = useState(
     initialSelection.frame === "composer-queue-paused",
   );
+  const [replayQueuedContinuation, setReplayQueuedContinuation] =
+    useState<string | null>(() =>
+      initialQueuedContinuation(initialSelection.frame),
+    );
   const [replayApprovalResolution, setReplayApprovalResolution] =
     useState<{
       decision: "approved" | "rejected";
@@ -757,11 +847,24 @@ export function App() {
   const isConversationLifecycle =
     mode === "replay" && scenarioId === "conversation-lifecycle";
   const lifecycleReplay = useMemo(
-    () =>
-      isConversationLifecycle && replayComposerStopped
-        ? interruptConversationReplay(replay)
-        : replay,
-    [isConversationLifecycle, replay, replayComposerStopped],
+    () => {
+      if (!isConversationLifecycle) return replay;
+      const continuedReplay = replayQueuedContinuation
+        ? continueQueuedConversationReplay(
+            replay,
+            replayQueuedContinuation,
+          )
+        : replay;
+      return replayComposerStopped
+        ? interruptConversationReplay(continuedReplay)
+        : continuedReplay;
+    },
+    [
+      isConversationLifecycle,
+      replay,
+      replayComposerStopped,
+      replayQueuedContinuation,
+    ],
   );
   const state = useMemo(
     () =>
@@ -853,6 +956,7 @@ export function App() {
     setActiveFrame(null);
     setReplayComposerSubmitting(false);
     setReplayComposerStopped(false);
+    setReplayQueuedContinuation(null);
     setReplayApprovalResolution(null);
     setQueueInterrupted(false);
     if (!isTurnActive(replayState(scenarioEvents, nextCount).status)) {
@@ -934,6 +1038,7 @@ export function App() {
     setQueueInterrupted(false);
     setReplayComposerSubmitting(false);
     setReplayComposerStopped(false);
+    setReplayQueuedContinuation(initialQueuedContinuation(frame));
     setReplayApprovalResolution(null);
     setActiveFrame(frame);
     setScenarioSelectionVersion((version) => version + 1);
@@ -974,6 +1079,7 @@ export function App() {
     setQueueInterrupted(false);
     setReplayComposerSubmitting(false);
     setReplayComposerStopped(false);
+    setReplayQueuedContinuation(null);
     setReplayApprovalResolution(null);
     setWorkspaceOverlay(null);
     setWorkspaceLocalEnvironmentOpen(false);
@@ -1053,6 +1159,7 @@ export function App() {
 
   const restoreConversationRunningReplay = () => {
     setReplayComposerStopped(false);
+    setReplayQueuedContinuation(null);
     setQueueInterrupted(false);
     setReplayCount(
       replayScenarios["conversation-lifecycle"].frames[
@@ -1087,6 +1194,7 @@ export function App() {
     cancelReplaySubmitTimer();
     setReplayComposerSubmitting(true);
     setReplayComposerStopped(false);
+    setReplayQueuedContinuation(null);
     setQueueInterrupted(false);
     replaySubmitTimerRef.current = window.setTimeout(() => {
       replaySubmitTimerRef.current = null;
@@ -1107,10 +1215,20 @@ export function App() {
     }
     cancelReplaySubmitTimer();
     setReplayComposerSubmitting(false);
-    setReplayComposerStopped(true);
-    if (queuedPrompts.length > 0) {
-      setQueueInterrupted(true);
+    const [nextQueuedPrompt, ...remainingQueuedPrompts] =
+      queuedPrompts;
+    if (
+      nextQueuedPrompt &&
+      typeof nextQueuedPrompt.text === "string"
+    ) {
+      setReplayComposerStopped(false);
+      setReplayQueuedContinuation(nextQueuedPrompt.text);
+      setQueuedPrompts(remainingQueuedPrompts);
+      setQueueInterrupted(false);
+      return;
     }
+    setReplayComposerStopped(true);
+    setQueueInterrupted(false);
   };
 
   const resumeQueue = () => {
@@ -1296,7 +1414,11 @@ export function App() {
           }
           actionsLabel="Current task actions"
           leading={<SidebarGlyph name="folder" />}
-          status={hasActiveTurnWork(state) ? "running" : "idle"}
+          status={
+            hasActiveTurnWork(state) || isTurnActive(state.status)
+              ? "running"
+              : "idle"
+          }
           statusLabel="Current task is running"
         >
           codex-ui-kit
@@ -1550,7 +1672,10 @@ export function App() {
               +
             </button>
             <button aria-label="Change permissions" type="button">
-              ◉ {currentMcpReplay ? "Full access" : "Approve for me"}
+              ◉{" "}
+              {currentMcpReplay || showLifecycleComposer
+                ? "Full access"
+                : "Approve for me"}
             </button>
           </span>
         ) : undefined
@@ -2868,12 +2993,10 @@ export function App() {
               durationMs={message.interruptionDurationMs ?? 0}
               label={
                 message.interruptionDurationMs === null
-                  ? "You stopped this response"
+                  ? "You stopped"
                   : undefined
               }
-              stoppedLabel={(time) =>
-                `You stopped this response after ${time}`
-              }
+              stoppedLabel={(time) => `You stopped after ${time}`}
             />
           ) : null}
           {message.compaction ? (

@@ -307,11 +307,12 @@
         "cdp-26.721:synthetic-submit-running-stop-control-completed-transition",
         "cdp-26.721:synthetic-streaming-stop-28x28-frozen-raster-and-stop-action",
         "cdp-26.721:synthetic-you-stopped-after-2s-divider-raster",
-        "cdp-26.721.81911:real-running-turn-stop-input-clear-and-focus-restore"
+        "cdp-26.721.81911:real-running-turn-stop-input-clear-and-focus-restore",
+        "cdp-26.727.40816:real-stop-28x28-you-stopped-after-2s-and-queued-auto-continuation"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "partial_legacy",
-      "electronStatus": "partial_legacy",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
       "priority": "p0"
     },
     {
@@ -460,11 +461,12 @@
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
         "cdp:queued-follow-up-card-delete-actions-and-sequential-run",
-        "cdp-26.721.81911:real-queue-steer-delete-actions-stop-paused-and-resume"
+        "cdp-26.721.81911:real-queue-steer-delete-actions-stop-paused-and-resume",
+        "cdp-26.727.40816:real-710x39-queue-steer-delete-actions-and-stop-auto-continuation"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "partial_legacy",
-      "electronStatus": "partial_legacy",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
       "priority": "p0"
     },
     {

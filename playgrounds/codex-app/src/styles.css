@@ -700,6 +700,9 @@ textarea {
   button:last-child,
 .demo-root[data-scenario="mcp-recovery-mixed-thread"]
   .demo-composer-controls
+  button:last-child,
+.demo-root[data-scenario="conversation-lifecycle"]
+  .demo-composer-controls
   button:last-child {
   color: #ff8b37;
 }

@@ -70,6 +70,8 @@ const currentBuildMcpRecoveryReferenceSize = {
 };
 const currentBuildComposerQueuedReference =
   process.env.CODEX_UI_KIT_COMPOSER_QUEUED_REFERENCE;
+const currentBuildComposerContinuedReference =
+  process.env.CODEX_UI_KIT_COMPOSER_CONTINUED_REFERENCE;
 const currentBuildComposerPausedReference =
   process.env.CODEX_UI_KIT_COMPOSER_PAUSED_REFERENCE;
 const currentBuildComposerReferenceSize = {
@@ -806,6 +808,8 @@ for (const scene of selectedScenes) {
   const currentBuildComposerReference =
     scene.id === "composer-queued"
       ? currentBuildComposerQueuedReference
+      : scene.id === "composer-auto-continued"
+        ? currentBuildComposerContinuedReference
       : scene.id === "composer-queue-paused"
         ? currentBuildComposerPausedReference
         : undefined;
@@ -828,15 +832,29 @@ for (const scene of selectedScenes) {
       );
     }
     const actualRegion = cropPng(actual, 331, 500, 792, 320);
-    const masks = [
-      { height: scene.id === "composer-queued" ? 150 : 130, left: 0, top: 0, width: 792 },
-      { height: 42, left: 45, top: 166, width: 505 },
-      { height: 45, left: 65, top: 255, width: 220 },
-      { height: 40, left: 530, top: 255, width: 155 },
-      ...(scene.id === "composer-queue-paused"
-        ? [{ height: 34, left: 45, top: 136, width: 590 }]
-        : []),
-    ];
+    const masks =
+      scene.id === "composer-auto-continued"
+        ? [
+            { height: 65, left: 0, top: 0, width: 792 },
+            { height: 35, left: 46, top: 65, width: 200 },
+            { height: 90, left: 0, top: 115, width: 792 },
+            { height: 45, left: 65, top: 255, width: 220 },
+            { height: 40, left: 530, top: 255, width: 155 },
+          ]
+        : [
+            {
+              height: scene.id === "composer-queued" ? 150 : 130,
+              left: 0,
+              top: 0,
+              width: 792,
+            },
+            { height: 42, left: 45, top: 166, width: 505 },
+            { height: 45, left: 65, top: 255, width: 220 },
+            { height: 40, left: 530, top: 255, width: 155 },
+            ...(scene.id === "composer-queue-paused"
+              ? [{ height: 34, left: 45, top: 136, width: 590 }]
+              : []),
+          ];
     const maskedReference = maskPng(reference, masks);
     const maskedActual = maskPng(
       cropPng(actual, 331, 500, 792, 320),
@@ -846,8 +864,10 @@ for (const scene of selectedScenes) {
     const maximumRatio = environmentRatio(
       scene.id === "composer-queued"
         ? "CODEX_UI_KIT_COMPOSER_QUEUED_MAX_DIFF_RATIO"
+        : scene.id === "composer-auto-continued"
+          ? "CODEX_UI_KIT_COMPOSER_CONTINUED_MAX_DIFF_RATIO"
         : "CODEX_UI_KIT_COMPOSER_PAUSED_MAX_DIFF_RATIO",
-      0.08,
+      scene.id === "composer-queue-paused" ? 0.08 : 0.02,
     );
     await writeFile(
       join(artifactDirectory, `${scene.id}.current-build.png`),

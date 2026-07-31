@@ -237,11 +237,11 @@ describe("composer auxiliary surfaces", () => {
     expect(onSendNow).toHaveBeenCalledWith("b");
 
     fireEvent.click(
-      screen.getAllByRole("button", { name: "Delete queued prompt" })[0]!,
+      screen.getAllByRole("button", { name: "Delete queued message" })[0]!,
     );
     expect(onDelete).toHaveBeenCalledWith("a");
     const firstActions = screen.getAllByRole("button", {
-      name: "Queued prompt actions",
+      name: "Queued message actions",
     })[0]!;
     fireEvent.click(firstActions);
     const actionMenu = screen.getByRole("menu");
@@ -291,7 +291,7 @@ describe("composer auxiliary surfaces", () => {
       />,
     );
     const trigger = screen.getByRole("button", {
-      name: "Queued prompt actions",
+      name: "Queued message actions",
     });
     fireEvent.click(trigger);
     expect(screen.getByRole("menu")).not.toBeNull();
@@ -330,7 +330,7 @@ describe("composer auxiliary surfaces", () => {
     );
 
     fireEvent.click(
-      screen.getByRole("button", { name: "Queued prompt actions" }),
+      screen.getByRole("button", { name: "Queued message actions" }),
     );
     expect(screen.queryByRole("menu")).toBeNull();
     expect(onEdit).not.toHaveBeenCalled();

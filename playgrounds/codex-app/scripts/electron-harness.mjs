@@ -69,6 +69,12 @@ export const visualScenes = [
     scenario: "conversation-lifecycle",
   },
   {
+    frame: "composer-auto-continued",
+    id: "composer-auto-continued",
+    maxPixelRatio: 0.0225,
+    scenario: "conversation-lifecycle",
+  },
+  {
     frame: "composer-queue-paused",
     id: "composer-queue-paused",
     maxPixelRatio: 0.0225,

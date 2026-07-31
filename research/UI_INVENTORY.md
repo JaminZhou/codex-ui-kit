@@ -59,15 +59,16 @@ observation from a previous build remains historical evidence.
   Pull requests loading/selection continuity, the New chat Composer/context
   row and project picker, the read-only project-named Terminal tab, and public
   PR Summary/Code with integrated Timeline and responsive detail restoration;
-  successful Code content plus successful and recovered OpenAI Developer Docs
-  calls are observed, while mutating review/comment/merge,
+  successful Code content, successful and recovered OpenAI Developer Docs
+  calls, and the current Composer queue/Stop automatic-continuation lifecycle
+  are observed, while mutating review/comment/merge,
   light-theme, global notifications, current-build long-thread
   virtualization, and unrelated surface evidence remain pending
 
-Current inventory: 75 surface groups; 23 have current-build runtime evidence,
-33 have previous-build-only runtime evidence, 19 remain `not_sampled`, and 0
-are `blocked_by_policy`. Current-build Browser verification covers 19 groups
-and Electron verification covers 19. Prior acceptance outside the sampled
+Current inventory: 75 surface groups; 25 have current-build runtime evidence,
+31 have previous-build-only runtime evidence, 19 remain `not_sampled`, and 0
+are `blocked_by_policy`. Current-build Browser verification covers 21 groups
+and Electron verification covers 21. Prior acceptance outside the sampled
 shell, sidebar, New chat, and Pull request slices remains recorded as
 `partial_legacy` until current-build re-observation.
 
@@ -262,22 +263,18 @@ comparison; the remaining full raster and header/message/Composer regions
 stay independently bounded.
 
 The previous full conversation/Composer probe observed build `26.721.81911`
-in a disposable second process using synthetic prompts only. At 1180×820, the main
-region remains 906px wide and the Composer column is 736px. The current
-Composer uses a 712×44 empty/focused input inside a 736×98 card, grows to an
-80px input and 134px card for three/four lines, exposes a 28×28 Stop control
-while a real turn runs, clears the submitted value, and retains/restores input
-focus after completion or interruption.
+in a disposable second process using synthetic prompts only. It remains the
+historical source for multiline, permission, Add-files, attachment, and
+paused/Resume variants.
 
-A real running turn also accepted a queued follow-up. Its tray is inset 13px
-from the Composer card and exposes Steer, Delete queued prompt, and queued
-message actions. Stop retained the row while adding `Queue paused because you
-interrupted` and Resume; resuming restored the running state. The current
-permissions menu measured 454.38×224.5 and exposed Ask for approval, Approve
-for me, Full access, Custom (`config.toml`), and Learn more. The Add files and
-more menu exposed Goal, Plan mode, Record a skill, and Plugins. Opening that
-menu is build-scoped evidence; no upload was performed, so attachment
-transport remains P1-partial.
+The current `26.727.40816` text-only probe re-observed the 736px Composer
+column, 712×44 textbox, 28×28 Stop button, and a real queued follow-up. The
+queue shell is inset 13px and measures 710×39px; its 708×38 scroll region
+contains a 684×28 row using 14/16px typography with Steer,
+Delete queued message, and queued message actions. Stop produced
+`You stopped after 2s`, removed the tray, promoted the queued prompt, and
+started the next turn automatically. The current product did not expose the
+old paused header or Resume action.
 
 The independent public contract adds `ComposerDock`,
 `ComposerContextBar`, and `ComposerContextControl`, keeps context, queue, and
@@ -285,20 +282,19 @@ input ownership separate, and lets a running `AgentComposer` route Enter to a
 host-owned queue while Stop remains the primary control. The 46-event
 conversation replay contains 11 turns and covers multiline, disabled,
 attachment, running, queued, queue-paused, completed, scroll-away,
-message-navigation, and windowed-history frames. CDP drives
-submit → running → queue → Stop → paused → Resume → delete, then message
-navigation and return-to-latest. Real Electron repeats the lifecycle in an
-1180×820 `BrowserWindow`; ten reviewed internal pixels guard its deterministic
-states.
+message-navigation, and windowed-history frames. Its default interaction now
+drives submit → running → queue → Stop → automatic queued continuation, then
+message navigation and return-to-latest. The old paused/Resume frame remains
+an explicit compatibility fixture rather than a current-product claim. Real
+Electron repeats the current lifecycle in an 1180×820 `BrowserWindow`.
 
-Optional 792×320 `26.721.81911` references are accepted through
+Optional 792×320 `26.727.40816` references are accepted through
 `CODEX_UI_KIT_COMPOSER_QUEUED_REFERENCE` and
-`CODEX_UI_KIT_COMPOSER_PAUSED_REFERENCE`. At the strict 0.05 pixel threshold,
-the accepted ownership-masked changed-pixel ratios are `0.002722538` and
-`0.004478378`. The `26.727.40816` probe re-observes the 712×44 empty New chat
-input plus its context row and project picker, so those structural slices
-remain current-build Browser/Electron verified. Queue, Stop/interruption,
-permission, attachment, and full multiline lifecycle evidence remains
+`CODEX_UI_KIT_COMPOSER_CONTINUED_REFERENCE`. At the strict 0.05 pixel
+threshold and 2% hard ratio limit, the accepted ownership-masked
+changed-pixel ratios are `0.004505997` and `0.006182923`. Queue and
+Stop/interruption are therefore current-build Browser/Electron verified.
+Permission, attachment, and full multiline lifecycle evidence remains
 `partial_legacy`. Message navigation and windowing retain strong independent
 Browser/Electron regression coverage, but stay `partial_legacy` because the
 current build's exact long-thread virtualization algorithm was not re-observed.
@@ -386,7 +382,7 @@ checks, reviewer, and thread surfaces. The deterministic state machine covers
 index/detail loading, failure and retry; running/failed/passed checks; comment
 failure/recovery; review submission; blocked/ready/merging/merged requirements;
 compact layout; and route restoration. Browser/CDP, real Electron, and
-reviewed pixels verify the resulting 58-frame matrix, so
+reviewed pixels verify the resulting 59-frame matrix, so
 `workspace.pull-request-route` and `workspace.pull-request-review` are now
 independently Browser/Electron verified.
 
@@ -491,7 +487,7 @@ progress, result, error, and completion fields. The new deterministic scenario
 continues into a second turn containing two commands, an accepted approval,
 one file change, and the Review panel. CDP and real `BrowserWindow`
 acceptance cover the standalone failure, recovered four-call group,
-raw-output dialog, and mixed Review split within the 58-frame lifecycle
+raw-output dialog, and mixed Review split within the 59-frame lifecycle
 matrix. The current-build masked 906×820 regional gate passes at the strict
 0.05 pixel threshold with changed-pixel ratios of 0.016253432 for the full
 main region, 0.028989319 for the recovery region, 0.010849453 for the upper

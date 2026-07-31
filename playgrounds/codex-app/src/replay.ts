@@ -72,7 +72,7 @@ export const replayScenarios: Record<ReplayScenarioId, ReplayScenario> = {
   "conversation-lifecycle": scenario(
     "conversation-lifecycle",
     "Conversation and Composer lifecycle",
-    "Long-thread navigation, follow recovery, Composer growth, queueing, interruption, and resume.",
+    "Long-thread navigation, follow recovery, Composer growth, queueing, interruption, automatic continuation, and legacy paused-queue compatibility.",
     conversationLifecycleTrace,
   ),
   "background-terminal": scenario(
