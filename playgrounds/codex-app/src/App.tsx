@@ -2426,7 +2426,8 @@ export function App() {
       scenarioId === "command-failure-recovery" ||
       scenarioId === "interruption" ||
       scenarioId === "compaction" ||
-      scenarioId === "context-summary");
+      scenarioId === "context-summary" ||
+      scenarioId === "current-review-rename");
   const usesCurrentAskPermission =
     isCurrentApprovalReplay ||
     isCurrentAttachmentReplay ||
@@ -2434,7 +2435,8 @@ export function App() {
     isCurrentCommandFailureReplay ||
     isCurrentCommandInterruptionReplay ||
     isCurrentContextCompactionReplay ||
-    isCurrentContextSummaryReplay;
+    isCurrentContextSummaryReplay ||
+    scenarioId === "current-review-rename";
   const selectedComposerPermission =
     (usesCurrentAskPermission
       ? composerPermissionOptions[0]
@@ -2570,6 +2572,7 @@ export function App() {
   const showMeasuredComposer =
     mode === "replay" &&
     (scenarioId === "multi-file-review" ||
+      scenarioId === "current-review-rename" ||
       scenarioId === "mixed-file-review" ||
       scenarioId === "markdown" ||
       scenarioId === "mcp-tool-call" ||
@@ -3491,7 +3494,8 @@ export function App() {
               ? {
                   kind: "diff" as const,
                   lines:
-                    change.kind === "added"
+                    change.kind === "added" ||
+                    scenarioId === "current-review-rename"
                       ? content.lines.filter(({ kind }) => kind !== "hunk")
                       : content.lines,
                 }
@@ -3499,7 +3503,7 @@ export function App() {
           deletions: stats.deletions,
         };
       }) ?? [],
-    [reviewFileChange],
+    [reviewFileChange, scenarioId],
   );
   const reviewTotals = reviewFiles.reduce(
     (totals, file) => ({
@@ -3522,14 +3526,28 @@ export function App() {
             <div className="demo-review-panel" data-testid="review-panel">
               <div className="demo-review-panel__toolbar">
                 <div>
-                  <strong>Last turn</strong>
-                  <span>
-                    {reviewFiles.length}{" "}
-                    {reviewFiles.length === 1 ? "file" : "files"}
-                  </span>
+                  <strong>
+                    {scenarioId === "current-review-rename"
+                      ? "Last Turn"
+                      : "Last turn"}
+                  </strong>
+                  {scenarioId === "current-review-rename" ? (
+                    <span aria-hidden="true">⌄</span>
+                  ) : (
+                    <span>
+                      {reviewFiles.length}{" "}
+                      {reviewFiles.length === 1 ? "file" : "files"}
+                    </span>
+                  )}
                 </div>
                 <span className="demo-review-panel__stats">
-                  +{reviewTotals.additions} −{reviewTotals.deletions}
+                  <span data-stat="additions">
+                    +{reviewTotals.additions}
+                  </span>{" "}
+                  <span data-stat="deletions">
+                    {scenarioId === "current-review-rename" ? "-" : "−"}
+                    {reviewTotals.deletions}
+                  </span>
                 </span>
               </div>
               <FileReview
@@ -4333,6 +4351,12 @@ export function App() {
             <ActivityTimeline
               summary={<TurnDuration durationMs={24_000} status="worked" />}
             />
+          ) : mode === "replay" &&
+            scenarioId === "current-review-rename" &&
+            message.id === "user-current-review-rename" ? (
+            <ActivityTimeline
+              summary={<TurnDuration durationMs={52_000} status="worked" />}
+            />
           ) : null}
         </Fragment>
       );
@@ -4933,7 +4957,9 @@ export function App() {
           }}
           status={fileChange.status}
         />
-        {mode === "replay" && fileChange.id === "file-multi-file" ? (
+        {mode === "replay" &&
+        (fileChange.id === "file-multi-file" ||
+          fileChange.id === "file-current-review-rename") ? (
           <div
             aria-label="Turn actions"
             className="demo-turn-actions"
@@ -4951,7 +4977,17 @@ export function App() {
             <button aria-label="Share response" type="button">
               ↗
             </button>
-            <time dateTime="14:39">2:39 PM</time>
+            <time
+              dateTime={
+                fileChange.id === "file-current-review-rename"
+                  ? "00:55"
+                  : "14:39"
+              }
+            >
+              {fileChange.id === "file-current-review-rename"
+                ? "12:55 AM"
+                : "2:39 PM"}
+            </time>
           </div>
         ) : null}
       </Fragment>

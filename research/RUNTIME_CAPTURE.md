@@ -258,6 +258,29 @@ verified that its children and `127.0.0.1:9471` listener were gone, removed the
 exact profile, and deleted the disposable ignored files. The original Codex
 process remained running.
 
+### Current `26.730.61309` Review rename/delete refresh
+
+The refreshed probe used exact second-process PID `85638`, loopback-only port
+`9559`, and a unique temporary profile. Two disposable tasks used only
+`apply_patch` against ignored `.research/current-review-probe` text files.
+The deletion path retains one card and one deletion diff. The rename path now
+uses separate source and destination rows backed by an added/removed
+`__CODEX_TEMP_RENAME_MARKER__` line, replacing the old `No content` rows while
+remaining distinct from the public App Server `move_path` arrow semantic.
+
+The independent replay locks the current 46px panel header, 36px `Last Turn`
+toolbar, 36px file headers, marker-backed diffs, keyboard destination
+selection, close/reopen sibling preservation, and Undo. Browser/CDP covers 86
+reviewed frames, Electron repeats the lifecycle, and the current-build
+906×820 gate passes at 6.21% full, 5.23% conversation, and 7.62% Review under
+6.5%, 5.5%, and 8% limits. Binary/conflict remains explicitly host-derived.
+
+Cleanup stopped exact main PID `85638`, its descendants, two profile-owned
+Crashpad handlers, modifier monitor, and App Server; port `9559` closed and
+the original PID `96228` remained running. The exact profile and external
+evidence moved to the recoverable Trash item
+`codex-ui-kit-review-refresh-cdp.EEQtJr-20260805`.
+
 ### Current Terminal session capture
 
 The `26.721.81911` Terminal probe used an exact second process, loopback port

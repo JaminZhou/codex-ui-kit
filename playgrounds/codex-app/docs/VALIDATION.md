@@ -4,7 +4,7 @@ Every deterministic scenario has one ID and produces four evidence layers:
 
 1. **Protocol** — ordered App Server notifications, server requests, and
    request responses checked against the pinned generated schemas. The current
-   deterministic set contains 20 fixtures and 246 events.
+   deterministic set contains 21 fixtures and 254 events.
 2. **CDP** — DOM identity, computed layout, focus, scrolling, and named-surface
    geometry, including the current 274px sidebar, 46px titlebar inset, 70px
    header, 30px rows, fixed footer, collapsible groups, focusable row actions,
@@ -34,7 +34,9 @@ Every deterministic scenario has one ID and produces four evidence layers:
    label/preview content. Mixed Review acceptance additionally requires
    ordered rename/delete/modified rows, two text diffs, explicit
    binary/conflict notices, focusable content, and synchronized file
-   selection.
+   selection. The current rename replay separately requires two modified file
+   rows, the marker-backed +1/-1 diffs observed on `26.730.61309`, keyboard
+   destination selection, close/reopen preservation, and group Undo.
 3. **Electron host** — real `BrowserWindow` bounds, renderer isolation,
    pointer and keyboard navigation/PR-panel resizing, Review-panel
    close/reopen behavior, compact 800×600 multi-file geometry, an eight-file

@@ -4,6 +4,7 @@ import approvalSimilarCommandsTrace from "../fixtures/traces/approval-similar-co
 import attachmentLifecycleTrace from "../fixtures/traces/attachment-lifecycle.jsonl?raw";
 import compactionTrace from "../fixtures/traces/compaction.jsonl?raw";
 import contextSummaryTrace from "../fixtures/traces/context-summary.jsonl?raw";
+import currentReviewRenameTrace from "../fixtures/traces/current-review-rename.jsonl?raw";
 import commandFailureRecoveryTrace from "../fixtures/traces/command-failure-recovery.jsonl?raw";
 import conversationLifecycleTrace from "../fixtures/traces/conversation-lifecycle.jsonl?raw";
 import backgroundTerminalTrace from "../fixtures/traces/background-terminal.jsonl?raw";
@@ -33,6 +34,7 @@ export type ReplayScenarioId =
   | "interruption"
   | "compaction"
   | "context-summary"
+  | "current-review-rename"
   | "large-file-review"
   | "long-command-output"
   | "markdown"
@@ -154,6 +156,12 @@ export const replayScenarios: Record<ReplayScenarioId, ReplayScenario> = {
     "Probe context summary panel",
     "The current thread summary toggle opens the compact environment and Git workflow overlay.",
     contextSummaryTrace,
+  ),
+  "current-review-rename": scenario(
+    "current-review-rename",
+    "Rename current review probe",
+    "The current product presents a rename as separate marker-backed source and destination diffs while preserving the public move-path replay independently.",
+    currentReviewRenameTrace,
   ),
   "multi-file-review": scenario(
     "multi-file-review",

@@ -1638,6 +1638,106 @@ try {
   await compactTerminalApp.close();
 }
 
+const currentReviewScene = {
+  frame: "review-open",
+  id: "electron-current-review-rename",
+  scenario: "current-review-rename",
+};
+const { app: currentReviewApp, page: currentReviewPage } = await launchScene(
+  currentReviewScene,
+  { capture: false },
+);
+
+try {
+  await currentReviewPage.waitForSelector(
+    '.codex-ui-app-shell[data-side-panel-open] [data-testid="review-panel"]',
+  );
+  const initialCurrentReview = await currentReviewPage.evaluate(() => ({
+    changeKinds: Array.from(
+      document.querySelectorAll(".codex-ui-file-change-group__file"),
+      (element) => element.getAttribute("data-change"),
+    ),
+    diffCount: document.querySelectorAll(
+      ".codex-ui-file-review .codex-ui-file-diff",
+    ).length,
+    fileCount: document.querySelectorAll(
+      ".codex-ui-file-review__file",
+    ).length,
+    markerLines: Array.from(
+      document.querySelectorAll(".codex-ui-file-diff__line"),
+      (element) => element.textContent?.trim(),
+    ).filter((text) => text?.includes("__CODEX_TEMP_RENAME_MARKER__")),
+    paths: Array.from(
+      document.querySelectorAll(".codex-ui-file-review__header"),
+      (element) => element.textContent?.replace(/\s+/g, " ").trim(),
+    ),
+  }));
+  if (
+    JSON.stringify(initialCurrentReview.changeKinds) !==
+      JSON.stringify(["modified", "modified"]) ||
+    initialCurrentReview.diffCount !== 2 ||
+    initialCurrentReview.fileCount !== 2 ||
+    initialCurrentReview.markerLines.length !== 2 ||
+    !initialCurrentReview.paths[0]?.includes("rename-only.txt") ||
+    !initialCurrentReview.paths[1]?.includes("renamed-only.txt")
+  ) {
+    throw new Error(
+      `Electron current Review rename content failed: ${JSON.stringify(initialCurrentReview)}`,
+    );
+  }
+
+  const renamedPath =
+    ".research/current-review-probe/renamed-only.txt";
+  await currentReviewPage
+    .getByRole("button", { name: `Select review for ${renamedPath}` })
+    .click();
+  if (
+    (await currentReviewPage
+      .getByRole("listitem", { name: `Review file ${renamedPath}` })
+      .getAttribute("data-selected")) !== "true"
+  ) {
+    throw new Error(
+      "Electron current Review did not synchronize rename destination selection.",
+    );
+  }
+
+  await currentReviewPage
+    .getByRole("button", { exact: true, name: "Close review" })
+    .click();
+  await currentReviewPage.waitForSelector(
+    ".codex-ui-app-shell:not([data-side-panel-open])",
+  );
+  await currentReviewPage
+    .getByRole("button", { name: `Open ${renamedPath}` })
+    .click();
+  if (
+    (await currentReviewPage
+      .getByRole("listitem", { name: `Review file ${renamedPath}` })
+      .getAttribute("data-selected")) !== "true" ||
+    (await currentReviewPage
+      .getByRole("list", {
+        name: "Review diff for .research/current-review-probe/rename-only.txt",
+      })
+      .count()) !== 1
+  ) {
+    throw new Error(
+      "Electron current Review did not preserve the source diff on destination reopen.",
+    );
+  }
+
+  await currentReviewPage
+    .getByRole("button", { exact: true, name: "Undo" })
+    .click();
+  await currentReviewPage.waitForSelector('[data-testid="file-change-group"]', {
+    state: "detached",
+  });
+  await currentReviewPage.waitForSelector(
+    ".codex-ui-app-shell:not([data-side-panel-open])",
+  );
+} finally {
+  await currentReviewApp.close();
+}
+
 const mixedReviewScene = {
   frame: "review-open",
   id: "electron-mixed-file-review",

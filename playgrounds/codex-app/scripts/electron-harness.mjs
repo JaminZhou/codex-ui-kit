@@ -488,6 +488,16 @@ export const visualScenes = [
     surfaces: ["fileChange", "reviewPanel"],
   },
   {
+    changeKinds: ["modified", "modified"],
+    diffCount: 2,
+    fileCount: 2,
+    frame: "review-open",
+    id: "current-review-rename",
+    maxPixelRatio: 0.01,
+    scenario: "current-review-rename",
+    surfaces: ["fileChange", "reviewPanel"],
+  },
+  {
     changeKinds: ["renamed", "deleted", "modified", "modified"],
     diffCount: 2,
     fileCount: 4,
@@ -711,6 +721,16 @@ export async function launchScene(
         }
       }, offset);
     }
+  }
+  if (capture && scene.id === "current-review-rename") {
+    await page.evaluate(() => {
+      const turn = document.querySelector(
+        ".codex-ui-conversation-thread-shell .codex-ui-agent-turn",
+      );
+      if (turn instanceof HTMLElement) {
+        turn.style.transform = "translateY(-128px)";
+      }
+    });
   }
   if (
     scene.view === "pull-request" &&
