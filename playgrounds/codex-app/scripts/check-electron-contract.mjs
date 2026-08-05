@@ -3129,6 +3129,11 @@ try {
   await composerMenusPage.waitForSelector(
     '.demo-root:not([data-composer-overlay])',
   );
+  await composerMenusPage.waitForFunction(
+    () =>
+      document.activeElement?.getAttribute("aria-label") ===
+      "Change permissions",
+  );
   const permissionFocus = await composerMenusPage.evaluate(
     () => document.activeElement?.getAttribute("aria-label"),
   );
