@@ -1319,9 +1319,59 @@ for (const scene of visualScenes) {
       const interruptionRule = interruptionSummary?.querySelector(
         ".codex-ui-thread-interruption-summary__rule",
       );
+      const contextEvent = document.querySelector(
+        ".codex-ui-thread-context-event",
+      );
+      const contextOptimization = contextEvent?.querySelector(
+        ".codex-ui-thread-context-optimization",
+      );
+      const contextWorking = contextEvent?.querySelector(
+        ".codex-ui-thread-context-event__working",
+      );
+      const contextRule = contextEvent?.querySelector(
+        ".codex-ui-thread-context-event__rule",
+      );
       return {
         commandOutput,
         composer: composerRect,
+        contextCompaction: contextEvent
+          ? {
+              eventRect: rect(contextEvent),
+              eventStatus: contextEvent.getAttribute("data-status"),
+              mode: contextOptimization?.getAttribute("data-mode") ?? null,
+              optimizationRect: contextOptimization
+                ? rect(contextOptimization)
+                : null,
+              optimizationStatus:
+                contextOptimization?.getAttribute("data-status") ?? null,
+              rule: contextRule
+                ? {
+                    rect: rect(contextRule),
+                    style: {
+                      height: getComputedStyle(contextRule).height,
+                    },
+                  }
+                : null,
+              text:
+                contextOptimization?.textContent
+                  ?.replace(/\s+/g, " ")
+                  .trim() ?? null,
+              textStyle: contextOptimization
+                ? {
+                    fontFamily: getComputedStyle(contextOptimization)
+                      .fontFamily,
+                    fontSize: getComputedStyle(contextOptimization).fontSize,
+                    fontWeight:
+                      getComputedStyle(contextOptimization).fontWeight,
+                    lineHeight:
+                      getComputedStyle(contextOptimization).lineHeight,
+                  }
+                : null,
+              working:
+                contextWorking?.textContent?.replace(/\s+/g, " ").trim() ??
+                null,
+            }
+          : null,
         frame: root.getAttribute("data-frame"),
         header: headerRect,
         horizontalOverflow:
@@ -2938,6 +2988,93 @@ for (const scene of visualScenes) {
       }
     }
 
+    if (scene.id.startsWith("context-compaction-")) {
+      const commandMenu = scene.id === "context-compaction-command-menu";
+      const running = scene.id === "context-compaction-running";
+      const recovered = scene.id === "context-compaction-recovered";
+      const compactionState = await page.evaluate(() => ({
+        assistantText:
+          document
+            .querySelector(
+              '[data-item-id="assistant-context-compaction-recovery"] .codex-ui-markdown',
+            )
+            ?.textContent?.replace(/\s+/g, " ")
+            .trim() ?? null,
+        commandDescription:
+          document
+            .querySelector(".demo-compaction-command__description")
+            ?.textContent?.replace(/\s+/g, " ")
+            .trim() ?? null,
+        commandLabel:
+          document
+            .querySelector(".demo-compaction-command__label")
+            ?.textContent?.trim() ?? null,
+        composerPhase: document
+          .querySelector(".demo-root")
+          ?.getAttribute("data-composer-phase"),
+        composerValue: (() => {
+          const composer = document.querySelector(
+            '[aria-label="Message composer"]',
+          );
+          return composer
+            ? ("value" in composer
+                ? composer.value
+                : composer.textContent ?? ""
+              ).trim()
+            : null;
+        })(),
+        sendCount: [...document.querySelectorAll("button")].filter(
+          (button) =>
+            button.getAttribute("aria-label") === "Send" ||
+            button.textContent?.trim() === "Send",
+        ).length,
+        stopCount: [...document.querySelectorAll("button")].filter(
+          (button) =>
+            button.getAttribute("aria-label") === "Stop" ||
+            button.textContent?.trim() === "Stop",
+        ).length,
+      }));
+      const context = contract.contextCompaction;
+      if (
+        contract.rootStatus !== (running ? "running" : "completed") ||
+        compactionState.composerPhase !== (running ? "running" : "idle") ||
+        compactionState.stopCount !== (running ? 1 : 0) ||
+        compactionState.sendCount !== (running ? 0 : 1) ||
+        (commandMenu
+          ? context !== null ||
+            compactionState.commandLabel !== "Compact" ||
+            compactionState.commandDescription !==
+              "Compact this chat's context (9% full)" ||
+            compactionState.composerValue !== "/compact"
+          : !context ||
+            context.eventStatus !== (running ? "running" : "completed") ||
+            context.mode !== "manual" ||
+            context.optimizationStatus !==
+              (running ? "running" : "completed") ||
+            context.text !==
+              (running ? "Compacting context" : "Context compacted") ||
+            context.textStyle?.fontSize !== "14px" ||
+            context.textStyle?.fontWeight !== "445" ||
+            context.textStyle?.lineHeight !== "21px" ||
+            Math.abs((context.eventRect.width ?? 0) - 736) > 1 ||
+            (running
+              ? context.working !== "Working" ||
+                context.rule?.style.height !== "1px"
+              : context.working !== null || context.rule !== null)) ||
+        (recovered
+          ? compactionState.assistantText !== "COMPACTION RECOVERY ACCEPTED"
+          : compactionState.assistantText !== null)
+      ) {
+        throw new Error(
+          `${scene.id}: current context compaction contract failed: ${JSON.stringify({
+            compactionState,
+            context,
+            rootStatus: contract.rootStatus,
+          })}`,
+        );
+      }
+    }
+
     if (
       scene.id !== "composer-disabled" &&
       scene.id !== "approval-current-pending"
@@ -3118,6 +3255,97 @@ try {
   );
 } finally {
   await commandInterruptionApp.close();
+}
+
+const contextCompactionScene = {
+  frame: "context-compaction-ready",
+  id: "context-compaction-interaction",
+  scenario: "compaction",
+};
+const {
+  app: contextCompactionApp,
+  page: contextCompactionPage,
+} = await launchScene(contextCompactionScene, { capture: false });
+try {
+  const composer = contextCompactionPage.getByRole("textbox", {
+    name: "Message composer",
+  });
+  await composer.fill("/compact");
+  const compactCommand = contextCompactionPage.getByRole("option", {
+    name: "Compact this chat's context (9% full)",
+  });
+  await compactCommand.waitFor({ state: "visible" });
+  await compactCommand.click();
+  await contextCompactionPage.waitForSelector(
+    '.demo-root[data-frame="context-compaction-running"][data-status="running"][data-composer-phase="running"] .codex-ui-thread-context-event[data-status="running"]',
+  );
+  const running = await contextCompactionPage.evaluate(() => ({
+    label:
+      document
+        .querySelector(".codex-ui-thread-context-optimization")
+        ?.textContent?.replace(/\s+/g, " ")
+        .trim() ?? null,
+    stopCount: [...document.querySelectorAll("button")].filter(
+      (button) => button.getAttribute("aria-label") === "Stop",
+    ).length,
+    working:
+      document
+        .querySelector(".codex-ui-thread-context-event__working")
+        ?.textContent?.trim() ?? null,
+  }));
+  if (
+    running.label !== "Compacting context" ||
+    running.stopCount !== 1 ||
+    running.working !== "Working"
+  ) {
+    throw new Error(
+      `Current context compaction running transition failed: ${JSON.stringify(running)}`,
+    );
+  }
+  await contextCompactionPage.waitForSelector(
+    '.demo-root[data-frame="context-compaction-completed"][data-status="completed"][data-composer-phase="idle"] .codex-ui-thread-context-event[data-status="completed"]',
+  );
+  const recoveryPrompt =
+    "Do not use tools. Reply with exactly: COMPACTION RECOVERY ACCEPTED";
+  await composer.fill(recoveryPrompt);
+  await composer.press("Enter");
+  await contextCompactionPage.waitForSelector(
+    '.demo-root[data-frame="context-compaction-recovered"][data-status="completed"][data-composer-phase="idle"] [data-item-id="assistant-context-compaction-recovery"]',
+  );
+  const recovered = await contextCompactionPage.evaluate(() => ({
+    activeElement: document.activeElement?.getAttribute("aria-label"),
+    assistantText:
+      document
+        .querySelector(
+          '[data-item-id="assistant-context-compaction-recovery"] .codex-ui-markdown',
+        )
+        ?.textContent?.replace(/\s+/g, " ")
+        .trim() ?? null,
+    contextLabel:
+      document
+        .querySelector(".codex-ui-thread-context-optimization")
+        ?.textContent?.replace(/\s+/g, " ")
+        .trim() ?? null,
+    stopCount: [...document.querySelectorAll("button")].filter(
+      (button) => button.getAttribute("aria-label") === "Stop",
+    ).length,
+  }));
+  if (
+    recovered.activeElement !== "Message composer" ||
+    recovered.assistantText !== "COMPACTION RECOVERY ACCEPTED" ||
+    recovered.contextLabel !== "Context compacted" ||
+    recovered.stopCount !== 0
+  ) {
+    throw new Error(
+      `Current context compaction same-thread recovery failed: ${JSON.stringify(recovered)}`,
+    );
+  }
+  await writeFile(
+    join(artifactDirectory, "context-compaction-interaction.json"),
+    `${JSON.stringify({ recovered, running }, null, 2)}\n`,
+  );
+} finally {
+  await contextCompactionApp.close();
 }
 
 const interactivePullRequestScene = {

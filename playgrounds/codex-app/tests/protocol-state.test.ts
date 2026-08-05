@@ -399,19 +399,43 @@ describe("protocol lifecycle reducer", () => {
     expect(secondThread.eventCount).toBe(3);
   });
 
-  it("moves context compaction from running to completed", () => {
+  it("replays current manual context compaction and same-thread recovery", () => {
     const scenario = replayScenarios.compaction;
     const running = reduceProtocolTrace(
-      scenario.events.slice(0, scenario.frames.compacting),
+      scenario.events.slice(
+        0,
+        scenario.frames["context-compaction-running"],
+      ),
     );
-    const completed = reduceProtocolTrace(scenario.events);
+    const completed = reduceProtocolTrace(
+      scenario.events.slice(
+        0,
+        scenario.frames["context-compaction-completed"],
+      ),
+    );
+    const recovered = reduceProtocolTrace(scenario.events);
 
     expect(running.compaction).toBe("running");
     expect(completed.compaction).toBe("completed");
     expect(completed.status).toBe("completed");
-    expect(running.messages[0]?.compaction).toBe("running");
-    expect(completed.messages[0]?.compaction).toBe("completed");
-    expect(completed.messages.at(-1)?.compaction).toBeUndefined();
+    expect(running.messages.at(-1)).toMatchObject({
+      compaction: "running",
+      id: "assistant-compaction-baseline",
+    });
+    expect(completed.messages.at(-1)).toMatchObject({
+      compaction: "completed",
+      id: "assistant-compaction-baseline",
+    });
+    expect(recovered.messages.at(-1)).toMatchObject({
+      id: "assistant-context-compaction-recovery",
+      text: "COMPACTION RECOVERY ACCEPTED",
+    });
+    expect(recovered.messages.at(-1)?.compaction).toBeUndefined();
+    expect(recovered.turnDurationsMs).toMatchObject({
+      "turn-compaction-baseline": 1_500,
+      "turn-context-compaction": 8_000,
+      "turn-context-compaction-recovery": 1_500,
+    });
   });
 
   it("reduces command output, approval requests, and file patches", () => {
@@ -992,7 +1016,13 @@ describe("protocol lifecycle reducer", () => {
   });
 
   it("keeps completed compaction at its historical position on a follow-up turn", () => {
-    const compacted = reduceProtocolTrace(replayScenarios.compaction.events);
+    const scenario = replayScenarios.compaction;
+    const compacted = reduceProtocolTrace(
+      scenario.events.slice(
+        0,
+        scenario.frames["context-compaction-completed"],
+      ),
+    );
     const followUp = reduceProtocolNotification(compacted, {
       method: "turn/started",
       params: {
@@ -1015,7 +1045,11 @@ describe("protocol lifecycle reducer", () => {
     });
 
     expect(withFollowUpMessage.compaction).toBe("idle");
-    expect(withFollowUpMessage.messages[0]?.compaction).toBe("completed");
+    expect(
+      withFollowUpMessage.messages.find(
+        ({ id }) => id === "assistant-compaction-baseline",
+      )?.compaction,
+    ).toBe("completed");
     expect(withFollowUpMessage.messages.at(-1)?.compaction).toBeUndefined();
   });
 

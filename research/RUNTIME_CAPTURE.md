@@ -558,7 +558,7 @@ without an approval card.
 The 1180×820 Renderer retained the 736×227.06 command card,
 734×144 reverse-tail output viewport, 401 split lines, 7816px scroll height,
 `scrollTop = 0`, 13/19.5px monospace output, two copy controls, Shell label,
-and Success state. Browser/CDP, Electron, and all 73 internal pixel frames
+and Success state. Browser/CDP, Electron, and all 75 internal pixel frames
 pass; the ownership-masked current comparison measures `0.001655643` under
 the unchanged 1.5% hard limit. Other `26.727.40816` surfaces remain
 previous-build evidence until separately reached on this build.
@@ -589,7 +589,7 @@ with `stderr-001`, retains all 160 records, and ends with `stdout-080` then
 
 The independent public trace adds three reviewed frames: live output,
 collapsed failure, and expanded failure plus the successful follow-up.
-Browser/CDP now covers 73 frames and verifies semantic state, exact text,
+Browser/CDP now covers 75 frames and verifies semantic state, exact text,
 computed geometry, reverse-tail behavior, keyboard disclosure, and
 collapse/reopen restoration. Electron repeats the failure, copy, recovery,
 and disclosure interactions. The optional full-window external comparison
@@ -625,7 +625,7 @@ the empty Composer.
 
 The independent replay adds four reviewed frames and drives the transition in
 both Browser/CDP and a real Electron `BrowserWindow`: Stop → immediate summary
-→ background settlement → exact recovery message. The 73-frame contract also
+→ background settlement → exact recovery message. The 75-frame contract also
 locks 736px summary/command rows, 14/21px weight-445 system typography, the
 summary rule, compact running detail, and Stop/Send ownership. The optional
 ownership-masked full-window comparison against the immediate-stop screenshot
@@ -636,6 +636,39 @@ Cleanup terminated only the exact second-instance process tree, verified port
 was removed. Both exact temporary profiles and all external screenshots/JSON
 were moved to recoverable Trash; the successful evidence remains in
 `codex-ui-kit-command-stop-cdp.ZbTpcV`.
+
+### Current 26.730.61309 manual context compaction
+
+The compaction probe used exact main PID `13096`, loopback port `9543`, and
+unique profile
+`/private/tmp/codex-ui-kit-context-compaction-cdp.aJjET6/profile`. It selected
+the largest `app://-/index.html` Renderer, fixed it at 1180×820, and created
+one disposable task. The first exact no-tool reply established an ordinary
+completed turn before the probe inserted `/compact` into the empty Composer.
+
+The slash-command menu exposed `Compact this chat's context (9% full)`.
+Selecting it transitioned through `Working`, a full-width rule,
+`Compacting context`, and a 28×28 Stop action before reaching `Context
+compacted`. Polling every 50ms retained 131 state samples over 8.136 seconds.
+The running label was 14/21px weight-445 system text; the Composer input was
+712×44px and remained empty. A second no-tool message in the same thread
+returned exactly `COMPACTION RECOVERY ACCEPTED`, removed Stop, restored Send,
+and focused the empty Composer.
+
+The public replay adds command-menu, running, completed, and recovered frames.
+Browser/CDP and real Electron both drive the menu-to-recovery transition, and
+the full matrix now covers 75 internal pixel frames. The optional
+`CODEX_UI_KIT_CONTEXT_COMPACTION_REFERENCE` gate accepts the raw 1180×820
+running screenshot, masks the private/non-owning sidebar, title, transcript,
+scrollbar, and Composer interior, retains the compaction event and Composer
+boundary, and measures `0.0016256717651922281` under the default 0.5% hard
+limit.
+
+Cleanup terminated only the exact second-instance process tree, verified port
+`9543` closed, and left the original Codex process running. The ignored probe
+was removed, and the exact profile plus screenshots and computed-state JSON
+were moved to the recoverable Trash item
+`codex-ui-kit-context-compaction-cdp.aJjET6`.
 
 ### Current 26.730.61309 sidebar capture
 

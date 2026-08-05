@@ -12,7 +12,7 @@ exit gates; it does not replace the inventory.
 
 - The current installed package is Codex Desktop `26.730.61309` (`6223`).
 - The inventory contains 78 surface groups: 50 P0, 19 P1, and 9 P2.
-- 9 groups have current-build runtime evidence, 50 have previous-build-only
+- 10 groups have current-build runtime evidence, 49 have previous-build-only
   runtime evidence, and 19 have not been sampled.
 - The current `26.730.61309` refresh now covers all six left-sidebar groups
   plus the successful long-command surface. The sidebar capture locks the
@@ -31,7 +31,7 @@ exit gates; it does not replace the inventory.
   responsive detail restoration. Its independent state machine adds
   index/detail loading and failure, checks, comments, review submission,
   merge-readiness, merge completion, compact layout, and route restoration.
-  Together the playground gates cover 73 CDP/pixel frames, and the refreshed
+  Together the playground gates cover 75 CDP/pixel frames, and the refreshed
   PR detail passes the current 906×820 regional pixel gate. The refreshed
   real MCP success path now matches Search → Fetch, the integrated activity
   disclosure, computed typography, and a current regional pixel gate. The
@@ -64,7 +64,12 @@ exit gates; it does not replace the inventory.
   1m 35s`, the transient `Background terminal stopped with …` row, its later
   `Ran …` settlement, and exact same-thread no-tool recovery. Four independent
   frames plus Browser and Electron interaction pass, and the immediate-stop
-  full-window comparison measures 0.44% under a 0.5% hard limit. The other
+  full-window comparison measures 0.44% under a 0.5% hard limit. A fourth
+  disposable task drives `/compact` from its 9%-usage command row through
+  `Compacting context`, Stop, `Context compacted`, and exact same-thread
+  recovery. Four current frames plus Browser and Electron interaction pass;
+  the ownership-masked running comparison measures 0.16% under the same 0.5%
+  hard limit. The other
   preceding `26.727.40816` results remain previous-build evidence. Attachment
   variants, Terminal multi-tab/process behavior,
   Review rename/delete variants, and broader shell evidence from

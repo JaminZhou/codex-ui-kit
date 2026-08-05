@@ -119,8 +119,8 @@ export const replayScenarios: Record<ReplayScenarioId, ReplayScenario> = {
   ),
   compaction: scenario(
     "compaction",
-    "Context compaction",
-    "Context optimization transitions from running to completed.",
+    "Acknowledge compaction baseline",
+    "The current manual /compact command transitions from running to completed and accepts a clean same-thread follow-up.",
     compactionTrace,
   ),
   "multi-file-review": scenario(

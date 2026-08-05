@@ -54,10 +54,11 @@ observation from a previous build remains historical evidence.
 - Scoped CDP automation: available through a user-authorized second process;
   the Chromium profile is separate, but Codex application data and navigation
   are not fully isolated
-- Fresh current-build Renderer captures: three dark 1180×820 disposable tasks
+- Fresh current-build Renderer captures: four dark 1180×820 disposable tasks
   verify successful 400-line command output, mixed stdout/stderr failure with
   exit code 7 and a successful same-thread follow-up, plus a 95-second command
-  Stop/background-settlement/recovery lifecycle; a read-only
+  Stop/background-settlement/recovery lifecycle, and the manual `/compact`
+  menu/running/completed/same-thread-recovery lifecycle; a read-only
   sidebar sweep verifies all six sidebar groups at 1180×820, 820×680, and the
   exact 721/720 boundary. The sidebar remains 274px through 721px, auto-hides
   at 720px, stays pinned as a 274/446 split after an explicit Show action and
@@ -65,11 +66,11 @@ observation from a previous build remains historical evidence.
   preview. All other `26.727.40816` observations remain previous-build
   evidence until separately reached on `26.730.61309`.
 
-Current inventory: 78 surface groups; 9 have current-build runtime evidence,
-50 have previous-build-only runtime evidence, 19 remain `not_sampled`, and 0
-are `blocked_by_policy`. Current-build Browser verification covers 9 groups
-and Electron verification covers 9. Prior acceptance outside the sampled
-command, interruption, and six-sidebar slices remains recorded as `partial_legacy`
+Current inventory: 78 surface groups; 10 have current-build runtime evidence,
+49 have previous-build-only runtime evidence, 19 remain `not_sampled`, and 0
+are `blocked_by_policy`. Current-build Browser verification covers 10 groups
+and Electron verification covers 10. Prior acceptance outside the sampled
+command, interruption, compaction, and six-sidebar slices remains recorded as `partial_legacy`
 until current-build re-observation.
 
 The current package exposes candidates far beyond the old transcript sample:
@@ -144,7 +145,7 @@ but every
 affected inventory row was `partial_legacy` until it was re-observed on
 `26.727.40816`. After the `26.730.61309` update, every row below is again
 `partial_legacy` except the explicitly refreshed successful-command,
-command-failure/recovery, command-interruption, and six sidebar rows. The
+command-failure/recovery, command-interruption, context-compaction, and six sidebar rows. The
 machine-readable inventory is authoritative when historical prose describes
 a build as current at its capture time.
 
@@ -163,7 +164,7 @@ focus-managed modal mode only as an explicit safety fallback for widths that
 cannot fit the pinned split. The current product's separator exposes
 `role=separator` but no keyboard value semantics; UIKit intentionally retains
 Arrow/Home/End resizing and value attributes as an accessibility improvement.
-The dedicated de-identified scene passes 73 Browser/CDP and pixel frames,
+The dedicated de-identified scene passes 75 Browser/CDP and pixel frames,
 Electron interaction, and current-build regional ratios of 3.6234% for the
 top, 0.1292% for the masked selected row, and 0% for the masked footer.
 Implementation stays `partial` because light-theme runtime evidence, dynamic
@@ -599,7 +600,7 @@ scrolling output viewport, and `Success`. Its reverse column keeps lines
 the trailing newline.
 
 The independent trace contains exactly one command request/output pair.
-Browser/CDP now covers 73 lifecycle frames and verifies command identity,
+Browser/CDP now covers 75 lifecycle frames and verifies command identity,
 401 split lines, computed typography, output overflow, keyboard disclosure,
 and latest-line restoration after collapse/reopen. Electron drives the same
 interaction in a real 1180×820 `BrowserWindow`. The ownership-masked full
@@ -614,7 +615,7 @@ copy controls, a 734×144px reverse-tail output viewport, 161 split lines
 including the trailing newline, and `Exit code 7`. A no-tool follow-up then
 completed successfully in the same thread. The independent trace models the
 running-output, collapsed failure, expanded failure, first completed turn,
-and recovered follow-up states. Browser/CDP now covers 73 lifecycle frames;
+and recovered follow-up states. Browser/CDP now covers 75 lifecycle frames;
 Electron repeats disclosure, exact copied output, collapse/reopen, failure,
 and recovery. The ownership-masked full-window gate passes at
 `0.008898305084745763` under a 1% hard limit. This additionally promotes
@@ -638,11 +639,24 @@ and focus restoration. The ownership-masked full-window comparison measures
 queue continuation and broader background-process management retain their own
 gates. The `26.721.81911` MCP tool-call error/retry state is now
 captured separately; the broader thread-transport error/retry state has not
-been safely reached and remains an unpromoted gate. Compaction acceptance
-statically renders the observed running and completed states rather than
-driving their host transition, so `thread.context-compaction` also remains
-`partial_legacy`; it does not promote the still-unreached thread summary
-panel.
+been safely reached and remains an unpromoted gate.
+
+A fourth `26.730.61309` disposable task entered `/compact` only after an exact
+no-tool baseline response. The current menu exposed `Compact this chat's
+context (9% full)`, then transitioned through `Working`, `Compacting context`,
+and the 28×28 Stop action before settling to `Context compacted`. The 131 CDP
+samples observed the running-to-completed transition over 8.136 seconds. A
+second no-tool message in the same task returned exactly `COMPACTION RECOVERY
+ACCEPTED` and restored the empty Composer. The public replay now adds command
+menu, running, completed, and recovered frames; Browser/CDP and real Electron
+drive the menu and same-thread recovery instead of accepting static rendering.
+Computed contracts lock manual mode, 736px event geometry, 14/21px weight-445
+typography, separator, Stop/Send states, and focus restoration. The
+ownership-masked full-window running comparison measures
+`0.0016256717651922281` under a 0.5% hard limit. This promotes
+`thread.context-compaction` for the sampled manual lifecycle, while automatic
+and work-mode compaction, cancellation outcome, repeated compaction, and the
+still-unreached thread summary panel remain separate gates.
 
 This is a measurement- and raster-backed basic thread/workspace slice, not a
 claim that the whole application or every lifecycle is pixel-perfect. Broader

@@ -124,6 +124,12 @@ const currentBuildCommandInterruptionReferenceSize = {
   height: 820,
   width: 1180,
 };
+const currentBuildContextCompactionReference =
+  process.env.CODEX_UI_KIT_CONTEXT_COMPACTION_REFERENCE;
+const currentBuildContextCompactionReferenceSize = {
+  height: 820,
+  width: 1180,
+};
 const currentBuildWorkspaceReference =
   process.env.CODEX_UI_KIT_WORKSPACE_REFERENCE;
 const currentBuildWorkspaceReferenceSize = {
@@ -1397,6 +1403,71 @@ for (const scene of selectedScenes) {
     }
     console.log(
       `${scene.id}: current-build command-interruption pixel ratio ${comparison.ratio}`,
+    );
+  }
+
+  if (
+    scene.id === "context-compaction-running" &&
+    currentBuildContextCompactionReference
+  ) {
+    const reference = flattenPng(
+      PNG.sync.read(
+        await readFile(currentBuildContextCompactionReference),
+      ),
+      { blue: 24, green: 24, red: 24 },
+    );
+    if (
+      reference.width !== currentBuildContextCompactionReferenceSize.width ||
+      reference.height !== currentBuildContextCompactionReferenceSize.height
+    ) {
+      throw new Error(
+        `${scene.id}: current-build context-compaction reference must be exactly ${currentBuildContextCompactionReferenceSize.width}x${currentBuildContextCompactionReferenceSize.height}, received ${reference.width}x${reference.height}.`,
+      );
+    }
+    if (
+      actual.width !== currentBuildContextCompactionReferenceSize.width ||
+      actual.height !== currentBuildContextCompactionReferenceSize.height
+    ) {
+      throw new Error(
+        `${scene.id}: current-build context-compaction comparison requires an exact 1180x820 playground frame.`,
+      );
+    }
+    const masks = [
+      { height: 820, left: 0, top: 0, width: 274 },
+      { height: 47, left: 274, top: 0, width: 906 },
+      { height: 168, left: 350, top: 47, width: 745 },
+      { height: 650, left: 1080, top: 47, width: 22 },
+      { height: 650, left: 1168, top: 47, width: 12 },
+      { height: 80, left: 368, top: 714, width: 680 },
+    ];
+    const comparison = comparePng(
+      maskPng(clonePng(reference), masks),
+      maskPng(clonePng(actual), masks),
+    );
+    const maximumRatio = environmentRatio(
+      "CODEX_UI_KIT_CONTEXT_COMPACTION_MAX_DIFF_RATIO",
+      0.005,
+    );
+    await writeFile(
+      join(artifactDirectory, `${scene.id}.current-build.png`),
+      PNG.sync.write(actual),
+    );
+    if (comparison.pixels > 0) {
+      await writeFile(
+        join(
+          artifactDirectory,
+          `${scene.id}.current-build.diff.png`,
+        ),
+        PNG.sync.write(comparison.diff),
+      );
+    }
+    if (comparison.ratio > maximumRatio) {
+      throw new Error(
+        `${scene.id}: current-build context-compaction pixel ratio ${comparison.ratio} exceeds ${maximumRatio}.`,
+      );
+    }
+    console.log(
+      `${scene.id}: current-build context-compaction pixel ratio ${comparison.ratio}`,
     );
   }
 

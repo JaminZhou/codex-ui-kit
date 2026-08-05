@@ -61,7 +61,7 @@ The authoritative current-build inventory is:
   720px. Explicit Show pins a non-modal 274/446 split across Pull requests
   navigation; explicit Hide restores the full 720px route, and an inline-start
   hover no longer opens the historical edge preview. The de-identified public
-  scene remains covered by the 73-frame Browser/CDP and pixel matrix plus
+  scene remains covered by the 75-frame Browser/CDP and pixel matrix plus
   Electron interaction.
   Current-build regional ratios are 3.6234% for the top, 0.1292% for the
   text-masked selected row, and 0% for the text-masked footer. The UIKit
@@ -155,6 +155,19 @@ The authoritative current-build inventory is:
   successful no-tool follow-up in the same thread. The ownership-masked full
   1180×820 comparison passes at 0.89% under a 1% hard limit. This is evidence
   for command-level failure recovery, not transport-level retry parity.
+- A third current-build command slice drives the real 28×28 Stop action after
+  95 seconds, observes the immediate and background-settled command rows, and
+  completes an exact no-tool recovery turn in the same thread. Four public
+  frames plus Browser/CDP and Electron interaction preserve the interruption
+  summary and focus restoration; the ownership-masked running comparison is
+  below its 0.5% hard limit.
+- A fourth current-build task drives `/compact` from the 9%-usage command row
+  through manual running/completed states and an exact same-thread recovery.
+  Browser/CDP and Electron reproduce the command menu, `Working` separator,
+  Stop/Send transition, `Context compacted`, and focus restoration. Its
+  ownership-masked full-window running comparison is 0.16%, promoting only the
+  sampled manual compaction lifecycle; automatic/work modes, cancellation,
+  repetition, and the thread summary remain open.
 - npm publication remains out of scope until the agreed P0/P1 coverage and
   release acceptance surfaces are complete.
 

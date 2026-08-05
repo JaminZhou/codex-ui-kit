@@ -2849,6 +2849,93 @@ try {
   await commandInterruptionApp.close();
 }
 
+const contextCompactionScene = {
+  frame: "context-compaction-ready",
+  id: "electron-current-context-compaction",
+  scenario: "compaction",
+};
+const {
+  app: contextCompactionApp,
+  page: contextCompactionPage,
+} = await launchScene(contextCompactionScene, { capture: false });
+try {
+  const composer = contextCompactionPage.getByRole("textbox", {
+    name: "Message composer",
+  });
+  await composer.fill("/compact");
+  const compactCommand = contextCompactionPage.getByRole("option", {
+    name: "Compact this chat's context (9% full)",
+  });
+  await compactCommand.waitFor({ state: "visible" });
+  await compactCommand.click();
+  await contextCompactionPage.waitForSelector(
+    '.demo-root[data-frame="context-compaction-running"][data-status="running"][data-composer-phase="running"] .codex-ui-thread-context-event[data-status="running"]',
+  );
+  const running = await contextCompactionPage.evaluate(() => ({
+    label:
+      document
+        .querySelector(".codex-ui-thread-context-optimization")
+        ?.textContent?.replace(/\s+/g, " ")
+        .trim() ?? null,
+    stopCount: [...document.querySelectorAll("button")].filter(
+      (button) => button.getAttribute("aria-label") === "Stop",
+    ).length,
+    working:
+      document
+        .querySelector(".codex-ui-thread-context-event__working")
+        ?.textContent?.trim() ?? null,
+  }));
+  if (
+    running.label !== "Compacting context" ||
+    running.stopCount !== 1 ||
+    running.working !== "Working"
+  ) {
+    throw new Error(
+      `Electron current context compaction running transition failed: ${JSON.stringify(running)}`,
+    );
+  }
+  await contextCompactionPage.waitForSelector(
+    '.demo-root[data-frame="context-compaction-completed"][data-status="completed"][data-composer-phase="idle"] .codex-ui-thread-context-event[data-status="completed"]',
+  );
+  await composer.fill(
+    "Do not use tools. Reply with exactly: COMPACTION RECOVERY ACCEPTED",
+  );
+  await composer.press("Enter");
+  await contextCompactionPage.waitForSelector(
+    '.demo-root[data-frame="context-compaction-recovered"][data-status="completed"][data-composer-phase="idle"] [data-item-id="assistant-context-compaction-recovery"]',
+  );
+  const recovered = await contextCompactionPage.evaluate(() => ({
+    activeElement: document.activeElement?.getAttribute("aria-label"),
+    assistantText:
+      document
+        .querySelector(
+          '[data-item-id="assistant-context-compaction-recovery"] .codex-ui-markdown',
+        )
+        ?.textContent?.replace(/\s+/g, " ")
+        .trim() ?? null,
+    contextLabel:
+      document
+        .querySelector(".codex-ui-thread-context-optimization")
+        ?.textContent?.replace(/\s+/g, " ")
+        .trim() ?? null,
+    stopCount: [...document.querySelectorAll("button")].filter(
+      (button) => button.getAttribute("aria-label") === "Stop",
+    ).length,
+  }));
+  if (
+    recovered.activeElement !== "Message composer" ||
+    recovered.assistantText !== "COMPACTION RECOVERY ACCEPTED" ||
+    recovered.contextLabel !== "Context compacted" ||
+    recovered.stopCount !== 0
+  ) {
+    throw new Error(
+      `Electron current context compaction same-thread recovery failed: ${JSON.stringify(recovered)}`,
+    );
+  }
+} finally {
+  await contextCompactionApp.close();
+}
+
 const acceptedMixedApprovalScene = {
   frame: "mixed-approval-pending",
   id: "electron-mixed-approval-accepted",
@@ -3434,5 +3521,5 @@ try {
 }
 
 console.log(
-  "Electron host, native-window, coding-workspace routing, conversation/Composer lifecycle and current menus, current long, failed, and interrupted command output with same-thread recovery, default 720px narrow reachability, resizable navigation/Review/Terminal/PR detail, PR tabs and expansion, MCP disclosure/result, multi-file and mixed-content Review, selection/Undo, large diff scrolling, and compact geometry contracts passed.",
+  "Electron host, native-window, coding-workspace routing, conversation/Composer lifecycle and current menus, current long, failed, and interrupted command output plus manual context compaction with same-thread recovery, default 720px narrow reachability, resizable navigation/Review/Terminal/PR detail, PR tabs and expansion, MCP disclosure/result, multi-file and mixed-content Review, selection/Undo, large diff scrolling, and compact geometry contracts passed.",
 );
