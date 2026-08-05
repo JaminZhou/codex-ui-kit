@@ -3340,9 +3340,48 @@ try {
       `Current context compaction same-thread recovery failed: ${JSON.stringify(recovered)}`,
     );
   }
+  await composer.fill("/compact");
+  await composer.press("Enter");
+  await contextCompactionPage.waitForSelector(
+    '.demo-root[data-frame="context-compaction-running"][data-status="running"] button[aria-label="Stop"]',
+  );
+  await contextCompactionPage.getByRole("button", { name: "Stop" }).click();
+  await contextCompactionPage.waitForSelector(
+    '.demo-root[data-frame="context-compaction-ready"][data-status="completed"][data-composer-phase="idle"]',
+  );
+  await contextCompactionPage.waitForFunction(
+    () =>
+      document.activeElement?.getAttribute("aria-label") ===
+      "Message composer",
+  );
+  const stopped = await contextCompactionPage.evaluate(() => ({
+    activeElement: document.activeElement?.getAttribute("aria-label"),
+    composerValue: (() => {
+      const composer = document.querySelector(
+        '[aria-label="Message composer"]',
+      );
+      return composer && "value" in composer ? composer.value : null;
+    })(),
+    contextCount: document.querySelectorAll(
+      ".codex-ui-thread-context-event",
+    ).length,
+    stopCount: [...document.querySelectorAll("button")].filter(
+      (button) => button.getAttribute("aria-label") === "Stop",
+    ).length,
+  }));
+  if (
+    stopped.activeElement !== "Message composer" ||
+    stopped.composerValue !== "" ||
+    stopped.contextCount !== 0 ||
+    stopped.stopCount !== 0
+  ) {
+    throw new Error(
+      `Current context compaction Stop reset failed: ${JSON.stringify(stopped)}`,
+    );
+  }
   await writeFile(
     join(artifactDirectory, "context-compaction-interaction.json"),
-    `${JSON.stringify({ recovered, running }, null, 2)}\n`,
+    `${JSON.stringify({ recovered, running, stopped }, null, 2)}\n`,
   );
 } finally {
   await contextCompactionApp.close();

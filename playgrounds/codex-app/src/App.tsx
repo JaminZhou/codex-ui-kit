@@ -1458,9 +1458,48 @@ export function App() {
     );
   };
 
+  const startReplayCompaction = () => {
+    if (!isCurrentContextCompactionReplay || state.status === "running") {
+      return;
+    }
+    cancelReplaySubmitTimer();
+    setComposerValue("");
+    setComposerOverlay(null);
+    setReplayCount(
+      replayScenarios.compaction.frames["context-compaction-running"] ??
+        replayScenarios.compaction.events.length,
+    );
+    setActiveFrame("context-compaction-running");
+    replaySubmitTimerRef.current = window.setTimeout(() => {
+      replaySubmitTimerRef.current = null;
+      setReplayCount(
+        replayScenarios.compaction.frames["context-compaction-completed"] ??
+          replayScenarios.compaction.events.length,
+      );
+      setActiveFrame("context-compaction-completed");
+      requestAnimationFrame(() => composerInputRef.current?.focus());
+    }, 900);
+  };
+
+  const stopReplayCompaction = () => {
+    cancelReplaySubmitTimer();
+    setReplayComposerSubmitting(false);
+    setReplayCount(
+      replayScenarios.compaction.frames["context-compaction-ready"] ??
+        replayScenarios.compaction.events.length,
+    );
+    setActiveFrame("context-compaction-ready");
+    setComposerValue("");
+    requestAnimationFrame(() => composerInputRef.current?.focus());
+  };
+
   const submitComposer = (prompt: string) => {
     if (isCurrentContextCompactionReplay) {
-      if (state.status === "running" || prompt.trim() === "/compact") return;
+      if (state.status === "running") return;
+      if (prompt.trim() === "/compact") {
+        startReplayCompaction();
+        return;
+      }
       cancelReplaySubmitTimer();
       setReplayComposerSubmitting(true);
       setComposerOverlay(null);
@@ -1538,7 +1577,10 @@ export function App() {
   };
 
   const stopComposer = () => {
-    if (isCurrentContextCompactionReplay) return;
+    if (isCurrentContextCompactionReplay) {
+      stopReplayCompaction();
+      return;
+    }
     if (isCurrentCommandInterruptionReplay) {
       cancelReplaySubmitTimer();
       setReplayComposerSubmitting(false);
@@ -1586,27 +1628,6 @@ export function App() {
     setQueuedPrompts((items) =>
       items.map((item) => ({ ...item, status: "queued" })),
     );
-  };
-
-  const startReplayCompaction = () => {
-    if (!isCurrentContextCompactionReplay || state.status === "running") return;
-    cancelReplaySubmitTimer();
-    setComposerValue("");
-    setComposerOverlay(null);
-    setReplayCount(
-      replayScenarios.compaction.frames["context-compaction-running"] ??
-        replayScenarios.compaction.events.length,
-    );
-    setActiveFrame("context-compaction-running");
-    replaySubmitTimerRef.current = window.setTimeout(() => {
-      replaySubmitTimerRef.current = null;
-      setReplayCount(
-        replayScenarios.compaction.frames["context-compaction-completed"] ??
-          replayScenarios.compaction.events.length,
-      );
-      setActiveFrame("context-compaction-completed");
-      requestAnimationFrame(() => composerInputRef.current?.focus());
-    }, 900);
   };
 
   const removeQueuedPrompt = (id: string) => {
