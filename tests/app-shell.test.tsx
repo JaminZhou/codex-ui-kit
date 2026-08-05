@@ -770,6 +770,36 @@ describe("application shell", () => {
     ).toBe(-1);
   });
 
+  it("hides the side-panel resizer behind an active sidebar modal", () => {
+    const { container } = render(
+      <AppShell
+        layoutMode="narrow"
+        narrowSidebarBehavior="modal"
+        onSidePanelOpenChange={() => undefined}
+        sidePanel={<button type="button">Pull request summary</button>}
+        sidePanelOpen
+        sidePanelOverlay
+        sidePanelOverlayModal={false}
+        sidePanelResizable
+        sidebar={<button type="button">Projects</button>}
+        sidebarOpen
+      >
+        Pull request index
+      </AppShell>,
+    );
+
+    expect(
+      container
+        .querySelector(".codex-ui-app-shell__side-panel")
+        ?.getAttribute("aria-hidden"),
+    ).toBe("true");
+    expect(
+      screen.queryByRole("separator", {
+        name: "Resize workspace panel",
+      }),
+    ).toBeNull();
+  });
+
   it("treats expanded side panels as modal overlays below wide mode", () => {
     const { container } = render(
       <AppShell

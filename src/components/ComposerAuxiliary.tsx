@@ -165,6 +165,7 @@ export function ComposerPermissionMenu({
   options,
   selectedId,
   trigger,
+  width = "auto",
   ...props
 }: ComposerPermissionMenuProps) {
   return (
@@ -174,7 +175,7 @@ export function ComposerPermissionMenu({
         .filter(Boolean)
         .join(" ")}
       trigger={trigger}
-      width="auto"
+      width={width}
     >
       <div className="codex-ui-composer-permission-menu__header">
         <span>{heading}</span>

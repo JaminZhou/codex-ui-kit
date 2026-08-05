@@ -168,10 +168,12 @@ describe("composer auxiliary surfaces", () => {
         ]}
         selectedId="ask"
         trigger={<button type="button">Ask for approval</button>}
+        width="trigger"
       />,
     );
 
     fireEvent.click(screen.getByRole("button", { name: "Ask for approval" }));
+    expect(screen.getByRole("menu").dataset.width).toBe("trigger");
     expect(
       screen.getByText("How should ChatGPT actions be approved?"),
     ).not.toBeNull();

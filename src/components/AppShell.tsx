@@ -885,6 +885,7 @@ export function AppShell({
     sidePanelOpen &&
     sidePanel !== undefined &&
     sidePanel !== null &&
+    !sidebarModalOpen &&
     !resolvedSidePanelExpanded &&
     ((layoutMode === "wide" && !sidePanelOverlay) ||
       (sidePanelOverlay && !sidePanelOverlayModal));

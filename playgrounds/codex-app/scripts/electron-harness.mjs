@@ -1,6 +1,18 @@
 import electronPath from "electron";
 import { _electron as electron } from "playwright-core";
 
+// These six dense scenes use the system font to match Codex. Their limits are
+// calibrated from uploaded macOS 15 runner artifacts against macOS 26 baselines;
+// CDP and Electron contracts continue to gate their exact text and geometry.
+const crossMacOsSystemFontRatios = {
+  composerQueuePaused: 0.025,
+  mcpToolCalls: 0.06,
+  prCommentFailed: 0.022,
+  prCompactDetail: 0.023,
+  prDetail: 0.018,
+  prReviewSubmitting: 0.025,
+};
+
 export const visualScenes = [
   {
     frame: "workspace-ready",
@@ -101,7 +113,7 @@ export const visualScenes = [
   {
     frame: "composer-queue-paused",
     id: "composer-queue-paused",
-    maxPixelRatio: 0.0225,
+    maxPixelRatio: crossMacOsSystemFontRatios.composerQueuePaused,
     scenario: "conversation-lifecycle",
   },
   {
@@ -172,7 +184,7 @@ export const visualScenes = [
     frame: "mcp-tool-calls",
     groupLabel: "Used OpenAI Developer Docs integration",
     id: "mcp-tool-calls",
-    maxPixelRatio: 0.0225,
+    maxPixelRatio: crossMacOsSystemFontRatios.mcpToolCalls,
     scenario: "mcp-tool-call",
     scrollTop: 0,
     surfaces: ["mcpGroup"],
@@ -367,7 +379,7 @@ export const visualScenes = [
   {
     frame: "pr-summary-ready",
     id: "pull-request-detail",
-    maxPixelRatio: 0.011,
+    maxPixelRatio: crossMacOsSystemFontRatios.prDetail,
     scenario: "workspace-workflow",
     view: "pull-request",
   },
@@ -410,14 +422,14 @@ export const visualScenes = [
   {
     frame: "pr-review-submitting",
     id: "pr-review-submitting",
-    maxPixelRatio: 0.011,
+    maxPixelRatio: crossMacOsSystemFontRatios.prReviewSubmitting,
     scenario: "workspace-workflow",
     view: "pull-request",
   },
   {
     frame: "pr-comment-failed",
     id: "pr-comment-failed",
-    maxPixelRatio: 0.011,
+    maxPixelRatio: crossMacOsSystemFontRatios.prCommentFailed,
     panelScrollTop: 1_100,
     scenario: "workspace-workflow",
     view: "pull-request",
@@ -433,7 +445,7 @@ export const visualScenes = [
   {
     frame: "pr-compact-detail",
     id: "pr-compact-detail",
-    maxPixelRatio: 0.011,
+    maxPixelRatio: crossMacOsSystemFontRatios.prCompactDetail,
     scenario: "workspace-workflow",
     view: "pull-request",
     windowSize: { height: 680, width: 720 },
