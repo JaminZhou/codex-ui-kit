@@ -254,6 +254,8 @@ describe("menus and selects", () => {
     fireEvent.click(trigger);
     await waitFor(() => expect(screen.getByRole("menu")).toBeTruthy());
     expect(document.activeElement).toBe(trigger);
+    fireEvent.keyDown(trigger, { key: "Tab" });
+    expect(screen.queryByRole("menu")).toBeNull();
   });
 
   it("still focuses menu items for keyboard opens without pointer initial focus", async () => {

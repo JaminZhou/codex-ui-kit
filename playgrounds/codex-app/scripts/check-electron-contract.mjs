@@ -2181,18 +2181,13 @@ try {
       `Electron coding workspace environment picker is invalid: ${JSON.stringify(worktreeEnvironmentState)}.`,
     );
   }
-  await codingWorkspacePage.keyboard.press("Escape");
+  await codingWorkspacePage.keyboard.press("Tab");
   await worktreeEnvironmentMenu.waitFor({ state: "hidden" });
-  await codingWorkspacePage.waitForTimeout(50);
-  if (
-    (await codingWorkspacePage.evaluate(
-      () => document.activeElement?.getAttribute("aria-label"),
-    )) !== "Change environment: No environment"
-  ) {
-    throw new Error(
-      "Electron coding workspace environment picker did not restore trigger focus.",
-    );
-  }
+  await codingWorkspacePage.waitForFunction(
+    () =>
+      document.activeElement?.getAttribute("aria-label") ===
+      "Starting state: main",
+  );
   await codingWorkspacePage
     .getByRole("button", { name: "Change environment: No environment" })
     .press("ArrowDown");
@@ -2204,6 +2199,11 @@ try {
   );
   await codingWorkspacePage.keyboard.press("Escape");
   await worktreeEnvironmentMenu.waitFor({ state: "hidden" });
+  await codingWorkspacePage.waitForFunction(
+    () =>
+      document.activeElement?.getAttribute("aria-label") ===
+      "Change environment: No environment",
+  );
   await codingWorkspacePage
     .getByRole("button", { name: "Change run location: New worktree" })
     .click();

@@ -733,6 +733,7 @@ export function Popover({
         event.stopPropagation();
         close();
       }
+      if (event.key === "Tab" && effectiveOpen && role !== "dialog") close();
     },
   });
 
