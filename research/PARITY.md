@@ -61,7 +61,8 @@ The authoritative current-build inventory is:
   720px. Explicit Show pins a non-modal 274/446 split across Pull requests
   navigation; explicit Hide restores the full 720px route, and an inline-start
   hover no longer opens the historical edge preview. The de-identified public
-  scene passes 67 Browser/CDP and pixel frames plus Electron interaction.
+  scene remains covered by the 70-frame Browser/CDP and pixel matrix plus
+  Electron interaction.
   Current-build regional ratios are 3.6234% for the top, 0.1292% for the
   text-masked selected row, and 0% for the text-masked footer. The UIKit
   keyboard-resize semantics exceed the sampled native separator and are
@@ -147,6 +148,13 @@ The authoritative current-build inventory is:
   and expanded `Shell` surface, 144px reverse-tail viewport, 401 split lines,
   copy controls, Success state, and collapse/reopen restoration. The
   ownership-masked full-window comparison passes at 0.17%.
+- A second current-build command slice observes one real read-only loop with
+  80 stdout records, 80 stderr records, and exit code 7. Browser/CDP and
+  Electron reproduce its running output, failed/collapsed and failed/expanded
+  states, exact copied transcript, reverse-tail restoration, and the
+  successful no-tool follow-up in the same thread. The ownership-masked full
+  1180×820 comparison passes at 0.89% under a 1% hard limit. This is evidence
+  for command-level failure recovery, not transport-level retry parity.
 - npm publication remains out of scope until the agreed P0/P1 coverage and
   release acceptance surfaces are complete.
 
@@ -220,6 +228,13 @@ glyphs, Composer internals, and non-owning scrollbars while retaining the
 command-card boundary, disclosure structure, Shell/output geometry, and
 surrounding spacing under a 1.5% hard limit. CDP separately verifies all
 unmasked semantics plus the masked command and status typography.
+
+The current command-failure comparison uses a separate full 1180×820
+reference from the same build. It masks the private sidebar, current task
+title, dynamic response text/actions, Composer internals, and non-owning
+scrollbar while preserving the timeline, failed command disclosure, Shell
+card, reverse-tail viewport, and exit footer. The hard threshold is 1%; CDP
+and Electron independently lock every masked semantic and interaction.
 
 Broader final visual optimization remains scheduled after the remaining
 inventory, page compositions, and state transitions stabilize. A passing

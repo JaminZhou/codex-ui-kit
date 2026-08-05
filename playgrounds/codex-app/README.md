@@ -408,6 +408,25 @@ The twenty-third slice refreshes successful long command output against
 - a full 1180×820 ownership-masked current comparison passing at 0.17% under
   the 1.5% hard limit.
 
+## Twenty-fourth vertical slice
+
+The twenty-fourth slice adds current command failure and same-thread recovery
+against `26.730.61309`:
+
+- one real read-only shell loop emits 80 stdout and 80 stderr records before
+  exiting with code 7, followed by one successful no-tool turn in the same
+  disposable task;
+- a schema-validated public replay separates live output, collapsed failure,
+  expanded failure, and recovered follow-up frames;
+- Browser/CDP locks 161 split lines, the 736×246.58px failed `Shell` card,
+  734×144px reverse-tail viewport, 3136px scroll height, two copy controls,
+  keyboard disclosure, and `Exit code 7`;
+- Electron verifies exact copied output, failure state, same-thread recovery,
+  collapse/reopen, and tail restoration;
+- the 70-frame matrix includes three new reviewed baselines, and a full
+  1180×820 ownership-masked current comparison passes at 0.89% under a 1%
+  hard limit.
+
 ## Development
 
 From the repository root:
@@ -437,6 +456,14 @@ application reference outside the repository and provide its absolute path:
 
 ```bash
 CODEX_UI_KIT_MULTI_FILE_REVIEW_REFERENCE=/absolute/path/to/main-only-reference.png \
+  pnpm --filter @codex-ui-kit/codex-app-playground check:visual
+```
+
+The command-failure gate accepts the unmodified full-window current-build
+reference and masks non-owning private/dynamic regions internally:
+
+```bash
+CODEX_UI_KIT_COMMAND_FAILURE_REFERENCE=/absolute/path/to/command-failure.png \
   pnpm --filter @codex-ui-kit/codex-app-playground check:visual
 ```
 

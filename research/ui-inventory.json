@@ -156,7 +156,8 @@
         "cdp-26.721:synthetic-expanded-read-only-command-timeline-1072x820",
         "cdp-26.721:synthetic-exit-code-7-failed-command-compact-526x600",
         "cdp-26.727.40816:real-seq-1-400-expanded-shell-output-reverse-tail-and-masked-regional-pixels",
-        "cdp-26.730.61309:real-seq-1-400-expanded-shell-output-reverse-tail-and-masked-regional-pixels"
+        "cdp-26.730.61309:real-seq-1-400-expanded-shell-output-reverse-tail-and-masked-regional-pixels",
+        "cdp-26.730.61309:real-mixed-stdout-stderr-exit-7-expanded-shell-reverse-tail-and-same-thread-recovery"
       ],
       "implementationStatus": "partial",
       "browserStatus": "verified",
@@ -295,10 +296,13 @@
       "area": "conversation",
       "ownership": "thread",
       "packageEvidence": ["local-conversation-page", "remote-conversation-page"],
-      "runtimeStatus": "not_sampled",
+      "runtimeStatus": "runtime_observed",
+      "runtimeEvidence": [
+        "cdp-26.730.61309:real-command-exit-7-followed-by-successful-no-tool-turn-in-the-same-thread"
+      ],
       "implementationStatus": "partial",
-      "browserStatus": "partial_legacy",
-      "electronStatus": "partial_legacy",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
       "priority": "p0"
     },
     {

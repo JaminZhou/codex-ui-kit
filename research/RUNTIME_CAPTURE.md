@@ -569,6 +569,39 @@ app-server/modifier children, and profile-specific Crashpad helpers. Port
 external evidence to the recoverable Trash item
 `codex-ui-kit-current-cdp.mrkFgT`. The original Codex process was not stopped.
 
+### Current 26.730.61309 command failure and same-thread recovery
+
+The failure probe used exact main PID `71571`, loopback port `9541`, and
+unique profile `/private/tmp/codex-ui-kit-command-failure-cdp.Pwo1hz`. It
+created one disposable task and submitted one read-only shell loop that emits
+80 numbered stdout lines and 80 numbered stderr lines, then exits with code 7.
+It did not read or write files and did not retry the command. After the failed
+turn completed, the probe submitted one exact no-tool follow-up in the same
+thread and received `Recovery follow-up accepted.`
+
+At 1180×820, the current Renderer exposes `Worked for 12s`, a failed command
+disclosure, and an expanded 736×246.58px `Shell` card. The 734×144px output
+viewport uses reverse-column scrolling, 3136px scroll height,
+`scrollTop = 0`, and 13/19.5px weight-500 monospace text. The exact merged
+transcript contains 161 split lines including its trailing newline, begins
+with `stderr-001`, retains all 160 records, and ends with `stdout-080` then
+`stderr-080`. Two copy controls and `Exit code 7` complete the card.
+
+The independent public trace adds three reviewed frames: live output,
+collapsed failure, and expanded failure plus the successful follow-up.
+Browser/CDP now covers 70 frames and verifies semantic state, exact text,
+computed geometry, reverse-tail behavior, keyboard disclosure, and
+collapse/reopen restoration. Electron repeats the failure, copy, recovery,
+and disclosure interactions. The optional full-window external comparison
+masks the non-owning sidebar/header and dynamic response regions, retains the
+command surface, and passes at `0.008898305084745763` under a 1% hard limit.
+
+Cleanup stopped only PID `71571` and the exact profile-specific Crashpad PIDs
+`71577` and `71579`; port `9541` is closed and the original Codex process was
+not stopped. The ignored probe was removed, and the profile plus external
+screenshots were moved into the recoverable Trash item
+`codex-ui-kit-command-failure-cdp.Pwo1hz`.
+
 ### Current 26.730.61309 sidebar capture
 
 The final responsive sweep used exact main PID `40154`, loopback port `9532`,

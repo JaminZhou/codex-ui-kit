@@ -117,4 +117,19 @@ describe("lifecycle visual policy", () => {
       "current-build approval pixel ratio",
     );
   });
+
+  it("gates the current failed command and recovery frame", () => {
+    expect(contract).toContain(
+      "CODEX_UI_KIT_COMMAND_FAILURE_REFERENCE",
+    );
+    expect(contract).toContain(
+      "CODEX_UI_KIT_COMMAND_FAILURE_MAX_DIFF_RATIO",
+    );
+    expect(contract).toContain(
+      'scene.id === "command-failure-expanded"',
+    );
+    expect(contract).toContain(
+      "current-build command-failure pixel ratio",
+    );
+  });
 });

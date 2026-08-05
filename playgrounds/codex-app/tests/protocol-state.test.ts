@@ -218,6 +218,50 @@ describe("protocol lifecycle reducer", () => {
     ]);
   });
 
+  it("preserves a failed stdout/stderr command and recovers in the next turn", () => {
+    const scenario = replayScenarios["command-failure-recovery"];
+    const running = reduceProtocolTrace(
+      scenario.events.slice(
+        0,
+        scenario.frames["command-failure-output-running"],
+      ),
+    );
+    const failed = reduceProtocolTrace(
+      scenario.events.slice(0, scenario.frames["command-failure-failed"]),
+    );
+    const completed = reduceProtocolTrace(scenario.events);
+
+    expect(running.status).toBe("running");
+    expect(running.commands).toEqual([
+      expect.objectContaining({
+        exitCode: null,
+        output: expect.stringContaining("stderr-001\nstdout-001"),
+        status: "running",
+      }),
+    ]);
+    expect(failed.commands).toEqual([
+      expect.objectContaining({ exitCode: 7, status: "failed" }),
+    ]);
+    expect(failed.commands[0]?.output).toContain("stdout-080\nstderr-080\n");
+    expect(failed.commands[0]?.output.split("\n")).toHaveLength(161);
+    expect(completed.status).toBe("completed");
+    expect(completed.turnDurationsMs).toMatchObject({
+      "turn-command-failure": 12_857,
+      "turn-command-follow-up": 1_400,
+    });
+    expect(completed.messages.at(-1)).toMatchObject({
+      id: "assistant-command-follow-up",
+      text: "Recovery follow-up accepted.",
+    });
+    expect(completed.timeline.map(({ kind }) => kind)).toEqual([
+      "message",
+      "command",
+      "message",
+      "message",
+      "message",
+    ]);
+  });
+
   it("preserves an interrupted assistant partial and exposes the stop state", () => {
     const state = reduceProtocolTrace(
       replayScenarios.interruption.events,

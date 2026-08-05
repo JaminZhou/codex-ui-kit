@@ -2653,6 +2653,105 @@ try {
   await longCommandOutputApp.close();
 }
 
+const commandFailureScene = {
+  frame: "command-failure-recovered",
+  id: "electron-current-command-failure-recovery",
+  scenario: "command-failure-recovery",
+};
+const {
+  app: commandFailureApp,
+  page: commandFailurePage,
+} = await launchScene(commandFailureScene, { capture: false });
+try {
+  await commandFailurePage.evaluate(() => {
+    Object.defineProperty(navigator, "clipboard", {
+      configurable: true,
+      value: {
+        writeText: async (value) => {
+          window.__codexCommandFailureCopiedText = value;
+        },
+      },
+    });
+  });
+  const failureTimeline = commandFailurePage.getByRole("button", {
+    exact: true,
+    name: "Worked for 12s",
+  });
+  await failureTimeline.click();
+  const failureCommand = commandFailurePage.locator(
+    '[data-item-id="command-failure-output"]',
+  );
+  const failureSummary = failureCommand.locator("summary").first();
+  await failureSummary.click();
+  const failureOutput = failureCommand.getByRole("region", {
+    name: "Standard output",
+  });
+  await failureOutput.waitFor({ state: "visible" });
+  const failureState = await commandFailurePage.evaluate(() => {
+    const command = document.querySelector(
+      '[data-item-id="command-failure-output"]',
+    );
+    const output = command?.querySelector(
+      ".codex-ui-command-output pre",
+    );
+    const text = output?.querySelector("code")?.textContent ?? "";
+    return {
+      followUpAccepted:
+        document.body.textContent?.includes(
+          "Recovery follow-up accepted.",
+        ) ?? false,
+      lineCount: text.split("\n").length,
+      outputEnd: text.slice(-18),
+      outputStart: text.slice(0, 12),
+      scrollBottom: output ? output.scrollTop : null,
+      status: command?.getAttribute("data-status"),
+      footer: command
+        ?.querySelector(".codex-ui-command-execution__footer")
+        ?.textContent?.trim(),
+    };
+  });
+  if (
+    !failureState.followUpAccepted ||
+    failureState.lineCount !== 161 ||
+    failureState.outputStart !== "stderr-001\ns" ||
+    !failureState.outputEnd.endsWith("080\nstderr-080\n") ||
+    failureState.scrollBottom === null ||
+    Math.abs(failureState.scrollBottom) > 1 ||
+    failureState.status !== "failed" ||
+    failureState.footer !== "Exit code 7"
+  ) {
+    throw new Error(
+      `Electron current command failure recovery is incomplete: ${JSON.stringify(failureState)}`,
+    );
+  }
+  const copyButtons = failureCommand.getByRole("button", {
+    name: "Copy",
+  });
+  await copyButtons.last().click();
+  const copiedOutput = await commandFailurePage.evaluate(
+    () => window.__codexCommandFailureCopiedText,
+  );
+  if (
+    typeof copiedOutput !== "string" ||
+    !copiedOutput.startsWith("stderr-001\nstdout-001") ||
+    !copiedOutput.endsWith("stdout-080\nstderr-080\n")
+  ) {
+    throw new Error(
+      "Electron current command failure output copy omitted the observed transcript.",
+    );
+  }
+  await failureSummary.click();
+  if (await failureOutput.isVisible()) {
+    throw new Error(
+      "Electron current command failure output remained visible after collapse.",
+    );
+  }
+  await failureSummary.press("Enter");
+  await failureOutput.waitFor({ state: "visible" });
+} finally {
+  await commandFailureApp.close();
+}
+
 const acceptedMixedApprovalScene = {
   frame: "mixed-approval-pending",
   id: "electron-mixed-approval-accepted",
@@ -3233,5 +3332,5 @@ try {
 }
 
 console.log(
-  "Electron host, native-window, coding-workspace routing, conversation/Composer lifecycle and current menus, current long command output, default 720px narrow reachability, resizable navigation/Review/Terminal/PR detail, PR tabs and expansion, MCP disclosure/result, multi-file and mixed-content Review, selection/Undo, large diff scrolling, and compact geometry contracts passed.",
+  "Electron host, native-window, coding-workspace routing, conversation/Composer lifecycle and current menus, current long and failed command output with same-thread recovery, default 720px narrow reachability, resizable navigation/Review/Terminal/PR detail, PR tabs and expansion, MCP disclosure/result, multi-file and mixed-content Review, selection/Undo, large diff scrolling, and compact geometry contracts passed.",
 );

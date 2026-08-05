@@ -1128,6 +1128,8 @@ export function App() {
     mode === "replay" && scenarioId === "approval-denied";
   const isCurrentLongCommandReplay =
     mode === "replay" && scenarioId === "long-command-output";
+  const isCurrentCommandFailureReplay =
+    mode === "replay" && scenarioId === "command-failure-recovery";
   const replayComposerRunning =
     isConversationLifecycle && state.status === "running";
 
@@ -2005,9 +2007,14 @@ export function App() {
     mode === "replay" &&
     (scenarioId === "mcp-tool-call" ||
       scenarioId === "mcp-recovery-mixed-thread" ||
-      scenarioId === "long-command-output");
+      scenarioId === "long-command-output" ||
+      scenarioId === "command-failure-recovery");
+  const usesCurrentAskPermission =
+    isCurrentApprovalReplay ||
+    isCurrentLongCommandReplay ||
+    isCurrentCommandFailureReplay;
   const selectedComposerPermission =
-    (isCurrentApprovalReplay || isCurrentLongCommandReplay
+    (usesCurrentAskPermission
       ? composerPermissionOptions[0]
       : composerPermissionOptions.find(
           ({ id }) => id === composerPermissionId,
@@ -2098,7 +2105,8 @@ export function App() {
       scenarioId === "mcp-tool-call" ||
       scenarioId === "mcp-recovery-mixed-thread" ||
       scenarioId === "approval-denied" ||
-      scenarioId === "long-command-output");
+      scenarioId === "long-command-output" ||
+      scenarioId === "command-failure-recovery");
   const showLifecycleComposer = isConversationLifecycle;
   const composerSurface = (
     <AgentComposer
@@ -3524,7 +3532,10 @@ export function App() {
                   (message.id === "assistant-approval-denied" ||
                     message.id === "assistant-approval-approved")) ||
                 (scenarioId === "long-command-output" &&
-                  message.id === "assistant-long-command-final")) &&
+                  message.id === "assistant-long-command-final") ||
+                (scenarioId === "command-failure-recovery" &&
+                  (message.id === "assistant-command-failure-recovered" ||
+                    message.id === "assistant-command-follow-up"))) &&
               message.status === "completed" ? (
                 scenarioId === "mcp-tool-call" ||
                 scenarioId === "mcp-recovery-mixed-thread" ||
@@ -3926,6 +3937,45 @@ export function App() {
                 copyLabel="Copy"
                 copyText={command.output}
               >
+                {command.output}
+              </CommandOutput>
+            </CommandExecution>
+          </ActivityTimeline>
+        );
+      }
+      if (
+        isCurrentCommandFailureReplay &&
+        command.id === "command-failure-output"
+      ) {
+        return (
+          <ActivityTimeline
+            defaultOpen={false}
+            key={`command:${command.id}`}
+            summary={
+              <TurnDuration
+                durationMs={
+                  command.status === "running"
+                    ? 0
+                    : ((command.turnId
+                        ? state.turnDurationsMs[command.turnId]
+                        : undefined) ?? 12_857)
+                }
+                status={command.status === "running" ? "working" : "worked"}
+              />
+            }
+          >
+            <CommandExecution
+              command={command.command}
+              copyCommandLabel="Copy"
+              cwd={command.cwd}
+              data-item-id={command.id}
+              data-testid="command-execution"
+              defaultOpen={false}
+              durationMs={command.durationMs ?? undefined}
+              exitCode={command.exitCode ?? undefined}
+              status={command.status}
+            >
+              <CommandOutput copyLabel="Copy" copyText={command.output}>
                 {command.output}
               </CommandOutput>
             </CommandExecution>
@@ -4586,7 +4636,9 @@ export function App() {
                   activeFrame !== "thread-windowed",
                 followKey: state.eventCount,
                 latestOrigin:
-                  currentWindowedFrame || isCurrentLongCommandReplay
+                  currentWindowedFrame ||
+                  isCurrentLongCommandReplay ||
+                  isCurrentCommandFailureReplay
                     ? "start"
                     : "end",
                 onFollowingChange: setThreadFollowing,
