@@ -530,10 +530,25 @@
       "priority": "p1"
     },
     {
-      "id": "composer.attachments-plugins",
+      "id": "composer.attachments",
       "area": "composer",
       "ownership": "thread",
-      "packageEvidence": ["composer-work-home-plugins-control"],
+      "packageEvidence": ["composer-attachment", "message-attachment"],
+      "runtimeStatus": "runtime_observed",
+      "runtimeEvidence": [
+        "cdp-26.721.81911:add-files-goal-plan-skill-and-plugins-menu",
+        "cdp-26.730.61309:pasted-image-ready-remove-resubmit-complete-and-message-ownership"
+      ],
+      "implementationStatus": "partial",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
+      "priority": "p0"
+    },
+    {
+      "id": "composer.plugins",
+      "area": "composer",
+      "ownership": "thread",
+      "packageEvidence": ["composer-work-home-plugins-control", "connect-plugins-submenu-item"],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
         "cdp-26.721.81911:add-files-goal-plan-skill-and-plugins-menu"

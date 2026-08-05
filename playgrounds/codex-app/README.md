@@ -370,9 +370,9 @@ The twenty-first slice refreshes active Goal and Plan Composer modes against
 - strict ownership-masked current regional gates pass at 0.38% for Goal and
   0.35% for Plan under a 0.5% hard limit.
 
-The native macOS file panel is outside Renderer CDP and Computer Use blocks
-Codex control, so no attachment was added and attachment lifecycle remains
-historical.
+That probe could not automate the native macOS file panel, so it did not add
+an attachment. The later thirtieth slice independently verifies the current
+Renderer paste path; native file-panel behavior remains a separate gate.
 
 ## Twenty-second vertical slice
 
@@ -516,6 +516,26 @@ The twenty-ninth slice reaches the current matching-command approval rule on
 - two reviewed frames raise the matrix to 80, while ownership-masked menu and
   repeated-completion comparisons measure 1.21% and 1.37% under independent
   1.5% limits.
+
+## Thirtieth vertical slice
+
+The thirtieth slice reaches the current pasted-image lifecycle on
+`26.730.61309`:
+
+- one separate new chat receives a synthetic PNG through the real Renderer
+  paste path, then verifies removal, focus restoration, re-attachment,
+  submission, and the exact `ATTACHMENT LIFECYCLE COMPLETE.` response;
+- public `ComposerAttachment` and `MessageAttachment` ownership keeps the
+  removable draft card in the Composer and the sent media outside the editable
+  user bubble;
+- a five-event schema-validated trace raises the suite to 20 fixtures and 246
+  events;
+- Browser/CDP locks the observed coordinates, 80×80 attachment geometry,
+  radii, ownership, focus, permission, and full interaction; Electron repeats
+  the lifecycle in a real 1180×820 `BrowserWindow`;
+- the reviewed matrix totals 81 frames, while ownership-masked ready and
+  completed comparisons measure 0.39% and 0.79% under independent 1.5%
+  limits.
 
 ## Development
 
@@ -675,6 +695,15 @@ The current long-command gate accepts one full 1180×820 screenshot:
 
 ```bash
 CODEX_UI_KIT_COMMAND_OUTPUT_REFERENCE=/absolute/path/to/command-output.png \
+  pnpm --filter @codex-ui-kit/codex-app-playground check:visual
+```
+
+The current image-attachment gates accept separate 906×820 main-only ready and
+completed screenshots:
+
+```bash
+CODEX_UI_KIT_ATTACHMENT_READY_REFERENCE=/absolute/path/to/attachment-ready-main.png \
+CODEX_UI_KIT_ATTACHMENT_COMPLETED_REFERENCE=/absolute/path/to/attachment-completed-main.png \
   pnpm --filter @codex-ui-kit/codex-app-playground check:visual
 ```
 

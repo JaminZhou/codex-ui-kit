@@ -123,10 +123,16 @@ export const visualScenes = [
     scenario: "conversation-lifecycle",
   },
   {
-    frame: "composer-attachment",
-    id: "composer-attachment",
+    frame: "attachment-ready",
+    id: "attachment-current-ready",
     maxPixelRatio: 0.0225,
-    scenario: "conversation-lifecycle",
+    scenario: "attachment-lifecycle",
+  },
+  {
+    frame: "attachment-completed",
+    id: "attachment-current-completed",
+    maxPixelRatio: 0.0225,
+    scenario: "attachment-lifecycle",
   },
   {
     frame: "thread-scroll-away",

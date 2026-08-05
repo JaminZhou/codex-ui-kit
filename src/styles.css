@@ -4139,6 +4139,45 @@
   justify-content: flex-end;
 }
 
+.codex-ui-agent-message__attachments {
+  display: flex;
+  flex-direction: row-reverse;
+  gap: 0.5rem;
+  max-width: 100%;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.codex-ui-agent-message__attachments::-webkit-scrollbar {
+  display: none;
+}
+
+.codex-ui-message-attachment {
+  background: transparent;
+  border: 1px solid color-mix(in srgb, var(--codex-ui-text) 16%, transparent);
+  border-radius: 0.78125rem;
+  cursor: pointer;
+  display: block;
+  flex: 0 0 auto;
+  height: 5rem;
+  overflow: visible;
+  padding: 0;
+  width: 5rem;
+}
+
+.codex-ui-message-attachment > img {
+  border-radius: 0.625rem;
+  display: block;
+  height: 100%;
+  object-fit: cover;
+  width: 100%;
+}
+
+.codex-ui-message-attachment:focus-visible {
+  outline: 2px solid var(--codex-ui-focus);
+  outline-offset: 2px;
+}
+
 .codex-ui-agent-message__content {
   min-width: 0;
 }
@@ -7018,6 +7057,13 @@ summary.codex-ui-activity__header::after {
   display: none;
 }
 
+.codex-ui-composer__attachments:has(
+    > .codex-ui-composer-attachment[data-layout="image"]
+  ) {
+  margin-bottom: -0.75rem;
+  padding: 0.5625rem 0.5rem 0.3125rem 0.5625rem;
+}
+
 .codex-ui-composer__queue {
   min-width: 0;
 }
@@ -7052,11 +7098,13 @@ summary.codex-ui-activity__header::after {
 }
 
 .codex-ui-composer-attachment[data-layout="image"] {
-  border-radius: var(--codex-ui-radius-xl);
-  height: 4.5rem;
+  background: transparent;
+  border-color: color-mix(in srgb, var(--codex-ui-text) 16%, transparent);
+  border-radius: 1.0625rem;
+  height: 5rem;
   overflow: hidden;
   padding: 0;
-  width: 4.5rem;
+  width: 5rem;
 }
 
 .codex-ui-composer-attachment[data-status="uploading"] {
@@ -7156,6 +7204,18 @@ summary.codex-ui-activity__header::after {
   position: absolute;
   right: 0.25rem;
   top: 0.25rem;
+}
+
+.codex-ui-composer-attachment[data-layout="image"]
+  > .codex-ui-composer-attachment__remove {
+  background: var(--codex-ui-text);
+  box-shadow: 0 1px 2px -1px color-mix(in srgb, black 8%, transparent);
+  color: var(--codex-ui-bg);
+  font-size: 0.6875rem;
+  height: 1rem;
+  line-height: 1;
+  width: 1rem;
+  z-index: 1;
 }
 
 .codex-ui-composer-attachment__remove:hover:not(:disabled) {

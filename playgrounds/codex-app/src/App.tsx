@@ -38,6 +38,7 @@ import {
   MenuSeparator,
   McpToolCallGroup,
   McpToolIcon,
+  MessageAttachment,
   NewConversationStart,
   PullRequestCheckList,
   PullRequestCommentComposer,
@@ -278,6 +279,9 @@ function replayCountForSelection(
   scenario: ReplayScenario,
   frame: string | null,
 ) {
+  if (scenario.id === "attachment-lifecycle" && frame === "attachment-ready") {
+    return 0;
+  }
   if (frame && scenario.frames[frame]) return scenario.frames[frame];
   if (
     scenario.id === "compaction" &&
@@ -304,6 +308,9 @@ function replayCountForSelection(
 }
 
 function initialComposerValue(frame: string | null) {
+  if (frame === "attachment-ready") {
+    return "Reply using three uppercase words describing this test: attachment, lifecycle, complete. Include a final period and no other text.";
+  }
   if (frame === "context-compaction-command-menu") return "/compact";
   if (
     frame === "composer-multiline" ||
@@ -337,6 +344,9 @@ function initialComposerMode(frame: string | null): ComposerMode {
   if (frame === "composer-plan") return "plan";
   return null;
 }
+
+const attachmentPreviewDataUrl =
+  "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAusB9Y9WlS8AAAAASUVORK5CYII=";
 
 const composerPermissionOptions: readonly ComposerPermissionOption[] = [
   {
@@ -1176,6 +1186,8 @@ export function App() {
       scenarioId === "approval-similar-commands");
   const isCurrentApprovalSimilarReplay =
     mode === "replay" && scenarioId === "approval-similar-commands";
+  const isCurrentAttachmentReplay =
+    mode === "replay" && scenarioId === "attachment-lifecycle";
   const isCurrentLongCommandReplay =
     mode === "replay" && scenarioId === "long-command-output";
   const isCurrentCommandFailureReplay =
@@ -1587,6 +1599,22 @@ export function App() {
   };
 
   const submitComposer = (prompt: string) => {
+    if (isCurrentAttachmentReplay) {
+      if (activeFrame !== "attachment-ready") return;
+      cancelReplaySubmitTimer();
+      setReplayComposerSubmitting(true);
+      setComposerOverlay(null);
+      setActiveFrame("attachment-submitting");
+      replaySubmitTimerRef.current = window.setTimeout(() => {
+        replaySubmitTimerRef.current = null;
+        setReplayCount(scenario.events.length);
+        setActiveFrame("attachment-completed");
+        setReplayComposerSubmitting(false);
+        setComposerValue((current) => (current === prompt ? "" : current));
+        requestAnimationFrame(() => composerInputRef.current?.focus());
+      }, 160);
+      return;
+    }
     if (
       isCurrentApprovalSimilarReplay &&
       activeFrame === "approval-current-similar-first-completed"
@@ -2210,6 +2238,7 @@ export function App() {
   const composerIsDisabled =
     liveStartPending ||
     ((isConversationLifecycle ||
+      isCurrentAttachmentReplay ||
       isCurrentCommandInterruptionReplay ||
       isCurrentContextCompactionReplay) &&
       replayComposerSubmitting);
@@ -2227,7 +2256,8 @@ export function App() {
         : "running"
       : queueInterrupted
         ? "queue-paused"
-        : activeFrame === "composer-attachment"
+        : activeFrame === "composer-attachment" ||
+            activeFrame === "attachment-ready"
           ? "attachment"
           : composerMode
             ? composerMode
@@ -2238,6 +2268,7 @@ export function App() {
     mode === "replay" &&
     (scenarioId === "mcp-tool-call" ||
       scenarioId === "mcp-recovery-mixed-thread" ||
+      scenarioId === "attachment-lifecycle" ||
       scenarioId === "long-command-output" ||
       scenarioId === "command-failure-recovery" ||
       scenarioId === "interruption" ||
@@ -2245,6 +2276,7 @@ export function App() {
       scenarioId === "context-summary");
   const usesCurrentAskPermission =
     isCurrentApprovalReplay ||
+    isCurrentAttachmentReplay ||
     isCurrentLongCommandReplay ||
     isCurrentCommandFailureReplay ||
     isCurrentCommandInterruptionReplay ||
@@ -2389,6 +2421,7 @@ export function App() {
       scenarioId === "markdown" ||
       scenarioId === "mcp-tool-call" ||
       scenarioId === "mcp-recovery-mixed-thread" ||
+      scenarioId === "attachment-lifecycle" ||
       scenarioId === "approval-allow-once" ||
       scenarioId === "approval-denied" ||
       scenarioId === "approval-similar-commands" ||
@@ -2485,15 +2518,20 @@ export function App() {
       allowSubmitWhileRunning={showLifecycleComposer}
       aria-busy={composerIsDisabled || undefined}
       attachments={
-        showLifecycleComposer &&
-        activeFrame === "composer-attachment" ? (
+        (showLifecycleComposer && activeFrame === "composer-attachment") ||
+        (isCurrentAttachmentReplay && activeFrame === "attachment-ready") ? (
           <ComposerAttachment
-            kind="file"
-            label="current-build-composer-notes.md"
-            layout="card"
-            meta="Markdown · 4 KB"
+            kind="image"
+            label="codex-ui-kit-current.png"
+            layout="image"
             onOpen={() => undefined}
-            onRemove={() => setActiveFrame(null)}
+            onRemove={() => {
+              setActiveFrame(
+                isCurrentAttachmentReplay ? "attachment-empty" : null,
+              );
+              requestAnimationFrame(() => composerInputRef.current?.focus());
+            }}
+            previewSrc={attachmentPreviewDataUrl}
           />
         ) : undefined
       }
@@ -2570,6 +2608,13 @@ export function App() {
             onDismiss={dismissComposerResources}
             onSelect={(option) => {
               setComposerResourceActiveId(option.id);
+              if (isCurrentAttachmentReplay && option.id === "files") {
+                setActiveFrame("attachment-ready");
+                setComposerValue(initialComposerValue("attachment-ready"));
+                setComposerOverlay(null);
+                requestAnimationFrame(() => composerInputRef.current?.focus());
+                return;
+              }
               if (option.id === "goal" || option.id === "plan") {
                 setComposerMode(option.id);
                 setComposerValue("");
@@ -3915,6 +3960,24 @@ export function App() {
                 )
               ) : undefined
             }
+            attachments={
+              message.role === "user" && message.attachments?.length
+                ? message.attachments.map((attachment, index) => (
+                    <MessageAttachment
+                      alt="User attachment"
+                      key={`${message.id}:attachment:${index}`}
+                      label="User attachment"
+                      onClick={() => undefined}
+                      previewSrc={
+                        attachment.sourceType === "remote" &&
+                        attachment.source.startsWith("data:image/")
+                          ? attachment.source
+                          : attachmentPreviewDataUrl
+                      }
+                    />
+                  ))
+                : undefined
+            }
             data-item-id={message.id}
             role={message.role}
             status={agentMessageStatus(message.status)}
@@ -4927,13 +4990,16 @@ export function App() {
       data-mode={mode}
       data-composer-phase={
         isConversationLifecycle ||
+        isCurrentAttachmentReplay ||
         isCurrentCommandInterruptionReplay ||
         isCurrentContextCompactionReplay
           ? composerPhase
           : undefined
       }
       data-composer-overlay={
-        isConversationLifecycle ? composerOverlay ?? undefined : undefined
+        isConversationLifecycle || isCurrentAttachmentReplay
+          ? composerOverlay ?? undefined
+          : undefined
       }
       data-composer-mode={
         isConversationLifecycle ? composerMode ?? undefined : undefined

@@ -68,6 +68,7 @@ import {
   MenuCheckboxItem,
   MenuItem,
   MenuSubmenu,
+  MessageAttachment,
   type NoticeTone,
   NewConversationStart,
   ProposedPlan,
@@ -373,6 +374,7 @@ void Menu;
 void MenuCheckboxItem;
 void MenuItem;
 void MenuSubmenu;
+void MessageAttachment;
 void Popover;
 void Select;
 void Tooltip;

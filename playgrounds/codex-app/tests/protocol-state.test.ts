@@ -89,6 +89,31 @@ describe("protocol lifecycle reducer", () => {
     expect(scenario.frames["markdown-complete"]).toBe(scenario.events.length);
   });
 
+  it("preserves public image inputs with the submitted user message", () => {
+    const scenario = replayScenarios["attachment-lifecycle"];
+    const submitted = reduceProtocolTrace(
+      scenario.events.slice(0, scenario.frames["attachment-submitted"]),
+    );
+    const completed = reduceProtocolTrace(scenario.events);
+    const user = completed.messages.find(
+      ({ id }) => id === "user-attachment-lifecycle",
+    );
+
+    expect(submitted.messages[0]?.attachments).toEqual([
+      expect.objectContaining({
+        kind: "image",
+        label: "User attachment",
+        sourceType: "remote",
+      }),
+    ]);
+    expect(user?.text).toContain("describing this test");
+    expect(user?.attachments?.[0]?.source).toMatch(/^data:image\/png;base64,/);
+    expect(completed.messages.at(-1)?.text).toBe(
+      "ATTACHMENT LIFECYCLE COMPLETE.",
+    );
+    expect(completed.turnDurationMs).toBe(7_409);
+  });
+
   it("replays a successful public MCP integration lifecycle", () => {
     const scenario = replayScenarios["mcp-tool-call"];
     const runningState = reduceProtocolTrace(

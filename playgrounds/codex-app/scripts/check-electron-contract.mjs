@@ -278,6 +278,72 @@ try {
   await shellApp.close();
 }
 
+const attachmentScene = {
+  frame: "attachment-ready",
+  id: "electron-attachment-lifecycle",
+  scenario: "attachment-lifecycle",
+};
+const { app: attachmentApp, page: attachmentPage } = await launchScene(
+  attachmentScene,
+  { capture: false },
+);
+
+try {
+  const composer = attachmentPage.getByRole("textbox", {
+    name: "Message composer",
+  });
+  await attachmentPage
+    .getByRole("button", { name: "Remove codex-ui-kit-current.png" })
+    .click();
+  await attachmentPage.waitForSelector(
+    '.demo-root[data-composer-phase="idle"]',
+  );
+  await attachmentPage
+    .getByRole("button", { name: "Add files and more" })
+    .click();
+  await attachmentPage
+    .getByRole("option", { name: "Files and folders" })
+    .click();
+  await attachmentPage.waitForSelector(
+    '.demo-root[data-composer-phase="attachment"] .codex-ui-composer-attachment',
+  );
+  await composer.fill(
+    "Reply using three uppercase words describing this test: attachment, lifecycle, complete. Include a final period and no other text.",
+  );
+  await composer.press("Enter");
+  await attachmentPage.waitForSelector(
+    '.demo-root[data-frame="attachment-completed"][data-composer-phase="idle"]',
+  );
+  await attachmentPage
+    .getByText("ATTACHMENT LIFECYCLE COMPLETE.", { exact: true })
+    .waitFor();
+  await attachmentPage.waitForFunction(
+    () => document.activeElement?.getAttribute("aria-label") === "Message composer",
+  );
+  const attachmentState = await attachmentPage.evaluate(() => ({
+    composerAttachmentCount: document.querySelectorAll(
+      ".codex-ui-composer .codex-ui-composer-attachment",
+    ).length,
+    composerHeight: document
+      .querySelector(".codex-ui-composer")
+      ?.getBoundingClientRect().height,
+    messageAttachmentCount: document.querySelectorAll(
+      ".codex-ui-agent-message__attachments .codex-ui-message-attachment",
+    ).length,
+  }));
+  if (
+    attachmentState.composerAttachmentCount !== 0 ||
+    attachmentState.messageAttachmentCount !== 1 ||
+    Math.abs((attachmentState.composerHeight ?? 0) - 98) > 1
+  ) {
+    throw new Error(
+      `Electron attachment lifecycle failed: ${JSON.stringify(attachmentState)}`,
+    );
+  }
+} finally {
+  await attachmentApp.close();
+}
+
 const markdownScene = {
   frame: "markdown-complete",
   id: "electron-markdown",
@@ -3913,5 +3979,5 @@ try {
 }
 
 console.log(
-  "Electron host, native-window, coding-workspace routing, conversation/Composer lifecycle and current menus, current long, failed, and interrupted command output plus manual context compaction and thread summary, default 720px narrow reachability, resizable navigation/Review/Terminal/PR detail, PR tabs and expansion, MCP disclosure/result, multi-file and mixed-content Review, selection/Undo, large diff scrolling, and compact geometry contracts passed.",
+  "Electron host, native-window, coding-workspace routing, conversation/Composer and current image-attachment lifecycle plus current menus, current long, failed, and interrupted command output plus manual context compaction and thread summary, default 720px narrow reachability, resizable navigation/Review/Terminal/PR detail, PR tabs and expansion, MCP disclosure/result, multi-file and mixed-content Review, selection/Undo, large diff scrolling, and compact geometry contracts passed.",
 );

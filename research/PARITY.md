@@ -7,8 +7,8 @@ not establish full conversation, workspace, application, or product coverage.
 The authoritative current-build inventory is:
 
 - [`26.730.61309.md`](26.730.61309.md) for the current package fingerprint,
-  current long-command and six-group sidebar captures, and remaining
-  runtime-capture boundary;
+  current sidebar, command, approval, thread-overlay, and pasted-image
+  attachment captures plus the remaining runtime-capture boundary;
 - [`26.727.40816.md`](26.727.40816.md) for the previous main-Renderer shell,
   New chat, Terminal, PR, Composer, MCP, long-thread, approval, and command
   runtime sample;
@@ -96,8 +96,9 @@ The authoritative current-build inventory is:
   inline Add-resource picker. Public `ComposerPermissionMenu` and
   `ComposerResourcePicker` contracts, CDP, real Electron, and three regional
   gates pass at 0.10%, 0.13%, and 0.34% changed pixels. Active Goal/Plan modes
-  are independently current-observed; only native attachment selection
-  remains historical rather than being inferred from the resource menu.
+  are independently current-observed. That probe did not automate native
+  attachment selection; the later current-build pasted-image lifecycle is
+  recorded separately rather than inferred from the resource menu.
   Terminal multi-tab/process lifecycle, Review variants, broader
   shell matrices, and their external pixels remain `26.721.81911` historical
   evidence. The current project-named single Terminal tab and close/add
@@ -168,6 +169,26 @@ The authoritative current-build inventory is:
   ownership-masked full-window running comparison is 0.16%, promoting only the
   sampled manual compaction lifecycle; automatic/work modes, cancellation,
   repetition, and the thread summary remain open.
+- A fifth current-build task independently reaches the thread summary as an
+  environment/Git workflow overlay rather than context-compaction text. Its
+  public 300×199 surface, Browser/CDP behavior, real Electron interaction, and
+  ownership-scoped pixel gate pass; populated resource sections and compact or
+  pinned variants remain open.
+- Two current command-approval tasks complete the previously open success
+  paths. One drives `Allow once`; the other selects `Allow similar commands`
+  and proves an identical second command no longer asks while the global
+  policy remains `Ask for approval`. Browser/CDP, Electron, schema-validated
+  traces, and four ownership-masked current-build frames pass under their 1.5%
+  limits. Approval timeout, repeated denial, other approval kinds, and rule
+  lifetime across restart boundaries remain open.
+- A separate current-build pasted-image task drives attachment ready, Remove,
+  focus restoration, re-add, submit, sent-media ownership, exact completion,
+  and empty-Composer restoration. The public `ComposerAttachment`,
+  `MessageAttachment`, five-event trace, 81-frame Browser/CDP matrix, real
+  Electron flow, and two ownership-masked comparisons pass at 0.39% and 0.79%
+  under independent 1.5% limits. Native file-panel selection, non-image and
+  multi-attachment states, upload/error, overflow, and plugin variants remain
+  open.
 - npm publication remains out of scope until the agreed P0/P1 coverage and
   release acceptance surfaces are complete.
 
@@ -248,6 +269,14 @@ title, dynamic response text/actions, Composer internals, and non-owning
 scrollbar while preserving the timeline, failed command disclosure, Shell
 card, reverse-tail viewport, and exit footer. The hard threshold is 1%; CDP
 and Electron independently lock every masked semantic and interaction.
+
+The current image-attachment comparison uses separate 906×820 ready and
+completed references. Its masks exclude the private sidebar, header/task
+labels, dynamic transcript glyphs, Composer text, and non-owning scrollbar
+while retaining the draft/sent attachment geometry, user-message silhouette,
+Composer boundary, actions, and spacing. The comparisons measure 0.39% and
+0.79% under independent 1.5% hard limits; CDP and Electron separately drive
+the ownership and full Remove → Add → Submit → completion lifecycle.
 
 Broader final visual optimization remains scheduled after the remaining
 inventory, page compositions, and state transitions stabilize. A passing
