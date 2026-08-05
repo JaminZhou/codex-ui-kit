@@ -4,6 +4,7 @@ import {
   hasActiveTurnWork,
   initialProtocolState,
   isTurnActive,
+  messageAttachmentAccessibleLabel,
   messageAttachmentPreviewSource,
   reduceProtocolNotification,
   reduceProtocolTrace,
@@ -149,6 +150,29 @@ describe("protocol lifecycle reducer", () => {
         "fallback",
       ),
     ).toBe("fallback");
+  });
+
+  it("preserves attachment names and disambiguates generic image labels", () => {
+    const generic = {
+      kind: "image" as const,
+      label: "User attachment",
+      source: "data:image/png;base64,fixture",
+      sourceType: "remote" as const,
+    };
+    const named = { ...generic, label: "architecture.png" };
+
+    expect(messageAttachmentAccessibleLabel(named, 0, 2)).toBe(
+      "architecture.png",
+    );
+    expect(messageAttachmentAccessibleLabel(generic, 0, 2)).toBe(
+      "User attachment 1",
+    );
+    expect(messageAttachmentAccessibleLabel(generic, 1, 2)).toBe(
+      "User attachment 2",
+    );
+    expect(messageAttachmentAccessibleLabel(generic, 0, 1)).toBe(
+      "User attachment",
+    );
   });
 
   it("replays a successful public MCP integration lifecycle", () => {

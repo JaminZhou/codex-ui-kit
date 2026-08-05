@@ -45,6 +45,17 @@ export interface DemoMessageAttachment {
   sourceType: "local" | "remote";
 }
 
+export function messageAttachmentAccessibleLabel(
+  attachment: DemoMessageAttachment,
+  index: number,
+  count: number,
+): string {
+  const label = attachment.label.trim() || "User attachment";
+  return count > 1 && label === "User attachment"
+    ? `${label} ${index + 1}`
+    : label;
+}
+
 export function messageAttachmentPreviewSource(
   attachment: DemoMessageAttachment,
   fallback: string,

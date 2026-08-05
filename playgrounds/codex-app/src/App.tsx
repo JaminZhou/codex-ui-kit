@@ -91,6 +91,7 @@ import {
   hasActiveTurnWork,
   initialProtocolState,
   isTurnActive,
+  messageAttachmentAccessibleLabel,
   messageAttachmentPreviewSource,
   reduceProtocolNotification,
   settleApprovedCommandReplay,
@@ -3965,9 +3966,17 @@ export function App() {
               message.role === "user" && message.attachments?.length
                 ? message.attachments.map((attachment, index) => (
                     <MessageAttachment
-                      alt="User attachment"
+                      alt={messageAttachmentAccessibleLabel(
+                        attachment,
+                        index,
+                        message.attachments?.length ?? 0,
+                      )}
                       key={`${message.id}:attachment:${index}`}
-                      label="User attachment"
+                      label={messageAttachmentAccessibleLabel(
+                        attachment,
+                        index,
+                        message.attachments?.length ?? 0,
+                      )}
                       onClick={() => undefined}
                       previewSrc={messageAttachmentPreviewSource(
                         attachment,
