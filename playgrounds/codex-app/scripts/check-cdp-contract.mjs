@@ -1647,7 +1647,10 @@ for (const scene of visualScenes) {
     if (contract.horizontalOverflow > 1) {
       throw new Error(`${scene.id}: horizontal overflow ${contract.horizontalOverflow}px.`);
     }
-    if (scene.scenario === "approval-denied") {
+    if (
+      scene.scenario === "approval-denied" ||
+      scene.scenario === "approval-allow-once"
+    ) {
       const approvalContract = await page.evaluate(() => {
         const rect = (element) => {
           if (!element) return null;
@@ -1717,8 +1720,31 @@ for (const scene of visualScenes) {
           approvalContract.commandSummary?.replace(/\s+/g, " ").trim() ??
           null;
       }
+      if (scene.id === "approval-current-allow-once-completed") {
+        await page
+          .getByRole("button", {
+            exact: true,
+            name: "Worked for 4m 50s",
+          })
+          .click();
+        approvalContract.commandSummary = await page
+          .locator(
+            ".codex-ui-command-execution .codex-ui-activity__summary",
+          )
+          .textContent();
+        approvalContract.commandSummary =
+          approvalContract.commandSummary?.replace(/\s+/g, " ").trim() ??
+          null;
+      }
+      const pendingApprovalScene =
+        scene.id === "approval-current-pending" ||
+        scene.id === "approval-current-allow-once-pending";
+      const expectedPendingDuration =
+        scene.id === "approval-current-allow-once-pending"
+          ? "Working for 4m 33s"
+          : "Working for 14s";
       if (
-        scene.id === "approval-current-pending" &&
+        pendingApprovalScene &&
         (!approvalContract.approval ||
           approvalContract.approval.decision !== "pending" ||
           approvalContract.approval.presentation !== "composer" ||
@@ -1726,7 +1752,7 @@ for (const scene of visualScenes) {
           Math.abs(approvalContract.approval.rect.top - 642) > 1 ||
           Math.abs(approvalContract.approval.rect.width - 736) > 1 ||
           Math.abs(approvalContract.approval.rect.height - 162) > 1 ||
-          approvalContract.activitySummary !== "Working for 14s" ||
+          approvalContract.activitySummary !== expectedPendingDuration ||
           approvalContract.commandSummary !==
             "Running open -a Calculator" ||
           approvalContract.composer !== null ||
@@ -1762,6 +1788,95 @@ for (const scene of visualScenes) {
         throw new Error(
           `${scene.id}: current denied approval contract failed: ${JSON.stringify(approvalContract)}`,
         );
+      }
+      if (
+        scene.id === "approval-current-allow-once-completed" &&
+        (approvalContract.approval !== null ||
+          approvalContract.activitySummary !== "Worked for 4m 50s" ||
+          approvalContract.commandSummary !==
+            "Completed open -a Calculator" ||
+          approvalContract.assistantText !== "ALLOW ONCE COMPLETE." ||
+          !approvalContract.composer ||
+          Math.abs(approvalContract.composer.left - 359) > 1 ||
+          Math.abs(approvalContract.composer.top - 706) > 1 ||
+          Math.abs(approvalContract.composer.width - 736) > 1 ||
+          Math.abs(approvalContract.composer.height - 98) > 1 ||
+          approvalContract.permissionLabel !== "Ask for approval")
+      ) {
+        throw new Error(
+          `${scene.id}: current allow-once completion contract failed: ${JSON.stringify(approvalContract)}`,
+        );
+      }
+      if (scene.id === "approval-current-allow-once-pending") {
+        await page
+          .getByTestId("current-approval-request")
+          .getByRole("button", { exact: true, name: "Allow once" })
+          .click();
+        await page.waitForSelector(
+          '.demo-root[data-frame="approval-current-allow-once-completed"]',
+        );
+        await page
+          .getByText("ALLOW ONCE COMPLETE.", { exact: true })
+          .waitFor();
+        const restoredComposer = await page.evaluate(() => {
+          const composer = document.querySelector(
+            '.codex-ui-composer textarea',
+          );
+          return {
+            activeLabel:
+              document.activeElement?.getAttribute("aria-label") ?? null,
+            approvalCount: document.querySelectorAll(
+              '[data-testid="current-approval-request"]',
+            ).length,
+            composerValue:
+              composer instanceof HTMLTextAreaElement
+                ? composer.value
+                : null,
+            permissionLabel:
+              document
+                .querySelector(".demo-composer-permission-trigger")
+                ?.textContent?.replace(/^◉/, "")
+                .trim() ?? null,
+          };
+        });
+        if (
+          restoredComposer.approvalCount !== 0 ||
+          restoredComposer.composerValue !== "" ||
+          restoredComposer.activeLabel !== "Message composer" ||
+          restoredComposer.permissionLabel !== "Ask for approval"
+        ) {
+          throw new Error(
+            `${scene.id}: Allow once did not restore the unchanged focused Composer: ${JSON.stringify(restoredComposer)}`,
+          );
+        }
+        await page
+          .getByRole("button", {
+            exact: true,
+            name: "Worked for 4m 50s",
+          })
+          .click();
+        const approvedContract = await page.evaluate(() => {
+          const command = document.querySelector(
+            '[data-testid="command-execution"]',
+          );
+          return {
+            commandStatus: command?.getAttribute("data-execution-status"),
+            commandSummary:
+              command
+                ?.querySelector(".codex-ui-activity__summary")
+                ?.textContent?.replace(/\s+/g, " ")
+                .trim() ?? null,
+          };
+        });
+        if (
+          approvedContract.commandStatus !== "completed" ||
+          approvedContract.commandSummary !==
+            "Completed open -a Calculator"
+        ) {
+          throw new Error(
+            `${scene.id}: Allow once did not complete exactly one command: ${JSON.stringify(approvedContract)}`,
+          );
+        }
       }
     }
     if (scene.scenario === "conversation-lifecycle") {

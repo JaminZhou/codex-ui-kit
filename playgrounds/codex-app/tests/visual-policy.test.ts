@@ -100,7 +100,7 @@ describe("lifecycle visual policy", () => {
     );
   });
 
-  it("gates current pending and denied command approval regions", () => {
+  it("gates current command approval decision regions", () => {
     expect(contract).toContain(
       "CODEX_UI_KIT_APPROVAL_PENDING_REFERENCE",
     );
@@ -108,10 +108,16 @@ describe("lifecycle visual policy", () => {
       "CODEX_UI_KIT_APPROVAL_DENIED_REFERENCE",
     );
     expect(contract).toContain(
+      "CODEX_UI_KIT_APPROVAL_ALLOW_ONCE_COMPLETED_REFERENCE",
+    );
+    expect(contract).toContain(
       "CODEX_UI_KIT_APPROVAL_PENDING_MAX_DIFF_RATIO",
     );
     expect(contract).toContain(
       "CODEX_UI_KIT_APPROVAL_DENIED_MAX_DIFF_RATIO",
+    );
+    expect(contract).toContain(
+      "CODEX_UI_KIT_APPROVAL_ALLOW_ONCE_COMPLETED_MAX_DIFF_RATIO",
     );
     expect(contract).toContain(
       "current-build approval pixel ratio",

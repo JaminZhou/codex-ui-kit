@@ -1,3 +1,4 @@
+import approvalAllowOnceTrace from "../fixtures/traces/approval-allow-once.jsonl?raw";
 import approvalDeniedTrace from "../fixtures/traces/approval-denied.jsonl?raw";
 import compactionTrace from "../fixtures/traces/compaction.jsonl?raw";
 import contextSummaryTrace from "../fixtures/traces/context-summary.jsonl?raw";
@@ -18,6 +19,7 @@ import workflowTrace from "../fixtures/traces/workspace-workflow.jsonl?raw";
 import type { ProtocolEventRecord } from "./protocol-state";
 
 export type ReplayScenarioId =
+  | "approval-allow-once"
   | "approval-denied"
   | "background-terminal"
   | "command-failure-recovery"
@@ -77,6 +79,12 @@ function scenario(
 }
 
 export const replayScenarios: Record<ReplayScenarioId, ReplayScenario> = {
+  "approval-allow-once": scenario(
+    "approval-allow-once",
+    "Approval allowed once",
+    "A current command pauses in the Composer dock, is allowed exactly once, completes, and restores the unchanged approval policy.",
+    approvalAllowOnceTrace,
+  ),
   "approval-denied": scenario(
     "approval-denied",
     "Approval denied",

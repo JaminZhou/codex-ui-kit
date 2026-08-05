@@ -102,6 +102,8 @@ const currentBuildApprovalPendingReference =
   process.env.CODEX_UI_KIT_APPROVAL_PENDING_REFERENCE;
 const currentBuildApprovalDeniedReference =
   process.env.CODEX_UI_KIT_APPROVAL_DENIED_REFERENCE;
+const currentBuildApprovalAllowOnceCompletedReference =
+  process.env.CODEX_UI_KIT_APPROVAL_ALLOW_ONCE_COMPLETED_REFERENCE;
 const currentBuildApprovalReferenceSize = {
   height: 820,
   width: 906,
@@ -1136,10 +1138,13 @@ for (const scene of selectedScenes) {
   }
 
   const currentBuildApprovalReference =
-    scene.id === "approval-current-pending"
+    scene.id === "approval-current-pending" ||
+    scene.id === "approval-current-allow-once-pending"
       ? currentBuildApprovalPendingReference
       : scene.id === "approval-current-denied"
         ? currentBuildApprovalDeniedReference
+        : scene.id === "approval-current-allow-once-completed"
+          ? currentBuildApprovalAllowOnceCompletedReference
         : undefined;
   if (currentBuildApprovalReference) {
     const reference = flattenPng(
@@ -1161,7 +1166,8 @@ for (const scene of selectedScenes) {
     }
     const actualRegion = cropPng(actual, 274, 0, 906, 820);
     const masks =
-      scene.id === "approval-current-pending"
+      scene.id === "approval-current-pending" ||
+      scene.id === "approval-current-allow-once-pending"
         ? [
             { height: 55, left: 0, top: 0, width: 906 },
             { height: 48, left: 264, top: 70, width: 548 },
@@ -1182,9 +1188,12 @@ for (const scene of selectedScenes) {
       maskPng(clonePng(actualRegion), masks),
     );
     const maximumRatio = environmentRatio(
-      scene.id === "approval-current-pending"
+      scene.id === "approval-current-pending" ||
+      scene.id === "approval-current-allow-once-pending"
         ? "CODEX_UI_KIT_APPROVAL_PENDING_MAX_DIFF_RATIO"
-        : "CODEX_UI_KIT_APPROVAL_DENIED_MAX_DIFF_RATIO",
+        : scene.id === "approval-current-allow-once-completed"
+          ? "CODEX_UI_KIT_APPROVAL_ALLOW_ONCE_COMPLETED_MAX_DIFF_RATIO"
+          : "CODEX_UI_KIT_APPROVAL_DENIED_MAX_DIFF_RATIO",
       0.015,
     );
     await writeFile(
