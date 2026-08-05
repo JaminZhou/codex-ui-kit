@@ -140,6 +140,13 @@ export interface DemoProtocolState {
   turnDurationsMs: Record<string, number>;
 }
 
+export interface ApprovedCommandReplaySettlement {
+  durationMs?: number;
+  messageId: string;
+  messageText: string;
+  replacedMessageId?: string;
+}
+
 export const initialProtocolState: DemoProtocolState = {
   approvals: [],
   commands: [],
@@ -158,6 +165,69 @@ export const initialProtocolState: DemoProtocolState = {
   turnDurationMs: null,
   turnDurationsMs: {},
 };
+
+export function settleApprovedCommandReplay(
+  state: DemoProtocolState,
+  requestId: number | string,
+  settlement: ApprovedCommandReplaySettlement,
+): DemoProtocolState {
+  const approval = state.approvals.find(
+    (candidate) => candidate.requestId === requestId,
+  );
+  if (!approval) return state;
+
+  const replacedMessage = settlement.replacedMessageId
+    ? state.messages.find(({ id }) => id === settlement.replacedMessageId)
+    : undefined;
+  const approvedMessage: DemoMessage = {
+    id: settlement.messageId,
+    role: "assistant",
+    status: "completed",
+    text: settlement.messageText,
+    turnId: approval.turnId,
+    ...(replacedMessage
+      ? {
+          interruptionDurationMs: replacedMessage.interruptionDurationMs,
+        }
+      : {}),
+  };
+  const messages = replacedMessage
+    ? state.messages.map((message) =>
+        message.id === settlement.replacedMessageId
+          ? approvedMessage
+          : message,
+      )
+    : [...state.messages, approvedMessage];
+  const timeline = replacedMessage
+    ? state.timeline.map((entry) =>
+        entry.kind === "message" &&
+        entry.id === settlement.replacedMessageId
+          ? { ...entry, id: settlement.messageId }
+          : entry,
+      )
+    : [...state.timeline, { id: settlement.messageId, kind: "message" as const }];
+
+  return {
+    ...state,
+    approvals: state.approvals.map((candidate) =>
+      candidate.requestId === requestId
+        ? { ...candidate, decision: "approved" }
+        : candidate,
+    ),
+    commands: state.commands.map((command) =>
+      command.id === approval.itemId
+        ? {
+            ...command,
+            durationMs: settlement.durationMs ?? command.durationMs,
+            exitCode: 0,
+            status: "completed",
+          }
+        : command,
+    ),
+    messages,
+    timeline,
+  };
+}
 
 type RecordValue = Record<string, unknown>;
 

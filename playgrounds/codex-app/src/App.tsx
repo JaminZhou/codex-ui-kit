@@ -84,6 +84,7 @@ import {
   initialProtocolState,
   isTurnActive,
   reduceProtocolNotification,
+  settleApprovedCommandReplay,
   terminalTranscriptEvents,
   type DemoProtocolState,
   type ProtocolEventRecord,
@@ -1050,15 +1051,29 @@ export function App() {
     ],
   );
   const state = useMemo(
-    () =>
-      mode === "live"
-        ? liveState
-        : replayApprovalResolution
-          ? reduceProtocolNotification(lifecycleReplay, {
-              ...replayApprovalResolution,
-              kind: "approval-resolution",
-            })
-          : lifecycleReplay,
+    () => {
+      if (mode === "live") return liveState;
+      const resolvedReplay = replayApprovalResolution
+        ? reduceProtocolNotification(lifecycleReplay, {
+            ...replayApprovalResolution,
+            kind: "approval-resolution",
+          })
+        : lifecycleReplay;
+      return scenarioId === "approval-denied" &&
+        replayApprovalResolution?.decision === "approved"
+        ? settleApprovedCommandReplay(
+            resolvedReplay,
+            replayApprovalResolution.requestId,
+            {
+              durationMs: 23_000,
+              messageId: "assistant-approval-approved",
+              messageText:
+                "Approval was granted, and the command completed successfully.",
+              replacedMessageId: "assistant-approval-denied",
+            },
+          )
+        : resolvedReplay;
+    },
     [
       lifecycleReplay,
       liveState,
@@ -1298,6 +1313,7 @@ export function App() {
             decision: "approved",
             requestId,
           });
+          setReplayCount(scenario.events.length);
           setActiveFrame(null);
         }
         return;
@@ -3333,7 +3349,8 @@ export function App() {
                   (message.id === "assistant-recovery" ||
                     message.id === "assistant-workflow")) ||
                 (scenarioId === "approval-denied" &&
-                  message.id === "assistant-approval-denied") ||
+                  (message.id === "assistant-approval-denied" ||
+                    message.id === "assistant-approval-approved")) ||
                 (scenarioId === "long-command-output" &&
                   message.id === "assistant-long-command-final")) &&
               message.status === "completed" ? (
@@ -3344,7 +3361,8 @@ export function App() {
                   <McpResponseActions
                     label={
                       message.id === "assistant-workflow" ||
-                      message.id === "assistant-approval-denied"
+                      message.id === "assistant-approval-denied" ||
+                      message.id === "assistant-approval-approved"
                         ? "Response actions"
                         : undefined
                     }
@@ -3662,6 +3680,7 @@ export function App() {
         command.id === "command-open-calculator"
       ) {
         const pending = command.status === "running";
+        const approved = command.status === "completed";
         return (
           <ActivityTimeline
             key={`command:${command.id}`}
@@ -3683,6 +3702,8 @@ export function App() {
               summary={
                 pending ? (
                   <>Running {command.command}</>
+                ) : approved ? (
+                  <>Completed {command.command}</>
                 ) : (
                   <>Did not run {command.command}</>
                 )

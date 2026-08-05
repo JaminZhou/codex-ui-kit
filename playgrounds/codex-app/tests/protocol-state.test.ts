@@ -6,11 +6,52 @@ import {
   isTurnActive,
   reduceProtocolNotification,
   reduceProtocolTrace,
+  settleApprovedCommandReplay,
   terminalTranscriptEvents,
 } from "../src/protocol-state";
 import { replayScenarios } from "../src/replay";
 
 describe("protocol lifecycle reducer", () => {
+  it("settles an approved command replay with completed work and a final response", () => {
+    const scenario = replayScenarios["approval-denied"];
+    const completed = reduceProtocolTrace(scenario.events);
+    const settled = settleApprovedCommandReplay(
+      completed,
+      "approval-open-calculator",
+      {
+        durationMs: 23_000,
+        messageId: "assistant-approval-approved",
+        messageText:
+          "Approval was granted, and the command completed successfully.",
+        replacedMessageId: "assistant-approval-denied",
+      },
+    );
+
+    expect(settled.approvals).toEqual([
+      expect.objectContaining({ decision: "approved" }),
+    ]);
+    expect(settled.commands).toEqual([
+      expect.objectContaining({
+        durationMs: 23_000,
+        exitCode: 0,
+        status: "completed",
+      }),
+    ]);
+    expect(settled.messages.at(-1)).toMatchObject({
+      id: "assistant-approval-approved",
+      status: "completed",
+      text: "Approval was granted, and the command completed successfully.",
+    });
+    expect(settled.timeline.at(-1)).toEqual({
+      id: "assistant-approval-approved",
+      kind: "message",
+    });
+    expect(settled.timeline).toContainEqual({
+      id: "command-open-calculator",
+      kind: "command",
+    });
+  });
+
   it("keeps streamed text across a retry and reaches a clean completion", () => {
     const scenario = replayScenarios["streaming-recovery"];
     const retryState = reduceProtocolTrace(

@@ -2497,6 +2497,61 @@ try {
   await currentDeniedApprovalApp.close();
 }
 
+const currentApprovedApprovalScene = {
+  frame: "approval-current-pending",
+  id: "electron-current-approval-approved",
+  scenario: "approval-denied",
+};
+const {
+  app: currentApprovedApprovalApp,
+  page: currentApprovedApprovalPage,
+} = await launchScene(currentApprovedApprovalScene, { capture: false });
+try {
+  await currentApprovedApprovalPage
+    .getByTestId("current-approval-request")
+    .getByRole("button", { name: "Allow once" })
+    .click();
+  await currentApprovedApprovalPage
+    .getByText(
+      "Approval was granted, and the command completed successfully.",
+      { exact: true },
+    )
+    .waitFor();
+  const approvalCount = await currentApprovedApprovalPage
+    .getByTestId("current-approval-request")
+    .count();
+  await currentApprovedApprovalPage
+    .getByRole("button", { exact: true, name: "Worked for 23s" })
+    .click();
+  const commandExecution = currentApprovedApprovalPage.getByTestId(
+    "command-execution",
+  );
+  await commandExecution.waitFor();
+  const commandStatus = await commandExecution.getAttribute(
+    "data-execution-status",
+  );
+  const commandSummary = (
+    await commandExecution.locator(".codex-ui-activity__summary").textContent()
+  )
+    ?.replace(/\s+/g, " ")
+    .trim();
+  if (
+    approvalCount !== 0 ||
+    commandStatus !== "completed" ||
+    commandSummary !== "Completed open -a Calculator"
+  ) {
+    throw new Error(
+      `Electron current approval acceptance did not settle the command replay: ${JSON.stringify({
+        approvalCount,
+        commandSummary,
+        commandStatus,
+      })}`,
+    );
+  }
+} finally {
+  await currentApprovedApprovalApp.close();
+}
+
 const longCommandOutputScene = {
   frame: "command-output-expanded",
   id: "electron-current-long-command-output",

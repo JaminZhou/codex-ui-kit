@@ -188,10 +188,13 @@ function mergeStatusAfterRequirements(
   state: PullRequestLifecycleState,
   reviewRequirement = state.reviewRequirement,
 ) {
-  return state.checkStatus === "passed" &&
-    reviewRequirement === "passed"
-    ? "ready"
-    : "blocked";
+  if (state.checkStatus === "failed" || reviewRequirement === "failed") {
+    return "blocked";
+  }
+  if (state.checkStatus === "running" || reviewRequirement === "pending") {
+    return "checking";
+  }
+  return "ready";
 }
 
 export function reducePullRequestLifecycle(

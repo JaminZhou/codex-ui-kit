@@ -71,6 +71,23 @@ describe("pull request lifecycle", () => {
     ).toBe("merged");
   });
 
+  it("keeps merge checking when a review succeeds before checks finish", () => {
+    const initial = initialPullRequestLifecycleState("pr-checks-running");
+    const submitting = reducePullRequestLifecycle(initial, {
+      type: "review/submit",
+    });
+    const reviewed = reducePullRequestLifecycle(submitting, {
+      type: "review/succeed",
+    });
+
+    expect(reviewed).toMatchObject({
+      checkStatus: "running",
+      mergeStatus: "checking",
+      reviewRequirement: "passed",
+      reviewStatus: "submitted",
+    });
+  });
+
   it("preserves comment text on failure and clears it on success", () => {
     const initial = initialPullRequestLifecycleState(null);
     const edited = reducePullRequestLifecycle(initial, {
