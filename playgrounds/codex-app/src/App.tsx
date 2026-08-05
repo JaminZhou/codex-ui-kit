@@ -1783,7 +1783,11 @@ export function App() {
               key={project.id}
               label={project.label}
               leading={<SidebarGlyph name="folder" />}
-              selected={project.selected && view === "conversation"}
+              selected={
+                project.selected &&
+                view === "conversation" &&
+                mode === "replay"
+              }
               status={
                 project.selected &&
                 (hasActiveTurnWork(state) || isTurnActive(state.status))

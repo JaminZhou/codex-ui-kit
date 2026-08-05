@@ -3236,6 +3236,25 @@ try {
       `sidebar-current: compact interaction contract failed: ${JSON.stringify(compact)}`,
     );
   }
+  await sidebarPage
+    .getByRole("button", { exact: true, name: "Live local" })
+    .click();
+  const liveCurrentPages = await sidebarPage.evaluate(() =>
+    Array.from(
+      document.querySelectorAll(
+        '.codex-ui-app-sidebar [aria-current="page"]',
+      ),
+      (item) =>
+        item
+          .querySelector(".codex-ui-app-sidebar__item-label")
+          ?.textContent?.trim() ?? item.textContent?.trim(),
+    ),
+  );
+  if (JSON.stringify(liveCurrentPages) !== JSON.stringify(["Live local"])) {
+    throw new Error(
+      `sidebar-current: Live local did not own the only current page: ${JSON.stringify(liveCurrentPages)}`,
+    );
+  }
   await projectsToggle.click();
   const collapsed = {
     expanded: await projectsToggle.getAttribute("aria-expanded"),
