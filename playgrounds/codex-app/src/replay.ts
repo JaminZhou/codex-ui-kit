@@ -1,5 +1,6 @@
 import approvalDeniedTrace from "../fixtures/traces/approval-denied.jsonl?raw";
 import compactionTrace from "../fixtures/traces/compaction.jsonl?raw";
+import commandFailureRecoveryTrace from "../fixtures/traces/command-failure-recovery.jsonl?raw";
 import conversationLifecycleTrace from "../fixtures/traces/conversation-lifecycle.jsonl?raw";
 import backgroundTerminalTrace from "../fixtures/traces/background-terminal.jsonl?raw";
 import interruptionTrace from "../fixtures/traces/interruption.jsonl?raw";
@@ -18,6 +19,7 @@ import type { ProtocolEventRecord } from "./protocol-state";
 export type ReplayScenarioId =
   | "approval-denied"
   | "background-terminal"
+  | "command-failure-recovery"
   | "conversation-lifecycle"
   | "streaming-recovery"
   | "terminal-lifecycle"
@@ -90,6 +92,12 @@ export const replayScenarios: Record<ReplayScenarioId, ReplayScenario> = {
     "Background terminal",
     "Process output, terminal interaction, resize, close, and restore.",
     backgroundTerminalTrace,
+  ),
+  "command-failure-recovery": scenario(
+    "command-failure-recovery",
+    "Recover from command failure",
+    "A current stdout/stderr command exits 7, expands into its bounded reverse-tail shell, and accepts a clean follow-up turn.",
+    commandFailureRecoveryTrace,
   ),
   "terminal-lifecycle": scenario(
     "terminal-lifecycle",

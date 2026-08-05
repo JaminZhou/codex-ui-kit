@@ -112,6 +112,12 @@ const currentBuildCommandOutputReferenceSize = {
   height: 820,
   width: 1180,
 };
+const currentBuildCommandFailureReference =
+  process.env.CODEX_UI_KIT_COMMAND_FAILURE_REFERENCE;
+const currentBuildCommandFailureReferenceSize = {
+  height: 820,
+  width: 1180,
+};
 const currentBuildWorkspaceReference =
   process.env.CODEX_UI_KIT_WORKSPACE_REFERENCE;
 const currentBuildWorkspaceReferenceSize = {
@@ -1254,6 +1260,71 @@ for (const scene of selectedScenes) {
     }
     console.log(
       `${scene.id}: current-build command-output pixel ratio ${comparison.ratio}`,
+    );
+  }
+
+  if (
+    scene.id === "command-failure-expanded" &&
+    currentBuildCommandFailureReference
+  ) {
+    const reference = flattenPng(
+      PNG.sync.read(await readFile(currentBuildCommandFailureReference)),
+      { blue: 24, green: 24, red: 24 },
+    );
+    if (
+      reference.width !== currentBuildCommandFailureReferenceSize.width ||
+      reference.height !== currentBuildCommandFailureReferenceSize.height
+    ) {
+      throw new Error(
+        `${scene.id}: current-build command-failure reference must be exactly ${currentBuildCommandFailureReferenceSize.width}x${currentBuildCommandFailureReferenceSize.height}, received ${reference.width}x${reference.height}.`,
+      );
+    }
+    if (
+      actual.width !== currentBuildCommandFailureReferenceSize.width ||
+      actual.height !== currentBuildCommandFailureReferenceSize.height
+    ) {
+      throw new Error(
+        `${scene.id}: current-build command-failure comparison requires an exact 1180x820 playground frame.`,
+      );
+    }
+    const masks = [
+      { height: 820, left: 0, top: 0, width: 274 },
+      { height: 47, left: 274, top: 0, width: 906 },
+      { height: 24, left: 274, top: 398, width: 736 },
+      { height: 42, left: 274, top: 428, width: 736 },
+      { height: 48, left: 474, top: 449, width: 536 },
+      { height: 70, left: 274, top: 539, width: 736 },
+      { height: 650, left: 1080, top: 47, width: 22 },
+      { height: 75, left: 284, top: 716, width: 714 },
+    ];
+    const comparison = comparePng(
+      maskPng(clonePng(reference), masks),
+      maskPng(clonePng(actual), masks),
+    );
+    const maximumRatio = environmentRatio(
+      "CODEX_UI_KIT_COMMAND_FAILURE_MAX_DIFF_RATIO",
+      0.01,
+    );
+    await writeFile(
+      join(artifactDirectory, `${scene.id}.current-build.png`),
+      PNG.sync.write(actual),
+    );
+    if (comparison.pixels > 0) {
+      await writeFile(
+        join(
+          artifactDirectory,
+          `${scene.id}.current-build.diff.png`,
+        ),
+        PNG.sync.write(comparison.diff),
+      );
+    }
+    if (comparison.ratio > maximumRatio) {
+      throw new Error(
+        `${scene.id}: current-build command-failure pixel ratio ${comparison.ratio} exceeds ${maximumRatio}.`,
+      );
+    }
+    console.log(
+      `${scene.id}: current-build command-failure pixel ratio ${comparison.ratio}`,
     );
   }
 

@@ -319,6 +319,27 @@ export const visualScenes = [
     surfaces: ["command"],
   },
   {
+    frame: "command-failure-output-running",
+    id: "command-failure-running",
+    maxPixelRatio: 0.0225,
+    scenario: "command-failure-recovery",
+    surfaces: ["command"],
+  },
+  {
+    frame: "command-failure-completed",
+    id: "command-failure-collapsed",
+    maxPixelRatio: 0.0225,
+    scenario: "command-failure-recovery",
+    surfaces: ["command"],
+  },
+  {
+    frame: "command-failure-recovered",
+    id: "command-failure-expanded",
+    maxPixelRatio: 0.0225,
+    scenario: "command-failure-recovery",
+    surfaces: ["command"],
+  },
+  {
     frame: "approval-pending",
     id: "approval-pending",
     scenario: "workspace-workflow",
@@ -546,6 +567,27 @@ export async function launchScene(
         turn.style.transform = "translateY(-210px)";
       }
     });
+  }
+  if (
+    capture &&
+    (scene.id === "command-failure-running" ||
+      scene.id === "command-failure-collapsed" ||
+      scene.id === "command-failure-expanded")
+  ) {
+    const timelineLabel =
+      scene.id === "command-failure-running" ? "Working" : "Worked for 12s";
+    await page
+      .getByRole("button", { exact: true, name: timelineLabel })
+      .click();
+    if (scene.id !== "command-failure-collapsed") {
+      await page
+        .locator('[data-item-id="command-failure-output"] summary')
+        .first()
+        .click();
+      await page.waitForSelector(
+        '[data-item-id="command-failure-output"] .codex-ui-command-output',
+      );
+    }
   }
   if (
     scene.view === "pull-request" &&

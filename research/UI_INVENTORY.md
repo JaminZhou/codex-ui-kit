@@ -54,8 +54,9 @@ observation from a previous build remains historical evidence.
 - Scoped CDP automation: available through a user-authorized second process;
   the Chromium profile is separate, but Codex application data and navigation
   are not fully isolated
-- Fresh current-build Renderer captures: one dark 1180×820 disposable task
-  verifies successful 400-line command output, and a separate read-only
+- Fresh current-build Renderer captures: two dark 1180×820 disposable tasks
+  verify successful 400-line command output plus mixed stdout/stderr failure
+  with exit code 7 and a successful same-thread follow-up, and a read-only
   sidebar sweep verifies all six sidebar groups at 1180×820, 820×680, and the
   exact 721/720 boundary. The sidebar remains 274px through 721px, auto-hides
   at 720px, stays pinned as a 274/446 split after an explicit Show action and
@@ -63,11 +64,11 @@ observation from a previous build remains historical evidence.
   preview. All other `26.727.40816` observations remain previous-build
   evidence until separately reached on `26.730.61309`.
 
-Current inventory: 77 surface groups; 7 have current-build runtime evidence,
+Current inventory: 78 surface groups; 8 have current-build runtime evidence,
 51 have previous-build-only runtime evidence, 19 remain `not_sampled`, and 0
-are `blocked_by_policy`. Current-build Browser verification covers 7 groups
-and Electron verification covers 7. Prior acceptance outside the sampled
-long-command and six-sidebar slices remains recorded as `partial_legacy`
+are `blocked_by_policy`. Current-build Browser verification covers 8 groups
+and Electron verification covers 8. Prior acceptance outside the sampled
+command and six-sidebar slices remains recorded as `partial_legacy`
 until current-build re-observation.
 
 The current package exposes candidates far beyond the old transcript sample:
@@ -602,8 +603,22 @@ and latest-line restoration after collapse/reopen. Electron drives the same
 interaction in a real 1180×820 `BrowserWindow`. The ownership-masked full
 1180×820 comparison passes at `0.001655643` under a 1.5% hard limit. This
 promotes `thread.command-execution` for the sampled current long-output
-contract. stdout/stderr separation, failure, interruption, active truncation
-copy affordances, background processes, and other command kinds remain open.
+contract.
+
+A second `26.730.61309` disposable task ran one read-only shell loop that
+emitted 80 stdout and 80 stderr lines before exiting with code 7. The current
+Renderer exposed `Worked for 12s`, a failed 736×246.58px `Shell` card, two
+copy controls, a 734×144px reverse-tail output viewport, 161 split lines
+including the trailing newline, and `Exit code 7`. A no-tool follow-up then
+completed successfully in the same thread. The independent trace models the
+running-output, collapsed failure, expanded failure, first completed turn,
+and recovered follow-up states. Browser/CDP now covers 70 lifecycle frames;
+Electron repeats disclosure, exact copied output, collapse/reopen, failure,
+and recovery. The ownership-masked full-window gate passes at
+`0.008898305084745763` under a 1% hard limit. This additionally promotes
+`thread.command-failure-recovery` only for recovery after a command-level failure.
+Interruption, active truncation copy affordances, background processes,
+transport-level retry, and other command kinds remain open.
 
 The interruption acceptance renders the observed summary statically rather than
 driving a host run-to-stop-to-summary transition, so that row also remains

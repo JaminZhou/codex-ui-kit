@@ -1189,9 +1189,9 @@ for (const scene of visualScenes) {
               ?.textContent?.trim(),
           }
         : null;
-      const commandExecution = document.querySelector(
-        '[data-item-id="command-long-output"]',
-      );
+      const commandExecution =
+        document.querySelector('[data-item-id="command-failure-output"]') ??
+        document.querySelector('[data-item-id="command-long-output"]');
       const commandOutput = (() => {
         if (!commandExecution) return null;
         const shell = commandExecution.querySelector(
@@ -1264,6 +1264,7 @@ for (const scene of visualScenes) {
               }
             : null,
           shellLabel: shellLabel?.textContent?.trim() ?? null,
+          status: commandExecution.getAttribute("data-execution-status"),
           summary:
             commandExecution
               .querySelector(".codex-ui-activity__summary")
@@ -2673,6 +2674,105 @@ for (const scene of visualScenes) {
             restoredBottom,
           })}`,
         );
+      }
+    }
+
+    if (
+      scene.id === "command-failure-running" ||
+      scene.id === "command-failure-collapsed" ||
+      scene.id === "command-failure-expanded"
+    ) {
+      const commandOutput = contract.commandOutput;
+      const running = scene.id === "command-failure-running";
+      const expanded = scene.id !== "command-failure-collapsed";
+      if (
+        !commandOutput ||
+        !commandOutput.timelineExpanded ||
+        commandOutput.timelineLabel !==
+          (running ? "Working" : "Worked for 12s") ||
+        commandOutput.executionExpanded !== expanded ||
+        commandOutput.status !== (running ? "running" : "failed") ||
+        !commandOutput.summary?.startsWith(
+          running ? "Running command" : "Ran sh -c 'i=1;",
+        ) ||
+        !commandOutput.commandLabel?.startsWith("$ sh -c 'i=1;") ||
+        commandOutput.commandExpanded !== "false" ||
+        commandOutput.lineCount !== 161 ||
+        commandOutput.shellLabel !== "Shell" ||
+        commandOutput.copyLabels.filter((label) => label === "Copy").length !==
+          2
+      ) {
+        throw new Error(
+          `${scene.id}: command failure lifecycle contract failed: ${JSON.stringify(commandOutput)}`,
+        );
+      }
+
+      if (
+        expanded &&
+        (!commandOutput.shell ||
+          Math.abs(commandOutput.shell.rect.width - 736) > 1 ||
+          commandOutput.shell.style.borderRadius !== "12.5px" ||
+          commandOutput.shell.style.overflow !== "hidden" ||
+          !commandOutput.output ||
+          Math.abs(commandOutput.output.rect.width - 734) > 1 ||
+          Math.abs(commandOutput.output.rect.height - 144) > 1 ||
+          commandOutput.output.clientHeight !== 144 ||
+          commandOutput.output.scrollHeight !== 3136 ||
+          Math.abs(commandOutput.output.scrollTop) > 1 ||
+          commandOutput.output.style.flexDirection !== "column-reverse" ||
+          commandOutput.output.style.fontSize !== "13px" ||
+          commandOutput.output.style.lineHeight !== "19.5px" ||
+          commandOutput.output.style.maxHeight !== "144px" ||
+          commandOutput.output.style.overflowY !== "auto" ||
+          commandOutput.output.style.padding !== "8px" ||
+          commandOutput.output.textStart !== "stderr-001\ns" ||
+          !commandOutput.output.textEnd.endsWith("080\nstderr-080\n") ||
+          (!running && commandOutput.footer?.text !== "Exit code 7"))
+      ) {
+        throw new Error(
+          `${scene.id}: expanded command failure output contract failed: ${JSON.stringify(commandOutput)}`,
+        );
+      }
+
+      if (scene.id === "command-failure-expanded") {
+        const commandLine = page.locator(
+          '[data-item-id="command-failure-output"] .codex-ui-command-execution__command-line',
+        );
+        await commandLine.press("Enter");
+        const keyboardExpanded = await commandLine.getAttribute(
+          "aria-expanded",
+        );
+        const executionSummary = page
+          .locator(
+            '[data-item-id="command-failure-output"] > .codex-ui-activity__disclosure > summary',
+          );
+        await executionSummary.click();
+        const collapsedOutputVisible = await page
+          .locator(
+            '[data-item-id="command-failure-output"] .codex-ui-command-output',
+          )
+          .isVisible();
+        await executionSummary.click();
+        const restoredBottom = await page.evaluate(() => {
+          const output = document.querySelector(
+            '[data-item-id="command-failure-output"] .codex-ui-command-output pre',
+          );
+          return output ? output.scrollTop : null;
+        });
+        if (
+          keyboardExpanded !== "true" ||
+          collapsedOutputVisible ||
+          restoredBottom === null ||
+          Math.abs(restoredBottom) > 1
+        ) {
+          throw new Error(
+            `${scene.id}: failure output keyboard/collapse restoration failed: ${JSON.stringify({
+              collapsedOutputVisible,
+              keyboardExpanded,
+              restoredBottom,
+            })}`,
+          );
+        }
       }
     }
 
