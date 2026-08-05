@@ -11,8 +11,8 @@ exit gates; it does not replace the inventory.
 ## Current position
 
 - The current installed package is Codex Desktop `26.730.61309` (`6223`).
-- The inventory contains 78 surface groups: 50 P0, 19 P1, and 9 P2.
-- 12 groups have current-build runtime evidence, 48 have previous-build-only
+- The inventory contains 79 surface groups: 51 P0, 19 P1, and 9 P2.
+- 13 groups have current-build runtime evidence, 48 have previous-build-only
   runtime evidence, and 18 have not been sampled.
 - The current `26.730.61309` refresh now covers all six left-sidebar groups
   plus the successful long-command surface. The sidebar capture locks the
@@ -84,9 +84,17 @@ exit gates; it does not replace the inventory.
   first command completes after approval, an identical second command
   completes without another prompt, the global Composer policy remains Ask,
   and Browser/CDP, Electron, and two current-build pixel gates pass at 1.21%
-  and 1.37% under 1.5% limits. The other
-  preceding `26.727.40816` results remain previous-build evidence. Attachment
-  variants, Terminal multi-tab/process behavior,
+  and 1.37% under 1.5% limits. An eighth current disposable task now locks the
+  pasted-image attachment lifecycle:
+  a 736×180 Composer, 80×80 attachment with a 78×78 preview and 16×16 Remove,
+  removal/focus restoration, re-attachment and submission, an 80×80 sent
+  message attachment, the exact final response, and the restored focused
+  736×98 Composer. Browser/CDP covers 81 frames, Electron drives the same
+  lifecycle, and current-build ready/completed regional gates pass at 0.39%
+  and 0.79% under 1.5% limits. Native file-panel selection, non-image files,
+  multi-attachment overflow, upload/error, and plugin variants remain open.
+  The preceding `26.727.40816` results remain previous-build evidence.
+  Attachment variants outside that sampled image path, Terminal multi-tab/process behavior,
   Review rename/delete variants, and broader shell evidence from
   `26.721.81911` remain historical regression evidence until re-observed. The
   current project-named single Terminal tab and close/add controls now pass
@@ -310,7 +318,8 @@ without confusing package readiness with full product reconstruction.
    real command approval pending → denied path additionally confirms
    non-execution and restores the current Composer. Allow once and the
    matching-command persistence rule are now delivered; continue with
-   attachment, approval timeout/`acceptForSession`, and broader recovery evidence;
+   approval timeout/`acceptForSession`, broader attachment variants, and
+   recovery evidence;
    retain queue pause/Resume only as a legacy compatibility fixture.
 6. **Coding workspace entry**: current project/context entry plus independent
    project → environment/worktree → command → approval → Review → Terminal →
@@ -331,7 +340,9 @@ without confusing package readiness with full product reconstruction.
     exit-code failure, interruption/settlement, manual context compaction,
     thread-summary Environment/Git state, and same-thread recovery are
     delivered. Approval allow-once and matching-command persistence are also
-    delivered. Continue with approval timeout/`acceptForSession`, attachment lifecycle, Markdown mutation/
+    delivered. The sampled pasted-image attachment lifecycle is also delivered;
+    continue with approval timeout/`acceptForSession`, native-file and attachment
+    upload/error/multi-item variants, Markdown mutation/
     large content, populated summary resource sections, subagents, and
     transport recovery.
 11. **P1 resources and integrations**: Browser/artifact/document previews,

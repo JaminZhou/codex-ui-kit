@@ -14,7 +14,8 @@ Codex UI Kit exposes protocol-neutral React components. Hosts own data fetching,
 - `AgentThreadViewport`: focusable, follow-aware scroll surface with latest-turn detection, normal or reverse latest-origin scrolling, reduced-motion-safe auto-follow, direct-input cancellation for programmatic following, and a sticky footer.
 - `AgentTurn` and `ActivityGroup`: explicit standard and grouped spacing contracts.
 - `ThreadVirtualizedPlaceholder`: estimated-height placeholder for host-owned thread virtualization.
-- `AgentMessage`: user, assistant, and system presentation with user-bubble geometry, edit activation, actions, running ARIA state, and target highlighting.
+- `AgentMessage`: user, assistant, and system presentation with user-bubble geometry, edit activation, actions, running ARIA state, target highlighting, and a message-owned attachment slot outside the editable user bubble.
+- `MessageAttachment`: current-build sent-image presentation with an explicit host-owned open action and accessible label.
 - `ThreadLoadingState` and `ThreadThinkingPlaceholder`: loading, reconnecting, and thinking states.
 - `ThreadContextOptimization`: manual compaction, automatic compaction, and Work-mode conversation optimization in running and completed states.
 - `ThreadInterruptionSummary`: current-build stop-result row with duration
@@ -91,7 +92,7 @@ All privileged behavior remains host-owned. The components never auto-approve co
   external queue state, and the input card in distinct ownership slots.
 - `ComposerContextBar` and `ComposerContextControl`: accessible project,
   environment, branch, or host-defined context controls above the Composer.
-- `ComposerAttachment`: pill, card, and image layouts with ready, uploading, error, open, and remove states.
+- `ComposerAttachment`: pill, card, and current-build 80px image layouts with ready, uploading, error, open, and remove states.
 - `ComposerMentionMenu`: grouped file, skill, app, agent, or custom mentions with loading, empty, disabled, active, and keyboard-selection states.
 - `ComposerModeIndicator`: Plan, Goal, Review, or host-defined footer mode with a clear affordance.
 - `QueuedPromptList`: reorderable queued follow-ups with queued, editing, paused, interrupted, retry, steer, delete, resume, and queue-toggle behavior.

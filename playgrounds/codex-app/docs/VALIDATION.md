@@ -3,7 +3,8 @@
 Every deterministic scenario has one ID and produces four evidence layers:
 
 1. **Protocol** — ordered App Server notifications, server requests, and
-   request responses checked against the pinned generated schemas.
+   request responses checked against the pinned generated schemas. The current
+   deterministic set contains 20 fixtures and 246 events.
 2. **CDP** — DOM identity, computed layout, focus, scrolling, and named-surface
    geometry, including the current 274px sidebar, 46px titlebar inset, 70px
    header, 30px rows, fixed footer, collapsible groups, focusable row actions,
@@ -22,7 +23,9 @@ Every deterministic scenario has one ID and produces four evidence layers:
    queue proves that its action menu is portaled without disabling bounded
    vertical scrolling, and replay controls prove that the Composer follows
    protocol running/completed positions while clearing stale Stop and paused
-   interaction state, including leaving the disabled fixture frame. Scenario
+   interaction state, including leaving the disabled fixture frame. Current
+   pasted-image acceptance additionally locks the ready geometry, sent-message
+   ownership, and Remove → Add → Submit → completion lifecycle. Scenario
    selection also resets the owned viewport before the scroll callback
    confirms following, while submission/navigation consume fixture-only
    Composer attachments, final-row removal leaves paused queue state, and
@@ -44,6 +47,9 @@ Every deterministic scenario has one ID and produces four evidence layers:
    continuation and return-to-latest in a real 1180×820 window. A separate
    current Composer flow verifies permission selection, Escape/focus
    restoration, resource keyboard selection, and the 205px long-input clamp.
+   A dedicated current image-attachment flow repeats removal, re-addition,
+   submission, exact completion, focus restoration, and unchanged approval
+   policy in the real window.
    A current long-thread flow verifies compact navigation selection, a
    seven-turn mounted window, negative away-from-latest scrolling, and
    return-to-latest at scroll origin zero. The current long-command flow
@@ -97,8 +103,12 @@ Every deterministic scenario has one ID and produces four evidence layers:
    `CODEX_UI_KIT_APPROVAL_SIMILAR_MENU_REFERENCE` and
    `CODEX_UI_KIT_APPROVAL_SIMILAR_COMPLETED_REFERENCE`; it retains the split
    menu, approval silhouette/actions, two-turn activity structure, and restored
-   Composer under the same independent 1.5% hard limits. Current long command output accepts a
-   full 1180×820 `CODEX_UI_KIT_COMMAND_OUTPUT_REFERENCE`; its ownership mask
+   Composer under the same independent 1.5% hard limits. Current image
+   attachments accept `CODEX_UI_KIT_ATTACHMENT_READY_REFERENCE` and
+   `CODEX_UI_KIT_ATTACHMENT_COMPLETED_REFERENCE`; their masks retain the
+   draft/sent 80px media geometry, message and Composer silhouettes, actions,
+   and spacing under independent 1.5% hard limits. Current long command output
+   accepts a full 1180×820 `CODEX_UI_KIT_COMMAND_OUTPUT_REFERENCE`; its ownership mask
    retains the command-card boundary, disclosure/Shell/output structure, and
    spacing under a 1.5% hard limit. Transparent
    Electron/CDP reference pixels are composited onto the observed `#181818`
@@ -129,6 +139,8 @@ Historical approval pending and denied comparisons measured `0.008493512` and
 comparisons measured `0.012554514617993862` and `0.002993592849835783`.
 The current matching-command menu and repeated completed comparisons measured
 `0.012100899154686911` and `0.013686534216335542`.
+The current attachment-ready and attachment-completed comparisons measured
+`0.0038954396166478223` and `0.007934905507995478`.
 Current `26.730.61309` long command output measured
 `0.001655643`.
 
@@ -206,7 +218,7 @@ CDP independently locks the current 736×134/736×259 Composer geometry,
 480×222 permission menu, 736×320 resource picker, 28px controls, 13px queue
 inset, navigation markers, disabled semantics, and windowed placeholder.
 
-The reviewed matrix now totals 80 frames. Its historical two command-approval frames cover the
+The reviewed matrix now totals 81 frames. Its historical two command-approval frames cover the
 current 736×162 pending Composer-dock card and the denied completion with
 response actions and restored 736×98 Composer. CDP verifies request state,
 command/activity labels, dimensions, and permission restoration. Electron
@@ -224,3 +236,8 @@ current split menu plus a two-turn trace in which only the first identical
 command requests approval. Browser/CDP and Electron drive the menu selection,
 verify both command completions and exact final responses, and prove the
 second turn avoids another card without changing the global Ask policy.
+The current attachment pair adds one ready and one completed state while
+replacing the legacy generic attachment frame. Browser/CDP locks the exact
+736×180 Composer, 80×80 draft/sent attachments, 78×78 draft image, Remove
+action, ownership, radii, and completed 736×98 Composer; Electron drives the
+same interaction and verifies the exact final response, focus, and permission.

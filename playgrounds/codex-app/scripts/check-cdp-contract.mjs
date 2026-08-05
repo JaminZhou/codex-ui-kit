@@ -2664,6 +2664,105 @@ for (const scene of visualScenes) {
         );
       }
     }
+    if (scene.scenario === "attachment-lifecycle") {
+      const attachmentLifecycle = await page.evaluate(() => {
+        const rect = (element) => {
+          if (!element) return null;
+          const value = element.getBoundingClientRect();
+          return {
+            height: value.height,
+            left: value.left,
+            top: value.top,
+            width: value.width,
+          };
+        };
+        const composer = document.querySelector(".codex-ui-composer");
+        const composerAttachment = composer?.querySelector(
+          ".codex-ui-composer-attachment",
+        );
+        const composerImage = composerAttachment?.querySelector("img");
+        const remove = composerAttachment?.querySelector(
+          'button[aria-label^="Remove "]',
+        );
+        const messageAttachment = document.querySelector(
+          ".codex-ui-agent-message__attachments .codex-ui-message-attachment",
+        );
+        return {
+          composer: rect(composer),
+          composerAttachment: rect(composerAttachment),
+          composerAttachmentRadius: composerAttachment
+            ? getComputedStyle(composerAttachment).borderRadius
+            : null,
+          composerImage: rect(composerImage),
+          finalCount: Array.from(
+            document.querySelectorAll(
+              '.codex-ui-agent-message[data-role="assistant"]',
+            ),
+          ).filter(
+            (element) =>
+              element.textContent?.trim() ===
+              "ATTACHMENT LIFECYCLE COMPLETE.",
+          ).length,
+          messageAttachment: rect(messageAttachment),
+          messageAttachmentRadius: messageAttachment
+            ? getComputedStyle(messageAttachment).borderRadius
+            : null,
+          messageImageRadius: messageAttachment
+            ? getComputedStyle(messageAttachment.querySelector("img"))
+                .borderRadius
+            : null,
+          phase: document
+            .querySelector(".demo-root")
+            ?.getAttribute("data-composer-phase"),
+          remove: rect(remove),
+        };
+      });
+      contract.attachmentLifecycle = attachmentLifecycle;
+      const ready = scene.id === "attachment-current-ready";
+      if (
+        !attachmentLifecycle.composer ||
+        Math.abs(attachmentLifecycle.composer.width - 736) > 1 ||
+        Math.abs(attachmentLifecycle.composer.left - 359.05) > 1 ||
+        (ready
+          ? !attachmentLifecycle.composerAttachment ||
+            !attachmentLifecycle.composerImage ||
+            !attachmentLifecycle.remove ||
+            attachmentLifecycle.messageAttachment !== null ||
+            attachmentLifecycle.phase !== "attachment" ||
+            Math.abs(attachmentLifecycle.composer.height - 180) > 1 ||
+            Math.abs(attachmentLifecycle.composer.top - 624) > 1 ||
+            Math.abs(attachmentLifecycle.composerAttachment.width - 80) > 1 ||
+            Math.abs(attachmentLifecycle.composerAttachment.height - 80) > 1 ||
+            Math.abs(attachmentLifecycle.composerAttachment.left - 368.05) >
+              1 ||
+            Math.abs(attachmentLifecycle.composerAttachment.top - 633) > 1 ||
+            Math.abs(attachmentLifecycle.composerImage.width - 78) > 1 ||
+            Math.abs(attachmentLifecycle.composerImage.height - 78) > 1 ||
+            Math.abs(attachmentLifecycle.composerImage.left - 369.05) > 1 ||
+            Math.abs(attachmentLifecycle.composerImage.top - 634) > 1 ||
+            Math.abs(attachmentLifecycle.remove.width - 16) > 1 ||
+            Math.abs(attachmentLifecycle.remove.height - 16) > 1 ||
+            Math.abs(attachmentLifecycle.remove.left - 427.05) > 1 ||
+            Math.abs(attachmentLifecycle.remove.top - 638) > 1 ||
+            attachmentLifecycle.composerAttachmentRadius !== "17px"
+          : attachmentLifecycle.composerAttachment !== null ||
+            !attachmentLifecycle.messageAttachment ||
+            attachmentLifecycle.finalCount !== 1 ||
+            Math.abs(attachmentLifecycle.composer.height - 98) > 1 ||
+            Math.abs(attachmentLifecycle.composer.top - 706) > 1 ||
+            Math.abs(attachmentLifecycle.messageAttachment.width - 80) > 1 ||
+            Math.abs(attachmentLifecycle.messageAttachment.height - 80) > 1 ||
+            Math.abs(attachmentLifecycle.messageAttachment.left - 1015.05) >
+              1 ||
+            Math.abs(attachmentLifecycle.messageAttachment.top - 79) > 1 ||
+            attachmentLifecycle.messageAttachmentRadius !== "12.5px" ||
+            attachmentLifecycle.messageImageRadius !== "10px")
+      ) {
+        throw new Error(
+          `${scene.id}: current attachment lifecycle contract failed: ${JSON.stringify(attachmentLifecycle)}`,
+        );
+      }
+    }
     if (
       contract.header.bottom > contract.viewport.bottom ||
       contract.composer.top < contract.header.bottom ||
@@ -5344,77 +5443,87 @@ try {
   await disabledModeApp.close();
 }
 
-const attachmentSubmitScene = {
-  frame: "composer-attachment",
-  id: "attachment-submit-interaction",
-  scenario: "conversation-lifecycle",
+const attachmentLifecycleScene = {
+  frame: "attachment-ready",
+  id: "attachment-lifecycle-interaction",
+  scenario: "attachment-lifecycle",
 };
 const {
-  app: attachmentSubmitApp,
-  page: attachmentSubmitPage,
-} = await launchScene(attachmentSubmitScene, { capture: false });
+  app: attachmentLifecycleApp,
+  page: attachmentLifecyclePage,
+} = await launchScene(attachmentLifecycleScene, { capture: false });
 try {
-  const attachmentSubmitComposer = attachmentSubmitPage.getByRole(
-    "textbox",
-    { name: "Message composer" },
+  const composer = attachmentLifecyclePage.getByRole("textbox", {
+    name: "Message composer",
+  });
+  const remove = attachmentLifecyclePage.getByRole("button", {
+    name: "Remove codex-ui-kit-current.png",
+  });
+  await remove.click();
+  await attachmentLifecyclePage.waitForSelector(
+    '.demo-root[data-composer-phase="idle"] .codex-ui-composer:not([data-disabled])',
   );
-  await attachmentSubmitPage.waitForSelector(
-    '.demo-root[data-composer-phase="attachment"] .codex-ui-composer-attachment',
-  );
-  await attachmentSubmitComposer.fill("Use the attached evidence.");
-  await attachmentSubmitComposer.press("Enter");
-  await attachmentSubmitPage.waitForSelector(
-    '.demo-root[data-composer-phase="running"]',
+  await attachmentLifecyclePage.waitForFunction(
+    () => document.activeElement?.getAttribute("aria-label") === "Message composer",
   );
   if (
-    (await attachmentSubmitPage
-      .locator(".codex-ui-composer-attachment")
+    (await attachmentLifecyclePage
+      .locator(".codex-ui-composer .codex-ui-composer-attachment")
       .count()) !== 0
   ) {
-    throw new Error("Successful submission retained the attachment fixture.");
+    throw new Error("Removing the current attachment retained its Composer card.");
   }
-} finally {
-  await attachmentSubmitApp.close();
-}
 
-const attachmentNavigationScene = {
-  frame: "composer-attachment",
-  id: "attachment-scenario-navigation-interaction",
-  scenario: "conversation-lifecycle",
-};
-const {
-  app: attachmentNavigationApp,
-  page: attachmentNavigationPage,
-} = await launchScene(attachmentNavigationScene, { capture: false });
-try {
-  await attachmentNavigationPage.waitForSelector(
+  await attachmentLifecyclePage
+    .getByRole("button", { name: "Add files and more" })
+    .click();
+  await attachmentLifecyclePage
+    .getByRole("option", { name: "Files and folders" })
+    .click();
+  await attachmentLifecyclePage.waitForSelector(
     '.demo-root[data-composer-phase="attachment"] .codex-ui-composer-attachment',
   );
-  await attachmentNavigationPage
-    .locator(".codex-ui-app-sidebar__item", {
-      hasText: "Streaming and retry",
-    })
-    .click();
-  await attachmentNavigationPage.waitForSelector(
-    '.demo-root[data-scenario="streaming-recovery"]',
+  await composer.fill(
+    "Reply using three uppercase words describing this test: attachment, lifecycle, complete. Include a final period and no other text.",
   );
-  await attachmentNavigationPage
-    .locator(".codex-ui-app-sidebar__item", {
-      hasText: "Conversation and Composer lifecycle",
-    })
-    .click();
-  await attachmentNavigationPage.waitForSelector(
-    '.demo-root[data-scenario="conversation-lifecycle"][data-composer-phase="idle"]',
+  await composer.press("Enter");
+  await attachmentLifecyclePage.waitForSelector(
+    '.demo-root[data-frame="attachment-completed"][data-composer-phase="idle"]',
   );
+  await attachmentLifecyclePage
+    .getByText("ATTACHMENT LIFECYCLE COMPLETE.", { exact: true })
+    .waitFor();
+  await attachmentLifecyclePage.waitForFunction(
+    () => document.activeElement?.getAttribute("aria-label") === "Message composer",
+  );
+  const completed = await attachmentLifecyclePage.evaluate(() => ({
+    composerAttachmentCount: document.querySelectorAll(
+      ".codex-ui-composer .codex-ui-composer-attachment",
+    ).length,
+    composerValue:
+      document.querySelector('.codex-ui-composer textarea[aria-label="Message composer"]')
+        ?.value ?? null,
+    messageAttachmentCount: document.querySelectorAll(
+      ".codex-ui-agent-message__attachments .codex-ui-message-attachment",
+    ).length,
+    permissionLabel:
+      document
+        .querySelector(".demo-composer-permission-trigger")
+        ?.textContent?.replace(/^◉/, "")
+        .trim() ?? null,
+  }));
   if (
-    (await attachmentNavigationPage
-      .locator(".codex-ui-composer-attachment")
-      .count()) !== 0
+    completed.composerAttachmentCount !== 0 ||
+    completed.composerValue !== "" ||
+    completed.messageAttachmentCount !== 1 ||
+    completed.permissionLabel !== "Ask for approval"
   ) {
-    throw new Error("Scenario navigation retained the attachment fixture.");
+    throw new Error(
+      `Attachment lifecycle completion failed: ${JSON.stringify(completed)}`,
+    );
   }
 } finally {
-  await attachmentNavigationApp.close();
+  await attachmentLifecycleApp.close();
 }
 
 const contextSummaryScene = {

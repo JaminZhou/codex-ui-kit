@@ -4,6 +4,8 @@ import {
   hasActiveTurnWork,
   initialProtocolState,
   isTurnActive,
+  messageAttachmentAccessibleLabel,
+  messageAttachmentPreviewSource,
   reduceProtocolNotification,
   reduceProtocolTrace,
   settleApprovedCommandReplay,
@@ -87,6 +89,90 @@ describe("protocol lifecycle reducer", () => {
     expect(assistant?.text).toContain("| Markdown | Ready |");
     expect(assistant?.text).toContain("```ts");
     expect(scenario.frames["markdown-complete"]).toBe(scenario.events.length);
+  });
+
+  it("preserves public image inputs with the submitted user message", () => {
+    const scenario = replayScenarios["attachment-lifecycle"];
+    const submitted = reduceProtocolTrace(
+      scenario.events.slice(0, scenario.frames["attachment-submitted"]),
+    );
+    const completed = reduceProtocolTrace(scenario.events);
+    const user = completed.messages.find(
+      ({ id }) => id === "user-attachment-lifecycle",
+    );
+
+    expect(submitted.messages[0]?.attachments).toEqual([
+      expect.objectContaining({
+        kind: "image",
+        label: "User attachment",
+        sourceType: "remote",
+      }),
+    ]);
+    expect(user?.text).toContain("describing this test");
+    expect(user?.attachments?.[0]?.source).toMatch(/^data:image\/png;base64,/);
+    expect(completed.messages.at(-1)?.text).toBe(
+      "ATTACHMENT LIFECYCLE COMPLETE.",
+    );
+    expect(completed.turnDurationMs).toBe(7_409);
+  });
+
+  it("keeps safe remote image sources and falls back for local or unsafe inputs", () => {
+    const remote = {
+      kind: "image" as const,
+      label: "Evidence",
+      sourceType: "remote" as const,
+    };
+
+    for (const source of [
+      "https://example.com/evidence.png",
+      "http://127.0.0.1:3000/evidence.png",
+      "blob:https://example.com/attachment-id",
+      "data:image/png;base64,fixture",
+    ]) {
+      expect(
+        messageAttachmentPreviewSource({ ...remote, source }, "fallback"),
+      ).toBe(source);
+    }
+    expect(
+      messageAttachmentPreviewSource(
+        { ...remote, source: "javascript:alert(1)" },
+        "fallback",
+      ),
+    ).toBe("fallback");
+    expect(
+      messageAttachmentPreviewSource(
+        {
+          kind: "image",
+          label: "local.png",
+          source: "/tmp/local.png",
+          sourceType: "local",
+        },
+        "fallback",
+      ),
+    ).toBe("fallback");
+  });
+
+  it("preserves attachment names and disambiguates generic image labels", () => {
+    const generic = {
+      kind: "image" as const,
+      label: "User attachment",
+      source: "data:image/png;base64,fixture",
+      sourceType: "remote" as const,
+    };
+    const named = { ...generic, label: "architecture.png" };
+
+    expect(messageAttachmentAccessibleLabel(named, 0, 2)).toBe(
+      "architecture.png",
+    );
+    expect(messageAttachmentAccessibleLabel(generic, 0, 2)).toBe(
+      "User attachment 1",
+    );
+    expect(messageAttachmentAccessibleLabel(generic, 1, 2)).toBe(
+      "User attachment 2",
+    );
+    expect(messageAttachmentAccessibleLabel(generic, 0, 1)).toBe(
+      "User attachment",
+    );
   });
 
   it("replays a successful public MCP integration lifecycle", () => {

@@ -88,6 +88,14 @@ const currentBuildComposerGoalReference =
   process.env.CODEX_UI_KIT_COMPOSER_GOAL_REFERENCE;
 const currentBuildComposerPlanReference =
   process.env.CODEX_UI_KIT_COMPOSER_PLAN_REFERENCE;
+const currentBuildAttachmentReadyReference =
+  process.env.CODEX_UI_KIT_ATTACHMENT_READY_REFERENCE;
+const currentBuildAttachmentCompletedReference =
+  process.env.CODEX_UI_KIT_ATTACHMENT_COMPLETED_REFERENCE;
+const currentBuildAttachmentReferenceSize = {
+  height: 820,
+  width: 906,
+};
 const currentBuildComposerMenuReferenceSize = {
   height: 820,
   width: 906,
@@ -1167,6 +1175,77 @@ for (const scene of selectedScenes) {
               "approval-current-similar-repeated-completed"
             ? currentBuildApprovalSimilarCompletedReference
         : undefined;
+  const currentBuildAttachmentReference =
+    scene.id === "attachment-current-ready"
+      ? currentBuildAttachmentReadyReference
+      : scene.id === "attachment-current-completed"
+        ? currentBuildAttachmentCompletedReference
+        : undefined;
+  if (currentBuildAttachmentReference) {
+    const reference = flattenPng(
+      PNG.sync.read(await readFile(currentBuildAttachmentReference)),
+      { blue: 24, green: 24, red: 24 },
+    );
+    if (
+      reference.width !== currentBuildAttachmentReferenceSize.width ||
+      reference.height !== currentBuildAttachmentReferenceSize.height
+    ) {
+      throw new Error(
+        `${scene.id}: current-build attachment reference must be exactly ${currentBuildAttachmentReferenceSize.width}x${currentBuildAttachmentReferenceSize.height}, received ${reference.width}x${reference.height}.`,
+      );
+    }
+    if (actual.width !== 1180 || actual.height !== 820) {
+      throw new Error(
+        `${scene.id}: current-build attachment comparison requires an exact 1180x820 playground frame.`,
+      );
+    }
+    const actualRegion = cropPng(actual, 274, 0, 906, 820);
+    const masks =
+      scene.id === "attachment-current-ready"
+        ? [
+            { height: 624, left: 0, top: 0, width: 906 },
+            { height: 180, left: 0, top: 624, width: 85 },
+            { height: 180, left: 821, top: 624, width: 85 },
+            { height: 16, left: 0, top: 804, width: 906 },
+          ]
+        : [
+            { height: 70, left: 0, top: 0, width: 906 },
+            { height: 250, left: 0, top: 70, width: 85 },
+            { height: 250, left: 821, top: 70, width: 85 },
+            { height: 386, left: 0, top: 320, width: 906 },
+            { height: 98, left: 0, top: 706, width: 85 },
+            { height: 98, left: 821, top: 706, width: 85 },
+            { height: 16, left: 0, top: 804, width: 906 },
+          ];
+    const comparison = comparePng(
+      maskPng(clonePng(reference), masks),
+      maskPng(clonePng(actualRegion), masks),
+    );
+    const maximumRatio = environmentRatio(
+      scene.id === "attachment-current-ready"
+        ? "CODEX_UI_KIT_ATTACHMENT_READY_MAX_DIFF_RATIO"
+        : "CODEX_UI_KIT_ATTACHMENT_COMPLETED_MAX_DIFF_RATIO",
+      0.015,
+    );
+    await writeFile(
+      join(artifactDirectory, `${scene.id}.current-build.png`),
+      PNG.sync.write(actualRegion),
+    );
+    if (comparison.pixels > 0) {
+      await writeFile(
+        join(artifactDirectory, `${scene.id}.current-build.diff.png`),
+        PNG.sync.write(comparison.diff),
+      );
+    }
+    if (comparison.ratio > maximumRatio) {
+      throw new Error(
+        `${scene.id}: current-build attachment pixel ratio ${comparison.ratio} exceeds ${maximumRatio}.`,
+      );
+    }
+    console.log(
+      `${scene.id}: current-build attachment pixel ratio ${comparison.ratio}`,
+    );
+  }
   if (currentBuildApprovalReference) {
     const reference = flattenPng(
       PNG.sync.read(await readFile(currentBuildApprovalReference)),

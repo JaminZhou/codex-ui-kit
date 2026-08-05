@@ -1,6 +1,7 @@
 import approvalAllowOnceTrace from "../fixtures/traces/approval-allow-once.jsonl?raw";
 import approvalDeniedTrace from "../fixtures/traces/approval-denied.jsonl?raw";
 import approvalSimilarCommandsTrace from "../fixtures/traces/approval-similar-commands.jsonl?raw";
+import attachmentLifecycleTrace from "../fixtures/traces/attachment-lifecycle.jsonl?raw";
 import compactionTrace from "../fixtures/traces/compaction.jsonl?raw";
 import contextSummaryTrace from "../fixtures/traces/context-summary.jsonl?raw";
 import commandFailureRecoveryTrace from "../fixtures/traces/command-failure-recovery.jsonl?raw";
@@ -23,6 +24,7 @@ export type ReplayScenarioId =
   | "approval-allow-once"
   | "approval-denied"
   | "approval-similar-commands"
+  | "attachment-lifecycle"
   | "background-terminal"
   | "command-failure-recovery"
   | "conversation-lifecycle"
@@ -81,6 +83,12 @@ function scenario(
 }
 
 export const replayScenarios: Record<ReplayScenarioId, ReplayScenario> = {
+  "attachment-lifecycle": scenario(
+    "attachment-lifecycle",
+    "Complete attachment lifecycle test",
+    "A current image attachment can be removed, added again, submitted, rendered with the user message, and cleared from the restored Composer.",
+    attachmentLifecycleTrace,
+  ),
   "approval-allow-once": scenario(
     "approval-allow-once",
     "Approval allowed once",

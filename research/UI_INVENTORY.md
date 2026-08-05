@@ -54,7 +54,7 @@ observation from a previous build remains historical evidence.
 - Scoped CDP automation: available through a user-authorized second process;
   the Chromium profile is separate, but Codex application data and navigation
   are not fully isolated
-- Fresh current-build Renderer captures: seven dark 1180×820 disposable tasks
+- Fresh current-build Renderer captures: eight dark 1180×820 disposable tasks
   verify successful 400-line command output, mixed stdout/stderr failure with
   exit code 7 and a successful same-thread follow-up, plus a 95-second command
   Stop/background-settlement/recovery lifecycle, and the manual `/compact`
@@ -62,7 +62,9 @@ observation from a previous build remains historical evidence.
   summary toggle and its Environment/Git workflow overlay, plus a real
   command approval that is allowed once and completes successfully, plus a
   matching-command rule whose identical second command completes without a
-  second approval while the global Composer policy remains Ask; a read-only
+  second approval while the global Composer policy remains Ask, plus a pasted
+  image that is removed, added again, submitted, and retained with the user
+  message while the empty Composer is restored; a read-only
   sidebar sweep verifies all six sidebar groups at 1180×820, 820×680, and the
   exact 721/720 boundary. The sidebar remains 274px through 721px, auto-hides
   at 720px, stays pinned as a 274/446 split after an explicit Show action and
@@ -70,10 +72,10 @@ observation from a previous build remains historical evidence.
   preview. All other `26.727.40816` observations remain previous-build
   evidence until separately reached on `26.730.61309`.
 
-Current inventory: 78 surface groups; 12 have current-build runtime evidence,
+Current inventory: 79 surface groups; 13 have current-build runtime evidence,
 48 have previous-build-only runtime evidence, 18 remain `not_sampled`, and 0
-are `blocked_by_policy`. Current-build Browser verification covers 12 groups
-and Electron verification covers 12. Prior acceptance outside the sampled
+are `blocked_by_policy`. Current-build Browser verification covers 13 groups
+and Electron verification covers 13. Prior acceptance outside the sampled
 command, approval, interruption, compaction, summary, and six-sidebar slices remains recorded as `partial_legacy`
 until current-build re-observation.
 
@@ -280,7 +282,8 @@ stay independently bounded.
 
 The previous full conversation/Composer probe observed build `26.721.81911`
 in a disposable second process using synthetic prompts only. It remains the
-historical source for attachment, active mode, and paused/Resume variants.
+historical source for non-image attachment, active mode, and paused/Resume
+variants.
 
 The `26.727.40816` text-only probe re-observed the 736px Composer
 column, 712×44 textbox, 28×28 Stop button, and a real queued follow-up. The
@@ -334,8 +337,8 @@ probe verifies active Goal and Plan
 labels, prompts, 736×98 geometry, 28px clear controls, and focus restoration.
 Their 906×820 regional gates pass at `0.003763528` and `0.003486243`, so
 `composer.modes` was Browser/Electron verified on `26.727.40816` and is now
-`partial_legacy`. The native
-file-panel attachment lifecycle remains `partial_legacy`.
+`partial_legacy`. Native file-panel selection remains outside Renderer CDP;
+the current pasted-image lifecycle is independently refreshed below.
 
 The `26.727.40816` long-thread probe re-observes an 82-message compact
 navigation
@@ -606,6 +609,28 @@ verification for the sampled one-time and matching-command paths. Approval
 timeout, repeated denial, `acceptForSession`, non-command approval kinds, and
 rule lifetime across thread/restart boundaries remain open; the denial runtime
 sample remains previous-build evidence.
+
+The current attachment slice used a separate `26.730.61309` new chat and a
+synthetic 1×1 PNG delivered through the Composer paste path, avoiding the
+native macOS file panel. The ready Composer measures 736×180px at
+x=359.05/y=624. Its attachment surface is 80×80px with a 78×78px image,
+17px radius, 16%-white border, and a 16×16px Remove action. Removing it clears
+the card and restores input focus; adding the same image again and submitting
+produces one 80×80px user-message attachment, the exact final response
+`ATTACHMENT LIFECYCLE COMPLETE.`, and an empty focused 736×98px Composer.
+
+The independent `attachment-lifecycle` trace adds public image input to the
+protocol reducer and brings the matrix to 20 fixtures and 246 events. Public
+`MessageAttachment` ownership keeps sent media outside the editable user
+bubble, while `ComposerAttachment` owns the removable draft card. Browser/CDP
+now covers 81 frames and drives Remove → Add → Submit → completion; Electron
+repeats the lifecycle in a real 1180×820 `BrowserWindow`. Ownership-masked
+current-build 906×820 comparisons pass at `0.0038954396166478223` for ready
+and `0.007934905507995478` for completed, below independent 1.5% hard limits.
+This promotes `composer.attachments` only for the sampled pasted-image path.
+Native file selection, pasted text, ordinary file cards, multiple attachments,
+horizontal overflow, upload progress/failure, preview failure, and plugin
+resources remain separate gates.
 
 The current long-command slice uses a separate disposable task on
 `26.730.61309` and requests

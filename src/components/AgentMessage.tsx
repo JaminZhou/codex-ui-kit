@@ -1,8 +1,14 @@
-import type { HTMLAttributes, KeyboardEvent, ReactNode } from "react";
+import type {
+  ButtonHTMLAttributes,
+  HTMLAttributes,
+  KeyboardEvent,
+  ReactNode,
+} from "react";
 import type { AgentMessageRole, AgentItemStatus } from "../types.js";
 
 export interface AgentMessageProps extends HTMLAttributes<HTMLElement> {
   actions?: ReactNode;
+  attachments?: ReactNode;
   children: ReactNode;
   editable?: boolean;
   highlighted?: boolean;
@@ -14,6 +20,7 @@ export interface AgentMessageProps extends HTMLAttributes<HTMLElement> {
 
 export function AgentMessage({
   actions,
+  attachments,
   children,
   className,
   editable = false,
@@ -44,6 +51,15 @@ export function AgentMessage({
       data-status={status}
       {...props}
     >
+      {userMessage && attachments ? (
+        <div
+          aria-label="Message attachments"
+          className="codex-ui-agent-message__attachments"
+          role="group"
+        >
+          {attachments}
+        </div>
+      ) : null}
       <div
         className="codex-ui-agent-message__content"
         data-editable={canEdit || undefined}
@@ -66,5 +82,40 @@ export function AgentMessage({
         </div>
       ) : null}
     </article>
+  );
+}
+
+export interface MessageAttachmentProps
+  extends Omit<
+    ButtonHTMLAttributes<HTMLButtonElement>,
+    "children" | "onClick"
+  > {
+  alt?: string;
+  label?: string;
+  onClick: NonNullable<ButtonHTMLAttributes<HTMLButtonElement>["onClick"]>;
+  previewSrc: string;
+}
+
+export function MessageAttachment({
+  alt = "",
+  className,
+  label = alt || "User attachment",
+  previewSrc,
+  type = "button",
+  ...props
+}: MessageAttachmentProps) {
+  const classes = ["codex-ui-message-attachment", className]
+    .filter(Boolean)
+    .join(" ");
+
+  return (
+    <button
+      aria-label={label}
+      className={classes}
+      type={type}
+      {...props}
+    >
+      <img alt={alt} src={previewSrc} />
+    </button>
   );
 }

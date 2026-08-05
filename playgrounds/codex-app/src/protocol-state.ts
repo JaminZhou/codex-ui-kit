@@ -28,6 +28,7 @@ export interface ProtocolApprovalResolution {
 }
 
 export interface DemoMessage {
+  attachments?: DemoMessageAttachment[];
   compaction?: "running" | "completed";
   id: string;
   interruptionDurationMs?: number | null;
@@ -35,6 +36,45 @@ export interface DemoMessage {
   status: DemoTurnStatus;
   text: string;
   turnId: string | null;
+}
+
+export interface DemoMessageAttachment {
+  kind: "image";
+  label: string;
+  source: string;
+  sourceType: "local" | "remote";
+}
+
+export function messageAttachmentAccessibleLabel(
+  attachment: DemoMessageAttachment,
+  index: number,
+  count: number,
+): string {
+  const label = attachment.label.trim() || "User attachment";
+  return count > 1 && label === "User attachment"
+    ? `${label} ${index + 1}`
+    : label;
+}
+
+export function messageAttachmentPreviewSource(
+  attachment: DemoMessageAttachment,
+  fallback: string,
+): string {
+  if (attachment.sourceType !== "remote") return fallback;
+  try {
+    const { protocol } = new URL(attachment.source);
+    if (
+      protocol === "https:" ||
+      protocol === "http:" ||
+      protocol === "blob:" ||
+      (protocol === "data:" && /^data:image\//i.test(attachment.source))
+    ) {
+      return attachment.source;
+    }
+  } catch {
+    // Replay-local paths and malformed sources use the deterministic fixture.
+  }
+  return fallback;
 }
 
 export interface DemoCommandExecution {
@@ -482,15 +522,36 @@ function recordTurnCompaction(
   return next;
 }
 
-function textFromUserContent(content: unknown): string {
-  if (!Array.isArray(content)) return "";
-  return content
-    .map((entry) => {
-      if (!isRecord(entry) || entry.type !== "text") return "";
-      return asString(entry.text) ?? "";
-    })
-    .filter(Boolean)
-    .join("\n");
+function userContentFrom(content: unknown): {
+  attachments: DemoMessageAttachment[];
+  text: string;
+} {
+  if (!Array.isArray(content)) return { attachments: [], text: "" };
+  const attachments: DemoMessageAttachment[] = [];
+  const text: string[] = [];
+  for (const entry of content) {
+    if (!isRecord(entry)) continue;
+    if (entry.type === "text") {
+      const value = asString(entry.text);
+      if (value) text.push(value);
+      continue;
+    }
+    if (entry.type !== "image" && entry.type !== "localImage") continue;
+    const source = asString(
+      entry.type === "localImage" ? entry.path : entry.url,
+    );
+    if (!source) continue;
+    const pathLabel = source.split(/[\\/]/).filter(Boolean).at(-1);
+    attachments.push({
+      kind: "image",
+      label: source.startsWith("data:")
+        ? "User attachment"
+        : (pathLabel ?? "User attachment"),
+      source,
+      sourceType: entry.type === "localImage" ? "local" : "remote",
+    });
+  }
+  return { attachments, text: text.join("\n") };
 }
 
 function turnStatus(
@@ -756,13 +817,15 @@ export function reduceProtocolNotification(
       };
     }
     if (itemType === "userMessage") {
+      const content = userContentFrom(item.content);
       return {
         ...next,
         messages: upsertMessage(state.messages, {
+          attachments: content.attachments,
           id: itemId,
           role: "user",
           status: "completed",
-          text: textFromUserContent(item.content),
+          text: content.text,
           turnId: itemTurnId,
         }),
         timeline: appendTimeline(state.timeline, {

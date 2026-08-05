@@ -5,8 +5,10 @@ import { createRef, useState } from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import {
   AgentComposer,
+  AgentMessage,
   ComposerAttachment,
   ComposerMentionMenu,
+  MessageAttachment,
   QueuedPromptList,
 } from "../src";
 
@@ -849,5 +851,33 @@ describe("AgentComposer", () => {
     expect(onOpen).toHaveBeenCalledOnce();
     expect(onRemove).toHaveBeenCalledOnce();
     expect(container.querySelector('[role="button"]')).toBeNull();
+  });
+
+  it("keeps sent attachments outside the editable user bubble", () => {
+    render(
+      <AgentMessage
+        attachments={
+          <MessageAttachment
+            alt="User attachment"
+            label="User attachment"
+            onClick={() => undefined}
+            previewSrc="data:image/png;base64,fixture"
+          />
+        }
+        role="user"
+      >
+        Use the attached evidence.
+      </AgentMessage>,
+    );
+
+    const attachment = screen.getByRole("button", {
+      name: "User attachment",
+    });
+    const group = screen.getByRole("group", {
+      name: "Message attachments",
+    });
+    const bubble = screen.getByText("Use the attached evidence.");
+    expect(group.contains(attachment)).toBe(true);
+    expect(bubble.contains(attachment)).toBe(false);
   });
 });
