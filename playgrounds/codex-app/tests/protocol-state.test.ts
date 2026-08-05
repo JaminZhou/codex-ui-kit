@@ -569,6 +569,60 @@ describe("protocol lifecycle reducer", () => {
     expect(completed.turnDurationMs).toBe(290_000);
   });
 
+  it("persists a matching command rule without a second approval", () => {
+    const scenario = replayScenarios["approval-similar-commands"];
+    const pending = reduceProtocolTrace(
+      scenario.events.slice(
+        0,
+        scenario.frames["approval-current-similar-pending"],
+      ),
+    );
+    const firstCompleted = reduceProtocolTrace(
+      scenario.events.slice(
+        0,
+        scenario.frames["approval-current-similar-first-completed"],
+      ),
+    );
+    const repeatedCompleted = reduceProtocolTrace(scenario.events);
+
+    expect(pending.approvals).toHaveLength(1);
+    expect(pending.approvals[0]).toMatchObject({
+      command: "open -a Calculator",
+      decision: "pending",
+      itemId: "command-open-calculator-similar-first",
+      responseDecision: "approved",
+    });
+    expect(firstCompleted.approvals).toHaveLength(1);
+    expect(firstCompleted.approvals[0]?.decision).toBe("approved");
+    expect(firstCompleted.commands).toHaveLength(1);
+    expect(firstCompleted.commands[0]).toMatchObject({
+      durationMs: 99_900,
+      exitCode: 0,
+      status: "completed",
+    });
+    expect(firstCompleted.messages.at(-1)?.text).toBe(
+      "SESSION APPROVAL FIRST COMPLETE.",
+    );
+    expect(firstCompleted.turnDurationsMs).toEqual({
+      "turn-approval-similar-first": 101_000,
+    });
+
+    expect(repeatedCompleted.approvals).toHaveLength(1);
+    expect(repeatedCompleted.commands).toHaveLength(2);
+    expect(
+      repeatedCompleted.commands.every(
+        ({ exitCode, status }) => exitCode === 0 && status === "completed",
+      ),
+    ).toBe(true);
+    expect(repeatedCompleted.messages.at(-1)?.text).toBe(
+      "SESSION APPROVAL SECOND COMPLETE.",
+    );
+    expect(repeatedCompleted.turnDurationsMs).toEqual({
+      "turn-approval-similar-first": 101_000,
+      "turn-approval-similar-second": 7_000,
+    });
+  });
+
   it("preserves rename, delete, binary, and conflict patch evidence", () => {
     const state = reduceProtocolTrace(
       replayScenarios["mixed-file-review"].events,

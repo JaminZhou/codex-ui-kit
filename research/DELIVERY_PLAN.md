@@ -31,7 +31,7 @@ exit gates; it does not replace the inventory.
   responsive detail restoration. Its independent state machine adds
   index/detail loading and failure, checks, comments, review submission,
   merge-readiness, merge completion, compact layout, and route restoration.
-  Together the playground gates cover 78 CDP/pixel frames, and the refreshed
+  Together the playground gates cover 80 CDP/pixel frames, and the refreshed
   PR detail passes the current 906×820 regional pixel gate. The refreshed
   real MCP success path now matches Search → Fetch, the integrated activity
   disclosure, computed typography, and a current regional pixel gate. The
@@ -79,7 +79,12 @@ exit gates; it does not replace the inventory.
   the exact final response, unchanged `Ask for approval` policy, and focused
   empty 736×98 Composer restoration. Its independent accept trace, Browser/CDP,
   Electron, and pending/completed current-build pixel gates pass at 1.26% and
-  0.30% under 1.5% limits. The other
+  0.30% under 1.5% limits. A seventh disposable task now locks the current
+  `Allow similar commands` menu and proposed execpolicy-amendment path: the
+  first command completes after approval, an identical second command
+  completes without another prompt, the global Composer policy remains Ask,
+  and Browser/CDP, Electron, and two current-build pixel gates pass at 1.21%
+  and 1.37% under 1.5% limits. The other
   preceding `26.727.40816` results remain previous-build evidence. Attachment
   variants, Terminal multi-tab/process behavior,
   Review rename/delete variants, and broader shell evidence from
@@ -302,9 +307,10 @@ without confusing package readiness with full product reconstruction.
    Browser/CDP, Electron, and regional pixels. Current permissions, Add
    resources, multiline/long-input geometry, active Goal/Plan modes, and the
    sampled long-thread navigation/windowing contract are also delivered. A
-   real command approval pending → denied path now additionally confirms
-   non-execution and restores the current Composer. Continue with attachment,
-   approval allow-once/persistence/timeout, and broader recovery evidence;
+   real command approval pending → denied path additionally confirms
+   non-execution and restores the current Composer. Allow once and the
+   matching-command persistence rule are now delivered; continue with
+   attachment, approval timeout/`acceptForSession`, and broader recovery evidence;
    retain queue pause/Resume only as a legacy compatibility fixture.
 6. **Coding workspace entry**: current project/context entry plus independent
    project → environment/worktree → command → approval → Review → Terminal →
@@ -324,8 +330,8 @@ without confusing package readiness with full product reconstruction.
     scrolling, expansion, latest-line restoration, mixed stdout/stderr,
     exit-code failure, interruption/settlement, manual context compaction,
     thread-summary Environment/Git state, and same-thread recovery are
-    delivered. Continue with approval
-    allow-once/timeout/persistence, attachment lifecycle, Markdown mutation/
+    delivered. Approval allow-once and matching-command persistence are also
+    delivered. Continue with approval timeout/`acceptForSession`, attachment lifecycle, Markdown mutation/
     large content, populated summary resource sections, subagents, and
     transport recovery.
 11. **P1 resources and integrations**: Browser/artifact/document previews,

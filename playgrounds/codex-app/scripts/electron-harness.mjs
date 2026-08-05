@@ -416,6 +416,19 @@ export const visualScenes = [
     scrollTop: 72,
   },
   {
+    frame: "approval-current-similar-pending",
+    id: "approval-current-similar-menu",
+    maxPixelRatio: 0.0225,
+    scenario: "approval-similar-commands",
+    surfaces: ["approval", "command"],
+  },
+  {
+    frame: "approval-current-similar-repeated-completed",
+    id: "approval-current-similar-repeated-completed",
+    maxPixelRatio: 0.0225,
+    scenario: "approval-similar-commands",
+  },
+  {
     frame: "file-changing",
     id: "file-changing",
     scenario: "workspace-workflow",

@@ -2463,7 +2463,7 @@ try {
   });
   await options.click();
   await currentDeniedApprovalPage
-    .getByRole("menuitem", { name: "Allow this conversation" })
+    .getByRole("menuitem", { name: "Allow similar commands" })
     .waitFor();
   await currentDeniedApprovalPage.keyboard.press("Escape");
   if (
@@ -2583,6 +2583,125 @@ try {
   }
 } finally {
   await currentApprovedApprovalApp.close();
+}
+
+const currentSimilarApprovalScene = {
+  frame: "approval-current-similar-pending",
+  id: "electron-current-approval-similar-commands",
+  scenario: "approval-similar-commands",
+};
+const {
+  app: currentSimilarApprovalApp,
+  page: currentSimilarApprovalPage,
+} = await launchScene(currentSimilarApprovalScene, { capture: false });
+try {
+  const approval = currentSimilarApprovalPage.getByTestId(
+    "current-approval-request",
+  );
+  await approval
+    .getByRole("button", { name: "Approval options" })
+    .click();
+  const similarAction = currentSimilarApprovalPage
+    .locator(
+      '.codex-ui-approval-request__options-menu [role="menuitem"]',
+    )
+    .filter({ hasText: "Allow similar commands" });
+  await similarAction.waitFor();
+  if (
+    (await currentSimilarApprovalPage
+      .getByLabel(
+        "Allow future commands that match this proposed rule",
+      )
+      .count()) !== 1
+  ) {
+    throw new Error(
+      "Electron matching approval option did not expose its rule information.",
+    );
+  }
+  await similarAction.click();
+  await currentSimilarApprovalPage.waitForSelector(
+    '.demo-root[data-frame="approval-current-similar-first-completed"]',
+  );
+  await currentSimilarApprovalPage
+    .getByText("SESSION APPROVAL FIRST COMPLETE.", { exact: true })
+    .waitFor();
+  const secondPrompt =
+    "Run the exact same harmless command again; the matching approval rule should avoid another prompt.";
+  await currentSimilarApprovalPage
+    .getByLabel("Message composer")
+    .fill(secondPrompt);
+  await currentSimilarApprovalPage
+    .getByLabel("Message composer")
+    .press("Enter");
+  await currentSimilarApprovalPage.waitForSelector(
+    '.demo-root[data-frame="approval-current-similar-repeated-completed"]',
+  );
+  await currentSimilarApprovalPage
+    .getByText("SESSION APPROVAL SECOND COMPLETE.", { exact: true })
+    .waitFor();
+  const repeated = await currentSimilarApprovalPage.evaluate(() => {
+    const composer = document.querySelector(
+      ".codex-ui-composer textarea",
+    );
+    return {
+      activeLabel:
+        document.activeElement?.getAttribute("aria-label") ?? null,
+      approvalCount: document.querySelectorAll(
+        '[data-testid="current-approval-request"]',
+      ).length,
+      composerValue:
+        composer instanceof HTMLTextAreaElement ? composer.value : null,
+      permissionLabel:
+        document
+          .querySelector(".demo-composer-permission-trigger")
+          ?.textContent?.replace(/^◉/, "")
+          .trim() ?? null,
+      workedLabels: Array.from(
+        document.querySelectorAll(
+          ".codex-ui-activity-timeline__toggle",
+        ),
+        (element) => element.textContent?.replace(/\s+/g, " ").trim(),
+      ),
+    };
+  });
+  if (
+    repeated.activeLabel !== "Message composer" ||
+    repeated.approvalCount !== 0 ||
+    repeated.composerValue !== "" ||
+    repeated.permissionLabel !== "Ask for approval" ||
+    JSON.stringify(repeated.workedLabels) !==
+      JSON.stringify(["Worked for 1m 41s", "Worked for 7s"])
+  ) {
+    throw new Error(
+      `Electron matching approval did not persist for the repeated command: ${JSON.stringify(repeated)}`,
+    );
+  }
+  await currentSimilarApprovalPage
+    .getByRole("button", {
+      exact: true,
+      name: "Worked for 1m 41s",
+    })
+    .click();
+  await currentSimilarApprovalPage
+    .getByRole("button", { exact: true, name: "Worked for 7s" })
+    .click();
+  const commandStatuses = await currentSimilarApprovalPage
+    .locator('[data-testid="command-execution"]')
+    .evaluateAll((elements) =>
+      elements.map((element) =>
+        element.getAttribute("data-execution-status"),
+      ),
+    );
+  if (
+    JSON.stringify(commandStatuses) !==
+    JSON.stringify(["completed", "completed"])
+  ) {
+    throw new Error(
+      `Electron matching approval commands did not both complete: ${JSON.stringify(commandStatuses)}`,
+    );
+  }
+} finally {
+  await currentSimilarApprovalApp.close();
 }
 
 const longCommandOutputScene = {

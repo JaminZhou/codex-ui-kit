@@ -104,6 +104,10 @@ const currentBuildApprovalDeniedReference =
   process.env.CODEX_UI_KIT_APPROVAL_DENIED_REFERENCE;
 const currentBuildApprovalAllowOnceCompletedReference =
   process.env.CODEX_UI_KIT_APPROVAL_ALLOW_ONCE_COMPLETED_REFERENCE;
+const currentBuildApprovalSimilarMenuReference =
+  process.env.CODEX_UI_KIT_APPROVAL_SIMILAR_MENU_REFERENCE;
+const currentBuildApprovalSimilarCompletedReference =
+  process.env.CODEX_UI_KIT_APPROVAL_SIMILAR_COMPLETED_REFERENCE;
 const currentBuildApprovalReferenceSize = {
   height: 820,
   width: 906,
@@ -411,6 +415,18 @@ for (const scene of selectedScenes) {
           }
         `,
       });
+    }
+    if (scene.id === "approval-current-similar-menu") {
+      await page
+        .getByTestId("current-approval-request")
+        .getByRole("button", { name: "Approval options" })
+        .click();
+      await page
+        .locator(
+          '.codex-ui-approval-request__options-menu [role="menuitem"]',
+        )
+        .filter({ hasText: "Allow similar commands" })
+        .waitFor();
     }
     await page.screenshot({
       animations: "disabled",
@@ -1141,10 +1157,15 @@ for (const scene of selectedScenes) {
     scene.id === "approval-current-pending" ||
     scene.id === "approval-current-allow-once-pending"
       ? currentBuildApprovalPendingReference
+      : scene.id === "approval-current-similar-menu"
+        ? currentBuildApprovalSimilarMenuReference
       : scene.id === "approval-current-denied"
         ? currentBuildApprovalDeniedReference
         : scene.id === "approval-current-allow-once-completed"
           ? currentBuildApprovalAllowOnceCompletedReference
+          : scene.id ===
+              "approval-current-similar-repeated-completed"
+            ? currentBuildApprovalSimilarCompletedReference
         : undefined;
   if (currentBuildApprovalReference) {
     const reference = flattenPng(
@@ -1176,6 +1197,15 @@ for (const scene of selectedScenes) {
             { height: 29, left: 94, top: 682, width: 700 },
             { height: 750, left: 890, top: 55, width: 16 },
           ]
+        : scene.id === "approval-current-similar-menu"
+          ? [
+              { height: 55, left: 0, top: 0, width: 906 },
+              { height: 68, left: 264, top: 55, width: 548 },
+              { height: 25, left: 80, top: 168, width: 220 },
+              { height: 26, left: 104, top: 215, width: 300 },
+              { height: 72, left: 95, top: 680, width: 480 },
+              { height: 750, left: 890, top: 55, width: 16 },
+            ]
         : [
             { height: 55, left: 0, top: 0, width: 906 },
             { height: 26, left: 80, top: 139, width: 550 },
@@ -1191,8 +1221,13 @@ for (const scene of selectedScenes) {
       scene.id === "approval-current-pending" ||
       scene.id === "approval-current-allow-once-pending"
         ? "CODEX_UI_KIT_APPROVAL_PENDING_MAX_DIFF_RATIO"
+        : scene.id === "approval-current-similar-menu"
+          ? "CODEX_UI_KIT_APPROVAL_SIMILAR_MENU_MAX_DIFF_RATIO"
         : scene.id === "approval-current-allow-once-completed"
           ? "CODEX_UI_KIT_APPROVAL_ALLOW_ONCE_COMPLETED_MAX_DIFF_RATIO"
+          : scene.id ===
+              "approval-current-similar-repeated-completed"
+            ? "CODEX_UI_KIT_APPROVAL_SIMILAR_COMPLETED_MAX_DIFF_RATIO"
           : "CODEX_UI_KIT_APPROVAL_DENIED_MAX_DIFF_RATIO",
       0.015,
     );

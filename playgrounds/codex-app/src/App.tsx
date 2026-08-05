@@ -1172,7 +1172,10 @@ export function App() {
   const isCurrentApprovalReplay =
     mode === "replay" &&
     (scenarioId === "approval-allow-once" ||
-      scenarioId === "approval-denied");
+      scenarioId === "approval-denied" ||
+      scenarioId === "approval-similar-commands");
+  const isCurrentApprovalSimilarReplay =
+    mode === "replay" && scenarioId === "approval-similar-commands";
   const isCurrentLongCommandReplay =
     mode === "replay" && scenarioId === "long-command-output";
   const isCurrentCommandFailureReplay =
@@ -1408,9 +1411,39 @@ export function App() {
   const respondToApproval = async (
     requestId: number | string,
     decision: "accept" | "decline",
+    scope: "once" | "similar" = "once",
   ) => {
     if (mode === "replay") {
       if (isCurrentApprovalReplay) {
+        if (decision === "accept" && scope === "similar") {
+          if (scenarioId !== "approval-similar-commands") {
+            selectScenario(
+              "approval-similar-commands",
+              "approval-current-similar-first-completed",
+            );
+          } else {
+            setReplayApprovalResolution(null);
+            setReplayCount(
+              scenario.frames[
+                "approval-current-similar-first-completed"
+              ] ?? scenario.events.length,
+            );
+            setActiveFrame("approval-current-similar-first-completed");
+          }
+          window.setTimeout(() => composerInputRef.current?.focus());
+          return;
+        }
+        if (
+          scenarioId === "approval-similar-commands" &&
+          decision === "accept"
+        ) {
+          selectScenario(
+            "approval-allow-once",
+            "approval-current-allow-once-completed",
+          );
+          window.setTimeout(() => composerInputRef.current?.focus());
+          return;
+        }
         if (scenarioId === "approval-allow-once" && decision === "accept") {
           setReplayApprovalResolution(null);
           setReplayCount(scenario.events.length);
@@ -1419,7 +1452,10 @@ export function App() {
           return;
         }
         if (decision === "decline") {
-          if (scenarioId === "approval-allow-once") {
+          if (
+            scenarioId === "approval-allow-once" ||
+            scenarioId === "approval-similar-commands"
+          ) {
             selectScenario("approval-denied", "approval-current-denied");
             window.setTimeout(() => composerInputRef.current?.focus());
             return;
@@ -1551,6 +1587,23 @@ export function App() {
   };
 
   const submitComposer = (prompt: string) => {
+    if (
+      isCurrentApprovalSimilarReplay &&
+      activeFrame === "approval-current-similar-first-completed"
+    ) {
+      cancelReplaySubmitTimer();
+      setReplayComposerSubmitting(true);
+      setComposerOverlay(null);
+      replaySubmitTimerRef.current = window.setTimeout(() => {
+        replaySubmitTimerRef.current = null;
+        setReplayCount(scenario.events.length);
+        setActiveFrame("approval-current-similar-repeated-completed");
+        setReplayComposerSubmitting(false);
+        setComposerValue((current) => (current === prompt ? "" : current));
+        requestAnimationFrame(() => composerInputRef.current?.focus());
+      }, 160);
+      return;
+    }
     if (isCurrentContextCompactionReplay) {
       if (state.status === "running") return;
       if (prompt.trim() === "/compact") {
@@ -2338,6 +2391,7 @@ export function App() {
       scenarioId === "mcp-recovery-mixed-thread" ||
       scenarioId === "approval-allow-once" ||
       scenarioId === "approval-denied" ||
+      scenarioId === "approval-similar-commands" ||
       scenarioId === "long-command-output" ||
       scenarioId === "command-failure-recovery" ||
       scenarioId === "interruption" ||
@@ -2588,9 +2642,14 @@ export function App() {
       }
       presentation="composer"
       scopedApproveAction={{
-        label: "Allow this conversation",
+        info: "Allow future commands that match this proposed rule",
+        label: "Allow similar commands",
         onClick: () =>
-          respondToApproval(currentPendingApproval.requestId, "accept"),
+          respondToApproval(
+            currentPendingApproval.requestId,
+            "accept",
+            "similar",
+          ),
       }}
       title="Allow opening the requested local application?"
     />
@@ -3796,10 +3855,13 @@ export function App() {
                   (message.id === "assistant-recovery" ||
                     message.id === "assistant-workflow")) ||
                 ((scenarioId === "approval-denied" ||
-                  scenarioId === "approval-allow-once") &&
+                  scenarioId === "approval-allow-once" ||
+                  scenarioId === "approval-similar-commands") &&
                   (message.id === "assistant-approval-denied" ||
                     message.id === "assistant-approval-approved" ||
-                    message.id === "assistant-approval-allow-once")) ||
+                    message.id === "assistant-approval-allow-once" ||
+                    message.id === "assistant-approval-similar-first" ||
+                    message.id === "assistant-approval-similar-second")) ||
                 (scenarioId === "long-command-output" &&
                   message.id === "assistant-long-command-final") ||
                 (scenarioId === "command-failure-recovery" &&
@@ -3817,13 +3879,16 @@ export function App() {
                 scenarioId === "mcp-recovery-mixed-thread" ||
                 scenarioId === "approval-allow-once" ||
                 scenarioId === "approval-denied" ||
+                scenarioId === "approval-similar-commands" ||
                 scenarioId === "long-command-output" ? (
                   <McpResponseActions
                     label={
                       message.id === "assistant-workflow" ||
                       message.id === "assistant-approval-denied" ||
                       message.id === "assistant-approval-approved" ||
-                      message.id === "assistant-approval-allow-once"
+                      message.id === "assistant-approval-allow-once" ||
+                      message.id === "assistant-approval-similar-first" ||
+                      message.id === "assistant-approval-similar-second"
                         ? "Response actions"
                         : undefined
                     }
@@ -4141,12 +4206,21 @@ export function App() {
       if (
         isCurrentApprovalReplay &&
         (command.id === "command-open-calculator" ||
-          command.id === "command-open-calculator-once")
+          command.id === "command-open-calculator-once" ||
+          command.id === "command-open-calculator-similar-first" ||
+          command.id === "command-open-calculator-similar-second")
       ) {
         const pending = command.status === "running";
         const approved = command.status === "completed";
         const pendingDurationMs =
-          scenarioId === "approval-allow-once" ? 273_000 : 14_000;
+          scenarioId === "approval-allow-once"
+            ? 273_000
+            : scenarioId === "approval-similar-commands"
+              ? 98_000
+              : 14_000;
+        const completedTurnDurationMs = command.turnId
+          ? state.turnDurationsMs[command.turnId]
+          : undefined;
         return (
           <ActivityTimeline
             key={`command:${command.id}`}
@@ -4156,7 +4230,9 @@ export function App() {
                 durationMs={
                   pending
                     ? pendingDurationMs
-                    : (state.turnDurationMs ?? 23_000)
+                    : (completedTurnDurationMs ??
+                      state.turnDurationMs ??
+                      23_000)
                 }
                 status={pending ? "working" : "worked"}
               />

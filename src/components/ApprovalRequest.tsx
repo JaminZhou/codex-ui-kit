@@ -228,18 +228,18 @@ export function ApprovalRequest({
       const toggle = optionsToggleRef.current;
       if (!toggle) return;
       const rect = toggle.getBoundingClientRect();
-      const menuWidth = optionsMenuRef.current?.offsetWidth || 224;
-      const menuHeight = optionsMenuRef.current?.offsetHeight || 84;
-      const space = 4;
+      const menuWidth = optionsMenuRef.current?.offsetWidth || 196;
+      const menuHeight = optionsMenuRef.current?.offsetHeight || 68;
+      const borderOverlap = 1;
       const edge = 8;
       const left = Math.max(
         edge,
         Math.min(rect.right - menuWidth, window.innerWidth - menuWidth - edge),
       );
       const top =
-        rect.bottom + space + menuHeight <= window.innerHeight - edge
-          ? rect.bottom + space
-          : Math.max(edge, rect.top - menuHeight - space);
+        rect.bottom - borderOverlap + menuHeight <= window.innerHeight - edge
+          ? rect.bottom - borderOverlap
+          : Math.max(edge, rect.top - menuHeight + borderOverlap);
       setOptionsPosition({ left, top });
     };
 

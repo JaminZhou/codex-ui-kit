@@ -819,7 +819,8 @@ textarea {
 }
 
 .demo-root[data-scenario="approval-allow-once"],
-.demo-root[data-scenario="approval-denied"] {
+.demo-root[data-scenario="approval-denied"],
+.demo-root[data-scenario="approval-similar-commands"] {
   --codex-ui-conversation-thread-content-top-inset: 1.0625rem;
 }
 
@@ -1167,6 +1168,10 @@ textarea {
 }
 
 .demo-root[data-frame="approval-current-allow-once-completed"]
+  .codex-ui-conversation-thread-shell__thread,
+.demo-root[data-frame="approval-current-similar-first-completed"]
+  .codex-ui-conversation-thread-shell__thread,
+.demo-root[data-frame="approval-current-similar-repeated-completed"]
   .codex-ui-conversation-thread-shell__thread,
 .demo-root[data-frame="approval-current-denied"]
   .codex-ui-conversation-thread-shell__thread {
