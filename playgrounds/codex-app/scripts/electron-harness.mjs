@@ -270,13 +270,26 @@ export const visualScenes = [
     surfaces: ["command"],
   },
   {
-    frame: "compacting",
-    id: "compacting",
+    frame: "context-compaction-command-menu",
+    id: "context-compaction-command-menu",
     scenario: "compaction",
   },
   {
-    frame: "compacted",
-    id: "compacted",
+    frame: "context-compaction-running",
+    id: "context-compaction-running",
+    maxPixelRatio: 0.0225,
+    scenario: "compaction",
+  },
+  {
+    frame: "context-compaction-completed",
+    id: "context-compaction-completed",
+    maxPixelRatio: 0.0225,
+    scenario: "compaction",
+  },
+  {
+    frame: "context-compaction-recovered",
+    id: "context-compaction-recovered",
+    maxPixelRatio: 0.0225,
     scenario: "compaction",
   },
   {

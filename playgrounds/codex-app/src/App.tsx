@@ -246,6 +246,14 @@ function replayCountForSelection(
   frame: string | null,
 ) {
   if (frame && scenario.frames[frame]) return scenario.frames[frame];
+  if (
+    scenario.id === "compaction" &&
+    frame === "context-compaction-command-menu"
+  ) {
+    return (
+      scenario.frames["context-compaction-ready"] ?? scenario.events.length
+    );
+  }
   if (scenario.id !== "conversation-lifecycle" || !frame) {
     return scenario.events.length;
   }
@@ -263,6 +271,7 @@ function replayCountForSelection(
 }
 
 function initialComposerValue(frame: string | null) {
+  if (frame === "context-compaction-command-menu") return "/compact";
   if (
     frame === "composer-multiline" ||
     frame === "composer-permissions-menu" ||
@@ -1132,6 +1141,8 @@ export function App() {
     mode === "replay" && scenarioId === "command-failure-recovery";
   const isCurrentCommandInterruptionReplay =
     mode === "replay" && scenarioId === "interruption";
+  const isCurrentContextCompactionReplay =
+    mode === "replay" && scenarioId === "compaction";
   const replayComposerRunning =
     isConversationLifecycle && state.status === "running";
 
@@ -1447,7 +1458,66 @@ export function App() {
     );
   };
 
+  const startReplayCompaction = () => {
+    if (!isCurrentContextCompactionReplay || state.status === "running") {
+      return;
+    }
+    cancelReplaySubmitTimer();
+    setComposerValue("");
+    setComposerOverlay(null);
+    setReplayCount(
+      replayScenarios.compaction.frames["context-compaction-running"] ??
+        replayScenarios.compaction.events.length,
+    );
+    setActiveFrame("context-compaction-running");
+    replaySubmitTimerRef.current = window.setTimeout(() => {
+      replaySubmitTimerRef.current = null;
+      setReplayCount(
+        replayScenarios.compaction.frames["context-compaction-completed"] ??
+          replayScenarios.compaction.events.length,
+      );
+      setActiveFrame("context-compaction-completed");
+      requestAnimationFrame(() => composerInputRef.current?.focus());
+    }, 900);
+  };
+
+  const stopReplayCompaction = () => {
+    cancelReplaySubmitTimer();
+    setReplayComposerSubmitting(false);
+    setReplayCount(
+      replayScenarios.compaction.frames["context-compaction-ready"] ??
+        replayScenarios.compaction.events.length,
+    );
+    setActiveFrame("context-compaction-ready");
+    setComposerValue("");
+    requestAnimationFrame(() => composerInputRef.current?.focus());
+  };
+
   const submitComposer = (prompt: string) => {
+    if (isCurrentContextCompactionReplay) {
+      if (state.status === "running") return;
+      if (prompt.trim() === "/compact") {
+        startReplayCompaction();
+        return;
+      }
+      if (state.compaction !== "completed") return;
+      cancelReplaySubmitTimer();
+      setReplayComposerSubmitting(true);
+      setComposerOverlay(null);
+      replaySubmitTimerRef.current = window.setTimeout(() => {
+        replaySubmitTimerRef.current = null;
+        setReplayCount(
+          replayScenarios.compaction.frames[
+            "context-compaction-recovered"
+          ] ?? replayScenarios.compaction.events.length,
+        );
+        setActiveFrame("context-compaction-recovered");
+        setReplayComposerSubmitting(false);
+        setComposerValue((current) => (current === prompt ? "" : current));
+        requestAnimationFrame(() => composerInputRef.current?.focus());
+      }, 160);
+      return;
+    }
     if (isCurrentCommandInterruptionReplay) {
       if (state.status === "running") return;
       cancelReplaySubmitTimer();
@@ -1508,6 +1578,10 @@ export function App() {
   };
 
   const stopComposer = () => {
+    if (isCurrentContextCompactionReplay) {
+      stopReplayCompaction();
+      return;
+    }
     if (isCurrentCommandInterruptionReplay) {
       cancelReplaySubmitTimer();
       setReplayComposerSubmitting(false);
@@ -2020,10 +2094,14 @@ export function App() {
     mode === "live"
       ? isTurnActive(liveState.status)
       : (isConversationLifecycle && replayComposerRunning) ||
-        (isCurrentCommandInterruptionReplay && state.status === "running");
+        ((isCurrentCommandInterruptionReplay ||
+          isCurrentContextCompactionReplay) &&
+          state.status === "running");
   const composerIsDisabled =
     liveStartPending ||
-    ((isConversationLifecycle || isCurrentCommandInterruptionReplay) &&
+    ((isConversationLifecycle ||
+      isCurrentCommandInterruptionReplay ||
+      isCurrentContextCompactionReplay) &&
       replayComposerSubmitting);
   const displayedStatus =
     isConversationLifecycle && replayComposerStopped
@@ -2052,12 +2130,14 @@ export function App() {
       scenarioId === "mcp-recovery-mixed-thread" ||
       scenarioId === "long-command-output" ||
       scenarioId === "command-failure-recovery" ||
-      scenarioId === "interruption");
+      scenarioId === "interruption" ||
+      scenarioId === "compaction");
   const usesCurrentAskPermission =
     isCurrentApprovalReplay ||
     isCurrentLongCommandReplay ||
     isCurrentCommandFailureReplay ||
-    isCurrentCommandInterruptionReplay;
+    isCurrentCommandInterruptionReplay ||
+    isCurrentContextCompactionReplay;
   const selectedComposerPermission =
     (usesCurrentAskPermission
       ? composerPermissionOptions[0]
@@ -2152,7 +2232,8 @@ export function App() {
       scenarioId === "approval-denied" ||
       scenarioId === "long-command-output" ||
       scenarioId === "command-failure-recovery" ||
-      scenarioId === "interruption");
+      scenarioId === "interruption" ||
+      scenarioId === "compaction");
   const showLifecycleComposer = isConversationLifecycle;
   const composerSurface = (
     <AgentComposer
@@ -2285,10 +2366,40 @@ export function App() {
                 : "Switch to Live to send a real local turn…"
       }
       stopLabel="Stop"
-      submitLabel={isCurrentCommandInterruptionReplay ? "Send" : undefined}
+      submitLabel={
+        isCurrentCommandInterruptionReplay ||
+        isCurrentContextCompactionReplay
+          ? "Send"
+          : undefined
+      }
       suggestions={
-        (showMeasuredComposer || showLifecycleComposer) &&
-        composerOverlay === "resources" ? (
+        isCurrentContextCompactionReplay &&
+        (activeFrame === "context-compaction-ready" ||
+          activeFrame === "context-compaction-command-menu") &&
+        composerValue.trim() === "/compact" ? (
+          <div
+            aria-label="Slash commands"
+            className="demo-compaction-command-menu"
+            role="listbox"
+          >
+            <button
+              aria-label="Compact this chat's context (9% full)"
+              className="demo-compaction-command"
+              onClick={startReplayCompaction}
+              role="option"
+              type="button"
+            >
+              <span aria-hidden="true" className="demo-compaction-command__icon">
+                ◴
+              </span>
+              <span className="demo-compaction-command__label">Compact</span>
+              <span className="demo-compaction-command__description">
+                Compact this chat&apos;s context (9% full)
+              </span>
+            </button>
+          </div>
+        ) : (showMeasuredComposer || showLifecycleComposer) &&
+          composerOverlay === "resources" ? (
           <ComposerResourcePicker
             activeId={composerResourceActiveId}
             groups={composerResourceGroups}
@@ -3585,7 +3696,11 @@ export function App() {
                     message.id === "assistant-command-follow-up")) ||
                 (scenarioId === "interruption" &&
                   message.id ===
-                    "assistant-command-interruption-recovery")) &&
+                    "assistant-command-interruption-recovery") ||
+                (scenarioId === "compaction" &&
+                  (message.id === "assistant-compaction-baseline" ||
+                    message.id ===
+                      "assistant-context-compaction-recovery"))) &&
               message.status === "completed" ? (
                 scenarioId === "mcp-tool-call" ||
                 scenarioId === "mcp-recovery-mixed-thread" ||
@@ -3650,7 +3765,9 @@ export function App() {
           ) : null}
           {message.compaction ? (
             <ThreadContextEvent
-              mode="automatic"
+              mode={
+                isCurrentContextCompactionReplay ? "manual" : "automatic"
+              }
               status={message.compaction}
             />
           ) : null}
@@ -4613,7 +4730,9 @@ export function App() {
       data-last-method={state.lastMethod ?? undefined}
       data-mode={mode}
       data-composer-phase={
-        isConversationLifecycle || isCurrentCommandInterruptionReplay
+        isConversationLifecycle ||
+        isCurrentCommandInterruptionReplay ||
+        isCurrentContextCompactionReplay
           ? composerPhase
           : undefined
       }
@@ -4810,6 +4929,7 @@ export function App() {
                 ) : null}
 
                 {state.status === "running" &&
+                !isCurrentContextCompactionReplay &&
                 !activeTurnHasWork &&
                 !state.messages.some(
                   ({ role, status, turnId }) =>

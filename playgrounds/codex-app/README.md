@@ -441,9 +441,29 @@ against `26.730.61309`:
   prompt, and verifies the retained `You stopped after 1m 35s` summary plus
   Composer focus restoration;
 - Electron repeats the same transition in a real 1180×820 `BrowserWindow`;
-- the 73-frame matrix includes four new reviewed baselines, and the
+- the 75-frame matrix includes four reviewed baselines, and the
   ownership-masked immediate-stop full-window comparison passes at 0.44%
   under a 0.5% hard limit.
+
+## Twenty-sixth vertical slice
+
+The twenty-sixth slice refreshes manual context compaction and same-thread
+recovery against `26.730.61309`:
+
+- a disposable task establishes an exact no-tool baseline, then opens the
+  `/compact` row reporting 9% context usage;
+- the public replay separates command-menu, `Compacting context`, `Context
+  compacted`, and exact recovered-follow-up frames;
+- Browser/CDP clicks the slash command, checks the `Working` separator and
+  28×28 Stop action, waits for completion, submits the recovery prompt, and
+  verifies the restored empty Composer focus; it also gates Enter/Send command
+  submission, refuses recovery before completion, scopes manual labels to the
+  replay, and provides a replay-local Stop reset without claiming the
+  unobserved native cancellation result;
+- Electron repeats the same lifecycle in a real 1180×820 `BrowserWindow`;
+- the 75-frame matrix replaces two legacy static compaction frames with four
+  current reviewed baselines, and the ownership-masked running comparison
+  passes at 0.16% under a 0.5% hard limit.
 
 ## Development
 
@@ -482,6 +502,14 @@ reference and masks non-owning private/dynamic regions internally:
 
 ```bash
 CODEX_UI_KIT_COMMAND_FAILURE_REFERENCE=/absolute/path/to/command-failure.png \
+  pnpm --filter @codex-ui-kit/codex-app-playground check:visual
+```
+
+The manual context-compaction gate accepts its raw 1180×820 running screenshot
+and masks private/non-owning regions internally:
+
+```bash
+CODEX_UI_KIT_CONTEXT_COMPACTION_REFERENCE=/absolute/path/to/compacting.png \
   pnpm --filter @codex-ui-kit/codex-app-playground check:visual
 ```
 

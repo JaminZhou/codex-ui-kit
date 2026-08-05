@@ -147,4 +147,19 @@ describe("lifecycle visual policy", () => {
       "current-build command-interruption pixel ratio",
     );
   });
+
+  it("gates the current manual context-compaction running frame", () => {
+    expect(contract).toContain(
+      "CODEX_UI_KIT_CONTEXT_COMPACTION_REFERENCE",
+    );
+    expect(contract).toContain(
+      "CODEX_UI_KIT_CONTEXT_COMPACTION_MAX_DIFF_RATIO",
+    );
+    expect(contract).toContain(
+      'scene.id === "context-compaction-running"',
+    );
+    expect(contract).toContain(
+      "current-build context-compaction pixel ratio",
+    );
+  });
 });

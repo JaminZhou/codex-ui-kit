@@ -354,11 +354,13 @@
       "packageEvidence": ["local-conversation-page"],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
-        "cdp-26.721:slash-compact-running-and-completed-raster"
+        "cdp-26.721:slash-compact-running-and-completed-raster",
+        "cdp-26.730.61309:real-slash-compact-menu-running-completed-and-same-thread-recovery",
+        "cdp-26.730.61309:real-manual-compaction-computed-styles-and-ownership-masked-full-window-pixels"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "partial_legacy",
-      "electronStatus": "partial_legacy",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
       "priority": "p0"
     },
     {

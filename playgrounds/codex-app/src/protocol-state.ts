@@ -472,6 +472,7 @@ function recordTurnCompaction(
   if (!turnId) return messages;
   let index = messages.length - 1;
   while (index >= 0 && messages[index]?.turnId !== turnId) index -= 1;
+  if (index < 0) index = messages.length - 1;
   if (index < 0) return messages;
   const next = [...messages];
   next[index] = {
