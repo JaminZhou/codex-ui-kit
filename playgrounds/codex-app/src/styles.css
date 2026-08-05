@@ -910,6 +910,16 @@ textarea {
   transform: translateX(-85px);
 }
 
+.demo-root[data-scenario="command-failure-recovery"]
+  .codex-ui-thread-viewport {
+  scrollbar-width: none;
+}
+
+.demo-root[data-scenario="command-failure-recovery"]
+  .codex-ui-thread-viewport::-webkit-scrollbar {
+  display: none;
+}
+
 .demo-root[data-scenario="command-failure-recovery"],
 .demo-root[data-scenario="command-failure-recovery"]
   *:not(code):not(kbd):not(pre) {
