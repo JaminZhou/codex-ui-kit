@@ -55,6 +55,12 @@ import {
   ThreadInterruptionSummary,
   ThreadFloatingButton,
   ThreadMessageNavigationRail,
+  ThreadSummaryDelta,
+  ThreadSummaryIconButton,
+  ThreadSummaryItem,
+  ThreadSummaryPanel,
+  ThreadSummaryPopover,
+  ThreadSummarySection,
   ThreadThinkingPlaceholder,
   ThreadVirtualizedPlaceholder,
   ToolCallCard,
@@ -137,6 +143,13 @@ type SidebarGlyphName =
   | "sites"
   | "thread";
 
+type SummaryGlyphName =
+  | "branch"
+  | "changes"
+  | "commit"
+  | "computer"
+  | "github";
+
 function SidebarGlyph({ name }: { name: SidebarGlyphName }) {
   const path = {
     activity:
@@ -165,6 +178,26 @@ function SidebarGlyph({ name }: { name: SidebarGlyphName }) {
   }[name];
   return (
     <svg aria-hidden="true" className="demo-sidebar-glyph" viewBox="0 0 16 16">
+      <path d={path} />
+    </svg>
+  );
+}
+
+function SummaryGlyph({ name }: { name: SummaryGlyphName }) {
+  const path = {
+    branch:
+      "M4 2.5v7.25A2.25 2.25 0 0 0 6.25 12h3.5M4 2.5a1.25 1.25 0 1 0 0 .01M11 4.25a1.25 1.25 0 1 0 0 .01M11 5.5v4M11 12a1.25 1.25 0 1 0 0 .01",
+    changes:
+      "M2.75 3.25h10.5v9.5H2.75v-9.5Zm2.5 2.5h5.5M5.25 8h5.5m-5.5 2.25h3",
+    commit:
+      "M2.25 8h3.5M10.25 8h3.5M8 5.75A2.25 2.25 0 1 1 8 10.25 2.25 2.25 0 0 1 8 5.75Z",
+    computer:
+      "M2.25 3.25h11.5v7.5H2.25v-7.5Zm3 10h5.5M8 10.75v2.5",
+    github:
+      "M8 2.25a5.75 5.75 0 0 0-1.82 11.2c.29.05.39-.13.39-.28v-1.1c-1.63.35-1.97-.69-1.97-.69-.27-.68-.65-.86-.65-.86-.53-.36.04-.35.04-.35.59.04.9.6.9.6.52.9 1.36.64 1.69.49.05-.38.2-.64.37-.79-1.3-.15-2.67-.65-2.67-2.9 0-.64.23-1.16.6-1.57-.06-.15-.26-.74.06-1.54 0 0 .49-.16 1.58.6A5.5 5.5 0 0 1 8 4.54c.49 0 .97.07 1.43.2 1.1-.75 1.58-.6 1.58-.6.32.8.12 1.39.06 1.54.38.41.6.93.6 1.57 0 2.25-1.37 2.75-2.68 2.89.21.18.4.54.4 1.09v1.94c0 .15.1.33.4.27A5.75 5.75 0 0 0 8 2.25Z",
+  }[name];
+  return (
+    <svg aria-hidden="true" viewBox="0 0 16 16">
       <path d={path} />
     </svg>
   );
@@ -944,6 +977,9 @@ export function App() {
   const [replayComposerStopped, setReplayComposerStopped] = useState(
     initialSelection.frame === "composer-queue-paused",
   );
+  const [threadSummaryOpen, setThreadSummaryOpen] = useState(
+    initialSelection.frame === "context-summary-open",
+  );
   const [replayQueuedContinuation, setReplayQueuedContinuation] =
     useState<string | null>(() =>
       initialQueuedContinuation(initialSelection.frame),
@@ -1143,6 +1179,8 @@ export function App() {
     mode === "replay" && scenarioId === "interruption";
   const isCurrentContextCompactionReplay =
     mode === "replay" && scenarioId === "compaction";
+  const isCurrentContextSummaryReplay =
+    mode === "replay" && scenarioId === "context-summary";
   const replayComposerRunning =
     isConversationLifecycle && state.status === "running";
 
@@ -1219,6 +1257,7 @@ export function App() {
     setReplayComposerStopped(false);
     setReplayQueuedContinuation(null);
     setReplayApprovalResolution(null);
+    setThreadSummaryOpen(false);
     setQueueInterrupted(false);
     if (!isTurnActive(replayState(scenarioEvents, nextCount).status)) {
       setQueuedPrompts([]);
@@ -1309,6 +1348,9 @@ export function App() {
     setReplayComposerStopped(false);
     setReplayQueuedContinuation(initialQueuedContinuation(frame));
     setReplayApprovalResolution(null);
+    setThreadSummaryOpen(
+      nextId === "context-summary" && frame === "context-summary-open",
+    );
     setActiveFrame(frame);
     setScenarioSelectionVersion((version) => version + 1);
     setWindowedSelectedMessageIndex(currentWindowedInitialIndex);
@@ -1350,6 +1392,7 @@ export function App() {
     setReplayComposerStopped(false);
     setReplayQueuedContinuation(null);
     setReplayApprovalResolution(null);
+    setThreadSummaryOpen(false);
     setWorkspaceOverlay(null);
     setWorkspaceLocalEnvironmentOpen(false);
   };
@@ -2131,13 +2174,15 @@ export function App() {
       scenarioId === "long-command-output" ||
       scenarioId === "command-failure-recovery" ||
       scenarioId === "interruption" ||
-      scenarioId === "compaction");
+      scenarioId === "compaction" ||
+      scenarioId === "context-summary");
   const usesCurrentAskPermission =
     isCurrentApprovalReplay ||
     isCurrentLongCommandReplay ||
     isCurrentCommandFailureReplay ||
     isCurrentCommandInterruptionReplay ||
-    isCurrentContextCompactionReplay;
+    isCurrentContextCompactionReplay ||
+    isCurrentContextSummaryReplay;
   const selectedComposerPermission =
     (usesCurrentAskPermission
       ? composerPermissionOptions[0]
@@ -2152,9 +2197,57 @@ export function App() {
             <button aria-label="Open integration menu" type="button">
               ◈⌄
             </button>
-            <button aria-label="Thread settings" type="button">
-              ☷
-            </button>
+            {isCurrentContextSummaryReplay ? (
+              <ThreadSummaryPopover
+                onOpenChange={setThreadSummaryOpen}
+                open={threadSummaryOpen}
+              >
+                <ThreadSummaryPanel>
+                  <ThreadSummarySection
+                    actions={
+                      <ThreadSummaryIconButton
+                        icon="+"
+                        label="Set up local environment"
+                      />
+                    }
+                    collapsible
+                    title="Environment"
+                    toggleLabel="Toggle environment summary"
+                  >
+                    <ThreadSummaryItem
+                      label="Changes"
+                      leading={<SummaryGlyph name="changes" />}
+                      meta={<ThreadSummaryDelta added={0} removed={0} />}
+                    />
+                    <ThreadSummaryItem
+                      label="Local"
+                      leading={<SummaryGlyph name="computer" />}
+                      title="Select where to run the chat"
+                      trailing="⌄"
+                    />
+                    <ThreadSummaryItem
+                      label="feat/current-context-summary"
+                      leading={<SummaryGlyph name="branch" />}
+                      title="Switch branch"
+                      trailing="⌄"
+                    />
+                    <ThreadSummaryItem
+                      disabled
+                      label="Commit or push"
+                      leading={<SummaryGlyph name="commit" />}
+                    />
+                    <ThreadSummaryItem
+                      label="Create pull request"
+                      leading={<SummaryGlyph name="github" />}
+                    />
+                  </ThreadSummarySection>
+                </ThreadSummaryPanel>
+              </ThreadSummaryPopover>
+            ) : (
+              <button aria-label="Thread settings" type="button">
+                ☷
+              </button>
+            )}
             <button aria-label="Toggle bottom panel" type="button">
               ▱
             </button>
@@ -2233,7 +2326,8 @@ export function App() {
       scenarioId === "long-command-output" ||
       scenarioId === "command-failure-recovery" ||
       scenarioId === "interruption" ||
-      scenarioId === "compaction");
+      scenarioId === "compaction" ||
+      scenarioId === "context-summary");
   const showLifecycleComposer = isConversationLifecycle;
   const composerSurface = (
     <AgentComposer

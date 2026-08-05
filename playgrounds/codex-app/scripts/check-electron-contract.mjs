@@ -3593,6 +3593,176 @@ try {
   await composerMenusApp.close();
 }
 
+const contextSummaryScene = {
+  frame: "context-summary-open",
+  id: "electron-context-summary",
+  scenario: "context-summary",
+};
+const { app: contextSummaryApp, page: contextSummaryPage } = await launchScene(
+  contextSummaryScene,
+  { capture: false },
+);
+try {
+  const nativeBounds = await contextSummaryApp.evaluate(({ BrowserWindow }) =>
+    BrowserWindow.getAllWindows()[0]?.getContentBounds(),
+  );
+  const summary = await contextSummaryPage.evaluate(() => {
+    const measure = (selector) => {
+      const element = document.querySelector(selector);
+      if (!element) return null;
+      const value = element.getBoundingClientRect();
+      return {
+        height: value.height,
+        left: value.left,
+        top: value.top,
+        width: value.width,
+      };
+    };
+    const panel = document.querySelector(".codex-ui-thread-summary-panel");
+    const panelStyle = panel ? getComputedStyle(panel) : null;
+    return {
+      disabledRows: document.querySelectorAll(
+        ".codex-ui-thread-summary-item:disabled",
+      ).length,
+      panel: measure(".codex-ui-thread-summary-panel"),
+      panelStyle: panelStyle
+        ? {
+            backgroundColor: panelStyle.backgroundColor,
+            borderRadius: panelStyle.borderRadius,
+            fontSize: panelStyle.fontSize,
+            fontWeight: panelStyle.fontWeight,
+            lineHeight: panelStyle.lineHeight,
+          }
+        : null,
+      popover: measure(".codex-ui-thread-summary-popover"),
+      rowCount: document.querySelectorAll(".codex-ui-thread-summary-item").length,
+      rows: [...document.querySelectorAll(".codex-ui-thread-summary-item")].map(
+        (element) => {
+          const value = element.getBoundingClientRect();
+          return {
+            height: value.height,
+            left: value.left,
+            top: value.top,
+            width: value.width,
+          };
+        },
+      ),
+    };
+  });
+  if (
+    nativeBounds?.width !== 1180 ||
+    nativeBounds?.height !== 820 ||
+    !summary.panel ||
+    !summary.popover ||
+    Math.abs(summary.popover.left - 804) > 1 ||
+    Math.abs(summary.popover.top - 45) > 1 ||
+    Math.abs(summary.popover.width - 300) > 1 ||
+    Math.abs(summary.popover.height - 199) > 1 ||
+    summary.panelStyle?.backgroundColor !== "rgb(45, 45, 45)" ||
+    summary.panelStyle?.borderRadius !== "25px" ||
+    summary.panelStyle?.fontSize !== "14px" ||
+    summary.panelStyle?.fontWeight !== "445" ||
+    summary.panelStyle?.lineHeight !== "21px" ||
+    summary.rowCount !== 5 ||
+    summary.rows.some(
+      (row) =>
+        !row ||
+        Math.abs(row.height - 29) > 1 ||
+        Math.abs(row.width - 272) > 1,
+    ) ||
+    summary.disabledRows !== 1
+  ) {
+    throw new Error(
+      `Electron current thread summary geometry failed: ${JSON.stringify({ nativeBounds, summary })}`,
+    );
+  }
+
+  const trigger = contextSummaryPage.getByRole("button", {
+    exact: true,
+    name: "Toggle summary",
+  });
+  const dialog = contextSummaryPage.getByRole("dialog", {
+    exact: true,
+    name: "Thread summary",
+  });
+  await dialog.press("Escape");
+  await dialog.waitFor({ state: "hidden" });
+  await contextSummaryPage.waitForFunction(
+    () => document.activeElement?.getAttribute("aria-label") === "Toggle summary",
+  );
+  await trigger.click();
+  await dialog.waitFor({ state: "visible" });
+  const sectionToggle = contextSummaryPage.getByRole("button", {
+    name: "Toggle environment summary",
+  });
+  await sectionToggle.click();
+  if (
+    (await contextSummaryPage.locator(".codex-ui-thread-summary-item").count()) !== 0
+  ) {
+    throw new Error("Electron thread summary section did not collapse.");
+  }
+  await sectionToggle.click();
+  await contextSummaryPage.getByRole("textbox", { name: "Message composer" }).click();
+  await dialog.waitFor({ state: "hidden" });
+} finally {
+  await contextSummaryApp.close();
+}
+
+const {
+  app: contextSummaryCompactApp,
+  page: contextSummaryCompactPage,
+} = await launchScene(contextSummaryScene, {
+  capture: false,
+  windowSize: { height: 680, width: 720 },
+});
+try {
+  const nativeBounds = await contextSummaryCompactApp.evaluate(
+    ({ BrowserWindow }) => BrowserWindow.getAllWindows()[0]?.getContentBounds(),
+  );
+  const compact = await contextSummaryCompactPage.evaluate(() => {
+    const popover = document.querySelector(
+      ".codex-ui-thread-summary-popover",
+    );
+    const value = popover?.getBoundingClientRect();
+    return {
+      horizontalOverflow:
+        document.documentElement.scrollWidth -
+        document.documentElement.clientWidth,
+      popover: value
+        ? {
+            bottom: value.bottom,
+            height: value.height,
+            left: value.left,
+            right: value.right,
+            top: value.top,
+            width: value.width,
+          }
+        : null,
+      viewport: { height: window.innerHeight, width: window.innerWidth },
+    };
+  });
+  if (
+    nativeBounds?.width !== 720 ||
+    nativeBounds?.height !== 680 ||
+    compact.viewport.width !== 720 ||
+    compact.viewport.height !== 680 ||
+    !compact.popover ||
+    Math.abs(compact.popover.width - 300) > 1 ||
+    Math.abs(compact.popover.height - 199) > 1 ||
+    compact.popover.left < 8 ||
+    compact.popover.right > compact.viewport.width - 8 ||
+    compact.popover.top < 8 ||
+    compact.popover.bottom > compact.viewport.height - 8 ||
+    compact.horizontalOverflow > 1
+  ) {
+    throw new Error(
+      `Electron compact thread summary containment failed: ${JSON.stringify({ compact, nativeBounds })}`,
+    );
+  }
+} finally {
+  await contextSummaryCompactApp.close();
+}
+
 console.log(
-  "Electron host, native-window, coding-workspace routing, conversation/Composer lifecycle and current menus, current long, failed, and interrupted command output plus manual context compaction with same-thread recovery, default 720px narrow reachability, resizable navigation/Review/Terminal/PR detail, PR tabs and expansion, MCP disclosure/result, multi-file and mixed-content Review, selection/Undo, large diff scrolling, and compact geometry contracts passed.",
+  "Electron host, native-window, coding-workspace routing, conversation/Composer lifecycle and current menus, current long, failed, and interrupted command output plus manual context compaction and thread summary, default 720px narrow reachability, resizable navigation/Review/Terminal/PR detail, PR tabs and expansion, MCP disclosure/result, multi-file and mixed-content Review, selection/Undo, large diff scrolling, and compact geometry contracts passed.",
 );

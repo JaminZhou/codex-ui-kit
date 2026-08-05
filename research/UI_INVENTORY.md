@@ -54,11 +54,12 @@ observation from a previous build remains historical evidence.
 - Scoped CDP automation: available through a user-authorized second process;
   the Chromium profile is separate, but Codex application data and navigation
   are not fully isolated
-- Fresh current-build Renderer captures: four dark 1180×820 disposable tasks
+- Fresh current-build Renderer captures: five dark 1180×820 disposable tasks
   verify successful 400-line command output, mixed stdout/stderr failure with
   exit code 7 and a successful same-thread follow-up, plus a 95-second command
   Stop/background-settlement/recovery lifecycle, and the manual `/compact`
-  menu/running/completed/same-thread-recovery lifecycle; a read-only
+  menu/running/completed/same-thread-recovery lifecycle, plus the thread
+  summary toggle and its Environment/Git workflow overlay; a read-only
   sidebar sweep verifies all six sidebar groups at 1180×820, 820×680, and the
   exact 721/720 boundary. The sidebar remains 274px through 721px, auto-hides
   at 720px, stays pinned as a 274/446 split after an explicit Show action and
@@ -66,11 +67,11 @@ observation from a previous build remains historical evidence.
   preview. All other `26.727.40816` observations remain previous-build
   evidence until separately reached on `26.730.61309`.
 
-Current inventory: 78 surface groups; 10 have current-build runtime evidence,
-49 have previous-build-only runtime evidence, 19 remain `not_sampled`, and 0
-are `blocked_by_policy`. Current-build Browser verification covers 10 groups
-and Electron verification covers 10. Prior acceptance outside the sampled
-command, interruption, compaction, and six-sidebar slices remains recorded as `partial_legacy`
+Current inventory: 78 surface groups; 11 have current-build runtime evidence,
+49 have previous-build-only runtime evidence, 18 remain `not_sampled`, and 0
+are `blocked_by_policy`. Current-build Browser verification covers 11 groups
+and Electron verification covers 11. Prior acceptance outside the sampled
+command, interruption, compaction, summary, and six-sidebar slices remains recorded as `partial_legacy`
 until current-build re-observation.
 
 The current package exposes candidates far beyond the old transcript sample:
@@ -145,7 +146,8 @@ but every
 affected inventory row was `partial_legacy` until it was re-observed on
 `26.727.40816`. After the `26.730.61309` update, every row below is again
 `partial_legacy` except the explicitly refreshed successful-command,
-command-failure/recovery, command-interruption, context-compaction, and six sidebar rows. The
+command-failure/recovery, command-interruption, context-compaction,
+thread-summary, and six sidebar rows. The
 machine-readable inventory is authoritative when historical prose describes
 a build as current at its capture time.
 
@@ -164,7 +166,7 @@ focus-managed modal mode only as an explicit safety fallback for widths that
 cannot fit the pinned split. The current product's separator exposes
 `role=separator` but no keyboard value semantics; UIKit intentionally retains
 Arrow/Home/End resizing and value attributes as an accessibility improvement.
-The dedicated de-identified scene passes 75 Browser/CDP and pixel frames,
+The dedicated de-identified scene passes 76 Browser/CDP and pixel frames,
 Electron interaction, and current-build regional ratios of 3.6234% for the
 top, 0.1292% for the masked selected row, and 0% for the masked footer.
 Implementation stays `partial` because light-theme runtime evidence, dynamic
@@ -659,8 +661,27 @@ local reset; this does not promote an unobserved native cancellation outcome.
 The ownership-masked full-window running comparison measures
 `0.0016256717651922281` under a 0.5% hard limit. This promotes
 `thread.context-compaction` for the sampled manual lifecycle, while automatic
-and work-mode compaction, cancellation outcome, repeated compaction, and the
-still-unreached thread summary panel remain separate gates.
+and work-mode compaction, cancellation outcome, and repeated compaction remain
+separate gates. The thread summary panel is now independently sampled below.
+
+The fifth `26.730.61309` disposable task used a single no-tool prompt, then
+opened the 28×28 `Toggle summary` header action. At 1180×820 the resulting
+thread-owned overlay is anchored 8px below the control at x=804/y=45 and
+measures 300×199px with a 25px radius. It exposes an `Environment` section,
+a 28px setup action, five 272×29px rows for Changes, Local execution, branch,
+Commit/Push, and pull-request creation, plus the current +0/-0 delta and one
+disabled action. The panel uses 14/21px weight-445 system typography on the
+current dark 45/45/45 surface.
+
+The independent public composition adds `ThreadSummaryPanel`, section, item,
+delta, icon-button, and controlled/uncontrolled popover primitives. Browser/CDP
+and Electron verify open/close, Escape focus return, section collapse, outside
+dismissal, exact geometry, computed styles, and responsive viewport clamping.
+The ownership-scoped 300×199 current-build comparison differs by
+`0.028609715242881074`, below a 3% hard limit, and the full reviewed matrix now
+covers 76 frames. This promotes `thread.context-summary` only for the sampled
+Environment/Git workflow overlay; populated artifact/source/subagent sections,
+light theme, pinned layout, and host mutations remain separate gates.
 
 This is a measurement- and raster-backed basic thread/workspace slice, not a
 claim that the whole application or every lifecycle is pixel-perfect. Broader

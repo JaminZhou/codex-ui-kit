@@ -109,6 +109,12 @@ import {
   ThreadNavigationControls,
   ThreadRenderError,
   ThreadSkeleton,
+  ThreadSummaryDelta,
+  ThreadSummaryIconButton,
+  ThreadSummaryItem,
+  ThreadSummaryPanel,
+  ThreadSummaryPopover,
+  ThreadSummarySection,
   ThreadThinkingPlaceholder,
   ThreadVirtualizedPlaceholder,
   type ThreadMessageNavigationItem,
@@ -340,6 +346,12 @@ void ThreadMessageNavigationRail;
 void ThreadNavigationControls;
 void ThreadRenderError;
 void ThreadSkeleton;
+void ThreadSummaryDelta;
+void ThreadSummaryIconButton;
+void ThreadSummaryItem;
+void ThreadSummaryPanel;
+void ThreadSummaryPopover;
+void ThreadSummarySection;
 void ThreadThinkingPlaceholder;
 void ThreadVirtualizedPlaceholder;
 void navigationItem;

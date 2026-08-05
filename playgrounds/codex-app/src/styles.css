@@ -733,6 +733,11 @@ textarea {
   gap: 0.25rem;
 }
 
+.demo-root[data-scenario="context-summary"]
+  .demo-current-mcp-header-actions {
+  gap: 0.375rem;
+}
+
 .demo-current-mcp-header-actions button {
   appearance: none;
   background: transparent;
@@ -745,7 +750,7 @@ textarea {
   width: 1.75rem;
 }
 
-.demo-current-mcp-header-actions button:first-child {
+.demo-current-mcp-header-actions > button:first-child {
   background: rgba(255, 255, 255, 0.06);
   width: 3.25rem;
 }

@@ -465,6 +465,22 @@ recovery against `26.730.61309`:
   current reviewed baselines, and the ownership-masked running comparison
   passes at 0.16% under a 0.5% hard limit.
 
+## Twenty-seventh vertical slice
+
+The twenty-seventh slice reaches the current thread summary overlay on
+`26.730.61309`:
+
+- one no-tool disposable task exposes the 28×28 header toggle and the
+  thread-owned Environment/Git workflow surface;
+- the public component family adds controlled or uncontrolled popover,
+  section, item, delta, and icon-button primitives without importing private
+  state or mutations;
+- Browser/CDP and Electron verify Escape focus return, section collapse,
+  outside dismissal, the 300×199 surface, five 272×29 rows, 25px radius, and
+  14/21px weight-445 system typography;
+- the 76-frame reviewed matrix adds the summary overlay, and its ownership-
+  scoped component comparison differs by 2.86% under a 3% hard limit.
+
 ## Development
 
 From the repository root:
@@ -511,6 +527,14 @@ and masks private/non-owning regions internally:
 ```bash
 CODEX_UI_KIT_CONTEXT_COMPACTION_REFERENCE=/absolute/path/to/compacting.png \
   pnpm --filter @codex-ui-kit/codex-app-playground check:visual
+```
+
+The thread-summary gate accepts the raw 1180×820 current-build screenshot but
+compares only the owned 300×199 overlay region:
+
+```bash
+CODEX_UI_KIT_CONTEXT_SUMMARY_REFERENCE=/absolute/path/to/context-summary.png \
+  pnpm --filter @codex-ui-kit/codex-app-playground check:visual --scenes=context-summary-open
 ```
 
 The Pull request detail gate uses a separate 906×820 current-build reference:

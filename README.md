@@ -25,7 +25,8 @@ Codex UI Kit turns those interaction patterns into protocol-neutral React primit
   surface and evidence status are tracked in
   [`research/UI_INVENTORY.md`](research/UI_INVENTORY.md); current-build
   runtime observation now covers the sampled dark shell/sidebar, route
-  continuity, and MCP recovery slices, while unsampled surfaces remain
+  continuity, MCP recovery, command lifecycle, manual context compaction, and
+  thread-summary Environment/Git slices, while unsampled surfaces remain
   explicitly separate.
 - The repository is public and the package baseline is `0.1.0`, but the npm package has **not** been published.
 - The API remains pre-1.0 and may change while public documentation and consumer feedback mature.
@@ -52,6 +53,8 @@ review the [coverage policy](research/PARITY.md), or follow the
 - Command execution with current-build long-output/tail-following evidence,
   structured file diffs, tool calls, approvals, and notices.
 - Composer attachments, mentions, modes, queued prompts, and running states.
+- A reusable thread-summary popover with collapsible sections, compact action
+  rows, change deltas, disabled states, and controlled/uncontrolled behavior.
 - Accessible menus, tooltips, popovers, selects, dialogs, and keyboard flows.
 - Resource cards, citations, generated-image galleries, and preview surfaces.
 - Light, dark, system, compact-window, reduced-motion, and focus states.
@@ -124,7 +127,7 @@ export function Example() {
 | [Composer](docs/COMPONENTS.md#composer) | `AgentComposer`, `ComposerDock`, context controls, attachments, mentions, modes, queued prompts |
 | [Interactive primitives](docs/COMPONENTS.md#interactive-primitives) | Buttons, dialogs, menus, selects, popovers, tooltips |
 | [Resources and media](docs/COMPONENTS.md#resources-and-media) | Resource cards, sources, artifacts, generated images |
-| [Navigation and shell](docs/COMPONENTS.md#navigation-and-shell) | Application/sidebar shell, workspace tabs, thread header, navigation rail, floating controls |
+| [Navigation and shell](docs/COMPONENTS.md#navigation-and-shell) | Application/sidebar shell, workspace tabs, thread header, thread-summary panel, navigation rail, floating controls |
 | [Workspace and PR workflow](docs/COMPONENTS.md#workspace-and-pull-request-workflow) | Terminal session primitives, project index, new-chat destination/context, local environments, protocol-neutral routing/worktree selectors, PR lists, details, checks, reviewers, and threads |
 
 See the [complete component reference](docs/COMPONENTS.md) for behavior, state, and composition details.

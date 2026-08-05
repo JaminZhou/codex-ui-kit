@@ -89,6 +89,12 @@ import {
   ThreadRenderError,
   ThreadInterruptionSummary,
   ThreadSkeleton,
+  ThreadSummaryDelta,
+  ThreadSummaryIconButton,
+  ThreadSummaryItem,
+  ThreadSummaryPanel,
+  ThreadSummaryPopover,
+  ThreadSummarySection,
   ThreadThinkingPlaceholder,
   ThreadVirtualizedPlaceholder,
   TurnDuration,
@@ -2428,9 +2434,60 @@ function Showcase() {
             <div className="navigation-preview">
               <ThreadHeader
                 endActions={
-                  <Tooltip content="More actions">
-                    <IconButton icon={<span>•••</span>} label="More actions" />
-                  </Tooltip>
+                  <>
+                    <ThreadSummaryPopover>
+                      <ThreadSummaryPanel>
+                        <ThreadSummarySection
+                          actions={
+                            <ThreadSummaryIconButton
+                              icon={<span>+</span>}
+                              label="Set up local environment"
+                              onClick={() =>
+                                setNavigationStatus(
+                                  "Requested local environment setup",
+                                )
+                              }
+                            />
+                          }
+                          collapsible
+                          title="Environment"
+                          toggleLabel="Toggle environment summary"
+                        >
+                          <ThreadSummaryItem
+                            label="Changes"
+                            leading={<span>◫</span>}
+                            meta={<ThreadSummaryDelta added={2} removed={1} />}
+                          />
+                          <ThreadSummaryItem
+                            label="Local"
+                            leading={<span>▱</span>}
+                            trailing={<span>⌄</span>}
+                          />
+                          <ThreadSummaryItem
+                            label="feat/current-context-summary"
+                            leading={<span>⌘</span>}
+                          />
+                          <ThreadSummaryItem
+                            disabled
+                            label="Commit or push"
+                            leading={<span>○</span>}
+                          />
+                          <ThreadSummaryItem
+                            label="Create pull request"
+                            leading={<span>◇</span>}
+                            onClick={() =>
+                              setNavigationStatus(
+                                "Requested pull request creation",
+                              )
+                            }
+                          />
+                        </ThreadSummarySection>
+                      </ThreadSummaryPanel>
+                    </ThreadSummaryPopover>
+                    <Tooltip content="More actions">
+                      <IconButton icon={<span>•••</span>} label="More actions" />
+                    </Tooltip>
+                  </>
                 }
                 navigation={
                   <ThreadNavigationControls
