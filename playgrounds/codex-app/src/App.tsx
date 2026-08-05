@@ -1430,7 +1430,7 @@ export function App() {
             );
             setActiveFrame("approval-current-similar-first-completed");
           }
-          window.setTimeout(() => composerInputRef.current?.focus());
+          requestAnimationFrame(() => composerInputRef.current?.focus());
           return;
         }
         if (
@@ -1441,14 +1441,14 @@ export function App() {
             "approval-allow-once",
             "approval-current-allow-once-completed",
           );
-          window.setTimeout(() => composerInputRef.current?.focus());
+          requestAnimationFrame(() => composerInputRef.current?.focus());
           return;
         }
         if (scenarioId === "approval-allow-once" && decision === "accept") {
           setReplayApprovalResolution(null);
           setReplayCount(scenario.events.length);
           setActiveFrame("approval-current-allow-once-completed");
-          window.setTimeout(() => composerInputRef.current?.focus());
+          requestAnimationFrame(() => composerInputRef.current?.focus());
           return;
         }
         if (decision === "decline") {
@@ -1457,7 +1457,7 @@ export function App() {
             scenarioId === "approval-similar-commands"
           ) {
             selectScenario("approval-denied", "approval-current-denied");
-            window.setTimeout(() => composerInputRef.current?.focus());
+            requestAnimationFrame(() => composerInputRef.current?.focus());
             return;
           }
           setReplayApprovalResolution(null);
