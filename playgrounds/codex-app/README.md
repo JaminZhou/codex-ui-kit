@@ -457,8 +457,9 @@ recovery against `26.730.61309`:
 - Browser/CDP clicks the slash command, checks the `Working` separator and
   28×28 Stop action, waits for completion, submits the recovery prompt, and
   verifies the restored empty Composer focus; it also gates Enter/Send command
-  submission and a replay-local Stop reset without claiming the unobserved
-  native cancellation result;
+  submission, refuses recovery before completion, scopes manual labels to the
+  replay, and provides a replay-local Stop reset without claiming the
+  unobserved native cancellation result;
 - Electron repeats the same lifecycle in a real 1180×820 `BrowserWindow`;
 - the 75-frame matrix replaces two legacy static compaction frames with four
   current reviewed baselines, and the ownership-masked running comparison

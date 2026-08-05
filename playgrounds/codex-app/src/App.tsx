@@ -1500,6 +1500,7 @@ export function App() {
         startReplayCompaction();
         return;
       }
+      if (state.compaction !== "completed") return;
       cancelReplaySubmitTimer();
       setReplayComposerSubmitting(true);
       setComposerOverlay(null);
@@ -3764,7 +3765,9 @@ export function App() {
           ) : null}
           {message.compaction ? (
             <ThreadContextEvent
-              mode={scenarioId === "compaction" ? "manual" : "automatic"}
+              mode={
+                isCurrentContextCompactionReplay ? "manual" : "automatic"
+              }
               status={message.compaction}
             />
           ) : null}

@@ -2867,6 +2867,30 @@ try {
   const composer = contextCompactionPage.getByRole("textbox", {
     name: "Message composer",
   });
+  const prematurePrompt = "Do not skip the compaction prerequisite";
+  await composer.fill(prematurePrompt);
+  await composer.press("Enter");
+  const premature = await contextCompactionPage.evaluate(() => ({
+    composerValue: (() => {
+      const composer = document.querySelector(
+        '[aria-label="Message composer"]',
+      );
+      return composer && "value" in composer ? composer.value : null;
+    })(),
+    frame: document.querySelector(".demo-root")?.getAttribute("data-frame"),
+    recoveryCount: document.querySelectorAll(
+      '[data-item-id="assistant-context-compaction-recovery"]',
+    ).length,
+  }));
+  if (
+    premature.composerValue !== prematurePrompt ||
+    premature.frame !== "context-compaction-ready" ||
+    premature.recoveryCount !== 0
+  ) {
+    throw new Error(
+      `Electron current context compaction prerequisite gate failed: ${JSON.stringify(premature)}`,
+    );
+  }
   await composer.fill("/compact");
   const compactCommand = contextCompactionPage.getByRole("option", {
     name: "Compact this chat's context (9% full)",

@@ -653,9 +653,10 @@ drive the menu and same-thread recovery instead of accepting static rendering.
 Computed contracts lock manual mode, 736px event geometry, 14/21px weight-445
 typography, separator, Stop/Send states, and focus restoration. The
 interactive playground additionally routes Enter/Send through the selected
-command and gives its visible Stop control a deterministic local reset; this
-does not promote an unobserved native cancellation outcome. The
-ownership-masked full-window running comparison measures
+command, refuses recovery before completion, scopes manual labels away from
+Live automatic events, and gives its visible Stop control a deterministic
+local reset; this does not promote an unobserved native cancellation outcome.
+The ownership-masked full-window running comparison measures
 `0.0016256717651922281` under a 0.5% hard limit. This promotes
 `thread.context-compaction` for the sampled manual lifecycle, while automatic
 and work-mode compaction, cancellation outcome, repeated compaction, and the
