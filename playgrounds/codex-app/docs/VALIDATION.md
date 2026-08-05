@@ -93,7 +93,11 @@ Every deterministic scenario has one ID and produces four evidence layers:
    completion additionally accepts
    `CODEX_UI_KIT_APPROVAL_ALLOW_ONCE_COMPLETED_REFERENCE`; their masks retain the
    approval/Composer silhouettes, actions, activity structure, and spacing
-   under independent 1.5% hard limits. Current long command output accepts a
+   under independent 1.5% hard limits. The matching-command flow accepts
+   `CODEX_UI_KIT_APPROVAL_SIMILAR_MENU_REFERENCE` and
+   `CODEX_UI_KIT_APPROVAL_SIMILAR_COMPLETED_REFERENCE`; it retains the split
+   menu, approval silhouette/actions, two-turn activity structure, and restored
+   Composer under the same independent 1.5% hard limits. Current long command output accepts a
    full 1180×820 `CODEX_UI_KIT_COMMAND_OUTPUT_REFERENCE`; its ownership mask
    retains the command-card boundary, disclosure/Shell/output structure, and
    spacing under a 1.5% hard limit. Transparent
@@ -123,6 +127,8 @@ The current long-thread rail/control comparison measured `0.005937382`.
 Historical approval pending and denied comparisons measured `0.008493512` and
 `0.001214128`. Current `26.730.61309` Allow-once pending and completed
 comparisons measured `0.012554514617993862` and `0.002993592849835783`.
+The current matching-command menu and repeated completed comparisons measured
+`0.012100899154686911` and `0.013686534216335542`.
 Current `26.730.61309` long command output measured
 `0.001655643`.
 
@@ -200,7 +206,7 @@ CDP independently locks the current 736×134/736×259 Composer geometry,
 480×222 permission menu, 736×320 resource picker, 28px controls, 13px queue
 inset, navigation markers, disabled semantics, and windowed placeholder.
 
-The reviewed matrix now totals 78 frames. Its historical two command-approval frames cover the
+The reviewed matrix now totals 80 frames. Its historical two command-approval frames cover the
 current 736×162 pending Composer-dock card and the denied completion with
 response actions and restored 736×98 Composer. CDP verifies request state,
 command/activity labels, dimensions, and permission restoration. Electron
@@ -213,4 +219,8 @@ The current Allow-once pair adds an independent accept response, successful
 command completion, exact final answer, unchanged approval policy, and focused
 empty Composer restoration. Both Browser/CDP and real Electron drive this
 transition, and separate current-build pending/completed references remain
-under their 1.5% ownership-masked limits.
+under their 1.5% ownership-masked limits. The matching-command pair adds the
+current split menu plus a two-turn trace in which only the first identical
+command requests approval. Browser/CDP and Electron drive the menu selection,
+verify both command completions and exact final responses, and prove the
+second turn avoids another card without changing the global Ask policy.

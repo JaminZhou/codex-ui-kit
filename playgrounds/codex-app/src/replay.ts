@@ -1,5 +1,6 @@
 import approvalAllowOnceTrace from "../fixtures/traces/approval-allow-once.jsonl?raw";
 import approvalDeniedTrace from "../fixtures/traces/approval-denied.jsonl?raw";
+import approvalSimilarCommandsTrace from "../fixtures/traces/approval-similar-commands.jsonl?raw";
 import compactionTrace from "../fixtures/traces/compaction.jsonl?raw";
 import contextSummaryTrace from "../fixtures/traces/context-summary.jsonl?raw";
 import commandFailureRecoveryTrace from "../fixtures/traces/command-failure-recovery.jsonl?raw";
@@ -21,6 +22,7 @@ import type { ProtocolEventRecord } from "./protocol-state";
 export type ReplayScenarioId =
   | "approval-allow-once"
   | "approval-denied"
+  | "approval-similar-commands"
   | "background-terminal"
   | "command-failure-recovery"
   | "conversation-lifecycle"
@@ -90,6 +92,12 @@ export const replayScenarios: Record<ReplayScenarioId, ReplayScenario> = {
     "Approval denied",
     "A current command approval is denied, the command is not executed, and the turn completes.",
     approvalDeniedTrace,
+  ),
+  "approval-similar-commands": scenario(
+    "approval-similar-commands",
+    "Allow similar commands",
+    "A current command installs a matching approval rule, then the same command completes again without another prompt.",
+    approvalSimilarCommandsTrace,
   ),
   "conversation-lifecycle": scenario(
     "conversation-lifecycle",

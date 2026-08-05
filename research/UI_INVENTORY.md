@@ -54,13 +54,15 @@ observation from a previous build remains historical evidence.
 - Scoped CDP automation: available through a user-authorized second process;
   the Chromium profile is separate, but Codex application data and navigation
   are not fully isolated
-- Fresh current-build Renderer captures: six dark 1180×820 disposable tasks
+- Fresh current-build Renderer captures: seven dark 1180×820 disposable tasks
   verify successful 400-line command output, mixed stdout/stderr failure with
   exit code 7 and a successful same-thread follow-up, plus a 95-second command
   Stop/background-settlement/recovery lifecycle, and the manual `/compact`
   menu/running/completed/same-thread-recovery lifecycle, plus the thread
   summary toggle and its Environment/Git workflow overlay, plus a real
-  command approval that is allowed once and completes successfully; a read-only
+  command approval that is allowed once and completes successfully, plus a
+  matching-command rule whose identical second command completes without a
+  second approval while the global Composer policy remains Ask; a read-only
   sidebar sweep verifies all six sidebar groups at 1180×820, 820×680, and the
   exact 721/720 boundary. The sidebar remains 274px through 721px, auto-hides
   at 720px, stays pinned as a 274/446 split after an explicit Show action and
@@ -589,17 +591,21 @@ the real `Allow once` action, and is closed after the exact final response
 and completion restores the empty focused 736×98 Composer while its policy
 remains `Ask for approval`.
 
-The new schema-validated accept trace brings the set to 18 fixtures and 225
-events. Browser/CDP covers 78 frames and verifies the pending geometry,
+The schema-validated approval traces bring the set to 19 fixtures and 241
+events. Browser/CDP covers 80 frames and verifies the pending geometry,
 computed state, exact approval transition, completed command, final response,
-permission preservation, and focus restoration. Electron repeats the same
-interaction in a real 1180×820 `BrowserWindow`. Ownership-masked current-build
-906×820 comparisons pass at `0.012554514617993862` pending and
-`0.002993592849835783` completed, under separate 1.5% hard limits. This
-promotes `thread.approval-permission-events` to current-build Browser and
-Electron verification for the sampled command Allow-once path. Persistent
-approval, timeout, repeated denial, and non-command approval kinds remain open;
-the denial runtime sample remains previous-build evidence.
+permission preservation, focus restoration, and the matching-rule second
+execution without another approval. Electron repeats both interactions in a
+real 1180×820 `BrowserWindow`. Ownership-masked current-build 906×820
+comparisons pass at `0.012554514617993862` for Allow-once pending,
+`0.002993592849835783` for Allow-once completed, `0.012100899154686911` for
+the matching-rule menu, and `0.013686534216335542` for the repeated completed
+state, under independent 1.5% hard limits. This promotes
+`thread.approval-permission-events` to current-build Browser and Electron
+verification for the sampled one-time and matching-command paths. Approval
+timeout, repeated denial, `acceptForSession`, non-command approval kinds, and
+rule lifetime across thread/restart boundaries remain open; the denial runtime
+sample remains previous-build evidence.
 
 The current long-command slice uses a separate disposable task on
 `26.730.61309` and requests

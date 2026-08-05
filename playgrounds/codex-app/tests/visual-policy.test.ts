@@ -111,6 +111,12 @@ describe("lifecycle visual policy", () => {
       "CODEX_UI_KIT_APPROVAL_ALLOW_ONCE_COMPLETED_REFERENCE",
     );
     expect(contract).toContain(
+      "CODEX_UI_KIT_APPROVAL_SIMILAR_MENU_REFERENCE",
+    );
+    expect(contract).toContain(
+      "CODEX_UI_KIT_APPROVAL_SIMILAR_COMPLETED_REFERENCE",
+    );
+    expect(contract).toContain(
       "CODEX_UI_KIT_APPROVAL_PENDING_MAX_DIFF_RATIO",
     );
     expect(contract).toContain(
@@ -118,6 +124,12 @@ describe("lifecycle visual policy", () => {
     );
     expect(contract).toContain(
       "CODEX_UI_KIT_APPROVAL_ALLOW_ONCE_COMPLETED_MAX_DIFF_RATIO",
+    );
+    expect(contract).toContain(
+      "CODEX_UI_KIT_APPROVAL_SIMILAR_MENU_MAX_DIFF_RATIO",
+    );
+    expect(contract).toContain(
+      "CODEX_UI_KIT_APPROVAL_SIMILAR_COMPLETED_MAX_DIFF_RATIO",
     );
     expect(contract).toContain(
       "current-build approval pixel ratio",

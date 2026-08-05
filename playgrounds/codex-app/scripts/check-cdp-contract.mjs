@@ -1649,7 +1649,8 @@ for (const scene of visualScenes) {
     }
     if (
       scene.scenario === "approval-denied" ||
-      scene.scenario === "approval-allow-once"
+      scene.scenario === "approval-allow-once" ||
+      scene.scenario === "approval-similar-commands"
     ) {
       const approvalContract = await page.evaluate(() => {
         const rect = (element) => {
@@ -1738,10 +1739,13 @@ for (const scene of visualScenes) {
       }
       const pendingApprovalScene =
         scene.id === "approval-current-pending" ||
-        scene.id === "approval-current-allow-once-pending";
+        scene.id === "approval-current-allow-once-pending" ||
+        scene.id === "approval-current-similar-menu";
       const expectedPendingDuration =
         scene.id === "approval-current-allow-once-pending"
           ? "Working for 4m 33s"
+          : scene.id === "approval-current-similar-menu"
+            ? "Working for 1m 38s"
           : "Working for 14s";
       if (
         pendingApprovalScene &&
@@ -1875,6 +1879,198 @@ for (const scene of visualScenes) {
         ) {
           throw new Error(
             `${scene.id}: Allow once did not complete exactly one command: ${JSON.stringify(approvedContract)}`,
+          );
+        }
+      }
+      if (scene.id === "approval-current-similar-menu") {
+        const approval = page.getByTestId("current-approval-request");
+        await approval
+          .getByRole("button", { name: "Approval options" })
+          .click();
+        const similarAction = page
+          .locator(
+            '.codex-ui-approval-request__options-menu [role="menuitem"]',
+          )
+          .filter({ hasText: "Allow similar commands" });
+        await similarAction.waitFor();
+        const optionContract = await page.evaluate(() => ({
+          infoCount: document.querySelectorAll(
+            '[aria-label="Allow future commands that match this proposed rule"]',
+          ).length,
+          labels: Array.from(
+            document.querySelectorAll(
+              ".codex-ui-approval-request__options-menu [role=menuitem]",
+            ),
+            (element) =>
+              element.firstElementChild?.textContent
+                ?.replace(/\s+/g, " ")
+                .trim() ??
+              element.textContent?.replace(/\s+/g, " ").trim(),
+          ),
+        }));
+        if (
+          optionContract.infoCount !== 1 ||
+          JSON.stringify(optionContract.labels) !==
+            JSON.stringify(["Allow once", "Allow similar commands"])
+        ) {
+          throw new Error(
+            `${scene.id}: matching approval menu contract failed: ${JSON.stringify(optionContract)}`,
+          );
+        }
+        await similarAction.click();
+        await page.waitForSelector(
+          '.demo-root[data-frame="approval-current-similar-first-completed"]',
+        );
+        await page
+          .getByText("SESSION APPROVAL FIRST COMPLETE.", { exact: true })
+          .waitFor();
+        const firstCompleted = await page.evaluate(() => {
+          const composer = document.querySelector(
+            ".codex-ui-composer textarea",
+          );
+          return {
+            activeLabel:
+              document.activeElement?.getAttribute("aria-label") ?? null,
+            approvalCount: document.querySelectorAll(
+              '[data-testid="current-approval-request"]',
+            ).length,
+            composerValue:
+              composer instanceof HTMLTextAreaElement
+                ? composer.value
+                : null,
+            permissionLabel:
+              document
+                .querySelector(".demo-composer-permission-trigger")
+                ?.textContent?.replace(/^◉/, "")
+                .trim() ?? null,
+          };
+        });
+        if (
+          firstCompleted.activeLabel !== "Message composer" ||
+          firstCompleted.approvalCount !== 0 ||
+          firstCompleted.composerValue !== "" ||
+          firstCompleted.permissionLabel !== "Ask for approval"
+        ) {
+          throw new Error(
+            `${scene.id}: first matching-rule command did not settle correctly: ${JSON.stringify(firstCompleted)}`,
+          );
+        }
+        await page
+          .getByRole("button", {
+            exact: true,
+            name: "Worked for 1m 41s",
+          })
+          .click();
+        if (
+          (await page.locator(
+            '[data-testid="command-execution"][data-execution-status="completed"]',
+          ).count()) !== 1
+        ) {
+          throw new Error(
+            `${scene.id}: first matching-rule command did not complete exactly once.`,
+          );
+        }
+        const secondPrompt =
+          "Run the exact same harmless command again; the matching approval rule should avoid another prompt.";
+        await page.getByLabel("Message composer").fill(secondPrompt);
+        await page.getByLabel("Message composer").press("Enter");
+        await page.waitForSelector(
+          '.demo-root[data-frame="approval-current-similar-repeated-completed"]',
+        );
+        await page
+          .getByText("SESSION APPROVAL SECOND COMPLETE.", { exact: true })
+          .waitFor();
+        const repeatedCompleted = await page.evaluate(() => ({
+          activeLabel:
+            document.activeElement?.getAttribute("aria-label") ?? null,
+          approvalCount: document.querySelectorAll(
+            '[data-testid="current-approval-request"]',
+          ).length,
+          composerValue:
+            document.querySelector(".codex-ui-composer textarea") instanceof
+            HTMLTextAreaElement
+              ? document.querySelector(".codex-ui-composer textarea").value
+              : null,
+          permissionLabel:
+            document
+              .querySelector(".demo-composer-permission-trigger")
+              ?.textContent?.replace(/^◉/, "")
+              .trim() ?? null,
+          workedLabels: Array.from(
+            document.querySelectorAll(
+              ".codex-ui-activity-timeline__toggle",
+            ),
+            (element) => element.textContent?.replace(/\s+/g, " ").trim(),
+          ),
+        }));
+        if (
+          repeatedCompleted.activeLabel !== "Message composer" ||
+          repeatedCompleted.approvalCount !== 0 ||
+          repeatedCompleted.composerValue !== "" ||
+          repeatedCompleted.permissionLabel !== "Ask for approval" ||
+          JSON.stringify(repeatedCompleted.workedLabels) !==
+            JSON.stringify(["Worked for 1m 41s", "Worked for 7s"])
+        ) {
+          throw new Error(
+            `${scene.id}: repeated matching command did not bypass a second prompt: ${JSON.stringify(repeatedCompleted)}`,
+          );
+        }
+        await page
+          .getByRole("button", { exact: true, name: "Worked for 7s" })
+          .click();
+        if (
+          (await page.locator(
+            '[data-testid="command-execution"][data-execution-status="completed"]',
+          ).count()) !== 2
+        ) {
+          throw new Error(
+            `${scene.id}: repeated matching command did not complete twice.`,
+          );
+        }
+      }
+      if (scene.id === "approval-current-similar-repeated-completed") {
+        await page
+          .getByRole("button", {
+            exact: true,
+            name: "Worked for 1m 41s",
+          })
+          .click();
+        await page
+          .getByRole("button", { exact: true, name: "Worked for 7s" })
+          .click();
+        const repeatedContract = await page.evaluate(() => ({
+          approvalCount: document.querySelectorAll(
+            '[data-testid="current-approval-request"]',
+          ).length,
+          commandStatuses: Array.from(
+            document.querySelectorAll('[data-testid="command-execution"]'),
+            (element) => element.getAttribute("data-execution-status"),
+          ),
+          finalText:
+            Array.from(
+              document.querySelectorAll(
+                '.codex-ui-agent-message[data-role="assistant"]',
+              ),
+            )
+              .at(-1)
+              ?.textContent?.replace(/\s+/g, " ")
+              .trim() ?? null,
+          permissionLabel:
+            document
+              .querySelector(".demo-composer-permission-trigger")
+              ?.textContent?.replace(/^◉/, "")
+              .trim() ?? null,
+        }));
+        if (
+          repeatedContract.approvalCount !== 0 ||
+          JSON.stringify(repeatedContract.commandStatuses) !==
+            JSON.stringify(["completed", "completed"]) ||
+          repeatedContract.finalText !==
+            "SESSION APPROVAL SECOND COMPLETE." ||
+          repeatedContract.permissionLabel !== "Ask for approval"
+        ) {
+          throw new Error(
+            `${scene.id}: repeated completion contract failed: ${JSON.stringify(repeatedContract)}`,
           );
         }
       }

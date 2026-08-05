@@ -497,6 +497,26 @@ The twenty-eighth slice reaches a successful current command approval on
 - two reviewed frames raise the matrix to 78, while ownership-masked pending
   and completed comparisons measure 1.26% and 0.30% under 1.5% limits.
 
+## Twenty-ninth vertical slice
+
+The twenty-ninth slice reaches the current matching-command approval rule on
+`26.730.61309`:
+
+- the real split menu exposes `Allow once` and `Allow similar commands` with
+  rule information in a 194×68px surface;
+- selecting the matching rule completes the first `open -a Calculator`, then
+  an identical second command completes without another approval card while
+  the global Composer policy remains `Ask for approval`;
+- a schema-validated two-turn trace records the
+  `acceptWithExecpolicyAmendment` decision and deliberately contains only one
+  approval request for two completed commands;
+- Browser/CDP and Electron drive the complete menu → first completion →
+  repeated completion flow, including exact 1m 41s/7s activity labels, final
+  responses, focus restoration, and command counts;
+- two reviewed frames raise the matrix to 80, while ownership-masked menu and
+  repeated-completion comparisons measure 1.21% and 1.37% under independent
+  1.5% limits.
+
 ## Development
 
 From the repository root:
@@ -635,6 +655,19 @@ conversation content:
 
 ```bash
 CODEX_UI_KIT_LONG_THREAD_REFERENCE=/absolute/path/to/long-thread-main.png \
+  pnpm --filter @codex-ui-kit/codex-app-playground check:visual
+```
+
+The current command-approval gates accept 906×820 main-only crops. The
+matching-command pair independently locks the open split menu and the repeated
+completed state:
+
+```bash
+CODEX_UI_KIT_APPROVAL_PENDING_REFERENCE=/absolute/path/to/approval-pending-main.png \
+CODEX_UI_KIT_APPROVAL_DENIED_REFERENCE=/absolute/path/to/approval-denied-main.png \
+CODEX_UI_KIT_APPROVAL_ALLOW_ONCE_COMPLETED_REFERENCE=/absolute/path/to/approval-allow-once-completed-main.png \
+CODEX_UI_KIT_APPROVAL_SIMILAR_MENU_REFERENCE=/absolute/path/to/approval-similar-menu-main.png \
+CODEX_UI_KIT_APPROVAL_SIMILAR_COMPLETED_REFERENCE=/absolute/path/to/approval-similar-completed-main.png \
   pnpm --filter @codex-ui-kit/codex-app-playground check:visual
 ```
 
