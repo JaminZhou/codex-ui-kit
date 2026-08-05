@@ -717,16 +717,31 @@ export function Popover({
     disabled: nativeDisabled,
     onClick: (event) => {
       triggerNode.props.onClick?.(event);
-      if (!event.defaultPrevented && !nativeDisabled) setOpen(!resolvedOpen);
+      if (!event.defaultPrevented && !nativeDisabled) {
+        if (!resolvedOpen && initialFocus === "none" && event.detail === 0) {
+          keyboardOpenTargetRef.current = "first";
+        }
+        setOpen(!resolvedOpen);
+      }
     },
     onKeyDown: (event) => {
       triggerNode.props.onKeyDown?.(event);
       if (event.defaultPrevented || nativeDisabled) return;
       if (event.key === "ArrowDown" || event.key === "ArrowUp") {
         event.preventDefault();
-        keyboardOpenTargetRef.current =
-          event.key === "ArrowUp" ? "last" : "first";
-        setOpen(true);
+        const target = event.key === "ArrowUp" ? "last" : "first";
+        keyboardOpenTargetRef.current = target;
+        if (effectiveOpen && typeof window !== "undefined") {
+          window.setTimeout(() => {
+            const items = contentRef.current
+              ? getFocusableItems(contentRef.current)
+              : [];
+            (target === "last" ? items.at(-1) : items[0])?.focus();
+            keyboardOpenTargetRef.current = null;
+          });
+        } else {
+          setOpen(true);
+        }
       }
       if (event.key === "Escape" && effectiveOpen) {
         event.preventDefault();

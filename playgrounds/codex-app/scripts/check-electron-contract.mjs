@@ -2204,6 +2204,15 @@ try {
       document.activeElement?.getAttribute("aria-label") ===
       "Change environment: No environment",
   );
+  await codingWorkspacePage.keyboard.press("Enter");
+  await worktreeEnvironmentMenu.waitFor();
+  await codingWorkspacePage.waitForFunction(
+    () =>
+      document.activeElement?.textContent?.trim() ===
+      "Work without environment✓",
+  );
+  await codingWorkspacePage.keyboard.press("Escape");
+  await worktreeEnvironmentMenu.waitFor({ state: "hidden" });
   await codingWorkspacePage
     .getByRole("button", { name: "Change run location: New worktree" })
     .click();
