@@ -818,6 +818,7 @@ textarea {
   gap: 12px;
 }
 
+.demo-root[data-scenario="approval-allow-once"],
 .demo-root[data-scenario="approval-denied"] {
   --codex-ui-conversation-thread-content-top-inset: 1.0625rem;
 }
@@ -1165,6 +1166,8 @@ textarea {
   white-space: nowrap;
 }
 
+.demo-root[data-frame="approval-current-allow-once-completed"]
+  .codex-ui-conversation-thread-shell__thread,
 .demo-root[data-frame="approval-current-denied"]
   .codex-ui-conversation-thread-shell__thread {
   min-height: calc(

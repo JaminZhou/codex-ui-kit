@@ -533,6 +533,42 @@ describe("protocol lifecycle reducer", () => {
     expect(completed.status).toBe("completed");
   });
 
+  it("reduces the current allow-once approval through command completion", () => {
+    const scenario = replayScenarios["approval-allow-once"];
+    const pending = reduceProtocolTrace(
+      scenario.events.slice(
+        0,
+        scenario.frames["approval-current-allow-once-pending"],
+      ),
+    );
+    const completed = reduceProtocolTrace(scenario.events);
+
+    expect(pending.approvals[0]).toMatchObject({
+      command: "open -a Calculator",
+      decision: "pending",
+      itemId: "command-open-calculator-once",
+      kind: "command",
+      responseDecision: "approved",
+    });
+    expect(pending.commands[0]).toMatchObject({
+      command: "open -a Calculator",
+      output: "",
+      status: "running",
+    });
+    expect(completed.approvals[0]?.decision).toBe("approved");
+    expect(completed.commands[0]).toMatchObject({
+      durationMs: 288_400,
+      exitCode: 0,
+      output: "",
+      status: "completed",
+    });
+    expect(completed.messages.at(-1)?.text).toBe(
+      "ALLOW ONCE COMPLETE.",
+    );
+    expect(completed.status).toBe("completed");
+    expect(completed.turnDurationMs).toBe(290_000);
+  });
+
   it("preserves rename, delete, binary, and conflict patch evidence", () => {
     const state = reduceProtocolTrace(
       replayScenarios["mixed-file-review"].events,

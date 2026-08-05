@@ -2511,9 +2511,9 @@ try {
 }
 
 const currentApprovedApprovalScene = {
-  frame: "approval-current-pending",
+  frame: "approval-current-allow-once-pending",
   id: "electron-current-approval-approved",
-  scenario: "approval-denied",
+  scenario: "approval-allow-once",
 };
 const {
   app: currentApprovedApprovalApp,
@@ -2526,15 +2526,31 @@ try {
     .click();
   await currentApprovedApprovalPage
     .getByText(
-      "Approval was granted, and the command completed successfully.",
+      "ALLOW ONCE COMPLETE.",
       { exact: true },
     )
     .waitFor();
   const approvalCount = await currentApprovedApprovalPage
     .getByTestId("current-approval-request")
     .count();
+  const restoredComposer = await currentApprovedApprovalPage.evaluate(() => {
+    const composer = document.querySelector(
+      '.codex-ui-composer textarea',
+    );
+    return {
+      activeLabel:
+        document.activeElement?.getAttribute("aria-label") ?? null,
+      composerValue:
+        composer instanceof HTMLTextAreaElement ? composer.value : null,
+      permissionLabel:
+        document
+          .querySelector(".demo-composer-permission-trigger")
+          ?.textContent?.replace(/^◉/, "")
+          .trim() ?? null,
+    };
+  });
   await currentApprovedApprovalPage
-    .getByRole("button", { exact: true, name: "Worked for 23s" })
+    .getByRole("button", { exact: true, name: "Worked for 4m 50s" })
     .click();
   const commandExecution = currentApprovedApprovalPage.getByTestId(
     "command-execution",
@@ -2551,13 +2567,17 @@ try {
   if (
     approvalCount !== 0 ||
     commandStatus !== "completed" ||
-    commandSummary !== "Completed open -a Calculator"
+    commandSummary !== "Completed open -a Calculator" ||
+    restoredComposer.activeLabel !== "Message composer" ||
+    restoredComposer.composerValue !== "" ||
+    restoredComposer.permissionLabel !== "Ask for approval"
   ) {
     throw new Error(
       `Electron current approval acceptance did not settle the command replay: ${JSON.stringify({
         approvalCount,
         commandSummary,
         commandStatus,
+        restoredComposer,
       })}`,
     );
   }

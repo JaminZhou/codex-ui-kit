@@ -481,6 +481,22 @@ The twenty-seventh slice reaches the current thread summary overlay on
 - the 76-frame reviewed matrix adds the summary overlay, and its ownership-
   scoped component comparison differs by 2.86% under a 3% hard limit.
 
+## Twenty-eighth vertical slice
+
+The twenty-eighth slice reaches a successful current command approval on
+`26.730.61309`:
+
+- one disposable task requests only `open -a Calculator`, confirms the app is
+  absent before approval, activates `Allow once`, and closes Calculator after
+  the exact `ALLOW ONCE COMPLETE.` response;
+- a dedicated schema-validated accept trace records pending approval,
+  resolution, successful command completion, and final turn completion;
+- Browser/CDP and Electron drive the transition and verify the approval card
+  disappears, the command completes once, the empty Composer regains focus,
+  and the permission remains `Ask for approval`;
+- two reviewed frames raise the matrix to 78, while ownership-masked pending
+  and completed comparisons measure 1.26% and 0.30% under 1.5% limits.
+
 ## Development
 
 From the repository root:

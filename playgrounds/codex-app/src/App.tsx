@@ -1170,7 +1170,9 @@ export function App() {
     ],
   );
   const isCurrentApprovalReplay =
-    mode === "replay" && scenarioId === "approval-denied";
+    mode === "replay" &&
+    (scenarioId === "approval-allow-once" ||
+      scenarioId === "approval-denied");
   const isCurrentLongCommandReplay =
     mode === "replay" && scenarioId === "long-command-output";
   const isCurrentCommandFailureReplay =
@@ -1409,7 +1411,19 @@ export function App() {
   ) => {
     if (mode === "replay") {
       if (isCurrentApprovalReplay) {
+        if (scenarioId === "approval-allow-once" && decision === "accept") {
+          setReplayApprovalResolution(null);
+          setReplayCount(scenario.events.length);
+          setActiveFrame("approval-current-allow-once-completed");
+          window.setTimeout(() => composerInputRef.current?.focus());
+          return;
+        }
         if (decision === "decline") {
+          if (scenarioId === "approval-allow-once") {
+            selectScenario("approval-denied", "approval-current-denied");
+            window.setTimeout(() => composerInputRef.current?.focus());
+            return;
+          }
           setReplayApprovalResolution(null);
           setReplayCount(scenario.events.length);
           setActiveFrame("approval-current-denied");
@@ -2322,6 +2336,7 @@ export function App() {
       scenarioId === "markdown" ||
       scenarioId === "mcp-tool-call" ||
       scenarioId === "mcp-recovery-mixed-thread" ||
+      scenarioId === "approval-allow-once" ||
       scenarioId === "approval-denied" ||
       scenarioId === "long-command-output" ||
       scenarioId === "command-failure-recovery" ||
@@ -3780,9 +3795,11 @@ export function App() {
                 (scenarioId === "mcp-recovery-mixed-thread" &&
                   (message.id === "assistant-recovery" ||
                     message.id === "assistant-workflow")) ||
-                (scenarioId === "approval-denied" &&
+                ((scenarioId === "approval-denied" ||
+                  scenarioId === "approval-allow-once") &&
                   (message.id === "assistant-approval-denied" ||
-                    message.id === "assistant-approval-approved")) ||
+                    message.id === "assistant-approval-approved" ||
+                    message.id === "assistant-approval-allow-once")) ||
                 (scenarioId === "long-command-output" &&
                   message.id === "assistant-long-command-final") ||
                 (scenarioId === "command-failure-recovery" &&
@@ -3798,13 +3815,15 @@ export function App() {
               message.status === "completed" ? (
                 scenarioId === "mcp-tool-call" ||
                 scenarioId === "mcp-recovery-mixed-thread" ||
+                scenarioId === "approval-allow-once" ||
                 scenarioId === "approval-denied" ||
                 scenarioId === "long-command-output" ? (
                   <McpResponseActions
                     label={
                       message.id === "assistant-workflow" ||
                       message.id === "assistant-approval-denied" ||
-                      message.id === "assistant-approval-approved"
+                      message.id === "assistant-approval-approved" ||
+                      message.id === "assistant-approval-allow-once"
                         ? "Response actions"
                         : undefined
                     }
@@ -4121,17 +4140,24 @@ export function App() {
       if (!command) return null;
       if (
         isCurrentApprovalReplay &&
-        command.id === "command-open-calculator"
+        (command.id === "command-open-calculator" ||
+          command.id === "command-open-calculator-once")
       ) {
         const pending = command.status === "running";
         const approved = command.status === "completed";
+        const pendingDurationMs =
+          scenarioId === "approval-allow-once" ? 273_000 : 14_000;
         return (
           <ActivityTimeline
             key={`command:${command.id}`}
             open={initialSelection.capture && pending ? true : undefined}
             summary={
               <TurnDuration
-                durationMs={pending ? 14_000 : (state.turnDurationMs ?? 23_000)}
+                durationMs={
+                  pending
+                    ? pendingDurationMs
+                    : (state.turnDurationMs ?? 23_000)
+                }
                 status={pending ? "working" : "worked"}
               />
             }

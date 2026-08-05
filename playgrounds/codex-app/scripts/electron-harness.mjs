@@ -402,6 +402,20 @@ export const visualScenes = [
     scrollTop: 72,
   },
   {
+    frame: "approval-current-allow-once-pending",
+    id: "approval-current-allow-once-pending",
+    maxPixelRatio: 0.0225,
+    scenario: "approval-allow-once",
+    surfaces: ["approval", "command"],
+  },
+  {
+    frame: "approval-current-allow-once-completed",
+    id: "approval-current-allow-once-completed",
+    maxPixelRatio: 0.0225,
+    scenario: "approval-allow-once",
+    scrollTop: 72,
+  },
+  {
     frame: "file-changing",
     id: "file-changing",
     scenario: "workspace-workflow",

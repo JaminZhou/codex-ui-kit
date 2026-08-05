@@ -12,7 +12,7 @@ exit gates; it does not replace the inventory.
 
 - The current installed package is Codex Desktop `26.730.61309` (`6223`).
 - The inventory contains 78 surface groups: 50 P0, 19 P1, and 9 P2.
-- 11 groups have current-build runtime evidence, 49 have previous-build-only
+- 12 groups have current-build runtime evidence, 48 have previous-build-only
   runtime evidence, and 18 have not been sampled.
 - The current `26.730.61309` refresh now covers all six left-sidebar groups
   plus the successful long-command surface. The sidebar capture locks the
@@ -31,7 +31,7 @@ exit gates; it does not replace the inventory.
   responsive detail restoration. Its independent state machine adds
   index/detail loading and failure, checks, comments, review submission,
   merge-readiness, merge completion, compact layout, and route restoration.
-  Together the playground gates cover 76 CDP/pixel frames, and the refreshed
+  Together the playground gates cover 78 CDP/pixel frames, and the refreshed
   PR detail passes the current 906×820 regional pixel gate. The refreshed
   real MCP success path now matches Search → Fetch, the integrated activity
   disclosure, computed typography, and a current regional pixel gate. The
@@ -73,7 +73,13 @@ exit gates; it does not replace the inventory.
   environment/Git workflow overlay, locks its 28px trigger, 300x199px panel,
   five compact rows, keyboard/dismissal behavior, and 2.86% ownership-scoped
   pixel result in Browser and Electron. Populated resource sections and the
-  current compact/pinned layouts remain separate evidence gates. The other
+  current compact/pinned layouts remain separate evidence gates. A sixth
+  disposable task now locks a real `open -a Calculator` approval from the
+  736×162 pending Composer-dock surface through `Allow once`, command success,
+  the exact final response, unchanged `Ask for approval` policy, and focused
+  empty 736×98 Composer restoration. Its independent accept trace, Browser/CDP,
+  Electron, and pending/completed current-build pixel gates pass at 1.26% and
+  0.30% under 1.5% limits. The other
   preceding `26.727.40816` results remain previous-build evidence. Attachment
   variants, Terminal multi-tab/process behavior,
   Review rename/delete variants, and broader shell evidence from

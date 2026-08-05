@@ -89,7 +89,9 @@ Every deterministic scenario has one ID and produces four evidence layers:
    content and retains the compact rail and floating control under a 1% hard
    limit. Current command approval uses separate 906×820
    `CODEX_UI_KIT_APPROVAL_PENDING_REFERENCE` and
-   `CODEX_UI_KIT_APPROVAL_DENIED_REFERENCE` inputs; their masks retain the
+   `CODEX_UI_KIT_APPROVAL_DENIED_REFERENCE` inputs. The current Allow-once
+   completion additionally accepts
+   `CODEX_UI_KIT_APPROVAL_ALLOW_ONCE_COMPLETED_REFERENCE`; their masks retain the
    approval/Composer silhouettes, actions, activity structure, and spacing
    under independent 1.5% hard limits. Current long command output accepts a
    full 1180×820 `CODEX_UI_KIT_COMMAND_OUTPUT_REFERENCE`; its ownership mask
@@ -118,8 +120,10 @@ masks exclude unrelated transcript text and fixture-specific labels while
 preserving the queue, overlay, Composer silhouettes, controls, backgrounds,
 radii, and spacing. Goal and Plan measured `0.003763528` and `0.003486243`.
 The current long-thread rail/control comparison measured `0.005937382`.
-Current approval pending and denied comparisons measured `0.008493512` and
-`0.001214128`. Current `26.730.61309` long command output measured
+Historical approval pending and denied comparisons measured `0.008493512` and
+`0.001214128`. Current `26.730.61309` Allow-once pending and completed
+comparisons measured `0.012554514617993862` and `0.002993592849835783`.
+Current `26.730.61309` long command output measured
 `0.001655643`.
 
 Computer Use remains an optional macOS acceptance layer for real pointer,
@@ -196,7 +200,7 @@ CDP independently locks the current 736×134/736×259 Composer geometry,
 480×222 permission menu, 736×320 resource picker, 28px controls, 13px queue
 inset, navigation markers, disabled semantics, and windowed placeholder.
 
-The matrix now totals 66 frames. Its two command-approval frames cover the
+The reviewed matrix now totals 78 frames. Its historical two command-approval frames cover the
 current 736×162 pending Composer-dock card and the denied completion with
 response actions and restored 736×98 Composer. CDP verifies request state,
 command/activity labels, dimensions, and permission restoration. Electron
@@ -205,3 +209,8 @@ opens and dismisses the scoped menu with focus restoration, then drives
 The final frame covers a successful 400-line command with `Shell`, two copy
 controls, a 144px reverse-tail viewport, and Success. CDP locks its 401 split
 lines and collapse/reopen restoration; Electron drives the same disclosures.
+The current Allow-once pair adds an independent accept response, successful
+command completion, exact final answer, unchanged approval policy, and focused
+empty Composer restoration. Both Browser/CDP and real Electron drive this
+transition, and separate current-build pending/completed references remain
+under their 1.5% ownership-masked limits.
