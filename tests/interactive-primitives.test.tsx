@@ -256,6 +256,28 @@ describe("menus and selects", () => {
     expect(document.activeElement).toBe(trigger);
   });
 
+  it("still focuses menu items for keyboard opens without pointer initial focus", async () => {
+    render(
+      <Menu
+        initialFocus="none"
+        trigger={<button type="button">Choose environment</button>}
+      >
+        <MenuItem>Work without environment</MenuItem>
+        <MenuItem>Environment settings</MenuItem>
+      </Menu>,
+    );
+
+    const trigger = screen.getByRole("button", {
+      name: "Choose environment",
+    });
+    fireEvent.keyDown(trigger, { key: "ArrowDown" });
+    await waitFor(() =>
+      expect(document.activeElement).toBe(
+        screen.getByRole("menuitem", { name: "Work without environment" }),
+      ),
+    );
+  });
+
   it("keeps text editing in the input while retaining menu arrow navigation", async () => {
     render(
       <Menu defaultOpen trigger={<button type="button">Branches</button>}>

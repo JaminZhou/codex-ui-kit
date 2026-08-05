@@ -685,9 +685,11 @@ export function Popover({
   }, [close, effectiveOpen, id]);
 
   useEffect(() => {
-    if (!effectiveOpen || initialFocus === "none" || typeof window === "undefined") {
+    if (!effectiveOpen || typeof window === "undefined") {
       return;
     }
+    const keyboardOpenTarget = keyboardOpenTargetRef.current;
+    if (initialFocus === "none" && !keyboardOpenTarget) return;
     const timer = window.setTimeout(() => {
       const content = contentRef.current;
       if (!content) return;
@@ -696,8 +698,8 @@ export function Popover({
         : null;
       const target =
         selected ??
-        (initialFocus === "first"
-          ? keyboardOpenTargetRef.current === "last"
+        (keyboardOpenTarget || initialFocus === "first"
+          ? keyboardOpenTarget === "last"
             ? getFocusableItems(content).at(-1)
             : getFocusableItems(content)[0]
           : content);

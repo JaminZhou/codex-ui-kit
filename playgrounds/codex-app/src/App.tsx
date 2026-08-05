@@ -3278,6 +3278,11 @@ export function App() {
             </button>
             <button
               onClick={() => {
+                const focusTargetId =
+                  workspaceProjectTriggerId ===
+                  "demo-workspace-destination-trigger"
+                    ? "demo-workspace-project-trigger"
+                    : workspaceProjectTriggerId;
                 setWorkspaceProjectId(null);
                 setWorkspaceEnvironmentId("local");
                 setWorkspaceWorktreeId("main");
@@ -3286,7 +3291,7 @@ export function App() {
                 setWorkspaceProjectQuery("");
                 window.setTimeout(() =>
                   document
-                    .getElementById(workspaceProjectTriggerId)
+                    .getElementById(focusTargetId)
                     ?.focus(),
                 );
               }}

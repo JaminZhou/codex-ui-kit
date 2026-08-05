@@ -2037,7 +2037,7 @@ try {
     .getByRole("textbox", { name: "Do anything" })
     .focus();
   await projectDialog.waitFor({ state: "hidden" });
-  await projectTrigger.click();
+  await projectDestination.click();
   await projectDialog
     .getByRole("button", {
       name: "Don't work in a project",
@@ -2053,7 +2053,7 @@ try {
     )) !== "Choose project"
   ) {
     throw new Error(
-      "Electron coding workspace did not restore project-trigger focus after clearing the project.",
+      "Electron coding workspace did not restore the surviving project-trigger focus after clearing from the destination.",
     );
   }
   const noProjectDestination = (
@@ -2152,6 +2152,15 @@ try {
     name: "Environment",
   });
   await worktreeEnvironmentMenu.waitFor();
+  if (
+    (await codingWorkspacePage.evaluate(
+      () => document.activeElement?.getAttribute("aria-label"),
+    )) !== "Change environment: No environment"
+  ) {
+    throw new Error(
+      "Electron coding workspace pointer-opened environment picker moved focus away from its trigger.",
+    );
+  }
   const worktreeEnvironmentState = {
     empty: (
       await worktreeEnvironmentMenu
@@ -2184,6 +2193,17 @@ try {
       "Electron coding workspace environment picker did not restore trigger focus.",
     );
   }
+  await codingWorkspacePage
+    .getByRole("button", { name: "Change environment: No environment" })
+    .press("ArrowDown");
+  await worktreeEnvironmentMenu.waitFor();
+  await codingWorkspacePage.waitForFunction(
+    () =>
+      document.activeElement?.textContent?.trim() ===
+      "Work without environment✓",
+  );
+  await codingWorkspacePage.keyboard.press("Escape");
+  await worktreeEnvironmentMenu.waitFor({ state: "hidden" });
   await codingWorkspacePage
     .getByRole("button", { name: "Change run location: New worktree" })
     .click();
