@@ -64,8 +64,8 @@ observation from a previous build remains historical evidence.
   preview. All other `26.727.40816` observations remain previous-build
   evidence until separately reached on `26.730.61309`.
 
-Current inventory: 77 surface groups; 8 have current-build runtime evidence,
-51 have previous-build-only runtime evidence, 18 remain `not_sampled`, and 0
+Current inventory: 78 surface groups; 8 have current-build runtime evidence,
+51 have previous-build-only runtime evidence, 19 remain `not_sampled`, and 0
 are `blocked_by_policy`. Current-build Browser verification covers 8 groups
 and Electron verification covers 8. Prior acceptance outside the sampled
 command and six-sidebar slices remains recorded as `partial_legacy`
@@ -616,7 +616,7 @@ and recovered follow-up states. Browser/CDP now covers 70 lifecycle frames;
 Electron repeats disclosure, exact copied output, collapse/reopen, failure,
 and recovery. The ownership-masked full-window gate passes at
 `0.008898305084745763` under a 1% hard limit. This additionally promotes
-`thread.error-retry-recovery` only for recovery after a command-level failure.
+`thread.command-failure-recovery` only for recovery after a command-level failure.
 Interruption, active truncation copy affordances, background processes,
 transport-level retry, and other command kinds remain open.
 

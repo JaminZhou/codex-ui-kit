@@ -11,9 +11,9 @@ exit gates; it does not replace the inventory.
 ## Current position
 
 - The current installed package is Codex Desktop `26.730.61309` (`6223`).
-- The inventory contains 77 surface groups: 49 P0, 19 P1, and 9 P2.
+- The inventory contains 78 surface groups: 50 P0, 19 P1, and 9 P2.
 - 8 groups have current-build runtime evidence, 51 have previous-build-only
-  runtime evidence, and 18 have not been sampled.
+  runtime evidence, and 19 have not been sampled.
 - The current `26.730.61309` refresh now covers all six left-sidebar groups
   plus the successful long-command surface. The sidebar capture locks the
   274px column, 46px titlebar, 70px navigation header, 30px rows, five

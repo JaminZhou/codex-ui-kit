@@ -165,6 +165,20 @@
       "priority": "p0"
     },
     {
+      "id": "thread.command-failure-recovery",
+      "area": "conversation",
+      "ownership": "thread",
+      "packageEvidence": ["run-command-animation", "local-conversation-page"],
+      "runtimeStatus": "runtime_observed",
+      "runtimeEvidence": [
+        "cdp-26.730.61309:real-command-exit-7-followed-by-successful-no-tool-turn-in-the-same-thread"
+      ],
+      "implementationStatus": "partial",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
+      "priority": "p0"
+    },
+    {
       "id": "thread.file-change-diff",
       "area": "conversation",
       "ownership": "turn",
@@ -296,13 +310,10 @@
       "area": "conversation",
       "ownership": "thread",
       "packageEvidence": ["local-conversation-page", "remote-conversation-page"],
-      "runtimeStatus": "runtime_observed",
-      "runtimeEvidence": [
-        "cdp-26.730.61309:real-command-exit-7-followed-by-successful-no-tool-turn-in-the-same-thread"
-      ],
+      "runtimeStatus": "not_sampled",
       "implementationStatus": "partial",
-      "browserStatus": "verified",
-      "electronStatus": "verified",
+      "browserStatus": "partial_legacy",
+      "electronStatus": "partial_legacy",
       "priority": "p0"
     },
     {
