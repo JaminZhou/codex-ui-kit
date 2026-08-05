@@ -1924,6 +1924,11 @@ for (const scene of visualScenes) {
         await page
           .getByText("SESSION APPROVAL FIRST COMPLETE.", { exact: true })
           .waitFor();
+        await page.waitForFunction(
+          () =>
+            document.activeElement?.getAttribute("aria-label") ===
+            "Message composer",
+        );
         const firstCompleted = await page.evaluate(() => {
           const composer = document.querySelector(
             ".codex-ui-composer textarea",
@@ -1980,6 +1985,11 @@ for (const scene of visualScenes) {
         await page
           .getByText("SESSION APPROVAL SECOND COMPLETE.", { exact: true })
           .waitFor();
+        await page.waitForFunction(
+          () =>
+            document.activeElement?.getAttribute("aria-label") ===
+            "Message composer",
+        );
         const repeatedCompleted = await page.evaluate(() => ({
           activeLabel:
             document.activeElement?.getAttribute("aria-label") ?? null,

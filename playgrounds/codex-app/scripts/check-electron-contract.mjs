@@ -2625,6 +2625,11 @@ try {
   await currentSimilarApprovalPage
     .getByText("SESSION APPROVAL FIRST COMPLETE.", { exact: true })
     .waitFor();
+  await currentSimilarApprovalPage.waitForFunction(
+    () =>
+      document.activeElement?.getAttribute("aria-label") ===
+      "Message composer",
+  );
   const secondPrompt =
     "Run the exact same harmless command again; the matching approval rule should avoid another prompt.";
   await currentSimilarApprovalPage
@@ -2639,6 +2644,11 @@ try {
   await currentSimilarApprovalPage
     .getByText("SESSION APPROVAL SECOND COMPLETE.", { exact: true })
     .waitFor();
+  await currentSimilarApprovalPage.waitForFunction(
+    () =>
+      document.activeElement?.getAttribute("aria-label") ===
+      "Message composer",
+  );
   const repeated = await currentSimilarApprovalPage.evaluate(() => {
     const composer = document.querySelector(
       ".codex-ui-composer textarea",
