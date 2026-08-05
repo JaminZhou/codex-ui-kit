@@ -9,6 +9,12 @@ const styles = readFileSync(
 describe("terminal panel visual contract", () => {
   it("keeps transcript and prompt bounded inside the bottom panel", () => {
     expect(styles).toContain(".codex-ui-terminal-session");
+    expect(styles).toContain(".codex-ui-terminal-panel__tab-label");
+    expect(styles).toContain(".codex-ui-terminal-process-list");
+    expect(styles).toContain("padding-inline: 0.5rem 2rem");
+    expect(styles).toContain(
+      '.codex-ui-terminal-panel__tab-label[data-status="restoring"]',
+    );
     expect(styles).toContain(".codex-ui-terminal-transcript");
     expect(styles).toContain("overscroll-behavior: contain");
     expect(styles).toContain(".codex-ui-terminal-prompt");

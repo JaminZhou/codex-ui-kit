@@ -110,6 +110,12 @@ import {
   SubagentPanel,
   SubagentSummary,
   SubagentTranscriptHeader,
+  TerminalPanel,
+  TerminalProcessList,
+  TerminalPrompt,
+  TerminalSession,
+  TerminalTranscript,
+  type TerminalSessionStatus,
   TurnDuration,
   Tooltip,
   WorkspacePanel,
@@ -210,6 +216,7 @@ const generatedImage: GeneratedImageItem = {
 };
 const dialogSize: DialogSize = "compact";
 const warningStatus: StatusIndicatorStatus = "warning";
+const terminalStatus: TerminalSessionStatus = "restoring";
 // @ts-expect-error Warning is intentionally scoped to activity/status surfaces.
 const invalidFileChangeWarning: FileChangeStatus = "warning";
 // @ts-expect-error Warning is intentionally scoped to activity/status surfaces.
@@ -318,6 +325,11 @@ void SubagentActivityGroup;
 void SubagentPanel;
 void SubagentSummary;
 void SubagentTranscriptHeader;
+void TerminalPanel;
+void TerminalProcessList;
+void TerminalPrompt;
+void TerminalSession;
+void TerminalTranscript;
 void TurnDuration;
 void Button;
 void IconButton;
@@ -357,5 +369,6 @@ void queuedPrompt;
 void generatedImage;
 void dialogSize;
 void warningStatus;
+void terminalStatus;
 void invalidFileChangeWarning;
 void invalidCommandWarning;

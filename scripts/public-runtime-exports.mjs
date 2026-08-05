@@ -91,6 +91,8 @@ export const publicRuntimeExports = [
   "SubagentPanel",
   "SubagentSummary",
   "SubagentTranscriptHeader",
+  "TerminalPanel",
+  "TerminalProcessList",
   "TerminalPrompt",
   "TerminalSession",
   "TerminalTranscript",

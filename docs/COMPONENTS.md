@@ -165,7 +165,13 @@ All privileged behavior remains host-owned. The components never auto-approve co
 - `TerminalTranscript`, `TerminalPrompt`, and `TerminalSession`: terminal
   output, controlled input, and process-status composition with typed output
   rows, polite follow output, named log/input regions, and explicit
-  host-owned submission. They never start a shell or execute input.
+  host-owned submission. `TerminalPanel` adds controlled multi-session tabs,
+  per-tab close, create/restore hooks, independent values, and running,
+  failed, restoring, idle, or exited status. Tab names expose that status to
+  assistive technology and use distinct visible symbols rather than color
+  alone. `TerminalProcessList` presents host-supplied background-process
+  summaries and reopen requests. None of these components starts a shell,
+  owns process persistence, or executes input.
 - `ThreadHeader`: draggable desktop header with truncating identity, navigation, and independently aligned action slots.
 - `ThreadNavigationControls`: sidebar and optional Back/Forward toolbar controls with shortcuts, disabled states, and transient-navigation hover hooks.
 - `ThreadMessageNavigationRail`: message overview with a current-build default

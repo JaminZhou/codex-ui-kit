@@ -644,6 +644,7 @@ for (const scene of visualScenes) {
           '.codex-ui-workspace-panel[data-placement="bottom"]',
         mcpGroup: ".codex-ui-mcp-tool-call-group",
         terminal: ".codex-ui-terminal-session",
+        terminalProcesses: ".codex-ui-terminal-process-list",
       };
       const namedSurfaces = Object.fromEntries(
         Object.entries(namedSurfaceSelectors).map(([name, selector]) => {
@@ -960,25 +961,55 @@ for (const scene of visualScenes) {
           const transcript = panel?.querySelector(
             '[role="log"][aria-label="Terminal output"]',
           );
-          return panel &&
-            panelContent &&
-            panelHeader &&
-            selectedTab &&
-            tabPanel &&
-            terminalInput &&
-            transcript
+          return panel && panelHeader
             ? {
                 entryKinds: Array.from(
-                  transcript.querySelectorAll("[data-kind]"),
+                  transcript?.querySelectorAll("[data-kind]") ?? [],
                   (entry) => entry.getAttribute("data-kind"),
                 ),
-                inputLabel: terminalInput.getAttribute("aria-label"),
+                emptyText: panel.querySelector(
+                  ".codex-ui-workspace-panel__empty",
+                )?.textContent?.trim(),
+                inputLabel: terminalInput?.getAttribute("aria-label"),
                 panel: rect(panel),
-                panelContent: rect(panelContent),
+                panelContent: panelContent ? rect(panelContent) : null,
                 panelHeader: rect(panelHeader),
-                selectedTab: selectedTab.textContent?.trim(),
-                tabPanelLabelledBy: tabPanel.getAttribute("aria-labelledby"),
-                transcriptLive: transcript.getAttribute("aria-live"),
+                selectedTab: selectedTab?.textContent?.trim(),
+                sessionCount: panel.querySelectorAll(
+                  ".codex-ui-terminal-session",
+                ).length,
+                tabCloseCount: panel.querySelectorAll(
+                  ".codex-ui-workspace-panel__tab-close",
+                ).length,
+                tabCount: panel.querySelectorAll('[role="tab"]').length,
+                tabPanelLabelledBy:
+                  tabPanel?.getAttribute("aria-labelledby"),
+                tabStatuses: Array.from(
+                  panel.querySelectorAll(
+                    ".codex-ui-terminal-panel__tab-label",
+                  ),
+                  (label) => label.getAttribute("data-status"),
+                ),
+                transcriptLive: transcript?.getAttribute("aria-live"),
+              }
+            : null;
+        })(),
+        terminalPicker: (() => {
+          const menu = document.querySelector(
+            '.demo-terminal-tab-menu[role="menu"]',
+          );
+          return menu
+            ? {
+                items: Array.from(
+                  menu.querySelectorAll('[role="menuitem"]'),
+                  (item) => ({
+                    disabled:
+                      item.getAttribute("aria-disabled") === "true" ||
+                      item.hasAttribute("disabled"),
+                    text: item.textContent?.trim(),
+                  }),
+                ),
+                rect: rect(menu),
               }
             : null;
         })(),
@@ -1288,11 +1319,14 @@ for (const scene of visualScenes) {
     if (contract.styles.viewportOverflowY !== "auto") {
       throw new Error(`${scene.id}: conversation viewport is not scrollable.`);
     }
+    const expectedViewportHeight = scene.windowSize?.height ?? 820;
     if (
       !contract.sidebar ||
       !contract.sidebar.titlebarInset ||
       Math.abs(contract.sidebar.rect.width - 274) > 1 ||
-      Math.abs(contract.sidebar.rect.height - 820) > 1 ||
+      Math.abs(
+        contract.sidebar.rect.height - expectedViewportHeight,
+      ) > 1 ||
       Math.abs(contract.sidebar.header.top - 46) > 1 ||
       Math.abs(contract.sidebar.header.height - 70) > 1 ||
       Math.abs(contract.sidebar.navigation.top - 116) > 1 ||
@@ -1301,7 +1335,9 @@ for (const scene of visualScenes) {
           contract.sidebar.footer.top,
       ) > 1 ||
       Math.abs(contract.sidebar.footer.height - 46) > 1 ||
-      Math.abs(contract.sidebar.footer.bottom - 820) > 1 ||
+      Math.abs(
+        contract.sidebar.footer.bottom - expectedViewportHeight,
+      ) > 1 ||
       contract.sidebar.navigation.scrollHeight <
         contract.sidebar.navigation.clientHeight ||
       contract.sidebar.projectToggleExpanded !== "false" ||
@@ -1315,9 +1351,12 @@ for (const scene of visualScenes) {
         `${scene.id}: current-build sidebar contract failed: ${JSON.stringify(contract.sidebar)}`,
       );
     }
-    const expectedSidebarMax = scene.surfaces?.includes("reviewPanel")
-      ? "508"
-      : "520";
+    const expectedSidebarMax =
+      scene.id === "terminal-compact"
+        ? "468"
+        : scene.surfaces?.includes("reviewPanel")
+          ? "508"
+          : "520";
     if (
       contract.styles.resizerCursor !== "col-resize" ||
       Math.abs(contract.sidebarResizer.rect.width - 16) > 0.5 ||
@@ -1387,25 +1426,55 @@ for (const scene of visualScenes) {
     if (scene.surfaces?.includes("bottomPanel")) {
       const terminal = contract.terminal;
       const resizer = contract.bottomPanelResizer;
+      const compactTerminal = scene.id === "terminal-compact";
+      const closedTerminal = scene.id === "terminal-closed";
+      const expectedTerminalWidth = compactTerminal ? 546 : 906;
+      const expectedTerminalMaximum = compactTerminal ? "332" : "402";
+      const expectedTerminalTabs = {
+        "background-terminal": 1,
+        "terminal-closed": 0,
+        "terminal-compact": 3,
+        "terminal-failed": 2,
+        "terminal-multi-tab": 3,
+        "terminal-picker": 3,
+        "terminal-running": 1,
+      }[scene.id];
+      const expectedTerminalStatuses = {
+        "background-terminal": ["running"],
+        "terminal-closed": [],
+        "terminal-compact": ["running", "failed", "exited"],
+        "terminal-failed": ["running", "failed"],
+        "terminal-multi-tab": ["running", "failed", "exited"],
+        "terminal-picker": ["exited", "failed", "exited"],
+        "terminal-running": ["running"],
+      }[scene.id];
       if (
         !terminal ||
         !resizer ||
         resizer.cursor !== "row-resize" ||
         Math.abs(resizer.rect.height - 16) > 0.5 ||
         resizer.ariaMin !== "152" ||
-        resizer.ariaMax !== "402" ||
+        resizer.ariaMax !== expectedTerminalMaximum ||
         resizer.ariaNow !== "272" ||
-        Math.abs(terminal.panel.width - 906) > 1 ||
+        Math.abs(terminal.panel.width - expectedTerminalWidth) > 1 ||
         Math.abs(terminal.panel.height - 272) > 1 ||
         Math.abs(terminal.panelHeader.height - 33) > 1 ||
-        Math.abs(terminal.panelContent.height - 239) > 1 ||
         Math.abs(resizer.rect.bottom - terminal.panel.top) > 1 ||
-        !terminal.selectedTab?.includes("codex-ui-kit") ||
-        terminal.inputLabel !== "Terminal input" ||
-        terminal.transcriptLive !== "polite" ||
-        !terminal.tabPanelLabelledBy ||
-        !terminal.entryKinds.includes("command") ||
-        !terminal.entryKinds.includes("stdout")
+        terminal.sessionCount !== (closedTerminal ? 0 : 1) ||
+        terminal.tabCount !== expectedTerminalTabs ||
+        terminal.tabCloseCount !== expectedTerminalTabs ||
+        JSON.stringify(terminal.tabStatuses) !==
+          JSON.stringify(expectedTerminalStatuses) ||
+        (closedTerminal
+          ? !terminal.emptyText?.includes("Restore last terminal")
+          : !terminal.panelContent ||
+            Math.abs(terminal.panelContent.height - 239) > 1 ||
+            !terminal.selectedTab?.includes("codex-ui-kit") ||
+            terminal.inputLabel !== "Terminal input" ||
+            terminal.transcriptLive !== "polite" ||
+            !terminal.tabPanelLabelledBy ||
+            !terminal.entryKinds.includes("command") ||
+            !terminal.entryKinds.includes("stdout"))
       ) {
         throw new Error(
           `${scene.id}: Terminal panel contract failed: ${JSON.stringify({
@@ -1413,6 +1482,44 @@ for (const scene of visualScenes) {
             terminal,
           })}`,
         );
+      }
+      if (
+        scene.id === "terminal-picker" &&
+        (!contract.terminalPicker ||
+          contract.terminalPicker.items.length !== 4 ||
+          !contract.terminalPicker.items[0]?.text?.includes("Review") ||
+          !contract.terminalPicker.items[1]?.text?.includes("Terminal") ||
+          !contract.terminalPicker.items[2]?.text?.includes("Browser") ||
+          !contract.terminalPicker.items[3]?.text?.includes("Files") ||
+          contract.terminalPicker.rect.width < 280)
+      ) {
+        throw new Error(
+          `${scene.id}: Terminal picker contract failed: ${JSON.stringify(contract.terminalPicker)}`,
+        );
+      }
+      if (scene.id === "terminal-closed") {
+        await page
+          .getByRole("button", { name: "Restore last terminal" })
+          .click();
+        await page.waitForSelector('[role="tab"][aria-selected="true"]');
+        const restoredTerminal = await page.evaluate(() => ({
+          inputLabel: document
+            .querySelector(".codex-ui-terminal-prompt__input")
+            ?.getAttribute("aria-label"),
+          selectedTab: document
+            .querySelector('[role="tab"][aria-selected="true"]')
+            ?.textContent?.trim(),
+          tabCount: document.querySelectorAll('[role="tab"]').length,
+        }));
+        if (
+          restoredTerminal.tabCount !== 1 ||
+          !restoredTerminal.selectedTab?.includes("codex-ui-kit") ||
+          restoredTerminal.inputLabel !== "Terminal input"
+        ) {
+          throw new Error(
+            `${scene.id}: Terminal restore action failed: ${JSON.stringify(restoredTerminal)}`,
+          );
+        }
       }
     } else if (contract.bottomPanelResizer) {
       throw new Error(

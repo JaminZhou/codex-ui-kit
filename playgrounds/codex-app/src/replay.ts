@@ -9,6 +9,7 @@ import mcpRecoveryMixedThreadTrace from "../fixtures/traces/mcp-recovery-mixed-t
 import mixedFileReviewTrace from "../fixtures/traces/mixed-file-review.jsonl?raw";
 import multiFileReviewTrace from "../fixtures/traces/multi-file-review.jsonl?raw";
 import recoveryTrace from "../fixtures/traces/streaming-recovery.jsonl?raw";
+import terminalLifecycleTrace from "../fixtures/traces/terminal-lifecycle.jsonl?raw";
 import workflowTrace from "../fixtures/traces/workspace-workflow.jsonl?raw";
 import type { ProtocolEventRecord } from "./protocol-state";
 
@@ -16,6 +17,7 @@ export type ReplayScenarioId =
   | "background-terminal"
   | "conversation-lifecycle"
   | "streaming-recovery"
+  | "terminal-lifecycle"
   | "interruption"
   | "compaction"
   | "large-file-review"
@@ -78,6 +80,12 @@ export const replayScenarios: Record<ReplayScenarioId, ReplayScenario> = {
     "Background terminal",
     "Process output, terminal interaction, resize, close, and restore.",
     backgroundTerminalTrace,
+  ),
+  "terminal-lifecycle": scenario(
+    "terminal-lifecycle",
+    "Terminal session lifecycle",
+    "Multiple terminal tabs, running/failed/exited processes, close, restore, and compact behavior.",
+    terminalLifecycleTrace,
   ),
   "streaming-recovery": scenario(
     "streaming-recovery",

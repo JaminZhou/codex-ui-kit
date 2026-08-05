@@ -888,6 +888,208 @@ try {
   await terminalApp.close();
 }
 
+const terminalLifecycleScene = {
+  frame: "terminal-multi-tab",
+  id: "electron-terminal-lifecycle",
+  scenario: "terminal-lifecycle",
+};
+const {
+  app: terminalLifecycleApp,
+  page: terminalLifecyclePage,
+} = await launchScene(terminalLifecycleScene, { capture: false });
+
+try {
+  const terminalTabs = terminalLifecyclePage.getByRole("tab");
+  if (
+    (await terminalTabs.count()) !== 3 ||
+    (await terminalTabs.nth(0).getAttribute("aria-label")) !==
+      "codex-ui-kit 1, Running" ||
+    (await terminalTabs.nth(1).getAttribute("aria-label")) !==
+      "codex-ui-kit 2, Failed" ||
+    (await terminalTabs.nth(2).getAttribute("aria-label")) !==
+      "codex-ui-kit 3, Exited" ||
+    (await terminalTabs.nth(0).textContent())?.trim() !==
+      "●codex-ui-kit 1" ||
+    (await terminalTabs.nth(1).textContent())?.trim() !==
+      "!codex-ui-kit 2" ||
+    (await terminalTabs.nth(2).textContent())?.trim() !==
+      "□codex-ui-kit 3" ||
+    (await terminalTabs.nth(2).getAttribute("aria-selected")) !== "true"
+  ) {
+    throw new Error("Electron multi-terminal tab baseline failed.");
+  }
+  const tabStatuses = await terminalLifecyclePage
+    .locator(".codex-ui-terminal-panel__tab-label")
+    .evaluateAll((labels) =>
+      labels.map((label) => label.getAttribute("data-status")),
+    );
+  if (
+    JSON.stringify(tabStatuses) !==
+    JSON.stringify(["running", "failed", "exited"])
+  ) {
+    throw new Error(
+      `Electron multi-terminal statuses failed: ${JSON.stringify(tabStatuses)}`,
+    );
+  }
+
+  await terminalTabs.nth(2).focus();
+  await terminalTabs.nth(2).press("ArrowLeft");
+  const failedTab = terminalLifecyclePage.getByRole("tab", {
+    name: "codex-ui-kit 2, Failed",
+    selected: true,
+  });
+  if (
+    !(await failedTab.isVisible()) ||
+    (await terminalLifecyclePage.evaluate(
+      () => document.activeElement?.getAttribute("aria-label"),
+    )) !== "codex-ui-kit 2, Failed"
+  ) {
+    throw new Error("Electron Terminal ArrowLeft navigation failed.");
+  }
+
+  const terminalInput = terminalLifecyclePage.getByRole("textbox", {
+    name: "Terminal input",
+  });
+  await terminalInput.fill("retry");
+  await terminalLifecyclePage
+    .getByRole("tab", { name: "codex-ui-kit 1, Running" })
+    .click();
+  await terminalInput.fill("status");
+  await terminalLifecyclePage
+    .getByRole("tab", { name: "codex-ui-kit 2, Failed" })
+    .click();
+  if ((await terminalInput.inputValue()) !== "retry") {
+    throw new Error(
+      "Electron Terminal did not preserve per-session controlled input.",
+    );
+  }
+  for (let index = 0; index < 10; index += 1) {
+    await terminalInput.fill(`history-${index}`);
+    await terminalInput.press("Enter");
+  }
+  const terminalTranscript = terminalLifecyclePage.locator(
+    ".codex-ui-terminal-transcript",
+  );
+  const terminalScrollRange = await terminalTranscript.evaluate(
+    (element) => ({
+      clientHeight: element.clientHeight,
+      scrollHeight: element.scrollHeight,
+    }),
+  );
+  if (
+    terminalScrollRange.scrollHeight <= terminalScrollRange.clientHeight
+  ) {
+    throw new Error(
+      "Electron Terminal history did not become scrollable.",
+    );
+  }
+  await terminalTranscript.evaluate((element) => {
+    element.scrollTop = 0;
+  });
+  await terminalInput.fill("draft while reviewing history");
+  if (
+    (await terminalTranscript.evaluate((element) => element.scrollTop)) >
+    1
+  ) {
+    throw new Error(
+      "Electron Terminal typing changed the reviewed transcript position.",
+    );
+  }
+
+  await terminalLifecyclePage
+    .getByRole("button", { name: "Close codex-ui-kit 2 tab" })
+    .click();
+  const selectedAfterClose = terminalLifecyclePage.getByRole("tab", {
+    name: "codex-ui-kit 3, Exited",
+    selected: true,
+  });
+  if (
+    !(await selectedAfterClose.isVisible()) ||
+    (await terminalLifecyclePage.getByRole("tab").count()) !== 2
+  ) {
+    throw new Error(
+      "Electron Terminal close did not select the nearest remaining tab.",
+    );
+  }
+
+  await terminalLifecyclePage
+    .getByRole("button", { name: "Open bottom panel tab" })
+    .click();
+  const terminalPicker = terminalLifecyclePage.getByRole("menu", {
+    name: "Open bottom panel tab",
+  });
+  if (
+    !(await terminalPicker.isVisible()) ||
+    (await terminalPicker.getByRole("menuitem").count()) !== 4
+  ) {
+    throw new Error("Electron Terminal tab picker did not open.");
+  }
+  await terminalPicker
+    .getByRole("menuitem", { name: "Terminal" })
+    .click();
+  if (
+    (await terminalLifecyclePage.getByRole("tab").count()) !== 3 ||
+    !(await terminalLifecyclePage
+      .getByRole("tab", {
+        name: "codex-ui-kit 4, Idle",
+        selected: true,
+      })
+      .isVisible())
+  ) {
+    throw new Error("Electron Terminal picker did not create a session.");
+  }
+
+  for (let count = 3; count > 0; count -= 1) {
+    const selected = terminalLifecyclePage.locator(
+      '[role="tab"][aria-selected="true"]',
+    );
+    const label = (await selected.getAttribute("aria-label"))?.replace(
+      /, (Exited|Failed|Idle|Restoring|Running)$/,
+      "",
+    );
+    if (!label) {
+      throw new Error("Electron Terminal selected tab lost its label.");
+    }
+    await terminalLifecyclePage
+      .getByRole("button", { name: `Close ${label} tab` })
+      .click();
+  }
+  const restoreTerminal = terminalLifecyclePage.getByRole("button", {
+    name: "Restore last terminal",
+  });
+  if (!(await restoreTerminal.isVisible())) {
+    throw new Error("Electron Terminal empty restore state is missing.");
+  }
+  await restoreTerminal.click();
+  if (
+    !(await terminalLifecyclePage
+      .getByRole("tab", {
+        name: "codex-ui-kit, Running",
+        selected: true,
+      })
+      .isVisible())
+  ) {
+    throw new Error("Electron Terminal restore did not reopen the last tab.");
+  }
+
+  await terminalLifecyclePage
+    .getByRole("button", { name: /Failed process/ })
+    .click();
+  if (
+    (await terminalLifecyclePage
+      .locator(
+        '[role="tab"][aria-selected="true"] .codex-ui-terminal-panel__tab-label',
+      )
+      .getAttribute("data-status")) !== "failed"
+  ) {
+    throw new Error(
+      "Electron background process selection did not reopen the failed terminal.",
+    );
+  }
+} finally {
+  await terminalLifecycleApp.close();
+}
+
 const pullRequestScene = {
   frame: "review-open",
   id: "electron-pull-request-detail",
@@ -2037,12 +2239,16 @@ try {
   await codingWorkspacePage.waitForSelector(
     '.codex-ui-app-shell[data-bottom-panel-open] [data-testid="terminal-panel"]',
   );
+  const workspaceTerminalTab = codingWorkspacePage.getByRole("tab", {
+    name: "codex-app-server-client, Exited",
+  });
   const workspaceTerminalLabel = (
-    await codingWorkspacePage
-      .locator(".demo-terminal-tab-label")
-      .textContent()
-  )?.replace("×", "").trim();
-  if (workspaceTerminalLabel !== "▣codex-app-server-client") {
+    await workspaceTerminalTab.textContent()
+  )?.trim();
+  if (
+    !(await workspaceTerminalTab.isVisible()) ||
+    workspaceTerminalLabel !== "□codex-app-server-client"
+  ) {
     throw new Error(
       `Electron coding workspace terminal tab did not use the routed project: ${JSON.stringify(workspaceTerminalLabel)}.`,
     );

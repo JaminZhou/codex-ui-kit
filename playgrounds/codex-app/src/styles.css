@@ -877,36 +877,18 @@ textarea {
   background: #101010;
 }
 
-.demo-terminal-panel .codex-ui-workspace-panel__tab {
-  flex-basis: auto;
-  min-width: 0;
-  padding-inline: 1rem;
-}
-
-.demo-terminal-panel .codex-ui-workspace-panel__actions {
-  flex: 1 1 auto;
-  margin-inline-start: 0;
-}
-
-.demo-terminal-panel
-  .codex-ui-workspace-panel__actions
-  > :last-child {
-  margin-inline-start: auto;
-}
-
-.demo-terminal-tab-label {
-  align-items: center;
-  display: inline-flex;
-  gap: 0.5rem;
-}
-
-.demo-terminal-tab-label > :last-child {
-  color: rgba(255, 255, 255, 0.5);
-  margin-inline-start: 0.25rem;
-}
-
 .demo-terminal-panel .codex-ui-terminal-session {
   height: 100%;
+}
+
+.demo-terminal-processes {
+  border-block-start: 1px solid rgba(255, 255, 255, 0.08);
+  margin-block-start: 1rem;
+  padding-block-start: 0.75rem;
+}
+
+.demo-terminal-tab-menu {
+  min-width: 17.5rem;
 }
 
 .demo-turn-actions {

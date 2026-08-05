@@ -59,14 +59,15 @@ observation from a previous build remains historical evidence.
   Pull requests loading/selection continuity, and a real OpenAI Developer Docs
   failed-Fetch → Search → successful-Fetch recovery, plus real
   Composer submit/Stop, queue/pause/Resume, permissions, add-menu states, and
-  the new-chat workspace entry plus project picker;
+  the new-chat workspace entry plus project picker, and the bottom Terminal's
+  three-tab, per-tab close, picker, and compact states;
   light-theme, global notifications, current-build long-thread
   virtualization, and unrelated surface evidence remain pending
 
-Current inventory: 74 surface groups; 20 have current-build runtime evidence,
+Current inventory: 75 surface groups; 21 have current-build runtime evidence,
 35 have previous-build-only runtime evidence, 19 remain `not_sampled`, and 0
-are `blocked_by_policy`. Current-build Browser verification covers 17 groups
-and Electron verification covers 17. Prior acceptance outside the sampled
+are `blocked_by_policy`. Current-build Browser verification covers 18 groups
+and Electron verification covers 18. Prior acceptance outside the sampled
 shell, sidebar, recovered MCP, and Composer lifecycle slices remains recorded
 as `partial_legacy` until current-build re-observation.
 
@@ -384,27 +385,38 @@ public PR path; both are now `partial_legacy`. Merge execution, review
 submission, loading/failure states, and broader PR variants remain outside
 this slice.
 
-The Terminal slice completes the bottom-panel interaction contract for
-`26.721.41059`. Scoped CDP measured a 272px default bottom panel, 152px
-minimum, half-height responsive maximum, 16px drag strip, 33px tab header,
-239px content region, named tab/tabpanel, and `Terminal input`. The independent
-`AppShell` adds controlled or uncontrolled pointer and Arrow/Home/End resizing
-with accessible separator values, while `TerminalTranscript`,
-`TerminalPrompt`, and `TerminalSession` keep output, input, and process status
-protocol-neutral and host-owned.
+The original Terminal slice established the bottom-panel interaction contract
+on `26.721.41059`: a 272px panel track, 152px minimum, half-height responsive
+maximum, 16px drag strip, 33px tab header, 239px content region, named
+tab/tabpanel, and `Terminal input`. The `26.721.81911` refresh now separately
+verifies the session-tab surface. Current-product CDP observed three
+auto-numbered Terminal tabs, one close button named for each tab, nearest-tab
+selection after closing the active tab, a four-item Review/Terminal/Browser/
+Files picker, and all three tabs fitting at 820×680 without horizontal
+overflow. Tabs measured 140px at 1180×820 and about 136px at 820×680; the
+current outer bottom-panel container includes its resize affordance, while the
+independent `AppShell` preserves the 272px track and 239px content contract.
 
-The pinned public App Server client supplies `processId`, command output, and
-`item/commandExecution/terminalInteraction` to a deterministic background
-terminal trace. CDP gates the standard geometry and semantics across 15
-frames. Electron drives pointer and keyboard resizing, local input submission,
-close/restore, and 820×680 compact geometry. The reviewed pixel baseline also
-accepts an optional 906×820 `26.721.41059` reference; the accepted sample
-differs by 1.2791% in the full Terminal panel and 0.7288% in its content at the
-strict 0.05 threshold. Whole-main pixels are reported but not promoted because
-the synthetic protocol conversation intentionally differs from the observed
-product conversation. Multi-tab lifecycle, shell creation/termination,
-background-process enumeration, failure recovery, and persisted panel state
-remain outside this slice.
+The public `TerminalPanel` composes controlled multi-session tabs over
+`WorkspacePanel`; `TerminalTranscript`, `TerminalPrompt`, and
+`TerminalSession` keep output, input, status, and submission protocol-neutral
+and host-owned. `TerminalProcessList` presents running, failed, restoring,
+idle, and exited process summaries without starting, stopping, or reopening a
+process itself. A 15-event public-protocol trace supplies three independent
+commands and six reviewed states: running, failed, three-tab, picker,
+all-closed/restore, and compact layout. Browser/CDP gates 49 shared frames.
+Electron drives tab changes with keyboard and pointer input, preserves
+per-session command values, closes to the nearest tab, creates a session from
+the picker, closes all sessions, restores the latest one, and reopens a failed
+process.
+
+This promotes `workspace.terminal` for the currently observed tab/input/
+compact contract. The independently implemented process list and
+running/failed/exited replay are deliberately split into
+`workspace.terminal-process-lifecycle`: the installed build's real process
+lifecycle was not safely exercised in this refresh, so that row retains
+previous-build runtime evidence and `partial_legacy` verification. Persisted
+panel state and real shell creation/termination remain open.
 
 The compact tool/recovery slice splits the former combined
 `thread.search-tool-mcp-events` candidate into independent search, Browser, and
@@ -487,8 +499,8 @@ claim that the whole application or every lifecycle is pixel-perfect. Broader
 Markdown variants, the exact host virtualization algorithm, code search,
 other MCP and connector variants, thread-level retry recovery, approval
 persistence and timeout, current-product binary/conflict reachability, PR
-merge/review-submission states, Terminal multi-tab and
-process-creation/termination lifecycles, and native Codex window behavior
+merge/review-submission states, current-product Terminal process lifecycle and
+panel persistence, and native Codex window behavior
 retain their own inventory gates.
 
 The Markdown slice revalidates one synthetic completed response on build

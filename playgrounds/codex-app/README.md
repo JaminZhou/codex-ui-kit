@@ -224,6 +224,29 @@ The fourteenth slice broadens Review content and synchronization:
   group-Undo lifecycle in a real Electron window;
 - a forty-third CDP/pixel frame with ordered change/content-kind gates.
 
+## Fifteenth vertical slice
+
+The fifteenth slice expands Terminal from one background session into a
+current-build session-tab contract and an independent process lifecycle:
+
+- `26.721.81911` CDP evidence for three auto-numbered tabs, per-tab close
+  buttons, nearest-tab selection, the Review/Terminal/Browser/Files picker,
+  `Terminal input`, and three-tab compact fit at 820×680;
+- public `TerminalPanel` and `TerminalProcessList` compositions that leave
+  process execution, creation, restore policy, and input handling with the
+  host;
+- a 15-event protocol trace with running, failed, exited, three-tab, picker,
+  close-all/restore, and compact states;
+- real Electron pointer and keyboard tab selection, independent per-session
+  values, close-nearest, picker creation, close-all/restore, and failed-process
+  reopening;
+- six additional reviewed visual frames and a shared 49-frame CDP/pixel
+  matrix.
+
+The current-product probe did not execute a shell process. Running, failed,
+exited, and restore states are deterministic public-host acceptance rather
+than promoted current-product lifecycle evidence.
+
 ## Development
 
 From the repository root:
