@@ -91,6 +91,7 @@ import {
   hasActiveTurnWork,
   initialProtocolState,
   isTurnActive,
+  messageAttachmentPreviewSource,
   reduceProtocolNotification,
   settleApprovedCommandReplay,
   terminalTranscriptEvents,
@@ -3968,12 +3969,10 @@ export function App() {
                       key={`${message.id}:attachment:${index}`}
                       label="User attachment"
                       onClick={() => undefined}
-                      previewSrc={
-                        attachment.sourceType === "remote" &&
-                        attachment.source.startsWith("data:image/")
-                          ? attachment.source
-                          : attachmentPreviewDataUrl
-                      }
+                      previewSrc={messageAttachmentPreviewSource(
+                        attachment,
+                        attachmentPreviewDataUrl,
+                      )}
                     />
                   ))
                 : undefined

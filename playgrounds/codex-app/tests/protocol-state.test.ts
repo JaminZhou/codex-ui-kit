@@ -4,6 +4,7 @@ import {
   hasActiveTurnWork,
   initialProtocolState,
   isTurnActive,
+  messageAttachmentPreviewSource,
   reduceProtocolNotification,
   reduceProtocolTrace,
   settleApprovedCommandReplay,
@@ -112,6 +113,42 @@ describe("protocol lifecycle reducer", () => {
       "ATTACHMENT LIFECYCLE COMPLETE.",
     );
     expect(completed.turnDurationMs).toBe(7_409);
+  });
+
+  it("keeps safe remote image sources and falls back for local or unsafe inputs", () => {
+    const remote = {
+      kind: "image" as const,
+      label: "Evidence",
+      sourceType: "remote" as const,
+    };
+
+    for (const source of [
+      "https://example.com/evidence.png",
+      "http://127.0.0.1:3000/evidence.png",
+      "blob:https://example.com/attachment-id",
+      "data:image/png;base64,fixture",
+    ]) {
+      expect(
+        messageAttachmentPreviewSource({ ...remote, source }, "fallback"),
+      ).toBe(source);
+    }
+    expect(
+      messageAttachmentPreviewSource(
+        { ...remote, source: "javascript:alert(1)" },
+        "fallback",
+      ),
+    ).toBe("fallback");
+    expect(
+      messageAttachmentPreviewSource(
+        {
+          kind: "image",
+          label: "local.png",
+          source: "/tmp/local.png",
+          sourceType: "local",
+        },
+        "fallback",
+      ),
+    ).toBe("fallback");
   });
 
   it("replays a successful public MCP integration lifecycle", () => {

@@ -45,6 +45,27 @@ export interface DemoMessageAttachment {
   sourceType: "local" | "remote";
 }
 
+export function messageAttachmentPreviewSource(
+  attachment: DemoMessageAttachment,
+  fallback: string,
+): string {
+  if (attachment.sourceType !== "remote") return fallback;
+  try {
+    const { protocol } = new URL(attachment.source);
+    if (
+      protocol === "https:" ||
+      protocol === "http:" ||
+      protocol === "blob:" ||
+      (protocol === "data:" && /^data:image\//i.test(attachment.source))
+    ) {
+      return attachment.source;
+    }
+  } catch {
+    // Replay-local paths and malformed sources use the deterministic fixture.
+  }
+  return fallback;
+}
+
 export interface DemoCommandExecution {
   command: string;
   cwd: string;
