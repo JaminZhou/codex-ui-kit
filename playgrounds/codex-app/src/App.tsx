@@ -2740,12 +2740,11 @@ export function App() {
       </button>
     ) : undefined;
   const showPullRequestLifecycleDetails =
-    initialSelection.capture &&
-    (activeFrame === "pr-checks-running" ||
-      activeFrame === "pr-checks-failed" ||
-      activeFrame === "pr-merge-blocked" ||
-      activeFrame === "pr-merge-ready" ||
-      activeFrame === "pr-merged");
+    activeFrame === "pr-checks-running" ||
+    activeFrame === "pr-checks-failed" ||
+    activeFrame === "pr-merge-blocked" ||
+    activeFrame === "pr-merge-ready" ||
+    activeFrame === "pr-merged";
   const pullRequestTimeline = (
     <div aria-label="Pull request timeline" className="demo-pr-panel__timeline">
       <article>
@@ -3666,7 +3665,7 @@ export function App() {
         return (
           <ActivityTimeline
             key={`command:${command.id}`}
-            open={initialSelection.capture ? pending : undefined}
+            open={initialSelection.capture && pending ? true : undefined}
             summary={
               <TurnDuration
                 durationMs={pending ? 14_000 : (state.turnDurationMs ?? 23_000)}
@@ -3681,7 +3680,13 @@ export function App() {
               data-testid="command-execution"
               hideRawCommand
               status={command.status}
-              summary={<>Running {command.command}</>}
+              summary={
+                pending ? (
+                  <>Running {command.command}</>
+                ) : (
+                  <>Did not run {command.command}</>
+                )
+              }
             />
           </ActivityTimeline>
         );

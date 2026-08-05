@@ -1584,6 +1584,19 @@ for (const scene of visualScenes) {
             permissionTrigger?.textContent?.replace(/^◉/, "").trim() ?? null,
         };
       });
+      if (scene.id === "approval-current-denied") {
+        await page
+          .getByRole("button", { exact: true, name: "Worked for 23s" })
+          .click();
+        approvalContract.commandSummary = await page
+          .locator(
+            ".codex-ui-command-execution .codex-ui-activity__summary",
+          )
+          .textContent();
+        approvalContract.commandSummary =
+          approvalContract.commandSummary?.replace(/\s+/g, " ").trim() ??
+          null;
+      }
       if (
         scene.id === "approval-current-pending" &&
         (!approvalContract.approval ||
@@ -1615,6 +1628,8 @@ for (const scene of visualScenes) {
         scene.id === "approval-current-denied" &&
         (approvalContract.approval !== null ||
           approvalContract.activitySummary !== "Worked for 23s" ||
+          approvalContract.commandSummary !==
+            "Did not run open -a Calculator" ||
           approvalContract.assistantText !==
             "Approval was not granted, so the command was not run." ||
           !approvalContract.composer ||
@@ -2736,6 +2751,82 @@ for (const scene of visualScenes) {
   } finally {
     await app.close();
   }
+}
+
+const interactivePullRequestScene = {
+  frame: "pr-checks-failed",
+  id: "pr-lifecycle-interactive",
+  scenario: "workspace-workflow",
+  view: "pull-request",
+};
+const {
+  app: interactivePullRequestApp,
+  page: interactivePullRequestPage,
+} = await launchScene(interactivePullRequestScene, { capture: false });
+try {
+  const initial = await interactivePullRequestPage.evaluate(() => ({
+    failedChecks: document.querySelectorAll(
+      '.codex-ui-pull-request-checks li[data-status="failed"]',
+    ).length,
+    mergeStatus:
+      document
+        .querySelector(".codex-ui-pull-request-merge-readiness")
+        ?.getAttribute("data-status") ?? null,
+    retryVisible: [...document.querySelectorAll("button")].some(
+      (button) => button.textContent?.trim() === "Re-run checks",
+    ),
+  }));
+  if (
+    initial.failedChecks !== 2 ||
+    initial.mergeStatus !== "blocked" ||
+    !initial.retryVisible
+  ) {
+    throw new Error(
+      `pr-lifecycle-interactive: non-capture details missing: ${JSON.stringify(initial)}`,
+    );
+  }
+
+  await interactivePullRequestPage
+    .getByRole("button", { exact: true, name: "Re-run checks" })
+    .click();
+  await interactivePullRequestPage.waitForSelector(
+    '.codex-ui-pull-request-merge-readiness[data-status="checking"]',
+  );
+  await interactivePullRequestPage.waitForFunction(() => {
+    const merge = document.querySelector(
+      ".codex-ui-pull-request-merge-readiness",
+    );
+    const openReview = [...document.querySelectorAll("button")].some(
+      (button) => button.textContent?.trim() === "Open review",
+    );
+    return merge?.getAttribute("data-status") === "blocked" && openReview;
+  });
+  const settled = await interactivePullRequestPage.evaluate(() => ({
+    failedChecks: document.querySelectorAll(
+      '.codex-ui-pull-request-checks li[data-status="failed"]',
+    ).length,
+    openReviewVisible: [...document.querySelectorAll("button")].some(
+      (button) => button.textContent?.trim() === "Open review",
+    ),
+    passedChecks: document.querySelectorAll(
+      '.codex-ui-pull-request-checks li[data-status="passed"]',
+    ).length,
+  }));
+  if (
+    settled.failedChecks !== 0 ||
+    settled.passedChecks !== 4 ||
+    !settled.openReviewVisible
+  ) {
+    throw new Error(
+      `pr-lifecycle-interactive: retry transition failed: ${JSON.stringify(settled)}`,
+    );
+  }
+  await writeFile(
+    join(artifactDirectory, "pr-lifecycle-interactive.json"),
+    `${JSON.stringify({ initial, settled }, null, 2)}\n`,
+  );
+} finally {
+  await interactivePullRequestApp.close();
 }
 
 const workspaceResponsiveScene = {
