@@ -5133,6 +5133,30 @@ summary.codex-ui-activity__header::after {
   padding: 0;
 }
 
+.codex-ui-command-execution__compact-detail {
+  align-items: center;
+  color: var(--codex-ui-text-tertiary);
+  display: flex;
+  font-size: var(--codex-ui-font-size-sm);
+  gap: 0.5rem;
+  line-height: var(--codex-ui-line-height-sm);
+  min-height: var(--codex-ui-line-height-sm);
+  min-width: 0;
+}
+
+.codex-ui-command-execution__compact-detail > span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.codex-ui-command-execution__compact-detail
+  .codex-ui-command-execution__icon {
+  height: 0.875rem;
+  width: 0.875rem;
+}
+
 .codex-ui-command-execution__shell {
   background: var(--codex-ui-code-block-bg);
   border: 1px solid var(--codex-ui-border-heavy);

@@ -1130,6 +1130,8 @@ export function App() {
     mode === "replay" && scenarioId === "long-command-output";
   const isCurrentCommandFailureReplay =
     mode === "replay" && scenarioId === "command-failure-recovery";
+  const isCurrentCommandInterruptionReplay =
+    mode === "replay" && scenarioId === "interruption";
   const replayComposerRunning =
     isConversationLifecycle && state.status === "running";
 
@@ -1446,6 +1448,25 @@ export function App() {
   };
 
   const submitComposer = (prompt: string) => {
+    if (isCurrentCommandInterruptionReplay) {
+      if (state.status === "running") return;
+      cancelReplaySubmitTimer();
+      setReplayComposerSubmitting(true);
+      setComposerOverlay(null);
+      replaySubmitTimerRef.current = window.setTimeout(() => {
+        replaySubmitTimerRef.current = null;
+        setReplayCount(
+          replayScenarios.interruption.frames[
+            "command-interruption-recovered"
+          ] ?? replayScenarios.interruption.events.length,
+        );
+        setActiveFrame("command-interruption-recovered");
+        setReplayComposerSubmitting(false);
+        setComposerValue((current) => (current === prompt ? "" : current));
+        requestAnimationFrame(() => composerInputRef.current?.focus());
+      }, 160);
+      return;
+    }
     if (!isConversationLifecycle) {
       void submitLive(prompt);
       return;
@@ -1487,6 +1508,26 @@ export function App() {
   };
 
   const stopComposer = () => {
+    if (isCurrentCommandInterruptionReplay) {
+      cancelReplaySubmitTimer();
+      setReplayComposerSubmitting(false);
+      setReplayCount(
+        replayScenarios.interruption.frames[
+          "command-interruption-stopping"
+        ] ?? replayScenarios.interruption.events.length,
+      );
+      setActiveFrame("command-interruption-stopping");
+      replaySubmitTimerRef.current = window.setTimeout(() => {
+        replaySubmitTimerRef.current = null;
+        setReplayCount(
+          replayScenarios.interruption.frames[
+            "command-interruption-settled"
+          ] ?? replayScenarios.interruption.events.length,
+        );
+        setActiveFrame("command-interruption-settled");
+      }, 900);
+      return;
+    }
     if (!isConversationLifecycle) {
       void stopLive();
       return;
@@ -1978,10 +2019,12 @@ export function App() {
   const composerIsRunning =
     mode === "live"
       ? isTurnActive(liveState.status)
-      : isConversationLifecycle && replayComposerRunning;
+      : (isConversationLifecycle && replayComposerRunning) ||
+        (isCurrentCommandInterruptionReplay && state.status === "running");
   const composerIsDisabled =
     liveStartPending ||
-    (isConversationLifecycle && replayComposerSubmitting);
+    ((isConversationLifecycle || isCurrentCommandInterruptionReplay) &&
+      replayComposerSubmitting);
   const displayedStatus =
     isConversationLifecycle && replayComposerStopped
       ? "interrupted"
@@ -2008,11 +2051,13 @@ export function App() {
     (scenarioId === "mcp-tool-call" ||
       scenarioId === "mcp-recovery-mixed-thread" ||
       scenarioId === "long-command-output" ||
-      scenarioId === "command-failure-recovery");
+      scenarioId === "command-failure-recovery" ||
+      scenarioId === "interruption");
   const usesCurrentAskPermission =
     isCurrentApprovalReplay ||
     isCurrentLongCommandReplay ||
-    isCurrentCommandFailureReplay;
+    isCurrentCommandFailureReplay ||
+    isCurrentCommandInterruptionReplay;
   const selectedComposerPermission =
     (usesCurrentAskPermission
       ? composerPermissionOptions[0]
@@ -2106,7 +2151,8 @@ export function App() {
       scenarioId === "mcp-recovery-mixed-thread" ||
       scenarioId === "approval-denied" ||
       scenarioId === "long-command-output" ||
-      scenarioId === "command-failure-recovery");
+      scenarioId === "command-failure-recovery" ||
+      scenarioId === "interruption");
   const showLifecycleComposer = isConversationLifecycle;
   const composerSurface = (
     <AgentComposer
@@ -2239,6 +2285,7 @@ export function App() {
                 : "Switch to Live to send a real local turn…"
       }
       stopLabel="Stop"
+      submitLabel={isCurrentCommandInterruptionReplay ? "Send" : undefined}
       suggestions={
         (showMeasuredComposer || showLifecycleComposer) &&
         composerOverlay === "resources" ? (
@@ -3535,7 +3582,10 @@ export function App() {
                   message.id === "assistant-long-command-final") ||
                 (scenarioId === "command-failure-recovery" &&
                   (message.id === "assistant-command-failure-recovered" ||
-                    message.id === "assistant-command-follow-up"))) &&
+                    message.id === "assistant-command-follow-up")) ||
+                (scenarioId === "interruption" &&
+                  message.id ===
+                    "assistant-command-interruption-recovery")) &&
               message.status === "completed" ? (
                 scenarioId === "mcp-tool-call" ||
                 scenarioId === "mcp-recovery-mixed-thread" ||
@@ -3980,6 +4030,64 @@ export function App() {
               </CommandOutput>
             </CommandExecution>
           </ActivityTimeline>
+        );
+      }
+      if (
+        isCurrentCommandInterruptionReplay &&
+        command.id === "command-interruption"
+      ) {
+        const commandSummary = (
+          <span className="codex-ui-command-execution__summary-command">
+            {command.command}
+          </span>
+        );
+        const running = command.status === "running" && state.status === "running";
+        const stopping =
+          command.status === "running" && state.status === "interrupted";
+        const execution = (
+          <CommandExecution
+            command={command.command}
+            compactDetail={running ? "Running command for 1m 28s" : undefined}
+            data-item-id={command.id}
+            data-testid="command-execution"
+            hideRawCommand
+            indicator={
+              stopping ? (
+                <span
+                  aria-hidden="true"
+                  className="demo-command-stop-indicator"
+                />
+              ) : undefined
+            }
+            open={running ? true : undefined}
+            status={
+              stopping
+                ? "interrupted"
+                : command.status === "completed"
+                  ? "background-finished"
+                  : "running"
+            }
+            summary={
+              stopping ? (
+                <>Background terminal stopped with {commandSummary}</>
+              ) : command.status === "completed" ? (
+                <>Ran {commandSummary}</>
+              ) : (
+                <>Running {commandSummary}</>
+              )
+            }
+          />
+        );
+        return running ? (
+          <ActivityTimeline
+            key={`command:${command.id}`}
+            open
+            summary={<TurnDuration durationMs={95_000} status="working" />}
+          >
+            {execution}
+          </ActivityTimeline>
+        ) : (
+          <Fragment key={`command:${command.id}`}>{execution}</Fragment>
         );
       }
       return (
@@ -4504,7 +4612,11 @@ export function App() {
       data-layout={initialSelection.layoutMode}
       data-last-method={state.lastMethod ?? undefined}
       data-mode={mode}
-      data-composer-phase={isConversationLifecycle ? composerPhase : undefined}
+      data-composer-phase={
+        isConversationLifecycle || isCurrentCommandInterruptionReplay
+          ? composerPhase
+          : undefined
+      }
       data-composer-overlay={
         isConversationLifecycle ? composerOverlay ?? undefined : undefined
       }
@@ -4638,7 +4750,8 @@ export function App() {
                 latestOrigin:
                   currentWindowedFrame ||
                   isCurrentLongCommandReplay ||
-                  isCurrentCommandFailureReplay
+                  isCurrentCommandFailureReplay ||
+                  isCurrentCommandInterruptionReplay
                     ? "start"
                     : "end",
                 onFollowingChange: setThreadFollowing,

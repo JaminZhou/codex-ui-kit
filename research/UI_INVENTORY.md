@@ -54,9 +54,10 @@ observation from a previous build remains historical evidence.
 - Scoped CDP automation: available through a user-authorized second process;
   the Chromium profile is separate, but Codex application data and navigation
   are not fully isolated
-- Fresh current-build Renderer captures: two dark 1180×820 disposable tasks
-  verify successful 400-line command output plus mixed stdout/stderr failure
-  with exit code 7 and a successful same-thread follow-up, and a read-only
+- Fresh current-build Renderer captures: three dark 1180×820 disposable tasks
+  verify successful 400-line command output, mixed stdout/stderr failure with
+  exit code 7 and a successful same-thread follow-up, plus a 95-second command
+  Stop/background-settlement/recovery lifecycle; a read-only
   sidebar sweep verifies all six sidebar groups at 1180×820, 820×680, and the
   exact 721/720 boundary. The sidebar remains 274px through 721px, auto-hides
   at 720px, stays pinned as a 274/446 split after an explicit Show action and
@@ -64,11 +65,11 @@ observation from a previous build remains historical evidence.
   preview. All other `26.727.40816` observations remain previous-build
   evidence until separately reached on `26.730.61309`.
 
-Current inventory: 78 surface groups; 8 have current-build runtime evidence,
-51 have previous-build-only runtime evidence, 19 remain `not_sampled`, and 0
-are `blocked_by_policy`. Current-build Browser verification covers 8 groups
-and Electron verification covers 8. Prior acceptance outside the sampled
-command and six-sidebar slices remains recorded as `partial_legacy`
+Current inventory: 78 surface groups; 9 have current-build runtime evidence,
+50 have previous-build-only runtime evidence, 19 remain `not_sampled`, and 0
+are `blocked_by_policy`. Current-build Browser verification covers 9 groups
+and Electron verification covers 9. Prior acceptance outside the sampled
+command, interruption, and six-sidebar slices remains recorded as `partial_legacy`
 until current-build re-observation.
 
 The current package exposes candidates far beyond the old transcript sample:
@@ -142,8 +143,8 @@ that previously matched `26.721.81911` or earlier remains regression coverage,
 but every
 affected inventory row was `partial_legacy` until it was re-observed on
 `26.727.40816`. After the `26.730.61309` update, every row below is again
-`partial_legacy` except the explicitly refreshed long-command and six sidebar
-rows. The
+`partial_legacy` except the explicitly refreshed successful-command,
+command-failure/recovery, command-interruption, and six sidebar rows. The
 machine-readable inventory is authoritative when historical prose describes
 a build as current at its capture time.
 
@@ -162,7 +163,7 @@ focus-managed modal mode only as an explicit safety fallback for widths that
 cannot fit the pinned split. The current product's separator exposes
 `role=separator` but no keyboard value semantics; UIKit intentionally retains
 Arrow/Home/End resizing and value attributes as an accessibility improvement.
-The dedicated de-identified scene passes 67 Browser/CDP and pixel frames,
+The dedicated de-identified scene passes 73 Browser/CDP and pixel frames,
 Electron interaction, and current-build regional ratios of 3.6234% for the
 top, 0.1292% for the masked selected row, and 0% for the masked footer.
 Implementation stays `partial` because light-theme runtime evidence, dynamic
@@ -313,9 +314,10 @@ Optional 792×320 `26.727.40816` references are accepted through
 `CODEX_UI_KIT_COMPOSER_QUEUED_REFERENCE` and
 `CODEX_UI_KIT_COMPOSER_CONTINUED_REFERENCE`. At the strict 0.05 pixel
 threshold and 2% hard ratio limit, the accepted ownership-masked
-changed-pixel ratios are `0.003480114` and `0.005105745`. Queue and
-Stop/interruption were Browser/Electron verified on `26.727.40816` and are
-now `partial_legacy`.
+changed-pixel ratios are `0.003480114` and `0.005105745`. The
+queue/automatic-continuation contract was Browser/Electron verified on
+`26.727.40816` and remains `partial_legacy`; the independent real-command Stop
+contract is refreshed on `26.730.61309` below.
 The four-line, permission, and Add-resource frames add two more reviewed
 Browser/CDP/pixel frames and real Electron interaction. Their strict
 ownership-masked changed-pixel ratios are `0.000994318`, `0.001280084`, and
@@ -597,7 +599,7 @@ scrolling output viewport, and `Success`. Its reverse column keeps lines
 the trailing newline.
 
 The independent trace contains exactly one command request/output pair.
-Browser/CDP now covers 67 lifecycle frames and verifies command identity,
+Browser/CDP now covers 73 lifecycle frames and verifies command identity,
 401 split lines, computed typography, output overflow, keyboard disclosure,
 and latest-line restoration after collapse/reopen. Electron drives the same
 interaction in a real 1180×820 `BrowserWindow`. The ownership-masked full
@@ -612,17 +614,29 @@ copy controls, a 734×144px reverse-tail output viewport, 161 split lines
 including the trailing newline, and `Exit code 7`. A no-tool follow-up then
 completed successfully in the same thread. The independent trace models the
 running-output, collapsed failure, expanded failure, first completed turn,
-and recovered follow-up states. Browser/CDP now covers 70 lifecycle frames;
+and recovered follow-up states. Browser/CDP now covers 73 lifecycle frames;
 Electron repeats disclosure, exact copied output, collapse/reopen, failure,
 and recovery. The ownership-masked full-window gate passes at
 `0.008898305084745763` under a 1% hard limit. This additionally promotes
 `thread.command-failure-recovery` only for recovery after a command-level failure.
-Interruption, active truncation copy affordances, background processes,
+Active truncation copy affordances, broader background processes,
 transport-level retry, and other command kinds remain open.
 
-The interruption acceptance renders the observed summary statically rather than
-driving a host run-to-stop-to-summary transition, so that row also remains
-`partial_legacy`. The `26.721.81911` MCP tool-call error/retry state is now
+A third `26.730.61309` disposable task ran the exact read-only 120-second
+probe and used the current 28×28 Stop action after 95 seconds. The Renderer
+first exposed `You stopped after 1m 35s` plus the transient
+`Background terminal stopped with …` row; after the background-terminal
+settlement the row became `Ran …`. A second no-tool message in the same thread
+returned exactly `INTERRUPTION RECOVERY ACCEPTED` and restored Composer focus.
+The public trace separates running, immediate-stop, settled, and recovered
+frames. Browser/CDP and real Electron drive the Stop and recovery transitions
+rather than merely rendering a static summary. Computed contracts lock the
+736px rows, 14/21px weight-445 system typography, summary rule, action states,
+and focus restoration. The ownership-masked full-window comparison measures
+`0.0043520049607275735` under a 0.5% hard limit. This promotes
+`thread.interruption-stop` for the sampled command-interruption lifecycle;
+queue continuation and broader background-process management retain their own
+gates. The `26.721.81911` MCP tool-call error/retry state is now
 captured separately; the broader thread-transport error/retry state has not
 been safely reached and remains an unpromoted gate. Compaction acceptance
 statically renders the observed running and completed states rather than

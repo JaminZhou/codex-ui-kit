@@ -2752,6 +2752,103 @@ try {
   await commandFailureApp.close();
 }
 
+const commandInterruptionScene = {
+  frame: "command-interruption-running",
+  id: "electron-current-command-interruption",
+  scenario: "interruption",
+};
+const {
+  app: commandInterruptionApp,
+  page: commandInterruptionPage,
+} = await launchScene(commandInterruptionScene, { capture: false });
+try {
+  const stop = commandInterruptionPage.getByRole("button", {
+    exact: true,
+    name: "Stop",
+  });
+  if ((await stop.count()) !== 1) {
+    throw new Error(
+      "Electron current command interruption did not expose one Stop action.",
+    );
+  }
+  await stop.click();
+  await commandInterruptionPage.waitForSelector(
+    '.demo-root[data-frame="command-interruption-stopping"][data-status="interrupted"] [data-item-id="command-interruption"][data-execution-status="interrupted"]',
+  );
+  const stopping = await commandInterruptionPage.evaluate(() => ({
+    commandSummary:
+      document
+        .querySelector(
+          '[data-item-id="command-interruption"] .codex-ui-activity__summary',
+        )
+        ?.textContent?.replace(/\s+/g, " ")
+        .trim() ?? null,
+    interruption:
+      document
+        .querySelector(".codex-ui-thread-interruption-summary__label")
+        ?.textContent?.trim() ?? null,
+  }));
+  if (
+    !stopping.commandSummary?.startsWith(
+      "Background terminal stopped with seq 1 120",
+    ) ||
+    stopping.interruption !== "You stopped after 1m 35s"
+  ) {
+    throw new Error(
+      `Electron current command Stop transition failed: ${JSON.stringify(stopping)}`,
+    );
+  }
+
+  await commandInterruptionPage.waitForSelector(
+    '.demo-root[data-frame="command-interruption-settled"][data-status="interrupted"] [data-item-id="command-interruption"][data-execution-status="background-finished"]',
+  );
+  const composer = commandInterruptionPage.getByRole("textbox", {
+    name: "Message composer",
+  });
+  await composer.fill(
+    "Do not use tools. Reply with exactly: INTERRUPTION RECOVERY ACCEPTED",
+  );
+  await composer.press("Enter");
+  await commandInterruptionPage.waitForSelector(
+    '.demo-root[data-frame="command-interruption-recovered"][data-status="completed"][data-composer-phase="idle"]',
+  );
+  const recovered = await commandInterruptionPage.evaluate(() => ({
+    activeElement: document.activeElement?.getAttribute("aria-label"),
+    assistantText:
+      document
+        .querySelector(
+          '[data-item-id="assistant-command-interruption-recovery"] .codex-ui-markdown',
+        )
+        ?.textContent?.replace(/\s+/g, " ")
+        .trim() ?? null,
+    commandStatus: document
+      .querySelector('[data-item-id="command-interruption"]')
+      ?.getAttribute("data-execution-status"),
+    interruption:
+      document
+        .querySelector(".codex-ui-thread-interruption-summary__label")
+        ?.textContent?.trim() ?? null,
+    stopCount: [...document.querySelectorAll("button")].filter(
+      (button) =>
+        button.getAttribute("aria-label") === "Stop" ||
+        button.textContent?.trim() === "Stop",
+    ).length,
+  }));
+  if (
+    recovered.activeElement !== "Message composer" ||
+    recovered.assistantText !== "INTERRUPTION RECOVERY ACCEPTED" ||
+    recovered.commandStatus !== "background-finished" ||
+    recovered.interruption !== "You stopped after 1m 35s" ||
+    recovered.stopCount !== 0
+  ) {
+    throw new Error(
+      `Electron current command same-thread recovery failed: ${JSON.stringify(recovered)}`,
+    );
+  }
+} finally {
+  await commandInterruptionApp.close();
+}
+
 const acceptedMixedApprovalScene = {
   frame: "mixed-approval-pending",
   id: "electron-mixed-approval-accepted",
@@ -3337,5 +3434,5 @@ try {
 }
 
 console.log(
-  "Electron host, native-window, coding-workspace routing, conversation/Composer lifecycle and current menus, current long and failed command output with same-thread recovery, default 720px narrow reachability, resizable navigation/Review/Terminal/PR detail, PR tabs and expansion, MCP disclosure/result, multi-file and mixed-content Review, selection/Undo, large diff scrolling, and compact geometry contracts passed.",
+  "Electron host, native-window, coding-workspace routing, conversation/Composer lifecycle and current menus, current long, failed, and interrupted command output with same-thread recovery, default 720px narrow reachability, resizable navigation/Review/Terminal/PR detail, PR tabs and expansion, MCP disclosure/result, multi-file and mixed-content Review, selection/Undo, large diff scrolling, and compact geometry contracts passed.",
 );

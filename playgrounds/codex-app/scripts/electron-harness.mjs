@@ -242,9 +242,32 @@ export const visualScenes = [
     surfaces: ["approval", "command", "fileChange", "reviewPanel"],
   },
   {
-    frame: "interrupted",
-    id: "interrupted",
+    frame: "command-interruption-running",
+    id: "command-interruption-running",
+    maxPixelRatio: 0.0225,
     scenario: "interruption",
+    surfaces: ["command"],
+  },
+  {
+    frame: "command-interruption-stopping",
+    id: "command-interruption-stopping",
+    maxPixelRatio: 0.0225,
+    scenario: "interruption",
+    surfaces: ["command"],
+  },
+  {
+    frame: "command-interruption-settled",
+    id: "command-interruption-settled",
+    maxPixelRatio: 0.0225,
+    scenario: "interruption",
+    surfaces: ["command"],
+  },
+  {
+    frame: "command-interruption-recovered",
+    id: "command-interruption-recovered",
+    maxPixelRatio: 0.0225,
+    scenario: "interruption",
+    surfaces: ["command"],
   },
   {
     frame: "compacting",
@@ -587,6 +610,25 @@ export async function launchScene(
       await page.waitForSelector(
         '[data-item-id="command-failure-output"] .codex-ui-command-output',
       );
+    }
+  }
+  if (capture && scene.scenario === "interruption") {
+    const interruptionOffsets = {
+      "command-interruption-running": -129,
+      "command-interruption-stopping": -133,
+      "command-interruption-settled": -163,
+      "command-interruption-recovered": -162,
+    };
+    const offset = interruptionOffsets[scene.id];
+    if (offset !== undefined) {
+      await page.evaluate((translateY) => {
+        const turn = document.querySelector(
+          ".codex-ui-conversation-thread-shell .codex-ui-agent-turn",
+        );
+        if (turn instanceof HTMLElement) {
+          turn.style.transform = `translateY(${translateY}px)`;
+        }
+      }, offset);
     }
   }
   if (
