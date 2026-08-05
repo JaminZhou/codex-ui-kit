@@ -61,7 +61,7 @@ The authoritative current-build inventory is:
   720px. Explicit Show pins a non-modal 274/446 split across Pull requests
   navigation; explicit Hide restores the full 720px route, and an inline-start
   hover no longer opens the historical edge preview. The de-identified public
-  scene remains covered by the 70-frame Browser/CDP and pixel matrix plus
+  scene remains covered by the 73-frame Browser/CDP and pixel matrix plus
   Electron interaction.
   Current-build regional ratios are 3.6234% for the top, 0.1292% for the
   text-masked selected row, and 0% for the text-masked footer. The UIKit

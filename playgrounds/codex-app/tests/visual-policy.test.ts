@@ -132,4 +132,19 @@ describe("lifecycle visual policy", () => {
       "current-build command-failure pixel ratio",
     );
   });
+
+  it("gates the current command Stop and interruption-summary frame", () => {
+    expect(contract).toContain(
+      "CODEX_UI_KIT_COMMAND_INTERRUPTION_REFERENCE",
+    );
+    expect(contract).toContain(
+      "CODEX_UI_KIT_COMMAND_INTERRUPTION_MAX_DIFF_RATIO",
+    );
+    expect(contract).toContain(
+      'scene.id === "command-interruption-stopping"',
+    );
+    expect(contract).toContain(
+      "current-build command-interruption pixel ratio",
+    );
+  });
 });

@@ -262,79 +262,60 @@ describe("protocol lifecycle reducer", () => {
     ]);
   });
 
-  it("preserves an interrupted assistant partial and exposes the stop state", () => {
-    const state = reduceProtocolTrace(
-      replayScenarios.interruption.events,
+  it("replays current command Stop, settlement, and same-thread recovery", () => {
+    const scenario = replayScenarios.interruption;
+    const running = reduceProtocolTrace(
+      scenario.events.slice(0, scenario.frames["command-interruption-running"]),
     );
-
-    expect(state.status).toBe("interrupted");
-    expect(state.messages.at(-1)?.text).toContain("Electron acceptance");
-    expect(state.messages.at(-1)?.status).toBe("interrupted");
-    expect(state.messages.at(-1)?.interruptionDurationMs).toBe(18_400);
-    expect(state.turnDurationMs).toBe(18_400);
-  });
-
-  it("preserves an interruption summary after a follow-up turn completes", () => {
-    const interrupted = reduceProtocolTrace(
-      replayScenarios.interruption.events,
+    const stopping = reduceProtocolTrace(
+      scenario.events.slice(
+        0,
+        scenario.frames["command-interruption-stopping"],
+      ),
     );
-    const followUpEvents = [
-      {
-        method: "turn/started",
-        params: {
-          threadId: "thread-demo",
-          turn: { id: "turn-follow-up" },
-        },
-      },
-      {
-        method: "item/started",
-        params: {
-          item: {
-            id: "assistant-follow-up",
-            phase: "final_answer",
-            text: "",
-            type: "agentMessage",
-          },
-          threadId: "thread-demo",
-          turnId: "turn-follow-up",
-        },
-      },
-      {
-        method: "item/completed",
-        params: {
-          item: {
-            id: "assistant-follow-up",
-            phase: "final_answer",
-            text: "Follow-up complete.",
-            type: "agentMessage",
-          },
-          threadId: "thread-demo",
-          turnId: "turn-follow-up",
-        },
-      },
-      {
-        method: "turn/completed",
-        params: {
-          threadId: "thread-demo",
-          turn: {
-            durationMs: 900,
-            id: "turn-follow-up",
-            status: "completed",
-          },
-        },
-      },
-    ] as const;
-    const completed = followUpEvents.reduce(
-      reduceProtocolNotification,
-      interrupted,
+    const settled = reduceProtocolTrace(
+      scenario.events.slice(0, scenario.frames["command-interruption-settled"]),
     );
+    const recovered = reduceProtocolTrace(scenario.events);
 
-    expect(completed.status).toBe("completed");
+    expect(running.status).toBe("running");
+    expect(running.commands).toEqual([
+      expect.objectContaining({
+        id: "command-interruption",
+        status: "running",
+      }),
+    ]);
+    expect(stopping.status).toBe("interrupted");
+    expect(stopping.commands[0]).toMatchObject({ status: "running" });
     expect(
-      completed.messages.find(({ id }) => id === "assistant-interrupt")
+      stopping.messages.find(({ id }) => id === "user-command-interruption")
         ?.interruptionDurationMs,
-    ).toBe(18_400);
-    expect(completed.messages.at(-1)?.text).toBe("Follow-up complete.");
+    ).toBe(95_000);
+    expect(settled.status).toBe("interrupted");
+    expect(settled.commands[0]).toMatchObject({
+      durationMs: 113_000,
+      exitCode: 0,
+      status: "completed",
+    });
+    expect(recovered.status).toBe("completed");
+    expect(recovered.turnDurationsMs).toMatchObject({
+      "turn-command-interruption": 95_000,
+      "turn-command-interruption-recovery": 1_500,
+    });
+    expect(recovered.messages.at(-1)).toMatchObject({
+      id: "assistant-command-interruption-recovery",
+      text: "INTERRUPTION RECOVERY ACCEPTED",
+    });
+    expect(
+      recovered.messages.find(({ id }) => id === "user-command-interruption")
+        ?.interruptionDurationMs,
+    ).toBe(95_000);
+    expect(recovered.timeline.map(({ kind }) => kind)).toEqual([
+      "message",
+      "command",
+      "message",
+      "message",
+    ]);
   });
 
   it("treats retrying as an active turn so Stop remains available", () => {

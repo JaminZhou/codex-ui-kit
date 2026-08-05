@@ -1190,6 +1190,7 @@ for (const scene of visualScenes) {
           }
         : null;
       const commandExecution =
+        document.querySelector('[data-item-id="command-interruption"]') ??
         document.querySelector('[data-item-id="command-failure-output"]') ??
         document.querySelector('[data-item-id="command-long-output"]');
       const commandOutput = (() => {
@@ -1210,12 +1211,44 @@ for (const scene of visualScenes) {
         const footer = commandExecution.querySelector(
           ".codex-ui-command-execution__footer",
         );
+        const compactDetail = commandExecution.querySelector(
+          ".codex-ui-command-execution__compact-detail",
+        );
+        const activityHeader = commandExecution.querySelector(
+          ".codex-ui-activity__header",
+        );
+        const activitySummary = commandExecution.querySelector(
+          ".codex-ui-activity__summary",
+        );
         const timeline = commandExecution.closest(
           ".codex-ui-activity-timeline",
         );
         const shellStyle = shell ? getComputedStyle(shell) : null;
         const outputStyle = output ? getComputedStyle(output) : null;
         return {
+          header: activityHeader
+            ? {
+                rect: rect(activityHeader),
+                style: {
+                  fontFamily: getComputedStyle(activityHeader).fontFamily,
+                  fontSize: getComputedStyle(activityHeader).fontSize,
+                  fontWeight: getComputedStyle(activityHeader).fontWeight,
+                  lineHeight: getComputedStyle(activityHeader).lineHeight,
+                },
+              }
+            : null,
+          compactDetail: compactDetail
+            ? {
+                rect: rect(compactDetail),
+                style: {
+                  fontFamily: getComputedStyle(compactDetail).fontFamily,
+                  fontSize: getComputedStyle(compactDetail).fontSize,
+                  fontWeight: getComputedStyle(compactDetail).fontWeight,
+                  lineHeight: getComputedStyle(compactDetail).lineHeight,
+                },
+                text: compactDetail.textContent?.replace(/\s+/g, " ").trim(),
+              }
+            : null,
           commandExpanded:
             commandLine?.getAttribute("aria-expanded") ?? null,
           commandLabel: commandLine?.getAttribute("aria-label") ?? null,
@@ -1266,10 +1299,8 @@ for (const scene of visualScenes) {
           shellLabel: shellLabel?.textContent?.trim() ?? null,
           status: commandExecution.getAttribute("data-execution-status"),
           summary:
-            commandExecution
-              .querySelector(".codex-ui-activity__summary")
-              ?.textContent?.replace(/\s+/g, " ")
-              .trim() ?? null,
+            activitySummary?.textContent?.replace(/\s+/g, " ").trim() ??
+            null,
           timelineExpanded:
             timeline?.hasAttribute("data-expanded") ?? false,
           timelineLabel:
@@ -1279,6 +1310,15 @@ for (const scene of visualScenes) {
               .trim() ?? null,
         };
       })();
+      const interruptionSummary = document.querySelector(
+        ".codex-ui-thread-interruption-summary",
+      );
+      const interruptionLabel = interruptionSummary?.querySelector(
+        ".codex-ui-thread-interruption-summary__label",
+      );
+      const interruptionRule = interruptionSummary?.querySelector(
+        ".codex-ui-thread-interruption-summary__rule",
+      );
       return {
         commandOutput,
         composer: composerRect,
@@ -1288,6 +1328,35 @@ for (const scene of visualScenes) {
           document.documentElement.scrollWidth -
           document.documentElement.clientWidth,
         mode: root.getAttribute("data-mode"),
+        interruption: interruptionSummary
+          ? {
+              label: interruptionLabel
+                ? {
+                    rect: rect(interruptionLabel),
+                    style: {
+                      fontFamily: getComputedStyle(interruptionLabel).fontFamily,
+                      fontSize: getComputedStyle(interruptionLabel).fontSize,
+                      fontWeight: getComputedStyle(interruptionLabel).fontWeight,
+                      lineHeight: getComputedStyle(interruptionLabel).lineHeight,
+                    },
+                    text: interruptionLabel.textContent?.trim(),
+                  }
+                : null,
+              rect: rect(interruptionSummary),
+              rule: interruptionRule
+                ? {
+                    rect: rect(interruptionRule),
+                    style: {
+                      backgroundColor:
+                        getComputedStyle(interruptionRule).backgroundColor,
+                    height: getComputedStyle(interruptionRule).height,
+                    marginTop: getComputedStyle(interruptionRule).marginTop,
+                  },
+                }
+                : null,
+              status: interruptionSummary.getAttribute("data-status"),
+            }
+          : null,
         markdown,
         mcp,
         mcpFailure,
@@ -2776,6 +2845,99 @@ for (const scene of visualScenes) {
       }
     }
 
+    if (scene.id.startsWith("command-interruption-")) {
+      const commandOutput = contract.commandOutput;
+      const running = scene.id === "command-interruption-running";
+      const stopping = scene.id === "command-interruption-stopping";
+      const recovered = scene.id === "command-interruption-recovered";
+      const interruptionState = await page.evaluate(() => ({
+        assistantText:
+          document
+            .querySelector(
+              '[data-item-id="assistant-command-interruption-recovery"] .codex-ui-markdown',
+            )
+            ?.textContent?.replace(/\s+/g, " ")
+            .trim() ?? null,
+        composerPhase: document
+          .querySelector(".demo-root")
+          ?.getAttribute("data-composer-phase"),
+        sendCount: [...document.querySelectorAll("button")].filter(
+          (button) =>
+            button.getAttribute("aria-label") === "Send" ||
+            button.textContent?.trim() === "Send",
+        ).length,
+        stopCount: [...document.querySelectorAll("button")].filter(
+          (button) =>
+            button.getAttribute("aria-label") === "Stop" ||
+            button.textContent?.trim() === "Stop",
+        ).length,
+      }));
+      const expectedRootStatus = running
+        ? "running"
+        : recovered
+          ? "completed"
+          : "interrupted";
+      const expectedCommandStatus = running
+        ? "running"
+        : stopping
+          ? "interrupted"
+          : "background-finished";
+      const expectedSummaryPrefix = running
+        ? "Running seq 1 120"
+        : stopping
+          ? "Background terminal stopped with seq 1 120"
+          : "Ran seq 1 120";
+      if (
+        !commandOutput ||
+        contract.rootStatus !== expectedRootStatus ||
+        commandOutput.status !== expectedCommandStatus ||
+        !commandOutput.summary?.startsWith(expectedSummaryPrefix) ||
+        commandOutput.executionExpanded !== running ||
+        commandOutput.timelineExpanded !== running ||
+        commandOutput.timelineLabel !== (running ? "Working for 1m 35s" : null) ||
+        Math.abs((commandOutput.header?.rect.width ?? 0) - 736) > 1 ||
+        Math.abs((commandOutput.header?.rect.height ?? 0) - 21) > 1 ||
+        commandOutput.header?.style.fontSize !== "14px" ||
+        commandOutput.header?.style.fontWeight !== "445" ||
+        commandOutput.header?.style.lineHeight !== "21px" ||
+        interruptionState.composerPhase !== (running ? "running" : "idle") ||
+        interruptionState.stopCount !== (running ? 1 : 0) ||
+        interruptionState.sendCount !== (running ? 0 : 1) ||
+        (running
+          ? !commandOutput.compactDetail ||
+            commandOutput.compactDetail.text !==
+              "Running command for 1m 28s" ||
+            commandOutput.compactDetail.style.fontSize !== "14px" ||
+            commandOutput.compactDetail.style.fontWeight !== "445" ||
+            commandOutput.compactDetail.style.lineHeight !== "21px" ||
+            contract.interruption !== null
+          : commandOutput.compactDetail !== null ||
+            !contract.interruption ||
+            contract.interruption.status !== "stopped" ||
+            contract.interruption.label?.text !== "You stopped after 1m 35s" ||
+            contract.interruption.label?.style.fontSize !== "14px" ||
+            contract.interruption.label?.style.fontWeight !== "445" ||
+            contract.interruption.label?.style.lineHeight !== "21px" ||
+            Math.abs((contract.interruption.rect.width ?? 0) - 736) > 1 ||
+            Math.abs((contract.interruption.label?.rect.height ?? 0) - 21) > 1 ||
+            contract.interruption.rule?.style.height !== "1px" ||
+            contract.interruption.rule?.style.marginTop !== "8px") ||
+        (recovered
+          ? interruptionState.assistantText !==
+            "INTERRUPTION RECOVERY ACCEPTED"
+          : interruptionState.assistantText !== null)
+      ) {
+        throw new Error(
+          `${scene.id}: current command interruption contract failed: ${JSON.stringify({
+            commandOutput,
+            interruption: contract.interruption,
+            interruptionState,
+            rootStatus: contract.rootStatus,
+          })}`,
+        );
+      }
+    }
+
     if (
       scene.id !== "composer-disabled" &&
       scene.id !== "approval-current-pending"
@@ -2851,6 +3013,111 @@ for (const scene of visualScenes) {
   } finally {
     await app.close();
   }
+}
+
+const commandInterruptionScene = {
+  frame: "command-interruption-running",
+  id: "command-interruption-interaction",
+  scenario: "interruption",
+};
+const {
+  app: commandInterruptionApp,
+  page: commandInterruptionPage,
+} = await launchScene(commandInterruptionScene, { capture: false });
+try {
+  const stop = commandInterruptionPage.getByRole("button", {
+    exact: true,
+    name: "Stop",
+  });
+  if ((await stop.count()) !== 1) {
+    throw new Error("Current command interruption did not expose one Stop action.");
+  }
+  await stop.click();
+  await commandInterruptionPage.waitForSelector(
+    '.demo-root[data-frame="command-interruption-stopping"][data-status="interrupted"] [data-item-id="command-interruption"][data-execution-status="interrupted"]',
+  );
+  const stopping = await commandInterruptionPage.evaluate(() => ({
+    commandSummary:
+      document
+        .querySelector(
+          '[data-item-id="command-interruption"] .codex-ui-activity__summary',
+        )
+        ?.textContent?.replace(/\s+/g, " ")
+        .trim() ?? null,
+    interruption:
+      document
+        .querySelector(".codex-ui-thread-interruption-summary__label")
+        ?.textContent?.trim() ?? null,
+    stopCount: [...document.querySelectorAll("button")].filter(
+      (button) =>
+        button.getAttribute("aria-label") === "Stop" ||
+        button.textContent?.trim() === "Stop",
+    ).length,
+  }));
+  if (
+    !stopping.commandSummary?.startsWith(
+      "Background terminal stopped with seq 1 120",
+    ) ||
+    stopping.interruption !== "You stopped after 1m 35s" ||
+    stopping.stopCount !== 0
+  ) {
+    throw new Error(
+      `Current command Stop transition failed: ${JSON.stringify(stopping)}`,
+    );
+  }
+
+  await commandInterruptionPage.waitForSelector(
+    '.demo-root[data-frame="command-interruption-settled"][data-status="interrupted"] [data-item-id="command-interruption"][data-execution-status="background-finished"]',
+  );
+  const composer = commandInterruptionPage.getByRole("textbox", {
+    name: "Message composer",
+  });
+  const recoveryPrompt =
+    "Do not use tools. Reply with exactly: INTERRUPTION RECOVERY ACCEPTED";
+  await composer.fill(recoveryPrompt);
+  await composer.press("Enter");
+  await commandInterruptionPage.waitForSelector(
+    '.demo-root[data-frame="command-interruption-recovered"][data-status="completed"][data-composer-phase="idle"]',
+  );
+  const recovered = await commandInterruptionPage.evaluate(() => ({
+    activeElement: document.activeElement?.getAttribute("aria-label"),
+    assistantText:
+      document
+        .querySelector(
+          '[data-item-id="assistant-command-interruption-recovery"] .codex-ui-markdown',
+        )
+        ?.textContent?.replace(/\s+/g, " ")
+        .trim() ?? null,
+    commandStatus: document
+      .querySelector('[data-item-id="command-interruption"]')
+      ?.getAttribute("data-execution-status"),
+    interruption:
+      document
+        .querySelector(".codex-ui-thread-interruption-summary__label")
+        ?.textContent?.trim() ?? null,
+    stopCount: [...document.querySelectorAll("button")].filter(
+      (button) =>
+        button.getAttribute("aria-label") === "Stop" ||
+        button.textContent?.trim() === "Stop",
+    ).length,
+  }));
+  if (
+    recovered.activeElement !== "Message composer" ||
+    recovered.assistantText !== "INTERRUPTION RECOVERY ACCEPTED" ||
+    recovered.commandStatus !== "background-finished" ||
+    recovered.interruption !== "You stopped after 1m 35s" ||
+    recovered.stopCount !== 0
+  ) {
+    throw new Error(
+      `Current command same-thread recovery failed: ${JSON.stringify(recovered)}`,
+    );
+  }
+  await writeFile(
+    join(artifactDirectory, "command-interruption-interaction.json"),
+    `${JSON.stringify({ recovered, stopping }, null, 2)}\n`,
+  );
+} finally {
+  await commandInterruptionApp.close();
 }
 
 const interactivePullRequestScene = {

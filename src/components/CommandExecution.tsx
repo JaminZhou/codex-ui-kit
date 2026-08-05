@@ -84,6 +84,7 @@ export interface CommandExecutionProps
   children?: ReactNode;
   command: ReactNode;
   commandLabel?: string;
+  compactDetail?: ReactNode;
   completedAtMs?: number;
   copyCommandLabel?: string;
   copyCommandText?: string;
@@ -94,6 +95,7 @@ export interface CommandExecutionProps
   exitCode?: number;
   footer?: ReactNode;
   hideRawCommand?: boolean;
+  indicator?: ReactNode;
   noOutputLabel?: ReactNode;
   onCopyCommand?: (command: string) => void | Promise<void>;
   onOpenChange?: (open: boolean) => void;
@@ -109,6 +111,7 @@ export function CommandExecution({
   className,
   command,
   commandLabel,
+  compactDetail,
   completedAtMs,
   copyCommandLabel = "Copy command",
   copyCommandText,
@@ -119,6 +122,7 @@ export function CommandExecution({
   exitCode,
   footer,
   hideRawCommand = false,
+  indicator,
   noOutputLabel = "No output",
   onCopyCommand,
   onOpenChange,
@@ -240,7 +244,14 @@ export function CommandExecution({
               : `Exit code ${exitCode ?? "unknown"}`}
     </div>
   );
-  const body = hideRawCommand ? undefined : (
+  const body = hideRawCommand ? (
+    compactDetail === undefined || compactDetail === null ? undefined : (
+      <div className="codex-ui-command-execution__compact-detail">
+        <TerminalIcon />
+        <span>{compactDetail}</span>
+      </div>
+    )
+  ) : (
     <div
       className="codex-ui-command-execution__shell"
       data-command-expanded={commandExpanded || undefined}
@@ -286,7 +297,7 @@ export function CommandExecution({
       className={classes}
       data-execution-status={status}
       detail={detail}
-      indicator={<TerminalIcon />}
+      indicator={indicator ?? <TerminalIcon />}
       kind="command"
       onOpenChange={handleOpenChange}
       open={resolvedOpen}

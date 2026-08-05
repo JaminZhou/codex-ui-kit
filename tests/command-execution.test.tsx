@@ -159,6 +159,26 @@ describe("CommandExecution", () => {
     expect(html).not.toContain("private transport command");
   });
 
+  it("can expose a compact running detail without rendering the raw shell", () => {
+    const html = renderToStaticMarkup(
+      <CommandExecution
+        command="private long-running command"
+        compactDetail="Running command for 1m 28s"
+        defaultOpen
+        hideRawCommand
+        status="running"
+        summary="Running a read-only probe"
+      />,
+    );
+
+    expect(html).toContain("Running a read-only probe");
+    expect(html).toContain("Running command for 1m 28s");
+    expect(html).toContain("codex-ui-command-execution__compact-detail");
+    expect(html).toContain("<details");
+    expect(html).not.toContain("private long-running command");
+    expect(html).not.toContain("codex-ui-command-execution__shell");
+  });
+
   it("can replace or omit the sampled shell label", () => {
     const custom = renderToStaticMarkup(
       <CommandExecution

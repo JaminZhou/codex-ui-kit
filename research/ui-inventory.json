@@ -328,11 +328,12 @@
         "cdp-26.721:synthetic-streaming-stop-28x28-frozen-raster-and-stop-action",
         "cdp-26.721:synthetic-you-stopped-after-2s-divider-raster",
         "cdp-26.721.81911:real-running-turn-stop-input-clear-and-focus-restore",
-        "cdp-26.727.40816:real-stop-28x28-you-stopped-after-2s-and-queued-auto-continuation"
+        "cdp-26.727.40816:real-stop-28x28-you-stopped-after-2s-and-queued-auto-continuation",
+        "cdp-26.730.61309:real-long-running-command-stop-95s-background-terminal-stopping-settlement-and-same-thread-recovery"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "partial_legacy",
-      "electronStatus": "partial_legacy",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
       "priority": "p0"
     },
     {

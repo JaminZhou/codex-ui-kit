@@ -427,6 +427,24 @@ against `26.730.61309`:
   1180×820 ownership-masked current comparison passes at 0.89% under a 1%
   hard limit.
 
+## Twenty-fifth vertical slice
+
+The twenty-fifth slice refreshes command interruption and same-thread recovery
+against `26.730.61309`:
+
+- one real read-only 120-second command is stopped after 95 seconds through
+  the current 28×28 Stop action;
+- a schema-validated public replay separates the expanded running command,
+  immediate `Background terminal stopped with …` row, later `Ran …`
+  settlement, and exact recovered follow-up;
+- Browser/CDP clicks Stop, waits for background settlement, sends the recovery
+  prompt, and verifies the retained `You stopped after 1m 35s` summary plus
+  Composer focus restoration;
+- Electron repeats the same transition in a real 1180×820 `BrowserWindow`;
+- the 73-frame matrix includes four new reviewed baselines, and the
+  ownership-masked immediate-stop full-window comparison passes at 0.44%
+  under a 0.5% hard limit.
+
 ## Development
 
 From the repository root:

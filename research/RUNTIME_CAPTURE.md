@@ -558,7 +558,7 @@ without an approval card.
 The 1180×820 Renderer retained the 736×227.06 command card,
 734×144 reverse-tail output viewport, 401 split lines, 7816px scroll height,
 `scrollTop = 0`, 13/19.5px monospace output, two copy controls, Shell label,
-and Success state. Browser/CDP, Electron, and all 67 internal pixel frames
+and Success state. Browser/CDP, Electron, and all 73 internal pixel frames
 pass; the ownership-masked current comparison measures `0.001655643` under
 the unchanged 1.5% hard limit. Other `26.727.40816` surfaces remain
 previous-build evidence until separately reached on this build.
@@ -589,7 +589,7 @@ with `stderr-001`, retains all 160 records, and ends with `stdout-080` then
 
 The independent public trace adds three reviewed frames: live output,
 collapsed failure, and expanded failure plus the successful follow-up.
-Browser/CDP now covers 70 frames and verifies semantic state, exact text,
+Browser/CDP now covers 73 frames and verifies semantic state, exact text,
 computed geometry, reverse-tail behavior, keyboard disclosure, and
 collapse/reopen restoration. Electron repeats the failure, copy, recovery,
 and disclosure interactions. The optional full-window external comparison
@@ -601,6 +601,41 @@ Cleanup stopped only PID `71571` and the exact profile-specific Crashpad PIDs
 not stopped. The ignored probe was removed, and the profile plus external
 screenshots were moved into the recoverable Trash item
 `codex-ui-kit-command-failure-cdp.Pwo1hz`.
+
+### Current 26.730.61309 command interruption and same-thread recovery
+
+The interruption probe used exact main PID `94866`, loopback port `9542`, and
+unique profile `/private/tmp/codex-ui-kit-command-stop-cdp.ZbTpcV/profile`.
+Because a direct executable launch followed Electron's single-instance path,
+the successful isolated second instance was opened with `open -na` and the
+same profile/remote-debugging arguments. It created one disposable task and
+ran only this read-only command:
+
+```sh
+seq 1 120 | while read i; do printf 'interrupt-probe-%03d\n' "$i"; sleep 1; done
+```
+
+At 1180×820, the running Renderer exposed `Working for 1m 35s`, the exact
+command row, `Running command for 1m 28s`, and a 28×28 Stop control. Clicking
+Stop produced `You stopped after 1m 35s` and the transient row
+`Background terminal stopped with …`. The process then settled to `Ran …`
+without leaving a matching command process. A no-tool message in that same
+thread returned exactly `INTERRUPTION RECOVERY ACCEPTED` and restored focus to
+the empty Composer.
+
+The independent replay adds four reviewed frames and drives the transition in
+both Browser/CDP and a real Electron `BrowserWindow`: Stop → immediate summary
+→ background settlement → exact recovery message. The 73-frame contract also
+locks 736px summary/command rows, 14/21px weight-445 system typography, the
+summary rule, compact running detail, and Stop/Send ownership. The optional
+ownership-masked full-window comparison against the immediate-stop screenshot
+passes at `0.0043520049607275735` under a 0.5% hard limit.
+
+Cleanup terminated only the exact second-instance process tree, verified port
+`9542` closed, and left the original Codex process running. The ignored probe
+was removed. Both exact temporary profiles and all external screenshots/JSON
+were moved to recoverable Trash; the successful evidence remains in
+`codex-ui-kit-command-stop-cdp.ZbTpcV`.
 
 ### Current 26.730.61309 sidebar capture
 
@@ -620,7 +655,7 @@ at 720px pins a non-modal 274/446 split across Pull requests navigation;
 explicit Hide returns the main route to 720px, and a 1.2-second hover at x=1
 does not open the historical edge preview.
 
-The independent scene and public project-group contract pass all 67
+The independent scene and public project-group contract pass all 73
 Browser/CDP and internal pixel frames plus Electron interaction. The optional
 current-build regional comparison passes at `0.036233576642335764` for the
 top, `0.0012919896640826874` for the text-masked selected row, and `0` for the
