@@ -4,6 +4,7 @@ import conversationLifecycleTrace from "../fixtures/traces/conversation-lifecycl
 import backgroundTerminalTrace from "../fixtures/traces/background-terminal.jsonl?raw";
 import interruptionTrace from "../fixtures/traces/interruption.jsonl?raw";
 import largeFileReviewTrace from "../fixtures/traces/large-file-review.jsonl?raw";
+import longCommandOutputTrace from "../fixtures/traces/long-command-output.jsonl?raw";
 import markdownTrace from "../fixtures/traces/markdown.jsonl?raw";
 import mcpToolCallTrace from "../fixtures/traces/mcp-tool-call.jsonl?raw";
 import mcpRecoveryMixedThreadTrace from "../fixtures/traces/mcp-recovery-mixed-thread.jsonl?raw";
@@ -23,6 +24,7 @@ export type ReplayScenarioId =
   | "interruption"
   | "compaction"
   | "large-file-review"
+  | "long-command-output"
   | "markdown"
   | "mcp-tool-call"
   | "mcp-recovery-mixed-thread"
@@ -136,6 +138,12 @@ export const replayScenarios: Record<ReplayScenarioId, ReplayScenario> = {
     "Large Review workspace",
     "Eight files and long diffs exercise panel scrolling and exact file reveal.",
     largeFileReviewTrace,
+  ),
+  "long-command-output": scenario(
+    "long-command-output",
+    "Run command output probe",
+    "A current completed command expands from its work summary into a 400-line, bottom-following shell output card.",
+    longCommandOutputTrace,
   ),
   markdown: scenario(
     "markdown",

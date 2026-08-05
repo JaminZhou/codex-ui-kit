@@ -281,7 +281,7 @@ and failure transitions against deterministic public host state, not GitHub.
 Cleanup terminated only the exact temporary-profile process, verified its
 listener was gone, and removed its external screenshots and profile.
 
-### Current 26.727.40816 refresh capture
+### 26.727.40816 refresh capture
 
 The `26.727.40816` refresh used exact process PID `38608`, loopback port
 `9511`, and unique profile
@@ -317,7 +317,7 @@ Cleanup resolved and terminated only PID `38608`, verified
 temporary profile and external screenshots into one recoverable Trash
 directory. The original Codex process remained running.
 
-### Current 26.727.40816 successful MCP capture
+### 26.727.40816 successful MCP capture
 
 The successful MCP refresh used exact process PID `59950`, loopback port
 `9512`, and unique profile
@@ -343,7 +343,7 @@ Cleanup terminated only PID `59950`, verified the exact profile children and
 temporary reference images into one recoverable Trash directory. The
 original Codex process remained running.
 
-### Current 26.727.40816 MCP failure/recovery capture
+### 26.727.40816 MCP failure/recovery capture
 
 The recovery refresh used exact process PID `67251`, loopback port `9513`,
 and unique profile
@@ -372,7 +372,7 @@ gone, and moved the profile and reference images into
 `/Users/JaminZhou/.Trash/codex-ui-kit-mcp-recovery-cleanup.yS1xY9`. The
 original Codex process remained running.
 
-### Current 26.727.40816 Composer queue and Stop capture
+### 26.727.40816 Composer queue and Stop capture
 
 The current Composer refresh used exact process PID `78399`, loopback port
 `9514`, and unique profile
@@ -411,7 +411,7 @@ port `9514` were gone, and moved the profile and screenshots into
 `/Users/JaminZhou/.Trash/codex-ui-kit-composer-cleanup.FE0SB8`. The original
 Codex process remained running.
 
-### Current 26.727.40816 Composer menus and long-input capture
+### 26.727.40816 Composer menus and long-input capture
 
 The current menu refresh used exact process PID `89666`, loopback port `9515`,
 and unique profile
@@ -461,7 +461,7 @@ evidence to the recoverable
 `/Users/JaminZhou/.Trash/codex-ui-kit-composer-modes-cleanup.CJuP6u`
 directory.
 
-### Current 26.727.40816 long-thread capture
+### 26.727.40816 long-thread capture
 
 The long-thread refresh used exact process PID `6481`, child `6523`, loopback
 port `9517`, and unique profile
@@ -493,7 +493,7 @@ and child, verified port `9517` was gone, and moved the profile and reference
 images to
 `/Users/JaminZhou/.Trash/codex-ui-kit-long-thread-cleanup.XSqBZw`.
 
-### Current 26.727.40816 command-approval denial
+### 26.727.40816 command-approval denial
 
 The approval probe used exact main PID `13129`, loopback port `9518`, and
 unique profile `/private/tmp/codex-ui-kit-approval-cdp.7bt4qn`. It created one
@@ -513,7 +513,7 @@ The bounded sequence was:
 5. verify no Calculator process existed.
 
 The independent replay records the declined request/resolution event order
-with empty command output and no exit code. Browser/CDP covers 65 frames,
+with empty command output and no exit code. Browser/CDP covers 66 frames,
 Electron drives the split options menu and rejection transition, and masked
 current-build comparisons pass at `0.008493512` pending and `0.001214128`
 denied. This captures one command-denial path only; allow once, persistence,
@@ -523,6 +523,51 @@ Cleanup stopped only the exact second-process tree and its profile-specific
 Crashpad helpers, closed port `9518`, removed the ignored probe, and moved
 the profile and external screenshots to
 `/Users/JaminZhou/.Trash/codex-ui-kit-approval-cleanup.byVfmp`.
+
+### 26.727.40816 long command output
+
+The long-output probe used exact main PID `22071`, loopback port `9519`, and
+unique profile `/private/tmp/codex-ui-kit-command-cdp.jW2xHc`. It created one
+disposable task and requested only `seq 1 400`. Ask mode ran this exact
+low-risk command without an approval card, so the run is command-output
+evidence rather than approval allow-once evidence.
+
+The completed turn exposed a collapsed `Ran seq 1 400` disclosure. Expanding
+it revealed a 736×227px command surface at x=274.05/y=101.44 with `Shell`,
+the command row, two copy controls, a 734×144px output viewport, and
+`Success`. The output uses 13/19.5px monospace text, splits into 401 lines
+including the trailing newline, and uses a reverse column: `scrollTop = 0`
+shows lines 394–400 at the latest edge while `scrollHeight = 7816`.
+
+The independent public trace preserves exactly one command request/output
+pair and all 400 generated lines. Browser/CDP covers 66 frames and verifies
+geometry, styles, overflow, keyboard expansion, collapse/reopen, and
+latest-line restoration. Electron repeats the disclosure flow in a real
+1180×820 window. An ownership-masked comparison against the full current
+1180×820 screenshot passes at `0.000924969` under a 1.5% hard limit. The
+external profile/reference remains untracked and is moved to Trash during
+recoverable probe cleanup.
+
+### Current 26.730.61309 long command output
+
+The refreshed probe used exact main PID `99165`, loopback port `9520`, and
+unique profile `/private/tmp/codex-ui-kit-current-cdp.mrkFgT`. It submitted
+the same one-command prompt exactly once. Ask mode again ran `seq 1 400`
+without an approval card.
+
+The 1180×820 Renderer retained the 736×227.06 command card,
+734×144 reverse-tail output viewport, 401 split lines, 7816px scroll height,
+`scrollTop = 0`, 13/19.5px monospace output, two copy controls, Shell label,
+and Success state. Browser/CDP, Electron, and all 66 internal pixel frames
+pass; the ownership-masked current comparison measures `0.001655643` under
+the unchanged 1.5% hard limit. Other `26.727.40816` surfaces remain
+previous-build evidence until separately reached on this build.
+
+Cleanup stopped only PID `99165`, its exact process tree, reparented
+app-server/modifier children, and profile-specific Crashpad helpers. Port
+`9520` closed, the ignored probe was removed, and Finder moved the profile and
+external evidence to the recoverable Trash item
+`codex-ui-kit-current-cdp.mrkFgT`. The original Codex process was not stopped.
 
 ## Required flow matrix
 

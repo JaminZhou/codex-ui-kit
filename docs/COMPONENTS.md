@@ -56,8 +56,14 @@ The built-in highlighter escapes untrusted code. A custom `CodeHighlighter` retu
 
 - `McpToolCallGroup`: expandable integration-owned group for ordered MCP calls with running, recovered, and failed labels.
 - `ToolCallCard`: generic MCP, connector, and arbitrary tool-call row with structured, empty, danger-alert, neutral language/output-error, host-owned raw-output states, and an independently localizable failed-state accessible name.
-- `CommandExecution`: expandable command surface with duration, copy, background-terminal, success, failure, and interruption states. `formatCommandDuration` exposes its standalone duration formatter.
-- `CommandOutput`: labeled stdout/stderr with no-output, tail-following, overflow, fade, and copy behavior.
+- `CommandExecution`: expandable command surface with duration, copy,
+  optional `Shell`/host-defined shell label, background-terminal, success,
+  failure, and interruption states. Completed expanded summaries preserve the
+  command identity. `formatCommandDuration` exposes its standalone duration
+  formatter.
+- `CommandOutput`: labeled stdout/stderr with no-output, 144px bounded
+  reverse-tail following, overflow, fade, collapse/reopen restoration, and
+  copy behavior.
 - `FileChange`: one-file create, apply, stop, reject, delete, and rename activities with disclosure, statistics, path opening, and copy hooks.
 - `FileChangeGroup`: one protocol item's aggregate changed-files card with group status/actions, independent file rows, statistics, rename paths, and host-owned file opening.
 - `FileReview`: a scrollable workspace composition that stacks every changed

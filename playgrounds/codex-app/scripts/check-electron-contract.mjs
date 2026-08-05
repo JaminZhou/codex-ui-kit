@@ -2497,6 +2497,94 @@ try {
   await currentDeniedApprovalApp.close();
 }
 
+const longCommandOutputScene = {
+  frame: "command-output-expanded",
+  id: "electron-current-long-command-output",
+  scenario: "long-command-output",
+};
+const {
+  app: longCommandOutputApp,
+  page: longCommandOutputPage,
+} = await launchScene(longCommandOutputScene, { capture: false });
+try {
+  const timelineToggle = longCommandOutputPage.getByRole("button", {
+    name: "Worked for 10s",
+  });
+  await timelineToggle.click();
+  const commandSummary = longCommandOutputPage
+    .locator('[data-item-id="command-long-output"] summary')
+    .first();
+  if ((await commandSummary.textContent())?.trim() !== "Ran seq 1 400") {
+    throw new Error(
+      "Electron current long command did not expose its sampled collapsed summary.",
+    );
+  }
+  await commandSummary.click();
+  const output = longCommandOutputPage.getByRole("region", {
+    name: "Standard output",
+  });
+  await output.waitFor({ state: "visible" });
+  const expanded = await longCommandOutputPage.evaluate(() => {
+    const command = document.querySelector(
+      '[data-item-id="command-long-output"]',
+    );
+    const output = command?.querySelector(
+      ".codex-ui-command-output pre",
+    );
+    return {
+      copyCount:
+        command?.querySelectorAll('button[aria-label="Copy"]').length ?? 0,
+      lineCount:
+        (output?.querySelector("code")?.textContent ?? "").split("\n")
+          .length,
+      scrollBottom: output ? output.scrollTop : null,
+      shellLabel:
+        command
+          ?.querySelector(".codex-ui-command-execution__shell-label")
+          ?.textContent?.trim() ?? null,
+      success:
+        command
+          ?.querySelector(".codex-ui-command-execution__footer")
+          ?.textContent?.trim() ?? null,
+    };
+  });
+  if (
+    expanded.copyCount !== 2 ||
+    expanded.lineCount !== 401 ||
+    expanded.scrollBottom === null ||
+    Math.abs(expanded.scrollBottom) > 1 ||
+    expanded.shellLabel !== "Shell" ||
+    expanded.success !== "Success"
+  ) {
+    throw new Error(
+      `Electron current long command output did not restore the bottom-following shell: ${JSON.stringify(expanded)}`,
+    );
+  }
+  const copyButtons = longCommandOutputPage.getByRole("button", {
+    name: "Copy",
+  });
+  await copyButtons.first().click();
+  await copyButtons.last().click();
+  await commandSummary.click();
+  if (await output.isVisible()) {
+    throw new Error(
+      "Electron current long command output remained visible after collapse.",
+    );
+  }
+  await commandSummary.click();
+  await output.waitFor({ state: "visible" });
+  const restoredBottom = await output.evaluate(
+    (element) => element.scrollTop,
+  );
+  if (Math.abs(restoredBottom) > 1) {
+    throw new Error(
+      `Electron current long command output lost its bottom-following position: ${restoredBottom}`,
+    );
+  }
+} finally {
+  await longCommandOutputApp.close();
+}
+
 const acceptedMixedApprovalScene = {
   frame: "mixed-approval-pending",
   id: "electron-mixed-approval-accepted",
@@ -3077,5 +3165,5 @@ try {
 }
 
 console.log(
-  "Electron host, native-window, coding-workspace routing, conversation/Composer lifecycle and current menus, default 720px narrow reachability, resizable navigation/Review/Terminal/PR detail, PR tabs and expansion, MCP disclosure/result, multi-file and mixed-content Review, selection/Undo, large diff scrolling, and compact geometry contracts passed.",
+  "Electron host, native-window, coding-workspace routing, conversation/Composer lifecycle and current menus, current long command output, default 720px narrow reachability, resizable navigation/Review/Terminal/PR detail, PR tabs and expansion, MCP disclosure/result, multi-file and mixed-content Review, selection/Undo, large diff scrolling, and compact geometry contracts passed.",
 );

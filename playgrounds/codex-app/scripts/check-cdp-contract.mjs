@@ -1189,7 +1189,97 @@ for (const scene of visualScenes) {
               ?.textContent?.trim(),
           }
         : null;
+      const commandExecution = document.querySelector(
+        '[data-item-id="command-long-output"]',
+      );
+      const commandOutput = (() => {
+        if (!commandExecution) return null;
+        const shell = commandExecution.querySelector(
+          ".codex-ui-command-execution__shell",
+        );
+        const shellLabel = commandExecution.querySelector(
+          ".codex-ui-command-execution__shell-label",
+        );
+        const commandLine = commandExecution.querySelector(
+          ".codex-ui-command-execution__command-line",
+        );
+        const output = commandExecution.querySelector(
+          ".codex-ui-command-output pre",
+        );
+        const outputCode = output?.querySelector("code");
+        const footer = commandExecution.querySelector(
+          ".codex-ui-command-execution__footer",
+        );
+        const timeline = commandExecution.closest(
+          ".codex-ui-activity-timeline",
+        );
+        const shellStyle = shell ? getComputedStyle(shell) : null;
+        const outputStyle = output ? getComputedStyle(output) : null;
+        return {
+          commandExpanded:
+            commandLine?.getAttribute("aria-expanded") ?? null,
+          commandLabel: commandLine?.getAttribute("aria-label") ?? null,
+          copyLabels: Array.from(
+            commandExecution.querySelectorAll("button"),
+            (button) => button.getAttribute("aria-label"),
+          ).filter(Boolean),
+          executionExpanded:
+            commandExecution
+              .querySelector(".codex-ui-activity__disclosure")
+              ?.hasAttribute("open") ?? false,
+          footer: footer
+            ? {
+                rect: rect(footer),
+                text: footer.textContent?.trim(),
+              }
+            : null,
+          lineCount: (outputCode?.textContent ?? "").split("\n").length,
+          output: output
+            ? {
+                clientHeight: output.clientHeight,
+                rect: rect(output),
+                scrollHeight: output.scrollHeight,
+                scrollTop: output.scrollTop,
+                style: {
+                  flexDirection: outputStyle?.flexDirection,
+                  fontFamily: outputStyle?.fontFamily,
+                  fontSize: outputStyle?.fontSize,
+                  lineHeight: outputStyle?.lineHeight,
+                  maxHeight: outputStyle?.maxHeight,
+                  overflowY: outputStyle?.overflowY,
+                  padding: outputStyle?.padding,
+                },
+                textEnd: (outputCode?.textContent ?? "").slice(-16),
+                textStart: (outputCode?.textContent ?? "").slice(0, 12),
+              }
+            : null,
+          shell: shell
+            ? {
+                rect: rect(shell),
+                style: {
+                  backgroundColor: shellStyle?.backgroundColor,
+                  borderRadius: shellStyle?.borderRadius,
+                  overflow: shellStyle?.overflow,
+                },
+              }
+            : null,
+          shellLabel: shellLabel?.textContent?.trim() ?? null,
+          summary:
+            commandExecution
+              .querySelector(".codex-ui-activity__summary")
+              ?.textContent?.replace(/\s+/g, " ")
+              .trim() ?? null,
+          timelineExpanded:
+            timeline?.hasAttribute("data-expanded") ?? false,
+          timelineLabel:
+            timeline
+              ?.querySelector(".codex-ui-activity-timeline__toggle")
+              ?.textContent?.replace(/\s+/g, " ")
+              .trim() ?? null,
+        };
+      })();
       return {
+        commandOutput,
         composer: composerRect,
         frame: root.getAttribute("data-frame"),
         header: headerRect,
@@ -2476,6 +2566,97 @@ for (const scene of visualScenes) {
       ) {
         throw new Error(
           `${scene.id}: current-build Markdown contract failed: ${JSON.stringify(markdown)}`,
+        );
+      }
+    }
+
+    if (scene.id === "command-output-expanded") {
+      const commandOutput = contract.commandOutput;
+      if (
+        !commandOutput ||
+        !commandOutput.timelineExpanded ||
+        commandOutput.timelineLabel !== "Worked for 10s" ||
+        !commandOutput.executionExpanded ||
+        commandOutput.summary !== "Ran seq 1 400" ||
+        commandOutput.shellLabel !== "Shell" ||
+        commandOutput.commandLabel !== "$ seq 1 400" ||
+        commandOutput.commandExpanded !== "false" ||
+        commandOutput.lineCount !== 401 ||
+        !commandOutput.shell ||
+        Math.abs(commandOutput.shell.rect.width - 736) > 1 ||
+        Math.abs(commandOutput.shell.rect.height - 227) > 1 ||
+        commandOutput.shell.style.borderRadius !== "12.5px" ||
+        commandOutput.shell.style.overflow !== "hidden" ||
+        !commandOutput.output ||
+        Math.abs(commandOutput.output.rect.width - 734) > 1 ||
+        Math.abs(commandOutput.output.rect.height - 144) > 1 ||
+        commandOutput.output.clientHeight !== 144 ||
+        commandOutput.output.scrollHeight !== 7816 ||
+        Math.abs(commandOutput.output.scrollTop) > 1 ||
+        commandOutput.output.style.flexDirection !== "column-reverse" ||
+        commandOutput.output.style.fontSize !== "13px" ||
+        commandOutput.output.style.lineHeight !== "19.5px" ||
+        commandOutput.output.style.maxHeight !== "144px" ||
+        commandOutput.output.style.overflowY !== "auto" ||
+        commandOutput.output.style.padding !== "8px" ||
+        commandOutput.output.textStart !== "1\n2\n3\n4\n5\n6\n" ||
+        !commandOutput.output.textEnd.endsWith("397\n398\n399\n400\n") ||
+        commandOutput.footer?.text !== "Success" ||
+        Math.abs((commandOutput.footer?.rect.height ?? 0) - 27) > 1 ||
+        commandOutput.copyLabels.filter((label) => label === "Copy")
+          .length !== 2
+      ) {
+        throw new Error(
+          `${scene.id}: current long command output contract failed: ${JSON.stringify(commandOutput)}`,
+        );
+      }
+
+      const commandLine = page.getByRole("button", {
+        name: "$ seq 1 400",
+      });
+      await commandLine.press("Enter");
+      const keyboardExpanded = await commandLine.getAttribute(
+        "aria-expanded",
+      );
+      const executionSummary = page
+        .locator(
+          '[data-item-id="command-long-output"] > .codex-ui-activity__disclosure > summary',
+        );
+      await executionSummary.click();
+      const collapsed = await page.evaluate(() => ({
+        expanded:
+          document
+            .querySelector(
+              '[data-item-id="command-long-output"] .codex-ui-activity__disclosure',
+            )
+            ?.hasAttribute("open") ?? false,
+      }));
+      const collapsedOutputVisible = await page
+        .locator(
+          '[data-item-id="command-long-output"] .codex-ui-command-output',
+        )
+        .isVisible();
+      await executionSummary.click();
+      const restoredBottom = await page.evaluate(() => {
+        const output = document.querySelector(
+          '[data-item-id="command-long-output"] .codex-ui-command-output pre',
+        );
+        return output ? output.scrollTop : null;
+      });
+      if (
+        keyboardExpanded !== "true" ||
+        collapsed.expanded ||
+        collapsedOutputVisible ||
+        restoredBottom === null ||
+        Math.abs(restoredBottom) > 1
+      ) {
+        throw new Error(
+          `${scene.id}: command keyboard/collapse restoration failed: ${JSON.stringify({
+            collapsed,
+            collapsedOutputVisible,
+            keyboardExpanded,
+            restoredBottom,
+          })}`,
         );
       }
     }

@@ -10,11 +10,11 @@ exit gates; it does not replace the inventory.
 
 ## Current position
 
-- The current installed package is Codex Desktop `26.727.40816` (`6067`).
+- The current installed package is Codex Desktop `26.730.61309` (`6223`).
 - The inventory contains 77 surface groups: 49 P0, 19 P1, and 9 P2.
-- 30 groups have current-build runtime evidence, 28 have previous-build-only
+- 1 group has current-build runtime evidence, 57 have previous-build-only
   runtime evidence, and 19 have not been sampled.
-- The current-build refresh covers all six left-sidebar groups, window
+- The `26.727.40816` refresh covered all six left-sidebar groups, window
   navigation, route loading/restoration, the New chat Composer and project
   picker, the read-only Terminal shell, and the public Pull request route.
   The PR lifecycle now follows the two-tab Summary/Code contract with Timeline
@@ -22,7 +22,7 @@ exit gates; it does not replace the inventory.
   responsive detail restoration. Its independent state machine adds
   index/detail loading and failure, checks, comments, review submission,
   merge-readiness, merge completion, compact layout, and route restoration.
-  Together the playground gates cover 65 CDP/pixel frames, and the refreshed
+  Together the playground gates cover 66 CDP/pixel frames, and the refreshed
   PR detail passes the current 906×820 regional pixel gate. The refreshed
   real MCP success path now matches Search → Fetch, the integrated activity
   disclosure, computed typography, and a current regional pixel gate. The
@@ -42,7 +42,14 @@ exit gates; it does not replace the inventory.
   ownership-masked regional gate. A fifth disposable-task slice locks the
   736×162 command-approval card, denial without execution, response actions,
   and restored 736×98 Composer through CDP, Electron, and sub-1% regional
-  gates. Attachment variants, Terminal
+  gates. After the `26.730.61309` update, a fresh disposable-task slice
+  re-locks a real 400-line successful
+  command, collapsed/expanded Shell card, 144px reverse-tail viewport,
+  copy controls, and collapse/reopen restoration through CDP, Electron, and
+  a 0.17% ownership-masked full-window gate. This command surface is the only
+  group currently reverified on `26.730.61309`; the preceding
+  `26.727.40816` results are previous-build evidence. Attachment variants,
+  Terminal
   multi-tab/process behavior,
   Review rename/delete variants, and broader shell evidence from
   `26.721.81911` remain historical regression evidence until re-observed. The
@@ -280,9 +287,11 @@ without confusing package readiness with full product reconstruction.
    failure, checks, reviewers, comments, review submission, merge-readiness,
    merge completion, responsive non-modal panel composition, and route
    restoration. Current-product evidence remains deliberately read-only.
-10. **Remaining P0 turn/tool gaps**: long command output and truncation,
-    approval allow-once/timeout/persistence, attachment lifecycle, Markdown
-    mutation/large content, subagents, and transport recovery.
+10. **Remaining P0 turn/tool gaps**: current long command output, bounded
+    scrolling, expansion, and latest-line restoration are delivered. Continue
+    with stdout/stderr/failure/interruption variants, approval
+    allow-once/timeout/persistence, attachment lifecycle, Markdown mutation/
+    large content, subagents, and transport recovery.
 11. **P1 resources and integrations**: Browser/artifact/document previews,
     environments, remote connections, Settings, MCP, plugins, skills, and
     automations, each with one end-to-end vertical slice.

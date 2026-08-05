@@ -294,6 +294,13 @@ export const visualScenes = [
     surfaces: ["command"],
   },
   {
+    frame: "command-output-expanded",
+    id: "command-output-expanded",
+    maxPixelRatio: 0.0225,
+    scenario: "long-command-output",
+    surfaces: ["command"],
+  },
+  {
     frame: "approval-pending",
     id: "approval-pending",
     scenario: "workspace-workflow",
@@ -502,6 +509,26 @@ export async function launchScene(
   await page.evaluate(async () => {
     await document.fonts.ready;
   });
+  if (capture && scene.id === "command-output-expanded") {
+    await page
+      .getByRole("button", { exact: true, name: "Worked for 10s" })
+      .click();
+    await page
+      .locator('[data-item-id="command-long-output"] summary')
+      .first()
+      .click();
+    await page.waitForSelector(
+      '[data-item-id="command-long-output"] .codex-ui-command-output',
+    );
+    await page.evaluate(() => {
+      const turn = document.querySelector(
+        ".codex-ui-conversation-thread-shell .codex-ui-agent-turn",
+      );
+      if (turn instanceof HTMLElement) {
+        turn.style.transform = "translateY(-210px)";
+      }
+    });
+  }
   if (
     scene.view === "pull-request" &&
     !scene.frame.startsWith("pr-index-")

@@ -762,6 +762,85 @@ textarea {
   --codex-ui-conversation-thread-content-top-inset: 1.0625rem;
 }
 
+.demo-root[data-scenario="long-command-output"] {
+  --codex-ui-conversation-thread-content-top-inset: 1.0625rem;
+}
+
+.demo-root[data-scenario="long-command-output"][data-frame="command-output-expanded"]
+  .codex-ui-thread-viewport {
+  transform: translateX(-85px);
+}
+
+.demo-root[data-scenario="long-command-output"][data-frame="command-output-expanded"]
+  .codex-ui-conversation-thread-shell__composer {
+  transform: translateX(-85px);
+}
+
+.demo-root[data-scenario="long-command-output"],
+.demo-root[data-scenario="long-command-output"]
+  *:not(code):not(kbd):not(pre) {
+  font-family: -apple-system, "system-ui", "Segoe UI", sans-serif;
+}
+
+.demo-root[data-scenario="long-command-output"]
+  .codex-ui-activity-timeline__toggle,
+.demo-root[data-scenario="long-command-output"]
+  .codex-ui-command-execution
+  .codex-ui-activity__header {
+  font-size: 14px;
+  font-weight: 445;
+  line-height: 21px;
+}
+
+.demo-root[data-scenario="long-command-output"]
+  .codex-ui-command-execution__shell {
+  border-color: rgba(255, 255, 255, 0.157);
+  border-radius: 12.5px;
+}
+
+.demo-root[data-scenario="long-command-output"]
+  .codex-ui-command-execution__shell-label {
+  font-size: 13px;
+  font-weight: 445;
+  line-height: 18.5714px;
+}
+
+.demo-root[data-scenario="long-command-output"]
+  .codex-ui-command-execution__command-line,
+.demo-root[data-scenario="long-command-output"]
+  .codex-ui-command-output
+  pre {
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas,
+    "Liberation Mono", monospace;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 19.5px;
+}
+
+.demo-root[data-scenario="long-command-output"]
+  .codex-ui-command-output {
+  max-height: none;
+}
+
+.demo-root[data-scenario="long-command-output"]
+  .codex-ui-command-output
+  pre {
+  max-height: 144px;
+  scrollbar-gutter: auto;
+}
+
+.demo-root[data-scenario="long-command-output"]
+  .codex-ui-command-execution__footer {
+  font-size: 14px;
+  font-weight: 445;
+  line-height: 21px;
+}
+
+.demo-root[data-scenario="long-command-output"]
+  [data-item-id="assistant-long-command-final"] {
+  margin-top: 8px;
+}
+
 .demo-root[data-frame="approval-current-denied"]
   .codex-ui-conversation-thread-shell__thread {
   min-height: calc(

@@ -21,7 +21,7 @@ Codex UI Kit turns those interaction patterns into protocol-neutral React primit
 
 - The current components are a partial coding-agent UI foundation, not a
   complete Codex Desktop reconstruction.
-- The latest sampled package is `26.721.81911` (`5973`). Its seed candidate
+- The latest sampled package is `26.730.61309` (`6223`). Its seed candidate
   surface and evidence status are tracked in
   [`research/UI_INVENTORY.md`](research/UI_INVENTORY.md); current-build
   runtime observation now covers the sampled dark shell/sidebar, route
@@ -37,10 +37,11 @@ review the [coverage policy](research/PARITY.md), or follow the
 
 ## Highlights
 
-- A conversation shell with build-scoped current evidence from
-  `26.727.40816` for Composer lifecycle, successful and recovered MCP calls,
-  long-thread navigation/windowing, and command-approval denial, plus partial
-  message, activity, reasoning, plan, streaming, and mixed event primitives.
+- A conversation shell with current `26.730.61309` evidence for successful
+  long command output and build-scoped `26.727.40816` historical evidence for
+  Composer lifecycle, successful/recovered MCP calls, long-thread navigation,
+  and command-approval denial, plus partial message, activity, reasoning,
+  plan, streaming, and mixed event primitives.
 - Application/sidebar and side/bottom workspace-panel composition with
   current-build window navigation, route lifecycle feedback, portalled global
   notifications, responsive restoration rules, and pointer- and
@@ -48,7 +49,8 @@ review the [coverage policy](research/PARITY.md), or follow the
 - Project index, previous-build new-chat destination/context setup, grouped
   local environment dialog, protocol-neutral route/worktree selectors, PR
   list/detail, checks, reviewers, and inline review-thread compositions.
-- Command execution, structured file diffs, tool calls, approvals, and notices.
+- Command execution with current-build long-output/tail-following evidence,
+  structured file diffs, tool calls, approvals, and notices.
 - Composer attachments, mentions, modes, queued prompts, and running states.
 - Accessible menus, tooltips, popovers, selects, dialogs, and keyboard flows.
 - Resource cards, citations, generated-image galleries, and preview surfaces.

@@ -5128,6 +5128,13 @@ summary.codex-ui-activity__header::after {
   overflow: hidden;
 }
 
+.codex-ui-command-execution__shell-label {
+  color: var(--codex-ui-text-secondary);
+  font-size: 0.8125rem;
+  line-height: 1.160714rem;
+  padding: 0.25rem 0.5rem;
+}
+
 .codex-ui-command-execution__command-row {
   min-width: 0;
   padding: 0.5rem 2rem 0 0.5rem;
@@ -5247,13 +5254,15 @@ summary.codex-ui-activity__header::after {
   border: 0;
   border-radius: 0;
   color: var(--codex-ui-text-secondary);
+  display: flex;
+  flex-direction: column-reverse;
   font: inherit;
   font-family: var(--codex-ui-font-mono);
   font-size: var(--codex-ui-font-size-sm);
   font-weight: var(--codex-ui-font-weight-medium);
   line-height: var(--codex-ui-line-height-code);
   margin: 0;
-  max-height: 8.75rem;
+  max-height: 9rem;
   overflow-x: auto;
   overflow-y: auto;
   padding: 0.5rem;
@@ -5263,6 +5272,7 @@ summary.codex-ui-activity__header::after {
 
 .codex-ui-command-output pre code {
   color: inherit;
+  flex: none;
   font: inherit;
 }
 

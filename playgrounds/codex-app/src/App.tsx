@@ -1068,6 +1068,8 @@ export function App() {
   );
   const isCurrentApprovalReplay =
     mode === "replay" && scenarioId === "approval-denied";
+  const isCurrentLongCommandReplay =
+    mode === "replay" && scenarioId === "long-command-output";
   const replayComposerRunning =
     isConversationLifecycle && state.status === "running";
 
@@ -1820,12 +1822,13 @@ export function App() {
             : composerValue.includes("\n")
               ? "multiline"
               : "idle";
-  const currentMcpReplay =
+  const currentHeaderReplay =
     mode === "replay" &&
     (scenarioId === "mcp-tool-call" ||
-      scenarioId === "mcp-recovery-mixed-thread");
+      scenarioId === "mcp-recovery-mixed-thread" ||
+      scenarioId === "long-command-output");
   const selectedComposerPermission =
-    (isCurrentApprovalReplay
+    (isCurrentApprovalReplay || isCurrentLongCommandReplay
       ? composerPermissionOptions[0]
       : composerPermissionOptions.find(
           ({ id }) => id === composerPermissionId,
@@ -1833,7 +1836,7 @@ export function App() {
   const header = (
     <ThreadHeader
       endActions={
-        currentMcpReplay ? (
+        currentHeaderReplay ? (
           <div className="demo-current-mcp-header-actions">
             <button aria-label="Open integration menu" type="button">
               ◈⌄
@@ -1882,7 +1885,7 @@ export function App() {
         )
       }
       navigation={
-        currentMcpReplay ? (
+        currentHeaderReplay ? (
           <span aria-hidden="true" className="demo-current-mcp-folder">
             ▱
           </span>
@@ -1898,7 +1901,7 @@ export function App() {
         )
       }
       subtitle={
-        currentMcpReplay
+        currentHeaderReplay
           ? undefined
           : mode === "replay"
           ? `${scenario.id} · ${replayCount}/${scenario.events.length} events`
@@ -1915,7 +1918,8 @@ export function App() {
       scenarioId === "markdown" ||
       scenarioId === "mcp-tool-call" ||
       scenarioId === "mcp-recovery-mixed-thread" ||
-      scenarioId === "approval-denied");
+      scenarioId === "approval-denied" ||
+      scenarioId === "long-command-output");
   const showLifecycleComposer = isConversationLifecycle;
   const composerSurface = (
     <AgentComposer
@@ -1976,7 +1980,7 @@ export function App() {
                   type="button"
                 >
                   <span aria-hidden="true">◉</span>
-                  {currentMcpReplay ||
+                  {currentHeaderReplay ||
                   showLifecycleComposer ||
                   isCurrentApprovalReplay
                     ? selectedComposerPermission.label
@@ -3301,14 +3305,20 @@ export function App() {
     if (entry.kind === "message") {
       const message = state.messages.find(({ id }) => id === entry.id);
       if (!message) return null;
-      if (
+      const groupedMcpIntro =
         ((scenarioId === "mcp-recovery-mixed-thread" &&
           (message.id === "assistant-recovery-intro" ||
             message.id === "assistant-recovery-status")) ||
           (scenarioId === "mcp-tool-call" &&
             message.id === "assistant-mcp-intro")) &&
-        hasMcpToolCallGroupForTurn(state, message.turnId)
-      ) {
+        hasMcpToolCallGroupForTurn(state, message.turnId);
+      const groupedLongCommandIntro =
+        (isCurrentLongCommandReplay &&
+          message.id === "assistant-long-command-intro" &&
+          state.commands.some(
+            ({ id }) => id === "command-long-output",
+          ));
+      if (groupedMcpIntro || groupedLongCommandIntro) {
         return null;
       }
       return (
@@ -3324,11 +3334,14 @@ export function App() {
                   (message.id === "assistant-recovery" ||
                     message.id === "assistant-workflow")) ||
                 (scenarioId === "approval-denied" &&
-                  message.id === "assistant-approval-denied")) &&
+                  message.id === "assistant-approval-denied") ||
+                (scenarioId === "long-command-output" &&
+                  message.id === "assistant-long-command-final")) &&
               message.status === "completed" ? (
                 scenarioId === "mcp-tool-call" ||
                 scenarioId === "mcp-recovery-mixed-thread" ||
-                scenarioId === "approval-denied" ? (
+                scenarioId === "approval-denied" ||
+                scenarioId === "long-command-output" ? (
                   <McpResponseActions
                     label={
                       message.id === "assistant-workflow" ||
@@ -3670,6 +3683,54 @@ export function App() {
               status={command.status}
               summary={<>Running {command.command}</>}
             />
+          </ActivityTimeline>
+        );
+      }
+      if (
+        isCurrentLongCommandReplay &&
+        command.id === "command-long-output"
+      ) {
+        const intro = state.messages.find(
+          ({ id }) => id === "assistant-long-command-intro",
+        );
+        return (
+          <ActivityTimeline
+            defaultOpen={false}
+            key={`command:${command.id}`}
+            summary={
+              <TurnDuration
+                durationMs={state.turnDurationMs ?? 10_000}
+                status="worked"
+              />
+            }
+          >
+            {intro ? (
+              <AgentMessage
+                data-item-id={intro.id}
+                role="assistant"
+                status={agentMessageStatus(intro.status)}
+              >
+                <AgentMarkdown>{intro.text}</AgentMarkdown>
+              </AgentMessage>
+            ) : null}
+            <CommandExecution
+              command={command.command}
+              copyCommandLabel="Copy"
+              cwd={command.cwd}
+              data-item-id={command.id}
+              data-testid="command-execution"
+              defaultOpen={false}
+              durationMs={command.durationMs ?? undefined}
+              exitCode={command.exitCode ?? undefined}
+              status={command.status}
+            >
+              <CommandOutput
+                copyLabel="Copy"
+                copyText={command.output}
+              >
+                {command.output}
+              </CommandOutput>
+            </CommandExecution>
           </ActivityTimeline>
         );
       }
@@ -4325,7 +4386,10 @@ export function App() {
                   activeFrame !== "thread-scroll-away" &&
                   activeFrame !== "thread-windowed",
                 followKey: state.eventCount,
-                latestOrigin: currentWindowedFrame ? "start" : "end",
+                latestOrigin:
+                  currentWindowedFrame || isCurrentLongCommandReplay
+                    ? "start"
+                    : "end",
                 onFollowingChange: setThreadFollowing,
               }}
               viewportRef={threadViewportRef}

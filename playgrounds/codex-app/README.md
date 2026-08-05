@@ -384,6 +384,23 @@ The twenty-second slice refreshes long-conversation navigation against
   floating return control, excluding all real and synthetic conversation
   content.
 
+## Twenty-third vertical slice
+
+The twenty-third slice refreshes successful long command output against
+`26.730.61309`:
+
+- one real `seq 1 400` command, auto-run by the current low-risk Ask policy
+  without an approval card;
+- a public schema-validated trace with exactly one command pair and all 400
+  output lines;
+- the current collapsed `Ran seq 1 400` disclosure and expanded 736×227px
+  `Shell` card, two copy controls, 144px reverse-tail output viewport, and
+  Success state;
+- 66-frame Browser/CDP coverage plus real Electron disclosure,
+  collapse/reopen, 401-split-line, and latest-line restoration checks;
+- a full 1180×820 ownership-masked current comparison passing at 0.17% under
+  the 1.5% hard limit.
+
 ## Development
 
 From the repository root:
@@ -498,6 +515,13 @@ conversation content:
 
 ```bash
 CODEX_UI_KIT_LONG_THREAD_REFERENCE=/absolute/path/to/long-thread-main.png \
+  pnpm --filter @codex-ui-kit/codex-app-playground check:visual
+```
+
+The current long-command gate accepts one full 1180×820 screenshot:
+
+```bash
+CODEX_UI_KIT_COMMAND_OUTPUT_REFERENCE=/absolute/path/to/command-output.png \
   pnpm --filter @codex-ui-kit/codex-app-playground check:visual
 ```
 

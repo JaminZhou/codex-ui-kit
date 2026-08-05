@@ -98,6 +98,7 @@ export interface CommandExecutionProps
   onCopyCommand?: (command: string) => void | Promise<void>;
   onOpenChange?: (open: boolean) => void;
   open?: boolean;
+  shellLabel?: ReactNode;
   startedAtMs?: number;
   status: CommandExecutionStatus;
   summary?: ReactNode;
@@ -122,6 +123,7 @@ export function CommandExecution({
   onCopyCommand,
   onOpenChange,
   open,
+  shellLabel = "Shell",
   startedAtMs,
   status,
   summary,
@@ -184,17 +186,9 @@ export function CommandExecution({
     if (status === "failed") {
       // The sampled Renderer intentionally keeps the collapsed verb as "Ran";
       // the expanded footer is the authoritative exit/failure signal.
-      return resolvedOpen ? (
-        <>Ran command{timer}</>
-      ) : (
-        <>Ran {summaryCommand}{timer}</>
-      );
+      return <>Ran {summaryCommand}{timer}</>;
     }
-    return resolvedOpen ? (
-      <>Ran command{timer}</>
-    ) : (
-      <>Ran {summaryCommand}{timer}</>
-    );
+    return <>Ran {summaryCommand}{timer}</>;
   })();
   const resolvedSummary = summary !== undefined && summary !== null ? (
     <>{summary}{timer}</>
@@ -252,6 +246,11 @@ export function CommandExecution({
       data-command-expanded={commandExpanded || undefined}
       title={cwdTitle}
     >
+      {shellLabel !== undefined && shellLabel !== null ? (
+        <div className="codex-ui-command-execution__shell-label">
+          {shellLabel}
+        </div>
+      ) : null}
       <div className="codex-ui-command-execution__command-row">
         <div
           aria-label={resolvedCommandLabel}
@@ -341,9 +340,16 @@ export function CommandOutput({
     const element = preRef.current;
     if (!element) return;
     const maximum = element.scrollHeight - element.clientHeight;
+    const reverse =
+      getComputedStyle(element).flexDirection === "column-reverse";
+    const position = reverse ? -element.scrollTop : element.scrollTop;
     const next = {
-      bottom: maximum > 1 && element.scrollTop < maximum - 1,
-      top: maximum > 1 && element.scrollTop > 1,
+      bottom:
+        maximum > 1 &&
+        (reverse ? position > 1 : position < maximum - 1),
+      top:
+        maximum > 1 &&
+        (reverse ? position < maximum - 1 : position > 1),
     };
     setFade((current) =>
       current.bottom === next.bottom && current.top === next.top
@@ -355,7 +361,10 @@ export function CommandOutput({
   useLayoutEffect(() => {
     const element = preRef.current;
     if (!element) return;
-    element.scrollTop = element.scrollHeight;
+    element.scrollTop =
+      getComputedStyle(element).flexDirection === "column-reverse"
+        ? 0
+        : element.scrollHeight;
     updateFade();
   }, [children]);
 

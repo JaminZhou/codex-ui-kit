@@ -9,7 +9,10 @@ import {
   formatCommandDuration,
 } from "../src";
 
-afterEach(cleanup);
+afterEach(() => {
+  cleanup();
+  vi.restoreAllMocks();
+});
 
 describe("formatCommandDuration", () => {
   it.each([
@@ -45,6 +48,9 @@ describe("CommandExecution", () => {
     expect(html).toContain("for 1m 1s");
     expect(html).toContain('title="cwd\n/workspace/ui"');
     expect(html).toContain("Success");
+    expect(html).toContain(
+      'class="codex-ui-command-execution__shell-label">Shell</div>',
+    );
     expect(html).toContain('aria-label="Standard output"');
     expect(html).not.toContain(" open=");
   });
@@ -65,9 +71,7 @@ describe("CommandExecution", () => {
     expect(container.querySelector("details")?.open).toBe(true);
     expect(
       container.querySelector(".codex-ui-activity__summary")?.textContent,
-    ).toBe(
-      "Ran command for 2s",
-    );
+    ).toBe("Ran pnpm check for 2s");
     expect(screen.getByRole("button", { name: "$ pnpm check" })).toBeTruthy();
     expect(screen.getByText("All checks passed")).toBeTruthy();
   });
@@ -155,6 +159,30 @@ describe("CommandExecution", () => {
     expect(html).not.toContain("private transport command");
   });
 
+  it("can replace or omit the sampled shell label", () => {
+    const custom = renderToStaticMarkup(
+      <CommandExecution
+        command="pwd"
+        shellLabel="Terminal"
+        status="completed"
+      />,
+    );
+    const omitted = renderToStaticMarkup(
+      <CommandExecution
+        command="pwd"
+        shellLabel={null}
+        status="completed"
+      />,
+    );
+
+    expect(custom).toContain(
+      'class="codex-ui-command-execution__shell-label">Terminal</div>',
+    );
+    expect(omitted).not.toContain(
+      "codex-ui-command-execution__shell-label",
+    );
+  });
+
   it("expands long commands and delegates copy actions", () => {
     const onCopyCommand = vi.fn();
     const onCopyOutput = vi.fn();
@@ -201,4 +229,45 @@ describe("CommandOutput", () => {
     expect(whitespace).toContain('data-empty="true"');
     expect(whitespace).not.toContain("Copy output");
   });
+
+  it.each([
+    {
+      flexDirection: "column-reverse",
+      latestScrollTop: 0,
+      oldestScrollTop: -100,
+    },
+    {
+      flexDirection: "column",
+      latestScrollTop: 100,
+      oldestScrollTop: 0,
+    },
+  ])(
+    "keeps $flexDirection fade directions aligned with visual scroll edges",
+    ({ flexDirection, latestScrollTop, oldestScrollTop }) => {
+      vi.spyOn(window, "getComputedStyle").mockReturnValue({
+        flexDirection,
+      } as CSSStyleDeclaration);
+      const { container } = render(
+        <CommandOutput>{"line\n".repeat(20)}</CommandOutput>,
+      );
+      const root = container.querySelector(".codex-ui-command-output")!;
+      const pre = container.querySelector("pre")!;
+
+      Object.defineProperties(pre, {
+        clientHeight: { configurable: true, value: 100 },
+        scrollHeight: { configurable: true, value: 200 },
+      });
+      pre.scrollTop = latestScrollTop;
+      fireEvent.scroll(pre);
+
+      expect(root.hasAttribute("data-fade-bottom")).toBe(false);
+      expect(root.hasAttribute("data-fade-top")).toBe(true);
+
+      pre.scrollTop = oldestScrollTop;
+      fireEvent.scroll(pre);
+
+      expect(root.hasAttribute("data-fade-bottom")).toBe(true);
+      expect(root.hasAttribute("data-fade-top")).toBe(false);
+    },
+  );
 });

@@ -1,17 +1,18 @@
 {
   "schemaVersion": 1,
   "baseline": {
-    "appVersion": "26.727.40816",
-    "buildNumber": "6067",
-    "sampledAt": "2026-07-31",
-    "reverifiedAt": "2026-07-31",
-    "appAsarSha256": "0e4f824024d0838dd7548751c02d3a7d21917c4fc3edf74c9e98d88ea9e3127d",
+    "appVersion": "26.730.61309",
+    "buildNumber": "6223",
+    "sampledAt": "2026-08-05",
+    "reverifiedAt": "2026-08-05",
+    "appAsarSha256": "9de942a9a058fca20b78d171032e0fe65ccb1063868f175ff7eb4e159efc2c38",
     "runtimeEvidence": "scoped_cdp",
     "runtimeEvidenceBuilds": {
       "cdp": "26.715.72359",
       "cdp-26.721": "26.721.41059",
       "cdp-26.721.81911": "26.721.81911",
-      "cdp-26.727.40816": "26.727.40816"
+      "cdp-26.727.40816": "26.727.40816",
+      "cdp-26.730.61309": "26.730.61309"
     }
   },
   "surfaces": [
@@ -42,8 +43,8 @@
         "cdp-26.727.40816:new-chat-project-local-branch-context-controls-1180x820"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "verified",
-      "electronStatus": "verified",
+      "browserStatus": "partial_legacy",
+      "electronStatus": "partial_legacy",
       "priority": "p0"
     },
     {
@@ -58,8 +59,8 @@
         "cdp-26.727.40816:new-chat-project-dialog-260x249.5-listbox-252x142.81"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "verified",
-      "electronStatus": "verified",
+      "browserStatus": "partial_legacy",
+      "electronStatus": "partial_legacy",
       "priority": "p0"
     },
     {
@@ -107,8 +108,8 @@
         "cdp-26.727.40816:real-82-message-compact-navigation-seven-mounted-turns-reverse-scroll-and-return"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "verified",
-      "electronStatus": "verified",
+      "browserStatus": "partial_legacy",
+      "electronStatus": "partial_legacy",
       "priority": "p0"
     },
     {
@@ -153,11 +154,13 @@
         "cdp:long-output-144px-scroll-fade-container",
         "cdp:running-duration-stop-and-background-process-state",
         "cdp-26.721:synthetic-expanded-read-only-command-timeline-1072x820",
-        "cdp-26.721:synthetic-exit-code-7-failed-command-compact-526x600"
+        "cdp-26.721:synthetic-exit-code-7-failed-command-compact-526x600",
+        "cdp-26.727.40816:real-seq-1-400-expanded-shell-output-reverse-tail-and-masked-regional-pixels",
+        "cdp-26.730.61309:real-seq-1-400-expanded-shell-output-reverse-tail-and-masked-regional-pixels"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "partial_legacy",
-      "electronStatus": "partial_legacy",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
       "priority": "p0"
     },
     {
@@ -223,8 +226,8 @@
         "cdp-26.727.40816:real-mcp-success-computed-styles-and-masked-906x820-regional-pixel-gate"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "verified",
-      "electronStatus": "verified",
+      "browserStatus": "partial_legacy",
+      "electronStatus": "partial_legacy",
       "priority": "p0"
     },
     {
@@ -243,8 +246,8 @@
         "cdp-26.727.40816:real-mcp-recovery-computed-styles-and-masked-906x820-regional-pixel-gate"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "verified",
-      "electronStatus": "verified",
+      "browserStatus": "partial_legacy",
+      "electronStatus": "partial_legacy",
       "priority": "p0"
     },
     {
@@ -283,8 +286,8 @@
         "cdp-26.727.40816:real-command-approval-pending-denied-no-execution-computed-styles-and-masked-regional-pixels"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "verified",
-      "electronStatus": "verified",
+      "browserStatus": "partial_legacy",
+      "electronStatus": "partial_legacy",
       "priority": "p0"
     },
     {
@@ -313,8 +316,8 @@
         "cdp-26.727.40816:real-stop-28x28-you-stopped-after-2s-and-queued-auto-continuation"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "verified",
-      "electronStatus": "verified",
+      "browserStatus": "partial_legacy",
+      "electronStatus": "partial_legacy",
       "priority": "p0"
     },
     {
@@ -415,8 +418,8 @@
         "cdp-26.727.40816:new-chat-do-anything-input-712x44-14x20"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "verified",
-      "electronStatus": "verified",
+      "browserStatus": "partial_legacy",
+      "electronStatus": "partial_legacy",
       "priority": "p0"
     },
     {
@@ -451,8 +454,8 @@
         "cdp-26.727.40816:ask-approve-full-custom-permission-menu-480x222"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "verified",
-      "electronStatus": "verified",
+      "browserStatus": "partial_legacy",
+      "electronStatus": "partial_legacy",
       "priority": "p0"
     },
     {
@@ -467,8 +470,8 @@
         "cdp-26.727.40816:goal-plan-active-mode-label-placeholder-clear-and-focus"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "verified",
-      "electronStatus": "verified",
+      "browserStatus": "partial_legacy",
+      "electronStatus": "partial_legacy",
       "priority": "p0"
     },
     {
@@ -483,8 +486,8 @@
         "cdp-26.727.40816:real-710x39-queue-steer-delete-actions-and-stop-auto-continuation"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "verified",
-      "electronStatus": "verified",
+      "browserStatus": "partial_legacy",
+      "electronStatus": "partial_legacy",
       "priority": "p0"
     },
     {
@@ -498,8 +501,8 @@
         "cdp-26.727.40816:add-files-inline-resource-picker-736x320-scrollable-groups"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "verified",
-      "electronStatus": "verified",
+      "browserStatus": "partial_legacy",
+      "electronStatus": "partial_legacy",
       "priority": "p1"
     },
     {
@@ -530,8 +533,8 @@
         "cdp-26.727.40816:main-renderer-sidebar-274.11-titlebar-46-responsive-hide-at-720"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "verified",
-      "electronStatus": "verified",
+      "browserStatus": "partial_legacy",
+      "electronStatus": "partial_legacy",
       "priority": "p0"
     },
     {
@@ -548,8 +551,8 @@
         "cdp-26.727.40816:new-chat-pull-requests-sites-scheduled-plugins-primary-stack"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "verified",
-      "electronStatus": "verified",
+      "browserStatus": "partial_legacy",
+      "electronStatus": "partial_legacy",
       "priority": "p0"
     },
     {
@@ -563,8 +566,8 @@
         "cdp-26.727.40816:pinned-expanded-projects-collapsed-project-navigation"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "verified",
-      "electronStatus": "verified",
+      "browserStatus": "partial_legacy",
+      "electronStatus": "partial_legacy",
       "priority": "p0"
     },
     {
@@ -578,8 +581,8 @@
         "cdp-26.727.40816:recents-expanded-dense-history"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "verified",
-      "electronStatus": "verified",
+      "browserStatus": "partial_legacy",
+      "electronStatus": "partial_legacy",
       "priority": "p0"
     },
     {
@@ -593,8 +596,8 @@
         "cdp-26.727.40816:project-pin-archive-actions-and-status-indicators"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "verified",
-      "electronStatus": "verified",
+      "browserStatus": "partial_legacy",
+      "electronStatus": "partial_legacy",
       "priority": "p0"
     },
     {
@@ -608,8 +611,8 @@
         "cdp-26.727.40816:fixed-profile-help-footer"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "verified",
-      "electronStatus": "verified",
+      "browserStatus": "partial_legacy",
+      "electronStatus": "partial_legacy",
       "priority": "p0"
     },
     {
@@ -623,8 +626,8 @@
         "cdp-26.727.40816:titlebar-46-hide-sidebar-back-forward"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "verified",
-      "electronStatus": "verified",
+      "browserStatus": "partial_legacy",
+      "electronStatus": "partial_legacy",
       "priority": "p0"
     },
     {
@@ -638,8 +641,8 @@
         "cdp-26.727.40816:pull-request-detail-loading-to-code-content"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "verified",
-      "electronStatus": "verified",
+      "browserStatus": "partial_legacy",
+      "electronStatus": "partial_legacy",
       "priority": "p0"
     },
     {
@@ -653,8 +656,8 @@
         "cdp-26.727.40816:pr-detail-auto-hide-and-explicit-reopen-at-1180-960-820-720"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "verified",
-      "electronStatus": "verified",
+      "browserStatus": "partial_legacy",
+      "electronStatus": "partial_legacy",
       "priority": "p0"
     },
     {
@@ -708,8 +711,8 @@
         "cdp-26.727.40816:new-chat-project-dialog-and-context-entry-1180x820"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "verified",
-      "electronStatus": "verified",
+      "browserStatus": "partial_legacy",
+      "electronStatus": "partial_legacy",
       "priority": "p0"
     },
     {
@@ -750,8 +753,8 @@
         "cdp-26.727.40816:public-pr-nonmodal-side-panel-1180-960-820-720"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "verified",
-      "electronStatus": "verified",
+      "browserStatus": "partial_legacy",
+      "electronStatus": "partial_legacy",
       "priority": "p0"
     },
     {
@@ -804,8 +807,8 @@
         "cdp-26.727.40816:project-named-terminal-tab-bottom-panel-shell-read-only"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "verified",
-      "electronStatus": "verified",
+      "browserStatus": "partial_legacy",
+      "electronStatus": "partial_legacy",
       "priority": "p0"
     },
     {
@@ -835,8 +838,8 @@
         "cdp-26.727.40816:public-pr-80-two-tab-summary-code-responsive-overlay"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "verified",
-      "electronStatus": "verified",
+      "browserStatus": "partial_legacy",
+      "electronStatus": "partial_legacy",
       "priority": "p0"
     },
     {
@@ -851,8 +854,8 @@
         "cdp-26.727.40816:public-pr-80-integrated-timeline-successful-code-display-menu"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "verified",
-      "electronStatus": "verified",
+      "browserStatus": "partial_legacy",
+      "electronStatus": "partial_legacy",
       "priority": "p0"
     },
     {

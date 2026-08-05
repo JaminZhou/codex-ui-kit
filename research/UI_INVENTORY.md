@@ -45,36 +45,27 @@ observation from a previous build remains historical evidence.
 
 ## Current baseline
 
-- Codex Desktop `26.727.40816` (`6067`)
-- Package sampled and reverified on 2026-07-31
+- Codex Desktop `26.730.61309` (`6223`)
+- Package sampled and reverified on 2026-08-05
 - `app.asar` SHA-256:
-  `0e4f824024d0838dd7548751c02d3a7d21917c4fc3edf74c9e98d88ea9e3127d`
+  `9de942a9a058fca20b78d171032e0fe65ccb1063868f175ff7eb4e159efc2c38`
 - Computer Use automation: blocked by the environment safety policy for
   `com.openai.codex`
 - Scoped CDP automation: available through a user-authorized second process;
   the Chromium profile is separate, but Codex application data and navigation
   are not fully isolated
-- Fresh current-build Renderer capture: recorded for the dark 1180×820 main
-  application target, the six left-sidebar groups, 46px window navigation,
-  Pull requests loading/selection continuity, the New chat Composer/context
-  row and project picker, the read-only project-named Terminal tab, and public
-  PR Summary/Code with integrated Timeline and responsive detail restoration;
-  successful Code content, successful and recovered OpenAI Developer Docs
-  calls, and the current Composer queue/Stop automatic-continuation lifecycle
-  plus multiline input, permission choices, the inline Add-resource picker,
-  active Goal/Plan modes, and the sampled 82-message long-thread navigation/
-  windowing state plus a real command approval pending → denied lifecycle
-  with confirmed non-execution are observed, while mutating
-  review/comment/merge,
-  light-theme, global notifications, and unrelated surface evidence remain
-  pending
+- Fresh current-build Renderer capture: one dark 1180×820 disposable task
+  verifies successful 400-line command output, the collapsed/expanded Shell
+  surface, 144px reverse-tail viewport, copy controls, Success state, and
+  latest-line restoration. All other `26.727.40816` observations are now
+  previous-build evidence until separately reached on `26.730.61309`.
 
-Current inventory: 77 surface groups; 30 have current-build runtime evidence,
-28 have previous-build-only runtime evidence, 19 remain `not_sampled`, and 0
-are `blocked_by_policy`. Current-build Browser verification covers 26 groups
-and Electron verification covers 26. Prior acceptance outside the sampled
-shell, sidebar, New chat, and Pull request slices remains recorded as
-`partial_legacy` until current-build re-observation.
+Current inventory: 77 surface groups; 1 has current-build runtime evidence,
+57 have previous-build-only runtime evidence, 19 remain `not_sampled`, and 0
+are `blocked_by_policy`. Current-build Browser verification covers 1 group
+and Electron verification covers 1. Prior acceptance outside the sampled
+long-command slice remains recorded as `partial_legacy` until current-build
+re-observation.
 
 The current package exposes candidates far beyond the old transcript sample:
 application and thread shells, local/remote conversation routes, projects and
@@ -140,15 +131,18 @@ finished visual work.
 The complete workstream order, sidebar acceptance matrix, exit gates, and
 planned PR sequence are defined in [`DELIVERY_PLAN.md`](DELIVERY_PLAN.md).
 
-## Current implementation slice
+## Build-scoped implementation history
 
 The implementation history below names the exact observed build. Acceptance
 that previously matched `26.721.81911` or earlier remains regression coverage,
 but every
-affected inventory row is now `partial_legacy` until it is re-observed on
-`26.727.40816`.
+affected inventory row was `partial_legacy` until it was re-observed on
+`26.727.40816`. After the `26.730.61309` update, every row below is again
+`partial_legacy` except the explicitly refreshed long-command row. The
+machine-readable inventory is authoritative when historical prose describes
+a build as current at its capture time.
 
-The current sidebar slice re-observes all six application-sidebar groups on
+The previous sidebar slice re-observed all six application-sidebar groups on
 `26.727.40816`. It independently implements the 274px shell, 46px
 traffic-light-safe titlebar inset, 70px header, 30px rows, collapsible
 Projects/Pinned/Recents sections, dense thread status/action rows, and fixed
@@ -166,7 +160,7 @@ separate work.
 
 The application-shell continuity slice splits window navigation, route
 lifecycle feedback, route selection/restoration, and global notifications
-into independently owned inventory rows. Current-build CDP records the 46px
+into independently owned inventory rows. `26.727.40816` CDP records the 46px
 chrome, Sidebar/Back/Forward controls, Pull requests loading status, and
 detail auto-hide/reopen through 1180, 960, 820, and 720px. The broader
 961/960, 721/720, 1920×1080, 2560×1440, first-use-dialog, and hard-reload
@@ -224,7 +218,7 @@ remaining controls, checks grouping, search filtering, and repair-state
 disabling, selects a local environment, submits the real composer, and captures
 both wide and compact dialog screenshots.
 
-The current `conversation.context-controls`,
+The `26.727.40816` `conversation.context-controls`,
 `conversation.project-picker`, and
 `app.new-thread-workspace-selection` slices are Browser- and
 Electron-verified against `26.727.40816`. Their implementation remains
@@ -270,7 +264,7 @@ The previous full conversation/Composer probe observed build `26.721.81911`
 in a disposable second process using synthetic prompts only. It remains the
 historical source for attachment, active mode, and paused/Resume variants.
 
-The current `26.727.40816` text-only probe re-observed the 736px Composer
+The `26.727.40816` text-only probe re-observed the 736px Composer
 column, 712×44 textbox, 28×28 Stop button, and a real queued follow-up. The
 queue shell is inset 13px and measures 710×39px; its 708×38 scroll region
 contains a 684×28 row using 14/16px typography with Steer,
@@ -279,7 +273,7 @@ Delete queued message, and queued message actions. Stop produced
 started the next turn automatically. The current product did not expose the
 old paused header or Resume action.
 
-A second exact current-build Composer probe reached four-line and long-input
+A second exact `26.727.40816` Composer probe reached four-line and long-input
 states without submitting the draft. The four-line Composer measures 736×134
 at x=359/y=670 with a 712×80 textbox at x=371/y=684. Twenty lines clamp the
 textbox to the current 205px `25dvh` maximum and grow the surface to 736×259.
@@ -309,19 +303,23 @@ Optional 792×320 `26.727.40816` references are accepted through
 `CODEX_UI_KIT_COMPOSER_CONTINUED_REFERENCE`. At the strict 0.05 pixel
 threshold and 2% hard ratio limit, the accepted ownership-masked
 changed-pixel ratios are `0.003480114` and `0.005105745`. Queue and
-Stop/interruption are therefore current-build Browser/Electron verified.
+Stop/interruption were Browser/Electron verified on `26.727.40816` and are
+now `partial_legacy`.
 The four-line, permission, and Add-resource frames add two more reviewed
 Browser/CDP/pixel frames and real Electron interaction. Their strict
 ownership-masked changed-pixel ratios are `0.000994318`, `0.001280084`, and
 `0.003352986`, under hard 0.5%, 0.5%, and 0.8% limits respectively.
-Permissions, Add resources, and multiline growth are therefore current-build
-verified. A separate unsubmitted-draft probe verifies active Goal and Plan
+Permissions, Add resources, and multiline growth were verified on
+`26.727.40816` and are now `partial_legacy`. A separate unsubmitted-draft
+probe verifies active Goal and Plan
 labels, prompts, 736×98 geometry, 28px clear controls, and focus restoration.
 Their 906×820 regional gates pass at `0.003763528` and `0.003486243`, so
-`composer.modes` is current-build Browser/Electron verified. The native
+`composer.modes` was Browser/Electron verified on `26.727.40816` and is now
+`partial_legacy`. The native
 file-panel attachment lifecycle remains `partial_legacy`.
 
-The current long-thread probe re-observes an 82-message compact navigation
+The `26.727.40816` long-thread probe re-observes an 82-message compact
+navigation
 rail, its 36×10px buttons and 26×2px selected marker, a seven-turn mounted
 window around message 40, reverse-origin scrolling, and the 32×32px
 return-to-latest control. The independent fixture keeps labels synthetic and
@@ -329,11 +327,12 @@ the host responsible for choosing which turns stay mounted. Browser/CDP and
 real Electron jump to message 20, retain seven mounted turns, and return to
 message 82 at `scrollTop = 0`. Its ownership-masked 906×820 gate retains only
 the rail and floating control and passes at `0.005937382` under a 1% hard
-limit. `thread.virtualized-timeline` is therefore current-build
-Browser/Electron verified for this sampled contract; unobserved window sizes
+limit. `thread.virtualized-timeline` was Browser/Electron verified for this
+sampled `26.727.40816` contract and is now `partial_legacy`; unobserved window
+sizes
 and host eviction heuristics do not become product-level claims.
 
-Three more `26.721.41059` scenarios cover an expanded read-only command, a
+Three `26.721.41059` scenarios cover an expanded read-only command, a
 pending command approval, and an applied file card with the Review panel open.
 The command and approval remain turn-owned. The file scenario explicitly
 splits its 666px conversation region from the independent 406px
@@ -345,8 +344,8 @@ slot and composes the existing `ActivityTimeline`, `CommandExecution`,
 `ApprovalRequest`, `ConversationThreadShell`, `WorkspacePanel`, and `FileDiff`
 primitives. Browser evidence and real `BrowserWindow` acceptance previously
 verified the sampled command and approval states against `26.721.41059`. The
-expanded read-only command remains `partial_legacy`; the command-approval
-denial path is refreshed against `26.727.40816` below.
+command-approval denial path and long-output command contract are refreshed
+against `26.727.40816` below.
 
 The protocol-backed Codex App playground now exercises command execution, a
 real App Server approval request/response, the applied turn-owned file card,
@@ -402,7 +401,7 @@ implementation-partial rather than being promoted to product-level
 completion.
 
 The refreshed Pull request lifecycle keeps the controlled, resizable workspace
-panel but follows the current `26.727.40816` non-modal overlay geometry. The
+panel but follows the `26.727.40816` non-modal overlay geometry. The
 read-only public-PR probe measured a 369.28px detail panel over the 906px main
 route at 1180×820, a 321.97px panel at 960×720, about 319px at 820×680, and a
 329.31px panel at 720×680 after the sidebar collapsed. The 16px resize target
@@ -421,7 +420,7 @@ reviewed pixels verify the resulting 61-frame matrix, so
 `workspace.pull-request-route` and `workspace.pull-request-review` are now
 independently Browser/Electron verified.
 
-The current-product evidence now covers the two-tab Summary/Code structure,
+The `26.727.40816` product evidence covers the two-tab Summary/Code structure,
 Timeline integrated below the Summary comment composer, successful multi-file
 Code content, the three-item display-options menu, Auto-merge, and responsive
 geometry. The independent visual comparison passes at 5.75% for the full
@@ -435,7 +434,7 @@ The original Terminal slice established the bottom-panel interaction contract
 on `26.721.41059`: a 272px panel track, 152px minimum, half-height responsive
 maximum, 16px drag strip, 33px tab header, 239px content region, named
 tab/tabpanel, and `Terminal input`. The `26.721.81911` refresh now separately
-verifies the session-tab surface. Current-product CDP observed three
+verifies the session-tab surface. `26.721.81911` CDP observed three
 auto-numbered Terminal tabs, one close button named for each tab, nearest-tab
 selection after closing the active tab, a four-item Review/Terminal/Browser/
 Files picker, and all three tabs fitting at 820×680 without horizontal
@@ -456,11 +455,12 @@ per-session command values, closes to the nearest tab, creates a session from
 the picker, closes all sessions, restores the latest one, and reopens a failed
 process.
 
-The current `26.727.40816` shell instead presented one project-named
+The `26.727.40816` shell instead presented one project-named
 `codex-ui-kit` tab in the bounded read-only observation. The independent
 single-session model matches that label plus the close/add controls and passes
-the current-build regional pixel gate at 1.79% for the panel and 0.73% for its
-content, so `workspace.terminal` is current-build Browser/Electron verified.
+the `26.727.40816` regional pixel gate at 1.79% for the panel and 0.73% for its
+content. `workspace.terminal` was Browser/Electron verified on that build and
+is now `partial_legacy`.
 The independently implemented process list and
 running/failed/exited replay are deliberately split into
 `workspace.terminal-process-lifecycle`: the installed build's real process
@@ -496,15 +496,16 @@ Fetch calls.
 Build `26.727.40816` refreshes the primary successful path with one real
 Search followed by one real Fetch, a `Worked for 31s` disclosure, an
 intermediate assistant explanation inside the activity timeline, and a linked
-Markdown answer. The independent two-call replay now matches the current
-group order, 14/21px typography, system font, 445 weight, 0.6 secondary color,
-and response layout. Its current 906×820 gate passes at 2.03% full-main,
+Markdown answer. The independent two-call replay matches the
+`26.727.40816` group order, 14/21px typography, system font, 445 weight, 0.6
+secondary color, and response layout. Its build-scoped 906×820 gate passes at
+2.03% full-main,
 0.05% tool-structure, 1.87% answer, and 1.92% Composer difference without
 changing the existing limits. Dynamic header/task/intermediate/group-label
 glyphs and the non-owning scrollbar are masked; the answer stays unmasked,
 and CDP separately gates the masked typography and disclosure properties.
-`thread.mcp-tool-events` is therefore current-build
-Browser/Electron verified.
+`thread.mcp-tool-events` was Browser/Electron verified on `26.727.40816` and
+is now `partial_legacy`.
 
 Build `26.721.81911` first established a separate real recovery path. Build
 `26.727.40816` now refreshes it with a disposable task that deliberately calls
@@ -523,15 +524,16 @@ continues into a second turn containing two commands, an accepted approval,
 one file change, and the Review panel. CDP and real `BrowserWindow`
 acceptance cover the standalone failure, recovered four-call group,
 raw-output dialog, and mixed Review split within the 61-frame lifecycle
-matrix. The current-build masked 906×820 regional gate passes at the strict
+matrix. The `26.727.40816` masked 906×820 regional gate passes at the strict
 0.05 pixel threshold with changed-pixel ratios of 0.016253432 for the full
 main region, 0.028989319 for the recovery region, 0.010849453 for the upper
 activity/failure region, and 0.019065999 for the Composer region. The final
 answer remains unmasked; CDP independently locks masked labels and computed
 styles.
 
-This promotes `thread.mcp-tool-events` and the newly split
-`thread.mcp-tool-failure-retry` gate for the sampled current-build path.
+This promoted `thread.mcp-tool-events` and the newly split
+`thread.mcp-tool-failure-retry` gate for the sampled `26.727.40816` path;
+both are now `partial_legacy`.
 Authentication, elicitation, MCP approvals, unavailable connectors, other
 integrations, cancellation, and thread-transport retry remain open.
 
@@ -554,7 +556,7 @@ exercise selection, reverse scrolling, the seven-turn window, and return to
 latest, so the virtualization row is verified for the sampled current
 contract.
 
-The current command-approval slice uses a dedicated disposable task and
+The `26.727.40816` command-approval slice uses a dedicated disposable task and
 requests only `open -a Calculator`. The 736×162 turn-owned pending surface
 appears at x=359/y=642 with `Terminal`, the command preview, `Deny`,
 `Allow once`, and a split `Approval options` menu. Selecting `Deny` removes
@@ -563,14 +565,35 @@ Composer with `Ask for approval`, and produces a final response while the
 command retains empty output, no exit code, and no Calculator process.
 
 The independent protocol trace records the request/decline/resolution order
-without executing the command. CDP now covers 65 frames and locks the card,
+without executing the command. CDP now covers 66 frames and locks the card,
 activity, command, Composer, and permission geometry; Electron drives
 options-menu Escape/focus restoration and denial. Ownership-masked 906×820
-current-build comparisons pass at `0.008493512` pending and `0.001214128`
-denied under separate 1.5% hard limits. This promotes
-`thread.approval-permission-events` for the sampled current denial contract.
+build-scoped comparisons pass at `0.008493512` pending and `0.001214128`
+denied under separate 1.5% hard limits. This promoted
+`thread.approval-permission-events` for the sampled `26.727.40816` denial
+contract; the row is now `partial_legacy`.
 Allow-once completion, persistent approval, timeout, repeated denial, and
 non-command approval kinds remain open.
+
+The current long-command slice uses a separate disposable task on
+`26.730.61309` and requests
+only `seq 1 400`. Ask mode classified that exact command as low risk and ran it
+without showing an approval card; this observation therefore does not promote
+the allow-once approval state. The collapsed `Ran seq 1 400` disclosure opens
+to a 736×227px command card with a `Shell` label, copy controls, a 144px
+scrolling output viewport, and `Success`. Its reverse column keeps lines
+394–400 visible at `scrollTop = 0` while preserving all 400 output lines plus
+the trailing newline.
+
+The independent trace contains exactly one command request/output pair.
+Browser/CDP now covers 66 lifecycle frames and verifies command identity,
+401 split lines, computed typography, output overflow, keyboard disclosure,
+and latest-line restoration after collapse/reopen. Electron drives the same
+interaction in a real 1180×820 `BrowserWindow`. The ownership-masked full
+1180×820 comparison passes at `0.001655643` under a 1.5% hard limit. This
+promotes `thread.command-execution` for the sampled current long-output
+contract. stdout/stderr separation, failure, interruption, active truncation
+copy affordances, background processes, and other command kinds remain open.
 
 The interruption acceptance renders the observed summary statically rather than
 driving a host run-to-stop-to-summary transition, so that row also remains
