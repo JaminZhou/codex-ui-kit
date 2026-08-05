@@ -3341,6 +3341,11 @@ try {
   await contextCompactionPage.waitForSelector(
     '.demo-root[data-frame="context-compaction-recovered"][data-status="completed"][data-composer-phase="idle"] [data-item-id="assistant-context-compaction-recovery"]',
   );
+  await contextCompactionPage.waitForFunction(
+    () =>
+      document.activeElement?.getAttribute("aria-label") ===
+      "Message composer",
+  );
   const recovered = await contextCompactionPage.evaluate(() => ({
     activeElement: document.activeElement?.getAttribute("aria-label"),
     assistantText:
