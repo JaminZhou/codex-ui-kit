@@ -3728,6 +3728,98 @@ for (const scene of visualScenes) {
   }
 }
 
+const currentReviewInteractionScene = {
+  frame: "review-open",
+  id: "current-review-rename-interaction",
+  scenario: "current-review-rename",
+};
+const {
+  app: currentReviewInteractionApp,
+  page: currentReviewInteractionPage,
+} = await launchScene(currentReviewInteractionScene, { capture: false });
+try {
+  const sourcePath = ".research/current-review-probe/rename-only.txt";
+  const destinationPath =
+    ".research/current-review-probe/renamed-only.txt";
+  const destinationSelection = currentReviewInteractionPage.getByRole(
+    "button",
+    { name: `Select review for ${destinationPath}` },
+  );
+  await destinationSelection.focus();
+  await destinationSelection.press("Enter");
+  const selected = await currentReviewInteractionPage.evaluate(
+    ({ destinationPath, sourcePath }) => ({
+      destinationSelected:
+        document
+          .querySelector(
+            `.codex-ui-file-review__file[aria-label="Review file ${destinationPath}"]`,
+          )
+          ?.getAttribute("data-selected") === "true",
+      markerLineCount: [...document.querySelectorAll(".codex-ui-file-diff__line")]
+        .filter((element) =>
+          element.textContent?.includes("__CODEX_TEMP_RENAME_MARKER__"),
+        ).length,
+      sourceDiffCount: document.querySelectorAll(
+        `.codex-ui-file-diff[aria-label="Review diff for ${sourcePath}"]`,
+      ).length,
+    }),
+    { destinationPath, sourcePath },
+  );
+  if (
+    !selected.destinationSelected ||
+    selected.markerLineCount !== 2 ||
+    selected.sourceDiffCount !== 1
+  ) {
+    throw new Error(
+      `Current Review keyboard selection failed: ${JSON.stringify(selected)}`,
+    );
+  }
+
+  await currentReviewInteractionPage
+    .getByRole("button", { exact: true, name: "Close review" })
+    .click();
+  await currentReviewInteractionPage.waitForSelector(
+    ".codex-ui-app-shell:not([data-side-panel-open])",
+  );
+  const reopen = currentReviewInteractionPage.getByRole("button", {
+    name: `Open ${destinationPath}`,
+  });
+  await reopen.focus();
+  await reopen.press("Enter");
+  await currentReviewInteractionPage.waitForSelector(
+    `.codex-ui-file-review__file[data-selected][aria-label="Review file ${destinationPath}"]`,
+  );
+  await currentReviewInteractionPage
+    .getByRole("button", { exact: true, name: "Undo" })
+    .click();
+  await currentReviewInteractionPage.waitForSelector(
+    '[data-testid="file-change-group"]',
+    { state: "detached" },
+  );
+  await currentReviewInteractionPage.waitForSelector(
+    ".codex-ui-app-shell:not([data-side-panel-open])",
+  );
+  const settled = await currentReviewInteractionPage.evaluate(() => ({
+    fileGroupCount: document.querySelectorAll(
+      '[data-testid="file-change-group"]',
+    ).length,
+    panelOpen: document
+      .querySelector(".codex-ui-app-shell")
+      ?.hasAttribute("data-side-panel-open"),
+  }));
+  if (settled.fileGroupCount !== 0 || settled.panelOpen !== false) {
+    throw new Error(
+      `Current Review Undo settlement failed: ${JSON.stringify(settled)}`,
+    );
+  }
+  await writeFile(
+    join(artifactDirectory, "current-review-rename-interaction.json"),
+    `${JSON.stringify({ selected, settled }, null, 2)}\n`,
+  );
+} finally {
+  await currentReviewInteractionApp.close();
+}
+
 const commandInterruptionScene = {
   frame: "command-interruption-running",
   id: "command-interruption-interaction",

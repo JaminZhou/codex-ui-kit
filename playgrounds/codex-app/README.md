@@ -537,6 +537,26 @@ The thirtieth slice reaches the current pasted-image lifecycle on
   completed comparisons measure 0.39% and 0.79% under independent 1.5%
   limits.
 
+## Thirty-first vertical slice
+
+The thirty-first slice refreshes Review rename/delete evidence on
+`26.730.61309`:
+
+- a real ignored-file delete still produces one `Edited …` card and one
+  deletion diff in the 370px `Last Turn` side region;
+- a real rename is now displayed as separate source and destination files,
+  with `__CODEX_TEMP_RENAME_MARKER__` added to the source diff and removed from
+  the destination diff; the public `move_path` arrow remains an independent
+  App Server semantic rather than a claim about current-product rendering;
+- a new eight-event deterministic replay raises the suite to 21 fixtures and
+  254 events, while Browser/CDP reaches 86 reviewed frames;
+- Browser/CDP and Electron select the destination, close and reopen it without
+  dropping the source diff, then apply group Undo and verify that both the card
+  and Review panel close;
+- the exact 906×820 current-build reference passes at 6.21% for the full main
+  region, 5.23% for the conversation region, and 7.62% for the Review region,
+  below independent 6.5%, 5.5%, and 8% limits.
+
 ## Development
 
 From the repository root:
@@ -567,6 +587,14 @@ application reference outside the repository and provide its absolute path:
 ```bash
 CODEX_UI_KIT_MULTI_FILE_REVIEW_REFERENCE=/absolute/path/to/main-only-reference.png \
   pnpm --filter @codex-ui-kit/codex-app-playground check:visual
+```
+
+The current rename gate accepts the exact 906×820 current-build main-region
+capture and checks the conversation and Review ownership regions separately:
+
+```bash
+CODEX_UI_KIT_CURRENT_REVIEW_REFERENCE=/absolute/path/to/current-review-rename.png \
+  pnpm --filter @codex-ui-kit/codex-app-playground check:visual --scenes=current-review-rename
 ```
 
 The command-failure gate accepts the unmodified full-window current-build

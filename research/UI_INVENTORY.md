@@ -54,7 +54,7 @@ observation from a previous build remains historical evidence.
 - Scoped CDP automation: available through a user-authorized second process;
   the Chromium profile is separate, but Codex application data and navigation
   are not fully isolated
-- Fresh current-build Renderer captures: nine dark isolated probes
+- Fresh current-build Renderer captures: eleven dark isolated probes
   verify successful 400-line command output, mixed stdout/stderr failure with
   exit code 7 and a successful same-thread follow-up, plus a 95-second command
   Stop/background-settlement/recovery lifecycle, and the manual `/compact`
@@ -72,15 +72,17 @@ observation from a previous build remains historical evidence.
   preview. A non-mutating workspace-entry sweep additionally refreshes
   selected/no-project headings, two suggestion rows, the project picker,
   Start in and branch menus, the inline New worktree/environment-empty state,
-  and the 720×680 layout. All other `26.727.40816` observations remain previous-build
-  evidence until separately reached on `26.730.61309`.
+  and the 720×680 layout. A two-task Review refresh additionally verifies a
+  real deletion and the current marker-backed two-file rename presentation.
+  All other `26.727.40816` observations remain previous-build evidence until
+  separately reached on `26.730.61309`.
 
-Current inventory: 79 surface groups; 18 have current-build runtime evidence,
-43 have previous-build-only runtime evidence, 18 remain `not_sampled`, and 0
-are `blocked_by_policy`. Current-build Browser verification covers 18 groups
-and Electron verification covers 18. Prior acceptance outside the sampled
-command, approval, interruption, compaction, summary, workspace-entry, and
-six-sidebar slices remains recorded as `partial_legacy`
+Current inventory: 79 surface groups; 22 have current-build runtime evidence,
+39 have previous-build-only runtime evidence, 18 remain `not_sampled`, and 0
+are `blocked_by_policy`. Current-build Browser verification covers 22 groups
+and Electron verification covers 22. Prior acceptance outside the sampled
+command, approval, interruption, compaction, summary, workspace-entry,
+Review, and six-sidebar slices remains recorded as `partial_legacy`
 until current-build re-observation.
 
 The current package exposes candidates far beyond the old transcript sample:
@@ -251,7 +253,7 @@ The `26.730.61309` workspace refresh promotes
 verification. The selected-project and no-project headings, two suggestion
 rows, 14-option project picker, five-item Start in menu, seven-branch menu,
 inline New worktree state, environment empty menu, and exact 720px layout are
-all independently gated. Browser/CDP now covers 85 lifecycle frames and six
+all independently gated. Browser/CDP now covers 86 lifecycle frames and six
 responsive widths; Electron drives the safe transitions and continues through
 the protocol-backed command → approval → Review → Terminal → PR path.
 
@@ -425,17 +427,27 @@ rows, two diffs, two notices, their ordered kinds, focus, and split geometry;
 Electron repeats selection, close/reopen, sibling preservation, and Undo. A
 reviewed full-frame pixel baseline covers the integrated state.
 
-A separate `26.721.81911` disposable ignored-file probe observed the
-then-current
-delete card, its 28px Undo/Review actions, a 370px Last Turn Review panel, and
-the deletion diff. A rename-only `apply_patch` run was rendered by the current
-product as separate `+0 −0` entries with `No content`, not a single
-rename-arrow row. The independent mapper therefore retains the public
-`move_path` semantic while documenting that it is not the current-product
-presentation observed in this run. Binary and conflict notices remain
-synthetic host-state coverage, so the broader Review family remains
-implementation-partial rather than being promoted to product-level
-completion.
+A refreshed `26.730.61309` disposable ignored-file probe re-observes the
+28px Undo/Review actions, 370px `Last Turn` side region, and one real deletion
+diff. The rename-only `apply_patch` path still renders separate source and
+destination entries rather than one rename-arrow row, but it no longer exposes
+the old two-row `No content` state: the source now contains one added
+`__CODEX_TEMP_RENAME_MARKER__` line and the destination removes the same line,
+producing `+1 −0` and `+0 −1` diffs. The independent mapper therefore keeps
+the public `move_path` semantic and adds a separate current-product replay for
+the marker-backed presentation.
+
+That eight-event replay raises the matrix to 21 fixtures and 254 events.
+Browser/CDP covers 86 reviewed frames, drives keyboard selection, close/reopen,
+sibling preservation, and Undo; Electron repeats the lifecycle in a real
+1180×820 `BrowserWindow`. The exact 906×820 current-build comparison passes at
+`0.06206724815592527` full, `0.05229341099381143` conversation, and
+`0.07620303230059328` Review-panel ratios under 6.5%, 5.5%, and 8% limits.
+`thread.file-change-diff`, `workspace.side-panel-shell`,
+`workspace.editor-diff`, and `workspace.multi-file-review` are current-build
+Browser/Electron verified for this sampled delete/rename family. Binary and
+conflict notices remain synthetic host-state coverage, so the broader Review
+family remains implementation-partial rather than product-level complete.
 
 The refreshed Pull request lifecycle keeps the controlled, resizable workspace
 panel but follows the `26.727.40816` non-modal overlay geometry. The

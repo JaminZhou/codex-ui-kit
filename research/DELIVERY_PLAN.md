@@ -12,7 +12,7 @@ exit gates; it does not replace the inventory.
 
 - The current installed package is Codex Desktop `26.730.61309` (`6223`).
 - The inventory contains 79 surface groups: 51 P0, 19 P1, and 9 P2.
-- 18 groups have current-build runtime evidence, 43 have previous-build-only
+- 22 groups have current-build runtime evidence, 39 have previous-build-only
   runtime evidence, and 18 have not been sampled.
 - The current `26.730.61309` refresh now covers all six left-sidebar groups,
   selected/no-project and New worktree entry, plus sampled command, approval,
@@ -95,11 +95,15 @@ exit gates; it does not replace the inventory.
   and 0.79% under 1.5% limits. Native file-panel selection, non-image files,
   multi-attachment overflow, upload/error, and plugin variants remain open.
   The preceding `26.727.40816` results remain previous-build evidence.
-  Attachment variants outside that sampled image path, Terminal multi-tab/process behavior,
-  Review rename/delete variants, and broader shell evidence from
-  `26.721.81911` remain historical regression evidence until re-observed. The
-  current project-named single Terminal tab and close/add controls now pass
-  independent Browser, Electron, and regional pixel gates.
+  Attachment variants outside that sampled image path and Terminal
+  multi-tab/process behavior remain historical regression evidence. Review
+  rename/delete is now re-observed on `26.730.61309`: delete remains a
+  single-file diff, while rename is presented as separate source/destination
+  files backed by a temporary marker line rather than a public `move_path`
+  arrow. The dedicated replay, Browser/CDP, Electron, and current-build pixel
+  gates pass; binary/conflict reachability remains host-derived. The current
+  project-named single Terminal tab and close/add controls now pass independent
+  Browser, Electron, and regional pixel gates.
   Global notification runtime evidence, light-theme shell evidence, unsampled
   long-thread window sizes/eviction heuristics, real current-product Terminal
   process execution/persistence, current-product review submission and

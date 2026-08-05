@@ -38,6 +38,12 @@ const currentBuildMultiFileReferenceSize = {
   height: 820,
   width: 906,
 };
+const currentBuildReviewRenameReference =
+  process.env.CODEX_UI_KIT_CURRENT_REVIEW_REFERENCE;
+const currentBuildReviewRenameReferenceSize = {
+  height: 820,
+  width: 906,
+};
 const currentBuildPullRequestReference =
   process.env.CODEX_UI_KIT_PULL_REQUEST_REFERENCE;
 const currentBuildPullRequestReferenceSize = {
@@ -1907,6 +1913,97 @@ for (const scene of selectedScenes) {
       "CODEX_UI_KIT_MULTI_FILE_REVIEW_PANEL_MAX_DIFF_RATIO",
       0.08,
     );
+    if (
+      comparison.ratio > maximumRatio ||
+      conversationComparison.ratio > maximumConversationRatio ||
+      reviewComparison.ratio > maximumReviewRatio
+    ) {
+      throw new Error(
+        `${scene.id}: current-build pixel ratios ${JSON.stringify({
+          conversation: conversationComparison.ratio,
+          full: comparison.ratio,
+          review: reviewComparison.ratio,
+        })} exceed ${JSON.stringify({
+          conversation: maximumConversationRatio,
+          full: maximumRatio,
+          review: maximumReviewRatio,
+        })}.`,
+      );
+    }
+    console.log(
+      `${scene.id}: current-build pixel ratios ${JSON.stringify({
+        conversation: conversationComparison.ratio,
+        full: comparison.ratio,
+        review: reviewComparison.ratio,
+      })}`,
+    );
+  }
+
+  if (
+    scene.id === "current-review-rename" &&
+    currentBuildReviewRenameReference
+  ) {
+    const reference = PNG.sync.read(
+      await readFile(currentBuildReviewRenameReference),
+    );
+    if (
+      reference.width !== currentBuildReviewRenameReferenceSize.width ||
+      reference.height !== currentBuildReviewRenameReferenceSize.height
+    ) {
+      throw new Error(
+        `${scene.id}: current-build reference must be exactly ${currentBuildReviewRenameReferenceSize.width}x${currentBuildReviewRenameReferenceSize.height}, received ${reference.width}x${reference.height}.`,
+      );
+    }
+    if (
+      actual.height !== reference.height ||
+      actual.width < reference.width
+    ) {
+      throw new Error(
+        `${scene.id}: current-build reference ${reference.width}x${reference.height} cannot be aligned to ${actual.width}x${actual.height}.`,
+      );
+    }
+    const main = cropPng(
+      actual,
+      actual.width - reference.width,
+      0,
+      reference.width,
+      reference.height,
+    );
+    const split = 536;
+    const comparison = comparePng(reference, main);
+    const conversationComparison = comparePng(
+      cropPng(reference, 0, 0, split, reference.height),
+      cropPng(main, 0, 0, split, reference.height),
+    );
+    const reviewComparison = comparePng(
+      cropPng(reference, split, 0, reference.width - split, reference.height),
+      cropPng(main, split, 0, reference.width - split, reference.height),
+    );
+    const maximumRatio = environmentRatio(
+      "CODEX_UI_KIT_CURRENT_REVIEW_MAX_DIFF_RATIO",
+      0.065,
+    );
+    const maximumConversationRatio = environmentRatio(
+      "CODEX_UI_KIT_CURRENT_REVIEW_CONVERSATION_MAX_DIFF_RATIO",
+      0.055,
+    );
+    const maximumReviewRatio = environmentRatio(
+      "CODEX_UI_KIT_CURRENT_REVIEW_PANEL_MAX_DIFF_RATIO",
+      0.08,
+    );
+    await writeFile(
+      join(artifactDirectory, `${scene.id}.current-build.png`),
+      PNG.sync.write(main),
+    );
+    if (comparison.pixels > 0) {
+      await writeFile(
+        join(
+          artifactDirectory,
+          `${scene.id}.current-build.diff.png`,
+        ),
+        PNG.sync.write(comparison.diff),
+      );
+    }
     if (
       comparison.ratio > maximumRatio ||
       conversationComparison.ratio > maximumConversationRatio ||

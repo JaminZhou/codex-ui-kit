@@ -741,6 +741,37 @@ describe("protocol lifecycle reducer", () => {
     expect(state.fileChanges[0]?.changes[3]?.diff).toContain("<<<<<<< HEAD");
   });
 
+  it("preserves the current marker-backed rename presentation", () => {
+    const state = reduceProtocolTrace(
+      replayScenarios["current-review-rename"].events,
+    );
+
+    expect(state.fileChanges).toHaveLength(1);
+    expect(state.fileChanges[0]).toMatchObject({
+      changes: [
+        {
+          kind: "modified",
+          path: ".research/current-review-probe/rename-only.txt",
+        },
+        {
+          kind: "modified",
+          path: ".research/current-review-probe/renamed-only.txt",
+        },
+      ],
+      status: "applied",
+    });
+    expect(state.fileChanges[0]?.changes[0]?.diff).toContain(
+      "+__CODEX_TEMP_RENAME_MARKER__",
+    );
+    expect(state.fileChanges[0]?.changes[1]?.diff).toContain(
+      "-__CODEX_TEMP_RENAME_MARKER__",
+    );
+    expect(state.messages.at(-1)?.text).toBe("Rename probe complete.");
+    expect(state.turnDurationsMs).toEqual({
+      "turn-current-review-rename": 52_000,
+    });
+  });
+
   it("keeps terminal interaction attached to the matching process", () => {
     const scenario = replayScenarios["background-terminal"];
     const terminalOpen = reduceProtocolTrace(
