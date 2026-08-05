@@ -148,6 +148,12 @@ export const visualScenes = [
     scenario: "conversation-lifecycle",
   },
   {
+    frame: "sidebar-current",
+    id: "current-sidebar",
+    maxPixelRatio: 0.0225,
+    scenario: "streaming-recovery",
+  },
+  {
     frame: "streaming",
     id: "streaming",
     scenario: "streaming-recovery",

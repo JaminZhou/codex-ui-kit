@@ -15,6 +15,7 @@ import {
   AppSidebar,
   AppSidebarFooter,
   AppSidebarItem,
+  AppSidebarProjectGroup,
   AppSidebarSection,
   ApprovalRequest,
   Dialog,
@@ -831,7 +832,7 @@ describe("application shell", () => {
     ).toBe(0);
   });
 
-  it("supports current-build narrow edge preview and explicit pinning", async () => {
+  it("matches current-build narrow collapse and explicit pinning", () => {
     function CurrentBuildNarrowFixture() {
       const [sidebarOpen, setSidebarOpen] = useState(false);
       return (
@@ -873,68 +874,16 @@ describe("application shell", () => {
     });
     showSidebar.focus();
     fireEvent.pointerMove(shell, { clientX: 1 });
-    expect(shell.hasAttribute("data-sidebar-preview-open")).toBe(true);
-    expect(sidebar.getAttribute("aria-hidden")).toBe("false");
-    expect(main.hasAttribute("inert")).toBe(false);
-    expect((backdrop as HTMLButtonElement).hidden).toBe(true);
-    screen.getByRole("button", { name: "Projects" }).focus();
-
-    fireEvent.pointerMove(shell, { clientX: 400 });
     expect(shell.hasAttribute("data-sidebar-preview-open")).toBe(false);
     expect(sidebar.getAttribute("aria-hidden")).toBe("true");
-    await waitFor(() => expect(document.activeElement).toBe(showSidebar));
+    expect(main.hasAttribute("inert")).toBe(false);
+    expect((backdrop as HTMLButtonElement).hidden).toBe(true);
 
     fireEvent.click(showSidebar);
     expect(shell.hasAttribute("data-sidebar-open")).toBe(true);
     expect(sidebar.getAttribute("aria-hidden")).toBe("false");
     expect(main.hasAttribute("inert")).toBe(false);
     expect((backdrop as HTMLButtonElement).hidden).toBe(true);
-  });
-
-  it("keeps current-build sidebar previews open across owned portals", () => {
-    const onSelect = vi.fn();
-    const { container } = render(
-      <AppShell
-        layoutMode="narrow"
-        narrowSidebarBehavior="current-build"
-        onSidebarOpenChange={() => undefined}
-        sidebar={
-          <Popover
-            label="Project actions"
-            trigger={<button type="button">Project menu</button>}
-          >
-            <button onClick={onSelect} type="button">
-              Open project
-            </button>
-          </Popover>
-        }
-        sidebarOpen={false}
-      >
-        Conversation
-      </AppShell>,
-    );
-    const shell = container.querySelector(".codex-ui-app-shell")!;
-
-    fireEvent.pointerMove(shell, { clientX: 1 });
-    expect(shell.hasAttribute("data-sidebar-preview-open")).toBe(true);
-    fireEvent.click(
-      screen.getByRole("button", { name: "Project menu" }),
-    );
-    const popover = screen.getByRole("dialog", {
-      name: "Project actions",
-    });
-    expect(popover.dataset.codexUiSurfaceOwner).toBeTruthy();
-
-    const action = screen.getByRole("button", {
-      name: "Open project",
-    });
-    fireEvent.pointerMove(action, { clientX: 400 });
-    expect(shell.hasAttribute("data-sidebar-preview-open")).toBe(true);
-    expect(screen.getByRole("dialog", { name: "Project actions" })).toBe(
-      popover,
-    );
-    fireEvent.click(action);
-    expect(onSelect).toHaveBeenCalledOnce();
   });
 
   it("falls back to a modal when a pinned narrow sidebar cannot fit", () => {
@@ -3907,6 +3856,40 @@ describe("application sidebar", () => {
     expect(onOpen).not.toHaveBeenCalled();
     fireEvent.click(task);
     expect(onOpen).toHaveBeenCalledTimes(1);
+  });
+
+  it("groups project tasks behind a focus-stable project row", () => {
+    const onExpandedChange = vi.fn();
+    render(
+      <AppSidebar>
+        <AppSidebarSection kind="pinned" title="Pinned">
+          <AppSidebarProjectGroup
+            actions={<button type="button">More</button>}
+            actionsLabel="Demo project actions"
+            defaultExpanded={false}
+            label="Demo project"
+            leading="Folder"
+            onExpandedChange={onExpandedChange}
+          >
+            <AppSidebarItem depth={1}>Nested task</AppSidebarItem>
+          </AppSidebarProjectGroup>
+        </AppSidebarSection>
+      </AppSidebar>,
+    );
+
+    const project = screen.getByRole("button", { name: "Demo project" });
+    expect(project.getAttribute("aria-expanded")).toBe("false");
+    expect(screen.queryByRole("button", { name: "Nested task" })).toBeNull();
+    expect(
+      screen.getByRole("toolbar", { name: "Demo project actions" }),
+    ).toBeTruthy();
+
+    project.focus();
+    fireEvent.click(project);
+    expect(project.getAttribute("aria-expanded")).toBe("true");
+    expect(screen.getByRole("button", { name: "Nested task" })).toBeTruthy();
+    expect(document.activeElement).toBe(project);
+    expect(onExpandedChange).toHaveBeenCalledWith(true);
   });
 
   it("preserves the focused navigation button across lifecycle status changes", () => {

@@ -7,7 +7,8 @@ not establish full conversation, workspace, application, or product coverage.
 The authoritative current-build inventory is:
 
 - [`26.730.61309.md`](26.730.61309.md) for the current package fingerprint,
-  current long-command capture, and remaining runtime-capture boundary;
+  current long-command and six-group sidebar captures, and remaining
+  runtime-capture boundary;
 - [`26.727.40816.md`](26.727.40816.md) for the previous main-Renderer shell,
   New chat, Terminal, PR, Composer, MCP, long-thread, approval, and command
   runtime sample;
@@ -53,6 +54,18 @@ The authoritative current-build inventory is:
   behavior, code search, broader connectors, or the wider thread-error, queue,
   Markdown variants, menu, global-route, and Settings states; those remain
   historical evidence from `26.715.72359` until sampled again.
+- The current Codex Desktop `26.730.61309` (`6223`) sidebar refresh locks the
+  274px dark column, 46px titlebar, 70px header, 30px routes, five expandable
+  project groups, dense history, actions/status, fixed 46px footer, and 16px
+  resize target. The regular split remains through 721px and auto-hides at
+  720px. Explicit Show pins a non-modal 274/446 split across Pull requests
+  navigation; explicit Hide restores the full 720px route, and an inline-start
+  hover no longer opens the historical edge preview. The de-identified public
+  scene passes 67 Browser/CDP and pixel frames plus Electron interaction.
+  Current-build regional ratios are 3.6234% for the top, 0.1292% for the
+  text-masked selected row, and 0% for the text-masked footer. The UIKit
+  keyboard-resize semantics exceed the sampled native separator and are
+  documented as an accessibility improvement, not inferred parity.
 - The previous Codex Desktop `26.727.40816` (`6067`) snapshot has dark
   main-Renderer
   captures for all six left-sidebar groups, the New chat Composer/project

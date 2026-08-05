@@ -581,8 +581,16 @@ textarea {
   min-height: 32px;
 }
 
+.demo-sidebar-brand-actions {
+  align-items: center;
+  display: flex;
+  gap: 2px;
+}
+
 .demo-sidebar-brand,
 .demo-sidebar-header-action,
+.demo-sidebar-new-chat,
+.demo-sidebar-quick-chat,
 .demo-sidebar-section-action,
 .codex-ui-app-sidebar-footer__actions > button {
   appearance: none;
@@ -608,6 +616,10 @@ textarea {
 .demo-sidebar-brand:focus-visible,
 .demo-sidebar-header-action:hover,
 .demo-sidebar-header-action:focus-visible,
+.demo-sidebar-new-chat:hover,
+.demo-sidebar-new-chat:focus-visible,
+.demo-sidebar-quick-chat:hover,
+.demo-sidebar-quick-chat:focus-visible,
 .demo-sidebar-section-action:hover,
 .demo-sidebar-section-action:focus-visible,
 .codex-ui-app-sidebar-footer__actions > button:hover,
@@ -616,6 +628,7 @@ textarea {
 }
 
 .demo-sidebar-header-action,
+.demo-sidebar-quick-chat,
 .demo-sidebar-section-action,
 .codex-ui-app-sidebar-footer__actions > button {
   align-items: center;
@@ -626,6 +639,48 @@ textarea {
   justify-content: center;
   padding: 4px;
   width: 26px;
+}
+
+.demo-sidebar-new-chat-row {
+  align-items: center;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 20px;
+  height: 30px;
+}
+
+.demo-sidebar-new-chat {
+  align-items: center;
+  border-radius: 12.5px;
+  color: #fff;
+  display: flex;
+  font-size: 13px;
+  font-weight: 445;
+  gap: 8px;
+  height: 30px;
+  line-height: 18.5714px;
+  min-width: 0;
+  padding: 5px 8px;
+  text-align: start;
+}
+
+.demo-sidebar-new-chat > span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.demo-sidebar-quick-chat {
+  border-radius: 10px;
+  color: rgba(255, 255, 255, 0.425);
+  height: 20px;
+  padding: 2px;
+  width: 20px;
+}
+
+.demo-root[data-sidebar-current]
+  .codex-ui-app-sidebar__section[data-kind="pinned"]
+  > .codex-ui-app-sidebar__items {
+  padding-block-start: var(--codex-ui-spacing);
 }
 
 .demo-sidebar-section-action {
@@ -1275,6 +1330,30 @@ textarea {
   height: 100%;
   min-height: 0;
   min-width: 0;
+}
+
+.demo-pr-sidebar-toggle {
+  align-items: center;
+  appearance: none;
+  background: transparent;
+  border: 0;
+  border-radius: 10px;
+  color: rgba(255, 255, 255, 0.5);
+  cursor: pointer;
+  display: inline-flex;
+  height: 28px;
+  justify-content: center;
+  padding: 6px;
+  position: absolute;
+  right: 16px;
+  top: 9px;
+  width: 28px;
+  z-index: 45;
+}
+
+.demo-pr-sidebar-toggle:hover,
+.demo-pr-sidebar-toggle:focus-visible {
+  background: rgba(255, 255, 255, 0.08);
 }
 
 .demo-pr-index > header {

@@ -131,20 +131,26 @@ The eighth slice adds a real successful public MCP workflow:
 
 ## Ninth vertical slice
 
-The ninth slice completes the first current-build application-sidebar
-contract:
+The ninth slice completes the application-sidebar contract and is refreshed
+against Codex Desktop `26.730.61309`:
 
-- the 274px shell, 46px titlebar-safe inset, 70px header, 30px rows, and fixed
-  46px footer measured on Codex Desktop `26.721.81911`;
+- the 274px shell, 46px titlebar-safe inset, 70px header, 30px rows, fixed
+  46px footer, and 54px scroll clearance;
 - primary routes, collapsible Pinned/Projects/Recents sections, long names,
-  dense history, status indicators, keyboard-accessible row actions, account,
-  and settings composition;
+  five reusable expandable project groups, dense history, status indicators,
+  keyboard-accessible row actions, account, and settings composition;
 - normal responsive behavior with an 820×680 split, a default-hidden 720px
-  sidebar, a 12px edge preview, and explicit pinning into the regular column;
+  sidebar, no edge-hover preview, and explicit pinning into the regular column
+  across route navigation;
 - an explicit wide capture mode so pixel fixtures do not override normal
   responsive behavior;
+- the refreshed composition is used by normal interaction and its dedicated
+  `current-sidebar` capture, while historical lifecycle captures keep their
+  prior sidebar fixture so one owned sidebar change cannot invalidate unrelated
+  main-region baselines;
 - Browser and Electron interaction gates plus an optional current-build
-  regional sidebar comparison.
+  regional sidebar comparison across top, masked selected-row, and masked
+  footer regions.
 
 ## Tenth vertical slice
 
@@ -175,8 +181,9 @@ The eleventh slice completes the first application-shell continuity contract:
   stale route-outlet states;
 - responsive side-surface auto-collapse and restoration that does not reopen a
   surface the user closed manually;
-- exact 961/960 and 721/720 boundary gates, current-build narrow edge preview
-  versus explicit pinning, and structural 1920×1080/2560×1440 checks;
+- exact 961/960 and 721/720 boundary gates, current-build auto-collapse versus
+  explicit pinning without an edge-hover preview, and structural
+  1920×1080/2560×1440 checks;
 - a body-portalled global notification region;
 - Browser CDP coverage across the shared lifecycle matrix and real Electron
   offline → retry → ready plus 1180×820 → 720×680 → 1180×820 acceptance;

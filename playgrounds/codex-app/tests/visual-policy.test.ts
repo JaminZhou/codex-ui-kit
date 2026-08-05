@@ -5,6 +5,11 @@ const contract = readFileSync(
   new URL("../scripts/check-visual-contract.mjs", import.meta.url),
   "utf8",
 );
+const appSource = readFileSync(new URL("../src/App.tsx", import.meta.url), "utf8");
+const appStyles = readFileSync(
+  new URL("../src/styles.css", import.meta.url),
+  "utf8",
+);
 
 describe("lifecycle visual policy", () => {
   it("keeps the main gate strict while scoping raster tolerance to the sidebar", () => {
@@ -38,6 +43,22 @@ describe("lifecycle visual policy", () => {
     expect(contract).toContain(
       "CODEX_UI_KIT_WINDOW_CHROME_MAX_DIFF_RATIO",
     );
+  });
+
+  it("gates the dedicated current-build sidebar regions", () => {
+    expect(contract).toContain('scene.id === "current-sidebar"');
+    expect(contract).toContain("CODEX_UI_KIT_SIDEBAR_REFERENCE");
+    expect(contract).toContain("CODEX_UI_KIT_SIDEBAR_TOP_MAX_DIFF_RATIO");
+    expect(contract).toContain("CODEX_UI_KIT_SIDEBAR_SELECTED_MAX_DIFF_RATIO");
+    expect(contract).toContain("CODEX_UI_KIT_SIDEBAR_FOOTER_MAX_DIFF_RATIO");
+    expect(contract).toContain("`${scene.id}.current-build.${region}.diff.png`");
+    expect(appSource).toContain(
+      'initialSelection.frame === "sidebar-current" || !initialSelection.capture',
+    );
+    expect(appSource).toContain(
+      "data-sidebar-current={currentSidebarComposition || undefined}",
+    );
+    expect(appStyles).toContain(".demo-root[data-sidebar-current]");
   });
 
   it("gates current multiline, permission, resource, and mode Composer regions", () => {
