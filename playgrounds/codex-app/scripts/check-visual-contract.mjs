@@ -307,11 +307,11 @@ for (const scene of selectedScenes) {
   let workspaceWorktreeMenuBounds;
 
   try {
-    if (scene.id === "streaming") {
+    if (scene.id === "current-sidebar") {
       sidebarSelectedTop = await page.evaluate(() => {
         const current = Array.from(
           document.querySelectorAll(
-            ".codex-ui-app-sidebar [aria-current=\"page\"]",
+            ".codex-ui-app-sidebar__project-group > .codex-ui-app-sidebar__item-row > [aria-current=\"page\"]",
           ),
         );
         if (current.length !== 1) {
@@ -711,7 +711,7 @@ for (const scene of selectedScenes) {
     });
   }
 
-  if (scene.id === "streaming" && currentBuildSidebarReference) {
+  if (scene.id === "current-sidebar" && currentBuildSidebarReference) {
     if (!Number.isInteger(sidebarSelectedTop)) {
       throw new Error(
         `${scene.id}: current sidebar row position was not captured.`,
@@ -773,17 +773,32 @@ for (const scene of selectedScenes) {
       referenceFooter,
       actualFooter,
     );
+    for (const [region, comparison] of [
+      ["footer", footerComparison],
+      ["selected", selectedComparison],
+      ["top", topComparison],
+    ]) {
+      if (comparison.pixels > 0) {
+        await writeFile(
+          join(
+            artifactDirectory,
+            `${scene.id}.current-build.${region}.diff.png`,
+          ),
+          PNG.sync.write(comparison.diff),
+        );
+      }
+    }
     const maximumTopRatio = environmentRatio(
       "CODEX_UI_KIT_SIDEBAR_TOP_MAX_DIFF_RATIO",
-      0.07,
+      0.045,
     );
     const maximumSelectedRatio = environmentRatio(
       "CODEX_UI_KIT_SIDEBAR_SELECTED_MAX_DIFF_RATIO",
-      0.05,
+      0.01,
     );
     const maximumFooterRatio = environmentRatio(
       "CODEX_UI_KIT_SIDEBAR_FOOTER_MAX_DIFF_RATIO",
-      0.05,
+      0.005,
     );
     if (
       topComparison.ratio > maximumTopRatio ||

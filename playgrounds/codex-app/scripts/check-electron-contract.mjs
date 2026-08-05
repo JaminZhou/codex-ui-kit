@@ -165,6 +165,19 @@ try {
       `Electron current-build pinned sidebar geometry failed: ${pinnedMainWidth}`,
     );
   }
+  await narrowPage
+    .getByRole("button", { exact: true, name: "Pull requests" })
+    .click();
+  await narrowPage.waitForFunction(() => {
+    const root = document.querySelector(".demo-root");
+    const shell = document.querySelector(".codex-ui-app-shell");
+    const main = document.querySelector(".codex-ui-app-shell__main");
+    return (
+      root?.getAttribute("data-view") === "pull-request" &&
+      shell?.hasAttribute("data-sidebar-open") &&
+      Math.abs((main?.getBoundingClientRect().width ?? 0) - 446) <= 1
+    );
+  });
   await narrowPage.getByRole("button", { name: "Hide sidebar" }).click();
   await narrowPage.waitForSelector(
     ".codex-ui-app-shell[data-layout-mode=\"narrow\"]:not([data-sidebar-open]) .codex-ui-app-shell__main:not([inert])",

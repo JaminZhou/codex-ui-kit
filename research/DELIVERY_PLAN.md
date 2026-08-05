@@ -12,9 +12,18 @@ exit gates; it does not replace the inventory.
 
 - The current installed package is Codex Desktop `26.730.61309` (`6223`).
 - The inventory contains 77 surface groups: 49 P0, 19 P1, and 9 P2.
-- 1 group has current-build runtime evidence, 57 have previous-build-only
+- 7 groups have current-build runtime evidence, 51 have previous-build-only
   runtime evidence, and 19 have not been sampled.
-- The `26.727.40816` refresh covered all six left-sidebar groups, window
+- The current `26.730.61309` refresh now covers all six left-sidebar groups
+  plus the successful long-command surface. The sidebar capture locks the
+  274px column, 46px titlebar, 70px navigation header, 30px rows, five
+  expandable project groups, dense history, item actions/status, fixed 46px
+  footer, 16px resize target, and the exact 721/720 responsive boundary. At
+  720px it auto-hides; an explicit Show action pins the normal 274px split
+  across route navigation, while an inline-start hover no longer opens the
+  legacy edge preview. The dedicated de-identified scene passes Browser,
+  Electron, internal pixels, and current-build top/selected/footer regional
+  gates. The preceding `26.727.40816` refresh covered window
   navigation, route loading/restoration, the New chat Composer and project
   picker, the read-only Terminal shell, and the public Pull request route.
   The PR lifecycle now follows the two-tab Summary/Code contract with Timeline
@@ -22,7 +31,7 @@ exit gates; it does not replace the inventory.
   responsive detail restoration. Its independent state machine adds
   index/detail loading and failure, checks, comments, review submission,
   merge-readiness, merge completion, compact layout, and route restoration.
-  Together the playground gates cover 66 CDP/pixel frames, and the refreshed
+  Together the playground gates cover 67 CDP/pixel frames, and the refreshed
   PR detail passes the current 906×820 regional pixel gate. The refreshed
   real MCP success path now matches Search → Fetch, the integrated activity
   disclosure, computed typography, and a current regional pixel gate. The
@@ -46,9 +55,8 @@ exit gates; it does not replace the inventory.
   re-locks a real 400-line successful
   command, collapsed/expanded Shell card, 144px reverse-tail viewport,
   copy controls, and collapse/reopen restoration through CDP, Electron, and
-  a 0.17% ownership-masked full-window gate. This command surface is the only
-  group currently reverified on `26.730.61309`; the preceding
-  `26.727.40816` results are previous-build evidence. Attachment variants,
+  a 0.17% ownership-masked full-window gate. The other preceding
+  `26.727.40816` results remain previous-build evidence. Attachment variants,
   Terminal
   multi-tab/process behavior,
   Review rename/delete variants, and broader shell evidence from
@@ -105,7 +113,7 @@ new parity claims:
 - re-observe the shell, left sidebar, conversation, Composer, Review, Terminal,
   Markdown, and MCP anchors;
 - retain previous-build results as regression fixtures while promoting only
-  surfaces re-observed on `26.727.40816`;
+  surfaces re-observed on `26.730.61309`;
 - update inventory evidence prefixes and the current build note.
 
 Exit: the current build has a reproducible CDP capture recipe and no
@@ -146,7 +154,7 @@ Acceptance matrix:
 
 | Axis | Required states |
 | --- | --- |
-| Width | wide split, medium constrained split, narrow modal sidebar |
+| Width | wide split, medium constrained split, 720px auto-collapse, explicit narrow pinned split, modal safety fallback |
 | Theme | light and dark |
 | Content | empty, normal, long names, dense history, overflow |
 | Lifecycle | loading, selected, running, queued, unread, error, restored |
@@ -254,9 +262,11 @@ without confusing package readiness with full product reconstruction.
 
 1. **Plan and evidence reset**: record the new package baseline, split the
    sidebar inventory, publish this roadmap, and prevent count drift.
-2. **Current sidebar parity**: fresh CDP capture, sidebar state contract,
-   full-app playground scene, Browser/Electron interaction, and regional pixel
-   gates.
+2. **Current sidebar parity — delivered for the sampled dark contract**:
+   fresh CDP capture, sidebar state contract, full-app playground scene,
+   Browser/Electron interaction, and regional pixel gates. Light-theme
+   current-product evidence and unsampled lifecycle variants remain separate
+   follow-up evidence rather than blockers for the observed dark contract.
 3. **Tool recovery and mixed thread**: real MCP failure/unavailable/retry plus
    a multi-turn command/approval/file/tool composition.
 4. **App shell continuity**: window chrome, global feedback, loading/error/

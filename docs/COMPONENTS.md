@@ -162,11 +162,12 @@ All privileged behavior remains host-owned. The components never auto-approve co
   restoration intent for a new route or workspace. Controlled-host callbacks
   must acknowledge the requested state before the surface becomes eligible
   for later restoration.
-  `narrowSidebarBehavior="current-build"` separates
-  a transient 12px edge preview from explicitly pinning the normal sidebar
-  track, and restores focus before that preview becomes inert.
-- `AppSidebar`, `AppSidebarSection`, `AppSidebarItem`, and
-  `AppSidebarFooter`: grouped primary navigation with one selected route,
+  `narrowSidebarBehavior="current-build"` matches the refreshed 720px
+  auto-collapse boundary and lets an explicit Show action pin the normal
+  sidebar track without reintroducing the removed edge-hover preview.
+- `AppSidebar`, `AppSidebarSection`, `AppSidebarProjectGroup`,
+  `AppSidebarItem`, and `AppSidebarFooter`: grouped primary navigation with
+  one selected route, reusable expandable project/task groups,
   heading-preserving collapsible collections, lifecycle status, measured
   action columns, and an in-flow footer slot that cannot cover navigation.
   A titleless section remains expanded because it has no operable toggle;

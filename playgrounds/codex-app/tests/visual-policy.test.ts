@@ -40,6 +40,15 @@ describe("lifecycle visual policy", () => {
     );
   });
 
+  it("gates the dedicated current-build sidebar regions", () => {
+    expect(contract).toContain('scene.id === "current-sidebar"');
+    expect(contract).toContain("CODEX_UI_KIT_SIDEBAR_REFERENCE");
+    expect(contract).toContain("CODEX_UI_KIT_SIDEBAR_TOP_MAX_DIFF_RATIO");
+    expect(contract).toContain("CODEX_UI_KIT_SIDEBAR_SELECTED_MAX_DIFF_RATIO");
+    expect(contract).toContain("CODEX_UI_KIT_SIDEBAR_FOOTER_MAX_DIFF_RATIO");
+    expect(contract).toContain("`${scene.id}.current-build.${region}.diff.png`");
+  });
+
   it("gates current multiline, permission, resource, and mode Composer regions", () => {
     expect(contract).toContain(
       "CODEX_UI_KIT_COMPOSER_MULTILINE_REFERENCE",

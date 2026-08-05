@@ -616,7 +616,6 @@ export function AppShell({
   const [bottomPanelResizing, setBottomPanelResizing] = useState(false);
   const [sidePanelResizing, setSidePanelResizing] = useState(false);
   const [sidebarResizing, setSidebarResizing] = useState(false);
-  const [sidebarPreviewOpen, setSidebarPreviewOpen] = useState(false);
   const sidebarIsVisible =
     sidebarOpen && sidebar !== undefined && sidebar !== null;
   const observedSidebarWidth = useObservedElementWidth(
@@ -627,13 +626,7 @@ export function AppShell({
   const layoutMode = layoutModeOverride ?? automaticLayout.mode;
   const currentBuildNarrowSidebar =
     narrowSidebarBehavior === "current-build" && layoutMode === "narrow";
-  const sidebarPreviewVisible =
-    currentBuildNarrowSidebar &&
-    !sidebarOpen &&
-    sidebarPreviewOpen &&
-    sidebar !== undefined &&
-    sidebar !== null;
-  const sidebarSurfaceVisible = sidebarOpen || sidebarPreviewVisible;
+  const sidebarSurfaceVisible = sidebarOpen;
   const previousLayoutModeRef = useRef(layoutMode);
   const responsivePanelContinuityKeyRef = useRef(
     responsivePanelContinuityKey,
@@ -1031,11 +1024,6 @@ export function AppShell({
       sidePanelAutoCollapsedRef.current = false;
     }
   }, [layoutMode, sidePanelOpen, sidebarOpen]);
-  useLayoutEffect(() => {
-    if (!currentBuildNarrowSidebar || sidebarOpen) {
-      setSidebarPreviewOpen(false);
-    }
-  }, [currentBuildNarrowSidebar, sidebarOpen]);
   const resolveBottomPanelHeight = (nextHeight: number) => {
     const measuredLiveShellHeight =
       shellRef.current === null
@@ -1666,48 +1654,6 @@ export function AppShell({
     sidebarModalOpen,
     sidebarOpen,
   ]);
-  const handleShellPointerMoveCapture = (
-    event: ReactPointerEvent<HTMLDivElement>,
-  ) => {
-    onPointerMoveCapture?.(event);
-    if (
-      event.defaultPrevented ||
-      !currentBuildNarrowSidebar ||
-      sidebarOpen
-    ) {
-      return;
-    }
-    const shell = shellRef.current;
-    if (!shell) return;
-    const portalOwner =
-      event.target instanceof Element
-        ? event.target.closest<HTMLElement>(
-            "[data-codex-ui-surface-owner]",
-          )?.dataset.codexUiSurfaceOwner
-        : undefined;
-    if (portalOwner === sidebarPortalOwnerId) return;
-    const bounds = shell.getBoundingClientRect();
-    const direction = getComputedStyle(shell).direction;
-    const inlineStartDistance =
-      direction === "rtl"
-        ? bounds.right - event.clientX
-        : event.clientX - bounds.left;
-    if (inlineStartDistance <= 12) {
-      setSidebarPreviewOpen(true);
-    } else if (
-      sidebarPreviewOpen &&
-      inlineStartDistance > resolvedSidebarWidth
-    ) {
-      setSidebarPreviewOpen(false);
-    }
-  };
-  const handleShellPointerLeave = (
-    event: ReactPointerEvent<HTMLDivElement>,
-  ) => {
-    onPointerLeave?.(event);
-    if (!event.defaultPrevented) setSidebarPreviewOpen(false);
-  };
-
   return (
     <div
       className={["codex-ui-app-shell", className].filter(Boolean).join(" ")}
@@ -1726,14 +1672,13 @@ export function AppShell({
       data-side-panel-resizing={sidePanelResizing || undefined}
       data-narrow-sidebar-behavior={narrowSidebarBehavior}
       data-sidebar-pinned={currentBuildNarrowSidebarPinned || undefined}
-      data-sidebar-preview-open={sidebarPreviewVisible || undefined}
       data-sidebar-resizable={sidebarResizable || undefined}
       data-sidebar-resizing={sidebarResizing || undefined}
       data-sidebar-open={sidebarOpen || undefined}
       data-layout-mode={layoutMode}
       data-window-chrome={windowChrome ? true : undefined}
-      onPointerLeave={handleShellPointerLeave}
-      onPointerMoveCapture={handleShellPointerMoveCapture}
+      onPointerLeave={onPointerLeave}
+      onPointerMoveCapture={onPointerMoveCapture}
       ref={shellRef}
       style={shellStyle}
       {...props}
@@ -2068,6 +2013,79 @@ export type AppSidebarItemStatus =
   | "queued"
   | "running"
   | "unread";
+
+export interface AppSidebarProjectGroupProps
+  extends Omit<HTMLAttributes<HTMLDivElement>, "children" | "onClick"> {
+  actions?: ReactNode;
+  actionsLabel?: string;
+  children: ReactNode;
+  defaultExpanded?: boolean;
+  expanded?: boolean;
+  label: ReactNode;
+  leading?: ReactNode;
+  onExpandedChange?: (expanded: boolean) => void;
+  selected?: boolean;
+  status?: AppSidebarItemStatus;
+  statusLabel?: string;
+  toggleLabel?: string;
+}
+
+export function AppSidebarProjectGroup({
+  actions,
+  actionsLabel = "Project actions",
+  children,
+  className,
+  defaultExpanded = true,
+  expanded,
+  label,
+  leading,
+  onExpandedChange,
+  selected = false,
+  status = "idle",
+  statusLabel,
+  toggleLabel,
+  ...props
+}: AppSidebarProjectGroupProps) {
+  const contentId = useId();
+  const [internalExpanded, setInternalExpanded] = useState(defaultExpanded);
+  const isExpanded = expanded ?? internalExpanded;
+  const setExpanded = (nextExpanded: boolean) => {
+    if (expanded === undefined) setInternalExpanded(nextExpanded);
+    onExpandedChange?.(nextExpanded);
+  };
+
+  return (
+    <div
+      className={["codex-ui-app-sidebar__project-group", className]
+        .filter(Boolean)
+        .join(" ")}
+      data-expanded={isExpanded || undefined}
+      {...props}
+    >
+      <AppSidebarItem
+        actions={actions}
+        actionsLabel={actionsLabel}
+        aria-controls={contentId}
+        aria-expanded={isExpanded}
+        aria-label={toggleLabel}
+        leading={leading}
+        onClick={() => setExpanded(!isExpanded)}
+        selected={selected}
+        status={status}
+        statusLabel={statusLabel}
+      >
+        {label}
+      </AppSidebarItem>
+      <div
+        className="codex-ui-app-sidebar__project-children"
+        hidden={!isExpanded}
+        id={contentId}
+      >
+        {children}
+      </div>
+    </div>
+  );
+}
 
 export interface AppSidebarItemProps
   extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, "children"> {

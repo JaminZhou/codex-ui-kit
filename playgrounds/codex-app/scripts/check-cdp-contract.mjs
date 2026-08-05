@@ -3366,6 +3366,8 @@ try {
     const main = document.querySelector(".codex-ui-app-shell__main");
     return {
       mainInert: main?.hasAttribute("inert"),
+      mainLeft: main?.getBoundingClientRect().left,
+      mainWidth: main?.getBoundingClientRect().width,
       sidebarOpen: shell?.hasAttribute("data-sidebar-open"),
       view: document
         .querySelector(".demo-root")
@@ -3373,12 +3375,14 @@ try {
     };
   });
   if (
-    navigated.sidebarOpen ||
+    !navigated.sidebarOpen ||
     navigated.mainInert ||
+    Math.abs((navigated.mainLeft ?? 0) - 274) > 1 ||
+    Math.abs((navigated.mainWidth ?? 0) - 446) > 1 ||
     navigated.view !== "pull-request"
   ) {
     throw new Error(
-      `sidebar-current-narrow: navigation did not dismiss the overlay: ${JSON.stringify(navigated)}`,
+      `sidebar-current-narrow: pinned navigation was not retained: ${JSON.stringify(navigated)}`,
     );
   }
 
@@ -3387,9 +3391,7 @@ try {
     '.demo-root[data-scenario="streaming-recovery"][data-frame="streaming"]',
   );
   await sidebarNarrowPage.mouse.move(1, 200);
-  await sidebarNarrowPage.waitForSelector(
-    '.codex-ui-app-shell[data-sidebar-preview-open]:not([data-sidebar-open])',
-  );
+  await sidebarNarrowPage.waitForTimeout(500);
   const preview = await sidebarNarrowPage.evaluate(() => {
     const shell = document.querySelector(".codex-ui-app-shell");
     const sidebar = document.querySelector(".codex-ui-app-shell__sidebar");
@@ -3403,27 +3405,26 @@ try {
       mainWidth: main?.getBoundingClientRect().width,
       position: sidebar ? getComputedStyle(sidebar).position : null,
       previewOpen: shell?.hasAttribute("data-sidebar-preview-open"),
+      sidebarAriaHidden: sidebar?.getAttribute("aria-hidden"),
       sidebarLeft: sidebar?.getBoundingClientRect().left,
       sidebarOpen: shell?.hasAttribute("data-sidebar-open"),
     };
   });
   if (
-    !preview.previewOpen ||
+    preview.previewOpen ||
     preview.sidebarOpen ||
     preview.mainInert ||
     Math.abs((preview.mainWidth ?? 0) - 720) > 1 ||
-    Math.abs(preview.sidebarLeft ?? -274) > 1 ||
+    (preview.sidebarLeft ?? 0) > -273 ||
+    preview.sidebarAriaHidden !== "true" ||
     preview.position !== "absolute" ||
     preview.backdropHidden !== true
   ) {
     throw new Error(
-      `sidebar-current-narrow: edge preview failed: ${JSON.stringify(preview)}`,
+      `sidebar-current-narrow: collapsed edge unexpectedly previewed: ${JSON.stringify(preview)}`,
     );
   }
   await sidebarNarrowPage.mouse.move(500, 200);
-  await sidebarNarrowPage.waitForSelector(
-    '.codex-ui-app-shell:not([data-sidebar-preview-open])',
-  );
 } finally {
   await sidebarNarrowApp.close();
 }

@@ -54,18 +54,21 @@ observation from a previous build remains historical evidence.
 - Scoped CDP automation: available through a user-authorized second process;
   the Chromium profile is separate, but Codex application data and navigation
   are not fully isolated
-- Fresh current-build Renderer capture: one dark 1180×820 disposable task
-  verifies successful 400-line command output, the collapsed/expanded Shell
-  surface, 144px reverse-tail viewport, copy controls, Success state, and
-  latest-line restoration. All other `26.727.40816` observations are now
-  previous-build evidence until separately reached on `26.730.61309`.
+- Fresh current-build Renderer captures: one dark 1180×820 disposable task
+  verifies successful 400-line command output, and a separate read-only
+  sidebar sweep verifies all six sidebar groups at 1180×820, 820×680, and the
+  exact 721/720 boundary. The sidebar remains 274px through 721px, auto-hides
+  at 720px, stays pinned as a 274/446 split after an explicit Show action and
+  route navigation, and no longer opens the historical inline-start hover
+  preview. All other `26.727.40816` observations remain previous-build
+  evidence until separately reached on `26.730.61309`.
 
-Current inventory: 77 surface groups; 1 has current-build runtime evidence,
-57 have previous-build-only runtime evidence, 19 remain `not_sampled`, and 0
-are `blocked_by_policy`. Current-build Browser verification covers 1 group
-and Electron verification covers 1. Prior acceptance outside the sampled
-long-command slice remains recorded as `partial_legacy` until current-build
-re-observation.
+Current inventory: 77 surface groups; 7 have current-build runtime evidence,
+51 have previous-build-only runtime evidence, 19 remain `not_sampled`, and 0
+are `blocked_by_policy`. Current-build Browser verification covers 7 groups
+and Electron verification covers 7. Prior acceptance outside the sampled
+long-command and six-sidebar slices remains recorded as `partial_legacy`
+until current-build re-observation.
 
 The current package exposes candidates far beyond the old transcript sample:
 application and thread shells, local/remote conversation routes, projects and
@@ -138,24 +141,31 @@ that previously matched `26.721.81911` or earlier remains regression coverage,
 but every
 affected inventory row was `partial_legacy` until it was re-observed on
 `26.727.40816`. After the `26.730.61309` update, every row below is again
-`partial_legacy` except the explicitly refreshed long-command row. The
+`partial_legacy` except the explicitly refreshed long-command and six sidebar
+rows. The
 machine-readable inventory is authoritative when historical prose describes
 a build as current at its capture time.
 
-The previous sidebar slice re-observed all six application-sidebar groups on
-`26.727.40816`. It independently implements the 274px shell, 46px
-traffic-light-safe titlebar inset, 70px header, 30px rows, collapsible
-Projects/Pinned/Recents sections, dense thread status/action rows, and fixed
-46px account/settings footer. The normal H5 and Electron composition now uses
-the current 960px right-panel coordination boundary and 720px sidebar collapse
-boundary. A closed narrow sidebar exposes the observed 12px edge preview;
-clicking Show sidebar pins the regular 274px column and leaves the remaining
-main width in flow. The reusable `AppShell` retains its focus-managed modal
-mode as an explicit fallback rather than describing it as the current Codex
-behavior. Deterministic capture mode remains explicitly wide so regional
-pixel fixtures do not disable the real responsive contract. Implementation
-stays `partial` because light-theme runtime evidence, native current-app
-resize, dynamic right-panel sizing, and broader route coverage remain
+The current sidebar slice re-observed all six application-sidebar groups on
+`26.730.61309`. It independently implements the 274px shell, 46px
+traffic-light-safe titlebar inset, 70px header, 30px rows, Codex/Search/
+activity controls, New chat/Quick chat, five reusable expandable project
+groups with nested tasks, Pinned/Projects/Recents sections, dense history,
+actions/status, and a fixed 46px footer with 54px scroll clearance. The
+normal H5 and Electron composition retains the 960px right-panel coordination
+boundary and locks the exact 721/720 sidebar boundary: the sidebar remains in
+flow through 721px and auto-hides at 720px. An explicit Show action pins the
+regular 274px column, including after navigating to Pull requests; a hidden
+sidebar no longer opens from the legacy 12px edge hover. `AppShell` keeps its
+focus-managed modal mode only as an explicit safety fallback for widths that
+cannot fit the pinned split. The current product's separator exposes
+`role=separator` but no keyboard value semantics; UIKit intentionally retains
+Arrow/Home/End resizing and value attributes as an accessibility improvement.
+The dedicated de-identified scene passes 67 Browser/CDP and pixel frames,
+Electron interaction, and current-build regional ratios of 3.6234% for the
+top, 0.1292% for the masked selected row, and 0% for the masked footer.
+Implementation stays `partial` because light-theme runtime evidence, dynamic
+right-panel sizing, context-menu mutations, and broader route coverage remain
 separate work.
 
 The application-shell continuity slice splits window navigation, route
@@ -586,7 +596,7 @@ scrolling output viewport, and `Success`. Its reverse column keeps lines
 the trailing newline.
 
 The independent trace contains exactly one command request/output pair.
-Browser/CDP now covers 66 lifecycle frames and verifies command identity,
+Browser/CDP now covers 67 lifecycle frames and verifies command identity,
 401 split lines, computed typography, output overflow, keyboard disclosure,
 and latest-line restoration after collapse/reopen. Electron drives the same
 interaction in a real 1180×820 `BrowserWindow`. The ownership-masked full

@@ -558,7 +558,7 @@ without an approval card.
 The 1180×820 Renderer retained the 736×227.06 command card,
 734×144 reverse-tail output viewport, 401 split lines, 7816px scroll height,
 `scrollTop = 0`, 13/19.5px monospace output, two copy controls, Shell label,
-and Success state. Browser/CDP, Electron, and all 66 internal pixel frames
+and Success state. Browser/CDP, Electron, and all 67 internal pixel frames
 pass; the ownership-masked current comparison measures `0.001655643` under
 the unchanged 1.5% hard limit. Other `26.727.40816` surfaces remain
 previous-build evidence until separately reached on this build.
@@ -568,6 +568,40 @@ app-server/modifier children, and profile-specific Crashpad helpers. Port
 `9520` closed, the ignored probe was removed, and Finder moved the profile and
 external evidence to the recoverable Trash item
 `codex-ui-kit-current-cdp.mrkFgT`. The original Codex process was not stopped.
+
+### Current 26.730.61309 sidebar capture
+
+The final responsive sweep used exact main PID `40154`, loopback port `9532`,
+and unique profile `/private/tmp/codex-ui-kit-sidebar-sweep.Pp6HBF`. It
+selected the largest `app://-/index.html` Renderer by URL, viewport area, and
+application-shell landmarks and performed only navigation, expansion,
+viewport emulation, DOM/accessibility inspection, and screenshots.
+
+At 1180×820 and 820×680, the sidebar measured 274px with a 46px titlebar,
+70px header, 30px route rows, 46px footer, 54px scroll clearance, and 16px
+resize target. De-identified counts recorded five project groups, five
+project actions, five project New chat controls, 16 thread/history items, and
+two status markers. The width sweep established an exact 721/720 boundary:
+the regular split remains through 721px and auto-hides at 720px. Explicit Show
+at 720px pins a non-modal 274/446 split across Pull requests navigation;
+explicit Hide returns the main route to 720px, and a 1.2-second hover at x=1
+does not open the historical edge preview.
+
+The independent scene and public project-group contract pass all 67
+Browser/CDP and internal pixel frames plus Electron interaction. The optional
+current-build regional comparison passes at `0.036233576642335764` for the
+top, `0.0012919896640826874` for the text-masked selected row, and `0` for the
+text-masked footer. The native separator did not expose range values or
+respond to Home/End in the sampled Renderer; the UIKit keyboard-resize
+contract is an explicit accessibility improvement, not a current-product
+claim.
+
+Cleanup terminated only PID `40154`, its exact process tree, and reparented
+modifier child PID `40202`; port `9532` was verified closed. The four ignored
+probe scripts were removed. Both exact temporary profiles and all sidebar
+screenshots were moved into the recoverable Trash directory
+`codex-ui-kit-sidebar-evidence.ptbmTs`; the original Codex process remained
+running.
 
 ## Required flow matrix
 

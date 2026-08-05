@@ -10,6 +10,7 @@ import {
   AppSidebar,
   AppSidebarFooter,
   AppSidebarItem,
+  AppSidebarProjectGroup,
   AppSidebarSection,
   AppWindowChrome,
   ApprovalRequest,
@@ -121,6 +122,7 @@ import {
 type DemoView = "conversation" | "pull-request" | "shell" | "workspace";
 
 type SidebarGlyphName =
+  | "activity"
   | "automation"
   | "folder"
   | "more"
@@ -128,13 +130,17 @@ type SidebarGlyphName =
   | "pin"
   | "plugins"
   | "pull-request"
+  | "quick"
   | "search"
+  | "sidebar"
   | "settings"
   | "sites"
   | "thread";
 
 function SidebarGlyph({ name }: { name: SidebarGlyphName }) {
   const path = {
+    activity:
+      "M3.25 11.25h9.5l-1.1-1.55V6.9A3.65 3.65 0 0 0 8 3.25 3.65 3.65 0 0 0 4.35 6.9v2.8l-1.1 1.55ZM6.4 12.5a1.65 1.65 0 0 0 3.2 0",
     automation:
       "M8 2.25a5.75 5.75 0 1 1-4.07 1.68M8 4.75V8l2.15 1.45",
     folder:
@@ -146,7 +152,10 @@ function SidebarGlyph({ name }: { name: SidebarGlyphName }) {
       "M6.25 1.75v3M9.75 1.75v3M4.5 4.75h7v2.5A3.5 3.5 0 0 1 8 10.75v3.5M2 7.25h12",
     "pull-request":
       "M4 3.25v8.5M4 3.25a1.25 1.25 0 1 0 0 .01M4 11.75a1.25 1.25 0 1 0 0 .01M12 4.5a1.25 1.25 0 1 0 0 .01M12 5.75v2a4 4 0 0 1-4 4H6.5",
+    quick:
+      "M2.5 3.25h7.25v7.5H6L3.25 13v-2.25H2.5v-7.5Zm7.5 1.5h3.5m-1.75-1.75v3.5",
     search: "m11.5 11.5 2.75 2.75M13 7.25A5.75 5.75 0 1 1 1.5 7.25 5.75 5.75 0 0 1 13 7.25Z",
+    sidebar: "M2.25 3.5h11.5v9H2.25v-9Zm4 0v9",
     settings:
       "M8 5.5A2.5 2.5 0 1 1 8 10.5 2.5 2.5 0 0 1 8 5.5Zm0-3.75.8 1.3 1.55.35 1.2-.95 2 2-.95 1.2.35 1.55 1.3.8-1.3.8-.35 1.55.95 1.2-2 2-1.2-.95-1.55.35L8 14.25l-.8-1.3-1.55-.35-1.2.95-2-2 .95-1.2-.35-1.55L1.75 8l1.3-.8.35-1.55-.95-1.2 2-2 1.2.95 1.55-.35L8 1.75Z",
     sites:
@@ -805,6 +814,40 @@ const workspaceWorktreesByProject: Record<
   tooling: [workspaceEnvironmentGroups[0].items[0]],
 };
 
+const currentSidebarProjects = [
+  {
+    id: "session-browser",
+    label: "session-browser",
+    tasks: ["Inspect timeline structure"],
+  },
+  {
+    id: "desktop-cleanup",
+    label: "desktop-cleanup",
+    tasks: ["Verify recent item cleanup"],
+  },
+  {
+    id: "codex-ui-kit",
+    label: "codex-ui-kit",
+    selected: true,
+    tasks: ["Match current sidebar", "Review responsive shell"],
+  },
+  {
+    id: "design-assets",
+    label: "design-assets",
+    status: "unread" as const,
+    tasks: [
+      "Audit monthly layout",
+      "Compare visual baseline",
+      "Tune compact spacing",
+    ],
+  },
+  {
+    id: "protocol-client",
+    label: "protocol-client",
+    tasks: ["Check compatibility matrix"],
+  },
+];
+
 export function App() {
   const initialSelection = useMemo(querySelection, []);
   const [scenarioId, setScenarioId] = useState<ReplayScenarioId>(
@@ -1169,7 +1212,11 @@ export function App() {
   };
 
   const dismissSidebarAfterNavigation = () => {
-    if (isNarrowDemoWindow()) setSidebarOpen(false);
+    if (!isNarrowDemoWindow()) return;
+    const shell = document.querySelector(".codex-ui-app-shell");
+    if (!shell?.hasAttribute("data-sidebar-pinned")) {
+      setSidebarOpen(false);
+    }
   };
 
   const openWorkspace = (
@@ -1586,6 +1633,7 @@ export function App() {
   }, [currentWindowedFrame, windowedSelectedMessageIndex]);
 
   const lastEvent = scenario.events[Math.max(0, replayCount - 1)];
+  const currentSidebarFrame = initialSelection.frame === "sidebar-current";
   const sidebar = (
     <AppSidebar
       footer={
@@ -1615,20 +1663,40 @@ export function App() {
               Codex
               <span aria-hidden="true">⌄</span>
             </button>
+            <span className="demo-sidebar-brand-actions">
+              <button
+                aria-label="Search"
+                className="demo-sidebar-header-action"
+                type="button"
+              >
+                <SidebarGlyph name="search" />
+              </button>
+              <button
+                aria-label="View activity"
+                className="demo-sidebar-header-action"
+                type="button"
+              >
+                <SidebarGlyph name="activity" />
+              </button>
+            </span>
+          </div>
+          <div className="demo-sidebar-new-chat-row">
             <button
-              aria-label="Search"
-              className="demo-sidebar-header-action"
+              className="demo-sidebar-new-chat"
+              onClick={() => openWorkspace()}
               type="button"
             >
-              <SidebarGlyph name="search" />
+              <SidebarGlyph name="new" />
+              <span>New chat</span>
+            </button>
+            <button
+              aria-label="Quick chat"
+              className="demo-sidebar-quick-chat"
+              type="button"
+            >
+              <SidebarGlyph name="quick" />
             </button>
           </div>
-          <AppSidebarItem
-            leading={<SidebarGlyph name="new" />}
-            onClick={() => openWorkspace()}
-          >
-            New chat
-          </AppSidebarItem>
         </div>
       }
       primaryNavigation={
@@ -1664,43 +1732,93 @@ export function App() {
         title="Pinned"
         toggleLabel="Toggle pinned tasks"
       >
-        <AppSidebarItem
-          actions={
-            <>
-              <button aria-label="Pin current task" type="button">
-                <SidebarGlyph name="pin" />
-              </button>
-              <button aria-label="Current task actions" type="button">
-                <SidebarGlyph name="more" />
-              </button>
-            </>
-          }
-          actionsLabel="Current task actions"
-          leading={<SidebarGlyph name="folder" />}
-          status={
-            hasActiveTurnWork(state) || isTurnActive(state.status)
-              ? "running"
-              : "idle"
-          }
-          statusLabel="Current task is running"
-        >
-          codex-ui-kit
-        </AppSidebarItem>
-        <AppSidebarItem
-          actions={
-            <button aria-label="Pinned task actions" type="button">
-              <SidebarGlyph name="more" />
-            </button>
-          }
-          actionsLabel="Pinned task actions"
-          depth={1}
-          leading={<SidebarGlyph name="thread" />}
-          onClick={() => selectScenario("mcp-tool-call")}
-          status="unread"
-          statusLabel="Unread update"
-        >
-          MCP tool validation
-        </AppSidebarItem>
+        {currentSidebarFrame ? (
+          currentSidebarProjects.map((project) => (
+            <AppSidebarProjectGroup
+              actions={
+                <>
+                  <button
+                    aria-label={`Project actions for ${project.label}`}
+                    type="button"
+                  >
+                    <SidebarGlyph name="more" />
+                  </button>
+                  <button
+                    aria-label={`Start new chat in ${project.label}`}
+                    type="button"
+                  >
+                    <SidebarGlyph name="new" />
+                  </button>
+                </>
+              }
+              actionsLabel={`${project.label} project actions`}
+              key={project.id}
+              label={project.label}
+              leading={<SidebarGlyph name="folder" />}
+              selected={project.selected}
+              status={project.status}
+              statusLabel={project.status ? "Unread project update" : undefined}
+            >
+              {project.tasks.map((task, index) => (
+                <AppSidebarItem
+                  actions={
+                    <button
+                      aria-label={`Task actions for ${project.id}-${index + 1}`}
+                      type="button"
+                    >
+                      <SidebarGlyph name="more" />
+                    </button>
+                  }
+                  actionsLabel={`${project.id} task actions`}
+                  depth={1}
+                  key={task}
+                >
+                  {task}
+                </AppSidebarItem>
+              ))}
+            </AppSidebarProjectGroup>
+          ))
+        ) : (
+          <>
+            <AppSidebarItem
+              actions={
+                <>
+                  <button aria-label="Pin current task" type="button">
+                    <SidebarGlyph name="pin" />
+                  </button>
+                  <button aria-label="Current task actions" type="button">
+                    <SidebarGlyph name="more" />
+                  </button>
+                </>
+              }
+              actionsLabel="Current task actions"
+              leading={<SidebarGlyph name="folder" />}
+              status={
+                hasActiveTurnWork(state) || isTurnActive(state.status)
+                  ? "running"
+                  : "idle"
+              }
+              statusLabel="Current task is running"
+            >
+              codex-ui-kit
+            </AppSidebarItem>
+            <AppSidebarItem
+              actions={
+                <button aria-label="Pinned task actions" type="button">
+                  <SidebarGlyph name="more" />
+                </button>
+              }
+              actionsLabel="Pinned task actions"
+              depth={1}
+              leading={<SidebarGlyph name="thread" />}
+              onClick={() => selectScenario("mcp-tool-call")}
+              status="unread"
+              statusLabel="Unread update"
+            >
+              MCP tool validation
+            </AppSidebarItem>
+          </>
+        )}
       </AppSidebarSection>
       <AppSidebarSection
         actions={
@@ -1767,6 +1885,7 @@ export function App() {
             leading={<SidebarGlyph name="thread" />}
             onClick={() => selectScenario(item.id)}
             selected={
+              !currentSidebarFrame &&
               view === "conversation" &&
               mode === "replay" &&
               scenarioId === item.id
@@ -3138,6 +3257,15 @@ export function App() {
   );
   const pullRequestIndex = (
     <section aria-label="Pull requests" className="demo-pr-index">
+      <button
+        aria-expanded={sidebarOpen}
+        aria-label={sidebarOpen ? "Hide sidebar" : "Show sidebar"}
+        className="demo-pr-sidebar-toggle"
+        onClick={() => setSidebarOpen((open) => !open)}
+        type="button"
+      >
+        <SidebarGlyph name="sidebar" />
+      </button>
       <header>
         <div role="tablist" aria-label="Pull request filters">
           <button aria-selected="true" role="tab" type="button">

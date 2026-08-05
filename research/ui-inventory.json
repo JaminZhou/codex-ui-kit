@@ -530,11 +530,12 @@
         "cdp-26.721:main-shell-landmarks-and-interactive-density",
         "cdp-26.721:navigation-resizer-16px-pointer-track-240-to-520",
         "cdp-26.721.81911:main-renderer-sidebar-274-titlebar-46-header-70-footer-46-960-panel-autocollapse-720-sidebar-autocollapse-719-edge-preview-and-explicit-pin",
-        "cdp-26.727.40816:main-renderer-sidebar-274.11-titlebar-46-responsive-hide-at-720"
+        "cdp-26.727.40816:main-renderer-sidebar-274.11-titlebar-46-responsive-hide-at-720",
+        "cdp-26.730.61309:main-renderer-sidebar-274-titlebar-46-scroll-footer-resizer-exact-720-collapse-explicit-pin-and-no-edge-preview"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "partial_legacy",
-      "electronStatus": "partial_legacy",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
       "priority": "p0"
     },
     {
@@ -548,11 +549,12 @@
         "cdp:pull-requests-sites-scheduled-plugins-routes",
         "cdp-26.721:main-shell-landmarks-and-interactive-density",
         "cdp-26.721.81911:codex-search-new-task-primary-route-stack",
-        "cdp-26.727.40816:new-chat-pull-requests-sites-scheduled-plugins-primary-stack"
+        "cdp-26.727.40816:new-chat-pull-requests-sites-scheduled-plugins-primary-stack",
+        "cdp-26.730.61309:codex-search-activity-new-chat-quick-chat-and-primary-route-stack"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "partial_legacy",
-      "electronStatus": "partial_legacy",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
       "priority": "p0"
     },
     {
@@ -563,11 +565,12 @@
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
         "cdp-26.721.81911:projects-collapsible-section-long-name-and-nested-task",
-        "cdp-26.727.40816:pinned-expanded-projects-collapsed-project-navigation"
+        "cdp-26.727.40816:pinned-expanded-projects-collapsed-project-navigation",
+        "cdp-26.730.61309:five-project-groups-expansion-selection-and-nested-tasks"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "partial_legacy",
-      "electronStatus": "partial_legacy",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
       "priority": "p0"
     },
     {
@@ -578,11 +581,12 @@
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
         "cdp-26.721.81911:recents-dense-scroll-history-running-queued-unread-error",
-        "cdp-26.727.40816:recents-expanded-dense-history"
+        "cdp-26.727.40816:recents-expanded-dense-history",
+        "cdp-26.730.61309:pinned-and-recents-dense-scroll-history"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "partial_legacy",
-      "electronStatus": "partial_legacy",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
       "priority": "p0"
     },
     {
@@ -593,11 +597,12 @@
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
         "cdp-26.721.81911:hover-focus-actions-and-sibling-status-indicators",
-        "cdp-26.727.40816:project-pin-archive-actions-and-status-indicators"
+        "cdp-26.727.40816:project-pin-archive-actions-and-status-indicators",
+        "cdp-26.730.61309:five-project-action-controls-five-new-chat-controls-and-two-status-markers"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "partial_legacy",
-      "electronStatus": "partial_legacy",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
       "priority": "p0"
     },
     {
@@ -608,11 +613,12 @@
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
         "cdp-26.721.81911:fixed-footer-account-avatar-settings-and-bottom-scroll-padding",
-        "cdp-26.727.40816:fixed-profile-help-footer"
+        "cdp-26.727.40816:fixed-profile-help-footer",
+        "cdp-26.730.61309:fixed-46px-footer-and-54px-scroll-padding"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "partial_legacy",
-      "electronStatus": "partial_legacy",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
       "priority": "p0"
     },
     {

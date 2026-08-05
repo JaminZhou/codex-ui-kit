@@ -51,23 +51,21 @@ describe("application shell visual contract", () => {
     );
   });
 
-  it("keeps current-build narrow preview distinct from modal fallback", () => {
+  it("keeps current-build narrow pinning distinct from modal fallback", () => {
     expect(styles).toContain(
       '.codex-ui-app-shell[data-narrow-sidebar-behavior="current-build"][data-sidebar-pinned]',
     );
     expect(styles).toMatch(
       /\[data-narrow-sidebar-behavior="current-build"\]\[data-sidebar-pinned\][\s\S]*?grid-template-columns:[\s\S]*?calc\(100% - 3rem\)[\s\S]*?minmax\(3rem, 1fr\);/,
     );
-    expect(styles).toContain(
-      '.codex-ui-app-shell[data-narrow-sidebar-behavior="current-build"][data-sidebar-preview-open]:not([data-sidebar-open])',
-    );
+    expect(styles).not.toContain("data-sidebar-preview-open");
     expect(styles).toMatch(
       /@container codex-ui-app-shell \(max-width: 45rem\) \{[\s\S]*?\.codex-ui-app-shell:dir\(rtl\) \.codex-ui-app-shell__sidebar \{[\s\S]*?transform: translateX\(100%\);[\s\S]*?\.codex-ui-app-shell\[data-sidebar-open\] \.codex-ui-app-shell__sidebar \{[\s\S]*?transform: translateX\(0\);/,
     );
     expect(component).toContain(
       'export type AppShellNarrowSidebarBehavior = "current-build" | "modal"',
     );
-    expect(component).toContain("inlineStartDistance <= 12");
+    expect(component).not.toContain("inlineStartDistance <= 12");
   });
 
   it("keeps panel tabs, content, and focus semantics explicit", () => {
@@ -156,6 +154,12 @@ describe("application shell visual contract", () => {
     );
     expect(component).toContain(
       "hidden={canCollapse && !isExpanded}",
+    );
+    expect(component).toContain(
+      "export function AppSidebarProjectGroup",
+    );
+    expect(styles).toContain(
+      ".codex-ui-app-sidebar__project-group",
     );
   });
 
