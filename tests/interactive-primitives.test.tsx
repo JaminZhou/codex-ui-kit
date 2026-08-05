@@ -237,6 +237,25 @@ describe("menus and selects", () => {
     );
   });
 
+  it("can retain trigger focus when a menu opens without initial focus", async () => {
+    render(
+      <Menu
+        initialFocus="none"
+        trigger={<button type="button">Choose environment</button>}
+      >
+        <MenuItem>Work without environment</MenuItem>
+      </Menu>,
+    );
+
+    const trigger = screen.getByRole("button", {
+      name: "Choose environment",
+    });
+    trigger.focus();
+    fireEvent.click(trigger);
+    await waitFor(() => expect(screen.getByRole("menu")).toBeTruthy());
+    expect(document.activeElement).toBe(trigger);
+  });
+
   it("keeps text editing in the input while retaining menu arrow navigation", async () => {
     render(
       <Menu defaultOpen trigger={<button type="button">Branches</button>}>

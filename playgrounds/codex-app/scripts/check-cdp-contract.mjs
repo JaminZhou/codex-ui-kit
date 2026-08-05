@@ -34,7 +34,13 @@ for (const scene of visualScenes) {
           ".demo-workspace-start .codex-ui-new-conversation-start__header h3",
         );
         const prompt = document.querySelector(
-          ".demo-workspace-start .codex-ui-new-conversation-start__prompt > button",
+          ".demo-workspace-start .demo-workspace-prompts > button",
+        );
+        const prompts = Array.from(
+          document.querySelectorAll(
+            ".demo-workspace-start .demo-workspace-prompts > button",
+          ),
+          (button) => rect(button),
         );
         const context = document.querySelector(
           ".demo-workspace-start .codex-ui-conversation-context-bar",
@@ -60,6 +66,18 @@ for (const scene of visualScenes) {
         );
         const environmentButtons = Array.from(
           environmentMenu?.querySelectorAll(".codex-ui-menu-item") ?? [],
+          (button) => ({
+            disabled: button.disabled,
+            role: button.getAttribute("role"),
+          }),
+        );
+        const worktreeEnvironmentMenu = document.querySelector(
+          ".demo-workspace-worktree-environment-menu[role=\"menu\"]",
+        );
+        const worktreeEnvironmentButtons = Array.from(
+          worktreeEnvironmentMenu?.querySelectorAll(
+            ".codex-ui-menu-item",
+          ) ?? [],
           (button) => ({
             disabled: button.disabled,
             role: button.getAttribute("role"),
@@ -129,12 +147,23 @@ for (const scene of visualScenes) {
               }
             : null,
           prompt: rect(prompt),
+          prompts,
           start: rect(start),
           view: root?.getAttribute("data-view"),
           worktree: worktreeMenu
             ? {
                 buttons: worktreeButtons,
                 rect: rect(worktreeMenu),
+              }
+            : null,
+          worktreeEnvironment: worktreeEnvironmentMenu
+            ? {
+                buttons: worktreeEnvironmentButtons,
+                emptyText:
+                  worktreeEnvironmentMenu.querySelector(
+                    ".demo-workspace-context-menu__empty",
+                  )?.textContent ?? null,
+                rect: rect(worktreeEnvironmentMenu),
               }
             : null,
         };
@@ -145,6 +174,22 @@ for (const scene of visualScenes) {
       const localEnvironmentExpected =
         scene.frame === "workspace-environment";
       const worktreeExpected = scene.frame === "workspace-worktree-menu";
+      const worktreeEnvironmentExpected =
+        scene.frame === "workspace-environment-picker";
+      const noProjectExpected = scene.frame === "workspace-no-project";
+      const newWorktreeExpected =
+        scene.frame === "workspace-new-worktree" ||
+        worktreeEnvironmentExpected;
+      const compactExpected = scene.frame === "workspace-compact-ready";
+      const expectedContextButtonCount = noProjectExpected
+        ? 1
+        : newWorktreeExpected
+          ? 4
+          : 3;
+      const expectedComposerWidth = compactExpected ? 688 : 736;
+      const expectedComposerLeft = compactExpected ? 16 : 358;
+      const expectedComposerBottom = compactExpected ? 664 : 804;
+      const expectedHeadingTop = compactExpected ? 299 : 363;
       const repairingExpected = scene.frame === "workspace-repairing";
       const worktreeTrigger = contract.contextButtons.find(
         ({ kind }) => kind === "worktree",
@@ -157,16 +202,20 @@ for (const scene of visualScenes) {
         !contract.composer ||
         !contract.context ||
         !contract.heading ||
-        !contract.prompt ||
-        contract.contextButtons.length !== 3 ||
-        Math.abs(contract.composer.width - 736) > 1 ||
+        contract.contextButtons.length !== expectedContextButtonCount ||
+        Math.abs(contract.composer.width - expectedComposerWidth) > 1 ||
         Math.abs(contract.composer.height - 98) > 1 ||
-        Math.abs(contract.composer.left - 358) > 1 ||
-        Math.abs(contract.composer.bottom - 804) > 1 ||
-        Math.abs(contract.heading.top - 363) > 1 ||
+        Math.abs(contract.composer.left - expectedComposerLeft) > 1 ||
+        Math.abs(contract.composer.bottom - expectedComposerBottom) > 1 ||
+        Math.abs(contract.heading.top - expectedHeadingTop) > 1 ||
         Math.abs(contract.heading.height - 33.6) > 1 ||
-        Math.abs(contract.prompt.width - 654) > 1 ||
-        Math.abs(contract.prompt.height - 40) > 1 ||
+        contract.prompts.length !== (noProjectExpected ? 0 : 2) ||
+        contract.prompts.some(
+          (value) =>
+            !value ||
+            Math.abs(value.width - (compactExpected ? 606 : 654)) > 1 ||
+            Math.abs(value.height - 40) > 1,
+        ) ||
         contract.contextButtons.some(
           ({ rect: value }) => !value || Math.abs(value.height - 28) > 1,
         ) ||
@@ -175,6 +224,8 @@ for (const scene of visualScenes) {
         Boolean(contract.localEnvironment) !==
           localEnvironmentExpected ||
         Boolean(contract.worktree) !== worktreeExpected ||
+        Boolean(contract.worktreeEnvironment) !==
+          worktreeEnvironmentExpected ||
         Boolean(worktreeTrigger?.disabled) !== repairingExpected
       ) {
         throw new Error(
@@ -187,7 +238,7 @@ for (const scene of visualScenes) {
           Math.abs(contract.project.rect.width - 260) > 1 ||
           Math.abs(contract.project.rect.height - 250) > 1 ||
           Math.abs(contract.project.listbox.width - 252) > 1 ||
-          contract.project.optionCount !== 5 ||
+          contract.project.optionCount !== 14 ||
           contract.project.selectedCount !== 1 ||
           contract.activeElement !== "Search projects" ||
           contract.contextButtons[0]?.expanded !== "true" ||
@@ -229,14 +280,27 @@ for (const scene of visualScenes) {
         );
       }
       if (
+        worktreeEnvironmentExpected &&
+        (!contract.worktreeEnvironment ||
+          Math.abs(contract.worktreeEnvironment.rect.width - 264) > 1 ||
+          Math.abs(contract.worktreeEnvironment.rect.height - 126) > 1 ||
+          contract.worktreeEnvironment.buttons.length !== 2 ||
+          contract.worktreeEnvironment.emptyText?.trim() !==
+            "No environments found")
+      ) {
+        throw new Error(
+          `${scene.id}: workspace environment picker failed: ${JSON.stringify(contract)}`,
+        );
+      }
+      if (
         worktreeExpected &&
         (!contract.worktree ||
           Math.abs(contract.worktree.rect.width - 296) > 1 ||
           Math.abs(contract.worktree.rect.height - 280) > 1 ||
-          contract.worktree.buttons.length !== 3 ||
+          contract.worktree.buttons.length !== 8 ||
           contract.worktree.buttons.filter(
             ({ role }) => role === "menuitemradio",
-          ).length !== 2 ||
+          ).length !== 7 ||
           contract.worktree.buttons.filter(
             ({ checked }) => checked === "true",
           ).length !== 1 ||
@@ -4062,14 +4126,14 @@ try {
       width: 820,
     },
     {
-      composerLeft: 56,
-      composerWidth: 648,
+      composerLeft: 16,
+      composerWidth: 688,
       height: 680,
       layoutMode: "narrow",
       mainLeft: 0,
       mainWidth: 720,
-      rootLeft: 40,
-      rootWidth: 680,
+      rootLeft: 0,
+      rootWidth: 720,
       sidebarOpen: false,
       width: 720,
     },
@@ -4152,7 +4216,7 @@ try {
         layoutMode: shell?.getAttribute("data-layout-mode"),
         main: rect(".codex-ui-app-shell__main"),
         prompt: rect(
-          ".demo-workspace-start .codex-ui-new-conversation-start__prompt > button",
+          ".demo-workspace-start .demo-workspace-prompts > button",
         ),
         root: rect(".demo-workspace-start"),
         sidebarOpen: shell?.hasAttribute("data-sidebar-open"),
@@ -4187,7 +4251,12 @@ try {
       !near(state.context.left, expected.composerLeft) ||
       !near(state.context.width, expected.composerWidth) ||
       !near(state.context.height, 28) ||
-      !near(state.heading.top, expected.height / 2 - 47) ||
+      !near(
+        state.heading.top,
+        expected.width === 720
+          ? expected.height / 2 - 41
+          : expected.height / 2 - 47,
+      ) ||
       !near(state.heading.height, 33.6) ||
       !near(state.prompt.width, expected.rootWidth - 114) ||
       !near(state.prompt.height, 40)

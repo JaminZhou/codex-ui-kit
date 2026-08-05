@@ -779,10 +779,13 @@ interface MenuContextValue {
 const MenuContext = createContext<MenuContextValue | null>(null);
 
 export interface MenuProps
-  extends Omit<PopoverProps, "initialFocus" | "role"> {}
+  extends Omit<PopoverProps, "initialFocus" | "role"> {
+  initialFocus?: PopoverProps["initialFocus"];
+}
 
 export function Menu({
   defaultOpen = false,
+  initialFocus = "first",
   onOpenChange,
   open,
   width = "menu",
@@ -800,7 +803,7 @@ export function Menu({
         className={["codex-ui-menu", props.className]
           .filter(Boolean)
           .join(" ")}
-        initialFocus="first"
+        initialFocus={initialFocus}
         onOpenChange={setOpen}
         open={resolvedOpen}
         role="menu"

@@ -1889,10 +1889,10 @@ try {
       width: 820,
     },
     {
-      composerWidth: 648,
+      composerWidth: 688,
       height: 680,
       layoutMode: "narrow",
-      rootWidth: 680,
+      rootWidth: 720,
       sidebarOpen: false,
       width: 720,
     },
@@ -2034,7 +2034,7 @@ try {
   await projectTrigger.click();
   await projectTrigger.focus();
   await codingWorkspacePage
-    .getByRole("textbox", { name: "Workspace message composer" })
+    .getByRole("textbox", { name: "Do anything" })
     .focus();
   await projectDialog.waitFor({ state: "hidden" });
   await projectTrigger.click();
@@ -2044,13 +2044,13 @@ try {
     })
     .click();
   await codingWorkspacePage.waitForSelector(
-    'button[aria-label="Change project: No project"]',
+    'button[aria-label="Choose project"]',
   );
   await codingWorkspacePage.waitForTimeout(50);
   if (
     (await codingWorkspacePage.evaluate(
       () => document.activeElement?.getAttribute("aria-label"),
-    )) !== "Change project: No project"
+    )) !== "Choose project"
   ) {
     throw new Error(
       "Electron coding workspace did not restore project-trigger focus after clearing the project.",
@@ -2058,16 +2058,22 @@ try {
   }
   const noProjectDestination = (
     await codingWorkspacePage
-      .locator(".demo-workspace-destination")
+      .locator(
+        ".demo-workspace-start .codex-ui-new-conversation-start__header h3",
+      )
       .textContent()
   )?.trim();
-  if (noProjectDestination !== "No project?") {
+  if (
+    noProjectDestination !== "What should we build?" ||
+    (await codingWorkspacePage.locator(".demo-workspace-prompts").count()) !==
+      0
+  ) {
     throw new Error(
       `Electron coding workspace did not enter the no-project state: ${JSON.stringify(noProjectDestination)}.`,
     );
   }
   await codingWorkspacePage
-    .getByRole("button", { name: "Change project: No project" })
+    .getByRole("button", { name: "Choose project" })
     .click();
   await codingWorkspacePage.waitForTimeout(50);
   await projectSearch.fill("app-server");
@@ -2082,7 +2088,7 @@ try {
   await codingWorkspacePage.waitForTimeout(50);
 
   await codingWorkspacePage
-    .getByRole("button", { name: "Change environment: Local" })
+    .getByRole("button", { name: "Change run location: Local" })
     .press("ArrowDown");
   await codingWorkspacePage.waitForTimeout(50);
   const environmentMenu = codingWorkspacePage.getByRole("menu", {
@@ -2105,7 +2111,92 @@ try {
   await environmentMenu
     .getByRole("menuitemradio", { name: "New worktree" })
     .click();
+  await codingWorkspacePage.waitForSelector(
+    '.demo-root[data-frame="workspace-new-worktree"]',
+  );
+  const newWorktreeState = await codingWorkspacePage.evaluate(() => ({
+    contextLabels: Array.from(
+      document.querySelectorAll(
+        ".demo-workspace-start .codex-ui-conversation-context-bar button",
+      ),
+      (button) => button.getAttribute("aria-label"),
+    ),
+    contextKinds: Array.from(
+      document.querySelectorAll(
+        ".demo-workspace-start .codex-ui-conversation-context-bar button",
+      ),
+      (button) => button.getAttribute("data-kind"),
+    ),
+  }));
+  if (
+    JSON.stringify(newWorktreeState.contextKinds) !==
+      JSON.stringify([
+        "project",
+        "run-location",
+        "environment",
+        "starting-state",
+      ]) ||
+    !newWorktreeState.contextLabels.includes(
+      "Change environment: No environment",
+    ) ||
+    !newWorktreeState.contextLabels.includes("Starting state: main")
+  ) {
+    throw new Error(
+      `Electron coding workspace did not enter the current New worktree state: ${JSON.stringify(newWorktreeState)}.`,
+    );
+  }
+  await codingWorkspacePage
+    .getByRole("button", { name: "Change environment: No environment" })
+    .click();
+  const worktreeEnvironmentMenu = codingWorkspacePage.getByRole("menu", {
+    name: "Environment",
+  });
+  await worktreeEnvironmentMenu.waitFor();
+  const worktreeEnvironmentState = {
+    empty: (
+      await worktreeEnvironmentMenu
+        .locator(".demo-workspace-context-menu__empty")
+        .textContent()
+    )?.trim(),
+    items: await worktreeEnvironmentMenu.getByRole("menuitem").allTextContents(),
+  };
+  if (
+    worktreeEnvironmentState.empty !== "No environments found" ||
+    JSON.stringify(worktreeEnvironmentState.items.map((item) => item.trim())) !==
+      JSON.stringify([
+        "Work without environment✓",
+        "Environment settings↗",
+      ])
+  ) {
+    throw new Error(
+      `Electron coding workspace environment picker is invalid: ${JSON.stringify(worktreeEnvironmentState)}.`,
+    );
+  }
+  await codingWorkspacePage.keyboard.press("Escape");
+  await worktreeEnvironmentMenu.waitFor({ state: "hidden" });
   await codingWorkspacePage.waitForTimeout(50);
+  if (
+    (await codingWorkspacePage.evaluate(
+      () => document.activeElement?.getAttribute("aria-label"),
+    )) !== "Change environment: No environment"
+  ) {
+    throw new Error(
+      "Electron coding workspace environment picker did not restore trigger focus.",
+    );
+  }
+  await codingWorkspacePage
+    .getByRole("button", { name: "Change run location: New worktree" })
+    .click();
+  await environmentMenu
+    .getByRole("menuitemradio", { name: "Work locally" })
+    .click();
+  await codingWorkspacePage.waitForSelector(
+    'button[aria-label="Change run location: Local"]',
+  );
+  await codingWorkspacePage.waitForSelector(
+    'button[aria-label="Change worktree: main"]',
+  );
+
   const localEnvironmentDialog = codingWorkspacePage.getByRole("dialog", {
     name: "Select local environment",
   });
@@ -2114,75 +2205,6 @@ try {
     {
       name: "Search local environments",
     },
-  );
-  await codingWorkspacePage.waitForFunction(
-    () =>
-      document.activeElement?.getAttribute("aria-label") ===
-      "Search local environments",
-  );
-  const repairing = localEnvironmentDialog.getByRole("button", {
-    name: "Use local environment Repairing worktree",
-  });
-  if (!(await repairing.isDisabled())) {
-    throw new Error(
-      "Electron coding workspace exposed a repairing environment as selectable.",
-    );
-  }
-  await localEnvironmentSearch.press("Escape");
-  await localEnvironmentDialog.waitFor({ state: "hidden" });
-  await codingWorkspacePage.waitForTimeout(50);
-  const canceledWorktreeState = await codingWorkspacePage.evaluate(() => ({
-    activeLabel: document.activeElement?.getAttribute("aria-label"),
-    environmentLabel: document
-      .querySelector('[data-kind="environment"]')
-      ?.getAttribute("aria-label"),
-  }));
-  if (
-    canceledWorktreeState.activeLabel !== "Change environment: Local" ||
-    canceledWorktreeState.environmentLabel !== "Change environment: Local"
-  ) {
-    throw new Error(
-      `Electron coding workspace did not preserve and refocus the local environment after canceling New worktree: ${JSON.stringify(canceledWorktreeState)}.`,
-    );
-  }
-  await codingWorkspacePage
-    .getByRole("button", { name: "Change environment: Local" })
-    .press("ArrowDown");
-  await environmentMenu
-    .getByRole("menuitemradio", { name: "New worktree" })
-    .click();
-  await codingWorkspacePage.waitForFunction(
-    () =>
-      document.activeElement?.getAttribute("aria-label") ===
-      "Search local environments",
-  );
-  await localEnvironmentSearch.fill("coding");
-  await localEnvironmentDialog
-    .getByRole("button", {
-      name: "Use local environment Coding workspace",
-    })
-    .click();
-  await codingWorkspacePage.waitForSelector(
-    'button[aria-label="Change environment: Local"]',
-  );
-  await codingWorkspacePage.waitForSelector(
-    'button[aria-label="Change worktree: feat/coding-workspace-lifecycle"]',
-  );
-
-  await codingWorkspacePage
-    .getByRole("button", { name: "Change project: codex-ui-kit" })
-    .click();
-  await projectSearch.fill("app-server");
-  await projectDialog
-    .getByRole("option", {
-      name: "Select project codex-app-server-client",
-    })
-    .click();
-  await codingWorkspacePage.waitForSelector(
-    'button[aria-label="Change environment: Local"]',
-  );
-  await codingWorkspacePage.waitForSelector(
-    'button[aria-label="Change worktree: main"]',
   );
 
   await codingWorkspacePage
@@ -2226,6 +2248,14 @@ try {
       document.activeElement?.getAttribute("aria-label") ===
       "Search local environments",
   );
+  const repairing = localEnvironmentDialog.getByRole("button", {
+    name: "Use local environment Repairing worktree",
+  });
+  if (!(await repairing.isDisabled())) {
+    throw new Error(
+      "Electron coding workspace exposed a repairing environment as selectable.",
+    );
+  }
   await localEnvironmentSearch.press("Escape");
   await localEnvironmentDialog.waitFor({ state: "hidden" });
   await codingWorkspacePage.waitForTimeout(50);
@@ -2253,12 +2283,16 @@ try {
     .getByRole("button", { name: "Create worktree" })
     .click();
   await codingWorkspacePage.waitForSelector(
-    'button[aria-label="Change environment: New worktree"]',
+    'button[aria-label="Change run location: New worktree"]',
   );
   await codingWorkspacePage
-    .getByRole("button", {
-      name: "Change worktree: main",
-    })
+    .getByRole("button", { name: "Change run location: New worktree" })
+    .click();
+  await environmentMenu
+    .getByRole("menuitemradio", { name: "Work locally" })
+    .click();
+  await codingWorkspacePage
+    .getByRole("button", { name: "Change worktree: main" })
     .click();
   await codingWorkspacePage.waitForTimeout(50);
   await branchSearch.press("m");
@@ -2297,11 +2331,11 @@ try {
     'button[aria-label="Change worktree: main"]',
   );
   await codingWorkspacePage.waitForSelector(
-    'button[aria-label="Change environment: Local"]',
+    'button[aria-label="Change run location: Local"]',
   );
 
   const workspaceComposer = codingWorkspacePage.getByRole("textbox", {
-    name: "Workspace message composer",
+    name: "Do anything",
   });
   await workspaceComposer.fill(
     "Run the protocol-backed coding workspace lifecycle.",
@@ -2420,14 +2454,14 @@ const {
 } = await launchScene(cloudWorkspaceScene, { capture: false });
 try {
   await cloudWorkspacePage
-    .getByRole("button", { name: "Change environment: Local" })
+    .getByRole("button", { name: "Change run location: Local" })
     .click();
   await cloudWorkspacePage
     .getByRole("menu", { name: "Start in" })
     .getByRole("menuitemradio", { name: "Connect Codex web" })
     .click();
   await cloudWorkspacePage.waitForSelector(
-    'button[aria-label="Change environment: Codex web"]',
+    'button[aria-label="Change run location: Codex web"]',
   );
   await cloudWorkspacePage
     .getByRole("button", { name: "Change worktree: main" })
@@ -2435,14 +2469,14 @@ try {
   await cloudWorkspacePage
     .getByRole("menu", { name: "Branches" })
     .getByRole("menuitemradio", {
-      name: "feat/coding-workspace-lifecycle",
+      name: "feat/current-workspace-entry-refresh",
     })
     .click();
   await cloudWorkspacePage
-    .getByRole("textbox", { name: "Workspace message composer" })
+    .getByRole("textbox", { name: "Do anything" })
     .fill("Run the cloud worktree lifecycle.");
   await cloudWorkspacePage
-    .getByRole("textbox", { name: "Workspace message composer" })
+    .getByRole("textbox", { name: "Do anything" })
     .press("Enter");
   await cloudWorkspacePage.waitForSelector(
     '.demo-root[data-view="conversation"][data-scenario="workspace-workflow"][data-frame="approval-pending"]',
@@ -2458,7 +2492,7 @@ try {
     cloudWorkspaceCommandCwds.some(
       (cwd) =>
         cwd !==
-        "cwd\n/cloud/codex-ui-kit/.worktrees/feat-coding-workspace-lifecycle",
+        "cwd\n/cloud/codex-ui-kit/.worktrees/feat-current-workspace-entry-refresh",
     )
   ) {
     throw new Error(

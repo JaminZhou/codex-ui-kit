@@ -23,11 +23,12 @@
       "packageEvidence": ["local-conversation-page", "remote-conversation-page", "chatgpt-conversation-page"],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
-        "cdp-26.721:new-chat-chatgpt-destination-and-worktree-prompt"
+        "cdp-26.721:new-chat-chatgpt-destination-and-worktree-prompt",
+        "cdp-26.730.61309:project-and-no-project-destination-current-build"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "partial_legacy",
-      "electronStatus": "partial_legacy",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
       "priority": "p0"
     },
     {
@@ -40,11 +41,12 @@
         "cdp-26.721:new-chat-project-local-main-context-controls",
         "cdp-26.721:local-environment-dialog-600x600-scrollable-group-structure",
         "cdp-26.721.81911:new-chat-context-bar-736x28-project-local-main",
-        "cdp-26.727.40816:new-chat-project-local-branch-context-controls-1180x820"
+        "cdp-26.727.40816:new-chat-project-local-branch-context-controls-1180x820",
+        "cdp-26.730.61309:local-and-new-worktree-four-part-context-controls-wide-and-720"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "partial_legacy",
-      "electronStatus": "partial_legacy",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
       "priority": "p0"
     },
     {
@@ -56,11 +58,12 @@
       "runtimeEvidence": [
         "cdp-26.721:new-chat-project-popover-260x250-listbox-14-options",
         "cdp-26.721.81911:new-chat-project-dialog-260x250-listbox-252x142.81-14-options",
-        "cdp-26.727.40816:new-chat-project-dialog-260x249.5-listbox-252x142.81"
+        "cdp-26.727.40816:new-chat-project-dialog-260x249.5-listbox-252x142.81",
+        "cdp-26.730.61309:project-dialog-260x249.5-listbox-252x142.81-14-options"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "partial_legacy",
-      "electronStatus": "partial_legacy",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
       "priority": "p0"
     },
     {
@@ -459,11 +462,12 @@
         "cdp-26.721:new-chat-project-local-main-context-controls",
         "cdp-26.721:new-chat-project-popover-260x250-listbox-14-options",
         "cdp-26.721.81911:project-local-and-main-context-controls",
-        "cdp-26.727.40816:project-local-feat-current-build-pr-refresh-context-row"
+        "cdp-26.727.40816:project-local-feat-current-build-pr-refresh-context-row",
+        "cdp-26.730.61309:new-worktree-no-environment-main-and-environment-empty-menu"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "partial_legacy",
-      "electronStatus": "partial_legacy",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
       "priority": "p0"
     },
     {
@@ -753,11 +757,12 @@
         "cdp-26.721:new-chat-chatgpt-destination-and-worktree-prompt",
         "cdp-26.721:new-chat-project-local-main-context-controls",
         "cdp-26.721.81911:new-chat-1180x820-project-picker-entry",
-        "cdp-26.727.40816:new-chat-project-dialog-and-context-entry-1180x820"
+        "cdp-26.727.40816:new-chat-project-dialog-and-context-entry-1180x820",
+        "cdp-26.730.61309:new-chat-wide-compact-no-project-new-worktree-and-overlay-pixels"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "partial_legacy",
-      "electronStatus": "partial_legacy",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
       "priority": "p0"
     },
     {

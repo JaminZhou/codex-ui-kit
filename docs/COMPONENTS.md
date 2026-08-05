@@ -103,7 +103,7 @@ All privileged behavior remains host-owned. The components never auto-approve co
 - `Dialog` and `DialogChoice`: controlled modal presentation with compact, standard, and wide sizes; focus trapping/restoration; an optional `returnFocusRef` for launchers that unmount before the modal commits; scroll locking; Escape/backdrop dismissal; and descriptive choice rows.
 - `Tooltip`: delayed pointer and immediate keyboard disclosure with shortcut, side, alignment, and collision support.
 - `Popover`: portalled dialog, menu, or listbox positioning with outside dismissal, focus restoration, and viewport collision handling.
-- `Menu`, `MenuItem`, `MenuCheckboxItem`, `MenuSubmenu`, `MenuSectionLabel`, and `MenuSeparator`: keyboard navigation, labelled sections, separators, checked states, nested portals, shortcuts, descriptions, and destructive actions.
+- `Menu`, `MenuItem`, `MenuCheckboxItem`, `MenuSubmenu`, `MenuSectionLabel`, and `MenuSeparator`: keyboard navigation, labelled sections, separators, checked states, nested portals, shortcuts, descriptions, destructive actions, and opt-in `initialFocus="none"` when the host must retain trigger focus.
 - `Select`: controlled listbox selection with descriptions, icons, disabled options, selected state, and empty fallback.
 
 ## Resources and media
@@ -213,9 +213,10 @@ All privileged behavior remains host-owned. The components never auto-approve co
   states.
 - `NewConversationStart`: centered new-chat composition with an independent
   destination, composer, context controls, and optional worktree prompt.
-- `ConversationContextBar`: compact, controlled Project, environment, and
-  worktree buttons with optional listbox/menu/dialog linkage, expansion,
-  status, and disabled semantics.
+- `ConversationContextBar`: compact, controlled project, run-location,
+  environment, starting-state, and worktree buttons with optional
+  listbox/menu/dialog linkage, per-item accessible-label overrides,
+  expansion, status, and disabled semantics.
 - `ConversationProjectListbox`: linked project options with selected/disabled
   states, initial focus, arrow/Home/End navigation, Escape dismissal, and
   outside-pointer dismissal.

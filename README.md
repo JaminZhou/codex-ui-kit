@@ -26,8 +26,9 @@ Codex UI Kit turns those interaction patterns into protocol-neutral React primit
   [`research/UI_INVENTORY.md`](research/UI_INVENTORY.md); current-build
   runtime observation now covers the sampled dark shell/sidebar, route
   continuity, MCP recovery, command lifecycle, manual context compaction, and
-  thread-summary Environment/Git slices, while unsampled surfaces remain
-  explicitly separate.
+  thread-summary Environment/Git slices, plus current selected/no-project and
+  New worktree workspace entry at wide and 720px layouts, while unsampled
+  surfaces remain explicitly separate.
 - The repository is public and the package baseline is `0.1.0`, but the npm package has **not** been published.
 - The API remains pre-1.0 and may change while public documentation and consumer feedback mature.
 - Extracted application files, private IPC, bundled fonts, and OpenAI brand assets are not included.
@@ -47,9 +48,10 @@ review the [coverage policy](research/PARITY.md), or follow the
   current-build window navigation, route lifecycle feedback, portalled global
   notifications, responsive restoration rules, and pointer- and
   keyboard-resizable navigation and bottom-panel tracks.
-- Project index, previous-build new-chat destination/context setup, grouped
-  local environment dialog, protocol-neutral route/worktree selectors, PR
-  list/detail, checks, reviewers, and inline review-thread compositions.
+- Project index, current-build new-chat destination/context setup and
+  New worktree environment-empty flow, grouped host-defined local environment
+  dialog, protocol-neutral route/worktree selectors, PR list/detail, checks,
+  reviewers, and inline review-thread compositions.
 - Command execution with current-build long-output/tail-following evidence,
   structured file diffs, tool calls, approvals, and notices.
 - Composer attachments, mentions, modes, queued prompts, and running states.

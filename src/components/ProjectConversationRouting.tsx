@@ -709,6 +709,8 @@ export function NewConversationStart({
 export type ConversationContextItemKind =
   | "environment"
   | "project"
+  | "run-location"
+  | "starting-state"
   | "worktree";
 
 export type ConversationContextItemStatus =
@@ -718,6 +720,7 @@ export type ConversationContextItemStatus =
   | "unavailable";
 
 export interface ConversationContextItem {
+  ariaLabel?: string;
   controlsId?: string;
   disabled?: boolean;
   icon?: ReactNode;
@@ -805,7 +808,9 @@ export function ConversationContextBar({
                 ? (item.popupRole ?? "dialog")
                 : undefined
             }
-            aria-label={`Change ${item.kind}: ${accessibleValue}`}
+            aria-label={
+              item.ariaLabel ?? `Change ${item.kind}: ${accessibleValue}`
+            }
             className="codex-ui-conversation-context-bar__item"
             data-expanded={expandedId === item.id || undefined}
             data-kind={item.kind}

@@ -814,11 +814,73 @@ const workspaceProjects = [
   },
   {
     icon: <SidebarGlyph name="folder" />,
-    id: "unavailable",
-    label: "archived-workspace",
-    path: "/workspace/archived-workspace",
-    status: "unavailable" as const,
-    statusLabel: "Unavailable",
+    id: "component-lab",
+    label: "component-lab",
+    path: "/workspace/component-lab",
+    status: "available" as const,
+  },
+  {
+    icon: <SidebarGlyph name="folder" />,
+    id: "desktop-client",
+    label: "desktop-client",
+    path: "/workspace/desktop-client",
+    status: "available" as const,
+  },
+  {
+    icon: <SidebarGlyph name="folder" />,
+    id: "design-system",
+    label: "design-system",
+    path: "/workspace/design-system",
+    status: "available" as const,
+  },
+  {
+    icon: <SidebarGlyph name="folder" />,
+    id: "release-tools",
+    label: "release-tools",
+    path: "/workspace/release-tools",
+    status: "available" as const,
+  },
+  {
+    icon: <SidebarGlyph name="folder" />,
+    id: "protocol-kit",
+    label: "protocol-kit",
+    path: "/workspace/protocol-kit",
+    status: "available" as const,
+  },
+  {
+    icon: <SidebarGlyph name="folder" />,
+    id: "test-fixtures",
+    label: "test-fixtures",
+    path: "/workspace/test-fixtures",
+    status: "available" as const,
+  },
+  {
+    icon: <SidebarGlyph name="folder" />,
+    id: "documentation",
+    label: "documentation",
+    path: "/workspace/documentation",
+    status: "available" as const,
+  },
+  {
+    icon: <SidebarGlyph name="folder" />,
+    id: "automation",
+    label: "automation",
+    path: "/workspace/automation",
+    status: "available" as const,
+  },
+  {
+    icon: <SidebarGlyph name="folder" />,
+    id: "sample-app",
+    label: "sample-app",
+    path: "/workspace/sample-app",
+    status: "available" as const,
+  },
+  {
+    icon: <SidebarGlyph name="folder" />,
+    id: "shared-utils",
+    label: "shared-utils",
+    path: "/workspace/shared-utils",
+    status: "available" as const,
   },
 ];
 
@@ -858,14 +920,82 @@ const workspaceEnvironmentGroups = [
   },
 ];
 
+type WorkspaceBranch = {
+  branch: string;
+  id: string;
+  label: string;
+  meta?: string;
+  status: "available" | "repairing";
+  statusLabel?: string;
+};
+
+const workspaceBranches: WorkspaceBranch[] = [
+  {
+    branch: "main",
+    id: "main",
+    label: "Main",
+    meta: "clean",
+    status: "available" as const,
+  },
+  {
+    branch: "feat/current-workspace-entry-refresh",
+    id: "feature",
+    label: "Workspace entry refresh",
+    meta: "ready",
+    status: "available" as const,
+  },
+  {
+    branch: "fix/context-layout",
+    id: "context-layout",
+    label: "Context layout",
+    meta: "ready",
+    status: "available" as const,
+  },
+  {
+    branch: "docs/parity-notes",
+    id: "parity-notes",
+    label: "Parity notes",
+    meta: "clean",
+    status: "available" as const,
+  },
+  {
+    branch: "test/electron-workspace",
+    id: "electron-workspace",
+    label: "Electron workspace",
+    meta: "clean",
+    status: "available" as const,
+  },
+  {
+    branch: "refactor/context-controls",
+    id: "context-controls",
+    label: "Context controls",
+    meta: "clean",
+    status: "available" as const,
+  },
+  {
+    branch: "chore/current-baseline",
+    id: "current-baseline",
+    label: "Current baseline",
+    meta: "clean",
+    status: "available" as const,
+  },
+  {
+    branch: "fix/repair",
+    id: "repairing",
+    label: "Repairing worktree",
+    status: "repairing",
+    statusLabel: "Repairing",
+  },
+];
+
 const workspaceWorktreesByProject: Record<
   string,
-  (typeof workspaceEnvironmentGroups)[number]["items"]
+  typeof workspaceBranches
 > = {
-  "app-server-client": [workspaceEnvironmentGroups[0].items[0]],
-  "codex-ui-kit": workspaceEnvironmentGroups[0].items,
-  "desktop-shell": [workspaceEnvironmentGroups[0].items[0]],
-  tooling: [workspaceEnvironmentGroups[0].items[0]],
+  "app-server-client": [workspaceBranches[0]],
+  "codex-ui-kit": workspaceBranches,
+  "desktop-shell": [workspaceBranches[0]],
+  tooling: [workspaceBranches[0]],
 };
 
 const currentSidebarProjects = [
@@ -921,14 +1051,27 @@ export function App() {
   const [view, setView] = useState<DemoView>(initialSelection.view);
   const [workspaceProjectId, setWorkspaceProjectId] = useState<
     string | null
-  >("codex-ui-kit");
+  >(
+    initialSelection.view === "workspace" &&
+      initialSelection.frame === "workspace-no-project"
+      ? null
+      : "codex-ui-kit",
+  );
   const [workspaceEnvironmentId, setWorkspaceEnvironmentId] =
-    useState("local");
+    useState(
+      initialSelection.view === "workspace" &&
+        (initialSelection.frame === "workspace-new-worktree" ||
+          initialSelection.frame === "workspace-environment-picker")
+        ? "worktree"
+        : "local",
+    );
   const [workspaceWorktreeId, setWorkspaceWorktreeId] = useState(
     initialSelection.view === "workspace" &&
       initialSelection.frame === "workspace-repairing"
       ? "repairing"
-      : "main",
+      : initialSelection.view === "workspace" && initialSelection.capture
+        ? "feature"
+        : "main",
   );
   const [workspaceLocalEnvironmentOpen, setWorkspaceLocalEnvironmentOpen] =
     useState(
@@ -936,7 +1079,11 @@ export function App() {
         initialSelection.frame === "workspace-environment",
     );
   const [workspaceOverlay, setWorkspaceOverlay] = useState<
-    "environment" | "project" | "worktree" | null
+    | "environment"
+    | "project"
+    | "worktree"
+    | "worktree-environment"
+    | null
   >(
     initialSelection.view === "workspace" &&
       initialSelection.frame === "workspace-project-menu"
@@ -947,7 +1094,10 @@ export function App() {
         : initialSelection.view === "workspace" &&
             initialSelection.frame === "workspace-worktree-menu"
           ? "worktree"
-        : null,
+          : initialSelection.view === "workspace" &&
+              initialSelection.frame === "workspace-environment-picker"
+            ? "worktree-environment"
+            : null,
   );
   const [workspaceBranchQuery, setWorkspaceBranchQuery] = useState("");
   const [workspaceEnvironmentQuery, setWorkspaceEnvironmentQuery] =
@@ -1022,7 +1172,8 @@ export function App() {
   const [sidebarOpen, setSidebarOpen] = useState(
     () =>
       (initialSelection.capture &&
-        initialSelection.frame !== "pr-compact-detail") ||
+        initialSelection.frame !== "pr-compact-detail" &&
+        initialSelection.frame !== "workspace-compact-ready") ||
       !isNarrowDemoWindow(),
   );
   const [reviewOpen, setReviewOpen] = useState(
@@ -2713,7 +2864,7 @@ export function App() {
   const workspaceWorktrees =
     (workspaceProjectId
       ? workspaceWorktreesByProject[workspaceProjectId]
-      : undefined) ?? [workspaceEnvironmentGroups[0].items[0]];
+      : undefined) ?? [workspaceBranches[0]];
   const workspaceWorktree =
     workspaceWorktrees.find(
       ({ id }) => id === workspaceWorktreeId,
@@ -2737,13 +2888,43 @@ export function App() {
           .toLocaleLowerCase()
           .includes(workspaceBranchQuery.trim().toLocaleLowerCase()),
     );
+  const workspaceBaseFrame =
+    initialSelection.frame === "workspace-compact-ready"
+      ? "workspace-compact-ready"
+      : workspaceProjectId === null
+        ? "workspace-no-project"
+        : workspaceEnvironmentId === "worktree"
+          ? "workspace-new-worktree"
+          : workspaceWorktree.status === "repairing"
+            ? "workspace-repairing"
+            : "workspace-ready";
   useEffect(() => {
     if (view === "workspace" && workspaceLocalEnvironmentOpen) {
       setActiveFrame("workspace-environment");
     }
   }, [view, workspaceLocalEnvironmentOpen]);
+  useEffect(() => {
+    if (
+      view !== "workspace" ||
+      workspaceLocalEnvironmentOpen ||
+      workspaceOverlay
+    ) {
+      return;
+    }
+    setActiveFrame(workspaceBaseFrame);
+  }, [
+    view,
+    workspaceBaseFrame,
+    workspaceLocalEnvironmentOpen,
+    workspaceOverlay,
+  ]);
   const setWorkspaceOverlayState = (
-    overlay: "environment" | "project" | "worktree" | null,
+    overlay:
+      | "environment"
+      | "project"
+      | "worktree"
+      | "worktree-environment"
+      | null,
   ) => {
     if (overlay) setWorkspaceLocalEnvironmentOpen(false);
     setWorkspaceOverlay(overlay);
@@ -2754,7 +2935,9 @@ export function App() {
           ? "workspace-environment-menu"
           : overlay === "worktree"
             ? "workspace-worktree-menu"
-            : "workspace-ready",
+            : overlay === "worktree-environment"
+              ? "workspace-environment-picker"
+              : workspaceBaseFrame,
     );
   };
   const openWorkspaceLocalEnvironment = (
@@ -2770,6 +2953,17 @@ export function App() {
     setWorkspaceLocalEnvironmentOpen(false);
     setActiveFrame("workspace-ready");
   };
+  const selectWorkspaceRunLocation = (
+    environmentId: "cloud" | "local" | "worktree",
+  ) => {
+    setWorkspaceEnvironmentId(environmentId);
+    setWorkspaceOverlay(null);
+    setActiveFrame(
+      environmentId === "worktree"
+        ? "workspace-new-worktree"
+        : "workspace-ready",
+    );
+  };
   const workspaceContext = (
     <>
       <ConversationContextBar
@@ -2781,38 +2975,77 @@ export function App() {
         }
         items={[
           {
+            ariaLabel: workspaceProject
+              ? `Change project: ${workspaceProject.label}`
+              : "Choose project",
             controlsId: "demo-workspace-project-dialog",
             icon: <SidebarGlyph name="folder" />,
             id: "project",
             kind: "project",
-            label: workspaceProject?.label ?? "No project",
+            label: workspaceProject?.label ?? "Choose project",
             popupRole: "dialog",
-            textValue: workspaceProject?.label ?? "No project",
+            textValue: workspaceProject?.label ?? "Choose project",
             triggerId: "demo-workspace-project-trigger",
           },
-          {
-            controlsId: "demo-workspace-environment-menu",
-            icon: "▱",
-            id: "environment",
-            kind: "environment",
-            label:
-              workspaceEnvironmentId === "local"
-                ? "Local"
-                : workspaceEnvironmentId === "worktree"
-                  ? "New worktree"
-                  : "Codex web",
-            popupRole: "menu",
-          },
-          {
-            controlsId: "demo-workspace-worktree-menu",
-            icon: "⑂",
-            id: "worktree",
-            kind: "worktree",
-            label: workspaceWorktree.branch,
-            popupRole: "menu",
-            status: workspaceWorktree.status,
-            statusLabel: workspaceWorktree.statusLabel,
-          },
+          ...(workspaceProject
+            ? workspaceEnvironmentId === "worktree"
+              ? [
+                  {
+                    ariaLabel: "Change run location: New worktree",
+                    controlsId: "demo-workspace-environment-menu",
+                    icon: "↗",
+                    id: "environment",
+                    kind: "run-location" as const,
+                    label: "New worktree",
+                    popupRole: "menu" as const,
+                  },
+                  {
+                    ariaLabel: "Change environment: No environment",
+                    controlsId:
+                      "demo-workspace-worktree-environment-menu",
+                    icon: "⚙",
+                    id: "worktree-environment",
+                    kind: "environment" as const,
+                    label: "No environment",
+                    popupRole: "menu" as const,
+                  },
+                  {
+                    ariaLabel: "Starting state: main",
+                    icon: "⑂",
+                    id: "starting-state",
+                    kind: "starting-state" as const,
+                    label: "main",
+                  },
+                ]
+              : [
+                  {
+                    ariaLabel: `Change run location: ${
+                      workspaceEnvironmentId === "local"
+                        ? "Local"
+                        : "Codex web"
+                    }`,
+                    controlsId: "demo-workspace-environment-menu",
+                    icon: "▱",
+                    id: "environment",
+                    kind: "run-location" as const,
+                    label:
+                      workspaceEnvironmentId === "local"
+                        ? "Local"
+                        : "Codex web",
+                    popupRole: "menu" as const,
+                  },
+                  {
+                    controlsId: "demo-workspace-worktree-menu",
+                    icon: "⑂",
+                    id: "worktree",
+                    kind: "worktree" as const,
+                    label: workspaceWorktree.branch,
+                    popupRole: "menu" as const,
+                    status: workspaceWorktree.status,
+                    statusLabel: workspaceWorktree.statusLabel,
+                  },
+                ]
+            : []),
         ]}
         onSelect={(itemId) => {
           if (itemId === "project") {
@@ -2832,6 +3065,15 @@ export function App() {
             );
             return;
           }
+          if (itemId === "worktree-environment") {
+            setWorkspaceOverlayState(
+              workspaceOverlay === "worktree-environment"
+                ? null
+                : "worktree-environment",
+            );
+            return;
+          }
+          if (itemId === "starting-state") return;
           setWorkspaceOverlayState(
             workspaceOverlay === "worktree" ? null : "worktree",
           );
@@ -2861,7 +3103,7 @@ export function App() {
                   endIcon={
                     workspaceEnvironmentId === "local" ? "✓" : undefined
                   }
-                  onSelect={() => setWorkspaceEnvironmentId("local")}
+                  onSelect={() => selectWorkspaceRunLocation("local")}
                   role="menuitemradio"
                   startIcon="▱"
                 >
@@ -2872,9 +3114,7 @@ export function App() {
                   endIcon={
                     workspaceEnvironmentId === "worktree" ? "✓" : undefined
                   }
-                  onSelect={() => {
-                    openWorkspaceLocalEnvironment("environment");
-                  }}
+                  onSelect={() => selectWorkspaceRunLocation("worktree")}
                   role="menuitemradio"
                   startIcon="↗"
                 >
@@ -2885,7 +3125,7 @@ export function App() {
                   endIcon={
                     workspaceEnvironmentId === "cloud" ? "✓" : "↗"
                   }
-                  onSelect={() => setWorkspaceEnvironmentId("cloud")}
+                  onSelect={() => selectWorkspaceRunLocation("cloud")}
                   role="menuitemradio"
                   startIcon="◌"
                 >
@@ -2898,6 +3138,33 @@ export function App() {
                 <MenuItem endIcon="›" startIcon="◔">
                   Usage remaining
                 </MenuItem>
+              </Menu>
+            );
+          }
+          if (item.id === "worktree-environment") {
+            return (
+              <Menu
+                align="start"
+                className="demo-workspace-context-menu demo-workspace-worktree-environment-menu"
+                initialFocus="none"
+                label="Environment"
+                onOpenChange={(open) =>
+                  setWorkspaceOverlayState(
+                    open ? "worktree-environment" : null,
+                  )
+                }
+                open={workspaceOverlay === "worktree-environment"}
+                side="top"
+                sideOffset={1}
+                trigger={trigger}
+                width="auto"
+              >
+                <MenuSectionLabel>Environment</MenuSectionLabel>
+                <MenuItem endIcon="✓">Work without environment</MenuItem>
+                <span className="demo-workspace-context-menu__empty">
+                  No environments found
+                </span>
+                <MenuItem endIcon="↗">Environment settings</MenuItem>
               </Menu>
             );
           }
@@ -2930,29 +3197,29 @@ export function App() {
                   value={workspaceBranchQuery}
                 />
                 <MenuSectionLabel>Branches</MenuSectionLabel>
-                {filteredWorkspaceWorktrees.map((worktree) => (
-                  <MenuItem
-                    aria-checked={worktree.id === workspaceWorktreeId}
-                    endIcon={
-                      worktree.id === workspaceWorktreeId ? "✓" : undefined
-                    }
-                    key={worktree.id}
-                    onSelect={() => {
-                      if (workspaceEnvironmentId === "worktree") {
-                        setWorkspaceEnvironmentId("local");
+                <div className="demo-workspace-worktree-menu__branches">
+                  {filteredWorkspaceWorktrees.map((worktree) => (
+                    <MenuItem
+                      aria-checked={worktree.id === workspaceWorktreeId}
+                      endIcon={
+                        worktree.id === workspaceWorktreeId
+                          ? "✓"
+                          : undefined
                       }
-                      setWorkspaceWorktreeId(worktree.id);
-                    }}
-                    role="menuitemradio"
-                    startIcon="⑂"
-                  >
-                    {worktree.branch}
-                  </MenuItem>
-                ))}
-                <span
-                  aria-hidden="true"
-                  className="demo-workspace-worktree-menu__spacer"
-                />
+                      key={worktree.id}
+                      onSelect={() => {
+                        if (workspaceEnvironmentId === "worktree") {
+                          setWorkspaceEnvironmentId("local");
+                        }
+                        setWorkspaceWorktreeId(worktree.id);
+                      }}
+                      role="menuitemradio"
+                      startIcon="⑂"
+                    >
+                      {worktree.branch}
+                    </MenuItem>
+                  ))}
+                </div>
                 <MenuSeparator />
                 <MenuItem
                   onSelect={() =>
@@ -2998,6 +3265,7 @@ export function App() {
               setWorkspaceEnvironmentId("local");
               setWorkspaceWorktreeId("main");
               setWorkspaceOverlayState(null);
+              setActiveFrame("workspace-ready");
               setWorkspaceProjectQuery("");
             }}
             selectedId={workspaceProjectId ?? undefined}
@@ -3014,6 +3282,7 @@ export function App() {
                 setWorkspaceEnvironmentId("local");
                 setWorkspaceWorktreeId("main");
                 setWorkspaceOverlayState(null);
+                setActiveFrame("workspace-no-project");
                 setWorkspaceProjectQuery("");
                 window.setTimeout(() =>
                   document
@@ -3039,16 +3308,29 @@ export function App() {
             +
           </button>
           <button aria-label="Change permissions" type="button">
-            ◉ Approve for me
+            ◉ Ask for approval
           </button>
         </span>
       }
       controls={
         <span className="demo-composer-actions">
-          <span>5.6 Sol Extra High⌄</span>
+          <span className="demo-workspace-model">
+            <span>5.6 Sol</span>
+            <span>Extra High</span>
+            <span aria-hidden="true">⌄</span>
+          </span>
           <button aria-label="Dictate" type="button">
             ♫
           </button>
+          {!composerValue.trim() ? (
+            <button
+              aria-label="Start new voice chat"
+              className="demo-workspace-voice"
+              type="button"
+            >
+              <span aria-hidden="true">≋</span>
+            </button>
+          ) : null}
         </span>
       }
       layout="multiline"
@@ -3061,7 +3343,7 @@ export function App() {
       }}
       onValueChange={setComposerValue}
       placeholder="Do anything"
-      textareaLabel="Workspace message composer"
+      textareaLabel="Do anything"
       value={composerValue}
     />
   );
@@ -3072,29 +3354,33 @@ export function App() {
         composer={workspaceComposer}
         context={workspaceContext}
         destination={
-          <>
-            What should we build in{" "}
-            <button
-              aria-controls="demo-workspace-project-dialog"
-              aria-expanded={
-                workspaceOverlay === "project" &&
-                workspaceProjectTriggerId ===
-                  "demo-workspace-destination-trigger"
-              }
-              aria-haspopup="dialog"
-              className="demo-workspace-destination"
-              id="demo-workspace-destination-trigger"
-              onClick={() => {
-                setWorkspaceProjectTriggerId(
-                  "demo-workspace-destination-trigger",
-                );
-                setWorkspaceOverlayState("project");
-              }}
-              type="button"
-            >
-              {workspaceProject?.label ?? "No project"}?
-            </button>
-          </>
+          workspaceProject ? (
+            <>
+              What should we build in{" "}
+              <button
+                aria-controls="demo-workspace-project-dialog"
+                aria-expanded={
+                  workspaceOverlay === "project" &&
+                  workspaceProjectTriggerId ===
+                    "demo-workspace-destination-trigger"
+                }
+                aria-haspopup="dialog"
+                className="demo-workspace-destination"
+                id="demo-workspace-destination-trigger"
+                onClick={() => {
+                  setWorkspaceProjectTriggerId(
+                    "demo-workspace-destination-trigger",
+                  );
+                  setWorkspaceOverlayState("project");
+                }}
+                type="button"
+              >
+                {workspaceProject.label}?
+              </button>
+            </>
+          ) : (
+            "What should we build?"
+          )
         }
         eyebrow={
           <span aria-hidden="true" className="demo-workspace-mark">
@@ -3103,18 +3389,34 @@ export function App() {
         }
         label="New coding workspace"
         prompt={
-          <button
-            onClick={() =>
-              setComposerValue(
-                "Review the current workspace changes and prepare delivery.",
-              )
-            }
-            type="button"
-          >
-            <span aria-hidden="true">◌</span>
-            <span>Review the current workspace changes</span>
-            <span aria-hidden="true">→</span>
-          </button>
+          workspaceProject ? (
+            <div className="demo-workspace-prompts">
+              <button
+                onClick={() =>
+                  setComposerValue(
+                    "Review the latest workspace changes and prepare delivery.",
+                  )
+                }
+                type="button"
+              >
+                <SidebarGlyph name="thread" />
+                <span>Review the latest workspace changes</span>
+                <span aria-hidden="true">→</span>
+              </button>
+              <button
+                onClick={() =>
+                  setComposerValue(
+                    "Plan the next component parity slice and its verification.",
+                  )
+                }
+                type="button"
+              >
+                <SidebarGlyph name="thread" />
+                <span>Plan the next component parity slice</span>
+                <span aria-hidden="true">→</span>
+              </button>
+            </div>
+          ) : undefined
         }
       />
       <LocalEnvironmentDialog

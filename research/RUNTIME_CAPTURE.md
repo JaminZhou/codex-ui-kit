@@ -190,6 +190,44 @@ profile, verified its child processes and loopback listener were gone, and
 deleted the profile plus the three external screenshots. The original Codex
 main process remained running.
 
+### Current `26.730.61309` workspace-entry refresh
+
+The refreshed probe used `open -na` with a unique Chromium profile because a
+direct binary launch correctly honored Electron's single-instance lock. The
+exact second process exposed loopback-only CDP on port `9558`; the main
+Renderer was selected by `app://-/index.html`, viewport area, shell landmarks,
+and the `Do anything` editor. The existing Codex process was excluded by PID.
+
+The safe sequence was:
+
+1. record the selected-project heading, two suggestion rows, Composer,
+   project/Local/branch context controls, computed typography, and 1180×820
+   screenshot;
+2. open the project dialog, record its search/list/actions, capture only the
+   252×144 listbox crop, then dismiss with Escape;
+3. open Start in, choose New worktree, record the four-part inline context,
+   open and dismiss the No environment menu, then return to Work locally;
+4. open the branch menu and record only de-identified structure, count,
+   selection, dimensions, and fixed create action;
+5. choose Don't work in a project, record the generic heading and one-control
+   context, then restore the original project;
+6. resize the same Renderer to 720×680, verify automatic sidebar hiding,
+   16px Composer insets, overlay clamping, and zero horizontal overflow;
+7. pass the external PNGs only through the named optional pixel gates. Raw
+   screenshots remain outside version control.
+
+No project, branch, environment, file, command, or remote mutation was
+performed. The public Electron flow exercises equivalent state transitions
+against de-identified fixtures; it does not upgrade creation or persistence
+to observed product behavior.
+
+Cleanup terminated the exact second-process tree, its two profile-specific
+Crashpad handlers, modifier monitor, App Server, and profile-owned Computer
+Use service. Port `9558` is closed; the unique profile and external PNGs were
+moved to the recoverable Trash directory
+`codex-ui-kit-workspace-entry-cdp.XXXXXX-20260805`. The original Codex PID
+`96228` remained running.
+
 ### Current Review rename/delete capture
 
 The `26.721.81911` Review probe used an exact second process, the loopback-only

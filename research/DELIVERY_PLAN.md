@@ -12,10 +12,11 @@ exit gates; it does not replace the inventory.
 
 - The current installed package is Codex Desktop `26.730.61309` (`6223`).
 - The inventory contains 79 surface groups: 51 P0, 19 P1, and 9 P2.
-- 13 groups have current-build runtime evidence, 48 have previous-build-only
+- 18 groups have current-build runtime evidence, 43 have previous-build-only
   runtime evidence, and 18 have not been sampled.
-- The current `26.730.61309` refresh now covers all six left-sidebar groups
-  plus the successful long-command surface. The sidebar capture locks the
+- The current `26.730.61309` refresh now covers all six left-sidebar groups,
+  selected/no-project and New worktree entry, plus sampled command, approval,
+  interruption, compaction, summary, and pasted-image surfaces. The sidebar capture locks the
   274px column, 46px titlebar, 70px navigation header, 30px rows, five
   expandable project groups, dense history, item actions/status, fixed 46px
   footer, 16px resize target, and the exact 721/720 responsive boundary. At
@@ -229,6 +230,15 @@ structural evidence, Browser acceptance, and Electron acceptance.
   review submission, merge-readiness, and route restoration;
 - side, bottom, expanded, stacked, and compact panel compositions.
 
+Delivered workspace-entry slice: current `26.730.61309` selected/no-project
+destinations, two suggestions, 14-option project picker, Local/New worktree
+run-location transition, environment empty menu, seven-branch picker, and
+1180→720 responsive geometry now pass Browser/CDP, Electron, and external
+pixel gates. The historical 600×600 local-environment dialog remains an
+independent host capability rather than the current New worktree entry path.
+Project/branch creation and persistence, environment settings, Remote/Codex
+web execution, and unavailable/repair flows remain in this phase.
+
 Exit: a protocol-backed coding task can travel from project selection through
 command, approval, file review, terminal, and PR review without fixture-only
 state jumps.
@@ -321,9 +331,12 @@ without confusing package readiness with full product reconstruction.
    approval timeout/`acceptForSession`, broader attachment variants, and
    recovery evidence;
    retain queue pause/Resume only as a legacy compatibility fixture.
-6. **Coding workspace entry**: current project/context entry plus independent
-   project → environment/worktree → command → approval → Review → Terminal →
-   PR acceptance.
+6. **Coding workspace entry**: current selected/no-project destination,
+   project/Local/branch context, New worktree/environment-empty state, and
+   720px layout are delivered; independent project → environment/worktree →
+   command → approval → Review → Terminal → PR acceptance remains covered.
+   Continue with real creation/persistence, environment settings,
+   Remote/Codex web, and unavailable/repair evidence.
 7. **Review content variants**: current delete and rename/no-content evidence,
    public rename/delete/binary/conflict replay, selection synchronization, and
    Undo.
