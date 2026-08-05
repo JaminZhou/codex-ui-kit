@@ -164,6 +164,14 @@ const currentBuildWorkspaceProjectReferenceSize = {
 };
 const currentBuildWorkspaceEnvironmentReference =
   process.env.CODEX_UI_KIT_WORKSPACE_ENVIRONMENT_REFERENCE;
+const currentBuildWorkspaceEnvironmentPickerReference =
+  process.env.CODEX_UI_KIT_WORKSPACE_ENVIRONMENT_PICKER_REFERENCE;
+const currentBuildWorkspaceNewWorktreeReference =
+  process.env.CODEX_UI_KIT_WORKSPACE_NEW_WORKTREE_REFERENCE;
+const currentBuildWorkspaceNoProjectReference =
+  process.env.CODEX_UI_KIT_WORKSPACE_NO_PROJECT_REFERENCE;
+const currentBuildWorkspaceCompactReference =
+  process.env.CODEX_UI_KIT_WORKSPACE_COMPACT_REFERENCE;
 const currentBuildWorkspaceWorktreeReference =
   process.env.CODEX_UI_KIT_WORKSPACE_WORKTREE_REFERENCE;
 const currentBuildSidebarReference =
@@ -332,6 +340,54 @@ async function compareCurrentBuildOverlay({
   );
 }
 
+async function compareCurrentBuildWorkspaceFrame({
+  actual,
+  defaultMaximumRatio,
+  masks,
+  maximumRatioName,
+  referencePath,
+  sceneId,
+}) {
+  const reference = flattenPng(
+    PNG.sync.read(await readFile(referencePath)),
+    { blue: 24, green: 24, red: 24 },
+  );
+  if (
+    reference.width !== actual.width ||
+    reference.height !== actual.height
+  ) {
+    throw new Error(
+      `${sceneId}: current-build workspace frame must match ${actual.width}x${actual.height}, received ${reference.width}x${reference.height}.`,
+    );
+  }
+  const comparison = comparePng(
+    maskPng(reference, masks),
+    maskPng(actual, masks),
+  );
+  const maximumRatio = environmentRatio(
+    maximumRatioName,
+    defaultMaximumRatio,
+  );
+  await writeFile(
+    join(artifactDirectory, `${sceneId}.current-build.png`),
+    PNG.sync.write(actual),
+  );
+  if (comparison.pixels > 0) {
+    await writeFile(
+      join(artifactDirectory, `${sceneId}.current-build.diff.png`),
+      PNG.sync.write(comparison.diff),
+    );
+  }
+  if (comparison.ratio > maximumRatio) {
+    throw new Error(
+      `${sceneId}: current-build workspace frame pixel ratio ${comparison.ratio} exceeds ${maximumRatio}.`,
+    );
+  }
+  console.log(
+    `${sceneId}: current-build workspace frame pixel ratio ${comparison.ratio}`,
+  );
+}
+
 const regionalFailures = [];
 
 for (const scene of selectedScenes) {
@@ -341,6 +397,7 @@ for (const scene of selectedScenes) {
   const diffPath = join(artifactDirectory, `${scene.id}.diff.png`);
   let sidebarSelectedTop;
   let workspaceEnvironmentMenuBounds;
+  let workspaceEnvironmentPickerBounds;
   let workspaceProjectListboxBounds;
   let workspaceWorktreeMenuBounds;
 
@@ -388,6 +445,21 @@ for (const scene of selectedScenes) {
       });
       workspaceEnvironmentMenuBounds = await page
         .locator(".demo-workspace-environment-menu[role=\"menu\"]")
+        .evaluate((element) => {
+          const value = element.getBoundingClientRect();
+          return {
+            height: Math.round(value.height),
+            left: Math.round(value.left),
+            top: Math.round(value.top),
+            width: Math.round(value.width),
+          };
+        });
+    }
+    if (scene.id === "workspace-environment-picker") {
+      workspaceEnvironmentPickerBounds = await page
+        .locator(
+          ".demo-workspace-worktree-environment-menu[role=\"menu\"]",
+        )
         .evaluate((element) => {
           const value = element.getBoundingClientRect();
           return {
@@ -630,6 +702,73 @@ for (const scene of selectedScenes) {
   }
 
   if (
+    scene.id === "workspace-new-worktree" &&
+    currentBuildWorkspaceNewWorktreeReference
+  ) {
+    await compareCurrentBuildWorkspaceFrame({
+      actual,
+      defaultMaximumRatio: 0.02,
+      masks: [
+        { height: 820, left: 0, top: 0, width: 274 },
+        { height: 52, left: 480, top: 350, width: 500 },
+        { height: 92, left: 406, top: 558, width: 650 },
+        { height: 28, left: 402, top: 672, width: 470 },
+        { height: 24, left: 367, top: 716, width: 180 },
+        { height: 28, left: 398, top: 767, width: 150 },
+        { height: 28, left: 870, top: 767, width: 185 },
+      ],
+      maximumRatioName:
+        "CODEX_UI_KIT_WORKSPACE_NEW_WORKTREE_MAX_DIFF_RATIO",
+      referencePath: currentBuildWorkspaceNewWorktreeReference,
+      sceneId: scene.id,
+    });
+  }
+
+  if (
+    scene.id === "workspace-no-project" &&
+    currentBuildWorkspaceNoProjectReference
+  ) {
+    await compareCurrentBuildWorkspaceFrame({
+      actual,
+      defaultMaximumRatio: 0.02,
+      masks: [
+        { height: 820, left: 0, top: 0, width: 274 },
+        { height: 52, left: 520, top: 350, width: 430 },
+        { height: 28, left: 402, top: 672, width: 160 },
+        { height: 24, left: 367, top: 716, width: 180 },
+        { height: 28, left: 398, top: 767, width: 150 },
+        { height: 28, left: 870, top: 767, width: 185 },
+      ],
+      maximumRatioName:
+        "CODEX_UI_KIT_WORKSPACE_NO_PROJECT_MAX_DIFF_RATIO",
+      referencePath: currentBuildWorkspaceNoProjectReference,
+      sceneId: scene.id,
+    });
+  }
+
+  if (
+    scene.id === "workspace-compact-ready" &&
+    currentBuildWorkspaceCompactReference
+  ) {
+    await compareCurrentBuildWorkspaceFrame({
+      actual,
+      defaultMaximumRatio: 0.025,
+      masks: [
+        { height: 42, left: 125, top: 290, width: 480 },
+        { height: 90, left: 62, top: 420, width: 610 },
+        { height: 28, left: 58, top: 532, width: 400 },
+        { height: 24, left: 26, top: 576, width: 180 },
+        { height: 28, left: 56, top: 627, width: 150 },
+        { height: 28, left: 480, top: 627, width: 185 },
+      ],
+      maximumRatioName:
+        "CODEX_UI_KIT_WORKSPACE_COMPACT_MAX_DIFF_RATIO",
+      referencePath: currentBuildWorkspaceCompactReference,
+      sceneId: scene.id,
+    });
+  }
+
+  if (
     scene.id === "workspace-project-menu" &&
     currentBuildWorkspaceProjectReference
   ) {
@@ -729,6 +868,33 @@ for (const scene of selectedScenes) {
         width: 216,
       },
       referencePath: currentBuildWorkspaceEnvironmentReference,
+      sceneId: scene.id,
+    });
+  }
+
+  if (
+    scene.id === "workspace-environment-picker" &&
+    currentBuildWorkspaceEnvironmentPickerReference
+  ) {
+    await compareCurrentBuildOverlay({
+      actual,
+      actualBounds: workspaceEnvironmentPickerBounds,
+      defaultMaximumRatio: 0.08,
+      masks: [
+        { height: 18, left: 12, top: 10, width: 96 },
+        { height: 18, left: 34, top: 39, width: 180 },
+        { height: 18, left: 12, top: 68, width: 180 },
+        { height: 18, left: 34, top: 97, width: 180 },
+      ],
+      maximumRatioName:
+        "CODEX_UI_KIT_WORKSPACE_ENVIRONMENT_PICKER_MAX_DIFF_RATIO",
+      referenceCrop: {
+        height: 126,
+        left: 625,
+        top: 545,
+        width: 264,
+      },
+      referencePath: currentBuildWorkspaceEnvironmentPickerReference,
       sceneId: scene.id,
     });
   }

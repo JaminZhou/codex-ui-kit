@@ -44,6 +44,7 @@ describe("project conversation routing", () => {
             expandedId="project"
             items={[
               {
+                ariaLabel: "Choose project",
                 controlsId: "project-options",
                 id: "project",
                 kind: "project",
@@ -98,7 +99,7 @@ describe("project conversation routing", () => {
         ),
     ).toBe(true);
     const project = within(setup).getByRole("button", {
-      name: "Change project: Project",
+      name: "Choose project",
     });
     expect(project.getAttribute("aria-controls")).toBe(
       "project-options",

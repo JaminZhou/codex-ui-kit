@@ -237,6 +237,94 @@ describe("menus and selects", () => {
     );
   });
 
+  it("can retain trigger focus when a menu opens without initial focus", async () => {
+    render(
+      <Menu
+        initialFocus="none"
+        trigger={<button type="button">Choose environment</button>}
+      >
+        <MenuItem>Work without environment</MenuItem>
+      </Menu>,
+    );
+
+    const trigger = screen.getByRole("button", {
+      name: "Choose environment",
+    });
+    trigger.focus();
+    fireEvent.click(trigger, { detail: 1 });
+    await waitFor(() => expect(screen.getByRole("menu")).toBeTruthy());
+    expect(document.activeElement).toBe(trigger);
+    fireEvent.keyDown(trigger, { key: "Tab" });
+    expect(screen.queryByRole("menu")).toBeNull();
+  });
+
+  it("focuses a menu item when a no-focus menu is keyboard activated", async () => {
+    render(
+      <Menu
+        initialFocus="none"
+        trigger={<button type="button">Choose environment</button>}
+      >
+        <MenuItem>Work without environment</MenuItem>
+      </Menu>,
+    );
+
+    fireEvent.click(
+      screen.getByRole("button", { name: "Choose environment" }),
+      { detail: 0 },
+    );
+    await waitFor(() =>
+      expect(document.activeElement).toBe(
+        screen.getByRole("menuitem", { name: "Work without environment" }),
+      ),
+    );
+  });
+
+  it("moves focus into an already pointer-opened no-focus menu", async () => {
+    render(
+      <Menu
+        initialFocus="none"
+        trigger={<button type="button">Choose environment</button>}
+      >
+        <MenuItem>Work without environment</MenuItem>
+      </Menu>,
+    );
+
+    const trigger = screen.getByRole("button", {
+      name: "Choose environment",
+    });
+    trigger.focus();
+    fireEvent.click(trigger, { detail: 1 });
+    await waitFor(() => expect(document.activeElement).toBe(trigger));
+    fireEvent.keyDown(trigger, { key: "ArrowDown" });
+    await waitFor(() =>
+      expect(document.activeElement).toBe(
+        screen.getByRole("menuitem", { name: "Work without environment" }),
+      ),
+    );
+  });
+
+  it("still focuses menu items for keyboard opens without pointer initial focus", async () => {
+    render(
+      <Menu
+        initialFocus="none"
+        trigger={<button type="button">Choose environment</button>}
+      >
+        <MenuItem>Work without environment</MenuItem>
+        <MenuItem>Environment settings</MenuItem>
+      </Menu>,
+    );
+
+    const trigger = screen.getByRole("button", {
+      name: "Choose environment",
+    });
+    fireEvent.keyDown(trigger, { key: "ArrowDown" });
+    await waitFor(() =>
+      expect(document.activeElement).toBe(
+        screen.getByRole("menuitem", { name: "Work without environment" }),
+      ),
+    );
+  });
+
   it("keeps text editing in the input while retaining menu arrow navigation", async () => {
     render(
       <Menu defaultOpen trigger={<button type="button">Branches</button>}>

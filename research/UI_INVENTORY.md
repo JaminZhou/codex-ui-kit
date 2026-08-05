@@ -54,7 +54,7 @@ observation from a previous build remains historical evidence.
 - Scoped CDP automation: available through a user-authorized second process;
   the Chromium profile is separate, but Codex application data and navigation
   are not fully isolated
-- Fresh current-build Renderer captures: eight dark 1180×820 disposable tasks
+- Fresh current-build Renderer captures: nine dark isolated probes
   verify successful 400-line command output, mixed stdout/stderr failure with
   exit code 7 and a successful same-thread follow-up, plus a 95-second command
   Stop/background-settlement/recovery lifecycle, and the manual `/compact`
@@ -69,14 +69,18 @@ observation from a previous build remains historical evidence.
   exact 721/720 boundary. The sidebar remains 274px through 721px, auto-hides
   at 720px, stays pinned as a 274/446 split after an explicit Show action and
   route navigation, and no longer opens the historical inline-start hover
-  preview. All other `26.727.40816` observations remain previous-build
+  preview. A non-mutating workspace-entry sweep additionally refreshes
+  selected/no-project headings, two suggestion rows, the project picker,
+  Start in and branch menus, the inline New worktree/environment-empty state,
+  and the 720×680 layout. All other `26.727.40816` observations remain previous-build
   evidence until separately reached on `26.730.61309`.
 
-Current inventory: 79 surface groups; 13 have current-build runtime evidence,
-48 have previous-build-only runtime evidence, 18 remain `not_sampled`, and 0
-are `blocked_by_policy`. Current-build Browser verification covers 13 groups
-and Electron verification covers 13. Prior acceptance outside the sampled
-command, approval, interruption, compaction, summary, and six-sidebar slices remains recorded as `partial_legacy`
+Current inventory: 79 surface groups; 18 have current-build runtime evidence,
+43 have previous-build-only runtime evidence, 18 remain `not_sampled`, and 0
+are `blocked_by_policy`. Current-build Browser verification covers 18 groups
+and Electron verification covers 18. Prior acceptance outside the sampled
+command, approval, interruption, compaction, summary, workspace-entry, and
+six-sidebar slices remains recorded as `partial_legacy`
 until current-build re-observation.
 
 The current package exposes candidates far beyond the old transcript sample:
@@ -152,7 +156,8 @@ affected inventory row was `partial_legacy` until it was re-observed on
 `26.727.40816`. After the `26.730.61309` update, every row below is again
 `partial_legacy` except the explicitly refreshed successful-command,
 command-failure/recovery, command-interruption, context-compaction,
-thread-summary, and six sidebar rows. The
+thread-summary, approval, pasted-image attachment, workspace-entry, and six
+sidebar rows. The
 machine-readable inventory is authoritative when historical prose describes
 a build as current at its capture time.
 
@@ -171,7 +176,8 @@ focus-managed modal mode only as an explicit safety fallback for widths that
 cannot fit the pinned split. The current product's separator exposes
 `role=separator` but no keyboard value semantics; UIKit intentionally retains
 Arrow/Home/End resizing and value attributes as an accessibility improvement.
-The dedicated de-identified scene passes 76 Browser/CDP and pixel frames,
+The dedicated de-identified scene passes within the 85-frame Browser/CDP and
+pixel matrix,
 Electron interaction, and current-build regional ratios of 3.6234% for the
 top, 0.1292% for the masked selected row, and 0% for the masked footer.
 Implementation stays `partial` because light-theme runtime evidence, dynamic
@@ -238,20 +244,29 @@ remaining controls, checks grouping, search filtering, and repair-state
 disabling, selects a local environment, submits the real composer, and captures
 both wide and compact dialog screenshots.
 
-The `26.727.40816` `conversation.context-controls`,
-`conversation.project-picker`, and
-`app.new-thread-workspace-selection` slices are Browser- and
-Electron-verified against `26.727.40816`. Their implementation remains
-`partial` because the current probe does not establish Remote destination
-behavior, real project selection, creation workflows, or persistence. The
-broader project index, environment settings, and worktree settings families
-remain partial/legacy, as does the legacy host-defined route selector. The
-current PR route is covered separately below; generic review components still
-do not establish mutating product behavior. The remaining P0
-conversation/workspace variants remain open. Global notification runtime
-observation and light-theme shell evidence also remain open. Final
-H5/Electron visual unification is intentionally deferred until coverage
-stabilizes.
+The `26.730.61309` workspace refresh promotes
+`conversation.destination`, `conversation.context-controls`,
+`conversation.project-picker`, `composer.project-worktree-selection`, and
+`app.new-thread-workspace-selection` to current-build Browser and Electron
+verification. The selected-project and no-project headings, two suggestion
+rows, 14-option project picker, five-item Start in menu, seven-branch menu,
+inline New worktree state, environment empty menu, and exact 720px layout are
+all independently gated. Browser/CDP now covers 85 lifecycle frames and six
+responsive widths; Electron drives the safe transitions and continues through
+the protocol-backed command → approval → Review → Terminal → PR path.
+
+External current-build ratios are 0.5437% for ready, 0.2248% for no project,
+0.2378% for New worktree, 2.9943% for the environment picker, 0.4619% for
+compact, 2.9046% for the project list, 3.2800% for Start in, and 7.1320% for
+branches. Implementation remains `partial` because project/branch creation,
+environment settings, persistence, Remote/Codex web execution, and unavailable
+environment behavior were not mutated in the current product. The searchable
+600×600 `LocalEnvironmentDialog` remains a protocol-neutral host capability;
+it is no longer presented as the current New worktree entry behavior. The
+broader projects index, environment settings, and worktree settings families
+remain partial/legacy, as does the legacy host-defined route selector. Global
+notification runtime observation and light-theme shell evidence also remain
+open.
 
 The current-thread slice adds `ConversationThreadShell`, which composes the
 existing header, scroll-following timeline, messages, and Composer into one

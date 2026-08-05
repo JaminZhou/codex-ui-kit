@@ -685,9 +685,11 @@ export function Popover({
   }, [close, effectiveOpen, id]);
 
   useEffect(() => {
-    if (!effectiveOpen || initialFocus === "none" || typeof window === "undefined") {
+    if (!effectiveOpen || typeof window === "undefined") {
       return;
     }
+    const keyboardOpenTarget = keyboardOpenTargetRef.current;
+    if (initialFocus === "none" && !keyboardOpenTarget) return;
     const timer = window.setTimeout(() => {
       const content = contentRef.current;
       if (!content) return;
@@ -696,8 +698,8 @@ export function Popover({
         : null;
       const target =
         selected ??
-        (initialFocus === "first"
-          ? keyboardOpenTargetRef.current === "last"
+        (keyboardOpenTarget || initialFocus === "first"
+          ? keyboardOpenTarget === "last"
             ? getFocusableItems(content).at(-1)
             : getFocusableItems(content)[0]
           : content);
@@ -715,22 +717,38 @@ export function Popover({
     disabled: nativeDisabled,
     onClick: (event) => {
       triggerNode.props.onClick?.(event);
-      if (!event.defaultPrevented && !nativeDisabled) setOpen(!resolvedOpen);
+      if (!event.defaultPrevented && !nativeDisabled) {
+        if (!resolvedOpen && initialFocus === "none" && event.detail === 0) {
+          keyboardOpenTargetRef.current = "first";
+        }
+        setOpen(!resolvedOpen);
+      }
     },
     onKeyDown: (event) => {
       triggerNode.props.onKeyDown?.(event);
       if (event.defaultPrevented || nativeDisabled) return;
       if (event.key === "ArrowDown" || event.key === "ArrowUp") {
         event.preventDefault();
-        keyboardOpenTargetRef.current =
-          event.key === "ArrowUp" ? "last" : "first";
-        setOpen(true);
+        const target = event.key === "ArrowUp" ? "last" : "first";
+        keyboardOpenTargetRef.current = target;
+        if (effectiveOpen && typeof window !== "undefined") {
+          window.setTimeout(() => {
+            const items = contentRef.current
+              ? getFocusableItems(contentRef.current)
+              : [];
+            (target === "last" ? items.at(-1) : items[0])?.focus();
+            keyboardOpenTargetRef.current = null;
+          });
+        } else {
+          setOpen(true);
+        }
       }
       if (event.key === "Escape" && effectiveOpen) {
         event.preventDefault();
         event.stopPropagation();
         close();
       }
+      if (event.key === "Tab" && effectiveOpen && role !== "dialog") close();
     },
   });
 
@@ -779,10 +797,13 @@ interface MenuContextValue {
 const MenuContext = createContext<MenuContextValue | null>(null);
 
 export interface MenuProps
-  extends Omit<PopoverProps, "initialFocus" | "role"> {}
+  extends Omit<PopoverProps, "initialFocus" | "role"> {
+  initialFocus?: PopoverProps["initialFocus"];
+}
 
 export function Menu({
   defaultOpen = false,
+  initialFocus = "first",
   onOpenChange,
   open,
   width = "menu",
@@ -800,7 +821,7 @@ export function Menu({
         className={["codex-ui-menu", props.className]
           .filter(Boolean)
           .join(" ")}
-        initialFocus="first"
+        initialFocus={initialFocus}
         onOpenChange={setOpen}
         open={resolvedOpen}
         role="menu"

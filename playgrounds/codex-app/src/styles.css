@@ -245,7 +245,14 @@ textarea {
   width: auto;
 }
 
-.demo-workspace-start .codex-ui-new-conversation-start__prompt > button {
+.demo-workspace-prompts {
+  display: grid;
+}
+
+.demo-workspace-start
+  .codex-ui-new-conversation-start__prompt
+  .demo-workspace-prompts
+  > button {
   align-items: center;
   background: transparent;
   border: 0;
@@ -264,9 +271,15 @@ textarea {
 
 .demo-workspace-start
   .codex-ui-new-conversation-start__prompt
+  .demo-workspace-prompts
   > button:hover {
   background: rgba(255, 255, 255, 0.05);
   border: 0;
+}
+
+.demo-workspace-prompts .demo-sidebar-glyph {
+  height: 16px;
+  width: 16px;
 }
 
 .demo-workspace-destination {
@@ -472,6 +485,12 @@ textarea {
   width: 216px;
 }
 
+.demo-workspace-worktree-environment-menu {
+  height: 126px;
+  min-width: 264px;
+  width: 264px;
+}
+
 .demo-workspace-context-menu .codex-ui-menu-section-label {
   font-size: 13px;
   font-weight: 445;
@@ -488,6 +507,17 @@ textarea {
   height: 28.5px;
   line-height: 18.5px;
   min-height: 28.5px;
+  padding: 5px 8px;
+}
+
+.demo-workspace-context-menu__empty {
+  align-items: center;
+  color: rgba(255, 255, 255, 0.32);
+  display: flex;
+  font-size: 13px;
+  font-weight: 445;
+  height: 28.5px;
+  line-height: 18.5px;
   padding: 5px 8px;
 }
 
@@ -522,13 +552,60 @@ textarea {
   box-shadow: none;
 }
 
-.demo-workspace-worktree-menu__spacer {
+.demo-workspace-worktree-menu__branches {
   flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  scrollbar-width: none;
+}
+
+.demo-workspace-worktree-menu__branches::-webkit-scrollbar {
+  display: none;
+}
+
+.demo-workspace-model {
+  align-items: center;
+  display: inline-flex;
+  gap: 4px;
+  white-space: nowrap;
+}
+
+.demo-workspace-start .demo-composer-actions,
+.demo-workspace-start .demo-composer-controls {
+  font-size: 13px;
+  gap: 4px;
+}
+
+.demo-workspace-start .demo-composer-actions button,
+.demo-workspace-start .demo-composer-controls button {
+  align-items: center;
+  border-radius: 999px;
+  display: inline-flex;
+  height: 28px;
+  justify-content: center;
+}
+
+.demo-workspace-start
+  .codex-ui-composer:has(.demo-workspace-voice)
+  .codex-ui-composer__primary:disabled {
+  display: none;
+}
+
+.demo-workspace-start .demo-workspace-voice {
+  background: #fff !important;
+  border: 0 !important;
+  color: #181818 !important;
+  border-radius: 999px !important;
+  display: inline-flex;
+  font-size: 16px;
+  height: 28px;
+  padding: 2px !important;
+  width: 28px;
 }
 
 @container codex-ui-app-shell (max-width: 45rem) {
-  .demo-workspace-route {
-    padding-inline-start: 40px;
+  .demo-workspace-start .codex-ui-new-conversation-start__header h3 {
+    margin-top: 34px;
   }
 
   .demo-workspace-start
