@@ -294,6 +294,8 @@ async function compareCurrentBuildOverlay({
   );
 }
 
+const regionalFailures = [];
+
 for (const scene of selectedScenes) {
   const { app, page } = await launchScene(scene);
   const actualPath = join(artifactDirectory, `${scene.id}.png`);
@@ -457,15 +459,17 @@ for (const scene of selectedScenes) {
     mainComparison.ratio > maximumMainPixelRatio ||
     sidebarComparison.ratio > defaultLifecycleSidebarPixelRatio
   ) {
-    throw new Error(
+    const failure =
       `${scene.id}: regional pixel drift ${JSON.stringify({
         main: mainComparison.ratio,
         sidebar: sidebarComparison.ratio,
       })} exceeds ${JSON.stringify({
         main: maximumMainPixelRatio,
         sidebar: defaultLifecycleSidebarPixelRatio,
-      })}.`,
-    );
+      })}.`;
+    regionalFailures.push(failure);
+    console.error(failure);
+    continue;
   }
 
   if (scene.id === "workspace-ready" && currentBuildWorkspaceReference) {
@@ -1890,6 +1894,12 @@ for (const scene of selectedScenes) {
       })}`,
     );
   }
+}
+
+if (regionalFailures.length > 0) {
+  throw new Error(
+    `Regional pixel contracts failed for ${regionalFailures.length} lifecycle frames:\n${regionalFailures.join("\n")}`,
+  );
 }
 
 console.log(

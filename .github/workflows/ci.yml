@@ -88,3 +88,10 @@ jobs:
           node-version: 22
       - run: pnpm install --frozen-lockfile
       - run: pnpm check:codex-app:acceptance
+      - name: Upload visual failure evidence
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: codex-app-visual-failure-${{ github.run_id }}
+          path: playgrounds/codex-app/artifacts/visual
+          retention-days: 7
