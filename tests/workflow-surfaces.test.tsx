@@ -488,6 +488,27 @@ describe("pull request workspace surfaces", () => {
     ).toHaveProperty("disabled", true);
   });
 
+  it("supports an uncontrolled review body and decision", () => {
+    const onSubmit = vi.fn();
+    render(<PullRequestReviewComposer onSubmit={onSubmit} />);
+
+    fireEvent.click(
+      screen.getByRole("radio", { name: "Request changes" }),
+    );
+    fireEvent.change(
+      screen.getByRole("textbox", { name: "Review summary" }),
+      {
+        target: { value: "Please restore keyboard focus." },
+      },
+    );
+    fireEvent.click(screen.getByRole("button", { name: "Submit review" }));
+
+    expect(onSubmit).toHaveBeenCalledWith({
+      body: "Please restore keyboard focus.",
+      kind: "request-changes",
+    });
+  });
+
   it("submits a controlled comment and exposes a recoverable error", () => {
     const onSubmit = vi.fn();
 
@@ -522,6 +543,23 @@ describe("pull request workspace surfaces", () => {
     );
     expect(screen.getByRole("alert").textContent).toBe(
       "The comment was not posted. Try again.",
+    );
+  });
+
+  it("supports an uncontrolled pull request comment", () => {
+    const onSubmit = vi.fn();
+    render(<PullRequestCommentComposer onSubmit={onSubmit} />);
+
+    const submit = screen.getByRole("button", { name: "Post comment" });
+    expect(submit).toHaveProperty("disabled", true);
+    fireEvent.change(screen.getByRole("textbox", { name: "Comment" }), {
+      target: { value: "Current-head checks are green." },
+    });
+    expect(submit).toHaveProperty("disabled", false);
+    fireEvent.click(submit);
+
+    expect(onSubmit).toHaveBeenCalledWith(
+      "Current-head checks are green.",
     );
   });
 

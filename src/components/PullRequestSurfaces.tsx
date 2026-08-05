@@ -1,5 +1,6 @@
 import {
   useId,
+  useState,
   type HTMLAttributes,
   type ReactNode,
 } from "react";
@@ -902,12 +903,12 @@ export interface PullRequestReviewComposerProps
 }
 
 export function PullRequestReviewComposer({
-  body = "",
+  body,
   className,
   disabled = false,
   error,
   heading = "Submit review",
-  kind = "comment",
+  kind,
   onBodyChange,
   onKindChange,
   onSubmit,
@@ -919,11 +920,17 @@ export function PullRequestReviewComposer({
   const headingId = useId();
   const feedbackId = useId();
   const kindName = useId();
+  const [internalBody, setInternalBody] = useState("");
+  const [internalKind, setInternalKind] =
+    useState<PullRequestReviewKind>("comment");
+  const resolvedBody = body ?? internalBody;
+  const resolvedKind = kind ?? internalKind;
   const submitting = status === "submitting";
   const submissionDisabled =
     disabled ||
     submitting ||
-    (kind === "request-changes" && body.trim().length === 0);
+    (resolvedKind === "request-changes" &&
+      resolvedBody.trim().length === 0);
   const feedback =
     status === "error"
       ? error ?? "Review could not be submitted."
@@ -943,7 +950,9 @@ export function PullRequestReviewComposer({
       data-status={status}
       onSubmit={(event) => {
         event.preventDefault();
-        if (!submissionDisabled) onSubmit?.({ body, kind });
+        if (!submissionDisabled) {
+          onSubmit?.({ body: resolvedBody, kind: resolvedKind });
+        }
       }}
     >
       <h3 id={headingId}>{heading}</h3>
@@ -955,11 +964,17 @@ export function PullRequestReviewComposer({
               pullRequestReviewKindLabels,
             ) as PullRequestReviewKind[]
           ).map((option) => (
-            <label data-selected={kind === option || undefined} key={option}>
+            <label
+              data-selected={resolvedKind === option || undefined}
+              key={option}
+            >
               <input
-                checked={kind === option}
+                checked={resolvedKind === option}
                 name={kindName}
-                onChange={() => onKindChange?.(option)}
+                onChange={() => {
+                  if (kind === undefined) setInternalKind(option);
+                  onKindChange?.(option);
+                }}
                 type="radio"
                 value={option}
               />
@@ -971,9 +986,13 @@ export function PullRequestReviewComposer({
           <span>Review summary</span>
           <textarea
             aria-describedby={feedback ? feedbackId : undefined}
-            onChange={(event) => onBodyChange?.(event.currentTarget.value)}
+            onChange={(event) => {
+              const nextBody = event.currentTarget.value;
+              if (body === undefined) setInternalBody(nextBody);
+              onBodyChange?.(nextBody);
+            }}
             placeholder={placeholder}
-            value={body}
+            value={resolvedBody}
           />
         </label>
       </fieldset>
@@ -1021,10 +1040,12 @@ export function PullRequestCommentComposer({
   placeholder = "Leave a comment",
   status = "idle",
   submitLabel = "Post comment",
-  value = "",
+  value,
   ...props
 }: PullRequestCommentComposerProps) {
   const feedbackId = useId();
+  const [internalValue, setInternalValue] = useState("");
+  const resolvedValue = value ?? internalValue;
   const submitting = status === "submitting";
   const feedback =
     status === "error"
@@ -1044,8 +1065,12 @@ export function PullRequestCommentComposer({
       data-status={status}
       onSubmit={(event) => {
         event.preventDefault();
-        if (!disabled && !submitting && value.trim().length > 0) {
-          onSubmit?.(value);
+        if (
+          !disabled &&
+          !submitting &&
+          resolvedValue.trim().length > 0
+        ) {
+          onSubmit?.(resolvedValue);
         }
       }}
     >
@@ -1054,9 +1079,13 @@ export function PullRequestCommentComposer({
         <textarea
           aria-describedby={feedback ? feedbackId : undefined}
           disabled={disabled || submitting}
-          onChange={(event) => onValueChange?.(event.currentTarget.value)}
+          onChange={(event) => {
+            const nextValue = event.currentTarget.value;
+            if (value === undefined) setInternalValue(nextValue);
+            onValueChange?.(nextValue);
+          }}
           placeholder={placeholder}
-          value={value}
+          value={resolvedValue}
         />
       </label>
       <div className="codex-ui-pull-request-comment-composer__footer">
@@ -1073,7 +1102,9 @@ export function PullRequestCommentComposer({
           <span />
         )}
         <button
-          disabled={disabled || submitting || value.trim().length === 0}
+          disabled={
+            disabled || submitting || resolvedValue.trim().length === 0
+          }
           type="submit"
         >
           {submitting ? "Posting…" : submitLabel}
