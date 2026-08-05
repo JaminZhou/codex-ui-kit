@@ -3216,6 +3216,11 @@ try {
   await commandInterruptionPage.waitForSelector(
     '.demo-root[data-frame="command-interruption-recovered"][data-status="completed"][data-composer-phase="idle"]',
   );
+  await commandInterruptionPage.waitForFunction(
+    () =>
+      document.activeElement?.getAttribute("aria-label") ===
+      "Message composer",
+  );
   const recovered = await commandInterruptionPage.evaluate(() => ({
     activeElement: document.activeElement?.getAttribute("aria-label"),
     assistantText:
