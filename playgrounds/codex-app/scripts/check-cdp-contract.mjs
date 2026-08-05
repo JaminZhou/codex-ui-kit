@@ -3229,7 +3229,7 @@ try {
     !compact.actionsReserved ||
     compact.accountPopup !== "menu" ||
     JSON.stringify(compact.currentPages) !==
-      JSON.stringify(["Streaming and retry"]) ||
+      JSON.stringify(["codex-ui-kit"]) ||
     !compact.settingsAction
   ) {
     throw new Error(

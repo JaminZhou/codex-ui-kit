@@ -677,6 +677,12 @@ textarea {
   width: 20px;
 }
 
+.demo-root[data-sidebar-current]
+  .codex-ui-app-sidebar__section[data-kind="pinned"]
+  > .codex-ui-app-sidebar__items {
+  padding-block-start: var(--codex-ui-spacing);
+}
+
 .demo-sidebar-section-action {
   font-size: 18px;
   height: 24px;

@@ -989,11 +989,6 @@
   display: none;
 }
 
-.codex-ui-app-sidebar__section[data-kind="pinned"]
-  > .codex-ui-app-sidebar__items {
-  padding-block-start: var(--codex-ui-spacing);
-}
-
 .codex-ui-app-sidebar__project-group,
 .codex-ui-app-sidebar__project-children {
   display: flex;

@@ -1633,7 +1633,8 @@ export function App() {
   }, [currentWindowedFrame, windowedSelectedMessageIndex]);
 
   const lastEvent = scenario.events[Math.max(0, replayCount - 1)];
-  const currentSidebarFrame = initialSelection.frame === "sidebar-current";
+  const currentSidebarComposition =
+    initialSelection.frame === "sidebar-current" || !initialSelection.capture;
   const sidebar = (
     <AppSidebar
       footer={
@@ -1651,7 +1652,7 @@ export function App() {
           }
         />
       }
-      header={
+      header={currentSidebarComposition ? (
         <div className="demo-sidebar-header">
           <div className="demo-sidebar-brand-row">
             <button
@@ -1698,7 +1699,34 @@ export function App() {
             </button>
           </div>
         </div>
-      }
+      ) : (
+        <div className="demo-sidebar-header">
+          <div className="demo-sidebar-brand-row">
+            <button
+              aria-expanded={false}
+              aria-haspopup="menu"
+              className="demo-sidebar-brand"
+              type="button"
+            >
+              Codex
+              <span aria-hidden="true">⌄</span>
+            </button>
+            <button
+              aria-label="Search"
+              className="demo-sidebar-header-action"
+              type="button"
+            >
+              <SidebarGlyph name="search" />
+            </button>
+          </div>
+          <AppSidebarItem
+            leading={<SidebarGlyph name="new" />}
+            onClick={() => openWorkspace()}
+          >
+            New chat
+          </AppSidebarItem>
+        </div>
+      )}
       primaryNavigation={
         <>
           <AppSidebarItem
@@ -1732,7 +1760,7 @@ export function App() {
         title="Pinned"
         toggleLabel="Toggle pinned tasks"
       >
-        {currentSidebarFrame ? (
+        {currentSidebarComposition ? (
           currentSidebarProjects.map((project) => (
             <AppSidebarProjectGroup
               actions={
@@ -1755,9 +1783,21 @@ export function App() {
               key={project.id}
               label={project.label}
               leading={<SidebarGlyph name="folder" />}
-              selected={project.selected}
-              status={project.status}
-              statusLabel={project.status ? "Unread project update" : undefined}
+              selected={project.selected && view === "conversation"}
+              status={
+                project.selected &&
+                (hasActiveTurnWork(state) || isTurnActive(state.status))
+                  ? "running"
+                  : project.status
+              }
+              statusLabel={
+                project.selected &&
+                (hasActiveTurnWork(state) || isTurnActive(state.status))
+                  ? "Current project is running"
+                  : project.status
+                    ? "Unread project update"
+                    : undefined
+              }
             >
               {project.tasks.map((task, index) => (
                 <AppSidebarItem
@@ -1885,7 +1925,7 @@ export function App() {
             leading={<SidebarGlyph name="thread" />}
             onClick={() => selectScenario(item.id)}
             selected={
-              !currentSidebarFrame &&
+              !currentSidebarComposition &&
               view === "conversation" &&
               mode === "replay" &&
               scenarioId === item.id
@@ -4424,6 +4464,7 @@ export function App() {
         isConversationLifecycle ? queueingEnabled : undefined
       }
       data-scenario={scenarioId}
+      data-sidebar-current={currentSidebarComposition || undefined}
       data-status={displayedStatus}
       data-thread-following={
         isConversationLifecycle ? threadFollowing : undefined

@@ -144,6 +144,10 @@ against Codex Desktop `26.730.61309`:
   across route navigation;
 - an explicit wide capture mode so pixel fixtures do not override normal
   responsive behavior;
+- the refreshed composition is used by normal interaction and its dedicated
+  `current-sidebar` capture, while historical lifecycle captures keep their
+  prior sidebar fixture so one owned sidebar change cannot invalidate unrelated
+  main-region baselines;
 - Browser and Electron interaction gates plus an optional current-build
   regional sidebar comparison across top, masked selected-row, and masked
   footer regions.
