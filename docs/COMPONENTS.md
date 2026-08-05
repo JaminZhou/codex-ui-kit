@@ -11,7 +11,7 @@ Codex UI Kit exposes protocol-neutral React components. Hosts own data fetching,
   `viewportRef` exposes the owned scroll element for host navigation and
   return-to-latest behavior without replacing internal measurement.
 - `AgentThread`: responsive `768px` content column with turn separation and container-query reflow.
-- `AgentThreadViewport`: focusable, follow-aware scroll surface with latest-turn detection, reduced-motion-safe auto-follow, direct-input cancellation for programmatic following, and a sticky footer.
+- `AgentThreadViewport`: focusable, follow-aware scroll surface with latest-turn detection, normal or reverse latest-origin scrolling, reduced-motion-safe auto-follow, direct-input cancellation for programmatic following, and a sticky footer.
 - `AgentTurn` and `ActivityGroup`: explicit standard and grouped spacing contracts.
 - `ThreadVirtualizedPlaceholder`: estimated-height placeholder for host-owned thread virtualization.
 - `AgentMessage`: user, assistant, and system presentation with user-bubble geometry, edit activation, actions, running ARIA state, and target highlighting.
@@ -56,8 +56,14 @@ The built-in highlighter escapes untrusted code. A custom `CodeHighlighter` retu
 
 - `McpToolCallGroup`: expandable integration-owned group for ordered MCP calls with running, recovered, and failed labels.
 - `ToolCallCard`: generic MCP, connector, and arbitrary tool-call row with structured, empty, danger-alert, neutral language/output-error, host-owned raw-output states, and an independently localizable failed-state accessible name.
-- `CommandExecution`: expandable command surface with duration, copy, background-terminal, success, failure, and interruption states. `formatCommandDuration` exposes its standalone duration formatter.
-- `CommandOutput`: labeled stdout/stderr with no-output, tail-following, overflow, fade, and copy behavior.
+- `CommandExecution`: expandable command surface with duration, copy,
+  optional `Shell`/host-defined shell label, background-terminal, success,
+  failure, and interruption states. Completed expanded summaries preserve the
+  command identity. `formatCommandDuration` exposes its standalone duration
+  formatter.
+- `CommandOutput`: labeled stdout/stderr with no-output, 144px bounded
+  reverse-tail following, overflow, fade, collapse/reopen restoration, and
+  copy behavior.
 - `FileChange`: one-file create, apply, stop, reject, delete, and rename activities with disclosure, statistics, path opening, and copy hooks.
 - `FileChangeGroup`: one protocol item's aggregate changed-files card with group status/actions, independent file rows, statistics, rename paths, and host-owned file opening.
 - `FileReview`: a scrollable workspace composition that stacks every changed
@@ -65,7 +71,9 @@ The built-in highlighter escapes untrusted code. A custom `CodeHighlighter` retu
   content, optional controlled file selection, and a selected-file marker.
   Existing `lines` items remain supported; `FileReviewContent` makes non-text
   states explicit, and `FileReviewNotice` can also be composed independently.
-- `ApprovalRequest`: command, patch, network, permission, and generic approval card with scoped actions, shortcuts, loading, and outcome states.
+- `ApprovalRequest`: command, patch, network, permission, and generic approval
+  card with scoped actions, shortcuts, loading, outcome states, and default or
+  current Composer-dock presentation.
 - `ApprovalCommandPreview`: bounded command preview with explicit expansion controls.
 - `StatusBanner`: neutral, info, warning, and error shell with actions, dismissal, and compact reflow.
 - `InlineNotice`: transcript divider with tone, guidance, wrapping, and active shimmer.
@@ -135,6 +143,10 @@ All privileged behavior remains host-owned. The components never auto-approve co
   `sidePanelResizable` applies the same accessible interaction contract to the
   right workspace, with configurable panel/main minima, responsive clamping,
   controlled persistence, focus restoration, and an expanded full-main mode.
+  `sidePanelOverlay` lets a host explicitly preserve the main route beneath a
+  responsive panel; `sidePanelOverlayModal` separately controls backdrop,
+  inertness, focus trapping, and dismissal so a current-build non-modal PR
+  overlay can remain resizable without disabling the route.
   Responsive width clamping also applies when the panel has no resize
   affordance, and a wider sidebar is coordinated with the persistent panel
   minimum so both fixed tracks cannot consume the main route.
@@ -176,7 +188,8 @@ All privileged behavior remains host-owned. The components never auto-approve co
 - `ThreadNavigationControls`: sidebar and optional Back/Forward toolbar controls with shortcuts, disabled states, and transient-navigation hover hooks.
 - `ThreadMessageNavigationRail`: message overview with a current-build default
   threshold of ten user messages, active markers, keyboard and pointer
-  previews, click navigation, and pointer scrubbing.
+  previews, click navigation, pointer scrubbing, regular or compact row
+  density, and optional initial end positioning for long histories.
 - `FloatingThreadPanel`: non-modal, inert-when-closed panel with host-controlled contents and inset.
 - `ThreadFloatingButton`: latest-message control with chevron, working dots, hidden-interaction removal, and reduced-motion behavior.
 
@@ -221,10 +234,20 @@ All privileged behavior remains host-owned. The components never auto-approve co
   actions, change statistics, navigation, state, and host-owned content.
 - `PullRequestPanelSummary`: current resizable-panel Summary composition with
   a level-one title, metadata, fact rows, Description and Checks regions,
-  edit actions, and a host-owned comment composer.
+  edit actions, a host-owned comment composer, and an optional integrated
+  Timeline region.
 - `PullRequestCheckList`, `PullRequestReviewSummary`, and
   `PullRequestReviewThread`: check progress, reviewer outcomes, inline file
   threads, resolved/outdated states, and host-owned review actions.
+- `PullRequestQueryState`: accessible list/detail loading, refreshing, empty,
+  and retryable failure presentation with reduced-motion-safe skeletons.
+- `PullRequestMergeReadiness`: blocked, checking, conflicted, ready, merging,
+  and merged presentation with explicit passed, pending, and failed
+  requirements that do not rely on color alone.
+- `PullRequestReviewComposer` and `PullRequestCommentComposer`: controlled,
+  host-submitted review/comment forms with nonblank guards, submitting,
+  success, and failure feedback. Request changes additionally requires review
+  body content.
 
 The workflow components do not fetch repositories, create worktrees, call
 GitHub, or merge changes. Hosts normalize those states and perform every

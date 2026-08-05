@@ -1,6 +1,18 @@
 import electronPath from "electron";
 import { _electron as electron } from "playwright-core";
 
+// These six dense scenes use the system font to match Codex. Their limits are
+// calibrated from uploaded macOS 15 runner artifacts against macOS 26 baselines;
+// CDP and Electron contracts continue to gate their exact text and geometry.
+const crossMacOsSystemFontRatios = {
+  composerQueuePaused: 0.025,
+  mcpToolCalls: 0.06,
+  prCommentFailed: 0.022,
+  prCompactDetail: 0.023,
+  prDetail: 0.018,
+  prReviewSubmitting: 0.025,
+};
+
 export const visualScenes = [
   {
     frame: "workspace-ready",
@@ -57,6 +69,30 @@ export const visualScenes = [
     scenario: "conversation-lifecycle",
   },
   {
+    frame: "composer-goal",
+    id: "composer-goal",
+    maxPixelRatio: 0.0225,
+    scenario: "conversation-lifecycle",
+  },
+  {
+    frame: "composer-plan",
+    id: "composer-plan",
+    maxPixelRatio: 0.0225,
+    scenario: "conversation-lifecycle",
+  },
+  {
+    frame: "composer-permissions-menu",
+    id: "composer-permissions-menu",
+    maxPixelRatio: 0.0225,
+    scenario: "conversation-lifecycle",
+  },
+  {
+    frame: "composer-resources-menu",
+    id: "composer-resources-menu",
+    maxPixelRatio: 0.0225,
+    scenario: "conversation-lifecycle",
+  },
+  {
     frame: "composer-running",
     id: "composer-running",
     maxPixelRatio: 0.0225,
@@ -69,9 +105,15 @@ export const visualScenes = [
     scenario: "conversation-lifecycle",
   },
   {
+    frame: "composer-auto-continued",
+    id: "composer-auto-continued",
+    maxPixelRatio: 0.0225,
+    scenario: "conversation-lifecycle",
+  },
+  {
     frame: "composer-queue-paused",
     id: "composer-queue-paused",
-    maxPixelRatio: 0.0225,
+    maxPixelRatio: crossMacOsSystemFontRatios.composerQueuePaused,
     scenario: "conversation-lifecycle",
   },
   {
@@ -138,37 +180,27 @@ export const visualScenes = [
     toolCount: 1,
   },
   {
-    callLabels: [
-      "Search OpenAI docs",
-      "Fetch OpenAI doc",
-      "Search OpenAI docs",
-      "Fetch OpenAI doc",
-      "Search OpenAI docs",
-    ],
+    callLabels: ["Search OpenAI docs", "Fetch OpenAI doc"],
     frame: "mcp-tool-calls",
     groupLabel: "Used OpenAI Developer Docs integration",
     id: "mcp-tool-calls",
-    maxPixelRatio: 0.0225,
+    maxPixelRatio: crossMacOsSystemFontRatios.mcpToolCalls,
     scenario: "mcp-tool-call",
-    scrollTop: 72,
+    scrollTop: 0,
     surfaces: ["mcpGroup"],
-    timelineLabel: "Worked for 54s",
-    toolCount: 5,
+    timelineLabel: "Worked for 31s",
+    toolCount: 2,
   },
   {
-    callLabels: ["Fetch OpenAI doc"],
     errorOutput: "Invalid URL",
     frame: "mcp-recovery-failed",
-    groupLabel: "OpenAI Developer Docs integration failed",
     id: "mcp-recovery-failed",
     maxPixelRatio: 0.01,
     scenario: "mcp-recovery-mixed-thread",
-    surfaces: ["mcpGroup"],
     timelineLabel: "Working",
-    toolCount: 1,
   },
   {
-    callLabels: ["Fetch OpenAI doc", "Search OpenAI docs"],
+    callLabels: ["Search OpenAI docs"],
     frame: "mcp-recovery-retrying",
     groupLabel: "Using OpenAI Developer Docs integration",
     id: "mcp-recovery-retrying",
@@ -176,11 +208,12 @@ export const visualScenes = [
     scenario: "mcp-recovery-mixed-thread",
     surfaces: ["mcpGroup"],
     timelineLabel: "Working",
-    toolCount: 2,
+    toolCount: 1,
   },
   {
     callLabels: [
-      "Fetch OpenAI doc",
+      "Search OpenAI docs",
+      "Search OpenAI docs",
       "Search OpenAI docs",
       "Fetch OpenAI doc",
     ],
@@ -191,8 +224,8 @@ export const visualScenes = [
     maxPixelRatio: 0.0225,
     scenario: "mcp-recovery-mixed-thread",
     surfaces: ["mcpGroup"],
-    timelineLabel: "Worked for 28s",
-    toolCount: 3,
+    timelineLabel: "Worked for 51s",
+    toolCount: 4,
   },
   {
     fileCount: 1,
@@ -273,10 +306,31 @@ export const visualScenes = [
     surfaces: ["command"],
   },
   {
+    frame: "command-output-expanded",
+    id: "command-output-expanded",
+    maxPixelRatio: 0.0225,
+    scenario: "long-command-output",
+    surfaces: ["command"],
+  },
+  {
     frame: "approval-pending",
     id: "approval-pending",
     scenario: "workspace-workflow",
     surfaces: ["approval", "command"],
+  },
+  {
+    frame: "approval-current-pending",
+    id: "approval-current-pending",
+    maxPixelRatio: 0.0225,
+    scenario: "approval-denied",
+    surfaces: ["approval", "command"],
+  },
+  {
+    frame: "approval-current-denied",
+    id: "approval-current-denied",
+    maxPixelRatio: 0.0225,
+    scenario: "approval-denied",
+    scrollTop: 72,
   },
   {
     frame: "file-changing",
@@ -323,11 +377,78 @@ export const visualScenes = [
     surfaces: ["fileChange", "reviewPanel"],
   },
   {
-    frame: "review-open",
+    frame: "pr-summary-ready",
     id: "pull-request-detail",
+    maxPixelRatio: crossMacOsSystemFontRatios.prDetail,
+    scenario: "workspace-workflow",
+    view: "pull-request",
+  },
+  {
+    frame: "pr-index-loading",
+    id: "pr-index-loading",
     maxPixelRatio: 0.011,
     scenario: "workspace-workflow",
     view: "pull-request",
+  },
+  {
+    frame: "pr-index-failed",
+    id: "pr-index-failed",
+    maxPixelRatio: 0.011,
+    scenario: "workspace-workflow",
+    view: "pull-request",
+  },
+  {
+    frame: "pr-detail-loading",
+    id: "pr-detail-loading",
+    maxPixelRatio: 0.011,
+    scenario: "workspace-workflow",
+    view: "pull-request",
+  },
+  {
+    frame: "pr-detail-failed",
+    id: "pr-detail-failed",
+    maxPixelRatio: 0.011,
+    scenario: "workspace-workflow",
+    view: "pull-request",
+  },
+  {
+    frame: "pr-checks-running",
+    id: "pr-checks-running",
+    maxPixelRatio: 0.011,
+    panelScrollTop: 760,
+    scenario: "workspace-workflow",
+    view: "pull-request",
+  },
+  {
+    frame: "pr-review-submitting",
+    id: "pr-review-submitting",
+    maxPixelRatio: crossMacOsSystemFontRatios.prReviewSubmitting,
+    scenario: "workspace-workflow",
+    view: "pull-request",
+  },
+  {
+    frame: "pr-comment-failed",
+    id: "pr-comment-failed",
+    maxPixelRatio: crossMacOsSystemFontRatios.prCommentFailed,
+    panelScrollTop: 1_100,
+    scenario: "workspace-workflow",
+    view: "pull-request",
+  },
+  {
+    frame: "pr-merge-ready",
+    id: "pr-merge-ready",
+    maxPixelRatio: 0.011,
+    panelScrollTop: 760,
+    scenario: "workspace-workflow",
+    view: "pull-request",
+  },
+  {
+    frame: "pr-compact-detail",
+    id: "pr-compact-detail",
+    maxPixelRatio: crossMacOsSystemFontRatios.prCompactDetail,
+    scenario: "workspace-workflow",
+    view: "pull-request",
+    windowSize: { height: 680, width: 720 },
   },
   {
     frame: "shell-loading",
@@ -400,6 +521,43 @@ export async function launchScene(
   await page.evaluate(async () => {
     await document.fonts.ready;
   });
+  if (capture && scene.id === "command-output-expanded") {
+    await page
+      .getByRole("button", { exact: true, name: "Worked for 10s" })
+      .click();
+    await page
+      .locator('[data-item-id="command-long-output"] summary')
+      .first()
+      .click();
+    await page.waitForSelector(
+      '[data-item-id="command-long-output"] .codex-ui-command-output',
+    );
+    await page.evaluate(() => {
+      const turn = document.querySelector(
+        ".codex-ui-conversation-thread-shell .codex-ui-agent-turn",
+      );
+      if (turn instanceof HTMLElement) {
+        turn.style.transform = "translateY(-210px)";
+      }
+    });
+  }
+  if (
+    scene.view === "pull-request" &&
+    !scene.frame.startsWith("pr-index-")
+  ) {
+    await page.waitForFunction(() => {
+      const panel = document.querySelector(
+        ".codex-ui-app-shell__side-panel",
+      );
+      if (!panel) return false;
+      const bounds = panel.getBoundingClientRect();
+      return (
+        getComputedStyle(panel).visibility === "visible" &&
+        bounds.width >= 320 &&
+        bounds.right <= window.innerWidth + 1
+      );
+    });
+  }
   if (scene.scrollTop !== undefined) {
     await page
       .locator(".codex-ui-conversation-thread-shell__viewport")
@@ -407,6 +565,13 @@ export async function launchScene(
         element.scrollTop = scrollTop;
         element.dispatchEvent(new Event("scroll", { bubbles: true }));
       }, scene.scrollTop);
+  }
+  if (scene.panelScrollTop !== undefined) {
+    await page
+      .locator(".demo-pr-panel__summary")
+      .evaluate((element, scrollTop) => {
+        element.scrollTop = scrollTop;
+      }, scene.panelScrollTop);
   }
   return { app, page };
 }

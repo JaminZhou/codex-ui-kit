@@ -10,34 +10,56 @@ exit gates; it does not replace the inventory.
 
 ## Current position
 
-- The current installed package is Codex Desktop `26.721.81911` (`5973`).
-- The inventory contains 75 surface groups: 48 P0, 18 P1, and 9 P2.
-- 21 groups have current-build runtime evidence, 35 have previous-build-only
+- The current installed package is Codex Desktop `26.730.61309` (`6223`).
+- The inventory contains 77 surface groups: 49 P0, 19 P1, and 9 P2.
+- 1 group has current-build runtime evidence, 57 have previous-build-only
   runtime evidence, and 19 have not been sampled.
-- The first five current-build vertical slices cover all six left-sidebar
-  groups, a real MCP failed-Fetch → Search → successful-Fetch recovery, and
-  App shell window/loading/selection continuity through CDP, Browser,
-  Electron, and regional pixel gates. The shell slice locks the 960/720px
-  transitions, narrow edge preview versus explicit pinning, and structural
-  behavior at 1920×1080 and 2560×1440. The recovery replay continues into a
-  second command/approval/file/Review turn. The conversation slice adds real
-  empty/focused/multiline/submit/Stop/completed Composer evidence, real
-  queue/interrupt/Resume and permission/add-menu evidence, host-owned
-  long-thread replay, Electron interaction, and current-build queue-region
-  pixel gates. The coding-workspace entry slice adds the current
-  project/context surface plus an independent project → environment/worktree →
-  command → approval → two-file Review → Terminal → PR path. The Review
-  slice adds current-build delete and rename/no-content evidence plus
-  deterministic rename/delete/binary/conflict, selection, and Undo coverage.
-  The Terminal expansion adds current-build multi-tab, per-tab close, picker,
-  and compact evidence plus independent running/failed/exited process replay,
-  close/restore, and 820×680 acceptance. Together the current playground gates
-  cover 49 CDP/pixel frames. Global
-  notification runtime evidence, light-theme shell evidence, exact
-  current-build long-thread virtualization, real current-product Terminal
-  process execution/persistence, and the remaining PR, Markdown, tool, and
-  attachment variants remain on their recorded evidence levels until
-  separately re-observed.
+- The `26.727.40816` refresh covered all six left-sidebar groups, window
+  navigation, route loading/restoration, the New chat Composer and project
+  picker, the read-only Terminal shell, and the public Pull request route.
+  The PR lifecycle now follows the two-tab Summary/Code contract with Timeline
+  integrated into Summary, successful read-only Code content, Auto-merge, and
+  responsive detail restoration. Its independent state machine adds
+  index/detail loading and failure, checks, comments, review submission,
+  merge-readiness, merge completion, compact layout, and route restoration.
+  Together the playground gates cover 66 CDP/pixel frames, and the refreshed
+  PR detail passes the current 906×820 regional pixel gate. The refreshed
+  real MCP success path now matches Search → Fetch, the integrated activity
+  disclosure, computed typography, and a current regional pixel gate. The
+  refreshed failure path now matches a standalone invalid-URL Fetch,
+  intermediate explanation, three Search rows, successful Fetch, linked
+  answer, and current regional pixel gate. The current Composer queue/Stop
+  probe now locks its 710×39 tray, 28×28 Stop control, `You stopped after 2s`
+  summary, and automatic queued continuation in Browser, Electron, and two
+  regional pixel gates. A second current probe and independent public
+  components now lock four-line/20-line growth, all four permission choices,
+  and the 736×320 inline Add-resource picker through CDP, real Electron, and
+  three additional regional pixel gates. A third read-only probe locks active
+  Goal and Plan labels, prompts, 736×98 geometry, clear/focus restoration,
+  and two sub-0.5% regional pixel gates. A fourth read-only slice locks the
+  82-message compact navigation rail, seven-turn mounted window,
+  reverse-origin scrolling, return-to-latest interaction, and a sub-1%
+  ownership-masked regional gate. A fifth disposable-task slice locks the
+  736×162 command-approval card, denial without execution, response actions,
+  and restored 736×98 Composer through CDP, Electron, and sub-1% regional
+  gates. After the `26.730.61309` update, a fresh disposable-task slice
+  re-locks a real 400-line successful
+  command, collapsed/expanded Shell card, 144px reverse-tail viewport,
+  copy controls, and collapse/reopen restoration through CDP, Electron, and
+  a 0.17% ownership-masked full-window gate. This command surface is the only
+  group currently reverified on `26.730.61309`; the preceding
+  `26.727.40816` results are previous-build evidence. Attachment variants,
+  Terminal
+  multi-tab/process behavior,
+  Review rename/delete variants, and broader shell evidence from
+  `26.721.81911` remain historical regression evidence until re-observed. The
+  current project-named single Terminal tab and close/add controls now pass
+  independent Browser, Electron, and regional pixel gates.
+  Global notification runtime evidence, light-theme shell evidence, unsampled
+  long-thread window sizes/eviction heuristics, real current-product Terminal
+  process execution/persistence, current-product review submission and
+  mutating comment/merge transitions, and the remaining Markdown, tool, and
+  attachment variants remain on their recorded evidence levels.
 - Existing Browser and Electron results remain useful regression evidence, but
   they are `partial_legacy` until the affected surface is re-observed on the
   current build.
@@ -83,7 +105,7 @@ new parity claims:
 - re-observe the shell, left sidebar, conversation, Composer, Review, Terminal,
   Markdown, and MCP anchors;
 - retain previous-build results as regression fixtures while promoting only
-  surfaces re-observed on `26.721.81911`;
+  surfaces re-observed on `26.727.40816`;
 - update inventory evidence prefixes and the current build note.
 
 Exit: the current build has a reproducible CDP capture recipe and no
@@ -242,10 +264,15 @@ without confusing package readiness with full product reconstruction.
    gates are implemented; current-build evidence covers window chrome,
    loading, and in-session route restoration, while unsafely unreachable
    recovery/notification states remain explicitly synthetic.
-5. **Conversation and Composer lifecycle**: real current-build Composer,
-   Stop, queue/pause/Resume, permissions/add-menu evidence; deterministic
-   long-thread navigation/windowing; Browser/CDP, Electron, and regional
-   current-build pixels.
+5. **Conversation and Composer lifecycle**: current queue/Stop automatic
+   continuation is delivered through real current-build evidence,
+   Browser/CDP, Electron, and regional pixels. Current permissions, Add
+   resources, multiline/long-input geometry, active Goal/Plan modes, and the
+   sampled long-thread navigation/windowing contract are also delivered. A
+   real command approval pending → denied path now additionally confirms
+   non-execution and restores the current Composer. Continue with attachment,
+   approval allow-once/persistence/timeout, and broader recovery evidence;
+   retain queue pause/Resume only as a legacy compatibility fixture.
 6. **Coding workspace entry**: current project/context entry plus independent
    project → environment/worktree → command → approval → Review → Terminal →
    PR acceptance.
@@ -255,12 +282,16 @@ without confusing package readiness with full product reconstruction.
 8. **Terminal session lifecycle**: current multi-tab/close/picker/compact
    evidence plus independent running/failed/exited processes, per-session
    input, close-all/restore, and process reopening.
-9. **Pull request lifecycle**: index/detail loading and failure, checks,
-   reviewers, comments, review submission, merge-readiness, responsive panel
-   composition, and route restoration.
-10. **Remaining P0 turn/tool gaps**: long command output and truncation,
-    approval denial/timeout/persistence, attachment lifecycle, Markdown
-    mutation/large content, subagents, and transport recovery.
+9. **Pull request lifecycle**: delivered for the public component contract and
+   deterministic Browser/Electron/pixel gates: index/detail loading and
+   failure, checks, reviewers, comments, review submission, merge-readiness,
+   merge completion, responsive non-modal panel composition, and route
+   restoration. Current-product evidence remains deliberately read-only.
+10. **Remaining P0 turn/tool gaps**: current long command output, bounded
+    scrolling, expansion, and latest-line restoration are delivered. Continue
+    with stdout/stderr/failure/interruption variants, approval
+    allow-once/timeout/persistence, attachment lifecycle, Markdown mutation/
+    large content, subagents, and transport recovery.
 11. **P1 resources and integrations**: Browser/artifact/document previews,
     environments, remote connections, Settings, MCP, plugins, skills, and
     automations, each with one end-to-end vertical slice.

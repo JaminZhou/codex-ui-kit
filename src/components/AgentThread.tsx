@@ -66,6 +66,12 @@ export interface AgentThreadViewportProps
   followKey?: string | number;
   followThreshold?: number;
   footer?: ReactNode;
+  /**
+   * Scroll origin used by the host. Reverse-origin threads keep the latest
+   * content at scrollTop zero and move into history with negative values.
+   * @default "end"
+   */
+  latestOrigin?: "end" | "start";
   onFollowingChange?: (following: boolean) => void;
   onScroll?: (event: UIEvent<HTMLDivElement>) => void;
   topInset?: CSSProperties["paddingTop"];
@@ -83,6 +89,7 @@ export const AgentThreadViewport = forwardRef<
     followKey,
     followThreshold = 24,
     footer,
+    latestOrigin = "end",
     onFollowingChange,
     onScroll,
     style,
@@ -134,15 +141,19 @@ export const AgentThreadViewport = forwardRef<
   useEffect(() => {
     const viewport = viewportRef.current;
     if (!viewport) return;
+    const distanceFromLatest = () =>
+      latestOrigin === "start"
+        ? Math.abs(viewport.scrollTop)
+        : viewport.scrollHeight -
+          viewport.clientHeight -
+          viewport.scrollTop;
     const cancelProgrammaticFollow = () => {
       const wasProgrammaticallyFollowing =
         programmaticFollowTargetRef.current !== null;
       programmaticFollowTargetRef.current = null;
       if (!wasProgrammaticallyFollowing) return;
       viewport.scrollTo({ behavior: "auto", top: viewport.scrollTop });
-      const distanceFromLatest =
-        viewport.scrollHeight - viewport.clientHeight - viewport.scrollTop;
-      updateFollowing(distanceFromLatest <= followThreshold);
+      updateFollowing(distanceFromLatest() <= followThreshold);
     };
     const inputEvents = ["keydown", "pointerdown", "touchstart", "wheel"];
     for (const eventName of inputEvents) {
@@ -153,7 +164,7 @@ export const AgentThreadViewport = forwardRef<
         viewport.removeEventListener(eventName, cancelProgrammaticFollow);
       }
     };
-  }, [followThreshold, updateFollowing]);
+  }, [followThreshold, latestOrigin, updateFollowing]);
 
   useLayoutEffect(() => {
     const viewport = viewportRef.current;
@@ -170,12 +181,14 @@ export const AgentThreadViewport = forwardRef<
     const reducedMotion = window.matchMedia?.(
       "(prefers-reduced-motion: reduce)",
     ).matches;
-    programmaticFollowTargetRef.current = viewport.scrollHeight;
+    const latestScrollTop =
+      latestOrigin === "start" ? 0 : viewport.scrollHeight;
+    programmaticFollowTargetRef.current = latestScrollTop;
     viewport.scrollTo({
       behavior: reducedMotion ? "auto" : "smooth",
-      top: viewport.scrollHeight,
+      top: latestScrollTop,
     });
-  }, [autoFollow, children, followKey]);
+  }, [autoFollow, children, followKey, latestOrigin]);
 
   return (
     <div
@@ -184,15 +197,23 @@ export const AgentThreadViewport = forwardRef<
         .filter(Boolean)
         .join(" ")}
       data-following={following || undefined}
+      data-latest-origin={latestOrigin}
       onScroll={(event) => {
         const viewport = event.currentTarget;
         const distanceFromLatest =
-          viewport.scrollHeight - viewport.clientHeight - viewport.scrollTop;
+          latestOrigin === "start"
+            ? Math.abs(viewport.scrollTop)
+            : viewport.scrollHeight -
+              viewport.clientHeight -
+              viewport.scrollTop;
         const programmaticTarget = programmaticFollowTargetRef.current;
         if (programmaticTarget !== null) {
           const reachedTarget =
-            viewport.scrollTop + viewport.clientHeight >=
-            programmaticTarget - followThreshold;
+            latestOrigin === "start"
+              ? Math.abs(viewport.scrollTop - programmaticTarget) <=
+                followThreshold
+              : viewport.scrollTop + viewport.clientHeight >=
+                programmaticTarget - followThreshold;
           if (!reachedTarget) {
             onScroll?.(event);
             return;

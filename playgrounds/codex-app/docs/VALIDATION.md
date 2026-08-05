@@ -15,8 +15,10 @@ Every deterministic scenario has one ID and produces four evidence layers:
    limits, tab states, and expand/restore lifecycle, and the 16px Terminal
    separator, 272px default panel, responsive bounds, named tab/tabpanel, and
    terminal log/input semantics; plus Composer context/queue/input ownership,
-   running Enter-to-queue behavior, interruption/Resume, long-thread message
-   navigation, scroll-away recovery, and deterministic windowing. A 12-row
+   running Enter-to-queue behavior, Stop-to-automatic-continuation,
+   four-line/long-input sizing, four-choice permissions, the scrollable inline
+   Add-resource picker, long-thread message navigation, scroll-away recovery,
+   and deterministic windowing. A 12-row
    queue proves that its action menu is portaled without disabling bounded
    vertical scrolling, and replay controls prove that the Composer follows
    protocol running/completed positions while clearing stale Stop and paused
@@ -38,8 +40,16 @@ Every deterministic scenario has one ID and produces four evidence layers:
    Terminal pointer/keyboard resizing, host-owned input, close/restore,
    compact 820×680 geometry, and App shell offline → retry → restored
    notification plus native 1180×820 → 720×680 → 1180×820 continuity; the
-   conversation host also drives submit → queue → Stop → paused → Resume and
-   return-to-latest in a real 1180×820 window.
+   conversation host also drives submit → queue → Stop → automatic queued
+   continuation and return-to-latest in a real 1180×820 window. A separate
+   current Composer flow verifies permission selection, Escape/focus
+   restoration, resource keyboard selection, and the 205px long-input clamp.
+   A current long-thread flow verifies compact navigation selection, a
+   seven-turn mounted window, negative away-from-latest scrolling, and
+   return-to-latest at scroll origin zero. The current long-command flow
+   expands the activity and command disclosures, verifies all 401 split
+   output lines, then collapses and reopens the card to prove reverse-tail
+   restoration.
 4. **Pixels** — full-frame regression screenshots after the structural gates
    pass. The multi-file scenario can additionally compare a separately
    captured 906×820 current-build main region through
@@ -57,12 +67,34 @@ Every deterministic scenario has one ID and produces four evidence layers:
    row, and footer regions separately; the current MCP recovery scenario
    accepts a 906×820 main reference through
    `CODEX_UI_KIT_MCP_RECOVERY_REFERENCE` and gates the full main, recovered
-   call group, user prompt, and Composer regions separately; the App shell
+   call/answer region, upper activity/failure region, and Composer separately
+   while leaving the final answer unmasked; the App shell
    accepts a 120×46 ownership-scoped reference through
-   `CODEX_UI_KIT_WINDOW_CHROME_REFERENCE`. Queued and paused Composer states
+   `CODEX_UI_KIT_WINDOW_CHROME_REFERENCE`. Queued and automatic-continuation
+   Composer states
    accept separate 792×320 current-build crops through
    `CODEX_UI_KIT_COMPOSER_QUEUED_REFERENCE` and
-   `CODEX_UI_KIT_COMPOSER_PAUSED_REFERENCE`. Transparent
+   `CODEX_UI_KIT_COMPOSER_CONTINUED_REFERENCE`; both use a 2% hard
+   changed-pixel limit. `CODEX_UI_KIT_COMPOSER_PAUSED_REFERENCE` is retained
+   only for the previous-build paused/Resume compatibility frame. Current
+   multiline, permissions, and resources accept
+   `CODEX_UI_KIT_COMPOSER_MULTILINE_REFERENCE`,
+   `CODEX_UI_KIT_COMPOSER_PERMISSIONS_REFERENCE`, and
+   `CODEX_UI_KIT_COMPOSER_RESOURCES_REFERENCE`; their ownership masks retain
+   geometry/boundaries and use hard 0.5%, 0.5%, and 0.8% limits. Goal and Plan
+   main-region references use `CODEX_UI_KIT_COMPOSER_GOAL_REFERENCE` and
+   `CODEX_UI_KIT_COMPOSER_PLAN_REFERENCE` with 0.5% limits. The current
+   long-thread main-region reference uses
+   `CODEX_UI_KIT_LONG_THREAD_REFERENCE`; its mask excludes all conversation
+   content and retains the compact rail and floating control under a 1% hard
+   limit. Current command approval uses separate 906×820
+   `CODEX_UI_KIT_APPROVAL_PENDING_REFERENCE` and
+   `CODEX_UI_KIT_APPROVAL_DENIED_REFERENCE` inputs; their masks retain the
+   approval/Composer silhouettes, actions, activity structure, and spacing
+   under independent 1.5% hard limits. Current long command output accepts a
+   full 1180×820 `CODEX_UI_KIT_COMMAND_OUTPUT_REFERENCE`; its ownership mask
+   retains the command-card boundary, disclosure/Shell/output structure, and
+   spacing under a 1.5% hard limit. Transparent
    Electron/CDP reference pixels are composited onto the observed `#181818`
    window background before comparison, and independently implemented UI
    regions are located from their DOM contracts rather than hard-coded
@@ -78,11 +110,17 @@ the 120×46 window-chrome crop at the strict 0.05 pixel threshold, under its
 observed in Codex Desktop `26.721.81911`; offline/error/reconnecting/stale and
 restored-notification frames are explicitly synthetic coverage.
 
-The queued and paused Composer references measured `0.002722538` and
-`0.004478378` changed-pixel ratios at the same strict 0.05 pixel threshold.
-Their ownership masks exclude unrelated transcript text and fixture-specific
-labels, while preserving the queue and card silhouettes, 13px queue inset,
-controls, backgrounds, radii, and spacing.
+The current queued and automatic-continuation Composer references measured
+`0.003480114` and `0.005105745` changed-pixel ratios at the strict 0.05 pixel
+threshold. The current multiline, permissions, and resource references
+measured `0.000994318`, `0.001280084`, and `0.003352986`. Their ownership
+masks exclude unrelated transcript text and fixture-specific labels while
+preserving the queue, overlay, Composer silhouettes, controls, backgrounds,
+radii, and spacing. Goal and Plan measured `0.003763528` and `0.003486243`.
+The current long-thread rail/control comparison measured `0.005937382`.
+Current approval pending and denied comparisons measured `0.008493512` and
+`0.001214128`. Current `26.730.61309` long command output measured
+`0.001655643`.
 
 Computer Use remains an optional macOS acceptance layer for real pointer,
 focus, menu, multi-window, and OS integration checks. It is intentionally not a
@@ -151,10 +189,19 @@ accepted sample measured 2.9202337%, 5.1956799%, 4.7369405%, and 1.5698995%
 respectively.
 
 The twenty-third through twenty-sixth frames cover App shell loading, offline,
-stale, and restored states. The twenty-seventh through thirty-sixth frames
-cover conversation ready, multiline, running, queued, queue-paused, disabled,
-attachment, scroll-away, windowed history, and completion. The new frames use
-a scoped 2.25% internal main-region limit for their dense 20/22-message thread,
-covering the observed 1.84394% macOS-runner rasterization delta. CDP
-independently locks the 736×98 Composer, 28px controls, 13px queue inset,
-10/11 navigation markers, disabled semantics, and windowed placeholder.
+stale, and restored states. The conversation matrix now additionally includes
+current four-line, permission-menu, and resource-picker frames. These frames
+use a scoped 2.25% internal main-region limit for their dense thread, while
+CDP independently locks the current 736×134/736×259 Composer geometry,
+480×222 permission menu, 736×320 resource picker, 28px controls, 13px queue
+inset, navigation markers, disabled semantics, and windowed placeholder.
+
+The matrix now totals 66 frames. Its two command-approval frames cover the
+current 736×162 pending Composer-dock card and the denied completion with
+response actions and restored 736×98 Composer. CDP verifies request state,
+command/activity labels, dimensions, and permission restoration. Electron
+opens and dismisses the scoped menu with focus restoration, then drives
+`Deny` and confirms the approval disappears before the final response.
+The final frame covers a successful 400-line command with `Shell`, two copy
+controls, a 144px reverse-tail viewport, and Success. CDP locks its 401 split
+lines and collapse/reopen restoration; Electron drives the same disclosures.

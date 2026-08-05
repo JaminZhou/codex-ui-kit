@@ -20,6 +20,9 @@ import {
   ComposerContextBar,
   ComposerContextControl,
   ComposerDock,
+  ComposerModeIndicator,
+  ComposerPermissionMenu,
+  ComposerResourcePicker,
   ConversationContextBar,
   ConversationProjectListbox,
   ConversationThreadShell,
@@ -36,8 +39,12 @@ import {
   McpToolIcon,
   NewConversationStart,
   PullRequestCheckList,
+  PullRequestCommentComposer,
   PullRequestList,
+  PullRequestMergeReadiness,
   PullRequestPanelSummary,
+  PullRequestQueryState,
+  PullRequestReviewComposer,
   QueuedPromptList,
   StatusBanner,
   TerminalPanel,
@@ -54,6 +61,9 @@ import {
   WorkspacePanel,
   type TerminalEntry,
   type AppRouteOutletStatus,
+  type ComposerPermissionOption,
+  type ComposerModeKind,
+  type ComposerResourceGroup,
   type QueuedPrompt,
 } from "codex-ui-kit";
 import {
@@ -74,6 +84,7 @@ import {
   initialProtocolState,
   isTurnActive,
   reduceProtocolNotification,
+  settleApprovedCommandReplay,
   terminalTranscriptEvents,
   type DemoProtocolState,
   type ProtocolEventRecord,
@@ -101,6 +112,11 @@ import {
   mcpToolCallGroupStatus,
   mcpToolCallPresentation,
 } from "./mcp-tool-call-view";
+import {
+  initialPullRequestLifecycleState,
+  reducePullRequestLifecycle,
+  type PullRequestLifecycleAction,
+} from "./pull-request-lifecycle";
 
 type DemoView = "conversation" | "pull-request" | "shell" | "workspace";
 
@@ -197,15 +213,24 @@ function replayState(
 
 const conversationHostFrames = new Set([
   "composer-attachment",
+  "composer-auto-continued",
   "composer-disabled",
   "composer-idle",
+  "composer-goal",
   "composer-multiline",
+  "composer-plan",
+  "composer-permissions-menu",
   "composer-queue-paused",
   "composer-queued",
+  "composer-resources-menu",
   "composer-running",
   "thread-scroll-away",
   "thread-windowed",
 ]);
+
+const currentWindowedHistorySize = 82;
+const currentWindowedTurnWindowSize = 7;
+const currentWindowedInitialIndex = 39;
 
 function replayCountForSelection(
   scenario: ReplayScenario,
@@ -216,7 +241,11 @@ function replayCountForSelection(
     return scenario.events.length;
   }
   if (!conversationHostFrames.has(frame)) return scenario.events.length;
-  if (frame === "composer-running" || frame === "composer-queued") {
+  if (
+    frame === "composer-running" ||
+    frame === "composer-queued" ||
+    frame === "composer-auto-continued"
+  ) {
     return scenario.frames["conversation-running"] ?? scenario.events.length;
   }
   return (
@@ -225,11 +254,16 @@ function replayCountForSelection(
 }
 
 function initialComposerValue(frame: string | null) {
-  if (frame === "composer-multiline") {
+  if (
+    frame === "composer-multiline" ||
+    frame === "composer-permissions-menu" ||
+    frame === "composer-resources-menu"
+  ) {
     return [
-      "Please compare the current runtime evidence,",
-      "the computed Composer geometry,",
-      "and the regional pixel gate.",
+      "First current-build Composer line.",
+      "Second line checks automatic growth.",
+      "Third line keeps the draft unsubmitted.",
+      "Fourth line reaches the measured expanded state.",
     ].join("\n");
   }
   if (frame === "composer-disabled") {
@@ -237,6 +271,160 @@ function initialComposerValue(frame: string | null) {
   }
   return "";
 }
+
+type ComposerOverlay = "permissions" | "resources" | null;
+type ComposerMode = Extract<ComposerModeKind, "goal" | "plan"> | null;
+
+function initialComposerOverlay(frame: string | null): ComposerOverlay {
+  if (frame === "composer-permissions-menu") return "permissions";
+  if (frame === "composer-resources-menu") return "resources";
+  return null;
+}
+
+function initialComposerMode(frame: string | null): ComposerMode {
+  if (frame === "composer-goal") return "goal";
+  if (frame === "composer-plan") return "plan";
+  return null;
+}
+
+const composerPermissionOptions: readonly ComposerPermissionOption[] = [
+  {
+    description:
+      "Always ask to edit external files and use the internet",
+    icon: "○",
+    id: "ask",
+    label: "Ask for approval",
+  },
+  {
+    description:
+      "Only ask for actions detected as potentially unsafe",
+    icon: "○",
+    id: "approve",
+    label: "Approve for me",
+  },
+  {
+    description:
+      "Unrestricted access to the internet and any file on your computer",
+    icon: "◉",
+    id: "full",
+    label: "Full access",
+  },
+  {
+    description: "Uses permissions defined in config.toml",
+    icon: "○",
+    id: "custom",
+    label: "Custom (config.toml)",
+  },
+];
+
+const composerResourceGroups: readonly ComposerResourceGroup[] = [
+  {
+    id: "add",
+    options: [
+      {
+        icon: "＋",
+        id: "files",
+        label: "Files and folders",
+      },
+      {
+        icon: "▣",
+        id: "active-app",
+        label: "Attach active app",
+      },
+      {
+        description: "Choose project for new chats",
+        icon: "□",
+        id: "project",
+        label: "Work in a project",
+      },
+      {
+        description: "Set a goal to keep pursuing",
+        icon: "◎",
+        id: "goal",
+        label: "Goal",
+      },
+      {
+        description: "Turn plan mode on",
+        icon: "◇",
+        id: "plan",
+        label: "Plan mode",
+      },
+      {
+        icon: "◌",
+        id: "record-skill",
+        label: "Record a skill",
+      },
+    ],
+  },
+  {
+    id: "plugins",
+    label: "Plugins",
+    options: [
+      {
+        description: "Create and edit document artifacts",
+        icon: "▤",
+        id: "documents",
+        label: "Documents",
+      },
+      {
+        description: "Read, create, and verify PDF files",
+        icon: "▧",
+        id: "pdf",
+        label: "PDF",
+      },
+      {
+        description: "Create and edit spreadsheet files",
+        icon: "▦",
+        id: "spreadsheets",
+        label: "Spreadsheets",
+      },
+      {
+        description: "Create and edit presentations",
+        icon: "▥",
+        id: "presentations",
+        label: "Presentations",
+      },
+    ],
+  },
+  {
+    id: "skills",
+    label: "Skills",
+    options: [
+      { icon: "◎", id: "browser-control", label: "Browser control" },
+      { icon: "◎", id: "chrome-control", label: "Chrome control" },
+      { icon: "◎", id: "computer-use", label: "Computer use" },
+      { icon: "◎", id: "image-generation", label: "Image generation" },
+      { icon: "◎", id: "openai-docs", label: "OpenAI docs" },
+      { icon: "◎", id: "watch-pr", label: "Watch pull request" },
+      { icon: "◎", id: "visualize", label: "Visualize" },
+      { icon: "◎", id: "site-builder", label: "Site builder" },
+    ],
+  },
+  {
+    id: "apps",
+    label: "Apps",
+    options: [
+      { icon: "◫", id: "browser-app", label: "Browser" },
+      { icon: "◫", id: "chrome-app", label: "Chrome" },
+      { icon: "◫", id: "tasks-app", label: "Codex tasks" },
+      { icon: "◫", id: "files-app", label: "Local files" },
+      { icon: "◫", id: "terminal-app", label: "Terminal" },
+      { icon: "◫", id: "electron-app", label: "Electron" },
+      { icon: "◫", id: "github-app", label: "GitHub" },
+    ],
+  },
+  {
+    id: "context",
+    label: "Context",
+    options: [
+      { icon: "⊕", id: "current-task", label: "Current task" },
+      { icon: "⊕", id: "current-repository", label: "Current repository" },
+      { icon: "⊕", id: "browser-tab", label: "Open browser tab" },
+      { icon: "⊕", id: "recent-screenshot", label: "Recent screenshot" },
+      { icon: "⊕", id: "clipboard", label: "Clipboard" },
+    ],
+  },
+];
 
 function initialQueuedPrompts(frame: string | null): QueuedPrompt[] {
   if (frame !== "composer-queued" && frame !== "composer-queue-paused") {
@@ -249,6 +437,12 @@ function initialQueuedPrompts(frame: string | null): QueuedPrompt[] {
       text: "Verify the queued Composer lifecycle.",
     },
   ];
+}
+
+function initialQueuedContinuation(frame: string | null) {
+  return frame === "composer-auto-continued"
+    ? "Verify the queued Composer lifecycle."
+    : null;
 }
 
 const terminalLifecycleCommandIds = [
@@ -308,17 +502,92 @@ function interruptConversationReplay(
     params: {
       threadId: state.threadId,
       turn: {
-        completedAt: null,
-        durationMs: null,
+        completedAt: 13,
+        durationMs: 2_000,
         error: null,
         id: state.currentTurnId,
         items: [],
         itemsView: "full",
-        startedAt: null,
+        startedAt: 11,
         status: "interrupted",
       },
     },
   });
+}
+
+function continueQueuedConversationReplay(
+  state: DemoProtocolState,
+  prompt: string,
+): DemoProtocolState {
+  const interrupted = interruptConversationReplay(state);
+  const threadId =
+    interrupted.threadId ?? "thread-conversation-lifecycle";
+  const turnId = "turn-queued-continuation";
+  const startAt = interrupted.eventCount;
+  const continuationEvents: ProtocolEventRecord[] = [
+    {
+      atMs: startAt,
+      method: "item/started",
+      params: {
+        item: {
+          clientId: "demo-queued-continuation",
+          content: [{ text: prompt, text_elements: [], type: "text" }],
+          id: "user-queued-continuation",
+          type: "userMessage",
+        },
+        startedAtMs: 13_000,
+        threadId,
+        turnId,
+      },
+    },
+    {
+      atMs: startAt + 1,
+      method: "turn/started",
+      params: {
+        threadId,
+        turn: {
+          completedAt: null,
+          durationMs: null,
+          error: null,
+          id: turnId,
+          items: [],
+          itemsView: "full",
+          startedAt: 13,
+          status: "inProgress",
+        },
+      },
+    },
+    {
+      atMs: startAt + 2,
+      method: "item/started",
+      params: {
+        item: {
+          id: "assistant-queued-continuation",
+          memoryCitation: null,
+          phase: "final_answer",
+          text: "",
+          type: "agentMessage",
+        },
+        startedAtMs: 13_020,
+        threadId,
+        turnId,
+      },
+    },
+    {
+      atMs: startAt + 3,
+      method: "item/agentMessage/delta",
+      params: {
+        delta: "Working on the queued follow-up…",
+        itemId: "assistant-queued-continuation",
+        threadId,
+        turnId,
+      },
+    },
+  ];
+  return continuationEvents.reduce(
+    reduceProtocolNotification,
+    interrupted,
+  );
 }
 
 function statusLabel(state: DemoProtocolState) {
@@ -328,22 +597,6 @@ function statusLabel(state: DemoProtocolState) {
   if (state.status === "interrupted") return "Stopped";
   if (state.status === "failed") return "Failed";
   return "Ready";
-}
-
-function McpAnswer({ text }: { text: string }) {
-  const [title = "", url = ""] = text.split(/\r?\n/, 2);
-  return (
-    <div className="demo-mcp-answer">
-      <span>{title}</span>
-      <a href={url} rel="noreferrer" target="_blank">
-        <svg aria-hidden="true" viewBox="0 0 16 16">
-          <circle cx="8" cy="8" r="6.5" />
-          <path d="M1.8 8h12.4M8 1.5a10 10 0 0 1 0 13M8 1.5a10 10 0 0 0 0 13" />
-        </svg>
-        <span>{url}</span>
-      </a>
-    </div>
-  );
 }
 
 function McpResponseActions({
@@ -384,71 +637,86 @@ function McpResponseActions({
 
 const pullRequestFiles = [
   {
-    additions: 3,
+    additions: 31,
     change: "modified" as const,
-    deletions: 1,
+    deletions: 0,
     lines: [
       {
-        content: "@@ -318,6 +318,8 @@ export interface AppShellProps",
+        content:
+          "@@ -136,8 +137,31 @@ export type TerminalSessionStatus",
         kind: "hunk" as const,
       },
       {
-        content: "sidePanelOpen?: boolean;",
+        content: '| "idle"',
         kind: "context" as const,
-        newLineNumber: 329,
-        oldLineNumber: 329,
+        newLineNumber: 140,
+        oldLineNumber: 140,
       },
       {
-        content: "sidePanelResizable?: boolean;",
+        content: '| "restoring"',
         kind: "addition" as const,
-        newLineNumber: 330,
+        newLineNumber: 141,
       },
       {
-        content: "sidePanelResizeLabel?: string;",
+        content: '| "running";',
+        kind: "context" as const,
+        newLineNumber: 142,
+        oldLineNumber: 141,
+      },
+      {
+        content: "const terminalSessionStatusLabel = {",
         kind: "addition" as const,
-        newLineNumber: 331,
+        newLineNumber: 144,
       },
     ],
-    path: "src/components/AppShell.tsx",
+    path: "src/components/TerminalPanel.tsx",
   },
   {
-    additions: 5,
+    additions: 7,
     change: "modified" as const,
     deletions: 0,
     lines: [
       {
-        content: "@@ -243,6 +243,11 @@",
+        content: "@@ -16,6 +17,7 @@ export type ReplayScenarioId",
         kind: "hunk" as const,
       },
       {
-        content: ".codex-ui-app-shell__side-panel-resizer {",
+        content: '| "terminal-lifecycle"',
         kind: "addition" as const,
-        newLineNumber: 245,
+        newLineNumber: 20,
       },
       {
-        content: "  cursor: col-resize;",
+        content: '| "interruption"',
+        kind: "context" as const,
+        newLineNumber: 21,
+        oldLineNumber: 20,
+      },
+      {
+        content: '"terminal-lifecycle": scenario(',
         kind: "addition" as const,
-        newLineNumber: 246,
+        newLineNumber: 84,
       },
     ],
-    path: "src/styles.css",
+    path: "playgrounds/codex-app/src/replay.ts",
   },
   {
-    additions: 8,
+    additions: 140,
     change: "modified" as const,
     deletions: 0,
     lines: [
       {
-        content: "@@ -262,6 +262,14 @@ describe(\"application shell\", () => {",
+        content:
+          '@@ -87,4 +89,140 @@ describe("terminal panel", () => {',
         kind: "hunk" as const,
       },
       {
-        content: "it(\"resizes the workspace track\", () => {",
+        content:
+          'it("coordinates multiple controlled sessions, close, create, and restore", () => {',
         kind: "addition" as const,
-        newLineNumber: 265,
+        newLineNumber: 92,
       },
     ],
-    path: "tests/app-shell.test.tsx",
+    path: "tests/terminal-panel.test.tsx",
   },
 ];
 
@@ -600,6 +868,17 @@ export function App() {
   const [composerValue, setComposerValue] = useState(() =>
     initialComposerValue(initialSelection.frame),
   );
+  const [composerOverlay, setComposerOverlay] =
+    useState<ComposerOverlay>(() =>
+      initialComposerOverlay(initialSelection.frame),
+    );
+  const [composerMode, setComposerMode] = useState<ComposerMode>(() =>
+    initialComposerMode(initialSelection.frame),
+  );
+  const [composerPermissionId, setComposerPermissionId] =
+    useState("full");
+  const [composerResourceActiveId, setComposerResourceActiveId] =
+    useState("files");
   const [queuedPrompts, setQueuedPrompts] = useState<QueuedPrompt[]>(() =>
     initialQueuedPrompts(initialSelection.frame),
   );
@@ -613,6 +892,10 @@ export function App() {
   const [replayComposerStopped, setReplayComposerStopped] = useState(
     initialSelection.frame === "composer-queue-paused",
   );
+  const [replayQueuedContinuation, setReplayQueuedContinuation] =
+    useState<string | null>(() =>
+      initialQueuedContinuation(initialSelection.frame),
+    );
   const [replayApprovalResolution, setReplayApprovalResolution] =
     useState<{
       decision: "approved" | "rejected";
@@ -627,16 +910,20 @@ export function App() {
   const [workspaceRunProjectLabel, setWorkspaceRunProjectLabel] =
     useState("codex-ui-kit");
   const [threadFollowing, setThreadFollowing] = useState(
-    initialSelection.frame !== "thread-scroll-away",
+    initialSelection.frame !== "thread-scroll-away" &&
+      initialSelection.frame !== "thread-windowed",
   );
   const [activeFrame, setActiveFrame] = useState(initialSelection.frame);
   const [scenarioSelectionVersion, setScenarioSelectionVersion] =
     useState(0);
-  const [windowedTimelineExpanded, setWindowedTimelineExpanded] =
-    useState(false);
+  const [windowedSelectedMessageIndex, setWindowedSelectedMessageIndex] =
+    useState(currentWindowedInitialIndex);
   const [liveStartPending, setLiveStartPending] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(
-    () => initialSelection.capture || !isNarrowDemoWindow(),
+    () =>
+      (initialSelection.capture &&
+        initialSelection.frame !== "pr-compact-detail") ||
+      !isNarrowDemoWindow(),
   );
   const [reviewOpen, setReviewOpen] = useState(
     initialSelection.frame === "review-open" ||
@@ -683,19 +970,36 @@ export function App() {
     name: string;
     value: unknown;
   } | null>(null);
+  const [pullRequestState, dispatchPullRequest] = useReducer(
+    reducePullRequestLifecycle,
+    initialSelection.frame,
+    initialPullRequestLifecycleState,
+  );
   const [pullRequestExpanded, setPullRequestExpanded] = useState(false);
   const [pullRequestOpen, setPullRequestOpen] = useState(
-    initialSelection.view === "pull-request",
+    initialSelection.view === "pull-request" &&
+      pullRequestState.selectedId !== null,
   );
-  const [pullRequestWidth, setPullRequestWidth] = useState(554);
+  const [pullRequestWidth, setPullRequestWidth] = useState(370);
   const [pullRequestTab, setPullRequestTab] = useState<
-    "code" | "summary" | "timeline"
-  >("summary");
+    "code" | "summary"
+  >(
+    initialSelection.frame?.startsWith("pr-review-")
+      ? "code"
+      : "summary",
+  );
+  const [pullRequestReviewOpen, setPullRequestReviewOpen] = useState(
+    initialSelection.frame?.startsWith("pr-review-") ?? false,
+  );
+  const [pullRequestReviewMenuOpen, setPullRequestReviewMenuOpen] =
+    useState(false);
   const [undoneFileIds, setUndoneFileIds] = useState<Set<string>>(
     () => new Set(),
   );
   const [liveError, setLiveError] = useState<string | null>(null);
   const liveStartPendingRef = useRef(false);
+  const composerInputRef = useRef<HTMLTextAreaElement>(null);
+  const composerResourceTriggerRef = useRef<HTMLButtonElement>(null);
   const workspaceEnvironmentTriggerRef =
     useRef<HTMLButtonElement>(null);
   const workspaceWorktreeTriggerRef = useRef<HTMLButtonElement>(null);
@@ -704,10 +1008,7 @@ export function App() {
   const queuedPromptCounterRef = useRef(1);
   const terminalSessionCounterRef = useRef(1);
   const replaySubmitTimerRef = useRef<number | null>(null);
-  const pendingMessageNavigationRef = useRef<{
-    behavior: "instant" | "smooth";
-    id: string;
-  } | null>(null);
+  const pullRequestTransitionTimerRef = useRef<number | null>(null);
   const threadViewportRef = useRef<HTMLDivElement>(null);
   const liveApprovalSubmissionGateRef = useRef(
     new LiveApprovalSubmissionGate(),
@@ -730,22 +1031,49 @@ export function App() {
   const isConversationLifecycle =
     mode === "replay" && scenarioId === "conversation-lifecycle";
   const lifecycleReplay = useMemo(
-    () =>
-      isConversationLifecycle && replayComposerStopped
-        ? interruptConversationReplay(replay)
-        : replay,
-    [isConversationLifecycle, replay, replayComposerStopped],
+    () => {
+      if (!isConversationLifecycle) return replay;
+      const continuedReplay = replayQueuedContinuation
+        ? continueQueuedConversationReplay(
+            replay,
+            replayQueuedContinuation,
+          )
+        : replay;
+      return replayComposerStopped
+        ? interruptConversationReplay(continuedReplay)
+        : continuedReplay;
+    },
+    [
+      isConversationLifecycle,
+      replay,
+      replayComposerStopped,
+      replayQueuedContinuation,
+    ],
   );
   const state = useMemo(
-    () =>
-      mode === "live"
-        ? liveState
-        : replayApprovalResolution
-          ? reduceProtocolNotification(lifecycleReplay, {
-              ...replayApprovalResolution,
-              kind: "approval-resolution",
-            })
-          : lifecycleReplay,
+    () => {
+      if (mode === "live") return liveState;
+      const resolvedReplay = replayApprovalResolution
+        ? reduceProtocolNotification(lifecycleReplay, {
+            ...replayApprovalResolution,
+            kind: "approval-resolution",
+          })
+        : lifecycleReplay;
+      return scenarioId === "approval-denied" &&
+        replayApprovalResolution?.decision === "approved"
+        ? settleApprovedCommandReplay(
+            resolvedReplay,
+            replayApprovalResolution.requestId,
+            {
+              durationMs: 23_000,
+              messageId: "assistant-approval-approved",
+              messageText:
+                "Approval was granted, and the command completed successfully.",
+              replacedMessageId: "assistant-approval-denied",
+            },
+          )
+        : resolvedReplay;
+    },
     [
       lifecycleReplay,
       liveState,
@@ -753,6 +1081,10 @@ export function App() {
       replayApprovalResolution,
     ],
   );
+  const isCurrentApprovalReplay =
+    mode === "replay" && scenarioId === "approval-denied";
+  const isCurrentLongCommandReplay =
+    mode === "replay" && scenarioId === "long-command-output";
   const replayComposerRunning =
     isConversationLifecycle && state.status === "running";
 
@@ -791,6 +1123,9 @@ export function App() {
       if (replaySubmitTimerRef.current !== null) {
         window.clearTimeout(replaySubmitTimerRef.current);
       }
+      if (pullRequestTransitionTimerRef.current !== null) {
+        window.clearTimeout(pullRequestTransitionTimerRef.current);
+      }
     },
     [],
   );
@@ -801,11 +1136,30 @@ export function App() {
     replaySubmitTimerRef.current = null;
   };
 
+  const schedulePullRequestTransition = useCallback(
+    (
+      pending: PullRequestLifecycleAction,
+      settled: PullRequestLifecycleAction,
+    ) => {
+      if (pullRequestTransitionTimerRef.current !== null) {
+        window.clearTimeout(pullRequestTransitionTimerRef.current);
+      }
+      dispatchPullRequest(pending);
+      pullRequestTransitionTimerRef.current = window.setTimeout(() => {
+        dispatchPullRequest(settled);
+        pullRequestTransitionTimerRef.current = null;
+      }, 420);
+    },
+    [],
+  );
+
   const selectReplayPosition = (nextCount: number) => {
     cancelReplaySubmitTimer();
     setActiveFrame(null);
+    setComposerOverlay(null);
     setReplayComposerSubmitting(false);
     setReplayComposerStopped(false);
+    setReplayQueuedContinuation(null);
     setReplayApprovalResolution(null);
     setQueueInterrupted(false);
     if (!isTurnActive(replayState(scenarioEvents, nextCount).status)) {
@@ -834,6 +1188,7 @@ export function App() {
     setWorkspaceProjectQuery("");
     setWorkspaceProjectTriggerId("demo-workspace-project-trigger");
     setComposerValue("");
+    setComposerOverlay(null);
     setReplayApprovalResolution(null);
     setActiveFrame("workspace-ready");
     setReviewOpen(false);
@@ -881,17 +1236,20 @@ export function App() {
     setReplayCount(
       replayCountForSelection(replayScenarios[nextId], frame),
     );
-    setComposerValue("");
+    setComposerValue(initialComposerValue(frame));
+    setComposerOverlay(initialComposerOverlay(frame));
+    setComposerMode(initialComposerMode(frame));
+    setComposerResourceActiveId("files");
     setQueuedPrompts([]);
     setQueueingEnabled(true);
     setQueueInterrupted(false);
     setReplayComposerSubmitting(false);
     setReplayComposerStopped(false);
+    setReplayQueuedContinuation(initialQueuedContinuation(frame));
     setReplayApprovalResolution(null);
     setActiveFrame(frame);
     setScenarioSelectionVersion((version) => version + 1);
-    setWindowedTimelineExpanded(false);
-    pendingMessageNavigationRef.current = null;
+    setWindowedSelectedMessageIndex(currentWindowedInitialIndex);
     setReviewOpen(false);
     setReviewSelection(null);
     setTerminalOpen(
@@ -922,14 +1280,22 @@ export function App() {
     setMode(nextMode);
     setActiveFrame(null);
     setComposerValue("");
+    setComposerOverlay(null);
     setQueuedPrompts([]);
     setQueueingEnabled(true);
     setQueueInterrupted(false);
     setReplayComposerSubmitting(false);
     setReplayComposerStopped(false);
+    setReplayQueuedContinuation(null);
     setReplayApprovalResolution(null);
     setWorkspaceOverlay(null);
     setWorkspaceLocalEnvironmentOpen(false);
+  };
+
+  const dismissComposerResources = () => {
+    setComposerOverlay(null);
+    setActiveFrame(null);
+    window.setTimeout(() => composerInputRef.current?.focus());
   };
 
   const respondToApproval = async (
@@ -937,6 +1303,21 @@ export function App() {
     decision: "accept" | "decline",
   ) => {
     if (mode === "replay") {
+      if (isCurrentApprovalReplay) {
+        if (decision === "decline") {
+          setReplayApprovalResolution(null);
+          setReplayCount(scenario.events.length);
+          setActiveFrame("approval-current-denied");
+        } else {
+          setReplayApprovalResolution({
+            decision: "approved",
+            requestId,
+          });
+          setReplayCount(scenario.events.length);
+          setActiveFrame(null);
+        }
+        return;
+      }
       if (decision === "accept") {
         setReplayApprovalResolution(null);
         setReplayCount(scenario.events.length);
@@ -1006,6 +1387,7 @@ export function App() {
 
   const restoreConversationRunningReplay = () => {
     setReplayComposerStopped(false);
+    setReplayQueuedContinuation(null);
     setQueueInterrupted(false);
     setReplayCount(
       replayScenarios["conversation-lifecycle"].frames[
@@ -1020,6 +1402,7 @@ export function App() {
       return;
     }
     setActiveFrame(null);
+    setComposerOverlay(null);
     if (replayComposerRunning) {
       if (queueingEnabled) {
         queuedPromptCounterRef.current += 1;
@@ -1040,6 +1423,7 @@ export function App() {
     cancelReplaySubmitTimer();
     setReplayComposerSubmitting(true);
     setReplayComposerStopped(false);
+    setReplayQueuedContinuation(null);
     setQueueInterrupted(false);
     replaySubmitTimerRef.current = window.setTimeout(() => {
       replaySubmitTimerRef.current = null;
@@ -1060,10 +1444,20 @@ export function App() {
     }
     cancelReplaySubmitTimer();
     setReplayComposerSubmitting(false);
-    setReplayComposerStopped(true);
-    if (queuedPrompts.length > 0) {
-      setQueueInterrupted(true);
+    const [nextQueuedPrompt, ...remainingQueuedPrompts] =
+      queuedPrompts;
+    if (
+      nextQueuedPrompt &&
+      typeof nextQueuedPrompt.text === "string"
+    ) {
+      setReplayComposerStopped(false);
+      setReplayQueuedContinuation(nextQueuedPrompt.text);
+      setQueuedPrompts(remainingQueuedPrompts);
+      setQueueInterrupted(false);
+      return;
     }
+    setReplayComposerStopped(true);
+    setQueueInterrupted(false);
   };
 
   const resumeQueue = () => {
@@ -1107,14 +1501,20 @@ export function App() {
     });
   };
 
+  const currentWindowedFrame =
+    isConversationLifecycle && activeFrame === "thread-windowed";
+
   const returnToLatest = useCallback(() => {
     const viewport = threadViewportRef.current;
     if (!viewport) return;
+    if (currentWindowedFrame) {
+      setWindowedSelectedMessageIndex(currentWindowedHistorySize - 1);
+    }
     viewport.scrollTo({
       behavior: "smooth",
-      top: viewport.scrollHeight,
+      top: currentWindowedFrame ? 0 : viewport.scrollHeight,
     });
-  }, []);
+  }, [currentWindowedFrame]);
 
   useLayoutEffect(() => {
     if (scenarioSelectionVersion === 0) return;
@@ -1123,7 +1523,8 @@ export function App() {
     let resetFrame = 0;
     const layoutFrame = window.requestAnimationFrame(() => {
       resetFrame = window.requestAnimationFrame(() => {
-        viewport.scrollTop = viewport.scrollHeight;
+        viewport.scrollTop =
+          activeFrame === "thread-windowed" ? -28_484 : viewport.scrollHeight;
         viewport.dispatchEvent(new Event("scroll", { bubbles: true }));
       });
     });
@@ -1131,7 +1532,7 @@ export function App() {
       window.cancelAnimationFrame(layoutFrame);
       window.cancelAnimationFrame(resetFrame);
     };
-  }, [scenarioSelectionVersion]);
+  }, [activeFrame, scenarioSelectionVersion]);
 
   const scrollToMessage = useCallback(
     (id: string, behavior: "instant" | "smooth") => {
@@ -1149,13 +1550,40 @@ export function App() {
     [],
   );
 
-  useEffect(() => {
-    if (!windowedTimelineExpanded) return;
-    const pendingNavigation = pendingMessageNavigationRef.current;
-    if (!pendingNavigation) return;
-    pendingMessageNavigationRef.current = null;
-    scrollToMessage(pendingNavigation.id, pendingNavigation.behavior);
-  }, [scrollToMessage, windowedTimelineExpanded]);
+  useLayoutEffect(() => {
+    if (!currentWindowedFrame) return;
+    const viewport = threadViewportRef.current;
+    if (!viewport) return;
+    let alignmentFrame = 0;
+    let scrollFrame = window.requestAnimationFrame(() => {
+      scrollFrame = window.requestAnimationFrame(() => {
+        const messagesAfter =
+          currentWindowedHistorySize - 1 - windowedSelectedMessageIndex;
+        const distanceFromLatest =
+          messagesAfter === 0 ? 0 : messagesAfter * 672 + 320;
+        viewport.scrollTop = -Math.min(
+          viewport.scrollHeight - viewport.clientHeight,
+          distanceFromLatest,
+        );
+        alignmentFrame = window.requestAnimationFrame(() => {
+          const selectedTurn = viewport.querySelector<HTMLElement>(
+            `[data-windowed-turn="${windowedSelectedMessageIndex + 1}"]`,
+          );
+          if (selectedTurn && messagesAfter > 0) {
+            const viewportBounds = viewport.getBoundingClientRect();
+            const selectedBounds = selectedTurn.getBoundingClientRect();
+            viewport.scrollTop +=
+              selectedBounds.top - (viewportBounds.top + 180);
+          }
+          viewport.dispatchEvent(new Event("scroll", { bubbles: true }));
+        });
+      });
+    });
+    return () => {
+      window.cancelAnimationFrame(scrollFrame);
+      window.cancelAnimationFrame(alignmentFrame);
+    };
+  }, [currentWindowedFrame, windowedSelectedMessageIndex]);
 
   const lastEvent = scenario.events[Math.max(0, replayCount - 1)];
   const sidebar = (
@@ -1249,7 +1677,11 @@ export function App() {
           }
           actionsLabel="Current task actions"
           leading={<SidebarGlyph name="folder" />}
-          status={hasActiveTurnWork(state) ? "running" : "idle"}
+          status={
+            hasActiveTurnWork(state) || isTurnActive(state.status)
+              ? "running"
+              : "idle"
+          }
           statusLabel="Current task is running"
         >
           codex-ui-kit
@@ -1401,53 +1833,93 @@ export function App() {
         ? "queue-paused"
         : activeFrame === "composer-attachment"
           ? "attachment"
-          : composerValue.includes("\n")
-            ? "multiline"
-            : "idle";
+          : composerMode
+            ? composerMode
+            : composerValue.includes("\n")
+              ? "multiline"
+              : "idle";
+  const currentHeaderReplay =
+    mode === "replay" &&
+    (scenarioId === "mcp-tool-call" ||
+      scenarioId === "mcp-recovery-mixed-thread" ||
+      scenarioId === "long-command-output");
+  const selectedComposerPermission =
+    (isCurrentApprovalReplay || isCurrentLongCommandReplay
+      ? composerPermissionOptions[0]
+      : composerPermissionOptions.find(
+          ({ id }) => id === composerPermissionId,
+        )) ?? composerPermissionOptions[2]!;
   const header = (
     <ThreadHeader
       endActions={
-        <div className="demo-header-actions">
-          <span className="demo-status" data-status={displayedStatus}>
-            {replayStatusLabel(
-              state.status,
-              composerIsRunning,
-              isConversationLifecycle && replayComposerStopped,
-            )}
-          </span>
-          {scenarioId === "background-terminal" ||
-          scenarioId === "terminal-lifecycle" ? (
+        currentHeaderReplay ? (
+          <div className="demo-current-mcp-header-actions">
+            <button aria-label="Open integration menu" type="button">
+              ◈⌄
+            </button>
+            <button aria-label="Thread settings" type="button">
+              ☷
+            </button>
+            <button aria-label="Toggle bottom panel" type="button">
+              ▱
+            </button>
+            <button aria-label="Toggle side panel" type="button">
+              ▯
+            </button>
+          </div>
+        ) : (
+          <div className="demo-header-actions">
+            <span className="demo-status" data-status={displayedStatus}>
+              {replayStatusLabel(
+                state.status,
+                composerIsRunning,
+                isConversationLifecycle && replayComposerStopped,
+              )}
+            </span>
+            {scenarioId === "background-terminal" ||
+            scenarioId === "terminal-lifecycle" ? (
+              <Button
+                aria-label="Toggle bottom panel"
+                aria-pressed={terminalOpen}
+                onClick={() => setTerminalOpen((open) => !open)}
+                size="small"
+                tone="ghost"
+              >
+                ▱
+              </Button>
+            ) : null}
             <Button
-              aria-label="Toggle bottom panel"
-              aria-pressed={terminalOpen}
-              onClick={() => setTerminalOpen((open) => !open)}
+              onClick={() =>
+                selectMode(mode === "replay" ? "live" : "replay")
+              }
               size="small"
               tone="ghost"
             >
-              ▱
+              {mode === "replay" ? "Live" : "Replay"}
             </Button>
-          ) : null}
+          </div>
+        )
+      }
+      navigation={
+        currentHeaderReplay ? (
+          <span aria-hidden="true" className="demo-current-mcp-folder">
+            ▱
+          </span>
+        ) : (
           <Button
-            onClick={() => selectMode(mode === "replay" ? "live" : "replay")}
+            aria-label={sidebarOpen ? "Hide sidebar" : "Show sidebar"}
+            onClick={() => setSidebarOpen(!sidebarOpen)}
             size="small"
             tone="ghost"
           >
-            {mode === "replay" ? "Live" : "Replay"}
+            ☰
           </Button>
-        </div>
-      }
-      navigation={
-        <Button
-          aria-label={sidebarOpen ? "Hide sidebar" : "Show sidebar"}
-          onClick={() => setSidebarOpen(!sidebarOpen)}
-          size="small"
-          tone="ghost"
-        >
-          ☰
-        </Button>
+        )
       }
       subtitle={
-        mode === "replay"
+        currentHeaderReplay
+          ? undefined
+          : mode === "replay"
           ? `${scenario.id} · ${replayCount}/${scenario.events.length} events`
           : state.threadId ?? "Local app-server"
       }
@@ -1461,19 +1933,91 @@ export function App() {
       scenarioId === "mixed-file-review" ||
       scenarioId === "markdown" ||
       scenarioId === "mcp-tool-call" ||
-      scenarioId === "mcp-recovery-mixed-thread");
+      scenarioId === "mcp-recovery-mixed-thread" ||
+      scenarioId === "approval-denied" ||
+      scenarioId === "long-command-output");
   const showLifecycleComposer = isConversationLifecycle;
   const composerSurface = (
     <AgentComposer
       actions={
         showMeasuredComposer || showLifecycleComposer ? (
           <span className="demo-composer-controls">
-            <button aria-label="Add files and more" type="button">
+            <button
+              aria-expanded={composerOverlay === "resources"}
+              aria-label="Add files and more"
+              onClick={() => {
+                setActiveFrame(null);
+                setComposerOverlay((current) =>
+                  current === "resources" ? null : "resources",
+                );
+              }}
+              onKeyDown={(event) => {
+                if (
+                  event.key === "Escape" &&
+                  composerOverlay === "resources"
+                ) {
+                  event.preventDefault();
+                  dismissComposerResources();
+                }
+              }}
+              ref={composerResourceTriggerRef}
+              type="button"
+            >
               +
             </button>
-            <button aria-label="Change permissions" type="button">
-              ◉ Approve for me
-            </button>
+            <ComposerPermissionMenu
+              align="start"
+              heading="How should ChatGPT actions be approved?"
+              learnMore="Learn more"
+              onOpenChange={(open) => {
+                setActiveFrame(null);
+                setComposerOverlay((current) =>
+                  open
+                    ? "permissions"
+                    : current === "permissions"
+                      ? null
+                      : current,
+                );
+              }}
+              onSelect={(option) => {
+                setComposerPermissionId(option.id);
+                setComposerOverlay(null);
+                setActiveFrame(null);
+              }}
+              open={composerOverlay === "permissions"}
+              options={composerPermissionOptions}
+              selectedId={selectedComposerPermission.id}
+              side="top"
+              sideOffset={1.5}
+              trigger={
+                <button
+                  aria-label="Change permissions"
+                  className="demo-composer-permission-trigger"
+                  type="button"
+                >
+                  <span aria-hidden="true">◉</span>
+                  {currentHeaderReplay ||
+                  showLifecycleComposer ||
+                  isCurrentApprovalReplay
+                    ? selectedComposerPermission.label
+                    : "Approve for me"}
+                </button>
+              }
+            />
+            {composerMode ? (
+              <ComposerModeIndicator
+                clearLabel={
+                  composerMode === "goal" ? "Clear goal" : "Plan"
+                }
+                kind={composerMode}
+                label={composerMode === "goal" ? "Goal" : "Plan"}
+                onClear={() => {
+                  setComposerMode(null);
+                  setActiveFrame(null);
+                  requestAnimationFrame(() => composerInputRef.current?.focus());
+                }}
+              />
+            ) : null}
           </span>
         ) : undefined
       }
@@ -1513,18 +2057,48 @@ export function App() {
       onSubmit={submitComposer}
       onValueChange={setComposerValue}
       placeholder={
-        showMeasuredComposer || showLifecycleComposer
-          ? "Do anything"
-          : mode === "live"
-          ? "Ask Codex to inspect this repository…"
-          : "Switch to Live to send a real local turn…"
+        composerMode === "goal"
+          ? "Describe your goal, define measurable outcomes for best results"
+          : composerMode === "plan"
+            ? "Describe your task to generate a plan..."
+            : showMeasuredComposer || showLifecycleComposer
+              ? "Do anything"
+              : mode === "live"
+                ? "Ask Codex to inspect this repository…"
+                : "Switch to Live to send a real local turn…"
       }
       stopLabel="Stop"
-      textareaLabel="Message composer"
+      suggestions={
+        (showMeasuredComposer || showLifecycleComposer) &&
+        composerOverlay === "resources" ? (
+          <ComposerResourcePicker
+            activeId={composerResourceActiveId}
+            groups={composerResourceGroups}
+            onActiveIdChange={setComposerResourceActiveId}
+            onDismiss={dismissComposerResources}
+            onSelect={(option) => {
+              setComposerResourceActiveId(option.id);
+              if (option.id === "goal" || option.id === "plan") {
+                setComposerMode(option.id);
+                setComposerValue("");
+              }
+              dismissComposerResources();
+            }}
+          />
+        ) : undefined
+      }
+      textareaLabel={
+        composerMode === "goal"
+          ? "Describe your goal, define measurable outcomes for best results"
+          : composerMode === "plan"
+            ? "Describe your task to generate a plan..."
+            : "Message composer"
+      }
+      ref={composerInputRef}
       value={composerValue}
     />
   );
-  const composer = showLifecycleComposer ? (
+  const regularComposer = showLifecycleComposer ? (
     <ComposerDock
       composer={composerSurface}
       context={
@@ -1556,6 +2130,34 @@ export function App() {
     />
   ) : (
     composerSurface
+  );
+  const currentPendingApproval = isCurrentApprovalReplay
+    ? state.approvals.find(({ decision }) => decision === "pending")
+    : undefined;
+  const composer = currentPendingApproval ? (
+    <ApprovalRequest
+      autoFocus={false}
+      data-item-id={currentPendingApproval.itemId}
+      data-testid="current-approval-request"
+      description={currentPendingApproval.command}
+      identity="Terminal"
+      kind="command"
+      onApprove={() =>
+        respondToApproval(currentPendingApproval.requestId, "accept")
+      }
+      onReject={() =>
+        respondToApproval(currentPendingApproval.requestId, "decline")
+      }
+      presentation="composer"
+      scopedApproveAction={{
+        label: "Allow this conversation",
+        onClick: () =>
+          respondToApproval(currentPendingApproval.requestId, "accept"),
+      }}
+      title="Allow opening the requested local application?"
+    />
+  ) : (
+    regularComposer
   );
 
   const workspaceProject =
@@ -2100,51 +2702,188 @@ export function App() {
       ]}
     />
   ) : null;
-  const pullRequestSummary = (
+  const pullRequestChecks = [
+    {
+      id: "electron",
+      name: "Codex app Electron acceptance",
+      status:
+        pullRequestState.checkStatus === "passed"
+          ? ("passed" as const)
+          : pullRequestState.checkStatus === "failed"
+            ? ("failed" as const)
+            : ("running" as const),
+    },
+    {
+      id: "check",
+      name: "check",
+      status:
+        pullRequestState.checkStatus === "failed"
+          ? ("failed" as const)
+          : pullRequestState.checkStatus === "running"
+            ? ("running" as const)
+            : ("passed" as const),
+    },
+    { id: "codeql", name: "CodeQL", status: "passed" as const },
+    {
+      id: "react-nodenext",
+      name: "React 19 / NodeNext consumer",
+      status: "passed" as const,
+    },
+  ];
+  const pullRequestMergeAction =
+    pullRequestState.checkStatus === "failed" ? (
+      <button
+        onClick={() =>
+          schedulePullRequestTransition(
+            { type: "checks/run" },
+            { type: "checks/pass" },
+          )
+        }
+        type="button"
+      >
+        Re-run checks
+      </button>
+    ) : pullRequestState.reviewRequirement !== "passed" &&
+      pullRequestState.mergeStatus !== "checking" ? (
+      <button
+        onClick={() => {
+          setPullRequestTab("code");
+          setPullRequestReviewOpen(true);
+        }}
+        type="button"
+      >
+        Open review
+      </button>
+    ) : undefined;
+  const showPullRequestLifecycleDetails =
+    activeFrame === "pr-checks-running" ||
+    activeFrame === "pr-checks-failed" ||
+    activeFrame === "pr-merge-blocked" ||
+    activeFrame === "pr-merge-ready" ||
+    activeFrame === "pr-merged";
+  const pullRequestTimeline = (
+    <div aria-label="Pull request timeline" className="demo-pr-panel__timeline">
+      <article>
+        <span aria-hidden="true" className="demo-pr-avatar">
+          J
+        </span>
+        <div>
+          <strong>JaminZhou opened this pull request</strong>
+          <time dateTime="PT2H">2h</time>
+        </div>
+      </article>
+      <article>
+        <span aria-hidden="true" className="demo-pr-avatar">
+          C
+        </span>
+        <div>
+          <strong>chatgpt-codex-connector reviewed the latest push</strong>
+          <time dateTime="PT1H">1h</time>
+        </div>
+      </article>
+    </div>
+  );
+  const pullRequestSummaryReady = (
     <PullRequestPanelSummary
       checks={
-        <PullRequestCheckList
-          checks={[
-            {
-              id: "electron",
-              name: "Codex app Electron acceptance",
-              status: "passed",
-            },
-            { id: "check", name: "check", status: "passed" },
-            { id: "codeql", name: "CodeQL", status: "passed" },
-            {
-              id: "react-nodenext",
-              name: "React 19 / NodeNext consumer",
-              status: "passed",
-            },
-          ]}
-        />
+        showPullRequestLifecycleDetails ? (
+          <div className="demo-pr-checks">
+            <PullRequestCheckList checks={pullRequestChecks} />
+            <PullRequestMergeReadiness
+              action={pullRequestMergeAction}
+              description={
+                pullRequestState.mergeStatus === "blocked"
+                  ? "All current-head gates must pass before merging."
+                  : pullRequestState.mergeStatus === "ready"
+                    ? "Current-head checks, review, and threads are clean."
+                    : undefined
+              }
+              requirements={[
+                {
+                  description:
+                    pullRequestState.checkStatus === "passed"
+                      ? "7 checks successful"
+                      : pullRequestState.checkStatus === "running"
+                        ? "Current-head checks are running"
+                        : "A current-head check failed",
+                  id: "checks",
+                  label: "Checks",
+                  status:
+                    pullRequestState.checkStatus === "passed"
+                      ? "passed"
+                      : pullRequestState.checkStatus === "failed"
+                        ? "failed"
+                        : "pending",
+                },
+                {
+                  description:
+                    pullRequestState.reviewRequirement === "passed"
+                      ? "Fresh review after the latest push"
+                      : pullRequestState.reviewRequirement === "failed"
+                        ? "Review submission failed"
+                        : "Waiting for a fresh current-head review",
+                  id: "review",
+                  label: "Review",
+                  status: pullRequestState.reviewRequirement,
+                },
+                {
+                  description: "No unresolved bot threads",
+                  id: "threads",
+                  label: "Review threads",
+                  status: "passed",
+                },
+              ]}
+              status={pullRequestState.mergeStatus}
+            />
+          </div>
+        ) : undefined
       }
       className="demo-pr-panel__summary"
       commentComposer={
-        <label className="demo-pr-comment">
-          <span>Comment</span>
-          <textarea
-            aria-label="Pull request comment"
-            placeholder="Leave a comment"
-          />
-          <button aria-label="Post comment" type="button">
-            ↑
-          </button>
-        </label>
+        <PullRequestCommentComposer
+          error={pullRequestState.commentError}
+          onSubmit={() =>
+            schedulePullRequestTransition(
+              { type: "comment/submit" },
+              { type: "comment/succeed" },
+            )
+          }
+          onValueChange={(body) =>
+            dispatchPullRequest({ body, type: "comment/change" })
+          }
+          status={pullRequestState.commentStatus}
+          value={pullRequestState.commentBody}
+        />
       }
       description={
         <div className="demo-pr-description">
           <h3>Summary</h3>
           <ul>
-            <li>Add controlled and uncontrolled Review workspace resizing.</li>
-            <li>Preserve the measured panel and conversation constraints.</li>
-            <li>Gate pointer, keyboard, compact, Electron, and pixels.</li>
+            <li>
+              add controlled multi-session TerminalPanel tabs, per-tab close,
+              restore hooks, and TerminalProcessList
+            </li>
+            <li>
+              add a 15-event terminal lifecycle replay with running, failed,
+              exited, picker, close/restore, and compact states
+            </li>
+            <li>
+              gate 49 lifecycle scenes through CDP, real Electron interactions,
+              and reviewed pixels
+            </li>
+            <li>
+              refresh current-build terminal evidence and split session UI from
+              process lifecycle <span className="demo-pr-final-word">claims</span>
+            </li>
           </ul>
           <h3>Verification</h3>
           <ul>
-            <li>Focused component and accessibility tests.</li>
-            <li>CDP, Electron, and pixel acceptance.</li>
+            <li>pnpm check</li>
+            <li>pnpm check:codex-app:acceptance</li>
+            <li>
+              pnpm --filter @codex-ui-kit/codex-app-playground typecheck
+            </li>
+            <li>pnpm --filter @codex-ui-kit/codex-app-playground test</li>
           </ul>
         </div>
       }
@@ -2153,37 +2892,67 @@ export function App() {
           ✎
         </button>
       }
+      descriptionHeading={
+        <>
+          Description <span aria-hidden="true">⌄</span>
+        </>
+      }
       facts={[
         {
           id: "branch",
           indicator: "⑂",
           label: "Branch",
           value: (
-            <>
-              feat/review-panel-workspace → main{" "}
-              <span className="demo-pr-additions">+637</span>{" "}
-              <span className="demo-pr-deletions">−14</span>
-            </>
+            <span className="demo-pr-branch">
+              <span>feat/terminal-sessi…</span>
+              <span aria-hidden="true">›</span>
+              <span>m…</span>
+              <span className="demo-pr-additions">+1,743</span>
+              <span className="demo-pr-deletions">−231</span>
+            </span>
           ),
         },
         {
           id: "reviewers",
           indicator: "◎",
           label: "Reviewers",
-          value: "1 reviewer",
+          value: (
+            <span className="demo-pr-reviewers">
+              <span aria-hidden="true" className="demo-pr-reviewer-status" />
+              <button aria-label="Request reviewers" type="button">
+                +
+              </button>
+            </span>
+          ),
         },
         {
           id: "comments",
           indicator: "◌",
           label: "Comments",
-          value: "3 comments",
+          value: "17 comments",
         },
         {
           id: "checks",
           indicator: "○",
           label: "Checks",
-          tone: "success",
-          value: "Successful",
+          tone:
+            pullRequestState.checkStatus === "passed"
+              ? "success"
+              : pullRequestState.checkStatus === "failed"
+                ? "danger"
+                : undefined,
+          value:
+            pullRequestState.checkStatus === "passed"
+              ? "Successful"
+              : pullRequestState.checkStatus === "failed"
+                ? "Failed"
+                : "In progress",
+        },
+        {
+          id: "status",
+          indicator: "⑂",
+          label: "Status",
+          value: "Ready for review⌄",
         },
       ]}
       meta={
@@ -2191,12 +2960,11 @@ export function App() {
           <span className="demo-pr-avatar demo-pr-avatar--small">J</span>
           <span>JaminZhou</span>
           <span>·</span>
-          <span>now</span>
-          <span>·</span>
-          <span>Ready for review</span>
+          <span>2h</span>
         </>
       }
-      title="feat: add resizable review workspace"
+      timeline={pullRequestTimeline}
+      title="feat: add terminal session lifecycle"
       titleAction={
         <button aria-label="Edit title" type="button">
           ✎
@@ -2204,37 +2972,54 @@ export function App() {
       }
     />
   );
-  const pullRequestTimeline = (
-    <div className="demo-pr-panel__timeline">
-      <article>
-        <span aria-hidden="true" className="demo-pr-avatar">
-          J
-        </span>
-        <div>
-          <strong>JaminZhou opened this pull request</strong>
-          <time dateTime="PT1M">now</time>
-        </div>
-      </article>
-      <label className="demo-pr-comment">
-        <span>Comment</span>
-        <textarea
-          aria-label="Timeline comment"
-          placeholder="Leave a comment"
-        />
-        <button aria-label="Post timeline comment" type="button">
-          ↑
-        </button>
-      </label>
-    </div>
-  );
+  const pullRequestDetailState =
+    pullRequestState.detailStatus === "ready" ? null : (
+      <PullRequestQueryState
+        action={
+          pullRequestState.detailStatus === "error" ? (
+            <button
+              onClick={() =>
+                schedulePullRequestTransition(
+                  { type: "detail/load" },
+                  { type: "detail/ready" },
+                )
+              }
+              type="button"
+            >
+              Retry
+            </button>
+          ) : undefined
+        }
+        description={
+          pullRequestState.detailStatus === "error"
+            ? "The pull request detail could not be loaded."
+            : "Fetching the latest summary and diff."
+        }
+        heading={
+          pullRequestState.detailStatus === "error"
+            ? "Pull request unavailable"
+            : pullRequestState.detailStatus === "empty"
+              ? "Pull request not found"
+              : "Loading pull request"
+        }
+        status={pullRequestState.detailStatus}
+      />
+    );
+  const pullRequestSummary =
+    pullRequestDetailState ?? pullRequestSummaryReady;
   const pullRequestCode = (
-    <div className="demo-pr-panel__code">
+    <div
+      className="demo-pr-panel__code"
+      data-review-open={pullRequestReviewOpen || undefined}
+    >
       <div aria-label="Code review controls" className="demo-pr-code-toolbar">
-        <span>
-          <strong>feat/review-panel-workspace</strong>
-          <small>into main</small>
-        </span>
-        <button aria-label="Review options" type="button">
+        <button
+          aria-expanded={pullRequestReviewMenuOpen}
+          aria-haspopup="menu"
+          aria-label="Review options"
+          onClick={() => setPullRequestReviewMenuOpen((open) => !open)}
+          type="button"
+        >
           ⋯
         </button>
         <button aria-label="Collapse all diffs" type="button">
@@ -2246,7 +3031,54 @@ export function App() {
         <button aria-label="Show file tree" type="button">
           ☷
         </button>
+        {pullRequestReviewMenuOpen ? (
+          <div
+            aria-label="Review options"
+            className="demo-pr-review-menu"
+            role="menu"
+          >
+            <button role="menuitem" type="button">
+              Enable word wrap
+            </button>
+            <button role="menuitem" type="button">
+              Enable rich preview
+            </button>
+            <button role="menuitem" type="button">
+              Enable word diffs
+            </button>
+            <button
+              onClick={() => {
+                setPullRequestReviewMenuOpen(false);
+                setPullRequestReviewOpen(true);
+              }}
+              role="menuitem"
+              type="button"
+            >
+              Open synthetic review
+            </button>
+          </div>
+        ) : null}
       </div>
+      {pullRequestReviewOpen ? (
+        <PullRequestReviewComposer
+          body={pullRequestState.reviewBody}
+          error={pullRequestState.reviewError}
+          kind={pullRequestState.reviewKind}
+          onBodyChange={(body) =>
+            dispatchPullRequest({ body, type: "review/body" })
+          }
+          onKindChange={(kind) =>
+            dispatchPullRequest({ kind, type: "review/kind" })
+          }
+          onSubmit={() =>
+            schedulePullRequestTransition(
+              { type: "review/submit" },
+              { type: "review/succeed" },
+            )
+          }
+          status={pullRequestState.reviewStatus}
+        />
+      ) : null}
       <FileReview
         aria-label="Pull request code review"
         files={pullRequestFiles}
@@ -2261,11 +3093,24 @@ export function App() {
           <button aria-label="Open in browser" type="button">
             ↗
           </button>
-          <button aria-label="More pull request actions" type="button">
-            ⋯
+          <button type="button">
+            Auto-merge
           </button>
-          <button disabled type="button">
-            Merge
+          <button
+            disabled={pullRequestState.mergeStatus !== "ready"}
+            onClick={() =>
+              schedulePullRequestTransition(
+                { type: "merge/start" },
+                { type: "merge/succeed" },
+              )
+            }
+            type="button"
+          >
+            {pullRequestState.mergeStatus === "merged"
+              ? "Merged"
+              : pullRequestState.mergeStatus === "merging"
+                ? "Merging…"
+                : "Merge"}
           </button>
         </>
       }
@@ -2282,8 +3127,11 @@ export function App() {
       restorePanelLabel="Restore panel width"
       tabs={[
         { content: pullRequestSummary, id: "summary", label: "Summary" },
-        { content: pullRequestTimeline, id: "timeline", label: "Timeline" },
-        { content: pullRequestCode, id: "code", label: "Code" },
+        {
+          content: pullRequestDetailState ?? pullRequestCode,
+          id: "code",
+          label: "Code",
+        },
       ]}
       tabsLabel="Pull request view"
     />
@@ -2306,7 +3154,7 @@ export function App() {
       <div className="demo-pr-index__search">
         <input
           aria-label="Search pull requests"
-          defaultValue="69"
+          defaultValue="80"
           placeholder="Search pull requests"
           type="search"
         />
@@ -2315,28 +3163,76 @@ export function App() {
         </button>
       </div>
       <h2>Authored</h2>
-      <PullRequestList
-        items={[
-          {
-            author: "JaminZhou",
-            checkStatus: "passed",
-            commentCount: 3,
-            id: "69",
-            indicator: (
-              <span className="demo-pr-branch-indicator">
-                ⑂<i />
-              </span>
-            ),
-            number: 69,
-            repository: "codex-ui-kit",
-            state: "open",
-            title: "feat: add resizable review workspace",
-            updatedAt: "11m",
-          },
-        ]}
-        onSelect={() => setPullRequestOpen(true)}
-        selectedId={pullRequestOpen ? "69" : undefined}
-      />
+      {pullRequestState.indexStatus === "ready" ? (
+        <PullRequestList
+          items={[
+            {
+              author: "JaminZhou",
+              checkStatus:
+                pullRequestState.checkStatus === "passed"
+                  ? "passed"
+                  : pullRequestState.checkStatus === "failed"
+                    ? "failed"
+                    : "running",
+              commentCount: 6,
+              id: "80",
+              indicator: (
+                <span className="demo-pr-branch-indicator">
+                  ⑂<i />
+                </span>
+              ),
+              number: 80,
+              repository: "codex-ui-kit",
+              state: "open",
+              title: "feat: add terminal session lifecycle",
+              updatedAt: "now",
+            },
+          ]}
+          onSelect={(id) => {
+            dispatchPullRequest({ id, type: "select" });
+            setPullRequestOpen(true);
+            schedulePullRequestTransition(
+              { type: "detail/load" },
+              { type: "detail/ready" },
+            );
+          }}
+          selectedId={
+            pullRequestOpen
+              ? (pullRequestState.selectedId ?? undefined)
+              : undefined
+          }
+        />
+      ) : (
+        <PullRequestQueryState
+          action={
+            pullRequestState.indexStatus === "error" ||
+            pullRequestState.indexStatus === "empty" ? (
+              <button
+                onClick={() =>
+                  schedulePullRequestTransition(
+                    { type: "index/load" },
+                    { type: "index/ready" },
+                  )
+                }
+                type="button"
+              >
+                {pullRequestState.indexStatus === "empty"
+                  ? "Refresh"
+                  : "Retry"}
+              </button>
+            ) : undefined
+          }
+          description={
+            pullRequestState.indexStatus === "error"
+              ? "Check the connection and try again."
+              : pullRequestState.indexStatus === "empty"
+                ? "No pull requests match the current filters."
+                : undefined
+          }
+          status={pullRequestState.indexStatus}
+          variant="list"
+        />
+      )}
     </section>
   );
   const shellRouteContent = (
@@ -2399,33 +3295,45 @@ export function App() {
       {shellRouteContent}
     </AppRouteOutlet>
   );
-  const messageNavigationItems = state.messages
-    .filter(({ role }) => role === "user")
-    .map((message) => ({
-      id: message.id,
-      label: message.text,
-    }));
-  const windowedTimeline =
-    isConversationLifecycle &&
-    activeFrame === "thread-windowed" &&
-    !windowedTimelineExpanded;
-  const indexedTimeline = state.timeline.map((entry, entryIndex) => ({
-    entry,
-    entryIndex,
-  }));
-  const hiddenTimelineEntryCount = windowedTimeline
-    ? Math.max(0, indexedTimeline.length - 8)
-    : 0;
-  const visibleTimeline = indexedTimeline.slice(hiddenTimelineEntryCount);
-  const timelineContent = visibleTimeline.map(({ entry, entryIndex }) => {
+  const messageNavigationItems = currentWindowedFrame
+    ? Array.from({ length: currentWindowedHistorySize }, (_, index) => ({
+        id: `current-windowed-user-${index + 1}`,
+        label: `Synthetic user checkpoint ${index + 1}`,
+      }))
+    : state.messages
+        .filter(({ role }) => role === "user")
+        .map((message) => ({
+          id: message.id,
+          label: message.text,
+        }));
+  const currentWindowStart = Math.min(
+    currentWindowedHistorySize - currentWindowedTurnWindowSize,
+    Math.max(
+      0,
+      windowedSelectedMessageIndex -
+        Math.floor(currentWindowedTurnWindowSize / 2),
+    ),
+  );
+  const currentWindowEnd =
+    currentWindowStart + currentWindowedTurnWindowSize;
+  const timelineContent = state.timeline.map((entry, entryIndex) => {
     if (entry.kind === "message") {
       const message = state.messages.find(({ id }) => id === entry.id);
       if (!message) return null;
-      if (
-        scenarioId === "mcp-recovery-mixed-thread" &&
-        message.id === "assistant-recovery-intro" &&
-        hasMcpToolCallGroupForTurn(state, message.turnId)
-      ) {
+      const groupedMcpIntro =
+        ((scenarioId === "mcp-recovery-mixed-thread" &&
+          (message.id === "assistant-recovery-intro" ||
+            message.id === "assistant-recovery-status")) ||
+          (scenarioId === "mcp-tool-call" &&
+            message.id === "assistant-mcp-intro")) &&
+        hasMcpToolCallGroupForTurn(state, message.turnId);
+      const groupedLongCommandIntro =
+        (isCurrentLongCommandReplay &&
+          message.id === "assistant-long-command-intro" &&
+          state.commands.some(
+            ({ id }) => id === "command-long-output",
+          ));
+      if (groupedMcpIntro || groupedLongCommandIntro) {
         return null;
       }
       return (
@@ -2439,13 +3347,22 @@ export function App() {
                   message.id === "assistant-mcp") ||
                 (scenarioId === "mcp-recovery-mixed-thread" &&
                   (message.id === "assistant-recovery" ||
-                    message.id === "assistant-workflow"))) &&
+                    message.id === "assistant-workflow")) ||
+                (scenarioId === "approval-denied" &&
+                  (message.id === "assistant-approval-denied" ||
+                    message.id === "assistant-approval-approved")) ||
+                (scenarioId === "long-command-output" &&
+                  message.id === "assistant-long-command-final")) &&
               message.status === "completed" ? (
                 scenarioId === "mcp-tool-call" ||
-                scenarioId === "mcp-recovery-mixed-thread" ? (
+                scenarioId === "mcp-recovery-mixed-thread" ||
+                scenarioId === "approval-denied" ||
+                scenarioId === "long-command-output" ? (
                   <McpResponseActions
                     label={
-                      message.id === "assistant-workflow"
+                      message.id === "assistant-workflow" ||
+                      message.id === "assistant-approval-denied" ||
+                      message.id === "assistant-approval-approved"
                         ? "Response actions"
                         : undefined
                     }
@@ -2476,11 +3393,7 @@ export function App() {
             role={message.role}
             status={agentMessageStatus(message.status)}
           >
-            {message.role === "assistant" &&
-            scenarioId === "mcp-tool-call" &&
-            message.id === "assistant-mcp" ? (
-              <McpAnswer text={message.text} />
-            ) : message.role === "assistant" ? (
+            {message.role === "assistant" ? (
               <AgentMarkdown
                 linkTarget="_blank"
                 streaming={message.status === "running"}
@@ -2496,12 +3409,10 @@ export function App() {
               durationMs={message.interruptionDurationMs ?? 0}
               label={
                 message.interruptionDurationMs === null
-                  ? "You stopped this response"
+                  ? "You stopped"
                   : undefined
               }
-              stoppedLabel={(time) =>
-                `You stopped this response after ${time}`
-              }
+              stoppedLabel={(time) => `You stopped after ${time}`}
             />
           ) : null}
           {message.compaction ? (
@@ -2525,21 +3436,147 @@ export function App() {
       const calls = mcpToolCallGroupForEntry(state, entryIndex);
       if (!calls) return null;
       const toolCall = calls[0];
-      const recoveryIntro =
-        scenarioId === "mcp-recovery-mixed-thread"
-          ? state.messages.find(
-              ({ id }) => id === "assistant-recovery-intro",
-            )
-          : undefined;
+      if (scenarioId === "mcp-recovery-mixed-thread") {
+        const failedCall = calls.find(
+          ({ id }) => id === "mcp-fetch-invalid",
+        );
+        if (!failedCall || entry.id !== failedCall.id) return null;
+
+        const recoveryCalls = calls.filter(
+          ({ id }) => id !== failedCall.id,
+        );
+        const toolIntro = state.messages.find(
+          ({ id }) => id === "assistant-recovery-intro",
+        );
+        const recoveryStatus = state.messages.find(
+          ({ id }) => id === "assistant-recovery-status",
+        );
+        const failedPresentation =
+          mcpToolCallPresentation(failedCall);
+        const recoveryGroupStatus =
+          recoveryCalls.length > 0
+            ? mcpToolCallGroupStatus(recoveryCalls)
+            : undefined;
+        const captureOpen =
+          initialSelection.capture &&
+          (activeFrame === "mcp-running" ||
+            activeFrame === "mcp-progress" ||
+            activeFrame === "mcp-tool-calls" ||
+            activeFrame === "mcp-recovery-failed" ||
+            activeFrame === "mcp-recovery-retrying" ||
+            activeFrame === "mcp-recovery-completed");
+        const durationMs = mcpToolCallGroupDurationMs(state, calls);
+
+        return (
+          <ActivityTimeline
+            key={`mcp-recovery:${failedCall.turnId}:${failedCall.server}`}
+            open={initialSelection.capture ? captureOpen : undefined}
+            summary={
+              <TurnDuration
+                durationMs={durationMs}
+                status={
+                  state.currentTurnId === failedCall.turnId
+                    ? "working"
+                    : "worked"
+                }
+              />
+            }
+          >
+            {toolIntro ? (
+              <AgentMessage
+                className="demo-mcp-recovery-intro"
+                data-item-id={toolIntro.id}
+                role="assistant"
+                status={agentMessageStatus(toolIntro.status)}
+              >
+                <AgentMarkdown>{toolIntro.text}</AgentMarkdown>
+              </AgentMessage>
+            ) : null}
+            <ToolCallCard
+              className="demo-mcp-recovery-failed-call"
+              data-item-id={failedCall.id}
+              error={failedPresentation.error}
+              errorLanguage="plaintext"
+              errorPresentation="output"
+              failedAriaLabel={`${failedCall.toolLabel} failed`}
+              failedLabel={failedCall.toolLabel}
+              icon={<McpToolIcon />}
+              name={failedCall.toolLabel}
+              open={
+                initialSelection.capture &&
+                (activeFrame === "mcp-recovery-failed" ||
+                  activeFrame === "mcp-recovery-completed")
+                  ? true
+                  : undefined
+              }
+              onViewRawOutput={(value) =>
+                setRawToolOutput({
+                  name: failedCall.toolLabel,
+                  value,
+                })
+              }
+              rawOutput={{
+                arguments: failedCall.arguments,
+                error: failedCall.error,
+              }}
+              result={failedPresentation.result}
+              role="listitem"
+              source={failedCall.server}
+              status={failedCall.status}
+              structuredContent={failedPresentation.structuredContent}
+              summary={failedPresentation.summary}
+            />
+            {recoveryStatus ? (
+              <AgentMessage
+                className="demo-mcp-recovery-status"
+                data-item-id={recoveryStatus.id}
+                role="assistant"
+                status={agentMessageStatus(recoveryStatus.status)}
+              >
+                <AgentMarkdown>{recoveryStatus.text}</AgentMarkdown>
+              </AgentMessage>
+            ) : null}
+            {recoveryCalls.length > 0 && recoveryGroupStatus ? (
+              <McpToolCallGroup
+                data-testid="mcp-tool-call-group"
+                defaultOpen={false}
+                name={recoveryCalls[0]?.appName ?? failedCall.appName}
+                open={initialSelection.capture ? captureOpen : undefined}
+                source={recoveryCalls[0]?.server ?? failedCall.server}
+                status={recoveryGroupStatus}
+              >
+                {recoveryCalls.map((call) => {
+                  const presentation = mcpToolCallPresentation(call);
+                  return (
+                    <ToolCallCard
+                      data-item-id={call.id}
+                      error={presentation.error}
+                      icon={<McpToolIcon />}
+                      key={call.id}
+                      name={call.toolLabel}
+                      result={presentation.result}
+                      role="listitem"
+                      source={call.server}
+                      status={call.status}
+                      structuredContent={presentation.structuredContent}
+                      summary={presentation.summary}
+                    />
+                  );
+                })}
+              </McpToolCallGroup>
+            ) : null}
+          </ActivityTimeline>
+        );
+      }
+      const toolIntro = state.messages.find(
+        ({ id }) => id === "assistant-mcp-intro",
+      );
       const groupStatus = mcpToolCallGroupStatus(calls);
       const captureOpen =
         initialSelection.capture &&
         (activeFrame === "mcp-running" ||
           activeFrame === "mcp-progress" ||
-          activeFrame === "mcp-tool-calls" ||
-          activeFrame === "mcp-recovery-failed" ||
-          activeFrame === "mcp-recovery-retrying" ||
-          activeFrame === "mcp-recovery-completed");
+          activeFrame === "mcp-tool-calls");
       const durationMs = mcpToolCallGroupDurationMs(state, calls);
       return (
         <ActivityTimeline
@@ -2557,14 +3594,14 @@ export function App() {
             />
           }
         >
-          {recoveryIntro ? (
+          {toolIntro ? (
             <AgentMessage
-              className="demo-mcp-recovery-intro"
-              data-item-id={recoveryIntro.id}
+              className="demo-mcp-recovery-intro demo-mcp-current-intro"
+              data-item-id={toolIntro.id}
               role="assistant"
-              status={agentMessageStatus(recoveryIntro.status)}
+              status={agentMessageStatus(toolIntro.status)}
             >
-              <AgentMarkdown>{recoveryIntro.text}</AgentMarkdown>
+              <AgentMarkdown>{toolIntro.text}</AgentMarkdown>
             </AgentMessage>
           ) : null}
           <McpToolCallGroup
@@ -2638,6 +3675,91 @@ export function App() {
     if (entry.kind === "command") {
       const command = state.commands.find(({ id }) => id === entry.id);
       if (!command) return null;
+      if (
+        isCurrentApprovalReplay &&
+        command.id === "command-open-calculator"
+      ) {
+        const pending = command.status === "running";
+        const approved = command.status === "completed";
+        return (
+          <ActivityTimeline
+            key={`command:${command.id}`}
+            open={initialSelection.capture && pending ? true : undefined}
+            summary={
+              <TurnDuration
+                durationMs={pending ? 14_000 : (state.turnDurationMs ?? 23_000)}
+                status={pending ? "working" : "worked"}
+              />
+            }
+          >
+            <CommandExecution
+              command={command.command}
+              cwd={command.cwd}
+              data-item-id={command.id}
+              data-testid="command-execution"
+              hideRawCommand
+              status={command.status}
+              summary={
+                pending ? (
+                  <>Running {command.command}</>
+                ) : approved ? (
+                  <>Completed {command.command}</>
+                ) : (
+                  <>Did not run {command.command}</>
+                )
+              }
+            />
+          </ActivityTimeline>
+        );
+      }
+      if (
+        isCurrentLongCommandReplay &&
+        command.id === "command-long-output"
+      ) {
+        const intro = state.messages.find(
+          ({ id }) => id === "assistant-long-command-intro",
+        );
+        return (
+          <ActivityTimeline
+            defaultOpen={false}
+            key={`command:${command.id}`}
+            summary={
+              <TurnDuration
+                durationMs={state.turnDurationMs ?? 10_000}
+                status="worked"
+              />
+            }
+          >
+            {intro ? (
+              <AgentMessage
+                data-item-id={intro.id}
+                role="assistant"
+                status={agentMessageStatus(intro.status)}
+              >
+                <AgentMarkdown>{intro.text}</AgentMarkdown>
+              </AgentMessage>
+            ) : null}
+            <CommandExecution
+              command={command.command}
+              copyCommandLabel="Copy"
+              cwd={command.cwd}
+              data-item-id={command.id}
+              data-testid="command-execution"
+              defaultOpen={false}
+              durationMs={command.durationMs ?? undefined}
+              exitCode={command.exitCode ?? undefined}
+              status={command.status}
+            >
+              <CommandOutput
+                copyLabel="Copy"
+                copyText={command.output}
+              >
+                {command.output}
+              </CommandOutput>
+            </CommandExecution>
+          </ActivityTimeline>
+        );
+      }
       return (
         <CommandExecution
           command={command.command}
@@ -2690,6 +3812,7 @@ export function App() {
           `${typeof requestId}:${requestId}` === entry.id,
       );
       if (!approval) return null;
+      if (isCurrentApprovalReplay) return null;
       return (
         <ApprovalRequest
           data-item-id={approval.itemId}
@@ -2813,6 +3936,55 @@ export function App() {
       </Fragment>
     );
   });
+  const currentWindowedContent = currentWindowedFrame ? (
+    <div
+      data-mounted-turn-count={currentWindowedTurnWindowSize}
+      data-selected-message-index={windowedSelectedMessageIndex + 1}
+      data-total-message-count={currentWindowedHistorySize}
+    >
+      {currentWindowStart > 0 ? (
+        <ThreadVirtualizedPlaceholder
+          data-hidden-entry-count={currentWindowStart}
+          data-window-side="before"
+          estimatedHeight={`${currentWindowStart * 42}rem`}
+        />
+      ) : null}
+      {Array.from(
+        { length: currentWindowedTurnWindowSize },
+        (_, offset) => {
+          const messageIndex = currentWindowStart + offset;
+          return (
+            <AgentTurn
+              data-windowed-turn={messageIndex + 1}
+              key={`current-windowed-turn-${messageIndex + 1}`}
+              spacing="grouped"
+            >
+              <AgentMessage
+                data-item-id={`current-windowed-user-${messageIndex + 1}`}
+                role="user"
+              >
+                Synthetic user checkpoint {messageIndex + 1}
+              </AgentMessage>
+              <AgentMessage role="assistant">
+                The host keeps only the nearby deterministic turn window mounted.
+              </AgentMessage>
+            </AgentTurn>
+          );
+        },
+      )}
+      {currentWindowEnd < currentWindowedHistorySize ? (
+        <ThreadVirtualizedPlaceholder
+          data-hidden-entry-count={
+            currentWindowedHistorySize - currentWindowEnd
+          }
+          data-window-side="after"
+          estimatedHeight={`${
+            (currentWindowedHistorySize - currentWindowEnd) * 42
+          }rem`}
+        />
+      ) : null}
+    </div>
+  ) : null;
   const activeTurnHasWork = hasActiveTurnWork(state);
   const terminalCommands = useMemo(
     () => state.commands.filter(({ processId }) => Boolean(processId)),
@@ -3061,17 +4233,36 @@ export function App() {
   );
   const messageNavigation = isConversationLifecycle ? (
     <ThreadMessageNavigationRail
+      activeIds={
+        currentWindowedFrame
+          ? [
+              `current-windowed-user-${
+                windowedSelectedMessageIndex + 1
+              }`,
+            ]
+          : undefined
+      }
+      density={currentWindowedFrame ? "compact" : "regular"}
+      initialScroll={currentWindowedFrame ? "end" : "start"}
       items={messageNavigationItems}
       minItems={10}
       onNavigate={(item, behavior) => {
-        if (scrollToMessage(item.id, behavior)) return;
-        if (windowedTimeline) {
-          pendingMessageNavigationRef.current = {
-            behavior,
-            id: item.id,
-          };
-          setWindowedTimelineExpanded(true);
+        if (currentWindowedFrame) {
+          const nextIndex =
+            Number(item.id.replace("current-windowed-user-", "")) - 1;
+          if (
+            Number.isInteger(nextIndex) &&
+            nextIndex >= 0 &&
+            nextIndex < currentWindowedHistorySize
+          ) {
+            setWindowedSelectedMessageIndex(nextIndex);
+            setThreadFollowing(
+              nextIndex === currentWindowedHistorySize - 1,
+            );
+          }
+          return;
         }
+        if (scrollToMessage(item.id, behavior)) return;
       }}
     />
   ) : undefined;
@@ -3092,6 +4283,12 @@ export function App() {
       data-last-method={state.lastMethod ?? undefined}
       data-mode={mode}
       data-composer-phase={isConversationLifecycle ? composerPhase : undefined}
+      data-composer-overlay={
+        isConversationLifecycle ? composerOverlay ?? undefined : undefined
+      }
+      data-composer-mode={
+        isConversationLifecycle ? composerMode ?? undefined : undefined
+      }
       data-queue-count={
         isConversationLifecycle ? queuedPrompts.length : undefined
       }
@@ -3106,9 +4303,7 @@ export function App() {
       data-windowed-timeline={
         isConversationLifecycle &&
         activeFrame === "thread-windowed"
-          ? windowedTimeline
-            ? "trimmed"
-            : "expanded"
+          ? "current"
           : undefined
       }
       data-shell-state={view === "shell" ? shellState : undefined}
@@ -3139,7 +4334,8 @@ export function App() {
         bottomPanelResizeLabel="Resize bottom panel"
         onBottomPanelHeightChange={setTerminalHeight}
         layoutMode={
-          initialSelection.capture ||
+          (initialSelection.capture &&
+            activeFrame !== "pr-compact-detail") ||
           initialSelection.layoutMode === "wide"
             ? "wide"
             : undefined
@@ -3152,7 +4348,10 @@ export function App() {
         onSidePanelWidthChange={
           view === "pull-request" ? setPullRequestWidth : undefined
         }
-        responsivePanelContinuity={!initialSelection.capture}
+        responsivePanelContinuity={
+          !initialSelection.capture &&
+          activeFrame !== "pr-compact-detail"
+        }
         responsivePanelContinuityKey={`${mode}:${view}:${scenarioId}`}
         sidePanel={
           view === "pull-request" ? pullRequestPanel : reviewPanel
@@ -3163,11 +4362,15 @@ export function App() {
         sidePanelLabel={
           view === "pull-request" ? "Pull request details" : "Review"
         }
+        sidePanelMinMainWidth={view === "pull-request" ? 390 : undefined}
+        sidePanelMinWidth={view === "pull-request" ? 322 : undefined}
         sidePanelOpen={
           view === "pull-request"
             ? pullRequestOpen
             : reviewOpen && Boolean(reviewPanel)
         }
+        sidePanelOverlay={view === "pull-request"}
+        sidePanelOverlayModal={view !== "pull-request"}
         sidePanelResizable
         sidePanelWidth={
           view === "pull-request" ? pullRequestWidth : undefined
@@ -3206,27 +4409,31 @@ export function App() {
               threadWidth="wide"
               viewportProps={{
                 defaultFollowing:
-                  activeFrame !== "thread-scroll-away",
+                  activeFrame !== "thread-scroll-away" &&
+                  activeFrame !== "thread-windowed",
                 followKey: state.eventCount,
+                latestOrigin:
+                  currentWindowedFrame || isCurrentLongCommandReplay
+                    ? "start"
+                    : "end",
                 onFollowingChange: setThreadFollowing,
               }}
               viewportRef={threadViewportRef}
             >
-              <AgentTurn aria-label="Protocol-backed conversation">
+              <AgentTurn
+                aria-label="Protocol-backed conversation"
+                data-current-windowed-history={
+                  currentWindowedFrame || undefined
+                }
+              >
                 {liveError ? (
                   <StatusBanner heading="Live connection failed" tone="error">
                     {liveError}
                   </StatusBanner>
                 ) : null}
 
-                {hiddenTimelineEntryCount > 0 ? (
-                  <ThreadVirtualizedPlaceholder
-                    data-hidden-entry-count={hiddenTimelineEntryCount}
-                    estimatedHeight={`${hiddenTimelineEntryCount * 3.5}rem`}
-                  />
-                ) : null}
-
-                {timelineContent}
+                {currentWindowedContent}
+                {currentWindowedFrame ? null : timelineContent}
 
                 {scenarioId === "terminal-lifecycle" &&
                 terminalCommands.length > 0 ? (

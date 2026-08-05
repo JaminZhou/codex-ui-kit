@@ -139,6 +139,31 @@ describe("thread navigation surfaces", () => {
     ).toBe("true");
   });
 
+  it("exposes current compact density for long histories", () => {
+    const items = Array.from({ length: 82 }, (_, index) => ({
+      id: `message-${index + 1}`,
+      label: `Message ${index + 1}`,
+    }));
+    const { container } = render(
+      <ThreadMessageNavigationRail
+        activeIds={["message-40"]}
+        density="compact"
+        items={items}
+      />,
+    );
+
+    const rail = screen.getByRole("navigation", { name: "User messages" });
+    expect(rail.getAttribute("data-density")).toBe("compact");
+    expect(
+      screen
+        .getByRole("button", { name: "Jump to user message 40" })
+        .getAttribute("aria-current"),
+    ).toBe("true");
+    expect(
+      container.querySelectorAll(".codex-ui-message-navigation-rail__row"),
+    ).toHaveLength(82);
+  });
+
   it("previews message content and uses smooth click navigation", () => {
     const onNavigate = vi.fn();
     const items = Array.from({ length: 4 }, (_, index) => ({

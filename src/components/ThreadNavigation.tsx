@@ -135,6 +135,8 @@ export type ThreadMessageNavigationBehavior = "instant" | "smooth";
 export interface ThreadMessageNavigationRailProps {
   activeIds?: readonly string[];
   className?: string;
+  density?: "compact" | "regular";
+  initialScroll?: "end" | "start";
   insetInlineStart?: CSSProperties["insetInlineStart"];
   items: readonly ThreadMessageNavigationItem[];
   label?: string;
@@ -153,6 +155,8 @@ function hasPreviewContent(value: ReactNode) {
 export function ThreadMessageNavigationRail({
   activeIds = [],
   className,
+  density = "regular",
+  initialScroll = "start",
   insetInlineStart = "var(--codex-ui-message-navigation-inset)",
   items,
   label = "User messages",
@@ -258,6 +262,12 @@ export function ThreadMessageNavigationRail({
   }, [items.length, minItems]);
 
   useLayoutEffect(() => {
+    const list = listRef.current;
+    if (!list || initialScroll !== "end") return;
+    list.scrollTop = Math.max(0, list.scrollHeight - list.clientHeight);
+  }, [initialScroll, items.length]);
+
+  useLayoutEffect(() => {
     updateTooltipPosition();
     if (!revealedId) return;
 
@@ -305,6 +315,8 @@ export function ThreadMessageNavigationRail({
       className={["codex-ui-message-navigation-rail", className]
         .filter(Boolean)
         .join(" ")}
+      data-density={density}
+      data-initial-scroll={initialScroll}
       style={{ ...style, insetInlineStart }}
       ref={navRef}
     >

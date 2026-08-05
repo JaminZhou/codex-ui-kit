@@ -111,6 +111,7 @@ export interface ApprovalRequestProps
   loading?: boolean;
   onApprove?: () => void;
   onReject?: () => void;
+  presentation?: "composer" | "default";
   reason?: ReactNode;
   rejectLabel?: ReactNode;
   scopedApproveAction?: ApprovalAction;
@@ -137,6 +138,7 @@ export function ApprovalRequest({
   loading = false,
   onApprove,
   onReject,
+  presentation = "default",
   reason,
   rejectLabel,
   scopedApproveAction,
@@ -415,6 +417,7 @@ export function ApprovalRequest({
         disableHotkeys || surfaceBlocked || undefined
       }
       data-kind={kind}
+      data-presentation={presentation}
       ref={rootRef}
       {...props}
     >

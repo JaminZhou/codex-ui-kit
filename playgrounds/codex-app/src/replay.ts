@@ -1,8 +1,10 @@
+import approvalDeniedTrace from "../fixtures/traces/approval-denied.jsonl?raw";
 import compactionTrace from "../fixtures/traces/compaction.jsonl?raw";
 import conversationLifecycleTrace from "../fixtures/traces/conversation-lifecycle.jsonl?raw";
 import backgroundTerminalTrace from "../fixtures/traces/background-terminal.jsonl?raw";
 import interruptionTrace from "../fixtures/traces/interruption.jsonl?raw";
 import largeFileReviewTrace from "../fixtures/traces/large-file-review.jsonl?raw";
+import longCommandOutputTrace from "../fixtures/traces/long-command-output.jsonl?raw";
 import markdownTrace from "../fixtures/traces/markdown.jsonl?raw";
 import mcpToolCallTrace from "../fixtures/traces/mcp-tool-call.jsonl?raw";
 import mcpRecoveryMixedThreadTrace from "../fixtures/traces/mcp-recovery-mixed-thread.jsonl?raw";
@@ -14,6 +16,7 @@ import workflowTrace from "../fixtures/traces/workspace-workflow.jsonl?raw";
 import type { ProtocolEventRecord } from "./protocol-state";
 
 export type ReplayScenarioId =
+  | "approval-denied"
   | "background-terminal"
   | "conversation-lifecycle"
   | "streaming-recovery"
@@ -21,6 +24,7 @@ export type ReplayScenarioId =
   | "interruption"
   | "compaction"
   | "large-file-review"
+  | "long-command-output"
   | "markdown"
   | "mcp-tool-call"
   | "mcp-recovery-mixed-thread"
@@ -69,10 +73,16 @@ function scenario(
 }
 
 export const replayScenarios: Record<ReplayScenarioId, ReplayScenario> = {
+  "approval-denied": scenario(
+    "approval-denied",
+    "Approval denied",
+    "A current command approval is denied, the command is not executed, and the turn completes.",
+    approvalDeniedTrace,
+  ),
   "conversation-lifecycle": scenario(
     "conversation-lifecycle",
     "Conversation and Composer lifecycle",
-    "Long-thread navigation, follow recovery, Composer growth, queueing, interruption, and resume.",
+    "Long-thread navigation, follow recovery, Composer growth, queueing, interruption, automatic continuation, and legacy paused-queue compatibility.",
     conversationLifecycleTrace,
   ),
   "background-terminal": scenario(
@@ -129,6 +139,12 @@ export const replayScenarios: Record<ReplayScenarioId, ReplayScenario> = {
     "Eight files and long diffs exercise panel scrolling and exact file reveal.",
     largeFileReviewTrace,
   ),
+  "long-command-output": scenario(
+    "long-command-output",
+    "Run command output probe",
+    "A current completed command expands from its work summary into a 400-line, bottom-following shell output card.",
+    longCommandOutputTrace,
+  ),
   markdown: scenario(
     "markdown",
     "Markdown response",
@@ -137,13 +153,13 @@ export const replayScenarios: Record<ReplayScenarioId, ReplayScenario> = {
   ),
   "mcp-tool-call": scenario(
     "mcp-tool-call",
-    "Find Codex MCP support docs",
-    "A real public docs integration sequence with five successful MCP calls.",
+    "Find Codex MCP guidance",
+    "A current public docs integration sequence with successful Search and Fetch calls.",
     mcpToolCallTrace,
   ),
   "mcp-recovery-mixed-thread": scenario(
     "mcp-recovery-mixed-thread",
-    "Verify Codex MCP docs recovery",
+    "Recover Codex MCP docs lookup",
     "A failed fetch recovers through search, then a second turn runs a command, approval, and file review.",
     mcpRecoveryMixedThreadTrace,
   ),

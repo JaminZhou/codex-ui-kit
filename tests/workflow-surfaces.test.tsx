@@ -15,10 +15,14 @@ import {
   ConversationEventList,
   ProjectPicker,
   PullRequestCheckList,
+  PullRequestCommentComposer,
   PullRequestDetails,
   PullRequestList,
+  PullRequestMergeReadiness,
   PullRequestPanelSummary,
   PullRequestPage,
+  PullRequestQueryState,
+  PullRequestReviewComposer,
   PullRequestReviewSummary,
   PullRequestReviewThread,
   RunLocationMenu,
@@ -336,6 +340,229 @@ describe("pull request workspace surfaces", () => {
     expect(screen.getByText("Choose a review")).toBeTruthy();
   });
 
+  it("distinguishes loading and failed query states without relying on color", () => {
+    const { rerender } = render(
+      <PullRequestQueryState
+        placeholderRows={3}
+        status="loading"
+        variant="list"
+      />,
+    );
+
+    const loading = screen.getByRole("status");
+    expect(loading.getAttribute("aria-busy")).toBe("true");
+    expect(loading.getAttribute("aria-label")).toBe(
+      "Loading pull requests",
+    );
+    expect(
+      loading.querySelectorAll(
+        ".codex-ui-pull-request-query-state__skeleton",
+      ),
+    ).toHaveLength(3);
+
+    rerender(
+      <PullRequestQueryState
+        action={<button type="button">Retry</button>}
+        description="Check the connection and try again."
+        status="error"
+      />,
+    );
+    const failed = screen.getByRole("alert");
+    expect(failed.textContent).toContain("Pull requests unavailable");
+    expect(failed.textContent).toContain(
+      "Check the connection and try again.",
+    );
+    expect(screen.getByRole("button", { name: "Retry" })).toBeTruthy();
+  });
+
+  it("announces merge readiness and exposes every requirement state", () => {
+    const { rerender } = render(
+      <PullRequestMergeReadiness
+        action={<button type="button">View failed check</button>}
+        requirements={[
+          {
+            id: "ci",
+            label: "CI",
+            status: "failed",
+          },
+          {
+            id: "review",
+            label: "Codex review",
+            status: "pending",
+          },
+          {
+            id: "threads",
+            label: "Review threads",
+            status: "passed",
+          },
+        ]}
+        status="blocked"
+      />,
+    );
+
+    const blocked = screen.getByRole("alert");
+    expect(blocked.textContent).toContain("Merge blocked");
+    expect(
+      blocked.querySelector('[data-status="failed"]')?.textContent,
+    ).toContain("CI");
+    expect(
+      blocked.querySelector('[data-status="pending"]')?.textContent,
+    ).toContain("Codex review");
+    expect(
+      blocked.querySelector('[data-status="passed"]')?.textContent,
+    ).toContain("Review threads");
+
+    rerender(
+      <PullRequestMergeReadiness
+        action={<button type="button">Squash and merge</button>}
+        status="ready"
+      />,
+    );
+    expect(screen.getByRole("status").textContent).toContain(
+      "Ready to merge",
+    );
+    expect(
+      screen.getByRole("button", { name: "Squash and merge" }),
+    ).toBeTruthy();
+  });
+
+  it("submits a controlled review decision and reports progress", () => {
+    const onSubmit = vi.fn();
+
+    function Fixture() {
+      const [body, setBody] = useState("");
+      const [kind, setKind] = useState<
+        "approve" | "comment" | "request-changes"
+      >("comment");
+      return (
+        <PullRequestReviewComposer
+          body={body}
+          kind={kind}
+          onBodyChange={setBody}
+          onKindChange={setKind}
+          onSubmit={onSubmit}
+        />
+      );
+    }
+
+    const { rerender } = render(<Fixture />);
+    fireEvent.click(
+      screen.getByRole("radio", { name: "Request changes" }),
+    );
+    fireEvent.change(
+      screen.getByRole("textbox", { name: "Review summary" }),
+      {
+        target: { value: "Please restore keyboard focus." },
+      },
+    );
+    fireEvent.click(screen.getByRole("button", { name: "Submit review" }));
+    expect(onSubmit).toHaveBeenCalledWith({
+      body: "Please restore keyboard focus.",
+      kind: "request-changes",
+    });
+
+    rerender(
+      <PullRequestReviewComposer
+        body="Please restore keyboard focus."
+        kind="request-changes"
+        status="submitting"
+      />,
+    );
+    expect(screen.getByRole("status").textContent).toBe(
+      "Submitting review.",
+    );
+    expect(
+      screen.getByRole("button", { name: "Submitting…" }),
+    ).toHaveProperty("disabled", true);
+  });
+
+  it("requires review feedback when requesting changes", () => {
+    render(
+      <PullRequestReviewComposer
+        body="  "
+        kind="request-changes"
+      />,
+    );
+    expect(
+      screen.getByRole("button", { name: "Submit review" }),
+    ).toHaveProperty("disabled", true);
+  });
+
+  it("supports an uncontrolled review body and decision", () => {
+    const onSubmit = vi.fn();
+    render(<PullRequestReviewComposer onSubmit={onSubmit} />);
+
+    fireEvent.click(
+      screen.getByRole("radio", { name: "Request changes" }),
+    );
+    fireEvent.change(
+      screen.getByRole("textbox", { name: "Review summary" }),
+      {
+        target: { value: "Please restore keyboard focus." },
+      },
+    );
+    fireEvent.click(screen.getByRole("button", { name: "Submit review" }));
+
+    expect(onSubmit).toHaveBeenCalledWith({
+      body: "Please restore keyboard focus.",
+      kind: "request-changes",
+    });
+  });
+
+  it("submits a controlled comment and exposes a recoverable error", () => {
+    const onSubmit = vi.fn();
+
+    function Fixture() {
+      const [value, setValue] = useState("");
+      return (
+        <PullRequestCommentComposer
+          onSubmit={onSubmit}
+          onValueChange={setValue}
+          value={value}
+        />
+      );
+    }
+
+    const { rerender } = render(<Fixture />);
+    const submit = screen.getByRole("button", { name: "Post comment" });
+    expect(submit).toHaveProperty("disabled", true);
+    fireEvent.change(screen.getByRole("textbox", { name: "Comment" }), {
+      target: { value: "The current-head checks are green." },
+    });
+    fireEvent.click(submit);
+    expect(onSubmit).toHaveBeenCalledWith(
+      "The current-head checks are green.",
+    );
+
+    rerender(
+      <PullRequestCommentComposer
+        error="The comment was not posted. Try again."
+        status="error"
+        value="The current-head checks are green."
+      />,
+    );
+    expect(screen.getByRole("alert").textContent).toBe(
+      "The comment was not posted. Try again.",
+    );
+  });
+
+  it("supports an uncontrolled pull request comment", () => {
+    const onSubmit = vi.fn();
+    render(<PullRequestCommentComposer onSubmit={onSubmit} />);
+
+    const submit = screen.getByRole("button", { name: "Post comment" });
+    expect(submit).toHaveProperty("disabled", true);
+    fireEvent.change(screen.getByRole("textbox", { name: "Comment" }), {
+      target: { value: "Current-head checks are green." },
+    });
+    expect(submit).toHaveProperty("disabled", false);
+    fireEvent.click(submit);
+
+    expect(onSubmit).toHaveBeenCalledWith(
+      "Current-head checks are green.",
+    );
+  });
+
   it("renders the current pull request panel summary structure", () => {
     render(
       <PullRequestPanelSummary
@@ -358,6 +585,7 @@ describe("pull request workspace surfaces", () => {
           },
         ]}
         meta="Jamin · Ready for review"
+        timeline={<article>Codex reviewed the latest push.</article>}
         title="Add review workspace"
         titleAction={<button type="button">Edit title</button>}
       />,
@@ -380,5 +608,6 @@ describe("pull request workspace surfaces", () => {
     expect(
       screen.getByRole("textbox", { name: "Pull request comment" }),
     ).toBeTruthy();
+    expect(screen.getByText("Codex reviewed the latest push.")).toBeTruthy();
   });
 });

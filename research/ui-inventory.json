@@ -1,16 +1,18 @@
 {
   "schemaVersion": 1,
   "baseline": {
-    "appVersion": "26.721.81911",
-    "buildNumber": "5973",
-    "sampledAt": "2026-07-29",
-    "reverifiedAt": "2026-07-30",
-    "appAsarSha256": "3c9a101d9beec3718b0fcfc19e427c644a934045f48b3fe0e16b68b0b3f23e61",
+    "appVersion": "26.730.61309",
+    "buildNumber": "6223",
+    "sampledAt": "2026-08-05",
+    "reverifiedAt": "2026-08-05",
+    "appAsarSha256": "9de942a9a058fca20b78d171032e0fe65ccb1063868f175ff7eb4e159efc2c38",
     "runtimeEvidence": "scoped_cdp",
     "runtimeEvidenceBuilds": {
       "cdp": "26.715.72359",
       "cdp-26.721": "26.721.41059",
-      "cdp-26.721.81911": "26.721.81911"
+      "cdp-26.721.81911": "26.721.81911",
+      "cdp-26.727.40816": "26.727.40816",
+      "cdp-26.730.61309": "26.730.61309"
     }
   },
   "surfaces": [
@@ -37,11 +39,12 @@
       "runtimeEvidence": [
         "cdp-26.721:new-chat-project-local-main-context-controls",
         "cdp-26.721:local-environment-dialog-600x600-scrollable-group-structure",
-        "cdp-26.721.81911:new-chat-context-bar-736x28-project-local-main"
+        "cdp-26.721.81911:new-chat-context-bar-736x28-project-local-main",
+        "cdp-26.727.40816:new-chat-project-local-branch-context-controls-1180x820"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "verified",
-      "electronStatus": "verified",
+      "browserStatus": "partial_legacy",
+      "electronStatus": "partial_legacy",
       "priority": "p0"
     },
     {
@@ -52,11 +55,12 @@
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
         "cdp-26.721:new-chat-project-popover-260x250-listbox-14-options",
-        "cdp-26.721.81911:new-chat-project-dialog-260x250-listbox-252x142.81-14-options"
+        "cdp-26.721.81911:new-chat-project-dialog-260x250-listbox-252x142.81-14-options",
+        "cdp-26.727.40816:new-chat-project-dialog-260x249.5-listbox-252x142.81"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "verified",
-      "electronStatus": "verified",
+      "browserStatus": "partial_legacy",
+      "electronStatus": "partial_legacy",
       "priority": "p0"
     },
     {
@@ -100,7 +104,8 @@
       "packageEvidence": ["thread-virtualizer", "thread-scroll-controller-context-value"],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
-        "cdp-26.721:ten-turn-reverse-scroll-windowed-thread"
+        "cdp-26.721:ten-turn-reverse-scroll-windowed-thread",
+        "cdp-26.727.40816:real-82-message-compact-navigation-seven-mounted-turns-reverse-scroll-and-return"
       ],
       "implementationStatus": "partial",
       "browserStatus": "partial_legacy",
@@ -149,11 +154,13 @@
         "cdp:long-output-144px-scroll-fade-container",
         "cdp:running-duration-stop-and-background-process-state",
         "cdp-26.721:synthetic-expanded-read-only-command-timeline-1072x820",
-        "cdp-26.721:synthetic-exit-code-7-failed-command-compact-526x600"
+        "cdp-26.721:synthetic-exit-code-7-failed-command-compact-526x600",
+        "cdp-26.727.40816:real-seq-1-400-expanded-shell-output-reverse-tail-and-masked-regional-pixels",
+        "cdp-26.730.61309:real-seq-1-400-expanded-shell-output-reverse-tail-and-masked-regional-pixels"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "partial_legacy",
-      "electronStatus": "partial_legacy",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
       "priority": "p0"
     },
     {
@@ -214,11 +221,13 @@
       "runtimeEvidence": [
         "cdp-26.721:synthetic-openai-developer-docs-mcp-success-expanded-1180x820",
         "cdp-26.721.81911:real-openai-developer-docs-invalid-url-search-fetch-recovery-expanded-1180x820",
-        "cdp-26.721.81911:real-mcp-recovery-computed-styles-and-906x820-regional-pixel-gate"
+        "cdp-26.721.81911:real-mcp-recovery-computed-styles-and-906x820-regional-pixel-gate",
+        "cdp-26.727.40816:real-openai-developer-docs-search-fetch-success-expanded-1180x820",
+        "cdp-26.727.40816:real-mcp-success-computed-styles-and-masked-906x820-regional-pixel-gate"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "verified",
-      "electronStatus": "verified",
+      "browserStatus": "partial_legacy",
+      "electronStatus": "partial_legacy",
       "priority": "p0"
     },
     {
@@ -232,11 +241,13 @@
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
         "cdp-26.721.81911:real-openai-developer-docs-invalid-url-search-fetch-recovery-expanded-1180x820",
-        "cdp-26.721.81911:real-failed-fetch-plaintext-output-and-recovered-integration-group"
+        "cdp-26.721.81911:real-failed-fetch-plaintext-output-and-recovered-integration-group",
+        "cdp-26.727.40816:real-openai-developer-docs-invalid-url-three-search-fetch-recovery-expanded-1180x820",
+        "cdp-26.727.40816:real-mcp-recovery-computed-styles-and-masked-906x820-regional-pixel-gate"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "verified",
-      "electronStatus": "verified",
+      "browserStatus": "partial_legacy",
+      "electronStatus": "partial_legacy",
       "priority": "p0"
     },
     {
@@ -271,7 +282,8 @@
       "packageEvidence": ["auto-review-approval-nudge", "permissions-mode-dropdown"],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
-        "cdp-26.721:ask-for-approval-command-card-denied-without-execution"
+        "cdp-26.721:ask-for-approval-command-card-denied-without-execution",
+        "cdp-26.727.40816:real-command-approval-pending-denied-no-execution-computed-styles-and-masked-regional-pixels"
       ],
       "implementationStatus": "partial",
       "browserStatus": "partial_legacy",
@@ -300,11 +312,12 @@
         "cdp-26.721:synthetic-submit-running-stop-control-completed-transition",
         "cdp-26.721:synthetic-streaming-stop-28x28-frozen-raster-and-stop-action",
         "cdp-26.721:synthetic-you-stopped-after-2s-divider-raster",
-        "cdp-26.721.81911:real-running-turn-stop-input-clear-and-focus-restore"
+        "cdp-26.721.81911:real-running-turn-stop-input-clear-and-focus-restore",
+        "cdp-26.727.40816:real-stop-28x28-you-stopped-after-2s-and-queued-auto-continuation"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "verified",
-      "electronStatus": "verified",
+      "browserStatus": "partial_legacy",
+      "electronStatus": "partial_legacy",
       "priority": "p0"
     },
     {
@@ -357,7 +370,8 @@
         "cdp:right-environment-panel-visible",
         "cdp:sources-side-tab-and-bottom-terminal-tab",
         "cdp:floating-background-process-section",
-        "cdp-26.721:bottom-panel-toggle-resize-close-restore"
+        "cdp-26.721:bottom-panel-toggle-resize-close-restore",
+        "cdp-26.727.40816:bottom-terminal-and-right-pr-panel-open-read-only"
       ],
       "implementationStatus": "partial",
       "browserStatus": "partial_legacy",
@@ -400,11 +414,12 @@
         "cdp:composer-width-712-to-490-under-viewport-probe",
         "cdp-26.721:synthetic-composer-736x98-wide-494x98-compact",
         "cdp-26.721:synthetic-composer-empty-running-completed-controls",
-        "cdp-26.721.81911:empty-focused-multiline-running-stop-and-completed-composer"
+        "cdp-26.721.81911:empty-focused-multiline-running-stop-and-completed-composer",
+        "cdp-26.727.40816:new-chat-do-anything-input-712x44-14x20"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "verified",
-      "electronStatus": "verified",
+      "browserStatus": "partial_legacy",
+      "electronStatus": "partial_legacy",
       "priority": "p0"
     },
     {
@@ -419,7 +434,8 @@
         "cdp:branch-menu-current-and-create-actions",
         "cdp-26.721:new-chat-project-local-main-context-controls",
         "cdp-26.721:new-chat-project-popover-260x250-listbox-14-options",
-        "cdp-26.721.81911:project-local-and-main-context-controls"
+        "cdp-26.721.81911:project-local-and-main-context-controls",
+        "cdp-26.727.40816:project-local-feat-current-build-pr-refresh-context-row"
       ],
       "implementationStatus": "partial",
       "browserStatus": "partial_legacy",
@@ -427,15 +443,31 @@
       "priority": "p0"
     },
     {
-      "id": "composer.mode-permissions",
+      "id": "composer.permissions",
       "area": "composer",
       "ownership": "thread",
-      "packageEvidence": ["home-composer-mode-toggle", "permissions-mode-dropdown"],
+      "packageEvidence": ["permissions-mode-dropdown"],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
         "cdp:permission-menu-four-modes",
+        "cdp-26.721.81911:ask-approve-full-custom-permission-menu",
+        "cdp-26.727.40816:ask-approve-full-custom-permission-menu-480x222"
+      ],
+      "implementationStatus": "partial",
+      "browserStatus": "partial_legacy",
+      "electronStatus": "partial_legacy",
+      "priority": "p0"
+    },
+    {
+      "id": "composer.modes",
+      "area": "composer",
+      "ownership": "thread",
+      "packageEvidence": ["home-composer-mode-toggle"],
+      "runtimeStatus": "runtime_observed",
+      "runtimeEvidence": [
         "cdp:model-effort-speed-menu",
-        "cdp-26.721.81911:ask-approve-full-custom-permission-menu"
+        "cdp-26.721.81911:add-files-goal-plan-skill-and-plugins-menu",
+        "cdp-26.727.40816:goal-plan-active-mode-label-placeholder-clear-and-focus"
       ],
       "implementationStatus": "partial",
       "browserStatus": "partial_legacy",
@@ -450,18 +482,34 @@
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
         "cdp:queued-follow-up-card-delete-actions-and-sequential-run",
-        "cdp-26.721.81911:real-queue-steer-delete-actions-stop-paused-and-resume"
+        "cdp-26.721.81911:real-queue-steer-delete-actions-stop-paused-and-resume",
+        "cdp-26.727.40816:real-710x39-queue-steer-delete-actions-and-stop-auto-continuation"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "verified",
-      "electronStatus": "verified",
+      "browserStatus": "partial_legacy",
+      "electronStatus": "partial_legacy",
       "priority": "p0"
     },
     {
-      "id": "composer.plugins-attachments-resources",
+      "id": "composer.resources",
       "area": "composer",
       "ownership": "thread",
       "packageEvidence": ["composer-work-home-plugins-control", "connect-plugins-submenu-item"],
+      "runtimeStatus": "runtime_observed",
+      "runtimeEvidence": [
+        "cdp-26.721.81911:add-files-goal-plan-skill-and-plugins-menu",
+        "cdp-26.727.40816:add-files-inline-resource-picker-736x320-scrollable-groups"
+      ],
+      "implementationStatus": "partial",
+      "browserStatus": "partial_legacy",
+      "electronStatus": "partial_legacy",
+      "priority": "p1"
+    },
+    {
+      "id": "composer.attachments-plugins",
+      "area": "composer",
+      "ownership": "thread",
+      "packageEvidence": ["composer-work-home-plugins-control"],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
         "cdp-26.721.81911:add-files-goal-plan-skill-and-plugins-menu"
@@ -481,11 +529,12 @@
         "cdp:global-sidebar-and-top-controls",
         "cdp-26.721:main-shell-landmarks-and-interactive-density",
         "cdp-26.721:navigation-resizer-16px-pointer-track-240-to-520",
-        "cdp-26.721.81911:main-renderer-sidebar-274-titlebar-46-header-70-footer-46-960-panel-autocollapse-720-sidebar-autocollapse-719-edge-preview-and-explicit-pin"
+        "cdp-26.721.81911:main-renderer-sidebar-274-titlebar-46-header-70-footer-46-960-panel-autocollapse-720-sidebar-autocollapse-719-edge-preview-and-explicit-pin",
+        "cdp-26.727.40816:main-renderer-sidebar-274.11-titlebar-46-responsive-hide-at-720"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "verified",
-      "electronStatus": "verified",
+      "browserStatus": "partial_legacy",
+      "electronStatus": "partial_legacy",
       "priority": "p0"
     },
     {
@@ -498,11 +547,12 @@
         "cdp:global-sidebar-and-top-controls",
         "cdp:pull-requests-sites-scheduled-plugins-routes",
         "cdp-26.721:main-shell-landmarks-and-interactive-density",
-        "cdp-26.721.81911:codex-search-new-task-primary-route-stack"
+        "cdp-26.721.81911:codex-search-new-task-primary-route-stack",
+        "cdp-26.727.40816:new-chat-pull-requests-sites-scheduled-plugins-primary-stack"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "verified",
-      "electronStatus": "verified",
+      "browserStatus": "partial_legacy",
+      "electronStatus": "partial_legacy",
       "priority": "p0"
     },
     {
@@ -512,11 +562,12 @@
       "packageEvidence": ["app-main", "projects-index-page"],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
-        "cdp-26.721.81911:projects-collapsible-section-long-name-and-nested-task"
+        "cdp-26.721.81911:projects-collapsible-section-long-name-and-nested-task",
+        "cdp-26.727.40816:pinned-expanded-projects-collapsed-project-navigation"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "verified",
-      "electronStatus": "verified",
+      "browserStatus": "partial_legacy",
+      "electronStatus": "partial_legacy",
       "priority": "p0"
     },
     {
@@ -526,11 +577,12 @@
       "packageEvidence": ["app-main", "thread-app-shell-chrome"],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
-        "cdp-26.721.81911:recents-dense-scroll-history-running-queued-unread-error"
+        "cdp-26.721.81911:recents-dense-scroll-history-running-queued-unread-error",
+        "cdp-26.727.40816:recents-expanded-dense-history"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "verified",
-      "electronStatus": "verified",
+      "browserStatus": "partial_legacy",
+      "electronStatus": "partial_legacy",
       "priority": "p0"
     },
     {
@@ -540,11 +592,12 @@
       "packageEvidence": ["app-main", "thread-app-shell-chrome"],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
-        "cdp-26.721.81911:hover-focus-actions-and-sibling-status-indicators"
+        "cdp-26.721.81911:hover-focus-actions-and-sibling-status-indicators",
+        "cdp-26.727.40816:project-pin-archive-actions-and-status-indicators"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "verified",
-      "electronStatus": "verified",
+      "browserStatus": "partial_legacy",
+      "electronStatus": "partial_legacy",
       "priority": "p0"
     },
     {
@@ -554,11 +607,12 @@
       "packageEvidence": ["app-main"],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
-        "cdp-26.721.81911:fixed-footer-account-avatar-settings-and-bottom-scroll-padding"
+        "cdp-26.721.81911:fixed-footer-account-avatar-settings-and-bottom-scroll-padding",
+        "cdp-26.727.40816:fixed-profile-help-footer"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "verified",
-      "electronStatus": "verified",
+      "browserStatus": "partial_legacy",
+      "electronStatus": "partial_legacy",
       "priority": "p0"
     },
     {
@@ -568,11 +622,12 @@
       "packageEvidence": ["app-main", "thread-app-shell-chrome"],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
-        "cdp-26.721.81911:titlebar-46-sidebar-toggle-back-forward-at-88-120-152"
+        "cdp-26.721.81911:titlebar-46-sidebar-toggle-back-forward-at-88-120-152",
+        "cdp-26.727.40816:titlebar-46-hide-sidebar-back-forward"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "verified",
-      "electronStatus": "verified",
+      "browserStatus": "partial_legacy",
+      "electronStatus": "partial_legacy",
       "priority": "p0"
     },
     {
@@ -582,11 +637,12 @@
       "packageEvidence": ["app-main"],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
-        "cdp-26.721.81911:pull-requests-route-loading-status-and-content-preservation-boundary"
+        "cdp-26.721.81911:pull-requests-route-loading-status-and-content-preservation-boundary",
+        "cdp-26.727.40816:pull-request-detail-loading-to-code-content"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "verified",
-      "electronStatus": "verified",
+      "browserStatus": "partial_legacy",
+      "electronStatus": "partial_legacy",
       "priority": "p0"
     },
     {
@@ -596,11 +652,12 @@
       "packageEvidence": ["app-main"],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
-        "cdp-26.721.81911:pull-requests-selection-through-1180-961-960-721-720-1080p-2k-resize-and-dialog-dismissal"
+        "cdp-26.721.81911:pull-requests-selection-through-1180-961-960-721-720-1080p-2k-resize-and-dialog-dismissal",
+        "cdp-26.727.40816:pr-detail-auto-hide-and-explicit-reopen-at-1180-960-820-720"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "verified",
-      "electronStatus": "verified",
+      "browserStatus": "partial_legacy",
+      "electronStatus": "partial_legacy",
       "priority": "p0"
     },
     {
@@ -650,11 +707,12 @@
         "cdp:blank-new-chat-and-project-menu",
         "cdp-26.721:new-chat-chatgpt-destination-and-worktree-prompt",
         "cdp-26.721:new-chat-project-local-main-context-controls",
-        "cdp-26.721.81911:new-chat-1180x820-project-picker-entry"
+        "cdp-26.721.81911:new-chat-1180x820-project-picker-entry",
+        "cdp-26.727.40816:new-chat-project-dialog-and-context-entry-1180x820"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "verified",
-      "electronStatus": "verified",
+      "browserStatus": "partial_legacy",
+      "electronStatus": "partial_legacy",
       "priority": "p0"
     },
     {
@@ -691,7 +749,8 @@
         "cdp:right-sources-tabpanel-layout",
         "cdp-26.721:synthetic-review-panel-turn-file-diff-split-1072x820",
         "cdp-26.721:synthetic-multi-file-review-split-800x600-and-1180x820",
-        "cdp-26.721:review-panel-16px-resizer-320px-min-352px-main-and-expand-restore"
+        "cdp-26.721:review-panel-16px-resizer-320px-min-352px-main-and-expand-restore",
+        "cdp-26.727.40816:public-pr-nonmodal-side-panel-1180-960-820-720"
       ],
       "implementationStatus": "partial",
       "browserStatus": "partial_legacy",
@@ -709,7 +768,8 @@
         "cdp-26.721:current-build-delete-diff-and-rename-no-content",
         "cdp-26.721:synthetic-review-panel-single-addition-diff",
         "cdp-26.721:synthetic-two-file-stacked-review-diffs",
-        "cdp-26.721:synthetic-binary-and-conflict-review-notices"
+        "cdp-26.721:synthetic-binary-and-conflict-review-notices",
+        "cdp-26.727.40816:public-pr-code-successful-multi-file-diffs-and-display-controls"
       ],
       "implementationStatus": "partial",
       "browserStatus": "partial_legacy",
@@ -726,7 +786,8 @@
         "cdp-26.721:current-build-rename-move-separate-zero-line-items",
         "cdp-26.721:synthetic-two-file-change-group-and-stacked-review",
         "cdp-26.721:synthetic-multi-file-review-close-reopen-lifecycle",
-        "cdp-26.721:synthetic-mixed-file-review-selection-and-undo"
+        "cdp-26.721:synthetic-mixed-file-review-selection-and-undo",
+        "cdp-26.727.40816:public-pr-code-scroll-height-81492-multi-file-content"
       ],
       "implementationStatus": "partial",
       "browserStatus": "partial_legacy",
@@ -742,11 +803,12 @@
       "runtimeEvidence": [
         "cdp:bottom-terminal-tabpanel-header-and-terminal-input",
         "cdp-26.721:terminal-tabpanel-input-default-compact-and-bounds",
-        "cdp-26.721.81911:three-terminal-tabs-per-tab-close-140px-tab-1180-and-820-compact-picker-four-items"
+        "cdp-26.721.81911:three-terminal-tabs-per-tab-close-140px-tab-1180-and-820-compact-picker-four-items",
+        "cdp-26.727.40816:project-named-terminal-tab-bottom-panel-shell-read-only"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "verified",
-      "electronStatus": "verified",
+      "browserStatus": "partial_legacy",
+      "electronStatus": "partial_legacy",
       "priority": "p0"
     },
     {
@@ -771,7 +833,9 @@
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
         "cdp:pull-request-index-tabs-search-split-layout",
-        "cdp-26.721:pull-request-index-all-search-lists-800x600"
+        "cdp-26.721:pull-request-index-all-search-lists-800x600",
+        "cdp-26.721.81911:public-pr-80-summary-timeline-responsive-overlay-history",
+        "cdp-26.727.40816:public-pr-80-two-tab-summary-code-responsive-overlay"
       ],
       "implementationStatus": "partial",
       "browserStatus": "partial_legacy",
@@ -785,7 +849,9 @@
       "packageEvidence": ["pull-request-code-review", "pull-request-reviewer-status-list", "pull-request-fix-button", "pull-request-detail-query", "pull-request-media"],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
-        "cdp-26.721:public-pr-69-summary-timeline-code-resize-expand-restore"
+        "cdp-26.721:public-pr-69-summary-timeline-code-resize-expand-restore",
+        "cdp-26.721.81911:public-pr-80-checks-reviewers-comments-code-loading-boundary",
+        "cdp-26.727.40816:public-pr-80-integrated-timeline-successful-code-display-menu"
       ],
       "implementationStatus": "partial",
       "browserStatus": "partial_legacy",

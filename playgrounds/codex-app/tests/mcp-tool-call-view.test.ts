@@ -17,21 +17,21 @@ describe("MCP tool-call view model", () => {
     const completed = reduceProtocolTrace(
       replayScenarios["mcp-tool-call"].events,
     );
-    const [user, firstCall, secondCall, ...tail] = completed.timeline;
-    const assistant = tail.at(-1);
+    const [user, intro, firstCall, secondCall, assistant] =
+      completed.timeline;
     const interleaved = {
       ...completed,
       timeline: [
         user,
+        intro,
         firstCall,
         assistant,
         secondCall,
-        ...tail.slice(0, -1),
       ].filter((entry) => entry !== undefined),
     };
 
-    expect(mcpToolCallGroupForEntry(interleaved, 1)).toHaveLength(5);
-    expect(mcpToolCallGroupForEntry(interleaved, 3)).toBeNull();
+    expect(mcpToolCallGroupForEntry(interleaved, 2)).toHaveLength(2);
+    expect(mcpToolCallGroupForEntry(interleaved, 4)).toBeNull();
   });
 
   it("keeps a historical group duration scoped to its own turn", () => {
@@ -58,14 +58,14 @@ describe("MCP tool-call view model", () => {
         },
       },
     ].reduce(reduceProtocolNotification, completed);
-    const calls = mcpToolCallGroupForEntry(afterFollowUp, 1);
+    const calls = mcpToolCallGroupForEntry(afterFollowUp, 2);
 
     expect(calls).not.toBeNull();
-    expect(mcpToolCallGroupDurationMs(afterFollowUp, calls!)).toBe(54_000);
+    expect(mcpToolCallGroupDurationMs(afterFollowUp, calls!)).toBe(31_000);
     expect(afterFollowUp.turnDurationMs).toBe(900);
     expect(afterFollowUp.turnDurationsMs).toMatchObject({
       "turn-follow-up": 900,
-      "turn-mcp": 54_000,
+      "turn-mcp": 31_000,
     });
   });
 

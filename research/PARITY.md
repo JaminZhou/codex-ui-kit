@@ -6,9 +6,13 @@ not establish full conversation, workspace, application, or product coverage.
 
 The authoritative current-build inventory is:
 
-- [`26.721.81911.md`](26.721.81911.md) for the current package fingerprint,
-  main-Renderer sidebar and MCP recovery captures, and remaining
-  runtime-capture boundary;
+- [`26.730.61309.md`](26.730.61309.md) for the current package fingerprint,
+  current long-command capture, and remaining runtime-capture boundary;
+- [`26.727.40816.md`](26.727.40816.md) for the previous main-Renderer shell,
+  New chat, Terminal, PR, Composer, MCP, long-thread, approval, and command
+  runtime sample;
+- [`26.721.81911.md`](26.721.81911.md) for the previous sidebar, Composer,
+  MCP recovery, Review, Terminal, and PR runtime sample;
 - [`26.721.41059.md`](26.721.41059.md) for the previous runtime-sampled build,
   scoped CDP evidence, and research boundary;
 - [`26.715.72359.md`](26.715.72359.md) for the previous build's broader
@@ -49,21 +53,43 @@ The authoritative current-build inventory is:
   behavior, code search, broader connectors, or the wider thread-error, queue,
   Markdown variants, menu, global-route, and Settings states; those remain
   historical evidence from `26.715.72359` until sampled again.
-- Codex Desktop `26.721.81911` (`5973`) now has fresh dark main-Renderer
-  captures for all six left-sidebar groups and a real OpenAI Developer Docs
-  failed-Fetch → Search → successful-Fetch recovery. Target selection uses the
+- The previous Codex Desktop `26.727.40816` (`6067`) snapshot has dark
+  main-Renderer
+  captures for all six left-sidebar groups, the New chat Composer/project
+  picker, the read-only Terminal shell, a real successful OpenAI Developer
+  Docs Search → Fetch turn, and public PR `#80`. Target selection uses the
   `app://-/index.html` URL plus application-shell landmarks and excludes the
-  small auxiliary page. The independent Browser and Electron flows verify the
-  sidebar at 1180×820, the 961/960 and 721/720 boundaries, 1920×1080, and
-  2560×1440. Narrow behavior distinguishes the 12px edge preview from an
-  explicit pinned sidebar. The shell flow additionally covers window chrome,
-  loading/offline/stale/restored route states, in-session selection
-  restoration, and global feedback, while the MCP recovery continues through
-  its following command/approval/file/Review turn. External regional gates
-  verify the sidebar, window chrome, and MCP-owned regions. Offline/error/
-  reconnecting/stale and global-notification runtime states remain synthetic
-  independent coverage, not current-build observations. Older evidence
-  outside these sampled slices remains `partial_legacy`.
+  small auxiliary page. The successful MCP path now matches its two-call
+  integrated activity disclosure and passes a current regional pixel gate.
+  The failure/recovery path now matches a standalone invalid-URL Fetch,
+  intermediate explanation, three Search rows, successful Fetch, linked
+  answer, and a second current regional pixel gate. A read-only 82-message
+  thread additionally establishes compact navigation, seven mounted nearby
+  turns, reverse-origin scrolling, and return-to-latest behavior.
+  The current PR changed to Summary/Code tabs with
+  Timeline integrated into Summary, loaded real multi-file Code content, and
+  exposed a display-only Review options menu. The independent Browser and
+  Electron flows verify the matched shell/New chat/PR structures and all 66
+  deterministic lifecycle frames. The refreshed PR regional gate passes at
+  5.75% full-main, 4.68% index, and 6.44% detail difference. A third
+  text-only current probe verifies the 710×39 Composer queue, visible
+  Steer/Delete/message-actions controls, 28×28 Stop, `You stopped after 2s`,
+  and automatic queued continuation. Browser, Electron, and 792×320 regional
+  gates pass at 0.35% queued and 0.51% continued difference; the previous
+  paused/Resume behavior is retained only as legacy compatibility.
+  A fourth current probe verifies the 736×134 four-line Composer, 205px
+  long-input clamp, four-choice 480×222 permission menu, and the new 736×320
+  inline Add-resource picker. Public `ComposerPermissionMenu` and
+  `ComposerResourcePicker` contracts, CDP, real Electron, and three regional
+  gates pass at 0.10%, 0.13%, and 0.34% changed pixels. Active Goal/Plan modes
+  are independently current-observed; only native attachment selection
+  remains historical rather than being inferred from the resource menu.
+  Terminal multi-tab/process lifecycle, Review variants, broader
+  shell matrices, and their external pixels remain `26.721.81911` historical
+  evidence. The current project-named single Terminal tab and close/add
+  controls independently pass Browser, Electron, and regional pixel gates.
+  Offline/error/reconnecting/stale and global-notification runtime states
+  remain synthetic independent coverage, not current-build observations.
 - Renderer viewport probing exposed a narrow-layout gap: the thread and
   Composer shrink, but the fixed app sidebar remains and the right workspace
   panel can be laid out beyond the simulated viewport. The independently
@@ -71,6 +97,43 @@ The authoritative current-build inventory is:
   coverage at its measured wide and compact geometry, but native Codex window
   behavior, the updated build, and the remaining app-shell/panel interactions
   stay separate acceptance requirements.
+- A later read-only `26.727.40816` public-PR probe established that build's
+  non-modal PR overlay, Summary/Code content with integrated Timeline,
+  successful Code loading, responsive 1180/960/820/720px geometry, and
+  explicit row reopen after responsive auto-hide. The
+  independent public state machine adds list/detail loading and failure,
+  checks, comments, review submission, merge readiness/completion, and compact
+  recovery through 65 Browser/CDP, Electron, and reviewed-pixel frames. No
+  review, comment, or merge was sent to the real PR, and successful
+  review submission remains synthetic because the current Review options menu
+  contains display settings only; those mutating states must not be reported
+  as current-product runtime parity.
+- The `26.727.40816` Composer mode slice independently observed unsubmitted
+  Goal and Plan drafts. Both preserve the measured 736×98 shell, expose
+  mode-specific accessible prompts, and clear back to the default focused
+  input. Browser/CDP, real Electron, and masked regional pixels pass at 0.38%
+  and 0.35%. The native attachment panel was not automated and remains
+  outside that build's parity and is now previous-build evidence.
+- The `26.727.40816` long-thread slice observed 82 compact navigation buttons,
+  a seven-turn mounted window around message 40, negative away-from-latest
+  scrolling, and a 32×32px return control. Browser/CDP and Electron reproduce
+  selection and restoration with synthetic content, while a masked regional
+  gate compares only the rail and floating control at 0.59%. Host eviction
+  policy outside this sampled state remains an open product boundary.
+- The `26.727.40816` approval slice observed a real 736×162 command approval,
+  drives `Deny`, confirms the command did not execute, and verifies the
+  completed activity, final response, response actions, restored 736×98
+  Composer, and `Ask for approval` permission mode. The public declined trace,
+  CDP, Electron, and ownership-masked build pixels pass at 0.85% pending and
+  0.12% denied. Allow-once completion, persistent approval, timeout, repeated
+  denial, and other approval kinds remain open.
+- The current `26.730.61309` long-command slice observes one real
+  `seq 1 400` run.
+  Ask mode auto-ran the low-risk command without an approval card, so this is
+  not allow-once evidence. Browser/CDP and Electron reproduce the collapsed
+  and expanded `Shell` surface, 144px reverse-tail viewport, 401 split lines,
+  copy controls, Success state, and collapse/reopen restoration. The
+  ownership-masked full-window comparison passes at 0.17%.
 - npm publication remains out of scope until the agreed P0/P1 coverage and
   release acceptance surfaces are complete.
 
@@ -97,7 +160,7 @@ product-level parity.
 ## Visual optimization
 
 H5 and Electron are used continuously as functional acceptance surfaces. The
-current thread slice now has scenario-driven, main-only completed, streaming,
+thread suite has scenario-driven, main-only completed, streaming,
 expanded-command, pending-approval, file-review, web-search, Browser,
 unavailable-MCP, failed-command, message-navigation, scroll-away,
 post-interruption, and context-compaction raster fixtures with independent
@@ -108,15 +171,42 @@ Browser scenes lock the sampled follow and scroll-away positions; they are not
 represented as native window resizes.
 
 The protocol-backed Electron playground adds a separate completed-Markdown
-frame. Its optional 906×820 current-build comparison gates the assistant,
+frame. Its optional 906×820 `26.721.41059` comparison gates the assistant,
 fenced-code, and Composer regions at the strict 0.05 pixel threshold, while
 CDP separately locks semantic counts and computed geometry.
 
-The current-build MCP recovery adds four further frames for failure, retry,
+The `26.727.40816` MCP recovery adds four further frames for failure, retry,
 completion, and a mixed follow-up turn. Its optional 906×820 comparison gates
 the full main, recovered tool group, user prompt, and Composer independently
 at the same strict threshold. CDP locks call order, labels, expansion, error
 semantics, and group recovery; Electron locks the mixed Review composition.
+
+The `26.727.40816` Pull request slice adds nine lifecycle frames beyond the
+previous 49-frame matrix. Its independent gates cover index/detail loading and
+failure, running checks, review submission, comment failure, merge readiness,
+and 720×680 compact composition. The current-product comparison remains
+ownership-scoped and read-only.
+
+The `26.727.40816` long-thread comparison uses an external 906×820 main crop,
+keeps all real and synthetic transcript content outside the pixel denominator,
+and gates only the compact navigation rail and floating return control under a
+1% hard limit. CDP separately checks 82 navigation entries, seven mounted
+turns, reverse scroll origin, and the return-to-latest transition.
+
+The `26.727.40816` approval comparison uses separate pending and denied
+906×820 references. Ownership masks exclude task/header text, localized or
+synthetic response glyphs, and the non-owning scrollbar while preserving the
+approval/Composer silhouettes, activity and command structure, approval
+actions, response actions, and spacing. Both gates use a 1.5% hard limit;
+CDP and Electron independently verify decision semantics and focus.
+
+The current `26.730.61309` long-command comparison uses one full 1180×820
+reference.
+Its ownership mask excludes the sidebar, task/header text, final-answer
+glyphs, Composer internals, and non-owning scrollbars while retaining the
+command-card boundary, disclosure structure, Shell/output geometry, and
+surrounding spacing under a 1.5% hard limit. CDP separately verifies all
+unmasked semantics plus the masked command and status typography.
 
 Broader final visual optimization remains scheduled after the remaining
 inventory, page compositions, and state transitions stabilize. A passing

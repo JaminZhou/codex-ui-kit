@@ -13,6 +13,9 @@ describe("complete thread visual contract", () => {
     expect(styles).toContain("contain-intrinsic-size: auto var(--codex-ui-thread-placeholder-height)");
     expect(styles).toContain("overflow-anchor: none");
     expect(styles).toContain("position: sticky");
+    expect(styles).toMatch(
+      /\.codex-ui-thread-viewport\[data-latest-origin="start"\] \{[\s\S]*?display: flex;[\s\S]*?flex-direction: column-reverse;/,
+    );
   });
 
   it("protects shimmer, target highlight, focus, and reduced motion", () => {

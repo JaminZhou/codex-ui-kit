@@ -342,12 +342,12 @@ const statuses = inventory.surfaces.reduce(
 );
 const visibleMarkdownSummary = [
   `Current inventory: ${inventory.surfaces.length} surface groups;`,
-  `${currentRuntimeEvidenceIds.size} have current-build runtime evidence,`,
+  `${currentRuntimeEvidenceIds.size} ${currentRuntimeEvidenceIds.size === 1 ? "has" : "have"} current-build runtime evidence,`,
   `${previousRuntimeEvidenceIds.size} have previous-build-only runtime`,
   `evidence, ${statuses.runtime.not_sampled} remain \`not_sampled\`, and`,
   `${statuses.runtime.blocked_by_policy} are \`blocked_by_policy\`.`,
   "Current-build Browser verification covers",
-  `${statuses.browser.verified} groups and Electron verification covers`,
+  `${statuses.browser.verified} ${statuses.browser.verified === 1 ? "group" : "groups"} and Electron verification covers`,
   `${statuses.electron.verified}.`,
 ].join(" ");
 const normalizedInventoryMarkdown = inventoryMarkdown.replace(/\s+/g, " ");
@@ -363,7 +363,7 @@ const visibleRoadmapPrioritySummary = [
   `${priorities.p0} P0, ${priorities.p1} P1, and ${priorities.p2} P2.`,
 ].join(" ");
 const visibleRoadmapRuntimeSummary = [
-  `${currentRuntimeEvidenceIds.size} groups have current-build runtime`,
+  `${currentRuntimeEvidenceIds.size} ${currentRuntimeEvidenceIds.size === 1 ? "group has" : "groups have"} current-build runtime`,
   `evidence, ${previousRuntimeEvidenceIds.size} have previous-build-only`,
   `runtime evidence, and ${statuses.runtime.not_sampled} have not been sampled.`,
 ].join(" ");

@@ -382,6 +382,237 @@ for (const scene of visualScenes) {
     }
 
     if (scene.view === "pull-request") {
+      if (scene.id !== "pull-request-detail") {
+        const lifecycle = await page.evaluate(() => {
+          const rect = (element) => {
+            if (!element) return null;
+            const value = element.getBoundingClientRect();
+            return {
+              height: value.height,
+              left: value.left,
+              top: value.top,
+              width: value.width,
+            };
+          };
+          const root = document.querySelector(".demo-root");
+          const shell = document.querySelector(".codex-ui-app-shell");
+          const indexState = document.querySelector(
+            ".demo-pr-index > .codex-ui-pull-request-query-state",
+          );
+          const detailState = document.querySelector(
+            ".demo-pr-panel .codex-ui-pull-request-query-state",
+          );
+          const merge = document.querySelector(
+            ".codex-ui-pull-request-merge-readiness",
+          );
+          const review = document.querySelector(
+            ".codex-ui-pull-request-review-composer",
+          );
+          const comment = document.querySelector(
+            ".codex-ui-pull-request-comment-composer",
+          );
+          const mergeButton = Array.from(
+            document.querySelectorAll(
+              ".demo-pr-panel .codex-ui-workspace-panel__actions > button",
+            ),
+          ).find((button) =>
+            ["Merge", "Merged", "Merging…"].includes(
+              button.textContent?.trim() ?? "",
+            ),
+          );
+          return {
+            comment: comment
+              ? {
+                  busy: comment.getAttribute("aria-busy"),
+                  feedback:
+                    comment.querySelector(
+                      ".codex-ui-pull-request-submission-feedback",
+                    )?.textContent ?? null,
+                  status: comment.getAttribute("data-status"),
+                }
+              : null,
+            detail: detailState
+              ? {
+                  busy: detailState.getAttribute("aria-busy"),
+                  role: detailState.getAttribute("role"),
+                  status: detailState.getAttribute("data-status"),
+                }
+              : null,
+            frame: root?.getAttribute("data-frame"),
+            horizontalOverflow:
+              document.documentElement.scrollWidth -
+              document.documentElement.clientWidth,
+            index: indexState
+              ? {
+                  busy: indexState.getAttribute("aria-busy"),
+                  skeletons: indexState.querySelectorAll(
+                    ".codex-ui-pull-request-query-state__skeleton",
+                  ).length,
+                  status: indexState.getAttribute("data-status"),
+                }
+              : null,
+            layoutMode: shell?.getAttribute("data-layout-mode"),
+            main: rect(
+              document.querySelector(".codex-ui-app-shell__main"),
+            ),
+            mainInert: document
+              .querySelector(".codex-ui-app-shell__main")
+              ?.hasAttribute("inert"),
+            merge: merge?.getAttribute("data-status") ?? null,
+            mergeButton: mergeButton
+              ? {
+                  disabled: mergeButton.disabled,
+                  label: mergeButton.textContent?.trim() ?? null,
+                }
+              : null,
+            panel: rect(
+              document.querySelector(
+                ".codex-ui-app-shell__side-panel",
+              ),
+            ),
+            panelOpen: shell?.hasAttribute("data-side-panel-open"),
+            resizer: rect(
+              document.querySelector(
+                ".codex-ui-app-shell__side-panel-resizer",
+              ),
+            ),
+            review: review
+              ? {
+                  busy: review.getAttribute("aria-busy"),
+                  feedback:
+                    review.querySelector(
+                      ".codex-ui-pull-request-submission-feedback",
+                    )?.textContent ?? null,
+                  status: review.getAttribute("data-status"),
+                }
+              : null,
+            runningChecks: document.querySelectorAll(
+              '.codex-ui-pull-request-checks li[data-status="running"]',
+            ).length,
+            selectedTab:
+              document
+                .querySelector(
+                  '[aria-label="Pull request view"] [aria-selected="true"]',
+                )
+                ?.textContent?.trim() ?? null,
+            sidebar: rect(
+              document.querySelector(".codex-ui-app-shell__sidebar"),
+            ),
+            sidebarHidden:
+              document
+                .querySelector(".codex-ui-app-shell__sidebar")
+                ?.getAttribute("aria-hidden") === "true",
+          };
+        });
+        const failed =
+          lifecycle.frame !== scene.frame ||
+          lifecycle.horizontalOverflow > 1 ||
+          (scene.frame === "pr-index-loading" &&
+            (lifecycle.index?.status !== "loading" ||
+              lifecycle.index.busy !== "true" ||
+              lifecycle.index.skeletons !== 5 ||
+              lifecycle.panelOpen)) ||
+          (scene.frame === "pr-index-failed" &&
+            (lifecycle.index?.status !== "error" ||
+              lifecycle.index.busy !== null ||
+              lifecycle.index.skeletons !== 0 ||
+              lifecycle.panelOpen)) ||
+          (scene.frame === "pr-detail-loading" &&
+            (lifecycle.detail?.status !== "loading" ||
+              lifecycle.detail.busy !== "true")) ||
+          (scene.frame === "pr-detail-failed" &&
+            (lifecycle.detail?.status !== "error" ||
+              lifecycle.detail.role !== "alert")) ||
+          (scene.frame === "pr-checks-running" &&
+            (lifecycle.merge !== "checking" ||
+              lifecycle.runningChecks !== 2)) ||
+          (scene.frame === "pr-review-submitting" &&
+            (lifecycle.selectedTab !== "Code" ||
+              lifecycle.review?.status !== "submitting" ||
+              lifecycle.review.busy !== "true")) ||
+          (scene.frame === "pr-comment-failed" &&
+            (lifecycle.comment?.status !== "error" ||
+              lifecycle.comment.feedback !==
+                "The comment was not posted. Try again.")) ||
+          (scene.frame === "pr-merge-ready" &&
+            (lifecycle.merge !== "ready" ||
+              lifecycle.mergeButton?.disabled !== false)) ||
+          (scene.frame === "pr-compact-detail" &&
+            (lifecycle.layoutMode !== "narrow" ||
+              !lifecycle.sidebarHidden ||
+              lifecycle.mainInert ||
+              Math.abs((lifecycle.main?.width ?? 0) - 720) > 1 ||
+              Math.abs((lifecycle.panel?.left ?? 0) - 390) > 1 ||
+              Math.abs((lifecycle.panel?.width ?? 0) - 330) > 1 ||
+              Math.abs((lifecycle.resizer?.left ?? 0) - 382) > 1 ||
+              Math.abs((lifecycle.resizer?.width ?? 0) - 16) > 0.5));
+        if (failed) {
+          throw new Error(
+            `${scene.id}: pull request lifecycle contract failed: ${JSON.stringify(lifecycle)}`,
+          );
+        }
+        let retry = null;
+        if (scene.frame === "pr-index-failed") {
+          await page
+            .getByRole("button", { exact: true, name: "Retry" })
+            .click();
+          const pending = await page
+            .locator(
+              '.demo-pr-index > .codex-ui-pull-request-query-state[data-status="loading"]',
+            )
+            .getAttribute("aria-busy");
+          await page.waitForSelector(
+            ".demo-pr-index .codex-ui-pull-request-list__item",
+          );
+          retry = {
+            pending,
+            readyItems: await page
+              .locator(
+                ".demo-pr-index .codex-ui-pull-request-list__item",
+              )
+              .count(),
+          };
+          if (retry.pending !== "true" || retry.readyItems !== 1) {
+            throw new Error(
+              `${scene.id}: index retry failed: ${JSON.stringify(retry)}`,
+            );
+          }
+        }
+        if (scene.frame === "pr-detail-failed") {
+          await page
+            .getByRole("button", { exact: true, name: "Retry" })
+            .click();
+          const pending = await page
+            .locator(
+              '.demo-pr-panel .codex-ui-pull-request-query-state[data-status="loading"]',
+            )
+            .getAttribute("aria-busy");
+          await page.waitForSelector(
+            ".demo-pr-panel .codex-ui-pull-request-panel-summary",
+          );
+          retry = {
+            heading: await page
+              .locator(".demo-pr-panel h1")
+              .textContent(),
+            pending,
+          };
+          if (
+            retry.pending !== "true" ||
+            retry.heading?.trim() !==
+              "feat: add terminal session lifecycle"
+          ) {
+            throw new Error(
+              `${scene.id}: detail retry failed: ${JSON.stringify(retry)}`,
+            );
+          }
+        }
+        await writeFile(
+          join(artifactDirectory, `${scene.id}.json`),
+          `${JSON.stringify({ ...lifecycle, retry }, null, 2)}\n`,
+        );
+        continue;
+      }
+
       const initial = await page.evaluate(() => {
         const rect = (element) => {
           const value = element.getBoundingClientRect();
@@ -448,19 +679,19 @@ for (const scene of visualScenes) {
         initial.rootView !== "pull-request" ||
         initial.horizontalOverflow > 1 ||
         initial.listItems !== 1 ||
-        initial.tabCount !== 3 ||
+        initial.tabCount !== 2 ||
         initial.selectedTab !== "Summary" ||
-        initial.heading !== "feat: add resizable review workspace" ||
-        initial.checkCount !== 4 ||
-        Math.abs(initial.main.width - 352) > 1 ||
-        Math.abs(initial.panel.width - 554) > 1 ||
+        initial.heading !== "feat: add terminal session lifecycle" ||
+        initial.checkCount !== 0 ||
+        Math.abs(initial.main.width - 906) > 1 ||
+        Math.abs(initial.panel.width - 370) > 1 ||
         initial.resizer.cursor !== "col-resize" ||
         Math.abs(initial.resizer.rect.width - 16) > 0.5 ||
-        initial.resizer.ariaMin !== "320" ||
-        initial.resizer.ariaMax !== "554" ||
-        initial.resizer.ariaNow !== "554" ||
+        initial.resizer.ariaMin !== "322" ||
+        initial.resizer.ariaMax !== "516" ||
+        initial.resizer.ariaNow !== "370" ||
         !initial.actions.includes("Open in browser") ||
-        !initial.actions.includes("More pull request actions") ||
+        !initial.actions.includes("Auto-merge") ||
         !initial.actions.includes("Expand panel")
       ) {
         throw new Error(
@@ -468,15 +699,14 @@ for (const scene of visualScenes) {
         );
       }
 
-      await page.getByRole("tab", { name: "Timeline" }).click();
       if (
-        (await page.getByRole("tab", { name: "Timeline" }).getAttribute(
-          "aria-selected",
-        )) !== "true" ||
-        (await page.getByRole("textbox", { name: "Timeline comment" }).count()) !==
-          1
+        (await page.getByLabel("Pull request timeline").count()) !== 1 ||
+        (await page
+          .getByLabel("Pull request timeline")
+          .locator("article")
+          .count()) !== 2
       ) {
-        throw new Error(`${scene.id}: Timeline tab did not activate.`);
+        throw new Error(`${scene.id}: integrated timeline is missing.`);
       }
 
       await page.getByRole("tab", { name: "Code" }).click();
@@ -491,6 +721,59 @@ for (const scene of visualScenes) {
           1
       ) {
         throw new Error(`${scene.id}: Code tab did not activate.`);
+      }
+      await page.getByRole("button", { name: "Review options" }).click();
+      await page
+        .getByRole("menuitem", { name: "Open synthetic review" })
+        .click();
+      await page
+        .getByRole("textbox", { name: "Review summary" })
+        .fill("Current-head review is clean.");
+      await page
+        .getByRole("button", { name: "Submit review" })
+        .click();
+      await page.waitForSelector(
+        '.codex-ui-pull-request-review-composer[data-status="submitted"]',
+      );
+      const mergeAction = page.getByRole("button", {
+        exact: true,
+        name: "Merge",
+      });
+      if (!(await mergeAction.isEnabled())) {
+        throw new Error(
+          `${scene.id}: submitted review did not unlock merge.`,
+        );
+      }
+      await mergeAction.click();
+      await page
+        .getByRole("button", { exact: true, name: "Merged" })
+        .waitFor();
+      const reviewSubmission = await page.evaluate(() => ({
+        mergeLabel:
+          Array.from(
+            document.querySelectorAll(
+              ".demo-pr-panel .codex-ui-workspace-panel__actions > button",
+            ),
+          )
+            .find((button) => button.textContent?.trim() === "Merged")
+            ?.textContent?.trim() ?? null,
+        reviewFeedback:
+          document.querySelector(
+            ".codex-ui-pull-request-review-composer .codex-ui-pull-request-submission-feedback",
+          )?.textContent ?? null,
+        reviewStatus:
+          document
+            .querySelector(".codex-ui-pull-request-review-composer")
+            ?.getAttribute("data-status") ?? null,
+      }));
+      if (
+        reviewSubmission.reviewStatus !== "submitted" ||
+        reviewSubmission.reviewFeedback !== "Review submitted." ||
+        reviewSubmission.mergeLabel !== "Merged"
+      ) {
+        throw new Error(
+          `${scene.id}: review and merge lifecycle failed: ${JSON.stringify(reviewSubmission)}`,
+        );
       }
 
       await page.getByRole("button", { name: "Expand panel" }).click();
@@ -515,7 +798,7 @@ for (const scene of visualScenes) {
         !expanded.expanded ||
         expanded.resizer ||
         Math.abs((expanded.panelWidth ?? 0) - 906) > 1 ||
-        Math.abs(expanded.mainWidth ?? 0) > 1
+        Math.abs((expanded.mainWidth ?? 0) - 906) > 1
       ) {
         throw new Error(
           `${scene.id}: expanded pull request panel failed: ${JSON.stringify(expanded)}`,
@@ -541,10 +824,42 @@ for (const scene of visualScenes) {
       if (
         restored.expanded ||
         !restored.resizer ||
-        Math.abs((restored.panelWidth ?? 0) - 554) > 1
+        Math.abs((restored.panelWidth ?? 0) - 370) > 1
       ) {
         throw new Error(
           `${scene.id}: restored pull request panel failed: ${JSON.stringify(restored)}`,
+        );
+      }
+      await page
+        .getByRole("textbox", { name: "Comment" })
+        .fill("Current-head checks are green.");
+      await page
+        .getByRole("button", { name: "Post comment" })
+        .click();
+      await page.waitForSelector(
+        '.codex-ui-pull-request-comment-composer[data-status="submitted"]',
+      );
+      const commentSubmission = await page.evaluate(() => ({
+        feedback:
+          document.querySelector(
+            ".codex-ui-pull-request-comment-composer .codex-ui-pull-request-submission-feedback",
+          )?.textContent ?? null,
+        status:
+          document
+            .querySelector(".codex-ui-pull-request-comment-composer")
+            ?.getAttribute("data-status") ?? null,
+        value:
+          document.querySelector(
+            ".codex-ui-pull-request-comment-composer textarea",
+          )?.value ?? null,
+      }));
+      if (
+        commentSubmission.status !== "submitted" ||
+        commentSubmission.feedback !== "Comment posted." ||
+        commentSubmission.value !== ""
+      ) {
+        throw new Error(
+          `${scene.id}: comment lifecycle failed: ${JSON.stringify(commentSubmission)}`,
         );
       }
       await page.getByRole("button", { name: "Live local" }).click();
@@ -577,10 +892,52 @@ for (const scene of visualScenes) {
           `${scene.id}: Live local navigation did not leave the pull request view: ${JSON.stringify(liveNavigation)}`,
         );
       }
+      await page.getByRole("button", { name: "Pull requests" }).click();
+      await page.waitForSelector(
+        '.demo-root[data-view="pull-request"] [data-testid="pull-request-panel"]',
+      );
+      const routeRestored = await page.evaluate(() => ({
+        panelOpen: document
+          .querySelector(".codex-ui-app-shell")
+          ?.hasAttribute("data-side-panel-open"),
+        selectedItem:
+          document
+            .querySelector(
+              ".demo-pr-index .codex-ui-pull-request-list__item[data-selected]",
+            )
+            ?.textContent?.trim() ?? null,
+        selectedTab:
+          document
+            .querySelector(
+              '[aria-label="Pull request view"] [aria-selected="true"]',
+            )
+            ?.textContent?.trim() ?? null,
+        view: document
+          .querySelector(".demo-root")
+          ?.getAttribute("data-view"),
+      }));
+      if (
+        routeRestored.view !== "pull-request" ||
+        !routeRestored.panelOpen ||
+        !routeRestored.selectedItem?.includes("#80") ||
+        routeRestored.selectedTab !== "Summary"
+      ) {
+        throw new Error(
+          `${scene.id}: pull request route restoration failed: ${JSON.stringify(routeRestored)}`,
+        );
+      }
       await writeFile(
         join(artifactDirectory, `${scene.id}.json`),
         `${JSON.stringify(
-          { expanded, initial, liveNavigation, restored },
+          {
+            expanded,
+            commentSubmission,
+            initial,
+            liveNavigation,
+            restored,
+            reviewSubmission,
+            routeRestored,
+          },
           null,
           2,
         )}\n`,
@@ -674,7 +1031,10 @@ for (const scene of visualScenes) {
         return {
           backgroundColor: style.backgroundColor,
           borderRadius: style.borderRadius,
+          color: style.color,
+          fontFamily: style.fontFamily,
           fontSize: style.fontSize,
+          fontWeight: style.fontWeight,
           lineHeight: style.lineHeight,
           marginBlockEnd: style.marginBlockEnd,
           marginBlockStart: style.marginBlockStart,
@@ -794,7 +1154,132 @@ for (const scene of visualScenes) {
             ).length,
           }
         : null;
+      const failedMcpCall = document.querySelector(
+        '[data-item-id="mcp-fetch-invalid"]',
+      );
+      const mcpFailure = failedMcpCall
+        ? {
+            accessibleLabel: failedMcpCall
+              .querySelector(".codex-ui-tool-call__label")
+              ?.getAttribute("aria-label"),
+            errorOutput: (() => {
+              const element = failedMcpCall.querySelector(
+                '.codex-ui-tool-call__error[data-presentation="output"]',
+              );
+              return element
+                ? {
+                    rect: rect(element),
+                    role: element.getAttribute("role"),
+                    text: element.textContent?.replace(/\s+/g, " ").trim(),
+                  }
+                : null;
+            })(),
+            expanded:
+              failedMcpCall
+                .querySelector(".codex-ui-activity__disclosure")
+                ?.hasAttribute("open") ?? false,
+            status: failedMcpCall.getAttribute("data-status"),
+            timelineExpanded:
+              failedMcpCall
+                .closest(".codex-ui-activity-timeline")
+                ?.hasAttribute("data-expanded") ?? false,
+            timelineLabel: failedMcpCall
+              .closest(".codex-ui-activity-timeline")
+              ?.querySelector(".codex-ui-activity-timeline__toggle")
+              ?.textContent?.trim(),
+          }
+        : null;
+      const commandExecution = document.querySelector(
+        '[data-item-id="command-long-output"]',
+      );
+      const commandOutput = (() => {
+        if (!commandExecution) return null;
+        const shell = commandExecution.querySelector(
+          ".codex-ui-command-execution__shell",
+        );
+        const shellLabel = commandExecution.querySelector(
+          ".codex-ui-command-execution__shell-label",
+        );
+        const commandLine = commandExecution.querySelector(
+          ".codex-ui-command-execution__command-line",
+        );
+        const output = commandExecution.querySelector(
+          ".codex-ui-command-output pre",
+        );
+        const outputCode = output?.querySelector("code");
+        const footer = commandExecution.querySelector(
+          ".codex-ui-command-execution__footer",
+        );
+        const timeline = commandExecution.closest(
+          ".codex-ui-activity-timeline",
+        );
+        const shellStyle = shell ? getComputedStyle(shell) : null;
+        const outputStyle = output ? getComputedStyle(output) : null;
+        return {
+          commandExpanded:
+            commandLine?.getAttribute("aria-expanded") ?? null,
+          commandLabel: commandLine?.getAttribute("aria-label") ?? null,
+          copyLabels: Array.from(
+            commandExecution.querySelectorAll("button"),
+            (button) => button.getAttribute("aria-label"),
+          ).filter(Boolean),
+          executionExpanded:
+            commandExecution
+              .querySelector(".codex-ui-activity__disclosure")
+              ?.hasAttribute("open") ?? false,
+          footer: footer
+            ? {
+                rect: rect(footer),
+                text: footer.textContent?.trim(),
+              }
+            : null,
+          lineCount: (outputCode?.textContent ?? "").split("\n").length,
+          output: output
+            ? {
+                clientHeight: output.clientHeight,
+                rect: rect(output),
+                scrollHeight: output.scrollHeight,
+                scrollTop: output.scrollTop,
+                style: {
+                  flexDirection: outputStyle?.flexDirection,
+                  fontFamily: outputStyle?.fontFamily,
+                  fontSize: outputStyle?.fontSize,
+                  lineHeight: outputStyle?.lineHeight,
+                  maxHeight: outputStyle?.maxHeight,
+                  overflowY: outputStyle?.overflowY,
+                  padding: outputStyle?.padding,
+                },
+                textEnd: (outputCode?.textContent ?? "").slice(-16),
+                textStart: (outputCode?.textContent ?? "").slice(0, 12),
+              }
+            : null,
+          shell: shell
+            ? {
+                rect: rect(shell),
+                style: {
+                  backgroundColor: shellStyle?.backgroundColor,
+                  borderRadius: shellStyle?.borderRadius,
+                  overflow: shellStyle?.overflow,
+                },
+              }
+            : null,
+          shellLabel: shellLabel?.textContent?.trim() ?? null,
+          summary:
+            commandExecution
+              .querySelector(".codex-ui-activity__summary")
+              ?.textContent?.replace(/\s+/g, " ")
+              .trim() ?? null,
+          timelineExpanded:
+            timeline?.hasAttribute("data-expanded") ?? false,
+          timelineLabel:
+            timeline
+              ?.querySelector(".codex-ui-activity-timeline__toggle")
+              ?.textContent?.replace(/\s+/g, " ")
+              .trim() ?? null,
+        };
+      })();
       return {
+        commandOutput,
         composer: composerRect,
         frame: root.getAttribute("data-frame"),
         header: headerRect,
@@ -804,6 +1289,7 @@ for (const scene of visualScenes) {
         mode: root.getAttribute("data-mode"),
         markdown,
         mcp,
+        mcpFailure,
         namedSurfaces,
         review: {
           contentLabels: Array.from(
@@ -1041,6 +1527,123 @@ for (const scene of visualScenes) {
     if (contract.horizontalOverflow > 1) {
       throw new Error(`${scene.id}: horizontal overflow ${contract.horizontalOverflow}px.`);
     }
+    if (scene.scenario === "approval-denied") {
+      const approvalContract = await page.evaluate(() => {
+        const rect = (element) => {
+          if (!element) return null;
+          const value = element.getBoundingClientRect();
+          return {
+            height: value.height,
+            left: value.left,
+            top: value.top,
+            width: value.width,
+          };
+        };
+        const approval = document.querySelector(
+          ".codex-ui-approval-request",
+        );
+        const composer = document.querySelector(".codex-ui-composer");
+        const permissionTrigger = document.querySelector(
+          ".demo-composer-permission-trigger",
+        );
+        return {
+          activitySummary:
+            document
+              .querySelector(".codex-ui-activity-timeline__toggle")
+              ?.textContent?.replace(/\s+/g, " ")
+              .trim() ?? null,
+          approval: approval
+            ? {
+                actionLabels: [...approval.querySelectorAll("button")].map(
+                  (button) => ({
+                    ariaLabel: button.getAttribute("aria-label"),
+                    text: button.textContent?.replace(/\s+/g, " ").trim(),
+                  }),
+                ),
+                decision: approval.getAttribute("data-decision"),
+                presentation: approval.getAttribute("data-presentation"),
+                rect: rect(approval),
+              }
+            : null,
+          assistantText:
+            [...document.querySelectorAll(
+              '.codex-ui-agent-message[data-role="assistant"]',
+            )]
+              .at(-1)
+              ?.textContent?.replace(/\s+/g, " ")
+              .trim() ?? null,
+          commandSummary:
+            document
+              .querySelector(
+                ".codex-ui-command-execution .codex-ui-activity__summary",
+              )
+              ?.textContent?.replace(/\s+/g, " ")
+              .trim() ?? null,
+          composer: composer ? rect(composer) : null,
+          permissionLabel:
+            permissionTrigger?.textContent?.replace(/^◉/, "").trim() ?? null,
+        };
+      });
+      if (scene.id === "approval-current-denied") {
+        await page
+          .getByRole("button", { exact: true, name: "Worked for 23s" })
+          .click();
+        approvalContract.commandSummary = await page
+          .locator(
+            ".codex-ui-command-execution .codex-ui-activity__summary",
+          )
+          .textContent();
+        approvalContract.commandSummary =
+          approvalContract.commandSummary?.replace(/\s+/g, " ").trim() ??
+          null;
+      }
+      if (
+        scene.id === "approval-current-pending" &&
+        (!approvalContract.approval ||
+          approvalContract.approval.decision !== "pending" ||
+          approvalContract.approval.presentation !== "composer" ||
+          Math.abs(approvalContract.approval.rect.left - 359) > 1 ||
+          Math.abs(approvalContract.approval.rect.top - 642) > 1 ||
+          Math.abs(approvalContract.approval.rect.width - 736) > 1 ||
+          Math.abs(approvalContract.approval.rect.height - 162) > 1 ||
+          approvalContract.activitySummary !== "Working for 14s" ||
+          approvalContract.commandSummary !==
+            "Running open -a Calculator" ||
+          approvalContract.composer !== null ||
+          !approvalContract.approval.actionLabels.some(
+            ({ text }) => text === "Deny",
+          ) ||
+          !approvalContract.approval.actionLabels.some(
+            ({ text }) => text === "Allow once",
+          ) ||
+          !approvalContract.approval.actionLabels.some(
+            ({ ariaLabel }) => ariaLabel === "Approval options",
+          ))
+      ) {
+        throw new Error(
+          `${scene.id}: current pending approval contract failed: ${JSON.stringify(approvalContract)}`,
+        );
+      }
+      if (
+        scene.id === "approval-current-denied" &&
+        (approvalContract.approval !== null ||
+          approvalContract.activitySummary !== "Worked for 23s" ||
+          approvalContract.commandSummary !==
+            "Did not run open -a Calculator" ||
+          approvalContract.assistantText !==
+            "Approval was not granted, so the command was not run." ||
+          !approvalContract.composer ||
+          Math.abs(approvalContract.composer.left - 359) > 1 ||
+          Math.abs(approvalContract.composer.top - 706) > 1 ||
+          Math.abs(approvalContract.composer.width - 736) > 1 ||
+          Math.abs(approvalContract.composer.height - 98) > 1 ||
+          approvalContract.permissionLabel !== "Ask for approval")
+      ) {
+        throw new Error(
+          `${scene.id}: current denied approval contract failed: ${JSON.stringify(approvalContract)}`,
+        );
+      }
+    }
     if (scene.scenario === "conversation-lifecycle") {
       const conversation = await page.evaluate(() => {
         const rect = (element) => {
@@ -1069,8 +1672,29 @@ for (const scene of visualScenes) {
         const navigation = document.querySelector(
           ".codex-ui-message-navigation-rail",
         );
+        const navigationList = navigation?.querySelector(
+          ".codex-ui-message-navigation-rail__list",
+        );
         const floating = document.querySelector(
           ".codex-ui-thread-floating-button",
+        );
+        const viewport = document.querySelector(
+          ".codex-ui-conversation-thread-shell__viewport",
+        );
+        const currentWindowedHistory = document.querySelector(
+          "[data-mounted-turn-count]",
+        );
+        const permissionMenu = document.querySelector(
+          ".codex-ui-composer-permission-menu",
+        );
+        const resourcePicker = document.querySelector(
+          ".codex-ui-composer-resource-picker",
+        );
+        const resourceScroller = resourcePicker?.querySelector(
+          ".codex-ui-composer-resource-picker__scroller",
+        );
+        const modeIndicator = composer?.querySelector(
+          ".codex-ui-composer-mode",
         );
         if (
           !root ||
@@ -1120,9 +1744,49 @@ for (const scene of visualScenes) {
             ".codex-ui-agent-message",
           ).length,
           navigation: {
+            activeCount: navigation.querySelectorAll(
+              'button[aria-current="true"]',
+            ).length,
             buttonCount: navigation.querySelectorAll("button").length,
+            density: navigation.getAttribute("data-density"),
             label: navigation.getAttribute("aria-label"),
+            list: navigationList
+              ? {
+                  clientHeight: navigationList.clientHeight,
+                  rect: rect(navigationList),
+                  scrollHeight: navigationList.scrollHeight,
+                }
+              : null,
+            selectedMarker: (() => {
+              const selected = navigation.querySelector(
+                'button[aria-current="true"]',
+              );
+              const marker = selected?.querySelector(
+                ".codex-ui-message-navigation-rail__marker",
+              );
+              return selected && marker
+                ? {
+                    button: rect(selected),
+                    marker: rect(marker),
+                    opacity: getComputedStyle(marker).opacity,
+                  }
+                : null;
+            })(),
           },
+          overlay: root.getAttribute("data-composer-overlay"),
+          mode: root.getAttribute("data-composer-mode"),
+          modeIndicator: modeIndicator
+            ? {
+                clearLabel: modeIndicator.getAttribute("aria-label"),
+                kind: modeIndicator.getAttribute("data-kind"),
+                label:
+                  modeIndicator
+                    .querySelector(".codex-ui-composer-mode__label")
+                    ?.textContent?.trim() ?? null,
+                rect: rect(modeIndicator),
+                svgCount: modeIndicator.querySelectorAll("svg").length,
+              }
+            : null,
           phase: root.getAttribute("data-composer-phase"),
           placeholder: {
             count: document.querySelectorAll(
@@ -1158,23 +1822,102 @@ for (const scene of visualScenes) {
               }
             : null,
           queueCount: root.getAttribute("data-queue-count"),
+          permissionMenu: permissionMenu
+            ? {
+                checkedCount: permissionMenu.querySelectorAll(
+                  '[role="menuitemradio"][aria-checked="true"]',
+                ).length,
+                labels: Array.from(
+                  permissionMenu.querySelectorAll(
+                    '[role="menuitemradio"]',
+                  ),
+                  (item) =>
+                    item.textContent?.replace(/\s+/g, " ").trim(),
+                ),
+                optionRects: Array.from(
+                  permissionMenu.querySelectorAll(
+                    ".codex-ui-composer-permission-menu__option",
+                  ),
+                  (item) => rect(item),
+                ),
+                rect: rect(permissionMenu),
+              }
+            : null,
+          resourcePicker: resourcePicker
+            ? {
+                activeId:
+                  resourcePicker.getAttribute("aria-activedescendant"),
+                groupCount: resourcePicker.querySelectorAll(
+                  ".codex-ui-composer-resource-picker__group",
+                ).length,
+                optionCount: resourcePicker.querySelectorAll(
+                  '[role="option"]',
+                ).length,
+                rect: rect(resourcePicker),
+                scroller: resourceScroller
+                  ? {
+                      clientHeight: resourceScroller.clientHeight,
+                      rect: rect(resourceScroller),
+                      scrollHeight: resourceScroller.scrollHeight,
+                    }
+                  : null,
+                selectedCount: resourcePicker.querySelectorAll(
+                  '[role="option"][aria-selected="true"]',
+                ).length,
+              }
+            : null,
+          interruptionText:
+            document
+              .querySelector(".codex-ui-thread-interruption-summary")
+              ?.textContent?.replace(/\s+/g, " ").trim() ?? null,
           stopCount: composer.querySelectorAll(
             'button[aria-label="Stop"]',
           ).length,
           surface: rect(surface),
           textarea: {
+            label: textarea.getAttribute("aria-label"),
             disabled: textarea.disabled,
             lineCount: textarea.value.split("\n").length,
             rect: rect(textarea),
             value: textarea.value,
           },
           threadFollowing: root.getAttribute("data-thread-following"),
+          viewport: viewport
+            ? {
+                clientHeight: viewport.clientHeight,
+                flexDirection: getComputedStyle(viewport).flexDirection,
+                latestOrigin: viewport.getAttribute("data-latest-origin"),
+                rect: rect(viewport),
+                scrollHeight: viewport.scrollHeight,
+                scrollTop: viewport.scrollTop,
+              }
+            : null,
+          windowed: currentWindowedHistory
+            ? {
+                mountedTurnCount: document.querySelectorAll(
+                  "[data-windowed-turn]",
+                ).length,
+                mountedUserBubbleCount: currentWindowedHistory.querySelectorAll(
+                  '.codex-ui-agent-message[data-role="user"]',
+                ).length,
+                placeholderCount: currentWindowedHistory.querySelectorAll(
+                  ".codex-ui-thread-virtualized-placeholder",
+                ).length,
+                selectedMessageIndex: currentWindowedHistory.getAttribute(
+                  "data-selected-message-index",
+                ),
+                totalMessageCount: currentWindowedHistory.getAttribute(
+                  "data-total-message-count",
+                ),
+              }
+            : null,
         };
       });
       contract.conversation = conversation;
       const expectsContext = ![
         "composer-running",
         "composer-queued",
+        "composer-auto-continued",
         "composer-queue-paused",
       ].includes(scene.id);
       if (
@@ -1201,14 +1944,115 @@ for (const scene of visualScenes) {
         );
       }
       if (
-        scene.id === "composer-multiline" &&
+        [
+          "composer-multiline",
+          "composer-permissions-menu",
+          "composer-resources-menu",
+        ].includes(scene.id) &&
         (conversation.phase !== "multiline" ||
           conversation.composer.layout !== "multiline" ||
-          conversation.textarea.lineCount !== 3 ||
-          conversation.textarea.rect.height < 60)
+          conversation.textarea.lineCount !== 4 ||
+          Math.abs(conversation.composer.rect.left - 359) > 1 ||
+          Math.abs(conversation.composer.rect.top - 670) > 1 ||
+          Math.abs(conversation.composer.rect.width - 736) > 1 ||
+          Math.abs(conversation.composer.rect.height - 134) > 1 ||
+          Math.abs(conversation.textarea.rect.left - 371) > 1 ||
+          Math.abs(conversation.textarea.rect.top - 684) > 1 ||
+          Math.abs(conversation.textarea.rect.width - 712) > 1 ||
+          Math.abs(conversation.textarea.rect.height - 80) > 1)
       ) {
         throw new Error(
           `${scene.id}: multiline Composer contract failed: ${JSON.stringify(conversation)}`,
+        );
+      }
+      if (
+        (scene.id === "composer-goal" || scene.id === "composer-plan") &&
+        (conversation.phase !==
+          (scene.id === "composer-goal" ? "goal" : "plan") ||
+          conversation.mode !==
+            (scene.id === "composer-goal" ? "goal" : "plan") ||
+          conversation.composer.layout !== "multiline" ||
+          !conversation.modeIndicator ||
+          conversation.modeIndicator.kind !== conversation.mode ||
+          conversation.modeIndicator.label !==
+            (scene.id === "composer-goal" ? "Goal" : "Plan") ||
+          conversation.modeIndicator.clearLabel !==
+            (scene.id === "composer-goal" ? "Clear goal" : "Plan") ||
+          conversation.modeIndicator.svgCount !== 1 ||
+          Math.abs(conversation.composer.rect.left - 359) > 1 ||
+          Math.abs(conversation.composer.rect.top - 706) > 1 ||
+          Math.abs(conversation.composer.rect.width - 736) > 1 ||
+          Math.abs(conversation.composer.rect.height - 98) > 1 ||
+          Math.abs(conversation.textarea.rect.left - 371) > 1 ||
+          Math.abs(conversation.textarea.rect.top - 720) > 1 ||
+          Math.abs(conversation.textarea.rect.width - 712) > 1 ||
+          Math.abs(conversation.textarea.rect.height - 44) > 1 ||
+          conversation.textarea.label !==
+            (scene.id === "composer-goal"
+              ? "Describe your goal, define measurable outcomes for best results"
+              : "Describe your task to generate a plan...") ||
+          Math.abs(conversation.modeIndicator.rect.left - 512) > 1 ||
+          Math.abs(conversation.modeIndicator.rect.top - 768) > 1 ||
+          Math.abs(conversation.modeIndicator.rect.height - 28) > 1)
+      ) {
+        throw new Error(
+          `${scene.id}: current Composer mode contract failed: ${JSON.stringify(conversation)}`,
+        );
+      }
+      if (
+        scene.id === "composer-permissions-menu" &&
+        (conversation.overlay !== "permissions" ||
+          !conversation.permissionMenu ||
+          conversation.resourcePicker !== null ||
+          conversation.permissionMenu.checkedCount !== 1 ||
+          conversation.permissionMenu.labels.length !== 4 ||
+          !conversation.permissionMenu.labels[0]?.includes(
+            "Ask for approval",
+          ) ||
+          !conversation.permissionMenu.labels[3]?.includes(
+            "Custom (config.toml)",
+          ) ||
+          Math.abs(conversation.permissionMenu.rect.left - 401) > 1 ||
+          Math.abs(conversation.permissionMenu.rect.top - 544) > 1 ||
+          Math.abs(conversation.permissionMenu.rect.width - 480.375) > 1 ||
+          Math.abs(conversation.permissionMenu.rect.height - 222.5) > 1 ||
+          conversation.permissionMenu.optionRects.some(
+            (option) =>
+              !option || Math.abs(option.height - 47.125) > 1,
+          ))
+      ) {
+        throw new Error(
+          `${scene.id}: current permission menu contract failed: ${JSON.stringify(conversation)}`,
+        );
+      }
+      if (
+        scene.id === "composer-resources-menu" &&
+        (conversation.overlay !== "resources" ||
+          conversation.permissionMenu !== null ||
+          !conversation.resourcePicker ||
+          !conversation.resourcePicker.scroller ||
+          conversation.resourcePicker.groupCount !== 5 ||
+          conversation.resourcePicker.optionCount !== 30 ||
+          conversation.resourcePicker.selectedCount !== 1 ||
+          !conversation.resourcePicker.activeId ||
+          Math.abs(conversation.resourcePicker.rect.left - 359) > 1 ||
+          Math.abs(conversation.resourcePicker.rect.top - 346) > 1 ||
+          Math.abs(conversation.resourcePicker.rect.width - 736) > 1 ||
+          Math.abs(conversation.resourcePicker.rect.height - 320) > 1 ||
+          Math.abs(
+            conversation.resourcePicker.scroller.rect.left - 364,
+          ) > 1 ||
+          Math.abs(
+            conversation.resourcePicker.scroller.rect.top - 351,
+          ) > 1 ||
+          Math.abs(
+            conversation.resourcePicker.scroller.rect.width - 726,
+          ) > 1 ||
+          conversation.resourcePicker.scroller.clientHeight !== 310 ||
+          conversation.resourcePicker.scroller.scrollHeight < 990)
+      ) {
+        throw new Error(
+          `${scene.id}: current resource picker contract failed: ${JSON.stringify(conversation)}`,
         );
       }
       if (
@@ -1231,8 +2075,8 @@ for (const scene of visualScenes) {
           conversation.queue.rowCount !== 1 ||
           conversation.queueCount !== "1" ||
           !conversation.queue.labels.includes("Steer") ||
-          !conversation.queue.labels.includes("Delete queued prompt") ||
-          !conversation.queue.labels.includes("Queued prompt actions") ||
+          !conversation.queue.labels.includes("Delete queued message") ||
+          !conversation.queue.labels.includes("Queued message actions") ||
           Math.abs(
             conversation.queue.rect.left -
               conversation.surface.left -
@@ -1246,6 +2090,18 @@ for (const scene of visualScenes) {
       ) {
         throw new Error(
           `${scene.id}: queued Composer contract failed: ${JSON.stringify(conversation)}`,
+        );
+      }
+      if (
+        scene.id === "composer-auto-continued" &&
+        (conversation.queue !== null ||
+          conversation.queueCount !== "0" ||
+          conversation.phase !== "running" ||
+          conversation.stopCount !== 1 ||
+          conversation.interruptionText !== "You stopped after 2s")
+      ) {
+        throw new Error(
+          `${scene.id}: automatic queued continuation contract failed: ${JSON.stringify(conversation)}`,
         );
       }
       if (
@@ -1298,13 +2154,72 @@ for (const scene of visualScenes) {
       }
       if (
         scene.id === "thread-windowed" &&
-        (conversation.placeholder.count !== 1 ||
-          Number(conversation.placeholder.hiddenEntryCount) <= 0 ||
-          conversation.messageCount >=
-            conversation.navigation.buttonCount * 2)
+        (conversation.placeholder.count !== 2 ||
+          Number(conversation.placeholder.hiddenEntryCount) !== 36 ||
+          conversation.navigation.buttonCount !== 82 ||
+          conversation.navigation.activeCount !== 1 ||
+          conversation.navigation.density !== "compact" ||
+          !conversation.navigation.list ||
+          conversation.navigation.list.clientHeight !== 574 ||
+          conversation.navigation.list.scrollHeight !== 820 ||
+          !conversation.navigation.selectedMarker ||
+          conversation.navigation.selectedMarker.opacity !== "1" ||
+          Math.abs(
+            conversation.navigation.selectedMarker.button.width - 36,
+          ) > 1 ||
+          Math.abs(
+            conversation.navigation.selectedMarker.button.height - 10,
+          ) > 1 ||
+          Math.abs(
+            conversation.navigation.selectedMarker.marker.width - 26,
+          ) > 1 ||
+          Math.abs(
+            conversation.navigation.selectedMarker.marker.height - 2,
+          ) > 1 ||
+          !conversation.viewport ||
+          conversation.viewport.latestOrigin !== "start" ||
+          conversation.viewport.flexDirection !== "column-reverse" ||
+          conversation.viewport.scrollTop >= -10_000 ||
+          conversation.viewport.scrollHeight < 40_000 ||
+          !conversation.windowed ||
+          conversation.windowed.mountedTurnCount !== 7 ||
+          conversation.windowed.mountedUserBubbleCount !== 7 ||
+          conversation.windowed.placeholderCount !== 2 ||
+          conversation.windowed.selectedMessageIndex !== "40" ||
+          conversation.windowed.totalMessageCount !== "82" ||
+          conversation.threadFollowing !== "false" ||
+          !conversation.floating.show ||
+          conversation.floating.hidden !== "false")
       ) {
         throw new Error(
           `${scene.id}: virtualized window contract failed: ${JSON.stringify(conversation)}`,
+        );
+      }
+      if (scene.id === "composer-permissions-menu") {
+        await page.getByRole("menu").press("Escape");
+        await page.waitForSelector(
+          '.demo-root:not([data-composer-overlay])',
+        );
+      }
+      if (scene.id === "composer-resources-menu") {
+        await page
+          .getByRole("listbox", { name: "Composer resources" })
+          .press("Escape");
+        await page.waitForSelector(
+          '.demo-root:not([data-composer-overlay])',
+        );
+      }
+      if (scene.id === "composer-goal" || scene.id === "composer-plan") {
+        await page
+          .getByRole("button", {
+            name: scene.id === "composer-goal" ? "Clear goal" : "Plan",
+          })
+          .click();
+        await page.waitForSelector(".demo-root:not([data-composer-mode])");
+        await page.waitForFunction(
+          () =>
+            document.activeElement?.getAttribute("aria-label") ===
+            "Message composer",
         );
       }
     }
@@ -1559,6 +2474,12 @@ for (const scene of visualScenes) {
         contract.mcp.timelineLabel !== scene.timelineLabel ||
         contract.mcp.groupStyle.fontSize !== "14px" ||
         contract.mcp.groupStyle.lineHeight !== "21px" ||
+        ((scene.id === "mcp-tool-calls" ||
+          scene.id === "mcp-recovery-completed") &&
+          (contract.mcp.groupStyle.fontFamily !==
+            '-apple-system, "system-ui", "Segoe UI", sans-serif' ||
+            contract.mcp.groupStyle.fontWeight !== "445" ||
+            !contract.mcp.groupStyle.color.includes("0.6"))) ||
         JSON.stringify(contract.mcp.callLabels) !==
           JSON.stringify(scene.callLabels)
       ) {
@@ -1574,22 +2495,26 @@ for (const scene of visualScenes) {
           `${scene.id}: MCP capture scroll state drifted: ${JSON.stringify(contract.viewportScroll)}`,
         );
       }
-      if (
-        scene.errorOutput !== undefined &&
-        (!contract.mcp.errorOutput ||
-          contract.mcp.errorOutput.role !== "alert" ||
-          !contract.mcp.errorOutput.text?.includes(scene.errorOutput) ||
-          contract.mcp.errorOutput.rect.width < 600 ||
-          contract.mcp.errorOutput.rect.height < 64 ||
-          contract.mcp.callStatuses[0] !== "failed" ||
-          contract.mcp.failedCallAccessibleLabel !==
-            "Fetch OpenAI doc failed" ||
-          !contract.mcp.expandedCallIds.includes("mcp-fetch-invalid"))
-      ) {
-        throw new Error(
-          `${scene.id}: recovered MCP error output contract failed: ${JSON.stringify(contract.mcp)}`,
-        );
-      }
+    }
+    if (
+      scene.errorOutput !== undefined &&
+      (!contract.mcpFailure ||
+        contract.mcpFailure.errorOutput?.role !== "alert" ||
+        !contract.mcpFailure.errorOutput.text?.includes(
+          scene.errorOutput,
+        ) ||
+        contract.mcpFailure.errorOutput.rect.width < 600 ||
+        contract.mcpFailure.errorOutput.rect.height < 64 ||
+        contract.mcpFailure.status !== "failed" ||
+        contract.mcpFailure.accessibleLabel !==
+          "Fetch OpenAI doc failed" ||
+        !contract.mcpFailure.expanded ||
+        !contract.mcpFailure.timelineExpanded ||
+        contract.mcpFailure.timelineLabel !== scene.timelineLabel)
+    ) {
+      throw new Error(
+        `${scene.id}: recovered MCP error output contract failed: ${JSON.stringify(contract.mcpFailure)}`,
+      );
     }
 
     if (scene.id === "markdown-complete") {
@@ -1660,7 +2585,101 @@ for (const scene of visualScenes) {
       }
     }
 
-    if (scene.id !== "composer-disabled") {
+    if (scene.id === "command-output-expanded") {
+      const commandOutput = contract.commandOutput;
+      if (
+        !commandOutput ||
+        !commandOutput.timelineExpanded ||
+        commandOutput.timelineLabel !== "Worked for 10s" ||
+        !commandOutput.executionExpanded ||
+        commandOutput.summary !== "Ran seq 1 400" ||
+        commandOutput.shellLabel !== "Shell" ||
+        commandOutput.commandLabel !== "$ seq 1 400" ||
+        commandOutput.commandExpanded !== "false" ||
+        commandOutput.lineCount !== 401 ||
+        !commandOutput.shell ||
+        Math.abs(commandOutput.shell.rect.width - 736) > 1 ||
+        Math.abs(commandOutput.shell.rect.height - 227) > 1 ||
+        commandOutput.shell.style.borderRadius !== "12.5px" ||
+        commandOutput.shell.style.overflow !== "hidden" ||
+        !commandOutput.output ||
+        Math.abs(commandOutput.output.rect.width - 734) > 1 ||
+        Math.abs(commandOutput.output.rect.height - 144) > 1 ||
+        commandOutput.output.clientHeight !== 144 ||
+        commandOutput.output.scrollHeight !== 7816 ||
+        Math.abs(commandOutput.output.scrollTop) > 1 ||
+        commandOutput.output.style.flexDirection !== "column-reverse" ||
+        commandOutput.output.style.fontSize !== "13px" ||
+        commandOutput.output.style.lineHeight !== "19.5px" ||
+        commandOutput.output.style.maxHeight !== "144px" ||
+        commandOutput.output.style.overflowY !== "auto" ||
+        commandOutput.output.style.padding !== "8px" ||
+        commandOutput.output.textStart !== "1\n2\n3\n4\n5\n6\n" ||
+        !commandOutput.output.textEnd.endsWith("397\n398\n399\n400\n") ||
+        commandOutput.footer?.text !== "Success" ||
+        Math.abs((commandOutput.footer?.rect.height ?? 0) - 27) > 1 ||
+        commandOutput.copyLabels.filter((label) => label === "Copy")
+          .length !== 2
+      ) {
+        throw new Error(
+          `${scene.id}: current long command output contract failed: ${JSON.stringify(commandOutput)}`,
+        );
+      }
+
+      const commandLine = page.getByRole("button", {
+        name: "$ seq 1 400",
+      });
+      await commandLine.press("Enter");
+      const keyboardExpanded = await commandLine.getAttribute(
+        "aria-expanded",
+      );
+      const executionSummary = page
+        .locator(
+          '[data-item-id="command-long-output"] > .codex-ui-activity__disclosure > summary',
+        );
+      await executionSummary.click();
+      const collapsed = await page.evaluate(() => ({
+        expanded:
+          document
+            .querySelector(
+              '[data-item-id="command-long-output"] .codex-ui-activity__disclosure',
+            )
+            ?.hasAttribute("open") ?? false,
+      }));
+      const collapsedOutputVisible = await page
+        .locator(
+          '[data-item-id="command-long-output"] .codex-ui-command-output',
+        )
+        .isVisible();
+      await executionSummary.click();
+      const restoredBottom = await page.evaluate(() => {
+        const output = document.querySelector(
+          '[data-item-id="command-long-output"] .codex-ui-command-output pre',
+        );
+        return output ? output.scrollTop : null;
+      });
+      if (
+        keyboardExpanded !== "true" ||
+        collapsed.expanded ||
+        collapsedOutputVisible ||
+        restoredBottom === null ||
+        Math.abs(restoredBottom) > 1
+      ) {
+        throw new Error(
+          `${scene.id}: command keyboard/collapse restoration failed: ${JSON.stringify({
+            collapsed,
+            collapsedOutputVisible,
+            keyboardExpanded,
+            restoredBottom,
+          })}`,
+        );
+      }
+    }
+
+    if (
+      scene.id !== "composer-disabled" &&
+      scene.id !== "approval-current-pending"
+    ) {
       const expectedFocus = scene.surfaces?.includes("reviewPanel")
         ? contract.review.firstContentLabel
         : "Message composer";
@@ -1732,6 +2751,82 @@ for (const scene of visualScenes) {
   } finally {
     await app.close();
   }
+}
+
+const interactivePullRequestScene = {
+  frame: "pr-checks-failed",
+  id: "pr-lifecycle-interactive",
+  scenario: "workspace-workflow",
+  view: "pull-request",
+};
+const {
+  app: interactivePullRequestApp,
+  page: interactivePullRequestPage,
+} = await launchScene(interactivePullRequestScene, { capture: false });
+try {
+  const initial = await interactivePullRequestPage.evaluate(() => ({
+    failedChecks: document.querySelectorAll(
+      '.codex-ui-pull-request-checks li[data-status="failed"]',
+    ).length,
+    mergeStatus:
+      document
+        .querySelector(".codex-ui-pull-request-merge-readiness")
+        ?.getAttribute("data-status") ?? null,
+    retryVisible: [...document.querySelectorAll("button")].some(
+      (button) => button.textContent?.trim() === "Re-run checks",
+    ),
+  }));
+  if (
+    initial.failedChecks !== 2 ||
+    initial.mergeStatus !== "blocked" ||
+    !initial.retryVisible
+  ) {
+    throw new Error(
+      `pr-lifecycle-interactive: non-capture details missing: ${JSON.stringify(initial)}`,
+    );
+  }
+
+  await interactivePullRequestPage
+    .getByRole("button", { exact: true, name: "Re-run checks" })
+    .click();
+  await interactivePullRequestPage.waitForSelector(
+    '.codex-ui-pull-request-merge-readiness[data-status="checking"]',
+  );
+  await interactivePullRequestPage.waitForFunction(() => {
+    const merge = document.querySelector(
+      ".codex-ui-pull-request-merge-readiness",
+    );
+    const openReview = [...document.querySelectorAll("button")].some(
+      (button) => button.textContent?.trim() === "Open review",
+    );
+    return merge?.getAttribute("data-status") === "blocked" && openReview;
+  });
+  const settled = await interactivePullRequestPage.evaluate(() => ({
+    failedChecks: document.querySelectorAll(
+      '.codex-ui-pull-request-checks li[data-status="failed"]',
+    ).length,
+    openReviewVisible: [...document.querySelectorAll("button")].some(
+      (button) => button.textContent?.trim() === "Open review",
+    ),
+    passedChecks: document.querySelectorAll(
+      '.codex-ui-pull-request-checks li[data-status="passed"]',
+    ).length,
+  }));
+  if (
+    settled.failedChecks !== 0 ||
+    settled.passedChecks !== 4 ||
+    !settled.openReviewVisible
+  ) {
+    throw new Error(
+      `pr-lifecycle-interactive: retry transition failed: ${JSON.stringify(settled)}`,
+    );
+  }
+  await writeFile(
+    join(artifactDirectory, "pr-lifecycle-interactive.json"),
+    `${JSON.stringify({ initial, settled }, null, 2)}\n`,
+  );
+} finally {
+  await interactivePullRequestApp.close();
 }
 
 const workspaceResponsiveScene = {
@@ -2583,7 +3678,7 @@ try {
     .getByRole("button", { exact: true, name: "Stop" })
     .click();
   await conversationLifecyclePage.waitForSelector(
-    '.demo-root[data-composer-phase="queue-paused"]',
+    '.demo-root[data-composer-phase="running"][data-queue-count="0"]',
   );
   const stoppedState = await conversationLifecyclePage.evaluate(() => {
     const currentTask = [
@@ -2605,19 +3700,32 @@ try {
   });
   if (
     stoppedState.assistantStatus !== "completed" ||
-    stoppedState.currentTaskStatus !== "idle" ||
-    stoppedState.rootStatus !== "interrupted"
+    stoppedState.currentTaskStatus !== "running" ||
+    stoppedState.rootStatus !== "running"
   ) {
     throw new Error(
       `Conversation stop state diverged: ${JSON.stringify(stoppedState)}`,
     );
   }
-  await conversationLifecyclePage.getByRole("button", { name: "Resume" }).click();
+  if (
+    (await conversationLifecyclePage
+      .getByText("You stopped after 2s", { exact: true })
+      .count()) !== 1 ||
+    (await conversationLifecyclePage
+      .getByText("Queue this follow-up while the turn is running.", {
+        exact: true,
+      })
+      .count()) !== 1
+  ) {
+    throw new Error("Stop did not promote the queued follow-up automatically.");
+  }
+  await composer.fill("Queue action controls while continuation runs.");
+  await composer.press("Enter");
   await conversationLifecyclePage.waitForSelector(
-    '.demo-root[data-composer-phase="queued"][data-status="running"]',
+    '.demo-root[data-composer-phase="queued"][data-queue-count="1"]',
   );
   const queuedPromptActions = conversationLifecyclePage.locator(
-    'button[aria-label="Queued prompt actions"]',
+    'button[aria-label="Queued message actions"]',
   );
   await queuedPromptActions.click();
   await conversationLifecyclePage
@@ -2628,7 +3736,7 @@ try {
   );
   await queuedPromptActions.click();
   await conversationLifecyclePage
-    .getByRole("button", { name: "Delete queued prompt" })
+    .getByRole("button", { name: "Delete queued message" })
     .click();
   await conversationLifecyclePage.waitForSelector(
     '.demo-root[data-composer-phase="running"][data-queue-count="0"]',
@@ -2802,10 +3910,12 @@ const {
 } = await launchScene(windowedNavigationScene, { capture: false });
 try {
   await windowedNavigationPage.waitForSelector(
-    '.demo-root[data-windowed-timeline="trimmed"]',
+    '.demo-root[data-windowed-timeline="current"][data-thread-following="false"] [data-selected-message-index="40"]',
   );
   if (
-    (await windowedNavigationPage.locator('[data-item-id="user-01"]').count()) !==
+    (await windowedNavigationPage
+      .locator('[data-item-id="current-windowed-user-20"]')
+      .count()) !==
     0
   ) {
     throw new Error("Windowed navigation mounted the hidden target too early.");
@@ -2813,17 +3923,24 @@ try {
   await windowedNavigationPage
     .getByRole("button", {
       exact: true,
-      name: "Jump to user message 1",
+      name: "Jump to user message 20",
     })
     .click();
   await windowedNavigationPage.waitForSelector(
-    '.demo-root[data-windowed-timeline="expanded"][data-thread-following="false"] [data-item-id="user-01"]',
+    '.demo-root[data-windowed-timeline="current"][data-thread-following="false"] [data-selected-message-index="20"] [data-item-id="current-windowed-user-20"]',
   );
   const materializedNavigation = await windowedNavigationPage.evaluate(() => ({
     hiddenPlaceholderCount: document.querySelectorAll(
       ".codex-ui-thread-virtualized-placeholder",
     ).length,
-    targetCount: document.querySelectorAll('[data-item-id="user-01"]').length,
+    mountedTurnCount: document.querySelectorAll("[data-windowed-turn]")
+      .length,
+    navigationCount: document.querySelectorAll(
+      ".codex-ui-message-navigation-rail__button",
+    ).length,
+    targetCount: document.querySelectorAll(
+      '[data-item-id="current-windowed-user-20"]',
+    ).length,
     threadFollowing: document
       .querySelector(".demo-root")
       ?.getAttribute("data-thread-following"),
@@ -2832,15 +3949,35 @@ try {
       ?.getAttribute("data-windowed-timeline"),
   }));
   if (
-    materializedNavigation.hiddenPlaceholderCount !== 0 ||
+    materializedNavigation.hiddenPlaceholderCount !== 2 ||
+    materializedNavigation.mountedTurnCount !== 7 ||
+    materializedNavigation.navigationCount !== 82 ||
     materializedNavigation.targetCount !== 1 ||
     materializedNavigation.threadFollowing !== "false" ||
-    materializedNavigation.windowedTimeline !== "expanded"
+    materializedNavigation.windowedTimeline !== "current"
   ) {
     throw new Error(
       `Windowed message navigation failed: ${JSON.stringify(materializedNavigation)}`,
     );
   }
+  await windowedNavigationPage
+    .getByRole("button", { name: "Scroll to bottom" })
+    .click();
+  await windowedNavigationPage.waitForFunction(
+    () => {
+      const root = document.querySelector(".demo-root");
+      const viewport = document.querySelector(
+        ".codex-ui-conversation-thread-shell__viewport",
+      );
+      return (
+        root?.getAttribute("data-thread-following") === "true" &&
+        document
+          .querySelector("[data-selected-message-index]")
+          ?.getAttribute("data-selected-message-index") === "82" &&
+        viewport?.scrollTop === 0
+      );
+    },
+  );
 } finally {
   await windowedNavigationApp.close();
 }
@@ -2890,7 +4027,7 @@ const {
 } = await launchScene(pausedDeleteScene, { capture: false });
 try {
   await pausedDeletePage
-    .getByRole("button", { name: "Delete queued prompt" })
+    .getByRole("button", { name: "Delete queued message" })
     .click();
   await pausedDeletePage.waitForFunction(() => {
     const root = document.querySelector(".demo-root");
@@ -2928,7 +4065,7 @@ try {
   );
   const longQueue = longQueuePage.locator(".codex-ui-composer-queue");
   const lastQueueActions = longQueuePage
-    .getByRole("button", { name: "Queued prompt actions" })
+    .getByRole("button", { name: "Queued message actions" })
     .last();
   await lastQueueActions.click();
   const longQueueMenu = longQueuePage.getByRole("menu");
@@ -3007,8 +4144,17 @@ try {
   );
   await stopReplay.click();
   await replayPositionPage.waitForSelector(
-    '.demo-root[data-composer-phase="queue-paused"][data-status="interrupted"]',
+    '.demo-root[data-composer-phase="running"][data-status="running"][data-queue-count="0"]',
   );
+  if (
+    (await replayPositionPage
+      .getByText("You stopped after 2s", { exact: true })
+      .count()) !== 1
+  ) {
+    throw new Error(
+      "Replay stop did not preserve the interruption summary while continuing the queue.",
+    );
+  }
 
   const replayPosition = replayPositionPage.getByRole("slider", {
     name: "Protocol event position",

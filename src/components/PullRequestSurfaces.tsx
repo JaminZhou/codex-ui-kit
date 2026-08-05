@@ -1,5 +1,6 @@
 import {
   useId,
+  useState,
   type HTMLAttributes,
   type ReactNode,
 } from "react";
@@ -372,6 +373,7 @@ export interface PullRequestPanelSummaryProps
   descriptionHeading?: ReactNode;
   facts?: readonly PullRequestPanelFact[];
   meta?: ReactNode;
+  timeline?: ReactNode;
   title: ReactNode;
   titleAction?: ReactNode;
 }
@@ -386,6 +388,7 @@ export function PullRequestPanelSummary({
   descriptionHeading = "Description",
   facts = [],
   meta,
+  timeline,
   title,
   titleAction,
   ...props
@@ -427,7 +430,9 @@ export function PullRequestPanelSummary({
                     {fact.indicator}
                   </span>
                 ) : null}
-                {fact.label}
+                <span className="codex-ui-pull-request-panel-summary__label">
+                  {fact.label}
+                </span>
               </dt>
               <dd>{fact.value}</dd>
             </div>
@@ -458,6 +463,11 @@ export function PullRequestPanelSummary({
       {commentComposer ? (
         <div className="codex-ui-pull-request-panel-summary__comment">
           {commentComposer}
+        </div>
+      ) : null}
+      {timeline ? (
+        <div className="codex-ui-pull-request-panel-summary__timeline">
+          {timeline}
         </div>
       ) : null}
     </article>
@@ -640,5 +650,466 @@ export function PullRequestReviewThread({
         <footer>{actions}</footer>
       ) : null}
     </article>
+  );
+}
+
+export type PullRequestQueryStatus =
+  | "empty"
+  | "error"
+  | "loading"
+  | "refreshing";
+
+const pullRequestQueryHeadings: Record<PullRequestQueryStatus, string> = {
+  empty: "No pull requests",
+  error: "Pull requests unavailable",
+  loading: "Loading pull requests",
+  refreshing: "Refreshing pull requests",
+};
+
+export interface PullRequestQueryStateProps
+  extends Omit<HTMLAttributes<HTMLDivElement>, "children"> {
+  action?: ReactNode;
+  description?: ReactNode;
+  heading?: ReactNode;
+  placeholderRows?: number;
+  status: PullRequestQueryStatus;
+  variant?: "detail" | "list";
+}
+
+export function PullRequestQueryState({
+  action,
+  "aria-label": ariaLabel,
+  className,
+  description,
+  heading,
+  placeholderRows = 5,
+  status,
+  variant = "detail",
+  ...props
+}: PullRequestQueryStateProps) {
+  const busy = status === "loading" || status === "refreshing";
+  const role = status === "error" ? "alert" : "status";
+  return (
+    <div
+      {...props}
+      aria-busy={busy || undefined}
+      aria-label={
+        ariaLabel ??
+        (variant === "list" && busy
+          ? pullRequestQueryHeadings[status]
+          : undefined)
+      }
+      aria-live={status === "error" ? "assertive" : "polite"}
+      className={["codex-ui-pull-request-query-state", className]
+        .filter(Boolean)
+        .join(" ")}
+      data-status={status}
+      data-variant={variant}
+      role={role}
+    >
+      {variant === "list" && busy ? (
+        <div
+          aria-hidden="true"
+          className="codex-ui-pull-request-query-state__skeletons"
+        >
+          {Array.from({ length: Math.max(1, placeholderRows) }, (_, index) => (
+            <span
+              className="codex-ui-pull-request-query-state__skeleton"
+              key={index}
+            >
+              <span />
+              <span />
+              <span />
+            </span>
+          ))}
+        </div>
+      ) : (
+        <>
+          <span
+            aria-hidden="true"
+            className="codex-ui-pull-request-query-state__indicator"
+          >
+            {status === "error"
+              ? "!"
+              : status === "empty"
+                ? "○"
+                : "↻"}
+          </span>
+          <div className="codex-ui-pull-request-query-state__copy">
+            <strong>{heading ?? pullRequestQueryHeadings[status]}</strong>
+            {description ? <span>{description}</span> : null}
+          </div>
+          {action ? (
+            <div className="codex-ui-pull-request-query-state__action">
+              {action}
+            </div>
+          ) : null}
+        </>
+      )}
+    </div>
+  );
+}
+
+export type PullRequestMergeReadinessStatus =
+  | "blocked"
+  | "checking"
+  | "conflicted"
+  | "merged"
+  | "merging"
+  | "ready";
+
+export type PullRequestMergeRequirementStatus =
+  | "failed"
+  | "passed"
+  | "pending";
+
+export interface PullRequestMergeRequirement {
+  description?: ReactNode;
+  id: string;
+  label: ReactNode;
+  status: PullRequestMergeRequirementStatus;
+}
+
+const pullRequestMergeHeadings: Record<
+  PullRequestMergeReadinessStatus,
+  string
+> = {
+  blocked: "Merge blocked",
+  checking: "Checking merge readiness",
+  conflicted: "Resolve conflicts before merging",
+  merged: "Pull request merged",
+  merging: "Merging pull request",
+  ready: "Ready to merge",
+};
+
+export interface PullRequestMergeReadinessProps
+  extends Omit<HTMLAttributes<HTMLElement>, "children"> {
+  action?: ReactNode;
+  description?: ReactNode;
+  heading?: ReactNode;
+  requirements?: readonly PullRequestMergeRequirement[];
+  status: PullRequestMergeReadinessStatus;
+}
+
+export function PullRequestMergeReadiness({
+  action,
+  className,
+  description,
+  heading,
+  requirements = [],
+  status,
+  ...props
+}: PullRequestMergeReadinessProps) {
+  const busy = status === "checking" || status === "merging";
+  const alert = status === "blocked" || status === "conflicted";
+  return (
+    <section
+      {...props}
+      aria-busy={busy || undefined}
+      aria-live={alert ? "assertive" : "polite"}
+      className={["codex-ui-pull-request-merge-readiness", className]
+        .filter(Boolean)
+        .join(" ")}
+      data-status={status}
+      role={alert ? "alert" : "status"}
+    >
+      <header>
+        <span
+          aria-hidden="true"
+          className="codex-ui-pull-request-merge-readiness__indicator"
+        >
+          {status === "ready" || status === "merged"
+            ? "✓"
+            : alert
+              ? "!"
+              : "↻"}
+        </span>
+        <div>
+          <strong>{heading ?? pullRequestMergeHeadings[status]}</strong>
+          {description ? <span>{description}</span> : null}
+        </div>
+        {action ? (
+          <div className="codex-ui-pull-request-merge-readiness__action">
+            {action}
+          </div>
+        ) : null}
+      </header>
+      {requirements.length > 0 ? (
+        <ul>
+          {requirements.map((requirement) => (
+            <li data-status={requirement.status} key={requirement.id}>
+              <span
+                aria-hidden="true"
+                className="codex-ui-pull-request-merge-readiness__requirement-indicator"
+              >
+                {requirement.status === "passed"
+                  ? "✓"
+                  : requirement.status === "failed"
+                    ? "!"
+                    : "…"}
+              </span>
+              <span>
+                <strong>{requirement.label}</strong>
+                {requirement.description ? (
+                  <span>{requirement.description}</span>
+                ) : null}
+              </span>
+            </li>
+          ))}
+        </ul>
+      ) : null}
+    </section>
+  );
+}
+
+export type PullRequestSubmissionStatus =
+  | "error"
+  | "idle"
+  | "submitted"
+  | "submitting";
+
+export type PullRequestReviewKind =
+  | "approve"
+  | "comment"
+  | "request-changes";
+
+export interface PullRequestReviewSubmission {
+  body: string;
+  kind: PullRequestReviewKind;
+}
+
+const pullRequestReviewKindLabels: Record<
+  PullRequestReviewKind,
+  string
+> = {
+  approve: "Approve",
+  comment: "Comment",
+  "request-changes": "Request changes",
+};
+
+export interface PullRequestReviewComposerProps
+  extends Omit<HTMLAttributes<HTMLFormElement>, "onSubmit"> {
+  body?: string;
+  disabled?: boolean;
+  error?: ReactNode;
+  heading?: ReactNode;
+  kind?: PullRequestReviewKind;
+  onBodyChange?: (body: string) => void;
+  onKindChange?: (kind: PullRequestReviewKind) => void;
+  onSubmit?: (submission: PullRequestReviewSubmission) => void;
+  placeholder?: string;
+  status?: PullRequestSubmissionStatus;
+  submitLabel?: ReactNode;
+}
+
+export function PullRequestReviewComposer({
+  body,
+  className,
+  disabled = false,
+  error,
+  heading = "Submit review",
+  kind,
+  onBodyChange,
+  onKindChange,
+  onSubmit,
+  placeholder = "Leave review feedback",
+  status = "idle",
+  submitLabel = "Submit review",
+  ...props
+}: PullRequestReviewComposerProps) {
+  const headingId = useId();
+  const feedbackId = useId();
+  const kindName = useId();
+  const [internalBody, setInternalBody] = useState("");
+  const [internalKind, setInternalKind] =
+    useState<PullRequestReviewKind>("comment");
+  const resolvedBody = body ?? internalBody;
+  const resolvedKind = kind ?? internalKind;
+  const submitting = status === "submitting";
+  const submissionDisabled =
+    disabled ||
+    submitting ||
+    (resolvedKind === "request-changes" &&
+      resolvedBody.trim().length === 0);
+  const feedback =
+    status === "error"
+      ? error ?? "Review could not be submitted."
+      : status === "submitted"
+        ? "Review submitted."
+        : status === "submitting"
+          ? "Submitting review."
+          : null;
+  return (
+    <form
+      {...props}
+      aria-busy={submitting || undefined}
+      aria-labelledby={headingId}
+      className={["codex-ui-pull-request-review-composer", className]
+        .filter(Boolean)
+        .join(" ")}
+      data-status={status}
+      onSubmit={(event) => {
+        event.preventDefault();
+        if (!submissionDisabled) {
+          onSubmit?.({ body: resolvedBody, kind: resolvedKind });
+        }
+      }}
+    >
+      <h3 id={headingId}>{heading}</h3>
+      <fieldset disabled={disabled || submitting}>
+        <legend>Review decision</legend>
+        <div className="codex-ui-pull-request-review-composer__kinds">
+          {(
+            Object.keys(
+              pullRequestReviewKindLabels,
+            ) as PullRequestReviewKind[]
+          ).map((option) => (
+            <label
+              data-selected={resolvedKind === option || undefined}
+              key={option}
+            >
+              <input
+                checked={resolvedKind === option}
+                name={kindName}
+                onChange={() => {
+                  if (kind === undefined) setInternalKind(option);
+                  onKindChange?.(option);
+                }}
+                type="radio"
+                value={option}
+              />
+              <span>{pullRequestReviewKindLabels[option]}</span>
+            </label>
+          ))}
+        </div>
+        <label className="codex-ui-pull-request-review-composer__body">
+          <span>Review summary</span>
+          <textarea
+            aria-describedby={feedback ? feedbackId : undefined}
+            onChange={(event) => {
+              const nextBody = event.currentTarget.value;
+              if (body === undefined) setInternalBody(nextBody);
+              onBodyChange?.(nextBody);
+            }}
+            placeholder={placeholder}
+            value={resolvedBody}
+          />
+        </label>
+      </fieldset>
+      <div className="codex-ui-pull-request-review-composer__footer">
+        {feedback ? (
+          <span
+            className="codex-ui-pull-request-submission-feedback"
+            data-status={status}
+            id={feedbackId}
+            role={status === "error" ? "alert" : "status"}
+          >
+            {feedback}
+          </span>
+        ) : (
+          <span />
+        )}
+        <button disabled={submissionDisabled} type="submit">
+          {submitting ? "Submitting…" : submitLabel}
+        </button>
+      </div>
+    </form>
+  );
+}
+
+export interface PullRequestCommentComposerProps
+  extends Omit<HTMLAttributes<HTMLFormElement>, "onSubmit"> {
+  disabled?: boolean;
+  error?: ReactNode;
+  label?: ReactNode;
+  onSubmit?: (comment: string) => void;
+  onValueChange?: (value: string) => void;
+  placeholder?: string;
+  status?: PullRequestSubmissionStatus;
+  submitLabel?: ReactNode;
+  value?: string;
+}
+
+export function PullRequestCommentComposer({
+  className,
+  disabled = false,
+  error,
+  label = "Comment",
+  onSubmit,
+  onValueChange,
+  placeholder = "Leave a comment",
+  status = "idle",
+  submitLabel = "Post comment",
+  value,
+  ...props
+}: PullRequestCommentComposerProps) {
+  const feedbackId = useId();
+  const [internalValue, setInternalValue] = useState("");
+  const resolvedValue = value ?? internalValue;
+  const submitting = status === "submitting";
+  const feedback =
+    status === "error"
+      ? error ?? "Comment could not be posted."
+      : status === "submitted"
+        ? "Comment posted."
+        : status === "submitting"
+          ? "Posting comment."
+          : null;
+  return (
+    <form
+      {...props}
+      aria-busy={submitting || undefined}
+      className={["codex-ui-pull-request-comment-composer", className]
+        .filter(Boolean)
+        .join(" ")}
+      data-status={status}
+      onSubmit={(event) => {
+        event.preventDefault();
+        if (
+          !disabled &&
+          !submitting &&
+          resolvedValue.trim().length > 0
+        ) {
+          onSubmit?.(resolvedValue);
+        }
+      }}
+    >
+      <label>
+        <span>{label}</span>
+        <textarea
+          aria-describedby={feedback ? feedbackId : undefined}
+          disabled={disabled || submitting}
+          onChange={(event) => {
+            const nextValue = event.currentTarget.value;
+            if (value === undefined) setInternalValue(nextValue);
+            onValueChange?.(nextValue);
+          }}
+          placeholder={placeholder}
+          value={resolvedValue}
+        />
+      </label>
+      <div className="codex-ui-pull-request-comment-composer__footer">
+        {feedback ? (
+          <span
+            className="codex-ui-pull-request-submission-feedback"
+            data-status={status}
+            id={feedbackId}
+            role={status === "error" ? "alert" : "status"}
+          >
+            {feedback}
+          </span>
+        ) : (
+          <span />
+        )}
+        <button
+          disabled={
+            disabled || submitting || resolvedValue.trim().length === 0
+          }
+          type="submit"
+        >
+          {submitting ? "Posting…" : submitLabel}
+        </button>
+      </div>
+    </form>
   );
 }

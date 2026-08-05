@@ -6,11 +6,52 @@ import {
   isTurnActive,
   reduceProtocolNotification,
   reduceProtocolTrace,
+  settleApprovedCommandReplay,
   terminalTranscriptEvents,
 } from "../src/protocol-state";
 import { replayScenarios } from "../src/replay";
 
 describe("protocol lifecycle reducer", () => {
+  it("settles an approved command replay with completed work and a final response", () => {
+    const scenario = replayScenarios["approval-denied"];
+    const completed = reduceProtocolTrace(scenario.events);
+    const settled = settleApprovedCommandReplay(
+      completed,
+      "approval-open-calculator",
+      {
+        durationMs: 23_000,
+        messageId: "assistant-approval-approved",
+        messageText:
+          "Approval was granted, and the command completed successfully.",
+        replacedMessageId: "assistant-approval-denied",
+      },
+    );
+
+    expect(settled.approvals).toEqual([
+      expect.objectContaining({ decision: "approved" }),
+    ]);
+    expect(settled.commands).toEqual([
+      expect.objectContaining({
+        durationMs: 23_000,
+        exitCode: 0,
+        status: "completed",
+      }),
+    ]);
+    expect(settled.messages.at(-1)).toMatchObject({
+      id: "assistant-approval-approved",
+      status: "completed",
+      text: "Approval was granted, and the command completed successfully.",
+    });
+    expect(settled.timeline.at(-1)).toEqual({
+      id: "assistant-approval-approved",
+      kind: "message",
+    });
+    expect(settled.timeline).toContainEqual({
+      id: "command-open-calculator",
+      kind: "command",
+    });
+  });
+
   it("keeps streamed text across a retry and reaches a clean completion", () => {
     const scenario = replayScenarios["streaming-recovery"];
     const retryState = reduceProtocolTrace(
@@ -66,7 +107,7 @@ describe("protocol lifecycle reducer", () => {
       }),
     ]);
     expect(hasActiveTurnWork(runningState)).toBe(true);
-    expect(completed.mcpToolCalls).toHaveLength(5);
+    expect(completed.mcpToolCalls).toHaveLength(2);
     expect(completed.mcpToolCalls.every(({ status }) => status === "completed"))
       .toBe(true);
     expect(completed.mcpToolCalls[0]).toMatchObject({
@@ -78,15 +119,13 @@ describe("protocol lifecycle reducer", () => {
     });
     expect(completed.timeline.map(({ kind }) => kind)).toEqual([
       "message",
-      "mcpToolCall",
-      "mcpToolCall",
-      "mcpToolCall",
+      "message",
       "mcpToolCall",
       "mcpToolCall",
       "message",
     ]);
-    expect(completed.turnDurationMs).toBe(54_000);
-    expect(completed.turnDurationsMs["turn-mcp"]).toBe(54_000);
+    expect(completed.turnDurationMs).toBe(31_000);
+    expect(completed.turnDurationsMs["turn-mcp"]).toBe(31_000);
     expect(completed.messages.at(-1)?.text).toContain(
       "https://learn.chatgpt.com/docs/extend/mcp",
     );
@@ -127,9 +166,11 @@ describe("protocol lifecycle reducer", () => {
       "failed",
       "completed",
       "completed",
+      "completed",
+      "completed",
     ]);
-    expect(recovered.turnDurationsMs["turn-recovery"]).toBe(28_000);
-    expect(recovered.messages.at(-1)?.text).toContain("恢复成功");
+    expect(recovered.turnDurationsMs["turn-recovery"]).toBe(51_000);
+    expect(recovered.messages.at(-1)?.text).toContain("恢复测试成功");
 
     expect(completed.status).toBe("completed");
     expect(completed.commands).toHaveLength(2);
@@ -155,12 +196,15 @@ describe("protocol lifecycle reducer", () => {
       }),
     ]);
     expect(completed.turnDurationsMs).toMatchObject({
-      "turn-recovery": 28_000,
+      "turn-recovery": 51_000,
       "turn-workflow": 1_520,
     });
     expect(completed.timeline.map(({ kind }) => kind)).toEqual([
       "message",
       "message",
+      "mcpToolCall",
+      "message",
+      "mcpToolCall",
       "mcpToolCall",
       "mcpToolCall",
       "mcpToolCall",
@@ -405,6 +449,39 @@ describe("protocol lifecycle reducer", () => {
       "approval",
       "fileChange",
     ]);
+  });
+
+  it("reduces the current denied approval without executing the command", () => {
+    const scenario = replayScenarios["approval-denied"];
+    const pending = reduceProtocolTrace(
+      scenario.events.slice(
+        0,
+        scenario.frames["approval-current-pending"],
+      ),
+    );
+    const completed = reduceProtocolTrace(scenario.events);
+
+    expect(pending.approvals[0]).toMatchObject({
+      command: "open -a Calculator",
+      decision: "pending",
+      itemId: "command-open-calculator",
+      kind: "command",
+    });
+    expect(pending.commands[0]).toMatchObject({
+      command: "open -a Calculator",
+      output: "",
+      status: "running",
+    });
+    expect(completed.approvals[0]?.decision).toBe("rejected");
+    expect(completed.commands[0]).toMatchObject({
+      exitCode: null,
+      output: "",
+      status: "failed",
+    });
+    expect(completed.messages.at(-1)?.text).toBe(
+      "Approval was not granted, so the command was not run.",
+    );
+    expect(completed.status).toBe("completed");
   });
 
   it("preserves rename, delete, binary, and conflict patch evidence", () => {

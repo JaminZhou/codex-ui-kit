@@ -351,7 +351,7 @@ const { app: mcpApp, page: mcpPage } = await launchScene(mcpScene, {
 
 try {
   const timelineToggle = mcpPage.getByRole("button", {
-    name: "Worked for 54s",
+    name: "Worked for 31s",
   });
   if ((await timelineToggle.getAttribute("aria-expanded")) !== "false") {
     throw new Error("Electron MCP timeline should start collapsed.");
@@ -370,10 +370,10 @@ try {
   await groupToggle.click();
   const calls = group.locator(".codex-ui-tool-call");
   if (
-    (await calls.count()) !== 5 ||
+    (await calls.count()) !== 2 ||
     (await group.getByText("Search OpenAI docs", { exact: true }).count()) !==
-      3 ||
-    (await group.getByText("Fetch OpenAI doc", { exact: true }).count()) !== 2
+      1 ||
+    (await group.getByText("Fetch OpenAI doc", { exact: true }).count()) !== 1
   ) {
     throw new Error("Electron MCP integration did not reveal all calls.");
   }
@@ -430,13 +430,15 @@ const { app: recoveryApp, page: recoveryPage } = await launchScene(
 
 try {
   const recoveryTimeline = recoveryPage.getByRole("button", {
-    name: "Worked for 28s",
+    name: "Worked for 51s",
   });
   await recoveryTimeline.click();
   const recoveryGroup = recoveryPage.getByTestId("mcp-tool-call-group");
   await recoveryGroup.locator(":scope > details > summary").click();
   const recoveryCalls = recoveryGroup.locator(".codex-ui-tool-call");
-  const failedCall = recoveryCalls.first();
+  const failedCall = recoveryPage.locator(
+    '[data-item-id="mcp-fetch-invalid"]',
+  );
   await failedCall.locator("summary").click();
 
   const recoveryInteraction = await recoveryPage.evaluate(() => {
@@ -501,7 +503,7 @@ try {
     !recoveryInteraction.reviewPanelOpen ||
     JSON.stringify(recoveryInteraction.responseActionLabels) !==
       JSON.stringify(["MCP response actions", "Response actions"]) ||
-    recoveryInteraction.toolCount !== 3 ||
+    recoveryInteraction.toolCount !== 4 ||
     recoveryInteraction.userCount !== 2
   ) {
     throw new Error(
@@ -1091,7 +1093,7 @@ try {
 }
 
 const pullRequestScene = {
-  frame: "review-open",
+  frame: "pr-summary-ready",
   id: "electron-pull-request-detail",
   scenario: "workspace-workflow",
   view: "pull-request",
@@ -1122,8 +1124,8 @@ try {
     !pullRequestGeometry.main ||
     !pullRequestGeometry.panel ||
     !pullRequestGeometry.resizer ||
-    Math.abs(pullRequestGeometry.main.width - 352) > 1 ||
-    Math.abs(pullRequestGeometry.panel.width - 554) > 1 ||
+    Math.abs(pullRequestGeometry.main.width - 906) > 1 ||
+    Math.abs(pullRequestGeometry.panel.width - 370) > 1 ||
     Math.abs(pullRequestGeometry.resizer.width - 16) > 0.5 ||
     pullRequestGeometry.selectedTab !== "Summary"
   ) {
@@ -1132,10 +1134,14 @@ try {
     );
   }
 
-  await pullRequestPage.getByRole("tab", { name: "Timeline" }).click();
-  await pullRequestPage.getByRole("textbox", { name: "Timeline comment" }).fill(
-    "Synthetic local comment",
-  );
+  if (
+    (await pullRequestPage
+      .getByLabel("Pull request timeline")
+      .locator("article")
+      .count()) !== 2
+  ) {
+    throw new Error("Electron pull request integrated timeline is missing.");
+  }
   await pullRequestPage.getByRole("tab", { name: "Code" }).click();
   if (
     (await pullRequestPage
@@ -1144,6 +1150,34 @@ try {
   ) {
     throw new Error("Electron pull request Code tab did not render three files.");
   }
+  await pullRequestPage
+    .getByRole("button", { name: "Review options" })
+    .click();
+  await pullRequestPage
+    .getByRole("menuitem", { name: "Open synthetic review" })
+    .click();
+  await pullRequestPage
+    .getByRole("textbox", { name: "Review summary" })
+    .fill("Current-head review is clean.");
+  await pullRequestPage
+    .getByRole("button", { name: "Submit review" })
+    .click();
+  await pullRequestPage.waitForSelector(
+    '.codex-ui-pull-request-review-composer[data-status="submitted"]',
+  );
+  const mergePullRequest = pullRequestPage.getByRole("button", {
+    exact: true,
+    name: "Merge",
+  });
+  if (!(await mergePullRequest.isEnabled())) {
+    throw new Error(
+      "Electron pull request review did not unlock the merge action.",
+    );
+  }
+  await mergePullRequest.click();
+  await pullRequestPage
+    .getByRole("button", { exact: true, name: "Merged" })
+    .waitFor();
 
   const pullRequestResizer = pullRequestPage.getByRole("separator", {
     name: "Resize workspace panel",
@@ -1166,7 +1200,7 @@ try {
   const narrowedPullRequestWidth = await pullRequestPage
     .locator(".codex-ui-app-shell__side-panel")
     .evaluate((element) => element.getBoundingClientRect().width);
-  if (Math.abs(narrowedPullRequestWidth - 490) > 1) {
+  if (Math.abs(narrowedPullRequestWidth - 322) > 1) {
     throw new Error(
       `Electron pull request pointer resize failed: ${narrowedPullRequestWidth}`,
     );
@@ -1198,6 +1232,15 @@ try {
     .getByRole("button", { name: "Restore panel width" })
     .click();
   await pullRequestPage.getByRole("tab", { name: "Summary" }).click();
+  await pullRequestPage
+    .getByRole("textbox", { name: "Comment" })
+    .fill("Current-head checks are green.");
+  await pullRequestPage
+    .getByRole("button", { name: "Post comment" })
+    .click();
+  await pullRequestPage.waitForSelector(
+    '.codex-ui-pull-request-comment-composer[data-status="submitted"]',
+  );
   await pullRequestPage.getByRole("button", { name: "Live local" }).click();
   await pullRequestPage.waitForSelector(
     '.demo-root[data-view="conversation"][data-mode="live"]',
@@ -1212,6 +1255,26 @@ try {
   ) {
     throw new Error(
       "Electron Live local navigation did not leave the pull request view.",
+    );
+  }
+  await pullRequestPage
+    .getByRole("button", { name: "Pull requests" })
+    .click();
+  await pullRequestPage.waitForSelector(
+    '.demo-root[data-view="pull-request"] [data-testid="pull-request-panel"]',
+  );
+  if (
+    (await pullRequestPage
+      .getByRole("button", {
+        name: "Open pull request 80: feat: add terminal session lifecycle",
+      })
+      .getAttribute("aria-current")) !== "page" ||
+    (await pullRequestPage
+      .getByRole("tab", { name: "Summary" })
+      .getAttribute("aria-selected")) !== "true"
+  ) {
+    throw new Error(
+      "Electron pull request route did not restore its selected detail.",
     );
   }
 } finally {
@@ -2356,6 +2419,227 @@ try {
   await rejectedApprovalApp.close();
 }
 
+const currentDeniedApprovalScene = {
+  frame: "approval-current-pending",
+  id: "electron-current-approval-denied",
+  scenario: "approval-denied",
+};
+const {
+  app: currentDeniedApprovalApp,
+  page: currentDeniedApprovalPage,
+} = await launchScene(currentDeniedApprovalScene, { capture: false });
+try {
+  const currentApproval = currentDeniedApprovalPage.getByTestId(
+    "current-approval-request",
+  );
+  if (
+    (await currentApproval.getAttribute("data-presentation")) !==
+      "composer" ||
+    (await currentApproval.getByRole("button", { name: "Deny" }).count()) !==
+      1 ||
+    (await currentApproval
+      .getByRole("button", { name: "Allow once" })
+      .count()) !== 1
+  ) {
+    throw new Error(
+      "Electron current approval did not expose the pending Composer-dock actions.",
+    );
+  }
+  const options = currentApproval.getByRole("button", {
+    name: "Approval options",
+  });
+  await options.click();
+  await currentDeniedApprovalPage
+    .getByRole("menuitem", { name: "Allow this conversation" })
+    .waitFor();
+  await currentDeniedApprovalPage.keyboard.press("Escape");
+  if (
+    !(await options.evaluate(
+      (element) => element === document.activeElement,
+    ))
+  ) {
+    throw new Error(
+      "Electron current approval options did not restore trigger focus.",
+    );
+  }
+  await currentApproval.getByRole("button", { name: "Deny" }).click();
+  await currentDeniedApprovalPage.waitForSelector(
+    '.demo-root[data-frame="approval-current-denied"]',
+  );
+  const currentApprovalCount = await currentDeniedApprovalPage
+    .getByTestId("current-approval-request")
+    .count();
+  const assistantFinalCount = await currentDeniedApprovalPage
+    .getByText(
+      "Approval was not granted, so the command was not run.",
+      { exact: true },
+    )
+    .count();
+  const permissionLabel = (await currentDeniedApprovalPage
+    .locator(".demo-composer-permission-trigger")
+    .textContent())
+    ?.replace(/^◉/, "")
+    .trim();
+  if (
+    currentApprovalCount !== 0 ||
+    assistantFinalCount !== 1 ||
+    permissionLabel !== "Ask for approval"
+  ) {
+    throw new Error(
+      `Electron current approval rejection did not remove the card and complete without execution: ${JSON.stringify({
+        assistantFinalCount,
+        currentApprovalCount,
+        permissionLabel,
+      })}`,
+    );
+  }
+} finally {
+  await currentDeniedApprovalApp.close();
+}
+
+const currentApprovedApprovalScene = {
+  frame: "approval-current-pending",
+  id: "electron-current-approval-approved",
+  scenario: "approval-denied",
+};
+const {
+  app: currentApprovedApprovalApp,
+  page: currentApprovedApprovalPage,
+} = await launchScene(currentApprovedApprovalScene, { capture: false });
+try {
+  await currentApprovedApprovalPage
+    .getByTestId("current-approval-request")
+    .getByRole("button", { name: "Allow once" })
+    .click();
+  await currentApprovedApprovalPage
+    .getByText(
+      "Approval was granted, and the command completed successfully.",
+      { exact: true },
+    )
+    .waitFor();
+  const approvalCount = await currentApprovedApprovalPage
+    .getByTestId("current-approval-request")
+    .count();
+  await currentApprovedApprovalPage
+    .getByRole("button", { exact: true, name: "Worked for 23s" })
+    .click();
+  const commandExecution = currentApprovedApprovalPage.getByTestId(
+    "command-execution",
+  );
+  await commandExecution.waitFor();
+  const commandStatus = await commandExecution.getAttribute(
+    "data-execution-status",
+  );
+  const commandSummary = (
+    await commandExecution.locator(".codex-ui-activity__summary").textContent()
+  )
+    ?.replace(/\s+/g, " ")
+    .trim();
+  if (
+    approvalCount !== 0 ||
+    commandStatus !== "completed" ||
+    commandSummary !== "Completed open -a Calculator"
+  ) {
+    throw new Error(
+      `Electron current approval acceptance did not settle the command replay: ${JSON.stringify({
+        approvalCount,
+        commandSummary,
+        commandStatus,
+      })}`,
+    );
+  }
+} finally {
+  await currentApprovedApprovalApp.close();
+}
+
+const longCommandOutputScene = {
+  frame: "command-output-expanded",
+  id: "electron-current-long-command-output",
+  scenario: "long-command-output",
+};
+const {
+  app: longCommandOutputApp,
+  page: longCommandOutputPage,
+} = await launchScene(longCommandOutputScene, { capture: false });
+try {
+  const timelineToggle = longCommandOutputPage.getByRole("button", {
+    name: "Worked for 10s",
+  });
+  await timelineToggle.click();
+  const commandSummary = longCommandOutputPage
+    .locator('[data-item-id="command-long-output"] summary')
+    .first();
+  if ((await commandSummary.textContent())?.trim() !== "Ran seq 1 400") {
+    throw new Error(
+      "Electron current long command did not expose its sampled collapsed summary.",
+    );
+  }
+  await commandSummary.click();
+  const output = longCommandOutputPage.getByRole("region", {
+    name: "Standard output",
+  });
+  await output.waitFor({ state: "visible" });
+  const expanded = await longCommandOutputPage.evaluate(() => {
+    const command = document.querySelector(
+      '[data-item-id="command-long-output"]',
+    );
+    const output = command?.querySelector(
+      ".codex-ui-command-output pre",
+    );
+    return {
+      copyCount:
+        command?.querySelectorAll('button[aria-label="Copy"]').length ?? 0,
+      lineCount:
+        (output?.querySelector("code")?.textContent ?? "").split("\n")
+          .length,
+      scrollBottom: output ? output.scrollTop : null,
+      shellLabel:
+        command
+          ?.querySelector(".codex-ui-command-execution__shell-label")
+          ?.textContent?.trim() ?? null,
+      success:
+        command
+          ?.querySelector(".codex-ui-command-execution__footer")
+          ?.textContent?.trim() ?? null,
+    };
+  });
+  if (
+    expanded.copyCount !== 2 ||
+    expanded.lineCount !== 401 ||
+    expanded.scrollBottom === null ||
+    Math.abs(expanded.scrollBottom) > 1 ||
+    expanded.shellLabel !== "Shell" ||
+    expanded.success !== "Success"
+  ) {
+    throw new Error(
+      `Electron current long command output did not restore the bottom-following shell: ${JSON.stringify(expanded)}`,
+    );
+  }
+  const copyButtons = longCommandOutputPage.getByRole("button", {
+    name: "Copy",
+  });
+  await copyButtons.first().click();
+  await copyButtons.last().click();
+  await commandSummary.click();
+  if (await output.isVisible()) {
+    throw new Error(
+      "Electron current long command output remained visible after collapse.",
+    );
+  }
+  await commandSummary.click();
+  await output.waitFor({ state: "visible" });
+  const restoredBottom = await output.evaluate(
+    (element) => element.scrollTop,
+  );
+  if (Math.abs(restoredBottom) > 1) {
+    throw new Error(
+      `Electron current long command output lost its bottom-following position: ${restoredBottom}`,
+    );
+  }
+} finally {
+  await longCommandOutputApp.close();
+}
+
 const acceptedMixedApprovalScene = {
   frame: "mixed-approval-pending",
   id: "electron-mixed-approval-accepted",
@@ -2441,12 +2725,20 @@ try {
     .getByRole("button", { exact: true, name: "Stop" })
     .click();
   await conversationLifecyclePage.waitForSelector(
-    '.demo-root[data-composer-phase="queue-paused"]',
+    '.demo-root[data-composer-phase="running"][data-status="running"][data-queue-count="0"]',
   );
-  await conversationLifecyclePage.getByRole("button", { name: "Resume" }).click();
-  await conversationLifecyclePage.waitForSelector(
-    '.demo-root[data-composer-phase="queued"][data-status="running"]',
-  );
+  if (
+    (await conversationLifecyclePage
+      .getByText("You stopped after 2s", { exact: true })
+      .count()) !== 1 ||
+    (await conversationLifecyclePage
+      .getByText("Queue the Electron follow-up.", { exact: true })
+      .count()) !== 1
+  ) {
+    throw new Error(
+      "Electron Stop did not promote the queued follow-up automatically.",
+    );
+  }
 
   await conversationLifecyclePage
     .getByRole("button", {
@@ -2486,8 +2778,8 @@ try {
   }));
   if (
     lifecycle.contextControls !== 0 ||
-    lifecycle.navigationButtons !== 11 ||
-    lifecycle.queueRows !== 1 ||
+    lifecycle.navigationButtons !== 12 ||
+    lifecycle.queueRows !== 0 ||
     lifecycle.status !== "running" ||
     lifecycle.stopButtons !== 1 ||
     lifecycle.threadFollowing !== "true"
@@ -2500,6 +2792,433 @@ try {
   await conversationLifecycleApp.close();
 }
 
+const currentWindowedScene = {
+  frame: "thread-windowed",
+  id: "electron-current-windowed-thread",
+  scenario: "conversation-lifecycle",
+};
+const {
+  app: currentWindowedApp,
+  page: currentWindowedPage,
+} = await launchScene(currentWindowedScene, { capture: false });
+try {
+  await currentWindowedPage.waitForSelector(
+    '.demo-root[data-windowed-timeline="current"][data-thread-following="false"] [data-selected-message-index="40"]',
+  );
+  const currentWindowedGeometry = await currentWindowedPage.evaluate(() => {
+    const viewport = document.querySelector(
+      ".codex-ui-conversation-thread-shell__viewport",
+    );
+    const list = document.querySelector(
+      ".codex-ui-message-navigation-rail__list",
+    );
+    const selected = document.querySelector(
+      '.codex-ui-message-navigation-rail__button[aria-current="true"]',
+    );
+    const marker = selected?.querySelector(
+      ".codex-ui-message-navigation-rail__marker",
+    );
+    if (!viewport || !list || !selected || !marker) return null;
+    const listRect = list.getBoundingClientRect();
+    const selectedRect = selected.getBoundingClientRect();
+    const markerRect = marker.getBoundingClientRect();
+    return {
+      list: {
+        clientHeight: list.clientHeight,
+        height: listRect.height,
+        left: listRect.left,
+        scrollHeight: list.scrollHeight,
+        top: listRect.top,
+        width: listRect.width,
+      },
+      marker: {
+        height: markerRect.height,
+        opacity: getComputedStyle(marker).opacity,
+        width: markerRect.width,
+      },
+      mountedTurns: document.querySelectorAll("[data-windowed-turn]")
+        .length,
+      mountedUserBubbles: document.querySelectorAll(
+        '[data-mounted-turn-count] .codex-ui-agent-message[data-role="user"]',
+      ).length,
+      navigationButtons: document.querySelectorAll(
+        ".codex-ui-message-navigation-rail__button",
+      ).length,
+      selectedButton: {
+        height: selectedRect.height,
+        width: selectedRect.width,
+      },
+      viewport: {
+        flexDirection: getComputedStyle(viewport).flexDirection,
+        latestOrigin: viewport.getAttribute("data-latest-origin"),
+        scrollHeight: viewport.scrollHeight,
+        scrollTop: viewport.scrollTop,
+      },
+    };
+  });
+  if (
+    !currentWindowedGeometry ||
+    currentWindowedGeometry.navigationButtons !== 82 ||
+    currentWindowedGeometry.mountedTurns !== 7 ||
+    currentWindowedGeometry.mountedUserBubbles !== 7 ||
+    currentWindowedGeometry.viewport.latestOrigin !== "start" ||
+    currentWindowedGeometry.viewport.flexDirection !== "column-reverse" ||
+    currentWindowedGeometry.viewport.scrollTop >= -10_000 ||
+    currentWindowedGeometry.viewport.scrollHeight < 40_000 ||
+    currentWindowedGeometry.list.clientHeight !== 574 ||
+    currentWindowedGeometry.list.scrollHeight !== 820 ||
+    Math.abs(currentWindowedGeometry.list.left - 290) > 1 ||
+    Math.abs(currentWindowedGeometry.list.top - 146.5) > 1 ||
+    Math.abs(currentWindowedGeometry.list.width - 36) > 1 ||
+    Math.abs(currentWindowedGeometry.list.height - 574) > 1 ||
+    Math.abs(currentWindowedGeometry.selectedButton.width - 36) > 1 ||
+    Math.abs(currentWindowedGeometry.selectedButton.height - 10) > 1 ||
+    Math.abs(currentWindowedGeometry.marker.width - 26) > 1 ||
+    Math.abs(currentWindowedGeometry.marker.height - 2) > 1 ||
+    currentWindowedGeometry.marker.opacity !== "1"
+  ) {
+    throw new Error(
+      `Electron current windowed-thread geometry failed: ${JSON.stringify(currentWindowedGeometry)}`,
+    );
+  }
+
+  await currentWindowedPage
+    .getByRole("button", { name: "Jump to user message 20" })
+    .click();
+  await currentWindowedPage.waitForSelector(
+    '[data-selected-message-index="20"] [data-item-id="current-windowed-user-20"]',
+  );
+  await currentWindowedPage
+    .getByRole("button", { name: "Scroll to bottom" })
+    .click();
+  await currentWindowedPage.waitForFunction(
+    () =>
+      document
+        .querySelector(".demo-root")
+        ?.getAttribute("data-thread-following") === "true" &&
+      document
+        .querySelector("[data-selected-message-index]")
+        ?.getAttribute("data-selected-message-index") === "82" &&
+      document.querySelector(
+        ".codex-ui-conversation-thread-shell__viewport",
+      )?.scrollTop === 0,
+  );
+} finally {
+  await currentWindowedApp.close();
+}
+
+const composerMenusScene = {
+  frame: "composer-multiline",
+  id: "electron-composer-current-menus",
+  scenario: "conversation-lifecycle",
+};
+const {
+  app: composerMenusApp,
+  page: composerMenusPage,
+} = await launchScene(composerMenusScene, { capture: false });
+try {
+  const composerInput = composerMenusPage.getByRole("textbox", {
+    name: "Message composer",
+  });
+  const initialComposerGeometry = await composerMenusPage.evaluate(() => {
+    const measure = (selector) => {
+      const element = document.querySelector(selector);
+      if (!element) return null;
+      const rect = element.getBoundingClientRect();
+      const style = getComputedStyle(element);
+      return {
+        height: rect.height,
+        left: rect.left,
+        lineHeight: style.lineHeight,
+        overflowY: style.overflowY,
+        top: rect.top,
+        width: rect.width,
+      };
+    };
+    return {
+      input: measure(".codex-ui-composer__input"),
+      surface: measure(".codex-ui-composer"),
+    };
+  });
+  if (
+    !initialComposerGeometry.surface ||
+    !initialComposerGeometry.input ||
+    Math.abs(initialComposerGeometry.surface.left - 359) > 1 ||
+    Math.abs(initialComposerGeometry.surface.top - 670) > 1 ||
+    Math.abs(initialComposerGeometry.surface.width - 736) > 1 ||
+    Math.abs(initialComposerGeometry.surface.height - 134) > 1 ||
+    Math.abs(initialComposerGeometry.input.left - 371) > 1 ||
+    Math.abs(initialComposerGeometry.input.top - 684) > 1 ||
+    Math.abs(initialComposerGeometry.input.width - 712) > 1 ||
+    Math.abs(initialComposerGeometry.input.height - 80) > 1 ||
+    initialComposerGeometry.input.lineHeight !== "20px"
+  ) {
+    throw new Error(
+      `Electron current Composer multiline geometry failed: ${JSON.stringify(initialComposerGeometry)}`,
+    );
+  }
+
+  const permissionTrigger = composerMenusPage.getByRole("button", {
+    name: "Change permissions",
+  });
+  await permissionTrigger.click();
+  await composerMenusPage.waitForSelector(
+    '.demo-root[data-composer-overlay="permissions"] .codex-ui-composer',
+  );
+  const permissionGeometry = await composerMenusPage.evaluate(() => {
+    const menu = document.querySelector(
+      ".codex-ui-composer-permission-menu",
+    );
+    const items = [
+      ...document.querySelectorAll(
+        ".codex-ui-composer-permission-menu__option",
+      ),
+    ];
+    if (!menu) return null;
+    const rect = menu.getBoundingClientRect();
+    return {
+      height: rect.height,
+      itemHeights: items.map(
+        (item) => item.getBoundingClientRect().height,
+      ),
+      left: rect.left,
+      top: rect.top,
+      width: rect.width,
+    };
+  });
+  if (
+    !permissionGeometry ||
+    Math.abs(permissionGeometry.left - 401) > 1 ||
+    Math.abs(permissionGeometry.top - 544) > 1 ||
+    Math.abs(permissionGeometry.width - 480.375) > 1 ||
+    Math.abs(permissionGeometry.height - 222.5) > 1 ||
+    permissionGeometry.itemHeights.length !== 4 ||
+    permissionGeometry.itemHeights.some(
+      (height) => Math.abs(height - 47.125) > 1,
+    )
+  ) {
+    throw new Error(
+      `Electron current Composer permission menu geometry failed: ${JSON.stringify(permissionGeometry)}`,
+    );
+  }
+  await composerMenusPage
+    .getByRole("menuitemradio", { name: /Approve for me/ })
+    .click();
+  if (
+    (await permissionTrigger.textContent())?.includes("Approve for me") !==
+    true
+  ) {
+    throw new Error(
+      "Electron Composer permission selection did not update the trigger.",
+    );
+  }
+  await permissionTrigger.click();
+  await composerMenusPage.keyboard.press("Escape");
+  await composerMenusPage.waitForSelector(
+    '.demo-root:not([data-composer-overlay])',
+  );
+  const permissionFocus = await composerMenusPage.evaluate(
+    () => document.activeElement?.getAttribute("aria-label"),
+  );
+  if (permissionFocus !== "Change permissions") {
+    throw new Error(
+      `Electron Composer permission Escape focus failed: ${JSON.stringify(permissionFocus)}`,
+    );
+  }
+
+  const resourceTrigger = composerMenusPage.getByRole("button", {
+    name: "Add files and more",
+  });
+  await resourceTrigger.click();
+  await composerMenusPage.waitForSelector(
+    '.demo-root[data-composer-overlay="resources"] .codex-ui-composer-resource-picker',
+  );
+  const resourceGeometry = await composerMenusPage.evaluate(() => {
+    const measure = (selector) => {
+      const element = document.querySelector(selector);
+      if (!element) return null;
+      const rect = element.getBoundingClientRect();
+      return {
+        clientHeight: element.clientHeight,
+        height: rect.height,
+        left: rect.left,
+        scrollHeight: element.scrollHeight,
+        top: rect.top,
+        width: rect.width,
+      };
+    };
+    return {
+      picker: measure(".codex-ui-composer-resource-picker"),
+      scroller: measure(".codex-ui-composer-resource-picker__scroller"),
+      visibleOptions: [
+        ...document.querySelectorAll(
+          ".codex-ui-composer-resource-picker__option",
+        ),
+      ].filter((option) => option.getBoundingClientRect().top < 666)
+        .length,
+    };
+  });
+  if (
+    !resourceGeometry.picker ||
+    !resourceGeometry.scroller ||
+    Math.abs(resourceGeometry.picker.left - 359) > 1 ||
+    Math.abs(resourceGeometry.picker.top - 346) > 1 ||
+    Math.abs(resourceGeometry.picker.width - 736) > 1 ||
+    Math.abs(resourceGeometry.picker.height - 320) > 1 ||
+    Math.abs(resourceGeometry.scroller.left - 364) > 1 ||
+    Math.abs(resourceGeometry.scroller.top - 351) > 1 ||
+    Math.abs(resourceGeometry.scroller.width - 726) > 1 ||
+    resourceGeometry.scroller.clientHeight !== 310 ||
+    resourceGeometry.scroller.scrollHeight < 990 ||
+    resourceGeometry.visibleOptions < 9
+  ) {
+    throw new Error(
+      `Electron current Composer resource picker geometry failed: ${JSON.stringify(resourceGeometry)}`,
+    );
+  }
+  const resourcePicker = composerMenusPage.getByRole("listbox", {
+    name: "Composer resources",
+  });
+  await resourcePicker.focus();
+  await resourcePicker.press("End");
+  await resourcePicker.press("Enter");
+  await composerMenusPage.waitForSelector(
+    '.demo-root:not([data-composer-overlay])',
+  );
+  await composerMenusPage.waitForFunction(
+    () =>
+      document.activeElement?.getAttribute("aria-label") ===
+      "Message composer",
+  );
+
+  await resourceTrigger.click();
+  await composerMenusPage
+    .getByRole("option", { name: /Goal/ })
+    .click();
+  await composerMenusPage.waitForSelector(
+    '.demo-root[data-composer-mode="goal"][data-composer-phase="goal"]',
+  );
+  const goalMode = await composerMenusPage.evaluate(() => {
+    const mode = document.querySelector(".codex-ui-composer-mode");
+    const input = document.querySelector(".codex-ui-composer__input");
+    if (!mode || !input) return null;
+    const rect = mode.getBoundingClientRect();
+    return {
+      clearLabel: mode.getAttribute("aria-label"),
+      height: rect.height,
+      inputLabel: input.getAttribute("aria-label"),
+      kind: mode.getAttribute("data-kind"),
+      left: rect.left,
+      top: rect.top,
+    };
+  });
+  if (
+    !goalMode ||
+    goalMode.kind !== "goal" ||
+    goalMode.clearLabel !== "Clear goal" ||
+    goalMode.inputLabel !==
+      "Describe your goal, define measurable outcomes for best results" ||
+    Math.abs(goalMode.left - 512) > 1 ||
+    Math.abs(goalMode.top - 768) > 1 ||
+    Math.abs(goalMode.height - 28) > 1
+  ) {
+    throw new Error(
+      `Electron current Composer Goal mode failed: ${JSON.stringify(goalMode)}`,
+    );
+  }
+  await composerMenusPage
+    .getByRole("button", { name: "Clear goal" })
+    .click();
+  await composerMenusPage.waitForFunction(
+    () =>
+      !document
+        .querySelector(".demo-root")
+        ?.hasAttribute("data-composer-mode") &&
+      document.activeElement?.getAttribute("aria-label") ===
+        "Message composer",
+  );
+
+  await resourceTrigger.click();
+  await composerMenusPage
+    .getByRole("option", { name: /Plan mode/ })
+    .click();
+  await composerMenusPage.waitForSelector(
+    '.demo-root[data-composer-mode="plan"][data-composer-phase="plan"]',
+  );
+  const planMode = await composerMenusPage.evaluate(() => ({
+    buttonCount: document.querySelectorAll(
+      '.codex-ui-composer-mode[data-kind="plan"][aria-label="Plan"]',
+    ).length,
+    inputLabel: document
+      .querySelector(".codex-ui-composer__input")
+      ?.getAttribute("aria-label"),
+  }));
+  if (
+    planMode.buttonCount !== 1 ||
+    planMode.inputLabel !== "Describe your task to generate a plan..."
+  ) {
+    throw new Error(
+      `Electron current Composer Plan mode failed: ${JSON.stringify(planMode)}`,
+    );
+  }
+  await composerMenusPage
+    .getByRole("button", { exact: true, name: "Plan" })
+    .click();
+  await composerMenusPage.waitForFunction(
+    () =>
+      !document
+        .querySelector(".demo-root")
+        ?.hasAttribute("data-composer-mode") &&
+      document.activeElement?.getAttribute("aria-label") ===
+        "Message composer",
+  );
+
+  await composerInput.fill(
+    Array.from(
+      { length: 20 },
+      (_, index) => `Current Composer line ${index + 1}.`,
+    ).join("\n"),
+  );
+  const longComposerGeometry = await composerMenusPage.evaluate(() => {
+    const input = document.querySelector(
+      ".codex-ui-composer__input",
+    );
+    const surface = document.querySelector(".codex-ui-composer");
+    if (!input || !surface) return null;
+    const inputRect = input.getBoundingClientRect();
+    const surfaceRect = surface.getBoundingClientRect();
+    return {
+      input: {
+        height: inputRect.height,
+        left: inputRect.left,
+        scrollHeight: input.scrollHeight,
+        top: inputRect.top,
+        width: inputRect.width,
+      },
+      surface: {
+        height: surfaceRect.height,
+        top: surfaceRect.top,
+      },
+    };
+  });
+  if (
+    !longComposerGeometry ||
+    Math.abs(longComposerGeometry.input.left - 371) > 1 ||
+    Math.abs(longComposerGeometry.input.top - 559) > 1 ||
+    Math.abs(longComposerGeometry.input.width - 712) > 1 ||
+    Math.abs(longComposerGeometry.input.height - 205) > 1 ||
+    longComposerGeometry.input.scrollHeight < 400 ||
+    Math.abs(longComposerGeometry.surface.top - 545) > 1 ||
+    Math.abs(longComposerGeometry.surface.height - 259) > 1
+  ) {
+    throw new Error(
+      `Electron current Composer long-input geometry failed: ${JSON.stringify(longComposerGeometry)}`,
+    );
+  }
+} finally {
+  await composerMenusApp.close();
+}
+
 console.log(
-  "Electron host, native-window, coding-workspace routing, conversation/Composer lifecycle, default 720px narrow reachability, resizable navigation/Review/Terminal/PR detail, PR tabs and expansion, MCP disclosure/result, multi-file and mixed-content Review, selection/Undo, large diff scrolling, and compact geometry contracts passed.",
+  "Electron host, native-window, coding-workspace routing, conversation/Composer lifecycle and current menus, current long command output, default 720px narrow reachability, resizable navigation/Review/Terminal/PR detail, PR tabs and expansion, MCP disclosure/result, multi-file and mixed-content Review, selection/Undo, large diff scrolling, and compact geometry contracts passed.",
 );

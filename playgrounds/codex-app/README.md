@@ -69,8 +69,8 @@ resizing is covered by the next current-build slice.
 
 ## Fifth vertical slice
 
-The fifth slice reaches the current public Pull request detail and completes
-the resizable workspace contract:
+The fifth slice established the previous-build public Pull request detail and
+the first resizable workspace contract:
 
 - a 16px Review/PR separator with a measured 320px panel minimum and 352px
   retained main track;
@@ -81,6 +81,10 @@ the resizable workspace contract:
 - full-main expansion and exact panel-width restoration;
 - a fourteenth reviewed pixel frame plus an optional external current-build
   index/detail comparison.
+
+Its 352/554px split remains a regression fixture for `26.721.41059`; the
+current-build overlay and complete deterministic lifecycle are described in
+the sixteenth slice below.
 
 ## Sixth vertical slice
 
@@ -147,18 +151,19 @@ contract:
 The tenth slice adds current-build MCP failure recovery and a mixed second
 turn:
 
-- a real OpenAI Developer Docs invalid-URL failure followed by Search and a
-  valid Fetch in Codex Desktop `26.721.81911`;
-- a recovered integration group whose earlier failed call remains expandable
-  as neutral `plaintext / Invalid URL` output;
+- a refreshed real OpenAI Developer Docs invalid-URL failure followed by three
+  Search calls and a valid Fetch in Codex Desktop `26.727.40816`;
+- a standalone failed Fetch whose neutral `plaintext / Invalid URL` output
+  remains expandable before the later recovered integration group;
 - a schema-validated two-turn replay that continues through two commands, one
   accepted approval, one file change, and Review;
 - CDP computed-style and geometry gates plus a real Electron disclosure and
   mixed-thread interaction flow;
 - four additional reviewed frames for failed, retrying, recovered, and mixed
   Review states;
-- an optional 906×820 current-build comparison for full-main, recovery, user,
-  and Composer regions.
+- an optional masked 906×820 current-build comparison for full-main, recovery,
+  upper activity/failure, and Composer regions while leaving the final answer
+  unmasked.
 
 ## Eleventh vertical slice
 
@@ -226,8 +231,8 @@ The fourteenth slice broadens Review content and synchronization:
 
 ## Fifteenth vertical slice
 
-The fifteenth slice expands Terminal from one background session into a
-current-build session-tab contract and an independent process lifecycle:
+The fifteenth slice expanded Terminal from one background session into the
+`26.721.81911` session-tab contract and an independent process lifecycle:
 
 - `26.721.81911` CDP evidence for three auto-numbered tabs, per-tab close
   buttons, nearest-tab selection, the Review/Terminal/Browser/Files picker,
@@ -245,7 +250,156 @@ current-build session-tab contract and an independent process lifecycle:
 
 The current-product probe did not execute a shell process. Running, failed,
 exited, and restore states are deterministic public-host acceptance rather
-than promoted current-product lifecycle evidence.
+than promoted current-product lifecycle evidence. The later
+`26.727.40816` read-only probe found a project-named tab instead of the
+auto-numbered presentation. The independent single-session model already
+uses the project name plus close/add controls and now passes the current
+Terminal regional gate at 1.79% panel and 0.73% content difference, so the
+session shell is current-build verified while process lifecycle remains
+`partial_legacy`.
+
+## Sixteenth vertical slice
+
+The sixteenth slice refreshes Pull request behavior against
+`26.727.40816` and expands it into a deterministic host-owned lifecycle:
+
+- read-only current-product evidence for Summary/Code tabs, Timeline integrated
+  into Summary, successful multi-file Code content, display options,
+  Auto-merge, non-modal overlay geometry, and responsive
+  1180/960/820/720px auto-hide/reopen behavior;
+- public `PullRequestQueryState`, `PullRequestMergeReadiness`,
+  `PullRequestReviewComposer`, and `PullRequestCommentComposer` contracts;
+- index/detail loading and failure/retry, running/failed/passed checks, comment
+  failure/recovery, review submission, merge blocked/ready/merging/merged, and
+  compact states;
+- real Electron review/comment/merge interaction against deterministic local
+  state, without GitHub side effects;
+- nine additional reviewed visual frames and a shared 61-frame CDP/pixel
+  matrix;
+- a current 906×820 regional comparison passing at 5.75% full-main, 4.68%
+  index, and 6.44% detail difference without relaxing the existing thresholds.
+
+The current-product probe did not submit a real comment, review, or merge.
+Its Review options menu contains word-wrap, rich-preview, and word-diff
+display settings rather than review submission. Mutating states therefore
+remain independent acceptance rather than promoted runtime evidence.
+
+## Seventeenth vertical slice
+
+The seventeenth slice refreshes the successful MCP/tool-call path against
+`26.727.40816`:
+
+- a real disposable OpenAI Developer Docs Search → Fetch turn with no shell,
+  browser, or file action;
+- a two-call schema-validated replay with the current 31-second disclosure,
+  intermediate assistant explanation, integrated group, and linked Markdown
+  answer;
+- CDP gates for ordered labels, expanded state, 14/21px typography, system
+  font, 445 weight, and 0.6 secondary color;
+- a current 906×820 comparison passing at 2.03% masked full-main, 0.05%
+  masked tool structure, 1.87% answer, and 1.92% Composer difference without
+  relaxing the existing thresholds.
+
+The pixel masks exclude dynamic header/task/intermediate/group-label glyphs
+and the non-owning scrollbar only; the answer remains unmasked. CDP separately
+verifies the masked regions' surrounding geometry and computed typography.
+Failure/retry is refreshed in the next slice.
+
+## Eighteenth vertical slice
+
+The eighteenth slice refreshes MCP failure/recovery against `26.727.40816`:
+
+- a real invalid-URL Fetch failure followed by three Search calls and one
+  successful Fetch, with no shell, browser-navigation, or file action;
+- the current standalone failed row and neutral 736×67.3125px
+  `plaintext / Invalid URL` output before the recovered integration group;
+- Browser and Electron contracts for ordering, disclosure ownership,
+  accessibility, typography, and failed-card geometry;
+- a current regional gate passing at 1.63% full-main, 2.90% recovery, 1.08%
+  upper activity/failure, and 1.91% Composer difference.
+
+## Nineteenth vertical slice
+
+The nineteenth slice refreshes the Composer queue and Stop lifecycle against
+`26.727.40816`:
+
+- a real 710×39px queued tray with a 684×28px row, 14/16px typography, and
+  Steer/Delete queued message/queued message actions;
+- the current 28×28 Stop transition to `You stopped after 2s`;
+- automatic promotion and execution of the queued follow-up, replacing the
+  previous paused header and Resume behavior;
+- deterministic Browser/CDP and real Electron acceptance for that default
+  state machine, while the former paused/Resume frame remains available as
+  explicit legacy compatibility;
+- two current 792×320 regional gates passing at 0.35% queued and 0.51%
+  automatic-continuation difference under a 2% hard limit.
+
+## Twentieth vertical slice
+
+The twentieth slice refreshes current multiline, permission, and Add-resource
+Composer behavior against `26.727.40816`:
+
+- exact 736×134 four-line and 736×259 long-input Composer geometry, including
+  the 712×80 draft area and 205px `25dvh` clamp;
+- a public `ComposerPermissionMenu` for the current Ask/Approve/Full/Custom
+  choices and a public, data-driven `ComposerResourcePicker` for the new
+  736×320 inline Add surface;
+- 61-frame CDP coverage plus real Electron selection, Escape/focus, scrolling,
+  and keyboard acceptance;
+- strict ownership-masked current regional gates passing at 0.10% multiline,
+  0.13% permissions, and 0.34% resources difference.
+
+## Twenty-first vertical slice
+
+The twenty-first slice refreshes active Goal and Plan Composer modes against
+`26.727.40816`:
+
+- an unsubmitted new-chat draft records each mode's accessible prompt,
+  736×98 Composer, 712×44 input, and 28px clearable footer control;
+- the public `ComposerModeIndicator` uses independently drawn SVG geometry and
+  current pill sizing;
+- shared CDP/pixel coverage increases to 63 frames, while Electron selects and
+  clears both modes through the Add-resource path and verifies focus recovery;
+- strict ownership-masked current regional gates pass at 0.38% for Goal and
+  0.35% for Plan under a 0.5% hard limit.
+
+The native macOS file panel is outside Renderer CDP and Computer Use blocks
+Codex control, so no attachment was added and attachment lifecycle remains
+historical.
+
+## Twenty-second vertical slice
+
+The twenty-second slice refreshes long-conversation navigation against
+`26.727.40816`:
+
+- a read-only current thread establishes an 82-message compact navigation
+  rail, a seven-turn mounted window, reverse-origin scrolling, and a floating
+  return-to-latest control;
+- public viewport and navigation contracts expose reverse latest-origin,
+  compact 36×10px navigation rows, active 26×2px markers, and initial
+  end-positioning without owning host virtualization;
+- synthetic Browser/CDP and Electron acceptance jumps to message 20, keeps
+  seven turns mounted, then returns to message 82 at scroll origin zero;
+- the current 906×820 regional gate compares only the navigation rail and
+  floating return control, excluding all real and synthetic conversation
+  content.
+
+## Twenty-third vertical slice
+
+The twenty-third slice refreshes successful long command output against
+`26.730.61309`:
+
+- one real `seq 1 400` command, auto-run by the current low-risk Ask policy
+  without an approval card;
+- a public schema-validated trace with exactly one command pair and all 400
+  output lines;
+- the current collapsed `Ran seq 1 400` disclosure and expanded 736×227px
+  `Shell` card, two copy controls, 144px reverse-tail output viewport, and
+  Success state;
+- 66-frame Browser/CDP coverage plus real Electron disclosure,
+  collapse/reopen, 401-split-line, and latest-line restoration checks;
+- a full 1180×820 ownership-masked current comparison passing at 0.17% under
+  the 1.5% hard limit.
 
 ## Development
 
@@ -332,12 +486,42 @@ CODEX_UI_KIT_WINDOW_CHROME_REFERENCE=/absolute/path/to/window-chrome.png \
   pnpm --filter @codex-ui-kit/codex-app-playground check:visual
 ```
 
-The current Composer gates accept the two untracked 792×320 crops captured
-from the same 1180×820 current-build Renderer:
+The current queue gates accept two untracked 792×320 crops captured from the
+same 1180×820 current-build Renderer:
 
 ```bash
 CODEX_UI_KIT_COMPOSER_QUEUED_REFERENCE=/absolute/path/to/composer-queued.png \
-CODEX_UI_KIT_COMPOSER_PAUSED_REFERENCE=/absolute/path/to/composer-paused.png \
+CODEX_UI_KIT_COMPOSER_CONTINUED_REFERENCE=/absolute/path/to/composer-continued.png \
+  pnpm --filter @codex-ui-kit/codex-app-playground check:visual
+```
+
+`CODEX_UI_KIT_COMPOSER_PAUSED_REFERENCE` remains available only for the
+previous-build paused/Resume compatibility frame.
+
+The current multiline/menu/mode gates accept one 792×320 Composer crop and
+four 906×820 main-only crops:
+
+```bash
+CODEX_UI_KIT_COMPOSER_MULTILINE_REFERENCE=/absolute/path/to/composer-multiline.png \
+CODEX_UI_KIT_COMPOSER_PERMISSIONS_REFERENCE=/absolute/path/to/composer-permissions-main.png \
+CODEX_UI_KIT_COMPOSER_RESOURCES_REFERENCE=/absolute/path/to/composer-resources-main.png \
+CODEX_UI_KIT_COMPOSER_GOAL_REFERENCE=/absolute/path/to/composer-goal-main.png \
+CODEX_UI_KIT_COMPOSER_PLAN_REFERENCE=/absolute/path/to/composer-plan-main.png \
+  pnpm --filter @codex-ui-kit/codex-app-playground check:visual
+```
+
+The current long-thread gate accepts one 906×820 main-only crop and masks all
+conversation content:
+
+```bash
+CODEX_UI_KIT_LONG_THREAD_REFERENCE=/absolute/path/to/long-thread-main.png \
+  pnpm --filter @codex-ui-kit/codex-app-playground check:visual
+```
+
+The current long-command gate accepts one full 1180×820 screenshot:
+
+```bash
+CODEX_UI_KIT_COMMAND_OUTPUT_REFERENCE=/absolute/path/to/command-output.png \
   pnpm --filter @codex-ui-kit/codex-app-playground check:visual
 ```
 

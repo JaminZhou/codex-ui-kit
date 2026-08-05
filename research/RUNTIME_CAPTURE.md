@@ -129,7 +129,7 @@ and terminates only the PID bearing the unique profile, verifies its children
 and loopback listener are gone, and removes only that exact profile and the
 external screenshot.
 
-### Current conversation and Composer capture
+### Previous 26.721.81911 conversation and Composer capture
 
 The `26.721.81911` conversation probe used a second exact process with a unique
 `/private/tmp/codex-ui-kit-conversation-cdp.XXXXXX` profile and loopback port.
@@ -249,6 +249,325 @@ Browser/Electron acceptance, not claimed as current-product evidence.
 Cleanup confirmed the exact spawned process and `127.0.0.1:9481` listener were
 gone, removed only the unique profile, and deleted all six external
 screenshots. The original Codex process remained running.
+
+### Current Pull request lifecycle capture
+
+The `26.721.81911` Pull request probe used an exact second process with a unique
+temporary Chromium profile and loopback-only debugging port. It selected the
+1180×820 `app://-/index.html` main Renderer by area and application-shell
+landmarks, then opened public PR `#80` read-only.
+
+The bounded sequence was:
+
+1. record the PR index and open the detail without changing repository state;
+2. inspect Summary facts, checks, reviewers, description, comment-action
+   disabled state, and sampled merge readiness;
+3. inspect Timeline public comments and bot-review entries;
+4. open Code only long enough to record its loading boundary;
+5. measure the panel and separator at 1180×820, 960×720, 820×680, and
+   720×680, including sidebar collapse at the compact width;
+6. expand and restore the detail, then use Back and Forward to verify route,
+   tab, and geometry restoration.
+
+At 1180×820 the panel measured x=810.72/w=369.28 with a 16px separator
+beginning at x=801.72 over the 906px main route. At 960×720, 820×680, and
+720×680 the panel was respectively 321.97px, about 319px, and 329.31px wide.
+The detail remained non-modal and did not inert the underlying main route.
+
+No real comment, review, rerun, or merge action was activated. Successful Code
+content was not reached within the bounded capture, so only its loading state
+is recorded. The independent Browser/Electron replay exercises those mutating
+and failure transitions against deterministic public host state, not GitHub.
+Cleanup terminated only the exact temporary-profile process, verified its
+listener was gone, and removed its external screenshots and profile.
+
+### 26.727.40816 refresh capture
+
+The `26.727.40816` refresh used exact process PID `38608`, loopback port
+`9511`, and unique profile
+`/private/tmp/codex-ui-kit-turn-cdp.ovwKlU`. It selected the 1180×820
+`app://-/index.html` main Renderer by URL, area, and shell landmarks. The
+installed package fingerprint, Chromium `150.0.7871.182`, and ASAR hash are
+recorded in [`26.727.40816.md`](26.727.40816.md).
+
+The bounded read-only sequence was:
+
+1. record the 46px titlebar, 274.11px sidebar, primary navigation, section
+   expansion, item actions/status, and footer;
+2. open New chat, measure the 712×44 `Do anything` input and context row, then
+   open/dismiss the 260×249.5 project dialog without selecting a project;
+3. open the bottom Terminal panel without submitting input and record the
+   project-named tab plus close/add controls;
+4. open public PR `#80`, inspect Summary and its integrated Timeline, wait for
+   successful Code content, inspect the three display-only Review options,
+   and measure responsive panel geometry at 1180, 960, 820, and 720px;
+5. capture only external current-build references needed for the optional
+   ownership-scoped PR pixel gate.
+
+The PR detail auto-hid after each responsive transition, so the selected row
+was explicitly reopened before measuring. Code reached real multi-file diff
+content with an 81492px scroller. No prompt, command, project selection,
+comment, review, auto-merge, or merge action was submitted. The independent
+review composer remains host-owned synthetic acceptance because the observed
+Review options menu contains only word-wrap, rich-preview, and word-diff
+display settings.
+
+Cleanup resolved and terminated only PID `38608`, verified
+`127.0.0.1:9511` and its children were gone, and moved only the exact
+temporary profile and external screenshots into one recoverable Trash
+directory. The original Codex process remained running.
+
+### 26.727.40816 successful MCP capture
+
+The successful MCP refresh used exact process PID `59950`, loopback port
+`9512`, and unique profile
+`/private/tmp/codex-ui-kit-mcp-cdp.u8Gd3C`. In a disposable New chat task it
+submitted one synthetic prompt authorizing only OpenAI Developer Docs Search
+and Fetch. The task performed no shell, browser, or file action.
+
+The completed 1180×820 Renderer exposed `Worked for 31s`, an intermediate
+assistant explanation, `Used OpenAI Developer Docs integration`, and exactly
+two successful ordered rows: Search OpenAI docs and Fetch OpenAI doc. The
+expanded group measured 736×75px; the title and call rows used 14/21px
+typography, the current system-font stack, 445 weight, and 0.6 secondary
+color. The linked final answer remained in the same turn.
+
+The current 906×820 pixel gate passes at 2.03% full-main, 0.05%
+tool-structure, 1.87% answer, and 1.92% Composer difference. Dynamic
+header/task/intermediate/group-label glyphs and the scrollbar are masked; the
+answer remains unmasked, while CDP separately locks masked text style,
+ordered labels, disclosure state, and geometry.
+
+Cleanup terminated only PID `59950`, verified the exact profile children and
+`127.0.0.1:9512` listener were gone, and moved the unique profile plus exact
+temporary reference images into one recoverable Trash directory. The
+original Codex process remained running.
+
+### 26.727.40816 MCP failure/recovery capture
+
+The recovery refresh used exact process PID `67251`, loopback port `9513`,
+and unique profile
+`/private/tmp/codex-ui-kit-mcp-recovery-cdp.7ztEiz`. In a disposable New chat
+task it authorized only OpenAI Developer Docs calls. The first Fetch used
+`not-a-valid-url` and failed with `Invalid URL`; recovery then used three
+Search calls and one valid Fetch. No shell, browser-navigation, or file action
+was requested or performed.
+
+The expanded 1180×820 Renderer exposed `Worked for 51s`, a standalone failed
+Fetch with 736×67.3125px neutral `plaintext / Invalid URL` output, an
+intermediate explanation, a later `Used OpenAI Developer Docs integration`
+group with four successful rows, and a linked final Markdown answer. Computed
+styles recorded the 12.5px failed-card radius, 0.05 white background, 0.157
+white border, 13/18.5714px language label, 14/22.75px 445-weight monospace
+output, and the existing 14/21px system-font integration rows.
+
+The masked 906×820 pixel gate passes at 1.63% full-main, 2.90% recovery,
+1.08% upper activity/failure, and 1.91% Composer difference. The final answer
+remains unmasked; CDP separately gates dynamic labels, disclosure ownership,
+status, accessibility, typography, and geometry.
+
+Cleanup terminated only PID `67251` plus the two exact Crashpad helpers left
+with that profile, verified the listener and all exact-profile processes were
+gone, and moved the profile and reference images into
+`/Users/JaminZhou/.Trash/codex-ui-kit-mcp-recovery-cleanup.yS1xY9`. The
+original Codex process remained running.
+
+### 26.727.40816 Composer queue and Stop capture
+
+The current Composer refresh used exact process PID `78399`, loopback port
+`9514`, and unique profile
+`/private/tmp/codex-ui-kit-composer-cdp.Ma9hyd`. It selected the 1180×820 main
+Renderer and created one disposable text-only task. The prompts explicitly
+forbade tools, commands, browser navigation, and file access.
+
+The bounded sequence was:
+
+1. start a long synthetic response and wait for the 28×28 Stop control;
+2. enter a second prompt while the first response remains active;
+3. record the queued tray, its computed ancestor chain, and
+   Steer/Delete/message-actions controls;
+4. Stop after two seconds, record `You stopped after 2s`, and verify that the
+   queue row disappears;
+5. verify that the queued prompt becomes the next user turn and starts
+   automatically, with no paused header or Resume action;
+6. repeat the transition after active output to exclude a zero-second timing
+   branch;
+7. capture only the two 792×320 bottom-main crops used by the optional
+   current-build regional gates.
+
+The current tray measured 710×39px at x=372.05/y=667. Its inner scroll region
+measured 708×38px and its row measured 684×28px at x=385.05/y=673. The text
+used 14/16px system typography. The independent replay now uses the current
+automatic-continuation state by default while retaining paused/Resume as a
+legacy compatibility frame.
+
+At the strict 0.05 pixel threshold and 2% hard changed-pixel limit, the queued
+and automatic-continuation crops pass at `0.003480114` and `0.005105745`.
+CDP covers 61 lifecycle frames and real Electron repeats the default
+transition.
+
+Cleanup stopped only PID `78399`, verified the exact profile process set and
+port `9514` were gone, and moved the profile and screenshots into
+`/Users/JaminZhou/.Trash/codex-ui-kit-composer-cleanup.FE0SB8`. The original
+Codex process remained running.
+
+### 26.727.40816 Composer menus and long-input capture
+
+The current menu refresh used exact process PID `89666`, loopback port `9515`,
+and unique profile
+`/private/tmp/codex-ui-kit-composer-menus-cdp.8CjIBw`. It selected the
+1180×820 main Renderer, entered only an unsubmitted synthetic draft, and did
+not select a permission/resource option, submit a turn, or use any tool.
+
+The bounded sequence was:
+
+1. record three-line, four-line, and 20-line textbox/surface geometry and
+   computed overflow styles, then restore the four-line draft;
+2. open the permission menu and record its heading, four labels, selected
+   state, 47px rows, outer geometry, and computed styles;
+3. dismiss with Escape, open `Add files and more`, and record the current
+   736×320 inline picker, visible top groups, 726×310 scroller, and
+   approximately 1010px content height without copying lower
+   user/environment-specific labels;
+4. dismiss without uploading, connecting, changing permission, or activating
+   Goal/Plan;
+5. capture one 792×320 Composer crop and two 906×820 main-only crops for
+   ownership-scoped pixel gates.
+
+The four-line Composer measured 736×134 with a 712×80 textbox; 20 lines
+clamped the textbox to 205px and grew the surface to 736×259. The permission
+menu measured 480.36×222.44 and the Add-resource picker 736×320. Public,
+data-driven permission and resource components now pass 61-frame CDP,
+Electron selection/Escape/focus/scroll/keyboard acceptance, and strict
+regional gates at `0.000994318`, `0.001280084`, and `0.003352986`.
+
+Cleanup stopped the exact main process and app-server child, verified port
+`9515` was gone, and moved the unique profile into
+`/Users/JaminZhou/.Trash/codex-ui-kit-composer-menus-cleanup.NV2plx` with the
+external reference images.
+Active Goal and Plan transitions were then sampled independently in a fifth
+exact process on port `9516`. Both kept the 736×98 Composer and 712×44 input;
+their clearable 28px controls changed the input accessibility label and
+placeholder, then restored default mode and focus without submitting. CDP now
+covers 63 frames, Electron drives both transitions, and the masked current
+pixel ratios are `0.003763528` and `0.003486243`.
+
+`Files and folders` opened a native macOS panel instead of a Renderer file
+input. Computer Use intentionally disallowed Codex control, so no workaround
+was used and no attachment was added. Attachment lifecycle remains pending
+current capture. Cleanup stopped the exact process, closed port `9516`,
+removed the ignored synthetic probe file, and moved the profile and external
+evidence to the recoverable
+`/Users/JaminZhou/.Trash/codex-ui-kit-composer-modes-cleanup.CJuP6u`
+directory.
+
+### 26.727.40816 long-thread capture
+
+The long-thread refresh used exact process PID `6481`, child `6523`, loopback
+port `9517`, and unique profile
+`/private/tmp/codex-ui-kit-long-thread-cdp.aAzATz`. It selected the 1180×820
+main Renderer and opened an existing conversation read-only. No message,
+command, edit, deletion, or other content mutation was performed.
+
+The bounded sequence was:
+
+1. wait for historical content and message navigation to stabilize;
+2. record the reverse-origin viewport at latest and the compact navigation
+   list;
+3. activate `Jump to user message 40`, record the selected marker, mounted
+   turn count, negative scroll position, and floating return control;
+4. move farther into history, then activate `Scroll to bottom` and verify
+   message 82 at `scrollTop = 0`;
+5. capture one external 906×820 main-only reference for an ownership-scoped
+   rail/control pixel gate.
+
+The current product exposed 82 navigation buttons, a 36×574px list with
+36×10px buttons, a 26×2px selected marker, seven mounted nearby turns at
+message 40, `scrollTop = -28484`, and a 32×32px return control. The public
+fixture uses synthetic labels, keeps eviction host-owned, and passes 63-frame
+CDP, real Electron interaction, and a masked regional comparison at
+`0.005937382` under a 1% limit.
+
+Cleanup restored the observed task to latest, stopped only the exact process
+and child, verified port `9517` was gone, and moved the profile and reference
+images to
+`/Users/JaminZhou/.Trash/codex-ui-kit-long-thread-cleanup.XSqBZw`.
+
+### 26.727.40816 command-approval denial
+
+The approval probe used exact main PID `13129`, loopback port `9518`, and
+unique profile `/private/tmp/codex-ui-kit-approval-cdp.7bt4qn`. It created one
+disposable task and requested only `open -a Calculator`, then waited at the
+approval boundary. The pending card measured x=359.05/y=642, 736×162px and
+exposed `Terminal`, the command, `Deny`, `Allow once`, and
+`Approval options`.
+
+The bounded sequence was:
+
+1. confirm the pending card remained stable without executing;
+2. capture its DOM, computed styles, geometry, and 906×820 main-only image;
+3. activate `Deny`;
+4. verify the card disappeared, `Worked for 23s` and the final non-execution
+   response appeared, and the 736×98 Composer returned with
+   `Ask for approval`;
+5. verify no Calculator process existed.
+
+The independent replay records the declined request/resolution event order
+with empty command output and no exit code. Browser/CDP covers 66 frames,
+Electron drives the split options menu and rejection transition, and masked
+current-build comparisons pass at `0.008493512` pending and `0.001214128`
+denied. This captures one command-denial path only; allow once, persistence,
+timeout, repeated denial, and other permission kinds remain required.
+
+Cleanup stopped only the exact second-process tree and its profile-specific
+Crashpad helpers, closed port `9518`, removed the ignored probe, and moved
+the profile and external screenshots to
+`/Users/JaminZhou/.Trash/codex-ui-kit-approval-cleanup.byVfmp`.
+
+### 26.727.40816 long command output
+
+The long-output probe used exact main PID `22071`, loopback port `9519`, and
+unique profile `/private/tmp/codex-ui-kit-command-cdp.jW2xHc`. It created one
+disposable task and requested only `seq 1 400`. Ask mode ran this exact
+low-risk command without an approval card, so the run is command-output
+evidence rather than approval allow-once evidence.
+
+The completed turn exposed a collapsed `Ran seq 1 400` disclosure. Expanding
+it revealed a 736×227px command surface at x=274.05/y=101.44 with `Shell`,
+the command row, two copy controls, a 734×144px output viewport, and
+`Success`. The output uses 13/19.5px monospace text, splits into 401 lines
+including the trailing newline, and uses a reverse column: `scrollTop = 0`
+shows lines 394–400 at the latest edge while `scrollHeight = 7816`.
+
+The independent public trace preserves exactly one command request/output
+pair and all 400 generated lines. Browser/CDP covers 66 frames and verifies
+geometry, styles, overflow, keyboard expansion, collapse/reopen, and
+latest-line restoration. Electron repeats the disclosure flow in a real
+1180×820 window. An ownership-masked comparison against the full current
+1180×820 screenshot passes at `0.000924969` under a 1.5% hard limit. The
+external profile/reference remains untracked and is moved to Trash during
+recoverable probe cleanup.
+
+### Current 26.730.61309 long command output
+
+The refreshed probe used exact main PID `99165`, loopback port `9520`, and
+unique profile `/private/tmp/codex-ui-kit-current-cdp.mrkFgT`. It submitted
+the same one-command prompt exactly once. Ask mode again ran `seq 1 400`
+without an approval card.
+
+The 1180×820 Renderer retained the 736×227.06 command card,
+734×144 reverse-tail output viewport, 401 split lines, 7816px scroll height,
+`scrollTop = 0`, 13/19.5px monospace output, two copy controls, Shell label,
+and Success state. Browser/CDP, Electron, and all 66 internal pixel frames
+pass; the ownership-masked current comparison measures `0.001655643` under
+the unchanged 1.5% hard limit. Other `26.727.40816` surfaces remain
+previous-build evidence until separately reached on this build.
+
+Cleanup stopped only PID `99165`, its exact process tree, reparented
+app-server/modifier children, and profile-specific Crashpad helpers. Port
+`9520` closed, the ignored probe was removed, and Finder moved the profile and
+external evidence to the recoverable Trash item
+`codex-ui-kit-current-cdp.mrkFgT`. The original Codex process was not stopped.
 
 ## Required flow matrix
 

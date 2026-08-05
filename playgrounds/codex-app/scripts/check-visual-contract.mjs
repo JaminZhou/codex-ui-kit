@@ -70,11 +70,47 @@ const currentBuildMcpRecoveryReferenceSize = {
 };
 const currentBuildComposerQueuedReference =
   process.env.CODEX_UI_KIT_COMPOSER_QUEUED_REFERENCE;
+const currentBuildComposerContinuedReference =
+  process.env.CODEX_UI_KIT_COMPOSER_CONTINUED_REFERENCE;
 const currentBuildComposerPausedReference =
   process.env.CODEX_UI_KIT_COMPOSER_PAUSED_REFERENCE;
 const currentBuildComposerReferenceSize = {
   height: 320,
   width: 792,
+};
+const currentBuildComposerMultilineReference =
+  process.env.CODEX_UI_KIT_COMPOSER_MULTILINE_REFERENCE;
+const currentBuildComposerPermissionsReference =
+  process.env.CODEX_UI_KIT_COMPOSER_PERMISSIONS_REFERENCE;
+const currentBuildComposerResourcesReference =
+  process.env.CODEX_UI_KIT_COMPOSER_RESOURCES_REFERENCE;
+const currentBuildComposerGoalReference =
+  process.env.CODEX_UI_KIT_COMPOSER_GOAL_REFERENCE;
+const currentBuildComposerPlanReference =
+  process.env.CODEX_UI_KIT_COMPOSER_PLAN_REFERENCE;
+const currentBuildComposerMenuReferenceSize = {
+  height: 820,
+  width: 906,
+};
+const currentBuildLongThreadReference =
+  process.env.CODEX_UI_KIT_LONG_THREAD_REFERENCE;
+const currentBuildLongThreadReferenceSize = {
+  height: 820,
+  width: 906,
+};
+const currentBuildApprovalPendingReference =
+  process.env.CODEX_UI_KIT_APPROVAL_PENDING_REFERENCE;
+const currentBuildApprovalDeniedReference =
+  process.env.CODEX_UI_KIT_APPROVAL_DENIED_REFERENCE;
+const currentBuildApprovalReferenceSize = {
+  height: 820,
+  width: 906,
+};
+const currentBuildCommandOutputReference =
+  process.env.CODEX_UI_KIT_COMMAND_OUTPUT_REFERENCE;
+const currentBuildCommandOutputReferenceSize = {
+  height: 820,
+  width: 1180,
 };
 const currentBuildWorkspaceReference =
   process.env.CODEX_UI_KIT_WORKSPACE_REFERENCE;
@@ -114,6 +150,10 @@ function cropPng(source, left, top, width, height) {
   const crop = new PNG({ height, width });
   PNG.bitblt(source, crop, left, top, width, height, 0, 0);
   return crop;
+}
+
+function clonePng(source) {
+  return PNG.sync.read(PNG.sync.write(source));
 }
 
 function comparePng(reference, actual, threshold = 0.05) {
@@ -253,6 +293,8 @@ async function compareCurrentBuildOverlay({
     `${sceneId}: current-build overlay pixel ratio ${comparison.ratio}`,
   );
 }
+
+const regionalFailures = [];
 
 for (const scene of selectedScenes) {
   const { app, page } = await launchScene(scene);
@@ -417,15 +459,17 @@ for (const scene of selectedScenes) {
     mainComparison.ratio > maximumMainPixelRatio ||
     sidebarComparison.ratio > defaultLifecycleSidebarPixelRatio
   ) {
-    throw new Error(
+    const failure =
       `${scene.id}: regional pixel drift ${JSON.stringify({
         main: mainComparison.ratio,
         sidebar: sidebarComparison.ratio,
       })} exceeds ${JSON.stringify({
         main: maximumMainPixelRatio,
         sidebar: defaultLifecycleSidebarPixelRatio,
-      })}.`,
-    );
+      })}.`;
+    regionalFailures.push(failure);
+    console.error(failure);
+    continue;
   }
 
   if (scene.id === "workspace-ready" && currentBuildWorkspaceReference) {
@@ -802,6 +846,8 @@ for (const scene of selectedScenes) {
   const currentBuildComposerReference =
     scene.id === "composer-queued"
       ? currentBuildComposerQueuedReference
+      : scene.id === "composer-auto-continued"
+        ? currentBuildComposerContinuedReference
       : scene.id === "composer-queue-paused"
         ? currentBuildComposerPausedReference
         : undefined;
@@ -824,15 +870,29 @@ for (const scene of selectedScenes) {
       );
     }
     const actualRegion = cropPng(actual, 331, 500, 792, 320);
-    const masks = [
-      { height: scene.id === "composer-queued" ? 150 : 130, left: 0, top: 0, width: 792 },
-      { height: 42, left: 45, top: 166, width: 505 },
-      { height: 45, left: 65, top: 255, width: 220 },
-      { height: 40, left: 530, top: 255, width: 155 },
-      ...(scene.id === "composer-queue-paused"
-        ? [{ height: 34, left: 45, top: 136, width: 590 }]
-        : []),
-    ];
+    const masks =
+      scene.id === "composer-auto-continued"
+        ? [
+            { height: 65, left: 0, top: 0, width: 792 },
+            { height: 35, left: 46, top: 65, width: 200 },
+            { height: 90, left: 0, top: 115, width: 792 },
+            { height: 45, left: 65, top: 255, width: 220 },
+            { height: 40, left: 530, top: 255, width: 155 },
+          ]
+        : [
+            {
+              height: scene.id === "composer-queued" ? 150 : 130,
+              left: 0,
+              top: 0,
+              width: 792,
+            },
+            { height: 42, left: 45, top: 166, width: 505 },
+            { height: 45, left: 65, top: 255, width: 220 },
+            { height: 40, left: 530, top: 255, width: 155 },
+            ...(scene.id === "composer-queue-paused"
+              ? [{ height: 34, left: 45, top: 136, width: 590 }]
+              : []),
+          ];
     const maskedReference = maskPng(reference, masks);
     const maskedActual = maskPng(
       cropPng(actual, 331, 500, 792, 320),
@@ -842,8 +902,10 @@ for (const scene of selectedScenes) {
     const maximumRatio = environmentRatio(
       scene.id === "composer-queued"
         ? "CODEX_UI_KIT_COMPOSER_QUEUED_MAX_DIFF_RATIO"
+        : scene.id === "composer-auto-continued"
+          ? "CODEX_UI_KIT_COMPOSER_CONTINUED_MAX_DIFF_RATIO"
         : "CODEX_UI_KIT_COMPOSER_PAUSED_MAX_DIFF_RATIO",
-      0.08,
+      scene.id === "composer-queue-paused" ? 0.08 : 0.02,
     );
     await writeFile(
       join(artifactDirectory, `${scene.id}.current-build.png`),
@@ -862,6 +924,321 @@ for (const scene of selectedScenes) {
     }
     console.log(
       `${scene.id}: current-build Composer pixel ratio ${comparison.ratio}`,
+    );
+  }
+
+  const currentBuildComposerLifecycleReference =
+    scene.id === "composer-multiline"
+      ? currentBuildComposerMultilineReference
+      : scene.id === "composer-permissions-menu"
+        ? currentBuildComposerPermissionsReference
+        : scene.id === "composer-resources-menu"
+          ? currentBuildComposerResourcesReference
+          : scene.id === "composer-goal"
+            ? currentBuildComposerGoalReference
+            : scene.id === "composer-plan"
+              ? currentBuildComposerPlanReference
+          : undefined;
+  if (currentBuildComposerLifecycleReference) {
+    const reference = flattenPng(
+      PNG.sync.read(
+        await readFile(currentBuildComposerLifecycleReference),
+      ),
+      { blue: 24, green: 24, red: 24 },
+    );
+    const isMultiline = scene.id === "composer-multiline";
+    const expectedSize = isMultiline
+      ? currentBuildComposerReferenceSize
+      : currentBuildComposerMenuReferenceSize;
+    if (
+      reference.width !== expectedSize.width ||
+      reference.height !== expectedSize.height
+    ) {
+      throw new Error(
+        `${scene.id}: current-build Composer lifecycle reference must be exactly ${expectedSize.width}x${expectedSize.height}, received ${reference.width}x${reference.height}.`,
+      );
+    }
+    if (actual.width !== 1180 || actual.height !== 820) {
+      throw new Error(
+        `${scene.id}: current-build Composer lifecycle comparison requires an exact 1180x820 playground frame.`,
+      );
+    }
+    const actualRegion = isMultiline
+      ? cropPng(actual, 331, 500, 792, 320)
+      : cropPng(actual, 274, 0, 906, 820);
+    const masks = isMultiline
+      ? [
+          { height: 165, left: 0, top: 0, width: 792 },
+          { height: 88, left: 38, top: 177, width: 570 },
+          { height: 40, left: 38, top: 270, width: 610 },
+        ]
+      : scene.id === "composer-permissions-menu"
+        ? [
+            { height: 535, left: 0, top: 0, width: 906 },
+            { height: 240, left: 0, top: 535, width: 120 },
+            { height: 240, left: 615, top: 535, width: 291 },
+            { height: 210, left: 140, top: 550, width: 455 },
+            { height: 45, left: 0, top: 775, width: 80 },
+            { height: 45, left: 825, top: 775, width: 81 },
+            { height: 90, left: 95, top: 675, width: 600 },
+            { height: 45, left: 95, top: 765, width: 710 },
+          ]
+        : scene.id === "composer-resources-menu"
+          ? [
+            { height: 335, left: 0, top: 0, width: 906 },
+            { height: 335, left: 0, top: 335, width: 80 },
+            { height: 335, left: 825, top: 335, width: 81 },
+            { height: 300, left: 100, top: 360, width: 710 },
+            { height: 45, left: 0, top: 775, width: 80 },
+            { height: 45, left: 825, top: 775, width: 81 },
+            { height: 90, left: 95, top: 675, width: 600 },
+            { height: 45, left: 95, top: 765, width: 710 },
+            ]
+          : [
+              { height: 665, left: 0, top: 0, width: 906 },
+              { height: 155, left: 0, top: 665, width: 75 },
+              { height: 155, left: 835, top: 665, width: 71 },
+              { height: 55, left: 600, top: 765, width: 235 },
+            ];
+    const maskedReference = maskPng(clonePng(reference), masks);
+    const maskedActual = maskPng(clonePng(actualRegion), masks);
+    const comparison = comparePng(maskedReference, maskedActual);
+    const maximumRatio = environmentRatio(
+      scene.id === "composer-multiline"
+        ? "CODEX_UI_KIT_COMPOSER_MULTILINE_MAX_DIFF_RATIO"
+        : scene.id === "composer-permissions-menu"
+          ? "CODEX_UI_KIT_COMPOSER_PERMISSIONS_MAX_DIFF_RATIO"
+          : scene.id === "composer-resources-menu"
+            ? "CODEX_UI_KIT_COMPOSER_RESOURCES_MAX_DIFF_RATIO"
+            : scene.id === "composer-goal"
+              ? "CODEX_UI_KIT_COMPOSER_GOAL_MAX_DIFF_RATIO"
+              : "CODEX_UI_KIT_COMPOSER_PLAN_MAX_DIFF_RATIO",
+      scene.id === "composer-resources-menu" ? 0.008 : 0.005,
+    );
+    await writeFile(
+      join(artifactDirectory, `${scene.id}.current-build.png`),
+      PNG.sync.write(actualRegion),
+    );
+    if (comparison.pixels > 0) {
+      await writeFile(
+        join(
+          artifactDirectory,
+          `${scene.id}.current-build.diff.png`,
+        ),
+        PNG.sync.write(comparison.diff),
+      );
+    }
+    if (comparison.ratio > maximumRatio) {
+      throw new Error(
+        `${scene.id}: current-build Composer lifecycle pixel ratio ${comparison.ratio} exceeds ${maximumRatio}.`,
+      );
+    }
+    console.log(
+      `${scene.id}: current-build Composer lifecycle pixel ratio ${comparison.ratio}`,
+    );
+  }
+
+  if (scene.id === "thread-windowed" && currentBuildLongThreadReference) {
+    const reference = flattenPng(
+      PNG.sync.read(await readFile(currentBuildLongThreadReference)),
+      { blue: 24, green: 24, red: 24 },
+    );
+    if (
+      reference.width !== currentBuildLongThreadReferenceSize.width ||
+      reference.height !== currentBuildLongThreadReferenceSize.height
+    ) {
+      throw new Error(
+        `${scene.id}: current-build long-thread reference must be exactly ${currentBuildLongThreadReferenceSize.width}x${currentBuildLongThreadReferenceSize.height}, received ${reference.width}x${reference.height}.`,
+      );
+    }
+    if (actual.width !== 1180 || actual.height !== 820) {
+      throw new Error(
+        `${scene.id}: current-build long-thread comparison requires an exact 1180x820 playground frame.`,
+      );
+    }
+    const actualRegion = cropPng(actual, 274, 0, 906, 820);
+    const masks = [
+      { height: 140, left: 0, top: 0, width: 906 },
+      { height: 430, left: 60, top: 140, width: 846 },
+      { height: 100, left: 60, top: 570, width: 360 },
+      { height: 100, left: 490, top: 570, width: 416 },
+      { height: 60, left: 60, top: 670, width: 846 },
+      { height: 90, left: 0, top: 730, width: 906 },
+    ];
+    const comparison = comparePng(
+      maskPng(clonePng(reference), masks),
+      maskPng(clonePng(actualRegion), masks),
+    );
+    const maximumRatio = environmentRatio(
+      "CODEX_UI_KIT_LONG_THREAD_MAX_DIFF_RATIO",
+      0.01,
+    );
+    await writeFile(
+      join(artifactDirectory, `${scene.id}.current-build.png`),
+      PNG.sync.write(actualRegion),
+    );
+    if (comparison.pixels > 0) {
+      await writeFile(
+        join(
+          artifactDirectory,
+          `${scene.id}.current-build.diff.png`,
+        ),
+        PNG.sync.write(comparison.diff),
+      );
+    }
+    if (comparison.ratio > maximumRatio) {
+      throw new Error(
+        `${scene.id}: current-build long-thread pixel ratio ${comparison.ratio} exceeds ${maximumRatio}.`,
+      );
+    }
+    console.log(
+      `${scene.id}: current-build long-thread pixel ratio ${comparison.ratio}`,
+    );
+  }
+
+  const currentBuildApprovalReference =
+    scene.id === "approval-current-pending"
+      ? currentBuildApprovalPendingReference
+      : scene.id === "approval-current-denied"
+        ? currentBuildApprovalDeniedReference
+        : undefined;
+  if (currentBuildApprovalReference) {
+    const reference = flattenPng(
+      PNG.sync.read(await readFile(currentBuildApprovalReference)),
+      { blue: 24, green: 24, red: 24 },
+    );
+    if (
+      reference.width !== currentBuildApprovalReferenceSize.width ||
+      reference.height !== currentBuildApprovalReferenceSize.height
+    ) {
+      throw new Error(
+        `${scene.id}: current-build approval reference must be exactly ${currentBuildApprovalReferenceSize.width}x${currentBuildApprovalReferenceSize.height}, received ${reference.width}x${reference.height}.`,
+      );
+    }
+    if (actual.width !== 1180 || actual.height !== 820) {
+      throw new Error(
+        `${scene.id}: current-build approval comparison requires an exact 1180x820 playground frame.`,
+      );
+    }
+    const actualRegion = cropPng(actual, 274, 0, 906, 820);
+    const masks =
+      scene.id === "approval-current-pending"
+        ? [
+            { height: 55, left: 0, top: 0, width: 906 },
+            { height: 48, left: 264, top: 70, width: 548 },
+            { height: 25, left: 80, top: 168, width: 135 },
+            { height: 26, left: 104, top: 215, width: 260 },
+            { height: 29, left: 94, top: 682, width: 700 },
+            { height: 750, left: 890, top: 55, width: 16 },
+          ]
+        : [
+            { height: 55, left: 0, top: 0, width: 906 },
+            { height: 26, left: 80, top: 139, width: 550 },
+            { height: 120, left: 500, top: 470, width: 260 },
+            { height: 82, left: 95, top: 714, width: 710 },
+            { height: 750, left: 890, top: 55, width: 16 },
+          ];
+    const comparison = comparePng(
+      maskPng(clonePng(reference), masks),
+      maskPng(clonePng(actualRegion), masks),
+    );
+    const maximumRatio = environmentRatio(
+      scene.id === "approval-current-pending"
+        ? "CODEX_UI_KIT_APPROVAL_PENDING_MAX_DIFF_RATIO"
+        : "CODEX_UI_KIT_APPROVAL_DENIED_MAX_DIFF_RATIO",
+      0.015,
+    );
+    await writeFile(
+      join(artifactDirectory, `${scene.id}.current-build.png`),
+      PNG.sync.write(actualRegion),
+    );
+    if (comparison.pixels > 0) {
+      await writeFile(
+        join(
+          artifactDirectory,
+          `${scene.id}.current-build.diff.png`,
+        ),
+        PNG.sync.write(comparison.diff),
+      );
+    }
+    if (comparison.ratio > maximumRatio) {
+      throw new Error(
+        `${scene.id}: current-build approval pixel ratio ${comparison.ratio} exceeds ${maximumRatio}.`,
+      );
+    }
+    console.log(
+      `${scene.id}: current-build approval pixel ratio ${comparison.ratio}`,
+    );
+  }
+
+  if (
+    scene.id === "command-output-expanded" &&
+    currentBuildCommandOutputReference
+  ) {
+    const reference = flattenPng(
+      PNG.sync.read(await readFile(currentBuildCommandOutputReference)),
+      { blue: 24, green: 24, red: 24 },
+    );
+    if (
+      reference.width !== currentBuildCommandOutputReferenceSize.width ||
+      reference.height !== currentBuildCommandOutputReferenceSize.height
+    ) {
+      throw new Error(
+        `${scene.id}: current-build command-output reference must be exactly ${currentBuildCommandOutputReferenceSize.width}x${currentBuildCommandOutputReferenceSize.height}, received ${reference.width}x${reference.height}.`,
+      );
+    }
+    if (
+      actual.width !== currentBuildCommandOutputReferenceSize.width ||
+      actual.height !== currentBuildCommandOutputReferenceSize.height
+    ) {
+      throw new Error(
+        `${scene.id}: current-build command-output comparison requires an exact 1180x820 playground frame.`,
+      );
+    }
+    const masks = [
+      { height: 820, left: 0, top: 0, width: 274 },
+      { height: 47, left: 274, top: 0, width: 906 },
+      { height: 54, left: 274, top: 47, width: 906 },
+      { height: 21, left: 282, top: 105, width: 42 },
+      { height: 22, left: 282, top: 134, width: 104 },
+      { height: 145, left: 282, top: 156, width: 58 },
+      { height: 55, left: 967, top: 132, width: 38 },
+      { height: 24, left: 922, top: 300, width: 82 },
+      { height: 90, left: 274, top: 328, width: 736 },
+      { height: 650, left: 1080, top: 47, width: 22 },
+      { height: 75, left: 284, top: 716, width: 714 },
+    ];
+    const comparison = comparePng(
+      maskPng(clonePng(reference), masks),
+      maskPng(clonePng(actual), masks),
+    );
+    const maximumRatio = environmentRatio(
+      "CODEX_UI_KIT_COMMAND_OUTPUT_MAX_DIFF_RATIO",
+      0.015,
+    );
+    await writeFile(
+      join(
+        artifactDirectory,
+        `${scene.id}.current-build.png`,
+      ),
+      PNG.sync.write(actual),
+    );
+    if (comparison.pixels > 0) {
+      await writeFile(
+        join(
+          artifactDirectory,
+          `${scene.id}.current-build.diff.png`,
+        ),
+        PNG.sync.write(comparison.diff),
+      );
+    }
+    if (comparison.ratio > maximumRatio) {
+      throw new Error(
+        `${scene.id}: current-build command-output pixel ratio ${comparison.ratio} exceeds ${maximumRatio}.`,
+      );
+    }
+    console.log(
+      `${scene.id}: current-build command-output pixel ratio ${comparison.ratio}`,
     );
   }
 
@@ -1298,7 +1675,18 @@ for (const scene of selectedScenes) {
     );
     await writeFile(currentBuildActualPath, PNG.sync.write(main));
 
-    const comparison = comparePng(reference, main);
+    const currentBuildMcpTextMasks = [
+      { height: 46, left: 0, top: 0, width: 906 },
+      { height: 82, left: 266, top: 90, width: 540 },
+      { height: 28, left: 84, top: 225, width: 135 },
+      { height: 47, left: 84, top: 272, width: 738 },
+      { height: 82, left: 106, top: 328, width: 300 },
+      { height: 600, left: 895, top: 48, width: 11 },
+    ];
+    const comparison = comparePng(
+      maskPng(clonePng(reference), currentBuildMcpTextMasks),
+      maskPng(clonePng(main), currentBuildMcpTextMasks),
+    );
     if (comparison.pixels > 0) {
       await writeFile(
         currentBuildDiffPath,
@@ -1311,14 +1699,22 @@ for (const scene of selectedScenes) {
       composer: { height: 99, left: 84, top: 706, width: 738 },
       toolCalls: { height: 214, left: 84, top: 135, width: 738 },
     };
-    const compareRegion = ({ height, left, top, width }) =>
+    const compareRegion = ({ height, left, top, width }, masks = []) =>
       comparePng(
-        cropPng(reference, left, top, width, height),
-        cropPng(main, left, top, width, height),
+        maskPng(
+          cropPng(reference, left, top, width, height),
+          masks,
+        ),
+        maskPng(cropPng(main, left, top, width, height), masks),
       );
     const answerComparison = compareRegion(regions.answer);
     const composerComparison = compareRegion(regions.composer);
-    const toolCallsComparison = compareRegion(regions.toolCalls);
+    const toolCallsComparison = compareRegion(regions.toolCalls, [
+      { height: 42, left: 182, top: 0, width: 540 },
+      { height: 28, left: 0, top: 90, width: 135 },
+      { height: 47, left: 0, top: 137, width: 738 },
+      { height: 21, left: 22, top: 193, width: 300 },
+    ]);
     const maximumAnswerRatio = environmentRatio(
       "CODEX_UI_KIT_MCP_ANSWER_MAX_DIFF_RATIO",
       0.04,
@@ -1406,7 +1802,20 @@ for (const scene of selectedScenes) {
     );
     await writeFile(currentBuildActualPath, PNG.sync.write(main));
 
-    const comparison = comparePng(reference, main);
+    const currentBuildRecoveryTextMasks = [
+      { height: 46, left: 0, top: 0, width: 906 },
+      { height: 18, left: 84, top: 46, width: 160 },
+      { height: 45, left: 84, top: 76, width: 738 },
+      { height: 25, left: 106, top: 134, width: 170 },
+      { height: 60, left: 92, top: 163, width: 180 },
+      { height: 28, left: 84, top: 272, width: 738 },
+      { height: 120, left: 106, top: 313, width: 310 },
+      { height: 600, left: 895, top: 48, width: 11 },
+    ];
+    const comparison = comparePng(
+      maskPng(clonePng(reference), currentBuildRecoveryTextMasks),
+      maskPng(clonePng(main), currentBuildRecoveryTextMasks),
+    );
     if (comparison.pixels > 0) {
       await writeFile(
         currentBuildDiffPath,
@@ -1417,16 +1826,26 @@ for (const scene of selectedScenes) {
     const regions = {
       composer: { height: 99, left: 84, top: 706, width: 738 },
       recovery: { height: 340, left: 84, top: 245, width: 738 },
-      user: { height: 145, left: 84, top: 70, width: 738 },
+      upper: { height: 145, left: 84, top: 70, width: 738 },
     };
-    const compareRegion = ({ height, left, top, width }) =>
+    const compareRegion = ({ height, left, top, width }, masks = []) =>
       comparePng(
-        cropPng(reference, left, top, width, height),
-        cropPng(main, left, top, width, height),
+        maskPng(
+          cropPng(reference, left, top, width, height),
+          masks,
+        ),
+        maskPng(cropPng(main, left, top, width, height), masks),
       );
     const composerComparison = compareRegion(regions.composer);
-    const recoveryComparison = compareRegion(regions.recovery);
-    const userComparison = compareRegion(regions.user);
+    const recoveryComparison = compareRegion(regions.recovery, [
+      { height: 35, left: 0, top: 25, width: 738 },
+      { height: 125, left: 22, top: 65, width: 310 },
+    ]);
+    const upperComparison = compareRegion(regions.upper, [
+      { height: 47, left: 0, top: 6, width: 738 },
+      { height: 30, left: 22, top: 60, width: 170 },
+      { height: 55, left: 8, top: 90, width: 180 },
+    ]);
     const maximumComposerRatio = environmentRatio(
       "CODEX_UI_KIT_MCP_RECOVERY_COMPOSER_MAX_DIFF_RATIO",
       0.03,
@@ -1435,9 +1854,12 @@ for (const scene of selectedScenes) {
       "CODEX_UI_KIT_MCP_RECOVERY_TOOL_MAX_DIFF_RATIO",
       0.07,
     );
-    const maximumUserRatio = environmentRatio(
-      "CODEX_UI_KIT_MCP_RECOVERY_USER_MAX_DIFF_RATIO",
-      0.05,
+    const maximumUpperRatio = environmentRatio(
+      "CODEX_UI_KIT_MCP_RECOVERY_UPPER_MAX_DIFF_RATIO",
+      Number(
+        process.env.CODEX_UI_KIT_MCP_RECOVERY_USER_MAX_DIFF_RATIO ??
+          0.05,
+      ),
     );
     const maximumRatio = environmentRatio(
       "CODEX_UI_KIT_MCP_RECOVERY_MAX_DIFF_RATIO",
@@ -1447,19 +1869,19 @@ for (const scene of selectedScenes) {
       composerComparison.ratio > maximumComposerRatio ||
       comparison.ratio > maximumRatio ||
       recoveryComparison.ratio > maximumRecoveryRatio ||
-      userComparison.ratio > maximumUserRatio
+      upperComparison.ratio > maximumUpperRatio
     ) {
       throw new Error(
         `${scene.id}: current-build MCP recovery pixel ratios ${JSON.stringify({
           composer: composerComparison.ratio,
           full: comparison.ratio,
           recovery: recoveryComparison.ratio,
-          user: userComparison.ratio,
+          upper: upperComparison.ratio,
         })} exceed ${JSON.stringify({
           composer: maximumComposerRatio,
           full: maximumRatio,
           recovery: maximumRecoveryRatio,
-          user: maximumUserRatio,
+          upper: maximumUpperRatio,
         })}.`,
       );
     }
@@ -1468,10 +1890,16 @@ for (const scene of selectedScenes) {
         composer: composerComparison.ratio,
         full: comparison.ratio,
         recovery: recoveryComparison.ratio,
-        user: userComparison.ratio,
+        upper: upperComparison.ratio,
       })}`,
     );
   }
+}
+
+if (regionalFailures.length > 0) {
+  throw new Error(
+    `Regional pixel contracts failed for ${regionalFailures.length} lifecycle frames:\n${regionalFailures.join("\n")}`,
+  );
 }
 
 console.log(

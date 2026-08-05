@@ -48,11 +48,29 @@ describe("composer visual contract", () => {
       ".codex-ui-composer-dock__surface",
     );
     expect(styles).toMatch(
+      /\.codex-ui-composer-permission-menu \{[\s\S]*?padding: 0\.25rem;[\s\S]*?width: min\(30\.0234375rem,/,
+    );
+    expect(styles).toMatch(
+      /\.codex-ui-composer-resource-picker \{[\s\S]*?height: 20rem;[\s\S]*?padding: 0\.25rem;[\s\S]*?width: 100%;/,
+    );
+    expect(styles).toMatch(
+      /\.codex-ui-composer-mode \{[\s\S]*?border-radius: 9999px;[\s\S]*?height: var\(--codex-ui-size-button-composer\);[\s\S]*?padding: 0 0\.5rem;/,
+    );
+    expect(styles).toMatch(
+      /\.codex-ui-composer-mode__icon svg \{[\s\S]*?height: 1rem;[\s\S]*?stroke-width: 1\.2;[\s\S]*?width: 1rem;/,
+    );
+    expect(styles).toMatch(
+      /\.codex-ui-composer__suggestions:has\([\s\S]*?> \.codex-ui-composer-resource-picker[\s\S]*?\) \{[\s\S]*?bottom: calc\(100% \+ 0\.25rem\);/,
+    );
+    expect(styles).toMatch(
       /\.codex-ui-conversation-thread-shell__composer[\s\S]*?> \.codex-ui-composer-dock[\s\S]*?> \.codex-ui-composer-dock__surface[\s\S]*?> \.codex-ui-composer \{[\s\S]*?--codex-ui-composer-background: var\([\s\S]*?--codex-ui-conversation-thread-composer-background/,
     );
   });
 
-  it("keeps queue actions discoverable from hover and keyboard focus", () => {
+  it("keeps current queue actions persistently visible and keyboard reachable", () => {
+    expect(styles).toMatch(
+      /\.codex-ui-composer-queue__send-now,[\s\S]*?\.codex-ui-composer-queue__more \{[\s\S]*?opacity: 1;/,
+    );
     expect(styles).toContain(
       ".codex-ui-composer-queue__row:focus-within .codex-ui-composer-queue__send-now",
     );

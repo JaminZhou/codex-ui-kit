@@ -10,6 +10,8 @@ import {
   ComposerDock,
   ComposerMentionMenu,
   ComposerModeIndicator,
+  ComposerPermissionMenu,
+  ComposerResourcePicker,
   QueuedPromptList,
 } from "../src";
 import { SurfaceBlockedContext } from "../src/internal/surfaceBlocked";
@@ -145,6 +147,108 @@ describe("composer auxiliary surfaces", () => {
     expect(onDismiss).toHaveBeenCalledTimes(1);
   });
 
+  it("models current permission choices as a single-select menu", () => {
+    const onSelect = vi.fn();
+    render(
+      <ComposerPermissionMenu
+        heading="How should ChatGPT actions be approved?"
+        learnMore="Learn more"
+        onSelect={onSelect}
+        options={[
+          {
+            description: "Always ask before external actions",
+            id: "ask",
+            label: "Ask for approval",
+          },
+          {
+            description: "Use permissions defined in config.toml",
+            id: "custom",
+            label: "Custom (config.toml)",
+          },
+        ]}
+        selectedId="ask"
+        trigger={<button type="button">Ask for approval</button>}
+        width="trigger"
+      />,
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "Ask for approval" }));
+    expect(screen.getByRole("menu").dataset.width).toBe("trigger");
+    expect(
+      screen.getByText("How should ChatGPT actions be approved?"),
+    ).not.toBeNull();
+    expect(screen.getByText("Learn more")).not.toBeNull();
+    const selected = screen.getByRole("menuitemradio", {
+      name: /Ask for approval/,
+    });
+    expect(selected.getAttribute("aria-checked")).toBe("true");
+    fireEvent.click(
+      screen.getByRole("menuitemradio", { name: /Custom \(config.toml\)/ }),
+    );
+    expect(onSelect).toHaveBeenCalledWith(
+      expect.objectContaining({ id: "custom" }),
+    );
+    expect(screen.queryByRole("menu")).toBeNull();
+  });
+
+  it("navigates the current grouped Composer resource picker", () => {
+    const onSelect = vi.fn();
+    const onDismiss = vi.fn();
+    render(
+      <ComposerResourcePicker
+        groups={[
+          {
+            id: "add",
+            options: [
+              {
+                description: "Choose project for new chats",
+                id: "project",
+                label: "Work in a project",
+              },
+              {
+                description: "Set a goal to keep pursuing",
+                id: "goal",
+                label: "Goal",
+              },
+            ],
+          },
+          {
+            id: "plugins",
+            label: "Plugins",
+            options: [
+              {
+                id: "documents",
+                label: "Documents",
+              },
+            ],
+          },
+        ]}
+        onDismiss={onDismiss}
+        onSelect={onSelect}
+      />,
+    );
+
+    const picker = screen.getByRole("listbox", {
+      name: "Composer resources",
+    });
+    expect(screen.getByText("Add")).not.toBeNull();
+    expect(screen.getByText("Plugins")).not.toBeNull();
+    expect(
+      screen
+        .getByRole("option", { name: /Work in a project/ })
+        .getAttribute("aria-selected"),
+    ).toBe("true");
+    fireEvent.keyDown(picker, { key: "End" });
+    const last = screen.getByRole("option", { name: "Documents" });
+    expect(last.getAttribute("aria-selected")).toBe("true");
+    fireEvent.keyDown(picker, { key: "Enter" });
+    expect(onSelect).toHaveBeenCalledWith(
+      expect.objectContaining({ id: "documents" }),
+    );
+    fireEvent.keyDown(picker, { key: "Escape" });
+    expect(onDismiss).toHaveBeenCalledTimes(1);
+  });
+
   it("exposes loading and empty mention states", () => {
     const onSelect = vi.fn();
     const { rerender } = render(
@@ -179,7 +283,7 @@ describe("composer auxiliary surfaces", () => {
 
   it("clears an active composer mode without exposing product state", () => {
     const onClear = vi.fn();
-    render(
+    const { container, rerender } = render(
       <ComposerModeIndicator
         clearLabel="Clear plan mode"
         kind="plan"
@@ -190,6 +294,25 @@ describe("composer auxiliary surfaces", () => {
 
     fireEvent.click(screen.getByRole("button", { name: "Clear plan mode" }));
     expect(onClear).toHaveBeenCalledTimes(1);
+    expect(
+      container.querySelector(
+        '.codex-ui-composer-mode[data-kind="plan"] svg',
+      ),
+    ).not.toBeNull();
+
+    rerender(
+      <ComposerModeIndicator
+        clearLabel="Clear goal"
+        kind="goal"
+        label="Goal"
+        onClear={onClear}
+      />,
+    );
+    expect(
+      container.querySelector(
+        '.codex-ui-composer-mode[data-kind="goal"] svg',
+      ),
+    ).not.toBeNull();
   });
 
   it("covers interrupted, paused, queued, and editing prompt actions", () => {
@@ -237,11 +360,11 @@ describe("composer auxiliary surfaces", () => {
     expect(onSendNow).toHaveBeenCalledWith("b");
 
     fireEvent.click(
-      screen.getAllByRole("button", { name: "Delete queued prompt" })[0]!,
+      screen.getAllByRole("button", { name: "Delete queued message" })[0]!,
     );
     expect(onDelete).toHaveBeenCalledWith("a");
     const firstActions = screen.getAllByRole("button", {
-      name: "Queued prompt actions",
+      name: "Queued message actions",
     })[0]!;
     fireEvent.click(firstActions);
     const actionMenu = screen.getByRole("menu");
@@ -291,7 +414,7 @@ describe("composer auxiliary surfaces", () => {
       />,
     );
     const trigger = screen.getByRole("button", {
-      name: "Queued prompt actions",
+      name: "Queued message actions",
     });
     fireEvent.click(trigger);
     expect(screen.getByRole("menu")).not.toBeNull();
@@ -330,7 +453,7 @@ describe("composer auxiliary surfaces", () => {
     );
 
     fireEvent.click(
-      screen.getByRole("button", { name: "Queued prompt actions" }),
+      screen.getByRole("button", { name: "Queued message actions" }),
     );
     expect(screen.queryByRole("menu")).toBeNull();
     expect(onEdit).not.toHaveBeenCalled();

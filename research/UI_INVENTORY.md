@@ -45,31 +45,27 @@ observation from a previous build remains historical evidence.
 
 ## Current baseline
 
-- Codex Desktop `26.721.81911` (`5973`)
-- Package sampled on 2026-07-29 and reverified on 2026-07-30
+- Codex Desktop `26.730.61309` (`6223`)
+- Package sampled and reverified on 2026-08-05
 - `app.asar` SHA-256:
-  `3c9a101d9beec3718b0fcfc19e427c644a934045f48b3fe0e16b68b0b3f23e61`
+  `9de942a9a058fca20b78d171032e0fe65ccb1063868f175ff7eb4e159efc2c38`
 - Computer Use automation: blocked by the environment safety policy for
   `com.openai.codex`
 - Scoped CDP automation: available through a user-authorized second process;
   the Chromium profile is separate, but Codex application data and navigation
   are not fully isolated
-- Fresh current-build Renderer capture: recorded for the dark 1180×820 main
-  application target, the six left-sidebar groups, 46px window navigation,
-  Pull requests loading/selection continuity, and a real OpenAI Developer Docs
-  failed-Fetch → Search → successful-Fetch recovery, plus real
-  Composer submit/Stop, queue/pause/Resume, permissions, add-menu states, and
-  the new-chat workspace entry plus project picker, and the bottom Terminal's
-  three-tab, per-tab close, picker, and compact states;
-  light-theme, global notifications, current-build long-thread
-  virtualization, and unrelated surface evidence remain pending
+- Fresh current-build Renderer capture: one dark 1180×820 disposable task
+  verifies successful 400-line command output, the collapsed/expanded Shell
+  surface, 144px reverse-tail viewport, copy controls, Success state, and
+  latest-line restoration. All other `26.727.40816` observations are now
+  previous-build evidence until separately reached on `26.730.61309`.
 
-Current inventory: 75 surface groups; 21 have current-build runtime evidence,
-35 have previous-build-only runtime evidence, 19 remain `not_sampled`, and 0
-are `blocked_by_policy`. Current-build Browser verification covers 18 groups
-and Electron verification covers 18. Prior acceptance outside the sampled
-shell, sidebar, recovered MCP, and Composer lifecycle slices remains recorded
-as `partial_legacy` until current-build re-observation.
+Current inventory: 77 surface groups; 1 has current-build runtime evidence,
+57 have previous-build-only runtime evidence, 19 remain `not_sampled`, and 0
+are `blocked_by_policy`. Current-build Browser verification covers 1 group
+and Electron verification covers 1. Prior acceptance outside the sampled
+long-command slice remains recorded as `partial_legacy` until current-build
+re-observation.
 
 The current package exposes candidates far beyond the old transcript sample:
 application and thread shells, local/remote conversation routes, projects and
@@ -87,7 +83,7 @@ track, and one public PR's Summary, Timeline, and Code views. The broader
 queue, Sources, Sites, Scheduled tasks, Plugins, Skills,
 and Settings samples were recorded on `26.715.72359`. Those entries remain
 `runtime_observed` with build-scoped evidence, but none satisfy the
-`26.721.81911` verification gate until reached again. The seed list is not an
+`26.727.40816` verification gate until reached again. The seed list is not an
 exhaustive denominator: newly observed routes, variants, and cross-layer
 transitions must add or split IDs.
 
@@ -135,15 +131,19 @@ finished visual work.
 The complete workstream order, sidebar acceptance matrix, exit gates, and
 planned PR sequence are defined in [`DELIVERY_PLAN.md`](DELIVERY_PLAN.md).
 
-## Current implementation slice
+## Build-scoped implementation history
 
 The implementation history below names the exact observed build. Acceptance
-that previously matched `26.721.41059` remains regression coverage, but every
-affected inventory row is now `partial_legacy` until it is re-observed on
-`26.721.81911`.
+that previously matched `26.721.81911` or earlier remains regression coverage,
+but every
+affected inventory row was `partial_legacy` until it was re-observed on
+`26.727.40816`. After the `26.730.61309` update, every row below is again
+`partial_legacy` except the explicitly refreshed long-command row. The
+machine-readable inventory is authoritative when historical prose describes
+a build as current at its capture time.
 
-The current sidebar slice re-observes all six application-sidebar groups on
-`26.721.81911`. It independently implements the 274px shell, 46px
+The previous sidebar slice re-observed all six application-sidebar groups on
+`26.727.40816`. It independently implements the 274px shell, 46px
 traffic-light-safe titlebar inset, 70px header, 30px rows, collapsible
 Projects/Pinned/Recents sections, dense thread status/action rows, and fixed
 46px account/settings footer. The normal H5 and Electron composition now uses
@@ -160,13 +160,11 @@ separate work.
 
 The application-shell continuity slice splits window navigation, route
 lifecycle feedback, route selection/restoration, and global notifications
-into independently owned inventory rows. Current-build CDP records the 46px
-chrome, 28px Sidebar/Back/Forward controls at x=88/120/152, Pull requests
-loading status, and selection continuity through the 1180, 961/960, 721/720,
-1920×1080, and 2560×1440 matrix plus a first-use dialog dismissal. The 960px
-transition auto-collapses and later restores the right panel; the 720px
-transition does the same for the sidebar. Hard Renderer reload returns to the
-default route and is not claimed as persistence.
+into independently owned inventory rows. `26.727.40816` CDP records the 46px
+chrome, Sidebar/Back/Forward controls, Pull requests loading status, and
+detail auto-hide/reopen through 1180, 960, 820, and 720px. The broader
+961/960, 721/720, 1920×1080, 2560×1440, first-use-dialog, and hard-reload
+results remain build-scoped evidence from `26.721.81911`.
 
 The public `AppWindowChrome`, `AppRouteOutlet`, and `AppNotificationRegion`
 contracts cover host-owned navigation, ready/loading/empty/error/offline/
@@ -175,8 +173,8 @@ passes the shared 36-frame matrix. Real Electron acceptance drives offline → r
 loading → ready → restored notification and the native 1180×820 → 720×680 →
 1180×820 responsive transition while preserving the selected route and
 restoring only auto-collapsed surfaces. Four deterministic App shell pixel
-frames pass, and the current-build 120×46 window-chrome comparison measures a
-3.93% changed-pixel ratio. Offline/error/reconnecting/stale and global
+frames pass. The 3.93% 120×46 window-chrome comparison is retained as a
+`26.721.81911` regression result. Offline/error/reconnecting/stale and global
 notification runtime evidence is still missing, so the implementation remains
 `partial`. Its independent Browser/Electron regression tests do not promote
 `cross-layer.global-notifications` to current-build parity.
@@ -220,16 +218,16 @@ remaining controls, checks grouping, search filtering, and repair-state
 disabling, selects a local environment, submits the real composer, and captures
 both wide and compact dialog screenshots.
 
-The current `conversation.context-controls`,
+The `26.727.40816` `conversation.context-controls`,
 `conversation.project-picker`, and
 `app.new-thread-workspace-selection` slices are Browser- and
-Electron-verified against `26.721.81911`. Their implementation remains
+Electron-verified against `26.727.40816`. Their implementation remains
 `partial` because the current probe does not establish Remote destination
 behavior, real project selection, creation workflows, or persistence. The
 broader project index, environment settings, and worktree settings families
-remain partial/legacy, as does the legacy host-defined route selector. Exact
-`26.721.81911` PR review-detail behavior remains `not_sampled`, so the generic
-review components do not establish product parity. The remaining P0
+remain partial/legacy, as does the legacy host-defined route selector. The
+current PR route is covered separately below; generic review components still
+do not establish mutating product behavior. The remaining P0
 conversation/workspace variants remain open. Global notification runtime
 observation and light-theme shell evidence also remain open. Final
 H5/Electron visual unification is intentionally deferred until coverage
@@ -262,50 +260,79 @@ omits only the workspace-owned Environment control from the thread-owned
 comparison; the remaining full raster and header/message/Composer regions
 stay independently bounded.
 
-The current conversation/Composer slice re-observes build `26.721.81911` in a
-disposable second process using synthetic prompts only. At 1180×820, the main
-region remains 906px wide and the Composer column is 736px. The current
-Composer uses a 712×44 empty/focused input inside a 736×98 card, grows to an
-80px input and 134px card for three/four lines, exposes a 28×28 Stop control
-while a real turn runs, clears the submitted value, and retains/restores input
-focus after completion or interruption.
+The previous full conversation/Composer probe observed build `26.721.81911`
+in a disposable second process using synthetic prompts only. It remains the
+historical source for attachment, active mode, and paused/Resume variants.
 
-A real running turn also accepted a queued follow-up. Its tray is inset 13px
-from the Composer card and exposes Steer, Delete queued prompt, and queued
-message actions. Stop retained the row while adding `Queue paused because you
-interrupted` and Resume; resuming restored the running state. The current
-permissions menu measured 454.38×224.5 and exposed Ask for approval, Approve
-for me, Full access, Custom (`config.toml`), and Learn more. The Add files and
-more menu exposed Goal, Plan mode, Record a skill, and Plugins. Opening that
-menu is current-build evidence; no upload was performed, so attachment
-transport remains P1-partial.
+The `26.727.40816` text-only probe re-observed the 736px Composer
+column, 712×44 textbox, 28×28 Stop button, and a real queued follow-up. The
+queue shell is inset 13px and measures 710×39px; its 708×38 scroll region
+contains a 684×28 row using 14/16px typography with Steer,
+Delete queued message, and queued message actions. Stop produced
+`You stopped after 2s`, removed the tray, promoted the queued prompt, and
+started the next turn automatically. The current product did not expose the
+old paused header or Resume action.
+
+A second exact `26.727.40816` Composer probe reached four-line and long-input
+states without submitting the draft. The four-line Composer measures 736×134
+at x=359/y=670 with a 712×80 textbox at x=371/y=684. Twenty lines clamp the
+textbox to the current 205px `25dvh` maximum and grow the surface to 736×259.
+The permission trigger measures 101.06×28 and opens the four current choices
+in a 480.36×222.44 menu: Ask for approval, Approve for me, Full access, and
+Custom (`config.toml`). `Add files and more` now opens a 736×320 inline,
+scrollable resource picker rather than the previous simple menu. Its visible
+top groups cover files/folders, active-app attachment, project, Goal, Plan
+mode, skill recording, and plugin resources. Lower installed entries are
+host-provided data and are not copied into the public fixture.
 
 The independent public contract adds `ComposerDock`,
-`ComposerContextBar`, and `ComposerContextControl`, keeps context, queue, and
-input ownership separate, and lets a running `AgentComposer` route Enter to a
-host-owned queue while Stop remains the primary control. The 46-event
+`ComposerContextBar`, `ComposerContextControl`, `ComposerPermissionMenu`, and
+`ComposerResourcePicker`, keeps context, queue, overlays, and input ownership
+separate, and lets a running `AgentComposer` route Enter to a host-owned queue
+while Stop remains the primary control. The 46-event
 conversation replay contains 11 turns and covers multiline, disabled,
 attachment, running, queued, queue-paused, completed, scroll-away,
-message-navigation, and windowed-history frames. CDP drives
-submit → running → queue → Stop → paused → Resume → delete, then message
-navigation and return-to-latest. Real Electron repeats the lifecycle in an
-1180×820 `BrowserWindow`; ten reviewed internal pixels guard its deterministic
-states.
+message-navigation, and windowed-history frames. Its default interaction now
+drives submit → running → queue → Stop → automatic queued continuation, then
+message navigation and return-to-latest. The old paused/Resume frame remains
+an explicit compatibility fixture rather than a current-product claim. Real
+Electron repeats the current lifecycle in an 1180×820 `BrowserWindow`.
 
-Optional 792×320 current-build references are accepted through
+Optional 792×320 `26.727.40816` references are accepted through
 `CODEX_UI_KIT_COMPOSER_QUEUED_REFERENCE` and
-`CODEX_UI_KIT_COMPOSER_PAUSED_REFERENCE`. At the strict 0.05 pixel threshold,
-the accepted ownership-masked changed-pixel ratios are `0.002722538` and
-`0.004478378`. This promotes `composer.shell`, `composer.queue`, and
-`thread.interruption-stop` to current-build Browser/Electron verification.
-The context row and project picker now have current-build Browser/Electron
-verification. Environment/worktree menus and permission modes remain partial
-because the current product's full menu lifecycle and persistence were not
-re-observed. Message navigation and windowing now have strong independent
-Browser/Electron regression coverage, but stay `partial_legacy` because the
-current build's exact long-thread virtualization algorithm was not re-observed.
+`CODEX_UI_KIT_COMPOSER_CONTINUED_REFERENCE`. At the strict 0.05 pixel
+threshold and 2% hard ratio limit, the accepted ownership-masked
+changed-pixel ratios are `0.003480114` and `0.005105745`. Queue and
+Stop/interruption were Browser/Electron verified on `26.727.40816` and are
+now `partial_legacy`.
+The four-line, permission, and Add-resource frames add two more reviewed
+Browser/CDP/pixel frames and real Electron interaction. Their strict
+ownership-masked changed-pixel ratios are `0.000994318`, `0.001280084`, and
+`0.003352986`, under hard 0.5%, 0.5%, and 0.8% limits respectively.
+Permissions, Add resources, and multiline growth were verified on
+`26.727.40816` and are now `partial_legacy`. A separate unsubmitted-draft
+probe verifies active Goal and Plan
+labels, prompts, 736×98 geometry, 28px clear controls, and focus restoration.
+Their 906×820 regional gates pass at `0.003763528` and `0.003486243`, so
+`composer.modes` was Browser/Electron verified on `26.727.40816` and is now
+`partial_legacy`. The native
+file-panel attachment lifecycle remains `partial_legacy`.
 
-Three more `26.721.41059` scenarios cover an expanded read-only command, a
+The `26.727.40816` long-thread probe re-observes an 82-message compact
+navigation
+rail, its 36×10px buttons and 26×2px selected marker, a seven-turn mounted
+window around message 40, reverse-origin scrolling, and the 32×32px
+return-to-latest control. The independent fixture keeps labels synthetic and
+the host responsible for choosing which turns stay mounted. Browser/CDP and
+real Electron jump to message 20, retain seven mounted turns, and return to
+message 82 at `scrollTop = 0`. Its ownership-masked 906×820 gate retains only
+the rail and floating control and passes at `0.005937382` under a 1% hard
+limit. `thread.virtualized-timeline` was Browser/Electron verified for this
+sampled `26.727.40816` contract and is now `partial_legacy`; unobserved window
+sizes
+and host eviction heuristics do not become product-level claims.
+
+Three `26.721.41059` scenarios cover an expanded read-only command, a
 pending command approval, and an applied file card with the Review panel open.
 The command and approval remain turn-owned. The file scenario explicitly
 splits its 666px conversation region from the independent 406px
@@ -316,8 +343,9 @@ The workflow fixture extends `FileChange` with a host-owned leading indicator
 slot and composes the existing `ActivityTimeline`, `CommandExecution`,
 `ApprovalRequest`, `ConversationThreadShell`, `WorkspacePanel`, and `FileDiff`
 primitives. Browser evidence and real `BrowserWindow` acceptance previously
-verified the sampled command and approval states against `26.721.41059`; their
-current inventory status is `partial_legacy`.
+verified the sampled command and approval states against `26.721.41059`. The
+command-approval denial path and long-output command contract are refreshed
+against `26.727.40816` below.
 
 The protocol-backed Codex App playground now exercises command execution, a
 real App Server approval request/response, the applied turn-owned file card,
@@ -360,7 +388,8 @@ rows, two diffs, two notices, their ordered kinds, focus, and split geometry;
 Electron repeats selection, close/reopen, sibling preservation, and Undo. A
 reviewed full-frame pixel baseline covers the integrated state.
 
-A separate `26.721.81911` disposable ignored-file probe observed the current
+A separate `26.721.81911` disposable ignored-file probe observed the
+then-current
 delete card, its 28px Undo/Review actions, a 370px Last Turn Review panel, and
 the deletion diff. A rename-only `apply_patch` run was rendered by the current
 product as separate `+0 −0` entries with `No content`, not a single
@@ -371,25 +400,41 @@ synthetic host-state coverage, so the broader Review family remains
 implementation-partial rather than being promoted to product-level
 completion.
 
-The Pull request detail slice adds a controlled, resizable workspace panel
-with a public `PullRequestPanelSummary`, an icon-capable PR list row, and
-Summary, Timeline, and Code tabs. CDP asserts the measured 352px index, 554px
-detail, 16px separator, 320px panel minimum, 352px retained main track, and
-expand/restore lifecycle. Electron drives pointer and keyboard resizing,
-tab changes, comment entry, and full-panel expansion in a real
-`BrowserWindow`. A fourteenth reviewed baseline covers the whole integration,
-while an optional 906×820 `26.721.41059` gate compares the index and detail
-regions separately. This previously verified `workspace.pull-request-route`
-and `workspace.pull-request-review` in Browser and Electron for the sampled
-public PR path; both are now `partial_legacy`. Merge execution, review
-submission, loading/failure states, and broader PR variants remain outside
-this slice.
+The refreshed Pull request lifecycle keeps the controlled, resizable workspace
+panel but follows the `26.727.40816` non-modal overlay geometry. The
+read-only public-PR probe measured a 369.28px detail panel over the 906px main
+route at 1180×820, a 321.97px panel at 960×720, about 319px at 820×680, and a
+329.31px panel at 720×680 after the sidebar collapsed. The 16px resize target
+sits on the panel edge; the underlying main route remains interactive. The
+detail auto-hides after the responsive transition and is restored by
+explicitly reopening the selected row.
+
+The public contract now includes `PullRequestQueryState`,
+`PullRequestMergeReadiness`, `PullRequestReviewComposer`, and
+`PullRequestCommentComposer` in addition to the PR list, details, summary,
+checks, reviewer, and thread surfaces. The deterministic state machine covers
+index/detail loading, failure and retry; running/failed/passed checks; comment
+failure/recovery; review submission; blocked/ready/merging/merged requirements;
+compact layout; and route restoration. Browser/CDP, real Electron, and
+reviewed pixels verify the resulting 61-frame matrix, so
+`workspace.pull-request-route` and `workspace.pull-request-review` are now
+independently Browser/Electron verified.
+
+The `26.727.40816` product evidence covers the two-tab Summary/Code structure,
+Timeline integrated below the Summary comment composer, successful multi-file
+Code content, the three-item display-options menu, Auto-merge, and responsive
+geometry. The independent visual comparison passes at 5.75% for the full
+906×820 main region, 4.68% for the index, and 6.44% for the detail without
+relaxing the existing thresholds. No real comment, review, auto-merge, or
+merge was submitted. The independent review composer is therefore exposed
+through a host-owned synthetic action rather than mislabeling the current
+display menu as review submission.
 
 The original Terminal slice established the bottom-panel interaction contract
 on `26.721.41059`: a 272px panel track, 152px minimum, half-height responsive
 maximum, 16px drag strip, 33px tab header, 239px content region, named
 tab/tabpanel, and `Terminal input`. The `26.721.81911` refresh now separately
-verifies the session-tab surface. Current-product CDP observed three
+verifies the session-tab surface. `26.721.81911` CDP observed three
 auto-numbered Terminal tabs, one close button named for each tab, nearest-tab
 selection after closing the active tab, a four-item Review/Terminal/Browser/
 Files picker, and all three tabs fitting at 820×680 without horizontal
@@ -410,8 +455,13 @@ per-session command values, closes to the nearest tab, creates a session from
 the picker, closes all sessions, restores the latest one, and reopens a failed
 process.
 
-This promotes `workspace.terminal` for the currently observed tab/input/
-compact contract. The independently implemented process list and
+The `26.727.40816` shell instead presented one project-named
+`codex-ui-kit` tab in the bounded read-only observation. The independent
+single-session model matches that label plus the close/add controls and passes
+the `26.727.40816` regional pixel gate at 1.79% for the panel and 0.73% for its
+content. `workspace.terminal` was Browser/Electron verified on that build and
+is now `partial_legacy`.
+The independently implemented process list and
 running/failed/exited replay are deliberately split into
 `workspace.terminal-process-lifecycle`: the installed build's real process
 lifecycle was not safely exercised in this refresh, so that row retains
@@ -443,33 +493,52 @@ records the completed answer, the `Worked for 54s` disclosure, the
 `Used OpenAI Developer Docs integration` group, and its three Search plus two
 Fetch calls.
 
-Build `26.721.81911` now adds a separate real recovery path. A disposable
-task deliberately calls `fetch_openai_doc` with `not-a-valid-url`, exposes the
-expanded neutral `plaintext / Invalid URL` output, retries with
-`search_openai_docs`, and finishes with a valid `fetch_openai_doc`. The
-current Renderer groups the three rows under `Worked for 28s` and
-`Used OpenAI Developer Docs integration`; an earlier failed call therefore
-does not make the recovered group itself failed. The independent replay tracks
-terminal-event order so overlapping calls cannot be misclassified from their
-start order.
+Build `26.727.40816` refreshes the primary successful path with one real
+Search followed by one real Fetch, a `Worked for 31s` disclosure, an
+intermediate assistant explanation inside the activity timeline, and a linked
+Markdown answer. The independent two-call replay matches the
+`26.727.40816` group order, 14/21px typography, system font, 445 weight, 0.6
+secondary color, and response layout. Its build-scoped 906×820 gate passes at
+2.03% full-main,
+0.05% tool-structure, 1.87% answer, and 1.92% Composer difference without
+changing the existing limits. Dynamic header/task/intermediate/group-label
+glyphs and the non-owning scrollbar are masked; the answer stays unmasked,
+and CDP separately gates the masked typography and disclosure properties.
+`thread.mcp-tool-events` was Browser/Electron verified on `26.727.40816` and
+is now `partial_legacy`.
+
+Build `26.721.81911` first established a separate real recovery path. Build
+`26.727.40816` now refreshes it with a disposable task that deliberately calls
+Fetch OpenAI doc with `not-a-valid-url`, exposes the expanded neutral
+`plaintext / Invalid URL` output, explains the retry, then performs three
+Search OpenAI docs calls and a successful Fetch OpenAI doc call. The current
+Renderer keeps the failed Fetch as a standalone activity row and groups the
+four recovery calls under `Worked for 51s` and
+`Used OpenAI Developer Docs integration`. The independent replay tracks that
+separation and terminal-event order so an earlier failed call cannot make the
+later recovered group itself failed.
 
 The public App Server traces use only schema-validated `mcpToolCall` start,
 progress, result, error, and completion fields. The new deterministic scenario
 continues into a second turn containing two commands, an accepted approval,
-one file change, and the Review panel. CDP gates 22 lifecycle frames and the
-real `BrowserWindow` acceptance expands the historical recovery group while
-the Review split remains open. The current-build 906×820 regional gate passed
-at the strict 0.05 pixel threshold with changed-pixel ratios of 0.029202337
-for the full main region, 0.051956799 for the recovery region, 0.047369405
-for the user region, and 0.015698995 for the Composer region.
+one file change, and the Review panel. CDP and real `BrowserWindow`
+acceptance cover the standalone failure, recovered four-call group,
+raw-output dialog, and mixed Review split within the 61-frame lifecycle
+matrix. The `26.727.40816` masked 906×820 regional gate passes at the strict
+0.05 pixel threshold with changed-pixel ratios of 0.016253432 for the full
+main region, 0.028989319 for the recovery region, 0.010849453 for the upper
+activity/failure region, and 0.019065999 for the Composer region. The final
+answer remains unmasked; CDP independently locks masked labels and computed
+styles.
 
-This promotes `thread.mcp-tool-events` and the newly split
-`thread.mcp-tool-failure-retry` gate for the sampled current-build path.
+This promoted `thread.mcp-tool-events` and the newly split
+`thread.mcp-tool-failure-retry` gate for the sampled `26.727.40816` path;
+both are now `partial_legacy`.
 Authentication, elicitation, MCP approvals, unavailable connectors, other
 integrations, cancellation, and thread-transport retry remain open.
 
-The long-thread continuity slice adds the `26.721.41059` default ten-message
-threshold and measured 36×10 rows to `ThreadMessageNavigationRail`, exposes
+The long-thread continuity slice adds the default ten-message threshold and
+measured 36×10 rows to `ThreadMessageNavigationRail`, exposes
 the rail and 32×32 latest-message control as overlay slots on
 `ConversationThreadShell`, and adds `ThreadInterruptionSummary` plus
 `ThreadContextEvent`. Five external references independently gate medium
@@ -478,13 +547,55 @@ context-completed states. Their full-image deltas are 1.8139%, 2.9354%,
 3.2975%, 3.6442%, and 3.4328%, with all named geometry and header/thread/
 Composer regional limits passing.
 
-The `26.721.41059` runtime evidence also records that the product's long-thread
-viewport uses reverse-origin scrolling (`scrollTop = 0` at latest, negative
-away from latest). The public package keeps the actual windowing and scroll
-algorithm host-owned. Browser and Electron acceptance exercise the
-placeholder, navigation, and follow contracts but not reverse scrolling or
-windowing, so the virtualization row remains `partial_legacy`. The
-interruption acceptance renders the observed summary statically rather than
+The `26.727.40816` refresh confirms that the product's long-thread viewport
+uses reverse-origin scrolling (`scrollTop = 0` at latest, negative away from
+latest) and samples 82 navigation items with seven nearby turns mounted. The
+public package keeps the actual eviction policy host-owned while exposing
+reverse-origin viewport and compact-rail contracts. Browser and Electron now
+exercise selection, reverse scrolling, the seven-turn window, and return to
+latest, so the virtualization row is verified for the sampled current
+contract.
+
+The `26.727.40816` command-approval slice uses a dedicated disposable task and
+requests only `open -a Calculator`. The 736×162 turn-owned pending surface
+appears at x=359/y=642 with `Terminal`, the command preview, `Deny`,
+`Allow once`, and a split `Approval options` menu. Selecting `Deny` removes
+the card, completes the activity as `Worked for 23s`, restores the 736×98
+Composer with `Ask for approval`, and produces a final response while the
+command retains empty output, no exit code, and no Calculator process.
+
+The independent protocol trace records the request/decline/resolution order
+without executing the command. CDP now covers 66 frames and locks the card,
+activity, command, Composer, and permission geometry; Electron drives
+options-menu Escape/focus restoration and denial. Ownership-masked 906×820
+build-scoped comparisons pass at `0.008493512` pending and `0.001214128`
+denied under separate 1.5% hard limits. This promoted
+`thread.approval-permission-events` for the sampled `26.727.40816` denial
+contract; the row is now `partial_legacy`.
+Allow-once completion, persistent approval, timeout, repeated denial, and
+non-command approval kinds remain open.
+
+The current long-command slice uses a separate disposable task on
+`26.730.61309` and requests
+only `seq 1 400`. Ask mode classified that exact command as low risk and ran it
+without showing an approval card; this observation therefore does not promote
+the allow-once approval state. The collapsed `Ran seq 1 400` disclosure opens
+to a 736×227px command card with a `Shell` label, copy controls, a 144px
+scrolling output viewport, and `Success`. Its reverse column keeps lines
+394–400 visible at `scrollTop = 0` while preserving all 400 output lines plus
+the trailing newline.
+
+The independent trace contains exactly one command request/output pair.
+Browser/CDP now covers 66 lifecycle frames and verifies command identity,
+401 split lines, computed typography, output overflow, keyboard disclosure,
+and latest-line restoration after collapse/reopen. Electron drives the same
+interaction in a real 1180×820 `BrowserWindow`. The ownership-masked full
+1180×820 comparison passes at `0.001655643` under a 1.5% hard limit. This
+promotes `thread.command-execution` for the sampled current long-output
+contract. stdout/stderr separation, failure, interruption, active truncation
+copy affordances, background processes, and other command kinds remain open.
+
+The interruption acceptance renders the observed summary statically rather than
 driving a host run-to-stop-to-summary transition, so that row also remains
 `partial_legacy`. The `26.721.81911` MCP tool-call error/retry state is now
 captured separately; the broader thread-transport error/retry state has not
@@ -496,7 +607,7 @@ panel.
 
 This is a measurement- and raster-backed basic thread/workspace slice, not a
 claim that the whole application or every lifecycle is pixel-perfect. Broader
-Markdown variants, the exact host virtualization algorithm, code search,
+Markdown variants, unsampled host eviction heuristics and window sizes, code search,
 other MCP and connector variants, thread-level retry recovery, approval
 persistence and timeout, current-product binary/conflict reachability, PR
 merge/review-submission states, current-product Terminal process lifecycle and
