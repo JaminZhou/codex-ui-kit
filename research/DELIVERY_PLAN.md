@@ -12,8 +12,8 @@ exit gates; it does not replace the inventory.
 
 - The current installed package is Codex Desktop `26.730.61309` (`6223`).
 - The inventory contains 78 surface groups: 50 P0, 19 P1, and 9 P2.
-- 10 groups have current-build runtime evidence, 49 have previous-build-only
-  runtime evidence, and 19 have not been sampled.
+- 11 groups have current-build runtime evidence, 49 have previous-build-only
+  runtime evidence, and 18 have not been sampled.
 - The current `26.730.61309` refresh now covers all six left-sidebar groups
   plus the successful long-command surface. The sidebar capture locks the
   274px column, 46px titlebar, 70px navigation header, 30px rows, five
@@ -31,7 +31,7 @@ exit gates; it does not replace the inventory.
   responsive detail restoration. Its independent state machine adds
   index/detail loading and failure, checks, comments, review submission,
   merge-readiness, merge completion, compact layout, and route restoration.
-  Together the playground gates cover 75 CDP/pixel frames, and the refreshed
+  Together the playground gates cover 76 CDP/pixel frames, and the refreshed
   PR detail passes the current 906×820 regional pixel gate. The refreshed
   real MCP success path now matches Search → Fetch, the integrated activity
   disclosure, computed typography, and a current regional pixel gate. The
@@ -69,7 +69,11 @@ exit gates; it does not replace the inventory.
   `Compacting context`, Stop, `Context compacted`, and exact same-thread
   recovery. Four current frames plus Browser and Electron interaction pass;
   the ownership-masked running comparison measures 0.16% under the same 0.5%
-  hard limit. The other
+  hard limit. A fifth current task identifies the thread summary as a distinct
+  environment/Git workflow overlay, locks its 28px trigger, 300x199px panel,
+  five compact rows, keyboard/dismissal behavior, and 2.86% ownership-scoped
+  pixel result in Browser and Electron. Populated resource sections and the
+  current compact/pinned layouts remain separate evidence gates. The other
   preceding `26.727.40816` results remain previous-build evidence. Attachment
   variants, Terminal multi-tab/process behavior,
   Review rename/delete variants, and broader shell evidence from
@@ -312,10 +316,12 @@ without confusing package readiness with full product reconstruction.
    restoration. Current-product evidence remains deliberately read-only.
 10. **Remaining P0 turn/tool gaps**: current long command output, bounded
     scrolling, expansion, latest-line restoration, mixed stdout/stderr,
-    exit-code failure, and same-thread recovery are delivered. Continue with
-    interruption variants, approval
+    exit-code failure, interruption/settlement, manual context compaction,
+    thread-summary Environment/Git state, and same-thread recovery are
+    delivered. Continue with approval
     allow-once/timeout/persistence, attachment lifecycle, Markdown mutation/
-    large content, subagents, and transport recovery.
+    large content, populated summary resource sections, subagents, and
+    transport recovery.
 11. **P1 resources and integrations**: Browser/artifact/document previews,
     environments, remote connections, Settings, MCP, plugins, skills, and
     automations, each with one end-to-end vertical slice.

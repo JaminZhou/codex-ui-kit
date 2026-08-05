@@ -293,6 +293,12 @@ export const visualScenes = [
     scenario: "compaction",
   },
   {
+    frame: "context-summary-open",
+    id: "context-summary-open",
+    maxPixelRatio: 0.0225,
+    scenario: "context-summary",
+  },
+  {
     frame: "terminal-open",
     id: "background-terminal",
     scenario: "background-terminal",

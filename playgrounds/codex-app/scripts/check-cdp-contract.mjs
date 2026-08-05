@@ -3075,6 +3075,98 @@ for (const scene of visualScenes) {
       }
     }
 
+    if (scene.id === "context-summary-open") {
+      const summary = await page.evaluate(() => {
+        const rect = (element) => {
+          if (!element) return null;
+          const value = element.getBoundingClientRect();
+          return {
+            height: value.height,
+            left: value.left,
+            top: value.top,
+            width: value.width,
+          };
+        };
+        const style = (element) => {
+          if (!element) return null;
+          const value = getComputedStyle(element);
+          return {
+            backgroundColor: value.backgroundColor,
+            borderRadius: value.borderRadius,
+            fontFamily: value.fontFamily,
+            fontSize: value.fontSize,
+            fontWeight: value.fontWeight,
+            lineHeight: value.lineHeight,
+            padding: value.padding,
+          };
+        };
+        const trigger = document.querySelector(
+          'button[aria-label="Toggle summary"]',
+        );
+        const popover = document.querySelector(
+          ".codex-ui-thread-summary-popover",
+        );
+        const panel = document.querySelector(
+          ".codex-ui-thread-summary-panel",
+        );
+        const section = document.querySelector(
+          ".codex-ui-thread-summary-section",
+        );
+        const rows = [...document.querySelectorAll(
+          ".codex-ui-thread-summary-item",
+        )];
+        return {
+          delta:
+            document
+              .querySelector(".codex-ui-thread-summary-delta")
+              ?.textContent?.trim() ?? null,
+          panel: { rect: rect(panel), style: style(panel) },
+          popover: { rect: rect(popover), style: style(popover) },
+          rows: rows.map((row) => ({
+            disabled: row.hasAttribute("disabled"),
+            rect: rect(row),
+            text: row.textContent?.replace(/\s+/g, " ").trim() ?? "",
+          })),
+          sectionExpanded: section?.getAttribute("data-expanded") ?? null,
+          trigger: {
+            expanded: trigger?.getAttribute("aria-expanded") ?? null,
+            pressed: trigger?.getAttribute("aria-pressed") ?? null,
+            rect: rect(trigger),
+          },
+        };
+      });
+      if (
+        summary.trigger.pressed !== "true" ||
+        summary.trigger.expanded !== "true" ||
+        Math.abs((summary.trigger.rect?.height ?? 0) - 28) > 1 ||
+        Math.abs((summary.trigger.rect?.width ?? 0) - 28) > 1 ||
+        Math.abs((summary.trigger.rect?.top ?? 0) - 9) > 1 ||
+        Math.abs((summary.popover.rect?.left ?? 0) - 804) > 1 ||
+        Math.abs((summary.popover.rect?.top ?? 0) - 45) > 1 ||
+        Math.abs((summary.popover.rect?.width ?? 0) - 300) > 1 ||
+        Math.abs((summary.popover.rect?.height ?? 0) - 199) > 1 ||
+        summary.panel.style?.backgroundColor !== "rgb(45, 45, 45)" ||
+        summary.panel.style?.borderRadius !== "25px" ||
+        summary.panel.style?.fontSize !== "14px" ||
+        summary.panel.style?.fontWeight !== "445" ||
+        summary.panel.style?.lineHeight !== "21px" ||
+        summary.sectionExpanded !== "true" ||
+        summary.rows.length !== 5 ||
+        summary.rows.some(
+          ({ rect: value }) =>
+            !value ||
+            Math.abs(value.height - 29) > 1 ||
+            Math.abs(value.width - 272) > 1,
+        ) ||
+        summary.rows.filter(({ disabled }) => disabled).length !== 1 ||
+        summary.delta !== "+0-0"
+      ) {
+        throw new Error(
+          `${scene.id}: current thread summary contract failed: ${JSON.stringify(summary)}`,
+        );
+      }
+    }
+
     if (
       scene.id !== "composer-disabled" &&
       scene.id !== "approval-current-pending"
@@ -5002,6 +5094,127 @@ try {
   }
 } finally {
   await attachmentNavigationApp.close();
+}
+
+const contextSummaryScene = {
+  frame: "context-summary-open",
+  id: "context-summary-interaction",
+  scenario: "context-summary",
+};
+const { app: contextSummaryApp, page: contextSummaryPage } = await launchScene(
+  contextSummaryScene,
+  { capture: false },
+);
+try {
+  const trigger = contextSummaryPage.getByRole("button", {
+    exact: true,
+    name: "Toggle summary",
+  });
+  const dialog = contextSummaryPage.getByRole("dialog", {
+    exact: true,
+    name: "Thread summary",
+  });
+  await dialog.waitFor({ state: "visible" });
+  await dialog.press("Escape");
+  await dialog.waitFor({ state: "hidden" });
+  await contextSummaryPage.waitForFunction(
+    () => document.activeElement?.getAttribute("aria-label") === "Toggle summary",
+  );
+
+  await trigger.click();
+  await dialog.waitFor({ state: "visible" });
+  const sectionToggle = contextSummaryPage.getByRole("button", {
+    name: "Toggle environment summary",
+  });
+  await sectionToggle.click();
+  const collapsed = await contextSummaryPage.evaluate(() => ({
+    expanded: document
+      .querySelector(".codex-ui-thread-summary-section")
+      ?.getAttribute("data-expanded"),
+    rowCount: document.querySelectorAll(".codex-ui-thread-summary-item").length,
+  }));
+  if (collapsed.expanded !== null || collapsed.rowCount !== 0) {
+    throw new Error(
+      `Thread summary collapse failed: ${JSON.stringify(collapsed)}`,
+    );
+  }
+  await sectionToggle.click();
+  await contextSummaryPage.getByRole("textbox", { name: "Message composer" }).click();
+  await dialog.waitFor({ state: "hidden" });
+  const settled = await contextSummaryPage.evaluate(() => ({
+    activeElement: document.activeElement?.getAttribute("aria-label"),
+    expanded: document
+      .querySelector(".codex-ui-thread-summary-section")
+      ?.getAttribute("data-expanded") ?? null,
+    pressed: document
+      .querySelector('button[aria-label="Toggle summary"]')
+      ?.getAttribute("aria-pressed"),
+  }));
+  if (
+    settled.activeElement !== "Message composer" ||
+    settled.expanded !== null ||
+    settled.pressed !== "false"
+  ) {
+    throw new Error(
+      `Thread summary outside-close failed: ${JSON.stringify(settled)}`,
+    );
+  }
+  await writeFile(
+    join(artifactDirectory, "context-summary-interaction.json"),
+    `${JSON.stringify({ collapsed, settled }, null, 2)}\n`,
+  );
+} finally {
+  await contextSummaryApp.close();
+}
+
+const {
+  app: contextSummaryCompactApp,
+  page: contextSummaryCompactPage,
+} = await launchScene(contextSummaryScene, {
+  capture: false,
+  windowSize: { height: 680, width: 720 },
+});
+try {
+  const compact = await contextSummaryCompactPage.evaluate(() => {
+    const popover = document.querySelector(
+      ".codex-ui-thread-summary-popover",
+    );
+    const value = popover?.getBoundingClientRect();
+    return {
+      horizontalOverflow:
+        document.documentElement.scrollWidth -
+        document.documentElement.clientWidth,
+      popover: value
+        ? {
+            bottom: value.bottom,
+            height: value.height,
+            left: value.left,
+            right: value.right,
+            top: value.top,
+            width: value.width,
+          }
+        : null,
+      viewport: { height: window.innerHeight, width: window.innerWidth },
+    };
+  });
+  if (
+    compact.viewport.width !== 720 ||
+    compact.viewport.height !== 680 ||
+    !compact.popover ||
+    Math.abs(compact.popover.width - 300) > 1 ||
+    Math.abs(compact.popover.height - 199) > 1 ||
+    compact.popover.left < 8 ||
+    compact.popover.right > compact.viewport.width - 8 ||
+    compact.popover.top < 8 ||
+    compact.popover.bottom > compact.viewport.height - 8 ||
+    compact.horizontalOverflow > 1
+  ) {
+    throw new Error(
+      `Thread summary compact containment failed: ${JSON.stringify(compact)}`,
+    );
+  }
+} finally {
+  await contextSummaryCompactApp.close();
 }
 
 console.log(`CDP contracts passed for ${visualScenes.length} lifecycle frames.`);

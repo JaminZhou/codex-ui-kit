@@ -130,6 +130,12 @@ const currentBuildContextCompactionReferenceSize = {
   height: 820,
   width: 1180,
 };
+const currentBuildContextSummaryReference =
+  process.env.CODEX_UI_KIT_CONTEXT_SUMMARY_REFERENCE;
+const currentBuildContextSummaryReferenceSize = {
+  height: 820,
+  width: 1180,
+};
 const currentBuildWorkspaceReference =
   process.env.CODEX_UI_KIT_WORKSPACE_REFERENCE;
 const currentBuildWorkspaceReferenceSize = {
@@ -1468,6 +1474,75 @@ for (const scene of selectedScenes) {
     }
     console.log(
       `${scene.id}: current-build context-compaction pixel ratio ${comparison.ratio}`,
+    );
+  }
+
+  if (
+    scene.id === "context-summary-open" &&
+    currentBuildContextSummaryReference
+  ) {
+    const reference = flattenPng(
+      PNG.sync.read(await readFile(currentBuildContextSummaryReference)),
+      { blue: 24, green: 24, red: 24 },
+    );
+    if (
+      reference.width !== currentBuildContextSummaryReferenceSize.width ||
+      reference.height !== currentBuildContextSummaryReferenceSize.height
+    ) {
+      throw new Error(
+        `${scene.id}: current-build context-summary reference must be exactly ${currentBuildContextSummaryReferenceSize.width}x${currentBuildContextSummaryReferenceSize.height}, received ${reference.width}x${reference.height}.`,
+      );
+    }
+    if (
+      actual.width !== currentBuildContextSummaryReferenceSize.width ||
+      actual.height !== currentBuildContextSummaryReferenceSize.height
+    ) {
+      throw new Error(
+        `${scene.id}: current-build context-summary comparison requires an exact 1180x820 playground frame.`,
+      );
+    }
+    const panelBounds = {
+      height: 199,
+      left: 804,
+      top: 45,
+      width: 300,
+    };
+    const referencePanel = cropPng(
+      reference,
+      panelBounds.left,
+      panelBounds.top,
+      panelBounds.width,
+      panelBounds.height,
+    );
+    const actualPanel = cropPng(
+      actual,
+      panelBounds.left,
+      panelBounds.top,
+      panelBounds.width,
+      panelBounds.height,
+    );
+    const comparison = comparePng(referencePanel, actualPanel);
+    const maximumRatio = environmentRatio(
+      "CODEX_UI_KIT_CONTEXT_SUMMARY_MAX_DIFF_RATIO",
+      0.03,
+    );
+    await writeFile(
+      join(artifactDirectory, `${scene.id}.current-build.png`),
+      PNG.sync.write(actualPanel),
+    );
+    if (comparison.pixels > 0) {
+      await writeFile(
+        join(artifactDirectory, `${scene.id}.current-build.diff.png`),
+        PNG.sync.write(comparison.diff),
+      );
+    }
+    if (comparison.ratio > maximumRatio) {
+      throw new Error(
+        `${scene.id}: current-build context-summary pixel ratio ${comparison.ratio} exceeds ${maximumRatio}.`,
+      );
+    }
+    console.log(
+      `${scene.id}: current-build context-summary pixel ratio ${comparison.ratio}`,
     );
   }
 

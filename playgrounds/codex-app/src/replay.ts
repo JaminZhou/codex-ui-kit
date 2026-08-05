@@ -1,5 +1,6 @@
 import approvalDeniedTrace from "../fixtures/traces/approval-denied.jsonl?raw";
 import compactionTrace from "../fixtures/traces/compaction.jsonl?raw";
+import contextSummaryTrace from "../fixtures/traces/context-summary.jsonl?raw";
 import commandFailureRecoveryTrace from "../fixtures/traces/command-failure-recovery.jsonl?raw";
 import conversationLifecycleTrace from "../fixtures/traces/conversation-lifecycle.jsonl?raw";
 import backgroundTerminalTrace from "../fixtures/traces/background-terminal.jsonl?raw";
@@ -25,6 +26,7 @@ export type ReplayScenarioId =
   | "terminal-lifecycle"
   | "interruption"
   | "compaction"
+  | "context-summary"
   | "large-file-review"
   | "long-command-output"
   | "markdown"
@@ -122,6 +124,12 @@ export const replayScenarios: Record<ReplayScenarioId, ReplayScenario> = {
     "Acknowledge compaction baseline",
     "The current manual /compact command transitions from running to completed and accepts a clean same-thread follow-up.",
     compactionTrace,
+  ),
+  "context-summary": scenario(
+    "context-summary",
+    "Probe context summary panel",
+    "The current thread summary toggle opens the compact environment and Git workflow overlay.",
+    contextSummaryTrace,
   ),
   "multi-file-review": scenario(
     "multi-file-review",

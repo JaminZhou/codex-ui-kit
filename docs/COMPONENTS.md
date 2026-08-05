@@ -188,6 +188,13 @@ All privileged behavior remains host-owned. The components never auto-approve co
   summaries and reopen requests. None of these components starts a shell,
   owns process persistence, or executes input.
 - `ThreadHeader`: draggable desktop header with truncating identity, navigation, and independently aligned action slots.
+- `ThreadSummaryPopover`, `ThreadSummaryPanel`, `ThreadSummarySection`,
+  `ThreadSummaryItem`, `ThreadSummaryDelta`, and
+  `ThreadSummaryIconButton`: controlled or uncontrolled thread-summary overlay
+  composition with current Environment/Git rows, compact metadata, disabled
+  actions, section collapse, outside dismissal, Escape focus return, and
+  viewport-clamped 300px geometry. Host code owns every environment, branch,
+  commit, and pull-request mutation.
 - `ThreadNavigationControls`: sidebar and optional Back/Forward toolbar controls with shortcuts, disabled states, and transient-navigation hover hooks.
 - `ThreadMessageNavigationRail`: message overview with a current-build default
   threshold of ten user messages, active markers, keyboard and pointer
