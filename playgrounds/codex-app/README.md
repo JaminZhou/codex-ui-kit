@@ -597,7 +597,8 @@ The thirty-third slice reaches real subagent delegation on
 - the schema-validated replay raises the suite to 22 fixtures and 260 events;
 - nine reviewed scenes extend Browser/CDP and pixel coverage to 102 frames,
   while Electron drives summary → panel → transcript → back, responsive
-  auto-close, and explicit reopen;
+  auto-close, explicit reopen, and an injected Live notification path that
+  preserves completed transcript access;
 - external current-build summary/panel/transcript crops pass at
   4.1812%/1.3451%/1.5969% under independent hard limits.
 

@@ -1513,11 +1513,14 @@ export function App() {
     mode === "replay" && scenarioId === "context-summary";
   const isCurrentSubagentReplay =
     mode === "replay" && scenarioId === "subagent-delegation";
+  const hasSubagentSurface =
+    isCurrentSubagentReplay ||
+    (mode === "live" && state.subagents.length > 0);
   const replayComposerRunning =
     isConversationLifecycle && state.status === "running";
 
   useEffect(() => {
-    if (!isCurrentSubagentReplay) return;
+    if (!hasSubagentSurface) return;
     const syncSubagentPanelWidth = () => {
       setSubagentPanelWidth(
         window.innerWidth <= 720
@@ -1532,7 +1535,7 @@ export function App() {
     return () => {
       window.removeEventListener("resize", syncSubagentPanelWidth);
     };
-  }, [isCurrentSubagentReplay]);
+  }, [hasSubagentSurface]);
 
   useEffect(() => {
     if (!window.codexDemo) return;
@@ -2848,6 +2851,17 @@ export function App() {
                 ▱
               </Button>
             ) : null}
+            {hasSubagentSurface ? (
+              <Button
+                aria-label="Toggle side panel"
+                aria-pressed={subagentPanelOpen}
+                onClick={() => setSubagentPanelOpen((open) => !open)}
+                size="small"
+                tone="ghost"
+              >
+                ▯
+              </Button>
+            ) : null}
             <Button
               onClick={() =>
                 selectMode(mode === "replay" ? "live" : "replay")
@@ -3892,7 +3906,7 @@ export function App() {
       ]}
     />
   ) : null;
-  const subagentPanel = isCurrentSubagentReplay ? (
+  const subagentPanel = hasSubagentSurface ? (
     <WorkspacePanel
       activeTabId="subagents"
       actions={
@@ -5024,9 +5038,14 @@ export function App() {
       const working = callSubagents.filter(
         ({ status }) => status !== "done",
       );
+      const activityItems =
+        working.length > 0 || mode !== "live"
+          ? working
+          : callSubagents;
       return (
         <ActivityTimeline
           className="demo-subagent-activity-timeline"
+          defaultOpen={mode === "live" && working.length > 0}
           key={`subagent:${entry.id}`}
           open={initialSelection.capture ? working.length > 0 : undefined}
           summary={
@@ -5036,10 +5055,11 @@ export function App() {
             />
           }
         >
-          {working.map((item) => (
+          {activityItems.map((item) => (
             <SubagentActivity
               item={{
-                activityStatus: "active",
+                activityStatus:
+                  item.status === "done" ? "done" : "active",
                 id: item.id,
                 name: item.name,
               }}
@@ -5887,14 +5907,14 @@ export function App() {
         onSidePanelOpenChange={
           view === "pull-request"
             ? setPullRequestOpen
-            : isCurrentSubagentReplay
+            : hasSubagentSurface
               ? setSubagentPanelOpen
               : setReviewOpen
         }
         onSidePanelWidthChange={
           view === "pull-request"
             ? setPullRequestWidth
-            : isCurrentSubagentReplay
+            : hasSubagentSurface
               ? setSubagentPanelWidth
               : undefined
         }
@@ -5906,7 +5926,7 @@ export function App() {
         sidePanel={
           view === "pull-request"
             ? pullRequestPanel
-            : isCurrentSubagentReplay
+            : hasSubagentSurface
               ? subagentPanel
               : reviewPanel
         }
@@ -5916,45 +5936,45 @@ export function App() {
         sidePanelLabel={
           view === "pull-request"
             ? "Pull request details"
-            : isCurrentSubagentReplay
+            : hasSubagentSurface
               ? "Subagents"
               : "Review"
         }
         sidePanelMinMainWidth={
           view === "pull-request"
             ? 390
-            : isCurrentSubagentReplay
+            : hasSubagentSurface
               ? 220
               : undefined
         }
         sidePanelMinWidth={
           view === "pull-request"
             ? 322
-            : isCurrentSubagentReplay
+            : hasSubagentSurface
               ? 300
               : undefined
         }
         sidePanelOpen={
           view === "pull-request"
             ? pullRequestOpen
-            : isCurrentSubagentReplay
+            : hasSubagentSurface
               ? subagentPanelOpen
               : reviewOpen && Boolean(reviewPanel)
         }
         sidePanelOverlay={view === "pull-request"}
         sidePanelOverlayModal={
-          view !== "pull-request" && !isCurrentSubagentReplay
+          view !== "pull-request" && !hasSubagentSurface
         }
         sidePanelResizable
         sidePanelWidth={
           view === "pull-request"
             ? pullRequestWidth
-            : isCurrentSubagentReplay
+            : hasSubagentSurface
               ? subagentPanelWidth
               : undefined
         }
         sidebar={sidebar}
-        sidebarMinMainWidth={isCurrentSubagentReplay ? 220 : undefined}
+        sidebarMinMainWidth={hasSubagentSurface ? 220 : undefined}
         sidebarOpen={sidebarOpen}
         sidebarResizable
         windowChrome={

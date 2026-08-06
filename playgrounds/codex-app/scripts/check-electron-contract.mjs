@@ -4392,6 +4392,161 @@ try {
   await subagentApp.close();
 }
 
+const liveSubagentScene = {
+  frame: "recovered",
+  id: "electron-live-subagent",
+  scenario: "streaming-recovery",
+};
+const { app: liveSubagentApp, page: liveSubagentPage } = await launchScene(
+  liveSubagentScene,
+  { capture: false },
+);
+try {
+  await liveSubagentPage
+    .getByRole("button", { exact: true, name: "Live" })
+    .click();
+  await liveSubagentPage.waitForSelector('.demo-root[data-mode="live"]');
+  await liveSubagentApp.evaluate(({ BrowserWindow }) => {
+    const contents = BrowserWindow.getAllWindows()[0]?.webContents;
+    contents?.send("demo:notification", {
+      method: "turn/started",
+      params: {
+        threadId: "thread-live-subagent",
+        turn: {
+          completedAt: null,
+          durationMs: null,
+          error: null,
+          id: "turn-live-subagent",
+          items: [],
+          itemsView: "full",
+          startedAt: 1,
+          status: "inProgress",
+        },
+      },
+    });
+    contents?.send("demo:notification", {
+      method: "item/started",
+      params: {
+        item: {
+          agentsStates: {
+            "long-probe": { message: null, status: "running" },
+          },
+          id: "collab-live-subagent",
+          model: null,
+          prompt: "Run the bounded live subagent probe.",
+          reasoningEffort: null,
+          receiverThreadIds: ["long-probe"],
+          senderThreadId: "thread-live-subagent",
+          status: "inProgress",
+          tool: "spawnAgent",
+          type: "collabAgentToolCall",
+        },
+        startedAtMs: 1_100,
+        threadId: "thread-live-subagent",
+        turnId: "turn-live-subagent",
+      },
+    });
+  });
+  const liveActivity = liveSubagentPage.getByRole("button", {
+    name: "Open Long probe subagent",
+  });
+  await liveActivity.waitFor({ state: "visible" });
+  await liveActivity.click();
+  await liveSubagentPage.waitForSelector(
+    '.codex-ui-app-shell[data-side-panel-open] [data-testid="subagent-transcript"]',
+  );
+
+  await liveSubagentApp.evaluate(({ BrowserWindow }) => {
+    const contents = BrowserWindow.getAllWindows()[0]?.webContents;
+    contents?.send("demo:notification", {
+      method: "item/completed",
+      params: {
+        completedAtMs: 46_000,
+        item: {
+          agentsStates: {
+            "long-probe": {
+              message: "SUBAGENT LIVE PROBE DONE",
+              status: "completed",
+            },
+          },
+          id: "collab-live-subagent",
+          model: null,
+          prompt: "Run the bounded live subagent probe.",
+          reasoningEffort: null,
+          receiverThreadIds: ["long-probe"],
+          senderThreadId: "thread-live-subagent",
+          status: "completed",
+          tool: "spawnAgent",
+          type: "collabAgentToolCall",
+        },
+        threadId: "thread-live-subagent",
+        turnId: "turn-live-subagent",
+      },
+    });
+    contents?.send("demo:notification", {
+      method: "turn/completed",
+      params: {
+        threadId: "thread-live-subagent",
+        turn: {
+          completedAt: 46,
+          durationMs: 45_000,
+          error: null,
+          id: "turn-live-subagent",
+          items: [],
+          itemsView: "full",
+          startedAt: 1,
+          status: "completed",
+        },
+      },
+    });
+  });
+  await liveSubagentPage.waitForFunction(
+    () =>
+      document
+        .querySelector('[data-testid="subagent-transcript"]')
+        ?.textContent?.includes("SUBAGENT LIVE PROBE DONE") ?? false,
+  );
+  await liveSubagentPage
+    .getByRole("button", { name: "Back to subagents" })
+    .click();
+  await liveSubagentPage.waitForSelector('[data-testid="subagent-panel"]');
+  await liveSubagentPage
+    .locator(
+      '.demo-subagent-workspace-panel button[aria-label="Toggle side panel"]',
+    )
+    .click();
+  await liveSubagentPage.waitForSelector(
+    ".codex-ui-app-shell:not([data-side-panel-open])",
+  );
+  await liveSubagentPage
+    .locator(
+      '.codex-ui-conversation-thread-shell__header button[aria-label="Toggle side panel"]',
+    )
+    .click();
+  await liveSubagentPage.waitForSelector(
+    '.codex-ui-app-shell[data-side-panel-open] [data-testid="subagent-panel"]',
+  );
+  await liveSubagentPage.locator(".codex-ui-subagent-panel__item").click();
+  const liveTranscript = liveSubagentPage.getByTestId(
+    "subagent-transcript",
+  );
+  await liveTranscript.waitFor({ state: "visible" });
+  if (
+    !(await liveTranscript.textContent())?.includes(
+      "SUBAGENT LIVE PROBE DONE",
+    ) ||
+    !(await liveSubagentPage
+      .getByRole("button", { name: "Open Long probe subagent" })
+      .isVisible())
+  ) {
+    throw new Error(
+      "Electron live subagent did not preserve completed activity and transcript access.",
+    );
+  }
+} finally {
+  await liveSubagentApp.close();
+}
+
 console.log(
-  "Electron host, native-window, coding-workspace routing, conversation/Composer and current image-attachment lifecycle plus current menus, current long, failed, and interrupted command output plus manual context compaction, thread summary, and subagent delegation, default 720px narrow reachability, resizable navigation/Review/Terminal/PR detail, PR tabs and expansion, MCP disclosure/result, multi-file and mixed-content Review, selection/Undo, large diff scrolling, and compact geometry contracts passed.",
+  "Electron host, native-window, coding-workspace routing, conversation/Composer and current image-attachment lifecycle plus current menus, current long, failed, and interrupted command output plus manual context compaction, thread summary, replay/live subagent delegation, default 720px narrow reachability, resizable navigation/Review/Terminal/PR detail, PR tabs and expansion, MCP disclosure/result, multi-file and mixed-content Review, selection/Undo, large diff scrolling, and compact geometry contracts passed.",
 );

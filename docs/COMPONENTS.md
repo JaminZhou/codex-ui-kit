@@ -53,8 +53,8 @@ The built-in highlighter escapes untrusted code. A custom `CodeHighlighter` retu
 - `SubagentPanel`: active and completed agent sections with pagination and selection hooks.
 - `SubagentTranscriptHeader` and `SubagentAvatar`: nested transcript navigation and asset-free agent identity.
 
-The protocol-backed playground composes these primitives for the current
-single-agent success path: active timeline, populated thread summary,
+The protocol-backed playground composes these primitives in Replay and Live
+for the current single-agent success path: active timeline, populated thread summary,
 active/done side-panel list, transcript/back navigation, and responsive
 wide/820px/720px panel continuity. Hosts still own protocol reduction,
 concurrent or nested topology, failure/cancellation policy, and transcript
