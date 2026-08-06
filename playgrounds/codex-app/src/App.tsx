@@ -342,6 +342,14 @@ function currentSubagentPanelFrame(frame: string | null) {
   );
 }
 
+function compactSubagentTime(timestampMs: number, nowMs: number) {
+  const elapsedMs = Math.max(0, nowMs - timestampMs);
+  if (elapsedMs < 60_000) return `${Math.floor(elapsedMs / 1_000)}s`;
+  if (elapsedMs < 3_600_000) return `${Math.floor(elapsedMs / 60_000)}m`;
+  if (elapsedMs < 86_400_000) return `${Math.floor(elapsedMs / 3_600_000)}h`;
+  return `${Math.floor(elapsedMs / 86_400_000)}d`;
+}
+
 function initialComposerValue(frame: string | null) {
   if (frame === "attachment-ready") {
     return "Reply using three uppercase words describing this test: attachment, lifecycle, complete. Include a final period and no other text.";
@@ -1306,6 +1314,13 @@ export function App() {
   const [subagentPanelOpen, setSubagentPanelOpen] = useState(
     currentSubagentPanelFrame(initialSelection.frame),
   );
+  const [activeConversationSidePanel, setActiveConversationSidePanel] =
+    useState<"review" | "subagents">(
+      currentSubagentPanelFrame(initialSelection.frame)
+        ? "subagents"
+        : "review",
+    );
+  const [subagentClockMs, setSubagentClockMs] = useState(() => Date.now());
   const [selectedSubagentId, setSelectedSubagentId] = useState<string | null>(
     initialSelection.frame === "subagent-current-transcript"
       ? "long-probe"
@@ -1538,6 +1553,13 @@ export function App() {
   }, [hasSubagentSurface]);
 
   useEffect(() => {
+    if (mode !== "live" || state.subagents.length === 0) return;
+    setSubagentClockMs(Date.now());
+    const timer = window.setInterval(() => setSubagentClockMs(Date.now()), 1_000);
+    return () => window.clearInterval(timer);
+  }, [mode, state.subagents.length]);
+
+  useEffect(() => {
     if (!window.codexDemo) return;
     const removeNotification = window.codexDemo.onNotification((notification) => {
       dispatchLive(notification);
@@ -1647,6 +1669,7 @@ export function App() {
     setActiveFrame("workspace-ready");
     setReviewOpen(false);
     setSubagentPanelOpen(false);
+    setActiveConversationSidePanel("review");
     setSelectedSubagentId(null);
     setTerminalOpen(false);
     setTerminalSessionIds([]);
@@ -1718,6 +1741,11 @@ export function App() {
     setWindowedSelectedMessageIndex(currentWindowedInitialIndex);
     setReviewOpen(false);
     setReviewSelection(null);
+    setActiveConversationSidePanel(
+      nextId === "subagent-delegation" && currentSubagentPanelFrame(frame)
+        ? "subagents"
+        : "review",
+    );
     setSubagentPanelOpen(
       nextId === "subagent-delegation" && currentSubagentPanelFrame(frame),
     );
@@ -1782,6 +1810,7 @@ export function App() {
     setReplayApprovalResolution(null);
     setThreadSummaryOpen(false);
     setSubagentPanelOpen(false);
+    setActiveConversationSidePanel("review");
     setSelectedSubagentId(null);
     setWorkspaceOverlay(null);
     setWorkspaceLocalEnvironmentOpen(false);
@@ -2624,24 +2653,59 @@ export function App() {
         : state.status;
   const subagentItems = useMemo<SubagentItem[]>(
     () =>
-      state.subagents.map((subagent) => ({
-        id: subagent.id,
-        lastMessage: subagent.message ?? undefined,
-        name: subagent.id === "long-probe" ? "Long probe" : "Agent",
-        status: subagent.status,
-        statusSummary:
-          subagent.status === "active"
-            ? "Working"
-            : subagent.message ?? undefined,
-        timestamp: subagent.status === "done" ? "1m ago" : "0s",
-      })),
-    [state.subagents],
+      state.subagents.map((subagent) => {
+        const timestampMs =
+          subagent.status === "done"
+            ? subagent.completedAtMs
+            : subagent.startedAtMs;
+        const liveTime =
+          mode === "live" && timestampMs !== null
+            ? {
+                dateTime: new Date(timestampMs).toISOString(),
+                timestamp: `${compactSubagentTime(timestampMs, subagentClockMs)}${subagent.status === "done" ? " ago" : ""}`,
+              }
+            : {
+                timestamp: subagent.status === "done" ? "1m ago" : "0s",
+              };
+        return {
+          ...liveTime,
+          id: subagent.id,
+          lastMessage: subagent.message ?? undefined,
+          name: subagent.id === "long-probe" ? "Long probe" : "Agent",
+          status: subagent.status,
+          statusSummary:
+            subagent.status === "active"
+              ? "Working"
+              : subagent.message ?? undefined,
+        };
+      }),
+    [mode, state.subagents, subagentClockMs],
   );
   const selectedSubagent =
     subagentItems.find(({ id }) => id === selectedSubagentId) ?? null;
   const activeSubagentCount = subagentItems.filter(
     ({ status }) => status !== "done",
   ).length;
+  const openReviewPanel = () => {
+    setActiveConversationSidePanel("review");
+    setSubagentPanelOpen(false);
+    setReviewOpen(true);
+  };
+  const openSubagentPanel = (subagentId?: string | null) => {
+    setActiveConversationSidePanel("subagents");
+    setReviewOpen(false);
+    if (subagentId !== undefined) setSelectedSubagentId(subagentId);
+    setSubagentPanelOpen(true);
+  };
+  const toggleSubagentPanel = () => {
+    const opening =
+      activeConversationSidePanel !== "subagents" || !subagentPanelOpen;
+    setActiveConversationSidePanel("subagents");
+    setReviewOpen(false);
+    setSubagentPanelOpen(opening);
+  };
+  const subagentPanelSelected =
+    hasSubagentSurface && activeConversationSidePanel === "subagents";
   const composerPhase = composerIsDisabled
     ? "submitting"
     : composerIsRunning
@@ -2736,8 +2800,7 @@ export function App() {
                         }
                         onClick={() => {
                           setThreadSummaryOpen(false);
-                          setSelectedSubagentId(null);
-                          setSubagentPanelOpen(true);
+                          openSubagentPanel(null);
                         }}
                       />
                     </ThreadSummarySection>
@@ -2820,7 +2883,7 @@ export function App() {
                   }
                   onClick={
                     isCurrentSubagentReplay
-                      ? () => setSubagentPanelOpen((open) => !open)
+                      ? toggleSubagentPanel
                       : undefined
                   }
                   type="button"
@@ -2854,8 +2917,8 @@ export function App() {
             {hasSubagentSurface ? (
               <Button
                 aria-label="Toggle side panel"
-                aria-pressed={subagentPanelOpen}
-                onClick={() => setSubagentPanelOpen((open) => !open)}
+                aria-pressed={subagentPanelSelected && subagentPanelOpen}
+                onClick={toggleSubagentPanel}
                 size="small"
                 tone="ghost"
               >
@@ -5086,8 +5149,7 @@ export function App() {
               }}
               key={item.id}
               onOpen={() => {
-                setSelectedSubagentId(item.id);
-                setSubagentPanelOpen(true);
+                openSubagentPanel(item.id);
               }}
             />
           ))}
@@ -5424,7 +5486,7 @@ export function App() {
               setReviewSelection({
                 fileChangeId: fileChange.id,
               });
-              setReviewOpen(true);
+              openReviewPanel();
             }}
             type="button"
           >
@@ -5446,7 +5508,7 @@ export function App() {
               fileChangeId: fileChange.id,
               path: change.path,
             });
-            setReviewOpen(true);
+            openReviewPanel();
           }}
           status={fileChange.status}
         />
@@ -5778,7 +5840,7 @@ export function App() {
             disabled={!reviewPanel}
             endIcon="⌃⇧G"
             onSelect={() => {
-              setReviewOpen(true);
+              openReviewPanel();
               setTerminalTabPickerOpen(false);
             }}
             startIcon="▣"
@@ -5928,14 +5990,14 @@ export function App() {
         onSidePanelOpenChange={
           view === "pull-request"
             ? setPullRequestOpen
-            : hasSubagentSurface
+            : subagentPanelSelected
               ? setSubagentPanelOpen
               : setReviewOpen
         }
         onSidePanelWidthChange={
           view === "pull-request"
             ? setPullRequestWidth
-            : hasSubagentSurface
+            : subagentPanelSelected
               ? setSubagentPanelWidth
               : undefined
         }
@@ -5947,7 +6009,7 @@ export function App() {
         sidePanel={
           view === "pull-request"
             ? pullRequestPanel
-            : hasSubagentSurface
+            : subagentPanelSelected
               ? subagentPanel
               : reviewPanel
         }
@@ -5957,45 +6019,45 @@ export function App() {
         sidePanelLabel={
           view === "pull-request"
             ? "Pull request details"
-            : hasSubagentSurface
+            : subagentPanelSelected
               ? "Subagents"
               : "Review"
         }
         sidePanelMinMainWidth={
           view === "pull-request"
             ? 390
-            : hasSubagentSurface
+            : subagentPanelSelected
               ? 220
               : undefined
         }
         sidePanelMinWidth={
           view === "pull-request"
             ? 322
-            : hasSubagentSurface
+            : subagentPanelSelected
               ? 300
               : undefined
         }
         sidePanelOpen={
           view === "pull-request"
             ? pullRequestOpen
-            : hasSubagentSurface
+            : subagentPanelSelected
               ? subagentPanelOpen
               : reviewOpen && Boolean(reviewPanel)
         }
         sidePanelOverlay={view === "pull-request"}
         sidePanelOverlayModal={
-          view !== "pull-request" && !hasSubagentSurface
+          view !== "pull-request" && !subagentPanelSelected
         }
         sidePanelResizable
         sidePanelWidth={
           view === "pull-request"
             ? pullRequestWidth
-            : hasSubagentSurface
+            : subagentPanelSelected
               ? subagentPanelWidth
               : undefined
         }
         sidebar={sidebar}
-        sidebarMinMainWidth={hasSubagentSurface ? 220 : undefined}
+        sidebarMinMainWidth={subagentPanelSelected ? 220 : undefined}
         sidebarOpen={sidebarOpen}
         sidebarResizable
         windowChrome={

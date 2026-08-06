@@ -599,7 +599,10 @@ The thirty-third slice reaches real subagent delegation on
   while Electron drives summary → panel → transcript → back, responsive
   auto-close, explicit reopen, and an injected Live notification path that
   preserves completed transcript access and derives ticking/settled duration
-  labels from protocol timestamps;
+  labels plus panel-row relative time and machine-readable dates from protocol
+  timestamps;
+- Live conversations explicitly select between `Subagents` and `Review`, so a
+  completed delegation remains reopenable without hiding later file changes;
 - external current-build summary/panel/transcript crops pass at
   4.1812%/1.3451%/1.5969% under independent hard limits.
 

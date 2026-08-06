@@ -4531,6 +4531,75 @@ try {
     .getByRole("button", { name: "Back to subagents" })
     .click();
   await liveSubagentPage.waitForSelector('[data-testid="subagent-panel"]');
+  const livePanelTime = liveSubagentPage.locator(
+    '[data-testid="subagent-panel"] time',
+  );
+  const firstLivePanelTime = await livePanelTime.textContent();
+  const livePanelDateTime = await livePanelTime.getAttribute("datetime");
+  await liveSubagentPage.waitForFunction(
+    (initialTime) =>
+      document.querySelector('[data-testid="subagent-panel"] time')
+        ?.textContent !== initialTime,
+    firstLivePanelTime,
+    { timeout: 3_000 },
+  );
+  const secondLivePanelTime = await livePanelTime.textContent();
+  if (
+    !firstLivePanelTime?.match(/^\d+[smhd] ago$/) ||
+    firstLivePanelTime === "1m ago" ||
+    firstLivePanelTime === secondLivePanelTime ||
+    !livePanelDateTime ||
+    Math.abs(Date.now() - Date.parse(livePanelDateTime)) > 10_000
+  ) {
+    throw new Error(
+      `Electron live subagent panel time was not protocol-backed: ${JSON.stringify({ firstLivePanelTime, livePanelDateTime, secondLivePanelTime })}`,
+    );
+  }
+
+  await liveSubagentApp.evaluate(({ BrowserWindow }) => {
+    BrowserWindow.getAllWindows()[0]?.webContents.send("demo:notification", {
+      method: "item/completed",
+      params: {
+        completedAtMs: Date.now(),
+        item: {
+          changes: [
+            {
+              diff: "@@ -0,0 +1 @@\n+review remains reachable after delegation\n",
+              kind: { type: "add" },
+              path: "SUBAGENT_REVIEW.md",
+            },
+          ],
+          id: "file-live-after-subagent",
+          status: "completed",
+          type: "fileChange",
+        },
+        threadId: "thread-live-subagent",
+        turnId: "turn-live-subagent",
+      },
+    });
+  });
+  const liveReviewAction = liveSubagentPage.getByRole("button", {
+    exact: true,
+    name: "Review",
+  });
+  await liveReviewAction.waitFor({ state: "visible" });
+  await liveReviewAction.click();
+  await liveSubagentPage.waitForSelector(
+    '.codex-ui-app-shell[data-side-panel-open] [data-testid="review-panel"]',
+  );
+  if (await liveSubagentPage.getByTestId("subagent-panel").isVisible()) {
+    throw new Error(
+      "Electron live file Review remained hidden behind the historical subagent panel.",
+    );
+  }
+  await liveSubagentPage
+    .locator(
+      '.codex-ui-conversation-thread-shell__header button[aria-label="Toggle side panel"]',
+    )
+    .click();
+  await liveSubagentPage.waitForSelector(
+    '.codex-ui-app-shell[data-side-panel-open] [data-testid="subagent-panel"]',
+  );
   await liveSubagentPage
     .locator(
       '.demo-subagent-workspace-panel button[aria-label="Toggle side panel"]',
