@@ -4402,6 +4402,21 @@ const { app: liveSubagentApp, page: liveSubagentPage } = await launchScene(
   { capture: false },
 );
 try {
+  await liveSubagentPage.evaluate(() => {
+    const activeIntervals = new Set();
+    const originalSetInterval = window.setInterval.bind(window);
+    const originalClearInterval = window.clearInterval.bind(window);
+    window.__demoOneSecondIntervals = activeIntervals;
+    window.setInterval = (handler, timeout, ...arguments_) => {
+      const intervalId = originalSetInterval(handler, timeout, ...arguments_);
+      if (timeout === 1_000) activeIntervals.add(intervalId);
+      return intervalId;
+    };
+    window.clearInterval = (intervalId) => {
+      activeIntervals.delete(intervalId);
+      originalClearInterval(intervalId);
+    };
+  });
   await liveSubagentPage
     .getByRole("button", { exact: true, name: "Live" })
     .click();
@@ -4586,6 +4601,9 @@ try {
   await liveReviewAction.click();
   await liveSubagentPage.waitForSelector(
     '.codex-ui-app-shell[data-side-panel-open] [data-testid="review-panel"]',
+  );
+  await liveSubagentPage.waitForFunction(
+    () => window.__demoOneSecondIntervals?.size === 0,
   );
   if (await liveSubagentPage.getByTestId("subagent-panel").isVisible()) {
     throw new Error(

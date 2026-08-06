@@ -600,7 +600,7 @@ The thirty-third slice reaches real subagent delegation on
   auto-close, explicit reopen, and an injected Live notification path that
   preserves completed transcript access and derives ticking/settled duration
   labels plus panel-row relative time and machine-readable dates from protocol
-  timestamps;
+  timestamps; the row clock runs only while that Live list is visible;
 - Live conversations explicitly select between `Subagents` and `Review`, so a
   completed delegation remains reopenable without hiding later file changes;
 - external current-build summary/panel/transcript crops pass at

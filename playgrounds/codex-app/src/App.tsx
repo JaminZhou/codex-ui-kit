@@ -1531,6 +1531,8 @@ export function App() {
   const hasSubagentSurface =
     isCurrentSubagentReplay ||
     (mode === "live" && state.subagents.length > 0);
+  const subagentPanelSelected =
+    hasSubagentSurface && activeConversationSidePanel === "subagents";
   const replayComposerRunning =
     isConversationLifecycle && state.status === "running";
 
@@ -1553,11 +1555,25 @@ export function App() {
   }, [hasSubagentSurface]);
 
   useEffect(() => {
-    if (mode !== "live" || state.subagents.length === 0) return;
+    if (
+      mode !== "live" ||
+      state.subagents.length === 0 ||
+      !subagentPanelSelected ||
+      !subagentPanelOpen ||
+      selectedSubagentId !== null
+    ) {
+      return;
+    }
     setSubagentClockMs(Date.now());
     const timer = window.setInterval(() => setSubagentClockMs(Date.now()), 1_000);
     return () => window.clearInterval(timer);
-  }, [mode, state.subagents.length]);
+  }, [
+    mode,
+    selectedSubagentId,
+    state.subagents.length,
+    subagentPanelOpen,
+    subagentPanelSelected,
+  ]);
 
   useEffect(() => {
     if (!window.codexDemo) return;
@@ -2704,8 +2720,6 @@ export function App() {
     setReviewOpen(false);
     setSubagentPanelOpen(opening);
   };
-  const subagentPanelSelected =
-    hasSubagentSurface && activeConversationSidePanel === "subagents";
   const composerPhase = composerIsDisabled
     ? "submitting"
     : composerIsRunning
