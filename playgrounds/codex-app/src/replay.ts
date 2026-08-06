@@ -17,6 +17,7 @@ import mcpRecoveryMixedThreadTrace from "../fixtures/traces/mcp-recovery-mixed-t
 import mixedFileReviewTrace from "../fixtures/traces/mixed-file-review.jsonl?raw";
 import multiFileReviewTrace from "../fixtures/traces/multi-file-review.jsonl?raw";
 import recoveryTrace from "../fixtures/traces/streaming-recovery.jsonl?raw";
+import subagentDelegationTrace from "../fixtures/traces/subagent-delegation.jsonl?raw";
 import terminalLifecycleTrace from "../fixtures/traces/terminal-lifecycle.jsonl?raw";
 import workflowTrace from "../fixtures/traces/workspace-workflow.jsonl?raw";
 import type { ProtocolEventRecord } from "./protocol-state";
@@ -30,6 +31,7 @@ export type ReplayScenarioId =
   | "command-failure-recovery"
   | "conversation-lifecycle"
   | "streaming-recovery"
+  | "subagent-delegation"
   | "terminal-lifecycle"
   | "interruption"
   | "compaction"
@@ -138,6 +140,12 @@ export const replayScenarios: Record<ReplayScenarioId, ReplayScenario> = {
     "Streaming and retry",
     "Incremental reply, transient error, retry, and recovery.",
     recoveryTrace,
+  ),
+  "subagent-delegation": scenario(
+    "subagent-delegation",
+    "Delegate single subagent probe",
+    "A current real subagent moves from working activity through the thread summary into the Subagents panel and nested transcript.",
+    subagentDelegationTrace,
   ),
   interruption: scenario(
     "interruption",

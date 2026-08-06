@@ -583,6 +583,27 @@ Failed/exited process summaries and reopen actions remain host-owned public
 compatibility coverage. A failed direct shell command did not add a native tab
 status badge, so this slice does not infer one.
 
+## Thirty-third vertical slice
+
+The thirty-third slice reaches real subagent delegation on
+`26.730.61639`:
+
+- one isolated task records a `collabAgentToolCall` from active work through
+  the exact successful result and final assistant response;
+- the current thread-summary row opens the 369.28px `Subagents` panel, whose
+  active/done sections lead into a nested transcript and back navigation;
+- explicit reopen matches the observed 319px panel with a retained sidebar at
+  820×680 and the 329.31px overlay after sidebar collapse at 720×680;
+- the schema-validated replay raises the suite to 22 fixtures and 260 events;
+- nine reviewed scenes extend Browser/CDP and pixel coverage to 102 frames,
+  while Electron drives summary → panel → transcript → back, responsive
+  auto-close, and explicit reopen;
+- external current-build summary/panel/transcript crops pass at
+  4.1812%/1.3451%/1.5969% under independent hard limits.
+
+Concurrent and nested delegation plus waiting, failure, cancellation,
+pagination, and streaming transcript states remain separate gates.
+
 ## Development
 
 From the repository root:
@@ -664,6 +685,17 @@ different conversation text. The current external comparison is scoped to
 CODEX_UI_KIT_TERMINAL_REFERENCE=/absolute/path/to/terminal-main-reference.png \
   pnpm --filter @codex-ui-kit/codex-app-playground check:visual \
   -- --scenes=terminal-current-single
+```
+
+The subagent gate accepts raw 1180×820 screenshots and compares only the
+owned 300×241 summary, 370×820 panel, and 370×820 transcript crops:
+
+```bash
+CODEX_UI_KIT_SUBAGENT_SUMMARY_REFERENCE=/absolute/path/to/subagent-summary.png \
+CODEX_UI_KIT_SUBAGENT_PANEL_REFERENCE=/absolute/path/to/subagent-panel.png \
+CODEX_UI_KIT_SUBAGENT_TRANSCRIPT_REFERENCE=/absolute/path/to/subagent-transcript.png \
+  pnpm --filter @codex-ui-kit/codex-app-playground check:visual \
+  -- --scenes=subagent-current-summary-completed,subagent-current-panel-completed,subagent-current-transcript
 ```
 
 The Markdown gate uses its own 906×820 main-only reference:

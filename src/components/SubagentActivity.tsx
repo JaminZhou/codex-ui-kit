@@ -74,8 +74,17 @@ export function SubagentAvatar({
       {...props}
     >
       <svg aria-hidden="true" viewBox="0 0 16 16">
-        <path d="M8 2.25 9.5 6.5 13.75 8 9.5 9.5 8 13.75 6.5 9.5 2.25 8 6.5 6.5 8 2.25Z" />
-        <circle cx="8" cy="8" r="1.35" />
+        <g className="codex-ui-subagent-avatar__petals">
+          <circle cx="8" cy="3.1" r="2.15" />
+          <circle cx="11.46" cy="4.54" r="2.15" />
+          <circle cx="12.9" cy="8" r="2.15" />
+          <circle cx="11.46" cy="11.46" r="2.15" />
+          <circle cx="8" cy="12.9" r="2.15" />
+          <circle cx="4.54" cy="11.46" r="2.15" />
+          <circle cx="3.1" cy="8" r="2.15" />
+          <circle cx="4.54" cy="4.54" r="2.15" />
+        </g>
+        <circle className="codex-ui-subagent-avatar__center" cx="8" cy="8" r="2.15" />
       </svg>
     </span>
   );

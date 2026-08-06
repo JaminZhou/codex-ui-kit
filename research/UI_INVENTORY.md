@@ -60,10 +60,13 @@ observation from a previous build remains historical evidence.
   close-nearest selection, the four-item picker, 820×680 fit, independent
   transcripts, close/reopen while a process runs, close-last collapse, fresh
   creation from the top Toggle, and `Dismiss`/`Open new terminal` recovery.
+  A separate current-build task now also covers one real delegated subagent
+  from active work through completion, the thread-summary row, wide side-panel
+  list, nested transcript, and explicit 820×680 and 720×680 panel reopen.
   All `26.730.61309` observations remain previous-build evidence until each
   surface is separately reached on `26.730.61639`.
 
-Current inventory: 80 surface groups; 3 have current-build runtime evidence, 59 have previous-build-only runtime evidence, 18 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 3 groups and Electron verification covers 3.
+Current inventory: 80 surface groups; 4 have current-build runtime evidence, 59 have previous-build-only runtime evidence, 17 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 4 groups and Electron verification covers 4.
 Prior acceptance outside the sampled Terminal session, process, and mismatch
 slices remains recorded as `partial_legacy` until current-build
 re-observation.
@@ -743,8 +746,25 @@ dismissal, exact geometry, computed styles, and responsive viewport clamping.
 The ownership-scoped 300×199 current-build comparison differs by
 `0.028609715242881074`, below a 3% hard limit, and the full reviewed matrix now
 covers 76 frames. This promotes `thread.context-summary` only for the sampled
-Environment/Git workflow overlay; populated artifact/source/subagent sections,
+Environment/Git workflow overlay; populated artifact/source sections,
 light theme, pinned layout, and host mutations remain separate gates.
+
+A `26.730.61639` isolated task then delegated one real long-running subagent,
+observed its `working` and completed states, and opened the populated
+`Subagents` summary, side-panel list, and nested transcript. CDP measurements
+lock the 300×241 summary, 369.28px wide panel at 1180×820, 319px explicit
+reopen with the sidebar at 820×680, and 329.31px overlay reopen after the
+sidebar collapses at 720×680. The public trace maps the current
+`collabAgentToolCall` lifecycle into one protocol-neutral subagent timeline;
+Browser/CDP and Electron verify summary → list → transcript → back navigation,
+responsive auto-close, explicit reopen, text, focusable controls, and computed
+row typography/spacing. Nine reviewed frames bring the matrix to 102 scenes.
+The three ownership-scoped current-build comparisons differ by
+4.1812% for the summary, 1.3451% for the panel, and 1.5969% for the transcript,
+all below their hard limits.
+This promotes `thread.subagent-delegation` only for the sampled single-agent
+success path; concurrent agents, nested delegation, waiting/failure/cancel,
+pagination, and transcript streaming remain separate gates.
 
 This is a measurement- and raster-backed basic thread/workspace slice, not a
 claim that the whole application or every lifecycle is pixel-perfect. Broader

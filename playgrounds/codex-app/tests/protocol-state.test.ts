@@ -1260,6 +1260,43 @@ describe("protocol lifecycle reducer", () => {
     expect(withFollowUpMessage.messages.at(-1)?.compaction).toBeUndefined();
   });
 
+  it("tracks a protocol-backed subagent from running to completed", () => {
+    const scenario = replayScenarios["subagent-delegation"];
+    const running = reduceProtocolTrace(
+      scenario.events.slice(0, scenario.frames["subagent-current-running"]),
+    );
+    const completed = reduceProtocolTrace(scenario.events);
+
+    expect(running.status).toBe("running");
+    expect(running.subagents).toEqual([
+      expect.objectContaining({
+        callId: "collab-subagent-long",
+        id: "long-probe",
+        message: null,
+        status: "active",
+        threadStatus: "running",
+        tool: "spawnAgent",
+      }),
+    ]);
+    expect(running.timeline.at(-1)).toEqual({
+      id: "collab-subagent-long",
+      kind: "subagent",
+    });
+    expect(completed.status).toBe("completed");
+    expect(completed.subagents).toEqual([
+      expect.objectContaining({
+        message: "SUBAGENT LONG PROBE DONE",
+        status: "done",
+        threadStatus: "completed",
+      }),
+    ]);
+    expect(completed.messages.at(-1)).toMatchObject({
+      id: "assistant-subagent-delegation",
+      status: "completed",
+      text: "SUBAGENT LONG PROBE COMPLETE.",
+    });
+  });
+
   it("keeps unknown notifications observable without corrupting state", () => {
     const state = reduceProtocolNotification(initialProtocolState, {
       method: "future/notification",

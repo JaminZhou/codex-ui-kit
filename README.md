@@ -25,7 +25,9 @@ Codex UI Kit turns those interaction patterns into protocol-neutral React primit
   surface and evidence status are tracked in
   [`research/UI_INVENTORY.md`](research/UI_INVENTORY.md); current-build
   runtime observation currently covers the Terminal session shell, direct
-  running/completed panel persistence, and cross-worktree mismatch recovery.
+  running/completed panel persistence, cross-worktree mismatch recovery, and
+  one real delegated-subagent success path from active work through summary,
+  side panel, and transcript.
   The broader `26.730.61309` shell/sidebar, route, command, approval,
   compaction, summary, attachment, workspace-entry, and Review evidence is
   retained as previous-build coverage rather than promoted implicitly.
@@ -51,6 +53,10 @@ review the [coverage policy](research/PARITY.md), or follow the
 - Current `26.730.61639` Terminal evidence for project-labelled multi-session
   tabs, real running/completed close/reopen persistence, close-last/fresh
   creation, compact fit, and cross-worktree mismatch recovery.
+- Current `26.730.61639` subagent evidence for active/completed timeline,
+  populated summary, wide list, nested transcript, and explicit 820px/720px
+  responsive reopen, backed by CDP styles, Electron interaction, and regional
+  pixels.
 - Project index, current-build new-chat destination/context setup and
   New worktree environment-empty flow, grouped host-defined local environment
   dialog, protocol-neutral route/worktree selectors, PR list/detail, checks,
@@ -210,6 +216,17 @@ Its current-build comparison is scoped to `terminal-current-single`:
 CODEX_UI_KIT_TERMINAL_REFERENCE=/absolute/path/to/terminal-main-reference.png \
   pnpm --filter @codex-ui-kit/codex-app-playground check:visual \
   -- --scenes=terminal-current-single
+```
+
+The subagent gate accepts three raw 1180×820 current-build captures and
+compares only the owned summary, side-panel list, and transcript regions:
+
+```bash
+CODEX_UI_KIT_SUBAGENT_SUMMARY_REFERENCE=/absolute/path/to/subagent-summary.png \
+CODEX_UI_KIT_SUBAGENT_PANEL_REFERENCE=/absolute/path/to/subagent-panel.png \
+CODEX_UI_KIT_SUBAGENT_TRANSCRIPT_REFERENCE=/absolute/path/to/subagent-transcript.png \
+  pnpm --filter @codex-ui-kit/codex-app-playground check:visual \
+  -- --scenes=subagent-current-summary-completed,subagent-current-panel-completed,subagent-current-transcript
 ```
 
 Current command approval accepts separate untracked pending and denied
