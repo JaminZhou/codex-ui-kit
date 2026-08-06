@@ -1273,6 +1273,7 @@ describe("protocol lifecycle reducer", () => {
         callId: "collab-subagent-long",
         id: "long-probe",
         message: null,
+        startedAtMs: 1100,
         status: "active",
         threadStatus: "running",
         tool: "spawnAgent",
@@ -1286,6 +1287,8 @@ describe("protocol lifecycle reducer", () => {
     expect(completed.subagents).toEqual([
       expect.objectContaining({
         message: "SUBAGENT LONG PROBE DONE",
+        completedAtMs: 46000,
+        startedAtMs: 1100,
         status: "done",
         threadStatus: "completed",
       }),

@@ -5042,6 +5042,18 @@ export function App() {
         working.length > 0 || mode !== "live"
           ? working
           : callSubagents;
+      const startedAtMs = state.subagents
+        .filter((item) => item.callId === entry.id)
+        .flatMap((item) =>
+          item.startedAtMs === null ? [] : [item.startedAtMs],
+        )
+        .sort((left, right) => left - right)[0];
+      const completedAtMs = state.subagents
+        .filter((item) => item.callId === entry.id)
+        .flatMap((item) =>
+          item.completedAtMs === null ? [] : [item.completedAtMs],
+        )
+        .sort((left, right) => right - left)[0];
       return (
         <ActivityTimeline
           className="demo-subagent-activity-timeline"
@@ -5050,7 +5062,16 @@ export function App() {
           open={initialSelection.capture ? working.length > 0 : undefined}
           summary={
             <TurnDuration
-              durationMs={working.length > 0 ? 14_000 : 45_000}
+              {...(mode === "live"
+                ? {
+                    completedAtMs:
+                      working.length === 0 ? completedAtMs : undefined,
+                    startedAtMs,
+                  }
+                : {
+                    durationMs:
+                      working.length > 0 ? 14_000 : 45_000,
+                  })}
               status={working.length > 0 ? "working" : "worked"}
             />
           }

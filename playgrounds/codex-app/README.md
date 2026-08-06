@@ -598,7 +598,8 @@ The thirty-third slice reaches real subagent delegation on
 - nine reviewed scenes extend Browser/CDP and pixel coverage to 102 frames,
   while Electron drives summary → panel → transcript → back, responsive
   auto-close, explicit reopen, and an injected Live notification path that
-  preserves completed transcript access;
+  preserves completed transcript access and derives ticking/settled duration
+  labels from protocol timestamps;
 - external current-build summary/panel/transcript crops pass at
   4.1812%/1.3451%/1.5969% under independent hard limits.
 

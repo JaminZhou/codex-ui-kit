@@ -158,9 +158,11 @@ export interface DemoMcpToolCall {
 
 export interface DemoSubagent {
   callId: string;
+  completedAtMs: number | null;
   id: string;
   message: string | null;
   prompt: string | null;
+  startedAtMs: number | null;
   status: "active" | "done" | "waiting";
   threadStatus: string;
   tool: string;
@@ -863,9 +865,17 @@ export function reduceProtocolNotification(
               : "done";
         return upsertById(items, {
           callId: itemId,
+          completedAtMs:
+            asNumber(params.completedAtMs) ??
+            existing?.completedAtMs ??
+            null,
           id,
           message: asString(agentState.message) ?? existing?.message ?? null,
           prompt: asString(item.prompt) ?? existing?.prompt ?? null,
+          startedAtMs:
+            asNumber(params.startedAtMs) ??
+            existing?.startedAtMs ??
+            null,
           status,
           threadStatus,
           tool: asString(item.tool) ?? existing?.tool ?? "spawnAgent",

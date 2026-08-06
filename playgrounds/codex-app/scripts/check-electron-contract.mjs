@@ -4408,6 +4408,7 @@ try {
   await liveSubagentPage.waitForSelector('.demo-root[data-mode="live"]');
   await liveSubagentApp.evaluate(({ BrowserWindow }) => {
     const contents = BrowserWindow.getAllWindows()[0]?.webContents;
+    const startedAtMs = Date.now() - 2_000;
     contents?.send("demo:notification", {
       method: "turn/started",
       params: {
@@ -4441,7 +4442,7 @@ try {
           tool: "spawnAgent",
           type: "collabAgentToolCall",
         },
-        startedAtMs: 1_100,
+        startedAtMs,
         threadId: "thread-live-subagent",
         turnId: "turn-live-subagent",
       },
@@ -4451,6 +4452,21 @@ try {
     name: "Open Long probe subagent",
   });
   await liveActivity.waitFor({ state: "visible" });
+  const liveDuration = liveSubagentPage.locator(
+    ".demo-subagent-activity-timeline .codex-ui-turn-duration",
+  );
+  const firstLiveDuration = await liveDuration.textContent();
+  await liveSubagentPage.waitForTimeout(1_100);
+  const secondLiveDuration = await liveDuration.textContent();
+  if (
+    !firstLiveDuration?.startsWith("Working for ") ||
+    !secondLiveDuration?.startsWith("Working for ") ||
+    firstLiveDuration === secondLiveDuration
+  ) {
+    throw new Error(
+      `Electron live subagent duration did not tick: ${JSON.stringify({ firstLiveDuration, secondLiveDuration })}`,
+    );
+  }
   await liveActivity.click();
   await liveSubagentPage.waitForSelector(
     '.codex-ui-app-shell[data-side-panel-open] [data-testid="subagent-transcript"]',
@@ -4461,7 +4477,7 @@ try {
     contents?.send("demo:notification", {
       method: "item/completed",
       params: {
-        completedAtMs: 46_000,
+        completedAtMs: Date.now(),
         item: {
           agentsStates: {
             "long-probe": {
@@ -4506,6 +4522,11 @@ try {
         .querySelector('[data-testid="subagent-transcript"]')
         ?.textContent?.includes("SUBAGENT LIVE PROBE DONE") ?? false,
   );
+  if (!(await liveDuration.textContent())?.startsWith("Worked for ")) {
+    throw new Error(
+      `Electron live subagent duration did not settle: ${JSON.stringify(await liveDuration.textContent())}`,
+    );
+  }
   await liveSubagentPage
     .getByRole("button", { name: "Back to subagents" })
     .click();

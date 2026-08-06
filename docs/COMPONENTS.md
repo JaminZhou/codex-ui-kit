@@ -56,7 +56,8 @@ The built-in highlighter escapes untrusted code. A custom `CodeHighlighter` retu
 The protocol-backed playground composes these primitives in Replay and Live
 for the current single-agent success path: active timeline, populated thread summary,
 active/done side-panel list, transcript/back navigation, and responsive
-wide/820px/720px panel continuity. Hosts still own protocol reduction,
+wide/820px/720px panel continuity. Live duration uses host-reduced protocol
+timestamps instead of replay constants. Hosts still own protocol reduction,
 concurrent or nested topology, failure/cancellation policy, and transcript
 streaming.
 
