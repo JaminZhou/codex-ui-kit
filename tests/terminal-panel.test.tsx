@@ -229,6 +229,26 @@ describe("terminal panel", () => {
     expect(onOpenNewTerminal).toHaveBeenCalledOnce();
   });
 
+  it("omits workspace mismatch actions without handlers", () => {
+    const onOpenNewTerminal = vi.fn();
+    const { rerender } = render(
+      <TerminalWorkspaceMismatchNotice
+        onOpenNewTerminal={onOpenNewTerminal}
+      />,
+    );
+
+    expect(
+      screen.queryByRole("button", { name: "Dismiss" }),
+    ).toBeNull();
+    fireEvent.click(
+      screen.getByRole("button", { name: "Open new terminal" }),
+    );
+    expect(onOpenNewTerminal).toHaveBeenCalledOnce();
+
+    rerender(<TerminalWorkspaceMismatchNotice />);
+    expect(screen.queryAllByRole("button")).toHaveLength(0);
+  });
+
   it("lists background process lifecycle without owning process actions", () => {
     const onOpenProcess = vi.fn();
     const { rerender } = render(

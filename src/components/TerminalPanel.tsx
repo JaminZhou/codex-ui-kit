@@ -404,18 +404,24 @@ export function TerminalWorkspaceMismatchNotice({
       <span className="codex-ui-terminal-workspace-mismatch__message">
         {message}
       </span>
-      <span className="codex-ui-terminal-workspace-mismatch__actions">
-        <button onClick={onDismiss} type="button">
-          {dismissLabel}
-        </button>
-        <button
-          data-primary="true"
-          onClick={onOpenNewTerminal}
-          type="button"
-        >
-          {openNewTerminalLabel}
-        </button>
-      </span>
+      {onDismiss || onOpenNewTerminal ? (
+        <span className="codex-ui-terminal-workspace-mismatch__actions">
+          {onDismiss ? (
+            <button onClick={onDismiss} type="button">
+              {dismissLabel}
+            </button>
+          ) : null}
+          {onOpenNewTerminal ? (
+            <button
+              data-primary="true"
+              onClick={onOpenNewTerminal}
+              type="button"
+            >
+              {openNewTerminalLabel}
+            </button>
+          ) : null}
+        </span>
+      ) : null}
     </div>
   );
 }
