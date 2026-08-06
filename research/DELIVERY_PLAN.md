@@ -12,16 +12,20 @@ exit gates; it does not replace the inventory.
 
 - The current installed package is Codex Desktop `26.730.61639` (`6234`).
 - The inventory contains 80 surface groups: 52 P0, 19 P1, and 9 P2.
-- 3 groups have current-build runtime evidence, 59 have previous-build-only runtime evidence, and 18 have not been sampled.
+- 4 groups have current-build runtime evidence, 59 have previous-build-only runtime evidence, and 17 have not been sampled.
 - The current `26.730.61639` refresh covers the local Terminal session shell,
   a real bounded running/completed command with panel persistence, and the
   cross-worktree mismatch warning plus recovery actions. It locks
   project-labelled/global-indexed tabs, close-nearest and label reindexing,
   the four-item picker, three-tab 820×680 fit, independent transcript state,
   close/reopen while running, close-last collapse, and fresh terminal creation
-  from the top Toggle. Browser/CDP covers 93 lifecycle frames; Electron repeats
+  from the top Toggle. The same refresh now also covers one real delegated
+  subagent through active work, completion, summary, panel, transcript, and
+  explicit 820×680/720×680 reopen. Browser/CDP covers 102 lifecycle frames; Electron repeats
   the session, mismatch, input, picker, close, and resize interactions; the
   current 906×820 panel/content pixel ratios pass at 1.5120%/0.4004%.
+  The subagent summary/panel/transcript regional ratios pass at
+  4.1812%/1.3451%/1.5969%.
 - The previous `26.730.61309` refresh covered all six left-sidebar groups,
   selected/no-project and New worktree entry, plus sampled command, approval,
   interruption, compaction, summary, and pasted-image surfaces. The sidebar capture locks the
@@ -40,7 +44,7 @@ exit gates; it does not replace the inventory.
   responsive detail restoration. Its independent state machine adds
   index/detail loading and failure, checks, comments, review submission,
   merge-readiness, merge completion, compact layout, and route restoration.
-  Together the playground gates now cover 93 CDP/pixel frames, and the refreshed
+  Together the playground gates now cover 102 CDP/pixel frames, and the refreshed
   PR detail passes the current 906×820 regional pixel gate. The refreshed
   real MCP success path now matches Search → Fetch, the integrated activity
   disclosure, computed typography, and a current regional pixel gate. The
@@ -371,11 +375,12 @@ without confusing package readiness with full product reconstruction.
     exit-code failure, interruption/settlement, manual context compaction,
     thread-summary Environment/Git state, and same-thread recovery are
     delivered. Approval allow-once and matching-command persistence are also
-    delivered. The sampled pasted-image attachment lifecycle is also delivered;
+    delivered. The sampled pasted-image attachment lifecycle and single-agent
+    successful delegation lifecycle are also delivered;
     continue with approval timeout/`acceptForSession`, native-file and attachment
     upload/error/multi-item variants, Markdown mutation/
-    large content, populated summary resource sections, subagents, and
-    transport recovery.
+    large content, populated artifact/source sections, concurrent/nested
+    subagents, subagent waiting/failure/cancel/streaming, and transport recovery.
 11. **P1 resources and integrations**: Browser/artifact/document previews,
     environments, remote connections, Settings, MCP, plugins, skills, and
     automations, each with one end-to-end vertical slice.

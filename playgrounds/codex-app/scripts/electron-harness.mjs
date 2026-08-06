@@ -334,6 +334,71 @@ export const visualScenes = [
     scenario: "context-summary",
   },
   {
+    frame: "subagent-current-running",
+    id: "subagent-current-running",
+    maxPixelRatio: 0.0225,
+    scenario: "subagent-delegation",
+    surfaces: ["subagent"],
+  },
+  {
+    frame: "subagent-current-summary-running",
+    id: "subagent-current-summary-running",
+    maxPixelRatio: 0.0225,
+    scenario: "subagent-delegation",
+    surfaces: ["subagent"],
+  },
+  {
+    frame: "subagent-current-panel-running",
+    id: "subagent-current-panel-running",
+    maxPixelRatio: 0.0225,
+    scenario: "subagent-delegation",
+    surfaces: ["subagent"],
+  },
+  {
+    frame: "subagent-current-completed",
+    id: "subagent-current-completed",
+    maxPixelRatio: 0.0225,
+    scenario: "subagent-delegation",
+    surfaces: ["subagent"],
+  },
+  {
+    frame: "subagent-current-summary-completed",
+    id: "subagent-current-summary-completed",
+    maxPixelRatio: 0.0225,
+    scenario: "subagent-delegation",
+    surfaces: ["subagent"],
+  },
+  {
+    frame: "subagent-current-panel-completed",
+    id: "subagent-current-panel-completed",
+    maxPixelRatio: 0.0225,
+    scenario: "subagent-delegation",
+    surfaces: ["subagent"],
+  },
+  {
+    frame: "subagent-current-transcript",
+    id: "subagent-current-transcript",
+    maxPixelRatio: 0.0225,
+    scenario: "subagent-delegation",
+    surfaces: ["subagent"],
+  },
+  {
+    frame: "subagent-current-compact-820",
+    id: "subagent-current-compact-820",
+    maxPixelRatio: 0.0225,
+    scenario: "subagent-delegation",
+    surfaces: ["subagent"],
+    windowSize: { height: 680, width: 820 },
+  },
+  {
+    frame: "subagent-current-compact-720",
+    id: "subagent-current-compact-720",
+    maxPixelRatio: 0.0225,
+    scenario: "subagent-delegation",
+    surfaces: ["subagent"],
+    windowSize: { height: 680, width: 720 },
+  },
+  {
     frame: "terminal-open",
     id: "background-terminal",
     scenario: "background-terminal",
@@ -770,6 +835,20 @@ export async function launchScene(
         }
       }, offset);
     }
+  }
+  if (
+    capture &&
+    scene.scenario === "subagent-delegation" &&
+    scene.frame === "subagent-current-running"
+  ) {
+    await page.evaluate(() => {
+      const turn = document.querySelector(
+        ".codex-ui-conversation-thread-shell .codex-ui-agent-turn",
+      );
+      if (turn instanceof HTMLElement) {
+        turn.style.transform = "translateY(-102px)";
+      }
+    });
   }
   if (capture && scene.id === "current-review-rename") {
     await page.evaluate(() => {

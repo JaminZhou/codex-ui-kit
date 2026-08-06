@@ -156,6 +156,12 @@ const currentBuildContextSummaryReferenceSize = {
   height: 820,
   width: 1180,
 };
+const currentBuildSubagentSummaryReference =
+  process.env.CODEX_UI_KIT_SUBAGENT_SUMMARY_REFERENCE;
+const currentBuildSubagentPanelReference =
+  process.env.CODEX_UI_KIT_SUBAGENT_PANEL_REFERENCE;
+const currentBuildSubagentTranscriptReference =
+  process.env.CODEX_UI_KIT_SUBAGENT_TRANSCRIPT_REFERENCE;
 const currentBuildWorkspaceReference =
   process.env.CODEX_UI_KIT_WORKSPACE_REFERENCE;
 const currentBuildWorkspaceReferenceSize = {
@@ -1839,6 +1845,55 @@ for (const scene of selectedScenes) {
     console.log(
       `${scene.id}: current-build context-summary pixel ratio ${comparison.ratio}`,
     );
+  }
+
+  if (
+    scene.id === "subagent-current-summary-completed" &&
+    currentBuildSubagentSummaryReference
+  ) {
+    await compareCurrentBuildOverlay({
+      actual,
+      actualBounds: { height: 241, left: 804, top: 45, width: 300 },
+      defaultMaximumRatio: 0.055,
+      masks: [],
+      maximumRatioName: "CODEX_UI_KIT_SUBAGENT_SUMMARY_MAX_DIFF_RATIO",
+      referenceCrop: { height: 241, left: 804, top: 45, width: 300 },
+      referencePath: currentBuildSubagentSummaryReference,
+      sceneId: scene.id,
+    });
+  }
+
+  if (
+    scene.id === "subagent-current-panel-completed" &&
+    currentBuildSubagentPanelReference
+  ) {
+    await compareCurrentBuildOverlay({
+      actual,
+      actualBounds: { height: 820, left: 810, top: 0, width: 370 },
+      defaultMaximumRatio: 0.045,
+      masks: [{ height: 32, left: 328, top: 170, width: 42 }],
+      maximumRatioName: "CODEX_UI_KIT_SUBAGENT_PANEL_MAX_DIFF_RATIO",
+      referenceCrop: { height: 820, left: 810, top: 0, width: 370 },
+      referencePath: currentBuildSubagentPanelReference,
+      sceneId: scene.id,
+    });
+  }
+
+  if (
+    scene.id === "subagent-current-transcript" &&
+    currentBuildSubagentTranscriptReference
+  ) {
+    await compareCurrentBuildOverlay({
+      actual,
+      actualBounds: { height: 820, left: 810, top: 0, width: 370 },
+      defaultMaximumRatio: 0.045,
+      masks: [],
+      maximumRatioName:
+        "CODEX_UI_KIT_SUBAGENT_TRANSCRIPT_MAX_DIFF_RATIO",
+      referenceCrop: { height: 820, left: 810, top: 0, width: 370 },
+      referencePath: currentBuildSubagentTranscriptReference,
+      sceneId: scene.id,
+    });
   }
 
   if (scene.id === "multi-file-review" && currentBuildMultiFileReference) {

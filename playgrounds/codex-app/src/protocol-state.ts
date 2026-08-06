@@ -156,9 +156,28 @@ export interface DemoMcpToolCall {
   turnId: string | null;
 }
 
+export interface DemoSubagent {
+  callId: string;
+  completedAtMs: number | null;
+  id: string;
+  message: string | null;
+  prompt: string | null;
+  startedAtMs: number | null;
+  status: "active" | "done" | "waiting";
+  threadStatus: string;
+  tool: string;
+  turnId: string | null;
+}
+
 export interface DemoTimelineEntry {
   id: string;
-  kind: "approval" | "command" | "fileChange" | "mcpToolCall" | "message";
+  kind:
+    | "approval"
+    | "command"
+    | "fileChange"
+    | "mcpToolCall"
+    | "message"
+    | "subagent";
 }
 
 export interface DemoProtocolState {
@@ -174,6 +193,7 @@ export interface DemoProtocolState {
   messages: DemoMessage[];
   retrying: boolean;
   status: DemoTurnStatus;
+  subagents: DemoSubagent[];
   threadId: string | null;
   timeline: DemoTimelineEntry[];
   turnDurationMs: number | null;
@@ -200,6 +220,7 @@ export const initialProtocolState: DemoProtocolState = {
   messages: [],
   retrying: false,
   status: "idle",
+  subagents: [],
   threadId: null,
   timeline: [],
   turnDurationMs: null,
@@ -590,6 +611,10 @@ export function hasActiveTurnWork(state: DemoProtocolState) {
       ({ status, turnId }) =>
         turnId === state.currentTurnId &&
         (status === "pending" || status === "running"),
+    ) ||
+    state.subagents.some(
+      ({ status, turnId }) =>
+        turnId === state.currentTurnId && status !== "done",
     )
   );
 }
@@ -813,6 +838,57 @@ export function reduceProtocolNotification(
         timeline: appendTimeline(state.timeline, {
           id: itemId,
           kind: "mcpToolCall",
+        }),
+      };
+    }
+    if (itemType === "collabAgentToolCall") {
+      const callStatus = asString(item.status) ?? "inProgress";
+      const agentStates = isRecord(item.agentsStates)
+        ? item.agentsStates
+        : {};
+      const receiverThreadIds = Array.isArray(item.receiverThreadIds)
+        ? item.receiverThreadIds.flatMap((value) => {
+            const id = asString(value);
+            return id ? [id] : [];
+          })
+        : [];
+      const subagents = receiverThreadIds.reduce((items, id) => {
+        const existing = items.find((candidate) => candidate.id === id);
+        const agentState = isRecord(agentStates[id]) ? agentStates[id] : {};
+        const threadStatus =
+          asString(agentState.status) ?? existing?.threadStatus ?? "pendingInit";
+        const status =
+          threadStatus === "pendingInit"
+            ? "waiting"
+            : threadStatus === "running"
+              ? "active"
+              : "done";
+        return upsertById(items, {
+          callId: itemId,
+          completedAtMs:
+            asNumber(params.completedAtMs) ??
+            existing?.completedAtMs ??
+            null,
+          id,
+          message: asString(agentState.message) ?? existing?.message ?? null,
+          prompt: asString(item.prompt) ?? existing?.prompt ?? null,
+          startedAtMs:
+            asNumber(params.startedAtMs) ??
+            existing?.startedAtMs ??
+            null,
+          status,
+          threadStatus,
+          tool: asString(item.tool) ?? existing?.tool ?? "spawnAgent",
+          turnId: itemTurnId,
+        });
+      }, state.subagents);
+      return {
+        ...next,
+        status: callStatus === "inProgress" ? "running" : next.status,
+        subagents,
+        timeline: appendTimeline(state.timeline, {
+          id: itemId,
+          kind: "subagent",
         }),
       };
     }

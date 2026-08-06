@@ -49,6 +49,10 @@ import {
   PullRequestReviewComposer,
   QueuedPromptList,
   StatusBanner,
+  SubagentActivity,
+  SubagentAvatar,
+  SubagentPanel,
+  SubagentTranscriptHeader,
   TerminalPanel,
   TerminalProcessList,
   TerminalWorkspaceMismatchNotice,
@@ -74,6 +78,7 @@ import {
   type ComposerModeKind,
   type ComposerResourceGroup,
   type QueuedPrompt,
+  type SubagentItem,
 } from "codex-ui-kit";
 import {
   cloneElement,
@@ -286,6 +291,12 @@ function replayCountForSelection(
     return 0;
   }
   if (frame && scenario.frames[frame]) return scenario.frames[frame];
+  if (scenario.id === "subagent-delegation" && frame) {
+    return frame.includes("running")
+      ? (scenario.frames["subagent-current-running"] ?? scenario.events.length)
+      : (scenario.frames["subagent-current-completed"] ??
+          scenario.events.length);
+  }
   if (
     scenario.id === "compaction" &&
     frame === "context-compaction-command-menu"
@@ -308,6 +319,35 @@ function replayCountForSelection(
   return (
     scenario.frames["conversation-thread-ready"] ?? scenario.events.length
   );
+}
+
+function currentSubagentFrame(frame: string | null) {
+  return frame?.startsWith("subagent-current-") ?? false;
+}
+
+function currentSubagentSummaryFrame(frame: string | null) {
+  return (
+    frame === "subagent-current-summary-running" ||
+    frame === "subagent-current-summary-completed"
+  );
+}
+
+function currentSubagentPanelFrame(frame: string | null) {
+  return (
+    frame === "subagent-current-panel-running" ||
+    frame === "subagent-current-panel-completed" ||
+    frame === "subagent-current-transcript" ||
+    frame === "subagent-current-compact-820" ||
+    frame === "subagent-current-compact-720"
+  );
+}
+
+function compactSubagentTime(timestampMs: number, nowMs: number) {
+  const elapsedMs = Math.max(0, nowMs - timestampMs);
+  if (elapsedMs < 60_000) return `${Math.floor(elapsedMs / 1_000)}s`;
+  if (elapsedMs < 3_600_000) return `${Math.floor(elapsedMs / 60_000)}m`;
+  if (elapsedMs < 86_400_000) return `${Math.floor(elapsedMs / 3_600_000)}h`;
+  return `${Math.floor(elapsedMs / 86_400_000)}d`;
 }
 
 function initialComposerValue(frame: string | null) {
@@ -744,8 +784,10 @@ function statusLabel(state: DemoProtocolState) {
 }
 
 function McpResponseActions({
+  includeShare = true,
   label = "MCP response actions",
 }: {
+  includeShare?: boolean;
   label?: string;
 }) {
   return (
@@ -770,11 +812,13 @@ function McpResponseActions({
           <path d="M5.2 3H3.5a1 1 0 0 0-1 1v4.5a1 1 0 0 0 1 1h1.7M5.2 3v6.5L8 13.2c.6.8 1.8.3 1.7-.7l-.3-2h2.5a1.5 1.5 0 0 0 1.4-2L11.8 4a1.5 1.5 0 0 0-1.4-1H5.2Z" />
         </svg>
       </button>
-      <button aria-label="Share response" type="button">
-        <svg aria-hidden="true" viewBox="0 0 16 16">
-          <path d="M5 3H3.5a1 1 0 0 0-1 1v8.5a1 1 0 0 0 1 1H12a1 1 0 0 0 1-1V11M8 8l5.5-5.5M9.5 2.5h4v4" />
-        </svg>
-      </button>
+      {includeShare ? (
+        <button aria-label="Share response" type="button">
+          <svg aria-hidden="true" viewBox="0 0 16 16">
+            <path d="M5 3H3.5a1 1 0 0 0-1 1v8.5a1 1 0 0 0 1 1H12a1 1 0 0 0 1-1V11M8 8l5.5-5.5M9.5 2.5h4v4" />
+          </svg>
+        </button>
+      ) : null}
     </span>
   );
 }
@@ -1221,7 +1265,8 @@ export function App() {
     initialSelection.frame === "composer-queue-paused",
   );
   const [threadSummaryOpen, setThreadSummaryOpen] = useState(
-    initialSelection.frame === "context-summary-open",
+    initialSelection.frame === "context-summary-open" ||
+      currentSubagentSummaryFrame(initialSelection.frame),
   );
   const [replayQueuedContinuation, setReplayQueuedContinuation] =
     useState<string | null>(() =>
@@ -1258,12 +1303,35 @@ export function App() {
     () =>
       (initialSelection.capture &&
         initialSelection.frame !== "pr-compact-detail" &&
-        initialSelection.frame !== "workspace-compact-ready") ||
+        initialSelection.frame !== "workspace-compact-ready" &&
+        initialSelection.frame !== "subagent-current-compact-720") ||
       !isNarrowDemoWindow(),
   );
   const [reviewOpen, setReviewOpen] = useState(
     initialSelection.frame === "review-open" ||
       initialSelection.frame === "mixed-review-open",
+  );
+  const [subagentPanelOpen, setSubagentPanelOpen] = useState(
+    currentSubagentPanelFrame(initialSelection.frame),
+  );
+  const [activeConversationSidePanel, setActiveConversationSidePanel] =
+    useState<"review" | "subagents">(
+      currentSubagentPanelFrame(initialSelection.frame)
+        ? "subagents"
+        : "review",
+    );
+  const [subagentClockMs, setSubagentClockMs] = useState(() => Date.now());
+  const [selectedSubagentId, setSelectedSubagentId] = useState<string | null>(
+    initialSelection.frame === "subagent-current-transcript"
+      ? "long-probe"
+      : null,
+  );
+  const [subagentPanelWidth, setSubagentPanelWidth] = useState(
+    initialSelection.frame === "subagent-current-compact-820"
+      ? 319
+      : initialSelection.frame === "subagent-current-compact-720"
+        ? 329.3125
+        : 369.28125,
   );
   const [terminalOpen, setTerminalOpen] = useState(
     initialSelection.scenarioId === "background-terminal" ||
@@ -1458,8 +1526,54 @@ export function App() {
     mode === "replay" && scenarioId === "compaction";
   const isCurrentContextSummaryReplay =
     mode === "replay" && scenarioId === "context-summary";
+  const isCurrentSubagentReplay =
+    mode === "replay" && scenarioId === "subagent-delegation";
+  const hasSubagentSurface =
+    isCurrentSubagentReplay ||
+    (mode === "live" && state.subagents.length > 0);
+  const subagentPanelSelected =
+    hasSubagentSurface && activeConversationSidePanel === "subagents";
   const replayComposerRunning =
     isConversationLifecycle && state.status === "running";
+
+  useEffect(() => {
+    if (!hasSubagentSurface) return;
+    const syncSubagentPanelWidth = () => {
+      setSubagentPanelWidth(
+        window.innerWidth <= 720
+          ? 329.3125
+          : window.innerWidth <= 820
+            ? 319
+            : 369.28125,
+      );
+    };
+    syncSubagentPanelWidth();
+    window.addEventListener("resize", syncSubagentPanelWidth);
+    return () => {
+      window.removeEventListener("resize", syncSubagentPanelWidth);
+    };
+  }, [hasSubagentSurface]);
+
+  useEffect(() => {
+    if (
+      mode !== "live" ||
+      state.subagents.length === 0 ||
+      !subagentPanelSelected ||
+      !subagentPanelOpen ||
+      selectedSubagentId !== null
+    ) {
+      return;
+    }
+    setSubagentClockMs(Date.now());
+    const timer = window.setInterval(() => setSubagentClockMs(Date.now()), 1_000);
+    return () => window.clearInterval(timer);
+  }, [
+    mode,
+    selectedSubagentId,
+    state.subagents.length,
+    subagentPanelOpen,
+    subagentPanelSelected,
+  ]);
 
   useEffect(() => {
     if (!window.codexDemo) return;
@@ -1570,6 +1684,9 @@ export function App() {
     setReplayApprovalResolution(null);
     setActiveFrame("workspace-ready");
     setReviewOpen(false);
+    setSubagentPanelOpen(false);
+    setActiveConversationSidePanel("review");
+    setSelectedSubagentId(null);
     setTerminalOpen(false);
     setTerminalSessionIds([]);
     setClosedTerminalSessionIds([]);
@@ -1631,13 +1748,36 @@ export function App() {
     setReplayQueuedContinuation(initialQueuedContinuation(frame));
     setReplayApprovalResolution(null);
     setThreadSummaryOpen(
-      nextId === "context-summary" && frame === "context-summary-open",
+      (nextId === "context-summary" && frame === "context-summary-open") ||
+        (nextId === "subagent-delegation" &&
+          currentSubagentSummaryFrame(frame)),
     );
     setActiveFrame(frame);
     setScenarioSelectionVersion((version) => version + 1);
     setWindowedSelectedMessageIndex(currentWindowedInitialIndex);
     setReviewOpen(false);
     setReviewSelection(null);
+    setActiveConversationSidePanel(
+      nextId === "subagent-delegation" && currentSubagentPanelFrame(frame)
+        ? "subagents"
+        : "review",
+    );
+    setSubagentPanelOpen(
+      nextId === "subagent-delegation" && currentSubagentPanelFrame(frame),
+    );
+    setSelectedSubagentId(
+      nextId === "subagent-delegation" &&
+        frame === "subagent-current-transcript"
+        ? "long-probe"
+        : null,
+    );
+    setSubagentPanelWidth(
+      frame === "subagent-current-compact-820"
+        ? 319
+        : frame === "subagent-current-compact-720"
+          ? 329.3125
+          : 369.28125,
+    );
     setTerminalOpen(
       nextId === "background-terminal" ||
         (nextId === "terminal-lifecycle" &&
@@ -1685,6 +1825,9 @@ export function App() {
     setReplayQueuedContinuation(null);
     setReplayApprovalResolution(null);
     setThreadSummaryOpen(false);
+    setSubagentPanelOpen(false);
+    setActiveConversationSidePanel("review");
+    setSelectedSubagentId(null);
     setWorkspaceOverlay(null);
     setWorkspaceLocalEnvironmentOpen(false);
   };
@@ -2508,7 +2651,8 @@ export function App() {
       ? isTurnActive(liveState.status)
       : (isConversationLifecycle && replayComposerRunning) ||
         ((isCurrentCommandInterruptionReplay ||
-          isCurrentContextCompactionReplay) &&
+          isCurrentContextCompactionReplay ||
+          isCurrentSubagentReplay) &&
           state.status === "running");
   const composerIsDisabled =
     liveStartPending ||
@@ -2523,6 +2667,59 @@ export function App() {
       : composerIsRunning
         ? "running"
         : state.status;
+  const subagentItems = useMemo<SubagentItem[]>(
+    () =>
+      state.subagents.map((subagent) => {
+        const timestampMs =
+          subagent.status === "done"
+            ? subagent.completedAtMs
+            : subagent.startedAtMs;
+        const liveTime =
+          mode === "live" && timestampMs !== null
+            ? {
+                dateTime: new Date(timestampMs).toISOString(),
+                timestamp: `${compactSubagentTime(timestampMs, subagentClockMs)}${subagent.status === "done" ? " ago" : ""}`,
+              }
+            : {
+                timestamp: subagent.status === "done" ? "1m ago" : "0s",
+              };
+        return {
+          ...liveTime,
+          id: subagent.id,
+          lastMessage: subagent.message ?? undefined,
+          name: subagent.id === "long-probe" ? "Long probe" : "Agent",
+          status: subagent.status,
+          statusSummary:
+            subagent.status === "active"
+              ? "Working"
+              : subagent.message ?? undefined,
+        };
+      }),
+    [mode, state.subagents, subagentClockMs],
+  );
+  const selectedSubagent =
+    subagentItems.find(({ id }) => id === selectedSubagentId) ?? null;
+  const activeSubagentCount = subagentItems.filter(
+    ({ status }) => status !== "done",
+  ).length;
+  const openReviewPanel = () => {
+    setActiveConversationSidePanel("review");
+    setSubagentPanelOpen(false);
+    setReviewOpen(true);
+  };
+  const openSubagentPanel = (subagentId?: string | null) => {
+    setActiveConversationSidePanel("subagents");
+    setReviewOpen(false);
+    if (subagentId !== undefined) setSelectedSubagentId(subagentId);
+    setSubagentPanelOpen(true);
+  };
+  const toggleSubagentPanel = () => {
+    const opening =
+      activeConversationSidePanel !== "subagents" || !subagentPanelOpen;
+    setActiveConversationSidePanel("subagents");
+    setReviewOpen(false);
+    setSubagentPanelOpen(opening);
+  };
   const composerPhase = composerIsDisabled
     ? "submitting"
     : composerIsRunning
@@ -2549,6 +2746,7 @@ export function App() {
       scenarioId === "interruption" ||
       scenarioId === "compaction" ||
       scenarioId === "context-summary" ||
+      scenarioId === "subagent-delegation" ||
       scenarioId === "current-review-rename");
   const usesCurrentAskPermission =
     isCurrentApprovalReplay ||
@@ -2558,6 +2756,7 @@ export function App() {
     isCurrentCommandInterruptionReplay ||
     isCurrentContextCompactionReplay ||
     isCurrentContextSummaryReplay ||
+    isCurrentSubagentReplay ||
     scenarioId === "current-review-rename";
   const selectedComposerPermission =
     (usesCurrentAskPermission
@@ -2570,66 +2769,143 @@ export function App() {
       endActions={
         currentHeaderReplay ? (
           <div className="demo-current-mcp-header-actions">
-            <button aria-label="Open integration menu" type="button">
-              ◈⌄
-            </button>
-            {isCurrentContextSummaryReplay ? (
+            {isCurrentSubagentReplay ? null : (
+              <button aria-label="Open integration menu" type="button">
+                ◈⌄
+              </button>
+            )}
+            {isCurrentContextSummaryReplay || isCurrentSubagentReplay ? (
               <ThreadSummaryPopover
                 onOpenChange={setThreadSummaryOpen}
                 open={threadSummaryOpen}
               >
-                <ThreadSummaryPanel>
-                  <ThreadSummarySection
-                    actions={
-                      <ThreadSummaryIconButton
-                        icon="+"
-                        label="Set up local environment"
+                {isCurrentSubagentReplay ? (
+                  <ThreadSummaryPanel className="demo-subagent-summary-panel">
+                    <ThreadSummarySection
+                      actions={
+                        <ThreadSummaryIconButton
+                          icon="+"
+                          label="Create a file or site"
+                        />
+                      }
+                      collapsible
+                      title="Outputs"
+                      toggleLabel="Toggle outputs summary"
+                    >
+                      <ThreadSummaryItem
+                        disabled
+                        label="Create a file or site"
                       />
-                    }
-                    collapsible
-                    title="Environment"
-                    toggleLabel="Toggle environment summary"
-                  >
-                    <ThreadSummaryItem
-                      label="Changes"
-                      leading={<SummaryGlyph name="changes" />}
-                      meta={<ThreadSummaryDelta added={0} removed={0} />}
-                    />
-                    <ThreadSummaryItem
-                      label="Local"
-                      leading={<SummaryGlyph name="computer" />}
-                      title="Select where to run the chat"
-                      trailing="⌄"
-                    />
-                    <ThreadSummaryItem
-                      label="feat/current-context-summary"
-                      leading={<SummaryGlyph name="branch" />}
-                      title="Switch branch"
-                      trailing="⌄"
-                    />
-                    <ThreadSummaryItem
-                      disabled
-                      label="Commit or push"
-                      leading={<SummaryGlyph name="commit" />}
-                    />
-                    <ThreadSummaryItem
-                      label="Create pull request"
-                      leading={<SummaryGlyph name="github" />}
-                    />
-                  </ThreadSummarySection>
-                </ThreadSummaryPanel>
+                    </ThreadSummarySection>
+                    <ThreadSummarySection
+                      collapsible
+                      title="Subagents"
+                      toggleLabel="Toggle subagents summary"
+                    >
+                      <ThreadSummaryItem
+                        aria-label="Open subagents"
+                        label={`${activeSubagentCount > 0 ? activeSubagentCount : subagentItems.length} ${activeSubagentCount > 0 ? "working" : "done"}`}
+                        leading={
+                          <SubagentAvatar
+                            active={activeSubagentCount > 0}
+                            seed="long-probe"
+                            size="tiny"
+                          />
+                        }
+                        onClick={() => {
+                          setThreadSummaryOpen(false);
+                          openSubagentPanel(null);
+                        }}
+                      />
+                    </ThreadSummarySection>
+                    <ThreadSummarySection
+                      actions={
+                        <ThreadSummaryIconButton
+                          icon="+"
+                          label="Attach files or connect apps"
+                        />
+                      }
+                      collapsible
+                      title="Sources"
+                      toggleLabel="Toggle sources summary"
+                    >
+                      <ThreadSummaryItem
+                        disabled
+                        label="Attach files or connect apps"
+                      />
+                    </ThreadSummarySection>
+                  </ThreadSummaryPanel>
+                ) : (
+                  <ThreadSummaryPanel>
+                    <ThreadSummarySection
+                      actions={
+                        <ThreadSummaryIconButton
+                          icon="+"
+                          label="Set up local environment"
+                        />
+                      }
+                      collapsible
+                      title="Environment"
+                      toggleLabel="Toggle environment summary"
+                    >
+                      <ThreadSummaryItem
+                        label="Changes"
+                        leading={<SummaryGlyph name="changes" />}
+                        meta={<ThreadSummaryDelta added={0} removed={0} />}
+                      />
+                      <ThreadSummaryItem
+                        label="Local"
+                        leading={<SummaryGlyph name="computer" />}
+                        title="Select where to run the chat"
+                        trailing="⌄"
+                      />
+                      <ThreadSummaryItem
+                        label="feat/current-context-summary"
+                        leading={<SummaryGlyph name="branch" />}
+                        title="Switch branch"
+                        trailing="⌄"
+                      />
+                      <ThreadSummaryItem
+                        disabled
+                        label="Commit or push"
+                        leading={<SummaryGlyph name="commit" />}
+                      />
+                      <ThreadSummaryItem
+                        label="Create pull request"
+                        leading={<SummaryGlyph name="github" />}
+                      />
+                    </ThreadSummarySection>
+                  </ThreadSummaryPanel>
+                )}
               </ThreadSummaryPopover>
             ) : (
               <button aria-label="Thread settings" type="button">
                 ☷
               </button>
             )}
-            <button aria-label="Toggle bottom panel" type="button">
-              ▱
-            </button>
-            <button aria-label="Toggle side panel" type="button">
-              ▯
-            </button>
+            {!isCurrentSubagentReplay || !subagentPanelOpen ? (
+              <>
+                <button aria-label="Toggle bottom panel" type="button">
+                  ▱
+                </button>
+                <button
+                  aria-label="Toggle side panel"
+                  aria-pressed={
+                    isCurrentSubagentReplay
+                      ? subagentPanelOpen
+                      : undefined
+                  }
+                  onClick={
+                    isCurrentSubagentReplay
+                      ? toggleSubagentPanel
+                      : undefined
+                  }
+                  type="button"
+                >
+                  ▯
+                </button>
+              </>
+            ) : null}
           </div>
         ) : (
           <div className="demo-header-actions">
@@ -2652,6 +2928,17 @@ export function App() {
                 ▱
               </Button>
             ) : null}
+            {hasSubagentSurface ? (
+              <Button
+                aria-label="Toggle side panel"
+                aria-pressed={subagentPanelSelected && subagentPanelOpen}
+                onClick={toggleSubagentPanel}
+                size="small"
+                tone="ghost"
+              >
+                ▯
+              </Button>
+            ) : null}
             <Button
               onClick={() =>
                 selectMode(mode === "replay" ? "live" : "replay")
@@ -2666,9 +2953,11 @@ export function App() {
       }
       navigation={
         currentHeaderReplay ? (
-          <span aria-hidden="true" className="demo-current-mcp-folder">
-            ▱
-          </span>
+          isCurrentSubagentReplay ? undefined : (
+            <span aria-hidden="true" className="demo-current-mcp-folder">
+              ▱
+            </span>
+          )
         ) : (
           <Button
             aria-label={sidebarOpen ? "Hide sidebar" : "Show sidebar"}
@@ -2707,7 +2996,8 @@ export function App() {
       scenarioId === "command-failure-recovery" ||
       scenarioId === "interruption" ||
       scenarioId === "compaction" ||
-      scenarioId === "context-summary");
+      scenarioId === "context-summary" ||
+      scenarioId === "subagent-delegation");
   const showLifecycleComposer = isConversationLifecycle;
   const composerSurface = (
     <AgentComposer
@@ -3693,6 +3983,93 @@ export function App() {
       ]}
     />
   ) : null;
+  const subagentPanel = hasSubagentSurface ? (
+    <WorkspacePanel
+      activeTabId="subagents"
+      actions={
+        <>
+          <button
+            aria-label="Open side panel tab"
+            className="demo-subagent-panel-header-action"
+            type="button"
+          >
+            +
+          </button>
+          <span className="demo-subagent-panel-header-spacer" />
+          <button
+            aria-label="Expand side panel"
+            className="demo-subagent-panel-header-action"
+            type="button"
+          >
+            ⌜
+          </button>
+          <button
+            aria-label="Toggle bottom panel"
+            className="demo-subagent-panel-header-action"
+            type="button"
+          >
+            ▱
+          </button>
+          <button
+            aria-label="Toggle side panel"
+            className="demo-subagent-panel-header-action"
+            onClick={() => setSubagentPanelOpen(false)}
+            type="button"
+          >
+            ▯
+          </button>
+        </>
+      }
+      className="demo-subagent-workspace-panel"
+      label="Subagents"
+      onActiveTabChange={() => undefined}
+      onCloseTab={() => setSubagentPanelOpen(false)}
+      placement="side"
+      tabCloseButtons
+      tabs={[
+        {
+          closeLabel: "Close Subagents tab",
+          content: selectedSubagent ? (
+            <div
+              className="demo-subagent-transcript"
+              data-testid="subagent-transcript"
+            >
+              <SubagentTranscriptHeader
+                item={selectedSubagent}
+                onBack={() => setSelectedSubagentId(null)}
+              />
+              <AgentMessage
+                actions={
+                  <McpResponseActions
+                    includeShare={false}
+                    label="Subagent response actions"
+                  />
+                }
+                role="assistant"
+              >
+                {selectedSubagent.lastMessage ?? "Working"}
+              </AgentMessage>
+            </div>
+          ) : (
+            <SubagentPanel
+              activeTitle={`Active · ${activeSubagentCount}`}
+              data-testid="subagent-panel"
+              items={subagentItems}
+              onSelect={(item) => setSelectedSubagentId(item.id)}
+            />
+          ),
+          id: "subagents",
+          label: (
+            <span className="demo-subagent-panel-tab-label">
+              <SubagentAvatar seed="long-probe" size="tiny" />
+              <span>Subagents</span>
+            </span>
+          ),
+        },
+      ]}
+      tabsLabel="Subagent tabs"
+    />
+  ) : null;
   const pullRequestChecks = [
     {
       id: "electron",
@@ -4364,6 +4741,8 @@ export function App() {
                 (scenarioId === "interruption" &&
                   message.id ===
                     "assistant-command-interruption-recovery") ||
+                (scenarioId === "subagent-delegation" &&
+                  message.id === "assistant-subagent-delegation") ||
                 (scenarioId === "compaction" &&
                   (message.id === "assistant-compaction-baseline" ||
                     message.id ===
@@ -4374,7 +4753,8 @@ export function App() {
                 scenarioId === "approval-allow-once" ||
                 scenarioId === "approval-denied" ||
                 scenarioId === "approval-similar-commands" ||
-                scenarioId === "long-command-output" ? (
+                scenarioId === "long-command-output" ||
+                scenarioId === "subagent-delegation" ? (
                   <McpResponseActions
                     label={
                       message.id === "assistant-workflow" ||
@@ -4724,6 +5104,73 @@ export function App() {
       );
     }
 
+    if (entry.kind === "subagent") {
+      const callSubagents = subagentItems.filter((item) =>
+        state.subagents.some(
+          (subagent) =>
+            subagent.callId === entry.id && subagent.id === item.id,
+        ),
+      );
+      if (callSubagents.length === 0) return null;
+      const working = callSubagents.filter(
+        ({ status }) => status !== "done",
+      );
+      const activityItems =
+        working.length > 0 || mode !== "live"
+          ? working
+          : callSubagents;
+      const startedAtMs = state.subagents
+        .filter((item) => item.callId === entry.id)
+        .flatMap((item) =>
+          item.startedAtMs === null ? [] : [item.startedAtMs],
+        )
+        .sort((left, right) => left - right)[0];
+      const completedAtMs = state.subagents
+        .filter((item) => item.callId === entry.id)
+        .flatMap((item) =>
+          item.completedAtMs === null ? [] : [item.completedAtMs],
+        )
+        .sort((left, right) => right - left)[0];
+      return (
+        <ActivityTimeline
+          className="demo-subagent-activity-timeline"
+          defaultOpen={mode === "live" && working.length > 0}
+          key={`subagent:${entry.id}`}
+          open={initialSelection.capture ? working.length > 0 : undefined}
+          summary={
+            <TurnDuration
+              {...(mode === "live"
+                ? {
+                    completedAtMs:
+                      working.length === 0 ? completedAtMs : undefined,
+                    startedAtMs,
+                  }
+                : {
+                    durationMs:
+                      working.length > 0 ? 14_000 : 45_000,
+                  })}
+              status={working.length > 0 ? "working" : "worked"}
+            />
+          }
+        >
+          {activityItems.map((item) => (
+            <SubagentActivity
+              item={{
+                activityStatus:
+                  item.status === "done" ? "done" : "active",
+                id: item.id,
+                name: item.name,
+              }}
+              key={item.id}
+              onOpen={() => {
+                openSubagentPanel(item.id);
+              }}
+            />
+          ))}
+        </ActivityTimeline>
+      );
+    }
+
     if (entry.kind === "command") {
       const command = state.commands.find(({ id }) => id === entry.id);
       if (!command) return null;
@@ -5053,7 +5500,7 @@ export function App() {
               setReviewSelection({
                 fileChangeId: fileChange.id,
               });
-              setReviewOpen(true);
+              openReviewPanel();
             }}
             type="button"
           >
@@ -5075,7 +5522,7 @@ export function App() {
               fileChangeId: fileChange.id,
               path: change.path,
             });
-            setReviewOpen(true);
+            openReviewPanel();
           }}
           status={fileChange.status}
         />
@@ -5407,7 +5854,7 @@ export function App() {
             disabled={!reviewPanel}
             endIcon="⌃⇧G"
             onSelect={() => {
-              setReviewOpen(true);
+              openReviewPanel();
               setTerminalTabPickerOpen(false);
             }}
             startIcon="▣"
@@ -5486,7 +5933,8 @@ export function App() {
         isConversationLifecycle ||
         isCurrentAttachmentReplay ||
         isCurrentCommandInterruptionReplay ||
-        isCurrentContextCompactionReplay
+        isCurrentContextCompactionReplay ||
+        isCurrentSubagentReplay
           ? composerPhase
           : undefined
       }
@@ -5545,7 +5993,8 @@ export function App() {
         onBottomPanelHeightChange={setTerminalHeight}
         layoutMode={
           (initialSelection.capture &&
-            activeFrame !== "pr-compact-detail") ||
+            activeFrame !== "pr-compact-detail" &&
+            activeFrame !== "subagent-current-compact-720") ||
           initialSelection.layoutMode === "wide"
             ? "wide"
             : undefined
@@ -5553,10 +6002,18 @@ export function App() {
         narrowSidebarBehavior="current-build"
         onSidebarOpenChange={setSidebarOpen}
         onSidePanelOpenChange={
-          view === "pull-request" ? setPullRequestOpen : setReviewOpen
+          view === "pull-request"
+            ? setPullRequestOpen
+            : subagentPanelSelected
+              ? setSubagentPanelOpen
+              : setReviewOpen
         }
         onSidePanelWidthChange={
-          view === "pull-request" ? setPullRequestWidth : undefined
+          view === "pull-request"
+            ? setPullRequestWidth
+            : subagentPanelSelected
+              ? setSubagentPanelWidth
+              : undefined
         }
         responsivePanelContinuity={
           !initialSelection.capture &&
@@ -5564,28 +6021,57 @@ export function App() {
         }
         responsivePanelContinuityKey={`${mode}:${view}:${scenarioId}`}
         sidePanel={
-          view === "pull-request" ? pullRequestPanel : reviewPanel
+          view === "pull-request"
+            ? pullRequestPanel
+            : subagentPanelSelected
+              ? subagentPanel
+              : reviewPanel
         }
         sidePanelExpanded={
           view === "pull-request" && pullRequestExpanded
         }
         sidePanelLabel={
-          view === "pull-request" ? "Pull request details" : "Review"
+          view === "pull-request"
+            ? "Pull request details"
+            : subagentPanelSelected
+              ? "Subagents"
+              : "Review"
         }
-        sidePanelMinMainWidth={view === "pull-request" ? 390 : undefined}
-        sidePanelMinWidth={view === "pull-request" ? 322 : undefined}
+        sidePanelMinMainWidth={
+          view === "pull-request"
+            ? 390
+            : subagentPanelSelected
+              ? 220
+              : undefined
+        }
+        sidePanelMinWidth={
+          view === "pull-request"
+            ? 322
+            : subagentPanelSelected
+              ? 300
+              : undefined
+        }
         sidePanelOpen={
           view === "pull-request"
             ? pullRequestOpen
-            : reviewOpen && Boolean(reviewPanel)
+            : subagentPanelSelected
+              ? subagentPanelOpen
+              : reviewOpen && Boolean(reviewPanel)
         }
         sidePanelOverlay={view === "pull-request"}
-        sidePanelOverlayModal={view !== "pull-request"}
+        sidePanelOverlayModal={
+          view !== "pull-request" && !subagentPanelSelected
+        }
         sidePanelResizable
         sidePanelWidth={
-          view === "pull-request" ? pullRequestWidth : undefined
+          view === "pull-request"
+            ? pullRequestWidth
+            : subagentPanelSelected
+              ? subagentPanelWidth
+              : undefined
         }
         sidebar={sidebar}
+        sidebarMinMainWidth={subagentPanelSelected ? 220 : undefined}
         sidebarOpen={sidebarOpen}
         sidebarResizable
         windowChrome={

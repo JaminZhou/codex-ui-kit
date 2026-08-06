@@ -4200,6 +4200,461 @@ try {
   await contextSummaryCompactApp.close();
 }
 
+const subagentScene = {
+  frame: "subagent-current-summary-completed",
+  id: "electron-subagent-delegation",
+  scenario: "subagent-delegation",
+};
+const { app: subagentApp, page: subagentPage } = await launchScene(
+  subagentScene,
+  { capture: false },
+);
+try {
+  const measureSubagentLayout = () =>
+    subagentPage.evaluate(() => {
+      const rect = (selector) => {
+        const element = document.querySelector(selector);
+        if (!element) return null;
+        const value = element.getBoundingClientRect();
+        return {
+          height: value.height,
+          left: value.left,
+          right: value.right,
+          top: value.top,
+          width: value.width,
+        };
+      };
+      const shell = document.querySelector(".codex-ui-app-shell");
+      return {
+        horizontalOverflow:
+          document.documentElement.scrollWidth -
+          document.documentElement.clientWidth,
+        main: rect(".codex-ui-app-shell__main"),
+        panel: rect('[data-testid="subagent-panel"]'),
+        panelOpen: shell?.hasAttribute("data-side-panel-open") ?? false,
+        panelOverlay:
+          shell?.hasAttribute("data-side-panel-overlay") ?? false,
+        side: rect(".codex-ui-app-shell__side-panel"),
+        sidebar: rect(".codex-ui-app-shell__sidebar"),
+        sidebarOpen: shell?.hasAttribute("data-sidebar-open") ?? false,
+        summary: rect(".demo-subagent-summary-panel"),
+        transcript: rect('[data-testid="subagent-transcript"]'),
+        viewport: { height: window.innerHeight, width: window.innerWidth },
+      };
+    });
+
+  const initialSubagent = await measureSubagentLayout();
+  if (
+    initialSubagent.panelOpen ||
+    !initialSubagent.summary ||
+    Math.abs(initialSubagent.summary.left - 804) > 1 ||
+    Math.abs(initialSubagent.summary.top - 45) > 1 ||
+    Math.abs(initialSubagent.summary.width - 300) > 1 ||
+    Math.abs(initialSubagent.summary.height - 241) > 1 ||
+    !(await subagentPage
+      .getByRole("button", { name: "Open subagents" })
+      .textContent())
+      ?.includes("1 done")
+  ) {
+    throw new Error(
+      `Electron subagent summary baseline failed: ${JSON.stringify(initialSubagent)}`,
+    );
+  }
+
+  await subagentPage
+    .getByRole("button", { name: "Open subagents" })
+    .click();
+  await subagentPage.waitForSelector(
+    '.codex-ui-app-shell[data-side-panel-open] [data-testid="subagent-panel"]',
+  );
+  const wideSubagent = await measureSubagentLayout();
+  if (
+    !wideSubagent.panelOpen ||
+    wideSubagent.summary ||
+    !wideSubagent.side ||
+    !wideSubagent.panel ||
+    Math.abs(wideSubagent.side.left - 810.71875) > 1 ||
+    Math.abs(wideSubagent.side.width - 369.28125) > 1 ||
+    Math.abs(wideSubagent.panel.top - 46) > 1 ||
+    Math.abs(wideSubagent.panel.height - 774) > 1
+  ) {
+    throw new Error(
+      `Electron subagent panel open failed: ${JSON.stringify(wideSubagent)}`,
+    );
+  }
+
+  await subagentPage.locator(".codex-ui-subagent-panel__item").click();
+  await subagentPage.waitForSelector('[data-testid="subagent-transcript"]');
+  const transcriptText = (
+    await subagentPage.getByTestId("subagent-transcript").textContent()
+  )?.replace(/\s+/g, " ").trim();
+  if (
+    !transcriptText?.includes("Long probe") ||
+    !transcriptText.includes("SUBAGENT LONG PROBE DONE") ||
+    (await subagentPage
+      .getByRole("toolbar", { name: "Subagent response actions" })
+      .count()) !== 1
+  ) {
+    throw new Error(
+      `Electron subagent transcript failed: ${JSON.stringify(transcriptText)}`,
+    );
+  }
+  await subagentPage
+    .getByRole("button", { name: "Back to subagents" })
+    .click();
+  await subagentPage.waitForSelector('[data-testid="subagent-panel"]');
+
+  await subagentApp.evaluate(({ BrowserWindow }) => {
+    BrowserWindow.getAllWindows()[0]?.setContentSize(820, 680);
+  });
+  await subagentPage.waitForFunction(
+    () =>
+      window.innerWidth === 820 &&
+      !document
+        .querySelector(".codex-ui-app-shell")
+        ?.hasAttribute("data-side-panel-open"),
+  );
+  await subagentPage
+    .locator(
+      '.codex-ui-conversation-thread-shell__header button[aria-label="Toggle side panel"]',
+    )
+    .click();
+  await subagentPage.waitForFunction(() => {
+    const shell = document.querySelector(".codex-ui-app-shell");
+    const side = document.querySelector(
+      ".codex-ui-app-shell__side-panel",
+    )?.getBoundingClientRect();
+    return (
+      shell?.hasAttribute("data-side-panel-open") &&
+      Math.abs((side?.left ?? 0) - 501) <= 1 &&
+      Math.abs((side?.width ?? 0) - 319) <= 1
+    );
+  });
+  const compact820Subagent = await measureSubagentLayout();
+  if (
+    !compact820Subagent.sidebarOpen ||
+    !compact820Subagent.panelOverlay ||
+    compact820Subagent.sidebar?.width !== 274 ||
+    compact820Subagent.horizontalOverflow > 1
+  ) {
+    throw new Error(
+      `Electron 820px subagent continuity failed: ${JSON.stringify(compact820Subagent)}`,
+    );
+  }
+  await subagentPage
+    .locator(
+      '.demo-subagent-workspace-panel button[aria-label="Toggle side panel"]',
+    )
+    .click();
+  await subagentPage.waitForSelector(
+    ".codex-ui-app-shell:not([data-side-panel-open])",
+  );
+
+  await subagentApp.evaluate(({ BrowserWindow }) => {
+    BrowserWindow.getAllWindows()[0]?.setContentSize(720, 680);
+  });
+  await subagentPage.waitForFunction(
+    () =>
+      window.innerWidth === 720 &&
+      !document
+        .querySelector(".codex-ui-app-shell")
+        ?.hasAttribute("data-sidebar-open"),
+  );
+  await subagentPage
+    .locator(
+      '.codex-ui-conversation-thread-shell__header button[aria-label="Toggle side panel"]',
+    )
+    .click();
+  await subagentPage.waitForFunction(() => {
+    const shell = document.querySelector(".codex-ui-app-shell");
+    const side = document.querySelector(
+      ".codex-ui-app-shell__side-panel",
+    )?.getBoundingClientRect();
+    return (
+      shell?.hasAttribute("data-side-panel-open") &&
+      Math.abs((side?.left ?? 0) - 390.6875) <= 1 &&
+      Math.abs((side?.width ?? 0) - 329.3125) <= 1
+    );
+  });
+  const compact720Subagent = await measureSubagentLayout();
+  if (
+    compact720Subagent.sidebarOpen ||
+    !compact720Subagent.panelOverlay ||
+    compact720Subagent.sidebar?.right !== 0 ||
+    compact720Subagent.main?.width !== 720 ||
+    compact720Subagent.horizontalOverflow > 1
+  ) {
+    throw new Error(
+      `Electron 720px subagent continuity failed: ${JSON.stringify(compact720Subagent)}`,
+    );
+  }
+} finally {
+  await subagentApp.close();
+}
+
+const liveSubagentScene = {
+  frame: "recovered",
+  id: "electron-live-subagent",
+  scenario: "streaming-recovery",
+};
+const { app: liveSubagentApp, page: liveSubagentPage } = await launchScene(
+  liveSubagentScene,
+  { capture: false },
+);
+try {
+  await liveSubagentPage.evaluate(() => {
+    const activeIntervals = new Set();
+    const originalSetInterval = window.setInterval.bind(window);
+    const originalClearInterval = window.clearInterval.bind(window);
+    window.__demoOneSecondIntervals = activeIntervals;
+    window.setInterval = (handler, timeout, ...arguments_) => {
+      const intervalId = originalSetInterval(handler, timeout, ...arguments_);
+      if (timeout === 1_000) activeIntervals.add(intervalId);
+      return intervalId;
+    };
+    window.clearInterval = (intervalId) => {
+      activeIntervals.delete(intervalId);
+      originalClearInterval(intervalId);
+    };
+  });
+  await liveSubagentPage
+    .getByRole("button", { exact: true, name: "Live" })
+    .click();
+  await liveSubagentPage.waitForSelector('.demo-root[data-mode="live"]');
+  await liveSubagentApp.evaluate(({ BrowserWindow }) => {
+    const contents = BrowserWindow.getAllWindows()[0]?.webContents;
+    const startedAtMs = Date.now() - 2_000;
+    contents?.send("demo:notification", {
+      method: "turn/started",
+      params: {
+        threadId: "thread-live-subagent",
+        turn: {
+          completedAt: null,
+          durationMs: null,
+          error: null,
+          id: "turn-live-subagent",
+          items: [],
+          itemsView: "full",
+          startedAt: 1,
+          status: "inProgress",
+        },
+      },
+    });
+    contents?.send("demo:notification", {
+      method: "item/started",
+      params: {
+        item: {
+          agentsStates: {
+            "long-probe": { message: null, status: "running" },
+          },
+          id: "collab-live-subagent",
+          model: null,
+          prompt: "Run the bounded live subagent probe.",
+          reasoningEffort: null,
+          receiverThreadIds: ["long-probe"],
+          senderThreadId: "thread-live-subagent",
+          status: "inProgress",
+          tool: "spawnAgent",
+          type: "collabAgentToolCall",
+        },
+        startedAtMs,
+        threadId: "thread-live-subagent",
+        turnId: "turn-live-subagent",
+      },
+    });
+  });
+  const liveActivity = liveSubagentPage.getByRole("button", {
+    name: "Open Long probe subagent",
+  });
+  await liveActivity.waitFor({ state: "visible" });
+  const liveDuration = liveSubagentPage.locator(
+    ".demo-subagent-activity-timeline .codex-ui-turn-duration",
+  );
+  const firstLiveDuration = await liveDuration.textContent();
+  await liveSubagentPage.waitForTimeout(1_100);
+  const secondLiveDuration = await liveDuration.textContent();
+  if (
+    !firstLiveDuration?.startsWith("Working for ") ||
+    !secondLiveDuration?.startsWith("Working for ") ||
+    firstLiveDuration === secondLiveDuration
+  ) {
+    throw new Error(
+      `Electron live subagent duration did not tick: ${JSON.stringify({ firstLiveDuration, secondLiveDuration })}`,
+    );
+  }
+  await liveActivity.click();
+  await liveSubagentPage.waitForSelector(
+    '.codex-ui-app-shell[data-side-panel-open] [data-testid="subagent-transcript"]',
+  );
+
+  await liveSubagentApp.evaluate(({ BrowserWindow }) => {
+    const contents = BrowserWindow.getAllWindows()[0]?.webContents;
+    contents?.send("demo:notification", {
+      method: "item/completed",
+      params: {
+        completedAtMs: Date.now(),
+        item: {
+          agentsStates: {
+            "long-probe": {
+              message: "SUBAGENT LIVE PROBE DONE",
+              status: "completed",
+            },
+          },
+          id: "collab-live-subagent",
+          model: null,
+          prompt: "Run the bounded live subagent probe.",
+          reasoningEffort: null,
+          receiverThreadIds: ["long-probe"],
+          senderThreadId: "thread-live-subagent",
+          status: "completed",
+          tool: "spawnAgent",
+          type: "collabAgentToolCall",
+        },
+        threadId: "thread-live-subagent",
+        turnId: "turn-live-subagent",
+      },
+    });
+    contents?.send("demo:notification", {
+      method: "turn/completed",
+      params: {
+        threadId: "thread-live-subagent",
+        turn: {
+          completedAt: 46,
+          durationMs: 45_000,
+          error: null,
+          id: "turn-live-subagent",
+          items: [],
+          itemsView: "full",
+          startedAt: 1,
+          status: "completed",
+        },
+      },
+    });
+  });
+  await liveSubagentPage.waitForFunction(
+    () =>
+      document
+        .querySelector('[data-testid="subagent-transcript"]')
+        ?.textContent?.includes("SUBAGENT LIVE PROBE DONE") ?? false,
+  );
+  if (!(await liveDuration.textContent())?.startsWith("Worked for ")) {
+    throw new Error(
+      `Electron live subagent duration did not settle: ${JSON.stringify(await liveDuration.textContent())}`,
+    );
+  }
+  await liveSubagentPage
+    .getByRole("button", { name: "Back to subagents" })
+    .click();
+  await liveSubagentPage.waitForSelector('[data-testid="subagent-panel"]');
+  const livePanelTime = liveSubagentPage.locator(
+    '[data-testid="subagent-panel"] time',
+  );
+  const firstLivePanelTime = await livePanelTime.textContent();
+  const livePanelDateTime = await livePanelTime.getAttribute("datetime");
+  await liveSubagentPage.waitForFunction(
+    (initialTime) =>
+      document.querySelector('[data-testid="subagent-panel"] time')
+        ?.textContent !== initialTime,
+    firstLivePanelTime,
+    { timeout: 3_000 },
+  );
+  const secondLivePanelTime = await livePanelTime.textContent();
+  if (
+    !firstLivePanelTime?.match(/^\d+[smhd] ago$/) ||
+    firstLivePanelTime === "1m ago" ||
+    firstLivePanelTime === secondLivePanelTime ||
+    !livePanelDateTime ||
+    Math.abs(Date.now() - Date.parse(livePanelDateTime)) > 10_000
+  ) {
+    throw new Error(
+      `Electron live subagent panel time was not protocol-backed: ${JSON.stringify({ firstLivePanelTime, livePanelDateTime, secondLivePanelTime })}`,
+    );
+  }
+
+  await liveSubagentApp.evaluate(({ BrowserWindow }) => {
+    BrowserWindow.getAllWindows()[0]?.webContents.send("demo:notification", {
+      method: "item/completed",
+      params: {
+        completedAtMs: Date.now(),
+        item: {
+          changes: [
+            {
+              diff: "@@ -0,0 +1 @@\n+review remains reachable after delegation\n",
+              kind: { type: "add" },
+              path: "SUBAGENT_REVIEW.md",
+            },
+          ],
+          id: "file-live-after-subagent",
+          status: "completed",
+          type: "fileChange",
+        },
+        threadId: "thread-live-subagent",
+        turnId: "turn-live-subagent",
+      },
+    });
+  });
+  const liveReviewAction = liveSubagentPage.getByRole("button", {
+    exact: true,
+    name: "Review",
+  });
+  await liveReviewAction.waitFor({ state: "visible" });
+  await liveReviewAction.click();
+  await liveSubagentPage.waitForSelector(
+    '.codex-ui-app-shell[data-side-panel-open] [data-testid="review-panel"]',
+  );
+  await liveSubagentPage.waitForFunction(
+    () => window.__demoOneSecondIntervals?.size === 0,
+  );
+  if (await liveSubagentPage.getByTestId("subagent-panel").isVisible()) {
+    throw new Error(
+      "Electron live file Review remained hidden behind the historical subagent panel.",
+    );
+  }
+  await liveSubagentPage
+    .locator(
+      '.codex-ui-conversation-thread-shell__header button[aria-label="Toggle side panel"]',
+    )
+    .click();
+  await liveSubagentPage.waitForSelector(
+    '.codex-ui-app-shell[data-side-panel-open] [data-testid="subagent-panel"]',
+  );
+  await liveSubagentPage
+    .locator(
+      '.demo-subagent-workspace-panel button[aria-label="Toggle side panel"]',
+    )
+    .click();
+  await liveSubagentPage.waitForSelector(
+    ".codex-ui-app-shell:not([data-side-panel-open])",
+  );
+  await liveSubagentPage
+    .locator(
+      '.codex-ui-conversation-thread-shell__header button[aria-label="Toggle side panel"]',
+    )
+    .click();
+  await liveSubagentPage.waitForSelector(
+    '.codex-ui-app-shell[data-side-panel-open] [data-testid="subagent-panel"]',
+  );
+  await liveSubagentPage.locator(".codex-ui-subagent-panel__item").click();
+  const liveTranscript = liveSubagentPage.getByTestId(
+    "subagent-transcript",
+  );
+  await liveTranscript.waitFor({ state: "visible" });
+  if (
+    !(await liveTranscript.textContent())?.includes(
+      "SUBAGENT LIVE PROBE DONE",
+    ) ||
+    !(await liveSubagentPage
+      .getByRole("button", { name: "Open Long probe subagent" })
+      .isVisible())
+  ) {
+    throw new Error(
+      "Electron live subagent did not preserve completed activity and transcript access.",
+    );
+  }
+} finally {
+  await liveSubagentApp.close();
+}
+
 console.log(
-  "Electron host, native-window, coding-workspace routing, conversation/Composer and current image-attachment lifecycle plus current menus, current long, failed, and interrupted command output plus manual context compaction and thread summary, default 720px narrow reachability, resizable navigation/Review/Terminal/PR detail, PR tabs and expansion, MCP disclosure/result, multi-file and mixed-content Review, selection/Undo, large diff scrolling, and compact geometry contracts passed.",
+  "Electron host, native-window, coding-workspace routing, conversation/Composer and current image-attachment lifecycle plus current menus, current long, failed, and interrupted command output plus manual context compaction, thread summary, replay/live subagent delegation, default 720px narrow reachability, resizable navigation/Review/Terminal/PR detail, PR tabs and expansion, MCP disclosure/result, multi-file and mixed-content Review, selection/Undo, large diff scrolling, and compact geometry contracts passed.",
 );

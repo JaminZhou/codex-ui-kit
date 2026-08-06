@@ -8393,12 +8393,12 @@ summary.codex-ui-activity__header::after {
   width: 100%;
 }
 
-.codex-ui-subagent-avatar path {
+.codex-ui-subagent-avatar__petals {
   fill: currentColor;
 }
 
-.codex-ui-subagent-avatar circle {
-  fill: var(--codex-ui-bg);
+.codex-ui-subagent-avatar__center {
+  fill: color-mix(in srgb, currentColor 58%, var(--codex-ui-bg));
 }
 
 .codex-ui-subagent-avatar[data-variant="1"],

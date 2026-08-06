@@ -445,6 +445,270 @@ for (const scene of visualScenes) {
       continue;
     }
 
+    if (scene.scenario === "subagent-delegation") {
+      await page.waitForTimeout(50);
+      const contract = await page.evaluate(() => {
+        const rect = (element) => {
+          if (!element) return null;
+          const value = element.getBoundingClientRect();
+          return {
+            bottom: value.bottom,
+            height: value.height,
+            left: value.left,
+            right: value.right,
+            top: value.top,
+            width: value.width,
+          };
+        };
+        const style = (element) => {
+          if (!element) return null;
+          const value = getComputedStyle(element);
+          return {
+            borderRadius: value.borderRadius,
+            fontSize: value.fontSize,
+            gap: value.gap,
+            lineHeight: value.lineHeight,
+            padding: value.padding,
+            position: value.position,
+            visibility: value.visibility,
+          };
+        };
+        const text = (element) =>
+          element?.textContent?.replace(/\s+/g, " ").trim() ?? null;
+        const root = document.querySelector(".demo-root");
+        const shell = document.querySelector(".codex-ui-app-shell");
+        const sidebar = document.querySelector(
+          ".codex-ui-app-shell__sidebar",
+        );
+        const main = document.querySelector(".codex-ui-app-shell__main");
+        const side = document.querySelector(
+          ".codex-ui-app-shell__side-panel",
+        );
+        const summary = document.querySelector(
+          ".demo-subagent-summary-panel",
+        );
+        const timeline = document.querySelector(
+          ".demo-subagent-activity-timeline",
+        );
+        const activity = document.querySelector(
+          ".codex-ui-subagent-activity",
+        );
+        const panel = document.querySelector(
+          '[data-testid="subagent-panel"]',
+        );
+        const panelHeading = panel?.querySelector(
+          ".codex-ui-subagent-panel__section h2",
+        );
+        const panelRow = panel?.querySelector(
+          ".codex-ui-subagent-panel__item",
+        );
+        const transcript = document.querySelector(
+          '[data-testid="subagent-transcript"]',
+        );
+        const panelTab = document.querySelector(
+          '.demo-subagent-workspace-panel [role="tab"]',
+        );
+        return {
+          activity: {
+            rect: rect(activity),
+            text: text(activity),
+          },
+          frame: root?.getAttribute("data-frame") ?? null,
+          horizontalOverflow:
+            document.documentElement.scrollWidth -
+            document.documentElement.clientWidth,
+          main: rect(main),
+          panel: {
+            heading: rect(panelHeading),
+            headingStyle: style(panelHeading),
+            rect: rect(panel),
+            row: rect(panelRow),
+            rowStyle: style(panelRow),
+            sectionCount:
+              panel?.querySelectorAll(
+                ".codex-ui-subagent-panel__section",
+              ).length ?? 0,
+            text: text(panel),
+          },
+          panelTab: {
+            rect: rect(panelTab),
+            selected: panelTab?.getAttribute("aria-selected") ?? null,
+            text: text(panelTab),
+          },
+          shell: rect(shell),
+          side: {
+            rect: rect(side),
+            style: style(side),
+          },
+          sidebar: rect(sidebar),
+          status: root?.getAttribute("data-status") ?? null,
+          summary: {
+            rect: rect(summary),
+            text: text(summary),
+          },
+          timeline: {
+            rect: rect(timeline),
+            text: text(timeline),
+          },
+          transcript: {
+            actions: Boolean(
+              transcript?.querySelector(
+                '[aria-label="Subagent response actions"]',
+              ),
+            ),
+            back: Boolean(
+              transcript?.querySelector(
+                ".codex-ui-subagent-transcript-header__back",
+              ),
+            ),
+            rect: rect(transcript),
+            text: text(transcript),
+          },
+          viewport: { height: window.innerHeight, width: window.innerWidth },
+        };
+      });
+      const running = scene.frame.includes("running");
+      const summaryOpen = scene.frame.includes("summary");
+      const panelOpen =
+        scene.frame.includes("panel") ||
+        scene.frame.includes("compact") ||
+        scene.frame.includes("transcript");
+      const transcriptOpen = scene.frame.includes("transcript");
+      const compact820 = scene.frame.endsWith("compact-820");
+      const compact720 = scene.frame.endsWith("compact-720");
+      const expectedViewportWidth = compact820 ? 820 : compact720 ? 720 : 1180;
+      const expectedSideWidth = compact820
+        ? 319
+        : compact720
+          ? 329.3125
+          : 369.28125;
+      const expectedSideLeft = compact820
+        ? 501
+        : compact720
+          ? 390.6875
+          : 810.71875;
+      if (
+        contract.frame !== scene.frame ||
+        contract.status !== (running ? "running" : "completed") ||
+        contract.viewport.width !== expectedViewportWidth ||
+        contract.viewport.height !== (compact820 || compact720 ? 680 : 820) ||
+        contract.horizontalOverflow > 1 ||
+        !contract.shell ||
+        !contract.main ||
+        !contract.sidebar ||
+        !contract.side.rect ||
+        !contract.timeline.rect ||
+        Boolean(contract.summary.rect) !== summaryOpen ||
+        Boolean(contract.transcript.rect) !== transcriptOpen ||
+        (panelOpen && !transcriptOpen && !contract.panel.rect)
+      ) {
+        throw new Error(
+          `${scene.id}: subagent surface contract failed: ${JSON.stringify(contract)}`,
+        );
+      }
+      if (
+        running !== Boolean(contract.activity.rect) ||
+        (running &&
+          (contract.activity.text !== "Long probe started working" ||
+            contract.timeline.text !==
+              "Working for 14sLong probe started working")) ||
+        (!running && contract.timeline.text !== "Worked for 45s")
+      ) {
+        throw new Error(
+          `${scene.id}: subagent lifecycle contract failed: ${JSON.stringify(contract)}`,
+        );
+      }
+      if (
+        summaryOpen &&
+        (!contract.summary.rect ||
+          Math.abs(contract.summary.rect.left - 804) > 1 ||
+          Math.abs(contract.summary.rect.top - 45) > 1 ||
+          Math.abs(contract.summary.rect.width - 300) > 1 ||
+          Math.abs(contract.summary.rect.height - 241) > 1 ||
+          !contract.summary.text?.includes("Outputs") ||
+          !contract.summary.text?.includes("Subagents") ||
+          !contract.summary.text?.includes(running ? "1 working" : "1 done") ||
+          !contract.summary.text?.includes("Sources"))
+      ) {
+        throw new Error(
+          `${scene.id}: subagent summary contract failed: ${JSON.stringify(contract)}`,
+        );
+      }
+      if (
+        panelOpen &&
+        (!contract.side.rect ||
+          Math.abs(contract.side.rect.left - expectedSideLeft) > 1 ||
+          Math.abs(contract.side.rect.width - expectedSideWidth) > 1 ||
+          contract.side.rect.right !== expectedViewportWidth ||
+          contract.side.style?.visibility !== "visible" ||
+          (compact820 || compact720
+            ? contract.side.style?.position !== "absolute"
+            : contract.side.style?.position !== "static") ||
+          contract.panelTab.selected !== "true" ||
+          contract.panelTab.text !== "Subagents")
+      ) {
+        throw new Error(
+          `${scene.id}: subagent side-panel geometry failed: ${JSON.stringify(contract)}`,
+        );
+      }
+      if (
+        panelOpen &&
+        !transcriptOpen &&
+        (!contract.panel.rect ||
+          contract.panel.sectionCount !== (running ? 1 : 2) ||
+          !contract.panel.text?.includes(
+            running ? "Active · 1" : "Active · 0",
+          ) ||
+          !contract.panel.text?.includes(
+            running ? "Working" : "SUBAGENT LONG PROBE DONE",
+          ) ||
+          contract.panel.headingStyle?.fontSize !== "13px" ||
+          contract.panel.headingStyle?.lineHeight !== "18.5712px" ||
+          contract.panel.headingStyle?.padding !== "0px 8px" ||
+          contract.panel.rowStyle?.padding !== "8px" ||
+          contract.panel.rowStyle?.gap !== "12px" ||
+          contract.panel.rowStyle?.borderRadius !== "12.5px")
+      ) {
+        throw new Error(
+          `${scene.id}: subagent list contract failed: ${JSON.stringify(contract)}`,
+        );
+      }
+      if (
+        transcriptOpen &&
+        (!contract.transcript.back ||
+          !contract.transcript.actions ||
+          !contract.transcript.text?.includes("Long probe") ||
+          !contract.transcript.text?.includes(
+            "SUBAGENT LONG PROBE DONE",
+          ))
+      ) {
+        throw new Error(
+          `${scene.id}: subagent transcript contract failed: ${JSON.stringify(contract)}`,
+        );
+      }
+      if (
+        compact820 &&
+        (contract.sidebar.width !== 274 || contract.main.width !== 227)
+      ) {
+        throw new Error(
+          `${scene.id}: 820px continuity contract failed: ${JSON.stringify(contract)}`,
+        );
+      }
+      if (
+        compact720 &&
+        (contract.sidebar.width !== 0 || contract.main.width !== 720)
+      ) {
+        throw new Error(
+          `${scene.id}: 720px continuity contract failed: ${JSON.stringify(contract)}`,
+        );
+      }
+      await writeFile(
+        join(artifactDirectory, `${scene.id}.json`),
+        `${JSON.stringify(contract, null, 2)}\n`,
+      );
+      continue;
+    }
+
     if (scene.view === "pull-request") {
       if (scene.id !== "pull-request-detail") {
         const lifecycle = await page.evaluate(() => {

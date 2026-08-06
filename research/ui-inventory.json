@@ -290,10 +290,14 @@
       "area": "conversation",
       "ownership": "turn",
       "packageEvidence": ["local-conversation-thread", "subagent-panel"],
-      "runtimeStatus": "not_sampled",
+      "runtimeStatus": "runtime_observed",
+      "runtimeEvidence": [
+        "cdp-26.730.61639:real-single-subagent-running-completed-summary-panel-and-transcript",
+        "cdp-26.730.61639:subagent-panel-computed-styles-and-explicit-820x680-and-720x680-reopen-geometry"
+      ],
       "implementationStatus": "partial",
-      "browserStatus": "partial_legacy",
-      "electronStatus": "partial_legacy",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
       "priority": "p0"
     },
     {
