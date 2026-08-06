@@ -11,6 +11,10 @@ describe("terminal panel visual contract", () => {
     expect(styles).toContain(".codex-ui-terminal-session");
     expect(styles).toContain(".codex-ui-terminal-panel__tab-label");
     expect(styles).toContain(".codex-ui-terminal-process-list");
+    expect(styles).toContain(
+      ".codex-ui-terminal-workspace-mismatch",
+    );
+    expect(styles).toContain("var(--codex-ui-border-warning)");
     expect(styles).toContain("padding-inline: 0.5rem 2rem");
     expect(styles).toContain(
       '.codex-ui-terminal-panel__tab-label[data-status="restoring"]',

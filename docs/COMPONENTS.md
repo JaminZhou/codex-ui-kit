@@ -185,7 +185,10 @@ All privileged behavior remains host-owned. The components never auto-approve co
   per-tab close, create/restore hooks, independent values, and running,
   failed, restoring, idle, or exited status. Tab names expose that status to
   assistive technology and use distinct visible symbols rather than color
-  alone. `TerminalProcessList` presents host-supplied background-process
+  alone unless a host opts into the current product's plain local-terminal
+  labels. `TerminalWorkspaceMismatchNotice` composes the current worktree
+  mismatch message plus host-owned dismiss/open-new-terminal actions.
+  `TerminalProcessList` presents host-supplied background-process
   summaries and reopen requests. None of these components starts a shell,
   owns process persistence, or executes input.
 - `ThreadHeader`: draggable desktop header with truncating identity, navigation, and independently aligned action slots.

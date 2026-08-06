@@ -169,6 +169,7 @@ export interface TerminalSessionProps
   inputDisabled?: boolean;
   inputLabel?: string;
   label?: string;
+  notice?: ReactNode;
   onCommandSubmit?: (command: string) => void;
   onValueChange?: (value: string) => void;
   outputLabel?: string;
@@ -184,6 +185,7 @@ export function TerminalSession({
   inputDisabled = false,
   inputLabel = "Terminal input",
   label = "Terminal session",
+  notice,
   onCommandSubmit,
   onValueChange,
   outputLabel = "Terminal output",
@@ -201,6 +203,7 @@ export function TerminalSession({
       data-status={status}
       {...props}
     >
+      {notice}
       <TerminalTranscript
         entries={entries}
         follow={followOutput}
@@ -225,9 +228,11 @@ export interface TerminalPanelSession {
   inputDisabled?: boolean;
   inputLabel?: string;
   label: string;
+  notice?: ReactNode;
   outputLabel?: string;
   prompt?: ReactNode;
   status?: TerminalSessionStatus;
+  showStatus?: boolean;
   value: string;
 }
 
@@ -310,8 +315,11 @@ export function TerminalPanel({
       tabCloseButtons
       tabs={sessions.map((session) => {
         const status = session.status ?? "idle";
+        const showStatus = session.showStatus ?? true;
         return {
-          ariaLabel: `${session.label}, ${terminalSessionStatusLabel[status]}`,
+          ariaLabel: showStatus
+            ? `${session.label}, ${terminalSessionStatusLabel[status]}`
+            : session.label,
           closeLabel:
             session.closeLabel ?? `Close ${session.label} tab`,
           content: (
@@ -320,6 +328,7 @@ export function TerminalPanel({
               inputDisabled={session.inputDisabled}
               inputLabel={session.inputLabel}
               label={session.label}
+              notice={session.notice}
               onCommandSubmit={(command) =>
                 onCommandSubmit?.(session.id, command)
               }
@@ -338,9 +347,15 @@ export function TerminalPanel({
               className="codex-ui-terminal-panel__tab-label"
               data-status={status}
             >
-              <span aria-hidden="true">
-                {terminalSessionStatusIcon[status]}
-              </span>
+              {showStatus ? (
+                <span aria-hidden="true">
+                  {terminalSessionStatusIcon[status]}
+                </span>
+              ) : (
+                <span aria-hidden="true">
+                  {terminalSessionStatusIcon.idle}
+                </span>
+              )}
               <span>{session.label}</span>
             </span>
           ),
@@ -348,6 +363,60 @@ export function TerminalPanel({
       })}
       tabsLabel={tabsLabel}
     />
+  );
+}
+
+export interface TerminalWorkspaceMismatchNoticeProps
+  extends Omit<HTMLAttributes<HTMLDivElement>, "children"> {
+  dismissLabel?: string;
+  message?: ReactNode;
+  onDismiss?: () => void;
+  onOpenNewTerminal?: () => void;
+  openNewTerminalLabel?: string;
+}
+
+export function TerminalWorkspaceMismatchNotice({
+  className,
+  dismissLabel = "Dismiss",
+  message = "This terminal's workspace does not match this chat's current worktree",
+  onDismiss,
+  onOpenNewTerminal,
+  openNewTerminalLabel = "Open new terminal",
+  ...props
+}: TerminalWorkspaceMismatchNoticeProps) {
+  return (
+    <div
+      className={[
+        "codex-ui-terminal-workspace-mismatch",
+        className,
+      ]
+        .filter(Boolean)
+        .join(" ")}
+      role="status"
+      {...props}
+    >
+      <span
+        aria-hidden="true"
+        className="codex-ui-terminal-workspace-mismatch__icon"
+      >
+        !
+      </span>
+      <span className="codex-ui-terminal-workspace-mismatch__message">
+        {message}
+      </span>
+      <span className="codex-ui-terminal-workspace-mismatch__actions">
+        <button onClick={onDismiss} type="button">
+          {dismissLabel}
+        </button>
+        <button
+          data-primary="true"
+          onClick={onOpenNewTerminal}
+          type="button"
+        >
+          {openNewTerminalLabel}
+        </button>
+      </span>
+    </div>
   );
 }
 

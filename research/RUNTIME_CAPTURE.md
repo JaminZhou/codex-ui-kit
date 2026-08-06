@@ -281,7 +281,53 @@ the original PID `96228` remained running. The exact profile and external
 evidence moved to the recoverable Trash item
 `codex-ui-kit-review-refresh-cdp.EEQtJr-20260805`.
 
-### Current Terminal session capture
+### Current `26.730.61639` Terminal lifecycle
+
+The refresh used exact second-process PID `6418`, loopback-only CDP port
+`9563`, and the unique profile
+`/private/tmp/codex-ui-kit-terminal-current.F4TuJY`. The main Renderer was
+selected by `app://-/index.html`, application-shell landmarks, and area, then
+held at 1180×820 or 820×680. The original Codex process was excluded by PID.
+
+The bounded sequence was:
+
+1. open the bottom-panel picker and record Review, Terminal, Browser, Files,
+   the project-labelled tab, close control, xterm `Terminal input`, and
+   905.89×279 outer/905.89×239 content geometry;
+2. create three local sessions, verify global visible numbering, close-nearest
+   selection, post-close label reindexing, and no overflow at 820×680;
+3. submit `sleep 3; echo terminal-after-reopen`, close/reopen the panel while
+   it is running, then verify output settlement, prompt return, and independent
+   per-session history;
+4. close every session, verify panel collapse, use the top Toggle, and confirm
+   that a fresh empty current-workspace terminal is created rather than the
+   last closed session being restored;
+5. retain an older-workspace Terminal while switching the chat worktree,
+   record the exact mismatch warning plus `Dismiss` and `Open new terminal`,
+   and verify that recovery preserves the older session;
+6. pass only the de-identified 906×820 main capture into the optional external
+   pixel gate.
+
+ArrowLeft moved focus to the active native tab but did not change its selected
+session. UIKit retains keyboard tab movement as an accessibility enhancement,
+not a current-product parity claim. A failed direct shell command also did not
+add a tab status badge, so failed/exited process summaries remain an
+independent host-owned public contract.
+
+Browser/CDP covers 93 lifecycle frames. Electron repeats the session,
+mismatch, input, picker, close, and resizing behavior. The current external
+reference differs by 1.5120% in the 272px panel region and 0.4004% in the
+239px content region, below independent 2% and 1% limits; the diagnostic-only
+full-main ratio is 8.6587% because the conversation content is intentionally
+different.
+
+Cleanup stopped exact main PID `6418` and its process tree, then terminated
+only the two profile-owned orphan Crashpad handlers `6423` and `6427`. Port
+`9563` closed and the original Codex PID `99263` remained running. The unique
+profile and 18 external screenshots moved to the recoverable Trash item
+`codex-ui-kit-terminal-61639-20260806`.
+
+### Historical `26.721.81911` Terminal session capture
 
 The `26.721.81911` Terminal probe used an exact second process, loopback port
 `9481`, and a unique

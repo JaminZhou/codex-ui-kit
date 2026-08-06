@@ -1542,6 +1542,86 @@
   background: var(--codex-ui-background-button-tertiary-hover);
 }
 
+.codex-ui-terminal-workspace-mismatch {
+  align-items: center;
+  background: color-mix(
+    in srgb,
+    var(--codex-ui-background-status-warning) 58%,
+    var(--codex-ui-background-surface)
+  );
+  border: 1px solid var(--codex-ui-border-warning);
+  border-radius: 0.75rem;
+  color: var(--codex-ui-text);
+  display: flex;
+  flex: 0 0 auto;
+  gap: calc(var(--codex-ui-spacing) * 2);
+  margin: calc(var(--codex-ui-spacing) * 2)
+    calc(var(--codex-ui-spacing) * 2) 0;
+  min-height: 2.75rem;
+  padding: calc(var(--codex-ui-spacing) * 1.5)
+    calc(var(--codex-ui-spacing) * 2);
+}
+
+.codex-ui-terminal-workspace-mismatch__icon {
+  align-items: center;
+  border: 1px solid currentColor;
+  border-radius: 999px;
+  color: var(--codex-ui-text-warning);
+  display: inline-flex;
+  flex: 0 0 auto;
+  font-family: var(--codex-ui-font-sans);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  height: 0.875rem;
+  justify-content: center;
+  line-height: 1;
+  width: 0.875rem;
+}
+
+.codex-ui-terminal-workspace-mismatch__message {
+  flex: 1 1 auto;
+  font-family: var(--codex-ui-font-sans);
+  font-size: var(--codex-ui-font-size-sm);
+  line-height: 1.125rem;
+  min-width: 0;
+}
+
+.codex-ui-terminal-workspace-mismatch__actions {
+  align-items: center;
+  display: flex;
+  flex: 0 0 auto;
+  gap: calc(var(--codex-ui-spacing) * 2);
+}
+
+.codex-ui-terminal-workspace-mismatch__actions button {
+  appearance: none;
+  background: transparent;
+  border: 0;
+  border-radius: 999px;
+  color: var(--codex-ui-text);
+  cursor: pointer;
+  font-family: var(--codex-ui-font-sans);
+  font-size: var(--codex-ui-font-size-sm);
+  line-height: 1.125rem;
+  min-height: 1.75rem;
+  padding: calc(var(--codex-ui-spacing) * 1.25)
+    calc(var(--codex-ui-spacing) * 2);
+  white-space: nowrap;
+}
+
+.codex-ui-terminal-workspace-mismatch__actions
+  button[data-primary="true"] {
+  background: var(--codex-ui-text);
+  color: var(--codex-ui-background-surface);
+  padding-inline: calc(var(--codex-ui-spacing) * 3);
+}
+
+.codex-ui-terminal-workspace-mismatch__actions button:hover,
+.codex-ui-terminal-workspace-mismatch__actions button:focus-visible {
+  box-shadow: inset 0 0 0 1px var(--codex-ui-focus);
+  outline: none;
+}
+
 .codex-ui-terminal-transcript {
   flex: 1 1 auto;
   min-height: 0;

@@ -9,6 +9,7 @@ import {
   TerminalProcessList,
   TerminalSession,
   TerminalTranscript,
+  TerminalWorkspaceMismatchNotice,
 } from "../src";
 
 afterEach(cleanup);
@@ -182,6 +183,50 @@ describe("terminal panel", () => {
       screen.getByRole("button", { name: "Restore last terminal" }),
     );
     expect(onRestoreSession).toHaveBeenCalledOnce();
+  });
+
+  it("supports current plain tab labels and workspace mismatch recovery", () => {
+    const onDismiss = vi.fn();
+    const onOpenNewTerminal = vi.fn();
+    render(
+      <TerminalPanel
+        activeSessionId="current"
+        onActiveSessionChange={() => undefined}
+        sessions={[
+          {
+            entries: [],
+            id: "current",
+            label: "codex-ui-kit",
+            notice: (
+              <TerminalWorkspaceMismatchNotice
+                onDismiss={onDismiss}
+                onOpenNewTerminal={onOpenNewTerminal}
+              />
+            ),
+            showStatus: false,
+            status: "idle",
+            value: "",
+          },
+        ]}
+      />,
+    );
+
+    const tab = screen.getByRole("tab", {
+      name: "codex-ui-kit",
+      selected: true,
+    });
+    expect(tab.textContent?.endsWith("codex-ui-kit")).toBe(true);
+    expect(
+      screen.getByRole("status").textContent,
+    ).toContain(
+      "This terminal's workspace does not match this chat's current worktree",
+    );
+    fireEvent.click(screen.getByRole("button", { name: "Dismiss" }));
+    fireEvent.click(
+      screen.getByRole("button", { name: "Open new terminal" }),
+    );
+    expect(onDismiss).toHaveBeenCalledOnce();
+    expect(onOpenNewTerminal).toHaveBeenCalledOnce();
   });
 
   it("lists background process lifecycle without owning process actions", () => {

@@ -1,18 +1,19 @@
 {
   "schemaVersion": 1,
   "baseline": {
-    "appVersion": "26.730.61309",
-    "buildNumber": "6223",
-    "sampledAt": "2026-08-05",
-    "reverifiedAt": "2026-08-05",
-    "appAsarSha256": "9de942a9a058fca20b78d171032e0fe65ccb1063868f175ff7eb4e159efc2c38",
+    "appVersion": "26.730.61639",
+    "buildNumber": "6234",
+    "sampledAt": "2026-08-06",
+    "reverifiedAt": "2026-08-06",
+    "appAsarSha256": "3fea92820c0fb7a69473e7a8308a8e5b8e91524289a84181a33533ec6cb51d45",
     "runtimeEvidence": "scoped_cdp",
     "runtimeEvidenceBuilds": {
       "cdp": "26.715.72359",
       "cdp-26.721": "26.721.41059",
       "cdp-26.721.81911": "26.721.81911",
       "cdp-26.727.40816": "26.727.40816",
-      "cdp-26.730.61309": "26.730.61309"
+      "cdp-26.730.61309": "26.730.61309",
+      "cdp-26.730.61639": "26.730.61639"
     }
   },
   "surfaces": [
@@ -27,8 +28,8 @@
         "cdp-26.730.61309:project-and-no-project-destination-current-build"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "verified",
-      "electronStatus": "verified",
+      "browserStatus": "partial_legacy",
+      "electronStatus": "partial_legacy",
       "priority": "p0"
     },
     {
@@ -45,8 +46,8 @@
         "cdp-26.730.61309:local-and-new-worktree-four-part-context-controls-wide-and-720"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "verified",
-      "electronStatus": "verified",
+      "browserStatus": "partial_legacy",
+      "electronStatus": "partial_legacy",
       "priority": "p0"
     },
     {
@@ -62,8 +63,8 @@
         "cdp-26.730.61309:project-dialog-260x249.5-listbox-252x142.81-14-options"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "verified",
-      "electronStatus": "verified",
+      "browserStatus": "partial_legacy",
+      "electronStatus": "partial_legacy",
       "priority": "p0"
     },
     {
@@ -163,8 +164,8 @@
         "cdp-26.730.61309:real-mixed-stdout-stderr-exit-7-expanded-shell-reverse-tail-and-same-thread-recovery"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "verified",
-      "electronStatus": "verified",
+      "browserStatus": "partial_legacy",
+      "electronStatus": "partial_legacy",
       "priority": "p0"
     },
     {
@@ -177,8 +178,8 @@
         "cdp-26.730.61309:real-command-exit-7-followed-by-successful-no-tool-turn-in-the-same-thread"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "verified",
-      "electronStatus": "verified",
+      "browserStatus": "partial_legacy",
+      "electronStatus": "partial_legacy",
       "priority": "p0"
     },
     {
@@ -197,8 +198,8 @@
         "cdp-26.730.61309:real-marker-backed-two-file-rename-review"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "verified",
-      "electronStatus": "verified",
+      "browserStatus": "partial_legacy",
+      "electronStatus": "partial_legacy",
       "priority": "p0"
     },
     {
@@ -308,8 +309,8 @@
         "cdp-26.730.61309:real-command-approval-similar-rule-repeated-command-no-second-prompt-computed-styles-and-masked-menu-completed-pixels"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "verified",
-      "electronStatus": "verified",
+      "browserStatus": "partial_legacy",
+      "electronStatus": "partial_legacy",
       "priority": "p0"
     },
     {
@@ -339,8 +340,8 @@
         "cdp-26.730.61309:real-long-running-command-stop-95s-background-terminal-stopping-settlement-and-same-thread-recovery"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "verified",
-      "electronStatus": "verified",
+      "browserStatus": "partial_legacy",
+      "electronStatus": "partial_legacy",
       "priority": "p0"
     },
     {
@@ -354,8 +355,8 @@
         "cdp-26.730.61309:real-thread-summary-300x199-ownership-scoped-pixels"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "verified",
-      "electronStatus": "verified",
+      "browserStatus": "partial_legacy",
+      "electronStatus": "partial_legacy",
       "priority": "p0"
     },
     {
@@ -370,8 +371,8 @@
         "cdp-26.730.61309:real-manual-compaction-computed-styles-and-ownership-masked-full-window-pixels"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "verified",
-      "electronStatus": "verified",
+      "browserStatus": "partial_legacy",
+      "electronStatus": "partial_legacy",
       "priority": "p0"
     },
     {
@@ -468,8 +469,8 @@
         "cdp-26.730.61309:new-worktree-no-environment-main-and-environment-empty-menu"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "verified",
-      "electronStatus": "verified",
+      "browserStatus": "partial_legacy",
+      "electronStatus": "partial_legacy",
       "priority": "p0"
     },
     {
@@ -546,8 +547,8 @@
         "cdp-26.730.61309:pasted-image-ready-remove-resubmit-complete-and-message-ownership"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "verified",
-      "electronStatus": "verified",
+      "browserStatus": "partial_legacy",
+      "electronStatus": "partial_legacy",
       "priority": "p0"
     },
     {
@@ -579,8 +580,8 @@
         "cdp-26.730.61309:main-renderer-sidebar-274-titlebar-46-scroll-footer-resizer-exact-720-collapse-explicit-pin-and-no-edge-preview"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "verified",
-      "electronStatus": "verified",
+      "browserStatus": "partial_legacy",
+      "electronStatus": "partial_legacy",
       "priority": "p0"
     },
     {
@@ -598,8 +599,8 @@
         "cdp-26.730.61309:codex-search-activity-new-chat-quick-chat-and-primary-route-stack"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "verified",
-      "electronStatus": "verified",
+      "browserStatus": "partial_legacy",
+      "electronStatus": "partial_legacy",
       "priority": "p0"
     },
     {
@@ -614,8 +615,8 @@
         "cdp-26.730.61309:five-project-groups-expansion-selection-and-nested-tasks"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "verified",
-      "electronStatus": "verified",
+      "browserStatus": "partial_legacy",
+      "electronStatus": "partial_legacy",
       "priority": "p0"
     },
     {
@@ -630,8 +631,8 @@
         "cdp-26.730.61309:pinned-and-recents-dense-scroll-history"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "verified",
-      "electronStatus": "verified",
+      "browserStatus": "partial_legacy",
+      "electronStatus": "partial_legacy",
       "priority": "p0"
     },
     {
@@ -646,8 +647,8 @@
         "cdp-26.730.61309:five-project-action-controls-five-new-chat-controls-and-two-status-markers"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "verified",
-      "electronStatus": "verified",
+      "browserStatus": "partial_legacy",
+      "electronStatus": "partial_legacy",
       "priority": "p0"
     },
     {
@@ -662,8 +663,8 @@
         "cdp-26.730.61309:fixed-46px-footer-and-54px-scroll-padding"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "verified",
-      "electronStatus": "verified",
+      "browserStatus": "partial_legacy",
+      "electronStatus": "partial_legacy",
       "priority": "p0"
     },
     {
@@ -763,8 +764,8 @@
         "cdp-26.730.61309:new-chat-wide-compact-no-project-new-worktree-and-overlay-pixels"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "verified",
-      "electronStatus": "verified",
+      "browserStatus": "partial_legacy",
+      "electronStatus": "partial_legacy",
       "priority": "p0"
     },
     {
@@ -806,8 +807,8 @@
         "cdp-26.730.61309:real-last-turn-review-370px-side-region"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "verified",
-      "electronStatus": "verified",
+      "browserStatus": "partial_legacy",
+      "electronStatus": "partial_legacy",
       "priority": "p0"
     },
     {
@@ -826,8 +827,8 @@
         "cdp-26.730.61309:real-delete-diff-and-marker-backed-rename-diffs"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "verified",
-      "electronStatus": "verified",
+      "browserStatus": "partial_legacy",
+      "electronStatus": "partial_legacy",
       "priority": "p0"
     },
     {
@@ -845,8 +846,8 @@
         "cdp-26.730.61309:real-marker-backed-two-file-rename-selection-and-undo-replay"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "verified",
-      "electronStatus": "verified",
+      "browserStatus": "partial_legacy",
+      "electronStatus": "partial_legacy",
       "priority": "p0"
     },
     {
@@ -859,11 +860,13 @@
         "cdp:bottom-terminal-tabpanel-header-and-terminal-input",
         "cdp-26.721:terminal-tabpanel-input-default-compact-and-bounds",
         "cdp-26.721.81911:three-terminal-tabs-per-tab-close-140px-tab-1180-and-820-compact-picker-four-items",
-        "cdp-26.727.40816:project-named-terminal-tab-bottom-panel-shell-read-only"
+        "cdp-26.727.40816:project-named-terminal-tab-bottom-panel-shell-read-only",
+        "cdp-26.730.61639:project-aware-multi-terminal-tabs-picker-close-renumber-140px-wide-and-135.96px-compact",
+        "cdp-26.730.61639:last-tab-close-panel-collapse-and-fresh-toggle-session"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "partial_legacy",
-      "electronStatus": "partial_legacy",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
       "priority": "p0"
     },
     {
@@ -873,11 +876,26 @@
       "packageEvidence": ["terminal", "run-command-animation", "background-process"],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
-        "cdp:running-duration-stop-and-background-process-state"
+        "cdp:running-duration-stop-and-background-process-state",
+        "cdp-26.730.61639:real-xterm-read-only-running-panel-close-reopen-output-and-completion"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "partial_legacy",
-      "electronStatus": "partial_legacy",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
+      "priority": "p0"
+    },
+    {
+      "id": "workspace.terminal-context-mismatch",
+      "area": "workspace",
+      "ownership": "cross-layer",
+      "packageEvidence": ["terminal", "worktree-environment-dropdown"],
+      "runtimeStatus": "runtime_observed",
+      "runtimeEvidence": [
+        "cdp-26.730.61639:cross-project-terminal-worktree-mismatch-dismiss-and-open-new-terminal"
+      ],
+      "implementationStatus": "partial",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
       "priority": "p0"
     },
     {

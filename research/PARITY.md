@@ -6,9 +6,11 @@ not establish full conversation, workspace, application, or product coverage.
 
 The authoritative current-build inventory is:
 
-- [`26.730.61309.md`](26.730.61309.md) for the current package fingerprint,
-  current sidebar, command, approval, thread-overlay, and pasted-image
-  attachment captures plus the remaining runtime-capture boundary;
+- [`26.730.61639.md`](26.730.61639.md) for the current package fingerprint,
+  Terminal session/process/mismatch captures, and current runtime boundary;
+- [`26.730.61309.md`](26.730.61309.md) for the previous sidebar, command,
+  approval, thread-overlay, pasted-image attachment, workspace-entry, and
+  Review captures;
 - [`26.727.40816.md`](26.727.40816.md) for the previous main-Renderer shell,
   New chat, Terminal, PR, Composer, MCP, long-thread, approval, and command
   runtime sample;
@@ -54,14 +56,26 @@ The authoritative current-build inventory is:
   behavior, code search, broader connectors, or the wider thread-error, queue,
   Markdown variants, menu, global-route, and Settings states; those remain
   historical evidence from `26.715.72359` until sampled again.
-- The current Codex Desktop `26.730.61309` (`6223`) sidebar refresh locks the
+- The current Codex Desktop `26.730.61639` (`6234`) Terminal refresh locks the
+  local project-labelled session shell, global visible numbering across
+  workspaces, nearest-tab selection, label reindexing, the four-item picker,
+  three-tab compact fit, and independent transcript state. A real bounded
+  command verifies close/reopen persistence while running and completed
+  settlement. Closing the last tab collapses the panel; the top Toggle creates
+  a fresh empty current-workspace terminal. The cross-worktree warning exposes
+  exact `Dismiss`/`Open new terminal` recovery without discarding older
+  sessions. Browser/CDP covers 93 frames, Electron repeats the owned
+  interactions, and the exact 906×820 reference passes at 1.5120% panel and
+  0.4004% content difference. Direct-shell failure/restart and background
+  agent-process reopen remain separate gates.
+- The previous Codex Desktop `26.730.61309` (`6223`) sidebar refresh locks the
   274px dark column, 46px titlebar, 70px header, 30px routes, five expandable
   project groups, dense history, actions/status, fixed 46px footer, and 16px
   resize target. The regular split remains through 721px and auto-hides at
   720px. Explicit Show pins a non-modal 274/446 split across Pull requests
   navigation; explicit Hide restores the full 720px route, and an inline-start
   hover no longer opens the historical edge preview. The de-identified public
-  scene remains covered by the 75-frame Browser/CDP and pixel matrix plus
+  scene remains covered by the 93-frame Browser/CDP and pixel matrix plus
   Electron interaction.
   Current-build regional ratios are 3.6234% for the top, 0.1292% for the
   text-masked selected row, and 0% for the text-masked footer. The UIKit
@@ -101,8 +115,9 @@ The authoritative current-build inventory is:
   recorded separately rather than inferred from the resource menu.
   Terminal multi-tab/process lifecycle, Review variants, broader
   shell matrices, and their external pixels remain `26.721.81911` historical
-  evidence. The current project-named single Terminal tab and close/add
-  controls independently pass Browser, Electron, and regional pixel gates.
+  evidence. That build's project-named single Terminal tab and close/add
+  controls independently passed Browser, Electron, and regional pixel gates;
+  the broader current lifecycle is recorded above.
   Offline/error/reconnecting/stale and global-notification runtime states
   remain synthetic independent coverage, not current-build observations.
 - Renderer viewport probing exposed a narrow-layout gap: the thread and
@@ -277,6 +292,13 @@ while retaining the draft/sent attachment geometry, user-message silhouette,
 Composer boundary, actions, and spacing. The comparisons measure 0.39% and
 0.79% under independent 1.5% hard limits; CDP and Electron separately drive
 the ownership and full Remove → Add → Submit → completion lifecycle.
+
+The current `26.730.61639` Terminal comparison uses a clean 906×820 main-only
+reference. It reports the full main as a diagnostic, then gates only the
+shared 272px bottom panel and 239px xterm content ownership regions. Those
+regions differ by 1.5120% and 0.4004%, below independent 2% and 1% hard
+limits. CDP and Electron separately lock the text, accessible names, focus,
+session/mismatch lifecycle, and compact geometry that pixels cannot establish.
 
 Broader final visual optimization remains scheduled after the remaining
 inventory, page compositions, and state transitions stabilize. A passing

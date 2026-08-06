@@ -1641,6 +1641,15 @@ for (const scene of visualScenes) {
                   ".codex-ui-workspace-panel__empty",
                 )?.textContent?.trim(),
                 inputLabel: terminalInput?.getAttribute("aria-label"),
+                mismatchActions: Array.from(
+                  panel.querySelectorAll(
+                    ".codex-ui-terminal-workspace-mismatch button",
+                  ),
+                  (button) => button.textContent?.trim(),
+                ),
+                mismatchText: panel
+                  .querySelector(".codex-ui-terminal-workspace-mismatch")
+                  ?.textContent?.trim(),
                 panel: rect(panel),
                 panelContent: panelContent ? rect(panelContent) : null,
                 panelHeader: rect(panelHeader),
@@ -2871,7 +2880,8 @@ for (const scene of visualScenes) {
       );
     }
     const expectedSidebarMax =
-      scene.id === "terminal-compact"
+      scene.id === "terminal-compact" ||
+      scene.id === "terminal-current-compact"
         ? "468"
         : scene.surfaces?.includes("reviewPanel")
           ? "508"
@@ -2945,8 +2955,9 @@ for (const scene of visualScenes) {
     if (scene.surfaces?.includes("bottomPanel")) {
       const terminal = contract.terminal;
       const resizer = contract.bottomPanelResizer;
-      const compactTerminal = scene.id === "terminal-compact";
-      const closedTerminal = scene.id === "terminal-closed";
+      const compactTerminal =
+        scene.id === "terminal-compact" ||
+        scene.id === "terminal-current-compact";
       const expectedTerminalWidth = compactTerminal ? 546 : 906;
       const expectedTerminalMaximum = compactTerminal ? "332" : "402";
       const expectedTerminalTabs = {
@@ -2957,6 +2968,12 @@ for (const scene of visualScenes) {
         "terminal-multi-tab": 3,
         "terminal-picker": 3,
         "terminal-running": 1,
+        "terminal-current-compact": 3,
+        "terminal-current-completed": 1,
+        "terminal-current-mismatch": 2,
+        "terminal-current-multi": 3,
+        "terminal-current-running": 1,
+        "terminal-current-single": 1,
       }[scene.id];
       const expectedTerminalStatuses = {
         "background-terminal": ["running"],
@@ -2966,7 +2983,14 @@ for (const scene of visualScenes) {
         "terminal-multi-tab": ["running", "failed", "exited"],
         "terminal-picker": ["exited", "failed", "exited"],
         "terminal-running": ["running"],
+        "terminal-current-compact": ["idle", "idle", "idle"],
+        "terminal-current-completed": ["idle"],
+        "terminal-current-mismatch": ["idle", "idle"],
+        "terminal-current-multi": ["idle", "idle", "idle"],
+        "terminal-current-running": ["idle"],
+        "terminal-current-single": ["idle"],
       }[scene.id];
+      const currentRunning = scene.id === "terminal-current-running";
       if (
         !terminal ||
         !resizer ||
@@ -2979,21 +3003,20 @@ for (const scene of visualScenes) {
         Math.abs(terminal.panel.height - 272) > 1 ||
         Math.abs(terminal.panelHeader.height - 33) > 1 ||
         Math.abs(resizer.rect.bottom - terminal.panel.top) > 1 ||
-        terminal.sessionCount !== (closedTerminal ? 0 : 1) ||
+        terminal.sessionCount !== 1 ||
         terminal.tabCount !== expectedTerminalTabs ||
         terminal.tabCloseCount !== expectedTerminalTabs ||
         JSON.stringify(terminal.tabStatuses) !==
           JSON.stringify(expectedTerminalStatuses) ||
-        (closedTerminal
-          ? !terminal.emptyText?.includes("Restore last terminal")
-          : !terminal.panelContent ||
+        (!terminal.panelContent ||
             Math.abs(terminal.panelContent.height - 239) > 1 ||
             !terminal.selectedTab?.includes("codex-ui-kit") ||
             terminal.inputLabel !== "Terminal input" ||
             terminal.transcriptLive !== "polite" ||
             !terminal.tabPanelLabelledBy ||
             !terminal.entryKinds.includes("command") ||
-            !terminal.entryKinds.includes("stdout"))
+            (!currentRunning &&
+              !terminal.entryKinds.includes("stdout")))
       ) {
         throw new Error(
           `${scene.id}: Terminal panel contract failed: ${JSON.stringify({
@@ -3016,34 +3039,60 @@ for (const scene of visualScenes) {
           `${scene.id}: Terminal picker contract failed: ${JSON.stringify(contract.terminalPicker)}`,
         );
       }
-      if (scene.id === "terminal-closed") {
-        await page
-          .getByRole("button", { name: "Restore last terminal" })
-          .click();
-        await page.waitForSelector('[role="tab"][aria-selected="true"]');
-        const restoredTerminal = await page.evaluate(() => ({
-          inputLabel: document
-            .querySelector(".codex-ui-terminal-prompt__input")
-            ?.getAttribute("aria-label"),
-          selectedTab: document
-            .querySelector('[role="tab"][aria-selected="true"]')
-            ?.textContent?.trim(),
-          tabCount: document.querySelectorAll('[role="tab"]').length,
-        }));
-        if (
-          restoredTerminal.tabCount !== 1 ||
-          !restoredTerminal.selectedTab?.includes("codex-ui-kit") ||
-          restoredTerminal.inputLabel !== "Terminal input"
-        ) {
-          throw new Error(
-            `${scene.id}: Terminal restore action failed: ${JSON.stringify(restoredTerminal)}`,
-          );
-        }
+      if (
+        scene.id === "terminal-current-mismatch" &&
+        (!terminal.mismatchText?.includes(
+          "does not match this chat's current worktree",
+        ) ||
+          JSON.stringify(terminal.mismatchActions) !==
+            JSON.stringify(["Dismiss", "Open new terminal"]))
+      ) {
+        throw new Error(
+          `${scene.id}: Terminal workspace mismatch contract failed: ${JSON.stringify(terminal)}`,
+        );
       }
     } else if (contract.bottomPanelResizer) {
       throw new Error(
         `${scene.id}: hidden Terminal panel retained its resize separator.`,
       );
+    }
+    if (
+      scene.id === "terminal-closed" ||
+      scene.id === "terminal-current-closed"
+    ) {
+      if (
+        (await page.getByRole("button", { name: "Restore last terminal" }).count()) !==
+          0 ||
+        (await page
+          .getByRole("button", { name: "Toggle bottom panel" })
+          .getAttribute("aria-pressed")) !== "false"
+      ) {
+        throw new Error(`${scene.id}: closed Terminal exposed stale restore UI.`);
+      }
+      await page.getByRole("button", { name: "Toggle bottom panel" }).click();
+      await page.waitForSelector(
+        '.codex-ui-app-shell[data-bottom-panel-open] [role="tab"]',
+      );
+      const freshTerminal = await page.evaluate(() => ({
+        selectedTab: document
+          .querySelector('[role="tab"][aria-selected="true"]')
+          ?.textContent?.trim(),
+        tabCount: document.querySelectorAll(
+          '.codex-ui-app-shell__bottom-panel [role="tab"]',
+        ).length,
+        transcriptText: document
+          .querySelector(".codex-ui-terminal-transcript")
+          ?.textContent?.trim(),
+      }));
+      if (
+        freshTerminal.tabCount !== 1 ||
+        !freshTerminal.selectedTab?.endsWith("codex-ui-kit") ||
+        freshTerminal.transcriptText !== ""
+      ) {
+        throw new Error(
+          `${scene.id}: reopening did not create a fresh Terminal: ${JSON.stringify(freshTerminal)}`,
+        );
+      }
     }
     if (
       scene.surfaces?.includes("reviewPanel") &&

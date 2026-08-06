@@ -104,6 +104,7 @@ export const publicRuntimeExports = [
   "TerminalPrompt",
   "TerminalSession",
   "TerminalTranscript",
+  "TerminalWorkspaceMismatchNotice",
   "ThreadContextEvent",
   "ThreadContextOptimization",
   "ThreadFloatingButton",
