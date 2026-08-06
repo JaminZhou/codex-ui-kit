@@ -42,8 +42,9 @@ Every deterministic scenario has one ID and produces four evidence layers:
    close/reopen behavior, compact 800×600 multi-file geometry, an eight-file
    scroll-to-selection flow, mixed-content selection/sibling/Undo lifecycle,
    PR tab/comment/expansion interactions, and
-   Terminal pointer/keyboard resizing, host-owned input, close/restore,
-   compact 820×680 geometry, and App shell offline → retry → restored
+   Terminal pointer/keyboard resizing, host-owned input, legacy process
+   close/restore, current local close-last/fresh creation, cross-worktree
+   mismatch recovery, compact 820×680 geometry, and App shell offline → retry → restored
    notification plus native 1180×820 → 720×680 → 1180×820 continuity; the
    conversation host also drives submit → queue → Stop → automatic queued
    continuation and return-to-latest in a real 1180×820 window. A separate
@@ -65,7 +66,7 @@ Every deterministic scenario has one ID and produces four evidence layers:
    its own 906×820 reference through
    `CODEX_UI_KIT_PULL_REQUEST_REFERENCE`; the Terminal scenario accepts a
    906×820 reference through `CODEX_UI_KIT_TERMINAL_REFERENCE` and gates the
-   shared panel and content regions separately; the completed-Markdown
+   current `terminal-current-single` panel and content regions separately; the completed-Markdown
    scenario accepts `CODEX_UI_KIT_MARKDOWN_REFERENCE` and gates assistant,
    fenced-code, and Composer regions separately; the successful-MCP scenario
    accepts `CODEX_UI_KIT_MCP_TOOL_CALL_REFERENCE` and gates full-main,

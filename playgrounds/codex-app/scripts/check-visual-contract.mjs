@@ -2128,7 +2128,10 @@ for (const scene of selectedScenes) {
     );
   }
 
-  if (scene.id === "background-terminal" && currentBuildTerminalReference) {
+  if (
+    scene.id === "terminal-current-single" &&
+    currentBuildTerminalReference
+  ) {
     const reference = PNG.sync.read(
       await readFile(currentBuildTerminalReference),
     );

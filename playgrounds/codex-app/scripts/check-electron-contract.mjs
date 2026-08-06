@@ -1081,7 +1081,7 @@ try {
     .getByRole("button", { name: "Close codex-ui-kit 2 tab" })
     .click();
   const selectedAfterClose = terminalLifecyclePage.getByRole("tab", {
-    name: "codex-ui-kit 3, Exited",
+    name: "codex-ui-kit 2, Exited",
     selected: true,
   });
   if (
@@ -1112,7 +1112,7 @@ try {
     (await terminalLifecyclePage.getByRole("tab").count()) !== 3 ||
     !(await terminalLifecyclePage
       .getByRole("tab", {
-        name: "codex-ui-kit 4, Idle",
+        name: "codex-ui-kit 3",
         selected: true,
       })
       .isVisible())
@@ -1135,22 +1135,31 @@ try {
       .getByRole("button", { name: `Close ${label} tab` })
       .click();
   }
-  const restoreTerminal = terminalLifecyclePage.getByRole("button", {
-    name: "Restore last terminal",
-  });
-  if (!(await restoreTerminal.isVisible())) {
-    throw new Error("Electron Terminal empty restore state is missing.");
+  await terminalLifecyclePage.waitForSelector(
+    ".codex-ui-app-shell:not([data-bottom-panel-open])",
+  );
+  if (
+    (await terminalLifecyclePage
+      .getByRole("button", { name: "Restore last terminal" })
+      .count()) !== 0
+  ) {
+    throw new Error("Electron Terminal retained stale restore UI.");
   }
-  await restoreTerminal.click();
+  await terminalLifecyclePage
+    .getByRole("button", { name: "Toggle bottom panel" })
+    .click();
   if (
     !(await terminalLifecyclePage
       .getByRole("tab", {
-        name: "codex-ui-kit, Running",
+        name: "codex-ui-kit",
         selected: true,
       })
-      .isVisible())
+      .isVisible()) ||
+    (await terminalLifecyclePage
+      .getByRole("log", { name: "Terminal output" })
+      .textContent()) !== ""
   ) {
-    throw new Error("Electron Terminal restore did not reopen the last tab.");
+    throw new Error("Electron Terminal did not reopen a fresh local session.");
   }
 
   await terminalLifecyclePage
@@ -1169,6 +1178,56 @@ try {
   }
 } finally {
   await terminalLifecycleApp.close();
+}
+
+const currentTerminalScene = {
+  frame: "terminal-current-mismatch",
+  id: "electron-current-terminal-mismatch",
+  scenario: "terminal-lifecycle",
+};
+const {
+  app: currentTerminalApp,
+  page: currentTerminalPage,
+} = await launchScene(currentTerminalScene, { capture: false });
+
+try {
+  const currentTabs = currentTerminalPage.getByRole("tab");
+  if (
+    (await currentTabs.count()) !== 2 ||
+    !(await currentTabs.nth(0).textContent())?.trim().endsWith("assets 1") ||
+    !(await currentTabs.nth(1).textContent())
+      ?.trim()
+      .endsWith("codex-ui-kit 2") ||
+    (await currentTabs.nth(1).getAttribute("aria-label")) !==
+      "codex-ui-kit 2"
+  ) {
+    throw new Error("Electron current Terminal labels drifted.");
+  }
+  const currentTerminalPanel = currentTerminalPage.getByTestId("terminal-panel");
+  const mismatch = currentTerminalPanel.getByRole("status");
+  if (
+    !(await mismatch.textContent())?.includes(
+      "does not match this chat's current worktree",
+    )
+  ) {
+    throw new Error("Electron current Terminal mismatch notice is missing.");
+  }
+  await mismatch
+    .getByRole("button", { name: "Open new terminal" })
+    .click();
+  if (
+    (await currentTabs.count()) !== 3 ||
+    !(await currentTerminalPage
+      .getByRole("tab", { name: "assets 3", selected: true })
+      .isVisible()) ||
+    (await currentTerminalPanel.getByRole("status").count()) !== 0
+  ) {
+    throw new Error(
+      "Electron current Terminal mismatch recovery did not open the matching workspace.",
+    );
+  }
+} finally {
+  await currentTerminalApp.close();
 }
 
 const pullRequestScene = {

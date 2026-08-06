@@ -21,14 +21,14 @@ Codex UI Kit turns those interaction patterns into protocol-neutral React primit
 
 - The current components are a partial coding-agent UI foundation, not a
   complete Codex Desktop reconstruction.
-- The latest sampled package is `26.730.61309` (`6223`). Its seed candidate
+- The latest sampled package is `26.730.61639` (`6234`). Its seed candidate
   surface and evidence status are tracked in
   [`research/UI_INVENTORY.md`](research/UI_INVENTORY.md); current-build
-  runtime observation now covers the sampled dark shell/sidebar, route
-  continuity, MCP recovery, command lifecycle, manual context compaction, and
-  thread-summary Environment/Git slices, plus current selected/no-project and
-  New worktree workspace entry at wide and 720px layouts, while unsampled
-  surfaces remain explicitly separate.
+  runtime observation currently covers the Terminal session shell, direct
+  running/completed panel persistence, and cross-worktree mismatch recovery.
+  The broader `26.730.61309` shell/sidebar, route, command, approval,
+  compaction, summary, attachment, workspace-entry, and Review evidence is
+  retained as previous-build coverage rather than promoted implicitly.
 - The repository is public and the package baseline is `0.1.0`, but the npm package has **not** been published.
 - The API remains pre-1.0 and may change while public documentation and consumer feedback mature.
 - Extracted application files, private IPC, bundled fonts, and OpenAI brand assets are not included.
@@ -39,8 +39,8 @@ review the [coverage policy](research/PARITY.md), or follow the
 
 ## Highlights
 
-- A conversation shell with current `26.730.61309` evidence for successful
-  long command output and build-scoped `26.727.40816` historical evidence for
+- A conversation shell with build-scoped `26.730.61309` evidence for
+  successful long command output and `26.727.40816` historical evidence for
   Composer lifecycle, successful/recovered MCP calls, long-thread navigation,
   and command-approval denial, plus partial message, activity, reasoning,
   plan, streaming, and mixed event primitives.
@@ -48,6 +48,9 @@ review the [coverage policy](research/PARITY.md), or follow the
   current-build window navigation, route lifecycle feedback, portalled global
   notifications, responsive restoration rules, and pointer- and
   keyboard-resizable navigation and bottom-panel tracks.
+- Current `26.730.61639` Terminal evidence for project-labelled multi-session
+  tabs, real running/completed close/reopen persistence, close-last/fresh
+  creation, compact fit, and cross-worktree mismatch recovery.
 - Project index, current-build new-chat destination/context setup and
   New worktree environment-empty flow, grouped host-defined local environment
   dialog, protocol-neutral route/worktree selectors, PR list/detail, checks,
@@ -200,11 +203,13 @@ regions separately; CDP and Electron still gate geometry and interaction
 independently.
 
 The Terminal gate uses its own 906×820 reference and applies hard pixel
-thresholds only to the shared 272px bottom-panel and 239px content regions:
+thresholds only to the shared 272px bottom-panel and 239px content regions.
+Its current-build comparison is scoped to `terminal-current-single`:
 
 ```bash
 CODEX_UI_KIT_TERMINAL_REFERENCE=/absolute/path/to/terminal-main-reference.png \
-  pnpm --filter @codex-ui-kit/codex-app-playground check:visual
+  pnpm --filter @codex-ui-kit/codex-app-playground check:visual \
+  -- --scenes=terminal-current-single
 ```
 
 Current command approval accepts separate untracked pending and denied

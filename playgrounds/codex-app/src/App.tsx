@@ -51,6 +51,7 @@ import {
   StatusBanner,
   TerminalPanel,
   TerminalProcessList,
+  TerminalWorkspaceMismatchNotice,
   ThreadContextEvent,
   ThreadHeader,
   ThreadInterruptionSummary,
@@ -514,12 +515,24 @@ const terminalLifecycleCommandIds = [
   "command-terminal-docs",
 ] as const;
 
+function currentTerminalFrame(frame: string | null) {
+  return frame?.startsWith("terminal-current-") ?? false;
+}
+
 function initialTerminalSessionIds(
   scenarioId: ReplayScenarioId,
   frame: string | null,
 ) {
   if (scenarioId === "background-terminal") return ["command-dev"];
   if (scenarioId !== "terminal-lifecycle") return [];
+  if (frame === "terminal-current-closed") return [];
+  if (frame === "terminal-current-multi") {
+    return ["local-terminal-1", "local-terminal-2", "local-terminal-3"];
+  }
+  if (frame === "terminal-current-mismatch") {
+    return ["local-terminal-1", "local-terminal-2"];
+  }
+  if (currentTerminalFrame(frame)) return ["local-terminal-1"];
   if (frame === "terminal-running") {
     return terminalLifecycleCommandIds.slice(0, 1);
   }
@@ -528,6 +541,74 @@ function initialTerminalSessionIds(
   }
   if (frame === "terminal-closed") return [];
   return [...terminalLifecycleCommandIds];
+}
+
+function initialTerminalWorkspaceLabels(
+  scenarioId: ReplayScenarioId,
+  frame: string | null,
+) {
+  const sessionIds = initialTerminalSessionIds(scenarioId, frame);
+  if (frame === "terminal-current-mismatch") {
+    return {
+      "local-terminal-1": "assets",
+      "local-terminal-2": "codex-ui-kit",
+    };
+  }
+  return Object.fromEntries(
+    sessionIds.map((sessionId) => [sessionId, "codex-ui-kit"]),
+  );
+}
+
+function initialTerminalHistory(
+  scenarioId: ReplayScenarioId,
+  frame: string | null,
+): Record<string, TerminalEntry[]> {
+  if (scenarioId !== "terminal-lifecycle" || !currentTerminalFrame(frame)) {
+    return {};
+  }
+  const sessionIds = initialTerminalSessionIds(scenarioId, frame);
+  return Object.fromEntries(
+    sessionIds.map((sessionId, index) => [
+      sessionId,
+      frame === "terminal-current-running" && index === 0
+        ? [
+            {
+              id: `${sessionId}:running`,
+              kind: "command" as const,
+              text: "/workspace/codex-ui-kit % sleep 3; echo terminal-after-reopen",
+            },
+          ]
+        : frame === "terminal-current-completed" && index === 0
+          ? [
+              {
+                id: `${sessionId}:command`,
+                kind: "command" as const,
+                text: "/workspace/codex-ui-kit % sleep 3; echo terminal-after-reopen",
+              },
+              {
+                id: `${sessionId}:stdout`,
+                kind: "stdout" as const,
+                text: "terminal-after-reopen",
+              },
+            ]
+          : [
+              {
+                id: `${sessionId}:prompt`,
+                kind: "command" as const,
+                text: `/workspace/${
+                  frame === "terminal-current-mismatch" && index === 0
+                    ? "assets"
+                    : "codex-ui-kit"
+                } %`,
+              },
+              {
+                id: `${sessionId}:ready`,
+                kind: "stdout" as const,
+                text: "",
+              },
+            ],
+    ]),
+  );
 }
 
 function initialClosedTerminalSessionIds(
@@ -1158,7 +1239,11 @@ export function App() {
     string | undefined
   >(undefined);
   const [workspaceRunProjectLabel, setWorkspaceRunProjectLabel] =
-    useState("codex-ui-kit");
+    useState(
+      initialSelection.frame === "terminal-current-mismatch"
+        ? "assets"
+        : "codex-ui-kit",
+    );
   const [threadFollowing, setThreadFollowing] = useState(
     initialSelection.frame !== "thread-scroll-away" &&
       initialSelection.frame !== "thread-windowed",
@@ -1182,7 +1267,9 @@ export function App() {
   );
   const [terminalOpen, setTerminalOpen] = useState(
     initialSelection.scenarioId === "background-terminal" ||
-      initialSelection.scenarioId === "terminal-lifecycle",
+      (initialSelection.scenarioId === "terminal-lifecycle" &&
+        initialSelection.frame !== "terminal-current-closed" &&
+        initialSelection.frame !== "terminal-closed"),
   );
   const [terminalSessionIds, setTerminalSessionIds] = useState<string[]>(() =>
     initialTerminalSessionIds(
@@ -1213,7 +1300,21 @@ export function App() {
   >({});
   const [terminalHistoryByCommand, setTerminalHistoryByCommand] = useState<
     Record<string, TerminalEntry[]>
-  >({});
+  >(() =>
+    initialTerminalHistory(
+      initialSelection.scenarioId,
+      initialSelection.frame,
+    ),
+  );
+  const [terminalWorkspaceBySession, setTerminalWorkspaceBySession] =
+    useState<Record<string, string>>(() =>
+      initialTerminalWorkspaceLabels(
+        initialSelection.scenarioId,
+        initialSelection.frame,
+      ),
+    );
+  const [dismissedTerminalMismatchIds, setDismissedTerminalMismatchIds] =
+    useState<Set<string>>(() => new Set());
   const [reviewSelection, setReviewSelection] =
     useState<ReviewSelection | null>(null);
   const [reviewSelectionKey, setReviewSelectionKey] = useState(0);
@@ -1257,7 +1358,13 @@ export function App() {
   const [workspaceEnvironmentLauncher, setWorkspaceEnvironmentLauncher] =
     useState<"environment" | "worktree">("environment");
   const queuedPromptCounterRef = useRef(1);
-  const terminalSessionCounterRef = useRef(1);
+  const terminalSessionCounterRef = useRef(
+    initialTerminalSessionIds(
+      initialSelection.scenarioId,
+      initialSelection.frame,
+    ).filter((sessionId) => sessionId.startsWith("local-terminal-")).length +
+      1,
+  );
   const replaySubmitTimerRef = useRef<number | null>(null);
   const pullRequestTransitionTimerRef = useRef<number | null>(null);
   const threadViewportRef = useRef<HTMLDivElement>(null);
@@ -1466,6 +1573,8 @@ export function App() {
     setTerminalOpen(false);
     setTerminalSessionIds([]);
     setClosedTerminalSessionIds([]);
+    setTerminalWorkspaceBySession({});
+    setDismissedTerminalMismatchIds(new Set());
     setTerminalTabPickerOpen(false);
     setTerminalCommandId(null);
     setTerminalValuesByCommand({});
@@ -1499,7 +1608,10 @@ export function App() {
         : undefined,
     );
     setWorkspaceRunProjectLabel(
-      workspaceContext?.projectLabel ?? "codex-ui-kit",
+      workspaceContext?.projectLabel ??
+        (frame === "terminal-current-mismatch"
+          ? "assets"
+          : "codex-ui-kit"),
     );
     setView("conversation");
     setMode("replay");
@@ -1528,15 +1640,25 @@ export function App() {
     setReviewSelection(null);
     setTerminalOpen(
       nextId === "background-terminal" ||
-        nextId === "terminal-lifecycle",
+        (nextId === "terminal-lifecycle" &&
+          frame !== "terminal-current-closed" &&
+          frame !== "terminal-closed"),
     );
     setTerminalSessionIds([...nextTerminalSessionIds]);
+    terminalSessionCounterRef.current =
+      nextTerminalSessionIds.filter((sessionId) =>
+        sessionId.startsWith("local-terminal-"),
+      ).length + 1;
     setClosedTerminalSessionIds([...nextClosedTerminalSessionIds]);
+    setTerminalWorkspaceBySession(
+      initialTerminalWorkspaceLabels(nextId, frame),
+    );
+    setDismissedTerminalMismatchIds(new Set());
     setTerminalTabPickerOpen(frame === "terminal-picker");
     setTerminalCommandId(nextTerminalSessionIds.at(-1) ?? null);
     setTerminalHeight(272);
     setTerminalValuesByCommand({});
-    setTerminalHistoryByCommand({});
+    setTerminalHistoryByCommand(initialTerminalHistory(nextId, frame));
     setUndoneFileIds(new Set());
     setLiveError(null);
     setShellNotificationVisible(false);
@@ -2523,7 +2645,7 @@ export function App() {
               <Button
                 aria-label="Toggle bottom panel"
                 aria-pressed={terminalOpen}
-                onClick={() => setTerminalOpen((open) => !open)}
+                onClick={toggleTerminalPanel}
                 size="small"
                 tone="ghost"
               >
@@ -5120,29 +5242,41 @@ export function App() {
     terminalSessionIds,
   ]);
   const terminalSessions = visibleTerminalSessionIds.map(
-    (sessionId) => {
+    (sessionId, visibleIndex) => {
       const terminalCommand = terminalCommands.find(
         ({ id }) => id === sessionId,
       );
-      const localSessionNumber = sessionId.startsWith("local-terminal-")
-        ? Number(sessionId.slice("local-terminal-".length))
-        : null;
-      const commandSessionIndex = terminalCommands.findIndex(
-        ({ id }) => id === sessionId,
-      );
-      const sessionNumber =
-        localSessionNumber !== null &&
-        Number.isInteger(localSessionNumber)
-          ? terminalCommands.length + localSessionNumber
-          : commandSessionIndex + 1;
+      const sessionProjectLabel =
+        terminalWorkspaceBySession[sessionId] ??
+        workspaceRunProjectLabel;
       const label =
         visibleTerminalSessionIds.length > 1
-          ? `${workspaceRunProjectLabel} ${sessionNumber}`
-          : workspaceRunProjectLabel;
+          ? `${sessionProjectLabel} ${visibleIndex + 1}`
+          : sessionProjectLabel;
+      const mismatched =
+        sessionId === activeTerminalSessionId &&
+        sessionProjectLabel !== workspaceRunProjectLabel &&
+        !dismissedTerminalMismatchIds.has(sessionId);
       return {
         entries: terminalEntriesBySession[sessionId]!,
         id: sessionId,
+        inputDisabled:
+          activeFrame === "terminal-current-running" &&
+          sessionId === activeTerminalSessionId,
         label,
+        notice: mismatched ? (
+          <TerminalWorkspaceMismatchNotice
+            onDismiss={() =>
+              setDismissedTerminalMismatchIds((sessionIds) => {
+                const next = new Set(sessionIds);
+                next.add(sessionId);
+                return next;
+              })
+            }
+            onOpenNewTerminal={() => createTerminalSession()}
+          />
+        ) : undefined,
+        showStatus: !sessionId.startsWith("local-terminal-"),
         status:
           terminalCommand?.status === "running"
             ? ("running" as const)
@@ -5162,10 +5296,25 @@ export function App() {
       ...sessionIds,
       sessionId,
     ]);
+    setTerminalWorkspaceBySession((labels) => ({
+      ...labels,
+      [sessionId]: workspaceRunProjectLabel,
+    }));
     setTerminalCommandId(sessionId);
     setTerminalOpen(true);
     setTerminalTabPickerOpen(false);
   };
+  function toggleTerminalPanel() {
+    if (terminalOpen) {
+      setTerminalOpen(false);
+      return;
+    }
+    if (visibleTerminalSessionIds.length === 0) {
+      createTerminalSession();
+      return;
+    }
+    setTerminalOpen(true);
+  }
   const terminalPanel = (
     <TerminalPanel
       activeSessionId={activeTerminalSessionId}
@@ -5188,12 +5337,18 @@ export function App() {
               ] ?? null,
             );
           }
+          if (remaining.length === 0) setTerminalOpen(false);
           return remaining;
         });
         setClosedTerminalSessionIds((sessionIds) => [
           ...sessionIds.filter((id) => id !== sessionId),
           sessionId,
         ]);
+        setDismissedTerminalMismatchIds((sessionIds) => {
+          const next = new Set(sessionIds);
+          next.delete(sessionId);
+          return next;
+        });
       }}
       onCommandSubmit={(sessionId, command) => {
         const terminalCommand = terminalCommands.find(
@@ -5224,18 +5379,6 @@ export function App() {
         }));
       }}
       onCreateSession={createTerminalSession}
-      onRestoreSession={() => {
-        const sessionId = closedTerminalSessionIds.at(-1);
-        if (!sessionId) return;
-        setClosedTerminalSessionIds((sessionIds) =>
-          sessionIds.slice(0, -1),
-        );
-        setTerminalSessionIds((sessionIds) => [
-          ...sessionIds,
-          sessionId,
-        ]);
-        setTerminalCommandId(sessionId);
-      }}
       onSessionValueChange={(sessionId, value) =>
         setTerminalValuesByCommand((values) => ({
           ...values,
@@ -5506,6 +5649,7 @@ export function App() {
                 {currentWindowedFrame ? null : timelineContent}
 
                 {scenarioId === "terminal-lifecycle" &&
+                !currentTerminalFrame(activeFrame) &&
                 terminalCommands.length > 0 ? (
                   <TerminalProcessList
                     className="demo-terminal-processes"

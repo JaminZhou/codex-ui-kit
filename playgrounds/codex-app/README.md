@@ -88,7 +88,7 @@ the sixteenth slice below.
 
 ## Sixth vertical slice
 
-The sixth slice adds the current background Terminal workflow:
+The sixth slice added the original background Terminal workflow:
 
 - a schema-validated command `processId`, output stream, and
   `item/commandExecution/terminalInteraction`;
@@ -96,9 +96,9 @@ The sixth slice adds the current background Terminal workflow:
   `TerminalSession` composition;
 - a 272px bottom panel, 16px pointer/keyboard separator, 152px minimum, and
   responsive half-height maximum;
-- close/restore, host-owned input submission, and real 820×680 compact
+- close/reopen, host-owned input submission, and real 820×680 compact
   Electron geometry;
-- a fifteenth reviewed pixel frame plus an optional current-build Terminal
+- a fifteenth reviewed pixel frame plus an optional build-scoped Terminal
   panel/content comparison.
 
 ## Seventh vertical slice
@@ -248,22 +248,22 @@ The fifteenth slice expanded Terminal from one background session into the
   process execution, creation, restore policy, and input handling with the
   host;
 - a 15-event protocol trace with running, failed, exited, three-tab, picker,
-  close-all/restore, and compact states;
+  legacy close-all/restore, and compact states;
 - real Electron pointer and keyboard tab selection, independent per-session
-  values, close-nearest, picker creation, close-all/restore, and failed-process
+  values, close-nearest, picker creation, legacy close-all/restore, and failed-process
   reopening;
 - six additional reviewed visual frames and a shared 49-frame CDP/pixel
   matrix.
 
-The current-product probe did not execute a shell process. Running, failed,
+That current-product probe did not execute a shell process. Running, failed,
 exited, and restore states are deterministic public-host acceptance rather
 than promoted current-product lifecycle evidence. The later
 `26.727.40816` read-only probe found a project-named tab instead of the
 auto-numbered presentation. The independent single-session model already
 uses the project name plus close/add controls and now passes the current
 Terminal regional gate at 1.79% panel and 0.73% content difference, so the
-session shell is current-build verified while process lifecycle remains
-`partial_legacy`.
+session shell was verified for that build. The newer current lifecycle is
+recorded in the thirty-second slice below.
 
 ## Sixteenth vertical slice
 
@@ -557,6 +557,32 @@ The thirty-first slice refreshes Review rename/delete evidence on
   region, 5.23% for the conversation region, and 7.62% for the Review region,
   below independent 6.5%, 5.5%, and 8% limits.
 
+## Thirty-second vertical slice
+
+The thirty-second slice refreshes Terminal against `26.730.61639`:
+
+- real CDP evidence locks project-labelled tabs, global visible numbering
+  across workspaces, close-nearest selection, label reindexing, the four-item
+  picker, and three-tab fit at 820×680;
+- a bounded `sleep 3; echo terminal-after-reopen` verifies running/completed
+  transcript settlement, independent per-session histories, and panel
+  close/reopen persistence while the command is active;
+- closing the last tab now collapses the panel, and the top Toggle creates a
+  fresh empty current-workspace terminal instead of restoring the last closed
+  session;
+- `TerminalWorkspaceMismatchNotice` reproduces the current cross-worktree
+  warning plus `Dismiss` and `Open new terminal` recovery while preserving the
+  older session;
+- seven current scenes extend Browser/CDP and pixel coverage to 93 frames;
+  Electron repeats the mismatch recovery, session input, picker, close, and
+  resizing interactions;
+- the exact 906×820 external reference passes at 1.5120% for the shared panel
+  and 0.4004% for the xterm content, below independent 2% and 1% limits.
+
+Failed/exited process summaries and reopen actions remain host-owned public
+compatibility coverage. A failed direct shell command did not add a native tab
+status badge, so this slice does not infer one.
+
 ## Development
 
 From the repository root:
@@ -631,11 +657,13 @@ CODEX_UI_KIT_PULL_REQUEST_REFERENCE=/absolute/path/to/pr-main-reference.png \
 The Terminal gate also uses a 906×820 main-only reference. It reports the
 whole-main difference but gates only the shared 272px panel and 239px content
 regions, because the protocol replay and observed task intentionally have
-different conversation text:
+different conversation text. The current external comparison is scoped to
+`terminal-current-single`:
 
 ```bash
 CODEX_UI_KIT_TERMINAL_REFERENCE=/absolute/path/to/terminal-main-reference.png \
-  pnpm --filter @codex-ui-kit/codex-app-playground check:visual
+  pnpm --filter @codex-ui-kit/codex-app-playground check:visual \
+  -- --scenes=terminal-current-single
 ```
 
 The Markdown gate uses its own 906×820 main-only reference:

@@ -10,11 +10,19 @@ exit gates; it does not replace the inventory.
 
 ## Current position
 
-- The current installed package is Codex Desktop `26.730.61309` (`6223`).
-- The inventory contains 79 surface groups: 51 P0, 19 P1, and 9 P2.
-- 22 groups have current-build runtime evidence, 39 have previous-build-only
-  runtime evidence, and 18 have not been sampled.
-- The current `26.730.61309` refresh now covers all six left-sidebar groups,
+- The current installed package is Codex Desktop `26.730.61639` (`6234`).
+- The inventory contains 80 surface groups: 52 P0, 19 P1, and 9 P2.
+- 3 groups have current-build runtime evidence, 59 have previous-build-only runtime evidence, and 18 have not been sampled.
+- The current `26.730.61639` refresh covers the local Terminal session shell,
+  a real bounded running/completed command with panel persistence, and the
+  cross-worktree mismatch warning plus recovery actions. It locks
+  project-labelled/global-indexed tabs, close-nearest and label reindexing,
+  the four-item picker, three-tab 820×680 fit, independent transcript state,
+  close/reopen while running, close-last collapse, and fresh terminal creation
+  from the top Toggle. Browser/CDP covers 93 lifecycle frames; Electron repeats
+  the session, mismatch, input, picker, close, and resize interactions; the
+  current 906×820 panel/content pixel ratios pass at 1.5120%/0.4004%.
+- The previous `26.730.61309` refresh covered all six left-sidebar groups,
   selected/no-project and New worktree entry, plus sampled command, approval,
   interruption, compaction, summary, and pasted-image surfaces. The sidebar capture locks the
   274px column, 46px titlebar, 70px navigation header, 30px rows, five
@@ -32,7 +40,7 @@ exit gates; it does not replace the inventory.
   responsive detail restoration. Its independent state machine adds
   index/detail loading and failure, checks, comments, review submission,
   merge-readiness, merge completion, compact layout, and route restoration.
-  Together the playground gates cover 80 CDP/pixel frames, and the refreshed
+  Together the playground gates now cover 93 CDP/pixel frames, and the refreshed
   PR detail passes the current 906×820 regional pixel gate. The refreshed
   real MCP success path now matches Search → Fetch, the integrated activity
   disclosure, computed typography, and a current regional pixel gate. The
@@ -101,12 +109,13 @@ exit gates; it does not replace the inventory.
   single-file diff, while rename is presented as separate source/destination
   files backed by a temporary marker line rather than a public `move_path`
   arrow. The dedicated replay, Browser/CDP, Electron, and current-build pixel
-  gates pass; binary/conflict reachability remains host-derived. The current
-  project-named single Terminal tab and close/add controls now pass independent
-  Browser, Electron, and regional pixel gates.
+  gates pass; binary/conflict reachability remains host-derived. That build's
+  project-named single Terminal tab and close/add controls passed independent
+  Browser, Electron, and regional pixel gates before the broader current
+  Terminal refresh superseded them.
   Global notification runtime evidence, light-theme shell evidence, unsampled
-  long-thread window sizes/eviction heuristics, real current-product Terminal
-  process execution/persistence, current-product review submission and
+  long-thread window sizes/eviction heuristics, direct-shell failure/restart
+  semantics, background agent-process reopening, current-product review submission and
   mutating comment/merge transitions, and the remaining Markdown, tool, and
   attachment variants remain on their recorded evidence levels.
 - Existing Browser and Electron results remain useful regression evidence, but
@@ -229,7 +238,8 @@ structural evidence, Browser acceptance, and Electron acceptance.
 - single- and multi-file changes, large diffs, binary/rename/delete/conflict
   variants, Undo, Review, and selection synchronization;
 - Terminal sessions, multiple tabs, background/running/failed processes,
-  input, close/restore, and compact layout;
+  input, close/reopen, close-last/fresh creation, mismatch recovery, and
+  compact layout;
 - Pull request index/detail, loading/failure, checks, reviewers, comments,
   review submission, merge-readiness, and route restoration;
 - side, bottom, expanded, stacked, and compact panel compositions.
@@ -344,9 +354,13 @@ without confusing package readiness with full product reconstruction.
 7. **Review content variants**: current delete and rename/no-content evidence,
    public rename/delete/binary/conflict replay, selection synchronization, and
    Undo.
-8. **Terminal session lifecycle**: current multi-tab/close/picker/compact
-   evidence plus independent running/failed/exited processes, per-session
-   input, close-all/restore, and process reopening.
+8. **Terminal session lifecycle — delivered for the current local-shell
+   contract**: current project-labelled multi-tab/close/picker/compact
+   evidence, per-session transcript ownership, real running/completed
+   close/reopen persistence, close-all/fresh creation, and cross-worktree
+   mismatch recovery. Independent failed/exited process summaries and reopen
+   actions remain host-owned compatibility coverage; direct-shell failure and
+   background agent-process restart/reopen require separate product evidence.
 9. **Pull request lifecycle**: delivered for the public component contract and
    deterministic Browser/Electron/pixel gates: index/detail loading and
    failure, checks, reviewers, comments, review submission, merge-readiness,

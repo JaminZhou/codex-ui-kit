@@ -131,6 +131,7 @@ import {
   TerminalPrompt,
   TerminalSession,
   TerminalTranscript,
+  TerminalWorkspaceMismatchNotice,
   type TerminalSessionStatus,
   TurnDuration,
   Tooltip,
@@ -367,6 +368,7 @@ void TerminalProcessList;
 void TerminalPrompt;
 void TerminalSession;
 void TerminalTranscript;
+void TerminalWorkspaceMismatchNotice;
 void TurnDuration;
 void Button;
 void IconButton;

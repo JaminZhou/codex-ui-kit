@@ -45,45 +45,28 @@ observation from a previous build remains historical evidence.
 
 ## Current baseline
 
-- Codex Desktop `26.730.61309` (`6223`)
-- Package sampled and reverified on 2026-08-05
+- Codex Desktop `26.730.61639` (`6234`)
+- Package sampled and reverified on 2026-08-06
 - `app.asar` SHA-256:
-  `9de942a9a058fca20b78d171032e0fe65ccb1063868f175ff7eb4e159efc2c38`
+  `3fea92820c0fb7a69473e7a8308a8e5b8e91524289a84181a33533ec6cb51d45`
 - Computer Use automation: blocked by the environment safety policy for
   `com.openai.codex`
 - Scoped CDP automation: available through a user-authorized second process;
   the Chromium profile is separate, but Codex application data and navigation
   are not fully isolated
-- Fresh current-build Renderer captures: eleven dark isolated probes
-  verify successful 400-line command output, mixed stdout/stderr failure with
-  exit code 7 and a successful same-thread follow-up, plus a 95-second command
-  Stop/background-settlement/recovery lifecycle, and the manual `/compact`
-  menu/running/completed/same-thread-recovery lifecycle, plus the thread
-  summary toggle and its Environment/Git workflow overlay, plus a real
-  command approval that is allowed once and completes successfully, plus a
-  matching-command rule whose identical second command completes without a
-  second approval while the global Composer policy remains Ask, plus a pasted
-  image that is removed, added again, submitted, and retained with the user
-  message while the empty Composer is restored; a read-only
-  sidebar sweep verifies all six sidebar groups at 1180×820, 820×680, and the
-  exact 721/720 boundary. The sidebar remains 274px through 721px, auto-hides
-  at 720px, stays pinned as a 274/446 split after an explicit Show action and
-  route navigation, and no longer opens the historical inline-start hover
-  preview. A non-mutating workspace-entry sweep additionally refreshes
-  selected/no-project headings, two suggestion rows, the project picker,
-  Start in and branch menus, the inline New worktree/environment-empty state,
-  and the 720×680 layout. A two-task Review refresh additionally verifies a
-  real deletion and the current marker-backed two-file rename presentation.
-  All other `26.727.40816` observations remain previous-build evidence until
-  separately reached on `26.730.61309`.
+- Fresh current-build Renderer evidence covers the Terminal session shell,
+  direct-shell running/completed persistence, and the cross-worktree mismatch
+  recovery. It verifies project-labelled tabs, multi-tab reindexing,
+  close-nearest selection, the four-item picker, 820×680 fit, independent
+  transcripts, close/reopen while a process runs, close-last collapse, fresh
+  creation from the top Toggle, and `Dismiss`/`Open new terminal` recovery.
+  All `26.730.61309` observations remain previous-build evidence until each
+  surface is separately reached on `26.730.61639`.
 
-Current inventory: 79 surface groups; 22 have current-build runtime evidence,
-39 have previous-build-only runtime evidence, 18 remain `not_sampled`, and 0
-are `blocked_by_policy`. Current-build Browser verification covers 22 groups
-and Electron verification covers 22. Prior acceptance outside the sampled
-command, approval, interruption, compaction, summary, workspace-entry,
-Review, and six-sidebar slices remains recorded as `partial_legacy`
-until current-build re-observation.
+Current inventory: 80 surface groups; 3 have current-build runtime evidence, 59 have previous-build-only runtime evidence, 18 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 3 groups and Electron verification covers 3.
+Prior acceptance outside the sampled Terminal session, process, and mismatch
+slices remains recorded as `partial_legacy` until current-build
+re-observation.
 
 The current package exposes candidates far beyond the old transcript sample:
 application and thread shells, local/remote conversation routes, projects and
@@ -155,15 +138,13 @@ The implementation history below names the exact observed build. Acceptance
 that previously matched `26.721.81911` or earlier remains regression coverage,
 but every
 affected inventory row was `partial_legacy` until it was re-observed on
-`26.727.40816`. After the `26.730.61309` update, every row below is again
-`partial_legacy` except the explicitly refreshed successful-command,
-command-failure/recovery, command-interruption, context-compaction,
-thread-summary, approval, pasted-image attachment, workspace-entry, and six
-sidebar rows. The
+`26.727.40816`. After the `26.730.61639` update, every row below is again
+`partial_legacy` except the explicitly refreshed Terminal session,
+direct-shell lifecycle, and context-mismatch rows. The
 machine-readable inventory is authoritative when historical prose describes
 a build as current at its capture time.
 
-The current sidebar slice re-observed all six application-sidebar groups on
+The previous sidebar slice re-observed all six application-sidebar groups on
 `26.730.61309`. It independently implements the 274px shell, 46px
 traffic-light-safe titlebar inset, 70px header, 30px rows, Codex/Search/
 activity controls, New chat/Quick chat, five reusable expandable project
@@ -178,7 +159,7 @@ focus-managed modal mode only as an explicit safety fallback for widths that
 cannot fit the pinned split. The current product's separator exposes
 `role=separator` but no keyboard value semantics; UIKit intentionally retains
 Arrow/Home/End resizing and value attributes as an accessibility improvement.
-The dedicated de-identified scene passes within the 85-frame Browser/CDP and
+The dedicated de-identified scene passes within the 93-frame Browser/CDP and
 pixel matrix,
 Electron interaction, and current-build regional ratios of 3.6234% for the
 top, 0.1292% for the masked selected row, and 0% for the masked footer.
@@ -504,18 +485,32 @@ per-session command values, closes to the nearest tab, creates a session from
 the picker, closes all sessions, restores the latest one, and reopens a failed
 process.
 
-The `26.727.40816` shell instead presented one project-named
-`codex-ui-kit` tab in the bounded read-only observation. The independent
-single-session model matches that label plus the close/add controls and passes
-the `26.727.40816` regional pixel gate at 1.79% for the panel and 0.73% for its
-content. `workspace.terminal` was Browser/Electron verified on that build and
-is now `partial_legacy`.
-The independently implemented process list and
-running/failed/exited replay are deliberately split into
-`workspace.terminal-process-lifecycle`: the installed build's real process
-lifecycle was not safely exercised in this refresh, so that row retains
-previous-build runtime evidence and `partial_legacy` verification. Persisted
-panel state and real shell creation/termination remain open.
+The current `26.730.61639` refresh reaches the complete local session shell:
+project-labelled tabs, global visible numbering across workspaces,
+close-nearest selection, label reindexing, the four-item picker, and three-tab
+fit at 820×680. Closing the last tab collapses the panel; the top Toggle then
+creates a fresh current-workspace terminal with an empty transcript instead of
+restoring the closed session. `TerminalPanel` exposes plain local accessible
+labels through `showStatus={false}` while retaining status-rich labels for the
+host-supplied process-list compatibility fixture.
+
+A real bounded `sleep 3; echo terminal-after-reopen` command additionally
+verifies running/completed transcript settlement, independent per-session
+history, and close/reopen persistence while the process is active. A failed
+direct shell command does not add a product tab status badge, so
+`TerminalProcessList` remains an explicitly host-owned presentation for
+running/failed/exited process summaries and reopen actions rather than an
+inferred native tab contract.
+
+Changing the chat worktree with an older Terminal active now has its own
+`workspace.terminal-context-mismatch` surface. The observed warning says
+`This terminal's workspace does not match this chat's current worktree` and
+offers `Dismiss` plus `Open new terminal` without discarding the older
+session. `TerminalWorkspaceMismatchNotice` implements that recovery contract.
+Browser/CDP covers 93 lifecycle frames and Electron repeats the session,
+mismatch, input, picker, close, and resizing interactions. Against the exact
+906×820 current-build reference, the shared panel and content differ by
+1.5120% and 0.4004%, below independent 2% and 1% limits.
 
 The compact tool/recovery slice splits the former combined
 `thread.search-tool-mcp-events` candidate into independent search, Browser, and
@@ -756,8 +751,8 @@ claim that the whole application or every lifecycle is pixel-perfect. Broader
 Markdown variants, unsampled host eviction heuristics and window sizes, code search,
 other MCP and connector variants, thread-level retry recovery, approval
 persistence and timeout, current-product binary/conflict reachability, PR
-merge/review-submission states, current-product Terminal process lifecycle and
-panel persistence, and native Codex window behavior
+merge/review-submission states, direct-shell failure/restart semantics,
+background agent-process reopening, and native Codex window behavior
 retain their own inventory gates.
 
 The Markdown slice revalidates one synthetic completed response on build
