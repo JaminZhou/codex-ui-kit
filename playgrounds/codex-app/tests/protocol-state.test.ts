@@ -5,6 +5,7 @@ import {
   initialProtocolState,
   isCurrentTurnGroupActive,
   isTurnActive,
+  latestSubagentLifecyclesById,
   messageAttachmentAccessibleLabel,
   messageAttachmentPreviewSource,
   reduceProtocolNotification,
@@ -1683,6 +1684,378 @@ describe("protocol lifecycle reducer", () => {
       status: "active",
       turnId: "turn-resume-alpha-late-activity",
     });
+  });
+
+  it("routes same-turn activity to the current resumed lifecycle", () => {
+    const completed = reduceProtocolTrace(
+      replayScenarios["subagent-concurrency"].events,
+    );
+    const activeTurn = reduceProtocolNotification(completed, {
+      method: "turn/started",
+      params: {
+        threadId: "thread-subagent-concurrency",
+        turn: { id: "turn-subagent-concurrency" },
+      },
+    });
+    const resumed = reduceProtocolNotification(activeTurn, {
+      method: "item/started",
+      params: {
+        item: {
+          agentsStates: { alpha: { status: "running" } },
+          id: "collab-resume-alpha-same-turn",
+          receiverThreadIds: ["alpha"],
+          senderThreadId: "thread-subagent-concurrency",
+          status: "inProgress",
+          tool: "resumeAgent",
+          type: "collabAgentToolCall",
+        },
+        startedAtMs: 90_000,
+        threadId: "thread-subagent-concurrency",
+        turnId: "turn-subagent-concurrency",
+      },
+    });
+    const withActivity = reduceProtocolNotification(resumed, {
+      method: "item/started",
+      params: {
+        item: {
+          agentPath: "/root/alpha",
+          agentThreadId: "alpha",
+          id: "activity-alpha-same-turn-resume",
+          kind: "started",
+          type: "subAgentActivity",
+        },
+        startedAtMs: 90_100,
+        threadId: "thread-subagent-concurrency",
+        turnId: "turn-subagent-concurrency",
+      },
+    });
+
+    expect(withActivity.status).toBe("running");
+    expect(hasActiveTurnWork(withActivity)).toBe(true);
+    expect(withActivity.subagents.find(({ id }) => id === "alpha"))
+      .toMatchObject({
+        callId: "collab-resume-alpha-same-turn",
+        startedAtMs: 90_000,
+        status: "active",
+        tool: "resumeAgent",
+      });
+  });
+
+  it("keeps same-turn late activity on the earlier lifecycle", () => {
+    const completed = reduceProtocolTrace(
+      replayScenarios["subagent-concurrency"].events,
+    );
+    const activeTurn = reduceProtocolNotification(completed, {
+      method: "turn/started",
+      params: {
+        threadId: "thread-subagent-concurrency",
+        turn: { id: "turn-subagent-concurrency" },
+      },
+    });
+    const resumed = reduceProtocolNotification(activeTurn, {
+      method: "item/started",
+      params: {
+        item: {
+          agentsStates: { alpha: { status: "running" } },
+          id: "collab-resume-alpha-before-old-activity",
+          receiverThreadIds: ["alpha"],
+          senderThreadId: "thread-subagent-concurrency",
+          status: "inProgress",
+          tool: "resumeAgent",
+          type: "collabAgentToolCall",
+        },
+        startedAtMs: 90_000,
+        threadId: "thread-subagent-concurrency",
+        turnId: "turn-subagent-concurrency",
+      },
+    });
+    const afterLateActivity = reduceProtocolNotification(resumed, {
+      method: "item/started",
+      params: {
+        item: {
+          agentPath: "/root/alpha",
+          agentThreadId: "alpha",
+          id: "activity-alpha-old-same-turn",
+          kind: "started",
+          type: "subAgentActivity",
+        },
+        startedAtMs: 1_200,
+        threadId: "thread-subagent-concurrency",
+        turnId: "turn-subagent-concurrency",
+      },
+    });
+
+    expect(hasActiveTurnWork(afterLateActivity)).toBe(true);
+    expect(afterLateActivity.subagents.find(({ id }) => id === "alpha"))
+      .toMatchObject({
+        callId: "collab-resume-alpha-before-old-activity",
+        startedAtMs: 90_000,
+        status: "active",
+      });
+    expect(
+      afterLateActivity.subagentLifecycles.find(
+        ({ callId, id }) =>
+          callId === "collab-subagent-alpha" && id === "alpha",
+      ),
+    ).toMatchObject({
+      completedAtMs: 32_000,
+      startedAtMs: 1_100,
+      status: "done",
+    });
+  });
+
+  it("starts another resume lifecycle within the same turn", () => {
+    const completed = reduceProtocolTrace(
+      replayScenarios["subagent-concurrency"].events,
+    );
+    const activeTurn = reduceProtocolNotification(completed, {
+      method: "turn/started",
+      params: {
+        threadId: "thread-subagent-concurrency",
+        turn: { id: "turn-subagent-concurrency" },
+      },
+    });
+    const firstResume = reduceProtocolNotification(activeTurn, {
+      method: "item/started",
+      params: {
+        item: {
+          agentsStates: { alpha: { status: "running" } },
+          id: "collab-resume-alpha-first",
+          receiverThreadIds: ["alpha"],
+          senderThreadId: "thread-subagent-concurrency",
+          status: "inProgress",
+          tool: "resumeAgent",
+          type: "collabAgentToolCall",
+        },
+        startedAtMs: 90_000,
+        threadId: "thread-subagent-concurrency",
+        turnId: "turn-subagent-concurrency",
+      },
+    });
+    const firstSettled = reduceProtocolNotification(firstResume, {
+      method: "item/completed",
+      params: {
+        completedAtMs: 91_000,
+        item: {
+          agentsStates: { alpha: { status: "completed" } },
+          id: "collab-resume-alpha-first",
+          receiverThreadIds: ["alpha"],
+          senderThreadId: "thread-subagent-concurrency",
+          status: "completed",
+          tool: "resumeAgent",
+          type: "collabAgentToolCall",
+        },
+        threadId: "thread-subagent-concurrency",
+        turnId: "turn-subagent-concurrency",
+      },
+    });
+    const secondResume = reduceProtocolNotification(firstSettled, {
+      method: "item/started",
+      params: {
+        item: {
+          agentsStates: { alpha: { status: "running" } },
+          id: "collab-resume-alpha-second",
+          receiverThreadIds: ["alpha"],
+          senderThreadId: "thread-subagent-concurrency",
+          status: "inProgress",
+          tool: "resumeAgent",
+          type: "collabAgentToolCall",
+        },
+        startedAtMs: 92_000,
+        threadId: "thread-subagent-concurrency",
+        turnId: "turn-subagent-concurrency",
+      },
+    });
+
+    expect(hasActiveTurnWork(secondResume)).toBe(true);
+    expect(secondResume.subagents.find(({ id }) => id === "alpha"))
+      .toMatchObject({
+        callId: "collab-resume-alpha-second",
+        completedAtMs: null,
+        startedAtMs: 92_000,
+        status: "active",
+      });
+    expect(
+      secondResume.subagentLifecycles
+        .filter(({ id, tool }) => id === "alpha" && tool === "resumeAgent")
+        .map(({ callId, status }) => ({ callId, status })),
+    ).toEqual([
+      { callId: "collab-resume-alpha-first", status: "done" },
+      { callId: "collab-resume-alpha-second", status: "active" },
+    ]);
+    expect(
+      latestSubagentLifecyclesById(
+        subagentLifecycleGroup(
+          secondResume,
+          "collab-resume-alpha-second",
+        ),
+      ).map(({ callId, id }) => ({ callId, id })),
+    ).toEqual([
+      { callId: "collab-resume-alpha-second", id: "alpha" },
+      { callId: "collab-subagent-beta", id: "beta" },
+    ]);
+  });
+
+  it("rekeys activity-first resume state into the reported collab call", () => {
+    const completed = reduceProtocolTrace(
+      replayScenarios["subagent-concurrency"].events,
+    );
+    const followUp = reduceProtocolNotification(completed, {
+      method: "turn/started",
+      params: {
+        threadId: "thread-subagent-concurrency",
+        turn: { id: "turn-activity-first-resume" },
+      },
+    });
+    const activityFirst = reduceProtocolNotification(followUp, {
+      method: "item/started",
+      params: {
+        item: {
+          agentPath: "/root/alpha",
+          agentThreadId: "alpha",
+          id: "activity-before-resume",
+          kind: "started",
+          type: "subAgentActivity",
+        },
+        startedAtMs: 100_000,
+        threadId: "thread-subagent-concurrency",
+        turnId: "turn-activity-first-resume",
+      },
+    });
+    const resumed = reduceProtocolNotification(activityFirst, {
+      method: "item/started",
+      params: {
+        item: {
+          agentsStates: { alpha: { status: "running" } },
+          id: "collab-activity-first-resume",
+          receiverThreadIds: ["alpha"],
+          senderThreadId: "thread-subagent-concurrency",
+          status: "inProgress",
+          tool: "resumeAgent",
+          type: "collabAgentToolCall",
+        },
+        startedAtMs: 100_100,
+        threadId: "thread-subagent-concurrency",
+        turnId: "turn-activity-first-resume",
+      },
+    });
+
+    expect(activityFirst.subagents.find(({ id }) => id === "alpha"))
+      .toMatchObject({
+        callId: "activity-before-resume",
+        provisional: true,
+      });
+    expect(resumed.subagents.find(({ id }) => id === "alpha"))
+      .toMatchObject({
+        callId: "collab-activity-first-resume",
+        provisional: false,
+        startedAtMs: 100_000,
+        status: "active",
+        tool: "resumeAgent",
+      });
+    expect(
+      resumed.subagentLifecycles.filter(
+        ({ id, turnId }) =>
+          id === "alpha" && turnId === "turn-activity-first-resume",
+      ),
+    ).toEqual([
+      expect.objectContaining({
+        callId: "collab-activity-first-resume",
+        provisional: false,
+      }),
+    ]);
+    expect(
+      resumed.timeline.filter(
+        ({ id, kind }) =>
+          kind === "subagent" &&
+          (id === "activity-before-resume" ||
+            id === "collab-activity-first-resume"),
+      ),
+    ).toEqual([
+      { id: "collab-activity-first-resume", kind: "subagent" },
+    ]);
+  });
+
+  it("places nested activity before the latest same-turn parent lifecycle", () => {
+    const turn = reduceProtocolNotification(initialProtocolState, {
+      method: "turn/started",
+      params: {
+        threadId: "thread-parent-lifecycle",
+        turn: { id: "turn-parent-lifecycle" },
+      },
+    });
+    const parentStarted = reduceProtocolNotification(turn, {
+      method: "item/started",
+      params: {
+        item: {
+          agentsStates: { parent: { status: "running" } },
+          id: "collab-parent-spawn",
+          receiverThreadIds: ["parent"],
+          senderThreadId: "thread-parent-lifecycle",
+          status: "inProgress",
+          tool: "spawnAgent",
+          type: "collabAgentToolCall",
+        },
+        startedAtMs: 1_000,
+        threadId: "thread-parent-lifecycle",
+        turnId: "turn-parent-lifecycle",
+      },
+    });
+    const parentCompleted = reduceProtocolNotification(parentStarted, {
+      method: "item/completed",
+      params: {
+        completedAtMs: 2_000,
+        item: {
+          agentsStates: { parent: { status: "completed" } },
+          id: "collab-parent-spawn",
+          receiverThreadIds: ["parent"],
+          senderThreadId: "thread-parent-lifecycle",
+          status: "completed",
+          tool: "spawnAgent",
+          type: "collabAgentToolCall",
+        },
+        threadId: "thread-parent-lifecycle",
+        turnId: "turn-parent-lifecycle",
+      },
+    });
+    const parentResumed = reduceProtocolNotification(parentCompleted, {
+      method: "item/started",
+      params: {
+        item: {
+          agentsStates: { parent: { status: "running" } },
+          id: "collab-parent-resume",
+          receiverThreadIds: ["parent"],
+          senderThreadId: "thread-parent-lifecycle",
+          status: "inProgress",
+          tool: "resumeAgent",
+          type: "collabAgentToolCall",
+        },
+        startedAtMs: 3_000,
+        threadId: "thread-parent-lifecycle",
+        turnId: "turn-parent-lifecycle",
+      },
+    });
+    const childActivity = reduceProtocolNotification(parentResumed, {
+      method: "item/started",
+      params: {
+        item: {
+          agentPath: "/root/parent/child",
+          agentThreadId: "child",
+          id: "activity-child-after-parent-resume",
+          kind: "started",
+          type: "subAgentActivity",
+        },
+        startedAtMs: 3_100,
+        threadId: "parent",
+        turnId: "turn-parent-lifecycle",
+      },
+    });
+
+    expect(childActivity.timeline).toEqual([
+      { id: "collab-parent-spawn", kind: "subagent" },
+      { id: "activity-child-after-parent-resume", kind: "subagent" },
+      { id: "collab-parent-resume", kind: "subagent" },
+    ]);
   });
 
   it("does not reactivate a completed subagent from a late activity event", () => {

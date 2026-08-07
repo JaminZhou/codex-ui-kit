@@ -164,6 +164,7 @@ export interface DemoSubagent {
   message: string | null;
   name: string | null;
   prompt: string | null;
+  provisional: boolean;
   senderThreadId: string | null;
   startedAtMs: number | null;
   status: "active" | "done" | "waiting";
@@ -418,6 +419,33 @@ function insertSubagentTimeline(
       ];
 }
 
+function rekeySubagentTimeline(
+  timeline: DemoTimelineEntry[],
+  provisionalIds: Set<string>,
+  callId: string,
+): DemoTimelineEntry[] {
+  if (provisionalIds.size === 0) return timeline;
+  const firstProvisionalIndex = timeline.findIndex(
+    ({ id, kind }) => kind === "subagent" && provisionalIds.has(id),
+  );
+  const filtered = timeline.filter(
+    ({ id, kind }) =>
+      kind !== "subagent" || (!provisionalIds.has(id) && id !== callId),
+  );
+  if (firstProvisionalIndex === -1) return filtered;
+  const insertionIndex = timeline
+    .slice(0, firstProvisionalIndex)
+    .filter(
+      ({ id, kind }) =>
+        kind !== "subagent" || (!provisionalIds.has(id) && id !== callId),
+    ).length;
+  return [
+    ...filtered.slice(0, insertionIndex),
+    { id: callId, kind: "subagent" },
+    ...filtered.slice(insertionIndex),
+  ];
+}
+
 function appendTerminalEvent(
   events: DemoTerminalEvent[],
   event: DemoTerminalEvent,
@@ -668,6 +696,56 @@ export function subagentLifecycleGroup(
     entrySubagent.turnId === null
       ? subagent.callId === entrySubagent.callId
       : subagent.turnId === entrySubagent.turnId,
+  );
+}
+
+export function latestSubagentLifecyclesById(
+  subagents: DemoSubagent[],
+): DemoSubagent[] {
+  return subagents.reduce<DemoSubagent[]>((latest, subagent) => {
+    const index = latest.findIndex(({ id }) => id === subagent.id);
+    if (index === -1) return [...latest, subagent];
+    const next = [...latest];
+    next[index] = subagent;
+    return next;
+  }, []);
+}
+
+function subagentLifecycleForActivity(
+  state: Pick<DemoProtocolState, "subagentLifecycles" | "subagents">,
+  agentThreadId: string,
+  turnId: string | null,
+  startedAtMs: number | null,
+): DemoSubagent | undefined {
+  const currentSubagent = state.subagents.find(
+    ({ id }) => id === agentThreadId,
+  );
+  if (
+    currentSubagent?.turnId === turnId &&
+    (startedAtMs === null ||
+      currentSubagent.startedAtMs === null ||
+      startedAtMs >= currentSubagent.startedAtMs)
+  ) {
+    return currentSubagent;
+  }
+  const candidates = state.subagentLifecycles.filter(
+    ({ id, turnId: lifecycleTurnId }) =>
+      id === agentThreadId && lifecycleTurnId === turnId,
+  );
+  if (startedAtMs === null) return candidates.at(-1);
+  const startedCandidates = candidates.filter(
+    ({ startedAtMs: lifecycleStartedAtMs }) =>
+      lifecycleStartedAtMs === null || lifecycleStartedAtMs <= startedAtMs,
+  );
+  return (
+    startedCandidates
+      .filter(
+        ({ completedAtMs }) =>
+          completedAtMs === null || startedAtMs <= completedAtMs,
+      )
+      .at(-1) ??
+    startedCandidates.at(-1) ??
+    candidates[0]
   );
 }
 
@@ -951,14 +1029,17 @@ export function reduceProtocolNotification(
             : reportedThreadStatus === "running"
               ? "active"
               : "done";
+        const rekeysProvisionalLifecycle =
+          existing?.provisional === true && existing.turnId === itemTurnId;
         const startsResumedLifecycle =
           reportedTool === "resumeAgent" &&
-          (existing?.turnId !== itemTurnId ||
-            existing?.tool !== "resumeAgent");
+          existing?.callId !== itemId &&
+          !rekeysProvisionalLifecycle;
         const status =
           existing?.status === "done" &&
           reportedStatus !== "done" &&
-          !startsResumedLifecycle
+          !startsResumedLifecycle &&
+          !rekeysProvisionalLifecycle
             ? "done"
             : reportedStatus;
         const threadStatus =
@@ -977,11 +1058,15 @@ export function reduceProtocolNotification(
           ? reportedStatus === "done"
             ? reportedCompletedAtMs
             : null
+          : rekeysProvisionalLifecycle
+            ? reportedStatus === "done"
+              ? existing?.completedAtMs ?? reportedCompletedAtMs
+              : null
           : existing?.completedAtMs ??
             (reportedStatus === "done" ? reportedCompletedAtMs : null);
         return upsertById(items, {
           agentPath: existing?.agentPath ?? null,
-          callId: startsResumedLifecycle
+          callId: startsResumedLifecycle || rekeysProvisionalLifecycle
             ? itemId
             : existing?.callId ?? itemId,
           completedAtMs,
@@ -995,6 +1080,7 @@ export function reduceProtocolNotification(
           prompt: startsResumedLifecycle
             ? asString(item.prompt) ?? existing?.prompt ?? null
             : existing?.prompt ?? asString(item.prompt) ?? null,
+          provisional: false,
           senderThreadId:
             asString(item.senderThreadId) ??
             existing?.senderThreadId ??
@@ -1002,12 +1088,25 @@ export function reduceProtocolNotification(
           startedAtMs,
           status,
           threadStatus,
-          tool: startsResumedLifecycle
-            ? "resumeAgent"
-            : existing?.tool ?? reportedTool ?? "spawnAgent",
+          tool:
+            startsResumedLifecycle || rekeysProvisionalLifecycle
+              ? reportedTool ?? "resumeAgent"
+              : existing?.tool ?? reportedTool ?? "spawnAgent",
           turnId: itemTurnId,
         });
       }, state.subagents);
+      const provisionalLifecycleIds = new Set(
+        receiverThreadIds.flatMap((id) => {
+          const existing = state.subagents.find(
+            (candidate) => candidate.id === id,
+          );
+          return existing?.provisional === true &&
+            existing.turnId === itemTurnId &&
+            existing.callId !== itemId
+            ? [existing.callId]
+            : [];
+        }),
+      );
       const subagentLifecycles = receiverThreadIds.reduce(
         (items, id) => {
           const subagent = subagents.find((candidate) => candidate.id === id);
@@ -1015,7 +1114,9 @@ export function reduceProtocolNotification(
             ? upsertSubagentLifecycle(items, subagent)
             : items;
         },
-        state.subagentLifecycles,
+        state.subagentLifecycles.filter(
+          ({ callId }) => !provisionalLifecycleIds.has(callId),
+        ),
       );
       const senderThreadId = asString(item.senderThreadId);
       const timelineId = receiverThreadIds
@@ -1036,7 +1137,11 @@ export function reduceProtocolNotification(
         subagentLifecycles,
         subagents,
         timeline: insertSubagentTimeline(
-          state.timeline,
+          rekeySubagentTimeline(
+            state.timeline,
+            provisionalLifecycleIds,
+            timelineId,
+          ),
           { id: timelineId, kind: "subagent" },
           parentCallId,
         ),
@@ -1049,19 +1154,17 @@ export function reduceProtocolNotification(
       const currentSubagent = state.subagents.find(
         ({ id }) => id === agentThreadId,
       );
-      const existingLifecycle = state.subagentLifecycles.find(
-        ({ id, turnId }) => id === agentThreadId && turnId === itemTurnId,
-      );
-      const existing =
-        existingLifecycle ??
-        (currentSubagent?.turnId === itemTurnId
-          ? currentSubagent
-          : undefined);
       const kind = asString(item.kind) ?? "started";
       const sourceThreadId = asString(params.threadId);
+      const reportedStartedAtMs = asNumber(params.startedAtMs);
+      const existing = subagentLifecycleForActivity(
+        state,
+        agentThreadId,
+        itemTurnId,
+        reportedStartedAtMs,
+      );
       const callId = existing?.callId ?? itemId;
       const isDone = kind === "interrupted" || existing?.status === "done";
-      const reportedStartedAtMs = asNumber(params.startedAtMs);
       const activitySubagent: DemoSubagent = {
         agentPath: agentPath ?? existing?.agentPath ?? null,
         callId,
@@ -1075,6 +1178,7 @@ export function reduceProtocolNotification(
           existing?.name ??
           null,
         prompt: existing?.prompt ?? null,
+        provisional: existing?.provisional ?? existing === undefined,
         senderThreadId: existing?.senderThreadId ?? sourceThreadId,
         startedAtMs:
           existing?.startedAtMs === null ||
@@ -1095,8 +1199,8 @@ export function reduceProtocolNotification(
       };
       const updatesCurrentSubagent =
         currentSubagent === undefined ||
-        currentSubagent.turnId === itemTurnId ||
-        itemTurnId === state.currentTurnId;
+        currentSubagent.callId === activitySubagent.callId ||
+        (existing === undefined && itemTurnId === state.currentTurnId);
       const subagents = updatesCurrentSubagent
         ? upsertById(state.subagents, activitySubagent)
         : state.subagents;
@@ -1105,10 +1209,12 @@ export function reduceProtocolNotification(
         activitySubagent,
       );
       const parentCallId = sourceThreadId
-        ? subagentLifecycles.find(
-            ({ id, turnId }) =>
-              id === sourceThreadId && turnId === itemTurnId,
-          )?.callId ??
+        ? [...subagentLifecycles]
+            .reverse()
+            .find(
+              ({ id, turnId }) =>
+                id === sourceThreadId && turnId === itemTurnId,
+            )?.callId ??
           subagents.find(({ id }) => id === sourceThreadId)?.callId ??
           null
         : null;

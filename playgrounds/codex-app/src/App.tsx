@@ -99,6 +99,7 @@ import {
   initialProtocolState,
   isCurrentTurnGroupActive,
   isTurnActive,
+  latestSubagentLifecyclesById,
   messageAttachmentAccessibleLabel,
   messageAttachmentPreviewSource,
   reduceProtocolNotification,
@@ -5177,12 +5178,14 @@ export function App() {
       const groupTurnId = entrySubagent.turnId;
       const turnSubagents = subagentLifecycleGroup(state, entry.id);
       const turnActive = isCurrentTurnGroupActive(state, groupTurnId);
-      const groupedSubagents = turnActive
-        ? turnSubagents.filter(
-            (subagent) =>
-              subagent.senderThreadId === entrySubagent.senderThreadId,
-          )
-        : turnSubagents;
+      const groupedSubagents = latestSubagentLifecyclesById(
+        turnActive
+          ? turnSubagents.filter(
+              (subagent) =>
+                subagent.senderThreadId === entrySubagent.senderThreadId,
+            )
+          : turnSubagents,
+      );
       const groupEntrySubagent = turnActive
         ? groupedSubagents[0]
         : groupedSubagents.find(
