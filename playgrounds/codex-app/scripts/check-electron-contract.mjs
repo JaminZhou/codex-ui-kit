@@ -4539,7 +4539,18 @@ try {
     ".demo-subagent-activity-timeline .codex-ui-turn-duration",
   );
   const firstLiveDuration = await liveDuration.textContent();
-  await liveSubagentPage.waitForTimeout(1_100);
+  await liveSubagentPage.waitForFunction(
+    (firstValue) => {
+      const currentValue = document.querySelector(
+        ".demo-subagent-activity-timeline .codex-ui-turn-duration",
+      )?.textContent;
+      return (
+        currentValue?.startsWith("Working for ") && currentValue !== firstValue
+      );
+    },
+    firstLiveDuration,
+    { timeout: 4_000 },
+  );
   const secondLiveDuration = await liveDuration.textContent();
   if (
     !firstLiveDuration?.startsWith("Working for ") ||
