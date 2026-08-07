@@ -65,11 +65,11 @@
   --codex-ui-code-syntax-dark-variable: #df3079;
   --codex-ui-code-syntax-dark-title: #f22c3d;
 
-  --codex-ui-font-sans-default: -apple-system, BlinkMacSystemFont, "Segoe UI",
+  --codex-ui-font-sans-default: -apple-system, system-ui, "Segoe UI",
     sans-serif;
   --codex-ui-font-openai-sans: "OpenAI Sans",
     var(--codex-ui-font-sans-default);
-  --codex-ui-font-sans: var(--codex-ui-font-openai-sans);
+  --codex-ui-font-sans: var(--codex-ui-font-sans-default);
   --codex-ui-font-mono: ui-monospace, "SFMono-Regular", "SF Mono", Menlo,
     Consolas, "Liberation Mono", monospace;
   --codex-ui-font-size-xs: 0.75rem;
@@ -88,6 +88,7 @@
   --codex-ui-font-weight-medium: 500;
   --codex-ui-font-weight-semibold: 600;
   --codex-ui-font-weight-bold: 700;
+  --codex-ui-font-weight-shell: 445;
 
   --codex-ui-radius-2xs: 0.125rem;
   --codex-ui-radius-xs: 0.25rem;

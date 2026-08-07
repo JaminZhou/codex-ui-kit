@@ -1,7 +1,11 @@
 # Research policy
 
-This directory records abstract findings used to design `codex-ui-kit`. It does
-not contain extracted application files or copied source code.
+This directory records evidence used to design and verify `codex-ui-kit`. It
+does not contain copied or transformed application business logic. Exact
+visual primitives may be retained for the exploratory parity playground only
+when [`VISUAL_ASSETS.md`](VISUAL_ASSETS.md) and
+[`visual-assets.json`](visual-assets.json) record their source, ownership,
+hash, package boundary, and remaining approximation denominator.
 
 ## Workflow
 
@@ -14,7 +18,9 @@ not contain extracted application files or copied source code.
 5. Update `ui-inventory.json`; keep package evidence, runtime evidence,
    implementation, H5 verification, and Electron verification separate.
 6. Write a build note containing observations, not source snippets.
-7. Implement components independently against the build note and public API.
+7. Implement reusable components independently against the build note and
+   public API. Keep current-product reference visuals in the private playground
+   boundary rather than the published package.
 8. Delete or replace the temporary extraction when the sampled app updates.
 
 Deterministic raster fixtures are declared in `visual-scenarios.json`. Current
@@ -37,10 +43,15 @@ control.
 
 ## Excluded material
 
-- Bundled JavaScript, CSS, source maps, fonts, images, icons, logos, and sounds.
+- Bundled JavaScript, CSS, source maps, and application business logic.
 - Private IPC names, authentication details, credentials, or service endpoints.
 - Code produced by formatting, deminifying, translating, or mechanically
   transforming bundled implementation code.
+
+Fonts, images, icons, logos, and sounds are not accepted merely because they
+exist in the installed package. A visual asset must satisfy the provenance and
+distribution rules in [`VISUAL_ASSETS.md`](VISUAL_ASSETS.md); uncertain or
+unused assets stay local until that evidence exists.
 
 Each sampled build receives a separate note so observations can be compared
 without treating one proprietary build as permanent source of truth.

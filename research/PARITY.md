@@ -219,6 +219,11 @@ The authoritative current-build inventory is:
   recovery remain open.
 - npm publication remains out of scope until the agreed P0/P1 coverage and
   release acceptance surfaces are complete.
+- Pixel ratios are regression evidence for their explicitly owned regions,
+  not a global pixel-parity claim. The machine-checked
+  [`visual-assets.json`](visual-assets.json) denominator keeps global parity
+  ineligible while any visible element still uses an inferred or approximate
+  source.
 
 ## Completion gate
 

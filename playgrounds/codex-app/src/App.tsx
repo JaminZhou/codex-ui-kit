@@ -81,6 +81,7 @@ import {
   type QueuedPrompt,
   type SubagentItem,
 } from "codex-ui-kit";
+import { CurrentBuildIcon } from "./currentBuildIcons";
 import {
   cloneElement,
   Fragment,
@@ -163,23 +164,29 @@ type SummaryGlyphName =
   | "github";
 
 function SidebarGlyph({ name }: { name: SidebarGlyphName }) {
+  if (name === "activity") {
+    return <CurrentBuildIcon name="sidebar-activity" />;
+  }
+  if (name === "new") {
+    return <CurrentBuildIcon name="sidebar-new-chat" />;
+  }
+  if (name === "quick") {
+    return <CurrentBuildIcon name="sidebar-quick-chat" />;
+  }
+  if (name === "search") {
+    return <CurrentBuildIcon name="sidebar-search" />;
+  }
   const path = {
-    activity:
-      "M3.25 11.25h9.5l-1.1-1.55V6.9A3.65 3.65 0 0 0 8 3.25 3.65 3.65 0 0 0 4.35 6.9v2.8l-1.1 1.55ZM6.4 12.5a1.65 1.65 0 0 0 3.2 0",
     automation:
       "M8 2.25a5.75 5.75 0 1 1-4.07 1.68M8 4.75V8l2.15 1.45",
     folder:
       "M1.75 4.5h4l1.2 1.5h7.3v6.25a1.5 1.5 0 0 1-1.5 1.5H3.25a1.5 1.5 0 0 1-1.5-1.5V4.5Zm0 2h12.5",
     more: "M3.25 8h.01M8 8h.01M12.75 8h.01",
-    new: "M3 13l.55-3.1L10.9 2.55a1.55 1.55 0 0 1 2.2 2.2L5.75 12.1 3 13Zm6.9-9.45 2.55 2.55",
     pin: "m5.25 2.5 5.5 5.5M9.6 1.6l4.8 4.8-2.15 1.05-3.7 3.7-1.05 2.15-4.8-4.8 2.15-1.05 3.7-3.7L9.6 1.6ZM8 11l-3 3",
     plugins:
       "M6.25 1.75v3M9.75 1.75v3M4.5 4.75h7v2.5A3.5 3.5 0 0 1 8 10.75v3.5M2 7.25h12",
     "pull-request":
       "M4 3.25v8.5M4 3.25a1.25 1.25 0 1 0 0 .01M4 11.75a1.25 1.25 0 1 0 0 .01M12 4.5a1.25 1.25 0 1 0 0 .01M12 5.75v2a4 4 0 0 1-4 4H6.5",
-    quick:
-      "M2.5 3.25h7.25v7.5H6L3.25 13v-2.25H2.5v-7.5Zm7.5 1.5h3.5m-1.75-1.75v3.5",
-    search: "m11.5 11.5 2.75 2.75M13 7.25A5.75 5.75 0 1 1 1.5 7.25 5.75 5.75 0 0 1 13 7.25Z",
     sidebar: "M2.25 3.5h11.5v9H2.25v-9Zm4 0v9",
     settings:
       "M8 5.5A2.5 2.5 0 1 1 8 10.5 2.5 2.5 0 0 1 8 5.5Zm0-3.75.8 1.3 1.55.35 1.2-.95 2 2-.95 1.2.35 1.55 1.3.8-1.3.8-.35 1.55.95 1.2-2 2-1.2-.95-1.55.35L8 14.25l-.8-1.3-1.55-.35-1.2.95-2-2 .95-1.2-.35-1.55L1.75 8l1.3-.8.35-1.55-.95-1.2 2-2 1.2.95 1.55-.35L8 1.75Z",
@@ -2391,7 +2398,7 @@ export function App() {
               type="button"
             >
               Codex
-              <span aria-hidden="true">⌄</span>
+              <CurrentBuildIcon name="sidebar-mode-chevron" />
             </button>
             <span className="demo-sidebar-brand-actions">
               <button
@@ -2438,7 +2445,7 @@ export function App() {
               type="button"
             >
               Codex
-              <span aria-hidden="true">⌄</span>
+              <CurrentBuildIcon name="sidebar-mode-chevron" />
             </button>
             <button
               aria-label="Search"
