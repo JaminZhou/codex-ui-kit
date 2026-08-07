@@ -4392,6 +4392,74 @@ try {
   await subagentApp.close();
 }
 
+for (const collaborationScene of [
+  {
+    frame: "subagent-concurrent-panel-mixed",
+    id: "electron-subagent-concurrency",
+    scenario: "subagent-concurrency",
+    agents: ["Beta", "Alpha"],
+    active: 1,
+    done: 1,
+    transcriptAgent: "Alpha",
+    transcriptMessage: "ALPHA SUBAGENT DONE",
+  },
+  {
+    frame: "subagent-nested-panel-mixed",
+    id: "electron-subagent-nested",
+    scenario: "subagent-nested",
+    agents: ["Parent", "Child"],
+    active: 1,
+    done: 1,
+    transcriptAgent: "Child",
+    transcriptMessage: "CHILD SUBAGENT DONE",
+  },
+]) {
+  const { app, page } = await launchScene(collaborationScene, {
+    capture: false,
+  });
+  try {
+    const panel = page.getByTestId("subagent-panel");
+    await panel.waitFor();
+    const panelText = (await panel.textContent())?.replace(/\s+/g, " ").trim();
+    const panelAgentNames = await panel
+      .locator(
+        ".codex-ui-subagent-panel__item-heading > span:first-child",
+      )
+      .allTextContents();
+    if (
+      !panelText?.includes(`Active · ${collaborationScene.active}`) ||
+      !panelText.includes(`Done · ${collaborationScene.done}`) ||
+      JSON.stringify(panelAgentNames) !==
+        JSON.stringify(collaborationScene.agents)
+    ) {
+      throw new Error(
+        `Electron ${collaborationScene.scenario} mixed lifecycle failed: ${JSON.stringify({ panelAgentNames, panelText })}`,
+      );
+    }
+    await panel
+      .locator(".codex-ui-subagent-panel__item")
+      .filter({ hasText: collaborationScene.transcriptAgent })
+      .click();
+    const transcript = page.getByTestId("subagent-transcript");
+    await transcript.waitFor();
+    const transcriptText = (await transcript.textContent())
+      ?.replace(/\s+/g, " ")
+      .trim();
+    if (
+      !transcriptText?.includes(collaborationScene.transcriptAgent) ||
+      !transcriptText.includes(collaborationScene.transcriptMessage)
+    ) {
+      throw new Error(
+        `Electron ${collaborationScene.scenario} transcript failed: ${JSON.stringify(transcriptText)}`,
+      );
+    }
+    await page.getByRole("button", { name: "Back to subagents" }).click();
+    await panel.waitFor();
+  } finally {
+    await app.close();
+  }
+}
+
 const liveSubagentScene = {
   frame: "recovered",
   id: "electron-live-subagent",
@@ -4533,14 +4601,24 @@ try {
   });
   await liveSubagentPage.waitForFunction(
     () =>
-      document
+      (document
         .querySelector('[data-testid="subagent-transcript"]')
-        ?.textContent?.includes("SUBAGENT LIVE PROBE DONE") ?? false,
+        ?.textContent?.includes("SUBAGENT LIVE PROBE DONE") ?? false) &&
+      document.querySelector(
+        ".demo-subagent-activity-timeline .codex-ui-subagent-activity, .demo-subagent-activity-timeline .codex-ui-subagent-activity-group",
+      ) === null,
   );
-  if (!(await liveDuration.textContent())?.startsWith("Worked for ")) {
+  if ((await liveDuration.textContent()) !== "Worked for 45s") {
     throw new Error(
       `Electron live subagent duration did not settle: ${JSON.stringify(await liveDuration.textContent())}`,
     );
+  }
+  if (
+    (await liveSubagentPage
+      .getByRole("button", { exact: true, name: "Worked for 45s" })
+      .getAttribute("aria-expanded")) !== "false"
+  ) {
+    throw new Error("Electron live subagent timeline did not settle collapsed.");
   }
   await liveSubagentPage
     .getByRole("button", { name: "Back to subagents" })
@@ -4642,13 +4720,27 @@ try {
   if (
     !(await liveTranscript.textContent())?.includes(
       "SUBAGENT LIVE PROBE DONE",
-    ) ||
+    )
+  ) {
+    throw new Error(
+      "Electron live subagent did not preserve completed transcript access.",
+    );
+  }
+  const settledTimeline = liveSubagentPage.getByRole("button", {
+    exact: true,
+    name: "Worked for 45s",
+  });
+  if ((await settledTimeline.getAttribute("aria-expanded")) !== "false") {
+    throw new Error("Electron live subagent timeline reopened unexpectedly.");
+  }
+  await settledTimeline.click();
+  if (
     !(await liveSubagentPage
       .getByRole("button", { name: "Open Long probe subagent" })
       .isVisible())
   ) {
     throw new Error(
-      "Electron live subagent did not preserve completed activity and transcript access.",
+      "Electron live subagent did not preserve manually reopenable completed activity.",
     );
   }
 } finally {
@@ -4656,5 +4748,5 @@ try {
 }
 
 console.log(
-  "Electron host, native-window, coding-workspace routing, conversation/Composer and current image-attachment lifecycle plus current menus, current long, failed, and interrupted command output plus manual context compaction, thread summary, replay/live subagent delegation, default 720px narrow reachability, resizable navigation/Review/Terminal/PR detail, PR tabs and expansion, MCP disclosure/result, multi-file and mixed-content Review, selection/Undo, large diff scrolling, and compact geometry contracts passed.",
+  "Electron host, native-window, coding-workspace routing, conversation/Composer and current image-attachment lifecycle plus current menus, current long, failed, and interrupted command output plus manual context compaction, thread summary, replay/live single, concurrent, and nested subagent delegation, default 720px narrow reachability, resizable navigation/Review/Terminal/PR detail, PR tabs and expansion, MCP disclosure/result, multi-file and mixed-content Review, selection/Undo, large diff scrolling, and compact geometry contracts passed.",
 );

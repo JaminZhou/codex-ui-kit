@@ -180,4 +180,40 @@ describe("lifecycle visual policy", () => {
       "current-build context-compaction pixel ratio",
     );
   });
+
+  it("gates current concurrent and nested subagent lifecycle regions", () => {
+    expect(contract).toContain(
+      "CODEX_UI_KIT_SUBAGENT_CONCURRENT_SUMMARY_REFERENCE",
+    );
+    expect(contract).toContain(
+      "CODEX_UI_KIT_SUBAGENT_CONCURRENT_MIXED_REFERENCE",
+    );
+    expect(contract).toContain(
+      "CODEX_UI_KIT_SUBAGENT_NESTED_RUNNING_REFERENCE",
+    );
+    expect(contract).toContain(
+      "CODEX_UI_KIT_SUBAGENT_NESTED_TRANSCRIPT_REFERENCE",
+    );
+    expect(contract).toContain(
+      "CODEX_UI_KIT_SUBAGENT_COLLABORATION_MAX_DIFF_RATIO",
+    );
+    expect(contract).toContain(
+      '"subagent-concurrent-summary-running":',
+    );
+    expect(contract).toContain(
+      '"subagent-concurrent-summary-mixed":',
+    );
+    expect(contract).toContain(
+      '"subagent-nested-panel-mixed":',
+    );
+    expect(contract).toContain(
+      'sceneId: "subagent-nested-main-activity-running"',
+    );
+    expect(appSource).toContain(
+      "subagentTimelinePresentation(state, entry.id)",
+    );
+    expect(appSource).toContain(
+      'key={`subagent:${entry.id}:${turnActive ? "active" : "settled"}`}',
+    );
+  });
 });

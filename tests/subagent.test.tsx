@@ -355,6 +355,81 @@ describe("SubagentPanel", () => {
     expect(onSelect).toHaveBeenCalledWith(activeAgent);
   });
 
+  it("orders each lifecycle section by its protocol timestamp", () => {
+    const { container } = render(
+      <SubagentPanel
+        items={[
+          {
+            ...activeAgent,
+            dateTime: "2026-08-07T01:00:01.000Z",
+            id: "alpha",
+            name: "Alpha",
+          },
+          {
+            ...activeAgent,
+            dateTime: "2026-08-07T01:00:05.000Z",
+            id: "beta",
+            name: "Beta",
+          },
+        ]}
+      />,
+    );
+
+    const labels = [...container.querySelectorAll(
+      ".codex-ui-subagent-panel__item-heading > span:first-child",
+    )].map((element) => element.textContent);
+    expect(labels).toEqual(["Beta", "Alpha"]);
+  });
+
+  it("shows an active agent timestamp before it has a message", () => {
+    render(
+      <SubagentPanel
+        items={[
+          {
+            id: "child-running",
+            name: "Child",
+            status: "active",
+            statusSummary: "Working",
+            timestamp: "2s",
+          },
+        ]}
+      />,
+    );
+
+    expect(screen.getByText("2s").tagName).toBe("TIME");
+  });
+
+  it("sorts relative protocol clocks without emitting a false machine date", () => {
+    const { container } = render(
+      <SubagentPanel
+        items={[
+          {
+            ...activeAgent,
+            id: "alpha-relative",
+            name: "Alpha",
+            sortTimestampMs: 1_100,
+          },
+          {
+            ...activeAgent,
+            id: "beta-relative",
+            name: "Beta",
+            sortTimestampMs: 5_100,
+          },
+        ]}
+      />,
+    );
+
+    const labels = [
+      ...container.querySelectorAll(
+        ".codex-ui-subagent-panel__item-heading > span:first-child",
+      ),
+    ].map((element) => element.textContent);
+    expect(labels).toEqual(["Beta", "Alpha"]);
+    expect(container.querySelector("time")?.hasAttribute("datetime")).toBe(
+      false,
+    );
+  });
+
   it("renders read-only rows without dead button controls", () => {
     render(<SubagentPanel items={[activeAgent]} />);
 

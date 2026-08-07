@@ -445,7 +445,7 @@ for (const scene of visualScenes) {
       continue;
     }
 
-    if (scene.scenario === "subagent-delegation") {
+    if (scene.scenario.startsWith("subagent-")) {
       await page.waitForTimeout(50);
       const contract = await page.evaluate(() => {
         const rect = (element) => {
@@ -487,12 +487,16 @@ for (const scene of visualScenes) {
         const summary = document.querySelector(
           ".demo-subagent-summary-panel",
         );
-        const timeline = document.querySelector(
-          ".demo-subagent-activity-timeline",
-        );
-        const activity = document.querySelector(
-          ".codex-ui-subagent-activity",
-        );
+        const timelines = [
+          ...document.querySelectorAll(
+            ".demo-subagent-activity-timeline",
+          ),
+        ];
+        const activities = [
+          ...document.querySelectorAll(
+            ".codex-ui-subagent-activity, .codex-ui-subagent-activity-group",
+          ),
+        ];
         const panel = document.querySelector(
           '[data-testid="subagent-panel"]',
         );
@@ -510,8 +514,8 @@ for (const scene of visualScenes) {
         );
         return {
           activity: {
-            rect: rect(activity),
-            text: text(activity),
+            rect: rect(activities[0]),
+            texts: activities.map((item) => text(item)),
           },
           frame: root?.getAttribute("data-frame") ?? null,
           horizontalOverflow:
@@ -523,6 +527,19 @@ for (const scene of visualScenes) {
             headingStyle: style(panelHeading),
             rect: rect(panel),
             row: rect(panelRow),
+            rowNames: panel
+              ? [
+                  ...panel.querySelectorAll(
+                    ".codex-ui-subagent-panel__item-heading > span:first-child",
+                  ),
+                ].map((item) => text(item))
+              : [],
+            rowTimes: panel
+              ? [...panel.querySelectorAll("time")].map((item) => ({
+                  dateTime: item.getAttribute("datetime"),
+                  text: text(item),
+                }))
+              : [],
             rowStyle: style(panelRow),
             sectionCount:
               panel?.querySelectorAll(
@@ -547,8 +564,9 @@ for (const scene of visualScenes) {
             text: text(summary),
           },
           timeline: {
-            rect: rect(timeline),
-            text: text(timeline),
+            rect: rect(timelines[0]),
+            text: text(timelines[0]),
+            texts: timelines.map((item) => text(item)),
           },
           transcript: {
             actions: Boolean(
@@ -567,7 +585,8 @@ for (const scene of visualScenes) {
           viewport: { height: window.innerHeight, width: window.innerWidth },
         };
       });
-      const running = scene.frame.includes("running");
+      const mixed = scene.frame.includes("mixed");
+      const running = scene.frame.includes("running") || mixed;
       const summaryOpen = scene.frame.includes("summary");
       const panelOpen =
         scene.frame.includes("panel") ||
@@ -587,6 +606,36 @@ for (const scene of visualScenes) {
         : compact720
           ? 390.6875
           : 810.71875;
+      const concurrent = scene.scenario === "subagent-concurrency";
+      const nested = scene.scenario === "subagent-nested";
+      const activeCount = running ? (mixed ? 1 : concurrent || nested ? 2 : 1) : 0;
+      const doneCount = mixed ? 1 : running ? 0 : concurrent || nested ? 2 : 1;
+      const expectedActivities = !running
+        ? []
+        : concurrent
+          ? ["AlphaBetastarted working"]
+          : nested
+            ? mixed
+              ? ["Child finished", "Parent started working"]
+              : ["Child started working", "Parent started working"]
+            : ["Long probe started working"];
+      const expectedPanelRows = concurrent
+        ? ["Beta", "Alpha"]
+        : nested
+          ? mixed || !running
+            ? ["Parent", "Child"]
+            : ["Child", "Parent"]
+          : ["Long probe"];
+      const expectedPanelTimes = !running
+        ? expectedPanelRows.map(() => "1m ago")
+        : mixed
+          ? ["0s", "1m ago"]
+          : expectedPanelRows.map(() => "0s");
+      const expectedCompletedDuration = concurrent
+        ? "Worked for 1m 19s"
+        : nested
+          ? "Worked for 1m 2s"
+          : "Worked for 45s";
       if (
         contract.frame !== scene.frame ||
         contract.status !== (running ? "running" : "completed") ||
@@ -607,12 +656,17 @@ for (const scene of visualScenes) {
         );
       }
       if (
-        running !== Boolean(contract.activity.rect) ||
+        JSON.stringify(contract.activity.texts) !==
+          JSON.stringify(expectedActivities) ||
         (running &&
-          (contract.activity.text !== "Long probe started working" ||
-            contract.timeline.text !==
-              "Working for 14sLong probe started working")) ||
-        (!running && contract.timeline.text !== "Worked for 45s")
+          (contract.timeline.texts.length !== expectedActivities.length ||
+            expectedActivities.some(
+              (expected, index) =>
+                !contract.timeline.texts[index]?.endsWith(expected),
+            ))) ||
+        (!running &&
+          (contract.timeline.text !== expectedCompletedDuration ||
+            contract.timeline.texts.length !== 1))
       ) {
         throw new Error(
           `${scene.id}: subagent lifecycle contract failed: ${JSON.stringify(contract)}`,
@@ -627,7 +681,14 @@ for (const scene of visualScenes) {
           Math.abs(contract.summary.rect.height - 241) > 1 ||
           !contract.summary.text?.includes("Outputs") ||
           !contract.summary.text?.includes("Subagents") ||
-          !contract.summary.text?.includes(running ? "1 working" : "1 done") ||
+          !contract.summary.text?.includes(
+            [
+              activeCount > 0 ? `${activeCount} working` : null,
+              doneCount > 0 ? `${doneCount} done` : null,
+            ]
+              .filter(Boolean)
+              .join(" "),
+          ) ||
           !contract.summary.text?.includes("Sources"))
       ) {
         throw new Error(
@@ -655,13 +716,36 @@ for (const scene of visualScenes) {
         panelOpen &&
         !transcriptOpen &&
         (!contract.panel.rect ||
-          contract.panel.sectionCount !== (running ? 1 : 2) ||
+          JSON.stringify(contract.panel.rowNames) !==
+            JSON.stringify(expectedPanelRows) ||
+          JSON.stringify(contract.panel.rowTimes.map(({ text }) => text)) !==
+            JSON.stringify(expectedPanelTimes) ||
+          contract.panel.rowTimes.some(
+            ({ dateTime }) => dateTime !== null,
+          ) ||
+          contract.panel.sectionCount !== (running && !mixed ? 1 : 2) ||
           !contract.panel.text?.includes(
-            running ? "Active · 1" : "Active · 0",
+            `Active · ${activeCount}`,
           ) ||
           !contract.panel.text?.includes(
-            running ? "Working" : "SUBAGENT LONG PROBE DONE",
+            concurrent
+              ? mixed
+                ? "clarifying command execution constraints"
+                : running
+                  ? "Working"
+                  : "BETA SUBAGENT DONE"
+              : nested
+                ? mixed
+                  ? "CHILD SUBAGENT DONE"
+                  : running
+                    ? "Working"
+                    : "PARENT SUBAGENT DONE."
+                : running
+                  ? "Working"
+                  : "SUBAGENT LONG PROBE DONE",
           ) ||
+          (doneCount > 0 &&
+            !contract.panel.text?.includes(`Done · ${doneCount}`)) ||
           contract.panel.headingStyle?.fontSize !== "13px" ||
           contract.panel.headingStyle?.lineHeight !== "18.5712px" ||
           contract.panel.headingStyle?.padding !== "0px 8px" ||
@@ -677,9 +761,27 @@ for (const scene of visualScenes) {
         transcriptOpen &&
         (!contract.transcript.back ||
           !contract.transcript.actions ||
-          !contract.transcript.text?.includes("Long probe") ||
           !contract.transcript.text?.includes(
-            "SUBAGENT LONG PROBE DONE",
+            concurrent
+              ? scene.frame.endsWith("alpha")
+                ? "Alpha"
+                : "Beta"
+              : nested
+                ? scene.frame.endsWith("parent")
+                  ? "Parent"
+                  : "Child"
+                : "Long probe",
+          ) ||
+          !contract.transcript.text?.includes(
+            concurrent
+              ? scene.frame.endsWith("alpha")
+                ? "ALPHA SUBAGENT DONE"
+                : "BETA SUBAGENT DONE"
+              : nested
+                ? scene.frame.endsWith("parent")
+                  ? "PARENT SUBAGENT DONE."
+                  : "CHILD SUBAGENT DONE"
+                : "SUBAGENT LONG PROBE DONE",
           ))
       ) {
         throw new Error(

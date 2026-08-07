@@ -157,16 +157,34 @@ export interface DemoMcpToolCall {
 }
 
 export interface DemoSubagent {
+  agentPath: string | null;
   callId: string;
   completedAtMs: number | null;
+  controlCallIds: string[];
   id: string;
   message: string | null;
+  name: string | null;
   prompt: string | null;
+  provisional: boolean;
+  senderThreadId: string | null;
   startedAtMs: number | null;
   status: "active" | "done" | "waiting";
   threadStatus: string;
   tool: string;
   turnId: string | null;
+}
+
+function subagentName(agentPath: string | null, id: string) {
+  const candidate = agentPath?.split("/").filter(Boolean).at(-1) ?? id;
+  if (!candidate || candidate === "root") return null;
+  if (/^[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$/i.test(candidate)) {
+    return null;
+  }
+  const words = candidate
+    .split(/[-_\s]+/)
+    .filter(Boolean)
+    .join(" ");
+  return `${words[0]?.toUpperCase() ?? ""}${words.slice(1)}`;
 }
 
 export interface DemoTimelineEntry {
@@ -193,6 +211,7 @@ export interface DemoProtocolState {
   messages: DemoMessage[];
   retrying: boolean;
   status: DemoTurnStatus;
+  subagentLifecycles: DemoSubagent[];
   subagents: DemoSubagent[];
   threadId: string | null;
   timeline: DemoTimelineEntry[];
@@ -220,6 +239,7 @@ export const initialProtocolState: DemoProtocolState = {
   messages: [],
   retrying: false,
   status: "idle",
+  subagentLifecycles: [],
   subagents: [],
   threadId: null,
   timeline: [],
@@ -333,6 +353,39 @@ function upsertById<T extends { id: string }>(items: T[], item: T): T[] {
   return next;
 }
 
+function upsertSubagentLifecycle(
+  items: DemoSubagent[],
+  item: DemoSubagent,
+): DemoSubagent[] {
+  const index = items.findIndex(
+    ({ callId, id }) => callId === item.callId && id === item.id,
+  );
+  if (index === -1) return [...items, item];
+  const next = [...items];
+  next[index] = { ...next[index], ...item };
+  return next;
+}
+
+function rekeyOrUpsertSubagentLifecycle(
+  items: DemoSubagent[],
+  item: DemoSubagent,
+  provisionalIds: Set<string>,
+): DemoSubagent[] {
+  const provisionalIndex = items.findIndex(
+    ({ callId, id, provisional, turnId }) =>
+      provisional &&
+      id === item.id &&
+      turnId === item.turnId &&
+      provisionalIds.has(callId),
+  );
+  if (provisionalIndex === -1) {
+    return upsertSubagentLifecycle(items, item);
+  }
+  const next = [...items];
+  next[provisionalIndex] = item;
+  return next;
+}
+
 function upsertApproval(
   approvals: DemoApprovalRequest[],
   approval: DemoApprovalRequest,
@@ -359,6 +412,60 @@ function appendTimeline(
   )
     ? timeline
     : [...timeline, entry];
+}
+
+function insertSubagentTimeline(
+  timeline: DemoTimelineEntry[],
+  entry: DemoTimelineEntry,
+  parentCallId: string | null,
+): DemoTimelineEntry[] {
+  if (
+    timeline.some(
+      ({ id, kind }) => id === entry.id && kind === entry.kind,
+    )
+  ) {
+    return timeline;
+  }
+  const parentIndex = parentCallId
+    ? timeline.findIndex(
+        ({ id, kind }) => id === parentCallId && kind === "subagent",
+      )
+    : -1;
+  return parentIndex === -1
+    ? [...timeline, entry]
+    : [
+        ...timeline.slice(0, parentIndex),
+        entry,
+        ...timeline.slice(parentIndex),
+      ];
+}
+
+function rekeySubagentTimeline(
+  timeline: DemoTimelineEntry[],
+  provisionalIds: Set<string>,
+  callId: string,
+): DemoTimelineEntry[] {
+  if (provisionalIds.size === 0) return timeline;
+  const firstAffectedIndex = timeline.findIndex(
+    ({ id, kind }) =>
+      kind === "subagent" && (provisionalIds.has(id) || id === callId),
+  );
+  const filtered = timeline.filter(
+    ({ id, kind }) =>
+      kind !== "subagent" || (!provisionalIds.has(id) && id !== callId),
+  );
+  if (firstAffectedIndex === -1) return filtered;
+  const insertionIndex = timeline
+    .slice(0, firstAffectedIndex)
+    .filter(
+      ({ id, kind }) =>
+        kind !== "subagent" || (!provisionalIds.has(id) && id !== callId),
+    ).length;
+  return [
+    ...filtered.slice(0, insertionIndex),
+    { id: callId, kind: "subagent" },
+    ...filtered.slice(insertionIndex),
+  ];
 }
 
 function appendTerminalEvent(
@@ -586,6 +693,141 @@ function turnStatus(
 
 export function isTurnActive(status: DemoTurnStatus): boolean {
   return status === "running" || status === "retrying";
+}
+
+export function isCurrentTurnGroupActive(
+  state: Pick<DemoProtocolState, "currentTurnId" | "status">,
+  groupTurnId: string | null,
+): boolean {
+  return (
+    groupTurnId !== null &&
+    groupTurnId === state.currentTurnId &&
+    isTurnActive(state.status)
+  );
+}
+
+export function subagentLifecycleGroup(
+  state: Pick<DemoProtocolState, "subagentLifecycles">,
+  callId: string,
+): DemoSubagent[] {
+  const entrySubagent = state.subagentLifecycles.find(
+    (subagent) => subagent.callId === callId,
+  );
+  if (!entrySubagent) return [];
+  return state.subagentLifecycles.filter((subagent) =>
+    entrySubagent.turnId === null
+      ? subagent.callId === entrySubagent.callId
+      : subagent.turnId === entrySubagent.turnId,
+  );
+}
+
+export function latestSubagentLifecyclesById(
+  subagents: DemoSubagent[],
+): DemoSubagent[] {
+  return subagents.reduce<DemoSubagent[]>((latest, subagent) => {
+    const index = latest.findIndex(({ id }) => id === subagent.id);
+    if (index === -1) return [...latest, subagent];
+    const next = [...latest];
+    next[index] = subagent;
+    return next;
+  }, []);
+}
+
+export interface SubagentTimelinePresentation {
+  active: boolean;
+  anchor: DemoSubagent;
+  completedAtMs: number | undefined;
+  lifecycles: DemoSubagent[];
+  rows: DemoSubagent[];
+  startedAtMs: number | undefined;
+  turnId: string | null;
+}
+
+export function subagentTimelinePresentation(
+  state: Pick<
+    DemoProtocolState,
+    | "currentTurnId"
+    | "status"
+    | "subagentLifecycles"
+    | "threadId"
+  >,
+  callId: string,
+): SubagentTimelinePresentation | null {
+  const entrySubagent = state.subagentLifecycles.find(
+    (subagent) => subagent.callId === callId,
+  );
+  if (!entrySubagent) return null;
+  const turnId = entrySubagent.turnId;
+  const active = isCurrentTurnGroupActive(state, turnId);
+  const turnSubagents = subagentLifecycleGroup(state, callId);
+  const lifecycles = active
+    ? turnSubagents.filter(
+        (subagent) =>
+          subagent.senderThreadId === entrySubagent.senderThreadId,
+      )
+    : turnSubagents;
+  const anchor = active
+    ? lifecycles[0]
+    : lifecycles.find(
+        ({ senderThreadId }) =>
+          senderThreadId === null || senderThreadId === state.threadId,
+      ) ?? lifecycles[0];
+  if (!anchor) return null;
+  return {
+    active,
+    anchor,
+    completedAtMs: lifecycles
+      .flatMap(({ completedAtMs }) =>
+        completedAtMs === null ? [] : [completedAtMs],
+      )
+      .sort((left, right) => right - left)[0],
+    lifecycles,
+    rows: latestSubagentLifecyclesById(lifecycles),
+    startedAtMs: lifecycles
+      .flatMap(({ startedAtMs }) =>
+        startedAtMs === null ? [] : [startedAtMs],
+      )
+      .sort((left, right) => left - right)[0],
+    turnId,
+  };
+}
+
+function subagentLifecycleForActivity(
+  state: Pick<DemoProtocolState, "subagentLifecycles" | "subagents">,
+  agentThreadId: string,
+  turnId: string | null,
+  startedAtMs: number | null,
+): DemoSubagent | undefined {
+  const currentSubagent = state.subagents.find(
+    ({ id }) => id === agentThreadId,
+  );
+  if (
+    currentSubagent?.turnId === turnId &&
+    (startedAtMs === null ||
+      currentSubagent.startedAtMs === null ||
+      startedAtMs >= currentSubagent.startedAtMs)
+  ) {
+    return currentSubagent;
+  }
+  const candidates = state.subagentLifecycles.filter(
+    ({ id, turnId: lifecycleTurnId }) =>
+      id === agentThreadId && lifecycleTurnId === turnId,
+  );
+  if (startedAtMs === null) return candidates.at(-1);
+  const startedCandidates = candidates.filter(
+    ({ startedAtMs: lifecycleStartedAtMs }) =>
+      lifecycleStartedAtMs === null || lifecycleStartedAtMs <= startedAtMs,
+  );
+  return (
+    startedCandidates
+      .filter(
+        ({ completedAtMs }) =>
+          completedAtMs === null || startedAtMs <= completedAtMs,
+      )
+      .at(-1) ??
+    startedCandidates.at(-1) ??
+    candidates[0]
+  );
 }
 
 export function agentMessageStatus(
@@ -843,6 +1085,7 @@ export function reduceProtocolNotification(
     }
     if (itemType === "collabAgentToolCall") {
       const callStatus = asString(item.status) ?? "inProgress";
+      const reportedTool = asString(item.tool);
       const agentStates = isRecord(item.agentsStates)
         ? item.agentsStates
         : {};
@@ -850,46 +1093,283 @@ export function reduceProtocolNotification(
         ? item.receiverThreadIds.flatMap((value) => {
             const id = asString(value);
             return id ? [id] : [];
-          })
+        })
         : [];
-      const subagents = receiverThreadIds.reduce((items, id) => {
-        const existing = items.find((candidate) => candidate.id === id);
+      const reportedStartedAtMs = asNumber(params.startedAtMs);
+      const reportedCompletedAtMs = asNumber(params.completedAtMs);
+      const updates = receiverThreadIds.map((id) => {
+        const currentSubagent = state.subagents.find(
+          (candidate) => candidate.id === id,
+        );
+        const exactLifecycle = state.subagentLifecycles.find(
+          (candidate) =>
+            candidate.id === id &&
+            (candidate.callId === itemId ||
+              candidate.controlCallIds.includes(itemId)),
+        );
+        const sameTurnLifecycle = [...state.subagentLifecycles]
+          .reverse()
+          .find(
+            (candidate) =>
+              candidate.id === id && candidate.turnId === itemTurnId,
+          );
+        const existing =
+          exactLifecycle ??
+          (currentSubagent?.turnId === itemTurnId
+            ? currentSubagent
+            : sameTurnLifecycle) ??
+          currentSubagent;
+        const targetsHistoricalLifecycle =
+          existing !== undefined &&
+          currentSubagent !== undefined &&
+          existing.callId !== currentSubagent.callId &&
+          (exactLifecycle !== undefined ||
+            existing.turnId !== currentSubagent.turnId);
         const agentState = isRecord(agentStates[id]) ? agentStates[id] : {};
-        const threadStatus =
-          asString(agentState.status) ?? existing?.threadStatus ?? "pendingInit";
-        const status =
-          threadStatus === "pendingInit"
+        const rekeysProvisionalLifecycle =
+          !targetsHistoricalLifecycle &&
+          currentSubagent?.provisional === true &&
+          currentSubagent.turnId === itemTurnId;
+        const startsNewLifecycle =
+          !targetsHistoricalLifecycle &&
+          itemTurnId === state.currentTurnId &&
+          existing?.callId !== itemId &&
+          (reportedTool === "resumeAgent" ||
+            existing?.turnId !== itemTurnId ||
+            (reportedTool === "sendInput" && existing?.status === "done")) &&
+          !rekeysProvisionalLifecycle;
+        const reportedThreadStatus =
+          asString(agentState.status) ??
+          (startsNewLifecycle ? null : existing?.threadStatus) ??
+          "pendingInit";
+        const reportedStatus =
+          reportedThreadStatus === "pendingInit"
             ? "waiting"
-            : threadStatus === "running"
+            : reportedThreadStatus === "running"
               ? "active"
               : "done";
-        return upsertById(items, {
-          callId: itemId,
-          completedAtMs:
-            asNumber(params.completedAtMs) ??
-            existing?.completedAtMs ??
-            null,
+        const status =
+          existing?.status === "done" &&
+          reportedStatus !== "done" &&
+          !startsNewLifecycle &&
+          !rekeysProvisionalLifecycle
+            ? "done"
+            : reportedStatus;
+        const threadStatus =
+          status === "done" && reportedStatus !== "done"
+            ? existing?.threadStatus ?? reportedThreadStatus
+            : reportedThreadStatus;
+        const startedAtMs = startsNewLifecycle
+          ? reportedStartedAtMs
+          : existing?.startedAtMs === null ||
+              existing?.startedAtMs === undefined
+            ? reportedStartedAtMs
+            : reportedStartedAtMs === null
+              ? existing.startedAtMs
+              : Math.min(existing.startedAtMs, reportedStartedAtMs);
+        const completedAtMs = startsNewLifecycle
+          ? reportedStatus === "done"
+            ? reportedCompletedAtMs
+            : null
+          : rekeysProvisionalLifecycle
+            ? reportedStatus === "done"
+              ? existing?.completedAtMs ?? reportedCompletedAtMs
+              : null
+          : existing?.completedAtMs ??
+            (reportedStatus === "done" ? reportedCompletedAtMs : null);
+        const subagent: DemoSubagent = {
+          agentPath: existing?.agentPath ?? null,
+          callId: startsNewLifecycle || rekeysProvisionalLifecycle
+            ? itemId
+            : existing?.callId ?? itemId,
+          completedAtMs,
+          controlCallIds:
+            startsNewLifecycle
+              ? [itemId]
+              : Array.from(
+                  new Set([
+                    ...(existing?.controlCallIds ??
+                      (existing ? [existing.callId] : [])),
+                    itemId,
+                  ]),
+                ),
           id,
-          message: asString(agentState.message) ?? existing?.message ?? null,
-          prompt: asString(item.prompt) ?? existing?.prompt ?? null,
-          startedAtMs:
-            asNumber(params.startedAtMs) ??
-            existing?.startedAtMs ??
+          message: startsNewLifecycle
+            ? asString(agentState.message)
+            : asString(agentState.message) ?? existing?.message ?? null,
+          name:
+            existing?.name ??
+            subagentName(existing?.agentPath ?? null, id),
+          prompt: startsNewLifecycle
+            ? asString(item.prompt) ?? existing?.prompt ?? null
+            : existing?.prompt ?? asString(item.prompt) ?? null,
+          provisional: false,
+          senderThreadId:
+            asString(item.senderThreadId) ??
+            existing?.senderThreadId ??
             null,
+          startedAtMs,
           status,
           threadStatus,
-          tool: asString(item.tool) ?? existing?.tool ?? "spawnAgent",
-          turnId: itemTurnId,
-        });
-      }, state.subagents);
+          tool:
+            startsNewLifecycle || rekeysProvisionalLifecycle
+              ? reportedTool ?? "spawnAgent"
+              : existing?.tool ?? reportedTool ?? "spawnAgent",
+          turnId:
+            startsNewLifecycle || rekeysProvisionalLifecycle
+              ? itemTurnId
+              : existing?.turnId ?? itemTurnId,
+        };
+        return {
+          rekeysProvisionalLifecycle,
+          subagent,
+          targetsHistoricalLifecycle,
+        };
+      });
+      const subagents = updates.reduce(
+        (items, { subagent, targetsHistoricalLifecycle }) =>
+          targetsHistoricalLifecycle
+            ? items
+            : upsertById(items, subagent),
+        state.subagents,
+      );
+      const provisionalLifecycleIds = new Set(
+        updates.flatMap(({ rekeysProvisionalLifecycle, subagent }) => {
+          if (!rekeysProvisionalLifecycle) return [];
+          const existing = state.subagents.find(
+            (candidate) => candidate.id === subagent.id,
+          );
+          return existing ? [existing.callId] : [];
+        }),
+      );
+      const subagentLifecycles = updates.reduce(
+        (items, { subagent }) =>
+          rekeyOrUpsertSubagentLifecycle(
+            items,
+            subagent,
+            provisionalLifecycleIds,
+          ),
+        state.subagentLifecycles,
+      );
+      const senderThreadId = asString(item.senderThreadId);
+      const timelineId = updates
+        .map(({ subagent }) => subagent.callId)
+        .find((id): id is string => Boolean(id)) ?? itemId;
+      const parentCallId = senderThreadId
+        ? subagents.find(({ id }) => id === senderThreadId)?.callId ?? null
+        : null;
+      const hasReportedActiveSubagent = receiverThreadIds.some(
+        (id) => subagents.find((candidate) => candidate.id === id)?.status !== "done",
+      );
       return {
         ...next,
-        status: callStatus === "inProgress" ? "running" : next.status,
+        status:
+          itemTurnId === state.currentTurnId &&
+          callStatus === "inProgress" &&
+          hasReportedActiveSubagent
+            ? "running"
+            : next.status,
+        subagentLifecycles,
         subagents,
-        timeline: appendTimeline(state.timeline, {
-          id: itemId,
-          kind: "subagent",
-        }),
+        timeline: insertSubagentTimeline(
+          rekeySubagentTimeline(
+            state.timeline,
+            provisionalLifecycleIds,
+            timelineId,
+          ),
+          { id: timelineId, kind: "subagent" },
+          parentCallId,
+        ),
+      };
+    }
+    if (itemType === "subAgentActivity") {
+      const agentThreadId = asString(item.agentThreadId);
+      if (!agentThreadId) return next;
+      const agentPath = asString(item.agentPath);
+      const currentSubagent = state.subagents.find(
+        ({ id }) => id === agentThreadId,
+      );
+      const kind = asString(item.kind) ?? "started";
+      const sourceThreadId = asString(params.threadId);
+      const reportedStartedAtMs = asNumber(params.startedAtMs);
+      const reportedCompletedAtMs = asNumber(params.completedAtMs);
+      const existing = subagentLifecycleForActivity(
+        state,
+        agentThreadId,
+        itemTurnId,
+        reportedStartedAtMs ?? reportedCompletedAtMs,
+      );
+      const callId = existing?.callId ?? itemId;
+      const isDone = kind === "interrupted" || existing?.status === "done";
+      const activitySubagent: DemoSubagent = {
+        agentPath: agentPath ?? existing?.agentPath ?? null,
+        callId,
+        completedAtMs:
+          existing?.completedAtMs ??
+          (kind === "interrupted" ? reportedCompletedAtMs : null),
+        controlCallIds: existing?.controlCallIds ?? [callId],
+        id: agentThreadId,
+        message: existing?.message ?? null,
+        name:
+          subagentName(agentPath ?? existing?.agentPath ?? null, agentThreadId) ??
+          existing?.name ??
+          null,
+        prompt: existing?.prompt ?? null,
+        provisional: existing?.provisional ?? existing === undefined,
+        senderThreadId: existing?.senderThreadId ?? sourceThreadId,
+        startedAtMs:
+          existing?.startedAtMs === null ||
+          existing?.startedAtMs === undefined
+            ? reportedStartedAtMs
+            : reportedStartedAtMs === null
+              ? existing.startedAtMs
+              : Math.min(existing.startedAtMs, reportedStartedAtMs),
+        status: isDone ? "done" : "active",
+        threadStatus:
+          kind === "interrupted"
+            ? "interrupted"
+            : isDone
+              ? existing?.threadStatus ?? "completed"
+              : "running",
+        tool: existing?.tool ?? "spawnAgent",
+        turnId: itemTurnId,
+      };
+      const updatesCurrentSubagent =
+        currentSubagent === undefined ||
+        currentSubagent.callId === activitySubagent.callId ||
+        (existing === undefined && itemTurnId === state.currentTurnId);
+      const subagents = updatesCurrentSubagent
+        ? upsertById(state.subagents, activitySubagent)
+        : state.subagents;
+      const subagentLifecycles = upsertSubagentLifecycle(
+        state.subagentLifecycles,
+        activitySubagent,
+      );
+      const parentCallId = sourceThreadId
+        ? [...subagentLifecycles]
+            .reverse()
+            .find(
+              ({ id, turnId }) =>
+                id === sourceThreadId && turnId === itemTurnId,
+            )?.callId ??
+          subagents.find(({ id }) => id === sourceThreadId)?.callId ??
+          null
+        : null;
+      return {
+        ...next,
+        status:
+          itemTurnId === state.currentTurnId &&
+          updatesCurrentSubagent &&
+          !isDone
+            ? "running"
+            : next.status,
+        subagentLifecycles,
+        subagents,
+        timeline: insertSubagentTimeline(
+          state.timeline,
+          { id: callId, kind: "subagent" },
+          parentCallId,
+        ),
       };
     }
     if (itemType === "userMessage") {

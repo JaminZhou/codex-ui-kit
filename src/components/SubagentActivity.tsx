@@ -26,6 +26,7 @@ export interface SubagentItem {
   name?: string;
   presentation?: "grouped" | "row";
   role?: string;
+  sortTimestampMs?: number;
   status: SubagentStatus;
   statusSummary?: ReactNode;
   timestamp?: ReactNode;
@@ -238,7 +239,19 @@ function sortForSummary(items: SubagentItem[]) {
     .sort((left, right) => {
       const leftDone = left.item.status === "done" ? 1 : 0;
       const rightDone = right.item.status === "done" ? 1 : 0;
-      return leftDone - rightDone || left.index - right.index;
+      const leftTime =
+        left.item.sortTimestampMs ??
+        (left.item.dateTime ? Date.parse(left.item.dateTime) : Number.NaN);
+      const rightTime =
+        right.item.sortTimestampMs ??
+        (right.item.dateTime ? Date.parse(right.item.dateTime) : Number.NaN);
+      const chronologicalOrder =
+        Number.isFinite(leftTime) && Number.isFinite(rightTime)
+          ? rightTime - leftTime
+          : 0;
+      return (
+        leftDone - rightDone || chronologicalOrder || left.index - right.index
+      );
     })
     .map(({ item }) => item);
 }
@@ -571,7 +584,7 @@ function SubagentPanelSection({
                 <span className="codex-ui-subagent-panel__item-content">
                   <span className="codex-ui-subagent-panel__item-heading">
                     <span>{displayName(item.name)}</span>
-                    {item.lastMessage != null && item.timestamp != null ? (
+                    {item.timestamp != null ? (
                       <time dateTime={item.dateTime}>{item.timestamp}</time>
                     ) : null}
                   </span>

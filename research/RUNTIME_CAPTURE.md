@@ -811,6 +811,18 @@ screenshots were moved into the recoverable Trash directory
 `codex-ui-kit-sidebar-evidence.ptbmTs`; the original Codex process remained
 running.
 
+## Current subagent collaboration sample
+
+The `26.730.61639` sample now includes two disposable 1180×820 tasks beyond
+the single-agent baseline. A sibling Alpha/Beta task records two working, one
+working plus one done, two done, progress preview, summary counts, and two
+transcripts. A Parent/Child task records nested spawn, shared active/done
+sections, both transcripts, and public `/root/parent/child` path metadata. The
+current visual panel is flat; the path is retained as protocol identity rather
+than rendered as an inferred tree. Waiting-before-initialization, failure,
+interruption/cancel, streaming, pagination, and recovery are still required
+captures.
+
 ## Required flow matrix
 
 ### 1. Application entry and navigation

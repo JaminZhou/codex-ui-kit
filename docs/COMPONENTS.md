@@ -50,16 +50,21 @@ The built-in highlighter escapes untrusted code. A custom `CodeHighlighter` retu
   status, metadata, content, and action slots for mixed session timelines.
 - `SubagentActivity` and `SubagentActivityGroup`: delegated-work rows and compact grouped activity.
 - `SubagentSummary`: controlled working/done summary with agent metadata and diff statistics.
-- `SubagentPanel`: active and completed agent sections with pagination and selection hooks.
+- `SubagentPanel`: active and completed agent sections with pagination and
+  selection hooks. Summary avatars and rows can use host-provided protocol
+  timestamps to keep active work ahead of completed work and newer agents ahead
+  of older peers.
 - `SubagentTranscriptHeader` and `SubagentAvatar`: nested transcript navigation and asset-free agent identity.
 
 The protocol-backed playground composes these primitives in Replay and Live
-for the current single-agent success path: active timeline, populated thread summary,
-active/done side-panel list, transcript/back navigation, and responsive
-wide/820px/720px panel continuity. Live duration uses host-reduced protocol
-timestamps instead of replay constants. Hosts still own protocol reduction,
-concurrent or nested topology, failure/cancellation policy, and transcript
-streaming.
+for current single-agent, concurrent-sibling, and nested-delegation success
+paths: active and grouped timelines, populated thread summaries, mixed
+active/done side-panel lists, independent transcript/back navigation, and
+responsive wide/820px/720px panel continuity. Nested public `agentPath`
+identity remains available to the host while the observed current panel stays
+flat. Live duration uses host-reduced protocol timestamps instead of replay
+constants. Hosts still own protocol reduction, topology policy,
+failure/cancellation policy, pagination, and transcript streaming.
 
 ## Tools, approvals, and status
 

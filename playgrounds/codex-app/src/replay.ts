@@ -17,7 +17,9 @@ import mcpRecoveryMixedThreadTrace from "../fixtures/traces/mcp-recovery-mixed-t
 import mixedFileReviewTrace from "../fixtures/traces/mixed-file-review.jsonl?raw";
 import multiFileReviewTrace from "../fixtures/traces/multi-file-review.jsonl?raw";
 import recoveryTrace from "../fixtures/traces/streaming-recovery.jsonl?raw";
+import subagentConcurrencyTrace from "../fixtures/traces/subagent-concurrency.jsonl?raw";
 import subagentDelegationTrace from "../fixtures/traces/subagent-delegation.jsonl?raw";
+import subagentNestedTrace from "../fixtures/traces/subagent-nested.jsonl?raw";
 import terminalLifecycleTrace from "../fixtures/traces/terminal-lifecycle.jsonl?raw";
 import workflowTrace from "../fixtures/traces/workspace-workflow.jsonl?raw";
 import type { ProtocolEventRecord } from "./protocol-state";
@@ -31,7 +33,9 @@ export type ReplayScenarioId =
   | "command-failure-recovery"
   | "conversation-lifecycle"
   | "streaming-recovery"
+  | "subagent-concurrency"
   | "subagent-delegation"
+  | "subagent-nested"
   | "terminal-lifecycle"
   | "interruption"
   | "compaction"
@@ -146,6 +150,18 @@ export const replayScenarios: Record<ReplayScenarioId, ReplayScenario> = {
     "Delegate single subagent probe",
     "A current real subagent moves from working activity through the thread summary into the Subagents panel and nested transcript.",
     subagentDelegationTrace,
+  ),
+  "subagent-concurrency": scenario(
+    "subagent-concurrency",
+    "Delegate concurrent subagents",
+    "Two current real sibling subagents aggregate across running, mixed, completed, summary, panel, and independent transcript states.",
+    subagentConcurrencyTrace,
+  ),
+  "subagent-nested": scenario(
+    "subagent-nested",
+    "Run nested subagent probe",
+    "A current real Parent delegates Child; public agent paths preserve the hierarchy while the current panel presents both agents in one flat lifecycle list.",
+    subagentNestedTrace,
   ),
   interruption: scenario(
     "interruption",

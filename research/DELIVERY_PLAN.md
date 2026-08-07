@@ -11,8 +11,8 @@ exit gates; it does not replace the inventory.
 ## Current position
 
 - The current installed package is Codex Desktop `26.730.61639` (`6234`).
-- The inventory contains 80 surface groups: 52 P0, 19 P1, and 9 P2.
-- 4 groups have current-build runtime evidence, 59 have previous-build-only runtime evidence, and 17 have not been sampled.
+- The inventory contains 81 surface groups: 53 P0, 19 P1, and 9 P2.
+- 5 groups have current-build runtime evidence, 59 have previous-build-only runtime evidence, and 17 have not been sampled.
 - The current `26.730.61639` refresh covers the local Terminal session shell,
   a real bounded running/completed command with panel persistence, and the
   cross-worktree mismatch warning plus recovery actions. It locks
@@ -21,11 +21,18 @@ exit gates; it does not replace the inventory.
   close/reopen while running, close-last collapse, and fresh terminal creation
   from the top Toggle. The same refresh now also covers one real delegated
   subagent through active work, completion, summary, panel, transcript, and
-  explicit 820×680/720×680 reopen. Browser/CDP covers 102 lifecycle frames; Electron repeats
+  explicit 820×680/720×680 reopen. Two more current tasks now cover concurrent
+  siblings plus a Parent → Child delegation through active, mixed, completed,
+  summary, flat-panel, live-progress, and independent transcript states while
+  retaining public `agentPath` hierarchy. Browser/CDP covers 111 lifecycle
+  frames; Electron repeats
   the session, mismatch, input, picker, close, and resize interactions; the
   current 906×820 panel/content pixel ratios pass at 1.5120%/0.4004%.
-  The subagent summary/panel/transcript regional ratios pass at
-  4.1812%/1.3451%/1.5969%.
+  The single-subagent summary/panel/transcript regional ratios pass at
+  4.1812%/1.3451%/1.5969%. Nine concurrent/nested scenes now gate ten regions:
+  panel/summary/transcript comparisons pass between 1.3329% and 4.6708%, and
+  the compact nested main-activity band passes at 11.4952% under its separate
+  12.5% limit.
 - The previous `26.730.61309` refresh covered all six left-sidebar groups,
   selected/no-project and New worktree entry, plus sampled command, approval,
   interruption, compaction, summary, and pasted-image surfaces. The sidebar capture locks the
@@ -44,7 +51,7 @@ exit gates; it does not replace the inventory.
   responsive detail restoration. Its independent state machine adds
   index/detail loading and failure, checks, comments, review submission,
   merge-readiness, merge completion, compact layout, and route restoration.
-  Together the playground gates now cover 102 CDP/pixel frames, and the refreshed
+  Together the playground gates now cover 111 CDP/pixel frames, and the refreshed
   PR detail passes the current 906×820 regional pixel gate. The refreshed
   real MCP success path now matches Search → Fetch, the integrated activity
   disclosure, computed typography, and a current regional pixel gate. The
@@ -379,8 +386,8 @@ without confusing package readiness with full product reconstruction.
     successful delegation lifecycle are also delivered;
     continue with approval timeout/`acceptForSession`, native-file and attachment
     upload/error/multi-item variants, Markdown mutation/
-    large content, populated artifact/source sections, concurrent/nested
-    subagents, subagent waiting/failure/cancel/streaming, and transport recovery.
+    large content, populated artifact/source sections, subagent
+    waiting/failure/cancel/streaming, pagination, and transport recovery.
 11. **P1 resources and integrations**: Browser/artifact/document previews,
     environments, remote connections, Settings, MCP, plugins, skills, and
     automations, each with one end-to-end vertical slice.

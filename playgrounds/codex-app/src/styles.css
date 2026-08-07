@@ -817,12 +817,20 @@ textarea {
   gap: 0.375rem;
 }
 
-.demo-root[data-scenario="subagent-delegation"] {
+.demo-root:is(
+    [data-scenario="subagent-delegation"],
+    [data-scenario="subagent-concurrency"],
+    [data-scenario="subagent-nested"]
+  ) {
   --codex-ui-user-message-compact-max-width: 24.3125rem;
   --codex-ui-user-message-max-width: 24.3125rem;
 }
 
-.demo-root[data-scenario="subagent-delegation"]
+.demo-root:is(
+    [data-scenario="subagent-delegation"],
+    [data-scenario="subagent-concurrency"],
+    [data-scenario="subagent-nested"]
+  )
   .demo-current-mcp-header-actions {
   gap: 0.375rem;
 }
@@ -902,30 +910,50 @@ textarea {
   flex: 1 1 auto;
 }
 
-.demo-root[data-scenario="subagent-delegation"]
+.demo-root:is(
+    [data-scenario="subagent-delegation"],
+    [data-scenario="subagent-concurrency"],
+    [data-scenario="subagent-nested"]
+  )
   .codex-ui-subagent-panel__section h2 {
   font-size: 0.8125rem;
   line-height: 1.1607rem;
   padding-inline: 0.5rem;
 }
 
-.demo-root[data-scenario="subagent-delegation"]
+.demo-root:is(
+    [data-scenario="subagent-delegation"],
+    [data-scenario="subagent-concurrency"],
+    [data-scenario="subagent-nested"]
+  )
   .codex-ui-subagent-panel__empty {
   font-size: 0.8125rem;
   line-height: 1.1607rem;
   padding: 0.25rem 0.5rem;
 }
 
-.demo-root[data-scenario="subagent-delegation"]
+.demo-root:is(
+    [data-scenario="subagent-delegation"],
+    [data-scenario="subagent-concurrency"],
+    [data-scenario="subagent-nested"]
+  )
   .codex-ui-subagent-panel__item {
   border-radius: 0.78125rem;
   gap: 0.75rem;
   padding: 0.5rem;
 }
 
-.demo-root[data-scenario="subagent-delegation"]
+.demo-root:is(
+    [data-scenario="subagent-delegation"],
+    [data-scenario="subagent-concurrency"],
+    [data-scenario="subagent-nested"]
+  )
   .codex-ui-subagent-panel__item-heading,
-.demo-root[data-scenario="subagent-delegation"]
+.demo-root:is(
+    [data-scenario="subagent-delegation"],
+    [data-scenario="subagent-concurrency"],
+    [data-scenario="subagent-nested"]
+  )
   .codex-ui-subagent-panel__preview {
   font-size: 0.8125rem;
   line-height: 1.1607rem;
@@ -949,6 +977,15 @@ textarea {
 
 .demo-subagent-summary-panel {
   padding-bottom: 0.25rem;
+}
+
+.demo-subagent-summary-avatars {
+  align-items: center;
+  display: inline-flex;
+}
+
+.demo-subagent-summary-avatars > * + * {
+  margin-left: -0.1875rem;
 }
 
 .demo-current-mcp-header-actions button {
