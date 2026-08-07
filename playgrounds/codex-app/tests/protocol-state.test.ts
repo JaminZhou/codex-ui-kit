@@ -2138,6 +2138,202 @@ describe("protocol lifecycle reducer", () => {
     );
   });
 
+  it("routes an old root-turn completion to its historical call", () => {
+    const turnOne = reduceProtocolNotification(initialProtocolState, {
+      method: "turn/started",
+      params: {
+        threadId: "thread-late-collab-completion",
+        turn: { id: "turn-late-collab-one" },
+      },
+    });
+    const spawned = reduceProtocolNotification(turnOne, {
+      method: "item/started",
+      params: {
+        item: {
+          agentsStates: { alpha: { status: "running" } },
+          id: "collab-late-spawn-alpha",
+          receiverThreadIds: ["alpha"],
+          senderThreadId: "thread-late-collab-completion",
+          status: "inProgress",
+          tool: "spawnAgent",
+          type: "collabAgentToolCall",
+        },
+        startedAtMs: 1_000,
+        threadId: "thread-late-collab-completion",
+        turnId: "turn-late-collab-one",
+      },
+    });
+    const turnOneCompleted = reduceProtocolNotification(spawned, {
+      method: "turn/completed",
+      params: {
+        threadId: "thread-late-collab-completion",
+        turn: {
+          durationMs: 1_000,
+          id: "turn-late-collab-one",
+          status: "completed",
+        },
+      },
+    });
+    const turnTwo = reduceProtocolNotification(turnOneCompleted, {
+      method: "turn/started",
+      params: {
+        threadId: "thread-late-collab-completion",
+        turn: { id: "turn-late-collab-two" },
+      },
+    });
+    const resumed = reduceProtocolNotification(turnTwo, {
+      method: "item/started",
+      params: {
+        item: {
+          agentsStates: { alpha: { status: "running" } },
+          id: "collab-current-resume-alpha",
+          receiverThreadIds: ["alpha"],
+          senderThreadId: "thread-late-collab-completion",
+          status: "inProgress",
+          tool: "resumeAgent",
+          type: "collabAgentToolCall",
+        },
+        startedAtMs: 3_000,
+        threadId: "thread-late-collab-completion",
+        turnId: "turn-late-collab-two",
+      },
+    });
+    const afterOldCompletion = reduceProtocolNotification(resumed, {
+      method: "item/completed",
+      params: {
+        completedAtMs: 2_000,
+        item: {
+          agentsStates: { alpha: { status: "completed" } },
+          id: "collab-late-spawn-alpha",
+          receiverThreadIds: ["alpha"],
+          senderThreadId: "thread-late-collab-completion",
+          status: "completed",
+          tool: "spawnAgent",
+          type: "collabAgentToolCall",
+        },
+        threadId: "thread-late-collab-completion",
+        turnId: "turn-late-collab-one",
+      },
+    });
+
+    expect(hasActiveTurnWork(afterOldCompletion)).toBe(true);
+    expect(afterOldCompletion.subagents.find(({ id }) => id === "alpha"))
+      .toMatchObject({
+        callId: "collab-current-resume-alpha",
+        completedAtMs: null,
+        startedAtMs: 3_000,
+        status: "active",
+        turnId: "turn-late-collab-two",
+      });
+    expect(
+      afterOldCompletion.subagentLifecycles.find(
+        ({ callId, id }) =>
+          callId === "collab-late-spawn-alpha" && id === "alpha",
+      ),
+    ).toMatchObject({
+      completedAtMs: 2_000,
+      startedAtMs: 1_000,
+      status: "done",
+      turnId: "turn-late-collab-one",
+    });
+  });
+
+  it("routes a late same-turn control completion through its call alias", () => {
+    const turn = reduceProtocolNotification(initialProtocolState, {
+      method: "turn/started",
+      params: {
+        threadId: "thread-control-alias",
+        turn: { id: "turn-control-alias" },
+      },
+    });
+    const spawned = reduceProtocolNotification(turn, {
+      method: "item/started",
+      params: {
+        item: {
+          agentsStates: { alpha: { status: "running" } },
+          id: "collab-alias-spawn",
+          receiverThreadIds: ["alpha"],
+          senderThreadId: "thread-control-alias",
+          status: "inProgress",
+          tool: "spawnAgent",
+          type: "collabAgentToolCall",
+        },
+        startedAtMs: 1_000,
+        threadId: "thread-control-alias",
+        turnId: "turn-control-alias",
+      },
+    });
+    const waited = reduceProtocolNotification(spawned, {
+      method: "item/started",
+      params: {
+        item: {
+          agentsStates: { alpha: { status: "running" } },
+          id: "collab-alias-wait",
+          receiverThreadIds: ["alpha"],
+          senderThreadId: "thread-control-alias",
+          status: "inProgress",
+          tool: "wait",
+          type: "collabAgentToolCall",
+        },
+        startedAtMs: 1_500,
+        threadId: "thread-control-alias",
+        turnId: "turn-control-alias",
+      },
+    });
+    const resumed = reduceProtocolNotification(waited, {
+      method: "item/started",
+      params: {
+        item: {
+          agentsStates: { alpha: { status: "running" } },
+          id: "collab-alias-resume",
+          receiverThreadIds: ["alpha"],
+          senderThreadId: "thread-control-alias",
+          status: "inProgress",
+          tool: "resumeAgent",
+          type: "collabAgentToolCall",
+        },
+        startedAtMs: 3_000,
+        threadId: "thread-control-alias",
+        turnId: "turn-control-alias",
+      },
+    });
+    const afterLateWait = reduceProtocolNotification(resumed, {
+      method: "item/completed",
+      params: {
+        completedAtMs: 2_000,
+        item: {
+          agentsStates: { alpha: { status: "completed" } },
+          id: "collab-alias-wait",
+          receiverThreadIds: ["alpha"],
+          senderThreadId: "thread-control-alias",
+          status: "completed",
+          tool: "wait",
+          type: "collabAgentToolCall",
+        },
+        threadId: "thread-control-alias",
+        turnId: "turn-control-alias",
+      },
+    });
+
+    expect(hasActiveTurnWork(afterLateWait)).toBe(true);
+    expect(afterLateWait.subagents.find(({ id }) => id === "alpha"))
+      .toMatchObject({
+        callId: "collab-alias-resume",
+        startedAtMs: 3_000,
+        status: "active",
+      });
+    expect(
+      afterLateWait.subagentLifecycles.find(
+        ({ callId, id }) =>
+          callId === "collab-alias-spawn" && id === "alpha",
+      ),
+    ).toMatchObject({
+      completedAtMs: 2_000,
+      controlCallIds: ["collab-alias-spawn", "collab-alias-wait"],
+      status: "done",
+    });
+  });
+
   it("does not reactivate a completed root turn from background activity", () => {
     const turn = reduceProtocolNotification(initialProtocolState, {
       method: "turn/started",

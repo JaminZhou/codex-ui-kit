@@ -160,6 +160,7 @@ export interface DemoSubagent {
   agentPath: string | null;
   callId: string;
   completedAtMs: number | null;
+  controlCallIds: string[];
   id: string;
   message: string | null;
   name: string | null;
@@ -1096,12 +1097,42 @@ export function reduceProtocolNotification(
         : [];
       const reportedStartedAtMs = asNumber(params.startedAtMs);
       const reportedCompletedAtMs = asNumber(params.completedAtMs);
-      const subagents = receiverThreadIds.reduce((items, id) => {
-        const existing = items.find((candidate) => candidate.id === id);
+      const updates = receiverThreadIds.map((id) => {
+        const currentSubagent = state.subagents.find(
+          (candidate) => candidate.id === id,
+        );
+        const exactLifecycle = state.subagentLifecycles.find(
+          (candidate) =>
+            candidate.id === id &&
+            (candidate.callId === itemId ||
+              candidate.controlCallIds.includes(itemId)),
+        );
+        const sameTurnLifecycle = [...state.subagentLifecycles]
+          .reverse()
+          .find(
+            (candidate) =>
+              candidate.id === id && candidate.turnId === itemTurnId,
+          );
+        const existing =
+          exactLifecycle ??
+          (currentSubagent?.turnId === itemTurnId
+            ? currentSubagent
+            : sameTurnLifecycle) ??
+          currentSubagent;
+        const targetsHistoricalLifecycle =
+          existing !== undefined &&
+          currentSubagent !== undefined &&
+          existing.callId !== currentSubagent.callId &&
+          (exactLifecycle !== undefined ||
+            existing.turnId !== currentSubagent.turnId);
         const agentState = isRecord(agentStates[id]) ? agentStates[id] : {};
         const rekeysProvisionalLifecycle =
-          existing?.provisional === true && existing.turnId === itemTurnId;
+          !targetsHistoricalLifecycle &&
+          currentSubagent?.provisional === true &&
+          currentSubagent.turnId === itemTurnId;
         const startsNewLifecycle =
+          !targetsHistoricalLifecycle &&
+          itemTurnId === state.currentTurnId &&
           existing?.callId !== itemId &&
           (reportedTool === "resumeAgent" ||
             existing?.turnId !== itemTurnId ||
@@ -1146,12 +1177,22 @@ export function reduceProtocolNotification(
               : null
           : existing?.completedAtMs ??
             (reportedStatus === "done" ? reportedCompletedAtMs : null);
-        return upsertById(items, {
+        const subagent: DemoSubagent = {
           agentPath: existing?.agentPath ?? null,
           callId: startsNewLifecycle || rekeysProvisionalLifecycle
             ? itemId
             : existing?.callId ?? itemId,
           completedAtMs,
+          controlCallIds:
+            startsNewLifecycle
+              ? [itemId]
+              : Array.from(
+                  new Set([
+                    ...(existing?.controlCallIds ??
+                      (existing ? [existing.callId] : [])),
+                    itemId,
+                  ]),
+                ),
           id,
           message: startsNewLifecycle
             ? asString(agentState.message)
@@ -1174,37 +1215,45 @@ export function reduceProtocolNotification(
             startsNewLifecycle || rekeysProvisionalLifecycle
               ? reportedTool ?? "spawnAgent"
               : existing?.tool ?? reportedTool ?? "spawnAgent",
-          turnId: itemTurnId,
-        });
-      }, state.subagents);
+          turnId:
+            startsNewLifecycle || rekeysProvisionalLifecycle
+              ? itemTurnId
+              : existing?.turnId ?? itemTurnId,
+        };
+        return {
+          rekeysProvisionalLifecycle,
+          subagent,
+          targetsHistoricalLifecycle,
+        };
+      });
+      const subagents = updates.reduce(
+        (items, { subagent, targetsHistoricalLifecycle }) =>
+          targetsHistoricalLifecycle
+            ? items
+            : upsertById(items, subagent),
+        state.subagents,
+      );
       const provisionalLifecycleIds = new Set(
-        receiverThreadIds.flatMap((id) => {
+        updates.flatMap(({ rekeysProvisionalLifecycle, subagent }) => {
+          if (!rekeysProvisionalLifecycle) return [];
           const existing = state.subagents.find(
-            (candidate) => candidate.id === id,
+            (candidate) => candidate.id === subagent.id,
           );
-          return existing?.provisional === true &&
-            existing.turnId === itemTurnId &&
-            existing.callId !== itemId
-            ? [existing.callId]
-            : [];
+          return existing ? [existing.callId] : [];
         }),
       );
-      const subagentLifecycles = receiverThreadIds.reduce(
-        (items, id) => {
-          const subagent = subagents.find((candidate) => candidate.id === id);
-          return subagent
-            ? rekeyOrUpsertSubagentLifecycle(
-                items,
-                subagent,
-                provisionalLifecycleIds,
-              )
-            : items;
-        },
+      const subagentLifecycles = updates.reduce(
+        (items, { subagent }) =>
+          rekeyOrUpsertSubagentLifecycle(
+            items,
+            subagent,
+            provisionalLifecycleIds,
+          ),
         state.subagentLifecycles,
       );
       const senderThreadId = asString(item.senderThreadId);
-      const timelineId = receiverThreadIds
-        .map((id) => subagents.find((candidate) => candidate.id === id)?.callId)
+      const timelineId = updates
+        .map(({ subagent }) => subagent.callId)
         .find((id): id is string => Boolean(id)) ?? itemId;
       const parentCallId = senderThreadId
         ? subagents.find(({ id }) => id === senderThreadId)?.callId ?? null
@@ -1258,6 +1307,7 @@ export function reduceProtocolNotification(
         completedAtMs:
           existing?.completedAtMs ??
           (kind === "interrupted" ? reportedCompletedAtMs : null),
+        controlCallIds: existing?.controlCallIds ?? [callId],
         id: agentThreadId,
         message: existing?.message ?? null,
         name:
