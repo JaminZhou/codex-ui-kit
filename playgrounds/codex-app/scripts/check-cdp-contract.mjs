@@ -534,10 +534,11 @@ for (const scene of visualScenes) {
                   ),
                 ].map((item) => text(item))
               : [],
-            rowDateTimes: panel
-              ? [...panel.querySelectorAll("time")].map((item) =>
-                  item.getAttribute("datetime"),
-                )
+            rowTimes: panel
+              ? [...panel.querySelectorAll("time")].map((item) => ({
+                  dateTime: item.getAttribute("datetime"),
+                  text: text(item),
+                }))
               : [],
             rowStyle: style(panelRow),
             sectionCount:
@@ -625,6 +626,11 @@ for (const scene of visualScenes) {
             ? ["Parent", "Child"]
             : ["Child", "Parent"]
           : ["Long probe"];
+      const expectedPanelTimes = !running
+        ? expectedPanelRows.map(() => "1m ago")
+        : mixed
+          ? ["0s", "1m ago"]
+          : expectedPanelRows.map(() => "0s");
       const expectedCompletedDuration = concurrent
         ? "Worked for 1m 19s"
         : nested
@@ -712,7 +718,11 @@ for (const scene of visualScenes) {
         (!contract.panel.rect ||
           JSON.stringify(contract.panel.rowNames) !==
             JSON.stringify(expectedPanelRows) ||
-          contract.panel.rowDateTimes.some((value) => value !== null) ||
+          JSON.stringify(contract.panel.rowTimes.map(({ text }) => text)) !==
+            JSON.stringify(expectedPanelTimes) ||
+          contract.panel.rowTimes.some(
+            ({ dateTime }) => dateTime !== null,
+          ) ||
           contract.panel.sectionCount !== (running && !mixed ? 1 : 2) ||
           !contract.panel.text?.includes(
             `Active · ${activeCount}`,

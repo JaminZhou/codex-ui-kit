@@ -896,6 +896,7 @@ export function reduceProtocolNotification(
     }
     if (itemType === "collabAgentToolCall") {
       const callStatus = asString(item.status) ?? "inProgress";
+      const reportedTool = asString(item.tool);
       const agentStates = isRecord(item.agentsStates)
         ? item.agentsStates
         : {};
@@ -903,8 +904,10 @@ export function reduceProtocolNotification(
         ? item.receiverThreadIds.flatMap((value) => {
             const id = asString(value);
             return id ? [id] : [];
-          })
+        })
         : [];
+      const reportedStartedAtMs = asNumber(params.startedAtMs);
+      const reportedCompletedAtMs = asNumber(params.completedAtMs);
       const subagents = receiverThreadIds.reduce((items, id) => {
         const existing = items.find((candidate) => candidate.id === id);
         const agentState = isRecord(agentStates[id]) ? agentStates[id] : {};
@@ -918,38 +921,60 @@ export function reduceProtocolNotification(
             : reportedThreadStatus === "running"
               ? "active"
               : "done";
+        const startsResumedLifecycle =
+          reportedTool === "resumeAgent" &&
+          (existing?.turnId !== itemTurnId ||
+            existing?.tool !== "resumeAgent");
         const status =
-          existing?.status === "done" && reportedStatus !== "done"
+          existing?.status === "done" &&
+          reportedStatus !== "done" &&
+          !startsResumedLifecycle
             ? "done"
             : reportedStatus;
         const threadStatus =
           status === "done" && reportedStatus !== "done"
             ? existing?.threadStatus ?? reportedThreadStatus
             : reportedThreadStatus;
+        const startedAtMs = startsResumedLifecycle
+          ? reportedStartedAtMs
+          : existing?.startedAtMs === null ||
+              existing?.startedAtMs === undefined
+            ? reportedStartedAtMs
+            : reportedStartedAtMs === null
+              ? existing.startedAtMs
+              : Math.min(existing.startedAtMs, reportedStartedAtMs);
+        const completedAtMs = startsResumedLifecycle
+          ? reportedStatus === "done"
+            ? reportedCompletedAtMs
+            : null
+          : existing?.completedAtMs ??
+            (reportedStatus === "done" ? reportedCompletedAtMs : null);
         return upsertById(items, {
           agentPath: existing?.agentPath ?? null,
-          callId: existing?.callId ?? itemId,
-          completedAtMs:
-            asNumber(params.completedAtMs) ??
-            existing?.completedAtMs ??
-            null,
+          callId: startsResumedLifecycle
+            ? itemId
+            : existing?.callId ?? itemId,
+          completedAtMs,
           id,
-          message: asString(agentState.message) ?? existing?.message ?? null,
+          message: startsResumedLifecycle
+            ? asString(agentState.message)
+            : asString(agentState.message) ?? existing?.message ?? null,
           name:
             existing?.name ??
             subagentName(existing?.agentPath ?? null, id),
-          prompt: asString(item.prompt) ?? existing?.prompt ?? null,
+          prompt: startsResumedLifecycle
+            ? asString(item.prompt) ?? existing?.prompt ?? null
+            : existing?.prompt ?? asString(item.prompt) ?? null,
           senderThreadId:
             asString(item.senderThreadId) ??
             existing?.senderThreadId ??
             null,
-          startedAtMs:
-            asNumber(params.startedAtMs) ??
-            existing?.startedAtMs ??
-            null,
+          startedAtMs,
           status,
           threadStatus,
-          tool: asString(item.tool) ?? existing?.tool ?? "spawnAgent",
+          tool: startsResumedLifecycle
+            ? "resumeAgent"
+            : existing?.tool ?? reportedTool ?? "spawnAgent",
           turnId: itemTurnId,
         });
       }, state.subagents);
@@ -986,15 +1011,13 @@ export function reduceProtocolNotification(
       const sourceThreadId = asString(params.threadId);
       const callId = existing?.callId ?? itemId;
       const isDone = kind === "interrupted" || existing?.status === "done";
+      const reportedStartedAtMs = asNumber(params.startedAtMs);
       const activitySubagent: DemoSubagent = {
         agentPath: agentPath ?? existing?.agentPath ?? null,
         callId,
         completedAtMs:
-          kind === "interrupted"
-            ? (asNumber(params.completedAtMs) ??
-              existing?.completedAtMs ??
-              null)
-            : (existing?.completedAtMs ?? null),
+          existing?.completedAtMs ??
+          (kind === "interrupted" ? asNumber(params.completedAtMs) : null),
         id: agentThreadId,
         message: existing?.message ?? null,
         name:
@@ -1004,7 +1027,12 @@ export function reduceProtocolNotification(
         prompt: existing?.prompt ?? null,
         senderThreadId: existing?.senderThreadId ?? sourceThreadId,
         startedAtMs:
-          asNumber(params.startedAtMs) ?? existing?.startedAtMs ?? null,
+          existing?.startedAtMs === null ||
+          existing?.startedAtMs === undefined
+            ? reportedStartedAtMs
+            : reportedStartedAtMs === null
+              ? existing.startedAtMs
+              : Math.min(existing.startedAtMs, reportedStartedAtMs),
         status: isDone ? "done" : "active",
         threadStatus:
           kind === "interrupted"

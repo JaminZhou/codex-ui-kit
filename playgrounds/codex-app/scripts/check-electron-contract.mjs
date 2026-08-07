@@ -4601,14 +4601,24 @@ try {
   });
   await liveSubagentPage.waitForFunction(
     () =>
-      document
+      (document
         .querySelector('[data-testid="subagent-transcript"]')
-        ?.textContent?.includes("SUBAGENT LIVE PROBE DONE") ?? false,
+        ?.textContent?.includes("SUBAGENT LIVE PROBE DONE") ?? false) &&
+      document.querySelector(
+        ".demo-subagent-activity-timeline .codex-ui-subagent-activity, .demo-subagent-activity-timeline .codex-ui-subagent-activity-group",
+      ) === null,
   );
-  if (!(await liveDuration.textContent())?.startsWith("Worked for ")) {
+  if ((await liveDuration.textContent()) !== "Worked for 45s") {
     throw new Error(
       `Electron live subagent duration did not settle: ${JSON.stringify(await liveDuration.textContent())}`,
     );
+  }
+  if (
+    (await liveSubagentPage
+      .getByRole("button", { exact: true, name: "Worked for 45s" })
+      .getAttribute("aria-expanded")) !== "false"
+  ) {
+    throw new Error("Electron live subagent timeline did not settle collapsed.");
   }
   await liveSubagentPage
     .getByRole("button", { name: "Back to subagents" })
@@ -4710,13 +4720,27 @@ try {
   if (
     !(await liveTranscript.textContent())?.includes(
       "SUBAGENT LIVE PROBE DONE",
-    ) ||
+    )
+  ) {
+    throw new Error(
+      "Electron live subagent did not preserve completed transcript access.",
+    );
+  }
+  const settledTimeline = liveSubagentPage.getByRole("button", {
+    exact: true,
+    name: "Worked for 45s",
+  });
+  if ((await settledTimeline.getAttribute("aria-expanded")) !== "false") {
+    throw new Error("Electron live subagent timeline reopened unexpectedly.");
+  }
+  await settledTimeline.click();
+  if (
     !(await liveSubagentPage
       .getByRole("button", { name: "Open Long probe subagent" })
       .isVisible())
   ) {
     throw new Error(
-      "Electron live subagent did not preserve completed activity and transcript access.",
+      "Electron live subagent did not preserve manually reopenable completed activity.",
     );
   }
 } finally {

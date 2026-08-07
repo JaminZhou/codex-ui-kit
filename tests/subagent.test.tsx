@@ -381,6 +381,24 @@ describe("SubagentPanel", () => {
     expect(labels).toEqual(["Beta", "Alpha"]);
   });
 
+  it("shows an active agent timestamp before it has a message", () => {
+    render(
+      <SubagentPanel
+        items={[
+          {
+            id: "child-running",
+            name: "Child",
+            status: "active",
+            statusSummary: "Working",
+            timestamp: "2s",
+          },
+        ]}
+      />,
+    );
+
+    expect(screen.getByText("2s").tagName).toBe("TIME");
+  });
+
   it("sorts relative protocol clocks without emitting a false machine date", () => {
     const { container } = render(
       <SubagentPanel

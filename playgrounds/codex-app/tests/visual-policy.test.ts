@@ -212,5 +212,8 @@ describe("lifecycle visual policy", () => {
     expect(appSource).toContain(
       "isCurrentTurnGroupActive(state, groupTurnId)",
     );
+    expect(appSource).toContain(
+      'key={`subagent:${entry.id}:${turnActive ? "active" : "settled"}`}',
+    );
   });
 });

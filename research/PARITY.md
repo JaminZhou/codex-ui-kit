@@ -213,7 +213,7 @@ The authoritative current-build inventory is:
   observed, while the main conversation keeps Child and Parent activity as
   separate hierarchy-ordered blocks. Browser/CDP covers 111 frames, Electron
   drives both mixed lists, and nine collaboration scenes gate ten current-build
-  regions: panel/summary/transcript crops pass between 1.32% and 4.67%, while
+  regions: panel/summary/transcript crops pass between 1.33% and 4.67%, while
   the compact main-activity crop passes at 11.50% under its independent 12.5%
   limit. Waiting, failure, cancellation, pagination, streaming, and transport
   recovery remain open.

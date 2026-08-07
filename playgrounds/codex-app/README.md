@@ -629,7 +629,7 @@ delegation on `26.730.61639`:
   concurrent running/mixed summaries, mixed/completed panels, transcript,
   the nested running/mixed/completed/transcript lifecycle, and the nested
   Child/Parent main activity band. Panel/summary/transcript regions pass from
-  1.3207% to 4.6708% under a 5.5% hard limit; the compact text-heavy activity
+  1.3329% to 4.6708% under a 5.5% hard limit; the compact text-heavy activity
   band passes at 11.4952% under its independent 12.5% limit.
 
 ## Development

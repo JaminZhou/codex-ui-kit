@@ -5214,11 +5214,15 @@ export function App() {
           item.completedAtMs === null ? [] : [item.completedAtMs],
         )
         .sort((left, right) => right - left)[0];
+      const settledTurnDurationMs =
+        working.length === 0 && groupTurnId !== null
+          ? state.turnDurationsMs[groupTurnId]
+          : undefined;
       return (
         <ActivityTimeline
           className="demo-subagent-activity-timeline"
           defaultOpen={mode === "live" && turnActive}
-          key={`subagent:${entry.id}`}
+          key={`subagent:${entry.id}:${turnActive ? "active" : "settled"}`}
           open={
             initialSelection.capture
               ? turnActive && activityItems.length > 0
@@ -5227,23 +5231,24 @@ export function App() {
           summary={
             <TurnDuration
               {...(mode === "live"
-                ? {
-                    completedAtMs:
-                      working.length === 0 ? completedAtMs : undefined,
-                    startedAtMs,
-                  }
+                ? settledTurnDurationMs !== undefined
+                  ? { durationMs: settledTurnDurationMs }
+                  : {
+                      completedAtMs:
+                        working.length === 0 ? completedAtMs : undefined,
+                      startedAtMs,
+                    }
                 : {
                     durationMs:
                       working.length > 0
                         ? 14_000
-                        : groupTurnId !== null &&
-                            state.turnDurationsMs[groupTurnId] !== undefined
-                          ? state.turnDurationsMs[groupTurnId]
-                        : turnActive &&
-                            startedAtMs !== undefined &&
-                            completedAtMs !== undefined
-                          ? Math.max(0, completedAtMs - startedAtMs)
-                        : state.turnDurationMs ?? 45_000,
+                        : settledTurnDurationMs !== undefined
+                          ? settledTurnDurationMs
+                          : turnActive &&
+                              startedAtMs !== undefined &&
+                              completedAtMs !== undefined
+                            ? Math.max(0, completedAtMs - startedAtMs)
+                            : state.turnDurationMs ?? 45_000,
                   })}
               status={working.length > 0 ? "working" : "worked"}
             />

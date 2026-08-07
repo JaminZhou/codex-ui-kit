@@ -1346,6 +1346,234 @@ describe("protocol lifecycle reducer", () => {
     expect(completed.turnDurationMs).toBe(79_000);
   });
 
+  it("preserves spawn identity and start time when a wait call reports the agent", () => {
+    const turn = reduceProtocolNotification(initialProtocolState, {
+      method: "turn/started",
+      params: {
+        threadId: "thread-wait",
+        turn: { id: "turn-wait" },
+      },
+    });
+    const spawned = reduceProtocolNotification(turn, {
+      method: "item/started",
+      params: {
+        item: {
+          agentsStates: { alpha: { status: "running" } },
+          id: "collab-spawn-alpha",
+          prompt: "Run the Alpha probe.",
+          receiverThreadIds: ["alpha"],
+          senderThreadId: "thread-wait",
+          status: "inProgress",
+          tool: "spawnAgent",
+          type: "collabAgentToolCall",
+        },
+        startedAtMs: 1_000,
+        threadId: "thread-wait",
+        turnId: "turn-wait",
+      },
+    });
+    const waited = reduceProtocolNotification(spawned, {
+      method: "item/started",
+      params: {
+        item: {
+          agentsStates: { alpha: { status: "running" } },
+          id: "collab-wait-alpha",
+          receiverThreadIds: ["alpha"],
+          senderThreadId: "thread-wait",
+          status: "inProgress",
+          tool: "wait",
+          type: "collabAgentToolCall",
+        },
+        startedAtMs: 5_000,
+        threadId: "thread-wait",
+        turnId: "turn-wait",
+      },
+    });
+
+    expect(waited.subagents).toEqual([
+      expect.objectContaining({
+        callId: "collab-spawn-alpha",
+        id: "alpha",
+        prompt: "Run the Alpha probe.",
+        startedAtMs: 1_000,
+        tool: "spawnAgent",
+      }),
+    ]);
+  });
+
+  it("keeps each agent's first terminal timestamp across later wait calls", () => {
+    const turn = reduceProtocolNotification(initialProtocolState, {
+      method: "turn/started",
+      params: {
+        threadId: "thread-wait-completion",
+        turn: { id: "turn-wait-completion" },
+      },
+    });
+    const spawned = reduceProtocolNotification(turn, {
+      method: "item/started",
+      params: {
+        item: {
+          agentsStates: {
+            alpha: { status: "running" },
+            beta: { status: "running" },
+          },
+          id: "collab-spawn-pair",
+          receiverThreadIds: ["alpha", "beta"],
+          senderThreadId: "thread-wait-completion",
+          status: "inProgress",
+          tool: "spawnAgent",
+          type: "collabAgentToolCall",
+        },
+        startedAtMs: 1_000,
+        threadId: "thread-wait-completion",
+        turnId: "turn-wait-completion",
+      },
+    });
+    const firstWait = reduceProtocolNotification(spawned, {
+      method: "item/completed",
+      params: {
+        completedAtMs: 5_000,
+        item: {
+          agentsStates: {
+            alpha: { status: "completed" },
+            beta: { status: "running" },
+          },
+          id: "collab-wait-first",
+          receiverThreadIds: ["alpha", "beta"],
+          senderThreadId: "thread-wait-completion",
+          status: "completed",
+          tool: "wait",
+          type: "collabAgentToolCall",
+        },
+        threadId: "thread-wait-completion",
+        turnId: "turn-wait-completion",
+      },
+    });
+    const secondWait = reduceProtocolNotification(firstWait, {
+      method: "item/completed",
+      params: {
+        completedAtMs: 8_000,
+        item: {
+          agentsStates: {
+            alpha: { status: "completed" },
+            beta: { status: "completed" },
+          },
+          id: "collab-wait-second",
+          receiverThreadIds: ["alpha", "beta"],
+          senderThreadId: "thread-wait-completion",
+          status: "completed",
+          tool: "wait",
+          type: "collabAgentToolCall",
+        },
+        threadId: "thread-wait-completion",
+        turnId: "turn-wait-completion",
+      },
+    });
+
+    expect(firstWait.subagents).toEqual([
+      expect.objectContaining({ id: "alpha", completedAtMs: 5_000 }),
+      expect.objectContaining({ id: "beta", completedAtMs: null }),
+    ]);
+    expect(secondWait.subagents).toEqual([
+      expect.objectContaining({
+        id: "alpha",
+        completedAtMs: 5_000,
+        startedAtMs: 1_000,
+        tool: "spawnAgent",
+      }),
+      expect.objectContaining({
+        id: "beta",
+        completedAtMs: 8_000,
+        startedAtMs: 1_000,
+        tool: "spawnAgent",
+      }),
+    ]);
+    expect(
+      [...secondWait.subagents]
+        .sort(
+          (left, right) =>
+            (right.completedAtMs ?? 0) - (left.completedAtMs ?? 0),
+        )
+        .map(({ id }) => id),
+    ).toEqual(["beta", "alpha"]);
+  });
+
+  it("starts a fresh active lifecycle when a completed agent is resumed", () => {
+    const completed = reduceProtocolTrace(
+      replayScenarios["subagent-concurrency"].events,
+    );
+    const followUp = reduceProtocolNotification(completed, {
+      method: "turn/started",
+      params: {
+        threadId: "thread-subagent-concurrency",
+        turn: { id: "turn-resume-alpha" },
+      },
+    });
+    const resumed = reduceProtocolNotification(followUp, {
+      method: "item/started",
+      params: {
+        item: {
+          agentsStates: { alpha: { status: "running" } },
+          id: "collab-resume-alpha",
+          prompt: "Continue the Alpha probe.",
+          receiverThreadIds: ["alpha"],
+          senderThreadId: "thread-subagent-concurrency",
+          status: "inProgress",
+          tool: "resumeAgent",
+          type: "collabAgentToolCall",
+        },
+        startedAtMs: 100_000,
+        threadId: "thread-subagent-concurrency",
+        turnId: "turn-resume-alpha",
+      },
+    });
+    const settled = reduceProtocolNotification(resumed, {
+      method: "item/completed",
+      params: {
+        completedAtMs: 105_000,
+        item: {
+          agentsStates: {
+            alpha: {
+              message: "ALPHA RESUMED DONE",
+              status: "completed",
+            },
+          },
+          id: "collab-resume-alpha",
+          receiverThreadIds: ["alpha"],
+          senderThreadId: "thread-subagent-concurrency",
+          status: "completed",
+          tool: "resumeAgent",
+          type: "collabAgentToolCall",
+        },
+        threadId: "thread-subagent-concurrency",
+        turnId: "turn-resume-alpha",
+      },
+    });
+
+    expect(
+      resumed.subagents.find(({ id }) => id === "alpha"),
+    ).toMatchObject({
+      callId: "collab-resume-alpha",
+      completedAtMs: null,
+      message: null,
+      startedAtMs: 100_000,
+      status: "active",
+      threadStatus: "running",
+      tool: "resumeAgent",
+      turnId: "turn-resume-alpha",
+    });
+    expect(
+      settled.subagents.find(({ id }) => id === "alpha"),
+    ).toMatchObject({
+      callId: "collab-resume-alpha",
+      completedAtMs: 105_000,
+      message: "ALPHA RESUMED DONE",
+      startedAtMs: 100_000,
+      status: "done",
+      tool: "resumeAgent",
+    });
+  });
+
   it("does not reactivate a completed subagent from a late activity event", () => {
     const completed = reduceProtocolTrace(
       replayScenarios["subagent-concurrency"].events,
@@ -1370,7 +1598,9 @@ describe("protocol lifecycle reducer", () => {
     expect(
       afterLateActivity.subagents.find(({ id }) => id === "alpha"),
     ).toMatchObject({
+      completedAtMs: 32_000,
       message: "ALPHA SUBAGENT DONE",
+      startedAtMs: 1_100,
       status: "done",
       threadStatus: "completed",
     });

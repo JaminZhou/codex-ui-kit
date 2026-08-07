@@ -584,7 +584,7 @@ function SubagentPanelSection({
                 <span className="codex-ui-subagent-panel__item-content">
                   <span className="codex-ui-subagent-panel__item-heading">
                     <span>{displayName(item.name)}</span>
-                    {item.lastMessage != null && item.timestamp != null ? (
+                    {item.timestamp != null ? (
                       <time dateTime={item.dateTime}>{item.timestamp}</time>
                     ) : null}
                   </span>

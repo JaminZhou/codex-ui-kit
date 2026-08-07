@@ -774,7 +774,7 @@ the public `agentPath` hierarchy without inferring a tree that the current UI
 does not draw; the main conversation still renders Child and Parent activity
 as separate hierarchy-ordered blocks. Browser/CDP covers 111 frames and nine
 reviewed scenes gate ten current-build regions. Panel/summary/transcript ratios
-range from `0.013206987475280159` to `0.046708160442600274`; the compact
+range from `0.013328938694792354` to `0.046708160442600274`; the compact
 text-heavy nested main-activity band passes at `0.11495227995758218` under its
 independent 0.125 limit. Waiting-before-initialization, failure,
 interruption/cancel, pagination, transcript streaming, and transport recovery
