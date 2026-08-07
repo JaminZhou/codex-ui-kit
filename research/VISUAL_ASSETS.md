@@ -92,5 +92,8 @@ Before capture output or updater write, a shared sanitizer requires the exact
 475-property computed-style protocol and rejects external, data, application,
 blob, extension, scheme-relative, and other non-local URL values. SVG
 references may target only a safe local `#fragment`. The research checker
-locks the property-name-set hash and exercises negative URL/protocol fixtures.
+locks the property-name-set hash and exercises raw, CSS-escaped, and
+scheme-relative negative URL/protocol fixtures. The same shared sanitizer
+covers the de-identified font-style samples and all promoted icon styles,
+attributes, class names, view boxes, and render sizes before capture output.
 Process/profile setup and exact-PID cleanup remain explicit operator steps.

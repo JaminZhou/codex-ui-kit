@@ -4,7 +4,10 @@ import { realpathSync } from "node:fs";
 import { homedir } from "node:os";
 import { fileURLToPath } from "node:url";
 import { chromium } from "../playgrounds/codex-app/node_modules/playwright-core/index.mjs";
-import { sanitizeVisualAssetIcon } from "./visual-asset-contract.mjs";
+import {
+  sanitizeVisualAssetIcon,
+  sanitizeVisualScalarRecord,
+} from "./visual-asset-contract.mjs";
 
 const port = Number(process.env.CODEX_VISUAL_ASSET_CDP_PORT);
 const expectedProfile = process.env.CODEX_VISUAL_ASSET_PROFILE;
@@ -449,6 +452,12 @@ try {
         ),
       );
     });
+  result.fontSamples.forEach((fontSample, index) =>
+    sanitizeVisualScalarRecord(
+      fontSample.style,
+      `capture.fontSamples[${index}].style`,
+    ),
+  );
   result.icons = result.icons.map((icon, index) => {
     const sanitized = sanitizeVisualAssetIcon(
       {

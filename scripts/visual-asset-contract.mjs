@@ -70,12 +70,48 @@ export const computedStylePropertyNamesSha256 =
 
 const localFragmentPattern = /^#[A-Za-z_][A-Za-z0-9_.:-]*$/;
 const urlFunctionPattern = /url\(\s*(["']?)([^"')]+)\1\s*\)/gi;
+const numberPattern = "-?(?:\\d+(?:\\.\\d*)?|\\.\\d+)(?:e[+-]?\\d+)?";
+const viewBoxPattern = new RegExp(
+  `^\\s*${numberPattern}(?:[ ,]+${numberPattern}){3}\\s*$`,
+  "i",
+);
+
+function decodeCssEscapes(value) {
+  let decoded = value;
+  for (let pass = 0; pass < 8; pass += 1) {
+    const next = decoded.replace(
+      /\\\\(?:([0-9a-f]{1,6})(?:\r\n|[\t\n\f\r ])?|([^\n\r\f0-9a-f]))/gi,
+      (_match, hexadecimal, escapedCharacter) => {
+        if (hexadecimal) {
+          const codePoint = Number.parseInt(hexadecimal, 16);
+          return codePoint === 0 || codePoint > 0x10ffff
+            ? "\uFFFD"
+            : String.fromCodePoint(codePoint);
+        }
+        return escapedCharacter;
+      },
+    );
+    if (next === decoded) return next;
+    decoded = next;
+  }
+  throw new Error("Visual value uses excessively nested CSS escapes.");
+}
 
 function assertSafeVisualScalar(value, context) {
-  if (typeof value !== "string" || /[\u0000-\u0008\u000b\u000c\u000e-\u001f\u007f]/.test(value)) {
+  if (
+    typeof value !== "string" ||
+    /[\u0000-\u0008\u000b\u000c\u000e-\u001f\u007f]/.test(value)
+  ) {
     throw new Error(`${context} must be a safe string.`);
   }
-  const withoutLocalUrls = value.replace(
+  if (/\/\*|\*\//.test(value)) {
+    throw new Error(`${context} must not contain CSS comments.`);
+  }
+  const normalized = decodeCssEscapes(value);
+  if (normalized.includes("\\")) {
+    throw new Error(`${context} contains an unsupported CSS escape.`);
+  }
+  const withoutLocalUrls = normalized.replace(
     urlFunctionPattern,
     (_match, _quote, target) => {
       if (!localFragmentPattern.test(target.trim())) {
@@ -92,6 +128,35 @@ function assertSafeVisualScalar(value, context) {
     throw new Error(`${context} contains an unsupported URL or executable CSS value.`);
   }
   return value;
+}
+
+function assertSafeClassName(value, context) {
+  if (value === null) return value;
+  if (
+    typeof value !== "string" ||
+    /[\u0000-\u001f\u007f]/.test(value) ||
+    /\/\*|\*\/|\burl\s*\(|(?:https?|app|blob|data|javascript|file|chrome-extension):\/\//i.test(
+      value,
+    )
+  ) {
+    throw new Error(`${context} must be a safe CSS class list.`);
+  }
+  return value;
+}
+
+export function sanitizeVisualScalarRecord(record, context) {
+  if (!record || typeof record !== "object" || Array.isArray(record)) {
+    throw new Error(`${context} must be a visual scalar record.`);
+  }
+  for (const [name, value] of Object.entries(record)) {
+    if (!/^[A-Za-z][A-Za-z0-9]*$/.test(name)) {
+      throw new Error(
+        `${context} contains an unsupported visual field: ${name}.`,
+      );
+    }
+    assertSafeVisualScalar(value, `${context}.${name}`);
+  }
+  return record;
 }
 
 export function sanitizeComputedStyle(style, context) {
@@ -172,6 +237,18 @@ export function sanitizeSvgPrimitive(primitive, context) {
 }
 
 export function sanitizeVisualAssetIcon(icon, context) {
+  assertSafeClassName(icon.sourceClassName, `${context}.sourceClassName`);
+  if (typeof icon.viewBox !== "string" || !viewBoxPattern.test(icon.viewBox)) {
+    throw new Error(`${context}.viewBox must contain exactly four numbers.`);
+  }
+  if (
+    !Number.isFinite(icon.renderSize?.width) ||
+    !Number.isFinite(icon.renderSize?.height) ||
+    icon.renderSize.width <= 0 ||
+    icon.renderSize.height <= 0
+  ) {
+    throw new Error(`${context}.renderSize must be finite and positive.`);
+  }
   sanitizeSvgAttributes(icon.rootAttributes, `${context}.rootAttributes`);
   sanitizeComputedStyle(icon.rootComputedStyle, `${context}.rootComputedStyle`);
   if (!Array.isArray(icon.primitives) || icon.primitives.length === 0) {

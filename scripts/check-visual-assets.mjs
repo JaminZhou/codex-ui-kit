@@ -1,6 +1,9 @@
 import { createHash } from "node:crypto";
 import { readFile } from "node:fs/promises";
-import { sanitizeVisualAssetIcon } from "./visual-asset-contract.mjs";
+import {
+  sanitizeVisualAssetIcon,
+  sanitizeVisualScalarRecord,
+} from "./visual-asset-contract.mjs";
 
 const manifestUrl = new URL("../research/visual-assets.json", import.meta.url);
 const packageUrl = new URL("../package.json", import.meta.url);
@@ -107,6 +110,24 @@ rejectUnsafeFixture(schemeRelativeAttributeFixture, "scheme-relative-svg-url");
 const externalHrefFixture = structuredClone(manifest.icons[0]);
 externalHrefFixture.rootAttributes.href = "blob:https://example.invalid/id";
 rejectUnsafeFixture(externalHrefFixture, "external-svg-href");
+const escapedExternalUrlFixture = structuredClone(manifest.icons[0]);
+escapedExternalUrlFixture.rootComputedStyle.fill =
+  "u\\72 l(\\68 ttps\\3a \\2f \\2f example.invalid\\2f fill.svg#paint)";
+rejectUnsafeFixture(escapedExternalUrlFixture, "css-escaped-external-url");
+try {
+  sanitizeVisualScalarRecord(
+    { filter: "url(chrome-extension://unsafe/filter.svg#paint)" },
+    "negative-fixture.font-sample",
+  );
+  throw new Error("visual asset sanitizer accepted unsafe font sample");
+} catch (error) {
+  if (error.message === "visual asset sanitizer accepted unsafe font sample") {
+    throw error;
+  }
+}
+const localFragmentFixture = structuredClone(manifest.icons[0]);
+localFragmentFixture.rootComputedStyle.filter = 'url("#safe-filter")';
+sanitizeVisualAssetIcon(localFragmentFixture, "positive-fixture.local-fragment");
 if (
   manifest.policy?.packageBoundary !== "playground-only" ||
   manifest.policy?.globalPixelParityEligible !== false ||
@@ -200,7 +221,8 @@ if (
   !captureSource.includes("Unsupported SVG attributes on") ||
   !captureSource.includes("baselineContext") ||
   !captureSource.includes("computedStyle: computedStyle(element)") ||
-  !captureSource.includes("sanitizeVisualAssetIcon")
+  !captureSource.includes("sanitizeVisualAssetIcon") ||
+  !captureSource.includes("sanitizeVisualScalarRecord")
 ) {
   throw new Error(
     "visual capture must prove argv and listener ancestry and fail closed on visual SVG attributes",
