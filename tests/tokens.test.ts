@@ -8,6 +8,16 @@ describe("visual token contract", () => {
   it("keeps measured foundations with accessible interactive target overrides", () => {
     expect(tokens).toContain("--codex-ui-spacing: 0.25rem");
     expect(tokens).toContain("--codex-ui-font-size-md: 1rem");
+    expect(tokens).toContain(
+      '--codex-ui-font-sans-default: -apple-system, "system-ui", "Segoe UI"',
+    );
+    expect(tokens).toContain(
+      "--codex-ui-font-sans: var(--codex-ui-font-sans-default)",
+    );
+    expect(tokens).toContain("--codex-ui-font-weight-shell: 445");
+    expect(styles).toContain(
+      "font-weight: var(--codex-ui-font-weight-shell)",
+    );
     expect(tokens).toContain("--codex-ui-radius-2xl: 1rem");
     expect(tokens).toContain("--codex-ui-thread-content-max-width: 48rem");
     expect(tokens).toContain("--codex-ui-radius-composer: calc(var(--codex-ui-spacing) * 5.5)");

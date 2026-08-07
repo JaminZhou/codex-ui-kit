@@ -143,6 +143,7 @@
   container-name: codex-ui-app-shell;
   container-type: inline-size;
   font-family: var(--codex-ui-font-sans);
+  font-weight: var(--codex-ui-font-weight-shell);
   height: 100%;
   isolation: isolate;
   min-height: 0;

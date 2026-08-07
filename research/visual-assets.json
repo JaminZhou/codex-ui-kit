@@ -1,0 +1,173 @@
+{
+  "schemaVersion": 1,
+  "geometryHashVersion": 2,
+  "baseline": {
+    "appVersion": "26.730.61639",
+    "buildNumber": "6234",
+    "appAsarSha256": "3fea92820c0fb7a69473e7a8308a8e5b8e91524289a84181a33533ec6cb51d45",
+    "capturedAt": "2026-08-07",
+    "viewport": {
+      "width": 1180,
+      "height": 820
+    }
+  },
+  "policy": {
+    "purpose": "exploratory visual parity and regression diagnosis",
+    "ownership": "Observed OpenAI product visuals remain the property of OpenAI and are not relicensed by this repository.",
+    "packageBoundary": "playground-only",
+    "sourceMethod": "de-identified CDP DOM and computed-style observation",
+    "sourceLocator": "local runtime app://-/index.html from the fingerprinted installed build",
+    "globalPixelParityEligible": false,
+    "remainingApproximationInventoryComplete": false,
+    "globalPixelParityBlocker": "Only the listed elements have exact-source coverage; remaining approximate elements must be promoted before claiming global pixel parity."
+  },
+  "typography": {
+    "shell": {
+      "fontFamily": "-apple-system, system-ui, Segoe UI, sans-serif",
+      "observedWeights": [445, 500],
+      "status": "runtime-observed",
+      "note": "The current main shell does not resolve to the OpenAI Sans files present in app.asar."
+    }
+  },
+  "icons": [
+    {
+      "id": "sidebar-mode-chevron",
+      "ownerAriaLabel": "Switch mode, current mode: Codex",
+      "region": "sidebar-primary",
+      "viewBox": "0 0 20 21",
+      "rootAttributes": { "fill": "none" },
+      "renderSize": { "width": 14, "height": 14 },
+      "sha256": "327c642c14cb7ab26ab32f6e81081544149bc48f7cae31e66acd6287fbce4b0a",
+      "status": "runtime-observed",
+      "primitives": [
+        {
+          "tag": "path",
+          "attributes": {
+            "d": "M15.2793 7.71101C15.539 7.45131 15.961 7.45131 16.2207 7.71101C16.4804 7.97071 16.4804 8.39272 16.2207 8.65242L10.4707 14.4024C10.211 14.6621 9.78902 14.6621 9.52932 14.4024L3.77932 8.65242L3.69436 8.54792C3.52385 8.28979 3.55205 7.93828 3.77932 7.71101C4.00659 7.48374 4.3581 7.45554 4.61623 7.62605L4.72073 7.71101L10 12.9903L15.2793 7.71101Z",
+            "fill": "currentColor",
+            "stroke": "currentColor",
+            "stroke-width": "0.6"
+          }
+        }
+      ]
+    },
+    {
+      "id": "sidebar-search",
+      "ownerAriaLabel": "Search",
+      "region": "sidebar-primary",
+      "viewBox": "0 0 16 16",
+      "rootAttributes": { "fill": "none" },
+      "renderSize": { "width": 16, "height": 16 },
+      "sha256": "fa496928cb6a392dd99cfa4b154bd14b7c2d785c49ebdfa578bcac2f684e4515",
+      "status": "runtime-observed",
+      "primitives": [
+        {
+          "tag": "path",
+          "attributes": {
+            "clip-rule": "evenodd",
+            "d": "M7.33057 1.98535C10.2484 1.98535 12.6136 4.3508 12.6138 7.26855C12.6138 8.58031 12.1346 9.77942 11.3433 10.7031L13.9897 13.3496C14.1655 13.5253 14.1655 13.8106 13.9897 13.9863C13.814 14.1621 13.5288 14.1621 13.353 13.9863L10.7017 11.335C9.78678 12.0942 8.61243 12.5518 7.33057 12.5518C4.41281 12.5516 2.04736 10.1864 2.04736 7.26855C2.04754 4.35091 4.41292 1.98553 7.33057 1.98535ZM7.33057 2.88574C4.90998 2.88592 2.94793 4.84796 2.94775 7.26855C2.94775 9.68929 4.90987 11.6522 7.33057 11.6523C9.75141 11.6523 11.7144 9.6894 11.7144 7.26855C11.7142 4.84786 9.75131 2.88574 7.33057 2.88574Z",
+            "fill": "currentColor",
+            "fill-rule": "evenodd"
+          }
+        }
+      ]
+    },
+    {
+      "id": "sidebar-activity",
+      "ownerAriaLabel": "View activity, needs attention",
+      "ownerEvidence": "base bell primitive observed inside the attention state; the optional attention dot is intentionally omitted for the playground's neutral View activity state",
+      "region": "sidebar-primary",
+      "viewBox": "0 0 20 20",
+      "rootAttributes": { "fill": "none" },
+      "renderSize": { "width": 16, "height": 16 },
+      "sha256": "d383b9c2f0e4c2f0b6153102212c445869fb70217d371fbe3151358ae2798e01",
+      "status": "runtime-observed",
+      "primitives": [
+        {
+          "tag": "path",
+          "attributes": {
+            "clip-rule": "evenodd",
+            "d": "M10.1924 1.62857C10.5595 1.63761 10.8499 1.94306 10.8408 2.31021C10.8318 2.67735 10.5263 2.96768 10.1592 2.95865C10.1067 2.95736 10.0535 2.9567 10 2.9567C8.50663 2.95673 7.36381 3.46274 6.57814 4.24966C5.78759 5.04163 5.316 6.16189 5.25099 7.45767L5.09669 10.5075C5.07992 10.839 4.992 11.1636 4.83986 11.4586L3.80958 13.4577C3.74517 13.5826 3.76889 13.6623 3.77345 13.6715L3.7754 13.6735C3.7754 13.6735 3.77926 13.6762 3.78322 13.6784C3.79744 13.6863 3.84926 13.7096 3.96388 13.7096H16.0371C16.1518 13.7096 16.2037 13.6862 16.2178 13.6784C16.2215 13.6763 16.2246 13.6735 16.2246 13.6735L16.2266 13.6725L16.2276 13.6715C16.2321 13.6624 16.2557 13.5825 16.1914 13.4577L15.1602 11.4586C15.008 11.1636 14.9201 10.839 14.9033 10.5075V9.58072C14.9033 9.21346 15.2011 8.91569 15.5684 8.91568C15.9354 8.91592 16.2334 9.2136 16.2334 9.58072V10.4489C16.2417 10.5882 16.2779 10.7243 16.3418 10.8483L17.3721 12.8473C17.5861 13.2621 17.6503 13.7943 17.419 14.2614C17.1674 14.7691 16.6502 15.0396 16.0371 15.0397H13.9434C13.6266 16.9314 11.9817 18.3727 10 18.3727C8.01845 18.3725 6.37423 16.9313 6.05763 15.0397H3.96388C3.35063 15.0397 2.83259 14.7693 2.58107 14.2614C2.34977 13.7943 2.41301 13.2621 2.62697 12.8473L3.65822 10.8483C3.72348 10.7216 3.76138 10.5825 3.76857 10.4401L3.92189 7.39029C4.00121 5.81129 4.58404 4.36557 5.63771 3.31021C6.69649 2.24974 8.18842 1.62665 10 1.62662C10.0645 1.62662 10.1287 1.627 10.1924 1.62857ZM7.41896 15.0397C7.71461 16.1911 8.75629 17.0425 10 17.0426C11.2439 17.0426 12.2862 16.1912 12.582 15.0397H7.41896Z",
+            "fill": "currentColor",
+            "fill-rule": "evenodd"
+          }
+        }
+      ]
+    },
+    {
+      "id": "sidebar-new-chat",
+      "ownerAriaLabel": null,
+      "ownerEvidence": "first primary sidebar row labelled New chat",
+      "region": "sidebar-primary",
+      "viewBox": "0 0 16 16",
+      "rootAttributes": { "fill": "none" },
+      "renderSize": { "width": 16, "height": 16 },
+      "sha256": "67bc1e6be67e0b07646730923f55f9922ebe29f633963fb98372609cfa6881f5",
+      "status": "runtime-observed",
+      "primitives": [
+        {
+          "tag": "path",
+          "attributes": {
+            "d": "M6.33325 1.88379C6.58178 1.88379 6.78345 2.08546 6.78345 2.33398C6.78328 2.58237 6.58168 2.78418 6.33325 2.78418H4.66626C3.62638 2.78435 2.78362 3.62711 2.78345 4.66699V11.334C2.78361 12.3739 3.62637 13.2176 4.66626 13.2178H11.3333C12.3733 13.2178 13.2169 12.374 13.217 11.334V9.66699C13.2172 9.41872 13.418 9.21795 13.6663 9.21777C13.9147 9.21777 14.1163 9.41861 14.1165 9.66699V11.334C14.1163 12.871 12.8703 14.1172 11.3333 14.1172H4.66626C3.12932 14.117 1.88322 12.8709 1.88306 11.334V4.66699C1.88323 3.13006 3.12933 1.88396 4.66626 1.88379H6.33325Z",
+            "fill": "currentColor"
+          }
+        },
+        {
+          "tag": "path",
+          "attributes": {
+            "clip-rule": "evenodd",
+            "d": "M10.8948 2.375C11.6494 1.63227 12.8628 1.63698 13.6116 2.38574C14.362 3.13643 14.3637 4.35266 13.6165 5.10644L9.36353 9.39355C9.01402 9.74579 8.56977 9.98985 8.08521 10.0967L6.17603 10.5166C5.74813 10.6107 5.36686 10.2296 5.46118 9.80176L5.88208 7.89746C5.98978 7.4105 6.23578 6.96428 6.59106 6.61426L10.8948 2.375ZM12.9749 3.02148C12.5756 2.62258 11.9289 2.62086 11.5266 3.0166L7.2229 7.25586C6.99148 7.4839 6.83116 7.77457 6.76099 8.0918L6.44165 9.53711L7.89185 9.21777C8.20744 9.14811 8.49721 8.98919 8.72485 8.75976L12.9778 4.47266C13.3759 4.07066 13.375 3.42164 12.9749 3.02148Z",
+            "fill": "currentColor",
+            "fill-rule": "evenodd"
+          }
+        }
+      ]
+    },
+    {
+      "id": "sidebar-quick-chat",
+      "ownerAriaLabel": "Quick chat",
+      "region": "sidebar-primary",
+      "viewBox": "0 0 20 20",
+      "rootAttributes": { "fill": "currentColor" },
+      "renderSize": { "width": 16, "height": 16 },
+      "sha256": "1b4ed088ef0f4f3f08bbb49d45e41dd1b2dfc4cdaa055c3154c9152a42d35d8f",
+      "status": "runtime-observed",
+      "primitives": [
+        {
+          "tag": "path",
+          "attributes": {
+            "d": "M3.165 10c0-3.51 3.024-6.418 6.835-6.418S16.835 6.49 16.835 10a6.138 6.138 0 0 1-1.388 3.877.667.667 0 0 0-.136.54c.095.508.23 1.003.384 1.487a12.883 12.883 0 0 1-1.823-.376l-.126-.022a.664.664 0 0 0-.369.076 7.145 7.145 0 0 1-3.377.837c-3.811 0-6.835-2.91-6.835-6.42Zm-1.33 0c0 4.314 3.692 7.749 8.165 7.749a8.487 8.487 0 0 0 3.766-.873c.92.242 1.865.393 2.86.455a.665.665 0 0 0 .661-.903l-.207-.565c-.162-.468-.3-.933-.402-1.402A7.45 7.45 0 0 0 18.165 10c0-4.315-3.692-7.748-8.165-7.748-4.473 0-8.165 3.433-8.165 7.748Z"
+          }
+        },
+        {
+          "tag": "path",
+          "attributes": {
+            "d": "M10 6.335A.665.665 0 0 0 9.335 7v2.335L7 9.349l-.134.013a.665.665 0 0 0 0 1.303L7 10.68l2.335-.014V13a.665.665 0 0 0 1.33 0v-2.335L13 10.68a.665.665 0 0 0 0-1.33l-2.335-.014V7A.665.665 0 0 0 10 6.335Z"
+          }
+        }
+      ]
+    }
+  ],
+  "remainingApproximationIds": [
+    "sidebar-folder",
+    "sidebar-more",
+    "sidebar-pin",
+    "sidebar-pull-request",
+    "sidebar-sites",
+    "sidebar-scheduled",
+    "sidebar-plugins",
+    "sidebar-settings",
+    "sidebar-thread",
+    "window-chrome-sidebar",
+    "window-chrome-back",
+    "window-chrome-forward",
+    "composer-project",
+    "composer-worktree",
+    "composer-branch",
+    "composer-add-files",
+    "composer-permission",
+    "composer-model-chevron",
+    "composer-dictate",
+    "composer-voice"
+  ]
+}
