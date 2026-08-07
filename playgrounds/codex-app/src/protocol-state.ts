@@ -711,6 +711,65 @@ export function latestSubagentLifecyclesById(
   }, []);
 }
 
+export interface SubagentTimelinePresentation {
+  active: boolean;
+  anchor: DemoSubagent;
+  completedAtMs: number | undefined;
+  lifecycles: DemoSubagent[];
+  rows: DemoSubagent[];
+  startedAtMs: number | undefined;
+  turnId: string | null;
+}
+
+export function subagentTimelinePresentation(
+  state: Pick<
+    DemoProtocolState,
+    | "currentTurnId"
+    | "status"
+    | "subagentLifecycles"
+    | "threadId"
+  >,
+  callId: string,
+): SubagentTimelinePresentation | null {
+  const entrySubagent = state.subagentLifecycles.find(
+    (subagent) => subagent.callId === callId,
+  );
+  if (!entrySubagent) return null;
+  const turnId = entrySubagent.turnId;
+  const active = isCurrentTurnGroupActive(state, turnId);
+  const turnSubagents = subagentLifecycleGroup(state, callId);
+  const lifecycles = active
+    ? turnSubagents.filter(
+        (subagent) =>
+          subagent.senderThreadId === entrySubagent.senderThreadId,
+      )
+    : turnSubagents;
+  const anchor = active
+    ? lifecycles[0]
+    : lifecycles.find(
+        ({ senderThreadId }) =>
+          senderThreadId === null || senderThreadId === state.threadId,
+      ) ?? lifecycles[0];
+  if (!anchor) return null;
+  return {
+    active,
+    anchor,
+    completedAtMs: lifecycles
+      .flatMap(({ completedAtMs }) =>
+        completedAtMs === null ? [] : [completedAtMs],
+      )
+      .sort((left, right) => right - left)[0],
+    lifecycles,
+    rows: latestSubagentLifecyclesById(lifecycles),
+    startedAtMs: lifecycles
+      .flatMap(({ startedAtMs }) =>
+        startedAtMs === null ? [] : [startedAtMs],
+      )
+      .sort((left, right) => left - right)[0],
+    turnId,
+  };
+}
+
 function subagentLifecycleForActivity(
   state: Pick<DemoProtocolState, "subagentLifecycles" | "subagents">,
   agentThreadId: string,

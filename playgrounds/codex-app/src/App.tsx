@@ -97,14 +97,12 @@ import {
   agentMessageStatus,
   hasActiveTurnWork,
   initialProtocolState,
-  isCurrentTurnGroupActive,
   isTurnActive,
-  latestSubagentLifecyclesById,
   messageAttachmentAccessibleLabel,
   messageAttachmentPreviewSource,
   reduceProtocolNotification,
   settleApprovedCommandReplay,
-  subagentLifecycleGroup,
+  subagentTimelinePresentation,
   terminalTranscriptEvents,
   type DemoProtocolState,
   type DemoSubagent,
@@ -5171,28 +5169,11 @@ export function App() {
     }
 
     if (entry.kind === "subagent") {
-      const entrySubagent = state.subagentLifecycles.find(
-        (subagent) => subagent.callId === entry.id,
-      );
-      if (!entrySubagent) return null;
-      const groupTurnId = entrySubagent.turnId;
-      const turnSubagents = subagentLifecycleGroup(state, entry.id);
-      const turnActive = isCurrentTurnGroupActive(state, groupTurnId);
-      const groupedSubagents = latestSubagentLifecyclesById(
-        turnActive
-          ? turnSubagents.filter(
-              (subagent) =>
-                subagent.senderThreadId === entrySubagent.senderThreadId,
-            )
-          : turnSubagents,
-      );
-      const groupEntrySubagent = turnActive
-        ? groupedSubagents[0]
-        : groupedSubagents.find(
-            ({ senderThreadId }) =>
-              senderThreadId === null || senderThreadId === state.threadId,
-          ) ?? groupedSubagents[0];
-      if (groupEntrySubagent?.callId !== entry.id) return null;
+      const presentation = subagentTimelinePresentation(state, entry.id);
+      if (!presentation || presentation.anchor.callId !== entry.id) return null;
+      const groupTurnId = presentation.turnId;
+      const turnActive = presentation.active;
+      const groupedSubagents = presentation.rows;
       const callSubagents = groupedSubagents.map((subagent) =>
         presentSubagent(subagent, mode, subagentClockMs),
       );
@@ -5206,16 +5187,8 @@ export function App() {
           : working.length > 0 || mode !== "live"
             ? working
             : callSubagents;
-      const startedAtMs = groupedSubagents
-        .flatMap((item) =>
-          item.startedAtMs === null ? [] : [item.startedAtMs],
-        )
-        .sort((left, right) => left - right)[0];
-      const completedAtMs = groupedSubagents
-        .flatMap((item) =>
-          item.completedAtMs === null ? [] : [item.completedAtMs],
-        )
-        .sort((left, right) => right - left)[0];
+      const startedAtMs = presentation.startedAtMs;
+      const completedAtMs = presentation.completedAtMs;
       const settledTurnDurationMs =
         working.length === 0 && groupTurnId !== null
           ? state.turnDurationsMs[groupTurnId]

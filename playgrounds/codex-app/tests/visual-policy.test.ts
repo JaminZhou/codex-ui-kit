@@ -210,13 +210,7 @@ describe("lifecycle visual policy", () => {
       'sceneId: "subagent-nested-main-activity-running"',
     );
     expect(appSource).toContain(
-      "isCurrentTurnGroupActive(state, groupTurnId)",
-    );
-    expect(appSource).toContain(
-      "state.subagentLifecycles.find",
-    );
-    expect(appSource).toContain(
-      "subagentLifecycleGroup(state, entry.id)",
+      "subagentTimelinePresentation(state, entry.id)",
     );
     expect(appSource).toContain(
       'key={`subagent:${entry.id}:${turnActive ? "active" : "settled"}`}',

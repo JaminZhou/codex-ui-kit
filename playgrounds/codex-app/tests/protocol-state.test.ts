@@ -12,6 +12,7 @@ import {
   reduceProtocolTrace,
   settleApprovedCommandReplay,
   subagentLifecycleGroup,
+  subagentTimelinePresentation,
   terminalTranscriptEvents,
 } from "../src/protocol-state";
 import { replayScenarios } from "../src/replay";
@@ -1894,6 +1895,27 @@ describe("protocol lifecycle reducer", () => {
       { callId: "collab-resume-alpha-second", id: "alpha" },
       { callId: "collab-subagent-beta", id: "beta" },
     ]);
+    expect(
+      subagentTimelinePresentation(
+        secondResume,
+        "collab-subagent-alpha",
+      ),
+    ).toMatchObject({
+      active: true,
+      anchor: { callId: "collab-subagent-alpha" },
+      rows: [
+        { callId: "collab-resume-alpha-second", id: "alpha" },
+        { callId: "collab-subagent-beta", id: "beta" },
+      ],
+      startedAtMs: 1_100,
+      turnId: "turn-subagent-concurrency",
+    });
+    expect(
+      subagentTimelinePresentation(
+        secondResume,
+        "collab-resume-alpha-second",
+      )?.anchor.callId,
+    ).toBe("collab-subagent-alpha");
   });
 
   it("rekeys activity-first resume state into the reported collab call", () => {
