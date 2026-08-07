@@ -1998,6 +1998,85 @@ describe("protocol lifecycle reducer", () => {
     ]);
   });
 
+  it("preserves concurrent row order when an activity-first agent is rekeyed", () => {
+    const turn = reduceProtocolNotification(initialProtocolState, {
+      method: "turn/started",
+      params: {
+        threadId: "thread-concurrent-provisional",
+        turn: { id: "turn-concurrent-provisional" },
+      },
+    });
+    const alphaActivity = reduceProtocolNotification(turn, {
+      method: "item/started",
+      params: {
+        item: {
+          agentPath: "/root/alpha",
+          agentThreadId: "alpha",
+          id: "activity-alpha-provisional",
+          kind: "started",
+          type: "subAgentActivity",
+        },
+        startedAtMs: 1_000,
+        threadId: "thread-concurrent-provisional",
+        turnId: "turn-concurrent-provisional",
+      },
+    });
+    const betaSpawn = reduceProtocolNotification(alphaActivity, {
+      method: "item/started",
+      params: {
+        item: {
+          agentsStates: { beta: { status: "running" } },
+          id: "collab-beta-spawn",
+          receiverThreadIds: ["beta"],
+          senderThreadId: "thread-concurrent-provisional",
+          status: "inProgress",
+          tool: "spawnAgent",
+          type: "collabAgentToolCall",
+        },
+        startedAtMs: 1_100,
+        threadId: "thread-concurrent-provisional",
+        turnId: "turn-concurrent-provisional",
+      },
+    });
+    const alphaSpawn = reduceProtocolNotification(betaSpawn, {
+      method: "item/started",
+      params: {
+        item: {
+          agentsStates: { alpha: { status: "running" } },
+          id: "collab-alpha-spawn",
+          receiverThreadIds: ["alpha"],
+          senderThreadId: "thread-concurrent-provisional",
+          status: "inProgress",
+          tool: "spawnAgent",
+          type: "collabAgentToolCall",
+        },
+        startedAtMs: 1_200,
+        threadId: "thread-concurrent-provisional",
+        turnId: "turn-concurrent-provisional",
+      },
+    });
+    const presentation = subagentTimelinePresentation(
+      alphaSpawn,
+      "collab-alpha-spawn",
+    );
+
+    expect(
+      alphaSpawn.subagentLifecycles.map(({ callId, id }) => ({ callId, id })),
+    ).toEqual([
+      { callId: "collab-alpha-spawn", id: "alpha" },
+      { callId: "collab-beta-spawn", id: "beta" },
+    ]);
+    expect(alphaSpawn.timeline).toEqual([
+      { id: "collab-alpha-spawn", kind: "subagent" },
+      { id: "collab-beta-spawn", kind: "subagent" },
+    ]);
+    expect(presentation).toMatchObject({
+      anchor: { callId: "collab-alpha-spawn", id: "alpha" },
+      rows: [{ id: "alpha" }, { id: "beta" }],
+      startedAtMs: 1_000,
+    });
+  });
+
   it("places nested activity before the latest same-turn parent lifecycle", () => {
     const turn = reduceProtocolNotification(initialProtocolState, {
       method: "turn/started",

@@ -365,6 +365,26 @@ function upsertSubagentLifecycle(
   return next;
 }
 
+function rekeyOrUpsertSubagentLifecycle(
+  items: DemoSubagent[],
+  item: DemoSubagent,
+  provisionalIds: Set<string>,
+): DemoSubagent[] {
+  const provisionalIndex = items.findIndex(
+    ({ callId, id, provisional, turnId }) =>
+      provisional &&
+      id === item.id &&
+      turnId === item.turnId &&
+      provisionalIds.has(callId),
+  );
+  if (provisionalIndex === -1) {
+    return upsertSubagentLifecycle(items, item);
+  }
+  const next = [...items];
+  next[provisionalIndex] = item;
+  return next;
+}
+
 function upsertApproval(
   approvals: DemoApprovalRequest[],
   approval: DemoApprovalRequest,
@@ -1170,12 +1190,14 @@ export function reduceProtocolNotification(
         (items, id) => {
           const subagent = subagents.find((candidate) => candidate.id === id);
           return subagent
-            ? upsertSubagentLifecycle(items, subagent)
+            ? rekeyOrUpsertSubagentLifecycle(
+                items,
+                subagent,
+                provisionalLifecycleIds,
+              )
             : items;
         },
-        state.subagentLifecycles.filter(
-          ({ callId }) => !provisionalLifecycleIds.has(callId),
-        ),
+        state.subagentLifecycles,
       );
       const senderThreadId = asString(item.senderThreadId);
       const timelineId = receiverThreadIds
