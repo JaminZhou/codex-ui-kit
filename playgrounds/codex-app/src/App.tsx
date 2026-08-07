@@ -97,6 +97,7 @@ import {
   agentMessageStatus,
   hasActiveTurnWork,
   initialProtocolState,
+  isCurrentTurnGroupActive,
   isTurnActive,
   messageAttachmentAccessibleLabel,
   messageAttachmentPreviewSource,
@@ -2702,12 +2703,13 @@ export function App() {
         return {
           ...relativeTime,
           dateTime:
-            timestampMs === null
+            mode !== "live" || timestampMs === null
               ? undefined
               : new Date(timestampMs).toISOString(),
           id: subagent.id,
           lastMessage: subagent.message ?? undefined,
           name: subagent.name ?? undefined,
+          sortTimestampMs: timestampMs ?? undefined,
           status: subagent.status,
           statusSummary:
             subagent.status === "active"
@@ -2726,12 +2728,8 @@ export function App() {
       subagentItems
         .map((item, index) => ({ index, item }))
         .sort((left, right) => {
-          const leftTime = left.item.dateTime
-            ? Date.parse(left.item.dateTime)
-            : Number.NaN;
-          const rightTime = right.item.dateTime
-            ? Date.parse(right.item.dateTime)
-            : Number.NaN;
+          const leftTime = left.item.sortTimestampMs ?? Number.NaN;
+          const rightTime = right.item.sortTimestampMs ?? Number.NaN;
           return Number.isFinite(leftTime) && Number.isFinite(rightTime)
             ? rightTime - leftTime || left.index - right.index
             : left.index - right.index;
@@ -5167,22 +5165,33 @@ export function App() {
       );
       if (!entrySubagent) return null;
       const groupTurnId = entrySubagent.turnId;
-      const senderTurnSubagents = state.subagents.filter(
+      const turnSubagents = state.subagents.filter(
         (subagent) =>
           (groupTurnId === null
             ? subagent.callId === entrySubagent.callId
-            : subagent.turnId === groupTurnId) &&
-          subagent.senderThreadId === entrySubagent.senderThreadId,
+            : subagent.turnId === groupTurnId),
       );
-      if (senderTurnSubagents[0]?.callId !== entry.id) return null;
+      const turnActive = isCurrentTurnGroupActive(state, groupTurnId);
+      const groupedSubagents = turnActive
+        ? turnSubagents.filter(
+            (subagent) =>
+              subagent.senderThreadId === entrySubagent.senderThreadId,
+          )
+        : turnSubagents;
+      const groupEntrySubagent = turnActive
+        ? groupedSubagents[0]
+        : groupedSubagents.find(
+            ({ senderThreadId }) =>
+              senderThreadId === null || senderThreadId === state.threadId,
+          ) ?? groupedSubagents[0];
+      if (groupEntrySubagent?.callId !== entry.id) return null;
       const callSubagents = subagentItems.filter((item) =>
-        senderTurnSubagents.some((subagent) => subagent.id === item.id),
+        groupedSubagents.some((subagent) => subagent.id === item.id),
       );
       if (callSubagents.length === 0) return null;
       const working = callSubagents.filter(
         ({ status }) => status !== "done",
       );
-      const turnActive = isTurnActive(state.status);
       const activityItems =
         turnActive
           ? callSubagents
@@ -5191,7 +5200,7 @@ export function App() {
             : callSubagents;
       const startedAtMs = state.subagents
         .filter((item) =>
-          senderTurnSubagents.some((subagent) => subagent.id === item.id),
+          groupedSubagents.some((subagent) => subagent.id === item.id),
         )
         .flatMap((item) =>
           item.startedAtMs === null ? [] : [item.startedAtMs],
@@ -5199,7 +5208,7 @@ export function App() {
         .sort((left, right) => left - right)[0];
       const completedAtMs = state.subagents
         .filter((item) =>
-          senderTurnSubagents.some((subagent) => subagent.id === item.id),
+          groupedSubagents.some((subagent) => subagent.id === item.id),
         )
         .flatMap((item) =>
           item.completedAtMs === null ? [] : [item.completedAtMs],
@@ -5227,6 +5236,9 @@ export function App() {
                     durationMs:
                       working.length > 0
                         ? 14_000
+                        : groupTurnId !== null &&
+                            state.turnDurationsMs[groupTurnId] !== undefined
+                          ? state.turnDurationsMs[groupTurnId]
                         : turnActive &&
                             startedAtMs !== undefined &&
                             completedAtMs !== undefined

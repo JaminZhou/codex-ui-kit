@@ -534,6 +534,11 @@ for (const scene of visualScenes) {
                   ),
                 ].map((item) => text(item))
               : [],
+            rowDateTimes: panel
+              ? [...panel.querySelectorAll("time")].map((item) =>
+                  item.getAttribute("datetime"),
+                )
+              : [],
             rowStyle: style(panelRow),
             sectionCount:
               panel?.querySelectorAll(
@@ -623,7 +628,7 @@ for (const scene of visualScenes) {
       const expectedCompletedDuration = concurrent
         ? "Worked for 1m 19s"
         : nested
-          ? "Worked for 34s"
+          ? "Worked for 1m 2s"
           : "Worked for 45s";
       if (
         contract.frame !== scene.frame ||
@@ -653,7 +658,9 @@ for (const scene of visualScenes) {
               (expected, index) =>
                 !contract.timeline.texts[index]?.endsWith(expected),
             ))) ||
-        (!running && contract.timeline.text !== expectedCompletedDuration)
+        (!running &&
+          (contract.timeline.text !== expectedCompletedDuration ||
+            contract.timeline.texts.length !== 1))
       ) {
         throw new Error(
           `${scene.id}: subagent lifecycle contract failed: ${JSON.stringify(contract)}`,
@@ -705,6 +712,7 @@ for (const scene of visualScenes) {
         (!contract.panel.rect ||
           JSON.stringify(contract.panel.rowNames) !==
             JSON.stringify(expectedPanelRows) ||
+          contract.panel.rowDateTimes.some((value) => value !== null) ||
           contract.panel.sectionCount !== (running && !mixed ? 1 : 2) ||
           !contract.panel.text?.includes(
             `Active · ${activeCount}`,

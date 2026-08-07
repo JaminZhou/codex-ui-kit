@@ -381,6 +381,37 @@ describe("SubagentPanel", () => {
     expect(labels).toEqual(["Beta", "Alpha"]);
   });
 
+  it("sorts relative protocol clocks without emitting a false machine date", () => {
+    const { container } = render(
+      <SubagentPanel
+        items={[
+          {
+            ...activeAgent,
+            id: "alpha-relative",
+            name: "Alpha",
+            sortTimestampMs: 1_100,
+          },
+          {
+            ...activeAgent,
+            id: "beta-relative",
+            name: "Beta",
+            sortTimestampMs: 5_100,
+          },
+        ]}
+      />,
+    );
+
+    const labels = [
+      ...container.querySelectorAll(
+        ".codex-ui-subagent-panel__item-heading > span:first-child",
+      ),
+    ].map((element) => element.textContent);
+    expect(labels).toEqual(["Beta", "Alpha"]);
+    expect(container.querySelector("time")?.hasAttribute("datetime")).toBe(
+      false,
+    );
+  });
+
   it("renders read-only rows without dead button controls", () => {
     render(<SubagentPanel items={[activeAgent]} />);
 

@@ -3,6 +3,7 @@ import {
   agentMessageStatus,
   hasActiveTurnWork,
   initialProtocolState,
+  isCurrentTurnGroupActive,
   isTurnActive,
   messageAttachmentAccessibleLabel,
   messageAttachmentPreviewSource,
@@ -1375,7 +1376,7 @@ describe("protocol lifecycle reducer", () => {
     });
   });
 
-  it("keeps nested agent paths while excluding child calls from the root timeline", () => {
+  it("keeps nested paths and does not reactivate them in a follow-up turn", () => {
     const scenario = replayScenarios["subagent-nested"];
     const running = reduceProtocolTrace(
       scenario.events.slice(0, scenario.frames["subagent-nested-running"]),
@@ -1384,6 +1385,13 @@ describe("protocol lifecycle reducer", () => {
       scenario.events.slice(0, scenario.frames["subagent-nested-mixed"]),
     );
     const completed = reduceProtocolTrace(scenario.events);
+    const followUp = reduceProtocolNotification(completed, {
+      method: "turn/started",
+      params: {
+        threadId: "thread-subagent-nested",
+        turn: { id: "turn-subagent-follow-up" },
+      },
+    });
 
     expect(running.subagents).toEqual([
       expect.objectContaining({
@@ -1415,6 +1423,12 @@ describe("protocol lifecycle reducer", () => {
       expect.objectContaining({ id: "parent", status: "done" }),
       expect.objectContaining({ id: "child", status: "done" }),
     ]);
+    expect(
+      isCurrentTurnGroupActive(running, "turn-subagent-nested"),
+    ).toBe(true);
+    expect(
+      isCurrentTurnGroupActive(followUp, "turn-subagent-nested"),
+    ).toBe(false);
   });
 
   it("keeps unknown notifications observable without corrupting state", () => {

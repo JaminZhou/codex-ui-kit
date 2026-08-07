@@ -630,6 +630,17 @@ export function isTurnActive(status: DemoTurnStatus): boolean {
   return status === "running" || status === "retrying";
 }
 
+export function isCurrentTurnGroupActive(
+  state: Pick<DemoProtocolState, "currentTurnId" | "status">,
+  groupTurnId: string | null,
+): boolean {
+  return (
+    groupTurnId !== null &&
+    groupTurnId === state.currentTurnId &&
+    isTurnActive(state.status)
+  );
+}
+
 export function agentMessageStatus(
   status: DemoTurnStatus,
 ): "completed" | "failed" | "running" {

@@ -209,5 +209,8 @@ describe("lifecycle visual policy", () => {
     expect(contract).toContain(
       'sceneId: "subagent-nested-main-activity-running"',
     );
+    expect(appSource).toContain(
+      "isCurrentTurnGroupActive(state, groupTurnId)",
+    );
   });
 });
