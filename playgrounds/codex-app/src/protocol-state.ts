@@ -1046,7 +1046,17 @@ export function reduceProtocolNotification(
       const agentThreadId = asString(item.agentThreadId);
       if (!agentThreadId) return next;
       const agentPath = asString(item.agentPath);
-      const existing = state.subagents.find(({ id }) => id === agentThreadId);
+      const currentSubagent = state.subagents.find(
+        ({ id }) => id === agentThreadId,
+      );
+      const existingLifecycle = state.subagentLifecycles.find(
+        ({ id, turnId }) => id === agentThreadId && turnId === itemTurnId,
+      );
+      const existing =
+        existingLifecycle ??
+        (currentSubagent?.turnId === itemTurnId
+          ? currentSubagent
+          : undefined);
       const kind = asString(item.kind) ?? "started";
       const sourceThreadId = asString(params.threadId);
       const callId = existing?.callId ?? itemId;
@@ -1083,17 +1093,29 @@ export function reduceProtocolNotification(
         tool: existing?.tool ?? "spawnAgent",
         turnId: itemTurnId,
       };
-      const subagents = upsertById(state.subagents, activitySubagent);
+      const updatesCurrentSubagent =
+        currentSubagent === undefined ||
+        currentSubagent.turnId === itemTurnId ||
+        itemTurnId === state.currentTurnId;
+      const subagents = updatesCurrentSubagent
+        ? upsertById(state.subagents, activitySubagent)
+        : state.subagents;
       const subagentLifecycles = upsertSubagentLifecycle(
         state.subagentLifecycles,
         activitySubagent,
       );
       const parentCallId = sourceThreadId
-        ? subagents.find(({ id }) => id === sourceThreadId)?.callId ?? null
+        ? subagentLifecycles.find(
+            ({ id, turnId }) =>
+              id === sourceThreadId && turnId === itemTurnId,
+          )?.callId ??
+          subagents.find(({ id }) => id === sourceThreadId)?.callId ??
+          null
         : null;
       return {
         ...next,
-        status: isDone ? next.status : "running",
+        status:
+          updatesCurrentSubagent && !isDone ? "running" : next.status,
         subagentLifecycles,
         subagents,
         timeline: insertSubagentTimeline(

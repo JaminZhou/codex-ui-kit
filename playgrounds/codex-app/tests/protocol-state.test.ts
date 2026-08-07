@@ -1607,6 +1607,84 @@ describe("protocol lifecycle reducer", () => {
     );
   });
 
+  it("keeps a resumed lifecycle active when old-turn activity arrives late", () => {
+    const completed = reduceProtocolTrace(
+      replayScenarios["subagent-concurrency"].events,
+    );
+    const followUp = reduceProtocolNotification(completed, {
+      method: "turn/started",
+      params: {
+        threadId: "thread-subagent-concurrency",
+        turn: { id: "turn-resume-alpha-late-activity" },
+      },
+    });
+    const resumed = reduceProtocolNotification(followUp, {
+      method: "item/started",
+      params: {
+        item: {
+          agentsStates: { alpha: { status: "running" } },
+          id: "collab-resume-alpha-late-activity",
+          prompt: "Continue the Alpha probe.",
+          receiverThreadIds: ["alpha"],
+          senderThreadId: "thread-subagent-concurrency",
+          status: "inProgress",
+          tool: "resumeAgent",
+          type: "collabAgentToolCall",
+        },
+        startedAtMs: 100_000,
+        threadId: "thread-subagent-concurrency",
+        turnId: "turn-resume-alpha-late-activity",
+      },
+    });
+    const afterLateActivity = reduceProtocolNotification(resumed, {
+      method: "item/started",
+      params: {
+        item: {
+          agentPath: "/root/alpha",
+          agentThreadId: "alpha",
+          id: "activity-subagent-alpha-late-after-resume",
+          kind: "started",
+          type: "subAgentActivity",
+        },
+        startedAtMs: 1_200,
+        threadId: "thread-subagent-concurrency",
+        turnId: "turn-subagent-concurrency",
+      },
+    });
+
+    expect(afterLateActivity.status).toBe("running");
+    expect(hasActiveTurnWork(afterLateActivity)).toBe(true);
+    expect(
+      afterLateActivity.subagents.find(({ id }) => id === "alpha"),
+    ).toMatchObject({
+      callId: "collab-resume-alpha-late-activity",
+      startedAtMs: 100_000,
+      status: "active",
+      turnId: "turn-resume-alpha-late-activity",
+    });
+    expect(
+      afterLateActivity.subagentLifecycles.find(
+        ({ callId, id }) =>
+          callId === "collab-subagent-alpha" && id === "alpha",
+      ),
+    ).toMatchObject({
+      completedAtMs: 32_000,
+      startedAtMs: 1_100,
+      status: "done",
+      turnId: "turn-subagent-concurrency",
+    });
+    expect(
+      afterLateActivity.subagentLifecycles.find(
+        ({ callId, id }) =>
+          callId === "collab-resume-alpha-late-activity" && id === "alpha",
+      ),
+    ).toMatchObject({
+      startedAtMs: 100_000,
+      status: "active",
+      turnId: "turn-resume-alpha-late-activity",
+    });
+  });
+
   it("does not reactivate a completed subagent from a late activity event", () => {
     const completed = reduceProtocolTrace(
       replayScenarios["subagent-concurrency"].events,
