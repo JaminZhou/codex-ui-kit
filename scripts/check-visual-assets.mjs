@@ -77,7 +77,6 @@ const allowedSvgAttributes = new Set([
   "stroke-miterlimit",
   "stroke-opacity",
   "stroke-width",
-  "style",
   "transform",
   "vector-effect",
   "width",

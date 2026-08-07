@@ -1,5 +1,7 @@
 import { createHash } from "node:crypto";
 import { execFileSync } from "node:child_process";
+import { realpathSync } from "node:fs";
+import { homedir } from "node:os";
 import { chromium } from "../playgrounds/codex-app/node_modules/playwright-core/index.mjs";
 
 const port = Number(process.env.CODEX_VISUAL_ASSET_CDP_PORT);
@@ -9,38 +11,83 @@ if (!Number.isInteger(port) || port < 1024 || port > 65535) {
     "Set CODEX_VISUAL_ASSET_CDP_PORT to an isolated loopback-only Codex CDP port.",
   );
 }
-if (
-  !expectedProfile?.startsWith("/") ||
-  (!expectedProfile.includes("/codex-ui-kit-") &&
-    !expectedProfile.includes("/.Trash/codex-ui-kit-"))
-) {
+if (!expectedProfile?.startsWith("/") || /\s/.test(expectedProfile)) {
   throw new Error(
     "Set CODEX_VISUAL_ASSET_PROFILE to the absolute unique codex-ui-kit profile used by the isolated Codex process.",
   );
 }
+const normalizedProfile = realpathSync(expectedProfile);
+const allowedProfilePrefixes = [
+  "/private/tmp/codex-ui-kit-",
+  `${homedir()}/.Trash/codex-ui-kit-`,
+];
+if (!allowedProfilePrefixes.some((prefix) => normalizedProfile.startsWith(prefix))) {
+  throw new Error(
+    "The isolated Codex profile must use a unique codex-ui-kit path in /private/tmp or Trash.",
+  );
+}
 
-const listenerPids = execFileSync(
+const listenerFields = execFileSync(
   "/usr/sbin/lsof",
-  ["-nP", `-iTCP:${port}`, "-sTCP:LISTEN", "-t"],
+  ["-nP", "-a", `-iTCP:${port}`, "-sTCP:LISTEN", "-Fpn"],
   { encoding: "utf8" },
 )
   .trim()
-  .split(/\s+/)
+  .split("\n")
   .filter(Boolean);
-const isolatedOwner = listenerPids.find((pid) => {
+const listeners = [];
+for (const field of listenerFields) {
+  if (field.startsWith("p")) {
+    listeners.push({ addresses: [], pid: field.slice(1) });
+  } else if (field.startsWith("n")) {
+    listeners.at(-1)?.addresses.push(field.slice(1));
+  }
+}
+const expectedEndpoint = `127.0.0.1:${port}`;
+if (
+  listeners.length === 0 ||
+  listeners.some(
+    (listener) =>
+      listener.addresses.length === 0 ||
+      listener.addresses.some((address) => address !== expectedEndpoint),
+  )
+) {
+  throw new Error(
+    `CDP listeners must bind only ${expectedEndpoint}.`,
+  );
+}
+
+const isolatedOwners = listeners.filter(({ pid }) => {
   const command = execFileSync("/bin/ps", ["-p", pid, "-o", "command="], {
     encoding: "utf8",
-  });
+  }).trim();
+  const argv = command.split(/\s+/);
+  const valuesFor = (prefix) =>
+    argv
+      .filter((argument) => argument.startsWith(prefix))
+      .map((argument) => argument.slice(prefix.length));
+  const addresses = valuesFor("--remote-debugging-address=");
+  const ports = valuesFor("--remote-debugging-port=");
+  const profiles = valuesFor("--user-data-dir=");
+  let candidateProfile;
+  try {
+    candidateProfile = profiles.length === 1 ? realpathSync(profiles[0]) : null;
+  } catch {
+    return false;
+  }
   return (
-    command.includes("/Applications/ChatGPT.app/Contents/MacOS/ChatGPT") &&
-    command.includes("--remote-debugging-address=127.0.0.1") &&
-    command.includes(`--remote-debugging-port=${port}`) &&
-    command.includes(`--user-data-dir=${expectedProfile}`)
+    argv[0] === "/Applications/ChatGPT.app/Contents/MacOS/ChatGPT" &&
+    addresses.length === 1 &&
+    addresses[0] === "127.0.0.1" &&
+    ports.length === 1 &&
+    ports[0] === String(port) &&
+    profiles.length === 1 &&
+    candidateProfile === normalizedProfile
   );
 });
-if (!isolatedOwner) {
+if (isolatedOwners.length !== 1) {
   throw new Error(
-    "CDP listener does not belong to the declared isolated Codex profile.",
+    "CDP listener ownership is ambiguous or does not exactly match the declared isolated Codex profile.",
   );
 }
 
@@ -77,6 +124,14 @@ try {
   const main = ranked[0]?.page;
   if (!main) throw new Error("Main Codex Renderer target not found.");
 
+  await main.waitForFunction(
+    () =>
+      Boolean(document.querySelector("main")) &&
+      Boolean(document.querySelector("nav")) &&
+      document.querySelectorAll("svg").length > 0,
+    undefined,
+    { timeout: 15_000 },
+  );
   await main.evaluate(async () => {
     await document.fonts.ready;
   });
@@ -133,7 +188,6 @@ try {
       "stroke-miterlimit",
       "stroke-opacity",
       "stroke-width",
-      "style",
       "transform",
       "vector-effect",
       "width",

@@ -55,8 +55,10 @@ CODEX_VISUAL_ASSET_PROFILE=<absolute-unique-profile> \
 node scripts/capture-current-visual-assets.mjs
 ```
 
-The capture script is read-only: it first proves that the loopback listener
-belongs to the declared unique profile, then selects the largest main Renderer
+The capture script is read-only: it first proves that every listener is bound
+only to the declared loopback endpoint and that exactly one listener process
+has the exact executable, port, address, and canonical unique-profile argv.
+It then selects the largest main Renderer
 and outputs a recursive allowlisted SVG tree, allowlisted static semantic IDs,
 geometry, computed style, and de-identified font samples. It never emits raw
 page, conversation, project, account, title, aria-label, or test-id text.
