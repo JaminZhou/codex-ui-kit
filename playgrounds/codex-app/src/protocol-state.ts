@@ -157,16 +157,32 @@ export interface DemoMcpToolCall {
 }
 
 export interface DemoSubagent {
+  agentPath: string | null;
   callId: string;
   completedAtMs: number | null;
   id: string;
   message: string | null;
+  name: string | null;
   prompt: string | null;
+  senderThreadId: string | null;
   startedAtMs: number | null;
   status: "active" | "done" | "waiting";
   threadStatus: string;
   tool: string;
   turnId: string | null;
+}
+
+function subagentName(agentPath: string | null, id: string) {
+  const candidate = agentPath?.split("/").filter(Boolean).at(-1) ?? id;
+  if (!candidate || candidate === "root") return null;
+  if (/^[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$/i.test(candidate)) {
+    return null;
+  }
+  const words = candidate
+    .split(/[-_\s]+/)
+    .filter(Boolean)
+    .join(" ");
+  return `${words[0]?.toUpperCase() ?? ""}${words.slice(1)}`;
 }
 
 export interface DemoTimelineEntry {
@@ -855,23 +871,41 @@ export function reduceProtocolNotification(
       const subagents = receiverThreadIds.reduce((items, id) => {
         const existing = items.find((candidate) => candidate.id === id);
         const agentState = isRecord(agentStates[id]) ? agentStates[id] : {};
-        const threadStatus =
-          asString(agentState.status) ?? existing?.threadStatus ?? "pendingInit";
-        const status =
-          threadStatus === "pendingInit"
+        const reportedThreadStatus =
+          asString(agentState.status) ??
+          existing?.threadStatus ??
+          "pendingInit";
+        const reportedStatus =
+          reportedThreadStatus === "pendingInit"
             ? "waiting"
-            : threadStatus === "running"
+            : reportedThreadStatus === "running"
               ? "active"
               : "done";
+        const status =
+          existing?.status === "done" && reportedStatus !== "done"
+            ? "done"
+            : reportedStatus;
+        const threadStatus =
+          status === "done" && reportedStatus !== "done"
+            ? existing?.threadStatus ?? reportedThreadStatus
+            : reportedThreadStatus;
         return upsertById(items, {
-          callId: itemId,
+          agentPath: existing?.agentPath ?? null,
+          callId: existing?.callId ?? itemId,
           completedAtMs:
             asNumber(params.completedAtMs) ??
             existing?.completedAtMs ??
             null,
           id,
           message: asString(agentState.message) ?? existing?.message ?? null,
+          name:
+            existing?.name ??
+            subagentName(existing?.agentPath ?? null, id),
           prompt: asString(item.prompt) ?? existing?.prompt ?? null,
+          senderThreadId:
+            asString(item.senderThreadId) ??
+            existing?.senderThreadId ??
+            null,
           startedAtMs:
             asNumber(params.startedAtMs) ??
             existing?.startedAtMs ??
@@ -882,14 +916,76 @@ export function reduceProtocolNotification(
           turnId: itemTurnId,
         });
       }, state.subagents);
+      const senderThreadId = asString(item.senderThreadId);
+      const timelineId = receiverThreadIds
+        .map((id) => subagents.find((candidate) => candidate.id === id)?.callId)
+        .find((id): id is string => Boolean(id)) ?? itemId;
+      const hasReportedActiveSubagent = receiverThreadIds.some(
+        (id) => subagents.find((candidate) => candidate.id === id)?.status !== "done",
+      );
       return {
         ...next,
-        status: callStatus === "inProgress" ? "running" : next.status,
+        status:
+          callStatus === "inProgress" && hasReportedActiveSubagent
+            ? "running"
+            : next.status,
         subagents,
-        timeline: appendTimeline(state.timeline, {
-          id: itemId,
-          kind: "subagent",
-        }),
+        timeline:
+          senderThreadId === null || senderThreadId === state.threadId
+            ? appendTimeline(state.timeline, {
+                id: timelineId,
+                kind: "subagent",
+              })
+            : state.timeline,
+      };
+    }
+    if (itemType === "subAgentActivity") {
+      const agentThreadId = asString(item.agentThreadId);
+      if (!agentThreadId) return next;
+      const agentPath = asString(item.agentPath);
+      const existing = state.subagents.find(({ id }) => id === agentThreadId);
+      const kind = asString(item.kind) ?? "started";
+      const sourceThreadId = asString(params.threadId);
+      const callId = existing?.callId ?? itemId;
+      const isDone = kind === "interrupted" || existing?.status === "done";
+      const activitySubagent: DemoSubagent = {
+        agentPath: agentPath ?? existing?.agentPath ?? null,
+        callId,
+        completedAtMs:
+          kind === "interrupted"
+            ? (asNumber(params.completedAtMs) ??
+              existing?.completedAtMs ??
+              null)
+            : (existing?.completedAtMs ?? null),
+        id: agentThreadId,
+        message: existing?.message ?? null,
+        name:
+          subagentName(agentPath ?? existing?.agentPath ?? null, agentThreadId) ??
+          existing?.name ??
+          null,
+        prompt: existing?.prompt ?? null,
+        senderThreadId: existing?.senderThreadId ?? sourceThreadId,
+        startedAtMs:
+          asNumber(params.startedAtMs) ?? existing?.startedAtMs ?? null,
+        status: isDone ? "done" : "active",
+        threadStatus:
+          kind === "interrupted"
+            ? "interrupted"
+            : isDone
+              ? existing?.threadStatus ?? "completed"
+              : "running",
+        tool: existing?.tool ?? "spawnAgent",
+        turnId: itemTurnId,
+      };
+      const subagents = upsertById(state.subagents, activitySubagent);
+      return {
+        ...next,
+        status: isDone ? next.status : "running",
+        subagents,
+        timeline:
+          sourceThreadId === null || sourceThreadId === state.threadId
+            ? appendTimeline(state.timeline, { id: callId, kind: "subagent" })
+            : state.timeline,
       };
     }
     if (itemType === "userMessage") {

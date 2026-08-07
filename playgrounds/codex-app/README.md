@@ -606,8 +606,28 @@ The thirty-third slice reaches real subagent delegation on
 - external current-build summary/panel/transcript crops pass at
   4.1812%/1.3451%/1.5969% under independent hard limits.
 
-Concurrent and nested delegation plus waiting, failure, cancellation,
-pagination, and streaming transcript states remain separate gates.
+Waiting, failure, cancellation, pagination, and streaming transcript states
+remain separate gates.
+
+## Thirty-fourth vertical slice
+
+The thirty-fourth slice reaches current sibling concurrency and nested
+delegation on `26.730.61639`:
+
+- a real Alpha/Beta task passes through two working, one working plus one done,
+  and two done, with live progress preview and two independent transcripts;
+- a real Parent task delegates Child, preserves `/root/parent/child` through
+  public `subAgentActivity.agentPath`, and matches the current flat shared
+  panel instead of inventing a visual tree;
+- the protocol reducer derives stable public names from paths, groups sibling
+  root activity, excludes nested child calls from the root activity row, and
+  retains both levels in summary, panel, and transcript navigation;
+- the schema-validated suite reaches 24 fixtures and 281 events, Browser/CDP
+  reaches 111 lifecycle frames, and Electron drives both mixed-state lists;
+- nine current-build overlay comparisons cover concurrent running/mixed
+  summaries, mixed/completed panels, transcript, plus the nested
+  running/mixed/completed/transcript lifecycle, passing from 1.3606% to
+  4.6708% under a 5.5% hard limit.
 
 ## Development
 
@@ -701,6 +721,23 @@ CODEX_UI_KIT_SUBAGENT_PANEL_REFERENCE=/absolute/path/to/subagent-panel.png \
 CODEX_UI_KIT_SUBAGENT_TRANSCRIPT_REFERENCE=/absolute/path/to/subagent-transcript.png \
   pnpm --filter @codex-ui-kit/codex-app-playground check:visual \
   -- --scenes=subagent-current-summary-completed,subagent-current-panel-completed,subagent-current-transcript
+```
+
+The collaboration extension accepts the raw current-build concurrent and
+nested screenshots while comparing only the owned summary, panel, and
+transcript regions:
+
+```bash
+CODEX_UI_KIT_SUBAGENT_CONCURRENT_SUMMARY_REFERENCE=/absolute/path/to/concurrent-summary.png \
+CODEX_UI_KIT_SUBAGENT_CONCURRENT_MIXED_REFERENCE=/absolute/path/to/concurrent-mixed.png \
+CODEX_UI_KIT_SUBAGENT_CONCURRENT_COMPLETED_REFERENCE=/absolute/path/to/concurrent-completed.png \
+CODEX_UI_KIT_SUBAGENT_CONCURRENT_TRANSCRIPT_REFERENCE=/absolute/path/to/concurrent-transcript.png \
+CODEX_UI_KIT_SUBAGENT_NESTED_RUNNING_REFERENCE=/absolute/path/to/nested-running.png \
+CODEX_UI_KIT_SUBAGENT_NESTED_MIXED_REFERENCE=/absolute/path/to/nested-mixed.png \
+CODEX_UI_KIT_SUBAGENT_NESTED_COMPLETED_REFERENCE=/absolute/path/to/nested-completed.png \
+CODEX_UI_KIT_SUBAGENT_NESTED_TRANSCRIPT_REFERENCE=/absolute/path/to/nested-transcript.png \
+  pnpm --filter @codex-ui-kit/codex-app-playground check:visual -- \
+  --scenes=subagent-concurrent-summary-running,subagent-concurrent-summary-mixed,subagent-concurrent-panel-mixed,subagent-concurrent-panel-completed,subagent-concurrent-transcript-beta,subagent-nested-panel-running,subagent-nested-panel-mixed,subagent-nested-panel-completed,subagent-nested-transcript-child
 ```
 
 The Markdown gate uses its own 906×820 main-only reference:

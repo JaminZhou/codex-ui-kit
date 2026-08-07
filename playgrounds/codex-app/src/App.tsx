@@ -50,6 +50,7 @@ import {
   QueuedPromptList,
   StatusBanner,
   SubagentActivity,
+  SubagentActivityGroup,
   SubagentAvatar,
   SubagentPanel,
   SubagentTranscriptHeader,
@@ -291,11 +292,19 @@ function replayCountForSelection(
     return 0;
   }
   if (frame && scenario.frames[frame]) return scenario.frames[frame];
-  if (scenario.id === "subagent-delegation" && frame) {
-    return frame.includes("running")
-      ? (scenario.frames["subagent-current-running"] ?? scenario.events.length)
-      : (scenario.frames["subagent-current-completed"] ??
-          scenario.events.length);
+  if (isSubagentScenarioId(scenario.id) && frame) {
+    const state = frame.includes("mixed")
+      ? "mixed"
+      : frame.includes("running")
+        ? "running"
+        : "completed";
+    const prefix =
+      scenario.id === "subagent-delegation"
+        ? "subagent-current"
+        : scenario.id === "subagent-concurrency"
+          ? "subagent-concurrent"
+          : "subagent-nested";
+    return scenario.frames[`${prefix}-${state}`] ?? scenario.events.length;
   }
   if (
     scenario.id === "compaction" &&
@@ -321,25 +330,39 @@ function replayCountForSelection(
   );
 }
 
+function isSubagentScenarioId(id: ReplayScenarioId) {
+  return (
+    id === "subagent-delegation" ||
+    id === "subagent-concurrency" ||
+    id === "subagent-nested"
+  );
+}
+
 function currentSubagentFrame(frame: string | null) {
-  return frame?.startsWith("subagent-current-") ?? false;
+  return frame?.startsWith("subagent-") ?? false;
 }
 
 function currentSubagentSummaryFrame(frame: string | null) {
-  return (
-    frame === "subagent-current-summary-running" ||
-    frame === "subagent-current-summary-completed"
-  );
+  return frame?.includes("-summary-") ?? false;
 }
 
 function currentSubagentPanelFrame(frame: string | null) {
   return (
-    frame === "subagent-current-panel-running" ||
-    frame === "subagent-current-panel-completed" ||
+    (frame?.includes("-panel-") ?? false) ||
+    (frame?.includes("-transcript-") ?? false) ||
     frame === "subagent-current-transcript" ||
     frame === "subagent-current-compact-820" ||
     frame === "subagent-current-compact-720"
   );
+}
+
+function initialSubagentId(frame: string | null) {
+  if (frame === "subagent-current-transcript") return "long-probe";
+  if (frame?.endsWith("transcript-alpha")) return "alpha";
+  if (frame?.endsWith("transcript-beta")) return "beta";
+  if (frame?.endsWith("transcript-parent")) return "parent";
+  if (frame?.endsWith("transcript-child")) return "child";
+  return null;
 }
 
 function compactSubagentTime(timestampMs: number, nowMs: number) {
@@ -1322,9 +1345,7 @@ export function App() {
     );
   const [subagentClockMs, setSubagentClockMs] = useState(() => Date.now());
   const [selectedSubagentId, setSelectedSubagentId] = useState<string | null>(
-    initialSelection.frame === "subagent-current-transcript"
-      ? "long-probe"
-      : null,
+    initialSubagentId(initialSelection.frame),
   );
   const [subagentPanelWidth, setSubagentPanelWidth] = useState(
     initialSelection.frame === "subagent-current-compact-820"
@@ -1527,7 +1548,7 @@ export function App() {
   const isCurrentContextSummaryReplay =
     mode === "replay" && scenarioId === "context-summary";
   const isCurrentSubagentReplay =
-    mode === "replay" && scenarioId === "subagent-delegation";
+    mode === "replay" && isSubagentScenarioId(scenarioId);
   const hasSubagentSurface =
     isCurrentSubagentReplay ||
     (mode === "live" && state.subagents.length > 0);
@@ -1749,8 +1770,7 @@ export function App() {
     setReplayApprovalResolution(null);
     setThreadSummaryOpen(
       (nextId === "context-summary" && frame === "context-summary-open") ||
-        (nextId === "subagent-delegation" &&
-          currentSubagentSummaryFrame(frame)),
+        (isSubagentScenarioId(nextId) && currentSubagentSummaryFrame(frame)),
     );
     setActiveFrame(frame);
     setScenarioSelectionVersion((version) => version + 1);
@@ -1758,18 +1778,15 @@ export function App() {
     setReviewOpen(false);
     setReviewSelection(null);
     setActiveConversationSidePanel(
-      nextId === "subagent-delegation" && currentSubagentPanelFrame(frame)
+      isSubagentScenarioId(nextId) && currentSubagentPanelFrame(frame)
         ? "subagents"
         : "review",
     );
     setSubagentPanelOpen(
-      nextId === "subagent-delegation" && currentSubagentPanelFrame(frame),
+      isSubagentScenarioId(nextId) && currentSubagentPanelFrame(frame),
     );
     setSelectedSubagentId(
-      nextId === "subagent-delegation" &&
-        frame === "subagent-current-transcript"
-        ? "long-probe"
-        : null,
+      isSubagentScenarioId(nextId) ? initialSubagentId(frame) : null,
     );
     setSubagentPanelWidth(
       frame === "subagent-current-compact-820"
@@ -2687,11 +2704,13 @@ export function App() {
           ...liveTime,
           id: subagent.id,
           lastMessage: subagent.message ?? undefined,
-          name: subagent.id === "long-probe" ? "Long probe" : "Agent",
+          name: subagent.name ?? undefined,
           status: subagent.status,
           statusSummary:
             subagent.status === "active"
-              ? "Working"
+              ? subagent.message ?? "Working"
+              : subagent.status === "waiting"
+                ? "Thinking"
               : subagent.message ?? undefined,
         };
       }),
@@ -2699,9 +2718,39 @@ export function App() {
   );
   const selectedSubagent =
     subagentItems.find(({ id }) => id === selectedSubagentId) ?? null;
+  const summarySubagentItems = useMemo(
+    () =>
+      subagentItems
+        .map((item, index) => ({ index, item }))
+        .sort((left, right) => {
+          const leftTime = left.item.dateTime
+            ? Date.parse(left.item.dateTime)
+            : Number.NaN;
+          const rightTime = right.item.dateTime
+            ? Date.parse(right.item.dateTime)
+            : Number.NaN;
+          return Number.isFinite(leftTime) && Number.isFinite(rightTime)
+            ? rightTime - leftTime || left.index - right.index
+            : left.index - right.index;
+        })
+        .map(({ item }) => item),
+    [subagentItems],
+  );
   const activeSubagentCount = subagentItems.filter(
     ({ status }) => status !== "done",
   ).length;
+  const completedSubagentCount =
+    subagentItems.length - activeSubagentCount;
+  const subagentSummaryLabel = [
+    activeSubagentCount > 0 ? `${activeSubagentCount} working` : null,
+    completedSubagentCount > 0 ? `${completedSubagentCount} done` : null,
+  ]
+    .filter(Boolean)
+    .join(" ");
+  const visibleSummarySubagents =
+    activeSubagentCount > 0
+      ? summarySubagentItems.filter(({ status }) => status !== "done")
+      : summarySubagentItems;
   const openReviewPanel = () => {
     setActiveConversationSidePanel("review");
     setSubagentPanelOpen(false);
@@ -2746,7 +2795,7 @@ export function App() {
       scenarioId === "interruption" ||
       scenarioId === "compaction" ||
       scenarioId === "context-summary" ||
-      scenarioId === "subagent-delegation" ||
+      isCurrentSubagentReplay ||
       scenarioId === "current-review-rename");
   const usesCurrentAskPermission =
     isCurrentApprovalReplay ||
@@ -2804,13 +2853,18 @@ export function App() {
                     >
                       <ThreadSummaryItem
                         aria-label="Open subagents"
-                        label={`${activeSubagentCount > 0 ? activeSubagentCount : subagentItems.length} ${activeSubagentCount > 0 ? "working" : "done"}`}
+                        label={subagentSummaryLabel}
                         leading={
-                          <SubagentAvatar
-                            active={activeSubagentCount > 0}
-                            seed="long-probe"
-                            size="tiny"
-                          />
+                          <span className="demo-subagent-summary-avatars">
+                            {visibleSummarySubagents.slice(0, 4).map((item) => (
+                              <SubagentAvatar
+                                active={item.status !== "done"}
+                                key={item.id}
+                                seed={item.id}
+                                size="tiny"
+                              />
+                            ))}
+                          </span>
                         }
                         onClick={() => {
                           setThreadSummaryOpen(false);
@@ -2997,7 +3051,7 @@ export function App() {
       scenarioId === "interruption" ||
       scenarioId === "compaction" ||
       scenarioId === "context-summary" ||
-      scenarioId === "subagent-delegation");
+      isCurrentSubagentReplay);
   const showLifecycleComposer = isConversationLifecycle;
   const composerSurface = (
     <AgentComposer
@@ -4741,8 +4795,8 @@ export function App() {
                 (scenarioId === "interruption" &&
                   message.id ===
                     "assistant-command-interruption-recovery") ||
-                (scenarioId === "subagent-delegation" &&
-                  message.id === "assistant-subagent-delegation") ||
+                (isCurrentSubagentReplay &&
+                  message.id.startsWith("assistant-subagent-")) ||
                 (scenarioId === "compaction" &&
                   (message.id === "assistant-compaction-baseline" ||
                     message.id ===
@@ -4754,7 +4808,7 @@ export function App() {
                 scenarioId === "approval-denied" ||
                 scenarioId === "approval-similar-commands" ||
                 scenarioId === "long-command-output" ||
-                scenarioId === "subagent-delegation" ? (
+                isCurrentSubagentReplay ? (
                   <McpResponseActions
                     label={
                       message.id === "assistant-workflow" ||
@@ -5105,11 +5159,28 @@ export function App() {
     }
 
     if (entry.kind === "subagent") {
+      const entrySubagent = state.subagents.find(
+        (subagent) => subagent.callId === entry.id,
+      );
+      if (
+        !entrySubagent ||
+        (entrySubagent.senderThreadId !== null &&
+          entrySubagent.senderThreadId !== state.threadId)
+      ) {
+        return null;
+      }
+      const groupTurnId = entrySubagent.turnId;
+      const rootTurnSubagents = state.subagents.filter(
+        (subagent) =>
+          (groupTurnId === null
+            ? subagent.callId === entrySubagent.callId
+            : subagent.turnId === groupTurnId) &&
+          (subagent.senderThreadId === null ||
+            subagent.senderThreadId === state.threadId),
+      );
+      if (rootTurnSubagents[0]?.callId !== entry.id) return null;
       const callSubagents = subagentItems.filter((item) =>
-        state.subagents.some(
-          (subagent) =>
-            subagent.callId === entry.id && subagent.id === item.id,
-        ),
+        rootTurnSubagents.some((subagent) => subagent.id === item.id),
       );
       if (callSubagents.length === 0) return null;
       const working = callSubagents.filter(
@@ -5120,13 +5191,17 @@ export function App() {
           ? working
           : callSubagents;
       const startedAtMs = state.subagents
-        .filter((item) => item.callId === entry.id)
+        .filter((item) =>
+          rootTurnSubagents.some((subagent) => subagent.id === item.id),
+        )
         .flatMap((item) =>
           item.startedAtMs === null ? [] : [item.startedAtMs],
         )
         .sort((left, right) => left - right)[0];
       const completedAtMs = state.subagents
-        .filter((item) => item.callId === entry.id)
+        .filter((item) =>
+          rootTurnSubagents.some((subagent) => subagent.id === item.id),
+        )
         .flatMap((item) =>
           item.completedAtMs === null ? [] : [item.completedAtMs],
         )
@@ -5147,26 +5222,40 @@ export function App() {
                   }
                 : {
                     durationMs:
-                      working.length > 0 ? 14_000 : 45_000,
+                      working.length > 0
+                        ? 14_000
+                        : state.turnDurationMs ?? 45_000,
                   })}
               status={working.length > 0 ? "working" : "worked"}
             />
           }
         >
-          {activityItems.map((item) => (
-            <SubagentActivity
-              item={{
+          {activityItems.length > 1 ? (
+            <SubagentActivityGroup
+              items={activityItems.map((item) => ({
                 activityStatus:
                   item.status === "done" ? "done" : "active",
                 id: item.id,
                 name: item.name,
-              }}
-              key={item.id}
-              onOpen={() => {
-                openSubagentPanel(item.id);
-              }}
+              }))}
+              onOpen={(item) => openSubagentPanel(item.id)}
             />
-          ))}
+          ) : (
+            activityItems.map((item) => (
+              <SubagentActivity
+                item={{
+                  activityStatus:
+                    item.status === "done" ? "done" : "active",
+                  id: item.id,
+                  name: item.name,
+                }}
+                key={item.id}
+                onOpen={() => {
+                  openSubagentPanel(item.id);
+                }}
+              />
+            ))
+          )}
         </ActivityTimeline>
       );
     }

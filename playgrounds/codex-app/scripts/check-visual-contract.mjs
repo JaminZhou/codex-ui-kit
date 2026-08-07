@@ -162,6 +162,22 @@ const currentBuildSubagentPanelReference =
   process.env.CODEX_UI_KIT_SUBAGENT_PANEL_REFERENCE;
 const currentBuildSubagentTranscriptReference =
   process.env.CODEX_UI_KIT_SUBAGENT_TRANSCRIPT_REFERENCE;
+const currentBuildSubagentConcurrentSummaryReference =
+  process.env.CODEX_UI_KIT_SUBAGENT_CONCURRENT_SUMMARY_REFERENCE;
+const currentBuildSubagentConcurrentMixedReference =
+  process.env.CODEX_UI_KIT_SUBAGENT_CONCURRENT_MIXED_REFERENCE;
+const currentBuildSubagentConcurrentCompletedReference =
+  process.env.CODEX_UI_KIT_SUBAGENT_CONCURRENT_COMPLETED_REFERENCE;
+const currentBuildSubagentConcurrentTranscriptReference =
+  process.env.CODEX_UI_KIT_SUBAGENT_CONCURRENT_TRANSCRIPT_REFERENCE;
+const currentBuildSubagentNestedRunningReference =
+  process.env.CODEX_UI_KIT_SUBAGENT_NESTED_RUNNING_REFERENCE;
+const currentBuildSubagentNestedMixedReference =
+  process.env.CODEX_UI_KIT_SUBAGENT_NESTED_MIXED_REFERENCE;
+const currentBuildSubagentNestedCompletedReference =
+  process.env.CODEX_UI_KIT_SUBAGENT_NESTED_COMPLETED_REFERENCE;
+const currentBuildSubagentNestedTranscriptReference =
+  process.env.CODEX_UI_KIT_SUBAGENT_NESTED_TRANSCRIPT_REFERENCE;
 const currentBuildWorkspaceReference =
   process.env.CODEX_UI_KIT_WORKSPACE_REFERENCE;
 const currentBuildWorkspaceReferenceSize = {
@@ -1892,6 +1908,84 @@ for (const scene of selectedScenes) {
         "CODEX_UI_KIT_SUBAGENT_TRANSCRIPT_MAX_DIFF_RATIO",
       referenceCrop: { height: 820, left: 810, top: 0, width: 370 },
       referencePath: currentBuildSubagentTranscriptReference,
+      sceneId: scene.id,
+    });
+  }
+
+  const currentSubagentCollaborationOverlay = {
+    "subagent-concurrent-summary-running": {
+      actualBounds: { height: 241, left: 804, top: 45, width: 300 },
+      referenceCrop: { height: 241, left: 504, top: 45, width: 300 },
+      referencePath: currentBuildSubagentConcurrentSummaryReference,
+    },
+    "subagent-concurrent-summary-mixed": {
+      actualBounds: { height: 241, left: 804, top: 45, width: 300 },
+      referenceCrop: { height: 241, left: 504, top: 45, width: 300 },
+      referencePath: currentBuildSubagentConcurrentMixedReference,
+    },
+    "subagent-concurrent-panel-mixed": {
+      actualBounds: { height: 820, left: 810, top: 0, width: 370 },
+      masks: [{ height: 32, left: 328, top: 66, width: 42 }],
+      referenceCrop: { height: 820, left: 810, top: 0, width: 370 },
+      referencePath: currentBuildSubagentConcurrentMixedReference,
+    },
+    "subagent-concurrent-panel-completed": {
+      actualBounds: { height: 820, left: 810, top: 0, width: 370 },
+      masks: [
+        { height: 32, left: 328, top: 170, width: 42 },
+        { height: 32, left: 328, top: 228, width: 42 },
+      ],
+      referenceCrop: { height: 820, left: 810, top: 0, width: 370 },
+      referencePath: currentBuildSubagentConcurrentCompletedReference,
+    },
+    "subagent-concurrent-transcript-beta": {
+      actualBounds: { height: 820, left: 810, top: 0, width: 370 },
+      referenceCrop: { height: 820, left: 810, top: 0, width: 370 },
+      referencePath: currentBuildSubagentConcurrentTranscriptReference,
+    },
+    "subagent-nested-panel-running": {
+      actualBounds: { height: 820, left: 810, top: 0, width: 370 },
+      masks: [
+        { height: 32, left: 328, top: 66, width: 42 },
+        { height: 32, left: 328, top: 124, width: 42 },
+      ],
+      referenceCrop: { height: 820, left: 810, top: 0, width: 370 },
+      referencePath: currentBuildSubagentNestedRunningReference,
+    },
+    "subagent-nested-panel-mixed": {
+      actualBounds: { height: 820, left: 810, top: 0, width: 370 },
+      masks: [
+        { height: 32, left: 328, top: 66, width: 42 },
+        { height: 32, left: 328, top: 170, width: 42 },
+      ],
+      referenceCrop: { height: 820, left: 810, top: 0, width: 370 },
+      referencePath: currentBuildSubagentNestedMixedReference,
+    },
+    "subagent-nested-panel-completed": {
+      actualBounds: { height: 820, left: 810, top: 0, width: 370 },
+      masks: [
+        { height: 32, left: 328, top: 170, width: 42 },
+        { height: 32, left: 328, top: 228, width: 42 },
+      ],
+      referenceCrop: { height: 820, left: 810, top: 0, width: 370 },
+      referencePath: currentBuildSubagentNestedCompletedReference,
+    },
+    "subagent-nested-transcript-child": {
+      actualBounds: { height: 820, left: 810, top: 0, width: 370 },
+      referenceCrop: { height: 820, left: 810, top: 0, width: 370 },
+      referencePath: currentBuildSubagentNestedTranscriptReference,
+    },
+  }[scene.id];
+  if (currentSubagentCollaborationOverlay?.referencePath) {
+    await compareCurrentBuildOverlay({
+      actual,
+      actualBounds: currentSubagentCollaborationOverlay.actualBounds,
+      defaultMaximumRatio: 0.055,
+      masks: currentSubagentCollaborationOverlay.masks ?? [],
+      maximumRatioName:
+        "CODEX_UI_KIT_SUBAGENT_COLLABORATION_MAX_DIFF_RATIO",
+      referenceCrop: currentSubagentCollaborationOverlay.referenceCrop,
+      referencePath: currentSubagentCollaborationOverlay.referencePath,
       sceneId: scene.id,
     });
   }

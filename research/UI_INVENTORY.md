@@ -62,11 +62,15 @@ observation from a previous build remains historical evidence.
   creation from the top Toggle, and `Dismiss`/`Open new terminal` recovery.
   A separate current-build task now also covers one real delegated subagent
   from active work through completion, the thread-summary row, wide side-panel
-  list, nested transcript, and explicit 820×680 and 720×680 panel reopen.
+  list, nested transcript, and explicit 820×680 and 720×680 panel reopen. Two
+  additional tasks cover concurrent siblings and a Parent → Child delegation:
+  both reach active, mixed active/done, completed, summary, flat panel, and
+  independent transcript states while public `agentPath` metadata preserves
+  the nested hierarchy.
   All `26.730.61309` observations remain previous-build evidence until each
   surface is separately reached on `26.730.61639`.
 
-Current inventory: 80 surface groups; 4 have current-build runtime evidence, 59 have previous-build-only runtime evidence, 17 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 4 groups and Electron verification covers 4.
+Current inventory: 81 surface groups; 5 have current-build runtime evidence, 59 have previous-build-only runtime evidence, 17 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 5 groups and Electron verification covers 5.
 Prior acceptance outside the sampled Terminal session, process, and mismatch
 slices remains recorded as `partial_legacy` until current-build
 re-observation.
@@ -763,8 +767,13 @@ The three ownership-scoped current-build comparisons differ by
 4.1812% for the summary, 1.3451% for the panel, and 1.5969% for the transcript,
 all below their hard limits.
 This promotes `thread.subagent-delegation` only for the sampled single-agent
-success path; concurrent agents, nested delegation, waiting/failure/cancel,
-pagination, and transcript streaming remain separate gates.
+success path. The independent `thread.subagent-collaboration` row now covers
+two sibling agents and one Parent → Child delegation across running, mixed,
+completed, summary, flat-panel, live-progress, and transcript states. It keeps
+the public `agentPath` hierarchy without inferring a tree that the current UI
+does not draw. Waiting-before-initialization, failure, interruption/cancel,
+pagination, transcript streaming, and transport recovery remain separate
+gates.
 
 This is a measurement- and raster-backed basic thread/workspace slice, not a
 claim that the whole application or every lifecycle is pixel-perfect. Broader

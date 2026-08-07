@@ -204,6 +204,16 @@ The authoritative current-build inventory is:
   under independent 1.5% limits. Native file-panel selection, non-image and
   multi-attachment states, upload/error, overflow, and plugin variants remain
   open.
+- Three current-build subagent tasks now separate the single-success contract
+  from collaboration. The original task covers one agent, summary, panel,
+  transcript, and 820/720 reopen. A sibling Alpha/Beta task and a nested
+  Parent/Child task cover two-working, mixed active/done, two-done, live
+  progress preview, and independent transcripts. The nested reducer preserves
+  public `/root/parent/child` identity while the visual panel stays flat, as
+  observed. Browser/CDP covers 111 frames, Electron drives both mixed lists,
+  and nine collaboration crops pass between 1.36% and 4.67%. Waiting,
+  failure, cancellation, pagination, streaming, and transport recovery remain
+  open.
 - npm publication remains out of scope until the agreed P0/P1 coverage and
   release acceptance surfaces are complete.
 

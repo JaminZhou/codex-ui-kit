@@ -355,6 +355,32 @@ describe("SubagentPanel", () => {
     expect(onSelect).toHaveBeenCalledWith(activeAgent);
   });
 
+  it("orders each lifecycle section by its protocol timestamp", () => {
+    const { container } = render(
+      <SubagentPanel
+        items={[
+          {
+            ...activeAgent,
+            dateTime: "2026-08-07T01:00:01.000Z",
+            id: "alpha",
+            name: "Alpha",
+          },
+          {
+            ...activeAgent,
+            dateTime: "2026-08-07T01:00:05.000Z",
+            id: "beta",
+            name: "Beta",
+          },
+        ]}
+      />,
+    );
+
+    const labels = [...container.querySelectorAll(
+      ".codex-ui-subagent-panel__item-heading > span:first-child",
+    )].map((element) => element.textContent);
+    expect(labels).toEqual(["Beta", "Alpha"]);
+  });
+
   it("renders read-only rows without dead button controls", () => {
     render(<SubagentPanel items={[activeAgent]} />);
 

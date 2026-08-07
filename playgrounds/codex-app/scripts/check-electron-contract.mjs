@@ -4392,6 +4392,68 @@ try {
   await subagentApp.close();
 }
 
+for (const collaborationScene of [
+  {
+    frame: "subagent-concurrent-panel-mixed",
+    id: "electron-subagent-concurrency",
+    scenario: "subagent-concurrency",
+    agents: ["Beta", "Alpha"],
+    active: 1,
+    done: 1,
+    transcriptAgent: "Alpha",
+    transcriptMessage: "ALPHA SUBAGENT DONE",
+  },
+  {
+    frame: "subagent-nested-panel-mixed",
+    id: "electron-subagent-nested",
+    scenario: "subagent-nested",
+    agents: ["Parent", "Child"],
+    active: 1,
+    done: 1,
+    transcriptAgent: "Child",
+    transcriptMessage: "CHILD SUBAGENT DONE",
+  },
+]) {
+  const { app, page } = await launchScene(collaborationScene, {
+    capture: false,
+  });
+  try {
+    const panel = page.getByTestId("subagent-panel");
+    await panel.waitFor();
+    const panelText = (await panel.textContent())?.replace(/\s+/g, " ").trim();
+    if (
+      !panelText?.includes(`Active · ${collaborationScene.active}`) ||
+      !panelText.includes(`Done · ${collaborationScene.done}`) ||
+      collaborationScene.agents.some((agent) => !panelText.includes(agent))
+    ) {
+      throw new Error(
+        `Electron ${collaborationScene.scenario} mixed lifecycle failed: ${JSON.stringify(panelText)}`,
+      );
+    }
+    await panel
+      .locator(".codex-ui-subagent-panel__item")
+      .filter({ hasText: collaborationScene.transcriptAgent })
+      .click();
+    const transcript = page.getByTestId("subagent-transcript");
+    await transcript.waitFor();
+    const transcriptText = (await transcript.textContent())
+      ?.replace(/\s+/g, " ")
+      .trim();
+    if (
+      !transcriptText?.includes(collaborationScene.transcriptAgent) ||
+      !transcriptText.includes(collaborationScene.transcriptMessage)
+    ) {
+      throw new Error(
+        `Electron ${collaborationScene.scenario} transcript failed: ${JSON.stringify(transcriptText)}`,
+      );
+    }
+    await page.getByRole("button", { name: "Back to subagents" }).click();
+    await panel.waitFor();
+  } finally {
+    await app.close();
+  }
+}
+
 const liveSubagentScene = {
   frame: "recovered",
   id: "electron-live-subagent",
@@ -4656,5 +4718,5 @@ try {
 }
 
 console.log(
-  "Electron host, native-window, coding-workspace routing, conversation/Composer and current image-attachment lifecycle plus current menus, current long, failed, and interrupted command output plus manual context compaction, thread summary, replay/live subagent delegation, default 720px narrow reachability, resizable navigation/Review/Terminal/PR detail, PR tabs and expansion, MCP disclosure/result, multi-file and mixed-content Review, selection/Undo, large diff scrolling, and compact geometry contracts passed.",
+  "Electron host, native-window, coding-workspace routing, conversation/Composer and current image-attachment lifecycle plus current menus, current long, failed, and interrupted command output plus manual context compaction, thread summary, replay/live single, concurrent, and nested subagent delegation, default 720px narrow reachability, resizable navigation/Review/Terminal/PR detail, PR tabs and expansion, MCP disclosure/result, multi-file and mixed-content Review, selection/Undo, large diff scrolling, and compact geometry contracts passed.",
 );

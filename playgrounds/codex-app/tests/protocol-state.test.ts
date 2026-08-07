@@ -1300,6 +1300,122 @@ describe("protocol lifecycle reducer", () => {
     });
   });
 
+  it("aggregates concurrent sibling subagents through a mixed state", () => {
+    const scenario = replayScenarios["subagent-concurrency"];
+    const running = reduceProtocolTrace(
+      scenario.events.slice(0, scenario.frames["subagent-concurrent-running"]),
+    );
+    const mixed = reduceProtocolTrace(
+      scenario.events.slice(0, scenario.frames["subagent-concurrent-mixed"]),
+    );
+    const completed = reduceProtocolTrace(scenario.events);
+
+    expect(running.subagents).toEqual([
+      expect.objectContaining({
+        agentPath: "/root/alpha",
+        id: "alpha",
+        name: "Alpha",
+        senderThreadId: "thread-subagent-concurrency",
+        status: "active",
+      }),
+      expect.objectContaining({
+        agentPath: "/root/beta",
+        id: "beta",
+        name: "Beta",
+        senderThreadId: "thread-subagent-concurrency",
+        status: "active",
+      }),
+    ]);
+    expect(mixed.subagents).toEqual([
+      expect.objectContaining({
+        id: "alpha",
+        message: "ALPHA SUBAGENT DONE",
+        status: "done",
+      }),
+      expect.objectContaining({
+        id: "beta",
+        message: "clarifying command execution constraints",
+        status: "active",
+      }),
+    ]);
+    expect(completed.subagents).toEqual([
+      expect.objectContaining({ id: "alpha", status: "done" }),
+      expect.objectContaining({ id: "beta", status: "done" }),
+    ]);
+    expect(completed.turnDurationMs).toBe(79_000);
+  });
+
+  it("does not reactivate a completed subagent from a late activity event", () => {
+    const completed = reduceProtocolTrace(
+      replayScenarios["subagent-concurrency"].events,
+    );
+    const afterLateActivity = reduceProtocolNotification(completed, {
+      method: "item/started",
+      params: {
+        item: {
+          agentPath: "/root/alpha",
+          agentThreadId: "alpha",
+          id: "activity-subagent-alpha-late",
+          kind: "started",
+          type: "subAgentActivity",
+        },
+        startedAtMs: 80_000,
+        threadId: "thread-subagent-concurrency",
+        turnId: "turn-subagent-concurrency",
+      },
+    });
+
+    expect(afterLateActivity.status).toBe("completed");
+    expect(
+      afterLateActivity.subagents.find(({ id }) => id === "alpha"),
+    ).toMatchObject({
+      message: "ALPHA SUBAGENT DONE",
+      status: "done",
+      threadStatus: "completed",
+    });
+  });
+
+  it("keeps nested agent paths while excluding child calls from the root timeline", () => {
+    const scenario = replayScenarios["subagent-nested"];
+    const running = reduceProtocolTrace(
+      scenario.events.slice(0, scenario.frames["subagent-nested-running"]),
+    );
+    const mixed = reduceProtocolTrace(
+      scenario.events.slice(0, scenario.frames["subagent-nested-mixed"]),
+    );
+    const completed = reduceProtocolTrace(scenario.events);
+
+    expect(running.subagents).toEqual([
+      expect.objectContaining({
+        agentPath: "/root/parent",
+        id: "parent",
+        name: "Parent",
+        senderThreadId: "thread-subagent-nested",
+      }),
+      expect.objectContaining({
+        agentPath: "/root/parent/child",
+        id: "child",
+        name: "Child",
+        senderThreadId: "parent",
+      }),
+    ]);
+    expect(running.timeline.filter(({ kind }) => kind === "subagent")).toEqual([
+      { id: "collab-subagent-parent", kind: "subagent" },
+    ]);
+    expect(mixed.subagents).toEqual([
+      expect.objectContaining({ id: "parent", status: "active" }),
+      expect.objectContaining({
+        id: "child",
+        message: "CHILD SUBAGENT DONE",
+        status: "done",
+      }),
+    ]);
+    expect(completed.subagents).toEqual([
+      expect.objectContaining({ id: "parent", status: "done" }),
+      expect.objectContaining({ id: "child", status: "done" }),
+    ]);
+  });
+
   it("keeps unknown notifications observable without corrupting state", () => {
     const state = reduceProtocolNotification(initialProtocolState, {
       method: "future/notification",
