@@ -69,7 +69,11 @@ export const computedStylePropertyNamesSha256 =
   "fdad1a151475c0604e6bae4e1391a2bfa0135bd36edac664a78c0f70ec06e75c";
 
 const localFragmentPattern = /^#[A-Za-z_][A-Za-z0-9_.:-]*$/;
-const urlFunctionPattern = /url\(\s*(["']?)([^"')]+)\1\s*\)/gi;
+const localFragmentSource = "#[A-Za-z_][A-Za-z0-9_.:-]*";
+const localUrlFunctionPattern = new RegExp(
+  `\\burl\\([\\t\\n\\f\\r ]*(?:"${localFragmentSource}"|'${localFragmentSource}'|${localFragmentSource})[\\t\\n\\f\\r ]*\\)`,
+  "gi",
+);
 const numberPattern = "-?(?:\\d+(?:\\.\\d*)?|\\.\\d+)(?:e[+-]?\\d+)?";
 const viewBoxPattern = new RegExp(
   `^\\s*${numberPattern}(?:[ ,]+${numberPattern}){3}\\s*$`,
@@ -111,15 +115,7 @@ function assertSafeVisualScalar(value, context) {
   if (normalized.includes("\\")) {
     throw new Error(`${context} contains an unsupported CSS escape.`);
   }
-  const withoutLocalUrls = normalized.replace(
-    urlFunctionPattern,
-    (_match, _quote, target) => {
-      if (!localFragmentPattern.test(target.trim())) {
-        throw new Error(`${context} contains a non-local URL reference.`);
-      }
-      return "";
-    },
-  );
+  const withoutLocalUrls = normalized.replace(localUrlFunctionPattern, "");
   if (
     /\burl\s*\(/i.test(withoutLocalUrls) ||
     /(?:[a-z][a-z0-9+.-]*:|\/\/)/i.test(withoutLocalUrls) ||

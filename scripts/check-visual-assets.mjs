@@ -114,6 +114,12 @@ const escapedExternalUrlFixture = structuredClone(manifest.icons[0]);
 escapedExternalUrlFixture.rootComputedStyle.fill =
   "u\\72 l(\\68 ttps\\3a \\2f \\2f example.invalid\\2f fill.svg#paint)";
 rejectUnsafeFixture(escapedExternalUrlFixture, "css-escaped-external-url");
+const quotedWhitespaceUrlFixture = structuredClone(manifest.icons[0]);
+quotedWhitespaceUrlFixture.rootComputedStyle.fill = 'url(" #safe-filter")';
+rejectUnsafeFixture(quotedWhitespaceUrlFixture, "quoted-whitespace-url");
+const nonBreakingWhitespaceUrlFixture = structuredClone(manifest.icons[0]);
+nonBreakingWhitespaceUrlFixture.rootComputedStyle.fill = 'url("\u00A0#safe-filter")';
+rejectUnsafeFixture(nonBreakingWhitespaceUrlFixture, "non-breaking-whitespace-url");
 try {
   sanitizeVisualScalarRecord(
     { filter: "url(chrome-extension://unsafe/filter.svg#paint)" },
@@ -126,7 +132,7 @@ try {
   }
 }
 const localFragmentFixture = structuredClone(manifest.icons[0]);
-localFragmentFixture.rootComputedStyle.filter = 'url("#safe-filter")';
+localFragmentFixture.rootComputedStyle.filter = 'url( "#safe-filter" )';
 sanitizeVisualAssetIcon(localFragmentFixture, "positive-fixture.local-fragment");
 if (
   manifest.policy?.packageBoundary !== "playground-only" ||
