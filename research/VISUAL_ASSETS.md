@@ -63,9 +63,15 @@ node scripts/capture-current-visual-assets.mjs
 ```
 
 After reviewing that de-identified output, `pnpm update:visual-assets` performs
-the deterministic geometry match and rewrites the five promoted entries. The
+the deterministic geometry match and rewrites the five promoted entries. It
+requires a complete ordered one-to-one primitive match; the Activity icon is
+the only explicit derivation and must contain the observed, fingerprinted
+attention-dot primitive after the promoted neutral bell primitive. No added,
+removed, duplicated, or unmatched primitive is silently accepted. The
 updater requires the same isolated port/profile environment and includes the
-app fingerprint, theme, interaction state, and viewport in every v4 hash.
+app fingerprint, capture date, theme, interaction state, and viewport in every
+v4 hash. A changed app fingerprint refreshes the capture date; an unchanged
+fingerprint preserves it so a dry run remains byte-for-byte deterministic.
 
 The capture script is read-only: it first proves that every listener is bound
 only to the declared loopback endpoint and that exactly one listener process
@@ -82,4 +88,9 @@ namespace declarations, and the SVG `version` marker are explicitly ignored
 as non-visual metadata. Root `class` and `viewBox` are accepted only because
 their source/resolved state is captured separately and included in the hash;
 the same attributes on a child still fail closed.
+Before capture output or updater write, a shared sanitizer requires the exact
+475-property computed-style protocol and rejects external, data, application,
+blob, extension, scheme-relative, and other non-local URL values. SVG
+references may target only a safe local `#fragment`. The research checker
+locks the property-name-set hash and exercises negative URL/protocol fixtures.
 Process/profile setup and exact-PID cleanup remain explicit operator steps.

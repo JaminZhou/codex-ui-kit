@@ -2,16 +2,16 @@
   "schemaVersion": 1,
   "geometryHashVersion": 4,
   "baseline": {
+    "appAsarSha256": "3fea92820c0fb7a69473e7a8308a8e5b8e91524289a84181a33533ec6cb51d45",
     "appVersion": "26.730.61639",
     "buildNumber": "6234",
-    "appAsarSha256": "3fea92820c0fb7a69473e7a8308a8e5b8e91524289a84181a33533ec6cb51d45",
-    "capturedAt": "2026-08-07",
-    "theme": "dark",
     "interactionState": "resting",
+    "theme": "dark",
     "viewport": {
       "height": 820,
       "width": 1180
-    }
+    },
+    "capturedAt": "2026-08-07"
   },
   "policy": {
     "purpose": "exploratory visual parity and regression diagnosis",
@@ -527,7 +527,7 @@
         "height": 14,
         "width": 14
       },
-      "sha256": "dab8517d3714c75833d39c472ecf67e7376d8c5b1cf5ad274af85a66beba3e9c",
+      "sha256": "6502fbfbb1c612ee10b678475653bd1188c68136b1eb1b943173dc5a146884f9",
       "status": "runtime-observed",
       "primitives": [
         {
@@ -1510,7 +1510,7 @@
         "height": 16,
         "width": 16
       },
-      "sha256": "36dfdda6c320c6039a824b939c4836610055916131170bd1ea8692678af3bbe3",
+      "sha256": "6fd385ca52821fec117924cf57d8e3b4f230e3dc71a99a2ffd8ef11bc478cebd",
       "status": "runtime-observed",
       "primitives": [
         {
@@ -2494,7 +2494,7 @@
         "height": 16,
         "width": 16
       },
-      "sha256": "371fb248d77bed28bff9c220d29d3f1a383e07f62ac238110b1acb5c0026284f",
+      "sha256": "d6e1b8e11f674feb5fcbbce99b6d59b71f52c9072fbbd79ee37b76bdc52698ac",
       "status": "runtime-observed",
       "primitives": [
         {
@@ -3478,7 +3478,7 @@
         "height": 16,
         "width": 16
       },
-      "sha256": "43dca6b278cf73285eace9a71fb8d4f4caa7b0584cf73d7f01afadc4e0476430",
+      "sha256": "e55126d2a6daeed161ba5efef43fed5a597b2162b3f6ffbe71b9c33582d06400",
       "status": "runtime-observed",
       "primitives": [
         {
@@ -4945,7 +4945,7 @@
         "height": 16,
         "width": 16
       },
-      "sha256": "c3f37e9aa2bef4f8da309b4e2d3a2679638bbd3726254f8b2b31f0a8bb491361",
+      "sha256": "f7b01150348c591b8c205d59b4c496855326f8aa03dca32dff5664f72398209d",
       "status": "runtime-observed",
       "primitives": [
         {

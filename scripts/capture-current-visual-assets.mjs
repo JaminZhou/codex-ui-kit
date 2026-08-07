@@ -4,6 +4,7 @@ import { realpathSync } from "node:fs";
 import { homedir } from "node:os";
 import { fileURLToPath } from "node:url";
 import { chromium } from "../playgrounds/codex-app/node_modules/playwright-core/index.mjs";
+import { sanitizeVisualAssetIcon } from "./visual-asset-contract.mjs";
 
 const port = Number(process.env.CODEX_VISUAL_ASSET_CDP_PORT);
 const expectedProfile = process.env.CODEX_VISUAL_ASSET_PROFILE;
@@ -448,26 +449,34 @@ try {
         ),
       );
     });
-  result.icons = result.icons.map((icon) => ({
-    ...icon,
-    owner: {
-      role: icon.owner.role,
-      semanticId: semanticLabels.get(icon.owner.rawSemanticLabel) ?? null,
-    },
-    sha256: createHash("sha256")
-      .update(
-        canonicalize({
-          baselineContext,
-          primitives: icon.primitives,
-          renderSize: icon.renderSize,
-          rootAttributes: icon.rootAttributes,
-          rootComputedStyle: icon.rootComputedStyle,
-          sourceClassName: icon.sourceClassName,
-          viewBox: icon.viewBox,
-        }),
-      )
-      .digest("hex"),
-  }));
+  result.icons = result.icons.map((icon, index) => {
+    const sanitized = sanitizeVisualAssetIcon(
+      {
+        ...icon,
+        owner: {
+          role: icon.owner.role,
+          semanticId: semanticLabels.get(icon.owner.rawSemanticLabel) ?? null,
+        },
+      },
+      `capture.icons[${index}]`,
+    );
+    return {
+      ...sanitized,
+      sha256: createHash("sha256")
+        .update(
+          canonicalize({
+            baselineContext,
+            primitives: sanitized.primitives,
+            renderSize: sanitized.renderSize,
+            rootAttributes: sanitized.rootAttributes,
+            rootComputedStyle: sanitized.rootComputedStyle,
+            sourceClassName: sanitized.sourceClassName,
+            viewBox: sanitized.viewBox,
+          }),
+        )
+        .digest("hex"),
+    };
+  });
 
   console.log(JSON.stringify(result, null, 2));
 } finally {
