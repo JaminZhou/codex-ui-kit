@@ -1099,16 +1099,6 @@ export function reduceProtocolNotification(
       const subagents = receiverThreadIds.reduce((items, id) => {
         const existing = items.find((candidate) => candidate.id === id);
         const agentState = isRecord(agentStates[id]) ? agentStates[id] : {};
-        const reportedThreadStatus =
-          asString(agentState.status) ??
-          existing?.threadStatus ??
-          "pendingInit";
-        const reportedStatus =
-          reportedThreadStatus === "pendingInit"
-            ? "waiting"
-            : reportedThreadStatus === "running"
-              ? "active"
-              : "done";
         const rekeysProvisionalLifecycle =
           existing?.provisional === true && existing.turnId === itemTurnId;
         const startsNewLifecycle =
@@ -1117,6 +1107,16 @@ export function reduceProtocolNotification(
             existing?.turnId !== itemTurnId ||
             (reportedTool === "sendInput" && existing?.status === "done")) &&
           !rekeysProvisionalLifecycle;
+        const reportedThreadStatus =
+          asString(agentState.status) ??
+          (startsNewLifecycle ? null : existing?.threadStatus) ??
+          "pendingInit";
+        const reportedStatus =
+          reportedThreadStatus === "pendingInit"
+            ? "waiting"
+            : reportedThreadStatus === "running"
+              ? "active"
+              : "done";
         const status =
           existing?.status === "done" &&
           reportedStatus !== "done" &&

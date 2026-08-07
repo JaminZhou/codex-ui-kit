@@ -2041,6 +2041,49 @@ describe("protocol lifecycle reducer", () => {
     ]);
   });
 
+  it("keeps new control lifecycles nonterminal while agent state is pending", () => {
+    const completed = reduceProtocolTrace(
+      replayScenarios["subagent-concurrency"].events,
+    );
+    const activeTurn = reduceProtocolNotification(completed, {
+      method: "turn/started",
+      params: {
+        threadId: "thread-subagent-concurrency",
+        turn: { id: "turn-subagent-concurrency" },
+      },
+    });
+
+    for (const tool of ["sendInput", "resumeAgent"] as const) {
+      const controlled = reduceProtocolNotification(activeTurn, {
+        method: "item/started",
+        params: {
+          item: {
+            agentsStates: {},
+            id: `collab-${tool}-pending-alpha`,
+            receiverThreadIds: ["alpha"],
+            senderThreadId: "thread-subagent-concurrency",
+            status: "inProgress",
+            tool,
+            type: "collabAgentToolCall",
+          },
+          startedAtMs: 90_000,
+          threadId: "thread-subagent-concurrency",
+          turnId: "turn-subagent-concurrency",
+        },
+      });
+
+      expect(hasActiveTurnWork(controlled)).toBe(true);
+      expect(controlled.subagents.find(({ id }) => id === "alpha"))
+        .toMatchObject({
+          callId: `collab-${tool}-pending-alpha`,
+          completedAtMs: null,
+          status: "waiting",
+          threadStatus: "pendingInit",
+          tool,
+        });
+    }
+  });
+
   it("keeps old summaries when a new root turn waits on an agent", () => {
     const completed = reduceProtocolTrace(
       replayScenarios["subagent-concurrency"].events,
