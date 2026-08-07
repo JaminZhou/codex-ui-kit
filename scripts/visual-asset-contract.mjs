@@ -80,27 +80,6 @@ const viewBoxPattern = new RegExp(
   "i",
 );
 
-function decodeCssEscapes(value) {
-  let decoded = value;
-  for (let pass = 0; pass < 8; pass += 1) {
-    const next = decoded.replace(
-      /\\(?:([0-9a-f]{1,6})(?:\r\n|[\t\n\f\r ])?|([^\n\r\f0-9a-f]))/gi,
-      (_match, hexadecimal, escapedCharacter) => {
-        if (hexadecimal) {
-          const codePoint = Number.parseInt(hexadecimal, 16);
-          return codePoint === 0 || codePoint > 0x10ffff
-            ? "\uFFFD"
-            : String.fromCodePoint(codePoint);
-        }
-        return escapedCharacter;
-      },
-    );
-    if (next === decoded) return next;
-    decoded = next;
-  }
-  throw new Error("Visual value uses excessively nested CSS escapes.");
-}
-
 function assertSafeVisualScalar(value, context) {
   if (
     typeof value !== "string" ||
@@ -111,11 +90,10 @@ function assertSafeVisualScalar(value, context) {
   if (/\/\*|\*\//.test(value)) {
     throw new Error(`${context} must not contain CSS comments.`);
   }
-  const normalized = decodeCssEscapes(value);
-  if (normalized.includes("\\")) {
+  if (value.includes("\\")) {
     throw new Error(`${context} contains an unsupported CSS escape.`);
   }
-  const withoutLocalUrls = normalized.replace(localUrlFunctionPattern, "");
+  const withoutLocalUrls = value.replace(localUrlFunctionPattern, "");
   if (
     /\burl\s*\(/i.test(withoutLocalUrls) ||
     /(?:[a-z][a-z0-9+.-]*:|\/\/)/i.test(withoutLocalUrls) ||

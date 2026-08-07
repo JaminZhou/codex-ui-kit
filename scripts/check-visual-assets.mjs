@@ -114,6 +114,12 @@ const escapedExternalUrlFixture = structuredClone(manifest.icons[0]);
 escapedExternalUrlFixture.rootComputedStyle.fill =
   "u\\72 l(\\68 ttps\\3a \\2f \\2f example.invalid\\2f fill.svg#paint)";
 rejectUnsafeFixture(escapedExternalUrlFixture, "css-escaped-external-url");
+const escapedQuoteUrlFixture = structuredClone(manifest.icons[0]);
+escapedQuoteUrlFixture.rootComputedStyle.fill = "url(\\22 #safe-filter\\22 )";
+rejectUnsafeFixture(escapedQuoteUrlFixture, "css-escaped-quote-url");
+const escapedWhitespaceUrlFixture = structuredClone(manifest.icons[0]);
+escapedWhitespaceUrlFixture.rootComputedStyle.fill = "url(\\20 #safe-filter)";
+rejectUnsafeFixture(escapedWhitespaceUrlFixture, "css-escaped-whitespace-url");
 const quotedWhitespaceUrlFixture = structuredClone(manifest.icons[0]);
 quotedWhitespaceUrlFixture.rootComputedStyle.fill = 'url(" #safe-filter")';
 rejectUnsafeFixture(quotedWhitespaceUrlFixture, "quoted-whitespace-url");

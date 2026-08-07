@@ -93,10 +93,11 @@ Before capture output or updater write, a shared sanitizer requires the exact
 blob, extension, scheme-relative, and other non-local URL values. SVG
 references may target only a safe local `#fragment`. The research checker
 locks the property-name-set hash and exercises raw, CSS-escaped, and
-scheme-relative negative URL/protocol fixtures. Local URL parsing follows CSS
-ASCII-whitespace rules and requires the untrimmed payload to be exactly the
-safe fragment, so quoted leading spaces and Unicode whitespace cannot turn
-into document-relative requests. The same shared sanitizer
-covers the de-identified font-style samples and all promoted icon styles,
+scheme-relative negative URL/protocol fixtures. All CSS escapes in captured
+visual values fail closed instead of being reinterpreted as URL syntax. Local
+URL parsing follows CSS ASCII-whitespace rules and requires the untrimmed
+payload to be exactly the safe fragment, so quoted leading spaces and Unicode
+whitespace cannot turn into document-relative requests. The same shared
+sanitizer covers the de-identified font-style samples and all promoted icon styles,
 attributes, class names, view boxes, and render sizes before capture output.
 Process/profile setup and exact-PID cleanup remain explicit operator steps.
