@@ -80,7 +80,7 @@ function decodeCssEscapes(value) {
   let decoded = value;
   for (let pass = 0; pass < 8; pass += 1) {
     const next = decoded.replace(
-      /\\\\(?:([0-9a-f]{1,6})(?:\r\n|[\t\n\f\r ])?|([^\n\r\f0-9a-f]))/gi,
+      /\\(?:([0-9a-f]{1,6})(?:\r\n|[\t\n\f\r ])?|([^\n\r\f0-9a-f]))/gi,
       (_match, hexadecimal, escapedCharacter) => {
         if (hexadecimal) {
           const codePoint = Number.parseInt(hexadecimal, 16);
