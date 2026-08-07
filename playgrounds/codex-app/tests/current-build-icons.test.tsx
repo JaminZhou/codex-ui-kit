@@ -21,8 +21,8 @@ describe("current-build visual assets", () => {
       expect(svg?.getAttribute("aria-hidden")).toBe("true");
       expect(svg?.getAttribute("data-current-build-icon")).toBe(icon.id);
       expect(svg?.getAttribute("viewBox")).toBe(icon.viewBox);
-      expect(svg?.getAttribute("width")).toBe(String(icon.renderSize.width));
-      expect(svg?.getAttribute("height")).toBe(String(icon.renderSize.height));
+      expect(svg?.style.width).toBe(`${icon.renderSize.width}px`);
+      expect(svg?.style.height).toBe(`${icon.renderSize.height}px`);
       expect(svg?.children).toHaveLength(icon.primitives.length);
       for (const [name, value] of Object.entries(icon.rootAttributes)) {
         expect(svg?.getAttribute(name)).toBe(value);

@@ -50,11 +50,14 @@ For a fresh isolated build probe, launch a second Codex process with a unique
 profile and loopback-only CDP port, prepare a disposable public state, and run:
 
 ```sh
-CODEX_VISUAL_ASSET_CDP_PORT=<port> node scripts/capture-current-visual-assets.mjs
+CODEX_VISUAL_ASSET_CDP_PORT=<port> \
+CODEX_VISUAL_ASSET_PROFILE=<absolute-unique-profile> \
+node scripts/capture-current-visual-assets.mjs
 ```
 
-The capture script is read-only: it selects the largest main Renderer and
-outputs only SVG structure, control semantics, geometry, computed style, and
-font samples. It never emits page or conversation text. Process/profile setup
-and exact-PID cleanup remain explicit operator steps so the script cannot
-accidentally start, stop, or attach to the user's main Codex process.
+The capture script is read-only: it first proves that the loopback listener
+belongs to the declared unique profile, then selects the largest main Renderer
+and outputs a recursive allowlisted SVG tree, allowlisted static semantic IDs,
+geometry, computed style, and de-identified font samples. It never emits raw
+page, conversation, project, account, title, aria-label, or test-id text.
+Process/profile setup and exact-PID cleanup remain explicit operator steps.

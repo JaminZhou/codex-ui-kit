@@ -9,7 +9,7 @@ describe("visual token contract", () => {
     expect(tokens).toContain("--codex-ui-spacing: 0.25rem");
     expect(tokens).toContain("--codex-ui-font-size-md: 1rem");
     expect(tokens).toContain(
-      '--codex-ui-font-sans-default: -apple-system, "system-ui", "Segoe UI"',
+      '--codex-ui-font-sans-default: -apple-system, system-ui, "Segoe UI"',
     );
     expect(tokens).toContain(
       "--codex-ui-font-sans: var(--codex-ui-font-sans-default)",

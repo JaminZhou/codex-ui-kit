@@ -26,6 +26,69 @@ const [manifestText, packageText, iconSource, appSource, playgroundStyles] =
   ]);
 const manifest = JSON.parse(manifestText);
 const packageJson = JSON.parse(packageText);
+const allowedSvgTags = new Set([
+  "circle",
+  "clippath",
+  "defs",
+  "ellipse",
+  "g",
+  "line",
+  "lineargradient",
+  "mask",
+  "path",
+  "polygon",
+  "polyline",
+  "radialgradient",
+  "rect",
+  "stop",
+  "use",
+]);
+const allowedSvgAttributes = new Set([
+  "clip-path",
+  "clip-rule",
+  "color",
+  "cx",
+  "cy",
+  "d",
+  "fill",
+  "fill-opacity",
+  "fill-rule",
+  "filter",
+  "gradienttransform",
+  "gradientunits",
+  "height",
+  "href",
+  "id",
+  "mask",
+  "offset",
+  "opacity",
+  "points",
+  "preserveaspectratio",
+  "r",
+  "rx",
+  "ry",
+  "stop-color",
+  "stop-opacity",
+  "stroke",
+  "stroke-dasharray",
+  "stroke-dashoffset",
+  "stroke-linecap",
+  "stroke-linejoin",
+  "stroke-miterlimit",
+  "stroke-opacity",
+  "stroke-width",
+  "style",
+  "transform",
+  "vector-effect",
+  "width",
+  "x",
+  "x1",
+  "x2",
+  "xlink:href",
+  "y",
+  "y1",
+  "y2",
+]);
 
 function canonicalize(value) {
   return JSON.stringify(value, (_key, nested) => {
@@ -38,6 +101,35 @@ function canonicalize(value) {
       ),
     );
   });
+}
+
+function validSvgAttributes(attributes) {
+  return (
+    attributes &&
+    typeof attributes === "object" &&
+    !Array.isArray(attributes) &&
+    Object.entries(attributes).every(
+      ([name, value]) =>
+        allowedSvgAttributes.has(name.toLowerCase()) &&
+        typeof value === "string",
+    )
+  );
+}
+
+function validSvgPrimitive(primitive) {
+  return (
+    primitive &&
+    typeof primitive === "object" &&
+    allowedSvgTags.has(primitive.tag) &&
+    validSvgAttributes(primitive.attributes) &&
+    (primitive.children === undefined ||
+      (Array.isArray(primitive.children) &&
+        primitive.children.length > 0 &&
+        primitive.children.every(validSvgPrimitive))) &&
+    Object.keys(primitive).every((key) =>
+      ["attributes", "children", "tag"].includes(key),
+    )
+  );
 }
 
 if (manifest.schemaVersion !== 1) {
@@ -86,11 +178,12 @@ for (const icon of manifest.icons ?? []) {
     icon.status !== "runtime-observed" ||
     !icon.region ||
     !icon.viewBox ||
-    !icon.rootAttributes ||
+    !validSvgAttributes(icon.rootAttributes) ||
     !Number.isFinite(icon.renderSize?.width) ||
     !Number.isFinite(icon.renderSize?.height) ||
     !Array.isArray(icon.primitives) ||
-    icon.primitives.length === 0
+    icon.primitives.length === 0 ||
+    !icon.primitives.every(validSvgPrimitive)
   ) {
     throw new Error(`incomplete runtime evidence for ${icon.id}`);
   }
@@ -114,6 +207,13 @@ for (const icon of manifest.icons ?? []) {
   if (!appSource.includes(`name="${icon.id}"`)) {
     throw new Error(`current-build playground does not render ${icon.id}`);
   }
+}
+
+if (
+  !iconSource.includes("primitive.children?.map") ||
+  !iconSource.includes("renderPrimitive(child")
+) {
+  throw new Error("current-build renderer must reconstruct nested SVG trees");
 }
 
 const remaining = manifest.remainingApproximationIds;

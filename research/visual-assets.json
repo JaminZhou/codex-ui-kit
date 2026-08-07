@@ -35,9 +35,9 @@
       "ownerAriaLabel": "Switch mode, current mode: Codex",
       "region": "sidebar-primary",
       "viewBox": "0 0 20 21",
-      "rootAttributes": { "fill": "none" },
+      "rootAttributes": { "fill": "none", "height": "21", "width": "20" },
       "renderSize": { "width": 14, "height": 14 },
-      "sha256": "327c642c14cb7ab26ab32f6e81081544149bc48f7cae31e66acd6287fbce4b0a",
+      "sha256": "96fa36d8a79c758bb21483f237370ffbf214ee64390cdc317a6dc7585badcc8c",
       "status": "runtime-observed",
       "primitives": [
         {
@@ -56,9 +56,9 @@
       "ownerAriaLabel": "Search",
       "region": "sidebar-primary",
       "viewBox": "0 0 16 16",
-      "rootAttributes": { "fill": "none" },
+      "rootAttributes": { "fill": "none", "height": "16", "width": "16" },
       "renderSize": { "width": 16, "height": 16 },
-      "sha256": "fa496928cb6a392dd99cfa4b154bd14b7c2d785c49ebdfa578bcac2f684e4515",
+      "sha256": "c3de27108b3e9fe4018e8d02951414394301cedb3271464a98e4a2392cd826d3",
       "status": "runtime-observed",
       "primitives": [
         {
@@ -78,9 +78,9 @@
       "ownerEvidence": "base bell primitive observed inside the attention state; the optional attention dot is intentionally omitted for the playground's neutral View activity state",
       "region": "sidebar-primary",
       "viewBox": "0 0 20 20",
-      "rootAttributes": { "fill": "none" },
+      "rootAttributes": { "fill": "none", "height": "20", "width": "20" },
       "renderSize": { "width": 16, "height": 16 },
-      "sha256": "d383b9c2f0e4c2f0b6153102212c445869fb70217d371fbe3151358ae2798e01",
+      "sha256": "27bf4ff791c74fbd4091cb0203983df184d8f62084fe7deeb145a85d6aacfd68",
       "status": "runtime-observed",
       "primitives": [
         {
@@ -100,9 +100,9 @@
       "ownerEvidence": "first primary sidebar row labelled New chat",
       "region": "sidebar-primary",
       "viewBox": "0 0 16 16",
-      "rootAttributes": { "fill": "none" },
+      "rootAttributes": { "fill": "none", "height": "16", "width": "16" },
       "renderSize": { "width": 16, "height": 16 },
-      "sha256": "67bc1e6be67e0b07646730923f55f9922ebe29f633963fb98372609cfa6881f5",
+      "sha256": "ee72ab339f8729b48aa7d6379e7a32aaed1d35ac4ee3f1d45a10e1a8f4d2ec58",
       "status": "runtime-observed",
       "primitives": [
         {
@@ -128,9 +128,9 @@
       "ownerAriaLabel": "Quick chat",
       "region": "sidebar-primary",
       "viewBox": "0 0 20 20",
-      "rootAttributes": { "fill": "currentColor" },
+      "rootAttributes": { "fill": "currentColor", "height": "20", "width": "20" },
       "renderSize": { "width": 16, "height": 16 },
-      "sha256": "1b4ed088ef0f4f3f08bbb49d45e41dd1b2dfc4cdaa055c3154c9152a42d35d8f",
+      "sha256": "68008ee8dce5767010c25b22d5e8b57fc86bf3bedeede7234005641b9a83ad06",
       "status": "runtime-observed",
       "primitives": [
         {

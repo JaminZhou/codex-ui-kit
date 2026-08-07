@@ -15,23 +15,56 @@ interface CurrentBuildIconProps extends SVGProps<SVGSVGElement> {
 const reactAttributeNames: Readonly<Record<string, string>> = {
   "clip-rule": "clipRule",
   "fill-rule": "fillRule",
+  gradienttransform: "gradientTransform",
+  gradientunits: "gradientUnits",
+  preserveaspectratio: "preserveAspectRatio",
   "stroke-linecap": "strokeLinecap",
   "stroke-linejoin": "strokeLinejoin",
   "stroke-width": "strokeWidth",
+  "xlink:href": "xlinkHref",
+};
+
+const reactTagNames: Readonly<Record<string, string>> = {
+  clippath: "clipPath",
+  lineargradient: "linearGradient",
+  radialgradient: "radialGradient",
 };
 
 function toReactAttributes(attributes: object) {
   return Object.fromEntries(
     Object.entries(attributes).map(([name, value]) => [
-      reactAttributeNames[name] ?? name,
+      reactAttributeNames[name.toLowerCase()] ?? name,
       value,
     ]),
+  );
+}
+
+type VisualPrimitive = {
+  attributes: object;
+  children?: readonly VisualPrimitive[];
+  tag: string;
+};
+
+function renderPrimitive(
+  primitive: VisualPrimitive,
+  key: string,
+): ReturnType<typeof createElement> {
+  return createElement(
+    reactTagNames[primitive.tag] ?? primitive.tag,
+    {
+      ...toReactAttributes(primitive.attributes),
+      key,
+    },
+    primitive.children?.map((child, index) =>
+      renderPrimitive(child, `${key}-${index}`),
+    ),
   );
 }
 
 export function CurrentBuildIcon({
   className,
   name,
+  style,
   ...props
 }: CurrentBuildIconProps) {
   const icon = visualAssets.icons.find((candidate) => candidate.id === name);
@@ -39,22 +72,22 @@ export function CurrentBuildIcon({
 
   return (
     <svg
+      {...toReactAttributes(icon.rootAttributes)}
       aria-hidden="true"
       className={["demo-current-build-icon", className]
         .filter(Boolean)
         .join(" ")}
       data-current-build-icon={name}
-      height={icon.renderSize.height}
+      style={{
+        height: icon.renderSize.height,
+        width: icon.renderSize.width,
+        ...style,
+      }}
       viewBox={icon.viewBox}
-      width={icon.renderSize.width}
-      {...toReactAttributes(icon.rootAttributes)}
       {...props}
     >
       {icon.primitives.map((primitive, index) =>
-        createElement(primitive.tag, {
-          ...toReactAttributes(primitive.attributes),
-          key: `${name}-${index}`,
-        }),
+        renderPrimitive(primitive, `${name}-${index}`),
       )}
     </svg>
   );

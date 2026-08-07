@@ -1,12 +1,61 @@
 import { createHash } from "node:crypto";
+import { execFileSync } from "node:child_process";
 import { chromium } from "../playgrounds/codex-app/node_modules/playwright-core/index.mjs";
 
 const port = Number(process.env.CODEX_VISUAL_ASSET_CDP_PORT);
+const expectedProfile = process.env.CODEX_VISUAL_ASSET_PROFILE;
 if (!Number.isInteger(port) || port < 1024 || port > 65535) {
   throw new Error(
     "Set CODEX_VISUAL_ASSET_CDP_PORT to an isolated loopback-only Codex CDP port.",
   );
 }
+if (
+  !expectedProfile?.startsWith("/") ||
+  (!expectedProfile.includes("/codex-ui-kit-") &&
+    !expectedProfile.includes("/.Trash/codex-ui-kit-"))
+) {
+  throw new Error(
+    "Set CODEX_VISUAL_ASSET_PROFILE to the absolute unique codex-ui-kit profile used by the isolated Codex process.",
+  );
+}
+
+const listenerPids = execFileSync(
+  "/usr/sbin/lsof",
+  ["-nP", `-iTCP:${port}`, "-sTCP:LISTEN", "-t"],
+  { encoding: "utf8" },
+)
+  .trim()
+  .split(/\s+/)
+  .filter(Boolean);
+const isolatedOwner = listenerPids.find((pid) => {
+  const command = execFileSync("/bin/ps", ["-p", pid, "-o", "command="], {
+    encoding: "utf8",
+  });
+  return (
+    command.includes("/Applications/ChatGPT.app/Contents/MacOS/ChatGPT") &&
+    command.includes("--remote-debugging-address=127.0.0.1") &&
+    command.includes(`--remote-debugging-port=${port}`) &&
+    command.includes(`--user-data-dir=${expectedProfile}`)
+  );
+});
+if (!isolatedOwner) {
+  throw new Error(
+    "CDP listener does not belong to the declared isolated Codex profile.",
+  );
+}
+
+const semanticLabels = new Map([
+  ["Add files and more", "composer-add-files"],
+  ["Back to ChatGPT", "window-back-to-chatgpt"],
+  ["Dictate", "composer-dictate"],
+  ["Don't work in a project", "composer-clear-project"],
+  ["Quick chat", "sidebar-quick-chat"],
+  ["Search", "sidebar-search"],
+  ["Start new voice chat", "composer-voice"],
+  ["Switch mode, current mode: Codex", "sidebar-mode-chevron"],
+  ["View activity", "sidebar-activity"],
+  ["View activity, needs attention", "sidebar-activity-attention"],
+]);
 
 const browser = await chromium.connectOverCDP(`http://127.0.0.1:${port}`);
 try {
@@ -33,6 +82,90 @@ try {
   });
 
   const result = await main.evaluate(() => {
+    const allowedSvgTags = new Set([
+      "circle",
+      "clippath",
+      "defs",
+      "ellipse",
+      "g",
+      "line",
+      "lineargradient",
+      "mask",
+      "path",
+      "polygon",
+      "polyline",
+      "radialgradient",
+      "rect",
+      "stop",
+      "use",
+    ]);
+    const allowedSvgAttributes = new Set([
+      "clip-path",
+      "clip-rule",
+      "color",
+      "cx",
+      "cy",
+      "d",
+      "fill",
+      "fill-opacity",
+      "fill-rule",
+      "filter",
+      "gradienttransform",
+      "gradientunits",
+      "height",
+      "href",
+      "id",
+      "mask",
+      "offset",
+      "opacity",
+      "points",
+      "preserveaspectratio",
+      "r",
+      "rx",
+      "ry",
+      "stop-color",
+      "stop-opacity",
+      "stroke",
+      "stroke-dasharray",
+      "stroke-dashoffset",
+      "stroke-linecap",
+      "stroke-linejoin",
+      "stroke-miterlimit",
+      "stroke-opacity",
+      "stroke-width",
+      "style",
+      "transform",
+      "vector-effect",
+      "width",
+      "x",
+      "x1",
+      "x2",
+      "xlink:href",
+      "y",
+      "y1",
+      "y2",
+    ]);
+    const attributes = (element) =>
+      Object.fromEntries(
+        [...element.attributes]
+          .filter((attribute) =>
+            allowedSvgAttributes.has(attribute.name.toLowerCase()),
+          )
+          .map((attribute) => [attribute.name, attribute.value])
+          .sort(([left], [right]) => left.localeCompare(right)),
+      );
+    const serializeSvgElement = (element) => {
+      const tag = element.tagName.toLowerCase();
+      if (!allowedSvgTags.has(tag)) {
+        throw new Error(`Unsupported SVG element: ${tag}`);
+      }
+      const children = [...element.children].map(serializeSvgElement);
+      return {
+        attributes: attributes(element),
+        ...(children.length > 0 ? { children } : {}),
+        tag,
+      };
+    };
     const round = (value) => Math.round(value * 100) / 100;
     const rect = (element) => {
       const value = element.getBoundingClientRect();
@@ -86,50 +219,27 @@ try {
         }
         return {
           owner: {
-            ariaLabel: owner.getAttribute("aria-label"),
-            dataTestId: owner.getAttribute("data-testid"),
+            rawSemanticLabel: owner.getAttribute("aria-label"),
             role: owner.getAttribute("role") ?? owner.tagName.toLowerCase(),
-            title: owner.getAttribute("title"),
           },
-          primitives: [...svg.children].map((child) => ({
-            attributes: Object.fromEntries(
-              [...child.attributes]
-                .map((attribute) => [attribute.name, attribute.value])
-                .sort(([left], [right]) => left.localeCompare(right)),
-            ),
-            tag: child.tagName.toLowerCase(),
-          })),
+          primitives: [...svg.children].map(serializeSvgElement),
           region: targetRegion,
           rect: rect(svg),
-          rootAttributes: Object.fromEntries(
-            [...svg.attributes]
-              .filter((attribute) =>
-                [
-                  "color",
-                  "fill",
-                  "stroke",
-                  "stroke-linecap",
-                  "stroke-linejoin",
-                  "stroke-width",
-                ].includes(attribute.name),
-              )
-              .map((attribute) => [attribute.name, attribute.value])
-              .sort(([left], [right]) => left.localeCompare(right)),
-          ),
+          rootAttributes: attributes(svg),
           style: style(svg),
           viewBox: svg.getAttribute("viewBox"),
         };
       })
       .filter(Boolean);
     const fontSamples = [
-      document.querySelector('[contenteditable="true"][role="textbox"]'),
-      document.querySelector("main"),
-      document.querySelector("nav"),
+      ["composer", document.querySelector('[contenteditable="true"][role="textbox"]')],
+      ["main", document.querySelector("main")],
+      ["navigation", document.querySelector("nav")],
     ]
-      .filter(Boolean)
-      .map((element) => ({
-        ariaLabel: element.getAttribute("aria-label"),
+      .filter(([, element]) => Boolean(element))
+      .map(([sample, element]) => ({
         rect: rect(element),
+        sample,
         style: style(element),
         tag: element.tagName,
       }));
@@ -153,6 +263,10 @@ try {
     });
   result.icons = result.icons.map((icon) => ({
     ...icon,
+    owner: {
+      role: icon.owner.role,
+      semanticId: semanticLabels.get(icon.owner.rawSemanticLabel) ?? null,
+    },
     sha256: createHash("sha256")
       .update(
         canonicalize({

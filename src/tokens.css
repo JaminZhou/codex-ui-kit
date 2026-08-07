@@ -65,7 +65,7 @@
   --codex-ui-code-syntax-dark-variable: #df3079;
   --codex-ui-code-syntax-dark-title: #f22c3d;
 
-  --codex-ui-font-sans-default: -apple-system, "system-ui", "Segoe UI",
+  --codex-ui-font-sans-default: -apple-system, system-ui, "Segoe UI",
     sans-serif;
   --codex-ui-font-openai-sans: "OpenAI Sans",
     var(--codex-ui-font-sans-default);
