@@ -209,6 +209,7 @@ export interface DemoProtocolState {
   messages: DemoMessage[];
   retrying: boolean;
   status: DemoTurnStatus;
+  subagentLifecycles: DemoSubagent[];
   subagents: DemoSubagent[];
   threadId: string | null;
   timeline: DemoTimelineEntry[];
@@ -236,6 +237,7 @@ export const initialProtocolState: DemoProtocolState = {
   messages: [],
   retrying: false,
   status: "idle",
+  subagentLifecycles: [],
   subagents: [],
   threadId: null,
   timeline: [],
@@ -343,6 +345,19 @@ function upsertMessage(
 
 function upsertById<T extends { id: string }>(items: T[], item: T): T[] {
   const index = items.findIndex(({ id }) => id === item.id);
+  if (index === -1) return [...items, item];
+  const next = [...items];
+  next[index] = { ...next[index], ...item };
+  return next;
+}
+
+function upsertSubagentLifecycle(
+  items: DemoSubagent[],
+  item: DemoSubagent,
+): DemoSubagent[] {
+  const index = items.findIndex(
+    ({ callId, id }) => callId === item.callId && id === item.id,
+  );
   if (index === -1) return [...items, item];
   const next = [...items];
   next[index] = { ...next[index], ...item };
@@ -638,6 +653,21 @@ export function isCurrentTurnGroupActive(
     groupTurnId !== null &&
     groupTurnId === state.currentTurnId &&
     isTurnActive(state.status)
+  );
+}
+
+export function subagentLifecycleGroup(
+  state: Pick<DemoProtocolState, "subagentLifecycles">,
+  callId: string,
+): DemoSubagent[] {
+  const entrySubagent = state.subagentLifecycles.find(
+    (subagent) => subagent.callId === callId,
+  );
+  if (!entrySubagent) return [];
+  return state.subagentLifecycles.filter((subagent) =>
+    entrySubagent.turnId === null
+      ? subagent.callId === entrySubagent.callId
+      : subagent.turnId === entrySubagent.turnId,
   );
 }
 
@@ -978,6 +1008,15 @@ export function reduceProtocolNotification(
           turnId: itemTurnId,
         });
       }, state.subagents);
+      const subagentLifecycles = receiverThreadIds.reduce(
+        (items, id) => {
+          const subagent = subagents.find((candidate) => candidate.id === id);
+          return subagent
+            ? upsertSubagentLifecycle(items, subagent)
+            : items;
+        },
+        state.subagentLifecycles,
+      );
       const senderThreadId = asString(item.senderThreadId);
       const timelineId = receiverThreadIds
         .map((id) => subagents.find((candidate) => candidate.id === id)?.callId)
@@ -994,6 +1033,7 @@ export function reduceProtocolNotification(
           callStatus === "inProgress" && hasReportedActiveSubagent
             ? "running"
             : next.status,
+        subagentLifecycles,
         subagents,
         timeline: insertSubagentTimeline(
           state.timeline,
@@ -1044,12 +1084,17 @@ export function reduceProtocolNotification(
         turnId: itemTurnId,
       };
       const subagents = upsertById(state.subagents, activitySubagent);
+      const subagentLifecycles = upsertSubagentLifecycle(
+        state.subagentLifecycles,
+        activitySubagent,
+      );
       const parentCallId = sourceThreadId
         ? subagents.find(({ id }) => id === sourceThreadId)?.callId ?? null
         : null;
       return {
         ...next,
         status: isDone ? next.status : "running",
+        subagentLifecycles,
         subagents,
         timeline: insertSubagentTimeline(
           state.timeline,

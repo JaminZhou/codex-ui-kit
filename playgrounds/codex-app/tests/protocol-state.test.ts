@@ -10,6 +10,7 @@ import {
   reduceProtocolNotification,
   reduceProtocolTrace,
   settleApprovedCommandReplay,
+  subagentLifecycleGroup,
   terminalTranscriptEvents,
 } from "../src/protocol-state";
 import { replayScenarios } from "../src/replay";
@@ -1572,6 +1573,38 @@ describe("protocol lifecycle reducer", () => {
       status: "done",
       tool: "resumeAgent",
     });
+    expect(
+      settled.subagentLifecycles.filter(({ id }) => id === "alpha"),
+    ).toEqual([
+      expect.objectContaining({
+        callId: "collab-subagent-alpha",
+        completedAtMs: 32_000,
+        message: "ALPHA SUBAGENT DONE",
+        turnId: "turn-subagent-concurrency",
+      }),
+      expect.objectContaining({
+        callId: "collab-resume-alpha",
+        completedAtMs: 105_000,
+        message: "ALPHA RESUMED DONE",
+        turnId: "turn-resume-alpha",
+      }),
+    ]);
+    expect(
+      subagentLifecycleGroup(settled, "collab-subagent-alpha").map(
+        ({ id }) => id,
+      ),
+    ).toEqual(["alpha", "beta"]);
+    expect(
+      subagentLifecycleGroup(settled, "collab-resume-alpha").map(
+        ({ id }) => id,
+      ),
+    ).toEqual(["alpha"]);
+    expect(settled.timeline).toEqual(
+      expect.arrayContaining([
+        { id: "collab-subagent-alpha", kind: "subagent" },
+        { id: "collab-resume-alpha", kind: "subagent" },
+      ]),
+    );
   });
 
   it("does not reactivate a completed subagent from a late activity event", () => {

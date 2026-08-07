@@ -103,8 +103,10 @@ import {
   messageAttachmentPreviewSource,
   reduceProtocolNotification,
   settleApprovedCommandReplay,
+  subagentLifecycleGroup,
   terminalTranscriptEvents,
   type DemoProtocolState,
+  type DemoSubagent,
   type ProtocolEventRecord,
 } from "./protocol-state";
 import { changeStats, reviewContent } from "./diff-lines";
@@ -372,6 +374,43 @@ function compactSubagentTime(timestampMs: number, nowMs: number) {
   if (elapsedMs < 3_600_000) return `${Math.floor(elapsedMs / 60_000)}m`;
   if (elapsedMs < 86_400_000) return `${Math.floor(elapsedMs / 3_600_000)}h`;
   return `${Math.floor(elapsedMs / 86_400_000)}d`;
+}
+
+function presentSubagent(
+  subagent: DemoSubagent,
+  mode: "live" | "replay",
+  nowMs: number,
+): SubagentItem {
+  const timestampMs =
+    subagent.status === "done"
+      ? subagent.completedAtMs
+      : subagent.startedAtMs;
+  const relativeTime =
+    mode === "live" && timestampMs !== null
+      ? {
+          timestamp: `${compactSubagentTime(timestampMs, nowMs)}${subagent.status === "done" ? " ago" : ""}`,
+        }
+      : {
+          timestamp: subagent.status === "done" ? "1m ago" : "0s",
+        };
+  return {
+    ...relativeTime,
+    dateTime:
+      mode !== "live" || timestampMs === null
+        ? undefined
+        : new Date(timestampMs).toISOString(),
+    id: subagent.id,
+    lastMessage: subagent.message ?? undefined,
+    name: subagent.name ?? undefined,
+    sortTimestampMs: timestampMs ?? undefined,
+    status: subagent.status,
+    statusSummary:
+      subagent.status === "active"
+        ? subagent.message ?? "Working"
+        : subagent.status === "waiting"
+          ? "Thinking"
+          : subagent.message ?? undefined,
+  };
 }
 
 function initialComposerValue(frame: string | null) {
@@ -2687,38 +2726,9 @@ export function App() {
         : state.status;
   const subagentItems = useMemo<SubagentItem[]>(
     () =>
-      state.subagents.map((subagent) => {
-        const timestampMs =
-          subagent.status === "done"
-            ? subagent.completedAtMs
-            : subagent.startedAtMs;
-        const relativeTime =
-          mode === "live" && timestampMs !== null
-            ? {
-                timestamp: `${compactSubagentTime(timestampMs, subagentClockMs)}${subagent.status === "done" ? " ago" : ""}`,
-              }
-            : {
-                timestamp: subagent.status === "done" ? "1m ago" : "0s",
-              };
-        return {
-          ...relativeTime,
-          dateTime:
-            mode !== "live" || timestampMs === null
-              ? undefined
-              : new Date(timestampMs).toISOString(),
-          id: subagent.id,
-          lastMessage: subagent.message ?? undefined,
-          name: subagent.name ?? undefined,
-          sortTimestampMs: timestampMs ?? undefined,
-          status: subagent.status,
-          statusSummary:
-            subagent.status === "active"
-              ? subagent.message ?? "Working"
-              : subagent.status === "waiting"
-                ? "Thinking"
-              : subagent.message ?? undefined,
-        };
-      }),
+      state.subagents.map((subagent) =>
+        presentSubagent(subagent, mode, subagentClockMs),
+      ),
     [mode, state.subagents, subagentClockMs],
   );
   const selectedSubagent =
@@ -5160,17 +5170,12 @@ export function App() {
     }
 
     if (entry.kind === "subagent") {
-      const entrySubagent = state.subagents.find(
+      const entrySubagent = state.subagentLifecycles.find(
         (subagent) => subagent.callId === entry.id,
       );
       if (!entrySubagent) return null;
       const groupTurnId = entrySubagent.turnId;
-      const turnSubagents = state.subagents.filter(
-        (subagent) =>
-          (groupTurnId === null
-            ? subagent.callId === entrySubagent.callId
-            : subagent.turnId === groupTurnId),
-      );
+      const turnSubagents = subagentLifecycleGroup(state, entry.id);
       const turnActive = isCurrentTurnGroupActive(state, groupTurnId);
       const groupedSubagents = turnActive
         ? turnSubagents.filter(
@@ -5185,8 +5190,8 @@ export function App() {
               senderThreadId === null || senderThreadId === state.threadId,
           ) ?? groupedSubagents[0];
       if (groupEntrySubagent?.callId !== entry.id) return null;
-      const callSubagents = subagentItems.filter((item) =>
-        groupedSubagents.some((subagent) => subagent.id === item.id),
+      const callSubagents = groupedSubagents.map((subagent) =>
+        presentSubagent(subagent, mode, subagentClockMs),
       );
       if (callSubagents.length === 0) return null;
       const working = callSubagents.filter(
@@ -5198,18 +5203,12 @@ export function App() {
           : working.length > 0 || mode !== "live"
             ? working
             : callSubagents;
-      const startedAtMs = state.subagents
-        .filter((item) =>
-          groupedSubagents.some((subagent) => subagent.id === item.id),
-        )
+      const startedAtMs = groupedSubagents
         .flatMap((item) =>
           item.startedAtMs === null ? [] : [item.startedAtMs],
         )
         .sort((left, right) => left - right)[0];
-      const completedAtMs = state.subagents
-        .filter((item) =>
-          groupedSubagents.some((subagent) => subagent.id === item.id),
-        )
+      const completedAtMs = groupedSubagents
         .flatMap((item) =>
           item.completedAtMs === null ? [] : [item.completedAtMs],
         )
