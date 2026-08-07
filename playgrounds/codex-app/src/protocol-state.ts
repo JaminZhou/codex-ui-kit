@@ -445,16 +445,17 @@ function rekeySubagentTimeline(
   callId: string,
 ): DemoTimelineEntry[] {
   if (provisionalIds.size === 0) return timeline;
-  const firstProvisionalIndex = timeline.findIndex(
-    ({ id, kind }) => kind === "subagent" && provisionalIds.has(id),
+  const firstAffectedIndex = timeline.findIndex(
+    ({ id, kind }) =>
+      kind === "subagent" && (provisionalIds.has(id) || id === callId),
   );
   const filtered = timeline.filter(
     ({ id, kind }) =>
       kind !== "subagent" || (!provisionalIds.has(id) && id !== callId),
   );
-  if (firstProvisionalIndex === -1) return filtered;
+  if (firstAffectedIndex === -1) return filtered;
   const insertionIndex = timeline
-    .slice(0, firstProvisionalIndex)
+    .slice(0, firstAffectedIndex)
     .filter(
       ({ id, kind }) =>
         kind !== "subagent" || (!provisionalIds.has(id) && id !== callId),
@@ -1110,14 +1111,16 @@ export function reduceProtocolNotification(
               : "done";
         const rekeysProvisionalLifecycle =
           existing?.provisional === true && existing.turnId === itemTurnId;
-        const startsResumedLifecycle =
-          reportedTool === "resumeAgent" &&
+        const startsNewLifecycle =
           existing?.callId !== itemId &&
+          (reportedTool === "resumeAgent" ||
+            existing?.turnId !== itemTurnId ||
+            (reportedTool === "sendInput" && existing?.status === "done")) &&
           !rekeysProvisionalLifecycle;
         const status =
           existing?.status === "done" &&
           reportedStatus !== "done" &&
-          !startsResumedLifecycle &&
+          !startsNewLifecycle &&
           !rekeysProvisionalLifecycle
             ? "done"
             : reportedStatus;
@@ -1125,7 +1128,7 @@ export function reduceProtocolNotification(
           status === "done" && reportedStatus !== "done"
             ? existing?.threadStatus ?? reportedThreadStatus
             : reportedThreadStatus;
-        const startedAtMs = startsResumedLifecycle
+        const startedAtMs = startsNewLifecycle
           ? reportedStartedAtMs
           : existing?.startedAtMs === null ||
               existing?.startedAtMs === undefined
@@ -1133,7 +1136,7 @@ export function reduceProtocolNotification(
             : reportedStartedAtMs === null
               ? existing.startedAtMs
               : Math.min(existing.startedAtMs, reportedStartedAtMs);
-        const completedAtMs = startsResumedLifecycle
+        const completedAtMs = startsNewLifecycle
           ? reportedStatus === "done"
             ? reportedCompletedAtMs
             : null
@@ -1145,18 +1148,18 @@ export function reduceProtocolNotification(
             (reportedStatus === "done" ? reportedCompletedAtMs : null);
         return upsertById(items, {
           agentPath: existing?.agentPath ?? null,
-          callId: startsResumedLifecycle || rekeysProvisionalLifecycle
+          callId: startsNewLifecycle || rekeysProvisionalLifecycle
             ? itemId
             : existing?.callId ?? itemId,
           completedAtMs,
           id,
-          message: startsResumedLifecycle
+          message: startsNewLifecycle
             ? asString(agentState.message)
             : asString(agentState.message) ?? existing?.message ?? null,
           name:
             existing?.name ??
             subagentName(existing?.agentPath ?? null, id),
-          prompt: startsResumedLifecycle
+          prompt: startsNewLifecycle
             ? asString(item.prompt) ?? existing?.prompt ?? null
             : existing?.prompt ?? asString(item.prompt) ?? null,
           provisional: false,
@@ -1168,8 +1171,8 @@ export function reduceProtocolNotification(
           status,
           threadStatus,
           tool:
-            startsResumedLifecycle || rekeysProvisionalLifecycle
-              ? reportedTool ?? "resumeAgent"
+            startsNewLifecycle || rekeysProvisionalLifecycle
+              ? reportedTool ?? "spawnAgent"
               : existing?.tool ?? reportedTool ?? "spawnAgent",
           turnId: itemTurnId,
         });
@@ -1212,7 +1215,9 @@ export function reduceProtocolNotification(
       return {
         ...next,
         status:
-          callStatus === "inProgress" && hasReportedActiveSubagent
+          itemTurnId === state.currentTurnId &&
+          callStatus === "inProgress" &&
+          hasReportedActiveSubagent
             ? "running"
             : next.status,
         subagentLifecycles,
@@ -1303,7 +1308,11 @@ export function reduceProtocolNotification(
       return {
         ...next,
         status:
-          updatesCurrentSubagent && !isDone ? "running" : next.status,
+          itemTurnId === state.currentTurnId &&
+          updatesCurrentSubagent &&
+          !isDone
+            ? "running"
+            : next.status,
         subagentLifecycles,
         subagents,
         timeline: insertSubagentTimeline(
