@@ -57,9 +57,12 @@ node scripts/capture-current-visual-assets.mjs
 
 The capture script is read-only: it first proves that every listener is bound
 only to the declared loopback endpoint and that exactly one listener process
-has the exact executable, port, address, and canonical unique-profile argv.
+has the exact kernel-reported executable and NUL-delimited argv for the port,
+address, and canonical unique profile. Every additional inherited listener
+must descend from that exact main process.
 It then selects the largest main Renderer
 and outputs a recursive allowlisted SVG tree, allowlisted static semantic IDs,
 geometry, computed style, and de-identified font samples. It never emits raw
-page, conversation, project, account, title, aria-label, or test-id text.
+page, conversation, project, account, title, aria-label, or test-id text. An
+inline SVG `style` attribute fails capture instead of producing a lossy hash.
 Process/profile setup and exact-PID cleanup remain explicit operator steps.

@@ -2,6 +2,7 @@ import { createHash } from "node:crypto";
 import { execFileSync } from "node:child_process";
 import { realpathSync } from "node:fs";
 import { homedir } from "node:os";
+import { fileURLToPath } from "node:url";
 import { chromium } from "../playgrounds/codex-app/node_modules/playwright-core/index.mjs";
 
 const port = Number(process.env.CODEX_VISUAL_ASSET_CDP_PORT);
@@ -57,11 +58,33 @@ if (
   );
 }
 
-const isolatedOwners = listeners.filter(({ pid }) => {
-  const command = execFileSync("/bin/ps", ["-p", pid, "-o", "command="], {
+const processInfoScript = fileURLToPath(
+  new URL("./read-macos-process-info.py", import.meta.url),
+);
+const processInfo = (pid) =>
+  JSON.parse(
+    execFileSync("/usr/bin/python3", [processInfoScript, pid], {
+      encoding: "utf8",
+    }),
+  );
+const parentPid = (pid) => {
+  const value = execFileSync("/bin/ps", ["-p", pid, "-o", "ppid="], {
     encoding: "utf8",
   }).trim();
-  const argv = command.split(/\s+/);
+  if (!/^\d+$/.test(value)) {
+    throw new Error(`Could not prove parentage for CDP listener PID ${pid}.`);
+  }
+  return value;
+};
+
+const isolatedOwners = listeners.filter(({ pid }) => {
+  let argv;
+  let executablePath;
+  try {
+    ({ argv, executablePath } = processInfo(pid));
+  } catch {
+    return false;
+  }
   const valuesFor = (prefix) =>
     argv
       .filter((argument) => argument.startsWith(prefix))
@@ -76,7 +99,8 @@ const isolatedOwners = listeners.filter(({ pid }) => {
     return false;
   }
   return (
-    argv[0] === "/Applications/ChatGPT.app/Contents/MacOS/ChatGPT" &&
+    executablePath === "/Applications/ChatGPT.app/Contents/MacOS/ChatGPT" &&
+    argv[0] === executablePath &&
     addresses.length === 1 &&
     addresses[0] === "127.0.0.1" &&
     ports.length === 1 &&
@@ -89,6 +113,24 @@ if (isolatedOwners.length !== 1) {
   throw new Error(
     "CDP listener ownership is ambiguous or does not exactly match the declared isolated Codex profile.",
   );
+}
+const isolatedOwnerPid = isolatedOwners[0].pid;
+for (const listener of listeners) {
+  if (listener.pid === isolatedOwnerPid) continue;
+  const visited = new Set();
+  let descendantPid = listener.pid;
+  while (descendantPid !== isolatedOwnerPid && descendantPid !== "1") {
+    if (visited.has(descendantPid)) {
+      throw new Error(`Cycle detected while proving listener PID ${listener.pid}.`);
+    }
+    visited.add(descendantPid);
+    descendantPid = parentPid(descendantPid);
+  }
+  if (descendantPid !== isolatedOwnerPid) {
+    throw new Error(
+      `CDP listener PID ${listener.pid} does not descend from isolated owner PID ${isolatedOwnerPid}.`,
+    );
+  }
 }
 
 const semanticLabels = new Map([
@@ -199,8 +241,13 @@ try {
       "y1",
       "y2",
     ]);
-    const attributes = (element) =>
-      Object.fromEntries(
+    const attributes = (element) => {
+      if (element.hasAttribute("style")) {
+        throw new Error(
+          `Inline SVG style attributes are unsupported: ${element.tagName.toLowerCase()}`,
+        );
+      }
+      return Object.fromEntries(
         [...element.attributes]
           .filter((attribute) =>
             allowedSvgAttributes.has(attribute.name.toLowerCase()),
@@ -208,6 +255,7 @@ try {
           .map((attribute) => [attribute.name, attribute.value])
           .sort(([left], [right]) => left.localeCompare(right)),
       );
+    };
     const serializeSvgElement = (element) => {
       const tag = element.tagName.toLowerCase();
       if (!allowedSvgTags.has(tag)) {

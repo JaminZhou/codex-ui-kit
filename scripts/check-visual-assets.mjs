@@ -15,14 +15,26 @@ const playgroundStylesUrl = new URL(
   "../playgrounds/codex-app/src/styles.css",
   import.meta.url,
 );
+const captureScriptUrl = new URL(
+  "./capture-current-visual-assets.mjs",
+  import.meta.url,
+);
 
-const [manifestText, packageText, iconSource, appSource, playgroundStyles] =
+const [
+  manifestText,
+  packageText,
+  iconSource,
+  appSource,
+  playgroundStyles,
+  captureSource,
+] =
   await Promise.all([
     readFile(manifestUrl, "utf8"),
     readFile(packageUrl, "utf8"),
     readFile(playgroundIconUrl, "utf8"),
     readFile(playgroundAppUrl, "utf8"),
     readFile(playgroundStylesUrl, "utf8"),
+    readFile(captureScriptUrl, "utf8"),
   ]);
 const manifest = JSON.parse(manifestText);
 const packageJson = JSON.parse(packageText);
@@ -213,6 +225,15 @@ if (
   !iconSource.includes("renderPrimitive(child")
 ) {
   throw new Error("current-build renderer must reconstruct nested SVG trees");
+}
+if (
+  !captureSource.includes("read-macos-process-info.py") ||
+  !captureSource.includes("does not descend from isolated owner PID") ||
+  !captureSource.includes("Inline SVG style attributes are unsupported")
+) {
+  throw new Error(
+    "visual capture must prove argv and listener ancestry and fail closed on inline SVG style",
+  );
 }
 
 const remaining = manifest.remainingApproximationIds;
