@@ -377,6 +377,32 @@ function appendTimeline(
     : [...timeline, entry];
 }
 
+function insertSubagentTimeline(
+  timeline: DemoTimelineEntry[],
+  entry: DemoTimelineEntry,
+  parentCallId: string | null,
+): DemoTimelineEntry[] {
+  if (
+    timeline.some(
+      ({ id, kind }) => id === entry.id && kind === entry.kind,
+    )
+  ) {
+    return timeline;
+  }
+  const parentIndex = parentCallId
+    ? timeline.findIndex(
+        ({ id, kind }) => id === parentCallId && kind === "subagent",
+      )
+    : -1;
+  return parentIndex === -1
+    ? [...timeline, entry]
+    : [
+        ...timeline.slice(0, parentIndex),
+        entry,
+        ...timeline.slice(parentIndex),
+      ];
+}
+
 function appendTerminalEvent(
   events: DemoTerminalEvent[],
   event: DemoTerminalEvent,
@@ -920,6 +946,9 @@ export function reduceProtocolNotification(
       const timelineId = receiverThreadIds
         .map((id) => subagents.find((candidate) => candidate.id === id)?.callId)
         .find((id): id is string => Boolean(id)) ?? itemId;
+      const parentCallId = senderThreadId
+        ? subagents.find(({ id }) => id === senderThreadId)?.callId ?? null
+        : null;
       const hasReportedActiveSubagent = receiverThreadIds.some(
         (id) => subagents.find((candidate) => candidate.id === id)?.status !== "done",
       );
@@ -930,13 +959,11 @@ export function reduceProtocolNotification(
             ? "running"
             : next.status,
         subagents,
-        timeline:
-          senderThreadId === null || senderThreadId === state.threadId
-            ? appendTimeline(state.timeline, {
-                id: timelineId,
-                kind: "subagent",
-              })
-            : state.timeline,
+        timeline: insertSubagentTimeline(
+          state.timeline,
+          { id: timelineId, kind: "subagent" },
+          parentCallId,
+        ),
       };
     }
     if (itemType === "subAgentActivity") {
@@ -978,14 +1005,18 @@ export function reduceProtocolNotification(
         turnId: itemTurnId,
       };
       const subagents = upsertById(state.subagents, activitySubagent);
+      const parentCallId = sourceThreadId
+        ? subagents.find(({ id }) => id === sourceThreadId)?.callId ?? null
+        : null;
       return {
         ...next,
         status: isDone ? next.status : "running",
         subagents,
-        timeline:
-          sourceThreadId === null || sourceThreadId === state.threadId
-            ? appendTimeline(state.timeline, { id: callId, kind: "subagent" })
-            : state.timeline,
+        timeline: insertSubagentTimeline(
+          state.timeline,
+          { id: callId, kind: "subagent" },
+          parentCallId,
+        ),
       };
     }
     if (itemType === "userMessage") {

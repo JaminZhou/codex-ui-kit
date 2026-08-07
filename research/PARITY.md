@@ -210,10 +210,13 @@ The authoritative current-build inventory is:
   Parent/Child task cover two-working, mixed active/done, two-done, live
   progress preview, and independent transcripts. The nested reducer preserves
   public `/root/parent/child` identity while the visual panel stays flat, as
-  observed. Browser/CDP covers 111 frames, Electron drives both mixed lists,
-  and nine collaboration crops pass between 1.36% and 4.67%. Waiting,
-  failure, cancellation, pagination, streaming, and transport recovery remain
-  open.
+  observed, while the main conversation keeps Child and Parent activity as
+  separate hierarchy-ordered blocks. Browser/CDP covers 111 frames, Electron
+  drives both mixed lists, and nine collaboration scenes gate ten current-build
+  regions: panel/summary/transcript crops pass between 1.32% and 4.67%, while
+  the compact main-activity crop passes at 11.50% under its independent 12.5%
+  limit. Waiting, failure, cancellation, pagination, streaming, and transport
+  recovery remain open.
 - npm publication remains out of scope until the agreed P0/P1 coverage and
   release acceptance surfaces are complete.
 

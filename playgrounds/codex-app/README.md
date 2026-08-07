@@ -620,14 +620,17 @@ delegation on `26.730.61639`:
   public `subAgentActivity.agentPath`, and matches the current flat shared
   panel instead of inventing a visual tree;
 - the protocol reducer derives stable public names from paths, groups sibling
-  root activity, excludes nested child calls from the root activity row, and
-  retains both levels in summary, panel, and transcript navigation;
+  root activity, keeps nested Child and Parent activity blocks independently
+  ordered by hierarchy, and retains both levels in summary, panel, and
+  transcript navigation;
 - the schema-validated suite reaches 24 fixtures and 281 events, Browser/CDP
   reaches 111 lifecycle frames, and Electron drives both mixed-state lists;
-- nine current-build overlay comparisons cover concurrent running/mixed
-  summaries, mixed/completed panels, transcript, plus the nested
-  running/mixed/completed/transcript lifecycle, passing from 1.3606% to
-  4.6708% under a 5.5% hard limit.
+- nine current-build scenes exercise ten ownership-scoped comparisons across
+  concurrent running/mixed summaries, mixed/completed panels, transcript,
+  the nested running/mixed/completed/transcript lifecycle, and the nested
+  Child/Parent main activity band. Panel/summary/transcript regions pass from
+  1.3207% to 4.6708% under a 5.5% hard limit; the compact text-heavy activity
+  band passes at 11.4952% under its independent 12.5% limit.
 
 ## Development
 
@@ -724,8 +727,8 @@ CODEX_UI_KIT_SUBAGENT_TRANSCRIPT_REFERENCE=/absolute/path/to/subagent-transcript
 ```
 
 The collaboration extension accepts the raw current-build concurrent and
-nested screenshots while comparing only the owned summary, panel, and
-transcript regions:
+nested screenshots while comparing only the owned summary, panel, transcript,
+and nested main-activity regions:
 
 ```bash
 CODEX_UI_KIT_SUBAGENT_CONCURRENT_SUMMARY_REFERENCE=/absolute/path/to/concurrent-summary.png \

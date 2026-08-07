@@ -1400,6 +1400,7 @@ describe("protocol lifecycle reducer", () => {
       }),
     ]);
     expect(running.timeline.filter(({ kind }) => kind === "subagent")).toEqual([
+      { id: "collab-subagent-child", kind: "subagent" },
       { id: "collab-subagent-parent", kind: "subagent" },
     ]);
     expect(mixed.subagents).toEqual([

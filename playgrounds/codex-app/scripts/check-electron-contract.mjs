@@ -4421,13 +4421,19 @@ for (const collaborationScene of [
     const panel = page.getByTestId("subagent-panel");
     await panel.waitFor();
     const panelText = (await panel.textContent())?.replace(/\s+/g, " ").trim();
+    const panelAgentNames = await panel
+      .locator(
+        ".codex-ui-subagent-panel__item-heading > span:first-child",
+      )
+      .allTextContents();
     if (
       !panelText?.includes(`Active · ${collaborationScene.active}`) ||
       !panelText.includes(`Done · ${collaborationScene.done}`) ||
-      collaborationScene.agents.some((agent) => !panelText.includes(agent))
+      JSON.stringify(panelAgentNames) !==
+        JSON.stringify(collaborationScene.agents)
     ) {
       throw new Error(
-        `Electron ${collaborationScene.scenario} mixed lifecycle failed: ${JSON.stringify(panelText)}`,
+        `Electron ${collaborationScene.scenario} mixed lifecycle failed: ${JSON.stringify({ panelAgentNames, panelText })}`,
       );
     }
     await panel

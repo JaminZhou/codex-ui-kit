@@ -487,12 +487,16 @@ for (const scene of visualScenes) {
         const summary = document.querySelector(
           ".demo-subagent-summary-panel",
         );
-        const timeline = document.querySelector(
-          ".demo-subagent-activity-timeline",
-        );
-        const activity = document.querySelector(
-          ".codex-ui-subagent-activity, .codex-ui-subagent-activity-group",
-        );
+        const timelines = [
+          ...document.querySelectorAll(
+            ".demo-subagent-activity-timeline",
+          ),
+        ];
+        const activities = [
+          ...document.querySelectorAll(
+            ".codex-ui-subagent-activity, .codex-ui-subagent-activity-group",
+          ),
+        ];
         const panel = document.querySelector(
           '[data-testid="subagent-panel"]',
         );
@@ -510,8 +514,8 @@ for (const scene of visualScenes) {
         );
         return {
           activity: {
-            rect: rect(activity),
-            text: text(activity),
+            rect: rect(activities[0]),
+            texts: activities.map((item) => text(item)),
           },
           frame: root?.getAttribute("data-frame") ?? null,
           horizontalOverflow:
@@ -523,6 +527,13 @@ for (const scene of visualScenes) {
             headingStyle: style(panelHeading),
             rect: rect(panel),
             row: rect(panelRow),
+            rowNames: panel
+              ? [
+                  ...panel.querySelectorAll(
+                    ".codex-ui-subagent-panel__item-heading > span:first-child",
+                  ),
+                ].map((item) => text(item))
+              : [],
             rowStyle: style(panelRow),
             sectionCount:
               panel?.querySelectorAll(
@@ -547,8 +558,9 @@ for (const scene of visualScenes) {
             text: text(summary),
           },
           timeline: {
-            rect: rect(timeline),
-            text: text(timeline),
+            rect: rect(timelines[0]),
+            text: text(timelines[0]),
+            texts: timelines.map((item) => text(item)),
           },
           transcript: {
             actions: Boolean(
@@ -592,13 +604,22 @@ for (const scene of visualScenes) {
       const nested = scene.scenario === "subagent-nested";
       const activeCount = running ? (mixed ? 1 : concurrent || nested ? 2 : 1) : 0;
       const doneCount = mixed ? 1 : running ? 0 : concurrent || nested ? 2 : 1;
-      const expectedActivity = concurrent
-        ? mixed
-          ? "Beta started working"
-          : "AlphaBetastarted working"
+      const expectedActivities = !running
+        ? []
+        : concurrent
+          ? ["AlphaBetastarted working"]
+          : nested
+            ? mixed
+              ? ["Child finished", "Parent started working"]
+              : ["Child started working", "Parent started working"]
+            : ["Long probe started working"];
+      const expectedPanelRows = concurrent
+        ? ["Beta", "Alpha"]
         : nested
-          ? "Parent started working"
-          : "Long probe started working";
+          ? mixed || !running
+            ? ["Parent", "Child"]
+            : ["Child", "Parent"]
+          : ["Long probe"];
       const expectedCompletedDuration = concurrent
         ? "Worked for 1m 19s"
         : nested
@@ -624,11 +645,14 @@ for (const scene of visualScenes) {
         );
       }
       if (
-        running !== Boolean(contract.activity.rect) ||
+        JSON.stringify(contract.activity.texts) !==
+          JSON.stringify(expectedActivities) ||
         (running &&
-          (contract.activity.text !== expectedActivity ||
-            contract.timeline.text !==
-              `Working for 14s${expectedActivity}`)) ||
+          (contract.timeline.texts.length !== expectedActivities.length ||
+            expectedActivities.some(
+              (expected, index) =>
+                !contract.timeline.texts[index]?.endsWith(expected),
+            ))) ||
         (!running && contract.timeline.text !== expectedCompletedDuration)
       ) {
         throw new Error(
@@ -679,6 +703,8 @@ for (const scene of visualScenes) {
         panelOpen &&
         !transcriptOpen &&
         (!contract.panel.rect ||
+          JSON.stringify(contract.panel.rowNames) !==
+            JSON.stringify(expectedPanelRows) ||
           contract.panel.sectionCount !== (running && !mixed ? 1 : 2) ||
           !contract.panel.text?.includes(
             `Active · ${activeCount}`,

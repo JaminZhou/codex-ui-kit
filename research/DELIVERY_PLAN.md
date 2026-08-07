@@ -29,8 +29,10 @@ exit gates; it does not replace the inventory.
   the session, mismatch, input, picker, close, and resize interactions; the
   current 906×820 panel/content pixel ratios pass at 1.5120%/0.4004%.
   The single-subagent summary/panel/transcript regional ratios pass at
-  4.1812%/1.3451%/1.5969%; nine concurrent/nested regions pass between
-  1.3606% and 4.6708%.
+  4.1812%/1.3451%/1.5969%. Nine concurrent/nested scenes now gate ten regions:
+  panel/summary/transcript comparisons pass between 1.3207% and 4.6708%, and
+  the compact nested main-activity band passes at 11.4952% under its separate
+  12.5% limit.
 - The previous `26.730.61309` refresh covered all six left-sidebar groups,
   selected/no-project and New worktree entry, plus sampled command, approval,
   interruption, compaction, summary, and pasted-image surfaces. The sidebar capture locks the

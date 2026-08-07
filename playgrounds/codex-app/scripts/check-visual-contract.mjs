@@ -1990,6 +1990,28 @@ for (const scene of selectedScenes) {
     });
   }
 
+  if (
+    scene.id === "subagent-nested-panel-running" &&
+    currentBuildSubagentNestedRunningReference
+  ) {
+    await compareCurrentBuildOverlay({
+      actual,
+      actualBounds: { height: 115, left: 290, top: 232, width: 205 },
+      // This compact text-heavy crop has little blank surface to dilute
+      // one-pixel font-rasterization differences between packaged Electron
+      // and the local harness, so it uses its own regional budget.
+      defaultMaximumRatio: 0.125,
+      masks: [
+        { height: 28, left: 0, top: 0, width: 24 },
+        { height: 28, left: 0, top: 87, width: 24 },
+      ],
+      maximumRatioName: "CODEX_UI_KIT_SUBAGENT_ACTIVITY_MAX_DIFF_RATIO",
+      referenceCrop: { height: 115, left: 290, top: 45, width: 205 },
+      referencePath: currentBuildSubagentNestedRunningReference,
+      sceneId: "subagent-nested-main-activity-running",
+    });
+  }
+
   if (scene.id === "multi-file-review" && currentBuildMultiFileReference) {
     const reference = PNG.sync.read(
       await readFile(currentBuildMultiFileReference),

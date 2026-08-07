@@ -2691,17 +2691,20 @@ export function App() {
           subagent.status === "done"
             ? subagent.completedAtMs
             : subagent.startedAtMs;
-        const liveTime =
+        const relativeTime =
           mode === "live" && timestampMs !== null
             ? {
-                dateTime: new Date(timestampMs).toISOString(),
                 timestamp: `${compactSubagentTime(timestampMs, subagentClockMs)}${subagent.status === "done" ? " ago" : ""}`,
               }
             : {
                 timestamp: subagent.status === "done" ? "1m ago" : "0s",
               };
         return {
-          ...liveTime,
+          ...relativeTime,
+          dateTime:
+            timestampMs === null
+              ? undefined
+              : new Date(timestampMs).toISOString(),
           id: subagent.id,
           lastMessage: subagent.message ?? undefined,
           name: subagent.name ?? undefined,
@@ -5162,37 +5165,33 @@ export function App() {
       const entrySubagent = state.subagents.find(
         (subagent) => subagent.callId === entry.id,
       );
-      if (
-        !entrySubagent ||
-        (entrySubagent.senderThreadId !== null &&
-          entrySubagent.senderThreadId !== state.threadId)
-      ) {
-        return null;
-      }
+      if (!entrySubagent) return null;
       const groupTurnId = entrySubagent.turnId;
-      const rootTurnSubagents = state.subagents.filter(
+      const senderTurnSubagents = state.subagents.filter(
         (subagent) =>
           (groupTurnId === null
             ? subagent.callId === entrySubagent.callId
             : subagent.turnId === groupTurnId) &&
-          (subagent.senderThreadId === null ||
-            subagent.senderThreadId === state.threadId),
+          subagent.senderThreadId === entrySubagent.senderThreadId,
       );
-      if (rootTurnSubagents[0]?.callId !== entry.id) return null;
+      if (senderTurnSubagents[0]?.callId !== entry.id) return null;
       const callSubagents = subagentItems.filter((item) =>
-        rootTurnSubagents.some((subagent) => subagent.id === item.id),
+        senderTurnSubagents.some((subagent) => subagent.id === item.id),
       );
       if (callSubagents.length === 0) return null;
       const working = callSubagents.filter(
         ({ status }) => status !== "done",
       );
+      const turnActive = isTurnActive(state.status);
       const activityItems =
-        working.length > 0 || mode !== "live"
-          ? working
-          : callSubagents;
+        turnActive
+          ? callSubagents
+          : working.length > 0 || mode !== "live"
+            ? working
+            : callSubagents;
       const startedAtMs = state.subagents
         .filter((item) =>
-          rootTurnSubagents.some((subagent) => subagent.id === item.id),
+          senderTurnSubagents.some((subagent) => subagent.id === item.id),
         )
         .flatMap((item) =>
           item.startedAtMs === null ? [] : [item.startedAtMs],
@@ -5200,7 +5199,7 @@ export function App() {
         .sort((left, right) => left - right)[0];
       const completedAtMs = state.subagents
         .filter((item) =>
-          rootTurnSubagents.some((subagent) => subagent.id === item.id),
+          senderTurnSubagents.some((subagent) => subagent.id === item.id),
         )
         .flatMap((item) =>
           item.completedAtMs === null ? [] : [item.completedAtMs],
@@ -5209,9 +5208,13 @@ export function App() {
       return (
         <ActivityTimeline
           className="demo-subagent-activity-timeline"
-          defaultOpen={mode === "live" && working.length > 0}
+          defaultOpen={mode === "live" && turnActive}
           key={`subagent:${entry.id}`}
-          open={initialSelection.capture ? working.length > 0 : undefined}
+          open={
+            initialSelection.capture
+              ? turnActive && activityItems.length > 0
+              : undefined
+          }
           summary={
             <TurnDuration
               {...(mode === "live"
@@ -5224,6 +5227,10 @@ export function App() {
                     durationMs:
                       working.length > 0
                         ? 14_000
+                        : turnActive &&
+                            startedAtMs !== undefined &&
+                            completedAtMs !== undefined
+                          ? Math.max(0, completedAtMs - startedAtMs)
                         : state.turnDurationMs ?? 45_000,
                   })}
               status={working.length > 0 ? "working" : "worked"}

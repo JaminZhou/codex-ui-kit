@@ -206,5 +206,8 @@ describe("lifecycle visual policy", () => {
     expect(contract).toContain(
       '"subagent-nested-panel-mixed":',
     );
+    expect(contract).toContain(
+      'sceneId: "subagent-nested-main-activity-running"',
+    );
   });
 });
