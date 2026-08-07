@@ -1805,6 +1805,72 @@ describe("protocol lifecycle reducer", () => {
     });
   });
 
+  it("routes same-turn late interrupted completion by its completion time", () => {
+    const completed = reduceProtocolTrace(
+      replayScenarios["subagent-concurrency"].events,
+    );
+    const activeTurn = reduceProtocolNotification(completed, {
+      method: "turn/started",
+      params: {
+        threadId: "thread-subagent-concurrency",
+        turn: { id: "turn-subagent-concurrency" },
+      },
+    });
+    const resumed = reduceProtocolNotification(activeTurn, {
+      method: "item/started",
+      params: {
+        item: {
+          agentsStates: { alpha: { status: "running" } },
+          id: "collab-resume-before-late-interruption",
+          receiverThreadIds: ["alpha"],
+          senderThreadId: "thread-subagent-concurrency",
+          status: "inProgress",
+          tool: "resumeAgent",
+          type: "collabAgentToolCall",
+        },
+        startedAtMs: 90_000,
+        threadId: "thread-subagent-concurrency",
+        turnId: "turn-subagent-concurrency",
+      },
+    });
+    const afterLateInterruption = reduceProtocolNotification(resumed, {
+      method: "item/completed",
+      params: {
+        completedAtMs: 33_000,
+        item: {
+          agentPath: "/root/alpha",
+          agentThreadId: "alpha",
+          id: "activity-alpha-old-interrupted",
+          kind: "interrupted",
+          type: "subAgentActivity",
+        },
+        threadId: "thread-subagent-concurrency",
+        turnId: "turn-subagent-concurrency",
+      },
+    });
+
+    expect(hasActiveTurnWork(afterLateInterruption)).toBe(true);
+    expect(afterLateInterruption.subagents.find(({ id }) => id === "alpha"))
+      .toMatchObject({
+        callId: "collab-resume-before-late-interruption",
+        completedAtMs: null,
+        startedAtMs: 90_000,
+        status: "active",
+        threadStatus: "running",
+      });
+    expect(
+      afterLateInterruption.subagentLifecycles.find(
+        ({ callId, id }) =>
+          callId === "collab-subagent-alpha" && id === "alpha",
+      ),
+    ).toMatchObject({
+      completedAtMs: 32_000,
+      startedAtMs: 1_100,
+      status: "done",
+      threadStatus: "interrupted",
+    });
+  });
+
   it("starts another resume lifecycle within the same turn", () => {
     const completed = reduceProtocolTrace(
       replayScenarios["subagent-concurrency"].events,

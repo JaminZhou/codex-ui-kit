@@ -1238,11 +1238,12 @@ export function reduceProtocolNotification(
       const kind = asString(item.kind) ?? "started";
       const sourceThreadId = asString(params.threadId);
       const reportedStartedAtMs = asNumber(params.startedAtMs);
+      const reportedCompletedAtMs = asNumber(params.completedAtMs);
       const existing = subagentLifecycleForActivity(
         state,
         agentThreadId,
         itemTurnId,
-        reportedStartedAtMs,
+        reportedStartedAtMs ?? reportedCompletedAtMs,
       );
       const callId = existing?.callId ?? itemId;
       const isDone = kind === "interrupted" || existing?.status === "done";
@@ -1251,7 +1252,7 @@ export function reduceProtocolNotification(
         callId,
         completedAtMs:
           existing?.completedAtMs ??
-          (kind === "interrupted" ? asNumber(params.completedAtMs) : null),
+          (kind === "interrupted" ? reportedCompletedAtMs : null),
         id: agentThreadId,
         message: existing?.message ?? null,
         name:
