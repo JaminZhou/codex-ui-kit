@@ -19,6 +19,10 @@ const captureScriptUrl = new URL(
   "./capture-current-visual-assets.mjs",
   import.meta.url,
 );
+const updaterScriptUrl = new URL(
+  "./update-current-visual-assets.mjs",
+  import.meta.url,
+);
 
 const [
   manifestText,
@@ -27,6 +31,7 @@ const [
   appSource,
   playgroundStyles,
   captureSource,
+  updaterSource,
 ] =
   await Promise.all([
     readFile(manifestUrl, "utf8"),
@@ -35,6 +40,7 @@ const [
     readFile(playgroundAppUrl, "utf8"),
     readFile(playgroundStylesUrl, "utf8"),
     readFile(captureScriptUrl, "utf8"),
+    readFile(updaterScriptUrl, "utf8"),
   ]);
 const manifest = JSON.parse(manifestText);
 const packageJson = JSON.parse(packageText);
@@ -100,41 +106,6 @@ const allowedSvgAttributes = new Set([
   "y1",
   "y2",
 ]);
-const rootComputedStyleKeys = new Set([
-  "clipPath",
-  "color",
-  "display",
-  "fill",
-  "fillOpacity",
-  "filter",
-  "flexBasis",
-  "flexGrow",
-  "flexShrink",
-  "fontFamily",
-  "fontSize",
-  "fontWeight",
-  "height",
-  "lineHeight",
-  "mask",
-  "opacity",
-  "overflow",
-  "paintOrder",
-  "shapeRendering",
-  "stroke",
-  "strokeDasharray",
-  "strokeDashoffset",
-  "strokeLinecap",
-  "strokeLinejoin",
-  "strokeMiterlimit",
-  "strokeOpacity",
-  "strokeWidth",
-  "transform",
-  "transformOrigin",
-  "vectorEffect",
-  "visibility",
-  "width",
-]);
-
 function canonicalize(value) {
   return JSON.stringify(value, (_key, nested) => {
     if (!nested || Array.isArray(nested) || typeof nested !== "object") {
@@ -146,6 +117,22 @@ function canonicalize(value) {
       ),
     );
   });
+}
+
+function validComputedStyle(style) {
+  return (
+    style &&
+    typeof style === "object" &&
+    !Array.isArray(style) &&
+    Object.keys(style).length >= 300 &&
+    Object.entries(style).every(
+      ([name, value]) =>
+        /^-?[a-z][a-z0-9-]*$/.test(name) &&
+        !name.startsWith("--") &&
+        typeof value === "string" &&
+        !/(?:https?|data|javascript|file):/i.test(value),
+    )
+  );
 }
 
 function validSvgAttributes(attributes) {
@@ -167,12 +154,13 @@ function validSvgPrimitive(primitive) {
     typeof primitive === "object" &&
     allowedSvgTags.has(primitive.tag) &&
     validSvgAttributes(primitive.attributes) &&
+    validComputedStyle(primitive.computedStyle) &&
     (primitive.children === undefined ||
       (Array.isArray(primitive.children) &&
         primitive.children.length > 0 &&
         primitive.children.every(validSvgPrimitive))) &&
     Object.keys(primitive).every((key) =>
-      ["attributes", "children", "tag"].includes(key),
+      ["attributes", "children", "computedStyle", "tag"].includes(key),
     )
   );
 }
@@ -180,18 +168,28 @@ function validSvgPrimitive(primitive) {
 if (manifest.schemaVersion !== 1) {
   throw new Error("visual asset schemaVersion must be 1");
 }
-if (manifest.geometryHashVersion !== 3) {
-  throw new Error("visual asset geometryHashVersion must be 3");
+if (manifest.geometryHashVersion !== 4) {
+  throw new Error("visual asset geometryHashVersion must be 4");
 }
 if (
   !manifest.baseline?.appVersion ||
   !manifest.baseline?.buildNumber ||
   manifest.baseline?.theme !== "dark" ||
   manifest.baseline?.interactionState !== "resting" ||
+  manifest.baseline?.viewport?.width !== 1180 ||
+  manifest.baseline?.viewport?.height !== 820 ||
   !/^[a-f0-9]{64}$/.test(manifest.baseline?.appAsarSha256 ?? "")
 ) {
   throw new Error("visual assets require a complete current-build fingerprint");
 }
+const baselineContext = {
+  appAsarSha256: manifest.baseline.appAsarSha256,
+  appVersion: manifest.baseline.appVersion,
+  buildNumber: manifest.baseline.buildNumber,
+  interactionState: manifest.baseline.interactionState,
+  theme: manifest.baseline.theme,
+  viewport: manifest.baseline.viewport,
+};
 if (
   manifest.policy?.packageBoundary !== "playground-only" ||
   manifest.policy?.globalPixelParityEligible !== false ||
@@ -226,14 +224,7 @@ for (const icon of manifest.icons ?? []) {
     !icon.region ||
     !icon.viewBox ||
     typeof icon.sourceClassName !== "string" ||
-    !icon.rootComputedStyle ||
-    typeof icon.rootComputedStyle !== "object" ||
-    Array.isArray(icon.rootComputedStyle) ||
-    Object.keys(icon.rootComputedStyle).length !== rootComputedStyleKeys.size ||
-    !Object.entries(icon.rootComputedStyle).every(
-      ([key, value]) =>
-        rootComputedStyleKeys.has(key) && typeof value === "string",
-    ) ||
+    !validComputedStyle(icon.rootComputedStyle) ||
     !validSvgAttributes(icon.rootAttributes) ||
     !Number.isFinite(icon.renderSize?.width) ||
     !Number.isFinite(icon.renderSize?.height) ||
@@ -246,6 +237,7 @@ for (const icon of manifest.icons ?? []) {
   const sha256 = createHash("sha256")
     .update(
       canonicalize({
+        baselineContext,
         primitives: icon.primitives,
         renderSize: icon.renderSize,
         rootAttributes: icon.rootAttributes,
@@ -270,9 +262,13 @@ for (const icon of manifest.icons ?? []) {
 
 if (
   !iconSource.includes("primitive.children?.map") ||
-  !iconSource.includes("renderPrimitive(child")
+  !iconSource.includes("renderPrimitive(child") ||
+  !iconSource.includes("toReactStyle(primitive.computedStyle)") ||
+  !iconSource.includes("toReactStyle(icon.rootComputedStyle)")
 ) {
-  throw new Error("current-build renderer must reconstruct nested SVG trees");
+  throw new Error(
+    "current-build renderer must reconstruct nested SVG trees and computed styles",
+  );
 }
 if (
   !captureSource.includes("read-macos-process-info.py") ||
@@ -280,11 +276,21 @@ if (
   !captureSource.includes("Inline SVG style attributes are unsupported") ||
   !captureSource.includes("ignoredNonVisualSvgAttributes") ||
   !captureSource.includes("separatelyCapturedRootSvgAttributes") ||
-  !captureSource.includes("Unsupported SVG attributes on")
+  !captureSource.includes("Unsupported SVG attributes on") ||
+  !captureSource.includes("baselineContext") ||
+  !captureSource.includes("computedStyle: computedStyle(element)")
 ) {
   throw new Error(
     "visual capture must prove argv and listener ancestry and fail closed on visual SVG attributes",
   );
+}
+if (
+  packageJson.scripts?.["update:visual-assets"] !==
+    "node scripts/update-current-visual-assets.mjs --write" ||
+  !updaterSource.includes("Expected one current capture") ||
+  !updaterSource.includes("baselineContext")
+) {
+  throw new Error("visual asset promotion must remain deterministic and explicit");
 }
 
 const remaining = manifest.remainingApproximationIds;

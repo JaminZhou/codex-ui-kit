@@ -59,6 +59,7 @@
     "check:visual:tool-recovery": "pnpm build:demo && node scripts/check-visual-scenarios.mjs --scenes=current-compact-search-tool,current-compact-browser-tool,current-compact-mcp-unavailable,current-compact-command-failure",
     "check:visual:continuity": "pnpm build:demo && node scripts/check-visual-scenarios.mjs --scenes=current-medium-message-navigation,current-compact-scroll-away,current-compact-interrupted,current-compact-context-running,current-compact-context-completed",
     "check:research": "node scripts/check-research-inventory.mjs && node scripts/check-visual-assets.mjs",
+    "update:visual-assets": "node scripts/update-current-visual-assets.mjs --write",
     "check:codex-app": "pnpm build && pnpm --filter @codex-ui-kit/codex-app-playground check",
     "check:codex-app:acceptance": "pnpm build && pnpm --filter @codex-ui-kit/codex-app-playground check:acceptance",
     "prepack": "node scripts/prepack.mjs",

@@ -39,9 +39,25 @@ function toReactAttributes(attributes: object) {
   );
 }
 
+function toReactStyle(style: object): SVGProps<SVGElement>["style"] {
+  return Object.fromEntries(
+    Object.entries(style).map(([name, value]) => {
+      const normalized = name
+        .replace(/^-webkit-/, "Webkit-")
+        .replace(/^-moz-/, "Moz-")
+        .replace(/^-ms-/, "ms-")
+        .replace(/-([a-z])/g, (_match, letter: string) =>
+          letter.toUpperCase(),
+        );
+      return [normalized, value];
+    }),
+  ) as SVGProps<SVGElement>["style"];
+}
+
 type VisualPrimitive = {
   attributes: object;
   children?: readonly VisualPrimitive[];
+  computedStyle: object;
   tag: string;
 };
 
@@ -54,6 +70,7 @@ function renderPrimitive(
     {
       ...toReactAttributes(primitive.attributes),
       key,
+      style: toReactStyle(primitive.computedStyle),
     },
     primitive.children?.map((child, index) =>
       renderPrimitive(child, `${key}-${index}`),
@@ -69,8 +86,7 @@ export function CurrentBuildIcon({
 }: CurrentBuildIconProps) {
   const icon = visualAssets.icons.find((candidate) => candidate.id === name);
   if (!icon) throw new Error(`Unknown current-build icon: ${name}`);
-  const exactRootStyle =
-    icon.rootComputedStyle as SVGProps<SVGSVGElement>["style"];
+  const exactRootStyle = toReactStyle(icon.rootComputedStyle);
 
   return (
     <svg

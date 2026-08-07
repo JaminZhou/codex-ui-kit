@@ -8,9 +8,10 @@ geometry otherwise create permanent noise that can hide regressions.
 truth for exact visual primitives observed in the current Codex Desktop build.
 Each entry records the application/build fingerprint, the de-identified CDP
 owner evidence, viewBox, rendered size, source root class, resolved root SVG
-style, root attributes, primitive geometry, and canonical SHA-256. Root class
-effects are replayed through their resolved style instead of depending on
-private upstream stylesheets. The same manifest explicitly lists remaining
+style, per-primitive resolved style, root attributes, primitive geometry, and
+canonical SHA-256. Root and descendant class effects are replayed through the
+complete standard computed-style snapshots instead of depending on private
+upstream stylesheets. The same manifest explicitly lists remaining
 approximations, so a passing regression check cannot be described as global
 pixel parity while the list is non-empty.
 
@@ -60,6 +61,11 @@ CODEX_VISUAL_ASSET_CDP_PORT=<port> \
 CODEX_VISUAL_ASSET_PROFILE=<absolute-unique-profile> \
 node scripts/capture-current-visual-assets.mjs
 ```
+
+After reviewing that de-identified output, `pnpm update:visual-assets` performs
+the deterministic geometry match and rewrites the five promoted entries. The
+updater requires the same isolated port/profile environment and includes the
+app fingerprint, theme, interaction state, and viewport in every v4 hash.
 
 The capture script is read-only: it first proves that every listener is bound
 only to the declared loopback endpoint and that exactly one listener process

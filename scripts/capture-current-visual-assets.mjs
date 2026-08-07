@@ -7,6 +7,9 @@ import { chromium } from "../playgrounds/codex-app/node_modules/playwright-core/
 
 const port = Number(process.env.CODEX_VISUAL_ASSET_CDP_PORT);
 const expectedProfile = process.env.CODEX_VISUAL_ASSET_PROFILE;
+const appBundle = "/Applications/ChatGPT.app";
+const appInfoPlist = `${appBundle}/Contents/Info.plist`;
+const appAsar = `${appBundle}/Contents/Resources/app.asar`;
 if (!Number.isInteger(port) || port < 1024 || port > 65535) {
   throw new Error(
     "Set CODEX_VISUAL_ASSET_CDP_PORT to an isolated loopback-only Codex CDP port.",
@@ -27,6 +30,20 @@ if (!allowedProfilePrefixes.some((prefix) => normalizedProfile.startsWith(prefix
     "The isolated Codex profile must use a unique codex-ui-kit path in /private/tmp or Trash.",
   );
 }
+const plistValue = (key) =>
+  execFileSync("/usr/bin/plutil", ["-extract", key, "raw", appInfoPlist], {
+    encoding: "utf8",
+  }).trim();
+const baselineContext = {
+  appAsarSha256: execFileSync("/usr/bin/shasum", ["-a", "256", appAsar], {
+    encoding: "utf8",
+  }).split(/\s+/)[0],
+  appVersion: plistValue("CFBundleShortVersionString"),
+  buildNumber: plistValue("CFBundleVersion"),
+  interactionState: "resting",
+  theme: "dark",
+  viewport: { height: 820, width: 1180 },
+};
 
 const listenerFields = execFileSync(
   "/usr/sbin/lsof",
@@ -283,6 +300,15 @@ try {
           .sort(([left], [right]) => left.localeCompare(right)),
       );
     };
+    const computedStyle = (element) => {
+      const value = getComputedStyle(element);
+      return Object.fromEntries(
+        [...value]
+          .filter((name) => !name.startsWith("--"))
+          .map((name) => [name, value.getPropertyValue(name)])
+          .sort(([left], [right]) => left.localeCompare(right)),
+      );
+    };
     const serializeSvgElement = (element) => {
       const tag = element.tagName.toLowerCase();
       if (!allowedSvgTags.has(tag)) {
@@ -292,6 +318,7 @@ try {
       return {
         attributes: attributes(element),
         ...(children.length > 0 ? { children } : {}),
+        computedStyle: computedStyle(element),
         tag,
       };
     };
@@ -316,7 +343,7 @@ try {
       }
       return null;
     };
-    const style = (element) => {
+    const fontStyle = (element) => {
       const value = getComputedStyle(element);
       return {
         clipPath: value.clipPath,
@@ -378,7 +405,7 @@ try {
           rect: rect(svg),
           renderSize: { height: round(bounds.height), width: round(bounds.width) },
           rootAttributes: attributes(svg, true),
-          rootComputedStyle: style(svg),
+          rootComputedStyle: computedStyle(svg),
           sourceClassName: svg.getAttribute("class"),
           viewBox: svg.getAttribute("viewBox"),
         };
@@ -393,7 +420,7 @@ try {
       .map(([sample, element]) => ({
         rect: rect(element),
         sample,
-        style: style(element),
+        style: fontStyle(element),
         tag: element.tagName,
       }));
     return {
@@ -402,6 +429,13 @@ try {
       viewport: { height: window.innerHeight, width: window.innerWidth },
     };
   });
+  if (
+    result.viewport.height !== baselineContext.viewport.height ||
+    result.viewport.width !== baselineContext.viewport.width
+  ) {
+    throw new Error("Captured viewport does not match the baseline context.");
+  }
+  result.baselineContext = baselineContext;
 
   const canonicalize = (value) =>
     JSON.stringify(value, (_key, nested) => {
@@ -423,6 +457,7 @@ try {
     sha256: createHash("sha256")
       .update(
         canonicalize({
+          baselineContext,
           primitives: icon.primitives,
           renderSize: icon.renderSize,
           rootAttributes: icon.rootAttributes,
