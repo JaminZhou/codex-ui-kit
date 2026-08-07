@@ -166,6 +166,7 @@ try {
   const main = ranked[0]?.page;
   if (!main) throw new Error("Main Codex Renderer target not found.");
 
+  await main.setViewportSize({ height: 820, width: 1180 });
   await main.waitForFunction(
     () =>
       Boolean(document.querySelector("main")) &&
@@ -241,10 +242,36 @@ try {
       "y1",
       "y2",
     ]);
-    const attributes = (element) => {
+    const ignoredNonVisualSvgAttributes = new Set([
+      "aria-describedby",
+      "aria-hidden",
+      "aria-label",
+      "aria-labelledby",
+      "focusable",
+      "role",
+      "tabindex",
+      "version",
+      "xmlns",
+      "xmlns:xlink",
+    ]);
+    const separatelyCapturedRootSvgAttributes = new Set(["class", "viewbox"]);
+    const attributes = (element, isRoot = false) => {
       if (element.hasAttribute("style")) {
         throw new Error(
           `Inline SVG style attributes are unsupported: ${element.tagName.toLowerCase()}`,
+        );
+      }
+      const unsupportedAttributes = [...element.attributes]
+        .map((attribute) => attribute.name.toLowerCase())
+        .filter(
+          (name) =>
+            !allowedSvgAttributes.has(name) &&
+            !ignoredNonVisualSvgAttributes.has(name) &&
+            !(isRoot && separatelyCapturedRootSvgAttributes.has(name)),
+        );
+      if (unsupportedAttributes.length > 0) {
+        throw new Error(
+          `Unsupported SVG attributes on ${element.tagName.toLowerCase()}: ${unsupportedAttributes.join(", ")}`,
         );
       }
       return Object.fromEntries(
@@ -292,15 +319,37 @@ try {
     const style = (element) => {
       const value = getComputedStyle(element);
       return {
+        clipPath: value.clipPath,
         color: value.color,
+        display: value.display,
         fill: value.fill,
+        fillOpacity: value.fillOpacity,
+        filter: value.filter,
+        flexBasis: value.flexBasis,
+        flexGrow: value.flexGrow,
+        flexShrink: value.flexShrink,
         fontFamily: value.fontFamily,
         fontSize: value.fontSize,
         fontWeight: value.fontWeight,
         height: value.height,
         lineHeight: value.lineHeight,
+        mask: value.mask,
+        opacity: value.opacity,
+        overflow: value.overflow,
+        paintOrder: value.paintOrder,
+        shapeRendering: value.shapeRendering,
         stroke: value.stroke,
+        strokeDasharray: value.strokeDasharray,
+        strokeDashoffset: value.strokeDashoffset,
+        strokeLinecap: value.strokeLinecap,
+        strokeLinejoin: value.strokeLinejoin,
+        strokeMiterlimit: value.strokeMiterlimit,
+        strokeOpacity: value.strokeOpacity,
         strokeWidth: value.strokeWidth,
+        transform: value.transform,
+        transformOrigin: value.transformOrigin,
+        vectorEffect: value.vectorEffect,
+        visibility: value.visibility,
         width: value.width,
       };
     };
@@ -327,8 +376,10 @@ try {
           primitives: [...svg.children].map(serializeSvgElement),
           region: targetRegion,
           rect: rect(svg),
-          rootAttributes: attributes(svg),
-          style: style(svg),
+          renderSize: { height: round(bounds.height), width: round(bounds.width) },
+          rootAttributes: attributes(svg, true),
+          rootComputedStyle: style(svg),
+          sourceClassName: svg.getAttribute("class"),
           viewBox: svg.getAttribute("viewBox"),
         };
       })
@@ -373,7 +424,10 @@ try {
       .update(
         canonicalize({
           primitives: icon.primitives,
+          renderSize: icon.renderSize,
           rootAttributes: icon.rootAttributes,
+          rootComputedStyle: icon.rootComputedStyle,
+          sourceClassName: icon.sourceClassName,
           viewBox: icon.viewBox,
         }),
       )

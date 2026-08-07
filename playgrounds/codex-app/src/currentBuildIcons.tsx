@@ -69,6 +69,8 @@ export function CurrentBuildIcon({
 }: CurrentBuildIconProps) {
   const icon = visualAssets.icons.find((candidate) => candidate.id === name);
   if (!icon) throw new Error(`Unknown current-build icon: ${name}`);
+  const exactRootStyle =
+    icon.rootComputedStyle as SVGProps<SVGSVGElement>["style"];
 
   return (
     <svg
@@ -79,6 +81,7 @@ export function CurrentBuildIcon({
         .join(" ")}
       data-current-build-icon={name}
       style={{
+        ...exactRootStyle,
         height: icon.renderSize.height,
         width: icon.renderSize.width,
         ...style,

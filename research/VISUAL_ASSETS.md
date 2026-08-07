@@ -7,10 +7,16 @@ geometry otherwise create permanent noise that can hide regressions.
 [`visual-assets.json`](visual-assets.json) is the machine-checked source of
 truth for exact visual primitives observed in the current Codex Desktop build.
 Each entry records the application/build fingerprint, the de-identified CDP
-owner evidence, viewBox, rendered size, root SVG attributes, primitive
-geometry, and canonical SHA-256. The same manifest explicitly lists remaining
+owner evidence, viewBox, rendered size, source root class, resolved root SVG
+style, root attributes, primitive geometry, and canonical SHA-256. Root class
+effects are replayed through their resolved style instead of depending on
+private upstream stylesheets. The same manifest explicitly lists remaining
 approximations, so a passing regression check cannot be described as global
 pixel parity while the list is non-empty.
+
+Resolved root styles are exact only for the manifest's named dark, resting
+state at 1180×820. Other themes, interaction states, and viewport-specific
+variants require their own runtime evidence before they can be called exact.
 
 The first manifest intentionally marks its remaining-approximation inventory
 as incomplete. The named blockers are the audited shell/sidebar/Composer
@@ -64,5 +70,10 @@ It then selects the largest main Renderer
 and outputs a recursive allowlisted SVG tree, allowlisted static semantic IDs,
 geometry, computed style, and de-identified font samples. It never emits raw
 page, conversation, project, account, title, aria-label, or test-id text. An
-inline SVG `style` attribute fails capture instead of producing a lossy hash.
+inline SVG `style` attribute or any other unknown attribute fails capture
+instead of producing a lossy hash. Selected `aria-*`, focus/role metadata, SVG
+namespace declarations, and the SVG `version` marker are explicitly ignored
+as non-visual metadata. Root `class` and `viewBox` are accepted only because
+their source/resolved state is captured separately and included in the hash;
+the same attributes on a child still fail closed.
 Process/profile setup and exact-PID cleanup remain explicit operator steps.

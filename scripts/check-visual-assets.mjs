@@ -100,6 +100,40 @@ const allowedSvgAttributes = new Set([
   "y1",
   "y2",
 ]);
+const rootComputedStyleKeys = new Set([
+  "clipPath",
+  "color",
+  "display",
+  "fill",
+  "fillOpacity",
+  "filter",
+  "flexBasis",
+  "flexGrow",
+  "flexShrink",
+  "fontFamily",
+  "fontSize",
+  "fontWeight",
+  "height",
+  "lineHeight",
+  "mask",
+  "opacity",
+  "overflow",
+  "paintOrder",
+  "shapeRendering",
+  "stroke",
+  "strokeDasharray",
+  "strokeDashoffset",
+  "strokeLinecap",
+  "strokeLinejoin",
+  "strokeMiterlimit",
+  "strokeOpacity",
+  "strokeWidth",
+  "transform",
+  "transformOrigin",
+  "vectorEffect",
+  "visibility",
+  "width",
+]);
 
 function canonicalize(value) {
   return JSON.stringify(value, (_key, nested) => {
@@ -146,12 +180,14 @@ function validSvgPrimitive(primitive) {
 if (manifest.schemaVersion !== 1) {
   throw new Error("visual asset schemaVersion must be 1");
 }
-if (manifest.geometryHashVersion !== 2) {
-  throw new Error("visual asset geometryHashVersion must be 2");
+if (manifest.geometryHashVersion !== 3) {
+  throw new Error("visual asset geometryHashVersion must be 3");
 }
 if (
   !manifest.baseline?.appVersion ||
   !manifest.baseline?.buildNumber ||
+  manifest.baseline?.theme !== "dark" ||
+  manifest.baseline?.interactionState !== "resting" ||
   !/^[a-f0-9]{64}$/.test(manifest.baseline?.appAsarSha256 ?? "")
 ) {
   throw new Error("visual assets require a complete current-build fingerprint");
@@ -189,6 +225,15 @@ for (const icon of manifest.icons ?? []) {
     icon.status !== "runtime-observed" ||
     !icon.region ||
     !icon.viewBox ||
+    typeof icon.sourceClassName !== "string" ||
+    !icon.rootComputedStyle ||
+    typeof icon.rootComputedStyle !== "object" ||
+    Array.isArray(icon.rootComputedStyle) ||
+    Object.keys(icon.rootComputedStyle).length !== rootComputedStyleKeys.size ||
+    !Object.entries(icon.rootComputedStyle).every(
+      ([key, value]) =>
+        rootComputedStyleKeys.has(key) && typeof value === "string",
+    ) ||
     !validSvgAttributes(icon.rootAttributes) ||
     !Number.isFinite(icon.renderSize?.width) ||
     !Number.isFinite(icon.renderSize?.height) ||
@@ -202,7 +247,10 @@ for (const icon of manifest.icons ?? []) {
     .update(
       canonicalize({
         primitives: icon.primitives,
+        renderSize: icon.renderSize,
         rootAttributes: icon.rootAttributes,
+        rootComputedStyle: icon.rootComputedStyle,
+        sourceClassName: icon.sourceClassName,
         viewBox: icon.viewBox,
       }),
     )
@@ -229,10 +277,13 @@ if (
 if (
   !captureSource.includes("read-macos-process-info.py") ||
   !captureSource.includes("does not descend from isolated owner PID") ||
-  !captureSource.includes("Inline SVG style attributes are unsupported")
+  !captureSource.includes("Inline SVG style attributes are unsupported") ||
+  !captureSource.includes("ignoredNonVisualSvgAttributes") ||
+  !captureSource.includes("separatelyCapturedRootSvgAttributes") ||
+  !captureSource.includes("Unsupported SVG attributes on")
 ) {
   throw new Error(
-    "visual capture must prove argv and listener ancestry and fail closed on inline SVG style",
+    "visual capture must prove argv and listener ancestry and fail closed on visual SVG attributes",
   );
 }
 
