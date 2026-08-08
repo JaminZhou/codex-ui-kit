@@ -4923,6 +4923,9 @@ try {
             width: helpRect.width,
           }
         : null,
+      recentItemCount: document.querySelectorAll(
+        '.codex-ui-app-sidebar__section[data-kind="threads"] .codex-ui-app-sidebar__item-row',
+      ).length,
       recentLeadingCount: document.querySelectorAll(
         '.codex-ui-app-sidebar__section[data-kind="threads"] .codex-ui-app-sidebar__item-leading',
       ).length,
@@ -4953,7 +4956,9 @@ try {
         { height: 20, rightInset: 4, width: 20 },
       ]) ||
     currentSidebarAssets.settingsAction ||
-    currentSidebarAssets.recentLeadingCount !== 0 ||
+    currentSidebarAssets.recentItemCount === 0 ||
+    currentSidebarAssets.recentLeadingCount !==
+      currentSidebarAssets.recentItemCount ||
     currentSidebarAssets.help?.width !== 32 ||
     currentSidebarAssets.help?.height !== 32 ||
     currentSidebarAssets.help?.iconWidth !== 18 ||
