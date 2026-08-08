@@ -4,7 +4,7 @@ import { readFileSync, writeFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { sanitizeVisualAssetIcon } from "./visual-asset-contract.mjs";
 import {
-  hasCurrentSidebarAbsenceEvidence,
+  hasCurrentSidebarSettingsAbsenceEvidence,
 } from "./visual-asset-sidebar-contract.mjs";
 
 const write = process.argv.includes("--write");
@@ -375,16 +375,14 @@ manifest.icons = [...promotionSpecs].map(([id]) =>
   promoteIcon(id, existingById.get(id)),
 );
 const promotedIds = new Set(promotionSpecs.keys());
-const currentBuildAbsenceIds = new Set([
-  "sidebar-settings",
-  "sidebar-thread",
-]);
-const currentSidebarAbsenceProven =
-  hasCurrentSidebarAbsenceEvidence(capture.sidebarObservation);
+const currentBuildAbsenceIds = new Set(["sidebar-settings"]);
+const currentSidebarSettingsAbsenceProven =
+  hasCurrentSidebarSettingsAbsenceEvidence(capture.sidebarObservation);
 const remainingApproximationCandidates = new Set(
   manifest.remainingApproximationIds,
 );
-if (!currentSidebarAbsenceProven) {
+remainingApproximationCandidates.add("sidebar-thread");
+if (!currentSidebarSettingsAbsenceProven) {
   for (const id of currentBuildAbsenceIds) {
     remainingApproximationCandidates.add(id);
   }
@@ -392,7 +390,9 @@ if (!currentSidebarAbsenceProven) {
 manifest.remainingApproximationIds = [...remainingApproximationCandidates].filter(
   (id) =>
     !promotedIds.has(id) &&
-    !(currentSidebarAbsenceProven && currentBuildAbsenceIds.has(id)),
+    !(
+      currentSidebarSettingsAbsenceProven && currentBuildAbsenceIds.has(id)
+    ),
 );
 
 const output = `${JSON.stringify(manifest, null, 2)}\n`;

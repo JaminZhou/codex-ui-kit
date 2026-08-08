@@ -5,7 +5,7 @@ import {
   sanitizeVisualScalarRecord,
 } from "./visual-asset-contract.mjs";
 import {
-  hasCurrentSidebarAbsenceEvidence,
+  hasCurrentSidebarSettingsAbsenceEvidence,
 } from "./visual-asset-sidebar-contract.mjs";
 
 const manifestUrl = new URL("../research/visual-assets.json", import.meta.url);
@@ -240,12 +240,14 @@ if (
   !captureSource.includes('targetRegion === "sidebar-projects"') ||
   !captureSource.includes("allowControlPatternFallback") ||
   !captureSource.includes("sidebarObservation") ||
-  !captureSource.includes("threadLeadingSvgCount") ||
+  !captureSource.includes("projectTaskLeadingSvgCount") ||
   !captureSource.includes(
     'resolveSemanticId(fixedTextLabel, targetRegion, false)',
   ) ||
   !captureSource.includes("bounds.bottom <= 0") ||
   !captureSource.includes("bounds.top >= window.innerHeight") ||
+  !captureSource.includes("bounds.right <= 0") ||
+  !captureSource.includes("bounds.left >= window.innerWidth") ||
   captureSource.includes("rawSemanticLabel") ||
   !captureSource.includes("computedStyle: computedStyle(element)") ||
   !captureSource.includes("sanitizeVisualAssetIcon") ||
@@ -267,8 +269,9 @@ if (
   !updaterSource.includes("sameFingerprintRetainedComputedStyleProperties") ||
   !updaterSource.includes('"scrollbar-color"') ||
   !updaterSource.includes("currentBuildAbsenceIds") ||
-  !updaterSource.includes("hasCurrentSidebarAbsenceEvidence") ||
-  !updaterSource.includes("currentSidebarAbsenceProven") ||
+  !updaterSource.includes("hasCurrentSidebarSettingsAbsenceEvidence") ||
+  !updaterSource.includes("currentSidebarSettingsAbsenceProven") ||
+  !updaterSource.includes('remainingApproximationCandidates.add("sidebar-thread")') ||
   !updaterSource.includes("remainingApproximationCandidates.add(id)") ||
   !updaterSource.includes("sanitizeVisualAssetIcon") ||
   !updaterSource.includes("capturedAt")
@@ -295,14 +298,12 @@ for (const id of [
     throw new Error(`${id} must be promoted from current-build runtime evidence`);
   }
 }
-const currentSidebarAbsenceProven =
-  hasCurrentSidebarAbsenceEvidence(manifest.sidebarObservation);
+const currentSidebarSettingsAbsenceProven =
+  hasCurrentSidebarSettingsAbsenceEvidence(manifest.sidebarObservation);
 if (
-  !hasCurrentSidebarAbsenceEvidence({
+  !hasCurrentSidebarSettingsAbsenceEvidence({
     footerHelpControlCount: 1,
     settingsControlCount: 0,
-    taskActionRowCount: 2,
-    threadLeadingSvgCount: 0,
   }) ||
   [
     undefined,
@@ -310,46 +311,46 @@ if (
     {
       footerHelpControlCount: 0,
       settingsControlCount: 0,
-      taskActionRowCount: 2,
-      threadLeadingSvgCount: 0,
     },
     {
       footerHelpControlCount: 1,
       settingsControlCount: 1,
-      taskActionRowCount: 2,
-      threadLeadingSvgCount: 0,
     },
-    {
-      footerHelpControlCount: 1,
-      settingsControlCount: 0,
-      taskActionRowCount: 0,
-      threadLeadingSvgCount: 0,
-    },
-    {
-      footerHelpControlCount: 1,
-      settingsControlCount: 0,
-      taskActionRowCount: 2,
-      threadLeadingSvgCount: 1,
-    },
-  ].some(hasCurrentSidebarAbsenceEvidence)
+  ].some(hasCurrentSidebarSettingsAbsenceEvidence)
 ) {
   throw new Error(
-    "sidebar absence evidence must fail closed on each sampled state",
+    "sidebar Settings absence evidence must fail closed on each sampled state",
   );
 }
-for (const id of ["sidebar-settings", "sidebar-thread"]) {
-  if (
-    ids.has(id) ||
-    (currentSidebarAbsenceProven
-      ? remaining.includes(id)
-      : !remaining.includes(id))
-  ) {
-    throw new Error(
-      currentSidebarAbsenceProven
-        ? `${id} must remain absent from the observed current sidebar`
-        : `${id} must return to the approximation inventory on an unproven build`,
-    );
-  }
+if (
+  !Number.isInteger(manifest.sidebarObservation?.projectTaskActionRowCount) ||
+  manifest.sidebarObservation.projectTaskActionRowCount < 2 ||
+  manifest.sidebarObservation?.projectTaskLeadingSvgCount !== 0
+) {
+  throw new Error(
+    "current sidebar capture must retain scoped project-task leading-icon evidence",
+  );
+}
+if (
+  ids.has("sidebar-settings") ||
+  (currentSidebarSettingsAbsenceProven
+    ? remaining.includes("sidebar-settings")
+    : !remaining.includes("sidebar-settings"))
+) {
+  throw new Error(
+    currentSidebarSettingsAbsenceProven
+      ? "sidebar-settings must remain absent from the observed current footer"
+      : "sidebar-settings must return to the approximation inventory on an unproven footer",
+  );
+}
+if (
+  ids.has("sidebar-thread") ||
+  !remaining.includes("sidebar-thread") ||
+  appSource.includes("currentSidebarComposition ? undefined")
+) {
+  throw new Error(
+    "sidebar-thread must remain an explicit Recents approximation until that row type is sampled",
+  );
 }
 
 console.log(

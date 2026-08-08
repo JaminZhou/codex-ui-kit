@@ -74,11 +74,12 @@ fingerprint. An optional interaction-state variant may be retained only when
 the installed app fingerprint is unchanged; all other missing, added, removed,
 duplicated, ambiguous, or unmatched primitives fail closed.
 
-Settings and leading Thread glyphs are removed from the approximation inventory
-only when the same de-identified capture reports one Help footer control, no
-Settings control, at least two task action rows, and no leading SVG in any of
-those row bands. A later account or feature state that does not repeat that
-absence proof restores both approximation IDs.
+Settings is removed from the approximation inventory only when the same
+de-identified capture reports one horizontally and vertically visible Help
+footer control and no visible Settings control. The zero-leading-SVG result is
+scoped to independently identified project-task action rows. Because
+Recents/history rows were not sampled independently, `sidebar-thread` remains
+an explicit approximation and the playground keeps that approximate glyph.
 
 The inherited `scrollbar-color` property is likewise retained from the first
 reviewed capture on an unchanged fingerprint because macOS changes it with
@@ -123,9 +124,9 @@ The current manifest fingerprints Codex Desktop `26.803.41515` (`6321`) and
 contains 14 runtime-observed sidebar icons: mode chevron, Search, neutral
 Activity, New chat, Quick chat, project folder, Pull requests, Sites,
 Scheduled, Plugins, More, Pin, Archive, and Help. The current build confirms
-that Settings and leading thread glyphs are absent from this sidebar rather
-than approximate assets awaiting promotion. Eleven named window-chrome and
-Composer approximations remain explicit, so global pixel parity is still
-ineligible. See
+that Settings is absent from the sampled footer and that sampled project-task
+rows have no leading glyph. Recents rows remain outside that absence proof, so
+the Thread glyph plus eleven named window-chrome and Composer assets leave 12
+approximations explicit and global pixel parity ineligible. See
 [`26.803.41515.md`](26.803.41515.md) for the scoped probe evidence and its
 separation from the broader UI inventory baseline.

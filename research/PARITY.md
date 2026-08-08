@@ -42,7 +42,7 @@ The authoritative current-build inventory is:
   exact 1180×820 dark/resting asset fingerprint and expands exact sidebar icon
   coverage from five to 14. Its sampled sidebar hover/footer contract also
   passes Browser/CDP and Electron acceptance, while the broader routes and
-  lifecycles remain on their separately recorded builds. Eleven visual
+  lifecycles remain on their separately recorded builds. Twelve visual
   approximations remain explicit.
 - Computer Use exploration is blocked by the environment safety policy for
   `com.openai.codex`. User-authorized CDP probes on `26.721.41059` revalidated

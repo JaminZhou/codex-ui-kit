@@ -432,6 +432,8 @@ try {
           !targetRegion ||
           bounds.width === 0 ||
           bounds.height === 0 ||
+          bounds.right <= 0 ||
+          bounds.left >= window.innerWidth ||
           bounds.bottom <= 0 ||
           bounds.top >= window.innerHeight
         ) {
@@ -473,6 +475,8 @@ try {
         ({ bounds }) =>
           bounds.width > 0 &&
           bounds.height > 0 &&
+          bounds.right > 0 &&
+          bounds.left < window.innerWidth &&
           bounds.bottom > 0 &&
           bounds.top < window.innerHeight,
       );
@@ -508,7 +512,7 @@ try {
           : null;
       })
       .filter(Boolean);
-    const threadLeadingSvgCount = taskActionRows.reduce(
+    const projectTaskLeadingSvgCount = taskActionRows.reduce(
       (count, row) =>
         count +
         [...document.querySelectorAll("svg")].filter((svg) => {
@@ -518,6 +522,8 @@ try {
             region(bounds) === "sidebar-projects" &&
             bounds.width > 0 &&
             bounds.height > 0 &&
+            bounds.right > 0 &&
+            bounds.left < window.innerWidth &&
             bounds.right <= row.left &&
             center >= row.top &&
             center <= row.bottom
@@ -534,8 +540,8 @@ try {
         "sidebar-settings",
         "sidebar-footer",
       ).length,
-      taskActionRowCount: taskActionRows.length,
-      threadLeadingSvgCount,
+      projectTaskActionRowCount: taskActionRows.length,
+      projectTaskLeadingSvgCount,
     };
     const fontSamples = [
       ["composer", document.querySelector('[contenteditable="true"][role="textbox"]')],

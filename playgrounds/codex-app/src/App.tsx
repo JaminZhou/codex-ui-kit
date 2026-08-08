@@ -2705,11 +2705,7 @@ export function App() {
             }
             actionsLabel={`Sidebar task actions for ${item.label}`}
             key={item.id}
-            leading={
-              currentSidebarComposition ? undefined : (
-                <SidebarGlyph name="thread" />
-              )
-            }
+            leading={<SidebarGlyph name="thread" />}
             onClick={() => selectScenario(item.id)}
             selected={
               !currentSidebarComposition &&

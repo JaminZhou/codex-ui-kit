@@ -16,8 +16,8 @@
   "sidebarObservation": {
     "footerHelpControlCount": 1,
     "settingsControlCount": 0,
-    "taskActionRowCount": 5,
-    "threadLeadingSvgCount": 0
+    "projectTaskActionRowCount": 5,
+    "projectTaskLeadingSvgCount": 0
   },
   "policy": {
     "purpose": "exploratory visual parity and regression diagnosis",
@@ -18161,6 +18161,7 @@
     }
   ],
   "remainingApproximationIds": [
+    "sidebar-thread",
     "window-chrome-sidebar",
     "window-chrome-back",
     "window-chrome-forward",
