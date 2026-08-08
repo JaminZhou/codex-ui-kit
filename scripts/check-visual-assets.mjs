@@ -290,9 +290,32 @@ for (const id of [
     throw new Error(`${id} must be promoted from current-build runtime evidence`);
   }
 }
+const knownCurrentSidebarAbsenceFingerprint = {
+  appAsarSha256:
+    "5f6e773aafd542d3cf09e10b5dca6cabd301d0a155f4b8ce870e3915fc3da25e",
+  appVersion: "26.803.41515",
+  buildNumber: "6321",
+};
+const manifestFingerprint = {
+  appAsarSha256: manifest.baseline.appAsarSha256,
+  appVersion: manifest.baseline.appVersion,
+  buildNumber: manifest.baseline.buildNumber,
+};
+const currentSidebarAbsenceProven =
+  canonicalize(manifestFingerprint) ===
+  canonicalize(knownCurrentSidebarAbsenceFingerprint);
 for (const id of ["sidebar-settings", "sidebar-thread"]) {
-  if (ids.has(id) || remaining.includes(id)) {
-    throw new Error(`${id} must remain absent from the observed current sidebar`);
+  if (
+    ids.has(id) ||
+    (currentSidebarAbsenceProven
+      ? remaining.includes(id)
+      : !remaining.includes(id))
+  ) {
+    throw new Error(
+      currentSidebarAbsenceProven
+        ? `${id} must remain absent from the observed current sidebar`
+        : `${id} must return to the approximation inventory on an unproven build`,
+    );
   }
 }
 
