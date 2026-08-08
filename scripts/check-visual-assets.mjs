@@ -232,6 +232,8 @@ if (
   !captureSource.includes("separatelyCapturedRootSvgAttributes") ||
   !captureSource.includes("Unsupported SVG attributes on") ||
   !captureSource.includes("baselineContext") ||
+  !captureSource.includes("semanticLabelEntries") ||
+  captureSource.includes("rawSemanticLabel") ||
   !captureSource.includes("computedStyle: computedStyle(element)") ||
   !captureSource.includes("sanitizeVisualAssetIcon") ||
   !captureSource.includes("sanitizeVisualScalarRecord")
@@ -246,6 +248,8 @@ if (
   !updaterSource.includes("Expected one current capture") ||
   !updaterSource.includes("baselineContext") ||
   !updaterSource.includes("complete ordered primitive match with no leftovers") ||
+  !updaterSource.includes("repeated captures do not share one visual fingerprint") ||
+  !updaterSource.includes("explicit current-build geometry seed") ||
   !updaterSource.includes("sanitizeVisualAssetIcon") ||
   !updaterSource.includes("capturedAt")
 ) {

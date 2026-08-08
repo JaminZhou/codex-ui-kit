@@ -21,8 +21,8 @@ Codex UI Kit turns those interaction patterns into protocol-neutral React primit
 
 - The current components are a partial coding-agent UI foundation, not a
   complete Codex Desktop reconstruction.
-- The latest sampled package is `26.730.61639` (`6234`). Its seed candidate
-  surface and evidence status are tracked in
+- The authoritative full-surface inventory baseline remains `26.730.61639`
+  (`6234`). Its seed candidate surface and evidence status are tracked in
   [`research/UI_INVENTORY.md`](research/UI_INVENTORY.md); current-build
   runtime observation currently covers the Terminal session shell, direct
   running/completed panel persistence, cross-worktree mismatch recovery, and
@@ -31,6 +31,10 @@ Codex UI Kit turns those interaction patterns into protocol-neutral React primit
   The broader `26.730.61309` shell/sidebar, route, command, approval,
   compaction, summary, attachment, workspace-entry, and Review evidence is
   retained as previous-build coverage rather than promoted implicitly.
+  A narrower visual-provenance probe against the newer installed
+  `26.803.41515` (`6321`) build revalidates five existing sidebar icons and
+  promotes five more exact sidebar icons without claiming that the broader UI
+  inventory has been refreshed.
 - The repository is public and the package baseline is `0.1.0`, but the npm package has **not** been published.
 - The API remains pre-1.0 and may change while public documentation and consumer feedback mature.
 - Extracted application files, private IPC, bundled fonts, and OpenAI brand assets are not included.
