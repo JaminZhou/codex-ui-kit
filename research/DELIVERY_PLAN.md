@@ -12,13 +12,15 @@ exit gates; it does not replace the inventory.
 
 - The installed package is Codex Desktop `26.803.41515` (`6321`). The broader
   UI inventory evidence baseline remains `26.730.61639` (`6234`) until those
-  surfaces are rerun; only the visual-asset slice has been refreshed on the
-  newer build.
+  surfaces are rerun; only the scoped sidebar visual/interaction slice has
+  been refreshed on the newer build.
 - The inventory contains 81 surface groups: 53 P0, 19 P1, and 9 P2.
 - 5 groups have current-build runtime evidence, 59 have previous-build-only runtime evidence, and 17 have not been sampled.
-- The scoped `26.803.41515` visual refresh revalidates the original five exact
-  sidebar icons, promotes folder/Pull requests/Sites/Scheduled/Plugins, and
-  reduces the explicit visual approximation denominator from 20 to 15.
+- The scoped `26.803.41515` refresh binds 14 sidebar icons to exact runtime
+  evidence. Its latest hover/footer follow-up promotes More, Pin, Archive, and
+  Help, confirms that Settings and leading thread glyphs are absent from the
+  current sidebar, and reduces the explicit visual approximation denominator
+  from 15 to 11.
 - The current `26.730.61639` refresh covers the local Terminal session shell,
   a real bounded running/completed command with panel persistence, and the
   cross-worktree mismatch warning plus recovery actions. It locks
@@ -49,9 +51,14 @@ exit gates; it does not replace the inventory.
   across route navigation, while an inline-start hover no longer opens the
   legacy edge preview. The dedicated de-identified scene passes Browser,
   Electron, internal pixels, and current-build top/selected/footer regional
-  gates. The preceding `26.727.40816` refresh covered window
-  navigation, route loading/restoration, the New chat Composer and project
-  picker, the read-only Terminal shell, and the public Pull request route.
+  gates. The `26.803.41515` follow-up additionally locks the current project
+  More/New chat and task Pin/Archive hover toolbars, the Help footer action,
+  and the absence of leading thread glyphs in both Browser/CDP and Electron.
+  Its current-build top/selected/footer pixel ratios are 3.4526%, 0.1163%, and
+  0.4126%, with the Help control left unmasked. The preceding `26.727.40816`
+  refresh covered window navigation, route loading/restoration, the New chat
+  Composer and project picker, the read-only Terminal shell, and the public
+  Pull request route.
   The PR lifecycle now follows the two-tab Summary/Code contract with Timeline
   integrated into Summary, successful read-only Code content, Auto-merge, and
   responsive detail restoration. Its independent state machine adds
@@ -344,6 +351,9 @@ without confusing package readiness with full product reconstruction.
    Browser/Electron interaction, and regional pixel gates. Light-theme
    current-product evidence and unsampled lifecycle variants remain separate
    follow-up evidence rather than blockers for the observed dark contract.
+   The later `26.803.41515` action slice also replaces the sampled More, Pin,
+   Archive, and Help glyphs with exact runtime primitives and removes
+   Settings/thread-leading assumptions disproved by the current build.
 3. **Tool recovery and mixed thread**: real MCP failure/unavailable/retry plus
    a multi-turn command/approval/file/tool composition.
 4. **App shell continuity**: window chrome, global feedback, loading/error/

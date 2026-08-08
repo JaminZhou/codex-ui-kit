@@ -143,11 +143,15 @@ type DemoView = "conversation" | "pull-request" | "shell" | "workspace";
 type SidebarGlyphName =
   | "activity"
   | "automation"
+  | "archive-current"
   | "folder"
   | "folder-current"
+  | "help-current"
   | "more"
+  | "more-current"
   | "new"
   | "pin"
+  | "pin-current"
   | "plugins"
   | "plugins-current"
   | "pull-request"
@@ -183,6 +187,18 @@ function SidebarGlyph({ name }: { name: SidebarGlyphName }) {
   }
   if (name === "folder-current") {
     return <CurrentBuildIcon name="sidebar-folder" />;
+  }
+  if (name === "archive-current") {
+    return <CurrentBuildIcon name="sidebar-archive" />;
+  }
+  if (name === "help-current") {
+    return <CurrentBuildIcon name="sidebar-help" />;
+  }
+  if (name === "more-current") {
+    return <CurrentBuildIcon name="sidebar-more" />;
+  }
+  if (name === "pin-current") {
+    return <CurrentBuildIcon name="sidebar-pin" />;
   }
   if (name === "plugins-current") {
     return <CurrentBuildIcon name="sidebar-plugins" />;
@@ -2393,9 +2409,15 @@ export function App() {
             "aria-haspopup": "menu",
           }}
           actions={
-            <button aria-label="Open settings" type="button">
-              <SidebarGlyph name="settings" />
-            </button>
+            currentSidebarComposition ? (
+              <button aria-label="Open help menu" type="button">
+                <SidebarGlyph name="help-current" />
+              </button>
+            ) : (
+              <button aria-label="Open settings" type="button">
+                <SidebarGlyph name="settings" />
+              </button>
+            )
           }
         />
       }
@@ -2516,7 +2538,7 @@ export function App() {
                     aria-label={`Project actions for ${project.label}`}
                     type="button"
                   >
-                    <SidebarGlyph name="more" />
+                    <SidebarGlyph name="more-current" />
                   </button>
                   <button
                     aria-label={`Start new chat in ${project.label}`}
@@ -2553,12 +2575,20 @@ export function App() {
               {project.tasks.map((task, index) => (
                 <AppSidebarItem
                   actions={
-                    <button
-                      aria-label={`Task actions for ${project.id}-${index + 1}`}
-                      type="button"
-                    >
-                      <SidebarGlyph name="more" />
-                    </button>
+                    <>
+                      <button
+                        aria-label={`Pin task ${project.id}-${index + 1}`}
+                        type="button"
+                      >
+                        <SidebarGlyph name="pin-current" />
+                      </button>
+                      <button
+                        aria-label={`Archive task ${project.id}-${index + 1}`}
+                        type="button"
+                      >
+                        <SidebarGlyph name="archive-current" />
+                      </button>
+                    </>
                   }
                   actionsLabel={`${project.id} task actions`}
                   depth={1}
@@ -2668,12 +2698,18 @@ export function App() {
                 aria-label={`Sidebar actions for ${item.label}`}
                 type="button"
               >
-                <SidebarGlyph name="more" />
+                <SidebarGlyph
+                  name={currentSidebarComposition ? "more-current" : "more"}
+                />
               </button>
             }
             actionsLabel={`Sidebar task actions for ${item.label}`}
             key={item.id}
-            leading={<SidebarGlyph name="thread" />}
+            leading={
+              currentSidebarComposition ? undefined : (
+                <SidebarGlyph name="thread" />
+              )
+            }
             onClick={() => selectScenario(item.id)}
             selected={
               !currentSidebarComposition &&

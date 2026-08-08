@@ -5,7 +5,7 @@ const scene = {
   id: "electron",
   scenario: "streaming-recovery",
 };
-const { app, page } = await launchScene(scene);
+const { app, page } = await launchScene(scene, { capture: false });
 
 try {
   const nativeState = await app.evaluate(({ BrowserWindow }) => {
@@ -31,6 +31,121 @@ try {
   ) {
     throw new Error(
       `Electron host contract failed: ${JSON.stringify(nativeState)}`,
+    );
+  }
+
+  const projectActions = page.getByRole("toolbar", {
+    name: "session-browser project actions",
+  });
+  await projectActions.locator("..").hover();
+  const projectActionContract = await projectActions.evaluate((toolbar) => {
+    const buttons = Array.from(toolbar.querySelectorAll("button"));
+    const rects = buttons.map((button) => {
+      const value = button.getBoundingClientRect();
+      return {
+        height: value.height,
+        left: value.left,
+        right: value.right,
+        width: value.width,
+      };
+    });
+    return {
+      gap: rects[1] ? rects[1].left - rects[0].right : null,
+      icons: buttons.map((button) =>
+        button
+          .querySelector("[data-current-build-icon]")
+          ?.getAttribute("data-current-build-icon"),
+      ),
+      opacity: getComputedStyle(toolbar).opacity,
+      rects,
+    };
+  });
+  const taskActions = page.getByRole("toolbar", {
+    name: "session-browser task actions",
+  });
+  await taskActions.locator("..").hover();
+  const taskActionContract = await taskActions.evaluate((toolbar) => {
+    const buttons = Array.from(toolbar.querySelectorAll("button"));
+    const rects = buttons.map((button) => {
+      const value = button.getBoundingClientRect();
+      return {
+        height: value.height,
+        left: value.left,
+        right: value.right,
+        width: value.width,
+      };
+    });
+    return {
+      gap: rects[1] ? rects[1].left - rects[0].right : null,
+      icons: buttons.map((button) =>
+        button
+          .querySelector("[data-current-build-icon]")
+          ?.getAttribute("data-current-build-icon"),
+      ),
+      opacity: getComputedStyle(toolbar).opacity,
+      rects,
+    };
+  });
+  const sidebarAssetContract = await page.evaluate(() => {
+    const help = document.querySelector(
+      '.codex-ui-app-sidebar-footer__actions button[aria-label="Open help menu"]',
+    );
+    const icon = help?.querySelector("[data-current-build-icon]");
+    const helpRect = help?.getBoundingClientRect();
+    const iconRect = icon?.getBoundingClientRect();
+    return {
+      help: helpRect
+        ? {
+            height: helpRect.height,
+            iconHeight: iconRect?.height,
+            iconName: icon?.getAttribute("data-current-build-icon"),
+            iconWidth: iconRect?.width,
+            width: helpRect.width,
+          }
+        : null,
+      recentLeadingCount: document.querySelectorAll(
+        '.codex-ui-app-sidebar__section[data-kind="threads"] .codex-ui-app-sidebar__item-leading',
+      ).length,
+      settingsAction: Boolean(
+        document.querySelector(
+          '.codex-ui-app-sidebar-footer__actions button[aria-label="Open settings"]',
+        ),
+      ),
+    };
+  });
+  if (
+    projectActionContract.opacity !== "1" ||
+    projectActionContract.gap !== 6 ||
+    JSON.stringify(projectActionContract.icons) !==
+      JSON.stringify(["sidebar-more", "sidebar-new-chat"]) ||
+    JSON.stringify(projectActionContract.rects) !==
+      JSON.stringify([
+        { height: 24, left: 210, right: 234, width: 24 },
+        { height: 24, left: 240, right: 264, width: 24 },
+      ]) ||
+    taskActionContract.opacity !== "1" ||
+    taskActionContract.gap !== 8 ||
+    JSON.stringify(taskActionContract.icons) !==
+      JSON.stringify(["sidebar-pin", "sidebar-archive"]) ||
+    JSON.stringify(taskActionContract.rects) !==
+      JSON.stringify([
+        { height: 20, left: 214, right: 234, width: 20 },
+        { height: 20, left: 242, right: 262, width: 20 },
+      ]) ||
+    sidebarAssetContract.settingsAction ||
+    sidebarAssetContract.recentLeadingCount !== 0 ||
+    sidebarAssetContract.help?.width !== 32 ||
+    sidebarAssetContract.help?.height !== 32 ||
+    sidebarAssetContract.help?.iconWidth !== 18 ||
+    sidebarAssetContract.help?.iconHeight !== 18 ||
+    sidebarAssetContract.help?.iconName !== "sidebar-help"
+  ) {
+    throw new Error(
+      `Electron current-build sidebar action assets failed: ${JSON.stringify({
+        projectActionContract,
+        sidebarAssetContract,
+        taskActionContract,
+      })}`,
     );
   }
 

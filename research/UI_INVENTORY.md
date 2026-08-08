@@ -70,10 +70,13 @@ observation from a previous build remains historical evidence.
   All `26.730.61309` observations remain previous-build evidence until each
   surface is separately reached on `26.730.61639`.
 
-A later, deliberately narrower `26.803.41515` (`6321`) probe refreshes only
-the visual-asset manifest and ten sidebar icon primitives. It is documented in
-[`26.803.41515.md`](26.803.41515.md) and does not change this inventory's
-current-build counts or promote untested routes and lifecycles.
+A later, deliberately narrower `26.803.41515` (`6321`) probe refreshes the
+sidebar visual/action slice and binds 14 icon primitives to exact runtime
+evidence. It also confirms current project/task hover actions, the Help footer,
+and the absence of leading thread glyphs. It is documented in
+[`26.803.41515.md`](26.803.41515.md) and does not change this broader
+inventory's `26.730.61639` current-build counts or promote untested routes and
+lifecycles.
 
 Current inventory: 81 surface groups; 5 have current-build runtime evidence, 59 have previous-build-only runtime evidence, 17 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 5 groups and Electron verification covers 5.
 Prior acceptance outside the sampled Terminal session, process, and mismatch
@@ -178,6 +181,17 @@ top, 0.1292% for the masked selected row, and 0% for the masked footer.
 Implementation stays `partial` because light-theme runtime evidence, dynamic
 right-panel sizing, context-menu mutations, and broader route coverage remain
 separate work.
+
+The narrower `26.803.41515` follow-up keeps that implementation boundary while
+correcting current dark-state details: project rows expose 24×24 More/New chat
+controls with a 6px gap; nested task rows expose 20×20 Pin/Archive controls
+with an 8px gap; the footer exposes a 32×32 Help control with an 18×18 exact
+glyph; and current task rows do not render a leading thread glyph. Browser/CDP
+and Electron independently gate the hover semantics and geometry. The
+1180×820 current-build regional comparison passes at 3.4526% for the top,
+0.1163% for the ownership-masked selected row, and 0.4126% for the footer,
+where only account-owned content is masked and the Help control remains under
+comparison.
 
 The application-shell continuity slice splits window navigation, route
 lifecycle feedback, route selection/restoration, and global notifications

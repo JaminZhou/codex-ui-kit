@@ -233,6 +233,10 @@ if (
   !captureSource.includes("Unsupported SVG attributes on") ||
   !captureSource.includes("baselineContext") ||
   !captureSource.includes("semanticLabelEntries") ||
+  !captureSource.includes('targetRegion === "sidebar-footer"') ||
+  !captureSource.includes('targetRegion === "sidebar-projects"') ||
+  !captureSource.includes("bounds.bottom <= 0") ||
+  !captureSource.includes("bounds.top >= window.innerHeight") ||
   captureSource.includes("rawSemanticLabel") ||
   !captureSource.includes("computedStyle: computedStyle(element)") ||
   !captureSource.includes("sanitizeVisualAssetIcon") ||
@@ -250,6 +254,10 @@ if (
   !updaterSource.includes("complete ordered primitive match with no leftovers") ||
   !updaterSource.includes("repeated captures do not share one visual fingerprint") ||
   !updaterSource.includes("explicit current-build geometry seed") ||
+  !updaterSource.includes("retainExistingWhenAbsentOnSameFingerprint") ||
+  !updaterSource.includes("sameFingerprintRetainedComputedStyleProperties") ||
+  !updaterSource.includes('"scrollbar-color"') ||
+  !updaterSource.includes("currentBuildAbsenceIds") ||
   !updaterSource.includes("sanitizeVisualAssetIcon") ||
   !updaterSource.includes("capturedAt")
 ) {
@@ -264,6 +272,21 @@ if (!Array.isArray(remaining) || remaining.length === 0) {
 }
 if (new Set(remaining).size !== remaining.length) {
   throw new Error("remaining approximation ids must be unique");
+}
+for (const id of [
+  "sidebar-more",
+  "sidebar-pin",
+  "sidebar-archive",
+  "sidebar-help",
+]) {
+  if (!ids.has(id) || remaining.includes(id)) {
+    throw new Error(`${id} must be promoted from current-build runtime evidence`);
+  }
+}
+for (const id of ["sidebar-settings", "sidebar-thread"]) {
+  if (ids.has(id) || remaining.includes(id)) {
+    throw new Error(`${id} must remain absent from the observed current sidebar`);
+  }
 }
 
 console.log(

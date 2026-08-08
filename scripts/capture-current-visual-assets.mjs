@@ -192,6 +192,10 @@ try {
   const main = ranked[0]?.page;
   if (!main) throw new Error("Main Codex Renderer target not found.");
 
+  await main.bringToFront();
+  await main.waitForFunction(() => document.hasFocus(), undefined, {
+    timeout: 15_000,
+  });
   await main.setViewportSize({ height: 820, width: 1180 });
   await main.waitForFunction(
     () =>
@@ -207,6 +211,23 @@ try {
 
   const result = await main.evaluate((semanticLabelEntries) => {
     const semanticLabels = new Map(semanticLabelEntries);
+    const resolveSemanticId = (label, targetRegion) => {
+      const exact = semanticLabels.get(label);
+      if (exact) return exact;
+      if (targetRegion === "sidebar-footer" && /\bhelp\b/i.test(label)) {
+        return "sidebar-help";
+      }
+      if (targetRegion === "sidebar-projects" && /\bactions?\b/i.test(label)) {
+        return "sidebar-more";
+      }
+      if (targetRegion === "sidebar-projects" && /^pin\b/i.test(label)) {
+        return "sidebar-pin";
+      }
+      if (targetRegion === "sidebar-projects" && /^archive\b/i.test(label)) {
+        return "sidebar-archive";
+      }
+      return null;
+    };
     const allowedSvgTags = new Set([
       "circle",
       "clippath",
@@ -402,7 +423,9 @@ try {
           !owner ||
           !targetRegion ||
           bounds.width === 0 ||
-          bounds.height === 0
+          bounds.height === 0 ||
+          bounds.bottom <= 0 ||
+          bounds.top >= window.innerHeight
         ) {
           return null;
         }
@@ -412,8 +435,8 @@ try {
           owner: {
             role: owner.getAttribute("role") ?? owner.tagName.toLowerCase(),
             semanticId:
-              semanticLabels.get(ariaLabel) ??
-              semanticLabels.get(fixedTextLabel) ??
+              resolveSemanticId(ariaLabel ?? "", targetRegion) ??
+              resolveSemanticId(fixedTextLabel, targetRegion) ??
               null,
           },
           primitives: [...svg.children].map(serializeSvgElement),
@@ -422,7 +445,7 @@ try {
           renderSize: { height: round(bounds.height), width: round(bounds.width) },
           rootAttributes: attributes(svg, true),
           rootComputedStyle: computedStyle(svg),
-          sourceClassName: svg.getAttribute("class"),
+          sourceClassName: svg.getAttribute("class") ?? "",
           viewBox: svg.getAttribute("viewBox"),
         };
       })

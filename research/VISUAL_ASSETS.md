@@ -63,13 +63,20 @@ node scripts/capture-current-visual-assets.mjs
 ```
 
 After reviewing that de-identified output, `pnpm update:visual-assets` performs
-the deterministic promotion and rewrites every explicitly promoted entry (ten
+the deterministic promotion and rewrites every explicitly promoted entry (14
 for the `26.803.41515` baseline). An unchanged app fingerprint requires a
 complete ordered one-to-one primitive and root-geometry match. A changed
 fingerprint may refresh geometry only through a fixed semantic ID; the dynamic
 project-folder glyph instead requires an explicit current-build geometry seed,
-multiple matching instances, and one shared visual fingerprint. No added,
-removed, duplicated, ambiguous, or unmatched primitive is silently accepted.
+multiple matching instances, and one shared visual fingerprint. Repeated More,
+Pin, and Archive controls likewise require multiple candidates and one shared
+fingerprint. An optional interaction-state variant may be retained only when
+the installed app fingerprint is unchanged; all other missing, added, removed,
+duplicated, ambiguous, or unmatched primitives fail closed.
+The inherited `scrollbar-color` property is likewise retained from the first
+reviewed capture on an unchanged fingerprint because macOS changes it with
+window activation even though it cannot affect SVG pixels; every other
+computed property still comes from the fresh observation.
 The updater requires the same isolated port/profile environment and includes
 the app fingerprint, capture date, theme, interaction state, and viewport in
 every v4 hash. A changed app fingerprint refreshes the capture date; an
@@ -106,9 +113,12 @@ attributes, class names, view boxes, and render sizes before capture output.
 Process/profile setup and exact-PID cleanup remain explicit operator steps.
 
 The current manifest fingerprints Codex Desktop `26.803.41515` (`6321`) and
-contains ten runtime-observed sidebar icons: mode chevron, Search, neutral
+contains 14 runtime-observed sidebar icons: mode chevron, Search, neutral
 Activity, New chat, Quick chat, project folder, Pull requests, Sites,
-Scheduled, and Plugins. Fifteen named shell/sidebar/Composer approximations
-remain explicit, so global pixel parity is still ineligible. See
+Scheduled, Plugins, More, Pin, Archive, and Help. The current build confirms
+that Settings and leading thread glyphs are absent from this sidebar rather
+than approximate assets awaiting promotion. Eleven named window-chrome and
+Composer approximations remain explicit, so global pixel parity is still
+ineligible. See
 [`26.803.41515.md`](26.803.41515.md) for the scoped probe evidence and its
 separation from the broader UI inventory baseline.
