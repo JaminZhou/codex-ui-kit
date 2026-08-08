@@ -18,9 +18,10 @@ exit gates; it does not replace the inventory.
 - 5 groups have current-build runtime evidence, 59 have previous-build-only runtime evidence, and 17 have not been sampled.
 - The scoped `26.803.41515` refresh binds 14 sidebar icons to exact runtime
   evidence. Its latest hover/footer follow-up promotes More, Pin, Archive, and
-  Help, confirms that Settings and leading thread glyphs are absent from the
-  current sidebar, and reduces the explicit visual approximation denominator
-  from 15 to 11.
+  Help, confirms that Settings is absent from the sampled footer and that
+  sampled project-task rows have no leading glyph, and reduces the explicit
+  visual approximation denominator from 15 to 12. Recents remains approximate
+  until that row type is independently sampled.
 - The current `26.730.61639` refresh covers the local Terminal session shell,
   a real bounded running/completed command with panel persistence, and the
   cross-worktree mismatch warning plus recovery actions. It locks
@@ -53,7 +54,8 @@ exit gates; it does not replace the inventory.
   Electron, internal pixels, and current-build top/selected/footer regional
   gates. The `26.803.41515` follow-up additionally locks the current project
   More/New chat and task Pin/Archive hover toolbars, the Help footer action,
-  and the absence of leading thread glyphs in both Browser/CDP and Electron.
+  and the scoped absence of leading glyphs in sampled project-task rows in both
+  Browser/CDP and Electron. Recents keeps its approximate leading glyph.
   Its current-build top/selected/footer pixel ratios are 3.4526%, 0.1163%, and
   0.4126%, with the Help control left unmasked. The preceding `26.727.40816`
   refresh covered window navigation, route loading/restoration, the New chat

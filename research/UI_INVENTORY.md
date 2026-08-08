@@ -73,7 +73,8 @@ observation from a previous build remains historical evidence.
 A later, deliberately narrower `26.803.41515` (`6321`) probe refreshes the
 sidebar visual/action slice and binds 14 icon primitives to exact runtime
 evidence. It also confirms current project/task hover actions, the Help footer,
-and the absence of leading thread glyphs. It is documented in
+and no leading glyph in sampled project-task rows. Recents retains an explicit
+approximation because it was not sampled independently. This is documented in
 [`26.803.41515.md`](26.803.41515.md) and does not change this broader
 inventory's `26.730.61639` current-build counts or promote untested routes and
 lifecycles.
@@ -186,8 +187,9 @@ The narrower `26.803.41515` follow-up keeps that implementation boundary while
 correcting current dark-state details: project rows expose 24×24 More/New chat
 controls with a 6px gap; nested task rows expose 20×20 Pin/Archive controls
 with an 8px gap; the footer exposes a 32×32 Help control with an 18×18 exact
-glyph; and current task rows do not render a leading thread glyph. Browser/CDP
-and Electron independently gate the hover semantics and geometry. The
+glyph; and sampled project-task rows do not render a leading glyph. Browser/CDP
+and Electron independently gate the hover semantics and geometry while Recents
+keeps its approximate leading glyph. The
 1180×820 current-build regional comparison passes at 3.4526% for the top,
 0.1163% for the ownership-masked selected row, and 0.4126% for the footer,
 where only account-owned content is masked and the Help control remains under

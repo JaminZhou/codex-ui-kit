@@ -34,8 +34,9 @@ Codex UI Kit turns those interaction patterns into protocol-neutral React primit
   A narrower visual-provenance and sidebar-action probe against the newer
   installed `26.803.41515` (`6321`) build binds 14 sidebar icons to exact
   runtime evidence, confirms that the current footer uses Help rather than
-  Settings and that current task rows have no leading thread glyph, without
-  claiming that the broader UI inventory has been refreshed.
+  Settings, and records no leading glyph in sampled project-task rows. Recents
+  remains an explicit approximation because that row type was not independently
+  sampled; the broader UI inventory has not been refreshed.
 - The repository is public and the package baseline is `0.1.0`, but the npm package has **not** been published.
 - The API remains pre-1.0 and may change while public documentation and consumer feedback mature.
 - Extracted application files, private IPC, bundled fonts, and OpenAI brand assets are not included.
