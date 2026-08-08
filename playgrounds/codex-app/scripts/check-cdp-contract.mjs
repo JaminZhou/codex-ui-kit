@@ -4851,18 +4851,22 @@ try {
   });
   await projectActions.locator("..").hover();
   const currentProjectActions = await projectActions.evaluate((toolbar) => {
+    const row = toolbar.closest(".codex-ui-app-sidebar__item-row");
+    const rowRect = row?.getBoundingClientRect();
     const buttons = Array.from(toolbar.querySelectorAll("button"));
     const rects = buttons.map((button) => {
       const value = button.getBoundingClientRect();
       return {
         height: value.height,
-        left: value.left,
-        right: value.right,
+        rightInset: rowRect ? rowRect.right - value.right : null,
         width: value.width,
       };
     });
     return {
-      gap: rects[1] ? rects[1].left - rects[0].right : null,
+      gap: buttons[1]
+        ? buttons[1].getBoundingClientRect().left -
+          buttons[0].getBoundingClientRect().right
+        : null,
       icons: buttons.map((button) =>
         button
           .querySelector("[data-current-build-icon]")
@@ -4877,18 +4881,22 @@ try {
   });
   await pinnedTaskActions.locator("..").hover();
   const currentTaskActions = await pinnedTaskActions.evaluate((toolbar) => {
+    const row = toolbar.closest(".codex-ui-app-sidebar__item-row");
+    const rowRect = row?.getBoundingClientRect();
     const buttons = Array.from(toolbar.querySelectorAll("button"));
     const rects = buttons.map((button) => {
       const value = button.getBoundingClientRect();
       return {
         height: value.height,
-        left: value.left,
-        right: value.right,
+        rightInset: rowRect ? rowRect.right - value.right : null,
         width: value.width,
       };
     });
     return {
-      gap: rects[1] ? rects[1].left - rects[0].right : null,
+      gap: buttons[1]
+        ? buttons[1].getBoundingClientRect().left -
+          buttons[0].getBoundingClientRect().right
+        : null,
       icons: buttons.map((button) =>
         button
           .querySelector("[data-current-build-icon]")
@@ -4932,8 +4940,8 @@ try {
       JSON.stringify(["sidebar-more", "sidebar-new-chat"]) ||
     JSON.stringify(currentProjectActions.rects) !==
       JSON.stringify([
-        { height: 24, left: 210, right: 234, width: 24 },
-        { height: 24, left: 240, right: 264, width: 24 },
+        { height: 24, rightInset: 32, width: 24 },
+        { height: 24, rightInset: 2, width: 24 },
       ]) ||
     currentTaskActions.opacity !== "1" ||
     currentTaskActions.gap !== 8 ||
@@ -4941,8 +4949,8 @@ try {
       JSON.stringify(["sidebar-pin", "sidebar-archive"]) ||
     JSON.stringify(currentTaskActions.rects) !==
       JSON.stringify([
-        { height: 20, left: 214, right: 234, width: 20 },
-        { height: 20, left: 242, right: 262, width: 20 },
+        { height: 20, rightInset: 32, width: 20 },
+        { height: 20, rightInset: 4, width: 20 },
       ]) ||
     currentSidebarAssets.settingsAction ||
     currentSidebarAssets.recentLeadingCount !== 0 ||

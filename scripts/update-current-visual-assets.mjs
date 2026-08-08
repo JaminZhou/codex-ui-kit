@@ -375,8 +375,27 @@ const currentBuildAbsenceIds = new Set([
   "sidebar-settings",
   "sidebar-thread",
 ]);
-manifest.remainingApproximationIds = manifest.remainingApproximationIds.filter(
-  (id) => !promotedIds.has(id) && !currentBuildAbsenceIds.has(id),
+const knownCurrentSidebarAbsenceFingerprint = {
+  appAsarSha256:
+    "5f6e773aafd542d3cf09e10b5dca6cabd301d0a155f4b8ce870e3915fc3da25e",
+  appVersion: "26.803.41515",
+  buildNumber: "6321",
+};
+const currentSidebarAbsenceProven =
+  canonicalize(currentFingerprint) ===
+  canonicalize(knownCurrentSidebarAbsenceFingerprint);
+const remainingApproximationCandidates = new Set(
+  manifest.remainingApproximationIds,
+);
+if (!currentSidebarAbsenceProven) {
+  for (const id of currentBuildAbsenceIds) {
+    remainingApproximationCandidates.add(id);
+  }
+}
+manifest.remainingApproximationIds = [...remainingApproximationCandidates].filter(
+  (id) =>
+    !promotedIds.has(id) &&
+    !(currentSidebarAbsenceProven && currentBuildAbsenceIds.has(id)),
 );
 
 const output = `${JSON.stringify(manifest, null, 2)}\n`;

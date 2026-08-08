@@ -211,9 +211,14 @@ try {
 
   const result = await main.evaluate((semanticLabelEntries) => {
     const semanticLabels = new Map(semanticLabelEntries);
-    const resolveSemanticId = (label, targetRegion) => {
+    const resolveSemanticId = (
+      label,
+      targetRegion,
+      allowControlPatternFallback,
+    ) => {
       const exact = semanticLabels.get(label);
       if (exact) return exact;
+      if (!allowControlPatternFallback) return null;
       if (targetRegion === "sidebar-footer" && /\bhelp\b/i.test(label)) {
         return "sidebar-help";
       }
@@ -435,8 +440,8 @@ try {
           owner: {
             role: owner.getAttribute("role") ?? owner.tagName.toLowerCase(),
             semanticId:
-              resolveSemanticId(ariaLabel ?? "", targetRegion) ??
-              resolveSemanticId(fixedTextLabel, targetRegion) ??
+              resolveSemanticId(ariaLabel ?? "", targetRegion, true) ??
+              resolveSemanticId(fixedTextLabel, targetRegion, false) ??
               null,
           },
           primitives: [...svg.children].map(serializeSvgElement),

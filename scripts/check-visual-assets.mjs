@@ -235,6 +235,10 @@ if (
   !captureSource.includes("semanticLabelEntries") ||
   !captureSource.includes('targetRegion === "sidebar-footer"') ||
   !captureSource.includes('targetRegion === "sidebar-projects"') ||
+  !captureSource.includes("allowControlPatternFallback") ||
+  !captureSource.includes(
+    'resolveSemanticId(fixedTextLabel, targetRegion, false)',
+  ) ||
   !captureSource.includes("bounds.bottom <= 0") ||
   !captureSource.includes("bounds.top >= window.innerHeight") ||
   captureSource.includes("rawSemanticLabel") ||
@@ -258,6 +262,9 @@ if (
   !updaterSource.includes("sameFingerprintRetainedComputedStyleProperties") ||
   !updaterSource.includes('"scrollbar-color"') ||
   !updaterSource.includes("currentBuildAbsenceIds") ||
+  !updaterSource.includes("knownCurrentSidebarAbsenceFingerprint") ||
+  !updaterSource.includes("currentSidebarAbsenceProven") ||
+  !updaterSource.includes("remainingApproximationCandidates.add(id)") ||
   !updaterSource.includes("sanitizeVisualAssetIcon") ||
   !updaterSource.includes("capturedAt")
 ) {
