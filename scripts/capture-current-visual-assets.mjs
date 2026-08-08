@@ -159,8 +159,13 @@ const semanticLabels = new Map([
   ["Back to ChatGPT", "window-back-to-chatgpt"],
   ["Dictate", "composer-dictate"],
   ["Don't work in a project", "composer-clear-project"],
+  ["New chat", "sidebar-new-chat"],
+  ["Plugins", "sidebar-plugins"],
+  ["Pull requests", "sidebar-pull-request"],
   ["Quick chat", "sidebar-quick-chat"],
   ["Search", "sidebar-search"],
+  ["Scheduled", "sidebar-scheduled"],
+  ["Sites", "sidebar-sites"],
   ["Start new voice chat", "composer-voice"],
   ["Switch mode, current mode: Codex", "sidebar-mode-chevron"],
   ["View activity", "sidebar-activity"],
@@ -200,7 +205,8 @@ try {
     await document.fonts.ready;
   });
 
-  const result = await main.evaluate(() => {
+  const result = await main.evaluate((semanticLabelEntries) => {
+    const semanticLabels = new Map(semanticLabelEntries);
     const allowedSvgTags = new Set([
       "circle",
       "clippath",
@@ -338,10 +344,11 @@ try {
     };
     const region = (value) => {
       if (value.top < 52) return "titlebar";
-      if (value.left < 274 && value.top < 180) return "sidebar-primary";
+      if (value.left < 274 && value.top < 250) return "sidebar-primary";
       if (value.left < 274 && value.top > window.innerHeight - 60) {
         return "sidebar-footer";
       }
+      if (value.left < 274) return "sidebar-projects";
       if (value.left >= 274 && value.top > window.innerHeight - 220) {
         return "composer";
       }
@@ -388,7 +395,7 @@ try {
       .map((svg) => {
         const bounds = svg.getBoundingClientRect();
         const owner = svg.closest(
-          'button, [role="button"], [role="tab"], [role="menuitem"]',
+          'a, button, [role="button"], [role="tab"], [role="menuitem"]',
         );
         const targetRegion = region(bounds);
         if (
@@ -399,10 +406,15 @@ try {
         ) {
           return null;
         }
+        const ariaLabel = owner.getAttribute("aria-label");
+        const fixedTextLabel = owner.textContent?.trim() ?? "";
         return {
           owner: {
-            rawSemanticLabel: owner.getAttribute("aria-label"),
             role: owner.getAttribute("role") ?? owner.tagName.toLowerCase(),
+            semanticId:
+              semanticLabels.get(ariaLabel) ??
+              semanticLabels.get(fixedTextLabel) ??
+              null,
           },
           primitives: [...svg.children].map(serializeSvgElement),
           region: targetRegion,
@@ -432,7 +444,7 @@ try {
       icons,
       viewport: { height: window.innerHeight, width: window.innerWidth },
     };
-  });
+  }, [...semanticLabels]);
   if (
     result.viewport.height !== baselineContext.viewport.height ||
     result.viewport.width !== baselineContext.viewport.width
@@ -462,10 +474,7 @@ try {
     const sanitized = sanitizeVisualAssetIcon(
       {
         ...icon,
-        owner: {
-          role: icon.owner.role,
-          semanticId: semanticLabels.get(icon.owner.rawSemanticLabel) ?? null,
-        },
+        owner: icon.owner,
       },
       `capture.icons[${index}]`,
     );

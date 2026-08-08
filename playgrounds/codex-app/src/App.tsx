@@ -144,10 +144,12 @@ type SidebarGlyphName =
   | "activity"
   | "automation"
   | "folder"
+  | "folder-current"
   | "more"
   | "new"
   | "pin"
   | "plugins"
+  | "plugins-current"
   | "pull-request"
   | "quick"
   | "search"
@@ -176,22 +178,31 @@ function SidebarGlyph({ name }: { name: SidebarGlyphName }) {
   if (name === "search") {
     return <CurrentBuildIcon name="sidebar-search" />;
   }
+  if (name === "automation") {
+    return <CurrentBuildIcon name="sidebar-scheduled" />;
+  }
+  if (name === "folder-current") {
+    return <CurrentBuildIcon name="sidebar-folder" />;
+  }
+  if (name === "plugins-current") {
+    return <CurrentBuildIcon name="sidebar-plugins" />;
+  }
+  if (name === "pull-request") {
+    return <CurrentBuildIcon name="sidebar-pull-request" />;
+  }
+  if (name === "sites") {
+    return <CurrentBuildIcon name="sidebar-sites" />;
+  }
   const path = {
-    automation:
-      "M8 2.25a5.75 5.75 0 1 1-4.07 1.68M8 4.75V8l2.15 1.45",
     folder:
       "M1.75 4.5h4l1.2 1.5h7.3v6.25a1.5 1.5 0 0 1-1.5 1.5H3.25a1.5 1.5 0 0 1-1.5-1.5V4.5Zm0 2h12.5",
     more: "M3.25 8h.01M8 8h.01M12.75 8h.01",
     pin: "m5.25 2.5 5.5 5.5M9.6 1.6l4.8 4.8-2.15 1.05-3.7 3.7-1.05 2.15-4.8-4.8 2.15-1.05 3.7-3.7L9.6 1.6ZM8 11l-3 3",
     plugins:
       "M6.25 1.75v3M9.75 1.75v3M4.5 4.75h7v2.5A3.5 3.5 0 0 1 8 10.75v3.5M2 7.25h12",
-    "pull-request":
-      "M4 3.25v8.5M4 3.25a1.25 1.25 0 1 0 0 .01M4 11.75a1.25 1.25 0 1 0 0 .01M12 4.5a1.25 1.25 0 1 0 0 .01M12 5.75v2a4 4 0 0 1-4 4H6.5",
     sidebar: "M2.25 3.5h11.5v9H2.25v-9Zm4 0v9",
     settings:
       "M8 5.5A2.5 2.5 0 1 1 8 10.5 2.5 2.5 0 0 1 8 5.5Zm0-3.75.8 1.3 1.55.35 1.2-.95 2 2-.95 1.2.35 1.55 1.3.8-1.3.8-.35 1.55.95 1.2-2 2-1.2-.95-1.55.35L8 14.25l-.8-1.3-1.55-.35-1.2.95-2-2 .95-1.2-.35-1.55L1.75 8l1.3-.8.35-1.55-.95-1.2 2-2 1.2.95 1.55-.35L8 1.75Z",
-    sites:
-      "M2.25 2.25h4.5v4.5h-4.5v-4.5Zm7 0h4.5v4.5h-4.5v-4.5Zm-7 7h4.5v4.5h-4.5v-4.5Zm7 0h4.5v4.5h-4.5v-4.5Z",
     thread:
       "M2.25 3.25h11.5v7.5H7L3.25 13.5v-2.75h-1V3.25Z",
   }[name];
@@ -2483,7 +2494,7 @@ export function App() {
           <AppSidebarItem leading={<SidebarGlyph name="automation" />}>
             Scheduled
           </AppSidebarItem>
-          <AppSidebarItem leading={<SidebarGlyph name="plugins" />}>
+          <AppSidebarItem leading={<SidebarGlyph name="plugins-current" />}>
             Plugins
           </AppSidebarItem>
         </>
@@ -2518,7 +2529,7 @@ export function App() {
               actionsLabel={`${project.label} project actions`}
               key={project.id}
               label={project.label}
-              leading={<SidebarGlyph name="folder" />}
+              leading={<SidebarGlyph name="folder-current" />}
               selected={
                 project.selected &&
                 view === "conversation" &&
@@ -2572,7 +2583,7 @@ export function App() {
                 </>
               }
               actionsLabel="Current task actions"
-              leading={<SidebarGlyph name="folder" />}
+              leading={<SidebarGlyph name="folder-current" />}
               status={
                 hasActiveTurnWork(state) || isTurnActive(state.status)
                   ? "running"
@@ -2617,7 +2628,7 @@ export function App() {
         toggleLabel="Toggle projects"
       >
         <AppSidebarItem
-          leading={<SidebarGlyph name="folder" />}
+          leading={<SidebarGlyph name="folder-current" />}
           onClick={() => openWorkspace("codex-ui-kit")}
           selected={
             view === "workspace" &&
@@ -2627,7 +2638,7 @@ export function App() {
           codex-ui-kit
         </AppSidebarItem>
         <AppSidebarItem
-          leading={<SidebarGlyph name="folder" />}
+          leading={<SidebarGlyph name="folder-current" />}
           onClick={() => openWorkspace("app-server-client")}
           selected={
             view === "workspace" &&
@@ -2637,7 +2648,7 @@ export function App() {
           codex-app-server-client
         </AppSidebarItem>
         <AppSidebarItem
-          leading={<SidebarGlyph name="folder" />}
+          leading={<SidebarGlyph name="folder-current" />}
           status="queued"
           statusLabel="Project task queued"
         >

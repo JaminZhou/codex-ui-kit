@@ -3,10 +3,15 @@ import visualAssets from "../../../research/visual-assets.json";
 
 type CurrentBuildIconName =
   | "sidebar-activity"
+  | "sidebar-folder"
   | "sidebar-mode-chevron"
   | "sidebar-new-chat"
+  | "sidebar-plugins"
+  | "sidebar-pull-request"
   | "sidebar-quick-chat"
-  | "sidebar-search";
+  | "sidebar-scheduled"
+  | "sidebar-search"
+  | "sidebar-sites";
 
 interface CurrentBuildIconProps extends SVGProps<SVGSVGElement> {
   name: CurrentBuildIconName;

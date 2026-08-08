@@ -6,6 +6,9 @@ not establish full conversation, workspace, application, or product coverage.
 
 The authoritative current-build inventory is:
 
+- [`26.803.41515.md`](26.803.41515.md) for the newer, narrowly scoped visual
+  asset fingerprint and sidebar-icon provenance refresh; it does not replace
+  the broader full-surface inventory baseline;
 - [`26.730.61639.md`](26.730.61639.md) for the current package fingerprint,
   Terminal session/process/mismatch captures, and current runtime boundary;
 - [`26.730.61309.md`](26.730.61309.md) for the previous sidebar, command,
@@ -35,6 +38,11 @@ The authoritative current-build inventory is:
 - The Electron playground validates the current package in a desktop
   BrowserWindow; it does not prove parity with unobserved product routes,
   panels, state transitions, or window types.
+- A scoped Codex Desktop `26.803.41515` (`6321`) visual probe refreshes the
+  exact 1180×820 dark/resting asset fingerprint and expands exact sidebar icon
+  coverage from five to ten. It intentionally does not promote any broader
+  route, lifecycle, Browser, Electron, or inventory evidence to this build;
+  fifteen visual approximations remain explicit.
 - Computer Use exploration is blocked by the environment safety policy for
   `com.openai.codex`. User-authorized CDP probes on `26.721.41059` revalidated
   access, the main-shell target shape, a de-identified Projects entry/list,

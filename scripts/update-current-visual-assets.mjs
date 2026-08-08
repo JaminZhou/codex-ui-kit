@@ -72,22 +72,8 @@ function promotePrimitive(existing, observed, context) {
   };
 }
 
-const activityAttentionPrimitiveGeometry = {
-  attributes: {
-    d: "M14.1562 6.63542C14.6701 6.93403 15.2292 7.08333 15.8333 7.08333C16.4375 7.08333 16.9931 6.93403 17.5 6.63542C18.0139 6.33681 18.4201 5.93403 18.7187 5.42708C19.0174 4.91319 19.1667 4.35417 19.1667 3.75C19.1667 3.14583 19.0174 2.59028 18.7187 2.08333C18.4201 1.56944 18.0139 1.16319 17.5 0.864583C16.9931 0.565972 16.4375 0.416667 15.8333 0.416667C15.2292 0.416667 14.6701 0.565972 14.1562 0.864583C13.6493 1.16319 13.2465 1.56944 12.9479 2.08333C12.6493 2.59028 12.5 3.14583 12.5 3.75C12.5 4.35417 12.6493 4.91319 12.9479 5.42708C13.2465 5.93403 13.6493 6.33681 14.1562 6.63542Z",
-    fill: "var(--color-token-text-link-foreground)",
-  },
-  tag: "path",
-};
-
 function promotePrimitives(icon, observed) {
-  const expectedObservedGeometry =
-    icon.id === "sidebar-activity"
-      ? [
-          ...icon.primitives.map(primitiveGeometry),
-          activityAttentionPrimitiveGeometry,
-        ]
-      : icon.primitives.map(primitiveGeometry);
+  const expectedObservedGeometry = icon.primitives.map(primitiveGeometry);
   const observedGeometry = observed.primitives.map(primitiveGeometry);
   if (canonicalize(observedGeometry) !== canonicalize(expectedObservedGeometry)) {
     throw new Error(
@@ -102,6 +88,98 @@ function promotePrimitives(icon, observed) {
     ),
   );
 }
+
+const promotionSpecs = new Map([
+  [
+    "sidebar-mode-chevron",
+    {
+      ownerAriaLabel: "Switch mode, current mode: Codex",
+      region: "sidebar-primary",
+      semanticId: "sidebar-mode-chevron",
+    },
+  ],
+  [
+    "sidebar-search",
+    {
+      ownerAriaLabel: "Search",
+      region: "sidebar-primary",
+      semanticId: "sidebar-search",
+    },
+  ],
+  [
+    "sidebar-activity",
+    {
+      ownerAriaLabel: "View activity",
+      region: "sidebar-primary",
+      semanticId: "sidebar-activity",
+    },
+  ],
+  [
+    "sidebar-new-chat",
+    {
+      ownerAriaLabel: null,
+      ownerEvidence: "first primary sidebar row labelled New chat",
+      region: "sidebar-primary",
+      semanticId: "sidebar-new-chat",
+    },
+  ],
+  [
+    "sidebar-quick-chat",
+    {
+      ownerAriaLabel: "Quick chat",
+      region: "sidebar-primary",
+      semanticId: "sidebar-quick-chat",
+    },
+  ],
+  [
+    "sidebar-folder",
+    {
+      geometrySha256:
+        "19f3960517971cf25ba4d32df632b5088a93be74278125ac49ce01d854a59124",
+      minimumCandidates: 2,
+      ownerAriaLabel: null,
+      ownerEvidence:
+        "repeated leading glyph in project rows, selected by an explicit current-build geometry seed",
+      region: "sidebar-projects",
+    },
+  ],
+  [
+    "sidebar-pull-request",
+    {
+      ownerAriaLabel: null,
+      ownerEvidence: "primary sidebar row labelled Pull requests",
+      region: "sidebar-primary",
+      semanticId: "sidebar-pull-request",
+    },
+  ],
+  [
+    "sidebar-sites",
+    {
+      ownerAriaLabel: null,
+      ownerEvidence: "primary sidebar row labelled Sites",
+      region: "sidebar-primary",
+      semanticId: "sidebar-sites",
+    },
+  ],
+  [
+    "sidebar-scheduled",
+    {
+      ownerAriaLabel: null,
+      ownerEvidence: "primary sidebar row labelled Scheduled",
+      region: "sidebar-primary",
+      semanticId: "sidebar-scheduled",
+    },
+  ],
+  [
+    "sidebar-plugins",
+    {
+      ownerAriaLabel: null,
+      ownerEvidence: "primary sidebar row labelled Plugins",
+      region: "sidebar-primary",
+      semanticId: "sidebar-plugins",
+    },
+  ],
+]);
 
 const manifest = JSON.parse(readFileSync(manifestPath, "utf8"));
 const capture = JSON.parse(
@@ -122,13 +200,6 @@ if (
   throw new Error("Capture is missing its exact baseline context.");
 }
 
-const semanticIdByManifestId = new Map([
-  ["sidebar-activity", "sidebar-activity-attention"],
-  ["sidebar-mode-chevron", "sidebar-mode-chevron"],
-  ["sidebar-quick-chat", "sidebar-quick-chat"],
-  ["sidebar-search", "sidebar-search"],
-]);
-
 const previousFingerprint = {
   appAsarSha256: manifest.baseline.appAsarSha256,
   appVersion: manifest.baseline.appVersion,
@@ -139,45 +210,72 @@ const currentFingerprint = {
   appVersion: baselineContext.appVersion,
   buildNumber: baselineContext.buildNumber,
 };
+const fingerprintChanged =
+  canonicalize(previousFingerprint) !== canonicalize(currentFingerprint);
 const capturedAt =
-  canonicalize(previousFingerprint) === canonicalize(currentFingerprint) &&
+  !fingerprintChanged &&
   /^\d{4}-\d{2}-\d{2}$/.test(manifest.baseline.capturedAt ?? "")
     ? manifest.baseline.capturedAt
     : new Date().toISOString().slice(0, 10);
 const hashBaselineContext = { ...baselineContext, capturedAt };
 manifest.geometryHashVersion = 4;
 manifest.baseline = hashBaselineContext;
-manifest.icons = manifest.icons.map((icon) => {
-  const semanticId = semanticIdByManifestId.get(icon.id);
-  const candidates = semanticId
-    ? capture.icons.filter((candidate) => candidate.owner.semanticId === semanticId)
-    : capture.icons.filter(
-        (candidate) =>
-          candidate.region === icon.region &&
-          legacyGeometryHash(candidate) === legacyGeometryHash(icon),
-      );
-  if (candidates.length !== 1) {
+
+function selectObservedIcon(id, spec) {
+  const candidates = capture.icons.filter(
+    (candidate) =>
+      candidate.region === spec.region &&
+      (spec.semanticId
+        ? candidate.owner.semanticId === spec.semanticId
+        : legacyGeometryHash(candidate) === spec.geometrySha256),
+  );
+  if (!spec.minimumCandidates && candidates.length !== 1) {
     throw new Error(
-      `Expected one current capture for ${icon.id}, received ${candidates.length}.`,
+      `Expected one current capture for ${id}, received ${candidates.length}.`,
     );
   }
-  const observed = candidates[0];
-  if (!observed) {
-    throw new Error(`No current capture matches ${icon.id}.`);
+  if (spec.minimumCandidates && candidates.length < spec.minimumCandidates) {
+    throw new Error(
+      `Expected at least ${spec.minimumCandidates} current captures for ${id}, received ${candidates.length}.`,
+    );
   }
-  if (
-    observed.region !== icon.region ||
-    observed.viewBox !== icon.viewBox ||
-    canonicalize(observed.rootAttributes) !== canonicalize(icon.rootAttributes)
-  ) {
-    throw new Error(`${icon.id} root geometry or region changed.`);
+  if (new Set(candidates.map((candidate) => candidate.sha256)).size !== 1) {
+    throw new Error(`${id} repeated captures do not share one visual fingerprint.`);
   }
+  return candidates[0];
+}
+
+function promoteIcon(id, existing) {
+  const spec = promotionSpecs.get(id);
+  if (!spec) throw new Error(`Missing explicit promotion spec for ${id}.`);
+  const observed = selectObservedIcon(id, spec);
+  if (!observed) throw new Error(`No current capture matches ${id}.`);
+
+  let primitives = observed.primitives;
+  if (existing && !fingerprintChanged) {
+    if (
+      observed.region !== existing.region ||
+      observed.viewBox !== existing.viewBox ||
+      canonicalize(observed.rootAttributes) !==
+        canonicalize(existing.rootAttributes)
+    ) {
+      throw new Error(`${id} root geometry or region changed.`);
+    }
+    primitives = promotePrimitives(existing, observed);
+  }
+
   const promoted = {
-    ...icon,
-    primitives: promotePrimitives(icon, observed),
+    id,
+    ownerAriaLabel: spec.ownerAriaLabel,
+    ...(spec.ownerEvidence ? { ownerEvidence: spec.ownerEvidence } : {}),
+    primitives,
+    region: observed.region,
     renderSize: observed.renderSize,
+    rootAttributes: observed.rootAttributes,
     rootComputedStyle: observed.rootComputedStyle,
     sourceClassName: observed.sourceClassName,
+    status: "runtime-observed",
+    viewBox: observed.viewBox,
   };
   promoted.sha256 = createHash("sha256")
     .update(
@@ -193,7 +291,16 @@ manifest.icons = manifest.icons.map((icon) => {
     )
     .digest("hex");
   return promoted;
-});
+}
+
+const existingById = new Map(manifest.icons.map((icon) => [icon.id, icon]));
+manifest.icons = [...promotionSpecs].map(([id]) =>
+  promoteIcon(id, existingById.get(id)),
+);
+const promotedIds = new Set(promotionSpecs.keys());
+manifest.remainingApproximationIds = manifest.remainingApproximationIds.filter(
+  (id) => !promotedIds.has(id),
+);
 
 const output = `${JSON.stringify(manifest, null, 2)}\n`;
 if (write) {

@@ -70,6 +70,11 @@ observation from a previous build remains historical evidence.
   All `26.730.61309` observations remain previous-build evidence until each
   surface is separately reached on `26.730.61639`.
 
+A later, deliberately narrower `26.803.41515` (`6321`) probe refreshes only
+the visual-asset manifest and ten sidebar icon primitives. It is documented in
+[`26.803.41515.md`](26.803.41515.md) and does not change this inventory's
+current-build counts or promote untested routes and lifecycles.
+
 Current inventory: 81 surface groups; 5 have current-build runtime evidence, 59 have previous-build-only runtime evidence, 17 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 5 groups and Electron verification covers 5.
 Prior acceptance outside the sampled Terminal session, process, and mismatch
 slices remains recorded as `partial_legacy` until current-build

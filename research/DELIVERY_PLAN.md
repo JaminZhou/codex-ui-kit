@@ -10,9 +10,15 @@ exit gates; it does not replace the inventory.
 
 ## Current position
 
-- The current installed package is Codex Desktop `26.730.61639` (`6234`).
+- The installed package is Codex Desktop `26.803.41515` (`6321`). The broader
+  UI inventory evidence baseline remains `26.730.61639` (`6234`) until those
+  surfaces are rerun; only the visual-asset slice has been refreshed on the
+  newer build.
 - The inventory contains 81 surface groups: 53 P0, 19 P1, and 9 P2.
 - 5 groups have current-build runtime evidence, 59 have previous-build-only runtime evidence, and 17 have not been sampled.
+- The scoped `26.803.41515` visual refresh revalidates the original five exact
+  sidebar icons, promotes folder/Pull requests/Sites/Scheduled/Plugins, and
+  reduces the explicit visual approximation denominator from 20 to 15.
 - The current `26.730.61639` refresh covers the local Terminal session shell,
   a real bounded running/completed command with panel persistence, and the
   cross-worktree mismatch warning plus recovery actions. It locks

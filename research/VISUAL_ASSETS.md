@@ -63,15 +63,18 @@ node scripts/capture-current-visual-assets.mjs
 ```
 
 After reviewing that de-identified output, `pnpm update:visual-assets` performs
-the deterministic geometry match and rewrites the five promoted entries. It
-requires a complete ordered one-to-one primitive match; the Activity icon is
-the only explicit derivation and must contain the observed, fingerprinted
-attention-dot primitive after the promoted neutral bell primitive. No added,
-removed, duplicated, or unmatched primitive is silently accepted. The
-updater requires the same isolated port/profile environment and includes the
-app fingerprint, capture date, theme, interaction state, and viewport in every
-v4 hash. A changed app fingerprint refreshes the capture date; an unchanged
-fingerprint preserves it so a dry run remains byte-for-byte deterministic.
+the deterministic promotion and rewrites every explicitly promoted entry (ten
+for the `26.803.41515` baseline). An unchanged app fingerprint requires a
+complete ordered one-to-one primitive and root-geometry match. A changed
+fingerprint may refresh geometry only through a fixed semantic ID; the dynamic
+project-folder glyph instead requires an explicit current-build geometry seed,
+multiple matching instances, and one shared visual fingerprint. No added,
+removed, duplicated, ambiguous, or unmatched primitive is silently accepted.
+The updater requires the same isolated port/profile environment and includes
+the app fingerprint, capture date, theme, interaction state, and viewport in
+every v4 hash. A changed app fingerprint refreshes the capture date; an
+unchanged fingerprint preserves it so a dry run remains byte-for-byte
+deterministic.
 
 The capture script is read-only: it first proves that every listener is bound
 only to the declared loopback endpoint and that exactly one listener process
@@ -101,3 +104,11 @@ whitespace cannot turn into document-relative requests. The same shared
 sanitizer covers the de-identified font-style samples and all promoted icon styles,
 attributes, class names, view boxes, and render sizes before capture output.
 Process/profile setup and exact-PID cleanup remain explicit operator steps.
+
+The current manifest fingerprints Codex Desktop `26.803.41515` (`6321`) and
+contains ten runtime-observed sidebar icons: mode chevron, Search, neutral
+Activity, New chat, Quick chat, project folder, Pull requests, Sites,
+Scheduled, and Plugins. Fifteen named shell/sidebar/Composer approximations
+remain explicit, so global pixel parity is still ineligible. See
+[`26.803.41515.md`](26.803.41515.md) for the scoped probe evidence and its
+separation from the broader UI inventory baseline.
