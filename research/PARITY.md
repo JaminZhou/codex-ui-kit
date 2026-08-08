@@ -40,9 +40,10 @@ The authoritative current-build inventory is:
   panels, state transitions, or window types.
 - A scoped Codex Desktop `26.803.41515` (`6321`) visual probe refreshes the
   exact 1180×820 dark/resting asset fingerprint and expands exact sidebar icon
-  coverage from five to ten. It intentionally does not promote any broader
-  route, lifecycle, Browser, Electron, or inventory evidence to this build;
-  fifteen visual approximations remain explicit.
+  coverage from five to 14. Its sampled sidebar hover/footer contract also
+  passes Browser/CDP and Electron acceptance, while the broader routes and
+  lifecycles remain on their separately recorded builds. Twelve visual
+  approximations remain explicit.
 - Computer Use exploration is blocked by the environment safety policy for
   `com.openai.codex`. User-authorized CDP probes on `26.721.41059` revalidated
   access, the main-shell target shape, a de-identified Projects entry/list,

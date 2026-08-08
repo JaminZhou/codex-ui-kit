@@ -3,6 +3,9 @@ import { execFileSync } from "node:child_process";
 import { readFileSync, writeFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { sanitizeVisualAssetIcon } from "./visual-asset-contract.mjs";
+import {
+  hasCurrentSidebarSettingsAbsenceEvidence,
+} from "./visual-asset-sidebar-contract.mjs";
 
 const write = process.argv.includes("--write");
 const manifestPath = fileURLToPath(
@@ -47,6 +50,20 @@ function legacyGeometryHash(icon) {
     .digest("hex");
 }
 
+const sameFingerprintRetainedComputedStyleProperties = new Set([
+  "scrollbar-color",
+]);
+
+function promoteComputedStyle(existing, observed) {
+  const promoted = { ...observed };
+  for (const property of sameFingerprintRetainedComputedStyleProperties) {
+    if (Object.hasOwn(existing, property)) {
+      promoted[property] = existing[property];
+    }
+  }
+  return promoted;
+}
+
 function promotePrimitive(existing, observed, context) {
   if (
     canonicalize(primitiveGeometry(existing)) !==
@@ -67,7 +84,10 @@ function promotePrimitive(existing, observed, context) {
           ),
         }
       : {}),
-    computedStyle: observed.computedStyle,
+    computedStyle: promoteComputedStyle(
+      existing.computedStyle,
+      observed.computedStyle,
+    ),
     tag: existing.tag,
   };
 }
@@ -111,6 +131,7 @@ const promotionSpecs = new Map([
     {
       ownerAriaLabel: "View activity",
       region: "sidebar-primary",
+      retainExistingWhenAbsentOnSameFingerprint: true,
       semanticId: "sidebar-activity",
     },
   ],
@@ -179,6 +200,47 @@ const promotionSpecs = new Map([
       semanticId: "sidebar-plugins",
     },
   ],
+  [
+    "sidebar-more",
+    {
+      minimumCandidates: 2,
+      ownerAriaLabel: null,
+      ownerEvidence:
+        "repeated project-row Actions controls, mapped to a fixed semantic ID inside the Renderer",
+      region: "sidebar-projects",
+      semanticId: "sidebar-more",
+    },
+  ],
+  [
+    "sidebar-pin",
+    {
+      minimumCandidates: 2,
+      ownerAriaLabel: null,
+      ownerEvidence:
+        "repeated task-row Pin controls, mapped to a fixed semantic ID inside the Renderer",
+      region: "sidebar-projects",
+      semanticId: "sidebar-pin",
+    },
+  ],
+  [
+    "sidebar-archive",
+    {
+      minimumCandidates: 2,
+      ownerAriaLabel: null,
+      ownerEvidence:
+        "repeated task-row Archive controls, mapped to a fixed semantic ID inside the Renderer",
+      region: "sidebar-projects",
+      semanticId: "sidebar-archive",
+    },
+  ],
+  [
+    "sidebar-help",
+    {
+      ownerAriaLabel: "Open help menu",
+      region: "sidebar-footer",
+      semanticId: "sidebar-help",
+    },
+  ],
 ]);
 
 const manifest = JSON.parse(readFileSync(manifestPath, "utf8"));
@@ -220,8 +282,9 @@ const capturedAt =
 const hashBaselineContext = { ...baselineContext, capturedAt };
 manifest.geometryHashVersion = 4;
 manifest.baseline = hashBaselineContext;
+manifest.sidebarObservation = capture.sidebarObservation;
 
-function selectObservedIcon(id, spec) {
+function selectObservedIcon(id, spec, existing) {
   const candidates = capture.icons.filter(
     (candidate) =>
       candidate.region === spec.region &&
@@ -229,6 +292,14 @@ function selectObservedIcon(id, spec) {
         ? candidate.owner.semanticId === spec.semanticId
         : legacyGeometryHash(candidate) === spec.geometrySha256),
   );
+  if (
+    candidates.length === 0 &&
+    existing &&
+    !fingerprintChanged &&
+    spec.retainExistingWhenAbsentOnSameFingerprint
+  ) {
+    return null;
+  }
   if (!spec.minimumCandidates && candidates.length !== 1) {
     throw new Error(
       `Expected one current capture for ${id}, received ${candidates.length}.`,
@@ -248,8 +319,8 @@ function selectObservedIcon(id, spec) {
 function promoteIcon(id, existing) {
   const spec = promotionSpecs.get(id);
   if (!spec) throw new Error(`Missing explicit promotion spec for ${id}.`);
-  const observed = selectObservedIcon(id, spec);
-  if (!observed) throw new Error(`No current capture matches ${id}.`);
+  const observed = selectObservedIcon(id, spec, existing);
+  if (!observed) return existing;
 
   let primitives = observed.primitives;
   if (existing && !fingerprintChanged) {
@@ -272,7 +343,13 @@ function promoteIcon(id, existing) {
     region: observed.region,
     renderSize: observed.renderSize,
     rootAttributes: observed.rootAttributes,
-    rootComputedStyle: observed.rootComputedStyle,
+    rootComputedStyle:
+      existing && !fingerprintChanged
+        ? promoteComputedStyle(
+            existing.rootComputedStyle,
+            observed.rootComputedStyle,
+          )
+        : observed.rootComputedStyle,
     sourceClassName: observed.sourceClassName,
     status: "runtime-observed",
     viewBox: observed.viewBox,
@@ -298,8 +375,24 @@ manifest.icons = [...promotionSpecs].map(([id]) =>
   promoteIcon(id, existingById.get(id)),
 );
 const promotedIds = new Set(promotionSpecs.keys());
-manifest.remainingApproximationIds = manifest.remainingApproximationIds.filter(
-  (id) => !promotedIds.has(id),
+const currentBuildAbsenceIds = new Set(["sidebar-settings"]);
+const currentSidebarSettingsAbsenceProven =
+  hasCurrentSidebarSettingsAbsenceEvidence(capture.sidebarObservation);
+const remainingApproximationCandidates = new Set(
+  manifest.remainingApproximationIds,
+);
+remainingApproximationCandidates.add("sidebar-thread");
+if (!currentSidebarSettingsAbsenceProven) {
+  for (const id of currentBuildAbsenceIds) {
+    remainingApproximationCandidates.add(id);
+  }
+}
+manifest.remainingApproximationIds = [...remainingApproximationCandidates].filter(
+  (id) =>
+    !promotedIds.has(id) &&
+    !(
+      currentSidebarSettingsAbsenceProven && currentBuildAbsenceIds.has(id)
+    ),
 );
 
 const output = `${JSON.stringify(manifest, null, 2)}\n`;

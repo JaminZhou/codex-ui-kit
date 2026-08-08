@@ -763,6 +763,38 @@ textarea {
   padding-block-start: var(--codex-ui-spacing);
 }
 
+.demo-root[data-sidebar-current]
+  .codex-ui-app-sidebar__project-group
+  > .codex-ui-app-sidebar__item-row
+  > .codex-ui-app-sidebar__item-actions {
+  gap: 6px;
+  margin-inline-end: 2px;
+}
+
+.demo-root[data-sidebar-current]
+  .codex-ui-app-sidebar__project-children
+  .codex-ui-app-sidebar__item-actions {
+  gap: 8px;
+  margin-inline-end: 4px;
+}
+
+.demo-root[data-sidebar-current]
+  .codex-ui-app-sidebar__project-children
+  .codex-ui-app-sidebar__item-actions
+  > button {
+  height: 20px;
+  padding: 2px;
+  width: 20px;
+}
+
+.demo-root[data-sidebar-current]
+  .codex-ui-app-sidebar-footer__actions
+  > button {
+  height: 32px;
+  padding: 7px;
+  width: 32px;
+}
+
 .demo-sidebar-section-action {
   font-size: 18px;
   height: 24px;

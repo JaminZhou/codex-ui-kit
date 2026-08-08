@@ -1003,7 +1003,7 @@ for (const scene of selectedScenes) {
     );
 
     const footerMasks = [
-      { height: 32, left: 8, top: 7, width: 258 },
+      { height: 32, left: 8, top: 7, width: 218 },
     ];
     const referenceFooter = maskPng(
       cropPng(referenceFull, 0, 774, 274, 46),

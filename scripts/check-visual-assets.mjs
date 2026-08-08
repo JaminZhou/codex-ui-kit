@@ -4,6 +4,9 @@ import {
   sanitizeVisualAssetIcon,
   sanitizeVisualScalarRecord,
 } from "./visual-asset-contract.mjs";
+import {
+  hasCurrentSidebarSettingsAbsenceEvidence,
+} from "./visual-asset-sidebar-contract.mjs";
 
 const manifestUrl = new URL("../research/visual-assets.json", import.meta.url);
 const packageUrl = new URL("../package.json", import.meta.url);
@@ -233,6 +236,18 @@ if (
   !captureSource.includes("Unsupported SVG attributes on") ||
   !captureSource.includes("baselineContext") ||
   !captureSource.includes("semanticLabelEntries") ||
+  !captureSource.includes('targetRegion === "sidebar-footer"') ||
+  !captureSource.includes('targetRegion === "sidebar-projects"') ||
+  !captureSource.includes("allowControlPatternFallback") ||
+  !captureSource.includes("sidebarObservation") ||
+  !captureSource.includes("projectTaskLeadingSvgCount") ||
+  !captureSource.includes(
+    'resolveSemanticId(fixedTextLabel, targetRegion, false)',
+  ) ||
+  !captureSource.includes("bounds.bottom <= 0") ||
+  !captureSource.includes("bounds.top >= window.innerHeight") ||
+  !captureSource.includes("bounds.right <= 0") ||
+  !captureSource.includes("bounds.left >= window.innerWidth") ||
   captureSource.includes("rawSemanticLabel") ||
   !captureSource.includes("computedStyle: computedStyle(element)") ||
   !captureSource.includes("sanitizeVisualAssetIcon") ||
@@ -250,6 +265,14 @@ if (
   !updaterSource.includes("complete ordered primitive match with no leftovers") ||
   !updaterSource.includes("repeated captures do not share one visual fingerprint") ||
   !updaterSource.includes("explicit current-build geometry seed") ||
+  !updaterSource.includes("retainExistingWhenAbsentOnSameFingerprint") ||
+  !updaterSource.includes("sameFingerprintRetainedComputedStyleProperties") ||
+  !updaterSource.includes('"scrollbar-color"') ||
+  !updaterSource.includes("currentBuildAbsenceIds") ||
+  !updaterSource.includes("hasCurrentSidebarSettingsAbsenceEvidence") ||
+  !updaterSource.includes("currentSidebarSettingsAbsenceProven") ||
+  !updaterSource.includes('remainingApproximationCandidates.add("sidebar-thread")') ||
+  !updaterSource.includes("remainingApproximationCandidates.add(id)") ||
   !updaterSource.includes("sanitizeVisualAssetIcon") ||
   !updaterSource.includes("capturedAt")
 ) {
@@ -264,6 +287,70 @@ if (!Array.isArray(remaining) || remaining.length === 0) {
 }
 if (new Set(remaining).size !== remaining.length) {
   throw new Error("remaining approximation ids must be unique");
+}
+for (const id of [
+  "sidebar-more",
+  "sidebar-pin",
+  "sidebar-archive",
+  "sidebar-help",
+]) {
+  if (!ids.has(id) || remaining.includes(id)) {
+    throw new Error(`${id} must be promoted from current-build runtime evidence`);
+  }
+}
+const currentSidebarSettingsAbsenceProven =
+  hasCurrentSidebarSettingsAbsenceEvidence(manifest.sidebarObservation);
+if (
+  !hasCurrentSidebarSettingsAbsenceEvidence({
+    footerHelpControlCount: 1,
+    settingsControlCount: 0,
+  }) ||
+  [
+    undefined,
+    {},
+    {
+      footerHelpControlCount: 0,
+      settingsControlCount: 0,
+    },
+    {
+      footerHelpControlCount: 1,
+      settingsControlCount: 1,
+    },
+  ].some(hasCurrentSidebarSettingsAbsenceEvidence)
+) {
+  throw new Error(
+    "sidebar Settings absence evidence must fail closed on each sampled state",
+  );
+}
+if (
+  !Number.isInteger(manifest.sidebarObservation?.projectTaskActionRowCount) ||
+  manifest.sidebarObservation.projectTaskActionRowCount < 2 ||
+  manifest.sidebarObservation?.projectTaskLeadingSvgCount !== 0
+) {
+  throw new Error(
+    "current sidebar capture must retain scoped project-task leading-icon evidence",
+  );
+}
+if (
+  ids.has("sidebar-settings") ||
+  (currentSidebarSettingsAbsenceProven
+    ? remaining.includes("sidebar-settings")
+    : !remaining.includes("sidebar-settings"))
+) {
+  throw new Error(
+    currentSidebarSettingsAbsenceProven
+      ? "sidebar-settings must remain absent from the observed current footer"
+      : "sidebar-settings must return to the approximation inventory on an unproven footer",
+  );
+}
+if (
+  ids.has("sidebar-thread") ||
+  !remaining.includes("sidebar-thread") ||
+  appSource.includes("currentSidebarComposition ? undefined")
+) {
+  throw new Error(
+    "sidebar-thread must remain an explicit Recents approximation until that row type is sampled",
+  );
 }
 
 console.log(

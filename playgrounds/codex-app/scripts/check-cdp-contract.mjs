@@ -4846,6 +4846,133 @@ try {
     name: "protocol-client-with-an-intentionally-long-worktree-name",
   });
   await longProject.waitFor({ state: "visible" });
+  const projectActions = sidebarPage.getByRole("toolbar", {
+    name: "session-browser project actions",
+  });
+  await projectActions.locator("..").hover();
+  const currentProjectActions = await projectActions.evaluate((toolbar) => {
+    const row = toolbar.closest(".codex-ui-app-sidebar__item-row");
+    const rowRect = row?.getBoundingClientRect();
+    const buttons = Array.from(toolbar.querySelectorAll("button"));
+    const rects = buttons.map((button) => {
+      const value = button.getBoundingClientRect();
+      return {
+        height: value.height,
+        rightInset: rowRect ? rowRect.right - value.right : null,
+        width: value.width,
+      };
+    });
+    return {
+      gap: buttons[1]
+        ? buttons[1].getBoundingClientRect().left -
+          buttons[0].getBoundingClientRect().right
+        : null,
+      icons: buttons.map((button) =>
+        button
+          .querySelector("[data-current-build-icon]")
+          ?.getAttribute("data-current-build-icon"),
+      ),
+      opacity: getComputedStyle(toolbar).opacity,
+      rects,
+    };
+  });
+  const pinnedTaskActions = sidebarPage.getByRole("toolbar", {
+    name: "session-browser task actions",
+  });
+  await pinnedTaskActions.locator("..").hover();
+  const currentTaskActions = await pinnedTaskActions.evaluate((toolbar) => {
+    const row = toolbar.closest(".codex-ui-app-sidebar__item-row");
+    const rowRect = row?.getBoundingClientRect();
+    const buttons = Array.from(toolbar.querySelectorAll("button"));
+    const rects = buttons.map((button) => {
+      const value = button.getBoundingClientRect();
+      return {
+        height: value.height,
+        rightInset: rowRect ? rowRect.right - value.right : null,
+        width: value.width,
+      };
+    });
+    return {
+      gap: buttons[1]
+        ? buttons[1].getBoundingClientRect().left -
+          buttons[0].getBoundingClientRect().right
+        : null,
+      icons: buttons.map((button) =>
+        button
+          .querySelector("[data-current-build-icon]")
+          ?.getAttribute("data-current-build-icon"),
+      ),
+      opacity: getComputedStyle(toolbar).opacity,
+      rects,
+    };
+  });
+  const currentSidebarAssets = await sidebarPage.evaluate(() => {
+    const help = document.querySelector(
+      '.codex-ui-app-sidebar-footer__actions button[aria-label="Open help menu"]',
+    );
+    const helpIcon = help?.querySelector("[data-current-build-icon]");
+    const helpRect = help?.getBoundingClientRect();
+    const helpIconRect = helpIcon?.getBoundingClientRect();
+    return {
+      help: helpRect
+        ? {
+            height: helpRect.height,
+            iconHeight: helpIconRect?.height,
+            iconName: helpIcon?.getAttribute("data-current-build-icon"),
+            iconWidth: helpIconRect?.width,
+            width: helpRect.width,
+          }
+        : null,
+      recentItemCount: document.querySelectorAll(
+        '.codex-ui-app-sidebar__section[data-kind="threads"] .codex-ui-app-sidebar__item-row',
+      ).length,
+      recentLeadingCount: document.querySelectorAll(
+        '.codex-ui-app-sidebar__section[data-kind="threads"] .codex-ui-app-sidebar__item-leading',
+      ).length,
+      settingsAction: Boolean(
+        document.querySelector(
+          '.codex-ui-app-sidebar-footer__actions button[aria-label="Open settings"]',
+        ),
+      ),
+    };
+  });
+  if (
+    currentProjectActions.opacity !== "1" ||
+    currentProjectActions.gap !== 6 ||
+    JSON.stringify(currentProjectActions.icons) !==
+      JSON.stringify(["sidebar-more", "sidebar-new-chat"]) ||
+    JSON.stringify(currentProjectActions.rects) !==
+      JSON.stringify([
+        { height: 24, rightInset: 32, width: 24 },
+        { height: 24, rightInset: 2, width: 24 },
+      ]) ||
+    currentTaskActions.opacity !== "1" ||
+    currentTaskActions.gap !== 8 ||
+    JSON.stringify(currentTaskActions.icons) !==
+      JSON.stringify(["sidebar-pin", "sidebar-archive"]) ||
+    JSON.stringify(currentTaskActions.rects) !==
+      JSON.stringify([
+        { height: 20, rightInset: 32, width: 20 },
+        { height: 20, rightInset: 4, width: 20 },
+      ]) ||
+    currentSidebarAssets.settingsAction ||
+    currentSidebarAssets.recentItemCount === 0 ||
+    currentSidebarAssets.recentLeadingCount !==
+      currentSidebarAssets.recentItemCount ||
+    currentSidebarAssets.help?.width !== 32 ||
+    currentSidebarAssets.help?.height !== 32 ||
+    currentSidebarAssets.help?.iconWidth !== 18 ||
+    currentSidebarAssets.help?.iconHeight !== 18 ||
+    currentSidebarAssets.help?.iconName !== "sidebar-help"
+  ) {
+    throw new Error(
+      `sidebar-current: current-build action assets failed: ${JSON.stringify({
+        currentProjectActions,
+        currentSidebarAssets,
+        currentTaskActions,
+      })}`,
+    );
+  }
   const taskActions = sidebarPage.getByRole("toolbar", {
     name: /Sidebar task actions for/,
   });
@@ -4958,9 +5085,9 @@ try {
           '.codex-ui-app-shell__sidebar-resizer[role="separator"]',
         ),
       ),
-      settingsAction: Boolean(
+      helpAction: Boolean(
         document.querySelector(
-          '.codex-ui-app-sidebar-footer__actions button[aria-label="Open settings"]',
+          '.codex-ui-app-sidebar-footer__actions button[aria-label="Open help menu"]',
         ),
       ),
       sidebar: sidebar ? rect(sidebar) : null,
@@ -4986,7 +5113,7 @@ try {
     compact.accountPopup !== "menu" ||
     JSON.stringify(compact.currentPages) !==
       JSON.stringify(["codex-ui-kit"]) ||
-    !compact.settingsAction
+    !compact.helpAction
   ) {
     throw new Error(
       `sidebar-current: compact interaction contract failed: ${JSON.stringify(compact)}`,
@@ -5030,7 +5157,16 @@ try {
   }
   await writeFile(
     join(artifactDirectory, "sidebar-current.json"),
-    `${JSON.stringify(compact, null, 2)}\n`,
+    `${JSON.stringify(
+      {
+        ...compact,
+        currentProjectActions,
+        currentSidebarAssets,
+        currentTaskActions,
+      },
+      null,
+      2,
+    )}\n`,
   );
 } finally {
   await sidebarApp.close();

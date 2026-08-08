@@ -3,9 +3,13 @@ import visualAssets from "../../../research/visual-assets.json";
 
 type CurrentBuildIconName =
   | "sidebar-activity"
+  | "sidebar-archive"
   | "sidebar-folder"
+  | "sidebar-help"
   | "sidebar-mode-chevron"
+  | "sidebar-more"
   | "sidebar-new-chat"
+  | "sidebar-pin"
   | "sidebar-plugins"
   | "sidebar-pull-request"
   | "sidebar-quick-chat"
