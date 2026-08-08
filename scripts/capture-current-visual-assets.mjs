@@ -160,11 +160,14 @@ const semanticLabels = new Map([
   ["Dictate", "composer-dictate"],
   ["Don't work in a project", "composer-clear-project"],
   ["New chat", "sidebar-new-chat"],
+  ["Open help menu", "sidebar-help"],
+  ["Open settings", "sidebar-settings"],
   ["Plugins", "sidebar-plugins"],
   ["Pull requests", "sidebar-pull-request"],
   ["Quick chat", "sidebar-quick-chat"],
   ["Search", "sidebar-search"],
   ["Scheduled", "sidebar-scheduled"],
+  ["Settings", "sidebar-settings"],
   ["Sites", "sidebar-sites"],
   ["Start new voice chat", "composer-voice"],
   ["Switch mode, current mode: Codex", "sidebar-mode-chevron"],
@@ -455,6 +458,85 @@ try {
         };
       })
       .filter(Boolean);
+    const visibleControls = [
+      ...document.querySelectorAll(
+        'a, button, [role="button"], [role="tab"], [role="menuitem"]',
+      ),
+    ]
+      .map((control) => ({
+        ariaLabel: control.getAttribute("aria-label") ?? "",
+        bounds: control.getBoundingClientRect(),
+        control,
+        fixedTextLabel: control.textContent?.trim() ?? "",
+      }))
+      .filter(
+        ({ bounds }) =>
+          bounds.width > 0 &&
+          bounds.height > 0 &&
+          bounds.bottom > 0 &&
+          bounds.top < window.innerHeight,
+      );
+    const controlsForSemanticId = (semanticId, targetRegion) =>
+      visibleControls.filter(
+        ({ ariaLabel, bounds, fixedTextLabel }) =>
+          region(bounds) === targetRegion &&
+          (resolveSemanticId(ariaLabel, targetRegion, true) === semanticId ||
+            resolveSemanticId(fixedTextLabel, targetRegion, false) ===
+              semanticId),
+      );
+    const pinControls = controlsForSemanticId(
+      "sidebar-pin",
+      "sidebar-projects",
+    );
+    const archiveControls = controlsForSemanticId(
+      "sidebar-archive",
+      "sidebar-projects",
+    );
+    const taskActionRows = pinControls
+      .map(({ bounds: pinBounds }) => {
+        const archive = archiveControls.find(({ bounds }) => {
+          const pinCenter = pinBounds.top + pinBounds.height / 2;
+          const archiveCenter = bounds.top + bounds.height / 2;
+          return Math.abs(pinCenter - archiveCenter) < 1;
+        });
+        return archive
+          ? {
+              bottom: pinBounds.bottom,
+              left: pinBounds.left,
+              top: pinBounds.top,
+            }
+          : null;
+      })
+      .filter(Boolean);
+    const threadLeadingSvgCount = taskActionRows.reduce(
+      (count, row) =>
+        count +
+        [...document.querySelectorAll("svg")].filter((svg) => {
+          const bounds = svg.getBoundingClientRect();
+          const center = bounds.top + bounds.height / 2;
+          return (
+            region(bounds) === "sidebar-projects" &&
+            bounds.width > 0 &&
+            bounds.height > 0 &&
+            bounds.right <= row.left &&
+            center >= row.top &&
+            center <= row.bottom
+          );
+        }).length,
+      0,
+    );
+    const sidebarObservation = {
+      footerHelpControlCount: controlsForSemanticId(
+        "sidebar-help",
+        "sidebar-footer",
+      ).length,
+      settingsControlCount: controlsForSemanticId(
+        "sidebar-settings",
+        "sidebar-footer",
+      ).length,
+      taskActionRowCount: taskActionRows.length,
+      threadLeadingSvgCount,
+    };
     const fontSamples = [
       ["composer", document.querySelector('[contenteditable="true"][role="textbox"]')],
       ["main", document.querySelector("main")],
@@ -470,6 +552,7 @@ try {
     return {
       fontSamples,
       icons,
+      sidebarObservation,
       viewport: { height: window.innerHeight, width: window.innerWidth },
     };
   }, [...semanticLabels]);

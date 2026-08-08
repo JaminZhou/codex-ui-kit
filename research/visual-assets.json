@@ -13,6 +13,12 @@
     },
     "capturedAt": "2026-08-08"
   },
+  "sidebarObservation": {
+    "footerHelpControlCount": 1,
+    "settingsControlCount": 0,
+    "taskActionRowCount": 5,
+    "threadLeadingSvgCount": 0
+  },
   "policy": {
     "purpose": "exploratory visual parity and regression diagnosis",
     "ownership": "Observed OpenAI product visuals remain the property of OpenAI and are not relicensed by this repository.",

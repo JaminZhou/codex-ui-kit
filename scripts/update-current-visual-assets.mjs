@@ -3,6 +3,9 @@ import { execFileSync } from "node:child_process";
 import { readFileSync, writeFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { sanitizeVisualAssetIcon } from "./visual-asset-contract.mjs";
+import {
+  hasCurrentSidebarAbsenceEvidence,
+} from "./visual-asset-sidebar-contract.mjs";
 
 const write = process.argv.includes("--write");
 const manifestPath = fileURLToPath(
@@ -279,6 +282,7 @@ const capturedAt =
 const hashBaselineContext = { ...baselineContext, capturedAt };
 manifest.geometryHashVersion = 4;
 manifest.baseline = hashBaselineContext;
+manifest.sidebarObservation = capture.sidebarObservation;
 
 function selectObservedIcon(id, spec, existing) {
   const candidates = capture.icons.filter(
@@ -375,15 +379,8 @@ const currentBuildAbsenceIds = new Set([
   "sidebar-settings",
   "sidebar-thread",
 ]);
-const knownCurrentSidebarAbsenceFingerprint = {
-  appAsarSha256:
-    "5f6e773aafd542d3cf09e10b5dca6cabd301d0a155f4b8ce870e3915fc3da25e",
-  appVersion: "26.803.41515",
-  buildNumber: "6321",
-};
 const currentSidebarAbsenceProven =
-  canonicalize(currentFingerprint) ===
-  canonicalize(knownCurrentSidebarAbsenceFingerprint);
+  hasCurrentSidebarAbsenceEvidence(capture.sidebarObservation);
 const remainingApproximationCandidates = new Set(
   manifest.remainingApproximationIds,
 );

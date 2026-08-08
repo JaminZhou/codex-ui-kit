@@ -4,6 +4,9 @@ import {
   sanitizeVisualAssetIcon,
   sanitizeVisualScalarRecord,
 } from "./visual-asset-contract.mjs";
+import {
+  hasCurrentSidebarAbsenceEvidence,
+} from "./visual-asset-sidebar-contract.mjs";
 
 const manifestUrl = new URL("../research/visual-assets.json", import.meta.url);
 const packageUrl = new URL("../package.json", import.meta.url);
@@ -236,6 +239,8 @@ if (
   !captureSource.includes('targetRegion === "sidebar-footer"') ||
   !captureSource.includes('targetRegion === "sidebar-projects"') ||
   !captureSource.includes("allowControlPatternFallback") ||
+  !captureSource.includes("sidebarObservation") ||
+  !captureSource.includes("threadLeadingSvgCount") ||
   !captureSource.includes(
     'resolveSemanticId(fixedTextLabel, targetRegion, false)',
   ) ||
@@ -262,7 +267,7 @@ if (
   !updaterSource.includes("sameFingerprintRetainedComputedStyleProperties") ||
   !updaterSource.includes('"scrollbar-color"') ||
   !updaterSource.includes("currentBuildAbsenceIds") ||
-  !updaterSource.includes("knownCurrentSidebarAbsenceFingerprint") ||
+  !updaterSource.includes("hasCurrentSidebarAbsenceEvidence") ||
   !updaterSource.includes("currentSidebarAbsenceProven") ||
   !updaterSource.includes("remainingApproximationCandidates.add(id)") ||
   !updaterSource.includes("sanitizeVisualAssetIcon") ||
@@ -290,20 +295,48 @@ for (const id of [
     throw new Error(`${id} must be promoted from current-build runtime evidence`);
   }
 }
-const knownCurrentSidebarAbsenceFingerprint = {
-  appAsarSha256:
-    "5f6e773aafd542d3cf09e10b5dca6cabd301d0a155f4b8ce870e3915fc3da25e",
-  appVersion: "26.803.41515",
-  buildNumber: "6321",
-};
-const manifestFingerprint = {
-  appAsarSha256: manifest.baseline.appAsarSha256,
-  appVersion: manifest.baseline.appVersion,
-  buildNumber: manifest.baseline.buildNumber,
-};
 const currentSidebarAbsenceProven =
-  canonicalize(manifestFingerprint) ===
-  canonicalize(knownCurrentSidebarAbsenceFingerprint);
+  hasCurrentSidebarAbsenceEvidence(manifest.sidebarObservation);
+if (
+  !hasCurrentSidebarAbsenceEvidence({
+    footerHelpControlCount: 1,
+    settingsControlCount: 0,
+    taskActionRowCount: 2,
+    threadLeadingSvgCount: 0,
+  }) ||
+  [
+    undefined,
+    {},
+    {
+      footerHelpControlCount: 0,
+      settingsControlCount: 0,
+      taskActionRowCount: 2,
+      threadLeadingSvgCount: 0,
+    },
+    {
+      footerHelpControlCount: 1,
+      settingsControlCount: 1,
+      taskActionRowCount: 2,
+      threadLeadingSvgCount: 0,
+    },
+    {
+      footerHelpControlCount: 1,
+      settingsControlCount: 0,
+      taskActionRowCount: 0,
+      threadLeadingSvgCount: 0,
+    },
+    {
+      footerHelpControlCount: 1,
+      settingsControlCount: 0,
+      taskActionRowCount: 2,
+      threadLeadingSvgCount: 1,
+    },
+  ].some(hasCurrentSidebarAbsenceEvidence)
+) {
+  throw new Error(
+    "sidebar absence evidence must fail closed on each sampled state",
+  );
+}
 for (const id of ["sidebar-settings", "sidebar-thread"]) {
   if (
     ids.has(id) ||

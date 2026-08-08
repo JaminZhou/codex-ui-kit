@@ -73,6 +73,13 @@ Pin, and Archive controls likewise require multiple candidates and one shared
 fingerprint. An optional interaction-state variant may be retained only when
 the installed app fingerprint is unchanged; all other missing, added, removed,
 duplicated, ambiguous, or unmatched primitives fail closed.
+
+Settings and leading Thread glyphs are removed from the approximation inventory
+only when the same de-identified capture reports one Help footer control, no
+Settings control, at least two task action rows, and no leading SVG in any of
+those row bands. A later account or feature state that does not repeat that
+absence proof restores both approximation IDs.
+
 The inherited `scrollbar-color` property is likewise retained from the first
 reviewed capture on an unchanged fingerprint because macOS changes it with
 window activation even though it cannot affect SVG pixels; every other
