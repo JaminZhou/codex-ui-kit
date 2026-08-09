@@ -20,6 +20,7 @@ const currentReplayComposerScenarios = new Set([
   "subagent-concurrency",
   "subagent-delegation",
   "subagent-nested",
+  "subagent-recovery",
 ]);
 const currentApprovalComposerScenes = new Set([
   "approval-current-allow-once-completed",
@@ -813,7 +814,10 @@ for (const scene of visualScenes) {
         };
       });
       const mixed = scene.frame.includes("mixed");
-      const running = scene.frame.includes("running") || mixed;
+      const recovery = scene.scenario === "subagent-recovery";
+      const recoveryStreaming = recovery && scene.frame.includes("streaming");
+      const recoveryTerminal = recovery && !recoveryStreaming;
+      const running = scene.frame.includes("running") || mixed || recovery;
       const summaryOpen = scene.frame.includes("summary");
       const panelOpen =
         scene.frame.includes("panel") ||
@@ -835,9 +839,33 @@ for (const scene of visualScenes) {
           : 810.71875;
       const concurrent = scene.scenario === "subagent-concurrency";
       const nested = scene.scenario === "subagent-nested";
-      const activeCount = running ? (mixed ? 1 : concurrent || nested ? 2 : 1) : 0;
-      const doneCount = mixed ? 1 : running ? 0 : concurrent || nested ? 2 : 1;
-      const expectedActivities = !running
+      const activeCount = recovery
+        ? recoveryStreaming
+          ? 12
+          : 0
+        : running
+          ? mixed
+            ? 1
+            : concurrent || nested
+              ? 2
+              : 1
+          : 0;
+      const doneCount = recovery
+        ? recoveryTerminal
+          ? 12
+          : 0
+        : mixed
+          ? 1
+          : running
+            ? 0
+            : concurrent || nested
+              ? 2
+              : 1;
+      const expectedActivities = recovery
+        ? recoveryStreaming
+          ? ["PlannerStreamerValidatorand 9 other subagents updated"]
+          : ["PlannerStreamerValidatorand 9 other subagents interrupted"]
+        : !running
         ? []
         : concurrent
           ? ["AlphaBetastarted working"]
@@ -846,14 +874,32 @@ for (const scene of visualScenes) {
               ? ["Child finished", "Parent started working"]
               : ["Child started working", "Parent started working"]
             : ["Long probe started working"];
-      const expectedPanelRows = concurrent
+      const recoveryRows = [
+        "Planner",
+        "Streamer",
+        "Validator",
+        "Reviewer",
+        "Tester",
+        "Reporter",
+        "Indexer",
+        "Auditor",
+        "Mapper",
+        "Reader",
+      ];
+      const expectedPanelRows = recovery
+        ? recoveryStreaming
+          ? recoveryRows.slice(0, 4)
+          : recoveryRows
+        : concurrent
         ? ["Beta", "Alpha"]
         : nested
           ? mixed || !running
             ? ["Parent", "Child"]
             : ["Child", "Parent"]
           : ["Long probe"];
-      const expectedPanelTimes = !running
+      const expectedPanelTimes = recovery
+        ? expectedPanelRows.map(() => (recoveryStreaming ? "0s" : "1m ago"))
+        : !running
         ? expectedPanelRows.map(() => "1m ago")
         : mixed
           ? ["0s", "1m ago"]
@@ -950,12 +996,17 @@ for (const scene of visualScenes) {
           contract.panel.rowTimes.some(
             ({ dateTime }) => dateTime !== null,
           ) ||
-          contract.panel.sectionCount !== (running && !mixed ? 1 : 2) ||
+          contract.panel.sectionCount !==
+            (recovery ? (recoveryStreaming ? 1 : 2) : running && !mixed ? 1 : 2) ||
           !contract.panel.text?.includes(
             `Active · ${activeCount}`,
           ) ||
           !contract.panel.text?.includes(
-            concurrent
+            recovery
+              ? recoveryStreaming
+                ? "Parsed 4 of 12 lifecycle events."
+                : "Validation failed: fixture mismatch."
+              : concurrent
               ? mixed
                 ? "clarifying command execution constraints"
                 : running
@@ -989,7 +1040,9 @@ for (const scene of visualScenes) {
         (!contract.transcript.back ||
           !contract.transcript.actions ||
           !contract.transcript.text?.includes(
-            concurrent
+            recovery
+              ? "Validator"
+              : concurrent
               ? scene.frame.endsWith("alpha")
                 ? "Alpha"
                 : "Beta"
@@ -1000,7 +1053,9 @@ for (const scene of visualScenes) {
                 : "Long probe",
           ) ||
           !contract.transcript.text?.includes(
-            concurrent
+            recovery
+              ? "Validation failed: fixture mismatch."
+              : concurrent
               ? scene.frame.endsWith("alpha")
                 ? "ALPHA SUBAGENT DONE"
                 : "BETA SUBAGENT DONE"
@@ -1030,6 +1085,31 @@ for (const scene of visualScenes) {
         throw new Error(
           `${scene.id}: 720px continuity contract failed: ${JSON.stringify(contract)}`,
         );
+      }
+      if (recovery && panelOpen && !transcriptOpen) {
+        const moreButton = page.getByRole("button", {
+          name: recoveryStreaming ? "Show 4 more" : "Show 2 more",
+        });
+        await moreButton.click();
+        const visibleAfterFirstPage = await page
+          .locator(".codex-ui-subagent-panel__item")
+          .count();
+        if (visibleAfterFirstPage !== (recoveryStreaming ? 8 : 12)) {
+          throw new Error(
+            `${scene.id}: first subagent pagination step failed: ${visibleAfterFirstPage}`,
+          );
+        }
+        if (recoveryStreaming) {
+          await page.getByRole("button", { name: "Show 4 more" }).click();
+          const visibleAfterSecondPage = await page
+            .locator(".codex-ui-subagent-panel__item")
+            .count();
+          if (visibleAfterSecondPage !== 12) {
+            throw new Error(
+              `${scene.id}: second subagent pagination step failed: ${visibleAfterSecondPage}`,
+            );
+          }
+        }
       }
       await writeFile(
         join(artifactDirectory, `${scene.id}.json`),

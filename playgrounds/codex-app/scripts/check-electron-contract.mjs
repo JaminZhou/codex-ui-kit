@@ -5569,6 +5569,115 @@ for (const collaborationScene of [
   }
 }
 
+for (const recoveryScene of [
+  {
+    activity: "updated",
+    active: 12,
+    frame: "subagent-recovery-panel-streaming",
+    initialRows: 4,
+    message: "Parsed 4 of 12 lifecycle events.",
+    pageSize: 4,
+  },
+  {
+    activity: "interrupted",
+    active: 0,
+    done: 12,
+    frame: "subagent-recovery-panel-terminal",
+    initialRows: 10,
+    message: "Validation failed: fixture mismatch.",
+    pageSize: 2,
+  },
+]) {
+  const { app, page } = await launchScene(
+    {
+      frame: recoveryScene.frame,
+      id: `electron-${recoveryScene.frame}`,
+      scenario: "subagent-recovery",
+    },
+    { capture: false },
+  );
+  try {
+    const panel = page.getByTestId("subagent-panel");
+    await panel.waitFor();
+    const panelText = (await panel.textContent())?.replace(/\s+/g, " ").trim();
+    const timeline = page.locator(".demo-subagent-activity-timeline");
+    await timeline.locator("button").first().click();
+    const timelineText = (
+      await timeline.textContent()
+    )?.replace(/\s+/g, " ").trim();
+    if (
+      !panelText?.includes(`Active · ${recoveryScene.active}`) ||
+      (recoveryScene.done !== undefined &&
+        !panelText.includes(`Done · ${recoveryScene.done}`)) ||
+      !panelText.includes(recoveryScene.message) ||
+      !timelineText?.endsWith(recoveryScene.activity) ||
+      (await panel.locator(".codex-ui-subagent-panel__item").count()) !==
+        recoveryScene.initialRows
+    ) {
+      throw new Error(
+        `Electron ${recoveryScene.frame} lifecycle failed: ${JSON.stringify({ panelText, timelineText })}`,
+      );
+    }
+
+    await panel
+      .getByRole("button", { name: `Show ${recoveryScene.pageSize} more` })
+      .click();
+    const firstExpandedCount = await panel
+      .locator(".codex-ui-subagent-panel__item")
+      .count();
+    if (
+      firstExpandedCount !==
+      recoveryScene.initialRows + recoveryScene.pageSize
+    ) {
+      throw new Error(
+        `Electron ${recoveryScene.frame} first pagination step failed: ${firstExpandedCount}`,
+      );
+    }
+    if (recoveryScene.frame.endsWith("streaming")) {
+      await panel.getByRole("button", { name: "Show 4 more" }).click();
+      if (
+        (await panel.locator(".codex-ui-subagent-panel__item").count()) !== 12
+      ) {
+        throw new Error(
+          `Electron ${recoveryScene.frame} second pagination step failed.`,
+        );
+      }
+    }
+  } finally {
+    await app.close();
+  }
+}
+
+const { app: recoveryTranscriptApp, page: recoveryTranscriptPage } =
+  await launchScene(
+    {
+      frame: "subagent-recovery-transcript-validator",
+      id: "electron-subagent-recovery-transcript-validator",
+      scenario: "subagent-recovery",
+    },
+    { capture: false },
+  );
+try {
+  const transcript = recoveryTranscriptPage.getByTestId("subagent-transcript");
+  await transcript.waitFor();
+  const transcriptText = (await transcript.textContent())
+    ?.replace(/\s+/g, " ")
+    .trim();
+  if (
+    !transcriptText?.includes("Validator") ||
+    !transcriptText.includes("Validation failed: fixture mismatch.") ||
+    (await recoveryTranscriptPage
+      .getByRole("toolbar", { name: "Subagent response actions" })
+      .count()) !== 1
+  ) {
+    throw new Error(
+      `Electron recovery subagent transcript failed: ${JSON.stringify(transcriptText)}`,
+    );
+  }
+} finally {
+  await recoveryTranscriptApp.close();
+}
+
 const liveSubagentScene = {
   frame: "recovered",
   id: "electron-live-subagent",
@@ -5868,5 +5977,5 @@ try {
 }
 
 console.log(
-  "Electron host, native-window, coding-workspace routing, conversation/Composer and current image-attachment lifecycle plus current menus, current long, failed, and interrupted command output plus manual context compaction, thread summary, replay/live single, concurrent, and nested subagent delegation, default 720px narrow reachability, resizable navigation/Review/Terminal/PR detail, PR tabs and expansion, MCP disclosure/result, multi-file and mixed-content Review, selection/Undo, large diff scrolling, and compact geometry contracts passed.",
+  "Electron host, native-window, coding-workspace routing, conversation/Composer and current image-attachment lifecycle plus current menus, current long, failed, and interrupted command output plus manual context compaction, thread summary, replay/live single, concurrent, nested, and mixed-recovery subagent delegation with 4/10 pagination, default 720px narrow reachability, resizable navigation/Review/Terminal/PR detail, PR tabs and expansion, MCP disclosure/result, multi-file and mixed-content Review, selection/Undo, large diff scrolling, and compact geometry contracts passed.",
 );

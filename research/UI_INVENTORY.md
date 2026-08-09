@@ -839,13 +839,19 @@ two sibling agents and one Parent → Child delegation across running, mixed,
 completed, summary, flat-panel, live-progress, and transcript states. It keeps
 the public `agentPath` hierarchy without inferring a tree that the current UI
 does not draw; the main conversation still renders Child and Parent activity
-as separate hierarchy-ordered blocks. Browser/CDP covers 111 frames and nine
+as separate hierarchy-ordered blocks. The unchanged `26.803.41515` package
+adds source-structural evidence for the seven collaboration statuses,
+Active/Done classification, and 4/10 panel limits. A schema-valid twelve-agent
+replay now covers waiting-before-initialization, streamed updates, errored,
+interrupted, shutdown, and unavailable terminal results, both pagination
+paths, and the failed-agent transcript. Browser/CDP reaches 125 frames;
+Electron repeats the pagination and transcript interactions. Nine
 reviewed scenes gate ten current-build regions. Panel/summary/transcript ratios
 range from `0.013328938694792354` to `0.046708160442600274`; the compact
 text-heavy nested main-activity band passes at `0.11495227995758218` under its
-independent 0.125 limit. Waiting-before-initialization, failure,
-interruption/cancel, pagination, transcript streaming, and transport recovery
-remain separate gates.
+independent 0.125 limit, and three reviewed internal recovery baselines pass.
+Product runtime reachability for those recovery transitions and transport
+recovery remain separate gates.
 
 This is a measurement- and raster-backed basic thread/workspace slice, not a
 claim that the whole application or every lifecycle is pixel-perfect. Broader

@@ -225,12 +225,18 @@ The authoritative current-build inventory is:
   progress preview, and independent transcripts. The nested reducer preserves
   public `/root/parent/child` identity while the visual panel stays flat, as
   observed, while the main conversation keeps Child and Parent activity as
-  separate hierarchy-ordered blocks. Browser/CDP covers 111 frames, Electron
+  separate hierarchy-ordered blocks. The unchanged `26.803.41515` package
+  additionally confirms all seven public collaboration thread states plus the
+  current Active/Done classifier and 4/10 list limits. A twelve-agent public
+  replay now covers pending initialization, updated progress, errored,
+  interrupted, shutdown, and unavailable results, both pagination limits, and
+  failed-agent transcript access. Browser/CDP covers 125 frames, Electron
   drives both mixed lists, and nine collaboration scenes gate ten current-build
   regions: panel/summary/transcript crops pass between 1.33% and 4.67%, while
   the compact main-activity crop passes at 11.50% under its independent 12.5%
-  limit. Waiting, failure, cancellation, pagination, streaming, and transport
-  recovery remain open.
+  limit; three additional internal recovery baselines pass their regional
+  regression gate. Real-product reachability for recovery transitions and
+  transport recovery remain open.
 - npm publication remains out of scope until the agreed P0/P1 coverage and
   release acceptance surfaces are complete.
 - Pixel ratios are regression evidence for their explicitly owned regions,

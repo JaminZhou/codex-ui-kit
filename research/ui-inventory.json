@@ -291,7 +291,11 @@
       "id": "thread.subagent-delegation",
       "area": "conversation",
       "ownership": "turn",
-      "packageEvidence": ["local-conversation-thread", "subagent-panel"],
+      "packageEvidence": [
+        "local-conversation-thread",
+        "subagent-panel",
+        "app-asar-26.803.41515:collaboration-status-set-active-done-classifier-and-4-10-panel-limits"
+      ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
         "cdp-26.730.61639:real-single-subagent-running-completed-summary-panel-and-transcript",
@@ -306,7 +310,11 @@
       "id": "thread.subagent-collaboration",
       "area": "conversation",
       "ownership": "thread",
-      "packageEvidence": ["local-conversation-thread", "subagent-panel"],
+      "packageEvidence": [
+        "local-conversation-thread",
+        "subagent-panel",
+        "app-asar-26.803.41515:collaboration-status-set-active-done-classifier-and-4-10-panel-limits"
+      ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
         "cdp-26.730.61639:real-concurrent-subagents-running-mixed-completed-summary-panel-and-independent-transcripts",

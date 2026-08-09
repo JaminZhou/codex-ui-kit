@@ -38,7 +38,7 @@ exit gates; it does not replace the inventory.
   explicit 820×680/720×680 reopen. Two more current tasks now cover concurrent
   siblings plus a Parent → Child delegation through active, mixed, completed,
   summary, flat-panel, live-progress, and independent transcript states while
-  retaining public `agentPath` hierarchy. Browser/CDP covers 122 lifecycle
+  retaining public `agentPath` hierarchy. Browser/CDP covers 125 lifecycle
   frames; Electron repeats
   the session, mismatch, input, picker, close, and resize interactions; the
   current 906×820 panel/content pixel ratios pass at 1.5120%/0.4004%.
@@ -47,6 +47,15 @@ exit gates; it does not replace the inventory.
   panel/summary/transcript comparisons pass between 1.3329% and 4.6708%, and
   the compact nested main-activity band passes at 11.4952% under its separate
   12.5% limit.
+- A source-structural follow-up on the unchanged `26.803.41515` fingerprint
+  confirms `pendingInit`, `running`, `interrupted`, `completed`, `errored`,
+  `shutdown`, and `notFound` agent states; Active/Done grouping by the public
+  three-state presentation; and 4/10 panel limits. A schema-valid twelve-agent
+  replay now covers waiting, streamed progress, errored/interrupted/shutdown/
+  unavailable terminal results, Active and Done pagination, and failed-agent
+  transcript access. Browser/CDP, Electron, and three reviewed internal pixel
+  baselines pass. These are independent implementation gates, not a claim that
+  the unsampled recovery transitions were runtime-reached in the product.
 - The previous `26.730.61309` refresh covered all six left-sidebar groups,
   selected/no-project and New worktree entry, plus sampled command, approval,
   interruption, compaction, summary, and pasted-image surfaces. The sidebar capture locks the
@@ -79,7 +88,7 @@ exit gates; it does not replace the inventory.
   responsive detail restoration. Its independent state machine adds
   index/detail loading and failure, checks, comments, review submission,
   merge-readiness, merge completion, compact layout, and route restoration.
-  Together the playground gates now cover 122 CDP/pixel frames, including one
+  Together the playground gates now cover 125 CDP/pixel frames, including one
   independently implemented light shell/sidebar/Composer composition. Light
   is route-scoped to the theme-complete shell/workspace; conversation and Pull
   Request retain their deterministic dark presentation. Project, Environment,
@@ -440,8 +449,9 @@ without confusing package readiness with full product reconstruction.
     Browser/Electron gates plus current source-structural evidence; retain the
     real product post-picker transition as an explicit evidence gap. Continue
     with plugin attachment variants, Markdown mutation/
-    large content, populated artifact/source sections, subagent
-    waiting/failure/cancel/streaming, pagination, and transport recovery.
+    large content, populated artifact/source sections, real-product subagent
+    recovery capture, and transport recovery. The independent subagent
+    waiting/failure/interruption/streaming/pagination matrix is delivered.
 11. **P1 resources and integrations**: Browser/artifact/document previews,
     environments, remote connections, Settings, MCP, plugins, skills, and
     automations, each with one end-to-end vertical slice.

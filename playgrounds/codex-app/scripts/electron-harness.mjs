@@ -509,6 +509,27 @@ export const visualScenes = [
     surfaces: ["subagent"],
   },
   {
+    frame: "subagent-recovery-panel-streaming",
+    id: "subagent-recovery-panel-streaming",
+    maxPixelRatio: 0.0225,
+    scenario: "subagent-recovery",
+    surfaces: ["subagent"],
+  },
+  {
+    frame: "subagent-recovery-panel-terminal",
+    id: "subagent-recovery-panel-terminal",
+    maxPixelRatio: 0.0225,
+    scenario: "subagent-recovery",
+    surfaces: ["subagent"],
+  },
+  {
+    frame: "subagent-recovery-transcript-validator",
+    id: "subagent-recovery-transcript-validator",
+    maxPixelRatio: 0.0225,
+    scenario: "subagent-recovery",
+    surfaces: ["subagent"],
+  },
+  {
     frame: "terminal-open",
     id: "background-terminal",
     scenario: "background-terminal",
