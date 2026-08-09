@@ -1355,9 +1355,31 @@ try {
         right: value.right,
       };
     };
+    const actionsRect =
+      actions instanceof Element ? actions.getBoundingClientRect() : null;
+    const lowerRailHit = actionsRect
+      ? document.elementFromPoint(
+          actionsRect.left + actionsRect.width / 2,
+          actionsRect.bottom - 8,
+        )
+      : null;
     return {
-      actions: rect(actions),
-      buttons: Array.from(actions?.querySelectorAll("button") ?? [], rect),
+      actions: actions
+        ? {
+            interceptsLowerEdge: Boolean(
+              lowerRailHit?.closest(".codex-ui-markdown__table-actions"),
+            ),
+            pointerEvents: getComputedStyle(actions).pointerEvents,
+            rect: rect(actions),
+          }
+        : null,
+      buttons: Array.from(
+        actions?.querySelectorAll("button") ?? [],
+        (button) => ({
+          pointerEvents: getComputedStyle(button).pointerEvents,
+          rect: rect(button),
+        }),
+      ),
       height: window.innerHeight,
       horizontalOverflow:
         document.documentElement.scrollWidth -
@@ -1389,10 +1411,17 @@ try {
     narrowState.height !== 680 ||
     narrowState.horizontalOverflow > 1 ||
     !narrowState.actions ||
-    narrowState.actions.left < 0 ||
-    narrowState.actions.right > narrowState.width ||
+    narrowState.actions.pointerEvents !== "none" ||
+    narrowState.actions.interceptsLowerEdge !== false ||
+    !narrowState.actions.rect ||
+    narrowState.actions.rect.left < 0 ||
+    narrowState.actions.rect.right > narrowState.width ||
     narrowState.buttons.some(
-      (rect) => !rect || rect.left < 0 || rect.right > narrowState.width,
+      ({ pointerEvents, rect }) =>
+        pointerEvents !== "auto" ||
+        !rect ||
+        rect.left < 0 ||
+        rect.right > narrowState.width,
     ) ||
     narrowReturnedFocus !== "Expand table"
   ) {

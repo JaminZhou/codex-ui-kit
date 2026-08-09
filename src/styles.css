@@ -8543,6 +8543,7 @@ summary.codex-ui-activity__header::after {
   inset-block: 0;
   inset-inline-end: var(--codex-ui-markdown-inline-overhang);
   opacity: 0;
+  pointer-events: none;
   position: absolute;
   transition: opacity var(--codex-ui-transition-fast);
   width: 2rem;
@@ -8576,6 +8577,7 @@ summary.codex-ui-activity__header::after {
   justify-content: center;
   margin: 0.25rem;
   padding: 0.25rem;
+  pointer-events: auto;
   width: 1.5rem;
 }
 

@@ -5796,10 +5796,22 @@ try {
           width: value.width,
         };
       };
+      const actionsRect =
+        actions instanceof Element ? actions.getBoundingClientRect() : null;
+      const lowerRailHit = actionsRect
+        ? document.elementFromPoint(
+            actionsRect.left + actionsRect.width / 2,
+            actionsRect.bottom - 8,
+          )
+        : null;
       return {
         actions: actions
           ? {
+              interceptsLowerEdge: Boolean(
+                lowerRailHit?.closest(".codex-ui-markdown__table-actions"),
+              ),
               opacity: getComputedStyle(actions).opacity,
+              pointerEvents: getComputedStyle(actions).pointerEvents,
               rect: rect(actions),
             }
           : null,
@@ -5807,6 +5819,7 @@ try {
           expanded: button.getAttribute("aria-expanded"),
           haspopup: button.getAttribute("aria-haspopup"),
           label: button.getAttribute("aria-label"),
+          pointerEvents: getComputedStyle(button).pointerEvents,
           rect: rect(button),
           viewBox: button.querySelector("svg")?.getAttribute("viewBox"),
         })),
@@ -5975,12 +5988,18 @@ try {
     Math.abs((hovered.firstCell?.rect?.width ?? 0) - 92.484) > 1 ||
     Math.abs((hovered.firstCell?.rect?.height ?? 0) - 87) > 0.5 ||
     hovered.actions?.opacity !== "1" ||
+    hovered.actions?.pointerEvents !== "none" ||
+    hovered.actions?.interceptsLowerEdge !== false ||
     hovered.actions.rect?.width !== 32 ||
     JSON.stringify(labels) !==
       JSON.stringify(["Expand table", "Copy table"]) ||
     JSON.stringify(viewBoxes) !== JSON.stringify(["0 0 20 20", "0 0 21 21"]) ||
     hovered.buttons.some(
-      ({ rect }) => !rect || Math.abs(rect.width - 24) > 0.5 || Math.abs(rect.height - 24) > 0.5,
+      ({ pointerEvents, rect }) =>
+        pointerEvents !== "auto" ||
+        !rect ||
+        Math.abs(rect.width - 24) > 0.5 ||
+        Math.abs(rect.height - 24) > 0.5,
     ) ||
     clipboard?.["text/plain"]?.length !== 1_863 ||
     !clipboard?.["text/plain"]?.startsWith("| PROBE-COL-01 |") ||
@@ -6008,6 +6027,8 @@ try {
     narrow.viewport.width !== 720 ||
     narrow.viewport.height !== 680 ||
     narrow.actions?.opacity !== "1" ||
+    narrow.actions?.pointerEvents !== "none" ||
+    narrow.actions?.interceptsLowerEdge !== false ||
     !narrow.actions?.rect ||
     narrow.actions.rect.left < 0 ||
     narrow.actions.rect.right > narrow.viewport.width ||

@@ -70,6 +70,12 @@ describe("Markdown visual contract", () => {
       "@container codex-ui-app-shell (min-width: 73rem)",
     );
     expect(styles).toContain("inset-inline-end: -2rem");
+    expect(styles).toMatch(
+      /\.codex-ui-markdown__table-actions \{[^}]*pointer-events: none;/,
+    );
+    expect(styles).toMatch(
+      /\.codex-ui-markdown__table-actions button \{[^}]*pointer-events: auto;/,
+    );
     expect(styles).toContain("height: 1.5rem");
     expect(styles).toContain("background: rgb(0 0 0 / 0.8)");
     expect(styles).toContain("padding: 3rem 2rem 3.25rem");
