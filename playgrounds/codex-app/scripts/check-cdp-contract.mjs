@@ -3755,6 +3755,22 @@ for (const scene of visualScenes) {
           cardHeights: attachments
             .filter((attachment) => attachment.getAttribute("data-layout") === "card")
             .map((attachment) => attachment.getBoundingClientRect().height),
+          cardContentGaps: attachments
+            .filter((attachment) => attachment.getAttribute("data-layout") === "card")
+            .map((attachment) => {
+              const icon = attachment.querySelector(
+                ".codex-ui-composer-attachment__icon",
+              );
+              const copy = attachment.querySelector(
+                ".codex-ui-composer-attachment__copy",
+              );
+              if (!icon || !copy) return null;
+              return (
+                copy.getBoundingClientRect().left -
+                icon.getBoundingClientRect().right
+              );
+            })
+            .filter((gap) => gap !== null),
           constrainedCardWidth,
           iconSizes: attachments
             .map((attachment) =>
@@ -3833,6 +3849,7 @@ for (const scene of visualScenes) {
         variant.submitDisabled !== expectsSubmitDisabled ||
         (expectsOverflow && !(variant.overflow > 0)) ||
         variant.cardHeights.some((height) => Math.abs(height - 64) > 1) ||
+        variant.cardContentGaps.some((gap) => Math.abs(gap - 10) > 1) ||
         (variant.constrainedCardWidth !== null &&
           variant.constrainedCardWidth > 257) ||
         variant.statusWithinOpenButton !== 0 ||

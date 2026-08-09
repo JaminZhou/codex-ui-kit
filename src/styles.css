@@ -7316,6 +7316,11 @@ summary.codex-ui-activity__header::after {
   width: fit-content;
 }
 
+.codex-ui-composer-attachment[data-layout="card"]
+  > .codex-ui-composer-attachment__open {
+  gap: 0.625rem;
+}
+
 .codex-ui-composer-attachment[data-layout="image"] {
   background: transparent;
   border-color: color-mix(in srgb, var(--codex-ui-text) 16%, transparent);
