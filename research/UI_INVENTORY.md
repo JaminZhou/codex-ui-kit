@@ -73,8 +73,10 @@ observation from a previous build remains historical evidence.
 A later, deliberately narrower `26.803.41515` (`6321`) probe refreshes the
 sidebar visual/action slice and binds 14 icon primitives to exact runtime
 evidence. It also confirms current project/task hover actions, the Help footer,
-and no leading glyph in sampled project-task rows. Recents retains an explicit
-approximation because it was not sampled independently. This is documented in
+and no leading glyph in sampled project-task rows. The Recents follow-up
+independently scrolls to six task rows, pairs their Pin/Archive controls, and
+confirms zero leading SVGs, removing the `sidebar-thread` approximation. This
+is documented in
 [`26.803.41515.md`](26.803.41515.md) and does not change this broader
 inventory's `26.730.61639` current-build counts or promote untested routes and
 lifecycles.
@@ -188,12 +190,13 @@ correcting current dark-state details: project rows expose 24×24 More/New chat
 controls with a 6px gap; nested task rows expose 20×20 Pin/Archive controls
 with an 8px gap; the footer exposes a 32×32 Help control with an 18×18 exact
 glyph; and sampled project-task rows do not render a leading glyph. Browser/CDP
-and Electron independently gate the hover semantics and geometry while Recents
-keeps its approximate leading glyph. The
+and Electron independently gate the hover semantics and geometry. The Recents
+follow-up adds six 24×24 Pin/Archive pairs with a 4px gap, zero leading glyphs,
+and a dedicated ownership-masked regional gate. The
 1180×820 current-build regional comparison passes at 3.4526% for the top,
 0.1163% for the ownership-masked selected row, and 0.4126% for the footer,
 where only account-owned content is masked and the Help control remains under
-comparison.
+comparison; the Recents region passes at 2.5356%.
 
 The application-shell continuity slice splits window navigation, route
 lifecycle feedback, route selection/restoration, and global notifications

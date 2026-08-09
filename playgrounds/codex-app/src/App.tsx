@@ -2398,6 +2398,9 @@ export function App() {
   const lastEvent = scenario.events[Math.max(0, replayCount - 1)];
   const currentSidebarComposition =
     initialSelection.frame === "sidebar-current" || !initialSelection.capture;
+  const sidebarRecentScenarios = (
+    Object.values(replayScenarios) as ReplayScenario[]
+  ).slice(0, currentSidebarComposition ? 6 : undefined);
   const sidebar = (
     <AppSidebar
       footer={
@@ -2691,21 +2694,40 @@ export function App() {
         title="Recents"
         toggleLabel="Toggle recent tasks"
       >
-        {(Object.values(replayScenarios) as ReplayScenario[]).map((item, index) => (
+        {sidebarRecentScenarios.map((item, index) => (
           <AppSidebarItem
             actions={
-              <button
-                aria-label={`Sidebar actions for ${item.label}`}
-                type="button"
-              >
-                <SidebarGlyph
-                  name={currentSidebarComposition ? "more-current" : "more"}
-                />
-              </button>
+              currentSidebarComposition ? (
+                <>
+                  <button
+                    aria-label={`Pin recent task ${item.id}`}
+                    type="button"
+                  >
+                    <SidebarGlyph name="pin-current" />
+                  </button>
+                  <button
+                    aria-label={`Archive recent task ${item.id}`}
+                    type="button"
+                  >
+                    <SidebarGlyph name="archive-current" />
+                  </button>
+                </>
+              ) : (
+                <button
+                  aria-label={`Sidebar actions for ${item.label}`}
+                  type="button"
+                >
+                  <SidebarGlyph name="more" />
+                </button>
+              )
             }
             actionsLabel={`Sidebar task actions for ${item.label}`}
             key={item.id}
-            leading={<SidebarGlyph name="thread" />}
+            leading={
+              currentSidebarComposition ? undefined : (
+                <SidebarGlyph name="thread" />
+              )
+            }
             onClick={() => selectScenario(item.id)}
             selected={
               !currentSidebarComposition &&
@@ -2714,22 +2736,26 @@ export function App() {
               scenarioId === item.id
             }
             status={
-              index === 1
-                ? "queued"
-                : index === 2
-                  ? "error"
-                  : index === 3
-                    ? "unread"
-                    : "idle"
+              currentSidebarComposition
+                ? "idle"
+                : index === 1
+                  ? "queued"
+                  : index === 2
+                    ? "error"
+                    : index === 3
+                      ? "unread"
+                      : "idle"
             }
             statusLabel={
-              index === 1
-                ? "Task queued"
-                : index === 2
-                  ? "Task failed"
-                  : index === 3
-                    ? "Unread update"
-                    : undefined
+              currentSidebarComposition
+                ? undefined
+                : index === 1
+                  ? "Task queued"
+                  : index === 2
+                    ? "Task failed"
+                    : index === 3
+                      ? "Unread update"
+                      : undefined
             }
           >
             {item.label}

@@ -5,6 +5,7 @@ import { fileURLToPath } from "node:url";
 import { sanitizeVisualAssetIcon } from "./visual-asset-contract.mjs";
 import {
   hasCurrentSidebarSettingsAbsenceEvidence,
+  hasCurrentSidebarThreadAbsenceEvidence,
 } from "./visual-asset-sidebar-contract.mjs";
 
 const write = process.argv.includes("--write");
@@ -375,24 +376,26 @@ manifest.icons = [...promotionSpecs].map(([id]) =>
   promoteIcon(id, existingById.get(id)),
 );
 const promotedIds = new Set(promotionSpecs.keys());
-const currentBuildAbsenceIds = new Set(["sidebar-settings"]);
 const currentSidebarSettingsAbsenceProven =
   hasCurrentSidebarSettingsAbsenceEvidence(capture.sidebarObservation);
+const currentSidebarThreadAbsenceProven =
+  hasCurrentSidebarThreadAbsenceEvidence(capture.sidebarObservation);
+const currentBuildAbsenceEvidence = new Map([
+  ["sidebar-settings", currentSidebarSettingsAbsenceProven],
+  ["sidebar-thread", currentSidebarThreadAbsenceProven],
+]);
 const remainingApproximationCandidates = new Set(
   manifest.remainingApproximationIds,
 );
-remainingApproximationCandidates.add("sidebar-thread");
-if (!currentSidebarSettingsAbsenceProven) {
-  for (const id of currentBuildAbsenceIds) {
+for (const [id, absenceProven] of currentBuildAbsenceEvidence) {
+  if (!absenceProven) {
     remainingApproximationCandidates.add(id);
   }
 }
 manifest.remainingApproximationIds = [...remainingApproximationCandidates].filter(
   (id) =>
     !promotedIds.has(id) &&
-    !(
-      currentSidebarSettingsAbsenceProven && currentBuildAbsenceIds.has(id)
-    ),
+    currentBuildAbsenceEvidence.get(id) !== true,
 );
 
 const output = `${JSON.stringify(manifest, null, 2)}\n`;

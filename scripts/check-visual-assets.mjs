@@ -6,6 +6,7 @@ import {
 } from "./visual-asset-contract.mjs";
 import {
   hasCurrentSidebarSettingsAbsenceEvidence,
+  hasCurrentSidebarThreadAbsenceEvidence,
 } from "./visual-asset-sidebar-contract.mjs";
 
 const manifestUrl = new URL("../research/visual-assets.json", import.meta.url);
@@ -241,6 +242,10 @@ if (
   !captureSource.includes("allowControlPatternFallback") ||
   !captureSource.includes("sidebarObservation") ||
   !captureSource.includes("projectTaskLeadingSvgCount") ||
+  !captureSource.includes("recentsSection.scrollIntoView") ||
+  !captureSource.includes("recentsTaskActionRowCount") ||
+  !captureSource.includes("recentsTaskLeadingSvgCount") ||
+  !captureSource.includes("recentsScrollContainer.scrollTop = 0") ||
   !captureSource.includes(
     'resolveSemanticId(fixedTextLabel, targetRegion, false)',
   ) ||
@@ -268,10 +273,11 @@ if (
   !updaterSource.includes("retainExistingWhenAbsentOnSameFingerprint") ||
   !updaterSource.includes("sameFingerprintRetainedComputedStyleProperties") ||
   !updaterSource.includes('"scrollbar-color"') ||
-  !updaterSource.includes("currentBuildAbsenceIds") ||
+  !updaterSource.includes("currentBuildAbsenceEvidence") ||
   !updaterSource.includes("hasCurrentSidebarSettingsAbsenceEvidence") ||
+  !updaterSource.includes("hasCurrentSidebarThreadAbsenceEvidence") ||
   !updaterSource.includes("currentSidebarSettingsAbsenceProven") ||
-  !updaterSource.includes('remainingApproximationCandidates.add("sidebar-thread")') ||
+  !updaterSource.includes("currentSidebarThreadAbsenceProven") ||
   !updaterSource.includes("remainingApproximationCandidates.add(id)") ||
   !updaterSource.includes("sanitizeVisualAssetIcon") ||
   !updaterSource.includes("capturedAt")
@@ -300,6 +306,8 @@ for (const id of [
 }
 const currentSidebarSettingsAbsenceProven =
   hasCurrentSidebarSettingsAbsenceEvidence(manifest.sidebarObservation);
+const currentSidebarThreadAbsenceProven =
+  hasCurrentSidebarThreadAbsenceEvidence(manifest.sidebarObservation);
 if (
   !hasCurrentSidebarSettingsAbsenceEvidence({
     footerHelpControlCount: 1,
@@ -320,6 +328,41 @@ if (
 ) {
   throw new Error(
     "sidebar Settings absence evidence must fail closed on each sampled state",
+  );
+}
+if (
+  !hasCurrentSidebarThreadAbsenceEvidence({
+    recentsSectionCount: 1,
+    recentsTaskActionRowCount: 6,
+    recentsTaskLeadingSvgCount: 0,
+  }) ||
+  [
+    undefined,
+    {},
+    {
+      recentsSectionCount: 0,
+      recentsTaskActionRowCount: 6,
+      recentsTaskLeadingSvgCount: 0,
+    },
+    {
+      recentsSectionCount: 2,
+      recentsTaskActionRowCount: 6,
+      recentsTaskLeadingSvgCount: 0,
+    },
+    {
+      recentsSectionCount: 1,
+      recentsTaskActionRowCount: 1,
+      recentsTaskLeadingSvgCount: 0,
+    },
+    {
+      recentsSectionCount: 1,
+      recentsTaskActionRowCount: 6,
+      recentsTaskLeadingSvgCount: 1,
+    },
+  ].some(hasCurrentSidebarThreadAbsenceEvidence)
+) {
+  throw new Error(
+    "sidebar thread absence evidence must fail closed on section, row, and leading-SVG samples",
   );
 }
 if (
@@ -345,11 +388,16 @@ if (
 }
 if (
   ids.has("sidebar-thread") ||
-  !remaining.includes("sidebar-thread") ||
-  appSource.includes("currentSidebarComposition ? undefined")
+  (currentSidebarThreadAbsenceProven
+    ? remaining.includes("sidebar-thread")
+    : !remaining.includes("sidebar-thread")) ||
+  !appSource.includes("currentSidebarComposition ? undefined") ||
+  !appSource.includes('<SidebarGlyph name="thread" />')
 ) {
   throw new Error(
-    "sidebar-thread must remain an explicit Recents approximation until that row type is sampled",
+    currentSidebarThreadAbsenceProven
+      ? "current-build Recents must omit a leading thread icon while legacy fixtures retain it"
+      : "sidebar-thread must return to the approximation inventory when Recents absence is unproven",
   );
 }
 

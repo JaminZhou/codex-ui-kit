@@ -420,6 +420,34 @@ try {
         width: value.width,
       };
     };
+    const navigation = document.querySelector("nav");
+    const recentsSections = [
+      ...new Set(
+        (navigation ? [...navigation.querySelectorAll("*")] : [])
+          .filter(
+            (element) =>
+              element.children.length === 0 &&
+              element.textContent?.trim() === "Recents",
+          )
+          .map((element) => element.closest("section"))
+          .filter(Boolean),
+      ),
+    ];
+    const recentsSection =
+      recentsSections.length === 1 ? recentsSections[0] : null;
+    let recentsScrollContainer = recentsSection?.parentElement ?? null;
+    while (recentsScrollContainer) {
+      const overflowY = getComputedStyle(recentsScrollContainer).overflowY;
+      if (
+        (overflowY === "auto" || overflowY === "scroll") &&
+        recentsScrollContainer.scrollHeight >
+          recentsScrollContainer.clientHeight
+      ) {
+        break;
+      }
+      recentsScrollContainer = recentsScrollContainer.parentElement;
+    }
+    if (recentsScrollContainer) recentsScrollContainer.scrollTop = 0;
     const icons = [...document.querySelectorAll("svg")]
       .map((svg) => {
         const bounds = svg.getBoundingClientRect();
@@ -460,77 +488,114 @@ try {
         };
       })
       .filter(Boolean);
-    const visibleControls = [
-      ...document.querySelectorAll(
-        'a, button, [role="button"], [role="tab"], [role="menuitem"]',
-      ),
-    ]
-      .map((control) => ({
-        ariaLabel: control.getAttribute("aria-label") ?? "",
-        bounds: control.getBoundingClientRect(),
-        control,
-        fixedTextLabel: control.textContent?.trim() ?? "",
-      }))
-      .filter(
-        ({ bounds }) =>
-          bounds.width > 0 &&
-          bounds.height > 0 &&
-          bounds.right > 0 &&
-          bounds.left < window.innerWidth &&
-          bounds.bottom > 0 &&
-          bounds.top < window.innerHeight,
-      );
-    const controlsForSemanticId = (semanticId, targetRegion) =>
-      visibleControls.filter(
+    const visibleControlsFor = (root = document) =>
+      [
+        ...root.querySelectorAll(
+          'a, button, [role="button"], [role="tab"], [role="menuitem"]',
+        ),
+      ]
+        .map((control) => ({
+          ariaLabel: control.getAttribute("aria-label") ?? "",
+          bounds: control.getBoundingClientRect(),
+          control,
+          fixedTextLabel: control.textContent?.trim() ?? "",
+        }))
+        .filter(
+          ({ bounds }) =>
+            bounds.width > 0 &&
+            bounds.height > 0 &&
+            bounds.right > 0 &&
+            bounds.left < window.innerWidth &&
+            bounds.bottom > 0 &&
+            bounds.top < window.innerHeight,
+        );
+    const visibleControls = visibleControlsFor();
+    const controlsForSemanticId = (
+      semanticId,
+      targetRegion,
+      controls = visibleControls,
+    ) =>
+      controls.filter(
         ({ ariaLabel, bounds, fixedTextLabel }) =>
           region(bounds) === targetRegion &&
           (resolveSemanticId(ariaLabel, targetRegion, true) === semanticId ||
             resolveSemanticId(fixedTextLabel, targetRegion, false) ===
               semanticId),
       );
-    const pinControls = controlsForSemanticId(
+    const pairTaskActionRows = (pinControls, archiveControls) =>
+      pinControls
+        .map(({ bounds: pinBounds }) => {
+          const archive = archiveControls.find(({ bounds }) => {
+            const pinCenter = pinBounds.top + pinBounds.height / 2;
+            const archiveCenter = bounds.top + bounds.height / 2;
+            return Math.abs(pinCenter - archiveCenter) < 1;
+          });
+          return archive
+            ? {
+                bottom: pinBounds.bottom,
+                left: pinBounds.left,
+                top: pinBounds.top,
+              }
+            : null;
+        })
+        .filter(Boolean);
+    const leadingSvgCountForRows = (rows, root = document) =>
+      rows.reduce(
+        (count, row) =>
+          count +
+          [...root.querySelectorAll("svg")].filter((svg) => {
+            const bounds = svg.getBoundingClientRect();
+            const center = bounds.top + bounds.height / 2;
+            return (
+              region(bounds) === "sidebar-projects" &&
+              bounds.width > 0 &&
+              bounds.height > 0 &&
+              bounds.right > 0 &&
+              bounds.left < window.innerWidth &&
+              bounds.right <= row.left &&
+              center >= row.top &&
+              center <= row.bottom
+            );
+          }).length,
+        0,
+      );
+    const projectPinControls = controlsForSemanticId(
       "sidebar-pin",
       "sidebar-projects",
     );
-    const archiveControls = controlsForSemanticId(
+    const projectArchiveControls = controlsForSemanticId(
       "sidebar-archive",
       "sidebar-projects",
     );
-    const taskActionRows = pinControls
-      .map(({ bounds: pinBounds }) => {
-        const archive = archiveControls.find(({ bounds }) => {
-          const pinCenter = pinBounds.top + pinBounds.height / 2;
-          const archiveCenter = bounds.top + bounds.height / 2;
-          return Math.abs(pinCenter - archiveCenter) < 1;
-        });
-        return archive
-          ? {
-              bottom: pinBounds.bottom,
-              left: pinBounds.left,
-              top: pinBounds.top,
-            }
-          : null;
-      })
-      .filter(Boolean);
-    const projectTaskLeadingSvgCount = taskActionRows.reduce(
-      (count, row) =>
-        count +
-        [...document.querySelectorAll("svg")].filter((svg) => {
-          const bounds = svg.getBoundingClientRect();
-          const center = bounds.top + bounds.height / 2;
-          return (
-            region(bounds) === "sidebar-projects" &&
-            bounds.width > 0 &&
-            bounds.height > 0 &&
-            bounds.right > 0 &&
-            bounds.left < window.innerWidth &&
-            bounds.right <= row.left &&
-            center >= row.top &&
-            center <= row.bottom
-          );
-        }).length,
-      0,
+    const projectTaskActionRows = pairTaskActionRows(
+      projectPinControls,
+      projectArchiveControls,
     );
+    const projectTaskLeadingSvgCount = leadingSvgCountForRows(
+      projectTaskActionRows,
+    );
+    if (recentsSection && recentsScrollContainer) {
+      recentsSection.scrollIntoView({ block: "end", inline: "nearest" });
+    }
+    const recentsVisibleControls = recentsSection
+      ? visibleControlsFor(recentsSection)
+      : [];
+    const recentsTaskActionRows = pairTaskActionRows(
+      controlsForSemanticId(
+        "sidebar-pin",
+        "sidebar-projects",
+        recentsVisibleControls,
+      ),
+      controlsForSemanticId(
+        "sidebar-archive",
+        "sidebar-projects",
+        recentsVisibleControls,
+      ),
+    );
+    const recentsTaskLeadingSvgCount = recentsSection
+      ? leadingSvgCountForRows(recentsTaskActionRows, recentsSection)
+      : 0;
+    if (recentsScrollContainer) recentsScrollContainer.scrollTop = 0;
     const sidebarObservation = {
       footerHelpControlCount: controlsForSemanticId(
         "sidebar-help",
@@ -540,8 +605,11 @@ try {
         "sidebar-settings",
         "sidebar-footer",
       ).length,
-      projectTaskActionRowCount: taskActionRows.length,
+      projectTaskActionRowCount: projectTaskActionRows.length,
       projectTaskLeadingSvgCount,
+      recentsSectionCount: recentsSections.length,
+      recentsTaskActionRowCount: recentsTaskActionRows.length,
+      recentsTaskLeadingSvgCount,
     };
     const fontSamples = [
       ["composer", document.querySelector('[contenteditable="true"][role="textbox"]')],

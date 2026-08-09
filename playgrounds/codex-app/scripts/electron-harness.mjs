@@ -189,6 +189,13 @@ export const visualScenes = [
     scenario: "streaming-recovery",
   },
   {
+    frame: "sidebar-current",
+    id: "current-sidebar-recents",
+    maxPixelRatio: 0.0225,
+    scenario: "streaming-recovery",
+    sidebarSectionKind: "threads",
+  },
+  {
     frame: "streaming",
     id: "streaming",
     scenario: "streaming-recovery",
@@ -839,6 +846,15 @@ export async function launchScene(
   await page.evaluate(async () => {
     await document.fonts.ready;
   });
+  if (scene.sidebarSectionKind) {
+    await page
+      .locator(
+        `.codex-ui-app-sidebar__section[data-kind="${scene.sidebarSectionKind}"]`,
+      )
+      .evaluate((element) => {
+        element.scrollIntoView({ block: "end", inline: "nearest" });
+      });
+  }
   if (capture && scene.id === "command-output-expanded") {
     await page
       .getByRole("button", { exact: true, name: "Worked for 10s" })
