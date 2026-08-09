@@ -783,26 +783,15 @@ for (const scene of selectedScenes) {
     );
 
     if (
-      JSON.stringify(
-        workspaceCurrentIconBounds?.map(({ height, name, width }) => ({
-          height,
-          name,
-          width,
-        })),
-      ) !==
-      JSON.stringify(
-        currentBuildComposerIconReferenceBounds.map(
-          ({ height, name, width }) => ({ height, name, width }),
-        ),
-      )
+      JSON.stringify(workspaceCurrentIconBounds) !==
+      JSON.stringify(currentBuildComposerIconReferenceBounds)
     ) {
       throw new Error(
-        `${scene.id}: current Composer icon bounds are incomplete: ${JSON.stringify(workspaceCurrentIconBounds)}.`,
+        `${scene.id}: current Composer icon bounds drifted from the current-build reference: ${JSON.stringify(workspaceCurrentIconBounds)}.`,
       );
     }
     const iconComparisons = currentBuildComposerIconReferenceBounds.map(
-      (referenceBounds, index) => {
-        const actualBounds = workspaceCurrentIconBounds[index];
+      (referenceBounds) => {
         return {
           comparison: comparePng(
             cropPng(
@@ -814,10 +803,10 @@ for (const scene of selectedScenes) {
             ),
             cropPng(
               actual,
-              actualBounds.left,
-              actualBounds.top,
-              actualBounds.width,
-              actualBounds.height,
+              referenceBounds.left,
+              referenceBounds.top,
+              referenceBounds.width,
+              referenceBounds.height,
             ),
             0.12,
           ),

@@ -316,13 +316,14 @@ textarea {
   flex-wrap: nowrap;
   justify-content: flex-start;
   overflow: hidden;
-  padding-inline-start: 20px;
+  padding-inline-start: 19px;
   width: 100%;
 }
 
 .demo-workspace-start .codex-ui-conversation-context-bar__item {
-  border: 0;
+  border: 1px solid transparent;
   border-radius: 999px;
+  box-sizing: border-box;
   flex: 0 0 auto;
   font-size: 13px;
   height: 28px;
@@ -330,6 +331,16 @@ textarea {
   max-width: 200px;
   min-height: 28px;
   padding: 0 8px;
+}
+
+.demo-workspace-start
+  .codex-ui-conversation-context-bar__item[data-kind="project"] {
+  width: 114px;
+}
+
+.demo-workspace-start
+  .codex-ui-conversation-context-bar__item[data-kind="run-location"] {
+  width: 72px;
 }
 
 .demo-workspace-start
@@ -353,6 +364,14 @@ textarea {
 .demo-workspace-start .codex-ui-composer {
   max-width: none;
   min-height: 98px;
+}
+
+.demo-workspace-start .codex-ui-composer__fieldset {
+  padding-top: 14px;
+}
+
+.demo-workspace-start .codex-ui-composer__toolbar {
+  min-height: 28px;
 }
 
 .demo-workspace-project-dialog {
@@ -577,10 +596,26 @@ textarea {
   gap: 4px;
 }
 
+.demo-workspace-start .demo-workspace-model {
+  border: 1px solid transparent;
+  border-radius: 999px;
+  box-sizing: border-box;
+  flex: 0 0 auto;
+  height: 28px;
+  padding: 0 8px;
+}
+
 .demo-workspace-start .demo-composer-actions,
 .demo-workspace-start .demo-composer-controls {
   font-size: 13px;
-  gap: 4px;
+}
+
+.demo-workspace-start .demo-composer-controls {
+  gap: 5px;
+}
+
+.demo-workspace-start .demo-composer-actions {
+  gap: 0;
 }
 
 .demo-workspace-start .demo-composer-actions button,
@@ -588,9 +623,35 @@ textarea {
   align-items: center;
   border-radius: 999px;
   display: inline-flex;
+  font-size: 13px;
   gap: 6px;
   height: 28px;
   justify-content: center;
+}
+
+.demo-workspace-start .demo-composer-controls button:first-child {
+  flex: 0 0 28px;
+  width: 28px;
+}
+
+.demo-workspace-start .demo-composer-controls button:last-child {
+  border: 1px solid transparent;
+  box-sizing: border-box;
+  flex: 0 0 101px;
+  gap: 4px;
+  padding: 0 6px;
+  width: 101px;
+}
+
+.demo-workspace-start
+  .demo-composer-actions
+  button[aria-label="Dictate"] {
+  flex: 0 0 28px;
+  width: 28px;
+}
+
+.demo-workspace-start .demo-composer-actions .demo-workspace-voice {
+  margin-left: 8px;
 }
 
 .demo-workspace-start

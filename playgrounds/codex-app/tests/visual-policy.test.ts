@@ -85,6 +85,35 @@ describe("lifecycle visual policy", () => {
     );
   });
 
+  it("keeps current-build Composer icon coordinates in the pixel gate", () => {
+    const composerIconGate = contract.slice(
+      contract.indexOf("const iconComparisons"),
+      contract.indexOf("const composerIconPixels"),
+    );
+
+    expect(contract).toContain(
+      "JSON.stringify(workspaceCurrentIconBounds) !==",
+    );
+    expect(contract).toContain(
+      "JSON.stringify(currentBuildComposerIconReferenceBounds)",
+    );
+    expect(contract).toContain(
+      "current Composer icon bounds drifted from the current-build reference",
+    );
+    expect(contract).not.toContain(
+      "workspaceCurrentIconBounds?.map(({ height, name, width })",
+    );
+    expect(composerIconGate).toContain("actual,\n              referenceBounds.left");
+    expect(composerIconGate).toContain("referenceBounds.top");
+    expect(composerIconGate).not.toContain("actualBounds.left");
+    expect(composerIconGate).not.toContain("actualBounds.top");
+    expect(appSource).toContain("Full access");
+    expect(appStyles).toContain("padding-inline-start: 19px");
+    expect(appStyles).toContain("padding-top: 14px");
+    expect(appStyles).toContain("flex: 0 0 101px");
+    expect(appStyles).toContain("margin-left: 8px");
+  });
+
   it("gates the current long-thread navigation and return control", () => {
     expect(contract).toContain(
       "CODEX_UI_KIT_LONG_THREAD_REFERENCE",

@@ -3907,7 +3907,7 @@ export function App() {
           </button>
           <button aria-label="Change permissions" type="button">
             <CurrentBuildIcon name="composer-permission" />
-            Ask for approval
+            Full access
           </button>
         </span>
       }
