@@ -3652,7 +3652,9 @@ export function App() {
           </span>
         ) : undefined
       }
-      allowAttachmentOnlySubmit={attachmentSubmissionReady}
+      allowAttachmentOnlySubmit={
+        isCurrentAttachmentReplay && attachmentSubmissionReady
+      }
       allowSubmitWhileRunning={showLifecycleComposer}
       aria-busy={composerIsDisabled || undefined}
       attachments={composerAttachmentNodes}
@@ -3700,7 +3702,9 @@ export function App() {
       }
       stopLabel="Stop"
       submitDisabled={
-        composerAttachments.length > 0 && !attachmentSubmissionReady
+        isCurrentAttachmentReplay
+          ? !attachmentSubmissionReady
+          : composerAttachments.length > 0 && !attachmentSubmissionReady
       }
       submitLabel={
         isCurrentCommandInterruptionReplay ||

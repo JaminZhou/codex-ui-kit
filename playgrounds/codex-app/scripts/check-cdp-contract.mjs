@@ -3178,6 +3178,9 @@ for (const scene of visualScenes) {
           stopCount: composer.querySelectorAll(
             'button[aria-label="Stop"]',
           ).length,
+          submitDisabled: composer
+            .querySelector('[data-action="submit"]')
+            ?.hasAttribute("disabled"),
           surface: rect(surface),
           textarea: {
             label: textarea.getAttribute("aria-label"),
@@ -3465,7 +3468,8 @@ for (const scene of visualScenes) {
         scene.id === "composer-attachment" &&
         (conversation.attachmentCount !== 1 ||
           conversation.phase !== "attachment" ||
-          conversation.composer.layout !== "multiline")
+          conversation.composer.layout !== "multiline" ||
+          conversation.submitDisabled !== true)
       ) {
         throw new Error(
           `${scene.id}: attachment Composer contract failed: ${JSON.stringify(conversation)}`,
@@ -6979,6 +6983,15 @@ try {
       .count()) !== 0
   ) {
     throw new Error("Removing the current attachment retained its Composer card.");
+  }
+  if (
+    await attachmentLifecyclePage
+      .getByRole("button", { name: "Send message" })
+      .isEnabled()
+  ) {
+    throw new Error(
+      "Removing the final attachment left Send enabled for an unsendable draft.",
+    );
   }
 
   await attachmentLifecyclePage
