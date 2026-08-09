@@ -257,6 +257,30 @@ export const visualScenes = [
     scenario: "markdown",
   },
   {
+    frame: "markdown-stream-fence",
+    id: "markdown-stream-fence",
+    maxPixelRatio: 0.01,
+    scenario: "markdown-streaming-large",
+  },
+  {
+    frame: "markdown-stream-table",
+    id: "markdown-stream-table",
+    maxPixelRatio: 0.01,
+    scenario: "markdown-streaming-large",
+  },
+  {
+    frame: "markdown-stream-large",
+    id: "markdown-stream-large",
+    maxPixelRatio: 0.01,
+    scenario: "markdown-streaming-large",
+  },
+  {
+    frame: "markdown-stream-complete",
+    id: "markdown-stream-complete",
+    maxPixelRatio: 0.01,
+    scenario: "markdown-streaming-large",
+  },
+  {
     callLabels: ["Search OpenAI docs"],
     frame: "mcp-running",
     groupLabel: "Using OpenAI Developer Docs integration",

@@ -5380,6 +5380,8 @@ export function App() {
               mode === "replay" &&
               ((scenarioId === "markdown" &&
                 message.id === "assistant-markdown") ||
+                (scenarioId === "markdown-streaming-large" &&
+                  message.id === "assistant-markdown-streaming-large") ||
                 (scenarioId === "mcp-tool-call" &&
                   message.id === "assistant-mcp") ||
                 (scenarioId === "mcp-recovery-mixed-thread" &&
@@ -6637,13 +6639,15 @@ export function App() {
       }}
     />
   ) : undefined;
-  const floatingControl = isConversationLifecycle ? (
-    <ThreadFloatingButton
-      onClick={returnToLatest}
-      show={!threadFollowing}
-      working={composerIsRunning}
-    />
-  ) : undefined;
+  const floatingControl =
+    isConversationLifecycle ||
+    (mode === "replay" && scenarioId === "markdown-streaming-large") ? (
+      <ThreadFloatingButton
+        onClick={returnToLatest}
+        show={!threadFollowing}
+        working={composerIsRunning}
+      />
+    ) : undefined;
 
   return (
     <div

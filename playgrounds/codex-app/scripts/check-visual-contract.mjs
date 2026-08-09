@@ -565,7 +565,10 @@ for (const scene of selectedScenes) {
           };
         });
     }
-    if (scene.id === "markdown-complete") {
+    if (
+      scene.id === "markdown-complete" ||
+      scene.scenario === "markdown-streaming-large"
+    ) {
       await page.addStyleTag({
         content: `
           .codex-ui-conversation-thread-shell__viewport {

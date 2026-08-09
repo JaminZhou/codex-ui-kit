@@ -849,6 +849,28 @@ Browser/CDP, Electron, and internal pixels. No isolated product task was driven
 through those recovery transitions, so real-product recovery reachability and
 transport recovery remain required captures.
 
+## Current Markdown structural follow-up
+
+Read-only inspection of the unchanged `26.803.41515` ASAR fingerprint confirms
+that conversation content is represented as `inline-markdown`, remains in
+progress until completion, and participates in the latest-turn follow
+controller's `static`, prework, and user-follow modes with a 24px bottom
+tolerance. The current table implementation also exposes its container,
+horizontal scroller, wrapper, cells, copy action, and optional
+expand-to-preview action. These observations are source-structural only; they
+do not promote current-product runtime or pixel evidence.
+
+The independent playground adds a schema-valid nine-event trace with four
+public deltas. Five Browser/CDP checkpoints cover an incomplete link, open
+fenced code, nested and task lists, a readable multi-column table, twelve long
+sections, completion actions, and bottom-follow behavior inside the 129-frame
+matrix. Electron independently checks exact code copy, table focus, real
+wheel-driven scroll-away, the floating return control, and return to latest.
+Four reviewed internal baselines cover the streamed fence, table, long running
+tail, and completed tail. Product runtime reachability, images, math,
+citations/sources, plugin variants, very-large-table actions/preview/error, and
+Markdown error variants remain required captures.
+
 ## Required flow matrix
 
 ### 1. Application entry and navigation

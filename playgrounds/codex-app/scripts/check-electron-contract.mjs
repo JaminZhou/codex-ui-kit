@@ -1109,6 +1109,104 @@ try {
   await markdownApp.close();
 }
 
+const markdownStreamingScene = {
+  frame: "markdown-stream-complete",
+  id: "electron-markdown-streaming-large",
+  scenario: "markdown-streaming-large",
+};
+const {
+  app: markdownStreamingApp,
+  page: markdownStreamingPage,
+} = await launchScene(markdownStreamingScene, { capture: false });
+
+try {
+  const nativeBounds = await markdownStreamingApp.evaluate(
+    ({ BrowserWindow }) => BrowserWindow.getAllWindows()[0]?.getContentBounds(),
+  );
+  if (nativeBounds?.width !== 1180 || nativeBounds?.height !== 820) {
+    throw new Error(
+      `Electron streaming Markdown native bounds failed: ${JSON.stringify(nativeBounds)}`,
+    );
+  }
+
+  await markdownStreamingPage.evaluate(() => {
+    Object.defineProperty(navigator, "clipboard", {
+      configurable: true,
+      value: {
+        writeText: async (value) => {
+          window.__codexMarkdownStreamingCopiedText = value;
+        },
+      },
+    });
+  });
+  const streamingMessage = markdownStreamingPage.locator(
+    '[data-item-id="assistant-markdown-streaming-large"]',
+  );
+  const tableScroll = streamingMessage.locator(
+    ".codex-ui-markdown__table-scroll",
+  );
+  await tableScroll.scrollIntoViewIfNeeded();
+  await tableScroll.focus();
+
+  const copy = streamingMessage.getByRole("button", { name: "Copy code" });
+  await copy.click();
+  await streamingMessage.getByRole("button", { name: "Copied" }).waitFor();
+  await tableScroll.focus();
+  const markdownViewport = markdownStreamingPage.locator(
+    ".codex-ui-conversation-thread-shell__viewport",
+  );
+  await markdownViewport.hover();
+  await markdownStreamingPage.mouse.wheel(0, -120);
+  const markdownScrollToBottom = markdownStreamingPage.getByRole("button", {
+    name: "Scroll to bottom",
+  });
+  await markdownScrollToBottom.waitFor({ state: "visible" });
+  const awayState = await markdownStreamingPage.evaluate(() => {
+    const viewport = document.querySelector(
+      ".codex-ui-conversation-thread-shell__viewport",
+    );
+    const table = document.querySelector(
+      '[data-item-id="assistant-markdown-streaming-large"] .codex-ui-markdown__table-scroll',
+    );
+    return {
+      actionCount: document.querySelectorAll(
+        '[aria-label="Markdown response actions"] button',
+      ).length,
+      copiedText: window.__codexMarkdownStreamingCopiedText,
+      distanceFromBottom: viewport
+        ? viewport.scrollHeight - viewport.clientHeight - viewport.scrollTop
+        : null,
+      tableFocused: document.activeElement === table,
+    };
+  });
+  if (
+    awayState.actionCount !== 4 ||
+    awayState.copiedText !==
+      'const chunks = ["link", "list", "code"];\nconsole.log(chunks.join(" -> "));' ||
+    (awayState.distanceFromBottom ?? 0) <= 100 ||
+    !awayState.tableFocused
+  ) {
+    throw new Error(
+      `Electron streaming Markdown interaction failed: ${JSON.stringify(awayState)}`,
+    );
+  }
+
+  await markdownScrollToBottom.click();
+  await markdownStreamingPage.waitForFunction(() => {
+    const viewport = document.querySelector(
+      ".codex-ui-conversation-thread-shell__viewport",
+    );
+    return (
+      viewport instanceof HTMLElement &&
+      Math.abs(
+        viewport.scrollHeight - viewport.clientHeight - viewport.scrollTop,
+      ) <= 1
+    );
+  });
+} finally {
+  await markdownStreamingApp.close();
+}
+
 const mcpScene = {
   frame: "mcp-tool-calls",
   id: "electron-mcp",

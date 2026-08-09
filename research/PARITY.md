@@ -230,7 +230,7 @@ The authoritative current-build inventory is:
   current Active/Done classifier and 4/10 list limits. A twelve-agent public
   replay now covers pending initialization, updated progress, errored,
   interrupted, shutdown, and unavailable results, both pagination limits, and
-  failed-agent transcript access. Browser/CDP covers 125 frames, Electron
+  failed-agent transcript access. Browser/CDP covers 129 frames, Electron
   drives both mixed lists, and nine collaboration scenes gate ten current-build
   regions: panel/summary/transcript crops pass between 1.33% and 4.67%, while
   the compact main-activity crop passes at 11.50% under its independent 12.5%
@@ -282,6 +282,18 @@ The protocol-backed Electron playground adds a separate completed-Markdown
 frame. Its optional 906×820 `26.721.41059` comparison gates the assistant,
 fenced-code, and Composer regions at the strict 0.05 pixel threshold, while
 CDP separately locks semantic counts and computed geometry.
+
+The unchanged `26.803.41515` fingerprint adds source-structural evidence for
+inline-Markdown in-progress ownership, the latest-turn follow state machine,
+and dedicated Table container/scroller plus Copy/Expand/Preview controls. A
+separate nine-event replay now mutates an incomplete link and code fence over
+four public message deltas, then completes nested/task lists, a multi-column
+table, and a twelve-section answer. Browser/CDP gates five checkpoints;
+Electron verifies code copy plus user scroll-away/return; and four reviewed
+internal baselines cover the fence, table, running tail, and completed tail.
+This is current independent `partial` coverage, not current-product pixel
+evidence. Images, math, citations/sources, very-large-table actions/preview,
+error variants, and product runtime reachability remain open.
 
 The `26.727.40816` MCP recovery adds four further frames for failure, retry,
 completion, and a mixed follow-up turn. Its optional 906×820 comparison gates

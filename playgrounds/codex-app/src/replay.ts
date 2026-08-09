@@ -13,6 +13,7 @@ import backgroundTerminalTrace from "../fixtures/traces/background-terminal.json
 import interruptionTrace from "../fixtures/traces/interruption.jsonl?raw";
 import largeFileReviewTrace from "../fixtures/traces/large-file-review.jsonl?raw";
 import longCommandOutputTrace from "../fixtures/traces/long-command-output.jsonl?raw";
+import markdownStreamingLargeTrace from "../fixtures/traces/markdown-streaming-large.jsonl?raw";
 import markdownTrace from "../fixtures/traces/markdown.jsonl?raw";
 import mcpToolCallTrace from "../fixtures/traces/mcp-tool-call.jsonl?raw";
 import mcpRecoveryMixedThreadTrace from "../fixtures/traces/mcp-recovery-mixed-thread.jsonl?raw";
@@ -50,6 +51,7 @@ export type ReplayScenarioId =
   | "large-file-review"
   | "long-command-output"
   | "markdown"
+  | "markdown-streaming-large"
   | "mcp-tool-call"
   | "mcp-recovery-mixed-thread"
   | "mixed-file-review"
@@ -246,6 +248,12 @@ export const replayScenarios: Record<ReplayScenarioId, ReplayScenario> = {
     "Markdown response",
     "Heading, inline semantics, quote, list, table, code, and response actions.",
     markdownTrace,
+  ),
+  "markdown-streaming-large": scenario(
+    "markdown-streaming-large",
+    "Stream a large Markdown response",
+    "Protocol deltas mutate an incomplete link and code fence before a multi-column table and twelve-section response exercise long-content scrolling.",
+    markdownStreamingLargeTrace,
   ),
   "mcp-tool-call": scenario(
     "mcp-tool-call",

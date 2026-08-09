@@ -96,6 +96,46 @@ describe("protocol lifecycle reducer", () => {
     expect(scenario.frames["markdown-complete"]).toBe(scenario.events.length);
   });
 
+  it("preserves streaming Markdown mutations before a large completion", () => {
+    const scenario = replayScenarios["markdown-streaming-large"];
+    const linkState = reduceProtocolTrace(
+      scenario.events.slice(0, scenario.frames["markdown-stream-link"]),
+    );
+    const fenceState = reduceProtocolTrace(
+      scenario.events.slice(0, scenario.frames["markdown-stream-fence"]),
+    );
+    const tableState = reduceProtocolTrace(
+      scenario.events.slice(0, scenario.frames["markdown-stream-table"]),
+    );
+    const largeState = reduceProtocolTrace(
+      scenario.events.slice(0, scenario.frames["markdown-stream-large"]),
+    );
+    const completedState = reduceProtocolTrace(scenario.events);
+    const message = (state: typeof linkState) =>
+      state.messages.find(
+        ({ id }) => id === "assistant-markdown-streaming-large",
+      );
+
+    expect(message(linkState)?.text).toBe(
+      "# Streaming Markdown stress\n\nThe [current link](https://exa",
+    );
+    expect(message(fenceState)?.text).toContain(
+      'const chunks = ["link", "list", "code"];',
+    );
+    expect(message(fenceState)?.status).toBe("running");
+    expect(message(tableState)?.text).toContain(
+      "| Width A | Width B | Width C |",
+    );
+    expect(message(largeState)?.text).toContain("## Section 12");
+    expect(message(largeState)?.text).toContain("End of streamed response.");
+    expect(message(completedState)?.status).toBe("completed");
+    expect(message(completedState)?.text).toBe(message(largeState)?.text);
+    expect(completedState.status).toBe("completed");
+    expect(scenario.frames["markdown-stream-complete"]).toBe(
+      scenario.events.length,
+    );
+  });
+
   it("preserves public image inputs with the submitted user message", () => {
     const scenario = replayScenarios["attachment-lifecycle"];
     const submitted = reduceProtocolTrace(

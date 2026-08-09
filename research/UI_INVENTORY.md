@@ -844,7 +844,7 @@ adds source-structural evidence for the seven collaboration statuses,
 Active/Done classification, and 4/10 panel limits. A schema-valid twelve-agent
 replay now covers waiting-before-initialization, streamed updates, errored,
 interrupted, shutdown, and unavailable terminal results, both pagination
-paths, and the failed-agent transcript. Browser/CDP reaches 125 frames;
+paths, and the failed-agent transcript. Browser/CDP reaches 129 frames;
 Electron repeats the pagination and transcript interactions. Nine
 reviewed scenes gate ten current-build regions. Panel/summary/transcript ratios
 range from `0.013328938694792354` to `0.046708160442600274`; the compact
@@ -862,16 +862,29 @@ merge/review-submission states, direct-shell failure/restart semantics,
 background agent-process reopening, and native Codex window behavior
 retain their own inventory gates.
 
-The Markdown slice revalidates one synthetic completed response on build
-`26.721.41059`. That build's CDP evidence records semantic heading, paragraph,
-link, inline code, quote, list, table, fenced-code, and action/copy controls
-together with their computed styles. The protocol replay adds a sixteenth
-deterministic frame; Browser and Electron gates retain regression coverage for
-external-link semantics, code-copy behavior, the four completed-response
-actions, 736px content geometry, and the measured scroll clearance above the
-736px Composer. A main-only 906×820 reference compares assistant, code-card,
-and Composer ownership regions independently. This previously verified only
-the sampled completed Markdown vocabulary against `26.721.41059`; its current
-status is `partial_legacy`. Nested lists, task lists, images, math,
-citations/sources, very large tables, streaming Markdown mutation, and error
-variants remain open.
+The original Markdown slice revalidates one synthetic completed response on
+build `26.721.41059`. That build's CDP evidence records semantic heading,
+paragraph, link, inline code, quote, list, table, fenced-code, and action/copy
+controls together with their computed styles. The protocol replay adds a
+sixteenth deterministic frame; Browser and Electron gates retain regression
+coverage for external-link semantics, code-copy behavior, the four
+completed-response actions, 736px content geometry, and the measured scroll
+clearance above the 736px Composer. A main-only 906×820 reference compares
+assistant, code-card, and Composer ownership regions independently. That
+product-level evidence still verifies only the sampled completed Markdown
+vocabulary against `26.721.41059`; its current status remains
+`partial_legacy`.
+
+Read-only inspection of the unchanged `26.803.41515` ASAR fingerprint adds
+current source-structural evidence for `inline-markdown`, the in-progress
+boundary, the latest-turn follow controller and its 24px tolerance, and the
+table container/scroller/actions structure. An independent nine-event replay
+now streams four deltas through an incomplete link, open fenced code, nested
+and task lists, a readable multi-column table, and twelve long sections before
+completion. Browser/CDP checks five checkpoints and raises the matrix to 129
+frames. Electron independently verifies exact code copy, table focus, real
+wheel-driven scroll-away, and return to latest; four reviewed internal pixel
+baselines cover the streamed fence, table, long running tail, and completed
+tail. Product runtime reachability, images, math, citations/sources, plugin
+variants, very-large-table actions/preview/error, and Markdown error variants
+remain open.
