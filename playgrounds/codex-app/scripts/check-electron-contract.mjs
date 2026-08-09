@@ -3658,6 +3658,107 @@ try {
   await currentSessionApprovalApp.close();
 }
 
+const {
+  app: liveSessionApprovalApp,
+  page: liveSessionApprovalPage,
+} = await launchScene(
+  {
+    frame: "recovered",
+    id: "electron-live-file-approval-for-session",
+    scenario: "streaming-recovery",
+  },
+  { capture: false },
+);
+try {
+  await liveSessionApprovalPage
+    .getByRole("button", { exact: true, name: "Live" })
+    .click();
+  await liveSessionApprovalPage.waitForSelector(
+    '.demo-root[data-mode="live"]',
+  );
+  await liveSessionApprovalApp.evaluate(
+    ({ BrowserWindow, ipcMain }) => {
+      globalThis.__codexUiKitApprovalResponse = null;
+      ipcMain.removeHandler("demo:approval:respond");
+      ipcMain.handle("demo:approval:respond", (_event, input) => {
+        globalThis.__codexUiKitApprovalResponse = input;
+      });
+      const window = BrowserWindow.getAllWindows()[0];
+      window?.webContents.send("demo:notification", {
+        method: "item/started",
+        params: {
+          item: {
+            changes: [
+              {
+                diff: "+session approval probe",
+                kind: { type: "update" },
+                path: "notes/live-session.md",
+              },
+            ],
+            id: "file-live-session",
+            status: "inProgress",
+            type: "fileChange",
+          },
+          threadId: "thread-live-session",
+          turnId: "turn-live-session",
+        },
+      });
+      window?.webContents.send("demo:server-request", {
+        id: "approval-live-session",
+        kind: "request",
+        method: "item/fileChange/requestApproval",
+        params: {
+          itemId: "file-live-session",
+          reason: "Apply the live session approval probe.",
+          threadId: "thread-live-session",
+          turnId: "turn-live-session",
+        },
+      });
+    },
+  );
+  const liveApproval = liveSessionApprovalPage.getByTestId(
+    "approval-request",
+  );
+  await liveApproval.waitFor();
+  await liveApproval
+    .getByRole("button", { name: "Approval options" })
+    .click();
+  const liveAllowAllEdits = liveSessionApprovalPage
+    .locator(
+      '.codex-ui-approval-request__options-menu [role="menuitem"]',
+    )
+    .filter({ hasText: "Allow all edits" });
+  await liveAllowAllEdits.waitFor();
+  if (
+    (await liveSessionApprovalPage
+      .getByLabel(
+        "Allow this and future file edits in this conversation without asking again",
+      )
+      .count()) !== 1
+  ) {
+    throw new Error(
+      "Electron live file approval did not expose its conversation scope.",
+    );
+  }
+  await liveAllowAllEdits.click();
+  const liveApprovalResponse = await liveSessionApprovalApp.evaluate(
+    () => globalThis.__codexUiKitApprovalResponse,
+  );
+  if (
+    JSON.stringify(liveApprovalResponse) !==
+    JSON.stringify({
+      decision: "acceptForSession",
+      requestId: "approval-live-session",
+    })
+  ) {
+    throw new Error(
+      `Electron live file approval did not emit its session decision: ${JSON.stringify(liveApprovalResponse)}`,
+    );
+  }
+} finally {
+  await liveSessionApprovalApp.close();
+}
+
 for (const alternateDecision of ["Allow once", "Deny"]) {
   const { app: alternateApp, page: alternatePage } = await launchScene(
     {

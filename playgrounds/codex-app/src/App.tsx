@@ -5784,6 +5784,19 @@ export function App() {
             respondToApproval(approval.requestId, "decline")
           }
           reason={approval.reason}
+          scopedApproveAction={
+            approval.kind === "file"
+              ? {
+                  info: "Allow this and future file edits in this conversation without asking again",
+                  label: "Allow all edits",
+                  onClick: () =>
+                    respondToApproval(
+                      approval.requestId,
+                      "acceptForSession",
+                    ),
+                }
+              : undefined
+          }
           title={
             approval.kind === "command"
               ? "Run this command?"
