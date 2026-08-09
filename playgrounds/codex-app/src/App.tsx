@@ -3452,7 +3452,9 @@ export function App() {
     }, 420);
   };
   const selectFilesAndFolders = async () => {
+    const previousAttachmentFrame = activeFrame;
     setComposerOverlay(null);
+    setActiveFrame("attachment-picker");
     if (
       !window.codexDemo ||
       window.codexDemo.useRendererAttachmentFixture
@@ -3465,6 +3467,11 @@ export function App() {
     }
     try {
       const selected = await window.codexDemo.selectAttachments();
+      if (selected.length === 0) {
+        setActiveFrame(previousAttachmentFrame);
+        requestAnimationFrame(() => composerInputRef.current?.focus());
+        return;
+      }
       setComposerAttachments(
         selected.map((item) => ({
           ...item,
@@ -3472,10 +3479,8 @@ export function App() {
           status: "ready" as const,
         })),
       );
-      setActiveFrame(selected.length > 0 ? "attachment-native-ready" : "attachment-empty");
-      if (selected.length > 0) {
-        setComposerValue(initialComposerValue("attachment-native-ready"));
-      }
+      setActiveFrame("attachment-native-ready");
+      setComposerValue(initialComposerValue("attachment-native-ready"));
     } catch {
       setComposerAttachments([
         {
@@ -3528,7 +3533,7 @@ export function App() {
               aria-expanded={composerOverlay === "resources"}
               aria-label="Add files and more"
               onClick={() => {
-                setActiveFrame(null);
+                if (!isCurrentAttachmentReplay) setActiveFrame(null);
                 setComposerOverlay((current) =>
                   current === "resources" ? null : "resources",
                 );
@@ -3659,6 +3664,9 @@ export function App() {
                 : "Switch to Live to send a real local turn…"
       }
       stopLabel="Stop"
+      submitDisabled={composerAttachments.some(
+        ({ status }) => status !== "ready",
+      )}
       submitLabel={
         isCurrentCommandInterruptionReplay ||
         isCurrentContextCompactionReplay

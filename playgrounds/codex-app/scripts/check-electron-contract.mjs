@@ -957,6 +957,60 @@ try {
   await nativeAttachmentApp.close();
 }
 
+const cancelledAttachmentScene = {
+  frame: "attachment-ready",
+  id: "electron-cancelled-attachment-selection",
+  scenario: "attachment-lifecycle",
+};
+const {
+  app: cancelledAttachmentApp,
+  page: cancelledAttachmentPage,
+} = await launchScene(cancelledAttachmentScene, {
+  capture: false,
+  environment: {
+    CODEX_DEMO_ATTACHMENT_FIXTURE_PATHS: "[]",
+  },
+});
+try {
+  const composer = cancelledAttachmentPage.getByRole("textbox", {
+    name: "Message composer",
+  });
+  const valueBefore = await composer.inputValue();
+  await cancelledAttachmentPage
+    .getByRole("button", { name: "Add files and more" })
+    .click();
+  await cancelledAttachmentPage
+    .getByRole("option", { name: "Files and folders" })
+    .click();
+  await cancelledAttachmentPage.waitForSelector(
+    '.demo-root[data-frame="attachment-ready"][data-composer-phase="attachment"]',
+  );
+  await cancelledAttachmentPage.waitForFunction(
+    () =>
+      document.activeElement?.getAttribute("aria-label") ===
+      "Message composer",
+  );
+  const cancelledSelection = await cancelledAttachmentPage.evaluate(() => ({
+    attachmentCount: document.querySelectorAll(
+      ".codex-ui-composer .codex-ui-composer-attachment",
+    ).length,
+    label: document
+      .querySelector(".codex-ui-composer-attachment__label")
+      ?.textContent?.trim(),
+  }));
+  if (
+    cancelledSelection.attachmentCount !== 1 ||
+    cancelledSelection.label !== "codex-ui-kit-current.png" ||
+    (await composer.inputValue()) !== valueBefore
+  ) {
+    throw new Error(
+      `Electron cancelled attachment selection changed the draft: ${JSON.stringify(cancelledSelection)}`,
+    );
+  }
+} finally {
+  await cancelledAttachmentApp.close();
+}
+
 const markdownScene = {
   frame: "markdown-complete",
   id: "electron-markdown",

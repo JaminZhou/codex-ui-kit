@@ -3704,11 +3704,19 @@ for (const scene of visualScenes) {
             ),
             (element) => element.textContent?.trim(),
           ),
+          submitDisabled: document
+            .querySelector('.codex-ui-composer [data-action="submit"]')
+            ?.hasAttribute("disabled"),
         };
       });
       contract.attachmentVariants = variant;
       const expectedCount = scene.id === "attachment-preview-error" ? 1 : 5;
       const expectsOverflow = scene.id !== "attachment-preview-error";
+      const expectsSubmitDisabled = [
+        "attachment-preview-error",
+        "attachment-upload-error",
+        "attachment-uploading",
+      ].includes(scene.id);
       const expectedStatus =
         scene.id === "attachment-uploading"
           ? "uploading"
@@ -3721,6 +3729,7 @@ for (const scene of visualScenes) {
         variant.attachmentCount !== expectedCount ||
         variant.phase !== "attachment" ||
         !variant.statuses.includes(expectedStatus) ||
+        variant.submitDisabled !== expectsSubmitDisabled ||
         (expectsOverflow && !(variant.overflow > 0)) ||
         variant.cardHeights.some((height) => Math.abs(height - 64) > 1) ||
         variant.iconSizes.some(

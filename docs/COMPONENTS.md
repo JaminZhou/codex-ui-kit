@@ -105,7 +105,7 @@ All privileged behavior remains host-owned. The components never auto-approve co
 
 ## Composer
 
-- `AgentComposer`: controlled autosizing input with automatic, single-line, and multiline layouts; text or attachment-only submit/stop behavior; focus transfer; and protocol-neutral slots. `allowSubmitWhileRunning` lets Enter route a follow-up to a host-owned queue while Stop remains the visible primary action.
+- `AgentComposer`: controlled autosizing input with automatic, single-line, and multiline layouts; text or attachment-only submit/stop behavior; focus transfer; and protocol-neutral slots. `allowSubmitWhileRunning` lets Enter route a follow-up to a host-owned queue while Stop remains the visible primary action. `submitDisabled` keeps only the submit affordance unavailable while host-owned attachment upload or recovery controls remain interactive.
 - `ComposerDock`: current-build composition that keeps context controls,
   external queue state, and the input card in distinct ownership slots.
 - `ComposerContextBar` and `ComposerContextControl`: accessible project,

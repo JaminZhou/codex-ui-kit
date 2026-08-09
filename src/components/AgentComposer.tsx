@@ -50,6 +50,7 @@ export interface AgentComposerProps
   queue?: ReactNode;
   suggestions?: ReactNode;
   stopLabel?: string;
+  submitDisabled?: boolean;
   submitLabel?: string;
   textareaLabel?: string;
   textareaProps?: Omit<
@@ -78,6 +79,7 @@ export const AgentComposer = forwardRef<
     placeholder = "Ask the agent to do something…",
     queue,
     stopLabel = "Stop generation",
+    submitDisabled = false,
     submitLabel = "Send message",
     textareaLabel = "Message",
     textareaProps,
@@ -119,6 +121,7 @@ export const AgentComposer = forwardRef<
   } = textareaProps ?? {};
   const canSubmit =
     !disabled &&
+    !submitDisabled &&
     (!isRunning || allowSubmitWhileRunning) &&
     (value.trim().length > 0 || hasAttachments);
   const contentRequiresMultiline =

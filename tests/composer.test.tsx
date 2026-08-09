@@ -917,6 +917,35 @@ describe("AgentComposer", () => {
     expect(screen.getByText("MD")).toBeTruthy();
   });
 
+  it("disables submit without blocking attachment recovery controls", () => {
+    const onRetry = vi.fn();
+    render(
+      <AgentComposer
+        attachments={
+          <ComposerAttachment
+            label="failed.txt"
+            onRetry={onRetry}
+            status="error"
+          />
+        }
+        onSubmit={() => undefined}
+        onValueChange={() => undefined}
+        submitDisabled
+        value="Retry this attachment"
+      />,
+    );
+
+    expect(
+      screen
+        .getByRole("button", { name: "Send message" })
+        .hasAttribute("disabled"),
+    ).toBe(true);
+    const retry = screen.getByRole("button", { name: "Retry failed.txt" });
+    expect(retry.hasAttribute("disabled")).toBe(false);
+    fireEvent.click(retry);
+    expect(onRetry).toHaveBeenCalledOnce();
+  });
+
   it("renders a sent attachment preview fallback", () => {
     render(
       <MessageAttachment
