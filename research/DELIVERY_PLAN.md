@@ -19,9 +19,10 @@ exit gates; it does not replace the inventory.
 - The scoped `26.803.41515` refresh binds 14 sidebar icons to exact runtime
   evidence. Its latest hover/footer follow-up promotes More, Pin, Archive, and
   Help, confirms that Settings is absent from the sampled footer and that
-  sampled project-task rows have no leading glyph, and reduces the explicit
-  visual approximation denominator from 15 to 12. Recents remains approximate
-  until that row type is independently sampled.
+  sampled project-task rows have no leading glyph. The Recents follow-up
+  independently scrolls to one section, pairs six Pin/Archive rows, confirms
+  zero leading SVGs, and reduces the explicit visual approximation denominator
+  from 15 to 11.
 - The current `26.730.61639` refresh covers the local Terminal session shell,
   a real bounded running/completed command with panel persistence, and the
   cross-worktree mismatch warning plus recovery actions. It locks
@@ -33,7 +34,7 @@ exit gates; it does not replace the inventory.
   explicit 820×680/720×680 reopen. Two more current tasks now cover concurrent
   siblings plus a Parent → Child delegation through active, mixed, completed,
   summary, flat-panel, live-progress, and independent transcript states while
-  retaining public `agentPath` hierarchy. Browser/CDP covers 111 lifecycle
+  retaining public `agentPath` hierarchy. Browser/CDP covers 112 lifecycle
   frames; Electron repeats
   the session, mismatch, input, picker, close, and resize interactions; the
   current 906×820 panel/content pixel ratios pass at 1.5120%/0.4004%.
@@ -55,9 +56,11 @@ exit gates; it does not replace the inventory.
   gates. The `26.803.41515` follow-up additionally locks the current project
   More/New chat and task Pin/Archive hover toolbars, the Help footer action,
   and the scoped absence of leading glyphs in sampled project-task rows in both
-  Browser/CDP and Electron. Recents keeps its approximate leading glyph.
+  Browser/CDP and Electron. The Recents follow-up adds six current rows with
+  24×24 Pin/Archive actions, a 4px action gap, and no leading glyph.
   Its current-build top/selected/footer pixel ratios are 3.4526%, 0.1163%, and
-  0.4126%, with the Help control left unmasked. The preceding `26.727.40816`
+  0.4126%, with the Help control left unmasked; the dedicated masked Recents
+  region passes at 2.5356%. The preceding `26.727.40816`
   refresh covered window navigation, route loading/restoration, the New chat
   Composer and project picker, the read-only Terminal shell, and the public
   Pull request route.
@@ -66,7 +69,7 @@ exit gates; it does not replace the inventory.
   responsive detail restoration. Its independent state machine adds
   index/detail loading and failure, checks, comments, review submission,
   merge-readiness, merge completion, compact layout, and route restoration.
-  Together the playground gates now cover 111 CDP/pixel frames, and the refreshed
+  Together the playground gates now cover 112 CDP/pixel frames, and the refreshed
   PR detail passes the current 906×820 regional pixel gate. The refreshed
   real MCP success path now matches Search → Fetch, the integrated activity
   disclosure, computed typography, and a current regional pixel gate. The

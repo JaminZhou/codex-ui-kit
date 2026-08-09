@@ -77,9 +77,11 @@ duplicated, ambiguous, or unmatched primitives fail closed.
 Settings is removed from the approximation inventory only when the same
 de-identified capture reports one horizontally and vertically visible Help
 footer control and no visible Settings control. The zero-leading-SVG result is
-scoped to independently identified project-task action rows. Because
-Recents/history rows were not sampled independently, `sidebar-thread` remains
-an explicit approximation and the playground keeps that approximate glyph.
+scoped separately to identified project-task action rows and to one exact
+Recents section reached by scrolling the internal navigation container. The
+Recents absence predicate additionally requires at least two paired
+Pin/Archive rows and zero leading SVGs before `sidebar-thread` can be removed;
+an ambiguous or unreachable section restores the approximation.
 
 The inherited `scrollbar-color` property is likewise retained from the first
 reviewed capture on an unchanged fingerprint because macOS changes it with
@@ -125,8 +127,8 @@ contains 14 runtime-observed sidebar icons: mode chevron, Search, neutral
 Activity, New chat, Quick chat, project folder, Pull requests, Sites,
 Scheduled, Plugins, More, Pin, Archive, and Help. The current build confirms
 that Settings is absent from the sampled footer and that sampled project-task
-rows have no leading glyph. Recents rows remain outside that absence proof, so
-the Thread glyph plus eleven named window-chrome and Composer assets leave 12
-approximations explicit and global pixel parity ineligible. See
+and Recents rows have no leading glyph. The three named window-chrome and eight
+Composer assets leave 11 approximations explicit and global pixel parity
+ineligible. See
 [`26.803.41515.md`](26.803.41515.md) for the scoped probe evidence and its
 separation from the broader UI inventory baseline.

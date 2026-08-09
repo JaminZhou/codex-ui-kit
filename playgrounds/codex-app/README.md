@@ -624,7 +624,7 @@ delegation on `26.730.61639`:
   ordered by hierarchy, and retains both levels in summary, panel, and
   transcript navigation;
 - the schema-validated suite reaches 24 fixtures and 281 events, Browser/CDP
-  reaches 111 lifecycle frames, and Electron drives both mixed-state lists;
+  reaches 112 lifecycle frames, and Electron drives both mixed-state lists;
 - nine current-build scenes exercise ten ownership-scoped comparisons across
   concurrent running/mixed summaries, mixed/completed panels, transcript,
   the nested running/mixed/completed/transcript lifecycle, and the nested

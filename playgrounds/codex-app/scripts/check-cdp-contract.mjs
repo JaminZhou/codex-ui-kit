@@ -3214,6 +3214,9 @@ for (const scene of visualScenes) {
       throw new Error(`${scene.id}: conversation viewport is not scrollable.`);
     }
     const expectedViewportHeight = scene.windowSize?.height ?? 820;
+    const currentBuildSidebarScene =
+      scene.id === "current-sidebar" ||
+      scene.id === "current-sidebar-recents";
     if (
       !contract.sidebar ||
       !contract.sidebar.titlebarInset ||
@@ -3236,9 +3239,11 @@ for (const scene of visualScenes) {
         contract.sidebar.navigation.clientHeight ||
       contract.sidebar.projectToggleExpanded !== "false" ||
       contract.sidebar.actionToolbars < 8 ||
-      contract.sidebar.statusCounts.error !== 1 ||
+      contract.sidebar.statusCounts.error !==
+        (currentBuildSidebarScene ? 0 : 1) ||
       contract.sidebar.statusCounts.queued < 1 ||
-      contract.sidebar.statusCounts.unread < 2 ||
+      contract.sidebar.statusCounts.unread <
+        (currentBuildSidebarScene ? 1 : 2) ||
       contract.sidebar.selectedCount < 1
     ) {
       throw new Error(
@@ -4906,6 +4911,38 @@ try {
       rects,
     };
   });
+  const recentTaskActions = sidebarPage.getByRole("toolbar", {
+    name: /Sidebar task actions for/,
+  });
+  await recentTaskActions.first().locator("..").hover();
+  const currentRecentActions = await recentTaskActions
+    .first()
+    .evaluate((toolbar) => {
+      const row = toolbar.closest(".codex-ui-app-sidebar__item-row");
+      const rowRect = row?.getBoundingClientRect();
+      const buttons = Array.from(toolbar.querySelectorAll("button"));
+      const rects = buttons.map((button) => {
+        const value = button.getBoundingClientRect();
+        return {
+          height: value.height,
+          rightInset: rowRect ? rowRect.right - value.right : null,
+          width: value.width,
+        };
+      });
+      return {
+        gap: buttons[1]
+          ? buttons[1].getBoundingClientRect().left -
+            buttons[0].getBoundingClientRect().right
+          : null,
+        icons: buttons.map((button) =>
+          button
+            .querySelector("[data-current-build-icon]")
+            ?.getAttribute("data-current-build-icon"),
+        ),
+        opacity: getComputedStyle(toolbar).opacity,
+        rects,
+      };
+    });
   const currentSidebarAssets = await sidebarPage.evaluate(() => {
     const help = document.querySelector(
       '.codex-ui-app-sidebar-footer__actions button[aria-label="Open help menu"]',
@@ -4926,6 +4963,12 @@ try {
       recentItemCount: document.querySelectorAll(
         '.codex-ui-app-sidebar__section[data-kind="threads"] .codex-ui-app-sidebar__item-row',
       ).length,
+      recentActionIcons: Array.from(
+        document.querySelectorAll(
+          '.codex-ui-app-sidebar__section[data-kind="threads"] .codex-ui-app-sidebar__item-actions button [data-current-build-icon]',
+        ),
+        (icon) => icon.getAttribute("data-current-build-icon"),
+      ),
       recentLeadingCount: document.querySelectorAll(
         '.codex-ui-app-sidebar__section[data-kind="threads"] .codex-ui-app-sidebar__item-leading',
       ).length,
@@ -4955,10 +4998,25 @@ try {
         { height: 20, rightInset: 32, width: 20 },
         { height: 20, rightInset: 4, width: 20 },
       ]) ||
+    currentRecentActions.opacity !== "1" ||
+    currentRecentActions.gap !== 4 ||
+    JSON.stringify(currentRecentActions.icons) !==
+      JSON.stringify(["sidebar-pin", "sidebar-archive"]) ||
+    JSON.stringify(currentRecentActions.rects) !==
+      JSON.stringify([
+        { height: 24, rightInset: 32, width: 24 },
+        { height: 24, rightInset: 4, width: 24 },
+      ]) ||
     currentSidebarAssets.settingsAction ||
-    currentSidebarAssets.recentItemCount === 0 ||
-    currentSidebarAssets.recentLeadingCount !==
-      currentSidebarAssets.recentItemCount ||
+    currentSidebarAssets.recentItemCount !== 6 ||
+    currentSidebarAssets.recentLeadingCount !== 0 ||
+    JSON.stringify(currentSidebarAssets.recentActionIcons) !==
+      JSON.stringify(
+        Array.from({ length: 6 }, () => [
+          "sidebar-pin",
+          "sidebar-archive",
+        ]).flat(),
+      ) ||
     currentSidebarAssets.help?.width !== 32 ||
     currentSidebarAssets.help?.height !== 32 ||
     currentSidebarAssets.help?.iconWidth !== 18 ||
@@ -4968,15 +5026,13 @@ try {
     throw new Error(
       `sidebar-current: current-build action assets failed: ${JSON.stringify({
         currentProjectActions,
+        currentRecentActions,
         currentSidebarAssets,
         currentTaskActions,
       })}`,
     );
   }
-  const taskActions = sidebarPage.getByRole("toolbar", {
-    name: /Sidebar task actions for/,
-  });
-  const firstAction = taskActions.first().getByRole("button");
+  const firstAction = recentTaskActions.first().getByRole("button").first();
   await firstAction.focus();
   const compact = await sidebarPage.evaluate(() => {
     const rect = (element) => {
@@ -5161,6 +5217,7 @@ try {
       {
         ...compact,
         currentProjectActions,
+        currentRecentActions,
         currentSidebarAssets,
         currentTaskActions,
       },

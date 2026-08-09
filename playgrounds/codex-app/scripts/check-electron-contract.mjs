@@ -94,6 +94,38 @@ try {
       rects,
     };
   });
+  const recentActions = page.getByRole("toolbar", {
+    name: /Sidebar task actions for/,
+  });
+  await recentActions.first().locator("..").hover();
+  const recentActionContract = await recentActions
+    .first()
+    .evaluate((toolbar) => {
+      const row = toolbar.closest(".codex-ui-app-sidebar__item-row");
+      const rowRect = row?.getBoundingClientRect();
+      const buttons = Array.from(toolbar.querySelectorAll("button"));
+      const rects = buttons.map((button) => {
+        const value = button.getBoundingClientRect();
+        return {
+          height: value.height,
+          rightInset: rowRect ? rowRect.right - value.right : null,
+          width: value.width,
+        };
+      });
+      return {
+        gap: buttons[1]
+          ? buttons[1].getBoundingClientRect().left -
+            buttons[0].getBoundingClientRect().right
+          : null,
+        icons: buttons.map((button) =>
+          button
+            .querySelector("[data-current-build-icon]")
+            ?.getAttribute("data-current-build-icon"),
+        ),
+        opacity: getComputedStyle(toolbar).opacity,
+        rects,
+      };
+    });
   const sidebarAssetContract = await page.evaluate(() => {
     const help = document.querySelector(
       '.codex-ui-app-sidebar-footer__actions button[aria-label="Open help menu"]',
@@ -114,6 +146,13 @@ try {
       recentItemCount: document.querySelectorAll(
         '.codex-ui-app-sidebar__section[data-kind="threads"] .codex-ui-app-sidebar__item-row',
       ).length,
+      recentActionIcons: Array.from(
+        document.querySelectorAll(
+          '.codex-ui-app-sidebar__section[data-kind="threads"] .codex-ui-app-sidebar__item-actions button [data-current-build-icon]',
+        ),
+        (currentIcon) =>
+          currentIcon.getAttribute("data-current-build-icon"),
+      ),
       recentLeadingCount: document.querySelectorAll(
         '.codex-ui-app-sidebar__section[data-kind="threads"] .codex-ui-app-sidebar__item-leading',
       ).length,
@@ -143,10 +182,25 @@ try {
         { height: 20, rightInset: 32, width: 20 },
         { height: 20, rightInset: 4, width: 20 },
       ]) ||
+    recentActionContract.opacity !== "1" ||
+    recentActionContract.gap !== 4 ||
+    JSON.stringify(recentActionContract.icons) !==
+      JSON.stringify(["sidebar-pin", "sidebar-archive"]) ||
+    JSON.stringify(recentActionContract.rects) !==
+      JSON.stringify([
+        { height: 24, rightInset: 32, width: 24 },
+        { height: 24, rightInset: 4, width: 24 },
+      ]) ||
     sidebarAssetContract.settingsAction ||
-    sidebarAssetContract.recentItemCount === 0 ||
-    sidebarAssetContract.recentLeadingCount !==
-      sidebarAssetContract.recentItemCount ||
+    sidebarAssetContract.recentItemCount !== 6 ||
+    sidebarAssetContract.recentLeadingCount !== 0 ||
+    JSON.stringify(sidebarAssetContract.recentActionIcons) !==
+      JSON.stringify(
+        Array.from({ length: 6 }, () => [
+          "sidebar-pin",
+          "sidebar-archive",
+        ]).flat(),
+      ) ||
     sidebarAssetContract.help?.width !== 32 ||
     sidebarAssetContract.help?.height !== 32 ||
     sidebarAssetContract.help?.iconWidth !== 18 ||
@@ -156,6 +210,7 @@ try {
     throw new Error(
       `Electron current-build sidebar action assets failed: ${JSON.stringify({
         projectActionContract,
+        recentActionContract,
         sidebarAssetContract,
         taskActionContract,
       })}`,

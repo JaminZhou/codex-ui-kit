@@ -13,7 +13,8 @@
       "cdp-26.721.81911": "26.721.81911",
       "cdp-26.727.40816": "26.727.40816",
       "cdp-26.730.61309": "26.730.61309",
-      "cdp-26.730.61639": "26.730.61639"
+      "cdp-26.730.61639": "26.730.61639",
+      "cdp-26.803.41515": "26.803.41515"
     }
   },
   "surfaces": [
@@ -648,7 +649,8 @@
       "runtimeEvidence": [
         "cdp-26.721.81911:recents-dense-scroll-history-running-queued-unread-error",
         "cdp-26.727.40816:recents-expanded-dense-history",
-        "cdp-26.730.61309:pinned-and-recents-dense-scroll-history"
+        "cdp-26.730.61309:pinned-and-recents-dense-scroll-history",
+        "cdp-26.803.41515:recents-six-row-scroll-no-leading-glyph-pin-archive-actions"
       ],
       "implementationStatus": "partial",
       "browserStatus": "partial_legacy",

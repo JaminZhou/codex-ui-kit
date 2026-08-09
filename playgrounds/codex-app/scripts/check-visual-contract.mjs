@@ -204,6 +204,8 @@ const currentBuildWorkspaceWorktreeReference =
   process.env.CODEX_UI_KIT_WORKSPACE_WORKTREE_REFERENCE;
 const currentBuildSidebarReference =
   process.env.CODEX_UI_KIT_SIDEBAR_REFERENCE;
+const currentBuildSidebarRecentsReference =
+  process.env.CODEX_UI_KIT_SIDEBAR_RECENTS_REFERENCE;
 const currentBuildWindowChromeReference =
   process.env.CODEX_UI_KIT_WINDOW_CHROME_REFERENCE;
 const defaultLifecycleMainPixelRatio = 0.0025;
@@ -424,6 +426,7 @@ for (const scene of selectedScenes) {
   const baselinePath = join(baselineDirectory, `${scene.id}.png`);
   const diffPath = join(artifactDirectory, `${scene.id}.diff.png`);
   let sidebarSelectedTop;
+  let sidebarRecentsBounds;
   let workspaceEnvironmentMenuBounds;
   let workspaceEnvironmentPickerBounds;
   let workspaceProjectListboxBounds;
@@ -444,6 +447,21 @@ for (const scene of selectedScenes) {
         }
         return Math.round(current[0].getBoundingClientRect().top);
       });
+    }
+    if (scene.id === "current-sidebar-recents") {
+      sidebarRecentsBounds = await page
+        .locator(
+          '.codex-ui-app-sidebar__section[data-kind="threads"]',
+        )
+        .evaluate((element) => {
+          const value = element.getBoundingClientRect();
+          return {
+            height: Math.round(value.height),
+            left: Math.round(value.left),
+            top: Math.round(value.top),
+            width: Math.round(value.width),
+          };
+        });
     }
     if (scene.id === "multi-file-review") {
       await page.evaluate(() => {
@@ -1068,6 +1086,36 @@ for (const scene of selectedScenes) {
         top: topComparison.ratio,
       })}`,
     );
+  }
+
+  if (
+    scene.id === "current-sidebar-recents" &&
+    currentBuildSidebarRecentsReference
+  ) {
+    await compareCurrentBuildOverlay({
+      actual,
+      actualBounds: sidebarRecentsBounds,
+      defaultMaximumRatio: 0.08,
+      masks: [
+        { height: 26, left: 8, top: 0, width: 220 },
+        { height: 26, left: 8, top: 27, width: 220 },
+        { height: 26, left: 8, top: 58, width: 220 },
+        { height: 26, left: 8, top: 89, width: 220 },
+        { height: 26, left: 8, top: 120, width: 220 },
+        { height: 26, left: 8, top: 151, width: 220 },
+        { height: 26, left: 8, top: 182, width: 220 },
+      ],
+      maximumRatioName:
+        "CODEX_UI_KIT_SIDEBAR_RECENTS_MAX_DIFF_RATIO",
+      referenceCrop: {
+        height: 210,
+        left: 0,
+        top: 556,
+        width: 274,
+      },
+      referencePath: currentBuildSidebarRecentsReference,
+      sceneId: scene.id,
+    });
   }
 
   if (
