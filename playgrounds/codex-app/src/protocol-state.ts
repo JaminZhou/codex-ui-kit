@@ -341,6 +341,30 @@ export function settleApprovedCommandReplay(
   };
 }
 
+export function settleRejectedFileReplay(
+  state: DemoProtocolState,
+  requestId: number | string,
+): DemoProtocolState {
+  const approval = state.approvals.find(
+    (candidate) => candidate.requestId === requestId,
+  );
+  if (!approval || approval.kind !== "file") return state;
+
+  return {
+    ...state,
+    currentTurnId: null,
+    error: null,
+    fileChanges: state.fileChanges.map((fileChange) =>
+      fileChange.id === approval.itemId
+        ? { ...fileChange, status: "rejected" }
+        : fileChange,
+    ),
+    retrying: false,
+    status: "completed",
+    turnDurationMs: null,
+  };
+}
+
 type RecordValue = Record<string, unknown>;
 
 function isRecord(value: unknown): value is RecordValue {

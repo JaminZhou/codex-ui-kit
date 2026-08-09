@@ -11,6 +11,7 @@ import {
   reduceProtocolNotification,
   reduceProtocolTrace,
   settleApprovedCommandReplay,
+  settleRejectedFileReplay,
   subagentLifecycleGroup,
   subagentTimelinePresentation,
   terminalTranscriptEvents,
@@ -752,6 +753,31 @@ describe("protocol lifecycle reducer", () => {
     expect(repeatedCompleted.messages.at(-1)?.text).toBe(
       "SESSION FILE APPROVAL SECOND COMPLETE.",
     );
+  });
+
+  it("settles a rejected session file approval without applying the file", () => {
+    const scenario = replayScenarios["approval-for-session"];
+    const pending = reduceProtocolTrace(
+      scenario.events.slice(
+        0,
+        scenario.frames["approval-current-session-pending"],
+      ),
+    );
+    const rejected = reduceProtocolNotification(pending, {
+      decision: "rejected",
+      kind: "approval-resolution",
+      requestId: "approval-file-session-first",
+    });
+    const settled = settleRejectedFileReplay(
+      rejected,
+      "approval-file-session-first",
+    );
+
+    expect(settled.approvals[0]?.decision).toBe("rejected");
+    expect(settled.currentTurnId).toBeNull();
+    expect(settled.fileChanges[0]?.status).toBe("rejected");
+    expect(settled.messages).toHaveLength(1);
+    expect(settled.status).toBe("completed");
   });
 
   it("preserves automatic approval review progress and timeout semantics", () => {

@@ -3828,10 +3828,34 @@ for (const alternateDecision of ["Allow once", "Deny"]) {
         );
       }
     } else {
+      const nextPrompt = "Try another file edit after denial.";
+      await alternatePage.getByLabel("Message composer").fill(nextPrompt);
+      await alternatePage.getByLabel("Message composer").press("Enter");
+      await alternatePage.waitForTimeout(240);
       const declined = await alternatePage.evaluate(() => ({
         approvalCount: document.querySelectorAll(
           '[data-testid="current-approval-request"]',
         ).length,
+        composerValue:
+          document.querySelector(".codex-ui-composer textarea") instanceof
+          HTMLTextAreaElement
+            ? document.querySelector(".codex-ui-composer textarea").value
+            : null,
+        fileStatus: document
+          .querySelector('[data-testid="file-change-group"]')
+          ?.getAttribute("data-file-status"),
+        frame: document
+          .querySelector(".demo-root")
+          ?.getAttribute("data-frame"),
+        liveErrorCount: document.querySelectorAll(
+          '.codex-ui-status-banner[data-tone="error"]',
+        ).length,
+        mode: document
+          .querySelector(".demo-root")
+          ?.getAttribute("data-mode"),
+        status: document
+          .querySelector(".demo-root")
+          ?.getAttribute("data-status"),
         secondCompletionCount: Array.from(
           document.querySelectorAll(
             '.codex-ui-agent-message[data-role="assistant"]',
@@ -3848,6 +3872,12 @@ for (const alternateDecision of ["Allow once", "Deny"]) {
       }));
       if (
         declined.approvalCount !== 0 ||
+        declined.composerValue !== nextPrompt ||
+        declined.fileStatus !== "rejected" ||
+        declined.frame !== "approval-current-session-denied" ||
+        declined.liveErrorCount !== 0 ||
+        declined.mode !== "replay" ||
+        declined.status !== "completed" ||
         declined.secondCompletionCount !== 0 ||
         declined.secondPathCount !== 0
       ) {

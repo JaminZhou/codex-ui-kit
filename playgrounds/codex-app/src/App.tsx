@@ -104,6 +104,7 @@ import {
   messageAttachmentPreviewSource,
   reduceProtocolNotification,
   settleApprovedCommandReplay,
+  settleRejectedFileReplay,
   subagentTimelinePresentation,
   terminalTranscriptEvents,
   type DemoProtocolState,
@@ -1611,20 +1612,32 @@ export function App() {
             kind: "approval-resolution",
           })
         : lifecycleReplay;
-      return scenarioId === "approval-denied" &&
+      if (
+        scenarioId === "approval-denied" &&
         replayApprovalResolution?.decision === "approved"
-        ? settleApprovedCommandReplay(
-            resolvedReplay,
-            replayApprovalResolution.requestId,
-            {
-              durationMs: 23_000,
-              messageId: "assistant-approval-approved",
-              messageText:
-                "Approval was granted, and the command completed successfully.",
-              replacedMessageId: "assistant-approval-denied",
-            },
-          )
-        : resolvedReplay;
+      ) {
+        return settleApprovedCommandReplay(
+          resolvedReplay,
+          replayApprovalResolution.requestId,
+          {
+            durationMs: 23_000,
+            messageId: "assistant-approval-approved",
+            messageText:
+              "Approval was granted, and the command completed successfully.",
+            replacedMessageId: "assistant-approval-denied",
+          },
+        );
+      }
+      if (
+        scenarioId === "approval-for-session" &&
+        replayApprovalResolution?.decision === "rejected"
+      ) {
+        return settleRejectedFileReplay(
+          resolvedReplay,
+          replayApprovalResolution.requestId,
+        );
+      }
+      return resolvedReplay;
     },
     [
       lifecycleReplay,
@@ -2222,6 +2235,12 @@ export function App() {
         setComposerValue((current) => (current === prompt ? "" : current));
         requestAnimationFrame(() => composerInputRef.current?.focus());
       }, 160);
+      return;
+    }
+    if (
+      isCurrentApprovalSessionReplay &&
+      activeFrame === "approval-current-session-denied"
+    ) {
       return;
     }
     if (
