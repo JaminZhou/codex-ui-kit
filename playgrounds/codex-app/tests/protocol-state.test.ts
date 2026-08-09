@@ -638,7 +638,8 @@ describe("protocol lifecycle reducer", () => {
       decision: "pending",
       itemId: "command-open-calculator-once",
       kind: "command",
-      responseDecision: "approved",
+      decisionScope: "once",
+      responseDecision: "accept",
     });
     expect(pending.commands[0]).toMatchObject({
       command: "open -a Calculator",
@@ -680,10 +681,12 @@ describe("protocol lifecycle reducer", () => {
       command: "open -a Calculator",
       decision: "pending",
       itemId: "command-open-calculator-similar-first",
-      responseDecision: "approved",
+      decisionScope: "similar",
+      responseDecision: "acceptWithExecpolicyAmendment",
     });
     expect(firstCompleted.approvals).toHaveLength(1);
     expect(firstCompleted.approvals[0]?.decision).toBe("approved");
+    expect(firstCompleted.approvals[0]?.decisionScope).toBe("similar");
     expect(firstCompleted.commands).toHaveLength(1);
     expect(firstCompleted.commands[0]).toMatchObject({
       durationMs: 99_900,
@@ -710,6 +713,75 @@ describe("protocol lifecycle reducer", () => {
     expect(repeatedCompleted.turnDurationsMs).toEqual({
       "turn-approval-similar-first": 101_000,
       "turn-approval-similar-second": 7_000,
+    });
+  });
+
+  it("preserves a file approval for the session without a second request", () => {
+    const scenario = replayScenarios["approval-for-session"];
+    const pending = reduceProtocolTrace(
+      scenario.events.slice(
+        0,
+        scenario.frames["approval-current-session-pending"],
+      ),
+    );
+    const firstCompleted = reduceProtocolTrace(
+      scenario.events.slice(
+        0,
+        scenario.frames["approval-current-session-first-completed"],
+      ),
+    );
+    const repeatedCompleted = reduceProtocolTrace(scenario.events);
+
+    expect(pending.approvals).toEqual([
+      expect.objectContaining({
+        decision: "pending",
+        decisionScope: "session",
+        itemId: "file-approval-session-first",
+        kind: "file",
+        responseDecision: "acceptForSession",
+      }),
+    ]);
+    expect(firstCompleted.approvals[0]).toMatchObject({
+      decision: "approved",
+      decisionScope: "session",
+      responseDecision: "acceptForSession",
+    });
+    expect(firstCompleted.fileChanges).toHaveLength(1);
+    expect(repeatedCompleted.fileChanges).toHaveLength(2);
+    expect(repeatedCompleted.approvals).toHaveLength(1);
+    expect(repeatedCompleted.messages.at(-1)?.text).toBe(
+      "SESSION FILE APPROVAL SECOND COMPLETE.",
+    );
+  });
+
+  it("preserves automatic approval review progress and timeout semantics", () => {
+    const scenario = replayScenarios["approval-review-timeout"];
+    const running = reduceProtocolTrace(
+      scenario.events.slice(0, scenario.frames["approval-review-running"]),
+    );
+    const timedOut = reduceProtocolTrace(
+      scenario.events.slice(0, scenario.frames["approval-review-timeout"]),
+    );
+
+    expect(running.automaticApprovalReviews).toEqual([
+      expect.objectContaining({
+        actionLabel: "Network access to https://example.com/health",
+        completedAtMs: null,
+        id: "auto-review-network-health",
+        startedAtMs: 2080,
+        status: "inProgress",
+        targetItemId: null,
+      }),
+    ]);
+    expect(hasActiveTurnWork(running)).toBe(true);
+    expect(timedOut.automaticApprovalReviews[0]).toMatchObject({
+      completedAtMs: 17080,
+      startedAtMs: 2080,
+      status: "timedOut",
+    });
+    expect(timedOut.timeline).toContainEqual({
+      id: "auto-review-network-health",
+      kind: "automaticApprovalReview",
     });
   });
 

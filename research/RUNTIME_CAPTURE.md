@@ -103,6 +103,24 @@ profile directory. Never use a broad `pkill` or delete a shared profile.
 CDP evidence covers Renderer behavior only. Record native window, menu,
 system-dialog, and real resize behavior separately.
 
+### Current `26.803.41515` approval-variant boundary
+
+The installed `/Applications/ChatGPT.app` reports version `26.803.41515`, build
+`6321`; its `app.asar` SHA-256 is
+`5f6e773aafd542d3cf09e10b5dca6cabd301d0a155f4b8ce870e3915fc3da25e`.
+Read-only package inspection and the pinned public App Server schema establish
+two candidates: file-change approval can return the distinct
+`acceptForSession` decision, and automatic approval review publishes
+`item/autoApprovalReview/started|completed` with terminal timeout semantics.
+
+Neither transition was forced in the real product for this slice. The
+repository therefore records only independently authored protocol fixtures,
+component behavior, Browser/CDP computed state, Electron interaction, and
+internal raster regression baselines. Those gates validate the implementation;
+they are not labeled current runtime observation or external product-pixel
+parity. A future disposable real task can promote each path only after its
+trigger, exact target, cleanup, and non-sensitive capture boundary are safe.
+
 ### Current application-shell capture
 
 The `26.721.81911` App shell capture used an exact second main process with a

@@ -20,6 +20,8 @@ import {
   ArtifactList,
   ApprovalCommandPreview,
   ApprovalRequest,
+  AutomaticApprovalReview,
+  type AutomaticApprovalReviewStatus,
   BrowserActivity,
   type BrowserActivityStep,
   Button,
@@ -186,6 +188,8 @@ const approvalAction: ApprovalAction = {
   onClick: () => undefined,
 };
 const approvalKind: ApprovalRequestKind = "command";
+const automaticApprovalReviewStatus: AutomaticApprovalReviewStatus =
+  "timedOut";
 const noticeTone: NoticeTone = "warning";
 const noticeAction: StatusBannerAction = {
   label: "Try again",
@@ -294,6 +298,7 @@ void AppSidebarSection;
 void ArtifactList;
 void ApprovalCommandPreview;
 void ApprovalRequest;
+void AutomaticApprovalReview;
 void BrowserActivity;
 void browserStep;
 void CodeBlock;
@@ -395,6 +400,7 @@ void subagent;
 void subagentActivity;
 void approvalAction;
 void approvalKind;
+void automaticApprovalReviewStatus;
 void noticeTone;
 void noticeAction;
 void composerLayout;

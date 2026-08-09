@@ -322,7 +322,13 @@
       "id": "thread.approval-permission-events",
       "area": "conversation",
       "ownership": "turn",
-      "packageEvidence": ["auto-review-approval-nudge", "permissions-mode-dropdown"],
+      "packageEvidence": [
+        "auto-review-approval-nudge",
+        "permissions-mode-dropdown",
+        "ApprovalRequest",
+        "AutomaticApprovalReview",
+        "app-asar-26.803.41515:session-file-approval-and-auto-review-lifecycle-candidates"
+      ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
         "cdp-26.721:ask-for-approval-command-card-denied-without-execution",

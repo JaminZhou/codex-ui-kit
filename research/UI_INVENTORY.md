@@ -683,10 +683,22 @@ comparisons pass at `0.012554514617993862` for Allow-once pending,
 the matching-rule menu, and `0.013686534216335542` for the repeated completed
 state, under independent 1.5% hard limits. This promotes
 `thread.approval-permission-events` to current-build Browser and Electron
-verification for the sampled one-time and matching-command paths. Approval
-timeout, repeated denial, `acceptForSession`, non-command approval kinds, and
-rule lifetime across thread/restart boundaries remain open; the denial runtime
-sample remains previous-build evidence.
+verification for the sampled one-time and matching-command paths.
+
+The installed `26.803.41515` package and pinned public protocol add two narrower
+structural facts without promoting them to runtime reachability: file-change
+approval accepts the distinct `acceptForSession` decision and exposes `Allow
+all edits`, while `item/autoApprovalReview/started|completed` carries
+`inProgress`, `approved`, `denied`, `timedOut`, and `aborted` states. The public
+`AutomaticApprovalReview` primitive and Electron approval bridge now preserve
+those semantics. Two schema-validated traces bring the current matrix to 26
+fixtures and 306 events; Browser/CDP, Electron, and four reviewed internal pixel
+scenes cover the session file-edit repeat path and `inProgress → timedOut`
+review path. This remains structural plus independent replay evidence: a safe
+real-product `acceptForSession` or auto-review timeout transition has not been
+sampled. Repeated denial, other non-command approval kinds, and rule lifetime
+across thread/restart boundaries also remain open; the denial runtime sample
+remains previous-build evidence.
 
 The current attachment slice used a separate `26.730.61309` new chat and a
 synthetic 1×1 PNG delivered through the Composer paste path, avoiding the

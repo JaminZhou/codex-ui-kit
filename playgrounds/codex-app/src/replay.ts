@@ -1,5 +1,7 @@
 import approvalAllowOnceTrace from "../fixtures/traces/approval-allow-once.jsonl?raw";
 import approvalDeniedTrace from "../fixtures/traces/approval-denied.jsonl?raw";
+import approvalForSessionTrace from "../fixtures/traces/approval-for-session.jsonl?raw";
+import approvalReviewTimeoutTrace from "../fixtures/traces/approval-review-timeout.jsonl?raw";
 import approvalSimilarCommandsTrace from "../fixtures/traces/approval-similar-commands.jsonl?raw";
 import attachmentLifecycleTrace from "../fixtures/traces/attachment-lifecycle.jsonl?raw";
 import compactionTrace from "../fixtures/traces/compaction.jsonl?raw";
@@ -27,6 +29,8 @@ import type { ProtocolEventRecord } from "./protocol-state";
 export type ReplayScenarioId =
   | "approval-allow-once"
   | "approval-denied"
+  | "approval-for-session"
+  | "approval-review-timeout"
   | "approval-similar-commands"
   | "attachment-lifecycle"
   | "background-terminal"
@@ -126,6 +130,18 @@ export const replayScenarios: Record<ReplayScenarioId, ReplayScenario> = {
     "Background terminal",
     "Process output, terminal interaction, resize, close, and restore.",
     backgroundTerminalTrace,
+  ),
+  "approval-for-session": scenario(
+    "approval-for-session",
+    "Allow all edits for session",
+    "A current file approval is accepted for the session, then a second file edit completes without another prompt.",
+    approvalForSessionTrace,
+  ),
+  "approval-review-timeout": scenario(
+    "approval-review-timeout",
+    "Automatic approval review timeout",
+    "The current automatic reviewer transitions from in-progress to timed out without running the reviewed network request.",
+    approvalReviewTimeoutTrace,
   ),
   "command-failure-recovery": scenario(
     "command-failure-recovery",

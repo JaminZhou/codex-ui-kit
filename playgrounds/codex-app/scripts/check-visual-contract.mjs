@@ -578,7 +578,10 @@ for (const scene of selectedScenes) {
         `,
       });
     }
-    if (scene.id === "approval-current-similar-menu") {
+    if (
+      scene.id === "approval-current-similar-menu" ||
+      scene.id === "approval-current-session-menu"
+    ) {
       await page
         .getByTestId("current-approval-request")
         .getByRole("button", { name: "Approval options" })
@@ -587,7 +590,12 @@ for (const scene of selectedScenes) {
         .locator(
           '.codex-ui-approval-request__options-menu [role="menuitem"]',
         )
-        .filter({ hasText: "Allow similar commands" })
+        .filter({
+          hasText:
+            scene.id === "approval-current-session-menu"
+              ? "Allow all edits"
+              : "Allow similar commands",
+        })
         .waitFor();
     }
     await page.screenshot({

@@ -71,7 +71,8 @@ review the [coverage policy](research/PARITY.md), or follow the
   dialog, protocol-neutral route/worktree selectors, PR list/detail, checks,
   reviewers, and inline review-thread compositions.
 - Command execution with current-build long-output/tail-following evidence,
-  structured file diffs, tool calls, approvals, and notices.
+  structured file diffs, tool calls, scoped file approvals, automatic-review
+  lifecycle states, and notices.
 - Composer attachments, mentions, modes, queued prompts, and running states.
 - A reusable thread-summary popover with collapsible sections, compact action
   rows, change deltas, disabled states, and controlled/uncontrolled behavior.
@@ -143,7 +144,7 @@ export function Example() {
 | [Thread and messages](docs/COMPONENTS.md#thread-and-message-surfaces) | `ConversationThreadShell`, `AgentThread`, `AgentTurn`, `AgentMessage`, loading and error states |
 | [Rich content](docs/COMPONENTS.md#rich-content) | `AgentMarkdown`, `InlineCode`, `CodeBlock`, `FileDiff`, `FileReview` |
 | [Agent activity](docs/COMPONENTS.md#agent-activity) | `ActivityTimeline`, `AgentReasoning`, `AgentPlan`, subagent surfaces |
-| [Tools and approvals](docs/COMPONENTS.md#tools-approvals-and-status) | `BrowserActivity`, `McpToolCallGroup`, `ToolCallCard`, `CommandExecution`, `FileChange`, `FileChangeGroup`, `ApprovalRequest` |
+| [Tools and approvals](docs/COMPONENTS.md#tools-approvals-and-status) | `BrowserActivity`, `McpToolCallGroup`, `ToolCallCard`, `CommandExecution`, `FileChange`, `FileChangeGroup`, `ApprovalRequest`, `AutomaticApprovalReview` |
 | [Composer](docs/COMPONENTS.md#composer) | `AgentComposer`, `ComposerDock`, context controls, attachments, mentions, modes, queued prompts |
 | [Interactive primitives](docs/COMPONENTS.md#interactive-primitives) | Buttons, dialogs, menus, selects, popovers, tooltips |
 | [Resources and media](docs/COMPONENTS.md#resources-and-media) | Resource cards, sources, artifacts, generated images |
