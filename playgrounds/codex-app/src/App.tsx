@@ -344,14 +344,13 @@ function replayCountForSelection(
   scenario: ReplayScenario,
   frame: string | null,
 ) {
+  if (frame && frame in scenario.frames) return scenario.frames[frame];
   if (
     scenario.id === "attachment-lifecycle" &&
-    frame?.startsWith("attachment-") &&
-    frame !== "attachment-completed"
+    frame?.startsWith("attachment-")
   ) {
     return 0;
   }
-  if (frame && scenario.frames[frame]) return scenario.frames[frame];
   if (isSubagentScenarioId(scenario.id) && frame) {
     const state = frame.includes("mixed")
       ? "mixed"
@@ -1487,6 +1486,9 @@ export function App() {
   >(() => attachmentItemsForFrame(initialSelection.frame));
   const [submittedComposerAttachments, setSubmittedComposerAttachments] =
     useState<DemoComposerAttachmentItem[]>([]);
+  const [submittedComposerPrompt, setSubmittedComposerPrompt] = useState<
+    string | null
+  >(null);
   const [queuedPrompts, setQueuedPrompts] = useState<QueuedPrompt[]>(() =>
     initialQueuedPrompts(initialSelection.frame),
   );
@@ -2014,6 +2016,7 @@ export function App() {
     setComposerResourceActiveId("files");
     setComposerAttachments(attachmentItemsForFrame(frame));
     setSubmittedComposerAttachments([]);
+    setSubmittedComposerPrompt(null);
     setQueuedPrompts([]);
     setQueueingEnabled(true);
     setQueueInterrupted(false);
@@ -2095,6 +2098,7 @@ export function App() {
     setComposerOverlay(null);
     setComposerAttachments([]);
     setSubmittedComposerAttachments([]);
+    setSubmittedComposerPrompt(null);
     setQueuedPrompts([]);
     setQueueingEnabled(true);
     setQueueInterrupted(false);
@@ -2348,6 +2352,7 @@ export function App() {
       setSubmittedComposerAttachments(
         composerAttachments.map((attachment) => ({ ...attachment })),
       );
+      setSubmittedComposerPrompt(prompt);
       setReplayComposerSubmitting(true);
       setComposerOverlay(null);
       setActiveFrame("attachment-submitting");
@@ -5330,6 +5335,9 @@ export function App() {
         submittedComposerAttachments.length > 0
           ? submittedComposerAttachments
           : null;
+      const submittedMessageText = submittedMessageAttachments
+        ? (submittedComposerPrompt ?? message.text)
+        : message.text;
       const groupedMcpIntro =
         ((scenarioId === "mcp-recovery-mixed-thread" &&
           (message.id === "assistant-recovery-intro" ||
@@ -5481,7 +5489,7 @@ export function App() {
                 {message.text || " "}
               </AgentMarkdown>
             ) : (
-              message.text
+              submittedMessageText
             )}
           </AgentMessage>
           {message.interruptionDurationMs !== undefined ? (

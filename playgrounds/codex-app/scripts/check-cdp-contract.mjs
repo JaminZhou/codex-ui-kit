@@ -7062,6 +7062,42 @@ try {
   await visualAttachmentSubmitApp.close();
 }
 
+const protocolAttachmentFrameScene = {
+  frame: "attachment-submitted",
+  id: "protocol-attachment-submitted-frame",
+  scenario: "attachment-lifecycle",
+};
+const {
+  app: protocolAttachmentFrameApp,
+  page: protocolAttachmentFramePage,
+} = await launchScene(protocolAttachmentFrameScene, { capture: false });
+try {
+  const protocolAttachmentFrame = await protocolAttachmentFramePage.evaluate(
+    () => ({
+      composerAttachmentCount: document.querySelectorAll(
+        ".codex-ui-composer .codex-ui-composer-attachment",
+      ).length,
+      messageAttachmentCount: document.querySelectorAll(
+        ".codex-ui-agent-message__attachments .codex-ui-message-attachment",
+      ).length,
+      userMessageCount: document.querySelectorAll(
+        '.codex-ui-agent-message[data-role="user"]',
+      ).length,
+    }),
+  );
+  if (
+    protocolAttachmentFrame.composerAttachmentCount !== 0 ||
+    protocolAttachmentFrame.messageAttachmentCount !== 1 ||
+    protocolAttachmentFrame.userMessageCount !== 1
+  ) {
+    throw new Error(
+      `The protocol-backed attachment-submitted frame was not replayed: ${JSON.stringify(protocolAttachmentFrame)}`,
+    );
+  }
+} finally {
+  await protocolAttachmentFrameApp.close();
+}
+
 const attachmentLifecycleScene = {
   frame: "attachment-ready",
   id: "attachment-lifecycle-interaction",
@@ -7182,9 +7218,7 @@ try {
       `Appending a selected attachment replaced the tray or draft: ${JSON.stringify(appendedAttachmentState)}`,
     );
   }
-  await composer.fill(
-    "Reply using three uppercase words describing this test: attachment, lifecycle, complete. Include a final period and no other text.",
-  );
+  await composer.fill("");
   await composer.press("Enter");
   await attachmentLifecyclePage.waitForSelector(
     '.demo-root[data-frame="attachment-completed"][data-composer-phase="idle"]',
@@ -7211,6 +7245,10 @@ try {
       ),
       (element) => element.getAttribute("aria-label"),
     ),
+    messageText:
+      document.querySelector(
+        '[data-item-id="user-attachment-lifecycle"] .codex-ui-agent-message__content',
+      )?.textContent ?? null,
     permissionLabel:
       document
         .querySelector(".demo-composer-permission-trigger")
@@ -7224,6 +7262,7 @@ try {
     completed.messageAttachmentLabels.some(
       (label) => label !== "codex-ui-kit-current.png",
     ) ||
+    completed.messageText !== "" ||
     completed.permissionLabel !== "Ask for approval"
   ) {
     throw new Error(
