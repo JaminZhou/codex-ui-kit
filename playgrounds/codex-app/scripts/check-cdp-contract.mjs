@@ -7183,6 +7183,11 @@ try {
   await attachmentRecoveryPage.waitForSelector(
     '.demo-root[data-frame="attachment-uploading"] [role="progressbar"][aria-valuenow="18"]',
   );
+  await attachmentRecoveryPage.waitForFunction(
+    () =>
+      document.activeElement?.getAttribute("aria-label") ===
+      "Message composer",
+  );
   await attachmentRecoveryPage.waitForSelector(
     '.demo-root[data-frame="attachment-multi-ready"] .codex-ui-composer-attachment[data-status="ready"]',
   );
@@ -7224,6 +7229,11 @@ try {
   await attachmentPreviewPage.waitForSelector(
     '.demo-root[data-frame="attachment-ready"] .codex-ui-composer-attachment[data-status="ready"] img',
   );
+  await attachmentPreviewPage.waitForFunction(
+    () =>
+      document.activeElement?.getAttribute("aria-label") ===
+      "Message composer",
+  );
   if (
     (await attachmentPreviewPage.getByText("Preview unavailable").count()) !== 0
   ) {
@@ -7231,6 +7241,69 @@ try {
   }
 } finally {
   await attachmentPreviewApp.close();
+}
+
+const nativeAttachmentRetryScene = {
+  frame: "attachment-empty",
+  id: "native-attachment-retry-interaction",
+  scenario: "attachment-lifecycle",
+};
+const {
+  app: nativeAttachmentRetryApp,
+  page: nativeAttachmentRetryPage,
+} = await launchScene(nativeAttachmentRetryScene, {
+  capture: false,
+  environment: {
+    CODEX_DEMO_ATTACHMENT_FIXTURE_FAIL_ONCE: "1",
+    CODEX_DEMO_ATTACHMENT_FIXTURE_PATHS: JSON.stringify([
+      join(process.cwd(), "../../README.md"),
+    ]),
+    CODEX_DEMO_ATTACHMENT_RENDERER_FIXTURE: "0",
+  },
+});
+try {
+  await nativeAttachmentRetryPage
+    .getByRole("button", { name: "Add files and more" })
+    .click();
+  await nativeAttachmentRetryPage
+    .getByRole("option", { name: "Files and folders" })
+    .click();
+  await nativeAttachmentRetryPage.waitForSelector(
+    '.demo-root[data-frame="attachment-upload-error"] .codex-ui-composer-attachment[data-status="error"]',
+  );
+  await nativeAttachmentRetryPage
+    .getByRole("button", { name: "Retry Files and folders" })
+    .click();
+  await nativeAttachmentRetryPage.waitForSelector(
+    '.demo-root[data-frame="attachment-native-ready"] .codex-ui-composer-attachment[data-status="ready"]',
+  );
+  await nativeAttachmentRetryPage.waitForFunction(
+    () =>
+      document.activeElement?.getAttribute("aria-label") ===
+      "Message composer",
+  );
+  const nativeRetryState = await nativeAttachmentRetryPage.evaluate(() => ({
+    attachmentCount: document.querySelectorAll(
+      ".codex-ui-composer .codex-ui-composer-attachment",
+    ).length,
+    errorCount: document.querySelectorAll(
+      '.codex-ui-composer-attachment[data-status="error"]',
+    ).length,
+    label: document
+      .querySelector(".codex-ui-composer-attachment__label")
+      ?.textContent?.trim(),
+  }));
+  if (
+    nativeRetryState.attachmentCount !== 1 ||
+    nativeRetryState.errorCount !== 0 ||
+    nativeRetryState.label !== "README.md"
+  ) {
+    throw new Error(
+      `Native attachment retry did not reopen and replace the failed selection: ${JSON.stringify(nativeRetryState)}`,
+    );
+  }
+} finally {
+  await nativeAttachmentRetryApp.close();
 }
 
 const contextSummaryScene = {

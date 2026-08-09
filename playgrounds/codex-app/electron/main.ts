@@ -61,6 +61,7 @@ let liveThread: CodexThread | null = null;
 let activeTurn: CodexTurn | null = null;
 let unsubscribeNotifications: (() => void) | null = null;
 let unsubscribeServerRequests: (() => void)[] = [];
+let attachmentFixtureFailureInjected = false;
 const liveTurnStartGate = new LiveTurnStartGate();
 const liveApprovalGate = new LiveApprovalGate();
 
@@ -331,7 +332,16 @@ async function chooseAttachmentDialogKind(): Promise<
 async function handleSelectAttachments(event: IpcMainInvokeEvent) {
   assertTrustedIpc(event);
   const fixturePaths = attachmentFixturePaths();
-  if (fixturePaths) return describeAttachmentPaths(fixturePaths);
+  if (fixturePaths) {
+    if (
+      process.env.CODEX_DEMO_ATTACHMENT_FIXTURE_FAIL_ONCE === "1" &&
+      !attachmentFixtureFailureInjected
+    ) {
+      attachmentFixtureFailureInjected = true;
+      throw new Error("Simulated attachment fixture failure");
+    }
+    return describeAttachmentPaths(fixturePaths);
+  }
   const kind = await chooseAttachmentDialogKind();
   if (!kind) return [];
   const result = mainWindow

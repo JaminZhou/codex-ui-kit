@@ -3418,6 +3418,10 @@ export function App() {
   };
   const retryComposerAttachment = (id: string) => {
     cancelReplaySubmitTimer();
+    if (id.startsWith("native-selection-error:")) {
+      void selectFilesAndFolders(id);
+      return;
+    }
     const previewRetry = composerAttachments.some(
       (item) => item.id === id && item.status === "preview-error",
     );
@@ -3434,6 +3438,7 @@ export function App() {
         ),
       );
       setActiveFrame("attachment-ready");
+      requestAnimationFrame(() => composerInputRef.current?.focus());
       return;
     }
     setComposerAttachments((items) =>
@@ -3444,6 +3449,7 @@ export function App() {
       ),
     );
     setActiveFrame("attachment-uploading");
+    requestAnimationFrame(() => composerInputRef.current?.focus());
     replaySubmitTimerRef.current = window.setTimeout(() => {
       replaySubmitTimerRef.current = null;
       setComposerAttachments((items) =>
@@ -3456,7 +3462,7 @@ export function App() {
       setActiveFrame("attachment-multi-ready");
     }, 420);
   };
-  const selectFilesAndFolders = async () => {
+  async function selectFilesAndFolders(replacingErrorId?: string) {
     const previousAttachmentFrame = activeFrame;
     setComposerOverlay(null);
     setActiveFrame("attachment-picker");
@@ -3466,7 +3472,7 @@ export function App() {
     ) {
       const selectionVersion = attachmentSelectionCounterRef.current++;
       setComposerAttachments((items) => [
-        ...items,
+        ...items.filter((item) => item.id !== replacingErrorId),
         ...attachmentItemsForFrame("attachment-ready").map(
           (attachment, index) => ({
             ...attachment,
@@ -3490,7 +3496,7 @@ export function App() {
       }
       const selectionVersion = attachmentSelectionCounterRef.current++;
       setComposerAttachments((items) => [
-        ...items,
+        ...items.filter((item) => item.id !== replacingErrorId),
         ...selected.map((item, index) => ({
           ...item,
           id: `${item.id}:selection:${selectionVersion}:${index + 1}`,
@@ -3505,20 +3511,24 @@ export function App() {
       );
     } catch {
       const selectionVersion = attachmentSelectionCounterRef.current++;
-      setComposerAttachments((items) => [
-        ...items,
-        {
-          id: `native-selection-error:selection:${selectionVersion}`,
-          kind: "file",
-          label: "Files and folders",
-          layout: "card",
-          status: "error",
-        },
-      ]);
+      setComposerAttachments((items) =>
+        replacingErrorId
+          ? items
+          : [
+              ...items,
+              {
+                id: `native-selection-error:selection:${selectionVersion}`,
+                kind: "file",
+                label: "Files and folders",
+                layout: "card",
+                status: "error",
+              },
+            ],
+      );
       setActiveFrame("attachment-upload-error");
     }
     requestAnimationFrame(() => composerInputRef.current?.focus());
-  };
+  }
   const composerAttachmentNodes = composerAttachments.map((attachment) => (
     <ComposerAttachment
       icon={
