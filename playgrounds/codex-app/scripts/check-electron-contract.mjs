@@ -389,6 +389,61 @@ try {
       `Electron shell native bounds failed: ${JSON.stringify(shellBounds)}`,
     );
   }
+  const shellChrome = await shellPage.evaluate(() =>
+    Array.from(
+      document.querySelectorAll(".codex-ui-app-window-chrome button"),
+      (button) => {
+        const icon = button.querySelector("[data-current-build-icon]");
+        const iconRect = icon?.getBoundingClientRect();
+        const rect = button.getBoundingClientRect();
+        return {
+          disabled: button.disabled,
+          iconHeight: iconRect?.height,
+          iconName: icon?.getAttribute("data-current-build-icon"),
+          iconWidth: iconRect?.width,
+          label: button.getAttribute("aria-label"),
+          left: rect.left,
+          size: rect.width,
+        };
+      },
+    ),
+  );
+  if (
+    JSON.stringify(shellChrome) !==
+    JSON.stringify([
+      {
+        disabled: false,
+        iconHeight: 16,
+        iconName: "window-chrome-sidebar",
+        iconWidth: 16,
+        label: "Hide sidebar",
+        left: 88,
+        size: 28,
+      },
+      {
+        disabled: true,
+        iconHeight: 16,
+        iconName: "window-chrome-back",
+        iconWidth: 16,
+        label: "Back",
+        left: 120,
+        size: 28,
+      },
+      {
+        disabled: true,
+        iconHeight: 16,
+        iconName: "window-chrome-forward",
+        iconWidth: 16,
+        label: "Forward",
+        left: 152,
+        size: 28,
+      },
+    ])
+  ) {
+    throw new Error(
+      `Electron current window chrome assets failed: ${JSON.stringify(shellChrome)}`,
+    );
+  }
   const shellOffline = shellPage.getByRole("alert");
   if (!(await shellOffline.textContent())?.includes("You’re offline")) {
     throw new Error("Electron shell did not expose the offline route state.");

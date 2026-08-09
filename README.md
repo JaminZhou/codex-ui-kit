@@ -32,13 +32,13 @@ Codex UI Kit turns those interaction patterns into protocol-neutral React primit
   compaction, summary, attachment, workspace-entry, and Review evidence is
   retained as previous-build coverage rather than promoted implicitly.
   A narrower visual-provenance and sidebar-action probe against the newer
-  installed `26.803.41515` (`6321`) build binds 14 sidebar icons to exact
-  runtime evidence, confirms that the current footer uses Help rather than
-  Settings, and records no leading glyph in both sampled project-task and
+  installed `26.803.41515` (`6321`) build binds 17 sidebar/window-chrome icons
+  to exact runtime evidence, confirms that the current footer uses Help rather
+  than Settings, and records no leading glyph in both sampled project-task and
   independently scrolled Recents rows. The Recents follow-up also locks six
-  rows with paired Pin/Archive actions and reduces the explicit visual
-  approximation inventory to 11; the broader UI inventory has not been
-  refreshed.
+  rows with paired Pin/Archive actions, while the Sidebar/Back/Forward follow-up
+  reduces the explicit visual approximation inventory to eight. The broader UI
+  inventory has not been refreshed.
 - The repository is public and the package baseline is `0.1.0`, but the npm package has **not** been published.
 - The API remains pre-1.0 and may change while public documentation and consumer feedback mature.
 - Extracted application files, private IPC, bundled fonts, and OpenAI brand assets are not included.

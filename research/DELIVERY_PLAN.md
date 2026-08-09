@@ -16,13 +16,14 @@ exit gates; it does not replace the inventory.
   been refreshed on the newer build.
 - The inventory contains 81 surface groups: 53 P0, 19 P1, and 9 P2.
 - 5 groups have current-build runtime evidence, 59 have previous-build-only runtime evidence, and 17 have not been sampled.
-- The scoped `26.803.41515` refresh binds 14 sidebar icons to exact runtime
-  evidence. Its latest hover/footer follow-up promotes More, Pin, Archive, and
-  Help, confirms that Settings is absent from the sampled footer and that
-  sampled project-task rows have no leading glyph. The Recents follow-up
+- The scoped `26.803.41515` refresh binds 17 sidebar/window-chrome icons to
+  exact runtime evidence. Its latest hover/footer follow-up promotes More, Pin,
+  Archive, and Help, confirms that Settings is absent from the sampled footer
+  and that sampled project-task rows have no leading glyph. The Recents follow-up
   independently scrolls to one section, pairs six Pin/Archive rows, confirms
-  zero leading SVGs, and reduces the explicit visual approximation denominator
-  from 15 to 11.
+  zero leading SVGs. The next follow-up promotes the visible window-chrome
+  Sidebar/Back/Forward controls and reduces the explicit visual approximation
+  denominator from 15 to 8.
 - The current `26.730.61639` refresh covers the local Terminal session shell,
   a real bounded running/completed command with panel persistence, and the
   cross-worktree mismatch warning plus recovery actions. It locks
@@ -60,7 +61,9 @@ exit gates; it does not replace the inventory.
   24×24 Pin/Archive actions, a 4px action gap, and no leading glyph.
   Its current-build top/selected/footer pixel ratios are 3.4526%, 0.1163%, and
   0.4126%, with the Help control left unmasked; the dedicated masked Recents
-  region passes at 2.5356%. The preceding `26.727.40816`
+  region passes at 2.5356%. The visible window-chrome icons now come from the
+  exact manifest, and their independent 120×46 crop passes at 3.2609%. The
+  preceding `26.727.40816`
   refresh covered window navigation, route loading/restoration, the New chat
   Composer and project picker, the read-only Terminal shell, and the public
   Pull request route.

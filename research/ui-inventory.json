@@ -697,7 +697,8 @@
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
         "cdp-26.721.81911:titlebar-46-sidebar-toggle-back-forward-at-88-120-152",
-        "cdp-26.727.40816:titlebar-46-hide-sidebar-back-forward"
+        "cdp-26.727.40816:titlebar-46-hide-sidebar-back-forward",
+        "cdp-26.803.41515:visible-titlebar-sidebar-back-forward-28-buttons-16-icons"
       ],
       "implementationStatus": "partial",
       "browserStatus": "partial_legacy",

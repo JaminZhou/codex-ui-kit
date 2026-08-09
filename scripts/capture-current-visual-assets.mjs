@@ -156,12 +156,15 @@ for (const listener of listeners) {
 
 const semanticLabels = new Map([
   ["Add files and more", "composer-add-files"],
+  ["Back", "window-chrome-back"],
   ["Back to ChatGPT", "window-back-to-chatgpt"],
   ["Dictate", "composer-dictate"],
   ["Don't work in a project", "composer-clear-project"],
   ["New chat", "sidebar-new-chat"],
   ["Open help menu", "sidebar-help"],
   ["Open settings", "sidebar-settings"],
+  ["Forward", "window-chrome-forward"],
+  ["Hide sidebar", "window-chrome-sidebar"],
   ["Plugins", "sidebar-plugins"],
   ["Pull requests", "sidebar-pull-request"],
   ["Quick chat", "sidebar-quick-chat"],
@@ -171,6 +174,7 @@ const semanticLabels = new Map([
   ["Sites", "sidebar-sites"],
   ["Start new voice chat", "composer-voice"],
   ["Switch mode, current mode: Codex", "sidebar-mode-chevron"],
+  ["Show sidebar", "window-chrome-sidebar"],
   ["View activity", "sidebar-activity"],
   ["View activity, needs attention", "sidebar-activity-attention"],
 ]);
@@ -458,6 +462,7 @@ try {
         if (
           !owner ||
           !targetRegion ||
+          getComputedStyle(svg).visibility !== "visible" ||
           bounds.width === 0 ||
           bounds.height === 0 ||
           bounds.right <= 0 ||

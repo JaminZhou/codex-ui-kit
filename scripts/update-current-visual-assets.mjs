@@ -112,6 +112,32 @@ function promotePrimitives(icon, observed) {
 
 const promotionSpecs = new Map([
   [
+    "window-chrome-sidebar",
+    {
+      ownerAriaLabel: null,
+      ownerEvidence:
+        "one visible current window-chrome Hide/Show sidebar control",
+      region: "titlebar",
+      semanticId: "window-chrome-sidebar",
+    },
+  ],
+  [
+    "window-chrome-back",
+    {
+      ownerAriaLabel: "Back",
+      region: "titlebar",
+      semanticId: "window-chrome-back",
+    },
+  ],
+  [
+    "window-chrome-forward",
+    {
+      ownerAriaLabel: "Forward",
+      region: "titlebar",
+      semanticId: "window-chrome-forward",
+    },
+  ],
+  [
     "sidebar-mode-chevron",
     {
       ownerAriaLabel: "Switch mode, current mode: Codex",
