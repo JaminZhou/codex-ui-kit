@@ -1325,9 +1325,34 @@ try {
       scrollLeft: scroller instanceof HTMLElement ? scroller.scrollLeft : 0,
     };
   });
-  await previewDialog.getByRole("button", {
+  const previewClose = previewDialog.getByRole("button", {
     name: "Close table preview",
-  }).click();
+  });
+  await previewClose.press("Tab");
+  await markdownTableActionsPage.waitForFunction(
+    () =>
+      document.activeElement?.classList.contains(
+        "codex-ui-markdown-table-preview__surface",
+      ) === true,
+  );
+  await markdownTableActionsPage.keyboard.press("ArrowRight");
+  await markdownTableActionsPage.waitForFunction(
+    () =>
+      (document.querySelector(
+        ".codex-ui-markdown-table-preview__surface",
+      )?.scrollLeft ?? 0) > 0,
+  );
+  const previewKeyboard = await markdownTableActionsPage.evaluate(() => {
+    const surface = document.querySelector(
+      ".codex-ui-markdown-table-preview__surface",
+    );
+    return {
+      active: document.activeElement === surface,
+      scrollLeft: surface?.scrollLeft ?? 0,
+      tabIndex: surface instanceof HTMLElement ? surface.tabIndex : -1,
+    };
+  });
+  await previewClose.click();
   await previewDialog.waitFor({ state: "hidden" });
   await markdownTableActionsPage.waitForFunction(
     () => document.activeElement?.getAttribute("aria-label") === "Expand table",
@@ -1404,6 +1429,9 @@ try {
     openState.columns !== 18 ||
     openState.rows !== 4 ||
     openState.scrollLeft <= 100 ||
+    !previewKeyboard.active ||
+    previewKeyboard.scrollLeft <= 0 ||
+    previewKeyboard.tabIndex !== 0 ||
     openState.clipboard?.["text/plain"]?.length !== 1_863 ||
     !openState.clipboard?.["text/html"]?.startsWith("<table>") ||
     returnedFocus !== "Expand table" ||
@@ -1426,7 +1454,7 @@ try {
     narrowReturnedFocus !== "Expand table"
   ) {
     throw new Error(
-      `Electron table actions interaction failed: ${JSON.stringify({ narrowReturnedFocus, narrowState, openState, returnedFocus })}`,
+      `Electron table actions interaction failed: ${JSON.stringify({ narrowReturnedFocus, narrowState, openState, previewKeyboard, returnedFocus })}`,
     );
   }
 } finally {

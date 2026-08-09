@@ -23,6 +23,120 @@ export type MarkdownTableCopyHandler = (
   payload: MarkdownTableCopyPayload,
 ) => void | Promise<void>;
 
+interface MarkdownSourcePosition {
+  end: {
+    line: number;
+    offset?: number;
+  };
+  start: {
+    line: number;
+    offset?: number;
+  };
+}
+
+interface MarkdownSourceNode {
+  children?: unknown[];
+  position?: MarkdownSourcePosition;
+  tagName?: string;
+}
+
+function markdownSourceNode(value: unknown): MarkdownSourceNode | undefined {
+  if (!value || typeof value !== "object") return undefined;
+  return value as MarkdownSourceNode;
+}
+
+function collectMarkdownTableRows(
+  value: unknown,
+  rows: Map<number, { end: number; start: number }>,
+) {
+  const node = markdownSourceNode(value);
+  if (!node) return;
+
+  const start = node.position?.start;
+  const end = node.position?.end;
+  if (
+    node.tagName === "tr" &&
+    typeof start?.line === "number" &&
+    typeof start.offset === "number" &&
+    typeof end?.offset === "number"
+  ) {
+    rows.set(start.line, { end: end.offset, start: start.offset });
+  }
+
+  for (const child of node.children ?? []) {
+    collectMarkdownTableRows(child, rows);
+  }
+}
+
+function markdownLineBounds(source: string, line: number) {
+  if (line < 1) return undefined;
+
+  let currentLine = 1;
+  let start = 0;
+  while (currentLine < line) {
+    const newline = source.indexOf("\n", start);
+    if (newline < 0) return undefined;
+    start = newline + 1;
+    currentLine += 1;
+  }
+
+  const newline = source.indexOf("\n", start);
+  let end = newline < 0 ? source.length : newline;
+  if (end > start && source[end - 1] === "\r") end -= 1;
+  return { end, start };
+}
+
+const markdownTableDelimiterPattern =
+  /^[ \t]*\|?[ \t]*:?-+:?[ \t]*(?:\|[ \t]*:?-+:?[ \t]*)+\|?[ \t]*$/;
+
+function standaloneMarkdownTableDelimiter(line: string) {
+  for (let index = 0; index < line.length; index += 1) {
+    const candidate = line.slice(index);
+    if (!markdownTableDelimiterPattern.test(candidate)) continue;
+    const indentation = candidate.match(/^[ \t]*/)?.[0].length ?? 0;
+    return line.slice(index + indentation);
+  }
+  return undefined;
+}
+
+function extractMarkdownTableSource(source: string, value: unknown) {
+  const node = markdownSourceNode(value);
+  const start = node?.position?.start;
+  const end = node?.position?.end;
+  if (
+    typeof start?.line !== "number" ||
+    typeof start.offset !== "number" ||
+    typeof end?.line !== "number" ||
+    typeof end.offset !== "number"
+  ) {
+    return "";
+  }
+
+  const rows = new Map<number, { end: number; start: number }>();
+  collectMarkdownTableRows(node, rows);
+  const lines: string[] = [];
+
+  for (let line = start.line; line <= end.line; line += 1) {
+    const row = rows.get(line);
+    if (row) {
+      lines.push(source.slice(row.start, row.end));
+      continue;
+    }
+
+    const bounds = markdownLineBounds(source, line);
+    if (!bounds) return source.slice(start.offset, end.offset);
+    const lineEnd =
+      line === end.line ? Math.min(bounds.end, end.offset) : bounds.end;
+    const delimiter = standaloneMarkdownTableDelimiter(
+      source.slice(bounds.start, lineEnd),
+    );
+    if (delimiter === undefined) return source.slice(start.offset, end.offset);
+    lines.push(delimiter);
+  }
+
+  return lines.join("\n");
+}
+
 export interface CodeHighlightResult {
   code: string;
   html: string;
@@ -278,7 +392,10 @@ function MarkdownTable({
           returnFocusRef={expandButtonRef}
           title="Table preview"
         >
-          <div className="codex-ui-markdown codex-ui-markdown-table-preview__surface">
+          <div
+            className="codex-ui-markdown codex-ui-markdown-table-preview__surface"
+            tabIndex={0}
+          >
             {table(true)}
           </div>
         </Dialog>
@@ -719,12 +836,10 @@ export function AgentMarkdown({
           return <pre {...preProps}>{preChildren}</pre>;
         },
         table({ children: tableChildren, node, ...tableProps }) {
-          const start = node?.position?.start.offset;
-          const end = node?.position?.end.offset;
-          const markdownSource =
-            typeof start === "number" && typeof end === "number"
-              ? sourceRef.current.slice(start, end)
-              : "";
+          const markdownSource = extractMarkdownTableSource(
+            sourceRef.current,
+            node,
+          );
           return (
             <MarkdownTable
               allowWideTables={allowWideTables}

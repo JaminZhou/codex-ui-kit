@@ -5930,12 +5930,36 @@ try {
             overflowX: surfaceStyle.overflowX,
             padding: surfaceStyle.padding,
             rect: rect(previewSurface),
+            tabIndex: previewSurface.tabIndex,
           }
         : null,
       table: rect(table),
     };
   });
-  await previewDialog.press("Escape");
+  const previewSurface = previewDialog.locator(
+    ".codex-ui-markdown-table-preview__surface",
+  );
+  await previewDialog
+    .getByRole("button", { name: "Close table preview" })
+    .press("Tab");
+  await markdownTableActionsPage.waitForFunction(
+    () =>
+      document.activeElement?.classList.contains(
+        "codex-ui-markdown-table-preview__surface",
+      ) === true,
+  );
+  await markdownTableActionsPage.keyboard.press("ArrowRight");
+  await markdownTableActionsPage.waitForFunction(
+    () =>
+      (document.querySelector(
+        ".codex-ui-markdown-table-preview__surface",
+      )?.scrollLeft ?? 0) > 0,
+  );
+  const previewKeyboard = await previewSurface.evaluate((surface) => ({
+    active: document.activeElement === surface,
+    scrollLeft: surface.scrollLeft,
+  }));
+  await previewSurface.press("Escape");
   await previewDialog.waitFor({ state: "hidden" });
   await markdownTableActionsPage.waitForFunction(
     () => document.activeElement?.getAttribute("aria-label") === "Expand table",
@@ -6015,6 +6039,9 @@ try {
     preview.surface.maxWidth !== "80%" ||
     preview.surface.overflowX !== "auto" ||
     preview.surface.padding !== "32px" ||
+    preview.surface.tabIndex !== 0 ||
+    !previewKeyboard.active ||
+    previewKeyboard.scrollLeft <= 0 ||
     !preview.close ||
     Math.abs(preview.close.rect.height - 40) > 0.5 ||
     Math.abs(preview.close.rect.width - 42) > 0.5 ||
@@ -6041,12 +6068,12 @@ try {
     narrowReturnedFocus !== "Expand table"
   ) {
     throw new Error(
-      `markdown-table-actions: current-build contract failed: ${JSON.stringify({ clipboard, hovered, narrow, narrowReturnedFocus, preview, resting, returnedFocus })}`,
+      `markdown-table-actions: current-build contract failed: ${JSON.stringify({ clipboard, hovered, narrow, narrowReturnedFocus, preview, previewKeyboard, resting, returnedFocus })}`,
     );
   }
   await writeFile(
     join(artifactDirectory, "markdown-table-actions.json"),
-    `${JSON.stringify({ clipboard, hovered, narrow, narrowReturnedFocus, preview, resting, returnedFocus }, null, 2)}\n`,
+    `${JSON.stringify({ clipboard, hovered, narrow, narrowReturnedFocus, preview, previewKeyboard, resting, returnedFocus }, null, 2)}\n`,
   );
 } finally {
   await markdownTableActionsApp.close();

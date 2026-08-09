@@ -195,6 +195,29 @@ After.`;
     expect(screen.getByRole("button", { name: "Copied" })).toBeTruthy();
   });
 
+  it.each([
+    {
+      name: "blockquote",
+      source:
+        "> Context\n>\n> | Alpha | Beta |\n>| :--- | ---: |\n> | one | two |",
+    },
+    {
+      name: "list continuation",
+      source:
+        "- Context\n\n  | Alpha | Beta |\n  | :--- | ---: |\n  | one | two |",
+    },
+  ])("copies a nested $name table as standalone Markdown", async ({ source }) => {
+    const onCopyTable = vi.fn<(payload: MarkdownTableCopyPayload) => void>();
+    render(<AgentMarkdown onCopyTable={onCopyTable}>{source}</AgentMarkdown>);
+
+    fireEvent.click(screen.getByRole("button", { name: "Copy table" }));
+
+    await waitFor(() => expect(onCopyTable).toHaveBeenCalledOnce());
+    expect(onCopyTable.mock.calls[0][0].markdown).toBe(
+      "| Alpha | Beta |\n| :--- | ---: |\n| one | two |",
+    );
+  });
+
   it("opens a wide table preview and restores the expand trigger", async () => {
     render(
       <AgentMarkdown allowWideTables>
@@ -210,6 +233,10 @@ After.`;
     });
     expect(dialog).toBeTruthy();
     expect(screen.getAllByRole("table")).toHaveLength(2);
+    const previewScroller = dialog.querySelector(
+      ".codex-ui-markdown-table-preview__surface",
+    );
+    expect(previewScroller?.getAttribute("tabindex")).toBe("0");
     expect(
       screen
         .getByRole("button", { name: "Close table preview" })
