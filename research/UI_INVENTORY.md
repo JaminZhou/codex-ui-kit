@@ -208,6 +208,16 @@ Electron lock the 28×28 buttons, 16×16 icons, disabled navigation state, and
 semantic IDs; a 120×46 external crop passes at 3.2609%. Hidden layout copies
 are excluded by computed visibility before capture.
 
+The independent full-app composition now exposes System, Light, and Dark as a
+separate state axis and combines the current sidebar with the workspace route
+without overloading the replay frame. Browser/CDP, Electron, and one reviewed
+internal pixel baseline gate the 1180×820 light shell, semantic token changes,
+focus, geometry, and theme-aware `currentColor` paint for the exact dark-build
+SVG geometry. This does not close the sidebar's light-theme evidence gap: the
+installed product was only inspected read-only with System selected on a dark
+macOS appearance, and no real Light preference or external Light pixel
+reference was captured.
+
 The application-shell continuity slice splits window navigation, route
 lifecycle feedback, route selection/restoration, and global notifications
 into independently owned inventory rows. `26.727.40816` CDP records the 46px

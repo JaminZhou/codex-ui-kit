@@ -28,6 +28,116 @@ const currentReplayComposerContracts = [];
 for (const scene of visualScenes) {
   const { app, page } = await launchScene(scene);
   try {
+    if (scene.id === "current-light-shell") {
+      const lightShell = await page.evaluate(() => {
+        const metric = (selector) => {
+          const element = document.querySelector(selector);
+          if (!(element instanceof HTMLElement)) return null;
+          const value = element.getBoundingClientRect();
+          const style = getComputedStyle(element);
+          return {
+            backgroundColor: style.backgroundColor,
+            color: style.color,
+            height: value.height,
+            width: value.width,
+          };
+        };
+        const iconPaint = (icon) => ({
+          color: getComputedStyle(icon).color,
+          name: icon.getAttribute("data-current-build-icon"),
+          paints: Array.from(
+            icon.querySelectorAll(
+              "path, circle, ellipse, line, polyline, polygon, rect",
+            ),
+            (primitive) => ({
+              fill: getComputedStyle(primitive).fill,
+              stroke: getComputedStyle(primitive).stroke,
+            }),
+          ).filter(({ fill, stroke }) => fill !== "none" || stroke !== "none"),
+        });
+        return {
+          allIcons: Array.from(
+            document.querySelectorAll("[data-current-build-icon]"),
+            iconPaint,
+          ),
+          colorScheme: getComputedStyle(document.documentElement).colorScheme,
+          composer: metric(".codex-ui-composer"),
+          composerIcons: Array.from(
+            document.querySelectorAll(
+              ".codex-ui-composer [data-current-build-icon]",
+            ),
+            iconPaint,
+          ),
+          contextIcons: Array.from(
+            document.querySelectorAll(
+              ".codex-ui-conversation-context-bar [data-current-build-icon]",
+            ),
+            iconPaint,
+          ),
+          horizontalOverflow:
+            document.documentElement.scrollWidth -
+            document.documentElement.clientWidth,
+          htmlTheme: document.documentElement.dataset.theme,
+          main: metric(".codex-ui-app-shell__main"),
+          rootTheme: document
+            .querySelector(".demo-root")
+            ?.getAttribute("data-theme"),
+          sidebar: metric(".codex-ui-app-shell__sidebar"),
+          workspace: metric(".demo-workspace-route"),
+        };
+      });
+      const expectedContextIcons = [
+        "composer-project",
+        "composer-worktree",
+        "composer-branch",
+      ];
+      const expectedComposerIcons = [
+        "composer-add-files",
+        "composer-permission",
+        "composer-model-chevron",
+        "composer-dictate",
+        "composer-voice",
+      ];
+      const visiblePaints = lightShell.allIcons.flatMap(({ name, paints }) =>
+        paints.map((paint) => ({ name, ...paint })),
+      );
+      if (
+        lightShell.colorScheme !== "light" ||
+        lightShell.htmlTheme !== "light" ||
+        lightShell.rootTheme !== "light" ||
+        lightShell.horizontalOverflow > 1 ||
+        lightShell.main?.backgroundColor !== "rgb(255, 255, 255)" ||
+        lightShell.workspace?.backgroundColor !== "rgb(255, 255, 255)" ||
+        lightShell.main?.width !== 906 ||
+        lightShell.workspace?.height !== 774 ||
+        lightShell.sidebar?.width !== 274 ||
+        lightShell.sidebar?.height !== 820 ||
+        lightShell.composer?.width !== 736 ||
+        lightShell.composer?.height !== 98 ||
+        lightShell.composer?.color !== "rgb(26, 28, 31)" ||
+        lightShell.allIcons.length < 18 ||
+        JSON.stringify(lightShell.contextIcons.map(({ name }) => name)) !==
+          JSON.stringify(expectedContextIcons) ||
+        JSON.stringify(lightShell.composerIcons.map(({ name }) => name)) !==
+          JSON.stringify(expectedComposerIcons) ||
+        visiblePaints.some(
+          ({ fill, name, stroke }) =>
+            name !== "composer-voice" &&
+            (fill === "rgb(255, 255, 255)" ||
+              stroke === "rgb(255, 255, 255)" ||
+              fill.startsWith("oklab(0.999") ||
+              stroke.startsWith("oklab(0.999")),
+        )
+      ) {
+        throw new Error(
+          `Current light shell contract failed: ${JSON.stringify(lightShell)}`,
+        );
+      }
+      await writeFile(
+        join(artifactDirectory, "current-light-shell.json"),
+        `${JSON.stringify(lightShell, null, 2)}\n`,
+      );
+    }
     if (
       currentReplayComposerScenarios.has(scene.scenario) ||
       currentApprovalComposerScenes.has(scene.id)

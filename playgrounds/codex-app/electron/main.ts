@@ -244,7 +244,12 @@ function createWindow() {
   const scenario = process.env.CODEX_DEMO_SCENARIO ?? "streaming-recovery";
   const frame = process.env.CODEX_DEMO_FRAME ?? "recovered";
   const capture = process.env.CODEX_DEMO_CAPTURE ?? "0";
+  const currentSidebar = process.env.CODEX_DEMO_CURRENT_SIDEBAR ?? "0";
   const layout = process.env.CODEX_DEMO_LAYOUT ?? "";
+  const requestedTheme = process.env.CODEX_DEMO_THEME;
+  const theme = ["system", "light", "dark"].includes(requestedTheme ?? "")
+    ? requestedTheme!
+    : "dark";
   const view = process.env.CODEX_DEMO_VIEW ?? "conversation";
   const shellState = process.env.CODEX_DEMO_SHELL_STATE ?? "ready";
   const requestedWidth = Number(process.env.CODEX_DEMO_WINDOW_WIDTH);
@@ -259,15 +264,17 @@ function createWindow() {
       : 820;
   const query = new URLSearchParams({
     capture,
+    currentSidebar,
     frame,
     layout,
     scenario,
     shellState,
+    theme,
     view,
   }).toString();
 
   const window = new BrowserWindow({
-    backgroundColor: "#101010",
+    backgroundColor: theme === "light" ? "#ffffff" : "#101010",
     height,
     minHeight: Math.min(640, height),
     minWidth: Math.min(720, width),

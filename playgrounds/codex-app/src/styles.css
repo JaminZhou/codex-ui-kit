@@ -1,10 +1,62 @@
 :root {
+  --demo-shell-under: #101010;
+  --demo-shell-main: #181818;
+  --demo-shell-sidebar: color(srgb 0.156863 0.156863 0.156863 / 0.7);
+  --demo-shell-text: #f1f1f1;
+  --demo-shell-text-strong: #f5f5f5;
+  --demo-shell-text-secondary: rgba(255, 255, 255, 0.5);
+  --demo-shell-text-tertiary: rgba(255, 255, 255, 0.32);
+  --demo-shell-hover: rgba(255, 255, 255, 0.08);
+  --demo-shell-hover-subtle: rgba(255, 255, 255, 0.05);
+  --demo-shell-border: rgba(255, 255, 255, 0.12);
+  --demo-shell-control-border: rgba(255, 255, 255, 0.09);
+  --demo-shell-panel: rgba(255, 255, 255, 0.035);
+  --demo-shell-primary-control: #fff;
+  --demo-shell-primary-control-text: #181818;
   color-scheme: dark;
   font-family:
     -apple-system, system-ui, "Segoe UI", sans-serif;
   font-weight: 445;
-  background: #101010;
-  color: #f1f1f1;
+  background: var(--demo-shell-under);
+  color: var(--demo-shell-text);
+}
+
+:root[data-theme="light"] {
+  --demo-shell-under: #f3f3f3;
+  --demo-shell-main: #fff;
+  --demo-shell-sidebar: color(srgb 0.964706 0.964706 0.964706 / 0.82);
+  --demo-shell-text: #1a1c1f;
+  --demo-shell-text-strong: #1a1c1f;
+  --demo-shell-text-secondary: rgba(26, 28, 31, 0.62);
+  --demo-shell-text-tertiary: rgba(26, 28, 31, 0.45);
+  --demo-shell-hover: rgba(26, 28, 31, 0.08);
+  --demo-shell-hover-subtle: rgba(26, 28, 31, 0.05);
+  --demo-shell-border: rgba(26, 28, 31, 0.12);
+  --demo-shell-control-border: rgba(26, 28, 31, 0.09);
+  --demo-shell-panel: rgba(26, 28, 31, 0.035);
+  --demo-shell-primary-control: #1a1c1f;
+  --demo-shell-primary-control-text: #fff;
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme]) {
+    --demo-shell-under: #f3f3f3;
+    --demo-shell-main: #fff;
+    --demo-shell-sidebar: color(srgb 0.964706 0.964706 0.964706 / 0.82);
+    --demo-shell-text: #1a1c1f;
+    --demo-shell-text-strong: #1a1c1f;
+    --demo-shell-text-secondary: rgba(26, 28, 31, 0.62);
+    --demo-shell-text-tertiary: rgba(26, 28, 31, 0.45);
+    --demo-shell-hover: rgba(26, 28, 31, 0.08);
+    --demo-shell-hover-subtle: rgba(26, 28, 31, 0.05);
+    --demo-shell-border: rgba(26, 28, 31, 0.12);
+    --demo-shell-control-border: rgba(26, 28, 31, 0.09);
+    --demo-shell-panel: rgba(26, 28, 31, 0.035);
+    --demo-shell-primary-control: #1a1c1f;
+    --demo-shell-primary-control-text: #fff;
+    color-scheme: light;
+  }
 }
 
 * {
@@ -31,7 +83,7 @@ body,
 body {
   background:
     radial-gradient(circle at 65% 0%, rgba(90, 90, 90, 0.1), transparent 30%),
-    #101010;
+    var(--demo-shell-under);
 }
 
 button,
@@ -74,7 +126,7 @@ textarea {
 }
 
 .demo-root .codex-ui-app-shell__sidebar {
-  background: color(srgb 0.156863 0.156863 0.156863 / 0.7);
+  background: var(--demo-shell-sidebar);
   border-inline-end: 0;
 }
 
@@ -93,9 +145,9 @@ textarea {
 }
 
 .demo-root .codex-ui-app-shell__main {
-  background: #181818;
+  background: var(--demo-shell-main);
   box-shadow:
-    rgba(255, 255, 255, 0.157) 0 0 0 0.5px,
+    var(--demo-shell-border) 0 0 0 0.5px,
     rgba(0, 0, 0, 0.04) 0 3px 7.5px,
     rgba(0, 0, 0, 0.05) 0 0 20px;
 }
@@ -128,14 +180,14 @@ textarea {
 }
 
 .demo-shell-route-eyebrow {
-  color: rgba(255, 255, 255, 0.45);
+  color: var(--demo-shell-text-tertiary);
   font-size: 12px;
 }
 
 .demo-shell-route-content button,
 .demo-shell-route-toolbar input {
-  background: rgba(255, 255, 255, 0.055);
-  border: 1px solid rgba(255, 255, 255, 0.09);
+  background: var(--demo-shell-hover-subtle);
+  border: 1px solid var(--demo-shell-control-border);
   border-radius: 10px;
   color: inherit;
   min-height: 32px;
@@ -151,8 +203,8 @@ textarea {
 }
 
 .demo-shell-route-content > article {
-  background: rgba(255, 255, 255, 0.035);
-  border: 1px solid rgba(255, 255, 255, 0.075);
+  background: var(--demo-shell-panel);
+  border: 1px solid var(--demo-shell-control-border);
   border-radius: 12px;
   gap: 12px;
   min-height: 64px;
@@ -168,7 +220,7 @@ textarea {
 
 .demo-shell-route-content > article span,
 .demo-shell-route-content > article time {
-  color: rgba(255, 255, 255, 0.5);
+  color: var(--demo-shell-text-secondary);
   font-size: 12px;
 }
 
@@ -184,7 +236,7 @@ textarea {
 }
 
 .demo-workspace-route {
-  background: #181818;
+  background: var(--demo-shell-main);
   height: 100%;
   min-height: 0;
   min-width: 0;
@@ -214,7 +266,7 @@ textarea {
 
 .demo-workspace-start .codex-ui-new-conversation-start__eyebrow {
   align-items: center;
-  color: rgba(255, 255, 255, 0.32);
+  color: var(--demo-shell-text-tertiary);
   display: flex;
   height: 48px;
   justify-content: center;
@@ -258,7 +310,7 @@ textarea {
   background: transparent;
   border: 0;
   border-radius: 12.5px;
-  color: rgba(255, 255, 255, 0.5);
+  color: var(--demo-shell-text-secondary);
   display: grid;
   font-size: 13px;
   gap: 6px;
@@ -274,7 +326,7 @@ textarea {
   .codex-ui-new-conversation-start__prompt
   .demo-workspace-prompts
   > button:hover {
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--demo-shell-hover-subtle);
   border: 0;
 }
 
@@ -291,7 +343,7 @@ textarea {
   cursor: pointer;
   font: inherit;
   padding: 0;
-  text-decoration-color: rgba(255, 255, 255, 0.7);
+  text-decoration-color: var(--demo-shell-text-secondary);
   text-decoration-line: underline;
   text-decoration-style: dotted;
   text-decoration-thickness: 1px;
@@ -661,9 +713,9 @@ textarea {
 }
 
 .demo-workspace-start .demo-workspace-voice {
-  background: #fff !important;
+  background: var(--demo-shell-primary-control) !important;
   border: 0 !important;
-  color: #181818 !important;
+  color: var(--demo-shell-primary-control-text) !important;
   border-radius: 999px !important;
   display: inline-flex;
   font-size: 16px;
@@ -685,7 +737,7 @@ textarea {
 
 .demo-root .codex-ui-app-sidebar__footer {
   background: transparent;
-  border-block-start-color: rgba(255, 255, 255, 0.12);
+  border-block-start-color: var(--demo-shell-border);
 }
 
 .demo-root:is([data-capture], [data-layout="wide"]):not(
@@ -751,7 +803,7 @@ textarea {
 .demo-sidebar-brand {
   align-items: center;
   border-radius: 15px;
-  color: #f5f5f5;
+  color: var(--demo-shell-text-strong);
   display: inline-flex;
   font-size: 17px;
   font-weight: 500;
@@ -772,7 +824,7 @@ textarea {
 .demo-sidebar-section-action:focus-visible,
 .codex-ui-app-sidebar-footer__actions > button:hover,
 .codex-ui-app-sidebar-footer__actions > button:focus-visible {
-  background: rgba(255, 255, 255, 0.08);
+  background: var(--demo-shell-hover);
 }
 
 .demo-sidebar-header-action,
@@ -781,7 +833,7 @@ textarea {
 .codex-ui-app-sidebar-footer__actions > button {
   align-items: center;
   border-radius: 10px;
-  color: rgba(255, 255, 255, 0.5);
+  color: var(--demo-shell-text-secondary);
   display: inline-flex;
   height: 26px;
   justify-content: center;
@@ -799,7 +851,7 @@ textarea {
 .demo-sidebar-new-chat {
   align-items: center;
   border-radius: 12.5px;
-  color: #fff;
+  color: var(--demo-shell-text-strong);
   display: flex;
   font-size: 13px;
   font-weight: 445;
@@ -819,7 +871,7 @@ textarea {
 
 .demo-sidebar-quick-chat {
   border-radius: 10px;
-  color: rgba(255, 255, 255, 0.425);
+  color: var(--demo-shell-text-tertiary);
   height: 20px;
   padding: 2px;
   width: 20px;
@@ -887,7 +939,7 @@ textarea {
 }
 
 .demo-sidebar-brand .demo-current-build-icon {
-  color: rgba(255, 255, 255, 0.498);
+  color: var(--demo-shell-text-secondary);
   height: 14px;
   width: 14px;
 }
@@ -908,6 +960,31 @@ textarea {
   display: flex;
   align-items: center;
   gap: 8px;
+}
+
+.demo-theme-control {
+  align-items: center;
+  color: var(--codex-ui-text-secondary);
+  display: inline-flex;
+  font-size: 0.75rem;
+  gap: 0.375rem;
+}
+
+.demo-theme-control select {
+  appearance: none;
+  background: var(--codex-ui-background-button-secondary);
+  border: 1px solid var(--codex-ui-border);
+  border-radius: 0.5rem;
+  color: var(--codex-ui-text);
+  font: inherit;
+  height: 1.75rem;
+  min-width: 4.75rem;
+  padding: 0 1.25rem 0 0.5rem;
+}
+
+.demo-theme-control select:focus-visible {
+  outline: 2px solid var(--codex-ui-focus);
+  outline-offset: 2px;
 }
 
 .demo-current-mcp-folder {
@@ -1833,7 +1910,7 @@ textarea {
 .demo-composer-actions,
 .demo-composer-controls {
   align-items: center;
-  color: rgba(255, 255, 255, 0.52);
+  color: var(--codex-ui-text-secondary);
   display: inline-flex;
   font-size: 0.6875rem;
   gap: 0.625rem;
@@ -1889,6 +1966,62 @@ textarea {
   height: 1.75rem;
   padding: 0 0.5rem;
   width: 6.31640625rem;
+}
+
+.demo-root[data-theme="light"] .demo-current-build-icon,
+.demo-root[data-theme="light"] .demo-current-build-icon * {
+  -webkit-text-fill-color: currentColor !important;
+  -webkit-text-stroke-color: currentColor !important;
+  color: inherit !important;
+}
+
+.demo-root[data-theme="light"] .demo-composer-permission-trigger {
+  color: var(--codex-ui-text-warning);
+}
+
+.demo-root[data-theme="light"]
+  .demo-current-build-icon
+  :is(path, circle, ellipse, line, polyline, polygon, rect)[style*="fill:"]:not(
+    [style*="fill: none"]
+  ) {
+  fill: currentColor !important;
+}
+
+.demo-root[data-theme="light"]
+  .demo-current-build-icon
+  :is(path, circle, ellipse, line, polyline, polygon, rect)[style*="stroke:"]:not(
+    [style*="stroke: none"]
+  ) {
+  stroke: currentColor !important;
+}
+
+@media (prefers-color-scheme: light) {
+  .demo-root[data-theme="system"] .demo-current-build-icon,
+  .demo-root[data-theme="system"] .demo-current-build-icon * {
+    -webkit-text-fill-color: currentColor !important;
+    -webkit-text-stroke-color: currentColor !important;
+    color: inherit !important;
+  }
+
+  .demo-root[data-theme="system"] .demo-composer-permission-trigger {
+    color: var(--codex-ui-text-warning);
+  }
+
+  .demo-root[data-theme="system"]
+    .demo-current-build-icon
+    :is(path, circle, ellipse, line, polyline, polygon, rect)[style*="fill:"]:not(
+      [style*="fill: none"]
+    ) {
+    fill: currentColor !important;
+  }
+
+  .demo-root[data-theme="system"]
+    .demo-current-build-icon
+    :is(path, circle, ellipse, line, polyline, polygon, rect)[style*="stroke:"]:not(
+      [style*="stroke: none"]
+    ) {
+    stroke: currentColor !important;
+  }
 }
 
 .demo-composer-controls button {

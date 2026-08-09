@@ -22,6 +22,15 @@ export const visualScenes = [
     view: "workspace",
   },
   {
+    currentSidebar: true,
+    frame: "workspace-ready",
+    id: "current-light-shell",
+    maxPixelRatio: 0.01,
+    scenario: "workspace-workflow",
+    theme: "light",
+    view: "workspace",
+  },
+  {
     frame: "workspace-no-project",
     id: "workspace-no-project",
     maxPixelRatio: 0.01,
@@ -811,20 +820,23 @@ export const visualScenes = [
 
 export async function launchScene(
   scene,
-  { capture = true, layoutMode, windowSize } = {},
+  { capture = true, layoutMode, theme, windowSize } = {},
 ) {
   const resolvedWindowSize = windowSize ?? scene.windowSize;
+  const resolvedTheme = theme ?? scene.theme ?? "dark";
   const app = await electron.launch({
     args: ["."],
     executablePath: electronPath,
     env: {
       ...process.env,
       CODEX_DEMO_CAPTURE: capture ? "1" : "0",
+      CODEX_DEMO_CURRENT_SIDEBAR: scene.currentSidebar ? "1" : "0",
       CODEX_DEMO_FRAME: scene.frame,
       CODEX_DEMO_HEADLESS: "1",
       ...(layoutMode ? { CODEX_DEMO_LAYOUT: layoutMode } : {}),
       CODEX_DEMO_SCENARIO: scene.scenario,
       CODEX_DEMO_SHELL_STATE: scene.shellState ?? "ready",
+      CODEX_DEMO_THEME: resolvedTheme,
       CODEX_DEMO_VIEW: scene.view ?? "conversation",
       ...(resolvedWindowSize
         ? {

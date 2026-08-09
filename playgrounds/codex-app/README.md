@@ -632,6 +632,29 @@ delegation on `26.730.61639`:
   1.3329% to 4.6708% under a 5.5% hard limit; the compact text-heavy activity
   band passes at 11.4952% under its independent 12.5% limit.
 
+## Thirty-fifth vertical slice
+
+The thirty-fifth slice makes theme ownership explicit without treating a
+forced media query as current-product evidence:
+
+- the full-app playground accepts `theme=system`, `theme=light`, and
+  `theme=dark`; the existing deterministic default remains dark;
+- a non-capture Theme control switches the same state model while preserving
+  the active route, sidebar width, Composer state, and keyboard focus;
+- current sidebar, window-chrome, context, and Composer SVG geometry is reused
+  in light mode, while theme-dependent paint follows the owning control's
+  semantic `currentColor` instead of replaying captured dark paint on a light
+  surface;
+- the current sidebar is now an independent composition axis, so it can be
+  combined with workspace and theme states without falsifying the lifecycle
+  frame;
+- Browser/CDP and reviewed internal pixels reach 113 frames, and Electron
+  drives System → Light → Dark inside one real `BrowserWindow`;
+- the light screenshot is an independent regression baseline only. A real
+  Codex Light preference capture and ownership-scoped external pixel
+  comparison are still required before promoting current-build light-theme
+  evidence.
+
 ## Development
 
 From the repository root:

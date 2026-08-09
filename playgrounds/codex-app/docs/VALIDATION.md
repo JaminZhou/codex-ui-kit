@@ -31,7 +31,11 @@ Every deterministic scenario has one ID and produces four evidence layers:
    Composer attachments, final-row removal leaves paused queue state, and
    completed replay positions reconcile queued work. Mode switches clear
    fixture-only host state, and message-navigation tooltips avoid duplicate
-   label/preview content. Mixed Review acceptance additionally requires
+   label/preview content. The independent theme contract combines the current
+   sidebar and workspace shell, locks 1180×820 light geometry and semantic
+   colors, prevents captured dark SVG paint from remaining white on light
+   surfaces, and keeps System/Light/Dark separate from lifecycle frames.
+   Mixed Review acceptance additionally requires
    ordered rename/delete/modified rows, two text diffs, explicit
    binary/conflict notices, focusable content, and synchronized file
    selection. The current rename replay separately requires two modified file
@@ -53,6 +57,10 @@ Every deterministic scenario has one ID and produces four evidence layers:
    A dedicated current image-attachment flow repeats removal, re-addition,
    submission, exact completion, focus restoration, and unchanged approval
    policy in the real window.
+   The same real window now emulates a light system preference, switches the
+   playground from explicit Dark to System, Light, and back to Dark, and gates
+   root ownership, computed `color-scheme`, focus, sidebar geometry, main
+   background, Composer foreground, and mode continuity.
    A current long-thread flow verifies compact navigation selection, a
    seven-turn mounted window, negative away-from-latest scrolling, and
    return-to-latest at scroll origin zero. The current long-command flow
@@ -60,8 +68,11 @@ Every deterministic scenario has one ID and produces four evidence layers:
    output lines, then collapses and reopens the card to prove reverse-tail
    restoration.
 4. **Pixels** — full-frame regression screenshots after the structural gates
-   pass. The multi-file scenario can additionally compare a separately
-   captured 906×820 current-build main region through
+   pass. The 113th reviewed frame is an internal light shell baseline that
+   combines the current sidebar, window chrome, workspace entry, context bar,
+   and Composer. It is not a current-product light reference. The multi-file
+   scenario can additionally compare a separately captured 906×820
+   current-build main region through
    `CODEX_UI_KIT_MULTI_FILE_REVIEW_REFERENCE`; the PR detail scenario accepts
    its own 906×820 reference through
    `CODEX_UI_KIT_PULL_REQUEST_REFERENCE`; the Terminal scenario accepts a

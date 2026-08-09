@@ -137,6 +137,11 @@ import {
   reducePullRequestLifecycle,
   type PullRequestLifecycleAction,
 } from "./pull-request-lifecycle";
+import {
+  applyDemoThemePreference,
+  parseDemoThemePreference,
+  type DemoThemePreference,
+} from "./theme";
 
 type DemoView = "conversation" | "pull-request" | "shell" | "workspace";
 
@@ -257,6 +262,8 @@ function querySelection() {
     : "streaming-recovery";
   const frame = params.get("frame");
   const capture = params.get("capture") === "1";
+  const currentSidebar = params.get("currentSidebar") === "1";
+  const theme = parseDemoThemePreference(params.get("theme"));
   const layoutMode =
     params.get("layout") === "wide" ? ("wide" as const) : undefined;
   const view: DemoView =
@@ -279,7 +286,16 @@ function querySelection() {
   ].includes(requestedShellState ?? "")
     ? (requestedShellState as AppRouteOutletStatus)
     : "ready";
-  return { capture, frame, layoutMode, scenarioId, shellState, view };
+  return {
+    capture,
+    currentSidebar,
+    frame,
+    layoutMode,
+    scenarioId,
+    shellState,
+    theme,
+    view,
+  };
 }
 
 function isNarrowDemoWindow() {
@@ -1269,6 +1285,9 @@ export function App() {
     initialProtocolState,
   );
   const [mode, setMode] = useState<"live" | "replay">("replay");
+  const [theme, setTheme] = useState<DemoThemePreference>(
+    initialSelection.theme,
+  );
   const [view, setView] = useState<DemoView>(initialSelection.view);
   const [workspaceProjectId, setWorkspaceProjectId] = useState<
     string | null
@@ -1684,12 +1703,8 @@ export function App() {
   }, []);
 
   useEffect(() => {
-    const root = document.documentElement;
-    root.dataset.theme = "dark";
-    return () => {
-      delete root.dataset.theme;
-    };
-  }, []);
+    applyDemoThemePreference(document.documentElement, theme);
+  }, [theme]);
 
   useEffect(() => {
     liveApprovalSubmissionGateRef.current.retainPending(
@@ -2397,7 +2412,9 @@ export function App() {
 
   const lastEvent = scenario.events[Math.max(0, replayCount - 1)];
   const currentSidebarComposition =
-    initialSelection.frame === "sidebar-current" || !initialSelection.capture;
+    initialSelection.currentSidebar ||
+    initialSelection.frame === "sidebar-current" ||
+    !initialSelection.capture;
   const sidebarRecentScenarios = (
     Object.values(replayScenarios) as ReplayScenario[]
   ).slice(0, currentSidebarComposition ? 6 : undefined);
@@ -3088,6 +3105,24 @@ export function App() {
             >
               {mode === "replay" ? "Live" : "Replay"}
             </Button>
+            {!initialSelection.capture ? (
+              <label className="demo-theme-control">
+                <span>Theme</span>
+                <select
+                  aria-label="Theme"
+                  onChange={(event) =>
+                    setTheme(
+                      parseDemoThemePreference(event.currentTarget.value),
+                    )
+                  }
+                  value={theme}
+                >
+                  <option value="system">System</option>
+                  <option value="light">Light</option>
+                  <option value="dark">Dark</option>
+                </select>
+              </label>
+            ) : null}
           </div>
         )
       }
@@ -6158,6 +6193,7 @@ export function App() {
       data-scenario={scenarioId}
       data-sidebar-current={currentSidebarComposition || undefined}
       data-status={displayedStatus}
+      data-theme={theme}
       data-thread-following={
         isConversationLifecycle ? threadFollowing : undefined
       }

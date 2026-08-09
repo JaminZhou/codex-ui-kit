@@ -275,6 +275,78 @@ try {
   }
 
   await page.emulateMedia({ colorScheme: "light", reducedMotion: "reduce" });
+  const themeControl = page.getByRole("combobox", { name: "Theme" });
+  const defaultTheme = await page.evaluate(() => ({
+    html: document.documentElement.dataset.theme,
+    root: document.querySelector(".demo-root")?.getAttribute("data-theme"),
+  }));
+  if (
+    (await themeControl.inputValue()) !== "dark" ||
+    defaultTheme.html !== "dark" ||
+    defaultTheme.root !== "dark"
+  ) {
+    throw new Error(
+      `Electron default theme contract failed: ${JSON.stringify(defaultTheme)}`,
+    );
+  }
+
+  await themeControl.focus();
+  await themeControl.selectOption("system");
+  await page.waitForFunction(
+    () =>
+      document.documentElement.dataset.theme === undefined &&
+      document
+        .querySelector(".demo-root")
+        ?.getAttribute("data-theme") === "system" &&
+      getComputedStyle(document.documentElement).colorScheme === "light",
+  );
+
+  await themeControl.selectOption("light");
+  await page.waitForFunction(
+    () => document.documentElement.dataset.theme === "light",
+  );
+  const lightTheme = await page.evaluate(() => {
+    const bounds = (selector) => {
+      const element = document.querySelector(selector);
+      if (!(element instanceof HTMLElement)) return null;
+      const value = element.getBoundingClientRect();
+      const style = getComputedStyle(element);
+      return {
+        backgroundColor: style.backgroundColor,
+        color: style.color,
+        height: value.height,
+        width: value.width,
+      };
+    };
+    return {
+      activeElement: document.activeElement?.getAttribute("aria-label"),
+      colorScheme: getComputedStyle(document.documentElement).colorScheme,
+      composer: bounds(".codex-ui-composer"),
+      html: document.documentElement.dataset.theme,
+      main: bounds(".codex-ui-app-shell__main"),
+      root: document.querySelector(".demo-root")?.getAttribute("data-theme"),
+      sidebar: bounds(".codex-ui-app-shell__sidebar"),
+    };
+  });
+  if (
+    lightTheme.activeElement !== "Theme" ||
+    lightTheme.colorScheme !== "light" ||
+    lightTheme.html !== "light" ||
+    lightTheme.root !== "light" ||
+    lightTheme.main?.backgroundColor !== "rgb(255, 255, 255)" ||
+    Math.abs((lightTheme.sidebar?.width ?? 0) - 272) > 1 ||
+    !lightTheme.composer ||
+    lightTheme.composer.color !== "rgb(26, 28, 31)"
+  ) {
+    throw new Error(
+      `Electron light theme contract failed: ${JSON.stringify(lightTheme)}`,
+    );
+  }
+
+  await themeControl.selectOption("dark");
+  await page.waitForFunction(
+    () => document.documentElement.dataset.theme === "dark",
+  );
   await page.getByRole("button", { exact: true, name: "Live" }).click();
   await page.waitForSelector('.demo-root[data-mode="live"]');
   const liveTheme = await page.evaluate(
