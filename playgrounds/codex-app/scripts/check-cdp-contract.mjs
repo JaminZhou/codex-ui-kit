@@ -4,10 +4,68 @@ import { launchScene, visualScenes } from "./electron-harness.mjs";
 
 const artifactDirectory = join(process.cwd(), "artifacts", "cdp");
 await mkdir(artifactDirectory, { recursive: true });
+const currentReplayComposerScenarios = new Set([
+  "attachment-lifecycle",
+  "command-failure-recovery",
+  "compaction",
+  "context-summary",
+  "current-review-rename",
+  "interruption",
+  "long-command-output",
+  "mcp-recovery-mixed-thread",
+  "mcp-tool-call",
+  "subagent-concurrency",
+  "subagent-delegation",
+  "subagent-nested",
+]);
+const currentApprovalComposerScenes = new Set([
+  "approval-current-allow-once-completed",
+  "approval-current-denied",
+  "approval-current-similar-repeated-completed",
+]);
+const currentReplayComposerContracts = [];
 
 for (const scene of visualScenes) {
   const { app, page } = await launchScene(scene);
   try {
+    if (
+      currentReplayComposerScenarios.has(scene.scenario) ||
+      currentApprovalComposerScenes.has(scene.id)
+    ) {
+      const currentComposerIcons = await page.evaluate(() =>
+        Array.from(
+          document.querySelectorAll(
+            ".codex-ui-composer [data-current-build-icon]",
+          ),
+          (icon) => {
+            const value = icon.getBoundingClientRect();
+            return {
+              height: value.height,
+              name: icon.getAttribute("data-current-build-icon"),
+              width: value.width,
+            };
+          },
+        ),
+      );
+      const expectedCurrentComposerIcons = [
+        { height: 16, name: "composer-add-files", width: 16 },
+        { height: 16, name: "composer-permission", width: 16 },
+        { height: 14, name: "composer-model-chevron", width: 14 },
+        { height: 16, name: "composer-dictate", width: 16 },
+      ];
+      if (
+        JSON.stringify(currentComposerIcons) !==
+        JSON.stringify(expectedCurrentComposerIcons)
+      ) {
+        throw new Error(
+          `${scene.id}: current replay Composer assets failed: ${JSON.stringify(currentComposerIcons)}`,
+        );
+      }
+      currentReplayComposerContracts.push({
+        icons: currentComposerIcons,
+        scene: scene.id,
+      });
+    }
     if (scene.view === "workspace") {
       await page.waitForTimeout(50);
       const contract = await page.evaluate(() => {
@@ -53,6 +111,13 @@ for (const scene of visualScenes) {
             haspopup: button.getAttribute("aria-haspopup"),
             kind: button.getAttribute("data-kind"),
             rect: rect(button),
+          }),
+        );
+        const currentIcons = Array.from(
+          start?.querySelectorAll("[data-current-build-icon]") ?? [],
+          (icon) => ({
+            name: icon.getAttribute("data-current-build-icon"),
+            rect: rect(icon),
           }),
         );
         const projectDialog = document.querySelector(
@@ -113,6 +178,7 @@ for (const scene of visualScenes) {
           composer: rect(composer),
           context: rect(context),
           contextButtons,
+          currentIcons,
           environment: environmentMenu
             ? {
                 buttons: environmentButtons,
@@ -194,6 +260,18 @@ for (const scene of visualScenes) {
       const worktreeTrigger = contract.contextButtons.find(
         ({ kind }) => kind === "worktree",
       );
+      const expectedCurrentIconNames = [
+        "composer-project",
+        ...(noProjectExpected || newWorktreeExpected
+          ? []
+          : ["composer-worktree"]),
+        ...(noProjectExpected ? [] : ["composer-branch"]),
+        "composer-add-files",
+        "composer-permission",
+        "composer-model-chevron",
+        "composer-dictate",
+        "composer-voice",
+      ];
       if (
         contract.view !== "workspace" ||
         contract.frame !== scene.frame ||
@@ -226,7 +304,19 @@ for (const scene of visualScenes) {
         Boolean(contract.worktree) !== worktreeExpected ||
         Boolean(contract.worktreeEnvironment) !==
           worktreeEnvironmentExpected ||
-        Boolean(worktreeTrigger?.disabled) !== repairingExpected
+        Boolean(worktreeTrigger?.disabled) !== repairingExpected ||
+        JSON.stringify(
+          contract.currentIcons.map(({ name }) => name),
+        ) !== JSON.stringify(expectedCurrentIconNames) ||
+        contract.currentIcons.some(({ name, rect: value }) => {
+          const expectedSize =
+            name === "composer-model-chevron" ? 14 : 16;
+          return (
+            !value ||
+            Math.abs(value.width - expectedSize) > 1 ||
+            Math.abs(value.height - expectedSize) > 1
+          );
+        })
       ) {
         throw new Error(
           `${scene.id}: workspace entry contract failed: ${JSON.stringify(contract)}`,
@@ -2626,6 +2716,17 @@ for (const scene of visualScenes) {
                 role: context.getAttribute("role"),
               }
             : null,
+          currentIcons: Array.from(
+            dock.querySelectorAll("[data-current-build-icon]"),
+            (icon) => {
+              const value = icon.getBoundingClientRect();
+              return {
+                height: value.height,
+                name: icon.getAttribute("data-current-build-icon"),
+                width: value.width,
+              };
+            },
+          ),
           dock: {
             hasContext: dock.getAttribute("data-has-context"),
             hasQueue: dock.getAttribute("data-has-queue"),
@@ -2815,6 +2916,19 @@ for (const scene of visualScenes) {
         "composer-auto-continued",
         "composer-queue-paused",
       ].includes(scene.id);
+      const expectedCurrentIconNames = [
+        ...(expectsContext
+          ? [
+              "composer-project",
+              "composer-worktree",
+              "composer-branch",
+            ]
+          : []),
+        "composer-add-files",
+        "composer-permission",
+        "composer-model-chevron",
+        "composer-dictate",
+      ];
       if (
         (expectsContext
           ? conversation.dock.hasContext !== "true" ||
@@ -2822,7 +2936,7 @@ for (const scene of visualScenes) {
             conversation.context.controls.length !== 3 ||
             JSON.stringify(
               conversation.context.controls.map(({ label }) => label),
-            ) !== JSON.stringify(["□codex-ui-kit", "◉Local", "⑂main"]) ||
+            ) !== JSON.stringify(["codex-ui-kit", "Local", "main"]) ||
             conversation.context.controls.some(
               ({ height }) => Math.abs(height - 28) > 1,
             )
@@ -2830,6 +2944,17 @@ for (const scene of visualScenes) {
             conversation.context !== null) ||
         conversation.navigation.label !== "User messages" ||
         conversation.navigation.buttonCount < 10 ||
+        JSON.stringify(
+          conversation.currentIcons.map(({ name }) => name),
+        ) !== JSON.stringify(expectedCurrentIconNames) ||
+        conversation.currentIcons.some(({ name, height, width }) => {
+          const expectedSize =
+            name === "composer-model-chevron" ? 14 : 16;
+          return (
+            Math.abs(width - expectedSize) > 1 ||
+            Math.abs(height - expectedSize) > 1
+          );
+        }) ||
         !conversation.dock.rect ||
         conversation.dock.rect.width < 700 ||
         conversation.dock.rect.width > 740
@@ -6430,5 +6555,10 @@ try {
 } finally {
   await contextSummaryCompactApp.close();
 }
+
+await writeFile(
+  join(artifactDirectory, "current-replay-composer-icons.json"),
+  `${JSON.stringify(currentReplayComposerContracts, null, 2)}\n`,
+);
 
 console.log(`CDP contracts passed for ${visualScenes.length} lifecycle frames.`);

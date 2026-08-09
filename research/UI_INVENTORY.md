@@ -71,13 +71,16 @@ observation from a previous build remains historical evidence.
   surface is separately reached on `26.730.61639`.
 
 A later, deliberately narrower `26.803.41515` (`6321`) probe refreshes the
-sidebar/window-chrome visual/action slice and binds 17 icon primitives to
+sidebar/window-chrome/Composer visual/action slice and binds 25 icon primitives to
 exact runtime evidence. It also confirms current project/task hover actions,
 the Help footer, and no leading glyph in sampled project-task rows. The Recents follow-up
 independently scrolls to six task rows, pairs their Pin/Archive controls, and
 confirms zero leading SVGs, removing the `sidebar-thread` approximation. The
-next follow-up promotes the visible Sidebar/Back/Forward titlebar controls,
-leaving eight Composer approximations. This is documented in
+next follow-up promotes the visible Sidebar/Back/Forward titlebar controls.
+The Composer follow-up promotes Project, Worktree, Branch, Add files,
+Permission, Model chevron, Dictate, and Voice, leaving zero scoped
+visible-shell approximations while the broader inventory and current-build
+lifecycle denominator remain incomplete. This is documented in
 [`26.803.41515.md`](26.803.41515.md) and does not change this broader
 inventory's `26.730.61639` current-build counts or promote untested routes and
 lifecycles.

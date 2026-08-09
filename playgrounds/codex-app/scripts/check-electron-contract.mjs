@@ -2366,6 +2366,39 @@ try {
     }
   }
 
+  const workspaceCurrentIcons = await codingWorkspacePage.evaluate(() =>
+    Array.from(
+      document.querySelectorAll(
+        ".demo-workspace-start [data-current-build-icon]",
+      ),
+      (icon) => {
+        const rect = icon.getBoundingClientRect();
+        return {
+          height: rect.height,
+          name: icon.getAttribute("data-current-build-icon"),
+          width: rect.width,
+        };
+      },
+    ),
+  );
+  if (
+    JSON.stringify(workspaceCurrentIcons) !==
+    JSON.stringify([
+      { height: 16, name: "composer-project", width: 16 },
+      { height: 16, name: "composer-worktree", width: 16 },
+      { height: 16, name: "composer-branch", width: 16 },
+      { height: 16, name: "composer-add-files", width: 16 },
+      { height: 16, name: "composer-permission", width: 16 },
+      { height: 14, name: "composer-model-chevron", width: 14 },
+      { height: 16, name: "composer-dictate", width: 16 },
+      { height: 16, name: "composer-voice", width: 16 },
+    ])
+  ) {
+    throw new Error(
+      `Electron current Composer assets failed: ${JSON.stringify(workspaceCurrentIcons)}`,
+    );
+  }
+
   const projectDestination = codingWorkspacePage.locator(
     "#demo-workspace-destination-trigger",
   );
