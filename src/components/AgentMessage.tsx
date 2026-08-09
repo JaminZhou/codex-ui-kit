@@ -35,6 +35,8 @@ export function AgentMessage({
   const classes = ["codex-ui-agent-message", className].filter(Boolean).join(" ");
   const userMessage = role === "user";
   const canEdit = userMessage && (editable || Boolean(onEdit));
+  const hasContent =
+    children !== null && children !== undefined && children !== "";
   const activateEdit = (event?: KeyboardEvent<HTMLDivElement>) => {
     if (!canEdit) return;
     if (event && event.key !== "Enter" && event.key !== " ") return;
@@ -61,17 +63,19 @@ export function AgentMessage({
           {attachments}
         </div>
       ) : null}
-      <div
-        className="codex-ui-agent-message__content"
-        data-editable={canEdit || undefined}
-        data-user-message-bubble={userMessage ? "" : undefined}
-        onDoubleClick={canEdit ? () => onEdit?.() : undefined}
-        onKeyDown={canEdit ? activateEdit : undefined}
-        role={canEdit ? "button" : undefined}
-        tabIndex={userMessage ? 0 : undefined}
-      >
-        {children}
-      </div>
+      {hasContent ? (
+        <div
+          className="codex-ui-agent-message__content"
+          data-editable={canEdit || undefined}
+          data-user-message-bubble={userMessage ? "" : undefined}
+          onDoubleClick={canEdit ? () => onEdit?.() : undefined}
+          onKeyDown={canEdit ? activateEdit : undefined}
+          role={canEdit ? "button" : undefined}
+          tabIndex={userMessage ? 0 : undefined}
+        >
+          {children}
+        </div>
+      ) : null}
       {metadata || actions ? (
         <div className="codex-ui-agent-message__accessories">
           {metadata ? (

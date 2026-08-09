@@ -1910,6 +1910,11 @@ export function App() {
       scenario.frames["approval-current-session-first-completed"];
     setActiveFrame(replaySessionFrame);
     setComposerOverlay(null);
+    if (isCurrentAttachmentReplay) {
+      setComposerAttachments([]);
+      setSubmittedComposerAttachments([]);
+      setSubmittedComposerPrompt(null);
+    }
     setReplayComposerSubmitting(false);
     setReplayComposerStopped(false);
     setReplayQueuedContinuation(null);
@@ -5489,7 +5494,7 @@ export function App() {
                 {message.text || " "}
               </AgentMarkdown>
             ) : (
-              submittedMessageText
+              submittedMessageText || null
             )}
           </AgentMessage>
           {message.interruptionDurationMs !== undefined ? (

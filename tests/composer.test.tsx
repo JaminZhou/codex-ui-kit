@@ -910,12 +910,17 @@ describe("AgentComposer", () => {
         }
         role="user"
       >
-        Review this file.
+        {""}
       </AgentMessage>,
     );
     const file = screen.getByRole("button", { name: "README.md" });
     expect(file.dataset.kind).toBe("file");
     expect(screen.getByText("MD")).toBeTruthy();
+    expect(
+      file.closest(".codex-ui-agent-message")?.querySelector(
+        ".codex-ui-agent-message__content",
+      ),
+    ).toBeNull();
   });
 
   it("requires an explicit signal for attachment-only submission", () => {

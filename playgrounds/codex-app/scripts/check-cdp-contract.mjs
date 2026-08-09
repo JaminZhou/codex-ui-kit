@@ -7098,6 +7098,48 @@ try {
   await protocolAttachmentFrameApp.close();
 }
 
+const attachmentReplayNavigationScene = {
+  frame: "attachment-ready",
+  id: "attachment-replay-navigation",
+  scenario: "attachment-lifecycle",
+};
+const {
+  app: attachmentReplayNavigationApp,
+  page: attachmentReplayNavigationPage,
+} = await launchScene(attachmentReplayNavigationScene, { capture: false });
+try {
+  await attachmentReplayNavigationPage
+    .getByRole("button", { name: "Next" })
+    .click();
+  await attachmentReplayNavigationPage.waitForSelector(
+    '[data-item-id="user-attachment-lifecycle"]',
+  );
+  const navigatedAttachmentReplay =
+    await attachmentReplayNavigationPage.evaluate(() => ({
+      composerAttachmentCount: document.querySelectorAll(
+        ".codex-ui-composer .codex-ui-composer-attachment",
+      ).length,
+      messageAttachmentCount: document.querySelectorAll(
+        ".codex-ui-agent-message__attachments .codex-ui-message-attachment",
+      ).length,
+      messageText:
+        document.querySelector(
+          '[data-item-id="user-attachment-lifecycle"] .codex-ui-agent-message__content',
+        )?.textContent ?? null,
+    }));
+  if (
+    navigatedAttachmentReplay.composerAttachmentCount !== 0 ||
+    navigatedAttachmentReplay.messageAttachmentCount !== 1 ||
+    !navigatedAttachmentReplay.messageText?.startsWith("Reply using three")
+  ) {
+    throw new Error(
+      `Replay navigation retained host-only attachment state: ${JSON.stringify(navigatedAttachmentReplay)}`,
+    );
+  }
+} finally {
+  await attachmentReplayNavigationApp.close();
+}
+
 const attachmentLifecycleScene = {
   frame: "attachment-ready",
   id: "attachment-lifecycle-interaction",
@@ -7262,11 +7304,38 @@ try {
     completed.messageAttachmentLabels.some(
       (label) => label !== "codex-ui-kit-current.png",
     ) ||
-    completed.messageText !== "" ||
+    completed.messageText !== null ||
     completed.permissionLabel !== "Ask for approval"
   ) {
     throw new Error(
       `Attachment lifecycle completion failed: ${JSON.stringify(completed)}`,
+    );
+  }
+  await attachmentLifecyclePage
+    .getByRole("button", { name: "Previous" })
+    .click();
+  await attachmentLifecyclePage.waitForFunction(
+    () =>
+      document
+        .querySelector(
+          '[data-item-id="user-attachment-lifecycle"] .codex-ui-agent-message__content',
+        )
+        ?.textContent?.startsWith("Reply using three") === true,
+  );
+  const scrubbed = await attachmentLifecyclePage.evaluate(() => ({
+    composerAttachmentCount: document.querySelectorAll(
+      ".codex-ui-composer .codex-ui-composer-attachment",
+    ).length,
+    messageAttachmentCount: document.querySelectorAll(
+      ".codex-ui-agent-message__attachments .codex-ui-message-attachment",
+    ).length,
+  }));
+  if (
+    scrubbed.composerAttachmentCount !== 0 ||
+    scrubbed.messageAttachmentCount !== 1
+  ) {
+    throw new Error(
+      `Replay scrubbing retained submitted attachment state: ${JSON.stringify(scrubbed)}`,
     );
   }
 } finally {
