@@ -3694,6 +3694,12 @@ for (const alternateDecision of ["Allow once", "Deny"]) {
         frame: document
           .querySelector(".demo-root")
           ?.getAttribute("data-frame"),
+        liveErrorCount: document.querySelectorAll(
+          '.codex-ui-status-banner[data-tone="error"]',
+        ).length,
+        mode: document
+          .querySelector(".demo-root")
+          ?.getAttribute("data-mode"),
         secondCompletionCount: Array.from(
           document.querySelectorAll(
             '.codex-ui-agent-message[data-role="assistant"]',
@@ -3711,6 +3717,8 @@ for (const alternateDecision of ["Allow once", "Deny"]) {
       if (
         oneTime.composerValue !== secondPrompt ||
         oneTime.frame !== "approval-current-session-first-completed" ||
+        oneTime.liveErrorCount !== 0 ||
+        oneTime.mode !== "replay" ||
         oneTime.secondCompletionCount !== 0 ||
         oneTime.secondPathCount !== 0
       ) {

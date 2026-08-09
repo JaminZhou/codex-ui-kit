@@ -2226,9 +2226,9 @@ export function App() {
     }
     if (
       isCurrentApprovalSessionReplay &&
-      activeFrame === "approval-current-session-first-completed" &&
-      replaySessionApprovalScope === "session"
+      activeFrame === "approval-current-session-first-completed"
     ) {
+      if (replaySessionApprovalScope !== "session") return;
       cancelReplaySubmitTimer();
       setReplayComposerSubmitting(true);
       setComposerOverlay(null);
