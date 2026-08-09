@@ -3751,6 +3751,16 @@ export function App() {
                 void selectFilesAndFolders();
                 return;
               }
+              if (
+                isCurrentAttachmentReplay &&
+                (option.id === "goal" || option.id === "plan")
+              ) {
+                selectScenario(
+                  "conversation-lifecycle",
+                  `composer-${option.id}`,
+                );
+                return;
+              }
               if (option.id === "goal" || option.id === "plan") {
                 setComposerMode(option.id);
                 setComposerValue("");

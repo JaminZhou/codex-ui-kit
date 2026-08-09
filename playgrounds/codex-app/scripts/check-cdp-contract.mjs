@@ -6954,6 +6954,64 @@ try {
   await attachmentModeApp.close();
 }
 
+for (const attachmentComposerMode of [
+  {
+    frame: "composer-goal",
+    id: "attachment-to-goal-mode-interaction",
+    label: "Goal",
+    mode: "goal",
+    textareaLabel:
+      "Describe your goal, define measurable outcomes for best results",
+  },
+  {
+    frame: "composer-plan",
+    id: "attachment-to-plan-mode-interaction",
+    label: "Plan mode",
+    mode: "plan",
+    textareaLabel: "Describe your task to generate a plan...",
+  },
+]) {
+  const { app, page } = await launchScene(
+    {
+      frame: "attachment-ready",
+      id: attachmentComposerMode.id,
+      scenario: "attachment-lifecycle",
+    },
+    { capture: false },
+  );
+  try {
+    await page.getByRole("button", { name: "Add files and more" }).click();
+    await page
+      .getByRole("option", { name: attachmentComposerMode.label })
+      .click();
+    await page.waitForSelector(
+      `.demo-root[data-scenario="conversation-lifecycle"][data-frame="${attachmentComposerMode.frame}"][data-composer-mode="${attachmentComposerMode.mode}"]`,
+    );
+    const transitionedMode = await page.evaluate(() => ({
+      attachmentCount: document.querySelectorAll(
+        ".codex-ui-composer .codex-ui-composer-attachment",
+      ).length,
+      submitDisabled: document
+        .querySelector('.codex-ui-composer [data-action="submit"]')
+        ?.hasAttribute("disabled"),
+      textareaLabel: document
+        .querySelector(".codex-ui-composer textarea")
+        ?.getAttribute("aria-label"),
+    }));
+    if (
+      transitionedMode.attachmentCount !== 0 ||
+      transitionedMode.submitDisabled !== true ||
+      transitionedMode.textareaLabel !== attachmentComposerMode.textareaLabel
+    ) {
+      throw new Error(
+        `${attachmentComposerMode.id} retained attachment submission state: ${JSON.stringify(transitionedMode)}`,
+      );
+    }
+  } finally {
+    await app.close();
+  }
+}
+
 const attachmentLifecycleScene = {
   frame: "attachment-ready",
   id: "attachment-lifecycle-interaction",
