@@ -44,6 +44,9 @@ describe("composer visual contract", () => {
     expect(styles).toContain(
       ".codex-ui-composer-attachment__progress",
     );
+    expect(styles).toMatch(
+      /\.codex-ui-composer-attachment\[data-layout="image"\][\s\S]*?> \.codex-ui-composer-attachment__progress \{[\s\S]*?left: 0\.5rem;[\s\S]*?right: 0\.5rem;/,
+    );
     expect(styles).toContain(
       ".codex-ui-composer-attachment__retry:focus-visible",
     );

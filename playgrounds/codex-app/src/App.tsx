@@ -2332,17 +2332,13 @@ export function App() {
     requestAnimationFrame(() => composerInputRef.current?.focus());
   };
 
+  const attachmentSubmissionReady =
+    composerAttachments.length > 0 &&
+    composerAttachments.every(({ status }) => status === "ready");
+
   const submitComposer = (prompt: string) => {
     if (isCurrentAttachmentReplay) {
-      if (
-        ![
-          "attachment-multi-ready",
-          "attachment-native-ready",
-          "attachment-ready",
-        ].includes(activeFrame ?? "")
-      ) {
-        return;
-      }
+      if (!attachmentSubmissionReady) return;
       cancelReplaySubmitTimer();
       setReplayComposerSubmitting(true);
       setComposerOverlay(null);
@@ -3619,7 +3615,7 @@ export function App() {
           </span>
         ) : undefined
       }
-      allowAttachmentOnlySubmit={composerAttachments.length > 0}
+      allowAttachmentOnlySubmit={attachmentSubmissionReady}
       allowSubmitWhileRunning={showLifecycleComposer}
       aria-busy={composerIsDisabled || undefined}
       attachments={composerAttachmentNodes}
@@ -3666,9 +3662,9 @@ export function App() {
                 : "Switch to Live to send a real local turn…"
       }
       stopLabel="Stop"
-      submitDisabled={composerAttachments.some(
-        ({ status }) => status !== "ready",
-      )}
+      submitDisabled={
+        composerAttachments.length > 0 && !attachmentSubmissionReady
+      }
       submitLabel={
         isCurrentCommandInterruptionReplay ||
         isCurrentContextCompactionReplay

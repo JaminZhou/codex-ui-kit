@@ -7423,6 +7423,12 @@ summary.codex-ui-activity__header::after {
   right: 2rem;
 }
 
+.codex-ui-composer-attachment[data-layout="image"]
+  > .codex-ui-composer-attachment__progress {
+  left: 0.5rem;
+  right: 0.5rem;
+}
+
 .codex-ui-composer-attachment__progress > span {
   background: var(--codex-ui-text);
   display: block;

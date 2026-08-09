@@ -3664,6 +3664,29 @@ for (const scene of visualScenes) {
             ".codex-ui-composer .codex-ui-composer-attachment",
           ),
         );
+        const uploadingAttachment = attachments.find(
+          (attachment) => attachment.getAttribute("data-status") === "uploading",
+        );
+        const progress = uploadingAttachment?.querySelector(
+          ".codex-ui-composer-attachment__progress",
+        );
+        let imageProgressGeometry = null;
+        if (uploadingAttachment && progress) {
+          const originalLayout = uploadingAttachment.getAttribute("data-layout");
+          uploadingAttachment.setAttribute("data-layout", "image");
+          const attachmentRect = uploadingAttachment.getBoundingClientRect();
+          const progressRect = progress.getBoundingClientRect();
+          imageProgressGeometry = {
+            leftInset: progressRect.left - attachmentRect.left,
+            rightInset: attachmentRect.right - progressRect.right,
+            width: progressRect.width,
+          };
+          if (originalLayout) {
+            uploadingAttachment.setAttribute("data-layout", originalLayout);
+          } else {
+            uploadingAttachment.removeAttribute("data-layout");
+          }
+        }
         return {
           attachmentCount: attachments.length,
           cardHeights: attachments
@@ -3680,6 +3703,7 @@ for (const scene of visualScenes) {
               const rect = icon.getBoundingClientRect();
               return { height: rect.height, width: rect.width };
             }),
+          imageProgressGeometry,
           overflow: tray ? tray.scrollWidth - tray.clientWidth : null,
           phase: document
             .querySelector(".demo-root")
@@ -3747,6 +3771,10 @@ for (const scene of visualScenes) {
         (scene.id === "attachment-uploading" &&
           (variant.progress !== "62" ||
             variant.accessibleProgressCount !== 1 ||
+            !variant.imageProgressGeometry ||
+            Math.abs(variant.imageProgressGeometry.leftInset - 8) > 1 ||
+            Math.abs(variant.imageProgressGeometry.rightInset - 8) > 1 ||
+            variant.imageProgressGeometry.width < 48 ||
             !variant.statusText.includes("Uploading…"))) ||
         (scene.id === "attachment-upload-error" &&
           (variant.retryCount !== 1 ||
@@ -6945,6 +6973,60 @@ try {
   }
 } finally {
   await attachmentLifecycleApp.close();
+}
+
+const attachmentCompactScene = {
+  frame: "attachment-multi-compact",
+  id: "attachment-compact-submit-interaction",
+  scenario: "attachment-lifecycle",
+};
+const {
+  app: attachmentCompactApp,
+  page: attachmentCompactPage,
+} = await launchScene(attachmentCompactScene, { capture: false });
+try {
+  const compactSubmit = attachmentCompactPage.getByRole("button", {
+    name: "Send message",
+  });
+  if (!(await compactSubmit.isEnabled())) {
+    throw new Error("Ready compact attachments did not enable submission.");
+  }
+  await compactSubmit.click();
+  await attachmentCompactPage.waitForSelector(
+    '.demo-root[data-frame="attachment-completed"][data-composer-phase="idle"]',
+  );
+} finally {
+  await attachmentCompactApp.close();
+}
+
+const attachmentRemoveErrorScene = {
+  frame: "attachment-upload-error",
+  id: "attachment-remove-error-interaction",
+  scenario: "attachment-lifecycle",
+};
+const {
+  app: attachmentRemoveErrorApp,
+  page: attachmentRemoveErrorPage,
+} = await launchScene(attachmentRemoveErrorScene, { capture: false });
+try {
+  await attachmentRemoveErrorPage
+    .getByRole("button", { name: "Remove current-build.zip" })
+    .click();
+  const recoveredSubmit = attachmentRemoveErrorPage.getByRole("button", {
+    name: "Send message",
+  });
+  await recoveredSubmit.waitFor();
+  if (!(await recoveredSubmit.isEnabled())) {
+    throw new Error(
+      "Removing the final failed attachment did not enable ready attachments.",
+    );
+  }
+  await recoveredSubmit.click();
+  await attachmentRemoveErrorPage.waitForSelector(
+    '.demo-root[data-frame="attachment-completed"][data-composer-phase="idle"]',
+  );
+} finally {
+  await attachmentRemoveErrorApp.close();
 }
 
 const attachmentRecoveryScene = {
