@@ -5930,6 +5930,7 @@ try {
       surface: previewSurface
         ? {
             borderRadius: surfaceStyle.borderRadius,
+            maxHeight: surfaceStyle.maxHeight,
             maxWidth: surfaceStyle.maxWidth,
             overflowX: surfaceStyle.overflowX,
             padding: surfaceStyle.padding,
@@ -5942,6 +5943,40 @@ try {
   });
   const previewSurface = previewDialog.locator(
     ".codex-ui-markdown-table-preview__surface",
+  );
+  const tallPreview = await previewSurface.evaluate((surface) => {
+    const body = surface.parentElement;
+    const tbody = surface.querySelector("tbody");
+    const row = tbody?.lastElementChild;
+    if (tbody && row) {
+      for (let index = 0; index < 16; index += 1) {
+        tbody.append(row.cloneNode(true));
+      }
+    }
+    const bodyStyle = body ? getComputedStyle(body) : null;
+    const surfaceStyle = getComputedStyle(surface);
+    return {
+      bodyClientHeight: body?.clientHeight ?? 0,
+      bodyOverflowY: bodyStyle?.overflowY,
+      bodyPointerEvents: bodyStyle?.pointerEvents,
+      bodyScrollHeight: body?.scrollHeight ?? 0,
+      surfaceClientHeight: surface.clientHeight,
+      surfaceMaxHeight: surfaceStyle.maxHeight,
+      surfaceOverflowY: surfaceStyle.overflowY,
+      surfacePointerEvents: surfaceStyle.pointerEvents,
+      surfaceScrollHeight: surface.scrollHeight,
+    };
+  });
+  await previewSurface.hover();
+  await markdownTableActionsPage.mouse.wheel(0, 480);
+  await markdownTableActionsPage.waitForFunction(
+    () =>
+      (document.querySelector(
+        ".codex-ui-markdown-table-preview__surface",
+      )?.scrollTop ?? 0) > 0,
+  );
+  const tallPreviewScrollTop = await previewSurface.evaluate(
+    (surface) => surface.scrollTop,
   );
   await previewDialog
     .getByRole("button", { name: "Close table preview" })
@@ -6076,12 +6111,21 @@ try {
     preview.dialog?.height !== 820 ||
     !preview.surface ||
     preview.surface.borderRadius !== "20px" ||
+    preview.surface.maxHeight !== "100%" ||
     preview.surface.maxWidth !== "80%" ||
     preview.surface.overflowX !== "auto" ||
     preview.surface.padding !== "32px" ||
     preview.surface.tabIndex !== 0 ||
     !previewKeyboard.active ||
     previewKeyboard.scrollLeft <= 0 ||
+    tallPreview.bodyPointerEvents !== "none" ||
+    tallPreview.bodyOverflowY !== "auto" ||
+    tallPreview.bodyScrollHeight - tallPreview.bodyClientHeight > 1 ||
+    tallPreview.surfaceMaxHeight !== "100%" ||
+    tallPreview.surfaceOverflowY !== "auto" ||
+    tallPreview.surfacePointerEvents !== "auto" ||
+    tallPreview.surfaceScrollHeight <= tallPreview.surfaceClientHeight ||
+    tallPreviewScrollTop <= 0 ||
     !splitPane.conversation ||
     splitPane.conversation.width >= 53 * 16 ||
     splitPane.actions?.opacity !== "1" ||
@@ -6121,12 +6165,12 @@ try {
     narrowReturnedFocus !== "Expand table"
   ) {
     throw new Error(
-      `markdown-table-actions: current-build contract failed: ${JSON.stringify({ clipboard, hovered, narrow, narrowReturnedFocus, preview, previewKeyboard, resting, returnedFocus, splitPane })}`,
+      `markdown-table-actions: current-build contract failed: ${JSON.stringify({ clipboard, hovered, narrow, narrowReturnedFocus, preview, previewKeyboard, resting, returnedFocus, splitPane, tallPreview, tallPreviewScrollTop })}`,
     );
   }
   await writeFile(
     join(artifactDirectory, "markdown-table-actions.json"),
-    `${JSON.stringify({ clipboard, hovered, narrow, narrowReturnedFocus, preview, previewKeyboard, resting, returnedFocus, splitPane }, null, 2)}\n`,
+    `${JSON.stringify({ clipboard, hovered, narrow, narrowReturnedFocus, preview, previewKeyboard, resting, returnedFocus, splitPane, tallPreview, tallPreviewScrollTop }, null, 2)}\n`,
   );
 } finally {
   await markdownTableActionsApp.close();

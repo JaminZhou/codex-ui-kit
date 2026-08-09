@@ -1328,6 +1328,41 @@ try {
   const previewClose = previewDialog.getByRole("button", {
     name: "Close table preview",
   });
+  const previewSurface = previewDialog.locator(
+    ".codex-ui-markdown-table-preview__surface",
+  );
+  const tallPreview = await previewSurface.evaluate((surface) => {
+    const body = surface.parentElement;
+    const tbody = surface.querySelector("tbody");
+    const row = tbody?.lastElementChild;
+    if (tbody && row) {
+      for (let index = 0; index < 16; index += 1) {
+        tbody.append(row.cloneNode(true));
+      }
+    }
+    const bodyStyle = body ? getComputedStyle(body) : null;
+    const surfaceStyle = getComputedStyle(surface);
+    return {
+      bodyClientHeight: body?.clientHeight ?? 0,
+      bodyPointerEvents: bodyStyle?.pointerEvents,
+      bodyScrollHeight: body?.scrollHeight ?? 0,
+      surfaceClientHeight: surface.clientHeight,
+      surfaceOverflowY: surfaceStyle.overflowY,
+      surfacePointerEvents: surfaceStyle.pointerEvents,
+      surfaceScrollHeight: surface.scrollHeight,
+    };
+  });
+  await previewSurface.hover();
+  await markdownTableActionsPage.mouse.wheel(0, 480);
+  await markdownTableActionsPage.waitForFunction(
+    () =>
+      (document.querySelector(
+        ".codex-ui-markdown-table-preview__surface",
+      )?.scrollTop ?? 0) > 0,
+  );
+  const tallPreviewScrollTop = await previewSurface.evaluate(
+    (surface) => surface.scrollTop,
+  );
   await previewClose.press("Tab");
   await markdownTableActionsPage.waitForFunction(
     () =>
@@ -1492,6 +1527,12 @@ try {
     !previewKeyboard.active ||
     previewKeyboard.scrollLeft <= 0 ||
     previewKeyboard.tabIndex !== 0 ||
+    tallPreview.bodyPointerEvents !== "none" ||
+    tallPreview.bodyScrollHeight - tallPreview.bodyClientHeight > 1 ||
+    tallPreview.surfaceOverflowY !== "auto" ||
+    tallPreview.surfacePointerEvents !== "auto" ||
+    tallPreview.surfaceScrollHeight <= tallPreview.surfaceClientHeight ||
+    tallPreviewScrollTop <= 0 ||
     openState.clipboard?.["text/plain"]?.length !== 1_863 ||
     !openState.clipboard?.["text/html"]?.startsWith("<table>") ||
     returnedFocus !== "Expand table" ||
@@ -1529,7 +1570,7 @@ try {
     narrowReturnedFocus !== "Expand table"
   ) {
     throw new Error(
-      `Electron table actions interaction failed: ${JSON.stringify({ narrowReturnedFocus, narrowState, openState, previewKeyboard, returnedFocus, splitPaneState })}`,
+      `Electron table actions interaction failed: ${JSON.stringify({ narrowReturnedFocus, narrowState, openState, previewKeyboard, returnedFocus, splitPaneState, tallPreview, tallPreviewScrollTop })}`,
     );
   }
 } finally {

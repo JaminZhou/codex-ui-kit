@@ -88,6 +88,7 @@ describe("Markdown visual contract", () => {
     expect(styles).toContain("background: var(--codex-ui-background-thread-summary)");
     expect(styles).toContain("border-radius: 1.25rem");
     expect(styles).toContain("flex: 0 0 80%");
+    expect(styles).toContain("max-height: 100%");
     expect(styles).toContain("padding: 2rem");
   });
 

@@ -8727,6 +8727,7 @@ summary.codex-ui-activity__header::after {
   box-shadow: 0 1rem 2rem -0.5rem rgb(0 0 0 / 0.19);
   flex: 0 0 80%;
   margin: auto;
+  max-height: 100%;
   max-width: 80%;
   overflow: auto;
   padding: 2rem;
