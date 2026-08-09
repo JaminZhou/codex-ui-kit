@@ -23,6 +23,16 @@ describe("live approval gate", () => {
     await expect(second).resolves.toEqual({ decision: "accept" });
   });
 
+  it("preserves a session-scoped approval decision", async () => {
+    const gate = new LiveApprovalGate();
+    const request = gate.request("file-session");
+
+    expect(gate.resolve("file-session", "acceptForSession")).toBe(true);
+    await expect(request).resolves.toEqual({
+      decision: "acceptForSession",
+    });
+  });
+
   it("declines every pending request on shutdown", async () => {
     const gate = new LiveApprovalGate();
     const first = gate.request("first");

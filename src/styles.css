@@ -34,6 +34,8 @@
 .codex-ui-composer *,
 .codex-ui-approval-request,
 .codex-ui-approval-request *,
+.codex-ui-auto-review,
+.codex-ui-auto-review *,
 .codex-ui-approval-request__options-menu,
 .codex-ui-approval-request__options-menu *,
 .codex-ui-command-output,
@@ -6584,6 +6586,80 @@ summary.codex-ui-activity__header::after {
   opacity: 0.35;
 }
 
+.codex-ui-auto-review {
+  align-items: flex-start;
+  color: var(--codex-ui-text);
+  display: grid;
+  font-family: var(--codex-ui-font-sans);
+  gap: 0.625rem;
+  grid-template-columns: 1rem minmax(0, 1fr);
+  min-width: 0;
+  padding: 0.25rem 0;
+}
+
+.codex-ui-auto-review__icon {
+  align-items: center;
+  color: var(--codex-ui-text-tertiary);
+  display: inline-flex;
+  height: 1.25rem;
+  justify-content: center;
+  width: 1rem;
+}
+
+.codex-ui-auto-review__icon svg {
+  fill: none;
+  height: 1rem;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.35;
+  width: 1rem;
+}
+
+.codex-ui-auto-review__spinner {
+  animation: codex-ui-approval-spin 800ms linear infinite;
+  border: 1.5px solid currentColor;
+  border-right-color: transparent;
+  border-radius: var(--codex-ui-radius-full);
+  height: 0.75rem;
+  width: 0.75rem;
+}
+
+.codex-ui-auto-review__main {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+  min-width: 0;
+}
+
+.codex-ui-auto-review__title {
+  font-size: var(--codex-ui-font-size-sm);
+  font-weight: var(--codex-ui-font-weight-medium);
+  line-height: 1.25rem;
+}
+
+.codex-ui-auto-review__action,
+.codex-ui-auto-review__summary,
+.codex-ui-auto-review__rationale {
+  color: var(--codex-ui-text-tertiary);
+  font-size: var(--codex-ui-font-size-sm);
+  line-height: 1.25rem;
+  overflow-wrap: anywhere;
+}
+
+.codex-ui-auto-review[data-status="approved"] .codex-ui-auto-review__icon {
+  color: var(--codex-ui-success);
+}
+
+.codex-ui-auto-review[data-status="denied"] .codex-ui-auto-review__icon,
+.codex-ui-auto-review[data-status="timedOut"] .codex-ui-auto-review__icon {
+  color: var(--codex-ui-danger);
+}
+
+.codex-ui-auto-review[data-status="aborted"] .codex-ui-auto-review__icon {
+  color: var(--codex-ui-warning);
+}
+
 .codex-ui-approval-request__split {
   display: inline-flex;
   position: relative;
@@ -9709,6 +9785,7 @@ button.codex-ui-generated-image-gallery__image {
   .codex-ui-subagent-panel__preview[data-placeholder],
   .codex-ui-subagent-activity-group__chip[data-animate-entrance],
   .codex-ui-approval-request__spinner,
+  .codex-ui-auto-review__spinner,
   .codex-ui-inline-notice__message[data-shimmering],
   .codex-ui-composer-mention-menu__spinner,
   .codex-ui-notice-action__spinner,

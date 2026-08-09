@@ -14,6 +14,7 @@ import {
   AppSidebarSection,
   AppWindowChrome,
   ApprovalRequest,
+  AutomaticApprovalReview,
   Button,
   CommandExecution,
   CommandOutput,
@@ -103,6 +104,7 @@ import {
   messageAttachmentPreviewSource,
   reduceProtocolNotification,
   settleApprovedCommandReplay,
+  settleRejectedFileReplay,
   subagentTimelinePresentation,
   terminalTranscriptEvents,
   type DemoProtocolState,
@@ -1396,6 +1398,14 @@ export function App() {
       decision: "approved" | "rejected";
       requestId: number | string;
     } | null>(null);
+  const [replaySessionApprovalScope, setReplaySessionApprovalScope] = useState<
+    "once" | "session" | null
+  >(
+    initialSelection.scenarioId === "approval-for-session" &&
+      initialSelection.frame !== "approval-current-session-pending"
+      ? "session"
+      : null,
+  );
   const [workspaceRunCwd, setWorkspaceRunCwd] = useState(
     "/workspace/codex-ui-kit",
   );
@@ -1602,20 +1612,32 @@ export function App() {
             kind: "approval-resolution",
           })
         : lifecycleReplay;
-      return scenarioId === "approval-denied" &&
+      if (
+        scenarioId === "approval-denied" &&
         replayApprovalResolution?.decision === "approved"
-        ? settleApprovedCommandReplay(
-            resolvedReplay,
-            replayApprovalResolution.requestId,
-            {
-              durationMs: 23_000,
-              messageId: "assistant-approval-approved",
-              messageText:
-                "Approval was granted, and the command completed successfully.",
-              replacedMessageId: "assistant-approval-denied",
-            },
-          )
-        : resolvedReplay;
+      ) {
+        return settleApprovedCommandReplay(
+          resolvedReplay,
+          replayApprovalResolution.requestId,
+          {
+            durationMs: 23_000,
+            messageId: "assistant-approval-approved",
+            messageText:
+              "Approval was granted, and the command completed successfully.",
+            replacedMessageId: "assistant-approval-denied",
+          },
+        );
+      }
+      if (
+        scenarioId === "approval-for-session" &&
+        replayApprovalResolution?.decision === "rejected"
+      ) {
+        return settleRejectedFileReplay(
+          resolvedReplay,
+          replayApprovalResolution.requestId,
+        );
+      }
+      return resolvedReplay;
     },
     [
       lifecycleReplay,
@@ -1628,9 +1650,14 @@ export function App() {
     mode === "replay" &&
     (scenarioId === "approval-allow-once" ||
       scenarioId === "approval-denied" ||
-      scenarioId === "approval-similar-commands");
+      scenarioId === "approval-similar-commands" ||
+      scenarioId === "approval-for-session");
   const isCurrentApprovalSimilarReplay =
     mode === "replay" && scenarioId === "approval-similar-commands";
+  const isCurrentApprovalSessionReplay =
+    mode === "replay" && scenarioId === "approval-for-session";
+  const isCurrentAutomaticReviewReplay =
+    mode === "replay" && scenarioId === "approval-review-timeout";
   const isCurrentAttachmentReplay =
     mode === "replay" && scenarioId === "attachment-lifecycle";
   const isCurrentLongCommandReplay =
@@ -1755,12 +1782,27 @@ export function App() {
 
   const selectReplayPosition = (nextCount: number) => {
     cancelReplaySubmitTimer();
-    setActiveFrame(null);
+    const replaySessionFrame =
+      scenarioId === "approval-for-session"
+        ? (Object.entries(scenario.frames).find(
+            ([, frameCount]) => frameCount === nextCount,
+          )?.[0] ?? null)
+        : null;
+    const replaySessionFirstCompletedCount =
+      scenario.frames["approval-current-session-first-completed"];
+    setActiveFrame(replaySessionFrame);
     setComposerOverlay(null);
     setReplayComposerSubmitting(false);
     setReplayComposerStopped(false);
     setReplayQueuedContinuation(null);
     setReplayApprovalResolution(null);
+    setReplaySessionApprovalScope(
+      scenarioId === "approval-for-session" &&
+        replaySessionFirstCompletedCount !== undefined &&
+        nextCount >= replaySessionFirstCompletedCount
+        ? "session"
+        : null,
+    );
     setThreadSummaryOpen(false);
     setQueueInterrupted(false);
     if (!isTurnActive(replayState(scenarioEvents, nextCount).status)) {
@@ -1795,6 +1837,7 @@ export function App() {
     setComposerValue("");
     setComposerOverlay(null);
     setReplayApprovalResolution(null);
+    setReplaySessionApprovalScope(null);
     setActiveFrame("workspace-ready");
     setReviewOpen(false);
     setSubagentPanelOpen(false);
@@ -1860,6 +1903,12 @@ export function App() {
     setReplayComposerStopped(false);
     setReplayQueuedContinuation(initialQueuedContinuation(frame));
     setReplayApprovalResolution(null);
+    setReplaySessionApprovalScope(
+      nextId === "approval-for-session" &&
+        frame !== "approval-current-session-pending"
+        ? "session"
+        : null,
+    );
     setThreadSummaryOpen(
       (nextId === "context-summary" && frame === "context-summary-open") ||
         (isSubagentScenarioId(nextId) && currentSubagentSummaryFrame(frame)),
@@ -1933,6 +1982,7 @@ export function App() {
     setReplayComposerStopped(false);
     setReplayQueuedContinuation(null);
     setReplayApprovalResolution(null);
+    setReplaySessionApprovalScope(null);
     setThreadSummaryOpen(false);
     setSubagentPanelOpen(false);
     setActiveConversationSidePanel("review");
@@ -1949,11 +1999,52 @@ export function App() {
 
   const respondToApproval = async (
     requestId: number | string,
-    decision: "accept" | "decline",
+    decision: "accept" | "acceptForSession" | "decline",
     scope: "once" | "similar" = "once",
   ) => {
     if (mode === "replay") {
       if (isCurrentApprovalReplay) {
+        if (
+          scenarioId === "approval-for-session" &&
+          decision === "acceptForSession"
+        ) {
+          setReplaySessionApprovalScope("session");
+          setReplayApprovalResolution(null);
+          setReplayCount(
+            scenario.frames["approval-current-session-first-completed"] ??
+              scenario.events.length,
+          );
+          setActiveFrame("approval-current-session-first-completed");
+          requestAnimationFrame(() => composerInputRef.current?.focus());
+          return;
+        }
+        if (
+          scenarioId === "approval-for-session" &&
+          decision === "accept"
+        ) {
+          setReplaySessionApprovalScope("once");
+          setReplayApprovalResolution(null);
+          setReplayCount(
+            scenario.frames["approval-current-session-first-completed"] ??
+              scenario.events.length,
+          );
+          setActiveFrame("approval-current-session-first-completed");
+          requestAnimationFrame(() => composerInputRef.current?.focus());
+          return;
+        }
+        if (
+          scenarioId === "approval-for-session" &&
+          decision === "decline"
+        ) {
+          setReplaySessionApprovalScope(null);
+          setReplayApprovalResolution({
+            decision: "rejected",
+            requestId,
+          });
+          setActiveFrame("approval-current-session-denied");
+          requestAnimationFrame(() => composerInputRef.current?.focus());
+          return;
+        }
         if (decision === "accept" && scope === "similar") {
           if (scenarioId !== "approval-similar-commands") {
             selectScenario(
@@ -2012,7 +2103,7 @@ export function App() {
         }
         return;
       }
-      if (decision === "accept") {
+      if (decision === "accept" || decision === "acceptForSession") {
         setReplayApprovalResolution(null);
         setReplayCount(scenario.events.length);
         setActiveFrame(null);
@@ -2030,9 +2121,10 @@ export function App() {
     try {
       await window.codexDemo?.respondToApproval({ decision, requestId });
       dispatchLive({
-        decision: decision === "accept" ? "approved" : "rejected",
+        decision: decision === "decline" ? "rejected" : "approved",
         kind: "approval-resolution",
         requestId,
+        responseDecision: decision,
       });
     } catch (error) {
       submissionGate.finish(requestId);
@@ -2153,6 +2245,26 @@ export function App() {
         replaySubmitTimerRef.current = null;
         setReplayCount(scenario.events.length);
         setActiveFrame("approval-current-similar-repeated-completed");
+        setReplayComposerSubmitting(false);
+        setComposerValue((current) => (current === prompt ? "" : current));
+        requestAnimationFrame(() => composerInputRef.current?.focus());
+      }, 160);
+      return;
+    }
+    if (isCurrentApprovalSessionReplay) {
+      if (
+        activeFrame !== "approval-current-session-first-completed" ||
+        replaySessionApprovalScope !== "session"
+      ) {
+        return;
+      }
+      cancelReplaySubmitTimer();
+      setReplayComposerSubmitting(true);
+      setComposerOverlay(null);
+      replaySubmitTimerRef.current = window.setTimeout(() => {
+        replaySubmitTimerRef.current = null;
+        setReplayCount(scenario.events.length);
+        setActiveFrame("approval-current-session-repeated-completed");
         setReplayComposerSubmitting(false);
         setComposerValue((current) => (current === prompt ? "" : current));
         requestAnimationFrame(() => composerInputRef.current?.focus());
@@ -2897,6 +3009,7 @@ export function App() {
     (scenarioId === "mcp-tool-call" ||
       scenarioId === "mcp-recovery-mixed-thread" ||
       scenarioId === "attachment-lifecycle" ||
+      isCurrentAutomaticReviewReplay ||
       scenarioId === "long-command-output" ||
       scenarioId === "command-failure-recovery" ||
       scenarioId === "interruption" ||
@@ -2906,6 +3019,7 @@ export function App() {
       scenarioId === "current-review-rename");
   const usesCurrentAskPermission =
     isCurrentApprovalReplay ||
+    isCurrentAutomaticReviewReplay ||
     isCurrentAttachmentReplay ||
     isCurrentLongCommandReplay ||
     isCurrentCommandFailureReplay ||
@@ -3153,6 +3267,8 @@ export function App() {
       scenarioId === "approval-allow-once" ||
       scenarioId === "approval-denied" ||
       scenarioId === "approval-similar-commands" ||
+      scenarioId === "approval-for-session" ||
+      scenarioId === "approval-review-timeout" ||
       scenarioId === "long-command-output" ||
       scenarioId === "command-failure-recovery" ||
       scenarioId === "interruption" ||
@@ -3439,8 +3555,10 @@ export function App() {
       data-item-id={currentPendingApproval.itemId}
       data-testid="current-approval-request"
       description={currentPendingApproval.command}
-      identity="Terminal"
-      kind="command"
+      identity={
+        currentPendingApproval.kind === "file" ? "Edit files" : "Terminal"
+      }
+      kind={currentPendingApproval.kind}
       onApprove={() =>
         respondToApproval(currentPendingApproval.requestId, "accept")
       }
@@ -3449,16 +3567,28 @@ export function App() {
       }
       presentation="composer"
       scopedApproveAction={{
-        info: "Allow future commands that match this proposed rule",
-        label: "Allow similar commands",
+        info:
+          currentPendingApproval.kind === "file"
+            ? "Allow this and future file edits in this conversation without asking again"
+            : "Allow future commands that match this proposed rule",
+        label:
+          currentPendingApproval.kind === "file"
+            ? "Allow all edits"
+            : "Allow similar commands",
         onClick: () =>
           respondToApproval(
             currentPendingApproval.requestId,
-            "accept",
-            "similar",
+            currentPendingApproval.kind === "file"
+              ? "acceptForSession"
+              : "accept",
+            currentPendingApproval.kind === "file" ? "once" : "similar",
           ),
       }}
-      title="Allow opening the requested local application?"
+      title={
+        currentPendingApproval.kind === "file"
+          ? "Allow ChatGPT to edit the following file?"
+          : "Allow opening the requested local application?"
+      }
     />
   ) : (
     regularComposer
@@ -4894,6 +5024,23 @@ export function App() {
   const currentWindowEnd =
     currentWindowStart + currentWindowedTurnWindowSize;
   const timelineContent = state.timeline.map((entry, entryIndex) => {
+    if (entry.kind === "automaticApprovalReview") {
+      const review = state.automaticApprovalReviews.find(
+        ({ id }) => id === entry.id,
+      );
+      if (!review || review.status === "approved") return null;
+      return (
+        <AutomaticApprovalReview
+          action={review.actionLabel}
+          data-item-id={review.id}
+          data-testid="automatic-approval-review"
+          key={`automatic-approval-review:${review.id}`}
+          rationale={review.rationale}
+          riskLevel={review.riskLevel}
+          status={review.status}
+        />
+      );
+    }
     if (entry.kind === "message") {
       const message = state.messages.find(({ id }) => id === entry.id);
       if (!message) return null;
@@ -5666,6 +5813,19 @@ export function App() {
             respondToApproval(approval.requestId, "decline")
           }
           reason={approval.reason}
+          scopedApproveAction={
+            approval.kind === "file"
+              ? {
+                  info: "Allow this and future file edits in this conversation without asking again",
+                  label: "Allow all edits",
+                  onClick: () =>
+                    respondToApproval(
+                      approval.requestId,
+                      "acceptForSession",
+                    ),
+                }
+              : undefined
+          }
           title={
             approval.kind === "command"
               ? "Run this command?"

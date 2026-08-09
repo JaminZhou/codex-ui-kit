@@ -6,6 +6,7 @@ const artifactDirectory = join(process.cwd(), "artifacts", "cdp");
 await mkdir(artifactDirectory, { recursive: true });
 const currentReplayComposerScenarios = new Set([
   "attachment-lifecycle",
+  "approval-review-timeout",
   "command-failure-recovery",
   "compaction",
   "context-summary",
@@ -22,6 +23,7 @@ const currentApprovalComposerScenes = new Set([
   "approval-current-allow-once-completed",
   "approval-current-denied",
   "approval-current-similar-repeated-completed",
+  "approval-current-session-repeated-completed",
 ]);
 const currentReplayComposerContracts = [];
 
@@ -1638,6 +1640,7 @@ for (const scene of visualScenes) {
       const headerRect = rect(header);
       const namedSurfaceSelectors = {
         approval: ".codex-ui-approval-request",
+        automaticApprovalReview: ".codex-ui-auto-review",
         command: ".codex-ui-command-execution",
         fileChange: ".codex-ui-file-change-group",
         reviewPanel:
@@ -2737,6 +2740,192 @@ for (const scene of visualScenes) {
             `${scene.id}: repeated completion contract failed: ${JSON.stringify(repeatedContract)}`,
           );
         }
+      }
+    }
+    if (scene.scenario === "approval-for-session") {
+      const sessionApproval = await page.evaluate(() => ({
+        approvalCount: document.querySelectorAll(
+          '[data-testid="current-approval-request"]',
+        ).length,
+        assistantText:
+          Array.from(
+            document.querySelectorAll(
+              '.codex-ui-agent-message[data-role="assistant"]',
+            ),
+          )
+            .at(-1)
+            ?.textContent?.replace(/\s+/g, " ")
+            .trim() ?? null,
+        fileChangeCount: document.querySelectorAll(
+          ".codex-ui-file-change-group",
+        ).length,
+        identity:
+          document
+            .querySelector(".codex-ui-approval-request__identity")
+            ?.textContent?.replace(/\s+/g, " ")
+            .trim() ?? null,
+        permissionLabel:
+          document
+            .querySelector(".demo-composer-permission-trigger")
+            ?.textContent?.trim() ?? null,
+        title:
+          document
+            .querySelector(".codex-ui-approval-request__heading h3")
+            ?.textContent?.replace(/\s+/g, " ")
+            .trim() ?? null,
+      }));
+      if (scene.id === "approval-current-session-menu") {
+        if (
+          sessionApproval.approvalCount !== 1 ||
+          sessionApproval.identity !== "Edit files" ||
+          sessionApproval.title !==
+            "Allow ChatGPT to edit the following file?" ||
+          sessionApproval.fileChangeCount !== 1
+        ) {
+          throw new Error(
+            `${scene.id}: session file approval shell failed: ${JSON.stringify(sessionApproval)}`,
+          );
+        }
+        const approval = page.getByTestId("current-approval-request");
+        await approval
+          .getByRole("button", { name: "Approval options" })
+          .click();
+        const allowAllEdits = page
+          .locator(
+            '.codex-ui-approval-request__options-menu [role="menuitem"]',
+          )
+          .filter({ hasText: "Allow all edits" });
+        await allowAllEdits.waitFor();
+        const options = await page.evaluate(() => ({
+          infoCount: document.querySelectorAll(
+            '[aria-label="Allow this and future file edits in this conversation without asking again"]',
+          ).length,
+          labels: Array.from(
+            document.querySelectorAll(
+              '.codex-ui-approval-request__options-menu [role="menuitem"]',
+            ),
+            (element) =>
+              element.firstElementChild?.textContent
+                ?.replace(/\s+/g, " ")
+                .trim() ??
+              element.textContent?.replace(/\s+/g, " ").trim() ??
+              null,
+          ),
+        }));
+        if (
+          options.infoCount !== 1 ||
+          JSON.stringify(options.labels) !==
+            JSON.stringify(["Allow once", "Allow all edits"])
+        ) {
+          throw new Error(
+            `${scene.id}: session approval options failed: ${JSON.stringify(options)}`,
+          );
+        }
+        await allowAllEdits.click();
+        await page.waitForSelector(
+          '.demo-root[data-frame="approval-current-session-first-completed"]',
+        );
+        await page
+          .getByText("SESSION FILE APPROVAL FIRST COMPLETE.", {
+            exact: true,
+          })
+          .waitFor();
+        const secondPrompt =
+          "Apply the second edit under the same session approval.";
+        await page.getByLabel("Message composer").fill(secondPrompt);
+        await page.getByLabel("Message composer").press("Enter");
+        await page.waitForSelector(
+          '.demo-root[data-frame="approval-current-session-repeated-completed"]',
+        );
+        const repeated = await page.evaluate(() => ({
+          approvalCount: document.querySelectorAll(
+            '[data-testid="current-approval-request"]',
+          ).length,
+          fileChangeCount: document.querySelectorAll(
+            ".codex-ui-file-change-group",
+          ).length,
+          finalText:
+            Array.from(
+              document.querySelectorAll(
+                '.codex-ui-agent-message[data-role="assistant"]',
+              ),
+            )
+              .at(-1)
+              ?.textContent?.replace(/\s+/g, " ")
+              .trim() ?? null,
+          permissionLabel:
+            document
+              .querySelector(".demo-composer-permission-trigger")
+              ?.textContent?.trim() ?? null,
+        }));
+        if (
+          repeated.approvalCount !== 0 ||
+          repeated.fileChangeCount !== 2 ||
+          repeated.finalText !== "SESSION FILE APPROVAL SECOND COMPLETE." ||
+          repeated.permissionLabel !== "Ask for approval"
+        ) {
+          throw new Error(
+            `${scene.id}: session approval did not bypass the second prompt: ${JSON.stringify(repeated)}`,
+          );
+        }
+      }
+      if (
+        scene.id === "approval-current-session-repeated-completed" &&
+        (sessionApproval.approvalCount !== 0 ||
+          sessionApproval.fileChangeCount !== 2 ||
+          sessionApproval.assistantText !==
+            "SESSION FILE APPROVAL SECOND COMPLETE." ||
+          sessionApproval.permissionLabel !== "Ask for approval")
+      ) {
+        throw new Error(
+          `${scene.id}: session approval completion failed: ${JSON.stringify(sessionApproval)}`,
+        );
+      }
+    }
+    if (scene.scenario === "approval-review-timeout") {
+      const automaticReview = await page.evaluate(() => {
+        const review = document.querySelector(
+          '[data-testid="automatic-approval-review"]',
+        );
+        return review
+          ? {
+              action:
+                review
+                  .querySelector(".codex-ui-auto-review__action")
+                  ?.textContent?.trim() ?? null,
+              busy: review.getAttribute("aria-busy"),
+              role: review.getAttribute("role"),
+              status: review.getAttribute("data-status"),
+              summary:
+                review
+                  .querySelector(".codex-ui-auto-review__summary")
+                  ?.textContent?.trim() ?? null,
+              title:
+                review
+                  .querySelector(".codex-ui-auto-review__title")
+                  ?.textContent?.trim() ?? null,
+            }
+          : null;
+      });
+      const expectedRunning = scene.id === "approval-review-running";
+      if (
+        !automaticReview ||
+        automaticReview.action !==
+          "Network access to https://example.com/health" ||
+        automaticReview.status !==
+          (expectedRunning ? "inProgress" : "timedOut") ||
+        automaticReview.role !== (expectedRunning ? "status" : "alert") ||
+        automaticReview.busy !== (expectedRunning ? "true" : null) ||
+        automaticReview.title !==
+          (expectedRunning ? "Auto-reviewing" : "Auto-review timed out") ||
+        automaticReview.summary !==
+          (expectedRunning
+            ? null
+            : "A carefully prompted reviewer agent timed out before ChatGPT ran this request")
+      ) {
+        throw new Error(
+          `${scene.id}: automatic approval review contract failed: ${JSON.stringify(automaticReview)}`,
+        );
       }
     }
     if (scene.scenario === "conversation-lifecycle") {

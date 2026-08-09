@@ -1,4 +1,7 @@
-export type LiveApprovalDecision = "accept" | "decline";
+export type LiveApprovalDecision =
+  | "accept"
+  | "acceptForSession"
+  | "decline";
 export type LiveApprovalRequestId = number | string;
 
 function approvalKey(requestId: LiveApprovalRequestId) {

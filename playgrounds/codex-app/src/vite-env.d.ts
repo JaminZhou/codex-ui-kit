@@ -12,7 +12,7 @@ interface CodexDemoBridge {
     handler: (request: ProtocolEventRecord) => void,
   ): () => void;
   respondToApproval(input: {
-    decision: "accept" | "decline";
+    decision: "accept" | "acceptForSession" | "decline";
     requestId: number | string;
   }): Promise<void>;
   startLive(input: { prompt: string }): Promise<{

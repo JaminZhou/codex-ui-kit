@@ -25,6 +25,7 @@ export interface ProtocolApprovalResolution {
   decision: "approved" | "rejected";
   kind: "approval-resolution";
   requestId: number | string;
+  responseDecision?: DemoApprovalResponseDecision;
 }
 
 export interface DemoMessage {
@@ -117,11 +118,38 @@ export function terminalTranscriptEvents(
 export interface DemoApprovalRequest {
   command: string;
   decision: "approved" | "pending" | "rejected";
+  decisionScope?: "once" | "session" | "similar";
   itemId: string;
   kind: "command" | "file";
   reason: string | null;
   requestId: number | string;
-  responseDecision?: "approved" | "rejected";
+  responseDecision?: DemoApprovalResponseDecision;
+  turnId: string | null;
+}
+
+export type DemoApprovalResponseDecision =
+  | "accept"
+  | "acceptForSession"
+  | "acceptWithExecpolicyAmendment"
+  | "cancel"
+  | "decline";
+
+export type DemoAutomaticApprovalReviewStatus =
+  | "aborted"
+  | "approved"
+  | "denied"
+  | "inProgress"
+  | "timedOut";
+
+export interface DemoAutomaticApprovalReview {
+  actionLabel: string;
+  completedAtMs: number | null;
+  id: string;
+  rationale: string | null;
+  riskLevel: string | null;
+  startedAtMs: number;
+  status: DemoAutomaticApprovalReviewStatus;
+  targetItemId: string | null;
   turnId: string | null;
 }
 
@@ -191,6 +219,7 @@ export interface DemoTimelineEntry {
   id: string;
   kind:
     | "approval"
+    | "automaticApprovalReview"
     | "command"
     | "fileChange"
     | "mcpToolCall"
@@ -200,6 +229,7 @@ export interface DemoTimelineEntry {
 
 export interface DemoProtocolState {
   approvals: DemoApprovalRequest[];
+  automaticApprovalReviews: DemoAutomaticApprovalReview[];
   commands: DemoCommandExecution[];
   compaction: "idle" | "running" | "completed";
   currentTurnId: string | null;
@@ -228,6 +258,7 @@ export interface ApprovedCommandReplaySettlement {
 
 export const initialProtocolState: DemoProtocolState = {
   approvals: [],
+  automaticApprovalReviews: [],
   commands: [],
   compaction: "idle",
   currentTurnId: null,
@@ -307,6 +338,30 @@ export function settleApprovedCommandReplay(
     ),
     messages,
     timeline,
+  };
+}
+
+export function settleRejectedFileReplay(
+  state: DemoProtocolState,
+  requestId: number | string,
+): DemoProtocolState {
+  const approval = state.approvals.find(
+    (candidate) => candidate.requestId === requestId,
+  );
+  if (!approval || approval.kind !== "file") return state;
+
+  return {
+    ...state,
+    currentTurnId: null,
+    error: null,
+    fileChanges: state.fileChanges.map((fileChange) =>
+      fileChange.id === approval.itemId
+        ? { ...fileChange, status: "rejected" }
+        : fileChange,
+    ),
+    retrying: false,
+    status: "completed",
+    turnDurationMs: null,
   };
 }
 
@@ -581,13 +636,96 @@ function fileChangesFrom(value: unknown): DemoFileUpdateChange[] {
 
 function approvalResponseDecision(
   value: unknown,
-): "approved" | "rejected" | undefined {
+): DemoApprovalResponseDecision | undefined {
   if (!isRecord(value)) return undefined;
-  if (value.decision === "decline" || value.decision === "cancel") {
-    return "rejected";
+  const decision = value.decision;
+  if (
+    decision === "accept" ||
+    decision === "acceptForSession" ||
+    decision === "decline" ||
+    decision === "cancel"
+  ) {
+    return decision;
   }
-  if (value.decision !== undefined) return "approved";
+  if (
+    isRecord(decision) &&
+    isRecord(decision.acceptWithExecpolicyAmendment)
+  ) {
+    return "acceptWithExecpolicyAmendment";
+  }
   return undefined;
+}
+
+function approvalDecision(
+  responseDecision: DemoApprovalResponseDecision | undefined,
+): "approved" | "rejected" | undefined {
+  if (!responseDecision) return undefined;
+  return responseDecision === "decline" || responseDecision === "cancel"
+    ? "rejected"
+    : "approved";
+}
+
+function approvalDecisionScope(
+  responseDecision: DemoApprovalResponseDecision | undefined,
+): DemoApprovalRequest["decisionScope"] {
+  if (responseDecision === "accept") return "once";
+  if (responseDecision === "acceptForSession") return "session";
+  if (responseDecision === "acceptWithExecpolicyAmendment") return "similar";
+  return undefined;
+}
+
+function automaticApprovalReviewStatus(
+  value: unknown,
+): DemoAutomaticApprovalReviewStatus {
+  if (
+    value === "approved" ||
+    value === "denied" ||
+    value === "timedOut" ||
+    value === "aborted"
+  ) {
+    return value;
+  }
+  return "inProgress";
+}
+
+export function automaticApprovalReviewActionLabel(value: unknown): string {
+  if (!isRecord(value)) return "Reviewing request";
+  if (value.type === "command") {
+    return asString(value.command) ?? "Reviewing command";
+  }
+  if (value.type === "execve") {
+    const program = asString(value.program) ?? "command";
+    const argv = Array.isArray(value.argv)
+      ? value.argv.flatMap((entry) => {
+          const argument = asString(entry);
+          return argument ? [argument] : [];
+        })
+      : [];
+    return [program, ...argv].join(" ");
+  }
+  if (value.type === "applyPatch") {
+    const files = Array.isArray(value.files)
+      ? value.files.flatMap((entry) => {
+          const file = asString(entry);
+          return file ? [file] : [];
+        })
+      : [];
+    if (files.length === 1) return `Editing ${files[0]}`;
+    if (files.length > 1) return `Editing ${files.length} files`;
+    return "Editing files";
+  }
+  if (value.type === "networkAccess") {
+    return `Network access to ${asString(value.target) ?? asString(value.host) ?? "requested host"}`;
+  }
+  if (value.type === "mcpToolCall") {
+    const connector =
+      asString(value.connectorName) ?? asString(value.server) ?? "MCP";
+    return `MCP ${asString(value.toolTitle) ?? asString(value.toolName) ?? "tool"} on ${connector}`;
+  }
+  if (value.type === "requestPermissions") {
+    return asString(value.reason) ?? "Permission request";
+  }
+  return "Reviewing request";
 }
 
 function appendAssistantDelta(
@@ -854,6 +992,10 @@ export function hasActiveTurnWork(state: DemoProtocolState) {
         turnId === state.currentTurnId &&
         (status === "pending" || status === "running"),
     ) ||
+    state.automaticApprovalReviews.some(
+      ({ status, turnId }) =>
+        turnId === state.currentTurnId && status === "inProgress",
+    ) ||
     state.subagents.some(
       ({ status, turnId }) =>
         turnId === state.currentTurnId && status !== "done",
@@ -876,7 +1018,15 @@ export function reduceProtocolNotification(
       ...state,
       approvals: state.approvals.map((approval) =>
         approval.requestId === notification.requestId
-          ? { ...approval, decision: notification.decision }
+          ? {
+              ...approval,
+              decision: notification.decision,
+              decisionScope: approvalDecisionScope(
+                notification.responseDecision,
+              ),
+              responseDecision:
+                notification.responseDecision ?? approval.responseDecision,
+            }
           : approval,
       ),
       eventCount: state.eventCount + 1,
@@ -889,6 +1039,50 @@ export function reduceProtocolNotification(
     eventCount: state.eventCount + 1,
     lastMethod: notification.method,
   };
+
+  if (
+    notification.method === "item/autoApprovalReview/started" ||
+    notification.method === "item/autoApprovalReview/completed"
+  ) {
+    const reviewId = asString(params.reviewId);
+    const review = isRecord(params.review) ? params.review : {};
+    if (!reviewId) return next;
+    const existing = state.automaticApprovalReviews.find(
+      ({ id }) => id === reviewId,
+    );
+    const completedAtMs = asNumber(params.completedAtMs);
+    return {
+      ...next,
+      automaticApprovalReviews: upsertById(
+        state.automaticApprovalReviews,
+        {
+          actionLabel:
+            automaticApprovalReviewActionLabel(params.action) ||
+            existing?.actionLabel ||
+            "Reviewing request",
+          completedAtMs:
+            notification.method === "item/autoApprovalReview/completed"
+              ? completedAtMs
+              : (existing?.completedAtMs ?? null),
+          id: reviewId,
+          rationale:
+            asString(review.rationale) ?? existing?.rationale ?? null,
+          riskLevel:
+            asString(review.riskLevel) ?? existing?.riskLevel ?? null,
+          startedAtMs:
+            asNumber(params.startedAtMs) ?? existing?.startedAtMs ?? 0,
+          status: automaticApprovalReviewStatus(review.status),
+          targetItemId:
+            asString(params.targetItemId) ?? existing?.targetItemId ?? null,
+          turnId: asString(params.turnId) ?? existing?.turnId ?? null,
+        },
+      ),
+      timeline: appendTimeline(state.timeline, {
+        id: reviewId,
+        kind: "automaticApprovalReview",
+      }),
+    };
+  }
 
   if (
     "kind" in notification &&
@@ -909,6 +1103,7 @@ export function reduceProtocolNotification(
       notification.method === "item/fileChange/requestApproval"
         ? "file"
         : "command";
+    const responseDecision = approvalResponseDecision(notification.response);
     return {
       ...next,
       approvals: upsertApproval(state.approvals, {
@@ -921,7 +1116,8 @@ export function reduceProtocolNotification(
         kind,
         reason: asString(params.reason),
         requestId,
-        responseDecision: approvalResponseDecision(notification.response),
+        decisionScope: approvalDecisionScope(responseDecision),
+        responseDecision,
         turnId: asString(params.turnId) ?? state.currentTurnId,
       }),
       timeline: appendTimeline(state.timeline, {
@@ -1537,7 +1733,11 @@ export function reduceProtocolNotification(
         approval.requestId === requestId && approval.decision === "pending"
           ? {
               ...approval,
-              decision: approval.responseDecision ?? "rejected",
+              decision:
+                approvalDecision(approval.responseDecision) ?? "rejected",
+              decisionScope: approvalDecisionScope(
+                approval.responseDecision,
+              ),
             }
           : approval,
       ),

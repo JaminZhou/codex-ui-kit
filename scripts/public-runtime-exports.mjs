@@ -22,6 +22,7 @@ export const publicRuntimeExports = [
   "ApprovalCommandPreview",
   "ApprovalRequest",
   "ArtifactList",
+  "AutomaticApprovalReview",
   "BrowserActivity",
   "Button",
   "CodeBlock",

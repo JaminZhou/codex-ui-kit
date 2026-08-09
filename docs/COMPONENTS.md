@@ -90,6 +90,10 @@ failure/cancellation policy, pagination, and transcript streaming.
 - `ApprovalRequest`: command, patch, network, permission, and generic approval
   card with scoped actions, shortcuts, loading, outcome states, and default or
   current Composer-dock presentation.
+- `AutomaticApprovalReview`: in-progress, approved, denied, high-risk denied,
+  timed-out, and aborted reviewer-agent status with action, rationale, and
+  accessible terminal semantics. It reports protocol state only; it never
+  performs or bypasses an approval.
 - `ApprovalCommandPreview`: bounded command preview with explicit expansion controls.
 - `StatusBanner`: neutral, info, warning, and error shell with actions, dismissal, and compact reflow.
 - `InlineNotice`: transcript divider with tone, guidance, wrapping, and active shimmer.

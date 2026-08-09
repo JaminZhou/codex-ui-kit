@@ -55,7 +55,7 @@ interface StartLiveInput {
 }
 
 interface ApprovalResponseInput {
-  decision: "accept" | "decline";
+  decision: "accept" | "acceptForSession" | "decline";
   requestId: number | string;
 }
 
@@ -78,7 +78,7 @@ function assertApprovalResponseInput(
     value === null ||
     (typeof (value as ApprovalResponseInput).requestId !== "string" &&
       typeof (value as ApprovalResponseInput).requestId !== "number") ||
-    !["accept", "decline"].includes(
+    !["accept", "acceptForSession", "decline"].includes(
       (value as ApprovalResponseInput).decision,
     )
   ) {

@@ -3575,6 +3575,392 @@ try {
   await currentSimilarApprovalApp.close();
 }
 
+const currentSessionApprovalScene = {
+  frame: "approval-current-session-pending",
+  id: "electron-current-approval-for-session",
+  scenario: "approval-for-session",
+};
+const {
+  app: currentSessionApprovalApp,
+  page: currentSessionApprovalPage,
+} = await launchScene(currentSessionApprovalScene, { capture: false });
+try {
+  const approval = currentSessionApprovalPage.getByTestId(
+    "current-approval-request",
+  );
+  await approval
+    .getByRole("button", { name: "Approval options" })
+    .click();
+  const allowAllEdits = currentSessionApprovalPage
+    .locator(
+      '.codex-ui-approval-request__options-menu [role="menuitem"]',
+    )
+    .filter({ hasText: "Allow all edits" });
+  await allowAllEdits.waitFor();
+  if (
+    (await currentSessionApprovalPage
+      .getByLabel(
+        "Allow this and future file edits in this conversation without asking again",
+      )
+      .count()) !== 1
+  ) {
+    throw new Error(
+      "Electron session approval option did not expose its conversation scope.",
+    );
+  }
+  await allowAllEdits.click();
+  await currentSessionApprovalPage.waitForSelector(
+    '.demo-root[data-frame="approval-current-session-first-completed"]',
+  );
+  await currentSessionApprovalPage
+    .getByRole("button", { exact: true, name: "Previous" })
+    .click();
+  await currentSessionApprovalPage.waitForFunction(
+    () => {
+      const position = document.querySelector(
+        'input[aria-label="Protocol event position"]',
+      );
+      return position instanceof HTMLInputElement && position.value === "9";
+    },
+  );
+  await currentSessionApprovalPage
+    .getByRole("button", { exact: true, name: "Next" })
+    .click();
+  await currentSessionApprovalPage.waitForSelector(
+    '.demo-root[data-frame="approval-current-session-first-completed"]',
+  );
+  const secondPrompt =
+    "Apply the second edit under the same session approval.";
+  await currentSessionApprovalPage
+    .getByLabel("Message composer")
+    .fill(secondPrompt);
+  await currentSessionApprovalPage
+    .getByLabel("Message composer")
+    .press("Enter");
+  await currentSessionApprovalPage.waitForSelector(
+    '.demo-root[data-frame="approval-current-session-repeated-completed"]',
+  );
+  const repeated = await currentSessionApprovalPage.evaluate(() => ({
+    approvalCount: document.querySelectorAll(
+      '[data-testid="current-approval-request"]',
+    ).length,
+    fileChangeCount: document.querySelectorAll(
+      ".codex-ui-file-change-group",
+    ).length,
+    finalText:
+      Array.from(
+        document.querySelectorAll(
+          '.codex-ui-agent-message[data-role="assistant"]',
+        ),
+      )
+        .at(-1)
+        ?.textContent?.replace(/\s+/g, " ")
+        .trim() ?? null,
+    permissionLabel:
+      document
+        .querySelector(".demo-composer-permission-trigger")
+        ?.textContent?.trim() ?? null,
+  }));
+  if (
+    repeated.approvalCount !== 0 ||
+    repeated.fileChangeCount !== 2 ||
+    repeated.finalText !== "SESSION FILE APPROVAL SECOND COMPLETE." ||
+    repeated.permissionLabel !== "Ask for approval"
+  ) {
+    throw new Error(
+      `Electron session approval did not persist for the second edit: ${JSON.stringify(repeated)}`,
+    );
+  }
+} finally {
+  await currentSessionApprovalApp.close();
+}
+
+const {
+  app: liveSessionApprovalApp,
+  page: liveSessionApprovalPage,
+} = await launchScene(
+  {
+    frame: "recovered",
+    id: "electron-live-file-approval-for-session",
+    scenario: "streaming-recovery",
+  },
+  { capture: false },
+);
+try {
+  await liveSessionApprovalPage
+    .getByRole("button", { exact: true, name: "Live" })
+    .click();
+  await liveSessionApprovalPage.waitForSelector(
+    '.demo-root[data-mode="live"]',
+  );
+  await liveSessionApprovalApp.evaluate(
+    ({ BrowserWindow, ipcMain }) => {
+      globalThis.__codexUiKitApprovalResponse = null;
+      ipcMain.removeHandler("demo:approval:respond");
+      ipcMain.handle("demo:approval:respond", (_event, input) => {
+        globalThis.__codexUiKitApprovalResponse = input;
+      });
+      const window = BrowserWindow.getAllWindows()[0];
+      window?.webContents.send("demo:notification", {
+        method: "item/started",
+        params: {
+          item: {
+            changes: [
+              {
+                diff: "+session approval probe",
+                kind: { type: "update" },
+                path: "notes/live-session.md",
+              },
+            ],
+            id: "file-live-session",
+            status: "inProgress",
+            type: "fileChange",
+          },
+          threadId: "thread-live-session",
+          turnId: "turn-live-session",
+        },
+      });
+      window?.webContents.send("demo:server-request", {
+        id: "approval-live-session",
+        kind: "request",
+        method: "item/fileChange/requestApproval",
+        params: {
+          itemId: "file-live-session",
+          reason: "Apply the live session approval probe.",
+          threadId: "thread-live-session",
+          turnId: "turn-live-session",
+        },
+      });
+    },
+  );
+  const liveApproval = liveSessionApprovalPage.getByTestId(
+    "approval-request",
+  );
+  await liveApproval.waitFor();
+  await liveApproval
+    .getByRole("button", { name: "Approval options" })
+    .click();
+  const liveAllowAllEdits = liveSessionApprovalPage
+    .locator(
+      '.codex-ui-approval-request__options-menu [role="menuitem"]',
+    )
+    .filter({ hasText: "Allow all edits" });
+  await liveAllowAllEdits.waitFor();
+  if (
+    (await liveSessionApprovalPage
+      .getByLabel(
+        "Allow this and future file edits in this conversation without asking again",
+      )
+      .count()) !== 1
+  ) {
+    throw new Error(
+      "Electron live file approval did not expose its conversation scope.",
+    );
+  }
+  await liveAllowAllEdits.click();
+  const liveApprovalResponse = await liveSessionApprovalApp.evaluate(
+    () => globalThis.__codexUiKitApprovalResponse,
+  );
+  if (
+    JSON.stringify(liveApprovalResponse) !==
+    JSON.stringify({
+      decision: "acceptForSession",
+      requestId: "approval-live-session",
+    })
+  ) {
+    throw new Error(
+      `Electron live file approval did not emit its session decision: ${JSON.stringify(liveApprovalResponse)}`,
+    );
+  }
+} finally {
+  await liveSessionApprovalApp.close();
+}
+
+for (const alternateDecision of ["Allow once", "Deny"]) {
+  const { app: alternateApp, page: alternatePage } = await launchScene(
+    {
+      frame: "approval-current-session-pending",
+      id: `electron-current-file-${alternateDecision.toLowerCase().replace(/\s+/g, "-")}`,
+      scenario: "approval-for-session",
+    },
+    { capture: false },
+  );
+  try {
+    await alternatePage
+      .getByTestId("current-approval-request")
+      .getByRole("button", { exact: true, name: alternateDecision })
+      .click();
+    await alternatePage.waitForSelector(
+      `.demo-root[data-frame="${
+        alternateDecision === "Allow once"
+          ? "approval-current-session-first-completed"
+          : "approval-current-session-denied"
+      }"]`,
+    );
+    if (alternateDecision === "Allow once") {
+      const secondPrompt =
+        "Apply the second edit under the same session approval.";
+      await alternatePage.getByLabel("Message composer").fill(secondPrompt);
+      await alternatePage.getByLabel("Message composer").press("Enter");
+      await alternatePage.waitForTimeout(240);
+      const oneTime = await alternatePage.evaluate(() => ({
+        composerValue:
+          document.querySelector(".codex-ui-composer textarea") instanceof
+          HTMLTextAreaElement
+            ? document.querySelector(".codex-ui-composer textarea").value
+            : null,
+        frame: document
+          .querySelector(".demo-root")
+          ?.getAttribute("data-frame"),
+        liveErrorCount: document.querySelectorAll(
+          '.codex-ui-status-banner[data-tone="error"]',
+        ).length,
+        mode: document
+          .querySelector(".demo-root")
+          ?.getAttribute("data-mode"),
+        secondCompletionCount: Array.from(
+          document.querySelectorAll(
+            '.codex-ui-agent-message[data-role="assistant"]',
+          ),
+        ).filter(
+          (element) =>
+            element.textContent?.trim() ===
+            "SESSION FILE APPROVAL SECOND COMPLETE.",
+        ).length,
+        secondPathCount: Array.from(
+          document.querySelectorAll(".codex-ui-file-change-group"),
+        ).filter((element) => element.textContent?.includes("notes/second.md"))
+          .length,
+      }));
+      if (
+        oneTime.composerValue !== secondPrompt ||
+        oneTime.frame !== "approval-current-session-first-completed" ||
+        oneTime.liveErrorCount !== 0 ||
+        oneTime.mode !== "replay" ||
+        oneTime.secondCompletionCount !== 0 ||
+        oneTime.secondPathCount !== 0
+      ) {
+        throw new Error(
+          `Electron one-time file approval incorrectly installed session scope: ${JSON.stringify(oneTime)}`,
+        );
+      }
+    } else {
+      const nextPrompt = "Try another file edit after denial.";
+      await alternatePage.getByLabel("Message composer").fill(nextPrompt);
+      await alternatePage.getByLabel("Message composer").press("Enter");
+      await alternatePage.waitForTimeout(240);
+      const declined = await alternatePage.evaluate(() => ({
+        approvalCount: document.querySelectorAll(
+          '[data-testid="current-approval-request"]',
+        ).length,
+        composerValue:
+          document.querySelector(".codex-ui-composer textarea") instanceof
+          HTMLTextAreaElement
+            ? document.querySelector(".codex-ui-composer textarea").value
+            : null,
+        fileStatus: document
+          .querySelector('[data-testid="file-change-group"]')
+          ?.getAttribute("data-file-status"),
+        frame: document
+          .querySelector(".demo-root")
+          ?.getAttribute("data-frame"),
+        liveErrorCount: document.querySelectorAll(
+          '.codex-ui-status-banner[data-tone="error"]',
+        ).length,
+        mode: document
+          .querySelector(".demo-root")
+          ?.getAttribute("data-mode"),
+        status: document
+          .querySelector(".demo-root")
+          ?.getAttribute("data-status"),
+        secondCompletionCount: Array.from(
+          document.querySelectorAll(
+            '.codex-ui-agent-message[data-role="assistant"]',
+          ),
+        ).filter(
+          (element) =>
+            element.textContent?.trim() ===
+            "SESSION FILE APPROVAL SECOND COMPLETE.",
+        ).length,
+        secondPathCount: Array.from(
+          document.querySelectorAll(".codex-ui-file-change-group"),
+        ).filter((element) => element.textContent?.includes("notes/second.md"))
+          .length,
+      }));
+      if (
+        declined.approvalCount !== 0 ||
+        declined.composerValue !== nextPrompt ||
+        declined.fileStatus !== "rejected" ||
+        declined.frame !== "approval-current-session-denied" ||
+        declined.liveErrorCount !== 0 ||
+        declined.mode !== "replay" ||
+        declined.status !== "completed" ||
+        declined.secondCompletionCount !== 0 ||
+        declined.secondPathCount !== 0
+      ) {
+        throw new Error(
+          `Electron denied file approval advanced the session trace: ${JSON.stringify(declined)}`,
+        );
+      }
+    }
+  } finally {
+    await alternateApp.close();
+  }
+}
+
+for (const reviewScene of [
+  {
+    frame: "approval-review-running",
+    id: "electron-approval-review-running",
+    scenario: "approval-review-timeout",
+    status: "inProgress",
+    title: "Auto-reviewing",
+  },
+  {
+    frame: "approval-review-timeout",
+    id: "electron-approval-review-timeout",
+    scenario: "approval-review-timeout",
+    status: "timedOut",
+    title: "Auto-review timed out",
+  },
+]) {
+  const { app: reviewApp, page: reviewPage } = await launchScene(
+    reviewScene,
+    { capture: false },
+  );
+  try {
+    const review = reviewPage.getByTestId("automatic-approval-review");
+    await review.waitFor();
+    const contract = await review.evaluate((element) => ({
+      action: element
+        .querySelector(".codex-ui-auto-review__action")
+        ?.textContent?.trim(),
+      status: element.getAttribute("data-status"),
+      summary: element
+        .querySelector(".codex-ui-auto-review__summary")
+        ?.textContent?.trim(),
+      title: element
+        .querySelector(".codex-ui-auto-review__title")
+        ?.textContent?.trim(),
+    }));
+    if (
+      contract.action !== "Network access to https://example.com/health" ||
+      contract.status !== reviewScene.status ||
+      contract.title !== reviewScene.title ||
+      contract.summary !==
+        (reviewScene.status === "timedOut"
+          ? "A carefully prompted reviewer agent timed out before ChatGPT ran this request"
+          : undefined)
+    ) {
+      throw new Error(
+        `${reviewScene.id}: Electron automatic approval review failed: ${JSON.stringify(contract)}`,
+      );
+    }
+  } finally {
+    await reviewApp.close();
+  }
+}
+
 const longCommandOutputScene = {
   frame: "command-output-expanded",
   id: "electron-current-long-command-output",

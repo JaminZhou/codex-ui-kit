@@ -389,8 +389,11 @@ without confusing package readiness with full product reconstruction.
    sampled long-thread navigation/windowing contract are also delivered. A
    real command approval pending → denied path additionally confirms
    non-execution and restores the current Composer. Allow once and the
-   matching-command persistence rule are now delivered; continue with
-   approval timeout/`acceptForSession`, broader attachment variants, and
+   matching-command persistence rule are now delivered. Schema-validated
+   `acceptForSession` file approval and automatic-review timeout replays now
+   pass Browser/CDP, Electron, and internal regional pixels against current
+   `26.803.41515` structural evidence; safe real-product reachability remains
+   an explicit evidence gap. Continue with broader attachment variants and
    recovery evidence;
    retain queue pause/Resume only as a legacy compatibility fixture.
 6. **Coding workspace entry**: current selected/no-project destination,
@@ -419,9 +422,11 @@ without confusing package readiness with full product reconstruction.
     exit-code failure, interruption/settlement, manual context compaction,
     thread-summary Environment/Git state, and same-thread recovery are
     delivered. Approval allow-once and matching-command persistence are also
-    delivered. The sampled pasted-image attachment lifecycle and single-agent
-    successful delegation lifecycle are also delivered;
-    continue with approval timeout/`acceptForSession`, native-file and attachment
+    delivered. Session-scoped file approval and automatic-review timeout now
+    have pinned protocol semantics plus independent Browser/Electron/pixel
+    gates, without claiming an unsampled product transition. The sampled
+    pasted-image attachment lifecycle and single-agent successful delegation
+    lifecycle are also delivered; continue with native-file and attachment
     upload/error/multi-item variants, Markdown mutation/
     large content, populated artifact/source sections, subagent
     waiting/failure/cancel/streaming, pagination, and transport recovery.
