@@ -2448,6 +2448,7 @@ export function App() {
     }
     setActiveFrame(null);
     setComposerOverlay(null);
+    setComposerAttachments([]);
     if (replayComposerRunning) {
       if (queueingEnabled) {
         queuedPromptCounterRef.current += 1;

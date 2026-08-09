@@ -7012,6 +7012,56 @@ for (const attachmentComposerMode of [
   }
 }
 
+const visualAttachmentSubmitScene = {
+  frame: "composer-attachment",
+  id: "visual-attachment-text-submit-interaction",
+  scenario: "conversation-lifecycle",
+};
+const {
+  app: visualAttachmentSubmitApp,
+  page: visualAttachmentSubmitPage,
+} = await launchScene(visualAttachmentSubmitScene, { capture: false });
+try {
+  const visualAttachmentComposer = visualAttachmentSubmitPage.getByRole(
+    "textbox",
+    { name: "Message composer" },
+  );
+  await visualAttachmentComposer.fill("Continue the conversation without attachments.");
+  const visualAttachmentSubmit = visualAttachmentSubmitPage.getByRole(
+    "button",
+    { name: "Send message" },
+  );
+  if (!(await visualAttachmentSubmit.isEnabled())) {
+    throw new Error(
+      "The visual-only attachment frame did not enable text submission.",
+    );
+  }
+  await visualAttachmentComposer.press("Enter");
+  await visualAttachmentSubmitPage.waitForFunction(
+    () =>
+      document.querySelectorAll(
+        ".codex-ui-composer .codex-ui-composer-attachment",
+      ).length === 0,
+  );
+  await visualAttachmentSubmitPage.waitForFunction(
+    () =>
+      document
+        .querySelector('.codex-ui-composer textarea[aria-label="Message composer"]')
+        ?.value === "",
+  );
+  if (
+    (await visualAttachmentSubmitPage
+      .locator('.demo-root[data-scenario="conversation-lifecycle"]')
+      .count()) !== 1
+  ) {
+    throw new Error(
+      "Submitting text from the visual-only attachment frame changed scenarios.",
+    );
+  }
+} finally {
+  await visualAttachmentSubmitApp.close();
+}
+
 const attachmentLifecycleScene = {
   frame: "attachment-ready",
   id: "attachment-lifecycle-interaction",
