@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   attachmentDialogModeForPlatform,
+  attachmentPathLabel,
   attachmentDialogProperties,
 } from "../electron/attachment-dialog";
 
@@ -25,5 +26,13 @@ describe("Electron attachment dialog policy", () => {
       "openDirectory",
       "multiSelections",
     ]);
+  });
+
+  it("keeps filesystem root and volume attachment labels nonempty", () => {
+    expect(attachmentPathLabel("/", "darwin")).toBe("/");
+    expect(attachmentPathLabel("/workspace", "linux")).toBe("workspace");
+    expect(attachmentPathLabel("C:\\", "win32")).toBe("C:\\");
+    expect(attachmentPathLabel("C:\\workspace", "win32")).toBe("workspace");
+    expect(attachmentPathLabel("\\\\server\\share\\", "win32")).toBe("share");
   });
 });

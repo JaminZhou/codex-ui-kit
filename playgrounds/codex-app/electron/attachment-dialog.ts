@@ -1,3 +1,5 @@
+import { posix, win32 } from "node:path";
+
 export type AttachmentDialogKind = "files" | "folders" | "mixed";
 
 export type AttachmentDialogProperty =
@@ -21,4 +23,9 @@ export function attachmentDialogProperties(
     kind === "files" ? "openFile" : "openDirectory",
     "multiSelections",
   ];
+}
+
+export function attachmentPathLabel(path: string, platform: string): string {
+  const pathApi = platform === "win32" ? win32 : posix;
+  return pathApi.basename(path) || pathApi.parse(path).root || "Filesystem root";
 }

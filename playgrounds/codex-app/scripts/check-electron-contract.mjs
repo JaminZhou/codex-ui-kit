@@ -888,6 +888,7 @@ const {
       resolve(repositoryRoot, "tsconfig.json"),
       resolve(repositoryRoot, "src"),
       resolve(repositoryRoot, "research"),
+      "/",
     ]),
   },
 });
@@ -920,9 +921,10 @@ try {
     };
   });
   if (
-    nativeSelection.attachmentCount !== 5 ||
+    nativeSelection.attachmentCount !== 6 ||
     !nativeSelection.labels.includes("README.md") ||
     !nativeSelection.labels.includes("src") ||
+    !nativeSelection.labels.includes("/") ||
     !(nativeSelection.overflow > 0) ||
     nativeSelection.submitDisabled
   ) {
@@ -936,7 +938,7 @@ try {
   if (
     (await nativeAttachmentPage
       .locator(".codex-ui-composer .codex-ui-composer-attachment")
-      .count()) !== 4
+      .count()) !== 5
   ) {
     throw new Error("Electron native attachment removal did not update the tray.");
   }

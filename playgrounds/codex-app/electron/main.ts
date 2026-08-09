@@ -15,7 +15,6 @@ import {
 } from "electron";
 import { stat } from "node:fs/promises";
 import {
-  basename,
   dirname,
   extname,
   isAbsolute,
@@ -25,6 +24,7 @@ import {
 import { fileURLToPath } from "node:url";
 import {
   attachmentDialogModeForPlatform,
+  attachmentPathLabel,
   attachmentDialogProperties,
   type AttachmentDialogKind,
 } from "./attachment-dialog.js";
@@ -296,7 +296,7 @@ async function describeAttachmentPaths(
       return {
         id: `native-attachment-${index + 1}`,
         kind,
-        label: basename(path),
+        label: attachmentPathLabel(path, process.platform),
         meta: kind === "folder" ? "Folder" : extension || "File",
       } satisfies AttachmentSelection;
     }),
