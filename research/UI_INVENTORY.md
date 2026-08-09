@@ -717,10 +717,16 @@ now covers 81 frames and drives Remove → Add → Submit → completion; Electr
 repeats the lifecycle in a real 1180×820 `BrowserWindow`. Ownership-masked
 current-build 906×820 comparisons pass at `0.0038954396166478223` for ready
 and `0.007934905507995478` for completed, below independent 1.5% hard limits.
-This promotes `composer.attachments` only for the sampled pasted-image path.
-Native file selection, pasted text, ordinary file cards, multiple attachments,
-horizontal overflow, upload progress/failure, preview failure, and plugin
-resources remain separate gates.
+This promotes the current product runtime evidence only for the sampled
+pasted-image path. The later `26.803.41515` follow-up adds source-structural
+evidence for 256px file cards, 40px icon wells, extension/line/folder
+subtitles, file-copy upload/error labels, and image progress semantics. The
+independent package and playground now cover file/folder/image cards,
+attachment-only submit, five-item overflow, bounded progress, failure/retry,
+preview recovery, and a trusted Electron file/folder selection bridge. The
+real product native panel could not be automated, so post-picker file cards,
+actual transfer failure/progress, exact file-type icons, and plugin resources
+remain separate runtime/pixel gates.
 
 The current long-command slice uses a separate disposable task on
 `26.730.61309` and requests

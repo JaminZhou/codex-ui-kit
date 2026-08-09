@@ -2,6 +2,8 @@ import { mkdir, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { launchScene, visualScenes } from "./electron-harness.mjs";
 
+process.env.CODEX_DEMO_ATTACHMENT_RENDERER_FIXTURE = "1";
+
 const artifactDirectory = join(process.cwd(), "artifacts", "cdp");
 await mkdir(artifactDirectory, { recursive: true });
 const currentReplayComposerScenarios = new Set([
@@ -30,6 +32,14 @@ const currentReplayComposerContracts = [];
 for (const scene of visualScenes) {
   const { app, page } = await launchScene(scene);
   try {
+    if (scene.id === "thread-windowed") {
+      await page.waitForFunction(() => {
+        const viewport = document.querySelector(
+          ".codex-ui-conversation-thread-shell__viewport",
+        );
+        return viewport instanceof HTMLElement && viewport.scrollTop < -10_000;
+      });
+    }
     if (scene.id === "current-light-shell") {
       const lightShell = await page.evaluate(() => {
         const metric = (selector) => {
@@ -147,7 +157,7 @@ for (const scene of visualScenes) {
       const currentComposerIcons = await page.evaluate(() =>
         Array.from(
           document.querySelectorAll(
-            ".codex-ui-composer [data-current-build-icon]",
+            ".codex-ui-composer__actions [data-current-build-icon], .codex-ui-composer__controls [data-current-build-icon]",
           ),
           (icon) => {
             const value = icon.getBoundingClientRect();
@@ -3168,6 +3178,9 @@ for (const scene of visualScenes) {
           stopCount: composer.querySelectorAll(
             'button[aria-label="Stop"]',
           ).length,
+          submitDisabled: composer
+            .querySelector('[data-action="submit"]')
+            ?.hasAttribute("disabled"),
           surface: rect(surface),
           textarea: {
             label: textarea.getAttribute("aria-label"),
@@ -3455,7 +3468,8 @@ for (const scene of visualScenes) {
         scene.id === "composer-attachment" &&
         (conversation.attachmentCount !== 1 ||
           conversation.phase !== "attachment" ||
-          conversation.composer.layout !== "multiline")
+          conversation.composer.layout !== "multiline" ||
+          conversation.submitDisabled !== true)
       ) {
         throw new Error(
           `${scene.id}: attachment Composer contract failed: ${JSON.stringify(conversation)}`,
@@ -3542,7 +3556,10 @@ for (const scene of visualScenes) {
         );
       }
     }
-    if (scene.scenario === "attachment-lifecycle") {
+    if (
+      scene.id === "attachment-current-ready" ||
+      scene.id === "attachment-current-completed"
+    ) {
       const attachmentLifecycle = await page.evaluate(() => {
         const rect = (element) => {
           if (!element) return null;
@@ -3642,6 +3659,236 @@ for (const scene of visualScenes) {
       }
     }
     if (
+      [
+        "attachment-multi-ready",
+        "attachment-uploading",
+        "attachment-upload-error",
+        "attachment-preview-error",
+        "attachment-multi-compact",
+      ].includes(scene.id)
+    ) {
+      const variant = await page.evaluate(() => {
+        const tray = document.querySelector(
+          ".codex-ui-composer__attachments",
+        );
+        const attachments = Array.from(
+          document.querySelectorAll(
+            ".codex-ui-composer .codex-ui-composer-attachment",
+          ),
+        );
+        const uploadingAttachment = attachments.find(
+          (attachment) => attachment.getAttribute("data-status") === "uploading",
+        );
+        const progress = uploadingAttachment?.querySelector(
+          ".codex-ui-composer-attachment__progress",
+        );
+        const failedAttachment = attachments.find(
+          (attachment) => attachment.getAttribute("data-status") === "error",
+        );
+        const constrainedCard = attachments.find(
+          (attachment) => attachment.getAttribute("data-layout") === "card",
+        );
+        let constrainedCardWidth = null;
+        if (constrainedCard) {
+          const label = constrainedCard.querySelector(
+            ".codex-ui-composer-attachment__label",
+          );
+          const meta = constrainedCard.querySelector(
+            ".codex-ui-composer-attachment__meta",
+          );
+          const originalLabel = label?.textContent;
+          const originalMeta = meta?.textContent;
+          if (label) label.textContent = "current-build-attachment-name-that-must-truncate.txt";
+          if (meta) meta.textContent = "A deliberately long metadata value";
+          constrainedCardWidth = constrainedCard.getBoundingClientRect().width;
+          if (label) label.textContent = originalLabel ?? "";
+          if (meta) meta.textContent = originalMeta ?? "";
+        }
+        let imageProgressGeometry = null;
+        let pillProgressGeometry = null;
+        if (uploadingAttachment && progress) {
+          const originalLayout = uploadingAttachment.getAttribute("data-layout");
+          uploadingAttachment.setAttribute("data-layout", "image");
+          const attachmentRect = uploadingAttachment.getBoundingClientRect();
+          const progressRect = progress.getBoundingClientRect();
+          imageProgressGeometry = {
+            leftInset: progressRect.left - attachmentRect.left,
+            rightInset: attachmentRect.right - progressRect.right,
+            width: progressRect.width,
+          };
+          uploadingAttachment.setAttribute("data-layout", "pill");
+          const pillAttachmentRect = uploadingAttachment.getBoundingClientRect();
+          const pillProgressRect = progress.getBoundingClientRect();
+          pillProgressGeometry = {
+            leftInset: pillProgressRect.left - pillAttachmentRect.left,
+            rightInset: pillAttachmentRect.right - pillProgressRect.right,
+            width: pillProgressRect.width,
+          };
+          if (originalLayout) {
+            uploadingAttachment.setAttribute("data-layout", originalLayout);
+          } else {
+            uploadingAttachment.removeAttribute("data-layout");
+          }
+        }
+        let pillRetryGeometry = null;
+        if (failedAttachment) {
+          const retry = failedAttachment.querySelector(
+            ".codex-ui-composer-attachment__retry",
+          );
+          const open = failedAttachment.querySelector(
+            ".codex-ui-composer-attachment__open",
+          );
+          if (retry && open) {
+            const originalLayout = failedAttachment.getAttribute("data-layout");
+            failedAttachment.setAttribute("data-layout", "pill");
+            const openRect = open.getBoundingClientRect();
+            const retryRect = retry.getBoundingClientRect();
+            pillRetryGeometry = {
+              gap: retryRect.left - openRect.right,
+              position: getComputedStyle(retry).position,
+            };
+            if (originalLayout) {
+              failedAttachment.setAttribute("data-layout", originalLayout);
+            } else {
+              failedAttachment.removeAttribute("data-layout");
+            }
+          }
+        }
+        return {
+          attachmentCount: attachments.length,
+          cardHeights: attachments
+            .filter((attachment) => attachment.getAttribute("data-layout") === "card")
+            .map((attachment) => attachment.getBoundingClientRect().height),
+          cardContentGaps: attachments
+            .filter((attachment) => attachment.getAttribute("data-layout") === "card")
+            .map((attachment) => {
+              const icon = attachment.querySelector(
+                ".codex-ui-composer-attachment__icon",
+              );
+              const copy = attachment.querySelector(
+                ".codex-ui-composer-attachment__copy",
+              );
+              if (!icon || !copy) return null;
+              return (
+                copy.getBoundingClientRect().left -
+                icon.getBoundingClientRect().right
+              );
+            })
+            .filter((gap) => gap !== null),
+          constrainedCardWidth,
+          iconSizes: attachments
+            .map((attachment) =>
+              attachment.querySelector(
+                ".codex-ui-composer-attachment__icon",
+              ),
+            )
+            .filter(Boolean)
+            .map((icon) => {
+              const rect = icon.getBoundingClientRect();
+              return { height: rect.height, width: rect.width };
+            }),
+          imageProgressGeometry,
+          overflow: tray ? tray.scrollWidth - tray.clientWidth : null,
+          phase: document
+            .querySelector(".demo-root")
+            ?.getAttribute("data-composer-phase"),
+          pillProgressGeometry,
+          pillRetryGeometry,
+          previewError: document
+            .querySelector(
+              '.codex-ui-composer-attachment[data-status="preview-error"] [role="status"]',
+            )
+            ?.textContent?.trim(),
+          progress: document
+            .querySelector('[role="progressbar"]')
+            ?.getAttribute("aria-valuenow"),
+          retryCount: document.querySelectorAll(
+            ".codex-ui-composer-attachment__retry",
+          ).length,
+          statuses: attachments.map((attachment) =>
+            attachment.getAttribute("data-status"),
+          ),
+          statusText: Array.from(
+            document.querySelectorAll(
+              ".codex-ui-composer-attachment__accessible-status[role=status]",
+            ),
+            (element) => element.textContent?.trim(),
+          ),
+          statusWithinOpenButton: document.querySelectorAll(
+            ".codex-ui-composer-attachment__open [role=status]",
+          ).length,
+          submitDisabled: document
+            .querySelector('.codex-ui-composer [data-action="submit"]')
+            ?.hasAttribute("disabled"),
+        };
+      });
+      variant.accessibleProgressCount =
+        scene.id === "attachment-uploading"
+          ? await page
+              .getByRole("progressbar", {
+                name: "Uploading current-build.zip",
+              })
+              .count()
+          : 0;
+      contract.attachmentVariants = variant;
+      const expectedCount = scene.id === "attachment-preview-error" ? 1 : 5;
+      const expectsOverflow = scene.id !== "attachment-preview-error";
+      const expectsSubmitDisabled = [
+        "attachment-preview-error",
+        "attachment-upload-error",
+        "attachment-uploading",
+      ].includes(scene.id);
+      const expectedStatus =
+        scene.id === "attachment-uploading"
+          ? "uploading"
+          : scene.id === "attachment-upload-error"
+            ? "error"
+            : scene.id === "attachment-preview-error"
+              ? "preview-error"
+              : "ready";
+      if (
+        variant.attachmentCount !== expectedCount ||
+        variant.phase !== "attachment" ||
+        !variant.statuses.includes(expectedStatus) ||
+        variant.submitDisabled !== expectsSubmitDisabled ||
+        (expectsOverflow && !(variant.overflow > 0)) ||
+        variant.cardHeights.some((height) => Math.abs(height - 64) > 1) ||
+        variant.cardContentGaps.some((gap) => Math.abs(gap - 10) > 1) ||
+        (variant.constrainedCardWidth !== null &&
+          variant.constrainedCardWidth > 257) ||
+        variant.statusWithinOpenButton !== 0 ||
+        variant.iconSizes.some(
+          ({ height, width }) =>
+            Math.abs(height - 40) > 1 || Math.abs(width - 40) > 1,
+        ) ||
+        (scene.id === "attachment-uploading" &&
+          (variant.progress !== "62" ||
+            variant.accessibleProgressCount !== 1 ||
+            !variant.imageProgressGeometry ||
+            Math.abs(variant.imageProgressGeometry.leftInset - 8) > 1 ||
+            Math.abs(variant.imageProgressGeometry.rightInset - 8) > 1 ||
+            variant.imageProgressGeometry.width < 48 ||
+            !variant.pillProgressGeometry ||
+            Math.abs(variant.pillProgressGeometry.leftInset - 8) > 1 ||
+            Math.abs(variant.pillProgressGeometry.rightInset - 8) > 1 ||
+            variant.pillProgressGeometry.width < 24 ||
+            !variant.statusText.includes("Uploading…"))) ||
+        (scene.id === "attachment-upload-error" &&
+          (variant.retryCount !== 1 ||
+            !variant.pillRetryGeometry ||
+            variant.pillRetryGeometry.position !== "static" ||
+            variant.pillRetryGeometry.gap < 0 ||
+            !variant.statusText.includes("Upload failed"))) ||
+        (scene.id === "attachment-preview-error" &&
+          (variant.retryCount !== 1 ||
+            variant.previewError !== "Preview unavailable"))
+      ) {
+        throw new Error(
+          `${scene.id}: attachment variant contract failed: ${JSON.stringify(variant)}`,
+        );
+      }
+    }
+    if (
       contract.header.bottom > contract.viewport.bottom ||
       contract.composer.top < contract.header.bottom ||
       contract.composer.bottom > contract.shell.bottom + 1 ||
@@ -3691,7 +3938,8 @@ for (const scene of visualScenes) {
     }
     const expectedSidebarMax =
       scene.id === "terminal-compact" ||
-      scene.id === "terminal-current-compact"
+      scene.id === "terminal-current-compact" ||
+      scene.id === "attachment-multi-compact"
         ? "468"
         : scene.surfaces?.includes("reviewPanel")
           ? "508"
@@ -6651,6 +6899,247 @@ try {
   await disabledModeApp.close();
 }
 
+const attachmentModeScene = {
+  frame: "attachment-ready",
+  id: "attachment-mode-switch-interaction",
+  scenario: "attachment-lifecycle",
+};
+const {
+  app: attachmentModeApp,
+  page: attachmentModePage,
+} = await launchScene(attachmentModeScene, { capture: false });
+try {
+  await attachmentModePage.waitForSelector(
+    '.demo-root[data-mode="replay"] .codex-ui-composer-attachment',
+  );
+  await attachmentModePage
+    .getByRole("button", { exact: true, name: "Live local" })
+    .click();
+  await attachmentModePage.waitForSelector('.demo-root[data-mode="live"]');
+  if (
+    (await attachmentModePage
+      .locator(".codex-ui-composer .codex-ui-composer-attachment")
+      .count()) !== 0
+  ) {
+    throw new Error("Attachment mode switching retained cards in Live mode.");
+  }
+  await attachmentModePage
+    .getByRole("button", { exact: true, name: "Replay" })
+    .click();
+  await attachmentModePage.waitForSelector(
+    '.demo-root[data-mode="replay"][data-composer-phase="idle"]',
+  );
+  const attachmentModeState = await attachmentModePage.evaluate(() => ({
+    attachmentCount: document.querySelectorAll(
+      ".codex-ui-composer .codex-ui-composer-attachment",
+    ).length,
+    submitDisabled: document
+      .querySelector('.codex-ui-composer [data-action="submit"]')
+      ?.hasAttribute("disabled"),
+    value:
+      document.querySelector(
+        'textarea[aria-label="Message composer"]',
+      )?.value ?? null,
+  }));
+  if (
+    attachmentModeState.attachmentCount !== 0 ||
+    !attachmentModeState.submitDisabled ||
+    attachmentModeState.value !== ""
+  ) {
+    throw new Error(
+      `Attachment mode switching retained stale state: ${JSON.stringify(attachmentModeState)}`,
+    );
+  }
+} finally {
+  await attachmentModeApp.close();
+}
+
+for (const attachmentComposerMode of [
+  {
+    frame: "composer-goal",
+    id: "attachment-to-goal-mode-interaction",
+    label: "Goal",
+    mode: "goal",
+    textareaLabel:
+      "Describe your goal, define measurable outcomes for best results",
+  },
+  {
+    frame: "composer-plan",
+    id: "attachment-to-plan-mode-interaction",
+    label: "Plan mode",
+    mode: "plan",
+    textareaLabel: "Describe your task to generate a plan...",
+  },
+]) {
+  const { app, page } = await launchScene(
+    {
+      frame: "attachment-ready",
+      id: attachmentComposerMode.id,
+      scenario: "attachment-lifecycle",
+    },
+    { capture: false },
+  );
+  try {
+    await page.getByRole("button", { name: "Add files and more" }).click();
+    await page
+      .getByRole("option", { name: attachmentComposerMode.label })
+      .click();
+    await page.waitForSelector(
+      `.demo-root[data-scenario="conversation-lifecycle"][data-frame="${attachmentComposerMode.frame}"][data-composer-mode="${attachmentComposerMode.mode}"]`,
+    );
+    const transitionedMode = await page.evaluate(() => ({
+      attachmentCount: document.querySelectorAll(
+        ".codex-ui-composer .codex-ui-composer-attachment",
+      ).length,
+      submitDisabled: document
+        .querySelector('.codex-ui-composer [data-action="submit"]')
+        ?.hasAttribute("disabled"),
+      textareaLabel: document
+        .querySelector(".codex-ui-composer textarea")
+        ?.getAttribute("aria-label"),
+    }));
+    if (
+      transitionedMode.attachmentCount !== 0 ||
+      transitionedMode.submitDisabled !== true ||
+      transitionedMode.textareaLabel !== attachmentComposerMode.textareaLabel
+    ) {
+      throw new Error(
+        `${attachmentComposerMode.id} retained attachment submission state: ${JSON.stringify(transitionedMode)}`,
+      );
+    }
+  } finally {
+    await app.close();
+  }
+}
+
+const visualAttachmentSubmitScene = {
+  frame: "composer-attachment",
+  id: "visual-attachment-text-submit-interaction",
+  scenario: "conversation-lifecycle",
+};
+const {
+  app: visualAttachmentSubmitApp,
+  page: visualAttachmentSubmitPage,
+} = await launchScene(visualAttachmentSubmitScene, { capture: false });
+try {
+  const visualAttachmentComposer = visualAttachmentSubmitPage.getByRole(
+    "textbox",
+    { name: "Message composer" },
+  );
+  await visualAttachmentComposer.fill("Continue the conversation without attachments.");
+  const visualAttachmentSubmit = visualAttachmentSubmitPage.getByRole(
+    "button",
+    { name: "Send message" },
+  );
+  if (!(await visualAttachmentSubmit.isEnabled())) {
+    throw new Error(
+      "The visual-only attachment frame did not enable text submission.",
+    );
+  }
+  await visualAttachmentComposer.press("Enter");
+  await visualAttachmentSubmitPage.waitForFunction(
+    () =>
+      document.querySelectorAll(
+        ".codex-ui-composer .codex-ui-composer-attachment",
+      ).length === 0,
+  );
+  await visualAttachmentSubmitPage.waitForFunction(
+    () =>
+      document
+        .querySelector('.codex-ui-composer textarea[aria-label="Message composer"]')
+        ?.value === "",
+  );
+  if (
+    (await visualAttachmentSubmitPage
+      .locator('.demo-root[data-scenario="conversation-lifecycle"]')
+      .count()) !== 1
+  ) {
+    throw new Error(
+      "Submitting text from the visual-only attachment frame changed scenarios.",
+    );
+  }
+} finally {
+  await visualAttachmentSubmitApp.close();
+}
+
+const protocolAttachmentFrameScene = {
+  frame: "attachment-submitted",
+  id: "protocol-attachment-submitted-frame",
+  scenario: "attachment-lifecycle",
+};
+const {
+  app: protocolAttachmentFrameApp,
+  page: protocolAttachmentFramePage,
+} = await launchScene(protocolAttachmentFrameScene, { capture: false });
+try {
+  const protocolAttachmentFrame = await protocolAttachmentFramePage.evaluate(
+    () => ({
+      composerAttachmentCount: document.querySelectorAll(
+        ".codex-ui-composer .codex-ui-composer-attachment",
+      ).length,
+      messageAttachmentCount: document.querySelectorAll(
+        ".codex-ui-agent-message__attachments .codex-ui-message-attachment",
+      ).length,
+      userMessageCount: document.querySelectorAll(
+        '.codex-ui-agent-message[data-role="user"]',
+      ).length,
+    }),
+  );
+  if (
+    protocolAttachmentFrame.composerAttachmentCount !== 0 ||
+    protocolAttachmentFrame.messageAttachmentCount !== 1 ||
+    protocolAttachmentFrame.userMessageCount !== 1
+  ) {
+    throw new Error(
+      `The protocol-backed attachment-submitted frame was not replayed: ${JSON.stringify(protocolAttachmentFrame)}`,
+    );
+  }
+} finally {
+  await protocolAttachmentFrameApp.close();
+}
+
+const attachmentReplayNavigationScene = {
+  frame: "attachment-ready",
+  id: "attachment-replay-navigation",
+  scenario: "attachment-lifecycle",
+};
+const {
+  app: attachmentReplayNavigationApp,
+  page: attachmentReplayNavigationPage,
+} = await launchScene(attachmentReplayNavigationScene, { capture: false });
+try {
+  await attachmentReplayNavigationPage
+    .getByRole("button", { name: "Next" })
+    .click();
+  await attachmentReplayNavigationPage.waitForSelector(
+    '[data-item-id="user-attachment-lifecycle"]',
+  );
+  const navigatedAttachmentReplay =
+    await attachmentReplayNavigationPage.evaluate(() => ({
+      composerAttachmentCount: document.querySelectorAll(
+        ".codex-ui-composer .codex-ui-composer-attachment",
+      ).length,
+      messageAttachmentCount: document.querySelectorAll(
+        ".codex-ui-agent-message__attachments .codex-ui-message-attachment",
+      ).length,
+      messageText:
+        document.querySelector(
+          '[data-item-id="user-attachment-lifecycle"] .codex-ui-agent-message__content',
+        )?.textContent ?? null,
+    }));
+  if (
+    navigatedAttachmentReplay.composerAttachmentCount !== 0 ||
+    navigatedAttachmentReplay.messageAttachmentCount !== 1 ||
+    !navigatedAttachmentReplay.messageText?.startsWith("Reply using three")
+  ) {
+    throw new Error(
+      `Replay navigation retained host-only attachment state: ${JSON.stringify(navigatedAttachmentReplay)}`,
+    );
+  }
+} finally {
+  await attachmentReplayNavigationApp.close();
+}
+
 const attachmentLifecycleScene = {
   frame: "attachment-ready",
   id: "attachment-lifecycle-interaction",
@@ -6681,6 +7170,15 @@ try {
   ) {
     throw new Error("Removing the current attachment retained its Composer card.");
   }
+  if (
+    await attachmentLifecyclePage
+      .getByRole("button", { name: "Send message" })
+      .isEnabled()
+  ) {
+    throw new Error(
+      "Removing the final attachment left Send enabled for an unsendable draft.",
+    );
+  }
 
   await attachmentLifecyclePage
     .getByRole("button", { name: "Add files and more" })
@@ -6691,9 +7189,78 @@ try {
   await attachmentLifecyclePage.waitForSelector(
     '.demo-root[data-composer-phase="attachment"] .codex-ui-composer-attachment',
   );
-  await composer.fill(
-    "Reply using three uppercase words describing this test: attachment, lifecycle, complete. Include a final period and no other text.",
+  const attachmentStateBeforeDismiss = await attachmentLifecyclePage.evaluate(
+    () => ({
+      attachmentCount: document.querySelectorAll(
+        ".codex-ui-composer .codex-ui-composer-attachment",
+      ).length,
+      frame: document.querySelector(".demo-root")?.getAttribute("data-frame"),
+    }),
   );
+  await attachmentLifecyclePage
+    .getByRole("button", { name: "Add files and more" })
+    .click();
+  const attachmentResources = attachmentLifecyclePage.getByRole("listbox", {
+    name: "Composer resources",
+  });
+  await attachmentResources.waitFor();
+  await attachmentResources.press("Escape");
+  await attachmentResources.waitFor({ state: "detached" });
+  const dismissedAttachmentResources = await attachmentLifecyclePage.evaluate(
+    () => ({
+      attachmentCount: document.querySelectorAll(
+        ".codex-ui-composer .codex-ui-composer-attachment",
+      ).length,
+      frame: document.querySelector(".demo-root")?.getAttribute("data-frame"),
+      submitDisabled: document
+        .querySelector('.codex-ui-composer [data-action="submit"]')
+        ?.hasAttribute("disabled"),
+    }),
+  );
+  if (
+    dismissedAttachmentResources.attachmentCount !==
+      attachmentStateBeforeDismiss.attachmentCount ||
+    dismissedAttachmentResources.frame !== attachmentStateBeforeDismiss.frame ||
+    dismissedAttachmentResources.submitDisabled !== false
+  ) {
+    throw new Error(
+      `Dismissing attachment resources lost the ready frame: ${JSON.stringify(dismissedAttachmentResources)}`,
+    );
+  }
+  await composer.fill("Preserve this draft while attaching another file.");
+  await attachmentLifecyclePage
+    .getByRole("button", { name: "Add files and more" })
+    .click();
+  await attachmentLifecyclePage
+    .getByRole("option", { name: "Files and folders" })
+    .click();
+  await attachmentLifecyclePage.waitForFunction(
+    () =>
+      document.querySelectorAll(
+        ".codex-ui-composer .codex-ui-composer-attachment",
+      ).length === 2,
+  );
+  const appendedAttachmentState = await attachmentLifecyclePage.evaluate(
+    () => ({
+      attachmentCount: document.querySelectorAll(
+        ".codex-ui-composer .codex-ui-composer-attachment",
+      ).length,
+      composerValue:
+        document.querySelector(
+          '.codex-ui-composer textarea[aria-label="Message composer"]',
+        )?.value ?? null,
+    }),
+  );
+  if (
+    appendedAttachmentState.attachmentCount !== 2 ||
+    appendedAttachmentState.composerValue !==
+      "Preserve this draft while attaching another file."
+  ) {
+    throw new Error(
+      `Appending a selected attachment replaced the tray or draft: ${JSON.stringify(appendedAttachmentState)}`,
+    );
+  }
+  await composer.fill("");
   await composer.press("Enter");
   await attachmentLifecyclePage.waitForSelector(
     '.demo-root[data-frame="attachment-completed"][data-composer-phase="idle"]',
@@ -6714,6 +7281,16 @@ try {
     messageAttachmentCount: document.querySelectorAll(
       ".codex-ui-agent-message__attachments .codex-ui-message-attachment",
     ).length,
+    messageAttachmentLabels: Array.from(
+      document.querySelectorAll(
+        ".codex-ui-agent-message__attachments .codex-ui-message-attachment",
+      ),
+      (element) => element.getAttribute("aria-label"),
+    ),
+    messageText:
+      document.querySelector(
+        '[data-item-id="user-attachment-lifecycle"] .codex-ui-agent-message__content',
+      )?.textContent ?? null,
     permissionLabel:
       document
         .querySelector(".demo-composer-permission-trigger")
@@ -6723,15 +7300,239 @@ try {
   if (
     completed.composerAttachmentCount !== 0 ||
     completed.composerValue !== "" ||
-    completed.messageAttachmentCount !== 1 ||
+    completed.messageAttachmentCount !== 2 ||
+    completed.messageAttachmentLabels.some(
+      (label) => label !== "codex-ui-kit-current.png",
+    ) ||
+    completed.messageText !== null ||
     completed.permissionLabel !== "Ask for approval"
   ) {
     throw new Error(
       `Attachment lifecycle completion failed: ${JSON.stringify(completed)}`,
     );
   }
+  await attachmentLifecyclePage
+    .getByRole("button", { name: "Previous" })
+    .click();
+  await attachmentLifecyclePage.waitForFunction(
+    () =>
+      document
+        .querySelector(
+          '[data-item-id="user-attachment-lifecycle"] .codex-ui-agent-message__content',
+        )
+        ?.textContent?.startsWith("Reply using three") === true,
+  );
+  const scrubbed = await attachmentLifecyclePage.evaluate(() => ({
+    composerAttachmentCount: document.querySelectorAll(
+      ".codex-ui-composer .codex-ui-composer-attachment",
+    ).length,
+    messageAttachmentCount: document.querySelectorAll(
+      ".codex-ui-agent-message__attachments .codex-ui-message-attachment",
+    ).length,
+  }));
+  if (
+    scrubbed.composerAttachmentCount !== 0 ||
+    scrubbed.messageAttachmentCount !== 1
+  ) {
+    throw new Error(
+      `Replay scrubbing retained submitted attachment state: ${JSON.stringify(scrubbed)}`,
+    );
+  }
 } finally {
   await attachmentLifecycleApp.close();
+}
+
+const attachmentCompactScene = {
+  frame: "attachment-multi-compact",
+  id: "attachment-compact-submit-interaction",
+  scenario: "attachment-lifecycle",
+};
+const {
+  app: attachmentCompactApp,
+  page: attachmentCompactPage,
+} = await launchScene(attachmentCompactScene, { capture: false });
+try {
+  const compactSubmit = attachmentCompactPage.getByRole("button", {
+    name: "Send message",
+  });
+  if (!(await compactSubmit.isEnabled())) {
+    throw new Error("Ready compact attachments did not enable submission.");
+  }
+  await compactSubmit.click();
+  await attachmentCompactPage.waitForSelector(
+    '.demo-root[data-frame="attachment-completed"][data-composer-phase="idle"]',
+  );
+} finally {
+  await attachmentCompactApp.close();
+}
+
+const attachmentRemoveErrorScene = {
+  frame: "attachment-upload-error",
+  id: "attachment-remove-error-interaction",
+  scenario: "attachment-lifecycle",
+};
+const {
+  app: attachmentRemoveErrorApp,
+  page: attachmentRemoveErrorPage,
+} = await launchScene(attachmentRemoveErrorScene, { capture: false });
+try {
+  await attachmentRemoveErrorPage
+    .getByRole("button", { name: "Remove current-build.zip" })
+    .click();
+  const recoveredSubmit = attachmentRemoveErrorPage.getByRole("button", {
+    name: "Send message",
+  });
+  await recoveredSubmit.waitFor();
+  if (!(await recoveredSubmit.isEnabled())) {
+    throw new Error(
+      "Removing the final failed attachment did not enable ready attachments.",
+    );
+  }
+  await recoveredSubmit.click();
+  await attachmentRemoveErrorPage.waitForSelector(
+    '.demo-root[data-frame="attachment-completed"][data-composer-phase="idle"]',
+  );
+} finally {
+  await attachmentRemoveErrorApp.close();
+}
+
+const attachmentRecoveryScene = {
+  frame: "attachment-upload-error",
+  id: "attachment-recovery-interaction",
+  scenario: "attachment-lifecycle",
+};
+const {
+  app: attachmentRecoveryApp,
+  page: attachmentRecoveryPage,
+} = await launchScene(attachmentRecoveryScene, { capture: false });
+try {
+  await attachmentRecoveryPage
+    .getByRole("button", { name: "Retry current-build.zip" })
+    .click();
+  await attachmentRecoveryPage.waitForSelector(
+    '.demo-root[data-frame="attachment-uploading"] [role="progressbar"][aria-valuenow="18"]',
+  );
+  await attachmentRecoveryPage.waitForFunction(
+    () =>
+      document.activeElement?.getAttribute("aria-label") ===
+      "Message composer",
+  );
+  await attachmentRecoveryPage.waitForSelector(
+    '.demo-root[data-frame="attachment-multi-ready"] .codex-ui-composer-attachment[data-status="ready"]',
+  );
+  const recoveryState = await attachmentRecoveryPage.evaluate(() => ({
+    attachmentCount: document.querySelectorAll(
+      ".codex-ui-composer .codex-ui-composer-attachment",
+    ).length,
+    errorCount: document.querySelectorAll(
+      '.codex-ui-composer-attachment[data-status="error"]',
+    ).length,
+    progressCount: document.querySelectorAll('[role="progressbar"]').length,
+  }));
+  if (
+    recoveryState.attachmentCount !== 5 ||
+    recoveryState.errorCount !== 0 ||
+    recoveryState.progressCount !== 0
+  ) {
+    throw new Error(
+      `Attachment upload retry did not settle cleanly: ${JSON.stringify(recoveryState)}`,
+    );
+  }
+} finally {
+  await attachmentRecoveryApp.close();
+}
+
+const attachmentPreviewScene = {
+  frame: "attachment-preview-error",
+  id: "attachment-preview-interaction",
+  scenario: "attachment-lifecycle",
+};
+const {
+  app: attachmentPreviewApp,
+  page: attachmentPreviewPage,
+} = await launchScene(attachmentPreviewScene, { capture: false });
+try {
+  await attachmentPreviewPage
+    .getByRole("button", { name: "Retry reference-unavailable.png" })
+    .click();
+  await attachmentPreviewPage.waitForSelector(
+    '.demo-root[data-frame="attachment-ready"] .codex-ui-composer-attachment[data-status="ready"] img',
+  );
+  await attachmentPreviewPage.waitForFunction(
+    () =>
+      document.activeElement?.getAttribute("aria-label") ===
+      "Message composer",
+  );
+  if (
+    (await attachmentPreviewPage.getByText("Preview unavailable").count()) !== 0
+  ) {
+    throw new Error("Attachment preview retry retained the failure status.");
+  }
+} finally {
+  await attachmentPreviewApp.close();
+}
+
+const nativeAttachmentRetryScene = {
+  frame: "attachment-empty",
+  id: "native-attachment-retry-interaction",
+  scenario: "attachment-lifecycle",
+};
+const {
+  app: nativeAttachmentRetryApp,
+  page: nativeAttachmentRetryPage,
+} = await launchScene(nativeAttachmentRetryScene, {
+  capture: false,
+  environment: {
+    CODEX_DEMO_ATTACHMENT_FIXTURE_FAIL_ONCE: "1",
+    CODEX_DEMO_ATTACHMENT_FIXTURE_PATHS: JSON.stringify([
+      join(process.cwd(), "../../README.md"),
+    ]),
+    CODEX_DEMO_ATTACHMENT_RENDERER_FIXTURE: "0",
+  },
+});
+try {
+  await nativeAttachmentRetryPage
+    .getByRole("button", { name: "Add files and more" })
+    .click();
+  await nativeAttachmentRetryPage
+    .getByRole("option", { name: "Files and folders" })
+    .click();
+  await nativeAttachmentRetryPage.waitForSelector(
+    '.demo-root[data-frame="attachment-upload-error"] .codex-ui-composer-attachment[data-status="error"]',
+  );
+  await nativeAttachmentRetryPage
+    .getByRole("button", { name: "Retry Files and folders" })
+    .click();
+  await nativeAttachmentRetryPage.waitForSelector(
+    '.demo-root[data-frame="attachment-native-ready"] .codex-ui-composer-attachment[data-status="ready"]',
+  );
+  await nativeAttachmentRetryPage.waitForFunction(
+    () =>
+      document.activeElement?.getAttribute("aria-label") ===
+      "Message composer",
+  );
+  const nativeRetryState = await nativeAttachmentRetryPage.evaluate(() => ({
+    attachmentCount: document.querySelectorAll(
+      ".codex-ui-composer .codex-ui-composer-attachment",
+    ).length,
+    errorCount: document.querySelectorAll(
+      '.codex-ui-composer-attachment[data-status="error"]',
+    ).length,
+    label: document
+      .querySelector(".codex-ui-composer-attachment__label")
+      ?.textContent?.trim(),
+  }));
+  if (
+    nativeRetryState.attachmentCount !== 1 ||
+    nativeRetryState.errorCount !== 0 ||
+    nativeRetryState.label !== "README.md"
+  ) {
+    throw new Error(
+      `Native attachment retry did not reopen and replace the failed selection: ${JSON.stringify(nativeRetryState)}`,
+    );
+  }
+} finally {
+  await nativeAttachmentRetryApp.close();
 }
 
 const contextSummaryScene = {

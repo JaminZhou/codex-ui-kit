@@ -135,7 +135,7 @@
   );
   --codex-ui-composer-attachment-gap: calc(var(--codex-ui-spacing) * 2);
   --codex-ui-composer-attachment-inset: calc(var(--codex-ui-spacing) * 2);
-  --codex-ui-composer-attachment-card-height: calc(var(--codex-ui-spacing) * 14);
+  --codex-ui-composer-attachment-card-height: calc(var(--codex-ui-spacing) * 16);
   --codex-ui-composer-context-control-height: 1.75rem;
   --codex-ui-composer-dock-gap: 0.3125rem;
   --codex-ui-composer-mention-max-height: 11.0625rem;

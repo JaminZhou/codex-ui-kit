@@ -15,7 +15,8 @@ Codex UI Kit exposes protocol-neutral React components. Hosts own data fetching,
 - `AgentTurn` and `ActivityGroup`: explicit standard and grouped spacing contracts.
 - `ThreadVirtualizedPlaceholder`: estimated-height placeholder for host-owned thread virtualization.
 - `AgentMessage`: user, assistant, and system presentation with user-bubble geometry, edit activation, actions, running ARIA state, target highlighting, and a message-owned attachment slot outside the editable user bubble.
-- `MessageAttachment`: current-build sent-image presentation with an explicit host-owned open action and accessible label.
+- `MessageAttachment`: sent image, file-card, and preview-unavailable
+  presentation with an explicit host-owned open action and accessible label.
 - `ThreadLoadingState` and `ThreadThinkingPlaceholder`: loading, reconnecting, and thinking states.
 - `ThreadContextOptimization`: manual compaction, automatic compaction, and Work-mode conversation optimization in running and completed states.
 - `ThreadInterruptionSummary`: current-build stop-result row with duration
@@ -104,12 +105,14 @@ All privileged behavior remains host-owned. The components never auto-approve co
 
 ## Composer
 
-- `AgentComposer`: controlled autosizing input with automatic, single-line, and multiline layouts; submit/stop behavior; focus transfer; and protocol-neutral slots. `allowSubmitWhileRunning` lets Enter route a follow-up to a host-owned queue while Stop remains the visible primary action.
+- `AgentComposer`: controlled autosizing input with automatic, single-line, and multiline layouts; text or explicitly host-enabled attachment-only submit/stop behavior; focus transfer; and protocol-neutral slots. `allowAttachmentOnlySubmit` confirms that the host has sendable attachment state instead of inferring it from an opaque React subtree. `allowSubmitWhileRunning` lets Enter route a follow-up to a host-owned queue while Stop remains the visible primary action. `submitDisabled` keeps only the submit affordance unavailable while host-owned attachment upload or recovery controls remain interactive.
 - `ComposerDock`: current-build composition that keeps context controls,
   external queue state, and the input card in distinct ownership slots.
 - `ComposerContextBar` and `ComposerContextControl`: accessible project,
   environment, branch, or host-defined context controls above the Composer.
-- `ComposerAttachment`: pill, card, and current-build 80px image layouts with ready, uploading, error, open, and remove states.
+- `ComposerAttachment`: pill, 64px file/folder card, and current-build 80px
+  image layouts with ready, bounded upload-progress, upload-error,
+  preview-error, retry, open, and remove states.
 - `ComposerMentionMenu`: grouped file, skill, app, agent, or custom mentions with loading, empty, disabled, active, and keyboard-selection states.
 - `ComposerModeIndicator`: Plan, Goal, Review, or host-defined footer mode with a clear affordance.
 - `QueuedPromptList`: reorderable queued follow-ups with queued, editing, paused, interrupted, retry, steer, delete, resume, and queue-toggle behavior.

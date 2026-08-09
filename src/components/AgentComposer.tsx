@@ -37,6 +37,7 @@ export type ComposerLayout = "auto" | "single-line" | "multiline";
 export interface AgentComposerProps
   extends Omit<FormHTMLAttributes<HTMLFormElement>, "children" | "onSubmit"> {
   actions?: ReactNode;
+  allowAttachmentOnlySubmit?: boolean;
   allowSubmitWhileRunning?: boolean;
   attachments?: ReactNode;
   controls?: ReactNode;
@@ -50,6 +51,7 @@ export interface AgentComposerProps
   queue?: ReactNode;
   suggestions?: ReactNode;
   stopLabel?: string;
+  submitDisabled?: boolean;
   submitLabel?: string;
   textareaLabel?: string;
   textareaProps?: Omit<
@@ -65,6 +67,7 @@ export const AgentComposer = forwardRef<
 >(function AgentComposer(
   {
     actions,
+    allowAttachmentOnlySubmit = false,
     allowSubmitWhileRunning = false,
     attachments,
     className,
@@ -78,6 +81,7 @@ export const AgentComposer = forwardRef<
     placeholder = "Ask the agent to do something…",
     queue,
     stopLabel = "Stop generation",
+    submitDisabled = false,
     submitLabel = "Send message",
     textareaLabel = "Message",
     textareaProps,
@@ -119,8 +123,10 @@ export const AgentComposer = forwardRef<
   } = textareaProps ?? {};
   const canSubmit =
     !disabled &&
+    !submitDisabled &&
     (!isRunning || allowSubmitWhileRunning) &&
-    value.trim().length > 0;
+    (value.trim().length > 0 ||
+      (allowAttachmentOnlySubmit && hasAttachments));
   const contentRequiresMultiline =
     hasAttachments || hasRenderedQueue || value.includes("\n");
   const resolvedLayout = contentRequiresMultiline
@@ -431,16 +437,20 @@ export interface ComposerAttachmentProps
     "children" | "onClick" | "onKeyDown"
   > {
   icon?: ReactNode;
-  kind?: "file" | "image" | "pasted-text" | "selection";
+  kind?: "file" | "folder" | "image" | "pasted-text" | "selection";
   label: string;
   layout?: "card" | "image" | "pill";
   meta?: string;
   onOpen?: () => void;
   onRemove?: () => void;
+  onRetry?: () => void;
   openLabel?: string;
   previewSrc?: string;
+  progress?: number;
   removeLabel?: string;
-  status?: "error" | "ready" | "uploading";
+  retryLabel?: string;
+  status?: "error" | "preview-error" | "ready" | "uploading";
+  statusLabel?: string;
 }
 
 export function ComposerAttachment({
@@ -452,19 +462,65 @@ export function ComposerAttachment({
   meta,
   onOpen,
   onRemove,
+  onRetry,
   openLabel = `Open ${label}`,
   previewSrc,
+  progress,
   removeLabel = `Remove ${label}`,
+  retryLabel = `Retry ${label}`,
   status = "ready",
+  statusLabel,
   ...props
 }: ComposerAttachmentProps) {
   const classes = ["codex-ui-composer-attachment", className]
     .filter(Boolean)
     .join(" ");
+  const resolvedStatusLabel =
+    statusLabel ??
+    (status === "uploading"
+      ? "Uploading…"
+      : status === "error"
+        ? "Upload failed"
+        : status === "preview-error"
+          ? "Preview unavailable"
+          : undefined);
+  const normalizedProgress =
+    typeof progress === "number" && Number.isFinite(progress)
+      ? Math.min(100, Math.max(0, progress))
+      : undefined;
+  const progressNode =
+    status === "uploading" && normalizedProgress !== undefined ? (
+      <span
+        aria-label={`Uploading ${label}`}
+        aria-valuemax={100}
+        aria-valuemin={0}
+        aria-valuenow={normalizedProgress}
+        className="codex-ui-composer-attachment__progress"
+        role="progressbar"
+      >
+        <span style={{ width: `${normalizedProgress}%` }} />
+      </span>
+    ) : null;
+  const accessibleStatusNode =
+    status !== "ready" && resolvedStatusLabel ? (
+      <span
+        className="codex-ui-composer-attachment__accessible-status"
+        role="status"
+      >
+        {resolvedStatusLabel}
+      </span>
+    ) : null;
 
   const content = (
     <>
-      {previewSrc ? (
+      {kind === "image" && status === "preview-error" ? (
+        <span
+          aria-hidden="true"
+          className="codex-ui-composer-attachment__preview-error"
+        >
+          {resolvedStatusLabel}
+        </span>
+      ) : previewSrc ? (
         <img
           alt=""
           className="codex-ui-composer-attachment__preview"
@@ -475,6 +531,8 @@ export function ComposerAttachment({
           {icon ??
             (kind === "pasted-text"
               ? "▤"
+              : kind === "folder"
+                ? "▱"
               : kind === "selection"
                 ? "⌁"
                 : "□")}
@@ -482,16 +540,9 @@ export function ComposerAttachment({
       )}
       <span className="codex-ui-composer-attachment__copy">
         <span className="codex-ui-composer-attachment__label">{label}</span>
-        {meta || status !== "ready" ? (
-          <span
-            className="codex-ui-composer-attachment__meta"
-            role={status === "ready" ? undefined : "status"}
-          >
-            {status === "uploading"
-              ? "Uploading…"
-              : status === "error"
-                ? "Upload failed"
-                : meta}
+        {meta || resolvedStatusLabel ? (
+          <span className="codex-ui-composer-attachment__meta">
+            {resolvedStatusLabel ?? meta}
           </span>
         ) : null}
       </span>
@@ -520,6 +571,18 @@ export function ComposerAttachment({
       ) : (
         content
       )}
+      {accessibleStatusNode}
+      {progressNode}
+      {onRetry ? (
+        <button
+          aria-label={retryLabel}
+          className="codex-ui-composer-attachment__retry"
+          onClick={onRetry}
+          type="button"
+        >
+          Retry
+        </button>
+      ) : null}
       {onRemove ? (
         <button
           aria-label={removeLabel}

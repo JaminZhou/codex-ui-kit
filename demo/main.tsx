@@ -2663,7 +2663,9 @@ function Showcase() {
                 </div>
 
                 <div className="composer-aux-preview__sample">
-                  <span>Attachment tray · file + paste + image</span>
+                  <span>
+                    Attachment tray · file + folder + upload + recovery
+                  </span>
                   <AgentComposer
                     attachments={
                       <>
@@ -2675,16 +2677,38 @@ function Showcase() {
                           onRemove={() => undefined}
                         />
                         <ComposerAttachment
-                          kind="pasted-text"
-                          label="Pasted text"
+                          kind="folder"
+                          label="src"
                           layout="card"
+                          meta="Folder"
+                          onRemove={() => undefined}
+                        />
+                        <ComposerAttachment
+                          kind="file"
+                          label="current-build.zip"
+                          layout="card"
+                          progress={62}
                           status="uploading"
+                        />
+                        <ComposerAttachment
+                          kind="file"
+                          label="failed-upload.json"
+                          layout="card"
+                          onRetry={() => undefined}
+                          status="error"
                         />
                         <ComposerAttachment
                           kind="image"
                           label="UI reference"
                           layout="image"
                           previewSrc="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='72' height='72'%3E%3Crect width='72' height='72' fill='%23339cff'/%3E%3Cpath d='M14 50l14-17 9 10 8-9 13 16' fill='none' stroke='white' stroke-width='4'/%3E%3C/svg%3E"
+                        />
+                        <ComposerAttachment
+                          kind="image"
+                          label="Unavailable preview"
+                          layout="image"
+                          onRetry={() => undefined}
+                          status="preview-error"
                         />
                       </>
                     }

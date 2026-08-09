@@ -344,10 +344,13 @@ function replayCountForSelection(
   scenario: ReplayScenario,
   frame: string | null,
 ) {
-  if (scenario.id === "attachment-lifecycle" && frame === "attachment-ready") {
+  if (frame && frame in scenario.frames) return scenario.frames[frame];
+  if (
+    scenario.id === "attachment-lifecycle" &&
+    frame?.startsWith("attachment-")
+  ) {
     return 0;
   }
-  if (frame && scenario.frames[frame]) return scenario.frames[frame];
   if (isSubagentScenarioId(scenario.id) && frame) {
     const state = frame.includes("mixed")
       ? "mixed"
@@ -467,7 +470,11 @@ function presentSubagent(
 }
 
 function initialComposerValue(frame: string | null) {
-  if (frame === "attachment-ready") {
+  if (
+    frame === "attachment-ready" ||
+    frame === "attachment-multi-ready" ||
+    frame === "attachment-native-ready"
+  ) {
     return "Reply using three uppercase words describing this test: attachment, lifecycle, complete. Include a final period and no other text.";
   }
   if (frame === "context-compaction-command-menu") return "/compact";
@@ -506,6 +513,108 @@ function initialComposerMode(frame: string | null): ComposerMode {
 
 const attachmentPreviewDataUrl =
   "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAusB9Y9WlS8AAAAASUVORK5CYII=";
+
+type DemoComposerAttachmentStatus =
+  | "error"
+  | "preview-error"
+  | "ready"
+  | "uploading";
+
+interface DemoComposerAttachmentItem {
+  id: string;
+  kind: "file" | "folder" | "image";
+  label: string;
+  layout: "card" | "image";
+  meta?: string;
+  previewSrc?: string;
+  progress?: number;
+  status: DemoComposerAttachmentStatus;
+}
+
+function attachmentItemsForFrame(
+  frame: string | null,
+): DemoComposerAttachmentItem[] {
+  if (frame === "composer-attachment" || frame === "attachment-ready") {
+    return [
+      {
+        id: "current-image",
+        kind: "image",
+        label: "codex-ui-kit-current.png",
+        layout: "image",
+        previewSrc: attachmentPreviewDataUrl,
+        status: "ready",
+      },
+    ];
+  }
+  if (frame === "attachment-preview-error") {
+    return [
+      {
+        id: "preview-error",
+        kind: "image",
+        label: "reference-unavailable.png",
+        layout: "image",
+        status: "preview-error",
+      },
+    ];
+  }
+  const status: DemoComposerAttachmentStatus =
+    frame === "attachment-uploading"
+      ? "uploading"
+      : frame === "attachment-upload-error"
+        ? "error"
+        : "ready";
+  if (
+    frame === "attachment-multi-ready" ||
+    frame === "attachment-multi-compact" ||
+    frame === "attachment-uploading" ||
+    frame === "attachment-upload-error"
+  ) {
+    return [
+      {
+        id: "readme",
+        kind: "file",
+        label: "README.md",
+        layout: "card",
+        meta: "MD",
+        status: "ready",
+      },
+      {
+        id: "source-folder",
+        kind: "folder",
+        label: "src",
+        layout: "card",
+        meta: "Folder",
+        status: "ready",
+      },
+      {
+        id: "archive",
+        kind: "file",
+        label: "current-build.zip",
+        layout: "card",
+        meta: "ZIP",
+        progress: status === "uploading" ? 62 : undefined,
+        status,
+      },
+      {
+        id: "notes",
+        kind: "file",
+        label: "notes.txt",
+        layout: "card",
+        meta: "TXT · 1–24",
+        status: "ready",
+      },
+      {
+        id: "manifest",
+        kind: "file",
+        label: "package.json",
+        layout: "card",
+        meta: "JSON",
+        status: "ready",
+      },
+    ];
+  }
+  return [];
+}
 
 const composerPermissionOptions: readonly ComposerPermissionOption[] = [
   {
@@ -1372,6 +1481,14 @@ export function App() {
     useState("full");
   const [composerResourceActiveId, setComposerResourceActiveId] =
     useState("files");
+  const [composerAttachments, setComposerAttachments] = useState<
+    DemoComposerAttachmentItem[]
+  >(() => attachmentItemsForFrame(initialSelection.frame));
+  const [submittedComposerAttachments, setSubmittedComposerAttachments] =
+    useState<DemoComposerAttachmentItem[]>([]);
+  const [submittedComposerPrompt, setSubmittedComposerPrompt] = useState<
+    string | null
+  >(null);
   const [queuedPrompts, setQueuedPrompts] = useState<QueuedPrompt[]>(() =>
     initialQueuedPrompts(initialSelection.frame),
   );
@@ -1553,6 +1670,7 @@ export function App() {
   const [workspaceEnvironmentLauncher, setWorkspaceEnvironmentLauncher] =
     useState<"environment" | "worktree">("environment");
   const queuedPromptCounterRef = useRef(1);
+  const attachmentSelectionCounterRef = useRef(1);
   const terminalSessionCounterRef = useRef(
     initialTerminalSessionIds(
       initialSelection.scenarioId,
@@ -1792,6 +1910,11 @@ export function App() {
       scenario.frames["approval-current-session-first-completed"];
     setActiveFrame(replaySessionFrame);
     setComposerOverlay(null);
+    if (isCurrentAttachmentReplay) {
+      setComposerAttachments([]);
+      setSubmittedComposerAttachments([]);
+      setSubmittedComposerPrompt(null);
+    }
     setReplayComposerSubmitting(false);
     setReplayComposerStopped(false);
     setReplayQueuedContinuation(null);
@@ -1896,6 +2019,9 @@ export function App() {
     setComposerOverlay(initialComposerOverlay(frame));
     setComposerMode(initialComposerMode(frame));
     setComposerResourceActiveId("files");
+    setComposerAttachments(attachmentItemsForFrame(frame));
+    setSubmittedComposerAttachments([]);
+    setSubmittedComposerPrompt(null);
     setQueuedPrompts([]);
     setQueueingEnabled(true);
     setQueueInterrupted(false);
@@ -1975,6 +2101,9 @@ export function App() {
     setActiveFrame(null);
     setComposerValue("");
     setComposerOverlay(null);
+    setComposerAttachments([]);
+    setSubmittedComposerAttachments([]);
+    setSubmittedComposerPrompt(null);
     setQueuedPrompts([]);
     setQueueingEnabled(true);
     setQueueInterrupted(false);
@@ -1993,7 +2122,7 @@ export function App() {
 
   const dismissComposerResources = () => {
     setComposerOverlay(null);
-    setActiveFrame(null);
+    if (!isCurrentAttachmentReplay) setActiveFrame(null);
     window.setTimeout(() => composerInputRef.current?.focus());
   };
 
@@ -2217,10 +2346,18 @@ export function App() {
     requestAnimationFrame(() => composerInputRef.current?.focus());
   };
 
+  const attachmentSubmissionReady =
+    composerAttachments.length > 0 &&
+    composerAttachments.every(({ status }) => status === "ready");
+
   const submitComposer = (prompt: string) => {
     if (isCurrentAttachmentReplay) {
-      if (activeFrame !== "attachment-ready") return;
+      if (!attachmentSubmissionReady) return;
       cancelReplaySubmitTimer();
+      setSubmittedComposerAttachments(
+        composerAttachments.map((attachment) => ({ ...attachment })),
+      );
+      setSubmittedComposerPrompt(prompt);
       setReplayComposerSubmitting(true);
       setComposerOverlay(null);
       setActiveFrame("attachment-submitting");
@@ -2228,6 +2365,7 @@ export function App() {
         replaySubmitTimerRef.current = null;
         setReplayCount(scenario.events.length);
         setActiveFrame("attachment-completed");
+        setComposerAttachments([]);
         setReplayComposerSubmitting(false);
         setComposerValue((current) => (current === prompt ? "" : current));
         requestAnimationFrame(() => composerInputRef.current?.focus());
@@ -2320,6 +2458,7 @@ export function App() {
     }
     setActiveFrame(null);
     setComposerOverlay(null);
+    setComposerAttachments([]);
     if (replayComposerRunning) {
       if (queueingEnabled) {
         queuedPromptCounterRef.current += 1;
@@ -2996,8 +3135,8 @@ export function App() {
         : "running"
       : queueInterrupted
         ? "queue-paused"
-        : activeFrame === "composer-attachment" ||
-            activeFrame === "attachment-ready"
+        : composerAttachments.length > 0 ||
+            activeFrame === "composer-attachment"
           ? "attachment"
           : composerMode
             ? composerMode
@@ -3278,6 +3417,158 @@ export function App() {
   const showLifecycleComposer = isConversationLifecycle;
   const currentComposerComposition =
     currentHeaderReplay || showLifecycleComposer || isCurrentApprovalReplay;
+  const removeComposerAttachment = (id: string) => {
+    setComposerAttachments((items) => {
+      const next = items.filter((item) => item.id !== id);
+      if (next.length === 0) {
+        setActiveFrame(isCurrentAttachmentReplay ? "attachment-empty" : null);
+      }
+      return next;
+    });
+    requestAnimationFrame(() => composerInputRef.current?.focus());
+  };
+  const retryComposerAttachment = (id: string) => {
+    cancelReplaySubmitTimer();
+    if (id.startsWith("native-selection-error:")) {
+      void selectFilesAndFolders(id);
+      return;
+    }
+    const previewRetry = composerAttachments.some(
+      (item) => item.id === id && item.status === "preview-error",
+    );
+    if (previewRetry) {
+      setComposerAttachments((items) =>
+        items.map((item) =>
+          item.id === id
+            ? {
+                ...item,
+                previewSrc: attachmentPreviewDataUrl,
+                status: "ready",
+              }
+            : item,
+        ),
+      );
+      setActiveFrame("attachment-ready");
+      requestAnimationFrame(() => composerInputRef.current?.focus());
+      return;
+    }
+    setComposerAttachments((items) =>
+      items.map((item) =>
+        item.id === id
+          ? { ...item, progress: 18, status: "uploading" }
+          : item,
+      ),
+    );
+    setActiveFrame("attachment-uploading");
+    requestAnimationFrame(() => composerInputRef.current?.focus());
+    replaySubmitTimerRef.current = window.setTimeout(() => {
+      replaySubmitTimerRef.current = null;
+      setComposerAttachments((items) =>
+        items.map((item) =>
+          item.id === id
+            ? { ...item, progress: undefined, status: "ready" }
+            : item,
+        ),
+      );
+      setActiveFrame("attachment-multi-ready");
+    }, 420);
+  };
+  async function selectFilesAndFolders(replacingErrorId?: string) {
+    const previousAttachmentFrame = activeFrame;
+    setComposerOverlay(null);
+    setActiveFrame("attachment-picker");
+    if (
+      !window.codexDemo ||
+      window.codexDemo.useRendererAttachmentFixture
+    ) {
+      const selectionVersion = attachmentSelectionCounterRef.current++;
+      setComposerAttachments((items) => [
+        ...items.filter((item) => item.id !== replacingErrorId),
+        ...attachmentItemsForFrame("attachment-ready").map(
+          (attachment, index) => ({
+            ...attachment,
+            id: `${attachment.id}:selection:${selectionVersion}:${index + 1}`,
+          }),
+        ),
+      ]);
+      setActiveFrame("attachment-ready");
+      setComposerValue(
+        (current) => current || initialComposerValue("attachment-ready"),
+      );
+      requestAnimationFrame(() => composerInputRef.current?.focus());
+      return;
+    }
+    try {
+      const selected = await window.codexDemo.selectAttachments();
+      if (selected.length === 0) {
+        setActiveFrame(previousAttachmentFrame);
+        requestAnimationFrame(() => composerInputRef.current?.focus());
+        return;
+      }
+      const selectionVersion = attachmentSelectionCounterRef.current++;
+      setComposerAttachments((items) => [
+        ...items.filter((item) => item.id !== replacingErrorId),
+        ...selected.map((item, index) => ({
+          ...item,
+          id: `${item.id}:selection:${selectionVersion}:${index + 1}`,
+          layout: "card" as const,
+          status: "ready" as const,
+        })),
+      ]);
+      setActiveFrame("attachment-native-ready");
+      setComposerValue(
+        (current) =>
+          current || initialComposerValue("attachment-native-ready"),
+      );
+    } catch {
+      const selectionVersion = attachmentSelectionCounterRef.current++;
+      setComposerAttachments((items) =>
+        replacingErrorId
+          ? items
+          : [
+              ...items,
+              {
+                id: `native-selection-error:selection:${selectionVersion}`,
+                kind: "file",
+                label: "Files and folders",
+                layout: "card",
+                status: "error",
+              },
+            ],
+      );
+      setActiveFrame("attachment-upload-error");
+    }
+    requestAnimationFrame(() => composerInputRef.current?.focus());
+  }
+  const composerAttachmentNodes = composerAttachments.map((attachment) => (
+    <ComposerAttachment
+      icon={
+        attachment.kind === "folder" ? (
+          <CurrentBuildIcon name="composer-project" />
+        ) : attachment.kind === "file" ? (
+          <span className="demo-current-file-type">
+            {attachment.meta?.split(/\s|·/)[0] ?? "FILE"}
+          </span>
+        ) : undefined
+      }
+      key={attachment.id}
+      kind={attachment.kind}
+      label={attachment.label}
+      layout={attachment.layout}
+      meta={attachment.meta}
+      onOpen={() => undefined}
+      onRemove={() => removeComposerAttachment(attachment.id)}
+      onRetry={
+        attachment.status === "error" ||
+        attachment.status === "preview-error"
+          ? () => retryComposerAttachment(attachment.id)
+          : undefined
+      }
+      previewSrc={attachment.previewSrc}
+      progress={attachment.progress}
+      status={attachment.status}
+    />
+  ));
   const composerSurface = (
     <AgentComposer
       actions={
@@ -3287,7 +3578,7 @@ export function App() {
               aria-expanded={composerOverlay === "resources"}
               aria-label="Add files and more"
               onClick={() => {
-                setActiveFrame(null);
+                if (!isCurrentAttachmentReplay) setActiveFrame(null);
                 setComposerOverlay((current) =>
                   current === "resources" ? null : "resources",
                 );
@@ -3372,26 +3663,12 @@ export function App() {
           </span>
         ) : undefined
       }
+      allowAttachmentOnlySubmit={
+        isCurrentAttachmentReplay && attachmentSubmissionReady
+      }
       allowSubmitWhileRunning={showLifecycleComposer}
       aria-busy={composerIsDisabled || undefined}
-      attachments={
-        (showLifecycleComposer && activeFrame === "composer-attachment") ||
-        (isCurrentAttachmentReplay && activeFrame === "attachment-ready") ? (
-          <ComposerAttachment
-            kind="image"
-            label="codex-ui-kit-current.png"
-            layout="image"
-            onOpen={() => undefined}
-            onRemove={() => {
-              setActiveFrame(
-                isCurrentAttachmentReplay ? "attachment-empty" : null,
-              );
-              requestAnimationFrame(() => composerInputRef.current?.focus());
-            }}
-            previewSrc={attachmentPreviewDataUrl}
-          />
-        ) : undefined
-      }
+      attachments={composerAttachmentNodes}
       controls={
         showMeasuredComposer || showLifecycleComposer ? (
           <span className="demo-composer-actions">
@@ -3435,6 +3712,11 @@ export function App() {
                 : "Switch to Live to send a real local turn…"
       }
       stopLabel="Stop"
+      submitDisabled={
+        isCurrentAttachmentReplay
+          ? !attachmentSubmissionReady
+          : composerAttachments.length > 0 && !attachmentSubmissionReady
+      }
       submitLabel={
         isCurrentCommandInterruptionReplay ||
         isCurrentContextCompactionReplay
@@ -3477,10 +3759,17 @@ export function App() {
             onSelect={(option) => {
               setComposerResourceActiveId(option.id);
               if (isCurrentAttachmentReplay && option.id === "files") {
-                setActiveFrame("attachment-ready");
-                setComposerValue(initialComposerValue("attachment-ready"));
-                setComposerOverlay(null);
-                requestAnimationFrame(() => composerInputRef.current?.focus());
+                void selectFilesAndFolders();
+                return;
+              }
+              if (
+                isCurrentAttachmentReplay &&
+                (option.id === "goal" || option.id === "plan")
+              ) {
+                selectScenario(
+                  "conversation-lifecycle",
+                  `composer-${option.id}`,
+                );
                 return;
               }
               if (option.id === "goal" || option.id === "plan") {
@@ -5044,6 +5333,16 @@ export function App() {
     if (entry.kind === "message") {
       const message = state.messages.find(({ id }) => id === entry.id);
       if (!message) return null;
+      const submittedMessageAttachments =
+        isCurrentAttachmentReplay &&
+        message.role === "user" &&
+        message.id === "user-attachment-lifecycle" &&
+        submittedComposerAttachments.length > 0
+          ? submittedComposerAttachments
+          : null;
+      const submittedMessageText = submittedMessageAttachments
+        ? (submittedComposerPrompt ?? message.text)
+        : message.text;
       const groupedMcpIntro =
         ((scenarioId === "mcp-recovery-mixed-thread" &&
           (message.id === "assistant-recovery-intro" ||
@@ -5137,7 +5436,30 @@ export function App() {
               ) : undefined
             }
             attachments={
-              message.role === "user" && message.attachments?.length
+              submittedMessageAttachments
+                ? submittedMessageAttachments.map((attachment) => (
+                    <MessageAttachment
+                      alt={
+                        attachment.kind === "image" ? attachment.label : ""
+                      }
+                      icon={
+                        attachment.kind === "folder" ? (
+                          <CurrentBuildIcon name="composer-project" />
+                        ) : attachment.kind === "file" ? (
+                          <span className="demo-current-file-type">
+                            {attachment.meta?.split(/\s|·/)[0] ?? "FILE"}
+                          </span>
+                        ) : undefined
+                      }
+                      key={`${message.id}:submitted-attachment:${attachment.id}`}
+                      kind={attachment.kind === "image" ? "image" : "file"}
+                      label={attachment.label}
+                      meta={attachment.meta}
+                      onClick={() => undefined}
+                      previewSrc={attachment.previewSrc}
+                    />
+                  ))
+                : message.role === "user" && message.attachments?.length
                 ? message.attachments.map((attachment, index) => (
                     <MessageAttachment
                       alt={messageAttachmentAccessibleLabel(
@@ -5172,7 +5494,7 @@ export function App() {
                 {message.text || " "}
               </AgentMarkdown>
             ) : (
-              message.text
+              submittedMessageText || null
             )}
           </AgentMessage>
           {message.interruptionDurationMs !== undefined ? (

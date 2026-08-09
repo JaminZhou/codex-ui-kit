@@ -39,6 +39,40 @@ describe("composer visual contract", () => {
       '.codex-ui-composer-attachment[data-layout="card"]',
     );
     expect(styles).toMatch(
+      /\.codex-ui-composer-attachment\[data-layout="card"\] \{[\s\S]*?gap: 0\.625rem;[\s\S]*?max-width: 16rem;[\s\S]*?padding: 0\.75rem 2rem 0\.75rem 0\.75rem;/,
+    );
+    expect(styles).toMatch(
+      /\.codex-ui-composer-attachment\[data-layout="card"\][\s\S]*?> \.codex-ui-composer-attachment__open \{[\s\S]*?gap: 0\.625rem;/,
+    );
+    expect(styles).toMatch(
+      /\.codex-ui-composer-attachment \{[\s\S]*?box-sizing: border-box;/,
+    );
+    expect(styles).toMatch(
+      /\.codex-ui-composer-attachment__copy \{[\s\S]*?min-width: 0;[\s\S]*?overflow: hidden;/,
+    );
+    expect(styles).toContain(
+      ".codex-ui-composer-attachment__progress",
+    );
+    expect(styles).toMatch(
+      /\.codex-ui-composer-attachment\[data-layout="image"\][\s\S]*?> \.codex-ui-composer-attachment__progress \{[\s\S]*?left: 0\.5rem;[\s\S]*?right: 0\.5rem;/,
+    );
+    expect(styles).toMatch(
+      /\.codex-ui-composer-attachment\[data-layout="pill"\][\s\S]*?> \.codex-ui-composer-attachment__progress \{[\s\S]*?left: 0\.5rem;[\s\S]*?right: 0\.5rem;/,
+    );
+    expect(styles).toMatch(
+      /\.codex-ui-composer-attachment\[data-layout="card"\][\s\S]*?> \.codex-ui-composer-attachment__retry,[\s\S]*?\.codex-ui-composer-attachment\[data-layout="image"\][\s\S]*?> \.codex-ui-composer-attachment__retry \{[\s\S]*?position: absolute;/,
+    );
+    const pillRetryBlock = styles.match(
+      /(?:^|\n)\.codex-ui-composer-attachment__retry \{([^}]*)\}/,
+    )?.[1];
+    expect(pillRetryBlock).not.toContain("position: absolute");
+    expect(styles).toContain(
+      ".codex-ui-composer-attachment__retry:focus-visible",
+    );
+    expect(styles).toMatch(
+      /\.codex-ui-message-attachment \{[\s\S]*?box-sizing: border-box;/,
+    );
+    expect(styles).toMatch(
       /\.codex-ui-composer-dock__queue \{[\s\S]*?var\(--codex-ui-composer-queue-inline-inset\)[\s\S]*?overflow: hidden;/,
     );
     expect(styles).toMatch(

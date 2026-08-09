@@ -7,13 +7,27 @@ import {
 import {
   app,
   BrowserWindow,
+  dialog,
   ipcMain,
   nativeTheme,
   shell,
   type IpcMainInvokeEvent,
 } from "electron";
-import { dirname, join, resolve } from "node:path";
+import { stat } from "node:fs/promises";
+import {
+  dirname,
+  extname,
+  isAbsolute,
+  join,
+  resolve,
+} from "node:path";
 import { fileURLToPath } from "node:url";
+import {
+  attachmentDialogModeForPlatform,
+  attachmentPathLabel,
+  attachmentDialogProperties,
+  type AttachmentDialogKind,
+} from "./attachment-dialog.js";
 import { LiveApprovalGate } from "./live-approval-gate.js";
 import { LiveTurnStartGate } from "./live-turn-start-gate.js";
 import {
@@ -47,6 +61,7 @@ let liveThread: CodexThread | null = null;
 let activeTurn: CodexTurn | null = null;
 let unsubscribeNotifications: (() => void) | null = null;
 let unsubscribeServerRequests: (() => void)[] = [];
+let attachmentFixtureFailureInjected = false;
 const liveTurnStartGate = new LiveTurnStartGate();
 const liveApprovalGate = new LiveApprovalGate();
 
@@ -57,6 +72,13 @@ interface StartLiveInput {
 interface ApprovalResponseInput {
   decision: "accept" | "acceptForSession" | "decline";
   requestId: number | string;
+}
+
+interface AttachmentSelection {
+  id: string;
+  kind: "file" | "folder";
+  label: string;
+  meta: string;
 }
 
 function assertStartInput(value: unknown): asserts value is StartLiveInput {
@@ -249,6 +271,92 @@ async function handleCloseLive(event: IpcMainInvokeEvent) {
   await closeLive();
 }
 
+function attachmentFixturePaths(): string[] | null {
+  const raw = process.env.CODEX_DEMO_ATTACHMENT_FIXTURE_PATHS;
+  if (!raw) return null;
+  const parsed: unknown = JSON.parse(raw);
+  if (
+    !Array.isArray(parsed) ||
+    parsed.some((path) => typeof path !== "string" || !isAbsolute(path))
+  ) {
+    throw new TypeError(
+      "CODEX_DEMO_ATTACHMENT_FIXTURE_PATHS must be an array of absolute paths.",
+    );
+  }
+  return parsed;
+}
+
+async function describeAttachmentPaths(
+  paths: readonly string[],
+): Promise<AttachmentSelection[]> {
+  return Promise.all(
+    paths.map(async (path, index) => {
+      const stats = await stat(path);
+      const kind = stats.isDirectory() ? "folder" : "file";
+      const extension = extname(path).slice(1).toUpperCase();
+      return {
+        id: `native-attachment-${index + 1}`,
+        kind,
+        label: attachmentPathLabel(path, process.platform),
+        meta: kind === "folder" ? "Folder" : extension || "File",
+      } satisfies AttachmentSelection;
+    }),
+  );
+}
+
+async function chooseAttachmentDialogKind(): Promise<
+  AttachmentDialogKind | null
+> {
+  if (attachmentDialogModeForPlatform(process.platform) === "mixed") {
+    return "mixed";
+  }
+  const options = {
+    buttons: ["Files", "Folders", "Cancel"],
+    cancelId: 2,
+    defaultId: 0,
+    message: "What would you like to attach?",
+    noLink: true,
+    title: "Files and folders",
+    type: "question" as const,
+  };
+  const result = mainWindow
+    ? await dialog.showMessageBox(mainWindow, options)
+    : await dialog.showMessageBox(options);
+  return result.response === 0
+    ? "files"
+    : result.response === 1
+      ? "folders"
+      : null;
+}
+
+async function handleSelectAttachments(event: IpcMainInvokeEvent) {
+  assertTrustedIpc(event);
+  const fixturePaths = attachmentFixturePaths();
+  if (fixturePaths) {
+    if (
+      process.env.CODEX_DEMO_ATTACHMENT_FIXTURE_FAIL_ONCE === "1" &&
+      !attachmentFixtureFailureInjected
+    ) {
+      attachmentFixtureFailureInjected = true;
+      throw new Error("Simulated attachment fixture failure");
+    }
+    return describeAttachmentPaths(fixturePaths);
+  }
+  const kind = await chooseAttachmentDialogKind();
+  if (!kind) return [];
+  const result = mainWindow
+    ? await dialog.showOpenDialog(mainWindow, {
+        properties: attachmentDialogProperties(kind),
+        title: "Files and folders",
+      })
+    : await dialog.showOpenDialog({
+        properties: attachmentDialogProperties(kind),
+        title: "Files and folders",
+      });
+  if (result.canceled) return [];
+  return describeAttachmentPaths(result.filePaths);
+}
+
 function createWindow() {
   const scenario = process.env.CODEX_DEMO_SCENARIO ?? "streaming-recovery";
   const frame = process.env.CODEX_DEMO_FRAME ?? "recovered";
@@ -328,6 +436,7 @@ ipcMain.handle("demo:live:start", startLive);
 ipcMain.handle("demo:live:stop", handleStopLive);
 ipcMain.handle("demo:live:close", handleCloseLive);
 ipcMain.handle("demo:approval:respond", handleApprovalResponse);
+ipcMain.handle("demo:attachments:select", handleSelectAttachments);
 
 app.whenReady().then(() => {
   createWindow();

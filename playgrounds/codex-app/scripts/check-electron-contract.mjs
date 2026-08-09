@@ -1,4 +1,5 @@
 import { launchScene } from "./electron-harness.mjs";
+import { resolve } from "node:path";
 
 const scene = {
   frame: "recovered",
@@ -832,21 +833,6 @@ try {
   const composer = attachmentPage.getByRole("textbox", {
     name: "Message composer",
   });
-  await attachmentPage
-    .getByRole("button", { name: "Remove codex-ui-kit-current.png" })
-    .click();
-  await attachmentPage.waitForSelector(
-    '.demo-root[data-composer-phase="idle"]',
-  );
-  await attachmentPage
-    .getByRole("button", { name: "Add files and more" })
-    .click();
-  await attachmentPage
-    .getByRole("option", { name: "Files and folders" })
-    .click();
-  await attachmentPage.waitForSelector(
-    '.demo-root[data-composer-phase="attachment"] .codex-ui-composer-attachment',
-  );
   await composer.fill(
     "Reply using three uppercase words describing this test: attachment, lifecycle, complete. Include a final period and no other text.",
   );
@@ -882,6 +868,170 @@ try {
   }
 } finally {
   await attachmentApp.close();
+}
+
+const repositoryRoot = resolve(process.cwd(), "../..");
+const nativeAttachmentScene = {
+  frame: "attachment-empty",
+  id: "electron-native-attachment-selection",
+  scenario: "attachment-lifecycle",
+};
+const {
+  app: nativeAttachmentApp,
+  page: nativeAttachmentPage,
+} = await launchScene(nativeAttachmentScene, {
+  capture: false,
+  environment: {
+    CODEX_DEMO_ATTACHMENT_FIXTURE_PATHS: JSON.stringify([
+      resolve(repositoryRoot, "README.md"),
+      resolve(repositoryRoot, "package.json"),
+      resolve(repositoryRoot, "tsconfig.json"),
+      resolve(repositoryRoot, "src"),
+      resolve(repositoryRoot, "research"),
+      "/",
+    ]),
+  },
+});
+try {
+  await nativeAttachmentPage
+    .getByRole("button", { name: "Add files and more" })
+    .click();
+  await nativeAttachmentPage
+    .getByRole("option", { name: "Files and folders" })
+    .click();
+  await nativeAttachmentPage.waitForSelector(
+    '.demo-root[data-frame="attachment-native-ready"] .codex-ui-composer-attachment',
+  );
+  const nativeSelection = await nativeAttachmentPage.evaluate(() => {
+    const tray = document.querySelector(".codex-ui-composer__attachments");
+    return {
+      attachmentCount: document.querySelectorAll(
+        ".codex-ui-composer .codex-ui-composer-attachment",
+      ).length,
+      labels: Array.from(
+        document.querySelectorAll(
+          ".codex-ui-composer-attachment__label",
+        ),
+        (element) => element.textContent?.trim(),
+      ),
+      overflow: tray ? tray.scrollWidth - tray.clientWidth : null,
+      submitDisabled: document
+        .querySelector('.codex-ui-composer [data-action="submit"]')
+        ?.hasAttribute("disabled"),
+    };
+  });
+  if (
+    nativeSelection.attachmentCount !== 6 ||
+    !nativeSelection.labels.includes("README.md") ||
+    !nativeSelection.labels.includes("src") ||
+    !nativeSelection.labels.includes("/") ||
+    !(nativeSelection.overflow > 0) ||
+    nativeSelection.submitDisabled
+  ) {
+    throw new Error(
+      `Electron native attachment selection failed: ${JSON.stringify(nativeSelection)}`,
+    );
+  }
+  await nativeAttachmentPage
+    .getByRole("button", { name: "Remove README.md" })
+    .click();
+  if (
+    (await nativeAttachmentPage
+      .locator(".codex-ui-composer .codex-ui-composer-attachment")
+      .count()) !== 5
+  ) {
+    throw new Error("Electron native attachment removal did not update the tray.");
+  }
+  await nativeAttachmentPage
+    .getByRole("button", { name: "Send message" })
+    .click();
+  await nativeAttachmentPage.waitForSelector(
+    '.demo-root[data-frame="attachment-completed"][data-composer-phase="idle"]',
+  );
+  const submittedNativeAttachments = await nativeAttachmentPage.evaluate(
+    () => ({
+      composerAttachmentCount: document.querySelectorAll(
+        ".codex-ui-composer .codex-ui-composer-attachment",
+      ).length,
+      messageAttachmentCount: document.querySelectorAll(
+        ".codex-ui-agent-message__attachments .codex-ui-message-attachment",
+      ).length,
+      messageAttachmentLabels: Array.from(
+        document.querySelectorAll(
+          ".codex-ui-agent-message__attachments .codex-ui-message-attachment",
+        ),
+        (element) => element.getAttribute("aria-label"),
+      ),
+    }),
+  );
+  if (
+    submittedNativeAttachments.composerAttachmentCount !== 0 ||
+    submittedNativeAttachments.messageAttachmentCount !== 5 ||
+    submittedNativeAttachments.messageAttachmentLabels.includes("README.md") ||
+    !submittedNativeAttachments.messageAttachmentLabels.includes("package.json") ||
+    !submittedNativeAttachments.messageAttachmentLabels.includes("src") ||
+    !submittedNativeAttachments.messageAttachmentLabels.includes("/")
+  ) {
+    throw new Error(
+      `Electron native attachment submission did not preserve the selected tray: ${JSON.stringify(submittedNativeAttachments)}`,
+    );
+  }
+} finally {
+  await nativeAttachmentApp.close();
+}
+
+const cancelledAttachmentScene = {
+  frame: "attachment-ready",
+  id: "electron-cancelled-attachment-selection",
+  scenario: "attachment-lifecycle",
+};
+const {
+  app: cancelledAttachmentApp,
+  page: cancelledAttachmentPage,
+} = await launchScene(cancelledAttachmentScene, {
+  capture: false,
+  environment: {
+    CODEX_DEMO_ATTACHMENT_FIXTURE_PATHS: "[]",
+  },
+});
+try {
+  const composer = cancelledAttachmentPage.getByRole("textbox", {
+    name: "Message composer",
+  });
+  const valueBefore = await composer.inputValue();
+  await cancelledAttachmentPage
+    .getByRole("button", { name: "Add files and more" })
+    .click();
+  await cancelledAttachmentPage
+    .getByRole("option", { name: "Files and folders" })
+    .click();
+  await cancelledAttachmentPage.waitForSelector(
+    '.demo-root[data-frame="attachment-ready"][data-composer-phase="attachment"]',
+  );
+  await cancelledAttachmentPage.waitForFunction(
+    () =>
+      document.activeElement?.getAttribute("aria-label") ===
+      "Message composer",
+  );
+  const cancelledSelection = await cancelledAttachmentPage.evaluate(() => ({
+    attachmentCount: document.querySelectorAll(
+      ".codex-ui-composer .codex-ui-composer-attachment",
+    ).length,
+    label: document
+      .querySelector(".codex-ui-composer-attachment__label")
+      ?.textContent?.trim(),
+  }));
+  if (
+    cancelledSelection.attachmentCount !== 1 ||
+    cancelledSelection.label !== "codex-ui-kit-current.png" ||
+    (await composer.inputValue()) !== valueBefore
+  ) {
+    throw new Error(
+      `Electron cancelled attachment selection changed the draft: ${JSON.stringify(cancelledSelection)}`,
+    );
+  }
+} finally {
+  await cancelledAttachmentApp.close();
 }
 
 const markdownScene = {

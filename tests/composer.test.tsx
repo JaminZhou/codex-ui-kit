@@ -880,4 +880,121 @@ describe("AgentComposer", () => {
     expect(group.contains(attachment)).toBe(true);
     expect(bubble.contains(attachment)).toBe(false);
   });
+
+  it("allows attachment-only submission and renders sent file cards", () => {
+    const onSubmit = vi.fn();
+    const { rerender } = render(
+      <AgentComposer
+        allowAttachmentOnlySubmit
+        attachments={
+          <ComposerAttachment label="README.md" layout="card" meta="MD" />
+        }
+        onSubmit={onSubmit}
+        onValueChange={() => undefined}
+        value=""
+      />,
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "Send message" }));
+    expect(onSubmit).toHaveBeenCalledWith("");
+
+    rerender(
+      <AgentMessage
+        attachments={
+          <MessageAttachment
+            kind="file"
+            label="README.md"
+            meta="MD"
+            onClick={() => undefined}
+          />
+        }
+        role="user"
+      >
+        {""}
+      </AgentMessage>,
+    );
+    const file = screen.getByRole("button", { name: "README.md" });
+    expect(file.dataset.kind).toBe("file");
+    expect(screen.getByText("MD")).toBeTruthy();
+    expect(
+      file.closest(".codex-ui-agent-message")?.querySelector(
+        ".codex-ui-agent-message__content",
+      ),
+    ).toBeNull();
+  });
+
+  it("requires an explicit signal for attachment-only submission", () => {
+    function EmptyAttachment() {
+      return null;
+    }
+
+    render(
+      <AgentComposer
+        attachments={<EmptyAttachment />}
+        onSubmit={() => undefined}
+        onValueChange={() => undefined}
+        value=""
+      />,
+    );
+
+    expect(
+      screen
+        .getByRole("button", { name: "Send message" })
+        .hasAttribute("disabled"),
+    ).toBe(true);
+  });
+
+  it("disables submit without blocking attachment recovery controls", () => {
+    const onRetry = vi.fn();
+    render(
+      <AgentComposer
+        attachments={
+          <ComposerAttachment
+            label="failed.txt"
+            onRetry={onRetry}
+            status="error"
+          />
+        }
+        onSubmit={() => undefined}
+        onValueChange={() => undefined}
+        submitDisabled
+        value="Retry this attachment"
+      />,
+    );
+
+    expect(
+      screen
+        .getByRole("button", { name: "Send message" })
+        .hasAttribute("disabled"),
+    ).toBe(true);
+    const retry = screen.getByRole("button", { name: "Retry failed.txt" });
+    expect(retry.hasAttribute("disabled")).toBe(false);
+    fireEvent.click(retry);
+    expect(onRetry).toHaveBeenCalledOnce();
+  });
+
+  it("renders a sent attachment preview fallback", () => {
+    render(
+      <>
+        <span id="attachment-help">Reference supplied by the user.</span>
+        <MessageAttachment
+          aria-describedby="attachment-help"
+          label="reference.png"
+          onClick={() => undefined}
+          status="preview-error"
+        />
+      </>,
+    );
+
+    const status = screen.getByRole("status");
+    expect(status.textContent).toBe("Preview unavailable");
+    expect(status.closest("button")).toBeNull();
+    expect(
+      screen
+        .getByRole("button", { name: "reference.png" })
+        .getAttribute("aria-describedby")
+        ?.split(" "),
+    ).toEqual(["attachment-help", status.id]);
+    expect(screen.queryByRole("img")).toBeNull();
+  });
 });

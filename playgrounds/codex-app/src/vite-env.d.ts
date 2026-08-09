@@ -4,6 +4,15 @@ import type { JsonRpcNotification } from "@jaminzhou/codex-app-server-client";
 import type { ProtocolEventRecord } from "./protocol-state";
 
 interface CodexDemoBridge {
+  useRendererAttachmentFixture: boolean;
+  selectAttachments(): Promise<
+    {
+      id: string;
+      kind: "file" | "folder";
+      label: string;
+      meta: string;
+    }[]
+  >;
   closeLive(): Promise<void>;
   onNotification(
     handler: (notification: JsonRpcNotification) => void,
