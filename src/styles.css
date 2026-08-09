@@ -7334,6 +7334,18 @@ summary.codex-ui-activity__header::after {
   width: 100%;
 }
 
+.codex-ui-composer-attachment__accessible-status {
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  padding: 0;
+  position: absolute;
+  white-space: nowrap;
+  width: 1px;
+}
+
 .codex-ui-composer-attachment__preview {
   height: 100%;
   object-fit: cover;

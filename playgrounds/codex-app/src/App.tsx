@@ -2108,7 +2108,7 @@ export function App() {
 
   const dismissComposerResources = () => {
     setComposerOverlay(null);
-    setActiveFrame(null);
+    if (!isCurrentAttachmentReplay) setActiveFrame(null);
     window.setTimeout(() => composerInputRef.current?.focus());
   };
 

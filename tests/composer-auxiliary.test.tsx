@@ -141,14 +141,15 @@ describe("composer auxiliary surfaces", () => {
         kind="image"
         label="unavailable.png"
         layout="image"
+        onOpen={() => undefined}
         previewSrc="https://example.invalid/unavailable.png"
         status="preview-error"
       />,
     );
 
-    expect(screen.getByRole("status").textContent).toBe(
-      "Preview unavailable",
-    );
+    const status = screen.getByRole("status");
+    expect(status.textContent).toBe("Preview unavailable");
+    expect(status.closest("button")).toBeNull();
     expect(container.querySelector("img")).toBeNull();
   });
 

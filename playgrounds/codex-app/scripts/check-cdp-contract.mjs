@@ -6866,6 +6866,44 @@ try {
   await attachmentLifecyclePage.waitForSelector(
     '.demo-root[data-composer-phase="attachment"] .codex-ui-composer-attachment',
   );
+  const attachmentStateBeforeDismiss = await attachmentLifecyclePage.evaluate(
+    () => ({
+      attachmentCount: document.querySelectorAll(
+        ".codex-ui-composer .codex-ui-composer-attachment",
+      ).length,
+      frame: document.querySelector(".demo-root")?.getAttribute("data-frame"),
+    }),
+  );
+  await attachmentLifecyclePage
+    .getByRole("button", { name: "Add files and more" })
+    .click();
+  const attachmentResources = attachmentLifecyclePage.getByRole("listbox", {
+    name: "Composer resources",
+  });
+  await attachmentResources.waitFor();
+  await attachmentResources.press("Escape");
+  await attachmentResources.waitFor({ state: "detached" });
+  const dismissedAttachmentResources = await attachmentLifecyclePage.evaluate(
+    () => ({
+      attachmentCount: document.querySelectorAll(
+        ".codex-ui-composer .codex-ui-composer-attachment",
+      ).length,
+      frame: document.querySelector(".demo-root")?.getAttribute("data-frame"),
+      submitDisabled: document
+        .querySelector('.codex-ui-composer [data-action="submit"]')
+        ?.hasAttribute("disabled"),
+    }),
+  );
+  if (
+    dismissedAttachmentResources.attachmentCount !==
+      attachmentStateBeforeDismiss.attachmentCount ||
+    dismissedAttachmentResources.frame !== attachmentStateBeforeDismiss.frame ||
+    dismissedAttachmentResources.submitDisabled !== false
+  ) {
+    throw new Error(
+      `Dismissing attachment resources lost the ready frame: ${JSON.stringify(dismissedAttachmentResources)}`,
+    );
+  }
   await composer.fill(
     "Reply using three uppercase words describing this test: attachment, lifecycle, complete. Include a final period and no other text.",
   );
