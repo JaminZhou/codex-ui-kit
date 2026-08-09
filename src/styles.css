@@ -8541,7 +8541,7 @@ summary.codex-ui-activity__header::after {
 
 .codex-ui-markdown__table-actions {
   inset-block: 0;
-  inset-inline-end: 0;
+  inset-inline-end: var(--codex-ui-markdown-inline-overhang);
   opacity: 0;
   position: absolute;
   transition: opacity var(--codex-ui-transition-fast);
@@ -8549,9 +8549,11 @@ summary.codex-ui-activity__header::after {
   z-index: 10;
 }
 
-.codex-ui-markdown__table-container[data-wide-block]
-  .codex-ui-markdown__table-actions {
-  inset-inline-end: -2rem;
+@container codex-ui-app-shell (min-width: 73rem) {
+  .codex-ui-markdown__table-container[data-wide-block]
+    .codex-ui-markdown__table-actions {
+    inset-inline-end: -2rem;
+  }
 }
 
 .codex-ui-markdown__table-container:hover

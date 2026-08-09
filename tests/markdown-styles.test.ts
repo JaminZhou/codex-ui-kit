@@ -63,6 +63,12 @@ describe("Markdown visual contract", () => {
     expect(styles).toContain("overflow-wrap: break-word");
     expect(styles).toContain("padding-inline-start: 0");
     expect(styles).toContain(".codex-ui-markdown__table-actions");
+    expect(styles).toContain(
+      "inset-inline-end: var(--codex-ui-markdown-inline-overhang)",
+    );
+    expect(styles).toContain(
+      "@container codex-ui-app-shell (min-width: 73rem)",
+    );
     expect(styles).toContain("inset-inline-end: -2rem");
     expect(styles).toContain("height: 1.5rem");
     expect(styles).toContain("background: rgb(0 0 0 / 0.8)");

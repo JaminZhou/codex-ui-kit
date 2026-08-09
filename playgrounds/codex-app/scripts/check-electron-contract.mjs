@@ -1335,6 +1335,48 @@ try {
   const returnedFocus = await markdownTableActionsPage.evaluate(
     () => document.activeElement?.getAttribute("aria-label"),
   );
+  await markdownTableActionsApp.evaluate(({ BrowserWindow }) => {
+    BrowserWindow.getAllWindows()[0]?.setContentSize(720, 680);
+  });
+  await markdownTableActionsPage.waitForFunction(
+    () => window.innerWidth === 720 && window.innerHeight === 680,
+  );
+  await tableContainer.scrollIntoViewIfNeeded();
+  await tableContainer.hover();
+  const narrowState = await markdownTableActionsPage.evaluate(() => {
+    const actions = document.querySelector(
+      '[data-item-id="assistant-markdown-table-actions"] .codex-ui-markdown__table-actions',
+    );
+    const rect = (element) => {
+      if (!(element instanceof Element)) return null;
+      const value = element.getBoundingClientRect();
+      return {
+        left: value.left,
+        right: value.right,
+      };
+    };
+    return {
+      actions: rect(actions),
+      buttons: Array.from(actions?.querySelectorAll("button") ?? [], rect),
+      height: window.innerHeight,
+      horizontalOverflow:
+        document.documentElement.scrollWidth -
+        document.documentElement.clientWidth,
+      width: window.innerWidth,
+    };
+  });
+  await expandButton.click();
+  await previewDialog.waitFor({ state: "visible" });
+  await previewDialog
+    .getByRole("button", { name: "Close table preview" })
+    .click();
+  await previewDialog.waitFor({ state: "hidden" });
+  await markdownTableActionsPage.waitForFunction(
+    () => document.activeElement?.getAttribute("aria-label") === "Expand table",
+  );
+  const narrowReturnedFocus = await markdownTableActionsPage.evaluate(
+    () => document.activeElement?.getAttribute("aria-label"),
+  );
   if (
     openState.activeElement !== "Close table preview" ||
     openState.columns !== 18 ||
@@ -1342,10 +1384,20 @@ try {
     openState.scrollLeft <= 100 ||
     openState.clipboard?.["text/plain"]?.length !== 1_863 ||
     !openState.clipboard?.["text/html"]?.startsWith("<table>") ||
-    returnedFocus !== "Expand table"
+    returnedFocus !== "Expand table" ||
+    narrowState.width !== 720 ||
+    narrowState.height !== 680 ||
+    narrowState.horizontalOverflow > 1 ||
+    !narrowState.actions ||
+    narrowState.actions.left < 0 ||
+    narrowState.actions.right > narrowState.width ||
+    narrowState.buttons.some(
+      (rect) => !rect || rect.left < 0 || rect.right > narrowState.width,
+    ) ||
+    narrowReturnedFocus !== "Expand table"
   ) {
     throw new Error(
-      `Electron table actions interaction failed: ${JSON.stringify({ openState, returnedFocus })}`,
+      `Electron table actions interaction failed: ${JSON.stringify({ narrowReturnedFocus, narrowState, openState, returnedFocus })}`,
     );
   }
 } finally {

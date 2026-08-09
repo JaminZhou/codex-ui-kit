@@ -38,7 +38,7 @@ exit gates; it does not replace the inventory.
   explicit 820×680/720×680 reopen. Two more current tasks now cover concurrent
   siblings plus a Parent → Child delegation through active, mixed, completed,
   summary, flat-panel, live-progress, and independent transcript states while
-  retaining public `agentPath` hierarchy. Browser/CDP covers 131 lifecycle
+  retaining public `agentPath` hierarchy. Browser/CDP covers 132 lifecycle
   frames; Electron repeats
   the session, mismatch, input, picker, close, and resize interactions; the
   current 906×820 panel/content pixel ratios pass at 1.5120%/0.4004%.
@@ -65,9 +65,10 @@ exit gates; it does not replace the inventory.
   Electron verifies code copy, user scroll-away, and return to latest; four
   reviewed internal baselines pass. A later current-build 18-column task
   runtime-reaches the table Copy, Expand, and preview path. The public
-  `allowWideTables` contract, exact Markdown/HTML copy, 131-frame Browser/CDP
-  matrix, real Electron flow, two internal baselines, and local-only 4%/1%
-  preview/close gates now pass. Product reachability and pixel attribution for
+  `allowWideTables` contract, exact Markdown/HTML copy, 132-frame Browser/CDP
+  matrix, real Electron flow, three internal baselines including a 720×680
+  action-reachability state, and local-only 4%/1% preview/close gates now pass.
+  Product reachability and pixel attribution for
   the streaming mutations remain open, as do table error variants.
 - The previous `26.730.61309` refresh covered all six left-sidebar groups,
   selected/no-project and New worktree entry, plus sampled command, approval,

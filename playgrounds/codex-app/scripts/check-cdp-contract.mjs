@@ -3968,13 +3968,18 @@ for (const scene of visualScenes) {
         );
       }
     }
+    const expectedWindowWidth = scene.windowSize?.width ?? 1_180;
+    const minimumConversationViewportWidth =
+      expectedWindowWidth <= 720 ? 400 : 500;
     if (
       contract.header.bottom > contract.viewport.bottom ||
       contract.composer.top < contract.header.bottom ||
       contract.composer.bottom > contract.shell.bottom + 1 ||
-      contract.viewport.width < 500
+      contract.viewport.width < minimumConversationViewportWidth
     ) {
-      throw new Error(`${scene.id}: named surface geometry is invalid.`);
+      throw new Error(
+        `${scene.id}: named surface geometry is invalid: ${JSON.stringify({ contract, minimumConversationViewportWidth })}`,
+      );
     }
     if (contract.styles.viewportOverflowY !== "auto") {
       throw new Error(`${scene.id}: conversation viewport is not scrollable.`);
@@ -4017,13 +4022,15 @@ for (const scene of visualScenes) {
       );
     }
     const expectedSidebarMax =
-      scene.id === "terminal-compact" ||
-      scene.id === "terminal-current-compact" ||
-      scene.id === "attachment-multi-compact"
-        ? "468"
-        : scene.surfaces?.includes("reviewPanel")
-          ? "508"
-          : "520";
+      scene.id === "markdown-table-actions-narrow"
+        ? "368"
+        : scene.id === "terminal-compact" ||
+            scene.id === "terminal-current-compact" ||
+            scene.id === "attachment-multi-compact"
+          ? "468"
+          : scene.surfaces?.includes("reviewPanel")
+            ? "508"
+            : "520";
     if (
       contract.styles.resizerCursor !== "col-resize" ||
       Math.abs(contract.sidebarResizer.rect.width - 16) > 0.5 ||
@@ -5835,6 +5842,10 @@ try {
               }
             : null,
         table: rect(table),
+        viewport: {
+          height: window.innerHeight,
+          width: window.innerWidth,
+        },
       };
     });
   const resting = await inspectTable();
@@ -5919,6 +5930,28 @@ try {
   const returnedFocus = await markdownTableActionsPage.evaluate(
     () => document.activeElement?.getAttribute("aria-label"),
   );
+  await markdownTableActionsApp.evaluate(({ BrowserWindow }) => {
+    BrowserWindow.getAllWindows()[0]?.setContentSize(720, 680);
+  });
+  await markdownTableActionsPage.waitForFunction(
+    () => window.innerWidth === 720 && window.innerHeight === 680,
+  );
+  await tableContainer.scrollIntoViewIfNeeded();
+  await tableContainer.hover();
+  await markdownTableActionsPage.waitForTimeout(150);
+  const narrow = await inspectTable();
+  await expandButton.click();
+  await previewDialog.waitFor({ state: "visible" });
+  await previewDialog
+    .getByRole("button", { name: "Close table preview" })
+    .click();
+  await previewDialog.waitFor({ state: "hidden" });
+  await markdownTableActionsPage.waitForFunction(
+    () => document.activeElement?.getAttribute("aria-label") === "Expand table",
+  );
+  const narrowReturnedFocus = await markdownTableActionsPage.evaluate(
+    () => document.activeElement?.getAttribute("aria-label"),
+  );
   const labels = hovered.buttons.map(({ label }) => label);
   const viewBoxes = hovered.buttons.map(({ viewBox }) => viewBox);
   if (
@@ -5971,15 +6004,28 @@ try {
     Math.abs((preview.close.icon?.width ?? 0) - 18) > 0.5 ||
     Math.abs(preview.surface.rect.width - 892.8) > 1 ||
     Math.abs((preview.table?.width ?? 0) - (hovered.table?.width ?? 0)) > 1 ||
-    returnedFocus !== "Expand table"
+    returnedFocus !== "Expand table" ||
+    narrow.viewport.width !== 720 ||
+    narrow.viewport.height !== 680 ||
+    narrow.actions?.opacity !== "1" ||
+    !narrow.actions?.rect ||
+    narrow.actions.rect.left < 0 ||
+    narrow.actions.rect.right > narrow.viewport.width ||
+    narrow.buttons.some(
+      ({ rect }) =>
+        !rect || rect.left < 0 || rect.right > narrow.viewport.width,
+    ) ||
+    narrow.scroller?.overflowX !== "auto" ||
+    narrow.scroller.scrollWidth - narrow.scroller.clientWidth < 700 ||
+    narrowReturnedFocus !== "Expand table"
   ) {
     throw new Error(
-      `markdown-table-actions: current-build contract failed: ${JSON.stringify({ clipboard, hovered, preview, resting, returnedFocus })}`,
+      `markdown-table-actions: current-build contract failed: ${JSON.stringify({ clipboard, hovered, narrow, narrowReturnedFocus, preview, resting, returnedFocus })}`,
     );
   }
   await writeFile(
     join(artifactDirectory, "markdown-table-actions.json"),
-    `${JSON.stringify({ clipboard, hovered, preview, resting, returnedFocus }, null, 2)}\n`,
+    `${JSON.stringify({ clipboard, hovered, narrow, narrowReturnedFocus, preview, resting, returnedFocus }, null, 2)}\n`,
   );
 } finally {
   await markdownTableActionsApp.close();

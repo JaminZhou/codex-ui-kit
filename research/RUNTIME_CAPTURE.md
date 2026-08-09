@@ -862,7 +862,7 @@ expand-to-preview action.
 The independent playground adds a schema-valid nine-event trace with four
 public deltas. Five Browser/CDP checkpoints cover an incomplete link, open
 fenced code, nested and task lists, a readable multi-column table, twelve long
-sections, completion actions, and bottom-follow behavior inside the 131-frame
+sections, completion actions, and bottom-follow behavior inside the 132-frame
 matrix. Electron independently checks exact code copy, table focus, real
 wheel-driven scroll-away, the floating return control, and return to latest.
 Four reviewed internal baselines cover the streamed fence, table, long running
@@ -879,7 +879,9 @@ Expand trigger after close even though this product sample returned focus to
 `BODY`.
 
 The five-event replay, Browser/CDP, real Electron horizontal-wheel/copy/preview
-flow, and two reviewed internal baselines pass. A local-only current-build
+flow, and three reviewed internal baselines pass. The 720×680 contract moves
+the action rail inward, keeps both controls fully visible and clickable, and
+preserves focus restoration without document-level horizontal overflow. A local-only current-build
 reference gates the preview and close regions at 3.9737% and 0.5929% under 4%
 and 1% ceilings; it is not committed. Streaming mutation reachability, images,
 math, citations/sources, plugin variants, table error variants, and Markdown

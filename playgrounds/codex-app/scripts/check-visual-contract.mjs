@@ -595,6 +595,30 @@ for (const scene of selectedScenes) {
       await tableContainer.scrollIntoViewIfNeeded();
       await tableContainer.hover();
       await page.waitForTimeout(150);
+      if (scene.id === "markdown-table-actions-narrow") {
+        const actions = tableContainer.locator(
+          ".codex-ui-markdown__table-actions",
+        );
+        const actionBounds = await actions.boundingBox();
+        const buttonBounds = await Promise.all(
+          (await actions.locator("button").all()).map((button) =>
+            button.boundingBox(),
+          ),
+        );
+        if (
+          !actionBounds ||
+          actionBounds.left < 0 ||
+          actionBounds.left + actionBounds.width > 720 ||
+          buttonBounds.some(
+            (bounds) =>
+              !bounds || bounds.left < 0 || bounds.left + bounds.width > 720,
+          )
+        ) {
+          throw new Error(
+            `${scene.id}: narrow table actions are clipped: ${JSON.stringify({ actionBounds, buttonBounds })}`,
+          );
+        }
+      }
       if (scene.markdownTableState === "preview") {
         await tableContainer
           .getByRole("button", { name: "Expand table" })

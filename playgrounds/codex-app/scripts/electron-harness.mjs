@@ -265,6 +265,14 @@ export const visualScenes = [
   },
   {
     frame: "markdown-table-complete",
+    id: "markdown-table-actions-narrow",
+    markdownTableState: "hover",
+    maxPixelRatio: 0.01,
+    scenario: "markdown-table-actions",
+    windowSize: { height: 680, width: 720 },
+  },
+  {
+    frame: "markdown-table-complete",
     id: "markdown-table-actions-preview",
     markdownTableState: "preview",
     maxPixelRatio: 0.01,
