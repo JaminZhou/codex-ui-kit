@@ -106,6 +106,7 @@ describe("composer auxiliary surfaces", () => {
         kind="file"
         label="current-build.txt"
         layout="card"
+        onOpen={() => undefined}
         progress={125}
         status="uploading"
       />,
@@ -115,6 +116,7 @@ describe("composer auxiliary surfaces", () => {
       name: "Uploading current-build.txt",
     });
     expect(progress.getAttribute("aria-valuenow")).toBe("100");
+    expect(progress.closest("button")).toBeNull();
     expect(screen.getByRole("status").textContent).toBe("Uploading…");
 
     rerender(

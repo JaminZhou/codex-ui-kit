@@ -3709,6 +3709,14 @@ for (const scene of visualScenes) {
             ?.hasAttribute("disabled"),
         };
       });
+      variant.accessibleProgressCount =
+        scene.id === "attachment-uploading"
+          ? await page
+              .getByRole("progressbar", {
+                name: "Uploading current-build.zip",
+              })
+              .count()
+          : 0;
       contract.attachmentVariants = variant;
       const expectedCount = scene.id === "attachment-preview-error" ? 1 : 5;
       const expectsOverflow = scene.id !== "attachment-preview-error";
@@ -3738,6 +3746,7 @@ for (const scene of visualScenes) {
         ) ||
         (scene.id === "attachment-uploading" &&
           (variant.progress !== "62" ||
+            variant.accessibleProgressCount !== 1 ||
             !variant.statusText.includes("Uploading…"))) ||
         (scene.id === "attachment-upload-error" &&
           (variant.retryCount !== 1 ||

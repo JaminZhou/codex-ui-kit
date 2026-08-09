@@ -485,6 +485,19 @@ export function ComposerAttachment({
     typeof progress === "number" && Number.isFinite(progress)
       ? Math.min(100, Math.max(0, progress))
       : undefined;
+  const progressNode =
+    status === "uploading" && normalizedProgress !== undefined ? (
+      <span
+        aria-label={`Uploading ${label}`}
+        aria-valuemax={100}
+        aria-valuemin={0}
+        aria-valuenow={normalizedProgress}
+        className="codex-ui-composer-attachment__progress"
+        role="progressbar"
+      >
+        <span style={{ width: `${normalizedProgress}%` }} />
+      </span>
+    ) : null;
 
   const content = (
     <>
@@ -528,18 +541,6 @@ export function ComposerAttachment({
           </span>
         ) : null}
       </span>
-      {status === "uploading" && normalizedProgress !== undefined ? (
-        <span
-          aria-label={`Uploading ${label}`}
-          aria-valuemax={100}
-          aria-valuemin={0}
-          aria-valuenow={normalizedProgress}
-          className="codex-ui-composer-attachment__progress"
-          role="progressbar"
-        >
-          <span style={{ width: `${normalizedProgress}%` }} />
-        </span>
-      ) : null}
     </>
   );
 
@@ -565,6 +566,7 @@ export function ComposerAttachment({
       ) : (
         content
       )}
+      {progressNode}
       {onRetry ? (
         <button
           aria-label={retryLabel}
