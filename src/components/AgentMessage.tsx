@@ -103,6 +103,7 @@ export interface MessageAttachmentProps
 }
 
 export function MessageAttachment({
+  "aria-describedby": ariaDescribedBy,
   alt = "",
   className,
   icon,
@@ -120,11 +121,17 @@ export function MessageAttachment({
     .join(" ");
   const statusId = useId();
   const hasPreviewError = status === "preview-error" && Boolean(statusLabel);
+  const describedBy = [
+    ariaDescribedBy,
+    hasPreviewError ? statusId : undefined,
+  ]
+    .filter(Boolean)
+    .join(" ") || undefined;
 
   return (
     <>
       <button
-        aria-describedby={hasPreviewError ? statusId : undefined}
+        aria-describedby={describedBy}
         aria-label={label}
         className={classes}
         data-kind={kind}

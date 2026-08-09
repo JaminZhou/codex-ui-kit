@@ -970,11 +970,15 @@ describe("AgentComposer", () => {
 
   it("renders a sent attachment preview fallback", () => {
     render(
-      <MessageAttachment
-        label="reference.png"
-        onClick={() => undefined}
-        status="preview-error"
-      />,
+      <>
+        <span id="attachment-help">Reference supplied by the user.</span>
+        <MessageAttachment
+          aria-describedby="attachment-help"
+          label="reference.png"
+          onClick={() => undefined}
+          status="preview-error"
+        />
+      </>,
     );
 
     const status = screen.getByRole("status");
@@ -983,8 +987,9 @@ describe("AgentComposer", () => {
     expect(
       screen
         .getByRole("button", { name: "reference.png" })
-        .getAttribute("aria-describedby"),
-    ).toBe(status.id);
+        .getAttribute("aria-describedby")
+        ?.split(" "),
+    ).toEqual(["attachment-help", status.id]);
     expect(screen.queryByRole("img")).toBeNull();
   });
 });
