@@ -162,7 +162,17 @@ describe("lifecycle visual policy", () => {
     expect(electronContract).toContain(
       'themeControl.selectOption("dark")',
     );
-    expect(appSource).toContain("data-theme={theme}");
+    expect(electronContract).toContain(
+      "Electron unsupported route theme contract failed",
+    );
+    expect(appSource).toContain("const themeAvailable = isDemoThemeView(view)");
+    expect(appSource).toContain(
+      'const appliedTheme = themeAvailable ? theme : "dark"',
+    );
+    expect(appSource).toContain("data-theme={appliedTheme}");
+    expect(appSource).toContain(
+      "!initialSelection.capture && themeAvailable",
+    );
     expect(appStyles).toContain(
       '.demo-root[data-theme="light"] .demo-current-build-icon',
     );

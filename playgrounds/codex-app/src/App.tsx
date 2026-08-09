@@ -139,7 +139,9 @@ import {
 } from "./pull-request-lifecycle";
 import {
   applyDemoThemePreference,
+  isDemoThemeView,
   parseDemoThemePreference,
+  resolveDemoThemePreference,
   type DemoThemePreference,
 } from "./theme";
 
@@ -263,7 +265,6 @@ function querySelection() {
   const frame = params.get("frame");
   const capture = params.get("capture") === "1";
   const currentSidebar = params.get("currentSidebar") === "1";
-  const theme = parseDemoThemePreference(params.get("theme"));
   const layoutMode =
     params.get("layout") === "wide" ? ("wide" as const) : undefined;
   const view: DemoView =
@@ -274,6 +275,7 @@ function querySelection() {
         : params.get("view") === "workspace"
           ? "workspace"
           : "conversation";
+  const theme = resolveDemoThemePreference(params.get("theme"), view);
   const requestedShellState = params.get("shellState");
   const shellState: AppRouteOutletStatus = [
     "ready",
@@ -1289,6 +1291,8 @@ export function App() {
     initialSelection.theme,
   );
   const [view, setView] = useState<DemoView>(initialSelection.view);
+  const themeAvailable = isDemoThemeView(view);
+  const appliedTheme = themeAvailable ? theme : "dark";
   const [workspaceProjectId, setWorkspaceProjectId] = useState<
     string | null
   >(
@@ -1703,8 +1707,8 @@ export function App() {
   }, []);
 
   useEffect(() => {
-    applyDemoThemePreference(document.documentElement, theme);
-  }, [theme]);
+    applyDemoThemePreference(document.documentElement, appliedTheme);
+  }, [appliedTheme]);
 
   useEffect(() => {
     liveApprovalSubmissionGateRef.current.retainPending(
@@ -3105,24 +3109,6 @@ export function App() {
             >
               {mode === "replay" ? "Live" : "Replay"}
             </Button>
-            {!initialSelection.capture ? (
-              <label className="demo-theme-control">
-                <span>Theme</span>
-                <select
-                  aria-label="Theme"
-                  onChange={(event) =>
-                    setTheme(
-                      parseDemoThemePreference(event.currentTarget.value),
-                    )
-                  }
-                  value={theme}
-                >
-                  <option value="system">System</option>
-                  <option value="light">Light</option>
-                  <option value="dark">Dark</option>
-                </select>
-              </label>
-            ) : null}
           </div>
         )
       }
@@ -6193,7 +6179,7 @@ export function App() {
       data-scenario={scenarioId}
       data-sidebar-current={currentSidebarComposition || undefined}
       data-status={displayedStatus}
-      data-theme={theme}
+      data-theme={appliedTheme}
       data-thread-following={
         isConversationLifecycle ? threadFollowing : undefined
       }
@@ -6206,6 +6192,24 @@ export function App() {
       data-shell-state={view === "shell" ? shellState : undefined}
       data-view={view}
     >
+      {!initialSelection.capture && themeAvailable ? (
+        <label className="demo-theme-control demo-theme-control--floating">
+          <span>Theme</span>
+          <select
+            aria-label="Theme"
+            onChange={(event) =>
+              setTheme(
+                parseDemoThemePreference(event.currentTarget.value),
+              )
+            }
+            value={theme}
+          >
+            <option value="system">System</option>
+            <option value="light">Light</option>
+            <option value="dark">Dark</option>
+          </select>
+        </label>
+      ) : null}
       <AppNotificationRegion
         notifications={
           view === "shell" && shellNotificationVisible

@@ -6,13 +6,15 @@ import "./styles.css";
 import { App } from "./App";
 import {
   applyDemoThemePreference,
-  parseDemoThemePreference,
+  resolveDemoThemePreference,
 } from "./theme";
 
+const initialParams = new URLSearchParams(window.location.search);
 applyDemoThemePreference(
   document.documentElement,
-  parseDemoThemePreference(
-    new URLSearchParams(window.location.search).get("theme"),
+  resolveDemoThemePreference(
+    initialParams.get("theme"),
+    initialParams.get("view"),
   ),
 );
 

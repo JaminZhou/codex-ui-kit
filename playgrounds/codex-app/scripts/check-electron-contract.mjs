@@ -275,13 +275,13 @@ try {
   }
 
   await page.emulateMedia({ colorScheme: "light", reducedMotion: "reduce" });
-  const themeControl = page.getByRole("combobox", { name: "Theme" });
   const defaultTheme = await page.evaluate(() => ({
+    controls: document.querySelectorAll('[aria-label="Theme"]').length,
     html: document.documentElement.dataset.theme,
     root: document.querySelector(".demo-root")?.getAttribute("data-theme"),
   }));
   if (
-    (await themeControl.inputValue()) !== "dark" ||
+    defaultTheme.controls !== 0 ||
     defaultTheme.html !== "dark" ||
     defaultTheme.root !== "dark"
   ) {
@@ -290,9 +290,53 @@ try {
     );
   }
 
+  await page.getByRole("button", { exact: true, name: "Live" }).click();
+  await page.waitForSelector('.demo-root[data-mode="live"]');
+  const liveTheme = await page.evaluate(
+    () => document.documentElement.dataset.theme,
+  );
+  if (liveTheme !== "dark") {
+    throw new Error(
+      `Electron live theme contract failed: ${JSON.stringify(liveTheme)}`,
+    );
+  }
+} finally {
+  await app.close();
+}
+
+const themeScene = {
+  currentSidebar: true,
+  frame: "workspace-ready",
+  id: "electron-light-shell",
+  scenario: "workspace-workflow",
+  view: "workspace",
+};
+const { app: themeApp, page: themePage } = await launchScene(themeScene, {
+  capture: false,
+});
+
+try {
+  await themePage.emulateMedia({
+    colorScheme: "light",
+    reducedMotion: "reduce",
+  });
+  const themeControl = themePage.getByRole("combobox", { name: "Theme" });
+  if ((await themeControl.inputValue()) !== "dark") {
+    throw new Error("Electron workspace theme control did not default to dark");
+  }
+
+  const themeSidebarResizer = themePage.getByRole("separator", {
+    name: "Resize navigation sidebar",
+  });
+  await themeSidebarResizer.press("Home");
+  await themeSidebarResizer.press("ArrowRight");
+  await themeSidebarResizer.press("ArrowRight");
+  await themeSidebarResizer.press("ArrowRight");
+  await themeSidebarResizer.press("ArrowRight");
+
   await themeControl.focus();
   await themeControl.selectOption("system");
-  await page.waitForFunction(
+  await themePage.waitForFunction(
     () =>
       document.documentElement.dataset.theme === undefined &&
       document
@@ -302,10 +346,10 @@ try {
   );
 
   await themeControl.selectOption("light");
-  await page.waitForFunction(
+  await themePage.waitForFunction(
     () => document.documentElement.dataset.theme === "light",
   );
-  const lightTheme = await page.evaluate(() => {
+  const lightTheme = await themePage.evaluate(() => {
     const bounds = (selector) => {
       const element = document.querySelector(selector);
       if (!(element instanceof HTMLElement)) return null;
@@ -343,22 +387,49 @@ try {
     );
   }
 
-  await themeControl.selectOption("dark");
-  await page.waitForFunction(
-    () => document.documentElement.dataset.theme === "dark",
-  );
-  await page.getByRole("button", { exact: true, name: "Live" }).click();
-  await page.waitForSelector('.demo-root[data-mode="live"]');
-  const liveTheme = await page.evaluate(
-    () => document.documentElement.dataset.theme,
-  );
-  if (liveTheme !== "dark") {
+  await themePage
+    .getByRole("button", {
+      exact: true,
+      name: "Complete attachment lifecycle test",
+    })
+    .click();
+  await themePage.waitForSelector('.demo-root[data-view="conversation"]');
+  const unsupportedTheme = await themePage.evaluate(() => ({
+    controls: document.querySelectorAll('[aria-label="Theme"]').length,
+    html: document.documentElement.dataset.theme,
+    root: document.querySelector(".demo-root")?.getAttribute("data-theme"),
+  }));
+  if (
+    unsupportedTheme.controls !== 0 ||
+    unsupportedTheme.html !== "dark" ||
+    unsupportedTheme.root !== "dark"
+  ) {
     throw new Error(
-      `Electron live theme contract failed: ${JSON.stringify(liveTheme)}`,
+      `Electron unsupported route theme contract failed: ${JSON.stringify(unsupportedTheme)}`,
     );
   }
+
+  await themePage.getByRole("button", { exact: true, name: "New chat" }).click();
+  await themePage.waitForSelector('.demo-root[data-view="workspace"]');
+  const restoredTheme = await themePage.evaluate(() => ({
+    html: document.documentElement.dataset.theme,
+    root: document.querySelector(".demo-root")?.getAttribute("data-theme"),
+  }));
+  if (
+    (await themeControl.inputValue()) !== "light" ||
+    restoredTheme.html !== "light" ||
+    restoredTheme.root !== "light"
+  ) {
+    throw new Error(
+      `Electron restored workspace theme contract failed: ${JSON.stringify(restoredTheme)}`,
+    );
+  }
+  await themeControl.selectOption("dark");
+  await themePage.waitForFunction(
+    () => document.documentElement.dataset.theme === "dark",
+  );
 } finally {
-  await app.close();
+  await themeApp.close();
 }
 
 const narrowReachabilityScene = {

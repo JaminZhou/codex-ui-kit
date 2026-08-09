@@ -987,6 +987,13 @@ textarea {
   outline-offset: 2px;
 }
 
+.demo-theme-control--floating {
+  inset-block-start: 0.5rem;
+  inset-inline-end: 0.75rem;
+  position: fixed;
+  z-index: 40;
+}
+
 .demo-current-mcp-folder {
   align-items: center;
   display: inline-flex;

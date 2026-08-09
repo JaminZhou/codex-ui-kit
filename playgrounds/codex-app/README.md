@@ -637,10 +637,13 @@ delegation on `26.730.61639`:
 The thirty-fifth slice makes theme ownership explicit without treating a
 forced media query as current-product evidence:
 
-- the full-app playground accepts `theme=system`, `theme=light`, and
-  `theme=dark`; the existing deterministic default remains dark;
-- a non-capture Theme control switches the same state model while preserving
-  the active route, sidebar width, Composer state, and keyboard focus;
+- the theme-complete shell and workspace routes accept `theme=system`,
+  `theme=light`, and `theme=dark`; conversation and Pull Request routes keep
+  the existing deterministic dark presentation until their custom surfaces
+  are converted;
+- a non-capture Theme control appears only on those completed routes and
+  switches the same state model while preserving sidebar width, Composer
+  state, and keyboard focus;
 - current sidebar, window-chrome, context, and Composer SVG geometry is reused
   in light mode, while theme-dependent paint follows the owning control's
   semantic `currentColor` instead of replaying captured dark paint on a light

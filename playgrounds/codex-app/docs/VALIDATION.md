@@ -34,7 +34,9 @@ Every deterministic scenario has one ID and produces four evidence layers:
    label/preview content. The independent theme contract combines the current
    sidebar and workspace shell, locks 1180×820 light geometry and semantic
    colors, prevents captured dark SVG paint from remaining white on light
-   surfaces, and keeps System/Light/Dark separate from lifecycle frames.
+   surfaces, keeps System/Light/Dark separate from lifecycle frames, and
+   rejects those preferences on conversation and Pull Request routes whose
+   custom paint is not yet theme-complete.
    Mixed Review acceptance additionally requires
    ordered rename/delete/modified rows, two text diffs, explicit
    binary/conflict notices, focusable content, and synchronized file
@@ -60,7 +62,8 @@ Every deterministic scenario has one ID and produces four evidence layers:
    The same real window now emulates a light system preference, switches the
    playground from explicit Dark to System, Light, and back to Dark, and gates
    root ownership, computed `color-scheme`, focus, sidebar geometry, main
-   background, Composer foreground, and mode continuity.
+   background, Composer foreground, route-scoped control availability, and
+   dark fallback after returning to an unsupported conversation route.
    A current long-thread flow verifies compact navigation selection, a
    seven-turn mounted window, negative away-from-latest scrolling, and
    return-to-latest at scroll origin zero. The current long-command flow

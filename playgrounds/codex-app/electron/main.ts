@@ -246,11 +246,13 @@ function createWindow() {
   const capture = process.env.CODEX_DEMO_CAPTURE ?? "0";
   const currentSidebar = process.env.CODEX_DEMO_CURRENT_SIDEBAR ?? "0";
   const layout = process.env.CODEX_DEMO_LAYOUT ?? "";
-  const requestedTheme = process.env.CODEX_DEMO_THEME;
-  const theme = ["system", "light", "dark"].includes(requestedTheme ?? "")
-    ? requestedTheme!
-    : "dark";
   const view = process.env.CODEX_DEMO_VIEW ?? "conversation";
+  const requestedTheme = process.env.CODEX_DEMO_THEME;
+  const theme =
+    ["shell", "workspace"].includes(view) &&
+    ["system", "light", "dark"].includes(requestedTheme ?? "")
+      ? requestedTheme!
+      : "dark";
   const shellState = process.env.CODEX_DEMO_SHELL_STATE ?? "ready";
   const requestedWidth = Number(process.env.CODEX_DEMO_WINDOW_WIDTH);
   const requestedHeight = Number(process.env.CODEX_DEMO_WINDOW_HEIGHT);

@@ -1,7 +1,9 @@
 import { describe, expect, it } from "vitest";
 import {
   applyDemoThemePreference,
+  isDemoThemeView,
   parseDemoThemePreference,
+  resolveDemoThemePreference,
 } from "../src/theme";
 
 describe("demo theme preference", () => {
@@ -16,6 +18,18 @@ describe("demo theme preference", () => {
       expect(parseDemoThemePreference(preference)).toBe(preference);
     },
   );
+
+  it("limits theme selection to the completed shell and workspace routes", () => {
+    expect(isDemoThemeView("shell")).toBe(true);
+    expect(isDemoThemeView("workspace")).toBe(true);
+    expect(isDemoThemeView("conversation")).toBe(false);
+    expect(isDemoThemeView("pull-request")).toBe(false);
+
+    expect(resolveDemoThemePreference("light", "workspace")).toBe("light");
+    expect(resolveDemoThemePreference("system", "shell")).toBe("system");
+    expect(resolveDemoThemePreference("light", "conversation")).toBe("dark");
+    expect(resolveDemoThemePreference("system", "pull-request")).toBe("dark");
+  });
 
   it("maps explicit themes to the root dataset and leaves system to media", () => {
     const dataset: Record<string, string> = {};
