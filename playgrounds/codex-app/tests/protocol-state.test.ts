@@ -96,6 +96,25 @@ describe("protocol lifecycle reducer", () => {
     expect(scenario.frames["markdown-complete"]).toBe(scenario.events.length);
   });
 
+  it("replays the current wide Markdown table fixture exactly", () => {
+    const scenario = replayScenarios["markdown-table-actions"];
+    const state = reduceProtocolTrace(scenario.events);
+    const assistant = state.messages.find(
+      ({ id }) => id === "assistant-markdown-table-actions",
+    );
+    const lines = assistant?.text.split("\n") ?? [];
+
+    expect(state.status).toBe("completed");
+    expect(assistant?.status).toBe("completed");
+    expect(lines).toHaveLength(5);
+    expect(lines[0].match(/PROBE-COL-/g)).toHaveLength(18);
+    expect(lines[2].match(/row-1-value-/g)).toHaveLength(18);
+    expect(lines[4]).toContain("row-3-value-18-abcdefghij");
+    expect(scenario.frames["markdown-table-complete"]).toBe(
+      scenario.events.length,
+    );
+  });
+
   it("preserves streaming Markdown mutations before a large completion", () => {
     const scenario = replayScenarios["markdown-streaming-large"];
     const linkState = reduceProtocolTrace(

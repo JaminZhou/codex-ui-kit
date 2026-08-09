@@ -844,7 +844,7 @@ adds source-structural evidence for the seven collaboration statuses,
 Active/Done classification, and 4/10 panel limits. A schema-valid twelve-agent
 replay now covers waiting-before-initialization, streamed updates, errored,
 interrupted, shutdown, and unavailable terminal results, both pagination
-paths, and the failed-agent transcript. Browser/CDP reaches 129 frames;
+paths, and the failed-agent transcript. Browser/CDP reaches 132 frames;
 Electron repeats the pagination and transcript interactions. Nine
 reviewed scenes gate ten current-build regions. Panel/summary/transcript ratios
 range from `0.013328938694792354` to `0.046708160442600274`; the compact
@@ -881,10 +881,17 @@ boundary, the latest-turn follow controller and its 24px tolerance, and the
 table container/scroller/actions structure. An independent nine-event replay
 now streams four deltas through an incomplete link, open fenced code, nested
 and task lists, a readable multi-column table, and twelve long sections before
-completion. Browser/CDP checks five checkpoints and raises the matrix to 129
-frames. Electron independently verifies exact code copy, table focus, real
-wheel-driven scroll-away, and return to latest; four reviewed internal pixel
-baselines cover the streamed fence, table, long running tail, and completed
-tail. Product runtime reachability, images, math, citations/sources, plugin
-variants, very-large-table actions/preview/error, and Markdown error variants
-remain open.
+completion. Browser/CDP checks five checkpoints; Electron independently
+verifies exact code copy, table focus, real wheel-driven scroll-away, and
+return to latest; four reviewed internal pixel baselines cover the streamed
+fence, table, long running tail, and completed tail.
+
+A later isolated current-build task reaches an 18-column table's Copy, Expand,
+and viewport preview path. The public five-event replay raises the matrix to
+132 frames, Electron repeats raw Markdown/HTML copy, horizontal wheel,
+preview interaction, and 720×680 action reachability, and three reviewed
+internal baselines pass. A local-only
+1180×820 reference gates the preview and close regions at 3.9737% and 0.5929%
+under 4% and 1% ceilings. Streaming product reachability, images, math,
+citations/sources, plugin variants, table error variants, and Markdown error
+variants remain open.

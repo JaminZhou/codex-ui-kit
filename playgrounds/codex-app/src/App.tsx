@@ -5380,6 +5380,8 @@ export function App() {
               mode === "replay" &&
               ((scenarioId === "markdown" &&
                 message.id === "assistant-markdown") ||
+                (scenarioId === "markdown-table-actions" &&
+                  message.id === "assistant-markdown-table-actions") ||
                 (scenarioId === "markdown-streaming-large" &&
                   message.id === "assistant-markdown-streaming-large") ||
                 (scenarioId === "mcp-tool-call" &&
@@ -5504,6 +5506,7 @@ export function App() {
           >
             {message.role === "assistant" ? (
               <AgentMarkdown
+                allowWideTables={scenarioId === "markdown-table-actions"}
                 linkTarget="_blank"
                 streaming={message.status === "running"}
               >

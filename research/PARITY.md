@@ -230,7 +230,7 @@ The authoritative current-build inventory is:
   current Active/Done classifier and 4/10 list limits. A twelve-agent public
   replay now covers pending initialization, updated progress, errored,
   interrupted, shutdown, and unavailable results, both pagination limits, and
-  failed-agent transcript access. Browser/CDP covers 129 frames, Electron
+  failed-agent transcript access. Browser/CDP covers 132 frames, Electron
   drives both mixed lists, and nine collaboration scenes gate ten current-build
   regions: panel/summary/transcript crops pass between 1.33% and 4.67%, while
   the compact main-activity crop passes at 11.50% under its independent 12.5%
@@ -291,9 +291,15 @@ four public message deltas, then completes nested/task lists, a multi-column
 table, and a twelve-section answer. Browser/CDP gates five checkpoints;
 Electron verifies code copy plus user scroll-away/return; and four reviewed
 internal baselines cover the fence, table, running tail, and completed tail.
-This is current independent `partial` coverage, not current-product pixel
-evidence. Images, math, citations/sources, very-large-table actions/preview,
-error variants, and product runtime reachability remain open.
+An isolated 18-column runtime follow-up then reaches Copy, Expand, and Table
+preview on the same build. `AgentMarkdown` copies exact raw Markdown plus HTML,
+and `allowWideTables` opts into the measured 1665.86px table, hover/focus rail,
+and viewport preview. Browser/CDP now covers 132 frames; Electron repeats copy,
+horizontal wheel, open/close, focus restoration, and 720×680 action
+reachability; three reviewed internal baselines pass. A local-only 1180×820 reference gates the owned preview and
+close regions at 3.9737% and 0.5929% under 4% and 1% ceilings. Images, math,
+citations/sources, table error variants, streaming product reachability, and
+plugin-specific Markdown remain open.
 
 The `26.727.40816` MCP recovery adds four further frames for failure, retry,
 completion, and a mixed follow-up turn. Its optional 906×820 comparison gates

@@ -38,7 +38,7 @@ exit gates; it does not replace the inventory.
   explicit 820×680/720×680 reopen. Two more current tasks now cover concurrent
   siblings plus a Parent → Child delegation through active, mixed, completed,
   summary, flat-panel, live-progress, and independent transcript states while
-  retaining public `agentPath` hierarchy. Browser/CDP covers 129 lifecycle
+  retaining public `agentPath` hierarchy. Browser/CDP covers 132 lifecycle
   frames; Electron repeats
   the session, mismatch, input, picker, close, and resize interactions; the
   current 906×820 panel/content pixel ratios pass at 1.5120%/0.4004%.
@@ -63,8 +63,13 @@ exit gates; it does not replace the inventory.
   across four deltas, then completes a nested/task-list, multi-column, twelve-
   section response. Browser/CDP gates five checkpoints and computed geometry;
   Electron verifies code copy, user scroll-away, and return to latest; four
-  reviewed internal baselines pass. Product reachability and pixel attribution
-  for these transitions remain open, as do the structural table actions.
+  reviewed internal baselines pass. A later current-build 18-column task
+  runtime-reaches the table Copy, Expand, and preview path. The public
+  `allowWideTables` contract, exact Markdown/HTML copy, 132-frame Browser/CDP
+  matrix, real Electron flow, three internal baselines including a 720×680
+  action-reachability state, and local-only 4%/1% preview/close gates now pass.
+  Product reachability and pixel attribution for
+  the streaming mutations remain open, as do table error variants.
 - The previous `26.730.61309` refresh covered all six left-sidebar groups,
   selected/no-project and New worktree entry, plus sampled command, approval,
   interruption, compaction, summary, and pasted-image surfaces. The sidebar capture locks the
@@ -459,9 +464,11 @@ without confusing package readiness with full product reconstruction.
     real product post-picker transition as an explicit evidence gap. Markdown
     link/fence mutation, nested/task lists, a multi-column table, long-content
     following, completion actions, and Electron scroll-away/return are now
-    delivered independently. Continue with plugin attachment variants,
-    Markdown images/math/citations, very-large-table actions/preview and error
-    variants, populated artifact/source sections, real-product subagent
+    delivered independently. Very-large-table Copy/Expand/Preview is now also
+    current-runtime-observed and delivered through public Browser/Electron/
+    pixel gates. Continue with plugin attachment variants, Markdown
+    images/math/citations and table/Markdown error variants, populated
+    artifact/source sections, real-product subagent
     recovery capture, and transport recovery. The independent subagent
     waiting/failure/interruption/streaming/pagination matrix is delivered.
 11. **P1 resources and integrations**: Browser/artifact/document previews,

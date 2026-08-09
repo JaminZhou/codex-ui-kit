@@ -13,6 +13,7 @@ import backgroundTerminalTrace from "../fixtures/traces/background-terminal.json
 import interruptionTrace from "../fixtures/traces/interruption.jsonl?raw";
 import largeFileReviewTrace from "../fixtures/traces/large-file-review.jsonl?raw";
 import longCommandOutputTrace from "../fixtures/traces/long-command-output.jsonl?raw";
+import markdownTableActionsTrace from "../fixtures/traces/markdown-table-actions.jsonl?raw";
 import markdownStreamingLargeTrace from "../fixtures/traces/markdown-streaming-large.jsonl?raw";
 import markdownTrace from "../fixtures/traces/markdown.jsonl?raw";
 import mcpToolCallTrace from "../fixtures/traces/mcp-tool-call.jsonl?raw";
@@ -51,6 +52,7 @@ export type ReplayScenarioId =
   | "large-file-review"
   | "long-command-output"
   | "markdown"
+  | "markdown-table-actions"
   | "markdown-streaming-large"
   | "mcp-tool-call"
   | "mcp-recovery-mixed-thread"
@@ -248,6 +250,12 @@ export const replayScenarios: Record<ReplayScenarioId, ReplayScenario> = {
     "Markdown response",
     "Heading, inline semantics, quote, list, table, code, and response actions.",
     markdownTrace,
+  ),
+  "markdown-table-actions": scenario(
+    "markdown-table-actions",
+    "Inspect a wide Markdown table",
+    "A current 18-column table exposes hover-only Copy and Expand actions, preserves the raw Markdown clipboard payload, and opens the full-screen table preview.",
+    markdownTableActionsTrace,
   ),
   "markdown-streaming-large": scenario(
     "markdown-streaming-large",

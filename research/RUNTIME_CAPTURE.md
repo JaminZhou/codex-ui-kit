@@ -849,7 +849,7 @@ Browser/CDP, Electron, and internal pixels. No isolated product task was driven
 through those recovery transitions, so real-product recovery reachability and
 transport recovery remain required captures.
 
-## Current Markdown structural follow-up
+## Current Markdown streaming and very-wide-table follow-up
 
 Read-only inspection of the unchanged `26.803.41515` ASAR fingerprint confirms
 that conversation content is represented as `inline-markdown`, remains in
@@ -857,19 +857,35 @@ progress until completion, and participates in the latest-turn follow
 controller's `static`, prework, and user-follow modes with a 24px bottom
 tolerance. The current table implementation also exposes its container,
 horizontal scroller, wrapper, cells, copy action, and optional
-expand-to-preview action. These observations are source-structural only; they
-do not promote current-product runtime or pixel evidence.
+expand-to-preview action.
 
 The independent playground adds a schema-valid nine-event trace with four
 public deltas. Five Browser/CDP checkpoints cover an incomplete link, open
 fenced code, nested and task lists, a readable multi-column table, twelve long
-sections, completion actions, and bottom-follow behavior inside the 129-frame
+sections, completion actions, and bottom-follow behavior inside the 132-frame
 matrix. Electron independently checks exact code copy, table focus, real
 wheel-driven scroll-away, the floating return control, and return to latest.
 Four reviewed internal baselines cover the streamed fence, table, long running
-tail, and completed tail. Product runtime reachability, images, math,
-citations/sources, plugin variants, very-large-table actions/preview/error, and
-Markdown error variants remain required captures.
+tail, and completed tail.
+
+A later isolated 1180×820 task runtime-reached the current 18-column table.
+CDP records its 1665.86×323 table, 802/1714px visible/scroll width, 49px header,
+87px rows, 32px hover-only action rail, 24×24 Copy/Expand buttons, exact current
+vector primitives, 1863-character raw Markdown plus HTML clipboard payload,
+and viewport-sized preview. The preview owns a 42×40 initially focused Close
+control and 892.8×389 inner surface with `#2d2d2d`, 20px radius, 32px padding,
+and horizontal overflow. The public implementation deliberately restores the
+Expand trigger after close even though this product sample returned focus to
+`BODY`.
+
+The five-event replay, Browser/CDP, real Electron horizontal-wheel/copy/preview
+flow, and three reviewed internal baselines pass. The 720×680 contract moves
+the action rail inward, keeps both controls fully visible and clickable, and
+preserves focus restoration without document-level horizontal overflow. A local-only current-build
+reference gates the preview and close regions at 3.9737% and 0.5929% under 4%
+and 1% ceilings; it is not committed. Streaming mutation reachability, images,
+math, citations/sources, plugin variants, table error variants, and Markdown
+error variants remain required captures.
 
 ## Required flow matrix
 

@@ -62,6 +62,12 @@ const currentBuildMarkdownReferenceSize = {
   height: 820,
   width: 906,
 };
+const currentBuildMarkdownTablePreviewReference =
+  process.env.CODEX_UI_KIT_MARKDOWN_TABLE_PREVIEW_REFERENCE;
+const currentBuildMarkdownTablePreviewReferenceSize = {
+  height: 820,
+  width: 1180,
+};
 const currentBuildMcpReference =
   process.env.CODEX_UI_KIT_MCP_TOOL_CALL_REFERENCE;
 const currentBuildMcpReferenceSize = {
@@ -567,19 +573,64 @@ for (const scene of selectedScenes) {
     }
     if (
       scene.id === "markdown-complete" ||
-      scene.scenario === "markdown-streaming-large"
+      scene.scenario === "markdown-streaming-large" ||
+      scene.scenario === "markdown-table-actions"
     ) {
       await page.addStyleTag({
         content: `
-          .codex-ui-conversation-thread-shell__viewport {
+          .codex-ui-conversation-thread-shell__viewport,
+          .codex-ui-markdown__table-scroll,
+          .codex-ui-markdown-table-preview__surface {
             scrollbar-width: none;
           }
 
-          .codex-ui-conversation-thread-shell__viewport::-webkit-scrollbar {
+          .codex-ui-conversation-thread-shell__viewport::-webkit-scrollbar,
+          .codex-ui-markdown__table-scroll::-webkit-scrollbar,
+          .codex-ui-markdown-table-preview__surface::-webkit-scrollbar {
             display: none;
           }
         `,
       });
+    }
+    if (scene.markdownTableState) {
+      const tableContainer = page.locator(
+        '[data-item-id="assistant-markdown-table-actions"] [data-markdown-table]',
+      );
+      await tableContainer.scrollIntoViewIfNeeded();
+      await tableContainer.hover();
+      await page.waitForTimeout(150);
+      if (scene.id === "markdown-table-actions-narrow") {
+        const actions = tableContainer.locator(
+          ".codex-ui-markdown__table-actions",
+        );
+        const actionBounds = await actions.boundingBox();
+        const buttonBounds = await Promise.all(
+          (await actions.locator("button").all()).map((button) =>
+            button.boundingBox(),
+          ),
+        );
+        if (
+          !actionBounds ||
+          actionBounds.left < 0 ||
+          actionBounds.left + actionBounds.width > 720 ||
+          buttonBounds.some(
+            (bounds) =>
+              !bounds || bounds.left < 0 || bounds.left + bounds.width > 720,
+          )
+        ) {
+          throw new Error(
+            `${scene.id}: narrow table actions are clipped: ${JSON.stringify({ actionBounds, buttonBounds })}`,
+          );
+        }
+      }
+      if (scene.markdownTableState === "preview") {
+        await tableContainer
+          .getByRole("button", { name: "Expand table" })
+          .click();
+        await page
+          .getByRole("dialog", { name: "Table preview" })
+          .waitFor({ state: "visible" });
+      }
     }
     if (
       scene.id === "approval-current-similar-menu" ||
@@ -2664,6 +2715,55 @@ for (const scene of selectedScenes) {
         composer: composerComparison.ratio,
         full: comparison.ratio,
       })}`,
+    );
+  }
+
+  if (
+    scene.id === "markdown-table-actions-preview" &&
+    currentBuildMarkdownTablePreviewReference
+  ) {
+    const reference = PNG.sync.read(
+      await readFile(currentBuildMarkdownTablePreviewReference),
+    );
+    if (
+      reference.width !== currentBuildMarkdownTablePreviewReferenceSize.width ||
+      reference.height !== currentBuildMarkdownTablePreviewReferenceSize.height ||
+      actual.width !== reference.width ||
+      actual.height !== reference.height
+    ) {
+      throw new Error(
+        `${scene.id}: current-build reference and actual must both be 1180x820, received reference ${reference.width}x${reference.height} and actual ${actual.width}x${actual.height}.`,
+      );
+    }
+    const regions = {
+      close: { height: 44, left: 1124, top: 10, width: 46 },
+      preview: { height: 392, left: 142, top: 212, width: 896 },
+    };
+    const compareRegion = ({ height, left, top, width }) =>
+      comparePng(
+        cropPng(reference, left, top, width, height),
+        cropPng(actual, left, top, width, height),
+      );
+    const closeComparison = compareRegion(regions.close);
+    const previewComparison = compareRegion(regions.preview);
+    const maximumCloseRatio = environmentRatio(
+      "CODEX_UI_KIT_MARKDOWN_TABLE_CLOSE_MAX_DIFF_RATIO",
+      0.01,
+    );
+    const maximumPreviewRatio = environmentRatio(
+      "CODEX_UI_KIT_MARKDOWN_TABLE_PREVIEW_MAX_DIFF_RATIO",
+      0.04,
+    );
+    if (
+      closeComparison.ratio > maximumCloseRatio ||
+      previewComparison.ratio > maximumPreviewRatio
+    ) {
+      throw new Error(
+        `${scene.id}: current-build table-preview pixel ratios ${JSON.stringify({ close: closeComparison.ratio, preview: previewComparison.ratio })} exceed ${JSON.stringify({ close: maximumCloseRatio, preview: maximumPreviewRatio })}.`,
+      );
+    }
+    console.log(
+      `${scene.id}: current-build table-preview pixel ratios ${JSON.stringify({ close: closeComparison.ratio, preview: previewComparison.ratio })}`,
     );
   }
 

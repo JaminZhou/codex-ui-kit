@@ -59,6 +59,39 @@ describe("Markdown visual contract", () => {
     );
   });
 
+  it("locks the current wide-table actions and preview geometry", () => {
+    expect(styles).toContain("overflow-wrap: break-word");
+    expect(styles).toContain("padding-inline-start: 0");
+    expect(styles).toContain(".codex-ui-markdown__table-actions");
+    expect(styles).toContain(
+      "inset-inline-end: var(--codex-ui-markdown-inline-overhang)",
+    );
+    expect(styles).toContain(
+      "container-name: codex-ui-conversation-thread-shell",
+    );
+    expect(styles).toContain(
+      "@container codex-ui-conversation-thread-shell (min-width: 53rem)",
+    );
+    expect(styles).not.toContain(
+      "@container codex-ui-app-shell (min-width: 73rem)",
+    );
+    expect(styles).toContain("inset-inline-end: -2rem");
+    expect(styles).toMatch(
+      /\.codex-ui-markdown__table-actions \{[^}]*pointer-events: none;/,
+    );
+    expect(styles).toMatch(
+      /\.codex-ui-markdown__table-actions button \{[^}]*pointer-events: auto;/,
+    );
+    expect(styles).toContain("height: 1.5rem");
+    expect(styles).toContain("background: rgb(0 0 0 / 0.8)");
+    expect(styles).toContain("padding: 3rem 2rem 3.25rem");
+    expect(styles).toContain("background: var(--codex-ui-background-thread-summary)");
+    expect(styles).toContain("border-radius: 1.25rem");
+    expect(styles).toContain("flex: 0 0 80%");
+    expect(styles).toContain("max-height: 100%");
+    expect(styles).toContain("padding: 2rem");
+  });
+
   it("maps independently contrast-safe light and dark highlight roles", () => {
     expect(tokens).toContain(
       "--codex-ui-code-syntax-light-keyword: #a626a4",

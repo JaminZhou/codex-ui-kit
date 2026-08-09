@@ -3968,13 +3968,18 @@ for (const scene of visualScenes) {
         );
       }
     }
+    const expectedWindowWidth = scene.windowSize?.width ?? 1_180;
+    const minimumConversationViewportWidth =
+      expectedWindowWidth <= 720 ? 400 : 500;
     if (
       contract.header.bottom > contract.viewport.bottom ||
       contract.composer.top < contract.header.bottom ||
       contract.composer.bottom > contract.shell.bottom + 1 ||
-      contract.viewport.width < 500
+      contract.viewport.width < minimumConversationViewportWidth
     ) {
-      throw new Error(`${scene.id}: named surface geometry is invalid.`);
+      throw new Error(
+        `${scene.id}: named surface geometry is invalid: ${JSON.stringify({ contract, minimumConversationViewportWidth })}`,
+      );
     }
     if (contract.styles.viewportOverflowY !== "auto") {
       throw new Error(`${scene.id}: conversation viewport is not scrollable.`);
@@ -4017,13 +4022,15 @@ for (const scene of visualScenes) {
       );
     }
     const expectedSidebarMax =
-      scene.id === "terminal-compact" ||
-      scene.id === "terminal-current-compact" ||
-      scene.id === "attachment-multi-compact"
-        ? "468"
-        : scene.surfaces?.includes("reviewPanel")
-          ? "508"
-          : "520";
+      scene.id === "markdown-table-actions-narrow"
+        ? "368"
+        : scene.id === "terminal-compact" ||
+            scene.id === "terminal-current-compact" ||
+            scene.id === "attachment-multi-compact"
+          ? "468"
+          : scene.surfaces?.includes("reviewPanel")
+            ? "508"
+            : "520";
     if (
       contract.styles.resizerCursor !== "col-resize" ||
       Math.abs(contract.sidebarResizer.rect.width - 16) > 0.5 ||
@@ -5723,6 +5730,451 @@ await writeFile(
   join(artifactDirectory, "markdown-streaming-large.json"),
   `${JSON.stringify(markdownStreamingContracts, null, 2)}\n`,
 );
+
+const markdownTableActionsScene = {
+  frame: "markdown-table-complete",
+  id: "markdown-table-actions",
+  scenario: "markdown-table-actions",
+};
+const {
+  app: markdownTableActionsApp,
+  page: markdownTableActionsPage,
+} = await launchScene(markdownTableActionsScene, { capture: false });
+try {
+  await markdownTableActionsPage.evaluate(() => {
+    class TestClipboardItem {
+      constructor(items) {
+        this.items = items;
+      }
+    }
+    window.ClipboardItem = TestClipboardItem;
+    Object.defineProperty(navigator, "clipboard", {
+      configurable: true,
+      value: {
+        write: async ([item]) => {
+          const entries = await Promise.all(
+            Object.entries(item.items).map(async ([type, blob]) => [
+              type,
+              await blob.text(),
+            ]),
+          );
+          window.__codexMarkdownTableClipboard = Object.fromEntries(entries);
+        },
+        writeText: async (value) => {
+          window.__codexMarkdownTableClipboard = { "text/plain": value };
+        },
+      },
+    });
+  });
+  const tableContainer = markdownTableActionsPage.locator(
+    '[data-item-id="assistant-markdown-table-actions"] [data-markdown-table]',
+  );
+  await tableContainer.waitFor({ state: "visible" });
+  const inspectTable = () =>
+    markdownTableActionsPage.evaluate(() => {
+      const container = document.querySelector(
+        '[data-item-id="assistant-markdown-table-actions"] [data-markdown-table]',
+      );
+      const conversation = document.querySelector(
+        ".codex-ui-conversation-thread-shell",
+      );
+      const table = container?.querySelector("table");
+      const scroller = container?.querySelector(
+        ".codex-ui-markdown__table-scroll",
+      );
+      const actions = container?.querySelector(
+        ".codex-ui-markdown__table-actions",
+      );
+      const firstHeader = table?.querySelector("th");
+      const firstCell = table?.querySelector("td");
+      const rect = (element) => {
+        if (!(element instanceof Element)) return null;
+        const value = element.getBoundingClientRect();
+        return {
+          bottom: value.bottom,
+          height: value.height,
+          left: value.left,
+          right: value.right,
+          top: value.top,
+          width: value.width,
+        };
+      };
+      const actionsRect =
+        actions instanceof Element ? actions.getBoundingClientRect() : null;
+      const lowerRailHit = actionsRect
+        ? document.elementFromPoint(
+            actionsRect.left + actionsRect.width / 2,
+            actionsRect.bottom - 8,
+          )
+        : null;
+      return {
+        actions: actions
+          ? {
+              interceptsLowerEdge: Boolean(
+                lowerRailHit?.closest(".codex-ui-markdown__table-actions"),
+              ),
+              opacity: getComputedStyle(actions).opacity,
+              pointerEvents: getComputedStyle(actions).pointerEvents,
+              rect: rect(actions),
+            }
+          : null,
+        buttons: Array.from(container?.querySelectorAll("button") ?? [], (button) => ({
+          expanded: button.getAttribute("aria-expanded"),
+          haspopup: button.getAttribute("aria-haspopup"),
+          label: button.getAttribute("aria-label"),
+          pointerEvents: getComputedStyle(button).pointerEvents,
+          rect: rect(button),
+          viewBox: button.querySelector("svg")?.getAttribute("viewBox"),
+        })),
+        columns:
+          table instanceof HTMLTableElement ? table.rows[0]?.cells.length ?? 0 : 0,
+        container: rect(container),
+        conversation: rect(conversation),
+        firstCell: firstCell
+          ? {
+              fontWeight: getComputedStyle(firstCell).fontWeight,
+              lineHeight: getComputedStyle(firstCell).lineHeight,
+              overflowWrap: getComputedStyle(firstCell).overflowWrap,
+              padding: getComputedStyle(firstCell).padding,
+              rect: rect(firstCell),
+            }
+          : null,
+        firstHeader: firstHeader
+          ? {
+              fontWeight: getComputedStyle(firstHeader).fontWeight,
+              lineHeight: getComputedStyle(firstHeader).lineHeight,
+              overflowWrap: getComputedStyle(firstHeader).overflowWrap,
+              padding: getComputedStyle(firstHeader).padding,
+              rect: rect(firstHeader),
+            }
+          : null,
+        rows: table instanceof HTMLTableElement ? table.rows.length : 0,
+        scroller:
+          scroller instanceof HTMLElement
+            ? {
+                clientWidth: scroller.clientWidth,
+                overflowX: getComputedStyle(scroller).overflowX,
+                rect: rect(scroller),
+                scrollWidth: scroller.scrollWidth,
+              }
+            : null,
+        table: rect(table),
+        viewport: {
+          height: window.innerHeight,
+          width: window.innerWidth,
+        },
+      };
+    });
+  const resting = await inspectTable();
+  await tableContainer.hover();
+  await markdownTableActionsPage.waitForTimeout(150);
+  const hovered = await inspectTable();
+  const expandButton = tableContainer.getByRole("button", {
+    name: "Expand table",
+  });
+  const copyButton = tableContainer.getByRole("button", {
+    name: "Copy table",
+  });
+  await copyButton.click();
+  await tableContainer.getByRole("button", { name: "Copied" }).waitFor();
+  const clipboard = await markdownTableActionsPage.evaluate(
+    () => window.__codexMarkdownTableClipboard,
+  );
+  await expandButton.click();
+  const previewDialog = markdownTableActionsPage.getByRole("dialog", {
+    name: "Table preview",
+  });
+  await previewDialog.waitFor({ state: "visible" });
+  await markdownTableActionsPage.waitForFunction(
+    () =>
+      document.activeElement?.getAttribute("aria-label") ===
+      "Close table preview",
+  );
+  const preview = await previewDialog.evaluate((dialog) => {
+    const previewSurface = dialog.querySelector(
+      ".codex-ui-markdown-table-preview__surface",
+    );
+    const table = previewSurface?.querySelector("table");
+    const close = dialog.querySelector(
+      'button[aria-label="Close table preview"]',
+    );
+    const closeIcon = close?.querySelector("svg");
+    const rect = (element) => {
+      if (!(element instanceof Element)) return null;
+      const value = element.getBoundingClientRect();
+      return {
+        bottom: value.bottom,
+        height: value.height,
+        left: value.left,
+        right: value.right,
+        top: value.top,
+        width: value.width,
+      };
+    };
+    const surfaceStyle = previewSurface
+      ? getComputedStyle(previewSurface)
+      : null;
+    return {
+      activeElement: document.activeElement?.getAttribute("aria-label"),
+      close: close
+        ? {
+            icon: rect(closeIcon),
+            rect: rect(close),
+            viewBox: closeIcon?.getAttribute("viewBox"),
+          }
+        : null,
+      columns:
+        table instanceof HTMLTableElement ? table.rows[0]?.cells.length ?? 0 : 0,
+      dialog: rect(dialog),
+      rows: table instanceof HTMLTableElement ? table.rows.length : 0,
+      surface: previewSurface
+        ? {
+            borderRadius: surfaceStyle.borderRadius,
+            maxHeight: surfaceStyle.maxHeight,
+            maxWidth: surfaceStyle.maxWidth,
+            overflowX: surfaceStyle.overflowX,
+            padding: surfaceStyle.padding,
+            rect: rect(previewSurface),
+            tabIndex: previewSurface.tabIndex,
+          }
+        : null,
+      table: rect(table),
+    };
+  });
+  const previewSurface = previewDialog.locator(
+    ".codex-ui-markdown-table-preview__surface",
+  );
+  const tallPreview = await previewSurface.evaluate((surface) => {
+    const body = surface.parentElement;
+    const tbody = surface.querySelector("tbody");
+    const row = tbody?.lastElementChild;
+    if (tbody && row) {
+      for (let index = 0; index < 16; index += 1) {
+        tbody.append(row.cloneNode(true));
+      }
+    }
+    const bodyStyle = body ? getComputedStyle(body) : null;
+    const surfaceStyle = getComputedStyle(surface);
+    return {
+      bodyClientHeight: body?.clientHeight ?? 0,
+      bodyOverflowY: bodyStyle?.overflowY,
+      bodyPointerEvents: bodyStyle?.pointerEvents,
+      bodyScrollHeight: body?.scrollHeight ?? 0,
+      surfaceClientHeight: surface.clientHeight,
+      surfaceMaxHeight: surfaceStyle.maxHeight,
+      surfaceOverflowY: surfaceStyle.overflowY,
+      surfacePointerEvents: surfaceStyle.pointerEvents,
+      surfaceScrollHeight: surface.scrollHeight,
+    };
+  });
+  await previewSurface.hover();
+  await markdownTableActionsPage.mouse.wheel(0, 480);
+  await markdownTableActionsPage.waitForFunction(
+    () =>
+      (document.querySelector(
+        ".codex-ui-markdown-table-preview__surface",
+      )?.scrollTop ?? 0) > 0,
+  );
+  const tallPreviewScrollTop = await previewSurface.evaluate(
+    (surface) => surface.scrollTop,
+  );
+  await previewDialog
+    .getByRole("button", { name: "Close table preview" })
+    .press("Tab");
+  await markdownTableActionsPage.waitForFunction(
+    () =>
+      document.activeElement?.classList.contains(
+        "codex-ui-markdown-table-preview__surface",
+      ) === true,
+  );
+  await markdownTableActionsPage.keyboard.press("ArrowRight");
+  await markdownTableActionsPage.waitForFunction(
+    () =>
+      (document.querySelector(
+        ".codex-ui-markdown-table-preview__surface",
+      )?.scrollLeft ?? 0) > 0,
+  );
+  const previewKeyboard = await previewSurface.evaluate((surface) => ({
+    active: document.activeElement === surface,
+    scrollLeft: surface.scrollLeft,
+  }));
+  await previewSurface.press("Escape");
+  await previewDialog.waitFor({ state: "hidden" });
+  await markdownTableActionsPage.waitForFunction(
+    () => document.activeElement?.getAttribute("aria-label") === "Expand table",
+  );
+  const returnedFocus = await markdownTableActionsPage.evaluate(
+    () => document.activeElement?.getAttribute("aria-label"),
+  );
+  const appLayout = markdownTableActionsPage.locator(
+    ".codex-ui-app-shell__layout",
+  );
+  await appLayout.evaluate((layout) => {
+    layout.style.setProperty("--codex-ui-app-shell-side-panel-track", "20rem");
+  });
+  await markdownTableActionsPage.waitForFunction(
+    () =>
+      (document.querySelector(
+        ".codex-ui-conversation-thread-shell",
+      )?.getBoundingClientRect().width ?? Number.POSITIVE_INFINITY) < 53 * 16,
+  );
+  await tableContainer.hover();
+  await markdownTableActionsPage.waitForTimeout(150);
+  const splitPane = await inspectTable();
+  await expandButton.click();
+  await previewDialog.waitFor({ state: "visible" });
+  await previewDialog
+    .getByRole("button", { name: "Close table preview" })
+    .click();
+  await previewDialog.waitFor({ state: "hidden" });
+  await markdownTableActionsPage.waitForFunction(
+    () => document.activeElement?.getAttribute("aria-label") === "Expand table",
+  );
+  await appLayout.evaluate((layout) => {
+    layout.style.removeProperty("--codex-ui-app-shell-side-panel-track");
+  });
+  await markdownTableActionsPage.waitForFunction(
+    () =>
+      (document.querySelector(
+        ".codex-ui-conversation-thread-shell",
+      )?.getBoundingClientRect().width ?? 0) >= 53 * 16,
+  );
+  await markdownTableActionsApp.evaluate(({ BrowserWindow }) => {
+    BrowserWindow.getAllWindows()[0]?.setContentSize(720, 680);
+  });
+  await markdownTableActionsPage.waitForFunction(
+    () => window.innerWidth === 720 && window.innerHeight === 680,
+  );
+  await tableContainer.scrollIntoViewIfNeeded();
+  await tableContainer.hover();
+  await markdownTableActionsPage.waitForTimeout(150);
+  const narrow = await inspectTable();
+  await expandButton.click();
+  await previewDialog.waitFor({ state: "visible" });
+  await previewDialog
+    .getByRole("button", { name: "Close table preview" })
+    .click();
+  await previewDialog.waitFor({ state: "hidden" });
+  await markdownTableActionsPage.waitForFunction(
+    () => document.activeElement?.getAttribute("aria-label") === "Expand table",
+  );
+  const narrowReturnedFocus = await markdownTableActionsPage.evaluate(
+    () => document.activeElement?.getAttribute("aria-label"),
+  );
+  const labels = hovered.buttons.map(({ label }) => label);
+  const viewBoxes = hovered.buttons.map(({ viewBox }) => viewBox);
+  if (
+    resting.columns !== 18 ||
+    resting.rows !== 4 ||
+    resting.actions?.opacity !== "0" ||
+    resting.scroller?.overflowX !== "auto" ||
+    resting.scroller.scrollWidth - resting.scroller.clientWidth < 700 ||
+    Math.abs((hovered.table?.width ?? 0) - 1_665.86) > 1 ||
+    Math.abs((hovered.table?.height ?? 0) - 323) > 0.5 ||
+    hovered.firstHeader?.padding !== "8px 24px 8px 0px" ||
+    hovered.firstHeader?.fontWeight !== "600" ||
+    hovered.firstHeader?.lineHeight !== "16px" ||
+    hovered.firstHeader?.overflowWrap !== "break-word" ||
+    Math.abs((hovered.firstHeader?.rect?.width ?? 0) - 92.484) > 1 ||
+    Math.abs((hovered.firstHeader?.rect?.height ?? 0) - 49) > 0.5 ||
+    hovered.firstCell?.padding !== "10px 24px 10px 0px" ||
+    hovered.firstCell?.fontWeight !== "445" ||
+    hovered.firstCell?.lineHeight !== "22px" ||
+    hovered.firstCell?.overflowWrap !== "break-word" ||
+    Math.abs((hovered.firstCell?.rect?.width ?? 0) - 92.484) > 1 ||
+    Math.abs((hovered.firstCell?.rect?.height ?? 0) - 87) > 0.5 ||
+    hovered.actions?.opacity !== "1" ||
+    hovered.actions?.pointerEvents !== "none" ||
+    hovered.actions?.interceptsLowerEdge !== false ||
+    hovered.actions.rect?.width !== 32 ||
+    !hovered.conversation ||
+    hovered.conversation.width < 53 * 16 ||
+    hovered.actions.rect?.left < (hovered.container?.right ?? 0) ||
+    JSON.stringify(labels) !==
+      JSON.stringify(["Expand table", "Copy table"]) ||
+    JSON.stringify(viewBoxes) !== JSON.stringify(["0 0 20 20", "0 0 21 21"]) ||
+    hovered.buttons.some(
+      ({ pointerEvents, rect }) =>
+        pointerEvents !== "auto" ||
+        !rect ||
+        Math.abs(rect.width - 24) > 0.5 ||
+        Math.abs(rect.height - 24) > 0.5,
+    ) ||
+    clipboard?.["text/plain"]?.length !== 1_863 ||
+    !clipboard?.["text/plain"]?.startsWith("| PROBE-COL-01 |") ||
+    !clipboard?.["text/plain"]?.endsWith("row-3-value-18-abcdefghij |") ||
+    !clipboard?.["text/html"]?.startsWith("<table>") ||
+    preview.activeElement !== "Close table preview" ||
+    preview.columns !== 18 ||
+    preview.rows !== 4 ||
+    preview.dialog?.width !== 1_180 ||
+    preview.dialog?.height !== 820 ||
+    !preview.surface ||
+    preview.surface.borderRadius !== "20px" ||
+    preview.surface.maxHeight !== "100%" ||
+    preview.surface.maxWidth !== "80%" ||
+    preview.surface.overflowX !== "auto" ||
+    preview.surface.padding !== "32px" ||
+    preview.surface.tabIndex !== 0 ||
+    !previewKeyboard.active ||
+    previewKeyboard.scrollLeft <= 0 ||
+    tallPreview.bodyPointerEvents !== "none" ||
+    tallPreview.bodyOverflowY !== "auto" ||
+    tallPreview.bodyScrollHeight - tallPreview.bodyClientHeight > 1 ||
+    tallPreview.surfaceMaxHeight !== "100%" ||
+    tallPreview.surfaceOverflowY !== "auto" ||
+    tallPreview.surfacePointerEvents !== "auto" ||
+    tallPreview.surfaceScrollHeight <= tallPreview.surfaceClientHeight ||
+    tallPreviewScrollTop <= 0 ||
+    !splitPane.conversation ||
+    splitPane.conversation.width >= 53 * 16 ||
+    splitPane.actions?.opacity !== "1" ||
+    !splitPane.actions?.rect ||
+    splitPane.actions.rect.right > (splitPane.container?.right ?? 0) ||
+    splitPane.actions.rect.left < splitPane.conversation.left ||
+    splitPane.actions.rect.right > splitPane.conversation.right ||
+    splitPane.buttons.some(
+      ({ rect }) =>
+        !rect ||
+        rect.left < splitPane.conversation.left ||
+        rect.right > splitPane.conversation.right,
+    ) ||
+    !preview.close ||
+    Math.abs(preview.close.rect.height - 40) > 0.5 ||
+    Math.abs(preview.close.rect.width - 42) > 0.5 ||
+    preview.close.viewBox !== "0 0 21 21" ||
+    Math.abs((preview.close.icon?.height ?? 0) - 18) > 0.5 ||
+    Math.abs((preview.close.icon?.width ?? 0) - 18) > 0.5 ||
+    Math.abs(preview.surface.rect.width - 892.8) > 1 ||
+    Math.abs((preview.table?.width ?? 0) - (hovered.table?.width ?? 0)) > 1 ||
+    returnedFocus !== "Expand table" ||
+    narrow.viewport.width !== 720 ||
+    narrow.viewport.height !== 680 ||
+    narrow.actions?.opacity !== "1" ||
+    narrow.actions?.pointerEvents !== "none" ||
+    narrow.actions?.interceptsLowerEdge !== false ||
+    !narrow.actions?.rect ||
+    narrow.actions.rect.left < 0 ||
+    narrow.actions.rect.right > narrow.viewport.width ||
+    narrow.buttons.some(
+      ({ rect }) =>
+        !rect || rect.left < 0 || rect.right > narrow.viewport.width,
+    ) ||
+    narrow.scroller?.overflowX !== "auto" ||
+    narrow.scroller.scrollWidth - narrow.scroller.clientWidth < 700 ||
+    narrowReturnedFocus !== "Expand table"
+  ) {
+    throw new Error(
+      `markdown-table-actions: current-build contract failed: ${JSON.stringify({ clipboard, hovered, narrow, narrowReturnedFocus, preview, previewKeyboard, resting, returnedFocus, splitPane, tallPreview, tallPreviewScrollTop })}`,
+    );
+  }
+  await writeFile(
+    join(artifactDirectory, "markdown-table-actions.json"),
+    `${JSON.stringify({ clipboard, hovered, narrow, narrowReturnedFocus, preview, previewKeyboard, resting, returnedFocus, splitPane, tallPreview, tallPreviewScrollTop }, null, 2)}\n`,
+  );
+} finally {
+  await markdownTableActionsApp.close();
+}
 
 const sidebarScene = {
   frame: "streaming",

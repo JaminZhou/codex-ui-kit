@@ -49,6 +49,17 @@ describe("lifecycle visual policy", () => {
     expect(contract).not.toContain("defaultLifecyclePixelRatio");
   });
 
+  it("removes host scrollbar preferences from Markdown table captures", () => {
+    expect(contract).toContain(
+      ".codex-ui-markdown__table-scroll,\n          .codex-ui-markdown-table-preview__surface",
+    );
+    expect(contract).toContain(
+      ".codex-ui-markdown__table-scroll::-webkit-scrollbar,\n          .codex-ui-markdown-table-preview__surface::-webkit-scrollbar",
+    );
+    expect(contract).toContain("scrollbar-width: none");
+    expect(contract).toContain("display: none");
+  });
+
   it("keeps the current-build window chrome comparison ownership-scoped", () => {
     expect(contract).toContain(
       "CODEX_UI_KIT_WINDOW_CHROME_REFERENCE",

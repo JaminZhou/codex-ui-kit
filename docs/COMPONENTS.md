@@ -28,7 +28,15 @@ Codex UI Kit exposes protocol-neutral React components. Hosts own data fetching,
 
 ## Rich content
 
-- `AgentMarkdown`: GFM rendering without raw HTML, streaming stabilization, semantic renderer overrides, and viewport-aware lazy syntax highlighting. `stabilizeStreamingMarkdown` exposes the package's standalone streaming helper; `CodeHighlighter` is the public contract for supplying a custom escaped-code highlighter.
+- `AgentMarkdown`: GFM rendering without raw HTML, streaming stabilization,
+  semantic renderer overrides, viewport-aware lazy syntax highlighting, and
+  current-style table actions. Tables copy their exact source Markdown plus
+  rendered HTML by default; `onCopyTable` can transfer that protocol-neutral
+  payload to a host. `allowWideTables` opts a host into the measured
+  horizontal overhang, hover/focus Copy and Expand rail, and full-screen table
+  preview. `stabilizeStreamingMarkdown` exposes the package's standalone
+  streaming helper; `CodeHighlighter` is the public contract for supplying a
+  custom escaped-code highlighter.
 - `InlineCode`: standalone inline-code treatment.
 - `CodeBlock`: language header, copy feedback, syntax highlighting, and wrapped or unwrapped states.
 - `FileDiff`: structured context, hunk, metadata, addition, and deletion lines with optional wrapping, viewport modes, and scroll-edge fades. `fileDiffToText` converts the structured public line model into copyable plain text.
