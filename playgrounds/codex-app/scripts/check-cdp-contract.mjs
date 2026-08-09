@@ -3670,6 +3670,9 @@ for (const scene of visualScenes) {
         const progress = uploadingAttachment?.querySelector(
           ".codex-ui-composer-attachment__progress",
         );
+        const failedAttachment = attachments.find(
+          (attachment) => attachment.getAttribute("data-status") === "error",
+        );
         const constrainedCard = attachments.find(
           (attachment) => attachment.getAttribute("data-layout") === "card",
         );
@@ -3690,6 +3693,7 @@ for (const scene of visualScenes) {
           if (meta) meta.textContent = originalMeta ?? "";
         }
         let imageProgressGeometry = null;
+        let pillProgressGeometry = null;
         if (uploadingAttachment && progress) {
           const originalLayout = uploadingAttachment.getAttribute("data-layout");
           uploadingAttachment.setAttribute("data-layout", "image");
@@ -3700,10 +3704,42 @@ for (const scene of visualScenes) {
             rightInset: attachmentRect.right - progressRect.right,
             width: progressRect.width,
           };
+          uploadingAttachment.setAttribute("data-layout", "pill");
+          const pillAttachmentRect = uploadingAttachment.getBoundingClientRect();
+          const pillProgressRect = progress.getBoundingClientRect();
+          pillProgressGeometry = {
+            leftInset: pillProgressRect.left - pillAttachmentRect.left,
+            rightInset: pillAttachmentRect.right - pillProgressRect.right,
+            width: pillProgressRect.width,
+          };
           if (originalLayout) {
             uploadingAttachment.setAttribute("data-layout", originalLayout);
           } else {
             uploadingAttachment.removeAttribute("data-layout");
+          }
+        }
+        let pillRetryGeometry = null;
+        if (failedAttachment) {
+          const retry = failedAttachment.querySelector(
+            ".codex-ui-composer-attachment__retry",
+          );
+          const open = failedAttachment.querySelector(
+            ".codex-ui-composer-attachment__open",
+          );
+          if (retry && open) {
+            const originalLayout = failedAttachment.getAttribute("data-layout");
+            failedAttachment.setAttribute("data-layout", "pill");
+            const openRect = open.getBoundingClientRect();
+            const retryRect = retry.getBoundingClientRect();
+            pillRetryGeometry = {
+              gap: retryRect.left - openRect.right,
+              position: getComputedStyle(retry).position,
+            };
+            if (originalLayout) {
+              failedAttachment.setAttribute("data-layout", originalLayout);
+            } else {
+              failedAttachment.removeAttribute("data-layout");
+            }
           }
         }
         return {
@@ -3728,6 +3764,8 @@ for (const scene of visualScenes) {
           phase: document
             .querySelector(".demo-root")
             ?.getAttribute("data-composer-phase"),
+          pillProgressGeometry,
+          pillRetryGeometry,
           previewError: document
             .querySelector(
               '.codex-ui-composer-attachment[data-status="preview-error"] [role="status"]',
@@ -3801,9 +3839,16 @@ for (const scene of visualScenes) {
             Math.abs(variant.imageProgressGeometry.leftInset - 8) > 1 ||
             Math.abs(variant.imageProgressGeometry.rightInset - 8) > 1 ||
             variant.imageProgressGeometry.width < 48 ||
+            !variant.pillProgressGeometry ||
+            Math.abs(variant.pillProgressGeometry.leftInset - 8) > 1 ||
+            Math.abs(variant.pillProgressGeometry.rightInset - 8) > 1 ||
+            variant.pillProgressGeometry.width < 24 ||
             !variant.statusText.includes("Uploading…"))) ||
         (scene.id === "attachment-upload-error" &&
           (variant.retryCount !== 1 ||
+            !variant.pillRetryGeometry ||
+            variant.pillRetryGeometry.position !== "static" ||
+            variant.pillRetryGeometry.gap < 0 ||
             !variant.statusText.includes("Upload failed"))) ||
         (scene.id === "attachment-preview-error" &&
           (variant.retryCount !== 1 ||

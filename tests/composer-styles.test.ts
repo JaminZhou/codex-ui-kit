@@ -53,6 +53,16 @@ describe("composer visual contract", () => {
     expect(styles).toMatch(
       /\.codex-ui-composer-attachment\[data-layout="image"\][\s\S]*?> \.codex-ui-composer-attachment__progress \{[\s\S]*?left: 0\.5rem;[\s\S]*?right: 0\.5rem;/,
     );
+    expect(styles).toMatch(
+      /\.codex-ui-composer-attachment\[data-layout="pill"\][\s\S]*?> \.codex-ui-composer-attachment__progress \{[\s\S]*?left: 0\.5rem;[\s\S]*?right: 0\.5rem;/,
+    );
+    expect(styles).toMatch(
+      /\.codex-ui-composer-attachment\[data-layout="card"\][\s\S]*?> \.codex-ui-composer-attachment__retry,[\s\S]*?\.codex-ui-composer-attachment\[data-layout="image"\][\s\S]*?> \.codex-ui-composer-attachment__retry \{[\s\S]*?position: absolute;/,
+    );
+    const pillRetryBlock = styles.match(
+      /(?:^|\n)\.codex-ui-composer-attachment__retry \{([^}]*)\}/,
+    )?.[1];
+    expect(pillRetryBlock).not.toContain("position: absolute");
     expect(styles).toContain(
       ".codex-ui-composer-attachment__retry:focus-visible",
     );
