@@ -921,6 +921,7 @@ export async function launchScene(
     },
   });
   const page = await app.firstWindow();
+  await page.bringToFront();
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.waitForSelector(
     `.demo-root[data-scenario="${scene.scenario}"][data-frame="${scene.frame}"]`,

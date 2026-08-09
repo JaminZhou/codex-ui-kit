@@ -32,6 +32,14 @@ const currentReplayComposerContracts = [];
 for (const scene of visualScenes) {
   const { app, page } = await launchScene(scene);
   try {
+    if (scene.id === "thread-windowed") {
+      await page.waitForFunction(() => {
+        const viewport = document.querySelector(
+          ".codex-ui-conversation-thread-shell__viewport",
+        );
+        return viewport instanceof HTMLElement && viewport.scrollTop < -10_000;
+      });
+    }
     if (scene.id === "current-light-shell") {
       const lightShell = await page.evaluate(() => {
         const metric = (selector) => {
