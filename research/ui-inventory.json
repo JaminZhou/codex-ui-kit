@@ -122,7 +122,14 @@
       "id": "thread.messages-markdown",
       "area": "conversation",
       "ownership": "turn",
-      "packageEvidence": ["conversation-markdown"],
+      "packageEvidence": [
+        "conversation-markdown",
+        "app-asar-26.803.41515:inline-markdown-follow-state-machine-and-table-container-actions",
+        "replay:public-delta-link-fence-nested-task-list-table-and-twelve-section-completion",
+        "browser-cdp:five-markdown-streaming-large-checkpoints-and-129-frame-matrix",
+        "electron:code-copy-table-focus-user-scroll-away-and-return-to-latest",
+        "pixel:four-reviewed-markdown-streaming-large-baselines"
+      ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
         "cdp:heading-lists-table-inline-code-code-block-quote-link-sample",

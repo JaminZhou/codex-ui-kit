@@ -38,7 +38,7 @@ exit gates; it does not replace the inventory.
   explicit 820×680/720×680 reopen. Two more current tasks now cover concurrent
   siblings plus a Parent → Child delegation through active, mixed, completed,
   summary, flat-panel, live-progress, and independent transcript states while
-  retaining public `agentPath` hierarchy. Browser/CDP covers 125 lifecycle
+  retaining public `agentPath` hierarchy. Browser/CDP covers 129 lifecycle
   frames; Electron repeats
   the session, mismatch, input, picker, close, and resize interactions; the
   current 906×820 panel/content pixel ratios pass at 1.5120%/0.4004%.
@@ -56,6 +56,15 @@ exit gates; it does not replace the inventory.
   transcript access. Browser/CDP, Electron, and three reviewed internal pixel
   baselines pass. These are independent implementation gates, not a claim that
   the unsampled recovery transitions were runtime-reached in the product.
+- The same unchanged fingerprint now supplies source-structural evidence for
+  inline-Markdown in-progress ownership, the latest-turn follow state machine,
+  and the current Table container/scroller plus Copy/Expand/Preview controls.
+  A separate schema-valid replay mutates an incomplete link and code fence
+  across four deltas, then completes a nested/task-list, multi-column, twelve-
+  section response. Browser/CDP gates five checkpoints and computed geometry;
+  Electron verifies code copy, user scroll-away, and return to latest; four
+  reviewed internal baselines pass. Product reachability and pixel attribution
+  for these transitions remain open, as do the structural table actions.
 - The previous `26.730.61309` refresh covered all six left-sidebar groups,
   selected/no-project and New worktree entry, plus sampled command, approval,
   interruption, compaction, summary, and pasted-image surfaces. The sidebar capture locks the
@@ -447,9 +456,12 @@ without confusing package readiness with full product reconstruction.
     lifecycle are also delivered. Native file/folder selection, multi-item
     overflow, upload/error, and preview recovery now have independent
     Browser/Electron gates plus current source-structural evidence; retain the
-    real product post-picker transition as an explicit evidence gap. Continue
-    with plugin attachment variants, Markdown mutation/
-    large content, populated artifact/source sections, real-product subagent
+    real product post-picker transition as an explicit evidence gap. Markdown
+    link/fence mutation, nested/task lists, a multi-column table, long-content
+    following, completion actions, and Electron scroll-away/return are now
+    delivered independently. Continue with plugin attachment variants,
+    Markdown images/math/citations, very-large-table actions/preview and error
+    variants, populated artifact/source sections, real-product subagent
     recovery capture, and transport recovery. The independent subagent
     waiting/failure/interruption/streaming/pagination matrix is delivered.
 11. **P1 resources and integrations**: Browser/artifact/document previews,

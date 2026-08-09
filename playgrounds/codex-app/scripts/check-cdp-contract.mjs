@@ -5594,6 +5594,136 @@ try {
   await markdownStartedApp.close();
 }
 
+const markdownStreamingScenes = [
+  { frame: "markdown-stream-link" },
+  { frame: "markdown-stream-fence" },
+  { frame: "markdown-stream-table" },
+  { frame: "markdown-stream-large" },
+  { frame: "markdown-stream-complete" },
+];
+const markdownStreamingContracts = [];
+for (const { frame } of markdownStreamingScenes) {
+  const markdownStreamingScene = {
+    frame,
+    id: `cdp-${frame}`,
+    scenario: "markdown-streaming-large",
+  };
+  const {
+    app: markdownStreamingApp,
+    page: markdownStreamingPage,
+  } = await launchScene(markdownStreamingScene, { capture: false });
+  try {
+    const contract = await markdownStreamingPage.evaluate(() => {
+      const message = document.querySelector(
+        '[data-item-id="assistant-markdown-streaming-large"]',
+      );
+      const root = message?.querySelector(".codex-ui-markdown");
+      const tableScroll = root?.querySelector(
+        ".codex-ui-markdown__table-scroll",
+      );
+      const viewport = document.querySelector(
+        ".codex-ui-conversation-thread-shell__viewport",
+      );
+      const rect = (element) => {
+        if (!(element instanceof Element)) return null;
+        const value = element.getBoundingClientRect();
+        return {
+          bottom: value.bottom,
+          height: value.height,
+          left: value.left,
+          right: value.right,
+          top: value.top,
+          width: value.width,
+        };
+      };
+      return {
+        actionCount: document.querySelectorAll(
+          '[aria-label="Markdown response actions"] button',
+        ).length,
+        code: root
+          ?.querySelector(".codex-ui-code-block__body code")
+          ?.textContent?.trim(),
+        codeBlockCount:
+          root?.querySelectorAll(".codex-ui-code-block").length ?? 0,
+        frame: document
+          .querySelector(".demo-root")
+          ?.getAttribute("data-frame"),
+        headingCount: root?.querySelectorAll("h1, h2").length ?? 0,
+        href: root?.querySelector("a")?.getAttribute("href"),
+        linkTarget: root?.querySelector("a")?.getAttribute("target"),
+        messageStatus: message?.getAttribute("data-status"),
+        root: rect(root),
+        streaming: root?.getAttribute("data-streaming"),
+        table: rect(root?.querySelector("table")),
+        tableScroll: tableScroll
+          ? {
+              clientWidth: tableScroll.clientWidth,
+              overflowX: getComputedStyle(tableScroll).overflowX,
+              scrollWidth: tableScroll.scrollWidth,
+              ...rect(tableScroll),
+            }
+          : null,
+        taskCount:
+          root?.querySelectorAll('.task-list-item input[type="checkbox"]')
+            .length ?? 0,
+        text: root?.textContent?.replace(/\s+/g, " ").trim(),
+        viewport: viewport
+          ? {
+              clientHeight: viewport.clientHeight,
+              scrollHeight: viewport.scrollHeight,
+              scrollTop: viewport.scrollTop,
+            }
+          : null,
+      };
+    });
+    markdownStreamingContracts.push(contract);
+
+    const isComplete = frame === "markdown-stream-complete";
+    const isAtBottom =
+      contract.viewport &&
+      Math.abs(
+        contract.viewport.scrollHeight -
+          contract.viewport.clientHeight -
+          contract.viewport.scrollTop,
+      ) <= 1;
+    if (
+      !contract.root ||
+      contract.frame !== frame ||
+      contract.messageStatus !== (isComplete ? "completed" : "running") ||
+      contract.streaming !== (isComplete ? null : "true") ||
+      contract.actionCount !== (isComplete ? 4 : 0) ||
+      contract.root.width < 700 ||
+      !isAtBottom ||
+      (frame === "markdown-stream-link" &&
+        (!contract.href?.startsWith("https://exa") ||
+          contract.linkTarget !== "_blank")) ||
+      (frame === "markdown-stream-fence" &&
+        (contract.codeBlockCount !== 1 ||
+          !contract.code?.includes('const chunks = ["link", "list", "code"];') ||
+          contract.taskCount !== 2)) ||
+      (frame === "markdown-stream-table" &&
+        (!contract.table ||
+          !contract.tableScroll ||
+          contract.tableScroll.overflowX !== "auto" ||
+          contract.tableScroll.clientWidth < contract.root.width)) ||
+      ((frame === "markdown-stream-large" || isComplete) &&
+        (contract.headingCount !== 13 ||
+          !contract.text?.endsWith("End of streamed response.") ||
+          contract.root.height <= (contract.viewport?.clientHeight ?? 0)))
+    ) {
+      throw new Error(
+        `${frame}: streaming Markdown contract failed: ${JSON.stringify(contract)}`,
+      );
+    }
+  } finally {
+    await markdownStreamingApp.close();
+  }
+}
+await writeFile(
+  join(artifactDirectory, "markdown-streaming-large.json"),
+  `${JSON.stringify(markdownStreamingContracts, null, 2)}\n`,
+);
+
 const sidebarScene = {
   frame: "streaming",
   id: "sidebar-current",
