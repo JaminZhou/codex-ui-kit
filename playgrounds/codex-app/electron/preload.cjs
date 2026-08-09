@@ -1,6 +1,9 @@
 const { contextBridge, ipcRenderer } = require("electron");
 
 contextBridge.exposeInMainWorld("codexDemo", {
+  useRendererAttachmentFixture:
+    process.env.CODEX_DEMO_ATTACHMENT_RENDERER_FIXTURE === "1",
+  selectAttachments: () => ipcRenderer.invoke("demo:attachments:select"),
   closeLive: () => ipcRenderer.invoke("demo:live:close"),
   onNotification: (handler) => {
     if (typeof handler !== "function") {

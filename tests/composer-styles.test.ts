@@ -39,6 +39,15 @@ describe("composer visual contract", () => {
       '.codex-ui-composer-attachment[data-layout="card"]',
     );
     expect(styles).toMatch(
+      /\.codex-ui-composer-attachment\[data-layout="card"\] \{[\s\S]*?gap: 0\.625rem;[\s\S]*?padding: 0\.75rem 2rem 0\.75rem 0\.75rem;/,
+    );
+    expect(styles).toContain(
+      ".codex-ui-composer-attachment__progress",
+    );
+    expect(styles).toContain(
+      ".codex-ui-composer-attachment__retry:focus-visible",
+    );
+    expect(styles).toMatch(
       /\.codex-ui-composer-dock__queue \{[\s\S]*?var\(--codex-ui-composer-queue-inline-inset\)[\s\S]*?overflow: hidden;/,
     );
     expect(styles).toMatch(

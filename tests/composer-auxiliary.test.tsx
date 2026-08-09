@@ -99,6 +99,56 @@ describe("composer auxiliary surfaces", () => {
     expect(onOpen).toHaveBeenCalledTimes(1);
   });
 
+  it("announces bounded upload progress and retries failed attachments", () => {
+    const onRetry = vi.fn();
+    const { rerender } = render(
+      <ComposerAttachment
+        kind="file"
+        label="current-build.txt"
+        layout="card"
+        progress={125}
+        status="uploading"
+      />,
+    );
+
+    const progress = screen.getByRole("progressbar", {
+      name: "Uploading current-build.txt",
+    });
+    expect(progress.getAttribute("aria-valuenow")).toBe("100");
+    expect(screen.getByRole("status").textContent).toBe("Uploading…");
+
+    rerender(
+      <ComposerAttachment
+        kind="file"
+        label="current-build.txt"
+        layout="card"
+        onRetry={onRetry}
+        status="error"
+      />,
+    );
+    fireEvent.click(
+      screen.getByRole("button", { name: "Retry current-build.txt" }),
+    );
+    expect(onRetry).toHaveBeenCalledOnce();
+    expect(screen.getByRole("status").textContent).toBe("Upload failed");
+  });
+
+  it("exposes preview failures without rendering a broken image", () => {
+    const { container } = render(
+      <ComposerAttachment
+        kind="image"
+        label="unavailable.png"
+        layout="image"
+        status="preview-error"
+      />,
+    );
+
+    expect(screen.getByRole("status").textContent).toBe(
+      "Preview unavailable",
+    );
+    expect(container.querySelector("img")).toBeNull();
+  });
+
   it("navigates grouped mention results while skipping unavailable options", () => {
     const onSelect = vi.fn();
     const onDismiss = vi.fn();

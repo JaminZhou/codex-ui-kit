@@ -880,4 +880,55 @@ describe("AgentComposer", () => {
     expect(group.contains(attachment)).toBe(true);
     expect(bubble.contains(attachment)).toBe(false);
   });
+
+  it("allows attachment-only submission and renders sent file cards", () => {
+    const onSubmit = vi.fn();
+    const { rerender } = render(
+      <AgentComposer
+        attachments={
+          <ComposerAttachment label="README.md" layout="card" meta="MD" />
+        }
+        onSubmit={onSubmit}
+        onValueChange={() => undefined}
+        value=""
+      />,
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "Send message" }));
+    expect(onSubmit).toHaveBeenCalledWith("");
+
+    rerender(
+      <AgentMessage
+        attachments={
+          <MessageAttachment
+            kind="file"
+            label="README.md"
+            meta="MD"
+            onClick={() => undefined}
+          />
+        }
+        role="user"
+      >
+        Review this file.
+      </AgentMessage>,
+    );
+    const file = screen.getByRole("button", { name: "README.md" });
+    expect(file.dataset.kind).toBe("file");
+    expect(screen.getByText("MD")).toBeTruthy();
+  });
+
+  it("renders a sent attachment preview fallback", () => {
+    render(
+      <MessageAttachment
+        label="reference.png"
+        onClick={() => undefined}
+        status="preview-error"
+      />,
+    );
+
+    expect(screen.getByRole("status").textContent).toBe(
+      "Preview unavailable",
+    );
+    expect(screen.queryByRole("img")).toBeNull();
+  });
 });

@@ -38,7 +38,7 @@ exit gates; it does not replace the inventory.
   explicit 820×680/720×680 reopen. Two more current tasks now cover concurrent
   siblings plus a Parent → Child delegation through active, mixed, completed,
   summary, flat-panel, live-progress, and independent transcript states while
-  retaining public `agentPath` hierarchy. Browser/CDP covers 113 lifecycle
+  retaining public `agentPath` hierarchy. Browser/CDP covers 122 lifecycle
   frames; Electron repeats
   the session, mismatch, input, picker, close, and resize interactions; the
   current 906×820 panel/content pixel ratios pass at 1.5120%/0.4004%.
@@ -79,7 +79,7 @@ exit gates; it does not replace the inventory.
   responsive detail restoration. Its independent state machine adds
   index/detail loading and failure, checks, comments, review submission,
   merge-readiness, merge completion, compact layout, and route restoration.
-  Together the playground gates now cover 113 CDP/pixel frames, including one
+  Together the playground gates now cover 122 CDP/pixel frames, including one
   independently implemented light shell/sidebar/Composer composition. Light
   is route-scoped to the theme-complete shell/workspace; conversation and Pull
   Request retain their deterministic dark presentation. Project, Environment,
@@ -145,8 +145,15 @@ exit gates; it does not replace the inventory.
   message attachment, the exact final response, and the restored focused
   736×98 Composer. Browser/CDP covers 81 frames, Electron drives the same
   lifecycle, and current-build ready/completed regional gates pass at 0.39%
-  and 0.79% under 1.5% limits. Native file-panel selection, non-image files,
-  multi-attachment overflow, upload/error, and plugin variants remain open.
+  and 0.79% under 1.5% limits. The `26.803.41515` attachment follow-up now
+  adds current source-structural file-card/upload/error/progress evidence,
+  public file/folder/image/error components, five-item horizontal overflow,
+  retry and preview recovery, and a trusted Electron file/folder selection
+  bridge. Browser/CDP and Electron verify the independent variants at
+  1180×820 and 820×680. The real product native panel remained host-owned and
+  unautomatable, so post-picker file cards and failure/progress transitions
+  are not promoted to product runtime or pixel evidence. Plugin attachment
+  variants and a public non-image App Server input type remain open.
   The preceding `26.727.40816` results remain previous-build evidence.
   Attachment variants outside that sampled image path and Terminal
   multi-tab/process behavior remain historical regression evidence. Review
@@ -393,8 +400,10 @@ without confusing package readiness with full product reconstruction.
    `acceptForSession` file approval and automatic-review timeout replays now
    pass Browser/CDP, Electron, and internal regional pixels against current
    `26.803.41515` structural evidence; safe real-product reachability remains
-   an explicit evidence gap. Continue with broader attachment variants and
-   recovery evidence;
+   an explicit evidence gap. File/folder/multi-item/upload/error/preview
+   attachment variants and the independent Electron picker bridge are now
+   delivered, while real product post-picker runtime/pixel evidence and plugin
+   variants remain open;
    retain queue pause/Resume only as a legacy compatibility fixture.
 6. **Coding workspace entry**: current selected/no-project destination,
    project/Local/branch context, New worktree/environment-empty state, and
@@ -426,8 +435,11 @@ without confusing package readiness with full product reconstruction.
     have pinned protocol semantics plus independent Browser/Electron/pixel
     gates, without claiming an unsampled product transition. The sampled
     pasted-image attachment lifecycle and single-agent successful delegation
-    lifecycle are also delivered; continue with native-file and attachment
-    upload/error/multi-item variants, Markdown mutation/
+    lifecycle are also delivered. Native file/folder selection, multi-item
+    overflow, upload/error, and preview recovery now have independent
+    Browser/Electron gates plus current source-structural evidence; retain the
+    real product post-picker transition as an explicit evidence gap. Continue
+    with plugin attachment variants, Markdown mutation/
     large content, populated artifact/source sections, subagent
     waiting/failure/cancel/streaming, pagination, and transport recovery.
 11. **P1 resources and integrations**: Browser/artifact/document previews,

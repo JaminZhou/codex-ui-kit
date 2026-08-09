@@ -167,6 +167,37 @@ export const visualScenes = [
     scenario: "attachment-lifecycle",
   },
   {
+    frame: "attachment-multi-ready",
+    id: "attachment-multi-ready",
+    maxPixelRatio: 0.0225,
+    scenario: "attachment-lifecycle",
+  },
+  {
+    frame: "attachment-uploading",
+    id: "attachment-uploading",
+    maxPixelRatio: 0.0225,
+    scenario: "attachment-lifecycle",
+  },
+  {
+    frame: "attachment-upload-error",
+    id: "attachment-upload-error",
+    maxPixelRatio: 0.0225,
+    scenario: "attachment-lifecycle",
+  },
+  {
+    frame: "attachment-preview-error",
+    id: "attachment-preview-error",
+    maxPixelRatio: 0.0225,
+    scenario: "attachment-lifecycle",
+  },
+  {
+    frame: "attachment-multi-compact",
+    id: "attachment-multi-compact",
+    maxPixelRatio: 0.0225,
+    scenario: "attachment-lifecycle",
+    windowSize: { height: 680, width: 820 },
+  },
+  {
     frame: "attachment-completed",
     id: "attachment-current-completed",
     maxPixelRatio: 0.0225,
@@ -850,6 +881,7 @@ export async function launchScene(
   scene,
   {
     capture = true,
+    environment = {},
     layoutMode,
     nativeThemeSource,
     theme,
@@ -863,6 +895,7 @@ export async function launchScene(
     executablePath: electronPath,
     env: {
       ...process.env,
+      ...environment,
       CODEX_DEMO_CAPTURE: capture ? "1" : "0",
       CODEX_DEMO_CURRENT_SIDEBAR: scene.currentSidebar ? "1" : "0",
       CODEX_DEMO_FRAME: scene.frame,

@@ -91,16 +91,26 @@ export interface MessageAttachmentProps
     "children" | "onClick"
   > {
   alt?: string;
+  icon?: ReactNode;
+  kind?: "file" | "image";
   label?: string;
+  meta?: string;
   onClick: NonNullable<ButtonHTMLAttributes<HTMLButtonElement>["onClick"]>;
-  previewSrc: string;
+  previewSrc?: string;
+  status?: "preview-error" | "ready";
+  statusLabel?: string;
 }
 
 export function MessageAttachment({
   alt = "",
   className,
+  icon,
+  kind = "image",
   label = alt || "User attachment",
+  meta,
   previewSrc,
+  status = "ready",
+  statusLabel = status === "preview-error" ? "Preview unavailable" : undefined,
   type = "button",
   ...props
 }: MessageAttachmentProps) {
@@ -112,10 +122,31 @@ export function MessageAttachment({
     <button
       aria-label={label}
       className={classes}
+      data-kind={kind}
+      data-status={status}
       type={type}
       {...props}
     >
-      <img alt={alt} src={previewSrc} />
+      {kind === "image" && previewSrc && status === "ready" ? (
+        <img alt={alt} src={previewSrc} />
+      ) : (
+        <>
+          <span aria-hidden="true" className="codex-ui-message-attachment__icon">
+            {icon ?? "□"}
+          </span>
+          <span className="codex-ui-message-attachment__copy">
+            <span className="codex-ui-message-attachment__label">{label}</span>
+            {meta || statusLabel ? (
+              <span
+                className="codex-ui-message-attachment__meta"
+                role={status === "preview-error" ? "status" : undefined}
+              >
+                {statusLabel ?? meta}
+              </span>
+            ) : null}
+          </span>
+        </>
+      )}
     </button>
   );
 }

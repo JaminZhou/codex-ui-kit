@@ -39,6 +39,9 @@ describe("visual token contract", () => {
     expect(tokens).toContain(
       "--codex-ui-composer-attachment-gap: calc(var(--codex-ui-spacing) * 2)",
     );
+    expect(tokens).toContain(
+      "--codex-ui-composer-attachment-card-height: calc(var(--codex-ui-spacing) * 16)",
+    );
   });
 
   it("keeps the measured semantic light and dark color anchors", () => {

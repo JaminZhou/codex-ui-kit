@@ -967,6 +967,26 @@ textarea {
   overflow: visible;
 }
 
+.demo-current-file-type {
+  font-size: 0.5rem;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  line-height: 1;
+  max-width: 2rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.demo-root[data-scenario="attachment-lifecycle"]
+  .codex-ui-composer__attachments {
+  scroll-snap-type: inline proximity;
+}
+
+.demo-root[data-scenario="attachment-lifecycle"]
+  .codex-ui-composer-attachment {
+  scroll-snap-align: start;
+}
+
 .demo-sidebar-brand .demo-current-build-icon {
   color: var(--demo-shell-text-secondary);
   height: 14px;

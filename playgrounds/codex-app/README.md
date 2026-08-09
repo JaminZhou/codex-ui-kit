@@ -658,7 +658,7 @@ forced media query as current-product evidence:
 - the current sidebar is now an independent composition axis, so it can be
   combined with workspace and theme states without falsifying the lifecycle
   frame;
-- Browser/CDP and reviewed internal pixels reach 113 frames, and Electron
+- Browser/CDP and reviewed internal pixels reach 122 frames, and Electron
   drives System → Light → Dark inside one real `BrowserWindow`;
 - the light screenshot is an independent regression baseline only. A real
   Codex Light preference capture and ownership-scoped external pixel

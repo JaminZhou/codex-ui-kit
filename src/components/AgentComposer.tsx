@@ -120,7 +120,7 @@ export const AgentComposer = forwardRef<
   const canSubmit =
     !disabled &&
     (!isRunning || allowSubmitWhileRunning) &&
-    value.trim().length > 0;
+    (value.trim().length > 0 || hasAttachments);
   const contentRequiresMultiline =
     hasAttachments || hasRenderedQueue || value.includes("\n");
   const resolvedLayout = contentRequiresMultiline
@@ -431,16 +431,20 @@ export interface ComposerAttachmentProps
     "children" | "onClick" | "onKeyDown"
   > {
   icon?: ReactNode;
-  kind?: "file" | "image" | "pasted-text" | "selection";
+  kind?: "file" | "folder" | "image" | "pasted-text" | "selection";
   label: string;
   layout?: "card" | "image" | "pill";
   meta?: string;
   onOpen?: () => void;
   onRemove?: () => void;
+  onRetry?: () => void;
   openLabel?: string;
   previewSrc?: string;
+  progress?: number;
   removeLabel?: string;
-  status?: "error" | "ready" | "uploading";
+  retryLabel?: string;
+  status?: "error" | "preview-error" | "ready" | "uploading";
+  statusLabel?: string;
 }
 
 export function ComposerAttachment({
@@ -452,15 +456,32 @@ export function ComposerAttachment({
   meta,
   onOpen,
   onRemove,
+  onRetry,
   openLabel = `Open ${label}`,
   previewSrc,
+  progress,
   removeLabel = `Remove ${label}`,
+  retryLabel = `Retry ${label}`,
   status = "ready",
+  statusLabel,
   ...props
 }: ComposerAttachmentProps) {
   const classes = ["codex-ui-composer-attachment", className]
     .filter(Boolean)
     .join(" ");
+  const resolvedStatusLabel =
+    statusLabel ??
+    (status === "uploading"
+      ? "Uploading…"
+      : status === "error"
+        ? "Upload failed"
+        : status === "preview-error"
+          ? "Preview unavailable"
+          : undefined);
+  const normalizedProgress =
+    typeof progress === "number" && Number.isFinite(progress)
+      ? Math.min(100, Math.max(0, progress))
+      : undefined;
 
   const content = (
     <>
@@ -470,11 +491,20 @@ export function ComposerAttachment({
           className="codex-ui-composer-attachment__preview"
           src={previewSrc}
         />
+      ) : kind === "image" && status === "preview-error" ? (
+        <span
+          className="codex-ui-composer-attachment__preview-error"
+          role="status"
+        >
+          {resolvedStatusLabel}
+        </span>
       ) : (
         <span aria-hidden="true" className="codex-ui-composer-attachment__icon">
           {icon ??
             (kind === "pasted-text"
               ? "▤"
+              : kind === "folder"
+                ? "▱"
               : kind === "selection"
                 ? "⌁"
                 : "□")}
@@ -482,19 +512,31 @@ export function ComposerAttachment({
       )}
       <span className="codex-ui-composer-attachment__copy">
         <span className="codex-ui-composer-attachment__label">{label}</span>
-        {meta || status !== "ready" ? (
+        {meta || resolvedStatusLabel ? (
           <span
             className="codex-ui-composer-attachment__meta"
-            role={status === "ready" ? undefined : "status"}
+            role={
+              status !== "ready" && status !== "preview-error"
+                ? "status"
+                : undefined
+            }
           >
-            {status === "uploading"
-              ? "Uploading…"
-              : status === "error"
-                ? "Upload failed"
-                : meta}
+            {resolvedStatusLabel ?? meta}
           </span>
         ) : null}
       </span>
+      {status === "uploading" && normalizedProgress !== undefined ? (
+        <span
+          aria-label={`Uploading ${label}`}
+          aria-valuemax={100}
+          aria-valuemin={0}
+          aria-valuenow={normalizedProgress}
+          className="codex-ui-composer-attachment__progress"
+          role="progressbar"
+        >
+          <span style={{ width: `${normalizedProgress}%` }} />
+        </span>
+      ) : null}
     </>
   );
 
@@ -520,6 +562,16 @@ export function ComposerAttachment({
       ) : (
         content
       )}
+      {onRetry ? (
+        <button
+          aria-label={retryLabel}
+          className="codex-ui-composer-attachment__retry"
+          onClick={onRetry}
+          type="button"
+        >
+          Retry
+        </button>
+      ) : null}
       {onRemove ? (
         <button
           aria-label={removeLabel}

@@ -2,6 +2,8 @@ import { mkdir, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { launchScene, visualScenes } from "./electron-harness.mjs";
 
+process.env.CODEX_DEMO_ATTACHMENT_RENDERER_FIXTURE = "1";
+
 const artifactDirectory = join(process.cwd(), "artifacts", "cdp");
 await mkdir(artifactDirectory, { recursive: true });
 const currentReplayComposerScenarios = new Set([
@@ -147,7 +149,7 @@ for (const scene of visualScenes) {
       const currentComposerIcons = await page.evaluate(() =>
         Array.from(
           document.querySelectorAll(
-            ".codex-ui-composer [data-current-build-icon]",
+            ".codex-ui-composer__actions [data-current-build-icon], .codex-ui-composer__controls [data-current-build-icon]",
           ),
           (icon) => {
             const value = icon.getBoundingClientRect();
@@ -3542,7 +3544,10 @@ for (const scene of visualScenes) {
         );
       }
     }
-    if (scene.scenario === "attachment-lifecycle") {
+    if (
+      scene.id === "attachment-current-ready" ||
+      scene.id === "attachment-current-completed"
+    ) {
       const attachmentLifecycle = await page.evaluate(() => {
         const rect = (element) => {
           if (!element) return null;
@@ -3642,6 +3647,102 @@ for (const scene of visualScenes) {
       }
     }
     if (
+      [
+        "attachment-multi-ready",
+        "attachment-uploading",
+        "attachment-upload-error",
+        "attachment-preview-error",
+        "attachment-multi-compact",
+      ].includes(scene.id)
+    ) {
+      const variant = await page.evaluate(() => {
+        const tray = document.querySelector(
+          ".codex-ui-composer__attachments",
+        );
+        const attachments = Array.from(
+          document.querySelectorAll(
+            ".codex-ui-composer .codex-ui-composer-attachment",
+          ),
+        );
+        return {
+          attachmentCount: attachments.length,
+          cardHeights: attachments
+            .filter((attachment) => attachment.getAttribute("data-layout") === "card")
+            .map((attachment) => attachment.getBoundingClientRect().height),
+          iconSizes: attachments
+            .map((attachment) =>
+              attachment.querySelector(
+                ".codex-ui-composer-attachment__icon",
+              ),
+            )
+            .filter(Boolean)
+            .map((icon) => {
+              const rect = icon.getBoundingClientRect();
+              return { height: rect.height, width: rect.width };
+            }),
+          overflow: tray ? tray.scrollWidth - tray.clientWidth : null,
+          phase: document
+            .querySelector(".demo-root")
+            ?.getAttribute("data-composer-phase"),
+          previewError: document
+            .querySelector(
+              '.codex-ui-composer-attachment[data-status="preview-error"] [role="status"]',
+            )
+            ?.textContent?.trim(),
+          progress: document
+            .querySelector('[role="progressbar"]')
+            ?.getAttribute("aria-valuenow"),
+          retryCount: document.querySelectorAll(
+            ".codex-ui-composer-attachment__retry",
+          ).length,
+          statuses: attachments.map((attachment) =>
+            attachment.getAttribute("data-status"),
+          ),
+          statusText: Array.from(
+            document.querySelectorAll(
+              ".codex-ui-composer-attachment__meta[role=status]",
+            ),
+            (element) => element.textContent?.trim(),
+          ),
+        };
+      });
+      contract.attachmentVariants = variant;
+      const expectedCount = scene.id === "attachment-preview-error" ? 1 : 5;
+      const expectsOverflow = scene.id !== "attachment-preview-error";
+      const expectedStatus =
+        scene.id === "attachment-uploading"
+          ? "uploading"
+          : scene.id === "attachment-upload-error"
+            ? "error"
+            : scene.id === "attachment-preview-error"
+              ? "preview-error"
+              : "ready";
+      if (
+        variant.attachmentCount !== expectedCount ||
+        variant.phase !== "attachment" ||
+        !variant.statuses.includes(expectedStatus) ||
+        (expectsOverflow && !(variant.overflow > 0)) ||
+        variant.cardHeights.some((height) => Math.abs(height - 64) > 1) ||
+        variant.iconSizes.some(
+          ({ height, width }) =>
+            Math.abs(height - 40) > 1 || Math.abs(width - 40) > 1,
+        ) ||
+        (scene.id === "attachment-uploading" &&
+          (variant.progress !== "62" ||
+            !variant.statusText.includes("Uploading…"))) ||
+        (scene.id === "attachment-upload-error" &&
+          (variant.retryCount !== 1 ||
+            !variant.statusText.includes("Upload failed"))) ||
+        (scene.id === "attachment-preview-error" &&
+          (variant.retryCount !== 1 ||
+            variant.previewError !== "Preview unavailable"))
+      ) {
+        throw new Error(
+          `${scene.id}: attachment variant contract failed: ${JSON.stringify(variant)}`,
+        );
+      }
+    }
+    if (
       contract.header.bottom > contract.viewport.bottom ||
       contract.composer.top < contract.header.bottom ||
       contract.composer.bottom > contract.shell.bottom + 1 ||
@@ -3691,7 +3792,8 @@ for (const scene of visualScenes) {
     }
     const expectedSidebarMax =
       scene.id === "terminal-compact" ||
-      scene.id === "terminal-current-compact"
+      scene.id === "terminal-current-compact" ||
+      scene.id === "attachment-multi-compact"
         ? "468"
         : scene.surfaces?.includes("reviewPanel")
           ? "508"
@@ -6732,6 +6834,72 @@ try {
   }
 } finally {
   await attachmentLifecycleApp.close();
+}
+
+const attachmentRecoveryScene = {
+  frame: "attachment-upload-error",
+  id: "attachment-recovery-interaction",
+  scenario: "attachment-lifecycle",
+};
+const {
+  app: attachmentRecoveryApp,
+  page: attachmentRecoveryPage,
+} = await launchScene(attachmentRecoveryScene, { capture: false });
+try {
+  await attachmentRecoveryPage
+    .getByRole("button", { name: "Retry current-build.zip" })
+    .click();
+  await attachmentRecoveryPage.waitForSelector(
+    '.demo-root[data-frame="attachment-uploading"] [role="progressbar"][aria-valuenow="18"]',
+  );
+  await attachmentRecoveryPage.waitForSelector(
+    '.demo-root[data-frame="attachment-multi-ready"] .codex-ui-composer-attachment[data-status="ready"]',
+  );
+  const recoveryState = await attachmentRecoveryPage.evaluate(() => ({
+    attachmentCount: document.querySelectorAll(
+      ".codex-ui-composer .codex-ui-composer-attachment",
+    ).length,
+    errorCount: document.querySelectorAll(
+      '.codex-ui-composer-attachment[data-status="error"]',
+    ).length,
+    progressCount: document.querySelectorAll('[role="progressbar"]').length,
+  }));
+  if (
+    recoveryState.attachmentCount !== 5 ||
+    recoveryState.errorCount !== 0 ||
+    recoveryState.progressCount !== 0
+  ) {
+    throw new Error(
+      `Attachment upload retry did not settle cleanly: ${JSON.stringify(recoveryState)}`,
+    );
+  }
+} finally {
+  await attachmentRecoveryApp.close();
+}
+
+const attachmentPreviewScene = {
+  frame: "attachment-preview-error",
+  id: "attachment-preview-interaction",
+  scenario: "attachment-lifecycle",
+};
+const {
+  app: attachmentPreviewApp,
+  page: attachmentPreviewPage,
+} = await launchScene(attachmentPreviewScene, { capture: false });
+try {
+  await attachmentPreviewPage
+    .getByRole("button", { name: "Retry reference-unavailable.png" })
+    .click();
+  await attachmentPreviewPage.waitForSelector(
+    '.demo-root[data-frame="attachment-ready"] .codex-ui-composer-attachment[data-status="ready"] img',
+  );
+  if (
+    (await attachmentPreviewPage.getByText("Preview unavailable").count()) !== 0
+  ) {
+    throw new Error("Attachment preview retry retained the failure status.");
+  }
+} finally {
+  await attachmentPreviewApp.close();
 }
 
 const contextSummaryScene = {
