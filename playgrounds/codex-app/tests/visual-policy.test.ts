@@ -156,6 +156,7 @@ describe("lifecycle visual policy", () => {
     expect(electronContract).toContain(
       'themeControl.selectOption("system")',
     );
+    expect(electronContract).toContain("Electron theme pointer contract failed");
     expect(electronContract).toContain(
       'themeControl.selectOption("light")',
     );
@@ -191,6 +192,7 @@ describe("lifecycle visual policy", () => {
     expect(appStyles).toContain(
       "color: var(--demo-shell-overlay-text)",
     );
+    expect(appStyles).toContain("-webkit-app-region: no-drag");
   });
 
   it("gates the current long-thread navigation and return control", () => {

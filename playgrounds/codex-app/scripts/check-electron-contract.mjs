@@ -334,7 +334,15 @@ try {
   await themeSidebarResizer.press("ArrowRight");
   await themeSidebarResizer.press("ArrowRight");
 
-  await themeControl.focus();
+  await themeControl.click();
+  const themePointerContract = await themeControl.evaluate((control) => ({
+    active: document.activeElement === control,
+  }));
+  if (!themePointerContract.active) {
+    throw new Error(
+      `Electron theme pointer contract failed: ${JSON.stringify(themePointerContract)}`,
+    );
+  }
   await themeControl.selectOption("system");
   await themePage.waitForFunction(
     () =>

@@ -643,7 +643,8 @@ forced media query as current-product evidence:
   are converted;
 - a non-capture Theme control appears only on those completed routes and
   switches the same state model while preserving sidebar width, Composer
-  state, and keyboard focus;
+  state, and keyboard focus; its fixed titlebar position is explicitly
+  non-draggable so pointer input reaches the native selector;
 - current sidebar, window-chrome, context, and Composer SVG geometry is reused
   in light mode, while theme-dependent paint follows the owning control's
   semantic `currentColor` instead of replaying captured dark paint on a light

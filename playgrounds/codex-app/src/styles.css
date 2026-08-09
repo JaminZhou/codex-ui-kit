@@ -1003,6 +1003,7 @@ textarea {
 }
 
 .demo-theme-control--floating {
+  -webkit-app-region: no-drag;
   inset-block-start: 0.5rem;
   inset-inline-end: 0.75rem;
   position: fixed;

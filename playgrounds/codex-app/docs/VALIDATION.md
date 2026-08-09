@@ -62,10 +62,11 @@ Every deterministic scenario has one ID and produces four evidence layers:
    policy in the real window.
    The same real window now emulates a light system preference, switches the
    playground from explicit Dark to System, Light, and back to Dark, and gates
-   root ownership, computed `color-scheme`, focus, sidebar geometry, main
-   background, Composer foreground, Project/Environment/Worktree overlay
-   paint, route-scoped control availability, and dark fallback after returning
-   to an unsupported conversation route.
+   pointer access through the draggable titlebar, root ownership, computed
+   `color-scheme`, focus, sidebar geometry, main background, Composer
+   foreground, Project/Environment/Worktree overlay paint, route-scoped
+   control availability, and dark fallback after returning to an unsupported
+   conversation route.
    A current long-thread flow verifies compact navigation selection, a
    seven-turn mounted window, negative away-from-latest scrolling, and
    return-to-latest at scroll origin zero. The current long-command flow
