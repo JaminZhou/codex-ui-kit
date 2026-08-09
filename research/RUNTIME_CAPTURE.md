@@ -837,9 +837,17 @@ working plus one done, two done, progress preview, summary counts, and two
 transcripts. A Parent/Child task records nested spawn, shared active/done
 sections, both transcripts, and public `/root/parent/child` path metadata. The
 current visual panel is flat; the path is retained as protocol identity rather
-than rendered as an inferred tree. Waiting-before-initialization, failure,
-interruption/cancel, streaming, pagination, and recovery are still required
-captures.
+than rendered as an inferred tree.
+
+The unchanged `26.803.41515` ASAR fingerprint later supplied read-only
+source-structural evidence for the public `pendingInit`, `running`,
+`interrupted`, `completed`, `errored`, `shutdown`, and `notFound` states, plus
+the current Active/Done classifier and 4/10 visible-item limits. The
+independent twelve-agent replay now covers waiting, streamed progress, mixed
+terminal outcomes, both pagination paths, and a failed-agent transcript in
+Browser/CDP, Electron, and internal pixels. No isolated product task was driven
+through those recovery transitions, so real-product recovery reachability and
+transport recovery remain required captures.
 
 ## Required flow matrix
 

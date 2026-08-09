@@ -1402,6 +1402,69 @@ describe("protocol lifecycle reducer", () => {
     });
   });
 
+  it("preserves waiting, streamed progress, and mixed terminal subagent outcomes", () => {
+    const scenario = replayScenarios["subagent-recovery"];
+    const waiting = reduceProtocolTrace(
+      scenario.events.slice(0, scenario.frames["subagent-recovery-waiting"]),
+    );
+    const streaming = reduceProtocolTrace(
+      scenario.events.slice(
+        0,
+        scenario.frames["subagent-recovery-panel-streaming"],
+      ),
+    );
+    const terminal = reduceProtocolTrace(
+      scenario.events.slice(
+        0,
+        scenario.frames["subagent-recovery-panel-terminal"],
+      ),
+    );
+    const completed = reduceProtocolTrace(scenario.events);
+
+    expect(waiting.subagents).toHaveLength(12);
+    expect(waiting.subagents.find(({ id }) => id === "planner")).toMatchObject({
+      status: "waiting",
+      threadStatus: "pendingInit",
+    });
+    expect(
+      streaming.subagents.find(({ id }) => id === "streamer"),
+    ).toMatchObject({
+      activityKind: "interacted",
+      message: "Parsed 4 of 12 lifecycle events.",
+      status: "active",
+      threadStatus: "running",
+    });
+    expect(terminal.status).toBe("running");
+    expect(terminal.subagents).toHaveLength(12);
+    expect(
+      terminal.subagents.map(({ status }) => status),
+    ).toEqual(Array.from({ length: 12 }, () => "done"));
+    expect(
+      terminal.subagents.find(({ id }) => id === "validator"),
+    ).toMatchObject({
+      message: "Validation failed: fixture mismatch.",
+      threadStatus: "errored",
+    });
+    expect(
+      terminal.subagents.find(({ id }) => id === "reviewer"),
+    ).toMatchObject({
+      message: "Review interrupted by parent.",
+      threadStatus: "interrupted",
+    });
+    expect(
+      terminal.subagents.find(({ id }) => id === "tester"),
+    ).toMatchObject({ threadStatus: "shutdown" });
+    expect(
+      terminal.subagents.find(({ id }) => id === "reporter"),
+    ).toMatchObject({ threadStatus: "notFound" });
+    expect(completed.status).toBe("completed");
+    expect(completed.messages.at(-1)).toMatchObject({
+      id: "assistant-subagent-recovery",
+      status: "completed",
+      text: "RECOVERY MATRIX COMPLETE: 8 completed, 1 errored, 1 interrupted, 1 shutdown, and 1 unavailable.",
+    });
+  });
+
   it("aggregates concurrent sibling subagents through a mixed state", () => {
     const scenario = replayScenarios["subagent-concurrency"];
     const running = reduceProtocolTrace(

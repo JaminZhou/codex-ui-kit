@@ -393,7 +393,8 @@ function isSubagentScenarioId(id: ReplayScenarioId) {
   return (
     id === "subagent-delegation" ||
     id === "subagent-concurrency" ||
-    id === "subagent-nested"
+    id === "subagent-nested" ||
+    id === "subagent-recovery"
   );
 }
 
@@ -421,6 +422,7 @@ function initialSubagentId(frame: string | null) {
   if (frame?.endsWith("transcript-beta")) return "beta";
   if (frame?.endsWith("transcript-parent")) return "parent";
   if (frame?.endsWith("transcript-child")) return "child";
+  if (frame?.endsWith("transcript-validator")) return "validator";
   return null;
 }
 
@@ -464,9 +466,21 @@ function presentSubagent(
       subagent.status === "active"
         ? subagent.message ?? "Working"
         : subagent.status === "waiting"
-          ? "Thinking"
+          ? "Waiting"
           : subagent.message ?? undefined,
   };
+}
+
+function subagentActivityStatus(subagent: DemoSubagent) {
+  if (
+    subagent.threadStatus === "interrupted" ||
+    subagent.threadStatus === "shutdown"
+  ) {
+    return "interrupted" as const;
+  }
+  if (subagent.status === "done") return "done" as const;
+  if (subagent.activityKind === "interacted") return "updated" as const;
+  return "active" as const;
 }
 
 function initialComposerValue(frame: string | null) {
@@ -5783,6 +5797,12 @@ export function App() {
         presentSubagent(subagent, mode, subagentClockMs),
       );
       if (callSubagents.length === 0) return null;
+      const activityStatuses = new Map(
+        groupedSubagents.map((subagent) => [
+          subagent.id,
+          subagentActivityStatus(subagent),
+        ]),
+      );
       const working = callSubagents.filter(
         ({ status }) => status !== "done",
       );
@@ -5837,8 +5857,7 @@ export function App() {
           {activityItems.length > 1 ? (
             <SubagentActivityGroup
               items={activityItems.map((item) => ({
-                activityStatus:
-                  item.status === "done" ? "done" : "active",
+                activityStatus: activityStatuses.get(item.id) ?? "active",
                 id: item.id,
                 name: item.name,
               }))}
@@ -5848,8 +5867,7 @@ export function App() {
             activityItems.map((item) => (
               <SubagentActivity
                 item={{
-                  activityStatus:
-                    item.status === "done" ? "done" : "active",
+                  activityStatus: activityStatuses.get(item.id) ?? "active",
                   id: item.id,
                   name: item.name,
                 }}

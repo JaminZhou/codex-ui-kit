@@ -347,6 +347,23 @@ describe("SubagentPanel", () => {
     expect(screen.getAllByRole("button", { name: /Agent/ })).toHaveLength(6);
   });
 
+  it("paginates done agents in ten-item increments", () => {
+    const items = Array.from({ length: 12 }, (_, index) => ({
+      id: `done-agent-${index}`,
+      name: `Done agent ${index + 1}`,
+      status: "done" as const,
+    }));
+    render(<SubagentPanel items={items} onSelect={() => undefined} />);
+
+    expect(
+      screen.getAllByRole("button", { name: /Done agent/ }),
+    ).toHaveLength(10);
+    fireEvent.click(screen.getByRole("button", { name: "Show 2 more" }));
+    expect(
+      screen.getAllByRole("button", { name: /Done agent/ }),
+    ).toHaveLength(12);
+  });
+
   it("delegates item selection", () => {
     const onSelect = vi.fn();
     render(<SubagentPanel items={[activeAgent]} onSelect={onSelect} />);

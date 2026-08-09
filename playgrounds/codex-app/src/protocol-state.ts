@@ -185,6 +185,7 @@ export interface DemoMcpToolCall {
 }
 
 export interface DemoSubagent {
+  activityKind?: "interacted";
   agentPath: string | null;
   callId: string;
   completedAtMs: number | null;
@@ -1374,6 +1375,9 @@ export function reduceProtocolNotification(
           : existing?.completedAtMs ??
             (reportedStatus === "done" ? reportedCompletedAtMs : null);
         const subagent: DemoSubagent = {
+          ...(!startsNewLifecycle && existing?.activityKind
+            ? { activityKind: existing.activityKind }
+            : {}),
           agentPath: existing?.agentPath ?? null,
           callId: startsNewLifecycle || rekeysProvisionalLifecycle
             ? itemId
@@ -1498,6 +1502,7 @@ export function reduceProtocolNotification(
       const callId = existing?.callId ?? itemId;
       const isDone = kind === "interrupted" || existing?.status === "done";
       const activitySubagent: DemoSubagent = {
+        ...(kind === "interacted" ? { activityKind: "interacted" } : {}),
         agentPath: agentPath ?? existing?.agentPath ?? null,
         callId,
         completedAtMs:

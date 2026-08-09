@@ -22,6 +22,7 @@ import recoveryTrace from "../fixtures/traces/streaming-recovery.jsonl?raw";
 import subagentConcurrencyTrace from "../fixtures/traces/subagent-concurrency.jsonl?raw";
 import subagentDelegationTrace from "../fixtures/traces/subagent-delegation.jsonl?raw";
 import subagentNestedTrace from "../fixtures/traces/subagent-nested.jsonl?raw";
+import subagentRecoveryTrace from "../fixtures/traces/subagent-recovery.jsonl?raw";
 import terminalLifecycleTrace from "../fixtures/traces/terminal-lifecycle.jsonl?raw";
 import workflowTrace from "../fixtures/traces/workspace-workflow.jsonl?raw";
 import type { ProtocolEventRecord } from "./protocol-state";
@@ -40,6 +41,7 @@ export type ReplayScenarioId =
   | "subagent-concurrency"
   | "subagent-delegation"
   | "subagent-nested"
+  | "subagent-recovery"
   | "terminal-lifecycle"
   | "interruption"
   | "compaction"
@@ -178,6 +180,12 @@ export const replayScenarios: Record<ReplayScenarioId, ReplayScenario> = {
     "Run nested subagent probe",
     "A current real Parent delegates Child; public agent paths preserve the hierarchy while the current panel presents both agents in one flat lifecycle list.",
     subagentNestedTrace,
+  ),
+  "subagent-recovery": scenario(
+    "subagent-recovery",
+    "Recover mixed subagent lifecycles",
+    "Twelve protocol-backed subagents cover waiting, streamed progress, terminal failure and interruption states, the current 4/10 panel pagination, and a recovered parent response.",
+    subagentRecoveryTrace,
   ),
   interruption: scenario(
     "interruption",
