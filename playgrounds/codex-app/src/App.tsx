@@ -3140,7 +3140,7 @@ export function App() {
       isCurrentSubagentReplay);
   const showLifecycleComposer = isConversationLifecycle;
   const currentComposerComposition =
-    currentHeaderReplay || showLifecycleComposer;
+    currentHeaderReplay || showLifecycleComposer || isCurrentApprovalReplay;
   const composerSurface = (
     <AgentComposer
       actions={

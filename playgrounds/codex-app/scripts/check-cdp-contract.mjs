@@ -18,12 +18,20 @@ const currentReplayComposerScenarios = new Set([
   "subagent-delegation",
   "subagent-nested",
 ]);
+const currentApprovalComposerScenes = new Set([
+  "approval-current-allow-once-completed",
+  "approval-current-denied",
+  "approval-current-similar-repeated-completed",
+]);
 const currentReplayComposerContracts = [];
 
 for (const scene of visualScenes) {
   const { app, page } = await launchScene(scene);
   try {
-    if (currentReplayComposerScenarios.has(scene.scenario)) {
+    if (
+      currentReplayComposerScenarios.has(scene.scenario) ||
+      currentApprovalComposerScenes.has(scene.id)
+    ) {
       const currentComposerIcons = await page.evaluate(() =>
         Array.from(
           document.querySelectorAll(

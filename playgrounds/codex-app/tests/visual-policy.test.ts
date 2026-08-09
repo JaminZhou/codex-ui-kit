@@ -5,6 +5,10 @@ const contract = readFileSync(
   new URL("../scripts/check-visual-contract.mjs", import.meta.url),
   "utf8",
 );
+const cdpContract = readFileSync(
+  new URL("../scripts/check-cdp-contract.mjs", import.meta.url),
+  "utf8",
+);
 const appSource = readFileSync(new URL("../src/App.tsx", import.meta.url), "utf8");
 const appStyles = readFileSync(
   new URL("../src/styles.css", import.meta.url),
@@ -112,6 +116,19 @@ describe("lifecycle visual policy", () => {
     expect(appStyles).toContain("padding-top: 14px");
     expect(appStyles).toContain("flex: 0 0 101px");
     expect(appStyles).toContain("margin-left: 8px");
+  });
+
+  it("keeps exact Composer assets after current approval decisions", () => {
+    expect(appSource).toMatch(
+      /const currentComposerComposition =\s+currentHeaderReplay \|\|\s+showLifecycleComposer \|\|\s+isCurrentApprovalReplay;/,
+    );
+    expect(cdpContract).toContain(
+      '"approval-current-allow-once-completed"',
+    );
+    expect(cdpContract).toContain('"approval-current-denied"');
+    expect(cdpContract).toContain(
+      '"approval-current-similar-repeated-completed"',
+    );
   });
 
   it("gates the current long-thread navigation and return control", () => {
