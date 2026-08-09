@@ -652,6 +652,9 @@ forced media query as current-product evidence:
 - Project, Environment, and Worktree overlays use the same semantic surface,
   border, field, selection, and text contract instead of retaining captured
   dark paint;
+- the shell success indicator uses a contrast-safe light success color, while
+  Electron resolves a System launch through `nativeTheme` before choosing the
+  native window background;
 - the current sidebar is now an independent composition axis, so it can be
   combined with workspace and theme states without falsifying the lifecycle
   frame;

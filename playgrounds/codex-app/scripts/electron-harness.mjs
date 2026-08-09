@@ -820,7 +820,13 @@ export const visualScenes = [
 
 export async function launchScene(
   scene,
-  { capture = true, layoutMode, theme, windowSize } = {},
+  {
+    capture = true,
+    layoutMode,
+    nativeThemeSource,
+    theme,
+    windowSize,
+  } = {},
 ) {
   const resolvedWindowSize = windowSize ?? scene.windowSize;
   const resolvedTheme = theme ?? scene.theme ?? "dark";
@@ -834,6 +840,9 @@ export async function launchScene(
       CODEX_DEMO_FRAME: scene.frame,
       CODEX_DEMO_HEADLESS: "1",
       ...(layoutMode ? { CODEX_DEMO_LAYOUT: layoutMode } : {}),
+      ...(nativeThemeSource
+        ? { CODEX_DEMO_NATIVE_THEME_SOURCE: nativeThemeSource }
+        : {}),
       CODEX_DEMO_SCENARIO: scene.scenario,
       CODEX_DEMO_SHELL_STATE: scene.shellState ?? "ready",
       CODEX_DEMO_THEME: resolvedTheme,

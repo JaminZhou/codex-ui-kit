@@ -216,10 +216,12 @@ Browser/CDP, Electron, and one reviewed internal pixel baseline gate the
 1180×820 light shell, semantic token changes, focus, geometry, and theme-aware
 `currentColor` paint for the exact dark-build SVG geometry. Electron also opens
 the Project, Environment, and Worktree overlays and requires light semantic
-surfaces with readable foregrounds. This does not close the sidebar's
-light-theme evidence gap: the installed product was only inspected read-only
-with System selected on a dark macOS appearance, and no real Light preference
-or external Light pixel reference was captured.
+surfaces with readable foregrounds, requires a contrast-safe shell success
+indicator, and resolves System through the native Electron theme before the
+Renderer loads. This does not close the sidebar's light-theme evidence gap:
+the installed product was only inspected read-only with System selected on a
+dark macOS appearance, and no real Light preference or external Light pixel
+reference was captured.
 
 The application-shell continuity slice splits window navigation, route
 lifecycle feedback, route selection/restoration, and global notifications

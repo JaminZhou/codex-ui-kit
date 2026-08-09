@@ -65,8 +65,9 @@ Every deterministic scenario has one ID and produces four evidence layers:
    pointer access through the draggable titlebar, root ownership, computed
    `color-scheme`, focus, sidebar geometry, main background, Composer
    foreground, Project/Environment/Worktree overlay paint, route-scoped
-   control availability, and dark fallback after returning to an unsupported
-   conversation route.
+   control availability, a contrast-safe shell success indicator, a light
+   native System backing before renderer load, and dark fallback after
+   returning to an unsupported conversation route.
    A current long-thread flow verifies compact navigation selection, a
    seven-turn mounted window, negative away-from-latest scrolling, and
    return-to-latest at scroll origin zero. The current long-command flow

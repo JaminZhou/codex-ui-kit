@@ -8,6 +8,7 @@ import {
   app,
   BrowserWindow,
   ipcMain,
+  nativeTheme,
   shell,
   type IpcMainInvokeEvent,
 } from "electron";
@@ -27,6 +28,14 @@ const preloadPath = join(currentDirectory, "preload.cjs");
 const workspaceDirectory =
   process.env.CODEX_UI_KIT_WORKSPACE ?? resolve(currentDirectory, "../../..");
 const cdpPort = process.env.CODEX_DEMO_CDP_PORT;
+const requestedNativeThemeSource = process.env.CODEX_DEMO_NATIVE_THEME_SOURCE;
+
+if (["system", "light", "dark"].includes(requestedNativeThemeSource ?? "")) {
+  nativeTheme.themeSource = requestedNativeThemeSource as
+    | "system"
+    | "light"
+    | "dark";
+}
 
 if (cdpPort) app.commandLine.appendSwitch("remote-debugging-port", cdpPort);
 app.commandLine.appendSwitch("force-device-scale-factor", "1");
@@ -274,9 +283,12 @@ function createWindow() {
     theme,
     view,
   }).toString();
+  const useLightWindowBackground =
+    theme === "light" ||
+    (theme === "system" && !nativeTheme.shouldUseDarkColors);
 
   const window = new BrowserWindow({
-    backgroundColor: theme === "light" ? "#ffffff" : "#101010",
+    backgroundColor: useLightWindowBackground ? "#ffffff" : "#101010",
     height,
     minHeight: Math.min(640, height),
     minWidth: Math.min(720, width),

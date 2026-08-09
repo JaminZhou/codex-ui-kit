@@ -17,6 +17,10 @@ const electronHarness = readFileSync(
   new URL("../scripts/electron-harness.mjs", import.meta.url),
   "utf8",
 );
+const electronMain = readFileSync(
+  new URL("../electron/main.ts", import.meta.url),
+  "utf8",
+);
 const appSource = readFileSync(new URL("../src/App.tsx", import.meta.url), "utf8");
 const appStyles = readFileSync(
   new URL("../src/styles.css", import.meta.url),
@@ -175,6 +179,14 @@ describe("lifecycle visual policy", () => {
     expect(electronContract).toContain(
       "Electron light worktree overlay contract failed",
     );
+    expect(electronContract).toContain(
+      "Electron native System theme contract failed",
+    );
+    expect(electronContract).toContain(
+      "Electron light shell status contract failed",
+    );
+    expect(electronHarness).toContain("CODEX_DEMO_NATIVE_THEME_SOURCE");
+    expect(electronMain).toContain("!nativeTheme.shouldUseDarkColors");
     expect(appSource).toContain("const themeAvailable = isDemoThemeView(view)");
     expect(appSource).toContain(
       'const appliedTheme = themeAvailable ? theme : "dark"',
@@ -193,6 +205,9 @@ describe("lifecycle visual policy", () => {
       "color: var(--demo-shell-overlay-text)",
     );
     expect(appStyles).toContain("-webkit-app-region: no-drag");
+    expect(appStyles).toContain(
+      "color: var(--demo-shell-success-text) !important",
+    );
   });
 
   it("gates the current long-thread navigation and return control", () => {

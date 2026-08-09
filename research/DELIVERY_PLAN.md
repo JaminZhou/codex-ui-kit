@@ -83,8 +83,9 @@ exit gates; it does not replace the inventory.
   independently implemented light shell/sidebar/Composer composition. Light
   is route-scoped to the theme-complete shell/workspace; conversation and Pull
   Request retain their deterministic dark presentation. Project, Environment,
-  and Worktree overlays are included in the light Electron contract. The
-  internal theme frame does not promote current-product light evidence. The
+  and Worktree overlays, the shell success indicator, and the native System
+  background are included in the light Electron contract. The internal theme
+  frame does not promote current-product light evidence. The
   refreshed PR detail passes the current 906×820 regional pixel gate. The
   refreshed real MCP success path now matches Search → Fetch, the integrated activity
   disclosure, computed typography, and a current regional pixel gate. The

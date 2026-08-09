@@ -309,10 +309,12 @@ const themeScene = {
   frame: "workspace-ready",
   id: "electron-light-shell",
   scenario: "workspace-workflow",
+  theme: "system",
   view: "workspace",
 };
 const { app: themeApp, page: themePage } = await launchScene(themeScene, {
   capture: false,
+  nativeThemeSource: "light",
 });
 
 try {
@@ -321,8 +323,26 @@ try {
     reducedMotion: "reduce",
   });
   const themeControl = themePage.getByRole("combobox", { name: "Theme" });
-  if ((await themeControl.inputValue()) !== "dark") {
-    throw new Error("Electron workspace theme control did not default to dark");
+  const nativeSystemTheme = await themeApp.evaluate(
+    ({ BrowserWindow, nativeTheme }) => ({
+      background: BrowserWindow.getAllWindows()[0]
+        ?.getBackgroundColor()
+        .toLowerCase(),
+      shouldUseDarkColors: nativeTheme.shouldUseDarkColors,
+      themeSource: nativeTheme.themeSource,
+    }),
+  );
+  if (
+    (await themeControl.inputValue()) !== "system" ||
+    !["#ffffff", "#ffffffff"].includes(
+      nativeSystemTheme.background ?? "",
+    ) ||
+    nativeSystemTheme.shouldUseDarkColors ||
+    nativeSystemTheme.themeSource !== "light"
+  ) {
+    throw new Error(
+      `Electron native System theme contract failed: ${JSON.stringify(nativeSystemTheme)}`,
+    );
   }
 
   const themeSidebarResizer = themePage.getByRole("separator", {
@@ -343,6 +363,10 @@ try {
       `Electron theme pointer contract failed: ${JSON.stringify(themePointerContract)}`,
     );
   }
+  await themeControl.selectOption("dark");
+  await themePage.waitForFunction(
+    () => document.documentElement.dataset.theme === "dark",
+  );
   await themeControl.selectOption("system");
   await themePage.waitForFunction(
     () =>
@@ -528,6 +552,43 @@ try {
   );
 } finally {
   await themeApp.close();
+}
+
+const shellLightScene = {
+  frame: "recovered",
+  id: "electron-light-shell-route",
+  scenario: "streaming-recovery",
+  shellState: "ready",
+  theme: "light",
+  view: "shell",
+};
+const { app: shellLightApp, page: shellLightPage } = await launchScene(
+  shellLightScene,
+  { capture: false },
+);
+
+try {
+  const shellLightStatus = await shellLightPage.evaluate(() => {
+    const main = document.querySelector(".codex-ui-app-shell__main");
+    const status = document.querySelector(".demo-shell-route-status");
+    return {
+      mainBackground: main ? getComputedStyle(main).backgroundColor : null,
+      statusBackground: status
+        ? getComputedStyle(status).backgroundColor
+        : null,
+      statusColor: status ? getComputedStyle(status).color : null,
+    };
+  });
+  if (
+    shellLightStatus.mainBackground !== "rgb(255, 255, 255)" ||
+    shellLightStatus.statusColor !== "rgb(0, 105, 42)"
+  ) {
+    throw new Error(
+      `Electron light shell status contract failed: ${JSON.stringify(shellLightStatus)}`,
+    );
+  }
+} finally {
+  await shellLightApp.close();
 }
 
 const narrowReachabilityScene = {
