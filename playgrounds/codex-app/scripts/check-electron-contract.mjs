@@ -387,6 +387,96 @@ try {
     );
   }
 
+  const themeProjectTrigger = themePage.getByRole("button", {
+    name: "Change project: codex-ui-kit",
+  });
+  const themeProjectDialog = themePage.getByRole("dialog", {
+    name: "Choose a project",
+  });
+  await themeProjectTrigger.click();
+  const projectOverlayPaint = await themeProjectDialog.evaluate((dialog) => ({
+    action: getComputedStyle(
+      dialog.querySelector(
+        ".demo-workspace-project-dialog__actions button",
+      ),
+    ).color,
+    background: getComputedStyle(dialog).backgroundColor,
+    border: getComputedStyle(dialog).borderColor,
+    input: getComputedStyle(dialog.querySelector("input")).color,
+    option: getComputedStyle(dialog.querySelector('[role="option"]')).color,
+  }));
+  if (
+    projectOverlayPaint.background !== "rgba(255, 255, 255, 0.94)" ||
+    projectOverlayPaint.border !== "rgba(26, 28, 31, 0.1)" ||
+    projectOverlayPaint.input !== "rgb(26, 28, 31)" ||
+    projectOverlayPaint.action !== "rgb(26, 28, 31)" ||
+    projectOverlayPaint.option !== "rgb(26, 28, 31)"
+  ) {
+    throw new Error(
+      `Electron light project overlay contract failed: ${JSON.stringify(projectOverlayPaint)}`,
+    );
+  }
+  await themeProjectDialog
+    .getByRole("searchbox", { name: "Search projects" })
+    .press("Escape");
+  await themeProjectDialog.waitFor({ state: "hidden" });
+
+  await themePage
+    .getByRole("button", { name: "Change run location: Local" })
+    .click();
+  const themeEnvironmentMenu = themePage.getByRole("menu", {
+    name: "Start in",
+  });
+  const environmentOverlayPaint = await themeEnvironmentMenu.evaluate(
+    (menu) => ({
+      background: getComputedStyle(menu).backgroundColor,
+      border: getComputedStyle(menu).borderColor,
+      item: getComputedStyle(
+        menu.querySelector('[role="menuitemradio"]'),
+      ).color,
+      label: getComputedStyle(
+        menu.querySelector(".codex-ui-menu-section-label"),
+      ).color,
+    }),
+  );
+  if (
+    environmentOverlayPaint.background !== "rgba(255, 255, 255, 0.94)" ||
+    environmentOverlayPaint.border !== "rgba(26, 28, 31, 0.1)" ||
+    environmentOverlayPaint.item !== "rgb(26, 28, 31)" ||
+    environmentOverlayPaint.label !== "rgb(93, 93, 93)"
+  ) {
+    throw new Error(
+      `Electron light environment overlay contract failed: ${JSON.stringify(environmentOverlayPaint)}`,
+    );
+  }
+  await themePage.keyboard.press("Escape");
+  await themeEnvironmentMenu.waitFor({ state: "hidden" });
+
+  await themePage
+    .getByRole("button", { name: "Change worktree: main" })
+    .click();
+  const themeWorktreeMenu = themePage.getByRole("menu", {
+    name: "Branches",
+  });
+  const worktreeOverlayPaint = await themeWorktreeMenu.evaluate((menu) => ({
+    background: getComputedStyle(menu).backgroundColor,
+    border: getComputedStyle(menu).borderColor,
+    input: getComputedStyle(menu.querySelector("input")).color,
+    item: getComputedStyle(menu.querySelector('[role="menuitemradio"]')).color,
+  }));
+  if (
+    worktreeOverlayPaint.background !== "rgba(255, 255, 255, 0.94)" ||
+    worktreeOverlayPaint.border !== "rgba(26, 28, 31, 0.1)" ||
+    worktreeOverlayPaint.input !== "rgb(26, 28, 31)" ||
+    worktreeOverlayPaint.item !== "rgb(26, 28, 31)"
+  ) {
+    throw new Error(
+      `Electron light worktree overlay contract failed: ${JSON.stringify(worktreeOverlayPaint)}`,
+    );
+  }
+  await themePage.keyboard.press("Escape");
+  await themeWorktreeMenu.waitFor({ state: "hidden" });
+
   await themePage
     .getByRole("button", {
       exact: true,

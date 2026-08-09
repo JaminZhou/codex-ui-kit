@@ -11,6 +11,11 @@
   --demo-shell-border: rgba(255, 255, 255, 0.12);
   --demo-shell-control-border: rgba(255, 255, 255, 0.09);
   --demo-shell-panel: rgba(255, 255, 255, 0.035);
+  --demo-shell-overlay: color-mix(in srgb, #303030 90%, transparent);
+  --demo-shell-overlay-border: rgba(255, 255, 255, 0.08);
+  --demo-shell-overlay-field: rgba(255, 255, 255, 0.04);
+  --demo-shell-overlay-hover: rgba(255, 255, 255, 0.08);
+  --demo-shell-overlay-text: #f5f5f5;
   --demo-shell-primary-control: #fff;
   --demo-shell-primary-control-text: #181818;
   color-scheme: dark;
@@ -34,6 +39,11 @@
   --demo-shell-border: rgba(26, 28, 31, 0.12);
   --demo-shell-control-border: rgba(26, 28, 31, 0.09);
   --demo-shell-panel: rgba(26, 28, 31, 0.035);
+  --demo-shell-overlay: color-mix(in srgb, #fff 94%, transparent);
+  --demo-shell-overlay-border: rgba(26, 28, 31, 0.1);
+  --demo-shell-overlay-field: rgba(26, 28, 31, 0.04);
+  --demo-shell-overlay-hover: rgba(26, 28, 31, 0.08);
+  --demo-shell-overlay-text: #1a1c1f;
   --demo-shell-primary-control: #1a1c1f;
   --demo-shell-primary-control-text: #fff;
   color-scheme: light;
@@ -53,6 +63,11 @@
     --demo-shell-border: rgba(26, 28, 31, 0.12);
     --demo-shell-control-border: rgba(26, 28, 31, 0.09);
     --demo-shell-panel: rgba(26, 28, 31, 0.035);
+    --demo-shell-overlay: color-mix(in srgb, #fff 94%, transparent);
+    --demo-shell-overlay-border: rgba(26, 28, 31, 0.1);
+    --demo-shell-overlay-field: rgba(26, 28, 31, 0.04);
+    --demo-shell-overlay-hover: rgba(26, 28, 31, 0.08);
+    --demo-shell-overlay-text: #1a1c1f;
     --demo-shell-primary-control: #1a1c1f;
     --demo-shell-primary-control-text: #fff;
     color-scheme: light;
@@ -428,8 +443,8 @@ textarea {
 
 .demo-workspace-project-dialog {
   backdrop-filter: blur(18px);
-  background: color-mix(in srgb, #303030 90%, transparent);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: var(--demo-shell-overlay);
+  border: 1px solid var(--demo-shell-overlay-border);
   border-radius: 15px;
   bottom: calc(100% + 1.5px);
   box-shadow: 0 8px 16px -4px rgba(0, 0, 0, 0.12);
@@ -445,10 +460,10 @@ textarea {
 
 .demo-workspace-project-dialog > input {
   appearance: none;
-  background: rgba(255, 255, 255, 0.04);
+  background: var(--demo-shell-overlay-field);
   border: 0;
   border-radius: 11px;
-  color: #f5f5f5;
+  color: var(--demo-shell-overlay-text);
   font-size: 13px;
   height: 28px;
   line-height: 18px;
@@ -509,11 +524,11 @@ textarea {
 
 .demo-workspace-project-dialog
   .codex-ui-conversation-project-options__item[aria-selected="true"] {
-  background: rgba(255, 255, 255, 0.08);
+  background: var(--demo-shell-overlay-hover);
 }
 
 .demo-workspace-project-dialog__actions {
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  border-top: 1px solid var(--demo-shell-overlay-border);
   display: grid;
   padding-top: 4px;
 }
@@ -524,7 +539,7 @@ textarea {
   background: transparent;
   border: 0;
   border-radius: 12.5px;
-  color: #f5f5f5;
+  color: var(--demo-shell-overlay-text);
   cursor: pointer;
   display: flex;
   font-size: 13px;
@@ -537,15 +552,15 @@ textarea {
 
 .demo-workspace-project-dialog__actions button:hover,
 .demo-workspace-project-dialog__actions button:focus-visible {
-  background: rgba(255, 255, 255, 0.08);
+  background: var(--demo-shell-overlay-hover);
   outline: none;
 }
 
 .demo-workspace-context-menu {
   --codex-ui-overlay-max-height: 666px;
   backdrop-filter: blur(18px);
-  background: color-mix(in srgb, #303030 90%, transparent);
-  border-color: rgba(255, 255, 255, 0.08);
+  background: var(--demo-shell-overlay);
+  border-color: var(--demo-shell-overlay-border);
   border-radius: 15px;
   gap: 0;
   padding: 4px;
@@ -584,7 +599,7 @@ textarea {
 
 .demo-workspace-context-menu__empty {
   align-items: center;
-  color: rgba(255, 255, 255, 0.32);
+  color: var(--demo-shell-text-tertiary);
   display: flex;
   font-size: 13px;
   font-weight: 445;
@@ -609,7 +624,7 @@ textarea {
   background: transparent;
   border: 0;
   border-radius: 11px;
-  color: #f5f5f5;
+  color: var(--demo-shell-overlay-text);
   flex: 0 0 28.5px;
   font-size: 13px;
   height: 28.5px;

@@ -165,6 +165,15 @@ describe("lifecycle visual policy", () => {
     expect(electronContract).toContain(
       "Electron unsupported route theme contract failed",
     );
+    expect(electronContract).toContain(
+      "Electron light project overlay contract failed",
+    );
+    expect(electronContract).toContain(
+      "Electron light environment overlay contract failed",
+    );
+    expect(electronContract).toContain(
+      "Electron light worktree overlay contract failed",
+    );
     expect(appSource).toContain("const themeAvailable = isDemoThemeView(view)");
     expect(appSource).toContain(
       'const appliedTheme = themeAvailable ? theme : "dark"',
@@ -175,6 +184,12 @@ describe("lifecycle visual policy", () => {
     );
     expect(appStyles).toContain(
       '.demo-root[data-theme="light"] .demo-current-build-icon',
+    );
+    expect(appStyles).toContain(
+      "background: var(--demo-shell-overlay)",
+    );
+    expect(appStyles).toContain(
+      "color: var(--demo-shell-overlay-text)",
     );
   });
 

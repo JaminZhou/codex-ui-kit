@@ -648,6 +648,9 @@ forced media query as current-product evidence:
   in light mode, while theme-dependent paint follows the owning control's
   semantic `currentColor` instead of replaying captured dark paint on a light
   surface;
+- Project, Environment, and Worktree overlays use the same semantic surface,
+  border, field, selection, and text contract instead of retaining captured
+  dark paint;
 - the current sidebar is now an independent composition axis, so it can be
   combined with workspace and theme states without falsifying the lifecycle
   frame;
