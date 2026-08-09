@@ -578,11 +578,15 @@ for (const scene of selectedScenes) {
     ) {
       await page.addStyleTag({
         content: `
-          .codex-ui-conversation-thread-shell__viewport {
+          .codex-ui-conversation-thread-shell__viewport,
+          .codex-ui-markdown__table-scroll,
+          .codex-ui-markdown-table-preview__surface {
             scrollbar-width: none;
           }
 
-          .codex-ui-conversation-thread-shell__viewport::-webkit-scrollbar {
+          .codex-ui-conversation-thread-shell__viewport::-webkit-scrollbar,
+          .codex-ui-markdown__table-scroll::-webkit-scrollbar,
+          .codex-ui-markdown-table-preview__surface::-webkit-scrollbar {
             display: none;
           }
         `,
