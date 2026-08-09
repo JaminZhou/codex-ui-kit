@@ -228,6 +228,60 @@ After.`;
     await waitFor(() => expect(screen.queryByRole("dialog")).toBeNull());
     expect(document.activeElement).toBe(expand);
   });
+
+  it("preserves wide-table state across streaming deltas", async () => {
+    const table = "| Alpha | Beta |\n| --- | --- |\n| one | two |";
+    const initial = `${table}\n\n\`\`\`ts\nconst stable = true;\n\`\`\``;
+    const onCopyCode = vi.fn();
+    const onCopyTable = vi.fn();
+    const { container, rerender } = render(
+      <AgentMarkdown
+        allowWideTables
+        onCopyCode={onCopyCode}
+        onCopyTable={onCopyTable}
+        streaming
+      >
+        {initial}
+      </AgentMarkdown>,
+    );
+    const scroller = container.querySelector(
+      ".codex-ui-markdown__table-scroll",
+    ) as HTMLElement;
+    const codeBlock = container.querySelector(".codex-ui-code-block");
+    const expand = screen.getByRole("button", { name: "Expand table" });
+    const copy = screen.getByRole("button", { name: "Copy table" });
+    const copyCode = screen.getByRole("button", { name: "Copy code" });
+    scroller.scrollLeft = 120;
+    fireEvent.click(copy);
+    await waitFor(() => expect(copy.getAttribute("aria-label")).toBe("Copied"));
+    fireEvent.click(copyCode);
+    await waitFor(() =>
+      expect(copyCode.getAttribute("aria-label")).toBe("Copied"),
+    );
+    fireEvent.click(expand);
+    await screen.findByRole("dialog", { name: "Table preview" });
+
+    rerender(
+      <AgentMarkdown
+        allowWideTables
+        onCopyCode={onCopyCode}
+        onCopyTable={onCopyTable}
+        streaming
+      >
+        {`${initial}\n\nA later streaming delta.`}
+      </AgentMarkdown>,
+    );
+
+    expect(
+      container.querySelector(".codex-ui-markdown__table-scroll"),
+    ).toBe(scroller);
+    expect(container.querySelector(".codex-ui-code-block")).toBe(codeBlock);
+    expect(scroller.scrollLeft).toBe(120);
+    expect(copy.getAttribute("aria-label")).toBe("Copied");
+    expect(copyCode.getAttribute("aria-label")).toBe("Copied");
+    expect(expand.getAttribute("aria-expanded")).toBe("true");
+    expect(screen.getByRole("dialog", { name: "Table preview" })).toBeTruthy();
+  });
 });
 
 describe("CodeBlock", () => {

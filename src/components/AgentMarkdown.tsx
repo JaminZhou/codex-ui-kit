@@ -628,6 +628,8 @@ export function AgentMarkdown({
   const onCopyTableRef = useRef(onCopyTable);
   onCopyTableRef.current = onCopyTable;
   const hasTableCopyHandler = onCopyTable !== undefined;
+  const sourceRef = useRef(source);
+  sourceRef.current = source;
   const markdownComponents = useMemo<Components>(
     () => {
       const handleCodeCopy: CodeCopyHandler | undefined = hasCodeCopyHandler
@@ -721,7 +723,7 @@ export function AgentMarkdown({
           const end = node?.position?.end.offset;
           const markdownSource =
             typeof start === "number" && typeof end === "number"
-              ? source.slice(start, end)
+              ? sourceRef.current.slice(start, end)
               : "";
           return (
             <MarkdownTable
@@ -747,7 +749,6 @@ export function AgentMarkdown({
       hasCodeCopyHandler,
       hasTableCopyHandler,
       linkTarget,
-      source,
       tableCopyable,
     ],
   );
