@@ -1151,15 +1151,33 @@ try {
   const copy = streamingMessage.getByRole("button", { name: "Copy code" });
   await copy.click();
   await streamingMessage.getByRole("button", { name: "Copied" }).waitFor();
-  await tableScroll.focus();
   const markdownViewport = markdownStreamingPage.locator(
     ".codex-ui-conversation-thread-shell__viewport",
   );
-  await markdownViewport.hover();
-  await markdownStreamingPage.mouse.wheel(0, -120);
   const markdownScrollToBottom = markdownStreamingPage.getByRole("button", {
     name: "Scroll to bottom",
   });
+  await markdownScrollToBottom.click();
+  await markdownStreamingPage.waitForFunction(() => {
+    const viewport = document.querySelector(
+      ".codex-ui-conversation-thread-shell__viewport",
+    );
+    return (
+      viewport instanceof HTMLElement &&
+      Math.abs(
+        viewport.scrollHeight - viewport.clientHeight - viewport.scrollTop,
+      ) <= 1
+    );
+  });
+  await markdownScrollToBottom.waitFor({ state: "hidden" });
+  await tableScroll.evaluate((element) => {
+    if (!(element instanceof HTMLElement)) {
+      throw new Error("Streaming Markdown table scroller is not focusable");
+    }
+    element.focus({ preventScroll: true });
+  });
+  await markdownViewport.hover();
+  await markdownStreamingPage.mouse.wheel(0, -120);
   await markdownScrollToBottom.waitFor({ state: "visible" });
   const awayState = await markdownStreamingPage.evaluate(() => {
     const viewport = document.querySelector(
