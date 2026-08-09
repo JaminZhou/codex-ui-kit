@@ -1782,13 +1782,27 @@ export function App() {
 
   const selectReplayPosition = (nextCount: number) => {
     cancelReplaySubmitTimer();
-    setActiveFrame(null);
+    const replaySessionFrame =
+      scenarioId === "approval-for-session"
+        ? (Object.entries(scenario.frames).find(
+            ([, frameCount]) => frameCount === nextCount,
+          )?.[0] ?? null)
+        : null;
+    const replaySessionFirstCompletedCount =
+      scenario.frames["approval-current-session-first-completed"];
+    setActiveFrame(replaySessionFrame);
     setComposerOverlay(null);
     setReplayComposerSubmitting(false);
     setReplayComposerStopped(false);
     setReplayQueuedContinuation(null);
     setReplayApprovalResolution(null);
-    setReplaySessionApprovalScope(null);
+    setReplaySessionApprovalScope(
+      scenarioId === "approval-for-session" &&
+        replaySessionFirstCompletedCount !== undefined &&
+        nextCount >= replaySessionFirstCompletedCount
+        ? "session"
+        : null,
+    );
     setThreadSummaryOpen(false);
     setQueueInterrupted(false);
     if (!isTurnActive(replayState(scenarioEvents, nextCount).status)) {
@@ -2237,17 +2251,13 @@ export function App() {
       }, 160);
       return;
     }
-    if (
-      isCurrentApprovalSessionReplay &&
-      activeFrame === "approval-current-session-denied"
-    ) {
-      return;
-    }
-    if (
-      isCurrentApprovalSessionReplay &&
-      activeFrame === "approval-current-session-first-completed"
-    ) {
-      if (replaySessionApprovalScope !== "session") return;
+    if (isCurrentApprovalSessionReplay) {
+      if (
+        activeFrame !== "approval-current-session-first-completed" ||
+        replaySessionApprovalScope !== "session"
+      ) {
+        return;
+      }
       cancelReplaySubmitTimer();
       setReplayComposerSubmitting(true);
       setComposerOverlay(null);

@@ -3612,6 +3612,23 @@ try {
   await currentSessionApprovalPage.waitForSelector(
     '.demo-root[data-frame="approval-current-session-first-completed"]',
   );
+  await currentSessionApprovalPage
+    .getByRole("button", { exact: true, name: "Previous" })
+    .click();
+  await currentSessionApprovalPage.waitForFunction(
+    () => {
+      const position = document.querySelector(
+        'input[aria-label="Protocol event position"]',
+      );
+      return position instanceof HTMLInputElement && position.value === "9";
+    },
+  );
+  await currentSessionApprovalPage
+    .getByRole("button", { exact: true, name: "Next" })
+    .click();
+  await currentSessionApprovalPage.waitForSelector(
+    '.demo-root[data-frame="approval-current-session-first-completed"]',
+  );
   const secondPrompt =
     "Apply the second edit under the same session approval.";
   await currentSessionApprovalPage
