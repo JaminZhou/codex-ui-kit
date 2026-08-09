@@ -1485,6 +1485,8 @@ export function App() {
   const [composerAttachments, setComposerAttachments] = useState<
     DemoComposerAttachmentItem[]
   >(() => attachmentItemsForFrame(initialSelection.frame));
+  const [submittedComposerAttachments, setSubmittedComposerAttachments] =
+    useState<DemoComposerAttachmentItem[]>([]);
   const [queuedPrompts, setQueuedPrompts] = useState<QueuedPrompt[]>(() =>
     initialQueuedPrompts(initialSelection.frame),
   );
@@ -1666,6 +1668,7 @@ export function App() {
   const [workspaceEnvironmentLauncher, setWorkspaceEnvironmentLauncher] =
     useState<"environment" | "worktree">("environment");
   const queuedPromptCounterRef = useRef(1);
+  const attachmentSelectionCounterRef = useRef(1);
   const terminalSessionCounterRef = useRef(
     initialTerminalSessionIds(
       initialSelection.scenarioId,
@@ -2010,6 +2013,7 @@ export function App() {
     setComposerMode(initialComposerMode(frame));
     setComposerResourceActiveId("files");
     setComposerAttachments(attachmentItemsForFrame(frame));
+    setSubmittedComposerAttachments([]);
     setQueuedPrompts([]);
     setQueueingEnabled(true);
     setQueueInterrupted(false);
@@ -2090,6 +2094,7 @@ export function App() {
     setComposerValue("");
     setComposerOverlay(null);
     setComposerAttachments([]);
+    setSubmittedComposerAttachments([]);
     setQueuedPrompts([]);
     setQueueingEnabled(true);
     setQueueInterrupted(false);
@@ -2340,6 +2345,9 @@ export function App() {
     if (isCurrentAttachmentReplay) {
       if (!attachmentSubmissionReady) return;
       cancelReplaySubmitTimer();
+      setSubmittedComposerAttachments(
+        composerAttachments.map((attachment) => ({ ...attachment })),
+      );
       setReplayComposerSubmitting(true);
       setComposerOverlay(null);
       setActiveFrame("attachment-submitting");
@@ -3456,9 +3464,20 @@ export function App() {
       !window.codexDemo ||
       window.codexDemo.useRendererAttachmentFixture
     ) {
-      setComposerAttachments(attachmentItemsForFrame("attachment-ready"));
+      const selectionVersion = attachmentSelectionCounterRef.current++;
+      setComposerAttachments((items) => [
+        ...items,
+        ...attachmentItemsForFrame("attachment-ready").map(
+          (attachment, index) => ({
+            ...attachment,
+            id: `${attachment.id}:selection:${selectionVersion}:${index + 1}`,
+          }),
+        ),
+      ]);
       setActiveFrame("attachment-ready");
-      setComposerValue(initialComposerValue("attachment-ready"));
+      setComposerValue(
+        (current) => current || initialComposerValue("attachment-ready"),
+      );
       requestAnimationFrame(() => composerInputRef.current?.focus());
       return;
     }
@@ -3469,19 +3488,27 @@ export function App() {
         requestAnimationFrame(() => composerInputRef.current?.focus());
         return;
       }
-      setComposerAttachments(
-        selected.map((item) => ({
+      const selectionVersion = attachmentSelectionCounterRef.current++;
+      setComposerAttachments((items) => [
+        ...items,
+        ...selected.map((item, index) => ({
           ...item,
+          id: `${item.id}:selection:${selectionVersion}:${index + 1}`,
           layout: "card" as const,
           status: "ready" as const,
         })),
-      );
+      ]);
       setActiveFrame("attachment-native-ready");
-      setComposerValue(initialComposerValue("attachment-native-ready"));
+      setComposerValue(
+        (current) =>
+          current || initialComposerValue("attachment-native-ready"),
+      );
     } catch {
-      setComposerAttachments([
+      const selectionVersion = attachmentSelectionCounterRef.current++;
+      setComposerAttachments((items) => [
+        ...items,
         {
-          id: "native-selection-error",
+          id: `native-selection-error:selection:${selectionVersion}`,
           kind: "file",
           label: "Files and folders",
           layout: "card",
@@ -5271,6 +5298,13 @@ export function App() {
     if (entry.kind === "message") {
       const message = state.messages.find(({ id }) => id === entry.id);
       if (!message) return null;
+      const submittedMessageAttachments =
+        isCurrentAttachmentReplay &&
+        message.role === "user" &&
+        message.id === "user-attachment-lifecycle" &&
+        submittedComposerAttachments.length > 0
+          ? submittedComposerAttachments
+          : null;
       const groupedMcpIntro =
         ((scenarioId === "mcp-recovery-mixed-thread" &&
           (message.id === "assistant-recovery-intro" ||
@@ -5364,7 +5398,30 @@ export function App() {
               ) : undefined
             }
             attachments={
-              message.role === "user" && message.attachments?.length
+              submittedMessageAttachments
+                ? submittedMessageAttachments.map((attachment) => (
+                    <MessageAttachment
+                      alt={
+                        attachment.kind === "image" ? attachment.label : ""
+                      }
+                      icon={
+                        attachment.kind === "folder" ? (
+                          <CurrentBuildIcon name="composer-project" />
+                        ) : attachment.kind === "file" ? (
+                          <span className="demo-current-file-type">
+                            {attachment.meta?.split(/\s|·/)[0] ?? "FILE"}
+                          </span>
+                        ) : undefined
+                      }
+                      key={`${message.id}:submitted-attachment:${attachment.id}`}
+                      kind={attachment.kind === "image" ? "image" : "file"}
+                      label={attachment.label}
+                      meta={attachment.meta}
+                      onClick={() => undefined}
+                      previewSrc={attachment.previewSrc}
+                    />
+                  ))
+                : message.role === "user" && message.attachments?.length
                 ? message.attachments.map((attachment, index) => (
                     <MessageAttachment
                       alt={messageAttachmentAccessibleLabel(

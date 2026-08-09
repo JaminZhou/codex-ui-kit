@@ -948,12 +948,33 @@ try {
   await nativeAttachmentPage.waitForSelector(
     '.demo-root[data-frame="attachment-completed"][data-composer-phase="idle"]',
   );
+  const submittedNativeAttachments = await nativeAttachmentPage.evaluate(
+    () => ({
+      composerAttachmentCount: document.querySelectorAll(
+        ".codex-ui-composer .codex-ui-composer-attachment",
+      ).length,
+      messageAttachmentCount: document.querySelectorAll(
+        ".codex-ui-agent-message__attachments .codex-ui-message-attachment",
+      ).length,
+      messageAttachmentLabels: Array.from(
+        document.querySelectorAll(
+          ".codex-ui-agent-message__attachments .codex-ui-message-attachment",
+        ),
+        (element) => element.getAttribute("aria-label"),
+      ),
+    }),
+  );
   if (
-    (await nativeAttachmentPage
-      .locator(".codex-ui-composer .codex-ui-composer-attachment")
-      .count()) !== 0
+    submittedNativeAttachments.composerAttachmentCount !== 0 ||
+    submittedNativeAttachments.messageAttachmentCount !== 5 ||
+    submittedNativeAttachments.messageAttachmentLabels.includes("README.md") ||
+    !submittedNativeAttachments.messageAttachmentLabels.includes("package.json") ||
+    !submittedNativeAttachments.messageAttachmentLabels.includes("src") ||
+    !submittedNativeAttachments.messageAttachmentLabels.includes("/")
   ) {
-    throw new Error("Electron native attachment submission retained Composer cards.");
+    throw new Error(
+      `Electron native attachment submission did not preserve the selected tray: ${JSON.stringify(submittedNativeAttachments)}`,
+    );
   }
 } finally {
   await nativeAttachmentApp.close();

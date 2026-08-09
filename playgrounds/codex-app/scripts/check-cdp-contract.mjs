@@ -7028,6 +7028,39 @@ try {
       `Dismissing attachment resources lost the ready frame: ${JSON.stringify(dismissedAttachmentResources)}`,
     );
   }
+  await composer.fill("Preserve this draft while attaching another file.");
+  await attachmentLifecyclePage
+    .getByRole("button", { name: "Add files and more" })
+    .click();
+  await attachmentLifecyclePage
+    .getByRole("option", { name: "Files and folders" })
+    .click();
+  await attachmentLifecyclePage.waitForFunction(
+    () =>
+      document.querySelectorAll(
+        ".codex-ui-composer .codex-ui-composer-attachment",
+      ).length === 2,
+  );
+  const appendedAttachmentState = await attachmentLifecyclePage.evaluate(
+    () => ({
+      attachmentCount: document.querySelectorAll(
+        ".codex-ui-composer .codex-ui-composer-attachment",
+      ).length,
+      composerValue:
+        document.querySelector(
+          '.codex-ui-composer textarea[aria-label="Message composer"]',
+        )?.value ?? null,
+    }),
+  );
+  if (
+    appendedAttachmentState.attachmentCount !== 2 ||
+    appendedAttachmentState.composerValue !==
+      "Preserve this draft while attaching another file."
+  ) {
+    throw new Error(
+      `Appending a selected attachment replaced the tray or draft: ${JSON.stringify(appendedAttachmentState)}`,
+    );
+  }
   await composer.fill(
     "Reply using three uppercase words describing this test: attachment, lifecycle, complete. Include a final period and no other text.",
   );
@@ -7051,6 +7084,12 @@ try {
     messageAttachmentCount: document.querySelectorAll(
       ".codex-ui-agent-message__attachments .codex-ui-message-attachment",
     ).length,
+    messageAttachmentLabels: Array.from(
+      document.querySelectorAll(
+        ".codex-ui-agent-message__attachments .codex-ui-message-attachment",
+      ),
+      (element) => element.getAttribute("aria-label"),
+    ),
     permissionLabel:
       document
         .querySelector(".demo-composer-permission-trigger")
@@ -7060,7 +7099,10 @@ try {
   if (
     completed.composerAttachmentCount !== 0 ||
     completed.composerValue !== "" ||
-    completed.messageAttachmentCount !== 1 ||
+    completed.messageAttachmentCount !== 2 ||
+    completed.messageAttachmentLabels.some(
+      (label) => label !== "codex-ui-kit-current.png",
+    ) ||
     completed.permissionLabel !== "Ask for approval"
   ) {
     throw new Error(
