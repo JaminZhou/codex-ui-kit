@@ -4297,6 +4297,18 @@
   white-space: nowrap;
 }
 
+.codex-ui-message-attachment__accessible-status {
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  padding: 0;
+  position: absolute;
+  white-space: nowrap;
+  width: 1px;
+}
+
 .codex-ui-message-attachment > img {
   border-radius: 0.625rem;
   display: block;
@@ -7279,6 +7291,7 @@ summary.codex-ui-activity__header::after {
   background: var(--codex-ui-bg-subtle);
   border: 1px solid var(--codex-ui-border);
   border-radius: var(--codex-ui-radius-md);
+  box-sizing: border-box;
   display: inline-flex;
   flex: 0 0 auto;
   gap: 0.375rem;
@@ -7297,6 +7310,7 @@ summary.codex-ui-activity__header::after {
   border-radius: var(--codex-ui-radius-lg);
   gap: 0.625rem;
   height: var(--codex-ui-composer-attachment-card-height);
+  max-width: 16rem;
   min-width: 10rem;
   padding: 0.75rem 2rem 0.75rem 0.75rem;
   width: fit-content;
@@ -7375,6 +7389,7 @@ summary.codex-ui-activity__header::after {
   display: flex;
   flex-direction: column;
   min-width: 0;
+  overflow: hidden;
 }
 
 .codex-ui-composer-attachment__open {

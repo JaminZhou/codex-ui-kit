@@ -501,8 +501,8 @@ export function ComposerAttachment({
         <span style={{ width: `${normalizedProgress}%` }} />
       </span>
     ) : null;
-  const previewErrorStatusNode =
-    status === "preview-error" && resolvedStatusLabel ? (
+  const accessibleStatusNode =
+    status !== "ready" && resolvedStatusLabel ? (
       <span
         className="codex-ui-composer-attachment__accessible-status"
         role="status"
@@ -541,14 +541,7 @@ export function ComposerAttachment({
       <span className="codex-ui-composer-attachment__copy">
         <span className="codex-ui-composer-attachment__label">{label}</span>
         {meta || resolvedStatusLabel ? (
-          <span
-            className="codex-ui-composer-attachment__meta"
-            role={
-              status !== "ready" && status !== "preview-error"
-                ? "status"
-                : undefined
-            }
-          >
+          <span className="codex-ui-composer-attachment__meta">
             {resolvedStatusLabel ?? meta}
           </span>
         ) : null}
@@ -578,7 +571,7 @@ export function ComposerAttachment({
       ) : (
         content
       )}
-      {previewErrorStatusNode}
+      {accessibleStatusNode}
       {progressNode}
       {onRetry ? (
         <button

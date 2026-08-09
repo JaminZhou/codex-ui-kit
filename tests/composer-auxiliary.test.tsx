@@ -118,12 +118,14 @@ describe("composer auxiliary surfaces", () => {
     expect(progress.getAttribute("aria-valuenow")).toBe("100");
     expect(progress.closest("button")).toBeNull();
     expect(screen.getByRole("status").textContent).toBe("Uploading…");
+    expect(screen.getByRole("status").closest("button")).toBeNull();
 
     rerender(
       <ComposerAttachment
         kind="file"
         label="current-build.txt"
         layout="card"
+        onOpen={() => undefined}
         onRetry={onRetry}
         status="error"
       />,
@@ -133,6 +135,7 @@ describe("composer auxiliary surfaces", () => {
     );
     expect(onRetry).toHaveBeenCalledOnce();
     expect(screen.getByRole("status").textContent).toBe("Upload failed");
+    expect(screen.getByRole("status").closest("button")).toBeNull();
   });
 
   it("exposes preview failures without rendering a broken image", () => {

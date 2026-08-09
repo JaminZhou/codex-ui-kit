@@ -977,9 +977,14 @@ describe("AgentComposer", () => {
       />,
     );
 
-    expect(screen.getByRole("status").textContent).toBe(
-      "Preview unavailable",
-    );
+    const status = screen.getByRole("status");
+    expect(status.textContent).toBe("Preview unavailable");
+    expect(status.closest("button")).toBeNull();
+    expect(
+      screen
+        .getByRole("button", { name: "reference.png" })
+        .getAttribute("aria-describedby"),
+    ).toBe(status.id);
     expect(screen.queryByRole("img")).toBeNull();
   });
 });

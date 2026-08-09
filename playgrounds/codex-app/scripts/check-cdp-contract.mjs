@@ -3670,6 +3670,25 @@ for (const scene of visualScenes) {
         const progress = uploadingAttachment?.querySelector(
           ".codex-ui-composer-attachment__progress",
         );
+        const constrainedCard = attachments.find(
+          (attachment) => attachment.getAttribute("data-layout") === "card",
+        );
+        let constrainedCardWidth = null;
+        if (constrainedCard) {
+          const label = constrainedCard.querySelector(
+            ".codex-ui-composer-attachment__label",
+          );
+          const meta = constrainedCard.querySelector(
+            ".codex-ui-composer-attachment__meta",
+          );
+          const originalLabel = label?.textContent;
+          const originalMeta = meta?.textContent;
+          if (label) label.textContent = "current-build-attachment-name-that-must-truncate.txt";
+          if (meta) meta.textContent = "A deliberately long metadata value";
+          constrainedCardWidth = constrainedCard.getBoundingClientRect().width;
+          if (label) label.textContent = originalLabel ?? "";
+          if (meta) meta.textContent = originalMeta ?? "";
+        }
         let imageProgressGeometry = null;
         if (uploadingAttachment && progress) {
           const originalLayout = uploadingAttachment.getAttribute("data-layout");
@@ -3692,6 +3711,7 @@ for (const scene of visualScenes) {
           cardHeights: attachments
             .filter((attachment) => attachment.getAttribute("data-layout") === "card")
             .map((attachment) => attachment.getBoundingClientRect().height),
+          constrainedCardWidth,
           iconSizes: attachments
             .map((attachment) =>
               attachment.querySelector(
@@ -3724,10 +3744,13 @@ for (const scene of visualScenes) {
           ),
           statusText: Array.from(
             document.querySelectorAll(
-              ".codex-ui-composer-attachment__meta[role=status]",
+              ".codex-ui-composer-attachment__accessible-status[role=status]",
             ),
             (element) => element.textContent?.trim(),
           ),
+          statusWithinOpenButton: document.querySelectorAll(
+            ".codex-ui-composer-attachment__open [role=status]",
+          ).length,
           submitDisabled: document
             .querySelector('.codex-ui-composer [data-action="submit"]')
             ?.hasAttribute("disabled"),
@@ -3764,6 +3787,9 @@ for (const scene of visualScenes) {
         variant.submitDisabled !== expectsSubmitDisabled ||
         (expectsOverflow && !(variant.overflow > 0)) ||
         variant.cardHeights.some((height) => Math.abs(height - 64) > 1) ||
+        (variant.constrainedCardWidth !== null &&
+          variant.constrainedCardWidth > 257) ||
+        variant.statusWithinOpenButton !== 0 ||
         variant.iconSizes.some(
           ({ height, width }) =>
             Math.abs(height - 40) > 1 || Math.abs(width - 40) > 1,

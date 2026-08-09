@@ -1,3 +1,4 @@
+import { useId } from "react";
 import type {
   ButtonHTMLAttributes,
   HTMLAttributes,
@@ -117,36 +118,50 @@ export function MessageAttachment({
   const classes = ["codex-ui-message-attachment", className]
     .filter(Boolean)
     .join(" ");
+  const statusId = useId();
+  const hasPreviewError = status === "preview-error" && Boolean(statusLabel);
 
   return (
-    <button
-      aria-label={label}
-      className={classes}
-      data-kind={kind}
-      data-status={status}
-      type={type}
-      {...props}
-    >
-      {kind === "image" && previewSrc && status === "ready" ? (
-        <img alt={alt} src={previewSrc} />
-      ) : (
-        <>
-          <span aria-hidden="true" className="codex-ui-message-attachment__icon">
-            {icon ?? "□"}
-          </span>
-          <span className="codex-ui-message-attachment__copy">
-            <span className="codex-ui-message-attachment__label">{label}</span>
-            {meta || statusLabel ? (
-              <span
-                className="codex-ui-message-attachment__meta"
-                role={status === "preview-error" ? "status" : undefined}
-              >
-                {statusLabel ?? meta}
-              </span>
-            ) : null}
-          </span>
-        </>
-      )}
-    </button>
+    <>
+      <button
+        aria-describedby={hasPreviewError ? statusId : undefined}
+        aria-label={label}
+        className={classes}
+        data-kind={kind}
+        data-status={status}
+        type={type}
+        {...props}
+      >
+        {kind === "image" && previewSrc && status === "ready" ? (
+          <img alt={alt} src={previewSrc} />
+        ) : (
+          <>
+            <span
+              aria-hidden="true"
+              className="codex-ui-message-attachment__icon"
+            >
+              {icon ?? "□"}
+            </span>
+            <span className="codex-ui-message-attachment__copy">
+              <span className="codex-ui-message-attachment__label">{label}</span>
+              {meta || statusLabel ? (
+                <span className="codex-ui-message-attachment__meta">
+                  {statusLabel ?? meta}
+                </span>
+              ) : null}
+            </span>
+          </>
+        )}
+      </button>
+      {hasPreviewError ? (
+        <span
+          className="codex-ui-message-attachment__accessible-status"
+          id={statusId}
+          role="status"
+        >
+          {statusLabel}
+        </span>
+      ) : null}
+    </>
   );
 }
