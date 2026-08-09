@@ -355,6 +355,28 @@ const capture = JSON.parse(
 capture.icons.forEach((icon, index) =>
   sanitizeVisualAssetIcon(icon, `capture.icons[${index}]`),
 );
+const expectedComposerIds = [...promotionSpecs.entries()]
+  .filter(([, spec]) => spec.region === "composer")
+  .map(([id]) => id)
+  .sort();
+const capturedComposerIds = capture.icons
+  .filter(({ region }) => region === "composer")
+  .map(({ owner }) => owner.semanticId)
+  .sort();
+if (
+  capture.composerObservation?.topContextIconCount !== 3 ||
+  capture.composerObservation?.bottomActionIconCount !== 5 ||
+  capture.composerObservation?.exactSemanticIconCount !== 8 ||
+  canonicalize(capturedComposerIds) !== canonicalize(expectedComposerIds)
+) {
+  throw new Error(
+    `Unexpected current Composer capture: ${canonicalize({
+      capturedComposerIds,
+      composerObservation: capture.composerObservation,
+      expectedComposerIds,
+    })}`,
+  );
+}
 const baselineContext = capture.baselineContext;
 if (
   !baselineContext ||

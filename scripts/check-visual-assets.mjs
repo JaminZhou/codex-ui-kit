@@ -286,6 +286,8 @@ if (
   !updaterSource.includes("currentSidebarSettingsAbsenceProven") ||
   !updaterSource.includes("currentSidebarThreadAbsenceProven") ||
   !updaterSource.includes("manifest.composerObservation") ||
+  !updaterSource.includes("capturedComposerIds") ||
+  !updaterSource.includes("Unexpected current Composer capture") ||
   !updaterSource.includes("remainingApproximationCandidates.add(id)") ||
   !updaterSource.includes("sanitizeVisualAssetIcon") ||
   !updaterSource.includes("capturedAt")

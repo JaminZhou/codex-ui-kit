@@ -849,6 +849,11 @@ for (const scene of selectedScenes) {
           PNG.sync.write(iconComparison.diff),
         );
       }
+      if (iconComparison.ratio > maximumComposerIconRatio) {
+        throw new Error(
+          `${scene.id}: current-build Composer icon ${name} pixel ratio ${iconComparison.ratio} exceeds ${maximumComposerIconRatio}.`,
+        );
+      }
     }
     if (composerIconRatio > maximumComposerIconRatio) {
       throw new Error(
