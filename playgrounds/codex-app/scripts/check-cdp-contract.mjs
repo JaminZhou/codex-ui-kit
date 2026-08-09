@@ -6771,6 +6771,61 @@ try {
   await disabledModeApp.close();
 }
 
+const attachmentModeScene = {
+  frame: "attachment-ready",
+  id: "attachment-mode-switch-interaction",
+  scenario: "attachment-lifecycle",
+};
+const {
+  app: attachmentModeApp,
+  page: attachmentModePage,
+} = await launchScene(attachmentModeScene, { capture: false });
+try {
+  await attachmentModePage.waitForSelector(
+    '.demo-root[data-mode="replay"] .codex-ui-composer-attachment',
+  );
+  await attachmentModePage
+    .getByRole("button", { exact: true, name: "Live local" })
+    .click();
+  await attachmentModePage.waitForSelector('.demo-root[data-mode="live"]');
+  if (
+    (await attachmentModePage
+      .locator(".codex-ui-composer .codex-ui-composer-attachment")
+      .count()) !== 0
+  ) {
+    throw new Error("Attachment mode switching retained cards in Live mode.");
+  }
+  await attachmentModePage
+    .getByRole("button", { exact: true, name: "Replay" })
+    .click();
+  await attachmentModePage.waitForSelector(
+    '.demo-root[data-mode="replay"][data-composer-phase="idle"]',
+  );
+  const attachmentModeState = await attachmentModePage.evaluate(() => ({
+    attachmentCount: document.querySelectorAll(
+      ".codex-ui-composer .codex-ui-composer-attachment",
+    ).length,
+    submitDisabled: document
+      .querySelector('.codex-ui-composer [data-action="submit"]')
+      ?.hasAttribute("disabled"),
+    value:
+      document.querySelector(
+        'textarea[aria-label="Message composer"]',
+      )?.value ?? null,
+  }));
+  if (
+    attachmentModeState.attachmentCount !== 0 ||
+    !attachmentModeState.submitDisabled ||
+    attachmentModeState.value !== ""
+  ) {
+    throw new Error(
+      `Attachment mode switching retained stale state: ${JSON.stringify(attachmentModeState)}`,
+    );
+  }
+} finally {
+  await attachmentModeApp.close();
+}
+
 const attachmentLifecycleScene = {
   frame: "attachment-ready",
   id: "attachment-lifecycle-interaction",

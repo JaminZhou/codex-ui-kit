@@ -37,6 +37,7 @@ export type ComposerLayout = "auto" | "single-line" | "multiline";
 export interface AgentComposerProps
   extends Omit<FormHTMLAttributes<HTMLFormElement>, "children" | "onSubmit"> {
   actions?: ReactNode;
+  allowAttachmentOnlySubmit?: boolean;
   allowSubmitWhileRunning?: boolean;
   attachments?: ReactNode;
   controls?: ReactNode;
@@ -66,6 +67,7 @@ export const AgentComposer = forwardRef<
 >(function AgentComposer(
   {
     actions,
+    allowAttachmentOnlySubmit = false,
     allowSubmitWhileRunning = false,
     attachments,
     className,
@@ -123,7 +125,8 @@ export const AgentComposer = forwardRef<
     !disabled &&
     !submitDisabled &&
     (!isRunning || allowSubmitWhileRunning) &&
-    (value.trim().length > 0 || hasAttachments);
+    (value.trim().length > 0 ||
+      (allowAttachmentOnlySubmit && hasAttachments));
   const contentRequiresMultiline =
     hasAttachments || hasRenderedQueue || value.includes("\n");
   const resolvedLayout = contentRequiresMultiline

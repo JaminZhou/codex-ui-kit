@@ -885,6 +885,7 @@ describe("AgentComposer", () => {
     const onSubmit = vi.fn();
     const { rerender } = render(
       <AgentComposer
+        allowAttachmentOnlySubmit
         attachments={
           <ComposerAttachment label="README.md" layout="card" meta="MD" />
         }
@@ -915,6 +916,27 @@ describe("AgentComposer", () => {
     const file = screen.getByRole("button", { name: "README.md" });
     expect(file.dataset.kind).toBe("file");
     expect(screen.getByText("MD")).toBeTruthy();
+  });
+
+  it("requires an explicit signal for attachment-only submission", () => {
+    function EmptyAttachment() {
+      return null;
+    }
+
+    render(
+      <AgentComposer
+        attachments={<EmptyAttachment />}
+        onSubmit={() => undefined}
+        onValueChange={() => undefined}
+        value=""
+      />,
+    );
+
+    expect(
+      screen
+        .getByRole("button", { name: "Send message" })
+        .hasAttribute("disabled"),
+    ).toBe(true);
   });
 
   it("disables submit without blocking attachment recovery controls", () => {

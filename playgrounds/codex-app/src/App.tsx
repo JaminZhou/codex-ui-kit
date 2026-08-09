@@ -2089,6 +2089,7 @@ export function App() {
     setActiveFrame(null);
     setComposerValue("");
     setComposerOverlay(null);
+    setComposerAttachments([]);
     setQueuedPrompts([]);
     setQueueingEnabled(true);
     setQueueInterrupted(false);
@@ -3618,6 +3619,7 @@ export function App() {
           </span>
         ) : undefined
       }
+      allowAttachmentOnlySubmit={composerAttachments.length > 0}
       allowSubmitWhileRunning={showLifecycleComposer}
       aria-busy={composerIsDisabled || undefined}
       attachments={composerAttachmentNodes}
