@@ -4,10 +4,60 @@ import { launchScene, visualScenes } from "./electron-harness.mjs";
 
 const artifactDirectory = join(process.cwd(), "artifacts", "cdp");
 await mkdir(artifactDirectory, { recursive: true });
+const currentReplayComposerScenarios = new Set([
+  "attachment-lifecycle",
+  "command-failure-recovery",
+  "compaction",
+  "context-summary",
+  "current-review-rename",
+  "interruption",
+  "long-command-output",
+  "mcp-recovery-mixed-thread",
+  "mcp-tool-call",
+  "subagent-concurrency",
+  "subagent-delegation",
+  "subagent-nested",
+]);
+const currentReplayComposerContracts = [];
 
 for (const scene of visualScenes) {
   const { app, page } = await launchScene(scene);
   try {
+    if (currentReplayComposerScenarios.has(scene.scenario)) {
+      const currentComposerIcons = await page.evaluate(() =>
+        Array.from(
+          document.querySelectorAll(
+            ".codex-ui-composer [data-current-build-icon]",
+          ),
+          (icon) => {
+            const value = icon.getBoundingClientRect();
+            return {
+              height: value.height,
+              name: icon.getAttribute("data-current-build-icon"),
+              width: value.width,
+            };
+          },
+        ),
+      );
+      const expectedCurrentComposerIcons = [
+        { height: 16, name: "composer-add-files", width: 16 },
+        { height: 16, name: "composer-permission", width: 16 },
+        { height: 14, name: "composer-model-chevron", width: 14 },
+        { height: 16, name: "composer-dictate", width: 16 },
+      ];
+      if (
+        JSON.stringify(currentComposerIcons) !==
+        JSON.stringify(expectedCurrentComposerIcons)
+      ) {
+        throw new Error(
+          `${scene.id}: current replay Composer assets failed: ${JSON.stringify(currentComposerIcons)}`,
+        );
+      }
+      currentReplayComposerContracts.push({
+        icons: currentComposerIcons,
+        scene: scene.id,
+      });
+    }
     if (scene.view === "workspace") {
       await page.waitForTimeout(50);
       const contract = await page.evaluate(() => {
@@ -6497,5 +6547,10 @@ try {
 } finally {
   await contextSummaryCompactApp.close();
 }
+
+await writeFile(
+  join(artifactDirectory, "current-replay-composer-icons.json"),
+  `${JSON.stringify(currentReplayComposerContracts, null, 2)}\n`,
+);
 
 console.log(`CDP contracts passed for ${visualScenes.length} lifecycle frames.`);
