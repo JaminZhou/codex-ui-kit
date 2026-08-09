@@ -1360,6 +1360,66 @@ try {
   const returnedFocus = await markdownTableActionsPage.evaluate(
     () => document.activeElement?.getAttribute("aria-label"),
   );
+  const appLayout = markdownTableActionsPage.locator(
+    ".codex-ui-app-shell__layout",
+  );
+  await appLayout.evaluate((layout) => {
+    layout.style.setProperty("--codex-ui-app-shell-side-panel-track", "20rem");
+  });
+  await markdownTableActionsPage.waitForFunction(
+    () =>
+      (document.querySelector(
+        ".codex-ui-conversation-thread-shell",
+      )?.getBoundingClientRect().width ?? Number.POSITIVE_INFINITY) < 53 * 16,
+  );
+  await tableContainer.hover();
+  await markdownTableActionsPage.waitForTimeout(150);
+  const splitPaneState = await markdownTableActionsPage.evaluate(() => {
+    const actions = document.querySelector(
+      '[data-item-id="assistant-markdown-table-actions"] .codex-ui-markdown__table-actions',
+    );
+    const container = actions?.closest("[data-markdown-table]");
+    const conversation = document.querySelector(
+      ".codex-ui-conversation-thread-shell",
+    );
+    const rect = (element) => {
+      if (!(element instanceof Element)) return null;
+      const value = element.getBoundingClientRect();
+      return {
+        left: value.left,
+        right: value.right,
+        width: value.width,
+      };
+    };
+    return {
+      actions: actions
+        ? {
+            opacity: getComputedStyle(actions).opacity,
+            rect: rect(actions),
+          }
+        : null,
+      buttons: Array.from(actions?.querySelectorAll("button") ?? [], rect),
+      container: rect(container),
+      conversation: rect(conversation),
+      viewportWidth: window.innerWidth,
+    };
+  });
+  await expandButton.click();
+  await previewDialog.waitFor({ state: "visible" });
+  await previewClose.click();
+  await previewDialog.waitFor({ state: "hidden" });
+  await markdownTableActionsPage.waitForFunction(
+    () => document.activeElement?.getAttribute("aria-label") === "Expand table",
+  );
+  await appLayout.evaluate((layout) => {
+    layout.style.removeProperty("--codex-ui-app-shell-side-panel-track");
+  });
+  await markdownTableActionsPage.waitForFunction(
+    () =>
+      (document.querySelector(
+        ".codex-ui-conversation-thread-shell",
+      )?.getBoundingClientRect().width ?? 0) >= 53 * 16,
+  );
   await markdownTableActionsApp.evaluate(({ BrowserWindow }) => {
     BrowserWindow.getAllWindows()[0]?.setContentSize(720, 680);
   });
@@ -1435,6 +1495,21 @@ try {
     openState.clipboard?.["text/plain"]?.length !== 1_863 ||
     !openState.clipboard?.["text/html"]?.startsWith("<table>") ||
     returnedFocus !== "Expand table" ||
+    splitPaneState.viewportWidth !== 1_180 ||
+    !splitPaneState.conversation ||
+    splitPaneState.conversation.width >= 53 * 16 ||
+    !splitPaneState.container ||
+    splitPaneState.actions?.opacity !== "1" ||
+    !splitPaneState.actions?.rect ||
+    splitPaneState.actions.rect.right > splitPaneState.container.right ||
+    splitPaneState.actions.rect.left < splitPaneState.conversation.left ||
+    splitPaneState.actions.rect.right > splitPaneState.conversation.right ||
+    splitPaneState.buttons.some(
+      (rect) =>
+        !rect ||
+        rect.left < splitPaneState.conversation.left ||
+        rect.right > splitPaneState.conversation.right,
+    ) ||
     narrowState.width !== 720 ||
     narrowState.height !== 680 ||
     narrowState.horizontalOverflow > 1 ||
@@ -1454,7 +1529,7 @@ try {
     narrowReturnedFocus !== "Expand table"
   ) {
     throw new Error(
-      `Electron table actions interaction failed: ${JSON.stringify({ narrowReturnedFocus, narrowState, openState, previewKeyboard, returnedFocus })}`,
+      `Electron table actions interaction failed: ${JSON.stringify({ narrowReturnedFocus, narrowState, openState, previewKeyboard, returnedFocus, splitPaneState })}`,
     );
   }
 } finally {

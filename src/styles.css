@@ -3434,6 +3434,8 @@
   --codex-ui-bg: var(--codex-ui-conversation-thread-background);
   background: var(--codex-ui-conversation-thread-background);
   color: var(--codex-ui-text);
+  container-name: codex-ui-conversation-thread-shell;
+  container-type: inline-size;
   display: grid;
   grid-template-rows:
     var(--codex-ui-conversation-thread-header-height)
@@ -8550,7 +8552,7 @@ summary.codex-ui-activity__header::after {
   z-index: 10;
 }
 
-@container codex-ui-app-shell (min-width: 73rem) {
+@container codex-ui-conversation-thread-shell (min-width: 53rem) {
   .codex-ui-markdown__table-container[data-wide-block]
     .codex-ui-markdown__table-actions {
     inset-inline-end: -2rem;

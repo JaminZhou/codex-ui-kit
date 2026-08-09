@@ -92,7 +92,7 @@ function markdownLineBounds(snapshot: MarkdownSourceSnapshot, line: number) {
 }
 
 const markdownTableDelimiterPattern =
-  /^[ \t]*\|?[ \t]*:?-+:?[ \t]*(?:\|[ \t]*:?-+:?[ \t]*)+\|?[ \t]*$/;
+  /^[ \t]*\|?[ \t]*:?-+:?[ \t]*(?:\|[ \t]*:?-+:?[ \t]*)*\|?[ \t]*$/;
 
 function standaloneMarkdownTableDelimiter(line: string) {
   for (let index = 0; index < line.length; index += 1) {

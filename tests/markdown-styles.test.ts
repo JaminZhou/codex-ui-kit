@@ -67,6 +67,12 @@ describe("Markdown visual contract", () => {
       "inset-inline-end: var(--codex-ui-markdown-inline-overhang)",
     );
     expect(styles).toContain(
+      "container-name: codex-ui-conversation-thread-shell",
+    );
+    expect(styles).toContain(
+      "@container codex-ui-conversation-thread-shell (min-width: 53rem)",
+    );
+    expect(styles).not.toContain(
       "@container codex-ui-app-shell (min-width: 73rem)",
     );
     expect(styles).toContain("inset-inline-end: -2rem");

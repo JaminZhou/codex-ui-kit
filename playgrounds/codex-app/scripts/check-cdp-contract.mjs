@@ -5775,6 +5775,9 @@ try {
       const container = document.querySelector(
         '[data-item-id="assistant-markdown-table-actions"] [data-markdown-table]',
       );
+      const conversation = document.querySelector(
+        ".codex-ui-conversation-thread-shell",
+      );
       const table = container?.querySelector("table");
       const scroller = container?.querySelector(
         ".codex-ui-markdown__table-scroll",
@@ -5826,6 +5829,7 @@ try {
         columns:
           table instanceof HTMLTableElement ? table.rows[0]?.cells.length ?? 0 : 0,
         container: rect(container),
+        conversation: rect(conversation),
         firstCell: firstCell
           ? {
               fontWeight: getComputedStyle(firstCell).fontWeight,
@@ -5967,6 +5971,39 @@ try {
   const returnedFocus = await markdownTableActionsPage.evaluate(
     () => document.activeElement?.getAttribute("aria-label"),
   );
+  const appLayout = markdownTableActionsPage.locator(
+    ".codex-ui-app-shell__layout",
+  );
+  await appLayout.evaluate((layout) => {
+    layout.style.setProperty("--codex-ui-app-shell-side-panel-track", "20rem");
+  });
+  await markdownTableActionsPage.waitForFunction(
+    () =>
+      (document.querySelector(
+        ".codex-ui-conversation-thread-shell",
+      )?.getBoundingClientRect().width ?? Number.POSITIVE_INFINITY) < 53 * 16,
+  );
+  await tableContainer.hover();
+  await markdownTableActionsPage.waitForTimeout(150);
+  const splitPane = await inspectTable();
+  await expandButton.click();
+  await previewDialog.waitFor({ state: "visible" });
+  await previewDialog
+    .getByRole("button", { name: "Close table preview" })
+    .click();
+  await previewDialog.waitFor({ state: "hidden" });
+  await markdownTableActionsPage.waitForFunction(
+    () => document.activeElement?.getAttribute("aria-label") === "Expand table",
+  );
+  await appLayout.evaluate((layout) => {
+    layout.style.removeProperty("--codex-ui-app-shell-side-panel-track");
+  });
+  await markdownTableActionsPage.waitForFunction(
+    () =>
+      (document.querySelector(
+        ".codex-ui-conversation-thread-shell",
+      )?.getBoundingClientRect().width ?? 0) >= 53 * 16,
+  );
   await markdownTableActionsApp.evaluate(({ BrowserWindow }) => {
     BrowserWindow.getAllWindows()[0]?.setContentSize(720, 680);
   });
@@ -6015,6 +6052,9 @@ try {
     hovered.actions?.pointerEvents !== "none" ||
     hovered.actions?.interceptsLowerEdge !== false ||
     hovered.actions.rect?.width !== 32 ||
+    !hovered.conversation ||
+    hovered.conversation.width < 53 * 16 ||
+    hovered.actions.rect?.left < (hovered.container?.right ?? 0) ||
     JSON.stringify(labels) !==
       JSON.stringify(["Expand table", "Copy table"]) ||
     JSON.stringify(viewBoxes) !== JSON.stringify(["0 0 20 20", "0 0 21 21"]) ||
@@ -6042,6 +6082,19 @@ try {
     preview.surface.tabIndex !== 0 ||
     !previewKeyboard.active ||
     previewKeyboard.scrollLeft <= 0 ||
+    !splitPane.conversation ||
+    splitPane.conversation.width >= 53 * 16 ||
+    splitPane.actions?.opacity !== "1" ||
+    !splitPane.actions?.rect ||
+    splitPane.actions.rect.right > (splitPane.container?.right ?? 0) ||
+    splitPane.actions.rect.left < splitPane.conversation.left ||
+    splitPane.actions.rect.right > splitPane.conversation.right ||
+    splitPane.buttons.some(
+      ({ rect }) =>
+        !rect ||
+        rect.left < splitPane.conversation.left ||
+        rect.right > splitPane.conversation.right,
+    ) ||
     !preview.close ||
     Math.abs(preview.close.rect.height - 40) > 0.5 ||
     Math.abs(preview.close.rect.width - 42) > 0.5 ||
@@ -6068,12 +6121,12 @@ try {
     narrowReturnedFocus !== "Expand table"
   ) {
     throw new Error(
-      `markdown-table-actions: current-build contract failed: ${JSON.stringify({ clipboard, hovered, narrow, narrowReturnedFocus, preview, previewKeyboard, resting, returnedFocus })}`,
+      `markdown-table-actions: current-build contract failed: ${JSON.stringify({ clipboard, hovered, narrow, narrowReturnedFocus, preview, previewKeyboard, resting, returnedFocus, splitPane })}`,
     );
   }
   await writeFile(
     join(artifactDirectory, "markdown-table-actions.json"),
-    `${JSON.stringify({ clipboard, hovered, narrow, narrowReturnedFocus, preview, previewKeyboard, resting, returnedFocus }, null, 2)}\n`,
+    `${JSON.stringify({ clipboard, hovered, narrow, narrowReturnedFocus, preview, previewKeyboard, resting, returnedFocus, splitPane }, null, 2)}\n`,
   );
 } finally {
   await markdownTableActionsApp.close();

@@ -197,26 +197,36 @@ After.`;
 
   it.each([
     {
+      expected:
+        "| Alpha | Beta |\n| :--- | ---: |\n| one | two |",
       name: "blockquote",
       source:
         "> Context\n>\n> | Alpha | Beta |\n>| :--- | ---: |\n> | one | two |",
     },
     {
+      expected:
+        "| Alpha | Beta |\n| :--- | ---: |\n| one | two |",
       name: "list continuation",
       source:
         "- Context\n\n  | Alpha | Beta |\n  | :--- | ---: |\n  | one | two |",
     },
-  ])("copies a nested $name table as standalone Markdown", async ({ source }) => {
-    const onCopyTable = vi.fn<(payload: MarkdownTableCopyPayload) => void>();
-    render(<AgentMarkdown onCopyTable={onCopyTable}>{source}</AgentMarkdown>);
+    {
+      expected: "| Alpha |\n| --- |\n| one |",
+      name: "one-column blockquote",
+      source: "> | Alpha |\n> | --- |\n> | one |",
+    },
+  ])(
+    "copies a nested $name table as standalone Markdown",
+    async ({ expected, source }) => {
+      const onCopyTable = vi.fn<(payload: MarkdownTableCopyPayload) => void>();
+      render(<AgentMarkdown onCopyTable={onCopyTable}>{source}</AgentMarkdown>);
 
-    fireEvent.click(screen.getByRole("button", { name: "Copy table" }));
+      fireEvent.click(screen.getByRole("button", { name: "Copy table" }));
 
-    await waitFor(() => expect(onCopyTable).toHaveBeenCalledOnce());
-    expect(onCopyTable.mock.calls[0][0].markdown).toBe(
-      "| Alpha | Beta |\n| :--- | ---: |\n| one | two |",
-    );
-  });
+      await waitFor(() => expect(onCopyTable).toHaveBeenCalledOnce());
+      expect(onCopyTable.mock.calls[0][0].markdown).toBe(expected);
+    },
+  );
 
   it("opens a wide table preview and restores the expand trigger", async () => {
     render(
