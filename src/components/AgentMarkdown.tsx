@@ -40,6 +40,11 @@ interface MarkdownSourceNode {
   tagName?: string;
 }
 
+interface MarkdownSourceSnapshot {
+  lineStarts: number[];
+  source: string;
+}
+
 function markdownSourceNode(value: unknown): MarkdownSourceNode | undefined {
   if (!value || typeof value !== "object") return undefined;
   return value as MarkdownSourceNode;
@@ -68,21 +73,21 @@ function collectMarkdownTableRows(
   }
 }
 
-function markdownLineBounds(source: string, line: number) {
-  if (line < 1) return undefined;
-
-  let currentLine = 1;
-  let start = 0;
-  while (currentLine < line) {
-    const newline = source.indexOf("\n", start);
-    if (newline < 0) return undefined;
-    start = newline + 1;
-    currentLine += 1;
+function createMarkdownSourceSnapshot(source: string): MarkdownSourceSnapshot {
+  const lineStarts = [0];
+  for (let index = 0; index < source.length; index += 1) {
+    if (source[index] === "\n") lineStarts.push(index + 1);
   }
+  return { lineStarts, source };
+}
 
-  const newline = source.indexOf("\n", start);
-  let end = newline < 0 ? source.length : newline;
-  if (end > start && source[end - 1] === "\r") end -= 1;
+function markdownLineBounds(snapshot: MarkdownSourceSnapshot, line: number) {
+  const start = snapshot.lineStarts[line - 1];
+  if (start === undefined) return undefined;
+
+  const nextLine = snapshot.lineStarts[line];
+  let end = nextLine === undefined ? snapshot.source.length : nextLine - 1;
+  if (end > start && snapshot.source[end - 1] === "\r") end -= 1;
   return { end, start };
 }
 
@@ -99,7 +104,11 @@ function standaloneMarkdownTableDelimiter(line: string) {
   return undefined;
 }
 
-function extractMarkdownTableSource(source: string, value: unknown) {
+function extractMarkdownTableSource(
+  snapshot: MarkdownSourceSnapshot,
+  value: unknown,
+) {
+  const { source } = snapshot;
   const node = markdownSourceNode(value);
   const start = node?.position?.start;
   const end = node?.position?.end;
@@ -123,7 +132,7 @@ function extractMarkdownTableSource(source: string, value: unknown) {
       continue;
     }
 
-    const bounds = markdownLineBounds(source, line);
+    const bounds = markdownLineBounds(snapshot, line);
     if (!bounds) return source.slice(start.offset, end.offset);
     const lineEnd =
       line === end.line ? Math.min(bounds.end, end.offset) : bounds.end;
@@ -394,6 +403,15 @@ function MarkdownTable({
         >
           <div
             className="codex-ui-markdown codex-ui-markdown-table-preview__surface"
+            onKeyDown={(event) => {
+              if (event.target !== event.currentTarget) return;
+              if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") {
+                return;
+              }
+              event.currentTarget.scrollLeft +=
+                event.key === "ArrowRight" ? 40 : -40;
+              event.preventDefault();
+            }}
             tabIndex={0}
           >
             {table(true)}
@@ -745,8 +763,13 @@ export function AgentMarkdown({
   const onCopyTableRef = useRef(onCopyTable);
   onCopyTableRef.current = onCopyTable;
   const hasTableCopyHandler = onCopyTable !== undefined;
-  const sourceRef = useRef(source);
-  sourceRef.current = source;
+  const sourceSnapshotRef = useRef<MarkdownSourceSnapshot>({
+    lineStarts: [0],
+    source: "",
+  });
+  if (sourceSnapshotRef.current.source !== source) {
+    sourceSnapshotRef.current = createMarkdownSourceSnapshot(source);
+  }
   const markdownComponents = useMemo<Components>(
     () => {
       const handleCodeCopy: CodeCopyHandler | undefined = hasCodeCopyHandler
@@ -837,7 +860,7 @@ export function AgentMarkdown({
         },
         table({ children: tableChildren, node, ...tableProps }) {
           const markdownSource = extractMarkdownTableSource(
-            sourceRef.current,
+            sourceSnapshotRef.current,
             node,
           );
           return (

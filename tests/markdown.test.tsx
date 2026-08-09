@@ -235,8 +235,12 @@ After.`;
     expect(screen.getAllByRole("table")).toHaveLength(2);
     const previewScroller = dialog.querySelector(
       ".codex-ui-markdown-table-preview__surface",
-    );
+    ) as HTMLElement;
     expect(previewScroller?.getAttribute("tabindex")).toBe("0");
+    fireEvent.keyDown(previewScroller, { key: "ArrowRight" });
+    expect(previewScroller.scrollLeft).toBe(40);
+    fireEvent.keyDown(previewScroller, { key: "ArrowLeft" });
+    expect(previewScroller.scrollLeft).toBe(0);
     expect(
       screen
         .getByRole("button", { name: "Close table preview" })
