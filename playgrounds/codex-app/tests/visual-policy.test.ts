@@ -9,6 +9,18 @@ const cdpContract = readFileSync(
   new URL("../scripts/check-cdp-contract.mjs", import.meta.url),
   "utf8",
 );
+const electronContract = readFileSync(
+  new URL("../scripts/check-electron-contract.mjs", import.meta.url),
+  "utf8",
+);
+const electronHarness = readFileSync(
+  new URL("../scripts/electron-harness.mjs", import.meta.url),
+  "utf8",
+);
+const electronMain = readFileSync(
+  new URL("../electron/main.ts", import.meta.url),
+  "utf8",
+);
 const appSource = readFileSync(new URL("../src/App.tsx", import.meta.url), "utf8");
 const appStyles = readFileSync(
   new URL("../src/styles.css", import.meta.url),
@@ -56,9 +68,11 @@ describe("lifecycle visual policy", () => {
     expect(contract).toContain("CODEX_UI_KIT_SIDEBAR_SELECTED_MAX_DIFF_RATIO");
     expect(contract).toContain("CODEX_UI_KIT_SIDEBAR_FOOTER_MAX_DIFF_RATIO");
     expect(contract).toContain("`${scene.id}.current-build.${region}.diff.png`");
+    expect(appSource).toContain("initialSelection.currentSidebar ||");
     expect(appSource).toContain(
-      'initialSelection.frame === "sidebar-current" || !initialSelection.capture',
+      'initialSelection.frame === "sidebar-current" ||',
     );
+    expect(appSource).toContain("!initialSelection.capture");
     expect(appSource).toContain(
       "data-sidebar-current={currentSidebarComposition || undefined}",
     );
@@ -128,6 +142,71 @@ describe("lifecycle visual policy", () => {
     expect(cdpContract).toContain('"approval-current-denied"');
     expect(cdpContract).toContain(
       '"approval-current-similar-repeated-completed"',
+    );
+  });
+
+  it("gates the independent light shell without promoting emulated product evidence", () => {
+    expect(electronHarness).toContain('id: "current-light-shell"');
+    expect(electronHarness).toContain('theme: "light"');
+    expect(cdpContract).toContain(
+      'scene.id === "current-light-shell"',
+    );
+    expect(cdpContract).toContain(
+      'lightShell.colorScheme !== "light"',
+    );
+    expect(cdpContract).toContain(
+      'lightShell.main?.backgroundColor !== "rgb(255, 255, 255)"',
+    );
+    expect(electronContract).toContain(
+      'themeControl.selectOption("system")',
+    );
+    expect(electronContract).toContain("Electron theme pointer contract failed");
+    expect(electronContract).toContain(
+      'themeControl.selectOption("light")',
+    );
+    expect(electronContract).toContain(
+      'themeControl.selectOption("dark")',
+    );
+    expect(electronContract).toContain(
+      "Electron unsupported route theme contract failed",
+    );
+    expect(electronContract).toContain(
+      "Electron light project overlay contract failed",
+    );
+    expect(electronContract).toContain(
+      "Electron light environment overlay contract failed",
+    );
+    expect(electronContract).toContain(
+      "Electron light worktree overlay contract failed",
+    );
+    expect(electronContract).toContain(
+      "Electron native System theme contract failed",
+    );
+    expect(electronContract).toContain(
+      "Electron light shell status contract failed",
+    );
+    expect(electronHarness).toContain("CODEX_DEMO_NATIVE_THEME_SOURCE");
+    expect(electronMain).toContain("!nativeTheme.shouldUseDarkColors");
+    expect(appSource).toContain("const themeAvailable = isDemoThemeView(view)");
+    expect(appSource).toContain(
+      'const appliedTheme = themeAvailable ? theme : "dark"',
+    );
+    expect(appSource).toContain("data-theme={appliedTheme}");
+    expect(appSource).toContain(
+      "!initialSelection.capture && themeAvailable",
+    );
+    expect(appStyles).toContain(
+      '.demo-root[data-theme="light"] .demo-current-build-icon',
+    );
+    expect(appStyles).toContain(
+      "background: var(--demo-shell-overlay)",
+    );
+    expect(appStyles).toContain(
+      "color: var(--demo-shell-overlay-text)",
+    );
+    expect(appStyles).toContain("-webkit-app-region: no-drag");
+    expect(appStyles).toContain(
+      "color: var(--demo-shell-success-text) !important",
     );
   });
 

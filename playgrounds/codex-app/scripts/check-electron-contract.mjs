@@ -275,6 +275,21 @@ try {
   }
 
   await page.emulateMedia({ colorScheme: "light", reducedMotion: "reduce" });
+  const defaultTheme = await page.evaluate(() => ({
+    controls: document.querySelectorAll('[aria-label="Theme"]').length,
+    html: document.documentElement.dataset.theme,
+    root: document.querySelector(".demo-root")?.getAttribute("data-theme"),
+  }));
+  if (
+    defaultTheme.controls !== 0 ||
+    defaultTheme.html !== "dark" ||
+    defaultTheme.root !== "dark"
+  ) {
+    throw new Error(
+      `Electron default theme contract failed: ${JSON.stringify(defaultTheme)}`,
+    );
+  }
+
   await page.getByRole("button", { exact: true, name: "Live" }).click();
   await page.waitForSelector('.demo-root[data-mode="live"]');
   const liveTheme = await page.evaluate(
@@ -287,6 +302,293 @@ try {
   }
 } finally {
   await app.close();
+}
+
+const themeScene = {
+  currentSidebar: true,
+  frame: "workspace-ready",
+  id: "electron-light-shell",
+  scenario: "workspace-workflow",
+  theme: "system",
+  view: "workspace",
+};
+const { app: themeApp, page: themePage } = await launchScene(themeScene, {
+  capture: false,
+  nativeThemeSource: "light",
+});
+
+try {
+  await themePage.emulateMedia({
+    colorScheme: "light",
+    reducedMotion: "reduce",
+  });
+  const themeControl = themePage.getByRole("combobox", { name: "Theme" });
+  const nativeSystemTheme = await themeApp.evaluate(
+    ({ BrowserWindow, nativeTheme }) => ({
+      background: BrowserWindow.getAllWindows()[0]
+        ?.getBackgroundColor()
+        .toLowerCase(),
+      shouldUseDarkColors: nativeTheme.shouldUseDarkColors,
+      themeSource: nativeTheme.themeSource,
+    }),
+  );
+  if (
+    (await themeControl.inputValue()) !== "system" ||
+    !["#ffffff", "#ffffffff"].includes(
+      nativeSystemTheme.background ?? "",
+    ) ||
+    nativeSystemTheme.shouldUseDarkColors ||
+    nativeSystemTheme.themeSource !== "light"
+  ) {
+    throw new Error(
+      `Electron native System theme contract failed: ${JSON.stringify(nativeSystemTheme)}`,
+    );
+  }
+
+  const themeSidebarResizer = themePage.getByRole("separator", {
+    name: "Resize navigation sidebar",
+  });
+  await themeSidebarResizer.press("Home");
+  await themeSidebarResizer.press("ArrowRight");
+  await themeSidebarResizer.press("ArrowRight");
+  await themeSidebarResizer.press("ArrowRight");
+  await themeSidebarResizer.press("ArrowRight");
+
+  await themeControl.click();
+  const themePointerContract = await themeControl.evaluate((control) => ({
+    active: document.activeElement === control,
+  }));
+  if (!themePointerContract.active) {
+    throw new Error(
+      `Electron theme pointer contract failed: ${JSON.stringify(themePointerContract)}`,
+    );
+  }
+  await themeControl.selectOption("dark");
+  await themePage.waitForFunction(
+    () => document.documentElement.dataset.theme === "dark",
+  );
+  await themeControl.selectOption("system");
+  await themePage.waitForFunction(
+    () =>
+      document.documentElement.dataset.theme === undefined &&
+      document
+        .querySelector(".demo-root")
+        ?.getAttribute("data-theme") === "system" &&
+      getComputedStyle(document.documentElement).colorScheme === "light",
+  );
+
+  await themeControl.selectOption("light");
+  await themePage.waitForFunction(
+    () => document.documentElement.dataset.theme === "light",
+  );
+  const lightTheme = await themePage.evaluate(() => {
+    const bounds = (selector) => {
+      const element = document.querySelector(selector);
+      if (!(element instanceof HTMLElement)) return null;
+      const value = element.getBoundingClientRect();
+      const style = getComputedStyle(element);
+      return {
+        backgroundColor: style.backgroundColor,
+        color: style.color,
+        height: value.height,
+        width: value.width,
+      };
+    };
+    return {
+      activeElement: document.activeElement?.getAttribute("aria-label"),
+      colorScheme: getComputedStyle(document.documentElement).colorScheme,
+      composer: bounds(".codex-ui-composer"),
+      html: document.documentElement.dataset.theme,
+      main: bounds(".codex-ui-app-shell__main"),
+      root: document.querySelector(".demo-root")?.getAttribute("data-theme"),
+      sidebar: bounds(".codex-ui-app-shell__sidebar"),
+    };
+  });
+  if (
+    lightTheme.activeElement !== "Theme" ||
+    lightTheme.colorScheme !== "light" ||
+    lightTheme.html !== "light" ||
+    lightTheme.root !== "light" ||
+    lightTheme.main?.backgroundColor !== "rgb(255, 255, 255)" ||
+    Math.abs((lightTheme.sidebar?.width ?? 0) - 272) > 1 ||
+    !lightTheme.composer ||
+    lightTheme.composer.color !== "rgb(26, 28, 31)"
+  ) {
+    throw new Error(
+      `Electron light theme contract failed: ${JSON.stringify(lightTheme)}`,
+    );
+  }
+
+  const themeProjectTrigger = themePage.getByRole("button", {
+    name: "Change project: codex-ui-kit",
+  });
+  const themeProjectDialog = themePage.getByRole("dialog", {
+    name: "Choose a project",
+  });
+  await themeProjectTrigger.click();
+  const projectOverlayPaint = await themeProjectDialog.evaluate((dialog) => ({
+    action: getComputedStyle(
+      dialog.querySelector(
+        ".demo-workspace-project-dialog__actions button",
+      ),
+    ).color,
+    background: getComputedStyle(dialog).backgroundColor,
+    border: getComputedStyle(dialog).borderColor,
+    input: getComputedStyle(dialog.querySelector("input")).color,
+    option: getComputedStyle(dialog.querySelector('[role="option"]')).color,
+  }));
+  if (
+    projectOverlayPaint.background !== "rgba(255, 255, 255, 0.94)" ||
+    projectOverlayPaint.border !== "rgba(26, 28, 31, 0.1)" ||
+    projectOverlayPaint.input !== "rgb(26, 28, 31)" ||
+    projectOverlayPaint.action !== "rgb(26, 28, 31)" ||
+    projectOverlayPaint.option !== "rgb(26, 28, 31)"
+  ) {
+    throw new Error(
+      `Electron light project overlay contract failed: ${JSON.stringify(projectOverlayPaint)}`,
+    );
+  }
+  await themeProjectDialog
+    .getByRole("searchbox", { name: "Search projects" })
+    .press("Escape");
+  await themeProjectDialog.waitFor({ state: "hidden" });
+
+  await themePage
+    .getByRole("button", { name: "Change run location: Local" })
+    .click();
+  const themeEnvironmentMenu = themePage.getByRole("menu", {
+    name: "Start in",
+  });
+  const environmentOverlayPaint = await themeEnvironmentMenu.evaluate(
+    (menu) => ({
+      background: getComputedStyle(menu).backgroundColor,
+      border: getComputedStyle(menu).borderColor,
+      item: getComputedStyle(
+        menu.querySelector('[role="menuitemradio"]'),
+      ).color,
+      label: getComputedStyle(
+        menu.querySelector(".codex-ui-menu-section-label"),
+      ).color,
+    }),
+  );
+  if (
+    environmentOverlayPaint.background !== "rgba(255, 255, 255, 0.94)" ||
+    environmentOverlayPaint.border !== "rgba(26, 28, 31, 0.1)" ||
+    environmentOverlayPaint.item !== "rgb(26, 28, 31)" ||
+    environmentOverlayPaint.label !== "rgb(93, 93, 93)"
+  ) {
+    throw new Error(
+      `Electron light environment overlay contract failed: ${JSON.stringify(environmentOverlayPaint)}`,
+    );
+  }
+  await themePage.keyboard.press("Escape");
+  await themeEnvironmentMenu.waitFor({ state: "hidden" });
+
+  await themePage
+    .getByRole("button", { name: "Change worktree: main" })
+    .click();
+  const themeWorktreeMenu = themePage.getByRole("menu", {
+    name: "Branches",
+  });
+  const worktreeOverlayPaint = await themeWorktreeMenu.evaluate((menu) => ({
+    background: getComputedStyle(menu).backgroundColor,
+    border: getComputedStyle(menu).borderColor,
+    input: getComputedStyle(menu.querySelector("input")).color,
+    item: getComputedStyle(menu.querySelector('[role="menuitemradio"]')).color,
+  }));
+  if (
+    worktreeOverlayPaint.background !== "rgba(255, 255, 255, 0.94)" ||
+    worktreeOverlayPaint.border !== "rgba(26, 28, 31, 0.1)" ||
+    worktreeOverlayPaint.input !== "rgb(26, 28, 31)" ||
+    worktreeOverlayPaint.item !== "rgb(26, 28, 31)"
+  ) {
+    throw new Error(
+      `Electron light worktree overlay contract failed: ${JSON.stringify(worktreeOverlayPaint)}`,
+    );
+  }
+  await themePage.keyboard.press("Escape");
+  await themeWorktreeMenu.waitFor({ state: "hidden" });
+
+  await themePage
+    .getByRole("button", {
+      exact: true,
+      name: "Complete attachment lifecycle test",
+    })
+    .click();
+  await themePage.waitForSelector('.demo-root[data-view="conversation"]');
+  const unsupportedTheme = await themePage.evaluate(() => ({
+    controls: document.querySelectorAll('[aria-label="Theme"]').length,
+    html: document.documentElement.dataset.theme,
+    root: document.querySelector(".demo-root")?.getAttribute("data-theme"),
+  }));
+  if (
+    unsupportedTheme.controls !== 0 ||
+    unsupportedTheme.html !== "dark" ||
+    unsupportedTheme.root !== "dark"
+  ) {
+    throw new Error(
+      `Electron unsupported route theme contract failed: ${JSON.stringify(unsupportedTheme)}`,
+    );
+  }
+
+  await themePage.getByRole("button", { exact: true, name: "New chat" }).click();
+  await themePage.waitForSelector('.demo-root[data-view="workspace"]');
+  const restoredTheme = await themePage.evaluate(() => ({
+    html: document.documentElement.dataset.theme,
+    root: document.querySelector(".demo-root")?.getAttribute("data-theme"),
+  }));
+  if (
+    (await themeControl.inputValue()) !== "light" ||
+    restoredTheme.html !== "light" ||
+    restoredTheme.root !== "light"
+  ) {
+    throw new Error(
+      `Electron restored workspace theme contract failed: ${JSON.stringify(restoredTheme)}`,
+    );
+  }
+  await themeControl.selectOption("dark");
+  await themePage.waitForFunction(
+    () => document.documentElement.dataset.theme === "dark",
+  );
+} finally {
+  await themeApp.close();
+}
+
+const shellLightScene = {
+  frame: "recovered",
+  id: "electron-light-shell-route",
+  scenario: "streaming-recovery",
+  shellState: "ready",
+  theme: "light",
+  view: "shell",
+};
+const { app: shellLightApp, page: shellLightPage } = await launchScene(
+  shellLightScene,
+  { capture: false },
+);
+
+try {
+  const shellLightStatus = await shellLightPage.evaluate(() => {
+    const main = document.querySelector(".codex-ui-app-shell__main");
+    const status = document.querySelector(".demo-shell-route-status");
+    return {
+      mainBackground: main ? getComputedStyle(main).backgroundColor : null,
+      statusBackground: status
+        ? getComputedStyle(status).backgroundColor
+        : null,
+      statusColor: status ? getComputedStyle(status).color : null,
+    };
+  });
+  if (
+    shellLightStatus.mainBackground !== "rgb(255, 255, 255)" ||
+    shellLightStatus.statusColor !== "rgb(0, 105, 42)"
+  ) {
+    throw new Error(
+      `Electron light shell status contract failed: ${JSON.stringify(shellLightStatus)}`,
+    );
+  }
+} finally {
+  await shellLightApp.close();
 }
 
 const narrowReachabilityScene = {

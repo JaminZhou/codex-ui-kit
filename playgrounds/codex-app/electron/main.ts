@@ -8,6 +8,7 @@ import {
   app,
   BrowserWindow,
   ipcMain,
+  nativeTheme,
   shell,
   type IpcMainInvokeEvent,
 } from "electron";
@@ -27,6 +28,14 @@ const preloadPath = join(currentDirectory, "preload.cjs");
 const workspaceDirectory =
   process.env.CODEX_UI_KIT_WORKSPACE ?? resolve(currentDirectory, "../../..");
 const cdpPort = process.env.CODEX_DEMO_CDP_PORT;
+const requestedNativeThemeSource = process.env.CODEX_DEMO_NATIVE_THEME_SOURCE;
+
+if (["system", "light", "dark"].includes(requestedNativeThemeSource ?? "")) {
+  nativeTheme.themeSource = requestedNativeThemeSource as
+    | "system"
+    | "light"
+    | "dark";
+}
 
 if (cdpPort) app.commandLine.appendSwitch("remote-debugging-port", cdpPort);
 app.commandLine.appendSwitch("force-device-scale-factor", "1");
@@ -244,8 +253,15 @@ function createWindow() {
   const scenario = process.env.CODEX_DEMO_SCENARIO ?? "streaming-recovery";
   const frame = process.env.CODEX_DEMO_FRAME ?? "recovered";
   const capture = process.env.CODEX_DEMO_CAPTURE ?? "0";
+  const currentSidebar = process.env.CODEX_DEMO_CURRENT_SIDEBAR ?? "0";
   const layout = process.env.CODEX_DEMO_LAYOUT ?? "";
   const view = process.env.CODEX_DEMO_VIEW ?? "conversation";
+  const requestedTheme = process.env.CODEX_DEMO_THEME;
+  const theme =
+    ["shell", "workspace"].includes(view) &&
+    ["system", "light", "dark"].includes(requestedTheme ?? "")
+      ? requestedTheme!
+      : "dark";
   const shellState = process.env.CODEX_DEMO_SHELL_STATE ?? "ready";
   const requestedWidth = Number(process.env.CODEX_DEMO_WINDOW_WIDTH);
   const requestedHeight = Number(process.env.CODEX_DEMO_WINDOW_HEIGHT);
@@ -259,15 +275,20 @@ function createWindow() {
       : 820;
   const query = new URLSearchParams({
     capture,
+    currentSidebar,
     frame,
     layout,
     scenario,
     shellState,
+    theme,
     view,
   }).toString();
+  const useLightWindowBackground =
+    theme === "light" ||
+    (theme === "system" && !nativeTheme.shouldUseDarkColors);
 
   const window = new BrowserWindow({
-    backgroundColor: "#101010",
+    backgroundColor: useLightWindowBackground ? "#ffffff" : "#101010",
     height,
     minHeight: Math.min(640, height),
     minWidth: Math.min(720, width),

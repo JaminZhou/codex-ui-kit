@@ -38,7 +38,7 @@ exit gates; it does not replace the inventory.
   explicit 820×680/720×680 reopen. Two more current tasks now cover concurrent
   siblings plus a Parent → Child delegation through active, mixed, completed,
   summary, flat-panel, live-progress, and independent transcript states while
-  retaining public `agentPath` hierarchy. Browser/CDP covers 112 lifecycle
+  retaining public `agentPath` hierarchy. Browser/CDP covers 113 lifecycle
   frames; Electron repeats
   the session, mismatch, input, picker, close, and resize interactions; the
   current 906×820 panel/content pixel ratios pass at 1.5120%/0.4004%.
@@ -79,9 +79,15 @@ exit gates; it does not replace the inventory.
   responsive detail restoration. Its independent state machine adds
   index/detail loading and failure, checks, comments, review submission,
   merge-readiness, merge completion, compact layout, and route restoration.
-  Together the playground gates now cover 112 CDP/pixel frames, and the refreshed
-  PR detail passes the current 906×820 regional pixel gate. The refreshed
-  real MCP success path now matches Search → Fetch, the integrated activity
+  Together the playground gates now cover 113 CDP/pixel frames, including one
+  independently implemented light shell/sidebar/Composer composition. Light
+  is route-scoped to the theme-complete shell/workspace; conversation and Pull
+  Request retain their deterministic dark presentation. Project, Environment,
+  and Worktree overlays, the shell success indicator, and the native System
+  background are included in the light Electron contract. The internal theme
+  frame does not promote current-product light evidence. The
+  refreshed PR detail passes the current 906×820 regional pixel gate. The
+  refreshed real MCP success path now matches Search → Fetch, the integrated activity
   disclosure, computed typography, and a current regional pixel gate. The
   refreshed failure path now matches a standalone invalid-URL Fetch,
   intermediate explanation, three Search rows, successful Fetch, linked
