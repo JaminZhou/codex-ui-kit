@@ -6241,10 +6241,19 @@ export function App() {
         windowChrome={
           view === "shell" || view === "workspace" ? (
             <AppWindowChrome
-              backAction={{ label: "Back" }}
-              forwardAction={{ disabled: true, label: "Forward" }}
+              backAction={{
+                disabled: true,
+                icon: <CurrentBuildIcon name="window-chrome-back" />,
+                label: "Back",
+              }}
+              forwardAction={{
+                disabled: true,
+                icon: <CurrentBuildIcon name="window-chrome-forward" />,
+                label: "Forward",
+              }}
               sidebarAction={{
                 "aria-expanded": sidebarOpen,
+                icon: <CurrentBuildIcon name="window-chrome-sidebar" />,
                 label: sidebarOpen ? "Hide sidebar" : "Show sidebar",
                 onClick: () => setSidebarOpen((open) => !open),
               }}

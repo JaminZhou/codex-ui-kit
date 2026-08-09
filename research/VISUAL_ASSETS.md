@@ -63,7 +63,7 @@ node scripts/capture-current-visual-assets.mjs
 ```
 
 After reviewing that de-identified output, `pnpm update:visual-assets` performs
-the deterministic promotion and rewrites every explicitly promoted entry (14
+the deterministic promotion and rewrites every explicitly promoted entry (17
 for the `26.803.41515` baseline). An unchanged app fingerprint requires a
 complete ordered one-to-one primitive and root-geometry match. A changed
 fingerprint may refresh geometry only through a fixed semantic ID; the dynamic
@@ -123,12 +123,13 @@ attributes, class names, view boxes, and render sizes before capture output.
 Process/profile setup and exact-PID cleanup remain explicit operator steps.
 
 The current manifest fingerprints Codex Desktop `26.803.41515` (`6321`) and
-contains 14 runtime-observed sidebar icons: mode chevron, Search, neutral
+contains 17 runtime-observed sidebar/window-chrome icons: Sidebar, Back,
+Forward, mode chevron, Search, neutral
 Activity, New chat, Quick chat, project folder, Pull requests, Sites,
 Scheduled, Plugins, More, Pin, Archive, and Help. The current build confirms
 that Settings is absent from the sampled footer and that sampled project-task
-and Recents rows have no leading glyph. The three named window-chrome and eight
-Composer assets leave 11 approximations explicit and global pixel parity
+and Recents rows have no leading glyph. The eight named Composer assets leave
+eight approximations explicit and global pixel parity
 ineligible. See
 [`26.803.41515.md`](26.803.41515.md) for the scoped probe evidence and its
 separation from the broader UI inventory baseline.

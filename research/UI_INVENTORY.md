@@ -71,12 +71,13 @@ observation from a previous build remains historical evidence.
   surface is separately reached on `26.730.61639`.
 
 A later, deliberately narrower `26.803.41515` (`6321`) probe refreshes the
-sidebar visual/action slice and binds 14 icon primitives to exact runtime
-evidence. It also confirms current project/task hover actions, the Help footer,
-and no leading glyph in sampled project-task rows. The Recents follow-up
+sidebar/window-chrome visual/action slice and binds 17 icon primitives to
+exact runtime evidence. It also confirms current project/task hover actions,
+the Help footer, and no leading glyph in sampled project-task rows. The Recents follow-up
 independently scrolls to six task rows, pairs their Pin/Archive controls, and
-confirms zero leading SVGs, removing the `sidebar-thread` approximation. This
-is documented in
+confirms zero leading SVGs, removing the `sidebar-thread` approximation. The
+next follow-up promotes the visible Sidebar/Back/Forward titlebar controls,
+leaving eight Composer approximations. This is documented in
 [`26.803.41515.md`](26.803.41515.md) and does not change this broader
 inventory's `26.730.61639` current-build counts or promote untested routes and
 lifecycles.
@@ -197,6 +198,12 @@ and a dedicated ownership-masked regional gate. The
 0.1163% for the ownership-masked selected row, and 0.4126% for the footer,
 where only account-owned content is masked and the Help control remains under
 comparison; the Recents region passes at 2.5356%.
+
+The same current-build manifest now supplies exact visible Sidebar, Back, and
+Forward primitives to the private playground window chrome. Browser/CDP and
+Electron lock the 28×28 buttons, 16×16 icons, disabled navigation state, and
+semantic IDs; a 120×46 external crop passes at 3.2609%. Hidden layout copies
+are excluded by computed visibility before capture.
 
 The application-shell continuity slice splits window navigation, route
 lifecycle feedback, route selection/restoration, and global notifications

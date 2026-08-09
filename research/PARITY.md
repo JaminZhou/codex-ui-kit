@@ -39,12 +39,14 @@ The authoritative current-build inventory is:
   BrowserWindow; it does not prove parity with unobserved product routes,
   panels, state transitions, or window types.
 - A scoped Codex Desktop `26.803.41515` (`6321`) visual probe refreshes the
-  exact 1180×820 dark/resting asset fingerprint and expands exact sidebar icon
-  coverage from five to 14. Its sampled sidebar hover/footer contract also
+  exact 1180×820 dark/resting asset fingerprint and expands exact
+  sidebar/window-chrome icon coverage from five to 17. Its sampled sidebar
+  hover/footer contract also
   passes Browser/CDP and Electron acceptance; its independently scrolled
   Recents sample removes the leading Thread approximation while the broader
-  routes and lifecycles remain on their separately recorded builds. Eleven
-  visual approximations remain explicit.
+  routes and lifecycles remain on their separately recorded builds. The visible
+  Sidebar/Back/Forward titlebar controls are exact; eight Composer visual
+  approximations remain explicit.
 - Computer Use exploration is blocked by the environment safety policy for
   `com.openai.codex`. User-authorized CDP probes on `26.721.41059` revalidated
   access, the main-shell target shape, a de-identified Projects entry/list,

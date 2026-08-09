@@ -253,6 +253,7 @@ if (
   !captureSource.includes("bounds.top >= window.innerHeight") ||
   !captureSource.includes("bounds.right <= 0") ||
   !captureSource.includes("bounds.left >= window.innerWidth") ||
+  !captureSource.includes('getComputedStyle(svg).visibility !== "visible"') ||
   captureSource.includes("rawSemanticLabel") ||
   !captureSource.includes("computedStyle: computedStyle(element)") ||
   !captureSource.includes("sanitizeVisualAssetIcon") ||
@@ -295,6 +296,9 @@ if (new Set(remaining).size !== remaining.length) {
   throw new Error("remaining approximation ids must be unique");
 }
 for (const id of [
+  "window-chrome-sidebar",
+  "window-chrome-back",
+  "window-chrome-forward",
   "sidebar-more",
   "sidebar-pin",
   "sidebar-archive",

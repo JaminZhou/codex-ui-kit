@@ -338,11 +338,16 @@ for (const scene of visualScenes) {
         const outlet = document.querySelector(".codex-ui-app-route-outlet");
         const controls = Array.from(
           chrome?.querySelectorAll("button") ?? [],
-          (button) => ({
-            disabled: button.disabled,
-            label: button.getAttribute("aria-label"),
-            rect: rect(button),
-          }),
+          (button) => {
+            const icon = button.querySelector("[data-current-build-icon]");
+            return {
+              disabled: button.disabled,
+              iconName: icon?.getAttribute("data-current-build-icon"),
+              iconRect: icon ? rect(icon) : null,
+              label: button.getAttribute("aria-label"),
+              rect: rect(button),
+            };
+          },
         );
         if (!root || !shell || !chrome || !main || !outlet) {
           throw new Error("App shell continuity surfaces are missing.");
@@ -413,11 +418,21 @@ for (const scene of visualScenes) {
         Math.abs(contract.outlet.rect.bottom - contract.shell.bottom) > 1 ||
         contract.controls.length !== 3 ||
         contract.controls[0].label !== "Hide sidebar" ||
+        contract.controls[0].iconName !== "window-chrome-sidebar" ||
         contract.controls[1].label !== "Back" ||
+        contract.controls[1].iconName !== "window-chrome-back" ||
         contract.controls[2].label !== "Forward" ||
+        contract.controls[2].iconName !== "window-chrome-forward" ||
         Math.abs(contract.controls[0].rect.left - 88) > 1 ||
         Math.abs(contract.controls[1].rect.left - 120) > 1 ||
         Math.abs(contract.controls[2].rect.left - 152) > 1 ||
+        !contract.controls[1].disabled ||
+        contract.controls.some(
+          ({ iconRect }) =>
+            !iconRect ||
+            Math.abs(iconRect.width - 16) > 1 ||
+            Math.abs(iconRect.height - 16) > 1,
+        ) ||
         !contract.controls[2].disabled ||
         contract.chrome.style.display !== "grid"
       ) {

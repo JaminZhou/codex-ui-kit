@@ -2,6 +2,9 @@ import { createElement, type SVGProps } from "react";
 import visualAssets from "../../../research/visual-assets.json";
 
 type CurrentBuildIconName =
+  | "window-chrome-back"
+  | "window-chrome-forward"
+  | "window-chrome-sidebar"
   | "sidebar-activity"
   | "sidebar-archive"
   | "sidebar-folder"
