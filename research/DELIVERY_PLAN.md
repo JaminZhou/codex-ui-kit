@@ -12,18 +12,21 @@ exit gates; it does not replace the inventory.
 
 - The installed package is Codex Desktop `26.803.41515` (`6321`). The broader
   UI inventory evidence baseline remains `26.730.61639` (`6234`) until those
-  surfaces are rerun; only the scoped sidebar visual/interaction slice has
-  been refreshed on the newer build.
+  surfaces are rerun; only the scoped sidebar, window-chrome, and Composer
+  visual/interaction slice has been refreshed on the newer build.
 - The inventory contains 81 surface groups: 53 P0, 19 P1, and 9 P2.
 - 5 groups have current-build runtime evidence, 59 have previous-build-only runtime evidence, and 17 have not been sampled.
-- The scoped `26.803.41515` refresh binds 17 sidebar/window-chrome icons to
+- The scoped `26.803.41515` refresh binds 25 sidebar/window-chrome/Composer icons to
   exact runtime evidence. Its latest hover/footer follow-up promotes More, Pin,
   Archive, and Help, confirms that Settings is absent from the sampled footer
   and that sampled project-task rows have no leading glyph. The Recents follow-up
   independently scrolls to one section, pairs six Pin/Archive rows, confirms
   zero leading SVGs. The next follow-up promotes the visible window-chrome
   Sidebar/Back/Forward controls and reduces the explicit visual approximation
-  denominator from 15 to 8.
+  denominator from 15 to 8. The Composer follow-up promotes Project, Worktree,
+  Branch, Add files, Permission, Model chevron, Dictate, and Voice, reducing
+  the scoped visible-shell denominator to zero while explicitly retaining the
+  broader inventory/lifecycle blocker.
 - The current `26.730.61639` refresh covers the local Terminal session shell,
   a real bounded running/completed command with panel persistence, and the
   cross-worktree mismatch warning plus recovery actions. It locks
@@ -63,6 +66,10 @@ exit gates; it does not replace the inventory.
   0.4126%, with the Help control left unmasked; the dedicated masked Recents
   region passes at 2.5356%. The visible window-chrome icons now come from the
   exact manifest, and their independent 120×46 crop passes at 3.2609%. The
+  visible Composer context/actions now also use eight exact manifest assets.
+  CDP and Electron gate their order and 14/16px geometry across current
+  conversation/workspace states; an external workspace comparison passes at
+  0.4651%, and the eight asset crops have zero changed pixels. The
   preceding `26.727.40816`
   refresh covered window navigation, route loading/restoration, the New chat
   Composer and project picker, the read-only Terminal shell, and the public

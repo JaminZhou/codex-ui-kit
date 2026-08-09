@@ -148,7 +148,8 @@ if (
   manifest.policy?.packageBoundary !== "playground-only" ||
   manifest.policy?.globalPixelParityEligible !== false ||
   manifest.policy?.remainingApproximationInventoryComplete !== false ||
-  !manifest.policy?.globalPixelParityBlocker
+  manifest.policy?.globalPixelParityBlocker !==
+    "The scoped visible shell asset denominator is zero, but the broader UI inventory and current-build lifecycle evidence remain incomplete."
 ) {
   throw new Error("visual asset policy must preserve the package and parity boundary");
 }
@@ -246,6 +247,11 @@ if (
   !captureSource.includes("recentsTaskActionRowCount") ||
   !captureSource.includes("recentsTaskLeadingSvgCount") ||
   !captureSource.includes("recentsScrollContainer.scrollTop = 0") ||
+  !captureSource.includes("composerStructuralSemanticIds") ||
+  !captureSource.includes("composerBottomUnlabelledInputs.length === 2") ||
+  !captureSource.includes("composerObservation") ||
+  !captureSource.includes("checkOpacity: true") ||
+  !captureSource.includes('targetRegion === "composer"') ||
   !captureSource.includes(
     'resolveSemanticId(fixedTextLabel, targetRegion, false)',
   ) ||
@@ -279,6 +285,7 @@ if (
   !updaterSource.includes("hasCurrentSidebarThreadAbsenceEvidence") ||
   !updaterSource.includes("currentSidebarSettingsAbsenceProven") ||
   !updaterSource.includes("currentSidebarThreadAbsenceProven") ||
+  !updaterSource.includes("manifest.composerObservation") ||
   !updaterSource.includes("remainingApproximationCandidates.add(id)") ||
   !updaterSource.includes("sanitizeVisualAssetIcon") ||
   !updaterSource.includes("capturedAt")
@@ -287,15 +294,23 @@ if (
 }
 
 const remaining = manifest.remainingApproximationIds;
-if (!Array.isArray(remaining) || remaining.length === 0) {
+if (!Array.isArray(remaining) || remaining.length !== 0) {
   throw new Error(
-    "global parity cannot be promoted until the remaining approximation inventory is explicitly empty",
+    "the scoped visible shell approximation denominator must remain explicitly zero",
   );
 }
 if (new Set(remaining).size !== remaining.length) {
   throw new Error("remaining approximation ids must be unique");
 }
 for (const id of [
+  "composer-project",
+  "composer-worktree",
+  "composer-branch",
+  "composer-add-files",
+  "composer-permission",
+  "composer-model-chevron",
+  "composer-dictate",
+  "composer-voice",
   "window-chrome-sidebar",
   "window-chrome-back",
   "window-chrome-forward",
@@ -307,6 +322,16 @@ for (const id of [
   if (!ids.has(id) || remaining.includes(id)) {
     throw new Error(`${id} must be promoted from current-build runtime evidence`);
   }
+}
+if (
+  manifest.icons.length !== 25 ||
+  manifest.composerObservation?.topContextIconCount !== 3 ||
+  manifest.composerObservation?.bottomActionIconCount !== 5 ||
+  manifest.composerObservation?.exactSemanticIconCount !== 8
+) {
+  throw new Error(
+    "current Composer capture must retain three context and five action icons with eight exact semantic mappings",
+  );
 }
 const currentSidebarSettingsAbsenceProven =
   hasCurrentSidebarSettingsAbsenceEvidence(manifest.sidebarObservation);

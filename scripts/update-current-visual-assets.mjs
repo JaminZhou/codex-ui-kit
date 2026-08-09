@@ -112,6 +112,80 @@ function promotePrimitives(icon, observed) {
 
 const promotionSpecs = new Map([
   [
+    "composer-project",
+    {
+      ownerAriaLabel: null,
+      ownerEvidence:
+        "first of three visible current Composer context controls, selected structurally without retaining its dynamic label",
+      region: "composer",
+      semanticId: "composer-project",
+    },
+  ],
+  [
+    "composer-worktree",
+    {
+      ownerAriaLabel: null,
+      ownerEvidence:
+        "second of three visible current Composer context controls, selected structurally without retaining its dynamic label",
+      region: "composer",
+      semanticId: "composer-worktree",
+    },
+  ],
+  [
+    "composer-branch",
+    {
+      ownerAriaLabel: null,
+      ownerEvidence:
+        "third of three visible current Composer context controls, selected structurally without retaining its dynamic label",
+      region: "composer",
+      semanticId: "composer-branch",
+    },
+  ],
+  [
+    "composer-add-files",
+    {
+      ownerAriaLabel: "Add files and more",
+      region: "composer",
+      semanticId: "composer-add-files",
+    },
+  ],
+  [
+    "composer-permission",
+    {
+      ownerAriaLabel: null,
+      ownerEvidence:
+        "one visible 16px current Composer permission control after Add files",
+      region: "composer",
+      semanticId: "composer-permission",
+    },
+  ],
+  [
+    "composer-model-chevron",
+    {
+      ownerAriaLabel: null,
+      ownerEvidence:
+        "one visible 14px current Composer model chevron before Dictate",
+      region: "composer",
+      semanticId: "composer-model-chevron",
+    },
+  ],
+  [
+    "composer-dictate",
+    {
+      ownerAriaLabel: "Dictate",
+      region: "composer",
+      semanticId: "composer-dictate",
+    },
+  ],
+  [
+    "composer-voice",
+    {
+      ownerAriaLabel: "Start new voice chat",
+      region: "composer",
+      semanticId: "composer-voice",
+    },
+  ],
+  [
     "window-chrome-sidebar",
     {
       ownerAriaLabel: null,
@@ -309,6 +383,7 @@ const capturedAt =
 const hashBaselineContext = { ...baselineContext, capturedAt };
 manifest.geometryHashVersion = 4;
 manifest.baseline = hashBaselineContext;
+manifest.composerObservation = capture.composerObservation;
 manifest.sidebarObservation = capture.sidebarObservation;
 
 function selectObservedIcon(id, spec, existing) {
@@ -423,6 +498,10 @@ manifest.remainingApproximationIds = [...remainingApproximationCandidates].filte
     !promotedIds.has(id) &&
     currentBuildAbsenceEvidence.get(id) !== true,
 );
+manifest.policy.globalPixelParityBlocker =
+  manifest.remainingApproximationIds.length === 0
+    ? "The scoped visible shell asset denominator is zero, but the broader UI inventory and current-build lifecycle evidence remain incomplete."
+    : "Only the listed elements have exact-source coverage; remaining approximate elements must be promoted before claiming global pixel parity.";
 
 const output = `${JSON.stringify(manifest, null, 2)}\n`;
 if (write) {

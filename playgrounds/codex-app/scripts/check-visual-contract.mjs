@@ -184,6 +184,22 @@ const currentBuildWorkspaceReferenceSize = {
   height: 820,
   width: 1180,
 };
+const currentBuildComposerIconReferenceBounds = [
+  { height: 16, left: 387, name: "composer-project", top: 679, width: 16 },
+  { height: 16, left: 505, name: "composer-worktree", top: 679, width: 16 },
+  { height: 16, left: 581, name: "composer-branch", top: 679, width: 16 },
+  { height: 16, left: 373, name: "composer-add-files", top: 774, width: 16 },
+  { height: 16, left: 407, name: "composer-permission", top: 774, width: 16 },
+  {
+    height: 14,
+    left: 998,
+    name: "composer-model-chevron",
+    top: 775,
+    width: 14,
+  },
+  { height: 16, left: 1029, name: "composer-dictate", top: 774, width: 16 },
+  { height: 16, left: 1065, name: "composer-voice", top: 774, width: 16 },
+];
 const currentBuildWorkspaceProjectReference =
   process.env.CODEX_UI_KIT_WORKSPACE_PROJECT_REFERENCE;
 const currentBuildWorkspaceProjectReferenceSize = {
@@ -427,12 +443,32 @@ for (const scene of selectedScenes) {
   const diffPath = join(artifactDirectory, `${scene.id}.diff.png`);
   let sidebarSelectedTop;
   let sidebarRecentsBounds;
+  let workspaceCurrentIconBounds;
   let workspaceEnvironmentMenuBounds;
   let workspaceEnvironmentPickerBounds;
   let workspaceProjectListboxBounds;
   let workspaceWorktreeMenuBounds;
 
   try {
+    if (scene.id === "workspace-ready") {
+      workspaceCurrentIconBounds = await page.evaluate(() =>
+        Array.from(
+          document.querySelectorAll(
+            ".demo-workspace-start [data-current-build-icon]",
+          ),
+          (icon) => {
+            const value = icon.getBoundingClientRect();
+            return {
+              height: Math.round(value.height),
+              left: Math.round(value.left),
+              name: icon.getAttribute("data-current-build-icon"),
+              top: Math.round(value.top),
+              width: Math.round(value.width),
+            };
+          },
+        ),
+      );
+    }
     if (scene.id === "current-sidebar") {
       sidebarSelectedTop = await page.evaluate(() => {
         const current = Array.from(
@@ -690,33 +726,33 @@ for (const scene of selectedScenes) {
       },
       {
         height: 22,
-        left: 132,
+        left: 134,
         top: 676,
-        width: 96,
+        width: 94,
       },
       {
         height: 22,
-        left: 236,
+        left: 252,
         top: 676,
-        width: 54,
+        width: 38,
       },
       {
         height: 22,
-        left: 314,
+        left: 330,
         top: 676,
-        width: 190,
+        width: 174,
       },
       {
         height: 24,
-        left: 136,
+        left: 155,
         top: 768,
-        width: 168,
+        width: 149,
       },
       {
         height: 24,
         left: 606,
         top: 768,
-        width: 176,
+        width: 112,
       },
     ];
     const comparison = comparePng(
@@ -744,6 +780,83 @@ for (const scene of selectedScenes) {
     }
     console.log(
       `${scene.id}: current-build workspace pixel ratio ${comparison.ratio}`,
+    );
+
+    if (
+      JSON.stringify(
+        workspaceCurrentIconBounds?.map(({ height, name, width }) => ({
+          height,
+          name,
+          width,
+        })),
+      ) !==
+      JSON.stringify(
+        currentBuildComposerIconReferenceBounds.map(
+          ({ height, name, width }) => ({ height, name, width }),
+        ),
+      )
+    ) {
+      throw new Error(
+        `${scene.id}: current Composer icon bounds are incomplete: ${JSON.stringify(workspaceCurrentIconBounds)}.`,
+      );
+    }
+    const iconComparisons = currentBuildComposerIconReferenceBounds.map(
+      (referenceBounds, index) => {
+        const actualBounds = workspaceCurrentIconBounds[index];
+        return {
+          comparison: comparePng(
+            cropPng(
+              referenceFull,
+              referenceBounds.left,
+              referenceBounds.top,
+              referenceBounds.width,
+              referenceBounds.height,
+            ),
+            cropPng(
+              actual,
+              actualBounds.left,
+              actualBounds.top,
+              actualBounds.width,
+              actualBounds.height,
+            ),
+            0.12,
+          ),
+          name: referenceBounds.name,
+        };
+      },
+    );
+    const composerIconPixels = iconComparisons.reduce(
+      (total, { comparison: iconComparison }) =>
+        total + iconComparison.pixels,
+      0,
+    );
+    const composerIconArea = currentBuildComposerIconReferenceBounds.reduce(
+      (total, { height, width }) => total + height * width,
+      0,
+    );
+    const composerIconRatio = composerIconPixels / composerIconArea;
+    const maximumComposerIconRatio = environmentRatio(
+      "CODEX_UI_KIT_COMPOSER_ICON_MAX_DIFF_RATIO",
+      0.16,
+    );
+    for (const { comparison: iconComparison, name } of iconComparisons) {
+      if (iconComparison.pixels > 0) {
+        await writeFile(
+          join(
+            artifactDirectory,
+            `${scene.id}.current-build.${name}.diff.png`,
+          ),
+          PNG.sync.write(iconComparison.diff),
+        );
+      }
+    }
+    if (composerIconRatio > maximumComposerIconRatio) {
+      throw new Error(
+        `${scene.id}: current-build Composer icon pixel ratio ${composerIconRatio} exceeds ${maximumComposerIconRatio}.`,
+      );
+    }
+    console.log(
+      `${scene.id}: current-build Composer icon pixel ratio ${composerIconRatio}`,
     );
   }
 

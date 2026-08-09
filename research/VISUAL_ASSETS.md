@@ -123,13 +123,14 @@ attributes, class names, view boxes, and render sizes before capture output.
 Process/profile setup and exact-PID cleanup remain explicit operator steps.
 
 The current manifest fingerprints Codex Desktop `26.803.41515` (`6321`) and
-contains 17 runtime-observed sidebar/window-chrome icons: Sidebar, Back,
-Forward, mode chevron, Search, neutral
+contains 25 runtime-observed sidebar/window-chrome/Composer icons: Sidebar,
+Back, Forward, mode chevron, Search, neutral
 Activity, New chat, Quick chat, project folder, Pull requests, Sites,
-Scheduled, Plugins, More, Pin, Archive, and Help. The current build confirms
+Scheduled, Plugins, More, Pin, Archive, Help, Composer Project, Worktree,
+Branch, Add files, Permission, Model chevron, Dictate, and Voice. The current build confirms
 that Settings is absent from the sampled footer and that sampled project-task
-and Recents rows have no leading glyph. The eight named Composer assets leave
-eight approximations explicit and global pixel parity
-ineligible. See
+and Recents rows have no leading glyph. The scoped visible-shell approximation
+list is now empty, but the broader inventory and current-build lifecycle
+denominator remain incomplete, so global pixel parity is still ineligible. See
 [`26.803.41515.md`](26.803.41515.md) for the scoped probe evidence and its
 separation from the broader UI inventory baseline.

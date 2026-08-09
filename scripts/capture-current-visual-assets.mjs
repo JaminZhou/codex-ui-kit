@@ -424,6 +424,25 @@ try {
         width: value.width,
       };
     };
+    const isActuallyVisible = (element) => {
+      if (typeof element.checkVisibility === "function") {
+        return element.checkVisibility({
+          checkOpacity: true,
+          checkVisibilityCSS: true,
+        });
+      }
+      for (let current = element; current; current = current.parentElement) {
+        const style = getComputedStyle(current);
+        if (
+          style.display === "none" ||
+          style.opacity === "0" ||
+          style.visibility !== "visible"
+        ) {
+          return false;
+        }
+      }
+      return true;
+    };
     const navigation = document.querySelector("nav");
     const recentsSections = [
       ...new Set(
@@ -452,7 +471,7 @@ try {
       recentsScrollContainer = recentsScrollContainer.parentElement;
     }
     if (recentsScrollContainer) recentsScrollContainer.scrollTop = 0;
-    const icons = [...document.querySelectorAll("svg")]
+    const iconInputs = [...document.querySelectorAll("svg")]
       .map((svg) => {
         const bounds = svg.getBoundingClientRect();
         const owner = svg.closest(
@@ -462,7 +481,9 @@ try {
         if (
           !owner ||
           !targetRegion ||
-          getComputedStyle(svg).visibility !== "visible" ||
+          (targetRegion === "composer"
+            ? !isActuallyVisible(svg)
+            : getComputedStyle(svg).visibility !== "visible") ||
           bounds.width === 0 ||
           bounds.height === 0 ||
           bounds.right <= 0 ||
@@ -472,6 +493,62 @@ try {
         ) {
           return null;
         }
+        return { bounds, owner, svg, targetRegion };
+      })
+      .filter(Boolean);
+    const composerInputs = iconInputs.filter(
+      ({ targetRegion }) => targetRegion === "composer",
+    );
+    const composerTopInputs = composerInputs
+      .filter(({ bounds }) => bounds.top < window.innerHeight - 100)
+      .sort((left, right) => left.bounds.left - right.bounds.left);
+    const composerBottomInputs = composerInputs
+      .filter(({ bounds }) => bounds.top >= window.innerHeight - 100)
+      .sort((left, right) => left.bounds.left - right.bounds.left);
+    const composerStructuralSemanticIds = new Map();
+    if (composerTopInputs.length === 3) {
+      ["composer-project", "composer-worktree", "composer-branch"].forEach(
+        (semanticId, index) => {
+          composerStructuralSemanticIds.set(
+            composerTopInputs[index].svg,
+            semanticId,
+          );
+        },
+      );
+    }
+    const composerBottomUnlabelledInputs = composerBottomInputs.filter(
+      ({ owner }) => {
+        const ariaLabel = owner.getAttribute("aria-label") ?? "";
+        const fixedTextLabel = owner.textContent?.trim() ?? "";
+        return (
+          resolveSemanticId(ariaLabel, "composer", true) === null &&
+          resolveSemanticId(fixedTextLabel, "composer", false) === null
+        );
+      },
+    );
+    const composerPermissionInput = composerBottomUnlabelledInputs.find(
+      ({ bounds, svg }) =>
+        bounds.width === 16 && svg.getAttribute("viewBox") === "0 0 20 20",
+    );
+    const composerModelChevronInput = composerBottomUnlabelledInputs.find(
+      ({ bounds, svg }) =>
+        bounds.width === 14 && svg.getAttribute("viewBox") === "0 0 16 16",
+    );
+    if (
+      composerBottomUnlabelledInputs.length === 2 &&
+      composerPermissionInput &&
+      composerModelChevronInput
+    ) {
+      composerStructuralSemanticIds.set(
+        composerPermissionInput.svg,
+        "composer-permission",
+      );
+      composerStructuralSemanticIds.set(
+        composerModelChevronInput.svg,
+        "composer-model-chevron",
+      );
+    }
+    const icons = iconInputs.map(({ bounds, owner, svg, targetRegion }) => {
         const ariaLabel = owner.getAttribute("aria-label");
         const fixedTextLabel = owner.textContent?.trim() ?? "";
         return {
@@ -480,6 +557,7 @@ try {
             semanticId:
               resolveSemanticId(ariaLabel ?? "", targetRegion, true) ??
               resolveSemanticId(fixedTextLabel, targetRegion, false) ??
+              composerStructuralSemanticIds.get(svg) ??
               null,
           },
           primitives: [...svg.children].map(serializeSvgElement),
@@ -491,8 +569,26 @@ try {
           sourceClassName: svg.getAttribute("class") ?? "",
           viewBox: svg.getAttribute("viewBox"),
         };
-      })
-      .filter(Boolean);
+      });
+    const exactComposerSemanticIds = new Set([
+      "composer-project",
+      "composer-worktree",
+      "composer-branch",
+      "composer-add-files",
+      "composer-permission",
+      "composer-model-chevron",
+      "composer-dictate",
+      "composer-voice",
+    ]);
+    const composerObservation = {
+      bottomActionIconCount: composerBottomInputs.length,
+      exactSemanticIconCount: icons.filter(
+        ({ owner, region: iconRegion }) =>
+          iconRegion === "composer" &&
+          exactComposerSemanticIds.has(owner.semanticId),
+      ).length,
+      topContextIconCount: composerTopInputs.length,
+    };
     const visibleControlsFor = (root = document) =>
       [
         ...root.querySelectorAll(
@@ -629,6 +725,7 @@ try {
         tag: element.tagName,
       }));
     return {
+      composerObservation,
       fontSamples,
       icons,
       sidebarObservation,

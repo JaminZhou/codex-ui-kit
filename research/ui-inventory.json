@@ -44,7 +44,8 @@
         "cdp-26.721:local-environment-dialog-600x600-scrollable-group-structure",
         "cdp-26.721.81911:new-chat-context-bar-736x28-project-local-main",
         "cdp-26.727.40816:new-chat-project-local-branch-context-controls-1180x820",
-        "cdp-26.730.61309:local-and-new-worktree-four-part-context-controls-wide-and-720"
+        "cdp-26.730.61309:local-and-new-worktree-four-part-context-controls-wide-and-720",
+        "cdp-26.803.41515:visible-composer-project-worktree-branch-exact-assets"
       ],
       "implementationStatus": "partial",
       "browserStatus": "partial_legacy",
@@ -466,7 +467,8 @@
         "cdp-26.721:synthetic-composer-736x98-wide-494x98-compact",
         "cdp-26.721:synthetic-composer-empty-running-completed-controls",
         "cdp-26.721.81911:empty-focused-multiline-running-stop-and-completed-composer",
-        "cdp-26.727.40816:new-chat-do-anything-input-712x44-14x20"
+        "cdp-26.727.40816:new-chat-do-anything-input-712x44-14x20",
+        "cdp-26.803.41515:visible-composer-three-context-five-action-exact-assets"
       ],
       "implementationStatus": "partial",
       "browserStatus": "partial_legacy",
@@ -487,7 +489,8 @@
         "cdp-26.721:new-chat-project-popover-260x250-listbox-14-options",
         "cdp-26.721.81911:project-local-and-main-context-controls",
         "cdp-26.727.40816:project-local-feat-current-build-pr-refresh-context-row",
-        "cdp-26.730.61309:new-worktree-no-environment-main-and-environment-empty-menu"
+        "cdp-26.730.61309:new-worktree-no-environment-main-and-environment-empty-menu",
+        "cdp-26.803.41515:visible-composer-project-worktree-branch-exact-assets"
       ],
       "implementationStatus": "partial",
       "browserStatus": "partial_legacy",

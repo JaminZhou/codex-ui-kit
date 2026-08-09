@@ -2,6 +2,14 @@ import { createElement, type SVGProps } from "react";
 import visualAssets from "../../../research/visual-assets.json";
 
 type CurrentBuildIconName =
+  | "composer-add-files"
+  | "composer-branch"
+  | "composer-dictate"
+  | "composer-model-chevron"
+  | "composer-permission"
+  | "composer-project"
+  | "composer-voice"
+  | "composer-worktree"
   | "window-chrome-back"
   | "window-chrome-forward"
   | "window-chrome-sidebar"

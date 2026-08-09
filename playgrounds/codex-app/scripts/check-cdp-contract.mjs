@@ -55,6 +55,13 @@ for (const scene of visualScenes) {
             rect: rect(button),
           }),
         );
+        const currentIcons = Array.from(
+          start?.querySelectorAll("[data-current-build-icon]") ?? [],
+          (icon) => ({
+            name: icon.getAttribute("data-current-build-icon"),
+            rect: rect(icon),
+          }),
+        );
         const projectDialog = document.querySelector(
           ".demo-workspace-project-dialog",
         );
@@ -113,6 +120,7 @@ for (const scene of visualScenes) {
           composer: rect(composer),
           context: rect(context),
           contextButtons,
+          currentIcons,
           environment: environmentMenu
             ? {
                 buttons: environmentButtons,
@@ -194,6 +202,18 @@ for (const scene of visualScenes) {
       const worktreeTrigger = contract.contextButtons.find(
         ({ kind }) => kind === "worktree",
       );
+      const expectedCurrentIconNames = [
+        "composer-project",
+        ...(noProjectExpected || newWorktreeExpected
+          ? []
+          : ["composer-worktree"]),
+        ...(noProjectExpected ? [] : ["composer-branch"]),
+        "composer-add-files",
+        "composer-permission",
+        "composer-model-chevron",
+        "composer-dictate",
+        "composer-voice",
+      ];
       if (
         contract.view !== "workspace" ||
         contract.frame !== scene.frame ||
@@ -226,7 +246,19 @@ for (const scene of visualScenes) {
         Boolean(contract.worktree) !== worktreeExpected ||
         Boolean(contract.worktreeEnvironment) !==
           worktreeEnvironmentExpected ||
-        Boolean(worktreeTrigger?.disabled) !== repairingExpected
+        Boolean(worktreeTrigger?.disabled) !== repairingExpected ||
+        JSON.stringify(
+          contract.currentIcons.map(({ name }) => name),
+        ) !== JSON.stringify(expectedCurrentIconNames) ||
+        contract.currentIcons.some(({ name, rect: value }) => {
+          const expectedSize =
+            name === "composer-model-chevron" ? 14 : 16;
+          return (
+            !value ||
+            Math.abs(value.width - expectedSize) > 1 ||
+            Math.abs(value.height - expectedSize) > 1
+          );
+        })
       ) {
         throw new Error(
           `${scene.id}: workspace entry contract failed: ${JSON.stringify(contract)}`,
@@ -2626,6 +2658,17 @@ for (const scene of visualScenes) {
                 role: context.getAttribute("role"),
               }
             : null,
+          currentIcons: Array.from(
+            dock.querySelectorAll("[data-current-build-icon]"),
+            (icon) => {
+              const value = icon.getBoundingClientRect();
+              return {
+                height: value.height,
+                name: icon.getAttribute("data-current-build-icon"),
+                width: value.width,
+              };
+            },
+          ),
           dock: {
             hasContext: dock.getAttribute("data-has-context"),
             hasQueue: dock.getAttribute("data-has-queue"),
@@ -2815,6 +2858,19 @@ for (const scene of visualScenes) {
         "composer-auto-continued",
         "composer-queue-paused",
       ].includes(scene.id);
+      const expectedCurrentIconNames = [
+        ...(expectsContext
+          ? [
+              "composer-project",
+              "composer-worktree",
+              "composer-branch",
+            ]
+          : []),
+        "composer-add-files",
+        "composer-permission",
+        "composer-model-chevron",
+        "composer-dictate",
+      ];
       if (
         (expectsContext
           ? conversation.dock.hasContext !== "true" ||
@@ -2822,7 +2878,7 @@ for (const scene of visualScenes) {
             conversation.context.controls.length !== 3 ||
             JSON.stringify(
               conversation.context.controls.map(({ label }) => label),
-            ) !== JSON.stringify(["□codex-ui-kit", "◉Local", "⑂main"]) ||
+            ) !== JSON.stringify(["codex-ui-kit", "Local", "main"]) ||
             conversation.context.controls.some(
               ({ height }) => Math.abs(height - 28) > 1,
             )
@@ -2830,6 +2886,17 @@ for (const scene of visualScenes) {
             conversation.context !== null) ||
         conversation.navigation.label !== "User messages" ||
         conversation.navigation.buttonCount < 10 ||
+        JSON.stringify(
+          conversation.currentIcons.map(({ name }) => name),
+        ) !== JSON.stringify(expectedCurrentIconNames) ||
+        conversation.currentIcons.some(({ name, height, width }) => {
+          const expectedSize =
+            name === "composer-model-chevron" ? 14 : 16;
+          return (
+            Math.abs(width - expectedSize) > 1 ||
+            Math.abs(height - expectedSize) > 1
+          );
+        }) ||
         !conversation.dock.rect ||
         conversation.dock.rect.width < 700 ||
         conversation.dock.rect.width > 740

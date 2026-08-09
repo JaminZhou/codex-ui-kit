@@ -3139,6 +3139,8 @@ export function App() {
       scenarioId === "context-summary" ||
       isCurrentSubagentReplay);
   const showLifecycleComposer = isConversationLifecycle;
+  const currentComposerComposition =
+    currentHeaderReplay || showLifecycleComposer;
   const composerSurface = (
     <AgentComposer
       actions={
@@ -3165,7 +3167,11 @@ export function App() {
               ref={composerResourceTriggerRef}
               type="button"
             >
-              +
+              {currentComposerComposition ? (
+                <CurrentBuildIcon name="composer-add-files" />
+              ) : (
+                "+"
+              )}
             </button>
             <ComposerPermissionMenu
               align="start"
@@ -3197,7 +3203,13 @@ export function App() {
                   className="demo-composer-permission-trigger"
                   type="button"
                 >
-                  <span aria-hidden="true">◉</span>
+                  <span aria-hidden="true">
+                    {currentComposerComposition ? (
+                      <CurrentBuildIcon name="composer-permission" />
+                    ) : (
+                      "◉"
+                    )}
+                  </span>
                   {currentHeaderReplay ||
                   showLifecycleComposer ||
                   isCurrentApprovalReplay
@@ -3246,9 +3258,20 @@ export function App() {
       controls={
         showMeasuredComposer || showLifecycleComposer ? (
           <span className="demo-composer-actions">
-            <span>5.6 Sol Extra High⌄</span>
+            <span className="demo-current-composer-model">
+              <span>5.6 Sol Extra High</span>
+              {currentComposerComposition ? (
+                <CurrentBuildIcon name="composer-model-chevron" />
+              ) : (
+                <span aria-hidden="true">⌄</span>
+              )}
+            </span>
             <button aria-label="Dictate" type="button">
-              ♫
+              {currentComposerComposition ? (
+                <CurrentBuildIcon name="composer-dictate" />
+              ) : (
+                "♫"
+              )}
             </button>
           </span>
         ) : undefined
@@ -3349,11 +3372,21 @@ export function App() {
       context={
         !composerIsRunning && !queueInterrupted ? (
           <ComposerContextBar>
-            <ComposerContextControl icon="□">
+            <ComposerContextControl
+              icon={<CurrentBuildIcon name="composer-project" />}
+            >
               codex-ui-kit
             </ComposerContextControl>
-            <ComposerContextControl icon="◉">Local</ComposerContextControl>
-            <ComposerContextControl icon="⑂">main</ComposerContextControl>
+            <ComposerContextControl
+              icon={<CurrentBuildIcon name="composer-worktree" />}
+            >
+              Local
+            </ComposerContextControl>
+            <ComposerContextControl
+              icon={<CurrentBuildIcon name="composer-branch" />}
+            >
+              main
+            </ComposerContextControl>
           </ComposerContextBar>
         ) : undefined
       }
@@ -3534,7 +3567,7 @@ export function App() {
               ? `Change project: ${workspaceProject.label}`
               : "Choose project",
             controlsId: "demo-workspace-project-dialog",
-            icon: <SidebarGlyph name="folder" />,
+            icon: <CurrentBuildIcon name="composer-project" />,
             id: "project",
             kind: "project",
             label: workspaceProject?.label ?? "Choose project",
@@ -3566,7 +3599,7 @@ export function App() {
                   },
                   {
                     ariaLabel: "Starting state: main",
-                    icon: "⑂",
+                    icon: <CurrentBuildIcon name="composer-branch" />,
                     id: "starting-state",
                     kind: "starting-state" as const,
                     label: "main",
@@ -3580,7 +3613,12 @@ export function App() {
                         : "Codex web"
                     }`,
                     controlsId: "demo-workspace-environment-menu",
-                    icon: "▱",
+                    icon:
+                      workspaceEnvironmentId === "local" ? (
+                        <CurrentBuildIcon name="composer-worktree" />
+                      ) : (
+                        "▱"
+                      ),
                     id: "environment",
                     kind: "run-location" as const,
                     label:
@@ -3591,7 +3629,7 @@ export function App() {
                   },
                   {
                     controlsId: "demo-workspace-worktree-menu",
-                    icon: "⑂",
+                    icon: <CurrentBuildIcon name="composer-branch" />,
                     id: "worktree",
                     kind: "worktree" as const,
                     label: workspaceWorktree.branch,
@@ -3865,10 +3903,11 @@ export function App() {
       actions={
         <span className="demo-composer-controls">
           <button aria-label="Add files and more" type="button">
-            +
+            <CurrentBuildIcon name="composer-add-files" />
           </button>
           <button aria-label="Change permissions" type="button">
-            ◉ Ask for approval
+            <CurrentBuildIcon name="composer-permission" />
+            Ask for approval
           </button>
         </span>
       }
@@ -3877,10 +3916,10 @@ export function App() {
           <span className="demo-workspace-model">
             <span>5.6 Sol</span>
             <span>Extra High</span>
-            <span aria-hidden="true">⌄</span>
+            <CurrentBuildIcon name="composer-model-chevron" />
           </span>
           <button aria-label="Dictate" type="button">
-            ♫
+            <CurrentBuildIcon name="composer-dictate" />
           </button>
           {!composerValue.trim() ? (
             <button
@@ -3888,7 +3927,7 @@ export function App() {
               className="demo-workspace-voice"
               type="button"
             >
-              <span aria-hidden="true">≋</span>
+              <CurrentBuildIcon name="composer-voice" />
             </button>
           ) : null}
         </span>
