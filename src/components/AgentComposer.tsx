@@ -485,19 +485,19 @@ export function ComposerAttachment({
 
   const content = (
     <>
-      {previewSrc ? (
-        <img
-          alt=""
-          className="codex-ui-composer-attachment__preview"
-          src={previewSrc}
-        />
-      ) : kind === "image" && status === "preview-error" ? (
+      {kind === "image" && status === "preview-error" ? (
         <span
           className="codex-ui-composer-attachment__preview-error"
           role="status"
         >
           {resolvedStatusLabel}
         </span>
+      ) : previewSrc ? (
+        <img
+          alt=""
+          className="codex-ui-composer-attachment__preview"
+          src={previewSrc}
+        />
       ) : (
         <span aria-hidden="true" className="codex-ui-composer-attachment__icon">
           {icon ??

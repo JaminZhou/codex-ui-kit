@@ -14,8 +14,20 @@ import {
   type IpcMainInvokeEvent,
 } from "electron";
 import { stat } from "node:fs/promises";
-import { basename, dirname, extname, isAbsolute, join, resolve } from "node:path";
+import {
+  basename,
+  dirname,
+  extname,
+  isAbsolute,
+  join,
+  resolve,
+} from "node:path";
 import { fileURLToPath } from "node:url";
+import {
+  attachmentDialogModeForPlatform,
+  attachmentDialogProperties,
+  type AttachmentDialogKind,
+} from "./attachment-dialog.js";
 import { LiveApprovalGate } from "./live-approval-gate.js";
 import { LiveTurnStartGate } from "./live-turn-start-gate.js";
 import {
@@ -291,17 +303,44 @@ async function describeAttachmentPaths(
   );
 }
 
+async function chooseAttachmentDialogKind(): Promise<
+  AttachmentDialogKind | null
+> {
+  if (attachmentDialogModeForPlatform(process.platform) === "mixed") {
+    return "mixed";
+  }
+  const options = {
+    buttons: ["Files", "Folders", "Cancel"],
+    cancelId: 2,
+    defaultId: 0,
+    message: "What would you like to attach?",
+    noLink: true,
+    title: "Files and folders",
+    type: "question" as const,
+  };
+  const result = mainWindow
+    ? await dialog.showMessageBox(mainWindow, options)
+    : await dialog.showMessageBox(options);
+  return result.response === 0
+    ? "files"
+    : result.response === 1
+      ? "folders"
+      : null;
+}
+
 async function handleSelectAttachments(event: IpcMainInvokeEvent) {
   assertTrustedIpc(event);
   const fixturePaths = attachmentFixturePaths();
   if (fixturePaths) return describeAttachmentPaths(fixturePaths);
+  const kind = await chooseAttachmentDialogKind();
+  if (!kind) return [];
   const result = mainWindow
     ? await dialog.showOpenDialog(mainWindow, {
-        properties: ["openFile", "openDirectory", "multiSelections"],
+        properties: attachmentDialogProperties(kind),
         title: "Files and folders",
       })
     : await dialog.showOpenDialog({
-        properties: ["openFile", "openDirectory", "multiSelections"],
+        properties: attachmentDialogProperties(kind),
         title: "Files and folders",
       });
   if (result.canceled) return [];

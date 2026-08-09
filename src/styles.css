@@ -4239,6 +4239,7 @@
   background: transparent;
   border: 1px solid color-mix(in srgb, var(--codex-ui-text) 16%, transparent);
   border-radius: 0.78125rem;
+  box-sizing: border-box;
   cursor: pointer;
   display: block;
   flex: 0 0 auto;

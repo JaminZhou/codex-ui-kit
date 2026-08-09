@@ -48,6 +48,9 @@ describe("composer visual contract", () => {
       ".codex-ui-composer-attachment__retry:focus-visible",
     );
     expect(styles).toMatch(
+      /\.codex-ui-message-attachment \{[\s\S]*?box-sizing: border-box;/,
+    );
+    expect(styles).toMatch(
       /\.codex-ui-composer-dock__queue \{[\s\S]*?var\(--codex-ui-composer-queue-inline-inset\)[\s\S]*?overflow: hidden;/,
     );
     expect(styles).toMatch(

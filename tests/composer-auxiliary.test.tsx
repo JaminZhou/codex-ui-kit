@@ -139,6 +139,7 @@ describe("composer auxiliary surfaces", () => {
         kind="image"
         label="unavailable.png"
         layout="image"
+        previewSrc="https://example.invalid/unavailable.png"
         status="preview-error"
       />,
     );
