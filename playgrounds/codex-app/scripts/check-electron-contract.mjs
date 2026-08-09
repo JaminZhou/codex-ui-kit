@@ -1225,6 +1225,133 @@ try {
   await markdownStreamingApp.close();
 }
 
+const markdownTableActionsScene = {
+  frame: "markdown-table-complete",
+  id: "electron-markdown-table-actions",
+  scenario: "markdown-table-actions",
+};
+const {
+  app: markdownTableActionsApp,
+  page: markdownTableActionsPage,
+} = await launchScene(markdownTableActionsScene, { capture: false });
+
+try {
+  const nativeBounds = await markdownTableActionsApp.evaluate(
+    ({ BrowserWindow }) => BrowserWindow.getAllWindows()[0]?.getContentBounds(),
+  );
+  if (nativeBounds?.width !== 1180 || nativeBounds?.height !== 820) {
+    throw new Error(
+      `Electron table actions native bounds failed: ${JSON.stringify(nativeBounds)}`,
+    );
+  }
+
+  await markdownTableActionsPage.evaluate(() => {
+    class TestClipboardItem {
+      constructor(items) {
+        this.items = items;
+      }
+    }
+    window.ClipboardItem = TestClipboardItem;
+    Object.defineProperty(navigator, "clipboard", {
+      configurable: true,
+      value: {
+        write: async ([item]) => {
+          const entries = await Promise.all(
+            Object.entries(item.items).map(async ([type, blob]) => [
+              type,
+              await blob.text(),
+            ]),
+          );
+          window.__codexMarkdownTableClipboard = Object.fromEntries(entries);
+        },
+        writeText: async (value) => {
+          window.__codexMarkdownTableClipboard = { "text/plain": value };
+        },
+      },
+    });
+  });
+  const tableContainer = markdownTableActionsPage.locator(
+    '[data-item-id="assistant-markdown-table-actions"] [data-markdown-table]',
+  );
+  const tableScroller = tableContainer.locator(
+    ".codex-ui-markdown__table-scroll",
+  );
+  await tableContainer.hover();
+  await tableContainer.getByRole("button", { name: "Copy table" }).click();
+  await tableContainer.getByRole("button", { name: "Copied" }).waitFor();
+
+  await tableScroller.hover();
+  await markdownTableActionsPage.mouse.wheel(360, 0);
+  await markdownTableActionsPage.waitForFunction(() => {
+    const scroller = document.querySelector(
+      '[data-item-id="assistant-markdown-table-actions"] .codex-ui-markdown__table-scroll',
+    );
+    return scroller instanceof HTMLElement && scroller.scrollLeft > 100;
+  });
+
+  await tableContainer.hover();
+  const expandButton = tableContainer.getByRole("button", {
+    name: "Expand table",
+  });
+  await expandButton.click();
+  const previewDialog = markdownTableActionsPage.getByRole("dialog", {
+    name: "Table preview",
+  });
+  await previewDialog.waitFor({ state: "visible" });
+  await markdownTableActionsPage.waitForFunction(
+    () =>
+      document.activeElement?.getAttribute("aria-label") ===
+      "Close table preview",
+  );
+  const openState = await markdownTableActionsPage.evaluate(() => {
+    const dialog = document.querySelector(
+      '.codex-ui-dialog__surface[role="dialog"]',
+    );
+    const previewTable = dialog?.querySelector("table");
+    const scroller = document.querySelector(
+      '[data-item-id="assistant-markdown-table-actions"] .codex-ui-markdown__table-scroll',
+    );
+    return {
+      activeElement: document.activeElement?.getAttribute("aria-label"),
+      clipboard: window.__codexMarkdownTableClipboard,
+      columns:
+        previewTable instanceof HTMLTableElement
+          ? previewTable.rows[0]?.cells.length ?? 0
+          : 0,
+      rows:
+        previewTable instanceof HTMLTableElement
+          ? previewTable.rows.length
+          : 0,
+      scrollLeft: scroller instanceof HTMLElement ? scroller.scrollLeft : 0,
+    };
+  });
+  await previewDialog.getByRole("button", {
+    name: "Close table preview",
+  }).click();
+  await previewDialog.waitFor({ state: "hidden" });
+  await markdownTableActionsPage.waitForFunction(
+    () => document.activeElement?.getAttribute("aria-label") === "Expand table",
+  );
+  const returnedFocus = await markdownTableActionsPage.evaluate(
+    () => document.activeElement?.getAttribute("aria-label"),
+  );
+  if (
+    openState.activeElement !== "Close table preview" ||
+    openState.columns !== 18 ||
+    openState.rows !== 4 ||
+    openState.scrollLeft <= 100 ||
+    openState.clipboard?.["text/plain"]?.length !== 1_863 ||
+    !openState.clipboard?.["text/html"]?.startsWith("<table>") ||
+    returnedFocus !== "Expand table"
+  ) {
+    throw new Error(
+      `Electron table actions interaction failed: ${JSON.stringify({ openState, returnedFocus })}`,
+    );
+  }
+} finally {
+  await markdownTableActionsApp.close();
+}
+
 const mcpScene = {
   frame: "mcp-tool-calls",
   id: "electron-mcp",

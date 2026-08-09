@@ -5724,6 +5724,267 @@ await writeFile(
   `${JSON.stringify(markdownStreamingContracts, null, 2)}\n`,
 );
 
+const markdownTableActionsScene = {
+  frame: "markdown-table-complete",
+  id: "markdown-table-actions",
+  scenario: "markdown-table-actions",
+};
+const {
+  app: markdownTableActionsApp,
+  page: markdownTableActionsPage,
+} = await launchScene(markdownTableActionsScene, { capture: false });
+try {
+  await markdownTableActionsPage.evaluate(() => {
+    class TestClipboardItem {
+      constructor(items) {
+        this.items = items;
+      }
+    }
+    window.ClipboardItem = TestClipboardItem;
+    Object.defineProperty(navigator, "clipboard", {
+      configurable: true,
+      value: {
+        write: async ([item]) => {
+          const entries = await Promise.all(
+            Object.entries(item.items).map(async ([type, blob]) => [
+              type,
+              await blob.text(),
+            ]),
+          );
+          window.__codexMarkdownTableClipboard = Object.fromEntries(entries);
+        },
+        writeText: async (value) => {
+          window.__codexMarkdownTableClipboard = { "text/plain": value };
+        },
+      },
+    });
+  });
+  const tableContainer = markdownTableActionsPage.locator(
+    '[data-item-id="assistant-markdown-table-actions"] [data-markdown-table]',
+  );
+  await tableContainer.waitFor({ state: "visible" });
+  const inspectTable = () =>
+    markdownTableActionsPage.evaluate(() => {
+      const container = document.querySelector(
+        '[data-item-id="assistant-markdown-table-actions"] [data-markdown-table]',
+      );
+      const table = container?.querySelector("table");
+      const scroller = container?.querySelector(
+        ".codex-ui-markdown__table-scroll",
+      );
+      const actions = container?.querySelector(
+        ".codex-ui-markdown__table-actions",
+      );
+      const firstHeader = table?.querySelector("th");
+      const firstCell = table?.querySelector("td");
+      const rect = (element) => {
+        if (!(element instanceof Element)) return null;
+        const value = element.getBoundingClientRect();
+        return {
+          bottom: value.bottom,
+          height: value.height,
+          left: value.left,
+          right: value.right,
+          top: value.top,
+          width: value.width,
+        };
+      };
+      return {
+        actions: actions
+          ? {
+              opacity: getComputedStyle(actions).opacity,
+              rect: rect(actions),
+            }
+          : null,
+        buttons: Array.from(container?.querySelectorAll("button") ?? [], (button) => ({
+          expanded: button.getAttribute("aria-expanded"),
+          haspopup: button.getAttribute("aria-haspopup"),
+          label: button.getAttribute("aria-label"),
+          rect: rect(button),
+          viewBox: button.querySelector("svg")?.getAttribute("viewBox"),
+        })),
+        columns:
+          table instanceof HTMLTableElement ? table.rows[0]?.cells.length ?? 0 : 0,
+        container: rect(container),
+        firstCell: firstCell
+          ? {
+              fontWeight: getComputedStyle(firstCell).fontWeight,
+              lineHeight: getComputedStyle(firstCell).lineHeight,
+              overflowWrap: getComputedStyle(firstCell).overflowWrap,
+              padding: getComputedStyle(firstCell).padding,
+              rect: rect(firstCell),
+            }
+          : null,
+        firstHeader: firstHeader
+          ? {
+              fontWeight: getComputedStyle(firstHeader).fontWeight,
+              lineHeight: getComputedStyle(firstHeader).lineHeight,
+              overflowWrap: getComputedStyle(firstHeader).overflowWrap,
+              padding: getComputedStyle(firstHeader).padding,
+              rect: rect(firstHeader),
+            }
+          : null,
+        rows: table instanceof HTMLTableElement ? table.rows.length : 0,
+        scroller:
+          scroller instanceof HTMLElement
+            ? {
+                clientWidth: scroller.clientWidth,
+                overflowX: getComputedStyle(scroller).overflowX,
+                rect: rect(scroller),
+                scrollWidth: scroller.scrollWidth,
+              }
+            : null,
+        table: rect(table),
+      };
+    });
+  const resting = await inspectTable();
+  await tableContainer.hover();
+  await markdownTableActionsPage.waitForTimeout(150);
+  const hovered = await inspectTable();
+  const expandButton = tableContainer.getByRole("button", {
+    name: "Expand table",
+  });
+  const copyButton = tableContainer.getByRole("button", {
+    name: "Copy table",
+  });
+  await copyButton.click();
+  await tableContainer.getByRole("button", { name: "Copied" }).waitFor();
+  const clipboard = await markdownTableActionsPage.evaluate(
+    () => window.__codexMarkdownTableClipboard,
+  );
+  await expandButton.click();
+  const previewDialog = markdownTableActionsPage.getByRole("dialog", {
+    name: "Table preview",
+  });
+  await previewDialog.waitFor({ state: "visible" });
+  await markdownTableActionsPage.waitForFunction(
+    () =>
+      document.activeElement?.getAttribute("aria-label") ===
+      "Close table preview",
+  );
+  const preview = await previewDialog.evaluate((dialog) => {
+    const previewSurface = dialog.querySelector(
+      ".codex-ui-markdown-table-preview__surface",
+    );
+    const table = previewSurface?.querySelector("table");
+    const close = dialog.querySelector(
+      'button[aria-label="Close table preview"]',
+    );
+    const closeIcon = close?.querySelector("svg");
+    const rect = (element) => {
+      if (!(element instanceof Element)) return null;
+      const value = element.getBoundingClientRect();
+      return {
+        bottom: value.bottom,
+        height: value.height,
+        left: value.left,
+        right: value.right,
+        top: value.top,
+        width: value.width,
+      };
+    };
+    const surfaceStyle = previewSurface
+      ? getComputedStyle(previewSurface)
+      : null;
+    return {
+      activeElement: document.activeElement?.getAttribute("aria-label"),
+      close: close
+        ? {
+            icon: rect(closeIcon),
+            rect: rect(close),
+            viewBox: closeIcon?.getAttribute("viewBox"),
+          }
+        : null,
+      columns:
+        table instanceof HTMLTableElement ? table.rows[0]?.cells.length ?? 0 : 0,
+      dialog: rect(dialog),
+      rows: table instanceof HTMLTableElement ? table.rows.length : 0,
+      surface: previewSurface
+        ? {
+            borderRadius: surfaceStyle.borderRadius,
+            maxWidth: surfaceStyle.maxWidth,
+            overflowX: surfaceStyle.overflowX,
+            padding: surfaceStyle.padding,
+            rect: rect(previewSurface),
+          }
+        : null,
+      table: rect(table),
+    };
+  });
+  await previewDialog.press("Escape");
+  await previewDialog.waitFor({ state: "hidden" });
+  await markdownTableActionsPage.waitForFunction(
+    () => document.activeElement?.getAttribute("aria-label") === "Expand table",
+  );
+  const returnedFocus = await markdownTableActionsPage.evaluate(
+    () => document.activeElement?.getAttribute("aria-label"),
+  );
+  const labels = hovered.buttons.map(({ label }) => label);
+  const viewBoxes = hovered.buttons.map(({ viewBox }) => viewBox);
+  if (
+    resting.columns !== 18 ||
+    resting.rows !== 4 ||
+    resting.actions?.opacity !== "0" ||
+    resting.scroller?.overflowX !== "auto" ||
+    resting.scroller.scrollWidth - resting.scroller.clientWidth < 700 ||
+    Math.abs((hovered.table?.width ?? 0) - 1_665.86) > 1 ||
+    Math.abs((hovered.table?.height ?? 0) - 323) > 0.5 ||
+    hovered.firstHeader?.padding !== "8px 24px 8px 0px" ||
+    hovered.firstHeader?.fontWeight !== "600" ||
+    hovered.firstHeader?.lineHeight !== "16px" ||
+    hovered.firstHeader?.overflowWrap !== "break-word" ||
+    Math.abs((hovered.firstHeader?.rect?.width ?? 0) - 92.484) > 1 ||
+    Math.abs((hovered.firstHeader?.rect?.height ?? 0) - 49) > 0.5 ||
+    hovered.firstCell?.padding !== "10px 24px 10px 0px" ||
+    hovered.firstCell?.fontWeight !== "445" ||
+    hovered.firstCell?.lineHeight !== "22px" ||
+    hovered.firstCell?.overflowWrap !== "break-word" ||
+    Math.abs((hovered.firstCell?.rect?.width ?? 0) - 92.484) > 1 ||
+    Math.abs((hovered.firstCell?.rect?.height ?? 0) - 87) > 0.5 ||
+    hovered.actions?.opacity !== "1" ||
+    hovered.actions.rect?.width !== 32 ||
+    JSON.stringify(labels) !==
+      JSON.stringify(["Expand table", "Copy table"]) ||
+    JSON.stringify(viewBoxes) !== JSON.stringify(["0 0 20 20", "0 0 21 21"]) ||
+    hovered.buttons.some(
+      ({ rect }) => !rect || Math.abs(rect.width - 24) > 0.5 || Math.abs(rect.height - 24) > 0.5,
+    ) ||
+    clipboard?.["text/plain"]?.length !== 1_863 ||
+    !clipboard?.["text/plain"]?.startsWith("| PROBE-COL-01 |") ||
+    !clipboard?.["text/plain"]?.endsWith("row-3-value-18-abcdefghij |") ||
+    !clipboard?.["text/html"]?.startsWith("<table>") ||
+    preview.activeElement !== "Close table preview" ||
+    preview.columns !== 18 ||
+    preview.rows !== 4 ||
+    preview.dialog?.width !== 1_180 ||
+    preview.dialog?.height !== 820 ||
+    !preview.surface ||
+    preview.surface.borderRadius !== "20px" ||
+    preview.surface.maxWidth !== "80%" ||
+    preview.surface.overflowX !== "auto" ||
+    preview.surface.padding !== "32px" ||
+    !preview.close ||
+    Math.abs(preview.close.rect.height - 40) > 0.5 ||
+    Math.abs(preview.close.rect.width - 42) > 0.5 ||
+    preview.close.viewBox !== "0 0 21 21" ||
+    Math.abs((preview.close.icon?.height ?? 0) - 18) > 0.5 ||
+    Math.abs((preview.close.icon?.width ?? 0) - 18) > 0.5 ||
+    Math.abs(preview.surface.rect.width - 892.8) > 1 ||
+    Math.abs((preview.table?.width ?? 0) - (hovered.table?.width ?? 0)) > 1 ||
+    returnedFocus !== "Expand table"
+  ) {
+    throw new Error(
+      `markdown-table-actions: current-build contract failed: ${JSON.stringify({ clipboard, hovered, preview, resting, returnedFocus })}`,
+    );
+  }
+  await writeFile(
+    join(artifactDirectory, "markdown-table-actions.json"),
+    `${JSON.stringify({ clipboard, hovered, preview, resting, returnedFocus }, null, 2)}\n`,
+  );
+} finally {
+  await markdownTableActionsApp.close();
+}
+
 const sidebarScene = {
   frame: "streaming",
   id: "sidebar-current",

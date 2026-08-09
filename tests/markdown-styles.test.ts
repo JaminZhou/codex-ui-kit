@@ -59,6 +59,20 @@ describe("Markdown visual contract", () => {
     );
   });
 
+  it("locks the current wide-table actions and preview geometry", () => {
+    expect(styles).toContain("overflow-wrap: break-word");
+    expect(styles).toContain("padding-inline-start: 0");
+    expect(styles).toContain(".codex-ui-markdown__table-actions");
+    expect(styles).toContain("inset-inline-end: -2rem");
+    expect(styles).toContain("height: 1.5rem");
+    expect(styles).toContain("background: rgb(0 0 0 / 0.8)");
+    expect(styles).toContain("padding: 3rem 2rem 3.25rem");
+    expect(styles).toContain("background: var(--codex-ui-background-thread-summary)");
+    expect(styles).toContain("border-radius: 1.25rem");
+    expect(styles).toContain("flex: 0 0 80%");
+    expect(styles).toContain("padding: 2rem");
+  });
+
   it("maps independently contrast-safe light and dark highlight roles", () => {
     expect(tokens).toContain(
       "--codex-ui-code-syntax-light-keyword: #a626a4",

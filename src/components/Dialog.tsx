@@ -20,6 +20,7 @@ export type DialogSize = "compact" | "standard" | "wide";
 export interface DialogProps
   extends Omit<HTMLAttributes<HTMLDivElement>, "children" | "title"> {
   children: ReactNode;
+  closeIcon?: ReactNode;
   closeLabel?: string;
   closeOnBackdrop?: boolean;
   closeOnEscape?: boolean;
@@ -83,6 +84,7 @@ function getDialogOwnedPortalTrigger(
 export function Dialog({
   children,
   className,
+  closeIcon,
   closeLabel = "Close dialog",
   closeOnBackdrop = true,
   closeOnEscape = true,
@@ -252,7 +254,7 @@ export function Dialog({
                   onClick={() => onOpenChange(false)}
                   type="button"
                 >
-                  <span aria-hidden="true">×</span>
+                  {closeIcon ?? <span aria-hidden="true">×</span>}
                 </button>
               ) : null}
             </header>

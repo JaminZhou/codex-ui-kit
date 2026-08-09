@@ -126,14 +126,19 @@
         "conversation-markdown",
         "app-asar-26.803.41515:inline-markdown-follow-state-machine-and-table-container-actions",
         "replay:public-delta-link-fence-nested-task-list-table-and-twelve-section-completion",
-        "browser-cdp:five-markdown-streaming-large-checkpoints-and-129-frame-matrix",
+        "replay:current-eighteen-column-markdown-table-copy-expand-and-preview",
+        "browser-cdp:five-markdown-streaming-large-checkpoints-and-131-frame-matrix",
+        "browser-cdp:wide-table-resting-hover-copy-preview-and-focus-contract",
         "electron:code-copy-table-focus-user-scroll-away-and-return-to-latest",
-        "pixel:four-reviewed-markdown-streaming-large-baselines"
+        "electron:wide-table-copy-horizontal-wheel-preview-and-focus-restoration",
+        "pixel:four-reviewed-markdown-streaming-large-baselines",
+        "pixel:two-reviewed-wide-table-baselines-and-current-build-preview-regions"
       ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
         "cdp:heading-lists-table-inline-code-code-block-quote-link-sample",
-        "cdp-26.721:synthetic-heading-inline-code-link-quote-list-table-code-block-906x820"
+        "cdp-26.721:synthetic-heading-inline-code-link-quote-list-table-code-block-906x820",
+        "cdp-26.803.41515:real-eighteen-column-table-copy-expand-and-preview-1180x820"
       ],
       "implementationStatus": "partial",
       "browserStatus": "partial_legacy",
