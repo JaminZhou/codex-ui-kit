@@ -19,6 +19,14 @@ export const currentBaselineViewports: Readonly<{
   wide: Readonly<{ height: number; width: number }>;
 }>;
 
+export const currentBaselineFingerprint: Readonly<{
+  appAsarBytes: number;
+  appAsarSha256: string;
+  appVersion: string;
+  buildNumber: string;
+  chromiumVersion: string;
+}>;
+
 export function selectCurrentMainCandidate<T extends CurrentMainCandidate>(
   candidates: T[],
 ): T;

@@ -12,6 +12,7 @@ import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import {
   assertCurrentBaselineRecord,
+  currentBaselineFingerprint,
   currentBaselineViewports,
   selectCurrentMainCandidate,
   writeCurrentBaselineOutput,
@@ -123,7 +124,11 @@ describe("current baseline capture contract", () => {
       navigation: { width: 274.11 },
       navigationScrollOwners,
       routeMarkers: { newChatHome: 1 },
-      routes: { "Pull requests": [{ ariaCurrent: null }] },
+      routes: Object.fromEntries(
+        ["New chat", "Plugins", "Pull requests", "Scheduled", "Sites"].map(
+          (route) => [route, [{ ariaCurrent: null }]],
+        ),
+      ),
       viewport: { devicePixelRatio: 1, height, width },
     });
     const wide = state(
@@ -170,16 +175,26 @@ describe("current baseline capture contract", () => {
       }),
       controls: { "Show sidebar": [{}] },
       navigation: null,
+      routes: Object.fromEntries(
+        ["New chat", "Plugins", "Pull requests", "Scheduled", "Sites"].map(
+          (route) => [route, []],
+        ),
+      ),
     };
     const compactPullRequests = {
       ...compactPinned,
       editor: null,
       routeMarkers: { newChatHome: 0 },
-      routes: { "Pull requests": [{ ariaCurrent: "page" }] },
+      routes: {
+        ...compactPinned.routes,
+        "Pull requests": [{ ariaCurrent: "page" }],
+      },
     };
     const record = {
       baseline: {
-        appAsarSha256: "a".repeat(64),
+        appAsarBytes: 223_450_200,
+        appAsarSha256:
+          "5f6e773aafd542d3cf09e10b5dca6cabd301d0a155f4b8ce870e3915fc3da25e",
         appVersion: "26.803.41515",
         buildNumber: "6321",
         chromiumVersion: "151.0.7922.76",
@@ -199,7 +214,14 @@ describe("current baseline capture contract", () => {
     };
 
     expect(() => assertCurrentBaselineRecord(record)).not.toThrow();
+    expect(currentBaselineFingerprint.appVersion).toBe("26.803.41515");
     expect(currentBaselineViewports.compact.width).toBe(720);
+    expect(() =>
+      assertCurrentBaselineRecord({
+        ...record,
+        baseline: { ...record.baseline, appVersion: "26.804.0" },
+      }),
+    ).toThrow("promoted build fingerprint");
     expect(() =>
       assertCurrentBaselineRecord({ ...record, projectName: "private" }),
     ).toThrow("forbidden user-content key");
@@ -263,6 +285,18 @@ describe("current baseline capture contract", () => {
         },
       }),
     ).toThrow("sidebar scroll ownership");
+    expect(() =>
+      assertCurrentBaselineRecord({
+        ...record,
+        states: {
+          ...record.states,
+          mediumNewChat: {
+            ...record.states.mediumNewChat,
+            routes: { ...record.states.mediumNewChat.routes, Sites: [] },
+          },
+        },
+      }),
+    ).toThrow("primary navigation route stack");
     expect(() =>
       assertCurrentBaselineRecord({
         ...record,

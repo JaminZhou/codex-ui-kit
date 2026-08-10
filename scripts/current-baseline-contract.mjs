@@ -9,6 +9,23 @@ export const currentBaselineViewports = Object.freeze({
   wide: Object.freeze({ height: 820, width: 1180 }),
 });
 
+export const currentBaselineFingerprint = Object.freeze({
+  appAsarBytes: 223_450_200,
+  appAsarSha256:
+    "5f6e773aafd542d3cf09e10b5dca6cabd301d0a155f4b8ce870e3915fc3da25e",
+  appVersion: "26.803.41515",
+  buildNumber: "6321",
+  chromiumVersion: "151.0.7922.76",
+});
+
+const primaryRoutes = Object.freeze([
+  "New chat",
+  "Plugins",
+  "Pull requests",
+  "Scheduled",
+  "Sites",
+]);
+
 const isMainRendererUrl = (url) =>
   url === "app://-/index.html" || url.startsWith("app://-/index.html?");
 
@@ -95,13 +112,13 @@ export function assertCurrentBaselineRecord(record) {
   if (record?.schemaVersion !== 1) {
     throw new Error("Current baseline record must use schema version 1.");
   }
-  if (
-    !record.baseline?.appVersion ||
-    !record.baseline?.buildNumber ||
-    !/^[a-f0-9]{64}$/.test(record.baseline?.appAsarSha256 ?? "") ||
-    !record.baseline?.chromiumVersion
-  ) {
-    throw new Error("Current baseline record is missing its build fingerprint.");
+  const fingerprintMismatch = Object.entries(currentBaselineFingerprint).some(
+    ([key, expected]) => record.baseline?.[key] !== expected,
+  );
+  if (fingerprintMismatch) {
+    throw new Error(
+      "Current baseline record does not match the promoted build fingerprint.",
+    );
   }
   if (
     record.captureKind !== "renderer_emulation" ||
@@ -178,6 +195,24 @@ export function assertCurrentBaselineRecord(record) {
   ) {
     throw new Error(
       `Current baseline record does not prove the New chat route boundary: ${JSON.stringify({ newChatMarkerStates, pullRequestsNewChatHome: pullRequests.routeMarkers?.newChatHome ?? null })}`,
+    );
+  }
+  const visibleNavigationStates = [
+    "wideNewChat",
+    "mediumNewChat",
+    "thresholdNewChat",
+    "compactPinned",
+    "compactPullRequests",
+    "compactRestored",
+  ];
+  const invalidRouteStacks = visibleNavigationStates.filter((state) =>
+    primaryRoutes.some(
+      (route) => record.states[state].routes?.[route]?.length !== 1,
+    ),
+  );
+  if (invalidRouteStacks.length > 0) {
+    throw new Error(
+      `Current baseline record does not prove the primary navigation route stack: ${JSON.stringify(invalidRouteStacks)}`,
     );
   }
   const expectedGeometryByState = {

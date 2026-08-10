@@ -214,8 +214,13 @@ const inspectShellState = (page) =>
       [...document.querySelectorAll(`[aria-label="${CSS.escape(label)}"]`)]
         .filter(visible)
         .map((element) => rect(element));
+    const navigation = [...document.querySelectorAll("nav")].find(visible);
     const fixedRouteState = (label) =>
-      [...document.querySelectorAll('a, button, [role="button"], [role="tab"]')]
+      [
+        ...(navigation?.querySelectorAll(
+          'a, button, [role="button"], [role="tab"]',
+        ) ?? []),
+      ]
         .filter(
           (element) =>
             visible(element) && element.textContent?.trim() === label,
@@ -231,7 +236,6 @@ const inspectShellState = (page) =>
       ),
     ].find(visible);
     const editorStyle = editor ? getComputedStyle(editor) : null;
-    const navigation = [...document.querySelectorAll("nav")].find(visible);
     const navigationScrollOwners = navigation
       ? [...navigation.querySelectorAll("*")]
           .filter((element) => {
