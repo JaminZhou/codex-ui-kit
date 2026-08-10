@@ -221,6 +221,30 @@ describe("current baseline capture contract", () => {
         ...record,
         states: {
           ...record.states,
+          compactPullRequests: {
+            ...record.states.compactPullRequests,
+            editor: { rect: { height: 44, left: 302.11, width: 389.89 } },
+          },
+        },
+      }),
+    ).toThrow("responsive shell and route-continuity contract");
+    expect(() =>
+      assertCurrentBaselineRecord({
+        ...record,
+        states: {
+          ...record.states,
+          compactRestored: {
+            ...record.states.compactRestored,
+            navigation: { width: 260 },
+          },
+        },
+      }),
+    ).toThrow("responsive shell and route-continuity contract");
+    expect(() =>
+      assertCurrentBaselineRecord({
+        ...record,
+        states: {
+          ...record.states,
           compactRestored: {
             ...record.states.compactRestored,
             viewport: { devicePixelRatio: 1, height: 681, width: 720 },

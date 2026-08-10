@@ -213,8 +213,13 @@ export function assertCurrentBaselineRecord(record) {
     pinnedNavigationWidth: pinned.navigation?.width ?? null,
     pullRequestsCurrent:
       pullRequests.routes?.["Pull requests"]?.[0]?.ariaCurrent ?? null,
+    pullRequestsEditor: pullRequests.editor,
+    pullRequestsMainCount: pullRequests.main?.length ?? 0,
+    pullRequestsMainWidth: pullRequests.main?.[0]?.width ?? null,
+    pullRequestsNavigationWidth: pullRequests.navigation?.width ?? null,
     restoredEditor: Boolean(restored.editor),
     restoredNavigation: Boolean(restored.navigation),
+    restoredNavigationWidth: restored.navigation?.width ?? null,
     thresholdNavigationWidth: threshold.navigation?.width ?? null,
     wideNavigationWidth: wide.navigation?.width ?? null,
   };
@@ -236,8 +241,13 @@ export function assertCurrentBaselineRecord(record) {
     responsiveContract.collapsedShowCount !== 1 ||
     Math.abs((responsiveContract.pinnedNavigationWidth ?? 0) - 274.11) > 1 ||
     responsiveContract.pullRequestsCurrent !== "page" ||
+    responsiveContract.pullRequestsEditor !== null ||
+    responsiveContract.pullRequestsMainCount !== 1 ||
+    !withinTolerance(responsiveContract.pullRequestsMainWidth, 445.89) ||
+    !withinTolerance(responsiveContract.pullRequestsNavigationWidth, 274.11) ||
     !responsiveContract.restoredNavigation ||
     !responsiveContract.restoredEditor ||
+    !withinTolerance(responsiveContract.restoredNavigationWidth, 274.11) ||
     Object.values(responsiveContract.overflowStates).some(
       (value) => Math.abs(value) > 1,
     )
