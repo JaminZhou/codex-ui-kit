@@ -4712,7 +4712,8 @@ button.codex-ui-activity__header {
 }
 
 .codex-ui-activity__disclosure[data-open]
-  .codex-ui-activity__button-chevron::after {
+  > .codex-ui-activity__header
+  > .codex-ui-activity__button-chevron::after {
   transform: rotate(45deg) translateY(-0.1rem);
 }
 

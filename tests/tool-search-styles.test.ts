@@ -35,6 +35,11 @@ describe("tool and search visual contract", () => {
     expect(styles).toMatch(
       /\.codex-ui-activity__button-chevron \{[\s\S]*?flex: 0 0 0\.75rem;[\s\S]*?opacity: 0/,
     );
+    expect(styles).toContain(
+      `.codex-ui-activity__disclosure[data-open]
+  > .codex-ui-activity__header
+  > .codex-ui-activity__button-chevron::after`,
+    );
   });
 
   it("supports the neutral output treatment used by recovered MCP failures", () => {
