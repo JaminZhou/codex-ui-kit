@@ -121,6 +121,53 @@ they are not labeled current runtime observation or external product-pixel
 parity. A future disposable real task can promote each path only after its
 trigger, exact target, cleanup, and non-sensitive capture boundary are safe.
 
+### Current `26.803.41515` global-shell baseline
+
+The reproducible shell capture is implemented by
+`scripts/capture-current-baseline.mjs`. It accepts only an isolated loopback
+CDP port, an absolute unique profile under `/private/tmp` or Trash, an explicit
+navigation opt-in, and an optional output inside that exact profile. Before
+connecting it verifies the installed build fingerprint, exact listener
+ownership, executable argv, canonical profile, and listener-child parentage.
+Main-target selection uses URL, area, `main`/navigation/sidebar-trigger/textbox
+landmarks, and visible-control density; it never selects by target order or
+private text.
+
+Run it only against the separately opened process:
+
+```bash
+CODEX_CURRENT_BASELINE_CDP_PORT=${codex_cdp_port} \
+CODEX_CURRENT_BASELINE_PROFILE=${codex_probe_dir} \
+CODEX_CURRENT_BASELINE_ALLOW_NAVIGATION=1 \
+CODEX_CURRENT_BASELINE_OUTPUT=${codex_probe_dir}/current-baseline.json \
+pnpm capture:current-baseline
+```
+
+The allowlisted sequence is New chat → fixed viewport matrix → explicit Hide
+and Show at 720px → Pull requests → New chat. The JSON contains only build,
+target structure, fixed route/control state, computed editor style, geometry,
+scroll ownership, viewport, theme, and overflow. It never captures screenshots
+or arbitrary page/body text. Ancestor-aware `checkVisibility()` distinguishes
+the visible navigation from retained hidden layout nodes, and consecutive
+geometry samples exclude transition frames. Do not hard reload the product
+Renderer: native initialization is not guaranteed to replay and a reload can
+leave an empty app document.
+
+The resulting metrics are Renderer viewport emulation, not proof of a native
+BrowserWindow resize. Compare the same 1180/820/721/720 matrix separately in
+Electron and keep regional product screenshots local-only. Cleanup must resolve
+the exact owning PID from the declared profile, terminate only that process
+tree, verify the loopback listener and profile argv are gone, and remove or
+move only the exact temporary profile.
+
+For the 2026-08-10 sample and fresh-profile repeat, cleanup terminated validated
+main PIDs `8126`, `10432`, and `13291` plus the six exact profile-owned
+reparented Crashpad handlers. Ports `9771` and `9781` closed, no process
+retained either profile path, and the raw records and local-only screenshots
+moved with the exact profiles to the recoverable Trash items
+`codex-ui-kit-baseline-cdp.ttx3i1-20260810` and
+`codex-ui-kit-baseline-cdp.l7K0Uy-20260810`.
+
 ### Current application-shell capture
 
 The `26.721.81911` App shell capture used an exact second main process with a

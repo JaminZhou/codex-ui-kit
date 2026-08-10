@@ -10,12 +10,11 @@ exit gates; it does not replace the inventory.
 
 ## Current position
 
-- The installed package is Codex Desktop `26.803.41515` (`6321`). The broader
-  UI inventory evidence baseline remains `26.730.61639` (`6234`) until those
-  surfaces are rerun; only the scoped sidebar, window-chrome, and Composer
-  visual/interaction slice has been refreshed on the newer build.
+- The installed package and machine-readable evidence baseline are Codex
+  Desktop `26.803.41515` (`6321`). Unsampled `26.730.61639` surfaces remain
+  previous-build regression evidence rather than current verification.
 - The inventory contains 81 surface groups: 53 P0, 19 P1, and 9 P2.
-- 5 groups have current-build runtime evidence, 59 have previous-build-only runtime evidence, and 17 have not been sampled.
+- 11 groups have current-build runtime evidence, 53 have previous-build-only runtime evidence, and 17 have not been sampled.
 - The scoped `26.803.41515` refresh binds 25 sidebar/window-chrome/Composer icons to
   exact runtime evidence. Its latest hover/footer follow-up promotes More, Pin,
   Archive, and Help, confirms that Settings is absent from the sampled footer
@@ -27,7 +26,14 @@ exit gates; it does not replace the inventory.
   Branch, Add files, Permission, Model chevron, Dictate, and Voice, reducing
   the scoped visible-shell denominator to zero while explicitly retaining the
   broader inventory/lifecycle blocker.
-- The current `26.730.61639` refresh covers the local Terminal session shell,
+- A reproducible sanitized global-shell capture now selects the main Renderer
+  structurally, records dark 1180×820, 820×680, 721×680, and 720×680 geometry,
+  normalizes collapsed and explicitly pinned narrow states, verifies Pull
+  requests → New chat restoration, and records zero horizontal overflow. Its
+  Browser/CDP and Electron counterparts cover the same boundary and owned
+  regional pixels. The capture is Renderer emulation; native resize remains a
+  separate Electron gate.
+- The previous `26.730.61639` refresh covers the local Terminal session shell,
   a real bounded running/completed command with panel persistence, and the
   cross-worktree mismatch warning plus recovery actions. It locks
   project-labelled/global-indexed tabs, close-nearest and label reindexing,
@@ -238,7 +244,7 @@ new parity claims:
 - re-observe the shell, left sidebar, conversation, Composer, Review, Terminal,
   Markdown, and MCP anchors;
 - retain previous-build results as regression fixtures while promoting only
-  surfaces re-observed on `26.730.61309`;
+  surfaces re-observed on `26.803.41515`;
 - update inventory evidence prefixes and the current build note.
 
 Exit: the current build has a reproducible CDP capture recipe and no

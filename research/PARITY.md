@@ -6,11 +6,11 @@ not establish full conversation, workspace, application, or product coverage.
 
 The authoritative current-build inventory is:
 
-- [`26.803.41515.md`](26.803.41515.md) for the newer, narrowly scoped visual
-  asset fingerprint and sidebar-icon provenance refresh; it does not replace
-  the broader full-surface inventory baseline;
-- [`26.730.61639.md`](26.730.61639.md) for the current package fingerprint,
-  Terminal session/process/mismatch captures, and current runtime boundary;
+- [`26.803.41515.md`](26.803.41515.md) for the current package fingerprint,
+  reproducible global-shell baseline, scoped visual assets, Markdown table,
+  attachment boundary, and sidebar/Composer/window-chrome provenance;
+- [`26.730.61639.md`](26.730.61639.md) for the previous Terminal
+  session/process/mismatch and subagent captures;
 - [`26.730.61309.md`](26.730.61309.md) for the previous sidebar, command,
   approval, thread-overlay, pasted-image attachment, workspace-entry, and
   Review captures;
@@ -49,6 +49,16 @@ The authoritative current-build inventory is:
   context/action icons are exact. This empties the scoped visible-shell
   approximation list without making the broader inventory or lifecycle
   denominator complete, so global pixel parity remains ineligible.
+- The same installed fingerprint now owns the machine-readable baseline. A
+  sanitized capture selects the main `app://-/index.html` Renderer by URL,
+  area, shell landmarks, and visible-control density; it excludes the avatar
+  overlay and stores no private text or screenshot. It records the 274.11px
+  sidebar at 1180/820/721, the exact 720px collapsed state, explicit 720px
+  pinning, Pull requests selection, New chat restoration, stable 44px editor
+  geometry, internal scroll ownership, and zero horizontal overflow. Matching
+  Browser/CDP, Electron, and owned regional-pixel gates promote only those
+  sampled shell groups. The capture is Renderer emulation, not native-window
+  resize evidence.
 - Computer Use exploration is blocked by the environment safety policy for
   `com.openai.codex`. User-authorized CDP probes on `26.721.41059` revalidated
   access, the main-shell target shape, a de-identified Projects entry/list,
@@ -70,7 +80,7 @@ The authoritative current-build inventory is:
   behavior, code search, broader connectors, or the wider thread-error, queue,
   Markdown variants, menu, global-route, and Settings states; those remain
   historical evidence from `26.715.72359` until sampled again.
-- The current Codex Desktop `26.730.61639` (`6234`) Terminal refresh locks the
+- The previous Codex Desktop `26.730.61639` (`6234`) Terminal refresh locks the
   local project-labelled session shell, global visible numbering across
   workspaces, nearest-tab selection, label reindexing, the four-item picker,
   three-tab compact fit, and independent transcript state. A real bounded
