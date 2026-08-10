@@ -70,8 +70,10 @@ export function assertCurrentSidebarLifecycle(lifecycle) {
     responsive?.keyboardRestored,
   ];
   if (
-    baseline?.projectGroupCount < 5 ||
-    baseline?.expandedProjectGroupCount < 5 ||
+    !Number.isSafeInteger(baseline?.projectGroupCount) ||
+    baseline.projectGroupCount < 5 ||
+    !Number.isSafeInteger(baseline?.expandedProjectGroupCount) ||
+    baseline.expandedProjectGroupCount < 5 ||
     baseline?.projectRow?.tag !== "div" ||
     baseline?.projectRow?.role !== "button" ||
     baseline?.projectRow?.tabIndex !== 0 ||

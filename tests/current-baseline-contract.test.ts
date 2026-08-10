@@ -370,6 +370,26 @@ describe("current baseline capture contract", () => {
         },
       }),
     ).toThrow("Help menu boundary");
+    for (const invalidCount of [undefined, 5.5]) {
+      expect(() =>
+        assertCurrentSidebarLifecycle({
+          ...record.sidebarLifecycle,
+          baseline: {
+            ...record.sidebarLifecycle.baseline,
+            projectGroupCount: invalidCount,
+          },
+        }),
+      ).toThrow("project-group baseline");
+      expect(() =>
+        assertCurrentSidebarLifecycle({
+          ...record.sidebarLifecycle,
+          baseline: {
+            ...record.sidebarLifecycle.baseline,
+            expandedProjectGroupCount: invalidCount,
+          },
+        }),
+      ).toThrow("project-group baseline");
+    }
     expect(() =>
       assertCurrentBaselineRecord({
         ...record,
