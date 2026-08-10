@@ -195,9 +195,15 @@ The stricter repeat used four exact profiles on port `9783`: two fail-closed
 calibration runs and two successful independent fresh-profile captures. It
 terminated validated main PIDs `23684`, `24617`, `25197`, and `25532` plus
 their eight exact profile-owned Crashpad handlers; the port closed and no
-profile argv remained. All four profiles moved recoverably to Trash. The two
-successful records were byte-identical with SHA-256
+profile argv remained. All four profiles moved recoverably to Trash. Before
+runtime-bundle identity was added, the two successful records were
+byte-identical with SHA-256
 `751ce8d580a4fc3c5ea61fde71e22db1f8098dd336438eab5725a020f50abf1c`.
+That is a historical pre-hardening artifact, not a reproducible current-output
+hash: current records intentionally include run-specific owner PID, process
+start time, and before/after check times. Current reproducibility means the
+stable fingerprint, state matrix, geometry, controls, and runtime-identity
+relations satisfy the same contract across runs.
 The optional output is restricted to a new direct child of the canonical
 profile and is atomically opened with no symlink following; capture refuses to
 overwrite an existing path. The record must match the promoted app version,
