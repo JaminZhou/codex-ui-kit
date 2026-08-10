@@ -45,50 +45,33 @@ observation from a previous build remains historical evidence.
 
 ## Current baseline
 
-- Codex Desktop `26.730.61639` (`6234`)
-- Package sampled and reverified on 2026-08-06
+- Codex Desktop `26.803.41515` (`6321`)
+- Package sampled on 2026-08-08 and reverified on 2026-08-10
 - `app.asar` SHA-256:
-  `3fea92820c0fb7a69473e7a8308a8e5b8e91524289a84181a33533ec6cb51d45`
+  `5f6e773aafd542d3cf09e10b5dca6cabd301d0a155f4b8ce870e3915fc3da25e`
 - Computer Use automation: blocked by the environment safety policy for
   `com.openai.codex`
 - Scoped CDP automation: available through a user-authorized second process;
   the Chromium profile is separate, but Codex application data and navigation
   are not fully isolated
-- Fresh current-build Renderer evidence covers the Terminal session shell,
-  direct-shell running/completed persistence, and the cross-worktree mismatch
-  recovery. It verifies project-labelled tabs, multi-tab reindexing,
-  close-nearest selection, the four-item picker, 820×680 fit, independent
-  transcripts, close/reopen while a process runs, close-last collapse, fresh
-  creation from the top Toggle, and `Dismiss`/`Open new terminal` recovery.
-  A separate current-build task now also covers one real delegated subagent
-  from active work through completion, the thread-summary row, wide side-panel
-  list, nested transcript, and explicit 820×680 and 720×680 panel reopen. Two
-  additional tasks cover concurrent siblings and a Parent → Child delegation:
-  both reach active, mixed active/done, completed, summary, flat panel, and
-  independent transcript states while public `agentPath` metadata preserves
-  the nested hierarchy.
-  All `26.730.61309` observations remain previous-build evidence until each
-  surface is separately reached on `26.730.61639`.
+- Fresh current-build Renderer evidence now covers the New chat destination,
+  1180×820 and 820×680 shell, the exact 721→720 sidebar boundary, explicit
+  compact pinning, Pull requests selection and return to New chat, current
+  Composer geometry, zero horizontal overflow, and stable sidebar scroll
+  ownership. Structural target ranking excludes the avatar overlay without
+  using private text, and warmed consecutive captures are field-identical.
+- Earlier probes on this same fingerprint cover current context/Composer
+  assets, Recents actions, window chrome, an 18-column Markdown table, and the
+  bounded attachment entry/structure evidence described in
+  [`26.803.41515.md`](26.803.41515.md). The scoped visible-shell approximation
+  list is empty, but the broader lifecycle denominator remains incomplete.
+- Terminal and subagent runtime captures from `26.730.61639` are retained as
+  previous-build regression evidence and have been downgraded from `verified`
+  to `partial_legacy` until they are reached again on the current fingerprint.
 
-A later, deliberately narrower `26.803.41515` (`6321`) probe refreshes the
-sidebar/window-chrome/Composer visual/action slice and binds 25 icon primitives to
-exact runtime evidence. It also confirms current project/task hover actions,
-the Help footer, and no leading glyph in sampled project-task rows. The Recents follow-up
-independently scrolls to six task rows, pairs their Pin/Archive controls, and
-confirms zero leading SVGs, removing the `sidebar-thread` approximation. The
-next follow-up promotes the visible Sidebar/Back/Forward titlebar controls.
-The Composer follow-up promotes Project, Worktree, Branch, Add files,
-Permission, Model chevron, Dictate, and Voice, leaving zero scoped
-visible-shell approximations while the broader inventory and current-build
-lifecycle denominator remain incomplete. This is documented in
-[`26.803.41515.md`](26.803.41515.md) and does not change this broader
-inventory's `26.730.61639` current-build counts or promote untested routes and
-lifecycles.
-
-Current inventory: 81 surface groups; 5 have current-build runtime evidence, 59 have previous-build-only runtime evidence, 17 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 5 groups and Electron verification covers 5.
-Prior acceptance outside the sampled Terminal session, process, and mismatch
-slices remains recorded as `partial_legacy` until current-build
-re-observation.
+Current inventory: 81 surface groups; 11 have current-build runtime evidence, 53 have previous-build-only runtime evidence, 17 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 10 groups and Electron verification covers 10.
+Prior acceptance outside those 11 sampled current-build groups remains
+recorded as `partial_legacy` until current-build re-observation.
 
 The current package exposes candidates far beyond the old transcript sample:
 application and thread shells, local/remote conversation routes, projects and

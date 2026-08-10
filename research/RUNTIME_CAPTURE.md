@@ -121,6 +121,108 @@ they are not labeled current runtime observation or external product-pixel
 parity. A future disposable real task can promote each path only after its
 trigger, exact target, cleanup, and non-sensitive capture boundary are safe.
 
+### Current `26.803.41515` global-shell baseline
+
+The reproducible shell capture is implemented by
+`scripts/capture-current-baseline.mjs`. It accepts only an isolated loopback
+CDP port, an absolute unique profile under `/private/tmp` or Trash, an explicit
+navigation opt-in, and an optional output inside that exact profile. Before
+connecting it verifies the installed build fingerprint, exact listener
+ownership, executable argv, canonical profile, and listener-child parentage.
+It also records the isolated owner start time and hashes the ASAR both before
+and after Renderer sampling. The ASAR device, inode, size, hash, and latest
+metadata-change time must remain identical, and that change must predate the
+owner process by at least the start-time clock boundary. This fails closed if
+the installed bundle is replaced after the running Renderer starts, rather
+than attributing an old Renderer to newly installed bytes.
+Main-target selection uses URL, area, route-independent `main`/navigation/
+sidebar-trigger landmarks, and visible-control density; it never selects by
+target order or private text. A Composer is not required until the fixed New
+chat route has been selected, so a process restored on Pull requests can still
+be normalized safely.
+
+Run it only against the separately opened process:
+
+```bash
+CODEX_CURRENT_BASELINE_CDP_PORT=${codex_cdp_port} \
+CODEX_CURRENT_BASELINE_PROFILE=${codex_probe_dir} \
+CODEX_CURRENT_BASELINE_ALLOW_NAVIGATION=1 \
+CODEX_CURRENT_BASELINE_OUTPUT=${codex_probe_dir}/current-baseline.json \
+pnpm capture:current-baseline
+```
+
+The allowlisted sequence is New chat → fixed viewport matrix → prove automatic
+collapse at 720px → explicit Show/pin → Pull requests → New chat → explicit
+Hide cleanup. The JSON contains only build, target structure, fixed
+route/control state, computed editor style, geometry, scroll ownership,
+viewport, theme, and overflow. It never captures screenshots or arbitrary
+page/body text. Ancestor-aware `checkVisibility()` distinguishes the visible
+navigation from retained hidden layout nodes, and consecutive geometry samples
+exclude transition frames. Do not hard reload the product Renderer: native
+initialization is not guaranteed to replay and a reload can leave an empty app
+document.
+
+The same route boundary applies on failure. A best-effort `finally` cleanup
+returns the selected Renderer to New chat when necessary and independently
+attempts to hide the sidebar before disconnecting CDP; one failed cleanup step
+does not skip the remaining step or replace the original capture error.
+
+New chat is ready only when its fixed `home-icon` route marker is visible; a
+pre-existing Composer is insufficient. The contract requires that marker in
+all New chat samples, rejects it on Pull requests, and rejects any missing or
+non-finite horizontal-overflow measurement. At 720px, inspect and reject a
+still-visible sidebar before any explicit sidebar normalization. Validate the
+documented main and Composer geometry in every New chat state plus the single
+navigation-owned wide/medium vertical scroller.
+
+The resulting metrics are Renderer viewport emulation, not proof of a native
+BrowserWindow resize. Compare the same 1180/820/721/720 matrix separately in
+Electron and keep regional product screenshots local-only. Cleanup must resolve
+the exact owning PID from the declared profile, terminate only that process
+tree, verify the loopback listener and profile argv are gone, and remove or
+move only the exact temporary profile.
+
+For the 2026-08-10 sample and repeats, cleanup terminated validated main PIDs
+`8126`, `10432`, `13291`, and `17788` plus the eight exact profile-owned
+reparented Crashpad handlers. Ports `9771`, `9781`, and `9782` closed, no
+process retained any profile path, and the raw records and local-only screenshots
+moved with the exact profiles to the recoverable Trash items
+`codex-ui-kit-baseline-cdp.ttx3i1-20260810` and
+`codex-ui-kit-baseline-cdp.l7K0Uy-20260810`, plus
+`codex-ui-kit-route-cdp.zdFyJ5-20260810`.
+
+The stricter repeat used four exact profiles on port `9783`: two fail-closed
+calibration runs and two successful independent fresh-profile captures. It
+terminated validated main PIDs `23684`, `24617`, `25197`, and `25532` plus
+their eight exact profile-owned Crashpad handlers; the port closed and no
+profile argv remained. All four profiles moved recoverably to Trash. Before
+runtime-bundle identity was added, the two successful records were
+byte-identical with SHA-256
+`751ce8d580a4fc3c5ea61fde71e22db1f8098dd336438eab5725a020f50abf1c`.
+That is a historical pre-hardening artifact, not a reproducible current-output
+hash: current records intentionally include run-specific owner PID, process
+start time, and before/after check times. Current reproducibility means the
+stable fingerprint, state matrix, geometry, controls, and runtime-identity
+relations satisfy the same contract across runs.
+The optional output is restricted to a new direct child of the canonical
+profile and is atomically opened with no symlink following; capture refuses to
+overwrite an existing path. The record must match the promoted app version,
+build number, app.asar size/SHA-256, and Chromium version exactly. All five
+primary routes must appear once inside `nav` whenever navigation is visible.
+The fixed control matrix requires Back/Forward in every state, mutually
+exclusive Hide/Show sidebar controls, Composer controls on New chat, and no
+Composer controls on Pull requests.
+
+The runtime-identity repeat used exact main PID `32692`, loopback port `9785`,
+and one fresh profile. Its owner started at `1786326246000` ms; both ASAR reads
+reported device `16777231`, inode `341558647`, 223450200 bytes, change time
+`1786150111510` ms, and the promoted SHA-256. The successful record hash is
+`f8f4bb0381ac951af3c972d12778d62476dbd557986183a97b5d492ab330c04c`.
+Cleanup terminated only that main process and its two reparented Crashpad
+handlers, verified the port and exact profile argv were gone, and moved the
+record recoverably to
+`codex-ui-kit-runtime-id-cdp.TkSi3W-20260810` in Trash.
+
 ### Current application-shell capture
 
 The `26.721.81911` App shell capture used an exact second main process with a
