@@ -102,6 +102,27 @@ export function assertCurrentBaselineRecord(record) {
   const pinned = record.states.compactPinned;
   const pullRequests = record.states.compactPullRequests;
   const restored = record.states.compactRestored;
+  const newChatMarkerStates = Object.fromEntries(
+    [
+      "wideNewChat",
+      "mediumNewChat",
+      "thresholdNewChat",
+      "compactCollapsed",
+      "compactPinned",
+      "compactRestored",
+    ].map((state) => [
+      state,
+      record.states[state].routeMarkers?.newChatHome ?? null,
+    ]),
+  );
+  if (
+    Object.values(newChatMarkerStates).some((value) => value !== 1) ||
+    pullRequests.routeMarkers?.newChatHome !== 0
+  ) {
+    throw new Error(
+      `Current baseline record does not prove the New chat route boundary: ${JSON.stringify({ newChatMarkerStates, pullRequestsNewChatHome: pullRequests.routeMarkers?.newChatHome ?? null })}`,
+    );
+  }
   const responsiveContract = {
     collapsedNavigation: collapsed.navigation,
     collapsedShowCount: collapsed.controls?.["Show sidebar"]?.length ?? 0,
@@ -120,6 +141,15 @@ export function assertCurrentBaselineRecord(record) {
     wideNavigationWidth: wide.navigation?.width ?? null,
   };
   if (
+    Object.values(responsiveContract.overflowStates).some(
+      (value) => !Number.isFinite(value),
+    )
+  ) {
+    throw new Error(
+      "Current baseline record requires a finite horizontal-overflow measurement for every state.",
+    );
+  }
+  if (
     Math.abs((responsiveContract.wideNavigationWidth ?? 0) - 274.11) > 1 ||
     Math.abs((responsiveContract.thresholdNavigationWidth ?? 0) - 274.11) >
       1 ||
@@ -130,7 +160,7 @@ export function assertCurrentBaselineRecord(record) {
     !responsiveContract.restoredNavigation ||
     !responsiveContract.restoredEditor ||
     Object.values(responsiveContract.overflowStates).some(
-      (value) => Math.abs(value ?? 0) > 1,
+      (value) => Math.abs(value) > 1,
     )
   ) {
     throw new Error(

@@ -153,6 +153,11 @@ geometry samples exclude transition frames. Do not hard reload the product
 Renderer: native initialization is not guaranteed to replay and a reload can
 leave an empty app document.
 
+New chat is ready only when its fixed `home-icon` route marker is visible; a
+pre-existing Composer is insufficient. The contract requires that marker in
+all New chat samples, rejects it on Pull requests, and rejects any missing or
+non-finite horizontal-overflow measurement.
+
 The resulting metrics are Renderer viewport emulation, not proof of a native
 BrowserWindow resize. Compare the same 1180/820/721/720 matrix separately in
 Electron and keep regional product screenshots local-only. Cleanup must resolve
@@ -160,13 +165,14 @@ the exact owning PID from the declared profile, terminate only that process
 tree, verify the loopback listener and profile argv are gone, and remove or
 move only the exact temporary profile.
 
-For the 2026-08-10 sample and fresh-profile repeat, cleanup terminated validated
-main PIDs `8126`, `10432`, and `13291` plus the six exact profile-owned
-reparented Crashpad handlers. Ports `9771` and `9781` closed, no process
-retained either profile path, and the raw records and local-only screenshots
+For the 2026-08-10 sample and repeats, cleanup terminated validated main PIDs
+`8126`, `10432`, `13291`, and `17788` plus the eight exact profile-owned
+reparented Crashpad handlers. Ports `9771`, `9781`, and `9782` closed, no
+process retained any profile path, and the raw records and local-only screenshots
 moved with the exact profiles to the recoverable Trash items
 `codex-ui-kit-baseline-cdp.ttx3i1-20260810` and
-`codex-ui-kit-baseline-cdp.l7K0Uy-20260810`.
+`codex-ui-kit-baseline-cdp.l7K0Uy-20260810`, plus
+`codex-ui-kit-route-cdp.zdFyJ5-20260810`.
 
 ### Current application-shell capture
 

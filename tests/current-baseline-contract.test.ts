@@ -58,6 +58,7 @@ describe("current baseline capture contract", () => {
       editor: {},
       horizontalOverflow: 0,
       navigation: { width: 274.11 },
+      routeMarkers: { newChatHome: 1 },
       routes: { "Pull requests": [{ ariaCurrent: null }] },
       viewport: { devicePixelRatio: 1, height, width },
     });
@@ -68,6 +69,7 @@ describe("current baseline capture contract", () => {
     };
     const compactPullRequests = {
       ...state(720, 680),
+      routeMarkers: { newChatHome: 0 },
       routes: { "Pull requests": [{ ariaCurrent: "page" }] },
     };
     const record = {
@@ -132,6 +134,30 @@ describe("current baseline capture contract", () => {
         },
       }),
     ).toThrow("required viewport matrix");
+    expect(() =>
+      assertCurrentBaselineRecord({
+        ...record,
+        states: {
+          ...record.states,
+          compactRestored: {
+            ...record.states.compactRestored,
+            routeMarkers: { newChatHome: 0 },
+          },
+        },
+      }),
+    ).toThrow("New chat route boundary");
+    expect(() =>
+      assertCurrentBaselineRecord({
+        ...record,
+        states: {
+          ...record.states,
+          compactPinned: {
+            ...record.states.compactPinned,
+            horizontalOverflow: undefined,
+          },
+        },
+      }),
+    ).toThrow("finite horizontal-overflow measurement");
   });
 
   it("normalizes transient Renderer state without unsafe reloads or retained content", () => {
@@ -142,6 +168,7 @@ describe("current baseline capture contract", () => {
 
     expect(captureSource).toContain("await hideSidebar();");
     expect(captureSource).toContain('return "non-app-page";');
+    expect(captureSource).toContain('[data-testid="home-icon"]:visible');
     expect(captureSource).not.toContain(".reload(");
     expect(captureSource).not.toContain(".screenshot(");
     expect(captureSource).not.toContain("document.body.textContent");

@@ -281,6 +281,11 @@ const inspectShellState = (page) =>
       main: [...document.querySelectorAll("main")].filter(visible).map(rect),
       navigation: rect(navigation),
       navigationScrollOwners,
+      routeMarkers: {
+        newChatHome: [
+          ...document.querySelectorAll('[data-testid="home-icon"]'),
+        ].filter(visible).length,
+      },
       routes: Object.fromEntries(
         ["New chat", "Plugins", "Pull requests", "Scheduled", "Sites"].map(
           (label) => [label, fixedRouteState(label)],
@@ -469,14 +474,25 @@ try {
     }
   };
   const newChat = () => page.locator("nav").getByText("New chat", { exact: true }).first();
+  const waitForNewChat = async () => {
+    await page.waitForSelector('[data-testid="home-icon"]:visible');
+    await page.waitForFunction(
+      () =>
+        [...document.querySelectorAll('[data-testid="home-icon"]')].some(
+          (element) =>
+            element.checkVisibility({
+              checkOpacity: true,
+              checkVisibilityCSS: true,
+            }),
+        ),
+    );
+  };
 
   await setViewport(currentBaselineViewports.wide);
   await waitForShell();
   await showSidebar();
   await newChat().click();
-  await page.waitForSelector(
-    'textarea, [contenteditable="true"], [role="textbox"]',
-  );
+  await waitForNewChat();
   await waitForStableShellGeometry();
   const normalizedCandidates = await Promise.all(pages.map(inspectCandidate));
   const normalizedSelected = normalizedCandidates.find(
@@ -514,9 +530,7 @@ try {
   states.compactPullRequests = await inspectShellState(page);
 
   await newChat().click();
-  await page.waitForSelector(
-    'textarea, [contenteditable="true"], [role="textbox"]',
-  );
+  await waitForNewChat();
   await waitForStableShellGeometry();
   states.compactRestored = await inspectShellState(page);
 
