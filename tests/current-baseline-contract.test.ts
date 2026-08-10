@@ -53,6 +53,7 @@ describe("current baseline capture contract", () => {
 
   it("keeps the required width matrix and rejects user-content keys", () => {
     const state = (width: number, height: number) => ({
+      colorScheme: "dark",
       controls: { "Show sidebar": [] },
       editor: {},
       horizontalOverflow: 0,
@@ -95,6 +96,18 @@ describe("current baseline capture contract", () => {
     expect(() =>
       assertCurrentBaselineRecord({ ...record, projectName: "private" }),
     ).toThrow("forbidden user-content key");
+    expect(() =>
+      assertCurrentBaselineRecord({
+        ...record,
+        states: {
+          ...record.states,
+          compactCollapsed: {
+            ...record.states.compactCollapsed,
+            colorScheme: "light",
+          },
+        },
+      }),
+    ).toThrow("expected dark color scheme");
   });
 
   it("normalizes transient Renderer state without unsafe reloads or retained content", () => {

@@ -72,6 +72,15 @@ export function assertCurrentBaselineRecord(record) {
   ) {
     throw new Error("Current baseline record is missing the required width matrix.");
   }
+  if (
+    expectedStates.some(
+      (state) => record.states[state].colorScheme !== "dark",
+    )
+  ) {
+    throw new Error(
+      "Current baseline record must use the expected dark color scheme in every state.",
+    );
+  }
   const wide = record.states.wideNewChat;
   const threshold = record.states.thresholdNewChat;
   const collapsed = record.states.compactCollapsed;
