@@ -282,6 +282,75 @@ describe("protocol lifecycle reducer", () => {
     expect(hasActiveTurnWork(completed)).toBe(false);
   });
 
+  it("replays the current three-call MCP success sequence", () => {
+    const scenario = replayScenarios["mcp-current-success"];
+    const running = reduceProtocolTrace(
+      scenario.events.slice(0, scenario.frames["mcp-current-running"]),
+    );
+    const completed = reduceProtocolTrace(scenario.events);
+
+    expect(running.mcpToolCalls).toEqual([
+      expect.objectContaining({
+        status: "running",
+        toolLabel: "Search OpenAI docs",
+      }),
+    ]);
+    expect(completed.mcpToolCalls.map(({ toolLabel }) => toolLabel)).toEqual([
+      "Search OpenAI docs",
+      "Search OpenAI docs",
+      "Fetch OpenAI doc",
+    ]);
+    expect(completed.mcpToolCalls.every(({ status }) => status === "completed"))
+      .toBe(true);
+    expect(completed.turnDurationsMs["turn-current-mcp-success"]).toBe(
+      35_000,
+    );
+    expect(completed.messages.at(-1)?.text).toContain(
+      "https://learn.chatgpt.com/docs/extend/mcp",
+    );
+  });
+
+  it("keeps the current failed fetch inside its recovered MCP group", () => {
+    const scenario = replayScenarios["mcp-current-recovery"];
+    const failed = reduceProtocolTrace(
+      scenario.events.slice(
+        0,
+        scenario.frames["mcp-current-recovery-failed"],
+      ),
+    );
+    const retrying = reduceProtocolTrace(
+      scenario.events.slice(
+        0,
+        scenario.frames["mcp-current-recovery-retrying"],
+      ),
+    );
+    const completed = reduceProtocolTrace(scenario.events);
+
+    expect(failed.mcpToolCalls).toEqual([
+      expect.objectContaining({
+        error: "Invalid URL",
+        status: "failed",
+        toolLabel: "Fetch OpenAI doc",
+      }),
+    ]);
+    expect(retrying.mcpToolCalls.map(({ status }) => status)).toEqual([
+      "failed",
+      "running",
+    ]);
+    expect(completed.mcpToolCalls.map(({ toolLabel, status }) => ({
+      status,
+      toolLabel,
+    }))).toEqual([
+      { status: "failed", toolLabel: "Fetch OpenAI doc" },
+      { status: "completed", toolLabel: "Search OpenAI docs" },
+      { status: "completed", toolLabel: "Fetch OpenAI doc" },
+    ]);
+    expect(completed.turnDurationsMs["turn-current-mcp-recovery"]).toBe(
+      16_000,
+    );
+    expect(completed.messages.at(-1)?.text).toContain("Recovery complete");
+  });
+
   it("replays MCP failure recovery followed by a mixed workflow turn", () => {
     const scenario = replayScenarios["mcp-recovery-mixed-thread"];
     const failed = reduceProtocolTrace(
@@ -514,6 +583,8 @@ describe("protocol lifecycle reducer", () => {
       ({ id }) => id === "assistant-failed",
     );
 
+    expect(failed.currentTurnId).toBe("turn-failed");
+    expect(isCurrentTurnGroupActive(failed, "turn-failed")).toBe(false);
     expect(failedMessage?.status).toBe("failed");
     expect(agentMessageStatus(failedMessage?.status ?? "idle")).toBe("failed");
   });

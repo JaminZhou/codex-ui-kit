@@ -128,7 +128,7 @@
         "app-asar-26.803.41515:inline-markdown-follow-state-machine-and-table-container-actions",
         "replay:public-delta-link-fence-nested-task-list-table-and-twelve-section-completion",
         "replay:current-eighteen-column-markdown-table-copy-expand-and-preview",
-        "browser-cdp:five-markdown-streaming-large-checkpoints-and-132-frame-matrix",
+        "browser-cdp:five-markdown-streaming-large-checkpoints-and-138-frame-matrix",
         "browser-cdp:wide-table-resting-hover-copy-preview-and-focus-contract",
         "electron:code-copy-table-focus-user-scroll-away-and-return-to-latest",
         "electron:wide-table-copy-horizontal-wheel-preview-and-focus-restoration",
@@ -259,11 +259,13 @@
         "cdp-26.721.81911:real-openai-developer-docs-invalid-url-search-fetch-recovery-expanded-1180x820",
         "cdp-26.721.81911:real-mcp-recovery-computed-styles-and-906x820-regional-pixel-gate",
         "cdp-26.727.40816:real-openai-developer-docs-search-fetch-success-expanded-1180x820",
-        "cdp-26.727.40816:real-mcp-success-computed-styles-and-masked-906x820-regional-pixel-gate"
+        "cdp-26.727.40816:real-mcp-success-computed-styles-and-masked-906x820-regional-pixel-gate",
+        "cdp-26.803.41515:real-openai-developer-docs-search-search-fetch-success-expanded-1180x820",
+        "cdp-26.803.41515:current-mcp-success-computed-styles-and-905x820-tool-group-pixel-gate"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "partial_legacy",
-      "electronStatus": "partial_legacy",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
       "priority": "p0"
     },
     {
@@ -279,11 +281,13 @@
         "cdp-26.721.81911:real-openai-developer-docs-invalid-url-search-fetch-recovery-expanded-1180x820",
         "cdp-26.721.81911:real-failed-fetch-plaintext-output-and-recovered-integration-group",
         "cdp-26.727.40816:real-openai-developer-docs-invalid-url-three-search-fetch-recovery-expanded-1180x820",
-        "cdp-26.727.40816:real-mcp-recovery-computed-styles-and-masked-906x820-regional-pixel-gate"
+        "cdp-26.727.40816:real-mcp-recovery-computed-styles-and-masked-906x820-regional-pixel-gate",
+        "cdp-26.803.41515:real-openai-developer-docs-invalid-url-search-fetch-recovery-expanded-1180x820-and-720x680",
+        "cdp-26.803.41515:current-mcp-recovery-computed-styles-and-720x680-card-pixel-gate"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "partial_legacy",
-      "electronStatus": "partial_legacy",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
       "priority": "p0"
     },
     {

@@ -599,6 +599,49 @@ gone, and moved the profile and reference images into
 `/Users/JaminZhou/.Trash/codex-ui-kit-mcp-recovery-cleanup.yS1xY9`. The
 original Codex process remained running.
 
+### 26.803.41515 MCP success and recovery capture
+
+The current-build refresh used exact main PID `38873`, loopback-only CDP port
+`9791`, and unique profile
+`/private/tmp/codex-ui-kit-mcp-current.YFVFyG`. Preflight verified the
+installed version/build, unchanged ASAR fingerprint, exact executable and argv,
+canonical profile ownership, loopback listener, inherited-listener parentage,
+and Chromium `151.0.7922.76` before selecting the main 1180×820
+`app://-/index.html` Renderer. Both disposable prompts allowed only the OpenAI
+Developer Docs integration and explicitly excluded shell, browser-navigation,
+and file actions.
+
+The successful task completed in 35 seconds with Search OpenAI docs → Search
+OpenAI docs → Fetch OpenAI doc under one
+`Used OpenAI Developer Docs integration` group. The terminal call rows expose
+transparent content-width buttons whose accessible names come from their
+visible summaries; running rows remain non-expandable. A second task completed in 16
+seconds after invalid-URL Fetch → Search → valid Fetch. On this build the
+failed Fetch remains inside the same integration group rather than becoming
+the standalone activity used by `26.727.40816`.
+
+The expanded failure output measures 736×67.3125px at 1180×820 with a 12.5px
+radius, `rgba(255,255,255,0.05)` background,
+`rgba(255,255,255,0.157)` border, 13/18.5714px language label, and
+14/22.75px 445-weight monospace result. At 720×680 the product has no visible
+navigation, document width remains exactly 720px with zero horizontal
+overflow, and the 688px card begins 12px left of the viewport.
+
+Independent public replays cover five lifecycle states plus one compact
+variant. Browser/CDP gates ordered calls, status, disclosure semantics,
+expanded output, computed styles, and responsive overflow; Electron repeats
+the interactions and a real native 720×680 resize. Six reviewed internal
+pixel baselines pass. Two optional local-only external gates compare the
+successful 736×100 group at 1.6440% changed pixels under 2% and the visible
+compact recovery-card region at 1.1017% under 1.2%; dynamic task content and
+the external screenshots stay outside the repository.
+
+Cleanup terminated only validated main PID `38873` and exact profile-owned
+reparented Crashpad handlers `38876` and `38878`. Port `9791` closed, no process
+retained the exact profile path, and the profile plus raw JSON and screenshots
+moved recoverably to
+`/Users/JaminZhou/.Trash/codex-ui-kit-mcp-current.YFVFyG-20260810`.
+
 ### 26.727.40816 Composer queue and Stop capture
 
 The current Composer refresh used exact process PID `78399`, loopback port
@@ -964,7 +1007,7 @@ expand-to-preview action.
 The independent playground adds a schema-valid nine-event trace with four
 public deltas. Five Browser/CDP checkpoints cover an incomplete link, open
 fenced code, nested and task lists, a readable multi-column table, twelve long
-sections, completion actions, and bottom-follow behavior inside the 132-frame
+sections, completion actions, and bottom-follow behavior inside the 138-frame
 matrix. Electron independently checks exact code copy, table focus, real
 wheel-driven scroll-away, the floating return control, and return to latest.
 Four reviewed internal baselines cover the streamed fence, table, long running

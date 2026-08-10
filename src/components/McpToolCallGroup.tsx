@@ -1,6 +1,9 @@
 import type { HTMLAttributes, ReactNode } from "react";
 import type { AgentItemStatus } from "../types.js";
-import { AgentActivity } from "./AgentActivity.js";
+import {
+  AgentActivity,
+  type AgentActivityProps,
+} from "./AgentActivity.js";
 
 export function McpToolIcon() {
   return (
@@ -24,6 +27,7 @@ export interface McpToolCallGroupProps
   children?: ReactNode;
   completedLabel?: ReactNode;
   defaultOpen?: boolean;
+  disclosureMode?: AgentActivityProps["disclosureMode"];
   failedLabel?: ReactNode;
   icon?: ReactNode;
   name: string;
@@ -39,6 +43,7 @@ export function McpToolCallGroup({
   className,
   completedLabel,
   defaultOpen = false,
+  disclosureMode,
   failedLabel,
   icon,
   name,
@@ -63,6 +68,8 @@ export function McpToolCallGroup({
       className={classes}
       data-source={source}
       defaultOpen={defaultOpen}
+      disclosureIndicator={disclosureMode === "button"}
+      disclosureMode={disclosureMode}
       indicator={icon ?? <McpToolIcon />}
       kind="tool"
       onOpenChange={onOpenChange}

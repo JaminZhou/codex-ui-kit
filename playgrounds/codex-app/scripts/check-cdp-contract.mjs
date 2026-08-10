@@ -15,6 +15,8 @@ const currentReplayComposerScenarios = new Set([
   "current-review-rename",
   "interruption",
   "long-command-output",
+  "mcp-current-recovery",
+  "mcp-current-success",
   "mcp-recovery-mixed-thread",
   "mcp-tool-call",
   "subagent-concurrency",
@@ -1682,6 +1684,85 @@ for (const scene of visualScenes) {
       continue;
     }
 
+    if (scene.id === "mcp-current-recovery-compact") {
+      const compactMcp = await page.evaluate(() => {
+        const group = document.querySelector(
+          ".codex-ui-mcp-tool-call-group",
+        );
+        const error = document.querySelector(
+          '[data-item-id="mcp-current-fetch-invalid"] .codex-ui-tool-call__error[data-presentation="output"]',
+        );
+        const cardRect = error?.getBoundingClientRect();
+        return {
+          callLabels: Array.from(
+            document.querySelectorAll(
+              ".codex-ui-mcp-tool-call-group .codex-ui-tool-call__label",
+            ),
+            (element) => element.textContent?.trim(),
+          ),
+          card: cardRect
+            ? {
+                height: cardRect.height,
+                left: cardRect.left,
+                width: cardRect.width,
+              }
+            : null,
+          clientWidth: document.documentElement.clientWidth,
+          failedExpanded:
+            document
+              .querySelector(
+                '[data-item-id="mcp-current-fetch-invalid"] .codex-ui-activity__disclosure',
+              )
+              ?.hasAttribute("data-open") ?? false,
+          groupExpanded:
+            group
+              ?.querySelector(
+                ":scope > .codex-ui-activity__disclosure",
+              )
+              ?.hasAttribute("data-open") ?? false,
+          horizontalOverflow:
+            document.documentElement.scrollWidth -
+            document.documentElement.clientWidth,
+          visibleNavigation: Array.from(
+            document.querySelectorAll("nav"),
+          ).some(
+            (element) =>
+              element instanceof HTMLElement &&
+              element.checkVisibility({
+                checkOpacity: true,
+                checkVisibilityCSS: true,
+              }),
+          ),
+        };
+      });
+      if (
+        compactMcp.clientWidth !== 720 ||
+        compactMcp.horizontalOverflow > 1 ||
+        compactMcp.visibleNavigation ||
+        !compactMcp.groupExpanded ||
+        !compactMcp.failedExpanded ||
+        JSON.stringify(compactMcp.callLabels) !==
+          JSON.stringify([
+            "Fetch OpenAI doc",
+            "Search OpenAI docs",
+            "Fetch OpenAI doc",
+          ]) ||
+        !compactMcp.card ||
+        Math.abs(compactMcp.card.left - 16) > 1 ||
+        Math.abs(compactMcp.card.width - 688) > 1 ||
+        Math.abs(compactMcp.card.height - 67.3125) > 1
+      ) {
+        throw new Error(
+          `${scene.id}: compact MCP contract failed: ${JSON.stringify(compactMcp)}`,
+        );
+      }
+      await writeFile(
+        join(artifactDirectory, `${scene.id}.json`),
+        `${JSON.stringify(compactMcp, null, 2)}\n`,
+      );
+      continue;
+    }
+
     const contract = await page.evaluate(() => {
       const root = document.querySelector(".demo-root");
       const shell = document.querySelector(".codex-ui-app-shell");
@@ -1856,19 +1937,22 @@ for (const scene of visualScenes) {
               mcpGroup.querySelectorAll(".codex-ui-tool-call"),
             )
               .filter((element) =>
-                element
-                  .querySelector(".codex-ui-activity__disclosure")
-                  ?.hasAttribute("open"),
+                Boolean(
+                  element
+                    .querySelector(".codex-ui-activity__disclosure")
+                    ?.matches("[open], [data-open]"),
+                ),
               )
               .map((element) => element.getAttribute("data-item-id")),
             failedCallAccessibleLabel: mcpGroup
               .querySelector(
-                '[data-item-id="mcp-fetch-invalid"] .codex-ui-tool-call__label',
+                '[data-item-id="mcp-fetch-invalid"] .codex-ui-tool-call__label, [data-item-id="mcp-current-fetch-invalid"] .codex-ui-tool-call__label',
               )
               ?.getAttribute("aria-label"),
             groupExpanded:
-              mcpGroup.querySelector(".codex-ui-activity__disclosure")
-                ?.open ?? false,
+              mcpGroup
+                .querySelector(":scope > .codex-ui-activity__disclosure")
+                ?.matches("[open], [data-open]") ?? false,
             groupLabel: mcpGroup
               .querySelector(".codex-ui-mcp-tool-call-group__label")
               ?.textContent?.trim(),
@@ -1878,6 +1962,31 @@ for (const scene of visualScenes) {
               mcpGroup.querySelector(
                 ":scope > .codex-ui-activity__disclosure > .codex-ui-activity__header",
               ),
+            ),
+            rowDisclosures: Array.from(
+              mcpGroup.querySelectorAll(".codex-ui-tool-call"),
+              (element) => {
+                const button = element.querySelector(
+                  "button[aria-labelledby]",
+                );
+                const labelledBy = button?.getAttribute("aria-labelledby");
+                const label = labelledBy
+                  ? document.getElementById(labelledBy)
+                  : null;
+                return {
+                  buttonRect: button ? rect(button) : null,
+                  chevronVisible:
+                    element
+                      .querySelector(
+                        ".codex-ui-activity__button-chevron",
+                      )
+                      ?.hasAttribute("data-visible") ?? null,
+                  expanded:
+                    button?.getAttribute("aria-expanded") ?? null,
+                  label: label?.textContent?.trim() ?? null,
+                  labelRect: label ? rect(label) : null,
+                };
+              },
             ),
             timelineExpanded:
               mcpGroup
@@ -1893,7 +2002,7 @@ for (const scene of visualScenes) {
           }
         : null;
       const failedMcpCall = document.querySelector(
-        '[data-item-id="mcp-fetch-invalid"]',
+        '[data-item-id="mcp-fetch-invalid"], [data-item-id="mcp-current-fetch-invalid"]',
       );
       const mcpFailure = failedMcpCall
         ? {
@@ -1915,7 +2024,7 @@ for (const scene of visualScenes) {
             expanded:
               failedMcpCall
                 .querySelector(".codex-ui-activity__disclosure")
-                ?.hasAttribute("open") ?? false,
+                ?.matches("[open], [data-open]") ?? false,
             status: failedMcpCall.getAttribute("data-status"),
             timelineExpanded:
               failedMcpCall
@@ -3986,6 +4095,7 @@ for (const scene of visualScenes) {
     }
     const expectedViewportHeight = scene.windowSize?.height ?? 820;
     const currentBuildSidebarScene =
+      scene.currentSidebar === true ||
       scene.id === "current-sidebar" ||
       scene.id === "current-sidebar-recents";
     if (
@@ -4273,7 +4383,9 @@ for (const scene of visualScenes) {
         contract.mcp.groupStyle.fontSize !== "14px" ||
         contract.mcp.groupStyle.lineHeight !== "21px" ||
         ((scene.id === "mcp-tool-calls" ||
-          scene.id === "mcp-recovery-completed") &&
+          scene.id === "mcp-recovery-completed" ||
+          scene.id === "mcp-current-success" ||
+          scene.id === "mcp-current-recovery-completed") &&
           (contract.mcp.groupStyle.fontFamily !==
             '-apple-system, "system-ui", "Segoe UI", sans-serif' ||
             contract.mcp.groupStyle.fontWeight !== "445" ||
@@ -4291,6 +4403,47 @@ for (const scene of visualScenes) {
       ) {
         throw new Error(
           `${scene.id}: MCP capture scroll state drifted: ${JSON.stringify(contract.viewportScroll)}`,
+        );
+      }
+      if (
+        scene.id.startsWith("mcp-current-") &&
+        (contract.mcp.rowDisclosures.length !== scene.toolCount ||
+          contract.mcp.rowDisclosures.some(
+            (
+              {
+                buttonRect,
+                chevronVisible,
+                expanded,
+                label,
+                labelRect,
+              },
+              index,
+            ) => {
+              const status = contract.mcp.callStatuses[index];
+              if (status === "running") {
+                return (
+                  buttonRect !== null ||
+                  chevronVisible !== null ||
+                  expanded !== null ||
+                  label !== null ||
+                  labelRect !== null
+                );
+              }
+              return (
+                expanded === null ||
+                label !== scene.callLabels[index] ||
+                !buttonRect ||
+                !labelRect ||
+                Math.abs(buttonRect.height - 21) > 0.1 ||
+                Math.abs(buttonRect.left - (labelRect.left - 22)) > 0.1 ||
+                Math.abs(buttonRect.width - (labelRect.width + 40)) > 0.1 ||
+                chevronVisible !== (expanded === "true")
+              );
+            },
+          ))
+      ) {
+        throw new Error(
+          `${scene.id}: current MCP row disclosure semantics drifted: ${JSON.stringify(contract.mcp.rowDisclosures)}`,
         );
       }
     }

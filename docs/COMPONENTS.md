@@ -77,8 +77,13 @@ failure/cancellation policy, pagination, and transcript streaming.
 
 ## Tools, approvals, and status
 
-- `McpToolCallGroup`: expandable integration-owned group for ordered MCP calls with running, recovered, and failed labels.
-- `ToolCallCard`: generic MCP, connector, and arbitrary tool-call row with structured, empty, danger-alert, neutral language/output-error, host-owned raw-output states, and an independently localizable failed-state accessible name.
+- `McpToolCallGroup`: expandable integration-owned group for ordered MCP calls
+  with running, recovered, and failed labels plus legacy `details` or current
+  content-button disclosure.
+- `ToolCallCard`: generic MCP, connector, and arbitrary tool-call row with
+  structured, empty, danger-alert, neutral language/output-error, host-owned
+  raw-output states, an independently localizable failed-state accessible name,
+  and legacy `details` or current content-width overlay-button disclosure.
 - `CommandExecution`: expandable command surface with duration, copy,
   optional `Shell`/host-defined shell label, background-terminal, success,
   failure, and interruption states. Completed expanded summaries preserve the

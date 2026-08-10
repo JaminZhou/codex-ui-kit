@@ -14,7 +14,8 @@ exit gates; it does not replace the inventory.
   Desktop `26.803.41515` (`6321`). Unsampled `26.730.61639` surfaces remain
   previous-build regression evidence rather than current verification.
 - The inventory contains 81 surface groups: 53 P0, 19 P1, and 9 P2.
-- 11 groups have current-build runtime evidence, 53 have previous-build-only runtime evidence, and 17 have not been sampled.
+- 13 groups have current-build runtime evidence, 51 have previous-build-only
+  runtime evidence, and 17 have not been sampled.
 - The scoped `26.803.41515` refresh binds 25 sidebar/window-chrome/Composer icons to
   exact runtime evidence. Its latest hover/footer follow-up promotes More, Pin,
   Archive, and Help, confirms that Settings is absent from the sampled footer
@@ -44,7 +45,7 @@ exit gates; it does not replace the inventory.
   explicit 820×680/720×680 reopen. Two more current tasks now cover concurrent
   siblings plus a Parent → Child delegation through active, mixed, completed,
   summary, flat-panel, live-progress, and independent transcript states while
-  retaining public `agentPath` hierarchy. Browser/CDP covers 132 lifecycle
+  retaining public `agentPath` hierarchy. Browser/CDP covers 138 lifecycle
   frames; Electron repeats
   the session, mismatch, input, picker, close, and resize interactions; the
   current 906×820 panel/content pixel ratios pass at 1.5120%/0.4004%.
@@ -71,7 +72,7 @@ exit gates; it does not replace the inventory.
   Electron verifies code copy, user scroll-away, and return to latest; four
   reviewed internal baselines pass. A later current-build 18-column task
   runtime-reaches the table Copy, Expand, and preview path. The public
-  `allowWideTables` contract, exact Markdown/HTML copy, 132-frame Browser/CDP
+  `allowWideTables` contract, exact Markdown/HTML copy, 138-frame Browser/CDP
   matrix, real Electron flow, three internal baselines including a 720×680
   action-reachability state, and local-only 4%/1% preview/close gates now pass.
   Product reachability and pixel attribution for
@@ -116,11 +117,13 @@ exit gates; it does not replace the inventory.
   background are included in the light Electron contract. The internal theme
   frame does not promote current-product light evidence. The
   refreshed PR detail passes the current 906×820 regional pixel gate. The
-  refreshed real MCP success path now matches Search → Fetch, the integrated activity
-  disclosure, computed typography, and a current regional pixel gate. The
-  refreshed failure path now matches a standalone invalid-URL Fetch,
-  intermediate explanation, three Search rows, successful Fetch, linked
-  answer, and current regional pixel gate. The current Composer queue/Stop
+  earlier MCP refresh matches Search → Fetch and the previous standalone
+  failure/recovery composition. The `26.803.41515` refresh now supersedes those
+  primary anchors with a 35-second Search → Search → Fetch success group and a
+  16-second invalid-URL Fetch → Search → Fetch recovery inside one group. Five
+  lifecycle states plus one compact variant pass Browser/CDP, native Electron,
+  six internal baselines, and local-only current-product group/card pixel
+  gates. The current Composer queue/Stop
   probe now locks its 710×39 tray, 28×28 Stop control, `You stopped after 2s`
   summary, and automatic queued continuation in Browser, Electron, and two
   regional pixel gates. A second current probe and independent public
@@ -305,9 +308,11 @@ the shell remains usable without horizontal overflow at the compact gate.
 - Composer queue, attachments, modes, permissions, environment/worktree
   context, long input, disabled/submitting/Stop states, and recovery.
 
-The first slice after the sidebar should be a real MCP failure/unavailable/retry
-flow followed by a mixed multi-turn replay. This prevents the successful MCP
-slice from becoming the only integration denominator.
+The real current-build MCP failure/retry half of the first post-sidebar slice
+is now delivered. Continue with an unavailable integration/transport recovery
+capture, then compose search, browser, command, approval, file, MCP, and
+subagent events in one current-style mixed multi-turn replay. This prevents the
+successful integration path from becoming the only denominator.
 
 Exit: every P0 turn/thread lifecycle has a deterministic replay, current-build
 structural evidence, Browser acceptance, and Electron acceptance.
@@ -411,8 +416,12 @@ without confusing package readiness with full product reconstruction.
    The later `26.803.41515` action slice also replaces the sampled More, Pin,
    Archive, and Help glyphs with exact runtime primitives and removes
    Settings/thread-leading assumptions disproved by the current build.
-3. **Tool recovery and mixed thread**: real MCP failure/unavailable/retry plus
-   a multi-turn command/approval/file/tool composition.
+3. **Tool recovery and mixed thread — current MCP success/failure delivered**:
+   `26.803.41515` now covers a real Search → Search → Fetch success and a real
+   invalid-URL Fetch → Search → Fetch recovery inside one integration group,
+   with Browser/CDP, Electron, compact layout, and local-only pixel gates.
+   Continue with unavailable integration/transport recovery and the current-
+   style multi-turn command/approval/file/tool/subagent composition.
 4. **App shell continuity**: window chrome, global feedback, loading/error/
    offline states, route and selection restoration. The independent replay and
    gates are implemented; current-build evidence covers window chrome,

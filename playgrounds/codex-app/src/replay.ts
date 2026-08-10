@@ -16,6 +16,8 @@ import longCommandOutputTrace from "../fixtures/traces/long-command-output.jsonl
 import markdownTableActionsTrace from "../fixtures/traces/markdown-table-actions.jsonl?raw";
 import markdownStreamingLargeTrace from "../fixtures/traces/markdown-streaming-large.jsonl?raw";
 import markdownTrace from "../fixtures/traces/markdown.jsonl?raw";
+import mcpCurrentRecoveryTrace from "../fixtures/traces/mcp-current-recovery.jsonl?raw";
+import mcpCurrentSuccessTrace from "../fixtures/traces/mcp-current-success.jsonl?raw";
 import mcpToolCallTrace from "../fixtures/traces/mcp-tool-call.jsonl?raw";
 import mcpRecoveryMixedThreadTrace from "../fixtures/traces/mcp-recovery-mixed-thread.jsonl?raw";
 import mixedFileReviewTrace from "../fixtures/traces/mixed-file-review.jsonl?raw";
@@ -54,6 +56,8 @@ export type ReplayScenarioId =
   | "markdown"
   | "markdown-table-actions"
   | "markdown-streaming-large"
+  | "mcp-current-recovery"
+  | "mcp-current-success"
   | "mcp-tool-call"
   | "mcp-recovery-mixed-thread"
   | "mixed-file-review"
@@ -262,6 +266,18 @@ export const replayScenarios: Record<ReplayScenarioId, ReplayScenario> = {
     "Stream a large Markdown response",
     "Protocol deltas mutate an incomplete link and code fence before a multi-column table and twelve-section response exercise long-content scrolling.",
     markdownStreamingLargeTrace,
+  ),
+  "mcp-current-success": scenario(
+    "mcp-current-success",
+    "Find current Codex MCP guidance",
+    "The current 26.803 product sequence uses two Search calls followed by one successful Fetch.",
+    mcpCurrentSuccessTrace,
+  ),
+  "mcp-current-recovery": scenario(
+    "mcp-current-recovery",
+    "Recover current Codex MCP lookup",
+    "The current 26.803 product keeps failed Fetch, recovery Search, and successful Fetch inside one integration group.",
+    mcpCurrentRecoveryTrace,
   ),
   "mcp-tool-call": scenario(
     "mcp-tool-call",

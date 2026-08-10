@@ -69,8 +69,8 @@ observation from a previous build remains historical evidence.
   previous-build regression evidence and have been downgraded from `verified`
   to `partial_legacy` until they are reached again on the current fingerprint.
 
-Current inventory: 81 surface groups; 11 have current-build runtime evidence, 53 have previous-build-only runtime evidence, 17 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 10 groups and Electron verification covers 10.
-Prior acceptance outside those 11 sampled current-build groups remains
+Current inventory: 81 surface groups; 13 have current-build runtime evidence, 51 have previous-build-only runtime evidence, 17 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 12 groups and Electron verification covers 12.
+Prior acceptance outside those 13 sampled current-build groups remains
 recorded as `partial_legacy` until current-build re-observation.
 
 The current package exposes candidates far beyond the old transcript sample:
@@ -617,6 +617,34 @@ styles.
 This promoted `thread.mcp-tool-events` and the newly split
 `thread.mcp-tool-failure-retry` gate for the sampled `26.727.40816` path;
 both are now `partial_legacy`.
+
+Build `26.803.41515` refreshes both P0 rows again. A real successful task now
+contains Search OpenAI docs → Search OpenAI docs → Fetch OpenAI doc under one
+`Used OpenAI Developer Docs integration` group and completes in 35 seconds.
+The current per-call disclosure is a transparent content-width button labelled
+by the visible call summary, rather than the older text-trigger contract.
+
+A second real task begins with an invalid-URL Fetch, keeps that failure inside
+the same integration group, then recovers through Search → Fetch and completes
+in 16 seconds. The expanded neutral failure card remains 736×67.3125px at
+1180×820 with a 12.5px radius, 0.05 white background, 0.157 white border,
+13/18.5714px language label, and 14/22.75px 445-weight monospace output. At
+720×680 the product auto-hides navigation, retains zero document overflow,
+and exposes the 688px card with its left edge clipped by 12px in the centered
+conversation layout.
+
+Two schema-valid current-build replays preserve those exact call orders and
+durations across five lifecycle states plus one compact variant. Browser/CDP
+gates status, content-width disclosure ownership, accessibility names, expanded failure output, computed
+styles, and compact overflow; Electron repeats the success/recovery
+interaction and native 720×680 resize. Six reviewed internal baselines pass.
+Optional local-only product comparisons keep the successful 736×100 tool
+group at 1.6440% changed pixels under 2% and the compact recovery-card region
+at 1.1017% under 1.2%. Product screenshots remain outside the repository.
+`thread.mcp-tool-events` and `thread.mcp-tool-failure-retry` are therefore
+current-build Browser/Electron verified while their implementation remains
+partial for the open variants below.
+
 Authentication, elicitation, MCP approvals, unavailable connectors, other
 integrations, cancellation, and thread-transport retry remain open.
 
@@ -827,7 +855,7 @@ adds source-structural evidence for the seven collaboration statuses,
 Active/Done classification, and 4/10 panel limits. A schema-valid twelve-agent
 replay now covers waiting-before-initialization, streamed updates, errored,
 interrupted, shutdown, and unavailable terminal results, both pagination
-paths, and the failed-agent transcript. Browser/CDP reaches 132 frames;
+paths, and the failed-agent transcript. Browser/CDP reaches 138 frames;
 Electron repeats the pagination and transcript interactions. Nine
 reviewed scenes gate ten current-build regions. Panel/summary/transcript ratios
 range from `0.013328938694792354` to `0.046708160442600274`; the compact
@@ -871,7 +899,7 @@ fence, table, long running tail, and completed tail.
 
 A later isolated current-build task reaches an 18-column table's Copy, Expand,
 and viewport preview path. The public five-event replay raises the matrix to
-132 frames, Electron repeats raw Markdown/HTML copy, horizontal wheel,
+138 frames, Electron repeats raw Markdown/HTML copy, horizontal wheel,
 preview interaction, and 720×680 action reachability, and three reviewed
 internal baselines pass. A local-only
 1180×820 reference gates the preview and close regions at 3.9737% and 0.5929%

@@ -80,6 +80,18 @@ const currentBuildMcpRecoveryReferenceSize = {
   height: 820,
   width: 906,
 };
+const currentMcpSuccessReference =
+  process.env.CODEX_UI_KIT_CURRENT_MCP_SUCCESS_REFERENCE;
+const currentMcpSuccessReferenceSize = {
+  height: 820,
+  width: 905,
+};
+const currentMcpRecoveryCompactReference =
+  process.env.CODEX_UI_KIT_CURRENT_MCP_RECOVERY_COMPACT_REFERENCE;
+const currentMcpRecoveryCompactReferenceSize = {
+  height: 680,
+  width: 720,
+};
 const currentBuildComposerQueuedReference =
   process.env.CODEX_UI_KIT_COMPOSER_QUEUED_REFERENCE;
 const currentBuildComposerContinuedReference =
@@ -652,6 +664,13 @@ for (const scene of selectedScenes) {
         })
         .waitFor();
     }
+    if (scene.id === "mcp-current-success") {
+      await page
+        .locator(
+          '[data-item-id="mcp-current-fetch"] .codex-ui-activity__header',
+        )
+        .hover();
+    }
     await page.screenshot({
       animations: "disabled",
       path: actualPath,
@@ -817,6 +836,8 @@ for (const scene of selectedScenes) {
         width: 112,
       },
     ];
+    // Align only the recorded integration band: the reference is a main-only
+    // crop and the playground retains its 274px application sidebar.
     const comparison = comparePng(
       maskPng(reference, masks),
       maskPng(workspaceActual, masks),
@@ -1023,6 +1044,8 @@ for (const scene of selectedScenes) {
       top: Math.round(index * 28.5 + 4),
       width: 190,
     }));
+    // The product card begins 12px outside the compact viewport. Compare the
+    // shared visible interior against the same card-relative playground span.
     const comparison = comparePng(
       maskPng(reference, masks),
       maskPng(projectActual, masks),
@@ -3022,6 +3045,73 @@ for (const scene of selectedScenes) {
         recovery: recoveryComparison.ratio,
         upper: upperComparison.ratio,
       })}`,
+    );
+  }
+
+  if (scene.id === "mcp-current-success" && currentMcpSuccessReference) {
+    const reference = PNG.sync.read(
+      await readFile(currentMcpSuccessReference),
+    );
+    if (
+      reference.width !== currentMcpSuccessReferenceSize.width ||
+      reference.height !== currentMcpSuccessReferenceSize.height ||
+      actual.width !== 1180 ||
+      actual.height !== 820
+    ) {
+      throw new Error(
+        `${scene.id}: current MCP success comparison requires a 905x820 product main crop and an exact 1180x820 playground frame, received reference ${reference.width}x${reference.height} and actual ${actual.width}x${actual.height}.`,
+      );
+    }
+    const comparison = comparePng(
+      cropPng(reference, 85, 103, 736, 100),
+      cropPng(actual, 359, 227, 736, 100),
+    );
+    const maximumRatio = environmentRatio(
+      "CODEX_UI_KIT_CURRENT_MCP_SUCCESS_MAX_DIFF_RATIO",
+      0.02,
+    );
+    if (comparison.ratio > maximumRatio) {
+      throw new Error(
+        `${scene.id}: current MCP success tool-group ratio ${comparison.ratio} exceeds ${maximumRatio}.`,
+      );
+    }
+    console.log(
+      `${scene.id}: current MCP success tool-group pixel ratio ${comparison.ratio}`,
+    );
+  }
+
+  if (
+    scene.id === "mcp-current-recovery-compact" &&
+    currentMcpRecoveryCompactReference
+  ) {
+    const reference = PNG.sync.read(
+      await readFile(currentMcpRecoveryCompactReference),
+    );
+    if (
+      reference.width !== currentMcpRecoveryCompactReferenceSize.width ||
+      reference.height !== currentMcpRecoveryCompactReferenceSize.height ||
+      actual.width !== reference.width ||
+      actual.height !== reference.height
+    ) {
+      throw new Error(
+        `${scene.id}: current MCP recovery comparison requires exact 720x680 product and playground frames, received reference ${reference.width}x${reference.height} and actual ${actual.width}x${actual.height}.`,
+      );
+    }
+    const comparison = comparePng(
+      cropPng(reference, 0, 207, 676, 67),
+      cropPng(actual, 28, 271, 676, 67),
+    );
+    const maximumRatio = environmentRatio(
+      "CODEX_UI_KIT_CURRENT_MCP_RECOVERY_COMPACT_MAX_DIFF_RATIO",
+      0.012,
+    );
+    if (comparison.ratio > maximumRatio) {
+      throw new Error(
+        `${scene.id}: current MCP compact recovery-card ratio ${comparison.ratio} exceeds ${maximumRatio}.`,
+      );
+    }
+    console.log(
+      `${scene.id}: current MCP compact recovery-card pixel ratio ${comparison.ratio}`,
     );
   }
 }

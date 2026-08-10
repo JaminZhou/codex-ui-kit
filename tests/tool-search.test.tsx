@@ -26,6 +26,35 @@ const webEntries: SearchActivityEntry[] = [
 afterEach(cleanup);
 
 describe("ToolCallCard", () => {
+  it("supports the current content-width labelled disclosure button", () => {
+    const { container } = render(
+      <ToolCallCard
+        disclosureIndicator={false}
+        disclosureMode="overlay-button"
+        name="Fetch OpenAI doc"
+        result="Fetched"
+        status="completed"
+      />,
+    );
+    const toggle = screen.getByRole("button", {
+      name: "Fetch OpenAI doc",
+    });
+    const label = container.querySelector(".codex-ui-tool-call__label");
+    const chevron = container.querySelector(
+      ".codex-ui-activity__button-chevron",
+    );
+
+    expect(toggle.getAttribute("aria-expanded")).toBe("false");
+    expect(toggle.getAttribute("aria-labelledby")).toBe(
+      label?.parentElement?.id,
+    );
+    expect(chevron?.hasAttribute("data-visible")).toBe(false);
+    fireEvent.click(toggle);
+    expect(toggle.getAttribute("aria-expanded")).toBe("true");
+    expect(chevron?.hasAttribute("data-visible")).toBe(true);
+    expect(screen.getByText("Fetched").textContent).toBe("Fetched");
+  });
+
   it("renders an active non-expandable tool row", () => {
     const html = renderToStaticMarkup(
       <ToolCallCard
@@ -159,6 +188,26 @@ describe("ToolCallCard", () => {
 });
 
 describe("McpToolCallGroup", () => {
+  it("supports the current content button disclosure", () => {
+    render(
+      <McpToolCallGroup
+        disclosureMode="button"
+        name="OpenAI Developer Docs"
+        status="completed"
+      >
+        <ToolCallCard name="Fetch OpenAI doc" status="completed" />
+      </McpToolCallGroup>,
+    );
+    const toggle = screen.getByRole("button", {
+      name: "Used OpenAI Developer Docs integration",
+    });
+
+    expect(toggle.getAttribute("aria-expanded")).toBe("false");
+    fireEvent.click(toggle);
+    expect(toggle.getAttribute("aria-expanded")).toBe("true");
+    expect(screen.getByRole("list")).toBeTruthy();
+  });
+
   it("groups public MCP calls under the integration lifecycle", () => {
     const html = renderToStaticMarkup(
       <McpToolCallGroup

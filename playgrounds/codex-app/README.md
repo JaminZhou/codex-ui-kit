@@ -797,6 +797,20 @@ CODEX_UI_KIT_MCP_RECOVERY_REFERENCE=/absolute/path/to/mcp-recovery-main-referenc
   pnpm --filter @codex-ui-kit/codex-app-playground check:visual
 ```
 
+The current `26.803.41515` MCP gates accept an untracked 905×820 expanded
+success main crop and an exact 720×680 compact recovery frame:
+
+```bash
+CODEX_UI_KIT_CURRENT_MCP_SUCCESS_REFERENCE=/absolute/path/to/current-mcp-success-main.png \
+CODEX_UI_KIT_CURRENT_MCP_RECOVERY_COMPACT_REFERENCE=/absolute/path/to/current-mcp-recovery-compact.png \
+  pnpm --filter @codex-ui-kit/codex-app-playground check:visual -- \
+  --scenes=mcp-current-success,mcp-current-recovery-compact
+```
+
+The success comparison gates the aligned 736×100 integration group under 2%;
+the compact comparison gates the visible failure-card region under 1.2%.
+Product references remain local-only.
+
 The sidebar gate uses a full 1180×820 current-build reference and compares
 only application-owned regions:
 

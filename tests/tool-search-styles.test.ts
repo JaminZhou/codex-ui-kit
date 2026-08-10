@@ -26,6 +26,20 @@ describe("tool and search visual contract", () => {
     expect(styles).toMatch(
       /\.codex-ui-mcp-tool-call-group__calls[\s\S]*?\.codex-ui-activity__body \{[\s\S]*?margin-left: 0/,
     );
+    expect(styles).toMatch(
+      /\.codex-ui-activity__disclosure:is\([\s\S]*?\[data-disclosure-mode="button"\],[\s\S]*?\[data-disclosure-mode="overlay-button"\][\s\S]*?width: fit-content/,
+    );
+    expect(styles).toMatch(
+      /\.codex-ui-activity__overlay-toggle \{[\s\S]*?inset: 0;[\s\S]*?position: absolute/,
+    );
+    expect(styles).toMatch(
+      /\.codex-ui-activity__button-chevron \{[\s\S]*?flex: 0 0 0\.75rem;[\s\S]*?opacity: 0/,
+    );
+    expect(styles).toContain(
+      `.codex-ui-activity__disclosure[data-open]
+  > .codex-ui-activity__header
+  > .codex-ui-activity__button-chevron::after`,
+    );
   });
 
   it("supports the neutral output treatment used by recovered MCP failures", () => {
@@ -45,6 +59,9 @@ describe("tool and search visual contract", () => {
     expect(styles).toContain("@keyframes codex-ui-tool-activity-enter");
     expect(styles).toContain(".codex-ui-tool-call__label[data-active]");
     expect(styles).toContain("@media (prefers-reduced-motion: reduce)");
+    expect(styles).toMatch(
+      /@media \(prefers-reduced-motion: reduce\) \{[\s\S]*?\.codex-ui-tool-call[\s\S]*?\.codex-ui-activity__disclosure\[data-open\][\s\S]*?animation: none/,
+    );
     const activePulse = styles.match(
       /@keyframes codex-ui-tool-activity-pulse \{([\s\S]*?)\n\}/,
     )?.[1];
