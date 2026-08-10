@@ -76,6 +76,11 @@ review the [coverage policy](research/PARITY.md), or follow the
 - Composer attachments, mentions, modes, queued prompts, and running states.
 - A reusable thread-summary popover with collapsible sections, compact action
   rows, change deltas, disabled states, and controlled/uncontrolled behavior.
+- A schema-valid current-style mixed thread that composes Web Search, Browser
+  verification, MCP Search → Fetch, command approval, file Review, and a
+  delegated audit across wide and 720px layouts. This is an independent
+  full-thread regression gate, not a claim that one current-product task
+  runtime-reached the entire composition.
 - Accessible menus, tooltips, popovers, selects, dialogs, and keyboard flows.
 - Resource cards, citations, generated-image galleries, and preview surfaces.
 - Light, dark, system, compact-window, reduced-motion, and focus states.

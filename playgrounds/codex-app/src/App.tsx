@@ -15,6 +15,7 @@ import {
   AppWindowChrome,
   ApprovalRequest,
   AutomaticApprovalReview,
+  BrowserActivity,
   Button,
   CommandExecution,
   CommandOutput,
@@ -49,6 +50,7 @@ import {
   PullRequestQueryState,
   PullRequestReviewComposer,
   QueuedPromptList,
+  SearchActivity,
   StatusBanner,
   SubagentActivity,
   SubagentActivityGroup,
@@ -1567,12 +1569,14 @@ export function App() {
         initialSelection.frame !== "workspace-compact-ready" &&
         initialSelection.frame !== "mcp-current-integration-recovered" &&
         initialSelection.frame !== "mcp-current-recovery-completed" &&
+        initialSelection.frame !== "current-mixed-completed" &&
         initialSelection.frame !== "subagent-current-compact-720") ||
       !isNarrowDemoWindow(),
   );
   const [reviewOpen, setReviewOpen] = useState(
     initialSelection.frame === "review-open" ||
-      initialSelection.frame === "mixed-review-open",
+      initialSelection.frame === "mixed-review-open" ||
+      initialSelection.frame === "current-mixed-review-open",
   );
   const [subagentPanelOpen, setSubagentPanelOpen] = useState(
     currentSubagentPanelFrame(initialSelection.frame),
@@ -1805,15 +1809,19 @@ export function App() {
     mode === "replay" && scenarioId === "compaction";
   const isCurrentContextSummaryReplay =
     mode === "replay" && scenarioId === "context-summary";
+  const isCurrentMixedToolReplay =
+    mode === "replay" && scenarioId === "current-mixed-tool-thread";
   const isCurrentMcpReplay =
     mode === "replay" &&
-    (scenarioId === "mcp-current-integration-recovery" ||
+    (scenarioId === "current-mixed-tool-thread" ||
+      scenarioId === "mcp-current-integration-recovery" ||
       scenarioId === "mcp-current-success" ||
       scenarioId === "mcp-current-recovery");
   const isCurrentSubagentReplay =
     mode === "replay" && isSubagentScenarioId(scenarioId);
   const hasSubagentSurface =
     isCurrentSubagentReplay ||
+    isCurrentMixedToolReplay ||
     (mode === "live" && state.subagents.length > 0);
   const subagentPanelSelected =
     hasSubagentSurface && activeConversationSidePanel === "subagents";
@@ -3078,6 +3086,7 @@ export function App() {
       : (isConversationLifecycle && replayComposerRunning) ||
         ((isCurrentCommandInterruptionReplay ||
           isCurrentContextCompactionReplay ||
+          isCurrentMixedToolReplay ||
           isCurrentSubagentReplay) &&
           state.status === "running");
   const composerIsDisabled =
@@ -3188,6 +3197,7 @@ export function App() {
     isCurrentCommandInterruptionReplay ||
     isCurrentContextCompactionReplay ||
     isCurrentContextSummaryReplay ||
+    isCurrentMixedToolReplay ||
     isCurrentSubagentReplay ||
     scenarioId === "current-review-rename";
   const selectedComposerPermission =
@@ -5375,15 +5385,25 @@ export function App() {
             message.id === "assistant-mcp-intro") ||
           (scenarioId === "mcp-current-integration-recovery" &&
             message.id ===
-              "assistant-current-integration-recovery-intro")) &&
+              "assistant-current-integration-recovery-intro") ||
+          (isCurrentMixedToolReplay &&
+            message.id === "assistant-current-mixed-mcp-intro")) &&
         hasMcpToolCallGroupForTurn(state, message.turnId);
+      const groupedWebSearchIntro =
+        isCurrentMixedToolReplay &&
+        message.id === "assistant-current-mixed-research-intro" &&
+        state.webSearches.some(({ turnId }) => turnId === message.turnId);
       const groupedLongCommandIntro =
         (isCurrentLongCommandReplay &&
           message.id === "assistant-long-command-intro" &&
           state.commands.some(
             ({ id }) => id === "command-long-output",
           ));
-      if (groupedMcpIntro || groupedLongCommandIntro) {
+      if (
+        groupedMcpIntro ||
+        groupedWebSearchIntro ||
+        groupedLongCommandIntro
+      ) {
         return null;
       }
       if (
@@ -5470,6 +5490,9 @@ export function App() {
                     "assistant-command-interruption-recovery") ||
                 (isCurrentSubagentReplay &&
                   message.id.startsWith("assistant-subagent-")) ||
+                (isCurrentMixedToolReplay &&
+                  message.id.startsWith("assistant-current-mixed-") &&
+                  !message.id.endsWith("-intro")) ||
                 (scenarioId === "compaction" &&
                   (message.id === "assistant-compaction-baseline" ||
                     message.id ===
@@ -5616,6 +5639,103 @@ export function App() {
       );
     }
 
+    if (entry.kind === "webSearch") {
+      const webSearch = state.webSearches.find(({ id }) => id === entry.id);
+      if (!webSearch) return null;
+      const turnSearches = state.webSearches.filter(
+        ({ turnId }) => turnId === webSearch.turnId,
+      );
+      if (turnSearches[0]?.id !== entry.id) return null;
+
+      const searchActions = turnSearches.filter(
+        ({ action }) => action === "search",
+      );
+      const browserActions = turnSearches.filter(
+        ({ action }) => action === "openPage" || action === "findInPage",
+      );
+      const intro = state.messages.find(
+        ({ id, turnId }) =>
+          turnId === webSearch.turnId &&
+          id === "assistant-current-mixed-research-intro",
+      );
+      const active = turnSearches.some(({ status }) => status === "running");
+      const captureOpen =
+        initialSelection.capture &&
+        (activeFrame === "current-mixed-research-running" ||
+          activeFrame === "current-mixed-research-completed");
+      const searchEntries = searchActions.flatMap((search) =>
+        search.results.map((result) => ({
+          completed: search.status === "completed",
+          detail: result.detail,
+          id: result.id,
+        })),
+      );
+      const browserSteps = browserActions.map((action) => ({
+        completed: action.status === "completed",
+        id: action.id,
+        kind: "navigation" as const,
+        label:
+          action.action === "openPage"
+            ? `Opened ${action.target ?? action.query}`
+            : `Found ${action.target ?? action.query}`,
+      }));
+      const durationMs =
+        (webSearch.turnId
+          ? state.turnDurationsMs[webSearch.turnId]
+          : undefined) ?? 22_000;
+
+      return (
+        <ActivityTimeline
+          className="demo-current-mixed-research-timeline"
+          key={`web-search:${webSearch.turnId}`}
+          open={initialSelection.capture ? captureOpen : undefined}
+          summary={
+            <TurnDuration
+              durationMs={active ? 0 : durationMs}
+              status={active ? "working" : "worked"}
+            />
+          }
+        >
+          {intro ? (
+            <AgentMessage
+              className="demo-current-mixed-research-intro"
+              data-item-id={intro.id}
+              role="assistant"
+              status={agentMessageStatus(intro.status)}
+            >
+              <AgentMarkdown>{intro.text}</AgentMarkdown>
+            </AgentMessage>
+          ) : null}
+          {searchActions.length > 0 ? (
+            <SearchActivity
+              data-item-id={searchActions[0]?.id}
+              entries={searchEntries}
+              kind="web"
+              open={initialSelection.capture ? captureOpen : undefined}
+              query={searchActions.at(-1)?.query}
+              status={
+                searchActions.some(({ status }) => status === "running")
+                  ? "running"
+                  : "completed"
+              }
+            />
+          ) : null}
+          {browserActions.length > 0 ? (
+            <BrowserActivity
+              data-item-id={browserActions[0]?.id}
+              open={initialSelection.capture ? captureOpen : undefined}
+              status={
+                browserActions.some(({ status }) => status === "running")
+                  ? "running"
+                  : "completed"
+              }
+              steps={browserSteps}
+            />
+          ) : null}
+        </ActivityTimeline>
+      );
+    }
+
     if (entry.kind === "mcpToolCall") {
       const calls = mcpToolCallGroupForEntry(state, entryIndex);
       if (!calls) return null;
@@ -5757,7 +5877,9 @@ export function App() {
           turnId === toolCall.turnId &&
           (id === "assistant-mcp-intro" ||
             (scenarioId === "mcp-current-integration-recovery" &&
-              id === "assistant-current-integration-recovery-intro")),
+              id === "assistant-current-integration-recovery-intro") ||
+            (isCurrentMixedToolReplay &&
+              id === "assistant-current-mixed-mcp-intro")),
       );
       const groupStatus = mcpToolCallGroupStatus(calls);
       const currentMcpTurnActive = isCurrentTurnGroupActive(
@@ -5776,7 +5898,10 @@ export function App() {
             activeFrame === "mcp-current-recovery-completed")) ||
         (scenarioId === "mcp-current-integration-recovery" &&
           (activeFrame === "mcp-current-integration-recovering" ||
-            activeFrame === "mcp-current-integration-recovered"));
+            activeFrame === "mcp-current-integration-recovered")) ||
+        (isCurrentMixedToolReplay &&
+          (activeFrame === "current-mixed-mcp-running" ||
+            activeFrame === "current-mixed-mcp-completed"));
       const captureOpen =
         initialSelection.capture &&
         (currentMcpCaptureOpen ||
@@ -5906,7 +6031,9 @@ export function App() {
       const activityItems =
         turnActive
           ? callSubagents
-          : working.length > 0 || mode !== "live"
+          : isCurrentMixedToolReplay
+            ? callSubagents
+            : working.length > 0 || mode !== "live"
             ? working
             : callSubagents;
       const startedAtMs = presentation.startedAtMs;
@@ -5922,7 +6049,9 @@ export function App() {
           key={`subagent:${entry.id}:${turnActive ? "active" : "settled"}`}
           open={
             initialSelection.capture
-              ? turnActive && activityItems.length > 0
+              ? (isCurrentMixedToolReplay &&
+                  activeFrame === "current-mixed-completed") ||
+                (turnActive && activityItems.length > 0)
               : undefined
           }
           summary={
@@ -6234,7 +6363,12 @@ export function App() {
           `${typeof requestId}:${requestId}` === entry.id,
       );
       if (!approval) return null;
-      if (isCurrentApprovalReplay) return null;
+      if (
+        isCurrentApprovalReplay ||
+        (isCurrentMixedToolReplay && approval.decision !== "pending")
+      ) {
+        return null;
+      }
       return (
         <ApprovalRequest
           data-item-id={approval.itemId}

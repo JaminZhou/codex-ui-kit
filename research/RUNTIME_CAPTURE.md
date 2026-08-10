@@ -680,6 +680,29 @@ moved recoverably to
 `/Users/JaminZhou/.Trash/codex-ui-kit-mcp-transport.6R8wjo-20260810`. The
 original Codex PID `17080` remained running.
 
+### Independent current-style mixed-tool composition
+
+No additional product process was launched for this composition. The trace
+reuses only public App Server item shapes and current component contracts that
+were already established separately: `webSearch` search/open/find,
+`mcpToolCall` Search → Fetch, command execution and approval, `fileChange`, and
+`collabAgentToolCall`. It contains 39 events across four turns and exposes
+eight lifecycle checkpoints plus a 720×680 completed scene.
+
+Browser/CDP verifies the grouped Search and Browser activities, MCP call order,
+pending approval, applied file Review, active/completed subagent presentation,
+system typography, disclosure state, and compact geometry. Electron opens each
+surface, switches the side panel from Review to the delegated transcript, and
+performs a native 720×680 resize with a 688px Composer and zero horizontal
+overflow. Nine reviewed committed rasters provide internal pixel-regression
+gates. The aggregate replay matrix is now 33 traces, 406 events, and 151
+CDP/pixel frames.
+
+This is deliberately `independent_composition`, not runtime capture. It does
+not claim that the installed product emitted the full sequence in one task,
+does not add a current-build runtime-evidence row, and does not replace future
+whole-thread CDP/product comparison when that path becomes safely reachable.
+
 ### 26.727.40816 Composer queue and Stop capture
 
 The current Composer refresh used exact process PID `78399`, loopback port
@@ -1045,7 +1068,7 @@ expand-to-preview action.
 The independent playground adds a schema-valid nine-event trace with four
 public deltas. Five Browser/CDP checkpoints cover an incomplete link, open
 fenced code, nested and task lists, a readable multi-column table, twelve long
-sections, completion actions, and bottom-follow behavior inside the 142-frame
+sections, completion actions, and bottom-follow behavior inside the 151-frame
 matrix. Electron independently checks exact code copy, table focus, real
 wheel-driven scroll-away, the floating return control, and return to latest.
 Four reviewed internal baselines cover the streamed fence, table, long running

@@ -45,7 +45,7 @@ exit gates; it does not replace the inventory.
   explicit 820×680/720×680 reopen. Two more current tasks now cover concurrent
   siblings plus a Parent → Child delegation through active, mixed, completed,
   summary, flat-panel, live-progress, and independent transcript states while
-  retaining public `agentPath` hierarchy. Browser/CDP covers 142 lifecycle
+  retaining public `agentPath` hierarchy. Browser/CDP covers 151 lifecycle
   frames; Electron repeats
   the session, mismatch, input, picker, close, and resize interactions; the
   current 906×820 panel/content pixel ratios pass at 1.5120%/0.4004%.
@@ -72,7 +72,7 @@ exit gates; it does not replace the inventory.
   Electron verifies code copy, user scroll-away, and return to latest; four
   reviewed internal baselines pass. A later current-build 18-column task
   runtime-reaches the table Copy, Expand, and preview path. The public
-  `allowWideTables` contract, exact Markdown/HTML copy, 142-frame Browser/CDP
+  `allowWideTables` contract, exact Markdown/HTML copy, 151-frame Browser/CDP
   matrix, real Electron flow, three internal baselines including a 720×680
   action-reachability state, and local-only 4%/1% preview/close gates now pass.
   Product reachability and pixel attribution for
@@ -205,6 +205,15 @@ exit gates; it does not replace the inventory.
 - Existing Browser and Electron results remain useful regression evidence, but
   they are `partial_legacy` until the affected surface is re-observed on the
   current build.
+- The current-style mixed-tool thread is now delivered as one schema-valid,
+  protocol-backed composition: Web Search → Browser open/find, OpenAI
+  Developer Docs Search → Fetch, command approval, file Review, and one
+  delegated audit across eight lifecycle states plus a 720×680 final state.
+  The replay matrix now contains 33 traces and 406 events, with 151 reviewed
+  CDP/pixel frames and real Electron interaction. Its nine committed rasters
+  are internal regression baselines. Because no single current-product task
+  was captured with the entire sequence, it does not promote any inventory
+  row or claim whole-thread product runtime/pixel parity.
 - The React package has a mature conversation/workflow foundation and a
   protocol-backed full-app playground. It is not yet a complete desktop
   reconstruction.
@@ -312,9 +321,10 @@ The real current-build MCP failure/retry path and the unavailable-integration
 fallback path are now delivered. The latter observes GitHub integration
 unavailability followed by OpenAI Developer Docs Search → Fetch recovery in the
 same thread; it does not claim that the unavailable transport itself
-reconnected. Continue by composing search, browser, command, approval, file,
-MCP, and subagent events in one current-style mixed multi-turn replay. This
-prevents a successful integration path from becoming the only denominator.
+reconnected. The current-style mixed multi-turn replay now composes search,
+Browser, MCP, command, approval, file Review, and subagent events under one
+public reducer and one Browser/Electron/pixel matrix. It is composition
+evidence, not a synthetic promotion of whole-thread current-product reachability.
 
 Exit: every P0 turn/thread lifecycle has a deterministic replay, current-build
 structural evidence, Browser acceptance, and Electron acceptance.
@@ -418,14 +428,16 @@ without confusing package readiness with full product reconstruction.
    The later `26.803.41515` action slice also replaces the sampled More, Pin,
    Archive, and Help glyphs with exact runtime primitives and removes
    Settings/thread-leading assumptions disproved by the current build.
-3. **Tool recovery and mixed thread — current MCP success/failure/fallback delivered**:
+3. **Tool recovery and mixed thread — delivered for current component contracts**:
    `26.803.41515` now covers a real Search → Search → Fetch success and a real
    invalid-URL Fetch → Search → Fetch recovery inside one integration group,
    plus a real unavailable GitHub integration followed by same-thread OpenAI
    Developer Docs Search → Fetch fallback, with Browser/CDP, Electron, compact
-   layout, and local-only pixel gates. Continue with the current-style
-   multi-turn command/approval/file/tool/subagent composition; retain true
-   same-transport disconnect/reconnect as a separate unsampled boundary.
+   layout, and local-only pixel gates. The schema-valid current-style mixed
+   replay now adds Web Search → Browser open/find, MCP Search → Fetch,
+   command approval, file Review, and delegated audit across wide and 720px
+   layouts. Retain true same-transport disconnect/reconnect and a single real
+   product task spanning the full composition as separate unsampled boundaries.
 4. **App shell continuity**: window chrome, global feedback, loading/error/
    offline states, route and selection restoration. The independent replay and
    gates are implemented; current-build evidence covers window chrome,

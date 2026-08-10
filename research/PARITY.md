@@ -240,7 +240,7 @@ The authoritative current-build inventory is:
   current Active/Done classifier and 4/10 list limits. A twelve-agent public
   replay now covers pending initialization, updated progress, errored,
   interrupted, shutdown, and unavailable results, both pagination limits, and
-  failed-agent transcript access. Browser/CDP covers 142 frames, Electron
+  failed-agent transcript access. Browser/CDP covers 151 frames, Electron
   drives both mixed lists, and nine collaboration scenes gate ten current-build
   regions: panel/summary/transcript crops pass between 1.33% and 4.67%, while
   the compact main-activity crop passes at 11.50% under its independent 12.5%
@@ -304,7 +304,7 @@ internal baselines cover the fence, table, running tail, and completed tail.
 An isolated 18-column runtime follow-up then reaches Copy, Expand, and Table
 preview on the same build. `AgentMarkdown` copies exact raw Markdown plus HTML,
 and `allowWideTables` opts into the measured 1665.86px table, hover/focus rail,
-and viewport preview. Browser/CDP now covers 142 frames; Electron repeats copy,
+and viewport preview. Browser/CDP now covers 151 frames; Electron repeats copy,
 horizontal wheel, open/close, focus restoration, and 720×680 action
 reachability; three reviewed internal baselines pass. A local-only 1180×820 reference gates the owned preview and
 close regions at 3.9737% and 0.5929% under 4% and 1% ceilings. Images, math,
@@ -337,6 +337,18 @@ both timelines and the recovered group before a native 720×680 resize. Four
 reviewed baselines pass, and the local-only 688×71 group comparison differs by
 0.6449% under 1.3%. This is same-thread fallback evidence, not proof of a
 same-transport disconnect/reconnect.
+
+The independent `current-mixed-tool-thread` replay then composes the already
+separately evidenced current contracts in one public state model: Web Search,
+Browser open/find, OpenAI Developer Docs Search → Fetch, a completed command,
+pending-to-approved command approval, an applied file change with Review, and
+one delegated audit. Eight lifecycle checkpoints plus a 720×680 final scene
+bring the shared Browser/CDP and reviewed-pixel matrix to 151 frames; Electron
+opens the search, Browser, MCP, Review, and subagent transcript surfaces before
+performing a native compact resize. The nine rasters are internal regression
+baselines. This closes the independent mixed-composition gap without claiming
+that one current-product task runtime-reached the entire sequence or promoting
+the inventory evidence denominator.
 
 The `26.727.40816` Pull request slice adds nine lifecycle frames beyond the
 previous 49-frame matrix. Its independent gates cover index/detail loading and

@@ -404,6 +404,130 @@ describe("protocol lifecycle reducer", () => {
     expect(completed.messages.at(-1)?.text).toContain("Recovery complete");
   });
 
+  it("composes the current mixed web, MCP, approval, file, and subagent turns", () => {
+    const scenario = replayScenarios["current-mixed-tool-thread"];
+    const researchRunning = reduceProtocolTrace(
+      scenario.events.slice(
+        0,
+        scenario.frames["current-mixed-research-running"],
+      ),
+    );
+    const researchCompleted = reduceProtocolTrace(
+      scenario.events.slice(
+        0,
+        scenario.frames["current-mixed-research-completed"],
+      ),
+    );
+    const mcpRunning = reduceProtocolTrace(
+      scenario.events.slice(0, scenario.frames["current-mixed-mcp-running"]),
+    );
+    const mcpCompleted = reduceProtocolTrace(
+      scenario.events.slice(
+        0,
+        scenario.frames["current-mixed-mcp-completed"],
+      ),
+    );
+    const approvalPending = reduceProtocolTrace(
+      scenario.events.slice(
+        0,
+        scenario.frames["current-mixed-approval-pending"],
+      ),
+    );
+    const reviewOpen = reduceProtocolTrace(
+      scenario.events.slice(0, scenario.frames["current-mixed-review-open"]),
+    );
+    const subagentRunning = reduceProtocolTrace(
+      scenario.events.slice(
+        0,
+        scenario.frames["current-mixed-subagent-running"],
+      ),
+    );
+    const completed = reduceProtocolTrace(scenario.events);
+
+    expect(researchRunning.webSearches).toEqual([
+      expect.objectContaining({
+        action: "search",
+        query: "official Codex MCP documentation",
+        status: "running",
+      }),
+    ]);
+    expect(hasActiveTurnWork(researchRunning)).toBe(true);
+    expect(
+      researchCompleted.webSearches.map(({ action, status }) => ({
+        action,
+        status,
+      })),
+    ).toEqual([
+      { action: "search", status: "completed" },
+      { action: "openPage", status: "completed" },
+      { action: "findInPage", status: "completed" },
+    ]);
+    expect(researchCompleted.webSearches[0]?.results).toEqual([
+      expect.objectContaining({
+        detail: "Model Context Protocol",
+        url: "https://learn.chatgpt.com/docs/extend/mcp",
+      }),
+    ]);
+    expect(
+      researchCompleted.turnDurationsMs["turn-current-mixed-research"],
+    ).toBe(22_000);
+
+    expect(mcpRunning.mcpToolCalls).toEqual([
+      expect.objectContaining({
+        status: "running",
+        toolLabel: "Search OpenAI docs",
+      }),
+    ]);
+    expect(mcpCompleted.mcpToolCalls.map(({ status, toolLabel }) => ({
+      status,
+      toolLabel,
+    }))).toEqual([
+      { status: "completed", toolLabel: "Search OpenAI docs" },
+      { status: "completed", toolLabel: "Fetch OpenAI doc" },
+    ]);
+
+    expect(approvalPending.approvals).toEqual([
+      expect.objectContaining({
+        decision: "pending",
+        itemId: "command-current-mixed-note",
+      }),
+    ]);
+    expect(hasActiveTurnWork(approvalPending)).toBe(true);
+    expect(reviewOpen.approvals[0]?.decision).toBe("approved");
+    expect(reviewOpen.fileChanges).toEqual([
+      expect.objectContaining({
+        changes: [
+          expect.objectContaining({
+            kind: "added",
+            path: "research/MIXED_TOOL_THREAD.md",
+          }),
+        ],
+        status: "applied",
+      }),
+    ]);
+
+    expect(subagentRunning.subagents).toEqual([
+      expect.objectContaining({
+        id: "mixed-audit",
+        name: "Mixed audit",
+        status: "active",
+      }),
+    ]);
+    expect(hasActiveTurnWork(subagentRunning)).toBe(true);
+    expect(completed.subagents).toEqual([
+      expect.objectContaining({
+        id: "mixed-audit",
+        message: "All listed mixed-tool surfaces are represented.",
+        status: "done",
+      }),
+    ]);
+    expect(completed.messages.at(-1)?.text).toContain(
+      "Mixed workflow complete",
+    );
+    expect(hasActiveTurnWork(completed)).toBe(false);
+    expect(completed.status).toBe("completed");
+  });
+
   it("replays MCP failure recovery followed by a mixed workflow turn", () => {
     const scenario = replayScenarios["mcp-recovery-mixed-thread"];
     const failed = reduceProtocolTrace(

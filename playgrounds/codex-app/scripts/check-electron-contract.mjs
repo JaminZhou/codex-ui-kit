@@ -1969,6 +1969,209 @@ try {
   await currentIntegrationRecoveryApp.close();
 }
 
+const currentMixedToolScene = {
+  frame: "current-mixed-completed",
+  id: "electron-current-mixed-tool-thread",
+  scenario: "current-mixed-tool-thread",
+};
+const {
+  app: currentMixedToolApp,
+  page: currentMixedToolPage,
+} = await launchScene(currentMixedToolScene, { capture: false });
+
+try {
+  const researchTimeline = currentMixedToolPage.getByRole("button", {
+    exact: true,
+    name: "Worked for 22s",
+  });
+  const mcpTimeline = currentMixedToolPage.getByRole("button", {
+    exact: true,
+    name: "Worked for 34s",
+  });
+  const subagentTimeline = currentMixedToolPage.getByRole("button", {
+    exact: true,
+    name: "Worked for 45s",
+  });
+  if (
+    (await researchTimeline.getAttribute("aria-expanded")) !== "false" ||
+    (await mcpTimeline.getAttribute("aria-expanded")) !== "false" ||
+    (await subagentTimeline.getAttribute("aria-expanded")) !== "false"
+  ) {
+    throw new Error(
+      "Current mixed-tool timelines should start collapsed outside capture mode.",
+    );
+  }
+
+  await researchTimeline.click();
+  const search = currentMixedToolPage.locator(
+    ".codex-ui-search-activity",
+  );
+  const browser = currentMixedToolPage.locator(
+    ".codex-ui-browser-activity",
+  );
+  await search.locator("summary").click();
+  await browser.locator("summary").click();
+  const researchState = await currentMixedToolPage.evaluate(() => ({
+    browserExpanded:
+      document
+        .querySelector(".codex-ui-browser-activity details")
+        ?.hasAttribute("open") ?? false,
+    browserSteps: Array.from(
+      document.querySelectorAll(
+        ".codex-ui-browser-activity__steps li",
+      ),
+      (element) => element.textContent?.replace(/\s+/g, " ").trim(),
+    ),
+    searchEntries: Array.from(
+      document.querySelectorAll(
+        ".codex-ui-search-activity__entries li",
+      ),
+      (element) => element.textContent?.replace(/\s+/g, " ").trim(),
+    ),
+    searchExpanded:
+      document
+        .querySelector(".codex-ui-search-activity details")
+        ?.hasAttribute("open") ?? false,
+  }));
+
+  await mcpTimeline.click();
+  const mixedMcpGroup = currentMixedToolPage.getByTestId(
+    "mcp-tool-call-group",
+  );
+  await mixedMcpGroup
+    .getByRole("button", {
+      name: "Used OpenAI Developer Docs integration",
+    })
+    .click();
+  const mcpState = await currentMixedToolPage.evaluate(() => ({
+    callLabels: Array.from(
+      document.querySelectorAll(
+        ".codex-ui-mcp-tool-call-group .codex-ui-tool-call__label",
+      ),
+      (element) => element.textContent?.trim(),
+    ),
+    groupExpanded:
+      document
+        .querySelector(
+          ".codex-ui-mcp-tool-call-group > .codex-ui-activity__disclosure",
+        )
+        ?.getAttribute("data-open") === "true",
+    rowDisclosures: Array.from(
+      document.querySelectorAll(
+        ".codex-ui-mcp-tool-call-group .codex-ui-tool-call",
+      ),
+      (element) => {
+        const button = element.querySelector("button[aria-labelledby]");
+        const labelledBy = button?.getAttribute("aria-labelledby");
+        return {
+          expanded: button?.getAttribute("aria-expanded"),
+          label: labelledBy
+            ? document.getElementById(labelledBy)?.textContent?.trim()
+            : null,
+        };
+      },
+    ),
+    source: document
+      .querySelector(".codex-ui-mcp-tool-call-group")
+      ?.getAttribute("data-source"),
+  }));
+
+  await currentMixedToolPage
+    .locator('[data-item-id="file-current-mixed-note"]')
+    .getByRole("button", { exact: true, name: "Review" })
+    .click();
+  await currentMixedToolPage.waitForSelector(
+    '.codex-ui-app-shell[data-side-panel-open] [data-testid="review-panel"]',
+  );
+  const reviewState = await currentMixedToolPage.evaluate(() => ({
+    fileCount: document.querySelectorAll(
+      ".codex-ui-file-review__file",
+    ).length,
+    path: document
+      .querySelector(".codex-ui-file-review__file code")
+      ?.textContent?.trim(),
+  }));
+
+  await subagentTimeline.click();
+  await currentMixedToolPage
+    .getByRole("button", { name: "Open Mixed audit subagent" })
+    .click();
+  await currentMixedToolPage.waitForSelector(
+    '.codex-ui-app-shell[data-side-panel-open] [data-testid="subagent-transcript"]',
+  );
+  const transcript = (
+    await currentMixedToolPage.getByTestId("subagent-transcript").textContent()
+  )?.replace(/\s+/g, " ").trim();
+
+  await currentMixedToolApp.evaluate(({ BrowserWindow }) => {
+    BrowserWindow.getAllWindows()[0]?.setContentSize(720, 680);
+  });
+  await currentMixedToolPage.waitForFunction(
+    () =>
+      window.innerWidth === 720 &&
+      window.innerHeight === 680 &&
+      document
+        .querySelector(".codex-ui-app-shell")
+        ?.getAttribute("data-layout-mode") === "narrow" &&
+      !document
+        .querySelector(".codex-ui-app-shell")
+        ?.hasAttribute("data-sidebar-open"),
+    undefined,
+    { timeout: 5_000 },
+  );
+  const compactState = await currentMixedToolPage.evaluate(() => {
+    const composer = document.querySelector(".codex-ui-composer");
+    return {
+      composerWidth: composer?.getBoundingClientRect().width,
+      horizontalOverflow:
+        document.documentElement.scrollWidth -
+        document.documentElement.clientWidth,
+      visibleNavigation: Array.from(document.querySelectorAll("nav")).some(
+        (element) =>
+          element instanceof HTMLElement &&
+          element.checkVisibility({
+            checkOpacity: true,
+            checkVisibilityCSS: true,
+          }),
+      ),
+    };
+  });
+
+  if (
+    !researchState.searchExpanded ||
+    JSON.stringify(researchState.searchEntries) !==
+      JSON.stringify(["Model Context Protocol"]) ||
+    !researchState.browserExpanded ||
+    researchState.browserSteps.length !== 2 ||
+    !researchState.browserSteps[0]?.includes(
+      "https://learn.chatgpt.com/docs/extend/mcp",
+    ) ||
+    !researchState.browserSteps[1]?.includes("Model Context Protocol") ||
+    !mcpState.groupExpanded ||
+    mcpState.source !== "openaiDeveloperDocs" ||
+    JSON.stringify(mcpState.callLabels) !==
+      JSON.stringify(["Search OpenAI docs", "Fetch OpenAI doc"]) ||
+    JSON.stringify(mcpState.rowDisclosures) !==
+      JSON.stringify([
+        { expanded: "false", label: "Search OpenAI docs" },
+        { expanded: "false", label: "Fetch OpenAI doc" },
+      ]) ||
+    reviewState.fileCount !== 1 ||
+    reviewState.path !== "research/MIXED_TOOL_THREAD.md" ||
+    !transcript?.includes("Mixed audit") ||
+    !transcript.includes("All listed mixed-tool surfaces are represented.") ||
+    compactState.visibleNavigation ||
+    compactState.horizontalOverflow > 1 ||
+    Math.abs((compactState.composerWidth ?? 0) - 688) > 1
+  ) {
+    throw new Error(
+      `Current Electron mixed-tool workflow drifted: ${JSON.stringify({ compactState, mcpState, researchState, reviewState, transcript })}`,
+    );
+  }
+} finally {
+  await currentMixedToolApp.close();
+}
+
 const recoveryScene = {
   frame: "mixed-review-open",
   id: "electron-mcp-recovery-mixed-thread",
@@ -6759,5 +6962,5 @@ try {
 }
 
 console.log(
-  "Electron host, native-window, coding-workspace routing, conversation/Composer and current image-attachment lifecycle plus current menus, current long, failed, and interrupted command output plus manual context compaction, thread summary, replay/live single, concurrent, nested, and mixed-recovery subagent delegation with 4/10 pagination, default 720px narrow reachability, resizable navigation/Review/Terminal/PR detail, PR tabs and expansion, MCP disclosure/result/unavailable-fallback, multi-file and mixed-content Review, selection/Undo, large diff scrolling, and compact geometry contracts passed.",
+  "Electron host, native-window, coding-workspace routing, conversation/Composer and current image-attachment lifecycle plus current menus, current long, failed, and interrupted command output plus manual context compaction, thread summary, replay/live single, concurrent, nested, and mixed-recovery subagent delegation with 4/10 pagination, current mixed Search/Browser/MCP/approval/file/subagent flow, default 720px narrow reachability, resizable navigation/Review/Terminal/PR detail, PR tabs and expansion, MCP disclosure/result/unavailable-fallback, multi-file and mixed-content Review, selection/Undo, large diff scrolling, and compact geometry contracts passed.",
 );

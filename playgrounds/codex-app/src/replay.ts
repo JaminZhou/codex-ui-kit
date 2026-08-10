@@ -6,6 +6,7 @@ import approvalSimilarCommandsTrace from "../fixtures/traces/approval-similar-co
 import attachmentLifecycleTrace from "../fixtures/traces/attachment-lifecycle.jsonl?raw";
 import compactionTrace from "../fixtures/traces/compaction.jsonl?raw";
 import contextSummaryTrace from "../fixtures/traces/context-summary.jsonl?raw";
+import currentMixedToolThreadTrace from "../fixtures/traces/current-mixed-tool-thread.jsonl?raw";
 import currentReviewRenameTrace from "../fixtures/traces/current-review-rename.jsonl?raw";
 import commandFailureRecoveryTrace from "../fixtures/traces/command-failure-recovery.jsonl?raw";
 import conversationLifecycleTrace from "../fixtures/traces/conversation-lifecycle.jsonl?raw";
@@ -51,6 +52,7 @@ export type ReplayScenarioId =
   | "interruption"
   | "compaction"
   | "context-summary"
+  | "current-mixed-tool-thread"
   | "current-review-rename"
   | "large-file-review"
   | "long-command-output"
@@ -214,6 +216,12 @@ export const replayScenarios: Record<ReplayScenarioId, ReplayScenario> = {
     "Probe context summary panel",
     "The current thread summary toggle opens the compact environment and Git workflow overlay.",
     contextSummaryTrace,
+  ),
+  "current-mixed-tool-thread": scenario(
+    "current-mixed-tool-thread",
+    "Run a mixed tool workflow",
+    "A current-style multi-turn composition of web search, Browser, MCP, command approval, file review, and subagent work backed by public protocol events.",
+    currentMixedToolThreadTrace,
   ),
   "current-review-rename": scenario(
     "current-review-rename",
