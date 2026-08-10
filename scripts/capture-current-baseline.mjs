@@ -565,9 +565,6 @@ try {
       () =>
         document.querySelector("main") &&
         document.querySelector(
-          'textarea, [contenteditable="true"], [role="textbox"]',
-        ) &&
-        document.querySelector(
           '[aria-label="Hide sidebar"], [aria-label="Show sidebar"]',
         ),
       undefined,
@@ -613,14 +610,23 @@ try {
   const waitForNewChat = async () => {
     await page.waitForSelector('[data-testid="home-icon"]:visible');
     await page.waitForFunction(
-      () =>
-        [...document.querySelectorAll('[data-testid="home-icon"]')].some(
-          (element) =>
-            element.checkVisibility({
-              checkOpacity: true,
-              checkVisibilityCSS: true,
-            }),
-        ),
+      () => {
+        const visible = (element) =>
+          element instanceof Element &&
+          element.checkVisibility({
+            checkOpacity: true,
+            checkVisibilityCSS: true,
+          });
+        const newChatMarker = [
+          ...document.querySelectorAll('[data-testid="home-icon"]'),
+        ].some(visible);
+        const composer = [
+          ...document.querySelectorAll(
+            'textarea, [contenteditable="true"], [role="textbox"]',
+          ),
+        ].some(visible);
+        return newChatMarker && composer;
+      },
     );
   };
 

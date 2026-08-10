@@ -54,6 +54,16 @@ describe("current baseline capture contract", () => {
     ).toThrow("ambiguous");
   });
 
+  it("selects the main shell before a route-specific composer exists", () => {
+    expect(
+      selectCurrentMainCandidate([
+        candidate({
+          landmarks: { main: 2, nav: 1, sidebarTrigger: 1, textbox: 0 },
+        }),
+      ]).index,
+    ).toBe(1);
+  });
+
   it("requires shell landmarks and interactive density", () => {
     expect(() =>
       selectCurrentMainCandidate([
@@ -491,6 +501,7 @@ describe("current baseline capture contract", () => {
     );
     expect(captureSource).toContain('return "non-app-page";');
     expect(captureSource).toContain('[data-testid="home-icon"]:visible');
+    expect(captureSource).toContain("return newChatMarker && composer;");
     expect(captureSource).toContain(
       "await cleanupCurrentBaselineRenderer(selectedPage)",
     );

@@ -135,9 +135,11 @@ metadata-change time must remain identical, and that change must predate the
 owner process by at least the start-time clock boundary. This fails closed if
 the installed bundle is replaced after the running Renderer starts, rather
 than attributing an old Renderer to newly installed bytes.
-Main-target selection uses URL, area, `main`/navigation/sidebar-trigger/textbox
-landmarks, and visible-control density; it never selects by target order or
-private text.
+Main-target selection uses URL, area, route-independent `main`/navigation/
+sidebar-trigger landmarks, and visible-control density; it never selects by
+target order or private text. A Composer is not required until the fixed New
+chat route has been selected, so a process restored on Pull requests can still
+be normalized safely.
 
 Run it only against the separately opened process:
 

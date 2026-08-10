@@ -124,7 +124,6 @@ export function selectCurrentMainCandidate(candidates) {
         candidate.landmarks.main >= 1 &&
         (candidate.landmarks.nav === 1 ||
           candidate.landmarks.sidebarTrigger >= 1) &&
-        candidate.landmarks.textbox >= 1 &&
         candidate.visibleControls >= 10,
     )
     .sort((left, right) => right.area - left.area);
