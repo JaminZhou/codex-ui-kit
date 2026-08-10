@@ -143,20 +143,24 @@ CODEX_CURRENT_BASELINE_OUTPUT=${codex_probe_dir}/current-baseline.json \
 pnpm capture:current-baseline
 ```
 
-The allowlisted sequence is New chat → fixed viewport matrix → explicit Hide
-and Show at 720px → Pull requests → New chat. The JSON contains only build,
-target structure, fixed route/control state, computed editor style, geometry,
-scroll ownership, viewport, theme, and overflow. It never captures screenshots
-or arbitrary page/body text. Ancestor-aware `checkVisibility()` distinguishes
-the visible navigation from retained hidden layout nodes, and consecutive
-geometry samples exclude transition frames. Do not hard reload the product
-Renderer: native initialization is not guaranteed to replay and a reload can
-leave an empty app document.
+The allowlisted sequence is New chat → fixed viewport matrix → prove automatic
+collapse at 720px → explicit Show/pin → Pull requests → New chat → explicit
+Hide cleanup. The JSON contains only build, target structure, fixed
+route/control state, computed editor style, geometry, scroll ownership,
+viewport, theme, and overflow. It never captures screenshots or arbitrary
+page/body text. Ancestor-aware `checkVisibility()` distinguishes the visible
+navigation from retained hidden layout nodes, and consecutive geometry samples
+exclude transition frames. Do not hard reload the product Renderer: native
+initialization is not guaranteed to replay and a reload can leave an empty app
+document.
 
 New chat is ready only when its fixed `home-icon` route marker is visible; a
 pre-existing Composer is insufficient. The contract requires that marker in
 all New chat samples, rejects it on Pull requests, and rejects any missing or
-non-finite horizontal-overflow measurement.
+non-finite horizontal-overflow measurement. At 720px, inspect and reject a
+still-visible sidebar before any explicit sidebar normalization. Validate the
+documented main and Composer geometry in every New chat state plus the single
+navigation-owned wide/medium vertical scroller.
 
 The resulting metrics are Renderer viewport emulation, not proof of a native
 BrowserWindow resize. Compare the same 1180/820/721/720 matrix separately in
@@ -173,6 +177,14 @@ moved with the exact profiles to the recoverable Trash items
 `codex-ui-kit-baseline-cdp.ttx3i1-20260810` and
 `codex-ui-kit-baseline-cdp.l7K0Uy-20260810`, plus
 `codex-ui-kit-route-cdp.zdFyJ5-20260810`.
+
+The stricter repeat used four exact profiles on port `9783`: two fail-closed
+calibration runs and two successful independent fresh-profile captures. It
+terminated validated main PIDs `23684`, `24617`, `25197`, and `25532` plus
+their eight exact profile-owned Crashpad handlers; the port closed and no
+profile argv remained. All four profiles moved recoverably to Trash. The two
+successful records were byte-identical with SHA-256
+`751ce8d580a4fc3c5ea61fde71e22db1f8098dd336438eab5725a020f50abf1c`.
 
 ### Current application-shell capture
 

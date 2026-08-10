@@ -8,6 +8,9 @@ export const currentBaselineViewports = Object.freeze({
 const isMainRendererUrl = (url) =>
   url === "app://-/index.html" || url.startsWith("app://-/index.html?");
 
+const withinTolerance = (value, expected, tolerance = 1) =>
+  Number.isFinite(value) && Math.abs(value - expected) <= tolerance;
+
 export function selectCurrentMainCandidate(candidates) {
   const eligible = candidates
     .filter(
@@ -122,6 +125,79 @@ export function assertCurrentBaselineRecord(record) {
   ) {
     throw new Error(
       `Current baseline record does not prove the New chat route boundary: ${JSON.stringify({ newChatMarkerStates, pullRequestsNewChatHome: pullRequests.routeMarkers?.newChatHome ?? null })}`,
+    );
+  }
+  const expectedGeometryByState = {
+    compactCollapsed: { editorLeft: 28, editorWidth: 664, mainWidth: 720 },
+    compactPinned: {
+      editorLeft: 302.11,
+      editorWidth: 389.89,
+      mainWidth: 445.89,
+    },
+    compactRestored: {
+      editorLeft: 302.11,
+      editorWidth: 389.89,
+      mainWidth: 445.89,
+    },
+    mediumNewChat: {
+      editorLeft: 302.11,
+      editorWidth: 489.89,
+      mainWidth: 545.89,
+    },
+    thresholdNewChat: {
+      editorLeft: 302.11,
+      editorWidth: 390.89,
+      mainWidth: 446.89,
+    },
+    wideNewChat: {
+      editorLeft: 371.05,
+      editorWidth: 712,
+      mainWidth: 905.89,
+    },
+  };
+  const invalidGeometryStates = Object.entries(expectedGeometryByState)
+    .filter(([state, expected]) => {
+      const sample = record.states[state];
+      return (
+        sample.main?.length !== 1 ||
+        !withinTolerance(sample.main[0]?.width, expected.mainWidth) ||
+        !withinTolerance(sample.editor?.rect?.left, expected.editorLeft) ||
+        !withinTolerance(sample.editor?.rect?.width, expected.editorWidth) ||
+        !withinTolerance(sample.editor?.rect?.height, 44)
+      );
+    })
+    .map(([state]) => state);
+  if (invalidGeometryStates.length > 0) {
+    throw new Error(
+      `Current baseline record does not satisfy exact New chat shell geometry: ${JSON.stringify(invalidGeometryStates)}`,
+    );
+  }
+  const expectedScrollOwners = {
+    mediumNewChat: { clientHeight: 565, scrollHeight: 949 },
+    wideNewChat: { clientHeight: 705, scrollHeight: 949 },
+  };
+  const invalidScrollOwnerStates = Object.entries(expectedScrollOwners)
+    .filter(([state, expected]) => {
+      const owners = record.states[state].navigationScrollOwners;
+      const owner = owners?.[0];
+      return (
+        owners?.length !== 1 ||
+        owner?.overflowY !== "auto" ||
+        !withinTolerance(owner?.clientHeight, expected.clientHeight) ||
+        !withinTolerance(owner?.rect?.height, expected.clientHeight) ||
+        !withinTolerance(owner?.scrollHeight, expected.scrollHeight)
+      );
+    })
+    .map(([state]) => state);
+  if (invalidScrollOwnerStates.length > 0) {
+    const observedScrollOwners = Object.fromEntries(
+      Object.keys(expectedScrollOwners).map((state) => [
+        state,
+        record.states[state].navigationScrollOwners,
+      ]),
+    );
+    throw new Error(
+      `Current baseline record does not satisfy sidebar scroll ownership: ${JSON.stringify({ invalidScrollOwnerStates, observedScrollOwners })}`,
     );
   }
   const responsiveContract = {

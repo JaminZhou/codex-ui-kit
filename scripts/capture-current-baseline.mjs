@@ -510,9 +510,16 @@ try {
   states.thresholdNewChat = await inspectShellState(page);
 
   await setViewport(currentBaselineViewports.compact);
-  await hideSidebar();
-  await waitForSidebarVisibility(false);
-  states.compactCollapsed = await inspectShellState(page);
+  const automaticallyCollapsed = await inspectShellState(page);
+  if (
+    automaticallyCollapsed.navigation !== null ||
+    automaticallyCollapsed.controls?.["Show sidebar"]?.length !== 1
+  ) {
+    throw new Error(
+      "The sidebar did not collapse automatically at the 720px breakpoint.",
+    );
+  }
+  states.compactCollapsed = automaticallyCollapsed;
 
   await showSidebar();
   states.compactPinned = await inspectShellState(page);
@@ -534,8 +541,7 @@ try {
   await waitForStableShellGeometry();
   states.compactRestored = await inspectShellState(page);
 
-  await setViewport(currentBaselineViewports.wide);
-  await showSidebar();
+  await hideSidebar();
   const record = {
     baseline,
     captureKind: "renderer_emulation",
