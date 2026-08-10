@@ -2143,10 +2143,11 @@ try {
       JSON.stringify(["Model Context Protocol"]) ||
     !researchState.browserExpanded ||
     researchState.browserSteps.length !== 2 ||
-    !researchState.browserSteps[0]?.includes(
-      "https://learn.chatgpt.com/docs/extend/mcp",
-    ) ||
-    !researchState.browserSteps[1]?.includes("Model Context Protocol") ||
+    JSON.stringify(researchState.browserSteps) !==
+      JSON.stringify([
+        "Opened https://learn.chatgpt.com/docs/extend/mcp",
+        "Found Model Context Protocol in https://learn.chatgpt.com/docs/extend/mcp",
+      ]) ||
     !mcpState.groupExpanded ||
     mcpState.source !== "openaiDeveloperDocs" ||
     JSON.stringify(mcpState.callLabels) !==

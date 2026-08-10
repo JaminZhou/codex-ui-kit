@@ -2139,12 +2139,11 @@ for (const scene of visualScenes) {
             !mixed.browser.expanded ||
             mixed.browser.status !== "completed" ||
             mixed.browser.stepLabels.length !== scene.browserStepCount ||
-            !mixed.browser.stepLabels[0]?.includes(
-              "https://learn.chatgpt.com/docs/extend/mcp",
-            ) ||
-            !mixed.browser.stepLabels[1]?.includes(
-              "Model Context Protocol",
-            ))) ||
+            JSON.stringify(mixed.browser.stepLabels) !==
+              JSON.stringify([
+                "Opened https://learn.chatgpt.com/docs/extend/mcp",
+                "Found Model Context Protocol in https://learn.chatgpt.com/docs/extend/mcp",
+              ]))) ||
         (scene.toolCount !== undefined &&
           (!mixed.mcp ||
             mixed.mcp.toolCount !== scene.toolCount ||
