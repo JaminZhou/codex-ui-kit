@@ -1789,6 +1789,20 @@ textarea {
   scrollbar-width: none;
 }
 
+.demo-root[data-scenario="mcp-current-success"]
+  .codex-ui-thread-viewport,
+.demo-root[data-scenario="mcp-current-recovery"]
+  .codex-ui-thread-viewport {
+  scrollbar-width: none;
+}
+
+.demo-root[data-scenario="mcp-current-success"]
+  .codex-ui-thread-viewport::-webkit-scrollbar,
+.demo-root[data-scenario="mcp-current-recovery"]
+  .codex-ui-thread-viewport::-webkit-scrollbar {
+  display: none;
+}
+
 .demo-root[data-scenario="mcp-recovery-mixed-thread"]
   .codex-ui-thread-viewport::-webkit-scrollbar {
   display: none;
