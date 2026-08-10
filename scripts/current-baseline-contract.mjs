@@ -32,6 +32,28 @@ const isMainRendererUrl = (url) =>
 const withinTolerance = (value, expected, tolerance = 1) =>
   Number.isFinite(value) && Math.abs(value - expected) <= tolerance;
 
+const appAsarSnapshotFields = Object.freeze([
+  "appAsarBytes",
+  "appAsarSha256",
+  "changedAtMs",
+  "device",
+  "inode",
+]);
+
+const validAppAsarSnapshot = (snapshot) =>
+  Number.isSafeInteger(snapshot?.appAsarBytes) &&
+  snapshot.appAsarBytes === currentBaselineFingerprint.appAsarBytes &&
+  snapshot.appAsarSha256 === currentBaselineFingerprint.appAsarSha256 &&
+  Number.isSafeInteger(snapshot.changedAtMs) &&
+  snapshot.changedAtMs > 0 &&
+  /^\d+$/.test(snapshot.device ?? "") &&
+  /^\d+$/.test(snapshot.inode ?? "") &&
+  Number.isSafeInteger(snapshot.checkedAtMs) &&
+  snapshot.checkedAtMs > 0;
+
+const sameAppAsarSnapshot = (before, after) =>
+  appAsarSnapshotFields.every((field) => before[field] === after[field]);
+
 export function resolveCurrentBaselineOutputPath(profilePath, outputPath) {
   const normalizedProfile = realpathSync(profilePath);
   const normalizedOutput = resolve(outputPath);
@@ -118,6 +140,28 @@ export function assertCurrentBaselineRecord(record) {
   if (fingerprintMismatch) {
     throw new Error(
       "Current baseline record does not match the promoted build fingerprint.",
+    );
+  }
+  const runtimeIdentity = record.runtimeBundleIdentity;
+  const beforeBundle = runtimeIdentity?.beforeCapture;
+  const afterBundle = runtimeIdentity?.afterCapture;
+  const processStartedAtMs = runtimeIdentity?.processStartedAtMs;
+  const bundleChangedBeforeProcess =
+    validAppAsarSnapshot(beforeBundle) &&
+    Number.isSafeInteger(processStartedAtMs) &&
+    Math.ceil(beforeBundle.changedAtMs / 1_000) * 1_000 <=
+      processStartedAtMs;
+  if (
+    !Number.isSafeInteger(runtimeIdentity?.ownerPid) ||
+    runtimeIdentity.ownerPid <= 1 ||
+    !bundleChangedBeforeProcess ||
+    !validAppAsarSnapshot(afterBundle) ||
+    !sameAppAsarSnapshot(beforeBundle, afterBundle) ||
+    beforeBundle.checkedAtMs < processStartedAtMs ||
+    afterBundle.checkedAtMs < beforeBundle.checkedAtMs
+  ) {
+    throw new Error(
+      "Current baseline record does not prove the running Renderer bundle identity.",
     );
   }
   if (

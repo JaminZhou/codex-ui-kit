@@ -1,6 +1,6 @@
 import { createHash } from "node:crypto";
 import { execFileSync } from "node:child_process";
-import { readFileSync, realpathSync } from "node:fs";
+import { readFileSync, realpathSync, statSync } from "node:fs";
 import { homedir } from "node:os";
 import { fileURLToPath } from "node:url";
 import { chromium } from "../playgrounds/codex-app/node_modules/playwright-core/index.mjs";
@@ -59,12 +59,37 @@ const plistValue = (key) =>
   execFileSync("/usr/bin/plutil", ["-extract", key, "raw", appInfoPlist], {
     encoding: "utf8",
   }).trim();
-const appAsarBytes = readFileSync(appAsar);
+const readAppAsarSnapshot = () => {
+  const before = statSync(appAsar);
+  if (!before.isFile()) {
+    throw new Error("The installed app.asar must be a regular file.");
+  }
+  const appAsarBytes = readFileSync(appAsar);
+  const after = statSync(appAsar);
+  if (
+    before.dev !== after.dev ||
+    before.ino !== after.ino ||
+    before.size !== after.size ||
+    before.ctimeMs !== after.ctimeMs ||
+    before.mtimeMs !== after.mtimeMs
+  ) {
+    throw new Error("The installed app.asar changed while it was being hashed.");
+  }
+  return {
+    appAsarBytes: appAsarBytes.byteLength,
+    appAsarSha256: createHash("sha256")
+      .update(appAsarBytes)
+      .digest("hex"),
+    changedAtMs: Math.ceil(Math.max(after.ctimeMs, after.mtimeMs)),
+    checkedAtMs: Date.now(),
+    device: String(after.dev),
+    inode: String(after.ino),
+  };
+};
+const beforeCaptureBundle = readAppAsarSnapshot();
 const baseline = {
-  appAsarBytes: appAsarBytes.byteLength,
-  appAsarSha256: createHash("sha256")
-    .update(appAsarBytes)
-    .digest("hex"),
+  appAsarBytes: beforeCaptureBundle.appAsarBytes,
+  appAsarSha256: beforeCaptureBundle.appAsarSha256,
   appVersion: plistValue("CFBundleShortVersionString"),
   buildNumber: plistValue("CFBundleVersion"),
   chromiumVersion: plistValue("ChromiumBaseVersion"),
@@ -157,6 +182,49 @@ if (isolatedOwners.length !== 1) {
   );
 }
 const isolatedOwnerPid = isolatedOwners[0].pid;
+const processStartedAt = execFileSync(
+  "/bin/ps",
+  ["-p", isolatedOwnerPid, "-o", "lstart="],
+  {
+    encoding: "utf8",
+    env: { ...process.env, LC_ALL: "C" },
+  },
+).trim();
+const processStartedAtMatch = processStartedAt.match(
+  /^(?:Sun|Mon|Tue|Wed|Thu|Fri|Sat)\s+(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s+(\d{1,2})\s+(\d{2}):(\d{2}):(\d{2})\s+(\d{4})$/,
+);
+if (!processStartedAtMatch) {
+  throw new Error(
+    `Could not prove the isolated owner start time for PID ${isolatedOwnerPid}.`,
+  );
+}
+const monthIndex = [
+  "Jan",
+  "Feb",
+  "Mar",
+  "Apr",
+  "May",
+  "Jun",
+  "Jul",
+  "Aug",
+  "Sep",
+  "Oct",
+  "Nov",
+  "Dec",
+].indexOf(processStartedAtMatch[1]);
+const processStartedAtMs = new Date(
+  Number(processStartedAtMatch[6]),
+  monthIndex,
+  Number(processStartedAtMatch[2]),
+  Number(processStartedAtMatch[3]),
+  Number(processStartedAtMatch[4]),
+  Number(processStartedAtMatch[5]),
+).getTime();
+if (!Number.isSafeInteger(processStartedAtMs) || processStartedAtMs <= 0) {
+  throw new Error(
+    `Could not prove the isolated owner start time for PID ${isolatedOwnerPid}.`,
+  );
+}
 for (const listener of listeners) {
   if (listener.pid === isolatedOwnerPid) continue;
   const visited = new Set();
@@ -546,9 +614,16 @@ try {
   states.compactRestored = await inspectShellState(page);
 
   await hideSidebar();
+  const afterCaptureBundle = readAppAsarSnapshot();
   const record = {
     baseline,
     captureKind: "renderer_emulation",
+    runtimeBundleIdentity: {
+      afterCapture: afterCaptureBundle,
+      beforeCapture: beforeCaptureBundle,
+      ownerPid: Number(isolatedOwnerPid),
+      processStartedAtMs,
+    },
     schemaVersion: 1,
     states,
     targetSelection: {

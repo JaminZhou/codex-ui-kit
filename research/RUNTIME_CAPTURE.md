@@ -129,6 +129,12 @@ CDP port, an absolute unique profile under `/private/tmp` or Trash, an explicit
 navigation opt-in, and an optional output inside that exact profile. Before
 connecting it verifies the installed build fingerprint, exact listener
 ownership, executable argv, canonical profile, and listener-child parentage.
+It also records the isolated owner start time and hashes the ASAR both before
+and after Renderer sampling. The ASAR device, inode, size, hash, and latest
+metadata-change time must remain identical, and that change must predate the
+owner process by at least the start-time clock boundary. This fails closed if
+the installed bundle is replaced after the running Renderer starts, rather
+than attributing an old Renderer to newly installed bytes.
 Main-target selection uses URL, area, `main`/navigation/sidebar-trigger/textbox
 landmarks, and visible-control density; it never selects by target order or
 private text.
@@ -193,6 +199,16 @@ primary routes must appear once inside `nav` whenever navigation is visible.
 The fixed control matrix requires Back/Forward in every state, mutually
 exclusive Hide/Show sidebar controls, Composer controls on New chat, and no
 Composer controls on Pull requests.
+
+The runtime-identity repeat used exact main PID `32692`, loopback port `9785`,
+and one fresh profile. Its owner started at `1786326246000` ms; both ASAR reads
+reported device `16777231`, inode `341558647`, 223450200 bytes, change time
+`1786150111510` ms, and the promoted SHA-256. The successful record hash is
+`f8f4bb0381ac951af3c972d12778d62476dbd557986183a97b5d492ab330c04c`.
+Cleanup terminated only that main process and its two reparented Crashpad
+handlers, verified the port and exact profile argv were gone, and moved the
+record recoverably to
+`codex-ui-kit-runtime-id-cdp.TkSi3W-20260810` in Trash.
 
 ### Current application-shell capture
 

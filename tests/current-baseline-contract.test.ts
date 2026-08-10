@@ -222,6 +222,28 @@ describe("current baseline capture contract", () => {
         chromiumVersion: "151.0.7922.76",
       },
       captureKind: "renderer_emulation",
+      runtimeBundleIdentity: {
+        afterCapture: {
+          appAsarBytes: 223_450_200,
+          appAsarSha256:
+            "5f6e773aafd542d3cf09e10b5dca6cabd301d0a155f4b8ce870e3915fc3da25e",
+          changedAtMs: 1_786_150_111_000,
+          checkedAtMs: 1_786_351_000_000,
+          device: "16777231",
+          inode: "341558647",
+        },
+        beforeCapture: {
+          appAsarBytes: 223_450_200,
+          appAsarSha256:
+            "5f6e773aafd542d3cf09e10b5dca6cabd301d0a155f4b8ce870e3915fc3da25e",
+          changedAtMs: 1_786_150_111_000,
+          checkedAtMs: 1_786_350_900_000,
+          device: "16777231",
+          inode: "341558647",
+        },
+        ownerPid: 25_197,
+        processStartedAtMs: 1_786_350_800_000,
+      },
       schemaVersion: 1,
       states: {
         compactCollapsed,
@@ -244,6 +266,27 @@ describe("current baseline capture contract", () => {
         baseline: { ...record.baseline, appVersion: "26.804.0" },
       }),
     ).toThrow("promoted build fingerprint");
+    expect(() =>
+      assertCurrentBaselineRecord({
+        ...record,
+        runtimeBundleIdentity: {
+          ...record.runtimeBundleIdentity,
+          processStartedAtMs: 1_786_150_110_000,
+        },
+      }),
+    ).toThrow("running Renderer bundle identity");
+    expect(() =>
+      assertCurrentBaselineRecord({
+        ...record,
+        runtimeBundleIdentity: {
+          ...record.runtimeBundleIdentity,
+          afterCapture: {
+            ...record.runtimeBundleIdentity.afterCapture,
+            inode: "341558648",
+          },
+        },
+      }),
+    ).toThrow("running Renderer bundle identity");
     expect(() =>
       assertCurrentBaselineRecord({ ...record, projectName: "private" }),
     ).toThrow("forbidden user-content key");
