@@ -101,9 +101,13 @@ export function AgentActivity({
               type="button"
             />
           </div>
-          {resolvedOpen ? (
-            <div className="codex-ui-activity__body">{children}</div>
-          ) : null}
+          <div
+            aria-hidden={!resolvedOpen}
+            className="codex-ui-activity__body"
+            hidden={!resolvedOpen}
+          >
+            {children}
+          </div>
         </div>
       ) : hasBody && disclosureMode === "button" ? (
         <div
@@ -120,9 +124,13 @@ export function AgentActivity({
             {header}
             {buttonChevron}
           </button>
-          {resolvedOpen ? (
-            <div className="codex-ui-activity__body">{children}</div>
-          ) : null}
+          <div
+            aria-hidden={!resolvedOpen}
+            className="codex-ui-activity__body"
+            hidden={!resolvedOpen}
+          >
+            {children}
+          </div>
         </div>
       ) : hasBody ? (
         <details

@@ -155,6 +155,46 @@ describe("ActivityTimeline", () => {
 });
 
 describe("AgentActivity disclosure", () => {
+  it.each(["button", "overlay-button"] as const)(
+    "keeps %s disclosure content mounted while collapsed",
+    (disclosureMode) => {
+      const { container } = render(
+        <AgentActivity
+          defaultOpen
+          disclosureMode={disclosureMode}
+          status="completed"
+          summary="Stateful activity"
+        >
+          <input aria-label="Persistent result" defaultValue="draft" />
+        </AgentActivity>,
+      );
+      const toggle = screen.getByRole("button", {
+        name: "Stateful activity",
+      });
+      const input = screen.getByRole("textbox", {
+        name: "Persistent result",
+      });
+
+      fireEvent.change(input, { target: { value: "edited" } });
+      fireEvent.click(toggle);
+
+      const collapsedBody = container.querySelector(
+        ".codex-ui-activity__body",
+      );
+      expect(toggle.getAttribute("aria-expanded")).toBe("false");
+      expect(collapsedBody?.hasAttribute("hidden")).toBe(true);
+      expect(collapsedBody?.getAttribute("aria-hidden")).toBe("true");
+      expect(container.querySelector("input")).toBe(input);
+
+      fireEvent.click(toggle);
+      expect(toggle.getAttribute("aria-expanded")).toBe("true");
+      expect(screen.getByRole("textbox", { name: "Persistent result" })).toBe(
+        input,
+      );
+      expect((input as HTMLInputElement).value).toBe("edited");
+    },
+  );
+
   it("supports controlled detail and a host-provided indicator", () => {
     const onOpenChange = vi.fn();
     const { container } = render(
