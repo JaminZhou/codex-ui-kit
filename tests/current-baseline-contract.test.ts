@@ -108,6 +108,30 @@ describe("current baseline capture contract", () => {
         },
       }),
     ).toThrow("expected dark color scheme");
+    expect(() =>
+      assertCurrentBaselineRecord({
+        ...record,
+        states: {
+          ...record.states,
+          mediumNewChat: {
+            ...record.states.mediumNewChat,
+            viewport: { devicePixelRatio: 1, height: 680, width: 821 },
+          },
+        },
+      }),
+    ).toThrow("required viewport matrix");
+    expect(() =>
+      assertCurrentBaselineRecord({
+        ...record,
+        states: {
+          ...record.states,
+          compactRestored: {
+            ...record.states.compactRestored,
+            viewport: { devicePixelRatio: 1, height: 681, width: 720 },
+          },
+        },
+      }),
+    ).toThrow("required viewport matrix");
   });
 
   it("normalizes transient Renderer state without unsafe reloads or retained content", () => {

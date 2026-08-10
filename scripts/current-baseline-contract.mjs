@@ -64,13 +64,28 @@ export function assertCurrentBaselineRecord(record) {
     "compactPullRequests",
     "compactRestored",
   ];
+  const expectedViewportByState = {
+    compactCollapsed: currentBaselineViewports.compact,
+    compactPinned: currentBaselineViewports.compact,
+    compactPullRequests: currentBaselineViewports.compact,
+    compactRestored: currentBaselineViewports.compact,
+    mediumNewChat: currentBaselineViewports.medium,
+    thresholdNewChat: currentBaselineViewports.threshold,
+    wideNewChat: currentBaselineViewports.wide,
+  };
+  if (expectedStates.some((state) => !record.states?.[state])) {
+    throw new Error("Current baseline record is missing a required state.");
+  }
   if (
-    expectedStates.some((state) => !record.states?.[state]) ||
-    record.states.wideNewChat.viewport.width !== currentBaselineViewports.wide.width ||
-    record.states.compactCollapsed.viewport.width !==
-      currentBaselineViewports.compact.width
+    Object.entries(expectedViewportByState).some(
+      ([state, expected]) =>
+        record.states[state].viewport?.height !== expected.height ||
+        record.states[state].viewport?.width !== expected.width,
+    )
   ) {
-    throw new Error("Current baseline record is missing the required width matrix.");
+    throw new Error(
+      "Current baseline record does not satisfy the required viewport matrix.",
+    );
   }
   if (
     expectedStates.some(
