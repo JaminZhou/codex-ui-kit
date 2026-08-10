@@ -1,15 +1,15 @@
 import { createHash } from "node:crypto";
 import { execFileSync } from "node:child_process";
 import { readFileSync, realpathSync } from "node:fs";
-import { writeFile } from "node:fs/promises";
 import { homedir } from "node:os";
-import { resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { chromium } from "../playgrounds/codex-app/node_modules/playwright-core/index.mjs";
 import {
   assertCurrentBaselineRecord,
   currentBaselineViewports,
+  resolveCurrentBaselineOutputPath,
   selectCurrentMainCandidate,
+  writeCurrentBaselineOutput,
 } from "./current-baseline-contract.mjs";
 
 const port = Number(process.env.CODEX_CURRENT_BASELINE_CDP_PORT);
@@ -51,9 +51,9 @@ if (
     "The isolated Codex profile must use a unique codex-ui-kit path in /private/tmp or Trash.",
   );
 }
-if (outputPath && !resolve(outputPath).startsWith(`${normalizedProfile}/`)) {
-  throw new Error("The optional capture output must stay inside the isolated profile.");
-}
+const normalizedOutputPath = outputPath
+  ? resolveCurrentBaselineOutputPath(normalizedProfile, outputPath)
+  : null;
 
 const plistValue = (key) =>
   execFileSync("/usr/bin/plutil", ["-extract", key, "raw", appInfoPlist], {
@@ -570,7 +570,13 @@ try {
   };
   assertCurrentBaselineRecord(record);
   const output = `${JSON.stringify(record, null, 2)}\n`;
-  if (outputPath) await writeFile(outputPath, output, "utf8");
+  if (normalizedOutputPath) {
+    await writeCurrentBaselineOutput(
+      normalizedProfile,
+      normalizedOutputPath,
+      output,
+    );
+  }
   process.stdout.write(output);
 } finally {
   await browser.close();

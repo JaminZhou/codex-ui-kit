@@ -185,6 +185,9 @@ their eight exact profile-owned Crashpad handlers; the port closed and no
 profile argv remained. All four profiles moved recoverably to Trash. The two
 successful records were byte-identical with SHA-256
 `751ce8d580a4fc3c5ea61fde71e22db1f8098dd336438eab5725a020f50abf1c`.
+The optional output is restricted to a new direct child of the canonical
+profile and is atomically opened with no symlink following; capture refuses to
+overwrite an existing path.
 
 ### Current application-shell capture
 

@@ -1,3 +1,7 @@
+import { constants, realpathSync } from "node:fs";
+import { open } from "node:fs/promises";
+import { basename, dirname, resolve } from "node:path";
+
 export const currentBaselineViewports = Object.freeze({
   compact: Object.freeze({ height: 680, width: 720 }),
   medium: Object.freeze({ height: 680, width: 820 }),
@@ -10,6 +14,55 @@ const isMainRendererUrl = (url) =>
 
 const withinTolerance = (value, expected, tolerance = 1) =>
   Number.isFinite(value) && Math.abs(value - expected) <= tolerance;
+
+export function resolveCurrentBaselineOutputPath(profilePath, outputPath) {
+  const normalizedProfile = realpathSync(profilePath);
+  const normalizedOutput = resolve(outputPath);
+  let normalizedParent;
+  try {
+    normalizedParent = realpathSync(dirname(normalizedOutput));
+  } catch {
+    throw new Error(
+      "The optional capture output must be a direct child of the isolated profile.",
+    );
+  }
+  if (normalizedParent !== normalizedProfile) {
+    throw new Error(
+      "The optional capture output must be a direct child of the isolated profile.",
+    );
+  }
+  return resolve(normalizedParent, basename(normalizedOutput));
+}
+
+export async function writeCurrentBaselineOutput(
+  profilePath,
+  outputPath,
+  contents,
+) {
+  const normalizedOutput = resolveCurrentBaselineOutputPath(
+    profilePath,
+    outputPath,
+  );
+  let handle;
+  try {
+    handle = await open(
+      normalizedOutput,
+      constants.O_CREAT |
+        constants.O_EXCL |
+        constants.O_NOFOLLOW |
+        constants.O_WRONLY,
+      0o600,
+    );
+    await handle.writeFile(contents, "utf8");
+  } catch (error) {
+    throw new Error(
+      "The optional capture output must be a new non-symlink file inside the isolated profile.",
+      { cause: error },
+    );
+  } finally {
+    await handle?.close();
+  }
+}
 
 export function selectCurrentMainCandidate(candidates) {
   const eligible = candidates

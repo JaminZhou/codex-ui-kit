@@ -1,9 +1,20 @@
 import { readFileSync } from "node:fs";
+import {
+  mkdir,
+  mkdtemp,
+  readFile,
+  rm,
+  symlink,
+  writeFile,
+} from "node:fs/promises";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import {
   assertCurrentBaselineRecord,
   currentBaselineViewports,
   selectCurrentMainCandidate,
+  writeCurrentBaselineOutput,
 } from "../scripts/current-baseline-contract.mjs";
 
 const candidate = (overrides: Record<string, unknown> = {}) => ({
@@ -49,6 +60,42 @@ describe("current baseline capture contract", () => {
         }),
       ]),
     ).toThrow("not found");
+  });
+
+  it("creates output without following links outside the profile", async () => {
+    const root = await mkdtemp(join(tmpdir(), "codex-baseline-output-"));
+    const profile = join(root, "profile");
+    const outside = join(root, "outside.json");
+    try {
+      await mkdir(profile);
+      await writeFile(outside, "keep", "utf8");
+      await symlink(outside, join(profile, "linked.json"));
+
+      await expect(
+        writeCurrentBaselineOutput(
+          profile,
+          join(profile, "linked.json"),
+          "overwrite",
+        ),
+      ).rejects.toThrow("new non-symlink file");
+      await expect(readFile(outside, "utf8")).resolves.toBe("keep");
+      await expect(
+        writeCurrentBaselineOutput(
+          profile,
+          join(profile, "nested", "capture.json"),
+          "escape",
+        ),
+      ).rejects.toThrow("direct child");
+
+      const safeOutput = join(profile, "capture.json");
+      await writeCurrentBaselineOutput(profile, safeOutput, "safe");
+      await expect(readFile(safeOutput, "utf8")).resolves.toBe("safe");
+      await expect(
+        writeCurrentBaselineOutput(profile, safeOutput, "overwrite"),
+      ).rejects.toThrow("new non-symlink file");
+    } finally {
+      await rm(root, { force: true, recursive: true });
+    }
   });
 
   it("keeps the required width matrix and rejects user-content keys", () => {

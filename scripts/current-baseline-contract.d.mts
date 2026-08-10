@@ -24,3 +24,14 @@ export function selectCurrentMainCandidate<T extends CurrentMainCandidate>(
 ): T;
 
 export function assertCurrentBaselineRecord(record: any): void;
+
+export function resolveCurrentBaselineOutputPath(
+  profilePath: string,
+  outputPath: string,
+): string;
+
+export function writeCurrentBaselineOutput(
+  profilePath: string,
+  outputPath: string,
+  contents: string,
+): Promise<void>;
