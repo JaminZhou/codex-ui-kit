@@ -99,6 +99,7 @@ import {
   agentMessageStatus,
   hasActiveTurnWork,
   initialProtocolState,
+  isCurrentTurnGroupActive,
   isTurnActive,
   messageAttachmentAccessibleLabel,
   messageAttachmentPreviewSource,
@@ -5704,8 +5705,12 @@ export function App() {
         ({ id }) => id === "assistant-mcp-intro",
       );
       const groupStatus = mcpToolCallGroupStatus(calls);
+      const currentMcpTurnActive = isCurrentTurnGroupActive(
+        state,
+        toolCall.turnId,
+      );
       const presentedGroupStatus =
-        state.currentTurnId === toolCall.turnId ? "running" : groupStatus;
+        currentMcpTurnActive ? "running" : groupStatus;
       const currentMcpCaptureOpen =
         (scenarioId === "mcp-current-success" &&
           (activeFrame === "mcp-current-running" ||
@@ -5729,8 +5734,7 @@ export function App() {
             <TurnDuration
               durationMs={durationMs}
               status={
-                presentedGroupStatus === "running" ||
-                state.currentTurnId === toolCall.turnId
+                presentedGroupStatus === "running"
                   ? "working"
                   : "worked"
               }

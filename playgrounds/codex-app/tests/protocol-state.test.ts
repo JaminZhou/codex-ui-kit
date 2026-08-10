@@ -583,6 +583,8 @@ describe("protocol lifecycle reducer", () => {
       ({ id }) => id === "assistant-failed",
     );
 
+    expect(failed.currentTurnId).toBe("turn-failed");
+    expect(isCurrentTurnGroupActive(failed, "turn-failed")).toBe(false);
     expect(failedMessage?.status).toBe("failed");
     expect(agentMessageStatus(failedMessage?.status ?? "idle")).toBe("failed");
   });
