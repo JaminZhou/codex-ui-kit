@@ -190,6 +190,9 @@ profile and is atomically opened with no symlink following; capture refuses to
 overwrite an existing path. The record must match the promoted app version,
 build number, app.asar size/SHA-256, and Chromium version exactly. All five
 primary routes must appear once inside `nav` whenever navigation is visible.
+The fixed control matrix requires Back/Forward in every state, mutually
+exclusive Hide/Show sidebar controls, Composer controls on New chat, and no
+Composer controls on Pull requests.
 
 ### Current application-shell capture
 

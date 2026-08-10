@@ -111,7 +111,15 @@ describe("current baseline capture contract", () => {
       navigationScrollOwners: unknown[] = [],
     ) => ({
       colorScheme: "dark",
-      controls: { "Show sidebar": [] },
+      controls: {
+        "Add files and more": [{}],
+        Back: [{}],
+        Dictate: [{}],
+        Forward: [{}],
+        "Hide sidebar": [{}],
+        "Show sidebar": [],
+        "Start new voice chat": [{}],
+      },
       editor: {
         rect: {
           height: 44,
@@ -173,7 +181,15 @@ describe("current baseline capture contract", () => {
         editorWidth: 664,
         mainWidth: 720,
       }),
-      controls: { "Show sidebar": [{}] },
+      controls: {
+        ...state(720, 680, {
+          editorLeft: 28,
+          editorWidth: 664,
+          mainWidth: 720,
+        }).controls,
+        "Hide sidebar": [],
+        "Show sidebar": [{}],
+      },
       navigation: null,
       routes: Object.fromEntries(
         ["New chat", "Plugins", "Pull requests", "Scheduled", "Sites"].map(
@@ -183,6 +199,12 @@ describe("current baseline capture contract", () => {
     };
     const compactPullRequests = {
       ...compactPinned,
+      controls: {
+        ...compactPinned.controls,
+        "Add files and more": [],
+        Dictate: [],
+        "Start new voice chat": [],
+      },
       editor: null,
       routeMarkers: { newChatHome: 0 },
       routes: {
@@ -297,6 +319,36 @@ describe("current baseline capture contract", () => {
         },
       }),
     ).toThrow("primary navigation route stack");
+    expect(() =>
+      assertCurrentBaselineRecord({
+        ...record,
+        states: {
+          ...record.states,
+          compactPinned: {
+            ...record.states.compactPinned,
+            controls: {
+              ...record.states.compactPinned.controls,
+              "Hide sidebar": [],
+            },
+          },
+        },
+      }),
+    ).toThrow("fixed shell control matrix");
+    expect(() =>
+      assertCurrentBaselineRecord({
+        ...record,
+        states: {
+          ...record.states,
+          compactCollapsed: {
+            ...record.states.compactCollapsed,
+            controls: {
+              ...record.states.compactCollapsed.controls,
+              "Hide sidebar": [{}],
+            },
+          },
+        },
+      }),
+    ).toThrow("fixed shell control matrix");
     expect(() =>
       assertCurrentBaselineRecord({
         ...record,

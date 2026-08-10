@@ -215,6 +215,35 @@ export function assertCurrentBaselineRecord(record) {
       `Current baseline record does not prove the primary navigation route stack: ${JSON.stringify(invalidRouteStacks)}`,
     );
   }
+  const controlCount = (state, label) =>
+    record.states[state].controls?.[label]?.length ?? 0;
+  const newChatStates = [
+    "wideNewChat",
+    "mediumNewChat",
+    "thresholdNewChat",
+    "compactCollapsed",
+    "compactPinned",
+    "compactRestored",
+  ];
+  const invalidControlStates = expectedStates.filter((state) => {
+    const navigationVisible = state !== "compactCollapsed";
+    const newChatVisible = newChatStates.includes(state);
+    return (
+      controlCount(state, "Back") !== 1 ||
+      controlCount(state, "Forward") !== 1 ||
+      controlCount(state, "Hide sidebar") !== (navigationVisible ? 1 : 0) ||
+      controlCount(state, "Show sidebar") !== (navigationVisible ? 0 : 1) ||
+      controlCount(state, "Add files and more") !== (newChatVisible ? 1 : 0) ||
+      controlCount(state, "Dictate") !== (newChatVisible ? 1 : 0) ||
+      controlCount(state, "Start new voice chat") !==
+        (newChatVisible ? 1 : 0)
+    );
+  });
+  if (invalidControlStates.length > 0) {
+    throw new Error(
+      `Current baseline record does not prove the fixed shell control matrix: ${JSON.stringify(invalidControlStates)}`,
+    );
+  }
   const expectedGeometryByState = {
     compactCollapsed: { editorLeft: 28, editorWidth: 664, mainWidth: 720 },
     compactPinned: {
