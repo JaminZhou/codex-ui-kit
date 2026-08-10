@@ -1942,7 +1942,15 @@ for (const scene of visualScenes) {
     }
 
     if (scene.scenario === "current-mixed-tool-thread") {
-      const mixed = await page.evaluate(() => {
+      const expectedTimelineSurface =
+        scene.webSearchCount !== undefined
+          ? "search"
+          : scene.toolCount !== undefined
+            ? "mcp"
+            : scene.subagentStatus !== undefined
+              ? "subagent"
+              : null;
+      const mixed = await page.evaluate((timelineSurface) => {
         const rect = (element) => {
           if (!(element instanceof Element)) return null;
           const value = element.getBoundingClientRect();
@@ -1973,9 +1981,13 @@ for (const scene of visualScenes) {
           ".codex-ui-subagent-activity",
         );
         const timeline =
-          search?.closest(".codex-ui-activity-timeline") ??
-          mcp?.closest(".codex-ui-activity-timeline") ??
-          subagent?.closest(".codex-ui-activity-timeline");
+          timelineSurface === "search"
+            ? search?.closest(".codex-ui-activity-timeline")
+            : timelineSurface === "mcp"
+              ? mcp?.closest(".codex-ui-activity-timeline")
+              : timelineSurface === "subagent"
+                ? subagent?.closest(".codex-ui-activity-timeline")
+                : null;
         const composer = document.querySelector(".codex-ui-composer");
         return {
           approval: approval
@@ -2120,7 +2132,7 @@ for (const scene of visualScenes) {
               }
             : null,
         };
-      });
+      }, expectedTimelineSurface);
 
       if (
         mixed.frame !== scene.frame ||
