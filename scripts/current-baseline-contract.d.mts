@@ -43,3 +43,7 @@ export function writeCurrentBaselineOutput(
   outputPath: string,
   contents: string,
 ): Promise<void>;
+
+export function runBestEffortCurrentBaselineCleanup(
+  steps: Array<{ name: string; run: () => Promise<void> }>,
+): Promise<string[]>;

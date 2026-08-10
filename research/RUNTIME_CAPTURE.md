@@ -160,6 +160,11 @@ exclude transition frames. Do not hard reload the product Renderer: native
 initialization is not guaranteed to replay and a reload can leave an empty app
 document.
 
+The same route boundary applies on failure. A best-effort `finally` cleanup
+returns the selected Renderer to New chat when necessary and independently
+attempts to hide the sidebar before disconnecting CDP; one failed cleanup step
+does not skip the remaining step or replace the original capture error.
+
 New chat is ready only when its fixed `home-icon` route marker is visible; a
 pre-existing Composer is insufficient. The contract requires that marker in
 all New chat samples, rejects it on Pull requests, and rejects any missing or

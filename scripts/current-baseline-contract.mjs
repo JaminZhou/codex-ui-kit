@@ -103,6 +103,18 @@ export async function writeCurrentBaselineOutput(
   }
 }
 
+export async function runBestEffortCurrentBaselineCleanup(steps) {
+  const failures = [];
+  for (const step of steps) {
+    try {
+      await step.run();
+    } catch {
+      failures.push(step.name);
+    }
+  }
+  return failures;
+}
+
 export function selectCurrentMainCandidate(candidates) {
   const eligible = candidates
     .filter(

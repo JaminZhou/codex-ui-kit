@@ -8,6 +8,7 @@ import {
   assertCurrentBaselineRecord,
   currentBaselineViewports,
   resolveCurrentBaselineOutputPath,
+  runBestEffortCurrentBaselineCleanup,
   selectCurrentMainCandidate,
   writeCurrentBaselineOutput,
 } from "./current-baseline-contract.mjs";
@@ -426,12 +427,75 @@ const recordCandidateUrl = (url) => {
   return "non-app-page";
 };
 
+const cleanupCurrentBaselineRenderer = async (page) => {
+  if (!page || page.isClosed()) return [];
+  return runBestEffortCurrentBaselineCleanup([
+    {
+      name: "focus-main-renderer",
+      run: () => page.bringToFront(),
+    },
+    {
+      name: "return-new-chat",
+      run: async () => {
+        const alreadyNewChat = page.locator(
+          '[data-testid="home-icon"]:visible',
+        );
+        if ((await alreadyNewChat.count()) > 0) return;
+        const showSidebar = page
+          .locator('[aria-label="Show sidebar"]:visible')
+          .first();
+        if ((await showSidebar.count()) > 0) {
+          await showSidebar.click();
+          await page.waitForSelector("nav:visible", { timeout: 5_000 });
+        }
+        const newChat = page
+          .locator("nav")
+          .getByText("New chat", { exact: true })
+          .first();
+        if ((await newChat.count()) === 0) {
+          throw new Error("New chat cleanup target is unavailable.");
+        }
+        await newChat.click();
+        await page.waitForSelector('[data-testid="home-icon"]:visible', {
+          timeout: 5_000,
+        });
+      },
+    },
+    {
+      name: "hide-sidebar",
+      run: async () => {
+        const hideSidebar = page
+          .locator('[aria-label="Hide sidebar"]:visible')
+          .first();
+        if ((await hideSidebar.count()) === 0) return;
+        await hideSidebar.click();
+        await page.waitForFunction(
+          () => {
+            const navigation = document.querySelector("nav");
+            return (
+              !(navigation instanceof Element) ||
+              !navigation.checkVisibility({
+                checkOpacity: true,
+                checkVisibilityCSS: true,
+              })
+            );
+          },
+          undefined,
+          { timeout: 5_000 },
+        );
+      },
+    },
+  ]);
+};
+
 const browser = await chromium.connectOverCDP(`http://127.0.0.1:${port}`);
+let selectedPage = null;
 try {
   const pages = browser.contexts().flatMap((context) => context.pages());
   const candidates = await Promise.all(pages.map(inspectCandidate));
   const selected = selectCurrentMainCandidate(candidates);
   const page = selected.page;
+  selectedPage = page;
   await page.bringToFront();
   await page.waitForFunction(() => document.hasFocus(), undefined, {
     timeout: 15_000,
@@ -658,5 +722,11 @@ try {
   }
   process.stdout.write(output);
 } finally {
+  const cleanupFailures = await cleanupCurrentBaselineRenderer(selectedPage);
+  if (cleanupFailures.length > 0) {
+    process.stderr.write(
+      `Best-effort Renderer cleanup could not complete: ${cleanupFailures.join(", ")}.\n`,
+    );
+  }
   await browser.close();
 }

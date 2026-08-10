@@ -14,6 +14,7 @@ import {
   assertCurrentBaselineRecord,
   currentBaselineFingerprint,
   currentBaselineViewports,
+  runBestEffortCurrentBaselineCleanup,
   selectCurrentMainCandidate,
   writeCurrentBaselineOutput,
 } from "../scripts/current-baseline-contract.mjs";
@@ -97,6 +98,28 @@ describe("current baseline capture contract", () => {
     } finally {
       await rm(root, { force: true, recursive: true });
     }
+  });
+
+  it("attempts every renderer cleanup step after an earlier failure", async () => {
+    const attempts: string[] = [];
+    const failures = await runBestEffortCurrentBaselineCleanup([
+      {
+        name: "return-new-chat",
+        run: async () => {
+          attempts.push("return-new-chat");
+          throw new Error("synthetic route cleanup failure");
+        },
+      },
+      {
+        name: "hide-sidebar",
+        run: async () => {
+          attempts.push("hide-sidebar");
+        },
+      },
+    ]);
+
+    expect(attempts).toEqual(["return-new-chat", "hide-sidebar"]);
+    expect(failures).toEqual(["return-new-chat"]);
   });
 
   it("keeps the required width matrix and rejects user-content keys", () => {
@@ -468,6 +491,14 @@ describe("current baseline capture contract", () => {
     );
     expect(captureSource).toContain('return "non-app-page";');
     expect(captureSource).toContain('[data-testid="home-icon"]:visible');
+    expect(captureSource).toContain(
+      "await cleanupCurrentBaselineRenderer(selectedPage)",
+    );
+    expect(
+      captureSource.indexOf(
+        "await cleanupCurrentBaselineRenderer(selectedPage)",
+      ),
+    ).toBeLessThan(captureSource.indexOf("await browser.close();"));
     expect(captureSource).not.toContain(".reload(");
     expect(captureSource).not.toContain(".screenshot(");
     expect(captureSource).not.toContain("document.body.textContent");
