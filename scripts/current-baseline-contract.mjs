@@ -97,6 +97,7 @@ export function assertCurrentBaselineRecord(record) {
     );
   }
   const wide = record.states.wideNewChat;
+  const medium = record.states.mediumNewChat;
   const threshold = record.states.thresholdNewChat;
   const collapsed = record.states.compactCollapsed;
   const pinned = record.states.compactPinned;
@@ -132,6 +133,7 @@ export function assertCurrentBaselineRecord(record) {
         value.horizontalOverflow ?? null,
       ]),
     ),
+    mediumNavigationWidth: medium.navigation?.width ?? null,
     pinnedNavigationWidth: pinned.navigation?.width ?? null,
     pullRequestsCurrent:
       pullRequests.routes?.["Pull requests"]?.[0]?.ariaCurrent ?? null,
@@ -151,6 +153,7 @@ export function assertCurrentBaselineRecord(record) {
   }
   if (
     Math.abs((responsiveContract.wideNavigationWidth ?? 0) - 274.11) > 1 ||
+    Math.abs((responsiveContract.mediumNavigationWidth ?? 0) - 274.11) > 1 ||
     Math.abs((responsiveContract.thresholdNavigationWidth ?? 0) - 274.11) >
       1 ||
     responsiveContract.collapsedNavigation !== null ||

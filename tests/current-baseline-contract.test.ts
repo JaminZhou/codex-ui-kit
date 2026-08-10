@@ -127,6 +127,18 @@ describe("current baseline capture contract", () => {
         ...record,
         states: {
           ...record.states,
+          mediumNewChat: {
+            ...record.states.mediumNewChat,
+            navigation: { width: 260 },
+          },
+        },
+      }),
+    ).toThrow("responsive shell and route-continuity contract");
+    expect(() =>
+      assertCurrentBaselineRecord({
+        ...record,
+        states: {
+          ...record.states,
           compactRestored: {
             ...record.states.compactRestored,
             viewport: { devicePixelRatio: 1, height: 681, width: 720 },
