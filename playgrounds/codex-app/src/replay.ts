@@ -16,6 +16,7 @@ import longCommandOutputTrace from "../fixtures/traces/long-command-output.jsonl
 import markdownTableActionsTrace from "../fixtures/traces/markdown-table-actions.jsonl?raw";
 import markdownStreamingLargeTrace from "../fixtures/traces/markdown-streaming-large.jsonl?raw";
 import markdownTrace from "../fixtures/traces/markdown.jsonl?raw";
+import mcpCurrentIntegrationRecoveryTrace from "../fixtures/traces/mcp-current-integration-recovery.jsonl?raw";
 import mcpCurrentRecoveryTrace from "../fixtures/traces/mcp-current-recovery.jsonl?raw";
 import mcpCurrentSuccessTrace from "../fixtures/traces/mcp-current-success.jsonl?raw";
 import mcpToolCallTrace from "../fixtures/traces/mcp-tool-call.jsonl?raw";
@@ -56,6 +57,7 @@ export type ReplayScenarioId =
   | "markdown"
   | "markdown-table-actions"
   | "markdown-streaming-large"
+  | "mcp-current-integration-recovery"
   | "mcp-current-recovery"
   | "mcp-current-success"
   | "mcp-tool-call"
@@ -272,6 +274,12 @@ export const replayScenarios: Record<ReplayScenarioId, ReplayScenario> = {
     "Find current Codex MCP guidance",
     "The current 26.803 product sequence uses two Search calls followed by one successful Fetch.",
     mcpCurrentSuccessTrace,
+  ),
+  "mcp-current-integration-recovery": scenario(
+    "mcp-current-integration-recovery",
+    "Recover an unavailable integration",
+    "The current 26.803 product reports an unavailable GitHub integration, then recovers in the same thread through OpenAI Developer Docs Search and Fetch calls.",
+    mcpCurrentIntegrationRecoveryTrace,
   ),
   "mcp-current-recovery": scenario(
     "mcp-current-recovery",

@@ -297,11 +297,13 @@
       "packageEvidence": ["local-conversation-page", "mcp-capability-view-page"],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
-        "cdp-26.721:synthetic-github-mcp-unavailable-assistant-recovery-compact-526x600"
+        "cdp-26.721:synthetic-github-mcp-unavailable-assistant-recovery-compact-526x600",
+        "cdp-26.803.41515:real-github-integration-unavailable-followed-by-openai-developer-docs-search-fetch-recovery-same-thread-1180x820-and-720x680",
+        "cdp-26.803.41515:current-integration-recovery-computed-styles-and-720x680-group-pixel-gate"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "partial_legacy",
-      "electronStatus": "partial_legacy",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
       "priority": "p0"
     },
     {

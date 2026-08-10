@@ -310,6 +310,59 @@ describe("protocol lifecycle reducer", () => {
     );
   });
 
+  it("recovers from a current unavailable integration in the same thread", () => {
+    const scenario =
+      replayScenarios["mcp-current-integration-recovery"];
+    const unavailable = reduceProtocolTrace(
+      scenario.events.slice(
+        0,
+        scenario.frames["mcp-current-integration-unavailable"],
+      ),
+    );
+    const recovering = reduceProtocolTrace(
+      scenario.events.slice(
+        0,
+        scenario.frames["mcp-current-integration-recovering"],
+      ),
+    );
+    const recovered = reduceProtocolTrace(scenario.events);
+
+    expect(unavailable.mcpToolCalls).toHaveLength(0);
+    expect(unavailable.messages.at(-1)).toMatchObject({
+      id: "assistant-current-integration-unavailable",
+      status: "completed",
+      text: "GitHub MCP integration is unavailable.",
+    });
+    expect(
+      unavailable.turnDurationsMs["turn-current-integration-unavailable"],
+    ).toBe(16_000);
+    expect(recovering.mcpToolCalls).toEqual([
+      expect.objectContaining({
+        server: "openaiDeveloperDocs",
+        status: "running",
+        toolLabel: "Search OpenAI docs",
+      }),
+    ]);
+    expect(isCurrentTurnGroupActive(
+      recovering,
+      "turn-current-integration-recovery",
+    )).toBe(true);
+    expect(recovered.mcpToolCalls.map(({ status, toolLabel }) => ({
+      status,
+      toolLabel,
+    }))).toEqual([
+      { status: "completed", toolLabel: "Search OpenAI docs" },
+      { status: "completed", toolLabel: "Fetch OpenAI doc" },
+    ]);
+    expect(
+      recovered.turnDurationsMs["turn-current-integration-recovery"],
+    ).toBe(34_000);
+    expect(recovered.messages.at(-1)?.text).toContain(
+      "Recovery complete: Model Context Protocol",
+    );
+    expect(hasActiveTurnWork(recovered)).toBe(false);
+  });
+
   it("keeps the current failed fetch inside its recovered MCP group", () => {
     const scenario = replayScenarios["mcp-current-recovery"];
     const failed = reduceProtocolTrace(

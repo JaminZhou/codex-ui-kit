@@ -642,6 +642,44 @@ retained the exact profile path, and the profile plus raw JSON and screenshots
 moved recoverably to
 `/Users/JaminZhou/.Trash/codex-ui-kit-mcp-current.YFVFyG-20260810`.
 
+### 26.803.41515 unavailable integration and fallback capture
+
+A second isolated current-build process used exact main PID `74865`,
+loopback-only CDP port `9823`, and unique profile
+`/private/tmp/codex-ui-kit-mcp-transport.6R8wjo`. Preflight retained the same
+installed version/build, ASAR fingerprint, executable/profile ownership, and
+Chromium `151.0.7922.76` boundary before selecting the 1180×820 main Renderer.
+Both public read-only prompts explicitly prohibited shell, Browser navigation,
+web search, and file access.
+
+The first turn allowed only GitHub MCP. The product emitted no MCP event/group
+and completed in 16 seconds with `GitHub MCP integration is unavailable.` That
+absence is evidence of integration capability unavailability, not a fabricated
+transport call. The next prompt stayed in the same thread and allowed only the
+OpenAI Developer Docs integration. It completed in 34 seconds after Search
+OpenAI docs → Fetch OpenAI doc under one expanded
+`Used OpenAI Developer Docs integration` group, followed by the exact linked
+recovery answer.
+
+At 720×680 navigation is hidden, document overflow is zero, the Composer is
+688px wide, and the recovered group is 688×71px. Its 14/21px system text uses
+weight 445, 0.6 white, and antialiased font smoothing. The schema-valid replay
+covers unavailable, recovering, recovered, and compact states. Browser/CDP
+locks the absence of a false GitHub call, exact responses, call order,
+typography, expanded ownership, and compact geometry; Electron opens both
+activity timelines and the recovered group before a native compact resize.
+Four reviewed internal baselines pass. The optional local-only 688×71 product
+comparison differs by 0.6449% under a 1.3% hard limit. This proves same-thread
+fallback to another available integration; a true disconnect/reconnect of the
+same transport remains unsampled.
+
+Cleanup terminated only validated main PID `74865` and exact profile-owned
+reparented Crashpad handlers `74868`/`74870`. Port `9823` closed, no process
+retained the exact profile path, and the unique profile plus raw screenshots
+moved recoverably to
+`/Users/JaminZhou/.Trash/codex-ui-kit-mcp-transport.6R8wjo-20260810`. The
+original Codex PID `17080` remained running.
+
 ### 26.727.40816 Composer queue and Stop capture
 
 The current Composer refresh used exact process PID `78399`, loopback port
@@ -1007,7 +1045,7 @@ expand-to-preview action.
 The independent playground adds a schema-valid nine-event trace with four
 public deltas. Five Browser/CDP checkpoints cover an incomplete link, open
 fenced code, nested and task lists, a readable multi-column table, twelve long
-sections, completion actions, and bottom-follow behavior inside the 138-frame
+sections, completion actions, and bottom-follow behavior inside the 142-frame
 matrix. Electron independently checks exact code copy, table focus, real
 wheel-driven scroll-away, the floating return control, and return to latest.
 Four reviewed internal baselines cover the streamed fence, table, long running

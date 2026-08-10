@@ -665,6 +665,31 @@ forced media query as current-product evidence:
   comparison are still required before promoting current-build light-theme
   evidence.
 
+## Thirty-sixth vertical slice
+
+The thirty-sixth slice covers current-build integration unavailability and
+same-thread fallback without inventing a successful call for the unavailable
+provider:
+
+- a real GitHub-MCP-only turn completes with the exact unavailable response and
+  no MCP event/group;
+- the next turn stays in the same thread and recovers through OpenAI Developer
+  Docs Search → Fetch under one completed integration group;
+- a schema-valid replay separates unavailable, recovering, recovered, and
+  compact states, preserving the observed 16s/34s durations and exact answer;
+- the deterministic protocol set reaches 32 fixtures and 367 events, while the
+  Browser/CDP and reviewed-pixel matrix reaches 142 lifecycle frames;
+- Browser/CDP locks the missing false call, ordered fallback calls, expanded
+  ownership, current typography, 1180×820 and 720×680 geometry, hidden compact
+  navigation, and zero horizontal overflow;
+- Electron opens both timelines and the recovered group before a native
+  720×680 resize, while four reviewed internal baselines cover the lifecycle;
+- an optional local-only compact product comparison gates the owned 688×71
+  integration group at 0.6449% changed pixels under a 1.3% hard limit.
+
+This proves fallback to another available integration in the same thread. A
+true disconnect/reconnect of the same transport remains a separate open gate.
+
 ## Development
 
 From the repository root:
@@ -798,17 +823,20 @@ CODEX_UI_KIT_MCP_RECOVERY_REFERENCE=/absolute/path/to/mcp-recovery-main-referenc
 ```
 
 The current `26.803.41515` MCP gates accept an untracked 905×820 expanded
-success main crop and an exact 720×680 compact recovery frame:
+success main crop, an exact 720×680 compact recovery frame, and an exact
+720×680 unavailable/fallback frame:
 
 ```bash
 CODEX_UI_KIT_CURRENT_MCP_SUCCESS_REFERENCE=/absolute/path/to/current-mcp-success-main.png \
 CODEX_UI_KIT_CURRENT_MCP_RECOVERY_COMPACT_REFERENCE=/absolute/path/to/current-mcp-recovery-compact.png \
+CODEX_UI_KIT_CURRENT_INTEGRATION_RECOVERY_REFERENCE=/absolute/path/to/current-integration-recovery-compact.png \
   pnpm --filter @codex-ui-kit/codex-app-playground check:visual -- \
-  --scenes=mcp-current-success,mcp-current-recovery-compact
+  --scenes=mcp-current-success,mcp-current-recovery-compact,mcp-current-integration-recovered-compact
 ```
 
 The success comparison gates the aligned 736×100 integration group under 2%;
-the compact comparison gates the visible failure-card region under 1.2%.
+the compact failure comparison gates the visible card region under 1.2%; and
+the fallback comparison gates the exact 688×71 integration group under 1.3%.
 Product references remain local-only.
 
 The sidebar gate uses a full 1180×820 current-build reference and compares

@@ -1565,6 +1565,7 @@ export function App() {
       (initialSelection.capture &&
         initialSelection.frame !== "pr-compact-detail" &&
         initialSelection.frame !== "workspace-compact-ready" &&
+        initialSelection.frame !== "mcp-current-integration-recovered" &&
         initialSelection.frame !== "mcp-current-recovery-completed" &&
         initialSelection.frame !== "subagent-current-compact-720") ||
       !isNarrowDemoWindow(),
@@ -1806,7 +1807,8 @@ export function App() {
     mode === "replay" && scenarioId === "context-summary";
   const isCurrentMcpReplay =
     mode === "replay" &&
-    (scenarioId === "mcp-current-success" ||
+    (scenarioId === "mcp-current-integration-recovery" ||
+      scenarioId === "mcp-current-success" ||
       scenarioId === "mcp-current-recovery");
   const isCurrentSubagentReplay =
     mode === "replay" && isSubagentScenarioId(scenarioId);
@@ -5370,7 +5372,10 @@ export function App() {
           (message.id === "assistant-recovery-intro" ||
             message.id === "assistant-recovery-status")) ||
           (scenarioId === "mcp-tool-call" &&
-            message.id === "assistant-mcp-intro")) &&
+            message.id === "assistant-mcp-intro") ||
+          (scenarioId === "mcp-current-integration-recovery" &&
+            message.id ===
+              "assistant-current-integration-recovery-intro")) &&
         hasMcpToolCallGroupForTurn(state, message.turnId);
       const groupedLongCommandIntro =
         (isCurrentLongCommandReplay &&
@@ -5380,6 +5385,47 @@ export function App() {
           ));
       if (groupedMcpIntro || groupedLongCommandIntro) {
         return null;
+      }
+      if (
+        scenarioId === "mcp-current-integration-recovery" &&
+        message.id === "assistant-current-integration-unavailable-intro"
+      ) {
+        const unavailableTurnActive = isCurrentTurnGroupActive(
+          state,
+          message.turnId,
+        );
+        return (
+          <ActivityTimeline
+            key={`integration-unavailable:${message.turnId}`}
+            open={
+              initialSelection.capture &&
+              (activeFrame === "mcp-current-integration-unavailable" ||
+                activeFrame === "mcp-current-integration-recovering" ||
+                activeFrame === "mcp-current-integration-recovered")
+                ? true
+                : undefined
+            }
+            summary={
+              <TurnDuration
+                durationMs={
+                  (message.turnId
+                    ? state.turnDurationsMs[message.turnId]
+                    : undefined) ?? 16_000
+                }
+                status={unavailableTurnActive ? "working" : "worked"}
+              />
+            }
+          >
+            <AgentMessage
+              className="demo-mcp-current-unavailable-intro"
+              data-item-id={message.id}
+              role="assistant"
+              status={agentMessageStatus(message.status)}
+            >
+              <AgentMarkdown>{message.text}</AgentMarkdown>
+            </AgentMessage>
+          </ActivityTimeline>
+        );
       }
       return (
         <Fragment key={`message:${message.id}`}>
@@ -5398,6 +5444,11 @@ export function App() {
                   message.id === "assistant-current-mcp-success") ||
                 (scenarioId === "mcp-current-recovery" &&
                   message.id === "assistant-current-mcp-recovery") ||
+                (scenarioId === "mcp-current-integration-recovery" &&
+                  (message.id ===
+                    "assistant-current-integration-unavailable" ||
+                    message.id ===
+                      "assistant-current-integration-recovered")) ||
                 (scenarioId === "mcp-recovery-mixed-thread" &&
                   (message.id === "assistant-recovery" ||
                     message.id === "assistant-workflow")) ||
@@ -5702,7 +5753,11 @@ export function App() {
         );
       }
       const toolIntro = state.messages.find(
-        ({ id }) => id === "assistant-mcp-intro",
+        ({ id, turnId }) =>
+          turnId === toolCall.turnId &&
+          (id === "assistant-mcp-intro" ||
+            (scenarioId === "mcp-current-integration-recovery" &&
+              id === "assistant-current-integration-recovery-intro")),
       );
       const groupStatus = mcpToolCallGroupStatus(calls);
       const currentMcpTurnActive = isCurrentTurnGroupActive(
@@ -5718,7 +5773,10 @@ export function App() {
         (scenarioId === "mcp-current-recovery" &&
           (activeFrame === "mcp-current-recovery-failed" ||
             activeFrame === "mcp-current-recovery-retrying" ||
-            activeFrame === "mcp-current-recovery-completed"));
+            activeFrame === "mcp-current-recovery-completed")) ||
+        (scenarioId === "mcp-current-integration-recovery" &&
+          (activeFrame === "mcp-current-integration-recovering" ||
+            activeFrame === "mcp-current-integration-recovered"));
       const captureOpen =
         initialSelection.capture &&
         (currentMcpCaptureOpen ||
