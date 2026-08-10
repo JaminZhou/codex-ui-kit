@@ -690,6 +690,26 @@ provider:
 This proves fallback to another available integration in the same thread. A
 true disconnect/reconnect of the same transport remains a separate open gate.
 
+## Thirty-seventh vertical slice
+
+The thirty-seventh slice refreshes the current sidebar project and Help
+lifecycle on Codex Desktop `26.803.41515`:
+
+- the sanitized product contract records six project groups, 30px project
+  rows, 40px task bands, pointer/Enter/Space expansion, the 721→720 automatic
+  collapse boundary, explicit 720px pinning, and zero horizontal overflow;
+- the six-item project menu and eight-item Help menu use twelve newly promoted
+  exact runtime icons; Help retains its `What's new` heading and one separator;
+- Browser/CDP covers project focus, both menus, Escape, and wide → medium →
+  collapsed → pinned restoration; real Electron repeats the interactions;
+- four reviewed internal frames extend both matrices to 155 lifecycle frames;
+- optional local-only product comparisons gate collapsed projects at 1.54%,
+  the project menu at 0.13%, the Help menu at 0.30%, and the full 720×680
+  pinned sidebar at 3.12%.
+
+Product text, screenshots, raw CDP records, profiles, and private application
+resources are not committed.
+
 ## Development
 
 From the repository root:
@@ -845,6 +865,18 @@ only application-owned regions:
 ```bash
 CODEX_UI_KIT_SIDEBAR_REFERENCE=/absolute/path/to/sidebar-reference.png \
   pnpm --filter @codex-ui-kit/codex-app-playground check:visual
+```
+
+The current sidebar lifecycle gates accept three 1180×820 product frames and
+one exact 720×680 compact frame. All references remain untracked and local:
+
+```bash
+CODEX_UI_KIT_CURRENT_SIDEBAR_PROJECT_COLLAPSED_REFERENCE=/absolute/path/to/current-sidebar-project-collapsed.png \
+CODEX_UI_KIT_CURRENT_SIDEBAR_PROJECT_MENU_REFERENCE=/absolute/path/to/current-sidebar-project-menu.png \
+CODEX_UI_KIT_CURRENT_SIDEBAR_HELP_MENU_REFERENCE=/absolute/path/to/current-sidebar-help-menu.png \
+CODEX_UI_KIT_CURRENT_SIDEBAR_COMPACT_PINNED_REFERENCE=/absolute/path/to/current-sidebar-compact-pinned.png \
+  pnpm --filter @codex-ui-kit/codex-app-playground check:visual -- \
+  --scenes=current-sidebar-project-collapsed,current-sidebar-project-menu,current-sidebar-help-menu,current-sidebar-compact-pinned
 ```
 
 The App shell gate uses only the 120×46 application-owned titlebar crop:

@@ -44,7 +44,7 @@ const baselineContext = {
   }).split(/\s+/)[0],
   appVersion: plistValue("CFBundleShortVersionString"),
   buildNumber: plistValue("CFBundleVersion"),
-  interactionState: "resting",
+  interactionState: "resting-and-open-sidebar-menus",
   theme: "dark",
   viewport: { height: 820, width: 1180 },
 };
@@ -382,7 +382,7 @@ try {
         return "sidebar-footer";
       }
       if (value.left < 274) return "sidebar-projects";
-      if (value.left >= 274 && value.top > window.innerHeight - 220) {
+      if (value.left >= 274 && value.top > window.innerHeight - 160) {
         return "composer";
       }
       return null;
@@ -443,6 +443,54 @@ try {
       }
       return true;
     };
+    const captureVisibleMenuIcons = ({ ids, region: menuRegion }) => {
+      const visibleMenus = [...document.querySelectorAll('[role="menu"]')].filter(
+        isActuallyVisible,
+      );
+      if (visibleMenus.length !== 1) {
+        throw new Error(
+          `Expected one visible ${menuRegion}, received ${visibleMenus.length}.`,
+        );
+      }
+      const items = [
+        ...visibleMenus[0].querySelectorAll('[role="menuitem"]'),
+      ];
+      if (items.length !== ids.length) {
+        throw new Error(
+          `Expected ${ids.length} ${menuRegion} items, received ${items.length}.`,
+        );
+      }
+      return items.map((item, index) => {
+        const svgs = [...item.querySelectorAll("svg")].filter(
+          isActuallyVisible,
+        );
+        if (svgs.length !== 1) {
+          throw new Error(
+            `Expected one visible icon for ${menuRegion} item ${index}, received ${svgs.length}.`,
+          );
+        }
+        const svg = svgs[0];
+        const bounds = svg.getBoundingClientRect();
+        return {
+          owner: { role: "menuitem", semanticId: ids[index] },
+          primitives: [...svg.children].map(serializeSvgElement),
+          region: menuRegion,
+          rect: rect(svg),
+          renderSize: {
+            height: round(bounds.height),
+            width: round(bounds.width),
+          },
+          rootAttributes: attributes(svg, true),
+          rootComputedStyle: computedStyle(svg),
+          sourceClassName: svg.getAttribute("class") ?? "",
+          viewBox: svg.getAttribute("viewBox"),
+        };
+      });
+    };
+    Object.defineProperty(window, "__codexUiKitCaptureVisibleMenuIcons", {
+      configurable: true,
+      value: captureVisibleMenuIcons,
+    });
     const navigation = document.querySelector("nav");
     const recentsSections = [
       ...new Set(
@@ -732,6 +780,66 @@ try {
       viewport: { height: window.innerHeight, width: window.innerWidth },
     };
   }, [...semanticLabels]);
+  try {
+    const projectRow = main
+      .locator(
+        'nav div[role="button"][aria-expanded]:not([aria-haspopup])',
+      )
+      .first();
+    await projectRow.hover();
+    await projectRow.locator('button[aria-haspopup="menu"]').first().click();
+    await main.waitForSelector('[role="menu"]:visible');
+    const projectMenuIcons = await main.evaluate(() =>
+      window.__codexUiKitCaptureVisibleMenuIcons({
+        ids: [
+          "sidebar-project-menu-unpin",
+          "sidebar-project-menu-reveal",
+          "sidebar-project-menu-worktree",
+          "sidebar-project-menu-edit",
+          "sidebar-project-menu-archive",
+          "sidebar-project-menu-remove",
+        ],
+        region: "sidebar-project-menu",
+      }),
+    );
+    await main.keyboard.press("Escape");
+    await main.waitForSelector('[role="menu"]', { state: "hidden" });
+
+    await main
+      .locator('button[aria-label="Open help menu"]:visible')
+      .first()
+      .click();
+    await main.waitForSelector('[role="menu"]:visible');
+    const helpMenuIcons = await main.evaluate(() =>
+      window.__codexUiKitCaptureVisibleMenuIcons({
+        ids: [
+          "sidebar-help-menu-release-note",
+          "sidebar-help-menu-release-note",
+          "sidebar-help-menu-release-note",
+          "sidebar-help-menu-changelog",
+          "sidebar-help-menu-chrome",
+          "sidebar-help-menu-remote",
+          "sidebar-help-menu-keyboard",
+          "sidebar-help-menu-support",
+        ],
+        region: "sidebar-help-menu",
+      }),
+    );
+    await main.keyboard.press("Escape");
+    await main.waitForSelector('[role="menu"]', { state: "hidden" });
+    result.icons.push(...projectMenuIcons, ...helpMenuIcons);
+    result.sidebarObservation.projectMenuItemCount = projectMenuIcons.length;
+    result.sidebarObservation.helpMenuItemCount = helpMenuIcons.length;
+  } finally {
+    if ((await main.locator('[role="menu"]:visible').count()) > 0) {
+      await main.keyboard.press("Escape").catch(() => {});
+    }
+    await main
+      .evaluate(() => {
+        delete window.__codexUiKitCaptureVisibleMenuIcons;
+      })
+      .catch(() => {});
+  }
   if (
     result.viewport.height !== baselineContext.viewport.height ||
     result.viewport.width !== baselineContext.viewport.width

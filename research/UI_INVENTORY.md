@@ -69,8 +69,8 @@ observation from a previous build remains historical evidence.
   previous-build regression evidence and have been downgraded from `verified`
   to `partial_legacy` until they are reached again on the current fingerprint.
 
-Current inventory: 81 surface groups; 14 have current-build runtime evidence, 50 have previous-build-only runtime evidence, 17 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 13 groups and Electron verification covers 13.
-Prior acceptance outside those 14 sampled current-build groups remains
+Current inventory: 84 surface groups; 17 have current-build runtime evidence, 50 have previous-build-only runtime evidence, 17 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 16 groups and Electron verification covers 16.
+Prior acceptance outside those 17 sampled current-build groups remains
 recorded as `partial_legacy` until current-build re-observation.
 
 The current package exposes candidates far beyond the old transcript sample:
@@ -184,6 +184,21 @@ and a dedicated ownership-masked regional gate. The
 0.1163% for the ownership-masked selected row, and 0.4126% for the footer,
 where only account-owned content is masked and the Help control remains under
 comparison; the Recents region passes at 2.5356%.
+
+The current sidebar lifecycle follow-up splits the broad historical project,
+action, and footer rows into three independently gated current-build groups:
+`app.sidebar-project-group-lifecycle`,
+`app.sidebar-project-actions-menu`, and `app.sidebar-help-menu`. The product
+record contains six expandable groups with 30px project rows and 40px task
+bands, pointer/Enter/Space transitions, the 721→720 automatic-collapse rule,
+explicit 720px pinning, a 214.05×179.38 six-item project menu, and a
+200×272.06 Help menu with a `What's new` heading and eight items. Browser/CDP
+and Electron repeat the lifecycle; four local-only ownership-masked product
+comparisons pass at 1.54%, 0.13%, 0.30%, and 3.12% for collapsed projects,
+the project menu, the Help menu, and the compact pinned sidebar. The broader
+project-navigation, mutation/status, and account/settings rows remain
+`partial_legacy` because these narrower observations do not prove every state
+they own.
 
 The same current-build manifest now supplies exact visible Sidebar, Back, and
 Forward primitives to the private playground window chrome. Browser/CDP and
@@ -672,8 +687,8 @@ Review content, subagent status, system typography, compact Composer width,
 hidden navigation, and zero overflow. Electron reopens every disclosure,
 switches Review to the subagent transcript, and performs the native compact
 resize. Nine reviewed internal pixel baselines pass. This expands the
-regression matrix to 33 traces, 406 events, and 151 visual frames without
-changing the 14 current-runtime / 50 previous-only / 17 unsampled inventory
+regression matrix to 33 traces, 406 events, and 155 visual frames without
+changing the now-expanded 17 current-runtime / 50 previous-only / 17 unsampled inventory
 counts: no single current-product task supplied whole-thread runtime or pixel
 evidence for this composition.
 
@@ -884,7 +899,7 @@ adds source-structural evidence for the seven collaboration statuses,
 Active/Done classification, and 4/10 panel limits. A schema-valid twelve-agent
 replay now covers waiting-before-initialization, streamed updates, errored,
 interrupted, shutdown, and unavailable terminal results, both pagination
-  paths, and the failed-agent transcript. Browser/CDP reaches 151 frames;
+  paths, and the failed-agent transcript. Browser/CDP reaches 155 frames;
 Electron repeats the pagination and transcript interactions. Nine
 reviewed scenes gate ten current-build regions. Panel/summary/transcript ratios
 range from `0.013328938694792354` to `0.046708160442600274`; the compact
@@ -928,7 +943,7 @@ fence, table, long running tail, and completed tail.
 
 A later isolated current-build task reaches an 18-column table's Copy, Expand,
 and viewport preview path. The public five-event replay contributes to the
-151-frame matrix; Electron repeats raw Markdown/HTML copy, horizontal wheel,
+155-frame matrix; Electron repeats raw Markdown/HTML copy, horizontal wheel,
 preview interaction, and 720×680 action reachability, and three reviewed
 internal baselines pass. A local-only
 1180×820 reference gates the preview and close regions at 3.9737% and 0.5929%

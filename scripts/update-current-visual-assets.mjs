@@ -342,6 +342,50 @@ const promotionSpecs = new Map([
       semanticId: "sidebar-help",
     },
   ],
+  ...[
+    "unpin",
+    "reveal",
+    "worktree",
+    "edit",
+    "archive",
+    "remove",
+  ].map((name) => [
+    `sidebar-project-menu-${name}`,
+    {
+      ownerAriaLabel: null,
+      ownerEvidence:
+        "fixed-position project-menu item icon selected by ordered current-build menu structure",
+      region: "sidebar-project-menu",
+      semanticId: `sidebar-project-menu-${name}`,
+    },
+  ]),
+  [
+    "sidebar-help-menu-release-note",
+    {
+      minimumCandidates: 3,
+      ownerAriaLabel: null,
+      ownerEvidence:
+        "three current-build release-note rows share one ordered menu icon",
+      region: "sidebar-help-menu",
+      semanticId: "sidebar-help-menu-release-note",
+    },
+  ],
+  ...[
+    "changelog",
+    "chrome",
+    "remote",
+    "keyboard",
+    "support",
+  ].map((name) => [
+    `sidebar-help-menu-${name}`,
+    {
+      ownerAriaLabel: null,
+      ownerEvidence:
+        "fixed-position Help-menu item icon selected by ordered current-build menu structure",
+      region: "sidebar-help-menu",
+      semanticId: `sidebar-help-menu-${name}`,
+    },
+  ]),
 ]);
 
 const manifest = JSON.parse(readFileSync(manifestPath, "utf8"));
@@ -377,6 +421,14 @@ if (
     })}`,
   );
 }
+if (
+  capture.sidebarObservation?.projectMenuItemCount !== 6 ||
+  capture.sidebarObservation?.helpMenuItemCount !== 8
+) {
+  throw new Error(
+    `Unexpected current sidebar menu capture: ${canonicalize(capture.sidebarObservation)}`,
+  );
+}
 const baselineContext = capture.baselineContext;
 if (
   !baselineContext ||
@@ -397,8 +449,14 @@ const currentFingerprint = {
 };
 const fingerprintChanged =
   canonicalize(previousFingerprint) !== canonicalize(currentFingerprint);
+const captureContextChanged =
+  fingerprintChanged ||
+  manifest.baseline.interactionState !== baselineContext.interactionState ||
+  manifest.baseline.theme !== baselineContext.theme ||
+  canonicalize(manifest.baseline.viewport) !==
+    canonicalize(baselineContext.viewport);
 const capturedAt =
-  !fingerprintChanged &&
+  !captureContextChanged &&
   /^\d{4}-\d{2}-\d{2}$/.test(manifest.baseline.capturedAt ?? "")
     ? manifest.baseline.capturedAt
     : new Date().toISOString().slice(0, 10);
@@ -444,7 +502,23 @@ function promoteIcon(id, existing) {
   const spec = promotionSpecs.get(id);
   if (!spec) throw new Error(`Missing explicit promotion spec for ${id}.`);
   const observed = selectObservedIcon(id, spec, existing);
-  if (!observed) return existing;
+  if (!observed) {
+    const retained = { ...existing };
+    retained.sha256 = createHash("sha256")
+      .update(
+        canonicalize({
+          baselineContext: hashBaselineContext,
+          primitives: retained.primitives,
+          renderSize: retained.renderSize,
+          rootAttributes: retained.rootAttributes,
+          rootComputedStyle: retained.rootComputedStyle,
+          sourceClassName: retained.sourceClassName,
+          viewBox: retained.viewBox,
+        }),
+      )
+      .digest("hex");
+    return retained;
+  }
 
   let primitives = observed.primitives;
   if (existing && !fingerprintChanged) {

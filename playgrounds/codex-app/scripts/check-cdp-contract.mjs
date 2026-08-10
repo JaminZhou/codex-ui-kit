@@ -2218,6 +2218,88 @@ for (const scene of visualScenes) {
       continue;
     }
 
+    if (scene.id === "current-sidebar-compact-pinned") {
+      const compactSidebar = await page.evaluate(() => {
+        const shell = document.querySelector(".codex-ui-app-shell");
+        const sidebar = document.querySelector(
+          ".codex-ui-app-shell__sidebar",
+        );
+        const main = document.querySelector(".codex-ui-app-shell__main");
+        return {
+          frame: document
+            .querySelector(".demo-root")
+            ?.getAttribute("data-frame"),
+          helpVisible: Boolean(
+            document.querySelector(
+              'button[aria-label="Open help menu"]',
+            ),
+          ),
+          horizontalOverflow:
+            document.documentElement.scrollWidth -
+            document.documentElement.clientWidth,
+          layoutMode: shell?.getAttribute("data-layout-mode"),
+          main: main
+            ? {
+                left: main.getBoundingClientRect().left,
+                width: main.getBoundingClientRect().width,
+              }
+            : null,
+          projectGroupCount: document.querySelectorAll(
+            ".codex-ui-app-sidebar__project-group",
+          ).length,
+          projectGroupExpanded: document
+            .querySelector(
+              '.codex-ui-app-sidebar__project-group [aria-expanded]',
+            )
+            ?.getAttribute("aria-expanded"),
+          resizer: Boolean(
+            document.querySelector(
+              '.codex-ui-app-shell__sidebar-resizer[role="separator"]',
+            ),
+          ),
+          sidebar: sidebar
+            ? {
+                left: sidebar.getBoundingClientRect().left,
+                width: sidebar.getBoundingClientRect().width,
+              }
+            : null,
+          sidebarOpen: shell?.hasAttribute("data-sidebar-open"),
+          sidebarState: document
+            .querySelector(".demo-root")
+            ?.getAttribute("data-sidebar-state"),
+          viewport: { height: innerHeight, width: innerWidth },
+        };
+      });
+      if (
+        compactSidebar.frame !== "sidebar-current" ||
+        compactSidebar.sidebarState !== "compact-pinned" ||
+        compactSidebar.layoutMode !== "narrow" ||
+        !compactSidebar.sidebarOpen ||
+        compactSidebar.resizer ||
+        !compactSidebar.sidebar ||
+        Math.abs(compactSidebar.sidebar.left) > 1 ||
+        Math.abs(compactSidebar.sidebar.width - 274) > 1 ||
+        !compactSidebar.main ||
+        Math.abs(compactSidebar.main.left - 274) > 1 ||
+        Math.abs(compactSidebar.main.width - 446) > 1 ||
+        compactSidebar.projectGroupCount !== 5 ||
+        compactSidebar.projectGroupExpanded !== "true" ||
+        !compactSidebar.helpVisible ||
+        Math.abs(compactSidebar.horizontalOverflow) > 1 ||
+        compactSidebar.viewport.width !== 720 ||
+        compactSidebar.viewport.height !== 680
+      ) {
+        throw new Error(
+          `current-sidebar-compact-pinned: narrow contract failed: ${JSON.stringify(compactSidebar)}`,
+        );
+      }
+      await writeFile(
+        join(artifactDirectory, `${scene.id}.json`),
+        `${JSON.stringify(compactSidebar, null, 2)}\n`,
+      );
+      continue;
+    }
+
     const contract = await page.evaluate(() => {
       const root = document.querySelector(".demo-root");
       const shell = document.querySelector(".codex-ui-app-shell");
@@ -6990,6 +7072,254 @@ try {
       })}`,
     );
   }
+  const projectGroup = sidebarPage.getByRole("button", {
+    exact: true,
+    name: "session-browser",
+  });
+  const projectTask = sidebarPage.getByRole("button", {
+    exact: true,
+    name: "Inspect timeline structure",
+  });
+  const readProjectState = async () => ({
+    expanded: await projectGroup.getAttribute("aria-expanded"),
+    focusOnGroup: await projectGroup.evaluate(
+      (element) => document.activeElement === element,
+    ),
+    taskVisible: await projectTask.isVisible(),
+  });
+  await projectGroup.click();
+  const projectPointerCollapsed = await readProjectState();
+  await projectGroup.press("Enter");
+  const projectEnterExpanded = await readProjectState();
+  await projectGroup.press("Space");
+  const projectSpaceCollapsed = await readProjectState();
+  await projectGroup.press("Space");
+  const projectSpaceExpanded = await readProjectState();
+  if (
+    projectPointerCollapsed.expanded !== "false" ||
+    !projectPointerCollapsed.focusOnGroup ||
+    projectPointerCollapsed.taskVisible ||
+    projectEnterExpanded.expanded !== "true" ||
+    !projectEnterExpanded.focusOnGroup ||
+    !projectEnterExpanded.taskVisible ||
+    projectSpaceCollapsed.expanded !== "false" ||
+    !projectSpaceCollapsed.focusOnGroup ||
+    projectSpaceCollapsed.taskVisible ||
+    projectSpaceExpanded.expanded !== "true" ||
+    !projectSpaceExpanded.focusOnGroup ||
+    !projectSpaceExpanded.taskVisible
+  ) {
+    throw new Error(
+      `sidebar-current: project expansion lifecycle failed: ${JSON.stringify({
+        projectEnterExpanded,
+        projectPointerCollapsed,
+        projectSpaceCollapsed,
+        projectSpaceExpanded,
+      })}`,
+    );
+  }
+
+  const projectMenuTrigger = projectActions.getByRole("button", {
+    name: "Project actions for session-browser",
+  });
+  await projectActions.locator("..").hover();
+  await projectMenuTrigger.click();
+  const projectMenu = sidebarPage.getByRole("menu", {
+    name: "session-browser project menu",
+  });
+  await projectMenu.waitFor({ state: "visible" });
+  const projectMenuContract = await projectMenu.evaluate((menu) => {
+    const bounds = menu.getBoundingClientRect();
+    return {
+      focusRole: document.activeElement?.getAttribute("role"),
+      icons: Array.from(
+        menu.querySelectorAll("[data-current-build-icon]"),
+        (icon) => icon.getAttribute("data-current-build-icon"),
+      ),
+      itemCount: menu.querySelectorAll('[role="menuitem"]').length,
+      rect: { height: bounds.height, width: bounds.width },
+    };
+  });
+  await sidebarPage.keyboard.press("Escape");
+  await projectMenu.waitFor({ state: "hidden" });
+  projectMenuContract.focusReturned = await projectMenuTrigger.evaluate(
+    (element) => document.activeElement === element,
+  );
+  if (
+    projectMenuContract.itemCount !== 6 ||
+    projectMenuContract.focusRole !== "menuitem" ||
+    !projectMenuContract.focusReturned ||
+    Math.abs(projectMenuContract.rect.width - 214.05) > 1 ||
+    Math.abs(projectMenuContract.rect.height - 179.38) > 1 ||
+    JSON.stringify(projectMenuContract.icons) !==
+      JSON.stringify([
+        "sidebar-project-menu-unpin",
+        "sidebar-project-menu-reveal",
+        "sidebar-project-menu-worktree",
+        "sidebar-project-menu-edit",
+        "sidebar-project-menu-archive",
+        "sidebar-project-menu-remove",
+      ])
+  ) {
+    throw new Error(
+      `sidebar-current: project menu contract failed: ${JSON.stringify(projectMenuContract)}`,
+    );
+  }
+
+  const helpMenuTrigger = sidebarPage.getByRole("button", {
+    name: "Open help menu",
+  });
+  await helpMenuTrigger.click();
+  const helpMenu = sidebarPage.getByRole("menu", { name: "Help menu" });
+  await helpMenu.waitFor({ state: "visible" });
+  const helpMenuContract = await helpMenu.evaluate((menu) => {
+    const bounds = menu.getBoundingClientRect();
+    return {
+      focusRole: document.activeElement?.getAttribute("role"),
+      heading:
+        menu.querySelector(
+          ".demo-current-sidebar-help-menu__heading",
+        )?.textContent,
+      icons: Array.from(
+        menu.querySelectorAll("[data-current-build-icon]"),
+        (icon) => icon.getAttribute("data-current-build-icon"),
+      ),
+      itemCount: menu.querySelectorAll('[role="menuitem"]').length,
+      rect: { height: bounds.height, width: bounds.width },
+      separatorCount: menu.querySelectorAll('[role="separator"]').length,
+    };
+  });
+  await sidebarPage.keyboard.press("Escape");
+  await helpMenu.waitFor({ state: "hidden" });
+  helpMenuContract.focusReturned = await helpMenuTrigger.evaluate(
+    (element) => document.activeElement === element,
+  );
+  if (
+    helpMenuContract.itemCount !== 8 ||
+    helpMenuContract.heading !== "What's new" ||
+    helpMenuContract.separatorCount !== 1 ||
+    helpMenuContract.focusRole !== "menuitem" ||
+    !helpMenuContract.focusReturned ||
+    Math.abs(helpMenuContract.rect.width - 200) > 1 ||
+    Math.abs(helpMenuContract.rect.height - 272.06) > 1 ||
+    JSON.stringify(helpMenuContract.icons) !==
+      JSON.stringify([
+        "sidebar-help-menu-release-note",
+        "sidebar-help-menu-release-note",
+        "sidebar-help-menu-release-note",
+        "sidebar-help-menu-changelog",
+        "sidebar-help-menu-chrome",
+        "sidebar-help-menu-remote",
+        "sidebar-help-menu-keyboard",
+        "sidebar-help-menu-support",
+      ])
+  ) {
+    throw new Error(
+      `sidebar-current: Help menu contract failed: ${JSON.stringify(helpMenuContract)}`,
+    );
+  }
+
+  await projectGroup.press("Space");
+  const resizeSidebar = async (width, height) => {
+    const layoutMode = width <= 720 ? "narrow" : width >= 1_024 ? "wide" : "medium";
+    await sidebarApp.evaluate(
+      ({ BrowserWindow }, size) => {
+        BrowserWindow.getAllWindows()[0]?.setContentSize(
+          size.width,
+          size.height,
+        );
+      },
+      { height, width },
+    );
+    await sidebarPage.waitForFunction(
+      (size) =>
+        innerWidth === size.width &&
+        innerHeight === size.height &&
+        document
+          .querySelector(".codex-ui-app-shell")
+          ?.getAttribute("data-layout-mode") === size.layoutMode,
+      { height, layoutMode, width },
+    );
+  };
+  await resizeSidebar(720, 680);
+  await sidebarPage.waitForFunction(
+    () =>
+      document
+        .querySelector(".codex-ui-app-shell")
+        ?.getAttribute("data-layout-mode") === "narrow" &&
+      !document
+        .querySelector(".codex-ui-app-shell")
+        ?.hasAttribute("data-sidebar-open"),
+  );
+  const responsiveProject = {
+    compactCollapsed: await sidebarPage.evaluate(() => ({
+      horizontalOverflow:
+        document.documentElement.scrollWidth -
+        document.documentElement.clientWidth,
+      projectExpanded: document
+        .querySelector(
+          '.codex-ui-app-sidebar__project-group [aria-expanded]',
+        )
+        ?.getAttribute("aria-expanded"),
+      sidebarOpen: document
+        .querySelector(".codex-ui-app-shell")
+        ?.hasAttribute("data-sidebar-open"),
+    })),
+  };
+  await sidebarPage.getByRole("button", { name: "Show sidebar" }).click();
+  await sidebarPage.waitForFunction(() =>
+    document
+      .querySelector(".codex-ui-app-shell")
+      ?.hasAttribute("data-sidebar-open"),
+  );
+  responsiveProject.compactPinned = await sidebarPage.evaluate(() => ({
+    horizontalOverflow:
+      document.documentElement.scrollWidth -
+      document.documentElement.clientWidth,
+    projectExpanded: document
+      .querySelector(
+        '.codex-ui-app-sidebar__project-group [aria-expanded]',
+      )
+      ?.getAttribute("aria-expanded"),
+    sidebarWidth: document
+      .querySelector(".codex-ui-app-shell__sidebar")
+      ?.getBoundingClientRect().width,
+  }));
+  await resizeSidebar(1180, 820);
+  responsiveProject.wideRestored = await sidebarPage.evaluate(() => ({
+    horizontalOverflow:
+      document.documentElement.scrollWidth -
+      document.documentElement.clientWidth,
+    projectExpanded: document
+      .querySelector(
+        '.codex-ui-app-sidebar__project-group [aria-expanded]',
+      )
+      ?.getAttribute("aria-expanded"),
+    sidebarWidth: document
+      .querySelector(".codex-ui-app-shell__sidebar")
+      ?.getBoundingClientRect().width,
+  }));
+  await projectGroup.press("Enter");
+  responsiveProject.keyboardRestored = await readProjectState();
+  if (
+    responsiveProject.compactCollapsed.sidebarOpen ||
+    responsiveProject.compactCollapsed.projectExpanded !== "false" ||
+    Math.abs(responsiveProject.compactCollapsed.horizontalOverflow) > 1 ||
+    responsiveProject.compactPinned.projectExpanded !== "false" ||
+    Math.abs((responsiveProject.compactPinned.sidebarWidth ?? 0) - 274) > 1 ||
+    Math.abs(responsiveProject.compactPinned.horizontalOverflow) > 1 ||
+    responsiveProject.wideRestored.projectExpanded !== "false" ||
+    Math.abs((responsiveProject.wideRestored.sidebarWidth ?? 0) - 274) > 1 ||
+    Math.abs(responsiveProject.wideRestored.horizontalOverflow) > 1 ||
+    responsiveProject.keyboardRestored.expanded !== "true" ||
+    !responsiveProject.keyboardRestored.focusOnGroup ||
+    !responsiveProject.keyboardRestored.taskVisible
+  ) {
+    throw new Error(
+      `sidebar-current: responsive project continuity failed: ${JSON.stringify(responsiveProject)}`,
+    );
+  }
+  await resizeSidebar(820, 680);
   const firstAction = recentTaskActions.first().getByRole("button").first();
   await firstAction.focus();
   const compact = await sidebarPage.evaluate(() => {
@@ -7178,6 +7508,13 @@ try {
         currentRecentActions,
         currentSidebarAssets,
         currentTaskActions,
+        helpMenuContract,
+        projectEnterExpanded,
+        projectMenuContract,
+        projectPointerCollapsed,
+        projectSpaceCollapsed,
+        projectSpaceExpanded,
+        responsiveProject,
       },
       null,
       2,

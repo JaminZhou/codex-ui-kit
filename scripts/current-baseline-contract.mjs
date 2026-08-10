@@ -54,6 +54,108 @@ const validAppAsarSnapshot = (snapshot) =>
 const sameAppAsarSnapshot = (before, after) =>
   appAsarSnapshotFields.every((field) => before[field] === after[field]);
 
+export function assertCurrentSidebarLifecycle(lifecycle) {
+  const baseline = lifecycle?.baseline;
+  const projectMenu = lifecycle?.projectMenu;
+  const helpMenu = lifecycle?.helpMenu;
+  const responsive = lifecycle?.responsive;
+  const states = [
+    lifecycle?.pointerCollapsed,
+    lifecycle?.enterExpanded,
+    lifecycle?.spaceCollapsed,
+    lifecycle?.spaceExpanded,
+    responsive?.compactCollapsed,
+    responsive?.compactPinned,
+    responsive?.wideRestored,
+    responsive?.keyboardRestored,
+  ];
+  if (
+    baseline?.projectGroupCount < 5 ||
+    baseline?.expandedProjectGroupCount < 5 ||
+    baseline?.projectRow?.tag !== "div" ||
+    baseline?.projectRow?.role !== "button" ||
+    baseline?.projectRow?.tabIndex !== 0 ||
+    !withinTolerance(baseline?.projectRow?.rect?.height, 30) ||
+    !withinTolerance(baseline?.projectRow?.rect?.width, 258.11) ||
+    baseline?.settingsControlCount !== 0 ||
+    baseline?.helpControlCount !== 1 ||
+    Math.abs(baseline?.horizontalOverflow ?? Infinity) > 1
+  ) {
+    throw new Error(
+      `Current sidebar lifecycle does not prove the project-group baseline: ${JSON.stringify(baseline)}`,
+    );
+  }
+  if (
+    states.some((state) => !state) ||
+    lifecycle.pointerCollapsed.expanded !== false ||
+    !lifecycle.pointerCollapsed.focusOnRow ||
+    lifecycle.enterExpanded.expanded !== true ||
+    !lifecycle.enterExpanded.focusOnRow ||
+    lifecycle.spaceCollapsed.expanded !== false ||
+    !lifecycle.spaceCollapsed.focusOnRow ||
+    lifecycle.spaceExpanded.expanded !== true ||
+    !lifecycle.spaceExpanded.focusOnRow
+  ) {
+    throw new Error(
+      `Current sidebar lifecycle does not prove pointer and keyboard expansion: ${JSON.stringify({
+        enterExpanded: lifecycle?.enterExpanded,
+        pointerCollapsed: lifecycle?.pointerCollapsed,
+        spaceCollapsed: lifecycle?.spaceCollapsed,
+        spaceExpanded: lifecycle?.spaceExpanded,
+      })}`,
+    );
+  }
+  if (
+    projectMenu?.opened?.visibleMenuCount !== 1 ||
+    projectMenu.opened.menuItemCount !== 6 ||
+    !projectMenu.opened.focusInside ||
+    projectMenu.opened.focusRole !== "menu" ||
+    !withinTolerance(projectMenu.opened.rect?.width, 214.05) ||
+    !withinTolerance(projectMenu.opened.rect?.height, 179.38) ||
+    projectMenu.closed?.visibleMenuCount !== 0 ||
+    projectMenu.closed.focusReturned !== false ||
+    projectMenu.closed.activeTag !== "body"
+  ) {
+    throw new Error(
+      `Current sidebar lifecycle does not prove the project menu boundary: ${JSON.stringify(projectMenu)}`,
+    );
+  }
+  if (
+    helpMenu?.opened?.visibleMenuCount !== 1 ||
+    helpMenu.opened.menuItemCount !== 8 ||
+    !helpMenu.opened.focusInside ||
+    helpMenu.opened.focusRole !== "menu" ||
+    !withinTolerance(helpMenu.opened.rect?.width, 200) ||
+    !withinTolerance(helpMenu.opened.rect?.height, 272.06) ||
+    helpMenu.closed?.visibleMenuCount !== 0 ||
+    helpMenu.closed.focusReturned !== true
+  ) {
+    throw new Error(
+      `Current sidebar lifecycle does not prove the Help menu boundary: ${JSON.stringify(helpMenu)}`,
+    );
+  }
+  if (
+    responsive.compactCollapsed.navigationVisible !== false ||
+    responsive.compactCollapsed.showSidebarCount !== 1 ||
+    responsive.compactCollapsed.projectExpanded !== false ||
+    Math.abs(responsive.compactCollapsed.horizontalOverflow ?? Infinity) > 1 ||
+    responsive.compactPinned.navigationVisible !== true ||
+    !withinTolerance(responsive.compactPinned.navigationWidth, 274.11) ||
+    responsive.compactPinned.projectExpanded !== false ||
+    Math.abs(responsive.compactPinned.horizontalOverflow ?? Infinity) > 1 ||
+    responsive.wideRestored.navigationVisible !== true ||
+    !withinTolerance(responsive.wideRestored.navigationWidth, 274.11) ||
+    responsive.wideRestored.projectExpanded !== false ||
+    Math.abs(responsive.wideRestored.horizontalOverflow ?? Infinity) > 1 ||
+    responsive.keyboardRestored.expanded !== true ||
+    !responsive.keyboardRestored.focusOnRow
+  ) {
+    throw new Error(
+      `Current sidebar lifecycle does not prove responsive state continuity: ${JSON.stringify(responsive)}`,
+    );
+  }
+}
+
 export function resolveCurrentBaselineOutputPath(profilePath, outputPath) {
   const normalizedProfile = realpathSync(profilePath);
   const normalizedOutput = resolve(outputPath);
@@ -175,6 +277,8 @@ export function assertCurrentBaselineRecord(record) {
       "Current baseline record does not prove the running Renderer bundle identity.",
     );
   }
+
+  assertCurrentSidebarLifecycle(record.sidebarLifecycle);
   if (
     record.captureKind !== "renderer_emulation" ||
     !isMainRendererUrl(record.targetSelection?.selected?.url ?? "")
@@ -345,8 +449,8 @@ export function assertCurrentBaselineRecord(record) {
     );
   }
   const expectedScrollOwners = {
-    mediumNewChat: { clientHeight: 565, scrollHeight: 949 },
-    wideNewChat: { clientHeight: 705, scrollHeight: 949 },
+    mediumNewChat: { clientHeight: 565, scrollHeight: 971 },
+    wideNewChat: { clientHeight: 705, scrollHeight: 1011 },
   };
   const invalidScrollOwnerStates = Object.entries(expectedScrollOwners)
     .filter(([state, expected]) => {

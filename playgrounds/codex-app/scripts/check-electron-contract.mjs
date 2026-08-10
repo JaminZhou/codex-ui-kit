@@ -218,6 +218,117 @@ try {
     );
   }
 
+  const projectGroup = page.getByRole("button", {
+    exact: true,
+    name: "session-browser",
+  });
+  const projectTask = page.getByRole("button", {
+    exact: true,
+    name: "Inspect timeline structure",
+  });
+  await projectGroup.click();
+  const pointerCollapsed = {
+    expanded: await projectGroup.getAttribute("aria-expanded"),
+    focusOnGroup: await projectGroup.evaluate(
+      (element) => document.activeElement === element,
+    ),
+    taskVisible: await projectTask.isVisible(),
+  };
+  await projectGroup.press("Enter");
+  await projectGroup.press("Space");
+  const spaceCollapsed = {
+    expanded: await projectGroup.getAttribute("aria-expanded"),
+    focusOnGroup: await projectGroup.evaluate(
+      (element) => document.activeElement === element,
+    ),
+    taskVisible: await projectTask.isVisible(),
+  };
+  await projectGroup.press("Space");
+  if (
+    pointerCollapsed.expanded !== "false" ||
+    !pointerCollapsed.focusOnGroup ||
+    pointerCollapsed.taskVisible ||
+    spaceCollapsed.expanded !== "false" ||
+    !spaceCollapsed.focusOnGroup ||
+    spaceCollapsed.taskVisible ||
+    (await projectGroup.getAttribute("aria-expanded")) !== "true" ||
+    !(await projectTask.isVisible())
+  ) {
+    throw new Error(
+      `Electron project expansion lifecycle failed: ${JSON.stringify({ pointerCollapsed, spaceCollapsed })}`,
+    );
+  }
+
+  const projectMenuTrigger = page.getByRole("button", {
+    name: "Project actions for session-browser",
+  });
+  await projectActions.locator("..").hover();
+  await projectMenuTrigger.click();
+  const projectMenu = page.getByRole("menu", {
+    name: "session-browser project menu",
+  });
+  await projectMenu.waitFor({ state: "visible" });
+  const projectMenuIcons = await projectMenu
+    .locator("[data-current-build-icon]")
+    .evaluateAll((icons) =>
+      icons.map((icon) => icon.getAttribute("data-current-build-icon")),
+    );
+  await page.keyboard.press("Escape");
+  await projectMenu.waitFor({ state: "hidden" });
+  const projectMenuFocusReturned = await projectMenuTrigger.evaluate(
+    (element) => document.activeElement === element,
+  );
+  if (
+    JSON.stringify(projectMenuIcons) !==
+      JSON.stringify([
+        "sidebar-project-menu-unpin",
+        "sidebar-project-menu-reveal",
+        "sidebar-project-menu-worktree",
+        "sidebar-project-menu-edit",
+        "sidebar-project-menu-archive",
+        "sidebar-project-menu-remove",
+      ]) ||
+    !projectMenuFocusReturned
+  ) {
+    throw new Error(
+      `Electron project menu lifecycle failed: ${JSON.stringify({ projectMenuFocusReturned, projectMenuIcons })}`,
+    );
+  }
+
+  const helpMenuTrigger = page.getByRole("button", {
+    name: "Open help menu",
+  });
+  await helpMenuTrigger.click();
+  const helpMenu = page.getByRole("menu", { name: "Help menu" });
+  await helpMenu.waitFor({ state: "visible" });
+  const helpMenuIcons = await helpMenu
+    .locator("[data-current-build-icon]")
+    .evaluateAll((icons) =>
+      icons.map((icon) => icon.getAttribute("data-current-build-icon")),
+    );
+  const helpMenuStructure = await helpMenu.evaluate((menu) => ({
+    heading: menu.querySelector(
+      ".demo-current-sidebar-help-menu__heading",
+    )?.textContent,
+    itemCount: menu.querySelectorAll('[role="menuitem"]').length,
+    separatorCount: menu.querySelectorAll('[role="separator"]').length,
+  }));
+  await page.keyboard.press("Escape");
+  await helpMenu.waitFor({ state: "hidden" });
+  if (
+    helpMenuIcons.length !== 8 ||
+    helpMenuStructure.heading !== "What's new" ||
+    helpMenuStructure.itemCount !== 8 ||
+    helpMenuStructure.separatorCount !== 1 ||
+    !(await helpMenuTrigger.evaluate(
+      (element) => document.activeElement === element,
+    ))
+  ) {
+    throw new Error(
+      `Electron Help menu lifecycle failed: ${JSON.stringify({ helpMenuIcons, helpMenuStructure })}`,
+    );
+  }
+
   const sidebarToggle = page.getByRole("button", { name: "Hide sidebar" });
   await sidebarToggle.click();
   await page.waitForSelector(

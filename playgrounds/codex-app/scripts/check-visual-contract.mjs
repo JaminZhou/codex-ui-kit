@@ -246,6 +246,14 @@ const currentBuildSidebarReference =
   process.env.CODEX_UI_KIT_SIDEBAR_REFERENCE;
 const currentBuildSidebarRecentsReference =
   process.env.CODEX_UI_KIT_SIDEBAR_RECENTS_REFERENCE;
+const currentBuildSidebarProjectCollapsedReference =
+  process.env.CODEX_UI_KIT_CURRENT_SIDEBAR_PROJECT_COLLAPSED_REFERENCE;
+const currentBuildSidebarProjectMenuReference =
+  process.env.CODEX_UI_KIT_CURRENT_SIDEBAR_PROJECT_MENU_REFERENCE;
+const currentBuildSidebarHelpMenuReference =
+  process.env.CODEX_UI_KIT_CURRENT_SIDEBAR_HELP_MENU_REFERENCE;
+const currentBuildSidebarCompactPinnedReference =
+  process.env.CODEX_UI_KIT_CURRENT_SIDEBAR_COMPACT_PINNED_REFERENCE;
 const currentBuildWindowChromeReference =
   process.env.CODEX_UI_KIT_WINDOW_CHROME_REFERENCE;
 const defaultLifecycleMainPixelRatio = 0.0025;
@@ -338,10 +346,12 @@ async function compareCurrentBuildOverlay({
   actual,
   actualBounds,
   defaultMaximumRatio,
+  expectedActualPosition,
   masks,
   maximumRatioName,
   referenceCrop,
   referencePath,
+  referenceSize = currentBuildWorkspaceReferenceSize,
   sceneId,
 }) {
   const referenceFull = flattenPng(
@@ -349,11 +359,11 @@ async function compareCurrentBuildOverlay({
     { blue: 24, green: 24, red: 24 },
   );
   if (
-    referenceFull.width !== currentBuildWorkspaceReferenceSize.width ||
-    referenceFull.height !== currentBuildWorkspaceReferenceSize.height
+    referenceFull.width !== referenceSize.width ||
+    referenceFull.height !== referenceSize.height
   ) {
     throw new Error(
-      `${sceneId}: current-build overlay reference must be exactly ${currentBuildWorkspaceReferenceSize.width}x${currentBuildWorkspaceReferenceSize.height}, received ${referenceFull.width}x${referenceFull.height}.`,
+      `${sceneId}: current-build overlay reference must be exactly ${referenceSize.width}x${referenceSize.height}, received ${referenceFull.width}x${referenceFull.height}.`,
     );
   }
   if (
@@ -363,6 +373,15 @@ async function compareCurrentBuildOverlay({
   ) {
     throw new Error(
       `${sceneId}: current-build overlay bounds do not match ${referenceCrop.width}x${referenceCrop.height}: ${JSON.stringify(actualBounds)}.`,
+    );
+  }
+  if (
+    expectedActualPosition &&
+    (actualBounds.left !== expectedActualPosition.left ||
+      actualBounds.top !== expectedActualPosition.top)
+  ) {
+    throw new Error(
+      `${sceneId}: current-build overlay position does not match ${JSON.stringify(expectedActualPosition)}: ${JSON.stringify(actualBounds)}.`,
     );
   }
   const reference = cropPng(
@@ -466,6 +485,8 @@ for (const scene of selectedScenes) {
   const baselinePath = join(baselineDirectory, `${scene.id}.png`);
   const diffPath = join(artifactDirectory, `${scene.id}.diff.png`);
   let sidebarSelectedTop;
+  let sidebarMenuBounds;
+  let sidebarMenuItemBounds;
   let sidebarRecentsBounds;
   let workspaceCurrentIconBounds;
   let workspaceEnvironmentMenuBounds;
@@ -522,6 +543,50 @@ for (const scene of selectedScenes) {
             width: Math.round(value.width),
           };
         });
+    }
+    if (
+      scene.id === "current-sidebar-project-menu" ||
+      scene.id === "current-sidebar-help-menu"
+    ) {
+      const menu = page.locator('[role="menu"]');
+      sidebarMenuBounds = await menu.evaluate((element) => {
+        const value = element.getBoundingClientRect();
+        return {
+          height: Math.round(value.height),
+          left: Math.round(value.left),
+          top: Math.round(value.top),
+          width: Math.round(value.width),
+        };
+      });
+      sidebarMenuItemBounds = await menu
+        .locator('[role="menuitem"]')
+        .evaluateAll((elements) => {
+          const menuBounds = elements[0]
+            ?.closest('[role="menu"]')
+            ?.getBoundingClientRect();
+          if (!menuBounds) return [];
+          return elements.map((element) => {
+            const value = element.getBoundingClientRect();
+            return {
+              height: Math.round(value.height),
+              left: Math.round(value.left - menuBounds.left),
+              top: Math.round(value.top - menuBounds.top),
+              width: Math.round(value.width),
+            };
+          });
+        });
+      await page.evaluate(() => {
+        const active = document.activeElement;
+        if (active instanceof HTMLElement) active.blur();
+      });
+    }
+    if (scene.id === "current-sidebar-project-collapsed") {
+      await page
+        .locator(
+          ".codex-ui-app-sidebar__project-group > .codex-ui-app-sidebar__item-row > button",
+        )
+        .first()
+        .focus();
     }
     if (scene.id === "multi-file-review") {
       await page.evaluate(() => {
@@ -1312,6 +1377,119 @@ for (const scene of selectedScenes) {
         width: 274,
       },
       referencePath: currentBuildSidebarRecentsReference,
+      sceneId: scene.id,
+    });
+  }
+
+  if (
+    scene.id === "current-sidebar-project-menu" &&
+    currentBuildSidebarProjectMenuReference
+  ) {
+    if (sidebarMenuItemBounds?.length !== 6) {
+      throw new Error(
+        `${scene.id}: expected six project menu item bounds, received ${sidebarMenuItemBounds?.length ?? 0}.`,
+      );
+    }
+    await compareCurrentBuildOverlay({
+      actual,
+      actualBounds: sidebarMenuBounds,
+      defaultMaximumRatio: 0.005,
+      expectedActualPosition: { left: 211, top: 313 },
+      masks: sidebarMenuItemBounds.map(({ height, top, width }) => ({
+        height: Math.max(0, height - 8),
+        left: 34,
+        top: top + 4,
+        width: Math.max(0, width - 38),
+      })),
+      maximumRatioName:
+        "CODEX_UI_KIT_CURRENT_SIDEBAR_PROJECT_MENU_MAX_DIFF_RATIO",
+      referenceCrop: {
+        height: 179,
+        left: 211,
+        top: 313,
+        width: 214,
+      },
+      referencePath: currentBuildSidebarProjectMenuReference,
+      sceneId: scene.id,
+    });
+  }
+
+  if (
+    scene.id === "current-sidebar-help-menu" &&
+    currentBuildSidebarHelpMenuReference
+  ) {
+    if (sidebarMenuItemBounds?.length !== 8) {
+      throw new Error(
+        `${scene.id}: expected eight Help menu item bounds, received ${sidebarMenuItemBounds?.length ?? 0}.`,
+      );
+    }
+    await compareCurrentBuildOverlay({
+      actual,
+      actualBounds: sidebarMenuBounds,
+      defaultMaximumRatio: 0.005,
+      expectedActualPosition: { left: 235, top: 502 },
+      masks: [
+        { height: 19, left: 8, top: 4, width: 110 },
+        ...sidebarMenuItemBounds.map(({ height, top, width }) => ({
+          height: Math.max(0, height - 8),
+          left: 34,
+          top: top + 4,
+          width: Math.max(0, width - 38),
+        })),
+      ],
+      maximumRatioName:
+        "CODEX_UI_KIT_CURRENT_SIDEBAR_HELP_MENU_MAX_DIFF_RATIO",
+      referenceCrop: {
+        height: 272,
+        left: 235,
+        top: 502,
+        width: 200,
+      },
+      referencePath: currentBuildSidebarHelpMenuReference,
+      sceneId: scene.id,
+    });
+  }
+
+  if (
+    scene.id === "current-sidebar-project-collapsed" &&
+    currentBuildSidebarProjectCollapsedReference
+  ) {
+    await compareCurrentBuildOverlay({
+      actual,
+      actualBounds: { height: 135, left: 0, top: 250, width: 274 },
+      defaultMaximumRatio: 0.02,
+      masks: [
+        { height: 24, left: 16, top: 2, width: 90 },
+        { height: 105, left: 38, top: 30, width: 172 },
+      ],
+      maximumRatioName:
+        "CODEX_UI_KIT_CURRENT_SIDEBAR_PROJECT_COLLAPSED_MAX_DIFF_RATIO",
+      referenceCrop: { height: 135, left: 0, top: 250, width: 274 },
+      referencePath: currentBuildSidebarProjectCollapsedReference,
+      sceneId: scene.id,
+    });
+  }
+
+  if (
+    scene.id === "current-sidebar-compact-pinned" &&
+    currentBuildSidebarCompactPinnedReference
+  ) {
+    await compareCurrentBuildOverlay({
+      actual,
+      actualBounds: { height: 680, left: 0, top: 0, width: 274 },
+      defaultMaximumRatio: 0.035,
+      masks: [
+        { height: 32, left: 16, top: 45, width: 82 },
+        { height: 154, left: 38, top: 83, width: 180 },
+        { height: 28, left: 16, top: 253, width: 90 },
+        { height: 351, left: 38, top: 282, width: 172 },
+        { height: 42, left: 39, top: 638, width: 181 },
+      ],
+      maximumRatioName:
+        "CODEX_UI_KIT_CURRENT_SIDEBAR_COMPACT_PINNED_MAX_DIFF_RATIO",
+      referenceCrop: { height: 680, left: 0, top: 0, width: 274 },
+      referencePath: currentBuildSidebarCompactPinnedReference,
+      referenceSize: { height: 680, width: 720 },
       sceneId: scene.id,
     });
   }
