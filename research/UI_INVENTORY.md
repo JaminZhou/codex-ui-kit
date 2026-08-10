@@ -663,6 +663,20 @@ without claiming that the unavailable GitHub transport itself reconnected.
 Authentication, elicitation, MCP approvals, same-transport disconnect/reconnect,
 other integrations, and cancellation remain open.
 
+The independent `current-mixed-tool-thread` trace now joins the separately
+validated search, Browser, MCP, command, approval, file Review, and subagent
+contracts in one schema-valid multi-turn reducer path. It records 39 events
+and eight named checkpoints; a ninth 720×680 scene reuses the completed frame.
+Browser/CDP verifies action order, disclosure ownership, approval semantics,
+Review content, subagent status, system typography, compact Composer width,
+hidden navigation, and zero overflow. Electron reopens every disclosure,
+switches Review to the subagent transcript, and performs the native compact
+resize. Nine reviewed internal pixel baselines pass. This expands the
+regression matrix to 33 traces, 406 events, and 151 visual frames without
+changing the 14 current-runtime / 50 previous-only / 17 unsampled inventory
+counts: no single current-product task supplied whole-thread runtime or pixel
+evidence for this composition.
+
 The long-thread continuity slice adds the default ten-message threshold and
 measured 36×10 rows to `ThreadMessageNavigationRail`, exposes
 the rail and 32×32 latest-message control as overlay slots on
@@ -870,7 +884,7 @@ adds source-structural evidence for the seven collaboration statuses,
 Active/Done classification, and 4/10 panel limits. A schema-valid twelve-agent
 replay now covers waiting-before-initialization, streamed updates, errored,
 interrupted, shutdown, and unavailable terminal results, both pagination
-paths, and the failed-agent transcript. Browser/CDP reaches 142 frames;
+  paths, and the failed-agent transcript. Browser/CDP reaches 151 frames;
 Electron repeats the pagination and transcript interactions. Nine
 reviewed scenes gate ten current-build regions. Panel/summary/transcript ratios
 range from `0.013328938694792354` to `0.046708160442600274`; the compact
@@ -913,8 +927,8 @@ return to latest; four reviewed internal pixel baselines cover the streamed
 fence, table, long running tail, and completed tail.
 
 A later isolated current-build task reaches an 18-column table's Copy, Expand,
-and viewport preview path. The public five-event replay raises the matrix to
-142 frames, Electron repeats raw Markdown/HTML copy, horizontal wheel,
+and viewport preview path. The public five-event replay contributes to the
+151-frame matrix; Electron repeats raw Markdown/HTML copy, horizontal wheel,
 preview interaction, and 720×680 action reachability, and three reviewed
 internal baselines pass. A local-only
 1180×820 reference gates the preview and close regions at 3.9737% and 0.5929%

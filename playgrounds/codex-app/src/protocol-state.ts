@@ -184,6 +184,28 @@ export interface DemoMcpToolCall {
   turnId: string | null;
 }
 
+export type DemoWebSearchAction =
+  | "findInPage"
+  | "openPage"
+  | "other"
+  | "search";
+
+export interface DemoWebSearchResult {
+  detail: string;
+  id: string;
+  url: string | null;
+}
+
+export interface DemoWebSearch {
+  action: DemoWebSearchAction;
+  id: string;
+  query: string;
+  results: DemoWebSearchResult[];
+  status: "completed" | "running";
+  target: string | null;
+  turnId: string | null;
+}
+
 export interface DemoSubagent {
   activityKind?: "interacted";
   agentPath: string | null;
@@ -225,7 +247,8 @@ export interface DemoTimelineEntry {
     | "fileChange"
     | "mcpToolCall"
     | "message"
-    | "subagent";
+    | "subagent"
+    | "webSearch";
 }
 
 export interface DemoProtocolState {
@@ -248,6 +271,7 @@ export interface DemoProtocolState {
   timeline: DemoTimelineEntry[];
   turnDurationMs: number | null;
   turnDurationsMs: Record<string, number>;
+  webSearches: DemoWebSearch[];
 }
 
 export interface ApprovedCommandReplaySettlement {
@@ -277,6 +301,7 @@ export const initialProtocolState: DemoProtocolState = {
   timeline: [],
   turnDurationMs: null,
   turnDurationsMs: {},
+  webSearches: [],
 };
 
 export function settleApprovedCommandReplay(
@@ -592,6 +617,59 @@ function mcpToolCallStatus(value: unknown): DemoMcpToolCall["status"] {
   if (value === "failed") return "failed";
   if (value === "inProgress") return "running";
   return "pending";
+}
+
+function webSearchActionFrom(value: unknown): {
+  action: DemoWebSearchAction;
+  target: string | null;
+} {
+  if (!isRecord(value)) return { action: "other", target: null };
+  if (value.type === "search") {
+    const query =
+      asString(value.query) ??
+      (Array.isArray(value.queries)
+        ? value.queries.flatMap((entry) => asString(entry) ?? []).at(0) ??
+          null
+        : null);
+    return { action: "search", target: query };
+  }
+  if (value.type === "openPage") {
+    return { action: "openPage", target: asString(value.url) };
+  }
+  if (value.type === "findInPage") {
+    const pattern = asString(value.pattern);
+    const url = asString(value.url);
+    return {
+      action: "findInPage",
+      target:
+        pattern && url
+          ? `${pattern} in ${url}`
+          : (pattern ?? url),
+    };
+  }
+  return { action: "other", target: null };
+}
+
+function webSearchResultsFrom(
+  value: unknown,
+  itemId: string,
+): DemoWebSearchResult[] {
+  if (!Array.isArray(value)) return [];
+  return value.flatMap((entry, index) => {
+    if (typeof entry === "string") {
+      return [{ detail: entry, id: `${itemId}:result:${index}`, url: null }];
+    }
+    if (!isRecord(entry)) return [];
+    const url = asString(entry.url);
+    const detail =
+      asString(entry.title) ??
+      asString(entry.name) ??
+      url ??
+      asString(entry.snippet);
+    return detail
+      ? [{ detail, id: `${itemId}:result:${index}`, url }]
+      : [];
+  });
 }
 
 function mcpToolLabel(tool: string, actionName: string | null) {
@@ -993,6 +1071,10 @@ export function hasActiveTurnWork(state: DemoProtocolState) {
         turnId === state.currentTurnId &&
         (status === "pending" || status === "running"),
     ) ||
+    state.webSearches.some(
+      ({ status, turnId }) =>
+        turnId === state.currentTurnId && status === "running",
+    ) ||
     state.automaticApprovalReviews.some(
       ({ status, turnId }) =>
         turnId === state.currentTurnId && status === "inProgress",
@@ -1277,6 +1359,36 @@ export function reduceProtocolNotification(
         timeline: appendTimeline(state.timeline, {
           id: itemId,
           kind: "mcpToolCall",
+        }),
+      };
+    }
+    if (itemType === "webSearch") {
+      const existing = state.webSearches.find(({ id }) => id === itemId);
+      const parsedAction = webSearchActionFrom(item.action);
+      const action = isRecord(item.action)
+        ? parsedAction.action
+        : (existing?.action ?? parsedAction.action);
+      const target = isRecord(item.action)
+        ? parsedAction.target
+        : (existing?.target ?? parsedAction.target);
+      const results = webSearchResultsFrom(item.results, itemId);
+      return {
+        ...next,
+        timeline: appendTimeline(state.timeline, {
+          id: itemId,
+          kind: "webSearch",
+        }),
+        webSearches: upsertById(state.webSearches, {
+          action,
+          id: itemId,
+          query: asString(item.query) ?? existing?.query ?? target ?? "",
+          results: results.length > 0 ? results : (existing?.results ?? []),
+          status:
+            notification.method === "item/completed"
+              ? "completed"
+              : "running",
+          target: target ?? existing?.target ?? null,
+          turnId: itemTurnId,
         }),
       };
     }

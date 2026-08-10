@@ -12,6 +12,7 @@ const currentReplayComposerScenarios = new Set([
   "command-failure-recovery",
   "compaction",
   "context-summary",
+  "current-mixed-tool-thread",
   "current-review-rename",
   "interruption",
   "long-command-output",
@@ -1936,6 +1937,283 @@ for (const scene of visualScenes) {
       await writeFile(
         join(artifactDirectory, `${scene.id}.json`),
         `${JSON.stringify(compactMcp, null, 2)}\n`,
+      );
+      continue;
+    }
+
+    if (scene.scenario === "current-mixed-tool-thread") {
+      const expectedTimelineSurface =
+        scene.webSearchCount !== undefined
+          ? "search"
+          : scene.toolCount !== undefined
+            ? "mcp"
+            : scene.subagentStatus !== undefined
+              ? "subagent"
+              : null;
+      const mixed = await page.evaluate((timelineSurface) => {
+        const rect = (element) => {
+          if (!(element instanceof Element)) return null;
+          const value = element.getBoundingClientRect();
+          return {
+            bottom: value.bottom,
+            height: value.height,
+            left: value.left,
+            right: value.right,
+            top: value.top,
+            width: value.width,
+          };
+        };
+        const root = document.querySelector(".demo-root");
+        const shell = document.querySelector(".codex-ui-app-shell");
+        const search = document.querySelector(
+          ".codex-ui-search-activity",
+        );
+        const browser = document.querySelector(
+          ".codex-ui-browser-activity",
+        );
+        const mcp = document.querySelector(
+          ".codex-ui-mcp-tool-call-group",
+        );
+        const approval = document.querySelector(
+          ".codex-ui-approval-request",
+        );
+        const subagent = document.querySelector(
+          ".codex-ui-subagent-activity",
+        );
+        const timeline =
+          timelineSurface === "search"
+            ? search?.closest(".codex-ui-activity-timeline")
+            : timelineSurface === "mcp"
+              ? mcp?.closest(".codex-ui-activity-timeline")
+              : timelineSurface === "subagent"
+                ? subagent?.closest(".codex-ui-activity-timeline")
+                : null;
+        const composer = document.querySelector(".codex-ui-composer");
+        return {
+          approval: approval
+            ? {
+                decision: approval.getAttribute("data-decision"),
+                text: approval.textContent?.replace(/\s+/g, " ").trim(),
+              }
+            : null,
+          browser: browser
+            ? {
+                expanded:
+                  browser
+                    .querySelector(".codex-ui-activity__disclosure")
+                    ?.matches("[open], [data-open]") ?? false,
+                status: browser.getAttribute("data-status"),
+                stepLabels: Array.from(
+                  browser.querySelectorAll(
+                    ".codex-ui-browser-activity__steps li",
+                  ),
+                  (element) => element.textContent?.replace(/\s+/g, " ").trim(),
+                ),
+              }
+            : null,
+          compact: {
+            clientWidth: document.documentElement.clientWidth,
+            composer: rect(composer),
+            horizontalOverflow:
+              document.documentElement.scrollWidth -
+              document.documentElement.clientWidth,
+            visibleNavigation: Array.from(
+              document.querySelectorAll("nav"),
+            ).some(
+              (element) =>
+                element instanceof HTMLElement &&
+                element.checkVisibility({
+                  checkOpacity: true,
+                  checkVisibilityCSS: true,
+                }),
+            ),
+          },
+          file: {
+            groupCount: document.querySelectorAll(
+              ".codex-ui-file-change-group",
+            ).length,
+            pathText: document
+              .querySelector(".codex-ui-file-change-group")
+              ?.textContent?.replace(/\s+/g, " ").trim(),
+            reviewFileCount: document.querySelectorAll(
+              ".codex-ui-file-review__file",
+            ).length,
+            reviewOpen:
+              shell?.hasAttribute("data-side-panel-open") ?? false,
+            reviewPanel: Boolean(
+              document.querySelector('[data-testid="review-panel"]'),
+            ),
+          },
+          finalText: document
+            .querySelector('[data-item-id="assistant-current-mixed-completed"]')
+            ?.textContent?.replace(/\s+/g, " ").trim(),
+          frame: root?.getAttribute("data-frame"),
+          mcp: mcp
+            ? {
+                callLabels: Array.from(
+                  mcp.querySelectorAll(".codex-ui-tool-call__label"),
+                  (element) => element.textContent?.trim(),
+                ),
+                callStatuses: Array.from(
+                  mcp.querySelectorAll(".codex-ui-tool-call"),
+                  (element) => element.getAttribute("data-status"),
+                ),
+                expanded:
+                  mcp
+                    .querySelector(
+                      ":scope > .codex-ui-activity__disclosure",
+                    )
+                    ?.matches("[open], [data-open]") ?? false,
+                label: mcp
+                  .querySelector(".codex-ui-mcp-tool-call-group__label")
+                  ?.textContent?.trim(),
+                rowDisclosures: Array.from(
+                  mcp.querySelectorAll(".codex-ui-tool-call"),
+                  (element) => {
+                    const button = element.querySelector(
+                      "button[aria-labelledby]",
+                    );
+                    const labelledBy = button?.getAttribute("aria-labelledby");
+                    return {
+                      expanded: button?.getAttribute("aria-expanded") ?? null,
+                      label: labelledBy
+                        ? document.getElementById(labelledBy)?.textContent?.trim()
+                        : null,
+                    };
+                  },
+                ),
+                source: mcp.getAttribute("data-source"),
+                style: (() => {
+                  const header = mcp.querySelector(
+                    ":scope > .codex-ui-activity__disclosure > .codex-ui-activity__header",
+                  );
+                  if (!header) return null;
+                  const value = getComputedStyle(header);
+                  return {
+                    color: value.color,
+                    fontFamily: value.fontFamily,
+                    fontSize: value.fontSize,
+                    fontWeight: value.fontWeight,
+                    lineHeight: value.lineHeight,
+                  };
+                })(),
+                toolCount: mcp.querySelectorAll(".codex-ui-tool-call").length,
+              }
+            : null,
+          rootStatus: root?.getAttribute("data-status"),
+          search: search
+            ? {
+                entryLabels: Array.from(
+                  search.querySelectorAll(
+                    ".codex-ui-search-activity__entries li",
+                  ),
+                  (element) => element.textContent?.replace(/\s+/g, " ").trim(),
+                ),
+                expanded:
+                  search
+                    .querySelector(".codex-ui-activity__disclosure")
+                    ?.matches("[open], [data-open]") ?? false,
+                status: search.getAttribute("data-status"),
+                text: search.textContent?.replace(/\s+/g, " ").trim(),
+              }
+            : null,
+          subagent: subagent
+            ? {
+                status: subagent.getAttribute("data-status"),
+                text: subagent.textContent?.replace(/\s+/g, " ").trim(),
+              }
+            : null,
+          timeline: timeline
+            ? {
+                expanded: timeline.hasAttribute("data-expanded"),
+                label: timeline
+                  .querySelector(".codex-ui-activity-timeline__toggle")
+                  ?.textContent?.replace(/\s+/g, " ").trim(),
+              }
+            : null,
+        };
+      }, expectedTimelineSurface);
+
+      if (
+        mixed.frame !== scene.frame ||
+        mixed.compact.horizontalOverflow > 1 ||
+        (scene.webSearchCount !== undefined &&
+          (!mixed.search ||
+            mixed.search.status !== scene.webSearchStatus ||
+            !mixed.timeline?.expanded ||
+            mixed.timeline.label !== scene.timelineLabel ||
+            (scene.webSearchStatus === "completed" &&
+              (!mixed.search.expanded ||
+                !mixed.search.entryLabels.includes("Model Context Protocol") ||
+                mixed.search.entryLabels.length !== scene.webSearchCount)))) ||
+        (scene.browserStepCount !== undefined &&
+          (!mixed.browser ||
+            !mixed.browser.expanded ||
+            mixed.browser.status !== "completed" ||
+            mixed.browser.stepLabels.length !== scene.browserStepCount ||
+            JSON.stringify(mixed.browser.stepLabels) !==
+              JSON.stringify([
+                "Opened https://learn.chatgpt.com/docs/extend/mcp",
+                "Found Model Context Protocol in https://learn.chatgpt.com/docs/extend/mcp",
+              ]))) ||
+        (scene.toolCount !== undefined &&
+          (!mixed.mcp ||
+            mixed.mcp.toolCount !== scene.toolCount ||
+            mixed.mcp.label !== scene.groupLabel ||
+            mixed.mcp.source !== "openaiDeveloperDocs" ||
+            !mixed.mcp.expanded ||
+            mixed.mcp.style?.fontFamily !==
+              '-apple-system, "system-ui", "Segoe UI", sans-serif' ||
+            mixed.mcp.style.fontSize !== "14px" ||
+            mixed.mcp.style.fontWeight !== "445" ||
+            mixed.mcp.style.lineHeight !== "21px" ||
+            !mixed.mcp.style.color.includes("0.6") ||
+            !mixed.timeline?.expanded ||
+            mixed.timeline.label !== scene.timelineLabel ||
+            JSON.stringify(mixed.mcp.callLabels) !==
+              JSON.stringify(scene.callLabels) ||
+            mixed.mcp.rowDisclosures.some((disclosure, index) =>
+              mixed.mcp.callStatuses[index] === "running"
+                ? disclosure.expanded !== null || disclosure.label !== null
+                : disclosure.expanded !== "false" ||
+                  disclosure.label !== scene.callLabels[index],
+            ))) ||
+        (scene.approvalDecision !== undefined &&
+          (!mixed.approval ||
+            mixed.approval.decision !== scene.approvalDecision ||
+            !mixed.approval.text?.includes("Run this command?") ||
+            !mixed.approval.text.includes(
+              "apply_patch research/MIXED_TOOL_THREAD.md",
+            ))) ||
+        (scene.fileCount !== undefined &&
+          (!mixed.file.reviewOpen ||
+            !mixed.file.reviewPanel ||
+            mixed.file.groupCount !== 1 ||
+            mixed.file.reviewFileCount !== scene.fileCount ||
+            !mixed.file.pathText?.includes("research/MIXED_TOOL_THREAD.md"))) ||
+        (scene.subagentStatus === "active" &&
+          (!mixed.subagent ||
+            mixed.subagent.status !== "active" ||
+            !mixed.subagent.text?.includes("Mixed audit") ||
+            !mixed.timeline?.expanded ||
+            mixed.timeline.label !== scene.timelineLabel)) ||
+        (scene.subagentStatus === "done" &&
+          (mixed.rootStatus !== "completed" ||
+            !mixed.finalText?.includes("Mixed workflow complete") ||
+            !mixed.subagent?.text?.includes("Mixed audit"))) ||
+        (scene.windowSize?.width === 720 &&
+          (mixed.compact.clientWidth !== 720 ||
+            mixed.compact.visibleNavigation ||
+            !mixed.compact.composer ||
+            Math.abs(mixed.compact.composer.width - 688) > 1))
+      ) {
+        throw new Error(
+          `${scene.id}: current mixed-tool contract failed: ${JSON.stringify(mixed)}`,
+        );
+      }
+      await writeFile(
+        join(artifactDirectory, `${scene.id}.json`),
+        `${JSON.stringify(mixed, null, 2)}\n`,
       );
       continue;
     }
