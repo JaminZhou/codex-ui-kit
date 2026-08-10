@@ -95,7 +95,12 @@ Every deterministic scenario has one ID and produces four evidence layers:
    accepts a 906×820 main reference through
    `CODEX_UI_KIT_MCP_RECOVERY_REFERENCE` and gates the full main, recovered
    call/answer region, upper activity/failure region, and Composer separately
-   while leaving the final answer unmasked; the App shell
+   while leaving the final answer unmasked. The current `26.803.41515` MCP
+   refresh accepts its local-only 905×820 success main crop through
+   `CODEX_UI_KIT_CURRENT_MCP_SUCCESS_REFERENCE` and the exact 720×680 recovery
+   frame through `CODEX_UI_KIT_CURRENT_MCP_RECOVERY_COMPACT_REFERENCE`; these
+   independently gate the aligned 736×100 tool group under 2% and the visible
+   compact failure-card region under 1.2%. The App shell
    accepts a 120×46 ownership-scoped reference through
    `CODEX_UI_KIT_WINDOW_CHROME_REFERENCE`. Queued and automatic-continuation
    Composer states

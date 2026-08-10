@@ -1655,6 +1655,189 @@ try {
   await mcpApp.close();
 }
 
+const currentMcpScene = {
+  frame: "mcp-current-success",
+  id: "electron-current-mcp",
+  scenario: "mcp-current-success",
+};
+const { app: currentMcpApp, page: currentMcpPage } = await launchScene(
+  currentMcpScene,
+  { capture: false },
+);
+
+try {
+  const timeline = currentMcpPage.getByRole("button", {
+    name: "Worked for 35s",
+  });
+  if ((await timeline.getAttribute("aria-expanded")) !== "false") {
+    throw new Error("Current Electron MCP timeline should start collapsed.");
+  }
+  await timeline.click();
+  const group = currentMcpPage.getByTestId("mcp-tool-call-group");
+  await group
+    .getByRole("button", {
+      name: "Used OpenAI Developer Docs integration",
+    })
+    .click();
+  const rows = group.locator(".codex-ui-tool-call");
+  const rowButtons = rows.getByRole("button");
+  const currentState = await currentMcpPage.evaluate(() => ({
+    callLabels: Array.from(
+      document.querySelectorAll(
+        ".codex-ui-mcp-tool-call-group .codex-ui-tool-call__label",
+      ),
+      (element) => element.textContent?.trim(),
+    ),
+    labelledButtons: Array.from(
+      document.querySelectorAll(
+        '.codex-ui-mcp-tool-call-group .codex-ui-tool-call button[aria-labelledby]',
+      ),
+      (button) => ({
+        expanded: button.getAttribute("aria-expanded"),
+        label: document
+          .getElementById(button.getAttribute("aria-labelledby") ?? "")
+          ?.textContent?.trim(),
+      }),
+    ),
+  }));
+  if (
+    (await rows.count()) !== 3 ||
+    (await rowButtons.count()) !== 3 ||
+    JSON.stringify(currentState.callLabels) !==
+      JSON.stringify([
+        "Search OpenAI docs",
+        "Search OpenAI docs",
+        "Fetch OpenAI doc",
+      ]) ||
+    currentState.labelledButtons.length !== 3 ||
+    currentState.labelledButtons.some(
+      ({ expanded, label }) => expanded !== "false" || !label,
+    )
+  ) {
+    throw new Error(
+      `Current Electron MCP rows drifted: ${JSON.stringify(currentState)}`,
+    );
+  }
+} finally {
+  await currentMcpApp.close();
+}
+
+const currentMcpRecoveryScene = {
+  frame: "mcp-current-recovery-completed",
+  id: "electron-current-mcp-recovery",
+  scenario: "mcp-current-recovery",
+};
+const {
+  app: currentMcpRecoveryApp,
+  page: currentMcpRecoveryPage,
+} = await launchScene(currentMcpRecoveryScene, { capture: false });
+
+try {
+  await currentMcpRecoveryPage
+    .getByRole("button", { name: "Worked for 16s" })
+    .click();
+  const group = currentMcpRecoveryPage.getByTestId("mcp-tool-call-group");
+  await group
+    .getByRole("button", {
+      name: "Used OpenAI Developer Docs integration",
+    })
+    .click();
+  const failedToggle = group.getByRole("button", {
+    name: "Fetch OpenAI doc failed",
+  });
+  await failedToggle.click();
+  const wideState = await currentMcpRecoveryPage.evaluate(() => {
+    const error = document.querySelector(
+      '[data-item-id="mcp-current-fetch-invalid"] .codex-ui-tool-call__error[data-presentation="output"]',
+    );
+    const bounds = error?.getBoundingClientRect();
+    const style = error ? getComputedStyle(error) : null;
+    return {
+      callLabels: Array.from(
+        document.querySelectorAll(
+          ".codex-ui-mcp-tool-call-group .codex-ui-tool-call__label",
+        ),
+        (element) => element.textContent?.trim(),
+      ),
+      error: error
+        ? {
+            backgroundColor: style?.backgroundColor,
+            borderColor: style?.borderColor,
+            borderRadius: style?.borderRadius,
+            height: bounds?.height,
+            role: error.getAttribute("role"),
+            text: error.textContent?.replace(/\s+/g, " ").trim(),
+            width: bounds?.width,
+          }
+        : null,
+      failedExpanded: document
+        .querySelector(
+          '[data-item-id="mcp-current-fetch-invalid"] button[aria-labelledby]',
+        )
+        ?.getAttribute("aria-expanded"),
+      groupStatus: document
+        .querySelector(".codex-ui-mcp-tool-call-group")
+        ?.getAttribute("data-status"),
+    };
+  });
+  await currentMcpRecoveryApp.evaluate(({ BrowserWindow }) => {
+    BrowserWindow.getAllWindows()[0]?.setContentSize(720, 680);
+  });
+  await currentMcpRecoveryPage.waitForFunction(
+    () =>
+      window.innerWidth === 720 &&
+      window.innerHeight === 680 &&
+      document
+        .querySelector(".codex-ui-app-shell")
+        ?.getAttribute("data-layout-mode") === "narrow" &&
+      !document
+        .querySelector(".codex-ui-app-shell")
+        ?.hasAttribute("data-sidebar-open"),
+    undefined,
+    { timeout: 5_000 },
+  );
+  const compactState = await currentMcpRecoveryPage.evaluate(() => ({
+    clientWidth: document.documentElement.clientWidth,
+    horizontalOverflow:
+      document.documentElement.scrollWidth -
+      document.documentElement.clientWidth,
+    visibleNavigation: Array.from(document.querySelectorAll("nav")).some(
+      (element) =>
+        element instanceof HTMLElement &&
+        element.checkVisibility({
+          checkOpacity: true,
+          checkVisibilityCSS: true,
+        }),
+    ),
+  }));
+  if (
+    JSON.stringify(wideState.callLabels) !==
+      JSON.stringify([
+        "Fetch OpenAI doc",
+        "Search OpenAI docs",
+        "Fetch OpenAI doc",
+      ]) ||
+    wideState.error?.role !== "alert" ||
+    !wideState.error.text?.includes("plaintextInvalid URL") ||
+    wideState.error.backgroundColor !== "rgba(255, 255, 255, 0.05)" ||
+    wideState.error.borderColor !== "rgba(255, 255, 255, 0.157)" ||
+    wideState.error.borderRadius !== "12.5px" ||
+    Math.abs((wideState.error.height ?? 0) - 67.3125) > 1 ||
+    (wideState.error.width ?? 0) < 700 ||
+    wideState.failedExpanded !== "true" ||
+    wideState.groupStatus !== "completed" ||
+    compactState.clientWidth !== 720 ||
+    compactState.horizontalOverflow > 1 ||
+    compactState.visibleNavigation
+  ) {
+    throw new Error(
+      `Current Electron MCP recovery drifted: ${JSON.stringify({ compactState, wideState })}`,
+    );
+  }
+} finally {
+  await currentMcpRecoveryApp.close();
+}
+
 const recoveryScene = {
   frame: "mixed-review-open",
   id: "electron-mcp-recovery-mixed-thread",

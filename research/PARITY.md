@@ -240,7 +240,7 @@ The authoritative current-build inventory is:
   current Active/Done classifier and 4/10 list limits. A twelve-agent public
   replay now covers pending initialization, updated progress, errored,
   interrupted, shutdown, and unavailable results, both pagination limits, and
-  failed-agent transcript access. Browser/CDP covers 132 frames, Electron
+  failed-agent transcript access. Browser/CDP covers 138 frames, Electron
   drives both mixed lists, and nine collaboration scenes gate ten current-build
   regions: panel/summary/transcript crops pass between 1.33% and 4.67%, while
   the compact main-activity crop passes at 11.50% under its independent 12.5%
@@ -304,7 +304,7 @@ internal baselines cover the fence, table, running tail, and completed tail.
 An isolated 18-column runtime follow-up then reaches Copy, Expand, and Table
 preview on the same build. `AgentMarkdown` copies exact raw Markdown plus HTML,
 and `allowWideTables` opts into the measured 1665.86px table, hover/focus rail,
-and viewport preview. Browser/CDP now covers 132 frames; Electron repeats copy,
+and viewport preview. Browser/CDP now covers 138 frames; Electron repeats copy,
 horizontal wheel, open/close, focus restoration, and 720×680 action
 reachability; three reviewed internal baselines pass. A local-only 1180×820 reference gates the owned preview and
 close regions at 3.9737% and 0.5929% under 4% and 1% ceilings. Images, math,
@@ -316,6 +316,17 @@ completion, and a mixed follow-up turn. Its optional 906×820 comparison gates
 the full main, recovered tool group, user prompt, and Composer independently
 at the same strict threshold. CDP locks call order, labels, expansion, error
 semantics, and group recovery; Electron locks the mixed Review composition.
+
+The `26.803.41515` MCP refresh supersedes those two primary runtime anchors.
+The successful group now contains Search → Search → Fetch and completes in 35
+seconds; recovery keeps invalid-URL Fetch → Search → Fetch inside the same
+group and completes in 16 seconds. Public `ToolCallCard` rows can now use the
+current transparent content-width labelled disclosure while retaining the
+legacy `details` mode. Browser/CDP and Electron cover five lifecycle states plus a
+native compact variant, including the 736×67.3125px failure output and zero
+overflow at 720×680. Six reviewed internal baselines pass. Optional local-only
+product comparisons gate the success group at 1.6440% under 2% and the compact
+failure card at 1.1017% under 1.2%; external screenshots remain uncommitted.
 
 The `26.727.40816` Pull request slice adds nine lifecycle frames beyond the
 previous 49-frame matrix. Its independent gates cover index/detail loading and

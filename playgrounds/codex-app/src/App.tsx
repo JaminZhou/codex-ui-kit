@@ -1564,6 +1564,7 @@ export function App() {
       (initialSelection.capture &&
         initialSelection.frame !== "pr-compact-detail" &&
         initialSelection.frame !== "workspace-compact-ready" &&
+        initialSelection.frame !== "mcp-current-recovery-completed" &&
         initialSelection.frame !== "subagent-current-compact-720") ||
       !isNarrowDemoWindow(),
   );
@@ -1802,6 +1803,10 @@ export function App() {
     mode === "replay" && scenarioId === "compaction";
   const isCurrentContextSummaryReplay =
     mode === "replay" && scenarioId === "context-summary";
+  const isCurrentMcpReplay =
+    mode === "replay" &&
+    (scenarioId === "mcp-current-success" ||
+      scenarioId === "mcp-current-recovery");
   const isCurrentSubagentReplay =
     mode === "replay" && isSubagentScenarioId(scenarioId);
   const hasSubagentSurface =
@@ -2921,7 +2926,7 @@ export function App() {
               actionsLabel="Pinned task actions"
               depth={1}
               leading={<SidebarGlyph name="thread" />}
-              onClick={() => selectScenario("mcp-tool-call")}
+              onClick={() => selectScenario("mcp-current-success")}
               status="unread"
               statusLabel="Unread update"
             >
@@ -3159,7 +3164,8 @@ export function App() {
               : "idle";
   const currentHeaderReplay =
     mode === "replay" &&
-    (scenarioId === "mcp-tool-call" ||
+    (isCurrentMcpReplay ||
+      scenarioId === "mcp-tool-call" ||
       scenarioId === "mcp-recovery-mixed-thread" ||
       scenarioId === "attachment-lifecycle" ||
       isCurrentAutomaticReviewReplay ||
@@ -3414,6 +3420,7 @@ export function App() {
       scenarioId === "current-review-rename" ||
       scenarioId === "mixed-file-review" ||
       scenarioId === "markdown" ||
+      isCurrentMcpReplay ||
       scenarioId === "mcp-tool-call" ||
       scenarioId === "mcp-recovery-mixed-thread" ||
       scenarioId === "attachment-lifecycle" ||
@@ -5386,6 +5393,10 @@ export function App() {
                   message.id === "assistant-markdown-streaming-large") ||
                 (scenarioId === "mcp-tool-call" &&
                   message.id === "assistant-mcp") ||
+                (scenarioId === "mcp-current-success" &&
+                  message.id === "assistant-current-mcp-success") ||
+                (scenarioId === "mcp-current-recovery" &&
+                  message.id === "assistant-current-mcp-recovery") ||
                 (scenarioId === "mcp-recovery-mixed-thread" &&
                   (message.id === "assistant-recovery" ||
                     message.id === "assistant-workflow")) ||
@@ -5412,6 +5423,7 @@ export function App() {
                     message.id ===
                       "assistant-context-compaction-recovery"))) &&
               message.status === "completed" ? (
+                isCurrentMcpReplay ||
                 scenarioId === "mcp-tool-call" ||
                 scenarioId === "mcp-recovery-mixed-thread" ||
                 scenarioId === "approval-allow-once" ||
@@ -5692,9 +5704,20 @@ export function App() {
         ({ id }) => id === "assistant-mcp-intro",
       );
       const groupStatus = mcpToolCallGroupStatus(calls);
+      const presentedGroupStatus =
+        state.currentTurnId === toolCall.turnId ? "running" : groupStatus;
+      const currentMcpCaptureOpen =
+        (scenarioId === "mcp-current-success" &&
+          (activeFrame === "mcp-current-running" ||
+            activeFrame === "mcp-current-success")) ||
+        (scenarioId === "mcp-current-recovery" &&
+          (activeFrame === "mcp-current-recovery-failed" ||
+            activeFrame === "mcp-current-recovery-retrying" ||
+            activeFrame === "mcp-current-recovery-completed"));
       const captureOpen =
         initialSelection.capture &&
-        (activeFrame === "mcp-running" ||
+        (currentMcpCaptureOpen ||
+          activeFrame === "mcp-running" ||
           activeFrame === "mcp-progress" ||
           activeFrame === "mcp-tool-calls");
       const durationMs = mcpToolCallGroupDurationMs(state, calls);
@@ -5706,7 +5729,7 @@ export function App() {
             <TurnDuration
               durationMs={durationMs}
               status={
-                groupStatus === "running" ||
+                presentedGroupStatus === "running" ||
                 state.currentTurnId === toolCall.turnId
                   ? "working"
                   : "worked"
@@ -5727,16 +5750,20 @@ export function App() {
           <McpToolCallGroup
             data-testid="mcp-tool-call-group"
             defaultOpen={false}
+            disclosureMode={isCurrentMcpReplay ? "button" : undefined}
             name={toolCall.appName}
             open={initialSelection.capture ? captureOpen : undefined}
             source={toolCall.server}
-            status={groupStatus}
+            status={presentedGroupStatus}
           >
             {calls.map((call) => {
               const presentation = mcpToolCallPresentation(call);
               return (
                 <ToolCallCard
                   data-item-id={call.id}
+                  disclosureMode={
+                    isCurrentMcpReplay ? "overlay-button" : undefined
+                  }
                   error={presentation.error}
                   errorLanguage={
                     call.status === "failed" ? "plaintext" : undefined
@@ -5755,9 +5782,12 @@ export function App() {
                   name={call.toolLabel}
                   open={
                     initialSelection.capture &&
-                    call.id === "mcp-fetch-invalid" &&
+                    (call.id === "mcp-fetch-invalid" ||
+                      call.id === "mcp-current-fetch-invalid") &&
                     (activeFrame === "mcp-recovery-failed" ||
-                      activeFrame === "mcp-recovery-completed")
+                      activeFrame === "mcp-recovery-completed" ||
+                      activeFrame === "mcp-current-recovery-failed" ||
+                      activeFrame === "mcp-current-recovery-completed")
                       ? true
                       : undefined
                   }

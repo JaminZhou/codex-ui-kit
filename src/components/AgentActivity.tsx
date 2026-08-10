@@ -1,4 +1,9 @@
-import { useState, type HTMLAttributes, type ReactNode } from "react";
+import {
+  useId,
+  useState,
+  type HTMLAttributes,
+  type ReactNode,
+} from "react";
 import type { AgentActivityKind } from "../types.js";
 import {
   StatusIndicator,
@@ -13,6 +18,8 @@ export interface AgentActivityProps
   defaultOpen?: boolean;
   description?: ReactNode;
   detail?: ReactNode;
+  disclosureIndicator?: boolean;
+  disclosureMode?: "button" | "details" | "overlay-button";
   indicator?: ReactNode;
   kind?: AgentActivityKind;
   onOpenChange?: (open: boolean) => void;
@@ -27,6 +34,8 @@ export function AgentActivity({
   defaultOpen = false,
   description,
   detail,
+  disclosureIndicator = false,
+  disclosureMode = "details",
   indicator,
   kind = "generic",
   onOpenChange,
@@ -35,18 +44,36 @@ export function AgentActivity({
   summary,
   ...props
 }: AgentActivityProps) {
+  const generatedSummaryId = useId();
   const [internalOpen, setInternalOpen] = useState(defaultOpen);
   const resolvedOpen = open ?? internalOpen;
   const classes = ["codex-ui-activity", className].filter(Boolean).join(" ");
   const hasBody = children !== undefined && children !== null;
+  const summaryId =
+    disclosureMode === "overlay-button" ? generatedSummaryId : undefined;
+  const updateOpen = (nextOpen: boolean) => {
+    if (open === undefined) {
+      setInternalOpen(nextOpen);
+    }
+    onOpenChange?.(nextOpen);
+  };
   const header = (
     <>
       {indicator === undefined ? <StatusIndicator status={status} /> : indicator}
-      <span className="codex-ui-activity__summary">{summary}</span>
+      <span className="codex-ui-activity__summary" id={summaryId}>
+        {summary}
+      </span>
       {detail ? (
         <span className="codex-ui-activity__detail">{detail}</span>
       ) : null}
     </>
+  );
+  const buttonChevron = (
+    <span
+      aria-hidden="true"
+      className="codex-ui-activity__button-chevron"
+      data-visible={disclosureIndicator || resolvedOpen || undefined}
+    />
   );
 
   return (
@@ -57,21 +84,60 @@ export function AgentActivity({
       data-expandable={hasBody || undefined}
       {...props}
     >
-      {hasBody ? (
+      {hasBody && disclosureMode === "overlay-button" ? (
+        <div
+          className="codex-ui-activity__disclosure"
+          data-disclosure-mode="overlay-button"
+          data-open={resolvedOpen || undefined}
+        >
+          <div className="codex-ui-activity__header">
+            {header}
+            {buttonChevron}
+            <button
+              aria-expanded={resolvedOpen}
+              aria-labelledby={summaryId}
+              className="codex-ui-activity__overlay-toggle"
+              onClick={() => updateOpen(!resolvedOpen)}
+              type="button"
+            />
+          </div>
+          {resolvedOpen ? (
+            <div className="codex-ui-activity__body">{children}</div>
+          ) : null}
+        </div>
+      ) : hasBody && disclosureMode === "button" ? (
+        <div
+          className="codex-ui-activity__disclosure"
+          data-disclosure-mode="button"
+          data-open={resolvedOpen || undefined}
+        >
+          <button
+            aria-expanded={resolvedOpen}
+            className="codex-ui-activity__header"
+            onClick={() => updateOpen(!resolvedOpen)}
+            type="button"
+          >
+            {header}
+            {buttonChevron}
+          </button>
+          {resolvedOpen ? (
+            <div className="codex-ui-activity__body">{children}</div>
+          ) : null}
+        </div>
+      ) : hasBody ? (
         <details
           className="codex-ui-activity__disclosure"
           onToggle={(event) => {
             const nextOpen = event.currentTarget.open;
             if (open !== undefined) {
               if (nextOpen !== open) {
-                onOpenChange?.(nextOpen);
+                updateOpen(nextOpen);
                 event.currentTarget.open = open;
               }
               return;
             }
 
-            setInternalOpen(nextOpen);
-            onOpenChange?.(nextOpen);
+            updateOpen(nextOpen);
           }}
           open={resolvedOpen}
         >
@@ -81,7 +147,7 @@ export function AgentActivity({
             onClick={(event) => {
               if (open === undefined) return;
               event.preventDefault();
-              onOpenChange?.(!open);
+              updateOpen(!open);
             }}
           >
             {header}

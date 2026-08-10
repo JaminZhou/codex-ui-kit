@@ -1,6 +1,9 @@
 import type { HTMLAttributes, ReactNode } from "react";
 import type { AgentItemStatus } from "../types.js";
-import { AgentActivity } from "./AgentActivity.js";
+import {
+  AgentActivity,
+  type AgentActivityProps,
+} from "./AgentActivity.js";
 
 function ToolIcon() {
   return (
@@ -41,6 +44,8 @@ export interface ToolCallCardProps
   children?: ReactNode;
   completedLabel?: ReactNode;
   defaultOpen?: boolean;
+  disclosureIndicator?: AgentActivityProps["disclosureIndicator"];
+  disclosureMode?: AgentActivityProps["disclosureMode"];
   emptyLabel?: ReactNode;
   error?: ReactNode;
   errorLanguage?: ReactNode;
@@ -68,6 +73,8 @@ export function ToolCallCard({
   className,
   completedLabel,
   defaultOpen = false,
+  disclosureIndicator,
+  disclosureMode,
   emptyLabel = "Tool returned no content",
   error,
   errorLanguage,
@@ -165,6 +172,8 @@ export function ToolCallCard({
       className={classes}
       data-source={source}
       defaultOpen={defaultOpen}
+      disclosureIndicator={disclosureIndicator}
+      disclosureMode={disclosureMode}
       description={
         summary ? <p className="codex-ui-tool-call__summary">{summary}</p> : null
       }
