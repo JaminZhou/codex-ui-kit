@@ -92,6 +92,12 @@ const currentMcpRecoveryCompactReferenceSize = {
   height: 680,
   width: 720,
 };
+const currentIntegrationRecoveryReference =
+  process.env.CODEX_UI_KIT_CURRENT_INTEGRATION_RECOVERY_REFERENCE;
+const currentIntegrationRecoveryReferenceSize = {
+  height: 680,
+  width: 720,
+};
 const currentBuildComposerQueuedReference =
   process.env.CODEX_UI_KIT_COMPOSER_QUEUED_REFERENCE;
 const currentBuildComposerContinuedReference =
@@ -3112,6 +3118,41 @@ for (const scene of selectedScenes) {
     }
     console.log(
       `${scene.id}: current MCP compact recovery-card pixel ratio ${comparison.ratio}`,
+    );
+  }
+
+  if (
+    scene.id === "mcp-current-integration-recovered-compact" &&
+    currentIntegrationRecoveryReference
+  ) {
+    const reference = PNG.sync.read(
+      await readFile(currentIntegrationRecoveryReference),
+    );
+    if (
+      reference.width !== currentIntegrationRecoveryReferenceSize.width ||
+      reference.height !== currentIntegrationRecoveryReferenceSize.height ||
+      actual.width !== reference.width ||
+      actual.height !== reference.height
+    ) {
+      throw new Error(
+        `${scene.id}: current integration recovery comparison requires exact 720x680 product and playground frames, received reference ${reference.width}x${reference.height} and actual ${actual.width}x${actual.height}.`,
+      );
+    }
+    const comparison = comparePng(
+      cropPng(reference, 16, 387, 688, 71),
+      cropPng(actual, 16, 335, 688, 71),
+    );
+    const maximumRatio = environmentRatio(
+      "CODEX_UI_KIT_CURRENT_INTEGRATION_RECOVERY_MAX_DIFF_RATIO",
+      0.013,
+    );
+    if (comparison.ratio > maximumRatio) {
+      throw new Error(
+        `${scene.id}: current integration recovery group ratio ${comparison.ratio} exceeds ${maximumRatio}.`,
+      );
+    }
+    console.log(
+      `${scene.id}: current integration recovery group pixel ratio ${comparison.ratio}`,
     );
   }
 }

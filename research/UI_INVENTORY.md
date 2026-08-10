@@ -69,8 +69,8 @@ observation from a previous build remains historical evidence.
   previous-build regression evidence and have been downgraded from `verified`
   to `partial_legacy` until they are reached again on the current fingerprint.
 
-Current inventory: 81 surface groups; 13 have current-build runtime evidence, 51 have previous-build-only runtime evidence, 17 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 12 groups and Electron verification covers 12.
-Prior acceptance outside those 13 sampled current-build groups remains
+Current inventory: 81 surface groups; 14 have current-build runtime evidence, 50 have previous-build-only runtime evidence, 17 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 13 groups and Electron verification covers 13.
+Prior acceptance outside those 14 sampled current-build groups remains
 recorded as `partial_legacy` until current-build re-observation.
 
 The current package exposes candidates far beyond the old transcript sample:
@@ -645,8 +645,23 @@ at 1.1017% under 1.2%. Product screenshots remain outside the repository.
 current-build Browser/Electron verified while their implementation remains
 partial for the open variants below.
 
-Authentication, elicitation, MCP approvals, unavailable connectors, other
-integrations, cancellation, and thread-transport retry remain open.
+The same build now refreshes `thread.tool-unavailable-recovery` with a separate
+real two-turn task. The first turn permits only GitHub MCP, emits no fabricated
+tool row, and terminates with the exact assistant fallback `GitHub MCP
+integration is unavailable.` The second turn stays in the same thread, permits
+only OpenAI Developer Docs, and completes Search → Fetch under one expanded
+`Used OpenAI Developer Docs integration` group in 34 seconds. At 720×680 the
+688px group, 14/21px system typography, 445 weight, 0.6 secondary color,
+antialiased rendering, hidden navigation, and zero horizontal overflow match
+the current Renderer. Browser/CDP covers unavailable, recovering, recovered,
+and compact states; Electron opens both timelines and the tool group before a
+real native compact resize. Four reviewed internal baselines pass, and the
+optional local-only 688×71 group comparison differs by 0.6449% under a 1.3%
+hard limit. This promotes the row to current-build Browser/Electron verified
+without claiming that the unavailable GitHub transport itself reconnected.
+
+Authentication, elicitation, MCP approvals, same-transport disconnect/reconnect,
+other integrations, and cancellation remain open.
 
 The long-thread continuity slice adds the default ten-message threshold and
 measured 36×10 rows to `ThreadMessageNavigationRail`, exposes
@@ -855,7 +870,7 @@ adds source-structural evidence for the seven collaboration statuses,
 Active/Done classification, and 4/10 panel limits. A schema-valid twelve-agent
 replay now covers waiting-before-initialization, streamed updates, errored,
 interrupted, shutdown, and unavailable terminal results, both pagination
-paths, and the failed-agent transcript. Browser/CDP reaches 138 frames;
+paths, and the failed-agent transcript. Browser/CDP reaches 142 frames;
 Electron repeats the pagination and transcript interactions. Nine
 reviewed scenes gate ten current-build regions. Panel/summary/transcript ratios
 range from `0.013328938694792354` to `0.046708160442600274`; the compact
@@ -899,7 +914,7 @@ fence, table, long running tail, and completed tail.
 
 A later isolated current-build task reaches an 18-column table's Copy, Expand,
 and viewport preview path. The public five-event replay raises the matrix to
-138 frames, Electron repeats raw Markdown/HTML copy, horizontal wheel,
+142 frames, Electron repeats raw Markdown/HTML copy, horizontal wheel,
 preview interaction, and 720×680 action reachability, and three reviewed
 internal baselines pass. A local-only
 1180×820 reference gates the preview and close regions at 3.9737% and 0.5929%

@@ -1838,6 +1838,137 @@ try {
   await currentMcpRecoveryApp.close();
 }
 
+const currentIntegrationRecoveryScene = {
+  frame: "mcp-current-integration-recovered",
+  id: "electron-current-integration-recovery",
+  scenario: "mcp-current-integration-recovery",
+};
+const {
+  app: currentIntegrationRecoveryApp,
+  page: currentIntegrationRecoveryPage,
+} = await launchScene(currentIntegrationRecoveryScene, { capture: false });
+
+try {
+  const unavailableTimeline = currentIntegrationRecoveryPage.getByRole(
+    "button",
+    { name: "Worked for 16s" },
+  );
+  const recoveryTimeline = currentIntegrationRecoveryPage.getByRole(
+    "button",
+    { name: "Worked for 34s" },
+  );
+  if (
+    (await unavailableTimeline.getAttribute("aria-expanded")) !== "false" ||
+    (await recoveryTimeline.getAttribute("aria-expanded")) !== "false"
+  ) {
+    throw new Error(
+      "Current integration recovery timelines should start collapsed.",
+    );
+  }
+  await unavailableTimeline.click();
+  await recoveryTimeline.click();
+  const group = currentIntegrationRecoveryPage.getByTestId(
+    "mcp-tool-call-group",
+  );
+  await group
+    .getByRole("button", {
+      name: "Used OpenAI Developer Docs integration",
+    })
+    .click();
+  const wideState = await currentIntegrationRecoveryPage.evaluate(() => ({
+    callLabels: Array.from(
+      document.querySelectorAll(
+        ".codex-ui-mcp-tool-call-group .codex-ui-tool-call__label",
+      ),
+      (element) => element.textContent?.trim(),
+    ),
+    groupExpanded:
+      document
+        .querySelector(
+          ".codex-ui-mcp-tool-call-group > .codex-ui-activity__disclosure",
+        )
+        ?.getAttribute("data-open") === "true",
+    recoveryHref: document
+      .querySelector(
+        '[data-item-id="assistant-current-integration-recovered"] a',
+      )
+      ?.getAttribute("href"),
+    recoveryText: document
+      .querySelector(
+        '[data-item-id="assistant-current-integration-recovered"]',
+      )
+      ?.textContent?.replace(/\s+/g, " ")
+      .trim(),
+    unavailableCommentary: document
+      .querySelector(
+        '[data-item-id="assistant-current-integration-unavailable-intro"]',
+      )
+      ?.textContent?.replace(/\s+/g, " ")
+      .trim(),
+    unavailableText: document
+      .querySelector(
+        '[data-item-id="assistant-current-integration-unavailable"]',
+      )
+      ?.textContent?.trim(),
+  }));
+  await currentIntegrationRecoveryApp.evaluate(({ BrowserWindow }) => {
+    BrowserWindow.getAllWindows()[0]?.setContentSize(720, 680);
+  });
+  await currentIntegrationRecoveryPage.waitForFunction(
+    () =>
+      window.innerWidth === 720 &&
+      window.innerHeight === 680 &&
+      document
+        .querySelector(".codex-ui-app-shell")
+        ?.getAttribute("data-layout-mode") === "narrow" &&
+      !document
+        .querySelector(".codex-ui-app-shell")
+        ?.hasAttribute("data-sidebar-open"),
+    undefined,
+    { timeout: 5_000 },
+  );
+  const compactState = await currentIntegrationRecoveryPage.evaluate(() => ({
+    clientWidth: document.documentElement.clientWidth,
+    horizontalOverflow:
+      document.documentElement.scrollWidth -
+      document.documentElement.clientWidth,
+    visibleNavigation: Array.from(document.querySelectorAll("nav")).some(
+      (element) =>
+        element instanceof HTMLElement &&
+        element.checkVisibility({
+          checkOpacity: true,
+          checkVisibilityCSS: true,
+        }),
+    ),
+    groupWidth: document
+      .querySelector(".codex-ui-mcp-tool-call-group")
+      ?.getBoundingClientRect().width,
+  }));
+  if (
+    wideState.unavailableText !==
+      "GitHub MCP integration is unavailable." ||
+    !wideState.unavailableCommentary?.includes("GitHub MCP") ||
+    JSON.stringify(wideState.callLabels) !==
+      JSON.stringify(["Search OpenAI docs", "Fetch OpenAI doc"]) ||
+    !wideState.groupExpanded ||
+    wideState.recoveryHref !==
+      "https://learn.chatgpt.com/docs/extend/mcp" ||
+    !wideState.recoveryText?.includes(
+      "Recovery complete: Model Context Protocol",
+    ) ||
+    compactState.clientWidth !== 720 ||
+    compactState.horizontalOverflow > 1 ||
+    compactState.visibleNavigation ||
+    Math.abs((compactState.groupWidth ?? 0) - 688) > 1
+  ) {
+    throw new Error(
+      `Current Electron integration recovery drifted: ${JSON.stringify({ compactState, wideState })}`,
+    );
+  }
+} finally {
+  await currentIntegrationRecoveryApp.close();
+}
+
 const recoveryScene = {
   frame: "mixed-review-open",
   id: "electron-mcp-recovery-mixed-thread",
@@ -6628,5 +6759,5 @@ try {
 }
 
 console.log(
-  "Electron host, native-window, coding-workspace routing, conversation/Composer and current image-attachment lifecycle plus current menus, current long, failed, and interrupted command output plus manual context compaction, thread summary, replay/live single, concurrent, nested, and mixed-recovery subagent delegation with 4/10 pagination, default 720px narrow reachability, resizable navigation/Review/Terminal/PR detail, PR tabs and expansion, MCP disclosure/result, multi-file and mixed-content Review, selection/Undo, large diff scrolling, and compact geometry contracts passed.",
+  "Electron host, native-window, coding-workspace routing, conversation/Composer and current image-attachment lifecycle plus current menus, current long, failed, and interrupted command output plus manual context compaction, thread summary, replay/live single, concurrent, nested, and mixed-recovery subagent delegation with 4/10 pagination, default 720px narrow reachability, resizable navigation/Review/Terminal/PR detail, PR tabs and expansion, MCP disclosure/result/unavailable-fallback, multi-file and mixed-content Review, selection/Undo, large diff scrolling, and compact geometry contracts passed.",
 );

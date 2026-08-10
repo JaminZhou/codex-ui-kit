@@ -1686,6 +1686,8 @@ textarea {
 
 .demo-root[data-scenario="mcp-tool-call"]
   .codex-ui-activity-timeline__toggle,
+.demo-root[data-scenario="mcp-current-integration-recovery"]
+  .codex-ui-activity-timeline__toggle,
 .demo-root[data-scenario="mcp-current-success"]
   .codex-ui-activity-timeline__toggle,
 .demo-root[data-scenario="mcp-current-recovery"]
@@ -1791,12 +1793,16 @@ textarea {
 
 .demo-root[data-scenario="mcp-current-success"]
   .codex-ui-thread-viewport,
+.demo-root[data-scenario="mcp-current-integration-recovery"]
+  .codex-ui-thread-viewport,
 .demo-root[data-scenario="mcp-current-recovery"]
   .codex-ui-thread-viewport {
   scrollbar-width: none;
 }
 
 .demo-root[data-scenario="mcp-current-success"]
+  .codex-ui-thread-viewport::-webkit-scrollbar,
+.demo-root[data-scenario="mcp-current-integration-recovery"]
   .codex-ui-thread-viewport::-webkit-scrollbar,
 .demo-root[data-scenario="mcp-current-recovery"]
   .codex-ui-thread-viewport::-webkit-scrollbar {
@@ -1846,11 +1852,29 @@ textarea {
   transform: translateY(-2px);
 }
 
+.demo-mcp-current-unavailable-intro {
+  margin-bottom: 0;
+}
+
+.demo-root[data-scenario="mcp-current-integration-recovery"]
+  .codex-ui-agent-message {
+  font-size: 14px;
+  font-weight: 445;
+  line-height: 22px;
+}
+
+.demo-root[data-scenario="mcp-current-integration-recovery"] {
+  -webkit-font-smoothing: antialiased;
+}
+
 .demo-root[data-scenario="mcp-current-success"],
+.demo-root[data-scenario="mcp-current-integration-recovery"],
 .demo-root[data-scenario="mcp-current-recovery"],
 .demo-root[data-scenario="mcp-tool-call"],
 .demo-root[data-scenario="mcp-recovery-mixed-thread"],
 .demo-root[data-scenario="mcp-current-success"]
+  *:not(code):not(kbd):not(pre),
+.demo-root[data-scenario="mcp-current-integration-recovery"]
   *:not(code):not(kbd):not(pre),
 .demo-root[data-scenario="mcp-current-recovery"]
   *:not(code):not(kbd):not(pre),
@@ -1863,6 +1887,8 @@ textarea {
 
 .demo-root[data-scenario="mcp-current-success"]
   .codex-ui-mcp-tool-call-group,
+.demo-root[data-scenario="mcp-current-integration-recovery"]
+  .codex-ui-mcp-tool-call-group,
 .demo-root[data-scenario="mcp-current-recovery"]
   .codex-ui-mcp-tool-call-group,
 .demo-root[data-scenario="mcp-tool-call"]
@@ -1870,6 +1896,9 @@ textarea {
 .demo-root[data-scenario="mcp-recovery-mixed-thread"]
   .codex-ui-mcp-tool-call-group,
 .demo-root[data-scenario="mcp-current-success"]
+  .codex-ui-mcp-tool-call-group
+  *,
+.demo-root[data-scenario="mcp-current-integration-recovery"]
   .codex-ui-mcp-tool-call-group
   *,
 .demo-root[data-scenario="mcp-current-recovery"]
@@ -1886,6 +1915,8 @@ textarea {
 
 .demo-root[data-scenario="mcp-current-success"]
   .codex-ui-turn-duration,
+.demo-root[data-scenario="mcp-current-integration-recovery"]
+  .codex-ui-turn-duration,
 .demo-root[data-scenario="mcp-current-recovery"]
   .codex-ui-turn-duration,
 .demo-root[data-scenario="mcp-tool-call"]
@@ -1898,6 +1929,10 @@ textarea {
 .demo-root[data-scenario="mcp-current-success"]
   .codex-ui-thread-viewport__content,
 .demo-root[data-scenario="mcp-current-success"]
+  .codex-ui-conversation-thread-shell__composer,
+.demo-root[data-scenario="mcp-current-integration-recovery"]
+  .codex-ui-thread-viewport__content,
+.demo-root[data-scenario="mcp-current-integration-recovery"]
   .codex-ui-conversation-thread-shell__composer,
 .demo-root[data-scenario="mcp-current-recovery"]
   .codex-ui-thread-viewport__content,

@@ -4,7 +4,7 @@ Every deterministic scenario has one ID and produces four evidence layers:
 
 1. **Protocol** — ordered App Server notifications, server requests, and
    request responses checked against the pinned generated schemas. The current
-   deterministic set contains 21 fixtures and 254 events.
+   deterministic set contains 32 fixtures and 367 events.
 2. **CDP** — DOM identity, computed layout, focus, scrolling, and named-surface
    geometry, including the current 274px sidebar, 46px titlebar inset, 70px
    header, 30px rows, fixed footer, collapsible groups, focusable row actions,
@@ -100,7 +100,12 @@ Every deterministic scenario has one ID and produces four evidence layers:
    `CODEX_UI_KIT_CURRENT_MCP_SUCCESS_REFERENCE` and the exact 720×680 recovery
    frame through `CODEX_UI_KIT_CURRENT_MCP_RECOVERY_COMPACT_REFERENCE`; these
    independently gate the aligned 736×100 tool group under 2% and the visible
-   compact failure-card region under 1.2%. The App shell
+   compact failure-card region under 1.2%. The unavailable/fallback replay
+   accepts an exact local-only 720×680 frame through
+   `CODEX_UI_KIT_CURRENT_INTEGRATION_RECOVERY_REFERENCE` and gates the owned
+   688×71 recovered integration group under 1.3%; exact CDP and Electron
+   contracts separately retain the unavailable response, missing false GitHub
+   tool row, same-thread fallback order, and responsive layout. The App shell
    accepts a 120×46 ownership-scoped reference through
    `CODEX_UI_KIT_WINDOW_CHROME_REFERENCE`. Queued and automatic-continuation
    Composer states

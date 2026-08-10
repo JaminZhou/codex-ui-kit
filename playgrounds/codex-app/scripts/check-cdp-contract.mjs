@@ -15,6 +15,7 @@ const currentReplayComposerScenarios = new Set([
   "current-review-rename",
   "interruption",
   "long-command-output",
+  "mcp-current-integration-recovery",
   "mcp-current-recovery",
   "mcp-current-success",
   "mcp-recovery-mixed-thread",
@@ -190,6 +191,94 @@ for (const scene of visualScenes) {
         icons: currentComposerIcons,
         scene: scene.id,
       });
+    }
+    if (scene.id === "mcp-current-integration-unavailable") {
+      const unavailable = await page.evaluate(() => {
+        const rect = (element) => {
+          if (!(element instanceof Element)) return null;
+          const value = element.getBoundingClientRect();
+          return {
+            height: value.height,
+            left: value.left,
+            top: value.top,
+            width: value.width,
+          };
+        };
+        const unavailableMessage = document.querySelector(
+          '[data-item-id="assistant-current-integration-unavailable"]',
+        );
+        const unavailableStyle = unavailableMessage
+          ? getComputedStyle(unavailableMessage)
+          : null;
+        const timeline = document.querySelector(
+          ".codex-ui-activity-timeline",
+        );
+        return {
+          commentary: document
+            .querySelector(
+              '[data-item-id="assistant-current-integration-unavailable-intro"]',
+            )
+            ?.textContent?.replace(/\s+/g, " ")
+            .trim(),
+          composer: rect(document.querySelector(".codex-ui-composer")),
+          groupCount: document.querySelectorAll(
+            ".codex-ui-mcp-tool-call-group",
+          ).length,
+          horizontalOverflow:
+            document.documentElement.scrollWidth -
+            document.documentElement.clientWidth,
+          message: {
+            rect: rect(unavailableMessage),
+            style: unavailableStyle
+              ? {
+                  color: unavailableStyle.color,
+                  fontFamily: unavailableStyle.fontFamily,
+                  fontSize: unavailableStyle.fontSize,
+                  fontWeight: unavailableStyle.fontWeight,
+                  lineHeight: unavailableStyle.lineHeight,
+                  webkitFontSmoothing:
+                    unavailableStyle.webkitFontSmoothing,
+                }
+              : null,
+            text: unavailableMessage?.textContent?.trim(),
+          },
+          timelineExpanded:
+            timeline?.getAttribute("data-expanded") === "true",
+          timelineLabel: timeline
+            ?.querySelector(".codex-ui-activity-timeline__toggle")
+            ?.textContent?.trim(),
+          viewport: { height: innerHeight, width: innerWidth },
+        };
+      });
+      if (
+        unavailable.viewport.width !== 1180 ||
+        unavailable.viewport.height !== 820 ||
+        unavailable.horizontalOverflow > 1 ||
+        unavailable.groupCount !== 0 ||
+        !unavailable.timelineExpanded ||
+        unavailable.timelineLabel !== scene.timelineLabel ||
+        !unavailable.commentary?.includes("GitHub MCP") ||
+        unavailable.message.text !==
+          "GitHub MCP integration is unavailable." ||
+        unavailable.message.rect?.width !== 736 ||
+        unavailable.message.style?.fontFamily !==
+          '-apple-system, "system-ui", "Segoe UI", sans-serif' ||
+        unavailable.message.style?.fontSize !== "14px" ||
+        unavailable.message.style?.fontWeight !== "445" ||
+        unavailable.message.style?.lineHeight !== "22px" ||
+        unavailable.message.style?.webkitFontSmoothing !== "antialiased" ||
+        unavailable.composer?.width !== 736 ||
+        unavailable.composer?.height !== 98
+      ) {
+        throw new Error(
+          `${scene.id}: unavailable integration contract failed: ${JSON.stringify(unavailable)}`,
+        );
+      }
+      await writeFile(
+        join(artifactDirectory, `${scene.id}.json`),
+        `${JSON.stringify(unavailable, null, 2)}\n`,
+      );
+      continue;
     }
     if (scene.view === "workspace") {
       await page.waitForTimeout(50);
@@ -1680,6 +1769,94 @@ for (const scene of visualScenes) {
           null,
           2,
         )}\n`,
+      );
+      continue;
+    }
+
+    if (scene.id === "mcp-current-integration-recovered-compact") {
+      const compactIntegration = await page.evaluate(() => {
+        const group = document.querySelector(
+          ".codex-ui-mcp-tool-call-group",
+        );
+        const groupRect = group?.getBoundingClientRect();
+        const groupStyle = group ? getComputedStyle(group) : null;
+        return {
+          callLabels: Array.from(
+            document.querySelectorAll(
+              ".codex-ui-mcp-tool-call-group .codex-ui-tool-call__label",
+            ),
+            (element) => element.textContent?.trim(),
+          ),
+          clientWidth: document.documentElement.clientWidth,
+          groupExpanded:
+            group
+              ?.querySelector(
+                ":scope > .codex-ui-activity__disclosure",
+              )
+              ?.getAttribute("data-open") === "true",
+          groupWidth: groupRect?.width,
+          groupWebkitFontSmoothing:
+            groupStyle?.webkitFontSmoothing,
+          horizontalOverflow:
+            document.documentElement.scrollWidth -
+            document.documentElement.clientWidth,
+          recoveryHref: document
+            .querySelector(
+              '[data-item-id="assistant-current-integration-recovered"] a',
+            )
+            ?.getAttribute("href"),
+          timelineLabels: Array.from(
+            document.querySelectorAll(
+              ".codex-ui-activity-timeline__toggle",
+            ),
+            (element) => ({
+              expanded: element.getAttribute("aria-expanded"),
+              label: element.textContent?.trim(),
+            }),
+          ),
+          unavailableText: document
+            .querySelector(
+              '[data-item-id="assistant-current-integration-unavailable"]',
+            )
+            ?.textContent?.trim(),
+          visibleNavigation: Array.from(
+            document.querySelectorAll("nav"),
+          ).some(
+            (element) =>
+              element instanceof HTMLElement &&
+              element.checkVisibility({
+                checkOpacity: true,
+                checkVisibilityCSS: true,
+              }),
+          ),
+        };
+      });
+      if (
+        compactIntegration.clientWidth !== 720 ||
+        compactIntegration.horizontalOverflow > 1 ||
+        compactIntegration.visibleNavigation ||
+        !compactIntegration.groupExpanded ||
+        Math.abs((compactIntegration.groupWidth ?? 0) - 688) > 1 ||
+        compactIntegration.groupWebkitFontSmoothing !== "antialiased" ||
+        JSON.stringify(compactIntegration.callLabels) !==
+          JSON.stringify(["Search OpenAI docs", "Fetch OpenAI doc"]) ||
+        JSON.stringify(compactIntegration.timelineLabels) !==
+          JSON.stringify([
+            { expanded: "true", label: "Worked for 16s" },
+            { expanded: "true", label: "Worked for 34s" },
+          ]) ||
+        compactIntegration.unavailableText !==
+          "GitHub MCP integration is unavailable." ||
+        compactIntegration.recoveryHref !==
+          "https://learn.chatgpt.com/docs/extend/mcp"
+      ) {
+        throw new Error(
+          `${scene.id}: compact integration recovery contract failed: ${JSON.stringify(compactIntegration)}`,
+        );
+      }
+      await writeFile(
+        join(artifactDirectory, `${scene.id}.json`),
+        `${JSON.stringify(compactIntegration, null, 2)}\n`,
       );
       continue;
     }
@@ -4385,6 +4562,7 @@ for (const scene of visualScenes) {
         ((scene.id === "mcp-tool-calls" ||
           scene.id === "mcp-recovery-completed" ||
           scene.id === "mcp-current-success" ||
+          scene.id === "mcp-current-integration-recovered" ||
           scene.id === "mcp-current-recovery-completed") &&
           (contract.mcp.groupStyle.fontFamily !==
             '-apple-system, "system-ui", "Segoe UI", sans-serif' ||
