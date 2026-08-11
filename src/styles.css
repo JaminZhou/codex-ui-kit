@@ -1187,11 +1187,11 @@
   width: 1rem;
 }
 
-.codex-ui-app-sidebar__item-row:hover
+.codex-ui-app-sidebar__item-row[data-has-actions]:hover
   .codex-ui-app-sidebar__item-status,
-.codex-ui-app-sidebar__item-row:focus-within
+.codex-ui-app-sidebar__item-row[data-has-actions]:focus-within
   .codex-ui-app-sidebar__item-status,
-.codex-ui-app-sidebar__item-row[data-selected][data-status="idle"]
+.codex-ui-app-sidebar__item-row[data-has-actions][data-selected][data-status="idle"]
   .codex-ui-app-sidebar__item-status {
   opacity: 0;
   pointer-events: none;
