@@ -3281,6 +3281,7 @@ export function App() {
                               ? "workspace-directory-missing"
                               : "workspace-persisted-thread",
                           );
+                          dismissSidebarAfterNavigation();
                         }
                       : undefined
                   }

@@ -327,7 +327,8 @@ The public replay keeps restored and missing-directory frames distinct.
 Browser/CDP verifies selected-row, branch-marker, message-count, summary,
 notice, and Composer geometry. Electron submits a model-only turn, toggles the
 workspace summary, opens New chat, and reselects the retained task to verify
-that the missing-directory warning stays latched. The optional
+that the missing-directory warning stays latched and the 600px modal sidebar
+dismisses so the restored thread is interactive. The optional
 current-product notice crop passes at 3.2572% under a 4% ceiling. Raw records
 and product screenshots remain local-only. Cleanup terminates only the exact
 isolated process and profile-owned handlers, removes the real Git worktree

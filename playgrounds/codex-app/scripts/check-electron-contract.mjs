@@ -7495,9 +7495,26 @@ try {
       "Electron persisted worktree task remained selected after opening New chat.",
     );
   }
+  await workspaceMissingApp.evaluate(({ BrowserWindow }) => {
+    const active = BrowserWindow.getAllWindows()[0];
+    active?.setMinimumSize(480, 480);
+    active?.setContentSize(600, 680);
+  });
+  await workspaceMissingPage.waitForSelector(
+    '.codex-ui-app-shell[data-layout-mode="narrow"]:not([data-sidebar-open])',
+  );
+  await workspaceMissingPage
+    .getByRole("button", { name: "Show sidebar" })
+    .click();
+  await workspaceMissingPage.waitForSelector(
+    '.codex-ui-app-shell[data-layout-mode="narrow"][data-sidebar-open] .codex-ui-app-shell__main[inert]',
+  );
   await retainedTask.click();
   await workspaceMissingPage.waitForSelector(
     '.demo-root[data-frame="workspace-directory-missing"]',
+  );
+  await workspaceMissingPage.waitForSelector(
+    '.codex-ui-app-shell[data-layout-mode="narrow"]:not([data-sidebar-open]) .codex-ui-app-shell__main:not([inert])',
   );
   const replaySummary = workspaceMissingPage.getByRole("dialog", {
     name: "Workspace summary",
