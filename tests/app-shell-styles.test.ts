@@ -188,6 +188,15 @@ describe("application shell visual contract", () => {
       '.codex-ui-app-sidebar__item-row[data-worktree-status="restored"][data-status="idle"]',
     );
     expect(styles).toContain(
+      ".codex-ui-app-sidebar__item-row[data-worktree-status]:not([data-has-actions])\n  > .codex-ui-app-sidebar__item",
+    );
+    expect(styles).toContain(
+      "padding-inline-end: calc(var(--codex-ui-spacing) * 8);",
+    );
+    expect(styles).toMatch(
+      /\.codex-ui-app-sidebar__item-worktree-description \{[\s\S]*?clip-path: inset\(50%\);[\s\S]*?position: absolute;[\s\S]*?width: 1px;/,
+    );
+    expect(styles).toContain(
       ".codex-ui-app-sidebar__item-row[data-has-actions]:hover\n  .codex-ui-app-sidebar__item-worktree-indicator",
     );
     expect(styles).toContain(

@@ -2074,7 +2074,7 @@ function appSidebarWorktreeStatusLabel(
     creating: "Worktree is being created",
     "setting-up": "Worktree is being set up",
     failed: "Worktree init failed",
-    restored: undefined,
+    restored: "Worktree is restored",
   }[status];
 }
 
@@ -2252,6 +2252,7 @@ export interface AppSidebarItemProps
 export function AppSidebarItem({
   actions,
   actionsLabel = "Item actions",
+  "aria-describedby": ariaDescribedBy,
   badge,
   children,
   className,
@@ -2269,17 +2270,26 @@ export function AppSidebarItem({
   ...props
 }: AppSidebarItemProps) {
   const statusId = useId();
+  const worktreeDescriptionId = useId();
   const ordinaryStatus = unread && status === "idle" ? "unread" : status;
   const resolvedStatus = worktreeStatus && worktreeStatus !== "restored"
     ? appSidebarWorktreeItemStatus(worktreeStatus)
     : ordinaryStatus;
   const visualStatus = appSidebarItemVisualStatus(resolvedStatus);
+  const worktreeDescription = worktreeStatus === "restored"
+    ? appSidebarWorktreeStatusLabel(worktreeStatus)
+    : undefined;
+  const describedBy = [
+    ariaDescribedBy,
+    resolvedStatus !== "idle" ? statusId : undefined,
+    worktreeDescription ? worktreeDescriptionId : undefined,
+  ]
+    .filter((value): value is string => Boolean(value))
+    .join(" ") || undefined;
   const item = (
     <button
       aria-current={selected ? "page" : undefined}
-      aria-describedby={
-        resolvedStatus !== "idle" ? statusId : undefined
-      }
+      aria-describedby={describedBy}
       className={["codex-ui-app-sidebar__item", className]
         .filter(Boolean)
         .join(" ")}
@@ -2324,6 +2334,14 @@ export function AppSidebarItem({
     >
       {item}
       {worktreeStatus ? <AppSidebarWorktreeIndicator /> : null}
+      {worktreeDescription ? (
+        <span
+          className="codex-ui-app-sidebar__item-worktree-description"
+          id={worktreeDescriptionId}
+        >
+          {worktreeDescription}
+        </span>
+      ) : null}
       {resolvedStatus !== "idle" ? (
         <span
           aria-label={

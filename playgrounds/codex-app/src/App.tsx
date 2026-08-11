@@ -3206,20 +3206,24 @@ export function App() {
               {project.tasks.map((task, index) => (
                 <AppSidebarItem
                   actions={
-                    <>
-                      <button
-                        aria-label={`Pin task ${project.id}-${index + 1}`}
-                        type="button"
-                      >
-                        <SidebarGlyph name="pin-current" />
-                      </button>
-                      <button
-                        aria-label={`Archive task ${project.id}-${index + 1}`}
-                        type="button"
-                      >
-                        <SidebarGlyph name="archive-current" />
-                      </button>
-                    </>
+                    initialSelection.sidebarState === "status-lifecycle" &&
+                    project.id === "protocol-client" &&
+                    index === 0 ? undefined : (
+                      <>
+                        <button
+                          aria-label={`Pin task ${project.id}-${index + 1}`}
+                          type="button"
+                        >
+                          <SidebarGlyph name="pin-current" />
+                        </button>
+                        <button
+                          aria-label={`Archive task ${project.id}-${index + 1}`}
+                          type="button"
+                        >
+                          <SidebarGlyph name="archive-current" />
+                        </button>
+                      </>
+                    )
                   }
                   actionsLabel={`${project.id} task actions`}
                   data-sidebar-status-fixture={

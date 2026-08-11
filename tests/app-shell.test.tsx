@@ -3941,21 +3941,33 @@ describe("application sidebar", () => {
 
   it("keeps pending worktree phases distinct while sharing current sidebar visuals", () => {
     render(
-      <AppSidebar>
-        <AppSidebarSection kind="threads" title="Worktree fixtures">
-          <AppSidebarItem worktreeStatus="queued">Queued</AppSidebarItem>
-          <AppSidebarItem worktreeStatus="creating">Creating</AppSidebarItem>
-          <AppSidebarItem worktreeStatus="setting-up">Setting up</AppSidebarItem>
-          <AppSidebarItem worktreeStatus="failed">Failed</AppSidebarItem>
-          <AppSidebarItem worktreeStatus="restored">Restored</AppSidebarItem>
-          <AppSidebarItem status="running" worktreeStatus="restored">
-            Restored running
-          </AppSidebarItem>
-          <AppSidebarItem unread worktreeStatus="restored">
-            Restored unread
-          </AppSidebarItem>
-        </AppSidebarSection>
-      </AppSidebar>,
+      <>
+        <span hidden id="restored-context">
+          Restored context
+        </span>
+        <AppSidebar>
+          <AppSidebarSection kind="threads" title="Worktree fixtures">
+            <AppSidebarItem worktreeStatus="queued">Queued</AppSidebarItem>
+            <AppSidebarItem worktreeStatus="creating">Creating</AppSidebarItem>
+            <AppSidebarItem worktreeStatus="setting-up">
+              Setting up
+            </AppSidebarItem>
+            <AppSidebarItem worktreeStatus="failed">Failed</AppSidebarItem>
+            <AppSidebarItem
+              aria-describedby="restored-context"
+              worktreeStatus="restored"
+            >
+              Restored
+            </AppSidebarItem>
+            <AppSidebarItem status="running" worktreeStatus="restored">
+              Restored running
+            </AppSidebarItem>
+            <AppSidebarItem unread worktreeStatus="restored">
+              Restored unread
+            </AppSidebarItem>
+          </AppSidebarSection>
+        </AppSidebar>
+      </>,
     );
 
     for (const [label, worktreeStatus, status] of [
@@ -3991,7 +4003,28 @@ describe("application sidebar", () => {
       screen.getByRole("status", { name: "Worktree init failed" })
         .getAttribute("data-visual-status"),
     ).toBe("error");
-    expect(screen.queryByRole("status", { name: "restored" })).toBeNull();
+    expect(
+      screen.queryByRole("status", { name: "Worktree is restored" }),
+    ).toBeNull();
+    for (const label of ["Restored", "Restored running", "Restored unread"]) {
+      const item = screen.getByRole("button", { name: label });
+      const descriptionIds = item
+        .getAttribute("aria-describedby")
+        ?.split(/\s+/) ?? [];
+      expect(
+        descriptionIds.some(
+          (id) =>
+            document.getElementById(id)?.textContent ===
+            "Worktree is restored",
+        ),
+      ).toBe(true);
+    }
+    expect(
+      screen
+        .getByRole("button", { name: "Restored" })
+        .getAttribute("aria-describedby")
+        ?.split(/\s+/),
+    ).toContain("restored-context");
     expect(
       screen
         .getByRole("button", { name: "Restored running" })
