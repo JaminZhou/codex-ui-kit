@@ -14,7 +14,7 @@ exit gates; it does not replace the inventory.
   Desktop `26.803.61601` (`6396`). Unsampled earlier-build surfaces remain
   previous-build regression evidence rather than current verification.
 - The inventory contains 86 surface groups: 58 P0, 19 P1, and 9 P2.
-- 16 groups have current-build runtime evidence, 53 have previous-build-only
+- 17 groups have current-build runtime evidence, 52 have previous-build-only
   runtime evidence, and 17 have not been sampled.
 - The scoped `26.803.61601` refresh revalidates 43
   sidebar/menu/window-chrome/Composer icons against exact runtime evidence.
@@ -34,9 +34,12 @@ exit gates; it does not replace the inventory.
   status are now separate verified denominators. The current-build status
   slice reaches active and unread runtime states, preserves the active spinner
   while a follow-up is queued, and locks the exact trailing rail, spinner, dot,
-  computed color, action replacement, and glyph pixels. Pending-worktree
-  queued/creating/setting-up/failed presentation remains a separate
-  previous-build-only row until those phases are deliberately runtime-reached.
+  computed color, action replacement, and glyph pixels. The separate
+  pending-worktree slice now reaches a real disposable worktree create, a
+  deterministic create failure, and a successful Retry recovery. It preserves
+  queued/creating/setting-up/failed/restored semantics, locks the 14×14 branch
+  marker plus 20×20 status rail, and adds Browser/CDP, Electron, and local-only
+  loading/error/restored pixel gates.
 - A reproducible sanitized global-shell capture now selects the main Renderer
   structurally, records dark 1180×820, 820×680, 721×680, and 720×680 geometry,
   normalizes collapsed and explicitly pinned narrow states, verifies Pull
@@ -465,8 +468,10 @@ without confusing package readiness with full product reconstruction.
    task-status follow-up separately reaches active and unread on
    `26.803.61601`, corrects task rows from the former 40px approximation to the
    current 30px structure, and gates trailing status geometry, color, action
-   replacement, and pixels. Pending-worktree queued/creating/setting-up/failed
-   runtime evidence remains open.
+   replacement, and pixels. The worktree follow-up then reaches a real create,
+   controlled failure, and Retry recovery in isolated disposable repositories;
+   it gates queued/creating/setting-up/failed/restored semantics, the exact
+   branch/error/spinner primitives, and owned pixels.
 3. **Tool recovery and mixed thread — delivered for current component contracts**:
    `26.803.41515` now covers a real Search → Search → Fetch success and a real
    invalid-URL Fetch → Search → Fetch recovery inside one integration group,

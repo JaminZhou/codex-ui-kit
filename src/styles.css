@@ -1187,6 +1187,27 @@
   width: 1rem;
 }
 
+.codex-ui-app-sidebar__item-worktree-indicator {
+  color: color-mix(in srgb, var(--codex-ui-text) 50%, transparent);
+  display: inline-flex;
+  height: 0.875rem;
+  inset-block-start: 0.5rem;
+  inset-inline-end: 2.1875rem;
+  position: absolute;
+  width: 0.875rem;
+  z-index: 1;
+}
+
+.codex-ui-app-sidebar__item-worktree-indicator svg {
+  height: 0.875rem;
+  width: 0.875rem;
+}
+
+.codex-ui-app-sidebar__item-row[data-worktree-status="restored"]
+  .codex-ui-app-sidebar__item-worktree-indicator {
+  inset-inline-end: 0.4375rem;
+}
+
 .codex-ui-app-sidebar__item-row[data-has-actions]:hover
   .codex-ui-app-sidebar__item-status,
 .codex-ui-app-sidebar__item-row[data-has-actions]:focus-within

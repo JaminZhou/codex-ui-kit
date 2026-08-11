@@ -2018,6 +2018,13 @@ export type AppSidebarItemStatus =
   | "unread"
   | "waiting";
 
+export type AppSidebarWorktreeStatus =
+  | "queued"
+  | "creating"
+  | "setting-up"
+  | "failed"
+  | "restored";
+
 type AppSidebarItemVisualStatus =
   | "attention"
   | "error"
@@ -2041,6 +2048,50 @@ function appSidebarItemVisualStatus(
     case "idle":
       return "idle";
   }
+}
+
+function appSidebarWorktreeItemStatus(
+  status: AppSidebarWorktreeStatus,
+): AppSidebarItemStatus {
+  switch (status) {
+    case "queued":
+      return "queued";
+    case "creating":
+    case "setting-up":
+      return "loading";
+    case "failed":
+      return "error";
+    case "restored":
+      return "idle";
+  }
+}
+
+function appSidebarWorktreeStatusLabel(
+  status: AppSidebarWorktreeStatus,
+) {
+  return {
+    queued: "Worktree creation is queued",
+    creating: "Worktree is being created",
+    "setting-up": "Worktree is being set up",
+    failed: "Worktree init failed",
+    restored: undefined,
+  }[status];
+}
+
+function AppSidebarWorktreeIndicator() {
+  return (
+    <span
+      aria-hidden="true"
+      className="codex-ui-app-sidebar__item-worktree-indicator"
+    >
+      <svg fill="none" viewBox="0 0 20 20">
+        <path
+          d="M15.8 11.535c.367 0 .665.298.665.665v5a.665.665 0 0 1-.665.665h-5a.665.665 0 1 1 0-1.33h3.394l-3.565-3.564a.666.666 0 0 1 .942-.942l3.564 3.565V12.2c0-.367.298-.665.665-.665Zm0-9.4c.367 0 .665.298.665.665v5a.665.665 0 0 1-1.33 0V4.405l-5.128 5.128c-.323.324-.558.565-.842.74a2.668 2.668 0 0 1-.771.319c-.324.078-.662.073-1.12.073H1.93a.665.665 0 1 1 0-1.33h5.345c.52 0 .673-.005.809-.037.136-.033.266-.086.385-.16.12-.072.23-.177.598-.545l5.128-5.128H10.8a.665.665 0 0 1 0-1.33h5Z"
+          fill="currentColor"
+        />
+      </svg>
+    </span>
+  );
 }
 
 function AppSidebarItemStatusVisual({
@@ -2195,6 +2246,7 @@ export interface AppSidebarItemProps
   statusLabel?: string;
   trailing?: ReactNode;
   unread?: boolean;
+  worktreeStatus?: AppSidebarWorktreeStatus;
 }
 
 export function AppSidebarItem({
@@ -2213,10 +2265,15 @@ export function AppSidebarItem({
   trailing,
   type = "button",
   unread = false,
+  worktreeStatus,
   ...props
 }: AppSidebarItemProps) {
   const statusId = useId();
-  const resolvedStatus = unread && status === "idle" ? "unread" : status;
+  const resolvedStatus = worktreeStatus
+    ? appSidebarWorktreeItemStatus(worktreeStatus)
+    : unread && status === "idle"
+      ? "unread"
+      : status;
   const visualStatus = appSidebarItemVisualStatus(resolvedStatus);
   const item = (
     <button
@@ -2231,6 +2288,7 @@ export function AppSidebarItem({
       data-pinned={pinned || undefined}
       data-selected={selected || undefined}
       data-status={resolvedStatus}
+      data-worktree-status={worktreeStatus}
       type={type}
       {...props}
     >
@@ -2263,11 +2321,18 @@ export function AppSidebarItem({
       data-has-actions={Boolean(actions) || undefined}
       data-selected={selected || undefined}
       data-status={resolvedStatus}
+      data-worktree-status={worktreeStatus}
     >
       {item}
+      {worktreeStatus ? <AppSidebarWorktreeIndicator /> : null}
       {resolvedStatus !== "idle" ? (
         <span
-          aria-label={statusLabel ?? resolvedStatus}
+          aria-label={
+            statusLabel ??
+            (worktreeStatus
+              ? appSidebarWorktreeStatusLabel(worktreeStatus)
+              : resolvedStatus)
+          }
           className="codex-ui-app-sidebar__item-status"
           data-status={resolvedStatus}
           data-visual-status={visualStatus}

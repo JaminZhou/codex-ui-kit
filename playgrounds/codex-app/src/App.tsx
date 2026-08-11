@@ -78,6 +78,7 @@ import {
   WorkspacePanel,
   type TerminalEntry,
   type AppRouteOutletStatus,
+  type AppSidebarWorktreeStatus,
   type ComposerPermissionOption,
   type ComposerModeKind,
   type ComposerResourceGroup,
@@ -1420,22 +1421,43 @@ function currentSidebarTaskStatus(projectId: string, taskIndex: number) {
       return "waiting" as const;
     case "codex-ui-kit:0":
       return "unread" as const;
-    case "codex-ui-kit:1":
-      return "loading" as const;
-    case "design-assets:0":
-      return "error" as const;
     default:
       return "idle" as const;
   }
 }
 
+function currentSidebarTaskWorktreeStatus(
+  projectId: string,
+  taskIndex: number,
+): AppSidebarWorktreeStatus | undefined {
+  const fixture = `${projectId}:${taskIndex}`;
+  return {
+    "codex-ui-kit:1": "queued",
+    "design-assets:0": "creating",
+    "design-assets:1": "setting-up",
+    "design-assets:2": "failed",
+    "protocol-client:0": "restored",
+  }[fixture] as AppSidebarWorktreeStatus | undefined;
+}
+
 function currentSidebarTaskStatusLabel(projectId: string, taskIndex: number) {
+  const worktreeStatus = currentSidebarTaskWorktreeStatus(
+    projectId,
+    taskIndex,
+  );
+  if (worktreeStatus) {
+    return {
+      queued: "Worktree creation is queued",
+      creating: "Worktree is being created",
+      "setting-up": "Worktree is being set up",
+      failed: "Worktree init failed",
+      restored: undefined,
+    }[worktreeStatus];
+  }
   const status = currentSidebarTaskStatus(projectId, taskIndex);
   return {
     active: "Task is active",
-    error: "Worktree initialization failed",
     idle: undefined,
-    loading: "Worktree initialization is queued",
     unread: "Task has an unread update",
     waiting: "Task is waiting for a response",
   }[status];
@@ -3205,8 +3227,21 @@ export function App() {
                       ? `${project.id}:${index}`
                       : undefined
                   }
+                  data-sidebar-worktree-status-fixture={
+                    initialSelection.sidebarState === "status-lifecycle" &&
+                    currentSidebarTaskWorktreeStatus(project.id, index)
+                      ? `${project.id}:${index}`
+                      : undefined
+                  }
                   depth={1}
                   key={task}
+                  aria-label={
+                    initialSelection.sidebarState === "status-lifecycle" &&
+                    currentSidebarTaskWorktreeStatus(project.id, index) ===
+                      "failed"
+                      ? "Worktree init failed"
+                      : undefined
+                  }
                   status={
                     initialSelection.sidebarState === "status-lifecycle"
                       ? currentSidebarTaskStatus(project.id, index)
@@ -3215,6 +3250,11 @@ export function App() {
                   statusLabel={
                     initialSelection.sidebarState === "status-lifecycle"
                       ? currentSidebarTaskStatusLabel(project.id, index)
+                      : undefined
+                  }
+                  worktreeStatus={
+                    initialSelection.sidebarState === "status-lifecycle"
+                      ? currentSidebarTaskWorktreeStatus(project.id, index)
                       : undefined
                   }
                 >

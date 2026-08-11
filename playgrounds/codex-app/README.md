@@ -937,14 +937,18 @@ CODEX_UI_KIT_CURRENT_SIDEBAR_COMPACT_PINNED_REFERENCE=/absolute/path/to/current-
   --scenes=current-sidebar-project-collapsed,current-sidebar-project-menu,current-sidebar-help-menu,current-sidebar-account-menu,current-sidebar-compact-pinned
 ```
 
-The ordinary task-status gate accepts two exact 259×30 local-only product row
-captures. It compares only the final 28px trailing rail after reducing each
-rail to a foreground mask; CDP independently locks status geometry and unread
-color:
+The combined ordinary/worktree task-status gate accepts five exact 259×30
+local-only product row captures. Ordinary states compare the final 28px status
+rail; worktree states compare the final 56px branch/status region. Each region
+is reduced to a foreground mask while CDP independently locks state identity,
+geometry, animation, color, and restored presentation:
 
 ```bash
 CODEX_UI_KIT_CURRENT_SIDEBAR_ACTIVE_STATUS_REFERENCE=/absolute/path/to/current-sidebar-active-row.png \
 CODEX_UI_KIT_CURRENT_SIDEBAR_UNREAD_STATUS_REFERENCE=/absolute/path/to/current-sidebar-unread-row.png \
+CODEX_UI_KIT_CURRENT_SIDEBAR_WORKTREE_LOADING_REFERENCE=/absolute/path/to/current-sidebar-worktree-loading-row.png \
+CODEX_UI_KIT_CURRENT_SIDEBAR_WORKTREE_ERROR_REFERENCE=/absolute/path/to/current-sidebar-worktree-error-row.png \
+CODEX_UI_KIT_CURRENT_SIDEBAR_WORKTREE_RESTORED_REFERENCE=/absolute/path/to/current-sidebar-worktree-restored-row.png \
   pnpm --filter @codex-ui-kit/codex-app-playground check:visual -- \
   --scenes=current-sidebar-status-lifecycle
 ```

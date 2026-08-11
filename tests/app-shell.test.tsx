@@ -3939,6 +3939,55 @@ describe("application sidebar", () => {
     ).toBeTruthy();
   });
 
+  it("keeps pending worktree phases distinct while sharing current sidebar visuals", () => {
+    render(
+      <AppSidebar>
+        <AppSidebarSection kind="threads" title="Worktree fixtures">
+          <AppSidebarItem worktreeStatus="queued">Queued</AppSidebarItem>
+          <AppSidebarItem worktreeStatus="creating">Creating</AppSidebarItem>
+          <AppSidebarItem worktreeStatus="setting-up">Setting up</AppSidebarItem>
+          <AppSidebarItem worktreeStatus="failed">Failed</AppSidebarItem>
+          <AppSidebarItem worktreeStatus="restored">Restored</AppSidebarItem>
+        </AppSidebarSection>
+      </AppSidebar>,
+    );
+
+    for (const [label, worktreeStatus, status] of [
+      ["Queued", "queued", "queued"],
+      ["Creating", "creating", "loading"],
+      ["Setting up", "setting-up", "loading"],
+      ["Failed", "failed", "error"],
+      ["Restored", "restored", "idle"],
+    ] as const) {
+      const item = screen.getByRole("button", { name: label });
+      expect(item.getAttribute("data-worktree-status")).toBe(worktreeStatus);
+      expect(item.getAttribute("data-status")).toBe(status);
+      expect(
+        item.parentElement?.querySelector(
+          ".codex-ui-app-sidebar__item-worktree-indicator svg",
+        ),
+      ).toBeTruthy();
+    }
+
+    expect(
+      screen.getByRole("status", { name: "Worktree creation is queued" })
+        .getAttribute("data-visual-status"),
+    ).toBe("loading");
+    expect(
+      screen.getByRole("status", { name: "Worktree is being created" })
+        .getAttribute("data-visual-status"),
+    ).toBe("loading");
+    expect(
+      screen.getByRole("status", { name: "Worktree is being set up" })
+        .getAttribute("data-visual-status"),
+    ).toBe("loading");
+    expect(
+      screen.getByRole("status", { name: "Worktree init failed" })
+        .getAttribute("data-visual-status"),
+    ).toBe("error");
+    expect(screen.queryByRole("status", { name: "restored" })).toBeNull();
+  });
+
   it("groups project tasks behind a focus-stable project row", () => {
     const onExpandedChange = vi.fn();
     render(

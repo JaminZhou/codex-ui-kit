@@ -534,12 +534,50 @@ try {
       },
     ),
   );
+  const worktreeContract = await sidebarStatusPage.evaluate(() =>
+    Array.from(
+      document.querySelectorAll(
+        "[data-sidebar-worktree-status-fixture]",
+      ),
+      (item) => {
+        const row = item.closest(".codex-ui-app-sidebar__item-row");
+        const status = row?.querySelector(
+          ".codex-ui-app-sidebar__item-status",
+        );
+        const branch = row?.querySelector(
+          ".codex-ui-app-sidebar__item-worktree-indicator",
+        );
+        const metric = (element) => {
+          if (!(element instanceof Element)) return null;
+          const bounds = element.getBoundingClientRect();
+          return { height: bounds.height, width: bounds.width };
+        };
+        const rowBounds = row?.getBoundingClientRect();
+        const branchBounds = branch?.getBoundingClientRect();
+        return {
+          branchRect: metric(branch),
+          branchRightInset:
+            rowBounds && branchBounds
+              ? rowBounds.right - branchBounds.right
+              : null,
+          fixture: item.getAttribute(
+            "data-sidebar-worktree-status-fixture",
+          ),
+          status: item.getAttribute("data-status"),
+          visualStatus: status?.getAttribute("data-visual-status"),
+          worktreeStatus: item.getAttribute("data-worktree-status"),
+        };
+      },
+    ),
+  );
   const expectedStatuses = [
     ["session-browser:0", "active", "loading"],
     ["desktop-cleanup:0", "waiting", "attention"],
     ["codex-ui-kit:0", "unread", "attention"],
-    ["codex-ui-kit:1", "loading", "loading"],
-    ["design-assets:0", "error", "error"],
+    ["codex-ui-kit:1", "queued", "loading"],
+    ["design-assets:0", "loading", "loading"],
+    ["design-assets:1", "loading", "loading"],
+    ["design-assets:2", "error", "error"],
   ];
   const actualStatuses = statusContract.map(
     ({ fixture, status, visualStatus }) => [fixture, status, visualStatus],
@@ -567,6 +605,36 @@ try {
   ) {
     throw new Error(
       `Electron current sidebar status lifecycle failed: ${JSON.stringify(statusContract)}`,
+    );
+  }
+  const expectedWorktreeStatuses = [
+    ["codex-ui-kit:1", "queued", "queued", "loading"],
+    ["design-assets:0", "creating", "loading", "loading"],
+    ["design-assets:1", "setting-up", "loading", "loading"],
+    ["design-assets:2", "failed", "error", "error"],
+    ["protocol-client:0", "restored", "idle", null],
+  ];
+  const actualWorktreeStatuses = worktreeContract.map(
+    ({ fixture, status, visualStatus, worktreeStatus }) => [
+      fixture,
+      worktreeStatus,
+      status,
+      visualStatus ?? null,
+    ],
+  );
+  if (
+    JSON.stringify(actualWorktreeStatuses) !==
+      JSON.stringify(expectedWorktreeStatuses) ||
+    worktreeContract.some(
+      (fixture) =>
+        fixture.branchRect?.width !== 14 ||
+        fixture.branchRect?.height !== 14 ||
+        fixture.branchRightInset !==
+          (fixture.worktreeStatus === "restored" ? 7 : 35),
+    )
+  ) {
+    throw new Error(
+      `Electron current sidebar worktree lifecycle failed: ${JSON.stringify(worktreeContract)}`,
     );
   }
 
