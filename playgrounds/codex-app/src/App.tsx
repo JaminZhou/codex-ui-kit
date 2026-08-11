@@ -1559,6 +1559,15 @@ export function App() {
   const [composerValue, setComposerValue] = useState(() =>
     initialComposerValue(initialSelection.frame),
   );
+  const [workspacePersistedTaskAvailable] = useState(() =>
+    currentWorkspacePersistenceFrame(initialSelection.frame),
+  );
+  const [workspaceDirectoryMissing] = useState(
+    initialSelection.frame === "workspace-directory-missing",
+  );
+  const [workspaceModelOnlyTurns, setWorkspaceModelOnlyTurns] = useState<
+    Array<{ id: number; prompt: string; response: string }>
+  >([]);
   const [composerOverlay, setComposerOverlay] =
     useState<ComposerOverlay>(() =>
       initialComposerOverlay(initialSelection.frame),
@@ -1790,6 +1799,7 @@ export function App() {
     useState<"environment" | "worktree">("environment");
   const queuedPromptCounterRef = useRef(1);
   const attachmentSelectionCounterRef = useRef(1);
+  const workspaceModelOnlyTurnCounterRef = useRef(1);
   const terminalSessionCounterRef = useRef(
     initialTerminalSessionIds(
       initialSelection.scenarioId,
@@ -3220,7 +3230,7 @@ export function App() {
             >
               {[
                 ...project.tasks,
-                ...(workspacePersistenceFrame &&
+                ...(workspacePersistedTaskAvailable &&
                 project.id === "codex-ui-kit"
                   ? ["Verify worktree persistence"]
                   : []),
@@ -3266,7 +3276,11 @@ export function App() {
                       ? () => {
                           setMode("replay");
                           setView("workspace");
-                          setActiveFrame("workspace-persisted-thread");
+                          setActiveFrame(
+                            workspaceDirectoryMissing
+                              ? "workspace-directory-missing"
+                              : "workspace-persisted-thread",
+                          );
                         }
                       : undefined
                   }
@@ -4807,6 +4821,27 @@ export function App() {
       }
       layout="multiline"
       onSubmit={(prompt) => {
+        if (workspacePersistenceFrame) {
+          const nextPrompt = prompt.trim();
+          if (!nextPrompt) return;
+          setWorkspaceModelOnlyTurns((turns) => [
+            ...turns,
+            {
+              id: workspaceModelOnlyTurnCounterRef.current++,
+              prompt: nextPrompt,
+              response: workspaceDirectoryMissing
+                ? "MODEL-ONLY WORKTREE TURN COMPLETE."
+                : "MODEL-ONLY TURN COMPLETE.",
+            },
+          ]);
+          setComposerValue("");
+          setActiveFrame(
+            workspaceDirectoryMissing
+              ? "workspace-directory-missing"
+              : "workspace-persisted-thread",
+          );
+          return;
+        }
         selectScenario("workspace-workflow", "approval-pending", {
           cwd: currentWorkspaceCwd,
           prompt,
@@ -4931,8 +4966,7 @@ export function App() {
       />
     </div>
   );
-  const workspaceThreadMissing =
-    activeFrame === "workspace-directory-missing";
+  const workspaceThreadMissing = workspaceDirectoryMissing;
   const workspaceThreadSummary = (
     <ThreadSummaryPopover
       className="demo-workspace-thread-summary-popover"
@@ -5061,6 +5095,22 @@ export function App() {
               </AgentMessage>
             </>
           ) : null}
+          {workspaceModelOnlyTurns.map((turn) => (
+            <Fragment key={turn.id}>
+              <AgentMessage role="user">{turn.prompt}</AgentMessage>
+              <AgentMessage
+                actions={
+                  <McpResponseActions
+                    includeShare={false}
+                    label="Model-only response actions"
+                  />
+                }
+                role="assistant"
+              >
+                <AgentMarkdown>{turn.response}</AgentMarkdown>
+              </AgentMessage>
+            </Fragment>
+          ))}
         </AgentTurn>
       </ConversationThreadShell>
     </div>

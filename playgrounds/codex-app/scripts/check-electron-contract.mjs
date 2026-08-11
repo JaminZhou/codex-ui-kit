@@ -7439,16 +7439,33 @@ try {
   const workspaceComposer = workspaceMissingPage.getByRole("textbox", {
     name: "Do anything",
   });
-  await workspaceComposer.fill("Model-only turns remain available.");
+  await workspaceComposer.fill(
+    "Reply exactly MODEL-ONLY WORKTREE TURN COMPLETE.",
+  );
   if (
     (await workspaceComposer.inputValue()) !==
-      "Model-only turns remain available." ||
+      "Reply exactly MODEL-ONLY WORKTREE TURN COMPLETE." ||
     !(await workspaceMissingPage
       .getByText("Pull request status unavailable", { exact: true })
       .isVisible())
   ) {
     throw new Error(
       "Electron missing-worktree state did not preserve the Composer and unavailable PR summary.",
+    );
+  }
+  await workspaceComposer.press("Enter");
+  await workspaceMissingPage
+    .getByText("MODEL-ONLY WORKTREE TURN COMPLETE.", { exact: true })
+    .waitFor({ state: "visible" });
+  if (
+    (await workspaceComposer.inputValue()) !== "" ||
+    !(await missingNotice.isVisible()) ||
+    (await workspaceMissingPage
+      .locator(".demo-workspace-persisted-thread .codex-ui-agent-message")
+      .count()) !== 6
+  ) {
+    throw new Error(
+      "Electron missing-worktree model-only turn did not preserve the latched thread state.",
     );
   }
   const summaryToggle = workspaceMissingPage.getByRole("button", {
@@ -7463,27 +7480,59 @@ try {
     .getByRole("dialog", { name: "Workspace summary" })
     .waitFor({ state: "visible" });
   await workspaceMissingPage
-    .getByRole("button", {
-      exact: true,
-      name: "Verify worktree persistence",
-    })
+    .getByRole("button", { exact: true, name: "New chat" })
     .click();
   await workspaceMissingPage.waitForSelector(
-    '.demo-root[data-frame="workspace-persisted-thread"]',
+    '.demo-root[data-frame="workspace-ready"]',
   );
+  const retainedTask = workspaceMissingPage.getByRole("button", {
+    exact: true,
+    name: "Verify worktree persistence",
+  });
+  await retainedTask.waitFor({ state: "visible" });
+  if ((await retainedTask.getAttribute("aria-current")) !== null) {
+    throw new Error(
+      "Electron persisted worktree task remained selected after opening New chat.",
+    );
+  }
+  await retainedTask.click();
+  await workspaceMissingPage.waitForSelector(
+    '.demo-root[data-frame="workspace-directory-missing"]',
+  );
+  const replaySummary = workspaceMissingPage.getByRole("dialog", {
+    name: "Workspace summary",
+  });
+  if (!(await replaySummary.isVisible())) {
+    await summaryToggle.click();
+    await replaySummary.waitFor({ state: "visible" });
+  }
+  const replayNoticeVisible = await missingNotice.isVisible();
+  const replayPullRequestUnavailable = await workspaceMissingPage
+    .getByText("Pull request status unavailable", { exact: true })
+    .isVisible();
+  const replaySelectedWorktreeMarkers = await workspaceMissingPage
+    .locator(
+      '.codex-ui-app-sidebar__item-row[data-selected="true"] .codex-ui-app-sidebar__item-worktree-indicator svg',
+    )
+    .count();
+  const replayMessageCount = await workspaceMissingPage
+    .locator(".demo-workspace-persisted-thread .codex-ui-agent-message")
+    .count();
   if (
-    (await missingNotice.count()) !== 0 ||
-    (await workspaceMissingPage
-      .locator(
-        '.codex-ui-app-sidebar__item-row[data-selected="true"] .codex-ui-app-sidebar__item-worktree-indicator svg',
-      )
-      .count()) !== 1 ||
-    (await workspaceMissingPage
-      .locator(".demo-workspace-persisted-thread .codex-ui-agent-message")
-      .count()) !== 2
+    !replayNoticeVisible ||
+    !replayPullRequestUnavailable ||
+    replaySelectedWorktreeMarkers !== 1 ||
+    replayMessageCount !== 6
   ) {
     throw new Error(
-      "Electron persisted-worktree replay did not clear the latched notice and retain the selected worktree task.",
+      `Electron missing-worktree replay did not retain the task, model-only turn, and session-latched warning: ${JSON.stringify(
+        {
+          replayMessageCount,
+          replayNoticeVisible,
+          replayPullRequestUnavailable,
+          replaySelectedWorktreeMarkers,
+        },
+      )}`,
     );
   }
 } finally {
