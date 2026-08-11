@@ -10,11 +10,11 @@ export const currentBaselineViewports = Object.freeze({
 });
 
 export const currentBaselineFingerprint = Object.freeze({
-  appAsarBytes: 223_450_200,
+  appAsarBytes: 223_451_508,
   appAsarSha256:
-    "5f6e773aafd542d3cf09e10b5dca6cabd301d0a155f4b8ce870e3915fc3da25e",
-  appVersion: "26.803.41515",
-  buildNumber: "6321",
+    "928129601e8b36eccba603114d6912352f2b13182f3a7d60b32166d0e81aafb5",
+  appVersion: "26.803.61601",
+  buildNumber: "6396",
   chromiumVersion: "151.0.7922.76",
 });
 
@@ -449,8 +449,8 @@ export function assertCurrentBaselineRecord(record) {
     );
   }
   const expectedScrollOwners = {
-    mediumNewChat: { clientHeight: 565, scrollHeight: 971 },
-    wideNewChat: { clientHeight: 705, scrollHeight: 1011 },
+    mediumNewChat: { clientHeight: 565 },
+    wideNewChat: { clientHeight: 705 },
   };
   const invalidScrollOwnerStates = Object.entries(expectedScrollOwners)
     .filter(([state, expected]) => {
@@ -461,7 +461,8 @@ export function assertCurrentBaselineRecord(record) {
         owner?.overflowY !== "auto" ||
         !withinTolerance(owner?.clientHeight, expected.clientHeight) ||
         !withinTolerance(owner?.rect?.height, expected.clientHeight) ||
-        !withinTolerance(owner?.scrollHeight, expected.scrollHeight)
+        !Number.isFinite(owner?.scrollHeight) ||
+        owner.scrollHeight <= owner.clientHeight
       );
     })
     .map(([state]) => state);

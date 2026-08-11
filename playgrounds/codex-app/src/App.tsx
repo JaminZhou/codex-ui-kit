@@ -2867,6 +2867,7 @@ export function App() {
           </div>
           <div className="demo-sidebar-new-chat-row">
             <button
+              aria-current={view === "workspace" ? "page" : undefined}
               className="demo-sidebar-new-chat"
               onClick={() => openWorkspace()}
               type="button"

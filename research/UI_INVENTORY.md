@@ -45,10 +45,10 @@ observation from a previous build remains historical evidence.
 
 ## Current baseline
 
-- Codex Desktop `26.803.41515` (`6321`)
-- Package sampled on 2026-08-08 and reverified on 2026-08-10
+- Codex Desktop `26.803.61601` (`6396`)
+- Package sampled and reverified on 2026-08-11
 - `app.asar` SHA-256:
-  `5f6e773aafd542d3cf09e10b5dca6cabd301d0a155f4b8ce870e3915fc3da25e`
+  `928129601e8b36eccba603114d6912352f2b13182f3a7d60b32166d0e81aafb5`
 - Computer Use automation: blocked by the environment safety policy for
   `com.openai.codex`
 - Scoped CDP automation: available through a user-authorized second process;
@@ -59,18 +59,22 @@ observation from a previous build remains historical evidence.
   compact pinning, Pull requests selection and return to New chat, current
   Composer geometry, zero horizontal overflow, and stable sidebar scroll
   ownership. Structural target ranking excludes the avatar overlay without
-  using private text, and warmed consecutive captures are field-identical.
-- Earlier probes on this same fingerprint cover current context/Composer
-  assets, Recents actions, window chrome, an 18-column Markdown table, and the
-  bounded attachment entry/structure evidence described in
-  [`26.803.41515.md`](26.803.41515.md). The scoped visible-shell approximation
-  list is empty, but the broader lifecycle denominator remains incomplete.
+  using private text. The exact `scrollHeight` remains content-dependent, so
+  the contract locks the unique scroll owner and visible geometry rather than
+  private task counts.
+- The same fingerprint revalidates 37 context/Composer/sidebar/menu/window
+  assets, six project groups, Recents actions, both menus, and the disabled
+  window-navigation cursor. See
+  [`26.803.61601.md`](26.803.61601.md). The scoped visible-shell approximation
+  list is empty, but the broader lifecycle denominator remains incomplete;
+  prior Markdown, MCP, attachment, approval, and collaboration evidence keeps
+  its `26.803.41515` prefix until separately re-reached.
 - Terminal and subagent runtime captures from `26.730.61639` are retained as
   previous-build regression evidence and have been downgraded from `verified`
   to `partial_legacy` until they are reached again on the current fingerprint.
 
-Current inventory: 84 surface groups; 17 have current-build runtime evidence, 50 have previous-build-only runtime evidence, 17 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 16 groups and Electron verification covers 16.
-Prior acceptance outside those 17 sampled current-build groups remains
+Current inventory: 84 surface groups; 15 have current-build runtime evidence, 52 have previous-build-only runtime evidence, 17 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 12 groups and Electron verification covers 12.
+Prior acceptance outside those 15 sampled current-build groups remains
 recorded as `partial_legacy` until current-build re-observation.
 
 The current package exposes candidates far beyond the old transcript sample:
@@ -687,8 +691,8 @@ Review content, subagent status, system typography, compact Composer width,
 hidden navigation, and zero overflow. Electron reopens every disclosure,
 switches Review to the subagent transcript, and performs the native compact
 resize. Nine reviewed internal pixel baselines pass. This expands the
-regression matrix to 33 traces, 406 events, and 155 visual frames without
-changing the now-expanded 17 current-runtime / 50 previous-only / 17 unsampled inventory
+regression matrix to 33 traces, 406 events, and 156 visual frames without
+changing the current 15 runtime / 52 previous-only / 17 unsampled inventory
 counts: no single current-product task supplied whole-thread runtime or pixel
 evidence for this composition.
 
@@ -899,7 +903,7 @@ adds source-structural evidence for the seven collaboration statuses,
 Active/Done classification, and 4/10 panel limits. A schema-valid twelve-agent
 replay now covers waiting-before-initialization, streamed updates, errored,
 interrupted, shutdown, and unavailable terminal results, both pagination
-  paths, and the failed-agent transcript. Browser/CDP reaches 155 frames;
+  paths, and the failed-agent transcript. Browser/CDP reaches 156 frames;
 Electron repeats the pagination and transcript interactions. Nine
 reviewed scenes gate ten current-build regions. Panel/summary/transcript ratios
 range from `0.013328938694792354` to `0.046708160442600274`; the compact
@@ -943,7 +947,7 @@ fence, table, long running tail, and completed tail.
 
 A later isolated current-build task reaches an 18-column table's Copy, Expand,
 and viewport preview path. The public five-event replay contributes to the
-155-frame matrix; Electron repeats raw Markdown/HTML copy, horizontal wheel,
+156-frame matrix; Electron repeats raw Markdown/HTML copy, horizontal wheel,
 preview interaction, and 720×680 action reachability, and three reviewed
 internal baselines pass. A local-only
 1180×820 reference gates the preview and close regions at 3.9737% and 0.5929%

@@ -249,6 +249,39 @@ describe("lifecycle visual policy", () => {
     );
   });
 
+  it("gates the current dark shell against like-owned product regions", () => {
+    expect(electronHarness).toContain('id: "current-dark-shell"');
+    expect(electronHarness).toContain('theme: "dark"');
+    expect(electronHarness).toContain("currentSidebar: true");
+    expect(cdpContract).toContain(
+      'scene.id === "current-dark-shell"',
+    );
+    expect(cdpContract).toContain(
+      'darkShell.newChatCurrent !== "page"',
+    );
+    expect(cdpContract).toContain(
+      'darkShell.back.cursor !== "not-allowed"',
+    );
+    expect(cdpContract).toContain(
+      'darkShell.forward.cursor !== "not-allowed"',
+    );
+    expect(contract).toContain(
+      "CODEX_UI_KIT_CURRENT_DARK_SHELL_REFERENCE",
+    );
+    expect(contract).toContain(
+      'scene.id === "current-dark-shell" && currentDarkShellReference',
+    );
+    expect(contract).toContain("cropPng(reference, 0, 0, 274, 250)");
+    expect(contract).toContain("cropPng(actual, 0, 0, 274, 250)");
+    expect(contract).toContain("0.08");
+    expect(contract).toContain(
+      "CODEX_UI_KIT_CURRENT_DARK_SHELL_TOP_MAX_DIFF_RATIO",
+    );
+    expect(appSource).toContain(
+      'aria-current={view === "workspace" ? "page" : undefined}',
+    );
+  });
+
   it("gates the current long-thread navigation and return control", () => {
     expect(contract).toContain(
       "CODEX_UI_KIT_LONG_THREAD_REFERENCE",

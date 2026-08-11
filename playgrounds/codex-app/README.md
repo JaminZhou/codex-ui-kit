@@ -710,6 +710,31 @@ lifecycle on Codex Desktop `26.803.41515`:
 Product text, screenshots, raw CDP records, profiles, and private application
 resources are not committed.
 
+## Thirty-eighth vertical slice
+
+The thirty-eighth slice refreshes the global shell baseline on Codex Desktop
+`26.803.61601`:
+
+- the fail-closed capture pins build `6396`, Chromium `151.0.7922.76`, the
+  223451508-byte ASAR, and its SHA-256 before and after sampling;
+- the 1180/820/721/720 geometry, automatic collapse, explicit compact pinning,
+  six project groups, project/Help menus, route restoration, and 37 visible
+  assets are re-observed without promoting unrelated previous-build evidence;
+- the new `current-dark-shell` scene composes the selected New chat route,
+  current sidebar, window chrome, workspace destination, context bar, and
+  Composer in one exact 1180×820 frame;
+- Browser/CDP locks dark theme ownership, New chat selection, 274/906/736px
+  geometry, exact icon order, disabled Back/Forward `not-allowed` cursors, and
+  zero horizontal overflow; Electron renders the same lifecycle frame;
+- the local-only current-product comparison passes at 3.1387% for the
+  semi-transparent top band, 0.4126% for the account-masked footer, and
+  0.3146% for the content-masked main region, extending the shared matrix to
+  156 reviewed lifecycle frames.
+
+The top comparison uses a 0.08 pixel color threshold for native transparency
+and text-antialias compositing while retaining a separate 4.5% regional hard
+limit. Raw product screenshots and records remain local-only.
+
 ## Development
 
 From the repository root:
@@ -865,6 +890,14 @@ only application-owned regions:
 ```bash
 CODEX_UI_KIT_SIDEBAR_REFERENCE=/absolute/path/to/sidebar-reference.png \
   pnpm --filter @codex-ui-kit/codex-app-playground check:visual
+```
+
+The current dark-shell gate uses a same-state 1180×820 New chat reference:
+
+```bash
+CODEX_UI_KIT_CURRENT_DARK_SHELL_REFERENCE=/absolute/path/to/current-dark-shell.png \
+  pnpm --filter @codex-ui-kit/codex-app-playground check:visual -- \
+  --scenes=current-dark-shell
 ```
 
 The current sidebar lifecycle gates accept three 1180×820 product frames and

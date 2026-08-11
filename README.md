@@ -22,16 +22,18 @@ Codex UI Kit turns those interaction patterns into protocol-neutral React primit
 - The current components are a partial coding-agent UI foundation, not a
   complete Codex Desktop reconstruction.
 - The authoritative full-surface inventory baseline is the installed
-  `26.803.41515` (`6321`) build. Its 84 candidate surface groups and
+  `26.803.61601` (`6396`) build. Its 84 candidate surface groups and
   build-scoped evidence status are tracked in
   [`research/UI_INVENTORY.md`](research/UI_INVENTORY.md); current-build
-  observation covers 17 groups; 50 previous-build groups remain regression
+  observation covers 15 groups; 52 previous-build groups remain regression
   evidence and 17 are still unsampled. The current visual manifest binds 37
   sidebar, menu, window-chrome, and Composer icons to exact runtime evidence
-  with zero scoped approximations. The latest sidebar lifecycle slice locks
+  with zero scoped approximations. The latest baseline refresh revalidates
   six project groups, pointer/Enter/Space expansion, the six-item project menu,
-  the eight-item Help menu, explicit compact pinning, Browser/CDP, Electron,
-  and four local-only current-product pixel gates. This is still a partial UI
+  the eight-item Help menu, explicit compact pinning, disabled window
+  navigation, and a same-state dark New chat shell. Browser/CDP, Electron, and
+  local-only current-product pixels pass at 3.1387% for the shell top, 0.4126%
+  for the footer, and 0.3146% for the main region. This is still a partial UI
   foundation rather than a global reconstruction claim.
 - The repository is public and the package baseline is `0.1.0`, but the npm package has **not** been published.
 - The API remains pre-1.0 and may change while public documentation and consumer feedback mature.
