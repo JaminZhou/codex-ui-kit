@@ -370,7 +370,7 @@ describe("current baseline capture contract", () => {
         },
       }),
     ).toThrow("Help menu boundary");
-    for (const invalidCount of [undefined, 5.5]) {
+    for (const invalidCount of [undefined, 5, 5.5, 7]) {
       expect(() =>
         assertCurrentSidebarLifecycle({
           ...record.sidebarLifecycle,
