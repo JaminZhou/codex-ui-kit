@@ -1195,6 +1195,7 @@
   inset-inline-end: 2.1875rem;
   pointer-events: none;
   position: absolute;
+  transition: opacity var(--codex-ui-transition-fast);
   width: 0.875rem;
   z-index: 1;
 }
@@ -1214,7 +1215,13 @@
 .codex-ui-app-sidebar__item-row[data-has-actions]:focus-within
   .codex-ui-app-sidebar__item-status,
 .codex-ui-app-sidebar__item-row[data-has-actions][data-selected][data-status="idle"]
-  .codex-ui-app-sidebar__item-status {
+  .codex-ui-app-sidebar__item-status,
+.codex-ui-app-sidebar__item-row[data-has-actions]:hover
+  .codex-ui-app-sidebar__item-worktree-indicator,
+.codex-ui-app-sidebar__item-row[data-has-actions]:focus-within
+  .codex-ui-app-sidebar__item-worktree-indicator,
+.codex-ui-app-sidebar__item-row[data-has-actions][data-selected][data-status="idle"]
+  .codex-ui-app-sidebar__item-worktree-indicator {
   opacity: 0;
   pointer-events: none;
 }

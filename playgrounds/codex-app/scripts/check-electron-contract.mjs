@@ -658,6 +658,27 @@ try {
       `Electron current sidebar status/action replacement failed: ${JSON.stringify(hovered)}`,
     );
   }
+
+  const worktreeItem = sidebarStatusPage.locator(
+    '[data-sidebar-worktree-status-fixture="design-assets:2"]',
+  );
+  const worktreeRow = worktreeItem.locator(
+    "xpath=ancestor::*[contains(@class, 'codex-ui-app-sidebar__item-row')]",
+  );
+  await worktreeRow.hover();
+  const hoveredWorktree = await worktreeRow.evaluate((row) => ({
+    actions: getComputedStyle(
+      row.querySelector(".codex-ui-app-sidebar__item-actions"),
+    ).opacity,
+    branch: getComputedStyle(
+      row.querySelector(".codex-ui-app-sidebar__item-worktree-indicator"),
+    ).opacity,
+  }));
+  if (hoveredWorktree.actions !== "1" || hoveredWorktree.branch !== "0") {
+    throw new Error(
+      `Electron current sidebar worktree/action replacement failed: ${JSON.stringify(hoveredWorktree)}`,
+    );
+  }
 } finally {
   await sidebarStatusApp.close();
 }
