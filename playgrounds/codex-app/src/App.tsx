@@ -270,6 +270,15 @@ function querySelection() {
   const frame = params.get("frame");
   const capture = params.get("capture") === "1";
   const currentSidebar = params.get("currentSidebar") === "1";
+  const requestedSidebarState = params.get("sidebarState");
+  const sidebarState = [
+    "compact-pinned",
+    "help-menu",
+    "project-collapsed",
+    "project-menu",
+  ].includes(requestedSidebarState ?? "")
+    ? requestedSidebarState
+    : null;
   const layoutMode =
     params.get("layout") === "wide" ? ("wide" as const) : undefined;
   const view: DemoView =
@@ -300,6 +309,7 @@ function querySelection() {
     layoutMode,
     scenarioId,
     shellState,
+    sidebarState,
     theme,
     view,
   };
@@ -1573,6 +1583,27 @@ export function App() {
         initialSelection.frame !== "subagent-current-compact-720") ||
       !isNarrowDemoWindow(),
   );
+  const [currentSidebarExpandedProjectIds, setCurrentSidebarExpandedProjectIds] =
+    useState<Set<string>>(
+      () =>
+        new Set(
+          currentSidebarProjects
+            .filter(
+              (_project, index) =>
+                initialSelection.sidebarState !== "project-collapsed" ||
+                index !== 0,
+            )
+            .map((project) => project.id),
+        ),
+    );
+  const [currentSidebarProjectMenuId, setCurrentSidebarProjectMenuId] =
+    useState<string | null>(
+      initialSelection.sidebarState === "project-menu"
+        ? currentSidebarProjects[0].id
+        : null,
+    );
+  const [currentSidebarHelpMenuOpen, setCurrentSidebarHelpMenuOpen] =
+    useState(initialSelection.sidebarState === "help-menu");
   const [reviewOpen, setReviewOpen] = useState(
     initialSelection.frame === "review-open" ||
       initialSelection.frame === "mixed-review-open" ||
@@ -2698,7 +2729,7 @@ export function App() {
   const lastEvent = scenario.events[Math.max(0, replayCount - 1)];
   const currentSidebarComposition =
     initialSelection.currentSidebar ||
-    initialSelection.frame === "sidebar-current" ||
+    initialSelection.frame?.startsWith("sidebar-current") ||
     !initialSelection.capture;
   const sidebarRecentScenarios = (
     Object.values(replayScenarios) as ReplayScenario[]
@@ -2715,9 +2746,88 @@ export function App() {
           }}
           actions={
             currentSidebarComposition ? (
-              <button aria-label="Open help menu" type="button">
-                <SidebarGlyph name="help-current" />
-              </button>
+              <Menu
+                align="start"
+                className="demo-current-sidebar-menu demo-current-sidebar-help-menu"
+                label="Help menu"
+                onOpenChange={setCurrentSidebarHelpMenuOpen}
+                open={currentSidebarHelpMenuOpen}
+                side="top"
+                sideOffset={7}
+                style={{ width: 200 }}
+                trigger={
+                  <button aria-label="Open help menu" type="button">
+                    <SidebarGlyph name="help-current" />
+                  </button>
+                }
+                width="auto"
+              >
+                <div className="demo-current-sidebar-help-menu__heading">
+                  What&apos;s new
+                </div>
+                <div className="demo-current-sidebar-help-menu__releases">
+                  <MenuItem
+                    shortcut="7/30"
+                    startIcon={
+                      <CurrentBuildIcon name="sidebar-help-menu-release-note" />
+                    }
+                  >
+                    Browser upgrades, multi-repository review, and image editing
+                  </MenuItem>
+                  <MenuItem
+                    shortcut="7/23"
+                    startIcon={
+                      <CurrentBuildIcon name="sidebar-help-menu-release-note" />
+                    }
+                  >
+                    ChatGPT Voice and multi-folder projects
+                  </MenuItem>
+                  <MenuItem
+                    shortcut="7/9"
+                    startIcon={
+                      <CurrentBuildIcon name="sidebar-help-menu-release-note" />
+                    }
+                  >
+                    Codex joins the ChatGPT desktop app
+                  </MenuItem>
+                </div>
+                <MenuItem
+                  startIcon={
+                    <CurrentBuildIcon name="sidebar-help-menu-changelog" />
+                  }
+                >
+                  Full changelog
+                </MenuItem>
+                <MenuSeparator />
+                <MenuItem
+                  startIcon={
+                    <CurrentBuildIcon name="sidebar-help-menu-chrome" />
+                  }
+                >
+                  Set up Chrome extension
+                </MenuItem>
+                <MenuItem
+                  startIcon={
+                    <CurrentBuildIcon name="sidebar-help-menu-remote" />
+                  }
+                >
+                  Set up remote
+                </MenuItem>
+                <MenuItem
+                  startIcon={
+                    <CurrentBuildIcon name="sidebar-help-menu-keyboard" />
+                  }
+                >
+                  Keyboard shortcuts
+                </MenuItem>
+                <MenuItem
+                  startIcon={
+                    <CurrentBuildIcon name="sidebar-help-menu-support" />
+                  }
+                >
+                  Help
+                </MenuItem>
+              </Menu>
             ) : (
               <button aria-label="Open settings" type="button">
                 <SidebarGlyph name="settings" />
@@ -2839,12 +2949,77 @@ export function App() {
             <AppSidebarProjectGroup
               actions={
                 <>
-                  <button
-                    aria-label={`Project actions for ${project.label}`}
-                    type="button"
+                  <Menu
+                    align="start"
+                    className="demo-current-sidebar-menu demo-current-sidebar-project-menu"
+                    label={`${project.label} project menu`}
+                    onOpenChange={(open) =>
+                      setCurrentSidebarProjectMenuId((current) =>
+                        open
+                          ? project.id
+                          : current === project.id
+                            ? null
+                            : current,
+                      )
+                    }
+                    open={currentSidebarProjectMenuId === project.id}
+                    side="bottom"
+                    sideOffset={2}
+                    style={{ width: 214.05 }}
+                    trigger={
+                      <button
+                        aria-label={`Project actions for ${project.label}`}
+                        type="button"
+                      >
+                        <SidebarGlyph name="more-current" />
+                      </button>
+                    }
+                    width="auto"
                   >
-                    <SidebarGlyph name="more-current" />
-                  </button>
+                    <MenuItem
+                      startIcon={
+                        <CurrentBuildIcon name="sidebar-project-menu-unpin" />
+                      }
+                    >
+                      Unpin project
+                    </MenuItem>
+                    <MenuItem
+                      startIcon={
+                        <CurrentBuildIcon name="sidebar-project-menu-reveal" />
+                      }
+                    >
+                      Reveal in Finder
+                    </MenuItem>
+                    <MenuItem
+                      startIcon={
+                        <CurrentBuildIcon name="sidebar-project-menu-worktree" />
+                      }
+                    >
+                      Create permanent worktree
+                    </MenuItem>
+                    <MenuItem
+                      startIcon={
+                        <CurrentBuildIcon name="sidebar-project-menu-edit" />
+                      }
+                    >
+                      Edit project
+                    </MenuItem>
+                    <MenuItem
+                      startIcon={
+                        <CurrentBuildIcon name="sidebar-project-menu-archive" />
+                      }
+                    >
+                      Archive chats
+                    </MenuItem>
+                    <MenuItem
+                      startIcon={
+                        <CurrentBuildIcon name="sidebar-project-menu-remove" />
+                      }
+                      tone="danger"
+                    >
+                      Remove
+                    </MenuItem>
+                  </Menu>
                   <button
                     aria-label={`Start new chat in ${project.label}`}
                     type="button"
@@ -2854,6 +3029,7 @@ export function App() {
                 </>
               }
               actionsLabel={`${project.label} project actions`}
+              expanded={currentSidebarExpandedProjectIds.has(project.id)}
               key={project.id}
               label={project.label}
               leading={<SidebarGlyph name="folder-current" />}
@@ -2875,6 +3051,14 @@ export function App() {
                   : project.status
                     ? "Unread project update"
                     : undefined
+              }
+              onExpandedChange={(expanded) =>
+                setCurrentSidebarExpandedProjectIds((current) => {
+                  const next = new Set(current);
+                  if (expanded) next.add(project.id);
+                  else next.delete(project.id);
+                  return next;
+                })
               }
             >
               {project.tasks.map((task, index) => (
@@ -6911,6 +7095,7 @@ export function App() {
       }
       data-scenario={scenarioId}
       data-sidebar-current={currentSidebarComposition || undefined}
+      data-sidebar-state={initialSelection.sidebarState ?? undefined}
       data-status={displayedStatus}
       data-theme={appliedTheme}
       data-thread-following={
@@ -6970,7 +7155,8 @@ export function App() {
         layoutMode={
           (initialSelection.capture &&
             activeFrame !== "pr-compact-detail" &&
-            activeFrame !== "subagent-current-compact-720") ||
+            activeFrame !== "subagent-current-compact-720" &&
+            initialSelection.sidebarState !== "compact-pinned") ||
           initialSelection.layoutMode === "wide"
             ? "wide"
             : undefined

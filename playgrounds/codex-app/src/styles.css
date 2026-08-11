@@ -821,7 +821,10 @@ textarea {
 .demo-sidebar-new-chat,
 .demo-sidebar-quick-chat,
 .demo-sidebar-section-action,
-.codex-ui-app-sidebar-footer__actions > button {
+.codex-ui-app-sidebar-footer__actions > button,
+.codex-ui-app-sidebar-footer__actions
+  > .codex-ui-popover-anchor
+  > button {
   appearance: none;
   border: 0;
   background: transparent;
@@ -852,14 +855,23 @@ textarea {
 .demo-sidebar-section-action:hover,
 .demo-sidebar-section-action:focus-visible,
 .codex-ui-app-sidebar-footer__actions > button:hover,
-.codex-ui-app-sidebar-footer__actions > button:focus-visible {
+.codex-ui-app-sidebar-footer__actions > button:focus-visible,
+.codex-ui-app-sidebar-footer__actions
+  > .codex-ui-popover-anchor
+  > button:hover,
+.codex-ui-app-sidebar-footer__actions
+  > .codex-ui-popover-anchor
+  > button:focus-visible {
   background: var(--demo-shell-hover);
 }
 
 .demo-sidebar-header-action,
 .demo-sidebar-quick-chat,
 .demo-sidebar-section-action,
-.codex-ui-app-sidebar-footer__actions > button {
+.codex-ui-app-sidebar-footer__actions > button,
+.codex-ui-app-sidebar-footer__actions
+  > .codex-ui-popover-anchor
+  > button {
   align-items: center;
   border-radius: 10px;
   color: var(--demo-shell-text-secondary);
@@ -907,9 +919,46 @@ textarea {
 }
 
 .demo-root[data-sidebar-current]
+  .codex-ui-app-sidebar__section[data-kind="pinned"] {
+  margin-block-start: 3px;
+}
+
+.demo-root[data-sidebar-current]
   .codex-ui-app-sidebar__section[data-kind="pinned"]
   > .codex-ui-app-sidebar__items {
   padding-block-start: var(--codex-ui-spacing);
+}
+
+.demo-root[data-sidebar-current]
+  .codex-ui-app-sidebar__project-group
+  + .codex-ui-app-sidebar__project-group {
+  margin-block-start: 0;
+}
+
+.demo-root[data-sidebar-current]
+  .codex-ui-app-sidebar__project-children
+  > .codex-ui-app-sidebar__item-row,
+.demo-root[data-sidebar-current]
+  .codex-ui-app-sidebar__project-children
+  > .codex-ui-app-sidebar__item-row
+  > .codex-ui-app-sidebar__item {
+  min-height: 40px;
+}
+
+.demo-root[data-sidebar-current]
+  .codex-ui-app-sidebar__project-group
+  > .codex-ui-app-sidebar__item-row:has(
+    > .codex-ui-app-sidebar__item:focus-visible
+  ) {
+  outline: 1px solid var(--codex-ui-focus);
+  outline-offset: 2px;
+}
+
+.demo-root[data-sidebar-current]
+  .codex-ui-app-sidebar__project-group
+  > .codex-ui-app-sidebar__item-row
+  > .codex-ui-app-sidebar__item:focus-visible {
+  outline: 0;
 }
 
 .demo-root[data-sidebar-current]
@@ -938,10 +987,64 @@ textarea {
 
 .demo-root[data-sidebar-current]
   .codex-ui-app-sidebar-footer__actions
+  > button,
+.demo-root[data-sidebar-current]
+  .codex-ui-app-sidebar-footer__actions
+  > .codex-ui-popover-anchor
   > button {
   height: 32px;
   padding: 7px;
   width: 32px;
+}
+
+.demo-current-sidebar-menu {
+  background: oklab(0.297161 0.0000135154 0.00000594556 / 0.9);
+  border: 0;
+  border-radius: 15px;
+  box-shadow:
+    0 0 0 0.5px rgba(255, 255, 255, 0.082),
+    0 8px 16px -4px rgba(0, 0, 0, 0.12);
+  padding: 4px;
+  margin-inline-start: 1px;
+}
+
+.demo-current-sidebar-menu .codex-ui-menu-item {
+  border-radius: 12.5px;
+  font-size: 13px;
+  line-height: 18.5714px;
+  min-height: 28.5625px;
+  padding: 5px 8px;
+}
+
+.demo-current-sidebar-menu .codex-ui-menu-item__icon {
+  height: 16px;
+  width: 16px;
+}
+
+.demo-current-sidebar-project-menu {
+  gap: 0;
+}
+
+.demo-current-sidebar-help-menu {
+  gap: 0;
+}
+
+.demo-current-sidebar-help-menu__heading {
+  box-sizing: border-box;
+  color: var(--codex-ui-text-muted);
+  font-size: 13px;
+  height: 26.5625px;
+  line-height: 18.5714px;
+  padding: 4px 8px;
+}
+
+.demo-current-sidebar-help-menu__releases {
+  display: flex;
+  flex-direction: column;
+}
+
+.demo-current-sidebar-help-menu .codex-ui-menu-separator {
+  margin: 4px 0;
 }
 
 .demo-sidebar-section-action {

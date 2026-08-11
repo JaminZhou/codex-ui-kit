@@ -76,7 +76,8 @@ if (
   !manifest.baseline?.buildNumber ||
   !/^\d{4}-\d{2}-\d{2}$/.test(manifest.baseline?.capturedAt ?? "") ||
   manifest.baseline?.theme !== "dark" ||
-  manifest.baseline?.interactionState !== "resting" ||
+  manifest.baseline?.interactionState !==
+    "resting-and-open-sidebar-menus" ||
   manifest.baseline?.viewport?.width !== 1180 ||
   manifest.baseline?.viewport?.height !== 820 ||
   !/^[a-f0-9]{64}$/.test(manifest.baseline?.appAsarSha256 ?? "")
@@ -320,19 +321,39 @@ for (const id of [
   "sidebar-pin",
   "sidebar-archive",
   "sidebar-help",
+  "sidebar-project-menu-unpin",
+  "sidebar-project-menu-reveal",
+  "sidebar-project-menu-worktree",
+  "sidebar-project-menu-edit",
+  "sidebar-project-menu-archive",
+  "sidebar-project-menu-remove",
+  "sidebar-help-menu-release-note",
+  "sidebar-help-menu-changelog",
+  "sidebar-help-menu-chrome",
+  "sidebar-help-menu-remote",
+  "sidebar-help-menu-keyboard",
+  "sidebar-help-menu-support",
 ]) {
   if (!ids.has(id) || remaining.includes(id)) {
     throw new Error(`${id} must be promoted from current-build runtime evidence`);
   }
 }
 if (
-  manifest.icons.length !== 25 ||
+  manifest.icons.length !== 37 ||
   manifest.composerObservation?.topContextIconCount !== 3 ||
   manifest.composerObservation?.bottomActionIconCount !== 5 ||
   manifest.composerObservation?.exactSemanticIconCount !== 8
 ) {
   throw new Error(
     "current Composer capture must retain three context and five action icons with eight exact semantic mappings",
+  );
+}
+if (
+  manifest.sidebarObservation?.projectMenuItemCount !== 6 ||
+  manifest.sidebarObservation?.helpMenuItemCount !== 8
+) {
+  throw new Error(
+    "current sidebar capture must retain six project and eight Help menu items",
   );
 }
 const currentSidebarSettingsAbsenceProven =

@@ -21,25 +21,18 @@ Codex UI Kit turns those interaction patterns into protocol-neutral React primit
 
 - The current components are a partial coding-agent UI foundation, not a
   complete Codex Desktop reconstruction.
-- The authoritative full-surface inventory baseline remains `26.730.61639`
-  (`6234`). Its seed candidate surface and evidence status are tracked in
+- The authoritative full-surface inventory baseline is the installed
+  `26.803.41515` (`6321`) build. Its 84 candidate surface groups and
+  build-scoped evidence status are tracked in
   [`research/UI_INVENTORY.md`](research/UI_INVENTORY.md); current-build
-  runtime observation currently covers the Terminal session shell, direct
-  running/completed panel persistence, cross-worktree mismatch recovery, and
-  one real delegated-subagent success path from active work through summary,
-  side panel, and transcript.
-  The broader `26.730.61309` shell/sidebar, route, command, approval,
-  compaction, summary, attachment, workspace-entry, and Review evidence is
-  retained as previous-build coverage rather than promoted implicitly.
-  A narrower visual-provenance and sidebar-action probe against the newer
-  installed `26.803.41515` (`6321`) build binds 25 sidebar, window-chrome, and
-  Composer icons to exact runtime evidence, confirms that the current footer
-  uses Help rather than Settings, and records no leading glyph in both sampled
-  project-task and independently scrolled Recents rows. The Recents follow-up
-  locks six rows with paired Pin/Archive actions; later follow-ups promote the
-  visible Sidebar/Back/Forward controls and all eight visible Composer context
-  and action icons. The scoped visible-shell approximation list is empty, but
-  the broader UI inventory and lifecycle denominator have not been refreshed.
+  observation covers 17 groups; 50 previous-build groups remain regression
+  evidence and 17 are still unsampled. The current visual manifest binds 37
+  sidebar, menu, window-chrome, and Composer icons to exact runtime evidence
+  with zero scoped approximations. The latest sidebar lifecycle slice locks
+  six project groups, pointer/Enter/Space expansion, the six-item project menu,
+  the eight-item Help menu, explicit compact pinning, Browser/CDP, Electron,
+  and four local-only current-product pixel gates. This is still a partial UI
+  foundation rather than a global reconstruction claim.
 - The repository is public and the package baseline is `0.1.0`, but the npm package has **not** been published.
 - The API remains pre-1.0 and may change while public documentation and consumer feedback mature.
 - Extracted application files, private IPC, bundled fonts, and OpenAI brand assets are not included.

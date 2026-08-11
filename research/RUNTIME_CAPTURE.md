@@ -151,16 +151,19 @@ CODEX_CURRENT_BASELINE_OUTPUT=${codex_probe_dir}/current-baseline.json \
 pnpm capture:current-baseline
 ```
 
-The allowlisted sequence is New chat → fixed viewport matrix → prove automatic
+The allowlisted sequence is New chat → project pointer/Enter/Space expansion →
+project and Help menu inspection → fixed viewport matrix → prove automatic
 collapse at 720px → explicit Show/pin → Pull requests → New chat → explicit
-Hide cleanup. The JSON contains only build, target structure, fixed
-route/control state, computed editor style, geometry, scroll ownership,
-viewport, theme, and overflow. It never captures screenshots or arbitrary
-page/body text. Ancestor-aware `checkVisibility()` distinguishes the visible
-navigation from retained hidden layout nodes, and consecutive geometry samples
-exclude transition frames. Do not hard reload the product Renderer: native
-initialization is not guaranteed to replay and a reload can leave an empty app
-document.
+Hide cleanup. The project and responsive samples share the same single
+721→720 automatic-collapse transition so an explicit pin cannot pollute the
+automatic-collapse proof. The JSON contains only build, target structure,
+fixed route/control state, menu counts/focus/geometry, computed editor style,
+project-group state, geometry, scroll ownership, viewport, theme, and overflow.
+It never captures screenshots or arbitrary page/body text. Ancestor-aware
+`checkVisibility()` distinguishes the visible navigation from retained hidden
+layout nodes, and consecutive geometry samples exclude transition frames. Do
+not hard reload the product Renderer: native initialization is not guaranteed
+to replay and a reload can leave an empty app document.
 
 The same route boundary applies on failure. A best-effort `finally` cleanup
 returns the selected Renderer to New chat when necessary and independently
@@ -174,6 +177,27 @@ non-finite horizontal-overflow measurement. At 720px, inspect and reject a
 still-visible sidebar before any explicit sidebar normalization. Validate the
 documented main and Composer geometry in every New chat state plus the single
 navigation-owned wide/medium vertical scroller.
+
+The `sidebarLifecycle` contract requires six project groups, 30px project
+rows, pointer/Enter/Space collapse and restoration with focus retained, a
+214.05×179.38 six-item project menu, a 200×272.06 eight-item Help menu, Escape
+dismissal, compact automatic collapse, explicit 274.11px pinning, wide
+restoration, and zero horizontal overflow. The observed project menu drops
+focus to the document body on Escape; the Help menu returns focus to its
+trigger. The independent UIKit intentionally improves the former behavior and
+documents that divergence rather than weakening keyboard focus management.
+
+The sidebar-lifecycle capture and calibration runs used loopback ports
+`9791`–`9794` with exact main PIDs `15049`, `16085`, `16407`, and `16844`.
+Cleanup stopped only those validated main processes and their eight exact
+profile-owned Crashpad handlers `15054`/`15056`, `16090`/`16093`,
+`16413`/`16415`, and `16849`/`16851`; every listener closed and no exact
+profile argv remained. The primary, two fail-closed calibration, and final
+successful profiles, including raw JSON and local-only references, moved
+recoverably to Trash as `codex-ui-kit-sidebar-cdp.7ImQtd-20260810`,
+`codex-ui-kit-sidebar-lifecycle.dL0GZO-failed-20260810`,
+`codex-ui-kit-sidebar-lifecycle.Pn6KQN-failed-20260810`, and
+`codex-ui-kit-sidebar-lifecycle.Va1yeY-20260810`.
 
 The resulting metrics are Renderer viewport emulation, not proof of a native
 BrowserWindow resize. Compare the same 1180/820/721/720 matrix separately in

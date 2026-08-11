@@ -81,13 +81,41 @@ describe("lifecycle visual policy", () => {
     expect(contract).toContain("`${scene.id}.current-build.${region}.diff.png`");
     expect(appSource).toContain("initialSelection.currentSidebar ||");
     expect(appSource).toContain(
-      'initialSelection.frame === "sidebar-current" ||',
+      'initialSelection.frame?.startsWith("sidebar-current") ||',
     );
     expect(appSource).toContain("!initialSelection.capture");
     expect(appSource).toContain(
       "data-sidebar-current={currentSidebarComposition || undefined}",
     );
     expect(appStyles).toContain(".demo-root[data-sidebar-current]");
+    for (const reference of [
+      "CODEX_UI_KIT_CURRENT_SIDEBAR_PROJECT_COLLAPSED_REFERENCE",
+      "CODEX_UI_KIT_CURRENT_SIDEBAR_PROJECT_MENU_REFERENCE",
+      "CODEX_UI_KIT_CURRENT_SIDEBAR_HELP_MENU_REFERENCE",
+      "CODEX_UI_KIT_CURRENT_SIDEBAR_COMPACT_PINNED_REFERENCE",
+    ]) {
+      expect(contract).toContain(reference);
+    }
+    for (const scene of [
+      "current-sidebar-project-collapsed",
+      "current-sidebar-project-menu",
+      "current-sidebar-help-menu",
+      "current-sidebar-compact-pinned",
+    ]) {
+      expect(electronHarness).toContain(`id: "${scene}"`);
+    }
+    expect(contract).toContain(
+      "expectedActualPosition: { left: 211, top: 313 }",
+    );
+    expect(contract).toContain(
+      "expectedActualPosition: { left: 235, top: 502 }",
+    );
+    expect(cdpContract).toContain(
+      'helpMenuContract.heading !== "What\'s new"',
+    );
+    expect(electronContract).toContain(
+      'helpMenuStructure.separatorCount !== 1',
+    );
   });
 
   it("gates current multiline, permission, resource, and mode Composer regions", () => {

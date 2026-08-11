@@ -13,10 +13,10 @@ exit gates; it does not replace the inventory.
 - The installed package and machine-readable evidence baseline are Codex
   Desktop `26.803.41515` (`6321`). Unsampled `26.730.61639` surfaces remain
   previous-build regression evidence rather than current verification.
-- The inventory contains 81 surface groups: 53 P0, 19 P1, and 9 P2.
-- 14 groups have current-build runtime evidence, 50 have previous-build-only
+- The inventory contains 84 surface groups: 56 P0, 19 P1, and 9 P2.
+- 17 groups have current-build runtime evidence, 50 have previous-build-only
   runtime evidence, and 17 have not been sampled.
-- The scoped `26.803.41515` refresh binds 25 sidebar/window-chrome/Composer icons to
+- The scoped `26.803.41515` refresh binds 37 sidebar/menu/window-chrome/Composer icons to
   exact runtime evidence. Its latest hover/footer follow-up promotes More, Pin,
   Archive, and Help, confirms that Settings is absent from the sampled footer
   and that sampled project-task rows have no leading glyph. The Recents follow-up
@@ -45,7 +45,7 @@ exit gates; it does not replace the inventory.
   explicit 820×680/720×680 reopen. Two more current tasks now cover concurrent
   siblings plus a Parent → Child delegation through active, mixed, completed,
   summary, flat-panel, live-progress, and independent transcript states while
-  retaining public `agentPath` hierarchy. Browser/CDP covers 151 lifecycle
+  retaining public `agentPath` hierarchy. Browser/CDP covers 155 lifecycle
   frames; Electron repeats
   the session, mismatch, input, picker, close, and resize interactions; the
   current 906×820 panel/content pixel ratios pass at 1.5120%/0.4004%.
@@ -72,7 +72,7 @@ exit gates; it does not replace the inventory.
   Electron verifies code copy, user scroll-away, and return to latest; four
   reviewed internal baselines pass. A later current-build 18-column task
   runtime-reaches the table Copy, Expand, and preview path. The public
-  `allowWideTables` contract, exact Markdown/HTML copy, 151-frame Browser/CDP
+  `allowWideTables` contract, exact Markdown/HTML copy, 155-frame Browser/CDP
   matrix, real Electron flow, three internal baselines including a 720×680
   action-reachability state, and local-only 4%/1% preview/close gates now pass.
   Product reachability and pixel attribution for
@@ -99,7 +99,13 @@ exit gates; it does not replace the inventory.
   visible Composer context/actions now also use eight exact manifest assets.
   CDP and Electron gate their order and 14/16px geometry across current
   conversation/workspace states; an external workspace comparison passes at
-  0.4651%, and the eight asset crops have zero changed pixels. The
+  0.4651%, and the eight asset crops have zero changed pixels. The newest
+  lifecycle pass adds six 30px/40px project-group stacks,
+  pointer/Enter/Space expansion, a six-item project menu, an eight-item Help
+  menu with its `What's new` heading, and explicit 720px pinned continuity.
+  Twelve additional menu icons are exact runtime primitives. Browser/CDP,
+  Electron, and four local-only current-product comparisons pass at 1.54%,
+  0.13%, 0.30%, and 3.12% under scoped hard limits. The
   preceding `26.727.40816`
   refresh covered window navigation, route loading/restoration, the New chat
   Composer and project picker, the read-only Terminal shell, and the public
@@ -209,7 +215,7 @@ exit gates; it does not replace the inventory.
   protocol-backed composition: Web Search → Browser open/find, OpenAI
   Developer Docs Search → Fetch, command approval, file Review, and one
   delegated audit across eight lifecycle states plus a 720×680 final state.
-  The replay matrix now contains 33 traces and 406 events, with 151 reviewed
+  The replay matrix now contains 33 traces and 406 events, with 155 reviewed
   CDP/pixel frames and real Electron interaction. Its nine committed rasters
   are internal regression baselines. Because no single current-product task
   was captured with the entire sequence, it does not promote any inventory
@@ -273,12 +279,18 @@ slot. It is split into:
   route, badges, and route restoration;
 - `app.sidebar-project-navigation`: project/workspace sections, expansion,
   selection, long names, overflow, and worktree context;
+- `app.sidebar-project-group-lifecycle`: row/task geometry, pointer and
+  keyboard expansion, focus, and responsive continuity;
+- `app.sidebar-project-actions-menu`: the fixed project action menu, keyboard
+  access, icons, dismissal, and focus behavior;
 - `app.sidebar-thread-history`: recent tasks, grouping, pinning, running,
   queued, unread, error, empty, loading, and long-list states;
 - `app.sidebar-item-actions-status`: hover/focus actions, context menu,
   rename/archive/delete affordances, status indicators, and keyboard access;
 - `app.sidebar-footer-account-settings`: account, settings, update/status, and
   footer overflow behavior.
+- `app.sidebar-help-menu`: current release-note grouping, support/setup actions,
+  geometry, dismissal, and focus return.
 
 The same workstream also covers shell gaps that otherwise distort every
 feature:
@@ -304,7 +316,7 @@ Acceptance matrix:
 | Input | pointer, keyboard, focus-visible, Escape, resize keys |
 | Evidence | current CDP styles, Browser, Electron, regional pixels |
 
-Exit: all six sidebar IDs have current-build evidence and an explicit status;
+Exit: all nine sidebar IDs have current-build evidence and an explicit status;
 the shell remains usable without horizontal overflow at the compact gate.
 
 ### 2. Finish conversation and Composer lifecycle
@@ -428,6 +440,10 @@ without confusing package readiness with full product reconstruction.
    The later `26.803.41515` action slice also replaces the sampled More, Pin,
    Archive, and Help glyphs with exact runtime primitives and removes
    Settings/thread-leading assumptions disproved by the current build.
+   The current lifecycle follow-up splits and verifies project expansion,
+   project actions, and Help-menu ownership, promotes twelve menu assets, and
+   adds four local-only product pixel gates without promoting the broader
+   navigation, mutation, or account/settings denominators.
 3. **Tool recovery and mixed thread — delivered for current component contracts**:
    `26.803.41515` now covers a real Search → Search → Fetch success and a real
    invalid-URL Fetch → Search → Fetch recovery inside one integration group,

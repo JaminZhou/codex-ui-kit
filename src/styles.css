@@ -1201,7 +1201,10 @@
   opacity: 1;
 }
 
-.codex-ui-app-sidebar__item-actions > button {
+.codex-ui-app-sidebar__item-actions > button,
+.codex-ui-app-sidebar__item-actions
+  > .codex-ui-popover-anchor
+  > button {
   align-items: center;
   appearance: none;
   background: transparent;
@@ -1217,12 +1220,21 @@
 }
 
 .codex-ui-app-sidebar__item-actions > button:hover,
-.codex-ui-app-sidebar__item-actions > button:focus-visible {
+.codex-ui-app-sidebar__item-actions > button:focus-visible,
+.codex-ui-app-sidebar__item-actions
+  > .codex-ui-popover-anchor
+  > button:hover,
+.codex-ui-app-sidebar__item-actions
+  > .codex-ui-popover-anchor
+  > button:focus-visible {
   background: var(--codex-ui-background-button-tertiary-hover);
   color: var(--codex-ui-text);
 }
 
-.codex-ui-app-sidebar__item-actions > button:focus-visible {
+.codex-ui-app-sidebar__item-actions > button:focus-visible,
+.codex-ui-app-sidebar__item-actions
+  > .codex-ui-popover-anchor
+  > button:focus-visible {
   outline: 2px solid var(--codex-ui-focus);
   outline-offset: -2px;
 }

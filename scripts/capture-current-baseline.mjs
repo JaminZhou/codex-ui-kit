@@ -560,6 +560,109 @@ try {
     );
     await waitForStableShellGeometry();
   };
+  const inspectSidebarLifecycleBaseline = () =>
+    page.evaluate(() => {
+      const visible = (element) =>
+        element instanceof Element &&
+        element.checkVisibility({
+          checkOpacity: true,
+          checkVisibilityCSS: true,
+        });
+      const round = (value) => Math.round(value * 100) / 100;
+      const projectRows = [
+        ...document.querySelectorAll(
+          'nav div[role="button"][aria-expanded]:not([aria-haspopup])',
+        ),
+      ].filter(visible);
+      const first = projectRows[0];
+      const bounds = first?.getBoundingClientRect();
+      return {
+        expandedProjectGroupCount: projectRows.filter(
+          (row) => row.getAttribute("aria-expanded") === "true",
+        ).length,
+        helpControlCount: [
+          ...document.querySelectorAll(
+            'button[aria-label="Open help menu"]',
+          ),
+        ].filter(visible).length,
+        horizontalOverflow:
+          document.documentElement.scrollWidth -
+          document.documentElement.clientWidth,
+        projectGroupCount: projectRows.length,
+        projectRow: first
+          ? {
+              rect: {
+                height: round(bounds.height),
+                width: round(bounds.width),
+              },
+              role: first.getAttribute("role"),
+              tabIndex: first.tabIndex,
+              tag: first.tagName.toLowerCase(),
+            }
+          : null,
+        settingsControlCount: [
+          ...document.querySelectorAll(
+            'button[aria-label="Open settings"], button[aria-label="Settings"]',
+          ),
+        ].filter(visible).length,
+      };
+    });
+  const inspectProjectExpansion = (projectRow) =>
+    projectRow.evaluate((element) => ({
+      expanded: element.getAttribute("aria-expanded") === "true",
+      focusOnRow: document.activeElement === element,
+    }));
+  const inspectOpenMenu = () =>
+    page.evaluate(() => {
+      const visible = (element) =>
+        element instanceof Element &&
+        element.checkVisibility({
+          checkOpacity: true,
+          checkVisibilityCSS: true,
+        });
+      const menus = [...document.querySelectorAll('[role="menu"]')].filter(
+        visible,
+      );
+      const menu = menus[0];
+      const active = document.activeElement;
+      const bounds = menu?.getBoundingClientRect();
+      const round = (value) => Math.round(value * 100) / 100;
+      return {
+        focusInside: Boolean(menu && active && menu.contains(active)),
+        focusRole: active?.getAttribute?.("role") ?? null,
+        menuItemCount:
+          menu?.querySelectorAll('[role="menuitem"]').length ?? 0,
+        rect: bounds
+          ? { height: round(bounds.height), width: round(bounds.width) }
+          : null,
+        visibleMenuCount: menus.length,
+      };
+    });
+  const inspectResponsiveSidebar = () =>
+    page.evaluate(() => {
+      const visible = (element) =>
+        element instanceof Element &&
+        element.checkVisibility({
+          checkOpacity: true,
+          checkVisibilityCSS: true,
+        });
+      const navigation = [...document.querySelectorAll("nav")].find(visible);
+      const projectRow = document.querySelector(
+        'nav div[role="button"][aria-expanded]:not([aria-haspopup])',
+      );
+      return {
+        horizontalOverflow:
+          document.documentElement.scrollWidth -
+          document.documentElement.clientWidth,
+        navigationVisible: Boolean(navigation),
+        navigationWidth: navigation?.getBoundingClientRect().width ?? null,
+        projectExpanded:
+          projectRow?.getAttribute("aria-expanded") === "true",
+        showSidebarCount: [
+          ...document.querySelectorAll('[aria-label="Show sidebar"]'),
+        ].filter(visible).length,
+      };
+    });
   const waitForShell = async () => {
     await page.waitForFunction(
       () =>
@@ -645,6 +748,143 @@ try {
   }
   states.wideNewChat = await inspectShellState(page);
 
+  const projectRow = page
+    .locator(
+      'nav div[role="button"][aria-expanded]:not([aria-haspopup])',
+    )
+    .first();
+  if ((await projectRow.count()) !== 1) {
+    throw new Error("A current sidebar project group was not available.");
+  }
+  if ((await projectRow.getAttribute("aria-expanded")) !== "true") {
+    await projectRow.focus();
+    await projectRow.press("Enter");
+    await page.waitForFunction(
+      () =>
+        document
+          .querySelector(
+            'nav div[role="button"][aria-expanded]:not([aria-haspopup])',
+          )
+          ?.getAttribute("aria-expanded") === "true",
+    );
+  }
+  const sidebarLifecycle = {
+    baseline: await inspectSidebarLifecycleBaseline(),
+  };
+  await projectRow.click();
+  await page.waitForFunction(
+    () =>
+      document
+        .querySelector(
+          'nav div[role="button"][aria-expanded]:not([aria-haspopup])',
+        )
+        ?.getAttribute("aria-expanded") === "false",
+  );
+  sidebarLifecycle.pointerCollapsed =
+    await inspectProjectExpansion(projectRow);
+  await projectRow.press("Enter");
+  await page.waitForFunction(
+    () =>
+      document
+        .querySelector(
+          'nav div[role="button"][aria-expanded]:not([aria-haspopup])',
+        )
+        ?.getAttribute("aria-expanded") === "true",
+  );
+  sidebarLifecycle.enterExpanded = await inspectProjectExpansion(projectRow);
+  await projectRow.press("Space");
+  await page.waitForFunction(
+    () =>
+      document
+        .querySelector(
+          'nav div[role="button"][aria-expanded]:not([aria-haspopup])',
+        )
+        ?.getAttribute("aria-expanded") === "false",
+  );
+  sidebarLifecycle.spaceCollapsed =
+    await inspectProjectExpansion(projectRow);
+  await projectRow.press("Space");
+  await page.waitForFunction(
+    () =>
+      document
+        .querySelector(
+          'nav div[role="button"][aria-expanded]:not([aria-haspopup])',
+        )
+        ?.getAttribute("aria-expanded") === "true",
+  );
+  sidebarLifecycle.spaceExpanded = await inspectProjectExpansion(projectRow);
+
+  await projectRow.hover();
+  const projectMenuTrigger = projectRow
+    .locator('button[aria-haspopup="menu"]')
+    .first();
+  await projectMenuTrigger.click();
+  await page.waitForSelector('[role="menu"]:visible');
+  await page.waitForTimeout(100);
+  sidebarLifecycle.projectMenu = { opened: await inspectOpenMenu() };
+  await page.keyboard.press("Escape");
+  await page.waitForFunction(
+    () =>
+      [...document.querySelectorAll('[role="menu"]')].every(
+        (element) =>
+          !element.checkVisibility({
+            checkOpacity: true,
+            checkVisibilityCSS: true,
+          }),
+      ),
+  );
+  sidebarLifecycle.projectMenu.closed = await page.evaluate((trigger) => ({
+    activeTag: document.activeElement?.tagName.toLowerCase() ?? null,
+    focusReturned: document.activeElement === trigger,
+    visibleMenuCount: [...document.querySelectorAll('[role="menu"]')].filter(
+      (element) =>
+        element.checkVisibility({
+          checkOpacity: true,
+          checkVisibilityCSS: true,
+        }),
+    ).length,
+  }), await projectMenuTrigger.elementHandle());
+
+  const helpMenuTrigger = page
+    .locator('button[aria-label="Open help menu"]:visible')
+    .first();
+  await helpMenuTrigger.click();
+  await page.waitForSelector('[role="menu"]:visible');
+  await page.waitForTimeout(100);
+  sidebarLifecycle.helpMenu = { opened: await inspectOpenMenu() };
+  await page.keyboard.press("Escape");
+  await page.waitForFunction(
+    () =>
+      [...document.querySelectorAll('[role="menu"]')].every(
+        (element) =>
+          !element.checkVisibility({
+            checkOpacity: true,
+            checkVisibilityCSS: true,
+          }),
+      ),
+  );
+  sidebarLifecycle.helpMenu.closed = await page.evaluate((trigger) => ({
+    focusReturned: document.activeElement === trigger,
+    visibleMenuCount: [...document.querySelectorAll('[role="menu"]')].filter(
+      (element) =>
+        element.checkVisibility({
+          checkOpacity: true,
+          checkVisibilityCSS: true,
+        }),
+    ).length,
+  }), await helpMenuTrigger.elementHandle());
+
+  await projectRow.focus();
+  await projectRow.press("Space");
+  await page.waitForFunction(
+    () =>
+      document
+        .querySelector(
+          'nav div[role="button"][aria-expanded]:not([aria-haspopup])',
+        )
+        ?.getAttribute("aria-expanded") === "false",
+  );
+
   await setViewport(currentBaselineViewports.medium);
   states.mediumNewChat = await inspectShellState(page);
 
@@ -662,9 +902,14 @@ try {
     );
   }
   states.compactCollapsed = automaticallyCollapsed;
+  sidebarLifecycle.responsive = {
+    compactCollapsed: await inspectResponsiveSidebar(),
+  };
 
   await showSidebar();
   states.compactPinned = await inspectShellState(page);
+  sidebarLifecycle.responsive.compactPinned =
+    await inspectResponsiveSidebar();
 
   await page.locator("nav").getByText("Pull requests", { exact: true }).first().click();
   await page.waitForFunction(() => {
@@ -683,6 +928,22 @@ try {
   await waitForStableShellGeometry();
   states.compactRestored = await inspectShellState(page);
 
+  await setViewport(currentBaselineViewports.wide);
+  sidebarLifecycle.responsive.wideRestored =
+    await inspectResponsiveSidebar();
+  await projectRow.focus();
+  await projectRow.press("Enter");
+  await page.waitForFunction(
+    () =>
+      document
+        .querySelector(
+          'nav div[role="button"][aria-expanded]:not([aria-haspopup])',
+        )
+        ?.getAttribute("aria-expanded") === "true",
+  );
+  sidebarLifecycle.responsive.keyboardRestored =
+    await inspectProjectExpansion(projectRow);
+
   await hideSidebar();
   const afterCaptureBundle = readAppAsarSnapshot();
   const record = {
@@ -695,6 +956,7 @@ try {
       processStartedAtMs,
     },
     schemaVersion: 1,
+    sidebarLifecycle,
     states,
     targetSelection: {
       candidates: normalizedCandidates.map(

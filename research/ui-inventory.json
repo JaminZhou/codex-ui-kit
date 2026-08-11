@@ -682,6 +682,34 @@
       "priority": "p0"
     },
     {
+      "id": "app.sidebar-project-group-lifecycle",
+      "area": "app-shell",
+      "ownership": "app",
+      "packageEvidence": ["app-main", "projects-index-page"],
+      "runtimeStatus": "runtime_observed",
+      "runtimeEvidence": [
+        "cdp-26.803.41515:six-project-groups-30px-rows-40px-task-bands-pointer-enter-space-collapse-and-wide-medium-720-pinned-restoration"
+      ],
+      "implementationStatus": "partial",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
+      "priority": "p0"
+    },
+    {
+      "id": "app.sidebar-project-actions-menu",
+      "area": "app-shell",
+      "ownership": "app",
+      "packageEvidence": ["app-main"],
+      "runtimeStatus": "runtime_observed",
+      "runtimeEvidence": [
+        "cdp-26.803.41515:project-actions-menu-six-items-214.05x179.38-current-icons"
+      ],
+      "implementationStatus": "partial",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
+      "priority": "p0"
+    },
+    {
       "id": "app.sidebar-thread-history",
       "area": "app-shell",
       "ownership": "app",
@@ -728,6 +756,20 @@
       "implementationStatus": "partial",
       "browserStatus": "partial_legacy",
       "electronStatus": "partial_legacy",
+      "priority": "p0"
+    },
+    {
+      "id": "app.sidebar-help-menu",
+      "area": "app-shell",
+      "ownership": "app",
+      "packageEvidence": ["app-main"],
+      "runtimeStatus": "runtime_observed",
+      "runtimeEvidence": [
+        "cdp-26.803.41515:help-menu-whats-new-eight-items-200x272.06-current-icons-and-escape-return"
+      ],
+      "implementationStatus": "partial",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
       "priority": "p0"
     },
     {

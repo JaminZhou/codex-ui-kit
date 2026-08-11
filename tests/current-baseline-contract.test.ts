@@ -12,6 +12,7 @@ import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import {
   assertCurrentBaselineRecord,
+  assertCurrentSidebarLifecycle,
   currentBaselineFingerprint,
   currentBaselineViewports,
   runBestEffortCurrentBaselineCleanup,
@@ -181,7 +182,7 @@ describe("current baseline capture contract", () => {
           clientHeight: 705,
           overflowY: "auto",
           rect: { height: 705 },
-          scrollHeight: 949,
+          scrollHeight: 1011,
         },
       ],
     );
@@ -194,7 +195,7 @@ describe("current baseline capture contract", () => {
           clientHeight: 565,
           overflowY: "auto",
           rect: { height: 565 },
-          scrollHeight: 949,
+          scrollHeight: 971,
         },
       ],
     );
@@ -278,6 +279,70 @@ describe("current baseline capture contract", () => {
         processStartedAtMs: 1_786_350_800_000,
       },
       schemaVersion: 1,
+      sidebarLifecycle: {
+        baseline: {
+          expandedProjectGroupCount: 6,
+          helpControlCount: 1,
+          horizontalOverflow: 0,
+          projectGroupCount: 6,
+          projectRow: {
+            rect: { height: 30, width: 258.11 },
+            role: "button",
+            tabIndex: 0,
+            tag: "div",
+          },
+          settingsControlCount: 0,
+        },
+        enterExpanded: { expanded: true, focusOnRow: true },
+        helpMenu: {
+          closed: { focusReturned: true, visibleMenuCount: 0 },
+          opened: {
+            focusInside: true,
+            focusRole: "menu",
+            menuItemCount: 8,
+            rect: { height: 272.06, width: 200 },
+            visibleMenuCount: 1,
+          },
+        },
+        pointerCollapsed: { expanded: false, focusOnRow: true },
+        projectMenu: {
+          closed: {
+            activeTag: "body",
+            focusReturned: false,
+            visibleMenuCount: 0,
+          },
+          opened: {
+            focusInside: true,
+            focusRole: "menu",
+            menuItemCount: 6,
+            rect: { height: 179.38, width: 214.05 },
+            visibleMenuCount: 1,
+          },
+        },
+        responsive: {
+          compactCollapsed: {
+            horizontalOverflow: 0,
+            navigationVisible: false,
+            projectExpanded: false,
+            showSidebarCount: 1,
+          },
+          compactPinned: {
+            horizontalOverflow: 0,
+            navigationVisible: true,
+            navigationWidth: 274.11,
+            projectExpanded: false,
+          },
+          keyboardRestored: { expanded: true, focusOnRow: true },
+          wideRestored: {
+            horizontalOverflow: 0,
+            navigationVisible: true,
+            navigationWidth: 274.11,
+            projectExpanded: false,
+          },
+        },
+        spaceCollapsed: { expanded: false, focusOnRow: true },
+        spaceExpanded: { expanded: true, focusOnRow: true },
+      },
       states: {
         compactCollapsed,
         compactPinned,
@@ -293,6 +358,38 @@ describe("current baseline capture contract", () => {
     expect(() => assertCurrentBaselineRecord(record)).not.toThrow();
     expect(currentBaselineFingerprint.appVersion).toBe("26.803.41515");
     expect(currentBaselineViewports.compact.width).toBe(720);
+    expect(() =>
+      assertCurrentSidebarLifecycle({
+        ...record.sidebarLifecycle,
+        helpMenu: {
+          ...record.sidebarLifecycle.helpMenu,
+          opened: {
+            ...record.sidebarLifecycle.helpMenu.opened,
+            menuItemCount: 7,
+          },
+        },
+      }),
+    ).toThrow("Help menu boundary");
+    for (const invalidCount of [undefined, 5, 5.5, 7]) {
+      expect(() =>
+        assertCurrentSidebarLifecycle({
+          ...record.sidebarLifecycle,
+          baseline: {
+            ...record.sidebarLifecycle.baseline,
+            projectGroupCount: invalidCount,
+          },
+        }),
+      ).toThrow("project-group baseline");
+      expect(() =>
+        assertCurrentSidebarLifecycle({
+          ...record.sidebarLifecycle,
+          baseline: {
+            ...record.sidebarLifecycle.baseline,
+            expandedProjectGroupCount: invalidCount,
+          },
+        }),
+      ).toThrow("project-group baseline");
+    }
     expect(() =>
       assertCurrentBaselineRecord({
         ...record,
