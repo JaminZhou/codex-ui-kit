@@ -272,6 +272,109 @@ textarea {
   overflow: hidden;
 }
 
+.demo-workspace-persisted-thread {
+  --codex-ui-conversation-thread-background: var(--demo-shell-main);
+  background: var(--demo-shell-main);
+  height: 100%;
+}
+
+.demo-workspace-persisted-thread .codex-ui-thread-header {
+  background: transparent;
+}
+
+.demo-workspace-persisted-title {
+  align-items: center;
+  display: inline-flex;
+  gap: 8px;
+}
+
+.demo-workspace-persisted-title .demo-sidebar-glyph {
+  height: 16px;
+  width: 16px;
+}
+
+.demo-workspace-persisted-thread
+  .codex-ui-thread-header__actions[data-align="start"]
+  > button {
+  appearance: none;
+  background: transparent;
+  border: 0;
+  border-radius: 8px;
+  color: var(--demo-shell-text-secondary);
+  font: inherit;
+  height: 28px;
+  padding: 0 6px;
+}
+
+.demo-workspace-persisted-composer {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+}
+
+.demo-workspace-persisted-composer > .codex-ui-composer {
+  --codex-ui-size-button-composer: var(
+    --codex-ui-conversation-thread-composer-control-size
+  );
+  max-width: none;
+  min-height: 98px;
+}
+
+.demo-workspace-persisted-composer
+  > .codex-ui-composer[data-layout="multiline"]
+  .codex-ui-composer__input {
+  margin: 0.875rem 0.75rem 0.25rem;
+  padding: 0;
+  width: calc(100% - 1.5rem);
+}
+
+.demo-workspace-persisted-composer
+  > .codex-ui-composer[data-layout="multiline"]
+  .codex-ui-composer__toolbar {
+  margin-top: 0;
+}
+
+.demo-workspace-persisted-composer .demo-composer-actions,
+.demo-workspace-persisted-composer .demo-composer-controls {
+  font-size: 13px;
+}
+
+.demo-workspace-persisted-composer .demo-composer-actions button,
+.demo-workspace-persisted-composer .demo-composer-controls button,
+.demo-workspace-persisted-composer .demo-workspace-model {
+  align-items: center;
+  border-radius: 999px;
+  display: inline-flex;
+  font-size: 13px;
+  gap: 4px;
+  height: 28px;
+  justify-content: center;
+}
+
+.demo-workspace-thread-summary-popover {
+  --codex-ui-thread-summary-panel-radius: 17px;
+  --codex-ui-thread-summary-panel-width: 240px;
+}
+
+.demo-workspace-thread-summary {
+  --codex-ui-thread-summary-panel-row-height: 23px;
+  padding: 8px 12px 6px;
+}
+
+.demo-workspace-thread-summary .codex-ui-thread-summary-section__header,
+.demo-workspace-thread-summary .codex-ui-thread-summary-section__actions,
+.demo-workspace-thread-summary .codex-ui-thread-summary-icon-button {
+  height: 24px;
+}
+
+.demo-workspace-thread-summary
+  .codex-ui-thread-summary-section
+  + .codex-ui-thread-summary-section {
+  margin-top: 6px;
+  padding-top: 6px;
+}
+
 .demo-workspace-start {
   height: 100%;
   max-width: 768px;

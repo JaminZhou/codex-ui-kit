@@ -7422,6 +7422,140 @@ try {
   await liveSubagentApp.close();
 }
 
+const workspaceMissingScene = {
+  currentSidebar: true,
+  frame: "workspace-directory-missing",
+  id: "workspace-directory-missing-electron",
+  scenario: "workspace-workflow",
+  view: "workspace",
+};
+const { app: workspaceMissingApp, page: workspaceMissingPage } =
+  await launchScene(workspaceMissingScene, { capture: false });
+try {
+  const missingNotice = workspaceMissingPage.getByRole("complementary", {
+    name: "Workspace status",
+  });
+  await missingNotice.waitFor({ state: "visible" });
+  const workspaceComposer = workspaceMissingPage.getByRole("textbox", {
+    name: "Do anything",
+  });
+  await workspaceComposer.fill(
+    "Reply exactly MODEL-ONLY WORKTREE TURN COMPLETE.",
+  );
+  if (
+    (await workspaceComposer.inputValue()) !==
+      "Reply exactly MODEL-ONLY WORKTREE TURN COMPLETE." ||
+    !(await workspaceMissingPage
+      .getByText("Pull request status unavailable", { exact: true })
+      .isVisible())
+  ) {
+    throw new Error(
+      "Electron missing-worktree state did not preserve the Composer and unavailable PR summary.",
+    );
+  }
+  await workspaceComposer.press("Enter");
+  await workspaceMissingPage
+    .getByText("MODEL-ONLY WORKTREE TURN COMPLETE.", { exact: true })
+    .waitFor({ state: "visible" });
+  if (
+    (await workspaceComposer.inputValue()) !== "" ||
+    !(await missingNotice.isVisible()) ||
+    (await workspaceMissingPage
+      .locator(".demo-workspace-persisted-thread .codex-ui-agent-message")
+      .count()) !== 6
+  ) {
+    throw new Error(
+      "Electron missing-worktree model-only turn did not preserve the latched thread state.",
+    );
+  }
+  const summaryToggle = workspaceMissingPage.getByRole("button", {
+    name: "Toggle workspace summary",
+  });
+  await summaryToggle.click();
+  await workspaceMissingPage
+    .getByRole("dialog", { name: "Workspace summary" })
+    .waitFor({ state: "hidden" });
+  await summaryToggle.click();
+  await workspaceMissingPage
+    .getByRole("dialog", { name: "Workspace summary" })
+    .waitFor({ state: "visible" });
+  await workspaceMissingPage
+    .getByRole("button", { exact: true, name: "New chat" })
+    .click();
+  await workspaceMissingPage.waitForSelector(
+    '.demo-root[data-frame="workspace-ready"]',
+  );
+  const retainedTask = workspaceMissingPage.getByRole("button", {
+    exact: true,
+    name: "Verify worktree persistence",
+  });
+  await retainedTask.waitFor({ state: "visible" });
+  if ((await retainedTask.getAttribute("aria-current")) !== null) {
+    throw new Error(
+      "Electron persisted worktree task remained selected after opening New chat.",
+    );
+  }
+  await workspaceMissingApp.evaluate(({ BrowserWindow }) => {
+    const active = BrowserWindow.getAllWindows()[0];
+    active?.setMinimumSize(480, 480);
+    active?.setContentSize(600, 680);
+  });
+  await workspaceMissingPage.waitForSelector(
+    '.codex-ui-app-shell[data-layout-mode="narrow"]:not([data-sidebar-open])',
+  );
+  await workspaceMissingPage
+    .getByRole("button", { name: "Show sidebar" })
+    .click();
+  await workspaceMissingPage.waitForSelector(
+    '.codex-ui-app-shell[data-layout-mode="narrow"][data-sidebar-open] .codex-ui-app-shell__main[inert]',
+  );
+  await retainedTask.click();
+  await workspaceMissingPage.waitForSelector(
+    '.demo-root[data-frame="workspace-directory-missing"]',
+  );
+  await workspaceMissingPage.waitForSelector(
+    '.codex-ui-app-shell[data-layout-mode="narrow"]:not([data-sidebar-open]) .codex-ui-app-shell__main:not([inert])',
+  );
+  const replaySummary = workspaceMissingPage.getByRole("dialog", {
+    name: "Workspace summary",
+  });
+  if (!(await replaySummary.isVisible())) {
+    await summaryToggle.click();
+    await replaySummary.waitFor({ state: "visible" });
+  }
+  const replayNoticeVisible = await missingNotice.isVisible();
+  const replayPullRequestUnavailable = await workspaceMissingPage
+    .getByText("Pull request status unavailable", { exact: true })
+    .isVisible();
+  const replaySelectedWorktreeMarkers = await workspaceMissingPage
+    .locator(
+      '.codex-ui-app-sidebar__item-row[data-selected="true"] .codex-ui-app-sidebar__item-worktree-indicator svg',
+    )
+    .count();
+  const replayMessageCount = await workspaceMissingPage
+    .locator(".demo-workspace-persisted-thread .codex-ui-agent-message")
+    .count();
+  if (
+    !replayNoticeVisible ||
+    !replayPullRequestUnavailable ||
+    replaySelectedWorktreeMarkers !== 1 ||
+    replayMessageCount !== 6
+  ) {
+    throw new Error(
+      `Electron missing-worktree replay did not retain the task, model-only turn, and session-latched warning: ${JSON.stringify(
+        {
+          replayMessageCount,
+          replayNoticeVisible,
+          replayPullRequestUnavailable,
+          replaySelectedWorktreeMarkers,
+        },
+      )}`,
+    );
+  }
+} finally {
+  await workspaceMissingApp.close();
+}
+
 console.log(
-  "Electron host, native-window, coding-workspace routing, conversation/Composer and current image-attachment lifecycle plus current menus, current long, failed, and interrupted command output plus manual context compaction, thread summary, replay/live single, concurrent, nested, and mixed-recovery subagent delegation with 4/10 pagination, current mixed Search/Browser/MCP/approval/file/subagent flow, default 720px narrow reachability, resizable navigation/Review/Terminal/PR detail, PR tabs and expansion, MCP disclosure/result/unavailable-fallback, multi-file and mixed-content Review, selection/Undo, large diff scrolling, and compact geometry contracts passed.",
+  "Electron host, native-window, coding-workspace routing and persisted/missing-worktree recovery replay, conversation/Composer and current image-attachment lifecycle plus current menus, current long, failed, and interrupted command output plus manual context compaction, thread summary, replay/live single, concurrent, nested, and mixed-recovery subagent delegation with 4/10 pagination, current mixed Search/Browser/MCP/approval/file/subagent flow, default 720px narrow reachability, resizable navigation/Review/Terminal/PR detail, PR tabs and expansion, MCP disclosure/result/unavailable-fallback, multi-file and mixed-content Review, selection/Undo, large diff scrolling, and compact geometry contracts passed.",
 );

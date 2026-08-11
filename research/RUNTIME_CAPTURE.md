@@ -304,6 +304,38 @@ local screenshots move recoverably to the single Trash item
 `codex-ui-kit-worktree-status.DF99q0-20260811`; the original Codex process
 remains running.
 
+### Current `26.803.61601` worktree persistence and directory recovery
+
+A separate fresh-profile probe uses one disposable repository and one
+loopback-only CDP listener. It creates a real worktree-backed task, waits for a
+harmless exact response, restarts only the isolated app process, and confirms
+that the project and task survive with the 14×14 branch marker. The initial
+post-restart route is New chat; selecting the retained task restores its exact
+conversation and 240px workspace summary. This is evidence for persisted
+project/task state, not automatic thread-route restoration.
+
+The probe then moves only the disposable worktree aside and activates the
+retained task. It records the 736×37.125 `Current working directory missing`
+notice, unavailable Pull request status after settlement, and a still-editable
+736×98 Composer. One pure model turn completes successfully without a working
+directory. Restoring the directory and reopening the task inside the same app
+session does not clear the notice; a full isolated app restart does. The
+warning is therefore treated as informational, has no inferred Retry/repair
+action, and is session-latched for this observed build.
+
+The public replay keeps restored and missing-directory frames distinct.
+Browser/CDP verifies selected-row, branch-marker, message-count, summary,
+notice, and Composer geometry. Electron submits a model-only turn, toggles the
+workspace summary, opens New chat, and reselects the retained task to verify
+that the missing-directory warning stays latched and the 600px modal sidebar
+dismisses so the restored thread is interactive. The optional
+current-product notice crop passes at 3.2572% under a 4% ceiling. Raw records
+and product screenshots remain local-only. Cleanup terminates only the exact
+isolated process and profile-owned handlers, removes the real Git worktree
+through its disposable owner repository, verifies the loopback listener and
+profile arguments are gone, and moves the probe root recoverably to Trash; the
+original Codex process remains running.
+
 ### Current application-shell capture
 
 The `26.721.81911` App shell capture used an exact second main process with a

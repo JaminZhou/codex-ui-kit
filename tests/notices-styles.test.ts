@@ -28,6 +28,15 @@ describe("notice visual contract", () => {
     );
   });
 
+  it("locks the current missing-directory notice geometry", () => {
+    expect(styles).toMatch(
+      /\.codex-ui-working-directory-notice \{[\s\S]*?border-radius: 20px;[\s\S]*?font-size: 13px;[\s\S]*?gap: 8px;[\s\S]*?line-height: 21\.125px;[\s\S]*?min-height: 37\.125px;[\s\S]*?padding: 8px 8px 8px 12px/,
+    );
+    expect(styles).toMatch(
+      /\.codex-ui-working-directory-notice__heading \{[\s\S]*?font-weight: var\(--codex-ui-font-weight-semibold\)/,
+    );
+  });
+
   it("locks the divider and reconnect disclosure geometry", () => {
     expect(styles).toMatch(
       /\.codex-ui-inline-notice__rule \{[\s\S]*?border-top: 1px solid var\(--codex-ui-border\)/,

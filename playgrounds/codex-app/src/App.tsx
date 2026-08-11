@@ -75,6 +75,7 @@ import {
   ThreadVirtualizedPlaceholder,
   ToolCallCard,
   TurnDuration,
+  WorkingDirectoryNotice,
   WorkspacePanel,
   type TerminalEntry,
   type AppRouteOutletStatus,
@@ -429,6 +430,13 @@ function currentSubagentPanelFrame(frame: string | null) {
     frame === "subagent-current-transcript" ||
     frame === "subagent-current-compact-820" ||
     frame === "subagent-current-compact-720"
+  );
+}
+
+function currentWorkspacePersistenceFrame(frame: string | null) {
+  return (
+    frame === "workspace-persisted-thread" ||
+    frame === "workspace-directory-missing"
   );
 }
 
@@ -1551,6 +1559,15 @@ export function App() {
   const [composerValue, setComposerValue] = useState(() =>
     initialComposerValue(initialSelection.frame),
   );
+  const [workspacePersistedTaskAvailable] = useState(() =>
+    currentWorkspacePersistenceFrame(initialSelection.frame),
+  );
+  const [workspaceDirectoryMissing] = useState(
+    initialSelection.frame === "workspace-directory-missing",
+  );
+  const [workspaceModelOnlyTurns, setWorkspaceModelOnlyTurns] = useState<
+    Array<{ id: number; prompt: string; response: string }>
+  >([]);
   const [composerOverlay, setComposerOverlay] =
     useState<ComposerOverlay>(() =>
       initialComposerOverlay(initialSelection.frame),
@@ -1587,7 +1604,8 @@ export function App() {
   );
   const [threadSummaryOpen, setThreadSummaryOpen] = useState(
     initialSelection.frame === "context-summary-open" ||
-      currentSubagentSummaryFrame(initialSelection.frame),
+      currentSubagentSummaryFrame(initialSelection.frame) ||
+      currentWorkspacePersistenceFrame(initialSelection.frame),
   );
   const [replayQueuedContinuation, setReplayQueuedContinuation] =
     useState<string | null>(() =>
@@ -1781,6 +1799,7 @@ export function App() {
     useState<"environment" | "worktree">("environment");
   const queuedPromptCounterRef = useRef(1);
   const attachmentSelectionCounterRef = useRef(1);
+  const workspaceModelOnlyTurnCounterRef = useRef(1);
   const terminalSessionCounterRef = useRef(
     initialTerminalSessionIds(
       initialSelection.scenarioId,
@@ -2794,6 +2813,8 @@ export function App() {
     initialSelection.currentSidebar ||
     initialSelection.frame?.startsWith("sidebar-current") ||
     !initialSelection.capture;
+  const workspacePersistenceFrame =
+    view === "workspace" && currentWorkspacePersistenceFrame(activeFrame);
   const sidebarRecentScenarios = (
     Object.values(replayScenarios) as ReplayScenario[]
   ).slice(0, currentSidebarComposition ? 6 : undefined);
@@ -3006,7 +3027,11 @@ export function App() {
           </div>
           <div className="demo-sidebar-new-chat-row">
             <button
-              aria-current={view === "workspace" ? "page" : undefined}
+              aria-current={
+                view === "workspace" && !workspacePersistenceFrame
+                  ? "page"
+                  : undefined
+              }
               className="demo-sidebar-new-chat"
               onClick={() => openWorkspace()}
               type="button"
@@ -3203,12 +3228,19 @@ export function App() {
                 })
               }
             >
-              {project.tasks.map((task, index) => (
+              {[
+                ...project.tasks,
+                ...(workspacePersistedTaskAvailable &&
+                project.id === "codex-ui-kit"
+                  ? ["Verify worktree persistence"]
+                  : []),
+              ].map((task, index) => (
                 <AppSidebarItem
                   actions={
-                    initialSelection.sidebarState === "status-lifecycle" &&
-                    project.id === "protocol-client" &&
-                    index === 0 ? undefined : (
+                    task === "Verify worktree persistence" ||
+                    (initialSelection.sidebarState === "status-lifecycle" &&
+                      project.id === "protocol-client" &&
+                      index === 0) ? undefined : (
                       <>
                         <button
                           aria-label={`Pin task ${project.id}-${index + 1}`}
@@ -3239,18 +3271,42 @@ export function App() {
                   }
                   depth={1}
                   key={task}
+                  onClick={
+                    task === "Verify worktree persistence"
+                      ? () => {
+                          setMode("replay");
+                          setView("workspace");
+                          setActiveFrame(
+                            workspaceDirectoryMissing
+                              ? "workspace-directory-missing"
+                              : "workspace-persisted-thread",
+                          );
+                          dismissSidebarAfterNavigation();
+                        }
+                      : undefined
+                  }
+                  selected={
+                    workspacePersistenceFrame &&
+                    task === "Verify worktree persistence"
+                  }
                   status={
-                    initialSelection.sidebarState === "status-lifecycle"
+                    task === "Verify worktree persistence"
+                      ? "idle"
+                      : initialSelection.sidebarState === "status-lifecycle"
                       ? currentSidebarTaskStatus(project.id, index)
                       : "idle"
                   }
                   statusLabel={
-                    initialSelection.sidebarState === "status-lifecycle"
+                    task === "Verify worktree persistence"
+                      ? undefined
+                      : initialSelection.sidebarState === "status-lifecycle"
                       ? currentSidebarTaskStatusLabel(project.id, index)
                       : undefined
                   }
                   worktreeStatus={
-                    initialSelection.sidebarState === "status-lifecycle"
+                    task === "Verify worktree persistence"
+                      ? "restored"
+                      : initialSelection.sidebarState === "status-lifecycle"
                       ? currentSidebarTaskWorktreeStatus(project.id, index)
                       : undefined
                   }
@@ -4307,7 +4363,9 @@ export function App() {
           .includes(workspaceBranchQuery.trim().toLocaleLowerCase()),
     );
   const workspaceBaseFrame =
-    initialSelection.frame === "workspace-compact-ready"
+    currentWorkspacePersistenceFrame(activeFrame)
+      ? activeFrame
+      : initialSelection.frame === "workspace-compact-ready"
       ? "workspace-compact-ready"
       : workspaceProjectId === null
         ? "workspace-no-project"
@@ -4764,6 +4822,27 @@ export function App() {
       }
       layout="multiline"
       onSubmit={(prompt) => {
+        if (workspacePersistenceFrame) {
+          const nextPrompt = prompt.trim();
+          if (!nextPrompt) return;
+          setWorkspaceModelOnlyTurns((turns) => [
+            ...turns,
+            {
+              id: workspaceModelOnlyTurnCounterRef.current++,
+              prompt: nextPrompt,
+              response: workspaceDirectoryMissing
+                ? "MODEL-ONLY WORKTREE TURN COMPLETE."
+                : "MODEL-ONLY TURN COMPLETE.",
+            },
+          ]);
+          setComposerValue("");
+          setActiveFrame(
+            workspaceDirectoryMissing
+              ? "workspace-directory-missing"
+              : "workspace-persisted-thread",
+          );
+          return;
+        }
         selectScenario("workspace-workflow", "approval-pending", {
           cwd: currentWorkspaceCwd,
           prompt,
@@ -4776,7 +4855,7 @@ export function App() {
       value={composerValue}
     />
   );
-  const workspaceRoute = (
+  const workspaceNewConversationRoute = (
     <div className="demo-workspace-route">
       <NewConversationStart
         className="demo-workspace-start"
@@ -4888,6 +4967,158 @@ export function App() {
       />
     </div>
   );
+  const workspaceThreadMissing = workspaceDirectoryMissing;
+  const workspaceThreadSummary = (
+    <ThreadSummaryPopover
+      className="demo-workspace-thread-summary-popover"
+      label="Workspace summary"
+      onOpenChange={setThreadSummaryOpen}
+      open={threadSummaryOpen}
+      triggerLabel="Toggle workspace summary"
+    >
+      <ThreadSummaryPanel
+        className="demo-workspace-thread-summary"
+        label="Workspace summary"
+      >
+        <ThreadSummarySection
+          actions={
+            <ThreadSummaryIconButton icon="+" label="Add environment item" />
+          }
+          collapsible
+          title="Environment"
+          toggleLabel="Toggle environment summary"
+        >
+          <ThreadSummaryItem
+            disabled
+            label="Changes"
+            leading={<SummaryGlyph name="changes" />}
+          />
+          <ThreadSummaryItem
+            label="Worktree"
+            leading={<SummaryGlyph name="computer" />}
+            trailing="⌄"
+          />
+          <ThreadSummaryItem
+            label="main"
+            leading={<SummaryGlyph name="branch" />}
+            trailing="⌄"
+          />
+          <ThreadSummaryItem
+            disabled
+            label="Commit or push"
+            leading={<SummaryGlyph name="commit" />}
+          />
+          <ThreadSummaryItem
+            disabled
+            label={
+              workspaceThreadMissing
+                ? "Pull request status unavailable"
+                : "No pull request"
+            }
+            leading={<SummaryGlyph name="github" />}
+          />
+        </ThreadSummarySection>
+        <ThreadSummarySection
+          actions={
+            <ThreadSummaryIconButton icon="+" label="Create a file or site" />
+          }
+          collapsible
+          title="Outputs"
+          toggleLabel="Toggle outputs summary"
+        >
+          <ThreadSummaryItem disabled label="Create a file or site" />
+        </ThreadSummarySection>
+      </ThreadSummaryPanel>
+    </ThreadSummaryPopover>
+  );
+  const workspacePersistedThread = (
+    <div className="demo-workspace-route demo-workspace-persisted-route">
+      <ConversationThreadShell
+        className="demo-workspace-persisted-thread"
+        composer={
+          <div className="demo-workspace-persisted-composer">
+            {workspaceThreadMissing ? (
+              <WorkingDirectoryNotice aria-label="Workspace status" />
+            ) : null}
+            {workspaceComposer}
+          </div>
+        }
+        header={
+          <ThreadHeader
+            endActions={workspaceThreadSummary}
+            startActions={
+              <button aria-label="Thread actions" type="button">
+                <SidebarGlyph name="more-current" />
+              </button>
+            }
+            title={
+              <span className="demo-workspace-persisted-title">
+                <SidebarGlyph name="folder-current" />
+                Verify worktree persistence
+              </span>
+            }
+          />
+        }
+        label="Persisted worktree conversation"
+        threadWidth="wide"
+      >
+        <AgentTurn aria-label="Persisted worktree transcript">
+          <AgentMessage role="user">
+            Create no files and reply exactly WORKTREE PERSISTENCE PROBE READY.
+          </AgentMessage>
+          <AgentMessage
+            actions={
+              <McpResponseActions
+                includeShare={false}
+                label="Persisted response actions"
+              />
+            }
+            metadata={<time dateTime="17:34">5:34 PM</time>}
+            role="assistant"
+          >
+            <AgentMarkdown>WORKTREE PERSISTENCE PROBE READY.</AgentMarkdown>
+          </AgentMessage>
+          {workspaceThreadMissing ? (
+            <>
+              <AgentMessage role="user">
+                Reply exactly MISSING WORKTREE PROBE.
+              </AgentMessage>
+              <AgentMessage
+                actions={
+                  <McpResponseActions
+                    includeShare={false}
+                    label="Missing worktree response actions"
+                  />
+                }
+                role="assistant"
+              >
+                <AgentMarkdown>MISSING WORKTREE PROBE.</AgentMarkdown>
+              </AgentMessage>
+            </>
+          ) : null}
+          {workspaceModelOnlyTurns.map((turn) => (
+            <Fragment key={turn.id}>
+              <AgentMessage role="user">{turn.prompt}</AgentMessage>
+              <AgentMessage
+                actions={
+                  <McpResponseActions
+                    includeShare={false}
+                    label="Model-only response actions"
+                  />
+                }
+                role="assistant"
+              >
+                <AgentMarkdown>{turn.response}</AgentMarkdown>
+              </AgentMessage>
+            </Fragment>
+          ))}
+        </AgentTurn>
+      </ConversationThreadShell>
+    </div>
+  );
+  const workspaceRoute = workspacePersistenceFrame
+    ? workspacePersistedThread
+    : workspaceNewConversationRoute;
 
   const reviewableFileChanges = useMemo(
     () =>

@@ -244,6 +244,12 @@ const currentBuildWorkspaceCompactReference =
   process.env.CODEX_UI_KIT_WORKSPACE_COMPACT_REFERENCE;
 const currentBuildWorkspaceWorktreeReference =
   process.env.CODEX_UI_KIT_WORKSPACE_WORKTREE_REFERENCE;
+const currentBuildWorkspaceDirectoryMissingReference =
+  process.env.CODEX_UI_KIT_WORKSPACE_DIRECTORY_MISSING_REFERENCE;
+const currentBuildWorkspaceDirectoryMissingReferenceSize = {
+  height: 1326,
+  width: 2560,
+};
 const currentBuildSidebarReference =
   process.env.CODEX_UI_KIT_SIDEBAR_REFERENCE;
 const currentBuildSidebarRecentsReference =
@@ -1259,6 +1265,58 @@ for (const scene of selectedScenes) {
       referencePath: currentBuildWorkspaceNewWorktreeReference,
       sceneId: scene.id,
     });
+  }
+
+  if (
+    scene.id === "workspace-directory-missing" &&
+    currentBuildWorkspaceDirectoryMissingReference
+  ) {
+    const reference = flattenPng(
+      PNG.sync.read(
+        await readFile(currentBuildWorkspaceDirectoryMissingReference),
+      ),
+      { blue: 24, green: 24, red: 24 },
+    );
+    if (
+      reference.width !==
+        currentBuildWorkspaceDirectoryMissingReferenceSize.width ||
+      reference.height !==
+        currentBuildWorkspaceDirectoryMissingReferenceSize.height ||
+      actual.width !== 1180 ||
+      actual.height !== 820
+    ) {
+      throw new Error(
+        `${scene.id}: current-build missing-directory comparison requires a 2560x1326 reference and 1180x820 playground frame.`,
+      );
+    }
+    const referenceNotice = cropPng(reference, 1049, 1059, 736, 37);
+    const actualNotice = cropPng(actual, 359, 661, 736, 37);
+    const comparison = comparePng(referenceNotice, actualNotice, 0.08);
+    const maximumRatio = environmentRatio(
+      "CODEX_UI_KIT_WORKSPACE_DIRECTORY_MISSING_MAX_DIFF_RATIO",
+      0.04,
+    );
+    await writeFile(
+      join(artifactDirectory, `${scene.id}.current-build.png`),
+      PNG.sync.write(actualNotice),
+    );
+    if (comparison.pixels > 0) {
+      await writeFile(
+        join(
+          artifactDirectory,
+          `${scene.id}.current-build.diff.png`,
+        ),
+        PNG.sync.write(comparison.diff),
+      );
+    }
+    if (comparison.ratio > maximumRatio) {
+      throw new Error(
+        `${scene.id}: current-build missing-directory notice pixel ratio ${comparison.ratio} exceeds ${maximumRatio}.`,
+      );
+    }
+    console.log(
+      `${scene.id}: current-build missing-directory notice pixel ratio ${comparison.ratio}`,
+    );
   }
 
   if (

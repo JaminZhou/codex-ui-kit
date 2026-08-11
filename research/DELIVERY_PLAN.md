@@ -14,7 +14,7 @@ exit gates; it does not replace the inventory.
   Desktop `26.803.61601` (`6396`). Unsampled earlier-build surfaces remain
   previous-build regression evidence rather than current verification.
 - The inventory contains 86 surface groups: 58 P0, 19 P1, and 9 P2.
-- 17 groups have current-build runtime evidence, 52 have previous-build-only
+- 18 groups have current-build runtime evidence, 51 have previous-build-only
   runtime evidence, and 17 have not been sampled.
 - The scoped `26.803.61601` refresh revalidates 43
   sidebar/menu/window-chrome/Composer icons against exact runtime evidence.
@@ -39,7 +39,16 @@ exit gates; it does not replace the inventory.
   deterministic create failure, and a successful Retry recovery. It preserves
   queued/creating/setting-up/failed/restored semantics, locks the 14×14 branch
   marker plus 20×20 status rail, and adds Browser/CDP, Electron, and local-only
-  loading/error/restored pixel gates.
+  loading/error/restored pixel gates. The persistence follow-up creates a real
+  worktree and task, proves project/task survival across an isolated app
+  restart, records that the exact thread route is restored only after selecting
+  the retained task, and reaches the 736×37.125 missing-working-directory
+  notice. It separately proves that an editable Composer and model-only turn
+  remain available, that restoring the directory does not clear the notice in
+  the existing app session, and that the next app restart recovers it. The
+  independent current-sidebar replay, Browser/CDP, Electron, and a local-only
+  notice-region gate cover the same observed boundary without inventing a
+  Retry or repair control.
 - A reproducible sanitized global-shell capture now selects the main Renderer
   structurally, records dark 1180×820, 820×680, 721×680, and 720×680 geometry,
   normalizes collapsed and explicitly pinned narrow states, verifies Pull
@@ -507,8 +516,13 @@ without confusing package readiness with full product reconstruction.
    project/Local/branch context, New worktree/environment-empty state, and
    720px layout are delivered; independent project → environment/worktree →
    command → approval → Review → Terminal → PR acceptance remains covered.
-   Continue with real creation/persistence, environment settings,
-   Remote/Codex web, and unavailable/repair evidence.
+   Real worktree creation and cross-restart project/task persistence are now
+   reached on `26.803.61601`. The retained task restores its exact thread only
+   after selection; a missing working directory leaves the Composer usable,
+   exposes unavailable PR status, and remains session-latched until an app
+   restart after the directory is restored. Continue with project/branch
+   creation, environment settings, Remote/Codex web, and the separate
+   environment-unavailable/repair families.
 7. **Review content variants**: current delete and rename/no-content evidence,
    public rename/delete/binary/conflict replay, selection synchronization, and
    Undo.

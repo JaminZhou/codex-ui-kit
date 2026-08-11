@@ -57,8 +57,15 @@ The authoritative current-build inventory is:
   local-only pixels. A separate disposable-repository probe reaches real
   worktree create, controlled failure, Retry recovery, and restored rows; it
   locks all five worktree phases plus exact branch/spinner/error geometry and
-  local-only pixels. Broader unsampled inventory still keeps global pixel
-  parity ineligible.
+  local-only pixels. A later real-worktree probe proves project/task persistence
+  across an app restart while also proving that New chat, rather than the exact
+  thread, is the initial restored route. Selecting the retained task restores
+  the conversation. Removing its disposable directory reaches the exact
+  missing-working-directory notice and unavailable PR status while the
+  Composer and a model-only turn remain usable; restoring the directory clears
+  the session-latched warning only after another app restart. Browser/CDP,
+  Electron, and a 3.2572% local-only notice crop gate that observed boundary.
+  Broader unsampled inventory still keeps global pixel parity ineligible.
 - The same installed fingerprint now owns the machine-readable baseline. A
   sanitized capture selects the main `app://-/index.html` Renderer by URL,
   area, shell landmarks, and visible-control density; it excludes the avatar
