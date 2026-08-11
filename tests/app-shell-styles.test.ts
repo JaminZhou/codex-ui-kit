@@ -129,10 +129,26 @@ describe("application shell visual contract", () => {
       ".codex-ui-app-sidebar__item-actions",
     );
     expect(styles).toMatch(
-      /\.codex-ui-app-sidebar__item-row \{[\s\S]*?display: grid;[\s\S]*?grid-template-columns: minmax\(0, 1fr\) auto auto;/,
+      /\.codex-ui-app-sidebar__item-row \{[\s\S]*?display: grid;[\s\S]*?grid-template-columns: minmax\(0, 1fr\) auto;/,
     );
     expect(styles).toMatch(
-      /\.codex-ui-app-sidebar__item-actions \{[\s\S]*?grid-column: 3;[\s\S]*?position: relative;/,
+      /\.codex-ui-app-sidebar__item-actions \{[\s\S]*?grid-column: 2;[\s\S]*?position: relative;/,
+    );
+    expect(styles).toContain(
+      ".codex-ui-app-sidebar__item-status-spinner",
+    );
+    expect(styles).toContain("animation: codex-ui-spin 2s linear infinite;");
+    expect(styles).toContain(
+      ".codex-ui-app-sidebar__item-status-attention",
+    );
+    expect(styles).toContain(
+      "background: var(--codex-ui-app-sidebar-attention, var(--codex-ui-link));",
+    );
+    expect(styles).toContain(
+      '.codex-ui-app-sidebar__item-row[data-selected][data-status="idle"]',
+    );
+    expect(styles).toMatch(
+      /\.codex-ui-app-sidebar__project-children \{[\s\S]*?gap: 1px;[\s\S]*?padding-block: 2px 8px;/,
     );
     expect(styles).not.toContain(
       ".codex-ui-app-sidebar__item-row[data-has-actions]\n  .codex-ui-app-sidebar__item {\n  padding-inline-end:",

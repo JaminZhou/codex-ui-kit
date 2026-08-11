@@ -13,8 +13,8 @@ exit gates; it does not replace the inventory.
 - The installed package and machine-readable evidence baseline are Codex
   Desktop `26.803.61601` (`6396`). Unsampled earlier-build surfaces remain
   previous-build regression evidence rather than current verification.
-- The inventory contains 85 surface groups: 57 P0, 19 P1, and 9 P2.
-- 16 groups have current-build runtime evidence, 52 have previous-build-only
+- The inventory contains 86 surface groups: 58 P0, 19 P1, and 9 P2.
+- 16 groups have current-build runtime evidence, 53 have previous-build-only
   runtime evidence, and 17 have not been sampled.
 - The scoped `26.803.61601` refresh revalidates 43
   sidebar/menu/window-chrome/Composer icons against exact runtime evidence.
@@ -30,10 +30,13 @@ exit gates; it does not replace the inventory.
   broader inventory/lifecycle blocker.
   The account-menu follow-up adds six exact icons and gates its six-item,
   one-avatar, zero-role-separator structure, 258.11×188.38 geometry, dismissal,
-  focus return, and owned pixels at 0.1979%. Sidebar actions are now a separate
-  verified denominator from transient running/queued/unread/error markers,
-  which remain previous-build-only until a current state is deliberately
-  triggered and captured.
+  focus return, and owned pixels at 0.1979%. Sidebar actions and ordinary task
+  status are now separate verified denominators. The current-build status
+  slice reaches active and unread runtime states, preserves the active spinner
+  while a follow-up is queued, and locks the exact trailing rail, spinner, dot,
+  computed color, action replacement, and glyph pixels. Pending-worktree
+  queued/creating/setting-up/failed presentation remains a separate
+  previous-build-only row until those phases are deliberately runtime-reached.
 - A reproducible sanitized global-shell capture now selects the main Renderer
   structurally, records dark 1180×820, 820×680, 721×680, and 720×680 geometry,
   normalizes collapsed and explicitly pinned narrow states, verifies Pull
@@ -110,7 +113,8 @@ exit gates; it does not replace the inventory.
   CDP and Electron gate their order and 14/16px geometry across current
   conversation/workspace states; an external workspace comparison passes at
   0.4651%, and the eight asset crops have zero changed pixels. The newest
-  lifecycle pass adds six 30px/40px project-group stacks,
+  lifecycle pass adds six project-group stacks with 30px project/task rows,
+  2px/8px child-list padding, and 1px separators,
   pointer/Enter/Space expansion, a six-item project menu, an eight-item Help
   menu with its `What's new` heading, and explicit 720px pinned continuity.
   Twelve additional menu icons are exact runtime primitives. Browser/CDP,
@@ -297,8 +301,10 @@ slot. It is split into:
   queued, unread, error, empty, loading, and long-list states;
 - `app.sidebar-item-actions`: hover/focus actions, context menu,
   rename/archive/delete affordances, and keyboard access;
-- `app.sidebar-status-indicators`: running, queued, unread, error, and other
-  transient sibling markers across project and recent rows;
+- `app.sidebar-status-indicators`: ordinary active, waiting, unread, and idle
+  task presentation across project and recent rows;
+- `app.sidebar-worktree-status-indicators`: pending worktree queued, creating,
+  setting-up, failed, and restored presentation;
 - `app.sidebar-footer-account-settings`: account, settings, update/status, and
   footer overflow behavior.
 - `app.sidebar-help-menu`: current release-note grouping, support/setup actions,
@@ -328,7 +334,7 @@ Acceptance matrix:
 | Input | pointer, keyboard, focus-visible, Escape, resize keys |
 | Evidence | current CDP styles, Browser, Electron, regional pixels |
 
-Exit: all nine sidebar IDs have current-build evidence and an explicit status;
+Exit: all ten sidebar IDs have current-build evidence and an explicit status;
 the shell remains usable without horizontal overflow at the compact gate.
 
 ### 2. Finish conversation and Composer lifecycle
@@ -455,7 +461,12 @@ without confusing package readiness with full product reconstruction.
    The current lifecycle follow-up splits and verifies project expansion,
    project actions, and Help-menu ownership, promotes twelve menu assets, and
    adds four local-only product pixel gates without promoting the broader
-   navigation, mutation, or account/settings denominators.
+   navigation, mutation, or account/settings denominators. The ordinary
+   task-status follow-up separately reaches active and unread on
+   `26.803.61601`, corrects task rows from the former 40px approximation to the
+   current 30px structure, and gates trailing status geometry, color, action
+   replacement, and pixels. Pending-worktree queued/creating/setting-up/failed
+   runtime evidence remains open.
 3. **Tool recovery and mixed thread — delivered for current component contracts**:
    `26.803.41515` now covers a real Search → Search → Fetch success and a real
    invalid-URL Fetch → Search → Fetch recovery inside one integration group,

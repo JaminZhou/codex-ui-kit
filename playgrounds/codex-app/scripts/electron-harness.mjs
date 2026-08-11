@@ -247,6 +247,14 @@ export const visualScenes = [
   {
     currentSidebar: true,
     frame: "sidebar-current",
+    id: "current-sidebar-status-lifecycle",
+    maxPixelRatio: 0.0225,
+    scenario: "streaming-recovery",
+    sidebarState: "status-lifecycle",
+  },
+  {
+    currentSidebar: true,
+    frame: "sidebar-current",
     id: "current-sidebar-project-collapsed",
     maxPixelRatio: 0.0225,
     scenario: "streaming-recovery",

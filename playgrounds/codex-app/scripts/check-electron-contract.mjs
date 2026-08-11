@@ -469,6 +469,132 @@ try {
   await app.close();
 }
 
+const sidebarStatusScene = {
+  currentSidebar: true,
+  frame: "sidebar-current",
+  id: "electron-current-sidebar-status-lifecycle",
+  scenario: "streaming-recovery",
+  sidebarState: "status-lifecycle",
+};
+const { app: sidebarStatusApp, page: sidebarStatusPage } = await launchScene(
+  sidebarStatusScene,
+  { capture: false },
+);
+
+try {
+  const statusContract = await sidebarStatusPage.evaluate(() =>
+    Array.from(
+      document.querySelectorAll(
+        '[data-sidebar-status-fixture]:not([data-status="idle"])',
+      ),
+      (item) => {
+        const row = item.closest(".codex-ui-app-sidebar__item-row");
+        const status = row?.querySelector(
+          ".codex-ui-app-sidebar__item-status",
+        );
+        const attention = status?.querySelector(
+          ".codex-ui-app-sidebar__item-status-attention",
+        );
+        const spinner = status?.querySelector(
+          ".codex-ui-app-sidebar__item-status-spinner",
+        );
+        const error = status?.querySelector(
+          ".codex-ui-app-sidebar__item-status-error",
+        );
+        const metric = (element) => {
+          if (!(element instanceof Element)) return null;
+          const bounds = element.getBoundingClientRect();
+          return { height: bounds.height, width: bounds.width };
+        };
+        const rowBounds = row?.getBoundingClientRect();
+        const statusBounds = status?.getBoundingClientRect();
+        return {
+          animationDuration: spinner
+            ? getComputedStyle(spinner).animationDuration
+            : null,
+          animationName: spinner
+            ? getComputedStyle(spinner).animationName
+            : null,
+          attentionColor: attention
+            ? getComputedStyle(attention).backgroundColor
+            : null,
+          attentionRect: metric(attention),
+          errorRect: metric(error),
+          fixture: item.getAttribute("data-sidebar-status-fixture"),
+          rowRect: metric(row),
+          rightInset:
+            rowBounds && statusBounds
+              ? rowBounds.right - statusBounds.right
+              : null,
+          status: status?.getAttribute("data-status"),
+          statusOpacity: status ? getComputedStyle(status).opacity : null,
+          statusRect: metric(status),
+          visualStatus: status?.getAttribute("data-visual-status"),
+        };
+      },
+    ),
+  );
+  const expectedStatuses = [
+    ["session-browser:0", "active", "loading"],
+    ["desktop-cleanup:0", "waiting", "attention"],
+    ["codex-ui-kit:0", "unread", "attention"],
+    ["codex-ui-kit:1", "loading", "loading"],
+    ["design-assets:0", "error", "error"],
+  ];
+  const actualStatuses = statusContract.map(
+    ({ fixture, status, visualStatus }) => [fixture, status, visualStatus],
+  );
+  if (
+    JSON.stringify(actualStatuses) !== JSON.stringify(expectedStatuses) ||
+    statusContract.some(
+      (fixture) =>
+        fixture.statusOpacity !== "1" ||
+        fixture.rowRect?.width !== 258 ||
+        fixture.rowRect?.height !== 30 ||
+        fixture.statusRect?.width !== 20 ||
+        fixture.statusRect?.height !== 20 ||
+        fixture.rightInset !== 4 ||
+        (fixture.visualStatus === "attention" &&
+          (fixture.attentionRect?.width !== 8 ||
+            fixture.attentionRect?.height !== 8 ||
+            fixture.attentionColor !== "rgb(131, 195, 255)")) ||
+        (fixture.visualStatus === "error" &&
+          (fixture.errorRect?.width !== 16 ||
+            fixture.errorRect?.height !== 16)) ||
+        (fixture.visualStatus === "loading" &&
+          (fixture.animationDuration !== "1e-06s" ||
+            fixture.animationName !== "none")),
+    )
+  ) {
+    throw new Error(
+      `Electron current sidebar status lifecycle failed: ${JSON.stringify(statusContract)}`,
+    );
+  }
+
+  const activeItem = sidebarStatusPage.locator(
+    '[data-sidebar-status-fixture="session-browser:0"]',
+  );
+  const activeRow = activeItem.locator(
+    "xpath=ancestor::*[contains(@class, 'codex-ui-app-sidebar__item-row')]",
+  );
+  await activeRow.hover();
+  const hovered = await activeRow.evaluate((row) => ({
+    actions: getComputedStyle(
+      row.querySelector(".codex-ui-app-sidebar__item-actions"),
+    ).opacity,
+    status: getComputedStyle(
+      row.querySelector(".codex-ui-app-sidebar__item-status"),
+    ).opacity,
+  }));
+  if (hovered.actions !== "1" || hovered.status !== "0") {
+    throw new Error(
+      `Electron current sidebar status/action replacement failed: ${JSON.stringify(hovered)}`,
+    );
+  }
+} finally {
+  await sidebarStatusApp.close();
+}
+
 const themeScene = {
   currentSidebar: true,
   frame: "workspace-ready",

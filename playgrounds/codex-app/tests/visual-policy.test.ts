@@ -94,6 +94,8 @@ describe("lifecycle visual policy", () => {
       "CODEX_UI_KIT_CURRENT_SIDEBAR_HELP_MENU_REFERENCE",
       "CODEX_UI_KIT_CURRENT_SIDEBAR_ACCOUNT_MENU_REFERENCE",
       "CODEX_UI_KIT_CURRENT_SIDEBAR_COMPACT_PINNED_REFERENCE",
+      "CODEX_UI_KIT_CURRENT_SIDEBAR_ACTIVE_STATUS_REFERENCE",
+      "CODEX_UI_KIT_CURRENT_SIDEBAR_UNREAD_STATUS_REFERENCE",
     ]) {
       expect(contract).toContain(reference);
     }
@@ -103,6 +105,7 @@ describe("lifecycle visual policy", () => {
       "current-sidebar-help-menu",
       "current-sidebar-account-menu",
       "current-sidebar-compact-pinned",
+      "current-sidebar-status-lifecycle",
     ]) {
       expect(electronHarness).toContain(`id: "${scene}"`);
     }

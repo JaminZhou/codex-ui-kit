@@ -4,7 +4,7 @@ Every deterministic scenario has one ID and produces four evidence layers:
 
 1. **Protocol** — ordered App Server notifications, server requests, and
    request responses checked against the pinned generated schemas. The current
-   deterministic set contains 32 fixtures and 367 events.
+   deterministic set contains 33 fixtures and 406 events.
 2. **CDP** — DOM identity, computed layout, focus, scrolling, and named-surface
    geometry, including the current 274px sidebar, 46px titlebar inset, 70px
    header, 30px rows, fixed footer, collapsible groups, focusable row actions,
@@ -146,6 +146,16 @@ Every deterministic scenario has one ID and produces four evidence layers:
    window background before comparison, and independently implemented UI
    regions are located from their DOM contracts rather than hard-coded
    vertical offsets.
+
+The ordinary sidebar task-status scene accepts local-only 259×30 active and
+unread row references through
+`CODEX_UI_KIT_CURRENT_SIDEBAR_ACTIVE_STATUS_REFERENCE` and
+`CODEX_UI_KIT_CURRENT_SIDEBAR_UNREAD_STATUS_REFERENCE`. It crops the final
+28px status rail and compares foreground masks so selected/hover row paint
+does not overwhelm glyph geometry. CDP separately requires the 20×20 rail,
+4px right inset, exact 16×16 spinner paths, centered 8×8 dot, and computed
+`rgb(131, 195, 255)` unread color; Electron verifies hover replacement by the
+trailing actions.
 
 The layers do not vote on the same claim. Protocol proves lifecycle behavior;
 CDP explains layout; Electron proves the desktop host; pixels catch final
