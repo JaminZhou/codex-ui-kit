@@ -6,9 +6,11 @@ not establish full conversation, workspace, application, or product coverage.
 
 The authoritative current-build inventory is:
 
-- [`26.803.41515.md`](26.803.41515.md) for the current package fingerprint,
-  reproducible global-shell baseline, scoped visual assets, Markdown table,
-  attachment boundary, and sidebar/Composer/window-chrome provenance;
+- [`26.803.61601.md`](26.803.61601.md) for the current package fingerprint,
+  reproducible global-shell baseline, revalidated scoped visual assets, and
+  same-state dark-shell acceptance;
+- [`26.803.41515.md`](26.803.41515.md) for the previous Markdown table,
+  attachment, MCP, sidebar/Composer, and window-chrome captures;
 - [`26.730.61639.md`](26.730.61639.md) for the previous Terminal
   session/process/mismatch and subagent captures;
 - [`26.730.61309.md`](26.730.61309.md) for the previous sidebar, command,
@@ -38,9 +40,9 @@ The authoritative current-build inventory is:
 - The Electron playground validates the current package in a desktop
   BrowserWindow; it does not prove parity with unobserved product routes,
   panels, state transitions, or window types.
-- A scoped Codex Desktop `26.803.41515` (`6321`) visual probe refreshes the
-  exact 1180×820 dark/resting asset fingerprint and expands exact
-  sidebar/menu/window-chrome/Composer icon coverage from five to 37. Its sampled sidebar
+- A scoped Codex Desktop `26.803.61601` (`6396`) visual probe revalidates the
+  exact 1180×820 dark/resting asset fingerprint and retains the 37 exact
+  sidebar/menu/window-chrome/Composer icons established by earlier slices. Its sampled sidebar
   hover/footer contract also
   passes Browser/CDP and Electron acceptance; its independently scrolled
   Recents sample removes the leading Thread approximation while the broader
@@ -64,7 +66,11 @@ The authoritative current-build inventory is:
   project menu, the eight-item Help menu, and explicit 720px pinning. Twelve
   newly promoted menu icons are exact runtime primitives. Browser/CDP,
   Electron, and four local-only comparisons pass at 1.54%, 0.13%, 0.30%, and
-  3.12%; the references and raw product records remain untracked.
+  3.12%; the references and raw product records remain untracked. The
+  `26.803.61601` refresh repeats the structural lifecycle and adds a same-state
+  dark New chat composition. Its current-product top/footer/main regions pass
+  at 3.1387%, 0.4126%, and 0.3146%, while evidence not re-reached on this build
+  retains its previous build prefix.
 - Computer Use exploration is blocked by the environment safety policy for
   `com.openai.codex`. User-authorized CDP probes on `26.721.41059` revalidated
   access, the main-shell target shape, a de-identified Projects entry/list,
@@ -246,7 +252,7 @@ The authoritative current-build inventory is:
   current Active/Done classifier and 4/10 list limits. A twelve-agent public
   replay now covers pending initialization, updated progress, errored,
   interrupted, shutdown, and unavailable results, both pagination limits, and
-  failed-agent transcript access. Browser/CDP covers 155 frames, Electron
+  failed-agent transcript access. Browser/CDP covers 156 frames, Electron
   drives both mixed lists, and nine collaboration scenes gate ten current-build
   regions: panel/summary/transcript crops pass between 1.33% and 4.67%, while
   the compact main-activity crop passes at 11.50% under its independent 12.5%
@@ -310,7 +316,7 @@ internal baselines cover the fence, table, running tail, and completed tail.
 An isolated 18-column runtime follow-up then reaches Copy, Expand, and Table
 preview on the same build. `AgentMarkdown` copies exact raw Markdown plus HTML,
 and `allowWideTables` opts into the measured 1665.86px table, hover/focus rail,
-and viewport preview. Browser/CDP now covers 155 frames; Electron repeats copy,
+and viewport preview. Browser/CDP now covers 156 frames; Electron repeats copy,
 horizontal wheel, open/close, focus restoration, and 720×680 action
 reachability; three reviewed internal baselines pass. A local-only 1180×820 reference gates the owned preview and
 close regions at 3.9737% and 0.5929% under 4% and 1% ceilings. Images, math,
@@ -349,7 +355,7 @@ separately evidenced current contracts in one public state model: Web Search,
 Browser open/find, OpenAI Developer Docs Search → Fetch, a completed command,
 pending-to-approved command approval, an applied file change with Review, and
 one delegated audit. Eight lifecycle checkpoints plus a 720×680 final scene
-bring the shared Browser/CDP and reviewed-pixel matrix to 155 frames; Electron
+bring the shared Browser/CDP and reviewed-pixel matrix to 156 frames; Electron
 opens the search, Browser, MCP, Review, and subagent transcript surfaces before
 performing a native compact resize. The nine rasters are internal regression
 baselines. This closes the independent mixed-composition gap without claiming

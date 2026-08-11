@@ -182,7 +182,7 @@ describe("current baseline capture contract", () => {
           clientHeight: 705,
           overflowY: "auto",
           rect: { height: 705 },
-          scrollHeight: 1011,
+          scrollHeight: 949,
         },
       ],
     );
@@ -195,7 +195,7 @@ describe("current baseline capture contract", () => {
           clientHeight: 565,
           overflowY: "auto",
           rect: { height: 565 },
-          scrollHeight: 971,
+          scrollHeight: 909,
         },
       ],
     );
@@ -248,28 +248,28 @@ describe("current baseline capture contract", () => {
     };
     const record = {
       baseline: {
-        appAsarBytes: 223_450_200,
+        appAsarBytes: 223_451_508,
         appAsarSha256:
-          "5f6e773aafd542d3cf09e10b5dca6cabd301d0a155f4b8ce870e3915fc3da25e",
-        appVersion: "26.803.41515",
-        buildNumber: "6321",
+          "928129601e8b36eccba603114d6912352f2b13182f3a7d60b32166d0e81aafb5",
+        appVersion: "26.803.61601",
+        buildNumber: "6396",
         chromiumVersion: "151.0.7922.76",
       },
       captureKind: "renderer_emulation",
       runtimeBundleIdentity: {
         afterCapture: {
-          appAsarBytes: 223_450_200,
+          appAsarBytes: 223_451_508,
           appAsarSha256:
-            "5f6e773aafd542d3cf09e10b5dca6cabd301d0a155f4b8ce870e3915fc3da25e",
+            "928129601e8b36eccba603114d6912352f2b13182f3a7d60b32166d0e81aafb5",
           changedAtMs: 1_786_150_111_000,
           checkedAtMs: 1_786_351_000_000,
           device: "16777231",
           inode: "341558647",
         },
         beforeCapture: {
-          appAsarBytes: 223_450_200,
+          appAsarBytes: 223_451_508,
           appAsarSha256:
-            "5f6e773aafd542d3cf09e10b5dca6cabd301d0a155f4b8ce870e3915fc3da25e",
+            "928129601e8b36eccba603114d6912352f2b13182f3a7d60b32166d0e81aafb5",
           changedAtMs: 1_786_150_111_000,
           checkedAtMs: 1_786_350_900_000,
           device: "16777231",
@@ -356,7 +356,7 @@ describe("current baseline capture contract", () => {
     };
 
     expect(() => assertCurrentBaselineRecord(record)).not.toThrow();
-    expect(currentBaselineFingerprint.appVersion).toBe("26.803.41515");
+    expect(currentBaselineFingerprint.appVersion).toBe("26.803.61601");
     expect(currentBaselineViewports.compact.width).toBe(720);
     expect(() =>
       assertCurrentSidebarLifecycle({
@@ -476,6 +476,24 @@ describe("current baseline capture contract", () => {
           wideNewChat: {
             ...record.states.wideNewChat,
             navigationScrollOwners: [],
+          },
+        },
+      }),
+    ).toThrow("sidebar scroll ownership");
+    expect(() =>
+      assertCurrentBaselineRecord({
+        ...record,
+        states: {
+          ...record.states,
+          wideNewChat: {
+            ...record.states.wideNewChat,
+            navigationScrollOwners: [
+              {
+                ...(record.states.wideNewChat
+                  .navigationScrollOwners[0] as Record<string, unknown>),
+                scrollHeight: 705,
+              },
+            ],
           },
         },
       }),

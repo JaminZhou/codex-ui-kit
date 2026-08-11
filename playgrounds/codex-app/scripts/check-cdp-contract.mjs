@@ -155,6 +155,109 @@ for (const scene of visualScenes) {
         `${JSON.stringify(lightShell, null, 2)}\n`,
       );
     }
+    if (scene.id === "current-dark-shell") {
+      const darkShell = await page.evaluate(() => {
+        const metric = (selector) => {
+          const element = document.querySelector(selector);
+          if (!(element instanceof HTMLElement)) return null;
+          const value = element.getBoundingClientRect();
+          const style = getComputedStyle(element);
+          return {
+            backgroundColor: style.backgroundColor,
+            color: style.color,
+            height: value.height,
+            width: value.width,
+          };
+        };
+        const control = (label) => {
+          const element = document.querySelector(`[aria-label="${label}"]`);
+          if (!(element instanceof HTMLButtonElement)) return null;
+          const value = element.getBoundingClientRect();
+          return {
+            cursor: getComputedStyle(element).cursor,
+            disabled: element.disabled,
+            height: value.height,
+            width: value.width,
+          };
+        };
+        return {
+          back: control("Back"),
+          colorScheme: getComputedStyle(document.documentElement).colorScheme,
+          composer: metric(".codex-ui-composer"),
+          composerIcons: Array.from(
+            document.querySelectorAll(
+              ".codex-ui-composer [data-current-build-icon]",
+            ),
+            (icon) => icon.getAttribute("data-current-build-icon"),
+          ),
+          contextIcons: Array.from(
+            document.querySelectorAll(
+              ".codex-ui-conversation-context-bar [data-current-build-icon]",
+            ),
+            (icon) => icon.getAttribute("data-current-build-icon"),
+          ),
+          forward: control("Forward"),
+          horizontalOverflow:
+            document.documentElement.scrollWidth -
+            document.documentElement.clientWidth,
+          htmlTheme: document.documentElement.dataset.theme,
+          main: metric(".codex-ui-app-shell__main"),
+          newChatCurrent: document
+            .querySelector(".demo-sidebar-new-chat")
+            ?.getAttribute("aria-current"),
+          rootTheme: document
+            .querySelector(".demo-root")
+            ?.getAttribute("data-theme"),
+          sidebar: metric(".codex-ui-app-shell__sidebar"),
+          workspace: metric(".demo-workspace-route"),
+        };
+      });
+      if (
+        darkShell.colorScheme !== "dark" ||
+        darkShell.htmlTheme !== "dark" ||
+        darkShell.rootTheme !== "dark" ||
+        darkShell.horizontalOverflow > 1 ||
+        darkShell.main?.backgroundColor !== "rgb(24, 24, 24)" ||
+        darkShell.workspace?.backgroundColor !== "rgb(24, 24, 24)" ||
+        darkShell.main?.width !== 906 ||
+        darkShell.workspace?.height !== 774 ||
+        darkShell.sidebar?.width !== 274 ||
+        darkShell.sidebar?.height !== 820 ||
+        darkShell.composer?.width !== 736 ||
+        darkShell.composer?.height !== 98 ||
+        darkShell.newChatCurrent !== "page" ||
+        !darkShell.back?.disabled ||
+        darkShell.back.cursor !== "not-allowed" ||
+        darkShell.back.width !== 28 ||
+        darkShell.back.height !== 28 ||
+        !darkShell.forward?.disabled ||
+        darkShell.forward.cursor !== "not-allowed" ||
+        darkShell.forward.width !== 28 ||
+        darkShell.forward.height !== 28 ||
+        JSON.stringify(darkShell.contextIcons) !==
+          JSON.stringify([
+            "composer-project",
+            "composer-worktree",
+            "composer-branch",
+          ]) ||
+        JSON.stringify(darkShell.composerIcons) !==
+          JSON.stringify([
+            "composer-add-files",
+            "composer-permission",
+            "composer-model-chevron",
+            "composer-dictate",
+            "composer-voice",
+          ])
+      ) {
+        throw new Error(
+          `Current dark shell contract failed: ${JSON.stringify(darkShell)}`,
+        );
+      }
+      await writeFile(
+        join(artifactDirectory, "current-dark-shell.json"),
+        `${JSON.stringify(darkShell, null, 2)}\n`,
+      );
+    }
     if (
       currentReplayComposerScenarios.has(scene.scenario) ||
       currentApprovalComposerScenes.has(scene.id)

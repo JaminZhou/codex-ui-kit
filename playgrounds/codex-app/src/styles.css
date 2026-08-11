@@ -884,9 +884,16 @@ textarea {
 
 .demo-sidebar-new-chat-row {
   align-items: center;
+  border-radius: 12.5px;
   display: grid;
   grid-template-columns: minmax(0, 1fr) 20px;
   height: 30px;
+}
+
+.demo-sidebar-new-chat-row:has(
+    .demo-sidebar-new-chat[aria-current="page"]
+  ) {
+  background: var(--demo-shell-hover);
 }
 
 .demo-sidebar-new-chat {

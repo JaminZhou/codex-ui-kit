@@ -63,8 +63,8 @@ node scripts/capture-current-visual-assets.mjs
 ```
 
 After reviewing that de-identified output, `pnpm update:visual-assets` performs
-the deterministic promotion and rewrites every explicitly promoted entry (17
-for the `26.803.41515` baseline). An unchanged app fingerprint requires a
+the deterministic promotion and rewrites every explicitly promoted entry (37
+for the `26.803.61601` baseline). An unchanged app fingerprint requires a
 complete ordered one-to-one primitive and root-geometry match. A changed
 fingerprint may refresh geometry only through a fixed semantic ID; the dynamic
 project-folder glyph instead requires an explicit current-build geometry seed,
@@ -122,15 +122,16 @@ sanitizer covers the de-identified font-style samples and all promoted icon styl
 attributes, class names, view boxes, and render sizes before capture output.
 Process/profile setup and exact-PID cleanup remain explicit operator steps.
 
-The current manifest fingerprints Codex Desktop `26.803.41515` (`6321`) and
-contains 25 runtime-observed sidebar/window-chrome/Composer icons: Sidebar,
+The current manifest fingerprints Codex Desktop `26.803.61601` (`6396`) and
+contains 37 runtime-observed sidebar/menu/window-chrome/Composer icons: Sidebar,
 Back, Forward, mode chevron, Search, neutral
 Activity, New chat, Quick chat, project folder, Pull requests, Sites,
 Scheduled, Plugins, More, Pin, Archive, Help, Composer Project, Worktree,
-Branch, Add files, Permission, Model chevron, Dictate, and Voice. The current build confirms
+Branch, Add files, Permission, Model chevron, Dictate, Voice, and the twelve
+project/Help menu primitives. The current build confirms
 that Settings is absent from the sampled footer and that sampled project-task
 and Recents rows have no leading glyph. The scoped visible-shell approximation
 list is now empty, but the broader inventory and current-build lifecycle
 denominator remain incomplete, so global pixel parity is still ineligible. See
-[`26.803.41515.md`](26.803.41515.md) for the scoped probe evidence and its
+[`26.803.61601.md`](26.803.61601.md) for the scoped probe evidence and its
 separation from the broader UI inventory baseline.

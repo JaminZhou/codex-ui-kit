@@ -2,21 +2,21 @@
   "schemaVersion": 1,
   "geometryHashVersion": 4,
   "baseline": {
-    "appAsarSha256": "5f6e773aafd542d3cf09e10b5dca6cabd301d0a155f4b8ce870e3915fc3da25e",
-    "appVersion": "26.803.41515",
-    "buildNumber": "6321",
+    "appAsarSha256": "928129601e8b36eccba603114d6912352f2b13182f3a7d60b32166d0e81aafb5",
+    "appVersion": "26.803.61601",
+    "buildNumber": "6396",
     "interactionState": "resting-and-open-sidebar-menus",
     "theme": "dark",
     "viewport": {
       "height": 820,
       "width": 1180
     },
-    "capturedAt": "2026-08-10"
+    "capturedAt": "2026-08-11"
   },
   "sidebarObservation": {
     "footerHelpControlCount": 1,
     "settingsControlCount": 0,
-    "projectTaskActionRowCount": 7,
+    "projectTaskActionRowCount": 6,
     "projectTaskLeadingSvgCount": 0,
     "recentsSectionCount": 1,
     "recentsTaskActionRowCount": 6,
@@ -1026,7 +1026,7 @@
       "sourceClassName": "icon-xs shrink-0",
       "status": "runtime-observed",
       "viewBox": "0 0 16 16",
-      "sha256": "dc728af9e7d4a6677fb3f5f19f81fd8b8edc8122ee3e2f8c0e8ac7cb6d8a3895"
+      "sha256": "e2ae3421709e29e24968d744e9107d95a509516c86b7f82d1cf97297c954881d"
     },
     {
       "id": "composer-worktree",
@@ -2008,7 +2008,7 @@
       "sourceClassName": "icon-xs",
       "status": "runtime-observed",
       "viewBox": "0 0 21 21",
-      "sha256": "8d2fb37770d5f2e2f2640a491ea3fed0c48b97f1de757a7310b031ea191f8453"
+      "sha256": "4cd78209044dc5749afeca04c35cceef37206680dd2b33cbaf4c10de1f3ffc4d"
     },
     {
       "id": "composer-branch",
@@ -4939,7 +4939,7 @@
       "sourceClassName": "icon-xs",
       "status": "runtime-observed",
       "viewBox": "0 0 20 20",
-      "sha256": "ae39108d56d7ead94b208b230e0f580ec191684fced8ba804f744811fdf8e586"
+      "sha256": "371115afd4d140efd03b3570ba18f60f870bdb6873c2a0f92b936d615d95212a"
     },
     {
       "id": "composer-add-files",
@@ -5333,7 +5333,7 @@
             "scroll-target-group": "none",
             "scroll-timeline-axis": "block",
             "scroll-timeline-name": "none",
-            "scrollbar-color": "rgba(255, 255, 255, 0.157) rgba(0, 0, 0, 0)",
+            "scrollbar-color": "rgba(255, 255, 255, 0.082) rgba(0, 0, 0, 0)",
             "scrollbar-gutter": "auto",
             "scrollbar-width": "auto",
             "shape-image-threshold": "0",
@@ -5823,7 +5823,7 @@
         "scroll-target-group": "none",
         "scroll-timeline-axis": "block",
         "scroll-timeline-name": "none",
-        "scrollbar-color": "rgba(255, 255, 255, 0.157) rgba(0, 0, 0, 0)",
+        "scrollbar-color": "rgba(255, 255, 255, 0.082) rgba(0, 0, 0, 0)",
         "scrollbar-gutter": "auto",
         "scrollbar-width": "auto",
         "shape-image-threshold": "0",
@@ -5920,7 +5920,7 @@
       "sourceClassName": "icon-xs text-token-text-primary",
       "status": "runtime-observed",
       "viewBox": "0 0 20 20",
-      "sha256": "992a79aa756481f1e5bcc280182bda399759027e3b9fd2c7b823c3ce363242b7"
+      "sha256": "a22bff28671e0fb7d2432b07e5c25b3a075623df080b7d4e133fdb5104023ee3"
     },
     {
       "id": "composer-permission",
@@ -6317,7 +6317,7 @@
             "scroll-target-group": "none",
             "scroll-timeline-axis": "block",
             "scroll-timeline-name": "none",
-            "scrollbar-color": "rgba(255, 255, 255, 0.157) rgba(0, 0, 0, 0)",
+            "scrollbar-color": "rgba(255, 255, 255, 0.082) rgba(0, 0, 0, 0)",
             "scrollbar-gutter": "auto",
             "scrollbar-width": "auto",
             "shape-image-threshold": "0",
@@ -6801,7 +6801,7 @@
             "scroll-target-group": "none",
             "scroll-timeline-axis": "block",
             "scroll-timeline-name": "none",
-            "scrollbar-color": "rgba(255, 255, 255, 0.157) rgba(0, 0, 0, 0)",
+            "scrollbar-color": "rgba(255, 255, 255, 0.082) rgba(0, 0, 0, 0)",
             "scrollbar-gutter": "auto",
             "scrollbar-width": "auto",
             "shape-image-threshold": "0",
@@ -7285,7 +7285,7 @@
             "scroll-target-group": "none",
             "scroll-timeline-axis": "block",
             "scroll-timeline-name": "none",
-            "scrollbar-color": "rgba(255, 255, 255, 0.157) rgba(0, 0, 0, 0)",
+            "scrollbar-color": "rgba(255, 255, 255, 0.082) rgba(0, 0, 0, 0)",
             "scrollbar-gutter": "auto",
             "scrollbar-width": "auto",
             "shape-image-threshold": "0",
@@ -7775,7 +7775,7 @@
         "scroll-target-group": "none",
         "scroll-timeline-axis": "block",
         "scroll-timeline-name": "none",
-        "scrollbar-color": "rgba(255, 255, 255, 0.157) rgba(0, 0, 0, 0)",
+        "scrollbar-color": "rgba(255, 255, 255, 0.082) rgba(0, 0, 0, 0)",
         "scrollbar-gutter": "auto",
         "scrollbar-width": "auto",
         "shape-image-threshold": "0",
@@ -7872,7 +7872,7 @@
       "sourceClassName": "icon-xs shrink-0 text-token-editor-warning-foreground",
       "status": "runtime-observed",
       "viewBox": "0 0 20 20",
-      "sha256": "c0361a0cde4c7cb4796b0cd8386eb1931ee679147d4526d21ca6073351e45394"
+      "sha256": "dc76d5297fd1275135ac33ff5c231a907de85bc11da40ee24a46a1e77d3fe838"
     },
     {
       "id": "composer-model-chevron",
@@ -8266,7 +8266,7 @@
             "scroll-target-group": "none",
             "scroll-timeline-axis": "block",
             "scroll-timeline-name": "none",
-            "scrollbar-color": "rgba(255, 255, 255, 0.157) rgba(0, 0, 0, 0)",
+            "scrollbar-color": "rgba(255, 255, 255, 0.082) rgba(0, 0, 0, 0)",
             "scrollbar-gutter": "auto",
             "scrollbar-width": "auto",
             "shape-image-threshold": "0",
@@ -8756,7 +8756,7 @@
         "scroll-target-group": "none",
         "scroll-timeline-axis": "block",
         "scroll-timeline-name": "none",
-        "scrollbar-color": "rgba(255, 255, 255, 0.157) rgba(0, 0, 0, 0)",
+        "scrollbar-color": "rgba(255, 255, 255, 0.082) rgba(0, 0, 0, 0)",
         "scrollbar-gutter": "auto",
         "scrollbar-width": "auto",
         "shape-image-threshold": "0",
@@ -8853,7 +8853,7 @@
       "sourceClassName": "me-0.5 h-3.5 w-3.5 shrink-0 text-token-text-tertiary",
       "status": "runtime-observed",
       "viewBox": "0 0 16 16",
-      "sha256": "b6ef8369e2b2e40167265d3288d97f5e494e08420806d1dddd17587b681b04d8"
+      "sha256": "89956174edb87694ee5c41b0a2b6b18ef69a7ae5da504d58774007aadfc89940"
     },
     {
       "id": "composer-dictate",
@@ -9251,7 +9251,7 @@
                 "scroll-target-group": "none",
                 "scroll-timeline-axis": "block",
                 "scroll-timeline-name": "none",
-                "scrollbar-color": "rgba(255, 255, 255, 0.157) rgba(0, 0, 0, 0)",
+                "scrollbar-color": "rgba(255, 255, 255, 0.082) rgba(0, 0, 0, 0)",
                 "scrollbar-gutter": "auto",
                 "scrollbar-width": "auto",
                 "shape-image-threshold": "0",
@@ -9736,7 +9736,7 @@
                 "scroll-target-group": "none",
                 "scroll-timeline-axis": "block",
                 "scroll-timeline-name": "none",
-                "scrollbar-color": "rgba(255, 255, 255, 0.157) rgba(0, 0, 0, 0)",
+                "scrollbar-color": "rgba(255, 255, 255, 0.082) rgba(0, 0, 0, 0)",
                 "scrollbar-gutter": "auto",
                 "scrollbar-width": "auto",
                 "shape-image-threshold": "0",
@@ -10216,7 +10216,7 @@
             "scroll-target-group": "none",
             "scroll-timeline-axis": "block",
             "scroll-timeline-name": "none",
-            "scrollbar-color": "rgba(255, 255, 255, 0.157) rgba(0, 0, 0, 0)",
+            "scrollbar-color": "rgba(255, 255, 255, 0.082) rgba(0, 0, 0, 0)",
             "scrollbar-gutter": "auto",
             "scrollbar-width": "auto",
             "shape-image-threshold": "0",
@@ -10706,7 +10706,7 @@
         "scroll-target-group": "none",
         "scroll-timeline-axis": "block",
         "scroll-timeline-name": "none",
-        "scrollbar-color": "rgba(255, 255, 255, 0.157) rgba(0, 0, 0, 0)",
+        "scrollbar-color": "rgba(255, 255, 255, 0.082) rgba(0, 0, 0, 0)",
         "scrollbar-gutter": "auto",
         "scrollbar-width": "auto",
         "shape-image-threshold": "0",
@@ -10803,7 +10803,7 @@
       "sourceClassName": "icon-xs text-token-text-primary",
       "status": "runtime-observed",
       "viewBox": "0 0 20 20",
-      "sha256": "d305024f62d05a2d4a2682ba006c48571a40825cd54740f83f4a8f4a1b66b93d"
+      "sha256": "39e73dc6ee074b174130eab37d29116eaab36137bc7f02307ef4f7a67cb5134c"
     },
     {
       "id": "composer-voice",
@@ -11196,7 +11196,7 @@
             "scroll-target-group": "none",
             "scroll-timeline-axis": "block",
             "scroll-timeline-name": "none",
-            "scrollbar-color": "rgba(255, 255, 255, 0.157) rgba(0, 0, 0, 0)",
+            "scrollbar-color": "rgba(255, 255, 255, 0.082) rgba(0, 0, 0, 0)",
             "scrollbar-gutter": "auto",
             "scrollbar-width": "auto",
             "shape-image-threshold": "0",
@@ -11679,7 +11679,7 @@
             "scroll-target-group": "none",
             "scroll-timeline-axis": "block",
             "scroll-timeline-name": "none",
-            "scrollbar-color": "rgba(255, 255, 255, 0.157) rgba(0, 0, 0, 0)",
+            "scrollbar-color": "rgba(255, 255, 255, 0.082) rgba(0, 0, 0, 0)",
             "scrollbar-gutter": "auto",
             "scrollbar-width": "auto",
             "shape-image-threshold": "0",
@@ -12162,7 +12162,7 @@
             "scroll-target-group": "none",
             "scroll-timeline-axis": "block",
             "scroll-timeline-name": "none",
-            "scrollbar-color": "rgba(255, 255, 255, 0.157) rgba(0, 0, 0, 0)",
+            "scrollbar-color": "rgba(255, 255, 255, 0.082) rgba(0, 0, 0, 0)",
             "scrollbar-gutter": "auto",
             "scrollbar-width": "auto",
             "shape-image-threshold": "0",
@@ -12645,7 +12645,7 @@
             "scroll-target-group": "none",
             "scroll-timeline-axis": "block",
             "scroll-timeline-name": "none",
-            "scrollbar-color": "rgba(255, 255, 255, 0.157) rgba(0, 0, 0, 0)",
+            "scrollbar-color": "rgba(255, 255, 255, 0.082) rgba(0, 0, 0, 0)",
             "scrollbar-gutter": "auto",
             "scrollbar-width": "auto",
             "shape-image-threshold": "0",
@@ -13128,7 +13128,7 @@
             "scroll-target-group": "none",
             "scroll-timeline-axis": "block",
             "scroll-timeline-name": "none",
-            "scrollbar-color": "rgba(255, 255, 255, 0.157) rgba(0, 0, 0, 0)",
+            "scrollbar-color": "rgba(255, 255, 255, 0.082) rgba(0, 0, 0, 0)",
             "scrollbar-gutter": "auto",
             "scrollbar-width": "auto",
             "shape-image-threshold": "0",
@@ -13618,7 +13618,7 @@
         "scroll-target-group": "none",
         "scroll-timeline-axis": "block",
         "scroll-timeline-name": "none",
-        "scrollbar-color": "rgba(255, 255, 255, 0.157) rgba(0, 0, 0, 0)",
+        "scrollbar-color": "rgba(255, 255, 255, 0.082) rgba(0, 0, 0, 0)",
         "scrollbar-gutter": "auto",
         "scrollbar-width": "auto",
         "shape-image-threshold": "0",
@@ -13715,7 +13715,7 @@
       "sourceClassName": "icon-xs text-token-dropdown-background",
       "status": "runtime-observed",
       "viewBox": "0 0 16 16",
-      "sha256": "b8b4a1b766f2bde932a87fb402148f6bed8066cca34d381bf63ca6e214a31e03"
+      "sha256": "d660b110421dc3f0d57f2f04c91c55159ddfc7f38b711d4af9c90d0db3041cf4"
     },
     {
       "id": "window-chrome-sidebar",
@@ -14697,7 +14697,7 @@
       "sourceClassName": "icon-xs",
       "status": "runtime-observed",
       "viewBox": "0 0 20 20",
-      "sha256": "6dff9f099accdf3ce89144941868aee97ab3c1927d3ba562aafa883cd00500a6"
+      "sha256": "f9c3c64e598ec132aee21f40c1f0542754f37ad8163a4daf78a0566a119d41a1"
     },
     {
       "id": "window-chrome-back",
@@ -14879,7 +14879,7 @@
             "counter-increment": "none",
             "counter-reset": "none",
             "counter-set": "none",
-            "cursor": "default",
+            "cursor": "not-allowed",
             "cx": "0px",
             "cy": "0px",
             "d": "path(\"M 8.8011 3.611 C 9.05912 3.44087 9.40989 3.46898 9.63703 3.69596 C 9.89673 3.95566 9.89673 4.37767 9.63703 4.63737 L 4.93977 9.33463 H 16.6663 L 16.8011 9.34831 C 17.1038 9.41043 17.3312 9.67859 17.3314 9.99967 C 17.3314 10.3209 17.1039 10.5888 16.8011 10.651 L 16.6663 10.6647 H 4.93879 L 9.63703 15.363 L 9.722 15.4674 C 9.89241 15.7255 9.86413 16.0761 9.63703 16.3034 C 9.40981 16.5306 9.05921 16.5587 8.8011 16.3883 L 8.69661 16.3034 L 2.86262 10.4704 C 2.60319 10.2108 2.6033 9.78962 2.86262 9.52995 L 8.69661 3.69596 L 8.8011 3.611 Z\")",
@@ -15369,7 +15369,7 @@
         "counter-increment": "none",
         "counter-reset": "none",
         "counter-set": "none",
-        "cursor": "default",
+        "cursor": "not-allowed",
         "cx": "0px",
         "cy": "0px",
         "d": "none",
@@ -15678,7 +15678,7 @@
       "sourceClassName": "icon-xs",
       "status": "runtime-observed",
       "viewBox": "0 0 20 20",
-      "sha256": "d074e18796c059a66b594c1c28ea70639a167a8c31dcf73abbf9661b68af3486"
+      "sha256": "67e9ceb053f215b7369b540322cf13794f02fa839466f44087062f1ef31e8868"
     },
     {
       "id": "window-chrome-forward",
@@ -16659,7 +16659,7 @@
       "sourceClassName": "icon-xs -scale-x-100",
       "status": "runtime-observed",
       "viewBox": "0 0 20 20",
-      "sha256": "4e805f0664cb48ffa4a2979bc1f7d82a908ac3f95c5d26db0928117f5c84bfcf"
+      "sha256": "c895e32f986de2370198e061779d7c13717e70e25094ff8a07083fa106c4dbec"
     },
     {
       "id": "sidebar-mode-chevron",
@@ -17642,7 +17642,7 @@
       "sourceClassName": "icon-2xs shrink-0 text-token-input-placeholder-foreground",
       "status": "runtime-observed",
       "viewBox": "0 0 20 21",
-      "sha256": "3921be1145df3aca8c92d4eff4c94f9826194e7a0fd98c0db363f540061b1a76"
+      "sha256": "8b7ff2734407cd0dceca3388644a6afdfe51d06de8e8d116f62f6144673b7523"
     },
     {
       "id": "sidebar-search",
@@ -18625,7 +18625,7 @@
       "sourceClassName": "icon-xs",
       "status": "runtime-observed",
       "viewBox": "0 0 16 16",
-      "sha256": "8dafba430c99e45e0751c1155a8acb8498ed105f2452c4506ebc8b48b72bb120"
+      "sha256": "87c086f8ded359c3caba6242b297d0b5c33ea5d24c0d742b654a46a5c095a010"
     },
     {
       "id": "sidebar-activity",
@@ -19608,7 +19608,7 @@
       "sourceClassName": "icon-xs",
       "status": "runtime-observed",
       "viewBox": "0 0 20 20",
-      "sha256": "d6c38c62677f20ba54b8725ca20e098f4ebbd8d56e0cc6541c49e510c969a7a4"
+      "sha256": "ae99766dc9da3e6d37b0c13a3499e3d486cdc946cc9da14edb217fcb9e180fd7"
     },
     {
       "id": "sidebar-new-chat",
@@ -21076,7 +21076,7 @@
       "sourceClassName": "icon-xs",
       "status": "runtime-observed",
       "viewBox": "0 0 16 16",
-      "sha256": "6da4b08dd506d09771644f1986d5e3a19011a19e2fbe34f217b180b354e6f572"
+      "sha256": "f129210e1208c1ae84c4a22690eaf9e5443ff5defba2ffdfcfd30196a11037de"
     },
     {
       "id": "sidebar-quick-chat",
@@ -22539,7 +22539,7 @@
       "sourceClassName": "icon-xs",
       "status": "runtime-observed",
       "viewBox": "0 0 20 20",
-      "sha256": "d64837684b0bf85872aa228843c78ed7b345d3de1ccf647f6a3437acfa6a28b4"
+      "sha256": "8199f991c38cf8d5fa2bc392741c508f89a5319b2538c30438ec2d330186d66f"
     },
     {
       "id": "sidebar-folder",
@@ -22936,7 +22936,7 @@
             "scroll-target-group": "none",
             "scroll-timeline-axis": "block",
             "scroll-timeline-name": "none",
-            "scrollbar-color": "rgba(255, 255, 255, 0.157) rgba(0, 0, 0, 0)",
+            "scrollbar-color": "rgba(255, 255, 255, 0.082) rgba(0, 0, 0, 0)",
             "scrollbar-gutter": "auto",
             "scrollbar-width": "auto",
             "shape-image-threshold": "0",
@@ -23426,7 +23426,7 @@
         "scroll-target-group": "none",
         "scroll-timeline-axis": "block",
         "scroll-timeline-name": "none",
-        "scrollbar-color": "rgba(255, 255, 255, 0.157) rgba(0, 0, 0, 0)",
+        "scrollbar-color": "rgba(255, 255, 255, 0.082) rgba(0, 0, 0, 0)",
         "scrollbar-gutter": "auto",
         "scrollbar-width": "auto",
         "shape-image-threshold": "0",
@@ -23523,7 +23523,7 @@
       "sourceClassName": "icon-xs shrink-0",
       "status": "runtime-observed",
       "viewBox": "0 0 16 16",
-      "sha256": "430f5907f8eddad60bada8517b3c627cf2f78aa9dfe73eccbd77f9f01be55887"
+      "sha256": "2513b8791c29dd19679d09571f47b02d5608157e7f4893210c8cf6739d1d7332"
     },
     {
       "id": "sidebar-pull-request",
@@ -23917,7 +23917,7 @@
             "scroll-target-group": "none",
             "scroll-timeline-axis": "block",
             "scroll-timeline-name": "none",
-            "scrollbar-color": "rgba(255, 255, 255, 0.157) rgba(0, 0, 0, 0)",
+            "scrollbar-color": "rgba(255, 255, 255, 0.082) rgba(0, 0, 0, 0)",
             "scrollbar-gutter": "auto",
             "scrollbar-width": "auto",
             "shape-image-threshold": "0",
@@ -24407,7 +24407,7 @@
         "scroll-target-group": "none",
         "scroll-timeline-axis": "block",
         "scroll-timeline-name": "none",
-        "scrollbar-color": "rgba(255, 255, 255, 0.157) rgba(0, 0, 0, 0)",
+        "scrollbar-color": "rgba(255, 255, 255, 0.082) rgba(0, 0, 0, 0)",
         "scrollbar-gutter": "auto",
         "scrollbar-width": "auto",
         "shape-image-threshold": "0",
@@ -24504,7 +24504,7 @@
       "sourceClassName": "icon-xs",
       "status": "runtime-observed",
       "viewBox": "0 0 21 21",
-      "sha256": "e63380122ea8c56871c96173161a5ce165f2f4f11ce396159cd2105fc8d116e0"
+      "sha256": "7a938bf078f45c7451e1890f9748089fb3fb15f94ca91381d185023997dfc649"
     },
     {
       "id": "sidebar-sites",
@@ -24901,7 +24901,7 @@
             "scroll-target-group": "none",
             "scroll-timeline-axis": "block",
             "scroll-timeline-name": "none",
-            "scrollbar-color": "rgba(255, 255, 255, 0.157) rgba(0, 0, 0, 0)",
+            "scrollbar-color": "rgba(255, 255, 255, 0.082) rgba(0, 0, 0, 0)",
             "scrollbar-gutter": "auto",
             "scrollbar-width": "auto",
             "shape-image-threshold": "0",
@@ -25387,7 +25387,7 @@
             "scroll-target-group": "none",
             "scroll-timeline-axis": "block",
             "scroll-timeline-name": "none",
-            "scrollbar-color": "rgba(255, 255, 255, 0.157) rgba(0, 0, 0, 0)",
+            "scrollbar-color": "rgba(255, 255, 255, 0.082) rgba(0, 0, 0, 0)",
             "scrollbar-gutter": "auto",
             "scrollbar-width": "auto",
             "shape-image-threshold": "0",
@@ -25873,7 +25873,7 @@
             "scroll-target-group": "none",
             "scroll-timeline-axis": "block",
             "scroll-timeline-name": "none",
-            "scrollbar-color": "rgba(255, 255, 255, 0.157) rgba(0, 0, 0, 0)",
+            "scrollbar-color": "rgba(255, 255, 255, 0.082) rgba(0, 0, 0, 0)",
             "scrollbar-gutter": "auto",
             "scrollbar-width": "auto",
             "shape-image-threshold": "0",
@@ -26363,7 +26363,7 @@
         "scroll-target-group": "none",
         "scroll-timeline-axis": "block",
         "scroll-timeline-name": "none",
-        "scrollbar-color": "rgba(255, 255, 255, 0.157) rgba(0, 0, 0, 0)",
+        "scrollbar-color": "rgba(255, 255, 255, 0.082) rgba(0, 0, 0, 0)",
         "scrollbar-gutter": "auto",
         "scrollbar-width": "auto",
         "shape-image-threshold": "0",
@@ -26460,7 +26460,7 @@
       "sourceClassName": "icon-xs",
       "status": "runtime-observed",
       "viewBox": "0 0 16 16",
-      "sha256": "7553fe59289e8e59d5f7eeb8471b44e2dd318f2bcfbf6b2355fc6a2515d395fa"
+      "sha256": "df3fb714ea30e3989d17c84fc1eb24c68d1b70f99a09e35566754780bde71297"
     },
     {
       "id": "sidebar-scheduled",
@@ -26855,7 +26855,7 @@
             "scroll-target-group": "none",
             "scroll-timeline-axis": "block",
             "scroll-timeline-name": "none",
-            "scrollbar-color": "rgba(255, 255, 255, 0.157) rgba(0, 0, 0, 0)",
+            "scrollbar-color": "rgba(255, 255, 255, 0.082) rgba(0, 0, 0, 0)",
             "scrollbar-gutter": "auto",
             "scrollbar-width": "auto",
             "shape-image-threshold": "0",
@@ -27341,7 +27341,7 @@
             "scroll-target-group": "none",
             "scroll-timeline-axis": "block",
             "scroll-timeline-name": "none",
-            "scrollbar-color": "rgba(255, 255, 255, 0.157) rgba(0, 0, 0, 0)",
+            "scrollbar-color": "rgba(255, 255, 255, 0.082) rgba(0, 0, 0, 0)",
             "scrollbar-gutter": "auto",
             "scrollbar-width": "auto",
             "shape-image-threshold": "0",
@@ -27831,7 +27831,7 @@
         "scroll-target-group": "none",
         "scroll-timeline-axis": "block",
         "scroll-timeline-name": "none",
-        "scrollbar-color": "rgba(255, 255, 255, 0.157) rgba(0, 0, 0, 0)",
+        "scrollbar-color": "rgba(255, 255, 255, 0.082) rgba(0, 0, 0, 0)",
         "scrollbar-gutter": "auto",
         "scrollbar-width": "auto",
         "shape-image-threshold": "0",
@@ -27928,7 +27928,7 @@
       "sourceClassName": "icon-xs",
       "status": "runtime-observed",
       "viewBox": "0 0 16 16",
-      "sha256": "31b0baed75e471e961547ae1c878a5fc3b5b6192352aec00fb50b045ce14cfd1"
+      "sha256": "588745b74cb8ea71d8e3469464548c555a4fa2116be999328267862d4148ea58"
     },
     {
       "id": "sidebar-plugins",
@@ -28325,7 +28325,7 @@
             "scroll-target-group": "none",
             "scroll-timeline-axis": "block",
             "scroll-timeline-name": "none",
-            "scrollbar-color": "rgba(255, 255, 255, 0.157) rgba(0, 0, 0, 0)",
+            "scrollbar-color": "rgba(255, 255, 255, 0.082) rgba(0, 0, 0, 0)",
             "scrollbar-gutter": "auto",
             "scrollbar-width": "auto",
             "shape-image-threshold": "0",
@@ -28815,7 +28815,7 @@
         "scroll-target-group": "none",
         "scroll-timeline-axis": "block",
         "scroll-timeline-name": "none",
-        "scrollbar-color": "rgba(255, 255, 255, 0.157) rgba(0, 0, 0, 0)",
+        "scrollbar-color": "rgba(255, 255, 255, 0.082) rgba(0, 0, 0, 0)",
         "scrollbar-gutter": "auto",
         "scrollbar-width": "auto",
         "shape-image-threshold": "0",
@@ -28912,7 +28912,7 @@
       "sourceClassName": "icon-xs",
       "status": "runtime-observed",
       "viewBox": "0 0 16 16",
-      "sha256": "8c8f5d51c809342d00ac95eb55a707ce51b198e57cc7802a0773b30fcc8f547b"
+      "sha256": "d97e515c6232a9a819f53882576aa69b7a1c7e74b08469a70ef0025bbcba7fd1"
     },
     {
       "id": "sidebar-more",
@@ -29307,7 +29307,7 @@
             "scroll-target-group": "none",
             "scroll-timeline-axis": "block",
             "scroll-timeline-name": "none",
-            "scrollbar-color": "rgba(255, 255, 255, 0.157) rgba(0, 0, 0, 0)",
+            "scrollbar-color": "rgba(255, 255, 255, 0.082) rgba(0, 0, 0, 0)",
             "scrollbar-gutter": "auto",
             "scrollbar-width": "auto",
             "shape-image-threshold": "0",
@@ -29791,7 +29791,7 @@
             "scroll-target-group": "none",
             "scroll-timeline-axis": "block",
             "scroll-timeline-name": "none",
-            "scrollbar-color": "rgba(255, 255, 255, 0.157) rgba(0, 0, 0, 0)",
+            "scrollbar-color": "rgba(255, 255, 255, 0.082) rgba(0, 0, 0, 0)",
             "scrollbar-gutter": "auto",
             "scrollbar-width": "auto",
             "shape-image-threshold": "0",
@@ -30275,7 +30275,7 @@
             "scroll-target-group": "none",
             "scroll-timeline-axis": "block",
             "scroll-timeline-name": "none",
-            "scrollbar-color": "rgba(255, 255, 255, 0.157) rgba(0, 0, 0, 0)",
+            "scrollbar-color": "rgba(255, 255, 255, 0.082) rgba(0, 0, 0, 0)",
             "scrollbar-gutter": "auto",
             "scrollbar-width": "auto",
             "shape-image-threshold": "0",
@@ -30765,7 +30765,7 @@
         "scroll-target-group": "none",
         "scroll-timeline-axis": "block",
         "scroll-timeline-name": "none",
-        "scrollbar-color": "rgba(255, 255, 255, 0.157) rgba(0, 0, 0, 0)",
+        "scrollbar-color": "rgba(255, 255, 255, 0.082) rgba(0, 0, 0, 0)",
         "scrollbar-gutter": "auto",
         "scrollbar-width": "auto",
         "shape-image-threshold": "0",
@@ -30862,7 +30862,7 @@
       "sourceClassName": "icon-xs",
       "status": "runtime-observed",
       "viewBox": "0 0 21 21",
-      "sha256": "27b2a817d2448bbc183889c621ac1bbeca4e183a05d57101a464e10cfcf48b28"
+      "sha256": "11d470c3aa49fd572a89b4d419920a489b0e19fbaa86213f47c338a8fa2c752c"
     },
     {
       "id": "sidebar-pin",
@@ -31257,7 +31257,7 @@
             "scroll-target-group": "none",
             "scroll-timeline-axis": "block",
             "scroll-timeline-name": "none",
-            "scrollbar-color": "rgba(255, 255, 255, 0.157) rgba(0, 0, 0, 0)",
+            "scrollbar-color": "rgba(255, 255, 255, 0.082) rgba(0, 0, 0, 0)",
             "scrollbar-gutter": "auto",
             "scrollbar-width": "auto",
             "shape-image-threshold": "0",
@@ -31747,7 +31747,7 @@
         "scroll-target-group": "none",
         "scroll-timeline-axis": "block",
         "scroll-timeline-name": "none",
-        "scrollbar-color": "rgba(255, 255, 255, 0.157) rgba(0, 0, 0, 0)",
+        "scrollbar-color": "rgba(255, 255, 255, 0.082) rgba(0, 0, 0, 0)",
         "scrollbar-gutter": "auto",
         "scrollbar-width": "auto",
         "shape-image-threshold": "0",
@@ -31844,7 +31844,7 @@
       "sourceClassName": "translate-x-px",
       "status": "runtime-observed",
       "viewBox": "0 0 20 20",
-      "sha256": "e9cf96e84f8afd4ef86705aa20840a62cfc90feff287cba977828204d76d3bb7"
+      "sha256": "564a81b7532bb00288f0c50c2f2a81a273b06a90571e829767be0d604e6a13ea"
     },
     {
       "id": "sidebar-archive",
@@ -32239,7 +32239,7 @@
             "scroll-target-group": "none",
             "scroll-timeline-axis": "block",
             "scroll-timeline-name": "none",
-            "scrollbar-color": "rgba(255, 255, 255, 0.157) rgba(0, 0, 0, 0)",
+            "scrollbar-color": "rgba(255, 255, 255, 0.082) rgba(0, 0, 0, 0)",
             "scrollbar-gutter": "auto",
             "scrollbar-width": "auto",
             "shape-image-threshold": "0",
@@ -32725,7 +32725,7 @@
             "scroll-target-group": "none",
             "scroll-timeline-axis": "block",
             "scroll-timeline-name": "none",
-            "scrollbar-color": "rgba(255, 255, 255, 0.157) rgba(0, 0, 0, 0)",
+            "scrollbar-color": "rgba(255, 255, 255, 0.082) rgba(0, 0, 0, 0)",
             "scrollbar-gutter": "auto",
             "scrollbar-width": "auto",
             "shape-image-threshold": "0",
@@ -33215,7 +33215,7 @@
         "scroll-target-group": "none",
         "scroll-timeline-axis": "block",
         "scroll-timeline-name": "none",
-        "scrollbar-color": "rgba(255, 255, 255, 0.157) rgba(0, 0, 0, 0)",
+        "scrollbar-color": "rgba(255, 255, 255, 0.082) rgba(0, 0, 0, 0)",
         "scrollbar-gutter": "auto",
         "scrollbar-width": "auto",
         "shape-image-threshold": "0",
@@ -33312,7 +33312,7 @@
       "sourceClassName": "",
       "status": "runtime-observed",
       "viewBox": "0 0 20 20",
-      "sha256": "e7694677f2ccc2fae7dbd64e40a119c00aac5c37ee300ad358be64a1f495b5ef"
+      "sha256": "44617f4dbff96e209152b758d3e68038e188c99c21550fa2ecb2db33331df0db"
     },
     {
       "id": "sidebar-help",
@@ -34777,7 +34777,7 @@
       "sourceClassName": "icon-sm",
       "status": "runtime-observed",
       "viewBox": "0 0 20 20",
-      "sha256": "5975de77de72a727ff22ff36359be6ae55c589b057527047cac952f8c053be27"
+      "sha256": "c6570bfd85b044e9ada422b5ae71c564e848101db9830dac685b87ca395eca66"
     },
     {
       "id": "sidebar-project-menu-unpin",
@@ -37207,7 +37207,7 @@
       "sourceClassName": "icon-xs shrink-0 opacity-75 group-focus:opacity-100 group-hover:opacity-100",
       "status": "runtime-observed",
       "viewBox": "0 0 20 20",
-      "sha256": "cce209ea71f7e49f4667d9b687dd2b0c958f76ee37cb8a9d8d4889bbb1fcd5a3"
+      "sha256": "a3bab86f65b803733cef600f57fa257f366a727a3d494f3fc252f875ddf46658"
     },
     {
       "id": "sidebar-project-menu-reveal",
@@ -38191,7 +38191,7 @@
       "sourceClassName": "icon-xs shrink-0 opacity-75 group-focus:opacity-100 group-hover:opacity-100",
       "status": "runtime-observed",
       "viewBox": "0 0 16 16",
-      "sha256": "34a73fcca42036789ce4953f33ad2d62c43c191ae2d01f6757c3db954e7df150"
+      "sha256": "fb98487420a41c700dcda3c1c98c7c4af7b6a13cdd6264992a8705ca3f7c5631"
     },
     {
       "id": "sidebar-project-menu-worktree",
@@ -39172,7 +39172,7 @@
       "sourceClassName": "icon-xs shrink-0 opacity-75 group-focus:opacity-100 group-hover:opacity-100",
       "status": "runtime-observed",
       "viewBox": "0 0 20 20",
-      "sha256": "bc1544cb2a137ed89e85ff59845865be4dee1843dcdd36387c1e5f8c76faa812"
+      "sha256": "90f75da3aad97970b477696e8133a3e3d38d695b22febffbeda73a7720e85da4"
     },
     {
       "id": "sidebar-project-menu-edit",
@@ -40642,7 +40642,7 @@
       "sourceClassName": "icon-xs shrink-0 opacity-75 group-focus:opacity-100 group-hover:opacity-100",
       "status": "runtime-observed",
       "viewBox": "0 0 20 20",
-      "sha256": "fb95a661bce200fd9ef3ce10e98eaf99bfcabccdc22a4f4ff953f699541d6c71"
+      "sha256": "aa6c03c20b35054db0614ecd9e734b5c3661996f5ed5045f2420c137bc3f3d56"
     },
     {
       "id": "sidebar-project-menu-archive",
@@ -42110,7 +42110,7 @@
       "sourceClassName": "icon-xs shrink-0 opacity-75 group-focus:opacity-100 group-hover:opacity-100",
       "status": "runtime-observed",
       "viewBox": "0 0 20 20",
-      "sha256": "8f51e3ed95972b3ba95d5bacb2110890dcacc7a09b1755828c4bffff317e382c"
+      "sha256": "c9f93eeb8a3304f4dd4671b3e97f21412ac723c925f7c6b1470569b850187664"
     },
     {
       "id": "sidebar-project-menu-remove",
@@ -43092,7 +43092,7 @@
       "sourceClassName": "icon-xs shrink-0 opacity-75 group-focus:opacity-100 group-hover:opacity-100",
       "status": "runtime-observed",
       "viewBox": "0 0 21 21",
-      "sha256": "bfe232cdff53350589c23d5538f5f0cedcaac14f3bf7e2764df6de2bbc0af8f0"
+      "sha256": "b350d76ffb0bcc6679932e91c9d76de9864e02f53e3db53685d767cd5961a720"
     },
     {
       "id": "sidebar-help-menu-release-note",
@@ -44076,7 +44076,7 @@
       "sourceClassName": "icon-xs text-token-text-tertiary shrink-0 opacity-75 group-focus:opacity-100 group-hover:opacity-100",
       "status": "runtime-observed",
       "viewBox": "0 0 20 21",
-      "sha256": "f1f5a566c2c0fb8bd7598be0de42b46ec6c73e162012b5fd9a12d85f53f60983"
+      "sha256": "421cfc3c61c02aa4de1549c3ca6f32afe16eb2635222c54a38ac891d835e66bb"
     },
     {
       "id": "sidebar-help-menu-changelog",
@@ -45060,7 +45060,7 @@
       "sourceClassName": "icon-xs shrink-0 opacity-75 group-focus:opacity-100 group-hover:opacity-100",
       "status": "runtime-observed",
       "viewBox": "0 0 20 21",
-      "sha256": "00c03ba56d97b5945781b07dfb86118da04b274f678c03235b914090d606e368"
+      "sha256": "60ef827b183b0caa7ae375539c7b6f37574d9b63aaa1b1daa9e8eb9db1ffdd1a"
     },
     {
       "id": "sidebar-help-menu-chrome",
@@ -47502,7 +47502,7 @@
       "sourceClassName": "icon-xs shrink-0 opacity-75 group-focus:opacity-100 group-hover:opacity-100",
       "status": "runtime-observed",
       "viewBox": "0 0 20 20",
-      "sha256": "b4cb7d9271986ce34e5f72e4a8a78f5a2b12a23770e42fafeb0d0cbb05b01250"
+      "sha256": "b0ea80c151577ac6fc848f8f82e53b35caade7c815f678c4d0fce3d26c0dd695"
     },
     {
       "id": "sidebar-help-menu-remote",
@@ -48970,7 +48970,7 @@
       "sourceClassName": "icon-xs shrink-0 opacity-75 group-focus:opacity-100 group-hover:opacity-100",
       "status": "runtime-observed",
       "viewBox": "0 0 16 16",
-      "sha256": "57bf39235b7cbd88b2b4444f1ab3a20386b45789843103ba9813d92d58290275"
+      "sha256": "97cf07ef2f49666f8c89314b816a5fa756711198a83066e53067e5a066ae198b"
     },
     {
       "id": "sidebar-help-menu-keyboard",
@@ -50441,7 +50441,7 @@
       "sourceClassName": "icon-xs shrink-0 opacity-75 group-focus:opacity-100 group-hover:opacity-100",
       "status": "runtime-observed",
       "viewBox": "0 0 24 24",
-      "sha256": "684211980f57a2fab5bb7c78cc50300a9cfee8bffa029319aac5149e4a0cb976"
+      "sha256": "74f62824a778cd8b17082211ec0d27d162868e691bf7989da04cd2d6eb5e96b4"
     },
     {
       "id": "sidebar-help-menu-support",
@@ -51425,7 +51425,7 @@
       "sourceClassName": "icon-xs shrink-0 opacity-75 group-focus:opacity-100 group-hover:opacity-100",
       "status": "runtime-observed",
       "viewBox": "0 0 21 21",
-      "sha256": "8f9d0e33a1607775c480276122daec52dfbfd1cd8daa872f4a2456ef4126b0b1"
+      "sha256": "71919bef5d1608a35c63aa9a608bb4ff0d9187487e3abae010d2e9102b933e52"
     }
   ],
   "remainingApproximationIds": [],

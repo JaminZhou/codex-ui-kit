@@ -204,6 +204,8 @@ const currentBuildSubagentNestedTranscriptReference =
   process.env.CODEX_UI_KIT_SUBAGENT_NESTED_TRANSCRIPT_REFERENCE;
 const currentBuildWorkspaceReference =
   process.env.CODEX_UI_KIT_WORKSPACE_REFERENCE;
+const currentDarkShellReference =
+  process.env.CODEX_UI_KIT_CURRENT_DARK_SHELL_REFERENCE;
 const currentBuildWorkspaceReferenceSize = {
   height: 820,
   width: 1180,
@@ -1005,6 +1007,89 @@ for (const scene of selectedScenes) {
     }
     console.log(
       `${scene.id}: current-build Composer icon pixel ratio ${composerIconRatio}`,
+    );
+  }
+
+  if (scene.id === "current-dark-shell" && currentDarkShellReference) {
+    const reference = flattenPng(
+      PNG.sync.read(await readFile(currentDarkShellReference)),
+      { blue: 24, green: 24, red: 24 },
+    );
+    if (
+      reference.width !== currentBuildWorkspaceReferenceSize.width ||
+      reference.height !== currentBuildWorkspaceReferenceSize.height ||
+      actual.width !== reference.width ||
+      actual.height !== reference.height
+    ) {
+      throw new Error(
+        `${scene.id}: current-build dark shell comparison requires matching 1180x820 frames.`,
+      );
+    }
+    const mainMasks = [
+      { height: 72, left: 170, top: 350, width: 620 },
+      { height: 54, left: 100, top: 596, width: 706 },
+      { height: 22, left: 134, top: 676, width: 94 },
+      { height: 22, left: 252, top: 676, width: 38 },
+      { height: 22, left: 330, top: 676, width: 174 },
+      { height: 24, left: 155, top: 768, width: 149 },
+      { height: 24, left: 606, top: 768, width: 112 },
+    ];
+    const footerMasks = [
+      { height: 32, left: 8, top: 7, width: 218 },
+    ];
+    const comparisons = {
+      footer: comparePng(
+        maskPng(cropPng(reference, 0, 774, 274, 46), footerMasks),
+        maskPng(cropPng(actual, 0, 774, 274, 46), footerMasks),
+      ),
+      main: comparePng(
+        maskPng(
+          cropPng(reference, 274, 0, reference.width - 274, reference.height),
+          mainMasks,
+        ),
+        maskPng(
+          cropPng(actual, 274, 0, actual.width - 274, actual.height),
+          mainMasks,
+        ),
+      ),
+      top: comparePng(
+        cropPng(reference, 0, 0, 274, 250),
+        cropPng(actual, 0, 0, 274, 250),
+        0.08,
+      ),
+    };
+    const limits = {
+      footer: environmentRatio(
+        "CODEX_UI_KIT_CURRENT_DARK_SHELL_FOOTER_MAX_DIFF_RATIO",
+        0.005,
+      ),
+      main: environmentRatio(
+        "CODEX_UI_KIT_CURRENT_DARK_SHELL_MAIN_MAX_DIFF_RATIO",
+        0.01,
+      ),
+      top: environmentRatio(
+        "CODEX_UI_KIT_CURRENT_DARK_SHELL_TOP_MAX_DIFF_RATIO",
+        0.045,
+      ),
+    };
+    for (const [region, comparison] of Object.entries(comparisons)) {
+      if (comparison.pixels > 0) {
+        await writeFile(
+          join(
+            artifactDirectory,
+            `${scene.id}.current-build.${region}.diff.png`,
+          ),
+          PNG.sync.write(comparison.diff),
+        );
+      }
+      if (comparison.ratio > limits[region]) {
+        throw new Error(
+          `${scene.id}: current-build ${region} pixel ratio ${comparison.ratio} exceeds ${limits[region]}.`,
+        );
+      }
+    }
+    console.log(
+      `${scene.id}: current-build regional pixel ratios ${JSON.stringify(Object.fromEntries(Object.entries(comparisons).map(([region, comparison]) => [region, comparison.ratio])))}`,
     );
   }
 

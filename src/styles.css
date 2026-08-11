@@ -272,7 +272,7 @@
     var(--codex-ui-text-tertiary) 55%,
     transparent
   );
-  cursor: default;
+  cursor: not-allowed;
 }
 
 .codex-ui-app-route-outlet {

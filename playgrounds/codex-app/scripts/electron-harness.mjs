@@ -24,6 +24,15 @@ export const visualScenes = [
   {
     currentSidebar: true,
     frame: "workspace-ready",
+    id: "current-dark-shell",
+    maxPixelRatio: 0.01,
+    scenario: "workspace-workflow",
+    theme: "dark",
+    view: "workspace",
+  },
+  {
+    currentSidebar: true,
+    frame: "workspace-ready",
     id: "current-light-shell",
     maxPixelRatio: 0.01,
     scenario: "workspace-workflow",

@@ -11,17 +11,18 @@ exit gates; it does not replace the inventory.
 ## Current position
 
 - The installed package and machine-readable evidence baseline are Codex
-  Desktop `26.803.41515` (`6321`). Unsampled `26.730.61639` surfaces remain
+  Desktop `26.803.61601` (`6396`). Unsampled earlier-build surfaces remain
   previous-build regression evidence rather than current verification.
 - The inventory contains 84 surface groups: 56 P0, 19 P1, and 9 P2.
-- 17 groups have current-build runtime evidence, 50 have previous-build-only
+- 15 groups have current-build runtime evidence, 52 have previous-build-only
   runtime evidence, and 17 have not been sampled.
-- The scoped `26.803.41515` refresh binds 37 sidebar/menu/window-chrome/Composer icons to
-  exact runtime evidence. Its latest hover/footer follow-up promotes More, Pin,
+- The scoped `26.803.61601` refresh revalidates 37
+  sidebar/menu/window-chrome/Composer icons against exact runtime evidence.
+  Earlier hover/footer slices promoted More, Pin,
   Archive, and Help, confirms that Settings is absent from the sampled footer
   and that sampled project-task rows have no leading glyph. The Recents follow-up
   independently scrolls to one section, pairs six Pin/Archive rows, confirms
-  zero leading SVGs. The next follow-up promotes the visible window-chrome
+  zero leading SVGs. The window-chrome follow-up promoted the visible
   Sidebar/Back/Forward controls and reduces the explicit visual approximation
   denominator from 15 to 8. The Composer follow-up promotes Project, Worktree,
   Branch, Add files, Permission, Model chevron, Dictate, and Voice, reducing
@@ -33,7 +34,10 @@ exit gates; it does not replace the inventory.
   requests → New chat restoration, and records zero horizontal overflow. Its
   Browser/CDP and Electron counterparts cover the same boundary and owned
   regional pixels. The capture is Renderer emulation; native resize remains a
-  separate Electron gate.
+  separate Electron gate. A same-state dark New chat composition additionally
+  passes current-product top/footer/main gates at 3.1387%, 0.4126%, and
+  0.3146%. Earlier lifecycle evidence that was not re-reached retains its
+  original build prefix.
 - The previous `26.730.61639` refresh covers the local Terminal session shell,
   a real bounded running/completed command with panel persistence, and the
   cross-worktree mismatch warning plus recovery actions. It locks
@@ -45,7 +49,7 @@ exit gates; it does not replace the inventory.
   explicit 820×680/720×680 reopen. Two more current tasks now cover concurrent
   siblings plus a Parent → Child delegation through active, mixed, completed,
   summary, flat-panel, live-progress, and independent transcript states while
-  retaining public `agentPath` hierarchy. Browser/CDP covers 155 lifecycle
+  retaining public `agentPath` hierarchy. Browser/CDP covers 156 lifecycle
   frames; Electron repeats
   the session, mismatch, input, picker, close, and resize interactions; the
   current 906×820 panel/content pixel ratios pass at 1.5120%/0.4004%.
@@ -72,7 +76,7 @@ exit gates; it does not replace the inventory.
   Electron verifies code copy, user scroll-away, and return to latest; four
   reviewed internal baselines pass. A later current-build 18-column task
   runtime-reaches the table Copy, Expand, and preview path. The public
-  `allowWideTables` contract, exact Markdown/HTML copy, 155-frame Browser/CDP
+  `allowWideTables` contract, exact Markdown/HTML copy, 156-frame Browser/CDP
   matrix, real Electron flow, three internal baselines including a 720×680
   action-reachability state, and local-only 4%/1% preview/close gates now pass.
   Product reachability and pixel attribution for
@@ -215,7 +219,7 @@ exit gates; it does not replace the inventory.
   protocol-backed composition: Web Search → Browser open/find, OpenAI
   Developer Docs Search → Fetch, command approval, file Review, and one
   delegated audit across eight lifecycle states plus a 720×680 final state.
-  The replay matrix now contains 33 traces and 406 events, with 155 reviewed
+  The replay matrix now contains 33 traces and 406 events, with 156 reviewed
   CDP/pixel frames and real Electron interaction. Its nine committed rasters
   are internal regression baselines. Because no single current-product task
   was captured with the entire sequence, it does not promote any inventory
@@ -262,7 +266,7 @@ new parity claims:
 - re-observe the shell, left sidebar, conversation, Composer, Review, Terminal,
   Markdown, and MCP anchors;
 - retain previous-build results as regression fixtures while promoting only
-  surfaces re-observed on `26.803.41515`;
+  surfaces re-observed on `26.803.61601`;
 - update inventory evidence prefixes and the current build note.
 
 Exit: the current build has a reproducible CDP capture recipe and no

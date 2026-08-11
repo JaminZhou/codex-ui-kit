@@ -1,11 +1,11 @@
 {
   "schemaVersion": 1,
   "baseline": {
-    "appVersion": "26.803.41515",
-    "buildNumber": "6321",
-    "sampledAt": "2026-08-08",
-    "reverifiedAt": "2026-08-10",
-    "appAsarSha256": "5f6e773aafd542d3cf09e10b5dca6cabd301d0a155f4b8ce870e3915fc3da25e",
+    "appVersion": "26.803.61601",
+    "buildNumber": "6396",
+    "sampledAt": "2026-08-11",
+    "reverifiedAt": "2026-08-11",
+    "appAsarSha256": "928129601e8b36eccba603114d6912352f2b13182f3a7d60b32166d0e81aafb5",
     "runtimeEvidence": "scoped_cdp",
     "runtimeEvidenceBuilds": {
       "cdp": "26.715.72359",
@@ -14,7 +14,8 @@
       "cdp-26.727.40816": "26.727.40816",
       "cdp-26.730.61309": "26.730.61309",
       "cdp-26.730.61639": "26.730.61639",
-      "cdp-26.803.41515": "26.803.41515"
+      "cdp-26.803.41515": "26.803.41515",
+      "cdp-26.803.61601": "26.803.61601"
     }
   },
   "surfaces": [
@@ -27,7 +28,8 @@
       "runtimeEvidence": [
         "cdp-26.721:new-chat-chatgpt-destination-and-worktree-prompt",
         "cdp-26.730.61309:project-and-no-project-destination-current-build",
-        "cdp-26.803.41515:new-chat-wide-medium-721-720-destination"
+        "cdp-26.803.41515:new-chat-wide-medium-721-720-destination",
+        "cdp-26.803.61601:new-chat-wide-medium-721-720-destination"
       ],
       "implementationStatus": "partial",
       "browserStatus": "verified",
@@ -46,7 +48,8 @@
         "cdp-26.721.81911:new-chat-context-bar-736x28-project-local-main",
         "cdp-26.727.40816:new-chat-project-local-branch-context-controls-1180x820",
         "cdp-26.730.61309:local-and-new-worktree-four-part-context-controls-wide-and-720",
-        "cdp-26.803.41515:visible-composer-project-worktree-branch-exact-assets"
+        "cdp-26.803.41515:visible-composer-project-worktree-branch-exact-assets",
+        "cdp-26.803.61601:visible-composer-project-worktree-branch-exact-assets"
       ],
       "implementationStatus": "partial",
       "browserStatus": "verified",
@@ -142,8 +145,8 @@
         "cdp-26.803.41515:real-eighteen-column-table-copy-expand-and-preview-1180x820"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "verified",
-      "electronStatus": "verified",
+      "browserStatus": "partial_legacy",
+      "electronStatus": "partial_legacy",
       "priority": "p0"
     },
     {
@@ -264,8 +267,8 @@
         "cdp-26.803.41515:current-mcp-success-computed-styles-and-905x820-tool-group-pixel-gate"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "verified",
-      "electronStatus": "verified",
+      "browserStatus": "partial_legacy",
+      "electronStatus": "partial_legacy",
       "priority": "p0"
     },
     {
@@ -286,8 +289,8 @@
         "cdp-26.803.41515:current-mcp-recovery-computed-styles-and-720x680-card-pixel-gate"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "verified",
-      "electronStatus": "verified",
+      "browserStatus": "partial_legacy",
+      "electronStatus": "partial_legacy",
       "priority": "p0"
     },
     {
@@ -302,8 +305,8 @@
         "cdp-26.803.41515:current-integration-recovery-computed-styles-and-720x680-group-pixel-gate"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "verified",
-      "electronStatus": "verified",
+      "browserStatus": "partial_legacy",
+      "electronStatus": "partial_legacy",
       "priority": "p0"
     },
     {
@@ -502,7 +505,8 @@
         "cdp-26.721.81911:empty-focused-multiline-running-stop-and-completed-composer",
         "cdp-26.727.40816:new-chat-do-anything-input-712x44-14x20",
         "cdp-26.803.41515:visible-composer-three-context-five-action-exact-assets",
-        "cdp-26.803.41515:new-chat-editor-712x44-wide-664x44-collapsed-389.89x44-pinned"
+        "cdp-26.803.41515:new-chat-editor-712x44-wide-664x44-collapsed-389.89x44-pinned",
+        "cdp-26.803.61601:new-chat-editor-712x44-wide-664x44-collapsed-389.89x44-pinned"
       ],
       "implementationStatus": "partial",
       "browserStatus": "verified",
@@ -524,7 +528,8 @@
         "cdp-26.721.81911:project-local-and-main-context-controls",
         "cdp-26.727.40816:project-local-feat-current-build-pr-refresh-context-row",
         "cdp-26.730.61309:new-worktree-no-environment-main-and-environment-empty-menu",
-        "cdp-26.803.41515:visible-composer-project-worktree-branch-exact-assets"
+        "cdp-26.803.41515:visible-composer-project-worktree-branch-exact-assets",
+        "cdp-26.803.61601:visible-composer-project-worktree-branch-exact-assets"
       ],
       "implementationStatus": "partial",
       "browserStatus": "verified",
@@ -638,7 +643,8 @@
         "cdp-26.721.81911:main-renderer-sidebar-274-titlebar-46-header-70-footer-46-960-panel-autocollapse-720-sidebar-autocollapse-719-edge-preview-and-explicit-pin",
         "cdp-26.727.40816:main-renderer-sidebar-274.11-titlebar-46-responsive-hide-at-720",
         "cdp-26.730.61309:main-renderer-sidebar-274-titlebar-46-scroll-footer-resizer-exact-720-collapse-explicit-pin-and-no-edge-preview",
-        "cdp-26.803.41515:wide-medium-721-720-collapse-explicit-pin-zero-overflow"
+        "cdp-26.803.41515:wide-medium-721-720-collapse-explicit-pin-zero-overflow",
+        "cdp-26.803.61601:wide-medium-721-720-collapse-explicit-pin-zero-overflow"
       ],
       "implementationStatus": "partial",
       "browserStatus": "verified",
@@ -658,7 +664,8 @@
         "cdp-26.721.81911:codex-search-new-task-primary-route-stack",
         "cdp-26.727.40816:new-chat-pull-requests-sites-scheduled-plugins-primary-stack",
         "cdp-26.730.61309:codex-search-activity-new-chat-quick-chat-and-primary-route-stack",
-        "cdp-26.803.41515:new-chat-pull-requests-sites-scheduled-plugins-and-route-current"
+        "cdp-26.803.41515:new-chat-pull-requests-sites-scheduled-plugins-and-route-current",
+        "cdp-26.803.61601:new-chat-pull-requests-sites-scheduled-plugins-and-route-current"
       ],
       "implementationStatus": "partial",
       "browserStatus": "verified",
@@ -674,7 +681,8 @@
       "runtimeEvidence": [
         "cdp-26.721.81911:projects-collapsible-section-long-name-and-nested-task",
         "cdp-26.727.40816:pinned-expanded-projects-collapsed-project-navigation",
-        "cdp-26.730.61309:five-project-groups-expansion-selection-and-nested-tasks"
+        "cdp-26.730.61309:five-project-groups-expansion-selection-and-nested-tasks",
+        "cdp-26.803.61601:six-project-groups-expanded-with-current-task-bands"
       ],
       "implementationStatus": "partial",
       "browserStatus": "partial_legacy",
@@ -688,7 +696,8 @@
       "packageEvidence": ["app-main", "projects-index-page"],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
-        "cdp-26.803.41515:six-project-groups-30px-rows-40px-task-bands-pointer-enter-space-collapse-and-wide-medium-720-pinned-restoration"
+        "cdp-26.803.41515:six-project-groups-30px-rows-40px-task-bands-pointer-enter-space-collapse-and-wide-medium-720-pinned-restoration",
+        "cdp-26.803.61601:six-project-groups-30px-rows-40px-task-bands-pointer-enter-space-collapse-and-wide-medium-720-pinned-restoration"
       ],
       "implementationStatus": "partial",
       "browserStatus": "verified",
@@ -702,7 +711,8 @@
       "packageEvidence": ["app-main"],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
-        "cdp-26.803.41515:project-actions-menu-six-items-214.05x179.38-current-icons"
+        "cdp-26.803.41515:project-actions-menu-six-items-214.05x179.38-current-icons",
+        "cdp-26.803.61601:project-actions-menu-six-items-214.05x179.38-current-icons"
       ],
       "implementationStatus": "partial",
       "browserStatus": "verified",
@@ -719,7 +729,8 @@
         "cdp-26.721.81911:recents-dense-scroll-history-running-queued-unread-error",
         "cdp-26.727.40816:recents-expanded-dense-history",
         "cdp-26.730.61309:pinned-and-recents-dense-scroll-history",
-        "cdp-26.803.41515:recents-six-row-scroll-no-leading-glyph-pin-archive-actions"
+        "cdp-26.803.41515:recents-six-row-scroll-no-leading-glyph-pin-archive-actions",
+        "cdp-26.803.61601:recents-six-row-scroll-no-leading-glyph-pin-archive-actions"
       ],
       "implementationStatus": "partial",
       "browserStatus": "verified",
@@ -735,7 +746,8 @@
       "runtimeEvidence": [
         "cdp-26.721.81911:hover-focus-actions-and-sibling-status-indicators",
         "cdp-26.727.40816:project-pin-archive-actions-and-status-indicators",
-        "cdp-26.730.61309:five-project-action-controls-five-new-chat-controls-and-two-status-markers"
+        "cdp-26.730.61309:five-project-action-controls-five-new-chat-controls-and-two-status-markers",
+        "cdp-26.803.61601:six-project-task-action-rows-six-recents-pin-archive-rows-and-zero-leading-glyphs"
       ],
       "implementationStatus": "partial",
       "browserStatus": "partial_legacy",
@@ -751,7 +763,8 @@
       "runtimeEvidence": [
         "cdp-26.721.81911:fixed-footer-account-avatar-settings-and-bottom-scroll-padding",
         "cdp-26.727.40816:fixed-profile-help-footer",
-        "cdp-26.730.61309:fixed-46px-footer-and-54px-scroll-padding"
+        "cdp-26.730.61309:fixed-46px-footer-and-54px-scroll-padding",
+        "cdp-26.803.61601:fixed-46px-footer-one-help-control-zero-settings-controls-and-redacted-account-content"
       ],
       "implementationStatus": "partial",
       "browserStatus": "partial_legacy",
@@ -765,7 +778,8 @@
       "packageEvidence": ["app-main"],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
-        "cdp-26.803.41515:help-menu-whats-new-eight-items-200x272.06-current-icons-and-escape-return"
+        "cdp-26.803.41515:help-menu-whats-new-eight-items-200x272.06-current-icons-and-escape-return",
+        "cdp-26.803.61601:help-menu-whats-new-eight-items-200x272.06-current-icons-and-escape-return"
       ],
       "implementationStatus": "partial",
       "browserStatus": "verified",
@@ -781,7 +795,8 @@
       "runtimeEvidence": [
         "cdp-26.721.81911:titlebar-46-sidebar-toggle-back-forward-at-88-120-152",
         "cdp-26.727.40816:titlebar-46-hide-sidebar-back-forward",
-        "cdp-26.803.41515:visible-titlebar-sidebar-back-forward-28-buttons-16-icons"
+        "cdp-26.803.41515:visible-titlebar-sidebar-back-forward-28-buttons-16-icons",
+        "cdp-26.803.61601:visible-titlebar-sidebar-back-forward-28-buttons-16-icons-and-disabled-not-allowed-cursor"
       ],
       "implementationStatus": "partial",
       "browserStatus": "verified",
@@ -812,7 +827,8 @@
       "runtimeEvidence": [
         "cdp-26.721.81911:pull-requests-selection-through-1180-961-960-721-720-1080p-2k-resize-and-dialog-dismissal",
         "cdp-26.727.40816:pr-detail-auto-hide-and-explicit-reopen-at-1180-960-820-720",
-        "cdp-26.803.41515:compact-pinned-pull-requests-to-new-chat-in-session-restoration"
+        "cdp-26.803.41515:compact-pinned-pull-requests-to-new-chat-in-session-restoration",
+        "cdp-26.803.61601:compact-pinned-pull-requests-to-new-chat-in-session-restoration"
       ],
       "implementationStatus": "partial",
       "browserStatus": "verified",
