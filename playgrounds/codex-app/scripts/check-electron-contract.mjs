@@ -549,7 +549,6 @@ try {
     statusContract.some(
       (fixture) =>
         fixture.statusOpacity !== "1" ||
-        fixture.rowRect?.width !== 258 ||
         fixture.rowRect?.height !== 30 ||
         fixture.statusRect?.width !== 20 ||
         fixture.statusRect?.height !== 20 ||

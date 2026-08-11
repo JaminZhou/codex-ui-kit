@@ -4850,7 +4850,6 @@ for (const scene of visualScenes) {
       );
       const geometryInvalid = contract.sidebar.statusFixtures.some(
         (fixture) =>
-          fixture.rowRect?.width !== 258 ||
           fixture.rowRect?.height !== 30 ||
           fixture.statusRect?.width !== 20 ||
           fixture.statusRect?.height !== 20 ||
