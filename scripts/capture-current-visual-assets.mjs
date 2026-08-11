@@ -487,9 +487,76 @@ try {
         };
       });
     };
+    const captureVisibleMenuIconSlots = ({
+      itemCount,
+      region: menuRegion,
+      slots,
+    }) => {
+      const visibleMenus = [...document.querySelectorAll('[role="menu"]')].filter(
+        isActuallyVisible,
+      );
+      if (visibleMenus.length !== 1) {
+        throw new Error(
+          `Expected one visible ${menuRegion}, received ${visibleMenus.length}.`,
+        );
+      }
+      const menu = visibleMenus[0];
+      const items = [...menu.querySelectorAll('[role="menuitem"]')];
+      if (items.length !== itemCount) {
+        throw new Error(
+          `Expected ${itemCount} ${menuRegion} items, received ${items.length}.`,
+        );
+      }
+      const icons = slots.map(({ id, itemIndex, svgIndex }) => {
+        const item = items[itemIndex];
+        if (!item) {
+          throw new Error(
+            `Missing ${menuRegion} item ${itemIndex} for ${id}.`,
+          );
+        }
+        const svgs = [...item.querySelectorAll("svg")].filter(
+          isActuallyVisible,
+        );
+        const svg = svgs[svgIndex];
+        if (!svg) {
+          throw new Error(
+            `Missing ${menuRegion} icon ${svgIndex} on item ${itemIndex} for ${id}.`,
+          );
+        }
+        const bounds = svg.getBoundingClientRect();
+        return {
+          owner: { role: "menuitem", semanticId: id },
+          primitives: [...svg.children].map(serializeSvgElement),
+          region: menuRegion,
+          rect: rect(svg),
+          renderSize: {
+            height: round(bounds.height),
+            width: round(bounds.width),
+          },
+          rootAttributes: attributes(svg, true),
+          rootComputedStyle: computedStyle(svg),
+          sourceClassName: svg.getAttribute("class") ?? "",
+          viewBox: svg.getAttribute("viewBox"),
+        };
+      });
+      return {
+        icons,
+        observation: {
+          iconCount: menu.querySelectorAll("svg").length,
+          imageCount: menu.querySelectorAll("img").length,
+          itemCount: items.length,
+          menuRect: rect(menu),
+          separatorCount: menu.querySelectorAll('[role="separator"]').length,
+        },
+      };
+    };
     Object.defineProperty(window, "__codexUiKitCaptureVisibleMenuIcons", {
       configurable: true,
       value: captureVisibleMenuIcons,
+    });
+    Object.defineProperty(window, "__codexUiKitCaptureVisibleMenuIconSlots", {
+      configurable: true,
+      value: captureVisibleMenuIconSlots,
     });
     const navigation = document.querySelector("nav");
     const recentsSections = [
@@ -827,9 +894,72 @@ try {
     );
     await main.keyboard.press("Escape");
     await main.waitForSelector('[role="menu"]', { state: "hidden" });
+
+    const accountTriggerIndices = await main
+      .locator('button[aria-haspopup="menu"]:visible')
+      .evaluateAll((buttons) =>
+        buttons
+          .map((button, index) => ({
+            bounds: button.getBoundingClientRect(),
+            index,
+          }))
+          .filter(
+            ({ bounds }) =>
+              bounds.left < 20 &&
+              bounds.top > window.innerHeight - 60 &&
+              bounds.width > 100,
+          )
+          .map(({ index }) => index),
+      );
+    if (accountTriggerIndices.length !== 1) {
+      throw new Error(
+        `Expected one structural sidebar account trigger, received ${accountTriggerIndices.length}.`,
+      );
+    }
+    const accountTrigger = main
+      .locator('button[aria-haspopup="menu"]:visible')
+      .nth(accountTriggerIndices[0]);
+    await accountTrigger.click();
+    await main.waitForSelector('[role="menu"]:visible');
+    const accountMenuCapture = await main.evaluate(() =>
+      window.__codexUiKitCaptureVisibleMenuIconSlots({
+        itemCount: 6,
+        region: "sidebar-account-menu",
+        slots: [
+          { id: "sidebar-account-menu-usage", itemIndex: 1, svgIndex: 0 },
+          {
+            id: "sidebar-account-menu-usage-chevron",
+            itemIndex: 1,
+            svgIndex: 1,
+          },
+          { id: "sidebar-account-menu-pet", itemIndex: 2, svgIndex: 0 },
+          { id: "sidebar-account-menu-invite", itemIndex: 3, svgIndex: 0 },
+          { id: "sidebar-account-menu-settings", itemIndex: 4, svgIndex: 0 },
+          { id: "sidebar-account-menu-logout", itemIndex: 5, svgIndex: 0 },
+        ],
+      }),
+    );
+    await main.keyboard.press("Escape");
+    await main.waitForSelector('[role="menu"]', { state: "hidden" });
+    const accountTriggerHandle = await accountTrigger.elementHandle();
+    if (!accountTriggerHandle) {
+      throw new Error("Sidebar account trigger detached while closing its menu.");
+    }
+    await main.waitForFunction(
+      (button) => document.activeElement === button,
+      accountTriggerHandle,
+    );
+    accountMenuCapture.observation.focusReturned =
+      await accountTrigger.evaluate(
+        (button) => document.activeElement === button,
+      );
+    accountMenuCapture.observation.triggerExpanded =
+      await accountTrigger.getAttribute("aria-expanded");
     result.icons.push(...projectMenuIcons, ...helpMenuIcons);
+    result.icons.push(...accountMenuCapture.icons);
     result.sidebarObservation.projectMenuItemCount = projectMenuIcons.length;
     result.sidebarObservation.helpMenuItemCount = helpMenuIcons.length;
+    result.sidebarObservation.accountMenu = accountMenuCapture.observation;
   } finally {
     if ((await main.locator('[role="menu"]:visible').count()) > 0) {
       await main.keyboard.press("Escape").catch(() => {});
@@ -837,6 +967,7 @@ try {
     await main
       .evaluate(() => {
         delete window.__codexUiKitCaptureVisibleMenuIcons;
+        delete window.__codexUiKitCaptureVisibleMenuIconSlots;
       })
       .catch(() => {});
   }

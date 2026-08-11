@@ -271,6 +271,14 @@ export const visualScenes = [
   {
     currentSidebar: true,
     frame: "sidebar-current",
+    id: "current-sidebar-account-menu",
+    maxPixelRatio: 0.0225,
+    scenario: "streaming-recovery",
+    sidebarState: "account-menu",
+  },
+  {
+    currentSidebar: true,
+    frame: "sidebar-current",
     id: "current-sidebar-compact-pinned",
     maxPixelRatio: 0.0225,
     scenario: "streaming-recovery",

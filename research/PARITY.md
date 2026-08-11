@@ -41,7 +41,7 @@ The authoritative current-build inventory is:
   BrowserWindow; it does not prove parity with unobserved product routes,
   panels, state transitions, or window types.
 - A scoped Codex Desktop `26.803.61601` (`6396`) visual probe revalidates the
-  exact 1180×820 dark/resting asset fingerprint and retains the 37 exact
+  exact 1180×820 dark/resting asset fingerprint and retains the 43 exact
   sidebar/menu/window-chrome/Composer icons established by earlier slices. Its sampled sidebar
   hover/footer contract also
   passes Browser/CDP and Electron acceptance; its independently scrolled
@@ -50,7 +50,11 @@ The authoritative current-build inventory is:
   Sidebar/Back/Forward titlebar controls and all eight visible Composer
   context/action icons are exact. This empties the scoped visible-shell
   approximation list without making the broader inventory or lifecycle
-  denominator complete, so global pixel parity remains ineligible.
+  denominator complete. The account-menu slice additionally locks six real
+  icons, six items, one de-identified avatar, zero role separators, Escape
+  focus return, and a 0.1979% owned pixel ratio. Transient sidebar status
+  markers remain separately incomplete, so global pixel parity remains
+  ineligible.
 - The same installed fingerprint now owns the machine-readable baseline. A
   sanitized capture selects the main `app://-/index.html` Renderer by URL,
   area, shell landmarks, and visible-control density; it excludes the avatar

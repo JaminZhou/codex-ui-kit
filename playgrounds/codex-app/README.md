@@ -900,16 +900,17 @@ CODEX_UI_KIT_CURRENT_DARK_SHELL_REFERENCE=/absolute/path/to/current-dark-shell.p
   --scenes=current-dark-shell
 ```
 
-The current sidebar lifecycle gates accept three 1180×820 product frames and
+The current sidebar lifecycle gates accept four 1180×820 product frames and
 one exact 720×680 compact frame. All references remain untracked and local:
 
 ```bash
 CODEX_UI_KIT_CURRENT_SIDEBAR_PROJECT_COLLAPSED_REFERENCE=/absolute/path/to/current-sidebar-project-collapsed.png \
 CODEX_UI_KIT_CURRENT_SIDEBAR_PROJECT_MENU_REFERENCE=/absolute/path/to/current-sidebar-project-menu.png \
 CODEX_UI_KIT_CURRENT_SIDEBAR_HELP_MENU_REFERENCE=/absolute/path/to/current-sidebar-help-menu.png \
+CODEX_UI_KIT_CURRENT_SIDEBAR_ACCOUNT_MENU_REFERENCE=/absolute/path/to/current-sidebar-account-menu.png \
 CODEX_UI_KIT_CURRENT_SIDEBAR_COMPACT_PINNED_REFERENCE=/absolute/path/to/current-sidebar-compact-pinned.png \
   pnpm --filter @codex-ui-kit/codex-app-playground check:visual -- \
-  --scenes=current-sidebar-project-collapsed,current-sidebar-project-menu,current-sidebar-help-menu,current-sidebar-compact-pinned
+  --scenes=current-sidebar-project-collapsed,current-sidebar-project-menu,current-sidebar-help-menu,current-sidebar-account-menu,current-sidebar-compact-pinned
 ```
 
 The App shell gate uses only the 120×46 application-owned titlebar crop:

@@ -206,6 +206,9 @@ All privileged behavior remains host-owned. The components never auto-approve co
   one selected route, reusable expandable project/task groups,
   heading-preserving collapsible collections, lifecycle status, measured
   action columns, and an in-flow footer slot that cannot cover navigation.
+  `AppSidebarFooter.renderAccountTrigger` lets a host wrap the component-owned
+  account button in one `Menu` or other overlay element without duplicating its
+  markup or shrinking the flexible account hit area.
   A titleless section remains expanded because it has no operable toggle;
   chevron and action visibility transitions respect reduced motion.
 - `WorkspacePanel`: controlled side or bottom tab shell with labelled tab

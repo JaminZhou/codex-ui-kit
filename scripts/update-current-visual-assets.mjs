@@ -386,6 +386,23 @@ const promotionSpecs = new Map([
       semanticId: `sidebar-help-menu-${name}`,
     },
   ]),
+  ...[
+    "usage",
+    "usage-chevron",
+    "pet",
+    "invite",
+    "settings",
+    "logout",
+  ].map((name) => [
+    `sidebar-account-menu-${name}`,
+    {
+      ownerAriaLabel: null,
+      ownerEvidence:
+        "fixed-position account-menu icon selected by ordered current-build menu structure without retaining account identity",
+      region: "sidebar-account-menu",
+      semanticId: `sidebar-account-menu-${name}`,
+    },
+  ]),
 ]);
 
 const manifest = JSON.parse(readFileSync(manifestPath, "utf8"));
@@ -423,7 +440,13 @@ if (
 }
 if (
   capture.sidebarObservation?.projectMenuItemCount !== 6 ||
-  capture.sidebarObservation?.helpMenuItemCount !== 8
+  capture.sidebarObservation?.helpMenuItemCount !== 8 ||
+  capture.sidebarObservation?.accountMenu?.itemCount !== 6 ||
+  capture.sidebarObservation?.accountMenu?.iconCount !== 6 ||
+  capture.sidebarObservation?.accountMenu?.imageCount !== 1 ||
+  capture.sidebarObservation?.accountMenu?.separatorCount !== 0 ||
+  capture.sidebarObservation?.accountMenu?.focusReturned !== true ||
+  capture.sidebarObservation?.accountMenu?.triggerExpanded !== "false"
 ) {
   throw new Error(
     `Unexpected current sidebar menu capture: ${canonicalize(capture.sidebarObservation)}`,

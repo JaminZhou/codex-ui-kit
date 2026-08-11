@@ -738,7 +738,7 @@
       "priority": "p0"
     },
     {
-      "id": "app.sidebar-item-actions-status",
+      "id": "app.sidebar-item-actions",
       "area": "app-shell",
       "ownership": "app",
       "packageEvidence": ["app-main", "thread-app-shell-chrome"],
@@ -747,7 +747,24 @@
         "cdp-26.721.81911:hover-focus-actions-and-sibling-status-indicators",
         "cdp-26.727.40816:project-pin-archive-actions-and-status-indicators",
         "cdp-26.730.61309:five-project-action-controls-five-new-chat-controls-and-two-status-markers",
-        "cdp-26.803.61601:six-project-task-action-rows-six-recents-pin-archive-rows-and-zero-leading-glyphs"
+        "cdp-26.803.61601:project-more-new-chat-six-project-task-and-six-recents-pin-archive-action-rows-with-current-icons"
+      ],
+      "implementationStatus": "partial",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
+      "priority": "p0"
+    },
+    {
+      "id": "app.sidebar-status-indicators",
+      "area": "app-shell",
+      "ownership": "app",
+      "packageEvidence": ["app-main", "thread-app-shell-chrome"],
+      "runtimeStatus": "runtime_observed",
+      "runtimeEvidence": [
+        "cdp-26.721.81911:sibling-running-queued-unread-error-status-indicators",
+        "cdp-26.727.40816:project-status-indicators",
+        "cdp-26.730.61309:two-status-markers",
+        "cdp-26.803.61601:zero-status-markers-in-current-resting-profile"
       ],
       "implementationStatus": "partial",
       "browserStatus": "partial_legacy",
@@ -764,11 +781,12 @@
         "cdp-26.721.81911:fixed-footer-account-avatar-settings-and-bottom-scroll-padding",
         "cdp-26.727.40816:fixed-profile-help-footer",
         "cdp-26.730.61309:fixed-46px-footer-and-54px-scroll-padding",
-        "cdp-26.803.61601:fixed-46px-footer-one-help-control-zero-settings-controls-and-redacted-account-content"
+        "cdp-26.803.61601:fixed-46px-footer-one-help-control-zero-settings-controls-and-redacted-account-content",
+        "cdp-26.803.61601:account-menu-six-items-258.11x188.38-six-current-icons-one-avatar-zero-role-separators-and-escape-return"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "partial_legacy",
-      "electronStatus": "partial_legacy",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
       "priority": "p0"
     },
     {

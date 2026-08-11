@@ -333,13 +333,19 @@ for (const id of [
   "sidebar-help-menu-remote",
   "sidebar-help-menu-keyboard",
   "sidebar-help-menu-support",
+  "sidebar-account-menu-usage",
+  "sidebar-account-menu-usage-chevron",
+  "sidebar-account-menu-pet",
+  "sidebar-account-menu-invite",
+  "sidebar-account-menu-settings",
+  "sidebar-account-menu-logout",
 ]) {
   if (!ids.has(id) || remaining.includes(id)) {
     throw new Error(`${id} must be promoted from current-build runtime evidence`);
   }
 }
 if (
-  manifest.icons.length !== 37 ||
+  manifest.icons.length !== 43 ||
   manifest.composerObservation?.topContextIconCount !== 3 ||
   manifest.composerObservation?.bottomActionIconCount !== 5 ||
   manifest.composerObservation?.exactSemanticIconCount !== 8
@@ -350,10 +356,16 @@ if (
 }
 if (
   manifest.sidebarObservation?.projectMenuItemCount !== 6 ||
-  manifest.sidebarObservation?.helpMenuItemCount !== 8
+  manifest.sidebarObservation?.helpMenuItemCount !== 8 ||
+  manifest.sidebarObservation?.accountMenu?.itemCount !== 6 ||
+  manifest.sidebarObservation?.accountMenu?.iconCount !== 6 ||
+  manifest.sidebarObservation?.accountMenu?.imageCount !== 1 ||
+  manifest.sidebarObservation?.accountMenu?.separatorCount !== 0 ||
+  manifest.sidebarObservation?.accountMenu?.focusReturned !== true ||
+  manifest.sidebarObservation?.accountMenu?.triggerExpanded !== "false"
 ) {
   throw new Error(
-    "current sidebar capture must retain six project and eight Help menu items",
+    "current sidebar capture must retain project, Help, and account menu evidence",
   );
 }
 const currentSidebarSettingsAbsenceProven =

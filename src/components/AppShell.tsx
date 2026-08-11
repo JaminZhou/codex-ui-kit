@@ -9,6 +9,7 @@ import {
   type HTMLAttributes,
   type KeyboardEvent,
   type PointerEvent as ReactPointerEvent,
+  type ReactElement,
   type ReactNode,
   type RefObject,
 } from "react";
@@ -2202,6 +2203,9 @@ export interface AppSidebarFooterProps
     "children"
   >;
   actions?: ReactNode;
+  renderAccountTrigger?: (
+    trigger: ReactElement<ButtonHTMLAttributes<HTMLButtonElement>>
+  ) => ReactElement;
   status?: ReactNode;
 }
 
@@ -2211,6 +2215,7 @@ export function AppSidebarFooter({
   accountButtonProps,
   actions,
   className,
+  renderAccountTrigger,
   status,
   ...props
 }: AppSidebarFooterProps) {
@@ -2219,6 +2224,37 @@ export function AppSidebarFooter({
     type: accountType = "button",
     ...resolvedAccountButtonProps
   } = accountButtonProps ?? {};
+  const accountTrigger = (
+    <button
+      className={[
+        "codex-ui-app-sidebar-footer__account",
+        accountClassName,
+      ]
+        .filter(Boolean)
+        .join(" ")}
+      type={accountType}
+      {...resolvedAccountButtonProps}
+    >
+      {accountAvatar ? (
+        <span
+          aria-hidden="true"
+          className="codex-ui-app-sidebar-footer__avatar"
+        >
+          {accountAvatar}
+        </span>
+      ) : null}
+      <span className="codex-ui-app-sidebar-footer__identity">
+        <span className="codex-ui-app-sidebar-footer__account-label">
+          {account}
+        </span>
+        {status ? (
+          <span className="codex-ui-app-sidebar-footer__status">
+            {status}
+          </span>
+        ) : null}
+      </span>
+    </button>
+  );
   return (
     <div
       className={["codex-ui-app-sidebar-footer", className]
@@ -2226,35 +2262,13 @@ export function AppSidebarFooter({
         .join(" ")}
       {...props}
     >
-      <button
-        className={[
-          "codex-ui-app-sidebar-footer__account",
-          accountClassName,
-        ]
-          .filter(Boolean)
-          .join(" ")}
-        type={accountType}
-        {...resolvedAccountButtonProps}
-      >
-        {accountAvatar ? (
-          <span
-            aria-hidden="true"
-            className="codex-ui-app-sidebar-footer__avatar"
-          >
-            {accountAvatar}
-          </span>
-        ) : null}
-        <span className="codex-ui-app-sidebar-footer__identity">
-          <span className="codex-ui-app-sidebar-footer__account-label">
-            {account}
-          </span>
-          {status ? (
-            <span className="codex-ui-app-sidebar-footer__status">
-              {status}
-            </span>
-          ) : null}
+      {renderAccountTrigger ? (
+        <span className="codex-ui-app-sidebar-footer__account-control">
+          {renderAccountTrigger(accountTrigger)}
         </span>
-      </button>
+      ) : (
+        accountTrigger
+      )}
       {actions ? (
         <span
           aria-label="Sidebar footer actions"

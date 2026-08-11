@@ -3794,6 +3794,40 @@ describe("application sidebar", () => {
     ).toBeTruthy();
   });
 
+  it("lets any single overlay wrap a full-width footer account trigger", async () => {
+    render(
+      <AppSidebarFooter
+        account="Demo account"
+        accountAvatar="D"
+        renderAccountTrigger={(trigger) => (
+          <Popover label="Account menu" role="menu" trigger={trigger}>
+            <button role="menuitem" type="button">
+              Usage remaining
+            </button>
+          </Popover>
+        )}
+      />,
+    );
+
+    const account = screen.getByRole("button", { name: "Demo account" });
+    expect(
+      account.classList.contains("codex-ui-app-sidebar-footer__account"),
+    ).toBe(true);
+    const accountControl = account.closest(
+      ".codex-ui-app-sidebar-footer__account-control",
+    );
+    expect(accountControl).toBeTruthy();
+    expect(
+      accountControl?.querySelectorAll(
+        ".codex-ui-app-sidebar-footer__account",
+      ),
+    ).toHaveLength(1);
+    fireEvent.click(account);
+    expect(screen.getByRole("menu", { name: "Account menu" })).toBeTruthy();
+    fireEvent.keyDown(screen.getByRole("menu"), { key: "Escape" });
+    await waitFor(() => expect(document.activeElement).toBe(account));
+  });
+
   it("keeps titleless collapsible content reachable", () => {
     const { container } = render(
       <AppSidebar>

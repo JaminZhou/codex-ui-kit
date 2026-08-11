@@ -62,8 +62,8 @@ observation from a previous build remains historical evidence.
   using private text. The exact `scrollHeight` remains content-dependent, so
   the contract locks the unique scroll owner and visible geometry rather than
   private task counts.
-- The same fingerprint revalidates 37 context/Composer/sidebar/menu/window
-  assets, six project groups, Recents actions, both menus, and the disabled
+- The same fingerprint revalidates 43 context/Composer/sidebar/menu/window
+  assets, six project groups, Recents actions, all three sampled menus, and the disabled
   window-navigation cursor. See
   [`26.803.61601.md`](26.803.61601.md). The scoped visible-shell approximation
   list is empty, but the broader lifecycle denominator remains incomplete;
@@ -73,8 +73,8 @@ observation from a previous build remains historical evidence.
   previous-build regression evidence and have been downgraded from `verified`
   to `partial_legacy` until they are reached again on the current fingerprint.
 
-Current inventory: 84 surface groups; 15 have current-build runtime evidence, 52 have previous-build-only runtime evidence, 17 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 12 groups and Electron verification covers 12.
-Prior acceptance outside those 15 sampled current-build groups remains
+Current inventory: 85 surface groups; 16 have current-build runtime evidence, 52 have previous-build-only runtime evidence, 17 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 14 groups and Electron verification covers 14.
+Prior acceptance outside those 16 sampled current-build groups remains
 recorded as `partial_legacy` until current-build re-observation.
 
 The current package exposes candidates far beyond the old transcript sample:

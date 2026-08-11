@@ -123,12 +123,13 @@ attributes, class names, view boxes, and render sizes before capture output.
 Process/profile setup and exact-PID cleanup remain explicit operator steps.
 
 The current manifest fingerprints Codex Desktop `26.803.61601` (`6396`) and
-contains 37 runtime-observed sidebar/menu/window-chrome/Composer icons: Sidebar,
+contains 43 runtime-observed sidebar/menu/window-chrome/Composer icons: Sidebar,
 Back, Forward, mode chevron, Search, neutral
 Activity, New chat, Quick chat, project folder, Pull requests, Sites,
 Scheduled, Plugins, More, Pin, Archive, Help, Composer Project, Worktree,
-Branch, Add files, Permission, Model chevron, Dictate, Voice, and the twelve
-project/Help menu primitives. The current build confirms
+Branch, Add files, Permission, Model chevron, Dictate, Voice, the twelve
+project/Help menu primitives, and six account-menu primitives for Usage,
+its chevron, Pet, Invite, Settings, and Log out. The current build confirms
 that Settings is absent from the sampled footer and that sampled project-task
 and Recents rows have no leading glyph. The scoped visible-shell approximation
 list is now empty, but the broader inventory and current-build lifecycle
