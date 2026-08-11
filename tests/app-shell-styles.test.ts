@@ -182,10 +182,10 @@ describe("application shell visual contract", () => {
     );
     expect(component).toContain("appSidebarWorktreeItemStatus");
     expect(styles).toMatch(
-      /\.codex-ui-app-sidebar__item-worktree-indicator \{[\s\S]*?height: 0\.875rem;[\s\S]*?inset-inline-end: 2\.1875rem;[\s\S]*?width: 0\.875rem;/,
+      /\.codex-ui-app-sidebar__item-worktree-indicator \{[\s\S]*?height: 0\.875rem;[\s\S]*?inset-inline-end: 2\.1875rem;[\s\S]*?pointer-events: none;[\s\S]*?width: 0\.875rem;/,
     );
     expect(styles).toContain(
-      '.codex-ui-app-sidebar__item-row[data-worktree-status="restored"]',
+      '.codex-ui-app-sidebar__item-row[data-worktree-status="restored"][data-status="idle"]',
     );
     expect(component).toContain(
       "const canCollapse = collapsible && Boolean(title)",

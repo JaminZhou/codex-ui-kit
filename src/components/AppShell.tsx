@@ -2269,11 +2269,10 @@ export function AppSidebarItem({
   ...props
 }: AppSidebarItemProps) {
   const statusId = useId();
-  const resolvedStatus = worktreeStatus
+  const ordinaryStatus = unread && status === "idle" ? "unread" : status;
+  const resolvedStatus = worktreeStatus && worktreeStatus !== "restored"
     ? appSidebarWorktreeItemStatus(worktreeStatus)
-    : unread && status === "idle"
-      ? "unread"
-      : status;
+    : ordinaryStatus;
   const visualStatus = appSidebarItemVisualStatus(resolvedStatus);
   const item = (
     <button
@@ -2329,7 +2328,7 @@ export function AppSidebarItem({
         <span
           aria-label={
             statusLabel ??
-            (worktreeStatus
+            (worktreeStatus && worktreeStatus !== "restored"
               ? appSidebarWorktreeStatusLabel(worktreeStatus)
               : resolvedStatus)
           }

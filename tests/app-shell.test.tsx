@@ -3948,6 +3948,12 @@ describe("application sidebar", () => {
           <AppSidebarItem worktreeStatus="setting-up">Setting up</AppSidebarItem>
           <AppSidebarItem worktreeStatus="failed">Failed</AppSidebarItem>
           <AppSidebarItem worktreeStatus="restored">Restored</AppSidebarItem>
+          <AppSidebarItem status="running" worktreeStatus="restored">
+            Restored running
+          </AppSidebarItem>
+          <AppSidebarItem unread worktreeStatus="restored">
+            Restored unread
+          </AppSidebarItem>
         </AppSidebarSection>
       </AppSidebar>,
     );
@@ -3986,6 +3992,26 @@ describe("application sidebar", () => {
         .getAttribute("data-visual-status"),
     ).toBe("error");
     expect(screen.queryByRole("status", { name: "restored" })).toBeNull();
+    expect(
+      screen
+        .getByRole("button", { name: "Restored running" })
+        .getAttribute("data-status"),
+    ).toBe("running");
+    expect(
+      screen.getByRole("status", { name: "running" }).getAttribute(
+        "data-visual-status",
+      ),
+    ).toBe("loading");
+    expect(
+      screen
+        .getByRole("button", { name: "Restored unread" })
+        .getAttribute("data-status"),
+    ).toBe("unread");
+    expect(
+      screen.getByRole("status", { name: "unread" }).getAttribute(
+        "data-visual-status",
+      ),
+    ).toBe("attention");
   });
 
   it("groups project tasks behind a focus-stable project row", () => {

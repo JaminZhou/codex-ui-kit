@@ -3235,13 +3235,6 @@ export function App() {
                   }
                   depth={1}
                   key={task}
-                  aria-label={
-                    initialSelection.sidebarState === "status-lifecycle" &&
-                    currentSidebarTaskWorktreeStatus(project.id, index) ===
-                      "failed"
-                      ? "Worktree init failed"
-                      : undefined
-                  }
                   status={
                     initialSelection.sidebarState === "status-lifecycle"
                       ? currentSidebarTaskStatus(project.id, index)
