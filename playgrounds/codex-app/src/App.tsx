@@ -277,6 +277,7 @@ function querySelection() {
     "help-menu",
     "project-collapsed",
     "project-menu",
+    "status-lifecycle",
   ].includes(requestedSidebarState ?? "")
     ? requestedSidebarState
     : null;
@@ -1409,6 +1410,36 @@ const currentSidebarProjects = [
     tasks: ["Check compatibility matrix"],
   },
 ];
+
+function currentSidebarTaskStatus(projectId: string, taskIndex: number) {
+  const fixture = `${projectId}:${taskIndex}`;
+  switch (fixture) {
+    case "session-browser:0":
+      return "active" as const;
+    case "desktop-cleanup:0":
+      return "waiting" as const;
+    case "codex-ui-kit:0":
+      return "unread" as const;
+    case "codex-ui-kit:1":
+      return "loading" as const;
+    case "design-assets:0":
+      return "error" as const;
+    default:
+      return "idle" as const;
+  }
+}
+
+function currentSidebarTaskStatusLabel(projectId: string, taskIndex: number) {
+  const status = currentSidebarTaskStatus(projectId, taskIndex);
+  return {
+    active: "Task is active",
+    error: "Worktree initialization failed",
+    idle: undefined,
+    loading: "Worktree initialization is queued",
+    unread: "Task has an unread update",
+    waiting: "Task is waiting for a response",
+  }[status];
+}
 
 export function App() {
   const initialSelection = useMemo(querySelection, []);
@@ -3126,10 +3157,12 @@ export function App() {
                 mode === "replay"
               }
               status={
-                project.selected &&
-                (hasActiveTurnWork(state) || isTurnActive(state.status))
-                  ? "running"
-                  : project.status
+                initialSelection.sidebarState === "status-lifecycle"
+                  ? "idle"
+                  : project.selected &&
+                      (hasActiveTurnWork(state) || isTurnActive(state.status))
+                    ? "running"
+                    : project.status
               }
               statusLabel={
                 project.selected &&
@@ -3167,8 +3200,23 @@ export function App() {
                     </>
                   }
                   actionsLabel={`${project.id} task actions`}
+                  data-sidebar-status-fixture={
+                    initialSelection.sidebarState === "status-lifecycle"
+                      ? `${project.id}:${index}`
+                      : undefined
+                  }
                   depth={1}
                   key={task}
+                  status={
+                    initialSelection.sidebarState === "status-lifecycle"
+                      ? currentSidebarTaskStatus(project.id, index)
+                      : "idle"
+                  }
+                  statusLabel={
+                    initialSelection.sidebarState === "status-lifecycle"
+                      ? currentSidebarTaskStatusLabel(project.id, index)
+                      : undefined
+                  }
                 >
                   {task}
                 </AppSidebarItem>

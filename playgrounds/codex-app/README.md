@@ -677,7 +677,7 @@ provider:
   Docs Search → Fetch under one completed integration group;
 - a schema-valid replay separates unavailable, recovering, recovered, and
   compact states, preserving the observed 16s/34s durations and exact answer;
-- the deterministic protocol set reaches 32 fixtures and 367 events, while the
+- the deterministic protocol set reaches 33 fixtures and 406 events, while the
   Browser/CDP and reviewed-pixel matrix reaches 142 lifecycle frames;
 - Browser/CDP locks the missing false call, ordered fallback calls, expanded
   ownership, current typography, 1180×820 and 720×680 geometry, hidden compact
@@ -695,9 +695,10 @@ true disconnect/reconnect of the same transport remains a separate open gate.
 The thirty-seventh slice refreshes the current sidebar project and Help
 lifecycle on Codex Desktop `26.803.41515`:
 
-- the sanitized product contract records six project groups, 30px project
-  rows, 40px task bands, pointer/Enter/Space expansion, the 721→720 automatic
-  collapse boundary, explicit 720px pinning, and zero horizontal overflow;
+- the sanitized product contract records six project groups, 30px project and
+  task rows, 2px/8px child-list padding, 1px separators,
+  pointer/Enter/Space expansion, the 721→720 automatic collapse boundary,
+  explicit 720px pinning, and zero horizontal overflow;
 - the six-item project menu and eight-item Help menu use twelve newly promoted
   exact runtime icons; Help retains its `What's new` heading and one separator;
 - Browser/CDP covers project focus, both menus, Escape, and wide → medium →
@@ -734,6 +735,29 @@ The thirty-eighth slice refreshes the global shell baseline on Codex Desktop
 The top comparison uses a 0.08 pixel color threshold for native transparency
 and text-antialias compositing while retaining a separate 4.5% regional hard
 limit. Raw product screenshots and records remain local-only.
+
+## Thirty-ninth vertical slice
+
+The thirty-ninth slice reaches ordinary sidebar task status on Codex Desktop
+`26.803.61601`:
+
+- one real active task and one background-completed unread task establish the
+  20×20 trailing rail, exact 16×16 spinner, centered 8×8 unread dot, and
+  computed `rgb(131, 195, 255)` color;
+- queuing a follow-up preserves the active spinner, while read-only package
+  structure separates pending-worktree loading/error phases from ordinary
+  active/waiting/unread state;
+- the public status contract retains compatibility aliases but exposes the
+  current canonical visual mapping, exact error glyph, and trailing
+  status-to-actions replacement;
+- Browser/CDP reaches 158 lifecycle frames and Electron repeats the status and
+  pointer replacement contract;
+- one reviewed internal frame plus local-only active/unread foreground masks
+  pass at 5.12% and 1.90%, with exact geometry/color gated separately.
+
+Pending-worktree phases remain previous-build-only until runtime-reached on
+this fingerprint. Product screenshots, profiles, and raw application data
+remain untracked.
 
 ## Development
 
@@ -911,6 +935,18 @@ CODEX_UI_KIT_CURRENT_SIDEBAR_ACCOUNT_MENU_REFERENCE=/absolute/path/to/current-si
 CODEX_UI_KIT_CURRENT_SIDEBAR_COMPACT_PINNED_REFERENCE=/absolute/path/to/current-sidebar-compact-pinned.png \
   pnpm --filter @codex-ui-kit/codex-app-playground check:visual -- \
   --scenes=current-sidebar-project-collapsed,current-sidebar-project-menu,current-sidebar-help-menu,current-sidebar-account-menu,current-sidebar-compact-pinned
+```
+
+The ordinary task-status gate accepts two exact 259×30 local-only product row
+captures. It compares only the final 28px trailing rail after reducing each
+rail to a foreground mask; CDP independently locks status geometry and unread
+color:
+
+```bash
+CODEX_UI_KIT_CURRENT_SIDEBAR_ACTIVE_STATUS_REFERENCE=/absolute/path/to/current-sidebar-active-row.png \
+CODEX_UI_KIT_CURRENT_SIDEBAR_UNREAD_STATUS_REFERENCE=/absolute/path/to/current-sidebar-unread-row.png \
+  pnpm --filter @codex-ui-kit/codex-app-playground check:visual -- \
+  --scenes=current-sidebar-status-lifecycle
 ```
 
 The App shell gate uses only the 120×46 application-owned titlebar crop:

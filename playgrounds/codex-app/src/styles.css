@@ -939,7 +939,7 @@ textarea {
 .demo-root[data-sidebar-current]
   .codex-ui-app-sidebar__project-group
   + .codex-ui-app-sidebar__project-group {
-  margin-block-start: 0;
+  margin-block-start: 1px;
 }
 
 .demo-root[data-sidebar-current]
@@ -949,7 +949,7 @@ textarea {
   .codex-ui-app-sidebar__project-children
   > .codex-ui-app-sidebar__item-row
   > .codex-ui-app-sidebar__item {
-  min-height: 40px;
+  min-height: 30px;
 }
 
 .demo-root[data-sidebar-current]

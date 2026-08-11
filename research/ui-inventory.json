@@ -764,7 +764,22 @@
         "cdp-26.721.81911:sibling-running-queued-unread-error-status-indicators",
         "cdp-26.727.40816:project-status-indicators",
         "cdp-26.730.61309:two-status-markers",
-        "cdp-26.803.61601:zero-status-markers-in-current-resting-profile"
+        "cdp-26.803.61601:active-thread-20px-rail-16px-spinner-and-8px-unread-link-dot"
+      ],
+      "implementationStatus": "partial",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
+      "priority": "p0"
+    },
+    {
+      "id": "app.sidebar-worktree-status-indicators",
+      "area": "app-shell",
+      "ownership": "app",
+      "packageEvidence": ["app-main", "app-main-pending-worktrees"],
+      "runtimeStatus": "runtime_observed",
+      "runtimeEvidence": [
+        "cdp-26.721.81911:sibling-running-queued-unread-error-status-indicators",
+        "cdp-26.727.40816:project-status-indicators"
       ],
       "implementationStatus": "partial",
       "browserStatus": "partial_legacy",

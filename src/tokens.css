@@ -210,6 +210,7 @@
   --codex-ui-app-sidebar-width: 17.125rem;
   --codex-ui-app-side-panel-width: 41.6875rem;
   --codex-ui-app-bottom-panel-height: 17rem;
+  --codex-ui-app-sidebar-attention: var(--codex-ui-blue-300);
   --codex-ui-workspace-panel-header-height: var(--codex-ui-toolbar-height);
   --codex-ui-workspace-panel-tab-max-width: 12rem;
   --codex-ui-header-action-gap: calc(var(--codex-ui-spacing) * 1.5);
@@ -384,6 +385,7 @@
 
 [data-theme="dark"] {
   color-scheme: dark;
+  --codex-ui-app-sidebar-attention: #83c3ff;
   --codex-ui-conversation-thread-background: #171717;
   --codex-ui-conversation-thread-composer-background: #282828;
   --codex-ui-conversation-thread-header-border: #3b3b3b;
@@ -509,6 +511,7 @@
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     color-scheme: dark;
+    --codex-ui-app-sidebar-attention: #83c3ff;
     --codex-ui-conversation-thread-background: #171717;
     --codex-ui-conversation-thread-composer-background: #282828;
     --codex-ui-conversation-thread-header-border: #3b3b3b;

@@ -73,7 +73,7 @@ observation from a previous build remains historical evidence.
   previous-build regression evidence and have been downgraded from `verified`
   to `partial_legacy` until they are reached again on the current fingerprint.
 
-Current inventory: 85 surface groups; 16 have current-build runtime evidence, 52 have previous-build-only runtime evidence, 17 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 14 groups and Electron verification covers 14.
+Current inventory: 86 surface groups; 16 have current-build runtime evidence, 53 have previous-build-only runtime evidence, 17 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 15 groups and Electron verification covers 15.
 Prior acceptance outside those 16 sampled current-build groups remains
 recorded as `partial_legacy` until current-build re-observation.
 
@@ -193,8 +193,9 @@ The current sidebar lifecycle follow-up splits the broad historical project,
 action, and footer rows into three independently gated current-build groups:
 `app.sidebar-project-group-lifecycle`,
 `app.sidebar-project-actions-menu`, and `app.sidebar-help-menu`. The product
-record contains six expandable groups with 30px project rows and 40px task
-bands, pointer/Enter/Space transitions, the 721→720 automatic-collapse rule,
+record contains six expandable groups with 30px project rows, 30px task rows,
+2px/8px child-list block padding, 1px row/group separators,
+pointer/Enter/Space transitions, the 721→720 automatic-collapse rule,
 explicit 720px pinning, a 214.05×179.38 six-item project menu, and a
 200×272.06 Help menu with a `What's new` heading and eight items. Browser/CDP
 and Electron repeat the lifecycle; four local-only ownership-masked product
@@ -203,6 +204,19 @@ the project menu, the Help menu, and the compact pinned sidebar. The broader
 project-navigation, mutation/status, and account/settings rows remain
 `partial_legacy` because these narrower observations do not prove every state
 they own.
+
+The ordinary task-status follow-up now reaches one real active thread and one
+background-completed unread thread on `26.803.61601`. It locks the 20×20
+trailing rail, exact 16×16 active spinner geometry, and centered 8×8 unread dot
+using the computed `rgb(131, 195, 255)` link color. A queued follow-up does not
+replace the active spinner, so ordinary thread presentation is classified as
+`active | waiting | unread | idle`. Read-only package structure separately
+maps pending worktree `queued | creating | setting-up` phases to loading and
+`failed` to the error glyph. Those worktree phases remain a distinct
+previous-build-only inventory row until runtime-reached on this build. The
+independent Browser/CDP matrix reaches 158 frames, Electron verifies trailing
+status-to-actions replacement, and the local-only active/unread glyph masks
+pass at 5.12% and 1.90%; exact computed geometry and color are separate gates.
 
 The same current-build manifest now supplies exact visible Sidebar, Back, and
 Forward primitives to the private playground window chrome. Browser/CDP and

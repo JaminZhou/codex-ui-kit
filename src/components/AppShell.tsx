@@ -2009,11 +2009,103 @@ export function AppSidebarSection({
 }
 
 export type AppSidebarItemStatus =
+  | "active"
   | "error"
   | "idle"
+  | "loading"
   | "queued"
   | "running"
-  | "unread";
+  | "unread"
+  | "waiting";
+
+type AppSidebarItemVisualStatus =
+  | "attention"
+  | "error"
+  | "idle"
+  | "loading";
+
+function appSidebarItemVisualStatus(
+  status: AppSidebarItemStatus,
+): AppSidebarItemVisualStatus {
+  switch (status) {
+    case "active":
+    case "loading":
+    case "queued":
+    case "running":
+      return "loading";
+    case "unread":
+    case "waiting":
+      return "attention";
+    case "error":
+      return "error";
+    case "idle":
+      return "idle";
+  }
+}
+
+function AppSidebarItemStatusVisual({
+  status,
+}: {
+  status: AppSidebarItemVisualStatus;
+}) {
+  if (status === "loading") {
+    return (
+      <span
+        aria-hidden="true"
+        className="codex-ui-app-sidebar__item-status-spinner"
+      >
+        <svg fill="none" viewBox="0 0 24 24">
+          <path
+            d="M18 12C18 8.68629 15.3137 6 12 6C8.68629 6 6 8.68629 6 12C6 15.3137 8.68629 18 12 18C15.3137 18 18 15.3137 18 12ZM20 12C20 16.4183 16.4183 20 12 20C7.58172 20 4 16.4183 4 12C4 7.58172 7.58172 4 12 4C16.4183 4 20 7.58172 20 12Z"
+            fill="currentColor"
+            opacity="0.3"
+          />
+          <path
+            d="M12 4C16.4183 4 20 7.58172 20 12C20 16.4183 16.4183 20 12 20C7.58172 20 4 16.4183 4 12H6C6 15.3137 8.68629 18 12 18C15.3137 18 18 15.3137 18 12C18 8.68629 15.3137 6 12 6V4Z"
+            fill="currentColor"
+          />
+        </svg>
+      </span>
+    );
+  }
+
+  if (status === "attention") {
+    return (
+      <span
+        aria-hidden="true"
+        className="codex-ui-app-sidebar__item-status-attention"
+      />
+    );
+  }
+
+  if (status === "error") {
+    return (
+      <svg
+        aria-hidden="true"
+        className="codex-ui-app-sidebar__item-status-error"
+        fill="none"
+        viewBox="0 0 21 21"
+      >
+        <path
+          d="M10.6 9.70459C11.0142 9.70461 11.35 10.0404 11.35 10.4546V13.7876C11.35 14.2018 11.0142 14.5376 10.6 14.5376C10.1858 14.5376 9.84998 14.2018 9.84998 13.7876V10.4546C9.84998 10.0404 10.1858 9.70459 10.6 9.70459Z"
+          fill="currentColor"
+        />
+        <path
+          d="M10.6 6.2876C11.1292 6.28762 11.558 6.71732 11.558 7.24658C11.5578 7.77569 11.1291 8.20457 10.6 8.20459C10.0708 8.20459 9.64215 7.7757 9.64197 7.24658C9.64197 6.71731 10.0707 6.2876 10.6 6.2876Z"
+          fill="currentColor"
+        />
+        <path
+          clipRule="evenodd"
+          d="M10.6 2.53955C14.9713 2.53955 18.515 6.08326 18.515 10.4546C18.515 14.8259 14.9713 18.3696 10.6 18.3696C6.22864 18.3696 2.68494 14.8259 2.68494 10.4546C2.68494 6.08326 6.22864 2.53955 10.6 2.53955ZM10.6 3.86963C6.96318 3.86963 4.01501 6.81779 4.01501 10.4546C4.01501 14.0914 6.96318 17.0396 10.6 17.0396C14.2368 17.0396 17.1849 14.0914 17.1849 10.4546C17.1849 6.81779 14.2368 3.86963 10.6 3.86963Z"
+          fill="currentColor"
+          fillRule="evenodd"
+        />
+      </svg>
+    );
+  }
+
+  return null;
+}
 
 export interface AppSidebarProjectGroupProps
   extends Omit<HTMLAttributes<HTMLDivElement>, "children" | "onClick"> {
@@ -2125,6 +2217,7 @@ export function AppSidebarItem({
 }: AppSidebarItemProps) {
   const statusId = useId();
   const resolvedStatus = unread && status === "idle" ? "unread" : status;
+  const visualStatus = appSidebarItemVisualStatus(resolvedStatus);
   const item = (
     <button
       aria-current={selected ? "page" : undefined}
@@ -2177,9 +2270,12 @@ export function AppSidebarItem({
           aria-label={statusLabel ?? resolvedStatus}
           className="codex-ui-app-sidebar__item-status"
           data-status={resolvedStatus}
+          data-visual-status={visualStatus}
           id={statusId}
           role="status"
-        />
+        >
+          <AppSidebarItemStatusVisual status={visualStatus} />
+        </span>
       ) : null}
       {actions ? (
         <span

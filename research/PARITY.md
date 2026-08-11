@@ -52,9 +52,10 @@ The authoritative current-build inventory is:
   approximation list without making the broader inventory or lifecycle
   denominator complete. The account-menu slice additionally locks six real
   icons, six items, one de-identified avatar, zero role separators, Escape
-  focus return, and a 0.1979% owned pixel ratio. Transient sidebar status
-  markers remain separately incomplete, so global pixel parity remains
-  ineligible.
+  focus return, and a 0.1979% owned pixel ratio. The ordinary sidebar status
+  slice now locks real active/unread geometry, color, actions replacement, and
+  local-only pixels; pending-worktree loading/error phases remain separately
+  incomplete, so global pixel parity remains ineligible.
 - The same installed fingerprint now owns the machine-readable baseline. A
   sanitized capture selects the main `app://-/index.html` Renderer by URL,
   area, shell landmarks, and visible-control density; it excludes the avatar
@@ -66,8 +67,9 @@ The authoritative current-build inventory is:
   sampled shell groups. The capture is Renderer emulation, not native-window
   resize evidence.
 - The current sidebar lifecycle follow-up records six project groups, 30px
-  project rows, 40px task bands, pointer/Enter/Space expansion, the six-item
-  project menu, the eight-item Help menu, and explicit 720px pinning. Twelve
+  project and task rows, 2px/8px child-list padding, 1px separators,
+  pointer/Enter/Space expansion, the six-item project menu, the eight-item Help
+  menu, and explicit 720px pinning. Twelve
   newly promoted menu icons are exact runtime primitives. Browser/CDP,
   Electron, and four local-only comparisons pass at 1.54%, 0.13%, 0.30%, and
   3.12%; the references and raw product records remain untracked. The

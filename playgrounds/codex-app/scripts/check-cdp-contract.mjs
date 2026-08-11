@@ -2982,8 +2982,14 @@ for (const scene of visualScenes) {
             rect: rect(sidebar),
             selectedCount: selected?.length ?? 0,
             statusCounts: {
+              active: sidebar.querySelectorAll(
+                '.codex-ui-app-sidebar__item-status[data-status="active"]',
+              ).length,
               error: sidebar.querySelectorAll(
                 '.codex-ui-app-sidebar__item-status[data-status="error"]',
+              ).length,
+              loading: sidebar.querySelectorAll(
+                '.codex-ui-app-sidebar__item-status[data-status="loading"]',
               ).length,
               queued: sidebar.querySelectorAll(
                 '.codex-ui-app-sidebar__item-status[data-status="queued"]',
@@ -2994,7 +3000,60 @@ for (const scene of visualScenes) {
               unread: sidebar.querySelectorAll(
                 '.codex-ui-app-sidebar__item-status[data-status="unread"]',
               ).length,
+              waiting: sidebar.querySelectorAll(
+                '.codex-ui-app-sidebar__item-status[data-status="waiting"]',
+              ).length,
             },
+            statusFixtures: Array.from(
+              sidebar.querySelectorAll(
+                '[data-sidebar-status-fixture]:not([data-status="idle"])',
+              ),
+              (item) => {
+                const row = item.closest(
+                  ".codex-ui-app-sidebar__item-row",
+                );
+                const status = row?.querySelector(
+                  ".codex-ui-app-sidebar__item-status",
+                );
+                const attention = status?.querySelector(
+                  ".codex-ui-app-sidebar__item-status-attention",
+                );
+                const spinner = status?.querySelector(
+                  ".codex-ui-app-sidebar__item-status-spinner",
+                );
+                const error = status?.querySelector(
+                  ".codex-ui-app-sidebar__item-status-error",
+                );
+                const rowBounds = row?.getBoundingClientRect();
+                const statusBounds = status?.getBoundingClientRect();
+                return {
+                  animationDuration: spinner
+                    ? getComputedStyle(spinner).animationDuration
+                    : null,
+                  animationName: spinner
+                    ? getComputedStyle(spinner).animationName
+                    : null,
+                  attentionColor: attention
+                    ? getComputedStyle(attention).backgroundColor
+                    : null,
+                  attentionRect: attention ? rect(attention) : null,
+                  errorRect: error ? rect(error) : null,
+                  fixture: item.getAttribute("data-sidebar-status-fixture"),
+                  pathData: Array.from(
+                    spinner?.querySelectorAll("path") ?? [],
+                    (path) => path.getAttribute("d"),
+                  ),
+                  rowRect: row ? rect(row) : null,
+                  rightInset:
+                    rowBounds && statusBounds
+                      ? rowBounds.right - statusBounds.right
+                      : null,
+                  status: status?.getAttribute("data-status"),
+                  statusRect: status ? rect(status) : null,
+                  visualStatus: status?.getAttribute("data-visual-status"),
+                };
+              },
+            ),
             titlebarInset: sidebar.hasAttribute("data-titlebar-inset"),
           };
         })(),
@@ -4738,6 +4797,8 @@ for (const scene of visualScenes) {
       scene.currentSidebar === true ||
       scene.id === "current-sidebar" ||
       scene.id === "current-sidebar-recents";
+    const currentSidebarStatusScene =
+      scene.id === "current-sidebar-status-lifecycle";
     if (
       !contract.sidebar ||
       !contract.sidebar.titlebarInset ||
@@ -4761,8 +4822,9 @@ for (const scene of visualScenes) {
       contract.sidebar.projectToggleExpanded !== "false" ||
       contract.sidebar.actionToolbars < 8 ||
       contract.sidebar.statusCounts.error !==
-        (currentBuildSidebarScene ? 0 : 1) ||
-      contract.sidebar.statusCounts.queued < 1 ||
+        (currentSidebarStatusScene ? 1 : currentBuildSidebarScene ? 0 : 1) ||
+      (!currentBuildSidebarScene &&
+        contract.sidebar.statusCounts.queued < 1) ||
       contract.sidebar.statusCounts.unread <
         (currentBuildSidebarScene ? 1 : 2) ||
       contract.sidebar.selectedCount < 1
@@ -4770,6 +4832,51 @@ for (const scene of visualScenes) {
       throw new Error(
         `${scene.id}: current-build sidebar contract failed: ${JSON.stringify(contract.sidebar)}`,
       );
+    }
+    if (currentSidebarStatusScene) {
+      const expectedStatuses = [
+        ["session-browser:0", "active", "loading"],
+        ["desktop-cleanup:0", "waiting", "attention"],
+        ["codex-ui-kit:0", "unread", "attention"],
+        ["codex-ui-kit:1", "loading", "loading"],
+        ["design-assets:0", "error", "error"],
+      ];
+      const actualStatuses = contract.sidebar.statusFixtures.map(
+        ({ fixture, status, visualStatus }) => [
+          fixture,
+          status,
+          visualStatus,
+        ],
+      );
+      const geometryInvalid = contract.sidebar.statusFixtures.some(
+        (fixture) =>
+          fixture.rowRect?.height !== 30 ||
+          fixture.statusRect?.width !== 20 ||
+          fixture.statusRect?.height !== 20 ||
+          fixture.rightInset !== 4 ||
+          (fixture.visualStatus === "attention" &&
+            (fixture.attentionRect?.width !== 8 ||
+              fixture.attentionRect?.height !== 8 ||
+              fixture.attentionColor !== "rgb(131, 195, 255)")) ||
+          (fixture.visualStatus === "error" &&
+            (fixture.errorRect?.width !== 16 ||
+              fixture.errorRect?.height !== 16)) ||
+          (fixture.visualStatus === "loading" &&
+            (fixture.animationDuration !== "1e-06s" ||
+              fixture.animationName !== "none" ||
+              fixture.pathData.length !== 2)),
+      );
+      if (
+        JSON.stringify(actualStatuses) !== JSON.stringify(expectedStatuses) ||
+        contract.sidebar.statusCounts.active !== 1 ||
+        contract.sidebar.statusCounts.loading !== 1 ||
+        contract.sidebar.statusCounts.waiting !== 1 ||
+        geometryInvalid
+      ) {
+        throw new Error(
+          `${scene.id}: current sidebar status lifecycle failed: ${JSON.stringify(contract.sidebar)}`,
+        );
+      }
     }
     const expectedSidebarMax =
       scene.id === "markdown-table-actions-narrow"

@@ -258,6 +258,10 @@ const currentBuildSidebarAccountMenuReference =
   process.env.CODEX_UI_KIT_CURRENT_SIDEBAR_ACCOUNT_MENU_REFERENCE;
 const currentBuildSidebarCompactPinnedReference =
   process.env.CODEX_UI_KIT_CURRENT_SIDEBAR_COMPACT_PINNED_REFERENCE;
+const currentBuildSidebarActiveStatusReference =
+  process.env.CODEX_UI_KIT_CURRENT_SIDEBAR_ACTIVE_STATUS_REFERENCE;
+const currentBuildSidebarUnreadStatusReference =
+  process.env.CODEX_UI_KIT_CURRENT_SIDEBAR_UNREAD_STATUS_REFERENCE;
 const currentBuildWindowChromeReference =
   process.env.CODEX_UI_KIT_WINDOW_CHROME_REFERENCE;
 const defaultLifecycleMainPixelRatio = 0.0025;
@@ -336,6 +340,28 @@ function maskPng(image, masks) {
     }
   }
   return image;
+}
+
+function foregroundMaskPng(image, threshold = 18) {
+  const masked = clonePng(image);
+  const background = {
+    blue: image.data[2],
+    green: image.data[1],
+    red: image.data[0],
+  };
+  for (let index = 0; index < masked.data.length; index += 4) {
+    const distance = Math.max(
+      Math.abs(masked.data[index] - background.red),
+      Math.abs(masked.data[index + 1] - background.green),
+      Math.abs(masked.data[index + 2] - background.blue),
+    );
+    const value = distance > threshold ? 255 : 0;
+    masked.data[index] = value;
+    masked.data[index + 1] = value;
+    masked.data[index + 2] = value;
+    masked.data[index + 3] = 255;
+  }
+  return masked;
 }
 
 function environmentRatio(name, fallback) {
@@ -433,6 +459,70 @@ async function compareCurrentBuildOverlay({
   );
 }
 
+async function compareCurrentBuildSidebarStatus({
+  actual,
+  actualBounds,
+  defaultMaximumRatio,
+  maximumRatioName,
+  referencePath,
+  sceneId,
+  status,
+}) {
+  const reference = flattenPng(
+    PNG.sync.read(await readFile(referencePath)),
+    { blue: 24, green: 24, red: 24 },
+  );
+  if (reference.width !== 259 || reference.height !== 30) {
+    throw new Error(
+      `${sceneId}: ${status} status reference must be exactly 259x30, received ${reference.width}x${reference.height}.`,
+    );
+  }
+  if (!actualBounds || actualBounds.width !== 258 || actualBounds.height !== 30) {
+    throw new Error(
+      `${sceneId}: ${status} status row must be exactly 258x30: ${JSON.stringify(actualBounds)}.`,
+    );
+  }
+  const actualRow = cropPng(
+    actual,
+    actualBounds.left,
+    actualBounds.top,
+    actualBounds.width,
+    actualBounds.height,
+  );
+  const referenceRail = cropPng(reference, 231, 0, 28, 30);
+  const actualRail = cropPng(actualRow, 230, 0, 28, 30);
+  const comparison = comparePng(
+    foregroundMaskPng(referenceRail),
+    foregroundMaskPng(actualRail),
+    0,
+  );
+  const maximumRatio = environmentRatio(
+    maximumRatioName,
+    defaultMaximumRatio,
+  );
+  await writeFile(
+    join(artifactDirectory, `${sceneId}.${status}.current-build.png`),
+    PNG.sync.write(actualRail),
+  );
+  if (comparison.pixels > 0) {
+    await writeFile(
+      join(
+        artifactDirectory,
+        `${sceneId}.${status}.current-build.diff.png`,
+      ),
+      PNG.sync.write(comparison.diff),
+    );
+  }
+  if (comparison.ratio > maximumRatio) {
+    throw new Error(
+      `${sceneId}: ${status} status pixel ratio ${comparison.ratio} exceeds ${maximumRatio}.`,
+    );
+  }
+  console.log(
+    `${sceneId}: ${status} status pixel ratio ${comparison.ratio}`,
+  );
+}
+
 async function compareCurrentBuildWorkspaceFrame({
   actual,
   defaultMaximumRatio,
@@ -489,6 +579,7 @@ for (const scene of selectedScenes) {
   const baselinePath = join(baselineDirectory, `${scene.id}.png`);
   const diffPath = join(artifactDirectory, `${scene.id}.diff.png`);
   let sidebarSelectedTop;
+  let sidebarStatusBounds;
   let sidebarMenuBounds;
   let sidebarMenuItemBounds;
   let sidebarRecentsBounds;
@@ -547,6 +638,35 @@ for (const scene of selectedScenes) {
             width: Math.round(value.width),
           };
         });
+    }
+    if (scene.id === "current-sidebar-status-lifecycle") {
+      sidebarStatusBounds = await page.evaluate(() =>
+        Object.fromEntries(
+          [
+            ["active", "session-browser:0"],
+            ["unread", "codex-ui-kit:0"],
+          ].map(([status, fixture]) => {
+            const item = document.querySelector(
+              `[data-sidebar-status-fixture="${fixture}"]`,
+            );
+            const row = item?.closest(
+              ".codex-ui-app-sidebar__item-row",
+            );
+            const value = row?.getBoundingClientRect();
+            return [
+              status,
+              value
+                ? {
+                    height: Math.round(value.height),
+                    left: Math.round(value.left),
+                    top: Math.round(value.top),
+                    width: Math.round(value.width),
+                  }
+                : null,
+            ];
+          }),
+        ),
+      );
     }
     if (
       scene.id === "current-sidebar-project-menu" ||
@@ -1437,6 +1557,33 @@ for (const scene of selectedScenes) {
         top: topComparison.ratio,
       })}`,
     );
+  }
+
+  if (scene.id === "current-sidebar-status-lifecycle") {
+    if (currentBuildSidebarActiveStatusReference) {
+      await compareCurrentBuildSidebarStatus({
+        actual,
+        actualBounds: sidebarStatusBounds?.active,
+        defaultMaximumRatio: 0.12,
+        maximumRatioName:
+          "CODEX_UI_KIT_CURRENT_SIDEBAR_ACTIVE_STATUS_MAX_DIFF_RATIO",
+        referencePath: currentBuildSidebarActiveStatusReference,
+        sceneId: scene.id,
+        status: "active",
+      });
+    }
+    if (currentBuildSidebarUnreadStatusReference) {
+      await compareCurrentBuildSidebarStatus({
+        actual,
+        actualBounds: sidebarStatusBounds?.unread,
+        defaultMaximumRatio: 0.025,
+        maximumRatioName:
+          "CODEX_UI_KIT_CURRENT_SIDEBAR_UNREAD_STATUS_MAX_DIFF_RATIO",
+        referencePath: currentBuildSidebarUnreadStatusReference,
+        sceneId: scene.id,
+        status: "unread",
+      });
+    }
   }
 
   if (

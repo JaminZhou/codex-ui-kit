@@ -3881,7 +3881,15 @@ describe("application sidebar", () => {
     expect(task.getAttribute("aria-current")).toBe("page");
     expect(task.getAttribute("data-depth")).toBe("1");
     expect(task.getAttribute("data-status")).toBe("running");
-    expect(screen.getByRole("status", { name: "Task is running" })).toBeTruthy();
+    const runningStatus = screen.getByRole("status", {
+      name: "Task is running",
+    });
+    expect(runningStatus.getAttribute("data-visual-status")).toBe("loading");
+    expect(
+      runningStatus.querySelector(
+        ".codex-ui-app-sidebar__item-status-spinner svg",
+      ),
+    ).toBeTruthy();
     expect(
       screen.getByRole("toolbar", { name: "Parity task actions" }),
     ).toBeTruthy();
@@ -3890,6 +3898,45 @@ describe("application sidebar", () => {
     expect(onOpen).not.toHaveBeenCalled();
     fireEvent.click(task);
     expect(onOpen).toHaveBeenCalledTimes(1);
+  });
+
+  it("maps current and compatibility sidebar lifecycle names to the current visuals", () => {
+    render(
+      <AppSidebar>
+        <AppSidebarSection kind="threads" title="Status fixtures">
+          <AppSidebarItem status="active">Active</AppSidebarItem>
+          <AppSidebarItem status="loading">Loading</AppSidebarItem>
+          <AppSidebarItem status="queued">Queued compatibility</AppSidebarItem>
+          <AppSidebarItem status="waiting">Waiting</AppSidebarItem>
+          <AppSidebarItem status="unread">Unread</AppSidebarItem>
+          <AppSidebarItem status="error">Error</AppSidebarItem>
+        </AppSidebarSection>
+      </AppSidebar>,
+    );
+
+    for (const label of ["active", "loading", "queued"]) {
+      const status = screen.getByRole("status", { name: label });
+      expect(status.getAttribute("data-visual-status")).toBe("loading");
+      expect(
+        status.querySelector(
+          ".codex-ui-app-sidebar__item-status-spinner svg",
+        ),
+      ).toBeTruthy();
+    }
+    for (const label of ["waiting", "unread"]) {
+      const status = screen.getByRole("status", { name: label });
+      expect(status.getAttribute("data-visual-status")).toBe("attention");
+      expect(
+        status.querySelector(
+          ".codex-ui-app-sidebar__item-status-attention",
+        ),
+      ).toBeTruthy();
+    }
+    expect(
+      screen
+        .getByRole("status", { name: "error" })
+        .querySelector(".codex-ui-app-sidebar__item-status-error"),
+    ).toBeTruthy();
   });
 
   it("groups project tasks behind a focus-stable project row", () => {
