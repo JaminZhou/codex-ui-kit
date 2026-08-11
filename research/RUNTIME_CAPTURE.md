@@ -269,6 +269,41 @@ handlers, verified the port and exact profile argv were gone, and moved the
 record recoverably to
 `codex-ui-kit-runtime-id-cdp.TkSi3W-20260810` in Trash.
 
+### Current `26.803.61601` worktree status lifecycle
+
+This mutating probe is limited to two fresh disposable Git repositories and
+two unique Chromium profiles. Each repository has one synthetic initial commit
+and is passed positionally to a separate `open -na` process. The two CDP ports
+bind only to `127.0.0.1`; the original Codex PID, real repositories, and real
+tasks remain untouched.
+
+The successful path selects `New worktree` and submits one harmless synthetic
+prompt. High-frequency CDP observation records the 30px task row, real Git
+worktree creation, the exact two-path spinner, its 2s animation, the persistent
+14×14 worktree marker, and the restored row after completion. The failure path
+blocks only the disposable repository's `.git/worktrees` location, submits a
+second synthetic prompt, and reaches the real `Worktree init failed` row plus
+the main error details and `Edit environment` / `Retry` controls. Restoring the
+disposable path and activating Retry creates the worktree and removes the
+failure presentation. Package structure retains the internal
+`queued | creating | setting-up` distinctions even though their Renderer
+presentation intentionally shares the same loading visual.
+
+Only structural selectors, computed styles, exact SVG paths, de-identified
+labels, and local screenshots are retained. The product row crops remain
+untracked and drive optional loading/error/restored foreground-mask gates at
+4.11%, 5.00%, and 1.67%; Browser/CDP and Electron independently lock raw state,
+geometry, animation, color, and recovery semantics.
+
+Cleanup terminates only the two validated second-instance main PIDs and their
+four exact profile-owned reparented Crashpad handlers. Both loopback ports and
+all exact profile arguments are verified absent. The two clean created
+worktrees are removed through their owning disposable repositories, leaving
+only each original synthetic worktree. The complete probe root, profiles, and
+local screenshots move recoverably to the single Trash item
+`codex-ui-kit-worktree-status.DF99q0-20260811`; the original Codex process
+remains running.
+
 ### Current application-shell capture
 
 The `26.721.81911` App shell capture used an exact second main process with a

@@ -262,6 +262,12 @@ const currentBuildSidebarActiveStatusReference =
   process.env.CODEX_UI_KIT_CURRENT_SIDEBAR_ACTIVE_STATUS_REFERENCE;
 const currentBuildSidebarUnreadStatusReference =
   process.env.CODEX_UI_KIT_CURRENT_SIDEBAR_UNREAD_STATUS_REFERENCE;
+const currentBuildSidebarWorktreeLoadingReference =
+  process.env.CODEX_UI_KIT_CURRENT_SIDEBAR_WORKTREE_LOADING_REFERENCE;
+const currentBuildSidebarWorktreeErrorReference =
+  process.env.CODEX_UI_KIT_CURRENT_SIDEBAR_WORKTREE_ERROR_REFERENCE;
+const currentBuildSidebarWorktreeRestoredReference =
+  process.env.CODEX_UI_KIT_CURRENT_SIDEBAR_WORKTREE_RESTORED_REFERENCE;
 const currentBuildWindowChromeReference =
   process.env.CODEX_UI_KIT_WINDOW_CHROME_REFERENCE;
 const defaultLifecycleMainPixelRatio = 0.0025;
@@ -464,6 +470,7 @@ async function compareCurrentBuildSidebarStatus({
   actualBounds,
   defaultMaximumRatio,
   maximumRatioName,
+  ownedWidth = 28,
   referencePath,
   sceneId,
   status,
@@ -489,8 +496,20 @@ async function compareCurrentBuildSidebarStatus({
     actualBounds.width,
     actualBounds.height,
   );
-  const referenceRail = cropPng(reference, 231, 0, 28, 30);
-  const actualRail = cropPng(actualRow, 230, 0, 28, 30);
+  const referenceRail = cropPng(
+    reference,
+    reference.width - ownedWidth,
+    0,
+    ownedWidth,
+    30,
+  );
+  const actualRail = cropPng(
+    actualRow,
+    actualRow.width - ownedWidth,
+    0,
+    ownedWidth,
+    30,
+  );
   const comparison = comparePng(
     foregroundMaskPng(referenceRail),
     foregroundMaskPng(actualRail),
@@ -645,6 +664,9 @@ for (const scene of selectedScenes) {
           [
             ["active", "session-browser:0"],
             ["unread", "codex-ui-kit:0"],
+            ["worktree-loading", "codex-ui-kit:1"],
+            ["worktree-error", "design-assets:2"],
+            ["worktree-restored", "protocol-client:0"],
           ].map(([status, fixture]) => {
             const item = document.querySelector(
               `[data-sidebar-status-fixture="${fixture}"]`,
@@ -1582,6 +1604,45 @@ for (const scene of selectedScenes) {
         referencePath: currentBuildSidebarUnreadStatusReference,
         sceneId: scene.id,
         status: "unread",
+      });
+    }
+    if (currentBuildSidebarWorktreeLoadingReference) {
+      await compareCurrentBuildSidebarStatus({
+        actual,
+        actualBounds: sidebarStatusBounds?.["worktree-loading"],
+        defaultMaximumRatio: 0.06,
+        maximumRatioName:
+          "CODEX_UI_KIT_CURRENT_SIDEBAR_WORKTREE_LOADING_MAX_DIFF_RATIO",
+        ownedWidth: 56,
+        referencePath: currentBuildSidebarWorktreeLoadingReference,
+        sceneId: scene.id,
+        status: "worktree-loading",
+      });
+    }
+    if (currentBuildSidebarWorktreeErrorReference) {
+      await compareCurrentBuildSidebarStatus({
+        actual,
+        actualBounds: sidebarStatusBounds?.["worktree-error"],
+        defaultMaximumRatio: 0.065,
+        maximumRatioName:
+          "CODEX_UI_KIT_CURRENT_SIDEBAR_WORKTREE_ERROR_MAX_DIFF_RATIO",
+        ownedWidth: 56,
+        referencePath: currentBuildSidebarWorktreeErrorReference,
+        sceneId: scene.id,
+        status: "worktree-error",
+      });
+    }
+    if (currentBuildSidebarWorktreeRestoredReference) {
+      await compareCurrentBuildSidebarStatus({
+        actual,
+        actualBounds: sidebarStatusBounds?.["worktree-restored"],
+        defaultMaximumRatio: 0.025,
+        maximumRatioName:
+          "CODEX_UI_KIT_CURRENT_SIDEBAR_WORKTREE_RESTORED_MAX_DIFF_RATIO",
+        ownedWidth: 56,
+        referencePath: currentBuildSidebarWorktreeRestoredReference,
+        sceneId: scene.id,
+        status: "worktree-restored",
       });
     }
   }

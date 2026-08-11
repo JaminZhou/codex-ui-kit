@@ -1061,6 +1061,11 @@
   padding-inline-start: calc(var(--codex-ui-spacing) * 12);
 }
 
+.codex-ui-app-sidebar__item-row[data-worktree-status]:not([data-has-actions])
+  > .codex-ui-app-sidebar__item {
+  padding-inline-end: calc(var(--codex-ui-spacing) * 8);
+}
+
 .codex-ui-app-sidebar__item:hover,
 .codex-ui-app-sidebar__item:focus-visible,
 .codex-ui-app-sidebar__item[data-selected] {
@@ -1187,12 +1192,54 @@
   width: 1rem;
 }
 
+.codex-ui-app-sidebar__item-worktree-indicator {
+  color: color-mix(in srgb, var(--codex-ui-text) 50%, transparent);
+  display: inline-flex;
+  height: 0.875rem;
+  inset-block-start: 0.5rem;
+  inset-inline-end: 2.1875rem;
+  pointer-events: none;
+  position: absolute;
+  transition: opacity var(--codex-ui-transition-fast);
+  width: 0.875rem;
+  z-index: 1;
+}
+
+.codex-ui-app-sidebar__item-worktree-indicator svg {
+  height: 0.875rem;
+  width: 0.875rem;
+}
+
+.codex-ui-app-sidebar__item-worktree-description {
+  border: 0;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  padding: 0;
+  position: absolute;
+  white-space: nowrap;
+  width: 1px;
+}
+
+.codex-ui-app-sidebar__item-row[data-worktree-status="restored"][data-status="idle"]
+  .codex-ui-app-sidebar__item-worktree-indicator {
+  inset-inline-end: 0.4375rem;
+}
+
 .codex-ui-app-sidebar__item-row[data-has-actions]:hover
   .codex-ui-app-sidebar__item-status,
 .codex-ui-app-sidebar__item-row[data-has-actions]:focus-within
   .codex-ui-app-sidebar__item-status,
 .codex-ui-app-sidebar__item-row[data-has-actions][data-selected][data-status="idle"]
-  .codex-ui-app-sidebar__item-status {
+  .codex-ui-app-sidebar__item-status,
+.codex-ui-app-sidebar__item-row[data-has-actions]:hover
+  .codex-ui-app-sidebar__item-worktree-indicator,
+.codex-ui-app-sidebar__item-row[data-has-actions]:focus-within
+  .codex-ui-app-sidebar__item-worktree-indicator,
+.codex-ui-app-sidebar__item-row[data-has-actions][data-selected][data-status="idle"]
+  .codex-ui-app-sidebar__item-worktree-indicator {
   opacity: 0;
   pointer-events: none;
 }

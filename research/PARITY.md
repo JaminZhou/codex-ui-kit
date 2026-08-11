@@ -54,8 +54,11 @@ The authoritative current-build inventory is:
   icons, six items, one de-identified avatar, zero role separators, Escape
   focus return, and a 0.1979% owned pixel ratio. The ordinary sidebar status
   slice now locks real active/unread geometry, color, actions replacement, and
-  local-only pixels; pending-worktree loading/error phases remain separately
-  incomplete, so global pixel parity remains ineligible.
+  local-only pixels. A separate disposable-repository probe reaches real
+  worktree create, controlled failure, Retry recovery, and restored rows; it
+  locks all five worktree phases plus exact branch/spinner/error geometry and
+  local-only pixels. Broader unsampled inventory still keeps global pixel
+  parity ineligible.
 - The same installed fingerprint now owns the machine-readable baseline. A
   sanitized capture selects the main `app://-/index.html` Renderer by URL,
   area, shell landmarks, and visible-control density; it excludes the avatar

@@ -534,12 +534,63 @@ try {
       },
     ),
   );
+  const worktreeContract = await sidebarStatusPage.evaluate(() =>
+    Array.from(
+      document.querySelectorAll(
+        "[data-sidebar-worktree-status-fixture]",
+      ),
+      (item) => {
+        const row = item.closest(".codex-ui-app-sidebar__item-row");
+        const status = row?.querySelector(
+          ".codex-ui-app-sidebar__item-status",
+        );
+        const branch = row?.querySelector(
+          ".codex-ui-app-sidebar__item-worktree-indicator",
+        );
+        const description = row?.querySelector(
+          ".codex-ui-app-sidebar__item-worktree-description",
+        );
+        const metric = (element) => {
+          if (!(element instanceof Element)) return null;
+          const bounds = element.getBoundingClientRect();
+          return { height: bounds.height, width: bounds.width };
+        };
+        const rowBounds = row?.getBoundingClientRect();
+        const branchBounds = branch?.getBoundingClientRect();
+        const describedBy = new Set(
+          item.getAttribute("aria-describedby")?.split(/\s+/) ?? [],
+        );
+        return {
+          branchRect: metric(branch),
+          branchRightInset:
+            rowBounds && branchBounds
+              ? rowBounds.right - branchBounds.right
+              : null,
+          fixture: item.getAttribute(
+            "data-sidebar-worktree-status-fixture",
+          ),
+          hasActions: row?.hasAttribute("data-has-actions") ?? false,
+          itemPaddingInlineEnd: getComputedStyle(item).paddingInlineEnd,
+          status: item.getAttribute("data-status"),
+          visualStatus: status?.getAttribute("data-visual-status"),
+          worktreeDescription:
+            description?.textContent?.trim() || null,
+          worktreeDescriptionLinked:
+            description instanceof HTMLElement &&
+            describedBy.has(description.id),
+          worktreeStatus: item.getAttribute("data-worktree-status"),
+        };
+      },
+    ),
+  );
   const expectedStatuses = [
     ["session-browser:0", "active", "loading"],
     ["desktop-cleanup:0", "waiting", "attention"],
     ["codex-ui-kit:0", "unread", "attention"],
-    ["codex-ui-kit:1", "loading", "loading"],
-    ["design-assets:0", "error", "error"],
+    ["codex-ui-kit:1", "queued", "loading"],
+    ["design-assets:0", "loading", "loading"],
+    ["design-assets:1", "loading", "loading"],
+    ["design-assets:2", "error", "error"],
   ];
   const actualStatuses = statusContract.map(
     ({ fixture, status, visualStatus }) => [fixture, status, visualStatus],
@@ -569,6 +620,47 @@ try {
       `Electron current sidebar status lifecycle failed: ${JSON.stringify(statusContract)}`,
     );
   }
+  const expectedWorktreeStatuses = [
+    ["codex-ui-kit:1", "queued", "queued", "loading", null],
+    ["design-assets:0", "creating", "loading", "loading", null],
+    ["design-assets:1", "setting-up", "loading", "loading", null],
+    ["design-assets:2", "failed", "error", "error", null],
+    ["protocol-client:0", "restored", "idle", null, "Worktree is restored"],
+  ];
+  const actualWorktreeStatuses = worktreeContract.map(
+    ({
+      fixture,
+      status,
+      visualStatus,
+      worktreeDescription,
+      worktreeStatus,
+    }) => [
+      fixture,
+      worktreeStatus,
+      status,
+      visualStatus ?? null,
+      worktreeDescription,
+    ],
+  );
+  if (
+    JSON.stringify(actualWorktreeStatuses) !==
+      JSON.stringify(expectedWorktreeStatuses) ||
+    worktreeContract.some(
+      (fixture) =>
+        fixture.branchRect?.width !== 14 ||
+        fixture.branchRect?.height !== 14 ||
+        fixture.branchRightInset !==
+          (fixture.worktreeStatus === "restored" ? 7 : 35) ||
+        (fixture.worktreeStatus === "restored" &&
+          (fixture.hasActions ||
+            fixture.itemPaddingInlineEnd !== "32px" ||
+            !fixture.worktreeDescriptionLinked)),
+    )
+  ) {
+    throw new Error(
+      `Electron current sidebar worktree lifecycle failed: ${JSON.stringify(worktreeContract)}`,
+    );
+  }
 
   const activeItem = sidebarStatusPage.locator(
     '[data-sidebar-status-fixture="session-browser:0"]',
@@ -588,6 +680,27 @@ try {
   if (hovered.actions !== "1" || hovered.status !== "0") {
     throw new Error(
       `Electron current sidebar status/action replacement failed: ${JSON.stringify(hovered)}`,
+    );
+  }
+
+  const worktreeItem = sidebarStatusPage.locator(
+    '[data-sidebar-worktree-status-fixture="design-assets:2"]',
+  );
+  const worktreeRow = worktreeItem.locator(
+    "xpath=ancestor::*[contains(@class, 'codex-ui-app-sidebar__item-row')]",
+  );
+  await worktreeRow.hover();
+  const hoveredWorktree = await worktreeRow.evaluate((row) => ({
+    actions: getComputedStyle(
+      row.querySelector(".codex-ui-app-sidebar__item-actions"),
+    ).opacity,
+    branch: getComputedStyle(
+      row.querySelector(".codex-ui-app-sidebar__item-worktree-indicator"),
+    ).opacity,
+  }));
+  if (hoveredWorktree.actions !== "1" || hoveredWorktree.branch !== "0") {
+    throw new Error(
+      `Electron current sidebar worktree/action replacement failed: ${JSON.stringify(hoveredWorktree)}`,
     );
   }
 } finally {

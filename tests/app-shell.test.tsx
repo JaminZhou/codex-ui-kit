@@ -3939,6 +3939,114 @@ describe("application sidebar", () => {
     ).toBeTruthy();
   });
 
+  it("keeps pending worktree phases distinct while sharing current sidebar visuals", () => {
+    render(
+      <>
+        <span hidden id="restored-context">
+          Restored context
+        </span>
+        <AppSidebar>
+          <AppSidebarSection kind="threads" title="Worktree fixtures">
+            <AppSidebarItem worktreeStatus="queued">Queued</AppSidebarItem>
+            <AppSidebarItem worktreeStatus="creating">Creating</AppSidebarItem>
+            <AppSidebarItem worktreeStatus="setting-up">
+              Setting up
+            </AppSidebarItem>
+            <AppSidebarItem worktreeStatus="failed">Failed</AppSidebarItem>
+            <AppSidebarItem
+              aria-describedby="restored-context"
+              worktreeStatus="restored"
+            >
+              Restored
+            </AppSidebarItem>
+            <AppSidebarItem status="running" worktreeStatus="restored">
+              Restored running
+            </AppSidebarItem>
+            <AppSidebarItem unread worktreeStatus="restored">
+              Restored unread
+            </AppSidebarItem>
+          </AppSidebarSection>
+        </AppSidebar>
+      </>,
+    );
+
+    for (const [label, worktreeStatus, status] of [
+      ["Queued", "queued", "queued"],
+      ["Creating", "creating", "loading"],
+      ["Setting up", "setting-up", "loading"],
+      ["Failed", "failed", "error"],
+      ["Restored", "restored", "idle"],
+    ] as const) {
+      const item = screen.getByRole("button", { name: label });
+      expect(item.getAttribute("data-worktree-status")).toBe(worktreeStatus);
+      expect(item.getAttribute("data-status")).toBe(status);
+      expect(
+        item.parentElement?.querySelector(
+          ".codex-ui-app-sidebar__item-worktree-indicator svg",
+        ),
+      ).toBeTruthy();
+    }
+
+    expect(
+      screen.getByRole("status", { name: "Worktree creation is queued" })
+        .getAttribute("data-visual-status"),
+    ).toBe("loading");
+    expect(
+      screen.getByRole("status", { name: "Worktree is being created" })
+        .getAttribute("data-visual-status"),
+    ).toBe("loading");
+    expect(
+      screen.getByRole("status", { name: "Worktree is being set up" })
+        .getAttribute("data-visual-status"),
+    ).toBe("loading");
+    expect(
+      screen.getByRole("status", { name: "Worktree init failed" })
+        .getAttribute("data-visual-status"),
+    ).toBe("error");
+    expect(
+      screen.queryByRole("status", { name: "Worktree is restored" }),
+    ).toBeNull();
+    for (const label of ["Restored", "Restored running", "Restored unread"]) {
+      const item = screen.getByRole("button", { name: label });
+      const descriptionIds = item
+        .getAttribute("aria-describedby")
+        ?.split(/\s+/) ?? [];
+      expect(
+        descriptionIds.some(
+          (id) =>
+            document.getElementById(id)?.textContent ===
+            "Worktree is restored",
+        ),
+      ).toBe(true);
+    }
+    expect(
+      screen
+        .getByRole("button", { name: "Restored" })
+        .getAttribute("aria-describedby")
+        ?.split(/\s+/),
+    ).toContain("restored-context");
+    expect(
+      screen
+        .getByRole("button", { name: "Restored running" })
+        .getAttribute("data-status"),
+    ).toBe("running");
+    expect(
+      screen.getByRole("status", { name: "running" }).getAttribute(
+        "data-visual-status",
+      ),
+    ).toBe("loading");
+    expect(
+      screen
+        .getByRole("button", { name: "Restored unread" })
+        .getAttribute("data-status"),
+    ).toBe("unread");
+    expect(
+      screen.getByRole("status", { name: "unread" }).getAttribute(
+        "data-visual-status",
+      ),
+    ).toBe("attention");
+  });
+
   it("groups project tasks behind a focus-stable project row", () => {
     const onExpandedChange = vi.fn();
     render(

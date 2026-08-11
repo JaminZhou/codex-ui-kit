@@ -697,7 +697,7 @@
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
         "cdp-26.803.41515:six-project-groups-30px-rows-40px-task-bands-pointer-enter-space-collapse-and-wide-medium-720-pinned-restoration",
-        "cdp-26.803.61601:six-project-groups-30px-rows-40px-task-bands-pointer-enter-space-collapse-and-wide-medium-720-pinned-restoration"
+        "cdp-26.803.61601:six-project-groups-30px-project-and-task-rows-2px-8px-child-padding-1px-separators-pointer-enter-space-collapse-and-wide-medium-720-pinned-restoration"
       ],
       "implementationStatus": "partial",
       "browserStatus": "verified",
@@ -779,11 +779,12 @@
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
         "cdp-26.721.81911:sibling-running-queued-unread-error-status-indicators",
-        "cdp-26.727.40816:project-status-indicators"
+        "cdp-26.727.40816:project-status-indicators",
+        "cdp-26.803.61601:disposable-real-worktree-create-controlled-failure-retry-recovery-and-restored-14px-branch-20px-status-rail"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "partial_legacy",
-      "electronStatus": "partial_legacy",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
       "priority": "p0"
     },
     {

@@ -73,8 +73,8 @@ observation from a previous build remains historical evidence.
   previous-build regression evidence and have been downgraded from `verified`
   to `partial_legacy` until they are reached again on the current fingerprint.
 
-Current inventory: 86 surface groups; 16 have current-build runtime evidence, 53 have previous-build-only runtime evidence, 17 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 15 groups and Electron verification covers 15.
-Prior acceptance outside those 16 sampled current-build groups remains
+Current inventory: 86 surface groups; 17 have current-build runtime evidence, 52 have previous-build-only runtime evidence, 17 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 16 groups and Electron verification covers 16.
+Prior acceptance outside those 17 sampled current-build groups remains
 recorded as `partial_legacy` until current-build re-observation.
 
 The current package exposes candidates far beyond the old transcript sample:
@@ -210,13 +210,15 @@ background-completed unread thread on `26.803.61601`. It locks the 20×20
 trailing rail, exact 16×16 active spinner geometry, and centered 8×8 unread dot
 using the computed `rgb(131, 195, 255)` link color. A queued follow-up does not
 replace the active spinner, so ordinary thread presentation is classified as
-`active | waiting | unread | idle`. Read-only package structure separately
-maps pending worktree `queued | creating | setting-up` phases to loading and
-`failed` to the error glyph. Those worktree phases remain a distinct
-previous-build-only inventory row until runtime-reached on this build. The
-independent Browser/CDP matrix reaches 158 frames, Electron verifies trailing
-status-to-actions replacement, and the local-only active/unread glyph masks
-pass at 5.12% and 1.90%; exact computed geometry and color are separate gates.
+`active | waiting | unread | idle`. A second isolated current-build probe now
+creates one real disposable worktree, reaches a deterministic create failure,
+and recovers it through the real Retry action. Package structure and runtime
+evidence together retain pending worktree `queued | creating | setting-up`
+phases as loading, `failed` as the error glyph, and `restored` as the persistent
+14×14 branch marker without a status rail. The independent Browser/CDP matrix
+reaches 158 frames, Electron verifies both lifecycle contracts, and local-only
+active/unread/loading/error/restored glyph masks pass at 5.12%, 1.90%, 4.11%,
+5.00%, and 1.67%; exact computed geometry and color are separate gates.
 
 The same current-build manifest now supplies exact visible Sidebar, Back, and
 Forward primitives to the private playground window chrome. Browser/CDP and

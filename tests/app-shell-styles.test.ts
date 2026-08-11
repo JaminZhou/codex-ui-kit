@@ -178,6 +178,31 @@ describe("application shell visual contract", () => {
       'export type AppSidebarItemStatus =',
     );
     expect(component).toContain(
+      'export type AppSidebarWorktreeStatus =',
+    );
+    expect(component).toContain("appSidebarWorktreeItemStatus");
+    expect(styles).toMatch(
+      /\.codex-ui-app-sidebar__item-worktree-indicator \{[\s\S]*?height: 0\.875rem;[\s\S]*?inset-inline-end: 2\.1875rem;[\s\S]*?pointer-events: none;[\s\S]*?transition: opacity var\(--codex-ui-transition-fast\);[\s\S]*?width: 0\.875rem;/,
+    );
+    expect(styles).toContain(
+      '.codex-ui-app-sidebar__item-row[data-worktree-status="restored"][data-status="idle"]',
+    );
+    expect(styles).toContain(
+      ".codex-ui-app-sidebar__item-row[data-worktree-status]:not([data-has-actions])\n  > .codex-ui-app-sidebar__item",
+    );
+    expect(styles).toContain(
+      "padding-inline-end: calc(var(--codex-ui-spacing) * 8);",
+    );
+    expect(styles).toMatch(
+      /\.codex-ui-app-sidebar__item-worktree-description \{[\s\S]*?clip-path: inset\(50%\);[\s\S]*?position: absolute;[\s\S]*?width: 1px;/,
+    );
+    expect(styles).toContain(
+      ".codex-ui-app-sidebar__item-row[data-has-actions]:hover\n  .codex-ui-app-sidebar__item-worktree-indicator",
+    );
+    expect(styles).toContain(
+      ".codex-ui-app-sidebar__item-row[data-has-actions]:focus-within\n  .codex-ui-app-sidebar__item-worktree-indicator",
+    );
+    expect(component).toContain(
       "const canCollapse = collapsible && Boolean(title)",
     );
     expect(component).toContain(

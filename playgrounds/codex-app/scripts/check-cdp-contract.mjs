@@ -3054,6 +3054,53 @@ for (const scene of visualScenes) {
                 };
               },
             ),
+            worktreeFixtures: Array.from(
+              sidebar.querySelectorAll(
+                "[data-sidebar-worktree-status-fixture]",
+              ),
+              (item) => {
+                const row = item.closest(
+                  ".codex-ui-app-sidebar__item-row",
+                );
+                const status = row?.querySelector(
+                  ".codex-ui-app-sidebar__item-status",
+                );
+                const branch = row?.querySelector(
+                  ".codex-ui-app-sidebar__item-worktree-indicator",
+                );
+                const description = row?.querySelector(
+                  ".codex-ui-app-sidebar__item-worktree-description",
+                );
+                const rowBounds = row?.getBoundingClientRect();
+                const branchBounds = branch?.getBoundingClientRect();
+                const describedBy = new Set(
+                  item.getAttribute("aria-describedby")?.split(/\s+/) ?? [],
+                );
+                return {
+                  branchRect: branch ? rect(branch) : null,
+                  branchRightInset:
+                    rowBounds && branchBounds
+                      ? rowBounds.right - branchBounds.right
+                      : null,
+                  fixture: item.getAttribute(
+                    "data-sidebar-worktree-status-fixture",
+                  ),
+                  hasActions: row?.hasAttribute("data-has-actions") ?? false,
+                  itemPaddingInlineEnd: getComputedStyle(item).paddingInlineEnd,
+                  status: item.getAttribute("data-status"),
+                  statusLabel: status?.getAttribute("aria-label"),
+                  visualStatus: status?.getAttribute("data-visual-status"),
+                  worktreeDescription:
+                    description?.textContent?.trim() || null,
+                  worktreeDescriptionLinked:
+                    description instanceof HTMLElement &&
+                    describedBy.has(description.id),
+                  worktreeStatus: item.getAttribute(
+                    "data-worktree-status",
+                  ),
+                };
+              },
+            ),
             titlebarInset: sidebar.hasAttribute("data-titlebar-inset"),
           };
         })(),
@@ -4838,14 +4885,38 @@ for (const scene of visualScenes) {
         ["session-browser:0", "active", "loading"],
         ["desktop-cleanup:0", "waiting", "attention"],
         ["codex-ui-kit:0", "unread", "attention"],
-        ["codex-ui-kit:1", "loading", "loading"],
-        ["design-assets:0", "error", "error"],
+        ["codex-ui-kit:1", "queued", "loading"],
+        ["design-assets:0", "loading", "loading"],
+        ["design-assets:1", "loading", "loading"],
+        ["design-assets:2", "error", "error"],
+      ];
+      const expectedWorktreeStatuses = [
+        ["codex-ui-kit:1", "queued", "queued", "loading", null],
+        ["design-assets:0", "creating", "loading", "loading", null],
+        ["design-assets:1", "setting-up", "loading", "loading", null],
+        ["design-assets:2", "failed", "error", "error", null],
+        ["protocol-client:0", "restored", "idle", null, "Worktree is restored"],
       ];
       const actualStatuses = contract.sidebar.statusFixtures.map(
         ({ fixture, status, visualStatus }) => [
           fixture,
           status,
           visualStatus,
+        ],
+      );
+      const actualWorktreeStatuses = contract.sidebar.worktreeFixtures.map(
+        ({
+          fixture,
+          status,
+          visualStatus,
+          worktreeDescription,
+          worktreeStatus,
+        }) => [
+          fixture,
+          worktreeStatus,
+          status,
+          visualStatus ?? null,
+          worktreeDescription,
         ],
       );
       const geometryInvalid = contract.sidebar.statusFixtures.some(
@@ -4866,12 +4937,28 @@ for (const scene of visualScenes) {
               fixture.animationName !== "none" ||
               fixture.pathData.length !== 2)),
       );
+      const worktreeGeometryInvalid =
+        contract.sidebar.worktreeFixtures.some(
+          (fixture) =>
+            fixture.branchRect?.width !== 14 ||
+            fixture.branchRect?.height !== 14 ||
+            fixture.branchRightInset !==
+              (fixture.worktreeStatus === "restored" ? 7 : 35) ||
+            (fixture.worktreeStatus === "restored" &&
+              (fixture.hasActions ||
+                fixture.itemPaddingInlineEnd !== "32px" ||
+                !fixture.worktreeDescriptionLinked)),
+        );
       if (
         JSON.stringify(actualStatuses) !== JSON.stringify(expectedStatuses) ||
+        JSON.stringify(actualWorktreeStatuses) !==
+          JSON.stringify(expectedWorktreeStatuses) ||
         contract.sidebar.statusCounts.active !== 1 ||
-        contract.sidebar.statusCounts.loading !== 1 ||
+        contract.sidebar.statusCounts.loading !== 2 ||
+        contract.sidebar.statusCounts.queued < 1 ||
         contract.sidebar.statusCounts.waiting !== 1 ||
-        geometryInvalid
+        geometryInvalid ||
+        worktreeGeometryInvalid
       ) {
         throw new Error(
           `${scene.id}: current sidebar status lifecycle failed: ${JSON.stringify(contract.sidebar)}`,
