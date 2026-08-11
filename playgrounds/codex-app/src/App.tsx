@@ -1718,6 +1718,9 @@ export function App() {
   const [liveError, setLiveError] = useState<string | null>(null);
   const liveStartPendingRef = useRef(false);
   const composerInputRef = useRef<HTMLTextAreaElement>(null);
+  const replayComposerWasSubmittingRef = useRef(
+    replayComposerSubmitting,
+  );
   const composerResourceTriggerRef = useRef<HTMLButtonElement>(null);
   const workspaceEnvironmentTriggerRef =
     useRef<HTMLButtonElement>(null);
@@ -1861,6 +1864,14 @@ export function App() {
     hasSubagentSurface && activeConversationSidePanel === "subagents";
   const replayComposerRunning =
     isConversationLifecycle && state.status === "running";
+
+  useEffect(() => {
+    const wasSubmitting = replayComposerWasSubmittingRef.current;
+    replayComposerWasSubmittingRef.current = replayComposerSubmitting;
+    if (wasSubmitting && !replayComposerSubmitting) {
+      composerInputRef.current?.focus();
+    }
+  }, [replayComposerSubmitting]);
 
   useEffect(() => {
     if (!hasSubagentSurface) return;
