@@ -1527,6 +1527,8 @@ export function App() {
   const [replayComposerSubmitting, setReplayComposerSubmitting] = useState(
     initialSelection.frame === "composer-disabled",
   );
+  const [replayComposerFocusRequest, setReplayComposerFocusRequest] =
+    useState(0);
   const [replayComposerStopped, setReplayComposerStopped] = useState(
     initialSelection.frame === "composer-queue-paused",
   );
@@ -1718,9 +1720,6 @@ export function App() {
   const [liveError, setLiveError] = useState<string | null>(null);
   const liveStartPendingRef = useRef(false);
   const composerInputRef = useRef<HTMLTextAreaElement>(null);
-  const replayComposerWasSubmittingRef = useRef(
-    replayComposerSubmitting,
-  );
   const composerResourceTriggerRef = useRef<HTMLButtonElement>(null);
   const workspaceEnvironmentTriggerRef =
     useRef<HTMLButtonElement>(null);
@@ -1866,12 +1865,9 @@ export function App() {
     isConversationLifecycle && state.status === "running";
 
   useEffect(() => {
-    const wasSubmitting = replayComposerWasSubmittingRef.current;
-    replayComposerWasSubmittingRef.current = replayComposerSubmitting;
-    if (wasSubmitting && !replayComposerSubmitting) {
-      composerInputRef.current?.focus();
-    }
-  }, [replayComposerSubmitting]);
+    if (replayComposerFocusRequest === 0) return;
+    composerInputRef.current?.focus();
+  }, [replayComposerFocusRequest]);
 
   useEffect(() => {
     if (!hasSubagentSurface) return;
@@ -1954,6 +1950,11 @@ export function App() {
     if (replaySubmitTimerRef.current === null) return;
     window.clearTimeout(replaySubmitTimerRef.current);
     replaySubmitTimerRef.current = null;
+  };
+
+  const completeReplayComposerSubmission = () => {
+    setReplayComposerSubmitting(false);
+    setReplayComposerFocusRequest((request) => request + 1);
   };
 
   const schedulePullRequestTransition = useCallback(
@@ -2441,9 +2442,8 @@ export function App() {
         setReplayCount(scenario.events.length);
         setActiveFrame("attachment-completed");
         setComposerAttachments([]);
-        setReplayComposerSubmitting(false);
+        completeReplayComposerSubmission();
         setComposerValue((current) => (current === prompt ? "" : current));
-        requestAnimationFrame(() => composerInputRef.current?.focus());
       }, 160);
       return;
     }
@@ -2458,9 +2458,8 @@ export function App() {
         replaySubmitTimerRef.current = null;
         setReplayCount(scenario.events.length);
         setActiveFrame("approval-current-similar-repeated-completed");
-        setReplayComposerSubmitting(false);
+        completeReplayComposerSubmission();
         setComposerValue((current) => (current === prompt ? "" : current));
-        requestAnimationFrame(() => composerInputRef.current?.focus());
       }, 160);
       return;
     }
@@ -2478,9 +2477,8 @@ export function App() {
         replaySubmitTimerRef.current = null;
         setReplayCount(scenario.events.length);
         setActiveFrame("approval-current-session-repeated-completed");
-        setReplayComposerSubmitting(false);
+        completeReplayComposerSubmission();
         setComposerValue((current) => (current === prompt ? "" : current));
-        requestAnimationFrame(() => composerInputRef.current?.focus());
       }, 160);
       return;
     }
@@ -2502,9 +2500,8 @@ export function App() {
           ] ?? replayScenarios.compaction.events.length,
         );
         setActiveFrame("context-compaction-recovered");
-        setReplayComposerSubmitting(false);
+        completeReplayComposerSubmission();
         setComposerValue((current) => (current === prompt ? "" : current));
-        requestAnimationFrame(() => composerInputRef.current?.focus());
       }, 160);
       return;
     }
@@ -2521,9 +2518,8 @@ export function App() {
           ] ?? replayScenarios.interruption.events.length,
         );
         setActiveFrame("command-interruption-recovered");
-        setReplayComposerSubmitting(false);
+        completeReplayComposerSubmission();
         setComposerValue((current) => (current === prompt ? "" : current));
-        requestAnimationFrame(() => composerInputRef.current?.focus());
       }, 160);
       return;
     }

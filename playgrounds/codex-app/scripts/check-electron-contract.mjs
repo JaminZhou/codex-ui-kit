@@ -5546,6 +5546,64 @@ try {
       `Electron current command same-thread recovery failed: ${JSON.stringify(recovered)}`,
     );
   }
+  await composer.fill(
+    "Navigation must retain focus while submission is pending",
+  );
+  const navigationLabel = "Protocol event position";
+  await commandInterruptionPage.evaluate(async () => {
+    const composer = document.querySelector('[aria-label="Message composer"]');
+    if (!(composer instanceof HTMLTextAreaElement)) {
+      throw new Error(
+        "Message composer is unavailable for navigation focus probe.",
+      );
+    }
+    composer.dispatchEvent(
+      new KeyboardEvent("keydown", {
+        bubbles: true,
+        cancelable: true,
+        code: "Enter",
+        key: "Enter",
+      }),
+    );
+    await new Promise((resolve) => setTimeout(resolve));
+    const input = document.querySelector(
+      '[aria-label="Protocol event position"]',
+    );
+    if (!(input instanceof HTMLInputElement)) {
+      throw new Error(
+        "Replay position is unavailable for navigation focus probe.",
+      );
+    }
+    input.focus();
+    const setValue = Object.getOwnPropertyDescriptor(
+      HTMLInputElement.prototype,
+      "value",
+    )?.set;
+    setValue?.call(
+      input,
+      String(Math.max(Number(input.min), Number(input.value) - 1)),
+    );
+    input.dispatchEvent(new Event("input", { bubbles: true }));
+    input.dispatchEvent(new Event("change", { bubbles: true }));
+  });
+  await commandInterruptionPage.waitForTimeout(250);
+  const navigationFocus = await commandInterruptionPage.evaluate(
+    (label) => ({
+      activeElementAriaLabel:
+        document.activeElement?.getAttribute("aria-label") ?? null,
+      activeElementTagName: document.activeElement?.tagName ?? null,
+      composerFocused:
+        document.activeElement?.getAttribute("aria-label") ===
+        "Message composer",
+      label,
+    }),
+    navigationLabel,
+  );
+  if (navigationFocus.composerFocused) {
+    throw new Error(
+      `Electron replay navigation focus was stolen after canceling a pending submission: ${JSON.stringify(navigationFocus)}`,
+    );
+  }
 } finally {
   await commandInterruptionApp.close();
 }
