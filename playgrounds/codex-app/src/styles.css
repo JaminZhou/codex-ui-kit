@@ -1032,6 +1032,33 @@ textarea {
   gap: 0;
 }
 
+.demo-current-sidebar-account-menu {
+  gap: 0;
+}
+
+.demo-current-sidebar-account-menu__divider {
+  box-sizing: border-box;
+  height: 9px;
+  padding: 4px 8px;
+}
+
+.demo-current-sidebar-account-menu__divider > span {
+  background: var(--codex-ui-border-light);
+  display: block;
+  height: 1px;
+}
+
+.demo-current-sidebar-account-menu__avatar {
+  display: block;
+  height: 18px;
+  width: 18px;
+}
+
+.demo-current-sidebar-account-menu__identity .codex-ui-menu-item__icon {
+  height: 18px;
+  width: 18px;
+}
+
 .demo-current-sidebar-help-menu {
   gap: 0;
 }

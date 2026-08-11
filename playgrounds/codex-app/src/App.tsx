@@ -273,6 +273,7 @@ function querySelection() {
   const requestedSidebarState = params.get("sidebarState");
   const sidebarState = [
     "compact-pinned",
+    "account-menu",
     "help-menu",
     "project-collapsed",
     "project-menu",
@@ -1604,6 +1605,8 @@ export function App() {
     );
   const [currentSidebarHelpMenuOpen, setCurrentSidebarHelpMenuOpen] =
     useState(initialSelection.sidebarState === "help-menu");
+  const [currentSidebarAccountMenuOpen, setCurrentSidebarAccountMenuOpen] =
+    useState(initialSelection.sidebarState === "account-menu");
   const [reviewOpen, setReviewOpen] = useState(
     initialSelection.frame === "review-open" ||
       initialSelection.frame === "mixed-review-open" ||
@@ -2740,17 +2743,93 @@ export function App() {
         <AppSidebarFooter
           account="Demo account"
           accountAvatar={<span className="demo-sidebar-avatar">D</span>}
-          accountButtonProps={{
-            "aria-expanded": false,
-            "aria-haspopup": "menu",
-          }}
+          renderAccountTrigger={(trigger) => (
+            <Menu
+              align="start"
+              className="demo-current-sidebar-menu demo-current-sidebar-account-menu"
+              label="Account menu"
+              onOpenChange={(open) => {
+                setCurrentSidebarAccountMenuOpen(open);
+                if (open) setCurrentSidebarHelpMenuOpen(false);
+              }}
+              open={currentSidebarAccountMenuOpen}
+              side="top"
+              sideOffset={7.5}
+              style={{
+                width: "calc(var(--codex-ui-app-sidebar-width) - 1rem)",
+              }}
+              trigger={trigger}
+              width="auto"
+            >
+              <MenuItem
+                className="demo-current-sidebar-account-menu__identity"
+                startIcon={
+                  <img
+                    alt=""
+                    className="demo-current-sidebar-account-menu__avatar"
+                    src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 18 18'%3E%3Ccircle cx='9' cy='9' r='9' fill='%230c7faa'/%3E%3Ctext x='9' y='12' text-anchor='middle' font-family='system-ui' font-size='8' fill='white'%3ED%3C/text%3E%3C/svg%3E"
+                  />
+                }
+              >
+                Demo account
+              </MenuItem>
+              <div
+                aria-hidden="true"
+                className="demo-current-sidebar-account-menu__divider"
+              >
+                <span />
+              </div>
+              <MenuItem
+                endIcon={
+                  <CurrentBuildIcon name="sidebar-account-menu-usage-chevron" />
+                }
+                startIcon={
+                  <CurrentBuildIcon name="sidebar-account-menu-usage" />
+                }
+              >
+                Usage remaining
+              </MenuItem>
+              <MenuItem
+                startIcon={
+                  <CurrentBuildIcon name="sidebar-account-menu-pet" />
+                }
+              >
+                Show pet
+              </MenuItem>
+              <MenuItem
+                startIcon={
+                  <CurrentBuildIcon name="sidebar-account-menu-invite" />
+                }
+              >
+                Invite a friend
+              </MenuItem>
+              <MenuItem
+                shortcut="⌘,"
+                startIcon={
+                  <CurrentBuildIcon name="sidebar-account-menu-settings" />
+                }
+              >
+                Settings
+              </MenuItem>
+              <MenuItem
+                startIcon={
+                  <CurrentBuildIcon name="sidebar-account-menu-logout" />
+                }
+              >
+                Log out
+              </MenuItem>
+            </Menu>
+          )}
           actions={
             currentSidebarComposition ? (
               <Menu
                 align="start"
                 className="demo-current-sidebar-menu demo-current-sidebar-help-menu"
                 label="Help menu"
-                onOpenChange={setCurrentSidebarHelpMenuOpen}
+                onOpenChange={(open) => {
+                  setCurrentSidebarHelpMenuOpen(open);
+                  if (open) setCurrentSidebarAccountMenuOpen(false);
+                }}
                 open={currentSidebarHelpMenuOpen}
                 side="top"
                 sideOffset={7}

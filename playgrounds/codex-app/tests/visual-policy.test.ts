@@ -92,6 +92,7 @@ describe("lifecycle visual policy", () => {
       "CODEX_UI_KIT_CURRENT_SIDEBAR_PROJECT_COLLAPSED_REFERENCE",
       "CODEX_UI_KIT_CURRENT_SIDEBAR_PROJECT_MENU_REFERENCE",
       "CODEX_UI_KIT_CURRENT_SIDEBAR_HELP_MENU_REFERENCE",
+      "CODEX_UI_KIT_CURRENT_SIDEBAR_ACCOUNT_MENU_REFERENCE",
       "CODEX_UI_KIT_CURRENT_SIDEBAR_COMPACT_PINNED_REFERENCE",
     ]) {
       expect(contract).toContain(reference);
@@ -100,6 +101,7 @@ describe("lifecycle visual policy", () => {
       "current-sidebar-project-collapsed",
       "current-sidebar-project-menu",
       "current-sidebar-help-menu",
+      "current-sidebar-account-menu",
       "current-sidebar-compact-pinned",
     ]) {
       expect(electronHarness).toContain(`id: "${scene}"`);
@@ -110,11 +112,20 @@ describe("lifecycle visual policy", () => {
     expect(contract).toContain(
       "expectedActualPosition: { left: 235, top: 502 }",
     );
+    expect(contract).toContain(
+      "expectedActualPosition: { left: 9, top: 587 }",
+    );
     expect(cdpContract).toContain(
       'helpMenuContract.heading !== "What\'s new"',
     );
     expect(electronContract).toContain(
       'helpMenuStructure.separatorCount !== 1',
+    );
+    expect(cdpContract).toContain(
+      'accountMenuContract.imageCount !== 1',
+    );
+    expect(electronContract).toContain(
+      'accountMenuContract.separatorCount !== 0',
     );
   });
 

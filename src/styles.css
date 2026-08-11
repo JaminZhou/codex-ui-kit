@@ -1242,8 +1242,13 @@
 .codex-ui-app-sidebar-footer {
   align-items: center;
   display: flex;
+  gap: calc(var(--codex-ui-spacing) * 2);
   min-height: 2.8125rem;
   min-width: 0;
+}
+
+.codex-ui-app-sidebar-footer > .codex-ui-popover-anchor {
+  flex: 1 1 auto;
 }
 
 .codex-ui-app-sidebar-footer__account {

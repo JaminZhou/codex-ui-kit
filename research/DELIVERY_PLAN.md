@@ -13,10 +13,10 @@ exit gates; it does not replace the inventory.
 - The installed package and machine-readable evidence baseline are Codex
   Desktop `26.803.61601` (`6396`). Unsampled earlier-build surfaces remain
   previous-build regression evidence rather than current verification.
-- The inventory contains 84 surface groups: 56 P0, 19 P1, and 9 P2.
-- 15 groups have current-build runtime evidence, 52 have previous-build-only
+- The inventory contains 85 surface groups: 57 P0, 19 P1, and 9 P2.
+- 16 groups have current-build runtime evidence, 52 have previous-build-only
   runtime evidence, and 17 have not been sampled.
-- The scoped `26.803.61601` refresh revalidates 37
+- The scoped `26.803.61601` refresh revalidates 43
   sidebar/menu/window-chrome/Composer icons against exact runtime evidence.
   Earlier hover/footer slices promoted More, Pin,
   Archive, and Help, confirms that Settings is absent from the sampled footer
@@ -28,6 +28,12 @@ exit gates; it does not replace the inventory.
   Branch, Add files, Permission, Model chevron, Dictate, and Voice, reducing
   the scoped visible-shell denominator to zero while explicitly retaining the
   broader inventory/lifecycle blocker.
+  The account-menu follow-up adds six exact icons and gates its six-item,
+  one-avatar, zero-role-separator structure, 258.11×188.38 geometry, dismissal,
+  focus return, and owned pixels at 0.1979%. Sidebar actions are now a separate
+  verified denominator from transient running/queued/unread/error markers,
+  which remain previous-build-only until a current state is deliberately
+  triggered and captured.
 - A reproducible sanitized global-shell capture now selects the main Renderer
   structurally, records dark 1180×820, 820×680, 721×680, and 720×680 geometry,
   normalizes collapsed and explicitly pinned narrow states, verifies Pull
@@ -289,8 +295,10 @@ slot. It is split into:
   access, icons, dismissal, and focus behavior;
 - `app.sidebar-thread-history`: recent tasks, grouping, pinning, running,
   queued, unread, error, empty, loading, and long-list states;
-- `app.sidebar-item-actions-status`: hover/focus actions, context menu,
-  rename/archive/delete affordances, status indicators, and keyboard access;
+- `app.sidebar-item-actions`: hover/focus actions, context menu,
+  rename/archive/delete affordances, and keyboard access;
+- `app.sidebar-status-indicators`: running, queued, unread, error, and other
+  transient sibling markers across project and recent rows;
 - `app.sidebar-footer-account-settings`: account, settings, update/status, and
   footer overflow behavior.
 - `app.sidebar-help-menu`: current release-note grouping, support/setup actions,

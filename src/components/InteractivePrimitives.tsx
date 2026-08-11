@@ -10,6 +10,7 @@ import {
   useMemo,
   useRef,
   useState,
+  type AriaAttributes,
   type ButtonHTMLAttributes,
   type ComponentPropsWithoutRef,
   type CSSProperties,
@@ -160,8 +161,8 @@ const OverlayOwnerContext = createContext<readonly string[]>([]);
 interface TriggerProps {
   "aria-controls"?: string;
   "aria-describedby"?: string;
-  "aria-expanded"?: boolean;
-  "aria-haspopup"?: "dialog" | "listbox" | "menu" | true;
+  "aria-expanded"?: AriaAttributes["aria-expanded"];
+  "aria-haspopup"?: AriaAttributes["aria-haspopup"];
   "data-state"?: "closed" | "open";
   disabled?: boolean;
   onBlur?: FocusEventHandler<HTMLElement>;

@@ -7322,6 +7322,69 @@ try {
     );
   }
 
+  const accountMenuTrigger = sidebarPage.getByRole("button", {
+    exact: true,
+    name: "Demo account",
+  });
+  await accountMenuTrigger.click();
+  const accountMenu = sidebarPage.getByRole("menu", {
+    name: "Account menu",
+  });
+  await accountMenu.waitFor({ state: "visible" });
+  const accountMenuContract = await accountMenu.evaluate((menu) => {
+    const bounds = menu.getBoundingClientRect();
+    const divider = menu.querySelector(
+      ".demo-current-sidebar-account-menu__divider",
+    );
+    const dividerBounds = divider?.getBoundingClientRect();
+    return {
+      dividerHeight: dividerBounds?.height,
+      focusRole: document.activeElement?.getAttribute("role"),
+      icons: Array.from(
+        menu.querySelectorAll("[data-current-build-icon]"),
+        (icon) => icon.getAttribute("data-current-build-icon"),
+      ),
+      imageCount: menu.querySelectorAll("img").length,
+      itemCount: menu.querySelectorAll('[role="menuitem"]').length,
+      rect: { height: bounds.height, width: bounds.width },
+      separatorCount: menu.querySelectorAll('[role="separator"]').length,
+    };
+  });
+  const accountTriggerBounds = await accountMenuTrigger.evaluate((trigger) => {
+    const bounds = trigger.getBoundingClientRect();
+    return { height: bounds.height, width: bounds.width };
+  });
+  await sidebarPage.keyboard.press("Escape");
+  await accountMenu.waitFor({ state: "hidden" });
+  accountMenuContract.focusReturned = await accountMenuTrigger.evaluate(
+    (element) => document.activeElement === element,
+  );
+  if (
+    accountMenuContract.itemCount !== 6 ||
+    accountMenuContract.imageCount !== 1 ||
+    accountMenuContract.separatorCount !== 0 ||
+    accountMenuContract.dividerHeight !== 9 ||
+    accountMenuContract.focusRole !== "menuitem" ||
+    !accountMenuContract.focusReturned ||
+    accountTriggerBounds.width !== 218 ||
+    accountTriggerBounds.height !== 29 ||
+    Math.abs(accountMenuContract.rect.width - 258) > 1 ||
+    Math.abs(accountMenuContract.rect.height - 188.38) > 1 ||
+    JSON.stringify(accountMenuContract.icons) !==
+      JSON.stringify([
+        "sidebar-account-menu-usage",
+        "sidebar-account-menu-usage-chevron",
+        "sidebar-account-menu-pet",
+        "sidebar-account-menu-invite",
+        "sidebar-account-menu-settings",
+        "sidebar-account-menu-logout",
+      ])
+  ) {
+    throw new Error(
+      `sidebar-current: account menu contract failed: ${JSON.stringify({ accountMenuContract, accountTriggerBounds })}`,
+    );
+  }
+
   await projectGroup.press("Space");
   const resizeSidebar = async (width, height) => {
     const layoutMode = width <= 720 ? "narrow" : width >= 1_024 ? "wide" : "medium";

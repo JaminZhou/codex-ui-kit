@@ -329,6 +329,59 @@ try {
     );
   }
 
+  const accountMenuTrigger = page.getByRole("button", {
+    exact: true,
+    name: "Demo account",
+  });
+  await accountMenuTrigger.click();
+  const accountMenu = page.getByRole("menu", { name: "Account menu" });
+  await accountMenu.waitFor({ state: "visible" });
+  const accountMenuContract = await accountMenu.evaluate((menu) => {
+    const bounds = menu.getBoundingClientRect();
+    return {
+      dividerHeight: menu
+        .querySelector(".demo-current-sidebar-account-menu__divider")
+        ?.getBoundingClientRect().height,
+      focusRole: document.activeElement?.getAttribute("role"),
+      icons: Array.from(
+        menu.querySelectorAll("[data-current-build-icon]"),
+        (icon) => icon.getAttribute("data-current-build-icon"),
+      ),
+      imageCount: menu.querySelectorAll("img").length,
+      itemCount: menu.querySelectorAll('[role="menuitem"]').length,
+      rect: { height: bounds.height, width: bounds.width },
+      separatorCount: menu.querySelectorAll('[role="separator"]').length,
+    };
+  });
+  await page.keyboard.press("Escape");
+  await accountMenu.waitFor({ state: "hidden" });
+  accountMenuContract.focusReturned = await accountMenuTrigger.evaluate(
+    (element) => document.activeElement === element,
+  );
+  if (
+    accountMenuContract.itemCount !== 6 ||
+    accountMenuContract.imageCount !== 1 ||
+    accountMenuContract.separatorCount !== 0 ||
+    accountMenuContract.dividerHeight !== 9 ||
+    accountMenuContract.focusRole !== "menuitem" ||
+    !accountMenuContract.focusReturned ||
+    Math.abs(accountMenuContract.rect.width - 258) > 1 ||
+    Math.abs(accountMenuContract.rect.height - 188.38) > 1 ||
+    JSON.stringify(accountMenuContract.icons) !==
+      JSON.stringify([
+        "sidebar-account-menu-usage",
+        "sidebar-account-menu-usage-chevron",
+        "sidebar-account-menu-pet",
+        "sidebar-account-menu-invite",
+        "sidebar-account-menu-settings",
+        "sidebar-account-menu-logout",
+      ])
+  ) {
+    throw new Error(
+      `Electron account menu lifecycle failed: ${JSON.stringify(accountMenuContract)}`,
+    );
+  }
+
   const sidebarToggle = page.getByRole("button", { name: "Hide sidebar" });
   await sidebarToggle.click();
   await page.waitForSelector(

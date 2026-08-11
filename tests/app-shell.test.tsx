@@ -3794,6 +3794,31 @@ describe("application sidebar", () => {
     ).toBeTruthy();
   });
 
+  it("lets a menu wrap the footer account trigger without duplicating its markup", async () => {
+    render(
+      <AppSidebarFooter
+        account="Demo account"
+        accountAvatar="D"
+        renderAccountTrigger={(trigger) => (
+          <Popover label="Account menu" role="menu" trigger={trigger}>
+            <button role="menuitem" type="button">
+              Usage remaining
+            </button>
+          </Popover>
+        )}
+      />,
+    );
+
+    const account = screen.getByRole("button", { name: "Demo account" });
+    expect(account.classList.contains("codex-ui-app-sidebar-footer__account")).toBe(
+      true,
+    );
+    fireEvent.click(account);
+    expect(screen.getByRole("menu", { name: "Account menu" })).toBeTruthy();
+    fireEvent.keyDown(screen.getByRole("menu"), { key: "Escape" });
+    await waitFor(() => expect(document.activeElement).toBe(account));
+  });
+
   it("keeps titleless collapsible content reachable", () => {
     const { container } = render(
       <AppSidebar>
