@@ -1155,11 +1155,13 @@
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
         "cdp:worktree-settings-empty-state-and-retention-controls",
-        "cdp-26.721:local-environment-worktree-groups-and-main-context"
+        "cdp-26.721:local-environment-worktree-groups-and-main-context",
+        "cdp-26.803.61601:real-worktree-task-cross-restart-persistence-with-selection-restored-thread",
+        "cdp-26.803.61601:missing-working-directory-model-only-turn-session-latched-warning-and-restart-recovery"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "partial_legacy",
-      "electronStatus": "partial_legacy",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
       "priority": "p0"
     },
     {

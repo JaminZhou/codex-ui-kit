@@ -104,6 +104,22 @@ export const visualScenes = [
     view: "workspace",
   },
   {
+    currentSidebar: true,
+    frame: "workspace-persisted-thread",
+    id: "workspace-persisted-thread",
+    maxPixelRatio: 0.01,
+    scenario: "workspace-workflow",
+    view: "workspace",
+  },
+  {
+    currentSidebar: true,
+    frame: "workspace-directory-missing",
+    id: "workspace-directory-missing",
+    maxPixelRatio: 0.01,
+    scenario: "workspace-workflow",
+    view: "workspace",
+  },
+  {
     frame: "conversation-thread-ready",
     id: "conversation-thread-ready",
     maxPixelRatio: 0.0225,

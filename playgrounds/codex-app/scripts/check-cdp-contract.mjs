@@ -384,6 +384,194 @@ for (const scene of visualScenes) {
       );
       continue;
     }
+    if (
+      scene.view === "workspace" &&
+      (scene.frame === "workspace-persisted-thread" ||
+        scene.frame === "workspace-directory-missing")
+    ) {
+      await page.waitForTimeout(50);
+      const contract = await page.evaluate(() => {
+        const rect = (element) => {
+          if (!(element instanceof Element)) return null;
+          const value = element.getBoundingClientRect();
+          return {
+            bottom: value.bottom,
+            height: value.height,
+            left: value.left,
+            right: value.right,
+            top: value.top,
+            width: value.width,
+          };
+        };
+        const root = document.querySelector(".demo-root");
+        const notice = document.querySelector(
+          ".codex-ui-working-directory-notice",
+        );
+        const heading = notice?.querySelector(
+          ".codex-ui-working-directory-notice__heading",
+        );
+        const message = notice?.querySelector(
+          ".codex-ui-working-directory-notice__message",
+        );
+        const composer = document.querySelector(
+          ".demo-workspace-persisted-composer > .codex-ui-composer",
+        );
+        const persistedTask = Array.from(
+          document.querySelectorAll(".codex-ui-app-sidebar__item"),
+        ).find(
+          (element) =>
+            element.textContent?.trim() === "Verify worktree persistence",
+        );
+        const persistedRow = persistedTask?.closest(
+          ".codex-ui-app-sidebar__item-row",
+        );
+        const worktreeMarker = persistedRow?.querySelector(
+          ".codex-ui-app-sidebar__item-worktree-indicator svg",
+        );
+        const summary = document.querySelector(
+          ".demo-workspace-thread-summary",
+        );
+        const noticeStyle = notice ? getComputedStyle(notice) : null;
+        const headingStyle = heading ? getComputedStyle(heading) : null;
+        const messageStyle = message ? getComputedStyle(message) : null;
+        const textarea = composer?.querySelector("textarea");
+        return {
+          composer: rect(composer),
+          frame: root?.getAttribute("data-frame"),
+          horizontalOverflow:
+            document.documentElement.scrollWidth -
+            document.documentElement.clientWidth,
+          messages: Array.from(
+            document.querySelectorAll(
+              ".demo-workspace-persisted-thread .codex-ui-agent-message",
+            ),
+            (element) => ({
+              role: element.getAttribute("data-role"),
+              text: element.textContent?.trim(),
+            }),
+          ),
+          notice: notice
+            ? {
+                heading: heading?.textContent?.trim(),
+                message: message?.textContent?.trim(),
+                rect: rect(notice),
+                style: {
+                  backgroundColor: noticeStyle?.backgroundColor,
+                  borderRadius: noticeStyle?.borderRadius,
+                  boxShadow: noticeStyle?.boxShadow,
+                  fontSize: noticeStyle?.fontSize,
+                  gap: noticeStyle?.gap,
+                  lineHeight: noticeStyle?.lineHeight,
+                  padding: noticeStyle?.padding,
+                },
+                headingStyle: {
+                  fontWeight: headingStyle?.fontWeight,
+                },
+                messageStyle: {
+                  color: messageStyle?.color,
+                },
+              }
+            : null,
+          selectedTask: persistedTask
+            ? {
+                current: persistedTask.getAttribute("aria-current"),
+                describedBy: persistedTask.getAttribute("aria-describedby"),
+                rect: rect(persistedRow),
+                selected: persistedTask.getAttribute("data-selected"),
+                worktreeStatus:
+                  persistedTask.getAttribute("data-worktree-status"),
+              }
+            : null,
+          summary: summary
+            ? {
+                items: Array.from(
+                  summary.querySelectorAll(
+                    ".codex-ui-thread-summary-item__label",
+                  ),
+                  (element) => element.textContent?.trim(),
+                ),
+                rect: rect(summary),
+              }
+            : null,
+          textarea: textarea
+            ? {
+                ariaLabel: textarea.getAttribute("aria-label"),
+                disabled: textarea.disabled,
+              }
+            : null,
+          title: document
+            .querySelector(".demo-workspace-persisted-title")
+            ?.textContent?.trim(),
+          view: root?.getAttribute("data-view"),
+          worktreeMarker: rect(worktreeMarker),
+        };
+      });
+      const missingExpected =
+        scene.frame === "workspace-directory-missing";
+      const expectedMessages = missingExpected ? 4 : 2;
+      const expectedSummaryItems = [
+        "Changes",
+        "Worktree",
+        "main",
+        "Commit or push",
+        missingExpected ? "Pull request status unavailable" : "No pull request",
+        "Create a file or site",
+      ];
+      if (
+        contract.view !== "workspace" ||
+        contract.frame !== scene.frame ||
+        contract.horizontalOverflow > 1 ||
+        contract.title !== "Verify worktree persistence" ||
+        contract.messages.length !== expectedMessages ||
+        contract.messages.at(0)?.role !== "user" ||
+        contract.messages.at(1)?.role !== "assistant" ||
+        !contract.composer ||
+        Math.abs(contract.composer.width - 736) > 1 ||
+        Math.abs(contract.composer.height - 98) > 1 ||
+        contract.textarea?.ariaLabel !== "Do anything" ||
+        contract.textarea?.disabled ||
+        contract.selectedTask?.current !== "page" ||
+        contract.selectedTask?.selected !== "true" ||
+        contract.selectedTask?.worktreeStatus !== "restored" ||
+        Math.abs((contract.selectedTask?.rect?.height ?? 0) - 30) > 1 ||
+        Math.abs((contract.worktreeMarker?.width ?? 0) - 14) > 1 ||
+        Math.abs((contract.worktreeMarker?.height ?? 0) - 14) > 1 ||
+        !contract.summary ||
+        Math.abs(contract.summary.rect.width - 240) > 1 ||
+        Math.abs(contract.summary.rect.height - 225) > 1 ||
+        JSON.stringify(contract.summary.items) !==
+          JSON.stringify(expectedSummaryItems) ||
+        Boolean(contract.notice) !== missingExpected
+      ) {
+        throw new Error(
+          `${scene.id}: persisted workspace contract failed: ${JSON.stringify(contract)}`,
+        );
+      }
+      if (
+        missingExpected &&
+        (contract.notice?.heading !== "Current working directory missing" ||
+          contract.notice?.message !==
+            "This chat's working directory no longer exists" ||
+          Math.abs((contract.notice?.rect?.width ?? 0) - 736) > 1 ||
+          Math.abs((contract.notice?.rect?.height ?? 0) - 37.125) > 0.2 ||
+          contract.notice?.style.borderRadius !== "20px" ||
+          contract.notice?.style.backgroundColor !== "rgb(24, 24, 24)" ||
+          contract.notice?.style.fontSize !== "13px" ||
+          contract.notice?.style.gap !== "8px" ||
+          contract.notice?.style.lineHeight !== "21.125px" ||
+          contract.notice?.style.padding !== "8px 8px 8px 12px" ||
+          contract.notice?.headingStyle.fontWeight !== "600")
+      ) {
+        throw new Error(
+          `${scene.id}: working-directory notice contract failed: ${JSON.stringify(contract.notice)}`,
+        );
+      }
+      await writeFile(
+        join(artifactDirectory, `${scene.id}.json`),
+        `${JSON.stringify(contract, null, 2)}\n`,
+      );
+      continue;
+    }
     if (scene.view === "workspace") {
       await page.waitForTimeout(50);
       const contract = await page.evaluate(() => {

@@ -295,7 +295,10 @@ describe("lifecycle visual policy", () => {
       "CODEX_UI_KIT_CURRENT_DARK_SHELL_TOP_MAX_DIFF_RATIO",
     );
     expect(appSource).toContain(
-      'aria-current={view === "workspace" ? "page" : undefined}',
+      'view === "workspace" && !workspacePersistenceFrame',
+    );
+    expect(appSource).toContain(
+      "currentWorkspacePersistenceFrame(activeFrame)",
     );
   });
 

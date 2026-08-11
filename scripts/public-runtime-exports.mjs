@@ -127,6 +127,7 @@ export const publicRuntimeExports = [
   "ToolCallCard",
   "Tooltip",
   "TurnDuration",
+  "WorkingDirectoryNotice",
   "WorkspacePanel",
   "WorkspaceSelection",
   "WorktreeList",

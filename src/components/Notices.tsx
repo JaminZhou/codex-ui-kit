@@ -196,6 +196,44 @@ export interface InlineNoticeProps
   wrap?: boolean;
 }
 
+export interface WorkingDirectoryNoticeProps
+  extends Omit<HTMLAttributes<HTMLElement>, "children" | "title"> {
+  children?: ReactNode;
+  heading?: ReactNode;
+}
+
+/**
+ * Reports that a persisted conversation no longer has a reachable working
+ * directory. The notice is intentionally informational: the current desktop
+ * client keeps the Composer available for model-only turns and clears the
+ * latched warning when the host restores the conversation lifecycle.
+ */
+export function WorkingDirectoryNotice({
+  children = "This chat's working directory no longer exists",
+  className,
+  heading = "Current working directory missing",
+  ...props
+}: WorkingDirectoryNoticeProps) {
+  return (
+    <aside
+      {...props}
+      className={["codex-ui-working-directory-notice", className]
+        .filter(Boolean)
+        .join(" ")}
+      data-status="missing"
+    >
+      <span className="codex-ui-working-directory-notice__heading">
+        {heading}
+      </span>
+      {children ? (
+        <span className="codex-ui-working-directory-notice__message">
+          {children}
+        </span>
+      ) : null}
+    </aside>
+  );
+}
+
 export function InlineNotice({
   children,
   className,

@@ -73,8 +73,8 @@ observation from a previous build remains historical evidence.
   previous-build regression evidence and have been downgraded from `verified`
   to `partial_legacy` until they are reached again on the current fingerprint.
 
-Current inventory: 86 surface groups; 17 have current-build runtime evidence, 52 have previous-build-only runtime evidence, 17 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 16 groups and Electron verification covers 16.
-Prior acceptance outside those 17 sampled current-build groups remains
+Current inventory: 86 surface groups; 18 have current-build runtime evidence, 51 have previous-build-only runtime evidence, 17 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 17 groups and Electron verification covers 17.
+Prior acceptance outside those 18 sampled current-build groups remains
 recorded as `partial_legacy` until current-build re-observation.
 
 The current package exposes candidates far beyond the old transcript sample:
@@ -316,12 +316,23 @@ External current-build ratios are 0.5437% for ready, 0.2248% for no project,
 0.2378% for New worktree, 2.9943% for the environment picker, 0.4619% for
 compact, 2.9046% for the project list, 3.2800% for Start in, and 7.1320% for
 branches. Implementation remains `partial` because project/branch creation,
-environment settings, persistence, Remote/Codex web execution, and unavailable
-environment behavior were not mutated in the current product. The searchable
+environment settings, Remote/Codex web execution, and unavailable environment
+behavior were not mutated in the current product. A later `26.803.61601`
+isolated probe creates a real worktree/task and proves project/task persistence
+across an app restart while keeping exact thread-route restoration conditional
+on selecting the retained task. Moving that disposable worktree aside reaches
+a 736×37.125 missing-working-directory notice and unavailable PR status while
+the 736×98 Composer and a model-only turn remain usable. Restoring the
+directory does not clear the warning in-session; the next app restart does.
+Browser/CDP, Electron, and a 3.2572% local-only notice-region gate cover that
+observed boundary without inventing a Retry or repair control. The searchable
 600×600 `LocalEnvironmentDialog` remains a protocol-neutral host capability;
 it is no longer presented as the current New worktree entry behavior. The
-broader projects index, environment settings, and worktree settings families
-remain partial/legacy, as does the legacy host-defined route selector. Global
+broader projects index and environment settings families remain partial/legacy;
+the worktree family has current Browser/Electron verification for the delivered
+creation/persistence/missing-directory slice but remains partially implemented
+because settings and additional repair variants are still open. The legacy
+host-defined route selector also remains partial/legacy. Global
 notification runtime observation and light-theme shell evidence also remain
 open.
 

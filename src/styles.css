@@ -52,6 +52,8 @@
 .codex-ui-status-banner *,
 .codex-ui-inline-notice,
 .codex-ui-inline-notice *,
+.codex-ui-working-directory-notice,
+.codex-ui-working-directory-notice *,
 .codex-ui-stream-notice,
 .codex-ui-stream-notice *,
 .codex-ui-search-activity *,
@@ -4050,6 +4052,47 @@
 .codex-ui-status-banner[data-layout="vertical"]
   .codex-ui-status-banner__icon {
   align-self: start;
+}
+
+.codex-ui-working-directory-notice {
+  align-items: center;
+  background: var(--codex-ui-background-surface);
+  border: 0;
+  border-radius: 20px;
+  box-shadow:
+    0 0 0 0.5px var(--codex-ui-border-heavy),
+    var(--codex-ui-shadow-sm);
+  color: var(--codex-ui-text);
+  display: flex;
+  font-family: var(--codex-ui-font-sans);
+  font-size: 13px;
+  font-weight: var(--codex-ui-font-weight-shell);
+  gap: 8px;
+  line-height: 21.125px;
+  min-height: 37.125px;
+  min-width: 0;
+  overflow: hidden;
+  padding: 8px 8px 8px 12px;
+  width: 100%;
+}
+
+.codex-ui-working-directory-notice__heading {
+  color: var(--codex-ui-text);
+  flex: 0 1 auto;
+  font-weight: var(--codex-ui-font-weight-semibold);
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.codex-ui-working-directory-notice__message {
+  color: var(--codex-ui-text-secondary);
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .codex-ui-inline-notice {

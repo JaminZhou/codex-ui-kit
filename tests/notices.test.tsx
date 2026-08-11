@@ -3,7 +3,12 @@
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { InlineNotice, StatusBanner, StreamNotice } from "../src";
+import {
+  InlineNotice,
+  StatusBanner,
+  StreamNotice,
+  WorkingDirectoryNotice,
+} from "../src";
 
 afterEach(cleanup);
 
@@ -146,6 +151,35 @@ describe("InlineNotice", () => {
     ).toHaveLength(2);
     expect(screen.getByText("Turn ended by Auto-review")).toBeTruthy();
     expect(screen.getByRole("button", { name: "Why?" })).toBeTruthy();
+  });
+});
+
+describe("WorkingDirectoryNotice", () => {
+  it("keeps the missing-directory state informational", () => {
+    render(<WorkingDirectoryNotice aria-label="Workspace status" />);
+
+    const notice = screen.getByRole("complementary", {
+      name: "Workspace status",
+    });
+    expect(notice.getAttribute("data-status")).toBe("missing");
+    expect(screen.getByText("Current working directory missing")).toBeTruthy();
+    expect(
+      screen.getByText("This chat's working directory no longer exists"),
+    ).toBeTruthy();
+    expect(screen.queryByRole("button")).toBeNull();
+  });
+
+  it("supports de-identified host copy without changing the state contract", () => {
+    render(
+      <WorkingDirectoryNotice heading="Workspace unavailable">
+        Restore the workspace and reopen this conversation.
+      </WorkingDirectoryNotice>,
+    );
+
+    expect(screen.getByText("Workspace unavailable")).toBeTruthy();
+    expect(
+      screen.getByText("Restore the workspace and reopen this conversation."),
+    ).toBeTruthy();
   });
 });
 
