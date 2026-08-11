@@ -1247,8 +1247,20 @@
   min-width: 0;
 }
 
-.codex-ui-app-sidebar-footer > .codex-ui-popover-anchor {
+.codex-ui-app-sidebar-footer__account-control {
+  display: flex;
   flex: 1 1 auto;
+  min-width: 0;
+}
+
+.codex-ui-app-sidebar-footer__account-control > * {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.codex-ui-app-sidebar-footer__account-control
+  .codex-ui-app-sidebar-footer__account {
+  width: 100%;
 }
 
 .codex-ui-app-sidebar-footer__account {

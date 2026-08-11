@@ -2205,7 +2205,7 @@ export interface AppSidebarFooterProps
   actions?: ReactNode;
   renderAccountTrigger?: (
     trigger: ReactElement<ButtonHTMLAttributes<HTMLButtonElement>>
-  ) => ReactNode;
+  ) => ReactElement;
   status?: ReactNode;
 }
 
@@ -2262,9 +2262,13 @@ export function AppSidebarFooter({
         .join(" ")}
       {...props}
     >
-      {renderAccountTrigger
-        ? renderAccountTrigger(accountTrigger)
-        : accountTrigger}
+      {renderAccountTrigger ? (
+        <span className="codex-ui-app-sidebar-footer__account-control">
+          {renderAccountTrigger(accountTrigger)}
+        </span>
+      ) : (
+        accountTrigger
+      )}
       {actions ? (
         <span
           aria-label="Sidebar footer actions"

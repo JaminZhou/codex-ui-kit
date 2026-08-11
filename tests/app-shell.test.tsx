@@ -3794,7 +3794,7 @@ describe("application sidebar", () => {
     ).toBeTruthy();
   });
 
-  it("lets a menu wrap the footer account trigger without duplicating its markup", async () => {
+  it("lets any single overlay wrap a full-width footer account trigger", async () => {
     render(
       <AppSidebarFooter
         account="Demo account"
@@ -3810,9 +3810,18 @@ describe("application sidebar", () => {
     );
 
     const account = screen.getByRole("button", { name: "Demo account" });
-    expect(account.classList.contains("codex-ui-app-sidebar-footer__account")).toBe(
-      true,
+    expect(
+      account.classList.contains("codex-ui-app-sidebar-footer__account"),
+    ).toBe(true);
+    const accountControl = account.closest(
+      ".codex-ui-app-sidebar-footer__account-control",
     );
+    expect(accountControl).toBeTruthy();
+    expect(
+      accountControl?.querySelectorAll(
+        ".codex-ui-app-sidebar-footer__account",
+      ),
+    ).toHaveLength(1);
     fireEvent.click(account);
     expect(screen.getByRole("menu", { name: "Account menu" })).toBeTruthy();
     fireEvent.keyDown(screen.getByRole("menu"), { key: "Escape" });

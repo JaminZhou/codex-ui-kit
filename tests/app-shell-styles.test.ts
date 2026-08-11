@@ -140,6 +140,12 @@ describe("application shell visual contract", () => {
     expect(styles).toContain(
       ".codex-ui-app-sidebar-footer__account",
     );
+    expect(styles).toMatch(
+      /\.codex-ui-app-sidebar-footer__account-control \{[\s\S]*?flex: 1 1 auto;[\s\S]*?min-width: 0;/,
+    );
+    expect(styles).toContain(
+      ".codex-ui-app-sidebar-footer__account-control > *",
+    );
     expect(styles).toContain(
       ".codex-ui-agent-message__actions,\n  .codex-ui-app-sidebar__item-actions,\n  .codex-ui-app-sidebar__section-chevron {\n    transition: none;",
     );
