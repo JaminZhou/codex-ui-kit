@@ -4863,22 +4863,17 @@ export function App() {
     if (!workspaceUsesHostBranches || !workspaceProjectId) {
       return workspaceEnvironmentGroups;
     }
-    const matchingGroup = workspaceEnvironmentGroups.find(
+    const templateGroup = workspaceEnvironmentGroups.find(
       ({ id }) => id === workspaceProjectId,
-    );
-    const templateGroup = matchingGroup ?? workspaceEnvironmentGroups[0];
+    ) ?? workspaceEnvironmentGroups[0];
     if (!templateGroup) return [];
-    const [currentCheckout, ...templateLinkedWorktrees] =
-      templateGroup.items;
+    const [currentCheckout] = templateGroup.items;
     if (!currentCheckout) return [];
     const hostGroup = {
       ...templateGroup,
       id: workspaceProjectId,
       label: workspaceProject?.label ?? workspaceProjectId,
     };
-    const linkedWorktrees = matchingGroup
-      ? templateLinkedWorktrees
-      : [];
     if (workspaceHostBranchState?.status !== "ready") {
       return [
         {
@@ -4890,7 +4885,6 @@ export function App() {
               meta: "Loading Git branches",
               status: "unavailable" as const,
             },
-            ...linkedWorktrees,
           ],
         },
       ];
@@ -4919,7 +4913,7 @@ export function App() {
             ? "Unborn checkout"
             : "Detached HEAD",
         };
-    return [{ ...hostGroup, items: [currentItem, ...linkedWorktrees] }];
+    return [{ ...hostGroup, items: [currentItem] }];
   })();
   const workspaceBranchOperationsAvailable =
     !workspaceUsesHostBranches ||

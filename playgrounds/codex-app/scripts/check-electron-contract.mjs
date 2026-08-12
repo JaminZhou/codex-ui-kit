@@ -5141,43 +5141,44 @@ const {
   },
 });
 try {
-  await linkedWorktreePage
-    .getByRole("dialog", { name: "Select local environment" })
-    .getByRole("button", { name: "Use local environment Coding workspace" })
-    .click();
-  await linkedWorktreePage.waitForSelector(
-    'button[aria-label="Change worktree: feat/coding-workspace-lifecycle"]',
-  );
-  await linkedWorktreePage.waitForTimeout(1_000);
+  const hostLocalEnvironmentDialog = linkedWorktreePage.getByRole("dialog", {
+    name: "Select local environment",
+  });
   if (
-    !(await linkedWorktreePage
-      .getByRole("button", {
-        name: "Change worktree: feat/coding-workspace-lifecycle",
-      })
-      .isVisible())
+    (await hostLocalEnvironmentDialog
+      .getByRole("button", { name: "Use local environment Coding workspace" })
+      .count()) !== 0
   ) {
-    const state = await linkedWorktreePage.evaluate(() => ({
-      frame: document.querySelector(".demo-root")?.getAttribute("data-frame"),
-      worktreeButtons: Array.from(
-        document.querySelectorAll('button[aria-label^="Change worktree:"]'),
-        (button) => button.getAttribute("aria-label"),
-      ),
-    }));
     throw new Error(
-      `Electron branch loading replaced the selected linked worktree: ${JSON.stringify(state)}.`,
+      "Electron host mode exposed a replay-only linked worktree fixture.",
     );
   }
+  await linkedWorktreePage.waitForTimeout(1_000);
+  const hostCurrentCheckout = hostLocalEnvironmentDialog.getByRole("button", {
+    name: "Use local environment Main",
+  });
+  if (
+    (await hostLocalEnvironmentDialog.locator("li").count()) !== 1 ||
+    (await hostCurrentCheckout.isDisabled())
+  ) {
+    throw new Error(
+      "Electron host mode did not expose exactly one available current checkout.",
+    );
+  }
+  await hostCurrentCheckout.click();
+  await linkedWorktreePage.waitForSelector(
+    'button[aria-label="Change worktree: main"]',
+  );
   await linkedWorktreePage
     .getByRole("textbox", { name: "Do anything" })
-    .fill("Run the linked worktree lifecycle.");
+    .fill("Run the host current-checkout lifecycle.");
   await linkedWorktreePage
     .getByRole("textbox", { name: "Do anything" })
     .press("Enter");
   await linkedWorktreePage.waitForSelector(
     '.demo-root[data-view="conversation"][data-scenario="workspace-workflow"][data-frame="approval-pending"]',
   );
-  const linkedWorktreeCwd = `${linkedWorktreeGitDirectory}/.worktrees/feat-coding-workspace-lifecycle`;
-  const linkedWorktreeCommandCwds = await linkedWorktreePage
+  const hostCurrentCheckoutCommandCwds = await linkedWorktreePage
     .locator(
       '[data-testid="command-execution"] .codex-ui-command-execution__shell',
     )
@@ -5185,12 +5186,12 @@ try {
       elements.map((element) => element.getAttribute("title")),
     );
   if (
-    linkedWorktreeCommandCwds.some(
-      (cwd) => cwd !== `cwd\n${linkedWorktreeCwd}`,
+    hostCurrentCheckoutCommandCwds.some(
+      (cwd) => cwd !== `cwd\n${linkedWorktreeGitDirectory}`,
     )
   ) {
     throw new Error(
-      `Electron linked-worktree selection routed to the wrong cwd: ${JSON.stringify(linkedWorktreeCommandCwds)}.`,
+      `Electron host current checkout routed to the wrong cwd: ${JSON.stringify(hostCurrentCheckoutCommandCwds)}.`,
     );
   }
 } finally {
