@@ -35,6 +35,12 @@ function normalizedBranchName(value: string) {
   return value.trim();
 }
 
+export function decodeGitOutput(chunks: readonly Uint8Array[]) {
+  return Buffer.concat(chunks.map((chunk) => Buffer.from(chunk)))
+    .toString("utf8")
+    .trim();
+}
+
 async function runGit(
   cwd: string,
   args: readonly string[],
@@ -51,7 +57,7 @@ async function runGit(
     let failure: Error | undefined;
     let finished = false;
     let forcedSettlementTimer: ReturnType<typeof setTimeout> | undefined;
-    let stdout = "";
+    const stdoutChunks: Buffer[] = [];
     let capturedBytes = 0;
     let terminationStarted = false;
     let timer: ReturnType<typeof setTimeout> | undefined;
@@ -121,7 +127,7 @@ async function runGit(
         );
         return;
       }
-      if (includeInStdout) stdout += chunk.toString("utf8");
+      if (includeInStdout) stdoutChunks.push(chunk);
     };
     child.stdout.on("data", (chunk: Buffer) => capture(chunk, true));
     child.stderr.on("data", (chunk: Buffer) => capture(chunk, false));
@@ -137,7 +143,7 @@ async function runGit(
         rejectOnce(new Error(`Git exited with status ${code ?? "unknown"}.`));
         return;
       }
-      resolveOnce(stdout.trim());
+      resolveOnce(decodeGitOutput(stdoutChunks));
     });
     timer = setTimeout(() => {
       terminateAndBoundSettlement(

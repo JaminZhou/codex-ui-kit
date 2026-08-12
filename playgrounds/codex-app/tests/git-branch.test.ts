@@ -7,6 +7,7 @@ import { afterEach, describe, expect, it } from "vitest";
 import {
   checkoutGitBranch,
   createAndCheckoutGitBranch,
+  decodeGitOutput,
   listGitBranches,
 } from "../electron/git-branch";
 
@@ -43,6 +44,15 @@ afterEach(async () => {
 });
 
 describe("Git branch creation", () => {
+  it("decodes multibyte branch output after joining stream chunks", () => {
+    const output = Buffer.from("main\nfeat/修复-界面\n", "utf8");
+    const split = output.indexOf(Buffer.from("修", "utf8")) + 1;
+
+    expect(
+      decodeGitOutput([output.subarray(0, split), output.subarray(split)]),
+    ).toBe("main\nfeat/修复-界面");
+  });
+
   it("creates and checks out a valid branch in the configured repository", async () => {
     const repository = await temporaryRepository();
 
