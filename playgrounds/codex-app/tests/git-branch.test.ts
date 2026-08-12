@@ -93,6 +93,21 @@ describe("Git branch creation", () => {
     expect(stdout.trim()).toBe("main");
   });
 
+  it("rejects checkout shorthands as literal branch names", async () => {
+    const repository = await temporaryRepository();
+    await execFileAsync("git", ["switch", "--detach"], { cwd: repository });
+    await execFileAsync("git", ["switch", "main"], { cwd: repository });
+
+    await expect(
+      createAndCheckoutGitBranch(repository, "@{-1}"),
+    ).rejects.toMatchObject({ code: "invalid" });
+    await expect(listGitBranches(repository)).resolves.toEqual({
+      branches: ["main"],
+      currentBranch: "main",
+      unbornBranch: null,
+    });
+  });
+
   it("preserves branch names when tags use the same short names", async () => {
     const repository = await temporaryRepository();
     await execFileAsync("git", ["tag", "main"], { cwd: repository });

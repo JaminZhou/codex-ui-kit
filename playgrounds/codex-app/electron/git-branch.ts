@@ -189,7 +189,7 @@ async function assertValidBranchName(
   try {
     await runGit(
       cwd,
-      ["check-ref-format", "--branch", branchName],
+      ["check-ref-format", `refs/heads/${branchName}`],
       options,
     );
   } catch (error) {
