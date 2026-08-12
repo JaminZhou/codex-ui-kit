@@ -226,7 +226,11 @@ export function ProjectIndex({
       >
         {onSortChange ? (
           <button
-            aria-label={`Sort projects by ${key}`}
+            aria-label={
+              active
+                ? `Sort projects by ${key}, ${sortDirection}`
+                : `Sort projects by ${key}`
+            }
             aria-pressed={active}
             onClick={() => onSortChange(key)}
             type="button"
@@ -323,7 +327,14 @@ export function ProjectIndex({
                 data-status={item.status}
                 key={item.id}
               >
-                <div className="codex-ui-project-index__row">
+                <div
+                  className="codex-ui-project-index__row"
+                  data-has-actions={Boolean(item.actions) || undefined}
+                  data-has-expand={
+                    Boolean(item.recentChats && onExpandedChange) ||
+                    undefined
+                  }
+                >
                   <button
                     aria-current={selected ? "page" : undefined}
                     aria-describedby={describedBy || undefined}

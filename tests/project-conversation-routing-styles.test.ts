@@ -83,6 +83,12 @@ describe("project conversation routing visual contract", () => {
     expect(styles).toMatch(
       /@container codex-ui-project-index \(max-width: 42\.5rem\)[\s\S]*?\.codex-ui-project-index__updated \{[\s\S]*?display: none/,
     );
+    expect(styles).toMatch(
+      /\.codex-ui-project-index\[data-layout="list"\][\s\S]*?\.codex-ui-project-index__row\[data-has-actions\][\s\S]*?padding-inline-end: 2\.75rem/,
+    );
+    expect(styles).toMatch(
+      /\.codex-ui-project-index\[data-layout="list"\][\s\S]*?\.codex-ui-project-index__row\[data-has-expand\][\s\S]*?padding-inline-end: 4\.75rem/,
+    );
     expect(styles).toContain(".codex-ui-project-index__recent");
     expect(styles).toContain(".codex-ui-project-index__page-status");
   });

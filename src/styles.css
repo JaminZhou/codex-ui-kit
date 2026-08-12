@@ -11186,6 +11186,18 @@ button.codex-ui-generated-image-gallery__image {
   position: relative;
 }
 
+.codex-ui-project-index[data-layout="list"]
+  .codex-ui-project-index__row[data-has-actions]
+  .codex-ui-project-index__item {
+  padding-inline-end: 2.75rem;
+}
+
+.codex-ui-project-index[data-layout="list"]
+  .codex-ui-project-index__row[data-has-expand]
+  .codex-ui-project-index__item {
+  padding-inline-end: 4.75rem;
+}
+
 .codex-ui-project-index[data-layout="table"]
   .codex-ui-project-index__item {
   align-items: center;

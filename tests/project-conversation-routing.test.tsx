@@ -751,10 +751,12 @@ describe("project conversation routing", () => {
         emptyState="No matching projects"
         items={[
           {
+            actions: <button aria-label="UI Kit actions">⋯</button>,
             description: "Current project",
             id: "ui-kit",
             label: "UI Kit",
             meta: "3 tasks",
+            recentChats: [],
             status: "available",
           },
           {
@@ -771,6 +773,7 @@ describe("project conversation routing", () => {
           },
         ]}
         onSelect={onSelect}
+        onExpandedChange={() => undefined}
         selectedId="ui-kit"
         toolbar={<input aria-label="Search projects" type="search" />}
       />,
@@ -785,6 +788,16 @@ describe("project conversation routing", () => {
       "Current project",
     );
     expect(accessibleDescriptionText(currentProject)).toContain("3 tasks");
+    expect(
+      currentProject
+        .closest(".codex-ui-project-index__row")
+        ?.getAttribute("data-has-actions"),
+    ).toBe("true");
+    expect(
+      currentProject
+        .closest(".codex-ui-project-index__row")
+        ?.getAttribute("data-has-expand"),
+    ).toBe("true");
     const missingProject = screen.getByRole("button", {
       name: "Open project Missing project",
     });
@@ -844,9 +857,14 @@ describe("project conversation routing", () => {
       "Some projects may be missing",
     );
     const updatedSort = screen.getByRole("button", {
-      name: "Sort projects by updated",
+      name: "Sort projects by updated, descending",
     });
     expect(updatedSort.getAttribute("aria-pressed")).toBe("true");
+    expect(
+      screen
+        .getByRole("button", { name: "Sort projects by name" })
+        .getAttribute("aria-pressed"),
+    ).toBe("false");
     fireEvent.click(updatedSort);
     expect(onSortChange).toHaveBeenCalledWith("updated");
     fireEvent.click(
