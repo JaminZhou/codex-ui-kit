@@ -37,8 +37,12 @@ describe("environment settings surfaces", () => {
       <EnvironmentSettingsPage
         message="Environment service failed"
         status="error"
+        statusHeading="Remote environment failed"
       />,
     );
+    expect(
+      screen.getByRole("alert", { name: "Remote environment failed" }),
+    ).toBeTruthy();
     expect(screen.getByRole("alert").textContent).toBe(
       "Environment service failed",
     );

@@ -20,7 +20,7 @@ export function EnvironmentSettingsPage({
   className,
   message = "We could not load local environment settings for this project",
   status = "ready",
-  statusHeading = "Local environments unavailable",
+  statusHeading,
   title = "Environments",
   ...props
 }: EnvironmentSettingsPageProps) {
@@ -28,8 +28,14 @@ export function EnvironmentSettingsPage({
   const statusHeadingId = useId();
   const statusMessageId = useId();
   const showStatus = status !== "ready";
-  const isUnavailable = status === "unavailable";
   const role = status === "error" ? "alert" : "status";
+  const resolvedStatusHeading =
+    statusHeading ??
+    (status === "loading"
+      ? "Loading local environments"
+      : status === "error"
+        ? "Local environments error"
+        : "Local environments unavailable");
 
   return (
     <section
@@ -43,13 +49,7 @@ export function EnvironmentSettingsPage({
       <h1 id={titleId}>{title}</h1>
       {showStatus ? (
         <div className="codex-ui-environment-settings-page__status">
-          <h2 id={statusHeadingId}>
-            {status === "loading"
-              ? "Loading local environments"
-              : isUnavailable
-                ? statusHeading
-                : "Local environments error"}
-          </h2>
+          <h2 id={statusHeadingId}>{resolvedStatusHeading}</h2>
           <div
             aria-labelledby={statusHeadingId}
             aria-describedby={statusMessageId}
