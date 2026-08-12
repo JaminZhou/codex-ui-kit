@@ -48,10 +48,13 @@ async function runGit(
       ? requestedTimeoutMs
       : defaultGitCommandTimeoutMs;
   return new Promise<string>((resolve, reject) => {
-    let timedOut = false;
     let failure: Error | undefined;
+    let finished = false;
+    let forcedSettlementTimer: ReturnType<typeof setTimeout> | undefined;
     let stdout = "";
     let capturedBytes = 0;
+    let terminationStarted = false;
+    let timer: ReturnType<typeof setTimeout> | undefined;
     const child = spawn(
       "git",
       [...args],
@@ -63,6 +66,16 @@ async function runGit(
       },
     );
     const killProcessTree = () => {
+      if (process.platform === "win32" && child.pid !== undefined) {
+        const terminator = spawn(
+          "taskkill",
+          ["/pid", String(child.pid), "/T", "/F"],
+          { stdio: "ignore", windowsHide: true },
+        );
+        terminator.on("error", () => child.kill("SIGKILL"));
+        terminator.unref();
+        return;
+      }
       if (process.platform !== "win32" && child.pid !== undefined) {
         try {
           process.kill(-child.pid, "SIGKILL");
@@ -73,11 +86,39 @@ async function runGit(
       }
       child.kill("SIGKILL");
     };
+    const clearTimers = () => {
+      if (timer !== undefined) clearTimeout(timer);
+      if (forcedSettlementTimer !== undefined) {
+        clearTimeout(forcedSettlementTimer);
+      }
+    };
+    const rejectOnce = (error: Error) => {
+      if (finished) return;
+      finished = true;
+      clearTimers();
+      reject(error);
+    };
+    const resolveOnce = (value: string) => {
+      if (finished) return;
+      finished = true;
+      clearTimers();
+      resolve(value);
+    };
+    const terminateAndBoundSettlement = (error: Error) => {
+      failure ??= error;
+      if (terminationStarted) return;
+      terminationStarted = true;
+      killProcessTree();
+      forcedSettlementTimer = setTimeout(() => {
+        rejectOnce(failure ?? error);
+      }, 1_000);
+    };
     const capture = (chunk: Buffer, includeInStdout: boolean) => {
       capturedBytes += chunk.length;
       if (capturedBytes > gitCommandMaxBufferBytes) {
-        failure ??= new Error("Git command output exceeded the allowed size.");
-        killProcessTree();
+        terminateAndBoundSettlement(
+          new Error("Git command output exceeded the allowed size."),
+        );
         return;
       }
       if (includeInStdout) stdout += chunk.toString("utf8");
@@ -85,32 +126,26 @@ async function runGit(
     child.stdout.on("data", (chunk: Buffer) => capture(chunk, true));
     child.stderr.on("data", (chunk: Buffer) => capture(chunk, false));
     child.on("error", (error) => {
-      failure ??= error;
+      rejectOnce(error);
     });
     child.on("close", (code) => {
-      clearTimeout(timer);
-      if (timedOut) {
-        reject(
-          new GitBranchCreationError(
-            "unavailable",
-            "The Git operation timed out.",
-          ),
-        );
-        return;
-      }
       if (failure) {
-        reject(failure);
+        rejectOnce(failure);
         return;
       }
       if (code !== 0) {
-        reject(new Error(`Git exited with status ${code ?? "unknown"}.`));
+        rejectOnce(new Error(`Git exited with status ${code ?? "unknown"}.`));
         return;
       }
-      resolve(stdout.trim());
+      resolveOnce(stdout.trim());
     });
-    const timer = setTimeout(() => {
-      timedOut = true;
-      killProcessTree();
+    timer = setTimeout(() => {
+      terminateAndBoundSettlement(
+        new GitBranchCreationError(
+          "unavailable",
+          "The Git operation timed out.",
+        ),
+      );
     }, timeoutMs);
   });
 }
@@ -193,12 +228,11 @@ async function switchGitBranch(
   mismatchMessage: string,
   options: GitCommandOptions,
 ) {
-  let switchFailed = false;
+  let switchError: unknown;
   try {
     await runGit(cwd, args, options);
   } catch (error) {
-    if (error instanceof GitBranchCreationError) throw error;
-    switchFailed = true;
+    switchError = error;
   }
   let currentBranch: string;
   try {
@@ -207,13 +241,15 @@ async function switchGitBranch(
       ["branch", "--show-current"],
       options,
     );
-  } catch {
+  } catch (error) {
+    if (error instanceof GitBranchCreationError) throw error;
     throw new GitBranchCreationError("unavailable", failureMessage);
   }
   if (currentBranch === branchName) return currentBranch;
+  if (switchError instanceof GitBranchCreationError) throw switchError;
   throw new GitBranchCreationError(
     "unavailable",
-    switchFailed ? failureMessage : mismatchMessage,
+    switchError ? failureMessage : mismatchMessage,
   );
 }
 
