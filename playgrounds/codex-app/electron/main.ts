@@ -62,6 +62,7 @@ let activeTurn: CodexTurn | null = null;
 let unsubscribeNotifications: (() => void) | null = null;
 let unsubscribeServerRequests: (() => void)[] = [];
 let attachmentFixtureFailureInjected = false;
+let projectFixtureSelectionIndex = 0;
 const liveTurnStartGate = new LiveTurnStartGate();
 const liveApprovalGate = new LiveApprovalGate();
 
@@ -357,6 +358,83 @@ async function handleSelectAttachments(event: IpcMainInvokeEvent) {
   return describeAttachmentPaths(result.filePaths);
 }
 
+async function handleSelectProjectDirectory(event: IpcMainInvokeEvent) {
+  assertTrustedIpc(event);
+  const fixtureSelectionsRaw =
+    process.env.CODEX_DEMO_PROJECT_FIXTURE_SELECTIONS;
+  if (fixtureSelectionsRaw) {
+    const fixtureSelections: unknown = JSON.parse(fixtureSelectionsRaw);
+    if (
+      !Array.isArray(fixtureSelections) ||
+      fixtureSelections.length === 0 ||
+      fixtureSelections.some(
+        (selection) =>
+          typeof selection !== "object" ||
+          selection === null ||
+          !("label" in selection) ||
+          typeof selection.label !== "string" ||
+          !("path" in selection) ||
+          typeof selection.path !== "string" ||
+          !isAbsolute(selection.path),
+      )
+    ) {
+      throw new TypeError(
+        "CODEX_DEMO_PROJECT_FIXTURE_SELECTIONS must be a non-empty array of labeled absolute directory paths.",
+      );
+    }
+    const selection = fixtureSelections[
+      Math.min(projectFixtureSelectionIndex, fixtureSelections.length - 1)
+    ] as { label: string; path: string };
+    projectFixtureSelectionIndex += 1;
+    return selection;
+  }
+  const fixturePathsRaw = process.env.CODEX_DEMO_PROJECT_FIXTURE_PATHS;
+  let fixturePath = process.env.CODEX_DEMO_PROJECT_FIXTURE_PATH;
+  if (fixturePathsRaw) {
+    const fixturePaths: unknown = JSON.parse(fixturePathsRaw);
+    if (
+      !Array.isArray(fixturePaths) ||
+      fixturePaths.length === 0 ||
+      fixturePaths.some((path) => typeof path !== "string" || !isAbsolute(path))
+    ) {
+      throw new TypeError(
+        "CODEX_DEMO_PROJECT_FIXTURE_PATHS must be a non-empty array of absolute directory paths.",
+      );
+    }
+    fixturePath =
+      fixturePaths[
+        Math.min(projectFixtureSelectionIndex, fixturePaths.length - 1)
+      ];
+    projectFixtureSelectionIndex += 1;
+  }
+  if (fixturePath) {
+    if (!isAbsolute(fixturePath) || !(await stat(fixturePath)).isDirectory()) {
+      throw new TypeError(
+        "CODEX_DEMO_PROJECT_FIXTURE_PATH must be an absolute directory path.",
+      );
+    }
+    return {
+      label: attachmentPathLabel(fixturePath, process.platform),
+      path: fixturePath,
+    };
+  }
+  const result = mainWindow
+    ? await dialog.showOpenDialog(mainWindow, {
+        properties: ["openDirectory", "createDirectory"],
+        title: "New project",
+      })
+    : await dialog.showOpenDialog({
+        properties: ["openDirectory", "createDirectory"],
+        title: "New project",
+      });
+  const path = result.filePaths[0];
+  if (result.canceled || !path) return null;
+  return {
+    label: attachmentPathLabel(path, process.platform),
+    path,
+  };
+}
+
 function createWindow() {
   const scenario = process.env.CODEX_DEMO_SCENARIO ?? "streaming-recovery";
   const frame = process.env.CODEX_DEMO_FRAME ?? "recovered";
@@ -367,7 +445,7 @@ function createWindow() {
   const view = process.env.CODEX_DEMO_VIEW ?? "conversation";
   const requestedTheme = process.env.CODEX_DEMO_THEME;
   const theme =
-    ["shell", "workspace"].includes(view) &&
+    ["projects", "shell", "workspace"].includes(view) &&
     ["system", "light", "dark"].includes(requestedTheme ?? "")
       ? requestedTheme!
       : "dark";
@@ -439,6 +517,7 @@ ipcMain.handle("demo:live:stop", handleStopLive);
 ipcMain.handle("demo:live:close", handleCloseLive);
 ipcMain.handle("demo:approval:respond", handleApprovalResponse);
 ipcMain.handle("demo:attachments:select", handleSelectAttachments);
+ipcMain.handle("demo:project:select", handleSelectProjectDirectory);
 
 app.whenReady().then(() => {
   createWindow();

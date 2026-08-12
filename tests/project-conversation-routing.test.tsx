@@ -751,10 +751,12 @@ describe("project conversation routing", () => {
         emptyState="No matching projects"
         items={[
           {
+            actions: <button aria-label="UI Kit actions">⋯</button>,
             description: "Current project",
             id: "ui-kit",
             label: "UI Kit",
             meta: "3 tasks",
+            recentChats: [],
             status: "available",
           },
           {
@@ -763,8 +765,15 @@ describe("project conversation routing", () => {
             status: "unavailable",
             statusLabel: "Unavailable",
           },
+          {
+            id: "failed",
+            label: "Failed project",
+            status: "error",
+            statusLabel: "Failed",
+          },
         ]}
         onSelect={onSelect}
+        onExpandedChange={() => undefined}
         selectedId="ui-kit"
         toolbar={<input aria-label="Search projects" type="search" />}
       />,
@@ -779,6 +788,16 @@ describe("project conversation routing", () => {
       "Current project",
     );
     expect(accessibleDescriptionText(currentProject)).toContain("3 tasks");
+    expect(
+      currentProject
+        .closest(".codex-ui-project-index__row")
+        ?.getAttribute("data-has-actions"),
+    ).toBe("true");
+    expect(
+      currentProject
+        .closest(".codex-ui-project-index__row")
+        ?.getAttribute("data-has-expand"),
+    ).toBe("true");
     const missingProject = screen.getByRole("button", {
       name: "Open project Missing project",
     });
@@ -786,7 +805,146 @@ describe("project conversation routing", () => {
     expect(accessibleDescriptionText(missingProject)).toContain(
       "Unavailable",
     );
-    expect(screen.getByRole("searchbox", { name: "Search projects" })).toBeTruthy();
+    const failedProject = screen.getByRole("button", {
+      name: "Open project Failed project",
+    });
+    expect(failedProject).toHaveProperty("disabled", true);
+    expect(accessibleDescriptionText(failedProject)).toContain("Failed");
+    expect(
+      screen.getByRole("searchbox", { name: "Search projects" }),
+    ).toBeTruthy();
+  });
+
+  it("renders the current table index with sort and recent-chat ownership", () => {
+    const onExpandedChange = vi.fn();
+    const onOpenRecentChat = vi.fn();
+    const onSortChange = vi.fn();
+    render(
+      <ProjectIndex
+        items={[
+          {
+            expanded: true,
+            id: "ui-kit",
+            kindLabel: "Local",
+            label: "UI Kit",
+            recentChats: [
+              {
+                id: "parity",
+                label: "Match project index",
+                meta: "2m",
+                pinned: true,
+              },
+            ],
+            updated: "2m",
+          },
+        ]}
+        layout="table"
+        onExpandedChange={onExpandedChange}
+        onOpenRecentChat={onOpenRecentChat}
+        onSelect={() => undefined}
+        onSortChange={onSortChange}
+        sortBy="updated"
+        sortDirection="descending"
+        status="partial-error"
+        toolbar={<input aria-label="Search projects" type="search" />}
+      />,
+    );
+
+    const index = screen.getByRole("navigation", { name: "Project index" });
+    expect(index.getAttribute("data-layout")).toBe("table");
+    expect(index.getAttribute("data-status")).toBe("partial-error");
+    expect(screen.getByRole("status").textContent).toContain(
+      "Some projects may be missing",
+    );
+    const updatedSort = screen.getByRole("button", {
+      name: "Sort projects by updated, descending",
+    });
+    expect(updatedSort.getAttribute("aria-pressed")).toBe("true");
+    expect(
+      screen
+        .getByRole("button", { name: "Sort projects by name" })
+        .getAttribute("aria-pressed"),
+    ).toBe("false");
+    fireEvent.click(updatedSort);
+    expect(onSortChange).toHaveBeenCalledWith("updated");
+    fireEvent.click(
+      screen.getByRole("button", {
+        name: "Hide recent chats in UI Kit",
+      }),
+    );
+    expect(onExpandedChange).toHaveBeenCalledWith("ui-kit", false);
+    const recentChat = screen.getByRole("button", {
+      name: "Open chat Match project index",
+    });
+    fireEvent.click(recentChat);
+    expect(onOpenRecentChat).toHaveBeenCalledWith("ui-kit", "parity");
+    expect(accessibleDescriptionText(recentChat)).toContain("2m");
+    expect(accessibleDescriptionText(recentChat)).toContain("Pinned");
+    expect(screen.getByLabelText("Pinned")).toBeTruthy();
+  });
+
+  it("renders recent chats as noninteractive content without an open handler", () => {
+    render(
+      <ProjectIndex
+        items={[
+          {
+            expanded: true,
+            id: "ui-kit",
+            label: "UI Kit",
+            recentChats: [
+              {
+                id: "parity",
+                label: "Match project index",
+                meta: "2m",
+                pinned: true,
+              },
+            ],
+          },
+        ]}
+        onExpandedChange={() => undefined}
+        onSelect={() => undefined}
+      />,
+    );
+
+    expect(
+      screen.queryByRole("button", {
+        name: "Open chat Match project index",
+      }),
+    ).toBeNull();
+    expect(screen.getByText("Match project index")).toBeTruthy();
+    expect(screen.getByText("2m")).toBeTruthy();
+    expect(screen.getByLabelText("Pinned")).toBeTruthy();
+  });
+
+  it("exposes table loading and error states without interactive rows", () => {
+    const { rerender } = render(
+      <ProjectIndex
+        items={[]}
+        layout="table"
+        onSelect={() => undefined}
+        status="loading"
+      />,
+    );
+
+    const index = screen.getByRole("navigation", { name: "Project index" });
+    expect(index.getAttribute("aria-busy")).toBe("true");
+    expect(screen.getByRole("status").textContent).toContain(
+      "Loading projects",
+    );
+    expect(screen.queryByText("No projects")).toBeNull();
+
+    rerender(
+      <ProjectIndex
+        items={[]}
+        layout="table"
+        onSelect={() => undefined}
+        status="error"
+      />,
+    );
+    expect(screen.getByRole("alert").textContent).toContain(
+      "Couldn’t load projects",
+    );
+    expect(screen.queryByText("No projects")).toBeNull();
   });
 
   it("supports radio keyboard navigation and skips unavailable routes", () => {

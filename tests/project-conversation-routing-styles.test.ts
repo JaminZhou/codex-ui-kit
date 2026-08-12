@@ -72,4 +72,24 @@ describe("project conversation routing visual contract", () => {
       '.codex-ui-project-index__status[data-status="unavailable"]',
     );
   });
+
+  it("matches the current projects table and compact updated-column boundary", () => {
+    expect(styles).toMatch(
+      /\.codex-ui-project-index__columns \{[\s\S]*?grid-template-columns: minmax\(0, 1fr\) 4rem 8rem;[\s\S]*?min-height: 2rem/,
+    );
+    expect(styles).toMatch(
+      /\.codex-ui-project-index\[data-layout="table"\][\s\S]*?\.codex-ui-project-index__item \{[\s\S]*?grid-template-columns: 2rem minmax\(0, 1fr\) 12rem;[\s\S]*?min-height: 4\.375rem/,
+    );
+    expect(styles).toMatch(
+      /@container codex-ui-project-index \(max-width: 42\.5rem\)[\s\S]*?\.codex-ui-project-index__updated \{[\s\S]*?display: none/,
+    );
+    expect(styles).toMatch(
+      /\.codex-ui-project-index\[data-layout="list"\][\s\S]*?\.codex-ui-project-index__row\[data-has-actions\][\s\S]*?padding-inline-end: 2\.75rem/,
+    );
+    expect(styles).toMatch(
+      /\.codex-ui-project-index\[data-layout="list"\][\s\S]*?\.codex-ui-project-index__row\[data-has-expand\][\s\S]*?padding-inline-end: 4\.75rem/,
+    );
+    expect(styles).toContain(".codex-ui-project-index__recent");
+    expect(styles).toContain(".codex-ui-project-index__page-status");
+  });
 });

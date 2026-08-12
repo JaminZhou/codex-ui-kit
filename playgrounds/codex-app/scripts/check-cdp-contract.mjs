@@ -258,6 +258,71 @@ for (const scene of visualScenes) {
         `${JSON.stringify(darkShell, null, 2)}\n`,
       );
     }
+    if (scene.id.startsWith("projects-index-")) {
+      const projectIndex = await page.evaluate(() => {
+        const index = document.querySelector(".codex-ui-project-index");
+        const bounds = (element) => {
+          if (!(element instanceof HTMLElement)) return null;
+          const rect = element.getBoundingClientRect();
+          return {
+            height: rect.height,
+            width: rect.width,
+          };
+        };
+        const updated = document.querySelector(
+          ".codex-ui-project-index__updated",
+        );
+        return {
+          columns: getComputedStyle(
+            document.querySelector(".codex-ui-project-index__columns"),
+          ).gridTemplateColumns,
+          expandedGroups: document.querySelectorAll(
+            '.codex-ui-project-index__recent[aria-label^="Recent chats in"]',
+          ).length,
+          horizontalOverflow:
+            document.documentElement.scrollWidth -
+            document.documentElement.clientWidth,
+          index: bounds(index),
+          layout: index?.getAttribute("data-layout"),
+          rows: Array.from(
+            document.querySelectorAll(".codex-ui-project-index__item"),
+            bounds,
+          ),
+          searchPlaceholder: document
+            .querySelector('.codex-ui-project-index input[type="search"]')
+            ?.getAttribute("placeholder"),
+          title: document
+            .querySelector(".codex-ui-project-index__header h3")
+            ?.textContent?.trim(),
+          updatedDisplay: updated ? getComputedStyle(updated).display : null,
+          view: document.querySelector(".demo-root")?.getAttribute("data-view"),
+        };
+      });
+      const compact = scene.id === "projects-index-compact";
+      const expanded = scene.id === "projects-index-expanded";
+      if (
+        projectIndex.view !== "projects" ||
+        projectIndex.layout !== "table" ||
+        projectIndex.title !== "Projects" ||
+        projectIndex.searchPlaceholder !== "Search projects" ||
+        projectIndex.horizontalOverflow > 1 ||
+        projectIndex.rows.length !== 4 ||
+        projectIndex.rows.some(({ height }) => height !== 70) ||
+        projectIndex.expandedGroups !== (expanded ? 1 : 0) ||
+        (compact
+          ? projectIndex.updatedDisplay !== "none"
+          : projectIndex.updatedDisplay === "none")
+      ) {
+        throw new Error(
+          `Current projects index contract failed: ${JSON.stringify(projectIndex)}`,
+        );
+      }
+      await writeFile(
+        join(artifactDirectory, `${scene.id}.json`),
+        `${JSON.stringify(projectIndex, null, 2)}\n`,
+      );
+      continue;
+    }
     if (
       currentReplayComposerScenarios.has(scene.scenario) ||
       currentApprovalComposerScenes.has(scene.id)
@@ -715,6 +780,13 @@ for (const scene of visualScenes) {
                   projectListbox?.querySelectorAll(
                     '[role="option"][aria-selected="true"]',
                   ).length ?? 0,
+                actionLabels: Array.from(
+                  projectDialog.querySelectorAll(
+                    ".demo-workspace-project-dialog__actions button",
+                  ),
+                  (button) =>
+                    button.textContent?.replace(/^＋/, "").trim() ?? "",
+                ),
                 listbox: rect(projectListbox),
               }
             : null,
@@ -832,10 +904,12 @@ for (const scene of visualScenes) {
         projectExpected &&
         (!contract.project ||
           Math.abs(contract.project.rect.width - 260) > 1 ||
-          Math.abs(contract.project.rect.height - 250) > 1 ||
+          Math.abs(contract.project.rect.height - 221) > 1 ||
           Math.abs(contract.project.listbox.width - 252) > 1 ||
           contract.project.optionCount !== 14 ||
           contract.project.selectedCount !== 1 ||
+          JSON.stringify(contract.project.actionLabels) !==
+            JSON.stringify(["New project"]) ||
           contract.activeElement !== "Search projects" ||
           contract.contextButtons[0]?.expanded !== "true" ||
           contract.contextButtons[0]?.haspopup !== "dialog")

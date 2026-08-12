@@ -66,11 +66,12 @@
         "cdp-26.721:new-chat-project-popover-260x250-listbox-14-options",
         "cdp-26.721.81911:new-chat-project-dialog-260x250-listbox-252x142.81-14-options",
         "cdp-26.727.40816:new-chat-project-dialog-260x249.5-listbox-252x142.81",
-        "cdp-26.730.61309:project-dialog-260x249.5-listbox-252x142.81-14-options"
+        "cdp-26.730.61309:project-dialog-260x249.5-listbox-252x142.81-14-options",
+        "cdp-26.803.61601:project-dialog-260x221-search-listbox-252x143.5-fourteen-options-new-project-only-and-native-panel-entry"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "partial_legacy",
-      "electronStatus": "partial_legacy",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
       "priority": "p0"
     },
     {
@@ -890,8 +891,8 @@
         "cdp-26.721:projects-entry-and-deidentified-list-structure"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "not_started",
-      "electronStatus": "not_started",
+      "browserStatus": "partial_legacy",
+      "electronStatus": "partial_legacy",
       "priority": "p0"
     },
     {
@@ -918,11 +919,12 @@
         "cdp-26.721:new-chat-project-local-main-context-controls",
         "cdp-26.721.81911:new-chat-1180x820-project-picker-entry",
         "cdp-26.727.40816:new-chat-project-dialog-and-context-entry-1180x820",
-        "cdp-26.730.61309:new-chat-wide-compact-no-project-new-worktree-and-overlay-pixels"
+        "cdp-26.730.61309:new-chat-wide-compact-no-project-new-worktree-and-overlay-pixels",
+        "cdp-26.803.61601:new-chat-project-dialog-new-project-only-and-native-directory-panel-entry"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "partial_legacy",
-      "electronStatus": "partial_legacy",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
       "priority": "p0"
     },
     {

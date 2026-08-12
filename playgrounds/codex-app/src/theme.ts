@@ -1,5 +1,5 @@
 export const demoThemePreferences = ["system", "light", "dark"] as const;
-export const demoThemeViews = ["shell", "workspace"] as const;
+export const demoThemeViews = ["projects", "shell", "workspace"] as const;
 
 export type DemoThemePreference = (typeof demoThemePreferences)[number];
 export type DemoThemeView = (typeof demoThemeViews)[number];

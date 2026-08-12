@@ -73,7 +73,7 @@ observation from a previous build remains historical evidence.
   previous-build regression evidence and have been downgraded from `verified`
   to `partial_legacy` until they are reached again on the current fingerprint.
 
-Current inventory: 86 surface groups; 18 have current-build runtime evidence, 51 have previous-build-only runtime evidence, 17 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 17 groups and Electron verification covers 17.
+Current inventory: 86 surface groups; 20 have current-build runtime evidence, 49 have previous-build-only runtime evidence, 17 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 19 groups and Electron verification covers 19.
 Prior acceptance outside those 18 sampled current-build groups remains
 recorded as `partial_legacy` until current-build re-observation.
 
@@ -335,6 +335,26 @@ because settings and additional repair variants are still open. The legacy
 host-defined route selector also remains partial/legacy. Global
 notification runtime observation and light-theme shell evidence also remain
 open.
+
+The `26.803.61601` project-entry follow-up separates two evidence levels. A
+live isolated Renderer re-observes the 260×221 project picker with a 28px
+search field, fourteen 28.5px options in a 252×143.5 scroll owner, and only
+the current fixed `New project` action; the removed
+`Don't work in a project` action is no longer rendered. The secure Electron
+host now owns directory selection through an explicit IPC boundary and a
+deterministic fixture proves selected-path return without touching a user
+project.
+
+The installed `projects-index-page` chunk structurally confirms the separate
+Projects route: `Projects`, `Search projects`, Name/Updated sorting, local
+project and pending-worktree status, 70px rows with 32px icons, row actions,
+and up to ten expandable recent chats. The independent full-app replay covers
+ready, expanded, loading, error, partial-error, search-empty, and 720px compact
+presentations; Browser/CDP now gates 163 lifecycle frames and Electron repeats
+the creation and routing contract. The inventory remains `partial_legacy`
+because its runtime denominator is still the prior `26.721` route sample;
+current installed-package structure and independent verification are recorded
+without falsely claiming current runtime or pixel reachability.
 
 The current-thread slice adds `ConversationThreadShell`, which composes the
 existing header, scroll-following timeline, messages, and Composer into one

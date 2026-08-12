@@ -4308,44 +4308,15 @@ try {
     .focus();
   await projectDialog.waitFor({ state: "hidden" });
   await projectDestination.click();
-  await projectDialog
-    .getByRole("button", {
-      name: "Don't work in a project",
-    })
-    .click();
-  await codingWorkspacePage.waitForSelector(
-    'button[aria-label="Choose project"]',
-  );
-  await codingWorkspacePage.waitForTimeout(50);
   if (
-    (await codingWorkspacePage.evaluate(
-      () => document.activeElement?.getAttribute("aria-label"),
-    )) !== "Choose project"
+    (await projectDialog.getByRole("button", { name: "New project" }).count()) !==
+      1 ||
+    (await projectDialog.getByText("Don't work in a project").count()) !== 0
   ) {
     throw new Error(
-      "Electron coding workspace did not restore the surviving project-trigger focus after clearing from the destination.",
+      "Electron coding workspace project picker does not match the current action boundary.",
     );
   }
-  const noProjectDestination = (
-    await codingWorkspacePage
-      .locator(
-        ".demo-workspace-start .codex-ui-new-conversation-start__header h3",
-      )
-      .textContent()
-  )?.trim();
-  if (
-    noProjectDestination !== "What should we build?" ||
-    (await codingWorkspacePage.locator(".demo-workspace-prompts").count()) !==
-      0
-  ) {
-    throw new Error(
-      `Electron coding workspace did not enter the no-project state: ${JSON.stringify(noProjectDestination)}.`,
-    );
-  }
-  await codingWorkspacePage
-    .getByRole("button", { name: "Choose project" })
-    .click();
-  await codingWorkspacePage.waitForTimeout(50);
   await projectSearch.fill("app-server");
   await projectDialog
     .getByRole("option", {
@@ -7556,6 +7527,417 @@ try {
   await workspaceMissingApp.close();
 }
 
+const projectCreationScene = {
+  frame: "workspace-project-menu",
+  id: "electron-project-creation",
+  scenario: "workspace-workflow",
+  view: "workspace",
+};
+const { app: projectCreationApp, page: projectCreationPage } =
+  await launchScene(projectCreationScene, {
+    environment: {
+      CODEX_DEMO_PROJECT_FIXTURE_PATHS: JSON.stringify([
+        resolve(process.cwd(), "scripts"),
+        resolve(process.cwd(), "src"),
+      ]),
+    },
+  });
+try {
+  const projectDialog = projectCreationPage.getByRole("dialog", {
+    name: "Choose a project",
+  });
+  await projectDialog.waitFor({ state: "visible" });
+  if (
+    (await projectDialog.getByRole("button", { name: "New project" }).count()) !==
+      1 ||
+    (await projectDialog.getByText("Don't work in a project").count()) !== 0
+  ) {
+    throw new Error(
+      "Electron current project picker retained a removed legacy action.",
+    );
+  }
+  await projectDialog.getByRole("button", { name: "New project" }).click();
+  await projectCreationPage.waitForSelector(
+    '.demo-root[data-view="workspace"][data-frame="workspace-project-created"]',
+  );
+  const createdProjectTrigger = projectCreationPage.getByRole("button", {
+    name: "Change project: scripts",
+  });
+  if (
+    !(await createdProjectTrigger.isVisible()) ||
+    (await projectDialog.isVisible())
+  ) {
+    throw new Error(
+      "Electron project-directory selection did not return to the created workspace.",
+    );
+  }
+  await createdProjectTrigger.click();
+  await projectDialog.waitFor({ state: "visible" });
+  await projectDialog.getByRole("button", { name: "New project" }).click();
+  await projectCreationPage.waitForSelector(
+    '.demo-root[data-view="workspace"][data-frame="workspace-project-created"]',
+  );
+  const secondCreatedProjectTrigger = projectCreationPage.getByRole(
+    "button",
+    { name: "Change project: src" },
+  );
+  await secondCreatedProjectTrigger.click();
+  await projectDialog.waitFor({ state: "visible" });
+  if (
+    !(await projectDialog
+      .getByRole("option", { name: "Select project scripts" })
+      .isVisible()) ||
+    !(await projectDialog
+      .getByRole("option", { name: "Select project src" })
+      .isVisible())
+  ) {
+    throw new Error(
+      "Electron project picker did not preserve every project added during the session.",
+    );
+  }
+  await projectCreationPage.keyboard.press("Escape");
+  await projectDialog.waitFor({ state: "hidden" });
+  await projectCreationPage
+    .getByRole("button", { name: "View projects" })
+    .click();
+  await projectCreationPage.waitForSelector(
+    '.demo-root[data-view="projects"][data-frame="projects-index-ready"]',
+  );
+  if (
+    !(await projectCreationPage
+      .getByRole("button", { name: "Open project scripts" })
+      .isVisible()) ||
+    !(await projectCreationPage
+      .getByRole("button", { name: "Open project src" })
+      .isVisible())
+  ) {
+    throw new Error(
+      "Electron created projects did not remain visible in the project index.",
+    );
+  }
+  if (
+    !(await projectCreationPage
+      .getByRole("button", { name: "Open project component-lab" })
+      .isDisabled())
+  ) {
+    throw new Error(
+      "Electron failed project row remained interactive and could route to a fallback workspace.",
+    );
+  }
+
+  await projectCreationPage
+    .getByRole("button", {
+      name: "Show recent chats in codex-ui-kit",
+    })
+    .click();
+  await projectCreationPage
+    .getByRole("button", {
+      name: "Open chat Match the current projects index",
+    })
+    .click();
+  await projectCreationPage.waitForSelector(
+    '.demo-root[data-view="workspace"][data-frame="projects-index-chat"] .demo-project-index-chat-route[data-project-id="codex-ui-kit"][data-chat-id="project-index-parity"]',
+  );
+  if (
+    !(await projectCreationPage
+      .locator(".demo-project-index-chat-route")
+      .getByText("Match the current projects index", { exact: true })
+      .isVisible())
+  ) {
+    throw new Error(
+      "Electron project-index chat route did not retain the selected chat label.",
+    );
+  }
+
+  await projectCreationPage
+    .getByRole("button", { name: "View projects" })
+    .click();
+  await projectCreationPage
+    .getByRole("button", {
+      name: "Show recent chats in codex-ui-kit",
+    })
+    .click();
+  await projectCreationPage
+    .getByRole("button", {
+      name: "Open chat Verify sidebar project behavior",
+    })
+    .click();
+  await projectCreationPage.waitForSelector(
+    '.demo-root[data-view="workspace"][data-frame="projects-index-chat"] .demo-project-index-chat-route[data-project-id="codex-ui-kit"][data-chat-id="sidebar-contract"]',
+  );
+  const projectChatNewChat = projectCreationPage.getByRole("button", {
+    exact: true,
+    name: "New chat",
+  });
+  if (
+    !(await projectCreationPage
+      .locator(".demo-project-index-chat-route")
+      .getByText("Verify sidebar project behavior", { exact: true })
+      .isVisible()) ||
+    (await projectChatNewChat.getAttribute("aria-current")) !== null
+  ) {
+    throw new Error(
+      "Electron project-index routing collapsed distinct recent chats or selected New chat on a saved-chat route.",
+    );
+  }
+  const projectChatComposer = projectCreationPage.getByRole("textbox", {
+    name: "Do anything",
+  });
+  await projectChatComposer.fill("Continue sidebar verification.");
+  await projectChatComposer.press("Enter");
+  await projectCreationPage
+    .getByText("Continue sidebar verification.", { exact: true })
+    .waitFor({ state: "visible" });
+  if (
+    (await projectChatComposer.inputValue()) !== "" ||
+    !(await projectCreationPage
+      .locator(
+        '.demo-root[data-view="workspace"][data-frame="projects-index-chat"] .demo-project-index-chat-route[data-project-id="codex-ui-kit"][data-chat-id="sidebar-contract"]',
+      )
+      .isVisible()) ||
+    !(await projectCreationPage
+      .getByText("The selected project chat has been updated.", {
+        exact: true,
+      })
+      .isVisible())
+  ) {
+    throw new Error(
+      "Electron project chat submission did not retain the selected project/chat route.",
+    );
+  }
+} finally {
+  await projectCreationApp.close();
+}
+
+const knownProjectCreationScene = {
+  frame: "workspace-project-menu",
+  id: "electron-known-project-creation",
+  scenario: "workspace-workflow",
+  view: "workspace",
+};
+const {
+  app: knownProjectCreationApp,
+  page: knownProjectCreationPage,
+} = await launchScene(knownProjectCreationScene, {
+  environment: {
+    CODEX_DEMO_PROJECT_FIXTURE_SELECTIONS: JSON.stringify([
+      {
+        label: "codex-ui-kit",
+        path: "/workspace/codex-ui-kit",
+      },
+    ]),
+  },
+  capture: false,
+});
+try {
+  await knownProjectCreationPage
+    .getByRole("dialog", { name: "Choose a project" })
+    .getByRole("button", { name: "New project" })
+    .click();
+  await knownProjectCreationPage.waitForSelector(
+    '.demo-root[data-view="workspace"][data-frame="workspace-ready"]',
+  );
+  await knownProjectCreationPage
+    .getByRole("button", { name: "Change project: codex-ui-kit" })
+    .click();
+  const knownProjectDialog = knownProjectCreationPage.getByRole("dialog", {
+    name: "Choose a project",
+  });
+  await knownProjectDialog.waitFor({ state: "visible" });
+  if (
+    (await knownProjectDialog
+      .getByRole("option", { name: "Select project codex-ui-kit" })
+      .count()) !== 1
+  ) {
+    throw new Error(
+      "Electron known-directory selection duplicated the project picker entry.",
+    );
+  }
+  await knownProjectCreationPage.keyboard.press("Escape");
+  await knownProjectCreationPage
+    .getByRole("button", { name: "View projects" })
+    .click();
+  if (
+    (await knownProjectCreationPage
+      .locator(".demo-projects-route")
+      .getByRole("button", { name: "Open project codex-ui-kit" })
+      .count()) !== 1
+  ) {
+    throw new Error(
+      "Electron known-directory selection duplicated the Projects Index entry.",
+    );
+  }
+} finally {
+  await knownProjectCreationApp.close();
+}
+
+const projectCreationFailureScene = {
+  currentSidebar: true,
+  frame: "projects-index-ready",
+  id: "electron-project-creation-failure",
+  scenario: "workspace-workflow",
+  view: "projects",
+};
+const {
+  app: projectCreationFailureApp,
+  page: projectCreationFailurePage,
+} = await launchScene(projectCreationFailureScene, {
+  environment: {
+    CODEX_DEMO_PROJECT_FIXTURE_PATH: resolve(
+      process.cwd(),
+      "missing-project-fixture",
+    ),
+  },
+  capture: false,
+});
+try {
+  await projectCreationFailurePage
+    .locator(".demo-projects-route")
+    .getByRole("button", { name: "New project" })
+    .click();
+  const projectCreationAlert = projectCreationFailurePage.getByRole("alert");
+  await projectCreationAlert.waitFor({ state: "visible" });
+  if (
+    (await projectCreationAlert.textContent())?.trim() !==
+    "Couldn’t add that project. Try again."
+  ) {
+    throw new Error(
+      "Electron Projects Index did not surface the project-creation failure.",
+    );
+  }
+} finally {
+  await projectCreationFailureApp.close();
+}
+
+const sidebarProjectCreationFailureScene = {
+  currentSidebar: true,
+  frame: "workspace-ready",
+  id: "electron-sidebar-project-creation-failure",
+  scenario: "workspace-workflow",
+  view: "workspace",
+};
+const {
+  app: sidebarProjectCreationFailureApp,
+  page: sidebarProjectCreationFailurePage,
+} = await launchScene(sidebarProjectCreationFailureScene, {
+  environment: {
+    CODEX_DEMO_PROJECT_FIXTURE_PATH: resolve(
+      process.cwd(),
+      "missing-project-fixture",
+    ),
+  },
+  capture: false,
+});
+try {
+  const sidebarProjectCreationRouteBefore =
+    await sidebarProjectCreationFailurePage
+      .locator(".demo-root")
+      .evaluate((element) => ({
+        frame: element.getAttribute("data-frame"),
+        view: element.getAttribute("data-view"),
+      }));
+  await sidebarProjectCreationFailurePage
+    .getByRole("button", { name: "New project" })
+    .click();
+  const sidebarProjectCreationAlert =
+    sidebarProjectCreationFailurePage.locator(".demo-sidebar-project-error");
+  await sidebarProjectCreationAlert.waitFor({ state: "visible" });
+  const sidebarProjectCreationRouteAfter =
+    await sidebarProjectCreationFailurePage
+      .locator(".demo-root")
+      .evaluate((element) => ({
+        frame: element.getAttribute("data-frame"),
+        view: element.getAttribute("data-view"),
+      }));
+  if (
+    (await sidebarProjectCreationAlert.textContent())?.trim() !==
+      "Couldn't add that project" ||
+    JSON.stringify(sidebarProjectCreationRouteAfter) !==
+      JSON.stringify(sidebarProjectCreationRouteBefore)
+  ) {
+    throw new Error(
+      `Electron sidebar project creation did not surface its failure in the invoking UI: ${JSON.stringify({
+        routeAfter: sidebarProjectCreationRouteAfter,
+        routeBefore: sidebarProjectCreationRouteBefore,
+        text: (await sidebarProjectCreationAlert.textContent())?.trim(),
+      })}`,
+    );
+  }
+} finally {
+  await sidebarProjectCreationFailureApp.close();
+}
+
+const projectCreationPanelCleanupScene = {
+  currentSidebar: true,
+  frame: "review-open",
+  id: "electron-project-creation-panel-cleanup",
+  scenario: "workspace-workflow",
+};
+const {
+  app: projectCreationPanelCleanupApp,
+  page: projectCreationPanelCleanupPage,
+} = await launchScene(projectCreationPanelCleanupScene, {
+  capture: false,
+  environment: {
+    CODEX_DEMO_PROJECT_FIXTURE_PATH: resolve(process.cwd(), "scripts"),
+  },
+  layoutMode: "wide",
+});
+try {
+  await projectCreationPanelCleanupPage.waitForSelector(
+    '.codex-ui-app-shell[data-side-panel-open] [data-testid="review-panel"]',
+  );
+  await projectCreationPanelCleanupPage
+    .getByRole("button", { name: "New project" })
+    .click();
+  await projectCreationPanelCleanupPage.waitForSelector(
+    '.demo-root[data-view="workspace"][data-frame="workspace-project-created"] .codex-ui-app-shell:not([data-side-panel-open])',
+  );
+} finally {
+  await projectCreationPanelCleanupApp.close();
+}
+
+const narrowProjectCreationScene = {
+  currentSidebar: true,
+  frame: "workspace-ready",
+  id: "electron-narrow-project-creation",
+  scenario: "workspace-workflow",
+  view: "workspace",
+};
+const {
+  app: narrowProjectCreationApp,
+  page: narrowProjectCreationPage,
+} = await launchScene(narrowProjectCreationScene, {
+  environment: {
+    CODEX_DEMO_PROJECT_FIXTURE_PATH: resolve(process.cwd(), "scripts"),
+  },
+  capture: false,
+});
+try {
+  await narrowProjectCreationApp.evaluate(({ BrowserWindow }) => {
+    const active = BrowserWindow.getAllWindows()[0];
+    active?.setMinimumSize(480, 480);
+    active?.setContentSize(600, 680);
+  });
+  await narrowProjectCreationPage.waitForSelector(
+    '.codex-ui-app-shell[data-layout-mode="narrow"]:not([data-sidebar-open])',
+  );
+  await narrowProjectCreationPage
+    .getByRole("button", { name: "Show sidebar" })
+    .click();
+  await narrowProjectCreationPage.waitForSelector(
+    '.codex-ui-app-shell[data-layout-mode="narrow"][data-sidebar-open] .codex-ui-app-shell__main[inert]',
+  );
+  await narrowProjectCreationPage
+    .getByRole("button", { name: "New project" })
+    .click();
+  await narrowProjectCreationPage.waitForSelector(
+    '.demo-root[data-view="workspace"][data-frame="workspace-project-created"] .codex-ui-app-shell[data-layout-mode="narrow"]:not([data-sidebar-open]) .codex-ui-app-shell__main:not([inert])',
+  );
+} finally {
+  await narrowProjectCreationApp.close();
+}
+
 console.log(
-  "Electron host, native-window, coding-workspace routing and persisted/missing-worktree recovery replay, conversation/Composer and current image-attachment lifecycle plus current menus, current long, failed, and interrupted command output plus manual context compaction, thread summary, replay/live single, concurrent, nested, and mixed-recovery subagent delegation with 4/10 pagination, current mixed Search/Browser/MCP/approval/file/subagent flow, default 720px narrow reachability, resizable navigation/Review/Terminal/PR detail, PR tabs and expansion, MCP disclosure/result/unavailable-fallback, multi-file and mixed-content Review, selection/Undo, large diff scrolling, and compact geometry contracts passed.",
+  "Electron host, native-window, current project-directory creation, coding-workspace routing and persisted/missing-worktree recovery replay, conversation/Composer and current image-attachment lifecycle plus current menus, current long, failed, and interrupted command output plus manual context compaction, thread summary, replay/live single, concurrent, nested, and mixed-recovery subagent delegation with 4/10 pagination, current mixed Search/Browser/MCP/approval/file/subagent flow, default 720px narrow reachability, resizable navigation/Review/Terminal/PR detail, PR tabs and expansion, MCP disclosure/result/unavailable-fallback, multi-file and mixed-content Review, selection/Undo, large diff scrolling, and compact geometry contracts passed.",
 );
