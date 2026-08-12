@@ -796,7 +796,7 @@ textarea {
 }
 
 .demo-workspace-environment-settings-route {
-  background: rgb(24 24 24);
+  background: var(--demo-shell-main);
   height: 100%;
   min-height: 0;
   overflow: auto;

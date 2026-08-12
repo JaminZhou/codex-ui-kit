@@ -914,8 +914,55 @@ try {
       `Electron light environment overlay contract failed: ${JSON.stringify(environmentOverlayPaint)}`,
     );
   }
-  await themePage.keyboard.press("Escape");
+  await themeEnvironmentMenu
+    .getByRole("menuitem", { name: "New worktree" })
+    .click();
   await themeEnvironmentMenu.waitFor({ state: "hidden" });
+  await themePage
+    .getByRole("button", { name: "Change environment: No environment" })
+    .click();
+  await themePage
+    .getByRole("menu", { name: "Environment" })
+    .getByRole("menuitem", { name: "Environment settings" })
+    .click();
+  const lightEnvironmentSettings = themePage.getByRole("region", {
+    name: "Environments",
+  });
+  await lightEnvironmentSettings.waitFor();
+  const lightEnvironmentSettingsPaint =
+    await lightEnvironmentSettings.evaluate((region) => {
+      const route = region.closest(
+        ".demo-workspace-environment-settings-route",
+      );
+      const title = region.querySelector("h1");
+      const statusHeading = region.querySelector("h2");
+      return {
+        routeBackground: route
+          ? getComputedStyle(route).backgroundColor
+          : null,
+        root: document
+          .querySelector(".demo-root")
+          ?.getAttribute("data-theme"),
+        statusHeadingColor: statusHeading
+          ? getComputedStyle(statusHeading).color
+          : null,
+        titleColor: title ? getComputedStyle(title).color : null,
+      };
+    });
+  if (
+    lightEnvironmentSettingsPaint.routeBackground !== "rgb(255, 255, 255)" ||
+    lightEnvironmentSettingsPaint.root !== "light" ||
+    lightEnvironmentSettingsPaint.statusHeadingColor !== "rgb(26, 28, 31)" ||
+    lightEnvironmentSettingsPaint.titleColor !== "rgb(26, 28, 31)"
+  ) {
+    throw new Error(
+      `Electron light environment settings contract failed: ${JSON.stringify(lightEnvironmentSettingsPaint)}`,
+    );
+  }
+  await themePage
+    .getByRole("button", { exact: true, name: "New chat" })
+    .click();
+  await lightEnvironmentSettings.waitFor({ state: "hidden" });
 
   await themePage
     .getByRole("button", {
