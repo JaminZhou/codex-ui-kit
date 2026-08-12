@@ -151,9 +151,19 @@ export function Dialog({
   }, [dialogId, initialFocusSelector, open, returnFocusRef]);
 
   useLayoutEffect(() => {
-    if (!open || !closeDisabled) return;
-    surfaceRef.current?.focus();
-  }, [closeDisabled, open]);
+    if (!open) return;
+    const surface = surfaceRef.current;
+    if (!surface) return;
+    if (closeDisabled) {
+      surface.focus();
+      return;
+    }
+    if (document.activeElement !== surface) return;
+    const requested = initialFocusSelector
+      ? surface.querySelector<HTMLElement>(initialFocusSelector)
+      : null;
+    (requested ?? getDialogFocusableItems(surface)[0] ?? surface).focus();
+  }, [closeDisabled, initialFocusSelector, open]);
 
   if (!open || typeof document === "undefined") return null;
 

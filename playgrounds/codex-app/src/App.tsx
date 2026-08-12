@@ -134,6 +134,7 @@ import {
   contextualizeWorkspaceReplay,
   workspaceExecutionCwd,
 } from "./workspace-replay";
+import { branchStateAfterSuccessfulCreation } from "./workspace-branch-state";
 import {
   hasMcpToolCallGroupForTurn,
   mcpToolCallGroupDurationMs,
@@ -5017,12 +5018,14 @@ export function App() {
     let selectedBranchId = createdBranch.id;
     if (workspaceUsesHostBranches) {
       const previous = workspaceHostBranchesByProject[projectId];
-      let nextState: WorkspaceHostBranchState = {
-        branches: previous?.status === "ready" ? previous.branches : [],
-        currentBranch: null,
-        status: "ready",
-        unbornBranch: response.branch,
-      };
+      let nextState: WorkspaceHostBranchState =
+        branchStateAfterSuccessfulCreation(
+          previous?.status === "ready" ? previous : undefined,
+          response.branch,
+        ) ?? {
+          message: "Git created the branch, but its state could not be refreshed.",
+          status: "error",
+        };
       try {
         const listed = await window.codexDemo?.listBranches({
           projectToken: projectToken ?? "",
@@ -5042,10 +5045,11 @@ export function App() {
         ...current,
         [projectId]: nextState,
       }));
-      selectedBranchId =
-        nextState.status === "ready" && nextState.currentBranch
+      selectedBranchId = nextState.status === "ready"
+        ? nextState.currentBranch
           ? workspaceGitBranchId(nextState.currentBranch)
-          : unattachedWorkspaceBranchId;
+          : unattachedWorkspaceBranchId
+        : createdBranch.id;
     } else {
       setWorkspaceCreatedBranches((current) => ({
         ...current,

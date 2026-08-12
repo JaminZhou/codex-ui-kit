@@ -122,6 +122,43 @@ describe("project conversation routing", () => {
     expect(onCreate).not.toHaveBeenCalled();
   });
 
+  it("returns focus to the branch input when creation fails", async () => {
+    const onOpenChange = vi.fn();
+    const { rerender } = render(
+      <BranchCreationDialog
+        branchName="feat/retry"
+        onBranchNameChange={() => undefined}
+        onCreate={() => undefined}
+        onOpenChange={onOpenChange}
+        open
+        status="creating"
+      />,
+    );
+
+    const dialog = screen.getByRole("dialog", {
+      name: "Create and checkout branch",
+    });
+    await waitFor(() => expect(document.activeElement).toBe(dialog));
+
+    rerender(
+      <BranchCreationDialog
+        branchName="feat/retry"
+        error="Git could not create and checkout the branch."
+        onBranchNameChange={() => undefined}
+        onCreate={() => undefined}
+        onOpenChange={onOpenChange}
+        open
+        status="error"
+      />,
+    );
+
+    await waitFor(() =>
+      expect(document.activeElement).toBe(
+        screen.getByRole("textbox", { name: "Branch name" }),
+      ),
+    );
+  });
+
   it("separates conversation destination from project, environment, and worktree context", () => {
     const onSelect = vi.fn();
     render(
