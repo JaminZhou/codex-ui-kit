@@ -1586,6 +1586,10 @@ export function App() {
       }
     | undefined
   >();
+  const [projectIndexChatTurns, setProjectIndexChatTurns] = useState<
+    Array<{ id: number; prompt: string; response: string }>
+  >([]);
+  const projectIndexChatTurnCounterRef = useRef(0);
   const [projectCreationStatus, setProjectCreationStatus] = useState<
     "error" | "idle" | "selecting"
   >("idle");
@@ -2302,6 +2306,7 @@ export function App() {
     );
     if (!project || !chat) return;
     openWorkspace(projectId);
+    setProjectIndexChatTurns([]);
     setProjectIndexChat({
       chatId,
       chatLabel: chat.label,
@@ -5024,6 +5029,21 @@ export function App() {
       }
       layout="multiline"
       onSubmit={(prompt) => {
+        if (projectIndexChat) {
+          const nextPrompt = prompt.trim();
+          if (!nextPrompt) return;
+          setProjectIndexChatTurns((turns) => [
+            ...turns,
+            {
+              id: projectIndexChatTurnCounterRef.current++,
+              prompt: nextPrompt,
+              response: "The selected project chat has been updated.",
+            },
+          ]);
+          setComposerValue("");
+          setActiveFrame("projects-index-chat");
+          return;
+        }
         if (workspacePersistenceFrame) {
           const nextPrompt = prompt.trim();
           if (!nextPrompt) return;
@@ -5348,6 +5368,12 @@ export function App() {
             The selected project chat is ready to continue.
           </AgentMessage>
         </AgentTurn>
+        {projectIndexChatTurns.map((turn) => (
+          <AgentTurn aria-label="Continued project chat turn" key={turn.id}>
+            <AgentMessage role="user">{turn.prompt}</AgentMessage>
+            <AgentMessage role="assistant">{turn.response}</AgentMessage>
+          </AgentTurn>
+        ))}
       </ConversationThreadShell>
     </div>
   ) : null;

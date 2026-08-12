@@ -7675,6 +7675,31 @@ try {
       "Electron project-index routing collapsed distinct recent chats onto one workspace route.",
     );
   }
+  const projectChatComposer = projectCreationPage.getByRole("textbox", {
+    name: "Do anything",
+  });
+  await projectChatComposer.fill("Continue sidebar verification.");
+  await projectChatComposer.press("Enter");
+  await projectCreationPage
+    .getByText("Continue sidebar verification.", { exact: true })
+    .waitFor({ state: "visible" });
+  if (
+    (await projectChatComposer.inputValue()) !== "" ||
+    !(await projectCreationPage
+      .locator(
+        '.demo-root[data-view="workspace"][data-frame="projects-index-chat"] .demo-project-index-chat-route[data-project-id="codex-ui-kit"][data-chat-id="sidebar-contract"]',
+      )
+      .isVisible()) ||
+    !(await projectCreationPage
+      .getByText("The selected project chat has been updated.", {
+        exact: true,
+      })
+      .isVisible())
+  ) {
+    throw new Error(
+      "Electron project chat submission did not retain the selected project/chat route.",
+    );
+  }
 } finally {
   await projectCreationApp.close();
 }
