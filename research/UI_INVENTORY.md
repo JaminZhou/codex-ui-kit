@@ -368,7 +368,9 @@ and switches back to `main` only through host-issued project tokens. A
 two-repository Electron check proves the selected host-registered directory is
 authoritative, creation retains modal focus and blocks dismissal until Git
 settles, and delayed checkout results cannot overwrite a newly selected
-project. Browser/CDP and reviewed pixels now gate 166 lifecycle frames; the
+project. The new project's branch control remains disabled with explicit
+pending feedback until Git settles. Browser/CDP and reviewed pixels now gate
+166 lifecycle frames; the
 local-only dialog crop differs by 3.0916% under an 8% ceiling. Current-product
 submission remains unpromoted until the same mutation is completed in the
 isolated disposable product repository.

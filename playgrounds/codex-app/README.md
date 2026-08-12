@@ -771,7 +771,8 @@ remain untracked.
   Creating blocks every dismissal path until Git settles. Acceptance routes a
   selected project across two generated disposable Git repositories only,
   retains modal focus while pending, and discards checkout UI results after
-  the user changes projects.
+  the user changes projects. The new project's branch control stays disabled
+  with an explicit pending notice until the original checkout settles.
 - Three reviewed blank/error/created frames extend Browser/CDP and pixels to
   166 lifecycle frames. The untracked current-product dialog crop passes at
   3.0916% under the 8% external ceiling.

@@ -7969,6 +7969,22 @@ try {
       name: "Select project codex-ui-kit",
     })
     .click();
+  const pendingCurrentProjectBranch = createdProjectBranchPage.getByRole(
+    "button",
+    { name: "Change worktree: main" },
+  );
+  if (
+    !(await pendingCurrentProjectBranch.isDisabled()) ||
+    !(await createdProjectBranchPage
+      .getByText("Waiting for the current Git checkout to finish.", {
+        exact: true,
+      })
+      .isVisible())
+  ) {
+    throw new Error(
+      "Electron checkout did not block the newly selected project's branch control.",
+    );
+  }
   let staleCheckoutBranch = "";
   for (let attempt = 0; attempt < 30; attempt += 1) {
     const result = await execFileAsync("git", ["branch", "--show-current"], {
@@ -7979,6 +7995,14 @@ try {
     if (staleCheckoutBranch === "feat/selected-project") break;
     await createdProjectBranchPage.waitForTimeout(100);
   }
+  await createdProjectBranchPage.waitForFunction(
+    () => {
+      const button = document.querySelector(
+        'button[aria-label="Change worktree: main"]',
+      );
+      return button instanceof HTMLButtonElement && !button.disabled;
+    },
+  );
   await createdProjectBranchPage
     .getByRole("button", { name: "Change worktree: main" })
     .click();

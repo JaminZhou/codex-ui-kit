@@ -1728,6 +1728,8 @@ export function App() {
   );
   const [workspaceBranchSwitchError, setWorkspaceBranchSwitchError] =
     useState<string>();
+  const [workspaceBranchCheckoutPending, setWorkspaceBranchCheckoutPending] =
+    useState(false);
   const [workspaceBranchSettingsNotice, setWorkspaceBranchSettingsNotice] =
     useState<string>();
   const [workspaceEnvironmentQuery, setWorkspaceEnvironmentQuery] =
@@ -4871,6 +4873,7 @@ export function App() {
     const initiatingProjectToken =
       workspaceProjectTokens[initiatingProjectId] ?? "";
     workspaceBranchCheckoutActiveRef.current = true;
+    setWorkspaceBranchCheckoutPending(true);
     setWorkspaceBranchSwitchError(undefined);
     setWorkspaceBranchSettingsNotice(undefined);
     let response: WorkspaceGitBranchResponse;
@@ -4889,6 +4892,7 @@ export function App() {
       };
     } finally {
       workspaceBranchCheckoutActiveRef.current = false;
+      setWorkspaceBranchCheckoutPending(false);
     }
     if (workspaceProjectIdRef.current !== initiatingProjectId) {
       return;
@@ -4992,6 +4996,7 @@ export function App() {
                   },
                   {
                     controlsId: "demo-workspace-worktree-menu",
+                    disabled: workspaceBranchCheckoutPending,
                     icon: <CurrentBuildIcon name="composer-branch" />,
                     id: "worktree",
                     kind: "worktree" as const,
@@ -5189,6 +5194,11 @@ export function App() {
       {workspaceBranchSwitchError ? (
         <StatusBanner heading="Couldn’t checkout branch" tone="error">
           {workspaceBranchSwitchError}
+        </StatusBanner>
+      ) : null}
+      {workspaceBranchCheckoutPending ? (
+        <StatusBanner heading="Switching branch" tone="info">
+          Waiting for the current Git checkout to finish.
         </StatusBanner>
       ) : null}
       {workspaceBranchSettingsNotice ? (
