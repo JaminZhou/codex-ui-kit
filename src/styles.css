@@ -11353,7 +11353,8 @@ button.codex-ui-generated-image-gallery__image {
   min-width: 0;
 }
 
-.codex-ui-project-index__recent li > button {
+.codex-ui-project-index__recent li > button,
+.codex-ui-project-index__recent-item {
   align-items: center;
   appearance: none;
   background: transparent;
@@ -11375,7 +11376,22 @@ button.codex-ui-generated-image-gallery__image {
   color: var(--codex-ui-text);
 }
 
-.codex-ui-project-index__recent li > button > span:first-child {
+.codex-ui-project-index__recent-item {
+  cursor: default;
+}
+
+.codex-ui-project-index__recent-pinned-label {
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  height: 1px;
+  overflow: hidden;
+  position: absolute;
+  white-space: nowrap;
+  width: 1px;
+}
+
+.codex-ui-project-index__recent li > button > span:first-child,
+.codex-ui-project-index__recent-item > span:first-child {
   color: inherit;
   flex: 1 1 auto;
   min-width: 0;

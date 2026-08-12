@@ -166,6 +166,7 @@ export interface ProjectIndexProps
 function projectIndexItemDisabled(item: ProjectIndexItem) {
   return (
     item.disabled ||
+    item.status === "error" ||
     item.status === "loading" ||
     item.status === "unavailable"
   );
@@ -427,38 +428,76 @@ export function ProjectIndex({
                   >
                     {item.recentChats.length > 0 ? (
                       <ul>
-                        {item.recentChats.slice(0, 10).map((chat) => {
-                          const chatTextValue =
-                            chat.textValue ??
-                            (typeof chat.label === "string"
-                              ? chat.label
-                              : chat.id);
-                          return (
-                            <li key={chat.id}>
-                              <button
-                                aria-label={`Open chat ${chatTextValue}`}
-                                onClick={() =>
-                                  onOpenRecentChat?.(item.id, chat.id)
-                                }
-                                type="button"
-                              >
+                        {item.recentChats
+                          .slice(0, 10)
+                          .map((chat, chatIndex) => {
+                            const chatTextValue =
+                              chat.textValue ??
+                              (typeof chat.label === "string"
+                                ? chat.label
+                                : chat.id);
+                            const chatMetaId = chat.meta
+                              ? `${projectIndexId}-chat-meta-${index}-${chatIndex}`
+                              : undefined;
+                            const chatPinnedId = chat.pinned
+                              ? `${projectIndexId}-chat-pinned-${index}-${chatIndex}`
+                              : undefined;
+                            const chatDescribedBy = [
+                              chatMetaId,
+                              chatPinnedId,
+                            ]
+                              .filter(Boolean)
+                              .join(" ");
+                            const chatContent = (
+                              <>
                                 <span>{chat.label}</span>
-                                {chat.meta ? <small>{chat.meta}</small> : null}
-                                {chat.pinned ? (
-                                  <span aria-label="Pinned">●</span>
+                                {chat.meta ? (
+                                  <small id={chatMetaId}>{chat.meta}</small>
                                 ) : null}
-                              </button>
-                              {chat.actions ? (
-                                <div
-                                  aria-label={`Chat actions for ${chatTextValue}`}
-                                  role="toolbar"
-                                >
-                                  {chat.actions}
-                                </div>
-                              ) : null}
-                            </li>
-                          );
-                        })}
+                                {chat.pinned ? (
+                                  <span
+                                    aria-label="Pinned"
+                                    id={chatPinnedId}
+                                  >
+                                    <span aria-hidden="true">●</span>
+                                    <span className="codex-ui-project-index__recent-pinned-label">
+                                      Pinned
+                                    </span>
+                                  </span>
+                                ) : null}
+                              </>
+                            );
+                            return (
+                              <li key={chat.id}>
+                                {onOpenRecentChat ? (
+                                  <button
+                                    aria-describedby={
+                                      chatDescribedBy || undefined
+                                    }
+                                    aria-label={`Open chat ${chatTextValue}`}
+                                    onClick={() =>
+                                      onOpenRecentChat(item.id, chat.id)
+                                    }
+                                    type="button"
+                                  >
+                                    {chatContent}
+                                  </button>
+                                ) : (
+                                  <div className="codex-ui-project-index__recent-item">
+                                    {chatContent}
+                                  </div>
+                                )}
+                                {chat.actions ? (
+                                  <div
+                                    aria-label={`Chat actions for ${chatTextValue}`}
+                                    role="toolbar"
+                                  >
+                                    {chat.actions}
+                                  </div>
+                                ) : null}
+                              </li>
+                            );
+                          })}
                       </ul>
                     ) : (
                       <p>No chats</p>

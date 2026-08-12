@@ -7615,6 +7615,15 @@ try {
       "Electron created projects did not remain visible in the project index.",
     );
   }
+  if (
+    !(await projectCreationPage
+      .getByRole("button", { name: "Open project component-lab" })
+      .isDisabled())
+  ) {
+    throw new Error(
+      "Electron failed project row remained interactive and could route to a fallback workspace.",
+    );
+  }
 
   await projectCreationPage
     .getByRole("button", {

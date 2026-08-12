@@ -763,6 +763,12 @@ describe("project conversation routing", () => {
             status: "unavailable",
             statusLabel: "Unavailable",
           },
+          {
+            id: "failed",
+            label: "Failed project",
+            status: "error",
+            statusLabel: "Failed",
+          },
         ]}
         onSelect={onSelect}
         selectedId="ui-kit"
@@ -786,7 +792,14 @@ describe("project conversation routing", () => {
     expect(accessibleDescriptionText(missingProject)).toContain(
       "Unavailable",
     );
-    expect(screen.getByRole("searchbox", { name: "Search projects" })).toBeTruthy();
+    const failedProject = screen.getByRole("button", {
+      name: "Open project Failed project",
+    });
+    expect(failedProject).toHaveProperty("disabled", true);
+    expect(accessibleDescriptionText(failedProject)).toContain("Failed");
+    expect(
+      screen.getByRole("searchbox", { name: "Search projects" }),
+    ).toBeTruthy();
   });
 
   it("renders the current table index with sort and recent-chat ownership", () => {
@@ -842,12 +855,46 @@ describe("project conversation routing", () => {
       }),
     );
     expect(onExpandedChange).toHaveBeenCalledWith("ui-kit", false);
-    fireEvent.click(
-      screen.getByRole("button", {
+    const recentChat = screen.getByRole("button", {
+      name: "Open chat Match project index",
+    });
+    fireEvent.click(recentChat);
+    expect(onOpenRecentChat).toHaveBeenCalledWith("ui-kit", "parity");
+    expect(accessibleDescriptionText(recentChat)).toContain("2m");
+    expect(accessibleDescriptionText(recentChat)).toContain("Pinned");
+    expect(screen.getByLabelText("Pinned")).toBeTruthy();
+  });
+
+  it("renders recent chats as noninteractive content without an open handler", () => {
+    render(
+      <ProjectIndex
+        items={[
+          {
+            expanded: true,
+            id: "ui-kit",
+            label: "UI Kit",
+            recentChats: [
+              {
+                id: "parity",
+                label: "Match project index",
+                meta: "2m",
+                pinned: true,
+              },
+            ],
+          },
+        ]}
+        onExpandedChange={() => undefined}
+        onSelect={() => undefined}
+      />,
+    );
+
+    expect(
+      screen.queryByRole("button", {
         name: "Open chat Match project index",
       }),
-    );
-    expect(onOpenRecentChat).toHaveBeenCalledWith("ui-kit", "parity");
+    ).toBeNull();
+    expect(screen.getByText("Match project index")).toBeTruthy();
+    expect(screen.getByText("2m")).toBeTruthy();
     expect(screen.getByLabelText("Pinned")).toBeTruthy();
   });
 
