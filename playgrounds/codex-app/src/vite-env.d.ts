@@ -5,6 +5,7 @@ import type { ProtocolEventRecord } from "./protocol-state";
 
 interface CodexDemoBridge {
   useRendererAttachmentFixture: boolean;
+  useWorkspaceBranchFixture: boolean;
   startupWorkspaceProjectToken: string;
   workspaceProjectId: string;
   createAndCheckoutBranch(input: {
@@ -19,6 +20,14 @@ interface CodexDemoBridge {
     projectToken: string;
   }): Promise<
     | { branch: string; ok: true }
+    | { code: string; message: string; ok: false }
+  >;
+  listBranches(input: { projectToken: string }): Promise<
+    | {
+        branches: string[];
+        currentBranch: string;
+        ok: true;
+      }
     | { code: string; message: string; ok: false }
   >;
   selectAttachments(): Promise<

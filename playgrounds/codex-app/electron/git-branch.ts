@@ -8,6 +8,11 @@ export interface GitBranchCreationResult {
   branch: string;
 }
 
+export interface GitBranchListResult {
+  branches: string[];
+  currentBranch: string;
+}
+
 export class GitBranchCreationError extends Error {
   readonly code: "duplicate" | "invalid" | "not-repository" | "unavailable";
 
@@ -81,6 +86,36 @@ async function branchExists(cwd: string, branchName: string) {
     branchName,
   ]);
   return branches.split(/\r?\n/).includes(branchName);
+}
+
+export async function listGitBranches(
+  cwd: string,
+): Promise<GitBranchListResult> {
+  await assertGitRepository(cwd);
+  try {
+    const [branchOutput, currentBranch] = await Promise.all([
+      runGit(cwd, [
+        "for-each-ref",
+        "--format=%(refname:short)",
+        "refs/heads",
+      ]),
+      runGit(cwd, ["branch", "--show-current"]),
+    ]);
+    const branches = branchOutput
+      .split(/\r?\n/)
+      .map((branch) => branch.trim())
+      .filter(Boolean);
+    if (!currentBranch || !branches.includes(currentBranch)) {
+      throw new Error("The repository is not on a local branch.");
+    }
+    return { branches, currentBranch };
+  } catch (error) {
+    if (error instanceof GitBranchCreationError) throw error;
+    throw new GitBranchCreationError(
+      "unavailable",
+      "Git could not list the repository branches.",
+    );
+  }
 }
 
 export async function createAndCheckoutGitBranch(

@@ -7,6 +7,7 @@ import { afterEach, describe, expect, it } from "vitest";
 import {
   checkoutGitBranch,
   createAndCheckoutGitBranch,
+  listGitBranches,
 } from "../electron/git-branch";
 
 const execFileAsync = promisify(execFile);
@@ -57,6 +58,10 @@ describe("Git branch creation", () => {
 
     await expect(checkoutGitBranch(repository, "main")).resolves.toEqual({
       branch: "main",
+    });
+    await expect(listGitBranches(repository)).resolves.toEqual({
+      branches: ["feat/current-branch", "main"],
+      currentBranch: "main",
     });
     const checkedOut = await execFileAsync(
       "git",

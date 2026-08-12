@@ -766,13 +766,17 @@ remain untracked.
 - `BranchCreationDialog` exposes controlled blank, creating, host-error, Close,
   optional Set prefix, Escape, focus trap, and launcher-focus-return behavior.
 - The Electron host issues opaque tokens for host-registered project
-  directories, validates branch names, rejects duplicates, creates and checks
-  out a real branch, and switches branches through guarded main-frame IPC.
+  directories, enumerates the selected repository's actual local branches,
+  validates branch names, rejects duplicates, creates and checks out a real
+  branch, and switches branches through guarded main-frame IPC. Fixture-only
+  projects remain visible for replay but their Git controls stay disabled
+  until the host binds a trusted directory token.
   Creating blocks every dismissal path until Git settles. Acceptance routes a
   selected project across two generated disposable Git repositories only,
   retains modal focus while pending, and discards checkout UI results after
   the user changes projects. The new project's branch control stays disabled
-  with an explicit pending notice until the original checkout settles.
+  with an explicit pending notice until the original checkout settles; stale
+  repository errors are cleared when project ownership changes.
 - Three reviewed blank/error/created frames extend Browser/CDP and pixels to
   166 lifecycle frames. The untracked current-product dialog crop passes at
   3.0916% under the 8% external ceiling.

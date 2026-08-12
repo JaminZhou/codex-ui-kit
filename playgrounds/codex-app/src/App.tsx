@@ -1393,6 +1393,29 @@ type WorkspaceGitBranchResponse =
   | { branch: string; ok: true }
   | { code: string; message: string; ok: false };
 
+type WorkspaceHostBranchState =
+  | { status: "loading" }
+  | {
+      branches: string[];
+      currentBranch: string;
+      status: "ready";
+    }
+  | { message: string; status: "error" };
+
+function workspaceGitBranchId(branch: string) {
+  return branch === "main" ? "main" : `git:${branch}`;
+}
+
+function workspaceGitBranch(branch: string): WorkspaceBranch {
+  return {
+    branch,
+    id: workspaceGitBranchId(branch),
+    label: branch,
+    meta: "clean",
+    status: "available",
+  };
+}
+
 const workspaceBranches: WorkspaceBranch[] = [
   {
     branch: "main",
@@ -1587,10 +1610,6 @@ export function App() {
   );
   const workspaceProjectIdRef = useRef(workspaceProjectId);
   const workspaceBranchCheckoutActiveRef = useRef(false);
-  const updateWorkspaceProjectId = (projectId: string | null) => {
-    workspaceProjectIdRef.current = projectId;
-    setWorkspaceProjectId(projectId);
-  };
   const [projectIndexQuery, setProjectIndexQuery] = useState(
     initialSelection.frame === "projects-index-empty" ? "missing" : "",
   );
@@ -1611,6 +1630,14 @@ export function App() {
             window.codexDemo.startupWorkspaceProjectToken,
         }
       : {},
+  );
+  const [workspaceHostBranchesByProject, setWorkspaceHostBranchesByProject] =
+    useState<Record<string, WorkspaceHostBranchState>>({});
+  const workspaceProjectToken = workspaceProjectId
+    ? workspaceProjectTokens[workspaceProjectId]
+    : undefined;
+  const workspaceUsesHostBranches = Boolean(
+    window.codexDemo && !window.codexDemo.useWorkspaceBranchFixture,
   );
   const [projectIndexChat, setProjectIndexChat] = useState<
     | {
@@ -1732,6 +1759,12 @@ export function App() {
     useState(false);
   const [workspaceBranchSettingsNotice, setWorkspaceBranchSettingsNotice] =
     useState<string>();
+  const updateWorkspaceProjectId = (projectId: string | null) => {
+    workspaceProjectIdRef.current = projectId;
+    setWorkspaceBranchSwitchError(undefined);
+    setWorkspaceBranchSettingsNotice(undefined);
+    setWorkspaceProjectId(projectId);
+  };
   const [workspaceEnvironmentQuery, setWorkspaceEnvironmentQuery] =
     useState("");
   const [workspaceProjectQuery, setWorkspaceProjectQuery] = useState("");
@@ -2182,6 +2215,68 @@ export function App() {
       removeServerRequest();
     };
   }, []);
+
+  useEffect(() => {
+    if (
+      !workspaceUsesHostBranches ||
+      !window.codexDemo ||
+      !workspaceProjectId ||
+      !workspaceProjectToken
+    ) {
+      return;
+    }
+    const projectId = workspaceProjectId;
+    let cancelled = false;
+    setWorkspaceHostBranchesByProject((current) => ({
+      ...current,
+      [projectId]: { status: "loading" },
+    }));
+    void window.codexDemo
+      .listBranches({ projectToken: workspaceProjectToken })
+      .then((response) => {
+        if (cancelled) return;
+        if (!response.ok) {
+          setWorkspaceHostBranchesByProject((current) => ({
+            ...current,
+            [projectId]: {
+              message: response.message,
+              status: "error",
+            },
+          }));
+          return;
+        }
+        setWorkspaceHostBranchesByProject((current) => ({
+          ...current,
+          [projectId]: {
+            branches: response.branches,
+            currentBranch: response.currentBranch,
+            status: "ready",
+          },
+        }));
+        if (workspaceProjectIdRef.current === projectId) {
+          setWorkspaceWorktreeId(
+            workspaceGitBranchId(response.currentBranch),
+          );
+        }
+      })
+      .catch(() => {
+        if (cancelled) return;
+        setWorkspaceHostBranchesByProject((current) => ({
+          ...current,
+          [projectId]: {
+            message: "Git could not list the repository branches.",
+            status: "error",
+          },
+        }));
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [
+    workspaceProjectId,
+    workspaceProjectToken,
+    workspaceUsesHostBranches,
+  ]);
 
   useEffect(() => {
     applyDemoThemePreference(document.documentElement, appliedTheme);
@@ -4674,15 +4769,32 @@ export function App() {
   const createdProjectBranchNames = new Set(
     createdProjectBranches.map(({ branch }) => branch),
   );
+  const workspaceHostBranchState = workspaceProjectId
+    ? workspaceHostBranchesByProject[workspaceProjectId]
+    : undefined;
+  const workspaceBranchOperationsAvailable =
+    !workspaceUsesHostBranches ||
+    Boolean(
+      workspaceProjectToken && workspaceHostBranchState?.status === "ready",
+    );
+  const workspaceBranchControlAvailable =
+    !workspaceUsesHostBranches ||
+    Boolean(
+      workspaceProjectToken && workspaceHostBranchState?.status !== "error",
+    );
   const workspaceWorktrees = workspaceProjectId
-    ? [
-        ...(workspaceWorktreesByProject[workspaceProjectId] ?? [
-          workspaceBranches[0],
-        ]).filter(
-          ({ branch }) => !createdProjectBranchNames.has(branch),
-        ),
-        ...createdProjectBranches,
-      ]
+    ? workspaceUsesHostBranches
+      ? workspaceHostBranchState?.status === "ready"
+        ? workspaceHostBranchState.branches.map(workspaceGitBranch)
+        : [workspaceBranches[0]]
+      : [
+          ...(workspaceWorktreesByProject[workspaceProjectId] ?? [
+            workspaceBranches[0],
+          ]).filter(
+            ({ branch }) => !createdProjectBranchNames.has(branch),
+          ),
+          ...createdProjectBranches,
+        ]
     : [workspaceBranches[0]];
   const workspaceWorktree =
     workspaceWorktrees.find(
@@ -4792,6 +4904,7 @@ export function App() {
     setActiveFrame("workspace-ready");
   };
   const openWorkspaceBranchCreation = () => {
+    if (!workspaceBranchOperationsAvailable) return;
     setWorkspaceOverlay(null);
     setWorkspaceBranchName("");
     setWorkspaceBranchError(undefined);
@@ -4809,11 +4922,21 @@ export function App() {
   };
   const createWorkspaceBranch = async (rawBranchName: string) => {
     const branchName = rawBranchName.trim();
-    if (!branchName || !workspaceProjectId) return;
+    const projectId = workspaceProjectId;
+    if (!branchName || !projectId) return;
+    const projectToken = workspaceProjectTokens[projectId];
+    if (workspaceUsesHostBranches && !projectToken) {
+      setWorkspaceBranchStatus("error");
+      setWorkspaceBranchError(
+        "Add this project from a local directory before managing its Git branches.",
+      );
+      setActiveFrame("workspace-branch-create-error");
+      return;
+    }
     setWorkspaceBranchStatus("creating");
     setWorkspaceBranchError(undefined);
     const duplicate =
-      !window.codexDemo &&
+      !workspaceUsesHostBranches &&
       workspaceWorktrees.some((worktree) => worktree.branch === branchName);
     let response: WorkspaceGitBranchResponse;
     try {
@@ -4823,10 +4946,10 @@ export function App() {
             message: `A branch named ${branchName} already exists.`,
             ok: false,
           }
-        : window.codexDemo
+        : workspaceUsesHostBranches && window.codexDemo
           ? await window.codexDemo.createAndCheckoutBranch({
               branchName,
-              projectToken: workspaceProjectTokens[workspaceProjectId] ?? "",
+              projectToken: projectToken ?? "",
             })
           : { branch: branchName, ok: true };
     } catch {
@@ -4844,20 +4967,42 @@ export function App() {
     }
     const createdBranch: WorkspaceBranch = {
       branch: response.branch,
-      id: `created:${response.branch}`,
+      id: workspaceUsesHostBranches
+        ? workspaceGitBranchId(response.branch)
+        : `created:${response.branch}`,
       label: response.branch,
       meta: "clean",
       status: "available",
     };
-    setWorkspaceCreatedBranches((current) => ({
-      ...current,
-      [workspaceProjectId]: [
-        ...(current[workspaceProjectId] ?? []).filter(
-          (branch) => branch.branch !== response.branch,
-        ),
-        createdBranch,
-      ],
-    }));
+    if (workspaceUsesHostBranches) {
+      setWorkspaceHostBranchesByProject((current) => {
+        const previous = current[projectId];
+        const branches =
+          previous?.status === "ready"
+            ? previous.branches
+            : [response.branch];
+        return {
+          ...current,
+          [projectId]: {
+            branches: Array.from(
+              new Set([...branches, response.branch]),
+            ).sort(),
+            currentBranch: response.branch,
+            status: "ready",
+          },
+        };
+      });
+    } else {
+      setWorkspaceCreatedBranches((current) => ({
+        ...current,
+        [projectId]: [
+          ...(current[projectId] ?? []).filter(
+            (branch) => branch.branch !== response.branch,
+          ),
+          createdBranch,
+        ],
+      }));
+    }
     setWorkspaceEnvironmentId("local");
     setWorkspaceWorktreeId(createdBranch.id);
     setWorkspaceBranchDialogOpen(false);
@@ -4872,13 +5017,20 @@ export function App() {
     }
     const initiatingProjectToken =
       workspaceProjectTokens[initiatingProjectId] ?? "";
+    if (workspaceUsesHostBranches && !initiatingProjectToken) {
+      setWorkspaceBranchSwitchError(
+        "Add this project from a local directory before managing its Git branches.",
+      );
+      setActiveFrame("workspace-branch-switch-error");
+      return;
+    }
     workspaceBranchCheckoutActiveRef.current = true;
     setWorkspaceBranchCheckoutPending(true);
     setWorkspaceBranchSwitchError(undefined);
     setWorkspaceBranchSettingsNotice(undefined);
     let response: WorkspaceGitBranchResponse;
     try {
-      response = window.codexDemo
+      response = workspaceUsesHostBranches && window.codexDemo
         ? await window.codexDemo.checkoutBranch({
             branchName: worktree.branch,
             projectToken: initiatingProjectToken,
@@ -4894,6 +5046,19 @@ export function App() {
       workspaceBranchCheckoutActiveRef.current = false;
       setWorkspaceBranchCheckoutPending(false);
     }
+    if (response.ok && workspaceUsesHostBranches) {
+      setWorkspaceHostBranchesByProject((current) => {
+        const previous = current[initiatingProjectId];
+        if (previous?.status !== "ready") return current;
+        return {
+          ...current,
+          [initiatingProjectId]: {
+            ...previous,
+            currentBranch: response.branch,
+          },
+        };
+      });
+    }
     if (workspaceProjectIdRef.current !== initiatingProjectId) {
       return;
     }
@@ -4905,7 +5070,11 @@ export function App() {
     if (workspaceEnvironmentId === "worktree") {
       setWorkspaceEnvironmentId("local");
     }
-    setWorkspaceWorktreeId(worktree.id);
+    setWorkspaceWorktreeId(
+      workspaceUsesHostBranches
+        ? workspaceGitBranchId(response.branch)
+        : worktree.id,
+    );
     setActiveFrame("workspace-ready");
   };
   const selectWorkspaceRunLocation = (
@@ -4996,7 +5165,9 @@ export function App() {
                   },
                   {
                     controlsId: "demo-workspace-worktree-menu",
-                    disabled: workspaceBranchCheckoutPending,
+                    disabled:
+                      workspaceBranchCheckoutPending ||
+                      !workspaceBranchControlAvailable,
                     icon: <CurrentBuildIcon name="composer-branch" />,
                     id: "worktree",
                     kind: "worktree" as const,
@@ -5162,6 +5333,7 @@ export function App() {
                   {filteredWorkspaceWorktrees.map((worktree) => (
                     <MenuItem
                       aria-checked={worktree.id === workspaceWorktreeId}
+                      disabled={!workspaceBranchOperationsAvailable}
                       endIcon={
                         worktree.id === workspaceWorktreeId
                           ? "✓"
@@ -5180,6 +5352,7 @@ export function App() {
                 </div>
                 <MenuSeparator />
                 <MenuItem
+                  disabled={!workspaceBranchOperationsAvailable}
                   onSelect={openWorkspaceBranchCreation}
                   startIcon="＋"
                 >
@@ -5199,6 +5372,28 @@ export function App() {
       {workspaceBranchCheckoutPending ? (
         <StatusBanner heading="Switching branch" tone="info">
           Waiting for the current Git checkout to finish.
+        </StatusBanner>
+      ) : null}
+      {workspaceUsesHostBranches &&
+      workspaceProjectId &&
+      !workspaceProjectToken ? (
+        <StatusBanner heading="Branch operations unavailable" tone="info">
+          Add this project from a local directory before managing its Git
+          branches.
+        </StatusBanner>
+      ) : null}
+      {workspaceUsesHostBranches &&
+      workspaceProjectToken &&
+      workspaceHostBranchState?.status === "loading" ? (
+        <StatusBanner heading="Loading branches" tone="info">
+          Reading the selected project’s local Git branches.
+        </StatusBanner>
+      ) : null}
+      {workspaceUsesHostBranches &&
+      workspaceProjectToken &&
+      workspaceHostBranchState?.status === "error" ? (
+        <StatusBanner heading="Branch operations unavailable" tone="error">
+          {workspaceHostBranchState.message}
         </StatusBanner>
       ) : null}
       {workspaceBranchSettingsNotice ? (

@@ -3,6 +3,7 @@ const { contextBridge, ipcRenderer } = require("electron");
 contextBridge.exposeInMainWorld("codexDemo", {
   useRendererAttachmentFixture:
     process.env.CODEX_DEMO_ATTACHMENT_RENDERER_FIXTURE === "1",
+  useWorkspaceBranchFixture: process.env.CODEX_DEMO_CAPTURE === "1",
   startupWorkspaceProjectToken: "startup-workspace",
   workspaceProjectId:
     process.env.CODEX_DEMO_WORKSPACE_PROJECT_ID ?? "codex-ui-kit",
@@ -12,6 +13,7 @@ contextBridge.exposeInMainWorld("codexDemo", {
     ipcRenderer.invoke("demo:git:create-branch", input),
   checkoutBranch: (input) =>
     ipcRenderer.invoke("demo:git:checkout-branch", input),
+  listBranches: (input) => ipcRenderer.invoke("demo:git:list-branches", input),
   closeLive: () => ipcRenderer.invoke("demo:live:close"),
   onNotification: (handler) => {
     if (typeof handler !== "function") {

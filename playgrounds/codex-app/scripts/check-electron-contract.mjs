@@ -721,8 +721,31 @@ const themeScene = {
   theme: "system",
   view: "workspace",
 };
+const themeWorkspaceGitDirectory = await mkdtemp(
+  join(tmpdir(), "codex-ui-kit-electron-theme-branch-"),
+);
+await execFileAsync("git", ["init", "-b", "main"], {
+  cwd: themeWorkspaceGitDirectory,
+});
+await execFileAsync(
+  "git",
+  [
+    "-c",
+    "user.name=Codex UI Kit",
+    "-c",
+    "user.email=codex-ui-kit@example.invalid",
+    "commit",
+    "--allow-empty",
+    "-m",
+    "test: initialize theme branch fixture",
+  ],
+  { cwd: themeWorkspaceGitDirectory },
+);
 const { app: themeApp, page: themePage } = await launchScene(themeScene, {
   capture: false,
+  environment: {
+    CODEX_UI_KIT_WORKSPACE: themeWorkspaceGitDirectory,
+  },
   nativeThemeSource: "light",
 });
 
@@ -894,7 +917,9 @@ try {
   await themeEnvironmentMenu.waitFor({ state: "hidden" });
 
   await themePage
-    .getByRole("button", { name: "Change worktree: main" })
+    .getByRole("button", {
+      name: "Change worktree: main",
+    })
     .click();
   const themeWorktreeMenu = themePage.getByRole("menu", {
     name: "Branches",
@@ -961,6 +986,7 @@ try {
   );
 } finally {
   await themeApp.close();
+  await rm(themeWorkspaceGitDirectory, { force: true, recursive: true });
 }
 
 const shellLightScene = {
@@ -4519,16 +4545,16 @@ try {
   );
   const appServerWorktreeLabels = await worktreeMenu
     .getByRole("menuitemradio")
-    .allTextContents();
+    .evaluateAll((items) =>
+      items.map((item) =>
+        (item.textContent ?? "").replace(/[⑂✓]/g, "").trim(),
+      ),
+    );
   if (
-    appServerWorktreeLabels.some(
-      (label) =>
-        label.includes("Repairing") ||
-        label.includes("feat/coding-workspace-lifecycle"),
-    )
+    JSON.stringify(appServerWorktreeLabels) !== JSON.stringify(["main"])
   ) {
     throw new Error(
-      `Electron coding workspace exposed another project's worktree: ${JSON.stringify(appServerWorktreeLabels)}.`,
+      `Electron coding workspace did not enumerate its host repository branches: ${JSON.stringify(appServerWorktreeLabels)}.`,
     );
   }
   await worktreeMenu
@@ -7862,6 +7888,9 @@ for (const directory of [
     { cwd: directory },
   );
 }
+await execFileAsync("git", ["branch", "feat/disappearing"], {
+  cwd: createdProjectStartupGitDirectory,
+});
 const createdProjectBranchScene = {
   frame: "workspace-project-menu",
   id: "electron-created-project-branch-routing",
@@ -7896,6 +7925,21 @@ try {
       `Electron host accepted an unregistered project token: ${JSON.stringify(untrustedProjectResponse)}.`,
     );
   }
+  const untrustedProjectListResponse = await createdProjectBranchPage.evaluate(
+    () =>
+      window.codexDemo?.listBranches({
+        projectToken: "unregistered-project-token",
+      }),
+  );
+  if (
+    !untrustedProjectListResponse ||
+    untrustedProjectListResponse.ok ||
+    untrustedProjectListResponse.code !== "unavailable"
+  ) {
+    throw new Error(
+      `Electron host listed branches for an unregistered project token: ${JSON.stringify(untrustedProjectListResponse)}.`,
+    );
+  }
   await createdProjectBranchPage
     .getByRole("dialog", { name: "Choose a project" })
     .getByRole("button", { name: "New project" })
@@ -7906,8 +7950,25 @@ try {
   await createdProjectBranchPage
     .getByRole("button", { name: "Change worktree: main" })
     .click();
-  await createdProjectBranchPage
-    .getByRole("menu", { name: "Branches" })
+  const selectedProjectBranchMenu = createdProjectBranchPage.getByRole(
+    "menu",
+    { name: "Branches" },
+  );
+  const selectedProjectInitialBranches = await selectedProjectBranchMenu
+    .getByRole("menuitemradio")
+    .evaluateAll((items) =>
+      items.map((item) =>
+        (item.textContent ?? "").replace(/[⑂✓]/g, "").trim(),
+      ),
+    );
+  if (
+    JSON.stringify(selectedProjectInitialBranches) !== JSON.stringify(["main"])
+  ) {
+    throw new Error(
+      `Electron selected project did not enumerate its host branches: ${JSON.stringify(selectedProjectInitialBranches)}.`,
+    );
+  }
+  await selectedProjectBranchMenu
     .getByRole("menuitem", { name: "Create and checkout new branch…" })
     .click();
   const routedBranchDialog = createdProjectBranchPage.getByRole("dialog", {
@@ -8015,6 +8076,50 @@ try {
   ) {
     throw new Error(
       "Electron stale checkout result leaked into the newly selected project.",
+    );
+  }
+  await createdProjectBranchPage.keyboard.press("Escape");
+  await execFileAsync("git", ["branch", "-D", "feat/disappearing"], {
+    cwd: createdProjectStartupGitDirectory,
+  });
+  await createdProjectBranchPage
+    .getByRole("button", { name: "Change worktree: main" })
+    .click();
+  await createdProjectBranchPage
+    .getByRole("menu", { name: "Branches" })
+    .getByRole("menuitemradio", { name: "feat/disappearing" })
+    .click();
+  await createdProjectBranchPage
+    .getByText("Couldn’t checkout branch", { exact: true })
+    .waitFor({ state: "visible" });
+  await createdProjectBranchPage
+    .locator("#demo-workspace-project-trigger")
+    .click();
+  await createdProjectBranchPage
+    .getByRole("dialog", { name: "Choose a project" })
+    .getByRole("option", {
+      exact: true,
+      name: "Select project desktop-shell",
+    })
+    .click();
+  const unboundProjectBranchControl = createdProjectBranchPage.getByRole(
+    "button",
+    { name: "Change worktree: main" },
+  );
+  if (
+    !(await unboundProjectBranchControl.isDisabled()) ||
+    (await createdProjectBranchPage
+      .getByText("Couldn’t checkout branch", { exact: true })
+      .count()) !== 0 ||
+    !(await createdProjectBranchPage
+      .getByText(
+        "Add this project from a local directory before managing its Git branches.",
+        { exact: true },
+      )
+      .isVisible())
+  ) {
+    throw new Error(
+      "Electron exposed branch operations for a project without a trusted host token.",
     );
   }
 } finally {

@@ -35,6 +35,7 @@ import {
   checkoutGitBranch,
   createAndCheckoutGitBranch,
   GitBranchCreationError,
+  listGitBranches,
 } from "./git-branch.js";
 import {
   isAllowedExternalUrl,
@@ -104,8 +105,16 @@ interface BranchCreationInput {
   projectToken: string;
 }
 
+interface ProjectTokenInput {
+  projectToken: string;
+}
+
 type BranchCreationResponse =
   | { branch: string; ok: true }
+  | { code: string; message: string; ok: false };
+
+type BranchListResponse =
+  | { branches: string[]; currentBranch: string; ok: true }
   | { code: string; message: string; ok: false };
 
 function assertStartInput(value: unknown): asserts value is StartLiveInput {
@@ -145,6 +154,18 @@ function assertBranchCreationInput(
     typeof (value as BranchCreationInput).projectToken !== "string"
   ) {
     throw new TypeError("A branch name is required.");
+  }
+}
+
+function assertProjectTokenInput(
+  value: unknown,
+): asserts value is ProjectTokenInput {
+  if (
+    typeof value !== "object" ||
+    value === null ||
+    typeof (value as ProjectTokenInput).projectToken !== "string"
+  ) {
+    throw new TypeError("A project token is required.");
   }
 }
 
@@ -556,6 +577,29 @@ async function handleCreateBranch(
   }
 }
 
+async function handleListBranches(
+  event: IpcMainInvokeEvent,
+  rawInput: unknown,
+): Promise<BranchListResponse> {
+  assertTrustedIpc(event);
+  assertProjectTokenInput(rawInput);
+  try {
+    const result = await listGitBranches(
+      trustedProjectDirectory(rawInput.projectToken),
+    );
+    return { ...result, ok: true };
+  } catch (error) {
+    if (error instanceof GitBranchCreationError) {
+      return { code: error.code, message: error.message, ok: false };
+    }
+    return {
+      code: "unavailable",
+      message: "Git could not list the repository branches.",
+      ok: false,
+    };
+  }
+}
+
 async function handleCheckoutBranch(
   event: IpcMainInvokeEvent,
   rawInput: unknown,
@@ -677,6 +721,7 @@ ipcMain.handle("demo:attachments:select", handleSelectAttachments);
 ipcMain.handle("demo:project:select", handleSelectProjectDirectory);
 ipcMain.handle("demo:git:create-branch", handleCreateBranch);
 ipcMain.handle("demo:git:checkout-branch", handleCheckoutBranch);
+ipcMain.handle("demo:git:list-branches", handleListBranches);
 
 app.whenReady().then(() => {
   createWindow();
