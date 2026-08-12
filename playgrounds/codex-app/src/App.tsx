@@ -1417,7 +1417,7 @@ function workspaceGitBranch(branch: string): WorkspaceBranch {
   };
 }
 
-const unattachedWorkspaceBranchId = "git:unattached-head";
+const unattachedWorkspaceBranchId = "state:unattached-head";
 
 function unattachedWorkspaceBranch(
   unbornBranch: string | null,

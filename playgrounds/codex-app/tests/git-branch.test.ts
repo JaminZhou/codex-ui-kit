@@ -157,4 +157,18 @@ describe("Git branch creation", () => {
       code: "not-repository",
     });
   });
+
+  it("does not treat a bare repository as a working tree", async () => {
+    const directory = await mkdtemp(join(tmpdir(), "codex-ui-kit-bare-"));
+    temporaryDirectories.push(directory);
+    await execFileAsync("git", ["init", "--bare"], { cwd: directory });
+
+    await expect(listGitBranches(directory)).rejects.toMatchObject({
+      code: "not-repository",
+      message: "The selected project is not a Git working tree.",
+    });
+    await expect(
+      createAndCheckoutGitBranch(directory, "feat/unavailable"),
+    ).rejects.toMatchObject({ code: "not-repository" });
+  });
 });

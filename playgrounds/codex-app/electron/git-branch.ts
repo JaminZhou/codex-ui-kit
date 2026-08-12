@@ -48,11 +48,17 @@ async function assertGitRepository(cwd: string) {
     );
   }
   try {
-    await runGit(cwd, ["rev-parse", "--is-inside-work-tree"]);
+    const isInsideWorkTree = await runGit(cwd, [
+      "rev-parse",
+      "--is-inside-work-tree",
+    ]);
+    if (isInsideWorkTree !== "true") {
+      throw new Error("The selected project is not a working tree.");
+    }
   } catch {
     throw new GitBranchCreationError(
       "not-repository",
-      "The selected project is not a Git repository.",
+      "The selected project is not a Git working tree.",
     );
   }
 }

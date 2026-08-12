@@ -8189,6 +8189,9 @@ await execFileAsync(
 await execFileAsync("git", ["switch", "--detach"], {
   cwd: detachedBranchGitDirectory,
 });
+await execFileAsync("git", ["branch", "unattached-head"], {
+  cwd: detachedBranchGitDirectory,
+});
 const detachedBranchScene = {
   frame: "workspace-ready",
   id: "electron-detached-branch-creation",
@@ -8221,10 +8224,13 @@ try {
   if (
     (await detachedBranchMenu
       .getByRole("menuitemradio", { name: "main" })
-      .getAttribute("aria-checked")) === "true"
+      .getAttribute("aria-checked")) === "true" ||
+    (await detachedBranchMenu
+      .getByRole("menuitemradio", { name: "unattached-head" })
+      .count()) !== 1
   ) {
     throw new Error(
-      "Electron presented a detached repository as attached to main.",
+      "Electron presented a detached repository as attached or hid a colliding real branch.",
     );
   }
   await detachedBranchMenu
