@@ -5027,6 +5027,7 @@ const {
 } = await launchScene(currentCheckoutScene, {
   capture: false,
   environment: {
+    CODEX_DEMO_WORKSPACE_PROJECT_ID: "app-server-client",
     CODEX_UI_KIT_WORKSPACE: currentCheckoutGitDirectory,
   },
 });
@@ -5034,6 +5035,18 @@ try {
   const currentCheckoutDialog = currentCheckoutPage.getByRole("dialog", {
     name: "Select local environment",
   });
+  await currentCheckoutDialog
+    .getByRole("heading", { name: "codex-app-server-client" })
+    .waitFor();
+  if (
+    (await currentCheckoutDialog
+      .getByRole("button", { name: "Use local environment Coding workspace" })
+      .count()) !== 0
+  ) {
+    throw new Error(
+      "Electron local environment dialog leaked another project's linked worktree.",
+    );
+  }
   const currentCheckoutItem = currentCheckoutDialog.getByRole("button", {
     name: "Use local environment Current checkout",
   });
@@ -5049,6 +5062,9 @@ try {
   await currentCheckoutItem.click();
   await currentCheckoutPage.waitForSelector(
     'button[aria-label="Change worktree: feat/current-host-checkout"]',
+  );
+  await currentCheckoutPage.waitForSelector(
+    'button[aria-label="Change project: codex-app-server-client"]',
   );
   const selectedCurrentCheckout = await execFileAsync(
     "git",

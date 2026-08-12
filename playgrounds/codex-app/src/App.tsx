@@ -1641,6 +1641,10 @@ export function App() {
     initialSelection.view === "workspace" &&
       initialSelection.frame === "workspace-no-project"
       ? null
+      : initialSelection.view === "workspace" &&
+          initialSelection.frame === "workspace-environment" &&
+          window.codexDemo
+        ? window.codexDemo.workspaceProjectId
       : "codex-ui-kit",
   );
   const workspaceProjectIdRef = useRef(workspaceProjectId);
@@ -4855,16 +4859,30 @@ export function App() {
       ? workspaceHostBranchState.branchesUnavailableForCheckout
       : [],
   );
-  const workspaceLocalEnvironmentGroups = workspaceEnvironmentGroups.map(
-    (group) => {
-      if (!workspaceUsesHostBranches || group.id !== workspaceProjectId) {
-        return group;
-      }
-      const [currentCheckout, ...linkedWorktrees] = group.items;
-      if (!currentCheckout) return group;
-      if (workspaceHostBranchState?.status !== "ready") {
-        return {
-          ...group,
+  const workspaceLocalEnvironmentGroups = (() => {
+    if (!workspaceUsesHostBranches || !workspaceProjectId) {
+      return workspaceEnvironmentGroups;
+    }
+    const matchingGroup = workspaceEnvironmentGroups.find(
+      ({ id }) => id === workspaceProjectId,
+    );
+    const templateGroup = matchingGroup ?? workspaceEnvironmentGroups[0];
+    if (!templateGroup) return [];
+    const [currentCheckout, ...templateLinkedWorktrees] =
+      templateGroup.items;
+    if (!currentCheckout) return [];
+    const hostGroup = {
+      ...templateGroup,
+      id: workspaceProjectId,
+      label: workspaceProject?.label ?? workspaceProjectId,
+    };
+    const linkedWorktrees = matchingGroup
+      ? templateLinkedWorktrees
+      : [];
+    if (workspaceHostBranchState?.status !== "ready") {
+      return [
+        {
+          ...hostGroup,
           items: [
             {
               ...currentCheckout,
@@ -4874,35 +4892,35 @@ export function App() {
             },
             ...linkedWorktrees,
           ],
+        },
+      ];
+    }
+    const currentBranch = workspaceHostBranchState.currentBranch;
+    const currentItem = currentBranch
+      ? {
+          ...currentCheckout,
+          branch: currentBranch,
+          id: workspaceGitBranchId(currentBranch),
+          label: currentBranch === "main" ? "Main" : "Current checkout",
+          meta: "current",
+          textValue:
+            currentBranch === "main" ? "Main" : "Current checkout",
+        }
+      : {
+          ...currentCheckout,
+          branch:
+            workspaceHostBranchState.unbornBranch ?? "Detached HEAD",
+          id: unattachedWorkspaceBranchId,
+          label: workspaceHostBranchState.unbornBranch
+            ? "Unborn checkout"
+            : "Detached HEAD",
+          meta: "current",
+          textValue: workspaceHostBranchState.unbornBranch
+            ? "Unborn checkout"
+            : "Detached HEAD",
         };
-      }
-      const currentBranch = workspaceHostBranchState.currentBranch;
-      const currentItem = currentBranch
-        ? {
-            ...currentCheckout,
-            branch: currentBranch,
-            id: workspaceGitBranchId(currentBranch),
-            label: currentBranch === "main" ? "Main" : "Current checkout",
-            meta: "current",
-            textValue:
-              currentBranch === "main" ? "Main" : "Current checkout",
-          }
-        : {
-            ...currentCheckout,
-            branch:
-              workspaceHostBranchState.unbornBranch ?? "Detached HEAD",
-            id: unattachedWorkspaceBranchId,
-            label: workspaceHostBranchState.unbornBranch
-              ? "Unborn checkout"
-              : "Detached HEAD",
-            meta: "current",
-            textValue: workspaceHostBranchState.unbornBranch
-              ? "Unborn checkout"
-              : "Detached HEAD",
-          };
-      return { ...group, items: [currentItem, ...linkedWorktrees] };
-    },
-  );
+    return [{ ...hostGroup, items: [currentItem, ...linkedWorktrees] }];
+  })();
   const workspaceBranchOperationsAvailable =
     !workspaceUsesHostBranches ||
     Boolean(
