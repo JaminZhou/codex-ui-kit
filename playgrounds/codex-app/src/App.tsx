@@ -5119,6 +5119,7 @@ export function App() {
   };
   const selectWorkspaceBranch = async (worktree: WorkspaceBranch) => {
     const initiatingProjectId = workspaceProjectId;
+    const initiatingEnvironmentId = workspaceEnvironmentId;
     if (
       !initiatingProjectId ||
       worktree.checkedOutInLinkedWorktree ||
@@ -5181,9 +5182,13 @@ export function App() {
     }
     if (
       workspaceUsesHostBranches ||
-      workspaceEnvironmentId === "worktree"
+      initiatingEnvironmentId === "worktree"
     ) {
-      setWorkspaceEnvironmentId("local");
+      setWorkspaceEnvironmentId((currentEnvironmentId) =>
+        currentEnvironmentId === initiatingEnvironmentId
+          ? "local"
+          : currentEnvironmentId,
+      );
     }
     updateWorkspaceWorktreeId(
       workspaceUsesHostBranches

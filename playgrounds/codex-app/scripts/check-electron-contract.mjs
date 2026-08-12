@@ -4792,6 +4792,53 @@ try {
     'button[aria-label="Change run location: Local"]',
   );
 
+  await codingWorkspacePage
+    .getByRole("button", { name: "Change worktree: main" })
+    .click();
+  await worktreeMenu
+    .getByRole("menuitemradio", { name: "feature/sidebar-shell" })
+    .click();
+  await codingWorkspacePage
+    .getByRole("button", { name: "Change run location: Local" })
+    .click();
+  await environmentMenu
+    .getByRole("menuitemradio", { name: "Connect Codex web" })
+    .click();
+  await codingWorkspacePage.waitForSelector(
+    'button[aria-label="Change run location: Codex web"]',
+  );
+  await codingWorkspacePage.waitForSelector(
+    'button[aria-label="Change worktree: feature/sidebar-shell"]',
+  );
+  if (
+    !(await codingWorkspacePage
+      .getByRole("button", { name: "Change run location: Codex web" })
+      .isVisible())
+  ) {
+    throw new Error(
+      "Electron branch checkout overwrote a newer run-location selection.",
+    );
+  }
+  const branchAfterRunLocationChange = await execFileAsync(
+    "git",
+    ["branch", "--show-current"],
+    { cwd: codingWorkspaceGitDirectory, encoding: "utf8" },
+  );
+  if (branchAfterRunLocationChange.stdout.trim() !== "feature/sidebar-shell") {
+    throw new Error(
+      `Electron branch checkout did not settle after the run-location change: ${branchAfterRunLocationChange.stdout.trim()}.`,
+    );
+  }
+  await codingWorkspacePage
+    .getByRole("button", { name: "Change run location: Codex web" })
+    .click();
+  await environmentMenu
+    .getByRole("menuitemradio", { name: "Work locally" })
+    .click();
+  await codingWorkspacePage.waitForSelector(
+    'button[aria-label="Change run location: Local"]',
+  );
+
   const workspaceComposer = codingWorkspacePage.getByRole("textbox", {
     name: "Do anything",
   });
