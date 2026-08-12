@@ -154,7 +154,11 @@ export async function createAndCheckoutGitBranch(
   const branchName = normalizedBranchName(rawBranchName);
   await assertGitRepository(cwd);
   await assertValidBranchName(cwd, branchName);
-  if (await branchExists(cwd, branchName)) {
+  const symbolicBranch = await runGit(cwd, ["branch", "--show-current"]);
+  if (
+    symbolicBranch === branchName ||
+    (await branchExists(cwd, branchName))
+  ) {
     throw new GitBranchCreationError(
       "duplicate",
       `A branch named ${branchName} already exists.`,

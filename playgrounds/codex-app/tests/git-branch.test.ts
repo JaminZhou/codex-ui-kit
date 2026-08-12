@@ -140,6 +140,9 @@ describe("Git branch creation", () => {
       unbornBranch: "main",
     });
     await expect(
+      createAndCheckoutGitBranch(unbornRepository, "main"),
+    ).rejects.toMatchObject({ code: "duplicate" });
+    await expect(
       createAndCheckoutGitBranch(unbornRepository, "feat/from-unborn"),
     ).resolves.toEqual({ branch: "feat/from-unborn" });
   });
