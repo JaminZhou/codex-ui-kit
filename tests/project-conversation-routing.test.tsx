@@ -177,6 +177,24 @@ describe("project conversation routing", () => {
     expect(onCreate).toHaveBeenCalledWith("feat/unicode\u00a0");
   });
 
+  it("trims large ASCII branch padding without backtracking", () => {
+    const onCreate = vi.fn();
+    render(
+      <BranchCreationDialog
+        branchName={`${"\t".repeat(100_000)}feat/linear${" ".repeat(100_000)}`}
+        onBranchNameChange={() => undefined}
+        onCreate={onCreate}
+        onOpenChange={() => undefined}
+        open
+      />,
+    );
+
+    fireEvent.submit(
+      screen.getByRole("textbox", { name: "Branch name" }).closest("form")!,
+    );
+    expect(onCreate).toHaveBeenCalledWith("feat/linear");
+  });
+
   it("separates conversation destination from project, environment, and worktree context", () => {
     const onSelect = vi.fn();
     render(
