@@ -38,13 +38,23 @@ type CurrentBuildIconName =
   | "sidebar-quick-chat"
   | "sidebar-project-menu-archive"
   | "sidebar-project-menu-edit"
+  | "sidebar-project-menu-mark-read"
   | "sidebar-project-menu-remove"
   | "sidebar-project-menu-reveal"
   | "sidebar-project-menu-unpin"
   | "sidebar-project-menu-worktree"
   | "sidebar-scheduled"
   | "sidebar-search"
-  | "sidebar-sites";
+  | "sidebar-sites"
+  | "workspace-environment-settings"
+  | "workspace-run-location-codex-web"
+  | "workspace-run-location-external"
+  | "workspace-run-location-local"
+  | "workspace-run-location-send-cloud"
+  | "workspace-run-location-usage"
+  | "workspace-run-location-usage-chevron"
+  | "workspace-run-location-worktree"
+  | "workspace-selection-check";
 
 interface CurrentBuildIconProps extends SVGProps<SVGSVGElement> {
   name: CurrentBuildIconName;

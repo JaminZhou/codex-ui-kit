@@ -212,7 +212,13 @@ const currentBuildWorkspaceReferenceSize = {
 };
 const currentBuildComposerIconReferenceBounds = [
   { height: 16, left: 387, name: "composer-project", top: 679, width: 16 },
-  { height: 16, left: 505, name: "composer-worktree", top: 679, width: 16 },
+  {
+    height: 16,
+    left: 505,
+    name: "workspace-run-location-local",
+    top: 679,
+    width: 16,
+  },
   { height: 16, left: 581, name: "composer-branch", top: 679, width: 16 },
   { height: 16, left: 373, name: "composer-add-files", top: 774, width: 16 },
   { height: 16, left: 407, name: "composer-permission", top: 774, width: 16 },
@@ -236,6 +242,8 @@ const currentBuildWorkspaceEnvironmentReference =
   process.env.CODEX_UI_KIT_WORKSPACE_ENVIRONMENT_REFERENCE;
 const currentBuildWorkspaceEnvironmentPickerReference =
   process.env.CODEX_UI_KIT_WORKSPACE_ENVIRONMENT_PICKER_REFERENCE;
+const currentBuildWorkspaceEnvironmentSettingsReference =
+  process.env.CODEX_UI_KIT_WORKSPACE_ENVIRONMENT_SETTINGS_REFERENCE;
 const currentBuildWorkspaceNewWorktreeReference =
   process.env.CODEX_UI_KIT_WORKSPACE_NEW_WORKTREE_REFERENCE;
 const currentBuildWorkspaceNoProjectReference =
@@ -613,6 +621,7 @@ for (const scene of selectedScenes) {
   let workspaceCurrentIconBounds;
   let workspaceEnvironmentMenuBounds;
   let workspaceEnvironmentPickerBounds;
+  let workspaceEnvironmentSettingsBounds;
   let workspaceProjectListboxBounds;
   let workspaceWorktreeMenuBounds;
   let workspaceBranchCreateBounds;
@@ -787,6 +796,19 @@ for (const scene of selectedScenes) {
         .locator(
           ".demo-workspace-worktree-environment-menu[role=\"menu\"]",
         )
+        .evaluate((element) => {
+          const value = element.getBoundingClientRect();
+          return {
+            height: Math.round(value.height),
+            left: Math.round(value.left),
+            top: Math.round(value.top),
+            width: Math.round(value.width),
+          };
+        });
+    }
+    if (scene.id === "workspace-environments-unavailable") {
+      workspaceEnvironmentSettingsBounds = await page
+        .locator(".codex-ui-environment-settings-page")
         .evaluate((element) => {
           const value = element.getBoundingClientRect();
           return {
@@ -1466,7 +1488,7 @@ for (const scene of selectedScenes) {
     await compareCurrentBuildOverlay({
       actual,
       actualBounds: workspaceEnvironmentMenuBounds,
-      defaultMaximumRatio: 0.08,
+      defaultMaximumRatio: 0.05,
       masks: [
         { height: 18, left: 12, top: 10, width: 96 },
         ...[39, 68, 97, 126, 163].map((top) => ({
@@ -1480,11 +1502,12 @@ for (const scene of selectedScenes) {
         "CODEX_UI_KIT_WORKSPACE_ENVIRONMENT_MAX_DIFF_RATIO",
       referenceCrop: {
         height: 189,
-        left: 495,
-        top: 483,
+        left: 0,
+        top: 0,
         width: 216,
       },
       referencePath: currentBuildWorkspaceEnvironmentReference,
+      referenceSize: { height: 190, width: 216 },
       sceneId: scene.id,
     });
   }
@@ -1496,7 +1519,7 @@ for (const scene of selectedScenes) {
     await compareCurrentBuildOverlay({
       actual,
       actualBounds: workspaceEnvironmentPickerBounds,
-      defaultMaximumRatio: 0.08,
+      defaultMaximumRatio: 0.05,
       masks: [
         { height: 18, left: 12, top: 10, width: 96 },
         { height: 18, left: 34, top: 39, width: 180 },
@@ -1507,11 +1530,39 @@ for (const scene of selectedScenes) {
         "CODEX_UI_KIT_WORKSPACE_ENVIRONMENT_PICKER_MAX_DIFF_RATIO",
       referenceCrop: {
         height: 126,
-        left: 625,
-        top: 545,
+        left: 0,
+        top: 0,
         width: 264,
       },
       referencePath: currentBuildWorkspaceEnvironmentPickerReference,
+      referenceSize: { height: 126, width: 264 },
+      sceneId: scene.id,
+    });
+  }
+
+  if (
+    scene.id === "workspace-environments-unavailable" &&
+    currentBuildWorkspaceEnvironmentSettingsReference
+  ) {
+    await compareCurrentBuildOverlay({
+      actual,
+      actualBounds: workspaceEnvironmentSettingsBounds,
+      defaultMaximumRatio: 0.04,
+      masks: [
+        { height: 24, left: 0, top: 16, width: 220 },
+        { height: 22, left: 0, top: 87, width: 250 },
+        { height: 40, left: 1, top: 128, width: 766 },
+      ],
+      maximumRatioName:
+        "CODEX_UI_KIT_WORKSPACE_ENVIRONMENT_SETTINGS_MAX_DIFF_RATIO",
+      referenceCrop: {
+        height: 171,
+        left: 44,
+        top: 0,
+        width: 768,
+      },
+      referencePath: currentBuildWorkspaceEnvironmentSettingsReference,
+      referenceSize: { height: 774, width: 857 },
       sceneId: scene.id,
     });
   }
@@ -1787,9 +1838,9 @@ for (const scene of selectedScenes) {
     scene.id === "current-sidebar-project-menu" &&
     currentBuildSidebarProjectMenuReference
   ) {
-    if (sidebarMenuItemBounds?.length !== 6) {
+    if (sidebarMenuItemBounds?.length !== 7) {
       throw new Error(
-        `${scene.id}: expected six project menu item bounds, received ${sidebarMenuItemBounds?.length ?? 0}.`,
+        `${scene.id}: expected seven project menu item bounds, received ${sidebarMenuItemBounds?.length ?? 0}.`,
       );
     }
     await compareCurrentBuildOverlay({
@@ -1806,12 +1857,13 @@ for (const scene of selectedScenes) {
       maximumRatioName:
         "CODEX_UI_KIT_CURRENT_SIDEBAR_PROJECT_MENU_MAX_DIFF_RATIO",
       referenceCrop: {
-        height: 179,
-        left: 211,
-        top: 313,
+        height: 208,
+        left: 0,
+        top: 0,
         width: 214,
       },
       referencePath: currentBuildSidebarProjectMenuReference,
+      referenceSize: { height: 208, width: 215 },
       sceneId: scene.id,
     });
   }

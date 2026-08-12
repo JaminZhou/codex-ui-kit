@@ -32,6 +32,30 @@ const isMainRendererUrl = (url) =>
 const withinTolerance = (value, expected, tolerance = 1) =>
   Number.isFinite(value) && Math.abs(value - expected) <= tolerance;
 
+const currentSidebarWidthBounds = Object.freeze({ max: 520, min: 240 });
+const currentSidebarMinimumMainWidth = 352;
+const currentSidebarCompactPinnedMaximum =
+  currentBaselineViewports.compact.width - currentSidebarMinimumMainWidth;
+
+const currentSidebarWidthForViewport = (persistedWidth, viewportWidth) =>
+  Math.min(
+    persistedWidth,
+    Math.min(
+      currentSidebarWidthBounds.max,
+      viewportWidth - currentSidebarMinimumMainWidth,
+    ),
+  );
+
+const expectedNewChatGeometry = (viewportWidth, navigationWidth = 0) => {
+  const mainWidth = viewportWidth - navigationWidth;
+  const editorWidth = Math.min(712, mainWidth - 56);
+  return {
+    editorLeft: navigationWidth + (mainWidth - editorWidth) / 2,
+    editorWidth,
+    mainWidth,
+  };
+};
+
 const appAsarSnapshotFields = Object.freeze([
   "appAsarBytes",
   "appAsarSha256",
@@ -69,6 +93,7 @@ export function assertCurrentSidebarLifecycle(lifecycle) {
     responsive?.wideRestored,
     responsive?.keyboardRestored,
   ];
+  const persistedNavigationWidth = baseline?.navigationWidth;
   if (
     baseline?.projectGroupCount !== 6 ||
     baseline?.expandedProjectGroupCount !== 6 ||
@@ -76,7 +101,14 @@ export function assertCurrentSidebarLifecycle(lifecycle) {
     baseline?.projectRow?.role !== "button" ||
     baseline?.projectRow?.tabIndex !== 0 ||
     !withinTolerance(baseline?.projectRow?.rect?.height, 30) ||
-    !withinTolerance(baseline?.projectRow?.rect?.width, 258.11) ||
+    !Number.isFinite(persistedNavigationWidth) ||
+    persistedNavigationWidth < currentSidebarWidthBounds.min ||
+    persistedNavigationWidth > currentSidebarWidthBounds.max ||
+    persistedNavigationWidth > currentSidebarCompactPinnedMaximum ||
+    !withinTolerance(
+      baseline?.projectRow?.rect?.width,
+      persistedNavigationWidth - 16,
+    ) ||
     baseline?.settingsControlCount !== 0 ||
     baseline?.helpControlCount !== 1 ||
     Math.abs(baseline?.horizontalOverflow ?? Infinity) > 1
@@ -105,13 +137,19 @@ export function assertCurrentSidebarLifecycle(lifecycle) {
       })}`,
     );
   }
+  const projectMenuVariant = projectMenu?.opened?.hasMarkAllAsRead
+    ? { height: 207.94, menuItemCount: 7 }
+    : { height: 179.38, menuItemCount: 6 };
   if (
     projectMenu?.opened?.visibleMenuCount !== 1 ||
-    projectMenu.opened.menuItemCount !== 6 ||
+    projectMenu.opened.menuItemCount !== projectMenuVariant.menuItemCount ||
     !projectMenu.opened.focusInside ||
     projectMenu.opened.focusRole !== "menu" ||
     !withinTolerance(projectMenu.opened.rect?.width, 214.05) ||
-    !withinTolerance(projectMenu.opened.rect?.height, 179.38) ||
+    !withinTolerance(
+      projectMenu.opened.rect?.height,
+      projectMenuVariant.height,
+    ) ||
     projectMenu.closed?.visibleMenuCount !== 0 ||
     projectMenu.closed.focusReturned !== false ||
     projectMenu.closed.activeTag !== "body"
@@ -140,11 +178,17 @@ export function assertCurrentSidebarLifecycle(lifecycle) {
     responsive.compactCollapsed.projectExpanded !== false ||
     Math.abs(responsive.compactCollapsed.horizontalOverflow ?? Infinity) > 1 ||
     responsive.compactPinned.navigationVisible !== true ||
-    !withinTolerance(responsive.compactPinned.navigationWidth, 274.11) ||
+    !withinTolerance(
+      responsive.compactPinned.navigationWidth,
+      persistedNavigationWidth,
+    ) ||
     responsive.compactPinned.projectExpanded !== false ||
     Math.abs(responsive.compactPinned.horizontalOverflow ?? Infinity) > 1 ||
     responsive.wideRestored.navigationVisible !== true ||
-    !withinTolerance(responsive.wideRestored.navigationWidth, 274.11) ||
+    !withinTolerance(
+      responsive.wideRestored.navigationWidth,
+      persistedNavigationWidth,
+    ) ||
     responsive.wideRestored.projectExpanded !== false ||
     Math.abs(responsive.wideRestored.horizontalOverflow ?? Infinity) > 1 ||
     responsive.keyboardRestored.expanded !== true ||
@@ -403,33 +447,45 @@ export function assertCurrentBaselineRecord(record) {
       `Current baseline record does not prove the fixed shell control matrix: ${JSON.stringify(invalidControlStates)}`,
     );
   }
+  const persistedNavigationWidth = record.sidebarLifecycle.baseline.navigationWidth;
+  const expectedNavigationByState = {
+    compactPinned: persistedNavigationWidth,
+    compactPullRequests: persistedNavigationWidth,
+    compactRestored: persistedNavigationWidth,
+    mediumNewChat: currentSidebarWidthForViewport(
+      persistedNavigationWidth,
+      currentBaselineViewports.medium.width,
+    ),
+    thresholdNewChat: currentSidebarWidthForViewport(
+      persistedNavigationWidth,
+      currentBaselineViewports.threshold.width,
+    ),
+    wideNewChat: persistedNavigationWidth,
+  };
   const expectedGeometryByState = {
-    compactCollapsed: { editorLeft: 28, editorWidth: 664, mainWidth: 720 },
-    compactPinned: {
-      editorLeft: 302.11,
-      editorWidth: 389.89,
-      mainWidth: 445.89,
-    },
-    compactRestored: {
-      editorLeft: 302.11,
-      editorWidth: 389.89,
-      mainWidth: 445.89,
-    },
-    mediumNewChat: {
-      editorLeft: 302.11,
-      editorWidth: 489.89,
-      mainWidth: 545.89,
-    },
-    thresholdNewChat: {
-      editorLeft: 302.11,
-      editorWidth: 390.89,
-      mainWidth: 446.89,
-    },
-    wideNewChat: {
-      editorLeft: 371.05,
-      editorWidth: 712,
-      mainWidth: 905.89,
-    },
+    compactCollapsed: expectedNewChatGeometry(
+      currentBaselineViewports.compact.width,
+    ),
+    compactPinned: expectedNewChatGeometry(
+      currentBaselineViewports.compact.width,
+      expectedNavigationByState.compactPinned,
+    ),
+    compactRestored: expectedNewChatGeometry(
+      currentBaselineViewports.compact.width,
+      expectedNavigationByState.compactRestored,
+    ),
+    mediumNewChat: expectedNewChatGeometry(
+      currentBaselineViewports.medium.width,
+      expectedNavigationByState.mediumNewChat,
+    ),
+    thresholdNewChat: expectedNewChatGeometry(
+      currentBaselineViewports.threshold.width,
+      expectedNavigationByState.thresholdNewChat,
+    ),
+    wideNewChat: expectedNewChatGeometry(
+      currentBaselineViewports.wide.width,
+      expectedNavigationByState.wideNewChat,
+    ),
   };
   const invalidGeometryStates = Object.entries(expectedGeometryByState)
     .filter(([state, expected]) => {
@@ -510,21 +566,42 @@ export function assertCurrentBaselineRecord(record) {
     );
   }
   if (
-    Math.abs((responsiveContract.wideNavigationWidth ?? 0) - 274.11) > 1 ||
-    Math.abs((responsiveContract.mediumNavigationWidth ?? 0) - 274.11) > 1 ||
-    Math.abs((responsiveContract.thresholdNavigationWidth ?? 0) - 274.11) >
-      1 ||
+    !withinTolerance(
+      responsiveContract.wideNavigationWidth,
+      expectedNavigationByState.wideNewChat,
+    ) ||
+    !withinTolerance(
+      responsiveContract.mediumNavigationWidth,
+      expectedNavigationByState.mediumNewChat,
+    ) ||
+    !withinTolerance(
+      responsiveContract.thresholdNavigationWidth,
+      expectedNavigationByState.thresholdNewChat,
+    ) ||
     responsiveContract.collapsedNavigation !== null ||
     responsiveContract.collapsedShowCount !== 1 ||
-    Math.abs((responsiveContract.pinnedNavigationWidth ?? 0) - 274.11) > 1 ||
+    !withinTolerance(
+      responsiveContract.pinnedNavigationWidth,
+      expectedNavigationByState.compactPinned,
+    ) ||
     responsiveContract.pullRequestsCurrent !== "page" ||
     responsiveContract.pullRequestsEditor !== null ||
     responsiveContract.pullRequestsMainCount !== 1 ||
-    !withinTolerance(responsiveContract.pullRequestsMainWidth, 445.89) ||
-    !withinTolerance(responsiveContract.pullRequestsNavigationWidth, 274.11) ||
+    !withinTolerance(
+      responsiveContract.pullRequestsMainWidth,
+      currentBaselineViewports.compact.width -
+        expectedNavigationByState.compactPullRequests,
+    ) ||
+    !withinTolerance(
+      responsiveContract.pullRequestsNavigationWidth,
+      expectedNavigationByState.compactPullRequests,
+    ) ||
     !responsiveContract.restoredNavigation ||
     !responsiveContract.restoredEditor ||
-    !withinTolerance(responsiveContract.restoredNavigationWidth, 274.11) ||
+    !withinTolerance(
+      responsiveContract.restoredNavigationWidth,
+      expectedNavigationByState.compactRestored,
+    ) ||
     Object.values(responsiveContract.overflowStates).some(
       (value) => Math.abs(value) > 1,
     )

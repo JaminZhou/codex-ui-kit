@@ -62,8 +62,9 @@ observation from a previous build remains historical evidence.
   using private text. The exact `scrollHeight` remains content-dependent, so
   the contract locks the unique scroll owner and visible geometry rather than
   private task counts.
-- The same fingerprint revalidates 43 context/Composer/sidebar/menu/window
-  assets, six project groups, Recents actions, all three sampled menus, and the disabled
+- The same fingerprint revalidates 53
+  context/Composer/sidebar/menu/window/environment assets, six project groups,
+  Recents actions, all sampled menus, and the disabled
   window-navigation cursor. See
   [`26.803.61601.md`](26.803.61601.md). The scoped visible-shell approximation
   list is empty, but the broader lifecycle denominator remains incomplete;
@@ -73,8 +74,8 @@ observation from a previous build remains historical evidence.
   previous-build regression evidence and have been downgraded from `verified`
   to `partial_legacy` until they are reached again on the current fingerprint.
 
-Current inventory: 86 surface groups; 21 have current-build runtime evidence, 48 have previous-build-only runtime evidence, 17 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 19 groups and Electron verification covers 19.
-Prior acceptance outside those 19 sampled current-build groups remains
+Current inventory: 86 surface groups; 22 have current-build runtime evidence, 47 have previous-build-only runtime evidence, 17 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 20 groups and Electron verification covers 20.
+Prior acceptance outside those 20 sampled current-build groups remains
 recorded as `partial_legacy` until current-build re-observation.
 
 The current package exposes candidates far beyond the old transcript sample:
@@ -196,7 +197,8 @@ action, and footer rows into three independently gated current-build groups:
 record contains six expandable groups with 30px project rows, 30px task rows,
 2px/8px child-list block padding, 1px row/group separators,
 pointer/Enter/Space transitions, the 721→720 automatic-collapse rule,
-explicit 720px pinning, a 214.05×179.38 six-item project menu, and a
+explicit 720px pinning, a 214.05px-wide project menu with conditional six- and
+seven-item variants, and a
 200×272.06 Help menu with a `What's new` heading and eight items. Browser/CDP
 and Electron repeat the lifecycle; four local-only ownership-masked product
 comparisons pass at 1.54%, 0.13%, 0.30%, and 3.12% for collapsed projects,
@@ -315,9 +317,16 @@ the protocol-backed command → approval → Review → Terminal → PR path.
 External current-build ratios are 0.5437% for ready, 0.2248% for no project,
 0.2378% for New worktree, 2.9943% for the environment picker, 0.4619% for
 compact, 2.9046% for the project list, 3.2800% for Start in, and 7.1320% for
-branches. Implementation remains `partial` because project/branch creation,
-environment settings, Remote/Codex web execution, and unavailable environment
-behavior were not mutated in the current product. A later `26.803.61601`
+branches. The current `26.803.61601` follow-up supersedes the execution-location
+entry model with a 216×189.31 five-action Work in menu. Codex web is an
+external anchor rather than an environment selection, and disabled Send to
+cloud cannot produce a synthetic working directory. New worktree exposes the
+264×125.69 no-environment menu and routes Environment settings to the current
+768px unavailable composition. Browser/CDP, Electron, and local-only product
+comparisons pass at 3.9193%, 3.0724%, and 0.0708% without creating an
+environment. Implementation remains `partial` because populated environment
+creation/editing, repair variants, and real Remote connection lifecycles remain
+open. A later `26.803.61601`
 isolated probe creates a real worktree/task and proves project/task persistence
 across an app restart while keeping exact thread-route restoration conditional
 on selecting the retained task. Moving that disposable worktree aside reaches
@@ -328,7 +337,7 @@ Browser/CDP, Electron, and a 3.2572% local-only notice-region gate cover that
 observed boundary without inventing a Retry or repair control. The searchable
 600×600 `LocalEnvironmentDialog` remains a protocol-neutral host capability;
 it is no longer presented as the current New worktree entry behavior. The
-broader projects index and environment settings families remain partial/legacy;
+broader projects index remains partial/legacy;
 the worktree family has current Browser/Electron verification for the delivered
 creation/persistence/missing-directory slice but remains partially implemented
 because settings and additional repair variants are still open. The legacy

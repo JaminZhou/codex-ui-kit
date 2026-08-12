@@ -31,12 +31,14 @@ import {
   ConversationProjectListbox,
   ConversationThreadShell,
   Dialog,
+  EnvironmentSettingsPage,
   FileChangeGroup,
   FileReview,
   IconButton,
   LocalEnvironmentDialog,
   Menu,
   MenuItem,
+  MenuLinkItem,
   MenuSectionLabel,
   MenuSeparator,
   McpToolCallGroup,
@@ -1711,13 +1713,22 @@ export function App() {
       ),
   );
   const [workspaceEnvironmentId, setWorkspaceEnvironmentId] =
-    useState(
+    useState<"local" | "worktree">(
       initialSelection.view === "workspace" &&
         (initialSelection.frame === "workspace-new-worktree" ||
-          initialSelection.frame === "workspace-environment-picker")
+          initialSelection.frame === "workspace-environment-picker" ||
+          initialSelection.frame === "workspace-environments-unavailable")
         ? "worktree"
         : "local",
     );
+  const [workspacePage, setWorkspacePage] = useState<
+    "conversation" | "environments"
+  >(
+    initialSelection.view === "workspace" &&
+      initialSelection.frame === "workspace-environments-unavailable"
+      ? "environments"
+      : "conversation",
+  );
   const [workspaceWorktreeId, setWorkspaceWorktreeId] = useState(
     initialSelection.view === "workspace" &&
       initialSelection.frame === "workspace-repairing"
@@ -2449,6 +2460,7 @@ export function App() {
     setMode("replay");
     setView("workspace");
     setProjectIndexChat(undefined);
+    setWorkspacePage("conversation");
     updateWorkspaceProjectId(projectId);
     setWorkspaceEnvironmentId("local");
     updateWorkspaceWorktreeId("main");
@@ -2538,6 +2550,7 @@ export function App() {
       setMode("replay");
       setView("workspace");
       setProjectIndexChat(undefined);
+      setWorkspacePage("conversation");
       updateWorkspaceProjectId(id);
       setWorkspaceEnvironmentId("local");
       updateWorkspaceWorktreeId("main");
@@ -3643,6 +3656,13 @@ export function App() {
                     </MenuItem>
                     <MenuItem
                       startIcon={
+                        <CurrentBuildIcon name="sidebar-project-menu-mark-read" />
+                      }
+                    >
+                      Mark all as read
+                    </MenuItem>
+                    <MenuItem
+                      startIcon={
                         <CurrentBuildIcon name="sidebar-project-menu-archive" />
                       }
                     >
@@ -3748,6 +3768,7 @@ export function App() {
                       ? () => {
                           setMode("replay");
                           setView("workspace");
+                          setWorkspacePage("conversation");
                           setActiveFrame(
                             workspaceDirectoryMissing
                               ? "workspace-directory-missing"
@@ -4995,7 +5016,9 @@ export function App() {
           .includes(workspaceBranchQuery.trim().toLocaleLowerCase()),
     );
   const workspaceBaseFrame =
-    projectIndexChat
+    workspacePage === "environments"
+      ? "workspace-environments-unavailable"
+      : projectIndexChat
       ? "projects-index-chat"
       : activeFrame === "workspace-branch-created"
         ? activeFrame
@@ -5279,10 +5302,11 @@ export function App() {
     setActiveFrame("workspace-ready");
   };
   const selectWorkspaceRunLocation = (
-    environmentId: "cloud" | "local" | "worktree",
+    environmentId: "local" | "worktree",
   ) => {
     workspaceRunLocationVersionRef.current += 1;
     setWorkspaceEnvironmentId(environmentId);
+    setWorkspacePage("conversation");
     setWorkspaceOverlay(null);
     setActiveFrame(
       environmentId === "worktree"
@@ -5319,7 +5343,9 @@ export function App() {
                   {
                     ariaLabel: "Change run location: New worktree",
                     controlsId: "demo-workspace-environment-menu",
-                    icon: "↗",
+                    icon: (
+                      <CurrentBuildIcon name="workspace-run-location-worktree" />
+                    ),
                     id: "environment",
                     kind: "run-location" as const,
                     label: "New worktree",
@@ -5329,7 +5355,9 @@ export function App() {
                     ariaLabel: "Change environment: No environment",
                     controlsId:
                       "demo-workspace-worktree-environment-menu",
-                    icon: "⚙",
+                    icon: (
+                      <CurrentBuildIcon name="workspace-environment-settings" />
+                    ),
                     id: "worktree-environment",
                     kind: "environment" as const,
                     label: "No environment",
@@ -5345,24 +5373,14 @@ export function App() {
                 ]
               : [
                   {
-                    ariaLabel: `Change run location: ${
-                      workspaceEnvironmentId === "local"
-                        ? "Local"
-                        : "Codex web"
-                    }`,
+                    ariaLabel: "Change run location: Local",
                     controlsId: "demo-workspace-environment-menu",
-                    icon:
-                      workspaceEnvironmentId === "local" ? (
-                        <CurrentBuildIcon name="composer-worktree" />
-                      ) : (
-                        "▱"
-                      ),
+                    icon: (
+                      <CurrentBuildIcon name="workspace-run-location-local" />
+                    ),
                     id: "environment",
                     kind: "run-location" as const,
-                    label:
-                      workspaceEnvironmentId === "local"
-                        ? "Local"
-                        : "Codex web",
+                    label: "Local",
                     popupRole: "menu" as const,
                   },
                   {
@@ -5421,7 +5439,7 @@ export function App() {
               <Menu
                 align="start"
                 className="demo-workspace-context-menu demo-workspace-environment-menu"
-                label="Start in"
+                label="Work in"
                 onOpenChange={(open) =>
                   setWorkspaceOverlayState(open ? "environment" : null)
                 }
@@ -5431,45 +5449,64 @@ export function App() {
                 trigger={environmentTrigger}
                 width="auto"
               >
-                <MenuSectionLabel>Start in</MenuSectionLabel>
+                <MenuSectionLabel>Work in</MenuSectionLabel>
                 <MenuItem
-                  aria-checked={workspaceEnvironmentId === "local"}
                   endIcon={
-                    workspaceEnvironmentId === "local" ? "✓" : undefined
+                    workspaceEnvironmentId === "local" ? (
+                      <CurrentBuildIcon name="workspace-selection-check" />
+                    ) : undefined
                   }
                   onSelect={() => selectWorkspaceRunLocation("local")}
-                  role="menuitemradio"
-                  startIcon="▱"
+                  startIcon={
+                    <CurrentBuildIcon name="workspace-run-location-local" />
+                  }
                 >
-                  Work locally
+                  Local
                 </MenuItem>
                 <MenuItem
-                  aria-checked={workspaceEnvironmentId === "worktree"}
                   endIcon={
-                    workspaceEnvironmentId === "worktree" ? "✓" : undefined
+                    workspaceEnvironmentId === "worktree" ? (
+                      <CurrentBuildIcon name="workspace-selection-check" />
+                    ) : undefined
                   }
                   onSelect={() => selectWorkspaceRunLocation("worktree")}
-                  role="menuitemradio"
-                  startIcon="↗"
+                  startIcon={
+                    <CurrentBuildIcon name="workspace-run-location-worktree" />
+                  }
                 >
                   New worktree
                 </MenuItem>
-                <MenuItem
-                  aria-checked={workspaceEnvironmentId === "cloud"}
+                <MenuLinkItem
                   endIcon={
-                    workspaceEnvironmentId === "cloud" ? "✓" : "↗"
+                    <CurrentBuildIcon name="workspace-run-location-external" />
                   }
-                  onSelect={() => selectWorkspaceRunLocation("cloud")}
-                  role="menuitemradio"
-                  startIcon="◌"
+                  href="https://chatgpt.com/codex/cloud"
+                  startIcon={
+                    <CurrentBuildIcon name="workspace-run-location-codex-web" />
+                  }
                 >
                   Connect Codex web
-                </MenuItem>
-                <MenuItem disabled startIcon="⌁">
+                </MenuLinkItem>
+                <MenuItem
+                  disabled
+                  startIcon={
+                    <CurrentBuildIcon name="workspace-run-location-send-cloud" />
+                  }
+                >
                   Send to cloud
                 </MenuItem>
-                <MenuSeparator />
-                <MenuItem endIcon="›" startIcon="◔">
+                <div
+                  aria-hidden="true"
+                  className="demo-workspace-context-menu__divider"
+                />
+                <MenuItem
+                  endIcon={
+                    <CurrentBuildIcon name="workspace-run-location-usage-chevron" />
+                  }
+                  startIcon={
+                    <CurrentBuildIcon name="workspace-run-location-usage" />
+                  }
+                >
                   Usage remaining
                 </MenuItem>
               </Menu>
@@ -5494,11 +5531,28 @@ export function App() {
                 width="auto"
               >
                 <MenuSectionLabel>Environment</MenuSectionLabel>
-                <MenuItem endIcon="✓">Work without environment</MenuItem>
+                <MenuItem
+                  endIcon={
+                    <CurrentBuildIcon name="workspace-selection-check" />
+                  }
+                >
+                  Work without environment
+                </MenuItem>
                 <span className="demo-workspace-context-menu__empty">
                   No environments found
                 </span>
-                <MenuItem endIcon="↗">Environment settings</MenuItem>
+                <MenuItem
+                  endIcon={
+                    <CurrentBuildIcon name="workspace-environment-settings" />
+                  }
+                  onSelect={() => {
+                    setWorkspaceOverlay(null);
+                    setWorkspacePage("environments");
+                    setActiveFrame("workspace-environments-unavailable");
+                  }}
+                >
+                  Environment settings
+                </MenuItem>
               </Menu>
             );
           }
@@ -6102,11 +6156,19 @@ export function App() {
       </ConversationThreadShell>
     </div>
   ) : null;
-  const workspaceRoute = projectIndexChatRoute
-    ? projectIndexChatRoute
-    : workspacePersistenceFrame
-      ? workspacePersistedThread
-      : workspaceNewConversationRoute;
+  const workspaceEnvironmentSettingsRoute = (
+    <div className="demo-workspace-environment-settings-route">
+      <EnvironmentSettingsPage status="unavailable" />
+    </div>
+  );
+  const workspaceRoute =
+    workspacePage === "environments"
+      ? workspaceEnvironmentSettingsRoute
+      : projectIndexChatRoute
+        ? projectIndexChatRoute
+        : workspacePersistenceFrame
+          ? workspacePersistedThread
+          : workspaceNewConversationRoute;
 
   const projectIndexStatus =
     activeFrame === "projects-index-loading"
@@ -8764,11 +8826,26 @@ export function App() {
         windowChrome={
           view === "projects" || view === "shell" || view === "workspace" ? (
             <AppWindowChrome
-              backAction={{
-                disabled: true,
-                icon: <CurrentBuildIcon name="window-chrome-back" />,
-                label: "Back",
-              }}
+              backAction={
+                view === "workspace" && workspacePage === "environments"
+                  ? {
+                      icon: <CurrentBuildIcon name="window-chrome-back" />,
+                      label: "Back to ChatGPT",
+                      onClick: () => {
+                        setWorkspacePage("conversation");
+                        setActiveFrame(
+                          workspaceEnvironmentId === "worktree"
+                            ? "workspace-new-worktree"
+                            : "workspace-ready",
+                        );
+                      },
+                    }
+                  : {
+                      disabled: true,
+                      icon: <CurrentBuildIcon name="window-chrome-back" />,
+                      label: "Back",
+                    }
+              }
               forwardAction={{
                 disabled: true,
                 icon: <CurrentBuildIcon name="window-chrome-forward" />,

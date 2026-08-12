@@ -212,6 +212,38 @@ try {
     undefined,
     { timeout: 15_000 },
   );
+  if (
+    (await main.locator('[contenteditable="true"][role="textbox"]').count()) ===
+    0
+  ) {
+    const backToApp = main.locator('button[aria-label="Back to ChatGPT"]');
+    if ((await backToApp.count()) === 1) {
+      // The native settings route intercepts a normal Playwright click while it
+      // swaps back to the app shell. Dispatching the DOM activation preserves
+      // that product path without waiting on a navigation that never commits.
+      await backToApp.evaluate((button) => button.click());
+      await main.waitForFunction(
+        () => document.body.textContent?.includes("New chat") ?? false,
+        undefined,
+        { timeout: 15_000 },
+      );
+    }
+    if (
+      (await main.locator('[contenteditable="true"][role="textbox"]').count()) ===
+      0
+    ) {
+      const newChat = main.locator("nav").getByText("New chat", {
+        exact: true,
+      });
+      if ((await newChat.count()) !== 1) {
+        throw new Error("Could not resolve one fixed New chat route.");
+      }
+      await newChat.click();
+    }
+    await main.waitForSelector('[contenteditable="true"][role="textbox"]', {
+      timeout: 15_000,
+    });
+  }
   await main.evaluate(async () => {
     await document.fonts.ready;
   });
@@ -375,14 +407,33 @@ try {
         width: round(value.width),
       };
     };
+    const navigationBounds = [...document.querySelectorAll("nav")]
+      .map((navigation) => navigation.getBoundingClientRect())
+      .filter((bounds) => bounds.width > 0 && bounds.height > 0)
+      .sort(
+        (left, right) =>
+          right.width * right.height - left.width * left.height,
+      )[0];
+    if (!navigationBounds) {
+      throw new Error("Current visual capture requires one visible navigation.");
+    }
+    const navigationRight = navigationBounds.right;
     const region = (value) => {
       if (value.top < 52) return "titlebar";
-      if (value.left < 274 && value.top < 250) return "sidebar-primary";
-      if (value.left < 274 && value.top > window.innerHeight - 60) {
+      if (value.left < navigationRight && value.top < 250) {
+        return "sidebar-primary";
+      }
+      if (
+        value.left < navigationRight &&
+        value.top > window.innerHeight - 60
+      ) {
         return "sidebar-footer";
       }
-      if (value.left < 274) return "sidebar-projects";
-      if (value.left >= 274 && value.top > window.innerHeight - 160) {
+      if (value.left < navigationRight) return "sidebar-projects";
+      if (
+        value.left >= navigationRight &&
+        value.top > window.innerHeight - 160
+      ) {
         return "composer";
       }
       return null;
@@ -856,6 +907,12 @@ try {
     await projectRow.hover();
     await projectRow.locator('button[aria-haspopup="menu"]').first().click();
     await main.waitForSelector('[role="menu"]:visible');
+    const projectMenuLabels = await main
+      .locator('[role="menu"]:visible [role="menuitem"]')
+      .allTextContents();
+    const projectMenuHasMarkAllAsRead = projectMenuLabels.some(
+      (label) => label.trim() === "Mark all as read",
+    );
     const projectMenuIcons = await main.evaluate(() =>
       window.__codexUiKitCaptureVisibleMenuIcons({
         ids: [
@@ -863,6 +920,14 @@ try {
           "sidebar-project-menu-reveal",
           "sidebar-project-menu-worktree",
           "sidebar-project-menu-edit",
+          ...([...document.querySelectorAll('[role="menu"]')]
+            .find((menu) => {
+              const bounds = menu.getBoundingClientRect();
+              return bounds.width > 0 && bounds.height > 0;
+            })
+            ?.textContent?.includes("Mark all as read")
+            ? ["sidebar-project-menu-mark-read"]
+            : []),
           "sidebar-project-menu-archive",
           "sidebar-project-menu-remove",
         ],
@@ -955,11 +1020,256 @@ try {
       );
     accountMenuCapture.observation.triggerExpanded =
       await accountTrigger.getAttribute("aria-expanded");
+
+    const runLocationTrigger = main.locator(
+      'main button[data-composer-navigation-target="run-location"]:visible',
+    );
+    if ((await runLocationTrigger.count()) !== 1) {
+      throw new Error("Expected one structural current run-location trigger.");
+    }
+    if (!(await runLocationTrigger.textContent())?.trim().endsWith("Local")) {
+      await runLocationTrigger.click();
+      const workInMenu = main.locator('[role="menu"]:visible');
+      await workInMenu.waitFor();
+      await workInMenu
+        .getByRole("menuitem", { name: "Local", exact: true })
+        .click();
+      await main.waitForFunction(
+        () =>
+          document
+            .querySelector(
+              'main button[data-composer-navigation-target="run-location"]',
+            )
+            ?.textContent?.trim()
+            .endsWith("Local") ?? false,
+      );
+    }
+    await runLocationTrigger.click();
+    const workInMenu = main.locator('[role="menu"]:visible');
+    await workInMenu.waitFor();
+    const workInCapture = await main.evaluate(() => {
+      const capture = window.__codexUiKitCaptureVisibleMenuIconSlots({
+        itemCount: 5,
+        region: "workspace-run-location-menu",
+        slots: [
+          { id: "workspace-run-location-local", itemIndex: 0, svgIndex: 0 },
+          { id: "workspace-selection-check", itemIndex: 0, svgIndex: 1 },
+          {
+            id: "workspace-run-location-worktree",
+            itemIndex: 1,
+            svgIndex: 0,
+          },
+          {
+            id: "workspace-run-location-codex-web",
+            itemIndex: 2,
+            svgIndex: 0,
+          },
+          {
+            id: "workspace-run-location-external",
+            itemIndex: 2,
+            svgIndex: 1,
+          },
+          {
+            id: "workspace-run-location-send-cloud",
+            itemIndex: 3,
+            svgIndex: 0,
+          },
+          { id: "workspace-run-location-usage", itemIndex: 4, svgIndex: 0 },
+          {
+            id: "workspace-run-location-usage-chevron",
+            itemIndex: 4,
+            svgIndex: 1,
+          },
+        ],
+      });
+      const menu = [...document.querySelectorAll('[role="menu"]')].find(
+        (candidate) => {
+          const bounds = candidate.getBoundingClientRect();
+          return bounds.width > 0 && bounds.height > 0;
+        },
+      );
+      const items = [...(menu?.querySelectorAll('[role="menuitem"]') ?? [])];
+      return {
+        ...capture,
+        observation: {
+          ...capture.observation,
+          codexWebHrefIsExpected:
+            items[2]?.tagName === "A" &&
+            items[2]?.getAttribute("href") ===
+              "https://chatgpt.com/codex/cloud",
+          disabled: items.map(
+            (item) =>
+              item.getAttribute("aria-disabled") === "true" ||
+              (item instanceof HTMLButtonElement && item.disabled),
+          ),
+          labels: items.map((item) => item.textContent?.trim() ?? ""),
+          roles: items.map((item) => item.getAttribute("role")),
+          tags: items.map((item) => item.tagName),
+          sectionLabel:
+            [...(menu?.querySelectorAll("*") ?? [])]
+              .find(
+                (element) =>
+                  element.children.length === 0 &&
+                  element.textContent?.trim() === "Work in",
+              )
+              ?.textContent?.trim() ??
+            null,
+        },
+      };
+    });
+    await main.keyboard.press("Escape");
+    await workInMenu.waitFor({ state: "hidden" });
+
+    await runLocationTrigger.click();
+    await workInMenu.waitFor();
+    await workInMenu
+      .getByRole("menuitem", { name: "New worktree", exact: true })
+      .click();
+    const environmentTrigger = main
+      .locator('main button[aria-haspopup="menu"]:visible')
+      .filter({ hasText: /^No environment$/ });
+    if ((await environmentTrigger.count()) !== 1) {
+      throw new Error("Expected one current No environment trigger.");
+    }
+    await environmentTrigger.click();
+    const environmentMenu = main.locator('[role="menu"]:visible');
+    await environmentMenu.waitFor();
+    const environmentCapture = await main.evaluate(() => {
+      const capture = window.__codexUiKitCaptureVisibleMenuIconSlots({
+        itemCount: 2,
+        region: "workspace-environment-menu",
+        slots: [
+          { id: "workspace-selection-check", itemIndex: 0, svgIndex: 0 },
+          {
+            id: "workspace-environment-settings",
+            itemIndex: 1,
+            svgIndex: 0,
+          },
+        ],
+      });
+      const menu = [...document.querySelectorAll('[role="menu"]')].find(
+        (candidate) => {
+          const bounds = candidate.getBoundingClientRect();
+          return bounds.width > 0 && bounds.height > 0;
+        },
+      );
+      const items = [...(menu?.querySelectorAll('[role="menuitem"]') ?? [])];
+      return {
+        ...capture,
+        observation: {
+          ...capture.observation,
+          emptyText: [...(menu?.querySelectorAll("*") ?? [])]
+            .find((element) => element.children.length === 0 && element.textContent?.trim() === "No environments found")
+            ?.textContent?.trim() ?? null,
+          labels: items.map((item) => item.textContent?.trim() ?? ""),
+          roles: items.map((item) => item.getAttribute("role")),
+        },
+      };
+    });
+    const environmentSettings = environmentMenu.getByRole("menuitem", {
+      name: "Environment settings",
+      exact: true,
+    });
+    await environmentSettings.click();
+    await main.getByRole("heading", { name: "Environments", exact: true }).waitFor();
+    const environmentSettingsObservation = await main.evaluate(() => {
+      const round = (value) => Math.round(value * 100) / 100;
+      const rect = (element) => {
+        if (!element) return null;
+        const bounds = element.getBoundingClientRect();
+        return {
+          height: round(bounds.height),
+          left: round(bounds.left),
+          top: round(bounds.top),
+          width: round(bounds.width),
+        };
+      };
+      const style = (element) => {
+        if (!element) return null;
+        const computed = getComputedStyle(element);
+        return {
+          backgroundColor: computed.backgroundColor,
+          borderColor: computed.borderColor,
+          borderRadius: computed.borderRadius,
+          color: computed.color,
+          fontFamily: computed.fontFamily,
+          fontSize: computed.fontSize,
+          fontWeight: computed.fontWeight,
+          lineHeight: computed.lineHeight,
+          padding: computed.padding,
+        };
+      };
+      const exactLeaf = (text) =>
+        [...document.querySelectorAll("*")].find(
+          (element) =>
+            element.children.length === 0 && element.textContent?.trim() === text,
+        );
+      const heading = document.querySelector("h1");
+      const unavailableHeading = exactLeaf("Local environments unavailable");
+      const message = exactLeaf(
+        "We could not load local environment settings for this project",
+      );
+      const card = message?.parentElement ?? null;
+      return {
+        card: { rect: rect(card), style: style(card) },
+        heading: {
+          rect: rect(heading),
+          style: style(heading),
+          text: heading?.textContent?.trim() ?? null,
+        },
+        message: {
+          rect: rect(message),
+          style: style(message),
+          text: message?.textContent?.trim() ?? null,
+        },
+        unavailableHeading: {
+          rect: rect(unavailableHeading),
+          style: style(unavailableHeading),
+          text: unavailableHeading?.textContent?.trim() ?? null,
+        },
+      };
+    });
+    const backToApp = main.locator('button[aria-label="Back to ChatGPT"]');
+    if ((await backToApp.count()) !== 1) {
+      throw new Error("Environment settings route lost its Back to ChatGPT control.");
+    }
+    await backToApp.evaluate((button) => button.click());
+    await main.waitForSelector('[contenteditable="true"][role="textbox"]', {
+      timeout: 15_000,
+    });
+    const restoredRunLocationTrigger = main.locator(
+      'main button[data-composer-navigation-target="run-location"]:visible',
+    );
+    if ((await restoredRunLocationTrigger.count()) !== 1) {
+      throw new Error("Environment settings route did not restore New worktree state.");
+    }
+    if (
+      !(await restoredRunLocationTrigger.textContent())
+        ?.trim()
+        .endsWith("New worktree")
+    ) {
+      throw new Error("Environment settings route changed its New worktree state.");
+    }
+    await restoredRunLocationTrigger.click();
+    const restoredWorkInMenu = main.locator('[role="menu"]:visible');
+    await restoredWorkInMenu.waitFor();
+    await restoredWorkInMenu
+      .getByRole("menuitem", { name: "Local", exact: true })
+      .click();
+
     result.icons.push(...projectMenuIcons, ...helpMenuIcons);
     result.icons.push(...accountMenuCapture.icons);
+    result.icons.push(...workInCapture.icons, ...environmentCapture.icons);
     result.sidebarObservation.projectMenuItemCount = projectMenuIcons.length;
+    result.sidebarObservation.projectMenuHasMarkAllAsRead =
+      projectMenuHasMarkAllAsRead;
     result.sidebarObservation.helpMenuItemCount = helpMenuIcons.length;
     result.sidebarObservation.accountMenu = accountMenuCapture.observation;
+    result.workspaceObservation = {
+      environmentMenu: environmentCapture.observation,
+      environmentSettings: environmentSettingsObservation,
+      workInMenu: workInCapture.observation,
+    };
   } finally {
     if ((await main.locator('[role="menu"]:visible').count()) > 0) {
       await main.keyboard.press("Escape").catch(() => {});
@@ -996,6 +1306,16 @@ try {
       `capture.fontSamples[${index}].style`,
     ),
   );
+  for (const [surface, observation] of Object.entries(
+    result.workspaceObservation?.environmentSettings ?? {},
+  )) {
+    if (observation?.style) {
+      sanitizeVisualScalarRecord(
+        observation.style,
+        `capture.workspaceObservation.environmentSettings.${surface}.style`,
+      );
+    }
+  }
   result.icons = result.icons.map((icon, index) => {
     const sanitized = sanitizeVisualAssetIcon(
       {

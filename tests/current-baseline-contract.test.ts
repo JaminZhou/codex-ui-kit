@@ -284,6 +284,7 @@ describe("current baseline capture contract", () => {
           expandedProjectGroupCount: 6,
           helpControlCount: 1,
           horizontalOverflow: 0,
+          navigationWidth: 274.11,
           projectGroupCount: 6,
           projectRow: {
             rect: { height: 30, width: 258.11 },
@@ -314,6 +315,7 @@ describe("current baseline capture contract", () => {
           opened: {
             focusInside: true,
             focusRole: "menu",
+            hasMarkAllAsRead: false,
             menuItemCount: 6,
             rect: { height: 179.38, width: 214.05 },
             visibleMenuCount: 1,
@@ -356,6 +358,104 @@ describe("current baseline capture contract", () => {
     };
 
     expect(() => assertCurrentBaselineRecord(record)).not.toThrow();
+    const withNavigationWidth = (
+      source: (typeof record.states)[keyof typeof record.states],
+      navigationWidth: number,
+    ) => {
+      const viewportWidth = source.viewport.width;
+      const mainWidth = viewportWidth - navigationWidth;
+      const editorWidth = Math.min(712, mainWidth - 56);
+      return {
+        ...source,
+        editor: source.editor
+          ? {
+              ...source.editor,
+              rect: {
+                ...source.editor.rect,
+                left:
+                  navigationWidth + (mainWidth - editorWidth) / 2,
+                width: editorWidth,
+              },
+            }
+          : null,
+        main: [{ width: mainWidth }],
+        navigation: { width: navigationWidth },
+      };
+    };
+    const persistedNavigationWidth = 322.91;
+    const persistedRecord = {
+      ...record,
+      sidebarLifecycle: {
+        ...record.sidebarLifecycle,
+        baseline: {
+          ...record.sidebarLifecycle.baseline,
+          navigationWidth: persistedNavigationWidth,
+          projectRow: {
+            ...record.sidebarLifecycle.baseline.projectRow,
+            rect: {
+              ...record.sidebarLifecycle.baseline.projectRow.rect,
+              width: persistedNavigationWidth - 16,
+            },
+          },
+        },
+        responsive: {
+          ...record.sidebarLifecycle.responsive,
+          compactPinned: {
+            ...record.sidebarLifecycle.responsive.compactPinned,
+            navigationWidth: persistedNavigationWidth,
+          },
+          wideRestored: {
+            ...record.sidebarLifecycle.responsive.wideRestored,
+            navigationWidth: persistedNavigationWidth,
+          },
+        },
+      },
+      states: {
+        compactCollapsed: record.states.compactCollapsed,
+        compactPinned: withNavigationWidth(
+          record.states.compactPinned,
+          persistedNavigationWidth,
+        ),
+        compactPullRequests: withNavigationWidth(
+          record.states.compactPullRequests,
+          persistedNavigationWidth,
+        ),
+        compactRestored: withNavigationWidth(
+          record.states.compactRestored,
+          persistedNavigationWidth,
+        ),
+        mediumNewChat: withNavigationWidth(
+          record.states.mediumNewChat,
+          persistedNavigationWidth,
+        ),
+        thresholdNewChat: withNavigationWidth(
+          record.states.thresholdNewChat,
+          persistedNavigationWidth,
+        ),
+        wideNewChat: withNavigationWidth(
+          record.states.wideNewChat,
+          persistedNavigationWidth,
+        ),
+      },
+    };
+    expect(() => assertCurrentBaselineRecord(persistedRecord)).not.toThrow();
+    expect(() =>
+      assertCurrentBaselineRecord({
+        ...persistedRecord,
+        sidebarLifecycle: {
+          ...persistedRecord.sidebarLifecycle,
+          projectMenu: {
+            ...persistedRecord.sidebarLifecycle.projectMenu,
+            opened: {
+              ...persistedRecord.sidebarLifecycle.projectMenu.opened,
+              hasMarkAllAsRead: true,
+              menuItemCount: 7,
+              rect: { height: 207.94, width: 214.05 },
+            },
+          },
+        },
+      }),
+    ).not.toThrow();
     expect(currentBaselineFingerprint.appVersion).toBe("26.803.61601");
     expect(currentBaselineViewports.compact.width).toBe(720);
     expect(() =>
@@ -390,6 +490,83 @@ describe("current baseline capture contract", () => {
         }),
       ).toThrow("project-group baseline");
     }
+    for (const invalidWidth of [undefined, 239, 369, 400, 521]) {
+      expect(() =>
+        assertCurrentSidebarLifecycle({
+          ...record.sidebarLifecycle,
+          baseline: {
+            ...record.sidebarLifecycle.baseline,
+            navigationWidth: invalidWidth,
+          },
+        }),
+      ).toThrow("project-group baseline");
+    }
+    expect(() =>
+      assertCurrentSidebarLifecycle({
+        ...persistedRecord.sidebarLifecycle,
+        baseline: {
+          ...persistedRecord.sidebarLifecycle.baseline,
+          navigationWidth: 400,
+          projectRow: {
+            ...persistedRecord.sidebarLifecycle.baseline.projectRow,
+            rect: {
+              ...persistedRecord.sidebarLifecycle.baseline.projectRow.rect,
+              width: 384,
+            },
+          },
+        },
+        responsive: {
+          ...persistedRecord.sidebarLifecycle.responsive,
+          compactPinned: {
+            ...persistedRecord.sidebarLifecycle.responsive.compactPinned,
+            navigationWidth: 400,
+          },
+          wideRestored: {
+            ...persistedRecord.sidebarLifecycle.responsive.wideRestored,
+            navigationWidth: 400,
+          },
+        },
+      }),
+    ).toThrow("project-group baseline");
+    expect(() =>
+      assertCurrentSidebarLifecycle({
+        ...persistedRecord.sidebarLifecycle,
+        baseline: {
+          ...persistedRecord.sidebarLifecycle.baseline,
+          projectRow: {
+            ...persistedRecord.sidebarLifecycle.baseline.projectRow,
+            rect: {
+              ...persistedRecord.sidebarLifecycle.baseline.projectRow.rect,
+              width: 258.11,
+            },
+          },
+        },
+      }),
+    ).toThrow("project-group baseline");
+    expect(() =>
+      assertCurrentSidebarLifecycle({
+        ...persistedRecord.sidebarLifecycle,
+        responsive: {
+          ...persistedRecord.sidebarLifecycle.responsive,
+          wideRestored: {
+            ...persistedRecord.sidebarLifecycle.responsive.wideRestored,
+            navigationWidth: 274.11,
+          },
+        },
+      }),
+    ).toThrow("responsive state continuity");
+    expect(() =>
+      assertCurrentSidebarLifecycle({
+        ...record.sidebarLifecycle,
+        projectMenu: {
+          ...record.sidebarLifecycle.projectMenu,
+          opened: {
+            ...record.sidebarLifecycle.projectMenu.opened,
+            hasMarkAllAsRead: true,
+          },
+        },
+      }),
+    ).toThrow("project menu boundary");
     expect(() =>
       assertCurrentBaselineRecord({
         ...record,

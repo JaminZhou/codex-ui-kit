@@ -532,7 +532,8 @@
         "cdp-26.727.40816:project-local-feat-current-build-pr-refresh-context-row",
         "cdp-26.730.61309:new-worktree-no-environment-main-and-environment-empty-menu",
         "cdp-26.803.41515:visible-composer-project-worktree-branch-exact-assets",
-        "cdp-26.803.61601:visible-composer-project-worktree-branch-exact-assets"
+        "cdp-26.803.61601:visible-composer-project-worktree-branch-exact-assets",
+        "cdp-26.803.61601:work-in-five-action-menu-external-codex-web-anchor-and-exact-icons"
       ],
       "implementationStatus": "partial",
       "browserStatus": "verified",
@@ -715,7 +716,8 @@
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
         "cdp-26.803.41515:project-actions-menu-six-items-214.05x179.38-current-icons",
-        "cdp-26.803.61601:project-actions-menu-six-items-214.05x179.38-current-icons"
+        "cdp-26.803.61601:project-actions-menu-six-items-214.05x179.38-current-icons",
+        "cdp-26.803.61601:project-actions-menu-seven-items-214.05x207.94-mark-all-as-read-current-icon"
       ],
       "implementationStatus": "partial",
       "browserStatus": "verified",
@@ -1145,11 +1147,13 @@
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
         "cdp:environment-side-panel-and-settings-project-index",
-        "cdp-26.721:local-environment-dialog-600x600-scrollable-group-structure"
+        "cdp-26.721:local-environment-dialog-600x600-scrollable-group-structure",
+        "cdp-26.803.61601:no-environment-menu-and-local-environments-unavailable-settings-route",
+        "cdp-26.803.61601:environment-settings-768x171-current-route-and-three-current-pixel-gates"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "partial_legacy",
-      "electronStatus": "partial_legacy",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
       "priority": "p1"
     },
     {

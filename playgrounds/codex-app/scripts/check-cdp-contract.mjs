@@ -125,7 +125,7 @@ for (const scene of selectedScenes) {
       });
       const expectedContextIcons = [
         "composer-project",
-        "composer-worktree",
+        "workspace-run-location-local",
         "composer-branch",
       ];
       const expectedComposerIcons = [
@@ -257,7 +257,7 @@ for (const scene of selectedScenes) {
         JSON.stringify(darkShell.contextIcons) !==
           JSON.stringify([
             "composer-project",
-            "composer-worktree",
+            "workspace-run-location-local",
             "composer-branch",
           ]) ||
         JSON.stringify(darkShell.composerIcons) !==
@@ -723,8 +723,16 @@ for (const scene of selectedScenes) {
         const environmentButtons = Array.from(
           environmentMenu?.querySelectorAll(".codex-ui-menu-item") ?? [],
           (button) => ({
-            disabled: button.disabled,
+            disabled:
+              button.getAttribute("aria-disabled") === "true" ||
+              (button instanceof HTMLButtonElement && button.disabled),
+            href: button.getAttribute("href"),
+            label:
+              button
+                .querySelector(".codex-ui-menu-item__label")
+                ?.textContent?.trim() ?? null,
             role: button.getAttribute("role"),
+            tag: button.tagName,
           }),
         );
         const worktreeEnvironmentMenu = document.querySelector(
@@ -736,6 +744,10 @@ for (const scene of selectedScenes) {
           ) ?? [],
           (button) => ({
             disabled: button.disabled,
+            label:
+              button
+                .querySelector(".codex-ui-menu-item__label")
+                ?.textContent?.trim() ?? null,
             role: button.getAttribute("role"),
           }),
         );
@@ -778,6 +790,31 @@ for (const scene of selectedScenes) {
           (button) =>
             button.textContent?.trim() === "Create and checkout",
         );
+        const environmentSettingsPage = document.querySelector(
+          ".codex-ui-environment-settings-page",
+        );
+        const environmentSettingsHeading =
+          environmentSettingsPage?.querySelector("h1");
+        const environmentSettingsStatusHeading =
+          environmentSettingsPage?.querySelector("h2");
+        const environmentSettingsStatus =
+          environmentSettingsPage?.querySelector('[role="status"]');
+        const environmentSettingsMessage =
+          environmentSettingsStatus?.querySelector("div");
+        const style = (element) => {
+          if (!element) return null;
+          const computed = getComputedStyle(element);
+          return {
+            backgroundColor: computed.backgroundColor,
+            borderColor: computed.borderColor,
+            borderRadius: computed.borderRadius,
+            color: computed.color,
+            fontSize: computed.fontSize,
+            fontWeight: computed.fontWeight,
+            lineHeight: computed.lineHeight,
+            padding: computed.padding,
+          };
+        };
         return {
           activeElement:
             document.activeElement?.getAttribute("aria-label") ?? null,
@@ -796,10 +833,46 @@ for (const scene of selectedScenes) {
           context: rect(context),
           contextButtons,
           currentIcons,
+          environmentSettings: environmentSettingsPage
+            ? {
+                heading: {
+                  rect: rect(environmentSettingsHeading),
+                  style: style(environmentSettingsHeading),
+                  text: environmentSettingsHeading?.textContent?.trim(),
+                },
+                message: {
+                  rect: rect(environmentSettingsMessage),
+                  style: style(environmentSettingsMessage),
+                  text: environmentSettingsMessage?.textContent?.trim(),
+                },
+                page: rect(environmentSettingsPage),
+                status: {
+                  rect: rect(environmentSettingsStatus),
+                  style: style(environmentSettingsStatus),
+                },
+                statusHeading: {
+                  rect: rect(environmentSettingsStatusHeading),
+                  style: style(environmentSettingsStatusHeading),
+                  text: environmentSettingsStatusHeading?.textContent?.trim(),
+                },
+              }
+            : null,
           environment: environmentMenu
             ? {
                 buttons: environmentButtons,
+                dividerCount: environmentMenu.querySelectorAll(
+                  ".demo-workspace-context-menu__divider",
+                ).length,
+                iconNames: Array.from(
+                  environmentMenu.querySelectorAll(
+                    "[data-current-build-icon]",
+                  ),
+                  (icon) => icon.getAttribute("data-current-build-icon"),
+                ),
                 rect: rect(environmentMenu),
+                separatorCount:
+                  environmentMenu.querySelectorAll('[role="separator"]')
+                    .length,
               }
             : null,
           localEnvironment: localEnvironmentDialog
@@ -853,11 +926,61 @@ for (const scene of selectedScenes) {
                   worktreeEnvironmentMenu.querySelector(
                     ".demo-workspace-context-menu__empty",
                   )?.textContent ?? null,
+                iconNames: Array.from(
+                  worktreeEnvironmentMenu.querySelectorAll(
+                    "[data-current-build-icon]",
+                  ),
+                  (icon) => icon.getAttribute("data-current-build-icon"),
+                ),
                 rect: rect(worktreeEnvironmentMenu),
               }
             : null,
         };
       });
+      if (scene.frame === "workspace-environments-unavailable") {
+        const settings = contract.environmentSettings;
+        if (
+          contract.view !== "workspace" ||
+          contract.frame !== scene.frame ||
+          contract.horizontalOverflow > 1 ||
+          !settings ||
+          contract.start ||
+          contract.composer ||
+          contract.context ||
+          settings.heading.text !== "Environments" ||
+          settings.statusHeading.text !== "Local environments unavailable" ||
+          settings.message.text !==
+            "We could not load local environment settings for this project" ||
+          Math.abs(settings.page.width - 768) > 1 ||
+          Math.abs(settings.heading.rect.left - 343) > 1 ||
+          Math.abs(settings.heading.rect.top - 66) > 1 ||
+          Math.abs(settings.heading.rect.height - 28.8) > 0.2 ||
+          settings.heading.style.fontSize !== "24px" ||
+          settings.heading.style.fontWeight !== "400" ||
+          settings.heading.style.lineHeight !== "28.8px" ||
+          Math.abs(settings.statusHeading.rect.top - 136.3) > 0.5 ||
+          settings.statusHeading.style.fontSize !== "14px" ||
+          settings.statusHeading.style.fontWeight !== "500" ||
+          settings.statusHeading.style.lineHeight !== "21px" ||
+          Math.abs(settings.status.rect.top - 172.8) > 0.5 ||
+          Math.abs(settings.status.rect.width - 768) > 1 ||
+          Math.abs(settings.status.rect.height - 44.56) > 0.2 ||
+          settings.status.style.backgroundColor !== "rgb(35, 35, 35)" ||
+          settings.status.style.borderRadius !== "20px" ||
+          settings.message.style.fontSize !== "13px" ||
+          settings.message.style.fontWeight !== "445" ||
+          settings.message.style.padding !== "12px"
+        ) {
+          throw new Error(
+            `${scene.id}: workspace environment settings contract failed: ${JSON.stringify(contract)}`,
+          );
+        }
+        await writeFile(
+          join(artifactDirectory, `${scene.id}.json`),
+          `${JSON.stringify(contract, null, 2)}\n`,
+        );
+        continue;
+      }
       const projectExpected = scene.frame === "workspace-project-menu";
       const environmentExpected =
         scene.frame === "workspace-environment-menu";
@@ -890,10 +1013,15 @@ for (const scene of selectedScenes) {
       );
       const expectedCurrentIconNames = [
         "composer-project",
-        ...(noProjectExpected || newWorktreeExpected
+        ...(noProjectExpected
           ? []
-          : ["composer-worktree"]),
-        ...(noProjectExpected ? [] : ["composer-branch"]),
+          : newWorktreeExpected
+            ? [
+                "workspace-run-location-worktree",
+                "workspace-environment-settings",
+                "composer-branch",
+              ]
+            : ["workspace-run-location-local", "composer-branch"]),
         "composer-add-files",
         "composer-permission",
         "composer-model-chevron",
@@ -994,10 +1122,42 @@ for (const scene of selectedScenes) {
         environmentExpected &&
         (!contract.environment ||
           Math.abs(contract.environment.rect.width - 216) > 1 ||
-          Math.abs(contract.environment.rect.height - 189) > 1 ||
+          Math.abs(contract.environment.rect.height - 189.31) > 1 ||
           contract.environment.buttons.length !== 5 ||
+          JSON.stringify(
+            contract.environment.buttons.map(({ label }) => label),
+          ) !==
+            JSON.stringify([
+              "Local",
+              "New worktree",
+              "Connect Codex web",
+              "Send to cloud",
+              "Usage remaining",
+            ]) ||
+          JSON.stringify(
+            contract.environment.buttons.map(({ role }) => role),
+          ) !== JSON.stringify(Array(5).fill("menuitem")) ||
+          JSON.stringify(
+            contract.environment.buttons.map(({ tag }) => tag),
+          ) !==
+            JSON.stringify(["BUTTON", "BUTTON", "A", "BUTTON", "BUTTON"]) ||
+          contract.environment.buttons[2]?.href !==
+            "https://chatgpt.com/codex/cloud" ||
           contract.environment.buttons.filter(({ disabled }) => disabled)
-            .length !== 1)
+            .length !== 1 ||
+          contract.environment.dividerCount !== 1 ||
+          contract.environment.separatorCount !== 0 ||
+          JSON.stringify(contract.environment.iconNames) !==
+            JSON.stringify([
+              "workspace-run-location-local",
+              "workspace-selection-check",
+              "workspace-run-location-worktree",
+              "workspace-run-location-codex-web",
+              "workspace-run-location-external",
+              "workspace-run-location-send-cloud",
+              "workspace-run-location-usage",
+              "workspace-run-location-usage-chevron",
+            ]))
       ) {
         throw new Error(
           `${scene.id}: workspace environment dialog failed: ${JSON.stringify(contract)}`,
@@ -1028,7 +1188,22 @@ for (const scene of selectedScenes) {
           Math.abs(contract.worktreeEnvironment.rect.height - 126) > 1 ||
           contract.worktreeEnvironment.buttons.length !== 2 ||
           contract.worktreeEnvironment.emptyText?.trim() !==
-            "No environments found")
+            "No environments found" ||
+          JSON.stringify(
+            contract.worktreeEnvironment.buttons.map(({ label }) => label),
+          ) !==
+            JSON.stringify([
+              "Work without environment",
+              "Environment settings",
+            ]) ||
+          JSON.stringify(
+            contract.worktreeEnvironment.buttons.map(({ role }) => role),
+          ) !== JSON.stringify(["menuitem", "menuitem"]) ||
+          JSON.stringify(contract.worktreeEnvironment.iconNames) !==
+            JSON.stringify([
+              "workspace-selection-check",
+              "workspace-environment-settings",
+            ]))
       ) {
         throw new Error(
           `${scene.id}: workspace environment picker failed: ${JSON.stringify(contract)}`,
@@ -7841,17 +8016,18 @@ try {
     (element) => document.activeElement === element,
   );
   if (
-    projectMenuContract.itemCount !== 6 ||
+    projectMenuContract.itemCount !== 7 ||
     projectMenuContract.focusRole !== "menuitem" ||
     !projectMenuContract.focusReturned ||
     Math.abs(projectMenuContract.rect.width - 214.05) > 1 ||
-    Math.abs(projectMenuContract.rect.height - 179.38) > 1 ||
+    Math.abs(projectMenuContract.rect.height - 207.94) > 1 ||
     JSON.stringify(projectMenuContract.icons) !==
       JSON.stringify([
         "sidebar-project-menu-unpin",
         "sidebar-project-menu-reveal",
         "sidebar-project-menu-worktree",
         "sidebar-project-menu-edit",
+        "sidebar-project-menu-mark-read",
         "sidebar-project-menu-archive",
         "sidebar-project-menu-remove",
       ])

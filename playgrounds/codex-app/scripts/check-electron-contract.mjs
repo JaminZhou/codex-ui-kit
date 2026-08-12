@@ -291,6 +291,7 @@ try {
         "sidebar-project-menu-reveal",
         "sidebar-project-menu-worktree",
         "sidebar-project-menu-edit",
+        "sidebar-project-menu-mark-read",
         "sidebar-project-menu-archive",
         "sidebar-project-menu-remove",
       ]) ||
@@ -889,14 +890,14 @@ try {
     .getByRole("button", { name: "Change run location: Local" })
     .click();
   const themeEnvironmentMenu = themePage.getByRole("menu", {
-    name: "Start in",
+    name: "Work in",
   });
   const environmentOverlayPaint = await themeEnvironmentMenu.evaluate(
     (menu) => ({
       background: getComputedStyle(menu).backgroundColor,
       border: getComputedStyle(menu).borderColor,
       item: getComputedStyle(
-        menu.querySelector('[role="menuitemradio"]'),
+        menu.querySelector('[role="menuitem"]'),
       ).color,
       label: getComputedStyle(
         menu.querySelector(".codex-ui-menu-section-label"),
@@ -913,8 +914,55 @@ try {
       `Electron light environment overlay contract failed: ${JSON.stringify(environmentOverlayPaint)}`,
     );
   }
-  await themePage.keyboard.press("Escape");
+  await themeEnvironmentMenu
+    .getByRole("menuitem", { name: "New worktree" })
+    .click();
   await themeEnvironmentMenu.waitFor({ state: "hidden" });
+  await themePage
+    .getByRole("button", { name: "Change environment: No environment" })
+    .click();
+  await themePage
+    .getByRole("menu", { name: "Environment" })
+    .getByRole("menuitem", { name: "Environment settings" })
+    .click();
+  const lightEnvironmentSettings = themePage.getByRole("region", {
+    name: "Environments",
+  });
+  await lightEnvironmentSettings.waitFor();
+  const lightEnvironmentSettingsPaint =
+    await lightEnvironmentSettings.evaluate((region) => {
+      const route = region.closest(
+        ".demo-workspace-environment-settings-route",
+      );
+      const title = region.querySelector("h1");
+      const statusHeading = region.querySelector("h2");
+      return {
+        routeBackground: route
+          ? getComputedStyle(route).backgroundColor
+          : null,
+        root: document
+          .querySelector(".demo-root")
+          ?.getAttribute("data-theme"),
+        statusHeadingColor: statusHeading
+          ? getComputedStyle(statusHeading).color
+          : null,
+        titleColor: title ? getComputedStyle(title).color : null,
+      };
+    });
+  if (
+    lightEnvironmentSettingsPaint.routeBackground !== "rgb(255, 255, 255)" ||
+    lightEnvironmentSettingsPaint.root !== "light" ||
+    lightEnvironmentSettingsPaint.statusHeadingColor !== "rgb(26, 28, 31)" ||
+    lightEnvironmentSettingsPaint.titleColor !== "rgb(26, 28, 31)"
+  ) {
+    throw new Error(
+      `Electron light environment settings contract failed: ${JSON.stringify(lightEnvironmentSettingsPaint)}`,
+    );
+  }
+  await themePage
+    .getByRole("button", { exact: true, name: "New chat" })
+    .click();
+  await lightEnvironmentSettings.waitFor({ state: "hidden" });
 
   await themePage
     .getByRole("button", {
@@ -4330,7 +4378,7 @@ try {
     JSON.stringify(workspaceCurrentIcons) !==
     JSON.stringify([
       { height: 16, name: "composer-project", width: 16 },
-      { height: 16, name: "composer-worktree", width: 16 },
+      { height: 16, name: "workspace-run-location-local", width: 16 },
       { height: 16, name: "composer-branch", width: 16 },
       { height: 16, name: "composer-add-files", width: 16 },
       { height: 16, name: "composer-permission", width: 16 },
@@ -4458,10 +4506,11 @@ try {
     .press("ArrowDown");
   await codingWorkspacePage.waitForTimeout(50);
   const environmentMenu = codingWorkspacePage.getByRole("menu", {
-    name: "Start in",
+    name: "Work in",
   });
-  const localEnvironment = environmentMenu.getByRole("menuitemradio", {
-    name: "Work locally",
+  const localEnvironment = environmentMenu.getByRole("menuitem", {
+    name: "Local",
+    exact: true,
   });
   await codingWorkspacePage.waitForFunction(
     () =>
@@ -4469,13 +4518,69 @@ try {
         ".demo-workspace-environment-menu .codex-ui-menu-item:first-of-type",
       ) ?? false,
   );
-  if ((await localEnvironment.getAttribute("aria-checked")) !== "true") {
+  const environmentMenuContract = await environmentMenu.evaluate((menu) => ({
+    disabled: Array.from(menu.querySelectorAll('[role="menuitem"]'), (item) =>
+      item.getAttribute("aria-disabled") === "true" ||
+      (item instanceof HTMLButtonElement && item.disabled),
+    ),
+    href: menu
+      .querySelector('a[role="menuitem"]')
+      ?.getAttribute("href"),
+    icons: Array.from(
+      menu.querySelectorAll("[data-current-build-icon]"),
+      (icon) => icon.getAttribute("data-current-build-icon"),
+    ),
+    labels: Array.from(
+      menu.querySelectorAll('[role="menuitem"]'),
+      (item) =>
+        item.querySelector(".codex-ui-menu-item__label")?.textContent?.trim(),
+    ),
+    roles: Array.from(
+      menu.querySelectorAll('[role="menuitem"]'),
+      (item) => item.getAttribute("role"),
+    ),
+    tags: Array.from(
+      menu.querySelectorAll('[role="menuitem"]'),
+      (item) => item.tagName,
+    ),
+  }));
+  if (
+    JSON.stringify(environmentMenuContract.labels) !==
+      JSON.stringify([
+        "Local",
+        "New worktree",
+        "Connect Codex web",
+        "Send to cloud",
+        "Usage remaining",
+      ]) ||
+    JSON.stringify(environmentMenuContract.roles) !==
+      JSON.stringify(Array(5).fill("menuitem")) ||
+    JSON.stringify(environmentMenuContract.tags) !==
+      JSON.stringify(["BUTTON", "BUTTON", "A", "BUTTON", "BUTTON"]) ||
+    JSON.stringify(environmentMenuContract.disabled) !==
+      JSON.stringify([false, false, false, true, false]) ||
+    environmentMenuContract.href !== "https://chatgpt.com/codex/cloud" ||
+    JSON.stringify(environmentMenuContract.icons) !==
+      JSON.stringify([
+        "workspace-run-location-local",
+        "workspace-selection-check",
+        "workspace-run-location-worktree",
+        "workspace-run-location-codex-web",
+        "workspace-run-location-external",
+        "workspace-run-location-send-cloud",
+        "workspace-run-location-usage",
+        "workspace-run-location-usage-chevron",
+      ]) ||
+    (await localEnvironment.locator(
+      '[data-current-build-icon="workspace-selection-check"]',
+    ).count()) !== 1
+  ) {
     throw new Error(
-      "Electron coding workspace did not preserve the local environment selection.",
+      `Electron coding workspace run-location menu is invalid: ${JSON.stringify(environmentMenuContract)}.`,
     );
   }
   await environmentMenu
-    .getByRole("menuitemradio", { name: "New worktree" })
+    .getByRole("menuitem", { name: "New worktree" })
     .click();
   await codingWorkspacePage.waitForSelector(
     '.demo-root[data-frame="workspace-new-worktree"]',
@@ -4533,20 +4638,154 @@ try {
         .locator(".demo-workspace-context-menu__empty")
         .textContent()
     )?.trim(),
-    items: await worktreeEnvironmentMenu.getByRole("menuitem").allTextContents(),
+    icons: await worktreeEnvironmentMenu
+      .locator("[data-current-build-icon]")
+      .evaluateAll((icons) =>
+        icons.map((icon) => icon.getAttribute("data-current-build-icon")),
+      ),
+    items: await worktreeEnvironmentMenu
+      .locator(".codex-ui-menu-item__label")
+      .allTextContents(),
   };
   if (
     worktreeEnvironmentState.empty !== "No environments found" ||
     JSON.stringify(worktreeEnvironmentState.items.map((item) => item.trim())) !==
       JSON.stringify([
-        "Work without environment✓",
-        "Environment settings↗",
+        "Work without environment",
+        "Environment settings",
+      ]) ||
+    JSON.stringify(worktreeEnvironmentState.icons) !==
+      JSON.stringify([
+        "workspace-selection-check",
+        "workspace-environment-settings",
       ])
   ) {
     throw new Error(
       `Electron coding workspace environment picker is invalid: ${JSON.stringify(worktreeEnvironmentState)}.`,
     );
   }
+  await worktreeEnvironmentMenu
+    .getByRole("menuitem", { name: "Environment settings" })
+    .click();
+  const environmentsRoute = codingWorkspacePage.getByRole("region", {
+    name: "Environments",
+  });
+  await environmentsRoute.waitFor();
+  const environmentUnavailable = await environmentsRoute.evaluate((region) => {
+    const rect = (element) => {
+      const bounds = element.getBoundingClientRect();
+      return {
+        height: bounds.height,
+        left: bounds.left,
+        top: bounds.top,
+        width: bounds.width,
+      };
+    };
+    const heading = region.querySelector("h1");
+    const statusHeading = region.querySelector("h2");
+    const status = region.querySelector('[role="status"]');
+    const message = status?.querySelector("div");
+    return {
+      heading: {
+        rect: rect(heading),
+        style: {
+          fontSize: getComputedStyle(heading).fontSize,
+          fontWeight: getComputedStyle(heading).fontWeight,
+          lineHeight: getComputedStyle(heading).lineHeight,
+        },
+        text: heading?.textContent?.trim(),
+      },
+      message: {
+        style: {
+          fontSize: getComputedStyle(message).fontSize,
+          fontWeight: getComputedStyle(message).fontWeight,
+          padding: getComputedStyle(message).padding,
+        },
+        text: message?.textContent?.trim(),
+      },
+      region: rect(region),
+      status: {
+        rect: rect(status),
+        style: {
+          backgroundColor: getComputedStyle(status).backgroundColor,
+          borderRadius: getComputedStyle(status).borderRadius,
+        },
+      },
+      statusHeading: {
+        rect: rect(statusHeading),
+        style: {
+          fontSize: getComputedStyle(statusHeading).fontSize,
+          fontWeight: getComputedStyle(statusHeading).fontWeight,
+          lineHeight: getComputedStyle(statusHeading).lineHeight,
+        },
+        text: statusHeading?.textContent?.trim(),
+      },
+    };
+  });
+  if (
+    environmentUnavailable.heading.text !== "Environments" ||
+    environmentUnavailable.statusHeading.text !==
+      "Local environments unavailable" ||
+    environmentUnavailable.message.text !==
+      "We could not load local environment settings for this project" ||
+    Math.abs(environmentUnavailable.region.width - 768) > 1 ||
+    Math.abs(environmentUnavailable.heading.rect.left - 343) > 1 ||
+    Math.abs(environmentUnavailable.heading.rect.top - 66) > 1 ||
+    environmentUnavailable.heading.style.fontSize !== "24px" ||
+    environmentUnavailable.heading.style.fontWeight !== "400" ||
+    environmentUnavailable.heading.style.lineHeight !== "28.8px" ||
+    Math.abs(environmentUnavailable.statusHeading.rect.top - 136.3) > 0.5 ||
+    environmentUnavailable.statusHeading.style.fontSize !== "14px" ||
+    environmentUnavailable.statusHeading.style.fontWeight !== "500" ||
+    Math.abs(environmentUnavailable.status.rect.top - 172.8) > 0.5 ||
+    Math.abs(environmentUnavailable.status.rect.height - 44.56) > 0.2 ||
+    environmentUnavailable.status.style.backgroundColor !==
+      "rgb(35, 35, 35)" ||
+    environmentUnavailable.status.style.borderRadius !== "20px" ||
+    environmentUnavailable.message.style.fontSize !== "13px" ||
+    environmentUnavailable.message.style.fontWeight !== "445" ||
+    environmentUnavailable.message.style.padding !== "12px"
+  ) {
+    throw new Error(
+      `Electron environment settings route is invalid: ${JSON.stringify(environmentUnavailable)}.`,
+    );
+  }
+  await codingWorkspacePage
+    .getByRole("button", { name: "New chat", exact: true })
+    .click();
+  await codingWorkspacePage.waitForSelector(
+    'button[aria-label="Change run location: Local"]',
+  );
+  if ((await environmentsRoute.count()) !== 0) {
+    throw new Error(
+      "Electron workspace navigation retained the environment settings route.",
+    );
+  }
+  await codingWorkspacePage
+    .getByRole("button", { name: "Change run location: Local" })
+    .click();
+  await environmentMenu.waitFor();
+  await environmentMenu
+    .getByRole("menuitem", { name: "New worktree" })
+    .click();
+  await codingWorkspacePage
+    .getByRole("button", { name: "Change environment: No environment" })
+    .click();
+  await worktreeEnvironmentMenu.waitFor();
+  await worktreeEnvironmentMenu
+    .getByRole("menuitem", { name: "Environment settings" })
+    .click();
+  await environmentsRoute.waitFor();
+  await codingWorkspacePage
+    .getByRole("button", { name: "Back to ChatGPT" })
+    .click();
+  await codingWorkspacePage.waitForSelector(
+    'button[aria-label="Change run location: New worktree"]',
+  );
+  await codingWorkspacePage
+    .getByRole("button", { name: "Change environment: No environment" })
+    .click();
+  await worktreeEnvironmentMenu.waitFor();
   await codingWorkspacePage.keyboard.press("Tab");
   await worktreeEnvironmentMenu.waitFor({ state: "hidden" });
   await codingWorkspacePage.waitForFunction(
@@ -4561,7 +4800,7 @@ try {
   await codingWorkspacePage.waitForFunction(
     () =>
       document.activeElement?.textContent?.trim() ===
-      "Work without environment✓",
+      "Work without environment",
   );
   await codingWorkspacePage.keyboard.press("Escape");
   await worktreeEnvironmentMenu.waitFor({ state: "hidden" });
@@ -4575,7 +4814,7 @@ try {
   await codingWorkspacePage.waitForFunction(
     () =>
       document.activeElement?.textContent?.trim() ===
-      "Work without environment✓",
+      "Work without environment",
   );
   await codingWorkspacePage.keyboard.press("Escape");
   await worktreeEnvironmentMenu.waitFor({ state: "hidden" });
@@ -4583,7 +4822,7 @@ try {
     .getByRole("button", { name: "Change run location: New worktree" })
     .click();
   await environmentMenu
-    .getByRole("menuitemradio", { name: "Work locally" })
+    .getByRole("menuitem", { name: "Local", exact: true })
     .click();
   await codingWorkspacePage.waitForSelector(
     'button[aria-label="Change run location: Local"]',
@@ -4863,24 +5102,20 @@ try {
   await codingWorkspacePage
     .getByRole("button", { name: "Change run location: Local" })
     .click();
-  await environmentMenu
-    .getByRole("menuitemradio", { name: "Connect Codex web" })
-    .click();
-  await codingWorkspacePage.waitForSelector(
-    'button[aria-label="Change run location: Codex web"]',
-  );
+  const codexWebLink = environmentMenu.getByRole("menuitem", {
+    name: "Connect Codex web",
+  });
+  if (
+    (await codexWebLink.evaluate((element) => element.tagName)) !== "A" ||
+    (await codexWebLink.getAttribute("href")) !==
+      "https://chatgpt.com/codex/cloud"
+  ) {
+    throw new Error("Electron Codex web action is not the current external link.");
+  }
+  await codingWorkspacePage.keyboard.press("Escape");
   await codingWorkspacePage.waitForSelector(
     'button[aria-label="Change worktree: feature/sidebar-shell"]',
   );
-  if (
-    !(await codingWorkspacePage
-      .getByRole("button", { name: "Change run location: Codex web" })
-      .isVisible())
-  ) {
-    throw new Error(
-      "Electron branch checkout overwrote a newer run-location selection.",
-    );
-  }
   const branchAfterRunLocationChange = await execFileAsync(
     "git",
     ["branch", "--show-current"],
@@ -4892,25 +5127,6 @@ try {
     );
   }
   await codingWorkspacePage
-    .getByRole("button", { name: "Change run location: Codex web" })
-    .click();
-  await environmentMenu
-    .getByRole("menuitemradio", { name: "Work locally" })
-    .click();
-  await codingWorkspacePage.waitForSelector(
-    'button[aria-label="Change run location: Local"]',
-  );
-
-  await codingWorkspacePage
-    .getByRole("button", { name: "Change run location: Local" })
-    .click();
-  await environmentMenu
-    .getByRole("menuitemradio", { name: "Connect Codex web" })
-    .click();
-  await codingWorkspacePage.waitForSelector(
-    'button[aria-label="Change run location: Codex web"]',
-  );
-  await codingWorkspacePage
     .getByRole("button", {
       name: "Change worktree: feature/sidebar-shell",
     })
@@ -4918,36 +5134,9 @@ try {
   await worktreeMenu
     .getByRole("menuitemradio", { name: "main" })
     .click();
-  await codingWorkspacePage
-    .getByRole("button", { name: "Change run location: Codex web" })
-    .click();
-  await environmentMenu
-    .getByRole("menuitemradio", { name: "Work locally" })
-    .click();
-  await codingWorkspacePage
-    .getByRole("button", { name: "Change run location: Local" })
-    .click();
-  await environmentMenu
-    .getByRole("menuitemradio", { name: "Connect Codex web" })
-    .click();
   await codingWorkspacePage.waitForSelector(
     'button[aria-label="Change worktree: main"]',
   );
-  if (
-    !(await codingWorkspacePage
-      .getByRole("button", { name: "Change run location: Codex web" })
-      .isVisible())
-  ) {
-    throw new Error(
-      "Electron branch checkout overwrote an ABA run-location selection.",
-    );
-  }
-  await codingWorkspacePage
-    .getByRole("button", { name: "Change run location: Codex web" })
-    .click();
-  await environmentMenu
-    .getByRole("menuitemradio", { name: "Work locally" })
-    .click();
   await codingWorkspacePage.waitForSelector(
     'button[aria-label="Change run location: Local"]',
   );
@@ -5300,17 +5489,17 @@ try {
   await rm(linkedWorktreeGitDirectory, { force: true, recursive: true });
 }
 
-const cloudWorkspaceScene = {
+const externalWorkspaceScene = {
   frame: "workspace-ready",
-  id: "electron-cloud-coding-workspace",
+  id: "electron-external-codex-web-action",
   scenario: "workspace-workflow",
   view: "workspace",
 };
-const cloudWorkspaceGitDirectory = await mkdtemp(
-  join(tmpdir(), "codex-ui-kit-electron-cloud-branch-"),
+const externalWorkspaceGitDirectory = await mkdtemp(
+  join(tmpdir(), "codex-ui-kit-electron-external-action-"),
 );
 await execFileAsync("git", ["init", "-b", "main"], {
-  cwd: cloudWorkspaceGitDirectory,
+  cwd: externalWorkspaceGitDirectory,
 });
 await execFileAsync(
   "git",
@@ -5324,58 +5513,62 @@ await execFileAsync(
     "-m",
     "test: initialize cloud branch fixture",
   ],
-  { cwd: cloudWorkspaceGitDirectory },
+  { cwd: externalWorkspaceGitDirectory },
 );
 await execFileAsync(
   "git",
   ["branch", "feat/current-workspace-entry-refresh"],
-  { cwd: cloudWorkspaceGitDirectory },
+  { cwd: externalWorkspaceGitDirectory },
 );
 const {
-  app: cloudWorkspaceApp,
-  page: cloudWorkspacePage,
-} = await launchScene(cloudWorkspaceScene, {
+  app: externalWorkspaceApp,
+  page: externalWorkspacePage,
+} = await launchScene(externalWorkspaceScene, {
   capture: false,
   environment: {
-    CODEX_UI_KIT_WORKSPACE: cloudWorkspaceGitDirectory,
+    CODEX_UI_KIT_WORKSPACE: externalWorkspaceGitDirectory,
   },
 });
 try {
-  await cloudWorkspacePage
+  await externalWorkspacePage
     .getByRole("button", { name: "Change run location: Local" })
     .click();
-  await cloudWorkspacePage
-    .getByRole("menu", { name: "Start in" })
-    .getByRole("menuitemradio", { name: "Connect Codex web" })
-    .click();
-  await cloudWorkspacePage.waitForSelector(
-    'button[aria-label="Change run location: Codex web"]',
-  );
-  await cloudWorkspacePage
+  const externalAction = externalWorkspacePage
+    .getByRole("menu", { name: "Work in" })
+    .getByRole("menuitem", { name: "Connect Codex web" });
+  if (
+    (await externalAction.evaluate((element) => element.tagName)) !== "A" ||
+    (await externalAction.getAttribute("href")) !==
+      "https://chatgpt.com/codex/cloud"
+  ) {
+    throw new Error("Electron Codex web action lost its external-link contract.");
+  }
+  await externalWorkspacePage.keyboard.press("Escape");
+  await externalWorkspacePage
     .getByRole("button", { name: "Change worktree: main" })
     .click();
-  await cloudWorkspacePage
+  await externalWorkspacePage
     .getByRole("menu", { name: "Branches" })
     .getByRole("menuitemradio", {
       name: "feat/current-workspace-entry-refresh",
     })
     .click();
-  await cloudWorkspacePage.waitForSelector(
+  await externalWorkspacePage.waitForSelector(
     'button[aria-label="Change worktree: feat/current-workspace-entry-refresh"]',
   );
-  await cloudWorkspacePage.waitForSelector(
+  await externalWorkspacePage.waitForSelector(
     'button[aria-label="Change run location: Local"]',
   );
-  await cloudWorkspacePage
+  await externalWorkspacePage
     .getByRole("textbox", { name: "Do anything" })
-    .fill("Run the cloud worktree lifecycle.");
-  await cloudWorkspacePage
+    .fill("Run the local worktree lifecycle.");
+  await externalWorkspacePage
     .getByRole("textbox", { name: "Do anything" })
     .press("Enter");
-  await cloudWorkspacePage.waitForSelector(
+  await externalWorkspacePage.waitForSelector(
     '.demo-root[data-view="conversation"][data-scenario="workspace-workflow"][data-frame="approval-pending"]',
   );
-  const cloudWorkspaceCommandCwds = await cloudWorkspacePage
+  const externalWorkspaceCommandCwds = await externalWorkspacePage
     .locator(
       '[data-testid="command-execution"] .codex-ui-command-execution__shell',
     )
@@ -5383,17 +5576,17 @@ try {
       elements.map((element) => element.getAttribute("title")),
     );
   if (
-    cloudWorkspaceCommandCwds.some(
-      (cwd) => cwd !== `cwd\n${cloudWorkspaceGitDirectory}`,
+    externalWorkspaceCommandCwds.some(
+      (cwd) => cwd !== `cwd\n${externalWorkspaceGitDirectory}`,
     )
   ) {
     throw new Error(
-      `Electron host checkout did not restore the trusted local project route: ${JSON.stringify(cloudWorkspaceCommandCwds)}.`,
+      `Electron external action changed the trusted local project route: ${JSON.stringify(externalWorkspaceCommandCwds)}.`,
     );
   }
 } finally {
-  await cloudWorkspaceApp.close();
-  await rm(cloudWorkspaceGitDirectory, {
+  await externalWorkspaceApp.close();
+  await rm(externalWorkspaceGitDirectory, {
     force: true,
     recursive: true,
   });
@@ -8092,6 +8285,40 @@ try {
       "Electron persisted worktree task remained selected after opening New chat.",
     );
   }
+  await workspaceMissingPage
+    .getByRole("button", { name: "Change run location: Local" })
+    .click();
+  await workspaceMissingPage
+    .getByRole("menu", { name: "Work in" })
+    .getByRole("menuitem", { name: "New worktree" })
+    .click();
+  await workspaceMissingPage
+    .getByRole("button", { name: "Change environment: No environment" })
+    .click();
+  await workspaceMissingPage
+    .getByRole("menu", { name: "Environment" })
+    .getByRole("menuitem", { name: "Environment settings" })
+    .click();
+  const persistedEnvironmentSettings = workspaceMissingPage.getByRole(
+    "region",
+    { name: "Environments" },
+  );
+  await persistedEnvironmentSettings.waitFor();
+  await retainedTask.click();
+  await workspaceMissingPage.waitForSelector(
+    '.demo-root[data-frame="workspace-directory-missing"]',
+  );
+  if ((await persistedEnvironmentSettings.count()) !== 0) {
+    throw new Error(
+      "Electron persisted-task navigation retained the environment settings route.",
+    );
+  }
+  await workspaceMissingPage
+    .getByRole("button", { name: "New chat", exact: true })
+    .click();
+  await workspaceMissingPage.waitForSelector(
+    '.demo-root[data-frame="workspace-ready"]',
+  );
   await workspaceMissingApp.evaluate(({ BrowserWindow }) => {
     const active = BrowserWindow.getAllWindows()[0];
     active?.setMinimumSize(480, 480);
