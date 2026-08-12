@@ -4177,6 +4177,7 @@ const {
   capture: false,
   environment: {
     CODEX_DEMO_GIT_BRANCH_DELAY_MS: "750",
+    CODEX_DEMO_GIT_BRANCH_LIST_RESPONSE_DELAY_MS: "1000",
     CODEX_DEMO_WORKSPACE_PROJECT_ID: "app-server-client",
     CODEX_UI_KIT_WORKSPACE: codingWorkspaceGitDirectory,
   },
@@ -4949,6 +4950,55 @@ try {
     .click();
   await codingWorkspacePage.waitForSelector(
     'button[aria-label="Change run location: Local"]',
+  );
+
+  await codingWorkspacePage
+    .getByRole("button", { name: "Change worktree: main" })
+    .click();
+  await worktreeMenu
+    .getByRole("menuitemradio", { name: "feature/sidebar-shell" })
+    .click();
+  await codingWorkspacePage
+    .getByRole("button", { name: "Change project: codex-app-server-client" })
+    .click();
+  await projectSearch.fill("codex-ui-kit");
+  await projectDialog
+    .getByRole("option", { name: "Select project codex-ui-kit" })
+    .click();
+  await codingWorkspacePage
+    .getByRole("button", { name: "Change project: codex-ui-kit" })
+    .click();
+  await projectSearch.fill("app-server");
+  await projectDialog
+    .getByRole("option", {
+      name: "Select project codex-app-server-client",
+    })
+    .click();
+  await codingWorkspacePage.waitForSelector(
+    'button[aria-label="Change worktree: feature/sidebar-shell"]',
+  );
+  await codingWorkspacePage.waitForTimeout(1_100);
+  if (
+    !(await codingWorkspacePage
+      .getByRole("button", {
+        name: "Change worktree: feature/sidebar-shell",
+      })
+      .isVisible())
+  ) {
+    throw new Error(
+      "Electron stale branch refresh overwrote the completed checkout.",
+    );
+  }
+  await codingWorkspacePage
+    .getByRole("button", {
+      name: "Change worktree: feature/sidebar-shell",
+    })
+    .click();
+  await worktreeMenu
+    .getByRole("menuitemradio", { name: "main" })
+    .click();
+  await codingWorkspacePage.waitForSelector(
+    'button[aria-label="Change worktree: main"]',
   );
 
   const workspaceComposer = codingWorkspacePage.getByRole("textbox", {

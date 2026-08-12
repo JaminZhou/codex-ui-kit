@@ -37,6 +37,7 @@ import {
   GitBranchCreationError,
   listGitBranches,
 } from "./git-branch.js";
+import { GitBranchOperationQueue } from "./git-branch-operation-queue.js";
 import {
   isAllowedExternalUrl,
   isTrustedRendererUrl,
@@ -64,6 +65,9 @@ const requestedGitBranchDelayMs = Number(
 const requestedGitBranchListDelayMs = Number(
   process.env.CODEX_DEMO_GIT_BRANCH_LIST_DELAY_MS ?? "0",
 );
+const requestedGitBranchListResponseDelayMs = Number(
+  process.env.CODEX_DEMO_GIT_BRANCH_LIST_RESPONSE_DELAY_MS ?? "0",
+);
 
 if (["system", "light", "dark"].includes(requestedNativeThemeSource ?? "")) {
   nativeTheme.themeSource = requestedNativeThemeSource as
@@ -85,6 +89,7 @@ let unsubscribeServerRequests: (() => void)[] = [];
 let attachmentFixtureFailureInjected = false;
 let projectFixtureSelectionIndex = 0;
 let gitBranchOperationActive = false;
+const gitBranchOperationQueue = new GitBranchOperationQueue();
 const liveTurnStartGate = new LiveTurnStartGate();
 const liveApprovalGate = new LiveApprovalGate();
 
@@ -569,13 +574,15 @@ async function handleCreateBranch(
   }
   gitBranchOperationActive = true;
   try {
-    await delayGitBranchOperationForFixture();
-    const projectDirectory = trustedProjectDirectory(rawInput.projectToken);
-    const result = await createAndCheckoutGitBranch(
-      projectDirectory,
-      rawInput.branchName,
-    );
-    return { branch: result.branch, ok: true };
+    return await gitBranchOperationQueue.run(async () => {
+      await delayGitBranchOperationForFixture();
+      const projectDirectory = trustedProjectDirectory(rawInput.projectToken);
+      const result = await createAndCheckoutGitBranch(
+        projectDirectory,
+        rawInput.branchName,
+      );
+      return { branch: result.branch, ok: true };
+    });
   } catch (error) {
     if (error instanceof GitBranchCreationError) {
       return { code: error.code, message: error.message, ok: false };
@@ -597,11 +604,16 @@ async function handleListBranches(
   assertTrustedIpc(event);
   assertProjectTokenInput(rawInput);
   try {
-    await delayGitBranchOperationForFixture(requestedGitBranchListDelayMs);
-    const result = await listGitBranches(
-      trustedProjectDirectory(rawInput.projectToken),
-    );
-    return { ...result, ok: true };
+    return await gitBranchOperationQueue.run(async () => {
+      await delayGitBranchOperationForFixture(requestedGitBranchListDelayMs);
+      const result = await listGitBranches(
+        trustedProjectDirectory(rawInput.projectToken),
+      );
+      await delayGitBranchOperationForFixture(
+        requestedGitBranchListResponseDelayMs,
+      );
+      return { ...result, ok: true };
+    });
   } catch (error) {
     if (error instanceof GitBranchCreationError) {
       return { code: error.code, message: error.message, ok: false };
@@ -629,13 +641,15 @@ async function handleCheckoutBranch(
   }
   gitBranchOperationActive = true;
   try {
-    await delayGitBranchOperationForFixture();
-    const projectDirectory = trustedProjectDirectory(rawInput.projectToken);
-    const result = await checkoutGitBranch(
-      projectDirectory,
-      rawInput.branchName,
-    );
-    return { branch: result.branch, ok: true };
+    return await gitBranchOperationQueue.run(async () => {
+      await delayGitBranchOperationForFixture();
+      const projectDirectory = trustedProjectDirectory(rawInput.projectToken);
+      const result = await checkoutGitBranch(
+        projectDirectory,
+        rawInput.branchName,
+      );
+      return { branch: result.branch, ok: true };
+    });
   } catch (error) {
     if (error instanceof GitBranchCreationError) {
       return { code: error.code, message: error.message, ok: false };
