@@ -72,6 +72,7 @@ export function BranchCreationDialog({
       className={["codex-ui-branch-creation-dialog", className]
         .filter(Boolean)
         .join(" ")}
+      closeDisabled={creating}
       closeLabel="Close branch creation dialog"
       footer={
         <>

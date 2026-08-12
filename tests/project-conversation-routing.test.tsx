@@ -82,13 +82,14 @@ describe("project conversation routing", () => {
 
   it("keeps host branch errors linked to the field and blocks duplicate submission while creating", () => {
     const onCreate = vi.fn();
+    const onOpenChange = vi.fn();
     render(
       <BranchCreationDialog
         branchName="main"
         error="A branch named main already exists."
         onBranchNameChange={() => undefined}
         onCreate={onCreate}
-        onOpenChange={() => undefined}
+        onOpenChange={onOpenChange}
         open
         status="creating"
       />,
@@ -104,6 +105,16 @@ describe("project conversation routing", () => {
       name: "Creating and checking out branch",
     });
     expect(submit).toHaveProperty("disabled", true);
+    const close = screen.getByRole("button", {
+      name: "Close branch creation dialog",
+    });
+    expect(close).toHaveProperty("disabled", true);
+    const dialog = screen.getByRole("dialog", {
+      name: "Create and checkout branch",
+    });
+    fireEvent.keyDown(dialog, { key: "Escape" });
+    fireEvent.pointerDown(dialog.parentElement!);
+    expect(onOpenChange).not.toHaveBeenCalled();
     fireEvent.submit(input.closest("form")!);
     expect(onCreate).not.toHaveBeenCalled();
   });

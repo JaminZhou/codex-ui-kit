@@ -397,11 +397,13 @@ Current branch-entry slice: `26.803.61601` Browser/CDP now locks the 296×280
 branch menu and 400×190.56 create-and-checkout dialog. The public
 `BranchCreationDialog` replaces the previous local-environment reuse, and the
 Electron host validates, creates, checks out, and switches branches only in a
-generated disposable Git repository during acceptance. Blank, error, and
-created states extend the reviewed matrix to 166 frames; the local-only dialog
-crop passes at 3.0916%. Current-product create submission is still pending the
-isolated native directory selection, so this is not yet a claim that branch
-mutation/persistence is complete in the product runtime.
+host-registered project selected by an opaque token; acceptance proves routing
+across two generated disposable Git repositories and blocks dismissal while
+creation is pending. Blank, error, and created states extend the reviewed
+matrix to 166 frames; the local-only dialog crop passes at 3.0916%.
+Current-product create submission is still pending the isolated native
+directory selection, so this is not yet a claim that branch mutation/
+persistence is complete in the product runtime.
 
 Exit: a protocol-backed coding task can travel from project selection through
 command, approval, file review, terminal, and PR review without fixture-only

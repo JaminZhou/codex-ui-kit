@@ -765,9 +765,11 @@ remain untracked.
   branch rows, fixed creation action, and 400×190.56 create-and-checkout modal.
 - `BranchCreationDialog` exposes controlled blank, creating, host-error, Close,
   optional Set prefix, Escape, focus trap, and launcher-focus-return behavior.
-- The Electron host validates branch names, rejects duplicates, creates and
-  checks out a real branch, and switches branches through guarded main-frame
-  IPC. Acceptance uses generated disposable Git repositories only.
+- The Electron host issues opaque tokens for host-registered project
+  directories, validates branch names, rejects duplicates, creates and checks
+  out a real branch, and switches branches through guarded main-frame IPC.
+  Creating blocks every dismissal path until Git settles. Acceptance routes a
+  selected project across two generated disposable Git repositories only.
 - Three reviewed blank/error/created frames extend Browser/CDP and pixels to
   166 lifecycle frames. The untracked current-product dialog crop passes at
   3.0916% under the 8% external ceiling.

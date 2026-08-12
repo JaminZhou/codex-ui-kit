@@ -4105,6 +4105,8 @@ const {
 } = await launchScene(codingWorkspaceScene, {
   capture: false,
   environment: {
+    CODEX_DEMO_GIT_BRANCH_DELAY_MS: "750",
+    CODEX_DEMO_WORKSPACE_PROJECT_ID: "app-server-client",
     CODEX_UI_KIT_WORKSPACE: codingWorkspaceGitDirectory,
   },
 });
@@ -4604,6 +4606,21 @@ try {
   // repository. The main-process Git state must remain authoritative.
   await branchInput.fill("feature/sidebar-shell");
   await createBranch.click();
+  await codingWorkspacePage.waitForFunction(
+    () =>
+      document
+        .querySelector(
+          '.codex-ui-branch-creation-dialog button[aria-label="Close branch creation dialog"]',
+        )
+        ?.hasAttribute("disabled") ?? false,
+  );
+  await branchDialog.press("Escape");
+  await branchDialog.locator("xpath=..").dispatchEvent("pointerdown");
+  if (!(await branchDialog.isVisible())) {
+    throw new Error(
+      "Electron branch creation allowed dismissal while Git was still running.",
+    );
+  }
   await branchDialog.waitFor({ state: "hidden" });
   await codingWorkspacePage.waitForSelector(
     'button[aria-label="Change worktree: feature/sidebar-shell"]',
@@ -7817,6 +7834,118 @@ try {
   }
 } finally {
   await projectCreationApp.close();
+}
+
+const createdProjectStartupGitDirectory = await mkdtemp(
+  join(tmpdir(), "codex-ui-kit-electron-startup-project-"),
+);
+const createdProjectTargetGitDirectory = await mkdtemp(
+  join(tmpdir(), "codex-ui-kit-electron-selected-project-"),
+);
+for (const directory of [
+  createdProjectStartupGitDirectory,
+  createdProjectTargetGitDirectory,
+]) {
+  await execFileAsync("git", ["init", "-b", "main"], { cwd: directory });
+  await execFileAsync(
+    "git",
+    [
+      "-c",
+      "user.name=Codex UI Kit",
+      "-c",
+      "user.email=codex-ui-kit@example.invalid",
+      "commit",
+      "--allow-empty",
+      "-m",
+      "test: initialize routed project fixture",
+    ],
+    { cwd: directory },
+  );
+}
+const createdProjectBranchScene = {
+  frame: "workspace-project-menu",
+  id: "electron-created-project-branch-routing",
+  scenario: "workspace-workflow",
+  view: "workspace",
+};
+const {
+  app: createdProjectBranchApp,
+  page: createdProjectBranchPage,
+} = await launchScene(createdProjectBranchScene, {
+  capture: false,
+  environment: {
+    CODEX_DEMO_PROJECT_FIXTURE_PATH: createdProjectTargetGitDirectory,
+    CODEX_UI_KIT_WORKSPACE: createdProjectStartupGitDirectory,
+  },
+});
+try {
+  const untrustedProjectResponse = await createdProjectBranchPage.evaluate(
+    () =>
+      window.codexDemo?.createAndCheckoutBranch({
+        branchName: "feat/untrusted-project",
+        projectToken: "unregistered-project-token",
+      }),
+  );
+  if (
+    !untrustedProjectResponse ||
+    untrustedProjectResponse.ok ||
+    untrustedProjectResponse.code !== "unavailable"
+  ) {
+    throw new Error(
+      `Electron host accepted an unregistered project token: ${JSON.stringify(untrustedProjectResponse)}.`,
+    );
+  }
+  await createdProjectBranchPage
+    .getByRole("dialog", { name: "Choose a project" })
+    .getByRole("button", { name: "New project" })
+    .click();
+  await createdProjectBranchPage.waitForSelector(
+    '.demo-root[data-view="workspace"][data-frame="workspace-project-created"]',
+  );
+  await createdProjectBranchPage
+    .getByRole("button", { name: "Change worktree: main" })
+    .click();
+  await createdProjectBranchPage
+    .getByRole("menu", { name: "Branches" })
+    .getByRole("menuitem", { name: "Create and checkout new branch…" })
+    .click();
+  const routedBranchDialog = createdProjectBranchPage.getByRole("dialog", {
+    name: "Create and checkout branch",
+  });
+  await routedBranchDialog
+    .getByRole("textbox", { name: "Branch name" })
+    .fill("feat/selected-project");
+  await routedBranchDialog
+    .getByRole("button", { name: "Create and checkout" })
+    .click();
+  await routedBranchDialog.waitFor({ state: "hidden" });
+  const [startupBranch, selectedBranch] = await Promise.all(
+    [createdProjectStartupGitDirectory, createdProjectTargetGitDirectory].map(
+      (cwd) =>
+        execFileAsync("git", ["branch", "--show-current"], {
+          cwd,
+          encoding: "utf8",
+        }),
+    ),
+  );
+  if (
+    startupBranch.stdout.trim() !== "main" ||
+    selectedBranch.stdout.trim() !== "feat/selected-project"
+  ) {
+    throw new Error(
+      `Electron branch operation did not route to the host-registered selected project: ${JSON.stringify({
+        selected: selectedBranch.stdout.trim(),
+        startup: startupBranch.stdout.trim(),
+      })}`,
+    );
+  }
+} finally {
+  await createdProjectBranchApp.close();
+  await Promise.all(
+    [createdProjectStartupGitDirectory, createdProjectTargetGitDirectory].map(
+      (directory) => rm(directory, { force: true, recursive: true }),
+    ),
+  );
 }
 
 const knownProjectCreationScene = {

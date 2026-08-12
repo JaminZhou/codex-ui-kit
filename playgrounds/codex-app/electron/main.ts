@@ -13,6 +13,7 @@ import {
   shell,
   type IpcMainInvokeEvent,
 } from "electron";
+import { randomUUID } from "node:crypto";
 import { stat } from "node:fs/promises";
 import {
   dirname,
@@ -46,8 +47,18 @@ const rendererEntryPath = join(rendererDirectory, "index.html");
 const preloadPath = join(currentDirectory, "preload.cjs");
 const workspaceDirectory =
   process.env.CODEX_UI_KIT_WORKSPACE ?? resolve(currentDirectory, "../../..");
+const startupWorkspaceProjectToken = "startup-workspace";
+const trustedProjectDirectories = new Map<string, string>([
+  [startupWorkspaceProjectToken, workspaceDirectory],
+]);
+const trustedProjectTokensByDirectory = new Map<string, string>([
+  [resolve(workspaceDirectory), startupWorkspaceProjectToken],
+]);
 const cdpPort = process.env.CODEX_DEMO_CDP_PORT;
 const requestedNativeThemeSource = process.env.CODEX_DEMO_NATIVE_THEME_SOURCE;
+const requestedGitBranchDelayMs = Number(
+  process.env.CODEX_DEMO_GIT_BRANCH_DELAY_MS ?? "0",
+);
 
 if (["system", "light", "dark"].includes(requestedNativeThemeSource ?? "")) {
   nativeTheme.themeSource = requestedNativeThemeSource as
@@ -90,6 +101,7 @@ interface AttachmentSelection {
 
 interface BranchCreationInput {
   branchName: string;
+  projectToken: string;
 }
 
 type BranchCreationResponse =
@@ -129,10 +141,57 @@ function assertBranchCreationInput(
   if (
     typeof value !== "object" ||
     value === null ||
-    typeof (value as BranchCreationInput).branchName !== "string"
+    typeof (value as BranchCreationInput).branchName !== "string" ||
+    typeof (value as BranchCreationInput).projectToken !== "string"
   ) {
     throw new TypeError("A branch name is required.");
   }
+}
+
+function registerTrustedProjectDirectory(path: string) {
+  const normalizedPath = resolve(path);
+  const existing = trustedProjectTokensByDirectory.get(normalizedPath);
+  if (existing) return existing;
+  const token = `project:${randomUUID()}`;
+  trustedProjectDirectories.set(token, path);
+  trustedProjectTokensByDirectory.set(normalizedPath, token);
+  return token;
+}
+
+async function describeProjectSelection(selection: {
+  label: string;
+  path: string;
+}) {
+  const directory = await stat(selection.path).catch(() => null);
+  return {
+    ...selection,
+    projectToken: directory?.isDirectory()
+      ? registerTrustedProjectDirectory(selection.path)
+      : undefined,
+  };
+}
+
+function trustedProjectDirectory(projectToken: string) {
+  const directory = trustedProjectDirectories.get(projectToken);
+  if (!directory) {
+    throw new GitBranchCreationError(
+      "unavailable",
+      "The selected project is unavailable to the host.",
+    );
+  }
+  return directory;
+}
+
+async function delayGitBranchOperationForFixture() {
+  if (
+    !Number.isFinite(requestedGitBranchDelayMs) ||
+    requestedGitBranchDelayMs <= 0
+  ) {
+    return;
+  }
+  await new Promise((resolveDelay) => {
+    setTimeout(resolveDelay, Math.min(requestedGitBranchDelayMs, 5_000));
+  });
 }
 
 function broadcastNotification(notification: JsonRpcNotification) {
@@ -412,7 +471,7 @@ async function handleSelectProjectDirectory(event: IpcMainInvokeEvent) {
       Math.min(projectFixtureSelectionIndex, fixtureSelections.length - 1)
     ] as { label: string; path: string };
     projectFixtureSelectionIndex += 1;
-    return selection;
+    return describeProjectSelection(selection);
   }
   const fixturePathsRaw = process.env.CODEX_DEMO_PROJECT_FIXTURE_PATHS;
   let fixturePath = process.env.CODEX_DEMO_PROJECT_FIXTURE_PATH;
@@ -439,10 +498,10 @@ async function handleSelectProjectDirectory(event: IpcMainInvokeEvent) {
         "CODEX_DEMO_PROJECT_FIXTURE_PATH must be an absolute directory path.",
       );
     }
-    return {
+    return describeProjectSelection({
       label: attachmentPathLabel(fixturePath, process.platform),
       path: fixturePath,
-    };
+    });
   }
   const result = mainWindow
     ? await dialog.showOpenDialog(mainWindow, {
@@ -455,10 +514,10 @@ async function handleSelectProjectDirectory(event: IpcMainInvokeEvent) {
       });
   const path = result.filePaths[0];
   if (result.canceled || !path) return null;
-  return {
+  return describeProjectSelection({
     label: attachmentPathLabel(path, process.platform),
     path,
-  };
+  });
 }
 
 async function handleCreateBranch(
@@ -476,8 +535,10 @@ async function handleCreateBranch(
   }
   gitBranchOperationActive = true;
   try {
+    await delayGitBranchOperationForFixture();
+    const projectDirectory = trustedProjectDirectory(rawInput.projectToken);
     const result = await createAndCheckoutGitBranch(
-      workspaceDirectory,
+      projectDirectory,
       rawInput.branchName,
     );
     return { branch: result.branch, ok: true };
@@ -510,8 +571,9 @@ async function handleCheckoutBranch(
   }
   gitBranchOperationActive = true;
   try {
+    const projectDirectory = trustedProjectDirectory(rawInput.projectToken);
     const result = await checkoutGitBranch(
-      workspaceDirectory,
+      projectDirectory,
       rawInput.branchName,
     );
     return { branch: result.branch, ok: true };

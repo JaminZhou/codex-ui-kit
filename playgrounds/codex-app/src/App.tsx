@@ -1589,8 +1589,23 @@ export function App() {
     initialSelection.frame === "projects-index-empty" ? "missing" : "",
   );
   const [createdProjects, setCreatedProjects] = useState<
-    Array<{ id: string; label: string; path: string }>
+    Array<{
+      id: string;
+      label: string;
+      path: string;
+      projectToken?: string;
+    }>
   >([]);
+  const [workspaceProjectTokens, setWorkspaceProjectTokens] = useState<
+    Record<string, string>
+  >(() =>
+    window.codexDemo
+      ? {
+          [window.codexDemo.workspaceProjectId]:
+            window.codexDemo.startupWorkspaceProjectToken,
+        }
+      : {},
+  );
   const [projectIndexChat, setProjectIndexChat] = useState<
     | {
         chatId: string;
@@ -2333,6 +2348,13 @@ export function App() {
         (project) => project.path === selection.path,
       );
       const id = knownProject?.id ?? `created:${selection.path}`;
+      const selectedProjectToken = selection.projectToken;
+      if (selectedProjectToken) {
+        setWorkspaceProjectTokens((current) => ({
+          ...current,
+          [id]: selectedProjectToken,
+        }));
+      }
       setCreatedProjects((current) => {
         const withoutSelectedPath = current.filter(
           (project) => project.path !== selection.path,
@@ -4771,6 +4793,7 @@ export function App() {
     setActiveFrame("workspace-branch-create");
   };
   const closeWorkspaceBranchCreation = () => {
+    if (workspaceBranchStatus === "creating") return;
     setWorkspaceBranchDialogOpen(false);
     setWorkspaceBranchStatus("idle");
     setWorkspaceBranchError(undefined);
@@ -4793,7 +4816,10 @@ export function App() {
             ok: false,
           }
         : window.codexDemo
-          ? await window.codexDemo.createAndCheckoutBranch({ branchName })
+          ? await window.codexDemo.createAndCheckoutBranch({
+              branchName,
+              projectToken: workspaceProjectTokens[workspaceProjectId] ?? "",
+            })
           : { branch: branchName, ok: true };
     } catch {
       response = {
@@ -4839,6 +4865,9 @@ export function App() {
       response = window.codexDemo
         ? await window.codexDemo.checkoutBranch({
             branchName: worktree.branch,
+            projectToken: workspaceProjectId
+              ? (workspaceProjectTokens[workspaceProjectId] ?? "")
+              : "",
           })
         : { branch: worktree.branch, ok: true };
     } catch {

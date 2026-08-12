@@ -5,11 +5,19 @@ import type { ProtocolEventRecord } from "./protocol-state";
 
 interface CodexDemoBridge {
   useRendererAttachmentFixture: boolean;
-  createAndCheckoutBranch(input: { branchName: string }): Promise<
+  startupWorkspaceProjectToken: string;
+  workspaceProjectId: string;
+  createAndCheckoutBranch(input: {
+    branchName: string;
+    projectToken: string;
+  }): Promise<
     | { branch: string; ok: true }
     | { code: string; message: string; ok: false }
   >;
-  checkoutBranch(input: { branchName: string }): Promise<
+  checkoutBranch(input: {
+    branchName: string;
+    projectToken: string;
+  }): Promise<
     | { branch: string; ok: true }
     | { code: string; message: string; ok: false }
   >;
@@ -25,6 +33,7 @@ interface CodexDemoBridge {
     | {
         label: string;
         path: string;
+        projectToken?: string;
       }
     | null
   >;

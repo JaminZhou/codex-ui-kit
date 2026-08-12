@@ -20,6 +20,7 @@ export type DialogSize = "compact" | "standard" | "wide";
 export interface DialogProps
   extends Omit<HTMLAttributes<HTMLDivElement>, "children" | "title"> {
   children: ReactNode;
+  closeDisabled?: boolean;
   closeIcon?: ReactNode;
   closeLabel?: string;
   closeOnBackdrop?: boolean;
@@ -84,6 +85,7 @@ function getDialogOwnedPortalTrigger(
 export function Dialog({
   children,
   className,
+  closeDisabled = false,
   closeIcon,
   closeLabel = "Close dialog",
   closeOnBackdrop = true,
@@ -154,6 +156,10 @@ export function Dialog({
     if (event.defaultPrevented) return;
     if (event.key === "Escape" && closeOnEscape) {
       event.preventDefault();
+      if (closeDisabled) {
+        event.stopPropagation();
+        return;
+      }
       onOpenChange(false);
       return;
     }
@@ -218,7 +224,11 @@ export function Dialog({
           data-theme={portalTheme}
           onKeyDown={handleKeyDown}
           onPointerDown={(event) => {
-            if (closeOnBackdrop && event.target === event.currentTarget) {
+            if (
+              closeOnBackdrop &&
+              !closeDisabled &&
+              event.target === event.currentTarget
+            ) {
               onOpenChange(false);
             }
           }}
@@ -251,6 +261,7 @@ export function Dialog({
                 <button
                   aria-label={closeLabel}
                   className="codex-ui-dialog__close"
+                  disabled={closeDisabled}
                   onClick={() => onOpenChange(false)}
                   type="button"
                 >
