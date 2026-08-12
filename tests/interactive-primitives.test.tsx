@@ -262,6 +262,36 @@ describe("menus and selects", () => {
     expect(screen.queryByRole("menu")).toBeNull();
   });
 
+  it("activates external menu actions with Space", () => {
+    const onClick = vi.fn();
+    const onSelect = vi.fn();
+    render(
+      <Menu defaultOpen trigger={<button type="button">Run location</button>}>
+        <MenuLinkItem
+          href="https://chatgpt.com/codex/cloud"
+          onClick={onClick}
+          onSelect={onSelect}
+        >
+          Connect Codex web
+        </MenuLinkItem>
+      </Menu>,
+    );
+
+    const link = screen.getByRole("menuitem", {
+      name: "Connect Codex web",
+    });
+    const space = new KeyboardEvent("keydown", {
+      bubbles: true,
+      cancelable: true,
+      key: " ",
+    });
+    expect(fireEvent(link, space)).toBe(false);
+    expect(space.defaultPrevented).toBe(true);
+    expect(onClick).toHaveBeenCalledOnce();
+    expect(onSelect).toHaveBeenCalledOnce();
+    expect(screen.queryByRole("menu")).toBeNull();
+  });
+
   it("can retain trigger focus when a menu opens without initial focus", async () => {
     render(
       <Menu

@@ -922,6 +922,7 @@ export function MenuLinkItem({
   endIcon,
   keepOpen = false,
   onClick,
+  onKeyDown,
   onSelect,
   role = "menuitem",
   shortcut,
@@ -944,6 +945,12 @@ export function MenuLinkItem({
         if (event.defaultPrevented) return;
         onSelect?.();
         if (!keepOpen) menu?.close();
+      }}
+      onKeyDown={(event) => {
+        onKeyDown?.(event);
+        if (event.defaultPrevented || event.key !== " ") return;
+        event.preventDefault();
+        event.currentTarget.click();
       }}
       role={role}
       tabIndex={-1}
