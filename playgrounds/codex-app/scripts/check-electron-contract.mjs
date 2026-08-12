@@ -8166,6 +8166,97 @@ try {
   );
 }
 
+const detachedBranchGitDirectory = await mkdtemp(
+  join(tmpdir(), "codex-ui-kit-electron-detached-branch-"),
+);
+await execFileAsync("git", ["init", "-b", "main"], {
+  cwd: detachedBranchGitDirectory,
+});
+await execFileAsync(
+  "git",
+  [
+    "-c",
+    "user.name=Codex UI Kit",
+    "-c",
+    "user.email=codex-ui-kit@example.invalid",
+    "commit",
+    "--allow-empty",
+    "-m",
+    "test: initialize detached branch fixture",
+  ],
+  { cwd: detachedBranchGitDirectory },
+);
+await execFileAsync("git", ["switch", "--detach"], {
+  cwd: detachedBranchGitDirectory,
+});
+const detachedBranchScene = {
+  frame: "workspace-ready",
+  id: "electron-detached-branch-creation",
+  scenario: "workspace-workflow",
+  view: "workspace",
+};
+const {
+  app: detachedBranchApp,
+  page: detachedBranchPage,
+} = await launchScene(detachedBranchScene, {
+  capture: false,
+  environment: {
+    CODEX_UI_KIT_WORKSPACE: detachedBranchGitDirectory,
+  },
+});
+try {
+  const detachedBranchControl = detachedBranchPage.getByRole("button", {
+    name: "Change worktree: Detached HEAD",
+  });
+  await detachedBranchControl.waitFor({ state: "visible" });
+  if (await detachedBranchControl.isDisabled()) {
+    throw new Error(
+      "Electron disabled branch creation while the repository HEAD was detached.",
+    );
+  }
+  await detachedBranchControl.click();
+  const detachedBranchMenu = detachedBranchPage.getByRole("menu", {
+    name: "Branches",
+  });
+  if (
+    (await detachedBranchMenu
+      .getByRole("menuitemradio", { name: "main" })
+      .getAttribute("aria-checked")) === "true"
+  ) {
+    throw new Error(
+      "Electron presented a detached repository as attached to main.",
+    );
+  }
+  await detachedBranchMenu
+    .getByRole("menuitem", { name: "Create and checkout new branch…" })
+    .click();
+  const detachedBranchDialog = detachedBranchPage.getByRole("dialog", {
+    name: "Create and checkout branch",
+  });
+  await detachedBranchDialog
+    .getByRole("textbox", { name: "Branch name" })
+    .fill("feat/from-detached");
+  await detachedBranchDialog
+    .getByRole("button", { name: "Create and checkout" })
+    .click();
+  await detachedBranchPage.waitForSelector(
+    'button[aria-label="Change worktree: feat/from-detached"]',
+  );
+  const detachedCreatedBranch = await execFileAsync(
+    "git",
+    ["branch", "--show-current"],
+    { cwd: detachedBranchGitDirectory, encoding: "utf8" },
+  );
+  if (detachedCreatedBranch.stdout.trim() !== "feat/from-detached") {
+    throw new Error(
+      `Electron did not create a branch from detached HEAD: ${detachedCreatedBranch.stdout.trim()}.`,
+    );
+  }
+} finally {
+  await detachedBranchApp.close();
+  await rm(detachedBranchGitDirectory, { force: true, recursive: true });
+}
+
 const knownProjectCreationScene = {
   frame: "workspace-project-menu",
   id: "electron-known-project-creation",

@@ -10,7 +10,7 @@ export interface GitBranchCreationResult {
 
 export interface GitBranchListResult {
   branches: string[];
-  currentBranch: string;
+  currentBranch: string | null;
 }
 
 export class GitBranchCreationError extends Error {
@@ -131,10 +131,13 @@ export async function listGitBranches(
       .split(/\r?\n/)
       .map((branch) => branch.trim())
       .filter(Boolean);
-    if (!currentBranch || !branches.includes(currentBranch)) {
-      throw new Error("The repository is not on a local branch.");
-    }
-    return { branches, currentBranch };
+    const availableBranches = currentBranch
+      ? Array.from(new Set([...branches, currentBranch])).sort()
+      : branches;
+    return {
+      branches: availableBranches,
+      currentBranch: currentBranch || null,
+    };
   } catch (error) {
     if (error instanceof GitBranchCreationError) throw error;
     throw new GitBranchCreationError(

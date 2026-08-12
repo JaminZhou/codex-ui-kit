@@ -1397,7 +1397,7 @@ type WorkspaceHostBranchState =
   | { status: "loading" }
   | {
       branches: string[];
-      currentBranch: string;
+      currentBranch: string | null;
       status: "ready";
     }
   | { message: string; status: "error" };
@@ -1415,6 +1415,14 @@ function workspaceGitBranch(branch: string): WorkspaceBranch {
     status: "available",
   };
 }
+
+const unattachedWorkspaceBranch: WorkspaceBranch = {
+  branch: "Detached HEAD",
+  id: "git:detached-head",
+  label: "Detached HEAD",
+  meta: "unattached",
+  status: "available",
+};
 
 const workspaceBranches: WorkspaceBranch[] = [
   {
@@ -2255,7 +2263,9 @@ export function App() {
         }));
         if (workspaceProjectIdRef.current === projectId) {
           setWorkspaceWorktreeId(
-            workspaceGitBranchId(response.currentBranch),
+            response.currentBranch
+              ? workspaceGitBranchId(response.currentBranch)
+              : unattachedWorkspaceBranch.id,
           );
         }
       })
@@ -4785,7 +4795,12 @@ export function App() {
   const workspaceWorktrees = workspaceProjectId
     ? workspaceUsesHostBranches
       ? workspaceHostBranchState?.status === "ready"
-        ? workspaceHostBranchState.branches.map(workspaceGitBranch)
+        ? [
+            ...(workspaceHostBranchState.currentBranch
+              ? []
+              : [unattachedWorkspaceBranch]),
+            ...workspaceHostBranchState.branches.map(workspaceGitBranch),
+          ]
         : [workspaceBranches[0]]
       : [
           ...(workspaceWorktreesByProject[workspaceProjectId] ?? [
@@ -4823,7 +4838,8 @@ export function App() {
   );
   const filteredWorkspaceWorktrees =
     workspaceWorktrees.filter(
-      ({ branch, label, status }) =>
+      ({ branch, id, label, status }) =>
+        id !== unattachedWorkspaceBranch.id &&
         status !== "repairing" &&
         `${branch} ${label}`
           .toLocaleLowerCase()

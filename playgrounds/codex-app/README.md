@@ -773,6 +773,8 @@ remain untracked.
   until the host binds a trusted directory token.
   Host-switched branches keep command routing on the project directory; only
   actual worktree selections derive a `.worktrees/...` execution path.
+  Detached and unborn HEAD states remain branch-creation-capable instead of
+  being collapsed into a repository-unavailable error.
   Creating blocks every dismissal path until Git settles. Acceptance routes a
   selected project across two generated disposable Git repositories only,
   retains modal focus while pending, and discards checkout UI results after

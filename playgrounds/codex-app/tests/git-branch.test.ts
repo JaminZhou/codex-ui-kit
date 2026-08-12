@@ -112,6 +112,35 @@ describe("Git branch creation", () => {
     expect(stdout.trim()).toBe("main");
   });
 
+  it("lists and creates branches from detached and unborn HEAD states", async () => {
+    const detachedRepository = await temporaryRepository();
+    await execFileAsync("git", ["switch", "--detach"], {
+      cwd: detachedRepository,
+    });
+    await expect(listGitBranches(detachedRepository)).resolves.toEqual({
+      branches: ["main"],
+      currentBranch: null,
+    });
+    await expect(
+      createAndCheckoutGitBranch(detachedRepository, "feat/from-detached"),
+    ).resolves.toEqual({ branch: "feat/from-detached" });
+
+    const unbornRepository = await mkdtemp(
+      join(tmpdir(), "codex-ui-kit-unborn-branch-"),
+    );
+    temporaryDirectories.push(unbornRepository);
+    await execFileAsync("git", ["init", "-b", "main"], {
+      cwd: unbornRepository,
+    });
+    await expect(listGitBranches(unbornRepository)).resolves.toEqual({
+      branches: ["main"],
+      currentBranch: "main",
+    });
+    await expect(
+      createAndCheckoutGitBranch(unbornRepository, "feat/from-unborn"),
+    ).resolves.toEqual({ branch: "feat/from-unborn" });
+  });
+
   it("does not treat a plain directory as a repository", async () => {
     const directory = await mkdtemp(join(tmpdir(), "codex-ui-kit-plain-"));
     temporaryDirectories.push(directory);
