@@ -1649,6 +1649,7 @@ export function App() {
   );
   const workspaceProjectIdRef = useRef(workspaceProjectId);
   const workspaceBranchCheckoutActiveRef = useRef(false);
+  const workspaceRunLocationVersionRef = useRef(0);
   const [projectIndexQuery, setProjectIndexQuery] = useState(
     initialSelection.frame === "projects-index-empty" ? "missing" : "",
   );
@@ -5199,6 +5200,8 @@ export function App() {
   const selectWorkspaceBranch = async (worktree: WorkspaceBranch) => {
     const initiatingProjectId = workspaceProjectId;
     const initiatingEnvironmentId = workspaceEnvironmentId;
+    const initiatingRunLocationVersion =
+      workspaceRunLocationVersionRef.current;
     if (
       !initiatingProjectId ||
       worktree.checkedOutInLinkedWorktree ||
@@ -5261,14 +5264,12 @@ export function App() {
       return;
     }
     if (
-      workspaceUsesHostBranches ||
-      initiatingEnvironmentId === "worktree"
+      (workspaceUsesHostBranches ||
+        initiatingEnvironmentId === "worktree") &&
+      workspaceRunLocationVersionRef.current ===
+        initiatingRunLocationVersion
     ) {
-      setWorkspaceEnvironmentId((currentEnvironmentId) =>
-        currentEnvironmentId === initiatingEnvironmentId
-          ? "local"
-          : currentEnvironmentId,
-      );
+      setWorkspaceEnvironmentId("local");
     }
     updateWorkspaceWorktreeId(
       workspaceUsesHostBranches
@@ -5280,6 +5281,7 @@ export function App() {
   const selectWorkspaceRunLocation = (
     environmentId: "cloud" | "local" | "worktree",
   ) => {
+    workspaceRunLocationVersionRef.current += 1;
     setWorkspaceEnvironmentId(environmentId);
     setWorkspaceOverlay(null);
     setActiveFrame(

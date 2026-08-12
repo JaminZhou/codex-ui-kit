@@ -4900,6 +4900,57 @@ try {
     'button[aria-label="Change run location: Local"]',
   );
 
+  await codingWorkspacePage
+    .getByRole("button", { name: "Change run location: Local" })
+    .click();
+  await environmentMenu
+    .getByRole("menuitemradio", { name: "Connect Codex web" })
+    .click();
+  await codingWorkspacePage.waitForSelector(
+    'button[aria-label="Change run location: Codex web"]',
+  );
+  await codingWorkspacePage
+    .getByRole("button", {
+      name: "Change worktree: feature/sidebar-shell",
+    })
+    .click();
+  await worktreeMenu
+    .getByRole("menuitemradio", { name: "main" })
+    .click();
+  await codingWorkspacePage
+    .getByRole("button", { name: "Change run location: Codex web" })
+    .click();
+  await environmentMenu
+    .getByRole("menuitemradio", { name: "Work locally" })
+    .click();
+  await codingWorkspacePage
+    .getByRole("button", { name: "Change run location: Local" })
+    .click();
+  await environmentMenu
+    .getByRole("menuitemradio", { name: "Connect Codex web" })
+    .click();
+  await codingWorkspacePage.waitForSelector(
+    'button[aria-label="Change worktree: main"]',
+  );
+  if (
+    !(await codingWorkspacePage
+      .getByRole("button", { name: "Change run location: Codex web" })
+      .isVisible())
+  ) {
+    throw new Error(
+      "Electron branch checkout overwrote an ABA run-location selection.",
+    );
+  }
+  await codingWorkspacePage
+    .getByRole("button", { name: "Change run location: Codex web" })
+    .click();
+  await environmentMenu
+    .getByRole("menuitemradio", { name: "Work locally" })
+    .click();
+  await codingWorkspacePage.waitForSelector(
+    'button[aria-label="Change run location: Local"]',
+  );
+
   const workspaceComposer = codingWorkspacePage.getByRole("textbox", {
     name: "Do anything",
   });
