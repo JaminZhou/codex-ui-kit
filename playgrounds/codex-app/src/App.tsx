@@ -1386,6 +1386,7 @@ const workspaceEnvironmentGroups = [
 type WorkspaceBranch = {
   branch: string;
   checkedOutInLinkedWorktree?: boolean;
+  checkoutUnavailable?: boolean;
   id: string;
   label: string;
   meta?: string;
@@ -1417,12 +1418,18 @@ function workspaceGitBranch(
   branchesCheckedOutElsewhere: ReadonlySet<string>,
 ): WorkspaceBranch {
   const checkedOutInLinkedWorktree = branchesCheckedOutElsewhere.has(branch);
+  const checkoutUnavailable = branch === "-";
   return {
     branch,
     checkedOutInLinkedWorktree,
+    checkoutUnavailable,
     id: workspaceGitBranchId(branch),
     label: branch,
-    meta: checkedOutInLinkedWorktree ? "Linked worktree" : "clean",
+    meta: checkedOutInLinkedWorktree
+      ? "Linked worktree"
+      : checkoutUnavailable
+        ? "Unavailable"
+        : "clean",
     status: "available",
   };
 }
@@ -5123,6 +5130,7 @@ export function App() {
     if (
       !initiatingProjectId ||
       worktree.checkedOutInLinkedWorktree ||
+      worktree.checkoutUnavailable ||
       workspaceBranchCheckoutActiveRef.current
     ) {
       return;
@@ -5455,7 +5463,8 @@ export function App() {
                       aria-checked={worktree.id === workspaceWorktreeId}
                       disabled={
                         !workspaceBranchOperationsAvailable ||
-                        worktree.checkedOutInLinkedWorktree
+                        worktree.checkedOutInLinkedWorktree ||
+                        worktree.checkoutUnavailable
                       }
                       endIcon={
                         worktree.id === workspaceWorktreeId
@@ -5471,6 +5480,8 @@ export function App() {
                       subText={
                         worktree.checkedOutInLinkedWorktree
                           ? "Checked out in another worktree"
+                          : worktree.checkoutUnavailable
+                            ? "Unavailable for checkout"
                           : undefined
                       }
                     >

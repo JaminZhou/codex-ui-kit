@@ -231,6 +231,12 @@ async function assertValidExistingBranchName(
   branchName: string,
   options: GitCommandOptions,
 ) {
+  if (branchName === "-") {
+    throw new GitBranchCreationError(
+      "unavailable",
+      "The branch - cannot be checked out safely.",
+    );
+  }
   if (!branchName) {
     throw new GitBranchCreationError(
       "invalid",

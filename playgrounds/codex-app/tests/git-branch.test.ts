@@ -159,6 +159,29 @@ describe("Git branch creation", () => {
     ).rejects.toMatchObject({ code: "invalid" });
   });
 
+  it("rejects the lone-dash ref without changing HEAD", async () => {
+    const repository = await temporaryRepository();
+    await execFileAsync(
+      "git",
+      ["update-ref", "refs/heads/-", "HEAD"],
+      { cwd: repository },
+    );
+
+    await expect(listGitBranches(repository)).resolves.toEqual({
+      branches: ["-", "main"],
+      branchesCheckedOutElsewhere: [],
+      currentBranch: "main",
+      unbornBranch: null,
+    });
+    await expect(checkoutGitBranch(repository, "-")).rejects.toMatchObject({
+      code: "unavailable",
+      message: "The branch - cannot be checked out safely.",
+    });
+    await expect(listGitBranches(repository)).resolves.toMatchObject({
+      currentBranch: "main",
+    });
+  });
+
   it("preserves Unicode whitespace in distinct branch refs", async () => {
     const repository = await temporaryRepository();
     const unicodeWhitespaceBranch = "topic\u00a0";

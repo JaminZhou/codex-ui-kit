@@ -4130,6 +4130,11 @@ await execFileAsync(
   ["update-ref", "refs/heads/-topic", "HEAD"],
   { cwd: codingWorkspaceGitDirectory },
 );
+await execFileAsync(
+  "git",
+  ["update-ref", "refs/heads/-", "HEAD"],
+  { cwd: codingWorkspaceGitDirectory },
+);
 const occupiedLinkedWorktreeBranch = "feat/linked-worktree";
 const occupiedLinkedWorktreeDirectory = join(
   codingWorkspaceGitDirectory,
@@ -4583,6 +4588,12 @@ try {
   if (
     JSON.stringify(appServerWorktreeItems) !==
     JSON.stringify([
+      {
+        branch: "-",
+        checked: "false",
+        disabled: true,
+        status: "Unavailable for checkout",
+      },
       {
         branch: "-topic",
         checked: "false",
