@@ -93,6 +93,20 @@ describe("Git branch creation", () => {
     expect(stdout.trim()).toBe("main");
   });
 
+  it("preserves branch names when tags use the same short names", async () => {
+    const repository = await temporaryRepository();
+    await execFileAsync("git", ["tag", "main"], { cwd: repository });
+
+    await expect(listGitBranches(repository)).resolves.toEqual({
+      branches: ["main"],
+      currentBranch: "main",
+      unbornBranch: null,
+    });
+    await expect(
+      createAndCheckoutGitBranch(repository, "main"),
+    ).rejects.toMatchObject({ code: "duplicate" });
+  });
+
   it("reconciles HEAD when a post-checkout hook returns nonzero", async () => {
     const repository = await temporaryRepository();
     const hook = join(repository, ".git", "hooks", "post-checkout");

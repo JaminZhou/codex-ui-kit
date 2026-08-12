@@ -88,7 +88,7 @@ async function branchExists(cwd: string, branchName: string) {
   const branches = await runGit(cwd, [
     "branch",
     "--list",
-    "--format=%(refname:short)",
+    "--format=%(refname:lstrip=2)",
     "--",
     branchName,
   ]);
@@ -129,7 +129,7 @@ export async function listGitBranches(
     const [branchOutput, currentBranch] = await Promise.all([
       runGit(cwd, [
         "for-each-ref",
-        "--format=%(refname:short)",
+        "--format=%(refname:lstrip=2)",
         "refs/heads",
       ]),
       runGit(cwd, ["branch", "--show-current"]),
