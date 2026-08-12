@@ -137,6 +137,28 @@ describe("Git branch creation", () => {
     ).rejects.toMatchObject({ code: "duplicate" });
   });
 
+  it("checks out enumerated refs whose names start with a dash", async () => {
+    const repository = await temporaryRepository();
+    await execFileAsync(
+      "git",
+      ["update-ref", "refs/heads/-topic", "HEAD"],
+      { cwd: repository },
+    );
+
+    await expect(listGitBranches(repository)).resolves.toEqual({
+      branches: ["-topic", "main"],
+      branchesCheckedOutElsewhere: [],
+      currentBranch: "main",
+      unbornBranch: null,
+    });
+    await expect(checkoutGitBranch(repository, "-topic")).resolves.toEqual({
+      branch: "-topic",
+    });
+    await expect(
+      createAndCheckoutGitBranch(repository, "-created"),
+    ).rejects.toMatchObject({ code: "invalid" });
+  });
+
   it("preserves Unicode whitespace in distinct branch refs", async () => {
     const repository = await temporaryRepository();
     const unicodeWhitespaceBranch = "topic\u00a0";

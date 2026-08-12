@@ -4125,6 +4125,11 @@ await execFileAsync(
   ],
   { cwd: codingWorkspaceGitDirectory },
 );
+await execFileAsync(
+  "git",
+  ["update-ref", "refs/heads/-topic", "HEAD"],
+  { cwd: codingWorkspaceGitDirectory },
+);
 const occupiedLinkedWorktreeBranch = "feat/linked-worktree";
 const occupiedLinkedWorktreeDirectory = join(
   codingWorkspaceGitDirectory,
@@ -4579,6 +4584,11 @@ try {
     JSON.stringify(appServerWorktreeItems) !==
     JSON.stringify([
       {
+        branch: "-topic",
+        checked: "false",
+        disabled: false,
+      },
+      {
         branch: occupiedLinkedWorktreeBranch,
         checked: "false",
         disabled: true,
@@ -4595,6 +4605,34 @@ try {
       `Electron coding workspace did not classify its host repository branches: ${JSON.stringify(appServerWorktreeItems)}.`,
     );
   }
+  await worktreeMenu
+    .getByRole("menuitemradio", { name: "-topic" })
+    .click();
+  await codingWorkspacePage.waitForSelector(
+    'button[aria-label="Change worktree: -topic"]',
+  );
+  const checkedOutDashBranch = await execFileAsync(
+    "git",
+    ["branch", "--show-current"],
+    { cwd: codingWorkspaceGitDirectory, encoding: "utf8" },
+  );
+  if (checkedOutDashBranch.stdout.trim() !== "-topic") {
+    throw new Error(
+      `Electron did not checkout the enumerated dash-prefixed branch: ${checkedOutDashBranch.stdout.trim()}.`,
+    );
+  }
+  await codingWorkspacePage
+    .getByRole("button", { name: "Change worktree: -topic" })
+    .click();
+  await worktreeMenu
+    .getByRole("menuitemradio", { name: "main" })
+    .click();
+  await codingWorkspacePage.waitForSelector(
+    'button[aria-label="Change worktree: main"]',
+  );
+  await codingWorkspacePage
+    .getByRole("button", { name: "Change worktree: main" })
+    .click();
   await worktreeMenu
     .getByRole("menuitem", {
       name: "Create and checkout new branch…",

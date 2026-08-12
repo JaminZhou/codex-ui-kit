@@ -226,6 +226,32 @@ async function assertValidBranchName(
   }
 }
 
+async function assertValidExistingBranchName(
+  cwd: string,
+  branchName: string,
+  options: GitCommandOptions,
+) {
+  if (!branchName) {
+    throw new GitBranchCreationError(
+      "invalid",
+      "Enter a valid Git branch name.",
+    );
+  }
+  try {
+    await runGit(
+      cwd,
+      ["check-ref-format", `refs/heads/${branchName}`],
+      options,
+    );
+  } catch (error) {
+    if (error instanceof GitBranchCreationError) throw error;
+    throw new GitBranchCreationError(
+      "invalid",
+      "Enter a valid Git branch name.",
+    );
+  }
+}
+
 async function branchExists(
   cwd: string,
   branchName: string,
@@ -365,7 +391,7 @@ export async function checkoutGitBranch(
 ): Promise<GitBranchCreationResult> {
   const branchName = normalizedBranchName(rawBranchName);
   await assertGitRepository(cwd, options);
-  await assertValidBranchName(cwd, branchName, options);
+  await assertValidExistingBranchName(cwd, branchName, options);
   if (!(await branchExists(cwd, branchName, options))) {
     throw new GitBranchCreationError(
       "unavailable",
@@ -375,7 +401,7 @@ export async function checkoutGitBranch(
   const currentBranch = await switchGitBranch(
     cwd,
     branchName,
-    ["switch", branchName],
+    ["switch", "--", branchName],
     "Git could not checkout the branch.",
     "Git did not report the requested branch as checked out.",
     options,
