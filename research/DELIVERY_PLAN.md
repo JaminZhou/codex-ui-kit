@@ -404,8 +404,10 @@ two generated disposable Git repositories and blocks dismissal while creation
 is pending while retaining modal focus. Delayed checkout results are discarded
 after a project change, the new project's branch control stays disabled with
 explicit pending feedback until Git settles, and repository-scoped errors are
-cleared on project change. Blank, error, and created states extend the reviewed
-matrix to 166 frames; the local-only dialog crop passes at 3.0916%.
+cleared on project change. In-place host branches keep execution rooted at the
+project directory instead of deriving a nonexistent worktree path. Blank,
+error, and created states extend the reviewed matrix to 166 frames; the
+local-only dialog crop passes at 3.0916%.
 Current-product create submission is still pending the isolated native
 directory selection, so this is not yet a claim that branch mutation/
 persistence is complete in the product runtime.

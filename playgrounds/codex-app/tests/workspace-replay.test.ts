@@ -18,6 +18,15 @@ describe("workspace replay routing", () => {
     expect(
       workspaceExecutionCwd({
         environmentId: "local",
+        inPlaceBranch: true,
+        projectPath: "/workspace/codex-ui-kit",
+        worktreeBranch: "feat/in-place-branch",
+        worktreeId: "git:feat/in-place-branch",
+      }),
+    ).toBe("/workspace/codex-ui-kit");
+    expect(
+      workspaceExecutionCwd({
+        environmentId: "local",
         projectPath: "/workspace/codex-ui-kit",
         worktreeBranch: "feat/coding-workspace-lifecycle",
         worktreeId: "feature",

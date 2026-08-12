@@ -3,6 +3,7 @@ import type { ProtocolEventRecord } from "./protocol-state";
 
 export interface WorkspaceExecutionSelection {
   environmentId: string;
+  inPlaceBranch?: boolean;
   projectPath?: string;
   worktreeBranch?: string;
   worktreeId: string;
@@ -38,6 +39,7 @@ function workspacePathSegment(value: string) {
 
 export function workspaceExecutionCwd({
   environmentId,
+  inPlaceBranch = false,
   projectPath,
   worktreeBranch,
   worktreeId,
@@ -55,6 +57,7 @@ export function workspaceExecutionCwd({
   if (environmentId === "worktree") {
     return `${basePath}/.worktrees/new-worktree`;
   }
+  if (inPlaceBranch) return basePath;
   if (worktreeId === "main") return basePath;
   const branch = workspacePathSegment(worktreeBranch ?? worktreeId);
   return `${basePath}/.worktrees/${branch || worktreeId}`;

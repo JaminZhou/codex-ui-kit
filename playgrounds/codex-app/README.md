@@ -771,6 +771,8 @@ remain untracked.
   branch, and switches branches through guarded main-frame IPC. Fixture-only
   projects remain visible for replay but their Git controls stay disabled
   until the host binds a trusted directory token.
+  Host-switched branches keep command routing on the project directory; only
+  actual worktree selections derive a `.worktrees/...` execution path.
   Creating blocks every dismissal path until Git settles. Acceptance routes a
   selected project across two generated disposable Git repositories only,
   retains modal focus while pending, and discards checkout UI results after

@@ -3,7 +3,9 @@ const { contextBridge, ipcRenderer } = require("electron");
 contextBridge.exposeInMainWorld("codexDemo", {
   useRendererAttachmentFixture:
     process.env.CODEX_DEMO_ATTACHMENT_RENDERER_FIXTURE === "1",
-  useWorkspaceBranchFixture: process.env.CODEX_DEMO_CAPTURE === "1",
+  useWorkspaceBranchFixture:
+    process.env.CODEX_DEMO_CAPTURE === "1" ||
+    process.env.CODEX_DEMO_WORKSPACE_BRANCH_FIXTURE === "1",
   startupWorkspaceProjectToken: "startup-workspace",
   workspaceProjectId:
     process.env.CODEX_DEMO_WORKSPACE_PROJECT_ID ?? "codex-ui-kit",

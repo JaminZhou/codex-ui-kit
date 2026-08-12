@@ -6749,6 +6749,9 @@ const {
   page: workspaceResponsivePage,
 } = await launchScene(workspaceResponsiveScene, {
   capture: false,
+  environment: {
+    CODEX_DEMO_WORKSPACE_BRANCH_FIXTURE: "1",
+  },
   windowSize: { height: 820, width: 1180 },
 });
 try {

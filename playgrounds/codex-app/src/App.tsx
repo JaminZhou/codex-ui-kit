@@ -4802,6 +4802,7 @@ export function App() {
     ) ?? workspaceWorktrees[0];
   const currentWorkspaceCwd = workspaceExecutionCwd({
     environmentId: workspaceEnvironmentId,
+    inPlaceBranch: workspaceUsesHostBranches,
     projectPath: workspaceProject?.path,
     worktreeBranch: workspaceWorktree.branch,
     worktreeId: workspaceWorktreeId,

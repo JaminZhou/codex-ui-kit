@@ -8122,6 +8122,41 @@ try {
       "Electron exposed branch operations for a project without a trusted host token.",
     );
   }
+  await createdProjectBranchPage
+    .locator("#demo-workspace-project-trigger")
+    .click();
+  await createdProjectBranchPage
+    .getByRole("dialog", { name: "Choose a project" })
+    .getByRole("button", { name: "New project" })
+    .click();
+  await createdProjectBranchPage.waitForSelector(
+    'button[aria-label="Change worktree: feat/selected-project"]',
+  );
+  await createdProjectBranchPage
+    .getByRole("textbox", { name: "Do anything" })
+    .fill("Verify the in-place branch route.");
+  await createdProjectBranchPage
+    .getByRole("textbox", { name: "Do anything" })
+    .press("Enter");
+  await createdProjectBranchPage.waitForSelector(
+    '.demo-root[data-view="conversation"][data-scenario="workspace-workflow"][data-frame="approval-pending"]',
+  );
+  const inPlaceBranchCommandCwds = await createdProjectBranchPage
+    .locator(
+      '[data-testid="command-execution"] .codex-ui-command-execution__shell',
+    )
+    .evaluateAll((elements) =>
+      elements.map((element) => element.getAttribute("title")),
+    );
+  if (
+    inPlaceBranchCommandCwds.some(
+      (cwd) => cwd !== `cwd\n${createdProjectTargetGitDirectory}`,
+    )
+  ) {
+    throw new Error(
+      `Electron in-place branch routed commands through a worktree path: ${JSON.stringify(inPlaceBranchCommandCwds)}.`,
+    );
+  }
 } finally {
   await createdProjectBranchApp.close();
   await Promise.all(
