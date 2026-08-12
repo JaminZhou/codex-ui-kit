@@ -132,6 +132,7 @@ import {
 } from "./review-selection";
 import {
   contextualizeWorkspaceReplay,
+  hostSelectionUsesInPlaceBranch,
   workspaceExecutionCwd,
 } from "./workspace-replay";
 import { branchStateAfterSuccessfulCreation } from "./workspace-branch-state";
@@ -4835,13 +4836,18 @@ export function App() {
           ...createdProjectBranches,
         ]
     : [workspaceBranches[0]];
+  const selectedLinkedWorkspaceWorktree = workspaceEnvironmentGroups
+    .find(({ id }) => id === workspaceProjectId)
+    ?.items.find(({ id }) => id === workspaceWorktreeId);
   const workspaceWorktree =
-    workspaceWorktrees.find(
-      ({ id }) => id === workspaceWorktreeId,
-    ) ?? workspaceWorktrees[0];
+    workspaceWorktrees.find(({ id }) => id === workspaceWorktreeId) ??
+    selectedLinkedWorkspaceWorktree ??
+    workspaceWorktrees[0];
   const currentWorkspaceCwd = workspaceExecutionCwd({
     environmentId: workspaceEnvironmentId,
-    inPlaceBranch: workspaceUsesHostBranches,
+    inPlaceBranch:
+      workspaceUsesHostBranches &&
+      hostSelectionUsesInPlaceBranch(workspaceWorktreeId),
     projectPath: workspaceProject?.path,
     worktreeBranch: workspaceWorktree.branch,
     worktreeId: workspaceWorktreeId,

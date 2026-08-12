@@ -9,6 +9,14 @@ export interface WorkspaceExecutionSelection {
   worktreeId: string;
 }
 
+export function hostSelectionUsesInPlaceBranch(worktreeId: string) {
+  return (
+    worktreeId === "main" ||
+    worktreeId === "state:unattached-head" ||
+    worktreeId.startsWith("git:")
+  );
+}
+
 function workspacePathSegment(value: string) {
   const characters: string[] = [];
   let replacingInvalidRun = false;

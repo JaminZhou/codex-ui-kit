@@ -2,10 +2,19 @@ import { describe, expect, it } from "vitest";
 import type { ProtocolEventRecord } from "../src/protocol-state";
 import {
   contextualizeWorkspaceReplay,
+  hostSelectionUsesInPlaceBranch,
   workspaceExecutionCwd,
 } from "../src/workspace-replay";
 
 describe("workspace replay routing", () => {
+  it("distinguishes host-switched branches from linked worktrees", () => {
+    expect(hostSelectionUsesInPlaceBranch("main")).toBe(true);
+    expect(hostSelectionUsesInPlaceBranch("git:feat/in-place")).toBe(true);
+    expect(hostSelectionUsesInPlaceBranch("state:unattached-head")).toBe(true);
+    expect(hostSelectionUsesInPlaceBranch("feature")).toBe(false);
+    expect(hostSelectionUsesInPlaceBranch("context-layout")).toBe(false);
+  });
+
   it("derives an execution cwd from project, environment, and worktree", () => {
     expect(
       workspaceExecutionCwd({

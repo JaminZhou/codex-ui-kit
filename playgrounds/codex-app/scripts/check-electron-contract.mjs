@@ -4828,6 +4828,80 @@ try {
   });
 }
 
+const linkedWorktreeGitDirectory = await mkdtemp(
+  join(tmpdir(), "codex-ui-kit-electron-linked-worktree-"),
+);
+await execFileAsync("git", ["init", "-b", "main"], {
+  cwd: linkedWorktreeGitDirectory,
+});
+await execFileAsync(
+  "git",
+  [
+    "-c",
+    "user.name=Codex UI Kit",
+    "-c",
+    "user.email=codex-ui-kit@example.invalid",
+    "commit",
+    "--allow-empty",
+    "-m",
+    "test: initialize linked worktree fixture",
+  ],
+  { cwd: linkedWorktreeGitDirectory },
+);
+const linkedWorktreeScene = {
+  frame: "workspace-environment",
+  id: "electron-linked-worktree-routing",
+  scenario: "workspace-workflow",
+  view: "workspace",
+};
+const {
+  app: linkedWorktreeApp,
+  page: linkedWorktreePage,
+} = await launchScene(linkedWorktreeScene, {
+  capture: false,
+  environment: {
+    CODEX_UI_KIT_WORKSPACE: linkedWorktreeGitDirectory,
+  },
+});
+try {
+  await linkedWorktreePage
+    .getByRole("dialog", { name: "Select local environment" })
+    .getByRole("button", { name: "Use local environment Coding workspace" })
+    .click();
+  await linkedWorktreePage.waitForSelector(
+    'button[aria-label="Change worktree: feat/coding-workspace-lifecycle"]',
+  );
+  await linkedWorktreePage
+    .getByRole("textbox", { name: "Do anything" })
+    .fill("Run the linked worktree lifecycle.");
+  await linkedWorktreePage
+    .getByRole("textbox", { name: "Do anything" })
+    .press("Enter");
+  await linkedWorktreePage.waitForSelector(
+    '.demo-root[data-view="conversation"][data-scenario="workspace-workflow"][data-frame="approval-pending"]',
+  );
+  const linkedWorktreeCwd = `${linkedWorktreeGitDirectory}/.worktrees/feat-coding-workspace-lifecycle`;
+  const linkedWorktreeCommandCwds = await linkedWorktreePage
+    .locator(
+      '[data-testid="command-execution"] .codex-ui-command-execution__shell',
+    )
+    .evaluateAll((elements) =>
+      elements.map((element) => element.getAttribute("title")),
+    );
+  if (
+    linkedWorktreeCommandCwds.some(
+      (cwd) => cwd !== `cwd\n${linkedWorktreeCwd}`,
+    )
+  ) {
+    throw new Error(
+      `Electron linked-worktree selection routed to the wrong cwd: ${JSON.stringify(linkedWorktreeCommandCwds)}.`,
+    );
+  }
+} finally {
+  await linkedWorktreeApp.close();
+  await rm(linkedWorktreeGitDirectory, { force: true, recursive: true });
+}
+
 const cloudWorkspaceScene = {
   frame: "workspace-ready",
   id: "electron-cloud-coding-workspace",
