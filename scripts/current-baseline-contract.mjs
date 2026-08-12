@@ -34,6 +34,8 @@ const withinTolerance = (value, expected, tolerance = 1) =>
 
 const currentSidebarWidthBounds = Object.freeze({ max: 520, min: 240 });
 const currentSidebarMinimumMainWidth = 352;
+const currentSidebarCompactPinnedMaximum =
+  currentBaselineViewports.compact.width - currentSidebarMinimumMainWidth;
 
 const currentSidebarWidthForViewport = (persistedWidth, viewportWidth) =>
   Math.min(
@@ -102,6 +104,7 @@ export function assertCurrentSidebarLifecycle(lifecycle) {
     !Number.isFinite(persistedNavigationWidth) ||
     persistedNavigationWidth < currentSidebarWidthBounds.min ||
     persistedNavigationWidth > currentSidebarWidthBounds.max ||
+    persistedNavigationWidth > currentSidebarCompactPinnedMaximum ||
     !withinTolerance(
       baseline?.projectRow?.rect?.width,
       persistedNavigationWidth - 16,

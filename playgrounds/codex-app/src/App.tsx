@@ -3768,6 +3768,7 @@ export function App() {
                       ? () => {
                           setMode("replay");
                           setView("workspace");
+                          setWorkspacePage("conversation");
                           setActiveFrame(
                             workspaceDirectoryMissing
                               ? "workspace-directory-missing"

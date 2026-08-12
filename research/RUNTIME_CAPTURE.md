@@ -198,9 +198,12 @@ The 2026-08-13 environment follow-up used one isolated process on loopback
 port `9822`, exact main PID `24810`, and profile
 `/private/tmp/codex-ui-kit-environment-cdp.CWsiES/profile`. It proved that the
 sidebar preference can persist at 322.91px, so the baseline now records
-`navigationWidth` and derives all dependent geometry inside the observed
-240–520px resize range instead of treating the 274.11px fresh-profile default
-as universal. The probe then captured the five-action Work in menu, the
+`navigationWidth` and derives all dependent geometry instead of treating the
+274.11px fresh-profile default as universal. The wide resize range remains
+240–520px, but the 720px pinned matrix accepts only 240–368px so its main
+column stays at least 352px; larger persisted widths fail closed until their
+narrow overlay/modal behavior has an independent model. The probe then
+captured the five-action Work in menu, the
 New-worktree no-environment menu, the current unavailable Environments route,
 and the seven-action project menu. It created no environment, worktree, task,
 project, or remote connection and normalized the product selection back to

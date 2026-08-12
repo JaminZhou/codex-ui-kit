@@ -8238,6 +8238,40 @@ try {
       "Electron persisted worktree task remained selected after opening New chat.",
     );
   }
+  await workspaceMissingPage
+    .getByRole("button", { name: "Change run location: Local" })
+    .click();
+  await workspaceMissingPage
+    .getByRole("menu", { name: "Work in" })
+    .getByRole("menuitem", { name: "New worktree" })
+    .click();
+  await workspaceMissingPage
+    .getByRole("button", { name: "Change environment: No environment" })
+    .click();
+  await workspaceMissingPage
+    .getByRole("menu", { name: "Environment" })
+    .getByRole("menuitem", { name: "Environment settings" })
+    .click();
+  const persistedEnvironmentSettings = workspaceMissingPage.getByRole(
+    "region",
+    { name: "Environments" },
+  );
+  await persistedEnvironmentSettings.waitFor();
+  await retainedTask.click();
+  await workspaceMissingPage.waitForSelector(
+    '.demo-root[data-frame="workspace-directory-missing"]',
+  );
+  if ((await persistedEnvironmentSettings.count()) !== 0) {
+    throw new Error(
+      "Electron persisted-task navigation retained the environment settings route.",
+    );
+  }
+  await workspaceMissingPage
+    .getByRole("button", { name: "New chat", exact: true })
+    .click();
+  await workspaceMissingPage.waitForSelector(
+    '.demo-root[data-frame="workspace-ready"]',
+  );
   await workspaceMissingApp.evaluate(({ BrowserWindow }) => {
     const active = BrowserWindow.getAllWindows()[0];
     active?.setMinimumSize(480, 480);

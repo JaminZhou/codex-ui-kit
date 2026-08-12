@@ -89,7 +89,8 @@ The authoritative current-build inventory is:
   at 3.1387%, 0.4126%, and 0.3146%, while evidence not re-reached on this build
   retains its previous build prefix.
 - A second current-build capture proves a persisted 322.91px sidebar within
-  the 240–520px resize contract, adds the five-action Work in menu, separates
+  the wide 240–520px resize contract and the stricter 240–368px compact-pinned
+  evidence range, adds the five-action Work in menu, separates
   the external Codex web anchor from local execution state, and reaches the
   no-environment menu plus the current 768px unavailable Environments route.
   Ten more exact primitives raise the scoped manifest to 53. Browser/CDP,

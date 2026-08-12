@@ -490,7 +490,7 @@ describe("current baseline capture contract", () => {
         }),
       ).toThrow("project-group baseline");
     }
-    for (const invalidWidth of [undefined, 239, 521]) {
+    for (const invalidWidth of [undefined, 239, 369, 400, 521]) {
       expect(() =>
         assertCurrentSidebarLifecycle({
           ...record.sidebarLifecycle,
@@ -501,6 +501,33 @@ describe("current baseline capture contract", () => {
         }),
       ).toThrow("project-group baseline");
     }
+    expect(() =>
+      assertCurrentSidebarLifecycle({
+        ...persistedRecord.sidebarLifecycle,
+        baseline: {
+          ...persistedRecord.sidebarLifecycle.baseline,
+          navigationWidth: 400,
+          projectRow: {
+            ...persistedRecord.sidebarLifecycle.baseline.projectRow,
+            rect: {
+              ...persistedRecord.sidebarLifecycle.baseline.projectRow.rect,
+              width: 384,
+            },
+          },
+        },
+        responsive: {
+          ...persistedRecord.sidebarLifecycle.responsive,
+          compactPinned: {
+            ...persistedRecord.sidebarLifecycle.responsive.compactPinned,
+            navigationWidth: 400,
+          },
+          wideRestored: {
+            ...persistedRecord.sidebarLifecycle.responsive.wideRestored,
+            navigationWidth: 400,
+          },
+        },
+      }),
+    ).toThrow("project-group baseline");
     expect(() =>
       assertCurrentSidebarLifecycle({
         ...persistedRecord.sidebarLifecycle,
