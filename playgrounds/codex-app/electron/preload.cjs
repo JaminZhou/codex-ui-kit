@@ -9,6 +9,8 @@ contextBridge.exposeInMainWorld("codexDemo", {
   startupWorkspaceProjectToken: "startup-workspace",
   workspaceProjectId:
     process.env.CODEX_DEMO_WORKSPACE_PROJECT_ID ?? "codex-ui-kit",
+  workspaceProjectPath:
+    process.env.CODEX_DEMO_WORKSPACE_PROJECT_PATH ?? "",
   selectAttachments: () => ipcRenderer.invoke("demo:attachments:select"),
   selectProjectDirectory: () => ipcRenderer.invoke("demo:project:select"),
   createAndCheckoutBranch: (input) =>

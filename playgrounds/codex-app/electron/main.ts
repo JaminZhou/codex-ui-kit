@@ -48,6 +48,7 @@ const rendererEntryPath = join(rendererDirectory, "index.html");
 const preloadPath = join(currentDirectory, "preload.cjs");
 const workspaceDirectory =
   process.env.CODEX_UI_KIT_WORKSPACE ?? resolve(currentDirectory, "../../..");
+process.env.CODEX_DEMO_WORKSPACE_PROJECT_PATH = workspaceDirectory;
 const startupWorkspaceProjectToken = "startup-workspace";
 const trustedProjectDirectories = new Map<string, string>([
   [startupWorkspaceProjectToken, workspaceDirectory],

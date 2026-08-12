@@ -4770,7 +4770,7 @@ export function App() {
   const createdWorkspaceProject = createdProjects.find(
     ({ id }) => id === workspaceProjectId,
   );
-  const workspaceProject =
+  const workspaceProjectFixture =
     workspaceProjectId === null
       ? undefined
       : createdWorkspaceProject
@@ -4782,6 +4782,16 @@ export function App() {
         : (workspaceProjects.find(
             ({ id }) => id === workspaceProjectId,
           ) ?? workspaceProjects[0]);
+  const workspaceProject =
+    workspaceProjectFixture &&
+    workspaceUsesHostBranches &&
+    window.codexDemo &&
+    workspaceProjectId === window.codexDemo.workspaceProjectId
+      ? {
+          ...workspaceProjectFixture,
+          path: window.codexDemo.workspaceProjectPath,
+        }
+      : workspaceProjectFixture;
   const createdProjectBranches = workspaceProjectId
     ? (workspaceCreatedBranches[workspaceProjectId] ?? [])
     : [];
@@ -5112,7 +5122,10 @@ export function App() {
       setActiveFrame("workspace-branch-switch-error");
       return;
     }
-    if (workspaceEnvironmentId === "worktree") {
+    if (
+      workspaceUsesHostBranches ||
+      workspaceEnvironmentId === "worktree"
+    ) {
       setWorkspaceEnvironmentId("local");
     }
     setWorkspaceWorktreeId(

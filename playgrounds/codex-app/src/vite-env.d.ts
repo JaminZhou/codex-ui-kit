@@ -8,6 +8,7 @@ interface CodexDemoBridge {
   useWorkspaceBranchFixture: boolean;
   startupWorkspaceProjectToken: string;
   workspaceProjectId: string;
+  workspaceProjectPath: string;
   createAndCheckoutBranch(input: {
     branchName: string;
     projectToken: string;

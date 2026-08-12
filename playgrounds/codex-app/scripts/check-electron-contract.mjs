@@ -4755,7 +4755,7 @@ try {
     );
   if (
     workspaceCommandCwds.some(
-      (cwd) => cwd !== "cwd\n/workspace/codex-app-server-client",
+      (cwd) => cwd !== `cwd\n${codingWorkspaceGitDirectory}`,
     )
   ) {
     throw new Error(
@@ -4891,6 +4891,9 @@ try {
   await cloudWorkspacePage.waitForSelector(
     'button[aria-label="Change worktree: feat/current-workspace-entry-refresh"]',
   );
+  await cloudWorkspacePage.waitForSelector(
+    'button[aria-label="Change run location: Local"]',
+  );
   await cloudWorkspacePage
     .getByRole("textbox", { name: "Do anything" })
     .fill("Run the cloud worktree lifecycle.");
@@ -4909,13 +4912,11 @@ try {
     );
   if (
     cloudWorkspaceCommandCwds.some(
-      (cwd) =>
-        cwd !==
-        "cwd\n/cloud/codex-ui-kit/.worktrees/feat-current-workspace-entry-refresh",
+      (cwd) => cwd !== `cwd\n${cloudWorkspaceGitDirectory}`,
     )
   ) {
     throw new Error(
-      `Electron cloud coding workspace discarded the selected worktree: ${JSON.stringify(cloudWorkspaceCommandCwds)}.`,
+      `Electron host checkout did not restore the trusted local project route: ${JSON.stringify(cloudWorkspaceCommandCwds)}.`,
     );
   }
 } finally {

@@ -773,6 +773,8 @@ remain untracked.
   until the host binds a trusted directory token.
   Host-switched branches keep command routing on the project directory; only
   actual worktree selections derive a `.worktrees/...` execution path.
+  Selecting a host branch from a Codex web run location restores Local and the
+  trusted startup project path before the next command is routed.
   Detached and unborn HEAD states remain branch-creation-capable instead of
   being collapsed into a repository-unavailable error; unborn symbolic names
   are shown as context, not advertised as selectable refs.

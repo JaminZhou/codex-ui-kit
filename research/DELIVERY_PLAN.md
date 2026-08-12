@@ -409,6 +409,8 @@ project directory instead of deriving a nonexistent worktree path; detached
 and unborn HEAD states still allow new-branch creation. Blank, error, and
 created states extend the reviewed matrix to 166 frames; the local-only dialog
 crop passes at 3.0916%.
+Host-backed branch selection also restores the Local run location and trusted
+project cwd when the Composer was previously set to Codex web.
 Current-product create submission is still pending the isolated native
 directory selection, so this is not yet a claim that branch mutation/
 persistence is complete in the product runtime.
