@@ -4855,6 +4855,54 @@ export function App() {
       ? workspaceHostBranchState.branchesUnavailableForCheckout
       : [],
   );
+  const workspaceLocalEnvironmentGroups = workspaceEnvironmentGroups.map(
+    (group) => {
+      if (!workspaceUsesHostBranches || group.id !== workspaceProjectId) {
+        return group;
+      }
+      const [currentCheckout, ...linkedWorktrees] = group.items;
+      if (!currentCheckout) return group;
+      if (workspaceHostBranchState?.status !== "ready") {
+        return {
+          ...group,
+          items: [
+            {
+              ...currentCheckout,
+              disabled: true,
+              meta: "Loading Git branches",
+              status: "unavailable" as const,
+            },
+            ...linkedWorktrees,
+          ],
+        };
+      }
+      const currentBranch = workspaceHostBranchState.currentBranch;
+      const currentItem = currentBranch
+        ? {
+            ...currentCheckout,
+            branch: currentBranch,
+            id: workspaceGitBranchId(currentBranch),
+            label: currentBranch === "main" ? "Main" : "Current checkout",
+            meta: "current",
+            textValue:
+              currentBranch === "main" ? "Main" : "Current checkout",
+          }
+        : {
+            ...currentCheckout,
+            branch:
+              workspaceHostBranchState.unbornBranch ?? "Detached HEAD",
+            id: unattachedWorkspaceBranchId,
+            label: workspaceHostBranchState.unbornBranch
+              ? "Unborn checkout"
+              : "Detached HEAD",
+            meta: "current",
+            textValue: workspaceHostBranchState.unbornBranch
+              ? "Unborn checkout"
+              : "Detached HEAD",
+          };
+      return { ...group, items: [currentItem, ...linkedWorktrees] };
+    },
+  );
   const workspaceBranchOperationsAvailable =
     !workspaceUsesHostBranches ||
     Boolean(
@@ -5780,7 +5828,7 @@ export function App() {
             Create worktree
           </Button>
         }
-        groups={workspaceEnvironmentGroups}
+        groups={workspaceLocalEnvironmentGroups}
         id="demo-workspace-local-environment-dialog"
         onOpenChange={(open) => {
           if (open) {
@@ -5793,7 +5841,11 @@ export function App() {
         onSelect={(groupId, itemId) => {
           updateWorkspaceProjectId(groupId);
           setWorkspaceEnvironmentId("local");
-          updateWorkspaceWorktreeId(itemId, true);
+          updateWorkspaceWorktreeId(
+            itemId,
+            !workspaceUsesHostBranches ||
+              !hostSelectionUsesInPlaceBranch(itemId),
+          );
           closeWorkspaceLocalEnvironment();
         }}
         open={workspaceLocalEnvironmentOpen}

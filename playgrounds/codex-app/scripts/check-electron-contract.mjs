@@ -4992,6 +4992,82 @@ try {
   });
 }
 
+const currentCheckoutGitDirectory = await mkdtemp(
+  join(tmpdir(), "codex-ui-kit-electron-current-checkout-"),
+);
+await execFileAsync("git", ["init", "-b", "main"], {
+  cwd: currentCheckoutGitDirectory,
+});
+await execFileAsync(
+  "git",
+  [
+    "-c",
+    "user.name=Codex UI Kit",
+    "-c",
+    "user.email=codex-ui-kit@example.invalid",
+    "commit",
+    "--allow-empty",
+    "-m",
+    "test: initialize current checkout fixture",
+  ],
+  { cwd: currentCheckoutGitDirectory },
+);
+await execFileAsync("git", ["switch", "-c", "feat/current-host-checkout"], {
+  cwd: currentCheckoutGitDirectory,
+});
+const currentCheckoutScene = {
+  frame: "workspace-environment",
+  id: "electron-current-checkout-environment",
+  scenario: "workspace-workflow",
+  view: "workspace",
+};
+const {
+  app: currentCheckoutApp,
+  page: currentCheckoutPage,
+} = await launchScene(currentCheckoutScene, {
+  capture: false,
+  environment: {
+    CODEX_UI_KIT_WORKSPACE: currentCheckoutGitDirectory,
+  },
+});
+try {
+  const currentCheckoutDialog = currentCheckoutPage.getByRole("dialog", {
+    name: "Select local environment",
+  });
+  const currentCheckoutItem = currentCheckoutDialog.getByRole("button", {
+    name: "Use local environment Current checkout",
+  });
+  await currentCheckoutItem.waitFor();
+  if (
+    (await currentCheckoutItem.locator("code").textContent())?.trim() !==
+    "feat/current-host-checkout"
+  ) {
+    throw new Error(
+      "Electron local environment dialog did not expose the real current branch.",
+    );
+  }
+  await currentCheckoutItem.click();
+  await currentCheckoutPage.waitForSelector(
+    'button[aria-label="Change worktree: feat/current-host-checkout"]',
+  );
+  const selectedCurrentCheckout = await execFileAsync(
+    "git",
+    ["branch", "--show-current"],
+    { cwd: currentCheckoutGitDirectory, encoding: "utf8" },
+  );
+  if (selectedCurrentCheckout.stdout.trim() !== "feat/current-host-checkout") {
+    throw new Error(
+      `Electron current-checkout selection changed the host branch: ${selectedCurrentCheckout.stdout.trim()}.`,
+    );
+  }
+} finally {
+  await currentCheckoutApp.close();
+  await rm(currentCheckoutGitDirectory, {
+    force: true,
+    recursive: true,
+  });
+}
+
 const linkedWorktreeGitDirectory = await mkdtemp(
   join(tmpdir(), "codex-ui-kit-electron-linked-worktree-"),
 );
