@@ -1578,6 +1578,14 @@ export function App() {
   const [createdProject, setCreatedProject] = useState<
     { id: string; label: string; path: string } | undefined
   >();
+  const [projectIndexChat, setProjectIndexChat] = useState<
+    | {
+        chatId: string;
+        chatLabel: string;
+        projectId: string;
+      }
+    | undefined
+  >();
   const [projectCreationStatus, setProjectCreationStatus] = useState<
     "error" | "idle" | "selecting"
   >("idle");
@@ -2190,6 +2198,7 @@ export function App() {
     cancelReplaySubmitTimer();
     setMode("replay");
     setView("workspace");
+    setProjectIndexChat(undefined);
     setWorkspaceProjectId(projectId);
     setWorkspaceEnvironmentId("local");
     setWorkspaceWorktreeId("main");
@@ -2225,6 +2234,7 @@ export function App() {
     cancelReplaySubmitTimer();
     setMode("replay");
     setView("projects");
+    setProjectIndexChat(undefined);
     setProjectIndexQuery("");
     setProjectIndexSortBy("updated");
     setProjectIndexSortDirection("descending");
@@ -2254,6 +2264,7 @@ export function App() {
       const id = `created:${selection.path}`;
       setCreatedProject({ id, ...selection });
       setView("workspace");
+      setProjectIndexChat(undefined);
       setWorkspaceProjectId(id);
       setWorkspaceEnvironmentId("local");
       setWorkspaceWorktreeId("main");
@@ -2267,6 +2278,23 @@ export function App() {
     } catch {
       setProjectCreationStatus("error");
     }
+  };
+
+  const openProjectIndexChat = (projectId: string, chatId: string) => {
+    const project = currentProjectIndexItems.find(
+      (candidate) => candidate.id === projectId,
+    );
+    const chat = project?.recentChats.find(
+      (candidate) => candidate.id === chatId,
+    );
+    if (!project || !chat) return;
+    openWorkspace(projectId);
+    setProjectIndexChat({
+      chatId,
+      chatLabel: chat.label,
+      projectId,
+    });
+    setActiveFrame("projects-index-chat");
   };
 
   const selectScenario = (
@@ -4531,7 +4559,9 @@ export function App() {
           .includes(workspaceBranchQuery.trim().toLocaleLowerCase()),
     );
   const workspaceBaseFrame =
-    currentWorkspacePersistenceFrame(activeFrame)
+    projectIndexChat
+      ? "projects-index-chat"
+      : currentWorkspacePersistenceFrame(activeFrame)
       ? activeFrame
       : initialSelection.frame === "workspace-compact-ready"
       ? "workspace-compact-ready"
@@ -5274,9 +5304,44 @@ export function App() {
       </ConversationThreadShell>
     </div>
   );
-  const workspaceRoute = workspacePersistenceFrame
-    ? workspacePersistedThread
-    : workspaceNewConversationRoute;
+  const projectIndexChatRoute = projectIndexChat ? (
+    <div
+      className="demo-workspace-route demo-project-index-chat-route"
+      data-chat-id={projectIndexChat.chatId}
+      data-project-id={projectIndexChat.projectId}
+    >
+      <ConversationThreadShell
+        className="demo-project-index-chat-thread"
+        composer={workspaceComposer}
+        header={
+          <ThreadHeader
+            startActions={
+              <button aria-label="Thread actions" type="button">
+                <SidebarGlyph name="more-current" />
+              </button>
+            }
+            title={projectIndexChat.chatLabel}
+          />
+        }
+        label={`Project chat ${projectIndexChat.chatLabel}`}
+        threadWidth="wide"
+      >
+        <AgentTurn aria-label="Project chat transcript">
+          <AgentMessage role="user">
+            Continue this project conversation from the saved context.
+          </AgentMessage>
+          <AgentMessage role="assistant">
+            The selected project chat is ready to continue.
+          </AgentMessage>
+        </AgentTurn>
+      </ConversationThreadShell>
+    </div>
+  ) : null;
+  const workspaceRoute = projectIndexChatRoute
+    ? projectIndexChatRoute
+    : workspacePersistenceFrame
+      ? workspacePersistedThread
+      : workspaceNewConversationRoute;
 
   const projectIndexStatus =
     activeFrame === "projects-index-loading"
@@ -5286,7 +5351,22 @@ export function App() {
         : activeFrame === "projects-index-partial-error"
           ? ("partial-error" as const)
           : ("ready" as const);
-  const filteredProjectIndexItems = currentProjectIndexItems
+  const projectIndexSourceItems = createdProject
+    ? [
+        {
+          id: createdProject.id,
+          kindLabel: "Local",
+          label: createdProject.label,
+          path: createdProject.path,
+          recentChats: [],
+          status: "available" as const,
+          updated: "Now",
+          updatedOrder: 5,
+        },
+        ...currentProjectIndexItems,
+      ]
+    : currentProjectIndexItems;
+  const filteredProjectIndexItems = projectIndexSourceItems
     .filter(({ label, path }) => {
       const query = projectIndexQuery.trim().toLocaleLowerCase();
       return (
@@ -5353,7 +5433,7 @@ export function App() {
             return next;
           })
         }
-        onOpenRecentChat={(projectId) => openWorkspace(projectId)}
+        onOpenRecentChat={openProjectIndexChat}
         onSelect={openWorkspace}
         onSortChange={(nextSort) => {
           if (projectIndexSortBy === nextSort) {

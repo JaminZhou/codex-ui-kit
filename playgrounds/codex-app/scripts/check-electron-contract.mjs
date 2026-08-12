@@ -7536,7 +7536,7 @@ const projectCreationScene = {
 const { app: projectCreationApp, page: projectCreationPage } =
   await launchScene(projectCreationScene, {
     environment: {
-      CODEX_DEMO_PROJECT_FIXTURE_PATH: resolve(process.cwd(), "../.."),
+      CODEX_DEMO_PROJECT_FIXTURE_PATH: resolve(process.cwd(), "scripts"),
     },
   });
 try {
@@ -7558,7 +7558,7 @@ try {
     '.demo-root[data-view="workspace"][data-frame="workspace-project-created"]',
   );
   const createdProjectTrigger = projectCreationPage.getByRole("button", {
-    name: "Change project: codex-ui-kit",
+    name: "Change project: scripts",
   });
   if (
     !(await createdProjectTrigger.isVisible()) ||
@@ -7566,6 +7566,72 @@ try {
   ) {
     throw new Error(
       "Electron project-directory selection did not return to the created workspace.",
+    );
+  }
+  await projectCreationPage
+    .getByRole("button", { name: "View projects" })
+    .click();
+  await projectCreationPage.waitForSelector(
+    '.demo-root[data-view="projects"][data-frame="projects-index-ready"]',
+  );
+  if (
+    !(await projectCreationPage
+      .getByRole("button", { name: "Open project scripts" })
+      .isVisible())
+  ) {
+    throw new Error(
+      "Electron created project did not appear in the project index.",
+    );
+  }
+
+  await projectCreationPage
+    .getByRole("button", {
+      name: "Show recent chats in codex-ui-kit",
+    })
+    .click();
+  await projectCreationPage
+    .getByRole("button", {
+      name: "Open chat Match the current projects index",
+    })
+    .click();
+  await projectCreationPage.waitForSelector(
+    '.demo-root[data-view="workspace"][data-frame="projects-index-chat"] .demo-project-index-chat-route[data-project-id="codex-ui-kit"][data-chat-id="project-index-parity"]',
+  );
+  if (
+    !(await projectCreationPage
+      .locator(".demo-project-index-chat-route")
+      .getByText("Match the current projects index", { exact: true })
+      .isVisible())
+  ) {
+    throw new Error(
+      "Electron project-index chat route did not retain the selected chat label.",
+    );
+  }
+
+  await projectCreationPage
+    .getByRole("button", { name: "View projects" })
+    .click();
+  await projectCreationPage
+    .getByRole("button", {
+      name: "Show recent chats in codex-ui-kit",
+    })
+    .click();
+  await projectCreationPage
+    .getByRole("button", {
+      name: "Open chat Verify sidebar project behavior",
+    })
+    .click();
+  await projectCreationPage.waitForSelector(
+    '.demo-root[data-view="workspace"][data-frame="projects-index-chat"] .demo-project-index-chat-route[data-project-id="codex-ui-kit"][data-chat-id="sidebar-contract"]',
+  );
+  if (
+    !(await projectCreationPage
+      .locator(".demo-project-index-chat-route")
+      .getByText("Verify sidebar project behavior", { exact: true })
+      .isVisible())
+  ) {
+    throw new Error(
+      "Electron project-index routing collapsed distinct recent chats onto one workspace route.",
     );
   }
 } finally {
