@@ -114,7 +114,12 @@ type BranchCreationResponse =
   | { code: string; message: string; ok: false };
 
 type BranchListResponse =
-  | { branches: string[]; currentBranch: string | null; ok: true }
+  | {
+      branches: string[];
+      currentBranch: string | null;
+      ok: true;
+      unbornBranch: string | null;
+    }
   | { code: string; message: string; ok: false };
 
 function assertStartInput(value: unknown): asserts value is StartLiveInput {

@@ -1399,6 +1399,7 @@ type WorkspaceHostBranchState =
       branches: string[];
       currentBranch: string | null;
       status: "ready";
+      unbornBranch: string | null;
     }
   | { message: string; status: "error" };
 
@@ -1416,13 +1417,20 @@ function workspaceGitBranch(branch: string): WorkspaceBranch {
   };
 }
 
-const unattachedWorkspaceBranch: WorkspaceBranch = {
-  branch: "Detached HEAD",
-  id: "git:detached-head",
-  label: "Detached HEAD",
-  meta: "unattached",
-  status: "available",
-};
+const unattachedWorkspaceBranchId = "git:unattached-head";
+
+function unattachedWorkspaceBranch(
+  unbornBranch: string | null,
+): WorkspaceBranch {
+  const label = unbornBranch ? `${unbornBranch} (unborn)` : "Detached HEAD";
+  return {
+    branch: label,
+    id: unattachedWorkspaceBranchId,
+    label,
+    meta: "unattached",
+    status: "available",
+  };
+}
 
 const workspaceBranches: WorkspaceBranch[] = [
   {
@@ -2259,13 +2267,14 @@ export function App() {
             branches: response.branches,
             currentBranch: response.currentBranch,
             status: "ready",
+            unbornBranch: response.unbornBranch,
           },
         }));
         if (workspaceProjectIdRef.current === projectId) {
           setWorkspaceWorktreeId(
             response.currentBranch
               ? workspaceGitBranchId(response.currentBranch)
-              : unattachedWorkspaceBranch.id,
+              : unattachedWorkspaceBranchId,
           );
         }
       })
@@ -4798,7 +4807,11 @@ export function App() {
         ? [
             ...(workspaceHostBranchState.currentBranch
               ? []
-              : [unattachedWorkspaceBranch]),
+              : [
+                  unattachedWorkspaceBranch(
+                    workspaceHostBranchState.unbornBranch,
+                  ),
+                ]),
             ...workspaceHostBranchState.branches.map(workspaceGitBranch),
           ]
         : [workspaceBranches[0]]
@@ -4839,7 +4852,7 @@ export function App() {
   const filteredWorkspaceWorktrees =
     workspaceWorktrees.filter(
       ({ branch, id, label, status }) =>
-        id !== unattachedWorkspaceBranch.id &&
+        id !== unattachedWorkspaceBranchId &&
         status !== "repairing" &&
         `${branch} ${label}`
           .toLocaleLowerCase()
@@ -4991,24 +5004,38 @@ export function App() {
       meta: "clean",
       status: "available",
     };
+    let selectedBranchId = createdBranch.id;
     if (workspaceUsesHostBranches) {
-      setWorkspaceHostBranchesByProject((current) => {
-        const previous = current[projectId];
-        const branches =
-          previous?.status === "ready"
-            ? previous.branches
-            : [response.branch];
-        return {
-          ...current,
-          [projectId]: {
-            branches: Array.from(
-              new Set([...branches, response.branch]),
-            ).sort(),
-            currentBranch: response.branch,
+      const previous = workspaceHostBranchesByProject[projectId];
+      let nextState: WorkspaceHostBranchState = {
+        branches: previous?.status === "ready" ? previous.branches : [],
+        currentBranch: null,
+        status: "ready",
+        unbornBranch: response.branch,
+      };
+      try {
+        const listed = await window.codexDemo?.listBranches({
+          projectToken: projectToken ?? "",
+        });
+        if (listed?.ok) {
+          nextState = {
+            branches: listed.branches,
+            currentBranch: listed.currentBranch,
             status: "ready",
-          },
-        };
-      });
+            unbornBranch: listed.unbornBranch,
+          };
+        }
+      } catch {
+        // The successful switch remains represented as an uncommitted ref.
+      }
+      setWorkspaceHostBranchesByProject((current) => ({
+        ...current,
+        [projectId]: nextState,
+      }));
+      selectedBranchId =
+        nextState.status === "ready" && nextState.currentBranch
+          ? workspaceGitBranchId(nextState.currentBranch)
+          : unattachedWorkspaceBranchId;
     } else {
       setWorkspaceCreatedBranches((current) => ({
         ...current,
@@ -5021,7 +5048,7 @@ export function App() {
       }));
     }
     setWorkspaceEnvironmentId("local");
-    setWorkspaceWorktreeId(createdBranch.id);
+    setWorkspaceWorktreeId(selectedBranchId);
     setWorkspaceBranchDialogOpen(false);
     setWorkspaceBranchName("");
     setWorkspaceBranchStatus("idle");
@@ -5072,6 +5099,7 @@ export function App() {
           [initiatingProjectId]: {
             ...previous,
             currentBranch: response.branch,
+            unbornBranch: null,
           },
         };
       });

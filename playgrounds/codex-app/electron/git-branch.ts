@@ -11,6 +11,7 @@ export interface GitBranchCreationResult {
 export interface GitBranchListResult {
   branches: string[];
   currentBranch: string | null;
+  unbornBranch: string | null;
 }
 
 export class GitBranchCreationError extends Error {
@@ -131,12 +132,11 @@ export async function listGitBranches(
       .split(/\r?\n/)
       .map((branch) => branch.trim())
       .filter(Boolean);
-    const availableBranches = currentBranch
-      ? Array.from(new Set([...branches, currentBranch])).sort()
-      : branches;
+    const attached = Boolean(currentBranch && branches.includes(currentBranch));
     return {
-      branches: availableBranches,
-      currentBranch: currentBranch || null,
+      branches,
+      currentBranch: attached ? currentBranch : null,
+      unbornBranch: currentBranch && !attached ? currentBranch : null,
     };
   } catch (error) {
     if (error instanceof GitBranchCreationError) throw error;

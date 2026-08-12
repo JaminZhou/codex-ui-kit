@@ -8257,6 +8257,71 @@ try {
   await rm(detachedBranchGitDirectory, { force: true, recursive: true });
 }
 
+const unbornBranchGitDirectory = await mkdtemp(
+  join(tmpdir(), "codex-ui-kit-electron-unborn-branch-"),
+);
+await execFileAsync("git", ["init", "-b", "main"], {
+  cwd: unbornBranchGitDirectory,
+});
+const unbornBranchScene = {
+  frame: "workspace-ready",
+  id: "electron-unborn-branch-creation",
+  scenario: "workspace-workflow",
+  view: "workspace",
+};
+const { app: unbornBranchApp, page: unbornBranchPage } = await launchScene(
+  unbornBranchScene,
+  {
+    capture: false,
+    environment: {
+      CODEX_UI_KIT_WORKSPACE: unbornBranchGitDirectory,
+    },
+  },
+);
+try {
+  const unbornBranchControl = unbornBranchPage.getByRole("button", {
+    name: "Change worktree: main (unborn)",
+  });
+  await unbornBranchControl.waitFor({ state: "visible" });
+  await unbornBranchControl.click();
+  const unbornBranchMenu = unbornBranchPage.getByRole("menu", {
+    name: "Branches",
+  });
+  if ((await unbornBranchMenu.getByRole("menuitemradio").count()) !== 0) {
+    throw new Error(
+      "Electron exposed an unborn symbolic branch as a selectable local ref.",
+    );
+  }
+  await unbornBranchMenu
+    .getByRole("menuitem", { name: "Create and checkout new branch…" })
+    .click();
+  const unbornBranchDialog = unbornBranchPage.getByRole("dialog", {
+    name: "Create and checkout branch",
+  });
+  await unbornBranchDialog
+    .getByRole("textbox", { name: "Branch name" })
+    .fill("feat/from-unborn");
+  await unbornBranchDialog
+    .getByRole("button", { name: "Create and checkout" })
+    .click();
+  await unbornBranchPage.waitForSelector(
+    'button[aria-label="Change worktree: feat/from-unborn (unborn)"]',
+  );
+  const unbornCreatedBranch = await execFileAsync(
+    "git",
+    ["branch", "--show-current"],
+    { cwd: unbornBranchGitDirectory, encoding: "utf8" },
+  );
+  if (unbornCreatedBranch.stdout.trim() !== "feat/from-unborn") {
+    throw new Error(
+      `Electron did not create an unborn branch: ${unbornCreatedBranch.stdout.trim()}.`,
+    );
+  }
+} finally {
+  await unbornBranchApp.close();
+  await rm(unbornBranchGitDirectory, { force: true, recursive: true });
+}
+
 const knownProjectCreationScene = {
   frame: "workspace-project-menu",
   id: "electron-known-project-creation",

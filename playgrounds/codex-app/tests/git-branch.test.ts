@@ -62,6 +62,7 @@ describe("Git branch creation", () => {
     await expect(listGitBranches(repository)).resolves.toEqual({
       branches: ["feat/current-branch", "main"],
       currentBranch: "main",
+      unbornBranch: null,
     });
     const checkedOut = await execFileAsync(
       "git",
@@ -120,6 +121,7 @@ describe("Git branch creation", () => {
     await expect(listGitBranches(detachedRepository)).resolves.toEqual({
       branches: ["main"],
       currentBranch: null,
+      unbornBranch: null,
     });
     await expect(
       createAndCheckoutGitBranch(detachedRepository, "feat/from-detached"),
@@ -133,8 +135,9 @@ describe("Git branch creation", () => {
       cwd: unbornRepository,
     });
     await expect(listGitBranches(unbornRepository)).resolves.toEqual({
-      branches: ["main"],
-      currentBranch: "main",
+      branches: [],
+      currentBranch: null,
+      unbornBranch: "main",
     });
     await expect(
       createAndCheckoutGitBranch(unbornRepository, "feat/from-unborn"),
