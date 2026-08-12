@@ -1,5 +1,5 @@
 import { execFile } from "node:child_process";
-import { mkdtemp, rm } from "node:fs/promises";
+import { chmod, mkdtemp, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { promisify } from "node:util";
@@ -83,6 +83,26 @@ describe("Git branch creation", () => {
       createAndCheckoutGitBranch(repository, "main"),
     ).rejects.toMatchObject({
       code: "duplicate",
+    });
+    const { stdout } = await execFileAsync(
+      "git",
+      ["branch", "--show-current"],
+      { cwd: repository, encoding: "utf8" },
+    );
+    expect(stdout.trim()).toBe("main");
+  });
+
+  it("reconciles HEAD when a post-checkout hook returns nonzero", async () => {
+    const repository = await temporaryRepository();
+    const hook = join(repository, ".git", "hooks", "post-checkout");
+    await writeFile(hook, "#!/bin/sh\nexit 1\n", "utf8");
+    await chmod(hook, 0o755);
+
+    await expect(
+      createAndCheckoutGitBranch(repository, "feat/hook-warning"),
+    ).resolves.toEqual({ branch: "feat/hook-warning" });
+    await expect(checkoutGitBranch(repository, "main")).resolves.toEqual({
+      branch: "main",
     });
     const { stdout } = await execFileAsync(
       "git",

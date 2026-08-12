@@ -88,6 +88,32 @@ async function branchExists(cwd: string, branchName: string) {
   return branches.split(/\r?\n/).includes(branchName);
 }
 
+async function switchGitBranch(
+  cwd: string,
+  branchName: string,
+  args: readonly string[],
+  failureMessage: string,
+  mismatchMessage: string,
+) {
+  let switchFailed = false;
+  try {
+    await runGit(cwd, args);
+  } catch {
+    switchFailed = true;
+  }
+  let currentBranch: string;
+  try {
+    currentBranch = await runGit(cwd, ["branch", "--show-current"]);
+  } catch {
+    throw new GitBranchCreationError("unavailable", failureMessage);
+  }
+  if (currentBranch === branchName) return currentBranch;
+  throw new GitBranchCreationError(
+    "unavailable",
+    switchFailed ? failureMessage : mismatchMessage,
+  );
+}
+
 export async function listGitBranches(
   cwd: string,
 ): Promise<GitBranchListResult> {
@@ -131,24 +157,13 @@ export async function createAndCheckoutGitBranch(
       `A branch named ${branchName} already exists.`,
     );
   }
-  try {
-    await runGit(cwd, ["switch", "-c", branchName]);
-  } catch {
-    throw new GitBranchCreationError(
-      "unavailable",
-      "Git could not create and checkout the branch.",
-    );
-  }
-  const currentBranch = await runGit(cwd, [
-    "branch",
-    "--show-current",
-  ]);
-  if (currentBranch !== branchName) {
-    throw new GitBranchCreationError(
-      "unavailable",
-      "Git created the branch but did not report it as checked out.",
-    );
-  }
+  const currentBranch = await switchGitBranch(
+    cwd,
+    branchName,
+    ["switch", "-c", branchName],
+    "Git could not create and checkout the branch.",
+    "Git created the branch but did not report it as checked out.",
+  );
   return { branch: currentBranch };
 }
 
@@ -165,20 +180,12 @@ export async function checkoutGitBranch(
       `The branch ${branchName} is unavailable.`,
     );
   }
-  try {
-    await runGit(cwd, ["switch", branchName]);
-  } catch {
-    throw new GitBranchCreationError(
-      "unavailable",
-      "Git could not checkout the branch.",
-    );
-  }
-  const currentBranch = await runGit(cwd, ["branch", "--show-current"]);
-  if (currentBranch !== branchName) {
-    throw new GitBranchCreationError(
-      "unavailable",
-      "Git did not report the requested branch as checked out.",
-    );
-  }
+  const currentBranch = await switchGitBranch(
+    cwd,
+    branchName,
+    ["switch", branchName],
+    "Git could not checkout the branch.",
+    "Git did not report the requested branch as checked out.",
+  );
   return { branch: currentBranch };
 }
