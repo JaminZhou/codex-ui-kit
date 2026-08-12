@@ -1,6 +1,6 @@
 import { launchScene } from "./electron-harness.mjs";
 import { execFile } from "node:child_process";
-import { mkdtemp, rm } from "node:fs/promises";
+import { mkdtemp, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { promisify } from "node:util";
@@ -4135,6 +4135,24 @@ await execFileAsync(
   ["update-ref", "refs/heads/-", "HEAD"],
   { cwd: codingWorkspaceGitDirectory },
 );
+const codingWorkspaceHead = (
+  await execFileAsync("git", ["rev-parse", "HEAD"], {
+    cwd: codingWorkspaceGitDirectory,
+    encoding: "utf8",
+  })
+).stdout.trim();
+await writeFile(
+  join(codingWorkspaceGitDirectory, ".git", "packed-refs"),
+  Buffer.concat([
+    Buffer.from("# pack-refs with: peeled fully-peeled sorted \n"),
+    Buffer.from(`${codingWorkspaceHead} refs/heads/bad-`),
+    Buffer.from([0xfe]),
+    Buffer.from("\n"),
+    Buffer.from(`${codingWorkspaceHead} refs/heads/bad-`),
+    Buffer.from([0xff]),
+    Buffer.from("\n"),
+  ]),
+);
 const occupiedLinkedWorktreeBranch = "feat/linked-worktree";
 const occupiedLinkedWorktreeDirectory = join(
   codingWorkspaceGitDirectory,
@@ -4598,6 +4616,18 @@ try {
         branch: "-topic",
         checked: "false",
         disabled: false,
+      },
+      {
+        branch: "Non-UTF-8 branch [6261642dfe]",
+        checked: "false",
+        disabled: true,
+        status: "Unavailable for checkout",
+      },
+      {
+        branch: "Non-UTF-8 branch [6261642dff]",
+        checked: "false",
+        disabled: true,
+        status: "Unavailable for checkout",
       },
       {
         branch: occupiedLinkedWorktreeBranch,

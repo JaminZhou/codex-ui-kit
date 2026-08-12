@@ -1403,6 +1403,7 @@ type WorkspaceHostBranchState =
   | {
       branches: string[];
       branchesCheckedOutElsewhere: string[];
+      branchesUnavailableForCheckout: string[];
       currentBranch: string | null;
       status: "ready";
       unbornBranch: string | null;
@@ -1416,9 +1417,10 @@ function workspaceGitBranchId(branch: string) {
 function workspaceGitBranch(
   branch: string,
   branchesCheckedOutElsewhere: ReadonlySet<string>,
+  branchesUnavailableForCheckout: ReadonlySet<string>,
 ): WorkspaceBranch {
   const checkedOutInLinkedWorktree = branchesCheckedOutElsewhere.has(branch);
-  const checkoutUnavailable = branch === "-";
+  const checkoutUnavailable = branchesUnavailableForCheckout.has(branch);
   return {
     branch,
     checkedOutInLinkedWorktree,
@@ -2297,6 +2299,8 @@ export function App() {
             branches: response.branches,
             branchesCheckedOutElsewhere:
               response.branchesCheckedOutElsewhere,
+            branchesUnavailableForCheckout:
+              response.branchesUnavailableForCheckout,
             currentBranch: response.currentBranch,
             status: "ready",
             unbornBranch: response.unbornBranch,
@@ -4846,6 +4850,11 @@ export function App() {
       ? workspaceHostBranchState.branchesCheckedOutElsewhere
       : [],
   );
+  const workspaceBranchesUnavailableForCheckout = new Set(
+    workspaceHostBranchState?.status === "ready"
+      ? workspaceHostBranchState.branchesUnavailableForCheckout
+      : [],
+  );
   const workspaceBranchOperationsAvailable =
     !workspaceUsesHostBranches ||
     Boolean(
@@ -4871,6 +4880,7 @@ export function App() {
               workspaceGitBranch(
                 branch,
                 workspaceBranchesCheckedOutElsewhere,
+                workspaceBranchesUnavailableForCheckout,
               ),
             ),
           ]
@@ -5089,6 +5099,8 @@ export function App() {
             branches: listed.branches,
             branchesCheckedOutElsewhere:
               listed.branchesCheckedOutElsewhere,
+            branchesUnavailableForCheckout:
+              listed.branchesUnavailableForCheckout,
             currentBranch: listed.currentBranch,
             status: "ready",
             unbornBranch: listed.unbornBranch,

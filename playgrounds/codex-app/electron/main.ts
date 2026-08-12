@@ -121,6 +121,7 @@ type BranchListResponse =
   | {
       branches: string[];
       branchesCheckedOutElsewhere: string[];
+      branchesUnavailableForCheckout: string[];
       currentBranch: string | null;
       ok: true;
       unbornBranch: string | null;

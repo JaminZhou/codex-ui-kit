@@ -15,6 +15,7 @@ export interface GitBranchCreationResult {
 export interface GitBranchListResult {
   branches: string[];
   branchesCheckedOutElsewhere: string[];
+  branchesUnavailableForCheckout: string[];
   currentBranch: string | null;
   unbornBranch: string | null;
 }
@@ -52,7 +53,7 @@ export function decodeGitOutput(chunks: readonly Uint8Array[]) {
     .replace(/(?:\r?\n)+$/g, "");
 }
 
-async function runGit(
+async function runGitOutput(
   cwd: string,
   args: readonly string[],
   options: GitCommandOptions,
@@ -64,7 +65,7 @@ async function runGit(
     requestedTimeoutMs > 0
       ? requestedTimeoutMs
       : defaultGitCommandTimeoutMs;
-  return new Promise<string>((resolve, reject) => {
+  return new Promise<Buffer>((resolve, reject) => {
     let failure: Error | undefined;
     let finished = false;
     let forcedSettlementTimer: ReturnType<typeof setTimeout> | undefined;
@@ -115,7 +116,7 @@ async function runGit(
       clearTimers();
       reject(error);
     };
-    const resolveOnce = (value: string) => {
+    const resolveOnce = (value: Buffer) => {
       if (finished) return;
       finished = true;
       clearTimers();
@@ -154,7 +155,7 @@ async function runGit(
         rejectOnce(new Error(`Git exited with status ${code ?? "unknown"}.`));
         return;
       }
-      resolveOnce(decodeGitOutput(stdoutChunks));
+      resolveOnce(Buffer.concat(stdoutChunks));
     });
     timer = setTimeout(() => {
       terminateAndBoundSettlement(
@@ -165,6 +166,47 @@ async function runGit(
       );
     }, timeoutMs);
   });
+}
+
+async function runGit(
+  cwd: string,
+  args: readonly string[],
+  options: GitCommandOptions,
+) {
+  return decodeGitOutput([await runGitOutput(cwd, args, options)]);
+}
+
+const strictUtf8Decoder = new TextDecoder("utf-8", { fatal: true });
+
+function branchNameFromBytes(value: Buffer) {
+  try {
+    return { name: strictUtf8Decoder.decode(value), unavailable: false };
+  } catch {
+    return {
+      name: `Non-UTF-8 branch [${value.toString("hex")}]`,
+      unavailable: true,
+    };
+  }
+}
+
+function splitBuffer(value: Buffer, separator: number) {
+  const records: Buffer[] = [];
+  let start = 0;
+  for (let index = 0; index < value.length; index += 1) {
+    if (value[index] !== separator) continue;
+    records.push(value.subarray(start, index));
+    start = index + 1;
+  }
+  if (start < value.length) records.push(value.subarray(start));
+  return records;
+}
+
+function trimGitRecordEnding(value: Buffer) {
+  let end = value.length;
+  while (end > 0 && (value[end - 1] === 0x0a || value[end - 1] === 0x0d)) {
+    end -= 1;
+  }
+  return value.subarray(0, end);
 }
 
 async function assertGitRepository(cwd: string, options: GitCommandOptions) {
@@ -316,8 +358,8 @@ export async function listGitBranches(
 ): Promise<GitBranchListResult> {
   await assertGitRepository(cwd, options);
   try {
-    const [branchOutput, currentBranch, worktreeOutput] = await Promise.all([
-      runGit(
+    const [branchOutput, currentBranchOutput, worktreeOutput] = await Promise.all([
+      runGitOutput(
         cwd,
         [
           "for-each-ref",
@@ -326,25 +368,40 @@ export async function listGitBranches(
         ],
         options,
       ),
-      runGit(cwd, ["branch", "--show-current"], options),
-      runGit(cwd, ["worktree", "list", "--porcelain", "-z"], options),
+      runGitOutput(cwd, ["branch", "--show-current"], options),
+      runGitOutput(cwd, ["worktree", "list", "--porcelain", "-z"], options),
     ]);
-    const branches = branchOutput
-      .split(/\r?\n/)
-      .filter(Boolean);
+    const branchItems = splitBuffer(branchOutput, 0x0a)
+      .filter((record) => record.length > 0)
+      .map(branchNameFromBytes);
+    const branches = branchItems.map(({ name }) => name);
+    const currentBranchRecord = trimGitRecordEnding(currentBranchOutput);
+    const currentBranch = currentBranchRecord.length
+      ? branchNameFromBytes(currentBranchRecord).name
+      : "";
     const attached = Boolean(currentBranch && branches.includes(currentBranch));
-    const worktreeBranchPrefix = "branch refs/heads/";
+    const worktreeBranchPrefix = Buffer.from("branch refs/heads/");
     const checkedOutBranches = new Set(
-      worktreeOutput
-        .split("\0")
-        .filter((field) => field.startsWith(worktreeBranchPrefix))
-        .map((field) => field.slice(worktreeBranchPrefix.length)),
+      splitBuffer(worktreeOutput, 0x00)
+        .filter(
+          (field) =>
+            field.length >= worktreeBranchPrefix.length &&
+            field.subarray(0, worktreeBranchPrefix.length).equals(
+              worktreeBranchPrefix,
+            ),
+        )
+        .map((field) =>
+          branchNameFromBytes(field.subarray(worktreeBranchPrefix.length)).name,
+        ),
     );
     return {
       branches,
       branchesCheckedOutElsewhere: branches.filter(
         (branch) => branch !== currentBranch && checkedOutBranches.has(branch),
       ),
+      branchesUnavailableForCheckout: branchItems
+        .filter(({ name, unavailable }) => unavailable || name === "-")
+        .map(({ name }) => name),
       currentBranch: attached ? currentBranch : null,
       unbornBranch: currentBranch && !attached ? currentBranch : null,
     };

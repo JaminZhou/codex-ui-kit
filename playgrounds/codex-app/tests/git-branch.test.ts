@@ -72,6 +72,7 @@ describe("Git branch creation", () => {
     await expect(listGitBranches(repository)).resolves.toEqual({
       branches: ["feat/current-branch", "main"],
       branchesCheckedOutElsewhere: [],
+      branchesUnavailableForCheckout: [],
       currentBranch: "main",
       unbornBranch: null,
     });
@@ -117,6 +118,7 @@ describe("Git branch creation", () => {
     await expect(listGitBranches(repository)).resolves.toEqual({
       branches: ["main"],
       branchesCheckedOutElsewhere: [],
+      branchesUnavailableForCheckout: [],
       currentBranch: "main",
       unbornBranch: null,
     });
@@ -129,6 +131,7 @@ describe("Git branch creation", () => {
     await expect(listGitBranches(repository)).resolves.toEqual({
       branches: ["main"],
       branchesCheckedOutElsewhere: [],
+      branchesUnavailableForCheckout: [],
       currentBranch: "main",
       unbornBranch: null,
     });
@@ -148,6 +151,7 @@ describe("Git branch creation", () => {
     await expect(listGitBranches(repository)).resolves.toEqual({
       branches: ["-topic", "main"],
       branchesCheckedOutElsewhere: [],
+      branchesUnavailableForCheckout: [],
       currentBranch: "main",
       unbornBranch: null,
     });
@@ -170,12 +174,51 @@ describe("Git branch creation", () => {
     await expect(listGitBranches(repository)).resolves.toEqual({
       branches: ["-", "main"],
       branchesCheckedOutElsewhere: [],
+      branchesUnavailableForCheckout: ["-"],
       currentBranch: "main",
       unbornBranch: null,
     });
     await expect(checkoutGitBranch(repository, "-")).rejects.toMatchObject({
       code: "unavailable",
       message: "The branch - cannot be checked out safely.",
+    });
+    await expect(listGitBranches(repository)).resolves.toMatchObject({
+      currentBranch: "main",
+    });
+  });
+
+  it("keeps distinct non-UTF-8 refs visible but unavailable", async () => {
+    const repository = await temporaryRepository();
+    const { stdout: headOutput } = await execFileAsync(
+      "git",
+      ["rev-parse", "HEAD"],
+      { cwd: repository, encoding: "utf8" },
+    );
+    const head = headOutput.trim();
+    await writeFile(
+      join(repository, ".git", "packed-refs"),
+      Buffer.concat([
+        Buffer.from("# pack-refs with: peeled fully-peeled sorted \n"),
+        Buffer.from(`${head} refs/heads/bad-`),
+        Buffer.from([0xfe]),
+        Buffer.from("\n"),
+        Buffer.from(`${head} refs/heads/bad-`),
+        Buffer.from([0xff]),
+        Buffer.from("\n"),
+      ]),
+    );
+
+    const first = "Non-UTF-8 branch [6261642dfe]";
+    const second = "Non-UTF-8 branch [6261642dff]";
+    await expect(listGitBranches(repository)).resolves.toEqual({
+      branches: [first, second, "main"],
+      branchesCheckedOutElsewhere: [],
+      branchesUnavailableForCheckout: [first, second],
+      currentBranch: "main",
+      unbornBranch: null,
+    });
+    await expect(checkoutGitBranch(repository, first)).rejects.toMatchObject({
+      code: "invalid",
     });
     await expect(listGitBranches(repository)).resolves.toMatchObject({
       currentBranch: "main",
@@ -193,6 +236,7 @@ describe("Git branch creation", () => {
     await expect(listGitBranches(repository)).resolves.toEqual({
       branches: ["main", "topic", unicodeWhitespaceBranch],
       branchesCheckedOutElsewhere: [],
+      branchesUnavailableForCheckout: [],
       currentBranch: "main",
       unbornBranch: null,
     });
@@ -237,12 +281,14 @@ describe("Git branch creation", () => {
     await expect(listGitBranches(repository)).resolves.toEqual({
       branches: ["feat/free", "feat/linked-worktree", "main"],
       branchesCheckedOutElsewhere: ["feat/linked-worktree"],
+      branchesUnavailableForCheckout: [],
       currentBranch: "main",
       unbornBranch: null,
     });
     await expect(listGitBranches(linkedWorktree)).resolves.toEqual({
       branches: ["feat/free", "feat/linked-worktree", "main"],
       branchesCheckedOutElsewhere: ["main"],
+      branchesUnavailableForCheckout: [],
       currentBranch: "feat/linked-worktree",
       unbornBranch: null,
     });
@@ -290,6 +336,7 @@ describe("Git branch creation", () => {
     await expect(listGitBranches(detachedRepository)).resolves.toEqual({
       branches: ["main"],
       branchesCheckedOutElsewhere: [],
+      branchesUnavailableForCheckout: [],
       currentBranch: null,
       unbornBranch: null,
     });
@@ -307,6 +354,7 @@ describe("Git branch creation", () => {
     await expect(listGitBranches(unbornRepository)).resolves.toEqual({
       branches: [],
       branchesCheckedOutElsewhere: [],
+      branchesUnavailableForCheckout: [],
       currentBranch: null,
       unbornBranch: "main",
     });

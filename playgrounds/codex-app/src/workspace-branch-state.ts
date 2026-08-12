@@ -1,6 +1,7 @@
 export type ReadyWorkspaceHostBranchState = {
   branches: string[];
   branchesCheckedOutElsewhere: string[];
+  branchesUnavailableForCheckout: string[];
   currentBranch: string | null;
   status: "ready";
   unbornBranch: string | null;
@@ -20,6 +21,8 @@ export function branchStateAfterSuccessfulCreation(
     return {
       branches: previous.branches,
       branchesCheckedOutElsewhere: previous.branchesCheckedOutElsewhere,
+      branchesUnavailableForCheckout:
+        previous.branchesUnavailableForCheckout,
       currentBranch: null,
       status: "ready",
       unbornBranch: branch,
@@ -30,6 +33,10 @@ export function branchStateAfterSuccessfulCreation(
     branchesCheckedOutElsewhere: previous.branchesCheckedOutElsewhere.filter(
       (item) => item !== branch,
     ),
+    branchesUnavailableForCheckout:
+      previous.branchesUnavailableForCheckout.filter(
+        (item) => item !== branch,
+      ),
     currentBranch: branch,
     status: "ready",
     unbornBranch: null,
