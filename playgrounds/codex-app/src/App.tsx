@@ -1585,6 +1585,12 @@ export function App() {
       ? null
       : "codex-ui-kit",
   );
+  const workspaceProjectIdRef = useRef(workspaceProjectId);
+  const workspaceBranchCheckoutActiveRef = useRef(false);
+  const updateWorkspaceProjectId = (projectId: string | null) => {
+    workspaceProjectIdRef.current = projectId;
+    setWorkspaceProjectId(projectId);
+  };
   const [projectIndexQuery, setProjectIndexQuery] = useState(
     initialSelection.frame === "projects-index-empty" ? "missing" : "",
   );
@@ -2278,7 +2284,7 @@ export function App() {
     setMode("replay");
     setView("workspace");
     setProjectIndexChat(undefined);
-    setWorkspaceProjectId(projectId);
+    updateWorkspaceProjectId(projectId);
     setWorkspaceEnvironmentId("local");
     setWorkspaceWorktreeId("main");
     setWorkspaceLocalEnvironmentOpen(false);
@@ -2367,7 +2373,7 @@ export function App() {
       setMode("replay");
       setView("workspace");
       setProjectIndexChat(undefined);
-      setWorkspaceProjectId(id);
+      updateWorkspaceProjectId(id);
       setWorkspaceEnvironmentId("local");
       setWorkspaceWorktreeId("main");
       setWorkspaceLocalEnvironmentOpen(false);
@@ -4858,6 +4864,13 @@ export function App() {
     setActiveFrame("workspace-branch-created");
   };
   const selectWorkspaceBranch = async (worktree: WorkspaceBranch) => {
+    const initiatingProjectId = workspaceProjectId;
+    if (!initiatingProjectId || workspaceBranchCheckoutActiveRef.current) {
+      return;
+    }
+    const initiatingProjectToken =
+      workspaceProjectTokens[initiatingProjectId] ?? "";
+    workspaceBranchCheckoutActiveRef.current = true;
     setWorkspaceBranchSwitchError(undefined);
     setWorkspaceBranchSettingsNotice(undefined);
     let response: WorkspaceGitBranchResponse;
@@ -4865,9 +4878,7 @@ export function App() {
       response = window.codexDemo
         ? await window.codexDemo.checkoutBranch({
             branchName: worktree.branch,
-            projectToken: workspaceProjectId
-              ? (workspaceProjectTokens[workspaceProjectId] ?? "")
-              : "",
+            projectToken: initiatingProjectToken,
           })
         : { branch: worktree.branch, ok: true };
     } catch {
@@ -4876,6 +4887,11 @@ export function App() {
         message: "Git could not checkout the branch.",
         ok: false,
       };
+    } finally {
+      workspaceBranchCheckoutActiveRef.current = false;
+    }
+    if (workspaceProjectIdRef.current !== initiatingProjectId) {
+      return;
     }
     if (!response.ok) {
       setWorkspaceBranchSwitchError(response.message);
@@ -5206,7 +5222,7 @@ export function App() {
               setWorkspaceOverlayState(null);
             }}
             onSelect={(projectId) => {
-              setWorkspaceProjectId(projectId);
+              updateWorkspaceProjectId(projectId);
               setWorkspaceEnvironmentId("local");
               setWorkspaceWorktreeId("main");
               setWorkspaceOverlayState(null);
@@ -5419,7 +5435,7 @@ export function App() {
         }}
         onQueryChange={setWorkspaceEnvironmentQuery}
         onSelect={(groupId, itemId) => {
-          setWorkspaceProjectId(groupId);
+          updateWorkspaceProjectId(groupId);
           setWorkspaceEnvironmentId("local");
           setWorkspaceWorktreeId(itemId);
           closeWorkspaceLocalEnvironment();

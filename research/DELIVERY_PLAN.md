@@ -399,8 +399,9 @@ branch menu and 400×190.56 create-and-checkout dialog. The public
 Electron host validates, creates, checks out, and switches branches only in a
 host-registered project selected by an opaque token; acceptance proves routing
 across two generated disposable Git repositories and blocks dismissal while
-creation is pending. Blank, error, and created states extend the reviewed
-matrix to 166 frames; the local-only dialog crop passes at 3.0916%.
+creation is pending while retaining modal focus. Delayed checkout results are
+discarded after a project change. Blank, error, and created states extend the
+reviewed matrix to 166 frames; the local-only dialog crop passes at 3.0916%.
 Current-product create submission is still pending the isolated native
 directory selection, so this is not yet a claim that branch mutation/
 persistence is complete in the product runtime.

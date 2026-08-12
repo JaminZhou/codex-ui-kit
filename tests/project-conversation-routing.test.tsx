@@ -80,7 +80,7 @@ describe("project conversation routing", () => {
     expect(document.activeElement).toBe(trigger);
   });
 
-  it("keeps host branch errors linked to the field and blocks duplicate submission while creating", () => {
+  it("keeps host branch errors linked to the field and blocks duplicate submission while creating", async () => {
     const onCreate = vi.fn();
     const onOpenChange = vi.fn();
     render(
@@ -112,6 +112,9 @@ describe("project conversation routing", () => {
     const dialog = screen.getByRole("dialog", {
       name: "Create and checkout branch",
     });
+    await waitFor(() => expect(document.activeElement).toBe(dialog));
+    fireEvent.keyDown(dialog, { key: "Tab" });
+    expect(document.activeElement).toBe(dialog);
     fireEvent.keyDown(dialog, { key: "Escape" });
     fireEvent.pointerDown(dialog.parentElement!);
     expect(onOpenChange).not.toHaveBeenCalled();

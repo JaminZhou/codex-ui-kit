@@ -571,6 +571,7 @@ async function handleCheckoutBranch(
   }
   gitBranchOperationActive = true;
   try {
+    await delayGitBranchOperationForFixture();
     const projectDirectory = trustedProjectDirectory(rawInput.projectToken);
     const result = await checkoutGitBranch(
       projectDirectory,

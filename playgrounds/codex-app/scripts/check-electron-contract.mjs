@@ -7874,6 +7874,7 @@ const {
 } = await launchScene(createdProjectBranchScene, {
   capture: false,
   environment: {
+    CODEX_DEMO_GIT_BRANCH_DELAY_MS: "750",
     CODEX_DEMO_PROJECT_FIXTURE_PATH: createdProjectTargetGitDirectory,
     CODEX_UI_KIT_WORKSPACE: createdProjectStartupGitDirectory,
   },
@@ -7937,6 +7938,59 @@ try {
         selected: selectedBranch.stdout.trim(),
         startup: startupBranch.stdout.trim(),
       })}`,
+    );
+  }
+  await createdProjectBranchPage
+    .getByRole("button", {
+      name: "Change worktree: feat/selected-project",
+    })
+    .click();
+  await createdProjectBranchPage
+    .getByRole("menu", { name: "Branches" })
+    .getByRole("menuitemradio", { name: "main" })
+    .click();
+  await createdProjectBranchPage.waitForSelector(
+    'button[aria-label="Change worktree: main"]',
+  );
+  await createdProjectBranchPage
+    .getByRole("button", { name: "Change worktree: main" })
+    .click();
+  await createdProjectBranchPage
+    .getByRole("menu", { name: "Branches" })
+    .getByRole("menuitemradio", { name: "feat/selected-project" })
+    .click();
+  await createdProjectBranchPage
+    .locator("#demo-workspace-project-trigger")
+    .click();
+  await createdProjectBranchPage
+    .getByRole("dialog", { name: "Choose a project" })
+    .getByRole("option", {
+      exact: true,
+      name: "Select project codex-ui-kit",
+    })
+    .click();
+  let staleCheckoutBranch = "";
+  for (let attempt = 0; attempt < 30; attempt += 1) {
+    const result = await execFileAsync("git", ["branch", "--show-current"], {
+      cwd: createdProjectTargetGitDirectory,
+      encoding: "utf8",
+    });
+    staleCheckoutBranch = result.stdout.trim();
+    if (staleCheckoutBranch === "feat/selected-project") break;
+    await createdProjectBranchPage.waitForTimeout(100);
+  }
+  await createdProjectBranchPage
+    .getByRole("button", { name: "Change worktree: main" })
+    .click();
+  const currentProjectMainBranch = createdProjectBranchPage
+    .getByRole("menu", { name: "Branches" })
+    .getByRole("menuitemradio", { name: "main" });
+  if (
+    staleCheckoutBranch !== "feat/selected-project" ||
+    (await currentProjectMainBranch.getAttribute("aria-checked")) !== "true"
+  ) {
+    throw new Error(
+      "Electron stale checkout result leaked into the newly selected project.",
     );
   }
 } finally {

@@ -150,6 +150,11 @@ export function Dialog({
     };
   }, [dialogId, initialFocusSelector, open, returnFocusRef]);
 
+  useLayoutEffect(() => {
+    if (!open || !closeDisabled) return;
+    surfaceRef.current?.focus();
+  }, [closeDisabled, open]);
+
   if (!open || typeof document === "undefined") return null;
 
   const handleKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {

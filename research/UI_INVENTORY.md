@@ -366,11 +366,12 @@ remains a separate P1 slice. The public component keeps Git validation and
 mutation host-owned, while the Electron bridge creates and checks out a branch
 and switches back to `main` only through host-issued project tokens. A
 two-repository Electron check proves the selected host-registered directory is
-authoritative, and creation blocks dismissal until Git settles. Browser/CDP
-and reviewed pixels now gate 166 lifecycle frames; the local-only dialog crop
-differs by 3.0916% under an 8% ceiling. Current-product submission remains
-unpromoted until the same mutation is completed in the isolated disposable
-product repository.
+authoritative, creation retains modal focus and blocks dismissal until Git
+settles, and delayed checkout results cannot overwrite a newly selected
+project. Browser/CDP and reviewed pixels now gate 166 lifecycle frames; the
+local-only dialog crop differs by 3.0916% under an 8% ceiling. Current-product
+submission remains unpromoted until the same mutation is completed in the
+isolated disposable product repository.
 
 The current-thread slice adds `ConversationThreadShell`, which composes the
 existing header, scroll-following timeline, messages, and Composer into one
