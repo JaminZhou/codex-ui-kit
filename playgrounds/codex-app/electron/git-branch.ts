@@ -187,6 +187,14 @@ async function assertValidBranchName(
     );
   }
   try {
+    const validatedBranchName = await runGit(
+      cwd,
+      ["check-ref-format", "--branch", branchName],
+      options,
+    );
+    if (validatedBranchName !== branchName) {
+      throw new Error("Git expanded the branch shorthand.");
+    }
     await runGit(
       cwd,
       ["check-ref-format", `refs/heads/${branchName}`],

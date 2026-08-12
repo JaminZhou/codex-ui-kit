@@ -98,9 +98,11 @@ describe("Git branch creation", () => {
     await execFileAsync("git", ["switch", "--detach"], { cwd: repository });
     await execFileAsync("git", ["switch", "main"], { cwd: repository });
 
-    await expect(
-      createAndCheckoutGitBranch(repository, "@{-1}"),
-    ).rejects.toMatchObject({ code: "invalid" });
+    for (const invalidBranchName of ["@{-1}", "HEAD"]) {
+      await expect(
+        createAndCheckoutGitBranch(repository, invalidBranchName),
+      ).rejects.toMatchObject({ code: "invalid" });
+    }
     await expect(listGitBranches(repository)).resolves.toEqual({
       branches: ["main"],
       currentBranch: "main",
