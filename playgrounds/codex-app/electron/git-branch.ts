@@ -176,7 +176,10 @@ async function runGit(
   return decodeGitOutput([await runGitOutput(cwd, args, options)]);
 }
 
-const strictUtf8Decoder = new TextDecoder("utf-8", { fatal: true });
+const strictUtf8Decoder = new TextDecoder("utf-8", {
+  fatal: true,
+  ignoreBOM: true,
+});
 
 function branchNameFromBytes(value: Buffer) {
   try {

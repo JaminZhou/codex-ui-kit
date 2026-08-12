@@ -248,6 +248,43 @@ describe("Git branch creation", () => {
     });
   });
 
+  it("preserves a leading UTF-8 BOM in branch and worktree refs", async () => {
+    const repository = await temporaryRepository();
+    const bomBranch = "\ufefftopic";
+    await execFileAsync("git", ["branch", "topic"], { cwd: repository });
+    await execFileAsync("git", ["branch", bomBranch], { cwd: repository });
+
+    await expect(listGitBranches(repository)).resolves.toEqual({
+      branches: ["main", "topic", bomBranch],
+      branchesCheckedOutElsewhere: [],
+      branchesUnavailableForCheckout: [],
+      currentBranch: "main",
+      unbornBranch: null,
+    });
+    await expect(checkoutGitBranch(repository, bomBranch)).resolves.toEqual({
+      branch: bomBranch,
+    });
+    await expect(listGitBranches(repository)).resolves.toMatchObject({
+      currentBranch: bomBranch,
+    });
+
+    await expect(checkoutGitBranch(repository, "main")).resolves.toEqual({
+      branch: "main",
+    });
+    const linkedWorktree = join(repository, ".worktrees", "bom");
+    await execFileAsync("git", ["worktree", "add", linkedWorktree, bomBranch], {
+      cwd: repository,
+    });
+    await expect(listGitBranches(repository)).resolves.toMatchObject({
+      branches: ["main", "topic", bomBranch],
+      branchesCheckedOutElsewhere: [bomBranch],
+      currentBranch: "main",
+    });
+    await expect(checkoutGitBranch(repository, bomBranch)).rejects.toMatchObject({
+      code: "unavailable",
+    });
+  });
+
   it("reconciles HEAD when a post-checkout hook returns nonzero", async () => {
     const repository = await temporaryRepository();
     const hook = join(repository, ".git", "hooks", "post-checkout");
