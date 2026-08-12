@@ -120,6 +120,7 @@ type BranchCreationResponse =
 type BranchListResponse =
   | {
       branches: string[];
+      branchesCheckedOutElsewhere: string[];
       currentBranch: string | null;
       ok: true;
       unbornBranch: string | null;

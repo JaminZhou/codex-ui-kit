@@ -14,6 +14,7 @@ export interface GitBranchCreationResult {
 
 export interface GitBranchListResult {
   branches: string[];
+  branchesCheckedOutElsewhere: string[];
   currentBranch: string | null;
   unbornBranch: string | null;
 }
@@ -283,7 +284,7 @@ export async function listGitBranches(
 ): Promise<GitBranchListResult> {
   await assertGitRepository(cwd, options);
   try {
-    const [branchOutput, currentBranch] = await Promise.all([
+    const [branchOutput, currentBranch, worktreeOutput] = await Promise.all([
       runGit(
         cwd,
         [
@@ -294,13 +295,24 @@ export async function listGitBranches(
         options,
       ),
       runGit(cwd, ["branch", "--show-current"], options),
+      runGit(cwd, ["worktree", "list", "--porcelain", "-z"], options),
     ]);
     const branches = branchOutput
       .split(/\r?\n/)
       .filter(Boolean);
     const attached = Boolean(currentBranch && branches.includes(currentBranch));
+    const worktreeBranchPrefix = "branch refs/heads/";
+    const checkedOutBranches = new Set(
+      worktreeOutput
+        .split("\0")
+        .filter((field) => field.startsWith(worktreeBranchPrefix))
+        .map((field) => field.slice(worktreeBranchPrefix.length)),
+    );
     return {
       branches,
+      branchesCheckedOutElsewhere: branches.filter(
+        (branch) => branch !== currentBranch && checkedOutBranches.has(branch),
+      ),
       currentBranch: attached ? currentBranch : null,
       unbornBranch: currentBranch && !attached ? currentBranch : null,
     };

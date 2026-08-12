@@ -4125,6 +4125,23 @@ await execFileAsync(
   ],
   { cwd: codingWorkspaceGitDirectory },
 );
+const occupiedLinkedWorktreeBranch = "feat/linked-worktree";
+const occupiedLinkedWorktreeDirectory = join(
+  codingWorkspaceGitDirectory,
+  ".worktrees",
+  "linked",
+);
+await execFileAsync(
+  "git",
+  [
+    "worktree",
+    "add",
+    "-b",
+    occupiedLinkedWorktreeBranch,
+    occupiedLinkedWorktreeDirectory,
+  ],
+  { cwd: codingWorkspaceGitDirectory },
+);
 const {
   app: codingWorkspaceApp,
   page: codingWorkspacePage,
@@ -4543,18 +4560,39 @@ try {
       document.activeElement?.getAttribute("aria-label") ===
       "Search branches",
   );
-  const appServerWorktreeLabels = await worktreeMenu
+  const appServerWorktreeItems = await worktreeMenu
     .getByRole("menuitemradio")
     .evaluateAll((items) =>
-      items.map((item) =>
-        (item.textContent ?? "").replace(/[⑂✓]/g, "").trim(),
-      ),
+      items.map((item) => ({
+        branch: item
+          .querySelector(".codex-ui-menu-item__label")
+          ?.textContent?.trim(),
+        checked: item.getAttribute("aria-checked"),
+        disabled:
+          item instanceof HTMLButtonElement ? item.disabled : undefined,
+        status: item
+          .querySelector(".codex-ui-menu-item__subtext")
+          ?.textContent?.trim(),
+      })),
     );
   if (
-    JSON.stringify(appServerWorktreeLabels) !== JSON.stringify(["main"])
+    JSON.stringify(appServerWorktreeItems) !==
+    JSON.stringify([
+      {
+        branch: occupiedLinkedWorktreeBranch,
+        checked: "false",
+        disabled: true,
+        status: "Checked out in another worktree",
+      },
+      {
+        branch: "main",
+        checked: "true",
+        disabled: false,
+      },
+    ])
   ) {
     throw new Error(
-      `Electron coding workspace did not enumerate its host repository branches: ${JSON.stringify(appServerWorktreeLabels)}.`,
+      `Electron coding workspace did not classify its host repository branches: ${JSON.stringify(appServerWorktreeItems)}.`,
     );
   }
   await worktreeMenu

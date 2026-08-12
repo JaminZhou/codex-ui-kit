@@ -26,6 +26,7 @@ interface CodexDemoBridge {
   listBranches(input: { projectToken: string }): Promise<
     | {
         branches: string[];
+        branchesCheckedOutElsewhere: string[];
         currentBranch: string | null;
         ok: true;
         unbornBranch: string | null;

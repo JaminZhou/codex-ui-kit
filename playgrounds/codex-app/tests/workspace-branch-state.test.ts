@@ -7,6 +7,7 @@ describe("workspace branch state", () => {
       branchStateAfterSuccessfulCreation(
         {
           branches: ["main", "feat/existing"],
+          branchesCheckedOutElsewhere: ["feat/existing"],
           currentBranch: "main",
           status: "ready",
           unbornBranch: null,
@@ -15,6 +16,7 @@ describe("workspace branch state", () => {
       ),
     ).toEqual({
       branches: ["main", "feat/existing", "feat/created"],
+      branchesCheckedOutElsewhere: ["feat/existing"],
       currentBranch: "feat/created",
       status: "ready",
       unbornBranch: null,
@@ -26,6 +28,7 @@ describe("workspace branch state", () => {
       branchStateAfterSuccessfulCreation(
         {
           branches: [],
+          branchesCheckedOutElsewhere: [],
           currentBranch: null,
           status: "ready",
           unbornBranch: "main",
@@ -34,6 +37,7 @@ describe("workspace branch state", () => {
       ),
     ).toEqual({
       branches: [],
+      branchesCheckedOutElsewhere: [],
       currentBranch: null,
       status: "ready",
       unbornBranch: "feat/created",

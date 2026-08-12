@@ -1385,6 +1385,7 @@ const workspaceEnvironmentGroups = [
 
 type WorkspaceBranch = {
   branch: string;
+  checkedOutInLinkedWorktree?: boolean;
   id: string;
   label: string;
   meta?: string;
@@ -1400,6 +1401,7 @@ type WorkspaceHostBranchState =
   | { status: "loading" }
   | {
       branches: string[];
+      branchesCheckedOutElsewhere: string[];
       currentBranch: string | null;
       status: "ready";
       unbornBranch: string | null;
@@ -1410,12 +1412,17 @@ function workspaceGitBranchId(branch: string) {
   return branch === "main" ? "main" : `git:${branch}`;
 }
 
-function workspaceGitBranch(branch: string): WorkspaceBranch {
+function workspaceGitBranch(
+  branch: string,
+  branchesCheckedOutElsewhere: ReadonlySet<string>,
+): WorkspaceBranch {
+  const checkedOutInLinkedWorktree = branchesCheckedOutElsewhere.has(branch);
   return {
     branch,
+    checkedOutInLinkedWorktree,
     id: workspaceGitBranchId(branch),
     label: branch,
-    meta: "clean",
+    meta: checkedOutInLinkedWorktree ? "Linked worktree" : "clean",
     status: "available",
   };
 }
@@ -2281,6 +2288,8 @@ export function App() {
           ...current,
           [projectId]: {
             branches: response.branches,
+            branchesCheckedOutElsewhere:
+              response.branchesCheckedOutElsewhere,
             currentBranch: response.currentBranch,
             status: "ready",
             unbornBranch: response.unbornBranch,
@@ -4825,6 +4834,11 @@ export function App() {
   const workspaceHostBranchState = workspaceProjectId
     ? workspaceHostBranchesByProject[workspaceProjectId]
     : undefined;
+  const workspaceBranchesCheckedOutElsewhere = new Set(
+    workspaceHostBranchState?.status === "ready"
+      ? workspaceHostBranchState.branchesCheckedOutElsewhere
+      : [],
+  );
   const workspaceBranchOperationsAvailable =
     !workspaceUsesHostBranches ||
     Boolean(
@@ -4846,7 +4860,12 @@ export function App() {
                     workspaceHostBranchState.unbornBranch,
                   ),
                 ]),
-            ...workspaceHostBranchState.branches.map(workspaceGitBranch),
+            ...workspaceHostBranchState.branches.map((branch) =>
+              workspaceGitBranch(
+                branch,
+                workspaceBranchesCheckedOutElsewhere,
+              ),
+            ),
           ]
         : [workspaceBranches[0]]
       : [
@@ -5061,6 +5080,8 @@ export function App() {
         if (listed?.ok) {
           nextState = {
             branches: listed.branches,
+            branchesCheckedOutElsewhere:
+              listed.branchesCheckedOutElsewhere,
             currentBranch: listed.currentBranch,
             status: "ready",
             unbornBranch: listed.unbornBranch,
@@ -5098,7 +5119,11 @@ export function App() {
   };
   const selectWorkspaceBranch = async (worktree: WorkspaceBranch) => {
     const initiatingProjectId = workspaceProjectId;
-    if (!initiatingProjectId || workspaceBranchCheckoutActiveRef.current) {
+    if (
+      !initiatingProjectId ||
+      worktree.checkedOutInLinkedWorktree ||
+      workspaceBranchCheckoutActiveRef.current
+    ) {
       return;
     }
     const initiatingProjectToken =
@@ -5423,7 +5448,10 @@ export function App() {
                   {filteredWorkspaceWorktrees.map((worktree) => (
                     <MenuItem
                       aria-checked={worktree.id === workspaceWorktreeId}
-                      disabled={!workspaceBranchOperationsAvailable}
+                      disabled={
+                        !workspaceBranchOperationsAvailable ||
+                        worktree.checkedOutInLinkedWorktree
+                      }
                       endIcon={
                         worktree.id === workspaceWorktreeId
                           ? "✓"
@@ -5435,6 +5463,11 @@ export function App() {
                       }}
                       role="menuitemradio"
                       startIcon="⑂"
+                      subText={
+                        worktree.checkedOutInLinkedWorktree
+                          ? "Checked out in another worktree"
+                          : undefined
+                      }
                     >
                       {worktree.branch}
                     </MenuItem>

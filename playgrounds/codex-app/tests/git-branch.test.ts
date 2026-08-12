@@ -71,6 +71,7 @@ describe("Git branch creation", () => {
     });
     await expect(listGitBranches(repository)).resolves.toEqual({
       branches: ["feat/current-branch", "main"],
+      branchesCheckedOutElsewhere: [],
       currentBranch: "main",
       unbornBranch: null,
     });
@@ -115,6 +116,7 @@ describe("Git branch creation", () => {
     }
     await expect(listGitBranches(repository)).resolves.toEqual({
       branches: ["main"],
+      branchesCheckedOutElsewhere: [],
       currentBranch: "main",
       unbornBranch: null,
     });
@@ -126,6 +128,7 @@ describe("Git branch creation", () => {
 
     await expect(listGitBranches(repository)).resolves.toEqual({
       branches: ["main"],
+      branchesCheckedOutElsewhere: [],
       currentBranch: "main",
       unbornBranch: null,
     });
@@ -144,6 +147,7 @@ describe("Git branch creation", () => {
 
     await expect(listGitBranches(repository)).resolves.toEqual({
       branches: ["main", "topic", unicodeWhitespaceBranch],
+      branchesCheckedOutElsewhere: [],
       currentBranch: "main",
       unbornBranch: null,
     });
@@ -173,6 +177,33 @@ describe("Git branch creation", () => {
       { cwd: repository, encoding: "utf8" },
     );
     expect(stdout.trim()).toBe("main");
+  });
+
+  it("reports branches checked out by other linked worktrees", async () => {
+    const repository = await temporaryRepository();
+    const linkedWorktree = join(repository, ".worktrees", "linked");
+    await execFileAsync(
+      "git",
+      ["worktree", "add", "-b", "feat/linked-worktree", linkedWorktree],
+      { cwd: repository },
+    );
+    await execFileAsync("git", ["branch", "feat/free"], { cwd: repository });
+
+    await expect(listGitBranches(repository)).resolves.toEqual({
+      branches: ["feat/free", "feat/linked-worktree", "main"],
+      branchesCheckedOutElsewhere: ["feat/linked-worktree"],
+      currentBranch: "main",
+      unbornBranch: null,
+    });
+    await expect(listGitBranches(linkedWorktree)).resolves.toEqual({
+      branches: ["feat/free", "feat/linked-worktree", "main"],
+      branchesCheckedOutElsewhere: ["main"],
+      currentBranch: "feat/linked-worktree",
+      unbornBranch: null,
+    });
+    await expect(
+      checkoutGitBranch(repository, "feat/linked-worktree"),
+    ).rejects.toMatchObject({ code: "unavailable" });
   });
 
   it("times out a hanging post-checkout hook without blocking later operations", async () => {
@@ -213,6 +244,7 @@ describe("Git branch creation", () => {
     });
     await expect(listGitBranches(detachedRepository)).resolves.toEqual({
       branches: ["main"],
+      branchesCheckedOutElsewhere: [],
       currentBranch: null,
       unbornBranch: null,
     });
@@ -229,6 +261,7 @@ describe("Git branch creation", () => {
     });
     await expect(listGitBranches(unbornRepository)).resolves.toEqual({
       branches: [],
+      branchesCheckedOutElsewhere: [],
       currentBranch: null,
       unbornBranch: "main",
     });
