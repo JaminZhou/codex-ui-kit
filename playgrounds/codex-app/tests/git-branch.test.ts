@@ -1,5 +1,5 @@
 import { execFile } from "node:child_process";
-import { chmod, mkdtemp, rm, writeFile } from "node:fs/promises";
+import { chmod, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { promisify } from "node:util";
@@ -125,6 +125,40 @@ describe("Git branch creation", () => {
       { cwd: repository, encoding: "utf8" },
     );
     expect(stdout.trim()).toBe("main");
+  });
+
+  it("times out a hanging post-checkout hook without blocking later operations", async () => {
+    const repository = await temporaryRepository();
+    const hook = join(repository, ".git", "hooks", "post-checkout");
+    const hookPidPath = join(repository, "post-checkout.pid");
+    await writeFile(
+      hook,
+      '#!/bin/sh\nprintf "%s\\n" "$$" > post-checkout.pid\nexec sleep 30\n',
+      "utf8",
+    );
+    await chmod(hook, 0o755);
+    const startedAt = performance.now();
+
+    await expect(
+      createAndCheckoutGitBranch(repository, "feat/hook-timeout", {
+        commandTimeoutMs: 250,
+      }),
+    ).rejects.toMatchObject({
+      code: "unavailable",
+      message: "The Git operation timed out.",
+    });
+    expect(performance.now() - startedAt).toBeLessThan(1_000);
+    if (process.platform !== "win32") {
+      const hookPid = Number(await readFile(hookPidPath, "utf8"));
+      expect(() => process.kill(hookPid, 0)).toThrow();
+    }
+    await writeFile(hook, "#!/bin/sh\nexit 0\n", "utf8");
+    await expect(listGitBranches(repository)).resolves.toMatchObject({
+      currentBranch: "feat/hook-timeout",
+    });
+    await expect(checkoutGitBranch(repository, "main")).resolves.toEqual({
+      branch: "main",
+    });
   });
 
   it("lists and creates branches from detached and unborn HEAD states", async () => {
