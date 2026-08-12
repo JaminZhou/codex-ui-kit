@@ -761,6 +761,7 @@ for (const scene of selectedScenes) {
           (button) => ({
             checked: button.getAttribute("aria-checked"),
             role: button.getAttribute("role"),
+            text: button.textContent?.trim(),
           }),
         );
         const branchCreationDialog = document.querySelector(
@@ -1038,10 +1039,13 @@ for (const scene of selectedScenes) {
         (!contract.worktree ||
           Math.abs(contract.worktree.rect.width - 296) > 1 ||
           Math.abs(contract.worktree.rect.height - 280) > 1 ||
-          contract.worktree.buttons.length !== 8 ||
+          contract.worktree.buttons.length !== 9 ||
           contract.worktree.buttons.filter(
             ({ role }) => role === "menuitemradio",
           ).length !== 7 ||
+          !contract.worktree.buttons.some(({ text }) =>
+            text?.includes("Select local environment…"),
+          ) ||
           contract.worktree.buttons.filter(
             ({ checked }) => checked === "true",
           ).length !== 1 ||
