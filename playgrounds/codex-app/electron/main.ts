@@ -357,6 +357,37 @@ async function handleSelectAttachments(event: IpcMainInvokeEvent) {
   return describeAttachmentPaths(result.filePaths);
 }
 
+async function handleSelectProjectDirectory(event: IpcMainInvokeEvent) {
+  assertTrustedIpc(event);
+  const fixturePath = process.env.CODEX_DEMO_PROJECT_FIXTURE_PATH;
+  if (fixturePath) {
+    if (!isAbsolute(fixturePath) || !(await stat(fixturePath)).isDirectory()) {
+      throw new TypeError(
+        "CODEX_DEMO_PROJECT_FIXTURE_PATH must be an absolute directory path.",
+      );
+    }
+    return {
+      label: attachmentPathLabel(fixturePath, process.platform),
+      path: fixturePath,
+    };
+  }
+  const result = mainWindow
+    ? await dialog.showOpenDialog(mainWindow, {
+        properties: ["openDirectory", "createDirectory"],
+        title: "New project",
+      })
+    : await dialog.showOpenDialog({
+        properties: ["openDirectory", "createDirectory"],
+        title: "New project",
+      });
+  const path = result.filePaths[0];
+  if (result.canceled || !path) return null;
+  return {
+    label: attachmentPathLabel(path, process.platform),
+    path,
+  };
+}
+
 function createWindow() {
   const scenario = process.env.CODEX_DEMO_SCENARIO ?? "streaming-recovery";
   const frame = process.env.CODEX_DEMO_FRAME ?? "recovered";
@@ -367,7 +398,7 @@ function createWindow() {
   const view = process.env.CODEX_DEMO_VIEW ?? "conversation";
   const requestedTheme = process.env.CODEX_DEMO_THEME;
   const theme =
-    ["shell", "workspace"].includes(view) &&
+    ["projects", "shell", "workspace"].includes(view) &&
     ["system", "light", "dark"].includes(requestedTheme ?? "")
       ? requestedTheme!
       : "dark";
@@ -439,6 +470,7 @@ ipcMain.handle("demo:live:stop", handleStopLive);
 ipcMain.handle("demo:live:close", handleCloseLive);
 ipcMain.handle("demo:approval:respond", handleApprovalResponse);
 ipcMain.handle("demo:attachments:select", handleSelectAttachments);
+ipcMain.handle("demo:project:select", handleSelectProjectDirectory);
 
 app.whenReady().then(() => {
   createWindow();

@@ -13,6 +13,13 @@ interface CodexDemoBridge {
       meta: string;
     }[]
   >;
+  selectProjectDirectory(): Promise<
+    | {
+        label: string;
+        path: string;
+      }
+    | null
+  >;
   closeLive(): Promise<void>;
   onNotification(
     handler: (notification: JsonRpcNotification) => void,

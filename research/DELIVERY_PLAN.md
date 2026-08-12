@@ -14,7 +14,7 @@ exit gates; it does not replace the inventory.
   Desktop `26.803.61601` (`6396`). Unsampled earlier-build surfaces remain
   previous-build regression evidence rather than current verification.
 - The inventory contains 86 surface groups: 58 P0, 19 P1, and 9 P2.
-- 18 groups have current-build runtime evidence, 51 have previous-build-only
+- 20 groups have current-build runtime evidence, 49 have previous-build-only
   runtime evidence, and 17 have not been sampled.
 - The scoped `26.803.61601` refresh revalidates 43
   sidebar/menu/window-chrome/Composer icons against exact runtime evidence.

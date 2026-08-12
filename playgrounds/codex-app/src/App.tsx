@@ -50,6 +50,7 @@ import {
   PullRequestQueryState,
   PullRequestReviewComposer,
   QueuedPromptList,
+  ProjectIndex,
   SearchActivity,
   StatusBanner,
   SubagentActivity,
@@ -152,7 +153,12 @@ import {
   type DemoThemePreference,
 } from "./theme";
 
-type DemoView = "conversation" | "pull-request" | "shell" | "workspace";
+type DemoView =
+  | "conversation"
+  | "projects"
+  | "pull-request"
+  | "shell"
+  | "workspace";
 
 type SidebarGlyphName =
   | "activity"
@@ -288,11 +294,13 @@ function querySelection() {
   const view: DemoView =
     params.get("view") === "pull-request"
       ? "pull-request"
-      : params.get("view") === "shell"
-        ? "shell"
-        : params.get("view") === "workspace"
-          ? "workspace"
-          : "conversation";
+      : params.get("view") === "projects"
+        ? "projects"
+        : params.get("view") === "shell"
+          ? "shell"
+          : params.get("view") === "workspace"
+            ? "workspace"
+            : "conversation";
   const theme = resolveDemoThemePreference(params.get("theme"), view);
   const requestedShellState = params.get("shellState");
   const shellState: AppRouteOutletStatus = [
@@ -1272,6 +1280,69 @@ const workspaceProjects = [
   },
 ];
 
+const currentProjectIndexItems = [
+  {
+    id: "codex-ui-kit",
+    kindLabel: "Local",
+    label: "codex-ui-kit",
+    path: "/workspace/codex-ui-kit",
+    recentChats: [
+      {
+        id: "project-index-parity",
+        label: "Match the current projects index",
+        meta: "2m",
+        pinned: true,
+      },
+      {
+        id: "sidebar-contract",
+        label: "Verify sidebar project behavior",
+        meta: "1h",
+      },
+    ],
+    status: "available" as const,
+    updated: "2m",
+    updatedOrder: 4,
+  },
+  {
+    id: "app-server-client",
+    kindLabel: "Local",
+    label: "codex-app-server-client",
+    path: "/workspace/codex-app-server-client",
+    recentChats: [
+      {
+        id: "protocol-baseline",
+        label: "Check the latest protocol baseline",
+        meta: "1d",
+      },
+    ],
+    status: "available" as const,
+    updated: "1d",
+    updatedOrder: 3,
+  },
+  {
+    id: "desktop-shell",
+    kindLabel: "Local",
+    label: "desktop-shell",
+    path: "/workspace/desktop-shell",
+    recentChats: [],
+    status: "loading" as const,
+    statusLabel: "Creating",
+    updated: "3d",
+    updatedOrder: 2,
+  },
+  {
+    id: "component-lab",
+    kindLabel: "Local",
+    label: "component-lab",
+    path: "/workspace/component-lab",
+    recentChats: [],
+    status: "error" as const,
+    statusLabel: "Failed",
+    updated: "1w",
+    updatedOrder: 1,
+  },
+];
+
 const workspaceEnvironmentGroups = [
   {
     description: "Current checkout and linked worktrees",
@@ -1501,6 +1572,28 @@ export function App() {
       ? null
       : "codex-ui-kit",
   );
+  const [projectIndexQuery, setProjectIndexQuery] = useState(
+    initialSelection.frame === "projects-index-empty" ? "missing" : "",
+  );
+  const [createdProject, setCreatedProject] = useState<
+    { id: string; label: string; path: string } | undefined
+  >();
+  const [projectCreationStatus, setProjectCreationStatus] = useState<
+    "error" | "idle" | "selecting"
+  >("idle");
+  const [projectIndexSortBy, setProjectIndexSortBy] = useState<
+    "name" | "updated"
+  >("updated");
+  const [projectIndexSortDirection, setProjectIndexSortDirection] =
+    useState<"ascending" | "descending">("descending");
+  const [expandedProjectIndexIds, setExpandedProjectIndexIds] = useState(
+    () =>
+      new Set(
+        initialSelection.frame === "projects-index-expanded"
+          ? ["codex-ui-kit"]
+          : [],
+      ),
+  );
   const [workspaceEnvironmentId, setWorkspaceEnvironmentId] =
     useState(
       initialSelection.view === "workspace" &&
@@ -1664,8 +1757,9 @@ export function App() {
           currentSidebarProjects
             .filter(
               (_project, index) =>
-                initialSelection.sidebarState !== "project-collapsed" ||
-                index !== 0,
+                initialSelection.view !== "projects" &&
+                (initialSelection.sidebarState !== "project-collapsed" ||
+                  index !== 0),
             )
             .map((project) => project.id),
         ),
@@ -2125,6 +2219,54 @@ export function App() {
     setTerminalHistoryByCommand({});
     setPullRequestOpen(false);
     dismissSidebarAfterNavigation();
+  };
+
+  const openProjectsIndex = () => {
+    cancelReplaySubmitTimer();
+    setMode("replay");
+    setView("projects");
+    setProjectIndexQuery("");
+    setProjectIndexSortBy("updated");
+    setProjectIndexSortDirection("descending");
+    setExpandedProjectIndexIds(new Set());
+    setActiveFrame("projects-index-ready");
+    setReviewOpen(false);
+    setSubagentPanelOpen(false);
+    setTerminalOpen(false);
+    setPullRequestOpen(false);
+    dismissSidebarAfterNavigation();
+  };
+
+  const createProject = async () => {
+    if (projectCreationStatus === "selecting") return;
+    setProjectCreationStatus("selecting");
+    try {
+      const selection = window.codexDemo
+        ? await window.codexDemo.selectProjectDirectory()
+        : {
+            label: "new-project",
+            path: "/workspace/new-project",
+          };
+      if (!selection) {
+        setProjectCreationStatus("idle");
+        return;
+      }
+      const id = `created:${selection.path}`;
+      setCreatedProject({ id, ...selection });
+      setView("workspace");
+      setWorkspaceProjectId(id);
+      setWorkspaceEnvironmentId("local");
+      setWorkspaceWorktreeId("main");
+      setWorkspaceOverlayState(null);
+      setWorkspaceProjectQuery("");
+      setActiveFrame("workspace-project-created");
+      setProjectCreationStatus("idle");
+      window.setTimeout(() =>
+        document.getElementById("demo-workspace-project-trigger")?.focus(),
+      );
+    } catch {
+      setProjectCreationStatus("error");
+    }
   };
 
   const selectScenario = (
@@ -3360,13 +3502,22 @@ export function App() {
       </AppSidebarSection>
       <AppSidebarSection
         actions={
-          <button
-            aria-label="New project"
-            className="demo-sidebar-section-action"
-            type="button"
-          >
-            +
-          </button>
+          <span className="demo-sidebar-project-section-actions">
+            <button
+              aria-label="View projects"
+              onClick={openProjectsIndex}
+              type="button"
+            >
+              ›
+            </button>
+            <button
+              aria-label="New project"
+              onClick={() => void createProject()}
+              type="button"
+            >
+              +
+            </button>
+          </span>
         }
         collapsible
         defaultExpanded={false}
@@ -4332,9 +4483,15 @@ export function App() {
   const workspaceProject =
     workspaceProjectId === null
       ? undefined
-      : (workspaceProjects.find(
-          ({ id }) => id === workspaceProjectId,
-        ) ?? workspaceProjects[0]);
+      : createdProject?.id === workspaceProjectId
+        ? {
+            ...createdProject,
+            icon: <SidebarGlyph name="folder" />,
+            status: "available" as const,
+          }
+        : (workspaceProjects.find(
+            ({ id }) => id === workspaceProjectId,
+          ) ?? workspaceProjects[0]);
   const workspaceWorktrees =
     (workspaceProjectId
       ? workspaceWorktreesByProject[workspaceProjectId]
@@ -4349,10 +4506,21 @@ export function App() {
     worktreeBranch: workspaceWorktree.branch,
     worktreeId: workspaceWorktreeId,
   });
-  const filteredWorkspaceProjects = workspaceProjects.filter(({ label }) =>
-    label
-      .toLocaleLowerCase()
-      .includes(workspaceProjectQuery.trim().toLocaleLowerCase()),
+  const selectableWorkspaceProjects = createdProject
+    ? [
+        {
+          ...createdProject,
+          icon: <SidebarGlyph name="folder" />,
+          status: "available" as const,
+        },
+        ...workspaceProjects,
+      ]
+    : workspaceProjects;
+  const filteredWorkspaceProjects = selectableWorkspaceProjects.filter(
+    ({ label }) =>
+      label
+        .toLocaleLowerCase()
+        .includes(workspaceProjectQuery.trim().toLocaleLowerCase()),
   );
   const filteredWorkspaceWorktrees =
     workspaceWorktrees.filter(
@@ -4371,9 +4539,11 @@ export function App() {
         ? "workspace-no-project"
         : workspaceEnvironmentId === "worktree"
           ? "workspace-new-worktree"
-          : workspaceWorktree.status === "repairing"
-            ? "workspace-repairing"
-            : "workspace-ready";
+            : workspaceWorktree.status === "repairing"
+              ? "workspace-repairing"
+              : createdProject?.id === workspaceProjectId
+                ? "workspace-project-created"
+                : "workspace-ready";
   useEffect(() => {
     if (view === "workspace" && workspaceLocalEnvironmentOpen) {
       setActiveFrame("workspace-environment");
@@ -4753,35 +4923,23 @@ export function App() {
             triggerId={workspaceProjectTriggerId}
           />
           <div className="demo-workspace-project-dialog__actions">
-            <button type="button">
-              <span aria-hidden="true">＋</span>
-              New project
-            </button>
             <button
-              onClick={() => {
-                const focusTargetId =
-                  workspaceProjectTriggerId ===
-                  "demo-workspace-destination-trigger"
-                    ? "demo-workspace-project-trigger"
-                    : workspaceProjectTriggerId;
-                setWorkspaceProjectId(null);
-                setWorkspaceEnvironmentId("local");
-                setWorkspaceWorktreeId("main");
-                setWorkspaceOverlayState(null);
-                setActiveFrame("workspace-no-project");
-                setWorkspaceProjectQuery("");
-                window.setTimeout(() =>
-                  document
-                    .getElementById(focusTargetId)
-                    ?.focus(),
-                );
-              }}
+              aria-busy={projectCreationStatus === "selecting" || undefined}
+              disabled={projectCreationStatus === "selecting"}
+              onClick={() => void createProject()}
               type="button"
             >
-              <span aria-hidden="true">⊘</span>
-              Don&apos;t work in a project
+              <span aria-hidden="true">＋</span>
+              {projectCreationStatus === "selecting"
+                ? "Choosing project…"
+                : "New project"}
             </button>
           </div>
+          {projectCreationStatus === "error" ? (
+            <p className="demo-workspace-project-dialog__error" role="alert">
+              Couldn&apos;t add that project
+            </p>
+          ) : null}
         </div>
       ) : null}
     </>
@@ -5119,6 +5277,118 @@ export function App() {
   const workspaceRoute = workspacePersistenceFrame
     ? workspacePersistedThread
     : workspaceNewConversationRoute;
+
+  const projectIndexStatus =
+    activeFrame === "projects-index-loading"
+      ? ("loading" as const)
+      : activeFrame === "projects-index-error"
+        ? ("error" as const)
+        : activeFrame === "projects-index-partial-error"
+          ? ("partial-error" as const)
+          : ("ready" as const);
+  const filteredProjectIndexItems = currentProjectIndexItems
+    .filter(({ label, path }) => {
+      const query = projectIndexQuery.trim().toLocaleLowerCase();
+      return (
+        query.length === 0 ||
+        label.toLocaleLowerCase().includes(query) ||
+        path.toLocaleLowerCase().includes(query)
+      );
+    })
+    .sort((left, right) => {
+      const direction = projectIndexSortDirection === "ascending" ? 1 : -1;
+      return projectIndexSortBy === "name"
+        ? left.label.localeCompare(right.label) * direction
+        : (left.updatedOrder - right.updatedOrder) * direction;
+    })
+    .map((item) => ({
+      ...item,
+      actions: (
+        <button aria-label={`Project actions for ${item.label}`} type="button">
+          <SidebarGlyph name="more-current" />
+        </button>
+      ),
+      expanded: expandedProjectIndexIds.has(item.id),
+      icon: <SidebarGlyph name="folder-current" />,
+      recentChats: item.recentChats.map((chat) => ({
+        ...chat,
+        actions: (
+          <button aria-label={`Chat actions for ${chat.label}`} type="button">
+            <SidebarGlyph name="more-current" />
+          </button>
+        ),
+      })),
+    }));
+  const projectIndexItems =
+    projectIndexStatus === "loading" || projectIndexStatus === "error"
+      ? []
+      : filteredProjectIndexItems;
+  const projectsRoute = (
+    <div className="demo-projects-route">
+      <ProjectIndex
+        actions={
+          <Button
+            disabled={projectCreationStatus === "selecting"}
+            onClick={() => void createProject()}
+            size="small"
+          >
+            {projectCreationStatus === "selecting"
+              ? "Choosing project…"
+              : "New project"}
+          </Button>
+        }
+        emptyState={
+          projectIndexQuery.trim()
+            ? "No projects found"
+            : "No projects"
+        }
+        items={projectIndexItems}
+        label="Projects"
+        layout="table"
+        onExpandedChange={(projectId, expanded) =>
+          setExpandedProjectIndexIds((current) => {
+            const next = new Set(current);
+            if (expanded) next.add(projectId);
+            else next.delete(projectId);
+            return next;
+          })
+        }
+        onOpenRecentChat={(projectId) => openWorkspace(projectId)}
+        onSelect={openWorkspace}
+        onSortChange={(nextSort) => {
+          if (projectIndexSortBy === nextSort) {
+            setProjectIndexSortDirection((current) =>
+              current === "ascending" ? "descending" : "ascending",
+            );
+            return;
+          }
+          setProjectIndexSortBy(nextSort);
+          setProjectIndexSortDirection(
+            nextSort === "name" ? "ascending" : "descending",
+          );
+        }}
+        sortBy={projectIndexSortBy}
+        sortDirection={projectIndexSortDirection}
+        status={projectIndexStatus}
+        statusMessage={
+          projectIndexStatus === "error"
+            ? "Couldn’t load projects"
+            : projectIndexStatus === "partial-error"
+              ? "Some projects may be missing"
+              : undefined
+        }
+        toolbar={
+          <input
+            aria-label="Search projects"
+            onChange={(event) => setProjectIndexQuery(event.currentTarget.value)}
+            placeholder="Search projects"
+            type="search"
+            value={projectIndexQuery}
+          />
+        }
+      />
+    </div>
+  );
 
   const reviewableFileChanges = useMemo(
     () =>
@@ -7640,7 +7910,7 @@ export function App() {
         sidebarOpen={sidebarOpen}
         sidebarResizable
         windowChrome={
-          view === "shell" || view === "workspace" ? (
+          view === "projects" || view === "shell" || view === "workspace" ? (
             <AppWindowChrome
               backAction={{
                 disabled: true,
@@ -7664,6 +7934,8 @@ export function App() {
       >
         {view === "pull-request" ? (
           pullRequestIndex
+        ) : view === "projects" ? (
+          projectsRoute
         ) : view === "shell" ? (
           shellRoute
         ) : view === "workspace" ? (

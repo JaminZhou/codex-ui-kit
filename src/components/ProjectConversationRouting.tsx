@@ -103,17 +103,39 @@ export type ProjectIndexItemStatus =
   | "unavailable";
 
 export interface ProjectIndexItem {
+  actions?: ReactNode;
   description?: ReactNode;
   disabled?: boolean;
+  expanded?: boolean;
   icon?: ReactNode;
   id: string;
+  kindLabel?: ReactNode;
   label: ReactNode;
   meta?: ReactNode;
   path?: ReactNode;
+  recentChats?: readonly ProjectIndexRecentChat[];
   status?: ProjectIndexItemStatus;
   statusLabel?: ReactNode;
   textValue?: string;
+  updated?: ReactNode;
 }
+
+export interface ProjectIndexRecentChat {
+  actions?: ReactNode;
+  id: string;
+  label: ReactNode;
+  meta?: ReactNode;
+  pinned?: boolean;
+  textValue?: string;
+}
+
+export type ProjectIndexLayout = "list" | "table";
+export type ProjectIndexPageStatus =
+  | "error"
+  | "loading"
+  | "partial-error"
+  | "ready";
+export type ProjectIndexSortKey = "name" | "updated";
 
 export interface ProjectIndexProps
   extends Omit<
@@ -125,10 +147,20 @@ export interface ProjectIndexProps
   emptyState?: ReactNode;
   items: readonly ProjectIndexItem[];
   label?: string;
+  layout?: ProjectIndexLayout;
+  nameColumnLabel?: ReactNode;
+  onExpandedChange?: (projectId: string, expanded: boolean) => void;
+  onOpenRecentChat?: (projectId: string, chatId: string) => void;
   onSelect: (projectId: string) => void;
+  onSortChange?: (sortKey: ProjectIndexSortKey) => void;
   selectedId?: string;
+  sortBy?: ProjectIndexSortKey;
+  sortDirection?: "ascending" | "descending";
+  status?: ProjectIndexPageStatus;
+  statusMessage?: ReactNode;
   title?: ReactNode;
   toolbar?: ReactNode;
+  updatedColumnLabel?: ReactNode;
 }
 
 function projectIndexItemDisabled(item: ProjectIndexItem) {
@@ -153,21 +185,75 @@ export function ProjectIndex({
   emptyState = "No projects",
   items,
   label = "Project index",
+  layout = "list",
+  nameColumnLabel = "Name",
+  onExpandedChange,
+  onOpenRecentChat,
   onSelect,
+  onSortChange,
   selectedId,
+  sortBy = "updated",
+  sortDirection = "descending",
+  status = "ready",
+  statusMessage,
   title = "Projects",
   toolbar,
+  updatedColumnLabel = "Updated",
   ...props
 }: ProjectIndexProps) {
   const projectIndexId = useId();
+  const tableLayout = layout === "table";
+  const defaultStatusMessage =
+    status === "loading"
+      ? "Loading projects"
+      : status === "error"
+        ? "Couldn’t load projects"
+        : status === "partial-error"
+          ? "Some projects may be missing"
+          : undefined;
+  const resolvedStatusMessage = statusMessage ?? defaultStatusMessage;
+
+  const sortHeader = (
+    key: ProjectIndexSortKey,
+    content: ReactNode,
+  ) => {
+    const active = sortBy === key;
+    return (
+      <div
+        className="codex-ui-project-index__column-header"
+        data-sort-direction={active ? sortDirection : undefined}
+      >
+        {onSortChange ? (
+          <button
+            aria-label={`Sort projects by ${key}`}
+            aria-pressed={active}
+            onClick={() => onSortChange(key)}
+            type="button"
+          >
+            <span>{content}</span>
+            {active ? (
+              <span aria-hidden="true" data-direction={sortDirection}>
+                ↓
+              </span>
+            ) : null}
+          </button>
+        ) : (
+          content
+        )}
+      </div>
+    );
+  };
 
   return (
     <nav
       {...props}
       aria-label={label}
+      aria-busy={status === "loading" || undefined}
       className={["codex-ui-project-index", className]
         .filter(Boolean)
         .join(" ")}
+      data-layout={layout}
+      data-status={status}
     >
       <header className="codex-ui-project-index__header">
         <div>
@@ -185,6 +271,29 @@ export function ProjectIndex({
           {toolbar}
         </div>
       ) : null}
+      {resolvedStatusMessage ? (
+        <p
+          aria-live={status === "error" ? "assertive" : "polite"}
+          className="codex-ui-project-index__page-status"
+          data-status={status}
+          role={status === "error" ? "alert" : "status"}
+        >
+          {resolvedStatusMessage}
+        </p>
+      ) : null}
+      {tableLayout && items.length > 0 ? (
+        <div
+          aria-label="Project columns"
+          className="codex-ui-project-index__columns"
+        >
+          {sortHeader("name", nameColumnLabel)}
+          <div
+            aria-label="Project type and status"
+            className="codex-ui-project-index__column-header"
+          />
+          {sortHeader("updated", updatedColumnLabel)}
+        </div>
+      ) : null}
       {items.length > 0 ? (
         <ul className="codex-ui-project-index__items">
           {items.map((item, index) => {
@@ -197,7 +306,7 @@ export function ProjectIndex({
               ? `${projectIndexId}-path-${index}`
               : undefined;
             const trailingId =
-              item.meta || item.statusLabel
+              item.meta || item.statusLabel || item.kindLabel || item.updated
                 ? `${projectIndexId}-trailing-${index}`
                 : undefined;
             const describedBy = [
@@ -208,17 +317,22 @@ export function ProjectIndex({
               .filter(Boolean)
               .join(" ");
             return (
-              <li data-status={item.status} key={item.id}>
-                <button
-                  aria-current={selected ? "page" : undefined}
-                  aria-describedby={describedBy || undefined}
-                  aria-label={`Open project ${itemTextValue(item)}`}
-                  className="codex-ui-project-index__item"
-                  data-selected={selected || undefined}
-                  disabled={disabled}
-                  onClick={() => onSelect(item.id)}
-                  type="button"
-                >
+              <li
+                data-expanded={item.expanded || undefined}
+                data-status={item.status}
+                key={item.id}
+              >
+                <div className="codex-ui-project-index__row">
+                  <button
+                    aria-current={selected ? "page" : undefined}
+                    aria-describedby={describedBy || undefined}
+                    aria-label={`Open project ${itemTextValue(item)}`}
+                    className="codex-ui-project-index__item"
+                    data-selected={selected || undefined}
+                    disabled={disabled}
+                    onClick={() => onSelect(item.id)}
+                    type="button"
+                  >
                   {item.icon ? (
                     <span
                       aria-hidden="true"
@@ -227,7 +341,9 @@ export function ProjectIndex({
                       {item.icon}
                     </span>
                   ) : null}
-                  <span className="codex-ui-project-index__copy">
+                  <span
+                    className="codex-ui-project-index__copy"
+                  >
                     <span className="codex-ui-project-index__label">
                       {item.label}
                     </span>
@@ -248,30 +364,114 @@ export function ProjectIndex({
                       </code>
                     ) : null}
                   </span>
-                  {item.meta || item.statusLabel ? (
+                  {item.meta ||
+                  item.statusLabel ||
+                  item.kindLabel ||
+                  item.updated ? (
                     <span
                       className="codex-ui-project-index__trailing"
                       id={trailingId}
                     >
-                      {item.meta ? <span>{item.meta}</span> : null}
-                      {item.statusLabel ? (
+                      <span
+                        className="codex-ui-project-index__kind"
+                      >
+                        {item.kindLabel}
+                        {item.statusLabel ? (
+                          <span
+                            className="codex-ui-project-index__status"
+                            data-status={item.status}
+                          >
+                            {item.statusLabel}
+                          </span>
+                        ) : null}
+                        {item.meta ? <span>{item.meta}</span> : null}
+                      </span>
+                      {item.updated ? (
                         <span
-                          className="codex-ui-project-index__status"
-                          data-status={item.status}
+                          className="codex-ui-project-index__updated"
                         >
-                          {item.statusLabel}
+                          {item.updated}
                         </span>
                       ) : null}
                     </span>
                   ) : null}
-                </button>
+                  </button>
+                  {item.recentChats && onExpandedChange ? (
+                    <button
+                      aria-expanded={item.expanded || false}
+                      aria-label={`${item.expanded ? "Hide" : "Show"} recent chats in ${itemTextValue(item)}`}
+                      className="codex-ui-project-index__expand"
+                      onClick={() =>
+                        onExpandedChange(item.id, !item.expanded)
+                      }
+                      type="button"
+                    >
+                      <span aria-hidden="true">›</span>
+                    </button>
+                  ) : null}
+                  {item.actions ? (
+                    <div
+                      aria-label={`Project actions for ${itemTextValue(item)}`}
+                      className="codex-ui-project-index__item-actions"
+                      role="toolbar"
+                    >
+                      {item.actions}
+                    </div>
+                  ) : null}
+                </div>
+                {item.expanded && item.recentChats ? (
+                  <div
+                    aria-label={`Recent chats in ${itemTextValue(item)}`}
+                    className="codex-ui-project-index__recent"
+                    role="group"
+                  >
+                    {item.recentChats.length > 0 ? (
+                      <ul>
+                        {item.recentChats.slice(0, 10).map((chat) => {
+                          const chatTextValue =
+                            chat.textValue ??
+                            (typeof chat.label === "string"
+                              ? chat.label
+                              : chat.id);
+                          return (
+                            <li key={chat.id}>
+                              <button
+                                aria-label={`Open chat ${chatTextValue}`}
+                                onClick={() =>
+                                  onOpenRecentChat?.(item.id, chat.id)
+                                }
+                                type="button"
+                              >
+                                <span>{chat.label}</span>
+                                {chat.meta ? <small>{chat.meta}</small> : null}
+                                {chat.pinned ? (
+                                  <span aria-label="Pinned">●</span>
+                                ) : null}
+                              </button>
+                              {chat.actions ? (
+                                <div
+                                  aria-label={`Chat actions for ${chatTextValue}`}
+                                  role="toolbar"
+                                >
+                                  {chat.actions}
+                                </div>
+                              ) : null}
+                            </li>
+                          );
+                        })}
+                      </ul>
+                    ) : (
+                      <p>No chats</p>
+                    )}
+                  </div>
+                ) : null}
               </li>
             );
           })}
         </ul>
-      ) : (
+      ) : status === "ready" || status === "partial-error" ? (
         <p className="codex-ui-project-index__empty">{emptyState}</p>
-      )}
+      ) : null}
     </nav>
   );
 }

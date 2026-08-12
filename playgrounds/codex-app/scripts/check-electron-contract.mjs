@@ -4308,44 +4308,15 @@ try {
     .focus();
   await projectDialog.waitFor({ state: "hidden" });
   await projectDestination.click();
-  await projectDialog
-    .getByRole("button", {
-      name: "Don't work in a project",
-    })
-    .click();
-  await codingWorkspacePage.waitForSelector(
-    'button[aria-label="Choose project"]',
-  );
-  await codingWorkspacePage.waitForTimeout(50);
   if (
-    (await codingWorkspacePage.evaluate(
-      () => document.activeElement?.getAttribute("aria-label"),
-    )) !== "Choose project"
+    (await projectDialog.getByRole("button", { name: "New project" }).count()) !==
+      1 ||
+    (await projectDialog.getByText("Don't work in a project").count()) !== 0
   ) {
     throw new Error(
-      "Electron coding workspace did not restore the surviving project-trigger focus after clearing from the destination.",
+      "Electron coding workspace project picker does not match the current action boundary.",
     );
   }
-  const noProjectDestination = (
-    await codingWorkspacePage
-      .locator(
-        ".demo-workspace-start .codex-ui-new-conversation-start__header h3",
-      )
-      .textContent()
-  )?.trim();
-  if (
-    noProjectDestination !== "What should we build?" ||
-    (await codingWorkspacePage.locator(".demo-workspace-prompts").count()) !==
-      0
-  ) {
-    throw new Error(
-      `Electron coding workspace did not enter the no-project state: ${JSON.stringify(noProjectDestination)}.`,
-    );
-  }
-  await codingWorkspacePage
-    .getByRole("button", { name: "Choose project" })
-    .click();
-  await codingWorkspacePage.waitForTimeout(50);
   await projectSearch.fill("app-server");
   await projectDialog
     .getByRole("option", {
@@ -7556,6 +7527,51 @@ try {
   await workspaceMissingApp.close();
 }
 
+const projectCreationScene = {
+  frame: "workspace-project-menu",
+  id: "electron-project-creation",
+  scenario: "workspace-workflow",
+  view: "workspace",
+};
+const { app: projectCreationApp, page: projectCreationPage } =
+  await launchScene(projectCreationScene, {
+    environment: {
+      CODEX_DEMO_PROJECT_FIXTURE_PATH: resolve(process.cwd(), "../.."),
+    },
+  });
+try {
+  const projectDialog = projectCreationPage.getByRole("dialog", {
+    name: "Choose a project",
+  });
+  await projectDialog.waitFor({ state: "visible" });
+  if (
+    (await projectDialog.getByRole("button", { name: "New project" }).count()) !==
+      1 ||
+    (await projectDialog.getByText("Don't work in a project").count()) !== 0
+  ) {
+    throw new Error(
+      "Electron current project picker retained a removed legacy action.",
+    );
+  }
+  await projectDialog.getByRole("button", { name: "New project" }).click();
+  await projectCreationPage.waitForSelector(
+    '.demo-root[data-view="workspace"][data-frame="workspace-project-created"]',
+  );
+  const createdProjectTrigger = projectCreationPage.getByRole("button", {
+    name: "Change project: codex-ui-kit",
+  });
+  if (
+    !(await createdProjectTrigger.isVisible()) ||
+    (await projectDialog.isVisible())
+  ) {
+    throw new Error(
+      "Electron project-directory selection did not return to the created workspace.",
+    );
+  }
+} finally {
+  await projectCreationApp.close();
+}
+
 console.log(
-  "Electron host, native-window, coding-workspace routing and persisted/missing-worktree recovery replay, conversation/Composer and current image-attachment lifecycle plus current menus, current long, failed, and interrupted command output plus manual context compaction, thread summary, replay/live single, concurrent, nested, and mixed-recovery subagent delegation with 4/10 pagination, current mixed Search/Browser/MCP/approval/file/subagent flow, default 720px narrow reachability, resizable navigation/Review/Terminal/PR detail, PR tabs and expansion, MCP disclosure/result/unavailable-fallback, multi-file and mixed-content Review, selection/Undo, large diff scrolling, and compact geometry contracts passed.",
+  "Electron host, native-window, current project-directory creation, coding-workspace routing and persisted/missing-worktree recovery replay, conversation/Composer and current image-attachment lifecycle plus current menus, current long, failed, and interrupted command output plus manual context compaction, thread summary, replay/live single, concurrent, nested, and mixed-recovery subagent delegation with 4/10 pagination, current mixed Search/Browser/MCP/approval/file/subagent flow, default 720px narrow reachability, resizable navigation/Review/Terminal/PR detail, PR tabs and expansion, MCP disclosure/result/unavailable-fallback, multi-file and mixed-content Review, selection/Undo, large diff scrolling, and compact geometry contracts passed.",
 );
