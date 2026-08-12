@@ -4432,6 +4432,26 @@ try {
   );
   await codingWorkspacePage.waitForTimeout(50);
 
+  await codingWorkspacePage.waitForSelector(
+    'button[aria-label="Change worktree: main"]:not([disabled])',
+  );
+  await codingWorkspacePage
+    .getByRole("button", { name: "Change worktree: main" })
+    .click();
+  await codingWorkspacePage
+    .getByRole("menu", { name: "Branches" })
+    .getByRole("menuitem", { name: "Select local environment…" })
+    .click();
+  const reachableLocalEnvironmentDialog = codingWorkspacePage.getByRole(
+    "dialog",
+    { name: "Select local environment" },
+  );
+  await reachableLocalEnvironmentDialog
+    .getByRole("heading", { name: "codex-app-server-client" })
+    .waitFor();
+  await reachableLocalEnvironmentDialog.press("Escape");
+  await reachableLocalEnvironmentDialog.waitFor({ state: "hidden" });
+
   await codingWorkspacePage
     .getByRole("button", { name: "Change run location: Local" })
     .press("ArrowDown");

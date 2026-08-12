@@ -5569,6 +5569,14 @@ export function App() {
                 </div>
                 <MenuSeparator />
                 <MenuItem
+                  onSelect={() =>
+                    openWorkspaceLocalEnvironment("worktree")
+                  }
+                  startIcon={<CurrentBuildIcon name="composer-worktree" />}
+                >
+                  Select local environment…
+                </MenuItem>
+                <MenuItem
                   disabled={!workspaceBranchOperationsAvailable}
                   onSelect={openWorkspaceBranchCreation}
                   startIcon="＋"
