@@ -360,6 +360,34 @@ async function handleSelectAttachments(event: IpcMainInvokeEvent) {
 
 async function handleSelectProjectDirectory(event: IpcMainInvokeEvent) {
   assertTrustedIpc(event);
+  const fixtureSelectionsRaw =
+    process.env.CODEX_DEMO_PROJECT_FIXTURE_SELECTIONS;
+  if (fixtureSelectionsRaw) {
+    const fixtureSelections: unknown = JSON.parse(fixtureSelectionsRaw);
+    if (
+      !Array.isArray(fixtureSelections) ||
+      fixtureSelections.length === 0 ||
+      fixtureSelections.some(
+        (selection) =>
+          typeof selection !== "object" ||
+          selection === null ||
+          !("label" in selection) ||
+          typeof selection.label !== "string" ||
+          !("path" in selection) ||
+          typeof selection.path !== "string" ||
+          !isAbsolute(selection.path),
+      )
+    ) {
+      throw new TypeError(
+        "CODEX_DEMO_PROJECT_FIXTURE_SELECTIONS must be a non-empty array of labeled absolute directory paths.",
+      );
+    }
+    const selection = fixtureSelections[
+      Math.min(projectFixtureSelectionIndex, fixtureSelections.length - 1)
+    ] as { label: string; path: string };
+    projectFixtureSelectionIndex += 1;
+    return selection;
+  }
   const fixturePathsRaw = process.env.CODEX_DEMO_PROJECT_FIXTURE_PATHS;
   let fixturePath = process.env.CODEX_DEMO_PROJECT_FIXTURE_PATH;
   if (fixturePathsRaw) {

@@ -7670,6 +7670,106 @@ try {
   await projectCreationApp.close();
 }
 
+const knownProjectCreationScene = {
+  frame: "workspace-project-menu",
+  id: "electron-known-project-creation",
+  scenario: "workspace-workflow",
+  view: "workspace",
+};
+const {
+  app: knownProjectCreationApp,
+  page: knownProjectCreationPage,
+} = await launchScene(knownProjectCreationScene, {
+  environment: {
+    CODEX_DEMO_PROJECT_FIXTURE_SELECTIONS: JSON.stringify([
+      {
+        label: "codex-ui-kit",
+        path: "/workspace/codex-ui-kit",
+      },
+    ]),
+  },
+  capture: false,
+});
+try {
+  await knownProjectCreationPage
+    .getByRole("dialog", { name: "Choose a project" })
+    .getByRole("button", { name: "New project" })
+    .click();
+  await knownProjectCreationPage.waitForSelector(
+    '.demo-root[data-view="workspace"][data-frame="workspace-ready"]',
+  );
+  await knownProjectCreationPage
+    .getByRole("button", { name: "Change project: codex-ui-kit" })
+    .click();
+  const knownProjectDialog = knownProjectCreationPage.getByRole("dialog", {
+    name: "Choose a project",
+  });
+  await knownProjectDialog.waitFor({ state: "visible" });
+  if (
+    (await knownProjectDialog
+      .getByRole("option", { name: "Select project codex-ui-kit" })
+      .count()) !== 1
+  ) {
+    throw new Error(
+      "Electron known-directory selection duplicated the project picker entry.",
+    );
+  }
+  await knownProjectCreationPage.keyboard.press("Escape");
+  await knownProjectCreationPage
+    .getByRole("button", { name: "View projects" })
+    .click();
+  if (
+    (await knownProjectCreationPage
+      .locator(".demo-projects-route")
+      .getByRole("button", { name: "Open project codex-ui-kit" })
+      .count()) !== 1
+  ) {
+    throw new Error(
+      "Electron known-directory selection duplicated the Projects Index entry.",
+    );
+  }
+} finally {
+  await knownProjectCreationApp.close();
+}
+
+const projectCreationFailureScene = {
+  currentSidebar: true,
+  frame: "projects-index-ready",
+  id: "electron-project-creation-failure",
+  scenario: "workspace-workflow",
+  view: "projects",
+};
+const {
+  app: projectCreationFailureApp,
+  page: projectCreationFailurePage,
+} = await launchScene(projectCreationFailureScene, {
+  environment: {
+    CODEX_DEMO_PROJECT_FIXTURE_PATH: resolve(
+      process.cwd(),
+      "missing-project-fixture",
+    ),
+  },
+  capture: false,
+});
+try {
+  await projectCreationFailurePage
+    .locator(".demo-projects-route")
+    .getByRole("button", { name: "New project" })
+    .click();
+  const projectCreationAlert = projectCreationFailurePage.getByRole("alert");
+  await projectCreationAlert.waitFor({ state: "visible" });
+  if (
+    (await projectCreationAlert.textContent())?.trim() !==
+    "Couldn’t add that project. Try again."
+  ) {
+    throw new Error(
+      "Electron Projects Index did not surface the project-creation failure.",
+    );
+  }
+} finally {
+  await projectCreationFailureApp.close();
+}
+
 const narrowProjectCreationScene = {
   currentSidebar: true,
   frame: "workspace-ready",

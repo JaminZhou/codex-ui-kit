@@ -2261,11 +2261,18 @@ export function App() {
         setProjectCreationStatus("idle");
         return;
       }
-      const id = `created:${selection.path}`;
-      setCreatedProjects((current) => [
-        { id, ...selection },
-        ...current.filter((project) => project.path !== selection.path),
-      ]);
+      const knownProject = workspaceProjects.find(
+        (project) => project.path === selection.path,
+      );
+      const id = knownProject?.id ?? `created:${selection.path}`;
+      setCreatedProjects((current) => {
+        const withoutSelectedPath = current.filter(
+          (project) => project.path !== selection.path,
+        );
+        return knownProject
+          ? withoutSelectedPath
+          : [{ id, ...selection }, ...withoutSelectedPath];
+      });
       setView("workspace");
       setProjectIndexChat(undefined);
       setWorkspaceProjectId(id);
@@ -2273,7 +2280,9 @@ export function App() {
       setWorkspaceWorktreeId("main");
       setWorkspaceOverlayState(null);
       setWorkspaceProjectQuery("");
-      setActiveFrame("workspace-project-created");
+      setActiveFrame(
+        knownProject ? "workspace-ready" : "workspace-project-created",
+      );
       setProjectCreationStatus("idle");
       dismissSidebarAfterNavigation();
       window.setTimeout(() =>
@@ -5406,6 +5415,10 @@ export function App() {
     projectIndexStatus === "loading" || projectIndexStatus === "error"
       ? []
       : filteredProjectIndexItems;
+  const projectIndexDisplayStatus =
+    projectCreationStatus === "error" && projectIndexStatus === "ready"
+      ? ("error" as const)
+      : projectIndexStatus;
   const projectsRoute = (
     <div className="demo-projects-route">
       <ProjectIndex
@@ -5452,13 +5465,15 @@ export function App() {
         }}
         sortBy={projectIndexSortBy}
         sortDirection={projectIndexSortDirection}
-        status={projectIndexStatus}
+        status={projectIndexDisplayStatus}
         statusMessage={
-          projectIndexStatus === "error"
-            ? "Couldn’t load projects"
-            : projectIndexStatus === "partial-error"
-              ? "Some projects may be missing"
-              : undefined
+          projectCreationStatus === "error"
+            ? "Couldn’t add that project. Try again."
+            : projectIndexStatus === "error"
+              ? "Couldn’t load projects"
+              : projectIndexStatus === "partial-error"
+                ? "Some projects may be missing"
+                : undefined
         }
         toolbar={
           <input
