@@ -244,6 +244,8 @@ const currentBuildWorkspaceCompactReference =
   process.env.CODEX_UI_KIT_WORKSPACE_COMPACT_REFERENCE;
 const currentBuildWorkspaceWorktreeReference =
   process.env.CODEX_UI_KIT_WORKSPACE_WORKTREE_REFERENCE;
+const currentBuildWorkspaceBranchCreateReference =
+  process.env.CODEX_UI_KIT_WORKSPACE_BRANCH_CREATE_REFERENCE;
 const currentBuildWorkspaceDirectoryMissingReference =
   process.env.CODEX_UI_KIT_WORKSPACE_DIRECTORY_MISSING_REFERENCE;
 const currentBuildWorkspaceDirectoryMissingReferenceSize = {
@@ -613,6 +615,7 @@ for (const scene of selectedScenes) {
   let workspaceEnvironmentPickerBounds;
   let workspaceProjectListboxBounds;
   let workspaceWorktreeMenuBounds;
+  let workspaceBranchCreateBounds;
 
   try {
     if (scene.id === "workspace-ready") {
@@ -806,6 +809,23 @@ for (const scene of selectedScenes) {
             width: Math.round(value.width),
           };
         });
+    }
+    if (scene.id === "workspace-branch-create") {
+      workspaceBranchCreateBounds = await page
+        .locator(".codex-ui-branch-creation-dialog [role=\"dialog\"]")
+        .evaluate((element) => {
+          const value = element.getBoundingClientRect();
+          return {
+            height: Math.round(value.height),
+            left: Math.round(value.left),
+            top: Math.round(value.top),
+            width: Math.round(value.width),
+          };
+        });
+      await page.evaluate(() => {
+        const active = document.activeElement;
+        if (active instanceof HTMLElement) active.blur();
+      });
     }
     if (
       scene.id === "markdown-complete" ||
@@ -1520,6 +1540,34 @@ for (const scene of selectedScenes) {
         width: 296,
       },
       referencePath: currentBuildWorkspaceWorktreeReference,
+      sceneId: scene.id,
+    });
+  }
+
+  if (
+    scene.id === "workspace-branch-create" &&
+    currentBuildWorkspaceBranchCreateReference
+  ) {
+    await compareCurrentBuildOverlay({
+      actual,
+      actualBounds: workspaceBranchCreateBounds,
+      defaultMaximumRatio: 0.08,
+      expectedActualPosition: { left: 390, top: 315 },
+      masks: [
+        { height: 30, left: 18, top: 20, width: 330 },
+        { height: 19, left: 18, top: 61, width: 344 },
+        { height: 24, left: 28, top: 96, width: 120 },
+        { height: 22, left: 130, top: 141, width: 238 },
+      ],
+      maximumRatioName:
+        "CODEX_UI_KIT_WORKSPACE_BRANCH_CREATE_MAX_DIFF_RATIO",
+      referenceCrop: {
+        height: 191,
+        left: 390,
+        top: 315,
+        width: 400,
+      },
+      referencePath: currentBuildWorkspaceBranchCreateReference,
       sceneId: scene.id,
     });
   }

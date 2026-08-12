@@ -759,6 +759,39 @@ Pending-worktree phases remain previous-build-only until runtime-reached on
 this fingerprint. Product screenshots, profiles, and raw application data
 remain untracked.
 
+## Current branch creation slice
+
+- Current Codex `26.803.61601` evidence locks the 296×280 branch menu, seven
+  branch rows, fixed creation action, and 400×190.56 create-and-checkout modal.
+- `BranchCreationDialog` exposes controlled blank, creating, host-error, Close,
+  optional Set prefix, Escape, focus trap, and launcher-focus-return behavior.
+- The Electron host issues opaque tokens for host-registered project
+  directories, enumerates the selected repository's actual local branches,
+  validates branch names, rejects duplicates, creates and checks out a real
+  branch, and switches branches through guarded main-frame IPC. Fixture-only
+  projects remain visible for replay but their Git controls stay disabled
+  until the host binds a trusted directory token.
+  Host-switched branches keep command routing on the project directory; only
+  actual worktree selections derive a `.worktrees/...` execution path.
+  Selecting a host branch from a Codex web run location restores Local and the
+  trusted startup project path before the next command is routed.
+  Detached and unborn HEAD states remain branch-creation-capable instead of
+  being collapsed into a repository-unavailable error; unborn symbolic names
+  are shown as context, not advertised as selectable refs.
+  Creating blocks every dismissal path until Git settles. Acceptance routes a
+  selected project across two generated disposable Git repositories only,
+  retains modal focus while pending, and discards checkout UI results after
+  the user changes projects. The new project's branch control stays disabled
+  with an explicit pending notice until the original checkout settles; stale
+  repository errors are cleared when project ownership changes.
+- Three reviewed blank/error/created frames extend Browser/CDP and pixels to
+  166 lifecycle frames. The untracked current-product dialog crop passes at
+  3.0916% under the 8% external ceiling.
+
+The current-product mutation itself remains a separate runtime gate until the
+isolated native project selector can attach the disposable repository. Raw
+screenshots and product project names remain local-only.
+
 ## Development
 
 From the repository root:
@@ -781,6 +814,15 @@ native-window contracts, and reviewed pixel baselines:
 
 ```bash
 pnpm check:codex-app:acceptance
+```
+
+The optional current branch-dialog gate accepts the unmodified 1180×820
+current-product screenshot and compares only the 400×191 modal crop:
+
+```bash
+CODEX_UI_KIT_WORKSPACE_BRANCH_CREATE_REFERENCE=/absolute/path/to/branch-create.png \
+  pnpm --filter @codex-ui-kit/codex-app-playground check:visual -- \
+  --scenes=workspace-branch-create
 ```
 
 To run the optional current-build multi-file pixel gate, keep the raw

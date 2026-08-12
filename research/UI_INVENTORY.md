@@ -73,8 +73,8 @@ observation from a previous build remains historical evidence.
   previous-build regression evidence and have been downgraded from `verified`
   to `partial_legacy` until they are reached again on the current fingerprint.
 
-Current inventory: 86 surface groups; 20 have current-build runtime evidence, 49 have previous-build-only runtime evidence, 17 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 19 groups and Electron verification covers 19.
-Prior acceptance outside those 18 sampled current-build groups remains
+Current inventory: 86 surface groups; 21 have current-build runtime evidence, 48 have previous-build-only runtime evidence, 17 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 19 groups and Electron verification covers 19.
+Prior acceptance outside those 19 sampled current-build groups remains
 recorded as `partial_legacy` until current-build re-observation.
 
 The current package exposes candidates far beyond the old transcript sample:
@@ -355,6 +355,25 @@ the creation and routing contract. The inventory remains `partial_legacy`
 because its runtime denominator is still the prior `26.721` route sample;
 current installed-package structure and independent verification are recorded
 without falsely claiming current runtime or pixel reachability.
+
+The `26.803.61601` branch-entry follow-up replaces the incorrect local-
+environment reuse with a dedicated branch workflow. The live Renderer exposes
+a 296×280 branch menu with seven selectable rows plus a fixed create action,
+then a 400×190.56 `Create and checkout branch` dialog with a 360×40 branch
+field, disabled empty submit, `Set prefix`, Close, and create actions. `Set
+prefix` routes to the current Git settings page; the broader settings shell
+remains a separate P1 slice. The public component keeps Git validation and
+mutation host-owned, while the Electron bridge creates and checks out a branch
+and switches back to `main` only through host-issued project tokens. A
+two-repository Electron check proves the selected host-registered directory is
+authoritative, creation retains modal focus and blocks dismissal until Git
+settles, and delayed checkout results cannot overwrite a newly selected
+project. The new project's branch control remains disabled with explicit
+pending feedback until Git settles. Browser/CDP and reviewed pixels now gate
+166 lifecycle frames; the
+local-only dialog crop differs by 3.0916% under an 8% ceiling. Current-product
+submission remains unpromoted until the same mutation is completed in the
+isolated disposable product repository.
 
 The current-thread slice adds `ConversationThreadShell`, which composes the
 existing header, scroll-following timeline, messages, and Composer into one

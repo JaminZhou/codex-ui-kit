@@ -13,6 +13,7 @@ import {
   shell,
   type IpcMainInvokeEvent,
 } from "electron";
+import { randomUUID } from "node:crypto";
 import { stat } from "node:fs/promises";
 import {
   dirname,
@@ -31,6 +32,13 @@ import {
 import { LiveApprovalGate } from "./live-approval-gate.js";
 import { LiveTurnStartGate } from "./live-turn-start-gate.js";
 import {
+  checkoutGitBranch,
+  createAndCheckoutGitBranch,
+  GitBranchCreationError,
+  listGitBranches,
+} from "./git-branch.js";
+import { GitBranchOperationQueue } from "./git-branch-operation-queue.js";
+import {
   isAllowedExternalUrl,
   isTrustedRendererUrl,
 } from "./navigation-policy.js";
@@ -41,8 +49,25 @@ const rendererEntryPath = join(rendererDirectory, "index.html");
 const preloadPath = join(currentDirectory, "preload.cjs");
 const workspaceDirectory =
   process.env.CODEX_UI_KIT_WORKSPACE ?? resolve(currentDirectory, "../../..");
+process.env.CODEX_DEMO_WORKSPACE_PROJECT_PATH = workspaceDirectory;
+const startupWorkspaceProjectToken = "startup-workspace";
+const trustedProjectDirectories = new Map<string, string>([
+  [startupWorkspaceProjectToken, workspaceDirectory],
+]);
+const trustedProjectTokensByDirectory = new Map<string, string>([
+  [resolve(workspaceDirectory), startupWorkspaceProjectToken],
+]);
 const cdpPort = process.env.CODEX_DEMO_CDP_PORT;
 const requestedNativeThemeSource = process.env.CODEX_DEMO_NATIVE_THEME_SOURCE;
+const requestedGitBranchDelayMs = Number(
+  process.env.CODEX_DEMO_GIT_BRANCH_DELAY_MS ?? "0",
+);
+const requestedGitBranchListDelayMs = Number(
+  process.env.CODEX_DEMO_GIT_BRANCH_LIST_DELAY_MS ?? "0",
+);
+const requestedGitBranchListResponseDelayMs = Number(
+  process.env.CODEX_DEMO_GIT_BRANCH_LIST_RESPONSE_DELAY_MS ?? "0",
+);
 
 if (["system", "light", "dark"].includes(requestedNativeThemeSource ?? "")) {
   nativeTheme.themeSource = requestedNativeThemeSource as
@@ -63,6 +88,8 @@ let unsubscribeNotifications: (() => void) | null = null;
 let unsubscribeServerRequests: (() => void)[] = [];
 let attachmentFixtureFailureInjected = false;
 let projectFixtureSelectionIndex = 0;
+let gitBranchOperationActive = false;
+const gitBranchOperationQueue = new GitBranchOperationQueue();
 const liveTurnStartGate = new LiveTurnStartGate();
 const liveApprovalGate = new LiveApprovalGate();
 
@@ -81,6 +108,30 @@ interface AttachmentSelection {
   label: string;
   meta: string;
 }
+
+interface BranchCreationInput {
+  branchName: string;
+  projectToken: string;
+}
+
+interface ProjectTokenInput {
+  projectToken: string;
+}
+
+type BranchCreationResponse =
+  | { branch: string; ok: true }
+  | { code: string; message: string; ok: false };
+
+type BranchListResponse =
+  | {
+      branches: string[];
+      branchesCheckedOutElsewhere: string[];
+      branchesUnavailableForCheckout: string[];
+      currentBranch: string | null;
+      ok: true;
+      unbornBranch: string | null;
+    }
+  | { code: string; message: string; ok: false };
 
 function assertStartInput(value: unknown): asserts value is StartLiveInput {
   if (
@@ -107,6 +158,79 @@ function assertApprovalResponseInput(
   ) {
     throw new TypeError("A valid approval response is required.");
   }
+}
+
+function assertBranchCreationInput(
+  value: unknown,
+): asserts value is BranchCreationInput {
+  if (
+    typeof value !== "object" ||
+    value === null ||
+    typeof (value as BranchCreationInput).branchName !== "string" ||
+    typeof (value as BranchCreationInput).projectToken !== "string"
+  ) {
+    throw new TypeError("A branch name is required.");
+  }
+}
+
+function assertProjectTokenInput(
+  value: unknown,
+): asserts value is ProjectTokenInput {
+  if (
+    typeof value !== "object" ||
+    value === null ||
+    typeof (value as ProjectTokenInput).projectToken !== "string"
+  ) {
+    throw new TypeError("A project token is required.");
+  }
+}
+
+function registerTrustedProjectDirectory(path: string) {
+  const normalizedPath = resolve(path);
+  const existing = trustedProjectTokensByDirectory.get(normalizedPath);
+  if (existing) return existing;
+  const token = `project:${randomUUID()}`;
+  trustedProjectDirectories.set(token, path);
+  trustedProjectTokensByDirectory.set(normalizedPath, token);
+  return token;
+}
+
+async function describeProjectSelection(selection: {
+  label: string;
+  path: string;
+}) {
+  const directory = await stat(selection.path).catch(() => null);
+  return {
+    ...selection,
+    projectToken: directory?.isDirectory()
+      ? registerTrustedProjectDirectory(selection.path)
+      : undefined,
+  };
+}
+
+function trustedProjectDirectory(projectToken: string) {
+  const directory = trustedProjectDirectories.get(projectToken);
+  if (!directory) {
+    throw new GitBranchCreationError(
+      "unavailable",
+      "The selected project is unavailable to the host.",
+    );
+  }
+  return directory;
+}
+
+async function delayGitBranchOperationForFixture(
+  requestedDelayMs = requestedGitBranchDelayMs,
+) {
+  if (
+    !Number.isFinite(requestedDelayMs) ||
+    requestedDelayMs <= 0
+  ) {
+    return;
+  }
+  await new Promise((resolveDelay) => {
+    setTimeout(resolveDelay, Math.min(requestedDelayMs, 5_000));
+  });
 }
 
 function broadcastNotification(notification: JsonRpcNotification) {
@@ -386,7 +510,7 @@ async function handleSelectProjectDirectory(event: IpcMainInvokeEvent) {
       Math.min(projectFixtureSelectionIndex, fixtureSelections.length - 1)
     ] as { label: string; path: string };
     projectFixtureSelectionIndex += 1;
-    return selection;
+    return describeProjectSelection(selection);
   }
   const fixturePathsRaw = process.env.CODEX_DEMO_PROJECT_FIXTURE_PATHS;
   let fixturePath = process.env.CODEX_DEMO_PROJECT_FIXTURE_PATH;
@@ -413,10 +537,10 @@ async function handleSelectProjectDirectory(event: IpcMainInvokeEvent) {
         "CODEX_DEMO_PROJECT_FIXTURE_PATH must be an absolute directory path.",
       );
     }
-    return {
+    return describeProjectSelection({
       label: attachmentPathLabel(fixturePath, process.platform),
       path: fixturePath,
-    };
+    });
   }
   const result = mainWindow
     ? await dialog.showOpenDialog(mainWindow, {
@@ -429,10 +553,115 @@ async function handleSelectProjectDirectory(event: IpcMainInvokeEvent) {
       });
   const path = result.filePaths[0];
   if (result.canceled || !path) return null;
-  return {
+  return describeProjectSelection({
     label: attachmentPathLabel(path, process.platform),
     path,
-  };
+  });
+}
+
+async function handleCreateBranch(
+  event: IpcMainInvokeEvent,
+  rawInput: unknown,
+): Promise<BranchCreationResponse> {
+  assertTrustedIpc(event);
+  assertBranchCreationInput(rawInput);
+  if (gitBranchOperationActive) {
+    return {
+      code: "busy",
+      message: "Another branch is being created.",
+      ok: false,
+    };
+  }
+  gitBranchOperationActive = true;
+  try {
+    return await gitBranchOperationQueue.run(async () => {
+      await delayGitBranchOperationForFixture();
+      const projectDirectory = trustedProjectDirectory(rawInput.projectToken);
+      const result = await createAndCheckoutGitBranch(
+        projectDirectory,
+        rawInput.branchName,
+      );
+      return { branch: result.branch, ok: true };
+    });
+  } catch (error) {
+    if (error instanceof GitBranchCreationError) {
+      return { code: error.code, message: error.message, ok: false };
+    }
+    return {
+      code: "unavailable",
+      message: "Git could not create and checkout the branch.",
+      ok: false,
+    };
+  } finally {
+    gitBranchOperationActive = false;
+  }
+}
+
+async function handleListBranches(
+  event: IpcMainInvokeEvent,
+  rawInput: unknown,
+): Promise<BranchListResponse> {
+  assertTrustedIpc(event);
+  assertProjectTokenInput(rawInput);
+  try {
+    return await gitBranchOperationQueue.run(async () => {
+      await delayGitBranchOperationForFixture(requestedGitBranchListDelayMs);
+      const result = await listGitBranches(
+        trustedProjectDirectory(rawInput.projectToken),
+      );
+      await delayGitBranchOperationForFixture(
+        requestedGitBranchListResponseDelayMs,
+      );
+      return { ...result, ok: true };
+    });
+  } catch (error) {
+    if (error instanceof GitBranchCreationError) {
+      return { code: error.code, message: error.message, ok: false };
+    }
+    return {
+      code: "unavailable",
+      message: "Git could not list the repository branches.",
+      ok: false,
+    };
+  }
+}
+
+async function handleCheckoutBranch(
+  event: IpcMainInvokeEvent,
+  rawInput: unknown,
+): Promise<BranchCreationResponse> {
+  assertTrustedIpc(event);
+  assertBranchCreationInput(rawInput);
+  if (gitBranchOperationActive) {
+    return {
+      code: "busy",
+      message: "Another Git branch operation is running.",
+      ok: false,
+    };
+  }
+  gitBranchOperationActive = true;
+  try {
+    return await gitBranchOperationQueue.run(async () => {
+      await delayGitBranchOperationForFixture();
+      const projectDirectory = trustedProjectDirectory(rawInput.projectToken);
+      const result = await checkoutGitBranch(
+        projectDirectory,
+        rawInput.branchName,
+      );
+      return { branch: result.branch, ok: true };
+    });
+  } catch (error) {
+    if (error instanceof GitBranchCreationError) {
+      return { code: error.code, message: error.message, ok: false };
+    }
+    return {
+      code: "unavailable",
+      message: "Git could not checkout the branch.",
+      ok: false,
+    };
+  } finally {
+    gitBranchOperationActive = false;
+  }
 }
 
 function createWindow() {
@@ -518,6 +747,9 @@ ipcMain.handle("demo:live:close", handleCloseLive);
 ipcMain.handle("demo:approval:respond", handleApprovalResponse);
 ipcMain.handle("demo:attachments:select", handleSelectAttachments);
 ipcMain.handle("demo:project:select", handleSelectProjectDirectory);
+ipcMain.handle("demo:git:create-branch", handleCreateBranch);
+ipcMain.handle("demo:git:checkout-branch", handleCheckoutBranch);
+ipcMain.handle("demo:git:list-branches", handleListBranches);
 
 app.whenReady().then(() => {
   createWindow();

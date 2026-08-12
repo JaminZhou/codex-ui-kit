@@ -14,7 +14,7 @@ exit gates; it does not replace the inventory.
   Desktop `26.803.61601` (`6396`). Unsampled earlier-build surfaces remain
   previous-build regression evidence rather than current verification.
 - The inventory contains 86 surface groups: 58 P0, 19 P1, and 9 P2.
-- 20 groups have current-build runtime evidence, 49 have previous-build-only
+- 21 groups have current-build runtime evidence, 48 have previous-build-only
   runtime evidence, and 17 have not been sampled.
 - The scoped `26.803.61601` refresh revalidates 43
   sidebar/menu/window-chrome/Composer icons against exact runtime evidence.
@@ -392,6 +392,28 @@ pixel gates. The historical 600×600 local-environment dialog remains an
 independent host capability rather than the current New worktree entry path.
 Project/branch creation and persistence, environment settings, Remote/Codex
 web execution, and unavailable/repair flows remain in this phase.
+
+Current branch-entry slice: `26.803.61601` Browser/CDP now locks the 296×280
+branch menu and 400×190.56 create-and-checkout dialog. The public
+`BranchCreationDialog` replaces the previous local-environment reuse, and the
+Electron host validates, creates, checks out, and switches branches only in a
+host-registered project selected by an opaque token. Checkout choices are
+enumerated from that repository rather than fixture names; unbound replay
+projects keep their Git controls disabled. Acceptance proves routing across
+two generated disposable Git repositories and blocks dismissal while creation
+is pending while retaining modal focus. Delayed checkout results are discarded
+after a project change, the new project's branch control stays disabled with
+explicit pending feedback until Git settles, and repository-scoped errors are
+cleared on project change. In-place host branches keep execution rooted at the
+project directory instead of deriving a nonexistent worktree path; detached
+and unborn HEAD states still allow new-branch creation. Blank, error, and
+created states extend the reviewed matrix to 166 frames; the local-only dialog
+crop passes at 3.0916%.
+Host-backed branch selection also restores the Local run location and trusted
+project cwd when the Composer was previously set to Codex web.
+Current-product create submission is still pending the isolated native
+directory selection, so this is not yet a claim that branch mutation/
+persistence is complete in the product runtime.
 
 Exit: a protocol-backed coding task can travel from project selection through
 command, approval, file review, terminal, and PR review without fixture-only

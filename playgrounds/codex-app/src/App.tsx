@@ -15,6 +15,7 @@ import {
   AppWindowChrome,
   ApprovalRequest,
   AutomaticApprovalReview,
+  BranchCreationDialog,
   BrowserActivity,
   Button,
   CommandExecution,
@@ -131,8 +132,11 @@ import {
 } from "./review-selection";
 import {
   contextualizeWorkspaceReplay,
+  hostSelectionUsesInPlaceBranch,
   workspaceExecutionCwd,
 } from "./workspace-replay";
+import { branchStateAfterSuccessfulCreation } from "./workspace-branch-state";
+import { trimBranchInputAsciiWhitespace } from "../../../src/internal/branchName";
 import {
   hasMcpToolCallGroupForTurn,
   mcpToolCallGroupDurationMs,
@@ -1381,12 +1385,71 @@ const workspaceEnvironmentGroups = [
 
 type WorkspaceBranch = {
   branch: string;
+  checkedOutInLinkedWorktree?: boolean;
+  checkoutUnavailable?: boolean;
   id: string;
   label: string;
   meta?: string;
   status: "available" | "repairing";
   statusLabel?: string;
 };
+
+type WorkspaceGitBranchResponse =
+  | { branch: string; ok: true }
+  | { code: string; message: string; ok: false };
+
+type WorkspaceHostBranchState =
+  | { status: "loading" }
+  | {
+      branches: string[];
+      branchesCheckedOutElsewhere: string[];
+      branchesUnavailableForCheckout: string[];
+      currentBranch: string | null;
+      status: "ready";
+      unbornBranch: string | null;
+    }
+  | { message: string; status: "error" };
+
+function workspaceGitBranchId(branch: string) {
+  return branch === "main" ? "main" : `git:${branch}`;
+}
+
+function workspaceGitBranch(
+  branch: string,
+  branchesCheckedOutElsewhere: ReadonlySet<string>,
+  branchesUnavailableForCheckout: ReadonlySet<string>,
+): WorkspaceBranch {
+  const checkedOutInLinkedWorktree = branchesCheckedOutElsewhere.has(branch);
+  const checkoutUnavailable = branchesUnavailableForCheckout.has(branch);
+  return {
+    branch,
+    checkedOutInLinkedWorktree,
+    checkoutUnavailable,
+    id: workspaceGitBranchId(branch),
+    label: branch,
+    meta: checkedOutInLinkedWorktree
+      ? "Linked worktree"
+      : checkoutUnavailable
+        ? "Unavailable"
+        : "clean",
+    status: "available",
+  };
+}
+
+const unattachedWorkspaceBranchId = "state:unattached-head";
+
+function unattachedWorkspaceBranch(
+  unbornBranch: string | null,
+): WorkspaceBranch {
+  const label = unbornBranch ? `${unbornBranch} (unborn)` : "Detached HEAD";
+  return {
+    branch: label,
+    id: unattachedWorkspaceBranchId,
+    label,
+    meta: "unattached",
+    status: "available",
+  };
+}
 
 const workspaceBranches: WorkspaceBranch[] = [
   {
@@ -1446,6 +1509,14 @@ const workspaceBranches: WorkspaceBranch[] = [
     statusLabel: "Repairing",
   },
 ];
+
+const capturedWorkspaceBranch: WorkspaceBranch = {
+  branch: "feat/current-branch",
+  id: "created:feat/current-branch",
+  label: "Current branch",
+  meta: "clean",
+  status: "available",
+};
 
 const workspaceWorktreesByProject: Record<
   string,
@@ -1570,14 +1641,44 @@ export function App() {
     initialSelection.view === "workspace" &&
       initialSelection.frame === "workspace-no-project"
       ? null
+      : initialSelection.view === "workspace" &&
+          initialSelection.frame === "workspace-environment" &&
+          window.codexDemo
+        ? window.codexDemo.workspaceProjectId
       : "codex-ui-kit",
   );
+  const workspaceProjectIdRef = useRef(workspaceProjectId);
+  const workspaceBranchCheckoutActiveRef = useRef(false);
+  const workspaceRunLocationVersionRef = useRef(0);
   const [projectIndexQuery, setProjectIndexQuery] = useState(
     initialSelection.frame === "projects-index-empty" ? "missing" : "",
   );
   const [createdProjects, setCreatedProjects] = useState<
-    Array<{ id: string; label: string; path: string }>
+    Array<{
+      id: string;
+      label: string;
+      path: string;
+      projectToken?: string;
+    }>
   >([]);
+  const [workspaceProjectTokens, setWorkspaceProjectTokens] = useState<
+    Record<string, string>
+  >(() =>
+    window.codexDemo
+      ? {
+          [window.codexDemo.workspaceProjectId]:
+            window.codexDemo.startupWorkspaceProjectToken,
+        }
+      : {},
+  );
+  const [workspaceHostBranchesByProject, setWorkspaceHostBranchesByProject] =
+    useState<Record<string, WorkspaceHostBranchState>>({});
+  const workspaceProjectToken = workspaceProjectId
+    ? workspaceProjectTokens[workspaceProjectId]
+    : undefined;
+  const workspaceUsesHostBranches = Boolean(
+    window.codexDemo && !window.codexDemo.useWorkspaceBranchFixture,
+  );
   const [projectIndexChat, setProjectIndexChat] = useState<
     | {
         chatId: string;
@@ -1621,10 +1722,25 @@ export function App() {
     initialSelection.view === "workspace" &&
       initialSelection.frame === "workspace-repairing"
       ? "repairing"
+      : initialSelection.view === "workspace" &&
+          initialSelection.frame === "workspace-branch-created"
+        ? capturedWorkspaceBranch.id
       : initialSelection.view === "workspace" && initialSelection.capture
         ? "feature"
         : "main",
   );
+  const workspaceLinkedWorktreeSelectionRef = useRef<string | null>(null);
+  const workspaceWorktreeIdRef = useRef(workspaceWorktreeId);
+  const updateWorkspaceWorktreeId = (
+    worktreeId: string,
+    linkedSelection = false,
+  ) => {
+    workspaceLinkedWorktreeSelectionRef.current = linkedSelection
+      ? worktreeId
+      : null;
+    workspaceWorktreeIdRef.current = worktreeId;
+    setWorkspaceWorktreeId(worktreeId);
+  };
   const [workspaceLocalEnvironmentOpen, setWorkspaceLocalEnvironmentOpen] =
     useState(
       initialSelection.view === "workspace" &&
@@ -1652,6 +1768,55 @@ export function App() {
             : null,
   );
   const [workspaceBranchQuery, setWorkspaceBranchQuery] = useState("");
+  const [workspaceCreatedBranches, setWorkspaceCreatedBranches] = useState<
+    Record<string, WorkspaceBranch[]>
+  >(() =>
+    initialSelection.frame === "workspace-branch-created"
+      ? { "codex-ui-kit": [capturedWorkspaceBranch] }
+      : ({} as Record<string, WorkspaceBranch[]>),
+  );
+  const [workspaceBranchDialogOpen, setWorkspaceBranchDialogOpen] =
+    useState(
+      initialSelection.view === "workspace" &&
+        [
+          "workspace-branch-create",
+          "workspace-branch-create-error",
+          "workspace-branch-create-filled",
+        ].includes(initialSelection.frame ?? ""),
+    );
+  const [workspaceBranchName, setWorkspaceBranchName] = useState(() =>
+    initialSelection.frame === "workspace-branch-create-error"
+      ? "main"
+      : initialSelection.frame === "workspace-branch-create-filled"
+        ? "feat/current-branch"
+        : "",
+  );
+  const [workspaceBranchStatus, setWorkspaceBranchStatus] = useState<
+    "creating" | "error" | "idle"
+  >(
+    initialSelection.frame === "workspace-branch-create-error"
+      ? "error"
+      : "idle",
+  );
+  const [workspaceBranchError, setWorkspaceBranchError] = useState<
+    string | undefined
+  >(
+    initialSelection.frame === "workspace-branch-create-error"
+      ? "A branch named main already exists."
+      : undefined,
+  );
+  const [workspaceBranchSwitchError, setWorkspaceBranchSwitchError] =
+    useState<string>();
+  const [workspaceBranchCheckoutPending, setWorkspaceBranchCheckoutPending] =
+    useState(false);
+  const [workspaceBranchSettingsNotice, setWorkspaceBranchSettingsNotice] =
+    useState<string>();
+  const updateWorkspaceProjectId = (projectId: string | null) => {
+    workspaceProjectIdRef.current = projectId;
+    setWorkspaceBranchSwitchError(undefined);
+    setWorkspaceBranchSettingsNotice(undefined);
+    setWorkspaceProjectId(projectId);
+  };
   const [workspaceEnvironmentQuery, setWorkspaceEnvironmentQuery] =
     useState("");
   const [workspaceProjectQuery, setWorkspaceProjectQuery] = useState("");
@@ -2104,6 +2269,84 @@ export function App() {
   }, []);
 
   useEffect(() => {
+    if (
+      !workspaceUsesHostBranches ||
+      !window.codexDemo ||
+      !workspaceProjectId ||
+      !workspaceProjectToken
+    ) {
+      return;
+    }
+    const projectId = workspaceProjectId;
+    const initialWorktreeId = workspaceWorktreeIdRef.current;
+    let cancelled = false;
+    setWorkspaceHostBranchesByProject((current) => ({
+      ...current,
+      [projectId]: { status: "loading" },
+    }));
+    void window.codexDemo
+      .listBranches({ projectToken: workspaceProjectToken })
+      .then((response) => {
+        if (cancelled) return;
+        if (!response.ok) {
+          setWorkspaceHostBranchesByProject((current) => ({
+            ...current,
+            [projectId]: {
+              message: response.message,
+              status: "error",
+            },
+          }));
+          return;
+        }
+        setWorkspaceHostBranchesByProject((current) => ({
+          ...current,
+          [projectId]: {
+            branches: response.branches,
+            branchesCheckedOutElsewhere:
+              response.branchesCheckedOutElsewhere,
+            branchesUnavailableForCheckout:
+              response.branchesUnavailableForCheckout,
+            currentBranch: response.currentBranch,
+            status: "ready",
+            unbornBranch: response.unbornBranch,
+          },
+        }));
+        if (workspaceProjectIdRef.current === projectId) {
+          setWorkspaceWorktreeId((currentWorktreeId) => {
+            if (
+              workspaceLinkedWorktreeSelectionRef.current !== null ||
+              currentWorktreeId !== initialWorktreeId
+            ) {
+              return currentWorktreeId;
+            }
+            const nextWorktreeId = response.currentBranch
+              ? workspaceGitBranchId(response.currentBranch)
+              : unattachedWorkspaceBranchId;
+            workspaceWorktreeIdRef.current = nextWorktreeId;
+            return nextWorktreeId;
+          });
+        }
+      })
+      .catch(() => {
+        if (cancelled) return;
+        setWorkspaceHostBranchesByProject((current) => ({
+          ...current,
+          [projectId]: {
+            message: "Git could not list the repository branches.",
+            status: "error",
+          },
+        }));
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [
+    workspaceProjectId,
+    workspaceProjectToken,
+    workspaceUsesHostBranches,
+  ]);
+
+  useEffect(() => {
     applyDemoThemePreference(document.documentElement, appliedTheme);
   }, [appliedTheme]);
 
@@ -2206,9 +2449,9 @@ export function App() {
     setMode("replay");
     setView("workspace");
     setProjectIndexChat(undefined);
-    setWorkspaceProjectId(projectId);
+    updateWorkspaceProjectId(projectId);
     setWorkspaceEnvironmentId("local");
-    setWorkspaceWorktreeId("main");
+    updateWorkspaceWorktreeId("main");
     setWorkspaceLocalEnvironmentOpen(false);
     setWorkspaceOverlay(null);
     setWorkspaceBranchQuery("");
@@ -2276,6 +2519,13 @@ export function App() {
         (project) => project.path === selection.path,
       );
       const id = knownProject?.id ?? `created:${selection.path}`;
+      const selectedProjectToken = selection.projectToken;
+      if (selectedProjectToken) {
+        setWorkspaceProjectTokens((current) => ({
+          ...current,
+          [id]: selectedProjectToken,
+        }));
+      }
       setCreatedProjects((current) => {
         const withoutSelectedPath = current.filter(
           (project) => project.path !== selection.path,
@@ -2288,9 +2538,9 @@ export function App() {
       setMode("replay");
       setView("workspace");
       setProjectIndexChat(undefined);
-      setWorkspaceProjectId(id);
+      updateWorkspaceProjectId(id);
       setWorkspaceEnvironmentId("local");
-      setWorkspaceWorktreeId("main");
+      updateWorkspaceWorktreeId("main");
       setWorkspaceLocalEnvironmentOpen(false);
       setWorkspaceOverlay(null);
       setWorkspaceBranchQuery("");
@@ -4569,7 +4819,7 @@ export function App() {
   const createdWorkspaceProject = createdProjects.find(
     ({ id }) => id === workspaceProjectId,
   );
-  const workspaceProject =
+  const workspaceProjectFixture =
     workspaceProjectId === null
       ? undefined
       : createdWorkspaceProject
@@ -4581,16 +4831,142 @@ export function App() {
         : (workspaceProjects.find(
             ({ id }) => id === workspaceProjectId,
           ) ?? workspaceProjects[0]);
-  const workspaceWorktrees =
-    (workspaceProjectId
-      ? workspaceWorktreesByProject[workspaceProjectId]
-      : undefined) ?? [workspaceBranches[0]];
+  const workspaceProject =
+    workspaceProjectFixture &&
+    workspaceUsesHostBranches &&
+    window.codexDemo &&
+    workspaceProjectId === window.codexDemo.workspaceProjectId
+      ? {
+          ...workspaceProjectFixture,
+          path: window.codexDemo.workspaceProjectPath,
+        }
+      : workspaceProjectFixture;
+  const createdProjectBranches = workspaceProjectId
+    ? (workspaceCreatedBranches[workspaceProjectId] ?? [])
+    : [];
+  const createdProjectBranchNames = new Set(
+    createdProjectBranches.map(({ branch }) => branch),
+  );
+  const workspaceHostBranchState = workspaceProjectId
+    ? workspaceHostBranchesByProject[workspaceProjectId]
+    : undefined;
+  const workspaceBranchesCheckedOutElsewhere = new Set(
+    workspaceHostBranchState?.status === "ready"
+      ? workspaceHostBranchState.branchesCheckedOutElsewhere
+      : [],
+  );
+  const workspaceBranchesUnavailableForCheckout = new Set(
+    workspaceHostBranchState?.status === "ready"
+      ? workspaceHostBranchState.branchesUnavailableForCheckout
+      : [],
+  );
+  const workspaceLocalEnvironmentGroups = (() => {
+    if (!workspaceUsesHostBranches || !workspaceProjectId) {
+      return workspaceEnvironmentGroups;
+    }
+    const templateGroup = workspaceEnvironmentGroups.find(
+      ({ id }) => id === workspaceProjectId,
+    ) ?? workspaceEnvironmentGroups[0];
+    if (!templateGroup) return [];
+    const [currentCheckout] = templateGroup.items;
+    if (!currentCheckout) return [];
+    const hostGroup = {
+      ...templateGroup,
+      id: workspaceProjectId,
+      label: workspaceProject?.label ?? workspaceProjectId,
+    };
+    if (workspaceHostBranchState?.status !== "ready") {
+      return [
+        {
+          ...hostGroup,
+          items: [
+            {
+              ...currentCheckout,
+              disabled: true,
+              meta: "Loading Git branches",
+              status: "unavailable" as const,
+            },
+          ],
+        },
+      ];
+    }
+    const currentBranch = workspaceHostBranchState.currentBranch;
+    const currentItem = currentBranch
+      ? {
+          ...currentCheckout,
+          branch: currentBranch,
+          id: workspaceGitBranchId(currentBranch),
+          label: currentBranch === "main" ? "Main" : "Current checkout",
+          meta: "current",
+          textValue:
+            currentBranch === "main" ? "Main" : "Current checkout",
+        }
+      : {
+          ...currentCheckout,
+          branch:
+            workspaceHostBranchState.unbornBranch ?? "Detached HEAD",
+          id: unattachedWorkspaceBranchId,
+          label: workspaceHostBranchState.unbornBranch
+            ? "Unborn checkout"
+            : "Detached HEAD",
+          meta: "current",
+          textValue: workspaceHostBranchState.unbornBranch
+            ? "Unborn checkout"
+            : "Detached HEAD",
+        };
+    return [{ ...hostGroup, items: [currentItem] }];
+  })();
+  const workspaceBranchOperationsAvailable =
+    !workspaceUsesHostBranches ||
+    Boolean(
+      workspaceProjectToken && workspaceHostBranchState?.status === "ready",
+    );
+  const workspaceBranchControlAvailable =
+    !workspaceUsesHostBranches ||
+    Boolean(
+      workspaceProjectToken && workspaceHostBranchState?.status !== "error",
+    );
+  const workspaceWorktrees = workspaceProjectId
+    ? workspaceUsesHostBranches
+      ? workspaceHostBranchState?.status === "ready"
+        ? [
+            ...(workspaceHostBranchState.currentBranch
+              ? []
+              : [
+                  unattachedWorkspaceBranch(
+                    workspaceHostBranchState.unbornBranch,
+                  ),
+                ]),
+            ...workspaceHostBranchState.branches.map((branch) =>
+              workspaceGitBranch(
+                branch,
+                workspaceBranchesCheckedOutElsewhere,
+                workspaceBranchesUnavailableForCheckout,
+              ),
+            ),
+          ]
+        : [workspaceBranches[0]]
+      : [
+          ...(workspaceWorktreesByProject[workspaceProjectId] ?? [
+            workspaceBranches[0],
+          ]).filter(
+            ({ branch }) => !createdProjectBranchNames.has(branch),
+          ),
+          ...createdProjectBranches,
+        ]
+    : [workspaceBranches[0]];
+  const selectedLinkedWorkspaceWorktree = workspaceEnvironmentGroups
+    .find(({ id }) => id === workspaceProjectId)
+    ?.items.find(({ id }) => id === workspaceWorktreeId);
   const workspaceWorktree =
-    workspaceWorktrees.find(
-      ({ id }) => id === workspaceWorktreeId,
-    ) ?? workspaceWorktrees[0];
+    workspaceWorktrees.find(({ id }) => id === workspaceWorktreeId) ??
+    selectedLinkedWorkspaceWorktree ??
+    workspaceWorktrees[0];
   const currentWorkspaceCwd = workspaceExecutionCwd({
     environmentId: workspaceEnvironmentId,
+    inPlaceBranch:
+      workspaceUsesHostBranches &&
+      hostSelectionUsesInPlaceBranch(workspaceWorktreeId),
     projectPath: workspaceProject?.path,
     worktreeBranch: workspaceWorktree.branch,
     worktreeId: workspaceWorktreeId,
@@ -4611,7 +4987,8 @@ export function App() {
   );
   const filteredWorkspaceWorktrees =
     workspaceWorktrees.filter(
-      ({ branch, label, status }) =>
+      ({ branch, id, label, status }) =>
+        id !== unattachedWorkspaceBranchId &&
         status !== "repairing" &&
         `${branch} ${label}`
           .toLocaleLowerCase()
@@ -4620,6 +4997,8 @@ export function App() {
   const workspaceBaseFrame =
     projectIndexChat
       ? "projects-index-chat"
+      : activeFrame === "workspace-branch-created"
+        ? activeFrame
       : currentWorkspacePersistenceFrame(activeFrame)
       ? activeFrame
       : initialSelection.frame === "workspace-compact-ready"
@@ -4642,6 +5021,7 @@ export function App() {
     if (
       view !== "workspace" ||
       workspaceLocalEnvironmentOpen ||
+      workspaceBranchDialogOpen ||
       workspaceOverlay
     ) {
       return;
@@ -4650,6 +5030,7 @@ export function App() {
   }, [
     view,
     workspaceBaseFrame,
+    workspaceBranchDialogOpen,
     workspaceLocalEnvironmentOpen,
     workspaceOverlay,
   ]);
@@ -4688,9 +5069,219 @@ export function App() {
     setWorkspaceLocalEnvironmentOpen(false);
     setActiveFrame("workspace-ready");
   };
+  const openWorkspaceBranchCreation = () => {
+    if (!workspaceBranchOperationsAvailable) return;
+    setWorkspaceOverlay(null);
+    setWorkspaceBranchName("");
+    setWorkspaceBranchError(undefined);
+    setWorkspaceBranchSettingsNotice(undefined);
+    setWorkspaceBranchStatus("idle");
+    setWorkspaceBranchDialogOpen(true);
+    setActiveFrame("workspace-branch-create");
+  };
+  const closeWorkspaceBranchCreation = () => {
+    if (workspaceBranchStatus === "creating") return;
+    setWorkspaceBranchDialogOpen(false);
+    setWorkspaceBranchStatus("idle");
+    setWorkspaceBranchError(undefined);
+    setActiveFrame("workspace-ready");
+  };
+  const createWorkspaceBranch = async (rawBranchName: string) => {
+    const branchName = trimBranchInputAsciiWhitespace(rawBranchName);
+    const projectId = workspaceProjectId;
+    if (!branchName || !projectId) return;
+    const projectToken = workspaceProjectTokens[projectId];
+    if (workspaceUsesHostBranches && !projectToken) {
+      setWorkspaceBranchStatus("error");
+      setWorkspaceBranchError(
+        "Add this project from a local directory before managing its Git branches.",
+      );
+      setActiveFrame("workspace-branch-create-error");
+      return;
+    }
+    setWorkspaceBranchStatus("creating");
+    setWorkspaceBranchError(undefined);
+    const duplicate =
+      !workspaceUsesHostBranches &&
+      workspaceWorktrees.some((worktree) => worktree.branch === branchName);
+    let response: WorkspaceGitBranchResponse;
+    try {
+      response = duplicate
+        ? {
+            code: "duplicate",
+            message: `A branch named ${branchName} already exists.`,
+            ok: false,
+          }
+        : workspaceUsesHostBranches && window.codexDemo
+          ? await window.codexDemo.createAndCheckoutBranch({
+              branchName,
+              projectToken: projectToken ?? "",
+            })
+          : { branch: branchName, ok: true };
+    } catch {
+      response = {
+        code: "unavailable",
+        message: "Git could not create and checkout the branch.",
+        ok: false,
+      };
+    }
+    if (!response.ok) {
+      setWorkspaceBranchStatus("error");
+      setWorkspaceBranchError(response.message);
+      setActiveFrame("workspace-branch-create-error");
+      return;
+    }
+    const createdBranch: WorkspaceBranch = {
+      branch: response.branch,
+      id: workspaceUsesHostBranches
+        ? workspaceGitBranchId(response.branch)
+        : `created:${response.branch}`,
+      label: response.branch,
+      meta: "clean",
+      status: "available",
+    };
+    let selectedBranchId = createdBranch.id;
+    if (workspaceUsesHostBranches) {
+      const previous = workspaceHostBranchesByProject[projectId];
+      let nextState: WorkspaceHostBranchState =
+        branchStateAfterSuccessfulCreation(
+          previous?.status === "ready" ? previous : undefined,
+          response.branch,
+        ) ?? {
+          message: "Git created the branch, but its state could not be refreshed.",
+          status: "error",
+        };
+      try {
+        const listed = await window.codexDemo?.listBranches({
+          projectToken: projectToken ?? "",
+        });
+        if (listed?.ok) {
+          nextState = {
+            branches: listed.branches,
+            branchesCheckedOutElsewhere:
+              listed.branchesCheckedOutElsewhere,
+            branchesUnavailableForCheckout:
+              listed.branchesUnavailableForCheckout,
+            currentBranch: listed.currentBranch,
+            status: "ready",
+            unbornBranch: listed.unbornBranch,
+          };
+        }
+      } catch {
+        // The successful switch remains represented as an uncommitted ref.
+      }
+      setWorkspaceHostBranchesByProject((current) => ({
+        ...current,
+        [projectId]: nextState,
+      }));
+      selectedBranchId = nextState.status === "ready"
+        ? nextState.currentBranch
+          ? workspaceGitBranchId(nextState.currentBranch)
+          : unattachedWorkspaceBranchId
+        : createdBranch.id;
+    } else {
+      setWorkspaceCreatedBranches((current) => ({
+        ...current,
+        [projectId]: [
+          ...(current[projectId] ?? []).filter(
+            (branch) => branch.branch !== response.branch,
+          ),
+          createdBranch,
+        ],
+      }));
+    }
+    setWorkspaceEnvironmentId("local");
+    updateWorkspaceWorktreeId(selectedBranchId);
+    setWorkspaceBranchDialogOpen(false);
+    setWorkspaceBranchName("");
+    setWorkspaceBranchStatus("idle");
+    setActiveFrame("workspace-branch-created");
+  };
+  const selectWorkspaceBranch = async (worktree: WorkspaceBranch) => {
+    const initiatingProjectId = workspaceProjectId;
+    const initiatingEnvironmentId = workspaceEnvironmentId;
+    const initiatingRunLocationVersion =
+      workspaceRunLocationVersionRef.current;
+    if (
+      !initiatingProjectId ||
+      worktree.checkedOutInLinkedWorktree ||
+      worktree.checkoutUnavailable ||
+      workspaceBranchCheckoutActiveRef.current
+    ) {
+      return;
+    }
+    const initiatingProjectToken =
+      workspaceProjectTokens[initiatingProjectId] ?? "";
+    if (workspaceUsesHostBranches && !initiatingProjectToken) {
+      setWorkspaceBranchSwitchError(
+        "Add this project from a local directory before managing its Git branches.",
+      );
+      setActiveFrame("workspace-branch-switch-error");
+      return;
+    }
+    workspaceBranchCheckoutActiveRef.current = true;
+    setWorkspaceBranchCheckoutPending(true);
+    setWorkspaceBranchSwitchError(undefined);
+    setWorkspaceBranchSettingsNotice(undefined);
+    let response: WorkspaceGitBranchResponse;
+    try {
+      response = workspaceUsesHostBranches && window.codexDemo
+        ? await window.codexDemo.checkoutBranch({
+            branchName: worktree.branch,
+            projectToken: initiatingProjectToken,
+          })
+        : { branch: worktree.branch, ok: true };
+    } catch {
+      response = {
+        code: "unavailable",
+        message: "Git could not checkout the branch.",
+        ok: false,
+      };
+    } finally {
+      workspaceBranchCheckoutActiveRef.current = false;
+      setWorkspaceBranchCheckoutPending(false);
+    }
+    if (response.ok && workspaceUsesHostBranches) {
+      setWorkspaceHostBranchesByProject((current) => {
+        const previous = current[initiatingProjectId];
+        if (previous?.status !== "ready") return current;
+        return {
+          ...current,
+          [initiatingProjectId]: {
+            ...previous,
+            currentBranch: response.branch,
+            unbornBranch: null,
+          },
+        };
+      });
+    }
+    if (workspaceProjectIdRef.current !== initiatingProjectId) {
+      return;
+    }
+    if (!response.ok) {
+      setWorkspaceBranchSwitchError(response.message);
+      setActiveFrame("workspace-branch-switch-error");
+      return;
+    }
+    if (
+      (workspaceUsesHostBranches ||
+        initiatingEnvironmentId === "worktree") &&
+      workspaceRunLocationVersionRef.current ===
+        initiatingRunLocationVersion
+    ) {
+      setWorkspaceEnvironmentId("local");
+    }
+    updateWorkspaceWorktreeId(
+      workspaceUsesHostBranches
+        ? workspaceGitBranchId(response.branch)
+        : worktree.id,
+    );
+    setActiveFrame("workspace-ready");
+  };
   const selectWorkspaceRunLocation = (
     environmentId: "cloud" | "local" | "worktree",
   ) => {
+    workspaceRunLocationVersionRef.current += 1;
     setWorkspaceEnvironmentId(environmentId);
     setWorkspaceOverlay(null);
     setActiveFrame(
@@ -4776,6 +5367,9 @@ export function App() {
                   },
                   {
                     controlsId: "demo-workspace-worktree-menu",
+                    disabled:
+                      workspaceBranchCheckoutPending ||
+                      !workspaceBranchControlAvailable,
                     icon: <CurrentBuildIcon name="composer-branch" />,
                     id: "worktree",
                     kind: "worktree" as const,
@@ -4941,6 +5535,11 @@ export function App() {
                   {filteredWorkspaceWorktrees.map((worktree) => (
                     <MenuItem
                       aria-checked={worktree.id === workspaceWorktreeId}
+                      disabled={
+                        !workspaceBranchOperationsAvailable ||
+                        worktree.checkedOutInLinkedWorktree ||
+                        worktree.checkoutUnavailable
+                      }
                       endIcon={
                         worktree.id === workspaceWorktreeId
                           ? "✓"
@@ -4948,13 +5547,17 @@ export function App() {
                       }
                       key={worktree.id}
                       onSelect={() => {
-                        if (workspaceEnvironmentId === "worktree") {
-                          setWorkspaceEnvironmentId("local");
-                        }
-                        setWorkspaceWorktreeId(worktree.id);
+                        void selectWorkspaceBranch(worktree);
                       }}
                       role="menuitemradio"
                       startIcon="⑂"
+                      subText={
+                        worktree.checkedOutInLinkedWorktree
+                          ? "Checked out in another worktree"
+                          : worktree.checkoutUnavailable
+                            ? "Unavailable for checkout"
+                          : undefined
+                      }
                     >
                       {worktree.branch}
                     </MenuItem>
@@ -4965,6 +5568,13 @@ export function App() {
                   onSelect={() =>
                     openWorkspaceLocalEnvironment("worktree")
                   }
+                  startIcon={<CurrentBuildIcon name="composer-worktree" />}
+                >
+                  Select local environment…
+                </MenuItem>
+                <MenuItem
+                  disabled={!workspaceBranchOperationsAvailable}
+                  onSelect={openWorkspaceBranchCreation}
                   startIcon="＋"
                 >
                   Create and checkout new branch…
@@ -4975,6 +5585,43 @@ export function App() {
           return trigger;
         }}
       />
+      {workspaceBranchSwitchError ? (
+        <StatusBanner heading="Couldn’t checkout branch" tone="error">
+          {workspaceBranchSwitchError}
+        </StatusBanner>
+      ) : null}
+      {workspaceBranchCheckoutPending ? (
+        <StatusBanner heading="Switching branch" tone="info">
+          Waiting for the current Git checkout to finish.
+        </StatusBanner>
+      ) : null}
+      {workspaceUsesHostBranches &&
+      workspaceProjectId &&
+      !workspaceProjectToken ? (
+        <StatusBanner heading="Branch operations unavailable" tone="info">
+          Add this project from a local directory before managing its Git
+          branches.
+        </StatusBanner>
+      ) : null}
+      {workspaceUsesHostBranches &&
+      workspaceProjectToken &&
+      workspaceHostBranchState?.status === "loading" ? (
+        <StatusBanner heading="Loading branches" tone="info">
+          Reading the selected project’s local Git branches.
+        </StatusBanner>
+      ) : null}
+      {workspaceUsesHostBranches &&
+      workspaceProjectToken &&
+      workspaceHostBranchState?.status === "error" ? (
+        <StatusBanner heading="Branch operations unavailable" tone="error">
+          {workspaceHostBranchState.message}
+        </StatusBanner>
+      ) : null}
+      {workspaceBranchSettingsNotice ? (
+        <StatusBanner heading="Branch prefix settings" tone="info">
+          {workspaceBranchSettingsNotice}
+        </StatusBanner>
+      ) : null}
       {workspaceOverlay === "project" ? (
         <div
           aria-label="Choose a project"
@@ -5001,9 +5648,9 @@ export function App() {
               setWorkspaceOverlayState(null);
             }}
             onSelect={(projectId) => {
-              setWorkspaceProjectId(projectId);
+              updateWorkspaceProjectId(projectId);
               setWorkspaceEnvironmentId("local");
-              setWorkspaceWorktreeId("main");
+              updateWorkspaceWorktreeId("main");
               setWorkspaceOverlayState(null);
               setActiveFrame("workspace-ready");
               setWorkspaceProjectQuery("");
@@ -5203,7 +5850,7 @@ export function App() {
             Create worktree
           </Button>
         }
-        groups={workspaceEnvironmentGroups}
+        groups={workspaceLocalEnvironmentGroups}
         id="demo-workspace-local-environment-dialog"
         onOpenChange={(open) => {
           if (open) {
@@ -5214,9 +5861,13 @@ export function App() {
         }}
         onQueryChange={setWorkspaceEnvironmentQuery}
         onSelect={(groupId, itemId) => {
-          setWorkspaceProjectId(groupId);
+          updateWorkspaceProjectId(groupId);
           setWorkspaceEnvironmentId("local");
-          setWorkspaceWorktreeId(itemId);
+          updateWorkspaceWorktreeId(
+            itemId,
+            !workspaceUsesHostBranches ||
+              !hostSelectionUsesInPlaceBranch(itemId),
+          );
           closeWorkspaceLocalEnvironment();
         }}
         open={workspaceLocalEnvironmentOpen}
@@ -5227,6 +5878,39 @@ export function App() {
             : workspaceEnvironmentTriggerRef
         }
         title="Select local environment"
+      />
+      <BranchCreationDialog
+        branchName={workspaceBranchName}
+        error={workspaceBranchError}
+        onBranchNameChange={(branchName) => {
+          setWorkspaceBranchName(branchName);
+          if (workspaceBranchError) {
+            setWorkspaceBranchError(undefined);
+            setWorkspaceBranchStatus("idle");
+          }
+        }}
+        onCreate={(branchName) => {
+          void createWorkspaceBranch(branchName);
+        }}
+        onOpenChange={(open) => {
+          if (open) {
+            setWorkspaceBranchDialogOpen(true);
+            return;
+          }
+          closeWorkspaceBranchCreation();
+        }}
+        onSetPrefix={() => {
+          setWorkspaceBranchDialogOpen(false);
+          setWorkspaceBranchError(undefined);
+          setWorkspaceBranchStatus("idle");
+          setWorkspaceBranchSettingsNotice(
+            "Open Settings → Git to change the prefix used for new branches.",
+          );
+          setActiveFrame("workspace-ready");
+        }}
+        open={workspaceBranchDialogOpen}
+        returnFocusRef={workspaceWorktreeTriggerRef}
+        status={workspaceBranchStatus}
       />
     </div>
   );

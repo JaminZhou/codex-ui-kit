@@ -11,6 +11,7 @@ import {
 import { useRef, useState } from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import {
+  BranchCreationDialog,
   ConversationContextBar,
   ConversationProjectListbox,
   ConversationRouteSelector,
@@ -34,6 +35,166 @@ function accessibleDescriptionText(element: Element) {
 }
 
 describe("project conversation routing", () => {
+  it("creates a branch from a focused modal and returns focus after close", async () => {
+    function BranchDialogHarness() {
+      const [branchName, setBranchName] = useState("");
+      const [open, setOpen] = useState(false);
+      const triggerRef = useRef<HTMLButtonElement>(null);
+      return (
+        <>
+          <button ref={triggerRef} onClick={() => setOpen(true)} type="button">
+            Create branch
+          </button>
+          <BranchCreationDialog
+            branchName={branchName}
+            onBranchNameChange={setBranchName}
+            onCreate={() => setOpen(false)}
+            onOpenChange={setOpen}
+            onSetPrefix={() => undefined}
+            open={open}
+            returnFocusRef={triggerRef}
+          />
+        </>
+      );
+    }
+
+    render(<BranchDialogHarness />);
+    const trigger = screen.getByRole("button", { name: "Create branch" });
+    fireEvent.click(trigger);
+
+    const dialog = screen.getByRole("dialog", {
+      name: "Create and checkout branch",
+    });
+    const input = within(dialog).getByRole("textbox", {
+      name: "Branch name",
+    });
+    await waitFor(() => expect(document.activeElement).toBe(input));
+    const submit = within(dialog).getByRole("button", {
+      name: "Create and checkout",
+    });
+    expect(submit).toHaveProperty("disabled", true);
+    fireEvent.change(input, { target: { value: "feat/current-branch" } });
+    expect(submit).toHaveProperty("disabled", false);
+    fireEvent.submit(input.closest("form")!);
+    await waitFor(() => expect(screen.queryByRole("dialog")).toBeNull());
+    expect(document.activeElement).toBe(trigger);
+  });
+
+  it("keeps host branch errors linked to the field and blocks duplicate submission while creating", async () => {
+    const onCreate = vi.fn();
+    const onOpenChange = vi.fn();
+    render(
+      <BranchCreationDialog
+        branchName="main"
+        error="A branch named main already exists."
+        onBranchNameChange={() => undefined}
+        onCreate={onCreate}
+        onOpenChange={onOpenChange}
+        open
+        status="creating"
+      />,
+    );
+
+    const input = screen.getByRole("textbox", { name: "Branch name" });
+    expect(input.getAttribute("aria-invalid")).toBe("true");
+    expect(accessibleDescriptionText(input)).toContain(
+      "A branch named main already exists.",
+    );
+    expect(input).toHaveProperty("disabled", true);
+    const submit = screen.getByRole("button", {
+      name: "Creating and checking out branch",
+    });
+    expect(submit).toHaveProperty("disabled", true);
+    const close = screen.getByRole("button", {
+      name: "Close branch creation dialog",
+    });
+    expect(close).toHaveProperty("disabled", true);
+    const dialog = screen.getByRole("dialog", {
+      name: "Create and checkout branch",
+    });
+    await waitFor(() => expect(document.activeElement).toBe(dialog));
+    fireEvent.keyDown(dialog, { key: "Tab" });
+    expect(document.activeElement).toBe(dialog);
+    fireEvent.keyDown(dialog, { key: "Escape" });
+    fireEvent.pointerDown(dialog.parentElement!);
+    expect(onOpenChange).not.toHaveBeenCalled();
+    fireEvent.submit(input.closest("form")!);
+    expect(onCreate).not.toHaveBeenCalled();
+  });
+
+  it("returns focus to the branch input when creation fails", async () => {
+    const onOpenChange = vi.fn();
+    const { rerender } = render(
+      <BranchCreationDialog
+        branchName="feat/retry"
+        onBranchNameChange={() => undefined}
+        onCreate={() => undefined}
+        onOpenChange={onOpenChange}
+        open
+        status="creating"
+      />,
+    );
+
+    const dialog = screen.getByRole("dialog", {
+      name: "Create and checkout branch",
+    });
+    await waitFor(() => expect(document.activeElement).toBe(dialog));
+
+    rerender(
+      <BranchCreationDialog
+        branchName="feat/retry"
+        error="Git could not create and checkout the branch."
+        onBranchNameChange={() => undefined}
+        onCreate={() => undefined}
+        onOpenChange={onOpenChange}
+        open
+        status="error"
+      />,
+    );
+
+    await waitFor(() =>
+      expect(document.activeElement).toBe(
+        screen.getByRole("textbox", { name: "Branch name" }),
+      ),
+    );
+  });
+
+  it("preserves Unicode whitespace while trimming ASCII branch padding", () => {
+    const onCreate = vi.fn();
+    render(
+      <BranchCreationDialog
+        branchName={"  feat/unicode\u00a0  "}
+        onBranchNameChange={() => undefined}
+        onCreate={onCreate}
+        onOpenChange={() => undefined}
+        open
+      />,
+    );
+
+    fireEvent.submit(
+      screen.getByRole("textbox", { name: "Branch name" }).closest("form")!,
+    );
+    expect(onCreate).toHaveBeenCalledWith("feat/unicode\u00a0");
+  });
+
+  it("trims large ASCII branch padding without backtracking", () => {
+    const onCreate = vi.fn();
+    render(
+      <BranchCreationDialog
+        branchName={`${"\t".repeat(100_000)}feat/linear${" ".repeat(100_000)}`}
+        onBranchNameChange={() => undefined}
+        onCreate={onCreate}
+        onOpenChange={() => undefined}
+        open
+      />,
+    );
+
+    fireEvent.submit(
+      screen.getByRole("textbox", { name: "Branch name" }).closest("form")!,
+    );
+    expect(onCreate).toHaveBeenCalledWith("feat/linear");
+  });
+
   it("separates conversation destination from project, environment, and worktree context", () => {
     const onSelect = vi.fn();
     render(

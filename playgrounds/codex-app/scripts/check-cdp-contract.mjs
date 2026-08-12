@@ -6,6 +6,26 @@ process.env.CODEX_DEMO_ATTACHMENT_RENDERER_FIXTURE = "1";
 
 const artifactDirectory = join(process.cwd(), "artifacts", "cdp");
 await mkdir(artifactDirectory, { recursive: true });
+const requestedScenesArgument = process.argv.find((argument) =>
+  argument.startsWith("--scenes="),
+);
+const requestedSceneIds = requestedScenesArgument
+  ? new Set(
+      requestedScenesArgument
+        .slice("--scenes=".length)
+        .split(",")
+        .map((value) => value.trim())
+        .filter(Boolean),
+    )
+  : null;
+const selectedScenes = requestedSceneIds
+  ? visualScenes.filter(({ id }) => requestedSceneIds.has(id))
+  : visualScenes;
+if (requestedSceneIds && selectedScenes.length !== requestedSceneIds.size) {
+  const knownIds = new Set(visualScenes.map(({ id }) => id));
+  const unknownIds = [...requestedSceneIds].filter((id) => !knownIds.has(id));
+  throw new Error(`Unknown CDP scenes: ${unknownIds.join(", ")}`);
+}
 const currentReplayComposerScenarios = new Set([
   "attachment-lifecycle",
   "approval-review-timeout",
@@ -34,7 +54,7 @@ const currentApprovalComposerScenes = new Set([
 ]);
 const currentReplayComposerContracts = [];
 
-for (const scene of visualScenes) {
+for (const scene of selectedScenes) {
   const { app, page } = await launchScene(scene);
   try {
     if (scene.id === "thread-windowed") {
@@ -741,12 +761,38 @@ for (const scene of visualScenes) {
           (button) => ({
             checked: button.getAttribute("aria-checked"),
             role: button.getAttribute("role"),
+            text: button.textContent?.trim(),
           }),
+        );
+        const branchCreationDialog = document.querySelector(
+          ".codex-ui-branch-creation-dialog",
+        );
+        const branchCreationSurface =
+          branchCreationDialog?.querySelector('[role="dialog"]');
+        const branchCreationInput = branchCreationDialog?.querySelector(
+          'input[aria-label="Branch name"]',
+        );
+        const branchCreationSubmit = Array.from(
+          branchCreationDialog?.querySelectorAll("button") ?? [],
+        ).find(
+          (button) =>
+            button.textContent?.trim() === "Create and checkout",
         );
         return {
           activeElement:
             document.activeElement?.getAttribute("aria-label") ?? null,
           composer: rect(composer),
+          branchCreation: branchCreationDialog
+            ? {
+                error:
+                  branchCreationDialog.querySelector('[role="alert"]')
+                    ?.textContent ?? null,
+                input: rect(branchCreationInput),
+                inputValue: branchCreationInput?.value ?? null,
+                rect: rect(branchCreationSurface),
+                submitDisabled: branchCreationSubmit?.disabled ?? null,
+              }
+            : null,
           context: rect(context),
           contextButtons,
           currentIcons,
@@ -818,6 +864,10 @@ for (const scene of visualScenes) {
       const localEnvironmentExpected =
         scene.frame === "workspace-environment";
       const worktreeExpected = scene.frame === "workspace-worktree-menu";
+      const branchCreationExpected = [
+        "workspace-branch-create",
+        "workspace-branch-create-error",
+      ].includes(scene.frame);
       const worktreeEnvironmentExpected =
         scene.frame === "workspace-environment-picker";
       const noProjectExpected = scene.frame === "workspace-no-project";
@@ -880,6 +930,7 @@ for (const scene of visualScenes) {
         Boolean(contract.localEnvironment) !==
           localEnvironmentExpected ||
         Boolean(contract.worktree) !== worktreeExpected ||
+        Boolean(contract.branchCreation) !== branchCreationExpected ||
         Boolean(contract.worktreeEnvironment) !==
           worktreeEnvironmentExpected ||
         Boolean(worktreeTrigger?.disabled) !== repairingExpected ||
@@ -898,6 +949,27 @@ for (const scene of visualScenes) {
       ) {
         throw new Error(
           `${scene.id}: workspace entry contract failed: ${JSON.stringify(contract)}`,
+        );
+      }
+      if (
+        branchCreationExpected &&
+        (!contract.branchCreation ||
+          Math.abs(contract.branchCreation.rect.width - 400) > 1 ||
+          Math.abs(contract.branchCreation.input.width - 360) > 1 ||
+          Math.abs(contract.branchCreation.input.height - 40) > 1 ||
+          contract.activeElement !== "Branch name" ||
+          (scene.frame === "workspace-branch-create" &&
+            (contract.branchCreation.inputValue !== "" ||
+              contract.branchCreation.submitDisabled !== true ||
+              contract.branchCreation.error !== null)) ||
+          (scene.frame === "workspace-branch-create-error" &&
+            (contract.branchCreation.inputValue !== "main" ||
+              contract.branchCreation.submitDisabled !== false ||
+              contract.branchCreation.error !==
+                "A branch named main already exists.")))
+      ) {
+        throw new Error(
+          `${scene.id}: workspace branch creation dialog failed: ${JSON.stringify(contract)}`,
         );
       }
       if (
@@ -967,10 +1039,13 @@ for (const scene of visualScenes) {
         (!contract.worktree ||
           Math.abs(contract.worktree.rect.width - 296) > 1 ||
           Math.abs(contract.worktree.rect.height - 280) > 1 ||
-          contract.worktree.buttons.length !== 8 ||
+          contract.worktree.buttons.length !== 9 ||
           contract.worktree.buttons.filter(
             ({ role }) => role === "menuitemradio",
           ).length !== 7 ||
+          !contract.worktree.buttons.some(({ text }) =>
+            text?.includes("Select local environment…"),
+          ) ||
           contract.worktree.buttons.filter(
             ({ checked }) => checked === "true",
           ).length !== 1 ||
@@ -6678,6 +6753,9 @@ const {
   page: workspaceResponsivePage,
 } = await launchScene(workspaceResponsiveScene, {
   capture: false,
+  environment: {
+    CODEX_DEMO_WORKSPACE_BRANCH_FIXTURE: "1",
+  },
   windowSize: { height: 820, width: 1180 },
 });
 try {
@@ -9949,4 +10027,4 @@ await writeFile(
   `${JSON.stringify(currentReplayComposerContracts, null, 2)}\n`,
 );
 
-console.log(`CDP contracts passed for ${visualScenes.length} lifecycle frames.`);
+console.log(`CDP contracts passed for ${selectedScenes.length} lifecycle frames.`);

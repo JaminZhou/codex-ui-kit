@@ -63,8 +63,9 @@ review the [coverage policy](research/PARITY.md), or follow the
   pixels.
 - Project index, current-build new-chat destination/context setup and
   New worktree environment-empty flow, grouped host-defined local environment
-  dialog, protocol-neutral route/worktree selectors, PR list/detail, checks,
-  reviewers, and inline review-thread compositions.
+  dialog, host-enumerated Git branches for trusted projects, guarded real
+  create/checkout, protocol-neutral route/worktree selectors, PR list/detail,
+  checks, reviewers, and inline review-thread compositions.
 - Command execution with current-build long-output/tail-following evidence,
   structured file diffs, tool calls, scoped file approvals, automatic-review
   lifecycle states, and notices.

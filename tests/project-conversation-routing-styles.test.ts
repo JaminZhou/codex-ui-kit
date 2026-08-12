@@ -46,6 +46,18 @@ describe("project conversation routing visual contract", () => {
     );
   });
 
+  it("matches the current compact branch creation geometry", () => {
+    expect(styles).toMatch(
+      /\.codex-ui-branch-creation-dialog \.codex-ui-dialog__surface \{[\s\S]*?border-radius: 1\.5625rem;[\s\S]*?min-height: 11\.91rem;[\s\S]*?padding: 1\.25rem;[\s\S]*?width: min\(25rem, 100%\)/,
+    );
+    expect(styles).toMatch(
+      /\.codex-ui-branch-creation-dialog__input \{[\s\S]*?border-radius: 0\.9375rem;[\s\S]*?height: 2\.5rem;[\s\S]*?padding: 0 0\.75rem/,
+    );
+    expect(styles).toMatch(
+      /\.codex-ui-branch-creation-dialog \.codex-ui-button \{[\s\S]*?border-radius: 0\.78125rem;[\s\S]*?height: 2rem;[\s\S]*?padding-inline: 1rem/,
+    );
+  });
+
   it("stacks routing and project selection at compact widths", () => {
     expect(styles).toMatch(
       /@container codex-ui-project-conversation-page \(max-width: 48rem\)[\s\S]*?\.codex-ui-project-conversation-page__body \{[\s\S]*?grid-template-columns: minmax\(0, 1fr\);[\s\S]*?grid-template-rows: auto minmax\(0, 1fr\)/,

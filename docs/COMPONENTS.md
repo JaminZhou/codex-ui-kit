@@ -262,6 +262,10 @@ All privileged behavior remains host-owned. The components never auto-approve co
 - `LocalEnvironmentDialog`: searchable, grouped local checkout/worktree
   selection with branch, metadata, repair/loading states, scrolling, and a
   host-owned create action.
+- `BranchCreationDialog`: current compact branch-name modal with an optional
+  Git-prefix action, empty/creating/error states, host-owned validation and
+  mutation, focus containment on the modal surface while creating, dismissal
+  blocking while creating, and launcher focus return.
 - `ConversationRouteSelector`: keyboard-navigable radio-card selection for
   host-defined products that use one mutually exclusive route choice. It is
   protocol-neutral and is not the current Codex new-chat destination/context
