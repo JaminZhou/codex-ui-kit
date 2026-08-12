@@ -7,6 +7,7 @@ import {
 } from "react";
 import { Dialog } from "./Dialog.js";
 import { Button } from "./InteractivePrimitives.js";
+import { trimBranchInputAsciiWhitespace } from "../internal/branchName.js";
 
 export type BranchCreationDialogStatus = "creating" | "error" | "idle";
 
@@ -58,7 +59,7 @@ export function BranchCreationDialog({
 }: BranchCreationDialogProps) {
   const formId = useId();
   const errorId = useId();
-  const normalizedBranchName = branchName.trim();
+  const normalizedBranchName = trimBranchInputAsciiWhitespace(branchName);
   const creating = status === "creating";
   const submit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();

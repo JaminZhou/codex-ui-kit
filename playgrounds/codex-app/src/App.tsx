@@ -136,6 +136,7 @@ import {
   workspaceExecutionCwd,
 } from "./workspace-replay";
 import { branchStateAfterSuccessfulCreation } from "./workspace-branch-state";
+import { trimBranchInputAsciiWhitespace } from "../../../src/internal/branchName";
 import {
   hasMcpToolCallGroupForTurn,
   mcpToolCallGroupDurationMs,
@@ -4968,7 +4969,7 @@ export function App() {
     setActiveFrame("workspace-ready");
   };
   const createWorkspaceBranch = async (rawBranchName: string) => {
-    const branchName = rawBranchName.trim();
+    const branchName = trimBranchInputAsciiWhitespace(rawBranchName);
     const projectId = workspaceProjectId;
     if (!branchName || !projectId) return;
     const projectToken = workspaceProjectTokens[projectId];

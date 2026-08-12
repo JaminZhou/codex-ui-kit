@@ -32,13 +32,13 @@ export class GitBranchCreationError extends Error {
 }
 
 function normalizedBranchName(value: string) {
-  return value.trim();
+  return value.replace(/^[\t\n\f\r ]+|[\t\n\f\r ]+$/g, "");
 }
 
 export function decodeGitOutput(chunks: readonly Uint8Array[]) {
   return Buffer.concat(chunks.map((chunk) => Buffer.from(chunk)))
     .toString("utf8")
-    .trim();
+    .replace(/(?:\r?\n)+$/g, "");
 }
 
 async function runGit(
@@ -287,7 +287,6 @@ export async function listGitBranches(
     ]);
     const branches = branchOutput
       .split(/\r?\n/)
-      .map((branch) => branch.trim())
       .filter(Boolean);
     const attached = Boolean(currentBranch && branches.includes(currentBranch));
     return {

@@ -159,6 +159,24 @@ describe("project conversation routing", () => {
     );
   });
 
+  it("preserves Unicode whitespace while trimming ASCII branch padding", () => {
+    const onCreate = vi.fn();
+    render(
+      <BranchCreationDialog
+        branchName={"  feat/unicode\u00a0  "}
+        onBranchNameChange={() => undefined}
+        onCreate={onCreate}
+        onOpenChange={() => undefined}
+        open
+      />,
+    );
+
+    fireEvent.submit(
+      screen.getByRole("textbox", { name: "Branch name" }).closest("form")!,
+    );
+    expect(onCreate).toHaveBeenCalledWith("feat/unicode\u00a0");
+  });
+
   it("separates conversation destination from project, environment, and worktree context", () => {
     const onSelect = vi.fn();
     render(

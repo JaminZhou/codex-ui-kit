@@ -134,6 +134,27 @@ describe("Git branch creation", () => {
     ).rejects.toMatchObject({ code: "duplicate" });
   });
 
+  it("preserves Unicode whitespace in distinct branch refs", async () => {
+    const repository = await temporaryRepository();
+    const unicodeWhitespaceBranch = "topic\u00a0";
+    await execFileAsync("git", ["branch", "topic"], { cwd: repository });
+    await execFileAsync("git", ["branch", unicodeWhitespaceBranch], {
+      cwd: repository,
+    });
+
+    await expect(listGitBranches(repository)).resolves.toEqual({
+      branches: ["main", "topic", unicodeWhitespaceBranch],
+      currentBranch: "main",
+      unbornBranch: null,
+    });
+    await expect(
+      checkoutGitBranch(repository, unicodeWhitespaceBranch),
+    ).resolves.toEqual({ branch: unicodeWhitespaceBranch });
+    await expect(listGitBranches(repository)).resolves.toMatchObject({
+      currentBranch: unicodeWhitespaceBranch,
+    });
+  });
+
   it("reconciles HEAD when a post-checkout hook returns nonzero", async () => {
     const repository = await temporaryRepository();
     const hook = join(repository, ".git", "hooks", "post-checkout");
