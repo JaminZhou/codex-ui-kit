@@ -4860,6 +4860,7 @@ const {
 } = await launchScene(linkedWorktreeScene, {
   capture: false,
   environment: {
+    CODEX_DEMO_GIT_BRANCH_LIST_DELAY_MS: "750",
     CODEX_UI_KIT_WORKSPACE: linkedWorktreeGitDirectory,
   },
 });
@@ -4871,6 +4872,25 @@ try {
   await linkedWorktreePage.waitForSelector(
     'button[aria-label="Change worktree: feat/coding-workspace-lifecycle"]',
   );
+  await linkedWorktreePage.waitForTimeout(1_000);
+  if (
+    !(await linkedWorktreePage
+      .getByRole("button", {
+        name: "Change worktree: feat/coding-workspace-lifecycle",
+      })
+      .isVisible())
+  ) {
+    const state = await linkedWorktreePage.evaluate(() => ({
+      frame: document.querySelector(".demo-root")?.getAttribute("data-frame"),
+      worktreeButtons: Array.from(
+        document.querySelectorAll('button[aria-label^="Change worktree:"]'),
+        (button) => button.getAttribute("aria-label"),
+      ),
+    }));
+    throw new Error(
+      `Electron branch loading replaced the selected linked worktree: ${JSON.stringify(state)}.`,
+    );
+  }
   await linkedWorktreePage
     .getByRole("textbox", { name: "Do anything" })
     .fill("Run the linked worktree lifecycle.");

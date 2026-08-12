@@ -1708,6 +1708,18 @@ export function App() {
         ? "feature"
         : "main",
   );
+  const workspaceLinkedWorktreeSelectionRef = useRef<string | null>(null);
+  const workspaceWorktreeIdRef = useRef(workspaceWorktreeId);
+  const updateWorkspaceWorktreeId = (
+    worktreeId: string,
+    linkedSelection = false,
+  ) => {
+    workspaceLinkedWorktreeSelectionRef.current = linkedSelection
+      ? worktreeId
+      : null;
+    workspaceWorktreeIdRef.current = worktreeId;
+    setWorkspaceWorktreeId(worktreeId);
+  };
   const [workspaceLocalEnvironmentOpen, setWorkspaceLocalEnvironmentOpen] =
     useState(
       initialSelection.view === "workspace" &&
@@ -2245,6 +2257,7 @@ export function App() {
       return;
     }
     const projectId = workspaceProjectId;
+    const initialWorktreeId = workspaceWorktreeIdRef.current;
     let cancelled = false;
     setWorkspaceHostBranchesByProject((current) => ({
       ...current,
@@ -2274,11 +2287,19 @@ export function App() {
           },
         }));
         if (workspaceProjectIdRef.current === projectId) {
-          setWorkspaceWorktreeId(
-            response.currentBranch
+          setWorkspaceWorktreeId((currentWorktreeId) => {
+            if (
+              workspaceLinkedWorktreeSelectionRef.current !== null ||
+              currentWorktreeId !== initialWorktreeId
+            ) {
+              return currentWorktreeId;
+            }
+            const nextWorktreeId = response.currentBranch
               ? workspaceGitBranchId(response.currentBranch)
-              : unattachedWorkspaceBranchId,
-          );
+              : unattachedWorkspaceBranchId;
+            workspaceWorktreeIdRef.current = nextWorktreeId;
+            return nextWorktreeId;
+          });
         }
       })
       .catch(() => {
@@ -2405,7 +2426,7 @@ export function App() {
     setProjectIndexChat(undefined);
     updateWorkspaceProjectId(projectId);
     setWorkspaceEnvironmentId("local");
-    setWorkspaceWorktreeId("main");
+    updateWorkspaceWorktreeId("main");
     setWorkspaceLocalEnvironmentOpen(false);
     setWorkspaceOverlay(null);
     setWorkspaceBranchQuery("");
@@ -2494,7 +2515,7 @@ export function App() {
       setProjectIndexChat(undefined);
       updateWorkspaceProjectId(id);
       setWorkspaceEnvironmentId("local");
-      setWorkspaceWorktreeId("main");
+      updateWorkspaceWorktreeId("main");
       setWorkspaceLocalEnvironmentOpen(false);
       setWorkspaceOverlay(null);
       setWorkspaceBranchQuery("");
@@ -5069,7 +5090,7 @@ export function App() {
       }));
     }
     setWorkspaceEnvironmentId("local");
-    setWorkspaceWorktreeId(selectedBranchId);
+    updateWorkspaceWorktreeId(selectedBranchId);
     setWorkspaceBranchDialogOpen(false);
     setWorkspaceBranchName("");
     setWorkspaceBranchStatus("idle");
@@ -5139,7 +5160,7 @@ export function App() {
     ) {
       setWorkspaceEnvironmentId("local");
     }
-    setWorkspaceWorktreeId(
+    updateWorkspaceWorktreeId(
       workspaceUsesHostBranches
         ? workspaceGitBranchId(response.branch)
         : worktree.id,
@@ -5498,7 +5519,7 @@ export function App() {
             onSelect={(projectId) => {
               updateWorkspaceProjectId(projectId);
               setWorkspaceEnvironmentId("local");
-              setWorkspaceWorktreeId("main");
+              updateWorkspaceWorktreeId("main");
               setWorkspaceOverlayState(null);
               setActiveFrame("workspace-ready");
               setWorkspaceProjectQuery("");
@@ -5711,7 +5732,7 @@ export function App() {
         onSelect={(groupId, itemId) => {
           updateWorkspaceProjectId(groupId);
           setWorkspaceEnvironmentId("local");
-          setWorkspaceWorktreeId(itemId);
+          updateWorkspaceWorktreeId(itemId, true);
           closeWorkspaceLocalEnvironment();
         }}
         open={workspaceLocalEnvironmentOpen}

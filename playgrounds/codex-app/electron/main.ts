@@ -61,6 +61,9 @@ const requestedNativeThemeSource = process.env.CODEX_DEMO_NATIVE_THEME_SOURCE;
 const requestedGitBranchDelayMs = Number(
   process.env.CODEX_DEMO_GIT_BRANCH_DELAY_MS ?? "0",
 );
+const requestedGitBranchListDelayMs = Number(
+  process.env.CODEX_DEMO_GIT_BRANCH_LIST_DELAY_MS ?? "0",
+);
 
 if (["system", "light", "dark"].includes(requestedNativeThemeSource ?? "")) {
   nativeTheme.themeSource = requestedNativeThemeSource as
@@ -209,15 +212,17 @@ function trustedProjectDirectory(projectToken: string) {
   return directory;
 }
 
-async function delayGitBranchOperationForFixture() {
+async function delayGitBranchOperationForFixture(
+  requestedDelayMs = requestedGitBranchDelayMs,
+) {
   if (
-    !Number.isFinite(requestedGitBranchDelayMs) ||
-    requestedGitBranchDelayMs <= 0
+    !Number.isFinite(requestedDelayMs) ||
+    requestedDelayMs <= 0
   ) {
     return;
   }
   await new Promise((resolveDelay) => {
-    setTimeout(resolveDelay, Math.min(requestedGitBranchDelayMs, 5_000));
+    setTimeout(resolveDelay, Math.min(requestedDelayMs, 5_000));
   });
 }
 
@@ -590,6 +595,7 @@ async function handleListBranches(
   assertTrustedIpc(event);
   assertProjectTokenInput(rawInput);
   try {
+    await delayGitBranchOperationForFixture(requestedGitBranchListDelayMs);
     const result = await listGitBranches(
       trustedProjectDirectory(rawInput.projectToken),
     );
