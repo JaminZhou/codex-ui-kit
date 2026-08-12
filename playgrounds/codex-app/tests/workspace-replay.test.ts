@@ -15,7 +15,7 @@ describe("workspace replay routing", () => {
     expect(hostSelectionUsesInPlaceBranch("context-layout")).toBe(false);
   });
 
-  it("derives an execution cwd from project, environment, and worktree", () => {
+  it("derives an execution cwd from local and worktree selections", () => {
     expect(
       workspaceExecutionCwd({
         environmentId: "local",
@@ -43,21 +43,6 @@ describe("workspace replay routing", () => {
     ).toBe(
       "/workspace/codex-ui-kit/.worktrees/feat-coding-workspace-lifecycle",
     );
-    expect(
-      workspaceExecutionCwd({
-        environmentId: "cloud",
-        projectPath: "/workspace/codex-ui-kit",
-        worktreeId: "main",
-      }),
-    ).toBe("/cloud/codex-ui-kit");
-    expect(
-      workspaceExecutionCwd({
-        environmentId: "cloud",
-        projectPath: "/workspace/codex-ui-kit",
-        worktreeBranch: "feat/cloud review",
-        worktreeId: "feature",
-      }),
-    ).toBe("/cloud/codex-ui-kit/.worktrees/feat-cloud-review");
     expect(
       workspaceExecutionCwd({
         environmentId: "local",

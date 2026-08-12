@@ -773,8 +773,8 @@ remain untracked.
   until the host binds a trusted directory token.
   Host-switched branches keep command routing on the project directory; only
   actual worktree selections derive a `.worktrees/...` execution path.
-  Selecting a host branch from a Codex web run location restores Local and the
-  trusted startup project path before the next command is routed.
+  Codex web is an external navigation anchor rather than a selectable run
+  location, so host branch changes never synthesize a cloud execution path.
   Detached and unborn HEAD states remain branch-creation-capable instead of
   being collapsed into a repository-unavailable error; unborn symbolic names
   are shown as context, not advertised as selectable refs.
@@ -791,6 +791,28 @@ remain untracked.
 The current-product mutation itself remains a separate runtime gate until the
 isolated native project selector can attach the disposable repository. Raw
 screenshots and product project names remain local-only.
+
+## Current environment-entry slice
+
+- Current Codex `26.803.61601` evidence replaces the former Start in model
+  with the five-action Work in menu: Local, New worktree, an external Codex
+  web anchor, disabled Send to cloud, and Usage remaining.
+- New worktree exposes the separate no-environment menu. Environment settings
+  routes to the current 768px page with a Local environments unavailable
+  status card; the historical 600×600 `LocalEnvironmentDialog` remains an
+  independent host capability, not this current route.
+- `MenuLinkItem` preserves menu styling and semantics for the external anchor,
+  while `EnvironmentSettingsPage` independently exposes ready, loading,
+  unavailable, and error states. No fake cloud environment or cloud working
+  directory is introduced.
+- Browser/CDP locks tags, roles, href, disabled state, exact icons, geometry,
+  route and Back restoration. Real Electron repeats the interactions. Three
+  reviewed internal scenes and three local-only current-product comparisons
+  pass at 3.9193%, 3.0724%, and 0.0708%.
+
+This slice does not create an environment or claim populated environment
+editing/repair coverage. Raw product screenshots and capture records remain
+local-only.
 
 ## Development
 
@@ -823,6 +845,18 @@ current-product screenshot and compares only the 400×191 modal crop:
 CODEX_UI_KIT_WORKSPACE_BRANCH_CREATE_REFERENCE=/absolute/path/to/branch-create.png \
   pnpm --filter @codex-ui-kit/codex-app-playground check:visual -- \
   --scenes=workspace-branch-create
+```
+
+The current environment-entry gates accept two exact overlay crops and one
+857×774 current settings-page capture. They compare only environment-owned
+regions and keep every product reference outside the repository:
+
+```bash
+CODEX_UI_KIT_WORKSPACE_ENVIRONMENT_REFERENCE=/absolute/path/to/environment-menu.png \
+CODEX_UI_KIT_WORKSPACE_ENVIRONMENT_PICKER_REFERENCE=/absolute/path/to/no-environment-menu.png \
+CODEX_UI_KIT_WORKSPACE_ENVIRONMENT_SETTINGS_REFERENCE=/absolute/path/to/environments-route.png \
+  pnpm --filter @codex-ui-kit/codex-app-playground check:visual -- \
+  --scenes=workspace-environment-menu,workspace-environment-picker,workspace-environments-unavailable
 ```
 
 To run the optional current-build multi-file pixel gate, keep the raw

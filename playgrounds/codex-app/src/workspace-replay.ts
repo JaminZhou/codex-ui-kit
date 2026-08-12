@@ -2,7 +2,7 @@ import type { JsonValue } from "@jaminzhou/codex-app-server-client";
 import type { ProtocolEventRecord } from "./protocol-state";
 
 export interface WorkspaceExecutionSelection {
-  environmentId: string;
+  environmentId: "local" | "worktree";
   inPlaceBranch?: boolean;
   projectPath?: string;
   worktreeBranch?: string;
@@ -53,15 +53,6 @@ export function workspaceExecutionCwd({
   worktreeId,
 }: WorkspaceExecutionSelection) {
   const basePath = projectPath ?? "/workspace";
-  if (environmentId === "cloud") {
-    const project = workspacePathSegment(
-      basePath.split("/").filter(Boolean).at(-1) ?? "workspace",
-    );
-    const cloudProjectPath = `/cloud/${project || "workspace"}`;
-    if (worktreeId === "main") return cloudProjectPath;
-    const branch = workspacePathSegment(worktreeBranch ?? worktreeId);
-    return `${cloudProjectPath}/.worktrees/${branch || worktreeId}`;
-  }
   if (environmentId === "worktree") {
     return `${basePath}/.worktrees/new-worktree`;
   }

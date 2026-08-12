@@ -89,6 +89,13 @@ export const visualScenes = [
     view: "workspace",
   },
   {
+    frame: "workspace-environments-unavailable",
+    id: "workspace-environments-unavailable",
+    maxPixelRatio: 0.01,
+    scenario: "workspace-workflow",
+    view: "workspace",
+  },
+  {
     frame: "workspace-compact-ready",
     id: "workspace-compact-ready",
     maxPixelRatio: 0.01,

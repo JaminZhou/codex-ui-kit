@@ -14,9 +14,9 @@ exit gates; it does not replace the inventory.
   Desktop `26.803.61601` (`6396`). Unsampled earlier-build surfaces remain
   previous-build regression evidence rather than current verification.
 - The inventory contains 86 surface groups: 58 P0, 19 P1, and 9 P2.
-- 21 groups have current-build runtime evidence, 48 have previous-build-only
+- 22 groups have current-build runtime evidence, 47 have previous-build-only
   runtime evidence, and 17 have not been sampled.
-- The scoped `26.803.61601` refresh revalidates 43
+- The scoped `26.803.61601` refresh revalidates 53
   sidebar/menu/window-chrome/Composer icons against exact runtime evidence.
   Earlier hover/footer slices promoted More, Pin,
   Archive, and Help, confirms that Settings is absent from the sampled footer
@@ -127,7 +127,8 @@ exit gates; it does not replace the inventory.
   0.4651%, and the eight asset crops have zero changed pixels. The newest
   lifecycle pass adds six project-group stacks with 30px project/task rows,
   2px/8px child-list padding, and 1px separators,
-  pointer/Enter/Space expansion, a six-item project menu, an eight-item Help
+  pointer/Enter/Space expansion, a conditional six-/seven-item project menu,
+  an eight-item Help
   menu with its `What's new` heading, and explicit 720px pinned continuity.
   Twelve additional menu icons are exact runtime primitives. Browser/CDP,
   Electron, and four local-only current-product comparisons pass at 1.54%,
@@ -390,8 +391,12 @@ run-location transition, environment empty menu, seven-branch picker, and
 1180→720 responsive geometry now pass Browser/CDP, Electron, and external
 pixel gates. The historical 600×600 local-environment dialog remains an
 independent host capability rather than the current New worktree entry path.
-Project/branch creation and persistence, environment settings, Remote/Codex
-web execution, and unavailable/repair flows remain in this phase.
+The current follow-up adds the five-action `Work in` menu, treats Codex web as
+an external anchor rather than a synthetic execution environment, covers the
+New-worktree no-environment menu, and implements the current 768px unavailable
+Environments route. Browser/CDP, Electron, and three local-only product gates
+pass without creating an environment. Populated environment creation/editing,
+repair variants, and real Remote connection lifecycles remain in this phase.
 
 Current branch-entry slice: `26.803.61601` Browser/CDP now locks the 296×280
 branch menu and 400×190.56 create-and-checkout dialog. The public
@@ -542,9 +547,11 @@ without confusing package readiness with full product reconstruction.
    reached on `26.803.61601`. The retained task restores its exact thread only
    after selection; a missing working directory leaves the Composer usable,
    exposes unavailable PR status, and remains session-latched until an app
-   restart after the directory is restored. Continue with project/branch
-   creation, environment settings, Remote/Codex web, and the separate
-   environment-unavailable/repair families.
+   restart after the directory is restored. Project and branch creation are
+   delivered. The current Work in/no-environment entry and unavailable
+   Environments route are also delivered without inventing a cloud working
+   directory. Continue with populated environment creation/editing, repair
+   variants, and real Remote connection lifecycles.
 7. **Review content variants**: current delete and rename/no-content evidence,
    public rename/delete/binary/conflict replay, selection synchronization, and
    Undo.

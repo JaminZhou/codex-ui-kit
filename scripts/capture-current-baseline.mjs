@@ -575,6 +575,7 @@ try {
         ),
       ].filter(visible);
       const first = projectRows[0];
+      const navigation = [...document.querySelectorAll("nav")].find(visible);
       const bounds = first?.getBoundingClientRect();
       return {
         expandedProjectGroupCount: projectRows.filter(
@@ -588,6 +589,9 @@ try {
         horizontalOverflow:
           document.documentElement.scrollWidth -
           document.documentElement.clientWidth,
+        navigationWidth: navigation
+          ? round(navigation.getBoundingClientRect().width)
+          : null,
         projectGroupCount: projectRows.length,
         projectRow: first
           ? {
@@ -626,12 +630,15 @@ try {
       const menu = menus[0];
       const active = document.activeElement;
       const bounds = menu?.getBoundingClientRect();
+      const menuItems = [...(menu?.querySelectorAll('[role="menuitem"]') ?? [])];
       const round = (value) => Math.round(value * 100) / 100;
       return {
         focusInside: Boolean(menu && active && menu.contains(active)),
         focusRole: active?.getAttribute?.("role") ?? null,
-        menuItemCount:
-          menu?.querySelectorAll('[role="menuitem"]').length ?? 0,
+        hasMarkAllAsRead: menuItems.some(
+          (item) => item.textContent?.trim() === "Mark all as read",
+        ),
+        menuItemCount: menuItems.length,
         rect: bounds
           ? { height: round(bounds.height), width: round(bounds.width) }
           : null,

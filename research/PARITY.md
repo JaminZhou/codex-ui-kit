@@ -41,8 +41,8 @@ The authoritative current-build inventory is:
   BrowserWindow; it does not prove parity with unobserved product routes,
   panels, state transitions, or window types.
 - A scoped Codex Desktop `26.803.61601` (`6396`) visual probe revalidates the
-  exact 1180×820 dark/resting asset fingerprint and retains the 43 exact
-  sidebar/menu/window-chrome/Composer icons established by earlier slices. Its sampled sidebar
+  exact 1180×820 dark/resting asset fingerprint and now retains 53 exact
+  sidebar/menu/window-chrome/Composer/environment icons. Its sampled sidebar
   hover/footer contract also
   passes Browser/CDP and Electron acceptance; its independently scrolled
   Recents sample removes the leading Thread approximation while the broader
@@ -70,7 +70,8 @@ The authoritative current-build inventory is:
   sanitized capture selects the main `app://-/index.html` Renderer by URL,
   area, shell landmarks, and visible-control density; it excludes the avatar
   overlay and stores no private text or screenshot. It records the 274.11px
-  sidebar at 1180/820/721, the exact 720px collapsed state, explicit 720px
+  fresh-profile sidebar at 1180/820/721, the exact 720px collapsed state,
+  explicit 720px
   pinning, Pull requests selection, New chat restoration, stable 44px editor
   geometry, internal scroll ownership, and zero horizontal overflow. Matching
   Browser/CDP, Electron, and owned regional-pixel gates promote only those
@@ -78,8 +79,8 @@ The authoritative current-build inventory is:
   resize evidence.
 - The current sidebar lifecycle follow-up records six project groups, 30px
   project and task rows, 2px/8px child-list padding, 1px separators,
-  pointer/Enter/Space expansion, the six-item project menu, the eight-item Help
-  menu, and explicit 720px pinning. Twelve
+  pointer/Enter/Space expansion, the conditional six-/seven-item project menu,
+  the eight-item Help menu, and explicit 720px pinning. Twelve
   newly promoted menu icons are exact runtime primitives. Browser/CDP,
   Electron, and four local-only comparisons pass at 1.54%, 0.13%, 0.30%, and
   3.12%; the references and raw product records remain untracked. The
@@ -87,6 +88,14 @@ The authoritative current-build inventory is:
   dark New chat composition. Its current-product top/footer/main regions pass
   at 3.1387%, 0.4126%, and 0.3146%, while evidence not re-reached on this build
   retains its previous build prefix.
+- A second current-build capture proves a persisted 322.91px sidebar within
+  the 240–520px resize contract, adds the five-action Work in menu, separates
+  the external Codex web anchor from local execution state, and reaches the
+  no-environment menu plus the current 768px unavailable Environments route.
+  Ten more exact primitives raise the scoped manifest to 53. Browser/CDP,
+  Electron, and three local-only product comparisons pass without creating an
+  environment; populated environment editing/repair and Remote connections
+  remain open.
 - Computer Use exploration is blocked by the environment safety policy for
   `com.openai.codex`. User-authorized CDP probes on `26.721.41059` revalidated
   access, the main-shell target shape, a de-identified Projects entry/list,

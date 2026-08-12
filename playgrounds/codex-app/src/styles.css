@@ -738,7 +738,7 @@ textarea {
 }
 
 .demo-workspace-environment-menu {
-  height: 189px;
+  height: 189.3125px;
   min-width: 216px;
   width: 216px;
 }
@@ -781,6 +781,25 @@ textarea {
 
 .demo-workspace-context-menu .codex-ui-menu-separator {
   margin: 4px 8px;
+}
+
+.demo-workspace-context-menu__divider {
+  background: var(--demo-shell-overlay-border);
+  flex: 0 0 1px;
+  height: 1px;
+  margin: 4px 8px;
+}
+
+.demo-workspace-context-menu .demo-current-build-icon {
+  height: 16px;
+  width: 16px;
+}
+
+.demo-workspace-environment-settings-route {
+  background: rgb(24 24 24);
+  height: 100%;
+  min-height: 0;
+  overflow: auto;
 }
 
 .demo-workspace-worktree-menu {

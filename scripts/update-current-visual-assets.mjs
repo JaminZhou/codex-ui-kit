@@ -52,6 +52,7 @@ function legacyGeometryHash(icon) {
 }
 
 const sameFingerprintRetainedComputedStyleProperties = new Set([
+  "cursor",
   "scrollbar-color",
 ]);
 
@@ -360,6 +361,17 @@ const promotionSpecs = new Map([
     },
   ]),
   [
+    "sidebar-project-menu-mark-read",
+    {
+      ownerAriaLabel: null,
+      ownerEvidence:
+        "conditional Mark all as read project-menu icon selected by current-build menu text and ordered structure",
+      region: "sidebar-project-menu",
+      retainExistingWhenAbsentOnSameFingerprint: true,
+      semanticId: "sidebar-project-menu-mark-read",
+    },
+  ],
+  [
     "sidebar-help-menu-release-note",
     {
       minimumCandidates: 3,
@@ -403,6 +415,46 @@ const promotionSpecs = new Map([
       semanticId: `sidebar-account-menu-${name}`,
     },
   ]),
+  [
+    "workspace-selection-check",
+    {
+      minimumCandidates: 2,
+      ownerAriaLabel: null,
+      ownerEvidence:
+        "shared current selection check captured from the Local and Work without environment menu items",
+      region: "workspace-selection",
+      regions: ["workspace-run-location-menu", "workspace-environment-menu"],
+      semanticId: "workspace-selection-check",
+    },
+  ],
+  ...[
+    "local",
+    "worktree",
+    "codex-web",
+    "external",
+    "send-cloud",
+    "usage",
+    "usage-chevron",
+  ].map((name) => [
+    `workspace-run-location-${name}`,
+    {
+      ownerAriaLabel: null,
+      ownerEvidence:
+        "fixed-position Work in menu icon selected by current-build action structure without retaining project identity",
+      region: "workspace-run-location-menu",
+      semanticId: `workspace-run-location-${name}`,
+    },
+  ]),
+  [
+    "workspace-environment-settings",
+    {
+      ownerAriaLabel: null,
+      ownerEvidence:
+        "fixed Environment settings action icon captured from the current No environment menu",
+      region: "workspace-environment-menu",
+      semanticId: "workspace-environment-settings",
+    },
+  ],
 ]);
 
 const manifest = JSON.parse(readFileSync(manifestPath, "utf8"));
@@ -438,8 +490,13 @@ if (
     })}`,
   );
 }
+const expectedProjectMenuItemCount = capture.sidebarObservation
+  ?.projectMenuHasMarkAllAsRead
+  ? 7
+  : 6;
 if (
-  capture.sidebarObservation?.projectMenuItemCount !== 6 ||
+  capture.sidebarObservation?.projectMenuItemCount !==
+    expectedProjectMenuItemCount ||
   capture.sidebarObservation?.helpMenuItemCount !== 8 ||
   capture.sidebarObservation?.accountMenu?.itemCount !== 6 ||
   capture.sidebarObservation?.accountMenu?.iconCount !== 6 ||
@@ -450,6 +507,45 @@ if (
 ) {
   throw new Error(
     `Unexpected current sidebar menu capture: ${canonicalize(capture.sidebarObservation)}`,
+  );
+}
+const workspaceObservation = capture.workspaceObservation;
+if (
+  workspaceObservation?.workInMenu?.itemCount !== 5 ||
+  workspaceObservation.workInMenu.iconCount !== 8 ||
+  workspaceObservation.workInMenu.separatorCount !== 0 ||
+  workspaceObservation.workInMenu.sectionLabel !== "Work in" ||
+  canonicalize(workspaceObservation.workInMenu.roles) !==
+    canonicalize(Array(5).fill("menuitem")) ||
+  canonicalize(workspaceObservation.workInMenu.tags) !==
+    canonicalize(["DIV", "DIV", "A", "DIV", "DIV"]) ||
+  canonicalize(workspaceObservation.workInMenu.disabled) !==
+    canonicalize([false, false, false, true, false]) ||
+  canonicalize(workspaceObservation.workInMenu.labels) !==
+    canonicalize([
+      "Local",
+      "New worktree",
+      "Connect Codex web",
+      "Send to cloud",
+      "Usage remaining",
+    ]) ||
+  workspaceObservation.workInMenu.codexWebHrefIsExpected !== true ||
+  workspaceObservation?.environmentMenu?.itemCount !== 2 ||
+  workspaceObservation.environmentMenu.iconCount !== 2 ||
+  workspaceObservation.environmentMenu.separatorCount !== 0 ||
+  workspaceObservation.environmentMenu.emptyText !== "No environments found" ||
+  canonicalize(workspaceObservation.environmentMenu.labels) !==
+    canonicalize(["Work without environment", "Environment settings"]) ||
+  canonicalize(workspaceObservation.environmentMenu.roles) !==
+    canonicalize(["menuitem", "menuitem"]) ||
+  workspaceObservation.environmentSettings?.heading?.text !== "Environments" ||
+  workspaceObservation.environmentSettings?.unavailableHeading?.text !==
+    "Local environments unavailable" ||
+  workspaceObservation.environmentSettings?.message?.text !==
+    "We could not load local environment settings for this project"
+) {
+  throw new Error(
+    `Unexpected current workspace environment capture: ${canonicalize(workspaceObservation)}`,
   );
 }
 const baselineContext = capture.baselineContext;
@@ -488,11 +584,13 @@ manifest.geometryHashVersion = 4;
 manifest.baseline = hashBaselineContext;
 manifest.composerObservation = capture.composerObservation;
 manifest.sidebarObservation = capture.sidebarObservation;
+manifest.workspaceObservation = workspaceObservation;
 
 function selectObservedIcon(id, spec, existing) {
+  const regions = spec.regions ?? [spec.region];
   const candidates = capture.icons.filter(
     (candidate) =>
-      candidate.region === spec.region &&
+      regions.includes(candidate.region) &&
       (spec.semanticId
         ? candidate.owner.semanticId === spec.semanticId
         : legacyGeometryHash(candidate) === spec.geometrySha256),
@@ -546,7 +644,7 @@ function promoteIcon(id, existing) {
   let primitives = observed.primitives;
   if (existing && !fingerprintChanged) {
     if (
-      observed.region !== existing.region ||
+      spec.region !== existing.region ||
       observed.viewBox !== existing.viewBox ||
       canonicalize(observed.rootAttributes) !==
         canonicalize(existing.rootAttributes)
@@ -561,7 +659,7 @@ function promoteIcon(id, existing) {
     ownerAriaLabel: spec.ownerAriaLabel,
     ...(spec.ownerEvidence ? { ownerEvidence: spec.ownerEvidence } : {}),
     primitives,
-    region: observed.region,
+    region: spec.region,
     renderSize: observed.renderSize,
     rootAttributes: observed.rootAttributes,
     rootComputedStyle:

@@ -186,12 +186,31 @@ de-identified project/task populations without changing the shell contract.
 
 The `sidebarLifecycle` contract requires six project groups, 30px project
 rows, pointer/Enter/Space collapse and restoration with focus retained, a
-214.05×179.38 six-item project menu, a 200×272.06 eight-item Help menu, Escape
-dismissal, compact automatic collapse, explicit 274.11px pinning, wide
+214.05px-wide six- or seven-item project menu depending on whether Mark all as
+read is exposed, a 200×272.06 eight-item Help menu, Escape dismissal, compact
+automatic collapse, explicit persisted-width pinning, wide
 restoration, and zero horizontal overflow. The observed project menu drops
 focus to the document body on Escape; the Help menu returns focus to its
 trigger. The independent UIKit intentionally improves the former behavior and
 documents that divergence rather than weakening keyboard focus management.
+
+The 2026-08-13 environment follow-up used one isolated process on loopback
+port `9822`, exact main PID `24810`, and profile
+`/private/tmp/codex-ui-kit-environment-cdp.CWsiES/profile`. It proved that the
+sidebar preference can persist at 322.91px, so the baseline now records
+`navigationWidth` and derives all dependent geometry inside the observed
+240–520px resize range instead of treating the 274.11px fresh-profile default
+as universal. The probe then captured the five-action Work in menu, the
+New-worktree no-environment menu, the current unavailable Environments route,
+and the seven-action project menu. It created no environment, worktree, task,
+project, or remote connection and normalized the product selection back to
+Local before cleanup.
+
+Cleanup terminated only exact main PID `24810`, its profile-owned children,
+and reparented Crashpad handlers `24815`/`24817`. Port `9822` closed, every
+recorded PID and the exact profile argv disappeared, and the complete local-
+only capture root moved recoverably to Trash as
+`codex-ui-kit-environment-cdp.CWsiES-20260813`.
 
 The `26.803.61601` refresh used three fresh profiles on loopback ports
 `9801`–`9803`. The first capture (main PID `58241`) failed closed after proving

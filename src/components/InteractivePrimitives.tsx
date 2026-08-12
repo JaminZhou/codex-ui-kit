@@ -904,6 +904,73 @@ export function MenuItem({
   );
 }
 
+export interface MenuLinkItemProps
+  extends Omit<ComponentPropsWithoutRef<"a">, "children"> {
+  children: ReactNode;
+  endIcon?: ReactNode;
+  keepOpen?: boolean;
+  onSelect?: () => void;
+  shortcut?: ReactNode;
+  startIcon?: ReactNode;
+  subText?: ReactNode;
+  tone?: "danger" | "default";
+}
+
+export function MenuLinkItem({
+  children,
+  className,
+  endIcon,
+  keepOpen = false,
+  onClick,
+  onSelect,
+  role = "menuitem",
+  shortcut,
+  startIcon,
+  subText,
+  tone = "default",
+  ...props
+}: MenuLinkItemProps) {
+  const menu = useContext(MenuContext);
+  const classes = ["codex-ui-menu-item", className]
+    .filter(Boolean)
+    .join(" ");
+  return (
+    <a
+      {...props}
+      className={classes}
+      data-tone={tone}
+      onClick={(event) => {
+        onClick?.(event);
+        if (event.defaultPrevented) return;
+        onSelect?.();
+        if (!keepOpen) menu?.close();
+      }}
+      role={role}
+      tabIndex={-1}
+    >
+      {startIcon ? (
+        <span aria-hidden="true" className="codex-ui-menu-item__icon">
+          {startIcon}
+        </span>
+      ) : null}
+      <span className="codex-ui-menu-item__copy">
+        <span className="codex-ui-menu-item__label">{children}</span>
+        {subText ? (
+          <span className="codex-ui-menu-item__subtext">{subText}</span>
+        ) : null}
+      </span>
+      {shortcut ? (
+        <span className="codex-ui-menu-item__shortcut">{shortcut}</span>
+      ) : null}
+      {endIcon ? (
+        <span aria-hidden="true" className="codex-ui-menu-item__icon">
+          {endIcon}
+        </span>
+      ) : null}
+    </a>
+  );
+}
+
 export interface MenuCheckboxItemProps
   extends Omit<MenuItemProps, "endIcon" | "onSelect"> {
   checked: boolean;

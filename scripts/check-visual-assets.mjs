@@ -145,6 +145,17 @@ try {
 const localFragmentFixture = structuredClone(manifest.icons[0]);
 localFragmentFixture.rootComputedStyle.filter = 'url( "#safe-filter" )';
 sanitizeVisualAssetIcon(localFragmentFixture, "positive-fixture.local-fragment");
+for (const [surface, observation] of Object.entries(
+  manifest.workspaceObservation?.environmentSettings ?? {},
+)) {
+  if (!observation?.style) {
+    throw new Error(`workspace environment ${surface} must retain computed style evidence`);
+  }
+  sanitizeVisualScalarRecord(
+    observation.style,
+    `manifest.workspaceObservation.environmentSettings.${surface}.style`,
+  );
+}
 if (
   manifest.policy?.packageBoundary !== "playground-only" ||
   manifest.policy?.globalPixelParityEligible !== false ||
@@ -280,6 +291,7 @@ if (
   !updaterSource.includes("explicit current-build geometry seed") ||
   !updaterSource.includes("retainExistingWhenAbsentOnSameFingerprint") ||
   !updaterSource.includes("sameFingerprintRetainedComputedStyleProperties") ||
+  !updaterSource.includes('"cursor"') ||
   !updaterSource.includes('"scrollbar-color"') ||
   !updaterSource.includes("currentBuildAbsenceEvidence") ||
   !updaterSource.includes("hasCurrentSidebarSettingsAbsenceEvidence") ||
@@ -325,6 +337,7 @@ for (const id of [
   "sidebar-project-menu-reveal",
   "sidebar-project-menu-worktree",
   "sidebar-project-menu-edit",
+  "sidebar-project-menu-mark-read",
   "sidebar-project-menu-archive",
   "sidebar-project-menu-remove",
   "sidebar-help-menu-release-note",
@@ -339,13 +352,22 @@ for (const id of [
   "sidebar-account-menu-invite",
   "sidebar-account-menu-settings",
   "sidebar-account-menu-logout",
+  "workspace-selection-check",
+  "workspace-run-location-local",
+  "workspace-run-location-worktree",
+  "workspace-run-location-codex-web",
+  "workspace-run-location-external",
+  "workspace-run-location-send-cloud",
+  "workspace-run-location-usage",
+  "workspace-run-location-usage-chevron",
+  "workspace-environment-settings",
 ]) {
   if (!ids.has(id) || remaining.includes(id)) {
     throw new Error(`${id} must be promoted from current-build runtime evidence`);
   }
 }
 if (
-  manifest.icons.length !== 43 ||
+  manifest.icons.length !== 53 ||
   manifest.composerObservation?.topContextIconCount !== 3 ||
   manifest.composerObservation?.bottomActionIconCount !== 5 ||
   manifest.composerObservation?.exactSemanticIconCount !== 8
@@ -354,8 +376,13 @@ if (
     "current Composer capture must retain three context and five action icons with eight exact semantic mappings",
   );
 }
+const expectedProjectMenuItemCount = manifest.sidebarObservation
+  ?.projectMenuHasMarkAllAsRead
+  ? 7
+  : 6;
 if (
-  manifest.sidebarObservation?.projectMenuItemCount !== 6 ||
+  manifest.sidebarObservation?.projectMenuItemCount !==
+    expectedProjectMenuItemCount ||
   manifest.sidebarObservation?.helpMenuItemCount !== 8 ||
   manifest.sidebarObservation?.accountMenu?.itemCount !== 6 ||
   manifest.sidebarObservation?.accountMenu?.iconCount !== 6 ||
@@ -366,6 +393,44 @@ if (
 ) {
   throw new Error(
     "current sidebar capture must retain project, Help, and account menu evidence",
+  );
+}
+if (
+  manifest.workspaceObservation?.workInMenu?.itemCount !== 5 ||
+  manifest.workspaceObservation.workInMenu.iconCount !== 8 ||
+  manifest.workspaceObservation.workInMenu.separatorCount !== 0 ||
+  manifest.workspaceObservation.workInMenu.sectionLabel !== "Work in" ||
+  canonicalize(manifest.workspaceObservation.workInMenu.roles) !==
+    canonicalize(Array(5).fill("menuitem")) ||
+  canonicalize(manifest.workspaceObservation.workInMenu.tags) !==
+    canonicalize(["DIV", "DIV", "A", "DIV", "DIV"]) ||
+  canonicalize(manifest.workspaceObservation.workInMenu.disabled) !==
+    canonicalize([false, false, false, true, false]) ||
+  canonicalize(manifest.workspaceObservation.workInMenu.labels) !==
+    canonicalize([
+      "Local",
+      "New worktree",
+      "Connect Codex web",
+      "Send to cloud",
+      "Usage remaining",
+    ]) ||
+  manifest.workspaceObservation.workInMenu.codexWebHrefIsExpected !== true ||
+  manifest.workspaceObservation?.environmentMenu?.itemCount !== 2 ||
+  manifest.workspaceObservation.environmentMenu.iconCount !== 2 ||
+  manifest.workspaceObservation.environmentMenu.separatorCount !== 0 ||
+  manifest.workspaceObservation.environmentMenu.emptyText !==
+    "No environments found" ||
+  canonicalize(manifest.workspaceObservation.environmentMenu.labels) !==
+    canonicalize(["Work without environment", "Environment settings"]) ||
+  manifest.workspaceObservation.environmentSettings?.heading?.text !==
+    "Environments" ||
+  manifest.workspaceObservation.environmentSettings?.unavailableHeading?.text !==
+    "Local environments unavailable" ||
+  manifest.workspaceObservation.environmentSettings?.message?.text !==
+    "We could not load local environment settings for this project"
+) {
+  throw new Error(
+    "current workspace capture must retain action, link, empty, and unavailable-state evidence",
   );
 }
 const currentSidebarSettingsAbsenceProven =
