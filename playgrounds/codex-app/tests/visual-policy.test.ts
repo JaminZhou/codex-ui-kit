@@ -295,8 +295,10 @@ describe("lifecycle visual policy", () => {
       "CODEX_UI_KIT_CURRENT_DARK_SHELL_TOP_MAX_DIFF_RATIO",
     );
     expect(appSource).toContain(
-      'view === "workspace" && !workspacePersistenceFrame',
+      'view === "workspace" &&',
     );
+    expect(appSource).toContain("!workspacePersistenceFrame &&");
+    expect(appSource).toContain("!projectIndexChat");
     expect(appSource).toContain(
       "currentWorkspacePersistenceFrame(activeFrame)",
     );

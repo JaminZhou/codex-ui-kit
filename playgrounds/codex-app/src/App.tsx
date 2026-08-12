@@ -1593,6 +1593,9 @@ export function App() {
   const [projectCreationStatus, setProjectCreationStatus] = useState<
     "error" | "idle" | "selecting"
   >("idle");
+  const [projectCreationSource, setProjectCreationSource] = useState<
+    "projects" | "sidebar" | "workspace" | null
+  >(null);
   const [projectIndexSortBy, setProjectIndexSortBy] = useState<
     "name" | "updated"
   >("updated");
@@ -2251,8 +2254,11 @@ export function App() {
     dismissSidebarAfterNavigation();
   };
 
-  const createProject = async () => {
+  const createProject = async (
+    source: "projects" | "sidebar" | "workspace",
+  ) => {
     if (projectCreationStatus === "selecting") return;
+    setProjectCreationSource(source);
     setProjectCreationStatus("selecting");
     try {
       const selection = window.codexDemo
@@ -2263,6 +2269,7 @@ export function App() {
           };
       if (!selection) {
         setProjectCreationStatus("idle");
+        setProjectCreationSource(null);
         return;
       }
       const knownProject = workspaceProjects.find(
@@ -2277,17 +2284,42 @@ export function App() {
           ? withoutSelectedPath
           : [{ id, ...selection }, ...withoutSelectedPath];
       });
+      cancelReplaySubmitTimer();
+      setMode("replay");
       setView("workspace");
       setProjectIndexChat(undefined);
       setWorkspaceProjectId(id);
       setWorkspaceEnvironmentId("local");
       setWorkspaceWorktreeId("main");
-      setWorkspaceOverlayState(null);
+      setWorkspaceLocalEnvironmentOpen(false);
+      setWorkspaceOverlay(null);
+      setWorkspaceBranchQuery("");
+      setWorkspaceEnvironmentQuery("");
       setWorkspaceProjectQuery("");
+      setWorkspaceProjectTriggerId("demo-workspace-project-trigger");
+      setComposerValue("");
+      setComposerOverlay(null);
+      setReplayApprovalResolution(null);
+      setReplaySessionApprovalScope(null);
       setActiveFrame(
         knownProject ? "workspace-ready" : "workspace-project-created",
       );
+      setReviewOpen(false);
+      setSubagentPanelOpen(false);
+      setActiveConversationSidePanel("review");
+      setSelectedSubagentId(null);
+      setTerminalOpen(false);
+      setTerminalSessionIds([]);
+      setClosedTerminalSessionIds([]);
+      setTerminalWorkspaceBySession({});
+      setDismissedTerminalMismatchIds(new Set());
+      setTerminalTabPickerOpen(false);
+      setTerminalCommandId(null);
+      setTerminalValuesByCommand({});
+      setTerminalHistoryByCommand({});
+      setPullRequestOpen(false);
       setProjectCreationStatus("idle");
+      setProjectCreationSource(null);
       dismissSidebarAfterNavigation();
       window.setTimeout(() =>
         document.getElementById("demo-workspace-project-trigger")?.focus(),
@@ -3216,7 +3248,9 @@ export function App() {
           <div className="demo-sidebar-new-chat-row">
             <button
               aria-current={
-                view === "workspace" && !workspacePersistenceFrame
+                view === "workspace" &&
+                !workspacePersistenceFrame &&
+                !projectIndexChat
                   ? "page"
                   : undefined
               }
@@ -3558,7 +3592,7 @@ export function App() {
             </button>
             <button
               aria-label="New project"
-              onClick={() => void createProject()}
+              onClick={() => void createProject("sidebar")}
               type="button"
             >
               +
@@ -3599,6 +3633,12 @@ export function App() {
           protocol-client-with-an-intentionally-long-worktree-name
         </AppSidebarItem>
       </AppSidebarSection>
+      {projectCreationStatus === "error" &&
+      projectCreationSource === "sidebar" ? (
+        <p className="demo-sidebar-project-error" role="alert">
+          Couldn&apos;t add that project
+        </p>
+      ) : null}
       <AppSidebarSection
         collapsible
         kind="threads"
@@ -4975,7 +5015,7 @@ export function App() {
             <button
               aria-busy={projectCreationStatus === "selecting" || undefined}
               disabled={projectCreationStatus === "selecting"}
-              onClick={() => void createProject()}
+              onClick={() => void createProject("workspace")}
               type="button"
             >
               <span aria-hidden="true">＋</span>
@@ -4984,7 +5024,8 @@ export function App() {
                 : "New project"}
             </button>
           </div>
-          {projectCreationStatus === "error" ? (
+          {projectCreationStatus === "error" &&
+          projectCreationSource === "workspace" ? (
             <p className="demo-workspace-project-dialog__error" role="alert">
               Couldn&apos;t add that project
             </p>
@@ -5442,7 +5483,9 @@ export function App() {
       ? []
       : filteredProjectIndexItems;
   const projectIndexDisplayStatus =
-    projectCreationStatus === "error" && projectIndexStatus === "ready"
+    projectCreationStatus === "error" &&
+    projectCreationSource === "projects" &&
+    projectIndexStatus === "ready"
       ? ("error" as const)
       : projectIndexStatus;
   const projectsRoute = (
@@ -5451,7 +5494,7 @@ export function App() {
         actions={
           <Button
             disabled={projectCreationStatus === "selecting"}
-            onClick={() => void createProject()}
+            onClick={() => void createProject("projects")}
             size="small"
           >
             {projectCreationStatus === "selecting"
@@ -5493,7 +5536,8 @@ export function App() {
         sortDirection={projectIndexSortDirection}
         status={projectIndexDisplayStatus}
         statusMessage={
-          projectCreationStatus === "error"
+          projectCreationStatus === "error" &&
+          projectCreationSource === "projects"
             ? "Couldn’t add that project. Try again."
             : projectIndexStatus === "error"
               ? "Couldn’t load projects"

@@ -7665,14 +7665,19 @@ try {
   await projectCreationPage.waitForSelector(
     '.demo-root[data-view="workspace"][data-frame="projects-index-chat"] .demo-project-index-chat-route[data-project-id="codex-ui-kit"][data-chat-id="sidebar-contract"]',
   );
+  const projectChatNewChat = projectCreationPage.getByRole("button", {
+    exact: true,
+    name: "New chat",
+  });
   if (
     !(await projectCreationPage
       .locator(".demo-project-index-chat-route")
       .getByText("Verify sidebar project behavior", { exact: true })
-      .isVisible())
+      .isVisible()) ||
+    (await projectChatNewChat.getAttribute("aria-current")) !== null
   ) {
     throw new Error(
-      "Electron project-index routing collapsed distinct recent chats onto one workspace route.",
+      "Electron project-index routing collapsed distinct recent chats or selected New chat on a saved-chat route.",
     );
   }
   const projectChatComposer = projectCreationPage.getByRole("textbox", {
@@ -7802,6 +7807,94 @@ try {
   }
 } finally {
   await projectCreationFailureApp.close();
+}
+
+const sidebarProjectCreationFailureScene = {
+  currentSidebar: true,
+  frame: "workspace-ready",
+  id: "electron-sidebar-project-creation-failure",
+  scenario: "workspace-workflow",
+  view: "workspace",
+};
+const {
+  app: sidebarProjectCreationFailureApp,
+  page: sidebarProjectCreationFailurePage,
+} = await launchScene(sidebarProjectCreationFailureScene, {
+  environment: {
+    CODEX_DEMO_PROJECT_FIXTURE_PATH: resolve(
+      process.cwd(),
+      "missing-project-fixture",
+    ),
+  },
+  capture: false,
+});
+try {
+  const sidebarProjectCreationRouteBefore =
+    await sidebarProjectCreationFailurePage
+      .locator(".demo-root")
+      .evaluate((element) => ({
+        frame: element.getAttribute("data-frame"),
+        view: element.getAttribute("data-view"),
+      }));
+  await sidebarProjectCreationFailurePage
+    .getByRole("button", { name: "New project" })
+    .click();
+  const sidebarProjectCreationAlert =
+    sidebarProjectCreationFailurePage.locator(".demo-sidebar-project-error");
+  await sidebarProjectCreationAlert.waitFor({ state: "visible" });
+  const sidebarProjectCreationRouteAfter =
+    await sidebarProjectCreationFailurePage
+      .locator(".demo-root")
+      .evaluate((element) => ({
+        frame: element.getAttribute("data-frame"),
+        view: element.getAttribute("data-view"),
+      }));
+  if (
+    (await sidebarProjectCreationAlert.textContent())?.trim() !==
+      "Couldn't add that project" ||
+    JSON.stringify(sidebarProjectCreationRouteAfter) !==
+      JSON.stringify(sidebarProjectCreationRouteBefore)
+  ) {
+    throw new Error(
+      `Electron sidebar project creation did not surface its failure in the invoking UI: ${JSON.stringify({
+        routeAfter: sidebarProjectCreationRouteAfter,
+        routeBefore: sidebarProjectCreationRouteBefore,
+        text: (await sidebarProjectCreationAlert.textContent())?.trim(),
+      })}`,
+    );
+  }
+} finally {
+  await sidebarProjectCreationFailureApp.close();
+}
+
+const projectCreationPanelCleanupScene = {
+  currentSidebar: true,
+  frame: "review-open",
+  id: "electron-project-creation-panel-cleanup",
+  scenario: "workspace-workflow",
+};
+const {
+  app: projectCreationPanelCleanupApp,
+  page: projectCreationPanelCleanupPage,
+} = await launchScene(projectCreationPanelCleanupScene, {
+  capture: false,
+  environment: {
+    CODEX_DEMO_PROJECT_FIXTURE_PATH: resolve(process.cwd(), "scripts"),
+  },
+  layoutMode: "wide",
+});
+try {
+  await projectCreationPanelCleanupPage.waitForSelector(
+    '.codex-ui-app-shell[data-side-panel-open] [data-testid="review-panel"]',
+  );
+  await projectCreationPanelCleanupPage
+    .getByRole("button", { name: "New project" })
+    .click();
+  await projectCreationPanelCleanupPage.waitForSelector(
+    '.demo-root[data-view="workspace"][data-frame="workspace-project-created"] .codex-ui-app-shell:not([data-side-panel-open])',
+  );
+} finally {
+  await projectCreationPanelCleanupApp.close();
 }
 
 const narrowProjectCreationScene = {

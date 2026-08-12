@@ -1262,6 +1262,13 @@ textarea {
   width: 24px;
 }
 
+.demo-sidebar-project-error {
+  color: var(--codex-ui-danger);
+  font-size: 12px;
+  line-height: 16px;
+  margin: -2px 12px 8px;
+}
+
 .demo-sidebar-glyph {
   fill: none;
   height: 16px;
