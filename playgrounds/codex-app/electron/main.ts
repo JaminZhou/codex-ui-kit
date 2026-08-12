@@ -31,6 +31,11 @@ import {
 import { LiveApprovalGate } from "./live-approval-gate.js";
 import { LiveTurnStartGate } from "./live-turn-start-gate.js";
 import {
+  checkoutGitBranch,
+  createAndCheckoutGitBranch,
+  GitBranchCreationError,
+} from "./git-branch.js";
+import {
   isAllowedExternalUrl,
   isTrustedRendererUrl,
 } from "./navigation-policy.js";
@@ -63,6 +68,7 @@ let unsubscribeNotifications: (() => void) | null = null;
 let unsubscribeServerRequests: (() => void)[] = [];
 let attachmentFixtureFailureInjected = false;
 let projectFixtureSelectionIndex = 0;
+let gitBranchOperationActive = false;
 const liveTurnStartGate = new LiveTurnStartGate();
 const liveApprovalGate = new LiveApprovalGate();
 
@@ -81,6 +87,14 @@ interface AttachmentSelection {
   label: string;
   meta: string;
 }
+
+interface BranchCreationInput {
+  branchName: string;
+}
+
+type BranchCreationResponse =
+  | { branch: string; ok: true }
+  | { code: string; message: string; ok: false };
 
 function assertStartInput(value: unknown): asserts value is StartLiveInput {
   if (
@@ -106,6 +120,18 @@ function assertApprovalResponseInput(
     )
   ) {
     throw new TypeError("A valid approval response is required.");
+  }
+}
+
+function assertBranchCreationInput(
+  value: unknown,
+): asserts value is BranchCreationInput {
+  if (
+    typeof value !== "object" ||
+    value === null ||
+    typeof (value as BranchCreationInput).branchName !== "string"
+  ) {
+    throw new TypeError("A branch name is required.");
   }
 }
 
@@ -435,6 +461,74 @@ async function handleSelectProjectDirectory(event: IpcMainInvokeEvent) {
   };
 }
 
+async function handleCreateBranch(
+  event: IpcMainInvokeEvent,
+  rawInput: unknown,
+): Promise<BranchCreationResponse> {
+  assertTrustedIpc(event);
+  assertBranchCreationInput(rawInput);
+  if (gitBranchOperationActive) {
+    return {
+      code: "busy",
+      message: "Another branch is being created.",
+      ok: false,
+    };
+  }
+  gitBranchOperationActive = true;
+  try {
+    const result = await createAndCheckoutGitBranch(
+      workspaceDirectory,
+      rawInput.branchName,
+    );
+    return { branch: result.branch, ok: true };
+  } catch (error) {
+    if (error instanceof GitBranchCreationError) {
+      return { code: error.code, message: error.message, ok: false };
+    }
+    return {
+      code: "unavailable",
+      message: "Git could not create and checkout the branch.",
+      ok: false,
+    };
+  } finally {
+    gitBranchOperationActive = false;
+  }
+}
+
+async function handleCheckoutBranch(
+  event: IpcMainInvokeEvent,
+  rawInput: unknown,
+): Promise<BranchCreationResponse> {
+  assertTrustedIpc(event);
+  assertBranchCreationInput(rawInput);
+  if (gitBranchOperationActive) {
+    return {
+      code: "busy",
+      message: "Another Git branch operation is running.",
+      ok: false,
+    };
+  }
+  gitBranchOperationActive = true;
+  try {
+    const result = await checkoutGitBranch(
+      workspaceDirectory,
+      rawInput.branchName,
+    );
+    return { branch: result.branch, ok: true };
+  } catch (error) {
+    if (error instanceof GitBranchCreationError) {
+      return { code: error.code, message: error.message, ok: false };
+    }
+    return {
+      code: "unavailable",
+      message: "Git could not checkout the branch.",
+      ok: false,
+    };
+  } finally {
+    gitBranchOperationActive = false;
+  }
+}
+
 function createWindow() {
   const scenario = process.env.CODEX_DEMO_SCENARIO ?? "streaming-recovery";
   const frame = process.env.CODEX_DEMO_FRAME ?? "recovered";
@@ -518,6 +612,8 @@ ipcMain.handle("demo:live:close", handleCloseLive);
 ipcMain.handle("demo:approval:respond", handleApprovalResponse);
 ipcMain.handle("demo:attachments:select", handleSelectAttachments);
 ipcMain.handle("demo:project:select", handleSelectProjectDirectory);
+ipcMain.handle("demo:git:create-branch", handleCreateBranch);
+ipcMain.handle("demo:git:checkout-branch", handleCheckoutBranch);
 
 app.whenReady().then(() => {
   createWindow();

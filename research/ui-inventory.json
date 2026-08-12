@@ -524,6 +524,8 @@
         "cdp:project-local-and-branch-controls",
         "cdp:local-cloud-worktree-location-menu",
         "cdp:branch-menu-current-and-create-actions",
+        "cdp-26.803.61601:branch-menu-296x280-seven-rows-and-create-action",
+        "cdp-26.803.61601:create-and-checkout-branch-dialog-400x190.56",
         "cdp-26.721:new-chat-project-local-main-context-controls",
         "cdp-26.721:new-chat-project-popover-260x250-listbox-14-options",
         "cdp-26.721.81911:project-local-and-main-context-controls",
@@ -920,7 +922,8 @@
         "cdp-26.721.81911:new-chat-1180x820-project-picker-entry",
         "cdp-26.727.40816:new-chat-project-dialog-and-context-entry-1180x820",
         "cdp-26.730.61309:new-chat-wide-compact-no-project-new-worktree-and-overlay-pixels",
-        "cdp-26.803.61601:new-chat-project-dialog-new-project-only-and-native-directory-panel-entry"
+        "cdp-26.803.61601:new-chat-project-dialog-new-project-only-and-native-directory-panel-entry",
+        "cdp-26.803.61601:new-chat-branch-create-dialog-and-git-settings-prefix-entry"
       ],
       "implementationStatus": "partial",
       "browserStatus": "verified",
@@ -1229,7 +1232,10 @@
       "ownership": "app",
       "packageEvidence": ["git-settings", "hooks-settings", "code-review-settings", "review-delivery-settings-row"],
       "runtimeStatus": "runtime_observed",
-      "runtimeEvidence": ["cdp:git-branch-pr-review-delivery-and-hooks-settings"],
+      "runtimeEvidence": [
+        "cdp:git-branch-pr-review-delivery-and-hooks-settings",
+        "cdp-26.803.61601:set-prefix-navigation-to-git-settings"
+      ],
       "implementationStatus": "not_started",
       "browserStatus": "not_started",
       "electronStatus": "not_started",

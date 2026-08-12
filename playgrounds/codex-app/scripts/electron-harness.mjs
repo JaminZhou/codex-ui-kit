@@ -125,6 +125,27 @@ export const visualScenes = [
     view: "workspace",
   },
   {
+    frame: "workspace-branch-create",
+    id: "workspace-branch-create",
+    maxPixelRatio: 0.01,
+    scenario: "workspace-workflow",
+    view: "workspace",
+  },
+  {
+    frame: "workspace-branch-create-error",
+    id: "workspace-branch-create-error",
+    maxPixelRatio: 0.01,
+    scenario: "workspace-workflow",
+    view: "workspace",
+  },
+  {
+    frame: "workspace-branch-created",
+    id: "workspace-branch-created",
+    maxPixelRatio: 0.01,
+    scenario: "workspace-workflow",
+    view: "workspace",
+  },
+  {
     frame: "workspace-repairing",
     id: "workspace-repairing",
     maxPixelRatio: 0.01,

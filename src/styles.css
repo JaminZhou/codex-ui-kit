@@ -136,6 +136,8 @@
 .codex-ui-conversation-context-bar *,
 .codex-ui-conversation-project-options,
 .codex-ui-conversation-project-options *,
+.codex-ui-branch-creation-dialog,
+.codex-ui-branch-creation-dialog *,
 .codex-ui-pull-request-page,
 .codex-ui-pull-request-page * {
   box-sizing: border-box;
@@ -11991,6 +11993,132 @@ button.codex-ui-generated-image-gallery__image {
   margin: 0;
   padding: 1.5rem 1rem;
   text-align: center;
+}
+
+.codex-ui-branch-creation-dialog .codex-ui-dialog__surface {
+  backdrop-filter: blur(18px);
+  background: color-mix(
+    in oklab,
+    var(--codex-ui-background-elevated-primary-opaque) 90%,
+    transparent
+  );
+  border: 0;
+  border-radius: 1.5625rem;
+  box-shadow:
+    0 0 0 0.5px color-mix(in oklab, var(--codex-ui-text) 8.2%, transparent),
+    0 0.25rem 0.5rem -0.125rem rgb(0 0 0 / 0.1);
+  min-height: 11.91rem;
+  padding: 1.25rem;
+  width: min(25rem, 100%);
+}
+
+.codex-ui-branch-creation-dialog .codex-ui-dialog__title {
+  font-size: 1.375rem;
+  font-weight: var(--codex-ui-font-weight-semibold);
+  line-height: 1.75rem;
+}
+
+.codex-ui-branch-creation-dialog .codex-ui-dialog__close {
+  border-radius: 0.25rem;
+  font-size: 1rem;
+  height: 1.5rem;
+  margin: -0.25rem;
+  width: 1.5rem;
+}
+
+.codex-ui-branch-creation-dialog .codex-ui-dialog__body {
+  margin-top: 0.75rem;
+}
+
+.codex-ui-branch-creation-dialog .codex-ui-dialog__footer {
+  flex-wrap: nowrap;
+  gap: 0.75rem;
+  margin-top: 0.75rem;
+}
+
+.codex-ui-branch-creation-dialog__form {
+  display: grid;
+  gap: 0.4375rem;
+}
+
+.codex-ui-branch-creation-dialog__label-row {
+  align-items: center;
+  display: flex;
+  font-size: 0.8125rem;
+  font-weight: var(--codex-ui-font-weight-medium);
+  justify-content: space-between;
+  line-height: 1.1607rem;
+}
+
+.codex-ui-branch-creation-dialog__prefix {
+  appearance: none;
+  background: transparent;
+  border: 0;
+  color: var(--codex-ui-text-tertiary);
+  cursor: pointer;
+  font: inherit;
+  font-weight: inherit;
+  padding: 0;
+}
+
+.codex-ui-branch-creation-dialog__prefix:hover:not(:disabled) {
+  color: var(--codex-ui-text-secondary);
+}
+
+.codex-ui-branch-creation-dialog__prefix:focus-visible {
+  border-radius: 0.25rem;
+  outline: 2px solid var(--codex-ui-focus);
+  outline-offset: 2px;
+}
+
+.codex-ui-branch-creation-dialog__input {
+  appearance: none;
+  background: var(--codex-ui-background-thread-summary);
+  border: 1px solid var(--codex-ui-border);
+  border-radius: 0.9375rem;
+  color: var(--codex-ui-text);
+  font-family: var(--codex-ui-font-sans);
+  font-size: 0.8125rem;
+  font-weight: var(--codex-ui-font-weight-medium);
+  height: 2.5rem;
+  line-height: 1.1607rem;
+  min-width: 0;
+  padding: 0 0.75rem;
+  width: 100%;
+}
+
+.codex-ui-branch-creation-dialog__input::placeholder {
+  color: var(--codex-ui-text-tertiary);
+  opacity: 1;
+}
+
+.codex-ui-branch-creation-dialog__input:focus-visible {
+  border-color: var(--codex-ui-border-heavy);
+  outline: 2px solid var(--codex-ui-focus);
+  outline-offset: 1px;
+}
+
+.codex-ui-branch-creation-dialog__input[aria-invalid="true"] {
+  border-color: var(--codex-ui-danger);
+}
+
+.codex-ui-branch-creation-dialog__error {
+  color: var(--codex-ui-text-error);
+  font-size: var(--codex-ui-font-size-xs);
+  line-height: var(--codex-ui-line-height-xs);
+  margin: 0;
+}
+
+.codex-ui-branch-creation-dialog .codex-ui-button {
+  border-radius: 0.78125rem;
+  font-size: 0.875rem;
+  height: 2rem;
+  line-height: 1.125rem;
+  padding-inline: 1rem;
+}
+
+.codex-ui-branch-creation-dialog .codex-ui-button:disabled {
+  opacity: 0.42;
 }
 
 @container codex-ui-new-conversation-start (max-width: 30rem) {

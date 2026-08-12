@@ -1,5 +1,11 @@
 import { launchScene } from "./electron-harness.mjs";
-import { resolve } from "node:path";
+import { execFile } from "node:child_process";
+import { mkdtemp, rm } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import { join, resolve } from "node:path";
+import { promisify } from "node:util";
+
+const execFileAsync = promisify(execFile);
 
 const scene = {
   frame: "recovered",
@@ -4073,10 +4079,35 @@ const codingWorkspaceScene = {
   scenario: "workspace-workflow",
   view: "workspace",
 };
+const codingWorkspaceGitDirectory = await mkdtemp(
+  join(tmpdir(), "codex-ui-kit-electron-branch-"),
+);
+await execFileAsync("git", ["init", "-b", "main"], {
+  cwd: codingWorkspaceGitDirectory,
+});
+await execFileAsync(
+  "git",
+  [
+    "-c",
+    "user.name=Codex UI Kit",
+    "-c",
+    "user.email=codex-ui-kit@example.invalid",
+    "commit",
+    "--allow-empty",
+    "-m",
+    "test: initialize electron branch fixture",
+  ],
+  { cwd: codingWorkspaceGitDirectory },
+);
 const {
   app: codingWorkspaceApp,
   page: codingWorkspacePage,
-} = await launchScene(codingWorkspaceScene, { capture: false });
+} = await launchScene(codingWorkspaceScene, {
+  capture: false,
+  environment: {
+    CODEX_UI_KIT_WORKSPACE: codingWorkspaceGitDirectory,
+  },
+});
 try {
   const nativeWindow = await codingWorkspaceApp.evaluate(
     ({ BrowserWindow }) => {
@@ -4467,16 +4498,6 @@ try {
     'button[aria-label="Change worktree: main"]',
   );
 
-  const localEnvironmentDialog = codingWorkspacePage.getByRole("dialog", {
-    name: "Select local environment",
-  });
-  const localEnvironmentSearch = localEnvironmentDialog.getByRole(
-    "searchbox",
-    {
-      name: "Search local environments",
-    },
-  );
-
   await codingWorkspacePage
     .getByRole("button", {
       name: "Change worktree: main",
@@ -4513,56 +4534,94 @@ try {
       name: "Create and checkout new branch…",
     })
     .click();
+  const branchDialog = codingWorkspacePage.getByRole("dialog", {
+    name: "Create and checkout branch",
+  });
+  const branchInput = branchDialog.getByRole("textbox", {
+    name: "Branch name",
+  });
+  const createBranch = branchDialog.getByRole("button", {
+    name: "Create and checkout",
+  });
   await codingWorkspacePage.waitForFunction(
     () =>
-      document.activeElement?.getAttribute("aria-label") ===
-      "Search local environments",
+      document.activeElement?.getAttribute("aria-label") === "Branch name",
   );
-  const repairing = localEnvironmentDialog.getByRole("button", {
-    name: "Use local environment Repairing worktree",
+  const branchDialogContract = await branchDialog.evaluate((dialog) => {
+    const surface = dialog.getBoundingClientRect();
+    const input = dialog
+      .querySelector('input[aria-label="Branch name"]')
+      ?.getBoundingClientRect();
+    return {
+      buttonLabels: Array.from(dialog.querySelectorAll("button"), (button) =>
+        button.textContent?.trim(),
+      ),
+      input: input
+        ? { height: input.height, width: input.width }
+        : null,
+      surface: { height: surface.height, width: surface.width },
+    };
   });
-  if (!(await repairing.isDisabled())) {
-    throw new Error(
-      "Electron coding workspace exposed a repairing environment as selectable.",
-    );
-  }
-  await localEnvironmentSearch.press("Escape");
-  await localEnvironmentDialog.waitFor({ state: "hidden" });
-  await codingWorkspacePage.waitForTimeout(50);
   if (
-    (await codingWorkspacePage.evaluate(
-      () => document.activeElement?.getAttribute("aria-label"),
-    )) !== "Change worktree: main"
+    Math.abs(branchDialogContract.surface.width - 400) > 1 ||
+    Math.abs(branchDialogContract.surface.height - 190.56) > 1 ||
+    Math.abs((branchDialogContract.input?.width ?? 0) - 360) > 1 ||
+    Math.abs((branchDialogContract.input?.height ?? 0) - 40) > 1 ||
+    JSON.stringify(branchDialogContract.buttonLabels) !==
+      JSON.stringify([
+        "×",
+        "Set prefix",
+        "Close",
+        "Create and checkout",
+      ]) ||
+    !(await createBranch.isDisabled())
   ) {
     throw new Error(
-      "Electron coding workspace did not restore focus to the worktree launcher.",
+      `Electron branch creation geometry is invalid: ${JSON.stringify(branchDialogContract)}.`,
+    );
+  }
+  await branchInput.fill("bad branch");
+  await createBranch.click();
+  await branchDialog.getByRole("alert").waitFor();
+  if (
+    (await branchDialog.getByRole("alert").textContent())?.trim() !==
+      "Enter a valid Git branch name." ||
+    (await branchInput.getAttribute("aria-invalid")) !== "true"
+  ) {
+    throw new Error(
+      "Electron branch creation did not preserve the host validation error.",
+    );
+  }
+  await branchInput.fill("main");
+  await createBranch.click();
+  await codingWorkspacePage.waitForFunction(
+    () =>
+      document.querySelector(
+        ".codex-ui-branch-creation-dialog [role=\"alert\"]",
+      )?.textContent === "A branch named main already exists.",
+  );
+  // This name exists in the replay-only renderer list but not in the host
+  // repository. The main-process Git state must remain authoritative.
+  await branchInput.fill("feature/sidebar-shell");
+  await createBranch.click();
+  await branchDialog.waitFor({ state: "hidden" });
+  await codingWorkspacePage.waitForSelector(
+    'button[aria-label="Change worktree: feature/sidebar-shell"]',
+  );
+  const createdGitBranch = await execFileAsync(
+    "git",
+    ["branch", "--show-current"],
+    { cwd: codingWorkspaceGitDirectory, encoding: "utf8" },
+  );
+  if (createdGitBranch.stdout.trim() !== "feature/sidebar-shell") {
+    throw new Error(
+      `Electron branch creation did not checkout the host repository: ${createdGitBranch.stdout.trim()}.`,
     );
   }
   await codingWorkspacePage
     .getByRole("button", {
-      name: "Change worktree: main",
+      name: "Change worktree: feature/sidebar-shell",
     })
-    .click();
-  await codingWorkspacePage.waitForTimeout(50);
-  await worktreeMenu
-    .getByRole("menuitem", {
-      name: "Create and checkout new branch…",
-    })
-    .click();
-  await localEnvironmentDialog
-    .getByRole("button", { name: "Create worktree" })
-    .click();
-  await codingWorkspacePage.waitForSelector(
-    'button[aria-label="Change run location: New worktree"]',
-  );
-  await codingWorkspacePage
-    .getByRole("button", { name: "Change run location: New worktree" })
-    .click();
-  await environmentMenu
-    .getByRole("menuitemradio", { name: "Work locally" })
-    .click();
-  await codingWorkspacePage
-    .getByRole("button", { name: "Change worktree: main" })
     .click();
   await codingWorkspacePage.waitForTimeout(50);
   await branchSearch.press("m");
@@ -4600,6 +4659,16 @@ try {
   await codingWorkspacePage.waitForSelector(
     'button[aria-label="Change worktree: main"]',
   );
+  const checkedOutMain = await execFileAsync(
+    "git",
+    ["branch", "--show-current"],
+    { cwd: codingWorkspaceGitDirectory, encoding: "utf8" },
+  );
+  if (checkedOutMain.stdout.trim() !== "main") {
+    throw new Error(
+      `Electron branch switch did not update the host repository: ${checkedOutMain.stdout.trim()}.`,
+    );
+  }
   await codingWorkspacePage.waitForSelector(
     'button[aria-label="Change run location: Local"]',
   );
@@ -4710,6 +4779,10 @@ try {
   );
 } finally {
   await codingWorkspaceApp.close();
+  await rm(codingWorkspaceGitDirectory, {
+    force: true,
+    recursive: true,
+  });
 }
 
 const cloudWorkspaceScene = {
@@ -4718,10 +4791,40 @@ const cloudWorkspaceScene = {
   scenario: "workspace-workflow",
   view: "workspace",
 };
+const cloudWorkspaceGitDirectory = await mkdtemp(
+  join(tmpdir(), "codex-ui-kit-electron-cloud-branch-"),
+);
+await execFileAsync("git", ["init", "-b", "main"], {
+  cwd: cloudWorkspaceGitDirectory,
+});
+await execFileAsync(
+  "git",
+  [
+    "-c",
+    "user.name=Codex UI Kit",
+    "-c",
+    "user.email=codex-ui-kit@example.invalid",
+    "commit",
+    "--allow-empty",
+    "-m",
+    "test: initialize cloud branch fixture",
+  ],
+  { cwd: cloudWorkspaceGitDirectory },
+);
+await execFileAsync(
+  "git",
+  ["branch", "feat/current-workspace-entry-refresh"],
+  { cwd: cloudWorkspaceGitDirectory },
+);
 const {
   app: cloudWorkspaceApp,
   page: cloudWorkspacePage,
-} = await launchScene(cloudWorkspaceScene, { capture: false });
+} = await launchScene(cloudWorkspaceScene, {
+  capture: false,
+  environment: {
+    CODEX_UI_KIT_WORKSPACE: cloudWorkspaceGitDirectory,
+  },
+});
 try {
   await cloudWorkspacePage
     .getByRole("button", { name: "Change run location: Local" })
@@ -4742,6 +4845,9 @@ try {
       name: "feat/current-workspace-entry-refresh",
     })
     .click();
+  await cloudWorkspacePage.waitForSelector(
+    'button[aria-label="Change worktree: feat/current-workspace-entry-refresh"]',
+  );
   await cloudWorkspacePage
     .getByRole("textbox", { name: "Do anything" })
     .fill("Run the cloud worktree lifecycle.");
@@ -4771,6 +4877,10 @@ try {
   }
 } finally {
   await cloudWorkspaceApp.close();
+  await rm(cloudWorkspaceGitDirectory, {
+    force: true,
+    recursive: true,
+  });
 }
 
 const rejectedApprovalScene = {

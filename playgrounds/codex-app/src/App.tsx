@@ -15,6 +15,7 @@ import {
   AppWindowChrome,
   ApprovalRequest,
   AutomaticApprovalReview,
+  BranchCreationDialog,
   BrowserActivity,
   Button,
   CommandExecution,
@@ -1388,6 +1389,10 @@ type WorkspaceBranch = {
   statusLabel?: string;
 };
 
+type WorkspaceGitBranchResponse =
+  | { branch: string; ok: true }
+  | { code: string; message: string; ok: false };
+
 const workspaceBranches: WorkspaceBranch[] = [
   {
     branch: "main",
@@ -1446,6 +1451,14 @@ const workspaceBranches: WorkspaceBranch[] = [
     statusLabel: "Repairing",
   },
 ];
+
+const capturedWorkspaceBranch: WorkspaceBranch = {
+  branch: "feat/current-branch",
+  id: "created:feat/current-branch",
+  label: "Current branch",
+  meta: "clean",
+  status: "available",
+};
 
 const workspaceWorktreesByProject: Record<
   string,
@@ -1621,6 +1634,9 @@ export function App() {
     initialSelection.view === "workspace" &&
       initialSelection.frame === "workspace-repairing"
       ? "repairing"
+      : initialSelection.view === "workspace" &&
+          initialSelection.frame === "workspace-branch-created"
+        ? capturedWorkspaceBranch.id
       : initialSelection.view === "workspace" && initialSelection.capture
         ? "feature"
         : "main",
@@ -1652,6 +1668,47 @@ export function App() {
             : null,
   );
   const [workspaceBranchQuery, setWorkspaceBranchQuery] = useState("");
+  const [workspaceCreatedBranches, setWorkspaceCreatedBranches] = useState<
+    Record<string, WorkspaceBranch[]>
+  >(() =>
+    initialSelection.frame === "workspace-branch-created"
+      ? { "codex-ui-kit": [capturedWorkspaceBranch] }
+      : ({} as Record<string, WorkspaceBranch[]>),
+  );
+  const [workspaceBranchDialogOpen, setWorkspaceBranchDialogOpen] =
+    useState(
+      initialSelection.view === "workspace" &&
+        [
+          "workspace-branch-create",
+          "workspace-branch-create-error",
+          "workspace-branch-create-filled",
+        ].includes(initialSelection.frame ?? ""),
+    );
+  const [workspaceBranchName, setWorkspaceBranchName] = useState(() =>
+    initialSelection.frame === "workspace-branch-create-error"
+      ? "main"
+      : initialSelection.frame === "workspace-branch-create-filled"
+        ? "feat/current-branch"
+        : "",
+  );
+  const [workspaceBranchStatus, setWorkspaceBranchStatus] = useState<
+    "creating" | "error" | "idle"
+  >(
+    initialSelection.frame === "workspace-branch-create-error"
+      ? "error"
+      : "idle",
+  );
+  const [workspaceBranchError, setWorkspaceBranchError] = useState<
+    string | undefined
+  >(
+    initialSelection.frame === "workspace-branch-create-error"
+      ? "A branch named main already exists."
+      : undefined,
+  );
+  const [workspaceBranchSwitchError, setWorkspaceBranchSwitchError] =
+    useState<string>();
+  const [workspaceBranchSettingsNotice, setWorkspaceBranchSettingsNotice] =
+    useState<string>();
   const [workspaceEnvironmentQuery, setWorkspaceEnvironmentQuery] =
     useState("");
   const [workspaceProjectQuery, setWorkspaceProjectQuery] = useState("");
@@ -4581,10 +4638,22 @@ export function App() {
         : (workspaceProjects.find(
             ({ id }) => id === workspaceProjectId,
           ) ?? workspaceProjects[0]);
-  const workspaceWorktrees =
-    (workspaceProjectId
-      ? workspaceWorktreesByProject[workspaceProjectId]
-      : undefined) ?? [workspaceBranches[0]];
+  const createdProjectBranches = workspaceProjectId
+    ? (workspaceCreatedBranches[workspaceProjectId] ?? [])
+    : [];
+  const createdProjectBranchNames = new Set(
+    createdProjectBranches.map(({ branch }) => branch),
+  );
+  const workspaceWorktrees = workspaceProjectId
+    ? [
+        ...(workspaceWorktreesByProject[workspaceProjectId] ?? [
+          workspaceBranches[0],
+        ]).filter(
+          ({ branch }) => !createdProjectBranchNames.has(branch),
+        ),
+        ...createdProjectBranches,
+      ]
+    : [workspaceBranches[0]];
   const workspaceWorktree =
     workspaceWorktrees.find(
       ({ id }) => id === workspaceWorktreeId,
@@ -4620,6 +4689,8 @@ export function App() {
   const workspaceBaseFrame =
     projectIndexChat
       ? "projects-index-chat"
+      : activeFrame === "workspace-branch-created"
+        ? activeFrame
       : currentWorkspacePersistenceFrame(activeFrame)
       ? activeFrame
       : initialSelection.frame === "workspace-compact-ready"
@@ -4642,6 +4713,7 @@ export function App() {
     if (
       view !== "workspace" ||
       workspaceLocalEnvironmentOpen ||
+      workspaceBranchDialogOpen ||
       workspaceOverlay
     ) {
       return;
@@ -4650,6 +4722,7 @@ export function App() {
   }, [
     view,
     workspaceBaseFrame,
+    workspaceBranchDialogOpen,
     workspaceLocalEnvironmentOpen,
     workspaceOverlay,
   ]);
@@ -4686,6 +4759,104 @@ export function App() {
   const closeWorkspaceLocalEnvironment = () => {
     setWorkspaceEnvironmentQuery("");
     setWorkspaceLocalEnvironmentOpen(false);
+    setActiveFrame("workspace-ready");
+  };
+  const openWorkspaceBranchCreation = () => {
+    setWorkspaceOverlay(null);
+    setWorkspaceBranchName("");
+    setWorkspaceBranchError(undefined);
+    setWorkspaceBranchSettingsNotice(undefined);
+    setWorkspaceBranchStatus("idle");
+    setWorkspaceBranchDialogOpen(true);
+    setActiveFrame("workspace-branch-create");
+  };
+  const closeWorkspaceBranchCreation = () => {
+    setWorkspaceBranchDialogOpen(false);
+    setWorkspaceBranchStatus("idle");
+    setWorkspaceBranchError(undefined);
+    setActiveFrame("workspace-ready");
+  };
+  const createWorkspaceBranch = async (rawBranchName: string) => {
+    const branchName = rawBranchName.trim();
+    if (!branchName || !workspaceProjectId) return;
+    setWorkspaceBranchStatus("creating");
+    setWorkspaceBranchError(undefined);
+    const duplicate =
+      !window.codexDemo &&
+      workspaceWorktrees.some((worktree) => worktree.branch === branchName);
+    let response: WorkspaceGitBranchResponse;
+    try {
+      response = duplicate
+        ? {
+            code: "duplicate",
+            message: `A branch named ${branchName} already exists.`,
+            ok: false,
+          }
+        : window.codexDemo
+          ? await window.codexDemo.createAndCheckoutBranch({ branchName })
+          : { branch: branchName, ok: true };
+    } catch {
+      response = {
+        code: "unavailable",
+        message: "Git could not create and checkout the branch.",
+        ok: false,
+      };
+    }
+    if (!response.ok) {
+      setWorkspaceBranchStatus("error");
+      setWorkspaceBranchError(response.message);
+      setActiveFrame("workspace-branch-create-error");
+      return;
+    }
+    const createdBranch: WorkspaceBranch = {
+      branch: response.branch,
+      id: `created:${response.branch}`,
+      label: response.branch,
+      meta: "clean",
+      status: "available",
+    };
+    setWorkspaceCreatedBranches((current) => ({
+      ...current,
+      [workspaceProjectId]: [
+        ...(current[workspaceProjectId] ?? []).filter(
+          (branch) => branch.branch !== response.branch,
+        ),
+        createdBranch,
+      ],
+    }));
+    setWorkspaceEnvironmentId("local");
+    setWorkspaceWorktreeId(createdBranch.id);
+    setWorkspaceBranchDialogOpen(false);
+    setWorkspaceBranchName("");
+    setWorkspaceBranchStatus("idle");
+    setActiveFrame("workspace-branch-created");
+  };
+  const selectWorkspaceBranch = async (worktree: WorkspaceBranch) => {
+    setWorkspaceBranchSwitchError(undefined);
+    setWorkspaceBranchSettingsNotice(undefined);
+    let response: WorkspaceGitBranchResponse;
+    try {
+      response = window.codexDemo
+        ? await window.codexDemo.checkoutBranch({
+            branchName: worktree.branch,
+          })
+        : { branch: worktree.branch, ok: true };
+    } catch {
+      response = {
+        code: "unavailable",
+        message: "Git could not checkout the branch.",
+        ok: false,
+      };
+    }
+    if (!response.ok) {
+      setWorkspaceBranchSwitchError(response.message);
+      setActiveFrame("workspace-branch-switch-error");
+      return;
+    }
+    if (workspaceEnvironmentId === "worktree") {
+      setWorkspaceEnvironmentId("local");
+    }
+    setWorkspaceWorktreeId(worktree.id);
     setActiveFrame("workspace-ready");
   };
   const selectWorkspaceRunLocation = (
@@ -4948,10 +5119,7 @@ export function App() {
                       }
                       key={worktree.id}
                       onSelect={() => {
-                        if (workspaceEnvironmentId === "worktree") {
-                          setWorkspaceEnvironmentId("local");
-                        }
-                        setWorkspaceWorktreeId(worktree.id);
+                        void selectWorkspaceBranch(worktree);
                       }}
                       role="menuitemradio"
                       startIcon="⑂"
@@ -4962,9 +5130,7 @@ export function App() {
                 </div>
                 <MenuSeparator />
                 <MenuItem
-                  onSelect={() =>
-                    openWorkspaceLocalEnvironment("worktree")
-                  }
+                  onSelect={openWorkspaceBranchCreation}
                   startIcon="＋"
                 >
                   Create and checkout new branch…
@@ -4975,6 +5141,16 @@ export function App() {
           return trigger;
         }}
       />
+      {workspaceBranchSwitchError ? (
+        <StatusBanner heading="Couldn’t checkout branch" tone="error">
+          {workspaceBranchSwitchError}
+        </StatusBanner>
+      ) : null}
+      {workspaceBranchSettingsNotice ? (
+        <StatusBanner heading="Branch prefix settings" tone="info">
+          {workspaceBranchSettingsNotice}
+        </StatusBanner>
+      ) : null}
       {workspaceOverlay === "project" ? (
         <div
           aria-label="Choose a project"
@@ -5227,6 +5403,39 @@ export function App() {
             : workspaceEnvironmentTriggerRef
         }
         title="Select local environment"
+      />
+      <BranchCreationDialog
+        branchName={workspaceBranchName}
+        error={workspaceBranchError}
+        onBranchNameChange={(branchName) => {
+          setWorkspaceBranchName(branchName);
+          if (workspaceBranchError) {
+            setWorkspaceBranchError(undefined);
+            setWorkspaceBranchStatus("idle");
+          }
+        }}
+        onCreate={(branchName) => {
+          void createWorkspaceBranch(branchName);
+        }}
+        onOpenChange={(open) => {
+          if (open) {
+            setWorkspaceBranchDialogOpen(true);
+            return;
+          }
+          closeWorkspaceBranchCreation();
+        }}
+        onSetPrefix={() => {
+          setWorkspaceBranchDialogOpen(false);
+          setWorkspaceBranchError(undefined);
+          setWorkspaceBranchStatus("idle");
+          setWorkspaceBranchSettingsNotice(
+            "Open Settings → Git to change the prefix used for new branches.",
+          );
+          setActiveFrame("workspace-ready");
+        }}
+        open={workspaceBranchDialogOpen}
+        returnFocusRef={workspaceWorktreeTriggerRef}
+        status={workspaceBranchStatus}
       />
     </div>
   );

@@ -5,6 +5,10 @@ contextBridge.exposeInMainWorld("codexDemo", {
     process.env.CODEX_DEMO_ATTACHMENT_RENDERER_FIXTURE === "1",
   selectAttachments: () => ipcRenderer.invoke("demo:attachments:select"),
   selectProjectDirectory: () => ipcRenderer.invoke("demo:project:select"),
+  createAndCheckoutBranch: (input) =>
+    ipcRenderer.invoke("demo:git:create-branch", input),
+  checkoutBranch: (input) =>
+    ipcRenderer.invoke("demo:git:checkout-branch", input),
   closeLive: () => ipcRenderer.invoke("demo:live:close"),
   onNotification: (handler) => {
     if (typeof handler !== "function") {

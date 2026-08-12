@@ -5,6 +5,14 @@ import type { ProtocolEventRecord } from "./protocol-state";
 
 interface CodexDemoBridge {
   useRendererAttachmentFixture: boolean;
+  createAndCheckoutBranch(input: { branchName: string }): Promise<
+    | { branch: string; ok: true }
+    | { code: string; message: string; ok: false }
+  >;
+  checkoutBranch(input: { branchName: string }): Promise<
+    | { branch: string; ok: true }
+    | { code: string; message: string; ok: false }
+  >;
   selectAttachments(): Promise<
     {
       id: string;

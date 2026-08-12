@@ -20,6 +20,7 @@ import {
   ApprovalRequest,
   ArtifactList,
   BrowserActivity,
+  BranchCreationDialog,
   Button,
   CommandExecution,
   CommandOutput,
@@ -1428,6 +1429,10 @@ function Showcase() {
     setLocalEnvironmentDialogOwner,
   ] = useState<"environment" | "worktree">();
   const [localEnvironmentQuery, setLocalEnvironmentQuery] = useState("");
+  const [branchCreationDialogOpen, setBranchCreationDialogOpen] =
+    useState(false);
+  const [branchCreationName, setBranchCreationName] = useState("");
+  const [branchCreationError, setBranchCreationError] = useState<string>();
   const [routingStatus, setRoutingStatus] = useState(
     "Choose a project route",
   );
@@ -1701,7 +1706,21 @@ function Showcase() {
           >
             <div className="workflow-preview">
               <ProjectConversationPage
-                actions={<button type="button">Open folder</button>}
+                actions={
+                  <>
+                    <button type="button">Open folder</button>
+                    <button
+                      onClick={() => {
+                        setBranchCreationName("");
+                        setBranchCreationError(undefined);
+                        setBranchCreationDialogOpen(true);
+                      }}
+                      type="button"
+                    >
+                      Create branch
+                    </button>
+                  </>
+                }
                 description="Move from the application-owned project index into a new conversation without losing workspace context."
                 footer={
                   <>
@@ -1951,6 +1970,33 @@ function Showcase() {
                 }}
                 open={localEnvironmentDialogOpen}
                 query={localEnvironmentQuery}
+              />
+              <BranchCreationDialog
+                branchName={branchCreationName}
+                error={branchCreationError}
+                onBranchNameChange={(branchName) => {
+                  setBranchCreationName(branchName);
+                  setBranchCreationError(undefined);
+                }}
+                onCreate={(branchName) => {
+                  if (branchName === "main") {
+                    setBranchCreationError(
+                      "A branch named main already exists.",
+                    );
+                    return;
+                  }
+                  setRoutingWorktree(branchName);
+                  setRoutingStatus(`Created and checked out ${branchName}`);
+                  setBranchCreationDialogOpen(false);
+                }}
+                onOpenChange={setBranchCreationDialogOpen}
+                onSetPrefix={() => {
+                  setBranchCreationDialogOpen(false);
+                  setRoutingStatus(
+                    "Open Git settings to set a branch prefix",
+                  );
+                }}
+                open={branchCreationDialogOpen}
               />
 
               <div className="workflow-preview__grid">

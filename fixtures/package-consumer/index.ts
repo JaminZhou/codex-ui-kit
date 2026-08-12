@@ -22,6 +22,7 @@ import {
   ApprovalRequest,
   AutomaticApprovalReview,
   type AutomaticApprovalReviewStatus,
+  BranchCreationDialog,
   BrowserActivity,
   type BrowserActivityStep,
   Button,
@@ -299,6 +300,7 @@ void ArtifactList;
 void ApprovalCommandPreview;
 void ApprovalRequest;
 void AutomaticApprovalReview;
+void BranchCreationDialog;
 void BrowserActivity;
 void browserStep;
 void CodeBlock;
