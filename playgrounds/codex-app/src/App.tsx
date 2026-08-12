@@ -2460,6 +2460,7 @@ export function App() {
     setMode("replay");
     setView("workspace");
     setProjectIndexChat(undefined);
+    setWorkspacePage("conversation");
     updateWorkspaceProjectId(projectId);
     setWorkspaceEnvironmentId("local");
     updateWorkspaceWorktreeId("main");
@@ -2549,6 +2550,7 @@ export function App() {
       setMode("replay");
       setView("workspace");
       setProjectIndexChat(undefined);
+      setWorkspacePage("conversation");
       updateWorkspaceProjectId(id);
       setWorkspaceEnvironmentId("local");
       updateWorkspaceWorktreeId("main");

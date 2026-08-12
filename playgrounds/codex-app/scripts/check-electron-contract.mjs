@@ -4704,6 +4704,32 @@ try {
     );
   }
   await codingWorkspacePage
+    .getByRole("button", { name: "New chat", exact: true })
+    .click();
+  await codingWorkspacePage.waitForSelector(
+    'button[aria-label="Change run location: Local"]',
+  );
+  if ((await environmentsRoute.count()) !== 0) {
+    throw new Error(
+      "Electron workspace navigation retained the environment settings route.",
+    );
+  }
+  await codingWorkspacePage
+    .getByRole("button", { name: "Change run location: Local" })
+    .click();
+  await environmentMenu.waitFor();
+  await environmentMenu
+    .getByRole("menuitem", { name: "New worktree" })
+    .click();
+  await codingWorkspacePage
+    .getByRole("button", { name: "Change environment: No environment" })
+    .click();
+  await worktreeEnvironmentMenu.waitFor();
+  await worktreeEnvironmentMenu
+    .getByRole("menuitem", { name: "Environment settings" })
+    .click();
+  await environmentsRoute.waitFor();
+  await codingWorkspacePage
     .getByRole("button", { name: "Back to ChatGPT" })
     .click();
   await codingWorkspacePage.waitForSelector(
