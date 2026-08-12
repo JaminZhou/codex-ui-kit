@@ -1575,9 +1575,9 @@ export function App() {
   const [projectIndexQuery, setProjectIndexQuery] = useState(
     initialSelection.frame === "projects-index-empty" ? "missing" : "",
   );
-  const [createdProject, setCreatedProject] = useState<
-    { id: string; label: string; path: string } | undefined
-  >();
+  const [createdProjects, setCreatedProjects] = useState<
+    Array<{ id: string; label: string; path: string }>
+  >([]);
   const [projectIndexChat, setProjectIndexChat] = useState<
     | {
         chatId: string;
@@ -2262,7 +2262,10 @@ export function App() {
         return;
       }
       const id = `created:${selection.path}`;
-      setCreatedProject({ id, ...selection });
+      setCreatedProjects((current) => [
+        { id, ...selection },
+        ...current.filter((project) => project.path !== selection.path),
+      ]);
       setView("workspace");
       setProjectIndexChat(undefined);
       setWorkspaceProjectId(id);
@@ -2272,6 +2275,7 @@ export function App() {
       setWorkspaceProjectQuery("");
       setActiveFrame("workspace-project-created");
       setProjectCreationStatus("idle");
+      dismissSidebarAfterNavigation();
       window.setTimeout(() =>
         document.getElementById("demo-workspace-project-trigger")?.focus(),
       );
@@ -4508,12 +4512,15 @@ export function App() {
     regularComposer
   );
 
+  const createdWorkspaceProject = createdProjects.find(
+    ({ id }) => id === workspaceProjectId,
+  );
   const workspaceProject =
     workspaceProjectId === null
       ? undefined
-      : createdProject?.id === workspaceProjectId
+      : createdWorkspaceProject
         ? {
-            ...createdProject,
+            ...createdWorkspaceProject,
             icon: <SidebarGlyph name="folder" />,
             status: "available" as const,
           }
@@ -4534,16 +4541,14 @@ export function App() {
     worktreeBranch: workspaceWorktree.branch,
     worktreeId: workspaceWorktreeId,
   });
-  const selectableWorkspaceProjects = createdProject
-    ? [
-        {
-          ...createdProject,
-          icon: <SidebarGlyph name="folder" />,
-          status: "available" as const,
-        },
-        ...workspaceProjects,
-      ]
-    : workspaceProjects;
+  const selectableWorkspaceProjects = [
+    ...createdProjects.map((project) => ({
+      ...project,
+      icon: <SidebarGlyph name="folder" />,
+      status: "available" as const,
+    })),
+    ...workspaceProjects,
+  ];
   const filteredWorkspaceProjects = selectableWorkspaceProjects.filter(
     ({ label }) =>
       label
@@ -4571,7 +4576,7 @@ export function App() {
           ? "workspace-new-worktree"
             : workspaceWorktree.status === "repairing"
               ? "workspace-repairing"
-              : createdProject?.id === workspaceProjectId
+              : createdWorkspaceProject
                 ? "workspace-project-created"
                 : "workspace-ready";
   useEffect(() => {
@@ -5351,21 +5356,19 @@ export function App() {
         : activeFrame === "projects-index-partial-error"
           ? ("partial-error" as const)
           : ("ready" as const);
-  const projectIndexSourceItems = createdProject
-    ? [
-        {
-          id: createdProject.id,
-          kindLabel: "Local",
-          label: createdProject.label,
-          path: createdProject.path,
-          recentChats: [],
-          status: "available" as const,
-          updated: "Now",
-          updatedOrder: 5,
-        },
-        ...currentProjectIndexItems,
-      ]
-    : currentProjectIndexItems;
+  const projectIndexSourceItems = [
+    ...createdProjects.map((project, index) => ({
+      id: project.id,
+      kindLabel: "Local",
+      label: project.label,
+      path: project.path,
+      recentChats: [],
+      status: "available" as const,
+      updated: "Now",
+      updatedOrder: 5 + createdProjects.length - index,
+    })),
+    ...currentProjectIndexItems,
+  ];
   const filteredProjectIndexItems = projectIndexSourceItems
     .filter(({ label, path }) => {
       const query = projectIndexQuery.trim().toLocaleLowerCase();

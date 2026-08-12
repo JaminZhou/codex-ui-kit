@@ -62,6 +62,7 @@ let activeTurn: CodexTurn | null = null;
 let unsubscribeNotifications: (() => void) | null = null;
 let unsubscribeServerRequests: (() => void)[] = [];
 let attachmentFixtureFailureInjected = false;
+let projectFixtureSelectionIndex = 0;
 const liveTurnStartGate = new LiveTurnStartGate();
 const liveApprovalGate = new LiveApprovalGate();
 
@@ -359,7 +360,25 @@ async function handleSelectAttachments(event: IpcMainInvokeEvent) {
 
 async function handleSelectProjectDirectory(event: IpcMainInvokeEvent) {
   assertTrustedIpc(event);
-  const fixturePath = process.env.CODEX_DEMO_PROJECT_FIXTURE_PATH;
+  const fixturePathsRaw = process.env.CODEX_DEMO_PROJECT_FIXTURE_PATHS;
+  let fixturePath = process.env.CODEX_DEMO_PROJECT_FIXTURE_PATH;
+  if (fixturePathsRaw) {
+    const fixturePaths: unknown = JSON.parse(fixturePathsRaw);
+    if (
+      !Array.isArray(fixturePaths) ||
+      fixturePaths.length === 0 ||
+      fixturePaths.some((path) => typeof path !== "string" || !isAbsolute(path))
+    ) {
+      throw new TypeError(
+        "CODEX_DEMO_PROJECT_FIXTURE_PATHS must be a non-empty array of absolute directory paths.",
+      );
+    }
+    fixturePath =
+      fixturePaths[
+        Math.min(projectFixtureSelectionIndex, fixturePaths.length - 1)
+      ];
+    projectFixtureSelectionIndex += 1;
+  }
   if (fixturePath) {
     if (!isAbsolute(fixturePath) || !(await stat(fixturePath)).isDirectory()) {
       throw new TypeError(

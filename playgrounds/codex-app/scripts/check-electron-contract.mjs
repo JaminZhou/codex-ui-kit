@@ -7536,7 +7536,10 @@ const projectCreationScene = {
 const { app: projectCreationApp, page: projectCreationPage } =
   await launchScene(projectCreationScene, {
     environment: {
-      CODEX_DEMO_PROJECT_FIXTURE_PATH: resolve(process.cwd(), "scripts"),
+      CODEX_DEMO_PROJECT_FIXTURE_PATHS: JSON.stringify([
+        resolve(process.cwd(), "scripts"),
+        resolve(process.cwd(), "src"),
+      ]),
     },
   });
 try {
@@ -7568,6 +7571,32 @@ try {
       "Electron project-directory selection did not return to the created workspace.",
     );
   }
+  await createdProjectTrigger.click();
+  await projectDialog.waitFor({ state: "visible" });
+  await projectDialog.getByRole("button", { name: "New project" }).click();
+  await projectCreationPage.waitForSelector(
+    '.demo-root[data-view="workspace"][data-frame="workspace-project-created"]',
+  );
+  const secondCreatedProjectTrigger = projectCreationPage.getByRole(
+    "button",
+    { name: "Change project: src" },
+  );
+  await secondCreatedProjectTrigger.click();
+  await projectDialog.waitFor({ state: "visible" });
+  if (
+    !(await projectDialog
+      .getByRole("option", { name: "Select project scripts" })
+      .isVisible()) ||
+    !(await projectDialog
+      .getByRole("option", { name: "Select project src" })
+      .isVisible())
+  ) {
+    throw new Error(
+      "Electron project picker did not preserve every project added during the session.",
+    );
+  }
+  await projectCreationPage.keyboard.press("Escape");
+  await projectDialog.waitFor({ state: "hidden" });
   await projectCreationPage
     .getByRole("button", { name: "View projects" })
     .click();
@@ -7577,10 +7606,13 @@ try {
   if (
     !(await projectCreationPage
       .getByRole("button", { name: "Open project scripts" })
+      .isVisible()) ||
+    !(await projectCreationPage
+      .getByRole("button", { name: "Open project src" })
       .isVisible())
   ) {
     throw new Error(
-      "Electron created project did not appear in the project index.",
+      "Electron created projects did not remain visible in the project index.",
     );
   }
 
@@ -7636,6 +7668,47 @@ try {
   }
 } finally {
   await projectCreationApp.close();
+}
+
+const narrowProjectCreationScene = {
+  currentSidebar: true,
+  frame: "workspace-ready",
+  id: "electron-narrow-project-creation",
+  scenario: "workspace-workflow",
+  view: "workspace",
+};
+const {
+  app: narrowProjectCreationApp,
+  page: narrowProjectCreationPage,
+} = await launchScene(narrowProjectCreationScene, {
+  environment: {
+    CODEX_DEMO_PROJECT_FIXTURE_PATH: resolve(process.cwd(), "scripts"),
+  },
+  capture: false,
+});
+try {
+  await narrowProjectCreationApp.evaluate(({ BrowserWindow }) => {
+    const active = BrowserWindow.getAllWindows()[0];
+    active?.setMinimumSize(480, 480);
+    active?.setContentSize(600, 680);
+  });
+  await narrowProjectCreationPage.waitForSelector(
+    '.codex-ui-app-shell[data-layout-mode="narrow"]:not([data-sidebar-open])',
+  );
+  await narrowProjectCreationPage
+    .getByRole("button", { name: "Show sidebar" })
+    .click();
+  await narrowProjectCreationPage.waitForSelector(
+    '.codex-ui-app-shell[data-layout-mode="narrow"][data-sidebar-open] .codex-ui-app-shell__main[inert]',
+  );
+  await narrowProjectCreationPage
+    .getByRole("button", { name: "New project" })
+    .click();
+  await narrowProjectCreationPage.waitForSelector(
+    '.demo-root[data-view="workspace"][data-frame="workspace-project-created"] .codex-ui-app-shell[data-layout-mode="narrow"]:not([data-sidebar-open]) .codex-ui-app-shell__main:not([inert])',
+  );
+} finally {
+  await narrowProjectCreationApp.close();
 }
 
 console.log(
