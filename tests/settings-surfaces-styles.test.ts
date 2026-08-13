@@ -12,7 +12,7 @@ describe("settings visual contract", () => {
       "--codex-ui-settings-sidebar-width: 20.181875rem",
     );
     expect(styles).toMatch(
-      /\.codex-ui-git-settings \{[\s\S]*?max-width: 48rem;[\s\S]*?padding: 4\.125rem 0 2rem;/,
+      /\.codex-ui-git-settings \{[\s\S]*?max-width: 48rem;[\s\S]*?padding: 1\.25rem 0 2rem;/,
     );
     expect(styles).toMatch(
       /\.codex-ui-settings-shell__search \{[\s\S]*?height: 2rem;/,
@@ -22,6 +22,9 @@ describe("settings visual contract", () => {
     );
     expect(styles).toMatch(
       /\.codex-ui-settings-shell__main \{[\s\S]*?scrollbar-width: none;/,
+    );
+    expect(styles).toMatch(
+      /\.codex-ui-settings-shell__main \{[\s\S]*?margin-top: 2\.875rem;/,
     );
     expect(styles).toMatch(
       /\.codex-ui-settings-shell__main::\-webkit-scrollbar \{[\s\S]*?display: none;/,
@@ -49,5 +52,32 @@ describe("settings visual contract", () => {
     expect(styles).not.toContain("background: #242424");
     expect(styles).not.toContain("background: #202020");
     expect(styles).not.toContain("background: #2b2b2b");
+  });
+
+  it("locks the current Appearance preview, editor, and Preferences geometry", () => {
+    expect(styles).toMatch(
+      /\.codex-ui-appearance-settings \{[\s\S]*?max-width: 48rem;[\s\S]*?padding: 1\.25rem 0 1\.3125rem;/,
+    );
+    expect(styles).toMatch(
+      /\.codex-ui-appearance-settings__theme-options \{[\s\S]*?grid-template-columns: repeat\(3, minmax\(0, 1fr\)\);/,
+    );
+    expect(styles).toMatch(
+      /\.codex-ui-appearance-settings__theme-preview \{[\s\S]*?aspect-ratio: 248 \/ 175;/,
+    );
+    expect(styles).toMatch(
+      /\.codex-ui-appearance-settings__diff-preview \{[\s\S]*?height: 6\.875rem;/,
+    );
+    expect(styles).toMatch(
+      /\.codex-ui-appearance-settings__editor,[\s\S]*?border-radius: 1\.0625rem;/,
+    );
+    expect(styles).toMatch(
+      /\.codex-ui-appearance-settings__switch \{[\s\S]*?height: 1\.25rem;[\s\S]*?width: 2rem;/,
+    );
+  });
+
+  it("projects keyboard focus from clipped radios onto visible choices", () => {
+    expect(styles).toMatch(
+      /\.codex-ui-appearance-settings__theme-choice[\s\S]*?> input:focus-visible[\s\S]*?\+ \.codex-ui-appearance-settings__theme-preview,[\s\S]*?\.codex-ui-appearance-settings__dock-icons[\s\S]*?> input:focus-visible[\s\S]*?\+ span \{[\s\S]*?outline: 2px solid var\(--codex-ui-focus\);[\s\S]*?outline-offset: 2px;/,
+    );
   });
 });

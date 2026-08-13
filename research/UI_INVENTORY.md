@@ -46,7 +46,7 @@ observation from a previous build remains historical evidence.
 ## Current baseline
 
 - Codex Desktop `26.803.61601` (`6396`)
-- Package sampled and reverified on 2026-08-11
+- Package sampled on 2026-08-11 and fingerprint-reverified on 2026-08-13
 - `app.asar` SHA-256:
   `928129601e8b36eccba603114d6912352f2b13182f3a7d60b32166d0e81aafb5`
 - Computer Use automation: blocked by the environment safety policy for
@@ -74,8 +74,8 @@ observation from a previous build remains historical evidence.
   previous-build regression evidence and have been downgraded from `verified`
   to `partial_legacy` until they are reached again on the current fingerprint.
 
-Current inventory: 87 surface groups; 23 have current-build runtime evidence, 47 have previous-build-only runtime evidence, 17 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 22 groups and Electron verification covers 22.
-Prior acceptance outside those 22 sampled current-build groups remains
+Current inventory: 88 surface groups; 24 have current-build runtime evidence, 47 have previous-build-only runtime evidence, 17 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 23 groups and Electron verification covers 23.
+Prior acceptance outside those 23 sampled current-build groups remains
 recorded as `partial_legacy` until current-build re-observation.
 
 The current package exposes candidates far beyond the old transcript sample:
@@ -116,7 +116,8 @@ transitions must add or split IDs.
 
 - Browser and artifact panels, document previews, environments.
 - Remaining Settings pages, including Hooks and code-review preferences. The
-  shell/search and Git/review-delivery slice are now current-build verified.
+  shell/search, Git/review-delivery, and Appearance slices are now
+  current-build verified.
 - MCP, plugins, skills, and automations.
 
 ### P2: confirm scope before implementing
@@ -385,14 +386,29 @@ submission remains unpromoted until the same mutation is completed in the
 isolated disposable product repository.
 
 The follow-up Settings slice separates `settings.shell-search`,
-`settings.git-preferences`, and `settings.hooks-review` so a reached Git page
-does not falsely complete Hooks. The current full-page route keeps the
+`settings.general`, `settings.appearance`, `settings.git-preferences`, and
+`settings.hooks-review` so a reached page does not falsely complete an
+independent Settings lifecycle. The current full-page route keeps the
 322.91px navigation, 21 items, grouped global search, 768px Git content, five
 preference rows, and two instruction editors. Twenty-four exact navigation
 icons raise the scoped manifest to 77. Browser/CDP and Electron verify the
 Branch → Set prefix → Settings → Back lifecycle, while local-only wide and
-720px comparisons pass at 2.4214% and 3.0210%. Hooks and every other page
-remain independently open.
+720px comparisons pass at 2.4214% and 3.0210%.
+
+The current-build Appearance follow-up reaches the full theme and Preferences
+scroll surface without reading or changing account-private values. It records
+three responsive theme previews, the 768×110 two-column diff preview, Light
+and Dark theme editors, the 240×328 sixteen-option code-theme menu, four real
+switches, two constrained contrast ranges, Dock icon radios, keyboard-operable
+Reduce motion and Diff markers groups, and the 11–16px / 8–24px numeric
+bounds. The public controlled component accepts host-supplied Dock artwork, so
+the proprietary product raster stays local-only while the exact Settings
+navigation assets remain in the existing provenance manifest. Browser/CDP and
+Electron verify route switching and state persistence across Git and
+Appearance; four reviewed internal scenes bring the matrix to 174. Local-only
+wide, 720px, and bottom-Preferences comparisons differ by 1.2787%, 1.8977%,
+and 3.4665% after ownership masks. General, Hooks, and every other Settings
+page remain independently open.
 
 The current-thread slice adds `ConversationThreadShell`, which composes the
 existing header, scroll-following timeline, messages, and Composer into one

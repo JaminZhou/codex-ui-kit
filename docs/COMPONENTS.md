@@ -255,6 +255,11 @@ All privileged behavior remains host-owned. The components never auto-approve co
   draft-PR, review-delivery, commit-instruction, and pull-request-instruction
   presentation. Hosts own persistence, validation, save failures, Git
   mutation, and dirty-state decisions.
+- `AppearanceSettingsPage`: controlled System/Light/Dark selection, responsive
+  previews, Light/Dark theme editors, code-theme menus, contrast ranges, and
+  the complete Preferences card. Hosts own persistence, file import, copy
+  behavior, and optional Dock icon nodes; no proprietary Dock artwork is
+  bundled by the component.
 
 ## Workspace and pull-request workflow
 

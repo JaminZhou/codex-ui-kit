@@ -13,8 +13,8 @@ exit gates; it does not replace the inventory.
 - The installed package and machine-readable evidence baseline are Codex
   Desktop `26.803.61601` (`6396`). Unsampled earlier-build surfaces remain
   previous-build regression evidence rather than current verification.
-- The inventory contains 87 surface groups: 58 P0, 20 P1, and 9 P2.
-- 23 groups have current-build runtime evidence, 47 have previous-build-only
+- The inventory contains 88 surface groups: 58 P0, 21 P1, and 9 P2.
+- 24 groups have current-build runtime evidence, 47 have previous-build-only
   runtime evidence, and 17 have not been sampled.
 - The scoped `26.803.61601` refresh revalidates 77
   sidebar/menu/window-chrome/Composer/Settings icons against exact runtime evidence.
@@ -437,9 +437,17 @@ P2 surfaces remain scope decisions until runtime reachability is confirmed.
 
 The first P1 vertical slice is now delivered: current-build Settings
 shell/search and Git/review-delivery preferences have independent components,
-Browser/CDP, Electron, exact assets, and wide/720 regional pixels. Appearance,
+Browser/CDP, Electron, exact assets, and wide/720 regional pixels. The next
+slice splits Appearance from General and delivers the three theme previews,
+Light/Dark editors, sixteen-option code-theme menu, responsive diff preview,
+and complete Preferences card as a controlled public component. Browser/CDP
+and Electron verify Git ↔ Appearance route/state continuity; four reviewed
+scenes extend the matrix to 174. Local-only current-build comparisons pass at
+1.2787% wide, 1.8977% at 720px, and 3.4665% for the bottom Preferences state.
+Proprietary Dock rasters remain host-supplied/local-only while exact public
+Settings navigation assets retain their manifest provenance. General,
 Hooks/code-review, and the remaining Settings/integration pages stay separate
-open rows; this slice does not imply Stage 4 completion.
+open rows; these slices do not imply Stage 4 completion.
 
 Exit: each in-scope P1 family has a documented ownership boundary and at least
 one end-to-end vertical slice.

@@ -384,6 +384,322 @@ for (const scene of selectedScenes) {
       );
       continue;
     }
+    if (scene.id.startsWith("workspace-appearance-settings")) {
+      if (scene.id.endsWith("-preferences")) {
+        await page.waitForFunction(() => {
+          const owner = document.querySelector(".codex-ui-settings-shell__main");
+          return owner && owner.scrollTop > 0;
+        });
+      }
+      const appearance = await page.evaluate(() => {
+        const rect = (selector) => {
+          const element = document.querySelector(selector);
+          if (!(element instanceof Element)) return null;
+          const value = element.getBoundingClientRect();
+          return {
+            bottom: value.bottom,
+            height: value.height,
+            left: value.left,
+            top: value.top,
+            width: value.width,
+          };
+        };
+        const rects = (selector) =>
+          Array.from(document.querySelectorAll(selector), (element) => {
+            const value = element.getBoundingClientRect();
+            return {
+              height: value.height,
+              left: value.left,
+              top: value.top,
+              width: value.width,
+            };
+          });
+        const checked = (label) =>
+          document.querySelector(`input[aria-label="${label}"]`)?.checked;
+        const style = (selector) => {
+          const element = document.querySelector(selector);
+          if (!element) return null;
+          const value = getComputedStyle(element);
+          return {
+            backgroundColor: value.backgroundColor,
+            color: value.color,
+          };
+        };
+        const scrollOwner = document.querySelector(
+          ".codex-ui-settings-shell__main",
+        );
+        return {
+          contrast: Array.from(
+            document.querySelectorAll('.codex-ui-appearance-settings input[type="range"]'),
+            (input) => ({
+              label: input.getAttribute("aria-label"),
+              max: input.max,
+              min: input.min,
+              step: input.step,
+              value: Number(input.value),
+            }),
+          ),
+          dock: {
+            chatgpt: checked("Use ChatGPT Dock icon"),
+            codex: checked("Use Codex Dock icon"),
+          },
+          editorCards: rects(".codex-ui-appearance-settings__editor"),
+          heading: rect(".codex-ui-appearance-settings > h1"),
+          horizontalOverflow:
+            document.documentElement.scrollWidth -
+            document.documentElement.clientWidth,
+          iconNames: Array.from(
+            document.querySelectorAll(
+              ".codex-ui-settings-shell__navigation [data-current-build-icon]",
+            ),
+            (icon) => icon.getAttribute("data-current-build-icon"),
+          ),
+          mainCount: document.querySelectorAll('main, [role="main"]').length,
+          navigation: rect(".codex-ui-settings-shell__navigation"),
+          navigationCount: document.querySelectorAll(
+            'nav[aria-label="Settings"]',
+          ).length,
+          numberInputs: Array.from(
+            document.querySelectorAll('.codex-ui-appearance-settings input[type="number"]'),
+            (input) => ({
+              label: input.getAttribute("aria-label"),
+              max: input.max,
+              min: input.min,
+              step: input.step,
+              value: Number(input.value),
+            }),
+          ),
+          outerRegionCount: document.querySelectorAll(
+            '[role="region"][aria-label="Settings route"]',
+          ).length,
+          preferences: rect(
+            ".codex-ui-appearance-settings__preferences-card",
+          ),
+          preview: rect(".codex-ui-appearance-settings__diff-preview"),
+          scrollOwner: scrollOwner
+            ? {
+                clientHeight: scrollOwner.clientHeight,
+                rect: (() => {
+                  const value = scrollOwner.getBoundingClientRect();
+                  return {
+                    height: value.height,
+                    left: value.left,
+                    top: value.top,
+                    width: value.width,
+                  };
+                })(),
+                scrollHeight: scrollOwner.scrollHeight,
+                scrollTop: scrollOwner.scrollTop,
+              }
+            : null,
+          selected: document
+            .querySelector('.codex-ui-settings-shell__item[aria-current="page"]')
+            ?.getAttribute("aria-label"),
+          switchStates: Array.from(
+            document.querySelectorAll(
+              '.codex-ui-appearance-settings [role="switch"]',
+            ),
+            (control) => ({
+              label: control.getAttribute("aria-label"),
+              value: control.getAttribute("aria-checked"),
+            }),
+          ),
+          theme: {
+            dark: checked("Dark"),
+            light: checked("Light"),
+            system: checked("System"),
+          },
+          themePreviews: rects(
+            ".codex-ui-appearance-settings__theme-preview",
+          ),
+          themeValue: document
+            .querySelector(".demo-root")
+            ?.getAttribute("data-theme"),
+          viewport: { height: innerHeight, width: innerWidth },
+          visualStyles: {
+            editor: style(".codex-ui-appearance-settings__editor"),
+            heading: style(".codex-ui-appearance-settings > h1"),
+            navigation: style(".codex-ui-settings-shell__navigation"),
+            shell: style(".codex-ui-settings-shell"),
+          },
+        };
+      });
+      const compact = scene.id === "workspace-appearance-settings-compact";
+      const preferences = scene.id.endsWith("-preferences");
+      const expectedWidth = compact ? 357.09375 : 768;
+      const expectedPreviewWidth = compact ? 111.03125 : 248;
+      if (
+        appearance.horizontalOverflow > 1 ||
+        appearance.navigationCount !== 1 ||
+        appearance.mainCount !== 1 ||
+        appearance.outerRegionCount !== 1 ||
+        appearance.selected !== "Appearance" ||
+        appearance.navigation?.width !== 322.90625 ||
+        appearance.navigation?.top !== 46 ||
+        appearance.navigation?.height !== appearance.viewport.height - 46 ||
+        appearance.scrollOwner?.rect.top !== 46 ||
+        appearance.scrollOwner?.rect.height !== appearance.viewport.height - 46 ||
+        appearance.scrollOwner?.rect.left !== 322.90625 ||
+        appearance.iconNames.length !== 24 ||
+        !appearance.iconNames.includes("settings-appearance") ||
+        appearance.themePreviews.length !== 3 ||
+        appearance.themePreviews.some(
+          ({ width }) => Math.abs(width - expectedPreviewWidth) > 1,
+        ) ||
+        appearance.editorCards.length !== 2 ||
+        appearance.editorCards.some(
+          ({ width }) => Math.abs(width - expectedWidth) > 1,
+        ) ||
+        appearance.preview?.width !== expectedWidth ||
+        appearance.preview?.height !== 110 ||
+        appearance.theme.system !== true ||
+        appearance.theme.light !== false ||
+        appearance.theme.dark !== false ||
+        appearance.dock.chatgpt !== false ||
+        appearance.dock.codex !== true ||
+        JSON.stringify(appearance.switchStates.map(({ value }) => value)) !==
+          JSON.stringify(["true", "true", "false", "true"]) ||
+        JSON.stringify(appearance.contrast) !==
+          JSON.stringify([
+            { label: "Light contrast", max: "100", min: "0", step: "1", value: 45 },
+            { label: "Dark contrast", max: "100", min: "0", step: "1", value: 60 },
+          ]) ||
+        JSON.stringify(appearance.numberInputs) !==
+          JSON.stringify([
+            { label: "Sans font size", max: "16", min: "11", step: "1", value: 14 },
+            { label: "Code font size", max: "24", min: "8", step: "1", value: 12 },
+          ]) ||
+        (!preferences &&
+          (appearance.heading?.top !== 66 ||
+            Math.abs(appearance.heading?.width - expectedWidth) > 1 ||
+            Math.abs(appearance.themePreviews[0].top - 173) > 1 ||
+            Math.abs(appearance.editorCards[0].top - (compact ? 419 : 513)) > 2)) ||
+        (preferences &&
+          (Math.abs(appearance.preferences?.bottom - 799) > 1 ||
+            appearance.scrollOwner?.scrollTop <= 0))
+      ) {
+        throw new Error(
+          `${scene.id}: current Appearance Settings contract failed: ${JSON.stringify(appearance)}`,
+        );
+      }
+      if (
+        scene.id === "workspace-appearance-settings-light" &&
+        (appearance.themeValue !== "light" ||
+          appearance.visualStyles.shell?.color !== "rgb(26, 28, 31)" ||
+          appearance.visualStyles.navigation?.backgroundColor ===
+            "rgb(36, 36, 36)" ||
+          appearance.visualStyles.editor?.backgroundColor ===
+            "rgb(32, 32, 32)" ||
+          appearance.visualStyles.heading?.color !== "rgb(26, 28, 31)")
+      ) {
+        throw new Error(
+          `${scene.id}: light Appearance Settings paint failed: ${JSON.stringify(appearance.visualStyles)}`,
+        );
+      }
+
+      let interaction = null;
+      if (scene.id === "workspace-appearance-settings") {
+        await page
+          .locator('label:has(input[aria-label="Dark"])')
+          .click();
+        await page
+          .getByRole("switch", { name: "Light translucent sidebar" })
+          .click();
+        const lightContrast = page.getByRole("slider", {
+          name: "Light contrast",
+        });
+        await lightContrast.focus();
+        for (let step = 0; step < 6; step += 1) {
+          await lightContrast.press("ArrowRight");
+        }
+        await page.getByRole("button", { name: "Light code theme" }).click();
+        const codeThemes = (await page.getByRole("menuitem").allTextContents()).map(
+          (label) => label.replace(/^Aa/, ""),
+        );
+        await page.getByRole("menuitem", { name: "GitHub" }).click();
+        await page
+          .getByRole("heading", { name: "Preferences", exact: true })
+          .scrollIntoViewIfNeeded();
+        await page.getByRole("switch", { name: "Use pointer cursors" }).click();
+        await page
+          .locator('label:has(input[aria-label="Use ChatGPT Dock icon"])')
+          .click();
+        const systemMotion = page.getByRole("button", {
+          name: "System",
+          exact: true,
+        });
+        await systemMotion.focus();
+        await systemMotion.press("ArrowRight");
+        await page.getByRole("spinbutton", { name: "Sans font size" }).fill("15");
+        await page.getByRole("spinbutton", { name: "Code font size" }).fill("13");
+        const colorMarkers = page.getByRole("button", {
+          name: "Color diff markers",
+        });
+        await colorMarkers.focus();
+        await colorMarkers.press("ArrowRight");
+        await page.getByRole("switch", { name: "Font smoothing" }).click();
+        interaction = await page.evaluate((codeThemes) => ({
+          codeTheme: document
+            .querySelector('button[aria-label="Light code theme"]')
+            ?.textContent?.trim(),
+          codeThemes,
+          darkTheme: document.querySelector('input[aria-label="Dark"]')?.checked,
+          dockIcon: document
+            .querySelector('input[aria-label="Use ChatGPT Dock icon"]')
+            ?.checked,
+          fontSmoothing: document
+            .querySelector('[role="switch"][aria-label="Font smoothing"]')
+            ?.getAttribute("aria-checked"),
+          lightContrast: Number(
+            document.querySelector('input[aria-label="Light contrast"]')?.value,
+          ),
+          lightSidebar: document
+            .querySelector(
+              '[role="switch"][aria-label="Light translucent sidebar"]',
+            )
+            ?.getAttribute("aria-checked"),
+          markers: document
+            .querySelector('button[aria-label="Plus / minus diff markers"]')
+            ?.getAttribute("aria-pressed"),
+          motion: document
+            .querySelector('button[aria-label="On"]')
+            ?.getAttribute("aria-pressed"),
+          pointer: document
+            .querySelector('[role="switch"][aria-label="Use pointer cursors"]')
+            ?.getAttribute("aria-checked"),
+          sizes: Array.from(
+            document.querySelectorAll(
+              '.codex-ui-appearance-settings input[type="number"]',
+            ),
+            (input) => Number(input.value),
+          ),
+        }), codeThemes);
+        if (
+          interaction.codeThemes.length !== 16 ||
+          interaction.codeThemes[0] !== "Absolutely" ||
+          interaction.codeThemes[15] !== "Xcode" ||
+          !interaction.codeTheme?.includes("GitHub") ||
+          interaction.darkTheme !== true ||
+          interaction.dockIcon !== true ||
+          interaction.fontSmoothing !== "false" ||
+          interaction.lightContrast !== 51 ||
+          interaction.lightSidebar !== "false" ||
+          interaction.markers !== "true" ||
+          interaction.motion !== "true" ||
+          interaction.pointer !== "true" ||
+          JSON.stringify(interaction.sizes) !== JSON.stringify([15, 13])
+        ) {
+          throw new Error(
+            `${scene.id}: current Appearance Settings interaction failed: ${JSON.stringify(interaction)}`,
+          );
+        }
+      }
+      await writeFile(
+        join(artifactDirectory, `${scene.id}.json`),
+        `${JSON.stringify({ appearance, interaction }, null, 2)}\n`,
+      );
+      continue;
+    }
     if (scene.id === "current-dark-shell") {
       const darkShell = await page.evaluate(() => {
         const metric = (selector) => {

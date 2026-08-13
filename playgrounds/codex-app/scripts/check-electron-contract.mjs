@@ -5078,6 +5078,182 @@ try {
   }
   await gitSettingsSave.click();
   await gitSettingsNavigation
+    .getByRole("button", { name: "Appearance", exact: true })
+    .click();
+  const appearanceSettingsMain = codingWorkspacePage.getByRole("main");
+  await appearanceSettingsMain
+    .getByRole("heading", { name: "Appearance", exact: true })
+    .waitFor();
+  const appearanceGeometry = await appearanceSettingsMain.evaluate((main) => {
+    const heading = main
+      .querySelector(".codex-ui-appearance-settings > h1")
+      ?.getBoundingClientRect();
+    const preview = main
+      .querySelector(".codex-ui-appearance-settings__diff-preview")
+      ?.getBoundingClientRect();
+    const themePreviews = Array.from(
+      main.querySelectorAll(".codex-ui-appearance-settings__theme-preview"),
+      (element) => {
+        const rect = element.getBoundingClientRect();
+        return { height: rect.height, width: rect.width };
+      },
+    );
+    return {
+      heading: heading
+        ? { top: heading.top, width: heading.width }
+        : null,
+      preview: preview
+        ? { height: preview.height, width: preview.width }
+        : null,
+      themePreviews,
+    };
+  });
+  if (
+    (await gitSettingsNavigation
+      .getByRole("button", { name: "Appearance", exact: true })
+      .getAttribute("aria-current")) !== "page" ||
+    appearanceGeometry.heading?.top !== 66 ||
+    appearanceGeometry.heading?.width !== 768 ||
+    appearanceGeometry.preview?.height !== 110 ||
+    appearanceGeometry.preview?.width !== 768 ||
+    appearanceGeometry.themePreviews.length !== 3 ||
+    appearanceGeometry.themePreviews.some(
+      ({ height, width }) => Math.abs(height - 175) > 1 || width !== 248,
+    ) ||
+    (await appearanceSettingsMain.getByRole("switch").count()) !== 4 ||
+    (await appearanceSettingsMain.getByRole("slider").count()) !== 2 ||
+    (await appearanceSettingsMain.getByRole("spinbutton").count()) !== 2
+  ) {
+    throw new Error(
+      `Electron Appearance Settings route is incomplete: ${JSON.stringify(appearanceGeometry)}.`,
+    );
+  }
+  await appearanceSettingsMain
+    .locator('label:has(input[aria-label="Dark"])')
+    .click();
+  await appearanceSettingsMain
+    .getByRole("switch", { name: "Light translucent sidebar" })
+    .click();
+  await appearanceSettingsMain
+    .getByRole("button", { name: "Copy Light theme" })
+    .click();
+  await codingWorkspacePage.waitForFunction(
+    () =>
+      document.querySelector(".demo-settings-action-status")?.textContent ===
+      "Light theme copied",
+  );
+  await appearanceSettingsMain
+    .getByRole("button", { name: "Light code theme" })
+    .click();
+  const appearanceCodeThemes = codingWorkspacePage.getByRole("menuitem");
+  if (
+    (await appearanceCodeThemes.count()) !== 16 ||
+    !(await appearanceCodeThemes.first().textContent())?.includes("Absolutely") ||
+    !(await appearanceCodeThemes.last().textContent())?.includes("Xcode")
+  ) {
+    throw new Error("Electron Appearance code theme menu is incomplete.");
+  }
+  await appearanceCodeThemes.filter({ hasText: "GitHub" }).click();
+  await appearanceSettingsMain
+    .getByRole("heading", { name: "Preferences", exact: true })
+    .scrollIntoViewIfNeeded();
+  const pointerCursor = appearanceSettingsMain.getByRole("switch", {
+    name: "Use pointer cursors",
+  });
+  await pointerCursor.click();
+  await appearanceSettingsMain
+    .locator('label:has(input[aria-label="Use ChatGPT Dock icon"])')
+    .click();
+  const systemMotion = appearanceSettingsMain.getByRole("button", {
+    name: "System",
+    exact: true,
+  });
+  await systemMotion.focus();
+  await systemMotion.press("ArrowRight");
+  await appearanceSettingsMain
+    .getByRole("spinbutton", { name: "Sans font size" })
+    .fill("15");
+  await appearanceSettingsMain
+    .getByRole("spinbutton", { name: "Code font size" })
+    .fill("13");
+  const colorMarkers = appearanceSettingsMain.getByRole("button", {
+    name: "Color diff markers",
+  });
+  await colorMarkers.focus();
+  await colorMarkers.press("ArrowRight");
+  await appearanceSettingsMain
+    .getByRole("switch", { name: "Font smoothing" })
+    .click();
+  const appearanceInteraction = await appearanceSettingsMain.evaluate((main) => ({
+    codeTheme: main
+      .querySelector('button[aria-label="Light code theme"]')
+      ?.textContent?.trim(),
+    darkTheme: main.querySelector('input[aria-label="Dark"]')?.checked,
+    dockIcon: main.querySelector(
+      'input[aria-label="Use ChatGPT Dock icon"]',
+    )?.checked,
+    fontSmoothing: main
+      .querySelector('[role="switch"][aria-label="Font smoothing"]')
+      ?.getAttribute("aria-checked"),
+    lightSidebar: main
+      .querySelector(
+        '[role="switch"][aria-label="Light translucent sidebar"]',
+      )
+      ?.getAttribute("aria-checked"),
+    markers: main
+      .querySelector('button[aria-label="Plus / minus diff markers"]')
+      ?.getAttribute("aria-pressed"),
+    motion: main
+      .querySelector('button[aria-label="On"]')
+      ?.getAttribute("aria-pressed"),
+    pointer: main
+      .querySelector('[role="switch"][aria-label="Use pointer cursors"]')
+      ?.getAttribute("aria-checked"),
+    sizes: Array.from(
+      main.querySelectorAll('input[type="number"]'),
+      (input) => Number(input.value),
+    ),
+  }));
+  if (
+    !appearanceInteraction.codeTheme?.includes("GitHub") ||
+    appearanceInteraction.darkTheme !== true ||
+    appearanceInteraction.dockIcon !== true ||
+    appearanceInteraction.fontSmoothing !== "false" ||
+    appearanceInteraction.lightSidebar !== "false" ||
+    appearanceInteraction.markers !== "true" ||
+    appearanceInteraction.motion !== "true" ||
+    appearanceInteraction.pointer !== "true" ||
+    JSON.stringify(appearanceInteraction.sizes) !== JSON.stringify([15, 13])
+  ) {
+    throw new Error(
+      `Electron Appearance Settings controls did not update controlled state: ${JSON.stringify(appearanceInteraction)}.`,
+    );
+  }
+  await gitSettingsNavigation
+    .getByRole("button", { name: "Git", exact: true })
+    .click();
+  await gitSettingsMain.getByRole("heading", { name: "Git", exact: true }).waitFor();
+  if (
+    (await gitSettingsMain
+      .getByRole("switch", { name: "Always force push" })
+      .getAttribute("aria-checked")) !== "true" ||
+    (await gitSettingsMain
+      .getByRole("radio", { name: "Squash" })
+      .getAttribute("aria-checked")) !== "true"
+  ) {
+    throw new Error("Electron Settings route switching lost Git controlled state.");
+  }
+  await gitSettingsNavigation
+    .getByRole("button", { name: "Appearance", exact: true })
+    .click();
+  if (
+    (await appearanceSettingsMain
+      .getByRole("switch", { name: "Use pointer cursors" })
+      .getAttribute("aria-checked")) !== "true"
+  ) {
+    throw new Error("Electron Settings route switching lost Appearance controlled state.");
+  }
+  await gitSettingsNavigation
     .getByRole("button", { name: "Back to app" })
     .click();
   await codingWorkspacePage.waitForSelector(

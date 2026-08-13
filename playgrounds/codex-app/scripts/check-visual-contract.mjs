@@ -258,6 +258,12 @@ const currentBuildGitSettingsReference =
   process.env.CODEX_UI_KIT_GIT_SETTINGS_REFERENCE;
 const currentBuildGitSettingsCompactReference =
   process.env.CODEX_UI_KIT_GIT_SETTINGS_COMPACT_REFERENCE;
+const currentBuildAppearanceSettingsReference =
+  process.env.CODEX_UI_KIT_APPEARANCE_SETTINGS_REFERENCE;
+const currentBuildAppearanceSettingsCompactReference =
+  process.env.CODEX_UI_KIT_APPEARANCE_SETTINGS_COMPACT_REFERENCE;
+const currentBuildAppearanceSettingsPreferencesReference =
+  process.env.CODEX_UI_KIT_APPEARANCE_SETTINGS_PREFERENCES_REFERENCE;
 const currentBuildWorkspaceDirectoryMissingReference =
   process.env.CODEX_UI_KIT_WORKSPACE_DIRECTORY_MISSING_REFERENCE;
 const currentBuildWorkspaceDirectoryMissingReferenceSize = {
@@ -1669,6 +1675,72 @@ for (const scene of selectedScenes) {
       maximumRatioName:
         "CODEX_UI_KIT_GIT_SETTINGS_COMPACT_MAX_DIFF_RATIO",
       referencePath: currentBuildGitSettingsCompactReference,
+      sceneId: scene.id,
+    });
+  }
+
+  if (
+    scene.id === "workspace-appearance-settings" &&
+    currentBuildAppearanceSettingsReference
+  ) {
+    await compareCurrentBuildWorkspaceFrame({
+      actual,
+      defaultMaximumRatio: 0.045,
+      masks: [
+        { height: 24, left: 43, top: 87, width: 263 },
+        { height: 630, left: 36, top: 133, width: 278 },
+        { height: 171, left: 369, top: 175, width: 244 },
+        { height: 171, left: 629, top: 175, width: 244 },
+        { height: 171, left: 889, top: 175, width: 244 },
+        { height: 106, left: 369, top: 391, width: 764 },
+        { height: 264, left: 382, top: 573, width: 737 },
+      ],
+      maximumRatioName:
+        "CODEX_UI_KIT_APPEARANCE_SETTINGS_MAX_DIFF_RATIO",
+      referencePath: currentBuildAppearanceSettingsReference,
+      sceneId: scene.id,
+    });
+  }
+
+  if (
+    scene.id === "workspace-appearance-settings-compact" &&
+    currentBuildAppearanceSettingsCompactReference
+  ) {
+    await compareCurrentBuildWorkspaceFrame({
+      actual,
+      defaultMaximumRatio: 0.055,
+      masks: [
+        { height: 24, left: 43, top: 87, width: 263 },
+        { height: 510, left: 36, top: 133, width: 278 },
+        { height: 74, left: 345, top: 175, width: 106 },
+        { height: 74, left: 468, top: 175, width: 106 },
+        { height: 74, left: 591, top: 175, width: 106 },
+        { height: 106, left: 345, top: 296, width: 353 },
+        { height: 248, left: 358, top: 477, width: 325 },
+      ],
+      maximumRatioName:
+        "CODEX_UI_KIT_APPEARANCE_SETTINGS_COMPACT_MAX_DIFF_RATIO",
+      referencePath: currentBuildAppearanceSettingsCompactReference,
+      sceneId: scene.id,
+    });
+  }
+
+  if (
+    scene.id === "workspace-appearance-settings-preferences" &&
+    currentBuildAppearanceSettingsPreferencesReference
+  ) {
+    await compareCurrentBuildWorkspaceFrame({
+      actual,
+      defaultMaximumRatio: 0.045,
+      masks: [
+        { height: 24, left: 43, top: 87, width: 263 },
+        { height: 630, left: 36, top: 133, width: 278 },
+        { height: 47, left: 1012, top: 435, width: 108 },
+        { height: 234, left: 382, top: 374, width: 737 },
+      ],
+      maximumRatioName:
+        "CODEX_UI_KIT_APPEARANCE_SETTINGS_PREFERENCES_MAX_DIFF_RATIO",
+      referencePath: currentBuildAppearanceSettingsPreferencesReference,
       sceneId: scene.id,
     });
   }

@@ -4,7 +4,7 @@
     "appVersion": "26.803.61601",
     "buildNumber": "6396",
     "sampledAt": "2026-08-11",
-    "reverifiedAt": "2026-08-11",
+    "reverifiedAt": "2026-08-13",
     "appAsarSha256": "928129601e8b36eccba603114d6912352f2b13182f3a7d60b32166d0e81aafb5",
     "runtimeEvidence": "scoped_cdp",
     "runtimeEvidenceBuilds": {
@@ -1189,15 +1189,33 @@
       "priority": "p1"
     },
     {
-      "id": "settings.general-appearance",
+      "id": "settings.general",
       "area": "settings",
       "ownership": "app",
-      "packageEvidence": ["general-settings", "appearance-settings"],
+      "packageEvidence": ["general-settings"],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": ["cdp:general-form-and-appearance-theme-preferences"],
       "implementationStatus": "not_started",
       "browserStatus": "not_started",
       "electronStatus": "not_started",
+      "priority": "p1"
+    },
+    {
+      "id": "settings.appearance",
+      "area": "settings",
+      "ownership": "app",
+      "packageEvidence": ["appearance-settings"],
+      "runtimeStatus": "runtime_observed",
+      "runtimeEvidence": [
+        "cdp:general-form-and-appearance-theme-preferences",
+        "cdp-26.803.61601:appearance-theme-previews-light-dark-editors-and-preferences",
+        "cdp-26.803.61601:appearance-wide-medium-compact-scroll-geometry-and-sixteen-code-themes",
+        "cdp-26.803.61601:appearance-controlled-browser-electron-interactions",
+        "cdp-26.803.61601:appearance-wide-compact-preferences-regional-pixel-gates"
+      ],
+      "implementationStatus": "partial",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
       "priority": "p1"
     },
     {

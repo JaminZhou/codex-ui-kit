@@ -1228,6 +1228,31 @@ and 1% ceilings; it is not committed. Streaming mutation reachability, images,
 math, citations/sources, plugin variants, table error variants, and Markdown
 error variants remain required captures.
 
+## Current Appearance Settings sample
+
+The `26.803.61601` read-only Appearance probe used a second app process with a
+unique profile and loopback-only port `9831`. Structural target selection
+rejected the avatar overlay and selected the main `app://-/index.html`
+Renderer. No prompt was submitted and no product setting was changed. The
+unchanged ASAR hash reverified the existing build baseline.
+
+At 1180×820 the Settings navigation is 322.91px wide and the main scroll owner
+starts at y=46 with a centered 768px content column. The same navigation
+persists at 820×680 and 720×680 while the content shrinks to 457.09px and
+357.09px with no horizontal overflow. The capture records three responsive
+theme radios/previews, a 768×110 diff preview, Light/Dark editors, sixteen
+code-theme menu items, four switches, two constrained ranges, two Dock radios,
+two numeric inputs, and the complete bottom Preferences card. All text-field
+values were redacted from structured output.
+
+The controlled replay covers wide, light, 720px, and bottom-scrolled states in
+Browser/CDP, then repeats Git ↔ Appearance routing and state persistence in
+Electron. Host callbacks own Import/Copy; host nodes own Dock artwork. The
+three local-only ownership-masked ratios are 1.2787%, 1.8977%, and 3.4665%.
+The product profile, screenshots, and ignored probes moved recoverably to
+Trash after port/process cleanup; no raw capture or proprietary Dock raster is
+tracked.
+
 ## Required flow matrix
 
 ### 1. Application entry and navigation
