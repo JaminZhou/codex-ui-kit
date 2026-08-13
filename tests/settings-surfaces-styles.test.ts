@@ -101,4 +101,10 @@ describe("settings visual contract", () => {
       /@media \(max-width: 50rem\)[\s\S]*?\.codex-ui-general-settings__hotkey-capture \{[\s\S]*?align-items: flex-end;[\s\S]*?flex-direction: column;/,
     );
   });
+
+  it("disables Hooks and Code review progress motion when requested", () => {
+    expect(styles).toMatch(
+      /@media \(prefers-reduced-motion: reduce\) \{[\s\S]*?\.codex-ui-hooks-settings\[data-refreshing="true"\][\s\S]*?\.codex-ui-hooks-settings__reload[\s\S]*?\.codex-ui-hooks-settings__loading > span:first-child,[\s\S]*?\.codex-ui-code-review-settings__loading > span:first-child \{[\s\S]*?animation: none;/,
+    );
+  });
 });
