@@ -119,7 +119,7 @@ The authoritative current-build inventory is:
   inherited from the shell. Its 21 rows span Permissions, General, Composer,
   Popout Window, and Notifications, with five menus, a searchable 66-language
   list, twelve switches, two keyboard groups, and locally controlled shortcut
-  capture/formatting/cancel.
+  capture/formatting/clear/cancel.
   Browser/CDP and Electron prove geometry, light/compact/bottom states,
   interactions, persistent-value continuity, and transient shortcut-capture
   cleanup across General, Git, and Appearance. Hotkey/bottom snapshot frames

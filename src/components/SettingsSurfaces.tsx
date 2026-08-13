@@ -1300,8 +1300,6 @@ function formatGeneralHotkey(event: KeyboardEvent<HTMLButtonElement>) {
     ArrowLeft: "←",
     ArrowRight: "→",
     ArrowUp: "↑",
-    Backspace: "⌫",
-    Delete: "⌦",
     Enter: "↩",
   };
   const key =
@@ -1839,6 +1837,13 @@ export function GeneralSettingsPage({
                   if (event.key === "Escape") {
                     event.preventDefault();
                     event.stopPropagation();
+                    onCancelHotkeyCapture?.();
+                    return;
+                  }
+                  if (event.key === "Backspace" || event.key === "Delete") {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    update("popoutHotkey", null);
                     onCancelHotkeyCapture?.();
                     return;
                   }

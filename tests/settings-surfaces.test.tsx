@@ -609,6 +609,43 @@ describe("settings surfaces", () => {
 
     fireEvent.click(hotkeyEdit);
     fireEvent.keyDown(screen.getByRole("button", { name: "Press shortcut" }), {
+      key: "Backspace",
+    });
+    hotkeyEdit = screen.getByRole("button", {
+      name: "Set shortcut for Popout Window hotkey",
+    });
+    expect(hotkeyEdit.textContent).toContain("Off");
+    expect(document.activeElement).toBe(hotkeyEdit);
+
+    fireEvent.click(hotkeyEdit);
+    fireEvent.keyDown(screen.getByRole("button", { name: "Press shortcut" }), {
+      key: "k",
+      metaKey: true,
+      shiftKey: true,
+    });
+    hotkeyEdit = screen.getByRole("button", {
+      name: "Set shortcut for Popout Window hotkey",
+    });
+    fireEvent.click(hotkeyEdit);
+    fireEvent.keyDown(screen.getByRole("button", { name: "Press shortcut" }), {
+      key: "Delete",
+    });
+    hotkeyEdit = screen.getByRole("button", {
+      name: "Set shortcut for Popout Window hotkey",
+    });
+    expect(hotkeyEdit.textContent).toContain("Off");
+
+    fireEvent.click(hotkeyEdit);
+    fireEvent.keyDown(screen.getByRole("button", { name: "Press shortcut" }), {
+      key: "k",
+      metaKey: true,
+      shiftKey: true,
+    });
+    hotkeyEdit = screen.getByRole("button", {
+      name: "Set shortcut for Popout Window hotkey",
+    });
+    fireEvent.click(hotkeyEdit);
+    fireEvent.keyDown(screen.getByRole("button", { name: "Press shortcut" }), {
       key: "Escape",
     });
     hotkeyEdit = screen.getByRole("button", {

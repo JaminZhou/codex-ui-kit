@@ -721,6 +721,25 @@ for (const scene of selectedScenes) {
         await hotkeyEdit.click();
         await page
           .getByRole("button", { name: "Press shortcut", exact: true })
+          .press("Backspace");
+        await page.waitForFunction(
+          () =>
+            document.activeElement?.getAttribute("aria-label") ===
+            "Set shortcut for Popout Window hotkey",
+        );
+        const hotkeyCleared = await hotkeyEdit.locator("span").first().textContent();
+        await hotkeyEdit.click();
+        await page
+          .getByRole("button", { name: "Press shortcut", exact: true })
+          .press("Meta+Shift+K");
+        await page.waitForFunction(
+          () =>
+            document.activeElement?.getAttribute("aria-label") ===
+            "Set shortcut for Popout Window hotkey",
+        );
+        await hotkeyEdit.click();
+        await page
+          .getByRole("button", { name: "Press shortcut", exact: true })
           .press("Escape");
         await page.waitForFunction(
           () =>
@@ -758,6 +777,7 @@ for (const scene of selectedScenes) {
           ({
             fileDestinations,
             hotkeyCaptured,
+            hotkeyCleared,
             hotkeyEscapePreserved,
             hotkeyFocusRestored,
             menuFocus,
@@ -783,6 +803,7 @@ for (const scene of selectedScenes) {
               document.querySelector(".codex-ui-general-settings__hotkey-capture"),
             ),
             hotkeyCaptured,
+            hotkeyCleared,
             hotkeyEscapePreserved,
             hotkeyFocus: hotkeyFocusRestored,
             language: document
@@ -804,6 +825,7 @@ for (const scene of selectedScenes) {
           {
             fileDestinations,
             hotkeyCaptured,
+            hotkeyCleared,
             hotkeyEscapePreserved,
             hotkeyFocusRestored,
             menuFocus,
@@ -850,6 +872,7 @@ for (const scene of selectedScenes) {
           interaction.followUp !== "true" ||
           interaction.hotkeyCapture ||
           interaction.hotkeyCaptured !== "⌘ ⇧ K" ||
+          interaction.hotkeyCleared !== "Off" ||
           interaction.hotkeyEscapePreserved !== "⌘ ⇧ K" ||
           interaction.hotkeyFocus !== "Set shortcut for Popout Window hotkey" ||
           interaction.language !== "简体中文⌄" ||

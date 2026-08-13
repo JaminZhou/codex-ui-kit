@@ -1267,7 +1267,7 @@ shrinks to 357.09px and the route grows from 1,820px to 2,239px without
 horizontal overflow. The 21 rows span five cards and expose twelve switches,
 five menus, Auto detect plus 65 languages, two segmented keyboard controls,
 license presentation, and shortcut capture/cancel. The controlled replay also
-formats and stores a local shortcut fixture; that behavior is a playground
+formats, stores, and clears a local shortcut fixture; that behavior is a playground
 contract, while captured product selections remain observed host values rather
 than defaults.
 

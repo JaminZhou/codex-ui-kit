@@ -5401,6 +5401,28 @@ try {
   await generalHotkeyEdit.click();
   await generalSettingsMain
     .getByRole("button", { name: "Press shortcut", exact: true })
+    .press("Delete");
+  await codingWorkspacePage.waitForFunction(
+    () =>
+      document.activeElement?.getAttribute("aria-label") ===
+      "Set shortcut for Popout Window hotkey",
+  );
+  const generalHotkeyCleared = await generalHotkeyEdit
+    .locator("span")
+    .first()
+    .textContent();
+  await generalHotkeyEdit.click();
+  await generalSettingsMain
+    .getByRole("button", { name: "Press shortcut", exact: true })
+    .press("Meta+Shift+K");
+  await codingWorkspacePage.waitForFunction(
+    () =>
+      document.activeElement?.getAttribute("aria-label") ===
+      "Set shortcut for Popout Window hotkey",
+  );
+  await generalHotkeyEdit.click();
+  await generalSettingsMain
+    .getByRole("button", { name: "Press shortcut", exact: true })
     .press("Escape");
   await codingWorkspacePage.waitForFunction(
     () =>
@@ -5463,6 +5485,7 @@ try {
       main.querySelector(".codex-ui-general-settings__hotkey-capture"),
     ),
     hotkeyCaptured: focus.hotkeyCaptured,
+    hotkeyCleared: focus.hotkeyCleared,
     hotkeyEscapePreserved: focus.hotkeyEscapePreserved,
     hotkeyFocus: focus.hotkey,
     language: main.querySelector('button[aria-label="Language"]')
@@ -5478,6 +5501,7 @@ try {
   }), {
     hotkey: generalHotkeyFocusRestored,
     hotkeyCaptured: generalHotkeyCaptured,
+    hotkeyCleared: generalHotkeyCleared,
     hotkeyEscapePreserved: generalHotkeyEscapePreserved,
     menu: generalMenuFocus,
   });
@@ -5489,6 +5513,7 @@ try {
     generalInteraction.followUp !== "true" ||
     generalInteraction.hotkeyCapture ||
     generalInteraction.hotkeyCaptured !== "⌘ ⇧ K" ||
+    generalInteraction.hotkeyCleared !== "Off" ||
     generalInteraction.hotkeyEscapePreserved !== "⌘ ⇧ K" ||
     generalInteraction.hotkeyFocus !== "Set shortcut for Popout Window hotkey" ||
     generalInteraction.language !== "简体中文⌄" ||
