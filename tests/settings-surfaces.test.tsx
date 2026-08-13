@@ -90,9 +90,15 @@ describe("settings surfaces", () => {
     expect(screen.getByText("Right before ChatGPT ends its turn")).toBeTruthy();
     expect(screen.queryByRole("button", { name: "Plugins" })).toBeNull();
 
-    fireEvent.click(screen.getByRole("button", { name: "Clear settings search" }));
+    const clearSearch = screen.getByRole("button", {
+      name: "Clear settings search",
+    });
+    clearSearch.focus();
+    fireEvent.click(clearSearch);
     expect(screen.getByRole("button", { name: "Plugins" })).toBeTruthy();
-    expect(screen.getByRole("searchbox").getAttribute("value")).toBe("");
+    const searchbox = screen.getByRole("searchbox");
+    expect(searchbox.getAttribute("value")).toBe("");
+    expect(document.activeElement).toBe(searchbox);
   });
 
   it("announces loading, error, and empty search states", () => {
@@ -181,5 +187,22 @@ describe("settings surfaces", () => {
         .getAllByRole("button", { name: "Save" })[0]
         .hasAttribute("disabled"),
     ).toBe(true);
+  });
+
+  it("keeps section heading ids instance-safe", () => {
+    render(
+      <>
+        <ShellFixture />
+        <ShellFixture />
+      </>,
+    );
+
+    const codingHeadings = screen.getAllByRole("heading", { name: "Coding" });
+    expect(codingHeadings[0].id).not.toBe(codingHeadings[1].id);
+    for (const heading of codingHeadings) {
+      expect(heading.closest("section")?.getAttribute("aria-labelledby")).toBe(
+        heading.id,
+      );
+    }
   });
 });

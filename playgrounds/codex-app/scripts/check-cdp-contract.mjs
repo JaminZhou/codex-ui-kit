@@ -291,7 +291,14 @@ for (const scene of selectedScenes) {
           `${scene.id}: unimplemented Settings navigation changed the Git route: ${JSON.stringify(routing)}`,
         );
       }
-      await page.getByRole("button", { name: "Clear settings search" }).click();
+      const clearSearch = page.getByRole("button", {
+        name: "Clear settings search",
+      });
+      await clearSearch.focus();
+      await clearSearch.click();
+      if (!(await page.getByRole("searchbox").evaluate((input) => input === document.activeElement))) {
+        throw new Error(`${scene.id}: clearing Settings search did not restore input focus.`);
+      }
       await page.getByRole("switch", { name: "Always force push" }).click();
       const mergeRadio = page.getByRole("radio", { name: "Merge" });
       await mergeRadio.focus();

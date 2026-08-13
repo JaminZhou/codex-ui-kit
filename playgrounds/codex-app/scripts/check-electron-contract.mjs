@@ -5034,9 +5034,14 @@ try {
   ) {
     throw new Error("Electron unimplemented Settings navigation replaced the Git route.");
   }
-  await gitSettingsNavigation
-    .getByRole("button", { name: "Clear settings search" })
-    .click();
+  const clearSettingsSearch = gitSettingsNavigation.getByRole("button", {
+    name: "Clear settings search",
+  });
+  await clearSettingsSearch.focus();
+  await clearSettingsSearch.click();
+  if (!(await settingsSearch.evaluate((input) => input === document.activeElement))) {
+    throw new Error("Electron clearing Settings search did not restore input focus.");
+  }
   const forcePushSwitch = gitSettingsMain.getByRole("switch", {
     name: "Always force push",
   });

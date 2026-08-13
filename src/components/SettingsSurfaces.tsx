@@ -4,6 +4,7 @@ import {
   type ReactNode,
   type TextareaHTMLAttributes,
   useId,
+  useRef,
 } from "react";
 
 export interface SettingsNavigationItem {
@@ -74,6 +75,8 @@ export function SettingsShell({
   status = "ready",
   ...props
 }: SettingsShellProps) {
+  const sectionHeadingIdPrefix = useId();
+  const searchInputRef = useRef<HTMLInputElement>(null);
   const normalizedQuery = normalizeSearchValue(query);
   const visibleSections = sections
     .map((section) => ({
@@ -120,6 +123,7 @@ export function SettingsShell({
           <input
             onChange={(event) => onQueryChange(event.currentTarget.value)}
             placeholder={searchPlaceholder}
+            ref={searchInputRef}
             role="searchbox"
             type="text"
             value={query}
@@ -128,7 +132,10 @@ export function SettingsShell({
             <button
               aria-label="Clear settings search"
               className="codex-ui-settings-shell__search-clear"
-              onClick={() => onQueryChange("")}
+              onClick={() => {
+                searchInputRef.current?.focus();
+                onQueryChange("");
+              }}
               type="button"
             >
               ×
@@ -154,11 +161,11 @@ export function SettingsShell({
           ) : (
             visibleSections.map((section) => (
               <section
-                aria-labelledby={`codex-ui-settings-section-${section.id}`}
+                aria-labelledby={`${sectionHeadingIdPrefix}-${section.id}`}
                 className="codex-ui-settings-shell__section"
                 key={section.id}
               >
-                <h2 id={`codex-ui-settings-section-${section.id}`}>
+                <h2 id={`${sectionHeadingIdPrefix}-${section.id}`}>
                   {normalizedQuery ? null : section.label}
                 </h2>
                 {section.items.map((item) => (
