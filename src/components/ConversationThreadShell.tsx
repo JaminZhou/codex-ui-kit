@@ -23,6 +23,7 @@ export interface ConversationThreadShellProps
   composer: ReactNode;
   floatingControl?: ReactNode;
   header: ReactNode;
+  isRunning?: boolean;
   label?: string;
   messageNavigation?: ReactNode;
   threadLabel?: string;
@@ -41,6 +42,7 @@ export function ConversationThreadShell({
   composer,
   floatingControl,
   header,
+  isRunning = false,
   label = "Conversation",
   messageNavigation,
   threadLabel = "Conversation timeline",
@@ -83,9 +85,13 @@ export function ConversationThreadShell({
   } = threadProps ?? {};
   const {
     className: viewportClassName,
+    latestOrigin: requestedLatestOrigin,
     ...restViewportProps
   } = viewportProps ?? {};
+  const latestOrigin =
+    requestedLatestOrigin ?? (isRunning ? "start" : "end");
   const shouldAutoFollow = restViewportProps.autoFollow ?? true;
+  const runningFollowBaseHeightRef = useRef(0);
 
   useLayoutEffect(() => {
     const body = bodyRef.current;
@@ -109,6 +115,21 @@ export function ConversationThreadShell({
             "--codex-ui-message-navigation-available-height",
             `${Math.max(0, bodyHeight - height)}px`,
           );
+          if (isRunning && latestOrigin === "start") {
+            runningFollowBaseHeightRef.current = Math.max(
+              runningFollowBaseHeightRef.current,
+              bodyHeight,
+            );
+            body.style.setProperty(
+              "--codex-ui-conversation-thread-running-follow-base-height",
+              `${runningFollowBaseHeightRef.current}px`,
+            );
+          } else {
+            runningFollowBaseHeightRef.current = 0;
+            body.style.removeProperty(
+              "--codex-ui-conversation-thread-running-follow-base-height",
+            );
+          }
         }
         if (
           shouldPinViewport &&
@@ -117,7 +138,7 @@ export function ConversationThreadShell({
         ) {
           viewport.scrollTo({
             behavior: "auto",
-            top: viewport.scrollHeight,
+            top: latestOrigin === "start" ? 0 : viewport.scrollHeight,
           });
         }
       }
@@ -130,7 +151,7 @@ export function ConversationThreadShell({
     observer.observe(composerDock);
     observer.observe(body);
     return () => observer.disconnect();
-  }, [shouldAutoFollow]);
+  }, [isRunning, latestOrigin, shouldAutoFollow]);
 
   return (
     <section
@@ -142,6 +163,8 @@ export function ConversationThreadShell({
       ]
         .filter(Boolean)
         .join(" ")}
+      data-latest-origin={latestOrigin}
+      data-running={isRunning || undefined}
     >
       <div className="codex-ui-conversation-thread-shell__header">
         {header}
@@ -163,6 +186,7 @@ export function ConversationThreadShell({
           ]
             .filter(Boolean)
             .join(" ")}
+          latestOrigin={latestOrigin}
           ref={setViewportRef}
         >
           <AgentThread

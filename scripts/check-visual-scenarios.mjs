@@ -333,11 +333,16 @@ try {
     mkdirSync(outputDir, { recursive: true });
     const page = await browser.newPage();
     try {
-      await page.setViewport({
+      const captureViewport = {
         deviceScaleFactor: 1,
         height: referenceOriginal.height,
         width: referenceOriginal.width,
-      });
+      };
+      await page.setViewport(
+        scenario.warmViewport
+          ? { deviceScaleFactor: 1, ...scenario.warmViewport }
+          : captureViewport,
+      );
       await page.emulateMediaFeatures([
         { name: "prefers-reduced-motion", value: "reduce" },
         {
@@ -353,6 +358,15 @@ try {
         `.current-thread-pixel-fixture[data-visual-scene="${scenario.id}"]`,
       );
       await page.evaluate(() => document.fonts.ready);
+      if (scenario.warmViewport) {
+        await page.setViewport(captureViewport);
+        await page.evaluate(
+          () =>
+            new Promise((resolve) =>
+              requestAnimationFrame(() => requestAnimationFrame(resolve)),
+            ),
+        );
+      }
       await page.addStyleTag({
         content:
           "*, *::before, *::after { animation: none !important; caret-color: transparent !important; transition: none !important; }",
@@ -360,7 +374,7 @@ try {
       const geometry = await page.evaluate((selectors) => {
         const bounds = (selector) => {
           const element = document.querySelector(selector);
-          if (!(element instanceof HTMLElement)) return null;
+          if (!(element instanceof Element)) return null;
           const rect = element.getBoundingClientRect();
           const style = getComputedStyle(element);
           return {

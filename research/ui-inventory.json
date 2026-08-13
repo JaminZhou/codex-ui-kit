@@ -103,7 +103,8 @@
         "cdp:basic-user-and-assistant-turn",
         "cdp-26.721:synthetic-user-bubble-assistant-flat-response-and-actions",
         "cdp-26.721:synthetic-streaming-assistant-736x22-font-14-22",
-        "cdp-26.803.61601:completed-user-bubble-assistant-flat-response-four-actions-14x22-typography-and-twelve-exact-thread-assets"
+        "cdp-26.803.61601:completed-user-bubble-assistant-flat-response-four-actions-14x22-typography-and-twelve-exact-thread-assets",
+        "cdp-26.803.61601:real-plain-text-streaming-wide-to-compact-reverse-origin-follow-and-natural-completion"
       ],
       "implementationStatus": "partial",
       "browserStatus": "verified",
@@ -398,7 +399,8 @@
         "cdp-26.721:synthetic-you-stopped-after-2s-divider-raster",
         "cdp-26.721.81911:real-running-turn-stop-input-clear-and-focus-restore",
         "cdp-26.727.40816:real-stop-28x28-you-stopped-after-2s-and-queued-auto-continuation",
-        "cdp-26.730.61309:real-long-running-command-stop-95s-background-terminal-stopping-settlement-and-same-thread-recovery"
+        "cdp-26.730.61309:real-long-running-command-stop-95s-background-terminal-stopping-settlement-and-same-thread-recovery",
+        "cdp-26.803.61601:exact-stop-20-viewbox-16px-render-28px-control-and-send-recovery"
       ],
       "implementationStatus": "partial",
       "browserStatus": "partial_legacy",
@@ -509,7 +511,8 @@
         "cdp-26.727.40816:new-chat-do-anything-input-712x44-14x20",
         "cdp-26.803.41515:visible-composer-three-context-five-action-exact-assets",
         "cdp-26.803.41515:new-chat-editor-712x44-wide-664x44-collapsed-389.89x44-pinned",
-        "cdp-26.803.61601:new-chat-editor-712x44-wide-664x44-collapsed-389.89x44-pinned"
+        "cdp-26.803.61601:new-chat-editor-712x44-wide-664x44-collapsed-389.89x44-pinned",
+        "cdp-26.803.61601:streaming-composer-736x98-wide-688x98-compact-exact-stop-and-send-recovery"
       ],
       "implementationStatus": "partial",
       "browserStatus": "verified",

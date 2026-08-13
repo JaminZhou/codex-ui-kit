@@ -50,6 +50,7 @@ export interface AgentComposerProps
   placeholder?: string;
   queue?: ReactNode;
   suggestions?: ReactNode;
+  stopIcon?: ReactNode;
   stopLabel?: string;
   submitIcon?: ReactNode;
   submitDisabled?: boolean;
@@ -88,6 +89,7 @@ export const AgentComposer = forwardRef<
     textareaLabel = "Message",
     textareaProps,
     suggestions,
+    stopIcon,
     value,
     "aria-label": ariaLabel = "Agent composer",
     onClick,
@@ -406,10 +408,19 @@ export const AgentComposer = forwardRef<
                 title={stopLabel}
                 type="button"
               >
-                <span
-                  aria-hidden="true"
-                  className="codex-ui-composer__stop-icon"
-                />
+                {stopIcon ?? (
+                  <svg
+                    aria-hidden="true"
+                    className="codex-ui-composer__stop-icon"
+                    fill="currentColor"
+                    height="20"
+                    viewBox="0 0 20 20"
+                    width="20"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path d="M4.5 5.75C4.5 5.05964 5.05964 4.5 5.75 4.5H14.25C14.9404 4.5 15.5 5.05964 15.5 5.75V14.25C15.5 14.9404 14.9404 15.5 14.25 15.5H5.75C5.05964 15.5 4.5 14.9404 4.5 14.25V5.75Z" />
+                  </svg>
+                )}
               </button>
             ) : (
               <button

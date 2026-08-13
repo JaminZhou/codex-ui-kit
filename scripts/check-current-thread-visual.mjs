@@ -6,6 +6,12 @@ export function selectCurrentThreadVisualScenes(environment = process.env) {
   if (environment.CODEX_UI_KIT_THREAD_COMPACT_REFERENCE) {
     scenes.push("current-thread-completed-compact");
   }
+  if (environment.CODEX_UI_KIT_THREAD_STREAMING_REFERENCE) {
+    scenes.push("current-thread-streaming");
+  }
+  if (environment.CODEX_UI_KIT_THREAD_STREAMING_COMPACT_REFERENCE) {
+    scenes.push("current-thread-streaming-compact");
+  }
   return scenes;
 }
 

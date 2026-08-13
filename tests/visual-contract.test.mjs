@@ -32,6 +32,17 @@ describe("current-thread visual contract", () => {
       "current-thread-completed",
       "current-thread-completed-compact",
     ]);
+    expect(
+      selectCurrentThreadVisualScenes({
+        CODEX_UI_KIT_THREAD_STREAMING_COMPACT_REFERENCE:
+          "/tmp/streaming-compact.png",
+        CODEX_UI_KIT_THREAD_STREAMING_REFERENCE: "/tmp/streaming.png",
+      }),
+    ).toEqual([
+      "current-thread-completed",
+      "current-thread-streaming",
+      "current-thread-streaming-compact",
+    ]);
   });
 
   it("registers every sampled workflow state as an independent scenario", () => {
@@ -40,6 +51,7 @@ describe("current-thread visual contract", () => {
       "current-thread-completed",
       "current-thread-completed-compact",
       "current-thread-streaming",
+      "current-thread-streaming-compact",
       "current-thread-tool-call",
       "current-thread-approval",
       "current-workspace-file-diff",
@@ -54,7 +66,7 @@ describe("current-thread visual contract", () => {
       "current-compact-context-completed",
     ]);
     expect(packageJson.scripts["check:visual:streaming"]).toContain(
-      "--scenes=current-thread-streaming",
+      "--scenes=current-thread-streaming,current-thread-streaming-compact",
     );
     expect(packageJson.scripts["check:visual:workflow"]).toContain(
       "--scenes=current-thread-tool-call,current-thread-approval,current-workspace-file-diff",
@@ -76,6 +88,9 @@ describe("current-thread visual contract", () => {
     );
     const compactCompleted = scenarios.scenarios.find(
       (scenario) => scenario.id === "current-thread-completed-compact",
+    );
+    const compactStreaming = scenarios.scenarios.find(
+      (scenario) => scenario.id === "current-thread-streaming-compact",
     );
 
     expect(completed).toMatchObject({
@@ -103,17 +118,31 @@ describe("current-thread visual contract", () => {
     expect(streaming.expectedGeometry.stop).toEqual(
       expect.objectContaining({
         height: 28,
-        left: 868,
+        left: 922,
+        padding: "2px",
         top: 768,
         width: 28,
       }),
     );
-    expect(streaming.masks).toEqual([
-      expect.objectContaining({
-        name: "workspace-environment-control",
-        reason: expect.stringContaining("outside the thread scene"),
-      }),
-    ]);
+    expect(streaming.expectedGeometry.stopIcon).toEqual({
+      height: 16,
+      left: 928,
+      top: 774,
+      width: 16,
+    });
+    expect(streaming.masks).toEqual([]);
+    expect(compactStreaming).toMatchObject({
+      capture: "current-thread-streaming-compact",
+      expectedGeometry: {
+        assistant: { left: 16, top: { tolerance: 1, value: -17 }, width: 688 },
+        composer: { height: 98, left: 16, top: 566, width: 688 },
+        stop: { height: 28, left: 668, top: 628, width: 28 },
+        user: { height: 82, left: 174, top: -145, width: 530 },
+      },
+      masks: [],
+      referenceEnv: "CODEX_UI_KIT_THREAD_STREAMING_COMPACT_REFERENCE",
+      warmViewport: { height: 820, width: 1180 },
+    });
     const fileDiff = scenarios.scenarios.find(
       (scenario) => scenario.id === "current-workspace-file-diff",
     );
@@ -128,5 +157,6 @@ describe("current-thread visual contract", () => {
     expect(scenarioScript).toContain("region.width ?? diff.width - left");
     expect(scenarioScript).toContain("!Number.isInteger(left)");
     expect(scenarioScript).toContain("geometryContractViolations.length > 0");
+    expect(scenarioScript).toContain("scenario.warmViewport");
   });
 });

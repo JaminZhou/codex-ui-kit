@@ -14,7 +14,7 @@ exit gates; it does not replace the inventory.
   Desktop `26.803.61601` (`6396`). Unsampled earlier-build surfaces remain
   previous-build regression evidence rather than current verification.
 - The inventory contains 88 surface groups: 58 P0, 21 P1, and 9 P2.
-- 28 groups have current-build runtime evidence, 43 have previous-build-only
+- 29 groups have current-build runtime evidence, 42 have previous-build-only
   runtime evidence, and 17 have not been sampled.
 - The scoped `26.803.61601` refresh revalidates 90
   sidebar/menu/window-chrome/Composer/Settings/completed-thread icons against exact runtime evidence.
@@ -375,8 +375,13 @@ one fresh exact synthetic reply. Settled 1180×820 and 720×680 CDP evidence,
 a real Electron BrowserWindow cover the header, user/assistant turn, four
 assistant actions, Composer, responsive insets, and zero overflow. Wide and
 compact full-frame deltas are 0.3272% and 0.6456%. Streaming, tool, approval,
-file, interruption, compaction, and long-thread rows retain their separately
-versioned evidence and remain the next Stage 2 convergence work. The shared
+file, interruption, compaction, and long-thread rows initially retained their
+separately versioned evidence. The streaming row is now also refreshed on the
+same current build with one real 1180→720 running resize and natural
+completion: reverse-origin follow, negative compact clipping, exact 16px Stop
+SVG in its 28px control, and Send recovery pass Browser/CDP plus independent
+wide/compact regional pixels. Tool, approval, file, interruption, compaction,
+and long-thread convergence remain the next Stage 2 work. The shared
 surface-token change affected 28 deterministic lifecycle baselines; each was
 reviewed and refreshed, and all 188 frames still pass their existing thresholds.
 

@@ -396,8 +396,13 @@ and viewport preview. Browser/CDP now covers 156 frames; Electron repeats copy,
 horizontal wheel, open/close, focus restoration, and 720×680 action
 reachability; three reviewed internal baselines pass. A local-only 1180×820 reference gates the owned preview and
 close regions at 3.9737% and 0.5929% under 4% and 1% ceilings. Images, math,
-citations/sources, table error variants, streaming product reachability, and
-plugin-specific Markdown remain open.
+citations/sources, table error variants, and plugin-specific Markdown remain
+open. Plain-text streaming product reachability is now current on
+`26.803.61601`: one live 1180→720 resize proves reverse-origin follow,
+negative compact clipping, the exact Stop vector, and natural Send recovery in
+Browser/CDP with external wide/compact regional pixels. Markdown mutation
+streaming remains independently versioned until the same current build reaches
+those richer deltas.
 
 The `26.727.40816` MCP recovery adds four further frames for failure, retry,
 completion, and a mixed follow-up turn. Its optional 906×820 comparison gates
