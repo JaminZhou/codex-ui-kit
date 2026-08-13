@@ -5509,6 +5509,10 @@ try {
       `Electron General Settings controls did not update controlled state: ${JSON.stringify(generalInteraction)}.`,
     );
   }
+  await generalHotkeyEdit.click();
+  await generalSettingsMain
+    .getByRole("button", { name: "Press shortcut", exact: true })
+    .waitFor();
   await gitSettingsNavigation
     .getByRole("button", { name: "Git", exact: true })
     .click();
@@ -5526,6 +5530,32 @@ try {
   await gitSettingsNavigation
     .getByRole("button", { name: "General", exact: true })
     .click();
+  await generalSettingsMain
+    .getByRole("heading", { level: 1, name: "General", exact: true })
+    .waitFor();
+  await codingWorkspacePage.waitForFunction(
+    () =>
+      !document.querySelector(".codex-ui-general-settings__hotkey-capture") &&
+      document.activeElement?.textContent?.trim() === "General",
+  );
+  const generalRouteLifecycle = await generalSettingsMain.evaluate((main) => ({
+    hotkey: main
+      .querySelector('button[aria-label="Set shortcut for Popout Window hotkey"] span')
+      ?.textContent?.trim(),
+    hotkeyCapture: Boolean(
+      main.querySelector(".codex-ui-general-settings__hotkey-capture"),
+    ),
+    scrollTop: main.scrollTop,
+  }));
+  if (
+    generalRouteLifecycle.hotkey !== "⌘ ⇧ K" ||
+    generalRouteLifecycle.hotkeyCapture ||
+    generalRouteLifecycle.scrollTop !== 0
+  ) {
+    throw new Error(
+      `Electron General route retained transient shortcut capture: ${JSON.stringify(generalRouteLifecycle)}.`,
+    );
+  }
   if (
     (await generalSettingsMain
       .getByRole("switch", { name: "Show Auto-review in the composer" })

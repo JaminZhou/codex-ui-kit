@@ -810,6 +810,37 @@ for (const scene of selectedScenes) {
             speedOptions,
           },
         );
+        await page
+          .getByRole("button", { name: "Set shortcut for Popout Window hotkey" })
+          .click();
+        await page
+          .getByRole("button", { name: "Press shortcut", exact: true })
+          .waitFor();
+        await page.getByRole("button", { name: "Git", exact: true }).click();
+        await page.getByRole("heading", { name: "Git", exact: true }).waitFor();
+        await page.getByRole("button", { name: "General", exact: true }).click();
+        await page
+          .getByRole("heading", { level: 1, name: "General", exact: true })
+          .waitFor();
+        await page.waitForFunction(
+          () =>
+            !document.querySelector(".codex-ui-general-settings__hotkey-capture") &&
+            document.activeElement?.textContent?.trim() === "General",
+        );
+        interaction.routeLifecycle = await page.evaluate(() => {
+          const hotkey = document.querySelector(
+            'button[aria-label="Set shortcut for Popout Window hotkey"] span',
+          );
+          const owner = document.querySelector(".codex-ui-settings-shell__main");
+          return {
+            activeText: document.activeElement?.textContent?.trim(),
+            hotkey: hotkey?.textContent?.trim(),
+            hotkeyCapture: Boolean(
+              document.querySelector(".codex-ui-general-settings__hotkey-capture"),
+            ),
+            scrollTop: owner instanceof HTMLElement ? owner.scrollTop : null,
+          };
+        });
         if (
           interaction.autoReview !== "false" ||
           interaction.completionNotifications !== "Always⌄" ||
@@ -832,6 +863,10 @@ for (const scene of selectedScenes) {
           interaction.menuFocus.languageOutside !== "Bottom" ||
           interaction.menuFocus.sendShortcut !== "Send shortcut" ||
           interaction.menuFocus.speed !== "Speed" ||
+          interaction.routeLifecycle.activeText !== "General" ||
+          interaction.routeLifecycle.hotkey !== "⌘ ⇧ K" ||
+          interaction.routeLifecycle.hotkeyCapture ||
+          interaction.routeLifecycle.scrollTop !== 0 ||
           interaction.sendShortcut !== "⌘ + Enter always⌄" ||
           !interaction.speed?.includes("Fast") ||
           interaction.speedOptions.length !== 2 ||

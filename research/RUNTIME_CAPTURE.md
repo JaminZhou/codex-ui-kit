@@ -1273,7 +1273,8 @@ than defaults.
 
 The controlled replay adds wide, light, 720px, hotkey, and bottom frames to
 Browser/CDP; Electron repeats menu/search/switch/keyboard interactions and
-state continuity across General, Git, and Appearance. Four optional local-only
+state continuity across General, Git, and Appearance, including clearing the
+transient capture state on route exit while retaining its local value. Four optional local-only
 product gates compare the unmasked full wide, top 720×680 crop, shortcut-
 capture, and bottom frames at 4.6143%, 6.7412%, 4.7654%, and 4.8818%. The exact
 profile tree and listener were removed,

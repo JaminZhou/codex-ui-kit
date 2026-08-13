@@ -1842,6 +1842,11 @@ export function App() {
   const [generalHotkeyCaptureActive, setGeneralHotkeyCaptureActive] = useState(
     initialSelection.frame === "workspace-general-settings-hotkey",
   );
+  useEffect(() => {
+    if (workspacePage !== "general-settings") {
+      setGeneralHotkeyCaptureActive(false);
+    }
+  }, [workspacePage]);
   const [generalSettingsAction, setGeneralSettingsAction] = useState("");
   const [savedCommitInstructions, setSavedCommitInstructions] = useState("");
   const [savedPullRequestInstructions, setSavedPullRequestInstructions] =
