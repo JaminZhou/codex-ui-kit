@@ -103,7 +103,17 @@ describe("settings visual contract", () => {
   });
 
   it("disables Hooks and Code review progress motion when requested", () => {
-    expect(styles).toMatch(
+    const spinnerDeclaration = styles.indexOf(
+      ".codex-ui-hooks-settings__loading > span:first-child,",
+    );
+    const reducedMotionOverride = styles.indexOf(
+      "@media (prefers-reduced-motion: reduce)",
+      spinnerDeclaration,
+    );
+
+    expect(spinnerDeclaration).toBeGreaterThan(-1);
+    expect(reducedMotionOverride).toBeGreaterThan(spinnerDeclaration);
+    expect(styles.slice(reducedMotionOverride)).toMatch(
       /@media \(prefers-reduced-motion: reduce\) \{[\s\S]*?\.codex-ui-hooks-settings\[data-refreshing="true"\][\s\S]*?\.codex-ui-hooks-settings__reload[\s\S]*?\.codex-ui-hooks-settings__loading > span:first-child,[\s\S]*?\.codex-ui-code-review-settings__loading > span:first-child \{[\s\S]*?animation: none;/,
     );
   });

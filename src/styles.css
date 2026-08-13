@@ -717,16 +717,6 @@
   }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .codex-ui-hooks-settings[data-refreshing="true"]
-    .codex-ui-hooks-settings__reload
-    > *,
-  .codex-ui-hooks-settings__loading > span:first-child,
-  .codex-ui-code-review-settings__loading > span:first-child {
-    animation: none;
-  }
-}
-
 .codex-ui-hooks-settings__empty,
 .codex-ui-hooks-settings__error,
 .codex-ui-hooks-settings__source-card,
@@ -791,6 +781,16 @@
   border-radius: 50%;
   height: 0.75rem;
   width: 0.75rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .codex-ui-hooks-settings[data-refreshing="true"]
+    .codex-ui-hooks-settings__reload
+    > *,
+  .codex-ui-hooks-settings__loading > span:first-child,
+  .codex-ui-code-review-settings__loading > span:first-child {
+    animation: none;
+  }
 }
 
 .codex-ui-hooks-settings__error,
