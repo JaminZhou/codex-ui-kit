@@ -625,14 +625,25 @@ for (const scene of selectedScenes) {
         await page
           .getByRole("button", { name: "Set shortcut for Popout Window hotkey" })
           .click();
+        await page.waitForFunction(
+          () => document.activeElement?.textContent?.trim() === "Press shortcut",
+        );
         await page.getByRole("button", { name: "Cancel", exact: true }).click();
+        await page.waitForFunction(
+          () =>
+            document.activeElement?.getAttribute("aria-label") ===
+            "Set shortcut for Popout Window hotkey",
+        );
+        const hotkeyFocusRestored = await page.evaluate(
+          () => document.activeElement?.getAttribute("aria-label"),
+        );
         await page
           .getByRole("button", { name: "Turn completion notifications" })
           .click();
         await page.getByRole("menuitem", { name: "Always", exact: true }).click();
         await page.getByRole("button", { name: "View", exact: true }).click();
         interaction = await page.evaluate(
-          ({ fileDestinations, speedOptions }) => ({
+          ({ fileDestinations, hotkeyFocusRestored, speedOptions }) => ({
             autoReview: document
               .querySelector('[role="switch"][aria-label="Show Auto-review in the composer"]')
               ?.getAttribute("aria-checked"),
@@ -652,6 +663,7 @@ for (const scene of selectedScenes) {
             hotkeyCapture: Boolean(
               document.querySelector(".codex-ui-general-settings__hotkey-capture"),
             ),
+            hotkeyFocus: hotkeyFocusRestored,
             language: document
               .querySelector('button[aria-label="Language"]')
               ?.textContent?.trim(),
@@ -667,7 +679,7 @@ for (const scene of selectedScenes) {
               .querySelector('button[aria-label="Right"]')
               ?.getAttribute("aria-pressed"),
           }),
-          { fileDestinations, speedOptions },
+          { fileDestinations, hotkeyFocusRestored, speedOptions },
         );
         if (
           interaction.autoReview !== "false" ||
@@ -677,6 +689,7 @@ for (const scene of selectedScenes) {
           interaction.fileDestinations.length !== 7 ||
           interaction.followUp !== "true" ||
           interaction.hotkeyCapture ||
+          interaction.hotkeyFocus !== "Set shortcut for Popout Window hotkey" ||
           interaction.language !== "简体中文⌄" ||
           interaction.licenses !== "Open source licenses requested" ||
           interaction.sendShortcut !== "⌘ + Enter always⌄" ||

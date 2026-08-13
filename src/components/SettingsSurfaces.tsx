@@ -1547,6 +1547,18 @@ export function GeneralSettingsPage({
   value,
   ...props
 }: GeneralSettingsPageProps) {
+  const hotkeyEditRef = useRef<HTMLButtonElement>(null);
+  const hotkeyRecordRef = useRef<HTMLButtonElement>(null);
+  const hotkeyCaptureWasActiveRef = useRef(false);
+  useEffect(() => {
+    const wasActive = hotkeyCaptureWasActiveRef.current;
+    hotkeyCaptureWasActiveRef.current = hotkeyCaptureActive;
+    if (hotkeyCaptureActive && !wasActive) {
+      hotkeyRecordRef.current?.focus();
+    } else if (!hotkeyCaptureActive && wasActive) {
+      hotkeyEditRef.current?.focus();
+    }
+  }, [hotkeyCaptureActive]);
   const update = <K extends keyof GeneralSettingsValue>(
     key: K,
     nextValue: GeneralSettingsValue[K],
@@ -1781,7 +1793,11 @@ export function GeneralSettingsPage({
         >
           {hotkeyCaptureActive ? (
             <div className="codex-ui-general-settings__hotkey-capture">
-              <button className="codex-ui-general-settings__hotkey-record" type="button">
+              <button
+                className="codex-ui-general-settings__hotkey-record"
+                ref={hotkeyRecordRef}
+                type="button"
+              >
                 Press shortcut
               </button>
               <button
@@ -1799,6 +1815,7 @@ export function GeneralSettingsPage({
               className="codex-ui-general-settings__hotkey-edit"
               disabled={!onStartHotkeyCapture}
               onClick={onStartHotkeyCapture}
+              ref={hotkeyEditRef}
               type="button"
             >
               <span>{value.popoutHotkey ?? "Off"}</span>

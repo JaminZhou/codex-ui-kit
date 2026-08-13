@@ -548,12 +548,14 @@ describe("settings surfaces", () => {
         name: "Set shortcut for Popout Window hotkey",
       }),
     );
-    expect(screen.getByRole("button", { name: "Press shortcut" })).toBeTruthy();
+    const hotkeyCapture = screen.getByRole("button", { name: "Press shortcut" });
+    expect(hotkeyCapture).toBeTruthy();
+    expect(document.activeElement).toBe(hotkeyCapture);
     fireEvent.click(screen.getByRole("button", { name: "Cancel" }));
-    expect(
-      screen.getByRole("button", {
-        name: "Set shortcut for Popout Window hotkey",
-      }),
-    ).toBeTruthy();
+    const hotkeyEdit = screen.getByRole("button", {
+      name: "Set shortcut for Popout Window hotkey",
+    });
+    expect(hotkeyEdit).toBeTruthy();
+    expect(document.activeElement).toBe(hotkeyEdit);
   });
 });

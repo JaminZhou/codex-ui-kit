@@ -5342,9 +5342,20 @@ try {
   await generalSettingsMain
     .getByRole("button", { name: "Press shortcut", exact: true })
     .waitFor();
+  await codingWorkspacePage.waitForFunction(
+    () => document.activeElement?.textContent?.trim() === "Press shortcut",
+  );
   await generalSettingsMain
     .getByRole("button", { name: "Cancel", exact: true })
     .click();
+  await codingWorkspacePage.waitForFunction(
+    () =>
+      document.activeElement?.getAttribute("aria-label") ===
+      "Set shortcut for Popout Window hotkey",
+  );
+  const generalHotkeyFocusRestored = await codingWorkspacePage.evaluate(
+    () => document.activeElement?.getAttribute("aria-label"),
+  );
   await generalSettingsMain
     .getByRole("button", { name: "Turn completion notifications" })
     .click();
@@ -5359,7 +5370,7 @@ try {
       document.querySelector(".demo-settings-action-status")?.textContent ===
       "Open source licenses requested",
   );
-  const generalInteraction = await generalSettingsMain.evaluate((main) => ({
+  const generalInteraction = await generalSettingsMain.evaluate((main, hotkeyFocus) => ({
     autoReview: main
       .querySelector('[role="switch"][aria-label="Show Auto-review in the composer"]')
       ?.getAttribute("aria-checked"),
@@ -5378,6 +5389,7 @@ try {
     hotkeyCapture: Boolean(
       main.querySelector(".codex-ui-general-settings__hotkey-capture"),
     ),
+    hotkeyFocus,
     language: main.querySelector('button[aria-label="Language"]')
       ?.textContent?.trim(),
     sendShortcut: main.querySelector('button[aria-label="Send shortcut"]')
@@ -5387,7 +5399,7 @@ try {
     terminal: main
       .querySelector('button[aria-label="Right"]')
       ?.getAttribute("aria-pressed"),
-  }));
+  }), generalHotkeyFocusRestored);
   if (
     generalInteraction.autoReview !== "false" ||
     generalInteraction.completionNotifications !== "Always⌄" ||
@@ -5395,6 +5407,7 @@ try {
     !generalInteraction.fileDestination?.includes("Xcode") ||
     generalInteraction.followUp !== "true" ||
     generalInteraction.hotkeyCapture ||
+    generalInteraction.hotkeyFocus !== "Set shortcut for Popout Window hotkey" ||
     generalInteraction.language !== "简体中文⌄" ||
     generalInteraction.sendShortcut !== "⌘ + Enter always⌄" ||
     !generalInteraction.speed?.includes("Fast") ||
