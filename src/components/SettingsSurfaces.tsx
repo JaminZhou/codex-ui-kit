@@ -625,10 +625,18 @@ function hookSourceHeading(source: HookSourceKind) {
 function hookSourceLabel(entry: HookSettingsEntry) {
   if (entry.source === "user") return "User config";
   if (entry.source === "admin") return "Admin config";
-  if (entry.source === "plugin") return entry.pluginName ?? "Unknown plugin";
-  if (entry.source === "project") return entry.projectLabel ?? "Project config";
+  if (entry.source === "plugin") {
+    return entry.pluginName?.trim() || "Unknown plugin";
+  }
+  if (entry.source === "project") {
+    return entry.projectLabel?.trim() || "Project config";
+  }
   if (entry.source === "sessionFlags") return "Session flags";
   return "Unknown source";
+}
+
+function hookSourceIdentity(entry: HookSettingsEntry) {
+  return hookSourceLabel(entry);
 }
 
 function HooksLoadingState() {
@@ -754,12 +762,25 @@ export function HooksSettingsPage({
   status = "ready",
   ...props
 }: HooksSettingsPageProps) {
-  const groupedSources = hookSourceOrder
-    .map((source) => ({
-      entries: entries.filter((entry) => entry.source === source),
+  const groupedSources = hookSourceOrder.flatMap((source) => {
+    const sourceGroups = new Map<string, HookSettingsEntry[]>();
+    for (const entry of entries.filter(
+      (candidate) => candidate.source === source,
+    )) {
+      const identity = hookSourceIdentity(entry);
+      const sourceEntries = sourceGroups.get(identity);
+      if (sourceEntries) {
+        sourceEntries.push(entry);
+      } else {
+        sourceGroups.set(identity, [entry]);
+      }
+    }
+    return [...sourceGroups].map(([identity, sourceEntries]) => ({
+      entries: sourceEntries,
+      identity,
       source,
-    }))
-    .filter(({ entries: sourceEntries }) => sourceEntries.length > 0);
+    }));
+  });
   const groupedHeadings = [
     ...new Set(groupedSources.map(({ source }) => hookSourceHeading(source))),
   ];
@@ -808,7 +829,11 @@ export function HooksSettingsPage({
               recently installed or modified hooks
             </span>
           </div>
-          <button disabled={!onReload} onClick={onReload} type="button">
+          <button
+            disabled={!onReload || refreshing}
+            onClick={onReload}
+            type="button"
+          >
             Retry
           </button>
         </section>
@@ -822,11 +847,11 @@ export function HooksSettingsPage({
               <div className="codex-ui-hooks-settings__source-card">
                 {groupedSources
                   .filter(({ source }) => hookSourceHeading(source) === heading)
-                  .map(({ entries: sourceEntries, source }) => (
+                  .map(({ entries: sourceEntries, identity, source }) => (
                     <section
                       aria-label={hookSourceLabel(sourceEntries[0])}
                       className="codex-ui-hooks-settings__source-group"
-                      key={source}
+                      key={`${source}:${identity}`}
                     >
                       <header>
                         <strong>{hookSourceLabel(sourceEntries[0])}</strong>

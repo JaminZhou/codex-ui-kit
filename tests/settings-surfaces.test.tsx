@@ -405,11 +405,52 @@ describe("settings surfaces", () => {
     expect(pluginSwitch.hasAttribute("disabled")).toBe(false);
   });
 
+  it("keeps each plugin and project in its own source group", () => {
+    render(
+      <HooksSettingsPage
+        entries={[
+          ...hookEntries,
+          {
+            enabled: true,
+            event: "SessionStart",
+            id: "plugin-session",
+            pluginName: "Session helpers",
+            source: "plugin",
+          },
+          {
+            enabled: true,
+            event: "PostCompact",
+            id: "project-frontend",
+            projectLabel: "Frontend",
+            source: "project",
+          },
+          {
+            enabled: true,
+            event: "PreCompact",
+            id: "project-backend",
+            projectLabel: "Backend",
+            source: "project",
+          },
+        ]}
+      />,
+    );
+
+    expect(
+      screen.getByRole("region", { name: "Quality checks" }),
+    ).toBeTruthy();
+    expect(
+      screen.getByRole("region", { name: "Session helpers" }),
+    ).toBeTruthy();
+    expect(screen.getByRole("region", { name: "Frontend" })).toBeTruthy();
+    expect(screen.getByRole("region", { name: "Backend" })).toBeTruthy();
+  });
+
   it("announces Hooks loading and failure without exposing stale rows", () => {
+    const onReload = vi.fn();
     const { rerender } = render(
       <HooksSettingsPage
         entries={hookEntries}
-        onReload={() => undefined}
+        onReload={onReload}
         status="loading"
       />,
     );
@@ -419,14 +460,18 @@ describe("settings surfaces", () => {
     rerender(
       <HooksSettingsPage
         entries={hookEntries}
-        onReload={() => undefined}
+        onReload={onReload}
+        refreshing
         status="error"
       />,
     );
     expect(screen.getByRole("alert").textContent).toContain(
       "Could not load hooks",
     );
-    expect(screen.getByRole("button", { name: "Retry" })).toBeTruthy();
+    const retry = screen.getByRole("button", { name: "Retry" });
+    expect(retry.hasAttribute("disabled")).toBe(true);
+    fireEvent.click(retry);
+    expect(onReload).not.toHaveBeenCalled();
   });
 
   it("keeps package-observed Code review preferences controlled", () => {
