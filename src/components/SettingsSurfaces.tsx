@@ -980,6 +980,8 @@ export function CodeReviewSettingsPage({
   value,
   ...props
 }: CodeReviewSettingsPageProps) {
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const triggerValueId = useId();
   const update = <K extends keyof CodeReviewSettingsValue>(
     key: K,
     nextValue: CodeReviewSettingsValue[K],
@@ -1036,12 +1038,16 @@ export function CodeReviewSettingsPage({
                 sideOffset={4}
                 trigger={
                   <button
+                    aria-describedby={triggerValueId}
                     aria-label="Review trigger"
                     className="codex-ui-code-review-settings__trigger"
                     disabled={disabled}
+                    ref={triggerRef}
                     type="button"
                   >
-                    <span>{codeReviewTriggerLabels[value.triggerPolicy]}</span>
+                    <span id={triggerValueId}>
+                      {codeReviewTriggerLabels[value.triggerPolicy]}
+                    </span>
                     <span aria-hidden="true">⌄</span>
                   </button>
                 }
@@ -1051,7 +1057,10 @@ export function CodeReviewSettingsPage({
                     <MenuItem
                       aria-checked={value.triggerPolicy === policy}
                       key={policy}
-                      onSelect={() => update("triggerPolicy", policy)}
+                      onSelect={() => {
+                        update("triggerPolicy", policy);
+                        triggerRef.current?.focus();
+                      }}
                       role="menuitemradio"
                     >
                       {codeReviewTriggerLabels[policy]}
