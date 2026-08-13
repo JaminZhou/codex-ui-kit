@@ -377,7 +377,7 @@ assistant actions, Composer, responsive insets, and zero overflow. Wide and
 compact full-frame deltas are 0.3272% and 0.6456%. Streaming, tool, approval,
 file, interruption, compaction, and long-thread rows retain their separately
 versioned evidence and remain the next Stage 2 convergence work. The shared
-surface-token change affected 25 deterministic lifecycle baselines; each was
+surface-token change affected 28 deterministic lifecycle baselines; each was
 reviewed and refreshed, and all 188 frames still pass their existing thresholds.
 
 Exit: every P0 turn/thread lifecycle has a deterministic replay, current-build
