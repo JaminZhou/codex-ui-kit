@@ -85,11 +85,12 @@
         "cdp:renderer-viewport-2560-1180-820-layout-metrics",
         "cdp-26.721:main-shell-target-2560x1326",
         "cdp-26.721:synthetic-thread-wide-2560x1410-header-timeline-composer-geometry",
-        "cdp-26.721:synthetic-thread-emulated-800x600-responsive-geometry"
+        "cdp-26.721:synthetic-thread-emulated-800x600-responsive-geometry",
+        "cdp-26.803.61601:completed-thread-1180x820-and-720x680-header-thread-composer-geometry-zero-overflow-and-responsive-collapse"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "partial_legacy",
-      "electronStatus": "partial_legacy",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
       "priority": "p0"
     },
     {
@@ -101,11 +102,12 @@
       "runtimeEvidence": [
         "cdp:basic-user-and-assistant-turn",
         "cdp-26.721:synthetic-user-bubble-assistant-flat-response-and-actions",
-        "cdp-26.721:synthetic-streaming-assistant-736x22-font-14-22"
+        "cdp-26.721:synthetic-streaming-assistant-736x22-font-14-22",
+        "cdp-26.803.61601:completed-user-bubble-assistant-flat-response-four-actions-14x22-typography-and-twelve-exact-thread-assets"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "partial_legacy",
-      "electronStatus": "partial_legacy",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
       "priority": "p0"
     },
     {

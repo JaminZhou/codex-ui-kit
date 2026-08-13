@@ -62,8 +62,8 @@ observation from a previous build remains historical evidence.
   using private text. The exact `scrollHeight` remains content-dependent, so
   the contract locks the unique scroll owner and visible geometry rather than
   private task counts.
-- The same fingerprint revalidates 78
-  context/Composer/sidebar/menu/window/environment/Settings assets, six project groups,
+- The same fingerprint revalidates 90
+  context/Composer/sidebar/menu/window/environment/Settings/completed-thread assets, six project groups,
   Recents actions, all sampled menus, and the disabled
   window-navigation cursor. See
   [`26.803.61601.md`](26.803.61601.md). The scoped visible-shell approximation
@@ -74,7 +74,7 @@ observation from a previous build remains historical evidence.
   previous-build regression evidence and have been downgraded from `verified`
   to `partial_legacy` until they are reached again on the current fingerprint.
 
-Current inventory: 88 surface groups; 26 have current-build runtime evidence, 45 have previous-build-only runtime evidence, 17 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 25 groups and Electron verification covers 25.
+Current inventory: 88 surface groups; 28 have current-build runtime evidence, 43 have previous-build-only runtime evidence, 17 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 27 groups and Electron verification covers 27.
 Prior acceptance outside those 23 sampled current-build groups remains
 recorded as `partial_legacy` until current-build re-observation.
 
@@ -470,6 +470,17 @@ running reply and 28px `Stop` control. It locks 14/22px running text, the
 omits only the workspace-owned Environment control from the thread-owned
 comparison; the remaining full raster and header/message/Composer regions
 stay independently bounded.
+
+The current `26.803.61601` completed-thread follow-up supersedes the basic
+shell/message evidence above without relabeling later lifecycle states. A
+fresh synthetic exact reply locks the settled 1180×820 and 720×680 layouts:
+46px header, 20px user bubble, 14/22px messages, four 26px assistant actions,
+25px-radius 736×98 or 688×98 Composer, 16px compact insets, and zero horizontal
+overflow. Twelve exact thread primitives raise the visual manifest from 78 to
+90. The titlebar also replays its separately hashed, playground-only VS Code
+integration PNG. Browser/CDP and Electron pass with no geometry violations;
+local-only regional comparisons pass at 0.3272% wide and 0.6456% compact. The source
+captures remain untracked.
 
 The previous full conversation/Composer probe observed build `26.721.81911`
 in a disposable second process using synthetic prompts only. It remains the

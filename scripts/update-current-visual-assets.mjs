@@ -10,8 +10,12 @@ import {
 
 const write = process.argv.includes("--write");
 const hooksOnly = process.argv.includes("--hooks-only");
+const threadOnly = process.argv.includes("--thread-only");
 const manifestPath = fileURLToPath(
   new URL("../research/visual-assets.json", import.meta.url),
+);
+const rasterManifestPath = fileURLToPath(
+  new URL("../research/visual-raster-assets.json", import.meta.url),
 );
 const capturePath = fileURLToPath(
   new URL("./capture-current-visual-assets.mjs", import.meta.url),
@@ -184,7 +188,19 @@ const promotionSpecs = new Map([
     {
       ownerAriaLabel: "Start new voice chat",
       region: "composer",
+      retainExistingWhenAbsentOnSameFingerprint: true,
       semanticId: "composer-voice",
+    },
+  ],
+  [
+    "composer-send",
+    {
+      ownerAriaLabel: "Send",
+      ownerEvidence:
+        "current completed-thread Composer terminal action selected by its exact accessible label",
+      region: "composer",
+      retainExistingWhenAbsentOnSameFingerprint: true,
+      semanticId: "composer-send",
     },
   ],
   [
@@ -213,6 +229,63 @@ const promotionSpecs = new Map([
       semanticId: "window-chrome-forward",
     },
   ],
+  ...[
+    [
+      "thread-header-new-chat",
+      null,
+      "one visible unlabeled 16px current-thread titlebar control selected structurally after Forward",
+      "titlebar",
+    ],
+    [
+      "thread-header-project",
+      null,
+      "one visible ownerless 16px current-thread project glyph selected structurally inside the titlebar",
+      "titlebar",
+    ],
+    ["thread-header-actions", "Chat actions", null, "titlebar"],
+    [
+      "thread-header-open-in-chevron",
+      "Secondary action",
+      null,
+      "titlebar",
+    ],
+    [
+      "thread-header-pinned-summary",
+      "Toggle pinned summary",
+      null,
+      "titlebar",
+    ],
+    [
+      "thread-header-bottom-panel",
+      "Toggle bottom panel",
+      null,
+      "titlebar",
+    ],
+    [
+      "thread-header-side-panel",
+      "Toggle side panel",
+      null,
+      "titlebar",
+    ],
+    ["thread-assistant-copy", "Copy", null, "conversation"],
+    ["thread-assistant-good", "Good response", null, "conversation"],
+    ["thread-assistant-bad", "Bad response", null, "conversation"],
+    [
+      "thread-assistant-continue",
+      "Continue in new chat from here",
+      null,
+      "conversation",
+    ],
+  ].map(([id, ownerAriaLabel, ownerEvidence, region]) => [
+    id,
+    {
+      ownerAriaLabel,
+      ...(ownerEvidence ? { ownerEvidence } : {}),
+      region,
+      retainExistingWhenAbsentOnSameFingerprint: true,
+      semanticId: id,
+    },
+  ]),
   [
     "sidebar-mode-chevron",
     {
@@ -507,13 +580,162 @@ const manifest = JSON.parse(readFileSync(manifestPath, "utf8"));
 const capture = JSON.parse(
   execFileSync(process.execPath, [capturePath], {
     encoding: "utf8",
-    env: process.env,
+    env: {
+      ...process.env,
+      ...(threadOnly ? { CODEX_VISUAL_ASSET_THREAD_ONLY: "1" } : {}),
+    },
     maxBuffer: 64 * 1024 * 1024,
   }),
 );
 capture.icons.forEach((icon, index) =>
   sanitizeVisualAssetIcon(icon, `capture.icons[${index}]`),
 );
+if (threadOnly) {
+  const targetIds = [
+    "composer-send",
+    "thread-header-new-chat",
+    "thread-header-project",
+    "thread-header-actions",
+    "thread-header-open-in-chevron",
+    "thread-header-pinned-summary",
+    "thread-header-bottom-panel",
+    "thread-header-side-panel",
+    "thread-assistant-copy",
+    "thread-assistant-good",
+    "thread-assistant-bad",
+    "thread-assistant-continue",
+  ];
+  if (capture.captureMode !== "completed-thread") {
+    throw new Error("Targeted current-thread capture mode was not proven.");
+  }
+  const rasterAssets = capture.rasterAssets;
+  if (
+    !Array.isArray(rasterAssets) ||
+    rasterAssets.length !== 1 ||
+    rasterAssets[0]?.id !== "thread-header-editor-vscode" ||
+    rasterAssets[0]?.mimeType !== "image/png" ||
+    rasterAssets[0]?.sourceUrl !== "app://-/apps/vscode.png" ||
+    rasterAssets[0]?.status !== "runtime-observed" ||
+    rasterAssets[0]?.naturalSize?.height !== 64 ||
+    rasterAssets[0]?.naturalSize?.width !== 64 ||
+    rasterAssets[0]?.renderSize?.height !== 16 ||
+    rasterAssets[0]?.renderSize?.width !== 16 ||
+    rasterAssets[0]?.byteLength !== 2804 ||
+    rasterAssets[0]?.sha256 !==
+      "5ff492ba38828c649ad3f2e8ce78e02d9cbdd1200009dd046992cfbde6897a24"
+  ) {
+    throw new Error("Targeted current-thread raster asset changed unexpectedly.");
+  }
+  const currentFingerprint = {
+    appAsarSha256: capture.baselineContext?.appAsarSha256,
+    appVersion: capture.baselineContext?.appVersion,
+    buildNumber: capture.baselineContext?.buildNumber,
+  };
+  const manifestFingerprint = {
+    appAsarSha256: manifest.baseline.appAsarSha256,
+    appVersion: manifest.baseline.appVersion,
+    buildNumber: manifest.baseline.buildNumber,
+  };
+  if (
+    canonicalize(currentFingerprint) !== canonicalize(manifestFingerprint) ||
+    capture.baselineContext?.interactionState !==
+      manifest.baseline.interactionState ||
+    capture.baselineContext?.theme !== manifest.baseline.theme ||
+    canonicalize(capture.baselineContext?.viewport) !==
+      canonicalize(manifest.baseline.viewport)
+  ) {
+    throw new Error(
+      "Targeted current-thread capture must match the exact tracked app fingerprint, interaction state, theme, and viewport.",
+    );
+  }
+  const promotedById = new Map();
+  for (const id of targetIds) {
+    const spec = promotionSpecs.get(id);
+    if (!spec) throw new Error(`Missing current-thread promotion spec: ${id}.`);
+    const observed = capture.icons.filter(
+      (candidate) =>
+        candidate.region === spec.region &&
+        candidate.owner?.semanticId === spec.semanticId,
+    );
+    if (observed.length !== 1) {
+      throw new Error(
+        `Expected one targeted current-thread capture for ${id}, received ${observed.length}.`,
+      );
+    }
+    const existing = manifest.icons.find((icon) => icon.id === id);
+    if (
+      existing &&
+      (existing.region !== spec.region ||
+        existing.viewBox !== observed[0].viewBox ||
+        canonicalize(existing.rootAttributes) !==
+          canonicalize(observed[0].rootAttributes))
+    ) {
+      throw new Error(`${id} root geometry or region changed.`);
+    }
+    const promoted = {
+      id,
+      ownerAriaLabel: spec.ownerAriaLabel,
+      ...(spec.ownerEvidence ? { ownerEvidence: spec.ownerEvidence } : {}),
+      primitives: existing
+        ? promotePrimitives(existing, observed[0])
+        : observed[0].primitives,
+      region: spec.region,
+      renderSize: observed[0].renderSize,
+      rootAttributes: observed[0].rootAttributes,
+      rootComputedStyle: existing
+        ? promoteComputedStyle(
+            existing.rootComputedStyle,
+            observed[0].rootComputedStyle,
+          )
+        : observed[0].rootComputedStyle,
+      sourceClassName: observed[0].sourceClassName,
+      status: "runtime-observed",
+      viewBox: observed[0].viewBox,
+    };
+    promoted.sha256 = createHash("sha256")
+      .update(
+        canonicalize({
+          baselineContext: manifest.baseline,
+          primitives: promoted.primitives,
+          renderSize: promoted.renderSize,
+          rootAttributes: promoted.rootAttributes,
+          rootComputedStyle: promoted.rootComputedStyle,
+          sourceClassName: promoted.sourceClassName,
+          viewBox: promoted.viewBox,
+        }),
+      )
+      .digest("hex");
+    promotedById.set(id, promoted);
+  }
+  const existingById = new Map(manifest.icons.map((icon) => [icon.id, icon]));
+  manifest.icons = [...promotionSpecs.keys()].map(
+    (id) => promotedById.get(id) ?? existingById.get(id),
+  );
+  const output = `${JSON.stringify(manifest, null, 2)}\n`;
+  const rasterOutput = `${JSON.stringify(
+    {
+      assets: rasterAssets,
+      baseline: manifest.baseline,
+      policy: {
+        distribution:
+          "exploratory playground only; excluded from the published npm package",
+        ownership: "Microsoft Visual Studio Code trademark asset",
+        runtimeSource: "Codex Desktop titlebar integration image",
+      },
+      schemaVersion: 1,
+    },
+    null,
+    2,
+  )}\n`;
+  if (write) {
+    writeFileSync(manifestPath, output);
+    writeFileSync(rasterManifestPath, rasterOutput);
+    console.log(`Updated ${manifestPath} with current-thread assets`);
+  } else {
+    process.stdout.write(output);
+  }
+  process.exit(0);
+}
 if (hooksOnly) {
   const observed = capture.icons.filter(
     ({ owner, region }) =>
@@ -604,23 +826,36 @@ if (hooksOnly) {
   }
   process.exit(0);
 }
+const composerTerminalIds = new Set(["composer-send", "composer-voice"]);
 const expectedComposerIds = [...promotionSpecs.entries()]
-  .filter(([, spec]) => spec.region === "composer")
+  .filter(
+    ([id, spec]) =>
+      spec.region === "composer" && !composerTerminalIds.has(id),
+  )
   .map(([id]) => id)
   .sort();
 const capturedComposerIds = capture.icons
   .filter(({ region }) => region === "composer")
   .map(({ owner }) => owner.semanticId)
   .sort();
+const capturedComposerRequiredIds = capturedComposerIds.filter(
+  (id) => !composerTerminalIds.has(id),
+);
+const capturedComposerTerminalIds = capturedComposerIds.filter((id) =>
+  composerTerminalIds.has(id),
+);
 if (
   capture.composerObservation?.topContextIconCount !== 3 ||
   capture.composerObservation?.bottomActionIconCount !== 5 ||
   capture.composerObservation?.exactSemanticIconCount !== 8 ||
-  canonicalize(capturedComposerIds) !== canonicalize(expectedComposerIds)
+  canonicalize(capturedComposerRequiredIds) !==
+    canonicalize(expectedComposerIds) ||
+  capturedComposerTerminalIds.length !== 1
 ) {
   throw new Error(
     `Unexpected current Composer capture: ${canonicalize({
       capturedComposerIds,
+      capturedComposerTerminalIds,
       composerObservation: capture.composerObservation,
       expectedComposerIds,
     })}`,

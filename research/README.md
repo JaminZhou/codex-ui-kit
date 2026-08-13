@@ -6,6 +6,10 @@ visual primitives may be retained for the exploratory parity playground only
 when [`VISUAL_ASSETS.md`](VISUAL_ASSETS.md) and
 [`visual-assets.json`](visual-assets.json) record their source, ownership,
 hash, package boundary, and remaining approximation denominator.
+The separately gated [`visual-raster-assets.json`](visual-raster-assets.json)
+holds only named app-integration rasters whose exact bytes are required by a
+pixel scene; it records the same build fingerprint and remains excluded from
+the published npm package.
 
 ## Workflow
 

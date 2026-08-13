@@ -74,6 +74,27 @@ fingerprint. An optional interaction-state variant may be retained only when
 the installed app fingerprint is unchanged; all other missing, added, removed,
 duplicated, ambiguous, or unmatched primitives fail closed.
 
+For an already completed synthetic thread on that exact fingerprint, the
+targeted path avoids reopening mutable sidebar and Settings states:
+
+```sh
+CODEX_VISUAL_ASSET_CDP_PORT=<port> \
+CODEX_VISUAL_ASSET_PROFILE=<absolute-unique-profile> \
+node scripts/update-current-visual-assets.mjs --thread-only --write
+pnpm update:current-thread-visual-assets
+```
+
+The targeted updater proves the `completed-thread` capture mode and exact
+baseline context before promoting Send, four assistant actions, and seven
+thread-header primitives. The generated 21-icon demo subset strips non-paint
+computed properties while retaining each source SHA-256; it is checked on
+every research run and emitted as a separate demo chunk. The same path captures
+the visible VS Code integration PNG into
+[`visual-raster-assets.json`](visual-raster-assets.json), which records its
+source URL, native/render sizes, byte count, SHA-256, trademark ownership, and
+playground-only distribution boundary. The research checker rejects any byte
+or fingerprint drift, and package checks keep this raster outside npm output.
+
 Settings is removed from the approximation inventory only when the same
 de-identified capture reports one horizontally and vertically visible Help
 footer control and no visible Settings control. The zero-leading-SVG result is
@@ -123,8 +144,8 @@ attributes, class names, view boxes, and render sizes before capture output.
 Process/profile setup and exact-PID cleanup remain explicit operator steps.
 
 The current manifest fingerprints Codex Desktop `26.803.61601` (`6396`) and
-contains 53 runtime-observed sidebar/menu/window-chrome/Composer/environment
-icons: Sidebar,
+contains 90 runtime-observed exact icons. The first 53 cover
+sidebar/menu/window-chrome/Composer/environment surfaces: Sidebar,
 Back, Forward, mode chevron, Search, neutral
 Activity, New chat, Quick chat, project folder, Pull requests, Sites,
 Scheduled, Plugins, More, Pin, Archive, Help, Composer Project, Worktree,
@@ -136,7 +157,11 @@ web, its external-link mark, disabled Send to cloud, Usage remaining, its
 chevron, and Environment settings. The current build confirms
 that Settings is absent from the sampled footer and that sampled project-task
 and Recents rows have no leading glyph. The scoped visible-shell approximation
-list is now empty, but the broader inventory and current-build lifecycle
-denominator remain incomplete, so global pixel parity is still ineligible. See
+list remains empty after adding 24 Settings navigation primitives, the Hooks
+reload action, and 12 completed-thread primitives: Send, New chat, project,
+thread actions, open-in chevron, pinned summary, bottom panel, side panel,
+Copy, Good response, Bad response, and Continue in new chat. The broader
+inventory and current-build lifecycle denominator remain incomplete, so
+global pixel parity is still ineligible. See
 [`26.803.61601.md`](26.803.61601.md) for the scoped probe evidence and its
 separation from the broader UI inventory baseline.

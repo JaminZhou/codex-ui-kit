@@ -26,6 +26,7 @@ describe("current-thread visual contract", () => {
     expect(scenarios.version).toBe(1);
     expect(scenarios.scenarios.map((scenario) => scenario.id)).toEqual([
       "current-thread-completed",
+      "current-thread-completed-compact",
       "current-thread-streaming",
       "current-thread-tool-call",
       "current-thread-approval",
@@ -61,6 +62,9 @@ describe("current-thread visual contract", () => {
     const streaming = scenarios.scenarios.find(
       (scenario) => scenario.id === "current-thread-streaming",
     );
+    const compactCompleted = scenarios.scenarios.find(
+      (scenario) => scenario.id === "current-thread-completed-compact",
+    );
 
     expect(completed).toMatchObject({
       maximumDiffRatioEnv: "CODEX_UI_KIT_VISUAL_MAX_DIFF",
@@ -73,6 +77,14 @@ describe("current-thread visual contract", () => {
         "CODEX_UI_KIT_VISUAL_MAX_COMPOSER_DIFF",
       ],
     );
+    expect(compactCompleted).toMatchObject({
+      referenceEnv: "CODEX_UI_KIT_THREAD_COMPACT_REFERENCE",
+      expectedGeometry: {
+        composer: { height: 98, left: 16, top: 566, width: 688 },
+        header: { height: 46, left: 0, top: 0, width: 720 },
+      },
+      masks: [],
+    });
     expect(streaming.referenceEnv).toBe(
       "CODEX_UI_KIT_THREAD_STREAMING_REFERENCE",
     );

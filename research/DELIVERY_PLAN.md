@@ -14,10 +14,10 @@ exit gates; it does not replace the inventory.
   Desktop `26.803.61601` (`6396`). Unsampled earlier-build surfaces remain
   previous-build regression evidence rather than current verification.
 - The inventory contains 88 surface groups: 58 P0, 21 P1, and 9 P2.
-- 26 groups have current-build runtime evidence, 45 have previous-build-only
+- 28 groups have current-build runtime evidence, 43 have previous-build-only
   runtime evidence, and 17 have not been sampled.
-- The scoped `26.803.61601` refresh revalidates 78
-  sidebar/menu/window-chrome/Composer/Settings icons against exact runtime evidence.
+- The scoped `26.803.61601` refresh revalidates 90
+  sidebar/menu/window-chrome/Composer/Settings/completed-thread icons against exact runtime evidence.
   Earlier hover/footer slices promoted More, Pin,
   Archive, and Help, confirms that Settings is absent from the sampled footer
   and that sampled project-task rows have no leading glyph. The Recents follow-up
@@ -369,6 +369,17 @@ Browser, MCP, command, approval, file Review, and subagent events under one
 public reducer and one Browser/Electron/pixel matrix. It is composition
 evidence, not a synthetic promotion of whole-thread current-product reachability.
 
+The basic completed conversation core is now refreshed on `26.803.61601` with
+one fresh exact synthetic reply. Settled 1180×820 and 720×680 CDP evidence,
+12 exact thread primitives, Browser geometry, regional pixel comparisons, and
+a real Electron BrowserWindow cover the header, user/assistant turn, four
+assistant actions, Composer, responsive insets, and zero overflow. Wide and
+compact full-frame deltas are 0.3272% and 0.6456%. Streaming, tool, approval,
+file, interruption, compaction, and long-thread rows retain their separately
+versioned evidence and remain the next Stage 2 convergence work. The shared
+surface-token change affected 25 deterministic lifecycle baselines; each was
+reviewed and refreshed, and all 188 frames still pass their existing thresholds.
+
 Exit: every P0 turn/thread lifecycle has a deterministic replay, current-build
 structural evidence, Browser acceptance, and Electron acceptance.
 
@@ -483,8 +494,9 @@ Electron verify empty/loading/error/configured states, refresh/search/route
 continuity, trust-before-enable, three review triggers, exhaustive review, and
 the optional credits preference. Eight reviewed frames extend the matrix to
 188. The untracked full-frame current Hooks comparisons pass without masks at
-1.7651% wide and 1.8064% at 720px. The exact runtime reload SVG raises the
-asset manifest to 78 icons. Remaining P1 families keep their existing open
+1.7651% wide and 1.8064% at 720px. The exact runtime reload SVG raised the
+asset manifest to 78 icons; the later completed-thread slice raises it to 90.
+Remaining P1 families keep their existing open
 gates, so Stage 4 is still in progress.
 
 Exit: each in-scope P1 family has a documented ownership boundary and at least

@@ -1,5 +1,9 @@
-import { createElement, type SVGProps } from "react";
+import type { ComponentProps } from "react";
 import visualAssets from "../../../research/visual-assets.json";
+import {
+  VisualAssetIcon,
+  type VisualAssetIconData,
+} from "./VisualAssetIcon";
 
 export type CurrentBuildIconName =
   | "composer-add-files"
@@ -8,6 +12,7 @@ export type CurrentBuildIconName =
   | "composer-model-chevron"
   | "composer-permission"
   | "composer-project"
+  | "composer-send"
   | "composer-voice"
   | "composer-worktree"
   | "window-chrome-back"
@@ -46,6 +51,17 @@ export type CurrentBuildIconName =
   | "sidebar-scheduled"
   | "sidebar-search"
   | "sidebar-sites"
+  | "thread-assistant-bad"
+  | "thread-assistant-continue"
+  | "thread-assistant-copy"
+  | "thread-assistant-good"
+  | "thread-header-actions"
+  | "thread-header-bottom-panel"
+  | "thread-header-new-chat"
+  | "thread-header-open-in-chevron"
+  | "thread-header-pinned-summary"
+  | "thread-header-project"
+  | "thread-header-side-panel"
   | "workspace-environment-settings"
   | "workspace-run-location-codex-web"
   | "workspace-run-location-external"
@@ -81,106 +97,20 @@ export type CurrentBuildIconName =
   | "settings-worktrees"
   | "settings-archived-chats";
 
-interface CurrentBuildIconProps extends SVGProps<SVGSVGElement> {
+interface CurrentBuildIconProps
+  extends Omit<ComponentProps<typeof VisualAssetIcon>, "assetId" | "icon"> {
   name: CurrentBuildIconName;
 }
 
-const reactAttributeNames: Readonly<Record<string, string>> = {
-  "clip-rule": "clipRule",
-  "fill-rule": "fillRule",
-  gradienttransform: "gradientTransform",
-  gradientunits: "gradientUnits",
-  preserveaspectratio: "preserveAspectRatio",
-  "stroke-linecap": "strokeLinecap",
-  "stroke-linejoin": "strokeLinejoin",
-  "stroke-width": "strokeWidth",
-  "xlink:href": "xlinkHref",
-};
-
-const reactTagNames: Readonly<Record<string, string>> = {
-  clippath: "clipPath",
-  lineargradient: "linearGradient",
-  radialgradient: "radialGradient",
-};
-
-function toReactAttributes(attributes: object) {
-  return Object.fromEntries(
-    Object.entries(attributes).map(([name, value]) => [
-      reactAttributeNames[name.toLowerCase()] ?? name,
-      value,
-    ]),
-  );
-}
-
-function toReactStyle(style: object): SVGProps<SVGElement>["style"] {
-  return Object.fromEntries(
-    Object.entries(style).map(([name, value]) => {
-      const normalized = name
-        .replace(/^-webkit-/, "Webkit-")
-        .replace(/^-moz-/, "Moz-")
-        .replace(/^-ms-/, "ms-")
-        .replace(/-([a-z])/g, (_match, letter: string) =>
-          letter.toUpperCase(),
-        );
-      return [normalized, value];
-    }),
-  ) as SVGProps<SVGElement>["style"];
-}
-
-type VisualPrimitive = {
-  attributes: object;
-  children?: readonly VisualPrimitive[];
-  computedStyle: object;
-  tag: string;
-};
-
-function renderPrimitive(
-  primitive: VisualPrimitive,
-  key: string,
-): ReturnType<typeof createElement> {
-  return createElement(
-    reactTagNames[primitive.tag] ?? primitive.tag,
-    {
-      ...toReactAttributes(primitive.attributes),
-      key,
-      style: toReactStyle(primitive.computedStyle),
-    },
-    primitive.children?.map((child, index) =>
-      renderPrimitive(child, `${key}-${index}`),
-    ),
-  );
-}
-
-export function CurrentBuildIcon({
-  className,
-  name,
-  style,
-  ...props
-}: CurrentBuildIconProps) {
+export function CurrentBuildIcon({ name, ...props }: CurrentBuildIconProps) {
   const icon = visualAssets.icons.find((candidate) => candidate.id === name);
   if (!icon) throw new Error(`Unknown current-build icon: ${name}`);
-  const exactRootStyle = toReactStyle(icon.rootComputedStyle);
 
   return (
-    <svg
-      {...toReactAttributes(icon.rootAttributes)}
-      aria-hidden="true"
-      className={["demo-current-build-icon", className]
-        .filter(Boolean)
-        .join(" ")}
-      data-current-build-icon={name}
-      style={{
-        ...exactRootStyle,
-        height: icon.renderSize.height,
-        width: icon.renderSize.width,
-        ...style,
-      }}
-      viewBox={icon.viewBox}
+    <VisualAssetIcon
+      assetId={name}
+      icon={icon as VisualAssetIconData}
       {...props}
-    >
-      {icon.primitives.map((primitive, index) =>
-        renderPrimitive(primitive, `${name}-${index}`),
-      )}
-    </svg>
+    />
   );
 }

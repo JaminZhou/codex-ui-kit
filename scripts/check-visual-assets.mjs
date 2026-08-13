@@ -10,9 +10,17 @@ import {
 } from "./visual-asset-sidebar-contract.mjs";
 
 const manifestUrl = new URL("../research/visual-assets.json", import.meta.url);
+const rasterManifestUrl = new URL(
+  "../research/visual-raster-assets.json",
+  import.meta.url,
+);
 const packageUrl = new URL("../package.json", import.meta.url);
 const playgroundIconUrl = new URL(
   "../playgrounds/codex-app/src/currentBuildIcons.tsx",
+  import.meta.url,
+);
+const visualAssetIconUrl = new URL(
+  "../playgrounds/codex-app/src/VisualAssetIcon.tsx",
   import.meta.url,
 );
 const playgroundAppUrl = new URL(
@@ -23,6 +31,7 @@ const playgroundStylesUrl = new URL(
   "../playgrounds/codex-app/src/styles.css",
   import.meta.url,
 );
+const demoAppUrl = new URL("../demo/main.tsx", import.meta.url);
 const captureScriptUrl = new URL(
   "./capture-current-visual-assets.mjs",
   import.meta.url,
@@ -34,23 +43,30 @@ const updaterScriptUrl = new URL(
 
 const [
   manifestText,
+  rasterManifestText,
   packageText,
   iconSource,
+  rendererSource,
   appSource,
+  demoSource,
   playgroundStyles,
   captureSource,
   updaterSource,
 ] =
   await Promise.all([
     readFile(manifestUrl, "utf8"),
+    readFile(rasterManifestUrl, "utf8"),
     readFile(packageUrl, "utf8"),
     readFile(playgroundIconUrl, "utf8"),
+    readFile(visualAssetIconUrl, "utf8"),
     readFile(playgroundAppUrl, "utf8"),
+    readFile(demoAppUrl, "utf8"),
     readFile(playgroundStylesUrl, "utf8"),
     readFile(captureScriptUrl, "utf8"),
     readFile(updaterScriptUrl, "utf8"),
   ]);
 const manifest = JSON.parse(manifestText);
+const rasterManifest = JSON.parse(rasterManifestText);
 const packageJson = JSON.parse(packageText);
 function canonicalize(value) {
   return JSON.stringify(value, (_key, nested) => {
@@ -70,6 +86,28 @@ if (manifest.schemaVersion !== 1) {
 }
 if (manifest.geometryHashVersion !== 4) {
   throw new Error("visual asset geometryHashVersion must be 4");
+}
+const rasterAsset = rasterManifest.assets?.[0];
+const rasterBytes = Buffer.from(rasterAsset?.dataBase64 ?? "", "base64");
+if (
+  rasterManifest.schemaVersion !== 1 ||
+  canonicalize(rasterManifest.baseline) !== canonicalize(manifest.baseline) ||
+  rasterManifest.assets?.length !== 1 ||
+  rasterAsset.id !== "thread-header-editor-vscode" ||
+  rasterAsset.mimeType !== "image/png" ||
+  rasterAsset.sourceUrl !== "app://-/apps/vscode.png" ||
+  rasterAsset.status !== "runtime-observed" ||
+  rasterAsset.naturalSize?.height !== 64 ||
+  rasterAsset.naturalSize?.width !== 64 ||
+  rasterAsset.renderSize?.height !== 16 ||
+  rasterAsset.renderSize?.width !== 16 ||
+  rasterAsset.byteLength !== rasterBytes.length ||
+  rasterBytes.toString("base64") !== rasterAsset.dataBase64 ||
+  rasterBytes.subarray(0, 8).toString("hex") !== "89504e470d0a1a0a" ||
+  createHash("sha256").update(rasterBytes).digest("hex") !== rasterAsset.sha256 ||
+  !demoSource.includes('name="thread-header-editor-vscode"')
+) {
+  throw new Error("current-thread VS Code raster provenance is incomplete");
 }
 if (
   !manifest.baseline?.appVersion ||
@@ -244,17 +282,18 @@ for (const icon of manifest.icons ?? []) {
       appSource.includes('name="settings-account-external"'));
   if (
     !appSource.includes(`name="${icon.id}"`) &&
+    !demoSource.includes(`name="${icon.id}"`) &&
     !renderedBySettingsNavigation
   ) {
-    throw new Error(`current-build playground does not render ${icon.id}`);
+    throw new Error(`current-build playgrounds do not render ${icon.id}`);
   }
 }
 
 if (
-  !iconSource.includes("primitive.children?.map") ||
-  !iconSource.includes("renderPrimitive(child") ||
-  !iconSource.includes("toReactStyle(primitive.computedStyle)") ||
-  !iconSource.includes("toReactStyle(icon.rootComputedStyle)")
+  !rendererSource.includes("primitive.children?.map") ||
+  !rendererSource.includes("renderPrimitive(child") ||
+  !rendererSource.includes("toReactStyle(primitive.computedStyle)") ||
+  !rendererSource.includes("toReactStyle(icon.rootComputedStyle)")
 ) {
   throw new Error(
     "current-build renderer must reconstruct nested SVG trees and computed styles",
@@ -409,19 +448,31 @@ for (const id of [
   "settings-environments",
   "settings-worktrees",
   "settings-archived-chats",
+  "composer-send",
+  "thread-header-new-chat",
+  "thread-header-project",
+  "thread-header-actions",
+  "thread-header-open-in-chevron",
+  "thread-header-pinned-summary",
+  "thread-header-bottom-panel",
+  "thread-header-side-panel",
+  "thread-assistant-copy",
+  "thread-assistant-good",
+  "thread-assistant-bad",
+  "thread-assistant-continue",
 ]) {
   if (!ids.has(id) || remaining.includes(id)) {
     throw new Error(`${id} must be promoted from current-build runtime evidence`);
   }
 }
 if (
-  manifest.icons.length !== 78 ||
+  manifest.icons.length !== 90 ||
   manifest.composerObservation?.topContextIconCount !== 3 ||
   manifest.composerObservation?.bottomActionIconCount !== 5 ||
   manifest.composerObservation?.exactSemanticIconCount !== 8
 ) {
   throw new Error(
-    "current Composer capture must retain three context and five action icons with eight exact semantic mappings",
+    "current visual asset capture must retain 90 promoted icons and the eight-icon Composer baseline",
   );
 }
 if (

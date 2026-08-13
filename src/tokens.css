@@ -103,10 +103,10 @@
 
   --codex-ui-font-size: var(--codex-ui-font-size-md);
   --codex-ui-line-height: var(--codex-ui-line-height-md);
-  --codex-ui-radius-message: var(--codex-ui-radius-2xl);
-  --codex-ui-radius-composer: calc(var(--codex-ui-spacing) * 5.5);
+  --codex-ui-radius-message: var(--codex-ui-radius-3xl);
+  --codex-ui-radius-composer: 1.5625rem;
   --codex-ui-radius-composer-single-line: var(--codex-ui-radius-composer);
-  --codex-ui-radius-composer-multiline: var(--codex-ui-radius-3xl);
+  --codex-ui-radius-composer-multiline: var(--codex-ui-radius-composer);
   --codex-ui-size-button-composer: calc(var(--codex-ui-spacing) * 8);
   --codex-ui-control-height-small: calc(var(--codex-ui-spacing) * 5);
   --codex-ui-control-height-medium: calc(var(--codex-ui-spacing) * 7);
@@ -170,10 +170,11 @@
   --codex-ui-conversation-thread-composer-background: var(
     --codex-ui-background-elevated-primary-opaque
   );
+  --codex-ui-conversation-thread-composer-surface-overlay: transparent;
   --codex-ui-conversation-thread-header-border: var(--codex-ui-border);
-  --codex-ui-conversation-thread-font-size: 0.884375rem;
+  --codex-ui-conversation-thread-font-size: 0.875rem;
   --codex-ui-conversation-thread-line-height: 1.375rem;
-  --codex-ui-conversation-thread-assistant-actions-gap: 0.625rem;
+  --codex-ui-conversation-thread-assistant-actions-gap: 0.1875rem;
   --codex-ui-conversation-thread-user-turn-gap: 2.125rem;
   --codex-ui-item-gap: calc(var(--codex-ui-spacing) * 4);
   --codex-ui-group-gap: var(--codex-ui-spacing);
@@ -387,7 +388,10 @@
   color-scheme: dark;
   --codex-ui-app-sidebar-attention: #83c3ff;
   --codex-ui-conversation-thread-background: #171717;
-  --codex-ui-conversation-thread-composer-background: #282828;
+  --codex-ui-conversation-thread-composer-background: oklab(
+    0.297161 0.0000135154 0.00000594556 / 0.864706
+  );
+  --codex-ui-conversation-thread-composer-surface-overlay: rgb(0 0 0 / 0.12);
   --codex-ui-conversation-thread-header-border: #3b3b3b;
   --codex-ui-code-syntax-comment-style: normal;
   --codex-ui-background-surface: var(--codex-ui-gray-900);
@@ -513,7 +517,10 @@
     color-scheme: dark;
     --codex-ui-app-sidebar-attention: #83c3ff;
     --codex-ui-conversation-thread-background: #171717;
-    --codex-ui-conversation-thread-composer-background: #282828;
+    --codex-ui-conversation-thread-composer-background: oklab(
+      0.297161 0.0000135154 0.00000594556 / 0.864706
+    );
+    --codex-ui-conversation-thread-composer-surface-overlay: rgb(0 0 0 / 0.12);
     --codex-ui-conversation-thread-header-border: #3b3b3b;
     --codex-ui-code-syntax-comment-style: normal;
     --codex-ui-background-surface: var(--codex-ui-gray-900);
