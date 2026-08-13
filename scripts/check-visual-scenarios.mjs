@@ -1,5 +1,4 @@
 import { createServer } from "node:http";
-import { spawnSync } from "node:child_process";
 import {
   existsSync,
   mkdirSync,
@@ -13,6 +12,7 @@ import { fileURLToPath } from "node:url";
 import pixelmatch from "pixelmatch";
 import { PNG } from "pngjs";
 import puppeteer from "puppeteer-core";
+import { findChromeExecutable } from "./browser-executable.mjs";
 
 const root = fileURLToPath(new URL("../", import.meta.url));
 const demoRoot = join(root, "demo/dist");
@@ -126,25 +126,6 @@ function geometryViolations(geometry, scenario) {
     }
   }
   return violations;
-}
-
-function findExecutable(command) {
-  const result = spawnSync("which", [command], { encoding: "utf8" });
-  if (result.status !== 0) return undefined;
-  return result.stdout.trim() || undefined;
-}
-
-function findChrome() {
-  const candidates = [
-    process.env.PUPPETEER_EXECUTABLE_PATH,
-    "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
-    "/Applications/Chromium.app/Contents/MacOS/Chromium",
-    findExecutable("google-chrome"),
-    findExecutable("google-chrome-stable"),
-    findExecutable("chromium"),
-    findExecutable("chromium-browser"),
-  ];
-  return candidates.find((candidate) => candidate && existsSync(candidate));
 }
 
 function createDemoServer() {
@@ -288,7 +269,7 @@ function mismatchRegions(diff, scenario) {
   });
 }
 
-const chrome = findChrome();
+const chrome = findChromeExecutable();
 if (!chrome) {
   throw new Error("Chrome or Chromium is required for visual scenarios.");
 }

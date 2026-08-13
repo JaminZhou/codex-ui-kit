@@ -1,9 +1,9 @@
 import { createServer } from "node:http";
-import { spawnSync } from "node:child_process";
-import { existsSync, readFileSync } from "node:fs";
+import { readFileSync } from "node:fs";
 import { extname, join, normalize, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 import puppeteer from "puppeteer-core";
+import { findChromeExecutable } from "./browser-executable.mjs";
 
 const root = fileURLToPath(new URL("../", import.meta.url));
 const demoRoot = join(root, "demo/dist");
@@ -14,18 +14,7 @@ const contentTypes = new Map([
   [".png", "image/png"],
 ]);
 
-function which(command) {
-  const result = spawnSync("which", [command], { encoding: "utf8" });
-  return result.status === 0 ? result.stdout.trim() : undefined;
-}
-
-const executablePath = [
-  process.env.PUPPETEER_EXECUTABLE_PATH,
-  "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
-  "/Applications/Chromium.app/Contents/MacOS/Chromium",
-  which("google-chrome"),
-  which("chromium"),
-].find((candidate) => candidate && existsSync(candidate));
+const executablePath = findChromeExecutable();
 if (!executablePath) throw new Error("Chrome or Chromium is required.");
 
 const server = createServer((request, response) => {
