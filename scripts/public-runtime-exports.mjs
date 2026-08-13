@@ -19,6 +19,7 @@ export const publicRuntimeExports = [
   "AppSidebarProjectGroup",
   "AppSidebarSection",
   "AppWindowChrome",
+  "AppearanceSettingsPage",
   "ApprovalCommandPreview",
   "ApprovalRequest",
   "ArtifactList",

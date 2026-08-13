@@ -13,6 +13,7 @@ import {
   AppSidebarProjectGroup,
   AppSidebarSection,
   AppWindowChrome,
+  AppearanceSettingsPage,
   ApprovalRequest,
   AutomaticApprovalReview,
   BranchCreationDialog,
@@ -86,6 +87,7 @@ import {
   type TerminalEntry,
   type AppRouteOutletStatus,
   type AppSidebarWorktreeStatus,
+  type AppearanceSettingsValue,
   type ComposerPermissionOption,
   type ComposerModeKind,
   type ComposerResourceGroup,
@@ -1728,7 +1730,7 @@ export function App() {
         : "local",
     );
   const [workspacePage, setWorkspacePage] = useState<
-    "conversation" | "environments" | "git-settings"
+    "appearance-settings" | "conversation" | "environments" | "git-settings"
   >(
     initialSelection.view === "workspace" &&
       initialSelection.frame === "workspace-environments-unavailable"
@@ -1738,10 +1740,17 @@ export function App() {
             initialSelection.frame ?? "",
           )
         ? "git-settings"
+      : initialSelection.view === "workspace" &&
+          initialSelection.frame?.startsWith("workspace-appearance-settings")
+        ? "appearance-settings"
       : "conversation",
   );
   const [settingsQuery, setSettingsQuery] = useState("");
-  const [selectedSettingsId, setSelectedSettingsId] = useState("git");
+  const [selectedSettingsId, setSelectedSettingsId] = useState(
+    initialSelection.frame?.startsWith("workspace-appearance-settings")
+      ? "appearance"
+      : "git",
+  );
   const [settingsRouteFocusPending, setSettingsRouteFocusPending] =
     useState(false);
   const settingsBackButtonRef = useRef<HTMLButtonElement>(null);
@@ -1754,6 +1763,38 @@ export function App() {
     pullRequestInstructions: "",
     reviewDelivery: "inline",
   });
+  const [appearanceSettings, setAppearanceSettings] =
+    useState<AppearanceSettingsValue>({
+      codeFontSize: 12,
+      dark: {
+        accent: "#339CFF",
+        background: "#181818",
+        codeFont: 'ui-monospace, "SFMono-Regular"',
+        codeTheme: "Codex",
+        contrast: 60,
+        foreground: "#FFFFFF",
+        translucentSidebar: true,
+        uiFont: "-apple-system, BlinkMacSystemFont",
+      },
+      diffMarkers: "color",
+      dockIcon: "codex",
+      fontSmoothing: true,
+      light: {
+        accent: "#339CFF",
+        background: "#FFFFFF",
+        codeFont: 'ui-monospace, "SFMono-Regular"',
+        codeTheme: "Codex",
+        contrast: 45,
+        foreground: "#1A1C1F",
+        translucentSidebar: true,
+        uiFont: "-apple-system, BlinkMacSystemFont",
+      },
+      reduceMotion: "system",
+      theme: "system",
+      uiFontSize: 14,
+      usePointerCursors: false,
+    });
+  const [appearanceThemeAction, setAppearanceThemeAction] = useState("");
   const [savedCommitInstructions, setSavedCommitInstructions] = useState("");
   const [savedPullRequestInstructions, setSavedPullRequestInstructions] =
     useState("");
@@ -5043,6 +5084,10 @@ export function App() {
   const workspaceBaseFrame =
     workspacePage === "environments"
       ? "workspace-environments-unavailable"
+      : workspacePage === "appearance-settings"
+        ? initialSelection.frame?.startsWith("workspace-appearance-settings")
+          ? initialSelection.frame
+          : "workspace-appearance-settings"
       : workspacePage === "git-settings"
         ? initialSelection.frame === "workspace-git-settings-compact"
           ? "workspace-git-settings-compact"
@@ -5087,13 +5132,31 @@ export function App() {
     workspaceOverlay,
   ]);
   useEffect(() => {
-    if (workspacePage !== "git-settings" || !settingsRouteFocusPending) return;
+    if (
+      !["appearance-settings", "git-settings"].includes(workspacePage) ||
+      !settingsRouteFocusPending
+    ) return;
     const timer = window.setTimeout(() => {
       settingsBackButtonRef.current?.focus();
       setSettingsRouteFocusPending(false);
     });
     return () => window.clearTimeout(timer);
   }, [settingsRouteFocusPending, workspacePage]);
+  useEffect(() => {
+    if (
+      workspacePage !== "appearance-settings" ||
+      !activeFrame?.startsWith("workspace-appearance-settings")
+    ) {
+      return;
+    }
+    const scrollOwner = document.querySelector<HTMLElement>(
+      ".codex-ui-settings-shell__main",
+    );
+    if (!scrollOwner) return;
+    scrollOwner.scrollTop = activeFrame?.endsWith("-preferences")
+      ? scrollOwner.scrollHeight
+      : 0;
+  }, [activeFrame, workspacePage]);
   const setWorkspaceOverlayState = (
     overlay:
       | "environment"
@@ -6275,7 +6338,7 @@ export function App() {
       resultLabel,
     })),
   }));
-  const workspaceGitSettingsRoute = (
+  const workspaceSettingsRoute = (
     <SettingsShell
       backIcon={<CurrentBuildIcon name="settings-back" />}
       backButtonRef={settingsBackButtonRef}
@@ -6290,42 +6353,77 @@ export function App() {
       }}
       onQueryChange={setSettingsQuery}
       onSelect={(itemId) => {
-        if (itemId !== "git") return;
+        if (itemId !== "appearance" && itemId !== "git") return;
         setSelectedSettingsId(itemId);
+        setWorkspacePage(
+          itemId === "appearance" ? "appearance-settings" : "git-settings",
+        );
+        setActiveFrame(
+          itemId === "appearance"
+            ? "workspace-appearance-settings"
+            : "workspace-git-settings",
+        );
       }}
       query={settingsQuery}
       searchIcon={<CurrentBuildIcon name="settings-search" />}
       sections={settingsNavigation}
       selectedId={selectedSettingsId}
     >
-      <GitSettingsPage
-        commitInstructionsDirty={
-          gitSettings.commitInstructions !== savedCommitInstructions
-        }
-        onChange={setGitSettings}
-        onSaveCommitInstructions={() =>
-          setSavedCommitInstructions(gitSettings.commitInstructions)
-        }
-        onSavePullRequestInstructions={() =>
-          setSavedPullRequestInstructions(gitSettings.pullRequestInstructions)
-        }
-        pullRequestInstructionsDirty={
-          gitSettings.pullRequestInstructions !== savedPullRequestInstructions
-        }
-        value={gitSettings}
-      />
+      {workspacePage === "appearance-settings" ? (
+        <>
+          <AppearanceSettingsPage
+            chatGptDockIcon={<CurrentBuildIcon name="settings-account" />}
+            codexDockIcon={
+              <span className="demo-codex-dock-icon" aria-hidden="true">
+                C
+              </span>
+            }
+            onChange={setAppearanceSettings}
+            onCopyTheme={(theme) =>
+              setAppearanceThemeAction(`${theme} theme copied`)
+            }
+            onImportTheme={(theme) =>
+              setAppearanceThemeAction(`${theme} theme import requested`)
+            }
+            value={appearanceSettings}
+          />
+          <span aria-live="polite" className="demo-settings-action-status">
+            {appearanceThemeAction}
+          </span>
+        </>
+      ) : (
+        <GitSettingsPage
+          commitInstructionsDirty={
+            gitSettings.commitInstructions !== savedCommitInstructions
+          }
+          onChange={setGitSettings}
+          onSaveCommitInstructions={() =>
+            setSavedCommitInstructions(gitSettings.commitInstructions)
+          }
+          onSavePullRequestInstructions={() =>
+            setSavedPullRequestInstructions(gitSettings.pullRequestInstructions)
+          }
+          pullRequestInstructionsDirty={
+            gitSettings.pullRequestInstructions !== savedPullRequestInstructions
+          }
+          value={gitSettings}
+        />
+      )}
     </SettingsShell>
   );
   const workspaceRoute =
     workspacePage === "environments"
       ? workspaceEnvironmentSettingsRoute
-      : workspacePage === "git-settings"
-        ? workspaceGitSettingsRoute
+      : workspacePage === "git-settings" ||
+          workspacePage === "appearance-settings"
+        ? workspaceSettingsRoute
       : projectIndexChatRoute
         ? projectIndexChatRoute
         : workspacePersistenceFrame
           ? workspacePersistedThread
           : workspaceNewConversationRoute;
+  const workspaceShowsSettings =
+    workspacePage === "appearance-settings" || workspacePage === "git-settings";
 
   const projectIndexStatus =
     activeFrame === "projects-index-loading"
@@ -8906,9 +9004,9 @@ export function App() {
             : undefined
         }
         mainLabel={
-          workspacePage === "git-settings" ? "Settings route" : undefined
+          workspaceShowsSettings ? "Settings route" : undefined
         }
-        mainRole={workspacePage === "git-settings" ? "region" : "main"}
+        mainRole={workspaceShowsSettings ? "region" : "main"}
         narrowSidebarBehavior="current-build"
         onSidebarOpenChange={setSidebarOpen}
         onSidePanelOpenChange={
@@ -8986,7 +9084,7 @@ export function App() {
         sidebarResizable
         windowChrome={
           view === "projects" || view === "shell" || view === "workspace" ? (
-            view === "workspace" && workspacePage === "git-settings" ? null : (
+            view === "workspace" && workspaceShowsSettings ? null : (
             <AppWindowChrome
               backAction={
                 view === "workspace" && workspacePage === "environments"

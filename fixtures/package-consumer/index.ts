@@ -17,6 +17,8 @@ import {
   AppSidebarSection,
   AppWindowChrome,
   type AppWindowChromeAction,
+  AppearanceSettingsPage,
+  type AppearanceSettingsValue,
   ArtifactList,
   ApprovalCommandPreview,
   ApprovalRequest,
@@ -156,6 +158,8 @@ import {
 import "codex-ui-kit/styles.css";
 import "codex-ui-kit/tokens.css";
 
+declare const appearanceSettingsValue: AppearanceSettingsValue;
+
 const line: FileDiffLine = {
   content: "package contract",
   kind: "context",
@@ -272,6 +276,8 @@ const appNotification: AppNotification = {
 void AppNotificationRegion;
 void AppRouteOutlet;
 void AppWindowChrome;
+void AppearanceSettingsPage;
+void appearanceSettingsValue;
 void appNotification;
 void appRouteOutletAction;
 void appWindowChromeAction;

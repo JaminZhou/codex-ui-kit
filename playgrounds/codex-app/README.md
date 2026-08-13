@@ -792,7 +792,7 @@ The current-product mutation itself remains a separate runtime gate until the
 isolated native project selector can attach the disposable repository. Raw
 screenshots and product project names remain local-only.
 
-## Current Settings and Git slice
+## Current Settings, Git, and Appearance slices
 
 - Branch → Set prefix now opens the independent full-page `SettingsShell` and
   `GitSettingsPage`; Back restores the app and the branch workflow continues.
@@ -806,6 +806,15 @@ screenshots and product project names remain local-only.
 - Reviewed internal dark wide/compact and light wide baselines pass. Optional
   local-only product gates pass at 2.4214% and 3.0210%; screenshots are never
   tracked.
+- The Appearance route adds three responsive theme previews, the two-column
+  diff preview, Light/Dark editors, all sixteen current code themes, and the
+  complete Preferences card. Browser/CDP and Electron verify controlled
+  radio/switch/range/number/keyboard behavior plus Git ↔ Appearance state
+  continuity. Wide, light, 720px, and bottom-scrolled reviewed frames extend
+  the matrix to 174.
+- Optional current-product Appearance gates pass at 1.2787% wide, 1.8977% at
+  720px, and 3.4665% for Preferences after ownership masks. Product Dock
+  rasters remain local-only and are supplied through public icon slots.
 
 ## Current environment-entry slice
 
@@ -884,6 +893,19 @@ CODEX_UI_KIT_GIT_SETTINGS_REFERENCE=/absolute/path/to/git-settings-wide.png \
 CODEX_UI_KIT_GIT_SETTINGS_COMPACT_REFERENCE=/absolute/path/to/git-settings-compact.png \
   pnpm --filter @codex-ui-kit/codex-app-playground check:visual -- \
   --scenes=workspace-git-settings,workspace-git-settings-compact
+```
+
+The Appearance gates accept wide, 720×680, and bottom-scrolled full-window
+references. Preview interiors, private text fields, and proprietary Dock
+artwork are masked; geometry, scroll ownership, selection borders, cards,
+separators, and remaining controls stay pixel-gated:
+
+```bash
+CODEX_UI_KIT_APPEARANCE_SETTINGS_REFERENCE=/absolute/path/to/appearance-wide.png \
+CODEX_UI_KIT_APPEARANCE_SETTINGS_COMPACT_REFERENCE=/absolute/path/to/appearance-compact.png \
+CODEX_UI_KIT_APPEARANCE_SETTINGS_PREFERENCES_REFERENCE=/absolute/path/to/appearance-preferences.png \
+  pnpm --filter @codex-ui-kit/codex-app-playground check:visual -- \
+  --scenes=workspace-appearance-settings,workspace-appearance-settings-compact,workspace-appearance-settings-preferences
 ```
 
 To run the optional current-build multi-file pixel gate, keep the raw

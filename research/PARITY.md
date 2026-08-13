@@ -7,8 +7,8 @@ not establish full conversation, workspace, application, or product coverage.
 The authoritative current-build inventory is:
 
 - [`26.803.61601.md`](26.803.61601.md) for the current package fingerprint,
-  reproducible global-shell baseline, revalidated scoped visual assets, and
-  same-state dark-shell acceptance;
+  reproducible global-shell baseline, revalidated scoped visual assets,
+  Settings/Git/Appearance, and same-state dark-shell acceptance;
 - [`26.803.41515.md`](26.803.41515.md) for the previous Markdown table,
   attachment, MCP, sidebar/Composer, and window-chrome captures;
 - [`26.730.61639.md`](26.730.61639.md) for the previous Terminal
@@ -104,6 +104,17 @@ The authoritative current-build inventory is:
   current-product comparisons at 2.4214% and 3.0210%. Hooks and all other
   Settings pages remain separate, so this raises the scoped asset manifest to
   77 without closing the broader P1 denominator.
+- The next read-only capture splits Appearance from General and reaches its
+  complete top-to-bottom scroll surface at 1180, 820, and 720 widths. The
+  controlled public page covers three theme radios/previews, Light/Dark theme
+  editors, the sixteen-option code-theme menu, diff preview, four switches,
+  two contrast ranges, Dock radios, keyboard groups, and bounded font-size
+  fields. Browser/CDP and Electron prove Git ↔ Appearance routing and retained
+  state; four reviewed frames bring the matrix to 174. Local-only wide,
+  compact, and Preferences comparisons pass at 1.2787%, 1.8977%, and 3.4665%.
+  Dock rasters remain host-owned/untracked, so exact navigation provenance is
+  preserved without importing proprietary product artwork. General, Hooks,
+  and the other Settings rows remain open.
 - Computer Use exploration is blocked by the environment safety policy for
   `com.openai.codex`. User-authorized CDP probes on `26.721.41059` revalidated
   access, the main-shell target shape, a de-identified Projects entry/list,
