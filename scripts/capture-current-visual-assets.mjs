@@ -206,7 +206,6 @@ try {
   await main.setViewportSize({ height: 820, width: 1180 });
   await main.waitForFunction(
     () =>
-      Boolean(document.querySelector("main")) &&
       Boolean(document.querySelector("nav")) &&
       document.querySelectorAll("svg").length > 0,
     undefined,
@@ -217,11 +216,18 @@ try {
     0
   ) {
     const backToApp = main.locator('button[aria-label="Back to ChatGPT"]');
-    if ((await backToApp.count()) === 1) {
+    const backToAppFallback = main.getByText("Back to app", { exact: true });
+    const backToAppControl =
+      (await backToApp.count()) === 1
+        ? backToApp
+        : (await backToAppFallback.count()) > 0
+          ? backToAppFallback.first()
+          : null;
+    if (backToAppControl) {
       // The native settings route intercepts a normal Playwright click while it
       // swaps back to the app shell. Dispatching the DOM activation preserves
       // that product path without waiting on a navigation that never commits.
-      await backToApp.evaluate((button) => button.click());
+      await backToAppControl.evaluate((control) => control.click());
       await main.waitForFunction(
         () => document.body.textContent?.includes("New chat") ?? false,
         undefined,
@@ -243,6 +249,29 @@ try {
     await main.waitForSelector('[contenteditable="true"][role="textbox"]', {
       timeout: 15_000,
     });
+  }
+  await main.waitForFunction(
+    () =>
+      Boolean(document.querySelector("main")) &&
+      Boolean(document.querySelector("nav")),
+    undefined,
+    { timeout: 15_000 },
+  );
+  const initialRunLocationTrigger = main.locator(
+    'main button[data-composer-navigation-target="run-location"]:visible',
+  );
+  if (
+    (await initialRunLocationTrigger.count()) === 1 &&
+    (await initialRunLocationTrigger.textContent())
+      ?.trim()
+      .endsWith("New worktree")
+  ) {
+    await initialRunLocationTrigger.click();
+    const initialWorkInMenu = main.locator('[role="menu"]:visible');
+    await initialWorkInMenu.waitFor();
+    await initialWorkInMenu
+      .getByRole("menuitem", { name: "Local", exact: true })
+      .click();
   }
   await main.evaluate(async () => {
     await document.fonts.ready;
@@ -601,6 +630,114 @@ try {
         },
       };
     };
+    const captureSettingsNavigationIcons = ({ items }) => {
+      const navigations = [...document.querySelectorAll("nav")].filter(
+        isActuallyVisible,
+      );
+      if (navigations.length !== 1) {
+        throw new Error(
+          `Expected one visible settings navigation, received ${navigations.length}.`,
+        );
+      }
+      const navigation = navigations[0];
+      const captureSvg = (svg, semanticId, ownerRole) => {
+        const bounds = svg.getBoundingClientRect();
+        return {
+          owner: { role: ownerRole, semanticId },
+          primitives: [...svg.children].map(serializeSvgElement),
+          region: "settings-navigation",
+          rect: rect(svg),
+          renderSize: {
+            height: round(bounds.height),
+            width: round(bounds.width),
+          },
+          rootAttributes: attributes(svg, true),
+          rootComputedStyle: computedStyle(svg),
+          sourceClassName: svg.getAttribute("class") ?? "",
+          viewBox: svg.getAttribute("viewBox"),
+        };
+      };
+      const icons = items.flatMap(({ id, label, secondaryId }) => {
+        const controls = [...navigation.querySelectorAll("button")].filter(
+          (button) =>
+            button.getAttribute("aria-label") === label &&
+            isActuallyVisible(button),
+        );
+        if (controls.length !== 1) {
+          throw new Error(
+            `Expected one visible settings item ${label}, received ${controls.length}.`,
+          );
+        }
+        const svgs = [...controls[0].querySelectorAll("svg")].filter(
+          isActuallyVisible,
+        );
+        const expectedSvgCount = secondaryId ? 2 : 1;
+        if (svgs.length !== expectedSvgCount) {
+          throw new Error(
+            `Expected ${expectedSvgCount} visible settings icons for ${label}, received ${svgs.length}.`,
+          );
+        }
+        return [
+          captureSvg(svgs[0], id, "button"),
+          ...(secondaryId
+            ? [captureSvg(svgs[1], secondaryId, "button")]
+            : []),
+        ];
+      });
+      const searchboxes = [
+        ...navigation.querySelectorAll('[role="searchbox"]'),
+      ].filter(isActuallyVisible);
+      if (searchboxes.length !== 1) {
+        throw new Error(
+          `Expected one visible settings searchbox, received ${searchboxes.length}.`,
+        );
+      }
+      const searchSvgs = [
+        ...(searchboxes[0].parentElement?.querySelectorAll("svg") ?? []),
+      ].filter(isActuallyVisible);
+      if (searchSvgs.length !== 1) {
+        throw new Error(
+          `Expected one visible settings search icon, received ${searchSvgs.length}.`,
+        );
+      }
+      icons.unshift(captureSvg(searchSvgs[0], "settings-search", "searchbox"));
+
+      const backSvgs = [...navigation.querySelectorAll("svg")].filter((svg) => {
+        if (!isActuallyVisible(svg)) return false;
+        for (
+          let current = svg.parentElement;
+          current && current !== navigation;
+          current = current.parentElement
+        ) {
+          const bounds = current.getBoundingClientRect();
+          if (
+            current.textContent?.trim() === "Back to app" &&
+            bounds.height > 0 &&
+            bounds.height <= 48
+          ) {
+            return true;
+          }
+        }
+        return false;
+      });
+      if (backSvgs.length !== 1) {
+        throw new Error(
+          `Expected one visible settings Back to app icon, received ${backSvgs.length}.`,
+        );
+      }
+      icons.unshift(captureSvg(backSvgs[0], "settings-back", "button"));
+      return {
+        icons,
+        observation: {
+          iconCount: icons.length,
+          itemCount: items.length,
+          navigationRect: rect(navigation),
+          selectedLabels: [...navigation.querySelectorAll('button[aria-current="page"]')]
+            .map((button) => button.getAttribute("aria-label"))
+            .filter(Boolean),
+        },
+      };
+    };
     Object.defineProperty(window, "__codexUiKitCaptureVisibleMenuIcons", {
       configurable: true,
       value: captureVisibleMenuIcons,
@@ -608,6 +745,10 @@ try {
     Object.defineProperty(window, "__codexUiKitCaptureVisibleMenuIconSlots", {
       configurable: true,
       value: captureVisibleMenuIconSlots,
+    });
+    Object.defineProperty(window, "__codexUiKitCaptureSettingsNavigationIcons", {
+      configurable: true,
+      value: captureSettingsNavigationIcons,
     });
     const navigation = document.querySelector("nav");
     const recentsSections = [
@@ -1229,11 +1370,182 @@ try {
         },
       };
     });
-    const backToApp = main.locator('button[aria-label="Back to ChatGPT"]');
-    if ((await backToApp.count()) !== 1) {
-      throw new Error("Environment settings route lost its Back to ChatGPT control.");
+    const settingsNavigationItems = [
+      { id: "settings-general", label: "General" },
+      { id: "settings-import", label: "Import" },
+      { id: "settings-profile", label: "Profile" },
+      { id: "settings-appearance", label: "Appearance" },
+      { id: "settings-voice", label: "Voice" },
+      { id: "settings-configuration", label: "Configuration" },
+      { id: "settings-personalization", label: "Personalization" },
+      { id: "settings-pets", label: "Pets" },
+      { id: "settings-keyboard-shortcuts", label: "Keyboard shortcuts" },
+      { id: "settings-usage-billing", label: "Usage & billing" },
+      {
+        id: "settings-account",
+        label: "Account",
+        secondaryId: "settings-account-external",
+      },
+      { id: "settings-appshots", label: "Appshots" },
+      { id: "settings-plugins", label: "Plugins" },
+      { id: "settings-browser", label: "Browser" },
+      { id: "settings-computer-use", label: "Computer use" },
+      { id: "settings-hooks", label: "Hooks" },
+      { id: "settings-connections", label: "Connections" },
+      { id: "settings-git", label: "Git" },
+      { id: "settings-environments", label: "Environments" },
+      { id: "settings-worktrees", label: "Worktrees" },
+      { id: "settings-archived-chats", label: "Archived chats" },
+    ];
+    const gitNavigation = main.getByRole("button", {
+      name: "Git",
+      exact: true,
+    });
+    if ((await gitNavigation.count()) !== 1) {
+      throw new Error("Settings route lost its unique Git navigation item.");
     }
-    await backToApp.evaluate((button) => button.click());
+    await gitNavigation.click();
+    await main.getByRole("heading", { name: "Git", exact: true }).waitFor();
+    const settingsCapture = await main.evaluate(
+      (items) => window.__codexUiKitCaptureSettingsNavigationIcons({ items }),
+      settingsNavigationItems,
+    );
+    const settingsPageObservation = await main.evaluate(() => {
+      const round = (value) => Math.round(value * 100) / 100;
+      const visible = (element) => {
+        const bounds = element.getBoundingClientRect();
+        return bounds.width > 0 && bounds.height > 0;
+      };
+      const rect = (element) => {
+        if (!element) return null;
+        const bounds = element.getBoundingClientRect();
+        return {
+          height: round(bounds.height),
+          left: round(bounds.left),
+          top: round(bounds.top),
+          width: round(bounds.width),
+        };
+      };
+      const style = (element) => {
+        if (!element) return null;
+        const computed = getComputedStyle(element);
+        return {
+          backgroundColor: computed.backgroundColor,
+          borderColor: computed.borderColor,
+          borderRadius: computed.borderRadius,
+          color: computed.color,
+          fontFamily: computed.fontFamily,
+          fontSize: computed.fontSize,
+          fontWeight: computed.fontWeight,
+          lineHeight: computed.lineHeight,
+          overflowX: computed.overflowX,
+          overflowY: computed.overflowY,
+          padding: computed.padding,
+        };
+      };
+      const heading = document.querySelector("h1");
+      const navigation = document.querySelector("nav");
+      const searchbox = navigation?.querySelector('[role="searchbox"]') ?? null;
+      const branchPrefix = document.querySelector('input[placeholder="codex/"]');
+      const firstCard = branchPrefix?.closest("section") ??
+        branchPrefix?.parentElement?.parentElement ??
+        null;
+      const controls = [...document.querySelectorAll("button, input, textarea")]
+        .filter(visible)
+        .filter((element) => !navigation?.contains(element))
+        .map((element) => ({
+          ariaChecked: element.getAttribute("aria-checked"),
+          ariaLabel: element.getAttribute("aria-label"),
+          disabled:
+            "disabled" in element && typeof element.disabled === "boolean"
+              ? element.disabled
+              : null,
+          placeholder:
+            element instanceof HTMLInputElement ||
+            element instanceof HTMLTextAreaElement
+              ? element.placeholder
+              : null,
+          rect: rect(element),
+          role: element.getAttribute("role"),
+          tagName: element.tagName,
+          text:
+            element instanceof HTMLInputElement ||
+            element instanceof HTMLTextAreaElement
+              ? "<redacted-value>"
+              : element.textContent?.trim() ?? "",
+        }));
+      let scrollOwner = navigation?.querySelector('button[aria-label="Git"]')
+        ?.parentElement ?? null;
+      while (scrollOwner) {
+        const computed = getComputedStyle(scrollOwner);
+        if (
+          ["auto", "scroll"].includes(computed.overflowY) &&
+          scrollOwner.scrollHeight > scrollOwner.clientHeight
+        ) {
+          break;
+        }
+        scrollOwner = scrollOwner.parentElement;
+      }
+      return {
+        controls,
+        document: {
+          horizontalOverflow:
+            document.documentElement.scrollWidth -
+            document.documentElement.clientWidth,
+          viewport: { height: window.innerHeight, width: window.innerWidth },
+        },
+        firstCard: { rect: rect(firstCard), style: style(firstCard) },
+        heading: {
+          rect: rect(heading),
+          style: style(heading),
+          text: heading?.textContent?.trim() ?? null,
+        },
+        navigation: { rect: rect(navigation), style: style(navigation) },
+        navigationLabels: [
+          ...(navigation?.querySelectorAll("button[aria-label]") ?? []),
+        ].map((button) => button.getAttribute("aria-label")),
+        scrollOwner: scrollOwner
+          ? {
+              clientHeight: scrollOwner.clientHeight,
+              rect: rect(scrollOwner),
+              scrollHeight: scrollOwner.scrollHeight,
+              style: style(scrollOwner),
+            }
+          : null,
+        searchbox: { rect: rect(searchbox), style: style(searchbox) },
+      };
+    });
+    const settingsSearch = main.getByRole("searchbox");
+    await settingsSearch.fill("git");
+    await main.waitForTimeout(150);
+    const searchResultLines = await main.locator("nav").evaluate((navigation) =>
+      navigation.innerText
+        .split("\n")
+        .map((line) => line.trim())
+        .filter(Boolean),
+    );
+    await settingsSearch.fill("");
+    await main.waitForTimeout(100);
+    const settingsObservation = {
+      ...settingsCapture.observation,
+      page: settingsPageObservation,
+      search: {
+        query: "git",
+        resultLines: searchResultLines,
+      },
+    };
+    const backToApp = main.locator('button[aria-label="Back to ChatGPT"]');
+    const backToAppFallback = main.getByText("Back to app", { exact: true });
+    const backToAppControl =
+      (await backToApp.count()) === 1
+        ? backToApp
+        : (await backToAppFallback.count()) > 0
+          ? backToAppFallback.first()
+          : null;
+    if (!backToAppControl) {
+      throw new Error("Settings route lost its Back to app control.");
+    }
+    await backToAppControl.evaluate((control) => control.click());
     await main.waitForSelector('[contenteditable="true"][role="textbox"]', {
       timeout: 15_000,
     });
@@ -1260,6 +1572,7 @@ try {
     result.icons.push(...projectMenuIcons, ...helpMenuIcons);
     result.icons.push(...accountMenuCapture.icons);
     result.icons.push(...workInCapture.icons, ...environmentCapture.icons);
+    result.icons.push(...settingsCapture.icons);
     result.sidebarObservation.projectMenuItemCount = projectMenuIcons.length;
     result.sidebarObservation.projectMenuHasMarkAllAsRead =
       projectMenuHasMarkAllAsRead;
@@ -1270,6 +1583,7 @@ try {
       environmentSettings: environmentSettingsObservation,
       workInMenu: workInCapture.observation,
     };
+    result.settingsObservation = settingsObservation;
   } finally {
     if ((await main.locator('[role="menu"]:visible').count()) > 0) {
       await main.keyboard.press("Escape").catch(() => {});
@@ -1278,6 +1592,7 @@ try {
       .evaluate(() => {
         delete window.__codexUiKitCaptureVisibleMenuIcons;
         delete window.__codexUiKitCaptureVisibleMenuIconSlots;
+        delete window.__codexUiKitCaptureSettingsNavigationIcons;
       })
       .catch(() => {});
   }
@@ -1313,6 +1628,16 @@ try {
       sanitizeVisualScalarRecord(
         observation.style,
         `capture.workspaceObservation.environmentSettings.${surface}.style`,
+      );
+    }
+  }
+  for (const [surface, observation] of Object.entries(
+    result.settingsObservation?.page ?? {},
+  )) {
+    if (observation?.style) {
+      sanitizeVisualScalarRecord(
+        observation.style,
+        `capture.settingsObservation.page.${surface}.style`,
       );
     }
   }

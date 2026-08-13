@@ -455,6 +455,41 @@ const promotionSpecs = new Map([
       semanticId: "workspace-environment-settings",
     },
   ],
+  ...[
+    "settings-back",
+    "settings-search",
+    "settings-general",
+    "settings-import",
+    "settings-profile",
+    "settings-appearance",
+    "settings-voice",
+    "settings-configuration",
+    "settings-personalization",
+    "settings-pets",
+    "settings-keyboard-shortcuts",
+    "settings-usage-billing",
+    "settings-account",
+    "settings-account-external",
+    "settings-appshots",
+    "settings-plugins",
+    "settings-browser",
+    "settings-computer-use",
+    "settings-hooks",
+    "settings-connections",
+    "settings-git",
+    "settings-environments",
+    "settings-worktrees",
+    "settings-archived-chats",
+  ].map((id) => [
+    id,
+    {
+      ownerAriaLabel: null,
+      ownerEvidence:
+        "fixed current Git Settings navigation icon selected by exact structural ownership",
+      region: "settings-navigation",
+      semanticId: id,
+    },
+  ]),
 ]);
 
 const manifest = JSON.parse(readFileSync(manifestPath, "utf8"));
@@ -548,6 +583,42 @@ if (
     `Unexpected current workspace environment capture: ${canonicalize(workspaceObservation)}`,
   );
 }
+const expectedSettingsIds = [...promotionSpecs.entries()]
+  .filter(([, spec]) => spec.region === "settings-navigation")
+  .map(([id]) => id)
+  .sort();
+const capturedSettingsIds = capture.icons
+  .filter(({ region }) => region === "settings-navigation")
+  .map(({ owner }) => owner.semanticId)
+  .sort();
+const settingsObservation = capture.settingsObservation;
+if (
+  canonicalize(capturedSettingsIds) !== canonicalize(expectedSettingsIds) ||
+  settingsObservation?.iconCount !== 24 ||
+  settingsObservation?.itemCount !== 21 ||
+  canonicalize(settingsObservation?.selectedLabels) !== canonicalize(["Git"]) ||
+  settingsObservation?.page?.heading?.text !== "Git" ||
+  settingsObservation?.page?.document?.horizontalOverflow !== 0 ||
+  settingsObservation?.page?.document?.viewport?.width !== 1180 ||
+  settingsObservation?.page?.document?.viewport?.height !== 820 ||
+  settingsObservation?.page?.navigation?.rect?.width !== 322.91 ||
+  settingsObservation?.page?.searchbox?.rect?.width !== 258.91 ||
+  settingsObservation?.page?.controls?.filter(
+    ({ placeholder }) => placeholder === "codex/",
+  ).length !== 1 ||
+  settingsObservation?.page?.controls?.filter(
+    ({ role }) => role === "switch",
+  ).length !== 2 ||
+  settingsObservation?.search?.query !== "git" ||
+  !settingsObservation?.search?.resultLines?.includes("GitHub") ||
+  !settingsObservation?.search?.resultLines?.includes(
+    "Go to a line in the current file",
+  )
+) {
+  throw new Error(
+    `Unexpected current Git Settings capture: ${canonicalize({ capturedSettingsIds, expectedSettingsIds, settingsObservation })}`,
+  );
+}
 const baselineContext = capture.baselineContext;
 if (
   !baselineContext ||
@@ -568,8 +639,12 @@ const currentFingerprint = {
 };
 const fingerprintChanged =
   canonicalize(previousFingerprint) !== canonicalize(currentFingerprint);
+const settingsCaptureExpanded = !manifest.icons.some(
+  ({ id }) => id === "settings-git",
+);
 const captureContextChanged =
   fingerprintChanged ||
+  settingsCaptureExpanded ||
   manifest.baseline.interactionState !== baselineContext.interactionState ||
   manifest.baseline.theme !== baselineContext.theme ||
   canonicalize(manifest.baseline.viewport) !==
@@ -585,6 +660,7 @@ manifest.baseline = hashBaselineContext;
 manifest.composerObservation = capture.composerObservation;
 manifest.sidebarObservation = capture.sidebarObservation;
 manifest.workspaceObservation = workspaceObservation;
+manifest.settingsObservation = settingsObservation;
 
 function selectObservedIcon(id, spec, existing) {
   const regions = spec.regions ?? [spec.region];

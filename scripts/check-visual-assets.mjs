@@ -156,6 +156,17 @@ for (const [surface, observation] of Object.entries(
     `manifest.workspaceObservation.environmentSettings.${surface}.style`,
   );
 }
+for (const [surface, observation] of Object.entries(
+  manifest.settingsObservation?.page ?? {},
+)) {
+  if (!observation?.style) {
+    continue;
+  }
+  sanitizeVisualScalarRecord(
+    observation.style,
+    `manifest.settingsObservation.page.${surface}.style`,
+  );
+}
 if (
   manifest.policy?.packageBoundary !== "playground-only" ||
   manifest.policy?.globalPixelParityEligible !== false ||
@@ -226,7 +237,15 @@ for (const icon of manifest.icons ?? []) {
   if (!iconSource.includes(`| "${icon.id}"`) && !iconSource.includes(`name: "${icon.id}"`)) {
     throw new Error(`current-build renderer does not declare ${icon.id}`);
   }
-  if (!appSource.includes(`name="${icon.id}"`)) {
+  const renderedBySettingsNavigation =
+    icon.id.startsWith("settings-") &&
+    appSource.includes('name={`settings-${id}` as CurrentBuildIconName}') &&
+    (icon.id !== "settings-account-external" ||
+      appSource.includes('name="settings-account-external"'));
+  if (
+    !appSource.includes(`name="${icon.id}"`) &&
+    !renderedBySettingsNavigation
+  ) {
     throw new Error(`current-build playground does not render ${icon.id}`);
   }
 }
@@ -262,6 +281,8 @@ if (
   !captureSource.includes("composerStructuralSemanticIds") ||
   !captureSource.includes("composerBottomUnlabelledInputs.length === 2") ||
   !captureSource.includes("composerObservation") ||
+  !captureSource.includes("settingsObservation") ||
+  !captureSource.includes('region: "settings-navigation"') ||
   !captureSource.includes("checkOpacity: true") ||
   !captureSource.includes('targetRegion === "composer"') ||
   !captureSource.includes(
@@ -299,6 +320,8 @@ if (
   !updaterSource.includes("currentSidebarSettingsAbsenceProven") ||
   !updaterSource.includes("currentSidebarThreadAbsenceProven") ||
   !updaterSource.includes("manifest.composerObservation") ||
+  !updaterSource.includes("manifest.settingsObservation") ||
+  !updaterSource.includes("Unexpected current Git Settings capture") ||
   !updaterSource.includes("capturedComposerIds") ||
   !updaterSource.includes("Unexpected current Composer capture") ||
   !updaterSource.includes("remainingApproximationCandidates.add(id)") ||
@@ -361,19 +384,70 @@ for (const id of [
   "workspace-run-location-usage",
   "workspace-run-location-usage-chevron",
   "workspace-environment-settings",
+  "settings-back",
+  "settings-search",
+  "settings-general",
+  "settings-import",
+  "settings-profile",
+  "settings-appearance",
+  "settings-voice",
+  "settings-configuration",
+  "settings-personalization",
+  "settings-pets",
+  "settings-keyboard-shortcuts",
+  "settings-usage-billing",
+  "settings-account",
+  "settings-account-external",
+  "settings-appshots",
+  "settings-plugins",
+  "settings-browser",
+  "settings-computer-use",
+  "settings-hooks",
+  "settings-connections",
+  "settings-git",
+  "settings-environments",
+  "settings-worktrees",
+  "settings-archived-chats",
 ]) {
   if (!ids.has(id) || remaining.includes(id)) {
     throw new Error(`${id} must be promoted from current-build runtime evidence`);
   }
 }
 if (
-  manifest.icons.length !== 53 ||
+  manifest.icons.length !== 77 ||
   manifest.composerObservation?.topContextIconCount !== 3 ||
   manifest.composerObservation?.bottomActionIconCount !== 5 ||
   manifest.composerObservation?.exactSemanticIconCount !== 8
 ) {
   throw new Error(
     "current Composer capture must retain three context and five action icons with eight exact semantic mappings",
+  );
+}
+if (
+  manifest.settingsObservation?.iconCount !== 24 ||
+  manifest.settingsObservation?.itemCount !== 21 ||
+  canonicalize(manifest.settingsObservation?.selectedLabels) !==
+    canonicalize(["Git"]) ||
+  manifest.settingsObservation?.page?.heading?.text !== "Git" ||
+  manifest.settingsObservation?.page?.document?.horizontalOverflow !== 0 ||
+  manifest.settingsObservation?.page?.document?.viewport?.width !== 1180 ||
+  manifest.settingsObservation?.page?.document?.viewport?.height !== 820 ||
+  manifest.settingsObservation?.page?.navigation?.rect?.width !== 322.91 ||
+  manifest.settingsObservation?.page?.searchbox?.rect?.width !== 258.91 ||
+  manifest.settingsObservation?.page?.controls?.filter(
+    ({ role }) => role === "switch",
+  ).length !== 2 ||
+  manifest.settingsObservation?.page?.controls?.filter(
+    ({ tagName }) => tagName === "TEXTAREA",
+  ).length !== 2 ||
+  manifest.settingsObservation?.search?.query !== "git" ||
+  !manifest.settingsObservation?.search?.resultLines?.includes("GitHub") ||
+  !manifest.settingsObservation?.search?.resultLines?.includes(
+    "Right before ChatGPT ends its turn",
+  )
+) {
+  throw new Error(
+    "current Settings capture must retain navigation, Git controls, and grouped search evidence",
   );
 }
 const expectedProjectMenuItemCount = manifest.sidebarObservation

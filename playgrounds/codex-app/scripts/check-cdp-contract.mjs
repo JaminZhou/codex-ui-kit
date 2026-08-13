@@ -175,6 +175,215 @@ for (const scene of selectedScenes) {
         `${JSON.stringify(lightShell, null, 2)}\n`,
       );
     }
+    if (scene.id.startsWith("workspace-git-settings")) {
+      const settings = await page.evaluate(() => {
+        const rect = (selector) => {
+          const element = document.querySelector(selector);
+          if (!(element instanceof Element)) return null;
+          const value = element.getBoundingClientRect();
+          return {
+            height: value.height,
+            left: value.left,
+            top: value.top,
+            width: value.width,
+          };
+        };
+        return {
+          branchPrefix: rect('.codex-ui-git-settings input[aria-label="Branch prefix"]'),
+          card: rect(".codex-ui-git-settings__card"),
+          heading: rect(".codex-ui-git-settings > h1"),
+          horizontalOverflow:
+            document.documentElement.scrollWidth -
+            document.documentElement.clientWidth,
+          iconNames: Array.from(
+            document.querySelectorAll(
+              ".codex-ui-settings-shell__navigation [data-current-build-icon]",
+            ),
+            (icon) => icon.getAttribute("data-current-build-icon"),
+          ),
+          mainCount: document.querySelectorAll('main, [role="main"]').length,
+          outerRegionCount: document.querySelectorAll(
+            '[role="region"][aria-label="Settings route"]',
+          ).length,
+          navigation: rect(".codex-ui-settings-shell__navigation"),
+          navigationCount: document.querySelectorAll(
+            'nav[aria-label="Settings"]',
+          ).length,
+          searchbox: rect('[role="searchbox"]'),
+          selected: document
+            .querySelector('.codex-ui-settings-shell__item[aria-current="page"]')
+            ?.getAttribute("aria-label"),
+          switchStates: Array.from(
+            document.querySelectorAll('[role="switch"]'),
+            (control) => ({
+              label: control.getAttribute("aria-label"),
+              value: control.getAttribute("aria-checked"),
+            }),
+          ),
+          textareaCount: document.querySelectorAll(
+            ".codex-ui-git-settings textarea",
+          ).length,
+          theme: document
+            .querySelector(".demo-root")
+            ?.getAttribute("data-theme"),
+          visualStyles: Object.fromEntries(
+            [
+              ["shell", ".codex-ui-settings-shell"],
+              ["navigation", ".codex-ui-settings-shell__navigation"],
+              ["card", ".codex-ui-git-settings__card"],
+              [
+                "input",
+                '.codex-ui-git-settings input[aria-label="Branch prefix"]',
+              ],
+              ["heading", ".codex-ui-git-settings > h1"],
+            ].map(([name, selector]) => {
+              const element = document.querySelector(selector);
+              const style = element ? getComputedStyle(element) : null;
+              return [
+                name,
+                style
+                  ? {
+                      backgroundColor: style.backgroundColor,
+                      color: style.color,
+                    }
+                  : null,
+              ];
+            }),
+          ),
+          viewport: { height: window.innerHeight, width: window.innerWidth },
+        };
+      });
+      const compact = scene.id === "workspace-git-settings-compact";
+      if (
+        settings.horizontalOverflow > 1 ||
+        settings.navigationCount !== 1 ||
+        settings.mainCount !== 1 ||
+        settings.outerRegionCount !== 1 ||
+        settings.selected !== "Git" ||
+        settings.navigation?.width !== 322.90625 ||
+        settings.navigation?.top !== 46 ||
+        settings.navigation?.height !== settings.viewport.height - 46 ||
+        settings.searchbox?.width !== 258.90625 ||
+        settings.searchbox?.height !== 18 ||
+        settings.heading?.top !== 66 ||
+        Math.abs(settings.heading?.width - (compact ? 357.09375 : 768)) > 1 ||
+        settings.branchPrefix?.width !== 224 ||
+        settings.branchPrefix?.height !== 35 ||
+        settings.card?.width !== (compact ? 357.09375 : 768) ||
+        settings.switchStates.length !== 2 ||
+        settings.switchStates[0]?.value !== "false" ||
+        settings.switchStates[1]?.value !== "true" ||
+        settings.textareaCount !== 2 ||
+        settings.iconNames.length !== 24 ||
+        !settings.iconNames.includes("settings-back") ||
+        !settings.iconNames.includes("settings-search") ||
+        !settings.iconNames.includes("settings-git")
+      ) {
+        throw new Error(
+          `${scene.id}: current Git Settings contract failed: ${JSON.stringify(settings)}`,
+        );
+      }
+      if (
+        scene.id === "workspace-git-settings-light" &&
+        (settings.theme !== "light" ||
+          settings.visualStyles.shell?.color !== "rgb(26, 28, 31)" ||
+          settings.visualStyles.navigation?.backgroundColor ===
+            "rgb(36, 36, 36)" ||
+          settings.visualStyles.card?.backgroundColor === "rgb(32, 32, 32)" ||
+          settings.visualStyles.input?.backgroundColor === "rgb(43, 43, 43)" ||
+          settings.visualStyles.heading?.color !== "rgb(26, 28, 31)")
+      ) {
+        throw new Error(
+          `${scene.id}: light Git Settings paint failed: ${JSON.stringify(settings.visualStyles)}`,
+        );
+      }
+
+      await page.getByRole("searchbox").fill("git");
+      await page.waitForSelector(".codex-ui-settings-shell__result-label");
+      const search = await page.evaluate(() => ({
+        hasGit: Boolean(
+          document.querySelector('.codex-ui-settings-shell__item[aria-label="Git"]'),
+        ),
+        hasHookResult: document.body.textContent?.includes(
+          "Right before ChatGPT ends its turn",
+        ),
+        hasPlugins: Boolean(
+          document.querySelector(
+            '.codex-ui-settings-shell__item[aria-label="Plugins"]',
+          ),
+        ),
+      }));
+      if (!search.hasGit || !search.hasHookResult || search.hasPlugins) {
+        throw new Error(
+          `${scene.id}: current Git Settings search failed: ${JSON.stringify(search)}`,
+        );
+      }
+      await page.getByRole("button", { name: "Hooks" }).click();
+      const routing = await page.evaluate(() => ({
+        heading: document.querySelector(".codex-ui-git-settings > h1")
+          ?.textContent,
+        query: document.querySelector('[role="searchbox"]')?.value,
+        selected: document
+          .querySelector('.codex-ui-settings-shell__item[aria-current="page"]')
+          ?.getAttribute("aria-label"),
+      }));
+      if (
+        routing.heading !== "Git" ||
+        routing.query !== "git" ||
+        routing.selected !== "Git"
+      ) {
+        throw new Error(
+          `${scene.id}: unimplemented Settings navigation changed the Git route: ${JSON.stringify(routing)}`,
+        );
+      }
+      const clearSearch = page.getByRole("button", {
+        name: "Clear settings search",
+      });
+      await clearSearch.focus();
+      await clearSearch.click();
+      if (!(await page.getByRole("searchbox").evaluate((input) => input === document.activeElement))) {
+        throw new Error(`${scene.id}: clearing Settings search did not restore input focus.`);
+      }
+      await page.getByRole("switch", { name: "Always force push" }).click();
+      const mergeRadio = page.getByRole("radio", { name: "Merge" });
+      await mergeRadio.focus();
+      await mergeRadio.press("ArrowRight");
+      const interaction = await page.evaluate(() => ({
+        forcePush: document
+          .querySelector('[role="switch"][aria-label="Always force push"]')
+          ?.getAttribute("aria-checked"),
+        mergeTabIndex: document
+          .querySelector(
+            '[role="radiogroup"][aria-label="Pull request merge method"] [role="radio"]:nth-child(1)',
+          )
+          ?.getAttribute("tabindex"),
+        squash: document
+          .querySelector(
+            '[role="radiogroup"][aria-label="Pull request merge method"] [role="radio"]:nth-child(2)',
+          )
+          ?.getAttribute("aria-checked"),
+        squashTabIndex: document
+          .querySelector(
+            '[role="radiogroup"][aria-label="Pull request merge method"] [role="radio"]:nth-child(2)',
+          )
+          ?.getAttribute("tabindex"),
+      }));
+      if (
+        interaction.forcePush !== "true" ||
+        interaction.mergeTabIndex !== "-1" ||
+        interaction.squash !== "true" ||
+        interaction.squashTabIndex !== "0"
+      ) {
+        throw new Error(
+          `${scene.id}: current Git Settings interaction failed: ${JSON.stringify(interaction)}`,
+        );
+      }
+      await writeFile(
+        join(artifactDirectory, `${scene.id}.json`),
+        `${JSON.stringify({ interaction, routing, search, settings }, null, 2)}\n`,
+      );
+      continue;
+    }
     if (scene.id === "current-dark-shell") {
       const darkShell = await page.evaluate(() => {
         const metric = (selector) => {

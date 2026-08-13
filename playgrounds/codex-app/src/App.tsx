@@ -34,6 +34,7 @@ import {
   EnvironmentSettingsPage,
   FileChangeGroup,
   FileReview,
+  GitSettingsPage,
   IconButton,
   LocalEnvironmentDialog,
   Menu,
@@ -55,6 +56,7 @@ import {
   QueuedPromptList,
   ProjectIndex,
   SearchActivity,
+  SettingsShell,
   StatusBanner,
   SubagentActivity,
   SubagentActivityGroup,
@@ -87,10 +89,14 @@ import {
   type ComposerPermissionOption,
   type ComposerModeKind,
   type ComposerResourceGroup,
+  type GitSettingsValue,
   type QueuedPrompt,
   type SubagentItem,
 } from "codex-ui-kit";
-import { CurrentBuildIcon } from "./currentBuildIcons";
+import {
+  CurrentBuildIcon,
+  type CurrentBuildIconName,
+} from "./currentBuildIcons";
 import {
   cloneElement,
   Fragment,
@@ -1722,13 +1728,35 @@ export function App() {
         : "local",
     );
   const [workspacePage, setWorkspacePage] = useState<
-    "conversation" | "environments"
+    "conversation" | "environments" | "git-settings"
   >(
     initialSelection.view === "workspace" &&
       initialSelection.frame === "workspace-environments-unavailable"
       ? "environments"
+      : initialSelection.view === "workspace" &&
+          ["workspace-git-settings", "workspace-git-settings-compact"].includes(
+            initialSelection.frame ?? "",
+          )
+        ? "git-settings"
       : "conversation",
   );
+  const [settingsQuery, setSettingsQuery] = useState("");
+  const [selectedSettingsId, setSelectedSettingsId] = useState("git");
+  const [settingsRouteFocusPending, setSettingsRouteFocusPending] =
+    useState(false);
+  const settingsBackButtonRef = useRef<HTMLButtonElement>(null);
+  const [gitSettings, setGitSettings] = useState<GitSettingsValue>({
+    alwaysForcePush: false,
+    branchPrefix: "",
+    commitInstructions: "",
+    createDraftPullRequests: true,
+    mergeMethod: "merge",
+    pullRequestInstructions: "",
+    reviewDelivery: "inline",
+  });
+  const [savedCommitInstructions, setSavedCommitInstructions] = useState("");
+  const [savedPullRequestInstructions, setSavedPullRequestInstructions] =
+    useState("");
   const [workspaceWorktreeId, setWorkspaceWorktreeId] = useState(
     initialSelection.view === "workspace" &&
       initialSelection.frame === "workspace-repairing"
@@ -1820,12 +1848,9 @@ export function App() {
     useState<string>();
   const [workspaceBranchCheckoutPending, setWorkspaceBranchCheckoutPending] =
     useState(false);
-  const [workspaceBranchSettingsNotice, setWorkspaceBranchSettingsNotice] =
-    useState<string>();
   const updateWorkspaceProjectId = (projectId: string | null) => {
     workspaceProjectIdRef.current = projectId;
     setWorkspaceBranchSwitchError(undefined);
-    setWorkspaceBranchSettingsNotice(undefined);
     setWorkspaceProjectId(projectId);
   };
   const [workspaceEnvironmentQuery, setWorkspaceEnvironmentQuery] =
@@ -5018,6 +5043,10 @@ export function App() {
   const workspaceBaseFrame =
     workspacePage === "environments"
       ? "workspace-environments-unavailable"
+      : workspacePage === "git-settings"
+        ? initialSelection.frame === "workspace-git-settings-compact"
+          ? "workspace-git-settings-compact"
+          : "workspace-git-settings"
       : projectIndexChat
       ? "projects-index-chat"
       : activeFrame === "workspace-branch-created"
@@ -5057,6 +5086,14 @@ export function App() {
     workspaceLocalEnvironmentOpen,
     workspaceOverlay,
   ]);
+  useEffect(() => {
+    if (workspacePage !== "git-settings" || !settingsRouteFocusPending) return;
+    const timer = window.setTimeout(() => {
+      settingsBackButtonRef.current?.focus();
+      setSettingsRouteFocusPending(false);
+    });
+    return () => window.clearTimeout(timer);
+  }, [settingsRouteFocusPending, workspacePage]);
   const setWorkspaceOverlayState = (
     overlay:
       | "environment"
@@ -5097,7 +5134,6 @@ export function App() {
     setWorkspaceOverlay(null);
     setWorkspaceBranchName("");
     setWorkspaceBranchError(undefined);
-    setWorkspaceBranchSettingsNotice(undefined);
     setWorkspaceBranchStatus("idle");
     setWorkspaceBranchDialogOpen(true);
     setActiveFrame("workspace-branch-create");
@@ -5245,7 +5281,6 @@ export function App() {
     workspaceBranchCheckoutActiveRef.current = true;
     setWorkspaceBranchCheckoutPending(true);
     setWorkspaceBranchSwitchError(undefined);
-    setWorkspaceBranchSettingsNotice(undefined);
     let response: WorkspaceGitBranchResponse;
     try {
       response = workspaceUsesHostBranches && window.codexDemo
@@ -5671,11 +5706,6 @@ export function App() {
           {workspaceHostBranchState.message}
         </StatusBanner>
       ) : null}
-      {workspaceBranchSettingsNotice ? (
-        <StatusBanner heading="Branch prefix settings" tone="info">
-          {workspaceBranchSettingsNotice}
-        </StatusBanner>
-      ) : null}
       {workspaceOverlay === "project" ? (
         <div
           aria-label="Choose a project"
@@ -5955,12 +5985,14 @@ export function App() {
         }}
         onSetPrefix={() => {
           setWorkspaceBranchDialogOpen(false);
+          setWorkspaceBranchName("");
           setWorkspaceBranchError(undefined);
           setWorkspaceBranchStatus("idle");
-          setWorkspaceBranchSettingsNotice(
-            "Open Settings → Git to change the prefix used for new branches.",
-          );
-          setActiveFrame("workspace-ready");
+          setSettingsQuery("");
+          setSelectedSettingsId("git");
+          setSettingsRouteFocusPending(true);
+          setWorkspacePage("git-settings");
+          setActiveFrame("workspace-git-settings");
         }}
         open={workspaceBranchDialogOpen}
         returnFocusRef={workspaceWorktreeTriggerRef}
@@ -6161,9 +6193,134 @@ export function App() {
       <EnvironmentSettingsPage status="unavailable" />
     </div>
   );
+  const settingsNavigation = [
+    {
+      id: "personal",
+      label: "Personal",
+      items: [
+        ["general", "General"],
+        ["import", "Import"],
+        ["profile", "Profile"],
+        ["appearance", "Appearance", "GitHub"],
+        ["voice", "Voice"],
+        ["configuration", "Configuration", "Choose how ChatGPT summarizes its reasoning"],
+        ["personalization", "Personalization", "Personalization"],
+        ["pets", "Pets"],
+        ["keyboard-shortcuts", "Keyboard shortcuts", "Go to a line in the current file"],
+        ["usage-billing", "Usage & billing", "GitHub"],
+        ["account", "Account"],
+      ],
+    },
+    {
+      id: "integrations",
+      label: "Integrations",
+      items: [
+        ["appshots", "Appshots"],
+        ["plugins", "Plugins"],
+        [
+          "browser",
+          "Browser",
+          "Allow ChatGPT to use full Chrome DevTools Protocol (CDP) access in connected Browser Use sessions.",
+        ],
+        ["computer-use", "Computer use", "Computer use"],
+      ],
+    },
+    {
+      id: "coding",
+      label: "Coding",
+      items: [
+        ["hooks", "Hooks", "Right before ChatGPT ends its turn"],
+        [
+          "connections",
+          "Connections",
+          "Allow ChatGPT apps signed into your account to use this device",
+        ],
+        ["git", "Git", "Git"],
+        ["environments", "Environments"],
+        [
+          "worktrees",
+          "Worktrees",
+          "Automatic deletion is disabled. ChatGPT will not prune old worktrees automatically.",
+        ],
+      ],
+    },
+    {
+      id: "archived",
+      label: "Archived",
+      items: [["archived-chats", "Archived chats"]],
+    },
+  ].map((section) => ({
+    ...section,
+    items: section.items.map(([id, label, resultLabel]) => ({
+      icon: (
+        <span className="demo-settings-navigation-icon-stack">
+          <CurrentBuildIcon
+            name={`settings-${id}` as CurrentBuildIconName}
+          />
+          {id === "account" ? (
+            <CurrentBuildIcon name="settings-account-external" />
+          ) : null}
+        </span>
+      ),
+      id,
+      keywords:
+        id === "appearance" || id === "usage-billing"
+          ? ["git", "github"]
+          : id === "hooks" || id === "keyboard-shortcuts"
+            ? ["git"]
+            : id === "browser" || id === "computer-use" || id === "connections" || id === "worktrees"
+              ? ["git"]
+              : undefined,
+      label,
+      resultLabel,
+    })),
+  }));
+  const workspaceGitSettingsRoute = (
+    <SettingsShell
+      backIcon={<CurrentBuildIcon name="settings-back" />}
+      backButtonRef={settingsBackButtonRef}
+      onBack={() => {
+        setSettingsQuery("");
+        setWorkspacePage("conversation");
+        setActiveFrame(
+          workspaceEnvironmentId === "worktree"
+            ? "workspace-new-worktree"
+            : "workspace-ready",
+        );
+      }}
+      onQueryChange={setSettingsQuery}
+      onSelect={(itemId) => {
+        if (itemId !== "git") return;
+        setSelectedSettingsId(itemId);
+      }}
+      query={settingsQuery}
+      searchIcon={<CurrentBuildIcon name="settings-search" />}
+      sections={settingsNavigation}
+      selectedId={selectedSettingsId}
+    >
+      <GitSettingsPage
+        commitInstructionsDirty={
+          gitSettings.commitInstructions !== savedCommitInstructions
+        }
+        onChange={setGitSettings}
+        onSaveCommitInstructions={() =>
+          setSavedCommitInstructions(gitSettings.commitInstructions)
+        }
+        onSavePullRequestInstructions={() =>
+          setSavedPullRequestInstructions(gitSettings.pullRequestInstructions)
+        }
+        pullRequestInstructionsDirty={
+          gitSettings.pullRequestInstructions !== savedPullRequestInstructions
+        }
+        value={gitSettings}
+      />
+    </SettingsShell>
+  );
   const workspaceRoute =
     workspacePage === "environments"
       ? workspaceEnvironmentSettingsRoute
+      : workspacePage === "git-settings"
+        ? workspaceGitSettingsRoute
       : projectIndexChatRoute
         ? projectIndexChatRoute
         : workspacePersistenceFrame
@@ -8748,6 +8905,10 @@ export function App() {
             ? "wide"
             : undefined
         }
+        mainLabel={
+          workspacePage === "git-settings" ? "Settings route" : undefined
+        }
+        mainRole={workspacePage === "git-settings" ? "region" : "main"}
         narrowSidebarBehavior="current-build"
         onSidebarOpenChange={setSidebarOpen}
         onSidePanelOpenChange={
@@ -8825,6 +8986,7 @@ export function App() {
         sidebarResizable
         windowChrome={
           view === "projects" || view === "shell" || view === "workspace" ? (
+            view === "workspace" && workspacePage === "git-settings" ? null : (
             <AppWindowChrome
               backAction={
                 view === "workspace" && workspacePage === "environments"
@@ -8858,6 +9020,7 @@ export function App() {
                 onClick: () => setSidebarOpen((open) => !open),
               }}
             />
+            )
           ) : undefined
         }
       >
