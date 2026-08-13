@@ -403,6 +403,7 @@ for (const id of [
   "settings-browser",
   "settings-computer-use",
   "settings-hooks",
+  "settings-hooks-reload",
   "settings-connections",
   "settings-git",
   "settings-environments",
@@ -414,7 +415,7 @@ for (const id of [
   }
 }
 if (
-  manifest.icons.length !== 77 ||
+  manifest.icons.length !== 78 ||
   manifest.composerObservation?.topContextIconCount !== 3 ||
   manifest.composerObservation?.bottomActionIconCount !== 5 ||
   manifest.composerObservation?.exactSemanticIconCount !== 8

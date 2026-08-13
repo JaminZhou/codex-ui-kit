@@ -35,6 +35,8 @@ import {
   CommandOutput,
   type CommandExecutionStatus,
   type CodeHighlighter,
+  CodeReviewSettingsPage,
+  type CodeReviewSettingsValue,
   ComposerAttachment,
   ComposerMentionMenu,
   type ComposerMentionOption,
@@ -65,6 +67,8 @@ import {
   GeneratedImageGallery,
   GeneralSettingsPage,
   type GeneralSettingsValue,
+  HooksSettingsPage,
+  type HookSettingsEntry,
   ImagePreviewDialog,
   IconButton,
   InlineNotice,
@@ -161,7 +165,9 @@ import "codex-ui-kit/styles.css";
 import "codex-ui-kit/tokens.css";
 
 declare const appearanceSettingsValue: AppearanceSettingsValue;
+declare const codeReviewSettingsValue: CodeReviewSettingsValue;
 declare const generalSettingsValue: GeneralSettingsValue;
+declare const hookSettingsEntry: HookSettingsEntry;
 
 const line: FileDiffLine = {
   content: "package contract",
@@ -281,8 +287,12 @@ void AppRouteOutlet;
 void AppWindowChrome;
 void AppearanceSettingsPage;
 void appearanceSettingsValue;
+void CodeReviewSettingsPage;
+void codeReviewSettingsValue;
 void GeneralSettingsPage;
 void generalSettingsValue;
+void HooksSettingsPage;
+void hookSettingsEntry;
 void appNotification;
 void appRouteOutletAction;
 void appWindowChromeAction;

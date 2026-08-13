@@ -14,9 +14,9 @@ exit gates; it does not replace the inventory.
   Desktop `26.803.61601` (`6396`). Unsampled earlier-build surfaces remain
   previous-build regression evidence rather than current verification.
 - The inventory contains 88 surface groups: 58 P0, 21 P1, and 9 P2.
-- 25 groups have current-build runtime evidence, 46 have previous-build-only
+- 26 groups have current-build runtime evidence, 45 have previous-build-only
   runtime evidence, and 17 have not been sampled.
-- The scoped `26.803.61601` refresh revalidates 77
+- The scoped `26.803.61601` refresh revalidates 78
   sidebar/menu/window-chrome/Composer/Settings icons against exact runtime evidence.
   Earlier hover/footer slices promoted More, Pin,
   Archive, and Help, confirms that Settings is absent from the sampled footer
@@ -466,8 +466,26 @@ Six reviewed frames extend the matrix to 180, with optional local-only full-
 frame comparisons for wide, compact, shortcut-capture, and bottom states at
 4.6143%, 6.7412%, 4.7654%, and 4.8818%.
 Observed host selections are fixture evidence rather than product defaults.
-Hooks/code-review is the next Settings slice; the remaining P1 families keep
-their existing open gates, so Stage 4 is still in progress.
+
+The Hooks/code-review family is now delivered with its evidence levels kept
+separate. An isolated current `26.803.61601` Renderer reaches the visible
+Hooks route, stable empty state, read-only reload feedback, exact 1180×820 and
+720×680 geometry, and the public `developers.openai.com/codex/hooks` link.
+The current ASAR independently confirms configured Config/Plugin/Project
+groups, eleven lifecycle event labels, trust/changed/managed states, load
+issues, and the separately registered Code review preferences module. Because
+the current navigation and settings search do not expose Code review, the
+playground keeps it as an explicit `package-observed` deep fixture rather than
+adding a false sidebar row. `HooksSettingsPage` and
+`CodeReviewSettingsPage` are controlled; reload, persistence, config opening,
+trust, and cloud preference mutation remain host-owned. Browser/CDP and
+Electron verify empty/loading/error/configured states, refresh/search/route
+continuity, trust-before-enable, three review triggers, exhaustive review, and
+the optional credits preference. Eight reviewed frames extend the matrix to
+188. The untracked full-frame current Hooks comparisons pass without masks at
+1.7651% wide and 1.8064% at 720px. The exact runtime reload SVG raises the
+asset manifest to 78 icons. Remaining P1 families keep their existing open
+gates, so Stage 4 is still in progress.
 
 Exit: each in-scope P1 family has a documented ownership boundary and at least
 one end-to-end vertical slice.

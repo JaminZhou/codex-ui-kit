@@ -495,6 +495,615 @@ export function GitSettingsPage({
   );
 }
 
+export type HooksSettingsStatus = "error" | "loading" | "ready";
+export type HookSourceKind =
+  | "admin"
+  | "plugin"
+  | "project"
+  | "sessionFlags"
+  | "unknown"
+  | "user";
+export type HookEventKind =
+  | "PermissionRequest"
+  | "PostCompact"
+  | "PostToolUse"
+  | "PreCompact"
+  | "PreToolUse"
+  | "SessionEnd"
+  | "SessionStart"
+  | "Stop"
+  | "SubagentStart"
+  | "SubagentStop"
+  | "UserPromptSubmit";
+
+export interface HookSettingsEntry {
+  agent?: string;
+  changedSinceTrusted?: boolean;
+  command?: string;
+  enabled: boolean;
+  event: HookEventKind;
+  handler?: string;
+  id: string;
+  managed?: boolean;
+  matcher?: string;
+  pluginName?: string;
+  projectLabel?: string;
+  prompt?: string;
+  source: HookSourceKind;
+  statusMessage?: string;
+  timeout?: string;
+  title?: string;
+  trusted?: boolean;
+}
+
+export interface HookSettingsLoadIssue {
+  message: string;
+  path: string;
+  source: HookSourceKind;
+}
+
+export interface HooksSettingsPageProps
+  extends Omit<HTMLAttributes<HTMLElement>, "children"> {
+  entries?: readonly HookSettingsEntry[];
+  learnMoreHref?: string;
+  loadIssues?: readonly HookSettingsLoadIssue[];
+  onOpenConfig?: (entry: HookSettingsEntry) => void;
+  onReload?: () => void;
+  onToggleHookEnabled?: (entry: HookSettingsEntry, enabled: boolean) => void;
+  onTrustHook?: (entry: HookSettingsEntry) => void;
+  refreshing?: boolean;
+  reloadIcon?: ReactNode;
+  status?: HooksSettingsStatus;
+}
+
+const hookEventCopy: Record<
+  HookEventKind,
+  { description: string; label: string }
+> = {
+  PermissionRequest: {
+    description: "When permission is requested",
+    label: "PermissionRequest",
+  },
+  PostCompact: {
+    description: "After ChatGPT compacts the conversation",
+    label: "PostCompact",
+  },
+  PostToolUse: {
+    description: "After a tool executes",
+    label: "PostToolUse",
+  },
+  PreCompact: {
+    description: "Before ChatGPT compacts the conversation",
+    label: "PreCompact",
+  },
+  PreToolUse: {
+    description: "Before a tool executes",
+    label: "PreToolUse",
+  },
+  SessionEnd: {
+    description: "When a session ends",
+    label: "SessionEnd",
+  },
+  SessionStart: {
+    description: "When a new session starts",
+    label: "SessionStart",
+  },
+  Stop: {
+    description: "Right before ChatGPT ends its turn",
+    label: "Stop",
+  },
+  SubagentStart: {
+    description: "When a subagent starts",
+    label: "SubagentStart",
+  },
+  SubagentStop: {
+    description: "When a subagent stops",
+    label: "SubagentStop",
+  },
+  UserPromptSubmit: {
+    description: "When the user submits a prompt",
+    label: "UserPromptSubmit",
+  },
+};
+
+const hookSourceOrder: readonly HookSourceKind[] = [
+  "user",
+  "admin",
+  "plugin",
+  "project",
+  "sessionFlags",
+  "unknown",
+];
+
+function hookSourceHeading(source: HookSourceKind) {
+  if (source === "user" || source === "admin") return "From Config";
+  if (source === "plugin") return "From Plugins";
+  if (source === "project") return "From Projects";
+  return "Other sources";
+}
+
+function hookSourceLabel(entry: HookSettingsEntry) {
+  if (entry.source === "user") return "User config";
+  if (entry.source === "admin") return "Admin config";
+  if (entry.source === "plugin") {
+    return entry.pluginName?.trim() || "Unknown plugin";
+  }
+  if (entry.source === "project") {
+    return entry.projectLabel?.trim() || "Project config";
+  }
+  if (entry.source === "sessionFlags") return "Session flags";
+  return "Unknown source";
+}
+
+function hookSourceIdentity(entry: HookSettingsEntry) {
+  return hookSourceLabel(entry);
+}
+
+function HooksLoadingState() {
+  return (
+    <div className="codex-ui-hooks-settings__loading" role="status">
+      <span aria-hidden="true" />
+      <span>Loading hooks…</span>
+    </div>
+  );
+}
+
+function HooksEmptyState() {
+  return (
+    <section className="codex-ui-hooks-settings__empty">
+      <strong>No hooks found</strong>
+      <span>Configured hooks will appear here</span>
+    </section>
+  );
+}
+
+function HookEntryDetails({
+  entry,
+  onOpenConfig,
+  onToggleHookEnabled,
+  onTrustHook,
+}: {
+  entry: HookSettingsEntry;
+  onOpenConfig?: (entry: HookSettingsEntry) => void;
+  onToggleHookEnabled?: (entry: HookSettingsEntry, enabled: boolean) => void;
+  onTrustHook?: (entry: HookSettingsEntry) => void;
+}) {
+  const details = [
+    ["Handler", entry.handler],
+    ["Command", entry.command],
+    ["Matcher", entry.matcher],
+    ["Timeout", entry.timeout],
+    ["Status message", entry.statusMessage],
+    ["Prompt", entry.prompt],
+    ["Agent", entry.agent],
+  ].filter((detail): detail is [string, string] => Boolean(detail[1]));
+  const needsTrust = entry.trusted === false || entry.changedSinceTrusted;
+
+  return (
+    <details className="codex-ui-hooks-settings__entry">
+      <summary>
+        <span className="codex-ui-hooks-settings__entry-copy">
+          <strong>{entry.title ?? hookEventCopy[entry.event].label}</strong>
+          <span>{hookEventCopy[entry.event].description}</span>
+        </span>
+        <span className="codex-ui-hooks-settings__entry-controls">
+          {needsTrust ? (
+            <span className="codex-ui-hooks-settings__review-badge">
+              {entry.changedSinceTrusted
+                ? "Hook changed since last trusted"
+                : "New hook"}
+            </span>
+          ) : null}
+          <button
+            aria-checked={entry.enabled}
+            aria-label={`${entry.title ?? hookEventCopy[entry.event].label} enabled`}
+            className="codex-ui-hooks-settings__switch"
+            disabled={entry.managed || needsTrust || !onToggleHookEnabled}
+            onClick={(event) => {
+              event.preventDefault();
+              onToggleHookEnabled?.(entry, !entry.enabled);
+            }}
+            role="switch"
+            type="button"
+          >
+            <span aria-hidden="true" />
+          </button>
+          <span aria-hidden="true" className="codex-ui-hooks-settings__chevron">
+            ›
+          </span>
+        </span>
+      </summary>
+      <div className="codex-ui-hooks-settings__entry-detail">
+        {entry.managed ? (
+          <p className="codex-ui-hooks-settings__entry-note">
+            Managed hooks are always on
+          </p>
+        ) : needsTrust ? (
+          <p className="codex-ui-hooks-settings__entry-note">
+            Disabled until hook is trusted
+          </p>
+        ) : null}
+        {details.length ? (
+          <dl>
+            {details.map(([label, value]) => (
+              <div key={label}>
+                <dt>{label}</dt>
+                <dd>{value}</dd>
+              </div>
+            ))}
+          </dl>
+        ) : null}
+        <div className="codex-ui-hooks-settings__entry-actions">
+          {needsTrust ? (
+            <button disabled={!onTrustHook} onClick={() => onTrustHook?.(entry)} type="button">
+              Trust
+            </button>
+          ) : null}
+          <button disabled={!onOpenConfig} onClick={() => onOpenConfig?.(entry)} type="button">
+            Open config file
+          </button>
+        </div>
+      </div>
+    </details>
+  );
+}
+
+export function HooksSettingsPage({
+  className,
+  entries = [],
+  learnMoreHref,
+  loadIssues = [],
+  onOpenConfig,
+  onReload,
+  onToggleHookEnabled,
+  onTrustHook,
+  refreshing = false,
+  reloadIcon,
+  status = "ready",
+  ...props
+}: HooksSettingsPageProps) {
+  const groupedSources = hookSourceOrder.flatMap((source) => {
+    const sourceGroups = new Map<string, HookSettingsEntry[]>();
+    for (const entry of entries.filter(
+      (candidate) => candidate.source === source,
+    )) {
+      const identity = hookSourceIdentity(entry);
+      const sourceEntries = sourceGroups.get(identity);
+      if (sourceEntries) {
+        sourceEntries.push(entry);
+      } else {
+        sourceGroups.set(identity, [entry]);
+      }
+    }
+    return [...sourceGroups].map(([identity, sourceEntries]) => ({
+      entries: sourceEntries,
+      identity,
+      source,
+    }));
+  });
+  const groupedHeadings = [
+    ...new Set(groupedSources.map(({ source }) => hookSourceHeading(source))),
+  ];
+
+  return (
+    <article
+      {...props}
+      className={["codex-ui-hooks-settings", className]
+        .filter(Boolean)
+        .join(" ")}
+      data-refreshing={refreshing || undefined}
+      data-status={status}
+    >
+      <header className="codex-ui-hooks-settings__header">
+        <div>
+          <h1>Hooks</h1>
+          <p>
+            Manage lifecycle hooks from config and enabled plugins.{" "}
+            {learnMoreHref ? (
+              <a href={learnMoreHref} rel="noreferrer" target="_blank">
+                Learn more
+              </a>
+            ) : (
+              <span>Learn more</span>
+            )}
+          </p>
+        </div>
+        <button
+          aria-label="Reload hooks"
+          className="codex-ui-hooks-settings__reload"
+          disabled={!onReload || status === "loading" || refreshing}
+          onClick={onReload}
+          type="button"
+        >
+          {reloadIcon ?? <span aria-hidden="true">↻</span>}
+        </button>
+      </header>
+      {status === "loading" ? (
+        <HooksLoadingState />
+      ) : status === "error" ? (
+        <section className="codex-ui-hooks-settings__error" role="alert">
+          <div>
+            <strong>Could not load hooks</strong>
+            <span>
+              Hooks can run outside of the sandbox so we ask you to review any
+              recently installed or modified hooks
+            </span>
+          </div>
+          <button
+            disabled={!onReload || refreshing}
+            onClick={onReload}
+            type="button"
+          >
+            Retry
+          </button>
+        </section>
+      ) : groupedSources.length === 0 && loadIssues.length === 0 ? (
+        <HooksEmptyState />
+      ) : (
+        <div className="codex-ui-hooks-settings__sources">
+          {groupedHeadings.map((heading) => (
+            <section className="codex-ui-hooks-settings__source" key={heading}>
+              <h2>{heading}</h2>
+              <div className="codex-ui-hooks-settings__source-card">
+                {groupedSources
+                  .filter(({ source }) => hookSourceHeading(source) === heading)
+                  .map(({ entries: sourceEntries, identity, source }) => (
+                    <section
+                      aria-label={hookSourceLabel(sourceEntries[0])}
+                      className="codex-ui-hooks-settings__source-group"
+                      key={`${source}:${identity}`}
+                    >
+                      <header>
+                        <strong>{hookSourceLabel(sourceEntries[0])}</strong>
+                        <span>
+                          {sourceEntries.length}{" "}
+                          {sourceEntries.length === 1 ? "hook" : "hooks"}
+                        </span>
+                      </header>
+                      {sourceEntries.map((entry) => (
+                        <HookEntryDetails
+                          entry={entry}
+                          key={entry.id}
+                          onOpenConfig={onOpenConfig}
+                          onToggleHookEnabled={onToggleHookEnabled}
+                          onTrustHook={onTrustHook}
+                        />
+                      ))}
+                    </section>
+                  ))}
+              </div>
+            </section>
+          ))}
+          {loadIssues.length ? (
+            <section className="codex-ui-hooks-settings__issues" role="alert">
+              <strong>
+                {loadIssues.length}{" "}
+                {loadIssues.length === 1
+                  ? "issue loading hooks for this source"
+                  : "issues loading hooks for this source"}
+              </strong>
+              {loadIssues.map((issue) => (
+                <span key={`${issue.source}:${issue.path}:${issue.message}`}>
+                  {issue.path}: {issue.message}
+                </span>
+              ))}
+            </section>
+          ) : null}
+        </div>
+      )}
+    </article>
+  );
+}
+
+export type CodeReviewTriggerPolicy =
+  | "every_push"
+  | "pr_open"
+  | "smart_detect";
+export type CodeReviewSettingsStatus = "error" | "loading" | "ready";
+
+export interface CodeReviewSettingsValue {
+  allowCreditsForCodeReviews: boolean;
+  automaticReview: boolean;
+  exhaustiveCodeReview: boolean;
+  triggerPolicy: CodeReviewTriggerPolicy;
+}
+
+export interface CodeReviewSettingsPageProps
+  extends Omit<HTMLAttributes<HTMLElement>, "onChange"> {
+  disabled?: boolean;
+  onChange: (value: CodeReviewSettingsValue) => void;
+  onRetry?: () => void;
+  showCreditPreference?: boolean;
+  status?: CodeReviewSettingsStatus;
+  value: CodeReviewSettingsValue;
+}
+
+const codeReviewTriggerLabels: Record<CodeReviewTriggerPolicy, string> = {
+  every_push: "On every push",
+  pr_open: "On PR open",
+  smart_detect: "Smart trigger",
+};
+
+function CodeReviewSwitch({
+  checked,
+  disabled,
+  label,
+  onChange,
+}: {
+  checked: boolean;
+  disabled?: boolean;
+  label: string;
+  onChange: (checked: boolean) => void;
+}) {
+  return (
+    <button
+      aria-checked={checked}
+      aria-label={label}
+      className="codex-ui-code-review-settings__switch"
+      disabled={disabled}
+      onClick={() => onChange(!checked)}
+      role="switch"
+      type="button"
+    >
+      <span aria-hidden="true" />
+    </button>
+  );
+}
+
+function CodeReviewRow({
+  children,
+  description,
+  label,
+}: {
+  children: ReactNode;
+  description: string;
+  label: string;
+}) {
+  return (
+    <div className="codex-ui-code-review-settings__row">
+      <div>
+        <strong>{label}</strong>
+        <p>{description}</p>
+      </div>
+      {children}
+    </div>
+  );
+}
+
+export function CodeReviewSettingsPage({
+  className,
+  disabled = false,
+  onChange,
+  onRetry,
+  showCreditPreference = false,
+  status = "ready",
+  value,
+  ...props
+}: CodeReviewSettingsPageProps) {
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const triggerValueId = useId();
+  const update = <K extends keyof CodeReviewSettingsValue>(
+    key: K,
+    nextValue: CodeReviewSettingsValue[K],
+  ) => onChange({ ...value, [key]: nextValue });
+
+  return (
+    <article
+      {...props}
+      className={["codex-ui-code-review-settings", className]
+        .filter(Boolean)
+        .join(" ")}
+      data-status={status}
+    >
+      <header>
+        <h1>Code review</h1>
+        <p>Set up ChatGPT to automatically review pull requests</p>
+      </header>
+      {status === "loading" ? (
+        <div className="codex-ui-code-review-settings__loading" role="status">
+          <span aria-hidden="true" />
+          <span>Loading code review settings…</span>
+        </div>
+      ) : status === "error" ? (
+        <section className="codex-ui-code-review-settings__error" role="alert">
+          <strong>Unable to load code review settings</strong>
+          <button disabled={!onRetry} onClick={onRetry} type="button">
+            Retry
+          </button>
+        </section>
+      ) : (
+        <section className="codex-ui-code-review-settings__section">
+          <h2>Personal preferences</h2>
+          <div className="codex-ui-code-review-settings__card">
+            <CodeReviewRow
+              description="Automatically review pull requests in repositories with code review enabled"
+              label="Automatic review"
+            >
+              <CodeReviewSwitch
+                checked={value.automaticReview}
+                disabled={disabled}
+                label="Enable automatic code review"
+                onChange={(automaticReview) =>
+                  update("automaticReview", automaticReview)
+                }
+              />
+            </CodeReviewRow>
+            <CodeReviewRow
+              description="Choose when ChatGPT should review your pull requests"
+              label="Review trigger"
+            >
+              <Menu
+                align="end"
+                label="Review trigger options"
+                sideOffset={4}
+                trigger={
+                  <button
+                    aria-describedby={triggerValueId}
+                    aria-label="Review trigger"
+                    className="codex-ui-code-review-settings__trigger"
+                    disabled={disabled}
+                    ref={triggerRef}
+                    type="button"
+                  >
+                    <span id={triggerValueId}>
+                      {codeReviewTriggerLabels[value.triggerPolicy]}
+                    </span>
+                    <span aria-hidden="true">⌄</span>
+                  </button>
+                }
+              >
+                {(Object.keys(codeReviewTriggerLabels) as CodeReviewTriggerPolicy[]).map(
+                  (policy) => (
+                    <MenuItem
+                      aria-checked={value.triggerPolicy === policy}
+                      key={policy}
+                      onSelect={() => {
+                        update("triggerPolicy", policy);
+                        triggerRef.current?.focus();
+                      }}
+                      role="menuitemradio"
+                    >
+                      {codeReviewTriggerLabels[policy]}
+                    </MenuItem>
+                  ),
+                )}
+              </Menu>
+            </CodeReviewRow>
+            <CodeReviewRow
+              description="Keep looking for findings until ChatGPT stops finding new issues"
+              label="Exhaustive code review"
+            >
+              <CodeReviewSwitch
+                checked={value.exhaustiveCodeReview}
+                disabled={disabled}
+                label="Enable exhaustive code review"
+                onChange={(exhaustiveCodeReview) =>
+                  update("exhaustiveCodeReview", exhaustiveCodeReview)
+                }
+              />
+            </CodeReviewRow>
+            {showCreditPreference ? (
+              <CodeReviewRow
+                description="Allow credits to be consumed for reviews after rate limits"
+                label="Use credits for reviews"
+              >
+                <CodeReviewSwitch
+                  checked={value.allowCreditsForCodeReviews}
+                  disabled={disabled}
+                  label="Allow credits for code reviews"
+                  onChange={(allowCreditsForCodeReviews) =>
+                    update("allowCreditsForCodeReviews", allowCreditsForCodeReviews)
+                  }
+                />
+              </CodeReviewRow>
+            ) : null}
+          </div>
+        </section>
+      )}
+    </article>
+  );
+}
+
 export type AppearanceThemeMode = "system" | "light" | "dark";
 export type AppearanceDockIcon = "chatgpt" | "codex";
 export type AppearanceReduceMotion = "system" | "on" | "off";

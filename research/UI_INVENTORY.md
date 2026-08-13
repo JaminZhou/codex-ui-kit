@@ -62,7 +62,7 @@ observation from a previous build remains historical evidence.
   using private text. The exact `scrollHeight` remains content-dependent, so
   the contract locks the unique scroll owner and visible geometry rather than
   private task counts.
-- The same fingerprint revalidates 77
+- The same fingerprint revalidates 78
   context/Composer/sidebar/menu/window/environment/Settings assets, six project groups,
   Recents actions, all sampled menus, and the disabled
   window-navigation cursor. See
@@ -74,7 +74,7 @@ observation from a previous build remains historical evidence.
   previous-build regression evidence and have been downgraded from `verified`
   to `partial_legacy` until they are reached again on the current fingerprint.
 
-Current inventory: 88 surface groups; 25 have current-build runtime evidence, 46 have previous-build-only runtime evidence, 17 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 24 groups and Electron verification covers 24.
+Current inventory: 88 surface groups; 26 have current-build runtime evidence, 45 have previous-build-only runtime evidence, 17 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 25 groups and Electron verification covers 25.
 Prior acceptance outside those 23 sampled current-build groups remains
 recorded as `partial_legacy` until current-build re-observation.
 
@@ -424,7 +424,25 @@ optional current-product comparisons cover the full wide, compact top-crop,
 shortcut-capture, and bottom frames at 4.6143%, 6.7412%, 4.7654%, and 4.8818%
 without committing raw screenshots. The captured values are observed host
 fixtures rather than product defaults.
-Hooks/code review and all remaining Settings pages stay independently open.
+
+The following Hooks/code-review slice preserves a stricter evidence split.
+The current `26.803.61601` Renderer reaches Hooks in the visible Coding group,
+including the stable `No hooks found` card, read-only reload feedback,
+current documentation link, 1180×820 geometry, and the exact 720×680 wrapped
+layout. Current ASAR structure confirms Config/Plugin/Project/other source
+groups, eleven lifecycle events, changed/new/trusted/managed states, load
+issues, entry details, and the independent Code review preferences module.
+The latter is registered but absent from current navigation and settings
+search, so it remains a clearly labelled `package-observed` deep fixture and
+is not introduced as a false current sidebar item. Both public pages are
+controlled and retain reload, persistence, config opening, trust, and cloud
+mutation as host responsibilities. Browser/CDP and Electron cover
+empty/loading/error/configured states, refresh and route continuity,
+trust-before-enable, review trigger selection, exhaustive review, and optional
+credit use. Eight reviewed frames bring the matrix to 188. Local-only,
+unmasked full-frame Hooks comparisons pass at 1.7651% wide and 1.8064% at
+720px; the exact reload icon raises the provenance manifest to 78. All
+remaining Settings pages stay independently open.
 
 The current-thread slice adds `ConversationThreadShell`, which composes the
 existing header, scroll-following timeline, messages, and Composer into one

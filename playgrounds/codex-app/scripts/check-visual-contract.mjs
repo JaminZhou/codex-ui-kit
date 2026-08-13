@@ -272,6 +272,10 @@ const currentBuildGeneralSettingsHotkeyReference =
   process.env.CODEX_UI_KIT_GENERAL_SETTINGS_HOTKEY_REFERENCE;
 const currentBuildGeneralSettingsBottomReference =
   process.env.CODEX_UI_KIT_GENERAL_SETTINGS_BOTTOM_REFERENCE;
+const currentBuildHooksSettingsReference =
+  process.env.CODEX_UI_KIT_HOOKS_SETTINGS_REFERENCE;
+const currentBuildHooksSettingsCompactReference =
+  process.env.CODEX_UI_KIT_HOOKS_SETTINGS_COMPACT_REFERENCE;
 const currentBuildWorkspaceDirectoryMissingReference =
   process.env.CODEX_UI_KIT_WORKSPACE_DIRECTORY_MISSING_REFERENCE;
 const currentBuildWorkspaceDirectoryMissingReferenceSize = {
@@ -1819,6 +1823,36 @@ for (const scene of selectedScenes) {
       maximumRatioName:
         "CODEX_UI_KIT_GENERAL_SETTINGS_BOTTOM_MAX_DIFF_RATIO",
       referencePath: currentBuildGeneralSettingsBottomReference,
+      sceneId: scene.id,
+    });
+  }
+
+  if (
+    scene.id === "workspace-hooks-settings" &&
+    currentBuildHooksSettingsReference
+  ) {
+    await compareCurrentBuildWorkspaceFrame({
+      actual,
+      defaultMaximumRatio: 0.03,
+      masks: [],
+      maximumRatioName: "CODEX_UI_KIT_HOOKS_SETTINGS_MAX_DIFF_RATIO",
+      referencePath: currentBuildHooksSettingsReference,
+      sceneId: scene.id,
+    });
+  }
+
+  if (
+    scene.id === "workspace-hooks-settings-compact" &&
+    currentBuildHooksSettingsCompactReference
+  ) {
+    await compareCurrentBuildWorkspaceFrame({
+      actual,
+      defaultMaximumRatio: 0.04,
+      masks: [],
+      maximumRatioName:
+        "CODEX_UI_KIT_HOOKS_SETTINGS_COMPACT_MAX_DIFF_RATIO",
+      referenceCrop: { height: 680, left: 0, top: 0, width: 720 },
+      referencePath: currentBuildHooksSettingsCompactReference,
       sceneId: scene.id,
     });
   }

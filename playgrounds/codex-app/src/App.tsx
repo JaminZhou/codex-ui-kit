@@ -19,6 +19,7 @@ import {
   BranchCreationDialog,
   BrowserActivity,
   Button,
+  CodeReviewSettingsPage,
   CommandExecution,
   CommandOutput,
   ComposerAttachment,
@@ -37,6 +38,7 @@ import {
   FileReview,
   GeneralSettingsPage,
   GitSettingsPage,
+  HooksSettingsPage,
   IconButton,
   LocalEnvironmentDialog,
   Menu,
@@ -92,8 +94,10 @@ import {
   type ComposerPermissionOption,
   type ComposerModeKind,
   type ComposerResourceGroup,
+  type CodeReviewSettingsValue,
   type GeneralSettingsValue,
   type GitSettingsValue,
+  type HookSettingsEntry,
   type QueuedPrompt,
   type SubagentItem,
 } from "codex-ui-kit";
@@ -284,6 +288,43 @@ function SummaryGlyph({ name }: { name: SummaryGlyphName }) {
     </svg>
   );
 }
+
+const configuredHookSettingsEntries: readonly HookSettingsEntry[] = [
+  {
+    command: "pnpm check",
+    enabled: true,
+    event: "Stop",
+    handler: "command",
+    id: "user-stop-check",
+    source: "user",
+    statusMessage: "Checking the workspace",
+    timeout: "120s",
+    trusted: true,
+  },
+  {
+    changedSinceTrusted: true,
+    command: "pnpm lint",
+    enabled: false,
+    event: "PreToolUse",
+    handler: "command",
+    id: "plugin-pre-tool-lint",
+    matcher: "Shell",
+    pluginName: "Quality checks",
+    source: "plugin",
+    trusted: false,
+  },
+  {
+    enabled: true,
+    event: "SessionStart",
+    handler: "prompt",
+    id: "project-session-context",
+    managed: true,
+    projectLabel: "codex-ui-kit",
+    prompt: "Load the project contribution guide.",
+    source: "project",
+    trusted: true,
+  },
+];
 
 function DemoVsCodeIcon() {
   return (
@@ -1745,10 +1786,12 @@ export function App() {
     );
   const [workspacePage, setWorkspacePage] = useState<
     | "appearance-settings"
+    | "code-review-settings"
     | "conversation"
     | "environments"
     | "general-settings"
     | "git-settings"
+    | "hooks-settings"
   >(
     initialSelection.view === "workspace" &&
       initialSelection.frame === "workspace-environments-unavailable"
@@ -1758,6 +1801,12 @@ export function App() {
             initialSelection.frame ?? "",
           )
         ? "git-settings"
+      : initialSelection.view === "workspace" &&
+          initialSelection.frame?.startsWith("workspace-hooks-settings")
+        ? "hooks-settings"
+      : initialSelection.view === "workspace" &&
+          initialSelection.frame?.startsWith("workspace-code-review-settings")
+        ? "code-review-settings"
       : initialSelection.view === "workspace" &&
           initialSelection.frame?.startsWith("workspace-general-settings")
         ? "general-settings"
@@ -1772,6 +1821,10 @@ export function App() {
       ? "general"
       : initialSelection.frame?.startsWith("workspace-appearance-settings")
         ? "appearance"
+        : initialSelection.frame?.startsWith("workspace-hooks-settings")
+          ? "hooks"
+        : initialSelection.frame?.startsWith("workspace-code-review-settings")
+          ? "code-review"
         : "git",
   );
   const [settingsRouteFocusPending, setSettingsRouteFocusPending] =
@@ -1848,6 +1901,31 @@ export function App() {
     }
   }, [workspacePage]);
   const [generalSettingsAction, setGeneralSettingsAction] = useState("");
+  const [hookSettingsEntries, setHookSettingsEntries] = useState<
+    readonly HookSettingsEntry[]
+  >(() =>
+    initialSelection.frame === "workspace-hooks-settings-configured"
+      ? configuredHookSettingsEntries
+      : [],
+  );
+  const [hookSettingsStatus, setHookSettingsStatus] = useState<
+    "error" | "loading" | "ready"
+  >(() =>
+    initialSelection.frame === "workspace-hooks-settings-loading"
+      ? "loading"
+      : initialSelection.frame === "workspace-hooks-settings-error"
+        ? "error"
+        : "ready",
+  );
+  const [hooksRefreshing, setHooksRefreshing] = useState(false);
+  const [hooksSettingsAction, setHooksSettingsAction] = useState("");
+  const [codeReviewSettings, setCodeReviewSettings] =
+    useState<CodeReviewSettingsValue>({
+      allowCreditsForCodeReviews: false,
+      automaticReview: true,
+      exhaustiveCodeReview: false,
+      triggerPolicy: "pr_open",
+    });
   const [savedCommitInstructions, setSavedCommitInstructions] = useState("");
   const [savedPullRequestInstructions, setSavedPullRequestInstructions] =
     useState("");
@@ -5141,6 +5219,14 @@ export function App() {
         ? activeFrame?.startsWith("workspace-general-settings")
           ? activeFrame
           : "workspace-general-settings"
+      : workspacePage === "hooks-settings"
+        ? activeFrame?.startsWith("workspace-hooks-settings")
+          ? activeFrame
+          : "workspace-hooks-settings"
+      : workspacePage === "code-review-settings"
+        ? activeFrame?.startsWith("workspace-code-review-settings")
+          ? activeFrame
+          : "workspace-code-review-settings"
       : workspacePage === "appearance-settings"
         ? initialSelection.frame?.startsWith("workspace-appearance-settings")
           ? initialSelection.frame
@@ -5190,7 +5276,13 @@ export function App() {
   ]);
   useEffect(() => {
     if (
-      !["appearance-settings", "general-settings", "git-settings"].includes(
+      ![
+        "appearance-settings",
+        "code-review-settings",
+        "general-settings",
+        "git-settings",
+        "hooks-settings",
+      ].includes(
         workspacePage,
       ) ||
       !settingsRouteFocusPending
@@ -6431,7 +6523,8 @@ export function App() {
         if (
           itemId !== "appearance" &&
           itemId !== "general" &&
-          itemId !== "git"
+          itemId !== "git" &&
+          itemId !== "hooks"
         ) {
           return;
         }
@@ -6441,6 +6534,8 @@ export function App() {
             ? "appearance-settings"
             : itemId === "general"
               ? "general-settings"
+              : itemId === "hooks"
+                ? "hooks-settings"
               : "git-settings",
         );
         setActiveFrame(
@@ -6448,6 +6543,8 @@ export function App() {
             ? "workspace-appearance-settings"
             : itemId === "general"
               ? "workspace-general-settings"
+              : itemId === "hooks"
+                ? "workspace-hooks-settings"
               : "workspace-git-settings",
         );
       }}
@@ -6456,7 +6553,65 @@ export function App() {
       sections={settingsNavigation}
       selectedId={selectedSettingsId}
     >
-      {workspacePage === "appearance-settings" ? (
+      {workspacePage === "hooks-settings" ? (
+        <>
+          <HooksSettingsPage
+            data-evidence="runtime-observed"
+            entries={hookSettingsEntries}
+            learnMoreHref="https://developers.openai.com/codex/hooks"
+            onOpenConfig={(entry) =>
+              setHooksSettingsAction(
+                `Open config requested for ${entry.title ?? entry.event}`,
+              )
+            }
+            onReload={() => {
+              setHooksSettingsAction("");
+              setHooksRefreshing(true);
+              window.setTimeout(() => {
+                setHookSettingsStatus("ready");
+                setHooksRefreshing(false);
+                setHooksSettingsAction("Refreshed hooks");
+              }, 180);
+            }}
+            onToggleHookEnabled={(entry, enabled) =>
+              setHookSettingsEntries((entries) =>
+                entries.map((candidate) =>
+                  candidate.id === entry.id
+                    ? { ...candidate, enabled }
+                    : candidate,
+                ),
+              )
+            }
+            onTrustHook={(entry) =>
+              setHookSettingsEntries((entries) =>
+                entries.map((candidate) =>
+                  candidate.id === entry.id
+                    ? {
+                        ...candidate,
+                        changedSinceTrusted: false,
+                        trusted: true,
+                      }
+                    : candidate,
+                ),
+              )
+            }
+            refreshing={hooksRefreshing}
+            reloadIcon={<CurrentBuildIcon name="settings-hooks-reload" />}
+            status={hookSettingsStatus}
+          />
+          <span aria-live="polite" className="demo-settings-action-status">
+            {hooksSettingsAction}
+          </span>
+        </>
+      ) : workspacePage === "code-review-settings" ? (
+        <CodeReviewSettingsPage
+          data-evidence="package-observed"
+          onChange={setCodeReviewSettings}
+          onRetry={() => undefined}
+          showCreditPreference
+          value={codeReviewSettings}
+        />
+      ) : workspacePage === "appearance-settings" ? (
         <>
           <AppearanceSettingsPage
             chatGptDockIcon={<CurrentBuildIcon name="settings-account" />}
@@ -6528,6 +6683,8 @@ export function App() {
     workspacePage === "environments"
       ? workspaceEnvironmentSettingsRoute
       : workspacePage === "git-settings" ||
+          workspacePage === "hooks-settings" ||
+          workspacePage === "code-review-settings" ||
           workspacePage === "appearance-settings" ||
           workspacePage === "general-settings"
         ? workspaceSettingsRoute
@@ -6538,8 +6695,10 @@ export function App() {
           : workspaceNewConversationRoute;
   const workspaceShowsSettings =
     workspacePage === "appearance-settings" ||
+    workspacePage === "code-review-settings" ||
     workspacePage === "general-settings" ||
-    workspacePage === "git-settings";
+    workspacePage === "git-settings" ||
+    workspacePage === "hooks-settings";
 
   const projectIndexStatus =
     activeFrame === "projects-index-loading"

@@ -738,6 +738,42 @@ try {
         },
       };
     };
+    const captureSettingsActionIcon = ({ ariaLabel, id }) => {
+      const controls = [...document.querySelectorAll("button")].filter(
+        (button) =>
+          button.getAttribute("aria-label") === ariaLabel &&
+          isActuallyVisible(button),
+      );
+      if (controls.length !== 1) {
+        throw new Error(
+          `Expected one visible settings action ${ariaLabel}, received ${controls.length}.`,
+        );
+      }
+      const svgs = [...controls[0].querySelectorAll("svg")].filter(
+        isActuallyVisible,
+      );
+      if (svgs.length !== 1) {
+        throw new Error(
+          `Expected one visible SVG for settings action ${ariaLabel}, received ${svgs.length}.`,
+        );
+      }
+      const svg = svgs[0];
+      const bounds = svg.getBoundingClientRect();
+      return {
+        owner: { role: "button", semanticId: id },
+        primitives: [...svg.children].map(serializeSvgElement),
+        region: "settings-page-action",
+        rect: rect(svg),
+        renderSize: {
+          height: round(bounds.height),
+          width: round(bounds.width),
+        },
+        rootAttributes: attributes(svg, true),
+        rootComputedStyle: computedStyle(svg),
+        sourceClassName: svg.getAttribute("class") ?? "",
+        viewBox: svg.getAttribute("viewBox"),
+      };
+    };
     Object.defineProperty(window, "__codexUiKitCaptureVisibleMenuIcons", {
       configurable: true,
       value: captureVisibleMenuIcons,
@@ -749,6 +785,10 @@ try {
     Object.defineProperty(window, "__codexUiKitCaptureSettingsNavigationIcons", {
       configurable: true,
       value: captureSettingsNavigationIcons,
+    });
+    Object.defineProperty(window, "__codexUiKitCaptureSettingsActionIcon", {
+      configurable: true,
+      value: captureSettingsActionIcon,
     });
     const navigation = document.querySelector("nav");
     const recentsSections = [
@@ -1526,6 +1566,19 @@ try {
     );
     await settingsSearch.fill("");
     await main.waitForTimeout(100);
+    const hooksNavigation = main.getByRole("button", {
+      name: "Hooks",
+      exact: true,
+    });
+    await hooksNavigation.click();
+    await main.getByRole("heading", { name: "Hooks", exact: true }).waitFor();
+    await main.getByText("No hooks found", { exact: true }).waitFor();
+    const hooksReloadIcon = await main.evaluate(() =>
+      window.__codexUiKitCaptureSettingsActionIcon({
+        ariaLabel: "Reload hooks",
+        id: "settings-hooks-reload",
+      }),
+    );
     const settingsObservation = {
       ...settingsCapture.observation,
       page: settingsPageObservation,
@@ -1572,7 +1625,7 @@ try {
     result.icons.push(...projectMenuIcons, ...helpMenuIcons);
     result.icons.push(...accountMenuCapture.icons);
     result.icons.push(...workInCapture.icons, ...environmentCapture.icons);
-    result.icons.push(...settingsCapture.icons);
+    result.icons.push(...settingsCapture.icons, hooksReloadIcon);
     result.sidebarObservation.projectMenuItemCount = projectMenuIcons.length;
     result.sidebarObservation.projectMenuHasMarkAllAsRead =
       projectMenuHasMarkAllAsRead;
@@ -1593,6 +1646,7 @@ try {
         delete window.__codexUiKitCaptureVisibleMenuIcons;
         delete window.__codexUiKitCaptureVisibleMenuIconSlots;
         delete window.__codexUiKitCaptureSettingsNavigationIcons;
+        delete window.__codexUiKitCaptureSettingsActionIcon;
       })
       .catch(() => {});
   }
