@@ -66,11 +66,18 @@ function CopyIcon() {
   );
 }
 
-function TerminalIcon() {
+function TerminalIcon({ children }: { children?: ReactNode }) {
+  if (children !== undefined && children !== null) {
+    return (
+      <span aria-hidden="true" className="codex-ui-command-execution__icon">
+        {children}
+      </span>
+    );
+  }
   return (
     <svg
       aria-hidden="true"
-      className="codex-ui-command-execution__icon"
+      className="codex-ui-command-execution__icon codex-ui-command-execution__icon--fallback"
       viewBox="0 0 16 16"
     >
       <rect height="12" rx="2" width="14" x="1" y="2" />
@@ -96,6 +103,7 @@ export interface CommandExecutionProps
   footer?: ReactNode;
   hideRawCommand?: boolean;
   indicator?: ReactNode;
+  terminalIcon?: ReactNode;
   noOutputLabel?: ReactNode;
   onCopyCommand?: (command: string) => void | Promise<void>;
   onOpenChange?: (open: boolean) => void;
@@ -131,6 +139,7 @@ export function CommandExecution({
   startedAtMs,
   status,
   summary,
+  terminalIcon,
   ...props
 }: CommandExecutionProps) {
   const [internalOpen, setInternalOpen] = useState(defaultOpen);
@@ -247,7 +256,7 @@ export function CommandExecution({
   const body = hideRawCommand ? (
     compactDetail === undefined || compactDetail === null ? undefined : (
       <div className="codex-ui-command-execution__compact-detail">
-        <TerminalIcon />
+        <TerminalIcon>{terminalIcon}</TerminalIcon>
         <span>{compactDetail}</span>
       </div>
     )
@@ -297,7 +306,7 @@ export function CommandExecution({
       className={classes}
       data-execution-status={status}
       detail={detail}
-      indicator={indicator ?? <TerminalIcon />}
+      indicator={indicator ?? <TerminalIcon>{terminalIcon}</TerminalIcon>}
       kind="command"
       onOpenChange={handleOpenChange}
       open={resolvedOpen}

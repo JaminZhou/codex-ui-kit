@@ -251,9 +251,13 @@ describe("terminal panel", () => {
 
   it("lists background process lifecycle without owning process actions", () => {
     const onOpenProcess = vi.fn();
+    const onStopAll = vi.fn();
+    const onStopProcess = vi.fn();
     const { rerender } = render(
       <TerminalProcessList
         onOpenProcess={onOpenProcess}
+        onStopAll={onStopAll}
+        onStopProcess={onStopProcess}
         processes={[
           {
             detail: "pnpm dev",
@@ -283,11 +287,62 @@ describe("terminal panel", () => {
     expect(screen.getByText("Failed")).toBeTruthy();
     expect(screen.getByText("Exited")).toBeTruthy();
     fireEvent.click(
-      screen.getByRole("button", { name: /Development server/ }),
+      screen.getByRole("button", {
+        name: "Development server pnpm dev Running",
+      }),
+    );
+    fireEvent.click(
+      screen.getByRole("button", { name: "Stop Development server" }),
+    );
+    fireEvent.click(
+      screen.getByRole("button", {
+        name: "Stop all background terminals",
+      }),
     );
     expect(onOpenProcess).toHaveBeenCalledWith("dev");
+    expect(onStopProcess).toHaveBeenCalledWith("dev");
+    expect(onStopAll).toHaveBeenCalledOnce();
+    expect(
+      screen.queryByRole("button", { name: "Stop Test run" }),
+    ).toBeNull();
 
     rerender(<TerminalProcessList processes={[]} />);
     expect(screen.getByText("No background processes")).toBeTruthy();
+    expect(
+      screen.queryByRole("button", {
+        name: "Stop all background terminals",
+      }),
+    ).toBeNull();
+  });
+
+  it("gives ReactNode process stop controls stable unique names", () => {
+    render(
+      <TerminalProcessList
+        onStopProcess={() => undefined}
+        processes={[
+          {
+            id: "worker-a",
+            label: <span>Worker</span>,
+            status: "running",
+          },
+          {
+            id: "worker-b",
+            label: <span>Worker</span>,
+            status: "running",
+          },
+        ]}
+      />,
+    );
+
+    expect(
+      screen.getByRole("button", {
+        name: "Stop background terminal worker-a",
+      }),
+    ).toBeTruthy();
+    expect(
+      screen.getByRole("button", {
+        name: "Stop background terminal worker-b",
+      }),
+    ).toBeTruthy();
   });
 });

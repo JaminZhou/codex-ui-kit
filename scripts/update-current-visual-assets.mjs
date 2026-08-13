@@ -276,6 +276,12 @@ const promotionSpecs = new Map([
       null,
       "conversation",
     ],
+    [
+      "thread-command-terminal",
+      null,
+      "first visible 16px SVG in a current command activity summary, selected structurally before the summary text",
+      "conversation",
+    ],
   ].map(([id, ownerAriaLabel, ownerEvidence, region]) => [
     id,
     {
@@ -604,6 +610,7 @@ if (threadOnly) {
     "thread-assistant-good",
     "thread-assistant-bad",
     "thread-assistant-continue",
+    "thread-command-terminal",
   ];
   if (capture.captureMode !== "completed-thread") {
     throw new Error("Targeted current-thread capture mode was not proven.");

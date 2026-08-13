@@ -637,6 +637,69 @@ code {
   font-weight: 400;
 }
 
+.current-command-lifecycle {
+  background: #171717;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  position: relative;
+}
+
+.current-command-lifecycle__conversation {
+  height: 100vh;
+  min-width: 0;
+}
+
+.current-command-lifecycle .codex-ui-conversation-thread-shell,
+.current-command-lifecycle .codex-ui-thread-viewport,
+.current-command-lifecycle .codex-ui-thread {
+  background: #171717;
+}
+
+.current-command-lifecycle .codex-ui-conversation-thread-shell {
+  --codex-ui-conversation-thread-font-size: 0.875rem;
+  font-weight: 445;
+}
+
+.current-command-lifecycle__timeline
+  .codex-ui-activity-timeline__toggle {
+  font-size: 0.875rem;
+  line-height: 1.3125rem;
+}
+
+.current-command-lifecycle .codex-ui-command-execution__icon {
+  stroke: none;
+}
+
+.current-command-lifecycle__process-panel {
+  background: #171717;
+  border-left: 1px solid var(--codex-ui-border);
+  box-shadow: -0.5rem 0 2rem rgb(0 0 0 / 18%);
+  color: var(--codex-ui-text);
+  padding: 1rem;
+  position: absolute;
+  right: 0;
+  top: 46px;
+  width: 260px;
+  z-index: 3;
+}
+
+.current-command-lifecycle__process-panel
+  .codex-ui-terminal-process-list__title,
+.current-command-lifecycle__process-panel
+  .codex-ui-terminal-process-list__label {
+  font-size: 0.875rem;
+  font-weight: 445;
+  line-height: 1.3125rem;
+}
+
+.current-command-lifecycle__process-panel
+  .codex-ui-terminal-process-list__detail,
+.current-command-lifecycle__process-panel
+  .codex-ui-terminal-process-list__status {
+  font-size: 0.75rem;
+  line-height: 1rem;
+}
+
 .workflow-pixel-fixture .codex-ui-conversation-thread-shell,
 .workflow-pixel-fixture .codex-ui-thread-viewport,
 .workflow-pixel-fixture .codex-ui-thread {

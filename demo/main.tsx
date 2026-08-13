@@ -1,4 +1,4 @@
-import { StrictMode, useState, type ReactNode } from "react";
+import { StrictMode, useEffect, useState, type ReactNode } from "react";
 import { createRoot } from "react-dom/client";
 import {
   CurrentThreadBuildIcon,
@@ -82,6 +82,7 @@ import {
   SubagentSummary,
   SubagentTranscriptHeader,
   TerminalSession,
+  TerminalProcessList,
   ToolCallCard,
   Tooltip,
   ThreadFloatingButton,
@@ -499,6 +500,110 @@ function PixelIcon({ name }: { name: PixelIconName }) {
 
 type CurrentThreadPixelState = "completed" | "streaming";
 
+function CurrentThreadExactHeader({ title }: { title: string }) {
+  return (
+    <ThreadHeader
+      navigation={
+        <div className="current-thread-pixel-fixture__navigation">
+          <button aria-label="Show sidebar" type="button">
+            <CurrentThreadBuildIcon name="window-chrome-sidebar" />
+          </button>
+          <button aria-label="Back" type="button">
+            <CurrentThreadBuildIcon name="window-chrome-back" />
+          </button>
+          <button aria-label="Forward" disabled type="button">
+            <CurrentThreadBuildIcon name="window-chrome-forward" />
+          </button>
+          <button aria-label="New chat" type="button">
+            <CurrentThreadBuildIcon name="thread-header-new-chat" />
+          </button>
+        </div>
+      }
+      endActions={
+        <>
+          <button
+            aria-label="Open in editor"
+            className="current-thread-pixel-fixture__editor-control"
+            type="button"
+          >
+            <CurrentThreadRasterAsset name="thread-header-editor-vscode" />
+            <CurrentThreadBuildIcon name="thread-header-open-in-chevron" />
+          </button>
+          <button aria-label="Thread controls" type="button">
+            <CurrentThreadBuildIcon name="thread-header-pinned-summary" />
+          </button>
+          <button aria-label="Toggle bottom panel" type="button">
+            <CurrentThreadBuildIcon name="thread-header-bottom-panel" />
+          </button>
+          <button aria-label="Toggle workspace panel" type="button">
+            <CurrentThreadBuildIcon name="thread-header-side-panel" />
+          </button>
+        </>
+      }
+      position="static"
+      title={
+        <span className="current-thread-pixel-fixture__title">
+          <CurrentThreadBuildIcon name="thread-header-project" />
+          <span>{title}</span>
+          <CurrentThreadBuildIcon name="thread-header-actions" />
+        </span>
+      }
+    />
+  );
+}
+
+function CurrentThreadExactComposer({
+  onStop,
+  onSubmit,
+  onValueChange,
+  running,
+  value,
+}: {
+  onStop?: () => void;
+  onSubmit: () => void;
+  onValueChange: (value: string) => void;
+  running: boolean;
+  value: string;
+}) {
+  return (
+    <AgentComposer
+      actions={
+        <>
+          <button aria-label="Add attachment" type="button">
+            <CurrentThreadBuildIcon name="composer-add-files" />
+          </button>
+          <button type="button">
+            <CurrentThreadBuildIcon name="composer-permission" />
+            <span>Full access</span>
+          </button>
+        </>
+      }
+      controls={
+        <>
+          <button type="button">
+            <span className="current-thread-pixel-fixture__model">
+              5.6 Sol <span>Extra High</span>
+            </span>
+            <CurrentThreadBuildIcon name="composer-model-chevron" />
+          </button>
+          <button aria-label="Voice input" type="button">
+            <CurrentThreadBuildIcon name="composer-dictate" />
+          </button>
+        </>
+      }
+      isRunning={running}
+      layout="multiline"
+      onStop={onStop}
+      onSubmit={onSubmit}
+      onValueChange={onValueChange}
+      placeholder="Do anything"
+      stopLabel="Stop"
+      submitIcon={<CurrentThreadBuildIcon name="composer-send" />}
+      value={value}
+    />
+  );
+}
+
 const streamingPixelPrompt =
   'Write exactly 24 short plain-text sentences about pixel-level UI verification. Begin the first sentence with "Streaming probe:" and number no sentences. Do not use Markdown or tools.';
 
@@ -536,92 +641,20 @@ function CurrentThreadPixelFixture({
     >
       <ConversationThreadShell
         composer={
-          <AgentComposer
-            actions={
-              <>
-                <button aria-label="Add attachment" type="button">
-                  <CurrentThreadBuildIcon name="composer-add-files" />
-                </button>
-                <button type="button">
-                  <CurrentThreadBuildIcon name="composer-permission" />
-                  <span>Full access</span>
-                </button>
-              </>
-            }
-            controls={
-              <>
-                <button type="button">
-                  <span className="current-thread-pixel-fixture__model">
-                    5.6 Sol <span>Extra High</span>
-                  </span>
-                  <CurrentThreadBuildIcon name="composer-model-chevron" />
-                </button>
-                <button aria-label="Voice input" type="button">
-                  <CurrentThreadBuildIcon name="composer-dictate" />
-                </button>
-              </>
-            }
-            isRunning={running}
-            layout="multiline"
+          <CurrentThreadExactComposer
             onStop={() => setRunning(false)}
             onSubmit={() => undefined}
             onValueChange={() => undefined}
-            placeholder="Do anything"
-            stopLabel="Stop"
-            submitIcon={<CurrentThreadBuildIcon name="composer-send" />}
+            running={running}
             value=""
           />
         }
         header={
-          <ThreadHeader
-            navigation={
-              <div className="current-thread-pixel-fixture__navigation">
-                <button aria-label="Show sidebar" type="button">
-                  <CurrentThreadBuildIcon name="window-chrome-sidebar" />
-                </button>
-                <button aria-label="Back" type="button">
-                  <CurrentThreadBuildIcon name="window-chrome-back" />
-                </button>
-                <button aria-label="Forward" disabled type="button">
-                  <CurrentThreadBuildIcon name="window-chrome-forward" />
-                </button>
-                <button aria-label="New chat" type="button">
-                  <CurrentThreadBuildIcon name="thread-header-new-chat" />
-                </button>
-              </div>
-            }
-            endActions={
-              <>
-                <button
-                  aria-label="Open in editor"
-                  className="current-thread-pixel-fixture__editor-control"
-                  type="button"
-                >
-                  <CurrentThreadRasterAsset name="thread-header-editor-vscode" />
-                  <CurrentThreadBuildIcon name="thread-header-open-in-chevron" />
-                </button>
-                <button aria-label="Thread controls" type="button">
-                  <CurrentThreadBuildIcon name="thread-header-pinned-summary" />
-                </button>
-                <button aria-label="Toggle bottom panel" type="button">
-                  <CurrentThreadBuildIcon name="thread-header-bottom-panel" />
-                </button>
-                <button aria-label="Toggle workspace panel" type="button">
-                  <CurrentThreadBuildIcon name="thread-header-side-panel" />
-                </button>
-              </>
-            }
-            position="static"
+          <CurrentThreadExactHeader
             title={
-              <span className="current-thread-pixel-fixture__title">
-                <CurrentThreadBuildIcon name="thread-header-project" />
-                <span>
-                  {streaming
-                    ? "Write pixel UI verification summary"
-                    : "Confirm UI probe completion"}
-                </span>
-                <CurrentThreadBuildIcon name="thread-header-actions" />
-              </span>
+              streaming
+                ? "Write pixel UI verification summary"
+                : "Confirm UI probe completion"
             }
           />
         }
@@ -650,6 +683,233 @@ function CurrentThreadPixelFixture({
           {streaming ? streamingReply : "UI probe complete."}
         </AgentMessage>
       </ConversationThreadShell>
+    </main>
+  );
+}
+
+type CurrentCommandLifecycleState =
+  | "failure"
+  | "interruption"
+  | "success";
+type CurrentCommandInterruptionPhase =
+  | "recovered"
+  | "running"
+  | "settled"
+  | "stopping";
+
+const currentSuccessCommand =
+  "for i in $(seq 1 12); do printf 'current-success-%03d\\n' \"$i\"; sleep 1; done";
+const currentFailureCommand =
+  "printf 'current-stdout\\n'; printf 'current-stderr\\n' >&2; exit 7";
+const currentInterruptionCommand =
+  "for i in $(seq 1 120); do printf 'current-interrupt-%03d\\n' \"$i\"; sleep 1; done";
+const currentSuccessOutput = Array.from(
+  { length: 12 },
+  (_, index) => `current-success-${String(index + 1).padStart(3, "0")}`,
+).join("\n");
+
+function CurrentCommandLifecycleFixture({
+  state,
+}: {
+  state: CurrentCommandLifecycleState;
+}) {
+  const [interruptionPhase, setInterruptionPhase] =
+    useState<CurrentCommandInterruptionPhase>("running");
+  const [composerValue, setComposerValue] = useState("");
+  const interruption = state === "interruption";
+  const turnRunning =
+    state === "success" ||
+    (interruption && interruptionPhase === "running");
+  const backgroundStopping =
+    interruption && interruptionPhase === "stopping";
+  const backgroundSettled =
+    interruption &&
+    (interruptionPhase === "settled" || interruptionPhase === "recovered");
+
+  const stopTurn = () => {
+    if (interruptionPhase === "running") setInterruptionPhase("stopping");
+  };
+  const stopBackground = () => {
+    if (interruptionPhase === "stopping") setInterruptionPhase("settled");
+  };
+  const submitRecovery = () => {
+    if (
+      interruptionPhase !== "settled" ||
+      composerValue !== "CURRENT INTERRUPTION RECOVERY"
+    ) {
+      return;
+    }
+    setComposerValue("");
+    setInterruptionPhase("recovered");
+  };
+
+  const terminalIcon = (
+    <CurrentThreadBuildIcon name="thread-command-terminal" />
+  );
+  const commandPanel = (() => {
+    if (state === "success") {
+      return (
+        <ActivityTimeline
+          className="current-command-lifecycle__timeline"
+          defaultOpen
+          summary={<TurnDuration durationMs={19_000} status="working" />}
+        >
+          <AgentReasoning label="Thinking" status="running">
+            <span />
+          </AgentReasoning>
+          <CommandExecution
+            command={currentSuccessCommand}
+            defaultOpen
+            durationMs={12_000}
+            exitCode={0}
+            status="completed"
+            terminalIcon={terminalIcon}
+          >
+            <CommandOutput copyLabel="Copy" copyText={currentSuccessOutput}>
+              {currentSuccessOutput}
+            </CommandOutput>
+          </CommandExecution>
+        </ActivityTimeline>
+      );
+    }
+    if (state === "failure") {
+      return (
+        <ActivityTimeline
+          className="current-command-lifecycle__timeline"
+          defaultOpen
+          summary={<TurnDuration durationMs={4_000} status="worked" />}
+        >
+          <CommandExecution
+            command={currentFailureCommand}
+            defaultOpen
+            durationMs={4_000}
+            exitCode={7}
+            status="failed"
+            terminalIcon={terminalIcon}
+          >
+            <CommandOutput
+              copyLabel="Copy"
+              copyText={"current-stdout\ncurrent-stderr\n"}
+            >
+              {"current-stdout\ncurrent-stderr\n"}
+            </CommandOutput>
+          </CommandExecution>
+        </ActivityTimeline>
+      );
+    }
+    const summary = backgroundStopping ? (
+      <>Background terminal stopped with {currentInterruptionCommand}</>
+    ) : backgroundSettled ? (
+      <>Ran {currentInterruptionCommand}</>
+    ) : (
+      <>Running {currentInterruptionCommand}</>
+    );
+    const execution = (
+      <CommandExecution
+        command={currentInterruptionCommand}
+        compactDetail={turnRunning ? "Running command for 16s" : undefined}
+        hideRawCommand
+        open={turnRunning}
+        status={
+          backgroundStopping
+            ? "interrupted"
+            : backgroundSettled
+              ? "background-finished"
+              : "running"
+        }
+        summary={summary}
+        terminalIcon={terminalIcon}
+      />
+    );
+    return turnRunning ? (
+      <ActivityTimeline
+        className="current-command-lifecycle__timeline"
+        open
+        summary={<TurnDuration durationMs={20_000} status="working" />}
+      >
+        {execution}
+      </ActivityTimeline>
+    ) : (
+      <>
+        <ThreadInterruptionSummary durationMs={20_000} />
+        {execution}
+      </>
+    );
+  })();
+
+  return (
+    <main
+      className="current-thread-pixel-fixture current-command-lifecycle"
+      data-interruption-phase={interruption ? interruptionPhase : undefined}
+      data-theme="dark"
+      data-visual-scene={`current-command-${state}`}
+    >
+      <div className="current-command-lifecycle__conversation">
+        <ConversationThreadShell
+          composer={
+            <CurrentThreadExactComposer
+              onStop={
+                turnRunning
+                  ? interruption
+                    ? stopTurn
+                    : () => undefined
+                  : undefined
+              }
+              onSubmit={submitRecovery}
+              onValueChange={setComposerValue}
+              running={turnRunning}
+              value={composerValue}
+            />
+          }
+          header={
+            <CurrentThreadExactHeader title="Current command lifecycle" />
+          }
+          isRunning={turnRunning}
+          label="Current command lifecycle"
+          viewportProps={{ followKey: interruptionPhase, latestOrigin: "start" }}
+        >
+          <AgentMessage role="user">
+            {state === "success"
+              ? currentSuccessCommand
+              : state === "failure"
+                ? currentFailureCommand
+                : currentInterruptionCommand}
+          </AgentMessage>
+          {commandPanel}
+          {state === "failure" ? (
+            <AgentMessage actions={<WorkflowMessageActions />} role="assistant">
+              CURRENT COMMAND FAILURE OBSERVED
+            </AgentMessage>
+          ) : null}
+          {interruptionPhase === "recovered" ? (
+            <>
+              <AgentMessage role="user">CURRENT INTERRUPTION RECOVERY</AgentMessage>
+              <AgentMessage actions={<WorkflowMessageActions />} role="assistant">
+                CURRENT INTERRUPTION RECOVERY ACCEPTED
+              </AgentMessage>
+            </>
+          ) : null}
+        </ConversationThreadShell>
+      </div>
+      {backgroundStopping ? (
+        <aside
+          aria-label="Current background terminal panel"
+          className="current-command-lifecycle__process-panel"
+        >
+          <TerminalProcessList
+            onStopAll={stopBackground}
+            onStopProcess={stopBackground}
+            processes={[
+              {
+                detail: currentInterruptionCommand,
+                id: "current-interruption",
+                label: "Background terminal",
+                status: "running",
+              },
+            ]}
+          />
+        </aside>
+      ) : null}
     </main>
   );
 }
@@ -4177,6 +4437,14 @@ const currentThreadCapture =
   capture === "current-thread-completed-compact" ||
   capture === "current-thread-streaming" ||
   capture === "current-thread-streaming-compact";
+const currentCommandLifecycleState: CurrentCommandLifecycleState | undefined =
+  capture === "current-command-success"
+    ? "success"
+    : capture === "current-command-failure"
+      ? "failure"
+      : capture === "current-command-interruption"
+        ? "interruption"
+        : undefined;
 const currentThreadPixelState: CurrentThreadPixelState =
   capture === "current-thread-streaming" ||
   capture === "current-thread-streaming-compact"
@@ -4214,7 +4482,9 @@ const continuityPixelState: ContinuityPixelState | undefined =
             : undefined;
 
 createRoot(document.getElementById("root")!).render(
-  continuityPixelState ? (
+  currentCommandLifecycleState ? (
+    <CurrentCommandLifecycleFixture state={currentCommandLifecycleState} />
+  ) : continuityPixelState ? (
     <ContinuityPixelFixture state={continuityPixelState} />
   ) : toolRecoveryPixelState ? (
     <ToolRecoveryPixelFixture state={toolRecoveryPixelState} />

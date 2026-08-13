@@ -179,6 +179,64 @@ describe("CommandExecution", () => {
     expect(html).not.toContain("codex-ui-command-execution__shell");
   });
 
+  it("reuses a host-provided terminal icon in summaries and compact details", () => {
+    const { container } = render(
+      <CommandExecution
+        command="private long-running command"
+        compactDetail="Running command for 3s"
+        defaultOpen
+        hideRawCommand
+        status="running"
+        terminalIcon={<svg data-testid="current-terminal-icon" viewBox="0 0 16 16" />}
+      />,
+    );
+
+    expect(
+      container.querySelectorAll('[data-testid="current-terminal-icon"]'),
+    ).toHaveLength(2);
+    expect(
+      container.querySelectorAll(".codex-ui-command-execution__icon"),
+    ).toHaveLength(2);
+    expect(
+      container.querySelectorAll(
+        '.codex-ui-command-execution__icon[aria-hidden="true"]',
+      ),
+    ).toHaveLength(2);
+    expect(
+      container.querySelectorAll(
+        ".codex-ui-command-execution__icon--fallback",
+      ),
+    ).toHaveLength(0);
+  });
+
+  it("scopes fallback paint styles away from host-provided terminal icons", () => {
+    const { container } = render(
+      <CommandExecution command="pwd" status="completed" />,
+    );
+
+    expect(
+      container.querySelectorAll(
+        "svg.codex-ui-command-execution__icon--fallback",
+      ),
+    ).toHaveLength(1);
+  });
+
+  it("wraps host-provided image terminal icons without changing their semantics", () => {
+    const { container } = render(
+      <CommandExecution
+        command="pwd"
+        status="completed"
+        terminalIcon={<img alt="" height={64} src="terminal.png" width={64} />}
+      />,
+    );
+
+    expect(
+      container.querySelector(
+        '.codex-ui-command-execution__icon[aria-hidden="true"] > img[width="64"][height="64"]',
+      ),
+    ).toBeTruthy();
+  });
+
   it("can replace or omit the sampled shell label", () => {
     const custom = renderToStaticMarkup(
       <CommandExecution

@@ -950,6 +950,42 @@ try {
           viewBox: svg.getAttribute("viewBox"),
         };
       });
+    const currentCommandTerminalIcons = [
+      ...document.querySelectorAll(".group\\/activity-header"),
+    ]
+      .filter((activity) => {
+        const text = activity.textContent?.replace(/\s+/g, " ").trim() ?? "";
+        return /^(Ran|Running)\b/.test(text);
+      })
+      .map((activity) => activity.querySelector("svg"))
+      .filter((svg) => {
+        if (!(svg instanceof SVGElement) || !isActuallyVisible(svg)) return false;
+        const bounds = svg.getBoundingClientRect();
+        return (
+          region(bounds) === "conversation" &&
+          bounds.width === 16 &&
+          bounds.height === 16 &&
+          svg.getAttribute("viewBox") === "0 0 20 20"
+        );
+      });
+    if (currentCommandTerminalIcons.length === 1) {
+      const svg = currentCommandTerminalIcons[0];
+      const bounds = svg.getBoundingClientRect();
+      icons.push({
+        owner: { role: "presentation", semanticId: "thread-command-terminal" },
+        primitives: [...svg.children].map(serializeSvgElement),
+        region: "conversation",
+        rect: rect(svg),
+        renderSize: {
+          height: round(bounds.height),
+          width: round(bounds.width),
+        },
+        rootAttributes: attributes(svg, true),
+        rootComputedStyle: computedStyle(svg),
+        sourceClassName: svg.getAttribute("class") ?? "",
+        viewBox: svg.getAttribute("viewBox"),
+      });
+    }
     const currentThreadProjectIcons = [
       ...document.querySelectorAll("header svg"),
     ].filter((svg) => {

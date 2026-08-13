@@ -55,6 +55,7 @@ export type CurrentBuildIconName =
   | "thread-assistant-continue"
   | "thread-assistant-copy"
   | "thread-assistant-good"
+  | "thread-command-terminal"
   | "thread-header-actions"
   | "thread-header-bottom-panel"
   | "thread-header-new-chat"

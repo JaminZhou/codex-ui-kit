@@ -3663,12 +3663,21 @@
   min-width: 0;
 }
 
+.codex-ui-terminal-process-list__header {
+  align-items: center;
+  display: flex;
+  gap: var(--codex-ui-spacing);
+  justify-content: space-between;
+  margin-bottom: calc(var(--codex-ui-spacing) * 2);
+  min-height: 1.75rem;
+}
+
 .codex-ui-terminal-process-list__title {
   color: var(--codex-ui-text-secondary);
   font-size: var(--codex-ui-font-size-sm);
   font-weight: var(--codex-ui-font-weight-medium);
   line-height: var(--codex-ui-line-height-sm);
-  margin: 0 0 calc(var(--codex-ui-spacing) * 2);
+  margin: 0;
 }
 
 .codex-ui-terminal-process-list__items {
@@ -3679,8 +3688,9 @@
   padding: 0;
 }
 
-.codex-ui-terminal-process-list__item > button,
-.codex-ui-terminal-process-list__item > div {
+.codex-ui-terminal-process-list__row,
+.codex-ui-terminal-process-list__open,
+.codex-ui-terminal-process-list__content {
   align-items: center;
   background: transparent;
   border: 0;
@@ -3691,18 +3701,71 @@
   gap: calc(var(--codex-ui-spacing) * 3);
   justify-content: space-between;
   min-width: 0;
-  padding: calc(var(--codex-ui-spacing) * 2);
+  padding: 0;
   text-align: start;
   width: 100%;
 }
 
-.codex-ui-terminal-process-list__item > button {
+.codex-ui-terminal-process-list__row {
+  min-height: 1.75rem;
+}
+
+.codex-ui-terminal-process-list__open,
+.codex-ui-terminal-process-list__content {
+  flex: 1 1 auto;
+  padding: calc(var(--codex-ui-spacing) * 2);
+}
+
+.codex-ui-terminal-process-list__open {
   cursor: pointer;
 }
 
-.codex-ui-terminal-process-list__item > button:hover,
-.codex-ui-terminal-process-list__item > button:focus-visible {
+.codex-ui-terminal-process-list__open:hover,
+.codex-ui-terminal-process-list__open:focus-visible {
   background: var(--codex-ui-background-button-tertiary-hover);
+}
+
+.codex-ui-terminal-process-list__stop-all,
+.codex-ui-terminal-process-list__stop {
+  align-items: center;
+  appearance: none;
+  background: transparent;
+  border: 0;
+  border-radius: var(--codex-ui-radius-sm);
+  color: var(--codex-ui-text-secondary);
+  cursor: pointer;
+  display: inline-flex;
+  flex: 0 0 auto;
+  height: 1.75rem;
+  justify-content: center;
+  padding: 0;
+  width: 1.75rem;
+}
+
+.codex-ui-terminal-process-list__stop {
+  margin-inline-end: calc(var(--codex-ui-spacing) * 2);
+}
+
+.codex-ui-terminal-process-list__stop-all:hover,
+.codex-ui-terminal-process-list__stop-all:focus-visible,
+.codex-ui-terminal-process-list__stop:hover,
+.codex-ui-terminal-process-list__stop:focus-visible {
+  background: var(--codex-ui-background-button-tertiary-hover);
+  color: var(--codex-ui-text);
+}
+
+.codex-ui-terminal-process-list__stop-all:focus-visible,
+.codex-ui-terminal-process-list__stop:focus-visible {
+  outline: 2px solid var(--codex-ui-focus);
+  outline-offset: 1px;
+}
+
+.codex-ui-terminal-process-list__stop-all > span,
+.codex-ui-terminal-process-list__stop > span {
+  background: currentColor;
+  border-radius: 0.125rem;
+  height: 0.5rem;
+  width: 0.5rem;
 }
 
 .codex-ui-terminal-process-list__identity {
@@ -7733,13 +7796,22 @@ summary.codex-ui-activity__header::after {
 .codex-ui-command-execution__icon {
   color: var(--codex-ui-text-tertiary);
   flex: 0 0 auto;
-  fill: none;
   height: 1rem;
+  width: 1rem;
+}
+
+.codex-ui-command-execution__icon > :is(img, svg) {
+  display: block;
+  height: 100%;
+  width: 100%;
+}
+
+.codex-ui-command-execution__icon--fallback {
+  fill: none;
   stroke: currentColor;
   stroke-linecap: round;
   stroke-linejoin: round;
   stroke-width: 1.25;
-  width: 1rem;
 }
 
 .codex-ui-command-execution__summary-command {
@@ -7820,8 +7892,9 @@ summary.codex-ui-activity__header::after {
   cursor: pointer;
   display: -webkit-box;
   font-family: var(--codex-ui-font-mono);
-  font-size: var(--codex-ui-font-size-sm);
-  line-height: var(--codex-ui-line-height-code);
+  font-size: 0.8125rem;
+  font-weight: var(--codex-ui-font-weight-shell);
+  line-height: 1.21875rem;
   min-width: 0;
   overflow: hidden;
   overflow-wrap: anywhere;
@@ -7930,9 +8003,9 @@ summary.codex-ui-activity__header::after {
   flex-direction: column-reverse;
   font: inherit;
   font-family: var(--codex-ui-font-mono);
-  font-size: var(--codex-ui-font-size-sm);
-  font-weight: var(--codex-ui-font-weight-medium);
-  line-height: var(--codex-ui-line-height-code);
+  font-size: 0.8125rem;
+  font-weight: var(--codex-ui-font-weight-shell);
+  line-height: 1.21875rem;
   margin: 0;
   max-height: 9rem;
   overflow-x: auto;

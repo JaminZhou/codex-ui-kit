@@ -4,7 +4,7 @@
     "appVersion": "26.803.61601",
     "buildNumber": "6396",
     "sampledAt": "2026-08-11",
-    "reverifiedAt": "2026-08-13",
+    "reverifiedAt": "2026-08-14",
     "appAsarSha256": "928129601e8b36eccba603114d6912352f2b13182f3a7d60b32166d0e81aafb5",
     "runtimeEvidence": "scoped_cdp",
     "runtimeEvidenceBuilds": {
@@ -183,11 +183,12 @@
         "cdp-26.721:synthetic-exit-code-7-failed-command-compact-526x600",
         "cdp-26.727.40816:real-seq-1-400-expanded-shell-output-reverse-tail-and-masked-regional-pixels",
         "cdp-26.730.61309:real-seq-1-400-expanded-shell-output-reverse-tail-and-masked-regional-pixels",
-        "cdp-26.730.61309:real-mixed-stdout-stderr-exit-7-expanded-shell-reverse-tail-and-same-thread-recovery"
+        "cdp-26.730.61309:real-mixed-stdout-stderr-exit-7-expanded-shell-reverse-tail-and-same-thread-recovery",
+        "cdp-26.803.61601:real-command-success-exit-7-and-current-terminal-glyph-with-computed-styles-and-owned-regional-pixels"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "partial_legacy",
-      "electronStatus": "partial_legacy",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
       "priority": "p0"
     },
     {
@@ -197,11 +198,12 @@
       "packageEvidence": ["run-command-animation", "local-conversation-page"],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
-        "cdp-26.730.61309:real-command-exit-7-followed-by-successful-no-tool-turn-in-the-same-thread"
+        "cdp-26.730.61309:real-command-exit-7-followed-by-successful-no-tool-turn-in-the-same-thread",
+        "cdp-26.803.61601:real-exit-7-expanded-shell-and-successful-no-tool-recovery-in-the-same-thread"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "partial_legacy",
-      "electronStatus": "partial_legacy",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
       "priority": "p0"
     },
     {
@@ -400,11 +402,12 @@
         "cdp-26.721.81911:real-running-turn-stop-input-clear-and-focus-restore",
         "cdp-26.727.40816:real-stop-28x28-you-stopped-after-2s-and-queued-auto-continuation",
         "cdp-26.730.61309:real-long-running-command-stop-95s-background-terminal-stopping-settlement-and-same-thread-recovery",
-        "cdp-26.803.61601:exact-stop-20-viewbox-16px-render-28px-control-and-send-recovery"
+        "cdp-26.803.61601:exact-stop-20-viewbox-16px-render-28px-control-and-send-recovery",
+        "cdp-26.803.61601:real-command-stop-background-terminal-stopping-settlement-and-same-thread-recovery"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "partial_legacy",
-      "electronStatus": "partial_legacy",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
       "priority": "p0"
     },
     {
@@ -1046,11 +1049,12 @@
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
         "cdp:running-duration-stop-and-background-process-state",
-        "cdp-26.730.61639:real-xterm-read-only-running-panel-close-reopen-output-and-completion"
+        "cdp-26.730.61639:real-xterm-read-only-running-panel-close-reopen-output-and-completion",
+        "cdp-26.803.61601:real-background-terminal-stop-all-and-per-process-controls-after-current-turn-stop"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "partial_legacy",
-      "electronStatus": "partial_legacy",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
       "priority": "p0"
     },
     {

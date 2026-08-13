@@ -41,7 +41,7 @@ The authoritative current-build inventory is:
   BrowserWindow; it does not prove parity with unobserved product routes,
   panels, state transitions, or window types.
 - A scoped Codex Desktop `26.803.61601` (`6396`) visual probe revalidates the
-  exact 1180×820 dark/resting asset fingerprint and now retains 90 exact
+  exact 1180×820 dark/resting asset fingerprint and now retains 91 exact
   sidebar/menu/window-chrome/Composer/environment/Settings/completed-thread icons plus
   one separately hashed, playground-only VS Code integration raster. Its sampled sidebar
   hover/footer contract also
@@ -67,6 +67,13 @@ The authoritative current-build inventory is:
   the session-latched warning only after another app restart. Browser/CDP,
   Electron, and a 3.2572% local-only notice crop gate that observed boundary.
   Broader unsampled inventory still keeps global pixel parity ineligible.
+- The current-command follow-up re-reaches bounded success, exact `exit 7`,
+  Stop, background settlement, and same-thread recovery on `26.803.61601`.
+  It adds the exact three-path terminal glyph; matches the 13px/19.5px/445
+  command typography; and separates current-turn Stop from host-owned Stop all
+  and per-process background controls. Browser covers wide/690/720 geometry,
+  the protocol app passes 188-frame CDP and real Electron interactions, and
+  local-only owned command/composer pixel regions pass at 2.3321%/1.3947%.
 - The same installed fingerprint now owns the machine-readable baseline. A
   sanitized capture selects the main `app://-/index.html` Renderer by URL,
   area, shell landmarks, and visible-control density; it excludes the avatar

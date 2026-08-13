@@ -438,7 +438,11 @@ export interface TerminalProcessListProps
   emptyState?: ReactNode;
   label?: string;
   onOpenProcess?: (id: string) => void;
+  onStopAll?: () => void;
+  onStopProcess?: (id: string) => void;
   processes: readonly TerminalProcessSummary[];
+  stopAllLabel?: string;
+  stopProcessLabel?: (process: TerminalProcessSummary) => string;
 }
 
 export function TerminalProcessList({
@@ -446,9 +450,18 @@ export function TerminalProcessList({
   emptyState = "No background processes",
   label = "Background processes",
   onOpenProcess,
+  onStopAll,
+  onStopProcess,
   processes,
+  stopAllLabel = "Stop all background terminals",
+  stopProcessLabel = (process) =>
+    `Stop ${typeof process.label === "string" ? process.label : `background terminal ${process.id}`}`,
   ...props
 }: TerminalProcessListProps) {
+  const hasRunningProcesses = processes.some(
+    (process) => process.status === "running",
+  );
+
   return (
     <section
       aria-label={label}
@@ -457,11 +470,23 @@ export function TerminalProcessList({
         .join(" ")}
       {...props}
     >
-      <h3 className="codex-ui-terminal-process-list__title">{label}</h3>
+      <header className="codex-ui-terminal-process-list__header">
+        <h3 className="codex-ui-terminal-process-list__title">{label}</h3>
+        {onStopAll && hasRunningProcesses ? (
+          <button
+            aria-label={stopAllLabel}
+            className="codex-ui-terminal-process-list__stop-all"
+            onClick={onStopAll}
+            type="button"
+          >
+            <span aria-hidden="true" />
+          </button>
+        ) : null}
+      </header>
       {processes.length > 0 ? (
         <ul className="codex-ui-terminal-process-list__items">
           {processes.map((process) => {
-            const content = (
+            const identity = (
               <>
                 <span className="codex-ui-terminal-process-list__identity">
                   <span className="codex-ui-terminal-process-list__label">
@@ -481,22 +506,39 @@ export function TerminalProcessList({
                 </span>
               </>
             );
+            const canStop =
+              Boolean(onStopProcess) && process.status === "running";
             return (
               <li
                 className="codex-ui-terminal-process-list__item"
                 data-status={process.status}
                 key={process.id}
               >
-                {onOpenProcess ? (
-                  <button
-                    onClick={() => onOpenProcess(process.id)}
-                    type="button"
-                  >
-                    {content}
-                  </button>
-                ) : (
-                  <div>{content}</div>
-                )}
+                <div className="codex-ui-terminal-process-list__row">
+                  {onOpenProcess ? (
+                    <button
+                      className="codex-ui-terminal-process-list__open"
+                      onClick={() => onOpenProcess(process.id)}
+                      type="button"
+                    >
+                      {identity}
+                    </button>
+                  ) : (
+                    <div className="codex-ui-terminal-process-list__content">
+                      {identity}
+                    </div>
+                  )}
+                  {canStop ? (
+                    <button
+                      aria-label={stopProcessLabel(process)}
+                      className="codex-ui-terminal-process-list__stop"
+                      onClick={() => onStopProcess?.(process.id)}
+                      type="button"
+                    >
+                      <span aria-hidden="true" />
+                    </button>
+                  ) : null}
+                </div>
               </li>
             );
           })}

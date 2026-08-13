@@ -3258,7 +3258,7 @@ export function App() {
       return;
     }
     if (isCurrentCommandInterruptionReplay) {
-      if (state.status === "running") return;
+      if (activeFrame !== "command-interruption-settled") return;
       cancelReplaySubmitTimer();
       setReplayComposerSubmitting(true);
       setComposerOverlay(null);
@@ -3316,6 +3316,17 @@ export function App() {
     }, 160);
   };
 
+  const settleCurrentCommandInterruption = () => {
+    if (!isCurrentCommandInterruptionReplay) return;
+    cancelReplaySubmitTimer();
+    setReplayCount(
+      replayScenarios.interruption.frames[
+        "command-interruption-settled"
+      ] ?? replayScenarios.interruption.events.length,
+    );
+    setActiveFrame("command-interruption-settled");
+  };
+
   const stopComposer = () => {
     if (isCurrentContextCompactionReplay) {
       stopReplayCompaction();
@@ -3330,15 +3341,6 @@ export function App() {
         ] ?? replayScenarios.interruption.events.length,
       );
       setActiveFrame("command-interruption-stopping");
-      replaySubmitTimerRef.current = window.setTimeout(() => {
-        replaySubmitTimerRef.current = null;
-        setReplayCount(
-          replayScenarios.interruption.frames[
-            "command-interruption-settled"
-          ] ?? replayScenarios.interruption.events.length,
-        );
-        setActiveFrame("command-interruption-settled");
-      }, 900);
       return;
     }
     if (!isConversationLifecycle) {
@@ -8504,6 +8506,9 @@ export function App() {
               durationMs={command.durationMs ?? undefined}
               exitCode={command.exitCode ?? undefined}
               status={command.status}
+              terminalIcon={
+                <CurrentBuildIcon name="thread-command-terminal" />
+              }
             >
               <CommandOutput
                 copyLabel="Copy"
@@ -8546,6 +8551,9 @@ export function App() {
               durationMs={command.durationMs ?? undefined}
               exitCode={command.exitCode ?? undefined}
               status={command.status}
+              terminalIcon={
+                <CurrentBuildIcon name="thread-command-terminal" />
+              }
             >
               <CommandOutput copyLabel="Copy" copyText={command.output}>
                 {command.output}
@@ -8588,6 +8596,9 @@ export function App() {
                 : command.status === "completed"
                   ? "background-finished"
                   : "running"
+            }
+            terminalIcon={
+              <CurrentBuildIcon name="thread-command-terminal" />
             }
             summary={
               stopping ? (
@@ -9444,6 +9455,27 @@ export function App() {
 
                 {currentWindowedContent}
                 {currentWindowedFrame ? null : timelineContent}
+
+                {isCurrentCommandInterruptionReplay &&
+                activeFrame === "command-interruption-stopping" ? (
+                  <TerminalProcessList
+                    className="demo-terminal-processes"
+                    data-testid="command-interruption-process-list"
+                    onStopAll={settleCurrentCommandInterruption}
+                    onStopProcess={settleCurrentCommandInterruption}
+                    processes={[
+                      {
+                        detail:
+                          state.commands.find(
+                            ({ id }) => id === "command-interruption",
+                          )?.command ?? "Background command",
+                        id: "process-command-interruption",
+                        label: "Background terminal",
+                        status: "running",
+                      },
+                    ]}
+                  />
+                ) : null}
 
                 {scenarioId === "terminal-lifecycle" &&
                 !currentTerminalFrame(activeFrame) &&
