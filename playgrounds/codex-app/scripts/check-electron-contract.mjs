@@ -4991,6 +4991,12 @@ try {
   await codingWorkspacePage.waitForSelector(
     '.demo-root[data-frame="workspace-git-settings"]',
   );
+  await codingWorkspacePage.waitForFunction(
+    () =>
+      document.activeElement?.matches(
+        ".codex-ui-settings-shell__back",
+      ) && document.activeElement.textContent?.trim() === "Back to app",
+  );
   const gitSettingsNavigation = codingWorkspacePage.getByRole("navigation", {
     name: "Settings",
   });
@@ -4998,6 +5004,10 @@ try {
   await gitSettingsNavigation.waitFor({ state: "visible" });
   if (
     (await gitSettingsNavigation.getByRole("button").count()) !== 22 ||
+    (await codingWorkspacePage.locator('main, [role="main"]').count()) !== 1 ||
+    (await codingWorkspacePage
+      .locator('[role="region"][aria-label="Settings route"]')
+      .count()) !== 1 ||
     (await gitSettingsMain.getByRole("heading", { name: "Git" }).count()) !==
       1 ||
     (await codingWorkspacePage

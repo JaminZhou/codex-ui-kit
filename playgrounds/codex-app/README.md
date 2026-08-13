@@ -799,12 +799,13 @@ screenshots and product project names remain local-only.
 - The replay uses all 24 exact current Settings icons, 21 navigation items,
   grouped `git` search results, Branch prefix, Merge/Squash, two switches,
   review delivery, and dirty-gated instruction saves.
-- Browser/CDP verifies 169 lifecycle frames including wide and 720px geometry,
-  semantics, icons, search, and interactions. Electron repeats the real route,
-  saves a harmless fixture, returns, and continues through real
-  temporary-repository branch creation.
-- Reviewed internal wide/compact baselines pass. Optional local-only product
-  gates pass at 2.4214% and 3.0210%; screenshots are never tracked.
+- Browser/CDP verifies 170 lifecycle frames including wide, 720px, and light
+  theme geometry, semantics, icons, search, contrast, and interactions.
+  Electron repeats the real route, saves a harmless fixture, returns, and
+  continues through real temporary-repository branch creation.
+- Reviewed internal dark wide/compact and light wide baselines pass. Optional
+  local-only product gates pass at 2.4214% and 3.0210%; screenshots are never
+  tracked.
 
 ## Current environment-entry slice
 

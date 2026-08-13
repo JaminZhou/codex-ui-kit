@@ -201,7 +201,10 @@ for (const scene of selectedScenes) {
             ),
             (icon) => icon.getAttribute("data-current-build-icon"),
           ),
-          mainCount: document.querySelectorAll("main").length,
+          mainCount: document.querySelectorAll('main, [role="main"]').length,
+          outerRegionCount: document.querySelectorAll(
+            '[role="region"][aria-label="Settings route"]',
+          ).length,
           navigation: rect(".codex-ui-settings-shell__navigation"),
           navigationCount: document.querySelectorAll(
             'nav[aria-label="Settings"]',
@@ -220,6 +223,33 @@ for (const scene of selectedScenes) {
           textareaCount: document.querySelectorAll(
             ".codex-ui-git-settings textarea",
           ).length,
+          theme: document
+            .querySelector(".demo-root")
+            ?.getAttribute("data-theme"),
+          visualStyles: Object.fromEntries(
+            [
+              ["shell", ".codex-ui-settings-shell"],
+              ["navigation", ".codex-ui-settings-shell__navigation"],
+              ["card", ".codex-ui-git-settings__card"],
+              [
+                "input",
+                '.codex-ui-git-settings input[aria-label="Branch prefix"]',
+              ],
+              ["heading", ".codex-ui-git-settings > h1"],
+            ].map(([name, selector]) => {
+              const element = document.querySelector(selector);
+              const style = element ? getComputedStyle(element) : null;
+              return [
+                name,
+                style
+                  ? {
+                      backgroundColor: style.backgroundColor,
+                      color: style.color,
+                    }
+                  : null,
+              ];
+            }),
+          ),
           viewport: { height: window.innerHeight, width: window.innerWidth },
         };
       });
@@ -228,6 +258,7 @@ for (const scene of selectedScenes) {
         settings.horizontalOverflow > 1 ||
         settings.navigationCount !== 1 ||
         settings.mainCount !== 1 ||
+        settings.outerRegionCount !== 1 ||
         settings.selected !== "Git" ||
         settings.navigation?.width !== 322.90625 ||
         settings.navigation?.top !== 46 ||
@@ -250,6 +281,20 @@ for (const scene of selectedScenes) {
       ) {
         throw new Error(
           `${scene.id}: current Git Settings contract failed: ${JSON.stringify(settings)}`,
+        );
+      }
+      if (
+        scene.id === "workspace-git-settings-light" &&
+        (settings.theme !== "light" ||
+          settings.visualStyles.shell?.color !== "rgb(26, 28, 31)" ||
+          settings.visualStyles.navigation?.backgroundColor ===
+            "rgb(36, 36, 36)" ||
+          settings.visualStyles.card?.backgroundColor === "rgb(32, 32, 32)" ||
+          settings.visualStyles.input?.backgroundColor === "rgb(43, 43, 43)" ||
+          settings.visualStyles.heading?.color !== "rgb(26, 28, 31)")
+      ) {
+        throw new Error(
+          `${scene.id}: light Git Settings paint failed: ${JSON.stringify(settings.visualStyles)}`,
         );
       }
 

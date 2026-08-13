@@ -40,4 +40,14 @@ describe("settings visual contract", () => {
     );
     expect(styles).toContain("grid-template-columns: var(--codex-ui-settings-sidebar-width) minmax(0, 1fr)");
   });
+
+  it("uses theme-aware paints while preserving the observed dark values", () => {
+    expect(styles).toContain("--codex-ui-settings-sidebar-background: light-dark(");
+    expect(styles).toContain("--codex-ui-settings-main-background: light-dark(");
+    expect(styles).toContain("--codex-ui-settings-card-background: light-dark(");
+    expect(styles).toContain("--codex-ui-settings-control-background: light-dark(");
+    expect(styles).not.toContain("background: #242424");
+    expect(styles).not.toContain("background: #202020");
+    expect(styles).not.toContain("background: #2b2b2b");
+  });
 });

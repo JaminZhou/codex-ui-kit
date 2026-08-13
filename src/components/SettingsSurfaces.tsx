@@ -2,6 +2,7 @@ import {
   type HTMLAttributes,
   type KeyboardEvent,
   type ReactNode,
+  type Ref,
   type TextareaHTMLAttributes,
   useId,
   useRef,
@@ -28,6 +29,7 @@ export interface SettingsShellProps
   extends Omit<HTMLAttributes<HTMLDivElement>, "children" | "onSelect"> {
   backIcon?: ReactNode;
   backLabel?: string;
+  backButtonRef?: Ref<HTMLButtonElement>;
   children?: ReactNode;
   emptyLabel?: ReactNode;
   error?: ReactNode;
@@ -58,6 +60,7 @@ function matchesSettingsItem(item: SettingsNavigationItem, query: string) {
 export function SettingsShell({
   backIcon,
   backLabel = "Back to app",
+  backButtonRef,
   children,
   className,
   emptyLabel = "No settings found",
@@ -102,6 +105,7 @@ export function SettingsShell({
         <button
           className="codex-ui-settings-shell__back"
           onClick={onBack}
+          ref={backButtonRef}
           type="button"
         >
           {backIcon ? (

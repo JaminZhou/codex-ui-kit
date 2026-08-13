@@ -1742,6 +1742,9 @@ export function App() {
   );
   const [settingsQuery, setSettingsQuery] = useState("");
   const [selectedSettingsId, setSelectedSettingsId] = useState("git");
+  const [settingsRouteFocusPending, setSettingsRouteFocusPending] =
+    useState(false);
+  const settingsBackButtonRef = useRef<HTMLButtonElement>(null);
   const [gitSettings, setGitSettings] = useState<GitSettingsValue>({
     alwaysForcePush: false,
     branchPrefix: "",
@@ -5083,6 +5086,14 @@ export function App() {
     workspaceLocalEnvironmentOpen,
     workspaceOverlay,
   ]);
+  useEffect(() => {
+    if (workspacePage !== "git-settings" || !settingsRouteFocusPending) return;
+    const timer = window.setTimeout(() => {
+      settingsBackButtonRef.current?.focus();
+      setSettingsRouteFocusPending(false);
+    });
+    return () => window.clearTimeout(timer);
+  }, [settingsRouteFocusPending, workspacePage]);
   const setWorkspaceOverlayState = (
     overlay:
       | "environment"
@@ -5979,6 +5990,7 @@ export function App() {
           setWorkspaceBranchStatus("idle");
           setSettingsQuery("");
           setSelectedSettingsId("git");
+          setSettingsRouteFocusPending(true);
           setWorkspacePage("git-settings");
           setActiveFrame("workspace-git-settings");
         }}
@@ -6266,6 +6278,7 @@ export function App() {
   const workspaceGitSettingsRoute = (
     <SettingsShell
       backIcon={<CurrentBuildIcon name="settings-back" />}
+      backButtonRef={settingsBackButtonRef}
       onBack={() => {
         setSettingsQuery("");
         setWorkspacePage("conversation");
@@ -8892,6 +8905,10 @@ export function App() {
             ? "wide"
             : undefined
         }
+        mainLabel={
+          workspacePage === "git-settings" ? "Settings route" : undefined
+        }
+        mainRole={workspacePage === "git-settings" ? "region" : "main"}
         narrowSidebarBehavior="current-build"
         onSidebarOpenChange={setSidebarOpen}
         onSidePanelOpenChange={

@@ -164,12 +164,30 @@
 
 .codex-ui-settings-shell {
   --codex-ui-settings-sidebar-width: 20.181875rem;
+  --codex-ui-settings-card-background: light-dark(
+    var(--codex-ui-background-elevated-secondary-opaque),
+    #202020
+  );
+  --codex-ui-settings-control-background: light-dark(
+    var(--codex-ui-background-editor-opaque),
+    #2b2b2b
+  );
+  --codex-ui-settings-main-background: light-dark(
+    var(--codex-ui-background-surface),
+    #171717
+  );
+  --codex-ui-settings-sidebar-background: light-dark(
+    var(--codex-ui-background-surface-under),
+    #242424
+  );
   background: linear-gradient(
     to right,
-    #242424 0,
-    #242424 var(--codex-ui-settings-sidebar-width),
-    #171717 var(--codex-ui-settings-sidebar-width),
-    #171717 100%
+    var(--codex-ui-settings-sidebar-background) 0,
+    var(--codex-ui-settings-sidebar-background)
+      var(--codex-ui-settings-sidebar-width),
+    var(--codex-ui-settings-main-background)
+      var(--codex-ui-settings-sidebar-width),
+    var(--codex-ui-settings-main-background) 100%
   );
   color: var(--codex-ui-text);
   display: grid;
@@ -184,8 +202,9 @@
 }
 
 .codex-ui-settings-shell__navigation {
-  background: #242424;
-  border-inline-end: 1px solid rgb(255 255 255 / 0.12);
+  background: var(--codex-ui-settings-sidebar-background);
+  border-inline-end: 1px solid
+    light-dark(var(--codex-ui-border-heavy), rgb(255 255 255 / 0.12));
   display: flex;
   flex-direction: column;
   min-height: 0;
@@ -232,8 +251,12 @@
 
 .codex-ui-settings-shell__search {
   align-items: center;
-  background: rgb(255 255 255 / 0.025);
-  border: 1px solid rgb(255 255 255 / 0.24);
+  background: light-dark(
+    var(--codex-ui-background-button-tertiary),
+    rgb(255 255 255 / 0.025)
+  );
+  border: 1px solid
+    light-dark(var(--codex-ui-border-heavy), rgb(255 255 255 / 0.24));
   border-radius: var(--codex-ui-radius-full);
   display: flex;
   flex: 0 0 2rem;
@@ -262,7 +285,10 @@
 }
 
 .codex-ui-settings-shell__search:focus-within {
-  border-color: rgb(255 255 255 / 0.45);
+  border-color: light-dark(
+    var(--codex-ui-border-focus),
+    rgb(255 255 255 / 0.45)
+  );
 }
 
 .codex-ui-settings-shell__search-clear {
@@ -325,7 +351,10 @@
 
 .codex-ui-settings-shell__item:hover,
 .codex-ui-settings-shell__item[aria-current="page"] {
-  background: rgb(255 255 255 / 0.14);
+  background: light-dark(
+    var(--codex-ui-background-button-secondary-hover),
+    rgb(255 255 255 / 0.14)
+  );
 }
 
 .codex-ui-settings-shell__item-heading {
@@ -402,8 +431,9 @@
 }
 
 .codex-ui-git-settings__card {
-  background: #202020;
-  border: 1px solid rgb(255 255 255 / 0.16);
+  background: var(--codex-ui-settings-card-background);
+  border: 1px solid
+    light-dark(var(--codex-ui-border-heavy), rgb(255 255 255 / 0.16));
   border-radius: 1.0625rem;
   overflow: hidden;
 }
@@ -418,7 +448,8 @@
 }
 
 .codex-ui-git-settings__row + .codex-ui-git-settings__row {
-  border-top: 1px solid rgb(255 255 255 / 0.11);
+  border-top: 1px solid
+    light-dark(var(--codex-ui-border), rgb(255 255 255 / 0.11));
 }
 
 .codex-ui-git-settings__row > div:first-child {
@@ -445,8 +476,9 @@
 }
 
 .codex-ui-git-settings__row > input {
-  background: #2b2b2b;
-  border: 1px solid rgb(255 255 255 / 0.2);
+  background: var(--codex-ui-settings-control-background);
+  border: 1px solid
+    light-dark(var(--codex-ui-border-heavy), rgb(255 255 255 / 0.2));
   border-radius: 0.5rem;
   color: var(--codex-ui-text);
   flex: 0 0 14rem;
@@ -478,13 +510,16 @@
 }
 
 .codex-ui-git-settings__segmented button[aria-checked="true"] {
-  background: rgb(255 255 255 / 0.08);
+  background: light-dark(
+    var(--codex-ui-background-button-secondary),
+    rgb(255 255 255 / 0.08)
+  );
   color: var(--codex-ui-text);
 }
 
 .codex-ui-git-settings__switch {
   appearance: none;
-  background: #3a3a3a;
+  background: light-dark(var(--codex-ui-gray-300), #3a3a3a);
   border: 0;
   border-radius: var(--codex-ui-radius-full);
   cursor: pointer;
@@ -534,7 +569,10 @@
 
 .codex-ui-git-settings__instructions header button {
   appearance: none;
-  background: rgb(255 255 255 / 0.08);
+  background: light-dark(
+    var(--codex-ui-background-button-secondary),
+    rgb(255 255 255 / 0.08)
+  );
   border: 0;
   border-radius: 0.625rem;
   color: var(--codex-ui-text);
@@ -551,8 +589,9 @@
 }
 
 .codex-ui-git-settings__instructions textarea {
-  background: #2b2b2b;
-  border: 1px solid rgb(255 255 255 / 0.21);
+  background: var(--codex-ui-settings-control-background);
+  border: 1px solid
+    light-dark(var(--codex-ui-border-heavy), rgb(255 255 255 / 0.21));
   border-radius: 0.5rem;
   color: var(--codex-ui-text);
   display: block;
