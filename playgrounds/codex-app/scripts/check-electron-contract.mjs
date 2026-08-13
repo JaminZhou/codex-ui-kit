@@ -3519,6 +3519,48 @@ try {
       "Electron background Terminal could not be reopened while its process stayed active.",
     );
   }
+  await backgroundTerminalApp.evaluate(({ BrowserWindow }) => {
+    BrowserWindow.getAllWindows()[0]?.setContentSize(720, 680);
+  });
+  await backgroundTerminalPage.waitForSelector(
+    ".codex-ui-app-shell:not([data-side-panel-open])",
+  );
+  if (
+    (await backgroundTerminalPage
+      .getByTestId("terminal-current-background-panel")
+      .isVisible()) ||
+    (await backgroundTerminalPage
+      .locator('.demo-root[data-frame="terminal-current-background-open"]')
+      .count()) !== 1
+  ) {
+    throw new Error(
+      "Electron responsive close changed the background Terminal content state.",
+    );
+  }
+  await backgroundTerminalApp.evaluate(({ BrowserWindow }) => {
+    BrowserWindow.getAllWindows()[0]?.setContentSize(1180, 820);
+  });
+  await backgroundTerminalPage.waitForSelector(
+    ".codex-ui-app-shell[data-side-panel-open]",
+  );
+  await backgroundTerminalPage
+    .getByRole("button", { name: "Pull requests" })
+    .click();
+  await backgroundTerminalPage.waitForSelector(
+    '.demo-root[data-view="pull-request"]',
+  );
+  const pullRequestShell = await backgroundTerminalPage.evaluate(() => {
+    const shell = document.querySelector(".codex-ui-app-shell");
+    return {
+      overlay: shell?.hasAttribute("data-side-panel-overlay") ?? false,
+      view: document.querySelector(".demo-root")?.getAttribute("data-view"),
+    };
+  });
+  if (!pullRequestShell.overlay || pullRequestShell.view !== "pull-request") {
+    throw new Error(
+      `Electron background Terminal navigation lost the pull-request overlay: ${JSON.stringify(pullRequestShell)}`,
+    );
+  }
 } finally {
   await backgroundTerminalApp.close();
 }

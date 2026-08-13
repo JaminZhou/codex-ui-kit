@@ -2269,6 +2269,12 @@ export function App() {
     useState<Set<string>>(() => new Set());
   const [backgroundTerminalPanelWidth, setBackgroundTerminalPanelWidth] =
     useState(381.4375);
+  const [backgroundTerminalPanelOpen, setBackgroundTerminalPanelOpen] =
+    useState(
+      initialSelection.scenarioId === "terminal-lifecycle" &&
+        (initialSelection.frame === "terminal-current-background-list" ||
+          initialSelection.frame === "terminal-current-background-open"),
+    );
   const [backgroundTerminalRunning, setBackgroundTerminalRunning] =
     useState(true);
   const [reviewSelection, setReviewSelection] =
@@ -2958,6 +2964,11 @@ export function App() {
     setTerminalCommandId(nextTerminalSessionIds.at(-1) ?? null);
     setTerminalHeight(272);
     setBackgroundTerminalPanelWidth(381.4375);
+    setBackgroundTerminalPanelOpen(
+      nextId === "terminal-lifecycle" &&
+        (frame === "terminal-current-background-list" ||
+          frame === "terminal-current-background-open"),
+    );
     setBackgroundTerminalRunning(true);
     setTerminalValuesByCommand({});
     setTerminalHistoryByCommand(initialTerminalHistory(nextId, frame));
@@ -9228,6 +9239,7 @@ export function App() {
   const backgroundTerminalCommand =
     "for i in $(seq 1 120); do printf 'terminal-background-handle-%03d\\n' \"$i\"; sleep 1; done";
   const backgroundTerminalPanelSelected =
+    view === "conversation" &&
     scenarioId === "terminal-lifecycle" &&
     (activeFrame === "terminal-current-background-list" ||
       activeFrame === "terminal-current-background-open");
@@ -9244,9 +9256,10 @@ export function App() {
     );
     setTerminalCommandId("agent-background-terminal");
     setTerminalOpen(false);
+    setBackgroundTerminalPanelOpen(true);
     setActiveFrame("terminal-current-background-open");
   };
-  const closeBackgroundTerminal = () => {
+  const closeBackgroundTerminalTab = () => {
     setTerminalSessionIds([]);
     setTerminalCommandId(null);
     setTerminalOpen(false);
@@ -9260,8 +9273,8 @@ export function App() {
         data-testid="terminal-current-background-panel"
         label="Background terminal"
         onActiveTabChange={() => undefined}
-        onClose={() => closeBackgroundTerminal()}
-        onCloseTab={() => closeBackgroundTerminal()}
+        onClose={() => setBackgroundTerminalPanelOpen(false)}
+        onCloseTab={() => closeBackgroundTerminalTab()}
         placement="side"
         tabCloseButtons
         tabs={[
@@ -9458,9 +9471,7 @@ export function App() {
           view === "pull-request"
             ? setPullRequestOpen
             : backgroundTerminalPanelSelected
-              ? (open) => {
-                  if (!open) closeBackgroundTerminal();
-                }
+              ? setBackgroundTerminalPanelOpen
             : subagentPanelSelected
               ? setSubagentPanelOpen
               : setReviewOpen
@@ -9524,14 +9535,12 @@ export function App() {
           view === "pull-request"
             ? pullRequestOpen
             : backgroundTerminalPanelSelected
-              ? true
+              ? backgroundTerminalPanelOpen
             : subagentPanelSelected
               ? subagentPanelOpen
               : reviewOpen && Boolean(reviewPanel)
         }
-        sidePanelOverlay={
-          view === "pull-request" && !backgroundTerminalPanelSelected
-        }
+        sidePanelOverlay={view === "pull-request"}
         sidePanelOverlayModal={
           view !== "pull-request" &&
           !backgroundTerminalPanelSelected &&
