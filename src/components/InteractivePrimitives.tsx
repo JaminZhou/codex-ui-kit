@@ -232,6 +232,7 @@ function focusByKey(event: KeyboardEvent<HTMLElement>) {
     return;
   }
   if (!["ArrowDown", "ArrowUp", "End", "Home"].includes(event.key)) return;
+  if (editableTarget && (event.key === "Home" || event.key === "End")) return;
   let nextIndex = currentIndex;
   if (event.key === "Home") nextIndex = 0;
   if (event.key === "End") nextIndex = items.length - 1;

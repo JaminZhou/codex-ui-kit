@@ -5320,6 +5320,29 @@ try {
     name: "Search languages",
   });
   await languageSearch.fill("简体");
+  await codingWorkspacePage.evaluate(() => {
+    window.__codexGeneralLanguageKeyEvents = [];
+    document.addEventListener("keydown", (event) => {
+      if (event.key !== "Home" && event.key !== "End") return;
+      window.__codexGeneralLanguageKeyEvents.push({
+        defaultPrevented: event.defaultPrevented,
+        key: event.key,
+      });
+    });
+  });
+  await languageSearch.press("Home");
+  const generalLanguageHomeFocus = await codingWorkspacePage.evaluate(
+    () => document.activeElement?.getAttribute("aria-label"),
+  );
+  await languageSearch.press("End");
+  const generalLanguageEditing = await codingWorkspacePage.evaluate(
+    (homeFocus) => ({
+      endFocus: document.activeElement?.getAttribute("aria-label"),
+      events: window.__codexGeneralLanguageKeyEvents,
+      homeFocus,
+    }),
+    generalLanguageHomeFocus,
+  );
   const simplifiedChinese = codingWorkspacePage.getByRole("option", {
     name: "简体中文",
     exact: true,
@@ -5490,6 +5513,7 @@ try {
     hotkeyFocus: focus.hotkey,
     language: main.querySelector('button[aria-label="Language"]')
       ?.textContent?.trim(),
+    languageEditing: focus.languageEditing,
     menuFocus: focus.menu,
     sendShortcut: main.querySelector('button[aria-label="Send shortcut"]')
       ?.textContent?.trim(),
@@ -5503,6 +5527,7 @@ try {
     hotkeyCaptured: generalHotkeyCaptured,
     hotkeyCleared: generalHotkeyCleared,
     hotkeyEscapePreserved: generalHotkeyEscapePreserved,
+    languageEditing: generalLanguageEditing,
     menu: generalMenuFocus,
   });
   if (
@@ -5517,6 +5542,12 @@ try {
     generalInteraction.hotkeyEscapePreserved !== "⌘ ⇧ K" ||
     generalInteraction.hotkeyFocus !== "Set shortcut for Popout Window hotkey" ||
     generalInteraction.language !== "简体中文⌄" ||
+    generalInteraction.languageEditing.endFocus !== "Search languages" ||
+    generalInteraction.languageEditing.homeFocus !== "Search languages" ||
+    generalInteraction.languageEditing.events.length !== 2 ||
+    generalInteraction.languageEditing.events.some(
+      ({ defaultPrevented }) => defaultPrevented,
+    ) ||
     generalInteraction.menuFocus.completionNotifications !==
       "Turn completion notifications" ||
     generalInteraction.menuFocus.fileDestination !==

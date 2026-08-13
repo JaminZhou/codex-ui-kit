@@ -654,7 +654,33 @@ for (const scene of selectedScenes) {
           "Default file open destination",
         );
         await page.getByRole("button", { name: "Language" }).click();
-        await page.getByRole("searchbox", { name: "Search languages" }).fill("简体");
+        const languageQuery = page.getByRole("searchbox", {
+          name: "Search languages",
+        });
+        await languageQuery.fill("简体");
+        await page.evaluate(() => {
+          window.__codexGeneralLanguageKeyEvents = [];
+          document.addEventListener("keydown", (event) => {
+            if (event.key !== "Home" && event.key !== "End") return;
+            window.__codexGeneralLanguageKeyEvents.push({
+              defaultPrevented: event.defaultPrevented,
+              key: event.key,
+            });
+          });
+        });
+        await languageQuery.press("Home");
+        const languageHomeFocus = await page.evaluate(
+          () => document.activeElement?.getAttribute("aria-label"),
+        );
+        await languageQuery.press("End");
+        const languageEditing = await page.evaluate(
+          (homeFocus) => ({
+            endFocus: document.activeElement?.getAttribute("aria-label"),
+            events: window.__codexGeneralLanguageKeyEvents,
+            homeFocus,
+          }),
+          languageHomeFocus,
+        );
         const simplifiedChinese = page.getByRole("option", {
           name: "简体中文",
           exact: true,
@@ -780,6 +806,7 @@ for (const scene of selectedScenes) {
             hotkeyCleared,
             hotkeyEscapePreserved,
             hotkeyFocusRestored,
+            languageEditing,
             menuFocus,
             speedOptions,
           }) => ({
@@ -809,6 +836,7 @@ for (const scene of selectedScenes) {
             language: document
               .querySelector('button[aria-label="Language"]')
               ?.textContent?.trim(),
+            languageEditing,
             licenses: document.querySelector(".demo-settings-action-status")
               ?.textContent?.trim(),
             menuFocus,
@@ -828,6 +856,7 @@ for (const scene of selectedScenes) {
             hotkeyCleared,
             hotkeyEscapePreserved,
             hotkeyFocusRestored,
+            languageEditing,
             menuFocus,
             speedOptions,
           },
@@ -876,6 +905,12 @@ for (const scene of selectedScenes) {
           interaction.hotkeyEscapePreserved !== "⌘ ⇧ K" ||
           interaction.hotkeyFocus !== "Set shortcut for Popout Window hotkey" ||
           interaction.language !== "简体中文⌄" ||
+          interaction.languageEditing.endFocus !== "Search languages" ||
+          interaction.languageEditing.homeFocus !== "Search languages" ||
+          interaction.languageEditing.events.length !== 2 ||
+          interaction.languageEditing.events.some(
+            ({ defaultPrevented }) => defaultPrevented,
+          ) ||
           interaction.licenses !== "Open source licenses requested" ||
           interaction.menuFocus.completionNotifications !==
             "Turn completion notifications" ||
