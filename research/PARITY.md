@@ -121,7 +121,8 @@ The authoritative current-build inventory is:
   list, twelve switches, two keyboard groups, and shortcut capture/cancel.
   Browser/CDP and Electron prove geometry, light/compact/bottom states,
   interactions, and state continuity across General, Git, and Appearance.
-  Five reviewed frames extend the matrix to 179. Optional local-only product
+  Six reviewed frames extend the matrix to 180, including a dedicated 720px
+  shortcut-capture frame. Optional local-only product
   gates compare the full wide, 720px top crop, hotkey capture, and bottom
   frames at 4.6143%, 6.7412%, 4.7654%, and 4.8818%; captured selections remain
   observed fixtures, not declared defaults.

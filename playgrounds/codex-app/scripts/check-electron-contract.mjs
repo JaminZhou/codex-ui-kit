@@ -5307,6 +5307,12 @@ try {
   await codingWorkspacePage
     .getByRole("option", { name: "简体中文", exact: true })
     .click();
+  await codingWorkspacePage.waitForFunction(
+    () => document.activeElement?.getAttribute("aria-label") === "Language",
+  );
+  const generalLanguageFocusRestored = await codingWorkspacePage.evaluate(
+    () => document.activeElement?.getAttribute("aria-label"),
+  );
   const bottomTerminal = generalSettingsMain.getByRole("button", {
     name: "Bottom",
     exact: true,
@@ -5370,7 +5376,7 @@ try {
       document.querySelector(".demo-settings-action-status")?.textContent ===
       "Open source licenses requested",
   );
-  const generalInteraction = await generalSettingsMain.evaluate((main, hotkeyFocus) => ({
+  const generalInteraction = await generalSettingsMain.evaluate((main, focus) => ({
     autoReview: main
       .querySelector('[role="switch"][aria-label="Show Auto-review in the composer"]')
       ?.getAttribute("aria-checked"),
@@ -5389,9 +5395,10 @@ try {
     hotkeyCapture: Boolean(
       main.querySelector(".codex-ui-general-settings__hotkey-capture"),
     ),
-    hotkeyFocus,
+    hotkeyFocus: focus.hotkey,
     language: main.querySelector('button[aria-label="Language"]')
       ?.textContent?.trim(),
+    languageFocus: focus.language,
     sendShortcut: main.querySelector('button[aria-label="Send shortcut"]')
       ?.textContent?.trim(),
     speed: main.querySelector('button[aria-label="Speed"]')
@@ -5399,7 +5406,10 @@ try {
     terminal: main
       .querySelector('button[aria-label="Right"]')
       ?.getAttribute("aria-pressed"),
-  }), generalHotkeyFocusRestored);
+  }), {
+    hotkey: generalHotkeyFocusRestored,
+    language: generalLanguageFocusRestored,
+  });
   if (
     generalInteraction.autoReview !== "false" ||
     generalInteraction.completionNotifications !== "Always⌄" ||
@@ -5409,6 +5419,7 @@ try {
     generalInteraction.hotkeyCapture ||
     generalInteraction.hotkeyFocus !== "Set shortcut for Popout Window hotkey" ||
     generalInteraction.language !== "简体中文⌄" ||
+    generalInteraction.languageFocus !== "Language" ||
     generalInteraction.sendShortcut !== "⌘ + Enter always⌄" ||
     !generalInteraction.speed?.includes("Fast") ||
     generalInteraction.terminal !== "true"

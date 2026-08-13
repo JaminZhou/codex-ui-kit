@@ -1466,6 +1466,13 @@ function GeneralLanguageControl({
 }) {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const wasOpenRef = useRef(false);
+  useEffect(() => {
+    const wasOpen = wasOpenRef.current;
+    wasOpenRef.current = open;
+    if (!open && wasOpen) triggerRef.current?.focus();
+  }, [open]);
   const selected = options.find((option) => option.value === value);
   const filtered = options.filter((option) =>
     option.label.toLocaleLowerCase().includes(query.trim().toLocaleLowerCase()),
@@ -1487,6 +1494,7 @@ function GeneralLanguageControl({
         <button
           aria-label="Language"
           className="codex-ui-general-settings__menu-trigger"
+          ref={triggerRef}
           type="button"
         >
           <span>{selected?.label ?? value}</span>

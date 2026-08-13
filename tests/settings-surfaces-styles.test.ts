@@ -97,5 +97,8 @@ describe("settings visual contract", () => {
     expect(styles).toMatch(
       /@media \(max-width: 50rem\)[\s\S]*?\.codex-ui-general-settings \{[\s\S]*?width: calc\(100% - 2\.5rem\);/,
     );
+    expect(styles).toMatch(
+      /@media \(max-width: 50rem\)[\s\S]*?\.codex-ui-general-settings__hotkey-capture \{[\s\S]*?align-items: flex-end;[\s\S]*?flex-direction: column;/,
+    );
   });
 });

@@ -418,7 +418,8 @@ host-owned. Browser/CDP covers all five menus, the searchable 66-language
 list, twelve switches, both keyboard-operable segmented choices, shortcut
 capture/cancel, 1180px and 720px geometry, light paint, and bottom scroll.
 Electron repeats the route and proves General, Git, and Appearance state remain
-independent across navigation. Five reviewed frames bring the matrix to 179;
+independent across navigation. Six reviewed frames bring the matrix to 180,
+including a dedicated 720px shortcut-capture frame;
 optional current-product comparisons cover the full wide, compact top-crop,
 shortcut-capture, and bottom frames at 4.6143%, 6.7412%, 4.7654%, and 4.8818%
 without committing raw screenshots. The captured values are observed host

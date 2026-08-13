@@ -455,7 +455,7 @@ Composer, Popout Window, and Notifications. Browser/CDP verifies five menus,
 language search, twelve switches, two keyboard groups, shortcut capture,
 1180px/720px layout, light paint, and bottom scroll. Electron repeats the
 route and retains General state while switching through Git and Appearance.
-Five reviewed frames extend the matrix to 179, with optional local-only full-
+Six reviewed frames extend the matrix to 180, with optional local-only full-
 frame comparisons for wide, compact, shortcut-capture, and bottom states at
 4.6143%, 6.7412%, 4.7654%, and 4.8818%.
 Observed host selections are fixture evidence rather than product defaults.

@@ -385,7 +385,7 @@ for (const scene of selectedScenes) {
       continue;
     }
     if (scene.id.startsWith("workspace-general-settings")) {
-      if (scene.id.endsWith("-bottom") || scene.id.endsWith("-hotkey")) {
+      if (scene.id.endsWith("-bottom") || scene.id.includes("-hotkey")) {
         await page.waitForFunction(() => {
           const owner = document.querySelector(".codex-ui-settings-shell__main");
           return owner instanceof HTMLElement && owner.scrollTop > 0;
@@ -436,6 +436,29 @@ for (const scene of selectedScenes) {
           hotkeyCapture: Boolean(
             document.querySelector(".codex-ui-general-settings__hotkey-capture"),
           ),
+          hotkeyGeometry: (() => {
+            const capture = document.querySelector(
+              ".codex-ui-general-settings__hotkey-capture",
+            );
+            const row = capture?.closest(".codex-ui-general-settings__row");
+            if (!capture || !row) return null;
+            const toRect = (element) => {
+              const value = element.getBoundingClientRect();
+              return {
+                bottom: value.bottom,
+                height: value.height,
+                left: value.left,
+                right: value.right,
+                top: value.top,
+                width: value.width,
+              };
+            };
+            return {
+              buttons: Array.from(capture.querySelectorAll("button"), toRect),
+              capture: toRect(capture),
+              row: toRect(row),
+            };
+          })(),
           iconNames: Array.from(
             document.querySelectorAll(
               ".codex-ui-settings-shell__navigation [data-current-build-icon]",
@@ -508,9 +531,9 @@ for (const scene of selectedScenes) {
           },
         };
       });
-      const compact = scene.id === "workspace-general-settings-compact";
+      const compact = scene.windowSize?.width === 720;
       const bottom = scene.id === "workspace-general-settings-bottom";
-      const hotkey = scene.id === "workspace-general-settings-hotkey";
+      const hotkey = scene.id.includes("-hotkey");
       const scrolled = bottom || hotkey;
       const expectedWidth = compact ? 357.09375 : 768;
       const expectedSwitches = [
@@ -572,6 +595,15 @@ for (const scene of selectedScenes) {
           ]),
         ) !== JSON.stringify(expectedSwitches) ||
         general.hotkeyCapture !== hotkey ||
+        (hotkey &&
+          (general.hotkeyGeometry?.buttons.length !== 2 ||
+            general.hotkeyGeometry.buttons.some(
+              ({ bottom, left, right, top }) =>
+                left < general.hotkeyGeometry.row.left ||
+                right > general.hotkeyGeometry.row.right ||
+                top < general.hotkeyGeometry.row.top ||
+                bottom > general.hotkeyGeometry.row.bottom,
+            ))) ||
         (!scrolled && general.scrollOwner?.scrollTop !== 0) ||
         (scrolled && general.scrollOwner?.scrollTop <= 0)
       ) {
@@ -605,6 +637,12 @@ for (const scene of selectedScenes) {
         await page.getByRole("button", { name: "Language" }).click();
         await page.getByRole("searchbox", { name: "Search languages" }).fill("简体");
         await page.getByRole("option", { name: "简体中文", exact: true }).click();
+        await page.waitForFunction(
+          () => document.activeElement?.getAttribute("aria-label") === "Language",
+        );
+        const languageFocusRestored = await page.evaluate(
+          () => document.activeElement?.getAttribute("aria-label"),
+        );
         const bottomControl = page.getByRole("button", { name: "Bottom", exact: true });
         await bottomControl.focus();
         await bottomControl.press("ArrowRight");
@@ -643,7 +681,7 @@ for (const scene of selectedScenes) {
         await page.getByRole("menuitem", { name: "Always", exact: true }).click();
         await page.getByRole("button", { name: "View", exact: true }).click();
         interaction = await page.evaluate(
-          ({ fileDestinations, hotkeyFocusRestored, speedOptions }) => ({
+          ({ fileDestinations, hotkeyFocusRestored, languageFocusRestored, speedOptions }) => ({
             autoReview: document
               .querySelector('[role="switch"][aria-label="Show Auto-review in the composer"]')
               ?.getAttribute("aria-checked"),
@@ -667,6 +705,7 @@ for (const scene of selectedScenes) {
             language: document
               .querySelector('button[aria-label="Language"]')
               ?.textContent?.trim(),
+            languageFocus: languageFocusRestored,
             licenses: document.querySelector(".demo-settings-action-status")
               ?.textContent?.trim(),
             sendShortcut: document
@@ -679,7 +718,12 @@ for (const scene of selectedScenes) {
               .querySelector('button[aria-label="Right"]')
               ?.getAttribute("aria-pressed"),
           }),
-          { fileDestinations, hotkeyFocusRestored, speedOptions },
+          {
+            fileDestinations,
+            hotkeyFocusRestored,
+            languageFocusRestored,
+            speedOptions,
+          },
         );
         if (
           interaction.autoReview !== "false" ||
@@ -691,6 +735,7 @@ for (const scene of selectedScenes) {
           interaction.hotkeyCapture ||
           interaction.hotkeyFocus !== "Set shortcut for Popout Window hotkey" ||
           interaction.language !== "简体中文⌄" ||
+          interaction.languageFocus !== "Language" ||
           interaction.licenses !== "Open source licenses requested" ||
           interaction.sendShortcut !== "⌘ + Enter always⌄" ||
           !interaction.speed?.includes("Fast") ||
@@ -701,6 +746,15 @@ for (const scene of selectedScenes) {
             `${scene.id}: current General Settings interaction failed: ${JSON.stringify(interaction)}`,
           );
         }
+      }
+      if (hotkey) {
+        const cancel = page.getByRole("button", { name: "Cancel", exact: true });
+        await cancel.click();
+        await page.waitForFunction(
+          () =>
+            document.activeElement?.getAttribute("aria-label") ===
+            "Set shortcut for Popout Window hotkey",
+        );
       }
       await writeFile(
         join(artifactDirectory, `${scene.id}.json`),

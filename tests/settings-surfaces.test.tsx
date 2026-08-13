@@ -520,10 +520,14 @@ describe("settings surfaces", () => {
     });
     fireEvent.change(languageSearch, { target: { value: "简体" } });
     expect(screen.getAllByRole("option")).toHaveLength(1);
-    fireEvent.click(screen.getByRole("option", { name: "简体中文" }));
-    expect(screen.getByRole("button", { name: "Language" }).textContent).toContain(
+    const languageOption = screen.getByRole("option", { name: "简体中文" });
+    languageOption.focus();
+    fireEvent.click(languageOption);
+    const languageTrigger = screen.getByRole("button", { name: "Language" });
+    expect(languageTrigger.textContent).toContain(
       "简体中文",
     );
+    expect(document.activeElement).toBe(languageTrigger);
 
     fireEvent.click(screen.getByRole("button", { name: "Speed" }));
     expect(screen.getByRole("menuitem", { name: /Fast/ })).toBeTruthy();

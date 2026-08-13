@@ -1481,6 +1481,8 @@
   align-items: center;
   display: flex;
   gap: 0.5rem;
+  justify-content: flex-end;
+  max-width: 100%;
 }
 
 .codex-ui-general-settings__hotkey-record {
@@ -1517,6 +1519,11 @@
   .codex-ui-general-settings__row-control {
     margin-inline-start: 1rem;
     max-width: 48%;
+  }
+
+  .codex-ui-general-settings__hotkey-capture {
+    align-items: flex-end;
+    flex-direction: column;
   }
 
   .codex-ui-git-settings__row {

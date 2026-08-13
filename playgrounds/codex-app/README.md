@@ -822,7 +822,8 @@ screenshots and product project names remain local-only.
   host selections are product defaults.
 - Browser/CDP covers wide, light, 720px, hotkey, and bottom-scrolled frames;
   Electron repeats the interaction and retains General state while switching
-  through Git and Appearance. Five reviewed frames extend the matrix to 179.
+  through Git and Appearance. Six reviewed frames extend the matrix to 180,
+  including a dedicated 720px shortcut-capture frame.
   Optional product gates accept local-only wide, 720×820 compact, hotkey, and
   bottom screenshots and pass at 4.6143%, 6.7412%, 4.7654%, and 4.8818%; raw
   current-product evidence is never tracked.

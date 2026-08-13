@@ -179,6 +179,14 @@ export const visualScenes = [
     view: "workspace",
   },
   {
+    frame: "workspace-general-settings-hotkey",
+    id: "workspace-general-settings-hotkey-compact",
+    maxPixelRatio: 0.01,
+    scenario: "workspace-workflow",
+    view: "workspace",
+    windowSize: { height: 680, width: 720 },
+  },
+  {
     frame: "workspace-general-settings-bottom",
     id: "workspace-general-settings-bottom",
     maxPixelRatio: 0.01,
