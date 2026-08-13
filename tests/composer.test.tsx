@@ -797,10 +797,36 @@ describe("AgentComposer", () => {
     expect(
       screen.queryByRole("button", { name: "Send message" }),
     ).toBeNull();
-    fireEvent.click(screen.getByRole("button", { name: "Stop generation" }));
+    const stop = screen.getByRole("button", { name: "Stop generation" });
+    const stopIcon = stop.querySelector("svg");
+    expect(stopIcon?.getAttribute("viewBox")).toBe("0 0 20 20");
+    expect(stopIcon?.getAttribute("width")).toBe("20");
+    expect(stopIcon?.getAttribute("height")).toBe("20");
+    expect(stopIcon?.getAttribute("fill")).toBe("currentColor");
+    expect(stopIcon?.querySelector("path")?.getAttribute("d")).toBe(
+      "M4.5 5.75C4.5 5.05964 5.05964 4.5 5.75 4.5H14.25C14.9404 4.5 15.5 5.05964 15.5 5.75V14.25C15.5 14.9404 14.9404 15.5 14.25 15.5H5.75C5.05964 15.5 4.5 14.9404 4.5 14.25V5.75Z",
+    );
+    fireEvent.click(stop);
 
     expect(onStop).toHaveBeenCalledOnce();
     expect(onSubmit).not.toHaveBeenCalled();
+  });
+
+  it("allows a host to replace the Stop asset", () => {
+    render(
+      <AgentComposer
+        isRunning
+        onStop={() => undefined}
+        onSubmit={() => undefined}
+        onValueChange={() => undefined}
+        stopIcon={<span data-testid="custom-stop-icon" />}
+        value=""
+      />,
+    );
+
+    const stop = screen.getByRole("button", { name: "Stop generation" });
+    expect(stop.contains(screen.getByTestId("custom-stop-icon"))).toBe(true);
+    expect(stop.querySelector("svg")).toBeNull();
   });
 
   it("can route Enter to a host-owned queue while Stop remains primary", () => {

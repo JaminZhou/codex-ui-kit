@@ -945,15 +945,14 @@ async function captureThreadSurfaces(
     if (viewport instanceof HTMLElement) {
       viewport.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true }));
       viewport.style.scrollBehavior = 'auto';
+      const reverseOrigin =
+        viewport.getAttribute('data-latest-origin') === 'start';
+      const target = ${position === "top" ? "reverseOrigin ? -viewport.scrollHeight : 0" : "reverseOrigin ? 0 : viewport.scrollHeight"};
       viewport.scrollTo({
         behavior: 'instant',
-        top: ${position === "top" ? "0" : "viewport.scrollHeight"},
+        top: target,
       });
-      viewport.scrollTop = ${
-        position === "top"
-          ? "0"
-          : "Math.max(0, viewport.scrollHeight - viewport.clientHeight)"
-      };
+      viewport.scrollTop = target;
     }
     await wait(120);
     const thread = card?.querySelector('.codex-ui-thread');
@@ -994,15 +993,15 @@ async function captureThreadSurfaces(
     const composerRegionBounds = composerRegion?.getBoundingClientRect();
     const composerBounds = composer?.getBoundingClientRect();
     if (viewport instanceof HTMLElement) {
-      viewport.scrollTop = ${
-        position === "top"
-          ? "0"
-          : "Math.max(0, viewport.scrollHeight - viewport.clientHeight)"
-      };
+      const reverseOrigin =
+        viewport.getAttribute('data-latest-origin') === 'start';
+      viewport.scrollTop = ${position === "top" ? "reverseOrigin ? -viewport.scrollHeight : 0" : "reverseOrigin ? 0 : viewport.scrollHeight"};
     }
     const viewportScrollMaximum = viewport instanceof HTMLElement
       ? Math.max(0, viewport.scrollHeight - viewport.clientHeight)
       : null;
+    const viewportReverseOrigin =
+      viewport?.getAttribute('data-latest-origin') === 'start';
     return {
       bodyScrollWidth: document.body.scrollWidth,
       bubble: rect(bubble),
@@ -1027,6 +1026,23 @@ async function captureThreadSurfaces(
       composerControl: rect(composerPrimary),
       composerControlAction:
         composerPrimary?.getAttribute('data-action') ?? null,
+      composerStopIcon: rect(
+        composer?.querySelector(
+          '.codex-ui-composer__primary[data-action="stop"] .codex-ui-composer__stop-icon',
+        ),
+      ),
+      composerStopPath:
+        composer
+          ?.querySelector(
+            '.codex-ui-composer__primary[data-action="stop"] svg path',
+          )
+          ?.getAttribute('d') ?? null,
+      composerStopViewBox:
+        composer
+          ?.querySelector(
+            '.codex-ui-composer__primary[data-action="stop"] svg',
+          )
+          ?.getAttribute('viewBox') ?? null,
       composerDock: rect(composerDock),
       composerDockPosition: composerDock
         ? getComputedStyle(composerDock).position
@@ -1039,6 +1055,10 @@ async function captureThreadSurfaces(
             )
           : null,
       conversationShell: rect(conversationShell),
+      conversationShellLatestOrigin:
+        conversationShell?.getAttribute('data-latest-origin') ?? null,
+      conversationShellRunning:
+        conversationShell?.getAttribute('data-running') ?? null,
       contextOptimizationStates: contextOptimizationStates.map((state) => ({
         bounds: rect(state),
         fontSize: getComputedStyle(state).fontSize,
@@ -1101,8 +1121,9 @@ async function captureThreadSurfaces(
       viewport: rect(viewport),
       viewportOverflowY: viewport ? getComputedStyle(viewport).overflowY : null,
       viewportPositionDelta: viewport instanceof HTMLElement
-        ? ${position === "top" ? "viewport.scrollTop" : "Math.abs(viewportScrollMaximum - viewport.scrollTop)"}
+        ? ${position === "top" ? "Math.abs(viewport.scrollTop - (viewportReverseOrigin ? -viewportScrollMaximum : 0))" : "Math.abs(viewport.scrollTop - (viewportReverseOrigin ? 0 : viewportScrollMaximum))"}
         : null,
+      viewportReverseOrigin,
       viewportScrollMaximum,
       viewportScrollTop: viewport instanceof HTMLElement ? viewport.scrollTop : null,
       viewportTabIndex: viewport?.tabIndex ?? null,
@@ -1279,6 +1300,43 @@ async function captureAcceptance(browserWindow: BrowserWindow) {
   );
   const compactThreadScreenshot =
     await browserWindow.webContents.capturePage();
+  const threadStopRecoveryMetrics = await browserWindow.webContents.executeJavaScript(`(async () => {
+    const stop = document.querySelector(
+      '.acceptance-card--thread .codex-ui-composer__primary[data-action="stop"]',
+    );
+    if (!(stop instanceof HTMLButtonElement)) return { clicked: false };
+    stop.click();
+    await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+    const shell = document.querySelector(
+      '.acceptance-card--thread .codex-ui-conversation-thread-shell',
+    );
+    const send = document.querySelector(
+      '.acceptance-card--thread .codex-ui-composer__primary[data-action="submit"]',
+    );
+    return {
+      clicked: true,
+      latestOrigin: shell?.getAttribute('data-latest-origin') ?? null,
+      running: shell?.getAttribute('data-running') ?? null,
+      sendAction: send?.getAttribute('data-action') ?? null,
+      sendDisabled:
+        send instanceof HTMLButtonElement ? send.disabled : null,
+      stopCount: document.querySelectorAll(
+        '.acceptance-card--thread .codex-ui-composer__primary[data-action="stop"]',
+      ).length,
+    };
+  })()`);
+  if (
+    threadStopRecoveryMetrics.clicked !== true ||
+    threadStopRecoveryMetrics.latestOrigin !== "end" ||
+    threadStopRecoveryMetrics.running !== null ||
+    threadStopRecoveryMetrics.sendAction !== "submit" ||
+    threadStopRecoveryMetrics.sendDisabled !== true ||
+    threadStopRecoveryMetrics.stopCount !== 0
+  ) {
+    throw new Error(
+      `thread Stop recovery failed: ${JSON.stringify(threadStopRecoveryMetrics)}`,
+    );
+  }
 
   assertAcceptanceMetric("composer auxiliary", metrics, {
     equals: { mentionLabelOverlapsTray: false },
@@ -1296,7 +1354,12 @@ async function captureAcceptance(browserWindow: BrowserWindow) {
       equals: {
         bubbleTabIndex: 0,
         composerControlAction: "stop",
+        composerStopPath:
+          "M4.5 5.75C4.5 5.05964 5.05964 4.5 5.75 4.5H14.25C14.9404 4.5 15.5 5.05964 15.5 5.75V14.25C15.5 14.9404 14.9404 15.5 14.25 15.5H5.75C5.05964 15.5 4.5 14.9404 4.5 14.25V5.75Z",
+        composerStopViewBox: "0 0 20 20",
         composerDockPosition: "absolute",
+        conversationShellLatestOrigin: "start",
+        conversationShellRunning: "true",
         headerHeight: 46,
         messageRailOverlapsComposer: false,
         position,
@@ -1323,6 +1386,7 @@ async function captureAcceptance(browserWindow: BrowserWindow) {
         "bubble",
         "composer",
         "composerControl",
+        "composerStopIcon",
         "composerDock",
         "composerRegion",
         "conversationShell",
@@ -1541,6 +1605,10 @@ async function captureAcceptance(browserWindow: BrowserWindow) {
     writeFile(
       join(outputDirectory, "thread-surfaces-top-metrics.json"),
       `${JSON.stringify(threadTopMetrics, null, 2)}\n`,
+    ),
+    writeFile(
+      join(outputDirectory, "thread-stop-recovery-metrics.json"),
+      `${JSON.stringify(threadStopRecoveryMetrics, null, 2)}\n`,
     ),
     writeFile(
       join(outputDirectory, "thread-surfaces-top.png"),

@@ -168,6 +168,7 @@
         "composer": ".codex-ui-composer",
         "header": ".codex-ui-conversation-thread-shell__header",
         "stop": ".codex-ui-composer__primary[data-action=\"stop\"]",
+        "stopIcon": ".codex-ui-composer__primary[data-action=\"stop\"] .codex-ui-composer__stop-icon",
         "thread": ".codex-ui-conversation-thread-shell__thread",
         "user": ".codex-ui-agent-message[data-role=\"user\"] .codex-ui-agent-message__content"
       },
@@ -176,18 +177,18 @@
           "fontSize": "14px",
           "fontWeight": "445",
           "height": 22,
-          "left": 168,
+          "left": 222,
           "lineHeight": "22px",
           "top": {
-            "value": 206,
+            "value": 123,
             "tolerance": 1
           },
           "width": 736
         },
         "composer": {
-          "borderRadius": "20px",
+          "borderRadius": "25px",
           "height": 98,
-          "left": 168,
+          "left": 222,
           "top": 706,
           "width": 736
         },
@@ -195,40 +196,38 @@
           "height": 46,
           "left": 0,
           "top": 0,
-          "width": 1072
+          "width": 1180
         },
         "stop": {
-          "borderRadius": "999px",
+          "borderRadius": "9999px",
           "height": 28,
-          "left": 868,
+          "left": 922,
+          "padding": "2px",
           "top": 768,
           "width": 28
         },
+        "stopIcon": {
+          "height": 16,
+          "left": 928,
+          "top": 774,
+          "width": 16
+        },
         "thread": {
-          "left": 152,
-          "top": 46,
+          "left": 206,
+          "top": -38,
           "width": 768
         },
         "user": {
-          "borderRadius": "16px",
+          "borderRadius": "20px",
           "height": 82,
-          "left": 337,
-          "top": 79,
+          "left": 391,
+          "top": -5,
           "width": 567
         }
       },
       "id": "current-thread-streaming",
-      "masks": [
-        {
-          "height": 54,
-          "name": "workspace-environment-control",
-          "reason": "Workspace-owned control is outside the thread scene.",
-          "top": 54,
-          "width": 322,
-          "left": 746
-        }
-      ],
-      "maximumDiffRatio": 0.011,
+      "masks": [],
+      "maximumDiffRatio": 0.01,
       "pixelThreshold": 0.05,
       "referenceEnv": "CODEX_UI_KIT_THREAD_STREAMING_REFERENCE",
       "regions": [
@@ -239,8 +238,8 @@
           "top": 0
         },
         {
-          "height": 360,
-          "maximumDiffRatio": 0.015,
+          "height": 150,
+          "maximumDiffRatio": 0.012,
           "name": "messages",
           "top": 46
         },
@@ -251,6 +250,101 @@
           "name": "composer"
         }
       ]
+    },
+    {
+      "capture": "current-thread-streaming-compact",
+      "colorScheme": "dark",
+      "geometry": {
+        "assistant": ".codex-ui-agent-message[data-role=\"assistant\"] .codex-ui-agent-message__content",
+        "composer": ".codex-ui-composer",
+        "header": ".codex-ui-conversation-thread-shell__header",
+        "stop": ".codex-ui-composer__primary[data-action=\"stop\"]",
+        "stopIcon": ".codex-ui-composer__primary[data-action=\"stop\"] .codex-ui-composer__stop-icon",
+        "thread": ".codex-ui-conversation-thread-shell__thread",
+        "user": ".codex-ui-agent-message[data-role=\"user\"] .codex-ui-agent-message__content"
+      },
+      "expectedGeometry": {
+        "assistant": {
+          "fontSize": "14px",
+          "fontWeight": "445",
+          "height": 22,
+          "left": 16,
+          "lineHeight": "22px",
+          "top": {
+            "value": -17,
+            "tolerance": 1
+          },
+          "width": 688
+        },
+        "composer": {
+          "borderRadius": "25px",
+          "height": 98,
+          "left": 16,
+          "top": 566,
+          "width": 688
+        },
+        "header": {
+          "height": 46,
+          "left": 0,
+          "top": 0,
+          "width": 720
+        },
+        "stop": {
+          "borderRadius": "9999px",
+          "height": 28,
+          "left": 668,
+          "padding": "2px",
+          "top": 628,
+          "width": 28
+        },
+        "stopIcon": {
+          "height": 16,
+          "left": 674,
+          "top": 634,
+          "width": 16
+        },
+        "thread": {
+          "left": 0,
+          "top": -178,
+          "width": 720
+        },
+        "user": {
+          "borderRadius": "20px",
+          "height": 82,
+          "left": 174,
+          "top": -145,
+          "width": 530
+        }
+      },
+      "id": "current-thread-streaming-compact",
+      "masks": [],
+      "maximumDiffRatio": 0.012,
+      "pixelThreshold": 0.05,
+      "referenceEnv": "CODEX_UI_KIT_THREAD_STREAMING_COMPACT_REFERENCE",
+      "regions": [
+        {
+          "height": 46,
+          "maximumDiffRatio": 0.051,
+          "name": "header",
+          "top": 0
+        },
+        {
+          "height": 120,
+          "maximumDiffRatio": 0.01,
+          "name": "messages",
+          "top": 46
+        },
+        {
+          "fromBottom": 130,
+          "height": 130,
+          "maximumDiffRatio": 0.012,
+          "name": "composer"
+        }
+      ],
+      "warmViewport": {
+        "height": 820,
+        "width": 1180
+      }
     },
     {
       "capture": "current-thread-tool-call",

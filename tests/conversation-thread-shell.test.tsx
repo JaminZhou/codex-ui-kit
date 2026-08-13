@@ -96,6 +96,136 @@ describe("ConversationThreadShell", () => {
     expect(onFollowingChange).toHaveBeenCalledWith(false);
   });
 
+  it("uses a reverse latest origin only for the running lifecycle", () => {
+    const { container, rerender } = render(
+      <ConversationThreadShell
+        composer={<span>Composer</span>}
+        header={<span>Header</span>}
+        isRunning
+      >
+        Streaming timeline
+      </ConversationThreadShell>,
+    );
+    const shell = container.querySelector<HTMLElement>(
+      ".codex-ui-conversation-thread-shell",
+    )!;
+    const viewport = container.querySelector<HTMLElement>(
+      ".codex-ui-conversation-thread-shell__viewport",
+    )!;
+
+    expect(shell.getAttribute("data-running")).toBe("true");
+    expect(shell.getAttribute("data-latest-origin")).toBe("start");
+    expect(viewport.getAttribute("data-latest-origin")).toBe("start");
+
+    rerender(
+      <ConversationThreadShell
+        composer={<span>Composer</span>}
+        header={<span>Header</span>}
+      >
+        Completed timeline
+      </ConversationThreadShell>,
+    );
+
+    expect(shell.hasAttribute("data-running")).toBe(false);
+    expect(shell.getAttribute("data-latest-origin")).toBe("end");
+    expect(viewport.getAttribute("data-latest-origin")).toBe("end");
+  });
+
+  it("preserves a scrolled-away position when recovery changes the latest origin", () => {
+    const { container, rerender } = render(
+      <ConversationThreadShell
+        composer={<span>Composer</span>}
+        header={<span>Header</span>}
+        isRunning
+        viewportProps={{ autoFollow: false }}
+      >
+        Streaming timeline
+      </ConversationThreadShell>,
+    );
+    const viewport = container.querySelector<HTMLDivElement>(
+      ".codex-ui-conversation-thread-shell__viewport",
+    )!;
+    Object.defineProperties(viewport, {
+      clientHeight: { configurable: true, value: 200 },
+      scrollHeight: { configurable: true, value: 600 },
+      scrollTop: { configurable: true, value: -120, writable: true },
+    });
+
+    act(() => {
+      viewport.dispatchEvent(new Event("scroll", { bubbles: true }));
+    });
+    expect(viewport.hasAttribute("data-following")).toBe(false);
+
+    rerender(
+      <ConversationThreadShell
+        composer={<span>Composer</span>}
+        header={<span>Header</span>}
+        viewportProps={{ autoFollow: false }}
+      >
+        Completed timeline
+      </ConversationThreadShell>,
+    );
+
+    expect(viewport.getAttribute("data-latest-origin")).toBe("end");
+    expect(viewport.scrollTop).toBe(280);
+    expect(viewport.hasAttribute("data-following")).toBe(false);
+  });
+
+  it("preserves the latest position across recovery when auto-follow is disabled", () => {
+    const { container, rerender } = render(
+      <ConversationThreadShell
+        composer={<span>Composer</span>}
+        header={<span>Header</span>}
+        isRunning
+        viewportProps={{ autoFollow: false }}
+      >
+        Streaming timeline
+      </ConversationThreadShell>,
+    );
+    const viewport = container.querySelector<HTMLDivElement>(
+      ".codex-ui-conversation-thread-shell__viewport",
+    )!;
+    Object.defineProperties(viewport, {
+      clientHeight: { configurable: true, value: 200 },
+      scrollHeight: { configurable: true, value: 600 },
+      scrollTop: { configurable: true, value: 0, writable: true },
+    });
+    expect(viewport.getAttribute("data-following")).toBe("true");
+
+    rerender(
+      <ConversationThreadShell
+        composer={<span>Composer</span>}
+        header={<span>Header</span>}
+        viewportProps={{ autoFollow: false }}
+      >
+        Completed timeline
+      </ConversationThreadShell>,
+    );
+
+    expect(viewport.getAttribute("data-latest-origin")).toBe("end");
+    expect(viewport.scrollTop).toBe(400);
+    expect(viewport.getAttribute("data-following")).toBe("true");
+  });
+
+  it("honors an explicit latest origin while running", () => {
+    const { container } = render(
+      <ConversationThreadShell
+        composer={<span>Composer</span>}
+        header={<span>Header</span>}
+        isRunning
+        viewportProps={{ latestOrigin: "end" }}
+      >
+        Host-owned timeline
+      </ConversationThreadShell>,
+    );
+
+    expect(
+      container
+        .querySelector(".codex-ui-conversation-thread-shell__viewport")
+        ?.getAttribute("data-latest-origin"),
+    ).toBe("end");
+  });
+
   it("exposes the owned viewport without replacing its internal measurement ref", () => {
     const viewportRef = { current: null as HTMLDivElement | null };
     const callbackRef = vi.fn();
@@ -387,6 +517,115 @@ describe("ConversationThreadShell", () => {
         resizeCallback?.([], observerInstance!);
       });
       expect(scrollTo).not.toHaveBeenCalled();
+    } finally {
+      globalThis.ResizeObserver = originalResizeObserver;
+    }
+  });
+
+  it("retains the running follow height across a narrower resize and clears it on recovery", () => {
+    const originalResizeObserver = globalThis.ResizeObserver;
+    let resizeCallback: ResizeObserverCallback | undefined;
+    let observerInstance: ResizeObserver | undefined;
+    let bodyHeight = 774;
+
+    globalThis.ResizeObserver = class ResizeObserver {
+      constructor(callback: ResizeObserverCallback) {
+        resizeCallback = callback;
+        observerInstance = this;
+      }
+
+      disconnect = vi.fn();
+      observe = vi.fn();
+      unobserve = vi.fn();
+    };
+
+    try {
+      const { container, rerender } = render(
+        <ConversationThreadShell
+          composer={<span>Composer</span>}
+          header={<span>Header</span>}
+          isRunning
+        >
+          Streaming timeline
+        </ConversationThreadShell>,
+      );
+      const body = container.querySelector<HTMLElement>(
+        ".codex-ui-conversation-thread-shell__body",
+      )!;
+      const composerDock = container.querySelector<HTMLElement>(
+        ".codex-ui-conversation-thread-shell__composer-dock",
+      )!;
+      const viewport = container.querySelector<HTMLDivElement>(
+        ".codex-ui-conversation-thread-shell__viewport",
+      )!;
+      vi.spyOn(body, "getBoundingClientRect").mockImplementation(() => ({
+        bottom: bodyHeight,
+        height: bodyHeight,
+        left: 0,
+        right: 1180,
+        top: 0,
+        width: 1180,
+        x: 0,
+        y: 0,
+        toJSON: () => ({}),
+      }));
+      vi.spyOn(composerDock, "getBoundingClientRect").mockReturnValue({
+        bottom: 130,
+        height: 130,
+        left: 0,
+        right: 1180,
+        top: 0,
+        width: 1180,
+        x: 0,
+        y: 0,
+        toJSON: () => ({}),
+      });
+      Object.defineProperties(viewport, {
+        scrollHeight: { configurable: true, value: 857 },
+        scrollTop: { configurable: true, value: 0, writable: true },
+      });
+      const scrollTo = vi.fn();
+      Object.defineProperty(viewport, "scrollTo", {
+        configurable: true,
+        value: scrollTo,
+      });
+
+      act(() => {
+        resizeCallback?.([], observerInstance!);
+      });
+      expect(
+        body.style.getPropertyValue(
+          "--codex-ui-conversation-thread-running-follow-base-height",
+        ),
+      ).toBe("774px");
+      expect(scrollTo).toHaveBeenLastCalledWith({
+        behavior: "auto",
+        top: 0,
+      });
+
+      bodyHeight = 634;
+      act(() => {
+        resizeCallback?.([], observerInstance!);
+      });
+      expect(
+        body.style.getPropertyValue(
+          "--codex-ui-conversation-thread-running-follow-base-height",
+        ),
+      ).toBe("774px");
+
+      rerender(
+        <ConversationThreadShell
+          composer={<span>Composer</span>}
+          header={<span>Header</span>}
+        >
+          Completed timeline
+        </ConversationThreadShell>,
+      );
+      expect(
+        body.style.getPropertyValue(
+          "--codex-ui-conversation-thread-running-follow-base-height",
+        ),
+      ).toBe("");
     } finally {
       globalThis.ResizeObserver = originalResizeObserver;
     }

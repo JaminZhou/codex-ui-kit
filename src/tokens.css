@@ -163,6 +163,7 @@
   --codex-ui-conversation-thread-composer-bottom-inset: 1rem;
   --codex-ui-conversation-thread-composer-reserve: 7.125rem;
   --codex-ui-conversation-thread-composer-scroll-clearance: 3.75rem;
+  --codex-ui-conversation-thread-running-follow-offset: 5.25rem;
   --codex-ui-conversation-thread-composer-control-size: 1.75rem;
   --codex-ui-conversation-thread-background: var(
     --codex-ui-background-surface

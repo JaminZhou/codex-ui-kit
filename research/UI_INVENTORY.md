@@ -74,7 +74,7 @@ observation from a previous build remains historical evidence.
   previous-build regression evidence and have been downgraded from `verified`
   to `partial_legacy` until they are reached again on the current fingerprint.
 
-Current inventory: 88 surface groups; 28 have current-build runtime evidence, 43 have previous-build-only runtime evidence, 17 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 27 groups and Electron verification covers 27.
+Current inventory: 88 surface groups; 29 have current-build runtime evidence, 42 have previous-build-only runtime evidence, 17 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 27 groups and Electron verification covers 27.
 Prior acceptance outside those 23 sampled current-build groups remains
 recorded as `partial_legacy` until current-build re-observation.
 
@@ -463,13 +463,13 @@ message band, and Composer regions independently. The sampled completed state
 matches all measured region geometry and stays below a 0.5% full-image raster
 delta at the strict 0.05 pixel threshold.
 
-The visual gate is now scenario-driven. A second external reference supplied
-through `CODEX_UI_KIT_THREAD_STREAMING_REFERENCE` covers a `26.721.41059`
-running reply and 28px `Stop` control. It locks 14/22px running text, the
-736px reply/Composer columns, and the 736×98 Composer card. Its declared mask
-omits only the workspace-owned Environment control from the thread-owned
-comparison; the remaining full raster and header/message/Composer regions
-stay independently bounded.
+The visual gate is now scenario-driven. Its streaming references are refreshed
+on `26.803.61601` through `CODEX_UI_KIT_THREAD_STREAMING_REFERENCE` and
+`CODEX_UI_KIT_THREAD_STREAMING_COMPACT_REFERENCE`. They cover one live
+1180→720 running resize, 14/22px running text, the 736px/688px columns,
+736×98/688×98 Composer cards, reverse-origin clipping, exact 16px Stop SVG,
+and completion recovery. No owner mask remains; full raster and
+header/message/Composer regions are independently bounded.
 
 The current `26.803.61601` completed-thread follow-up supersedes the basic
 shell/message evidence above without relabeling later lifecycle states. A
@@ -481,6 +481,12 @@ overflow. Twelve exact thread primitives raise the visual manifest from 78 to
 integration PNG. Browser/CDP and Electron pass with no geometry violations;
 local-only regional comparisons pass at 0.3272% wide and 0.6456% compact. The source
 captures remain untracked.
+
+The current streaming follow-up adds zero-violation wide and compact geometry.
+Its full-frame deltas are 0.3066% and 0.5074%; message-region deltas are
+0.2706% and 0%, while Composer deltas are 0.5372% and 0.8761%. Completion
+returns the wide turn from y=-4.83/y=123.17 to y=78/y=206 and replaces Stop
+with the empty usable Send state.
 
 The previous full conversation/Composer probe observed build `26.721.81911`
 in a disposable second process using synthetic prompts only. It remains the

@@ -1,5 +1,4 @@
 import { createServer } from "node:http";
-import { spawnSync } from "node:child_process";
 import {
   existsSync,
   mkdirSync,
@@ -13,6 +12,10 @@ import { fileURLToPath } from "node:url";
 import pixelmatch from "pixelmatch";
 import { PNG } from "pngjs";
 import puppeteer from "puppeteer-core";
+import {
+  chromeLaunchArgs,
+  findChromeExecutable,
+} from "./browser-executable.mjs";
 
 const root = fileURLToPath(new URL("../", import.meta.url));
 const demoRoot = join(root, "demo/dist");
@@ -126,25 +129,6 @@ function geometryViolations(geometry, scenario) {
     }
   }
   return violations;
-}
-
-function findExecutable(command) {
-  const result = spawnSync("which", [command], { encoding: "utf8" });
-  if (result.status !== 0) return undefined;
-  return result.stdout.trim() || undefined;
-}
-
-function findChrome() {
-  const candidates = [
-    process.env.PUPPETEER_EXECUTABLE_PATH,
-    "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
-    "/Applications/Chromium.app/Contents/MacOS/Chromium",
-    findExecutable("google-chrome"),
-    findExecutable("google-chrome-stable"),
-    findExecutable("chromium"),
-    findExecutable("chromium-browser"),
-  ];
-  return candidates.find((candidate) => candidate && existsSync(candidate));
 }
 
 function createDemoServer() {
@@ -288,7 +272,7 @@ function mismatchRegions(diff, scenario) {
   });
 }
 
-const chrome = findChrome();
+const chrome = findChromeExecutable();
 if (!chrome) {
   throw new Error("Chrome or Chromium is required for visual scenarios.");
 }
@@ -305,6 +289,7 @@ let browser;
 const results = [];
 try {
   browser = await puppeteer.launch({
+    args: chromeLaunchArgs,
     executablePath: chrome,
     headless: true,
   });
@@ -333,11 +318,16 @@ try {
     mkdirSync(outputDir, { recursive: true });
     const page = await browser.newPage();
     try {
-      await page.setViewport({
+      const captureViewport = {
         deviceScaleFactor: 1,
         height: referenceOriginal.height,
         width: referenceOriginal.width,
-      });
+      };
+      await page.setViewport(
+        scenario.warmViewport
+          ? { deviceScaleFactor: 1, ...scenario.warmViewport }
+          : captureViewport,
+      );
       await page.emulateMediaFeatures([
         { name: "prefers-reduced-motion", value: "reduce" },
         {
@@ -353,6 +343,15 @@ try {
         `.current-thread-pixel-fixture[data-visual-scene="${scenario.id}"]`,
       );
       await page.evaluate(() => document.fonts.ready);
+      if (scenario.warmViewport) {
+        await page.setViewport(captureViewport);
+        await page.evaluate(
+          () =>
+            new Promise((resolve) =>
+              requestAnimationFrame(() => requestAnimationFrame(resolve)),
+            ),
+        );
+      }
       await page.addStyleTag({
         content:
           "*, *::before, *::after { animation: none !important; caret-color: transparent !important; transition: none !important; }",
@@ -360,7 +359,7 @@ try {
       const geometry = await page.evaluate((selectors) => {
         const bounds = (selector) => {
           const element = document.querySelector(selector);
-          if (!(element instanceof HTMLElement)) return null;
+          if (!(element instanceof Element)) return null;
           const rect = element.getBoundingClientRect();
           const style = getComputedStyle(element);
           return {

@@ -13,6 +13,8 @@ second component implementation and it is not published with the package.
 - Validate thread follow state, turn spacing, user-message focus/edit actions,
   loading/reconnect/shimmer/skeleton states, virtualized estimates, and turn
   render errors at standard and compact window sizes.
+- Validate the current reverse-origin running timeline, exact Stop SVG, and
+  Stop-to-Send recovery in the real BrowserWindow.
 - Validate draggable header geometry, compact navigation, transient side
   panels, and latest-message floating states.
 - Exercise portalled tooltips, popovers, menus, submenus, and selects inside the

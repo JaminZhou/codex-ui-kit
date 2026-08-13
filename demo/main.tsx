@@ -500,10 +500,13 @@ function PixelIcon({ name }: { name: PixelIconName }) {
 type CurrentThreadPixelState = "completed" | "streaming";
 
 const streamingPixelPrompt =
-  'Write exactly 24 short plain-text sentences about pixel-level UI verification. Begin the first sentence with "Streaming probe:" and number no sentences. Do not use Markdown.';
+  'Write exactly 24 short plain-text sentences about pixel-level UI verification. Begin the first sentence with "Streaming probe:" and number no sentences. Do not use Markdown or tools.';
 
-const streamingPixelReply =
-  "Streaming probe: compare each rendered frame against the reference.";
+const streamingPixelReplies = {
+  compact:
+    "Streaming probe: compare each rendered frame with the approved refer",
+  wide: "Streaming probe: compare",
+} as const;
 
 function CurrentThreadPixelFixture({
   sceneId,
@@ -513,6 +516,11 @@ function CurrentThreadPixelFixture({
   state?: CurrentThreadPixelState;
 }) {
   const streaming = state === "streaming";
+  const [running, setRunning] = useState(streaming);
+  const streamingReply =
+    sceneId === "current-thread-streaming-compact"
+      ? streamingPixelReplies.compact
+      : streamingPixelReplies.wide;
   const messageActions = [
     ["copy", <CurrentThreadBuildIcon name="thread-assistant-copy" />],
     ["like", <CurrentThreadBuildIcon name="thread-assistant-good" />],
@@ -553,9 +561,9 @@ function CurrentThreadPixelFixture({
                 </button>
               </>
             }
-            isRunning={streaming}
+            isRunning={running}
             layout="multiline"
-            onStop={() => undefined}
+            onStop={() => setRunning(false)}
             onSubmit={() => undefined}
             onValueChange={() => undefined}
             placeholder="Do anything"
@@ -609,7 +617,7 @@ function CurrentThreadPixelFixture({
                 <CurrentThreadBuildIcon name="thread-header-project" />
                 <span>
                   {streaming
-                    ? "Write exactly 24 short plain-text sentences ab..."
+                    ? "Write pixel UI verification summary"
                     : "Confirm UI probe completion"}
                 </span>
                 <CurrentThreadBuildIcon name="thread-header-actions" />
@@ -617,7 +625,9 @@ function CurrentThreadPixelFixture({
             }
           />
         }
+        isRunning={running}
         label="Current conversation pixel fixture"
+        viewportProps={{ followKey: running ? streamingReply : state }}
       >
         <AgentMessage role="user">
           {streaming
@@ -626,7 +636,7 @@ function CurrentThreadPixelFixture({
         </AgentMessage>
         <AgentMessage
           actions={
-            streaming
+            running
               ? undefined
               : messageActions.map(([label, icon]) => (
                   <button aria-label={label} key={label} type="button">
@@ -635,9 +645,9 @@ function CurrentThreadPixelFixture({
                 ))
           }
           role="assistant"
-          status={streaming ? "running" : "completed"}
+          status={running ? "running" : "completed"}
         >
-          {streaming ? streamingPixelReply : "UI probe complete."}
+          {streaming ? streamingReply : "UI probe complete."}
         </AgentMessage>
       </ConversationThreadShell>
     </main>
@@ -4165,9 +4175,13 @@ const currentThreadCapture =
   capture === "current-thread" ||
   capture === "current-thread-completed" ||
   capture === "current-thread-completed-compact" ||
-  capture === "current-thread-streaming";
+  capture === "current-thread-streaming" ||
+  capture === "current-thread-streaming-compact";
 const currentThreadPixelState: CurrentThreadPixelState =
-  capture === "current-thread-streaming" ? "streaming" : "completed";
+  capture === "current-thread-streaming" ||
+  capture === "current-thread-streaming-compact"
+    ? "streaming"
+    : "completed";
 const workflowPixelState: WorkflowPixelState | undefined =
   capture === "current-thread-tool-call"
     ? "tool-call"

@@ -556,10 +556,78 @@ code {
   color: var(--codex-ui-text-tertiary);
 }
 
-.current-thread-pixel-fixture[data-visual-scene="current-thread-streaming"]
+.current-thread-pixel-fixture:is(
+    [data-visual-scene="current-thread-streaming"],
+    [data-visual-scene="current-thread-streaming-compact"]
+  )
   .codex-ui-conversation-thread-shell {
   --codex-ui-conversation-thread-font-size: 0.875rem;
   font-weight: 445;
+}
+
+.current-thread-pixel-fixture:is(
+    [data-visual-scene="current-thread-streaming"],
+    [data-visual-scene="current-thread-streaming-compact"]
+  )
+  .current-thread-pixel-fixture__title
+  > span {
+  font-weight: 445;
+}
+
+.current-thread-pixel-fixture:is(
+    [data-visual-scene="current-thread-streaming"],
+    [data-visual-scene="current-thread-streaming-compact"]
+  )
+  .current-thread-pixel-fixture__title {
+  transform: translateX(2px);
+}
+
+.current-thread-pixel-fixture:is(
+    [data-visual-scene="current-thread-streaming"],
+    [data-visual-scene="current-thread-streaming-compact"]
+  )
+  .current-thread-pixel-fixture__navigation
+  > button:first-child {
+  position: relative;
+}
+
+.current-thread-pixel-fixture:is(
+    [data-visual-scene="current-thread-streaming"],
+    [data-visual-scene="current-thread-streaming-compact"]
+  )
+  .current-thread-pixel-fixture__navigation
+  > button:first-child::after {
+  background: var(--codex-ui-app-sidebar-attention);
+  border-radius: 9999px;
+  content: "";
+  height: 0.3125rem;
+  position: absolute;
+  right: 0.375rem;
+  top: 0.125rem;
+  width: 0.3125rem;
+}
+
+.current-thread-pixel-fixture[data-visual-scene="current-thread-streaming"]::after,
+.current-thread-pixel-fixture[data-visual-scene="current-thread-streaming-compact"]::after {
+  border-radius: 9999px;
+  content: "";
+  pointer-events: none;
+  position: fixed;
+  right: 0.125rem;
+  width: 0.4375rem;
+  z-index: 100;
+}
+
+.current-thread-pixel-fixture[data-visual-scene="current-thread-streaming"]::after {
+  background: rgb(59 59 59);
+  bottom: 0.25rem;
+  height: 43.1875rem;
+}
+
+.current-thread-pixel-fixture[data-visual-scene="current-thread-streaming-compact"]::after {
+  background: rgb(42 42 42);
+  bottom: 0.25rem;
+  height: 28.875rem;
 }
 
 .workflow-pixel-fixture {

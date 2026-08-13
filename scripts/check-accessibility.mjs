@@ -1,11 +1,13 @@
-import { spawnSync } from "node:child_process";
 import { createServer } from "node:http";
-import { existsSync } from "node:fs";
 import { readFile } from "node:fs/promises";
 import { extname, join, normalize, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 import axe from "axe-core";
 import puppeteer from "puppeteer-core";
+import {
+  chromeLaunchArgs,
+  findChromeExecutable,
+} from "./browser-executable.mjs";
 import {
   contrastRatio,
   partitionSemanticIncomplete,
@@ -28,24 +30,6 @@ const contentTypes = new Map([
   [".json", "application/json; charset=utf-8"],
   [".svg", "image/svg+xml"],
 ]);
-
-function findExecutable(command) {
-  const result = spawnSync("which", [command], { encoding: "utf8" });
-  return result.status === 0 ? result.stdout.trim() : undefined;
-}
-
-function findChrome() {
-  const candidates = [
-    process.env.PUPPETEER_EXECUTABLE_PATH,
-    "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
-    "/Applications/Chromium.app/Contents/MacOS/Chromium",
-    findExecutable("google-chrome"),
-    findExecutable("google-chrome-stable"),
-    findExecutable("chromium"),
-    findExecutable("chromium-browser"),
-  ];
-  return candidates.find((candidate) => candidate && existsSync(candidate));
-}
 
 function createDemoServer() {
   return createServer(async (request, response) => {
@@ -82,7 +66,7 @@ function closeServer(server) {
   });
 }
 
-const chrome = findChrome();
+const chrome = findChromeExecutable();
 if (!chrome) {
   throw new Error(
     "Chrome or Chromium is required for the accessibility contract. Set PUPPETEER_EXECUTABLE_PATH when it is installed in a non-standard location.",
@@ -725,7 +709,7 @@ try {
   browser = await puppeteer.launch({
     executablePath: chrome,
     headless: true,
-    args: ["--disable-dev-shm-usage", "--no-sandbox"],
+    args: chromeLaunchArgs,
   });
   for (const testCase of cases) {
     const page = await browser.newPage();

@@ -1192,6 +1192,16 @@ transport recovery remain required captures.
 
 ## Current Markdown streaming and very-wide-table follow-up
 
+A later `26.803.61601` isolated plain-text task closes the basic streaming
+reachability gap without relabeling the richer Markdown replay. CDP captured a
+single running Renderer at 1180×820, resized that same task to 720×680, and
+waited for completion. Running uses reverse-origin `scrollTop=0`; the wide
+user/assistant anchors are y=-4.83/y=123.17 and the retained compact anchors
+y=-144.83/y=-16.83. Natural completion restores y=78/y=206, removes Stop, and
+returns the empty usable Send control. The exact 20-viewBox Stop path renders
+16×16 inside its 28×28 button. Browser/CDP and two external regional pixel
+references pass; screenshots and full probe output remain local-only.
+
 Read-only inspection of the unchanged `26.803.41515` ASAR fingerprint confirms
 that conversation content is represented as `inline-markdown`, remains in
 progress until completion, and participates in the latest-turn follow

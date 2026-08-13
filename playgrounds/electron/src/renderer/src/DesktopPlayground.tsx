@@ -671,6 +671,7 @@ export function DesktopPlayground() {
                   />
                 }
                 label="Desktop conversation shell"
+                isRunning={threadRunning}
                 floatingControl={
                   <ThreadFloatingButton
                     onClick={() => setThreadStatus("Scrolled to latest desktop turn")}
