@@ -12,7 +12,10 @@ import { fileURLToPath } from "node:url";
 import pixelmatch from "pixelmatch";
 import { PNG } from "pngjs";
 import puppeteer from "puppeteer-core";
-import { findChromeExecutable } from "./browser-executable.mjs";
+import {
+  chromeLaunchArgs,
+  findChromeExecutable,
+} from "./browser-executable.mjs";
 
 const root = fileURLToPath(new URL("../", import.meta.url));
 const demoRoot = join(root, "demo/dist");
@@ -286,6 +289,7 @@ let browser;
 const results = [];
 try {
   browser = await puppeteer.launch({
+    args: chromeLaunchArgs,
     executablePath: chrome,
     headless: true,
   });

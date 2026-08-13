@@ -8,6 +8,11 @@ export const chromeExecutableCommands = [
   "chromium-browser",
 ];
 
+export const chromeLaunchArgs = [
+  "--disable-dev-shm-usage",
+  "--no-sandbox",
+];
+
 function findExecutable(command) {
   const result = spawnSync("which", [command], { encoding: "utf8" });
   if (result.status !== 0) return undefined;

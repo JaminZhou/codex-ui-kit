@@ -3,7 +3,10 @@ import { readFileSync } from "node:fs";
 import { extname, join, normalize, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 import puppeteer from "puppeteer-core";
-import { findChromeExecutable } from "./browser-executable.mjs";
+import {
+  chromeLaunchArgs,
+  findChromeExecutable,
+} from "./browser-executable.mjs";
 
 const root = fileURLToPath(new URL("../", import.meta.url));
 const demoRoot = join(root, "demo/dist");
@@ -44,7 +47,11 @@ await new Promise((resolve, reject) => {
 const address = server.address();
 if (!address || typeof address === "string") throw new Error("No demo port.");
 
-const browser = await puppeteer.launch({ executablePath, headless: true });
+const browser = await puppeteer.launch({
+  args: chromeLaunchArgs,
+  executablePath,
+  headless: true,
+});
 try {
   const page = await browser.newPage();
   await page.setViewport({ deviceScaleFactor: 1, height: 820, width: 1180 });

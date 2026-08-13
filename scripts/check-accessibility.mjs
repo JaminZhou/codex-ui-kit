@@ -4,7 +4,10 @@ import { extname, join, normalize, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 import axe from "axe-core";
 import puppeteer from "puppeteer-core";
-import { findChromeExecutable } from "./browser-executable.mjs";
+import {
+  chromeLaunchArgs,
+  findChromeExecutable,
+} from "./browser-executable.mjs";
 import {
   contrastRatio,
   partitionSemanticIncomplete,
@@ -706,7 +709,7 @@ try {
   browser = await puppeteer.launch({
     executablePath: chrome,
     headless: true,
-    args: ["--disable-dev-shm-usage", "--no-sandbox"],
+    args: chromeLaunchArgs,
   });
   for (const testCase of cases) {
     const page = await browser.newPage();
