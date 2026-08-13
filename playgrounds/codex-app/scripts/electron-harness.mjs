@@ -96,6 +96,21 @@ export const visualScenes = [
     view: "workspace",
   },
   {
+    frame: "workspace-git-settings",
+    id: "workspace-git-settings",
+    maxPixelRatio: 0.01,
+    scenario: "workspace-workflow",
+    view: "workspace",
+  },
+  {
+    frame: "workspace-git-settings-compact",
+    id: "workspace-git-settings-compact",
+    maxPixelRatio: 0.01,
+    scenario: "workspace-workflow",
+    view: "workspace",
+    windowSize: { height: 680, width: 720 },
+  },
+  {
     frame: "workspace-compact-ready",
     id: "workspace-compact-ready",
     maxPixelRatio: 0.01,

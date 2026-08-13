@@ -175,6 +175,126 @@ for (const scene of selectedScenes) {
         `${JSON.stringify(lightShell, null, 2)}\n`,
       );
     }
+    if (scene.id.startsWith("workspace-git-settings")) {
+      const settings = await page.evaluate(() => {
+        const rect = (selector) => {
+          const element = document.querySelector(selector);
+          if (!(element instanceof Element)) return null;
+          const value = element.getBoundingClientRect();
+          return {
+            height: value.height,
+            left: value.left,
+            top: value.top,
+            width: value.width,
+          };
+        };
+        return {
+          branchPrefix: rect('.codex-ui-git-settings input[aria-label="Branch prefix"]'),
+          card: rect(".codex-ui-git-settings__card"),
+          heading: rect(".codex-ui-git-settings > h1"),
+          horizontalOverflow:
+            document.documentElement.scrollWidth -
+            document.documentElement.clientWidth,
+          iconNames: Array.from(
+            document.querySelectorAll(
+              ".codex-ui-settings-shell__navigation [data-current-build-icon]",
+            ),
+            (icon) => icon.getAttribute("data-current-build-icon"),
+          ),
+          mainCount: document.querySelectorAll("main").length,
+          navigation: rect(".codex-ui-settings-shell__navigation"),
+          navigationCount: document.querySelectorAll(
+            'nav[aria-label="Settings"]',
+          ).length,
+          searchbox: rect('[role="searchbox"]'),
+          selected: document
+            .querySelector('.codex-ui-settings-shell__item[aria-current="page"]')
+            ?.getAttribute("aria-label"),
+          switchStates: Array.from(
+            document.querySelectorAll('[role="switch"]'),
+            (control) => ({
+              label: control.getAttribute("aria-label"),
+              value: control.getAttribute("aria-checked"),
+            }),
+          ),
+          textareaCount: document.querySelectorAll(
+            ".codex-ui-git-settings textarea",
+          ).length,
+          viewport: { height: window.innerHeight, width: window.innerWidth },
+        };
+      });
+      const compact = scene.id === "workspace-git-settings-compact";
+      if (
+        settings.horizontalOverflow > 1 ||
+        settings.navigationCount !== 1 ||
+        settings.mainCount !== 1 ||
+        settings.selected !== "Git" ||
+        settings.navigation?.width !== 322.90625 ||
+        settings.navigation?.top !== 46 ||
+        settings.navigation?.height !== settings.viewport.height - 46 ||
+        settings.searchbox?.width !== 258.90625 ||
+        settings.searchbox?.height !== 18 ||
+        settings.heading?.top !== 66 ||
+        Math.abs(settings.heading?.width - (compact ? 357.09375 : 768)) > 1 ||
+        settings.branchPrefix?.width !== 224 ||
+        settings.branchPrefix?.height !== 35 ||
+        settings.card?.width !== (compact ? 357.09375 : 768) ||
+        settings.switchStates.length !== 2 ||
+        settings.switchStates[0]?.value !== "false" ||
+        settings.switchStates[1]?.value !== "true" ||
+        settings.textareaCount !== 2 ||
+        settings.iconNames.length !== 24 ||
+        !settings.iconNames.includes("settings-back") ||
+        !settings.iconNames.includes("settings-search") ||
+        !settings.iconNames.includes("settings-git")
+      ) {
+        throw new Error(
+          `${scene.id}: current Git Settings contract failed: ${JSON.stringify(settings)}`,
+        );
+      }
+
+      await page.getByRole("searchbox").fill("git");
+      await page.waitForSelector(".codex-ui-settings-shell__result-label");
+      const search = await page.evaluate(() => ({
+        hasGit: Boolean(
+          document.querySelector('.codex-ui-settings-shell__item[aria-label="Git"]'),
+        ),
+        hasHookResult: document.body.textContent?.includes(
+          "Right before ChatGPT ends its turn",
+        ),
+        hasPlugins: Boolean(
+          document.querySelector(
+            '.codex-ui-settings-shell__item[aria-label="Plugins"]',
+          ),
+        ),
+      }));
+      if (!search.hasGit || !search.hasHookResult || search.hasPlugins) {
+        throw new Error(
+          `${scene.id}: current Git Settings search failed: ${JSON.stringify(search)}`,
+        );
+      }
+      await page.getByRole("button", { name: "Clear settings search" }).click();
+      await page.getByRole("switch", { name: "Always force push" }).click();
+      await page.getByRole("radio", { name: "Squash" }).click();
+      const interaction = await page.evaluate(() => ({
+        forcePush: document
+          .querySelector('[role="switch"][aria-label="Always force push"]')
+          ?.getAttribute("aria-checked"),
+        squash: document
+          .querySelector('[role="radio"]:nth-child(2)')
+          ?.getAttribute("aria-checked"),
+      }));
+      if (interaction.forcePush !== "true" || interaction.squash !== "true") {
+        throw new Error(
+          `${scene.id}: current Git Settings interaction failed: ${JSON.stringify(interaction)}`,
+        );
+      }
+      await writeFile(
+        join(artifactDirectory, `${scene.id}.json`),
+        `${JSON.stringify({ interaction, search, settings }, null, 2)}\n`,
+      );
+      continue;
+    }
     if (scene.id === "current-dark-shell") {
       const darkShell = await page.evaluate(() => {
         const metric = (selector) => {

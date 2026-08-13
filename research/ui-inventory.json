@@ -1179,10 +1179,13 @@
       "ownership": "app",
       "packageEvidence": ["settings-page", "settings-command-menu-section-items", "virtual-settings-search-documents"],
       "runtimeStatus": "runtime_observed",
-      "runtimeEvidence": ["cdp:settings-full-page-shell-sidebar-and-search"],
-      "implementationStatus": "not_started",
-      "browserStatus": "not_started",
-      "electronStatus": "not_started",
+      "runtimeEvidence": [
+        "cdp:settings-full-page-shell-sidebar-and-search",
+        "cdp-26.803.61601:full-page-settings-shell-back-search-21-items-and-24-exact-navigation-icons"
+      ],
+      "implementationStatus": "partial",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
       "priority": "p1"
     },
     {
@@ -1231,15 +1234,29 @@
       "priority": "p2"
     },
     {
-      "id": "settings.git-hooks-review",
+      "id": "settings.git-preferences",
       "area": "settings",
       "ownership": "app",
-      "packageEvidence": ["git-settings", "hooks-settings", "code-review-settings", "review-delivery-settings-row"],
+      "packageEvidence": ["git-settings", "review-delivery-settings-row"],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
         "cdp:git-branch-pr-review-delivery-and-hooks-settings",
-        "cdp-26.803.61601:set-prefix-navigation-to-git-settings"
+        "cdp-26.803.61601:set-prefix-navigation-to-git-settings",
+        "cdp-26.803.61601:git-settings-wide-medium-compact-geometry-controls-and-grouped-search",
+        "cdp-26.803.61601:git-settings-wide-and-compact-current-build-regional-pixel-gates"
       ],
+      "implementationStatus": "partial",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
+      "priority": "p1"
+    },
+    {
+      "id": "settings.hooks-review",
+      "area": "settings",
+      "ownership": "app",
+      "packageEvidence": ["hooks-settings", "code-review-settings"],
+      "runtimeStatus": "runtime_observed",
+      "runtimeEvidence": ["cdp:git-branch-pr-review-delivery-and-hooks-settings"],
       "implementationStatus": "not_started",
       "browserStatus": "not_started",
       "electronStatus": "not_started",

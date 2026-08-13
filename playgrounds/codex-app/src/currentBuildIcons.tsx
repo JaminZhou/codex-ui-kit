@@ -1,7 +1,7 @@
 import { createElement, type SVGProps } from "react";
 import visualAssets from "../../../research/visual-assets.json";
 
-type CurrentBuildIconName =
+export type CurrentBuildIconName =
   | "composer-add-files"
   | "composer-branch"
   | "composer-dictate"
@@ -54,7 +54,31 @@ type CurrentBuildIconName =
   | "workspace-run-location-usage"
   | "workspace-run-location-usage-chevron"
   | "workspace-run-location-worktree"
-  | "workspace-selection-check";
+  | "workspace-selection-check"
+  | "settings-back"
+  | "settings-search"
+  | "settings-general"
+  | "settings-import"
+  | "settings-profile"
+  | "settings-appearance"
+  | "settings-voice"
+  | "settings-configuration"
+  | "settings-personalization"
+  | "settings-pets"
+  | "settings-keyboard-shortcuts"
+  | "settings-usage-billing"
+  | "settings-account"
+  | "settings-account-external"
+  | "settings-appshots"
+  | "settings-plugins"
+  | "settings-browser"
+  | "settings-computer-use"
+  | "settings-hooks"
+  | "settings-connections"
+  | "settings-git"
+  | "settings-environments"
+  | "settings-worktrees"
+  | "settings-archived-chats";
 
 interface CurrentBuildIconProps extends SVGProps<SVGSVGElement> {
   name: CurrentBuildIconName;

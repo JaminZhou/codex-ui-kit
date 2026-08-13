@@ -181,6 +181,24 @@ textarea {
     rgba(0, 0, 0, 0.05) 0 0 20px;
 }
 
+.demo-root[data-frame^="workspace-git-settings"]
+  .codex-ui-app-shell__layout {
+  --codex-ui-app-shell-sidebar-track: 0rem;
+  grid-template-columns: 0 minmax(0, 1fr) 0;
+}
+
+.demo-root[data-frame^="workspace-git-settings"]
+  .codex-ui-app-shell__sidebar,
+.demo-root[data-frame^="workspace-git-settings"]
+  .codex-ui-app-shell__sidebar-resizer {
+  display: none;
+}
+
+.demo-root[data-frame^="workspace-git-settings"]
+  .codex-ui-app-shell__main {
+  box-shadow: none;
+}
+
 .demo-shell-route-content {
   display: flex;
   flex-direction: column;
@@ -3406,4 +3424,18 @@ textarea {
     animation-duration: 0.001ms !important;
     animation-iteration-count: 1 !important;
   }
+}
+.demo-settings-navigation-icon-stack {
+  align-items: center;
+  display: inline-flex;
+  height: 100%;
+  position: relative;
+  width: 100%;
+}
+
+.demo-settings-navigation-icon-stack > svg + svg {
+  height: 0.6875rem !important;
+  inset-inline-end: -0.1875rem;
+  position: absolute;
+  width: 0.6875rem !important;
 }

@@ -22,12 +22,12 @@ Codex UI Kit turns those interaction patterns into protocol-neutral React primit
 - The current components are a partial coding-agent UI foundation, not a
   complete Codex Desktop reconstruction.
 - The authoritative full-surface inventory baseline is the installed
-  `26.803.61601` (`6396`) build. Its 84 candidate surface groups and
+  `26.803.61601` (`6396`) build. Its 87 candidate surface groups and
   build-scoped evidence status are tracked in
   [`research/UI_INVENTORY.md`](research/UI_INVENTORY.md); current-build
-  observation covers 15 groups; 52 previous-build groups remain regression
-  evidence and 17 are still unsampled. The current visual manifest binds 37
-  sidebar, menu, window-chrome, and Composer icons to exact runtime evidence
+  observation covers 23 groups; 47 previous-build groups remain regression
+  evidence and 17 are still unsampled. The current visual manifest binds 77
+  sidebar, menu, window-chrome, Composer, environment, and Settings icons to exact runtime evidence
   with zero scoped approximations. The latest baseline refresh revalidates
   six project groups, pointer/Enter/Space expansion, the six-item project menu,
   the eight-item Help menu, explicit compact pinning, disabled window
@@ -35,6 +35,9 @@ Codex UI Kit turns those interaction patterns into protocol-neutral React primit
   local-only current-product pixels pass at 3.1387% for the shell top, 0.4126%
   for the footer, and 0.3146% for the main region. This is still a partial UI
   foundation rather than a global reconstruction claim.
+  The newest vertical slice adds the full-page Settings shell, grouped search,
+  Git/review-delivery preferences, exact navigation assets, and wide/720px
+  current-product pixel gates; other Settings pages remain open.
 - The repository is public and the package baseline is `0.1.0`, but the npm package has **not** been published.
 - The API remains pre-1.0 and may change while public documentation and consumer feedback mature.
 - Extracted application files, private IPC, bundled fonts, and OpenAI brand assets are not included.
@@ -150,6 +153,7 @@ export function Example() {
 | [Interactive primitives](docs/COMPONENTS.md#interactive-primitives) | Buttons, dialogs, menus, selects, popovers, tooltips |
 | [Resources and media](docs/COMPONENTS.md#resources-and-media) | Resource cards, sources, artifacts, generated images |
 | [Navigation and shell](docs/COMPONENTS.md#navigation-and-shell) | Application/sidebar shell, workspace tabs, thread header, thread-summary panel, navigation rail, floating controls |
+| [Settings](docs/COMPONENTS.md#settings) | Full-page Settings shell/search and controlled Git/review-delivery preferences |
 | [Workspace and PR workflow](docs/COMPONENTS.md#workspace-and-pull-request-workflow) | Terminal session primitives, project index, new-chat destination/context, local environments, protocol-neutral routing/worktree selectors, PR lists, details, checks, reviewers, and threads |
 
 See the [complete component reference](docs/COMPONENTS.md) for behavior, state, and composition details.

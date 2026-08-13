@@ -41,8 +41,8 @@ The authoritative current-build inventory is:
   BrowserWindow; it does not prove parity with unobserved product routes,
   panels, state transitions, or window types.
 - A scoped Codex Desktop `26.803.61601` (`6396`) visual probe revalidates the
-  exact 1180×820 dark/resting asset fingerprint and now retains 53 exact
-  sidebar/menu/window-chrome/Composer/environment icons. Its sampled sidebar
+  exact 1180×820 dark/resting asset fingerprint and now retains 77 exact
+  sidebar/menu/window-chrome/Composer/environment/Settings icons. Its sampled sidebar
   hover/footer contract also
   passes Browser/CDP and Electron acceptance; its independently scrolled
   Recents sample removes the leading Thread approximation while the broader
@@ -97,6 +97,13 @@ The authoritative current-build inventory is:
   Electron, and three local-only product comparisons pass without creating an
   environment; populated environment editing/repair and Remote connections
   remain open.
+- A later current-build Settings capture promotes 24 exact Back/Search/item
+  icons and reaches the full-page 322.91px navigation plus the 768px Git
+  preferences page. The independent public shell and Git components pass
+  Browser/CDP, Electron, reviewed wide/720 baselines, and local-only
+  current-product comparisons at 2.4214% and 3.0210%. Hooks and all other
+  Settings pages remain separate, so this raises the scoped asset manifest to
+  77 without closing the broader P1 denominator.
 - Computer Use exploration is blocked by the environment safety policy for
   `com.openai.codex`. User-authorized CDP probes on `26.721.41059` revalidated
   access, the main-shell target shape, a de-identified Projects entry/list,

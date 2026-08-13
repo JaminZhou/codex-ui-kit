@@ -62,8 +62,8 @@ observation from a previous build remains historical evidence.
   using private text. The exact `scrollHeight` remains content-dependent, so
   the contract locks the unique scroll owner and visible geometry rather than
   private task counts.
-- The same fingerprint revalidates 53
-  context/Composer/sidebar/menu/window/environment assets, six project groups,
+- The same fingerprint revalidates 77
+  context/Composer/sidebar/menu/window/environment/Settings assets, six project groups,
   Recents actions, all sampled menus, and the disabled
   window-navigation cursor. See
   [`26.803.61601.md`](26.803.61601.md). The scoped visible-shell approximation
@@ -74,8 +74,8 @@ observation from a previous build remains historical evidence.
   previous-build regression evidence and have been downgraded from `verified`
   to `partial_legacy` until they are reached again on the current fingerprint.
 
-Current inventory: 86 surface groups; 22 have current-build runtime evidence, 47 have previous-build-only runtime evidence, 17 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 20 groups and Electron verification covers 20.
-Prior acceptance outside those 20 sampled current-build groups remains
+Current inventory: 87 surface groups; 23 have current-build runtime evidence, 47 have previous-build-only runtime evidence, 17 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 22 groups and Electron verification covers 22.
+Prior acceptance outside those 22 sampled current-build groups remains
 recorded as `partial_legacy` until current-build re-observation.
 
 The current package exposes candidates far beyond the old transcript sample:
@@ -115,7 +115,8 @@ transitions must add or split IDs.
 ### P1: make coding workflows complete
 
 - Browser and artifact panels, document previews, environments.
-- Settings shell, Git/hooks/review preferences.
+- Remaining Settings pages, including Hooks and code-review preferences. The
+  shell/search and Git/review-delivery slice are now current-build verified.
 - MCP, plugins, skills, and automations.
 
 ### P2: confirm scope before implementing
@@ -370,8 +371,7 @@ environment reuse with a dedicated branch workflow. The live Renderer exposes
 a 296×280 branch menu with seven selectable rows plus a fixed create action,
 then a 400×190.56 `Create and checkout branch` dialog with a 360×40 branch
 field, disabled empty submit, `Set prefix`, Close, and create actions. `Set
-prefix` routes to the current Git settings page; the broader settings shell
-remains a separate P1 slice. The public component keeps Git validation and
+prefix` routes to the current Git settings page. The public component keeps Git validation and
 mutation host-owned, while the Electron bridge creates and checks out a branch
 and switches back to `main` only through host-issued project tokens. A
 two-repository Electron check proves the selected host-registered directory is
@@ -383,6 +383,16 @@ pending feedback until Git settles. Browser/CDP and reviewed pixels now gate
 local-only dialog crop differs by 3.0916% under an 8% ceiling. Current-product
 submission remains unpromoted until the same mutation is completed in the
 isolated disposable product repository.
+
+The follow-up Settings slice separates `settings.shell-search`,
+`settings.git-preferences`, and `settings.hooks-review` so a reached Git page
+does not falsely complete Hooks. The current full-page route keeps the
+322.91px navigation, 21 items, grouped global search, 768px Git content, five
+preference rows, and two instruction editors. Twenty-four exact navigation
+icons raise the scoped manifest to 77. Browser/CDP and Electron verify the
+Branch → Set prefix → Settings → Back lifecycle, while local-only wide and
+720px comparisons pass at 2.4214% and 3.0210%. Hooks and every other page
+remain independently open.
 
 The current-thread slice adds `ConversationThreadShell`, which composes the
 existing header, scroll-following timeline, messages, and Composer into one

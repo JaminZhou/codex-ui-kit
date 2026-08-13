@@ -243,6 +243,19 @@ All privileged behavior remains host-owned. The components never auto-approve co
 - `FloatingThreadPanel`: non-modal, inert-when-closed panel with host-controlled contents and inset.
 - `ThreadFloatingButton`: latest-message control with chevron, working dots, hidden-interaction removal, and reduced-motion behavior.
 
+## Settings
+
+- `SettingsShell`: full-page application Settings composition with an
+  independent navigation landmark, Back action, controlled search, grouped
+  sections, selected-page state, exact host-supplied icon slots, loading,
+  empty, and error states, and a separately labelled main landmark. Search
+  terms and result descriptions remain host data so the component does not
+  own product routes or private preferences.
+- `GitSettingsPage`: controlled Branch prefix, Merge/Squash, force-push,
+  draft-PR, review-delivery, commit-instruction, and pull-request-instruction
+  presentation. Hosts own persistence, validation, save failures, Git
+  mutation, and dirty-state decisions.
+
 ## Workspace and pull-request workflow
 
 - `ProjectConversationPage`: bounded split/stacked page composition connecting

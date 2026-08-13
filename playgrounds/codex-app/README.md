@@ -792,6 +792,20 @@ The current-product mutation itself remains a separate runtime gate until the
 isolated native project selector can attach the disposable repository. Raw
 screenshots and product project names remain local-only.
 
+## Current Settings and Git slice
+
+- Branch → Set prefix now opens the independent full-page `SettingsShell` and
+  `GitSettingsPage`; Back restores the app and the branch workflow continues.
+- The replay uses all 24 exact current Settings icons, 21 navigation items,
+  grouped `git` search results, Branch prefix, Merge/Squash, two switches,
+  review delivery, and dirty-gated instruction saves.
+- Browser/CDP verifies 169 lifecycle frames including wide and 720px geometry,
+  semantics, icons, search, and interactions. Electron repeats the real route,
+  saves a harmless fixture, returns, and continues through real
+  temporary-repository branch creation.
+- Reviewed internal wide/compact baselines pass. Optional local-only product
+  gates pass at 2.4214% and 3.0210%; screenshots are never tracked.
+
 ## Current environment-entry slice
 
 - Current Codex `26.803.61601` evidence replaces the former Start in model
@@ -857,6 +871,18 @@ CODEX_UI_KIT_WORKSPACE_ENVIRONMENT_PICKER_REFERENCE=/absolute/path/to/no-environ
 CODEX_UI_KIT_WORKSPACE_ENVIRONMENT_SETTINGS_REFERENCE=/absolute/path/to/environments-route.png \
   pnpm --filter @codex-ui-kit/codex-app-playground check:visual -- \
   --scenes=workspace-environment-menu,workspace-environment-picker,workspace-environments-unavailable
+```
+
+The current Git Settings gates accept unmodified 1180×820 and 720×680
+full-page references. Dynamic/private text regions are masked internally while
+layout, backgrounds, separators, controls, exact icons, and remaining owned
+pixels stay gated:
+
+```bash
+CODEX_UI_KIT_GIT_SETTINGS_REFERENCE=/absolute/path/to/git-settings-wide.png \
+CODEX_UI_KIT_GIT_SETTINGS_COMPACT_REFERENCE=/absolute/path/to/git-settings-compact.png \
+  pnpm --filter @codex-ui-kit/codex-app-playground check:visual -- \
+  --scenes=workspace-git-settings,workspace-git-settings-compact
 ```
 
 To run the optional current-build multi-file pixel gate, keep the raw

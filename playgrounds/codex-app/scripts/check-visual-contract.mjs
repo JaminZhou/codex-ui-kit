@@ -254,6 +254,10 @@ const currentBuildWorkspaceWorktreeReference =
   process.env.CODEX_UI_KIT_WORKSPACE_WORKTREE_REFERENCE;
 const currentBuildWorkspaceBranchCreateReference =
   process.env.CODEX_UI_KIT_WORKSPACE_BRANCH_CREATE_REFERENCE;
+const currentBuildGitSettingsReference =
+  process.env.CODEX_UI_KIT_GIT_SETTINGS_REFERENCE;
+const currentBuildGitSettingsCompactReference =
+  process.env.CODEX_UI_KIT_GIT_SETTINGS_COMPACT_REFERENCE;
 const currentBuildWorkspaceDirectoryMissingReference =
   process.env.CODEX_UI_KIT_WORKSPACE_DIRECTORY_MISSING_REFERENCE;
 const currentBuildWorkspaceDirectoryMissingReferenceSize = {
@@ -1619,6 +1623,52 @@ for (const scene of selectedScenes) {
         width: 400,
       },
       referencePath: currentBuildWorkspaceBranchCreateReference,
+      sceneId: scene.id,
+    });
+  }
+
+  if (
+    scene.id === "workspace-git-settings" &&
+    currentBuildGitSettingsReference
+  ) {
+    await compareCurrentBuildWorkspaceFrame({
+      actual,
+      defaultMaximumRatio: 0.042,
+      masks: [
+        { height: 24, left: 43, top: 87, width: 263 },
+        { height: 630, left: 36, top: 133, width: 278 },
+        { height: 42, left: 366, top: 60, width: 190 },
+        { height: 290, left: 366, top: 126, width: 455 },
+        { height: 22, left: 900, top: 147, width: 205 },
+        { height: 102, left: 380, top: 548, width: 740 },
+        { height: 42, left: 366, top: 696, width: 290 },
+        { height: 42, left: 366, top: 754, width: 410 },
+      ],
+      maximumRatioName: "CODEX_UI_KIT_GIT_SETTINGS_MAX_DIFF_RATIO",
+      referencePath: currentBuildGitSettingsReference,
+      sceneId: scene.id,
+    });
+  }
+
+  if (
+    scene.id === "workspace-git-settings-compact" &&
+    currentBuildGitSettingsCompactReference
+  ) {
+    await compareCurrentBuildWorkspaceFrame({
+      actual,
+      defaultMaximumRatio: 0.05,
+      masks: [
+        { height: 24, left: 43, top: 87, width: 263 },
+        { height: 510, left: 36, top: 133, width: 278 },
+        { height: 42, left: 342, top: 60, width: 190 },
+        { height: 290, left: 342, top: 126, width: 190 },
+        { height: 22, left: 542, top: 147, width: 145 },
+        { height: 102, left: 354, top: 548, width: 333 },
+        { height: 42, left: 342, top: 696, width: 290 },
+      ],
+      maximumRatioName:
+        "CODEX_UI_KIT_GIT_SETTINGS_COMPACT_MAX_DIFF_RATIO",
+      referencePath: currentBuildGitSettingsCompactReference,
       sceneId: scene.id,
     });
   }

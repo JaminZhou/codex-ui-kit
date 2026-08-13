@@ -4985,6 +4985,83 @@ try {
       `Electron branch creation geometry is invalid: ${JSON.stringify(branchDialogContract)}.`,
     );
   }
+  await branchDialog
+    .getByRole("button", { name: "Set prefix", exact: true })
+    .click();
+  await codingWorkspacePage.waitForSelector(
+    '.demo-root[data-frame="workspace-git-settings"]',
+  );
+  const gitSettingsNavigation = codingWorkspacePage.getByRole("navigation", {
+    name: "Settings",
+  });
+  const gitSettingsMain = codingWorkspacePage.getByRole("main");
+  await gitSettingsNavigation.waitFor({ state: "visible" });
+  if (
+    (await gitSettingsNavigation.getByRole("button").count()) !== 22 ||
+    (await gitSettingsMain.getByRole("heading", { name: "Git" }).count()) !==
+      1 ||
+    (await codingWorkspacePage
+      .locator(".codex-ui-app-shell__sidebar:visible")
+      .count()) !== 0 ||
+    (await codingWorkspacePage
+      .locator("[data-current-build-icon^=settings-]")
+      .count()) !== 24
+  ) {
+    throw new Error("Electron Set prefix did not open the complete Git Settings route.");
+  }
+  const settingsSearch = gitSettingsNavigation.getByRole("searchbox");
+  await settingsSearch.fill("git");
+  await gitSettingsNavigation
+    .getByText("Right before ChatGPT ends its turn", { exact: true })
+    .waitFor();
+  if (
+    (await gitSettingsNavigation
+      .getByRole("button", { name: "Plugins", exact: true })
+      .count()) !== 0
+  ) {
+    throw new Error("Electron Git Settings search retained an unrelated result.");
+  }
+  await gitSettingsNavigation
+    .getByRole("button", { name: "Clear settings search" })
+    .click();
+  const forcePushSwitch = gitSettingsMain.getByRole("switch", {
+    name: "Always force push",
+  });
+  await forcePushSwitch.click();
+  await gitSettingsMain.getByRole("radio", { name: "Squash" }).click();
+  const commitInstructions = gitSettingsMain.getByRole("textbox", {
+    name: "Commit instructions",
+  });
+  await commitInstructions.fill("Use conventional commits.");
+  const gitSettingsSave = gitSettingsMain
+    .getByRole("button", { name: "Save" })
+    .first();
+  if (
+    (await forcePushSwitch.getAttribute("aria-checked")) !== "true" ||
+    (await gitSettingsMain
+      .getByRole("radio", { name: "Squash" })
+      .getAttribute("aria-checked")) !== "true" ||
+    (await gitSettingsSave.isDisabled())
+  ) {
+    throw new Error("Electron Git Settings controls did not update controlled state.");
+  }
+  await gitSettingsSave.click();
+  await gitSettingsNavigation
+    .getByRole("button", { name: "Back to app" })
+    .click();
+  await codingWorkspacePage.waitForSelector(
+    '.demo-root[data-frame="workspace-ready"]',
+  );
+  await codingWorkspacePage
+    .getByRole("button", { name: "Change worktree: main" })
+    .click();
+  await worktreeMenu
+    .getByRole("menuitem", { name: "Create and checkout new branch…" })
+    .click();
+  await branchDialog.waitFor({ state: "visible" });
+  await codingWorkspacePage.waitForFunction(
+    () => document.activeElement?.getAttribute("aria-label") === "Branch name",
+  );
   await branchInput.fill("bad branch");
   await createBranch.click();
   await branchDialog.getByRole("alert").waitFor();
