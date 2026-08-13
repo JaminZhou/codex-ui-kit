@@ -726,12 +726,6 @@ function CurrentCommandLifecycleFixture({
     interruption &&
     (interruptionPhase === "settled" || interruptionPhase === "recovered");
 
-  useEffect(() => {
-    if (!backgroundStopping) return;
-    const timer = window.setTimeout(() => setInterruptionPhase("settled"), 700);
-    return () => window.clearTimeout(timer);
-  }, [backgroundStopping]);
-
   const stopTurn = () => {
     if (interruptionPhase === "running") setInterruptionPhase("stopping");
   };

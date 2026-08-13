@@ -266,6 +266,8 @@ try {
   expect(stopping.rootText.includes("You stopped after 20s"), "interruption summary");
   expect(stopping.rootText.includes("Background terminal stopped with"), "background stopping summary");
 
+  await new Promise((resolve) => setTimeout(resolve, 1_100));
+  await page.waitForSelector('[aria-label="Stop all background terminals"]');
   await page.click('[aria-label="Stop all background terminals"]');
   await page.waitForFunction(
     () =>
