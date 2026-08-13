@@ -1445,6 +1445,7 @@ function GeneralMenuControl({
   value: string;
 }) {
   const triggerRef = useRef<HTMLButtonElement>(null);
+  const selectedValueId = useId();
   const selected = options.find((option) => option.value === value);
   return (
     <Menu
@@ -1454,6 +1455,7 @@ function GeneralMenuControl({
       sideOffset={4}
       trigger={
         <button
+          aria-describedby={selectedValueId}
           aria-label={label}
           className="codex-ui-general-settings__menu-trigger"
           ref={triggerRef}
@@ -1464,7 +1466,7 @@ function GeneralMenuControl({
               {selected.icon}
             </span>
           ) : null}
-          <span>{selected?.label ?? value}</span>
+          <span id={selectedValueId}>{selected?.label ?? value}</span>
           <span aria-hidden="true" className="codex-ui-general-settings__chevron">
             ⌄
           </span>
@@ -1474,12 +1476,14 @@ function GeneralMenuControl({
     >
       {options.map((option) => (
         <MenuItem
+          aria-checked={option.value === value}
           endIcon={option.value === value ? <span>✓</span> : undefined}
           key={option.value}
           onSelect={() => {
             onChange(option.value);
             triggerRef.current?.focus();
           }}
+          role="menuitemradio"
           startIcon={option.icon}
           subText={option.description}
         >
@@ -1503,6 +1507,7 @@ function GeneralLanguageControl({
   const [query, setQuery] = useState("");
   const listboxId = useId();
   const listboxRef = useRef<HTMLDivElement>(null);
+  const selectedValueId = useId();
   const triggerRef = useRef<HTMLButtonElement>(null);
   const selected = options.find((option) => option.value === value);
   const filtered = options.filter((option) =>
@@ -1532,12 +1537,13 @@ function GeneralLanguageControl({
       sideOffset={4}
       trigger={
         <button
+          aria-describedby={selectedValueId}
           aria-label="Language"
           className="codex-ui-general-settings__menu-trigger"
           ref={triggerRef}
           type="button"
         >
-          <span>{selected?.label ?? value}</span>
+          <span id={selectedValueId}>{selected?.label ?? value}</span>
           <span aria-hidden="true" className="codex-ui-general-settings__chevron">
             ⌄
           </span>
@@ -1650,6 +1656,7 @@ export function GeneralSettingsPage({
   value,
   ...props
 }: GeneralSettingsPageProps) {
+  const hotkeyValueId = useId();
   const hotkeyEditRef = useRef<HTMLButtonElement>(null);
   const hotkeyRecordRef = useRef<HTMLButtonElement>(null);
   const hotkeyCaptureWasActiveRef = useRef(false);
@@ -1935,6 +1942,7 @@ export function GeneralSettingsPage({
             </div>
           ) : (
             <button
+              aria-describedby={hotkeyValueId}
               aria-label="Set shortcut for Popout Window hotkey"
               className="codex-ui-general-settings__hotkey-edit"
               disabled={!onStartHotkeyCapture}
@@ -1942,7 +1950,7 @@ export function GeneralSettingsPage({
               ref={hotkeyEditRef}
               type="button"
             >
-              <span>{value.popoutHotkey ?? "Off"}</span>
+              <span id={hotkeyValueId}>{value.popoutHotkey ?? "Off"}</span>
               <span aria-hidden="true">⌁</span>
             </button>
           )}

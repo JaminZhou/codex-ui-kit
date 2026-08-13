@@ -451,7 +451,8 @@ open rows; these slices do not imply Stage 4 completion.
 
 The following General slice is now delivered independently: a controlled
 `GeneralSettingsPage` covers the 21 current rows in Permissions, General,
-Composer, Popout Window, and Notifications. Browser/CDP verifies five menus,
+Composer, Popout Window, and Notifications. Browser/CDP verifies five
+single-select menus with current-value descriptions and radio checked states,
 language search with a dialog-plus-listbox hierarchy and native Home/End caret
 editing, twelve switches, two keyboard groups, shortcut capture/
 formatting/clear/cancel,

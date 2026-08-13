@@ -504,17 +504,47 @@ describe("settings surfaces", () => {
   it("exposes current General menus, searchable languages, and selections", () => {
     render(<GeneralFixture />);
 
+    const describedValue = (control: HTMLElement) => {
+      const descriptionId = control.getAttribute("aria-describedby");
+      return descriptionId
+        ? document.getElementById(descriptionId)?.textContent
+        : null;
+    };
+
+    expect(
+      describedValue(
+        screen.getByRole("button", { name: "Default file open destination" }),
+      ),
+    ).toBe("VS Code");
+    expect(describedValue(screen.getByRole("button", { name: "Language" }))).toBe(
+      "Auto detect",
+    );
+    expect(
+      describedValue(
+        screen.getByRole("button", {
+          name: "Set shortcut for Popout Window hotkey",
+        }),
+      ),
+    ).toBe("Off");
+
     fireEvent.click(
       screen.getByRole("button", { name: "Default file open destination" }),
     );
-    expect(screen.getAllByRole("menuitem")).toHaveLength(7);
-    const xcode = screen.getByRole("menuitem", { name: /Xcode/ });
+    expect(screen.getAllByRole("menuitemradio")).toHaveLength(7);
+    expect(
+      screen.getByRole("menuitemradio", { name: /VS Code/ }).getAttribute(
+        "aria-checked",
+      ),
+    ).toBe("true");
+    const xcode = screen.getByRole("menuitemradio", { name: /Xcode/ });
+    expect(xcode.getAttribute("aria-checked")).toBe("false");
     xcode.focus();
     fireEvent.click(xcode);
     const fileDestinationTrigger = screen.getByRole("button", {
       name: "Default file open destination",
     });
     expect(fileDestinationTrigger.textContent).toContain("Xcode");
+    expect(describedValue(fileDestinationTrigger)).toBe("Xcode");
     expect(document.activeElement).toBe(fileDestinationTrigger);
 
     fireEvent.click(screen.getByRole("button", { name: "Language" }));
@@ -539,6 +569,7 @@ describe("settings surfaces", () => {
     expect(languageTrigger.textContent).toContain(
       "简体中文",
     );
+    expect(describedValue(languageTrigger)).toBe("简体中文");
     expect(document.activeElement).toBe(languageTrigger);
 
     fireEvent.click(languageTrigger);
@@ -553,18 +584,27 @@ describe("settings surfaces", () => {
     expect(reopenedLanguageListbox.contains(languageEmptyState)).toBe(false);
     fireEvent.keyDown(reopenedLanguageSearch, { key: "Escape" });
 
-    for (const [triggerName, itemName] of [
-      ["Speed", /Fast/],
-      ["Send shortcut", /⌘ \+ Enter always/],
-      ["Turn completion notifications", /^Always$/],
+    for (const [triggerName, itemName, selectedValue] of [
+      ["Speed", /Fast/, "Fast"],
+      ["Send shortcut", /⌘ \+ Enter always/, "⌘ + Enter always"],
+      ["Turn completion notifications", /^Always$/, "Always"],
     ] as const) {
       fireEvent.click(screen.getByRole("button", { name: triggerName }));
-      const item = screen.getByRole("menuitem", { name: itemName });
+      const radioItems = screen.getAllByRole("menuitemradio");
+      expect(
+        radioItems.filter(
+          (radioItem) => radioItem.getAttribute("aria-checked") === "true",
+        ),
+      ).toHaveLength(1);
+      const item = screen.getByRole("menuitemradio", { name: itemName });
       item.focus();
       fireEvent.click(item);
       expect(document.activeElement).toBe(
         screen.getByRole("button", { name: triggerName }),
       );
+      expect(
+        describedValue(screen.getByRole("button", { name: triggerName })),
+      ).toBe(selectedValue);
     }
   });
 

@@ -817,7 +817,8 @@ screenshots and product project names remain local-only.
   rasters remain local-only and are supplied through public icon slots.
 - The General route adds 21 current rows across Permissions, General,
   Composer, Popout Window, and Notifications. Its controlled fixture covers
-  five menus, 66 searchable language choices in a dialog-plus-listbox hierarchy
+  five single-select menus with exposed current-value descriptions and radio
+  checked states, 66 searchable language choices in a dialog-plus-listbox hierarchy
   with native Home/End caret editing, twelve switches, two keyboard
   groups, and locally controlled Popout shortcut capture/formatting/clear/cancel
   without claiming the observed host selections are product defaults.

@@ -5293,7 +5293,22 @@ try {
       () => document.activeElement?.getAttribute("aria-label"),
     );
   };
+  const readGeneralMenuState = () =>
+    codingWorkspacePage.getByRole("menuitemradio").evaluateAll((items) =>
+      items.map((item) => ({
+        checked: item.getAttribute("aria-checked"),
+        label: item.textContent?.trim(),
+      })),
+    );
+  const readGeneralDescribedValue = (label) =>
+    generalSettingsMain.getByRole("button", { name: label }).evaluate((control) => {
+      const descriptionId = control.getAttribute("aria-describedby");
+      return descriptionId
+        ? document.getElementById(descriptionId)?.textContent?.trim()
+        : null;
+    });
   const generalMenuFocus = {};
+  const generalMenuStates = {};
   const autoReviewSwitch = generalSettingsMain.getByRole("switch", {
     name: "Show Auto-review in the composer",
   });
@@ -5301,7 +5316,8 @@ try {
   await generalSettingsMain
     .getByRole("button", { name: "Default file open destination" })
     .click();
-  const fileDestinations = codingWorkspacePage.getByRole("menuitem");
+  const fileDestinations = codingWorkspacePage.getByRole("menuitemradio");
+  generalMenuStates.fileDestination = await readGeneralMenuState();
   if (
     (await fileDestinations.count()) !== 7 ||
     !(await fileDestinations.first().textContent())?.includes("VS Code") ||
@@ -5385,7 +5401,8 @@ try {
   await bottomTerminal.focus();
   await bottomTerminal.press("ArrowRight");
   await generalSettingsMain.getByRole("button", { name: "Speed" }).click();
-  const speedOptions = codingWorkspacePage.getByRole("menuitem");
+  const speedOptions = codingWorkspacePage.getByRole("menuitemradio");
+  generalMenuStates.speed = await readGeneralMenuState();
   if ((await speedOptions.count()) !== 2) {
     throw new Error("Electron General speed menu is incomplete.");
   }
@@ -5401,8 +5418,9 @@ try {
     .getByRole("button", { name: "Send shortcut" })
     .click();
   const commandEnter = codingWorkspacePage
-    .getByRole("menuitem")
+    .getByRole("menuitemradio")
     .filter({ hasText: "⌘ + Enter always" });
+  generalMenuStates.sendShortcut = await readGeneralMenuState();
   await commandEnter.focus();
   await commandEnter.press("Enter");
   generalMenuFocus.sendShortcut = await readGeneralFocusedLabel("Send shortcut");
@@ -5489,14 +5507,27 @@ try {
   await generalSettingsMain
     .getByRole("button", { name: "Turn completion notifications" })
     .click();
-  const alwaysNotifications = codingWorkspacePage.getByRole("menuitem", {
+  const alwaysNotifications = codingWorkspacePage.getByRole("menuitemradio", {
     name: "Always",
     exact: true,
   });
+  generalMenuStates.completionNotifications = await readGeneralMenuState();
   await alwaysNotifications.focus();
   await alwaysNotifications.press("Enter");
   generalMenuFocus.completionNotifications = await readGeneralFocusedLabel(
     "Turn completion notifications",
+  );
+  const generalDescribedValues = Object.fromEntries(
+    await Promise.all(
+      [
+        "Default file open destination",
+        "Language",
+        "Speed",
+        "Send shortcut",
+        "Set shortcut for Popout Window hotkey",
+        "Turn completion notifications",
+      ].map(async (label) => [label, await readGeneralDescribedValue(label)]),
+    ),
   );
   await generalSettingsMain
     .getByRole("button", { name: "View", exact: true })
@@ -5535,6 +5566,8 @@ try {
     languageArrowFocus: focus.languageArrowFocus,
     languageStructure: focus.languageStructure,
     menuFocus: focus.menu,
+    menuStates: focus.menuStates,
+    describedValues: focus.describedValues,
     sendShortcut: main.querySelector('button[aria-label="Send shortcut"]')
       ?.textContent?.trim(),
     speed: main.querySelector('button[aria-label="Speed"]')
@@ -5551,6 +5584,8 @@ try {
     languageArrowFocus: generalLanguageArrowFocus,
     languageStructure: generalLanguageStructure,
     menu: generalMenuFocus,
+    menuStates: generalMenuStates,
+    describedValues: generalDescribedValues,
   });
   if (
     generalInteraction.autoReview !== "false" ||
@@ -5575,6 +5610,20 @@ try {
     !generalInteraction.languageStructure.dialogContainsListbox ||
     !generalInteraction.languageStructure.dialogContainsSearch ||
     generalInteraction.languageStructure.listboxContainsSearch ||
+    Object.values(generalInteraction.menuStates).some(
+      (states) =>
+        states.length === 0 ||
+        states.filter(({ checked }) => checked === "true").length !== 1,
+    ) ||
+    JSON.stringify(generalInteraction.describedValues) !==
+      JSON.stringify({
+        "Default file open destination": "Xcode",
+        Language: "简体中文",
+        Speed: "Fast",
+        "Send shortcut": "⌘ + Enter always",
+        "Set shortcut for Popout Window hotkey": "⌘ ⇧ K",
+        "Turn completion notifications": "Always",
+      }) ||
     generalInteraction.menuFocus.completionNotifications !==
       "Turn completion notifications" ||
     generalInteraction.menuFocus.fileDestination !==

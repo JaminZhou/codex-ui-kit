@@ -636,15 +636,33 @@ for (const scene of selectedScenes) {
             () => document.activeElement?.getAttribute("aria-label"),
           );
         };
+        const readMenuState = () =>
+          page.getByRole("menuitemradio").evaluateAll((items) =>
+            items.map((item) => ({
+              checked: item.getAttribute("aria-checked"),
+              label: item.textContent?.trim(),
+            })),
+          );
+        const readDescribedValue = (label) =>
+          page.getByRole("button", { name: label }).evaluate((control) => {
+            const descriptionId = control.getAttribute("aria-describedby");
+            return descriptionId
+              ? document.getElementById(descriptionId)?.textContent?.trim()
+              : null;
+          });
         const menuFocus = {};
+        const menuStates = {};
         await page
           .getByRole("switch", { name: "Show Auto-review in the composer" })
           .click();
         await page
           .getByRole("button", { name: "Default file open destination" })
           .click();
-        const fileDestinations = await page.getByRole("menuitem").allTextContents();
-        const xcodeDestination = page.getByRole("menuitem", {
+        const fileDestinations = await page
+          .getByRole("menuitemradio")
+          .allTextContents();
+        menuStates.fileDestination = await readMenuState();
+        const xcodeDestination = page.getByRole("menuitemradio", {
           name: "Xcode",
           exact: true,
         });
@@ -723,8 +741,13 @@ for (const scene of selectedScenes) {
         await bottomControl.focus();
         await bottomControl.press("ArrowRight");
         await page.getByRole("button", { name: "Speed" }).click();
-        const speedOptions = await page.getByRole("menuitem").allTextContents();
-        const fastSpeed = page.getByRole("menuitem").filter({ hasText: /^Fast/ });
+        const speedOptions = await page
+          .getByRole("menuitemradio")
+          .allTextContents();
+        menuStates.speed = await readMenuState();
+        const fastSpeed = page
+          .getByRole("menuitemradio")
+          .filter({ hasText: /^Fast/ });
         await fastSpeed.focus();
         await fastSpeed.press("Enter");
         menuFocus.speed = await readFocusedLabel("Speed");
@@ -733,8 +756,9 @@ for (const scene of selectedScenes) {
           .click();
         await page.getByRole("button", { name: "Send shortcut" }).click();
         const commandEnter = page
-          .getByRole("menuitem")
+          .getByRole("menuitemradio")
           .filter({ hasText: "⌘ + Enter always" });
+        menuStates.sendShortcut = await readMenuState();
         await commandEnter.focus();
         await commandEnter.press("Enter");
         menuFocus.sendShortcut = await readFocusedLabel("Send shortcut");
@@ -807,14 +831,27 @@ for (const scene of selectedScenes) {
         await page
           .getByRole("button", { name: "Turn completion notifications" })
           .click();
-        const alwaysNotifications = page.getByRole("menuitem", {
+        const alwaysNotifications = page.getByRole("menuitemradio", {
           name: "Always",
           exact: true,
         });
+        menuStates.completionNotifications = await readMenuState();
         await alwaysNotifications.focus();
         await alwaysNotifications.press("Enter");
         menuFocus.completionNotifications = await readFocusedLabel(
           "Turn completion notifications",
+        );
+        const describedValues = Object.fromEntries(
+          await Promise.all(
+            [
+              "Default file open destination",
+              "Language",
+              "Speed",
+              "Send shortcut",
+              "Set shortcut for Popout Window hotkey",
+              "Turn completion notifications",
+            ].map(async (label) => [label, await readDescribedValue(label)]),
+          ),
         );
         await page.getByRole("button", { name: "View", exact: true }).click();
         interaction = await page.evaluate(
@@ -828,6 +865,8 @@ for (const scene of selectedScenes) {
             languageArrowFocus,
             languageStructure,
             menuFocus,
+            menuStates,
+            describedValues,
             speedOptions,
           }) => ({
             autoReview: document
@@ -862,6 +901,8 @@ for (const scene of selectedScenes) {
             licenses: document.querySelector(".demo-settings-action-status")
               ?.textContent?.trim(),
             menuFocus,
+            menuStates,
+            describedValues,
             sendShortcut: document
               .querySelector('button[aria-label="Send shortcut"]')
               ?.textContent?.trim(),
@@ -882,6 +923,8 @@ for (const scene of selectedScenes) {
             languageArrowFocus,
             languageStructure,
             menuFocus,
+            menuStates,
+            describedValues,
             speedOptions,
           },
         );
@@ -940,6 +983,20 @@ for (const scene of selectedScenes) {
           !interaction.languageStructure.dialogContainsListbox ||
           !interaction.languageStructure.dialogContainsSearch ||
           interaction.languageStructure.listboxContainsSearch ||
+          Object.values(interaction.menuStates).some(
+            (states) =>
+              states.length === 0 ||
+              states.filter(({ checked }) => checked === "true").length !== 1,
+          ) ||
+          JSON.stringify(interaction.describedValues) !==
+            JSON.stringify({
+              "Default file open destination": "Xcode",
+              Language: "简体中文",
+              Speed: "Fast",
+              "Send shortcut": "⌘ + Enter always",
+              "Set shortcut for Popout Window hotkey": "⌘ ⇧ K",
+              "Turn completion notifications": "Always",
+            }) ||
           interaction.licenses !== "Open source licenses requested" ||
           interaction.menuFocus.completionNotifications !==
             "Turn completion notifications" ||
