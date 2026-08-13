@@ -45,6 +45,21 @@ function ComposerHarness({
 }
 
 describe("AgentComposer", () => {
+  it("allows a host to supply the visual send icon", () => {
+    render(
+      <AgentComposer
+        onSubmit={() => undefined}
+        onValueChange={() => undefined}
+        submitIcon={<span data-testid="current-send-icon" />}
+        value="Ready"
+      />,
+    );
+
+    const submit = screen.getByRole("button", { name: "Send message" });
+    expect(submit.contains(screen.getByTestId("current-send-icon"))).toBe(true);
+    expect(submit.querySelector("svg")).toBeNull();
+  });
+
   it("starts in the compact single-line layout", () => {
     const { container } = render(
       <AgentComposer

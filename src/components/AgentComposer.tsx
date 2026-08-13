@@ -51,6 +51,7 @@ export interface AgentComposerProps
   queue?: ReactNode;
   suggestions?: ReactNode;
   stopLabel?: string;
+  submitIcon?: ReactNode;
   submitDisabled?: boolean;
   submitLabel?: string;
   textareaLabel?: string;
@@ -81,6 +82,7 @@ export const AgentComposer = forwardRef<
     placeholder = "Ask the agent to do something…",
     queue,
     stopLabel = "Stop generation",
+    submitIcon,
     submitDisabled = false,
     submitLabel = "Send message",
     textareaLabel = "Message",
@@ -418,9 +420,11 @@ export const AgentComposer = forwardRef<
                 title={submitLabel}
                 type="submit"
               >
-                <svg aria-hidden="true" viewBox="0 0 20 20">
-                  <path d="M10 15.5V4.75m0 0L5.75 9M10 4.75 14.25 9" />
-                </svg>
+                {submitIcon ?? (
+                  <svg aria-hidden="true" viewBox="0 0 20 20">
+                    <path d="M10 15.5V4.75m0 0L5.75 9M10 4.75 14.25 9" />
+                  </svg>
+                )}
               </button>
             )}
           </div>

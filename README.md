@@ -208,7 +208,9 @@ CODEX_UI_KIT_THREAD_REFERENCE=/absolute/path/to/main-only-reference.png \
 
 The script renders at the PNG dimensions and gates the full screenshot plus
 the header, message band, and Composer regions independently. Reference and
-diff images remain outside the package by default.
+diff images remain outside the package by default. Set
+`CODEX_UI_KIT_THREAD_COMPACT_REFERENCE` alongside the wide reference to gate
+the 720×680 completed-thread scene in the same command.
 
 The protocol-backed Codex App playground also accepts independent,
 untracked current-build references for multi-file Review, Pull request detail,

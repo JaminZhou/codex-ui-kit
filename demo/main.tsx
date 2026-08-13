@@ -1,6 +1,10 @@
 import { StrictMode, useState, type ReactNode } from "react";
 import { createRoot } from "react-dom/client";
 import {
+  CurrentThreadBuildIcon,
+  CurrentThreadRasterAsset,
+} from "./currentBuildIcons";
+import {
   ActivityGroup,
   ActivityTimeline,
   AgentActivity,
@@ -502,23 +506,25 @@ const streamingPixelReply =
   "Streaming probe: compare each rendered frame against the reference.";
 
 function CurrentThreadPixelFixture({
+  sceneId,
   state = "completed",
 }: {
+  sceneId?: string;
   state?: CurrentThreadPixelState;
 }) {
   const streaming = state === "streaming";
-  const messageActions: PixelIconName[] = [
-    "copy",
-    "like",
-    "dislike",
-    "expand",
-  ];
+  const messageActions = [
+    ["copy", <CurrentThreadBuildIcon name="thread-assistant-copy" />],
+    ["like", <CurrentThreadBuildIcon name="thread-assistant-good" />],
+    ["dislike", <CurrentThreadBuildIcon name="thread-assistant-bad" />],
+    ["expand", <CurrentThreadBuildIcon name="thread-assistant-continue" />],
+  ] as const;
 
   return (
     <main
       className="current-thread-pixel-fixture"
       data-theme="dark"
-      data-visual-scene={`current-thread-${state}`}
+      data-visual-scene={sceneId ?? `current-thread-${state}`}
     >
       <ConversationThreadShell
         composer={
@@ -526,11 +532,11 @@ function CurrentThreadPixelFixture({
             actions={
               <>
                 <button aria-label="Add attachment" type="button">
-                  <PixelIcon name="plus" />
+                  <CurrentThreadBuildIcon name="composer-add-files" />
                 </button>
                 <button type="button">
-                  <PixelIcon name="approve" />
-                  <span>Approve for me</span>
+                  <CurrentThreadBuildIcon name="composer-permission" />
+                  <span>Full access</span>
                 </button>
               </>
             }
@@ -540,10 +546,10 @@ function CurrentThreadPixelFixture({
                   <span className="current-thread-pixel-fixture__model">
                     5.6 Sol <span>Extra High</span>
                   </span>
-                  <PixelIcon name="chevron" />
+                  <CurrentThreadBuildIcon name="composer-model-chevron" />
                 </button>
                 <button aria-label="Voice input" type="button">
-                  <PixelIcon name="microphone" />
+                  <CurrentThreadBuildIcon name="composer-dictate" />
                 </button>
               </>
             }
@@ -554,11 +560,28 @@ function CurrentThreadPixelFixture({
             onValueChange={() => undefined}
             placeholder="Do anything"
             stopLabel="Stop"
+            submitIcon={<CurrentThreadBuildIcon name="composer-send" />}
             value=""
           />
         }
         header={
           <ThreadHeader
+            navigation={
+              <div className="current-thread-pixel-fixture__navigation">
+                <button aria-label="Show sidebar" type="button">
+                  <CurrentThreadBuildIcon name="window-chrome-sidebar" />
+                </button>
+                <button aria-label="Back" type="button">
+                  <CurrentThreadBuildIcon name="window-chrome-back" />
+                </button>
+                <button aria-label="Forward" disabled type="button">
+                  <CurrentThreadBuildIcon name="window-chrome-forward" />
+                </button>
+                <button aria-label="New chat" type="button">
+                  <CurrentThreadBuildIcon name="thread-header-new-chat" />
+                </button>
+              </div>
+            }
             endActions={
               <>
                 <button
@@ -566,30 +589,30 @@ function CurrentThreadPixelFixture({
                   className="current-thread-pixel-fixture__editor-control"
                   type="button"
                 >
-                  <span aria-hidden="true">⌁</span>
-                  <PixelIcon name="chevron" />
+                  <CurrentThreadRasterAsset name="thread-header-editor-vscode" />
+                  <CurrentThreadBuildIcon name="thread-header-open-in-chevron" />
                 </button>
                 <button aria-label="Thread controls" type="button">
-                  <PixelIcon name="sliders" />
+                  <CurrentThreadBuildIcon name="thread-header-pinned-summary" />
                 </button>
                 <button aria-label="Toggle bottom panel" type="button">
-                  <PixelIcon name="panel" />
+                  <CurrentThreadBuildIcon name="thread-header-bottom-panel" />
                 </button>
                 <button aria-label="Toggle workspace panel" type="button">
-                  <PixelIcon name="workspace" />
+                  <CurrentThreadBuildIcon name="thread-header-side-panel" />
                 </button>
               </>
             }
             position="static"
             title={
               <span className="current-thread-pixel-fixture__title">
-                <PixelIcon name="folder" />
+                <CurrentThreadBuildIcon name="thread-header-project" />
                 <span>
                   {streaming
                     ? "Write exactly 24 short plain-text sentences ab..."
                     : "Confirm UI probe completion"}
                 </span>
-                <PixelIcon name="more" />
+                <CurrentThreadBuildIcon name="thread-header-actions" />
               </span>
             }
           />
@@ -605,9 +628,9 @@ function CurrentThreadPixelFixture({
           actions={
             streaming
               ? undefined
-              : messageActions.map((name) => (
-                  <button aria-label={name} key={name} type="button">
-                    <PixelIcon name={name} />
+              : messageActions.map(([label, icon]) => (
+                  <button aria-label={label} key={label} type="button">
+                    {icon}
                   </button>
                 ))
           }
@@ -4141,6 +4164,7 @@ const capture = new URLSearchParams(window.location.search).get("capture");
 const currentThreadCapture =
   capture === "current-thread" ||
   capture === "current-thread-completed" ||
+  capture === "current-thread-completed-compact" ||
   capture === "current-thread-streaming";
 const currentThreadPixelState: CurrentThreadPixelState =
   capture === "current-thread-streaming" ? "streaming" : "completed";
@@ -4183,7 +4207,10 @@ createRoot(document.getElementById("root")!).render(
   ) : workflowPixelState ? (
     <WorkflowPixelFixture state={workflowPixelState} />
   ) : currentThreadCapture ? (
-    <CurrentThreadPixelFixture state={currentThreadPixelState} />
+    <CurrentThreadPixelFixture
+      sceneId={capture ?? undefined}
+      state={currentThreadPixelState}
+    />
   ) : (
     <StrictMode>
       <Showcase />

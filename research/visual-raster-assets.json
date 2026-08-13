@@ -1,0 +1,39 @@
+{
+  "assets": [
+    {
+      "dataBase64": "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",
+      "id": "thread-header-editor-vscode",
+      "mimeType": "image/png",
+      "naturalSize": {
+        "height": 64,
+        "width": 64
+      },
+      "renderSize": {
+        "height": 16,
+        "width": 16
+      },
+      "sourceUrl": "app://-/apps/vscode.png",
+      "status": "runtime-observed",
+      "byteLength": 2804,
+      "sha256": "5ff492ba38828c649ad3f2e8ce78e02d9cbdd1200009dd046992cfbde6897a24"
+    }
+  ],
+  "baseline": {
+    "appAsarSha256": "928129601e8b36eccba603114d6912352f2b13182f3a7d60b32166d0e81aafb5",
+    "appVersion": "26.803.61601",
+    "buildNumber": "6396",
+    "interactionState": "resting-and-open-sidebar-menus",
+    "theme": "dark",
+    "viewport": {
+      "height": 820,
+      "width": 1180
+    },
+    "capturedAt": "2026-08-12"
+  },
+  "policy": {
+    "distribution": "exploratory playground only; excluded from the published npm package",
+    "ownership": "Microsoft Visual Studio Code trademark asset",
+    "runtimeSource": "Codex Desktop titlebar integration image"
+  },
+  "schemaVersion": 1
+}

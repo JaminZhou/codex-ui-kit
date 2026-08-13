@@ -11,6 +11,7 @@ import {
 
 const port = Number(process.env.CODEX_VISUAL_ASSET_CDP_PORT);
 const expectedProfile = process.env.CODEX_VISUAL_ASSET_PROFILE;
+const threadOnly = process.env.CODEX_VISUAL_ASSET_THREAD_ONLY === "1";
 const appBundle = "/Applications/ChatGPT.app";
 const appInfoPlist = `${appBundle}/Contents/Info.plist`;
 const appAsar = `${appBundle}/Contents/Resources/app.asar`;
@@ -164,17 +165,29 @@ const semanticLabels = new Map([
   ["Open help menu", "sidebar-help"],
   ["Open settings", "sidebar-settings"],
   ["Forward", "window-chrome-forward"],
+  ["Bad response", "thread-assistant-bad"],
+  ["Chat actions", "thread-header-actions"],
+  ["Continue in new chat from here", "thread-assistant-continue"],
+  ["Copy", "thread-assistant-copy"],
+  ["Copy message", "thread-user-copy"],
+  ["Edit message", "thread-user-edit"],
+  ["Good response", "thread-assistant-good"],
   ["Hide sidebar", "window-chrome-sidebar"],
   ["Plugins", "sidebar-plugins"],
   ["Pull requests", "sidebar-pull-request"],
   ["Quick chat", "sidebar-quick-chat"],
   ["Search", "sidebar-search"],
+  ["Secondary action", "thread-header-open-in-chevron"],
+  ["Send", "composer-send"],
   ["Scheduled", "sidebar-scheduled"],
   ["Settings", "sidebar-settings"],
   ["Sites", "sidebar-sites"],
   ["Start new voice chat", "composer-voice"],
   ["Switch mode, current mode: Codex", "sidebar-mode-chevron"],
   ["Show sidebar", "window-chrome-sidebar"],
+  ["Toggle bottom panel", "thread-header-bottom-panel"],
+  ["Toggle pinned summary", "thread-header-pinned-summary"],
+  ["Toggle side panel", "thread-header-side-panel"],
   ["View activity", "sidebar-activity"],
   ["View activity, needs attention", "sidebar-activity-attention"],
 ]);
@@ -277,7 +290,7 @@ try {
     await document.fonts.ready;
   });
 
-  const result = await main.evaluate((semanticLabelEntries) => {
+  const result = await main.evaluate(({ semanticLabelEntries, threadOnly }) => {
     const semanticLabels = new Map(semanticLabelEntries);
     const resolveSemanticId = (
       label,
@@ -443,10 +456,10 @@ try {
         (left, right) =>
           right.width * right.height - left.width * left.height,
       )[0];
-    if (!navigationBounds) {
+    if (!navigationBounds && !threadOnly) {
       throw new Error("Current visual capture requires one visible navigation.");
     }
-    const navigationRight = navigationBounds.right;
+    const navigationRight = threadOnly ? 0 : navigationBounds?.right ?? 0;
     const region = (value) => {
       if (value.top < 52) return "titlebar";
       if (value.left < navigationRight && value.top < 250) {
@@ -465,6 +478,7 @@ try {
       ) {
         return "composer";
       }
+      if (value.left >= navigationRight) return "conversation";
       return null;
     };
     const fontStyle = (element) => {
@@ -895,16 +909,35 @@ try {
         "composer-model-chevron",
       );
     }
+    const titlebarStructuralSemanticIds = new Map();
+    const currentThreadNewChatInputs = iconInputs.filter(
+      ({ bounds, owner, svg, targetRegion }) =>
+        targetRegion === "titlebar" &&
+        bounds.top >= 9 &&
+        owner.tagName === "BUTTON" &&
+        !(owner.getAttribute("aria-label") ?? "").trim() &&
+        !(owner.textContent ?? "").trim() &&
+        svg.getAttribute("viewBox") === "0 0 16 16",
+    );
+    if (currentThreadNewChatInputs.length === 1) {
+      titlebarStructuralSemanticIds.set(
+        currentThreadNewChatInputs[0].svg,
+        "thread-header-new-chat",
+      );
+    }
     const icons = iconInputs.map(({ bounds, owner, svg, targetRegion }) => {
         const ariaLabel = owner.getAttribute("aria-label");
+        const titleLabel = owner.getAttribute("title") ?? "";
         const fixedTextLabel = owner.textContent?.trim() ?? "";
         return {
           owner: {
             role: owner.getAttribute("role") ?? owner.tagName.toLowerCase(),
             semanticId:
               resolveSemanticId(ariaLabel ?? "", targetRegion, true) ??
+              resolveSemanticId(titleLabel, targetRegion, false) ??
               resolveSemanticId(fixedTextLabel, targetRegion, false) ??
               composerStructuralSemanticIds.get(svg) ??
+              titlebarStructuralSemanticIds.get(svg) ??
               null,
           },
           primitives: [...svg.children].map(serializeSvgElement),
@@ -917,6 +950,40 @@ try {
           viewBox: svg.getAttribute("viewBox"),
         };
       });
+    const currentThreadProjectIcons = [
+      ...document.querySelectorAll("header svg"),
+    ].filter((svg) => {
+      const bounds = svg.getBoundingClientRect();
+      return (
+        !svg.closest(
+          'a, button, [role="button"], [role="tab"], [role="menuitem"]',
+        ) &&
+        isActuallyVisible(svg) &&
+        bounds.top >= 9 &&
+        bounds.bottom < 52 &&
+        bounds.width === 16 &&
+        bounds.height === 16 &&
+        svg.getAttribute("viewBox") === "0 0 16 16"
+      );
+    });
+    if (currentThreadProjectIcons.length === 1) {
+      const svg = currentThreadProjectIcons[0];
+      const bounds = svg.getBoundingClientRect();
+      icons.push({
+        owner: { role: "presentation", semanticId: "thread-header-project" },
+        primitives: [...svg.children].map(serializeSvgElement),
+        region: "titlebar",
+        rect: rect(svg),
+        renderSize: {
+          height: round(bounds.height),
+          width: round(bounds.width),
+        },
+        rootAttributes: attributes(svg, true),
+        rootComputedStyle: computedStyle(svg),
+        sourceClassName: svg.getAttribute("class") ?? "",
+        viewBox: svg.getAttribute("viewBox"),
+      });
+    }
     const exactComposerSemanticIds = new Set([
       "composer-project",
       "composer-worktree",
@@ -926,6 +993,7 @@ try {
       "composer-model-chevron",
       "composer-dictate",
       "composer-voice",
+      "composer-send",
     ]);
     const composerObservation = {
       bottomActionIconCount: composerBottomInputs.length,
@@ -1078,8 +1146,60 @@ try {
       sidebarObservation,
       viewport: { height: window.innerHeight, width: window.innerWidth },
     };
-  }, [...semanticLabels]);
-  try {
+  }, { semanticLabelEntries: [...semanticLabels], threadOnly });
+  if (threadOnly) {
+    result.rasterAssets = await main.evaluate(async () => {
+      const candidates = [
+        ...document.querySelectorAll('img[src="/apps/vscode.png"]'),
+      ].filter((image) => {
+        const bounds = image.getBoundingClientRect();
+        const style = getComputedStyle(image);
+        return (
+          bounds.width > 0 &&
+          bounds.height > 0 &&
+          bounds.right > 0 &&
+          bounds.bottom > 0 &&
+          bounds.left < innerWidth &&
+          bounds.top < innerHeight &&
+          image.src === "app://-/apps/vscode.png" &&
+          style.visibility === "visible"
+        );
+      });
+      if (candidates.length !== 1) {
+        throw new Error(
+          `Expected one visible VS Code titlebar image, received ${candidates.length}.`,
+        );
+      }
+      const image = candidates[0];
+      const bounds = image.getBoundingClientRect();
+      const response = await fetch(image.src);
+      if (!response.ok) {
+        throw new Error(`VS Code titlebar image fetch failed: ${response.status}.`);
+      }
+      const bytes = new Uint8Array(await response.arrayBuffer());
+      let binary = "";
+      for (const byte of bytes) binary += String.fromCharCode(byte);
+      return [
+        {
+          dataBase64: btoa(binary),
+          id: "thread-header-editor-vscode",
+          mimeType: response.headers.get("content-type")?.split(";")[0] ?? "",
+          naturalSize: {
+            height: image.naturalHeight,
+            width: image.naturalWidth,
+          },
+          renderSize: {
+            height: Math.round(bounds.height * 100) / 100,
+            width: Math.round(bounds.width * 100) / 100,
+          },
+          sourceUrl: image.src,
+          status: "runtime-observed",
+        },
+      ];
+    });
+  }
+  fullCapture: try {
+    if (threadOnly) break fullCapture;
     const projectRow = main
       .locator(
         'nav div[role="button"][aria-expanded]:not([aria-haspopup])',
@@ -1657,6 +1777,7 @@ try {
     throw new Error("Captured viewport does not match the baseline context.");
   }
   result.baselineContext = baselineContext;
+  result.captureMode = threadOnly ? "completed-thread" : "full";
 
   const canonicalize = (value) =>
     JSON.stringify(value, (_key, nested) => {
@@ -1718,6 +1839,35 @@ try {
           }),
         )
         .digest("hex"),
+    };
+  });
+  result.rasterAssets = (result.rasterAssets ?? []).map((asset, index) => {
+    if (
+      asset.id !== "thread-header-editor-vscode" ||
+      asset.mimeType !== "image/png" ||
+      asset.sourceUrl !== "app://-/apps/vscode.png" ||
+      asset.status !== "runtime-observed" ||
+      asset.naturalSize?.height !== 64 ||
+      asset.naturalSize?.width !== 64 ||
+      asset.renderSize?.height !== 16 ||
+      asset.renderSize?.width !== 16 ||
+      typeof asset.dataBase64 !== "string"
+    ) {
+      throw new Error(`Unexpected current-thread raster asset at index ${index}.`);
+    }
+    const bytes = Buffer.from(asset.dataBase64, "base64");
+    if (
+      bytes.length === 0 ||
+      bytes.length > 64 * 1024 ||
+      bytes.toString("base64") !== asset.dataBase64 ||
+      bytes.subarray(0, 8).toString("hex") !== "89504e470d0a1a0a"
+    ) {
+      throw new Error(`Invalid current-thread PNG payload at index ${index}.`);
+    }
+    return {
+      ...asset,
+      byteLength: bytes.length,
+      sha256: createHash("sha256").update(bytes).digest("hex"),
     };
   });
 

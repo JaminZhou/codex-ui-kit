@@ -31,7 +31,7 @@ describe("current conversation thread shell visual contract", () => {
       "--codex-ui-conversation-thread-user-turn-gap: 2.125rem",
     );
     expect(tokens).toContain(
-      "--codex-ui-conversation-thread-font-size: 0.884375rem",
+      "--codex-ui-conversation-thread-font-size: 0.875rem",
     );
     expect(tokens).toContain(
       "--codex-ui-conversation-thread-line-height: 1.375rem",
@@ -44,6 +44,9 @@ describe("current conversation thread shell visual contract", () => {
     );
     expect(styles).toContain(
       "padding-top: var(\n    --codex-ui-thread-content-top-inset\n  )",
+    );
+    expect(styles).toContain(
+      "font-weight: var(--codex-ui-font-weight-shell)",
     );
   });
 

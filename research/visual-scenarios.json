@@ -15,21 +15,21 @@
       "expectedGeometry": {
         "assistant": {
           "height": 22,
-          "left": 168,
+          "left": 222,
           "lineHeight": "22px",
           "top": 163,
           "width": 736
         },
         "assistantActions": {
-          "height": 16,
-          "left": 168,
-          "top": 195,
-          "width": 94
+          "height": 26,
+          "left": 222,
+          "top": 188,
+          "width": 110
         },
         "composer": {
-          "borderRadius": "20px",
+          "borderRadius": "25px",
           "height": 98,
-          "left": 168,
+          "left": 222,
           "top": 706,
           "width": 736
         },
@@ -37,17 +37,17 @@
           "height": 46,
           "left": 0,
           "top": 0,
-          "width": 1072
+          "width": 1180
         },
         "thread": {
-          "left": 152,
+          "left": 206,
           "top": 46,
           "width": 768
         },
         "user": {
-          "borderRadius": "16px",
+          "borderRadius": "20px",
           "height": 38,
-          "left": 587,
+          "left": 641,
           "top": 79,
           "width": 317
         }
@@ -79,6 +79,83 @@
           "height": 130,
           "maximumDiffRatio": 0.012,
           "maximumDiffRatioEnv": "CODEX_UI_KIT_VISUAL_MAX_COMPOSER_DIFF",
+          "name": "composer"
+        }
+      ]
+    },
+    {
+      "capture": "current-thread-completed-compact",
+      "colorScheme": "dark",
+      "geometry": {
+        "assistant": ".codex-ui-agent-message[data-role=\"assistant\"] .codex-ui-agent-message__content",
+        "assistantActions": ".codex-ui-agent-message[data-role=\"assistant\"] .codex-ui-agent-message__actions",
+        "composer": ".codex-ui-composer",
+        "header": ".codex-ui-conversation-thread-shell__header",
+        "thread": ".codex-ui-conversation-thread-shell__thread",
+        "user": ".codex-ui-agent-message[data-role=\"user\"] .codex-ui-agent-message__content"
+      },
+      "expectedGeometry": {
+        "assistant": {
+          "height": 22,
+          "left": 16,
+          "lineHeight": "22px",
+          "top": 163,
+          "width": 688
+        },
+        "assistantActions": {
+          "height": 26,
+          "left": 16,
+          "top": 188,
+          "width": 110
+        },
+        "composer": {
+          "borderRadius": "25px",
+          "height": 98,
+          "left": 16,
+          "top": 566,
+          "width": 688
+        },
+        "header": {
+          "height": 46,
+          "left": 0,
+          "top": 0,
+          "width": 720
+        },
+        "thread": {
+          "left": 0,
+          "top": 46,
+          "width": 720
+        },
+        "user": {
+          "borderRadius": "20px",
+          "height": 38,
+          "left": 387,
+          "top": 79,
+          "width": 317
+        }
+      },
+      "id": "current-thread-completed-compact",
+      "masks": [],
+      "maximumDiffRatio": 0.007,
+      "pixelThreshold": 0.05,
+      "referenceEnv": "CODEX_UI_KIT_THREAD_COMPACT_REFERENCE",
+      "regions": [
+        {
+          "height": 46,
+          "maximumDiffRatio": 0.045,
+          "name": "header",
+          "top": 0
+        },
+        {
+          "height": 194,
+          "maximumDiffRatio": 0.008,
+          "name": "messages",
+          "top": 46
+        },
+        {
+          "fromBottom": 130,
+          "height": 130,
+          "maximumDiffRatio": 0.012,
           "name": "composer"
         }
       ]

@@ -18,11 +18,12 @@ describe("visual token contract", () => {
     expect(styles).toContain(
       "font-weight: var(--codex-ui-font-weight-shell)",
     );
-    expect(tokens).toContain("--codex-ui-radius-2xl: 1rem");
+    expect(tokens).toContain("--codex-ui-radius-3xl: 1.25rem");
     expect(tokens).toContain("--codex-ui-thread-content-max-width: 48rem");
-    expect(tokens).toContain("--codex-ui-radius-composer: calc(var(--codex-ui-spacing) * 5.5)");
+    expect(tokens).toContain("--codex-ui-radius-message: var(--codex-ui-radius-3xl)");
+    expect(tokens).toContain("--codex-ui-radius-composer: 1.5625rem");
     expect(tokens).toContain(
-      "--codex-ui-radius-composer-multiline: var(--codex-ui-radius-3xl)",
+      "--codex-ui-radius-composer-multiline: var(--codex-ui-radius-composer)",
     );
     expect(tokens).toContain(
       "--codex-ui-size-button-composer: calc(var(--codex-ui-spacing) * 8)",

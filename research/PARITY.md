@@ -41,8 +41,9 @@ The authoritative current-build inventory is:
   BrowserWindow; it does not prove parity with unobserved product routes,
   panels, state transitions, or window types.
 - A scoped Codex Desktop `26.803.61601` (`6396`) visual probe revalidates the
-  exact 1180×820 dark/resting asset fingerprint and now retains 78 exact
-  sidebar/menu/window-chrome/Composer/environment/Settings icons. Its sampled sidebar
+  exact 1180×820 dark/resting asset fingerprint and now retains 90 exact
+  sidebar/menu/window-chrome/Composer/environment/Settings/completed-thread icons plus
+  one separately hashed, playground-only VS Code integration raster. Its sampled sidebar
   hover/footer contract also
   passes Browser/CDP and Electron acceptance; its independently scrolled
   Recents sample removes the leading Thread approximation while the broader
@@ -144,7 +145,8 @@ The authoritative current-build inventory is:
   Electron, and eight reviewed frames extend the matrix to 188. Untracked,
   unmasked full-frame current Hooks comparisons pass at 1.7651% wide and
   1.8064% at 720px. The runtime-captured reload SVG raises the exact asset
-  manifest to 78. Remaining P1 Settings/integration families stay open.
+  manifest to 78; the later completed-thread slice raises it to 90. Remaining
+  P1 Settings/integration families stay open.
 - Computer Use exploration is blocked by the environment safety policy for
   `com.openai.codex`. User-authorized CDP probes on `26.721.41059` revalidated
   access, the main-shell target shape, a de-identified Projects entry/list,
