@@ -703,6 +703,35 @@ for (const scene of selectedScenes) {
         await page.waitForFunction(
           () => document.activeElement?.textContent?.trim() === "Press shortcut",
         );
+        const hotkeyRecord = page.getByRole("button", {
+          name: "Press shortcut",
+          exact: true,
+        });
+        await hotkeyRecord.press("Meta");
+        await hotkeyRecord.press("Meta+Shift+K");
+        const hotkeyEdit = page.getByRole("button", {
+          name: "Set shortcut for Popout Window hotkey",
+        });
+        await page.waitForFunction(
+          () =>
+            document.activeElement?.getAttribute("aria-label") ===
+            "Set shortcut for Popout Window hotkey",
+        );
+        const hotkeyCaptured = await hotkeyEdit.locator("span").first().textContent();
+        await hotkeyEdit.click();
+        await page
+          .getByRole("button", { name: "Press shortcut", exact: true })
+          .press("Escape");
+        await page.waitForFunction(
+          () =>
+            document.activeElement?.getAttribute("aria-label") ===
+            "Set shortcut for Popout Window hotkey",
+        );
+        const hotkeyEscapePreserved = await hotkeyEdit
+          .locator("span")
+          .first()
+          .textContent();
+        await hotkeyEdit.click();
         await page.getByRole("button", { name: "Cancel", exact: true }).click();
         await page.waitForFunction(
           () =>
@@ -726,7 +755,14 @@ for (const scene of selectedScenes) {
         );
         await page.getByRole("button", { name: "View", exact: true }).click();
         interaction = await page.evaluate(
-          ({ fileDestinations, hotkeyFocusRestored, menuFocus, speedOptions }) => ({
+          ({
+            fileDestinations,
+            hotkeyCaptured,
+            hotkeyEscapePreserved,
+            hotkeyFocusRestored,
+            menuFocus,
+            speedOptions,
+          }) => ({
             autoReview: document
               .querySelector('[role="switch"][aria-label="Show Auto-review in the composer"]')
               ?.getAttribute("aria-checked"),
@@ -746,6 +782,8 @@ for (const scene of selectedScenes) {
             hotkeyCapture: Boolean(
               document.querySelector(".codex-ui-general-settings__hotkey-capture"),
             ),
+            hotkeyCaptured,
+            hotkeyEscapePreserved,
             hotkeyFocus: hotkeyFocusRestored,
             language: document
               .querySelector('button[aria-label="Language"]')
@@ -765,6 +803,8 @@ for (const scene of selectedScenes) {
           }),
           {
             fileDestinations,
+            hotkeyCaptured,
+            hotkeyEscapePreserved,
             hotkeyFocusRestored,
             menuFocus,
             speedOptions,
@@ -778,6 +818,8 @@ for (const scene of selectedScenes) {
           interaction.fileDestinations.length !== 7 ||
           interaction.followUp !== "true" ||
           interaction.hotkeyCapture ||
+          interaction.hotkeyCaptured !== "⌘ ⇧ K" ||
+          interaction.hotkeyEscapePreserved !== "⌘ ⇧ K" ||
           interaction.hotkeyFocus !== "Set shortcut for Popout Window hotkey" ||
           interaction.language !== "简体中文⌄" ||
           interaction.licenses !== "Open source licenses requested" ||

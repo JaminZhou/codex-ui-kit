@@ -818,8 +818,8 @@ screenshots and product project names remain local-only.
 - The General route adds 21 current rows across Permissions, General,
   Composer, Popout Window, and Notifications. Its controlled fixture covers
   five menus, 66 searchable language choices, twelve switches, two keyboard
-  groups, and Popout shortcut capture/cancel without claiming the observed
-  host selections are product defaults.
+  groups, and locally controlled Popout shortcut capture/formatting/cancel
+  without claiming the observed host selections are product defaults.
 - Browser/CDP covers wide, light, 720px, hotkey, and bottom-scrolled frames;
   Electron repeats the interaction and retains General state while switching
   through Git and Appearance. Six reviewed frames extend the matrix to 180,

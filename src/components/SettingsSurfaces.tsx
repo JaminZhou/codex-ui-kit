@@ -1278,6 +1278,38 @@ const defaultGeneralLanguageOptions: readonly GeneralSettingsOption[] = [
   "繁體中文（香港）",
 ].map((label) => ({ label, value: label === "Auto detect" ? "auto" : label }));
 
+function formatGeneralHotkey(event: KeyboardEvent<HTMLButtonElement>) {
+  if (
+    event.nativeEvent.isComposing ||
+    event.repeat ||
+    ["Alt", "Control", "Dead", "Meta", "Process", "Shift", "Tab", "Unidentified"].includes(
+      event.key,
+    )
+  ) {
+    return null;
+  }
+  const modifiers = [
+    event.metaKey ? "⌘" : null,
+    event.ctrlKey ? "⌃" : null,
+    event.altKey ? "⌥" : null,
+    event.shiftKey ? "⇧" : null,
+  ].filter(Boolean);
+  const keyLabels: Readonly<Record<string, string>> = {
+    " ": "Space",
+    ArrowDown: "↓",
+    ArrowLeft: "←",
+    ArrowRight: "→",
+    ArrowUp: "↑",
+    Backspace: "⌫",
+    Delete: "⌦",
+    Enter: "↩",
+  };
+  const key =
+    keyLabels[event.key] ??
+    (event.key.length === 1 ? event.key.toLocaleUpperCase() : event.key);
+  return [...modifiers, key].join(" ");
+}
+
 function GeneralSwitch({
   checked,
   disabled = false,
@@ -1803,6 +1835,20 @@ export function GeneralSettingsPage({
             <div className="codex-ui-general-settings__hotkey-capture">
               <button
                 className="codex-ui-general-settings__hotkey-record"
+                onKeyDown={(event) => {
+                  if (event.key === "Escape") {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    onCancelHotkeyCapture?.();
+                    return;
+                  }
+                  const hotkey = formatGeneralHotkey(event);
+                  if (!hotkey) return;
+                  event.preventDefault();
+                  event.stopPropagation();
+                  update("popoutHotkey", hotkey);
+                  onCancelHotkeyCapture?.();
+                }}
                 ref={hotkeyRecordRef}
                 type="button"
               >

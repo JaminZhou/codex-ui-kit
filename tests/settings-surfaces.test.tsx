@@ -594,11 +594,35 @@ describe("settings surfaces", () => {
     const hotkeyCapture = screen.getByRole("button", { name: "Press shortcut" });
     expect(hotkeyCapture).toBeTruthy();
     expect(document.activeElement).toBe(hotkeyCapture);
-    fireEvent.click(screen.getByRole("button", { name: "Cancel" }));
-    const hotkeyEdit = screen.getByRole("button", {
+    fireEvent.keyDown(hotkeyCapture, { key: "Meta", metaKey: true });
+    expect(screen.getByRole("button", { name: "Press shortcut" })).toBeTruthy();
+    fireEvent.keyDown(hotkeyCapture, {
+      key: "k",
+      metaKey: true,
+      shiftKey: true,
+    });
+    let hotkeyEdit = screen.getByRole("button", {
       name: "Set shortcut for Popout Window hotkey",
     });
-    expect(hotkeyEdit).toBeTruthy();
+    expect(hotkeyEdit.textContent).toContain("⌘ ⇧ K");
+    expect(document.activeElement).toBe(hotkeyEdit);
+
+    fireEvent.click(hotkeyEdit);
+    fireEvent.keyDown(screen.getByRole("button", { name: "Press shortcut" }), {
+      key: "Escape",
+    });
+    hotkeyEdit = screen.getByRole("button", {
+      name: "Set shortcut for Popout Window hotkey",
+    });
+    expect(hotkeyEdit.textContent).toContain("⌘ ⇧ K");
+    expect(document.activeElement).toBe(hotkeyEdit);
+
+    fireEvent.click(hotkeyEdit);
+    fireEvent.click(screen.getByRole("button", { name: "Cancel" }));
+    hotkeyEdit = screen.getByRole("button", {
+      name: "Set shortcut for Popout Window hotkey",
+    });
+    expect(hotkeyEdit.textContent).toContain("⌘ ⇧ K");
     expect(document.activeElement).toBe(hotkeyEdit);
   });
 });

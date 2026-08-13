@@ -1266,8 +1266,10 @@ centered 768px content match the prior Settings slices. At 720×820 content
 shrinks to 357.09px and the route grows from 1,820px to 2,239px without
 horizontal overflow. The 21 rows span five cards and expose twelve switches,
 five menus, Auto detect plus 65 languages, two segmented keyboard controls,
-license presentation, and shortcut capture/cancel. Captured selections are
-observed host values, not product defaults.
+license presentation, and shortcut capture/cancel. The controlled replay also
+formats and stores a local shortcut fixture; that behavior is a playground
+contract, while captured product selections remain observed host values rather
+than defaults.
 
 The controlled replay adds wide, light, 720px, hotkey, and bottom frames to
 Browser/CDP; Electron repeats menu/search/switch/keyboard interactions and

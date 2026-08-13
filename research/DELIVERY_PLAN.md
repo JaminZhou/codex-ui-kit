@@ -452,7 +452,8 @@ open rows; these slices do not imply Stage 4 completion.
 The following General slice is now delivered independently: a controlled
 `GeneralSettingsPage` covers the 21 current rows in Permissions, General,
 Composer, Popout Window, and Notifications. Browser/CDP verifies five menus,
-language search, twelve switches, two keyboard groups, shortcut capture,
+language search, twelve switches, two keyboard groups, shortcut capture/
+formatting/cancel,
 1180px/720px layout, light paint, and bottom scroll. Electron repeats the
 route and retains General state while switching through Git and Appearance.
 Six reviewed frames extend the matrix to 180, with optional local-only full-

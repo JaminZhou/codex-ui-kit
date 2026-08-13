@@ -5380,6 +5380,38 @@ try {
   await codingWorkspacePage.waitForFunction(
     () => document.activeElement?.textContent?.trim() === "Press shortcut",
   );
+  const generalHotkeyRecord = generalSettingsMain.getByRole("button", {
+    name: "Press shortcut",
+    exact: true,
+  });
+  await generalHotkeyRecord.press("Meta");
+  await generalHotkeyRecord.press("Meta+Shift+K");
+  const generalHotkeyEdit = generalSettingsMain.getByRole("button", {
+    name: "Set shortcut for Popout Window hotkey",
+  });
+  await codingWorkspacePage.waitForFunction(
+    () =>
+      document.activeElement?.getAttribute("aria-label") ===
+      "Set shortcut for Popout Window hotkey",
+  );
+  const generalHotkeyCaptured = await generalHotkeyEdit
+    .locator("span")
+    .first()
+    .textContent();
+  await generalHotkeyEdit.click();
+  await generalSettingsMain
+    .getByRole("button", { name: "Press shortcut", exact: true })
+    .press("Escape");
+  await codingWorkspacePage.waitForFunction(
+    () =>
+      document.activeElement?.getAttribute("aria-label") ===
+      "Set shortcut for Popout Window hotkey",
+  );
+  const generalHotkeyEscapePreserved = await generalHotkeyEdit
+    .locator("span")
+    .first()
+    .textContent();
+  await generalHotkeyEdit.click();
   await generalSettingsMain
     .getByRole("button", { name: "Cancel", exact: true })
     .click();
@@ -5430,6 +5462,8 @@ try {
     hotkeyCapture: Boolean(
       main.querySelector(".codex-ui-general-settings__hotkey-capture"),
     ),
+    hotkeyCaptured: focus.hotkeyCaptured,
+    hotkeyEscapePreserved: focus.hotkeyEscapePreserved,
     hotkeyFocus: focus.hotkey,
     language: main.querySelector('button[aria-label="Language"]')
       ?.textContent?.trim(),
@@ -5443,6 +5477,8 @@ try {
       ?.getAttribute("aria-pressed"),
   }), {
     hotkey: generalHotkeyFocusRestored,
+    hotkeyCaptured: generalHotkeyCaptured,
+    hotkeyEscapePreserved: generalHotkeyEscapePreserved,
     menu: generalMenuFocus,
   });
   if (
@@ -5452,6 +5488,8 @@ try {
     !generalInteraction.fileDestination?.includes("Xcode") ||
     generalInteraction.followUp !== "true" ||
     generalInteraction.hotkeyCapture ||
+    generalInteraction.hotkeyCaptured !== "⌘ ⇧ K" ||
+    generalInteraction.hotkeyEscapePreserved !== "⌘ ⇧ K" ||
     generalInteraction.hotkeyFocus !== "Set shortcut for Popout Window hotkey" ||
     generalInteraction.language !== "简体中文⌄" ||
     generalInteraction.menuFocus.completionNotifications !==
