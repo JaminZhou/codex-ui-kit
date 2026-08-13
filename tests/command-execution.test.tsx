@@ -197,6 +197,11 @@ describe("CommandExecution", () => {
     expect(
       container.querySelectorAll(".codex-ui-command-execution__icon"),
     ).toHaveLength(2);
+    expect(
+      container.querySelectorAll(
+        '.codex-ui-command-execution__icon[aria-hidden="true"]',
+      ),
+    ).toHaveLength(2);
   });
 
   it("can replace or omit the sampled shell label", () => {

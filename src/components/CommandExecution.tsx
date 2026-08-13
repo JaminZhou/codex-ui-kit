@@ -68,7 +68,11 @@ function CopyIcon() {
 
 function TerminalIcon({ children }: { children?: ReactNode }) {
   if (children !== undefined && children !== null) {
-    return <span className="codex-ui-command-execution__icon">{children}</span>;
+    return (
+      <span aria-hidden="true" className="codex-ui-command-execution__icon">
+        {children}
+      </span>
+    );
   }
   return (
     <svg
