@@ -179,6 +179,26 @@ describe("CommandExecution", () => {
     expect(html).not.toContain("codex-ui-command-execution__shell");
   });
 
+  it("reuses a host-provided terminal icon in summaries and compact details", () => {
+    const { container } = render(
+      <CommandExecution
+        command="private long-running command"
+        compactDetail="Running command for 3s"
+        defaultOpen
+        hideRawCommand
+        status="running"
+        terminalIcon={<svg data-testid="current-terminal-icon" viewBox="0 0 16 16" />}
+      />,
+    );
+
+    expect(
+      container.querySelectorAll('[data-testid="current-terminal-icon"]'),
+    ).toHaveLength(2);
+    expect(
+      container.querySelectorAll(".codex-ui-command-execution__icon"),
+    ).toHaveLength(2);
+  });
+
   it("can replace or omit the sampled shell label", () => {
     const custom = renderToStaticMarkup(
       <CommandExecution

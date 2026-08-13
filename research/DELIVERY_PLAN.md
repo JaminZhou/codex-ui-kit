@@ -14,9 +14,9 @@ exit gates; it does not replace the inventory.
   Desktop `26.803.61601` (`6396`). Unsampled earlier-build surfaces remain
   previous-build regression evidence rather than current verification.
 - The inventory contains 88 surface groups: 58 P0, 21 P1, and 9 P2.
-- 29 groups have current-build runtime evidence, 42 have previous-build-only
+- 32 groups have current-build runtime evidence, 39 have previous-build-only
   runtime evidence, and 17 have not been sampled.
-- The scoped `26.803.61601` refresh revalidates 90
+- The scoped `26.803.61601` refresh revalidates 91
   sidebar/menu/window-chrome/Composer/Settings/completed-thread icons against exact runtime evidence.
   Earlier hover/footer slices promoted More, Pin,
   Archive, and Help, confirms that Settings is absent from the sampled footer
@@ -27,7 +27,13 @@ exit gates; it does not replace the inventory.
   denominator from 15 to 8. The Composer follow-up promotes Project, Worktree,
   Branch, Add files, Permission, Model chevron, Dictate, and Voice, reducing
   the scoped visible-shell denominator to zero while explicitly retaining the
-  broader inventory/lifecycle blocker.
+  broader inventory/lifecycle blocker. The current-command follow-up re-runs
+  bounded success, exact `exit 7`, and a stopped 120-second command. It adds
+  the exact three-path terminal glyph, separates the current-turn 28px Stop
+  action from background-terminal Stop all/per-process controls, proves
+  settlement and same-thread recovery, and promotes command execution/failure,
+  interruption, and background-process management through Browser/CDP, real
+  Electron, and local-only owned pixels.
   The account-menu follow-up adds six exact icons and gates its six-item,
   one-avatar, zero-role-separator structure, 258.11×188.38 geometry, dismissal,
   focus return, and owned pixels at 0.1979%. Sidebar actions and ordinary task

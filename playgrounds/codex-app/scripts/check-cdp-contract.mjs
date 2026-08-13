@@ -8084,19 +8084,30 @@ try {
         button.getAttribute("aria-label") === "Stop" ||
         button.textContent?.trim() === "Stop",
     ).length,
+    stopAllCount: document.querySelectorAll(
+      '[aria-label="Stop all background terminals"]',
+    ).length,
+    stopProcessCount: document.querySelectorAll(
+      '[aria-label="Stop Background terminal"]',
+    ).length,
   }));
   if (
     !stopping.commandSummary?.startsWith(
       "Background terminal stopped with seq 1 120",
     ) ||
     stopping.interruption !== "You stopped after 1m 35s" ||
-    stopping.stopCount !== 0
+    stopping.stopCount !== 0 ||
+    stopping.stopAllCount !== 1 ||
+    stopping.stopProcessCount !== 1
   ) {
     throw new Error(
       `Current command Stop transition failed: ${JSON.stringify(stopping)}`,
     );
   }
 
+  await commandInterruptionPage
+    .getByRole("button", { name: "Stop all background terminals" })
+    .click();
   await commandInterruptionPage.waitForSelector(
     '.demo-root[data-frame="command-interruption-settled"][data-status="interrupted"] [data-item-id="command-interruption"][data-execution-status="background-finished"]',
   );

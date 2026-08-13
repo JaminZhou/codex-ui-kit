@@ -62,7 +62,7 @@ observation from a previous build remains historical evidence.
   using private text. The exact `scrollHeight` remains content-dependent, so
   the contract locks the unique scroll owner and visible geometry rather than
   private task counts.
-- The same fingerprint revalidates 90
+- The same fingerprint revalidates 91
   context/Composer/sidebar/menu/window/environment/Settings/completed-thread assets, six project groups,
   Recents actions, all sampled menus, and the disabled
   window-navigation cursor. See
@@ -74,8 +74,8 @@ observation from a previous build remains historical evidence.
   previous-build regression evidence and have been downgraded from `verified`
   to `partial_legacy` until they are reached again on the current fingerprint.
 
-Current inventory: 88 surface groups; 29 have current-build runtime evidence, 42 have previous-build-only runtime evidence, 17 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 27 groups and Electron verification covers 27.
-Prior acceptance outside those 23 sampled current-build groups remains
+Current inventory: 88 surface groups; 32 have current-build runtime evidence, 39 have previous-build-only runtime evidence, 17 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 31 groups and Electron verification covers 31.
+Prior acceptance outside those 32 sampled current-build groups remains
 recorded as `partial_legacy` until current-build re-observation.
 
 The current package exposes candidates far beyond the old transcript sample:
@@ -990,6 +990,21 @@ queue continuation and broader background-process management retain their own
 gates. The `26.721.81911` MCP tool-call error/retry state is now
 captured separately; the broader thread-transport error/retry state has not
 been safely reached and remains an unpromoted gate.
+
+The `26.803.61601` current-command follow-up supersedes the sampled success,
+failure/recovery, interruption, and background-process boundary above. A
+bounded twelve-line command completed successfully; one exact command emitted
+stdout/stderr and exited 7 before a no-tool recovery; and a 120-second command
+was stopped before a later recovery. The Renderer keeps a finished shell card
+inside a still-settling turn, changes the 28×28 Composer Stop back to Send at
+turn interruption, then independently exposes background-terminal Stop all
+and per-process Stop until settlement. The exact ownerless 16×16 terminal
+glyph contains three fill paths in a 20×20 viewBox. Its command text/output is
+13px, 19.5px, weight 445. The public H5 gate covers 1180×820, 690×820, and
+720×680 without overflow; the protocol playground drives Stop → Stop all →
+settlement → recovery in 188 CDP frames and a real Electron window. Local-only
+690×820 command/composer comparisons pass at 2.3321% and 1.3947%. Raw product
+screenshots and private task text remain untracked.
 
 A fourth `26.730.61309` disposable task entered `/compact` only after an exact
 no-tool baseline response. The current menu exposed `Compact this chat's

@@ -867,6 +867,19 @@ This slice does not create an environment or claim populated environment
 editing/repair coverage. Raw product screenshots and capture records remain
 local-only.
 
+## Current command-lifecycle follow-up
+
+- Current `26.803.61601` evidence re-runs bounded success, exact `exit 7`, and
+  a stopped long-running command instead of relabeling the older replay.
+- `CommandExecution` uses the exact current three-path terminal glyph and
+  13px/19.5px/445 command typography.
+- The replay keeps current-turn Stop separate from host-owned background
+  Stop all/per-process actions, then drives settlement and same-thread recovery.
+- Browser checks cover 1180×820, 690×820, and 720×680; the 188-frame CDP
+  matrix, real Electron acceptance, and reviewed internal baselines pass.
+- Optional local-only current-product command/composer regions pass at
+  2.3321% and 1.3947%; raw references are never committed.
+
 ## Development
 
 From the repository root:

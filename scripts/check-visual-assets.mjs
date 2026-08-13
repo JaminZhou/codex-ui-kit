@@ -460,19 +460,20 @@ for (const id of [
   "thread-assistant-good",
   "thread-assistant-bad",
   "thread-assistant-continue",
+  "thread-command-terminal",
 ]) {
   if (!ids.has(id) || remaining.includes(id)) {
     throw new Error(`${id} must be promoted from current-build runtime evidence`);
   }
 }
 if (
-  manifest.icons.length !== 90 ||
+  manifest.icons.length !== 91 ||
   manifest.composerObservation?.topContextIconCount !== 3 ||
   manifest.composerObservation?.bottomActionIconCount !== 5 ||
   manifest.composerObservation?.exactSemanticIconCount !== 8
 ) {
   throw new Error(
-    "current visual asset capture must retain 90 promoted icons and the eight-icon Composer baseline",
+    "current visual asset capture must retain 91 promoted icons and the eight-icon Composer baseline",
   );
 }
 if (

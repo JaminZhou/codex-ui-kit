@@ -25,6 +25,7 @@ export type CurrentThreadBuildIconName =
   | "thread-header-pinned-summary"
   | "thread-header-project"
   | "thread-header-side-panel"
+  | "thread-command-terminal"
   | "window-chrome-back"
   | "window-chrome-forward"
   | "window-chrome-sidebar";
