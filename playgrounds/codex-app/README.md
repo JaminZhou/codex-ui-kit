@@ -880,6 +880,23 @@ local-only.
 - Optional local-only current-product command/composer regions pass at
   2.3321% and 1.3947%; raw references are never committed.
 
+## Current Terminal recovery and background-process slice
+
+- Real direct-shell `exit 7` output returns to the same interactive prompt and
+  is not presented as a Terminal crash; ordinary shell `exit` closes the tab.
+- A real 120-line agent-created background loop remains active after the turn,
+  appears under `Background processes`, and opens live output in a 381.44px
+  side-panel tab.
+- `TerminalReloadNotice` models the current package-structural crash title,
+  description, and Reload action without claiming a deliberately crashed
+  product pty.
+- Electron closes and reopens the background side-panel tab while the process
+  remains active and clicks Reload through to a fresh shell.
+- Four reviewed internal baselines bring the visual matrix to 192 frames.
+
+Runtime, package-structural, and independent replay evidence remain separately
+attributed. No product screenshot or bundled private asset is committed.
+
 ## Development
 
 From the repository root:

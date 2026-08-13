@@ -112,6 +112,7 @@ export const publicRuntimeExports = [
   "TerminalPanel",
   "TerminalProcessList",
   "TerminalPrompt",
+  "TerminalReloadNotice",
   "TerminalSession",
   "TerminalTranscript",
   "TerminalWorkspaceMismatchNotice",

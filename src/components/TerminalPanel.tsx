@@ -170,10 +170,14 @@ export interface TerminalSessionProps
   inputLabel?: string;
   label?: string;
   notice?: ReactNode;
+  onReload?: () => void;
   onCommandSubmit?: (command: string) => void;
   onValueChange?: (value: string) => void;
   outputLabel?: string;
   prompt?: ReactNode;
+  reloadDescription?: ReactNode;
+  reloadLabel?: string;
+  reloadTitle?: ReactNode;
   status?: TerminalSessionStatus;
   value: string;
 }
@@ -186,10 +190,14 @@ export function TerminalSession({
   inputLabel = "Terminal input",
   label = "Terminal session",
   notice,
+  onReload,
   onCommandSubmit,
   onValueChange,
   outputLabel = "Terminal output",
   prompt,
+  reloadDescription = "Try reloading the terminal to continue",
+  reloadLabel = "Reload",
+  reloadTitle = "The terminal encountered an error",
   status = "idle",
   value,
   ...props
@@ -204,20 +212,68 @@ export function TerminalSession({
       {...props}
     >
       {notice}
-      <TerminalTranscript
-        entries={entries}
-        follow={followOutput}
-        label={outputLabel}
-      />
-      <TerminalPrompt
-        disabled={inputDisabled}
-        inputLabel={inputLabel}
-        onCommandSubmit={onCommandSubmit}
-        onValueChange={onValueChange}
-        prompt={prompt}
-        value={value}
-      />
+      {status === "failed" && onReload ? (
+        <TerminalReloadNotice
+          description={reloadDescription}
+          onReload={onReload}
+          reloadLabel={reloadLabel}
+          title={reloadTitle}
+        />
+      ) : (
+        <>
+          <TerminalTranscript
+            entries={entries}
+            follow={followOutput}
+            label={outputLabel}
+          />
+          <TerminalPrompt
+            disabled={inputDisabled}
+            inputLabel={inputLabel}
+            onCommandSubmit={onCommandSubmit}
+            onValueChange={onValueChange}
+            prompt={prompt}
+            value={value}
+          />
+        </>
+      )}
     </section>
+  );
+}
+
+export interface TerminalReloadNoticeProps
+  extends Omit<HTMLAttributes<HTMLDivElement>, "children" | "title"> {
+  description?: ReactNode;
+  onReload?: () => void;
+  reloadLabel?: string;
+  title?: ReactNode;
+}
+
+export function TerminalReloadNotice({
+  className,
+  description = "Try reloading the terminal to continue",
+  onReload,
+  reloadLabel = "Reload",
+  title = "The terminal encountered an error",
+  ...props
+}: TerminalReloadNoticeProps) {
+  return (
+    <div
+      className={["codex-ui-terminal-reload-notice", className]
+        .filter(Boolean)
+        .join(" ")}
+      role="alert"
+      {...props}
+    >
+      <div className="codex-ui-terminal-reload-notice__content">
+        <strong>{title}</strong>
+        <span>{description}</span>
+      </div>
+      {onReload ? (
+        <button onClick={onReload} type="button">
+          {reloadLabel}
+        </button>
+      ) : null}
+    </div>
   );
 }
 
@@ -229,8 +285,12 @@ export interface TerminalPanelSession {
   inputLabel?: string;
   label: string;
   notice?: ReactNode;
+  onReload?: () => void;
   outputLabel?: string;
   prompt?: ReactNode;
+  reloadDescription?: ReactNode;
+  reloadLabel?: string;
+  reloadTitle?: ReactNode;
   status?: TerminalSessionStatus;
   showStatus?: boolean;
   value: string;
@@ -329,6 +389,7 @@ export function TerminalPanel({
               inputLabel={session.inputLabel}
               label={session.label}
               notice={session.notice}
+              onReload={session.onReload}
               onCommandSubmit={(command) =>
                 onCommandSubmit?.(session.id, command)
               }
@@ -337,6 +398,9 @@ export function TerminalPanel({
               }
               outputLabel={session.outputLabel}
               prompt={session.prompt}
+              reloadDescription={session.reloadDescription}
+              reloadLabel={session.reloadLabel}
+              reloadTitle={session.reloadTitle}
               status={status}
               value={session.value}
             />
@@ -431,6 +495,7 @@ export interface TerminalProcessSummary {
   id: string;
   label: ReactNode;
   status: TerminalSessionStatus;
+  view?: "background" | "session";
 }
 
 export interface TerminalProcessListProps
@@ -461,6 +526,12 @@ export function TerminalProcessList({
   const hasRunningProcesses = processes.some(
     (process) => process.status === "running",
   );
+  const processStatusLabel = (process: TerminalProcessSummary) =>
+    process.view === "background"
+      ? process.status === "running"
+        ? "Running"
+        : null
+      : terminalSessionStatusLabel[process.status];
 
   return (
     <section
@@ -486,6 +557,7 @@ export function TerminalProcessList({
       {processes.length > 0 ? (
         <ul className="codex-ui-terminal-process-list__items">
           {processes.map((process) => {
+            const statusLabel = processStatusLabel(process);
             const identity = (
               <>
                 <span className="codex-ui-terminal-process-list__identity">
@@ -498,12 +570,14 @@ export function TerminalProcessList({
                     </span>
                   ) : null}
                 </span>
-                <span
-                  className="codex-ui-terminal-process-list__status"
-                  data-status={process.status}
-                >
-                  {terminalSessionStatusLabel[process.status]}
-                </span>
+                {statusLabel ? (
+                  <span
+                    className="codex-ui-terminal-process-list__status"
+                    data-status={process.status}
+                  >
+                    {statusLabel}
+                  </span>
+                ) : null}
               </>
             );
             const canStop =

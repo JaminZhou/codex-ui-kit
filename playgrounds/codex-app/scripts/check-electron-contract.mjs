@@ -3388,6 +3388,141 @@ try {
   await currentTerminalApp.close();
 }
 
+const directTerminalExitScene = {
+  frame: "terminal-current-command-exit-7",
+  id: "electron-current-terminal-command-exit-7",
+  scenario: "terminal-lifecycle",
+};
+const {
+  app: directTerminalExitApp,
+  page: directTerminalExitPage,
+} = await launchScene(directTerminalExitScene, { capture: false });
+
+try {
+  const output = await directTerminalExitPage
+    .getByRole("log", { name: "Terminal output" })
+    .textContent();
+  if (
+    !output?.includes("terminal-direct-out") ||
+    !output.trim().startsWith("/workspace/codex-ui-kit %") ||
+    !(await directTerminalExitPage
+      .getByRole("textbox", { name: "Terminal input" })
+      .isVisible()) ||
+    (await directTerminalExitPage.getByRole("alert").count()) !== 0
+  ) {
+    throw new Error(
+      "Electron command exit status was confused with a Terminal process failure.",
+    );
+  }
+} finally {
+  await directTerminalExitApp.close();
+}
+
+const terminalReloadScene = {
+  frame: "terminal-current-reload",
+  id: "electron-current-terminal-reload",
+  scenario: "terminal-lifecycle",
+};
+const { app: terminalReloadApp, page: terminalReloadPage } =
+  await launchScene(terminalReloadScene, { capture: false });
+
+try {
+  const alert = terminalReloadPage.getByRole("alert");
+  if (
+    !(await alert.textContent())?.includes(
+      "Try reloading the terminal to continue",
+    ) ||
+    (await terminalReloadPage.getByRole("log").count()) !== 0 ||
+    (await terminalReloadPage.getByRole("textbox").count()) !== 0
+  ) {
+    throw new Error("Electron Terminal reload surface is incomplete.");
+  }
+  await alert.getByRole("button", { name: "Reload" }).click();
+  await terminalReloadPage.waitForSelector(
+    '.demo-root[data-frame="terminal-current-single"]',
+  );
+  if (
+    (await terminalReloadPage.getByRole("alert").count()) !== 0 ||
+    !(await terminalReloadPage
+      .getByRole("textbox", { name: "Terminal input" })
+      .isVisible())
+  ) {
+    throw new Error(
+      "Electron Terminal reload did not restore a fresh interactive shell.",
+    );
+  }
+} finally {
+  await terminalReloadApp.close();
+}
+
+const backgroundTerminalScene = {
+  frame: "terminal-current-background-list",
+  id: "electron-current-background-terminal",
+  scenario: "terminal-lifecycle",
+};
+const {
+  app: backgroundTerminalApp,
+  page: backgroundTerminalPage,
+} = await launchScene(backgroundTerminalScene, { capture: false });
+
+try {
+  const summary = backgroundTerminalPage.getByTestId(
+    "terminal-current-background-summary",
+  );
+  const openProcess = summary.locator(
+    ".codex-ui-terminal-process-list__open",
+  );
+  if (
+    !(await openProcess.textContent())?.includes(
+      "terminal-background-handle",
+    ) ||
+    (await backgroundTerminalPage
+      .locator(".codex-ui-app-shell[data-bottom-panel-open]")
+      .count()) !== 0
+  ) {
+    throw new Error("Electron background process summary is incomplete.");
+  }
+  await openProcess.click();
+  await backgroundTerminalPage.waitForSelector(
+    '[data-testid="terminal-current-background-panel"]',
+  );
+  const backgroundOutput = await backgroundTerminalPage
+    .getByRole("log", { name: "Background terminal output" })
+    .textContent();
+  if (
+    !backgroundOutput?.includes("terminal-background-handle-066") ||
+    !backgroundOutput.includes("terminal-background-handle-110") ||
+    (await backgroundTerminalPage
+      .locator(".codex-ui-app-shell[data-bottom-panel-open]")
+      .count()) !== 0
+  ) {
+    throw new Error(
+      "Electron background process did not open in the side-panel Terminal.",
+    );
+  }
+  await backgroundTerminalPage
+    .locator(".codex-ui-workspace-panel__tab-close")
+    .click();
+  await backgroundTerminalPage.waitForSelector(
+    '[data-testid="terminal-current-background-summary"]',
+  );
+  await backgroundTerminalPage
+    .getByTestId("terminal-current-background-summary")
+    .locator(".codex-ui-terminal-process-list__open")
+    .click();
+  if (
+    !(await backgroundTerminalPage
+      .getByTestId("terminal-current-background-panel")
+      .isVisible())
+  ) {
+    throw new Error(
+      "Electron background Terminal could not be reopened while its process stayed active.",
+    );
+  }
+} finally {
+  await backgroundTerminalApp.close();
+}
+
 const pullRequestScene = {
   frame: "pr-summary-ready",
   id: "electron-pull-request-detail",

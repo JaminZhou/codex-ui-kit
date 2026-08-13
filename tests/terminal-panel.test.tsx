@@ -7,6 +7,7 @@ import {
   TerminalPanel,
   TerminalPrompt,
   TerminalProcessList,
+  TerminalReloadNotice,
   TerminalSession,
   TerminalTranscript,
   TerminalWorkspaceMismatchNotice,
@@ -89,6 +90,43 @@ describe("terminal panel", () => {
         "disabled",
       ),
     ).toBe(true);
+  });
+
+  it("separates a crashed shell reload from command exit status", () => {
+    const onReload = vi.fn();
+    render(
+      <TerminalSession
+        entries={[
+          { id: "command", kind: "command", text: "exit 7" },
+        ]}
+        label="Failed terminal"
+        onReload={onReload}
+        status="failed"
+        value=""
+      />,
+    );
+
+    expect(
+      screen.getByRole("alert").textContent,
+    ).toContain("The terminal encountered an error");
+    expect(screen.queryByRole("log")).toBeNull();
+    expect(screen.queryByRole("textbox")).toBeNull();
+    fireEvent.click(screen.getByRole("button", { name: "Reload" }));
+    expect(onReload).toHaveBeenCalledOnce();
+  });
+
+  it("keeps the terminal reload notice host-owned", () => {
+    render(
+      <TerminalReloadNotice
+        description="Host disconnected"
+        title="Terminal unavailable"
+      />,
+    );
+
+    expect(screen.getByRole("alert").textContent).toContain(
+      "Terminal unavailableHost disconnected",
+    );
+    expect(screen.queryByRole("button", { name: "Reload" })).toBeNull();
   });
 
   it("coordinates multiple controlled sessions, close, create, and restore", () => {
@@ -275,6 +313,7 @@ describe("terminal panel", () => {
             id: "docs",
             label: "Docs",
             status: "exited",
+            view: "background",
           },
         ]}
       />,
@@ -285,7 +324,7 @@ describe("terminal panel", () => {
     ).toBeTruthy();
     expect(screen.getByText("Running")).toBeTruthy();
     expect(screen.getByText("Failed")).toBeTruthy();
-    expect(screen.getByText("Exited")).toBeTruthy();
+    expect(screen.queryByText("Exited")).toBeNull();
     fireEvent.click(
       screen.getByRole("button", {
         name: "Development server pnpm dev Running",
