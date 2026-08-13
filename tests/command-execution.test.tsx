@@ -221,6 +221,22 @@ describe("CommandExecution", () => {
     ).toHaveLength(1);
   });
 
+  it("wraps host-provided image terminal icons without changing their semantics", () => {
+    const { container } = render(
+      <CommandExecution
+        command="pwd"
+        status="completed"
+        terminalIcon={<img alt="" height={64} src="terminal.png" width={64} />}
+      />,
+    );
+
+    expect(
+      container.querySelector(
+        '.codex-ui-command-execution__icon[aria-hidden="true"] > img[width="64"][height="64"]',
+      ),
+    ).toBeTruthy();
+  });
+
   it("can replace or omit the sampled shell label", () => {
     const custom = renderToStaticMarkup(
       <CommandExecution

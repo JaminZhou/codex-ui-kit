@@ -7800,7 +7800,7 @@ summary.codex-ui-activity__header::after {
   width: 1rem;
 }
 
-.codex-ui-command-execution__icon > svg {
+.codex-ui-command-execution__icon > :is(img, svg) {
   display: block;
   height: 100%;
   width: 100%;
