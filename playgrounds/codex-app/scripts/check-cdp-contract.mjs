@@ -1240,21 +1240,24 @@ for (const scene of selectedScenes) {
           name: "PreToolUse enabled",
         });
         await preTool.click();
-        interaction = await page.evaluate(() => ({
-          preToolChecked: document
-            .querySelector('[role="switch"][aria-label="PreToolUse enabled"]')
-            ?.getAttribute("aria-checked"),
-          preToolDisabled:
-            document.querySelector('[role="switch"][aria-label="PreToolUse enabled"]')
-              ?.disabled,
-          stopChecked: document
-            .querySelector('[role="switch"][aria-label="Stop enabled"]')
-            ?.getAttribute("aria-checked"),
-          trustVisible: Boolean(
-            document.querySelector(".codex-ui-hooks-settings__entry-actions")
-              ?.textContent?.includes("Trust"),
-          ),
-        }));
+        interaction = await page.evaluate(() => {
+          const preToolSwitch = document.querySelector(
+            '[role="switch"][aria-label="PreToolUse enabled"]',
+          );
+          const preToolEntry = preToolSwitch?.closest(
+            ".codex-ui-hooks-settings__entry",
+          );
+          return {
+            preToolChecked: preToolSwitch?.getAttribute("aria-checked"),
+            preToolDisabled: preToolSwitch?.disabled,
+            stopChecked: document
+              .querySelector('[role="switch"][aria-label="Stop enabled"]')
+              ?.getAttribute("aria-checked"),
+            trustVisible: [
+              ...(preToolEntry?.querySelectorAll("button") ?? []),
+            ].some((button) => button.textContent?.trim() === "Trust"),
+          };
+        });
         if (
           interaction.stopChecked !== "false" ||
           interaction.preToolDisabled !== false ||
