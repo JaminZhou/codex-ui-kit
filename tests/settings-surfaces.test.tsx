@@ -485,7 +485,16 @@ describe("settings surfaces", () => {
     expect(automaticReview.getAttribute("aria-checked")).toBe("false");
 
     fireEvent.click(screen.getByRole("button", { name: "Review trigger" }));
-    fireEvent.click(screen.getByRole("menuitem", { name: "On every push" }));
+    expect(
+      screen
+        .getByRole("menuitemradio", { name: "On PR open" })
+        .getAttribute("aria-checked"),
+    ).toBe("true");
+    const everyPush = screen.getByRole("menuitemradio", {
+      name: "On every push",
+    });
+    expect(everyPush.getAttribute("aria-checked")).toBe("false");
+    fireEvent.click(everyPush);
     expect(screen.getByRole("button", { name: "Review trigger" }).textContent).toContain(
       "On every push",
     );

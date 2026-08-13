@@ -1049,11 +1049,10 @@ export function CodeReviewSettingsPage({
                 {(Object.keys(codeReviewTriggerLabels) as CodeReviewTriggerPolicy[]).map(
                   (policy) => (
                     <MenuItem
-                      aria-current={
-                        value.triggerPolicy === policy ? "true" : undefined
-                      }
+                      aria-checked={value.triggerPolicy === policy}
                       key={policy}
                       onSelect={() => update("triggerPolicy", policy)}
+                      role="menuitemradio"
                     >
                       {codeReviewTriggerLabels[policy]}
                     </MenuItem>
