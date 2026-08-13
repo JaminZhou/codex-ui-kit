@@ -10131,9 +10131,19 @@ try {
     .getByRole("switch", { name: "Enable automatic code review" })
     .click();
   await codeReviewMain.getByRole("button", { name: "Review trigger" }).click();
-  await codeReviewSettingsPage
-    .getByRole("menuitem", { name: "Smart trigger" })
-    .click();
+  const selectedTrigger = codeReviewSettingsPage.getByRole("menuitemradio", {
+    name: "On PR open",
+  });
+  const smartTrigger = codeReviewSettingsPage.getByRole("menuitemradio", {
+    name: "Smart trigger",
+  });
+  if (
+    (await selectedTrigger.getAttribute("aria-checked")) !== "true" ||
+    (await smartTrigger.getAttribute("aria-checked")) !== "false"
+  ) {
+    throw new Error("Electron review trigger radio semantics are incomplete.");
+  }
+  await smartTrigger.click();
   if (
     (await codeReviewMain
       .getByRole("switch", { name: "Enable automatic code review" })

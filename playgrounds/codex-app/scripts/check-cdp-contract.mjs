@@ -1342,7 +1342,19 @@ for (const scene of selectedScenes) {
       });
       await automatic.click();
       await page.getByRole("button", { name: "Review trigger" }).click();
-      await page.getByRole("menuitem", { name: "On every push" }).click();
+      const selectedTrigger = page.getByRole("menuitemradio", {
+        name: "On PR open",
+      });
+      const everyPushTrigger = page.getByRole("menuitemradio", {
+        name: "On every push",
+      });
+      if (
+        (await selectedTrigger.getAttribute("aria-checked")) !== "true" ||
+        (await everyPushTrigger.getAttribute("aria-checked")) !== "false"
+      ) {
+        throw new Error(`${scene.id}: review trigger radio semantics failed.`);
+      }
+      await everyPushTrigger.click();
       await page
         .getByRole("switch", { name: "Enable exhaustive code review" })
         .click();
