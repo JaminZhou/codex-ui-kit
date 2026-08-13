@@ -3258,7 +3258,7 @@ export function App() {
       return;
     }
     if (isCurrentCommandInterruptionReplay) {
-      if (state.status === "running") return;
+      if (activeFrame !== "command-interruption-settled") return;
       cancelReplaySubmitTimer();
       setReplayComposerSubmitting(true);
       setComposerOverlay(null);

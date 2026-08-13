@@ -8105,10 +8105,24 @@ try {
     );
   }
 
+  const prematureRecoveryPrompt =
+    "Do not use tools. Reply with exactly: INTERRUPTION RECOVERY ACCEPTED";
+  const prematureComposer = commandInterruptionPage.getByRole("textbox", {
+    name: "Message composer",
+  });
+  await prematureComposer.fill(prematureRecoveryPrompt);
+  await prematureComposer.press("Enter");
   await commandInterruptionPage.waitForTimeout(1_100);
   await commandInterruptionPage
     .getByRole("button", { name: "Stop all background terminals" })
     .waitFor({ state: "visible" });
+  if (
+    (await commandInterruptionPage
+      .locator('.demo-root[data-frame="command-interruption-stopping"]')
+      .count()) !== 1
+  ) {
+    throw new Error("Current command interruption accepted premature recovery.");
+  }
   await commandInterruptionPage
     .getByRole("button", { name: "Stop all background terminals" })
     .click();
@@ -8118,8 +8132,7 @@ try {
   const composer = commandInterruptionPage.getByRole("textbox", {
     name: "Message composer",
   });
-  const recoveryPrompt =
-    "Do not use tools. Reply with exactly: INTERRUPTION RECOVERY ACCEPTED";
+  const recoveryPrompt = prematureRecoveryPrompt;
   await composer.fill(recoveryPrompt);
   await composer.press("Enter");
   await commandInterruptionPage.waitForSelector(

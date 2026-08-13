@@ -266,8 +266,17 @@ try {
   expect(stopping.rootText.includes("You stopped after 20s"), "interruption summary");
   expect(stopping.rootText.includes("Background terminal stopped with"), "background stopping summary");
 
+  await page.type(
+    '.codex-ui-composer textarea[aria-label="Message"]',
+    "CURRENT INTERRUPTION RECOVERY",
+  );
+  await page.keyboard.press("Enter");
   await new Promise((resolve) => setTimeout(resolve, 1_100));
   await page.waitForSelector('[aria-label="Stop all background terminals"]');
+  expect(
+    (await snapshot()).interruptionPhase === "stopping",
+    "stopping rejects premature recovery submission",
+  );
   await page.click('[aria-label="Stop all background terminals"]');
   await page.waitForFunction(
     () =>
@@ -281,10 +290,6 @@ try {
   expect(settled.stopAll === null && settled.stopProcess === null, "background controls removed");
   expect(settled.rootText.includes("Ran for i in"), "settled command summary");
 
-  await page.type(
-    '.codex-ui-composer textarea[aria-label="Message"]',
-    "CURRENT INTERRUPTION RECOVERY",
-  );
   await page.waitForFunction(
     () => {
       const submit = document.querySelector(
