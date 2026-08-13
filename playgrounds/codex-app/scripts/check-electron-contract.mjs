@@ -3427,23 +3427,31 @@ const { app: terminalReloadApp, page: terminalReloadPage } =
   await launchScene(terminalReloadScene, { capture: false });
 
 try {
-  const alert = terminalReloadPage.getByRole("alert");
+  const terminalReloadPanel = terminalReloadPage.getByTestId("terminal-panel");
+  const alert = terminalReloadPanel.getByRole("alert");
+  const reloadContract = {
+    alertText: await alert.textContent(),
+    logCount: await terminalReloadPanel.getByRole("log").count(),
+    textboxCount: await terminalReloadPanel.getByRole("textbox").count(),
+  };
   if (
-    !(await alert.textContent())?.includes(
+    !reloadContract.alertText?.includes(
       "Try reloading the terminal to continue",
     ) ||
-    (await terminalReloadPage.getByRole("log").count()) !== 0 ||
-    (await terminalReloadPage.getByRole("textbox").count()) !== 0
+    reloadContract.logCount !== 0 ||
+    reloadContract.textboxCount !== 0
   ) {
-    throw new Error("Electron Terminal reload surface is incomplete.");
+    throw new Error(
+      `Electron Terminal reload surface is incomplete: ${JSON.stringify(reloadContract)}`,
+    );
   }
   await alert.getByRole("button", { name: "Reload" }).click();
   await terminalReloadPage.waitForSelector(
     '.demo-root[data-frame="terminal-current-single"]',
   );
   if (
-    (await terminalReloadPage.getByRole("alert").count()) !== 0 ||
-    !(await terminalReloadPage
+    (await terminalReloadPanel.getByRole("alert").count()) !== 0 ||
+    !(await terminalReloadPanel
       .getByRole("textbox", { name: "Terminal input" })
       .isVisible())
   ) {
