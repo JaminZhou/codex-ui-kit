@@ -144,7 +144,7 @@ export const AgentThreadViewport = forwardRef<
   useLayoutEffect(() => {
     const viewport = viewportRef.current;
     if (!viewport || renderedLatestOrigin === latestOrigin) return;
-    if (!followingRef.current) {
+    if (!autoFollow || !followingRef.current) {
       pendingOriginDistanceRef.current =
         renderedLatestOrigin === "start"
           ? Math.abs(viewport.scrollTop)
@@ -156,7 +156,7 @@ export const AgentThreadViewport = forwardRef<
             );
     }
     setRenderedLatestOrigin(latestOrigin);
-  }, [latestOrigin, renderedLatestOrigin]);
+  }, [autoFollow, latestOrigin, renderedLatestOrigin]);
 
   useLayoutEffect(() => {
     const viewport = viewportRef.current;

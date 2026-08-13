@@ -171,6 +171,42 @@ describe("ConversationThreadShell", () => {
     expect(viewport.hasAttribute("data-following")).toBe(false);
   });
 
+  it("preserves the latest position across recovery when auto-follow is disabled", () => {
+    const { container, rerender } = render(
+      <ConversationThreadShell
+        composer={<span>Composer</span>}
+        header={<span>Header</span>}
+        isRunning
+        viewportProps={{ autoFollow: false }}
+      >
+        Streaming timeline
+      </ConversationThreadShell>,
+    );
+    const viewport = container.querySelector<HTMLDivElement>(
+      ".codex-ui-conversation-thread-shell__viewport",
+    )!;
+    Object.defineProperties(viewport, {
+      clientHeight: { configurable: true, value: 200 },
+      scrollHeight: { configurable: true, value: 600 },
+      scrollTop: { configurable: true, value: 0, writable: true },
+    });
+    expect(viewport.getAttribute("data-following")).toBe("true");
+
+    rerender(
+      <ConversationThreadShell
+        composer={<span>Composer</span>}
+        header={<span>Header</span>}
+        viewportProps={{ autoFollow: false }}
+      >
+        Completed timeline
+      </ConversationThreadShell>,
+    );
+
+    expect(viewport.getAttribute("data-latest-origin")).toBe("end");
+    expect(viewport.scrollTop).toBe(400);
+    expect(viewport.getAttribute("data-following")).toBe("true");
+  });
+
   it("honors an explicit latest origin while running", () => {
     const { container } = render(
       <ConversationThreadShell
