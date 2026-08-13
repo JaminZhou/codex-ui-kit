@@ -792,7 +792,7 @@ The current-product mutation itself remains a separate runtime gate until the
 isolated native project selector can attach the disposable repository. Raw
 screenshots and product project names remain local-only.
 
-## Current Settings, Git, and Appearance slices
+## Current Settings, Git, Appearance, and General slices
 
 - Branch → Set prefix now opens the independent full-page `SettingsShell` and
   `GitSettingsPage`; Back restores the app and the branch workflow continues.
@@ -815,6 +815,22 @@ screenshots and product project names remain local-only.
 - Optional current-product Appearance gates pass at 1.2787% wide, 1.8977% at
   720px, and 3.4665% for Preferences after ownership masks. Product Dock
   rasters remain local-only and are supplied through public icon slots.
+- The General route adds 21 current rows across Permissions, General,
+  Composer, Popout Window, and Notifications. Its controlled fixture covers
+  five single-select menus with exposed current-value descriptions and radio
+  checked states, 66 searchable language choices in a dialog-plus-listbox hierarchy
+  with native Home/End caret editing, twelve switches, two keyboard
+  groups, and locally controlled Popout shortcut capture/formatting/clear/cancel
+  without claiming the observed host selections are product defaults.
+- Browser/CDP covers wide, light, 720px, hotkey, and bottom-scrolled frames;
+  Electron repeats the interaction and retains General state while switching
+  through Git and Appearance while clearing transient shortcut capture on
+  route exit and normalizing initial hotkey/bottom snapshot frames on return.
+  Six reviewed frames extend the matrix to 180,
+  including a dedicated 720px shortcut-capture frame.
+  Optional product gates accept local-only wide, 720×820 compact, hotkey, and
+  bottom screenshots and pass at 4.6143%, 6.7412%, 4.7654%, and 4.8818%; raw
+  current-product evidence is never tracked.
 
 ## Current environment-entry slice
 
@@ -906,6 +922,20 @@ CODEX_UI_KIT_APPEARANCE_SETTINGS_COMPACT_REFERENCE=/absolute/path/to/appearance-
 CODEX_UI_KIT_APPEARANCE_SETTINGS_PREFERENCES_REFERENCE=/absolute/path/to/appearance-preferences.png \
   pnpm --filter @codex-ui-kit/codex-app-playground check:visual -- \
   --scenes=workspace-appearance-settings,workspace-appearance-settings-compact,workspace-appearance-settings-preferences
+```
+
+The General gates accept unmodified 1180×820 wide, shortcut-capture, and
+bottom references plus the unmodified 720×820 compact capture (the gate uses
+its top 720×680 crop). No content masks are applied, so typography, wrapping,
+controls, cards, sidebar, and scroll position stay in the measured ratio:
+
+```bash
+CODEX_UI_KIT_GENERAL_SETTINGS_REFERENCE=/absolute/path/to/general-wide.png \
+CODEX_UI_KIT_GENERAL_SETTINGS_COMPACT_REFERENCE=/absolute/path/to/general-720x820.png \
+CODEX_UI_KIT_GENERAL_SETTINGS_HOTKEY_REFERENCE=/absolute/path/to/general-hotkey.png \
+CODEX_UI_KIT_GENERAL_SETTINGS_BOTTOM_REFERENCE=/absolute/path/to/general-bottom.png \
+  pnpm --filter @codex-ui-kit/codex-app-playground check:visual -- \
+  --scenes=workspace-general-settings,workspace-general-settings-compact,workspace-general-settings-hotkey,workspace-general-settings-bottom
 ```
 
 To run the optional current-build multi-file pixel gate, keep the raw

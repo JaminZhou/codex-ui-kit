@@ -74,7 +74,7 @@ observation from a previous build remains historical evidence.
   previous-build regression evidence and have been downgraded from `verified`
   to `partial_legacy` until they are reached again on the current fingerprint.
 
-Current inventory: 88 surface groups; 24 have current-build runtime evidence, 47 have previous-build-only runtime evidence, 17 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 23 groups and Electron verification covers 23.
+Current inventory: 88 surface groups; 25 have current-build runtime evidence, 46 have previous-build-only runtime evidence, 17 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 24 groups and Electron verification covers 24.
 Prior acceptance outside those 23 sampled current-build groups remains
 recorded as `partial_legacy` until current-build re-observation.
 
@@ -409,6 +409,22 @@ Appearance; four reviewed internal scenes bring the matrix to 174. Local-only
 wide, 720px, and bottom-Preferences comparisons differ by 1.2787%, 1.8977%,
 and 3.4665% after ownership masks. General, Hooks, and every other Settings
 page remain independently open.
+
+The next current-build slice reaches General from top to bottom and records 21
+rows across Permissions, General, Composer, Popout Window, and Notifications.
+`GeneralSettingsPage` is controlled and keeps file-opening behavior, license
+presentation, shortcut registration, notifications, and persistence
+host-owned. Browser/CDP covers all five menus, the searchable 66-language
+list, twelve switches, both keyboard-operable segmented choices, shortcut
+capture/cancel, 1180px and 720px geometry, light paint, and bottom scroll.
+Electron repeats the route and proves General, Git, and Appearance state remain
+independent across navigation. Six reviewed frames bring the matrix to 180,
+including a dedicated 720px shortcut-capture frame;
+optional current-product comparisons cover the full wide, compact top-crop,
+shortcut-capture, and bottom frames at 4.6143%, 6.7412%, 4.7654%, and 4.8818%
+without committing raw screenshots. The captured values are observed host
+fixtures rather than product defaults.
+Hooks/code review and all remaining Settings pages stay independently open.
 
 The current-thread slice adds `ConversationThreadShell`, which composes the
 existing header, scroll-following timeline, messages, and Composer into one

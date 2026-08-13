@@ -5230,6 +5230,422 @@ try {
     );
   }
   await gitSettingsNavigation
+    .getByRole("button", { name: "General", exact: true })
+    .click();
+  const generalSettingsMain = codingWorkspacePage.getByRole("main");
+  await generalSettingsMain
+    .getByRole("heading", { level: 1, name: "General", exact: true })
+    .waitFor();
+  const generalGeometry = await generalSettingsMain.evaluate((main) => {
+    const heading = main
+      .querySelector(".codex-ui-general-settings > h1")
+      ?.getBoundingClientRect();
+    const cards = Array.from(
+      main.querySelectorAll(".codex-ui-general-settings__card"),
+      (element) => {
+        const rect = element.getBoundingClientRect();
+        return { height: rect.height, width: rect.width };
+      },
+    );
+    return {
+      cards,
+      heading: heading ? { top: heading.top, width: heading.width } : null,
+      rowCount: main.querySelectorAll(".codex-ui-general-settings__row").length,
+      sectionHeadings: Array.from(
+        main.querySelectorAll(".codex-ui-general-settings__section > h2"),
+        (heading) => heading.textContent,
+      ),
+    };
+  });
+  if (
+    (await gitSettingsNavigation
+      .getByRole("button", { name: "General", exact: true })
+      .getAttribute("aria-current")) !== "page" ||
+    generalGeometry.heading?.top !== 66 ||
+    generalGeometry.heading?.width !== 768 ||
+    generalGeometry.cards.length !== 5 ||
+    generalGeometry.cards.some(({ width }) => width !== 768) ||
+    generalGeometry.rowCount !== 21 ||
+    JSON.stringify(generalGeometry.sectionHeadings) !==
+      JSON.stringify([
+        "Permissions",
+        "General",
+        "Composer",
+        "Popout Window",
+        "Notifications",
+      ]) ||
+    (await generalSettingsMain.getByRole("switch").count()) !== 12 ||
+    (await generalSettingsMain
+      .locator('.codex-ui-general-settings__segmented[role="group"]')
+      .count()) !== 2
+  ) {
+    throw new Error(
+      `Electron General Settings route is incomplete: ${JSON.stringify(generalGeometry)}.`,
+    );
+  }
+  const readGeneralFocusedLabel = async (label) => {
+    await codingWorkspacePage.waitForFunction(
+      (expected) =>
+        document.activeElement?.getAttribute("aria-label") === expected,
+      label,
+    );
+    return codingWorkspacePage.evaluate(
+      () => document.activeElement?.getAttribute("aria-label"),
+    );
+  };
+  const readGeneralMenuState = () =>
+    codingWorkspacePage.getByRole("menuitemradio").evaluateAll((items) =>
+      items.map((item) => ({
+        checked: item.getAttribute("aria-checked"),
+        label: item.textContent?.trim(),
+      })),
+    );
+  const readGeneralDescribedValue = (label) =>
+    generalSettingsMain.getByRole("button", { name: label }).evaluate((control) => {
+      const descriptionId = control.getAttribute("aria-describedby");
+      return descriptionId
+        ? document.getElementById(descriptionId)?.textContent?.trim()
+        : null;
+    });
+  const generalMenuFocus = {};
+  const generalMenuStates = {};
+  const autoReviewSwitch = generalSettingsMain.getByRole("switch", {
+    name: "Show Auto-review in the composer",
+  });
+  await autoReviewSwitch.click();
+  await generalSettingsMain
+    .getByRole("button", { name: "Default file open destination" })
+    .click();
+  const fileDestinations = codingWorkspacePage.getByRole("menuitemradio");
+  generalMenuStates.fileDestination = await readGeneralMenuState();
+  if (
+    (await fileDestinations.count()) !== 7 ||
+    !(await fileDestinations.first().textContent())?.includes("VS Code") ||
+    !(await fileDestinations.last().textContent())?.includes("Xcode")
+  ) {
+    throw new Error("Electron General file destination menu is incomplete.");
+  }
+  const xcodeDestination = fileDestinations.filter({ hasText: "Xcode" });
+  await xcodeDestination.focus();
+  await xcodeDestination.press("Enter");
+  generalMenuFocus.fileDestination = await readGeneralFocusedLabel(
+    "Default file open destination",
+  );
+  await generalSettingsMain.getByRole("button", { name: "Language" }).click();
+  const languageSearch = codingWorkspacePage.getByRole("searchbox", {
+    name: "Search languages",
+  });
+  const generalLanguageStructure = await codingWorkspacePage.evaluate(() => {
+    const dialog = document.querySelector(
+      '.codex-ui-general-settings__language-popover[role="dialog"]',
+    );
+    const listbox = dialog?.querySelector('[role="listbox"]');
+    const search = dialog?.querySelector('input[aria-label="Search languages"]');
+    return {
+      controlsListbox:
+        search?.getAttribute("aria-controls") === listbox?.getAttribute("id"),
+      dialogContainsListbox: Boolean(dialog && listbox && dialog.contains(listbox)),
+      dialogContainsSearch: Boolean(dialog && search && dialog.contains(search)),
+      listboxContainsSearch: Boolean(listbox && search && listbox.contains(search)),
+    };
+  });
+  await languageSearch.fill("简体");
+  await codingWorkspacePage.evaluate(() => {
+    window.__codexGeneralLanguageKeyEvents = [];
+    document.addEventListener("keydown", (event) => {
+      if (event.key !== "Home" && event.key !== "End") return;
+      window.__codexGeneralLanguageKeyEvents.push({
+        defaultPrevented: event.defaultPrevented,
+        key: event.key,
+      });
+    });
+  });
+  await languageSearch.press("Home");
+  const generalLanguageHomeFocus = await codingWorkspacePage.evaluate(
+    () => document.activeElement?.getAttribute("aria-label"),
+  );
+  await languageSearch.press("End");
+  const generalLanguageEditing = await codingWorkspacePage.evaluate(
+    (homeFocus) => ({
+      endFocus: document.activeElement?.getAttribute("aria-label"),
+      events: window.__codexGeneralLanguageKeyEvents,
+      homeFocus,
+    }),
+    generalLanguageHomeFocus,
+  );
+  await languageSearch.press("ArrowDown");
+  const generalLanguageArrowFocus = await codingWorkspacePage.evaluate(
+    () => document.activeElement?.getAttribute("role"),
+  );
+  const simplifiedChinese = codingWorkspacePage.getByRole("option", {
+    name: "简体中文",
+    exact: true,
+  });
+  await simplifiedChinese.focus();
+  await simplifiedChinese.press("Enter");
+  generalMenuFocus.language = await readGeneralFocusedLabel("Language");
+  await generalSettingsMain.getByRole("button", { name: "Language" }).click();
+  await languageSearch.focus();
+  await languageSearch.press("Escape");
+  generalMenuFocus.languageEscape = await readGeneralFocusedLabel("Language");
+  const bottomTerminal = generalSettingsMain.getByRole("button", {
+    name: "Bottom",
+    exact: true,
+  });
+  await generalSettingsMain.getByRole("button", { name: "Language" }).click();
+  await codingWorkspacePage
+    .getByRole("searchbox", { name: "Search languages" })
+    .waitFor();
+  await bottomTerminal.click();
+  generalMenuFocus.languageOutside = await readGeneralFocusedLabel("Bottom");
+  await bottomTerminal.focus();
+  await bottomTerminal.press("ArrowRight");
+  await generalSettingsMain.getByRole("button", { name: "Speed" }).click();
+  const speedOptions = codingWorkspacePage.getByRole("menuitemradio");
+  generalMenuStates.speed = await readGeneralMenuState();
+  if ((await speedOptions.count()) !== 2) {
+    throw new Error("Electron General speed menu is incomplete.");
+  }
+  const fastSpeed = speedOptions.filter({ hasText: /^Fast/ });
+  await fastSpeed.focus();
+  await fastSpeed.press("Enter");
+  generalMenuFocus.speed = await readGeneralFocusedLabel("Speed");
+  const contextUsageSwitch = generalSettingsMain.getByRole("switch", {
+    name: "Show context window usage in the composer",
+  });
+  await contextUsageSwitch.click();
+  await generalSettingsMain
+    .getByRole("button", { name: "Send shortcut" })
+    .click();
+  const commandEnter = codingWorkspacePage
+    .getByRole("menuitemradio")
+    .filter({ hasText: "⌘ + Enter always" });
+  generalMenuStates.sendShortcut = await readGeneralMenuState();
+  await commandEnter.focus();
+  await commandEnter.press("Enter");
+  generalMenuFocus.sendShortcut = await readGeneralFocusedLabel("Send shortcut");
+  const queueBehavior = generalSettingsMain.getByRole("button", {
+    name: "Queue",
+    exact: true,
+  });
+  await queueBehavior.focus();
+  await queueBehavior.press("ArrowRight");
+  await generalSettingsMain
+    .getByRole("button", { name: "Set shortcut for Popout Window hotkey" })
+    .click();
+  await generalSettingsMain
+    .getByRole("button", { name: "Press shortcut", exact: true })
+    .waitFor();
+  await codingWorkspacePage.waitForFunction(
+    () => document.activeElement?.textContent?.trim() === "Press shortcut",
+  );
+  const generalHotkeyRecord = generalSettingsMain.getByRole("button", {
+    name: "Press shortcut",
+    exact: true,
+  });
+  await generalHotkeyRecord.press("Meta");
+  await generalHotkeyRecord.press("Meta+Shift+K");
+  const generalHotkeyEdit = generalSettingsMain.getByRole("button", {
+    name: "Set shortcut for Popout Window hotkey",
+  });
+  await codingWorkspacePage.waitForFunction(
+    () =>
+      document.activeElement?.getAttribute("aria-label") ===
+      "Set shortcut for Popout Window hotkey",
+  );
+  const generalHotkeyCaptured = await generalHotkeyEdit
+    .locator("span")
+    .first()
+    .textContent();
+  await generalHotkeyEdit.click();
+  await generalSettingsMain
+    .getByRole("button", { name: "Press shortcut", exact: true })
+    .press("Delete");
+  await codingWorkspacePage.waitForFunction(
+    () =>
+      document.activeElement?.getAttribute("aria-label") ===
+      "Set shortcut for Popout Window hotkey",
+  );
+  const generalHotkeyCleared = await generalHotkeyEdit
+    .locator("span")
+    .first()
+    .textContent();
+  await generalHotkeyEdit.click();
+  await generalSettingsMain
+    .getByRole("button", { name: "Press shortcut", exact: true })
+    .press("Meta+Shift+K");
+  await codingWorkspacePage.waitForFunction(
+    () =>
+      document.activeElement?.getAttribute("aria-label") ===
+      "Set shortcut for Popout Window hotkey",
+  );
+  await generalHotkeyEdit.click();
+  await generalSettingsMain
+    .getByRole("button", { name: "Press shortcut", exact: true })
+    .press("Escape");
+  await codingWorkspacePage.waitForFunction(
+    () =>
+      document.activeElement?.getAttribute("aria-label") ===
+      "Set shortcut for Popout Window hotkey",
+  );
+  const generalHotkeyEscapePreserved = await generalHotkeyEdit
+    .locator("span")
+    .first()
+    .textContent();
+  await generalHotkeyEdit.click();
+  await generalSettingsMain
+    .getByRole("button", { name: "Cancel", exact: true })
+    .click();
+  await codingWorkspacePage.waitForFunction(
+    () =>
+      document.activeElement?.getAttribute("aria-label") ===
+      "Set shortcut for Popout Window hotkey",
+  );
+  const generalHotkeyFocusRestored = await codingWorkspacePage.evaluate(
+    () => document.activeElement?.getAttribute("aria-label"),
+  );
+  await generalSettingsMain
+    .getByRole("button", { name: "Turn completion notifications" })
+    .click();
+  const alwaysNotifications = codingWorkspacePage.getByRole("menuitemradio", {
+    name: "Always",
+    exact: true,
+  });
+  generalMenuStates.completionNotifications = await readGeneralMenuState();
+  await alwaysNotifications.focus();
+  await alwaysNotifications.press("Enter");
+  generalMenuFocus.completionNotifications = await readGeneralFocusedLabel(
+    "Turn completion notifications",
+  );
+  const generalDescribedValues = Object.fromEntries(
+    await Promise.all(
+      [
+        "Default file open destination",
+        "Language",
+        "Speed",
+        "Send shortcut",
+        "Set shortcut for Popout Window hotkey",
+        "Turn completion notifications",
+      ].map(async (label) => [label, await readGeneralDescribedValue(label)]),
+    ),
+  );
+  await generalSettingsMain
+    .getByRole("button", { name: "View", exact: true })
+    .click();
+  await codingWorkspacePage.waitForFunction(
+    () =>
+      document.querySelector(".demo-settings-action-status")?.textContent ===
+      "Open source licenses requested",
+  );
+  const generalInteraction = await generalSettingsMain.evaluate((main, focus) => ({
+    autoReview: main
+      .querySelector('[role="switch"][aria-label="Show Auto-review in the composer"]')
+      ?.getAttribute("aria-checked"),
+    completionNotifications: main
+      .querySelector('button[aria-label="Turn completion notifications"]')
+      ?.textContent?.trim(),
+    contextUsage: main
+      .querySelector('[role="switch"][aria-label="Show context window usage in the composer"]')
+      ?.getAttribute("aria-checked"),
+    fileDestination: main
+      .querySelector('button[aria-label="Default file open destination"]')
+      ?.textContent?.trim(),
+    followUp: main
+      .querySelector('button[aria-label="Steer"]')
+      ?.getAttribute("aria-pressed"),
+    hotkeyCapture: Boolean(
+      main.querySelector(".codex-ui-general-settings__hotkey-capture"),
+    ),
+    hotkeyCaptured: focus.hotkeyCaptured,
+    hotkeyCleared: focus.hotkeyCleared,
+    hotkeyEscapePreserved: focus.hotkeyEscapePreserved,
+    hotkeyFocus: focus.hotkey,
+    language: main.querySelector('button[aria-label="Language"]')
+      ?.textContent?.trim(),
+    languageEditing: focus.languageEditing,
+    languageArrowFocus: focus.languageArrowFocus,
+    languageStructure: focus.languageStructure,
+    menuFocus: focus.menu,
+    menuStates: focus.menuStates,
+    describedValues: focus.describedValues,
+    sendShortcut: main.querySelector('button[aria-label="Send shortcut"]')
+      ?.textContent?.trim(),
+    speed: main.querySelector('button[aria-label="Speed"]')
+      ?.textContent?.trim(),
+    terminal: main
+      .querySelector('button[aria-label="Right"]')
+      ?.getAttribute("aria-pressed"),
+  }), {
+    hotkey: generalHotkeyFocusRestored,
+    hotkeyCaptured: generalHotkeyCaptured,
+    hotkeyCleared: generalHotkeyCleared,
+    hotkeyEscapePreserved: generalHotkeyEscapePreserved,
+    languageEditing: generalLanguageEditing,
+    languageArrowFocus: generalLanguageArrowFocus,
+    languageStructure: generalLanguageStructure,
+    menu: generalMenuFocus,
+    menuStates: generalMenuStates,
+    describedValues: generalDescribedValues,
+  });
+  if (
+    generalInteraction.autoReview !== "false" ||
+    generalInteraction.completionNotifications !== "Always⌄" ||
+    generalInteraction.contextUsage !== "true" ||
+    !generalInteraction.fileDestination?.includes("Xcode") ||
+    generalInteraction.followUp !== "true" ||
+    generalInteraction.hotkeyCapture ||
+    generalInteraction.hotkeyCaptured !== "⌘ ⇧ K" ||
+    generalInteraction.hotkeyCleared !== "Off" ||
+    generalInteraction.hotkeyEscapePreserved !== "⌘ ⇧ K" ||
+    generalInteraction.hotkeyFocus !== "Set shortcut for Popout Window hotkey" ||
+    generalInteraction.language !== "简体中文⌄" ||
+    generalInteraction.languageEditing.endFocus !== "Search languages" ||
+    generalInteraction.languageEditing.homeFocus !== "Search languages" ||
+    generalInteraction.languageEditing.events.length !== 2 ||
+    generalInteraction.languageEditing.events.some(
+      ({ defaultPrevented }) => defaultPrevented,
+    ) ||
+    generalInteraction.languageArrowFocus !== "option" ||
+    !generalInteraction.languageStructure.controlsListbox ||
+    !generalInteraction.languageStructure.dialogContainsListbox ||
+    !generalInteraction.languageStructure.dialogContainsSearch ||
+    generalInteraction.languageStructure.listboxContainsSearch ||
+    Object.values(generalInteraction.menuStates).some(
+      (states) =>
+        states.length === 0 ||
+        states.filter(({ checked }) => checked === "true").length !== 1,
+    ) ||
+    JSON.stringify(generalInteraction.describedValues) !==
+      JSON.stringify({
+        "Default file open destination": "Xcode",
+        Language: "简体中文",
+        Speed: "Fast",
+        "Send shortcut": "⌘ + Enter always",
+        "Set shortcut for Popout Window hotkey": "⌘ ⇧ K",
+        "Turn completion notifications": "Always",
+      }) ||
+    generalInteraction.menuFocus.completionNotifications !==
+      "Turn completion notifications" ||
+    generalInteraction.menuFocus.fileDestination !==
+      "Default file open destination" ||
+    generalInteraction.menuFocus.language !== "Language" ||
+    generalInteraction.menuFocus.languageEscape !== "Language" ||
+    generalInteraction.menuFocus.languageOutside !== "Bottom" ||
+    generalInteraction.menuFocus.sendShortcut !== "Send shortcut" ||
+    generalInteraction.menuFocus.speed !== "Speed" ||
+    generalInteraction.sendShortcut !== "⌘ + Enter always⌄" ||
+    !generalInteraction.speed?.includes("Fast") ||
+    generalInteraction.terminal !== "true"
+  ) {
+    throw new Error(
+      `Electron General Settings controls did not update controlled state: ${JSON.stringify(generalInteraction)}.`,
+    );
+  }
+  await generalHotkeyEdit.click();
+  await generalSettingsMain
+    .getByRole("button", { name: "Press shortcut", exact: true })
+    .waitFor();
+  await gitSettingsNavigation
     .getByRole("button", { name: "Git", exact: true })
     .click();
   await gitSettingsMain.getByRole("heading", { name: "Git", exact: true }).waitFor();
@@ -5242,6 +5658,45 @@ try {
       .getAttribute("aria-checked")) !== "true"
   ) {
     throw new Error("Electron Settings route switching lost Git controlled state.");
+  }
+  await gitSettingsNavigation
+    .getByRole("button", { name: "General", exact: true })
+    .click();
+  await generalSettingsMain
+    .getByRole("heading", { level: 1, name: "General", exact: true })
+    .waitFor();
+  await codingWorkspacePage.waitForFunction(
+    () =>
+      !document.querySelector(".codex-ui-general-settings__hotkey-capture") &&
+      document.activeElement?.textContent?.trim() === "General",
+  );
+  const generalRouteLifecycle = await generalSettingsMain.evaluate((main) => ({
+    hotkey: main
+      .querySelector('button[aria-label="Set shortcut for Popout Window hotkey"] span')
+      ?.textContent?.trim(),
+    hotkeyCapture: Boolean(
+      main.querySelector(".codex-ui-general-settings__hotkey-capture"),
+    ),
+    scrollTop: main.scrollTop,
+  }));
+  if (
+    generalRouteLifecycle.hotkey !== "⌘ ⇧ K" ||
+    generalRouteLifecycle.hotkeyCapture ||
+    generalRouteLifecycle.scrollTop !== 0
+  ) {
+    throw new Error(
+      `Electron General route retained transient shortcut capture: ${JSON.stringify(generalRouteLifecycle)}.`,
+    );
+  }
+  if (
+    (await generalSettingsMain
+      .getByRole("switch", { name: "Show Auto-review in the composer" })
+      .getAttribute("aria-checked")) !== "false" ||
+    (await generalSettingsMain
+      .getByRole("button", { name: "Right", exact: true })
+      .getAttribute("aria-pressed")) !== "true"
+  ) {
+    throw new Error("Electron Settings route switching lost General controlled state.");
   }
   await gitSettingsNavigation
     .getByRole("button", { name: "Appearance", exact: true })

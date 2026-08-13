@@ -260,6 +260,12 @@ All privileged behavior remains host-owned. The components never auto-approve co
   the complete Preferences card. Hosts own persistence, file import, copy
   behavior, and optional Dock icon nodes; no proprietary Dock artwork is
   bundled by the component.
+- `GeneralSettingsPage`: controlled Permissions, General, Composer, Popout
+  Window, and Notifications cards with host-supplied file destinations,
+  searchable languages, menus, switches, keyboard-operable segmented choices,
+  and shortcut-capture state. Hosts own persistence, file opening, license
+  presentation, global shortcut registration, and notification delivery;
+  observed playground values are fixtures rather than declared defaults.
 
 ## Workspace and pull-request workflow
 

@@ -1194,10 +1194,16 @@
       "ownership": "app",
       "packageEvidence": ["general-settings"],
       "runtimeStatus": "runtime_observed",
-      "runtimeEvidence": ["cdp:general-form-and-appearance-theme-preferences"],
-      "implementationStatus": "not_started",
-      "browserStatus": "not_started",
-      "electronStatus": "not_started",
+      "runtimeEvidence": [
+        "cdp:general-form-and-appearance-theme-preferences",
+        "cdp-26.803.61601:general-permissions-general-composer-popout-and-notifications",
+        "cdp-26.803.61601:general-five-menus-language-search-and-hotkey-capture",
+        "cdp-26.803.61601:general-wide-compact-bottom-scroll-geometry-and-regional-pixels",
+        "cdp-26.803.61601:general-controlled-browser-electron-interactions-and-route-persistence"
+      ],
+      "implementationStatus": "partial",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
       "priority": "p1"
     },
     {

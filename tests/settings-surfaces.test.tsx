@@ -5,9 +5,11 @@ import { useState } from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import {
   AppearanceSettingsPage,
+  GeneralSettingsPage,
   GitSettingsPage,
   SettingsShell,
   type AppearanceSettingsValue,
+  type GeneralSettingsValue,
   type GitSettingsValue,
 } from "../src";
 
@@ -116,6 +118,44 @@ function AppearanceFixture({
       onChange={setValue}
       onCopyTheme={onCopyTheme}
       onImportTheme={onImportTheme}
+      value={value}
+    />
+  );
+}
+
+const initialGeneralValue: GeneralSettingsValue = {
+  ambientSuggestions: true,
+  autoReview: true,
+  bottomPanel: true,
+  defaultFileOpenDestination: "vscode",
+  followUpBehavior: "queue",
+  fullAccess: true,
+  language: "auto",
+  permissionNotifications: true,
+  pluginsEnabled: true,
+  popoutHotkey: null,
+  popoutStandaloneChat: false,
+  preventSleepWhileRunning: false,
+  questionNotifications: true,
+  sendShortcut: "enter",
+  showContextWindowUsage: false,
+  showInMenuBar: true,
+  speed: "standard",
+  terminalLocation: "bottom",
+  turnCompletionNotifications: "unfocused",
+};
+
+function GeneralFixture({ onOpenSourceLicenses = () => undefined }) {
+  const [value, setValue] = useState(initialGeneralValue);
+  const [hotkeyCaptureActive, setHotkeyCaptureActive] = useState(false);
+  return (
+    <GeneralSettingsPage
+      elevatedRiskHref="https://help.openai.com/"
+      hotkeyCaptureActive={hotkeyCaptureActive}
+      onCancelHotkeyCapture={() => setHotkeyCaptureActive(false)}
+      onChange={setValue}
+      onOpenSourceLicenses={onOpenSourceLicenses}
+      onStartHotkeyCapture={() => setHotkeyCaptureActive(true)}
       value={value}
     />
   );
@@ -426,5 +466,261 @@ describe("settings surfaces", () => {
     expect(themeSections[0].getAttribute("aria-labelledby")).not.toBe(
       themeSections[1].getAttribute("aria-labelledby"),
     );
+  });
+
+  it("models all five current General settings groups as controlled inputs", () => {
+    render(<GeneralFixture />);
+
+    for (const heading of [
+      "Permissions",
+      "General",
+      "Composer",
+      "Popout Window",
+      "Notifications",
+    ]) {
+      expect(
+        screen.getByRole("heading", { level: 2, name: heading }),
+      ).toBeTruthy();
+    }
+    const defaultPermissions = screen.getByRole("switch", {
+      name: "Default permissions are always shown",
+    });
+    expect(defaultPermissions.hasAttribute("disabled")).toBe(true);
+    expect(defaultPermissions.getAttribute("aria-checked")).toBe("true");
+
+    const autoReview = screen.getByRole("switch", {
+      name: "Show Auto-review in the composer",
+    });
+    fireEvent.click(autoReview);
+    expect(autoReview.getAttribute("aria-checked")).toBe("false");
+
+    const showContext = screen.getByRole("switch", {
+      name: "Show context window usage in the composer",
+    });
+    fireEvent.click(showContext);
+    expect(showContext.getAttribute("aria-checked")).toBe("true");
+  });
+
+  it("exposes current General menus, searchable languages, and selections", () => {
+    render(<GeneralFixture />);
+
+    const describedValue = (control: HTMLElement) => {
+      const descriptionId = control.getAttribute("aria-describedby");
+      return descriptionId
+        ? document.getElementById(descriptionId)?.textContent
+        : null;
+    };
+
+    expect(
+      describedValue(
+        screen.getByRole("button", { name: "Default file open destination" }),
+      ),
+    ).toBe("VS Code");
+    expect(describedValue(screen.getByRole("button", { name: "Language" }))).toBe(
+      "Auto detect",
+    );
+    expect(
+      describedValue(
+        screen.getByRole("button", {
+          name: "Set shortcut for Popout Window hotkey",
+        }),
+      ),
+    ).toBe("Off");
+
+    fireEvent.click(
+      screen.getByRole("button", { name: "Default file open destination" }),
+    );
+    expect(screen.getAllByRole("menuitemradio")).toHaveLength(7);
+    expect(
+      screen.getByRole("menuitemradio", { name: /VS Code/ }).getAttribute(
+        "aria-checked",
+      ),
+    ).toBe("true");
+    const xcode = screen.getByRole("menuitemradio", { name: /Xcode/ });
+    expect(xcode.getAttribute("aria-checked")).toBe("false");
+    xcode.focus();
+    fireEvent.click(xcode);
+    const fileDestinationTrigger = screen.getByRole("button", {
+      name: "Default file open destination",
+    });
+    expect(fileDestinationTrigger.textContent).toContain("Xcode");
+    expect(describedValue(fileDestinationTrigger)).toBe("Xcode");
+    expect(document.activeElement).toBe(fileDestinationTrigger);
+
+    fireEvent.click(screen.getByRole("button", { name: "Language" }));
+    const languageSearch = screen.getByRole("searchbox", {
+      name: "Search languages",
+    });
+    const languageDialog = screen.getByRole("dialog", { name: "Language" });
+    const languageListbox = screen.getByRole("listbox", { name: "Languages" });
+    expect(languageDialog.contains(languageSearch)).toBe(true);
+    expect(languageDialog.contains(languageListbox)).toBe(true);
+    expect(languageListbox.contains(languageSearch)).toBe(false);
+    expect(languageSearch.getAttribute("aria-controls")).toBe(languageListbox.id);
+    fireEvent.change(languageSearch, { target: { value: "简体" } });
+    expect(screen.getAllByRole("option")).toHaveLength(1);
+    const languageOption = screen.getByRole("option", { name: "简体中文" });
+    fireEvent.keyDown(languageSearch, { key: "ArrowDown" });
+    expect(document.activeElement).toBe(languageOption);
+    fireEvent.keyDown(languageOption, { key: "Home" });
+    expect(document.activeElement).toBe(languageOption);
+    fireEvent.click(languageOption);
+    const languageTrigger = screen.getByRole("button", { name: "Language" });
+    expect(languageTrigger.textContent).toContain(
+      "简体中文",
+    );
+    expect(describedValue(languageTrigger)).toBe("简体中文");
+    expect(document.activeElement).toBe(languageTrigger);
+
+    fireEvent.click(languageTrigger);
+    const reopenedLanguageSearch = screen.getByRole("searchbox", {
+      name: "Search languages",
+    });
+    const reopenedLanguageListbox = screen.getByRole("listbox", {
+      name: "Languages",
+    });
+    fireEvent.change(reopenedLanguageSearch, { target: { value: "not-a-language" } });
+    const languageEmptyState = screen.getByText("No languages found");
+    expect(reopenedLanguageListbox.contains(languageEmptyState)).toBe(false);
+    fireEvent.keyDown(reopenedLanguageSearch, { key: "Escape" });
+
+    for (const [triggerName, itemName, selectedValue] of [
+      ["Speed", /Fast/, "Fast"],
+      ["Send shortcut", /⌘ \+ Enter always/, "⌘ + Enter always"],
+      ["Turn completion notifications", /^Always$/, "Always"],
+    ] as const) {
+      fireEvent.click(screen.getByRole("button", { name: triggerName }));
+      const radioItems = screen.getAllByRole("menuitemradio");
+      expect(
+        radioItems.filter(
+          (radioItem) => radioItem.getAttribute("aria-checked") === "true",
+        ),
+      ).toHaveLength(1);
+      const item = screen.getByRole("menuitemradio", { name: itemName });
+      item.focus();
+      fireEvent.click(item);
+      expect(document.activeElement).toBe(
+        screen.getByRole("button", { name: triggerName }),
+      );
+      expect(
+        describedValue(screen.getByRole("button", { name: triggerName })),
+      ).toBe(selectedValue);
+    }
+  });
+
+  it("does not steal General language focus when navigation closes the list", () => {
+    render(<GeneralFixture />);
+
+    const languageTrigger = screen.getByRole("button", { name: "Language" });
+    fireEvent.click(languageTrigger);
+    const languageSearch = screen.getByRole("searchbox", {
+      name: "Search languages",
+    });
+    languageSearch.focus();
+    fireEvent.keyDown(languageSearch, { key: "Tab" });
+    expect(
+      screen.queryByRole("searchbox", { name: "Search languages" }),
+    ).toBeNull();
+    expect(document.activeElement).not.toBe(languageTrigger);
+
+    fireEvent.click(languageTrigger);
+    const view = screen.getByRole("button", { name: "View" });
+    view.focus();
+    fireEvent.pointerDown(view);
+    expect(
+      screen.queryByRole("searchbox", { name: "Search languages" }),
+    ).toBeNull();
+    expect(document.activeElement).toBe(view);
+  });
+
+  it("supports General segmented keyboard flow and host-owned actions", () => {
+    const onOpenSourceLicenses = vi.fn();
+    render(<GeneralFixture onOpenSourceLicenses={onOpenSourceLicenses} />);
+
+    const bottom = screen.getByRole("button", { name: "Bottom" });
+    bottom.focus();
+    fireEvent.keyDown(bottom, { key: "ArrowRight" });
+    expect(
+      screen.getByRole("button", { name: "Right" }).getAttribute("aria-pressed"),
+    ).toBe("true");
+
+    fireEvent.click(screen.getByRole("button", { name: "View" }));
+    expect(onOpenSourceLicenses).toHaveBeenCalledOnce();
+
+    fireEvent.click(
+      screen.getByRole("button", {
+        name: "Set shortcut for Popout Window hotkey",
+      }),
+    );
+    const hotkeyCapture = screen.getByRole("button", { name: "Press shortcut" });
+    expect(hotkeyCapture).toBeTruthy();
+    expect(document.activeElement).toBe(hotkeyCapture);
+    fireEvent.keyDown(hotkeyCapture, { key: "Meta", metaKey: true });
+    expect(screen.getByRole("button", { name: "Press shortcut" })).toBeTruthy();
+    fireEvent.keyDown(hotkeyCapture, {
+      key: "k",
+      metaKey: true,
+      shiftKey: true,
+    });
+    let hotkeyEdit = screen.getByRole("button", {
+      name: "Set shortcut for Popout Window hotkey",
+    });
+    expect(hotkeyEdit.textContent).toContain("⌘ ⇧ K");
+    expect(document.activeElement).toBe(hotkeyEdit);
+
+    fireEvent.click(hotkeyEdit);
+    fireEvent.keyDown(screen.getByRole("button", { name: "Press shortcut" }), {
+      key: "Backspace",
+    });
+    hotkeyEdit = screen.getByRole("button", {
+      name: "Set shortcut for Popout Window hotkey",
+    });
+    expect(hotkeyEdit.textContent).toContain("Off");
+    expect(document.activeElement).toBe(hotkeyEdit);
+
+    fireEvent.click(hotkeyEdit);
+    fireEvent.keyDown(screen.getByRole("button", { name: "Press shortcut" }), {
+      key: "k",
+      metaKey: true,
+      shiftKey: true,
+    });
+    hotkeyEdit = screen.getByRole("button", {
+      name: "Set shortcut for Popout Window hotkey",
+    });
+    fireEvent.click(hotkeyEdit);
+    fireEvent.keyDown(screen.getByRole("button", { name: "Press shortcut" }), {
+      key: "Delete",
+    });
+    hotkeyEdit = screen.getByRole("button", {
+      name: "Set shortcut for Popout Window hotkey",
+    });
+    expect(hotkeyEdit.textContent).toContain("Off");
+
+    fireEvent.click(hotkeyEdit);
+    fireEvent.keyDown(screen.getByRole("button", { name: "Press shortcut" }), {
+      key: "k",
+      metaKey: true,
+      shiftKey: true,
+    });
+    hotkeyEdit = screen.getByRole("button", {
+      name: "Set shortcut for Popout Window hotkey",
+    });
+    fireEvent.click(hotkeyEdit);
+    fireEvent.keyDown(screen.getByRole("button", { name: "Press shortcut" }), {
+      key: "Escape",
+    });
+    hotkeyEdit = screen.getByRole("button", {
+      name: "Set shortcut for Popout Window hotkey",
+    });
+    expect(hotkeyEdit.textContent).toContain("⌘ ⇧ K");
+    expect(document.activeElement).toBe(hotkeyEdit);
+
+    fireEvent.click(hotkeyEdit);
+    fireEvent.click(screen.getByRole("button", { name: "Cancel" }));
+    hotkeyEdit = screen.getByRole("button", {
+      name: "Set shortcut for Popout Window hotkey",
+    });
+    expect(hotkeyEdit.textContent).toContain("⌘ ⇧ K");
+    expect(document.activeElement).toBe(hotkeyEdit);
   });
 });

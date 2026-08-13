@@ -115,6 +115,23 @@ The authoritative current-build inventory is:
   Dock rasters remain host-owned/untracked, so exact navigation provenance is
   preserved without importing proprietary product artwork. General, Hooks,
   and the other Settings rows remain open.
+- General is now a separate controlled Settings slice rather than coverage
+  inherited from the shell. Its 21 rows span Permissions, General, Composer,
+  Popout Window, and Notifications, with five single-select menus exposing
+  current-value descriptions and radio checked states, a searchable 66-language
+  list with a dialog-plus-listbox hierarchy that preserves native Home/End
+  caret editing, twelve switches, two keyboard groups, and locally controlled shortcut
+  capture/formatting/clear/cancel.
+  Browser/CDP and Electron prove geometry, light/compact/bottom states,
+  interactions, persistent-value continuity, and transient shortcut-capture
+  cleanup across General, Git, and Appearance. Hotkey/bottom snapshot frames
+  are initial-only and normalize after route navigation.
+  Six reviewed frames extend the matrix to 180, including a dedicated 720px
+  shortcut-capture frame. Optional local-only product
+  gates compare the full wide, 720px top crop, hotkey capture, and bottom
+  frames at 4.6143%, 6.7412%, 4.7654%, and 4.8818%; captured selections remain
+  observed fixtures, not declared defaults.
+  Hooks/code review and the remaining Settings rows remain open.
 - Computer Use exploration is blocked by the environment safety policy for
   `com.openai.codex`. User-authorized CDP probes on `26.721.41059` revalidated
   access, the main-shell target shape, a de-identified Projects entry/list,

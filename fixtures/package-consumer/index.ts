@@ -63,6 +63,8 @@ import {
   type FileReviewContent,
   FileReviewNotice,
   GeneratedImageGallery,
+  GeneralSettingsPage,
+  type GeneralSettingsValue,
   ImagePreviewDialog,
   IconButton,
   InlineNotice,
@@ -159,6 +161,7 @@ import "codex-ui-kit/styles.css";
 import "codex-ui-kit/tokens.css";
 
 declare const appearanceSettingsValue: AppearanceSettingsValue;
+declare const generalSettingsValue: GeneralSettingsValue;
 
 const line: FileDiffLine = {
   content: "package contract",
@@ -278,6 +281,8 @@ void AppRouteOutlet;
 void AppWindowChrome;
 void AppearanceSettingsPage;
 void appearanceSettingsValue;
+void GeneralSettingsPage;
+void generalSettingsValue;
 void appNotification;
 void appRouteOutletAction;
 void appWindowChromeAction;

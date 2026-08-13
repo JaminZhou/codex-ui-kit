@@ -384,6 +384,695 @@ for (const scene of selectedScenes) {
       );
       continue;
     }
+    if (scene.id.startsWith("workspace-general-settings")) {
+      if (scene.id.endsWith("-bottom") || scene.id.includes("-hotkey")) {
+        await page.waitForFunction(() => {
+          const owner = document.querySelector(".codex-ui-settings-shell__main");
+          return owner instanceof HTMLElement && owner.scrollTop > 0;
+        });
+      }
+      const general = await page.evaluate(() => {
+        const rect = (selector) => {
+          const element = document.querySelector(selector);
+          if (!(element instanceof Element)) return null;
+          const value = element.getBoundingClientRect();
+          return {
+            bottom: value.bottom,
+            height: value.height,
+            left: value.left,
+            top: value.top,
+            width: value.width,
+          };
+        };
+        const rects = (selector) =>
+          Array.from(document.querySelectorAll(selector), (element) => {
+            const value = element.getBoundingClientRect();
+            return {
+              height: value.height,
+              left: value.left,
+              top: value.top,
+              width: value.width,
+            };
+          });
+        const style = (selector) => {
+          const element = document.querySelector(selector);
+          if (!element) return null;
+          const value = getComputedStyle(element);
+          return {
+            backgroundColor: value.backgroundColor,
+            borderRadius: value.borderRadius,
+            color: value.color,
+          };
+        };
+        const scrollOwner = document.querySelector(
+          ".codex-ui-settings-shell__main",
+        );
+        return {
+          cards: rects(".codex-ui-general-settings__card"),
+          heading: rect(".codex-ui-general-settings > h1"),
+          horizontalOverflow:
+            document.documentElement.scrollWidth -
+            document.documentElement.clientWidth,
+          hotkeyCapture: Boolean(
+            document.querySelector(".codex-ui-general-settings__hotkey-capture"),
+          ),
+          hotkeyGeometry: (() => {
+            const capture = document.querySelector(
+              ".codex-ui-general-settings__hotkey-capture",
+            );
+            const row = capture?.closest(".codex-ui-general-settings__row");
+            if (!capture || !row) return null;
+            const toRect = (element) => {
+              const value = element.getBoundingClientRect();
+              return {
+                bottom: value.bottom,
+                height: value.height,
+                left: value.left,
+                right: value.right,
+                top: value.top,
+                width: value.width,
+              };
+            };
+            return {
+              buttons: Array.from(capture.querySelectorAll("button"), toRect),
+              capture: toRect(capture),
+              row: toRect(row),
+            };
+          })(),
+          iconNames: Array.from(
+            document.querySelectorAll(
+              ".codex-ui-settings-shell__navigation [data-current-build-icon]",
+            ),
+            (icon) => icon.getAttribute("data-current-build-icon"),
+          ),
+          mainCount: document.querySelectorAll('main, [role="main"]').length,
+          menuLabels: Array.from(
+            document.querySelectorAll(
+              ".codex-ui-general-settings__menu-trigger",
+            ),
+            (control) => control.getAttribute("aria-label"),
+          ),
+          navigation: rect(".codex-ui-settings-shell__navigation"),
+          navigationCount: document.querySelectorAll(
+            'nav[aria-label="Settings"]',
+          ).length,
+          outerRegionCount: document.querySelectorAll(
+            '[role="region"][aria-label="Settings route"]',
+          ).length,
+          rowCount: document.querySelectorAll(
+            ".codex-ui-general-settings__row",
+          ).length,
+          scrollOwner: scrollOwner
+            ? {
+                clientHeight: scrollOwner.clientHeight,
+                rect: (() => {
+                  const value = scrollOwner.getBoundingClientRect();
+                  return {
+                    height: value.height,
+                    left: value.left,
+                    top: value.top,
+                    width: value.width,
+                  };
+                })(),
+                scrollHeight: scrollOwner.scrollHeight,
+                scrollTop: scrollOwner.scrollTop,
+              }
+            : null,
+          sectionHeadings: Array.from(
+            document.querySelectorAll(".codex-ui-general-settings__section > h2"),
+            (heading) => heading.textContent,
+          ),
+          segmentedLabels: Array.from(
+            document.querySelectorAll(
+              '.codex-ui-general-settings__segmented[role="group"]',
+            ),
+            (group) => group.getAttribute("aria-label"),
+          ),
+          selected: document
+            .querySelector('.codex-ui-settings-shell__item[aria-current="page"]')
+            ?.getAttribute("aria-label"),
+          switchStates: Array.from(
+            document.querySelectorAll(
+              '.codex-ui-general-settings [role="switch"]',
+            ),
+            (control) => ({
+              disabled: control.hasAttribute("disabled"),
+              label: control.getAttribute("aria-label"),
+              value: control.getAttribute("aria-checked"),
+            }),
+          ),
+          theme: document.querySelector(".demo-root")?.getAttribute("data-theme"),
+          viewport: { height: innerHeight, width: innerWidth },
+          visualStyles: {
+            card: style(".codex-ui-general-settings__card"),
+            heading: style(".codex-ui-general-settings > h1"),
+            navigation: style(".codex-ui-settings-shell__navigation"),
+            shell: style(".codex-ui-settings-shell"),
+          },
+        };
+      });
+      const compact = scene.windowSize?.width === 720;
+      const bottom = scene.id === "workspace-general-settings-bottom";
+      const hotkey = scene.id.includes("-hotkey");
+      const scrolled = bottom || hotkey;
+      const expectedWidth = compact ? 357.09375 : 768;
+      const expectedSwitches = [
+        ["Default permissions are always shown", "true", true],
+        ["Show Auto-review in the composer", "true", false],
+        ["Show Full access in the composer", "true", false],
+        ["Show ChatGPT in the menu bar", "true", false],
+        ["Bottom panel", "true", false],
+        ["Prevent sleep while running", "false", false],
+        ["Enable ambient suggestions", "true", false],
+        ["Toggle plugins", "true", false],
+        ["Show context window usage in the composer", "false", false],
+        ["Default Popout Window to standalone chat", "false", false],
+        ["Enable permission notifications", "true", false],
+        ["Enable question notifications", "true", false],
+      ];
+      if (
+        general.horizontalOverflow > 1 ||
+        general.navigationCount !== 1 ||
+        general.mainCount !== 1 ||
+        general.outerRegionCount !== 1 ||
+        general.selected !== "General" ||
+        general.navigation?.width !== 322.90625 ||
+        general.navigation?.top !== 46 ||
+        general.navigation?.height !== general.viewport.height - 46 ||
+        general.scrollOwner?.rect.top !== 46 ||
+        general.scrollOwner?.rect.height !== general.viewport.height - 46 ||
+        general.scrollOwner?.rect.left !== 322.90625 ||
+        general.iconNames.length !== 24 ||
+        !general.iconNames.includes("settings-general") ||
+        (!scrolled && general.heading?.top !== 66) ||
+        Math.abs(general.heading?.width - expectedWidth) > 1 ||
+        general.cards.length !== 5 ||
+        general.cards.some(({ width }) => Math.abs(width - expectedWidth) > 1) ||
+        general.rowCount !== 21 ||
+        JSON.stringify(general.sectionHeadings) !==
+          JSON.stringify([
+            "Permissions",
+            "General",
+            "Composer",
+            "Popout Window",
+            "Notifications",
+          ]) ||
+        JSON.stringify(general.menuLabels) !==
+          JSON.stringify([
+            "Default file open destination",
+            "Language",
+            "Speed",
+            "Send shortcut",
+            "Turn completion notifications",
+          ]) ||
+        JSON.stringify(general.segmentedLabels) !==
+          JSON.stringify(["Default terminal location", "Follow-up behavior"]) ||
+        JSON.stringify(
+          general.switchStates.map(({ disabled, label, value }) => [
+            label,
+            value,
+            disabled,
+          ]),
+        ) !== JSON.stringify(expectedSwitches) ||
+        general.hotkeyCapture !== hotkey ||
+        (hotkey &&
+          (general.hotkeyGeometry?.buttons.length !== 2 ||
+            general.hotkeyGeometry.buttons.some(
+              ({ bottom, left, right, top }) =>
+                left < general.hotkeyGeometry.row.left ||
+                right > general.hotkeyGeometry.row.right ||
+                top < general.hotkeyGeometry.row.top ||
+                bottom > general.hotkeyGeometry.row.bottom,
+            ))) ||
+        (!scrolled && general.scrollOwner?.scrollTop !== 0) ||
+        (scrolled && general.scrollOwner?.scrollTop <= 0)
+      ) {
+        throw new Error(
+          `${scene.id}: current General Settings contract failed: ${JSON.stringify(general)}`,
+        );
+      }
+      if (
+        scene.id === "workspace-general-settings-light" &&
+        (general.theme !== "light" ||
+          general.visualStyles.shell?.color !== "rgb(26, 28, 31)" ||
+          general.visualStyles.navigation?.backgroundColor === "rgb(36, 36, 36)" ||
+          general.visualStyles.card?.backgroundColor === "rgb(35, 35, 35)" ||
+          general.visualStyles.heading?.color !== "rgb(26, 28, 31)")
+      ) {
+        throw new Error(
+          `${scene.id}: light General Settings paint failed: ${JSON.stringify(general.visualStyles)}`,
+        );
+      }
+
+      let interaction = null;
+      if (scene.id === "workspace-general-settings") {
+        const readFocusedLabel = async (label) => {
+          await page.waitForFunction(
+            (expected) =>
+              document.activeElement?.getAttribute("aria-label") === expected,
+            label,
+          );
+          return page.evaluate(
+            () => document.activeElement?.getAttribute("aria-label"),
+          );
+        };
+        const readMenuState = () =>
+          page.getByRole("menuitemradio").evaluateAll((items) =>
+            items.map((item) => ({
+              checked: item.getAttribute("aria-checked"),
+              label: item.textContent?.trim(),
+            })),
+          );
+        const readDescribedValue = (label) =>
+          page.getByRole("button", { name: label }).evaluate((control) => {
+            const descriptionId = control.getAttribute("aria-describedby");
+            return descriptionId
+              ? document.getElementById(descriptionId)?.textContent?.trim()
+              : null;
+          });
+        const menuFocus = {};
+        const menuStates = {};
+        await page
+          .getByRole("switch", { name: "Show Auto-review in the composer" })
+          .click();
+        await page
+          .getByRole("button", { name: "Default file open destination" })
+          .click();
+        const fileDestinations = await page
+          .getByRole("menuitemradio")
+          .allTextContents();
+        menuStates.fileDestination = await readMenuState();
+        const xcodeDestination = page.getByRole("menuitemradio", {
+          name: "Xcode",
+          exact: true,
+        });
+        await xcodeDestination.focus();
+        await xcodeDestination.press("Enter");
+        menuFocus.fileDestination = await readFocusedLabel(
+          "Default file open destination",
+        );
+        await page.getByRole("button", { name: "Language" }).click();
+        const languageQuery = page.getByRole("searchbox", {
+          name: "Search languages",
+        });
+        const languageStructure = await page.evaluate(() => {
+          const dialog = document.querySelector(
+            '.codex-ui-general-settings__language-popover[role="dialog"]',
+          );
+          const listbox = dialog?.querySelector('[role="listbox"]');
+          const search = dialog?.querySelector('input[aria-label="Search languages"]');
+          return {
+            controlsListbox:
+              search?.getAttribute("aria-controls") === listbox?.getAttribute("id"),
+            dialogContainsListbox: Boolean(dialog && listbox && dialog.contains(listbox)),
+            dialogContainsSearch: Boolean(dialog && search && dialog.contains(search)),
+            listboxContainsSearch: Boolean(listbox && search && listbox.contains(search)),
+          };
+        });
+        await languageQuery.fill("简体");
+        await page.evaluate(() => {
+          window.__codexGeneralLanguageKeyEvents = [];
+          document.addEventListener("keydown", (event) => {
+            if (event.key !== "Home" && event.key !== "End") return;
+            window.__codexGeneralLanguageKeyEvents.push({
+              defaultPrevented: event.defaultPrevented,
+              key: event.key,
+            });
+          });
+        });
+        await languageQuery.press("Home");
+        const languageHomeFocus = await page.evaluate(
+          () => document.activeElement?.getAttribute("aria-label"),
+        );
+        await languageQuery.press("End");
+        const languageEditing = await page.evaluate(
+          (homeFocus) => ({
+            endFocus: document.activeElement?.getAttribute("aria-label"),
+            events: window.__codexGeneralLanguageKeyEvents,
+            homeFocus,
+          }),
+          languageHomeFocus,
+        );
+        await languageQuery.press("ArrowDown");
+        const languageArrowFocus = await page.evaluate(
+          () => document.activeElement?.getAttribute("role"),
+        );
+        const simplifiedChinese = page.getByRole("option", {
+          name: "简体中文",
+          exact: true,
+        });
+        await simplifiedChinese.focus();
+        await simplifiedChinese.press("Enter");
+        menuFocus.language = await readFocusedLabel("Language");
+        await page.getByRole("button", { name: "Language" }).click();
+        const languageSearch = page.getByRole("searchbox", {
+          name: "Search languages",
+        });
+        await languageSearch.focus();
+        await languageSearch.press("Escape");
+        menuFocus.languageEscape = await readFocusedLabel("Language");
+        await page.getByRole("button", { name: "Language" }).click();
+        await page
+          .getByRole("searchbox", { name: "Search languages" })
+          .waitFor();
+        const bottomControl = page.getByRole("button", { name: "Bottom", exact: true });
+        await bottomControl.click();
+        menuFocus.languageOutside = await readFocusedLabel("Bottom");
+        await bottomControl.focus();
+        await bottomControl.press("ArrowRight");
+        await page.getByRole("button", { name: "Speed" }).click();
+        const speedOptions = await page
+          .getByRole("menuitemradio")
+          .allTextContents();
+        menuStates.speed = await readMenuState();
+        const fastSpeed = page
+          .getByRole("menuitemradio")
+          .filter({ hasText: /^Fast/ });
+        await fastSpeed.focus();
+        await fastSpeed.press("Enter");
+        menuFocus.speed = await readFocusedLabel("Speed");
+        await page
+          .getByRole("switch", { name: "Show context window usage in the composer" })
+          .click();
+        await page.getByRole("button", { name: "Send shortcut" }).click();
+        const commandEnter = page
+          .getByRole("menuitemradio")
+          .filter({ hasText: "⌘ + Enter always" });
+        menuStates.sendShortcut = await readMenuState();
+        await commandEnter.focus();
+        await commandEnter.press("Enter");
+        menuFocus.sendShortcut = await readFocusedLabel("Send shortcut");
+        const queueControl = page.getByRole("button", { name: "Queue", exact: true });
+        await queueControl.focus();
+        await queueControl.press("ArrowRight");
+        await page
+          .getByRole("button", { name: "Set shortcut for Popout Window hotkey" })
+          .click();
+        await page.waitForFunction(
+          () => document.activeElement?.textContent?.trim() === "Press shortcut",
+        );
+        const hotkeyRecord = page.getByRole("button", {
+          name: "Press shortcut",
+          exact: true,
+        });
+        await hotkeyRecord.press("Meta");
+        await hotkeyRecord.press("Meta+Shift+K");
+        const hotkeyEdit = page.getByRole("button", {
+          name: "Set shortcut for Popout Window hotkey",
+        });
+        await page.waitForFunction(
+          () =>
+            document.activeElement?.getAttribute("aria-label") ===
+            "Set shortcut for Popout Window hotkey",
+        );
+        const hotkeyCaptured = await hotkeyEdit.locator("span").first().textContent();
+        await hotkeyEdit.click();
+        await page
+          .getByRole("button", { name: "Press shortcut", exact: true })
+          .press("Backspace");
+        await page.waitForFunction(
+          () =>
+            document.activeElement?.getAttribute("aria-label") ===
+            "Set shortcut for Popout Window hotkey",
+        );
+        const hotkeyCleared = await hotkeyEdit.locator("span").first().textContent();
+        await hotkeyEdit.click();
+        await page
+          .getByRole("button", { name: "Press shortcut", exact: true })
+          .press("Meta+Shift+K");
+        await page.waitForFunction(
+          () =>
+            document.activeElement?.getAttribute("aria-label") ===
+            "Set shortcut for Popout Window hotkey",
+        );
+        await hotkeyEdit.click();
+        await page
+          .getByRole("button", { name: "Press shortcut", exact: true })
+          .press("Escape");
+        await page.waitForFunction(
+          () =>
+            document.activeElement?.getAttribute("aria-label") ===
+            "Set shortcut for Popout Window hotkey",
+        );
+        const hotkeyEscapePreserved = await hotkeyEdit
+          .locator("span")
+          .first()
+          .textContent();
+        await hotkeyEdit.click();
+        await page.getByRole("button", { name: "Cancel", exact: true }).click();
+        await page.waitForFunction(
+          () =>
+            document.activeElement?.getAttribute("aria-label") ===
+            "Set shortcut for Popout Window hotkey",
+        );
+        const hotkeyFocusRestored = await page.evaluate(
+          () => document.activeElement?.getAttribute("aria-label"),
+        );
+        await page
+          .getByRole("button", { name: "Turn completion notifications" })
+          .click();
+        const alwaysNotifications = page.getByRole("menuitemradio", {
+          name: "Always",
+          exact: true,
+        });
+        menuStates.completionNotifications = await readMenuState();
+        await alwaysNotifications.focus();
+        await alwaysNotifications.press("Enter");
+        menuFocus.completionNotifications = await readFocusedLabel(
+          "Turn completion notifications",
+        );
+        const describedValues = Object.fromEntries(
+          await Promise.all(
+            [
+              "Default file open destination",
+              "Language",
+              "Speed",
+              "Send shortcut",
+              "Set shortcut for Popout Window hotkey",
+              "Turn completion notifications",
+            ].map(async (label) => [label, await readDescribedValue(label)]),
+          ),
+        );
+        await page.getByRole("button", { name: "View", exact: true }).click();
+        interaction = await page.evaluate(
+          ({
+            fileDestinations,
+            hotkeyCaptured,
+            hotkeyCleared,
+            hotkeyEscapePreserved,
+            hotkeyFocusRestored,
+            languageEditing,
+            languageArrowFocus,
+            languageStructure,
+            menuFocus,
+            menuStates,
+            describedValues,
+            speedOptions,
+          }) => ({
+            autoReview: document
+              .querySelector('[role="switch"][aria-label="Show Auto-review in the composer"]')
+              ?.getAttribute("aria-checked"),
+            completionNotifications: document
+              .querySelector('button[aria-label="Turn completion notifications"]')
+              ?.textContent?.trim(),
+            contextUsage: document
+              .querySelector('[role="switch"][aria-label="Show context window usage in the composer"]')
+              ?.getAttribute("aria-checked"),
+            fileDestination: document
+              .querySelector('button[aria-label="Default file open destination"]')
+              ?.textContent?.trim(),
+            fileDestinations,
+            followUp: document
+              .querySelector('button[aria-label="Steer"]')
+              ?.getAttribute("aria-pressed"),
+            hotkeyCapture: Boolean(
+              document.querySelector(".codex-ui-general-settings__hotkey-capture"),
+            ),
+            hotkeyCaptured,
+            hotkeyCleared,
+            hotkeyEscapePreserved,
+            hotkeyFocus: hotkeyFocusRestored,
+            language: document
+              .querySelector('button[aria-label="Language"]')
+              ?.textContent?.trim(),
+            languageEditing,
+            languageArrowFocus,
+            languageStructure,
+            licenses: document.querySelector(".demo-settings-action-status")
+              ?.textContent?.trim(),
+            menuFocus,
+            menuStates,
+            describedValues,
+            sendShortcut: document
+              .querySelector('button[aria-label="Send shortcut"]')
+              ?.textContent?.trim(),
+            speed: document.querySelector('button[aria-label="Speed"]')
+              ?.textContent?.trim(),
+            speedOptions,
+            terminal: document
+              .querySelector('button[aria-label="Right"]')
+              ?.getAttribute("aria-pressed"),
+          }),
+          {
+            fileDestinations,
+            hotkeyCaptured,
+            hotkeyCleared,
+            hotkeyEscapePreserved,
+            hotkeyFocusRestored,
+            languageEditing,
+            languageArrowFocus,
+            languageStructure,
+            menuFocus,
+            menuStates,
+            describedValues,
+            speedOptions,
+          },
+        );
+        await page
+          .getByRole("button", { name: "Set shortcut for Popout Window hotkey" })
+          .click();
+        await page
+          .getByRole("button", { name: "Press shortcut", exact: true })
+          .waitFor();
+        await page.getByRole("button", { name: "Git", exact: true }).click();
+        await page.getByRole("heading", { name: "Git", exact: true }).waitFor();
+        await page.getByRole("button", { name: "General", exact: true }).click();
+        await page
+          .getByRole("heading", { level: 1, name: "General", exact: true })
+          .waitFor();
+        await page.waitForFunction(
+          () =>
+            !document.querySelector(".codex-ui-general-settings__hotkey-capture") &&
+            document.activeElement?.textContent?.trim() === "General",
+        );
+        interaction.routeLifecycle = await page.evaluate(() => {
+          const hotkey = document.querySelector(
+            'button[aria-label="Set shortcut for Popout Window hotkey"] span',
+          );
+          const owner = document.querySelector(".codex-ui-settings-shell__main");
+          return {
+            activeText: document.activeElement?.textContent?.trim(),
+            hotkey: hotkey?.textContent?.trim(),
+            hotkeyCapture: Boolean(
+              document.querySelector(".codex-ui-general-settings__hotkey-capture"),
+            ),
+            scrollTop: owner instanceof HTMLElement ? owner.scrollTop : null,
+          };
+        });
+        if (
+          interaction.autoReview !== "false" ||
+          interaction.completionNotifications !== "Always⌄" ||
+          interaction.contextUsage !== "true" ||
+          !interaction.fileDestination?.includes("Xcode") ||
+          interaction.fileDestinations.length !== 7 ||
+          interaction.followUp !== "true" ||
+          interaction.hotkeyCapture ||
+          interaction.hotkeyCaptured !== "⌘ ⇧ K" ||
+          interaction.hotkeyCleared !== "Off" ||
+          interaction.hotkeyEscapePreserved !== "⌘ ⇧ K" ||
+          interaction.hotkeyFocus !== "Set shortcut for Popout Window hotkey" ||
+          interaction.language !== "简体中文⌄" ||
+          interaction.languageEditing.endFocus !== "Search languages" ||
+          interaction.languageEditing.homeFocus !== "Search languages" ||
+          interaction.languageEditing.events.length !== 2 ||
+          interaction.languageEditing.events.some(
+            ({ defaultPrevented }) => defaultPrevented,
+          ) ||
+          interaction.languageArrowFocus !== "option" ||
+          !interaction.languageStructure.controlsListbox ||
+          !interaction.languageStructure.dialogContainsListbox ||
+          !interaction.languageStructure.dialogContainsSearch ||
+          interaction.languageStructure.listboxContainsSearch ||
+          Object.values(interaction.menuStates).some(
+            (states) =>
+              states.length === 0 ||
+              states.filter(({ checked }) => checked === "true").length !== 1,
+          ) ||
+          JSON.stringify(interaction.describedValues) !==
+            JSON.stringify({
+              "Default file open destination": "Xcode",
+              Language: "简体中文",
+              Speed: "Fast",
+              "Send shortcut": "⌘ + Enter always",
+              "Set shortcut for Popout Window hotkey": "⌘ ⇧ K",
+              "Turn completion notifications": "Always",
+            }) ||
+          interaction.licenses !== "Open source licenses requested" ||
+          interaction.menuFocus.completionNotifications !==
+            "Turn completion notifications" ||
+          interaction.menuFocus.fileDestination !==
+            "Default file open destination" ||
+          interaction.menuFocus.language !== "Language" ||
+          interaction.menuFocus.languageEscape !== "Language" ||
+          interaction.menuFocus.languageOutside !== "Bottom" ||
+          interaction.menuFocus.sendShortcut !== "Send shortcut" ||
+          interaction.menuFocus.speed !== "Speed" ||
+          interaction.routeLifecycle.activeText !== "General" ||
+          interaction.routeLifecycle.hotkey !== "⌘ ⇧ K" ||
+          interaction.routeLifecycle.hotkeyCapture ||
+          interaction.routeLifecycle.scrollTop !== 0 ||
+          interaction.sendShortcut !== "⌘ + Enter always⌄" ||
+          !interaction.speed?.includes("Fast") ||
+          interaction.speedOptions.length !== 2 ||
+          interaction.terminal !== "true"
+        ) {
+          throw new Error(
+            `${scene.id}: current General Settings interaction failed: ${JSON.stringify(interaction)}`,
+          );
+        }
+      }
+      if (hotkey) {
+        const cancel = page.getByRole("button", { name: "Cancel", exact: true });
+        await cancel.click();
+        await page.waitForFunction(
+          () =>
+            document.activeElement?.getAttribute("aria-label") ===
+          "Set shortcut for Popout Window hotkey",
+        );
+      }
+      let initialFrameRouteLifecycle = null;
+      if (hotkey || bottom) {
+        await page.getByRole("button", { name: "Git", exact: true }).click();
+        await page.getByRole("heading", { name: "Git", exact: true }).waitFor();
+        await page.getByRole("button", { name: "General", exact: true }).click();
+        await page
+          .getByRole("heading", { level: 1, name: "General", exact: true })
+          .waitFor();
+        await page.waitForFunction(
+          () =>
+            document.querySelector(".demo-root")?.getAttribute("data-frame") ===
+              "workspace-general-settings" &&
+            !document.querySelector(".codex-ui-general-settings__hotkey-capture") &&
+            document.activeElement?.textContent?.trim() === "General",
+        );
+        initialFrameRouteLifecycle = await page.evaluate(() => {
+          const owner = document.querySelector(".codex-ui-settings-shell__main");
+          return {
+            activeText: document.activeElement?.textContent?.trim(),
+            frame: document.querySelector(".demo-root")?.getAttribute("data-frame"),
+            hotkeyCapture: Boolean(
+              document.querySelector(".codex-ui-general-settings__hotkey-capture"),
+            ),
+            scrollTop: owner instanceof HTMLElement ? owner.scrollTop : null,
+          };
+        });
+        if (
+          initialFrameRouteLifecycle.activeText !== "General" ||
+          initialFrameRouteLifecycle.frame !== "workspace-general-settings" ||
+          initialFrameRouteLifecycle.hotkeyCapture ||
+          initialFrameRouteLifecycle.scrollTop !== 0
+        ) {
+          throw new Error(
+            `${scene.id}: initial General frame leaked across routing: ${JSON.stringify(initialFrameRouteLifecycle)}`,
+          );
+        }
+      }
+      await writeFile(
+        join(artifactDirectory, `${scene.id}.json`),
+        `${JSON.stringify({ general, initialFrameRouteLifecycle, interaction }, null, 2)}\n`,
+      );
+      continue;
+    }
     if (scene.id.startsWith("workspace-appearance-settings")) {
       if (scene.id.endsWith("-preferences")) {
         await page.waitForFunction(() => {

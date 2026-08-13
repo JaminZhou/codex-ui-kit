@@ -395,6 +395,10 @@ describe("menus and selects", () => {
     await waitFor(() => expect(document.activeElement).toBe(search));
     expect(fireEvent.keyDown(search, { key: "m" })).toBe(true);
     expect(document.activeElement).toBe(search);
+    expect(fireEvent.keyDown(search, { key: "Home" })).toBe(true);
+    expect(document.activeElement).toBe(search);
+    expect(fireEvent.keyDown(search, { key: "End" })).toBe(true);
+    expect(document.activeElement).toBe(search);
     expect(fireEvent.keyDown(search, { key: "ArrowDown" })).toBe(false);
     expect(document.activeElement).toBe(
       screen.getByRole("menuitem", { name: "Main" }),

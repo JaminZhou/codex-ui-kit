@@ -35,6 +35,7 @@ import {
   EnvironmentSettingsPage,
   FileChangeGroup,
   FileReview,
+  GeneralSettingsPage,
   GitSettingsPage,
   IconButton,
   LocalEnvironmentDialog,
@@ -91,6 +92,7 @@ import {
   type ComposerPermissionOption,
   type ComposerModeKind,
   type ComposerResourceGroup,
+  type GeneralSettingsValue,
   type GitSettingsValue,
   type QueuedPrompt,
   type SubagentItem,
@@ -279,6 +281,18 @@ function SummaryGlyph({ name }: { name: SummaryGlyphName }) {
   return (
     <svg aria-hidden="true" viewBox="0 0 16 16">
       <path d={path} />
+    </svg>
+  );
+}
+
+function DemoVsCodeIcon() {
+  return (
+    <svg aria-hidden="true" viewBox="0 0 16 16">
+      <rect fill="#2588d8" height="14" rx="3" width="14" x="1" y="1" />
+      <path
+        d="m4.2 8 2.4-2.2L11.8 3v10L6.6 10.2 4.2 8Zm2.4 0 3.3 2V6L6.6 8Z"
+        fill="#fff"
+      />
     </svg>
   );
 }
@@ -1730,7 +1744,11 @@ export function App() {
         : "local",
     );
   const [workspacePage, setWorkspacePage] = useState<
-    "appearance-settings" | "conversation" | "environments" | "git-settings"
+    | "appearance-settings"
+    | "conversation"
+    | "environments"
+    | "general-settings"
+    | "git-settings"
   >(
     initialSelection.view === "workspace" &&
       initialSelection.frame === "workspace-environments-unavailable"
@@ -1741,15 +1759,20 @@ export function App() {
           )
         ? "git-settings"
       : initialSelection.view === "workspace" &&
+          initialSelection.frame?.startsWith("workspace-general-settings")
+        ? "general-settings"
+      : initialSelection.view === "workspace" &&
           initialSelection.frame?.startsWith("workspace-appearance-settings")
         ? "appearance-settings"
       : "conversation",
   );
   const [settingsQuery, setSettingsQuery] = useState("");
   const [selectedSettingsId, setSelectedSettingsId] = useState(
-    initialSelection.frame?.startsWith("workspace-appearance-settings")
-      ? "appearance"
-      : "git",
+    initialSelection.frame?.startsWith("workspace-general-settings")
+      ? "general"
+      : initialSelection.frame?.startsWith("workspace-appearance-settings")
+        ? "appearance"
+        : "git",
   );
   const [settingsRouteFocusPending, setSettingsRouteFocusPending] =
     useState(false);
@@ -1795,6 +1818,36 @@ export function App() {
       usePointerCursors: false,
     });
   const [appearanceThemeAction, setAppearanceThemeAction] = useState("");
+  const [generalSettings, setGeneralSettings] = useState<GeneralSettingsValue>({
+    ambientSuggestions: true,
+    autoReview: true,
+    bottomPanel: true,
+    defaultFileOpenDestination: "vscode",
+    followUpBehavior: "queue",
+    fullAccess: true,
+    language: "auto",
+    permissionNotifications: true,
+    pluginsEnabled: true,
+    popoutHotkey: null,
+    popoutStandaloneChat: false,
+    preventSleepWhileRunning: false,
+    questionNotifications: true,
+    sendShortcut: "enter",
+    showContextWindowUsage: false,
+    showInMenuBar: true,
+    speed: "standard",
+    terminalLocation: "bottom",
+    turnCompletionNotifications: "unfocused",
+  });
+  const [generalHotkeyCaptureActive, setGeneralHotkeyCaptureActive] = useState(
+    initialSelection.frame === "workspace-general-settings-hotkey",
+  );
+  useEffect(() => {
+    if (workspacePage !== "general-settings") {
+      setGeneralHotkeyCaptureActive(false);
+    }
+  }, [workspacePage]);
+  const [generalSettingsAction, setGeneralSettingsAction] = useState("");
   const [savedCommitInstructions, setSavedCommitInstructions] = useState("");
   const [savedPullRequestInstructions, setSavedPullRequestInstructions] =
     useState("");
@@ -5084,6 +5137,10 @@ export function App() {
   const workspaceBaseFrame =
     workspacePage === "environments"
       ? "workspace-environments-unavailable"
+      : workspacePage === "general-settings"
+        ? activeFrame?.startsWith("workspace-general-settings")
+          ? activeFrame
+          : "workspace-general-settings"
       : workspacePage === "appearance-settings"
         ? initialSelection.frame?.startsWith("workspace-appearance-settings")
           ? initialSelection.frame
@@ -5133,7 +5190,9 @@ export function App() {
   ]);
   useEffect(() => {
     if (
-      !["appearance-settings", "git-settings"].includes(workspacePage) ||
+      !["appearance-settings", "general-settings", "git-settings"].includes(
+        workspacePage,
+      ) ||
       !settingsRouteFocusPending
     ) return;
     const timer = window.setTimeout(() => {
@@ -5154,6 +5213,22 @@ export function App() {
     );
     if (!scrollOwner) return;
     scrollOwner.scrollTop = activeFrame?.endsWith("-preferences")
+      ? scrollOwner.scrollHeight
+      : 0;
+  }, [activeFrame, workspacePage]);
+  useEffect(() => {
+    if (
+      workspacePage !== "general-settings" ||
+      !activeFrame?.startsWith("workspace-general-settings")
+    ) {
+      return;
+    }
+    const scrollOwner = document.querySelector<HTMLElement>(
+      ".codex-ui-settings-shell__main",
+    );
+    if (!scrollOwner) return;
+    scrollOwner.scrollTop =
+      activeFrame.endsWith("-bottom") || activeFrame.endsWith("-hotkey")
       ? scrollOwner.scrollHeight
       : 0;
   }, [activeFrame, workspacePage]);
@@ -6353,15 +6428,27 @@ export function App() {
       }}
       onQueryChange={setSettingsQuery}
       onSelect={(itemId) => {
-        if (itemId !== "appearance" && itemId !== "git") return;
+        if (
+          itemId !== "appearance" &&
+          itemId !== "general" &&
+          itemId !== "git"
+        ) {
+          return;
+        }
         setSelectedSettingsId(itemId);
         setWorkspacePage(
-          itemId === "appearance" ? "appearance-settings" : "git-settings",
+          itemId === "appearance"
+            ? "appearance-settings"
+            : itemId === "general"
+              ? "general-settings"
+              : "git-settings",
         );
         setActiveFrame(
           itemId === "appearance"
             ? "workspace-appearance-settings"
-            : "workspace-git-settings",
+            : itemId === "general"
+              ? "workspace-general-settings"
+              : "workspace-git-settings",
         );
       }}
       query={settingsQuery}
@@ -6391,6 +6478,32 @@ export function App() {
             {appearanceThemeAction}
           </span>
         </>
+      ) : workspacePage === "general-settings" ? (
+        <>
+          <GeneralSettingsPage
+            elevatedRiskHref="https://help.openai.com/"
+            fileDestinationOptions={[
+              { icon: <DemoVsCodeIcon />, label: "VS Code", value: "vscode" },
+              { label: "Cursor", value: "cursor" },
+              { label: "Sublime Text", value: "sublime-text" },
+              { label: "Default app", value: "default-app" },
+              { label: "Finder", value: "finder" },
+              { label: "Terminal", value: "terminal" },
+              { label: "Xcode", value: "xcode" },
+            ]}
+            hotkeyCaptureActive={generalHotkeyCaptureActive}
+            onCancelHotkeyCapture={() => setGeneralHotkeyCaptureActive(false)}
+            onChange={setGeneralSettings}
+            onOpenSourceLicenses={() =>
+              setGeneralSettingsAction("Open source licenses requested")
+            }
+            onStartHotkeyCapture={() => setGeneralHotkeyCaptureActive(true)}
+            value={generalSettings}
+          />
+          <span aria-live="polite" className="demo-settings-action-status">
+            {generalSettingsAction}
+          </span>
+        </>
       ) : (
         <GitSettingsPage
           commitInstructionsDirty={
@@ -6415,7 +6528,8 @@ export function App() {
     workspacePage === "environments"
       ? workspaceEnvironmentSettingsRoute
       : workspacePage === "git-settings" ||
-          workspacePage === "appearance-settings"
+          workspacePage === "appearance-settings" ||
+          workspacePage === "general-settings"
         ? workspaceSettingsRoute
       : projectIndexChatRoute
         ? projectIndexChatRoute
@@ -6423,7 +6537,9 @@ export function App() {
           ? workspacePersistedThread
           : workspaceNewConversationRoute;
   const workspaceShowsSettings =
-    workspacePage === "appearance-settings" || workspacePage === "git-settings";
+    workspacePage === "appearance-settings" ||
+    workspacePage === "general-settings" ||
+    workspacePage === "git-settings";
 
   const projectIndexStatus =
     activeFrame === "projects-index-loading"
