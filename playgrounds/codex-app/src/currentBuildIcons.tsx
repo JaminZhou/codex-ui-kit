@@ -74,6 +74,7 @@ export type CurrentBuildIconName =
   | "settings-browser"
   | "settings-computer-use"
   | "settings-hooks"
+  | "settings-hooks-reload"
   | "settings-connections"
   | "settings-git"
   | "settings-environments"

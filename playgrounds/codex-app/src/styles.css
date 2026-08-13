@@ -186,6 +186,10 @@ textarea {
 .demo-root[data-frame^="workspace-appearance-settings"]
   .codex-ui-app-shell__layout,
 .demo-root[data-frame^="workspace-general-settings"]
+  .codex-ui-app-shell__layout,
+.demo-root[data-frame^="workspace-hooks-settings"]
+  .codex-ui-app-shell__layout,
+.demo-root[data-frame^="workspace-code-review-settings"]
   .codex-ui-app-shell__layout {
   --codex-ui-app-shell-sidebar-track: 0rem;
   grid-template-columns: 0 minmax(0, 1fr) 0;
@@ -202,6 +206,14 @@ textarea {
 .demo-root[data-frame^="workspace-general-settings"]
   .codex-ui-app-shell__sidebar,
 .demo-root[data-frame^="workspace-general-settings"]
+  .codex-ui-app-shell__sidebar-resizer,
+.demo-root[data-frame^="workspace-hooks-settings"]
+  .codex-ui-app-shell__sidebar,
+.demo-root[data-frame^="workspace-hooks-settings"]
+  .codex-ui-app-shell__sidebar-resizer,
+.demo-root[data-frame^="workspace-code-review-settings"]
+  .codex-ui-app-shell__sidebar,
+.demo-root[data-frame^="workspace-code-review-settings"]
   .codex-ui-app-shell__sidebar-resizer {
   display: none;
 }
@@ -211,6 +223,10 @@ textarea {
 .demo-root[data-frame^="workspace-appearance-settings"]
   .codex-ui-app-shell__main,
 .demo-root[data-frame^="workspace-general-settings"]
+  .codex-ui-app-shell__main,
+.demo-root[data-frame^="workspace-hooks-settings"]
+  .codex-ui-app-shell__main,
+.demo-root[data-frame^="workspace-code-review-settings"]
   .codex-ui-app-shell__main {
   box-shadow: none;
 }

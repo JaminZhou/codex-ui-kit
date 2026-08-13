@@ -1278,12 +1278,22 @@
       "id": "settings.hooks-review",
       "area": "settings",
       "ownership": "app",
-      "packageEvidence": ["hooks-settings", "code-review-settings"],
+      "packageEvidence": [
+        "hooks-settings",
+        "hooks-settings-copy",
+        "code-review-settings",
+        "settings-route-registration"
+      ],
       "runtimeStatus": "runtime_observed",
-      "runtimeEvidence": ["cdp:git-branch-pr-review-delivery-and-hooks-settings"],
-      "implementationStatus": "not_started",
-      "browserStatus": "not_started",
-      "electronStatus": "not_started",
+      "runtimeEvidence": [
+        "cdp:git-branch-pr-review-delivery-and-hooks-settings",
+        "cdp-26.803.61601:hooks-empty-reload-wide-and-720-runtime",
+        "cdp-26.803.61601:code-review-hidden-from-current-navigation-and-search",
+        "cdp-26.803.61601:hooks-wide-and-compact-current-build-full-frame-pixel-gates"
+      ],
+      "implementationStatus": "partial",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
       "priority": "p1"
     },
     {

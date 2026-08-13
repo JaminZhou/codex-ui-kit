@@ -9,6 +9,7 @@ import {
 } from "./visual-asset-sidebar-contract.mjs";
 
 const write = process.argv.includes("--write");
+const hooksOnly = process.argv.includes("--hooks-only");
 const manifestPath = fileURLToPath(
   new URL("../research/visual-assets.json", import.meta.url),
 );
@@ -490,6 +491,16 @@ const promotionSpecs = new Map([
       semanticId: id,
     },
   ]),
+  [
+    "settings-hooks-reload",
+    {
+      ownerAriaLabel: "Reload hooks",
+      ownerEvidence:
+        "current Hooks Settings reload action selected by its exact accessible label",
+      region: "settings-page-action",
+      semanticId: "settings-hooks-reload",
+    },
+  ],
 ]);
 
 const manifest = JSON.parse(readFileSync(manifestPath, "utf8"));
@@ -503,6 +514,96 @@ const capture = JSON.parse(
 capture.icons.forEach((icon, index) =>
   sanitizeVisualAssetIcon(icon, `capture.icons[${index}]`),
 );
+if (hooksOnly) {
+  const observed = capture.icons.filter(
+    ({ owner, region }) =>
+      region === "settings-page-action" &&
+      owner?.semanticId === "settings-hooks-reload",
+  );
+  if (observed.length !== 1) {
+    throw new Error(
+      `Expected one current Hooks reload capture, received ${observed.length}.`,
+    );
+  }
+  const currentFingerprint = {
+    appAsarSha256: capture.baselineContext?.appAsarSha256,
+    appVersion: capture.baselineContext?.appVersion,
+    buildNumber: capture.baselineContext?.buildNumber,
+  };
+  const manifestFingerprint = {
+    appAsarSha256: manifest.baseline.appAsarSha256,
+    appVersion: manifest.baseline.appVersion,
+    buildNumber: manifest.baseline.buildNumber,
+  };
+  if (
+    canonicalize(currentFingerprint) !== canonicalize(manifestFingerprint) ||
+    capture.baselineContext?.interactionState !==
+      manifest.baseline.interactionState ||
+    capture.baselineContext?.theme !== manifest.baseline.theme ||
+    canonicalize(capture.baselineContext?.viewport) !==
+      canonicalize(manifest.baseline.viewport)
+  ) {
+    throw new Error(
+      "Targeted Hooks capture must match the exact tracked app fingerprint, interaction state, theme, and viewport.",
+    );
+  }
+  const existing = manifest.icons.find(
+    ({ id }) => id === "settings-hooks-reload",
+  );
+  if (
+    existing &&
+    (existing.region !== "settings-page-action" ||
+      existing.viewBox !== observed[0].viewBox ||
+      canonicalize(existing.rootAttributes) !==
+        canonicalize(observed[0].rootAttributes))
+  ) {
+    throw new Error("settings-hooks-reload root geometry or region changed.");
+  }
+  const primitives = existing
+    ? promotePrimitives(existing, observed[0])
+    : observed[0].primitives;
+  const promoted = {
+    id: "settings-hooks-reload",
+    ownerAriaLabel: "Reload hooks",
+    ownerEvidence:
+      "current Hooks Settings reload action selected by its exact accessible label",
+    primitives,
+    region: "settings-page-action",
+    renderSize: observed[0].renderSize,
+    rootAttributes: observed[0].rootAttributes,
+    rootComputedStyle: existing
+      ? promoteComputedStyle(existing.rootComputedStyle, observed[0].rootComputedStyle)
+      : observed[0].rootComputedStyle,
+    sourceClassName: observed[0].sourceClassName,
+    status: "runtime-observed",
+    viewBox: observed[0].viewBox,
+  };
+  promoted.sha256 = createHash("sha256")
+    .update(
+      canonicalize({
+        baselineContext: manifest.baseline,
+        primitives: promoted.primitives,
+        renderSize: promoted.renderSize,
+        rootAttributes: promoted.rootAttributes,
+        rootComputedStyle: promoted.rootComputedStyle,
+        sourceClassName: promoted.sourceClassName,
+        viewBox: promoted.viewBox,
+      }),
+    )
+    .digest("hex");
+  manifest.icons = [
+    ...manifest.icons.filter(({ id }) => id !== promoted.id),
+    promoted,
+  ];
+  const output = `${JSON.stringify(manifest, null, 2)}\n`;
+  if (write) {
+    writeFileSync(manifestPath, output);
+    console.log(`Updated ${manifestPath} with current Hooks assets`);
+  } else {
+    process.stdout.write(output);
+  }
+  process.exit(0);
+}
 const expectedComposerIds = [...promotionSpecs.entries()]
   .filter(([, spec]) => spec.region === "composer")
   .map(([id]) => id)

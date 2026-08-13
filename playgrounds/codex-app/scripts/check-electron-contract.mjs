@@ -5034,16 +5034,63 @@ try {
   await gitSettingsNavigation
     .getByRole("button", { name: "Hooks", exact: true })
     .click();
+  await gitSettingsMain
+    .getByRole("heading", { level: 1, name: "Hooks", exact: true })
+    .waitFor();
+  const hooksGeometry = await gitSettingsMain.evaluate((main) => {
+    const rect = (selector) => {
+      const element = main.querySelector(selector);
+      const value = element?.getBoundingClientRect();
+      return value
+        ? {
+            height: value.height,
+            left: value.left,
+            top: value.top,
+            width: value.width,
+          }
+        : null;
+    };
+    return {
+      card: rect(".codex-ui-hooks-settings__empty"),
+      evidence: main
+        .querySelector(".codex-ui-hooks-settings")
+        ?.getAttribute("data-evidence"),
+      heading: rect(".codex-ui-hooks-settings h1"),
+      reload: rect('.codex-ui-hooks-settings__reload[aria-label="Reload hooks"]'),
+      reloadIcon: main
+        .querySelector('[data-current-build-icon="settings-hooks-reload"]')
+        ?.getAttribute("data-current-build-icon"),
+    };
+  });
   if (
     (await gitSettingsNavigation
-      .getByRole("button", { name: "Git", exact: true })
+      .getByRole("button", { name: "Hooks", exact: true })
       .getAttribute("aria-current")) !== "page" ||
-    (await gitSettingsMain.getByRole("heading", { name: "Git" }).count()) !==
+    (await gitSettingsMain.getByText("No hooks found", { exact: true }).count()) !==
       1 ||
-    (await settingsSearch.inputValue()) !== "git"
+    (await settingsSearch.inputValue()) !== "git" ||
+    hooksGeometry.evidence !== "runtime-observed" ||
+    hooksGeometry.heading?.top !== 66 ||
+    hooksGeometry.heading?.width !== 726 ||
+    hooksGeometry.reload?.height !== 26 ||
+    hooksGeometry.reload?.width !== 26 ||
+    hooksGeometry.card?.top !== 153.796875 ||
+    hooksGeometry.card?.width !== 768 ||
+    Math.abs((hooksGeometry.card?.height ?? 0) - 62.578125) > 0.1 ||
+    hooksGeometry.reloadIcon !== "settings-hooks-reload"
   ) {
-    throw new Error("Electron unimplemented Settings navigation replaced the Git route.");
+    throw new Error(
+      `Electron Hooks Settings route is incomplete: ${JSON.stringify(hooksGeometry)}.`,
+    );
   }
+  await gitSettingsMain
+    .getByRole("button", { name: "Reload hooks", exact: true })
+    .click();
+  await codingWorkspacePage.waitForFunction(
+    () =>
+      document.querySelector(".demo-settings-action-status")?.textContent ===
+      "Refreshed hooks",
+  );
   const clearSettingsSearch = gitSettingsNavigation.getByRole("button", {
     name: "Clear settings search",
   });
@@ -5052,6 +5099,12 @@ try {
   if (!(await settingsSearch.evaluate((input) => input === document.activeElement))) {
     throw new Error("Electron clearing Settings search did not restore input focus.");
   }
+  await gitSettingsNavigation
+    .getByRole("button", { name: "Git", exact: true })
+    .click();
+  await gitSettingsMain
+    .getByRole("heading", { name: "Git", exact: true })
+    .waitFor();
   const forcePushSwitch = gitSettingsMain.getByRole("switch", {
     name: "Always force push",
   });
@@ -9996,6 +10049,105 @@ try {
   await narrowProjectCreationApp.close();
 }
 
+const hooksConfiguredScene = {
+  frame: "workspace-hooks-settings-configured",
+  id: "electron-hooks-settings-configured",
+  scenario: "workspace-workflow",
+  view: "workspace",
+};
+const {
+  app: hooksConfiguredApp,
+  page: hooksConfiguredPage,
+} = await launchScene(hooksConfiguredScene, { capture: false });
+try {
+  const hooksMain = hooksConfiguredPage.getByRole("main");
+  await hooksMain
+    .getByRole("heading", { level: 1, name: "Hooks", exact: true })
+    .waitFor();
+  if (
+    (await hooksMain.locator(".codex-ui-hooks-settings__entry").count()) !== 3 ||
+    JSON.stringify(
+      await hooksMain
+        .locator(".codex-ui-hooks-settings__source > h2")
+        .allTextContents(),
+    ) !== JSON.stringify(["From Config", "From Plugins", "From Projects"]) ||
+    (await hooksMain
+      .locator(".codex-ui-hooks-settings")
+      .getAttribute("data-evidence")) !== "runtime-observed"
+  ) {
+    throw new Error("Electron configured Hooks source groups are incomplete.");
+  }
+  const preTool = hooksMain.getByRole("switch", {
+    name: "PreToolUse enabled",
+  });
+  if (!(await preTool.isDisabled())) {
+    throw new Error("Electron changed Hooks entry was enabled before trust.");
+  }
+  await hooksMain.getByText("PreToolUse", { exact: true }).click();
+  await hooksMain.getByRole("button", { name: "Trust", exact: true }).click();
+  if (await preTool.isDisabled()) {
+    throw new Error("Electron trusted Hooks entry remained disabled.");
+  }
+  await preTool.click();
+  if ((await preTool.getAttribute("aria-checked")) !== "true") {
+    throw new Error("Electron trusted Hooks entry did not update controlled state.");
+  }
+} finally {
+  await hooksConfiguredApp.close();
+}
+
+const codeReviewSettingsScene = {
+  frame: "workspace-code-review-settings",
+  id: "electron-code-review-settings",
+  scenario: "workspace-workflow",
+  view: "workspace",
+};
+const {
+  app: codeReviewSettingsApp,
+  page: codeReviewSettingsPage,
+} = await launchScene(codeReviewSettingsScene, { capture: false });
+try {
+  const codeReviewMain = codeReviewSettingsPage.getByRole("main");
+  await codeReviewMain
+    .getByRole("heading", { level: 1, name: "Code review", exact: true })
+    .waitFor();
+  if (
+    (await codeReviewSettingsPage
+      .getByRole("navigation", { name: "Settings" })
+      .getByRole("button", { name: "Code review", exact: true })
+      .count()) !== 0 ||
+    (await codeReviewMain
+      .locator(".codex-ui-code-review-settings")
+      .getAttribute("data-evidence")) !== "package-observed" ||
+    (await codeReviewMain.locator(".codex-ui-code-review-settings__row").count()) !==
+      4 ||
+    (await codeReviewMain.getByRole("switch").count()) !== 3
+  ) {
+    throw new Error(
+      "Electron package-observed Code review state or hidden-entry boundary is incomplete.",
+    );
+  }
+  await codeReviewMain
+    .getByRole("switch", { name: "Enable automatic code review" })
+    .click();
+  await codeReviewMain.getByRole("button", { name: "Review trigger" }).click();
+  await codeReviewSettingsPage
+    .getByRole("menuitem", { name: "Smart trigger" })
+    .click();
+  if (
+    (await codeReviewMain
+      .getByRole("switch", { name: "Enable automatic code review" })
+      .getAttribute("aria-checked")) !== "false" ||
+    !(await codeReviewMain
+      .getByRole("button", { name: "Review trigger" })
+      .textContent())?.includes("Smart trigger")
+  ) {
+    throw new Error("Electron Code review preferences did not remain controlled.");
+  }
+} finally {
+  await codeReviewSettingsApp.close();
+}
+
 console.log(
-  "Electron host, native-window, current project-directory creation, coding-workspace routing and persisted/missing-worktree recovery replay, conversation/Composer and current image-attachment lifecycle plus current menus, current long, failed, and interrupted command output plus manual context compaction, thread summary, replay/live single, concurrent, nested, and mixed-recovery subagent delegation with 4/10 pagination, current mixed Search/Browser/MCP/approval/file/subagent flow, default 720px narrow reachability, resizable navigation/Review/Terminal/PR detail, PR tabs and expansion, MCP disclosure/result/unavailable-fallback, multi-file and mixed-content Review, selection/Undo, large diff scrolling, and compact geometry contracts passed.",
+  "Electron host, native-window, current project-directory creation, coding-workspace routing and persisted/missing-worktree recovery replay, conversation/Composer and current image-attachment lifecycle plus current menus, current long, failed, and interrupted command output plus manual context compaction, thread summary, replay/live single, concurrent, nested, and mixed-recovery subagent delegation with 4/10 pagination, current mixed Search/Browser/MCP/approval/file/subagent flow, runtime-observed Hooks and package-observed Code review Settings, default 720px narrow reachability, resizable navigation/Review/Terminal/PR detail, PR tabs and expansion, MCP disclosure/result/unavailable-fallback, multi-file and mixed-content Review, selection/Undo, large diff scrolling, and compact geometry contracts passed.",
 );

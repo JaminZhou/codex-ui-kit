@@ -5,12 +5,16 @@ import { useState } from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import {
   AppearanceSettingsPage,
+  CodeReviewSettingsPage,
   GeneralSettingsPage,
   GitSettingsPage,
+  HooksSettingsPage,
   SettingsShell,
   type AppearanceSettingsValue,
+  type CodeReviewSettingsValue,
   type GeneralSettingsValue,
   type GitSettingsValue,
+  type HookSettingsEntry,
 } from "../src";
 
 afterEach(cleanup);
@@ -161,6 +165,79 @@ function GeneralFixture({ onOpenSourceLicenses = () => undefined }) {
   );
 }
 
+const hookEntries: readonly HookSettingsEntry[] = [
+  {
+    command: "pnpm check",
+    enabled: true,
+    event: "Stop",
+    id: "stop-check",
+    source: "user",
+    trusted: true,
+  },
+  {
+    changedSinceTrusted: true,
+    command: "pnpm lint",
+    enabled: false,
+    event: "PreToolUse",
+    id: "plugin-lint",
+    pluginName: "Quality checks",
+    source: "plugin",
+    trusted: false,
+  },
+];
+
+function HooksFixture({ configured = false }: { configured?: boolean }) {
+  const [entries, setEntries] = useState<readonly HookSettingsEntry[]>(
+    configured ? hookEntries : [],
+  );
+  return (
+    <HooksSettingsPage
+      entries={entries}
+      learnMoreHref="https://developers.openai.com/codex/hooks"
+      onOpenConfig={() => undefined}
+      onReload={() => undefined}
+      onToggleHookEnabled={(entry, enabled) =>
+        setEntries((current) =>
+          current.map((candidate) =>
+            candidate.id === entry.id ? { ...candidate, enabled } : candidate,
+          ),
+        )
+      }
+      onTrustHook={(entry) =>
+        setEntries((current) =>
+          current.map((candidate) =>
+            candidate.id === entry.id
+              ? {
+                  ...candidate,
+                  changedSinceTrusted: false,
+                  trusted: true,
+                }
+              : candidate,
+          ),
+        )
+      }
+    />
+  );
+}
+
+const initialCodeReviewValue: CodeReviewSettingsValue = {
+  allowCreditsForCodeReviews: false,
+  automaticReview: true,
+  exhaustiveCodeReview: false,
+  triggerPolicy: "pr_open",
+};
+
+function CodeReviewFixture() {
+  const [value, setValue] = useState(initialCodeReviewValue);
+  return (
+    <CodeReviewSettingsPage
+      onChange={setValue}
+      showCreditPreference
+      value={value}
+    />
+  );
+}
+
 describe("settings surfaces", () => {
   it("exposes separate Settings navigation and main landmarks", () => {
     render(<ShellFixture />);
@@ -295,6 +372,89 @@ describe("settings surfaces", () => {
         heading.id,
       );
     }
+  });
+
+  it("renders the current Hooks empty contract and reload action", () => {
+    render(<HooksFixture />);
+
+    expect(screen.getByRole("heading", { level: 1, name: "Hooks" })).toBeTruthy();
+    expect(screen.getByText("No hooks found")).toBeTruthy();
+    expect(screen.getByText("Configured hooks will appear here")).toBeTruthy();
+    expect(screen.getByRole("button", { name: "Reload hooks" })).toBeTruthy();
+    expect(
+      screen.getByRole("link", { name: "Learn more" }).getAttribute("href"),
+    ).toBe("https://developers.openai.com/codex/hooks");
+  });
+
+  it("keeps configured hook trust and enablement host-controlled", () => {
+    render(<HooksFixture configured />);
+
+    expect(screen.getByRole("heading", { name: "From Config" })).toBeTruthy();
+    expect(screen.getByRole("heading", { name: "From Plugins" })).toBeTruthy();
+    const stopSwitch = screen.getByRole("switch", { name: "Stop enabled" });
+    expect(stopSwitch.getAttribute("aria-checked")).toBe("true");
+    fireEvent.click(stopSwitch);
+    expect(stopSwitch.getAttribute("aria-checked")).toBe("false");
+
+    const pluginSwitch = screen.getByRole("switch", {
+      name: "PreToolUse enabled",
+    });
+    expect(pluginSwitch.hasAttribute("disabled")).toBe(true);
+    fireEvent.click(screen.getByText("PreToolUse", { exact: true }));
+    fireEvent.click(screen.getByRole("button", { name: "Trust" }));
+    expect(pluginSwitch.hasAttribute("disabled")).toBe(false);
+  });
+
+  it("announces Hooks loading and failure without exposing stale rows", () => {
+    const { rerender } = render(
+      <HooksSettingsPage
+        entries={hookEntries}
+        onReload={() => undefined}
+        status="loading"
+      />,
+    );
+    expect(screen.getByRole("status").textContent).toContain("Loading hooks");
+    expect(screen.queryByText("From Config")).toBeNull();
+
+    rerender(
+      <HooksSettingsPage
+        entries={hookEntries}
+        onReload={() => undefined}
+        status="error"
+      />,
+    );
+    expect(screen.getByRole("alert").textContent).toContain(
+      "Could not load hooks",
+    );
+    expect(screen.getByRole("button", { name: "Retry" })).toBeTruthy();
+  });
+
+  it("keeps package-observed Code review preferences controlled", () => {
+    render(<CodeReviewFixture />);
+
+    const automaticReview = screen.getByRole("switch", {
+      name: "Enable automatic code review",
+    });
+    expect(automaticReview.getAttribute("aria-checked")).toBe("true");
+    fireEvent.click(automaticReview);
+    expect(automaticReview.getAttribute("aria-checked")).toBe("false");
+
+    fireEvent.click(screen.getByRole("button", { name: "Review trigger" }));
+    fireEvent.click(screen.getByRole("menuitem", { name: "On every push" }));
+    expect(screen.getByRole("button", { name: "Review trigger" }).textContent).toContain(
+      "On every push",
+    );
+
+    const exhaustive = screen.getByRole("switch", {
+      name: "Enable exhaustive code review",
+    });
+    const credits = screen.getByRole("switch", {
+      name: "Allow credits for code reviews",
+    });
+    fireEvent.click(exhaustive);
+    fireEvent.click(credits);
+    expect(exhaustive.getAttribute("aria-checked")).toBe("true");
+    expect(credits.getAttribute("aria-checked")).toBe("true");
   });
 
   it("keeps Appearance theme selection and editors fully controlled", () => {

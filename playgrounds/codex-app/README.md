@@ -792,14 +792,15 @@ The current-product mutation itself remains a separate runtime gate until the
 isolated native project selector can attach the disposable repository. Raw
 screenshots and product project names remain local-only.
 
-## Current Settings, Git, Appearance, and General slices
+## Current Settings, Git, Appearance, General, Hooks, and Code review slices
 
 - Branch → Set prefix now opens the independent full-page `SettingsShell` and
   `GitSettingsPage`; Back restores the app and the branch workflow continues.
 - The replay uses all 24 exact current Settings icons, 21 navigation items,
   grouped `git` search results, Branch prefix, Merge/Squash, two switches,
   review delivery, and dirty-gated instruction saves.
-- Browser/CDP verifies 170 lifecycle frames including wide, 720px, and light
+- Browser/CDP verifies the Settings slice within 188 lifecycle frames including
+  wide, 720px, and light
   theme geometry, semantics, icons, search, contrast, and interactions.
   Electron repeats the real route, saves a harmless fixture, returns, and
   continues through real temporary-repository branch creation.
@@ -831,6 +832,18 @@ screenshots and product project names remain local-only.
   Optional product gates accept local-only wide, 720×820 compact, hotkey, and
   bottom screenshots and pass at 4.6143%, 6.7412%, 4.7654%, and 4.8818%; raw
   current-product evidence is never tracked.
+- Hooks is now a real selectable route with the current title/subtitle/reload
+  action, empty/loading/error/configured states, Config/Plugin/Project source
+  groups, trust-before-enable behavior, and controlled host callbacks. The
+  current reload icon comes from the exact runtime provenance manifest.
+- The current product does not expose Code review in navigation or settings
+  search. Its installed module is therefore available only as an explicit
+  `package-observed` deep fixture, covering automatic review, three trigger
+  policies, exhaustive review, and optional credit use without inventing a
+  sidebar row. Browser/CDP and Electron enforce that negative boundary.
+- Eight reviewed Hooks/Code review frames extend the matrix from 180 to 188.
+  Optional unmasked full-frame Hooks comparisons pass at 1.7651% wide and
+  1.8064% at 720px; raw current-product references remain local-only.
 
 ## Current environment-entry slice
 
@@ -936,6 +949,18 @@ CODEX_UI_KIT_GENERAL_SETTINGS_HOTKEY_REFERENCE=/absolute/path/to/general-hotkey.
 CODEX_UI_KIT_GENERAL_SETTINGS_BOTTOM_REFERENCE=/absolute/path/to/general-bottom.png \
   pnpm --filter @codex-ui-kit/codex-app-playground check:visual -- \
   --scenes=workspace-general-settings,workspace-general-settings-compact,workspace-general-settings-hotkey,workspace-general-settings-bottom
+```
+
+The current Hooks gates accept unmodified 1180×820 and 720×680 full-window
+references. No masks are applied, so navigation, typography, wrapping, the
+runtime-captured reload icon, empty card, and all remaining pixels are
+measured:
+
+```bash
+CODEX_UI_KIT_HOOKS_SETTINGS_REFERENCE=/absolute/path/to/hooks-wide.png \
+CODEX_UI_KIT_HOOKS_SETTINGS_COMPACT_REFERENCE=/absolute/path/to/hooks-compact.png \
+  pnpm --filter @codex-ui-kit/codex-app-playground check:visual -- \
+  --scenes=workspace-hooks-settings,workspace-hooks-settings-compact
 ```
 
 To run the optional current-build multi-file pixel gate, keep the raw

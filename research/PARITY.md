@@ -41,7 +41,7 @@ The authoritative current-build inventory is:
   BrowserWindow; it does not prove parity with unobserved product routes,
   panels, state transitions, or window types.
 - A scoped Codex Desktop `26.803.61601` (`6396`) visual probe revalidates the
-  exact 1180×820 dark/resting asset fingerprint and now retains 77 exact
+  exact 1180×820 dark/resting asset fingerprint and now retains 78 exact
   sidebar/menu/window-chrome/Composer/environment/Settings icons. Its sampled sidebar
   hover/footer contract also
   passes Browser/CDP and Electron acceptance; its independently scrolled
@@ -101,9 +101,9 @@ The authoritative current-build inventory is:
   icons and reaches the full-page 322.91px navigation plus the 768px Git
   preferences page. The independent public shell and Git components pass
   Browser/CDP, Electron, reviewed wide/720 baselines, and local-only
-  current-product comparisons at 2.4214% and 3.0210%. Hooks and all other
-  Settings pages remain separate, so this raises the scoped asset manifest to
-  77 without closing the broader P1 denominator.
+  current-product comparisons at 2.4214% and 3.0210%. At that slice Hooks and
+  all other Settings pages remained separate, and the scoped asset manifest
+  reached 77 without closing the broader P1 denominator.
 - The next read-only capture splits Appearance from General and reaches its
   complete top-to-bottom scroll surface at 1180, 820, and 720 widths. The
   controlled public page covers three theme radios/previews, Light/Dark theme
@@ -131,7 +131,20 @@ The authoritative current-build inventory is:
   gates compare the full wide, 720px top crop, hotkey capture, and bottom
   frames at 4.6143%, 6.7412%, 4.7654%, and 4.8818%; captured selections remain
   observed fixtures, not declared defaults.
-  Hooks/code review and the remaining Settings rows remain open.
+  At that point Hooks/code review and the remaining Settings rows remained
+  open.
+- Hooks/code review now forms its own controlled family. The visible current
+  Hooks route covers empty/loading/error/configured sources, reload feedback,
+  trust-before-enable, exact navigation and reload assets, 1180px/720px
+  geometry, and route/search continuity. The separately registered Code
+  review module remains explicitly `package-observed` because current
+  navigation and search do not expose it; its controlled deep fixture covers
+  automatic review, PR-open/every-push/smart triggers, exhaustive review, and
+  optional credit use without adding a false current row. Browser/CDP,
+  Electron, and eight reviewed frames extend the matrix to 188. Untracked,
+  unmasked full-frame current Hooks comparisons pass at 1.7651% wide and
+  1.8064% at 720px. The runtime-captured reload SVG raises the exact asset
+  manifest to 78. Remaining P1 Settings/integration families stay open.
 - Computer Use exploration is blocked by the environment safety policy for
   `com.openai.codex`. User-authorized CDP probes on `26.721.41059` revalidated
   access, the main-shell target shape, a de-identified Projects entry/list,

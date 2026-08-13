@@ -1073,6 +1073,307 @@ for (const scene of selectedScenes) {
       );
       continue;
     }
+    if (scene.id.startsWith("workspace-hooks-settings")) {
+      await page
+        .getByRole("heading", { level: 1, name: "Hooks", exact: true })
+        .waitFor();
+      const hooks = await page.evaluate(() => {
+        const rect = (selector) => {
+          const element = document.querySelector(selector);
+          if (!(element instanceof Element)) return null;
+          const value = element.getBoundingClientRect();
+          return {
+            height: value.height,
+            left: value.left,
+            top: value.top,
+            width: value.width,
+          };
+        };
+        const pageRoot = document.querySelector(".codex-ui-hooks-settings");
+        return {
+          card: rect(
+            ".codex-ui-hooks-settings__empty, .codex-ui-hooks-settings__error, .codex-ui-hooks-settings__source-card",
+          ),
+          entryCount: document.querySelectorAll(
+            ".codex-ui-hooks-settings__entry",
+          ).length,
+          evidence: pageRoot?.getAttribute("data-evidence"),
+          heading: rect(".codex-ui-hooks-settings h1"),
+          horizontalOverflow:
+            document.documentElement.scrollWidth -
+            document.documentElement.clientWidth,
+          iconNames: Array.from(
+            document.querySelectorAll(
+              ".codex-ui-settings-shell__navigation [data-current-build-icon]",
+            ),
+            (icon) => icon.getAttribute("data-current-build-icon"),
+          ),
+          learnMoreHref: document
+            .querySelector(".codex-ui-hooks-settings__header a")
+            ?.getAttribute("href"),
+          loadingText: document
+            .querySelector(".codex-ui-hooks-settings__loading")
+            ?.textContent?.trim(),
+          navigation: rect(".codex-ui-settings-shell__navigation"),
+          reload: rect('.codex-ui-hooks-settings__reload[aria-label="Reload hooks"]'),
+          selected: document
+            .querySelector('.codex-ui-settings-shell__item[aria-current="page"]')
+            ?.getAttribute("aria-label"),
+          sourceHeadings: Array.from(
+            document.querySelectorAll(".codex-ui-hooks-settings__source > h2"),
+            (heading) => heading.textContent?.trim(),
+          ),
+          status: pageRoot?.getAttribute("data-status"),
+          subtitle: document
+            .querySelector(".codex-ui-hooks-settings__header p")
+            ?.textContent?.replace(/\s+/g, " ")
+            .trim(),
+          switchStates: Array.from(
+            document.querySelectorAll(
+              '.codex-ui-hooks-settings__entry [role="switch"]',
+            ),
+            (control) => ({
+              checked: control.getAttribute("aria-checked"),
+              disabled:
+                control instanceof HTMLButtonElement ? control.disabled : null,
+              label: control.getAttribute("aria-label"),
+            }),
+          ),
+          theme: document.documentElement.dataset.theme,
+          viewport: { height: innerHeight, width: innerWidth },
+        };
+      });
+      const compact = scene.id === "workspace-hooks-settings-compact";
+      const configured = scene.id === "workspace-hooks-settings-configured";
+      const loading = scene.id === "workspace-hooks-settings-loading";
+      const error = scene.id === "workspace-hooks-settings-error";
+      const expectedWidth = compact ? 357.09375 : 768;
+      const expectedHeadingWidth = compact ? 315.09375 : 726;
+      const expectedLeft = compact ? 342.90625 : 367.453125;
+      if (
+        hooks.evidence !== "runtime-observed" ||
+        hooks.status !== (loading ? "loading" : error ? "error" : "ready") ||
+        hooks.heading?.top !== 66 ||
+        Math.abs((hooks.heading?.left ?? 0) - expectedLeft) > 0.1 ||
+        Math.abs((hooks.heading?.width ?? 0) - expectedHeadingWidth) > 0.1 ||
+        hooks.reload?.top !== 66 ||
+        hooks.reload?.height !== 26 ||
+        hooks.reload?.width !== 26 ||
+        hooks.navigation?.width !== 322.90625 ||
+        hooks.selected !== "Hooks" ||
+        hooks.horizontalOverflow > 1 ||
+        hooks.learnMoreHref !== "https://developers.openai.com/codex/hooks" ||
+        hooks.subtitle !==
+          "Manage lifecycle hooks from config and enabled plugins. Learn more" ||
+        !hooks.iconNames.includes("settings-hooks") ||
+        (scene.id === "workspace-hooks-settings-light" &&
+          hooks.theme !== "light") ||
+        (configured &&
+          (hooks.entryCount !== 3 ||
+            JSON.stringify(hooks.sourceHeadings) !==
+              JSON.stringify(["From Config", "From Plugins", "From Projects"]) ||
+            hooks.switchStates.length !== 3 ||
+            hooks.switchStates[1]?.disabled !== true)) ||
+        (loading && hooks.loadingText !== "Loading hooks…") ||
+        (!configured && !loading && !error &&
+          (hooks.card?.top !== (compact ? 174.796875 : 153.796875) ||
+            Math.abs((hooks.card?.width ?? 0) - expectedWidth) > 0.1 ||
+            Math.abs((hooks.card?.height ?? 0) - 62.5625) > 0.1))
+      ) {
+        throw new Error(
+          `${scene.id}: current Hooks Settings contract failed: ${JSON.stringify(hooks)}`,
+        );
+      }
+
+      let interaction = null;
+      if (scene.id === "workspace-hooks-settings") {
+        const reload = page.getByRole("button", {
+          name: "Reload hooks",
+          exact: true,
+        });
+        await reload.click();
+        await page.waitForFunction(
+          () =>
+            document.querySelector(".demo-settings-action-status")?.textContent ===
+            "Refreshed hooks",
+        );
+        const search = page.getByRole("searchbox", { name: "Search settings" });
+        await search.fill("git");
+        const result = await page
+          .getByRole("button", { name: "Hooks", exact: true })
+          .textContent();
+        await search.fill("");
+        await page.getByRole("button", { name: "Git", exact: true }).click();
+        await page.getByRole("heading", { name: "Git", exact: true }).waitFor();
+        await page.getByRole("button", { name: "Hooks", exact: true }).click();
+        await page
+          .getByRole("heading", { level: 1, name: "Hooks", exact: true })
+          .waitFor();
+        interaction = await page.evaluate((resultText) => ({
+          action: document.querySelector(".demo-settings-action-status")?.textContent,
+          activeText: document.activeElement?.textContent?.trim(),
+          frame: document.querySelector(".demo-root")?.getAttribute("data-frame"),
+          resultText,
+          selected: document
+            .querySelector('.codex-ui-settings-shell__item[aria-current="page"]')
+            ?.getAttribute("aria-label"),
+        }), result);
+        if (
+          interaction.action !== "Refreshed hooks" ||
+          !interaction.resultText?.includes("Right before ChatGPT ends its turn") ||
+          interaction.frame !== "workspace-hooks-settings" ||
+          interaction.selected !== "Hooks" ||
+          interaction.activeText !== "Hooks"
+        ) {
+          throw new Error(
+            `${scene.id}: Hooks refresh/search/route lifecycle failed: ${JSON.stringify(interaction)}`,
+          );
+        }
+      } else if (configured) {
+        const stop = page.getByRole("switch", { name: "Stop enabled" });
+        await stop.click();
+        await page.getByText("PreToolUse", { exact: true }).click();
+        await page.getByRole("button", { name: "Trust", exact: true }).click();
+        const preTool = page.getByRole("switch", {
+          name: "PreToolUse enabled",
+        });
+        await preTool.click();
+        interaction = await page.evaluate(() => ({
+          preToolChecked: document
+            .querySelector('[role="switch"][aria-label="PreToolUse enabled"]')
+            ?.getAttribute("aria-checked"),
+          preToolDisabled:
+            document.querySelector('[role="switch"][aria-label="PreToolUse enabled"]')
+              ?.disabled,
+          stopChecked: document
+            .querySelector('[role="switch"][aria-label="Stop enabled"]')
+            ?.getAttribute("aria-checked"),
+          trustVisible: Boolean(
+            document.querySelector(".codex-ui-hooks-settings__entry-actions")
+              ?.textContent?.includes("Trust"),
+          ),
+        }));
+        if (
+          interaction.stopChecked !== "false" ||
+          interaction.preToolDisabled !== false ||
+          interaction.preToolChecked !== "true" ||
+          interaction.trustVisible
+        ) {
+          throw new Error(
+            `${scene.id}: configured Hooks controls failed: ${JSON.stringify(interaction)}`,
+          );
+        }
+      }
+      await writeFile(
+        join(artifactDirectory, `${scene.id}.json`),
+        `${JSON.stringify({ hooks, interaction }, null, 2)}\n`,
+      );
+      continue;
+    }
+    if (scene.id.startsWith("workspace-code-review-settings")) {
+      await page
+        .getByRole("heading", { level: 1, name: "Code review", exact: true })
+        .waitFor();
+      const codeReview = await page.evaluate(() => {
+        const rect = (selector) => {
+          const element = document.querySelector(selector);
+          if (!(element instanceof Element)) return null;
+          const value = element.getBoundingClientRect();
+          return {
+            height: value.height,
+            left: value.left,
+            top: value.top,
+            width: value.width,
+          };
+        };
+        const root = document.querySelector(".codex-ui-code-review-settings");
+        return {
+          card: rect(".codex-ui-code-review-settings__card"),
+          evidence: root?.getAttribute("data-evidence"),
+          heading: rect(".codex-ui-code-review-settings h1"),
+          horizontalOverflow:
+            document.documentElement.scrollWidth -
+            document.documentElement.clientWidth,
+          navigationCodeReviewCount: document.querySelectorAll(
+            '.codex-ui-settings-shell__navigation [aria-label="Code review"]',
+          ).length,
+          rowCount: document.querySelectorAll(
+            ".codex-ui-code-review-settings__row",
+          ).length,
+          selected: document
+            .querySelector('.codex-ui-settings-shell__item[aria-current="page"]')
+            ?.getAttribute("aria-label"),
+          switchCount: document.querySelectorAll(
+            '.codex-ui-code-review-settings [role="switch"]',
+          ).length,
+          triggerText: document
+            .querySelector('.codex-ui-code-review-settings__trigger[aria-label="Review trigger"]')
+            ?.textContent?.trim(),
+          viewport: { height: innerHeight, width: innerWidth },
+        };
+      });
+      const compact = scene.id.endsWith("-compact");
+      const expectedWidth = compact ? 357.09375 : 768;
+      const expectedLeft = compact ? 342.90625 : 367.453125;
+      if (
+        codeReview.evidence !== "package-observed" ||
+        codeReview.navigationCodeReviewCount !== 0 ||
+        codeReview.selected !== undefined ||
+        codeReview.heading?.top !== 66 ||
+        Math.abs((codeReview.heading?.left ?? 0) - expectedLeft) > 0.1 ||
+        Math.abs((codeReview.heading?.width ?? 0) - expectedWidth) > 0.1 ||
+        Math.abs((codeReview.card?.width ?? 0) - expectedWidth) > 0.1 ||
+        codeReview.rowCount !== 4 ||
+        codeReview.switchCount !== 3 ||
+        !codeReview.triggerText?.includes("On PR open") ||
+        codeReview.horizontalOverflow > 1
+      ) {
+        throw new Error(
+          `${scene.id}: package-observed Code review contract failed: ${JSON.stringify(codeReview)}`,
+        );
+      }
+      const automatic = page.getByRole("switch", {
+        name: "Enable automatic code review",
+      });
+      await automatic.click();
+      await page.getByRole("button", { name: "Review trigger" }).click();
+      await page.getByRole("menuitem", { name: "On every push" }).click();
+      await page
+        .getByRole("switch", { name: "Enable exhaustive code review" })
+        .click();
+      await page
+        .getByRole("switch", { name: "Allow credits for code reviews" })
+        .click();
+      const interaction = await page.evaluate(() => ({
+        automatic: document
+          .querySelector('[role="switch"][aria-label="Enable automatic code review"]')
+          ?.getAttribute("aria-checked"),
+        credits: document
+          .querySelector('[role="switch"][aria-label="Allow credits for code reviews"]')
+          ?.getAttribute("aria-checked"),
+        exhaustive: document
+          .querySelector('[role="switch"][aria-label="Enable exhaustive code review"]')
+          ?.getAttribute("aria-checked"),
+        trigger: document
+          .querySelector('.codex-ui-code-review-settings__trigger[aria-label="Review trigger"]')
+          ?.textContent?.trim(),
+      }));
+      if (
+        interaction.automatic !== "false" ||
+        interaction.credits !== "true" ||
+        interaction.exhaustive !== "true" ||
+        !interaction.trigger?.includes("On every push")
+      ) {
+        throw new Error(
+          `${scene.id}: Code review controls failed: ${JSON.stringify(interaction)}`,
+        );
+      }
+      await writeFile(
+        join(artifactDirectory, `${scene.id}.json`),
+        `${JSON.stringify({ codeReview, interaction }, null, 2)}\n`,
+      );
+      continue;
+    }
     if (scene.id.startsWith("workspace-appearance-settings")) {
       if (scene.id.endsWith("-preferences")) {
         await page.waitForFunction(() => {
