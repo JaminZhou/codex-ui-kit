@@ -3341,10 +3341,6 @@ export function App() {
         ] ?? replayScenarios.interruption.events.length,
       );
       setActiveFrame("command-interruption-stopping");
-      replaySubmitTimerRef.current = window.setTimeout(() => {
-        replaySubmitTimerRef.current = null;
-        settleCurrentCommandInterruption();
-      }, 900);
       return;
     }
     if (!isConversationLifecycle) {

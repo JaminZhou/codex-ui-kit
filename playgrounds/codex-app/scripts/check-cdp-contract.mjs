@@ -8105,6 +8105,10 @@ try {
     );
   }
 
+  await commandInterruptionPage.waitForTimeout(1_100);
+  await commandInterruptionPage
+    .getByRole("button", { name: "Stop all background terminals" })
+    .waitFor({ state: "visible" });
   await commandInterruptionPage
     .getByRole("button", { name: "Stop all background terminals" })
     .click();
