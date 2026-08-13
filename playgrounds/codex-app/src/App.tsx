@@ -2267,6 +2267,12 @@ export function App() {
     useState<Set<string>>(() => new Set());
   const [terminalReloadPendingIds, setTerminalReloadPendingIds] =
     useState<Set<string>>(() => new Set());
+  const [terminalReloadSessionId, setTerminalReloadSessionId] =
+    useState<string | null>(() =>
+      initialSelection.frame === "terminal-current-reload"
+        ? "local-terminal-1"
+        : null,
+    );
   const [backgroundTerminalPanelWidth, setBackgroundTerminalPanelWidth] =
     useState(381.4375);
   const [backgroundTerminalPanelOpen, setBackgroundTerminalPanelOpen] =
@@ -2960,6 +2966,9 @@ export function App() {
     );
     setDismissedTerminalMismatchIds(new Set());
     setTerminalReloadPendingIds(new Set());
+    setTerminalReloadSessionId(
+      frame === "terminal-current-reload" ? "local-terminal-1" : null,
+    );
     setTerminalTabPickerOpen(frame === "terminal-picker");
     setTerminalCommandId(nextTerminalSessionIds.at(-1) ?? null);
     setTerminalHeight(272);
@@ -9034,6 +9043,7 @@ export function App() {
         !dismissedTerminalMismatchIds.has(sessionId);
       const isDirectShellReload =
         activeFrame === "terminal-current-reload" &&
+        sessionId === terminalReloadSessionId &&
         !terminalReloadPendingIds.has(sessionId);
       const isBackgroundTerminal =
         sessionId === "agent-background-terminal";
@@ -9069,6 +9079,7 @@ export function App() {
                   next.delete(sessionId);
                   return next;
                 });
+                setTerminalReloadSessionId(null);
                 setActiveFrame("terminal-current-single");
               }, 160);
             }

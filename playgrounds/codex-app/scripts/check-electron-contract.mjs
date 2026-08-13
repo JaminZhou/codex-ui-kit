@@ -3428,7 +3428,7 @@ const { app: terminalReloadApp, page: terminalReloadPage } =
 
 try {
   const terminalReloadPanel = terminalReloadPage.getByTestId("terminal-panel");
-  const alert = terminalReloadPanel.getByRole("alert");
+  let alert = terminalReloadPanel.getByRole("alert");
   const reloadContract = {
     alertText: await alert.textContent(),
     logCount: await terminalReloadPanel.getByRole("log").count(),
@@ -3443,6 +3443,34 @@ try {
   ) {
     throw new Error(
       `Electron Terminal reload surface is incomplete: ${JSON.stringify(reloadContract)}`,
+    );
+  }
+  await terminalReloadPanel
+    .getByRole("button", { name: "Open bottom panel tab" })
+    .click();
+  await terminalReloadPage
+    .getByRole("menuitem", { name: "Terminal", exact: true })
+    .click();
+  if (
+    !(await terminalReloadPanel
+      .getByRole("tab", { name: "codex-ui-kit 2", selected: true })
+      .isVisible()) ||
+    !(await terminalReloadPanel
+      .getByRole("textbox", { name: "Terminal input" })
+      .isVisible()) ||
+    (await terminalReloadPanel.getByRole("alert").count()) !== 0
+  ) {
+    throw new Error(
+      "Electron fresh Terminal inherited the crashed session's reload state.",
+    );
+  }
+  await terminalReloadPanel
+    .getByRole("tab", { name: "codex-ui-kit 1" })
+    .click();
+  alert = terminalReloadPanel.getByRole("alert");
+  if (!(await alert.isVisible())) {
+    throw new Error(
+      "Electron crashed Terminal lost its session-scoped reload state.",
     );
   }
   await alert.getByRole("button", { name: "Reload" }).click();
