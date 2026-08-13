@@ -77,7 +77,7 @@ function TerminalIcon({ children }: { children?: ReactNode }) {
   return (
     <svg
       aria-hidden="true"
-      className="codex-ui-command-execution__icon"
+      className="codex-ui-command-execution__icon codex-ui-command-execution__icon--fallback"
       viewBox="0 0 16 16"
     >
       <rect height="12" rx="2" width="14" x="1" y="2" />

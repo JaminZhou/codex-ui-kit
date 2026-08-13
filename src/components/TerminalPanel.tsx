@@ -455,7 +455,7 @@ export function TerminalProcessList({
   processes,
   stopAllLabel = "Stop all background terminals",
   stopProcessLabel = (process) =>
-    `Stop ${typeof process.label === "string" ? process.label : "background terminal"}`,
+    `Stop ${typeof process.label === "string" ? process.label : `background terminal ${process.id}`}`,
   ...props
 }: TerminalProcessListProps) {
   const hasRunningProcesses = processes.some(

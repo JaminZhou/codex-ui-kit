@@ -202,6 +202,23 @@ describe("CommandExecution", () => {
         '.codex-ui-command-execution__icon[aria-hidden="true"]',
       ),
     ).toHaveLength(2);
+    expect(
+      container.querySelectorAll(
+        ".codex-ui-command-execution__icon--fallback",
+      ),
+    ).toHaveLength(0);
+  });
+
+  it("scopes fallback paint styles away from host-provided terminal icons", () => {
+    const { container } = render(
+      <CommandExecution command="pwd" status="completed" />,
+    );
+
+    expect(
+      container.querySelectorAll(
+        "svg.codex-ui-command-execution__icon--fallback",
+      ),
+    ).toHaveLength(1);
   });
 
   it("can replace or omit the sampled shell label", () => {

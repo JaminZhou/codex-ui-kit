@@ -314,4 +314,35 @@ describe("terminal panel", () => {
       }),
     ).toBeNull();
   });
+
+  it("gives ReactNode process stop controls stable unique names", () => {
+    render(
+      <TerminalProcessList
+        onStopProcess={() => undefined}
+        processes={[
+          {
+            id: "worker-a",
+            label: <span>Worker</span>,
+            status: "running",
+          },
+          {
+            id: "worker-b",
+            label: <span>Worker</span>,
+            status: "running",
+          },
+        ]}
+      />,
+    );
+
+    expect(
+      screen.getByRole("button", {
+        name: "Stop background terminal worker-a",
+      }),
+    ).toBeTruthy();
+    expect(
+      screen.getByRole("button", {
+        name: "Stop background terminal worker-b",
+      }),
+    ).toBeTruthy();
+  });
 });
