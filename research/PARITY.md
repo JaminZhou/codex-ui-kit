@@ -118,7 +118,8 @@ The authoritative current-build inventory is:
 - General is now a separate controlled Settings slice rather than coverage
   inherited from the shell. Its 21 rows span Permissions, General, Composer,
   Popout Window, and Notifications, with five menus, a searchable 66-language
-  list that preserves native Home/End caret editing, twelve switches, two keyboard groups, and locally controlled shortcut
+  list with a dialog-plus-listbox hierarchy that preserves native Home/End
+  caret editing, twelve switches, two keyboard groups, and locally controlled shortcut
   capture/formatting/clear/cancel.
   Browser/CDP and Electron prove geometry, light/compact/bottom states,
   interactions, persistent-value continuity, and transient shortcut-capture

@@ -521,16 +521,37 @@ describe("settings surfaces", () => {
     const languageSearch = screen.getByRole("searchbox", {
       name: "Search languages",
     });
+    const languageDialog = screen.getByRole("dialog", { name: "Language" });
+    const languageListbox = screen.getByRole("listbox", { name: "Languages" });
+    expect(languageDialog.contains(languageSearch)).toBe(true);
+    expect(languageDialog.contains(languageListbox)).toBe(true);
+    expect(languageListbox.contains(languageSearch)).toBe(false);
+    expect(languageSearch.getAttribute("aria-controls")).toBe(languageListbox.id);
     fireEvent.change(languageSearch, { target: { value: "简体" } });
     expect(screen.getAllByRole("option")).toHaveLength(1);
     const languageOption = screen.getByRole("option", { name: "简体中文" });
-    languageOption.focus();
+    fireEvent.keyDown(languageSearch, { key: "ArrowDown" });
+    expect(document.activeElement).toBe(languageOption);
+    fireEvent.keyDown(languageOption, { key: "Home" });
+    expect(document.activeElement).toBe(languageOption);
     fireEvent.click(languageOption);
     const languageTrigger = screen.getByRole("button", { name: "Language" });
     expect(languageTrigger.textContent).toContain(
       "简体中文",
     );
     expect(document.activeElement).toBe(languageTrigger);
+
+    fireEvent.click(languageTrigger);
+    const reopenedLanguageSearch = screen.getByRole("searchbox", {
+      name: "Search languages",
+    });
+    const reopenedLanguageListbox = screen.getByRole("listbox", {
+      name: "Languages",
+    });
+    fireEvent.change(reopenedLanguageSearch, { target: { value: "not-a-language" } });
+    const languageEmptyState = screen.getByText("No languages found");
+    expect(reopenedLanguageListbox.contains(languageEmptyState)).toBe(false);
+    fireEvent.keyDown(reopenedLanguageSearch, { key: "Escape" });
 
     for (const [triggerName, itemName] of [
       ["Speed", /Fast/],

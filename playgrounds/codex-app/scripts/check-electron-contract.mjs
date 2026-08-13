@@ -5319,6 +5319,20 @@ try {
   const languageSearch = codingWorkspacePage.getByRole("searchbox", {
     name: "Search languages",
   });
+  const generalLanguageStructure = await codingWorkspacePage.evaluate(() => {
+    const dialog = document.querySelector(
+      '.codex-ui-general-settings__language-popover[role="dialog"]',
+    );
+    const listbox = dialog?.querySelector('[role="listbox"]');
+    const search = dialog?.querySelector('input[aria-label="Search languages"]');
+    return {
+      controlsListbox:
+        search?.getAttribute("aria-controls") === listbox?.getAttribute("id"),
+      dialogContainsListbox: Boolean(dialog && listbox && dialog.contains(listbox)),
+      dialogContainsSearch: Boolean(dialog && search && dialog.contains(search)),
+      listboxContainsSearch: Boolean(listbox && search && listbox.contains(search)),
+    };
+  });
   await languageSearch.fill("简体");
   await codingWorkspacePage.evaluate(() => {
     window.__codexGeneralLanguageKeyEvents = [];
@@ -5342,6 +5356,10 @@ try {
       homeFocus,
     }),
     generalLanguageHomeFocus,
+  );
+  await languageSearch.press("ArrowDown");
+  const generalLanguageArrowFocus = await codingWorkspacePage.evaluate(
+    () => document.activeElement?.getAttribute("role"),
   );
   const simplifiedChinese = codingWorkspacePage.getByRole("option", {
     name: "简体中文",
@@ -5514,6 +5532,8 @@ try {
     language: main.querySelector('button[aria-label="Language"]')
       ?.textContent?.trim(),
     languageEditing: focus.languageEditing,
+    languageArrowFocus: focus.languageArrowFocus,
+    languageStructure: focus.languageStructure,
     menuFocus: focus.menu,
     sendShortcut: main.querySelector('button[aria-label="Send shortcut"]')
       ?.textContent?.trim(),
@@ -5528,6 +5548,8 @@ try {
     hotkeyCleared: generalHotkeyCleared,
     hotkeyEscapePreserved: generalHotkeyEscapePreserved,
     languageEditing: generalLanguageEditing,
+    languageArrowFocus: generalLanguageArrowFocus,
+    languageStructure: generalLanguageStructure,
     menu: generalMenuFocus,
   });
   if (
@@ -5548,6 +5570,11 @@ try {
     generalInteraction.languageEditing.events.some(
       ({ defaultPrevented }) => defaultPrevented,
     ) ||
+    generalInteraction.languageArrowFocus !== "option" ||
+    !generalInteraction.languageStructure.controlsListbox ||
+    !generalInteraction.languageStructure.dialogContainsListbox ||
+    !generalInteraction.languageStructure.dialogContainsSearch ||
+    generalInteraction.languageStructure.listboxContainsSearch ||
     generalInteraction.menuFocus.completionNotifications !==
       "Turn completion notifications" ||
     generalInteraction.menuFocus.fileDestination !==

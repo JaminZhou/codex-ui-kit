@@ -1501,11 +1501,22 @@ function GeneralLanguageControl({
 }) {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
+  const listboxId = useId();
+  const listboxRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
   const selected = options.find((option) => option.value === value);
   const filtered = options.filter((option) =>
     option.label.toLocaleLowerCase().includes(query.trim().toLocaleLowerCase()),
   );
+  const languageOptions = () =>
+    Array.from(
+      listboxRef.current?.querySelectorAll<HTMLButtonElement>('[role="option"]') ??
+        [],
+    );
+  const focusLanguageOption = (edge: "first" | "last") => {
+    const items = languageOptions();
+    (edge === "first" ? items[0] : items.at(-1))?.focus();
+  };
   return (
     <Popover
       align="end"
@@ -1517,7 +1528,7 @@ function GeneralLanguageControl({
         if (!nextOpen) setQuery("");
       }}
       open={open}
-      role="listbox"
+      role="dialog"
       sideOffset={4}
       trigger={
         <button
@@ -1537,14 +1548,68 @@ function GeneralLanguageControl({
       <label className="codex-ui-general-settings__language-search">
         <span aria-hidden="true">⌕</span>
         <input
+          aria-autocomplete="list"
+          aria-controls={listboxId}
+          aria-expanded={open}
           aria-label="Search languages"
           onChange={(event) => setQuery(event.currentTarget.value)}
+          onKeyDown={(event) => {
+            if (event.key === "ArrowDown" || event.key === "ArrowUp") {
+              event.preventDefault();
+              focusLanguageOption(event.key === "ArrowDown" ? "first" : "last");
+            } else if (event.key === "Tab") {
+              setOpen(false);
+            }
+          }}
           placeholder="Search languages"
           type="search"
           value={query}
         />
       </label>
-      <div className="codex-ui-general-settings__language-options">
+      <div
+        aria-label="Languages"
+        className="codex-ui-general-settings__language-options"
+        id={listboxId}
+        onKeyDown={(event) => {
+          const target = event.target;
+          if (!(target instanceof HTMLElement) || target.getAttribute("role") !== "option") {
+            return;
+          }
+          const items = languageOptions();
+          const index = items.indexOf(target as HTMLButtonElement);
+          if (["ArrowDown", "ArrowUp", "End", "Home"].includes(event.key)) {
+            event.preventDefault();
+            const nextIndex =
+              event.key === "Home"
+                ? 0
+                : event.key === "End"
+                  ? items.length - 1
+                  : event.key === "ArrowDown"
+                    ? (index + 1) % items.length
+                    : (index - 1 + items.length) % items.length;
+            items[nextIndex]?.focus();
+          } else if (
+            event.key.length === 1 &&
+            !event.altKey &&
+            !event.ctrlKey &&
+            !event.metaKey
+          ) {
+            const query = event.key.toLocaleLowerCase();
+            const ordered = [...items.slice(index + 1), ...items.slice(0, index + 1)];
+            const match = ordered.find((item) =>
+              item.textContent?.trim().toLocaleLowerCase().startsWith(query),
+            );
+            if (match) {
+              event.preventDefault();
+              match.focus();
+            }
+          } else if (event.key === "Tab") {
+            setOpen(false);
+          }
+        }}
+        ref={listboxRef}
+        role="listbox"
+      >
         {filtered.map((option) => (
           <button
             aria-selected={option.value === value}
@@ -1564,10 +1629,10 @@ function GeneralLanguageControl({
             <span aria-hidden="true">{option.value === value ? "✓" : ""}</span>
           </button>
         ))}
-        {filtered.length === 0 ? (
-          <p className="codex-ui-general-settings__language-empty">No languages found</p>
-        ) : null}
       </div>
+      {filtered.length === 0 ? (
+        <p className="codex-ui-general-settings__language-empty">No languages found</p>
+      ) : null}
     </Popover>
   );
 }

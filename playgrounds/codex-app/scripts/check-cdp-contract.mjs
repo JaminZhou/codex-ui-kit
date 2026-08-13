@@ -657,6 +657,20 @@ for (const scene of selectedScenes) {
         const languageQuery = page.getByRole("searchbox", {
           name: "Search languages",
         });
+        const languageStructure = await page.evaluate(() => {
+          const dialog = document.querySelector(
+            '.codex-ui-general-settings__language-popover[role="dialog"]',
+          );
+          const listbox = dialog?.querySelector('[role="listbox"]');
+          const search = dialog?.querySelector('input[aria-label="Search languages"]');
+          return {
+            controlsListbox:
+              search?.getAttribute("aria-controls") === listbox?.getAttribute("id"),
+            dialogContainsListbox: Boolean(dialog && listbox && dialog.contains(listbox)),
+            dialogContainsSearch: Boolean(dialog && search && dialog.contains(search)),
+            listboxContainsSearch: Boolean(listbox && search && listbox.contains(search)),
+          };
+        });
         await languageQuery.fill("简体");
         await page.evaluate(() => {
           window.__codexGeneralLanguageKeyEvents = [];
@@ -680,6 +694,10 @@ for (const scene of selectedScenes) {
             homeFocus,
           }),
           languageHomeFocus,
+        );
+        await languageQuery.press("ArrowDown");
+        const languageArrowFocus = await page.evaluate(
+          () => document.activeElement?.getAttribute("role"),
         );
         const simplifiedChinese = page.getByRole("option", {
           name: "简体中文",
@@ -807,6 +825,8 @@ for (const scene of selectedScenes) {
             hotkeyEscapePreserved,
             hotkeyFocusRestored,
             languageEditing,
+            languageArrowFocus,
+            languageStructure,
             menuFocus,
             speedOptions,
           }) => ({
@@ -837,6 +857,8 @@ for (const scene of selectedScenes) {
               .querySelector('button[aria-label="Language"]')
               ?.textContent?.trim(),
             languageEditing,
+            languageArrowFocus,
+            languageStructure,
             licenses: document.querySelector(".demo-settings-action-status")
               ?.textContent?.trim(),
             menuFocus,
@@ -857,6 +879,8 @@ for (const scene of selectedScenes) {
             hotkeyEscapePreserved,
             hotkeyFocusRestored,
             languageEditing,
+            languageArrowFocus,
+            languageStructure,
             menuFocus,
             speedOptions,
           },
@@ -911,6 +935,11 @@ for (const scene of selectedScenes) {
           interaction.languageEditing.events.some(
             ({ defaultPrevented }) => defaultPrevented,
           ) ||
+          interaction.languageArrowFocus !== "option" ||
+          !interaction.languageStructure.controlsListbox ||
+          !interaction.languageStructure.dialogContainsListbox ||
+          !interaction.languageStructure.dialogContainsSearch ||
+          interaction.languageStructure.listboxContainsSearch ||
           interaction.licenses !== "Open source licenses requested" ||
           interaction.menuFocus.completionNotifications !==
             "Turn completion notifications" ||
