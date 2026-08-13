@@ -4,8 +4,10 @@ import {
   type ReactNode,
   type Ref,
   type TextareaHTMLAttributes,
+  useEffect,
   useId,
   useRef,
+  useState,
 } from "react";
 import { Menu, MenuItem } from "./InteractivePrimitives.js";
 
@@ -887,6 +889,58 @@ function AppearancePreferenceRow({
   );
 }
 
+function AppearanceNumberInput({
+  label,
+  max,
+  min,
+  onCommit,
+  value,
+}: {
+  label: string;
+  max: number;
+  min: number;
+  onCommit: (value: number) => void;
+  value: number;
+}) {
+  const [draft, setDraft] = useState(String(value));
+  const editing = useRef(false);
+
+  useEffect(() => {
+    if (!editing.current) setDraft(String(value));
+  }, [value]);
+
+  const commit = () => {
+    editing.current = false;
+    const parsed = draft.trim() === "" ? Number.NaN : Number(draft);
+    if (!Number.isFinite(parsed)) {
+      setDraft(String(value));
+      return;
+    }
+    const bounded = Math.min(max, Math.max(min, parsed));
+    setDraft(String(bounded));
+    onCommit(bounded);
+  };
+
+  return (
+    <input
+      aria-label={label}
+      max={max}
+      min={min}
+      onBlur={commit}
+      onChange={(event) => setDraft(event.currentTarget.value)}
+      onFocus={() => {
+        editing.current = true;
+      }}
+      onKeyDown={(event) => {
+        if (event.key === "Enter") event.currentTarget.blur();
+      }}
+      step="1"
+      type="number"
+      value={draft}
+    />
+  );
+}
+
 export function AppearanceSettingsPage({
   chatGptDockIcon,
   className,
@@ -1026,20 +1080,11 @@ export function AppearanceSettingsPage({
               label="UI font size"
             >
               <label className="codex-ui-appearance-settings__number-control">
-                <input
-                  aria-label="Sans font size"
-                  max="16"
-                  min="11"
-                  onChange={(event) => {
-                    const nextValue = event.currentTarget.valueAsNumber;
-                    if (!Number.isFinite(nextValue)) return;
-                    update(
-                      "uiFontSize",
-                      Math.min(16, Math.max(11, nextValue)),
-                    );
-                  }}
-                  step="1"
-                  type="number"
+                <AppearanceNumberInput
+                  label="Sans font size"
+                  max={16}
+                  min={11}
+                  onCommit={(uiFontSize) => update("uiFontSize", uiFontSize)}
                   value={value.uiFontSize}
                 />
                 <span>px</span>
@@ -1050,20 +1095,13 @@ export function AppearanceSettingsPage({
               label="Code font size"
             >
               <label className="codex-ui-appearance-settings__number-control">
-                <input
-                  aria-label="Code font size"
-                  max="24"
-                  min="8"
-                  onChange={(event) => {
-                    const nextValue = event.currentTarget.valueAsNumber;
-                    if (!Number.isFinite(nextValue)) return;
-                    update(
-                      "codeFontSize",
-                      Math.min(24, Math.max(8, nextValue)),
-                    );
-                  }}
-                  step="1"
-                  type="number"
+                <AppearanceNumberInput
+                  label="Code font size"
+                  max={24}
+                  min={8}
+                  onCommit={(codeFontSize) =>
+                    update("codeFontSize", codeFontSize)
+                  }
                   value={value.codeFontSize}
                 />
                 <span>px</span>

@@ -339,8 +339,19 @@ describe("settings surfaces", () => {
       (codeFontSize as HTMLInputElement).min,
       (codeFontSize as HTMLInputElement).max,
     ]).toEqual(["11", "16", "8", "24"]);
+    fireEvent.focus(uiFontSize);
+    fireEvent.change(uiFontSize, { target: { value: "1" } });
+    expect((uiFontSize as HTMLInputElement).value).toBe("1");
+    fireEvent.change(uiFontSize, { target: { value: "15" } });
+    expect((uiFontSize as HTMLInputElement).value).toBe("15");
+    fireEvent.blur(uiFontSize);
+    expect((uiFontSize as HTMLInputElement).value).toBe("15");
+
     fireEvent.change(uiFontSize, { target: { value: "99" } });
+    fireEvent.blur(uiFontSize);
+    (codeFontSize as HTMLInputElement).focus();
     fireEvent.change(codeFontSize, { target: { value: "0" } });
+    fireEvent.keyDown(codeFontSize, { key: "Enter" });
     expect((uiFontSize as HTMLInputElement).value).toBe("16");
     expect((codeFontSize as HTMLInputElement).value).toBe("8");
 
