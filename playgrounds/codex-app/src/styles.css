@@ -2556,6 +2556,42 @@ textarea {
   height: 100%;
 }
 
+.demo-background-terminal-summary {
+  align-self: stretch;
+  padding: 3.625rem 1rem 1rem;
+}
+
+.demo-background-terminal-summary .codex-ui-terminal-process-list__header {
+  margin-bottom: 0.25rem;
+}
+
+.demo-background-terminal-summary .codex-ui-terminal-process-list__title {
+  font-size: 0.75rem;
+  line-height: 1.25rem;
+}
+
+.demo-background-terminal-summary .codex-ui-terminal-process-list__open {
+  min-height: 1.75rem;
+  padding: 0.25rem 0.375rem;
+}
+
+.demo-background-terminal-summary .codex-ui-terminal-process-list__identity {
+  display: block;
+}
+
+.demo-background-terminal-summary .codex-ui-terminal-process-list__detail {
+  display: none;
+}
+
+.demo-background-terminal-panel {
+  background: #101010;
+}
+
+.demo-background-terminal-panel .codex-ui-terminal-transcript {
+  height: 100%;
+  padding: 0.5rem 0.75rem;
+}
+
 .demo-terminal-processes {
   border-block-start: 1px solid rgba(255, 255, 255, 0.08);
   margin-block-start: 1rem;

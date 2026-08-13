@@ -4505,6 +4505,10 @@ for (const scene of selectedScenes) {
         mcpGroup: ".codex-ui-mcp-tool-call-group",
         terminal: ".codex-ui-terminal-session",
         terminalProcesses: ".codex-ui-terminal-process-list",
+        terminalReload: ".codex-ui-terminal-reload-notice",
+        backgroundSummary: ".demo-background-terminal-summary",
+        backgroundTerminal:
+          '[data-testid="terminal-current-background-panel"]',
       };
       const namedSurfaces = Object.fromEntries(
         Object.entries(namedSurfaceSelectors).map(([name, selector]) => {
@@ -5222,6 +5226,15 @@ for (const scene of selectedScenes) {
                 ),
                 mismatchText: panel
                   .querySelector(".codex-ui-terminal-workspace-mismatch")
+                  ?.textContent?.trim(),
+                reloadActions: Array.from(
+                  panel.querySelectorAll(
+                    ".codex-ui-terminal-reload-notice button",
+                  ),
+                  (button) => button.textContent?.trim(),
+                ),
+                reloadText: panel
+                  .querySelector(".codex-ui-terminal-reload-notice")
                   ?.textContent?.trim(),
                 panel: rect(panel),
                 panelContent: panelContent ? rect(panelContent) : null,
@@ -7012,6 +7025,9 @@ for (const scene of selectedScenes) {
     const expectedSidebarMax =
       scene.id === "markdown-table-actions-narrow"
         ? "368"
+        : scene.id === "terminal-current-background-list" ||
+            scene.id === "terminal-current-background-open"
+          ? "490"
         : scene.id === "terminal-compact" ||
             scene.id === "terminal-current-compact" ||
             scene.id === "attachment-multi-compact"
@@ -7077,8 +7093,12 @@ for (const scene of selectedScenes) {
         })}`,
       );
     }
+    const backgroundSidePanelScene =
+      scene.id === "terminal-current-background-list" ||
+      scene.id === "terminal-current-background-open";
     if (
       !scene.surfaces?.includes("reviewPanel") &&
+      !backgroundSidePanelScene &&
       contract.sidePanelResizer
     ) {
       throw new Error(
@@ -7103,10 +7123,12 @@ for (const scene of selectedScenes) {
         "terminal-running": 1,
         "terminal-current-compact": 3,
         "terminal-current-completed": 1,
+        "terminal-current-command-exit-7": 1,
         "terminal-current-mismatch": 2,
         "terminal-current-multi": 3,
         "terminal-current-running": 1,
         "terminal-current-single": 1,
+        "terminal-current-reload": 1,
       }[scene.id];
       const expectedTerminalStatuses = {
         "background-terminal": ["running"],
@@ -7118,12 +7140,15 @@ for (const scene of selectedScenes) {
         "terminal-running": ["running"],
         "terminal-current-compact": ["idle", "idle", "idle"],
         "terminal-current-completed": ["idle"],
+        "terminal-current-command-exit-7": ["idle"],
         "terminal-current-mismatch": ["idle", "idle"],
         "terminal-current-multi": ["idle", "idle", "idle"],
         "terminal-current-running": ["idle"],
         "terminal-current-single": ["idle"],
+        "terminal-current-reload": ["failed"],
       }[scene.id];
       const currentRunning = scene.id === "terminal-current-running";
+      const currentReload = scene.id === "terminal-current-reload";
       if (
         !terminal ||
         !resizer ||
@@ -7144,11 +7169,12 @@ for (const scene of selectedScenes) {
         (!terminal.panelContent ||
             Math.abs(terminal.panelContent.height - 239) > 1 ||
             !terminal.selectedTab?.includes("codex-ui-kit") ||
-            terminal.inputLabel !== "Terminal input" ||
-            terminal.transcriptLive !== "polite" ||
+            (!currentReload && terminal.inputLabel !== "Terminal input") ||
+            (!currentReload && terminal.transcriptLive !== "polite") ||
             !terminal.tabPanelLabelledBy ||
-            !terminal.entryKinds.includes("command") ||
-            (!currentRunning &&
+            (!currentReload && !terminal.entryKinds.includes("command")) ||
+            (!currentReload &&
+              !currentRunning &&
               !terminal.entryKinds.includes("stdout")))
       ) {
         throw new Error(
@@ -7156,6 +7182,21 @@ for (const scene of selectedScenes) {
             resizer,
             terminal,
           })}`,
+        );
+      }
+      if (
+        currentReload &&
+        (!terminal.reloadText?.includes("terminal encountered an error") ||
+          !terminal.reloadText?.includes(
+            "Try reloading the terminal to continue",
+          ) ||
+          JSON.stringify(terminal.reloadActions) !==
+            JSON.stringify(["Reload"]) ||
+          terminal.inputLabel ||
+          terminal.transcriptLive)
+      ) {
+        throw new Error(
+          `${scene.id}: Terminal reload contract failed: ${JSON.stringify(terminal)}`,
         );
       }
       if (
@@ -7188,6 +7229,118 @@ for (const scene of selectedScenes) {
       throw new Error(
         `${scene.id}: hidden Terminal panel retained its resize separator.`,
       );
+    }
+    if (
+      backgroundSidePanelScene &&
+      (!contract.sidePanelResizer ||
+        contract.sidePanelResizer.cursor !== "col-resize" ||
+        contract.sidePanelResizer.ariaMin !== "300" ||
+        contract.sidePanelResizer.ariaNow !== "381" ||
+        Math.abs(
+          contract.namedSurfaces[
+            scene.id === "terminal-current-background-open"
+              ? "backgroundTerminal"
+              : "backgroundSummary"
+          ].rect.width - 381.4375,
+        ) > 1)
+    ) {
+      throw new Error(
+        `${scene.id}: background side-panel resizer contract failed: ${JSON.stringify(contract.sidePanelResizer)}`,
+      );
+    }
+    if (scene.id === "terminal-current-command-exit-7") {
+      const exitContract = await page.evaluate(() => {
+        const terminal = document.querySelector(
+          ".codex-ui-terminal-session",
+        );
+        return {
+          hasReload: Boolean(
+            terminal?.querySelector(".codex-ui-terminal-reload-notice"),
+          ),
+          output: terminal
+            ?.querySelector('[role="log"]')
+            ?.textContent?.replace(/\s+/g, " ")
+            .trim(),
+          textbox: Boolean(
+            terminal?.querySelector('input[aria-label="Terminal input"]'),
+          ),
+        };
+      });
+      if (
+        exitContract.hasReload ||
+        !exitContract.textbox ||
+        !exitContract.output?.includes("terminal-direct-out") ||
+        !exitContract.output?.startsWith("/workspace/codex-ui-kit %")
+      ) {
+        throw new Error(
+          `${scene.id}: command exit status was confused with a shell failure: ${JSON.stringify(exitContract)}`,
+        );
+      }
+    }
+    if (scene.id === "terminal-current-background-list") {
+      const backgroundList = await page.evaluate(() => {
+        const summary = document.querySelector(
+          '[data-testid="terminal-current-background-summary"]',
+        );
+        const process = summary?.querySelector(
+          ".codex-ui-terminal-process-list__open",
+        );
+        const stopAll = summary?.querySelector(
+          'button[aria-label="Stop all background terminals"]',
+        );
+        return {
+          processText: process?.textContent?.trim(),
+          sidePanelOpen: document
+            .querySelector(".codex-ui-app-shell")
+            ?.hasAttribute("data-side-panel-open"),
+          stopAllLabel: stopAll?.getAttribute("aria-label"),
+        };
+      });
+      if (
+        !backgroundList.sidePanelOpen ||
+        !backgroundList.processText?.includes("terminal-background-handle") ||
+        backgroundList.stopAllLabel !== "Stop all background terminals"
+      ) {
+        throw new Error(
+          `${scene.id}: background process summary contract failed: ${JSON.stringify(backgroundList)}`,
+        );
+      }
+    }
+    if (scene.id === "terminal-current-background-open") {
+      const backgroundPanel = await page.evaluate(() => {
+        const panel = document.querySelector(
+          '[data-testid="terminal-current-background-panel"]',
+        );
+        const selectedTab = panel?.querySelector(
+          '[role="tab"][aria-selected="true"]',
+        );
+        return {
+          closeLabel: panel
+            ?.querySelector(".codex-ui-workspace-panel__tab-close")
+            ?.getAttribute("aria-label"),
+          output: panel
+            ?.querySelector('[role="log"]')
+            ?.textContent?.replace(/\s+/g, " ")
+            .trim(),
+          selectedTab: selectedTab?.textContent?.trim(),
+          sidePanelOpen: document
+            .querySelector(".codex-ui-app-shell")
+            ?.hasAttribute("data-side-panel-open"),
+        };
+      });
+      if (
+        !backgroundPanel.sidePanelOpen ||
+        !backgroundPanel.selectedTab?.includes(
+          "terminal-background-handle",
+        ) ||
+        !backgroundPanel.closeLabel?.startsWith("Close for i in") ||
+        !backgroundPanel.output?.includes("terminal-background-handle-066") ||
+        !backgroundPanel.output?.includes("terminal-background-handle-110")
+      ) {
+        throw new Error(
+          `${scene.id}: background terminal panel contract failed: ${JSON.stringify(backgroundPanel)}`,
+        );
+      }
     }
     if (
       scene.id === "terminal-closed" ||

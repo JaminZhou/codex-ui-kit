@@ -69,6 +69,7 @@ import {
   SubagentTranscriptHeader,
   TerminalPanel,
   TerminalProcessList,
+  TerminalTranscript,
   TerminalWorkspaceMismatchNotice,
   ThreadContextEvent,
   ThreadHeader,
@@ -906,6 +907,10 @@ function initialTerminalSessionIds(
   if (scenarioId === "background-terminal") return ["command-dev"];
   if (scenarioId !== "terminal-lifecycle") return [];
   if (frame === "terminal-current-closed") return [];
+  if (frame === "terminal-current-background-list") return [];
+  if (frame === "terminal-current-background-open") {
+    return ["agent-background-terminal"];
+  }
   if (frame === "terminal-current-multi") {
     return ["local-terminal-1", "local-terminal-2", "local-terminal-3"];
   }
@@ -950,7 +955,28 @@ function initialTerminalHistory(
   return Object.fromEntries(
     sessionIds.map((sessionId, index) => [
       sessionId,
-      frame === "terminal-current-running" && index === 0
+      frame === "terminal-current-background-open"
+        ? Array.from({ length: 45 }, (_, outputIndex) => ({
+            id: `${sessionId}:background:${outputIndex + 66}`,
+            kind: "stdout" as const,
+            text: `terminal-background-handle-${String(
+              outputIndex + 66,
+            ).padStart(3, "0")}`,
+          }))
+        : frame === "terminal-current-command-exit-7" && index === 0
+          ? [
+              {
+                id: `${sessionId}:exit-command`,
+                kind: "command" as const,
+                text: "/workspace/codex-ui-kit % sh -c 'printf terminal-direct-out; exit 7'",
+              },
+              {
+                id: `${sessionId}:exit-output`,
+                kind: "stdout" as const,
+                text: "terminal-direct-out",
+              },
+            ]
+        : frame === "terminal-current-running" && index === 0
         ? [
             {
               id: `${sessionId}:running`,
@@ -2191,6 +2217,8 @@ export function App() {
     initialSelection.scenarioId === "background-terminal" ||
       (initialSelection.scenarioId === "terminal-lifecycle" &&
         initialSelection.frame !== "terminal-current-closed" &&
+        initialSelection.frame !== "terminal-current-background-list" &&
+        initialSelection.frame !== "terminal-current-background-open" &&
         initialSelection.frame !== "terminal-closed"),
   );
   const [terminalSessionIds, setTerminalSessionIds] = useState<string[]>(() =>
@@ -2237,6 +2265,24 @@ export function App() {
     );
   const [dismissedTerminalMismatchIds, setDismissedTerminalMismatchIds] =
     useState<Set<string>>(() => new Set());
+  const [terminalReloadPendingIds, setTerminalReloadPendingIds] =
+    useState<Set<string>>(() => new Set());
+  const [terminalReloadSessionId, setTerminalReloadSessionId] =
+    useState<string | null>(() =>
+      initialSelection.frame === "terminal-current-reload"
+        ? "local-terminal-1"
+        : null,
+    );
+  const [backgroundTerminalPanelWidth, setBackgroundTerminalPanelWidth] =
+    useState(381.4375);
+  const [backgroundTerminalPanelOpen, setBackgroundTerminalPanelOpen] =
+    useState(
+      initialSelection.scenarioId === "terminal-lifecycle" &&
+        (initialSelection.frame === "terminal-current-background-list" ||
+          initialSelection.frame === "terminal-current-background-open"),
+    );
+  const [backgroundTerminalRunning, setBackgroundTerminalRunning] =
+    useState(true);
   const [reviewSelection, setReviewSelection] =
     useState<ReviewSelection | null>(null);
   const [reviewSelectionKey, setReviewSelectionKey] = useState(0);
@@ -2291,6 +2337,7 @@ export function App() {
   );
   const replaySubmitTimerRef = useRef<number | null>(null);
   const pullRequestTransitionTimerRef = useRef<number | null>(null);
+  const terminalReloadTimerRef = useRef<number | null>(null);
   const threadViewportRef = useRef<HTMLDivElement>(null);
   const liveApprovalSubmissionGateRef = useRef(
     new LiveApprovalSubmissionGate(),
@@ -2574,6 +2621,9 @@ export function App() {
       if (pullRequestTransitionTimerRef.current !== null) {
         window.clearTimeout(pullRequestTransitionTimerRef.current);
       }
+      if (terminalReloadTimerRef.current !== null) {
+        window.clearTimeout(terminalReloadTimerRef.current);
+      }
     },
     [],
   );
@@ -2582,6 +2632,12 @@ export function App() {
     if (replaySubmitTimerRef.current === null) return;
     window.clearTimeout(replaySubmitTimerRef.current);
     replaySubmitTimerRef.current = null;
+  };
+
+  const cancelTerminalReloadTimer = () => {
+    if (terminalReloadTimerRef.current === null) return;
+    window.clearTimeout(terminalReloadTimerRef.current);
+    terminalReloadTimerRef.current = null;
   };
 
   const completeReplayComposerSubmission = () => {
@@ -2817,6 +2873,7 @@ export function App() {
     },
   ) => {
     cancelReplaySubmitTimer();
+    cancelTerminalReloadTimer();
     const nextTerminalSessionIds = initialTerminalSessionIds(
       nextId,
       frame,
@@ -2894,6 +2951,8 @@ export function App() {
       nextId === "background-terminal" ||
         (nextId === "terminal-lifecycle" &&
           frame !== "terminal-current-closed" &&
+          frame !== "terminal-current-background-list" &&
+          frame !== "terminal-current-background-open" &&
           frame !== "terminal-closed"),
     );
     setTerminalSessionIds([...nextTerminalSessionIds]);
@@ -2906,9 +2965,20 @@ export function App() {
       initialTerminalWorkspaceLabels(nextId, frame),
     );
     setDismissedTerminalMismatchIds(new Set());
+    setTerminalReloadPendingIds(new Set());
+    setTerminalReloadSessionId(
+      frame === "terminal-current-reload" ? "local-terminal-1" : null,
+    );
     setTerminalTabPickerOpen(frame === "terminal-picker");
     setTerminalCommandId(nextTerminalSessionIds.at(-1) ?? null);
     setTerminalHeight(272);
+    setBackgroundTerminalPanelWidth(381.4375);
+    setBackgroundTerminalPanelOpen(
+      nextId === "terminal-lifecycle" &&
+        (frame === "terminal-current-background-list" ||
+          frame === "terminal-current-background-open"),
+    );
+    setBackgroundTerminalRunning(true);
     setTerminalValuesByCommand({});
     setTerminalHistoryByCommand(initialTerminalHistory(nextId, frame));
     setUndoneFileIds(new Set());
@@ -8971,6 +9041,12 @@ export function App() {
         sessionId === activeTerminalSessionId &&
         sessionProjectLabel !== workspaceRunProjectLabel &&
         !dismissedTerminalMismatchIds.has(sessionId);
+      const isDirectShellReload =
+        activeFrame === "terminal-current-reload" &&
+        sessionId === terminalReloadSessionId &&
+        !terminalReloadPendingIds.has(sessionId);
+      const isBackgroundTerminal =
+        sessionId === "agent-background-terminal";
       return {
         entries: terminalEntriesBySession[sessionId]!,
         id: sessionId,
@@ -8990,9 +9066,35 @@ export function App() {
             onOpenNewTerminal={() => createTerminalSession()}
           />
         ) : undefined,
-        showStatus: !sessionId.startsWith("local-terminal-"),
+        onReload: isDirectShellReload
+          ? () => {
+              cancelTerminalReloadTimer();
+              setTerminalReloadPendingIds((sessionIds) =>
+                new Set(sessionIds).add(sessionId),
+              );
+              terminalReloadTimerRef.current = window.setTimeout(() => {
+                terminalReloadTimerRef.current = null;
+                setTerminalReloadPendingIds((sessionIds) => {
+                  const next = new Set(sessionIds);
+                  next.delete(sessionId);
+                  return next;
+                });
+                setTerminalReloadSessionId(null);
+                setActiveFrame("terminal-current-single");
+              }, 160);
+            }
+          : undefined,
+        showStatus:
+          !sessionId.startsWith("local-terminal-") &&
+          !isBackgroundTerminal,
         status:
-          terminalCommand?.status === "running"
+          terminalReloadPendingIds.has(sessionId)
+            ? ("restoring" as const)
+            : isDirectShellReload
+              ? ("failed" as const)
+              : isBackgroundTerminal
+                ? ("running" as const)
+                : terminalCommand?.status === "running"
             ? ("running" as const)
             : terminalCommand?.status === "failed"
               ? ("failed" as const)
@@ -9145,6 +9247,87 @@ export function App() {
       sessions={terminalSessions}
     />
   );
+  const backgroundTerminalCommand =
+    "for i in $(seq 1 120); do printf 'terminal-background-handle-%03d\\n' \"$i\"; sleep 1; done";
+  const backgroundTerminalPanelSelected =
+    view === "conversation" &&
+    scenarioId === "terminal-lifecycle" &&
+    (activeFrame === "terminal-current-background-list" ||
+      activeFrame === "terminal-current-background-open");
+  const openBackgroundTerminal = () => {
+    setTerminalSessionIds(["agent-background-terminal"]);
+    setTerminalWorkspaceBySession({
+      "agent-background-terminal": "codex-ui-kit",
+    });
+    setTerminalHistoryByCommand(
+      initialTerminalHistory(
+        "terminal-lifecycle",
+        "terminal-current-background-open",
+      ),
+    );
+    setTerminalCommandId("agent-background-terminal");
+    setTerminalOpen(false);
+    setBackgroundTerminalPanelOpen(true);
+    setActiveFrame("terminal-current-background-open");
+  };
+  const closeBackgroundTerminalTab = () => {
+    setTerminalSessionIds([]);
+    setTerminalCommandId(null);
+    setTerminalOpen(false);
+    setActiveFrame("terminal-current-background-list");
+  };
+  const backgroundTerminalSidePanel =
+    activeFrame === "terminal-current-background-open" ? (
+      <WorkspacePanel
+        activeTabId="agent-background-terminal"
+        className="demo-background-terminal-panel"
+        data-testid="terminal-current-background-panel"
+        label="Background terminal"
+        onActiveTabChange={() => undefined}
+        onClose={() => closeBackgroundTerminalTab()}
+        onCloseTab={() => closeBackgroundTerminalTab()}
+        placement="side"
+        tabCloseButtons
+        tabs={[
+          {
+            closeLabel: `Close ${backgroundTerminalCommand} tab`,
+            content: (
+              <TerminalTranscript
+                entries={
+                  terminalEntriesBySession["agent-background-terminal"] ?? []
+                }
+                label="Background terminal output"
+              />
+            ),
+            id: "agent-background-terminal",
+            label: backgroundTerminalCommand,
+          },
+        ]}
+      />
+    ) : (
+      <div
+        className="demo-background-terminal-summary"
+        data-testid="terminal-current-background-summary"
+      >
+        <TerminalProcessList
+          label="Background processes"
+          onOpenProcess={openBackgroundTerminal}
+          onStopAll={() => setBackgroundTerminalRunning(false)}
+          processes={
+            backgroundTerminalRunning
+              ? [
+                  {
+                    id: "agent-background-terminal",
+                    label: backgroundTerminalCommand,
+                    status: "running",
+                    view: "background",
+                  },
+                ]
+              : []
+          }
+        />
+      </div>
+    );
   const messageNavigation = isConversationLifecycle ? (
     <ThreadMessageNavigationRail
       activeIds={
@@ -9298,6 +9481,8 @@ export function App() {
         onSidePanelOpenChange={
           view === "pull-request"
             ? setPullRequestOpen
+            : backgroundTerminalPanelSelected
+              ? setBackgroundTerminalPanelOpen
             : subagentPanelSelected
               ? setSubagentPanelOpen
               : setReviewOpen
@@ -9305,6 +9490,8 @@ export function App() {
         onSidePanelWidthChange={
           view === "pull-request"
             ? setPullRequestWidth
+            : backgroundTerminalPanelSelected
+              ? setBackgroundTerminalPanelWidth
             : subagentPanelSelected
               ? setSubagentPanelWidth
               : undefined
@@ -9317,6 +9504,8 @@ export function App() {
         sidePanel={
           view === "pull-request"
             ? pullRequestPanel
+            : backgroundTerminalPanelSelected
+              ? backgroundTerminalSidePanel
             : subagentPanelSelected
               ? subagentPanel
               : reviewPanel
@@ -9327,6 +9516,10 @@ export function App() {
         sidePanelLabel={
           view === "pull-request"
             ? "Pull request details"
+            : backgroundTerminalPanelSelected
+              ? activeFrame === "terminal-current-background-open"
+                ? "Background terminal"
+                : "Thread summary"
             : subagentPanelSelected
               ? "Subagents"
               : "Review"
@@ -9334,6 +9527,8 @@ export function App() {
         sidePanelMinMainWidth={
           view === "pull-request"
             ? 390
+            : backgroundTerminalPanelSelected
+              ? 390
             : subagentPanelSelected
               ? 220
               : undefined
@@ -9341,6 +9536,8 @@ export function App() {
         sidePanelMinWidth={
           view === "pull-request"
             ? 322
+            : backgroundTerminalPanelSelected
+              ? 300
             : subagentPanelSelected
               ? 300
               : undefined
@@ -9348,18 +9545,24 @@ export function App() {
         sidePanelOpen={
           view === "pull-request"
             ? pullRequestOpen
+            : backgroundTerminalPanelSelected
+              ? backgroundTerminalPanelOpen
             : subagentPanelSelected
               ? subagentPanelOpen
               : reviewOpen && Boolean(reviewPanel)
         }
         sidePanelOverlay={view === "pull-request"}
         sidePanelOverlayModal={
-          view !== "pull-request" && !subagentPanelSelected
+          view !== "pull-request" &&
+          !backgroundTerminalPanelSelected &&
+          !subagentPanelSelected
         }
         sidePanelResizable
         sidePanelWidth={
           view === "pull-request"
             ? pullRequestWidth
+            : backgroundTerminalPanelSelected
+              ? backgroundTerminalPanelWidth
             : subagentPanelSelected
               ? subagentPanelWidth
               : undefined

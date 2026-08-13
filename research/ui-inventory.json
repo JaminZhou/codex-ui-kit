@@ -1026,7 +1026,7 @@
       "id": "workspace.terminal",
       "area": "workspace",
       "ownership": "workspace",
-      "packageEvidence": ["terminal", "file-terminal", "shellsession"],
+      "packageEvidence": ["terminal", "file-terminal", "shellsession", "terminal-error-reload"],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
         "cdp:bottom-terminal-tabpanel-header-and-terminal-input",
@@ -1034,11 +1034,12 @@
         "cdp-26.721.81911:three-terminal-tabs-per-tab-close-140px-tab-1180-and-820-compact-picker-four-items",
         "cdp-26.727.40816:project-named-terminal-tab-bottom-panel-shell-read-only",
         "cdp-26.730.61639:project-aware-multi-terminal-tabs-picker-close-renumber-140px-wide-and-135.96px-compact",
-        "cdp-26.730.61639:last-tab-close-panel-collapse-and-fresh-toggle-session"
+        "cdp-26.730.61639:last-tab-close-panel-collapse-and-fresh-toggle-session",
+        "cdp-26.803.61601:direct-shell-exit-7-keeps-interactive-shell-and-normal-exit-closes-tab"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "partial_legacy",
-      "electronStatus": "partial_legacy",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
       "priority": "p0"
     },
     {
@@ -1050,7 +1051,8 @@
       "runtimeEvidence": [
         "cdp:running-duration-stop-and-background-process-state",
         "cdp-26.730.61639:real-xterm-read-only-running-panel-close-reopen-output-and-completion",
-        "cdp-26.803.61601:real-background-terminal-stop-all-and-per-process-controls-after-current-turn-stop"
+        "cdp-26.803.61601:real-background-terminal-stop-all-and-per-process-controls-after-current-turn-stop",
+        "cdp-26.803.61601:agent-created-background-process-summary-opens-live-side-panel-terminal"
       ],
       "implementationStatus": "partial",
       "browserStatus": "verified",

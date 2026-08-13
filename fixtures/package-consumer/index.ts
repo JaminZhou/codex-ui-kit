@@ -140,6 +140,7 @@ import {
   TerminalPanel,
   TerminalProcessList,
   TerminalPrompt,
+  TerminalReloadNotice,
   TerminalSession,
   TerminalTranscript,
   TerminalWorkspaceMismatchNotice,
@@ -394,6 +395,7 @@ void SubagentTranscriptHeader;
 void TerminalPanel;
 void TerminalProcessList;
 void TerminalPrompt;
+void TerminalReloadNotice;
 void TerminalSession;
 void TerminalTranscript;
 void TerminalWorkspaceMismatchNotice;

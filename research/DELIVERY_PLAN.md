@@ -14,7 +14,7 @@ exit gates; it does not replace the inventory.
   Desktop `26.803.61601` (`6396`). Unsampled earlier-build surfaces remain
   previous-build regression evidence rather than current verification.
 - The inventory contains 88 surface groups: 58 P0, 21 P1, and 9 P2.
-- 32 groups have current-build runtime evidence, 39 have previous-build-only
+- 33 groups have current-build runtime evidence, 38 have previous-build-only
   runtime evidence, and 17 have not been sampled.
 - The scoped `26.803.61601` refresh revalidates 91
   sidebar/menu/window-chrome/Composer/Settings/completed-thread icons against exact runtime evidence.
@@ -34,6 +34,15 @@ exit gates; it does not replace the inventory.
   settlement and same-thread recovery, and promotes command execution/failure,
   interruption, and background-process management through Browser/CDP, real
   Electron, and local-only owned pixels.
+  The current Terminal follow-up separately proves that a child command's
+  `exit 7` returns to the same interactive shell instead of producing a
+  terminal failure, while ordinary shell `exit` closes the tab. A real
+  agent-created background process appears in the thread summary and opens a
+  live side-panel terminal. Package structure supplies the otherwise unsafe
+  crash-only title/description/Reload contract. The independent replay keeps
+  those evidence classes separate and adds four Browser/CDP, Electron, and
+  reviewed pixel gates for command exit, reload, background summary, and
+  close/reopen side-panel behavior.
   The account-menu follow-up adds six exact icons and gates its six-item,
   one-avatar, zero-role-separator structure, 258.11×188.38 geometry, dismissal,
   focus return, and owned pixels at 0.1979%. Sidebar actions and ordinary task
@@ -630,13 +639,17 @@ without confusing package readiness with full product reconstruction.
 7. **Review content variants**: current delete and rename/no-content evidence,
    public rename/delete/binary/conflict replay, selection synchronization, and
    Undo.
-8. **Terminal session lifecycle — delivered for the current local-shell
-   contract**: current project-labelled multi-tab/close/picker/compact
+8. **Terminal session lifecycle — delivered for the current local-shell and
+   background-process contracts**: current project-labelled multi-tab/close/picker/compact
    evidence, per-session transcript ownership, real running/completed
    close/reopen persistence, close-all/fresh creation, and cross-worktree
-   mismatch recovery. Independent failed/exited process summaries and reopen
-   actions remain host-owned compatibility coverage; direct-shell failure and
-   background agent-process restart/reopen require separate product evidence.
+   mismatch recovery; direct command `exit 7` continuing in the same shell;
+   ordinary shell exit closing the tab; and an agent-created background
+   process opening, closing, and reopening in the side panel. Failed/exited
+   process summaries remain host-owned compatibility coverage. The terminal
+   crash Reload copy is current package-structural evidence plus independent
+   Browser/Electron coverage because intentionally crashing the product pty
+   is not a safe runtime requirement.
 9. **Pull request lifecycle**: delivered for the public component contract and
    deterministic Browser/Electron/pixel gates: index/detail loading and
    failure, checks, reviewers, comments, review submission, merge-readiness,

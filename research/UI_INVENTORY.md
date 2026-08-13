@@ -74,7 +74,7 @@ observation from a previous build remains historical evidence.
   previous-build regression evidence and have been downgraded from `verified`
   to `partial_legacy` until they are reached again on the current fingerprint.
 
-Current inventory: 88 surface groups; 32 have current-build runtime evidence, 39 have previous-build-only runtime evidence, 17 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 31 groups and Electron verification covers 31.
+Current inventory: 88 surface groups; 33 have current-build runtime evidence, 38 have previous-build-only runtime evidence, 17 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 32 groups and Electron verification covers 32.
 Prior acceptance outside those 32 sampled current-build groups remains
 recorded as `partial_legacy` until current-build re-observation.
 
@@ -712,12 +712,27 @@ direct shell command does not add a product tab status badge, so
 running/failed/exited process summaries and reopen actions rather than an
 inferred native tab contract.
 
+The `26.803.61601` follow-up sharpens that boundary. Running
+`sh -c 'printf terminal-direct-out; exit 7'` inside the direct Terminal returns
+to the same prompt with no failure notice, while ordinary `exit` closes the
+tab and reopening Terminal creates a new local shell. A disposable agent turn
+also starts a real 120-line background loop, finishes its response while the
+process remains active, exposes the exact command under `Background processes`,
+and opens the live output in a 381.44px side-panel tab. Closing that tab returns
+to the summary and the still-active process can be reopened. The public replay
+therefore keeps command exit, shell failure, and background-process ownership
+as three separate states. `TerminalReloadNotice` implements the current
+package-structural crash copy and Reload action without claiming that the
+product pty was intentionally crashed. Browser/CDP and Electron cover all four
+new frames and the close/reopen interaction; reviewed internal pixels raise
+the matrix to 192 frames.
+
 Changing the chat worktree with an older Terminal active now has its own
 `workspace.terminal-context-mismatch` surface. The observed warning says
 `This terminal's workspace does not match this chat's current worktree` and
 offers `Dismiss` plus `Open new terminal` without discarding the older
 session. `TerminalWorkspaceMismatchNotice` implements that recovery contract.
-Browser/CDP covers 93 lifecycle frames and Electron repeats the session,
+Browser/CDP covers 192 lifecycle frames and Electron repeats the session,
 mismatch, input, picker, close, and resizing interactions. Against the exact
 906×820 current-build reference, the shared panel and content differ by
 1.5120% and 0.4004%, below independent 2% and 1% limits.

@@ -3388,6 +3388,241 @@ try {
   await currentTerminalApp.close();
 }
 
+const directTerminalExitScene = {
+  frame: "terminal-current-command-exit-7",
+  id: "electron-current-terminal-command-exit-7",
+  scenario: "terminal-lifecycle",
+};
+const {
+  app: directTerminalExitApp,
+  page: directTerminalExitPage,
+} = await launchScene(directTerminalExitScene, { capture: false });
+
+try {
+  const output = await directTerminalExitPage
+    .getByRole("log", { name: "Terminal output" })
+    .textContent();
+  if (
+    !output?.includes("terminal-direct-out") ||
+    !output.trim().startsWith("/workspace/codex-ui-kit %") ||
+    !(await directTerminalExitPage
+      .getByRole("textbox", { name: "Terminal input" })
+      .isVisible()) ||
+    (await directTerminalExitPage.getByRole("alert").count()) !== 0
+  ) {
+    throw new Error(
+      "Electron command exit status was confused with a Terminal process failure.",
+    );
+  }
+} finally {
+  await directTerminalExitApp.close();
+}
+
+const terminalReloadScene = {
+  frame: "terminal-current-reload",
+  id: "electron-current-terminal-reload",
+  scenario: "terminal-lifecycle",
+};
+const { app: terminalReloadApp, page: terminalReloadPage } =
+  await launchScene(terminalReloadScene, { capture: false });
+
+try {
+  const terminalReloadPanel = terminalReloadPage.getByTestId("terminal-panel");
+  let alert = terminalReloadPanel.getByRole("alert");
+  const reloadContract = {
+    alertText: await alert.textContent(),
+    logCount: await terminalReloadPanel.getByRole("log").count(),
+    textboxCount: await terminalReloadPanel.getByRole("textbox").count(),
+  };
+  if (
+    !reloadContract.alertText?.includes(
+      "Try reloading the terminal to continue",
+    ) ||
+    reloadContract.logCount !== 0 ||
+    reloadContract.textboxCount !== 0
+  ) {
+    throw new Error(
+      `Electron Terminal reload surface is incomplete: ${JSON.stringify(reloadContract)}`,
+    );
+  }
+  await terminalReloadPanel
+    .getByRole("button", { name: "Open bottom panel tab" })
+    .click();
+  await terminalReloadPage
+    .getByRole("menuitem", { name: "Terminal", exact: true })
+    .click();
+  if (
+    !(await terminalReloadPanel
+      .getByRole("tab", { name: "codex-ui-kit 2", selected: true })
+      .isVisible()) ||
+    !(await terminalReloadPanel
+      .getByRole("textbox", { name: "Terminal input" })
+      .isVisible()) ||
+    (await terminalReloadPanel.getByRole("alert").count()) !== 0
+  ) {
+    throw new Error(
+      "Electron fresh Terminal inherited the crashed session's reload state.",
+    );
+  }
+  await terminalReloadPanel
+    .getByRole("tab", { name: "codex-ui-kit 1" })
+    .click();
+  alert = terminalReloadPanel.getByRole("alert");
+  if (!(await alert.isVisible())) {
+    throw new Error(
+      "Electron crashed Terminal lost its session-scoped reload state.",
+    );
+  }
+  await alert.getByRole("button", { name: "Reload" }).click();
+  await terminalReloadPage.waitForSelector(
+    '.demo-root[data-frame="terminal-current-single"]',
+  );
+  if (
+    (await terminalReloadPanel.getByRole("alert").count()) !== 0 ||
+    !(await terminalReloadPanel
+      .getByRole("textbox", { name: "Terminal input" })
+      .isVisible())
+  ) {
+    throw new Error(
+      "Electron Terminal reload did not restore a fresh interactive shell.",
+    );
+  }
+} finally {
+  await terminalReloadApp.close();
+}
+
+const backgroundTerminalScene = {
+  frame: "terminal-current-background-list",
+  id: "electron-current-background-terminal",
+  scenario: "terminal-lifecycle",
+};
+const {
+  app: backgroundTerminalApp,
+  page: backgroundTerminalPage,
+} = await launchScene(backgroundTerminalScene, { capture: false });
+
+try {
+  const summary = backgroundTerminalPage.getByTestId(
+    "terminal-current-background-summary",
+  );
+  const openProcess = summary.locator(
+    ".codex-ui-terminal-process-list__open",
+  );
+  if (
+    !(await openProcess.textContent())?.includes(
+      "terminal-background-handle",
+    ) ||
+    (await backgroundTerminalPage
+      .locator(".codex-ui-app-shell[data-bottom-panel-open]")
+      .count()) !== 0
+  ) {
+    throw new Error("Electron background process summary is incomplete.");
+  }
+  await openProcess.click();
+  await backgroundTerminalPage.waitForSelector(
+    '[data-testid="terminal-current-background-panel"]',
+  );
+  const backgroundOutput = await backgroundTerminalPage
+    .getByRole("log", { name: "Background terminal output" })
+    .textContent();
+  if (
+    !backgroundOutput?.includes("terminal-background-handle-066") ||
+    !backgroundOutput.includes("terminal-background-handle-110") ||
+    (await backgroundTerminalPage
+      .locator(".codex-ui-app-shell[data-bottom-panel-open]")
+      .count()) !== 0
+  ) {
+    throw new Error(
+      "Electron background process did not open in the side-panel Terminal.",
+    );
+  }
+  await backgroundTerminalPage
+    .getByRole("button", { name: "Close background terminal" })
+    .click();
+  await backgroundTerminalPage.waitForSelector(
+    '[data-testid="terminal-current-background-summary"]',
+  );
+  if (
+    !(await backgroundTerminalPage
+      .getByTestId("terminal-current-background-summary")
+      .isVisible()) ||
+    (await backgroundTerminalPage
+      .locator('.demo-root[data-frame="terminal-current-background-list"]')
+      .count()) !== 1
+  ) {
+    throw new Error(
+      "Electron background panel Close did not preserve the process reopen path.",
+    );
+  }
+  await backgroundTerminalPage
+    .getByTestId("terminal-current-background-summary")
+    .locator(".codex-ui-terminal-process-list__open")
+    .click();
+  await backgroundTerminalPage
+    .locator(".codex-ui-workspace-panel__tab-close")
+    .click();
+  await backgroundTerminalPage.waitForSelector(
+    '[data-testid="terminal-current-background-summary"]',
+  );
+  await backgroundTerminalPage
+    .getByTestId("terminal-current-background-summary")
+    .locator(".codex-ui-terminal-process-list__open")
+    .click();
+  if (
+    !(await backgroundTerminalPage
+      .getByTestId("terminal-current-background-panel")
+      .isVisible())
+  ) {
+    throw new Error(
+      "Electron background Terminal could not be reopened while its process stayed active.",
+    );
+  }
+  await backgroundTerminalApp.evaluate(({ BrowserWindow }) => {
+    BrowserWindow.getAllWindows()[0]?.setContentSize(720, 680);
+  });
+  await backgroundTerminalPage.waitForSelector(
+    ".codex-ui-app-shell:not([data-side-panel-open])",
+  );
+  if (
+    (await backgroundTerminalPage
+      .getByTestId("terminal-current-background-panel")
+      .isVisible()) ||
+    (await backgroundTerminalPage
+      .locator('.demo-root[data-frame="terminal-current-background-open"]')
+      .count()) !== 1
+  ) {
+    throw new Error(
+      "Electron responsive close changed the background Terminal content state.",
+    );
+  }
+  await backgroundTerminalApp.evaluate(({ BrowserWindow }) => {
+    BrowserWindow.getAllWindows()[0]?.setContentSize(1180, 820);
+  });
+  await backgroundTerminalPage.waitForSelector(
+    ".codex-ui-app-shell[data-side-panel-open]",
+  );
+  await backgroundTerminalPage
+    .getByRole("button", { name: "Pull requests" })
+    .click();
+  await backgroundTerminalPage.waitForSelector(
+    '.demo-root[data-view="pull-request"]',
+  );
+  const pullRequestShell = await backgroundTerminalPage.evaluate(() => {
+    const shell = document.querySelector(".codex-ui-app-shell");
+    return {
+      overlay: shell?.hasAttribute("data-side-panel-overlay") ?? false,
+      view: document.querySelector(".demo-root")?.getAttribute("data-view"),
+    };
+  });
+  if (!pullRequestShell.overlay || pullRequestShell.view !== "pull-request") {
+    throw new Error(
+      `Electron background Terminal navigation lost the pull-request overlay: ${JSON.stringify(pullRequestShell)}`,
+    );
+  }
+} finally {
+  await backgroundTerminalApp.close();
+}
+
 const pullRequestScene = {
   frame: "pr-summary-ready",
   id: "electron-pull-request-detail",

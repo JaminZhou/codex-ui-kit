@@ -175,6 +175,16 @@ The authoritative current-build inventory is:
   behavior, code search, broader connectors, or the wider thread-error, queue,
   Markdown variants, menu, global-route, and Settings states; those remain
   historical evidence from `26.715.72359` until sampled again.
+- The current Codex Desktop `26.803.61601` (`6396`) Terminal follow-up proves
+  that a child command `exit 7` leaves the direct interactive shell usable and
+  does not show a terminal failure, while ordinary shell `exit` closes its tab.
+  A real agent-created background loop remains active after the response,
+  appears in `Background processes`, and opens live output in a 381.44px side
+  panel. The independent state machine closes and reopens that tab while the
+  process remains active. The installed package supplies the separate crash
+  title/description/Reload structure; deliberately crashing the product pty is
+  not treated as required runtime evidence. Four new Browser/CDP, Electron,
+  and reviewed internal pixel scenes bring the visual matrix to 192.
 - The previous Codex Desktop `26.730.61639` (`6234`) Terminal refresh locks the
   local project-labelled session shell, global visible numbering across
   workspaces, nearest-tab selection, label reindexing, the four-item picker,
@@ -185,8 +195,8 @@ The authoritative current-build inventory is:
   exact `Dismiss`/`Open new terminal` recovery without discarding older
   sessions. Browser/CDP covers 93 frames, Electron repeats the owned
   interactions, and the exact 906×820 reference passes at 1.5120% panel and
-  0.4004% content difference. Direct-shell failure/restart and background
-  agent-process reopen remain separate gates.
+  0.4004% content difference. The current follow-up now owns the remaining
+  direct-command, crash-reload, and background agent-process gates above.
 - The previous Codex Desktop `26.730.61309` (`6223`) sidebar refresh locks the
   274px dark column, 46px titlebar, 70px header, 30px routes, five expandable
   project groups, dense history, actions/status, fixed 46px footer, and 16px
@@ -498,6 +508,14 @@ shared 272px bottom panel and 239px xterm content ownership regions. Those
 regions differ by 1.5120% and 0.4004%, below independent 2% and 1% hard
 limits. CDP and Electron separately lock the text, accessible names, focus,
 session/mismatch lifecycle, and compact geometry that pixels cannot establish.
+
+The `26.803.61601` command-exit, crash-reload, background-summary, and
+background-side-panel frames are reviewed internal regression baselines rather
+than product screenshots. Product runtime establishes direct `exit 7`, ordinary
+shell close, and live background-process opening; package structure establishes
+the crash Reload copy. CDP computed geometry and Electron interaction remain
+the semantic gates, so an internal zero-diff baseline is never presented as a
+current-product pixel ratio.
 
 Broader final visual optimization remains scheduled after the remaining
 inventory, page compositions, and state transitions stabilize. A passing

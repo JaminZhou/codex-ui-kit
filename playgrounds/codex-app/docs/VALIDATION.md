@@ -75,8 +75,13 @@ Every deterministic scenario has one ID and produces four evidence layers:
    output lines, then collapses and reopens the card to prove reverse-tail
    restoration.
 4. **Pixels** — full-frame regression screenshots after the structural gates
-   pass. The 113th reviewed frame is an internal light shell baseline that
-   combines the current sidebar, window chrome, workspace entry, context bar,
+   pass. The 192 reviewed frames include four current Terminal recovery and
+   background-process regressions. Those four are independent replay baselines,
+   not current-product screenshots: real CDP separately establishes child
+   `exit 7`, ordinary shell close, and background side-panel opening, while
+   package structure establishes the crash Reload copy. The earlier internal
+   light shell baseline likewise remains independent and combines the current
+   sidebar, window chrome, workspace entry, context bar,
    and Composer. It is not a current-product light reference. The multi-file
    scenario can additionally compare a separately captured 906×820
    current-build main region through
