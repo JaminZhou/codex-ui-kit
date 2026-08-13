@@ -101,7 +101,10 @@ export const AgentThreadViewport = forwardRef<
 ) {
   const viewportRef = useRef<HTMLDivElement>(null);
   const [following, setFollowing] = useState(defaultFollowing);
+  const [renderedLatestOrigin, setRenderedLatestOrigin] =
+    useState(latestOrigin);
   const followingRef = useRef(defaultFollowing);
+  const pendingOriginDistanceRef = useRef<number | null>(null);
   const programmaticFollowTargetRef = useRef<number | null>(null);
   const setViewportRef = useCallback(
     (viewport: HTMLDivElement | null) => {
@@ -138,11 +141,54 @@ export const AgentThreadViewport = forwardRef<
     [onFollowingChange],
   );
 
+  useLayoutEffect(() => {
+    const viewport = viewportRef.current;
+    if (!viewport || renderedLatestOrigin === latestOrigin) return;
+    if (!followingRef.current) {
+      pendingOriginDistanceRef.current =
+        renderedLatestOrigin === "start"
+          ? Math.abs(viewport.scrollTop)
+          : Math.max(
+              0,
+              viewport.scrollHeight -
+                viewport.clientHeight -
+                viewport.scrollTop,
+            );
+    }
+    setRenderedLatestOrigin(latestOrigin);
+  }, [latestOrigin, renderedLatestOrigin]);
+
+  useLayoutEffect(() => {
+    const viewport = viewportRef.current;
+    const distanceFromLatest = pendingOriginDistanceRef.current;
+    if (
+      !viewport ||
+      distanceFromLatest === null ||
+      renderedLatestOrigin !== latestOrigin
+    ) {
+      return;
+    }
+    pendingOriginDistanceRef.current = null;
+    programmaticFollowTargetRef.current = null;
+    const maximum = Math.max(
+      0,
+      viewport.scrollHeight - viewport.clientHeight,
+    );
+    const target =
+      renderedLatestOrigin === "start"
+        ? -Math.min(distanceFromLatest, maximum)
+        : Math.max(0, maximum - distanceFromLatest);
+    const previousScrollBehavior = viewport.style.scrollBehavior;
+    viewport.style.scrollBehavior = "auto";
+    viewport.scrollTop = target;
+    viewport.style.scrollBehavior = previousScrollBehavior;
+  }, [latestOrigin, renderedLatestOrigin]);
+
   useEffect(() => {
     const viewport = viewportRef.current;
     if (!viewport) return;
     const distanceFromLatest = () =>
-      latestOrigin === "start"
+      renderedLatestOrigin === "start"
         ? Math.abs(viewport.scrollTop)
         : viewport.scrollHeight -
           viewport.clientHeight -
@@ -164,7 +210,7 @@ export const AgentThreadViewport = forwardRef<
         viewport.removeEventListener(eventName, cancelProgrammaticFollow);
       }
     };
-  }, [followThreshold, latestOrigin, updateFollowing]);
+  }, [followThreshold, renderedLatestOrigin, updateFollowing]);
 
   useLayoutEffect(() => {
     const viewport = viewportRef.current;
@@ -182,13 +228,13 @@ export const AgentThreadViewport = forwardRef<
       "(prefers-reduced-motion: reduce)",
     ).matches;
     const latestScrollTop =
-      latestOrigin === "start" ? 0 : viewport.scrollHeight;
+      renderedLatestOrigin === "start" ? 0 : viewport.scrollHeight;
     programmaticFollowTargetRef.current = latestScrollTop;
     viewport.scrollTo({
       behavior: reducedMotion ? "auto" : "smooth",
       top: latestScrollTop,
     });
-  }, [autoFollow, children, followKey, latestOrigin]);
+  }, [autoFollow, children, followKey, renderedLatestOrigin]);
 
   return (
     <div
@@ -197,11 +243,11 @@ export const AgentThreadViewport = forwardRef<
         .filter(Boolean)
         .join(" ")}
       data-following={following || undefined}
-      data-latest-origin={latestOrigin}
+      data-latest-origin={renderedLatestOrigin}
       onScroll={(event) => {
         const viewport = event.currentTarget;
         const distanceFromLatest =
-          latestOrigin === "start"
+          renderedLatestOrigin === "start"
             ? Math.abs(viewport.scrollTop)
             : viewport.scrollHeight -
               viewport.clientHeight -
@@ -209,7 +255,7 @@ export const AgentThreadViewport = forwardRef<
         const programmaticTarget = programmaticFollowTargetRef.current;
         if (programmaticTarget !== null) {
           const reachedTarget =
-            latestOrigin === "start"
+            renderedLatestOrigin === "start"
               ? Math.abs(viewport.scrollTop - programmaticTarget) <=
                 followThreshold
               : viewport.scrollTop + viewport.clientHeight >=
