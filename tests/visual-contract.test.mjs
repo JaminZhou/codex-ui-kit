@@ -1,5 +1,6 @@
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
+import { selectCurrentThreadVisualScenes } from "../scripts/check-current-thread-visual.mjs";
 
 const packageJson = JSON.parse(
   readFileSync(new URL("../package.json", import.meta.url), "utf8"),
@@ -20,6 +21,17 @@ describe("current-thread visual contract", () => {
     expect(packageJson.scripts["check:visual:current-thread"]).toBe(
       "pnpm build:demo && node scripts/check-current-thread-visual.mjs",
     );
+    expect(selectCurrentThreadVisualScenes({})).toEqual([
+      "current-thread-completed",
+    ]);
+    expect(
+      selectCurrentThreadVisualScenes({
+        CODEX_UI_KIT_THREAD_COMPACT_REFERENCE: "/tmp/compact.png",
+      }),
+    ).toEqual([
+      "current-thread-completed",
+      "current-thread-completed-compact",
+    ]);
   });
 
   it("registers every sampled workflow state as an independent scenario", () => {
