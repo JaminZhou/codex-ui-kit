@@ -5138,8 +5138,8 @@ export function App() {
     workspacePage === "environments"
       ? "workspace-environments-unavailable"
       : workspacePage === "general-settings"
-        ? initialSelection.frame?.startsWith("workspace-general-settings")
-          ? initialSelection.frame
+        ? activeFrame?.startsWith("workspace-general-settings")
+          ? activeFrame
           : "workspace-general-settings"
       : workspacePage === "appearance-settings"
         ? initialSelection.frame?.startsWith("workspace-appearance-settings")

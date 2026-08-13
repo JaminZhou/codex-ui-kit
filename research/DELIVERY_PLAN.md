@@ -457,7 +457,9 @@ formatting/cancel,
 1180px/720px layout, light paint, and bottom scroll. Electron repeats the
 route and retains General state while switching through Git and Appearance.
 Transient shortcut capture is cancelled when navigation leaves General while
-the captured shortcut value remains controlled state.
+the captured shortcut value remains controlled state; hotkey and bottom
+snapshot frames are initial-only and return to the normal top frame after
+route navigation.
 Six reviewed frames extend the matrix to 180, with optional local-only full-
 frame comparisons for wide, compact, shortcut-capture, and bottom states at
 4.6143%, 6.7412%, 4.7654%, and 4.8818%.

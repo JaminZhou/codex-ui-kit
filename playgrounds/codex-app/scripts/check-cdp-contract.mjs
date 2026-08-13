@@ -883,12 +883,49 @@ for (const scene of selectedScenes) {
         await page.waitForFunction(
           () =>
             document.activeElement?.getAttribute("aria-label") ===
-            "Set shortcut for Popout Window hotkey",
+          "Set shortcut for Popout Window hotkey",
         );
+      }
+      let initialFrameRouteLifecycle = null;
+      if (hotkey || bottom) {
+        await page.getByRole("button", { name: "Git", exact: true }).click();
+        await page.getByRole("heading", { name: "Git", exact: true }).waitFor();
+        await page.getByRole("button", { name: "General", exact: true }).click();
+        await page
+          .getByRole("heading", { level: 1, name: "General", exact: true })
+          .waitFor();
+        await page.waitForFunction(
+          () =>
+            document.querySelector(".demo-root")?.getAttribute("data-frame") ===
+              "workspace-general-settings" &&
+            !document.querySelector(".codex-ui-general-settings__hotkey-capture") &&
+            document.activeElement?.textContent?.trim() === "General",
+        );
+        initialFrameRouteLifecycle = await page.evaluate(() => {
+          const owner = document.querySelector(".codex-ui-settings-shell__main");
+          return {
+            activeText: document.activeElement?.textContent?.trim(),
+            frame: document.querySelector(".demo-root")?.getAttribute("data-frame"),
+            hotkeyCapture: Boolean(
+              document.querySelector(".codex-ui-general-settings__hotkey-capture"),
+            ),
+            scrollTop: owner instanceof HTMLElement ? owner.scrollTop : null,
+          };
+        });
+        if (
+          initialFrameRouteLifecycle.activeText !== "General" ||
+          initialFrameRouteLifecycle.frame !== "workspace-general-settings" ||
+          initialFrameRouteLifecycle.hotkeyCapture ||
+          initialFrameRouteLifecycle.scrollTop !== 0
+        ) {
+          throw new Error(
+            `${scene.id}: initial General frame leaked across routing: ${JSON.stringify(initialFrameRouteLifecycle)}`,
+          );
+        }
       }
       await writeFile(
         join(artifactDirectory, `${scene.id}.json`),
-        `${JSON.stringify({ general, interaction }, null, 2)}\n`,
+        `${JSON.stringify({ general, initialFrameRouteLifecycle, interaction }, null, 2)}\n`,
       );
       continue;
     }

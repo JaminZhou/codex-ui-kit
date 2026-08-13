@@ -122,7 +122,8 @@ The authoritative current-build inventory is:
   capture/formatting/cancel.
   Browser/CDP and Electron prove geometry, light/compact/bottom states,
   interactions, persistent-value continuity, and transient shortcut-capture
-  cleanup across General, Git, and Appearance.
+  cleanup across General, Git, and Appearance. Hotkey/bottom snapshot frames
+  are initial-only and normalize after route navigation.
   Six reviewed frames extend the matrix to 180, including a dedicated 720px
   shortcut-capture frame. Optional local-only product
   gates compare the full wide, 720px top crop, hotkey capture, and bottom
