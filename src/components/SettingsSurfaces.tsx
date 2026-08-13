@@ -1414,6 +1414,7 @@ function GeneralMenuControl({
   options: readonly GeneralSettingsOption[];
   value: string;
 }) {
+  const triggerRef = useRef<HTMLButtonElement>(null);
   const selected = options.find((option) => option.value === value);
   return (
     <Menu
@@ -1425,6 +1426,7 @@ function GeneralMenuControl({
         <button
           aria-label={label}
           className="codex-ui-general-settings__menu-trigger"
+          ref={triggerRef}
           type="button"
         >
           {selected?.icon ? (
@@ -1444,7 +1446,10 @@ function GeneralMenuControl({
         <MenuItem
           endIcon={option.value === value ? <span>✓</span> : undefined}
           key={option.value}
-          onSelect={() => onChange(option.value)}
+          onSelect={() => {
+            onChange(option.value);
+            triggerRef.current?.focus();
+          }}
           startIcon={option.icon}
           subText={option.description}
         >
@@ -1467,12 +1472,6 @@ function GeneralLanguageControl({
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
   const triggerRef = useRef<HTMLButtonElement>(null);
-  const wasOpenRef = useRef(false);
-  useEffect(() => {
-    const wasOpen = wasOpenRef.current;
-    wasOpenRef.current = open;
-    if (!open && wasOpen) triggerRef.current?.focus();
-  }, [open]);
   const selected = options.find((option) => option.value === value);
   const filtered = options.filter((option) =>
     option.label.toLocaleLowerCase().includes(query.trim().toLocaleLowerCase()),
@@ -1525,6 +1524,7 @@ function GeneralLanguageControl({
               onChange(option.value);
               setOpen(false);
               setQuery("");
+              triggerRef.current?.focus();
             }}
             role="option"
             tabIndex={-1}

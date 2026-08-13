@@ -5283,6 +5283,17 @@ try {
       `Electron General Settings route is incomplete: ${JSON.stringify(generalGeometry)}.`,
     );
   }
+  const readGeneralFocusedLabel = async (label) => {
+    await codingWorkspacePage.waitForFunction(
+      (expected) =>
+        document.activeElement?.getAttribute("aria-label") === expected,
+      label,
+    );
+    return codingWorkspacePage.evaluate(
+      () => document.activeElement?.getAttribute("aria-label"),
+    );
+  };
+  const generalMenuFocus = {};
   const autoReviewSwitch = generalSettingsMain.getByRole("switch", {
     name: "Show Auto-review in the composer",
   });
@@ -5298,25 +5309,38 @@ try {
   ) {
     throw new Error("Electron General file destination menu is incomplete.");
   }
-  await fileDestinations.filter({ hasText: "Xcode" }).click();
+  const xcodeDestination = fileDestinations.filter({ hasText: "Xcode" });
+  await xcodeDestination.focus();
+  await xcodeDestination.press("Enter");
+  generalMenuFocus.fileDestination = await readGeneralFocusedLabel(
+    "Default file open destination",
+  );
   await generalSettingsMain.getByRole("button", { name: "Language" }).click();
   const languageSearch = codingWorkspacePage.getByRole("searchbox", {
     name: "Search languages",
   });
   await languageSearch.fill("简体");
-  await codingWorkspacePage
-    .getByRole("option", { name: "简体中文", exact: true })
-    .click();
-  await codingWorkspacePage.waitForFunction(
-    () => document.activeElement?.getAttribute("aria-label") === "Language",
-  );
-  const generalLanguageFocusRestored = await codingWorkspacePage.evaluate(
-    () => document.activeElement?.getAttribute("aria-label"),
-  );
+  const simplifiedChinese = codingWorkspacePage.getByRole("option", {
+    name: "简体中文",
+    exact: true,
+  });
+  await simplifiedChinese.focus();
+  await simplifiedChinese.press("Enter");
+  generalMenuFocus.language = await readGeneralFocusedLabel("Language");
+  await generalSettingsMain.getByRole("button", { name: "Language" }).click();
+  await languageSearch.focus();
+  await languageSearch.press("Escape");
+  generalMenuFocus.languageEscape = await readGeneralFocusedLabel("Language");
   const bottomTerminal = generalSettingsMain.getByRole("button", {
     name: "Bottom",
     exact: true,
   });
+  await generalSettingsMain.getByRole("button", { name: "Language" }).click();
+  await codingWorkspacePage
+    .getByRole("searchbox", { name: "Search languages" })
+    .waitFor();
+  await bottomTerminal.click();
+  generalMenuFocus.languageOutside = await readGeneralFocusedLabel("Bottom");
   await bottomTerminal.focus();
   await bottomTerminal.press("ArrowRight");
   await generalSettingsMain.getByRole("button", { name: "Speed" }).click();
@@ -5324,7 +5348,10 @@ try {
   if ((await speedOptions.count()) !== 2) {
     throw new Error("Electron General speed menu is incomplete.");
   }
-  await speedOptions.filter({ hasText: /^Fast/ }).click();
+  const fastSpeed = speedOptions.filter({ hasText: /^Fast/ });
+  await fastSpeed.focus();
+  await fastSpeed.press("Enter");
+  generalMenuFocus.speed = await readGeneralFocusedLabel("Speed");
   const contextUsageSwitch = generalSettingsMain.getByRole("switch", {
     name: "Show context window usage in the composer",
   });
@@ -5332,10 +5359,12 @@ try {
   await generalSettingsMain
     .getByRole("button", { name: "Send shortcut" })
     .click();
-  await codingWorkspacePage
+  const commandEnter = codingWorkspacePage
     .getByRole("menuitem")
-    .filter({ hasText: "⌘ + Enter always" })
-    .click();
+    .filter({ hasText: "⌘ + Enter always" });
+  await commandEnter.focus();
+  await commandEnter.press("Enter");
+  generalMenuFocus.sendShortcut = await readGeneralFocusedLabel("Send shortcut");
   const queueBehavior = generalSettingsMain.getByRole("button", {
     name: "Queue",
     exact: true,
@@ -5365,9 +5394,15 @@ try {
   await generalSettingsMain
     .getByRole("button", { name: "Turn completion notifications" })
     .click();
-  await codingWorkspacePage
-    .getByRole("menuitem", { name: "Always", exact: true })
-    .click();
+  const alwaysNotifications = codingWorkspacePage.getByRole("menuitem", {
+    name: "Always",
+    exact: true,
+  });
+  await alwaysNotifications.focus();
+  await alwaysNotifications.press("Enter");
+  generalMenuFocus.completionNotifications = await readGeneralFocusedLabel(
+    "Turn completion notifications",
+  );
   await generalSettingsMain
     .getByRole("button", { name: "View", exact: true })
     .click();
@@ -5398,7 +5433,7 @@ try {
     hotkeyFocus: focus.hotkey,
     language: main.querySelector('button[aria-label="Language"]')
       ?.textContent?.trim(),
-    languageFocus: focus.language,
+    menuFocus: focus.menu,
     sendShortcut: main.querySelector('button[aria-label="Send shortcut"]')
       ?.textContent?.trim(),
     speed: main.querySelector('button[aria-label="Speed"]')
@@ -5408,7 +5443,7 @@ try {
       ?.getAttribute("aria-pressed"),
   }), {
     hotkey: generalHotkeyFocusRestored,
-    language: generalLanguageFocusRestored,
+    menu: generalMenuFocus,
   });
   if (
     generalInteraction.autoReview !== "false" ||
@@ -5419,7 +5454,15 @@ try {
     generalInteraction.hotkeyCapture ||
     generalInteraction.hotkeyFocus !== "Set shortcut for Popout Window hotkey" ||
     generalInteraction.language !== "简体中文⌄" ||
-    generalInteraction.languageFocus !== "Language" ||
+    generalInteraction.menuFocus.completionNotifications !==
+      "Turn completion notifications" ||
+    generalInteraction.menuFocus.fileDestination !==
+      "Default file open destination" ||
+    generalInteraction.menuFocus.language !== "Language" ||
+    generalInteraction.menuFocus.languageEscape !== "Language" ||
+    generalInteraction.menuFocus.languageOutside !== "Bottom" ||
+    generalInteraction.menuFocus.sendShortcut !== "Send shortcut" ||
+    generalInteraction.menuFocus.speed !== "Speed" ||
     generalInteraction.sendShortcut !== "⌘ + Enter always⌄" ||
     !generalInteraction.speed?.includes("Fast") ||
     generalInteraction.terminal !== "true"

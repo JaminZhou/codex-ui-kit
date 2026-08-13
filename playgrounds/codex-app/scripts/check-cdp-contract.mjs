@@ -626,6 +626,17 @@ for (const scene of selectedScenes) {
 
       let interaction = null;
       if (scene.id === "workspace-general-settings") {
+        const readFocusedLabel = async (label) => {
+          await page.waitForFunction(
+            (expected) =>
+              document.activeElement?.getAttribute("aria-label") === expected,
+            label,
+          );
+          return page.evaluate(
+            () => document.activeElement?.getAttribute("aria-label"),
+          );
+        };
+        const menuFocus = {};
         await page
           .getByRole("switch", { name: "Show Auto-review in the composer" })
           .click();
@@ -633,30 +644,56 @@ for (const scene of selectedScenes) {
           .getByRole("button", { name: "Default file open destination" })
           .click();
         const fileDestinations = await page.getByRole("menuitem").allTextContents();
-        await page.getByRole("menuitem", { name: "Xcode", exact: true }).click();
+        const xcodeDestination = page.getByRole("menuitem", {
+          name: "Xcode",
+          exact: true,
+        });
+        await xcodeDestination.focus();
+        await xcodeDestination.press("Enter");
+        menuFocus.fileDestination = await readFocusedLabel(
+          "Default file open destination",
+        );
         await page.getByRole("button", { name: "Language" }).click();
         await page.getByRole("searchbox", { name: "Search languages" }).fill("简体");
-        await page.getByRole("option", { name: "简体中文", exact: true }).click();
-        await page.waitForFunction(
-          () => document.activeElement?.getAttribute("aria-label") === "Language",
-        );
-        const languageFocusRestored = await page.evaluate(
-          () => document.activeElement?.getAttribute("aria-label"),
-        );
+        const simplifiedChinese = page.getByRole("option", {
+          name: "简体中文",
+          exact: true,
+        });
+        await simplifiedChinese.focus();
+        await simplifiedChinese.press("Enter");
+        menuFocus.language = await readFocusedLabel("Language");
+        await page.getByRole("button", { name: "Language" }).click();
+        const languageSearch = page.getByRole("searchbox", {
+          name: "Search languages",
+        });
+        await languageSearch.focus();
+        await languageSearch.press("Escape");
+        menuFocus.languageEscape = await readFocusedLabel("Language");
+        await page.getByRole("button", { name: "Language" }).click();
+        await page
+          .getByRole("searchbox", { name: "Search languages" })
+          .waitFor();
         const bottomControl = page.getByRole("button", { name: "Bottom", exact: true });
+        await bottomControl.click();
+        menuFocus.languageOutside = await readFocusedLabel("Bottom");
         await bottomControl.focus();
         await bottomControl.press("ArrowRight");
         await page.getByRole("button", { name: "Speed" }).click();
         const speedOptions = await page.getByRole("menuitem").allTextContents();
-        await page.getByRole("menuitem").filter({ hasText: /^Fast/ }).click();
+        const fastSpeed = page.getByRole("menuitem").filter({ hasText: /^Fast/ });
+        await fastSpeed.focus();
+        await fastSpeed.press("Enter");
+        menuFocus.speed = await readFocusedLabel("Speed");
         await page
           .getByRole("switch", { name: "Show context window usage in the composer" })
           .click();
         await page.getByRole("button", { name: "Send shortcut" }).click();
-        await page
+        const commandEnter = page
           .getByRole("menuitem")
-          .filter({ hasText: "⌘ + Enter always" })
-          .click();
+          .filter({ hasText: "⌘ + Enter always" });
+        await commandEnter.focus();
+        await commandEnter.press("Enter");
+        menuFocus.sendShortcut = await readFocusedLabel("Send shortcut");
         const queueControl = page.getByRole("button", { name: "Queue", exact: true });
         await queueControl.focus();
         await queueControl.press("ArrowRight");
@@ -678,10 +715,18 @@ for (const scene of selectedScenes) {
         await page
           .getByRole("button", { name: "Turn completion notifications" })
           .click();
-        await page.getByRole("menuitem", { name: "Always", exact: true }).click();
+        const alwaysNotifications = page.getByRole("menuitem", {
+          name: "Always",
+          exact: true,
+        });
+        await alwaysNotifications.focus();
+        await alwaysNotifications.press("Enter");
+        menuFocus.completionNotifications = await readFocusedLabel(
+          "Turn completion notifications",
+        );
         await page.getByRole("button", { name: "View", exact: true }).click();
         interaction = await page.evaluate(
-          ({ fileDestinations, hotkeyFocusRestored, languageFocusRestored, speedOptions }) => ({
+          ({ fileDestinations, hotkeyFocusRestored, menuFocus, speedOptions }) => ({
             autoReview: document
               .querySelector('[role="switch"][aria-label="Show Auto-review in the composer"]')
               ?.getAttribute("aria-checked"),
@@ -705,9 +750,9 @@ for (const scene of selectedScenes) {
             language: document
               .querySelector('button[aria-label="Language"]')
               ?.textContent?.trim(),
-            languageFocus: languageFocusRestored,
             licenses: document.querySelector(".demo-settings-action-status")
               ?.textContent?.trim(),
+            menuFocus,
             sendShortcut: document
               .querySelector('button[aria-label="Send shortcut"]')
               ?.textContent?.trim(),
@@ -721,7 +766,7 @@ for (const scene of selectedScenes) {
           {
             fileDestinations,
             hotkeyFocusRestored,
-            languageFocusRestored,
+            menuFocus,
             speedOptions,
           },
         );
@@ -735,8 +780,16 @@ for (const scene of selectedScenes) {
           interaction.hotkeyCapture ||
           interaction.hotkeyFocus !== "Set shortcut for Popout Window hotkey" ||
           interaction.language !== "简体中文⌄" ||
-          interaction.languageFocus !== "Language" ||
           interaction.licenses !== "Open source licenses requested" ||
+          interaction.menuFocus.completionNotifications !==
+            "Turn completion notifications" ||
+          interaction.menuFocus.fileDestination !==
+            "Default file open destination" ||
+          interaction.menuFocus.language !== "Language" ||
+          interaction.menuFocus.languageEscape !== "Language" ||
+          interaction.menuFocus.languageOutside !== "Bottom" ||
+          interaction.menuFocus.sendShortcut !== "Send shortcut" ||
+          interaction.menuFocus.speed !== "Speed" ||
           interaction.sendShortcut !== "⌘ + Enter always⌄" ||
           !interaction.speed?.includes("Fast") ||
           interaction.speedOptions.length !== 2 ||

@@ -508,11 +508,14 @@ describe("settings surfaces", () => {
       screen.getByRole("button", { name: "Default file open destination" }),
     );
     expect(screen.getAllByRole("menuitem")).toHaveLength(7);
-    fireEvent.click(screen.getByRole("menuitem", { name: /Xcode/ }));
-    expect(
-      screen.getByRole("button", { name: "Default file open destination" })
-        .textContent,
-    ).toContain("Xcode");
+    const xcode = screen.getByRole("menuitem", { name: /Xcode/ });
+    xcode.focus();
+    fireEvent.click(xcode);
+    const fileDestinationTrigger = screen.getByRole("button", {
+      name: "Default file open destination",
+    });
+    expect(fileDestinationTrigger.textContent).toContain("Xcode");
+    expect(document.activeElement).toBe(fileDestinationTrigger);
 
     fireEvent.click(screen.getByRole("button", { name: "Language" }));
     const languageSearch = screen.getByRole("searchbox", {
@@ -529,8 +532,44 @@ describe("settings surfaces", () => {
     );
     expect(document.activeElement).toBe(languageTrigger);
 
-    fireEvent.click(screen.getByRole("button", { name: "Speed" }));
-    expect(screen.getByRole("menuitem", { name: /Fast/ })).toBeTruthy();
+    for (const [triggerName, itemName] of [
+      ["Speed", /Fast/],
+      ["Send shortcut", /⌘ \+ Enter always/],
+      ["Turn completion notifications", /^Always$/],
+    ] as const) {
+      fireEvent.click(screen.getByRole("button", { name: triggerName }));
+      const item = screen.getByRole("menuitem", { name: itemName });
+      item.focus();
+      fireEvent.click(item);
+      expect(document.activeElement).toBe(
+        screen.getByRole("button", { name: triggerName }),
+      );
+    }
+  });
+
+  it("does not steal General language focus when navigation closes the list", () => {
+    render(<GeneralFixture />);
+
+    const languageTrigger = screen.getByRole("button", { name: "Language" });
+    fireEvent.click(languageTrigger);
+    const languageSearch = screen.getByRole("searchbox", {
+      name: "Search languages",
+    });
+    languageSearch.focus();
+    fireEvent.keyDown(languageSearch, { key: "Tab" });
+    expect(
+      screen.queryByRole("searchbox", { name: "Search languages" }),
+    ).toBeNull();
+    expect(document.activeElement).not.toBe(languageTrigger);
+
+    fireEvent.click(languageTrigger);
+    const view = screen.getByRole("button", { name: "View" });
+    view.focus();
+    fireEvent.pointerDown(view);
+    expect(
+      screen.queryByRole("searchbox", { name: "Search languages" }),
+    ).toBeNull();
+    expect(document.activeElement).toBe(view);
   });
 
   it("supports General segmented keyboard flow and host-owned actions", () => {
