@@ -3501,6 +3501,28 @@ try {
     );
   }
   await backgroundTerminalPage
+    .getByRole("button", { name: "Close background terminal" })
+    .click();
+  await backgroundTerminalPage.waitForSelector(
+    '[data-testid="terminal-current-background-summary"]',
+  );
+  if (
+    !(await backgroundTerminalPage
+      .getByTestId("terminal-current-background-summary")
+      .isVisible()) ||
+    (await backgroundTerminalPage
+      .locator('.demo-root[data-frame="terminal-current-background-list"]')
+      .count()) !== 1
+  ) {
+    throw new Error(
+      "Electron background panel Close did not preserve the process reopen path.",
+    );
+  }
+  await backgroundTerminalPage
+    .getByTestId("terminal-current-background-summary")
+    .locator(".codex-ui-terminal-process-list__open")
+    .click();
+  await backgroundTerminalPage
     .locator(".codex-ui-workspace-panel__tab-close")
     .click();
   await backgroundTerminalPage.waitForSelector(

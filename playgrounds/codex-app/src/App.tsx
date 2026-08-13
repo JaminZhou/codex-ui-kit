@@ -9273,7 +9273,7 @@ export function App() {
         data-testid="terminal-current-background-panel"
         label="Background terminal"
         onActiveTabChange={() => undefined}
-        onClose={() => setBackgroundTerminalPanelOpen(false)}
+        onClose={() => closeBackgroundTerminalTab()}
         onCloseTab={() => closeBackgroundTerminalTab()}
         placement="side"
         tabCloseButtons
