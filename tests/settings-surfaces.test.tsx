@@ -131,12 +131,21 @@ describe("settings surfaces", () => {
     fireEvent.click(forcePush);
     expect(forcePush.getAttribute("aria-checked")).toBe("true");
 
+    const merge = screen.getByRole("radio", { name: "Merge" });
     const squash = screen.getByRole("radio", { name: "Squash" });
-    fireEvent.click(squash);
+    expect(merge.tabIndex).toBe(0);
+    expect(squash.tabIndex).toBe(-1);
+    merge.focus();
+    fireEvent.keyDown(merge, { key: "ArrowRight" });
     expect(squash.getAttribute("aria-checked")).toBe("true");
-    expect(
-      screen.getByRole("radio", { name: "Merge" }).getAttribute("aria-checked"),
-    ).toBe("false");
+    expect(merge.getAttribute("aria-checked")).toBe("false");
+    expect(document.activeElement).toBe(squash);
+    expect(merge.tabIndex).toBe(-1);
+    expect(squash.tabIndex).toBe(0);
+
+    fireEvent.keyDown(squash, { key: "ArrowRight" });
+    expect(merge.getAttribute("aria-checked")).toBe("true");
+    expect(document.activeElement).toBe(merge);
   });
 
   it("enables instruction save only for a changed controlled value", () => {

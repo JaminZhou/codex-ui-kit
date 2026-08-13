@@ -6277,8 +6277,8 @@ export function App() {
       }}
       onQueryChange={setSettingsQuery}
       onSelect={(itemId) => {
+        if (itemId !== "git") return;
         setSelectedSettingsId(itemId);
-        if (itemId !== "git") setSettingsQuery("");
       }}
       query={settingsQuery}
       searchIcon={<CurrentBuildIcon name="settings-search" />}

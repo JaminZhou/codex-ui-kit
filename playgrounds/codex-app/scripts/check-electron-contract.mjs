@@ -5022,13 +5022,29 @@ try {
     throw new Error("Electron Git Settings search retained an unrelated result.");
   }
   await gitSettingsNavigation
+    .getByRole("button", { name: "Hooks", exact: true })
+    .click();
+  if (
+    (await gitSettingsNavigation
+      .getByRole("button", { name: "Git", exact: true })
+      .getAttribute("aria-current")) !== "page" ||
+    (await gitSettingsMain.getByRole("heading", { name: "Git" }).count()) !==
+      1 ||
+    (await settingsSearch.inputValue()) !== "git"
+  ) {
+    throw new Error("Electron unimplemented Settings navigation replaced the Git route.");
+  }
+  await gitSettingsNavigation
     .getByRole("button", { name: "Clear settings search" })
     .click();
   const forcePushSwitch = gitSettingsMain.getByRole("switch", {
     name: "Always force push",
   });
   await forcePushSwitch.click();
-  await gitSettingsMain.getByRole("radio", { name: "Squash" }).click();
+  const mergeRadio = gitSettingsMain.getByRole("radio", { name: "Merge" });
+  const squashRadio = gitSettingsMain.getByRole("radio", { name: "Squash" });
+  await mergeRadio.focus();
+  await mergeRadio.press("ArrowRight");
   const commitInstructions = gitSettingsMain.getByRole("textbox", {
     name: "Commit instructions",
   });
@@ -5038,9 +5054,9 @@ try {
     .first();
   if (
     (await forcePushSwitch.getAttribute("aria-checked")) !== "true" ||
-    (await gitSettingsMain
-      .getByRole("radio", { name: "Squash" })
-      .getAttribute("aria-checked")) !== "true" ||
+    (await mergeRadio.getAttribute("tabindex")) !== "-1" ||
+    (await squashRadio.getAttribute("aria-checked")) !== "true" ||
+    (await squashRadio.getAttribute("tabindex")) !== "0" ||
     (await gitSettingsSave.isDisabled())
   ) {
     throw new Error("Electron Git Settings controls did not update controlled state.");

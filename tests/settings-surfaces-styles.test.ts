@@ -20,6 +20,12 @@ describe("settings visual contract", () => {
     expect(styles).toMatch(
       /\.codex-ui-settings-shell__navigation-scroll \{[\s\S]*?overflow: auto;/,
     );
+    expect(styles).toMatch(
+      /\.codex-ui-settings-shell__main \{[\s\S]*?scrollbar-width: none;/,
+    );
+    expect(styles).toMatch(
+      /\.codex-ui-settings-shell__main::\-webkit-scrollbar \{[\s\S]*?display: none;/,
+    );
   });
 
   it("retains current Git control geometry and compact overflow safety", () => {

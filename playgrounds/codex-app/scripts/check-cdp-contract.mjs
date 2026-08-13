@@ -273,25 +273,62 @@ for (const scene of selectedScenes) {
           `${scene.id}: current Git Settings search failed: ${JSON.stringify(search)}`,
         );
       }
+      await page.getByRole("button", { name: "Hooks" }).click();
+      const routing = await page.evaluate(() => ({
+        heading: document.querySelector(".codex-ui-git-settings > h1")
+          ?.textContent,
+        query: document.querySelector('[role="searchbox"]')?.value,
+        selected: document
+          .querySelector('.codex-ui-settings-shell__item[aria-current="page"]')
+          ?.getAttribute("aria-label"),
+      }));
+      if (
+        routing.heading !== "Git" ||
+        routing.query !== "git" ||
+        routing.selected !== "Git"
+      ) {
+        throw new Error(
+          `${scene.id}: unimplemented Settings navigation changed the Git route: ${JSON.stringify(routing)}`,
+        );
+      }
       await page.getByRole("button", { name: "Clear settings search" }).click();
       await page.getByRole("switch", { name: "Always force push" }).click();
-      await page.getByRole("radio", { name: "Squash" }).click();
+      const mergeRadio = page.getByRole("radio", { name: "Merge" });
+      await mergeRadio.focus();
+      await mergeRadio.press("ArrowRight");
       const interaction = await page.evaluate(() => ({
         forcePush: document
           .querySelector('[role="switch"][aria-label="Always force push"]')
           ?.getAttribute("aria-checked"),
+        mergeTabIndex: document
+          .querySelector(
+            '[role="radiogroup"][aria-label="Pull request merge method"] [role="radio"]:nth-child(1)',
+          )
+          ?.getAttribute("tabindex"),
         squash: document
-          .querySelector('[role="radio"]:nth-child(2)')
+          .querySelector(
+            '[role="radiogroup"][aria-label="Pull request merge method"] [role="radio"]:nth-child(2)',
+          )
           ?.getAttribute("aria-checked"),
+        squashTabIndex: document
+          .querySelector(
+            '[role="radiogroup"][aria-label="Pull request merge method"] [role="radio"]:nth-child(2)',
+          )
+          ?.getAttribute("tabindex"),
       }));
-      if (interaction.forcePush !== "true" || interaction.squash !== "true") {
+      if (
+        interaction.forcePush !== "true" ||
+        interaction.mergeTabIndex !== "-1" ||
+        interaction.squash !== "true" ||
+        interaction.squashTabIndex !== "0"
+      ) {
         throw new Error(
           `${scene.id}: current Git Settings interaction failed: ${JSON.stringify(interaction)}`,
         );
       }
       await writeFile(
         join(artifactDirectory, `${scene.id}.json`),
-        `${JSON.stringify({ interaction, search, settings }, null, 2)}\n`,
+        `${JSON.stringify({ interaction, routing, search, settings }, null, 2)}\n`,
       );
       continue;
     }

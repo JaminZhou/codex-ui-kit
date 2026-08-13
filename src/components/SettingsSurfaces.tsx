@@ -1,5 +1,6 @@
 import {
   type HTMLAttributes,
+  type KeyboardEvent,
   type ReactNode,
   type TextareaHTMLAttributes,
   useId,
@@ -233,18 +234,50 @@ function SegmentedControl<T extends string>({
   options: readonly { label: string; value: T }[];
   value: T;
 }) {
+  const moveSelection = (
+    event: KeyboardEvent<HTMLButtonElement>,
+    currentIndex: number,
+  ) => {
+    const lastIndex = options.length - 1;
+    const nextIndex =
+      event.key === "ArrowLeft" || event.key === "ArrowUp"
+        ? currentIndex === 0
+          ? lastIndex
+          : currentIndex - 1
+        : event.key === "ArrowRight" || event.key === "ArrowDown"
+          ? currentIndex === lastIndex
+            ? 0
+            : currentIndex + 1
+          : event.key === "Home"
+            ? 0
+            : event.key === "End"
+              ? lastIndex
+              : null;
+    if (nextIndex === null || !options[nextIndex]) return;
+
+    event.preventDefault();
+    onChange(options[nextIndex].value);
+    const radios =
+      event.currentTarget.parentElement?.querySelectorAll<HTMLElement>(
+        '[role="radio"]',
+      );
+    radios?.[nextIndex]?.focus();
+  };
+
   return (
     <div
       aria-label={label}
       className="codex-ui-git-settings__segmented"
       role="radiogroup"
     >
-      {options.map((option) => (
+      {options.map((option, index) => (
         <button
           aria-checked={value === option.value}
           key={option.value}
           onClick={() => onChange(option.value)}
+          onKeyDown={(event) => moveSelection(event, index)}
           role="radio"
+          tabIndex={value === option.value ? 0 : -1}
           type="button"
         >
           {option.label}
