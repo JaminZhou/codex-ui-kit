@@ -74,4 +74,10 @@ describe("settings visual contract", () => {
       /\.codex-ui-appearance-settings__switch \{[\s\S]*?height: 1\.25rem;[\s\S]*?width: 2rem;/,
     );
   });
+
+  it("projects keyboard focus from clipped radios onto visible choices", () => {
+    expect(styles).toMatch(
+      /\.codex-ui-appearance-settings__theme-choice[\s\S]*?> input:focus-visible[\s\S]*?\+ \.codex-ui-appearance-settings__theme-preview,[\s\S]*?\.codex-ui-appearance-settings__dock-icons[\s\S]*?> input:focus-visible[\s\S]*?\+ span \{[\s\S]*?outline: 2px solid var\(--codex-ui-focus\);[\s\S]*?outline-offset: 2px;/,
+    );
+  });
 });

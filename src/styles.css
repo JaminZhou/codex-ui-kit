@@ -684,6 +684,17 @@
   color: var(--codex-ui-text);
 }
 
+.codex-ui-appearance-settings__theme-choice
+  > input:focus-visible
+  + .codex-ui-appearance-settings__theme-preview,
+.codex-ui-appearance-settings__dock-icons
+  label
+  > input:focus-visible
+  + span {
+  outline: 2px solid var(--codex-ui-focus);
+  outline-offset: 2px;
+}
+
 .codex-ui-appearance-settings__theme-preview {
   background: #666;
   border: 2px solid transparent;
