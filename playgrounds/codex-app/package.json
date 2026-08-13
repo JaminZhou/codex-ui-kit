@@ -38,7 +38,7 @@
     "@vitejs/plugin-react": "6.0.1",
     "electron": "43.2.0",
     "pixelmatch": "7.2.0",
-    "playwright-core": "1.55.0",
+    "playwright-core": "1.62.1",
     "pngjs": "7.0.0",
     "typescript": "5.9.3",
     "vite": "8.1.5",

@@ -101,8 +101,8 @@ importers:
         specifier: 7.2.0
         version: 7.2.0
       playwright-core:
-        specifier: 1.55.0
-        version: 1.55.0
+        specifier: 1.62.1
+        version: 1.62.1
       pngjs:
         specifier: 7.0.0
         version: 7.0.0
@@ -1816,9 +1816,9 @@ packages:
     resolution: {integrity: sha512-xhcb4yHu9sM/G7foGzoLtXYcC0zHEaOXXjRKhGup0fw78Nf2Tkiapv4EQyMzrbcmQPsllAI7DbFY2UT7PlI9Pg==}
     hasBin: true
 
-  playwright-core@1.55.0:
-    resolution: {integrity: sha512-GvZs4vU3U5ro2nZpeiwyb0zuFaqb9sUiAJuyrWpcGouD8y9/HLgGbNRjIph7zU9D3hnPaisMl9zG9CgFi/biIg==}
-    engines: {node: '>=18'}
+  playwright-core@1.62.1:
+    resolution: {integrity: sha512-wPYSwEBJY9GHraISXqyqtx0na0LpO3XEX7jNDhntbex7tzUS7kLnZsOlFruFJB4Hi/rhDMjXGqHewDZ68nYZVw==}
+    engines: {node: '>=20'}
     hasBin: true
 
   pngjs@7.0.0:
@@ -3844,7 +3844,7 @@ snapshots:
     dependencies:
       pngjs: 7.0.0
 
-  playwright-core@1.55.0: {}
+  playwright-core@1.62.1: {}
 
   pngjs@7.0.0: {}
 
