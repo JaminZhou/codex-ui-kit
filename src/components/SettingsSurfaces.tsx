@@ -916,7 +916,7 @@ function AppearanceNumberInput({
       setDraft(String(value));
       return;
     }
-    const bounded = Math.min(max, Math.max(min, parsed));
+    const bounded = Math.min(max, Math.max(min, Math.round(parsed)));
     setDraft(String(bounded));
     onCommit(bounded);
   };
@@ -1054,7 +1054,7 @@ export function AppearanceSettingsPage({
                       type="radio"
                     />
                     <span aria-hidden="true">
-                      {icon ?? dockIcon.slice(0, 1).toUpperCase()}
+                      {icon ?? (dockIcon === "chatgpt" ? "GPT" : "CX")}
                     </span>
                   </label>
                 ))}

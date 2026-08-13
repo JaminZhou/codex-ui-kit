@@ -319,6 +319,11 @@ describe("settings surfaces", () => {
     });
     fireEvent.click(chatGptDock);
     expect((chatGptDock as HTMLInputElement).checked).toBe(true);
+    expect(chatGptDock.nextElementSibling?.textContent).toBe("GPT");
+    expect(
+      screen.getByRole("radio", { name: "Use Codex Dock icon" })
+        .nextElementSibling?.textContent,
+    ).toBe("CX");
 
     const systemMotion = screen.getByRole("button", { name: "System" });
     const motionOn = screen.getByRole("button", { name: "On" });
@@ -349,6 +354,11 @@ describe("settings surfaces", () => {
 
     fireEvent.change(uiFontSize, { target: { value: "99" } });
     fireEvent.blur(uiFontSize);
+    (codeFontSize as HTMLInputElement).focus();
+    fireEvent.change(codeFontSize, { target: { value: "12.5" } });
+    fireEvent.blur(codeFontSize);
+    expect((codeFontSize as HTMLInputElement).value).toBe("13");
+
     (codeFontSize as HTMLInputElement).focus();
     fireEvent.change(codeFontSize, { target: { value: "0" } });
     fireEvent.keyDown(codeFontSize, { key: "Enter" });
