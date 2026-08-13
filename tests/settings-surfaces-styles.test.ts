@@ -80,4 +80,22 @@ describe("settings visual contract", () => {
       /\.codex-ui-appearance-settings__theme-choice[\s\S]*?> input:focus-visible[\s\S]*?\+ \.codex-ui-appearance-settings__theme-preview,[\s\S]*?\.codex-ui-appearance-settings__dock-icons[\s\S]*?> input:focus-visible[\s\S]*?\+ span \{[\s\S]*?outline: 2px solid var\(--codex-ui-focus\);[\s\S]*?outline-offset: 2px;/,
     );
   });
+
+  it("locks the current General cards, row rhythm, and compact column", () => {
+    expect(styles).toMatch(
+      /\.codex-ui-general-settings \{[\s\S]*?max-width: 48rem;[\s\S]*?padding: 1\.25rem 0 1\.3125rem;/,
+    );
+    expect(styles).toMatch(
+      /\.codex-ui-general-settings__card \{[\s\S]*?border-radius: 1\.25rem;[\s\S]*?overflow: hidden;/,
+    );
+    expect(styles).toMatch(
+      /\.codex-ui-general-settings__row \{[\s\S]*?padding: 0\.75rem 1rem;/,
+    );
+    expect(styles).toMatch(
+      /\.codex-ui-general-settings__switch \{[\s\S]*?height: 1\.25rem;[\s\S]*?width: 2rem;/,
+    );
+    expect(styles).toMatch(
+      /@media \(max-width: 50rem\)[\s\S]*?\.codex-ui-general-settings \{[\s\S]*?width: calc\(100% - 2\.5rem\);/,
+    );
+  });
 });

@@ -9,7 +9,7 @@ import {
   useRef,
   useState,
 } from "react";
-import { Menu, MenuItem } from "./InteractivePrimitives.js";
+import { Menu, MenuItem, Popover } from "./InteractivePrimitives.js";
 
 export interface SettingsNavigationItem {
   description?: string;
@@ -1144,6 +1144,728 @@ export function AppearanceSettingsPage({
           </div>
         </section>
       </div>
+    </article>
+  );
+}
+
+export type GeneralTerminalLocation = "bottom" | "right";
+export type GeneralSpeed = "standard" | "fast";
+export type GeneralSendShortcut =
+  | "enter"
+  | "command-enter-multiline"
+  | "command-enter";
+export type GeneralFollowUpBehavior = "queue" | "steer";
+export type GeneralCompletionNotifications = "never" | "unfocused" | "always";
+
+export interface GeneralSettingsValue {
+  ambientSuggestions: boolean;
+  autoReview: boolean;
+  bottomPanel: boolean;
+  defaultFileOpenDestination: string;
+  followUpBehavior: GeneralFollowUpBehavior;
+  fullAccess: boolean;
+  language: string;
+  permissionNotifications: boolean;
+  pluginsEnabled: boolean;
+  popoutHotkey: string | null;
+  popoutStandaloneChat: boolean;
+  preventSleepWhileRunning: boolean;
+  questionNotifications: boolean;
+  sendShortcut: GeneralSendShortcut;
+  showContextWindowUsage: boolean;
+  showInMenuBar: boolean;
+  speed: GeneralSpeed;
+  terminalLocation: GeneralTerminalLocation;
+  turnCompletionNotifications: GeneralCompletionNotifications;
+}
+
+export interface GeneralSettingsOption {
+  description?: ReactNode;
+  icon?: ReactNode;
+  label: string;
+  value: string;
+}
+
+export interface GeneralSettingsPageProps
+  extends Omit<HTMLAttributes<HTMLElement>, "onChange"> {
+  elevatedRiskHref?: string;
+  fileDestinationOptions?: readonly GeneralSettingsOption[];
+  hotkeyCaptureActive?: boolean;
+  languageOptions?: readonly GeneralSettingsOption[];
+  onCancelHotkeyCapture?: () => void;
+  onChange: (value: GeneralSettingsValue) => void;
+  onOpenSourceLicenses?: () => void;
+  onStartHotkeyCapture?: () => void;
+  value: GeneralSettingsValue;
+}
+
+const defaultGeneralFileDestinationOptions: readonly GeneralSettingsOption[] = [
+  { label: "VS Code", value: "vscode" },
+  { label: "Cursor", value: "cursor" },
+  { label: "Sublime Text", value: "sublime-text" },
+  { label: "Default app", value: "default-app" },
+  { label: "Finder", value: "finder" },
+  { label: "Terminal", value: "terminal" },
+  { label: "Xcode", value: "xcode" },
+];
+
+const defaultGeneralLanguageOptions: readonly GeneralSettingsOption[] = [
+  "Auto detect",
+  "Albanian",
+  "Armenian",
+  "Bahasa Melayu",
+  "bosanski",
+  "Burmese",
+  "català",
+  "čeština",
+  "dansk",
+  "Deutsch",
+  "eesti",
+  "English",
+  "español (España)",
+  "español (Latinoamérica)",
+  "Filipino",
+  "français (Canada)",
+  "français (France)",
+  "Georgian",
+  "hrvatski",
+  "Icelandic",
+  "Indonesia",
+  "italiano",
+  "Kiswahili",
+  "latviešu",
+  "lietuvių",
+  "Macedonian",
+  "magyar",
+  "Mongolian",
+  "Nederlands",
+  "norsk bokmål",
+  "polski",
+  "português (Brasil)",
+  "português (Portugal)",
+  "română",
+  "slovenčina",
+  "slovenščina",
+  "Somali",
+  "suomi",
+  "svenska",
+  "Tiếng Việt",
+  "Türkçe",
+  "Ελληνικά",
+  "български",
+  "қазақ тілі",
+  "русский",
+  "српски",
+  "українська",
+  "اردو",
+  "العربية",
+  "فارسی",
+  "አማርኛ",
+  "मराठी",
+  "हिन्दी",
+  "বাংলা",
+  "ਪੰਜਾਬੀ",
+  "ગુજરાતી",
+  "தமிழ்",
+  "తెలుగు",
+  "ಕನ್ನಡ",
+  "മലയാളം",
+  "ไทย",
+  "한국어",
+  "日本語",
+  "简体中文",
+  "繁體中文（台灣）",
+  "繁體中文（香港）",
+].map((label) => ({ label, value: label === "Auto detect" ? "auto" : label }));
+
+function GeneralSwitch({
+  checked,
+  disabled = false,
+  label,
+  onChange,
+}: {
+  checked: boolean;
+  disabled?: boolean;
+  label: string;
+  onChange: (checked: boolean) => void;
+}) {
+  return (
+    <button
+      aria-checked={checked}
+      aria-label={label}
+      className="codex-ui-general-settings__switch"
+      disabled={disabled}
+      onClick={() => onChange(!checked)}
+      role="switch"
+      type="button"
+    >
+      <span aria-hidden="true" />
+    </button>
+  );
+}
+
+function GeneralSettingsSection({
+  children,
+  label,
+}: {
+  children: ReactNode;
+  label: string;
+}) {
+  const headingId = useId();
+  return (
+    <section
+      aria-labelledby={headingId}
+      className="codex-ui-general-settings__section"
+    >
+      <h2 id={headingId}>{label}</h2>
+      <div className="codex-ui-general-settings__card">{children}</div>
+    </section>
+  );
+}
+
+function GeneralSettingsRow({
+  children,
+  description,
+  label,
+}: {
+  children: ReactNode;
+  description?: ReactNode;
+  label: ReactNode;
+}) {
+  return (
+    <div className="codex-ui-general-settings__row">
+      <div className="codex-ui-general-settings__row-copy">
+        <span>{label}</span>
+        {description ? <p>{description}</p> : null}
+      </div>
+      <div className="codex-ui-general-settings__row-control">{children}</div>
+    </div>
+  );
+}
+
+function GeneralSegmented<T extends string>({
+  label,
+  onChange,
+  options,
+  value,
+}: {
+  label: string;
+  onChange: (value: T) => void;
+  options: readonly { label: string; value: T }[];
+  value: T;
+}) {
+  const moveSelection = (
+    event: KeyboardEvent<HTMLButtonElement>,
+    currentIndex: number,
+  ) => {
+    const lastIndex = options.length - 1;
+    const nextIndex =
+      event.key === "ArrowLeft" || event.key === "ArrowUp"
+        ? currentIndex === 0
+          ? lastIndex
+          : currentIndex - 1
+        : event.key === "ArrowRight" || event.key === "ArrowDown"
+          ? currentIndex === lastIndex
+            ? 0
+            : currentIndex + 1
+          : event.key === "Home"
+            ? 0
+            : event.key === "End"
+              ? lastIndex
+              : null;
+    if (nextIndex === null || !options[nextIndex]) return;
+    event.preventDefault();
+    onChange(options[nextIndex].value);
+    event.currentTarget.parentElement
+      ?.querySelectorAll<HTMLButtonElement>("button")
+      [nextIndex]?.focus();
+  };
+  return (
+    <div
+      aria-label={label}
+      className="codex-ui-general-settings__segmented"
+      role="group"
+    >
+      {options.map((option, index) => (
+        <button
+          aria-label={option.label}
+          aria-pressed={option.value === value}
+          key={option.value}
+          onClick={() => onChange(option.value)}
+          onKeyDown={(event) => moveSelection(event, index)}
+          tabIndex={option.value === value ? 0 : -1}
+          type="button"
+        >
+          {option.label}
+        </button>
+      ))}
+    </div>
+  );
+}
+
+function GeneralMenuControl({
+  label,
+  onChange,
+  options,
+  value,
+}: {
+  label: string;
+  onChange: (value: string) => void;
+  options: readonly GeneralSettingsOption[];
+  value: string;
+}) {
+  const selected = options.find((option) => option.value === value);
+  return (
+    <Menu
+      align="end"
+      className="codex-ui-general-settings__menu"
+      label={label}
+      sideOffset={4}
+      trigger={
+        <button
+          aria-label={label}
+          className="codex-ui-general-settings__menu-trigger"
+          type="button"
+        >
+          {selected?.icon ? (
+            <span aria-hidden="true" className="codex-ui-general-settings__menu-icon">
+              {selected.icon}
+            </span>
+          ) : null}
+          <span>{selected?.label ?? value}</span>
+          <span aria-hidden="true" className="codex-ui-general-settings__chevron">
+            ⌄
+          </span>
+        </button>
+      }
+      width="menu-wide"
+    >
+      {options.map((option) => (
+        <MenuItem
+          endIcon={option.value === value ? <span>✓</span> : undefined}
+          key={option.value}
+          onSelect={() => onChange(option.value)}
+          startIcon={option.icon}
+          subText={option.description}
+        >
+          {option.label}
+        </MenuItem>
+      ))}
+    </Menu>
+  );
+}
+
+function GeneralLanguageControl({
+  onChange,
+  options,
+  value,
+}: {
+  onChange: (value: string) => void;
+  options: readonly GeneralSettingsOption[];
+  value: string;
+}) {
+  const [open, setOpen] = useState(false);
+  const [query, setQuery] = useState("");
+  const selected = options.find((option) => option.value === value);
+  const filtered = options.filter((option) =>
+    option.label.toLocaleLowerCase().includes(query.trim().toLocaleLowerCase()),
+  );
+  return (
+    <Popover
+      align="end"
+      className="codex-ui-general-settings__language-popover"
+      initialFocus="first"
+      label="Language"
+      onOpenChange={(nextOpen) => {
+        setOpen(nextOpen);
+        if (!nextOpen) setQuery("");
+      }}
+      open={open}
+      role="listbox"
+      sideOffset={4}
+      trigger={
+        <button
+          aria-label="Language"
+          className="codex-ui-general-settings__menu-trigger"
+          type="button"
+        >
+          <span>{selected?.label ?? value}</span>
+          <span aria-hidden="true" className="codex-ui-general-settings__chevron">
+            ⌄
+          </span>
+        </button>
+      }
+      width="menu-wide"
+    >
+      <label className="codex-ui-general-settings__language-search">
+        <span aria-hidden="true">⌕</span>
+        <input
+          aria-label="Search languages"
+          onChange={(event) => setQuery(event.currentTarget.value)}
+          placeholder="Search languages"
+          type="search"
+          value={query}
+        />
+      </label>
+      <div className="codex-ui-general-settings__language-options">
+        {filtered.map((option) => (
+          <button
+            aria-selected={option.value === value}
+            className="codex-ui-general-settings__language-option"
+            key={option.value}
+            onClick={() => {
+              onChange(option.value);
+              setOpen(false);
+              setQuery("");
+            }}
+            role="option"
+            tabIndex={-1}
+            type="button"
+          >
+            <span>{option.label}</span>
+            <span aria-hidden="true">{option.value === value ? "✓" : ""}</span>
+          </button>
+        ))}
+        {filtered.length === 0 ? (
+          <p className="codex-ui-general-settings__language-empty">No languages found</p>
+        ) : null}
+      </div>
+    </Popover>
+  );
+}
+
+export function GeneralSettingsPage({
+  className,
+  elevatedRiskHref,
+  fileDestinationOptions = defaultGeneralFileDestinationOptions,
+  hotkeyCaptureActive = false,
+  languageOptions = defaultGeneralLanguageOptions,
+  onCancelHotkeyCapture,
+  onChange,
+  onOpenSourceLicenses,
+  onStartHotkeyCapture,
+  value,
+  ...props
+}: GeneralSettingsPageProps) {
+  const update = <K extends keyof GeneralSettingsValue>(
+    key: K,
+    nextValue: GeneralSettingsValue[K],
+  ) => onChange({ ...value, [key]: nextValue });
+  const riskDescription = (copy: string) => (
+    <>
+      {copy}
+      {elevatedRiskHref ? (
+        <>
+          {" "}
+          <a href={elevatedRiskHref}>Learn more</a> about elevated risks.
+        </>
+      ) : null}
+    </>
+  );
+  return (
+    <article
+      {...props}
+      className={["codex-ui-general-settings", className]
+        .filter(Boolean)
+        .join(" ")}
+    >
+      <h1>General</h1>
+      <GeneralSettingsSection label="Permissions">
+        <GeneralSettingsRow
+          description="By default, ChatGPT can read and edit files in its workspace. It can ask for additional access when needed"
+          label="Default permissions"
+        >
+          <GeneralSwitch
+            checked
+            disabled
+            label="Default permissions are always shown"
+            onChange={() => undefined}
+          />
+        </GeneralSettingsRow>
+        <GeneralSettingsRow
+          description={riskDescription(
+            "ChatGPT can read and edit files in its workspace. ChatGPT automatically reviews requests for additional access. Auto-review can make mistakes.",
+          )}
+          label="Auto-review"
+        >
+          <GeneralSwitch
+            checked={value.autoReview}
+            label="Show Auto-review in the composer"
+            onChange={(autoReview) => update("autoReview", autoReview)}
+          />
+        </GeneralSettingsRow>
+        <GeneralSettingsRow
+          description={riskDescription(
+            "When ChatGPT runs with full access, it can edit any file on your computer and run commands with network, without your approval. This significantly increases the risk of data loss, leaks, or unexpected behavior.",
+          )}
+          label="Full access"
+        >
+          <GeneralSwitch
+            checked={value.fullAccess}
+            label="Show Full access in the composer"
+            onChange={(fullAccess) => update("fullAccess", fullAccess)}
+          />
+        </GeneralSettingsRow>
+      </GeneralSettingsSection>
+
+      <GeneralSettingsSection label="General">
+        <GeneralSettingsRow
+          description="Where files and folders open by default"
+          label="Default file open destination"
+        >
+          <GeneralMenuControl
+            label="Default file open destination"
+            onChange={(defaultFileOpenDestination) =>
+              update("defaultFileOpenDestination", defaultFileOpenDestination)
+            }
+            options={fileDestinationOptions}
+            value={value.defaultFileOpenDestination}
+          />
+        </GeneralSettingsRow>
+        <GeneralSettingsRow description="Language for the app UI" label="Language">
+          <GeneralLanguageControl
+            onChange={(language) => update("language", language)}
+            options={languageOptions}
+            value={value.language}
+          />
+        </GeneralSettingsRow>
+        <GeneralSettingsRow
+          description="Keep ChatGPT in the macOS menu bar when the main window is closed"
+          label="Show in menu bar"
+        >
+          <GeneralSwitch
+            checked={value.showInMenuBar}
+            label="Show ChatGPT in the menu bar"
+            onChange={(showInMenuBar) => update("showInMenuBar", showInMenuBar)}
+          />
+        </GeneralSettingsRow>
+        <GeneralSettingsRow
+          description="Show the bottom panel control in the app header"
+          label="Bottom panel"
+        >
+          <GeneralSwitch
+            checked={value.bottomPanel}
+            label="Bottom panel"
+            onChange={(bottomPanel) => update("bottomPanel", bottomPanel)}
+          />
+        </GeneralSettingsRow>
+        <GeneralSettingsRow
+          description="Choose where the terminal shortcut and environment actions open terminal tabs"
+          label="Default terminal location"
+        >
+          <GeneralSegmented
+            label="Default terminal location"
+            onChange={(terminalLocation) => update("terminalLocation", terminalLocation)}
+            options={[
+              { label: "Bottom", value: "bottom" },
+              { label: "Right", value: "right" },
+            ]}
+            value={value.terminalLocation}
+          />
+        </GeneralSettingsRow>
+        <GeneralSettingsRow
+          description="Keep your computer awake while ChatGPT is running a task"
+          label="Prevent sleep while running"
+        >
+          <GeneralSwitch
+            checked={value.preventSleepWhileRunning}
+            label="Prevent sleep while running"
+            onChange={(preventSleepWhileRunning) =>
+              update("preventSleepWhileRunning", preventSleepWhileRunning)
+            }
+          />
+        </GeneralSettingsRow>
+        <GeneralSettingsRow
+          description="Choose how quickly ChatGPT runs across chats, subagents, and compaction"
+          label="Speed"
+        >
+          <GeneralMenuControl
+            label="Speed"
+            onChange={(speed) => update("speed", speed as GeneralSpeed)}
+            options={[
+              { description: "Default speed", label: "Standard", value: "standard" },
+              { description: "1.5x speed, increased usage", label: "Fast", value: "fast" },
+            ]}
+            value={value.speed}
+          />
+        </GeneralSettingsRow>
+        <GeneralSettingsRow
+          description="Suggest what to do next by searching project files and connected apps"
+          label="Suggested prompts"
+        >
+          <GeneralSwitch
+            checked={value.ambientSuggestions}
+            label="Enable ambient suggestions"
+            onChange={(ambientSuggestions) =>
+              update("ambientSuggestions", ambientSuggestions)
+            }
+          />
+        </GeneralSettingsRow>
+        <GeneralSettingsRow
+          description="Third-party notices for bundled dependencies"
+          label="Open source licenses"
+        >
+          <button
+            className="codex-ui-general-settings__secondary-action"
+            disabled={!onOpenSourceLicenses}
+            onClick={onOpenSourceLicenses}
+            type="button"
+          >
+            View
+          </button>
+        </GeneralSettingsRow>
+        <GeneralSettingsRow
+          description="Allow ChatGPT to use installed plugins"
+          label="Plugins"
+        >
+          <GeneralSwitch
+            checked={value.pluginsEnabled}
+            label="Toggle plugins"
+            onChange={(pluginsEnabled) => update("pluginsEnabled", pluginsEnabled)}
+          />
+        </GeneralSettingsRow>
+      </GeneralSettingsSection>
+
+      <GeneralSettingsSection label="Composer">
+        <GeneralSettingsRow label="Show context window usage">
+          <GeneralSwitch
+            checked={value.showContextWindowUsage}
+            label="Show context window usage in the composer"
+            onChange={(showContextWindowUsage) =>
+              update("showContextWindowUsage", showContextWindowUsage)
+            }
+          />
+        </GeneralSettingsRow>
+        <GeneralSettingsRow
+          description="Choose when Enter sends a prompt or inserts a new line"
+          label="Send shortcut"
+        >
+          <GeneralMenuControl
+            label="Send shortcut"
+            onChange={(sendShortcut) =>
+              update("sendShortcut", sendShortcut as GeneralSendShortcut)
+            }
+            options={[
+              { label: "Enter", value: "enter" },
+              {
+                label: "⌘ + Enter for multiline prompts",
+                value: "command-enter-multiline",
+              },
+              { label: "⌘ + Enter always", value: "command-enter" },
+            ]}
+            value={value.sendShortcut}
+          />
+        </GeneralSettingsRow>
+        <GeneralSettingsRow
+          description="Queue follow-ups while ChatGPT runs or steer the current run. Press ⌘⏎ to do the opposite for one message"
+          label="Follow-up behavior"
+        >
+          <GeneralSegmented
+            label="Follow-up behavior"
+            onChange={(followUpBehavior) =>
+              update("followUpBehavior", followUpBehavior)
+            }
+            options={[
+              { label: "Queue", value: "queue" },
+              { label: "Steer", value: "steer" },
+            ]}
+            value={value.followUpBehavior}
+          />
+        </GeneralSettingsRow>
+      </GeneralSettingsSection>
+
+      <GeneralSettingsSection label="Popout Window">
+        <GeneralSettingsRow
+          description="Set a global shortcut for Popout Window. Leave unset to keep it off."
+          label="Popout Window hotkey"
+        >
+          {hotkeyCaptureActive ? (
+            <div className="codex-ui-general-settings__hotkey-capture">
+              <button className="codex-ui-general-settings__hotkey-record" type="button">
+                Press shortcut
+              </button>
+              <button
+                className="codex-ui-general-settings__secondary-action"
+                disabled={!onCancelHotkeyCapture}
+                onClick={onCancelHotkeyCapture}
+                type="button"
+              >
+                Cancel
+              </button>
+            </div>
+          ) : (
+            <button
+              aria-label="Set shortcut for Popout Window hotkey"
+              className="codex-ui-general-settings__hotkey-edit"
+              disabled={!onStartHotkeyCapture}
+              onClick={onStartHotkeyCapture}
+              type="button"
+            >
+              <span>{value.popoutHotkey ?? "Off"}</span>
+              <span aria-hidden="true">⌁</span>
+            </button>
+          )}
+        </GeneralSettingsRow>
+        <GeneralSettingsRow
+          description="Start new chats outside of any project"
+          label="Default to standalone chat"
+        >
+          <GeneralSwitch
+            checked={value.popoutStandaloneChat}
+            label="Default Popout Window to standalone chat"
+            onChange={(popoutStandaloneChat) =>
+              update("popoutStandaloneChat", popoutStandaloneChat)
+            }
+          />
+        </GeneralSettingsRow>
+      </GeneralSettingsSection>
+
+      <GeneralSettingsSection label="Notifications">
+        <GeneralSettingsRow
+          description="Set when ChatGPT alerts you that it's finished"
+          label="Turn completion notifications"
+        >
+          <GeneralMenuControl
+            label="Turn completion notifications"
+            onChange={(turnCompletionNotifications) =>
+              update(
+                "turnCompletionNotifications",
+                turnCompletionNotifications as GeneralCompletionNotifications,
+              )
+            }
+            options={[
+              { label: "Never", value: "never" },
+              { label: "Only when unfocused", value: "unfocused" },
+              { label: "Always", value: "always" },
+            ]}
+            value={value.turnCompletionNotifications}
+          />
+        </GeneralSettingsRow>
+        <GeneralSettingsRow
+          description="Show alerts when notification permissions are required"
+          label="Enable permission notifications"
+        >
+          <GeneralSwitch
+            checked={value.permissionNotifications}
+            label="Enable permission notifications"
+            onChange={(permissionNotifications) =>
+              update("permissionNotifications", permissionNotifications)
+            }
+          />
+        </GeneralSettingsRow>
+        <GeneralSettingsRow
+          description="Show alerts when input is needed to continue"
+          label="Enable question notifications"
+        >
+          <GeneralSwitch
+            checked={value.questionNotifications}
+            label="Enable question notifications"
+            onChange={(questionNotifications) =>
+              update("questionNotifications", questionNotifications)
+            }
+          />
+        </GeneralSettingsRow>
+      </GeneralSettingsSection>
     </article>
   );
 }

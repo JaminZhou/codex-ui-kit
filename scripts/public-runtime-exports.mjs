@@ -53,6 +53,7 @@ export const publicRuntimeExports = [
   "FileReview",
   "FileReviewNotice",
   "FloatingThreadPanel",
+  "GeneralSettingsPage",
   "GeneratedImageGallery",
   "GitSettingsPage",
   "IconButton",

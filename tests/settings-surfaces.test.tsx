@@ -5,9 +5,11 @@ import { useState } from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import {
   AppearanceSettingsPage,
+  GeneralSettingsPage,
   GitSettingsPage,
   SettingsShell,
   type AppearanceSettingsValue,
+  type GeneralSettingsValue,
   type GitSettingsValue,
 } from "../src";
 
@@ -116,6 +118,44 @@ function AppearanceFixture({
       onChange={setValue}
       onCopyTheme={onCopyTheme}
       onImportTheme={onImportTheme}
+      value={value}
+    />
+  );
+}
+
+const initialGeneralValue: GeneralSettingsValue = {
+  ambientSuggestions: true,
+  autoReview: true,
+  bottomPanel: true,
+  defaultFileOpenDestination: "vscode",
+  followUpBehavior: "queue",
+  fullAccess: true,
+  language: "auto",
+  permissionNotifications: true,
+  pluginsEnabled: true,
+  popoutHotkey: null,
+  popoutStandaloneChat: false,
+  preventSleepWhileRunning: false,
+  questionNotifications: true,
+  sendShortcut: "enter",
+  showContextWindowUsage: false,
+  showInMenuBar: true,
+  speed: "standard",
+  terminalLocation: "bottom",
+  turnCompletionNotifications: "unfocused",
+};
+
+function GeneralFixture({ onOpenSourceLicenses = () => undefined }) {
+  const [value, setValue] = useState(initialGeneralValue);
+  const [hotkeyCaptureActive, setHotkeyCaptureActive] = useState(false);
+  return (
+    <GeneralSettingsPage
+      elevatedRiskHref="https://help.openai.com/"
+      hotkeyCaptureActive={hotkeyCaptureActive}
+      onCancelHotkeyCapture={() => setHotkeyCaptureActive(false)}
+      onChange={setValue}
+      onOpenSourceLicenses={onOpenSourceLicenses}
+      onStartHotkeyCapture={() => setHotkeyCaptureActive(true)}
       value={value}
     />
   );
@@ -426,5 +466,94 @@ describe("settings surfaces", () => {
     expect(themeSections[0].getAttribute("aria-labelledby")).not.toBe(
       themeSections[1].getAttribute("aria-labelledby"),
     );
+  });
+
+  it("models all five current General settings groups as controlled inputs", () => {
+    render(<GeneralFixture />);
+
+    for (const heading of [
+      "Permissions",
+      "General",
+      "Composer",
+      "Popout Window",
+      "Notifications",
+    ]) {
+      expect(
+        screen.getByRole("heading", { level: 2, name: heading }),
+      ).toBeTruthy();
+    }
+    const defaultPermissions = screen.getByRole("switch", {
+      name: "Default permissions are always shown",
+    });
+    expect(defaultPermissions.hasAttribute("disabled")).toBe(true);
+    expect(defaultPermissions.getAttribute("aria-checked")).toBe("true");
+
+    const autoReview = screen.getByRole("switch", {
+      name: "Show Auto-review in the composer",
+    });
+    fireEvent.click(autoReview);
+    expect(autoReview.getAttribute("aria-checked")).toBe("false");
+
+    const showContext = screen.getByRole("switch", {
+      name: "Show context window usage in the composer",
+    });
+    fireEvent.click(showContext);
+    expect(showContext.getAttribute("aria-checked")).toBe("true");
+  });
+
+  it("exposes current General menus, searchable languages, and selections", () => {
+    render(<GeneralFixture />);
+
+    fireEvent.click(
+      screen.getByRole("button", { name: "Default file open destination" }),
+    );
+    expect(screen.getAllByRole("menuitem")).toHaveLength(7);
+    fireEvent.click(screen.getByRole("menuitem", { name: /Xcode/ }));
+    expect(
+      screen.getByRole("button", { name: "Default file open destination" })
+        .textContent,
+    ).toContain("Xcode");
+
+    fireEvent.click(screen.getByRole("button", { name: "Language" }));
+    const languageSearch = screen.getByRole("searchbox", {
+      name: "Search languages",
+    });
+    fireEvent.change(languageSearch, { target: { value: "简体" } });
+    expect(screen.getAllByRole("option")).toHaveLength(1);
+    fireEvent.click(screen.getByRole("option", { name: "简体中文" }));
+    expect(screen.getByRole("button", { name: "Language" }).textContent).toContain(
+      "简体中文",
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "Speed" }));
+    expect(screen.getByRole("menuitem", { name: /Fast/ })).toBeTruthy();
+  });
+
+  it("supports General segmented keyboard flow and host-owned actions", () => {
+    const onOpenSourceLicenses = vi.fn();
+    render(<GeneralFixture onOpenSourceLicenses={onOpenSourceLicenses} />);
+
+    const bottom = screen.getByRole("button", { name: "Bottom" });
+    bottom.focus();
+    fireEvent.keyDown(bottom, { key: "ArrowRight" });
+    expect(
+      screen.getByRole("button", { name: "Right" }).getAttribute("aria-pressed"),
+    ).toBe("true");
+
+    fireEvent.click(screen.getByRole("button", { name: "View" }));
+    expect(onOpenSourceLicenses).toHaveBeenCalledOnce();
+
+    fireEvent.click(
+      screen.getByRole("button", {
+        name: "Set shortcut for Popout Window hotkey",
+      }),
+    );
+    expect(screen.getByRole("button", { name: "Press shortcut" })).toBeTruthy();
+    fireEvent.click(screen.getByRole("button", { name: "Cancel" }));
+    expect(
+      screen.getByRole("button", {
+        name: "Set shortcut for Popout Window hotkey",
+      }),
+    ).toBeTruthy();
   });
 });

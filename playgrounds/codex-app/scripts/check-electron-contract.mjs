@@ -5230,6 +5230,181 @@ try {
     );
   }
   await gitSettingsNavigation
+    .getByRole("button", { name: "General", exact: true })
+    .click();
+  const generalSettingsMain = codingWorkspacePage.getByRole("main");
+  await generalSettingsMain
+    .getByRole("heading", { level: 1, name: "General", exact: true })
+    .waitFor();
+  const generalGeometry = await generalSettingsMain.evaluate((main) => {
+    const heading = main
+      .querySelector(".codex-ui-general-settings > h1")
+      ?.getBoundingClientRect();
+    const cards = Array.from(
+      main.querySelectorAll(".codex-ui-general-settings__card"),
+      (element) => {
+        const rect = element.getBoundingClientRect();
+        return { height: rect.height, width: rect.width };
+      },
+    );
+    return {
+      cards,
+      heading: heading ? { top: heading.top, width: heading.width } : null,
+      rowCount: main.querySelectorAll(".codex-ui-general-settings__row").length,
+      sectionHeadings: Array.from(
+        main.querySelectorAll(".codex-ui-general-settings__section > h2"),
+        (heading) => heading.textContent,
+      ),
+    };
+  });
+  if (
+    (await gitSettingsNavigation
+      .getByRole("button", { name: "General", exact: true })
+      .getAttribute("aria-current")) !== "page" ||
+    generalGeometry.heading?.top !== 66 ||
+    generalGeometry.heading?.width !== 768 ||
+    generalGeometry.cards.length !== 5 ||
+    generalGeometry.cards.some(({ width }) => width !== 768) ||
+    generalGeometry.rowCount !== 21 ||
+    JSON.stringify(generalGeometry.sectionHeadings) !==
+      JSON.stringify([
+        "Permissions",
+        "General",
+        "Composer",
+        "Popout Window",
+        "Notifications",
+      ]) ||
+    (await generalSettingsMain.getByRole("switch").count()) !== 12 ||
+    (await generalSettingsMain
+      .locator('.codex-ui-general-settings__segmented[role="group"]')
+      .count()) !== 2
+  ) {
+    throw new Error(
+      `Electron General Settings route is incomplete: ${JSON.stringify(generalGeometry)}.`,
+    );
+  }
+  const autoReviewSwitch = generalSettingsMain.getByRole("switch", {
+    name: "Show Auto-review in the composer",
+  });
+  await autoReviewSwitch.click();
+  await generalSettingsMain
+    .getByRole("button", { name: "Default file open destination" })
+    .click();
+  const fileDestinations = codingWorkspacePage.getByRole("menuitem");
+  if (
+    (await fileDestinations.count()) !== 7 ||
+    !(await fileDestinations.first().textContent())?.includes("VS Code") ||
+    !(await fileDestinations.last().textContent())?.includes("Xcode")
+  ) {
+    throw new Error("Electron General file destination menu is incomplete.");
+  }
+  await fileDestinations.filter({ hasText: "Xcode" }).click();
+  await generalSettingsMain.getByRole("button", { name: "Language" }).click();
+  const languageSearch = codingWorkspacePage.getByRole("searchbox", {
+    name: "Search languages",
+  });
+  await languageSearch.fill("简体");
+  await codingWorkspacePage
+    .getByRole("option", { name: "简体中文", exact: true })
+    .click();
+  const bottomTerminal = generalSettingsMain.getByRole("button", {
+    name: "Bottom",
+    exact: true,
+  });
+  await bottomTerminal.focus();
+  await bottomTerminal.press("ArrowRight");
+  await generalSettingsMain.getByRole("button", { name: "Speed" }).click();
+  const speedOptions = codingWorkspacePage.getByRole("menuitem");
+  if ((await speedOptions.count()) !== 2) {
+    throw new Error("Electron General speed menu is incomplete.");
+  }
+  await speedOptions.filter({ hasText: /^Fast/ }).click();
+  const contextUsageSwitch = generalSettingsMain.getByRole("switch", {
+    name: "Show context window usage in the composer",
+  });
+  await contextUsageSwitch.click();
+  await generalSettingsMain
+    .getByRole("button", { name: "Send shortcut" })
+    .click();
+  await codingWorkspacePage
+    .getByRole("menuitem")
+    .filter({ hasText: "⌘ + Enter always" })
+    .click();
+  const queueBehavior = generalSettingsMain.getByRole("button", {
+    name: "Queue",
+    exact: true,
+  });
+  await queueBehavior.focus();
+  await queueBehavior.press("ArrowRight");
+  await generalSettingsMain
+    .getByRole("button", { name: "Set shortcut for Popout Window hotkey" })
+    .click();
+  await generalSettingsMain
+    .getByRole("button", { name: "Press shortcut", exact: true })
+    .waitFor();
+  await generalSettingsMain
+    .getByRole("button", { name: "Cancel", exact: true })
+    .click();
+  await generalSettingsMain
+    .getByRole("button", { name: "Turn completion notifications" })
+    .click();
+  await codingWorkspacePage
+    .getByRole("menuitem", { name: "Always", exact: true })
+    .click();
+  await generalSettingsMain
+    .getByRole("button", { name: "View", exact: true })
+    .click();
+  await codingWorkspacePage.waitForFunction(
+    () =>
+      document.querySelector(".demo-settings-action-status")?.textContent ===
+      "Open source licenses requested",
+  );
+  const generalInteraction = await generalSettingsMain.evaluate((main) => ({
+    autoReview: main
+      .querySelector('[role="switch"][aria-label="Show Auto-review in the composer"]')
+      ?.getAttribute("aria-checked"),
+    completionNotifications: main
+      .querySelector('button[aria-label="Turn completion notifications"]')
+      ?.textContent?.trim(),
+    contextUsage: main
+      .querySelector('[role="switch"][aria-label="Show context window usage in the composer"]')
+      ?.getAttribute("aria-checked"),
+    fileDestination: main
+      .querySelector('button[aria-label="Default file open destination"]')
+      ?.textContent?.trim(),
+    followUp: main
+      .querySelector('button[aria-label="Steer"]')
+      ?.getAttribute("aria-pressed"),
+    hotkeyCapture: Boolean(
+      main.querySelector(".codex-ui-general-settings__hotkey-capture"),
+    ),
+    language: main.querySelector('button[aria-label="Language"]')
+      ?.textContent?.trim(),
+    sendShortcut: main.querySelector('button[aria-label="Send shortcut"]')
+      ?.textContent?.trim(),
+    speed: main.querySelector('button[aria-label="Speed"]')
+      ?.textContent?.trim(),
+    terminal: main
+      .querySelector('button[aria-label="Right"]')
+      ?.getAttribute("aria-pressed"),
+  }));
+  if (
+    generalInteraction.autoReview !== "false" ||
+    generalInteraction.completionNotifications !== "Always⌄" ||
+    generalInteraction.contextUsage !== "true" ||
+    !generalInteraction.fileDestination?.includes("Xcode") ||
+    generalInteraction.followUp !== "true" ||
+    generalInteraction.hotkeyCapture ||
+    generalInteraction.language !== "简体中文⌄" ||
+    generalInteraction.sendShortcut !== "⌘ + Enter always⌄" ||
+    !generalInteraction.speed?.includes("Fast") ||
+    generalInteraction.terminal !== "true"
+  ) {
+    throw new Error(
+      `Electron General Settings controls did not update controlled state: ${JSON.stringify(generalInteraction)}.`,
+    );
+  }
+  await gitSettingsNavigation
     .getByRole("button", { name: "Git", exact: true })
     .click();
   await gitSettingsMain.getByRole("heading", { name: "Git", exact: true }).waitFor();
@@ -5242,6 +5417,19 @@ try {
       .getAttribute("aria-checked")) !== "true"
   ) {
     throw new Error("Electron Settings route switching lost Git controlled state.");
+  }
+  await gitSettingsNavigation
+    .getByRole("button", { name: "General", exact: true })
+    .click();
+  if (
+    (await generalSettingsMain
+      .getByRole("switch", { name: "Show Auto-review in the composer" })
+      .getAttribute("aria-checked")) !== "false" ||
+    (await generalSettingsMain
+      .getByRole("button", { name: "Right", exact: true })
+      .getAttribute("aria-pressed")) !== "true"
+  ) {
+    throw new Error("Electron Settings route switching lost General controlled state.");
   }
   await gitSettingsNavigation
     .getByRole("button", { name: "Appearance", exact: true })

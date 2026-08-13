@@ -14,7 +14,7 @@ exit gates; it does not replace the inventory.
   Desktop `26.803.61601` (`6396`). Unsampled earlier-build surfaces remain
   previous-build regression evidence rather than current verification.
 - The inventory contains 88 surface groups: 58 P0, 21 P1, and 9 P2.
-- 24 groups have current-build runtime evidence, 47 have previous-build-only
+- 25 groups have current-build runtime evidence, 46 have previous-build-only
   runtime evidence, and 17 have not been sampled.
 - The scoped `26.803.61601` refresh revalidates 77
   sidebar/menu/window-chrome/Composer/Settings icons against exact runtime evidence.
@@ -448,6 +448,19 @@ Proprietary Dock rasters remain host-supplied/local-only while exact public
 Settings navigation assets retain their manifest provenance. General,
 Hooks/code-review, and the remaining Settings/integration pages stay separate
 open rows; these slices do not imply Stage 4 completion.
+
+The following General slice is now delivered independently: a controlled
+`GeneralSettingsPage` covers the 21 current rows in Permissions, General,
+Composer, Popout Window, and Notifications. Browser/CDP verifies five menus,
+language search, twelve switches, two keyboard groups, shortcut capture,
+1180px/720px layout, light paint, and bottom scroll. Electron repeats the
+route and retains General state while switching through Git and Appearance.
+Five reviewed frames extend the matrix to 179, with optional local-only full-
+frame comparisons for wide, compact, shortcut-capture, and bottom states at
+4.6143%, 6.7412%, 4.7654%, and 4.8818%.
+Observed host selections are fixture evidence rather than product defaults.
+Hooks/code-review is the next Settings slice; the remaining P1 families keep
+their existing open gates, so Stage 4 is still in progress.
 
 Exit: each in-scope P1 family has a documented ownership boundary and at least
 one end-to-end vertical slice.

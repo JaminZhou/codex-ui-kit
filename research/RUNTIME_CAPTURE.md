@@ -1253,6 +1253,32 @@ The product profile, screenshots, and ignored probes moved recoverably to
 Trash after port/process cleanup; no raw capture or proprietary Dock raster is
 tracked.
 
+## Current General Settings sample
+
+The `26.803.61601` General probe used an isolated second process, unique
+profile, and loopback-only port `9832`. It selected the structural main
+`app://-/index.html` Renderer, opened General and each of its five menus, and
+entered then cancelled Popout shortcut capture. No stored product setting was
+changed; the primary Codex process remained untouched.
+
+At 1180×820 the 322.91px Settings navigation, y=46 main scroll owner, and
+centered 768px content match the prior Settings slices. At 720×820 content
+shrinks to 357.09px and the route grows from 1,820px to 2,239px without
+horizontal overflow. The 21 rows span five cards and expose twelve switches,
+five menus, Auto detect plus 65 languages, two segmented keyboard controls,
+license presentation, and shortcut capture/cancel. Captured selections are
+observed host values, not product defaults.
+
+The controlled replay adds wide, light, 720px, hotkey, and bottom frames to
+Browser/CDP; Electron repeats menu/search/switch/keyboard interactions and
+state continuity across General, Git, and Appearance. Four optional local-only
+product gates compare the unmasked full wide, top 720×680 crop, shortcut-
+capture, and bottom frames at 4.6143%, 6.7412%, 4.7654%, and 4.8818%. The exact
+profile tree and listener were removed,
+and the profile, probes, JSON, and screenshots moved recoverably to Trash.
+Only de-identified measurements and reviewed independent baselines are
+tracked.
+
 ## Required flow matrix
 
 ### 1. Application entry and navigation
