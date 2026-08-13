@@ -320,7 +320,7 @@ for (const scene of selectedScenes) {
       }
       await page.getByRole("button", { name: "Hooks" }).click();
       const routing = await page.evaluate(() => ({
-        heading: document.querySelector(".codex-ui-git-settings > h1")
+        heading: document.querySelector(".codex-ui-hooks-settings h1")
           ?.textContent,
         query: document.querySelector('[role="searchbox"]')?.value,
         selected: document
@@ -328,12 +328,12 @@ for (const scene of selectedScenes) {
           ?.getAttribute("aria-label"),
       }));
       if (
-        routing.heading !== "Git" ||
+        routing.heading !== "Hooks" ||
         routing.query !== "git" ||
-        routing.selected !== "Git"
+        routing.selected !== "Hooks"
       ) {
         throw new Error(
-          `${scene.id}: unimplemented Settings navigation changed the Git route: ${JSON.stringify(routing)}`,
+          `${scene.id}: current Hooks Settings routing failed: ${JSON.stringify(routing)}`,
         );
       }
       const clearSearch = page.getByRole("button", {
@@ -344,6 +344,8 @@ for (const scene of selectedScenes) {
       if (!(await page.getByRole("searchbox").evaluate((input) => input === document.activeElement))) {
         throw new Error(`${scene.id}: clearing Settings search did not restore input focus.`);
       }
+      await page.getByRole("button", { name: "Git" }).click();
+      await page.waitForSelector(".codex-ui-git-settings");
       await page.getByRole("switch", { name: "Always force push" }).click();
       const mergeRadio = page.getByRole("radio", { name: "Merge" });
       await mergeRadio.focus();
