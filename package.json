@@ -87,7 +87,7 @@
     "@types/react": "^19.2.18",
     "@types/react-dom": "^19.2.4",
     "axe-core": "4.12.1",
-    "happy-dom": "^20.11.1",
+    "happy-dom": "^20.11.2",
     "pixelmatch": "7.2.0",
     "pngjs": "7.0.0",
     "publint": "0.3.22",
