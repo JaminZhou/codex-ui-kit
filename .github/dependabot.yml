@@ -5,6 +5,23 @@ updates:
     schedule:
       interval: weekly
     open-pull-requests-limit: 5
+    groups:
+      build-tooling:
+        applies-to: version-updates
+        patterns:
+          - vite
+          - "@vitejs/plugin-react"
+        update-types:
+          - minor
+          - patch
+      browser-automation:
+        applies-to: version-updates
+        patterns:
+          - playwright-core
+          - puppeteer-core
+        update-types:
+          - minor
+          - patch
   - package-ecosystem: github-actions
     directory: /
     schedule:
