@@ -1876,6 +1876,137 @@ for (const scene of selectedScenes) {
       continue;
     }
     if (
+      scene.scenario === "streaming-recovery" &&
+      [
+        "retrying",
+        "retrying-progress",
+        "recovered",
+        "transport-failed",
+        "transport-retried",
+      ].includes(scene.id)
+    ) {
+      const transport = await page.evaluate(() => {
+        const rect = (element) => {
+          if (!element) return null;
+          const value = element.getBoundingClientRect();
+          return {
+            height: value.height,
+            left: value.left,
+            top: value.top,
+            width: value.width,
+          };
+        };
+        const text = (element) =>
+          element?.textContent?.replace(/\s+/g, " ").trim() ?? null;
+        const root = document.querySelector(".demo-root");
+        const streamNotices = Array.from(
+          document.querySelectorAll(".codex-ui-stream-notice"),
+          (notice) => {
+            const icon = notice.querySelector(
+              ".codex-ui-stream-notice__icon",
+            );
+            const style = getComputedStyle(notice);
+            return {
+              details: text(
+                notice.querySelector(".codex-ui-stream-notice__details"),
+              ),
+              icon: rect(icon),
+              id: notice.getAttribute("data-item-id"),
+              role: notice.getAttribute("role"),
+              style: {
+                fontSize: style.fontSize,
+                lineHeight: style.lineHeight,
+              },
+              text: text(notice),
+            };
+          },
+        );
+        const systemErrors = Array.from(
+          document.querySelectorAll(".codex-ui-system-error-notice"),
+          (notice) => ({
+            id: notice.getAttribute("data-item-id"),
+            role: notice.getAttribute("role"),
+            text: text(notice),
+          }),
+        );
+        return {
+          assistantAfterFailure: text(
+            document.querySelector(
+              '[data-item-id="assistant-after-failure"]',
+            ),
+          ),
+          composerDisabled:
+            document
+              .querySelector('[aria-label="Message composer"]')
+              ?.hasAttribute("disabled") ?? null,
+          frame: root?.getAttribute("data-frame"),
+          horizontalOverflow:
+            document.documentElement.scrollWidth -
+            document.documentElement.clientWidth,
+          status: root?.getAttribute("data-status"),
+          sendCount: Array.from(document.querySelectorAll("button")).filter(
+            (button) =>
+              button.getAttribute("aria-label") === "Send" ||
+              button.textContent?.trim() === "Send",
+          ).length,
+          stopCount: Array.from(document.querySelectorAll("button")).filter(
+            (button) =>
+              button.getAttribute("aria-label") === "Stop" ||
+              button.textContent?.trim() === "Stop",
+          ).length,
+          streamNotices,
+          systemErrors,
+        };
+      });
+      const retrying = scene.id === "retrying";
+      const retryingProgress = scene.id === "retrying-progress";
+      const failed = scene.id === "transport-failed";
+      const retried = scene.id === "transport-retried";
+      const expectedStatus =
+        retrying || retryingProgress
+          ? "retrying"
+          : failed
+            ? "failed"
+            : "completed";
+      const expectedRetryText = retryingProgress
+        ? "Server is busy, reconnecting 2/5The server is still busy; retrying the same response stream."
+        : "Server is busy, reconnecting 1/5The response stream disconnected before completion.";
+      if (
+        transport.frame !== scene.frame ||
+        transport.status !== expectedStatus ||
+        transport.horizontalOverflow > 1 ||
+        transport.streamNotices.length !== 1 ||
+        transport.streamNotices[0].role !== "status" ||
+        transport.streamNotices[0].style.fontSize !== "14px" ||
+        transport.streamNotices[0].style.lineHeight !== "21px" ||
+        Math.abs((transport.streamNotices[0].icon?.width ?? 0) - 16) > 1 ||
+        Math.abs((transport.streamNotices[0].icon?.height ?? 0) - 20) > 1 ||
+        ((retrying || retryingProgress) &&
+          transport.streamNotices[0].text !== expectedRetryText) ||
+        (failed || retried
+          ? transport.systemErrors.length !== 1 ||
+            transport.systemErrors[0].role !== "alert" ||
+            transport.systemErrors[0].text !==
+              "Response stream disconnected before completion."
+          : transport.systemErrors.length !== 0) ||
+        transport.composerDisabled !== false ||
+        transport.stopCount !== (retrying || retryingProgress ? 1 : 0) ||
+        transport.sendCount !== (retrying || retryingProgress ? 0 : 1) ||
+        (retried
+          ? transport.assistantAfterFailure !==
+            "The follow-up completed without losing the prior recovery history."
+          : transport.assistantAfterFailure !== null)
+      ) {
+        throw new Error(
+          `${scene.id}: transport lifecycle contract failed: ${JSON.stringify(transport)}`,
+        );
+      }
+      await writeFile(
+        join(artifactDirectory, `${scene.id}-transport.json`),
+        `${JSON.stringify(transport, null, 2)}\n`,
+      );
+    }
+    if (
       currentReplayComposerScenarios.has(scene.scenario) ||
       currentApprovalComposerScenes.has(scene.id)
     ) {
@@ -2769,6 +2900,197 @@ for (const scene of selectedScenes) {
       continue;
     }
 
+    if (scene.id.startsWith("app-server-crashed")) {
+      await page.waitForTimeout(50);
+      const contract = await page.evaluate(() => {
+        const rect = (element) => {
+          if (!element) return null;
+          const value = element.getBoundingClientRect();
+          return {
+            bottom: value.bottom,
+            height: value.height,
+            left: value.left,
+            right: value.right,
+            top: value.top,
+            width: value.width,
+          };
+        };
+        const text = (element) =>
+          element?.textContent?.replace(/\s+/g, " ").trim() ?? null;
+        const root = document.querySelector(".demo-root");
+        const recovery = document.querySelector(
+          ".codex-ui-app-server-crash-recovery",
+        );
+        const content = recovery?.querySelector(
+          ".codex-ui-app-server-crash-recovery__content",
+        );
+        const copy = recovery?.querySelector(
+          ".codex-ui-app-server-crash-recovery__copy",
+        );
+        const icon = recovery?.querySelector(
+          ".codex-ui-app-server-crash-recovery__icon",
+        );
+        const buttons = Array.from(
+          recovery?.querySelectorAll("button") ?? [],
+          (button) => ({
+            kind: button.getAttribute("data-kind"),
+            label: text(button),
+            rect: rect(button),
+            style: {
+              backgroundColor: getComputedStyle(button).backgroundColor,
+              border: getComputedStyle(button).border,
+              color: getComputedStyle(button).color,
+              fontSize: getComputedStyle(button).fontSize,
+              fontWeight: getComputedStyle(button).fontWeight,
+              lineHeight: getComputedStyle(button).lineHeight,
+            },
+          }),
+        );
+        return {
+          appServerState: root?.getAttribute("data-app-server-state"),
+          buttons,
+          content: rect(content),
+          copy: rect(copy),
+          description: text(content?.querySelector("p")),
+          descriptionStyle: content?.querySelector("p")
+            ? {
+                color: getComputedStyle(content.querySelector("p")).color,
+                fontSize: getComputedStyle(content.querySelector("p")).fontSize,
+                lineHeight: getComputedStyle(content.querySelector("p")).lineHeight,
+              }
+            : null,
+          heading: text(content?.querySelector("h1")),
+          headingStyle: content?.querySelector("h1")
+            ? {
+                fontSize: getComputedStyle(content.querySelector("h1")).fontSize,
+                fontWeight: getComputedStyle(content.querySelector("h1")).fontWeight,
+                lineHeight: getComputedStyle(content.querySelector("h1")).lineHeight,
+              }
+            : null,
+          horizontalOverflow:
+            document.documentElement.scrollWidth -
+            document.documentElement.clientWidth,
+          icon: rect(icon),
+          mainCount: document.querySelectorAll(
+            ".codex-ui-app-shell__main",
+          ).length,
+          recovery: rect(recovery),
+          role: content?.getAttribute("role"),
+          shellCount: document.querySelectorAll(".codex-ui-app-shell").length,
+        };
+      });
+      if (
+        contract.appServerState !== "crashed" ||
+        contract.role !== "alert" ||
+        contract.heading !== "ChatGPT stopped unexpectedly" ||
+        contract.description !==
+          "Restart ChatGPT to continue. If the problem persists, check your configuration or visit the documentation" ||
+        JSON.stringify(contract.buttons.map(({ label }) => label)) !==
+          JSON.stringify([
+            "documentation",
+            "Update ChatGPT",
+            "Open Config.toml",
+            "Restart",
+          ]) ||
+        contract.buttons[0].kind !== null ||
+        JSON.stringify(contract.buttons.slice(1).map(({ kind }) => kind)) !==
+          JSON.stringify(["update", "configuration", "restart"]) ||
+        contract.shellCount !== 0 ||
+        contract.mainCount !== 0 ||
+        contract.horizontalOverflow > 1 ||
+        !contract.recovery ||
+        Math.abs(contract.recovery.width - (scene.windowSize?.width ?? 1180)) > 1 ||
+        Math.abs(contract.recovery.height - (scene.windowSize?.height ?? 820)) > 1 ||
+        !contract.icon ||
+        Math.abs(contract.icon.width - 28) > 1 ||
+        Math.abs(contract.icon.height - 28) > 1 ||
+        !contract.content ||
+        Math.abs(
+          contract.content.width - Math.min(contract.recovery.width, 896)
+        ) > 1 ||
+        !contract.copy ||
+        Math.abs(contract.copy.width - Math.min(contract.recovery.width - 48, 448)) > 1 ||
+        contract.headingStyle?.fontSize !== "16px" ||
+        contract.headingStyle?.fontWeight !== "500" ||
+        contract.headingStyle?.lineHeight !== "24px" ||
+        contract.descriptionStyle?.fontSize !== "13px" ||
+        contract.descriptionStyle?.lineHeight !== "18.5714px" ||
+        JSON.stringify(contract.buttons.slice(1).map(({ rect }) => rect?.height)) !==
+          JSON.stringify([24, 24, 24]) ||
+        JSON.stringify(contract.buttons.slice(1).map(({ rect }) => rect?.width)) !==
+          JSON.stringify([141.21875, 125.453125, 62.25]) ||
+        JSON.stringify(contract.buttons.slice(1).map(({ style }) => style)) !==
+          JSON.stringify([
+            {
+              backgroundColor: "rgb(255, 255, 255)",
+              border: "1px solid rgba(255, 255, 255, 0.082)",
+              color: "rgb(45, 45, 45)",
+              fontSize: "13px",
+              fontWeight: "445",
+              lineHeight: "18px",
+            },
+            {
+              backgroundColor: "rgba(255, 255, 255, 0.03)",
+              border: "1px solid rgba(255, 255, 255, 0.082)",
+              color: "rgb(255, 255, 255)",
+              fontSize: "13px",
+              fontWeight: "445",
+              lineHeight: "18px",
+            },
+            {
+              backgroundColor: "rgb(255, 255, 255)",
+              border: "1px solid rgba(255, 255, 255, 0.082)",
+              color: "rgb(45, 45, 45)",
+              fontSize: "13px",
+              fontWeight: "445",
+              lineHeight: "18px",
+            },
+          ])
+      ) {
+        throw new Error(
+          `${scene.id}: app-server crash contract failed: ${JSON.stringify(contract)}`,
+        );
+      }
+      if (scene.id === "app-server-crashed") {
+        await page.getByRole("button", { name: "Restart", exact: true }).click();
+        await page.waitForFunction(() => {
+          const root = document.querySelector(".demo-root");
+          return (
+            root?.getAttribute("data-app-server-state") === "running" &&
+            root?.getAttribute("data-frame") === "app-server-restarted" &&
+            document.querySelector(".codex-ui-app-shell") !== null
+          );
+        });
+        contract.restart = await page.evaluate(() => ({
+          appServerState: document
+            .querySelector(".demo-root")
+            ?.getAttribute("data-app-server-state"),
+          frame: document
+            .querySelector(".demo-root")
+            ?.getAttribute("data-frame"),
+          mainCount: document.querySelectorAll(
+            ".codex-ui-app-shell__main",
+          ).length,
+          shellCount: document.querySelectorAll(".codex-ui-app-shell").length,
+        }));
+        if (
+          contract.restart.appServerState !== "running" ||
+          contract.restart.frame !== "app-server-restarted" ||
+          contract.restart.mainCount !== 1 ||
+          contract.restart.shellCount !== 1
+        ) {
+          throw new Error(
+            `${scene.id}: app-server restart failed: ${JSON.stringify(contract)}`,
+          );
+        }
+      }
+      await writeFile(
+        join(artifactDirectory, `${scene.id}.json`),
+        `${JSON.stringify(contract, null, 2)}\n`,
+      );
+      continue;
+    }
+
     if (scene.view === "shell") {
       await page.waitForTimeout(50);
       const contract = await page.evaluate(() => {
@@ -2807,8 +3129,17 @@ for (const scene of selectedScenes) {
         const liveState = outlet.querySelector(
           ':scope > [role="status"], :scope > [role="alert"]',
         );
-        const notification = document.querySelector(
-          ".codex-ui-app-notification",
+        const notificationRegion = document.querySelector(
+          ".codex-ui-app-notification-region",
+        );
+        const notifications = Array.from(
+          document.querySelectorAll(".codex-ui-app-notification"),
+          (notification) => ({
+            position: notification.getAttribute("aria-posinset"),
+            role: notification.getAttribute("role"),
+            setSize: notification.getAttribute("aria-setsize"),
+            text: notification.textContent?.replace(/\s+/g, " ").trim(),
+          }),
         );
         return {
           chrome: {
@@ -2826,12 +3157,28 @@ for (const scene of selectedScenes) {
             document.documentElement.scrollWidth -
             document.documentElement.clientWidth,
           main: rect(main),
-          notification: notification
+          notification: notifications[0]
             ? {
-                role: notification.getAttribute("role"),
-                text: notification.textContent?.replace(/\s+/g, " ").trim(),
+                role: notifications[0].role,
+                text: notifications[0].text,
               }
             : null,
+          notificationRegion: notificationRegion
+            ? {
+                hiddenCount: notificationRegion.getAttribute(
+                  "data-hidden-count",
+                ),
+                position: notificationRegion.getAttribute("data-position"),
+                rect: rect(notificationRegion),
+                totalCount: notificationRegion.getAttribute(
+                  "data-total-count",
+                ),
+                visibleCount: notificationRegion.getAttribute(
+                  "data-visible-count",
+                ),
+              }
+            : null,
+          notifications,
           outlet: {
             busy: outlet.getAttribute("aria-busy"),
             contentBusy:
@@ -2899,11 +3246,70 @@ for (const scene of selectedScenes) {
         (scene.shellState !== "reconnecting" &&
           contract.outlet.contentBusy !== null) ||
         ((scene.shellState === "stale") !== contract.outlet.preserved) ||
-        ((scene.id === "shell-restored") !== Boolean(contract.notification))
+        ((scene.id === "shell-restored" ||
+          scene.id === "shell-notification-queue") !==
+          Boolean(contract.notification))
       ) {
         throw new Error(
           `${scene.id}: route lifecycle state failed: ${JSON.stringify(contract)}`,
         );
+      }
+      if (scene.id === "shell-notification-queue") {
+        if (
+          contract.notificationRegion?.position !== "bottom-end" ||
+          contract.notificationRegion.totalCount !== "4" ||
+          contract.notificationRegion.visibleCount !== "3" ||
+          contract.notificationRegion.hiddenCount !== "1" ||
+          contract.notifications.length !== 3 ||
+          JSON.stringify(contract.notifications.map(({ position }) => position)) !==
+            JSON.stringify(["1", "2", "3"]) ||
+          contract.notifications.some(({ setSize }) => setSize !== "4") ||
+          contract.notifications[0].text !==
+            "Permission requiredA local command is waiting for approval.Review"
+        ) {
+          throw new Error(
+            `${scene.id}: notification queue contract failed: ${JSON.stringify(contract)}`,
+          );
+        }
+        await page.getByRole("button", { name: "Review", exact: true }).click();
+        await page.waitForFunction(() => {
+          const root = document.querySelector(".demo-root");
+          const region = document.querySelector(
+            ".codex-ui-app-notification-region",
+          );
+          return (
+            root?.getAttribute("data-notification-action") ===
+              "permission-reviewed" &&
+            region?.getAttribute("data-total-count") === "3" &&
+            region?.getAttribute("data-hidden-count") === "0"
+          );
+        });
+        await page.waitForTimeout(20);
+        const focus = await page.evaluate(() => ({
+          action: document
+            .querySelector(".demo-root")
+            ?.getAttribute("data-notification-action"),
+          activeLabel: document.activeElement?.textContent
+            ?.replace(/\s+/g, " ")
+            .trim(),
+          hiddenCount: document
+            .querySelector(".codex-ui-app-notification-region")
+            ?.getAttribute("data-hidden-count"),
+          totalCount: document
+            .querySelector(".codex-ui-app-notification-region")
+            ?.getAttribute("data-total-count"),
+        }));
+        if (
+          focus.action !== "permission-reviewed" ||
+          focus.activeLabel !== "Open" ||
+          focus.totalCount !== "3" ||
+          focus.hiddenCount !== "0"
+        ) {
+          throw new Error(
+            `${scene.id}: notification queue focus failed: ${JSON.stringify(focus)}`,
+          );
+        }
+        contract.afterAction = focus;
       }
       await writeFile(
         join(artifactDirectory, `${scene.id}.json`),
@@ -9451,9 +9857,9 @@ try {
 }
 
 const sidebarScene = {
-  frame: "streaming",
+  frame: "markdown-complete",
   id: "sidebar-current",
-  scenario: "streaming-recovery",
+  scenario: "markdown",
 };
 const { app: sidebarApp, page: sidebarPage } = await launchScene(
   sidebarScene,
@@ -10172,9 +10578,9 @@ try {
 }
 
 const sidebarNarrowScene = {
-  frame: "streaming",
+  frame: "markdown-complete",
   id: "sidebar-current-narrow",
-  scenario: "streaming-recovery",
+  scenario: "markdown",
 };
 const { app: sidebarNarrowApp, page: sidebarNarrowPage } =
   await launchScene(sidebarNarrowScene, {
@@ -10298,7 +10704,7 @@ try {
 
   await sidebarNarrowPage.reload();
   await sidebarNarrowPage.waitForSelector(
-    '.demo-root[data-scenario="streaming-recovery"][data-frame="streaming"]',
+    '.demo-root[data-scenario="markdown"][data-frame="markdown-complete"]',
   );
   await sidebarNarrowPage.mouse.move(1, 200);
   await sidebarNarrowPage.waitForTimeout(500);

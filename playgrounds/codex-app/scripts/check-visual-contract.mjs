@@ -206,6 +206,12 @@ const currentBuildWorkspaceReference =
   process.env.CODEX_UI_KIT_WORKSPACE_REFERENCE;
 const currentDarkShellReference =
   process.env.CODEX_UI_KIT_CURRENT_DARK_SHELL_REFERENCE;
+const currentBuildAppServerCrashReference =
+  process.env.CODEX_UI_KIT_APP_SERVER_CRASH_REFERENCE;
+const currentBuildAppServerCrashReferenceSize = {
+  height: 820,
+  width: 1180,
+};
 const currentBuildWorkspaceReferenceSize = {
   height: 820,
   width: 1180,
@@ -1053,6 +1059,73 @@ for (const scene of selectedScenes) {
     regionalFailures.push(failure);
     console.error(failure);
     continue;
+  }
+
+  if (
+    scene.id === "app-server-crashed" &&
+    currentBuildAppServerCrashReference
+  ) {
+    const reference = flattenPng(
+      PNG.sync.read(await readFile(currentBuildAppServerCrashReference)),
+      { blue: 0, green: 0, red: 0 },
+    );
+    const flattenedActual = flattenPng(clonePng(actual), {
+      blue: 0,
+      green: 0,
+      red: 0,
+    });
+    if (
+      reference.width !== currentBuildAppServerCrashReferenceSize.width ||
+      reference.height !== currentBuildAppServerCrashReferenceSize.height ||
+      flattenedActual.width !== reference.width ||
+      flattenedActual.height !== reference.height
+    ) {
+      throw new Error(
+        `${scene.id}: current-build App Server crash comparison requires exact 1180x820 product and playground frames, received reference ${reference.width}x${reference.height} and actual ${flattenedActual.width}x${flattenedActual.height}.`,
+      );
+    }
+    const fullComparison = comparePng(reference, flattenedActual, 0.1);
+    const core = { height: 185, left: 350, top: 320, width: 480 };
+    const coreComparison = comparePng(
+      cropPng(reference, core.left, core.top, core.width, core.height),
+      cropPng(
+        flattenedActual,
+        core.left,
+        core.top,
+        core.width,
+        core.height,
+      ),
+      0.1,
+    );
+    const maximumFullRatio = environmentRatio(
+      "CODEX_UI_KIT_APP_SERVER_CRASH_MAX_DIFF_RATIO",
+      0.002,
+    );
+    const maximumCoreRatio = environmentRatio(
+      "CODEX_UI_KIT_APP_SERVER_CRASH_CORE_MAX_DIFF_RATIO",
+      0.02,
+    );
+    await writeFile(
+      join(artifactDirectory, `${scene.id}.current-build.png`),
+      PNG.sync.write(flattenedActual),
+    );
+    if (fullComparison.pixels > 0) {
+      await writeFile(
+        join(artifactDirectory, `${scene.id}.current-build.diff.png`),
+        PNG.sync.write(fullComparison.diff),
+      );
+    }
+    if (
+      fullComparison.ratio > maximumFullRatio ||
+      coreComparison.ratio > maximumCoreRatio
+    ) {
+      throw new Error(
+        `${scene.id}: current-build App Server crash ratios ${JSON.stringify({ core: coreComparison.ratio, full: fullComparison.ratio })} exceed ${JSON.stringify({ core: maximumCoreRatio, full: maximumFullRatio })}.`,
+      );
+    }
+    console.log(
+      `${scene.id}: current-build App Server crash ratios ${JSON.stringify({ core: coreComparison.ratio, full: fullComparison.ratio })}`,
+    );
   }
 
   if (scene.id === "workspace-ready" && currentBuildWorkspaceReference) {

@@ -225,6 +225,24 @@ export interface DemoSubagent {
   turnId: string | null;
 }
 
+export interface DemoStreamError {
+  additionalDetails: string | null;
+  content: string;
+  errorInfo: JsonValue;
+  id: string;
+  reconnectAttempt: number | null;
+  reconnectMaxAttempts: number | null;
+  serverBusy: boolean;
+  turnId: string | null;
+}
+
+export interface DemoSystemError {
+  content: string;
+  errorInfo: JsonValue;
+  id: string;
+  turnId: string | null;
+}
+
 function subagentName(agentPath: string | null, id: string) {
   const candidate = agentPath?.split("/").filter(Boolean).at(-1) ?? id;
   if (!candidate || candidate === "root") return null;
@@ -247,7 +265,9 @@ export interface DemoTimelineEntry {
     | "fileChange"
     | "mcpToolCall"
     | "message"
+    | "streamError"
     | "subagent"
+    | "systemError"
     | "webSearch";
 }
 
@@ -265,8 +285,10 @@ export interface DemoProtocolState {
   messages: DemoMessage[];
   retrying: boolean;
   status: DemoTurnStatus;
+  streamErrors: DemoStreamError[];
   subagentLifecycles: DemoSubagent[];
   subagents: DemoSubagent[];
+  systemErrors: DemoSystemError[];
   threadId: string | null;
   timeline: DemoTimelineEntry[];
   turnDurationMs: number | null;
@@ -295,8 +317,10 @@ export const initialProtocolState: DemoProtocolState = {
   messages: [],
   retrying: false,
   status: "idle",
+  streamErrors: [],
   subagentLifecycles: [],
   subagents: [],
+  systemErrors: [],
   threadId: null,
   timeline: [],
   turnDurationMs: null,
@@ -407,6 +431,40 @@ function asNumber(value: unknown): number | null {
 
 function asJsonValue(value: unknown, fallback: JsonValue = null): JsonValue {
   return value === undefined ? fallback : (value as JsonValue);
+}
+
+const reconnectProgressPattern =
+  /^Reconnecting(?:\.\.\.)?\s+(\d+)\/(\d+)$/;
+
+function reconnectProgress(message: string) {
+  const match = reconnectProgressPattern.exec(message.trim());
+  if (!match) {
+    return { attempt: null, content: message, maxAttempts: null };
+  }
+  const attempt = Number(match[1]);
+  const maxAttempts = Number(match[2]);
+  if (
+    !Number.isSafeInteger(attempt) ||
+    !Number.isSafeInteger(maxAttempts) ||
+    attempt < 0 ||
+    maxAttempts < 1
+  ) {
+    return { attempt: null, content: message, maxAttempts: null };
+  }
+  return {
+    attempt,
+    content: `Reconnecting ${attempt}/${maxAttempts}`,
+    maxAttempts,
+  };
+}
+
+function isServerBusyError(errorInfo: JsonValue): boolean {
+  if (errorInfo === "serverOverloaded") return true;
+  if (!isRecord(errorInfo)) return false;
+  const disconnected = errorInfo.responseStreamDisconnected;
+  return (
+    isRecord(disconnected) && disconnected.httpStatusCode === 429
+  );
 }
 
 function notificationParams(
@@ -1876,14 +1934,68 @@ export function reduceProtocolNotification(
   if (notification.method === "error") {
     const error = isRecord(params.error) ? params.error : {};
     const retrying = params.willRetry === true;
+    const message = asString(error.message) ?? "The turn failed.";
+    const errorInfo = asJsonValue(error.codexErrorInfo);
+    const turnId = asString(params.turnId) ?? state.currentTurnId;
+    if (retrying) {
+      const progress = reconnectProgress(message);
+      const previousTimelineEntry = state.timeline.at(-1);
+      const previousStreamError =
+        previousTimelineEntry?.kind === "streamError"
+          ? state.streamErrors.find(
+              ({ id }) => id === previousTimelineEntry.id,
+            )
+          : undefined;
+      const updatesPreviousProgress = Boolean(
+        previousStreamError &&
+          previousStreamError.reconnectAttempt !== null &&
+          progress.attempt !== null &&
+          previousStreamError.turnId === turnId,
+      );
+      const id = updatesPreviousProgress
+        ? previousStreamError!.id
+        : `stream-error:${turnId ?? "unknown"}:${state.streamErrors.length + 1}`;
+      const streamError: DemoStreamError = {
+        additionalDetails: asString(error.additionalDetails),
+        content: progress.content,
+        errorInfo,
+        id,
+        reconnectAttempt: progress.attempt,
+        reconnectMaxAttempts: progress.maxAttempts,
+        serverBusy: isServerBusyError(errorInfo),
+        turnId,
+      };
+      return {
+        ...next,
+        error: message,
+        messages: state.messages,
+        retrying: true,
+        status: "retrying",
+        streamErrors: upsertById(state.streamErrors, streamError),
+        timeline: appendTimeline(state.timeline, {
+          id,
+          kind: "streamError",
+        }),
+      };
+    }
+    const id = `system-error:${turnId ?? "unknown"}:${state.systemErrors.length + 1}`;
+    const systemError: DemoSystemError = {
+      content: message,
+      errorInfo,
+      id,
+      turnId,
+    };
     return {
       ...next,
-      error: asString(error.message) ?? "The turn failed.",
-      messages: retrying
-        ? state.messages
-        : finalizeRunningMessages(state.messages, "failed"),
-      retrying,
-      status: retrying ? "retrying" : "failed",
+      error: message,
+      messages: finalizeRunningMessages(state.messages, "failed"),
+      retrying: false,
+      status: "failed",
+      systemErrors: upsertById(state.systemErrors, systemError),
+      timeline: appendTimeline(state.timeline, {
+        id,
+        kind: "systemError",
+      }),
     };
   }
 

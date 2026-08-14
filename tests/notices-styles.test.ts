@@ -44,6 +44,24 @@ describe("notice visual contract", () => {
     expect(styles).toMatch(
       /\.codex-ui-stream-notice__details \{[\s\S]*?margin: 0\.25rem 0 0 1\.5rem/,
     );
+    expect(styles).toMatch(
+      /\.codex-ui-stream-notice \{[\s\S]*?font-size: 14px;[\s\S]*?line-height: 21px/,
+    );
+  });
+
+  it("locks the current fatal App Server recovery composition", () => {
+    expect(styles).toMatch(
+      /\.codex-ui-app-server-crash-recovery__content \{[\s\S]*?gap: 1rem;[\s\S]*?max-width: 56rem;[\s\S]*?padding: 1\.5rem/,
+    );
+    expect(styles).toMatch(
+      /\.codex-ui-app-server-crash-recovery__icon \{[\s\S]*?color: #ff6764;[\s\S]*?height: 1\.75rem;[\s\S]*?width: 1\.75rem/,
+    );
+    expect(styles).toMatch(
+      /\.codex-ui-app-server-crash-recovery__copy \{[\s\S]*?gap: 0\.5rem;[\s\S]*?max-width: 28rem/,
+    );
+    expect(styles).toMatch(
+      /\.codex-ui-app-server-crash-recovery__action \{[\s\S]*?background: #fff;[\s\S]*?font-size: 0\.8125rem;[\s\S]*?height: 1\.5rem;[\s\S]*?padding: 0\.125rem 0\.5rem/,
+    );
   });
 
   it("disables notice motion for reduced-motion users", () => {

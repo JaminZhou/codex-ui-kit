@@ -171,8 +171,8 @@ export const replayScenarios: Record<ReplayScenarioId, ReplayScenario> = {
   ),
   "streaming-recovery": scenario(
     "streaming-recovery",
-    "Streaming and retry",
-    "Incremental reply, transient error, retry, and recovery.",
+    "Streaming retry, failure, and recovery",
+    "Incremental reply, in-place retry progress, successful recovery, final failure, and a successful same-thread follow-up.",
     recoveryTrace,
   ),
   "subagent-delegation": scenario(

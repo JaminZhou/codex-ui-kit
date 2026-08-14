@@ -8,9 +8,9 @@ import { promisify } from "node:util";
 const execFileAsync = promisify(execFile);
 
 const scene = {
-  frame: "recovered",
+  frame: "markdown-complete",
   id: "electron",
-  scenario: "streaming-recovery",
+  scenario: "markdown",
 };
 const { app, page } = await launchScene(scene, { capture: false });
 
@@ -1075,9 +1075,9 @@ try {
 }
 
 const narrowReachabilityScene = {
-  frame: "recovered",
+  frame: "markdown-complete",
   id: "electron-narrow-reachability",
-  scenario: "streaming-recovery",
+  scenario: "markdown",
 };
 const { app: narrowApp, page: narrowPage } = await launchScene(
   narrowReachabilityScene,
@@ -7035,9 +7035,9 @@ const {
   page: liveSessionApprovalPage,
 } = await launchScene(
   {
-    frame: "recovered",
+    frame: "markdown-complete",
     id: "electron-live-file-approval-for-session",
-    scenario: "streaming-recovery",
+    scenario: "markdown",
   },
   { capture: false },
 );
@@ -8973,9 +8973,9 @@ try {
 }
 
 const liveSubagentScene = {
-  frame: "recovered",
+  frame: "markdown-complete",
   id: "electron-live-subagent",
-  scenario: "streaming-recovery",
+  scenario: "markdown",
 };
 const { app: liveSubagentApp, page: liveSubagentPage } = await launchScene(
   liveSubagentScene,
@@ -10424,6 +10424,331 @@ try {
   await codeReviewSettingsApp.close();
 }
 
+const transportRetryingScene = {
+  frame: "retrying",
+  id: "electron-transport-retrying",
+  scenario: "streaming-recovery",
+};
+const {
+  app: transportRetryingApp,
+  page: transportRetryingPage,
+} = await launchScene(transportRetryingScene, { capture: false });
+try {
+  const transportContract = await transportRetryingPage.evaluate(() => {
+    const notice = document.querySelector(".codex-ui-stream-notice");
+    const icon = notice?.querySelector(".codex-ui-stream-notice__icon");
+    const iconRect = icon?.getBoundingClientRect();
+    const style = notice ? getComputedStyle(notice) : null;
+    return {
+      alertCount: document.querySelectorAll('[role="alert"]').length,
+      details:
+        notice?.querySelector(".codex-ui-stream-notice__details")
+          ?.textContent?.trim() ?? null,
+      icon: iconRect
+        ? { height: iconRect.height, width: iconRect.width }
+        : null,
+      role: notice?.getAttribute("role"),
+      sendCount: document.querySelectorAll(
+        '.codex-ui-composer__primary[aria-label="Send"]',
+      ).length,
+      status: document
+        .querySelector(".demo-root")
+        ?.getAttribute("data-status"),
+      stopCount: document.querySelectorAll(
+        '.codex-ui-composer__primary[aria-label="Stop"]',
+      ).length,
+      style: style
+        ? { fontSize: style.fontSize, lineHeight: style.lineHeight }
+        : null,
+      text: notice?.textContent?.replace(/\s+/g, " ").trim(),
+    };
+  });
+  if (
+    transportContract.status !== "retrying" ||
+    transportContract.stopCount !== 1 ||
+    transportContract.sendCount !== 0 ||
+    transportContract.role !== "status" ||
+    transportContract.alertCount !== 0 ||
+    transportContract.text !==
+      "Server is busy, reconnecting 1/5The response stream disconnected before completion." ||
+    transportContract.details !==
+      "The response stream disconnected before completion." ||
+    transportContract.icon?.width !== 16 ||
+    transportContract.icon?.height !== 20 ||
+    transportContract.style?.fontSize !== "14px" ||
+    transportContract.style?.lineHeight !== "21px"
+  ) {
+    throw new Error(
+      `Electron transport retry contract failed: ${JSON.stringify(transportContract)}`,
+    );
+  }
+} finally {
+  await transportRetryingApp.close();
+}
+
+const transportRecoveredScene = {
+  frame: "recovered",
+  id: "electron-transport-recovered",
+  scenario: "streaming-recovery",
+};
+const {
+  app: transportRecoveredApp,
+  page: transportRecoveredPage,
+} = await launchScene(transportRecoveredScene, { capture: false });
+try {
+  const recoveredContract = await transportRecoveredPage.evaluate(() => ({
+    assistant:
+      document
+        .querySelector('[data-item-id="assistant-recovery"]')
+        ?.textContent?.replace(/\s+/g, " ")
+        .trim() ?? null,
+    composerDisabled:
+      document
+        .querySelector('.codex-ui-composer textarea, textarea[aria-label]')
+        ?.hasAttribute("disabled") ?? null,
+    noticeCount: document.querySelectorAll(".codex-ui-stream-notice").length,
+    sendCount: document.querySelectorAll(
+      '.codex-ui-composer__primary[aria-label="Send"]',
+    ).length,
+    status: document.querySelector(".demo-root")?.getAttribute("data-status"),
+    stopCount: document.querySelectorAll(
+      '.codex-ui-composer__primary[aria-label="Stop"]',
+    ).length,
+  }));
+  if (
+    recoveredContract.status !== "completed" ||
+    recoveredContract.noticeCount !== 1 ||
+    recoveredContract.stopCount !== 0 ||
+    recoveredContract.sendCount !== 1 ||
+    recoveredContract.composerDisabled !== false ||
+    !recoveredContract.assistant?.includes("across retries")
+  ) {
+    throw new Error(
+      `Electron transport recovery contract failed: ${JSON.stringify(recoveredContract)}`,
+    );
+  }
+} finally {
+  await transportRecoveredApp.close();
+}
+
+for (const expected of [
+  {
+    assistantAfterFailure: null,
+    frame: "retrying-progress",
+    id: "electron-transport-retrying-progress",
+    noticeText:
+      "Server is busy, reconnecting 2/5The server is still busy; retrying the same response stream.",
+    sendCount: 0,
+    status: "retrying",
+    stopCount: 1,
+    systemErrorCount: 0,
+  },
+  {
+    assistantAfterFailure: null,
+    frame: "transport-failed",
+    id: "electron-transport-failed",
+    noticeText:
+      "Server is busy, reconnecting 2/5The server is still busy; retrying the same response stream.",
+    sendCount: 1,
+    status: "failed",
+    stopCount: 0,
+    systemErrorCount: 1,
+  },
+  {
+    assistantAfterFailure:
+      "The follow-up completed without losing the prior recovery history.",
+    frame: "transport-retried",
+    id: "electron-transport-retried",
+    noticeText:
+      "Server is busy, reconnecting 2/5The server is still busy; retrying the same response stream.",
+    sendCount: 1,
+    status: "completed",
+    stopCount: 0,
+    systemErrorCount: 1,
+  },
+]) {
+  const { app, page } = await launchScene(
+    {
+      frame: expected.frame,
+      id: expected.id,
+      scenario: "streaming-recovery",
+    },
+    { capture: false },
+  );
+  try {
+    const contract = await page.evaluate(() => {
+      const text = (element) =>
+        element?.textContent?.replace(/\s+/g, " ").trim() ?? null;
+      return {
+        assistantAfterFailure: text(
+          document.querySelector('[data-item-id="assistant-after-failure"]'),
+        ),
+        noticeText: text(document.querySelector(".codex-ui-stream-notice")),
+        sendCount: document.querySelectorAll(
+          '.codex-ui-composer__primary[aria-label="Send"]',
+        ).length,
+        status: document
+          .querySelector(".demo-root")
+          ?.getAttribute("data-status"),
+        stopCount: document.querySelectorAll(
+          '.codex-ui-composer__primary[aria-label="Stop"]',
+        ).length,
+        systemErrorCount: document.querySelectorAll(
+          '.codex-ui-system-error-notice[role="alert"]',
+        ).length,
+        systemErrorText: text(
+          document.querySelector(".codex-ui-system-error-notice"),
+        ),
+      };
+    });
+    if (
+      contract.status !== expected.status ||
+      contract.noticeText !== expected.noticeText ||
+      contract.stopCount !== expected.stopCount ||
+      contract.sendCount !== expected.sendCount ||
+      contract.systemErrorCount !== expected.systemErrorCount ||
+      contract.assistantAfterFailure !== expected.assistantAfterFailure ||
+      (expected.systemErrorCount === 1 &&
+        contract.systemErrorText !==
+          "Response stream disconnected before completion.")
+    ) {
+      throw new Error(
+        `${expected.id} contract failed: ${JSON.stringify(contract)}`,
+      );
+    }
+  } finally {
+    await app.close();
+  }
+}
+
+const appServerCrashScene = {
+  frame: "app-server-crashed",
+  id: "electron-app-server-crashed",
+  scenario: "streaming-recovery",
+  view: "shell",
+};
+const { app: appServerCrashApp, page: appServerCrashPage } = await launchScene(
+  appServerCrashScene,
+  { capture: false },
+);
+try {
+  const crashBounds = await appServerCrashApp.evaluate(({ BrowserWindow }) =>
+    BrowserWindow.getAllWindows()[0]?.getContentBounds(),
+  );
+  const crashContract = await appServerCrashPage.evaluate(() => ({
+    buttons: Array.from(
+      document.querySelectorAll(
+        ".codex-ui-app-server-crash-recovery button",
+      ),
+      (button) => button.textContent?.trim(),
+    ),
+    heading: document
+      .querySelector(".codex-ui-app-server-crash-recovery h1")
+      ?.textContent?.trim(),
+    mainCount: document.querySelectorAll(".codex-ui-app-shell__main").length,
+    state: document
+      .querySelector(".demo-root")
+      ?.getAttribute("data-app-server-state"),
+  }));
+  if (
+    crashBounds?.width !== 1180 ||
+    crashBounds?.height !== 820 ||
+    crashContract.state !== "crashed" ||
+    crashContract.mainCount !== 0 ||
+    crashContract.heading !== "ChatGPT stopped unexpectedly" ||
+    JSON.stringify(crashContract.buttons) !==
+      JSON.stringify([
+        "documentation",
+        "Update ChatGPT",
+        "Open Config.toml",
+        "Restart",
+      ])
+  ) {
+    throw new Error(
+      `Electron app-server crash contract failed: ${JSON.stringify({ crashBounds, crashContract })}`,
+    );
+  }
+  await appServerCrashApp.evaluate(({ BrowserWindow }) => {
+    BrowserWindow.getAllWindows()[0]?.setContentSize(720, 680);
+  });
+  await appServerCrashPage.waitForFunction(() => window.innerWidth === 720);
+  const compactCrash = await appServerCrashPage.evaluate(() => ({
+    height: window.innerHeight,
+    overflow:
+      document.documentElement.scrollWidth - document.documentElement.clientWidth,
+    width: window.innerWidth,
+  }));
+  if (
+    compactCrash.width !== 720 ||
+    compactCrash.height !== 680 ||
+    compactCrash.overflow > 1
+  ) {
+    throw new Error(
+      `Electron compact app-server crash failed: ${JSON.stringify(compactCrash)}`,
+    );
+  }
+  await appServerCrashPage
+    .getByRole("button", { name: "Restart", exact: true })
+    .click();
+  await appServerCrashPage.waitForSelector(
+    '.demo-root[data-app-server-state="running"][data-frame="app-server-restarted"] .codex-ui-app-shell',
+  );
+} finally {
+  await appServerCrashApp.close();
+}
+
+const notificationQueueScene = {
+  frame: "shell-notification-queue",
+  id: "electron-shell-notification-queue",
+  scenario: "streaming-recovery",
+  shellState: "ready",
+  view: "shell",
+};
+const {
+  app: notificationQueueApp,
+  page: notificationQueuePage,
+} = await launchScene(notificationQueueScene, { capture: false });
+try {
+  const queue = notificationQueuePage.locator(
+    ".codex-ui-app-notification-region",
+  );
+  if (
+    (await queue.getAttribute("data-total-count")) !== "4" ||
+    (await queue.getAttribute("data-visible-count")) !== "3" ||
+    (await queue.getAttribute("data-hidden-count")) !== "1" ||
+    (await notificationQueuePage
+      .locator(".codex-ui-app-notification")
+      .count()) !== 3
+  ) {
+    throw new Error("Electron notification queue did not enforce its bound.");
+  }
+  await notificationQueuePage
+    .getByRole("button", { name: "Review", exact: true })
+    .click();
+  await notificationQueuePage.waitForFunction(() => {
+    const root = document.querySelector(".demo-root");
+    const region = document.querySelector(
+      ".codex-ui-app-notification-region",
+    );
+    return (
+      root?.getAttribute("data-notification-action") ===
+        "permission-reviewed" &&
+      region?.getAttribute("data-total-count") === "3" &&
+      region?.getAttribute("data-hidden-count") === "0"
+    );
+  });
+  await notificationQueuePage.waitForTimeout(20);
+  if (
+    (await notificationQueuePage.evaluate(
+      () => document.activeElement?.textContent?.trim(),
+    )) !== "Open"
+  ) {
+    throw new Error("Electron notification queue did not preserve focus.");
+  }
+} finally {
+  await notificationQueueApp.close();
+}
+
 console.log(
-  "Electron host, native-window, current project-directory creation, coding-workspace routing and persisted/missing-worktree recovery replay, conversation/Composer and current image-attachment lifecycle plus current menus, current long, failed, and interrupted command output plus manual context compaction, thread summary, replay/live single, concurrent, nested, and mixed-recovery subagent delegation with 4/10 pagination, current mixed Search/Browser/MCP/approval/file/subagent flow, runtime-observed Hooks and package-observed Code review Settings, default 720px narrow reachability, resizable navigation/Review/Terminal/PR detail, PR tabs and expansion, MCP disclosure/result/unavailable-fallback, multi-file and mixed-content Review, selection/Undo, large diff scrolling, and compact geometry contracts passed.",
+  "Electron host, native-window, current project-directory creation, coding-workspace routing and persisted/missing-worktree recovery replay, conversation/Composer and current image-attachment lifecycle plus current menus, current long, failed, and interrupted command output plus manual context compaction, transport retry/recovery, fatal App Server restart, bounded global notification queue, thread summary, replay/live single, concurrent, nested, and mixed-recovery subagent delegation with 4/10 pagination, current mixed Search/Browser/MCP/approval/file/subagent flow, runtime-observed Hooks and package-observed Code review Settings, default 720px narrow reachability, resizable navigation/Review/Terminal/PR detail, PR tabs and expansion, MCP disclosure/result/unavailable-fallback, multi-file and mixed-content Review, selection/Undo, large diff scrolling, and compact geometry contracts passed.",
 );

@@ -8,9 +8,11 @@ import {
   waitFor,
 } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
+import { useState } from "react";
 import {
   AppNotificationRegion,
   AppRouteOutlet,
+  AppServerCrashRecovery,
   AppShell,
   AppWindowChrome,
   Dialog,
@@ -57,6 +59,56 @@ describe("AppWindowChrome", () => {
     fireEvent.click(screen.getByRole("button", { name: "Back" }));
     expect(onSidebar).toHaveBeenCalledOnce();
     expect(onBack).toHaveBeenCalledOnce();
+  });
+});
+
+describe("AppServerCrashRecovery", () => {
+  it("exposes the observed fatal recovery copy and host actions", () => {
+    const onDocumentation = vi.fn();
+    const onUpdate = vi.fn();
+    const onConfiguration = vi.fn();
+    const onRestart = vi.fn();
+    render(
+      <AppServerCrashRecovery
+        configurationAction={{
+          label: "Open Config.toml",
+          onClick: onConfiguration,
+        }}
+        documentationAction={{
+          label: "documentation",
+          onClick: onDocumentation,
+        }}
+        restartAction={{ label: "Restart", onClick: onRestart }}
+        updateAction={{ label: "Update ChatGPT", onClick: onUpdate }}
+      />,
+    );
+
+    const alert = screen.getByRole("alert");
+    expect(alert.textContent).toContain("ChatGPT stopped unexpectedly");
+    expect(alert.textContent).toContain("Restart ChatGPT to continue");
+    fireEvent.click(screen.getByRole("button", { name: "documentation" }));
+    fireEvent.click(screen.getByRole("button", { name: "Update ChatGPT" }));
+    fireEvent.click(screen.getByRole("button", { name: "Open Config.toml" }));
+    fireEvent.click(screen.getByRole("button", { name: "Restart" }));
+    expect(onDocumentation).toHaveBeenCalledOnce();
+    expect(onUpdate).toHaveBeenCalledOnce();
+    expect(onConfiguration).toHaveBeenCalledOnce();
+    expect(onRestart).toHaveBeenCalledOnce();
+  });
+
+  it("allows hosts to replace copy without exposing private transport details", () => {
+    render(
+      <AppServerCrashRecovery
+        description="Restart the host service."
+        heading="Service unavailable"
+      />,
+    );
+
+    expect(screen.getByRole("alert").textContent).toContain(
+      "Service unavailable",
+    );
+    expect(screen.getByText("Restart the host service.")).toBeTruthy();
+    expect(screen.queryByRole("button")).toBeNull();
   });
 });
 
@@ -163,6 +215,64 @@ describe("AppNotificationRegion", () => {
       screen.getByRole("button", { name: "Dismiss notification" }),
     );
     expect(onDismiss).toHaveBeenCalledOnce();
+  });
+
+  it("bounds a notification queue and exposes its hidden count", async () => {
+    render(
+      <AppNotificationRegion
+        maxVisible={2}
+        notifications={[
+          { heading: "First", id: "first" },
+          { heading: "Second", id: "second" },
+          { heading: "Third", id: "third" },
+          { heading: "Fourth", id: "fourth" },
+        ]}
+      />,
+    );
+
+    const region = await screen.findByRole("region", {
+      name: "Notifications",
+    });
+    expect(region.getAttribute("data-total-count")).toBe("4");
+    expect(region.getAttribute("data-visible-count")).toBe("2");
+    expect(region.getAttribute("data-hidden-count")).toBe("2");
+    expect(screen.getByText("First")).toBeTruthy();
+    expect(screen.getByText("Second")).toBeTruthy();
+    expect(screen.queryByText("Third")).toBeNull();
+    expect(screen.getByText("2 more notifications")).toBeTruthy();
+  });
+
+  it("moves focus to the next queued control when the active item is removed", async () => {
+    function Queue() {
+      const [ids, setIds] = useState(["first", "second"]);
+      return (
+        <>
+          <button type="button">Queue trigger</button>
+          <AppNotificationRegion
+            notifications={ids.map((id) => ({
+              heading: id,
+              id,
+              onDismiss: () =>
+                setIds((current) => current.filter((item) => item !== id)),
+            }))}
+          />
+        </>
+      );
+    }
+
+    render(<Queue />);
+    const [firstDismiss] = await screen.findAllByRole("button", {
+      name: "Dismiss notification",
+    });
+    firstDismiss.focus();
+    fireEvent.click(firstDismiss);
+
+    await waitFor(() => {
+      const remainingDismiss = screen.getByRole("button", {
+        name: "Dismiss notification",
+      });
+      expect(document.activeElement).toBe(remainingDismiss);
+    });
   });
 
   it("carries the triggering application theme into the body portal", async () => {

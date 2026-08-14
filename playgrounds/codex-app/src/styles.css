@@ -115,6 +115,11 @@ body {
     var(--demo-shell-under);
 }
 
+html:has(.demo-root[data-app-server-state="crashed"]),
+body:has(.demo-root[data-app-server-state="crashed"]) {
+  background: transparent;
+}
+
 button,
 input,
 textarea {
@@ -124,6 +129,10 @@ textarea {
 .demo-root {
   --codex-ui-app-side-panel-width: 370px;
   --codex-ui-thread-max-width: 760px;
+}
+
+.demo-root[data-app-server-state="crashed"] {
+  background: transparent;
 }
 
 .demo-root .codex-ui-app-shell,

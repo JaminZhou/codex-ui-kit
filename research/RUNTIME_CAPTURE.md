@@ -384,6 +384,38 @@ and terminates only the PID bearing the unique profile, verifies its children
 and loopback listener are gone, and removes only that exact profile and the
 external screenshot.
 
+### Current `26.803.61601` App Server crash and restart capture
+
+The fatal-recovery probe used one exact isolated process with a unique profile
+under `/private/tmp` and loopback-only CDP port `9831`. It first resolved the
+isolated main PID and the App Server child belonging to that process tree. Only
+that child received `SIGTERM`; the user's ordinary Codex processes and their
+App Servers were excluded by parentage.
+
+The product opened the 408×400 recovery Renderer with `ChatGPT stopped
+unexpectedly`, documentation/configuration guidance, and Update ChatGPT, Open
+Config.toml, and Restart actions. The same Renderer was safely emulated at
+1180×820 for computed-style and geometry capture. Restart restored the main
+app in about 1.4 seconds and created a new App Server child. This proves the
+fatal process-recovery path, not a response-stream disconnect.
+
+The public component and playground independently reproduce the observed
+ownership and host callbacks. Browser/CDP gates exact copy, 896px/448px
+container geometry, 28px icon, current typography, three action sizes/colors,
+720px fit, and Restart restoration. Real Electron repeats the native resize
+and restart interaction. The optional local-only pixel gate uses
+`CODEX_UI_KIT_APP_SERVER_CRASH_REFERENCE`; its 1180×820 full/core ratios are
+0.1101% and 1.1993% under 0.2% and 2% ceilings. No product screenshot is
+tracked.
+
+The same build's package structure was read only to distinguish recoverable
+thread `error` notifications from this fatal path. The independent protocol
+trace covers retry progress, recovery, terminal failure, and a successful
+same-thread follow-up. A real response-stream disconnect and a real global
+notification queue were not induced, so those two inventory rows remain
+`not_sampled` even though their Browser/CDP, Electron, and reviewed internal
+pixel contracts now pass.
+
 ### Previous 26.721.81911 conversation and Composer capture
 
 The `26.721.81911` conversation probe used a second exact process with a unique

@@ -64,13 +64,139 @@ describe("protocol lifecycle reducer", () => {
     const retryState = reduceProtocolTrace(
       scenario.events.slice(0, scenario.frames.retrying),
     );
+    const recoveredState = reduceProtocolTrace(
+      scenario.events.slice(0, scenario.frames.recovered),
+    );
     const finalState = reduceProtocolTrace(scenario.events);
 
     expect(retryState.status).toBe("retrying");
     expect(retryState.messages.at(-1)?.text).toContain("streaming, recovery");
+    expect(retryState.streamErrors).toEqual([
+      expect.objectContaining({
+        content: "Reconnecting 1/5",
+        reconnectAttempt: 1,
+        reconnectMaxAttempts: 5,
+      }),
+    ]);
+    expect(retryState.timeline.at(-1)?.kind).toBe("streamError");
+    expect(recoveredState.status).toBe("completed");
+    expect(recoveredState.retrying).toBe(false);
+    expect(recoveredState.messages.at(-1)?.text).toContain("across retries");
     expect(finalState.status).toBe("completed");
-    expect(finalState.retrying).toBe(false);
-    expect(finalState.messages.at(-1)?.text).toContain("across retries");
+    expect(finalState.messages.at(-1)?.text).toContain("prior recovery history");
+  });
+
+  it("keeps one progress row through retry updates, final failure, and follow-up", () => {
+    const scenario = replayScenarios["streaming-recovery"];
+    const progress = reduceProtocolTrace(
+      scenario.events.slice(0, scenario.frames["retrying-progress"]),
+    );
+    const failed = reduceProtocolTrace(
+      scenario.events.slice(0, scenario.frames["transport-failed"]),
+    );
+    const retrySubmitted = reduceProtocolTrace(
+      scenario.events.slice(0, scenario.frames["transport-retry-submitted"]),
+    );
+    const retried = reduceProtocolTrace(
+      scenario.events.slice(0, scenario.frames["transport-retried"]),
+    );
+
+    expect(progress.streamErrors).toEqual([
+      expect.objectContaining({
+        content: "Reconnecting 2/5",
+        reconnectAttempt: 2,
+        serverBusy: true,
+      }),
+    ]);
+    expect(progress.timeline.filter(({ kind }) => kind === "streamError")).toHaveLength(1);
+    expect(failed.status).toBe("failed");
+    expect(failed.systemErrors).toEqual([
+      expect.objectContaining({
+        content: "Response stream disconnected before completion.",
+        turnId: "turn-final-failure",
+      }),
+    ]);
+    expect(retrySubmitted.error).toBeNull();
+    expect(retried.error).toBeNull();
+    expect(retried.status).toBe("completed");
+    expect(retried.timeline.filter(({ kind }) => kind === "systemError")).toHaveLength(1);
+    expect(retried.messages.at(-1)).toMatchObject({
+      id: "assistant-after-failure",
+      status: "completed",
+    });
+  });
+
+  it("updates consecutive reconnect progress in place and preserves details", () => {
+    const first = reduceProtocolNotification(initialProtocolState, {
+      method: "error",
+      params: {
+        error: {
+          additionalDetails: "upstream closed early",
+          codexErrorInfo: "serverOverloaded",
+          message: "Reconnecting... 1/5",
+        },
+        threadId: "thread-demo",
+        turnId: "turn-retry",
+        willRetry: true,
+      },
+    });
+    const second = reduceProtocolNotification(first, {
+      method: "error",
+      params: {
+        error: {
+          additionalDetails: "second attempt",
+          codexErrorInfo: {
+            responseStreamDisconnected: { httpStatusCode: 429 },
+          },
+          message: "Reconnecting 2/5",
+        },
+        threadId: "thread-demo",
+        turnId: "turn-retry",
+        willRetry: true,
+      },
+    });
+
+    expect(second.streamErrors).toHaveLength(1);
+    expect(second.timeline.filter(({ kind }) => kind === "streamError")).toHaveLength(1);
+    expect(second.streamErrors[0]).toMatchObject({
+      additionalDetails: "second attempt",
+      content: "Reconnecting 2/5",
+      reconnectAttempt: 2,
+      reconnectMaxAttempts: 5,
+      serverBusy: true,
+    });
+  });
+
+  it("retains a final system error after the next turn starts", () => {
+    const failed = reduceProtocolNotification(initialProtocolState, {
+      method: "error",
+      params: {
+        error: {
+          additionalDetails: null,
+          codexErrorInfo: "internalServerError",
+          message: "The turn failed.",
+        },
+        threadId: "thread-demo",
+        turnId: "turn-failed",
+        willRetry: false,
+      },
+    });
+    const followUp = reduceProtocolNotification(failed, {
+      method: "turn/started",
+      params: {
+        threadId: "thread-demo",
+        turn: { id: "turn-follow-up" },
+      },
+    });
+
+    expect(followUp.error).toBeNull();
+    expect(followUp.systemErrors).toEqual([
+      expect.objectContaining({
+        content: "The turn failed.",
+        turnId: "turn-failed",
+      }),
+    ]);
+    expect(followUp.timeline.at(-1)?.kind).toBe("systemError");
   });
 
   it("replays the fixed Markdown response from public protocol messages", () => {

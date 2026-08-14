@@ -8,6 +8,8 @@ import {
   AgentTurn,
   AppNotificationRegion,
   type AppNotification,
+  AppServerCrashRecovery,
+  type AppServerCrashRecoveryAction,
   AppRouteOutlet,
   type AppRouteOutletAction,
   AppShell,
@@ -282,8 +284,12 @@ const appNotification: AppNotification = {
   id: "package-notification",
   tone: "info",
 };
+const appServerCrashRecoveryAction: AppServerCrashRecoveryAction = {
+  label: "Restart",
+};
 
 void AppNotificationRegion;
+void AppServerCrashRecovery;
 void AppRouteOutlet;
 void AppWindowChrome;
 void AppearanceSettingsPage;
@@ -295,6 +301,7 @@ void generalSettingsValue;
 void HooksSettingsPage;
 void hookSettingsEntry;
 void appNotification;
+void appServerCrashRecoveryAction;
 void appRouteOutletAction;
 void appWindowChromeAction;
 void FileChange;

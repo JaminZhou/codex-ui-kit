@@ -7,6 +7,7 @@ import {
   InlineNotice,
   StatusBanner,
   StreamNotice,
+  SystemErrorNotice,
   WorkingDirectoryNotice,
 } from "../src";
 
@@ -255,5 +256,16 @@ describe("StreamNotice", () => {
     expect(
       screen.queryByRole("button", { name: "Show connection details" }),
     ).toBeNull();
+  });
+});
+
+describe("SystemErrorNotice", () => {
+  it("renders a final system error as an alert without inventing retry", () => {
+    render(<SystemErrorNotice>Response stream disconnected.</SystemErrorNotice>);
+
+    expect(screen.getByRole("alert").textContent).toContain(
+      "Response stream disconnected.",
+    );
+    expect(screen.queryByRole("button", { name: "Try again" })).toBeNull();
   });
 });

@@ -87,9 +87,11 @@ function LoadingIndicator() {
 
 function ReconnectingIcon() {
   return (
-    <svg aria-hidden="true" viewBox="0 0 16 16">
-      <circle className="codex-ui-stream-notice__track" cx="8" cy="8" r="5.5" />
-      <path d="M8 2.5a5.5 5.5 0 0 1 5.5 5.5" />
+    <svg aria-hidden="true" fill="none" viewBox="0 0 16 16">
+      <path d="M2.4 6.1a8.7 8.7 0 0 1 11.2 0" />
+      <path d="M4.7 8.7a5.2 5.2 0 0 1 6.6 0" />
+      <path d="M7 11.2a1.7 1.7 0 0 1 2 0" />
+      <circle cx="8" cy="13" fill="currentColor" r="0.65" stroke="none" />
     </svg>
   );
 }
@@ -277,6 +279,33 @@ export function InlineNotice({
 
 export type StreamNoticeStatus = "reconnecting" | "failed";
 
+export interface SystemErrorNoticeProps
+  extends Omit<StatusBannerProps, "layout" | "role" | "tone"> {}
+
+export function SystemErrorNotice({
+  children,
+  className,
+  icon,
+  ...props
+}: SystemErrorNoticeProps) {
+  return (
+    <StatusBanner
+      className={["codex-ui-system-error-notice", className]
+        .filter(Boolean)
+        .join(" ")}
+      icon={icon}
+      layout="icon"
+      role="alert"
+      tone="error"
+      {...props}
+    >
+      <span className="codex-ui-system-error-notice__content">
+        {children}
+      </span>
+    </StatusBanner>
+  );
+}
+
 export interface StreamNoticeProps
   extends Omit<HTMLAttributes<HTMLDivElement>, "children"> {
   additionalDetails?: ReactNode;
@@ -325,12 +354,11 @@ export function StreamNotice({
       ? ` ${reconnectAttempt}/${reconnectMaxAttempts}`
       : "";
   const resolvedMessage =
-    children ??
-    (status === "failed"
-      ? "Connection lost"
+    status === "failed"
+      ? (children ?? "Connection lost")
       : serverBusy
         ? `Server is busy, reconnecting${progress}`
-        : `Reconnecting${progress}`);
+        : (children ?? `Reconnecting${progress}`);
   const classes = ["codex-ui-stream-notice", className]
     .filter(Boolean)
     .join(" ");

@@ -2,6 +2,7 @@ import {
   useContext,
   useEffect,
   useLayoutEffect,
+  useRef,
   useState,
   type HTMLAttributes,
   type MouseEventHandler,
@@ -24,7 +25,9 @@ export interface AppNotification {
 
 export interface AppNotificationRegionProps
   extends Omit<HTMLAttributes<HTMLDivElement>, "children"> {
+  maxVisible?: number;
   notifications: readonly AppNotification[];
+  overflowLabel?: (hiddenCount: number) => ReactNode;
   position?: "top-end" | "bottom-end";
   portalRoot?: Element | DocumentFragment | null;
   theme?: string;
@@ -45,7 +48,9 @@ function DismissIcon() {
 export function AppNotificationRegion({
   "aria-label": ariaLabel = "Notifications",
   className,
+  maxVisible = 3,
   notifications,
+  overflowLabel = (hiddenCount) => `${hiddenCount} more notifications`,
   portalRoot,
   position = "top-end",
   theme,
@@ -54,12 +59,45 @@ export function AppNotificationRegion({
   const overlayEnvironment = useContext(OverlayEnvironmentContext);
   const [mounted, setMounted] = useState(false);
   const [inferredTheme, setInferredTheme] = useState<string>();
+  const regionRef = useRef<HTMLDivElement>(null);
+  const returnFocusRef = useRef<HTMLElement | null>(null);
+  const previousNotificationCountRef = useRef(0);
   const notificationIdentity = JSON.stringify(
     notifications.map(({ id }) => id),
   );
+  const visibleLimit = Number.isFinite(maxVisible)
+    ? Math.max(1, Math.floor(maxVisible))
+    : 3;
+  const visibleNotifications = notifications.slice(0, visibleLimit);
+  const hiddenCount = notifications.length - visibleNotifications.length;
   const portalTheme =
     theme ?? overlayEnvironment.theme ?? inferredTheme;
   useEffect(() => setMounted(true), []);
+  useLayoutEffect(() => {
+    const previousCount = previousNotificationCountRef.current;
+    if (
+      previousCount === 0 &&
+      notifications.length > 0 &&
+      typeof document !== "undefined" &&
+      document.activeElement instanceof HTMLElement
+    ) {
+      returnFocusRef.current = document.activeElement;
+    }
+    if (previousCount > 0 && notifications.length === 0) {
+      const returnFocus = returnFocusRef.current;
+      window.requestAnimationFrame(() => {
+        const activeElement = document.activeElement;
+        if (
+          returnFocus?.isConnected &&
+          (activeElement === document.body || !activeElement?.isConnected)
+        ) {
+          returnFocus.focus();
+        }
+      });
+      returnFocusRef.current = null;
+    }
+    previousNotificationCountRef.current = notifications.length;
+  }, [notificationIdentity, notifications.length]);
   useLayoutEffect(() => {
     if (
       notifications.length === 0 ||
@@ -79,6 +117,23 @@ export function AppNotificationRegion({
   if (!mounted || notifications.length === 0) return null;
   const resolvedPortalRoot = portalRoot ?? document.body;
 
+  function preserveQueueFocus() {
+    window.requestAnimationFrame(() => {
+      const activeElement = document.activeElement;
+      if (activeElement?.isConnected && activeElement !== document.body) {
+        return;
+      }
+      const nextControl = regionRef.current?.querySelector<HTMLButtonElement>(
+        "button:not(:disabled)",
+      );
+      if (nextControl) {
+        nextControl.focus();
+      } else if (returnFocusRef.current?.isConnected) {
+        returnFocusRef.current.focus();
+      }
+    });
+  }
+
   return createPortal(
     <div
       aria-label={ariaLabel}
@@ -89,16 +144,22 @@ export function AppNotificationRegion({
         .filter(Boolean)
         .join(" ")}
       data-position={position}
+      data-hidden-count={hiddenCount}
+      data-total-count={notifications.length}
+      data-visible-count={visibleNotifications.length}
       data-codex-ui-dialog-owner={overlayEnvironment.ownerId}
       data-theme={portalTheme}
+      ref={regionRef}
       role="region"
       {...props}
     >
-      {notifications.map((notification) => {
+      {visibleNotifications.map((notification, index) => {
         const tone = notification.tone ?? "neutral";
         return (
           <article
             aria-atomic="true"
+            aria-posinset={index + 1}
+            aria-setsize={notifications.length}
             className="codex-ui-app-notification"
             data-tone={tone}
             key={notification.id}
@@ -113,7 +174,10 @@ export function AppNotificationRegion({
             {notification.onAction ? (
               <button
                 className="codex-ui-app-notification__action"
-                onClick={notification.onAction}
+                onClick={(event) => {
+                  notification.onAction?.(event);
+                  preserveQueueFocus();
+                }}
                 type="button"
               >
                 {notification.actionLabel ?? "View"}
@@ -123,7 +187,10 @@ export function AppNotificationRegion({
               <button
                 aria-label={notification.dismissLabel ?? "Dismiss notification"}
                 className="codex-ui-app-notification__dismiss"
-                onClick={notification.onDismiss}
+                onClick={(event) => {
+                  notification.onDismiss?.(event);
+                  preserveQueueFocus();
+                }}
                 type="button"
               >
                 <DismissIcon />
@@ -132,6 +199,15 @@ export function AppNotificationRegion({
           </article>
         );
       })}
+      {hiddenCount > 0 ? (
+        <p
+          aria-live="polite"
+          className="codex-ui-app-notification-region__overflow"
+          role="status"
+        >
+          {overflowLabel(hiddenCount)}
+        </p>
+      ) : null}
     </div>,
     resolvedPortalRoot,
   );
