@@ -7765,7 +7765,9 @@ export function App() {
           }
           serverBusy={streamError.serverBusy}
         >
-          {streamError.content}
+          {streamError.reconnectAttempt === null
+            ? streamError.content
+            : undefined}
         </StreamNotice>
       );
     }

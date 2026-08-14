@@ -354,11 +354,12 @@ export function StreamNotice({
       ? ` ${reconnectAttempt}/${reconnectMaxAttempts}`
       : "";
   const resolvedMessage =
-    status === "failed"
-      ? (children ?? "Connection lost")
+    children ??
+    (status === "failed"
+      ? "Connection lost"
       : serverBusy
         ? `Server is busy, reconnecting${progress}`
-        : (children ?? `Reconnecting${progress}`);
+        : `Reconnecting${progress}`);
   const classes = ["codex-ui-stream-notice", className]
     .filter(Boolean)
     .join(" ");

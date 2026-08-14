@@ -237,6 +237,25 @@ describe("StreamNotice", () => {
     );
   });
 
+  it("preserves host copy when a busy reconnect is localized", () => {
+    render(
+      <StreamNotice
+        reconnectAttempt={2}
+        reconnectMaxAttempts={5}
+        serverBusy
+      >
+        Serveur occupé, nouvelle tentative
+      </StreamNotice>,
+    );
+
+    expect(
+      screen.getByText("Serveur occupé, nouvelle tentative"),
+    ).toBeTruthy();
+    expect(
+      screen.queryByText("Server is busy, reconnecting 2/5"),
+    ).toBeNull();
+  });
+
   it("renders a final alert with an explicit retry action", () => {
     const onRetry = vi.fn();
     render(

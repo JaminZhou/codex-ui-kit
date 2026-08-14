@@ -117,15 +117,56 @@ export function AppNotificationRegion({
   if (!mounted || notifications.length === 0) return null;
   const resolvedPortalRoot = portalRoot ?? document.body;
 
-  function preserveQueueFocus() {
+  function preserveQueueFocus(
+    removedIndex: number,
+    controlKind: "action" | "dismiss",
+  ) {
     window.requestAnimationFrame(() => {
       const activeElement = document.activeElement;
       if (activeElement?.isConnected && activeElement !== document.body) {
         return;
       }
-      const nextControl = regionRef.current?.querySelector<HTMLButtonElement>(
-        "button:not(:disabled)",
+      const notificationElements = Array.from(
+        regionRef.current?.querySelectorAll<HTMLElement>(
+          ".codex-ui-app-notification",
+        ) ?? [],
       );
+      const startIndex = Math.min(
+        removedIndex,
+        Math.max(0, notificationElements.length - 1),
+      );
+      const candidateIndices: number[] = [];
+      for (
+        let distance = 0;
+        candidateIndices.length < notificationElements.length;
+        distance += 1
+      ) {
+        const forwardIndex = startIndex + distance;
+        if (forwardIndex < notificationElements.length) {
+          candidateIndices.push(forwardIndex);
+        }
+        const backwardIndex = startIndex - distance - 1;
+        if (backwardIndex >= 0) candidateIndices.push(backwardIndex);
+      }
+      const preferredSelector =
+        controlKind === "action"
+          ? ".codex-ui-app-notification__action:not(:disabled)"
+          : ".codex-ui-app-notification__dismiss:not(:disabled)";
+      const nextControl =
+        candidateIndices
+          .map((index) =>
+            notificationElements[index]?.querySelector<HTMLButtonElement>(
+              preferredSelector,
+            ),
+          )
+          .find(Boolean) ??
+        candidateIndices
+          .map((index) =>
+            notificationElements[index]?.querySelector<HTMLButtonElement>(
+              "button:not(:disabled)",
+            ),
+          )
+          .find(Boolean);
       if (nextControl) {
         nextControl.focus();
       } else if (returnFocusRef.current?.isConnected) {
@@ -176,7 +217,7 @@ export function AppNotificationRegion({
                 className="codex-ui-app-notification__action"
                 onClick={(event) => {
                   notification.onAction?.(event);
-                  preserveQueueFocus();
+                  preserveQueueFocus(index, "action");
                 }}
                 type="button"
               >
@@ -189,7 +230,7 @@ export function AppNotificationRegion({
                 className="codex-ui-app-notification__dismiss"
                 onClick={(event) => {
                   notification.onDismiss?.(event);
-                  preserveQueueFocus();
+                  preserveQueueFocus(index, "dismiss");
                 }}
                 type="button"
               >

@@ -275,6 +275,40 @@ describe("AppNotificationRegion", () => {
     });
   });
 
+  it("keeps focus at the removed notification position", async () => {
+    function Queue() {
+      const [ids, setIds] = useState(["first", "second", "third"]);
+      return (
+        <AppNotificationRegion
+          notifications={ids.map((id) => ({
+            heading: id,
+            id,
+            onDismiss: () =>
+              setIds((current) => current.filter((item) => item !== id)),
+          }))}
+        />
+      );
+    }
+
+    render(<Queue />);
+    const dismissButtons = await screen.findAllByRole("button", {
+      name: "Dismiss notification",
+    });
+    dismissButtons[1].focus();
+    fireEvent.click(dismissButtons[1]);
+
+    await waitFor(() => {
+      const thirdNotification = screen
+        .getByText("third")
+        .closest(".codex-ui-app-notification");
+      expect(document.activeElement).toBe(
+        thirdNotification?.querySelector(
+          ".codex-ui-app-notification__dismiss",
+        ),
+      );
+    });
+  });
+
   it("carries the triggering application theme into the body portal", async () => {
     const { rerender } = render(
       <div>
