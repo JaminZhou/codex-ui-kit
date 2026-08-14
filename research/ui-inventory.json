@@ -883,6 +883,20 @@
       "priority": "p0"
     },
     {
+      "id": "app.app-server-crash-recovery",
+      "area": "app-shell",
+      "ownership": "app",
+      "packageEvidence": ["app-main", "app-server-crash-recovery-page"],
+      "runtimeStatus": "runtime_observed",
+      "runtimeEvidence": [
+        "cdp-26.803.61601:isolated-app-server-child-exit-dedicated-recovery-renderer-and-restart-restoration"
+      ],
+      "implementationStatus": "partial",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
+      "priority": "p0"
+    },
+    {
       "id": "cross-layer.global-notifications",
       "area": "cross-layer",
       "ownership": "cross-layer",

@@ -13,8 +13,8 @@ exit gates; it does not replace the inventory.
 - The installed package and machine-readable evidence baseline are Codex
   Desktop `26.803.61601` (`6396`). Unsampled earlier-build surfaces remain
   previous-build regression evidence rather than current verification.
-- The inventory contains 88 surface groups: 58 P0, 21 P1, and 9 P2.
-- 33 groups have current-build runtime evidence, 38 have previous-build-only
+- The inventory contains 89 surface groups: 59 P0, 21 P1, and 9 P2.
+- 34 groups have current-build runtime evidence, 38 have previous-build-only
   runtime evidence, and 17 have not been sampled.
 - The scoped `26.803.61601` refresh revalidates 91
   sidebar/menu/window-chrome/Composer/Settings/completed-thread icons against exact runtime evidence.
@@ -602,11 +602,17 @@ without confusing package readiness with full product reconstruction.
    command approval, file Review, and delegated audit across wide and 720px
    layouts. Retain true same-transport disconnect/reconnect and a single real
    product task spanning the full composition as separate unsampled boundaries.
-4. **App shell continuity**: window chrome, global feedback, loading/error/
-   offline states, route and selection restoration. The independent replay and
-   gates are implemented; current-build evidence covers window chrome,
-   loading, and in-session route restoration, while unsafely unreachable
-   recovery/notification states remain explicitly synthetic.
+4. **App shell continuity — fatal recovery delivered; notification runtime
+   remains open**: window chrome, global feedback, loading/error/offline
+   states, route and selection restoration. Current-build evidence covers
+   window chrome, loading, in-session route restoration, and a safely reached
+   fatal App Server child exit through dedicated recovery Renderer and Restart.
+   The public fatal-recovery component passes Browser/CDP, Electron, compact
+   geometry, and local-only full/core pixels. The bounded four-item global
+   notification queue and complete response-stream retry/failure/follow-up
+   state machine pass independent Browser/Electron/pixel gates, but retain
+   `not_sampled` runtime status until those exact product transitions are
+   reached.
 5. **Conversation and Composer lifecycle**: current queue/Stop automatic
    continuation is delivered through real current-build evidence,
    Browser/CDP, Electron, and regional pixels. Current permissions, Add
@@ -675,7 +681,9 @@ without confusing package readiness with full product reconstruction.
     pixel gates. Continue with plugin attachment variants, Markdown
     images/math/citations and table/Markdown error variants, populated
     artifact/source sections, real-product subagent
-    recovery capture, and transport recovery. The independent subagent
+    recovery capture, real transport runtime reachability, and real global
+    notification reachability. The independent transport state machine and
+    subagent
     waiting/failure/interruption/streaming/pagination matrix is delivered.
 11. **P1 resources and integrations**: Browser/artifact/document previews,
     environments, remote connections, Settings, MCP, plugins, skills, and

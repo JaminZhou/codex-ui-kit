@@ -7,6 +7,7 @@ import {
   AppShell,
   AppNotificationRegion,
   AppRouteOutlet,
+  AppServerCrashRecovery,
   AppSidebar,
   AppSidebarFooter,
   AppSidebarItem,
@@ -62,11 +63,13 @@ import {
   SearchActivity,
   SettingsShell,
   StatusBanner,
+  StreamNotice,
   SubagentActivity,
   SubagentActivityGroup,
   SubagentAvatar,
   SubagentPanel,
   SubagentTranscriptHeader,
+  SystemErrorNotice,
   TerminalPanel,
   TerminalProcessList,
   TerminalTranscript,
@@ -440,6 +443,12 @@ function replayCountForSelection(
   frame: string | null,
 ) {
   if (frame && frame in scenario.frames) return scenario.frames[frame];
+  if (
+    scenario.id === "streaming-recovery" &&
+    frame?.startsWith("sidebar-current")
+  ) {
+    return scenario.frames.recovered ?? scenario.events.length;
+  }
   if (
     scenario.id === "attachment-lifecycle" &&
     frame?.startsWith("attachment-")
@@ -2063,6 +2072,19 @@ export function App() {
     initialSelection.shellState === "ready" &&
       initialSelection.frame === "shell-restored",
   );
+  const [shellQueuedNotificationIds, setShellQueuedNotificationIds] = useState<
+    string[]
+  >(() =>
+    initialSelection.frame === "shell-notification-queue"
+      ? ["permission", "background", "restored", "update"]
+      : [],
+  );
+  const [shellNotificationAction, setShellNotificationAction] = useState<
+    string | null
+  >(null);
+  const [appServerCrashed, setAppServerCrashed] = useState(
+    initialSelection.frame === "app-server-crashed",
+  );
   const [composerValue, setComposerValue] = useState(() =>
     initialComposerValue(initialSelection.frame),
   );
@@ -2446,6 +2468,8 @@ export function App() {
     mode === "replay" && scenarioId === "compaction";
   const isCurrentContextSummaryReplay =
     mode === "replay" && scenarioId === "context-summary";
+  const isCurrentTransportRecoveryReplay =
+    mode === "replay" && scenarioId === "streaming-recovery";
   const isCurrentMixedToolReplay =
     mode === "replay" && scenarioId === "current-mixed-tool-thread";
   const isCurrentMcpReplay =
@@ -4273,6 +4297,7 @@ export function App() {
     mode === "live"
       ? isTurnActive(liveState.status)
       : (isConversationLifecycle && replayComposerRunning) ||
+        (isCurrentTransportRecoveryReplay && isTurnActive(state.status)) ||
         ((isCurrentCommandInterruptionReplay ||
           isCurrentContextCompactionReplay ||
           isCurrentMixedToolReplay ||
@@ -4288,6 +4313,8 @@ export function App() {
   const displayedStatus =
     isConversationLifecycle && replayComposerStopped
       ? "interrupted"
+      : state.status === "retrying"
+        ? "retrying"
       : composerIsRunning
         ? "running"
         : state.status;
@@ -4375,6 +4402,7 @@ export function App() {
       scenarioId === "interruption" ||
       scenarioId === "compaction" ||
       scenarioId === "context-summary" ||
+      isCurrentTransportRecoveryReplay ||
       isCurrentSubagentReplay ||
       scenarioId === "current-review-rename");
   const usesCurrentAskPermission =
@@ -4386,6 +4414,7 @@ export function App() {
     isCurrentCommandInterruptionReplay ||
     isCurrentContextCompactionReplay ||
     isCurrentContextSummaryReplay ||
+    isCurrentTransportRecoveryReplay ||
     isCurrentMixedToolReplay ||
     isCurrentSubagentReplay ||
     scenarioId === "current-review-rename";
@@ -4636,6 +4665,7 @@ export function App() {
       scenarioId === "interruption" ||
       scenarioId === "compaction" ||
       scenarioId === "context-summary" ||
+      isCurrentTransportRecoveryReplay ||
       isCurrentSubagentReplay);
   const showLifecycleComposer = isConversationLifecycle;
   const currentComposerComposition =
@@ -4942,7 +4972,8 @@ export function App() {
       }
       submitLabel={
         isCurrentCommandInterruptionReplay ||
-        isCurrentContextCompactionReplay
+        isCurrentContextCompactionReplay ||
+        isCurrentTransportRecoveryReplay
           ? "Send"
           : undefined
       }
@@ -7720,6 +7751,38 @@ export function App() {
   const currentWindowEnd =
     currentWindowStart + currentWindowedTurnWindowSize;
   const timelineContent = state.timeline.map((entry, entryIndex) => {
+    if (entry.kind === "streamError") {
+      const streamError = state.streamErrors.find(({ id }) => id === entry.id);
+      if (!streamError) return null;
+      return (
+        <StreamNotice
+          additionalDetails={streamError.additionalDetails}
+          data-item-id={streamError.id}
+          key={`stream-error:${streamError.id}`}
+          reconnectAttempt={streamError.reconnectAttempt ?? undefined}
+          reconnectMaxAttempts={
+            streamError.reconnectMaxAttempts ?? undefined
+          }
+          serverBusy={streamError.serverBusy}
+        >
+          {streamError.reconnectAttempt === null
+            ? streamError.content
+            : undefined}
+        </StreamNotice>
+      );
+    }
+    if (entry.kind === "systemError") {
+      const systemError = state.systemErrors.find(({ id }) => id === entry.id);
+      if (!systemError) return null;
+      return (
+        <SystemErrorNotice
+          data-item-id={systemError.id}
+          key={`system-error:${systemError.id}`}
+        >
+          {systemError.content}
+        </SystemErrorNotice>
+      );
+    }
     if (entry.kind === "automaticApprovalReview") {
       const review = state.automaticApprovalReviews.find(
         ({ id }) => id === entry.id,
@@ -9419,6 +9482,8 @@ export function App() {
           : undefined
       }
       data-shell-state={view === "shell" ? shellState : undefined}
+      data-app-server-state={appServerCrashed ? "crashed" : "running"}
+      data-notification-action={shellNotificationAction ?? undefined}
       data-view={view}
     >
       {!initialSelection.capture && themeAvailable ? (
@@ -9441,20 +9506,102 @@ export function App() {
       ) : null}
       <AppNotificationRegion
         notifications={
-          view === "shell" && shellNotificationVisible
+          view === "shell"
             ? [
-                {
-                  description: "Pull requests are up to date.",
-                  heading: "Connection restored",
-                  id: "shell-restored",
-                  onDismiss: () => setShellNotificationVisible(false),
-                  tone: "info",
-                },
+                ...(shellNotificationVisible
+                  ? [
+                      {
+                        description: "Pull requests are up to date.",
+                        heading: "Connection restored",
+                        id: "shell-restored",
+                        onDismiss: () => setShellNotificationVisible(false),
+                        tone: "info" as const,
+                      },
+                    ]
+                  : []),
+                ...shellQueuedNotificationIds.map((id) => {
+                  const remove = () =>
+                    setShellQueuedNotificationIds((current) =>
+                      current.filter((candidate) => candidate !== id),
+                    );
+                  if (id === "permission") {
+                    return {
+                      actionLabel: "Review",
+                      description: "A local command is waiting for approval.",
+                      heading: "Permission required",
+                      id,
+                      onAction: () => {
+                        setShellNotificationAction("permission-reviewed");
+                        remove();
+                      },
+                      onDismiss: remove,
+                      tone: "warning" as const,
+                    };
+                  }
+                  if (id === "background") {
+                    return {
+                      actionLabel: "Open",
+                      description: "The validation task finished successfully.",
+                      heading: "Background task completed",
+                      id,
+                      onAction: () => {
+                        setShellNotificationAction("background-opened");
+                        remove();
+                      },
+                      onDismiss: remove,
+                      tone: "info" as const,
+                    };
+                  }
+                  if (id === "restored") {
+                    return {
+                      description: "Live updates are available again.",
+                      heading: "Connection restored",
+                      id,
+                      onDismiss: remove,
+                      tone: "info" as const,
+                    };
+                  }
+                  return {
+                    actionLabel: "View",
+                    description: "Restart when your current work is saved.",
+                    heading: "Update available",
+                    id,
+                    onAction: () => {
+                      setShellNotificationAction("update-viewed");
+                      remove();
+                    },
+                    onDismiss: remove,
+                    tone: "neutral" as const,
+                  };
+                }),
               ]
             : []
         }
         position="bottom-end"
       />
+      {appServerCrashed ? (
+        <AppServerCrashRecovery
+          configurationAction={{
+            label: "Open Config.toml",
+            onClick: () => setShellNotificationAction("configuration-opened"),
+          }}
+          documentationAction={{
+            label: "documentation",
+            onClick: () => setShellNotificationAction("documentation-opened"),
+          }}
+          restartAction={{
+            label: "Restart",
+            onClick: () => {
+              setAppServerCrashed(false);
+              setActiveFrame("app-server-restarted");
+            },
+          }}
+          updateAction={{
+            label: "Update ChatGPT",
+            onClick: () => setShellNotificationAction("update-opened"),
+          }}
+        />
+      ) : (
       <AppShell
         bottomPanel={terminalPanel}
         bottomPanelHeight={terminalHeight}
@@ -9729,17 +9876,6 @@ export function App() {
                   <ThreadThinkingPlaceholder />
                 ) : null}
 
-                {state.status === "retrying" ? (
-                  <StatusBanner heading="Connection interrupted" tone="warning">
-                    {state.error} Retrying the active turn…
-                  </StatusBanner>
-                ) : null}
-
-                {state.status === "failed" ? (
-                  <StatusBanner heading="Turn failed" tone="error">
-                    {state.error}
-                  </StatusBanner>
-                ) : null}
               </AgentTurn>
             </ConversationThreadShell>
 
@@ -9782,6 +9918,7 @@ export function App() {
           </>
         )}
       </AppShell>
+      )}
       <Dialog
         className="demo-raw-tool-output-dialog"
         description="Arguments and error returned by the integration."

@@ -533,8 +533,23 @@ export const visualScenes = [
     scenario: "streaming-recovery",
   },
   {
+    frame: "retrying-progress",
+    id: "retrying-progress",
+    scenario: "streaming-recovery",
+  },
+  {
     frame: "recovered",
     id: "recovered",
+    scenario: "streaming-recovery",
+  },
+  {
+    frame: "transport-failed",
+    id: "transport-failed",
+    scenario: "streaming-recovery",
+  },
+  {
+    frame: "transport-retried",
+    id: "transport-retried",
     scenario: "streaming-recovery",
   },
   {
@@ -1442,6 +1457,29 @@ export const visualScenes = [
     scenario: "workspace-workflow",
     view: "pull-request",
     windowSize: { height: 680, width: 720 },
+  },
+  {
+    frame: "app-server-crashed",
+    id: "app-server-crashed",
+    maxPixelRatio: 0.005,
+    scenario: "streaming-recovery",
+    view: "shell",
+  },
+  {
+    frame: "app-server-crashed",
+    id: "app-server-crashed-compact",
+    maxPixelRatio: 0.005,
+    scenario: "streaming-recovery",
+    view: "shell",
+    windowSize: { height: 680, width: 720 },
+  },
+  {
+    frame: "shell-notification-queue",
+    id: "shell-notification-queue",
+    maxPixelRatio: 0.005,
+    scenario: "streaming-recovery",
+    shellState: "ready",
+    view: "shell",
   },
   {
     frame: "shell-loading",

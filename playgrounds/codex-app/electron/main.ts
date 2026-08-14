@@ -703,9 +703,14 @@ function createWindow() {
   const useLightWindowBackground =
     theme === "light" ||
     (theme === "system" && !nativeTheme.shouldUseDarkColors);
+  const useTransparentWindowBackground = frame === "app-server-crashed";
 
   const window = new BrowserWindow({
-    backgroundColor: useLightWindowBackground ? "#ffffff" : "#101010",
+    backgroundColor: useTransparentWindowBackground
+      ? "#00000000"
+      : useLightWindowBackground
+        ? "#ffffff"
+        : "#101010",
     height,
     minHeight: Math.min(640, height),
     minWidth: Math.min(720, width),

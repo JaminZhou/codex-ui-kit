@@ -37,6 +37,13 @@ Raw inspection data belongs in `/private/tmp/codex-ui-kit-research` or a local
 `.research/` directory. Both locations are intentionally outside version
 control.
 
+The current fatal App Server recovery comparison is also local-only. Pass an
+exact 1180×820 product frame with
+`CODEX_UI_KIT_APP_SERVER_CRASH_REFERENCE=/absolute/path/to/reference.png` when
+running the `app-server-crashed` visual scene. The checker flattens transparent
+pixels against black and enforces separate 0.2% full-frame and 2% owned-core
+limits; the reference itself is never committed or published.
+
 ## Allowed observations
 
 - Component taxonomy and parent/child relationships.

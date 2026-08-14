@@ -74,8 +74,8 @@ observation from a previous build remains historical evidence.
   previous-build regression evidence and have been downgraded from `verified`
   to `partial_legacy` until they are reached again on the current fingerprint.
 
-Current inventory: 88 surface groups; 33 have current-build runtime evidence, 38 have previous-build-only runtime evidence, 17 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 32 groups and Electron verification covers 32.
-Prior acceptance outside those 32 sampled current-build groups remains
+Current inventory: 89 surface groups; 34 have current-build runtime evidence, 38 have previous-build-only runtime evidence, 17 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 33 groups and Electron verification covers 33.
+Prior acceptance outside those 33 sampled current-build groups remains
 recorded as `partial_legacy` until current-build re-observation.
 
 The current package exposes candidates far beyond the old transcript sample:
@@ -246,8 +246,9 @@ dark macOS appearance, and no real Light preference or external Light pixel
 reference was captured.
 
 The application-shell continuity slice splits window navigation, route
-lifecycle feedback, route selection/restoration, and global notifications
-into independently owned inventory rows. `26.727.40816` CDP records the 46px
+lifecycle feedback, route selection/restoration, fatal App Server recovery,
+and global notifications into independently owned inventory rows.
+`26.727.40816` CDP records the 46px
 chrome, Sidebar/Back/Forward controls, Pull requests loading status, and
 detail auto-hide/reopen through 1180, 960, 820, and 720px. The broader
 961/960, 721/720, 1920×1080, 2560×1440, first-use-dialog, and hard-reload
@@ -263,8 +264,28 @@ restoring only auto-collapsed surfaces. Four deterministic App shell pixel
 frames pass. The 3.93% 120×46 window-chrome comparison is retained as a
 `26.721.81911` regression result. Offline/error/reconnecting/stale and global
 notification runtime evidence is still missing, so the implementation remains
-`partial`. Its independent Browser/Electron regression tests do not promote
-`cross-layer.global-notifications` to current-build parity.
+`partial`. The current notification-queue fixture now limits four items to
+three visible alerts, exposes the hidden count and list positions, and restores
+focus after action/dismissal in Browser/CDP, Electron, and one reviewed pixel
+baseline. Those independent gates still do not promote
+`cross-layer.global-notifications` to current-build runtime parity.
+
+A separate current-build probe safely terminates only one isolated process's
+validated App Server child and reaches the dedicated 408×400 fatal recovery
+Renderer. Restart creates a new child and restores the app in about 1.4
+seconds. `AppServerCrashRecovery` exposes the observed copy and host callbacks;
+Browser/CDP and Electron gate 1180×820 and 720×680 geometry plus Restart. Its
+local-only product comparison passes at 0.1101% full-frame and 1.1993% in the
+owned core. This new `app.app-server-crash-recovery` row is current-runtime
+verified and remains separate from `thread.error-retry-recovery`.
+
+The thread transport replay follows current package structure through
+Reconnecting 1/5, in-place 2/5 progress, recovered completion, terminal system
+error, and successful same-thread follow-up. Browser/CDP, Electron, and five
+reviewed state pixels pass with the observed 14/21px notice and Stop/Send
+transitions. A real response-stream disconnect remains unsampled, so the
+transport row retains `not_sampled` rather than borrowing fatal-process
+evidence.
 
 The first P0 shell slice provides independently implemented `AppShell`,
 `AppSidebar`, and `WorkspacePanel` compositions. It covers the measured wide
