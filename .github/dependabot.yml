@@ -22,6 +22,15 @@ updates:
         update-types:
           - minor
           - patch
+      quality-tooling:
+        applies-to: version-updates
+        patterns:
+          - axe-core
+          - happy-dom
+          - publint
+        update-types:
+          - minor
+          - patch
       type-definitions:
         applies-to: version-updates
         patterns:
@@ -36,6 +45,7 @@ updates:
       - dependency-name: "@types/node"
         update-types:
           - version-update:semver-major
+      - dependency-name: electron
   - package-ecosystem: github-actions
     directory: /
     schedule:
