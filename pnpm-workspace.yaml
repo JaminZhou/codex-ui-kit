@@ -1,6 +1,10 @@
 packages:
   - playgrounds/*
 
+overrides:
+  "fast-uri@>=3.0.0 <3.1.5": 3.1.5
+  "undici@>=7.0.0 <7.29.0": 7.29.0
+
 allowBuilds:
   "@jaminzhou/codex-app-server-client@https://codeload.github.com/JaminZhou/codex-app-server-client/tar.gz/97ffcd496aa0aefdbdc868d13a5bce4e09a5afc5": true
   electron: true
