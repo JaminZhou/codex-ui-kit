@@ -69,13 +69,17 @@ The authoritative current-build inventory is:
   the session-latched warning only after another app restart. Browser/CDP,
   Electron, and a 3.2572% local-only notice crop gate that observed boundary.
   Broader unsampled inventory still keeps global pixel parity ineligible.
-- The previous-command follow-up reached bounded success, exact `exit 7`,
-  Stop, background settlement, and same-thread recovery on `26.803.61601`.
+- The current command follow-up reaches bounded success, exact `exit 7`, Stop,
+  persistent stopped-command settlement, and same-thread recovery on
+  `26.810.52044`.
   It adds the exact three-path terminal glyph; matches the 13px/19.5px/445
   command typography; and separates current-turn Stop from host-owned Stop all
-  and per-process background controls. Browser covers wide/690/720 geometry,
-  the protocol app passes 188-frame CDP and real Electron interactions, and
-  local-only owned command/composer pixel regions pass at 2.3321%/1.3947%.
+  and per-process background controls. Unlike the previous build, settlement
+  and recovery retain `Background terminal stopped with …` rather than
+  rewriting it to `Ran …`. Browser covers wide/690/720 geometry, the protocol
+  app passes 198-frame CDP and real Electron interactions, and the four new
+  local-only failure/stopped command and Composer regions pass between
+  2.2101% and 4.2564%.
 - The same installed fingerprint now owns the machine-readable baseline. A
   sanitized capture selects the main `app://-/index.html` Renderer by URL,
   area, shell landmarks, and visible-control density; it excludes the avatar

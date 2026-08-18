@@ -783,7 +783,7 @@ describe("protocol lifecycle reducer", () => {
     ]);
   });
 
-  it("replays current command Stop, settlement, and same-thread recovery", () => {
+  it("replays current command Stop, persistent stopped row, and recovery", () => {
     const scenario = replayScenarios.interruption;
     const running = reduceProtocolTrace(
       scenario.events.slice(0, scenario.frames["command-interruption-running"]),
@@ -811,26 +811,26 @@ describe("protocol lifecycle reducer", () => {
     expect(
       stopping.messages.find(({ id }) => id === "user-command-interruption")
         ?.interruptionDurationMs,
-    ).toBe(95_000);
+    ).toBe(8_000);
     expect(settled.status).toBe("interrupted");
     expect(settled.commands[0]).toMatchObject({
-      durationMs: 113_000,
+      durationMs: 8_000,
       exitCode: 0,
       status: "completed",
     });
     expect(recovered.status).toBe("completed");
     expect(recovered.turnDurationsMs).toMatchObject({
-      "turn-command-interruption": 95_000,
+      "turn-command-interruption": 8_000,
       "turn-command-interruption-recovery": 1_500,
     });
     expect(recovered.messages.at(-1)).toMatchObject({
       id: "assistant-command-interruption-recovery",
-      text: "INTERRUPTION RECOVERY ACCEPTED",
+      text: "CURRENT INTERRUPTION RECOVERY ACCEPTED",
     });
     expect(
       recovered.messages.find(({ id }) => id === "user-command-interruption")
         ?.interruptionDurationMs,
-    ).toBe(95_000);
+    ).toBe(8_000);
     expect(recovered.timeline.map(({ kind }) => kind)).toEqual([
       "message",
       "command",

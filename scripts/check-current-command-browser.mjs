@@ -94,6 +94,7 @@ try {
         if (!(element instanceof Element)) return null;
         const computed = getComputedStyle(element);
         return {
+          color: computed.color,
           fontFamily: computed.fontFamily,
           fontSize: computed.fontSize,
           fontWeight: computed.fontWeight,
@@ -120,6 +121,9 @@ try {
           document.body.scrollWidth - document.documentElement.clientWidth,
         composer: rect(".codex-ui-composer"),
         command: rect(".codex-ui-command-execution"),
+        commandHeaderStyle: style(
+          ".codex-ui-command-execution .codex-ui-activity__header",
+        ),
         commandLine: rect(".codex-ui-command-execution__command-line"),
         commandLineStyle: style(".codex-ui-command-execution__command-line"),
         commandOutput: rect(".codex-ui-command-output"),
@@ -128,6 +132,10 @@ try {
         commandShell: rect(".codex-ui-command-execution__shell"),
         commandShellStyle: style(".codex-ui-command-execution__shell"),
         executionStatus: execution?.getAttribute("data-execution-status") ?? null,
+        interruptionSummary: rect(".codex-ui-thread-interruption-summary"),
+        interruptionSummaryStyle: style(
+          ".codex-ui-thread-interruption-summary__label",
+        ),
         interruptionPhase: root?.getAttribute("data-interruption-phase") ?? null,
         rootText: root?.textContent?.replace(/\s+/g, " ").trim() ?? "",
         send: rect('.codex-ui-composer__primary[data-action="submit"]'),
@@ -238,7 +246,7 @@ try {
     "failure 690 composer",
   );
   expect(
-    failureCompact.command?.height === 171 &&
+    failureCompact.command?.height === 168 &&
       failureCompact.commandShell?.height === 139 &&
       failureCompact.commandOutputPre?.height === 55,
     "failure 690 command geometry",
@@ -263,7 +271,7 @@ try {
   expect(stopping.stop === null && stopping.send?.width === 28, "current Stop returns to Send");
   expect(stopping.stopAll !== null, "background Stop all is separate");
   expect(stopping.stopProcess !== null, "background process Stop is separate");
-  expect(stopping.rootText.includes("You stopped after 20s"), "interruption summary");
+  expect(stopping.rootText.includes("You stopped after 8s"), "interruption summary");
   expect(stopping.rootText.includes("Background terminal stopped with"), "background stopping summary");
 
   await page.type(
@@ -285,10 +293,21 @@ try {
         ?.getAttribute("data-interruption-phase") === "settled",
   );
   const settled = await snapshot();
+  if (process.env.CODEX_UI_KIT_COMMAND_SCREENSHOT_DIR) {
+    await page.screenshot({
+      path: join(
+        process.env.CODEX_UI_KIT_COMMAND_SCREENSHOT_DIR,
+        "current-command-interruption-settled-1180.png",
+      ),
+    });
+  }
   expect(settled.interruptionPhase === "settled", "interruption settled phase");
-  expect(settled.executionStatus === "background-finished", "background terminal settled");
+  expect(settled.executionStatus === "interrupted", "background terminal remains stopped");
   expect(settled.stopAll === null && settled.stopProcess === null, "background controls removed");
-  expect(settled.rootText.includes("Ran for i in"), "settled command summary");
+  expect(
+    settled.rootText.includes("Background terminal stopped with for i in"),
+    "settled stopped-command summary",
+  );
 
   await page.waitForFunction(
     () => {
@@ -306,7 +325,20 @@ try {
         ?.getAttribute("data-interruption-phase") === "recovered",
   );
   const recoveredWide = await snapshot();
+  if (process.env.CODEX_UI_KIT_COMMAND_SCREENSHOT_DIR) {
+    await page.screenshot({
+      path: join(
+        process.env.CODEX_UI_KIT_COMMAND_SCREENSHOT_DIR,
+        "current-command-interruption-recovered-1180.png",
+      ),
+    });
+  }
   expect(recoveredWide.rootText.includes("CURRENT INTERRUPTION RECOVERY ACCEPTED"), "interruption recovery response");
+  expect(recoveredWide.executionStatus === "interrupted", "recovered thread retains stopped command");
+  expect(
+    !recoveredWide.rootText.includes("Ran for i in"),
+    "recovered thread does not rewrite stopped command",
+  );
   expect(recoveredWide.textareaValue === "", "recovery clears composer");
   expect(recoveredWide.sendDisabled === true, "recovered empty Send disabled");
 

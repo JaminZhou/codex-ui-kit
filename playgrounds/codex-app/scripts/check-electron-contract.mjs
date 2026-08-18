@@ -7582,9 +7582,9 @@ try {
   }));
   if (
     !stopping.commandSummary?.startsWith(
-      "Background terminal stopped with seq 1 120",
+      "Background terminal stopped with for i in $(seq 1 120)",
     ) ||
-    stopping.interruption !== "You stopped after 1m 35s" ||
+    stopping.interruption !== "You stopped after 8s" ||
     stopping.stopAllCount !== 1 ||
     stopping.stopProcessCount !== 1
   ) {
@@ -7594,7 +7594,7 @@ try {
   }
 
   const prematureRecoveryPrompt =
-    "Do not use tools. Reply with exactly: INTERRUPTION RECOVERY ACCEPTED";
+    "Do not use tools. Reply exactly: CURRENT INTERRUPTION RECOVERY ACCEPTED";
   const prematureComposer = commandInterruptionPage.getByRole("textbox", {
     name: "Message composer",
   });
@@ -7617,13 +7617,13 @@ try {
     .getByRole("button", { name: "Stop all background terminals" })
     .click();
   await commandInterruptionPage.waitForSelector(
-    '.demo-root[data-frame="command-interruption-settled"][data-status="interrupted"] [data-item-id="command-interruption"][data-execution-status="background-finished"]',
+    '.demo-root[data-frame="command-interruption-settled"][data-status="interrupted"] [data-item-id="command-interruption"][data-execution-status="interrupted"]',
   );
   const composer = commandInterruptionPage.getByRole("textbox", {
     name: "Message composer",
   });
   await composer.fill(
-    "Do not use tools. Reply with exactly: INTERRUPTION RECOVERY ACCEPTED",
+    "Do not use tools. Reply exactly: CURRENT INTERRUPTION RECOVERY ACCEPTED",
   );
   await composer.press("Enter");
   await commandInterruptionPage.waitForSelector(
@@ -7658,9 +7658,9 @@ try {
   }));
   if (
     recovered.activeElement !== "Message composer" ||
-    recovered.assistantText !== "INTERRUPTION RECOVERY ACCEPTED" ||
-    recovered.commandStatus !== "background-finished" ||
-    recovered.interruption !== "You stopped after 1m 35s" ||
+    recovered.assistantText !== "CURRENT INTERRUPTION RECOVERY ACCEPTED" ||
+    recovered.commandStatus !== "interrupted" ||
+    recovered.interruption !== "You stopped after 8s" ||
     recovered.stopCount !== 0
   ) {
     throw new Error(

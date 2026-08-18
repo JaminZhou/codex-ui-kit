@@ -670,6 +670,100 @@ code {
   stroke: none;
 }
 
+.current-command-lifecycle:is(
+    [data-visual-scene="current-command-failure"],
+    [data-interruption-phase]
+  )
+  .codex-ui-command-execution
+  .codex-ui-activity__header {
+  font-size: 14px;
+  font-weight: 445;
+  line-height: 21px;
+  min-height: 21px;
+  padding-block: 0;
+}
+
+.current-command-lifecycle[data-visual-scene="current-command-failure"]
+  .codex-ui-command-execution
+  .codex-ui-activity__body {
+  margin-top: 8px;
+}
+
+.current-command-lifecycle[data-visual-scene="current-command-failure"]
+  .codex-ui-command-output
+  pre {
+  font-weight: 500;
+}
+
+.current-command-lifecycle[data-interruption-phase]
+  .codex-ui-agent-turn {
+  gap: 16px;
+}
+
+.current-command-lifecycle[data-interruption-phase]
+  .codex-ui-thread-interruption-summary {
+  color: rgb(140 140 140);
+  font-size: 14px;
+  font-weight: 445;
+  line-height: 21px;
+}
+
+.current-command-lifecycle[data-interruption-phase]
+  .codex-ui-thread-interruption-summary::before {
+  content: none;
+}
+
+.current-command-lifecycle[data-interruption-phase]
+  .codex-ui-thread-interruption-summary__label {
+  color: rgb(140 140 140);
+  min-height: 21px;
+}
+
+.current-command-lifecycle[data-interruption-phase]
+  .codex-ui-thread-interruption-summary__rule {
+  margin-top: 8px;
+}
+
+.current-command-lifecycle:is(
+    [data-interruption-phase="stopping"],
+    [data-interruption-phase="settled"],
+    [data-interruption-phase="recovered"]
+  )
+  .codex-ui-command-execution {
+  color: rgb(140 140 140);
+  margin-top: 4px;
+}
+
+.current-command-lifecycle:is(
+    [data-interruption-phase="stopping"],
+    [data-interruption-phase="settled"],
+    [data-interruption-phase="recovered"]
+  )
+  .codex-ui-command-execution
+  .codex-ui-activity__summary {
+  color: rgb(140 140 140);
+}
+
+.current-command-lifecycle:is(
+    [data-interruption-phase="stopping"],
+    [data-interruption-phase="settled"],
+    [data-interruption-phase="recovered"]
+  )
+  .codex-ui-command-execution
+  .codex-ui-activity__header {
+  gap: 6px;
+}
+
+.current-command-lifecycle .demo-command-stop-indicator {
+  background: currentColor;
+  border-radius: 1px;
+  flex: 0 0 auto;
+  height: 8px;
+  margin-inline: 4px;
+  opacity: 0.8;
+  width: 8px;
+}
+
 .current-command-lifecycle__process-panel {
   background: #171717;
   border-left: 1px solid var(--codex-ui-border);

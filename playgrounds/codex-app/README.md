@@ -869,16 +869,18 @@ local-only.
 
 ## Current command-lifecycle follow-up
 
-- Current `26.803.61601` evidence re-runs bounded success, exact `exit 7`, and
+- Current `26.810.52044` evidence re-runs bounded success, exact `exit 7`, and
   a stopped long-running command instead of relabeling the older replay.
 - `CommandExecution` uses the exact current three-path terminal glyph and
   13px/19.5px/445 command typography.
-- The replay keeps current-turn Stop separate from host-owned background
-  Stop all/per-process actions, then drives settlement and same-thread recovery.
-- Browser checks cover 1180×820, 690×820, and 720×680; the 188-frame CDP
+- The replay keeps current-turn Stop separate from host-owned background Stop
+  all/per-process actions, then retains `Background terminal stopped with …`
+  across process settlement and same-thread recovery.
+- Browser checks cover 1180×820, 690×820, and 720×680; the 198-frame CDP
   matrix, real Electron acceptance, and reviewed internal baselines pass.
-- Optional local-only current-product command/composer regions pass at
-  2.3321% and 1.3947%; raw references are never committed.
+- Optional local-only current-product failure-command, stopped-command, and
+  Composer regions pass between 2.2101% and 4.2564%; raw references are never
+  committed.
 
 ## Current Terminal recovery and background-process slice
 
@@ -892,7 +894,7 @@ local-only.
   product pty.
 - Electron closes and reopens the background side-panel tab while the process
   remains active and clicks Reload through to a fresh shell.
-- Four reviewed internal baselines bring the visual matrix to 192 frames.
+- Four reviewed internal baselines contribute to the current 198-frame matrix.
 
 Runtime, package-structural, and independent replay evidence remain separately
 attributed. No product screenshot or bundled private asset is committed.

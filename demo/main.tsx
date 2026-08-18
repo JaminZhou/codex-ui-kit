@@ -722,7 +722,7 @@ function CurrentCommandLifecycleFixture({
     (interruption && interruptionPhase === "running");
   const backgroundStopping =
     interruption && interruptionPhase === "stopping";
-  const backgroundSettled =
+  const backgroundStopped =
     interruption &&
     (interruptionPhase === "settled" || interruptionPhase === "recovered");
 
@@ -777,46 +777,42 @@ function CurrentCommandLifecycleFixture({
         <ActivityTimeline
           className="current-command-lifecycle__timeline"
           defaultOpen
-          summary={<TurnDuration durationMs={4_000} status="worked" />}
+          summary={<TurnDuration durationMs={5_000} status="worked" />}
         >
           <CommandExecution
             command={currentFailureCommand}
             defaultOpen
-            durationMs={4_000}
             exitCode={7}
             status="failed"
             terminalIcon={terminalIcon}
           >
             <CommandOutput
               copyLabel="Copy"
-              copyText={"current-stdout\ncurrent-stderr\n"}
+              copyText={"current-stderr\ncurrent-stdout\n"}
             >
-              {"current-stdout\ncurrent-stderr\n"}
+              {"current-stderr\ncurrent-stdout\n"}
             </CommandOutput>
           </CommandExecution>
         </ActivityTimeline>
       );
     }
-    const summary = backgroundStopping ? (
+    const commandStopped = backgroundStopping || backgroundStopped;
+    const summary = commandStopped ? (
       <>Background terminal stopped with {currentInterruptionCommand}</>
-    ) : backgroundSettled ? (
-      <>Ran {currentInterruptionCommand}</>
     ) : (
       <>Running {currentInterruptionCommand}</>
     );
     const execution = (
       <CommandExecution
         command={currentInterruptionCommand}
-        compactDetail={turnRunning ? "Running command for 16s" : undefined}
         hideRawCommand
-        open={turnRunning}
-        status={
-          backgroundStopping
-            ? "interrupted"
-            : backgroundSettled
-              ? "background-finished"
-              : "running"
+        indicator={
+          commandStopped ? (
+            <span aria-hidden="true" className="demo-command-stop-indicator" />
+          ) : undefined
         }
+        open={false}
+        status={commandStopped ? "interrupted" : "running"}
         summary={summary}
         terminalIcon={terminalIcon}
       />
@@ -825,13 +821,13 @@ function CurrentCommandLifecycleFixture({
       <ActivityTimeline
         className="current-command-lifecycle__timeline"
         open
-        summary={<TurnDuration durationMs={20_000} status="working" />}
+        summary={<TurnDuration durationMs={7_000} status="working" />}
       >
         {execution}
       </ActivityTimeline>
     ) : (
       <>
-        <ThreadInterruptionSummary durationMs={20_000} />
+        <ThreadInterruptionSummary durationMs={8_000} />
         {execution}
       </>
     );
