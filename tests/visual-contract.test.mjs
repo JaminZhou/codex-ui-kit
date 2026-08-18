@@ -15,8 +15,25 @@ const scenarioScript = readFileSync(
   new URL("../scripts/check-visual-scenarios.mjs", import.meta.url),
   "utf8",
 );
+const captureScript = readFileSync(
+  new URL("../scripts/capture-current-visual-assets.mjs", import.meta.url),
+  "utf8",
+);
 
 describe("current-thread visual contract", () => {
+  it("measures the removed structural header control before asserting its absence", () => {
+    const declaration =
+      "const currentThreadNewChatInputs = iconInputs.filter(";
+    const observation =
+      "structuralNewChatIconCount: currentThreadNewChatInputs.length";
+
+    expect(captureScript).toContain(declaration);
+    expect(captureScript).toContain(observation);
+    expect(captureScript.indexOf(declaration)).toBeLessThan(
+      captureScript.indexOf(observation),
+    );
+  });
+
   it("keeps the completed-thread compatibility command", () => {
     expect(packageJson.scripts["check:visual:current-thread"]).toBe(
       "pnpm build:demo && node scripts/check-current-thread-visual.mjs",

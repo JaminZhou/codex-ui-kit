@@ -3799,7 +3799,7 @@ export function App() {
                 <SidebarGlyph name="search" />
               </button>
               <button
-                aria-label="View activity"
+                aria-label="View activity, needs attention"
                 className="demo-sidebar-header-action"
                 type="button"
               >

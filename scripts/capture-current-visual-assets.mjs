@@ -950,6 +950,15 @@ try {
     const composerBottomInputs = composerInputs
       .filter(({ bounds }) => bounds.top >= window.innerHeight - 100)
       .sort((left, right) => left.bounds.left - right.bounds.left);
+    const currentThreadNewChatInputs = iconInputs.filter(
+      ({ bounds, owner, svg, targetRegion }) =>
+        targetRegion === "titlebar" &&
+        bounds.top >= 9 &&
+        owner.tagName === "BUTTON" &&
+        !(owner.getAttribute("aria-label") ?? "").trim() &&
+        !(owner.textContent ?? "").trim() &&
+        svg.getAttribute("viewBox") === "0 0 16 16",
+    );
     const composerStructuralSemanticIds = new Map();
     if (composerTopInputs.length === 3) {
       ["composer-project", "composer-worktree", "composer-branch"].forEach(

@@ -87,6 +87,9 @@ describe("lifecycle visual policy", () => {
     expect(appSource).toContain(
       "data-sidebar-current={currentSidebarComposition || undefined}",
     );
+    expect(appSource).toContain(
+      'aria-label="View activity, needs attention"',
+    );
     expect(appStyles).toContain(".demo-root[data-sidebar-current]");
     for (const reference of [
       "CODEX_UI_KIT_CURRENT_SIDEBAR_PROJECT_COLLAPSED_REFERENCE",
