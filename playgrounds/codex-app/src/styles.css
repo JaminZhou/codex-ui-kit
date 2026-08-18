@@ -1268,6 +1268,31 @@ textarea {
   width: 32px;
 }
 
+.demo-root[data-sidebar-current]
+  .codex-ui-app-sidebar-footer__actions {
+  gap: 4px;
+}
+
+.demo-root[data-sidebar-current]
+  .codex-ui-app-sidebar-footer__actions
+  > .demo-current-sidebar-voice {
+  border: 1px solid transparent;
+  border-radius: 12.5px;
+  color: var(--demo-shell-text-secondary);
+  font-size: 13px;
+  font-weight: 445;
+  gap: 4px;
+  height: 28px;
+  line-height: 18px;
+  padding: 0 10px;
+  width: auto;
+}
+
+.demo-current-sidebar-voice [data-current-build-icon] {
+  height: 16px;
+  width: 16px;
+}
+
 .demo-current-sidebar-menu {
   background: oklab(0.297161 0.0000135154 0.00000594556 / 0.9);
   border: 0;

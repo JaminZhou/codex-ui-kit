@@ -899,19 +899,22 @@ try {
   states.thresholdNewChat = await inspectShellState(page);
 
   await setViewport(currentBaselineViewports.compact);
-  const automaticallyCollapsed = await inspectShellState(page);
+  states.compactVisibleBeforeCollapse = await inspectShellState(page);
+  sidebarLifecycle.responsive = {
+    compactVisibleBeforeCollapse: await inspectResponsiveSidebar(),
+  };
   if (
-    automaticallyCollapsed.navigation !== null ||
-    automaticallyCollapsed.controls?.["Show sidebar"]?.length !== 1
+    states.compactVisibleBeforeCollapse.navigation === null ||
+    states.compactVisibleBeforeCollapse.controls?.["Hide sidebar"]?.length !== 1
   ) {
     throw new Error(
-      "The sidebar did not collapse automatically at the 720px breakpoint.",
+      `The sidebar did not remain visible at the 720px viewport: ${JSON.stringify(states.compactVisibleBeforeCollapse)}`,
     );
   }
-  states.compactCollapsed = automaticallyCollapsed;
-  sidebarLifecycle.responsive = {
-    compactCollapsed: await inspectResponsiveSidebar(),
-  };
+  await hideSidebar();
+  states.compactCollapsed = await inspectShellState(page);
+  sidebarLifecycle.responsive.compactCollapsed =
+    await inspectResponsiveSidebar();
 
   await showSidebar();
   states.compactPinned = await inspectShellState(page);

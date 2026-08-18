@@ -300,6 +300,8 @@ const currentBuildSidebarHelpMenuReference =
   process.env.CODEX_UI_KIT_CURRENT_SIDEBAR_HELP_MENU_REFERENCE;
 const currentBuildSidebarAccountMenuReference =
   process.env.CODEX_UI_KIT_CURRENT_SIDEBAR_ACCOUNT_MENU_REFERENCE;
+const currentBuildSidebarFooterControlsReference =
+  process.env.CODEX_UI_KIT_CURRENT_SIDEBAR_FOOTER_CONTROLS_REFERENCE;
 const currentBuildSidebarCompactPinnedReference =
   process.env.CODEX_UI_KIT_CURRENT_SIDEBAR_COMPACT_PINNED_REFERENCE;
 const currentBuildSidebarActiveStatusReference =
@@ -2042,6 +2044,46 @@ for (const scene of selectedScenes) {
         selected: selectedComparison.ratio,
         top: topComparison.ratio,
       })}`,
+    );
+  }
+
+  if (
+    scene.id === "current-sidebar" &&
+    currentBuildSidebarFooterControlsReference
+  ) {
+    const reference = flattenPng(
+      PNG.sync.read(
+        await readFile(currentBuildSidebarFooterControlsReference),
+      ),
+      { blue: 24, green: 24, red: 24 },
+    );
+    if (reference.width !== 133 || reference.height !== 46) {
+      throw new Error(
+        `${scene.id}: current footer controls reference must be exactly 133x46, received ${reference.width}x${reference.height}.`,
+      );
+    }
+    const actualFooterControls = cropPng(actual, 141, 774, 133, 46);
+    const comparison = comparePng(reference, actualFooterControls);
+    if (comparison.pixels > 0) {
+      await writeFile(
+        join(
+          artifactDirectory,
+          `${scene.id}.current-build.footer-controls.diff.png`,
+        ),
+        PNG.sync.write(comparison.diff),
+      );
+    }
+    const maximumRatio = environmentRatio(
+      "CODEX_UI_KIT_CURRENT_SIDEBAR_FOOTER_CONTROLS_MAX_DIFF_RATIO",
+      0.035,
+    );
+    if (comparison.ratio > maximumRatio) {
+      throw new Error(
+        `${scene.id}: current footer controls pixel ratio ${comparison.ratio} exceeds ${maximumRatio}.`,
+      );
+    }
+    console.log(
+      `${scene.id}: current footer controls pixel ratio ${comparison.ratio}`,
     );
   }
 

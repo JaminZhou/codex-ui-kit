@@ -143,25 +143,28 @@ sanitizer covers the de-identified font-style samples and all promoted icon styl
 attributes, class names, view boxes, and render sizes before capture output.
 Process/profile setup and exact-PID cleanup remain explicit operator steps.
 
-The current manifest fingerprints Codex Desktop `26.803.61601` (`6396`) and
-contains 90 runtime-observed exact icons. The first 53 cover
-sidebar/menu/window-chrome/Composer/environment surfaces: Sidebar,
-Back, Forward, mode chevron, Search, neutral
-Activity, New chat, Quick chat, project folder, Pull requests, Sites,
-Scheduled, Plugins, More, Pin, Archive, Help, Composer Project, Worktree,
-Branch, Add files, Permission, Model chevron, Dictate, Voice, the twelve
-project/Help menu primitives, and six account-menu primitives for Usage,
-its chevron, Pet, Invite, Settings, and Log out. The ten follow-up primitives
-cover Mark all as read, the shared selected check, Local, New worktree, Codex
-web, its external-link mark, disabled Send to cloud, Usage remaining, its
-chevron, and Environment settings. The current build confirms
-that Settings is absent from the sampled footer and that sampled project-task
-and Recents rows have no leading glyph. The scoped visible-shell approximation
-list remains empty after adding 24 Settings navigation primitives, the Hooks
-reload action, and 12 completed-thread primitives: Send, New chat, project,
-thread actions, open-in chevron, pinned summary, bottom panel, side panel,
-Copy, Good response, Bad response, and Continue in new chat. The broader
+The current manifest fingerprints Codex Desktop `26.810.52044` (`6662`) and
+contains 92 runtime-observed exact icons. It covers the visible
+sidebar/menu/window-chrome/Composer/environment surfaces, including neutral
+and attention Activity, the new footer Voice action, the conditional Mark all
+as read action, and the widened Help menu's leading changelog plus trailing
+external-link glyphs. The Account menu now contributes five SVGs: Usage, Pet,
+Invite, Settings, and Log out; the removed Usage chevron is not retained as a
+current asset. The current build confirms that Settings is absent from the
+sampled footer and that sampled project-task and Recents rows have no leading
+glyph. The scoped visible-shell approximation list remains empty after 24
+Settings navigation primitives, the Hooks reload action, and the current
+completed-thread primitives: Send, project, thread actions, open-in chevron,
+summary, bottom panel, side panel, Copy, Good response, Bad response, Fork,
+and the real successful-command Terminal glyph. The prior header New chat,
+pinned-summary, and Continue IDs are not promoted on this build. The broader
 inventory and current-build lifecycle denominator remain incomplete, so
 global pixel parity is still ineligible. See
-[`26.803.61601.md`](26.803.61601.md) for the scoped probe evidence and its
+[`26.810.52044.md`](26.810.52044.md) for the scoped probe evidence and its
 separation from the broader UI inventory baseline.
+
+The current footer Voice/Help pair also has an optional local-only pixel gate.
+Provide a 133×46 product crop through
+`CODEX_UI_KIT_CURRENT_SIDEBAR_FOOTER_CONTROLS_REFERENCE`; the checked-in
+threshold is 3.5%, while the current 26.810.52044 comparison passes at
+3.1219%. The reference itself remains outside the repository.

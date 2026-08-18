@@ -468,6 +468,7 @@ export interface AppShellProps
   sidePanelWidth?: number;
   responsivePanelContinuity?: boolean;
   responsivePanelContinuityKey?: string | number;
+  responsiveSidebarContinuity?: boolean;
   sidebar?: ReactNode;
   sidebarLabel?: string;
   sidebarMaxWidth?: number;
@@ -566,6 +567,7 @@ export function AppShell({
   sidePanelWidth,
   responsivePanelContinuity = false,
   responsivePanelContinuityKey,
+  responsiveSidebarContinuity,
   sidebar,
   sidebarLabel = "App navigation",
   sidebarMaxWidth = 520,
@@ -579,6 +581,8 @@ export function AppShell({
   windowChrome,
   ...props
 }: AppShellProps) {
+  const resolvedResponsiveSidebarContinuity =
+    responsiveSidebarContinuity ?? responsivePanelContinuity;
   const bottomPanelOpenRef = useRef(bottomPanelOpen);
   bottomPanelOpenRef.current = bottomPanelOpen;
   const bottomPanelRef = useRef<HTMLElement>(null);
@@ -903,12 +907,14 @@ export function AppShell({
       responsiveSidebarRequestTokenRef.current = null;
       responsiveSidePanelRequestTokenRef.current = null;
     }
-    if (!responsivePanelContinuity) {
+    if (!resolvedResponsiveSidebarContinuity) {
       sidebarAutoCollapsedRef.current = false;
-      sidePanelAutoCollapsedRef.current = false;
       expectedResponsiveSidebarOpenRef.current = null;
-      expectedResponsiveSidePanelOpenRef.current = null;
       responsiveSidebarRequestTokenRef.current = null;
+    }
+    if (!responsivePanelContinuity) {
+      sidePanelAutoCollapsedRef.current = false;
+      expectedResponsiveSidePanelOpenRef.current = null;
       responsiveSidePanelRequestTokenRef.current = null;
     }
 
@@ -916,13 +922,17 @@ export function AppShell({
     if (previousMode === layoutMode) return;
     previousLayoutModeRef.current = layoutMode;
     onLayoutModeChange?.(layoutMode, previousMode);
-    if (!responsivePanelContinuity) return;
 
     const enteredNarrow =
       previousMode !== "narrow" && layoutMode === "narrow";
     const leftNarrow =
       previousMode === "narrow" && layoutMode !== "narrow";
-    if (enteredNarrow && sidebarOpen && onSidebarOpenChange) {
+    if (
+      resolvedResponsiveSidebarContinuity &&
+      enteredNarrow &&
+      sidebarOpen &&
+      onSidebarOpenChange
+    ) {
       stageResponsiveOpenExpectation(
         expectedResponsiveSidebarOpenRef,
         responsiveSidebarRequestTokenRef,
@@ -931,6 +941,7 @@ export function AppShell({
       );
       onSidebarOpenChange(false);
     } else if (
+      resolvedResponsiveSidebarContinuity &&
       leftNarrow &&
       sidebarAutoCollapsedRef.current &&
       !sidebarOpen &&
@@ -943,7 +954,7 @@ export function AppShell({
         true,
       );
       onSidebarOpenChange(true);
-    } else if (leftNarrow) {
+    } else if (resolvedResponsiveSidebarContinuity && leftNarrow) {
       sidebarAutoCollapsedRef.current = false;
       expectedResponsiveSidebarOpenRef.current = null;
       responsiveSidebarRequestTokenRef.current = null;
@@ -953,7 +964,12 @@ export function AppShell({
       previousMode === "wide" && layoutMode !== "wide";
     const leftConstrained =
       previousMode !== "wide" && layoutMode === "wide";
-    if (enteredConstrained && sidePanelOpen && onSidePanelOpenChange) {
+    if (
+      responsivePanelContinuity &&
+      enteredConstrained &&
+      sidePanelOpen &&
+      onSidePanelOpenChange
+    ) {
       stageResponsiveOpenExpectation(
         expectedResponsiveSidePanelOpenRef,
         responsiveSidePanelRequestTokenRef,
@@ -962,6 +978,7 @@ export function AppShell({
       );
       onSidePanelOpenChange(false);
     } else if (
+      responsivePanelContinuity &&
       leftConstrained &&
       sidePanelAutoCollapsedRef.current &&
       !sidePanelOpen &&
@@ -974,7 +991,7 @@ export function AppShell({
         true,
       );
       onSidePanelOpenChange(true);
-    } else if (leftConstrained) {
+    } else if (responsivePanelContinuity && leftConstrained) {
       sidePanelAutoCollapsedRef.current = false;
       expectedResponsiveSidePanelOpenRef.current = null;
       responsiveSidePanelRequestTokenRef.current = null;
@@ -986,6 +1003,7 @@ export function AppShell({
     onSidebarOpenChange,
     responsivePanelContinuity,
     responsivePanelContinuityKey,
+    resolvedResponsiveSidebarContinuity,
     sidePanelOpen,
     sidebarOpen,
   ]);

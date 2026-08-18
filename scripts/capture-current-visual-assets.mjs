@@ -167,7 +167,7 @@ const semanticLabels = new Map([
   ["Forward", "window-chrome-forward"],
   ["Bad response", "thread-assistant-bad"],
   ["Chat actions", "thread-header-actions"],
-  ["Continue in new chat from here", "thread-assistant-continue"],
+  ["Fork chat from here", "thread-assistant-fork"],
   ["Copy", "thread-assistant-copy"],
   ["Copy message", "thread-user-copy"],
   ["Edit message", "thread-user-edit"],
@@ -186,7 +186,7 @@ const semanticLabels = new Map([
   ["Switch mode, current mode: Codex", "sidebar-mode-chevron"],
   ["Show sidebar", "window-chrome-sidebar"],
   ["Toggle bottom panel", "thread-header-bottom-panel"],
-  ["Toggle pinned summary", "thread-header-pinned-summary"],
+  ["Toggle summary", "thread-header-summary"],
   ["Toggle side panel", "thread-header-side-panel"],
   ["View activity", "sidebar-activity"],
   ["View activity, needs attention", "sidebar-activity-attention"],
@@ -263,6 +263,24 @@ try {
       timeout: 15_000,
     });
   }
+  if (
+    !threadOnly &&
+    (await main.locator('[data-testid="home-icon"]:visible').count()) === 0
+  ) {
+    const newChat = main
+      .locator("nav:visible")
+      .getByText("New chat", { exact: true });
+    if ((await newChat.count()) !== 1) {
+      throw new Error("Could not resolve one visible New chat route.");
+    }
+    await newChat.click();
+    await main.waitForSelector('[data-testid="home-icon"]:visible', {
+      timeout: 15_000,
+    });
+    await main.waitForSelector('[contenteditable="true"][role="textbox"]', {
+      timeout: 15_000,
+    });
+  }
   await main.waitForFunction(
     () =>
       Boolean(document.querySelector("main")) &&
@@ -289,6 +307,21 @@ try {
   await main.evaluate(async () => {
     await document.fonts.ready;
   });
+  if (
+    threadOnly &&
+    (await main.locator(".group\\/activity-header:visible").count()) === 0
+  ) {
+    const workedFor = main.getByText(/^Worked for /);
+    if ((await workedFor.count()) === 0) {
+      throw new Error(
+        "Completed-thread capture requires a visible Worked for disclosure.",
+      );
+    }
+    await workedFor.last().click();
+    await main.waitForSelector(".group\\/activity-header:visible", {
+      timeout: 15_000,
+    });
+  }
 
   const result = await main.evaluate(({ semanticLabelEntries, threadOnly }) => {
     const semanticLabels = new Map(semanticLabelEntries);
@@ -297,6 +330,12 @@ try {
       targetRegion,
       allowControlPatternFallback,
     ) => {
+      if (
+        targetRegion === "sidebar-footer" &&
+        label === "Start new voice chat"
+      ) {
+        return "sidebar-voice";
+      }
       const exact = semanticLabels.get(label);
       if (exact) return exact;
       if (!allowControlPatternFallback) return null;
@@ -788,6 +827,47 @@ try {
         viewBox: svg.getAttribute("viewBox"),
       };
     };
+    const captureVisibleControlIcon = ({ ariaLabel, id, targetRegion }) => {
+      const controls = [...document.querySelectorAll("button")].filter(
+        (button) =>
+          button.getAttribute("aria-label") === ariaLabel &&
+          isActuallyVisible(button),
+      );
+      if (controls.length !== 1) {
+        throw new Error(
+          `Expected one visible ${ariaLabel} control, received ${controls.length}.`,
+        );
+      }
+      const svgs = [...controls[0].querySelectorAll("svg")].filter(
+        isActuallyVisible,
+      );
+      if (svgs.length !== 1) {
+        throw new Error(
+          `Expected one visible SVG for ${ariaLabel}, received ${svgs.length}.`,
+        );
+      }
+      const svg = svgs[0];
+      const bounds = svg.getBoundingClientRect();
+      if (region(bounds) !== targetRegion) {
+        throw new Error(
+          `Visible ${ariaLabel} control did not belong to ${targetRegion}.`,
+        );
+      }
+      return {
+        owner: { role: "button", semanticId: id },
+        primitives: [...svg.children].map(serializeSvgElement),
+        region: targetRegion,
+        rect: rect(svg),
+        renderSize: {
+          height: round(bounds.height),
+          width: round(bounds.width),
+        },
+        rootAttributes: attributes(svg, true),
+        rootComputedStyle: computedStyle(svg),
+        sourceClassName: svg.getAttribute("class") ?? "",
+        viewBox: svg.getAttribute("viewBox"),
+      };
+    };
     Object.defineProperty(window, "__codexUiKitCaptureVisibleMenuIcons", {
       configurable: true,
       value: captureVisibleMenuIcons,
@@ -803,6 +883,10 @@ try {
     Object.defineProperty(window, "__codexUiKitCaptureSettingsActionIcon", {
       configurable: true,
       value: captureSettingsActionIcon,
+    });
+    Object.defineProperty(window, "__codexUiKitCaptureVisibleControlIcon", {
+      configurable: true,
+      value: captureVisibleControlIcon,
     });
     const navigation = document.querySelector("nav");
     const recentsSections = [
@@ -909,22 +993,6 @@ try {
         "composer-model-chevron",
       );
     }
-    const titlebarStructuralSemanticIds = new Map();
-    const currentThreadNewChatInputs = iconInputs.filter(
-      ({ bounds, owner, svg, targetRegion }) =>
-        targetRegion === "titlebar" &&
-        bounds.top >= 9 &&
-        owner.tagName === "BUTTON" &&
-        !(owner.getAttribute("aria-label") ?? "").trim() &&
-        !(owner.textContent ?? "").trim() &&
-        svg.getAttribute("viewBox") === "0 0 16 16",
-    );
-    if (currentThreadNewChatInputs.length === 1) {
-      titlebarStructuralSemanticIds.set(
-        currentThreadNewChatInputs[0].svg,
-        "thread-header-new-chat",
-      );
-    }
     const icons = iconInputs.map(({ bounds, owner, svg, targetRegion }) => {
         const ariaLabel = owner.getAttribute("aria-label");
         const titleLabel = owner.getAttribute("title") ?? "";
@@ -936,9 +1004,7 @@ try {
               resolveSemanticId(ariaLabel ?? "", targetRegion, true) ??
               resolveSemanticId(titleLabel, targetRegion, false) ??
               resolveSemanticId(fixedTextLabel, targetRegion, false) ??
-              composerStructuralSemanticIds.get(svg) ??
-              titlebarStructuralSemanticIds.get(svg) ??
-              null,
+              composerStructuralSemanticIds.get(svg) ?? null,
           },
           primitives: [...svg.children].map(serializeSvgElement),
           region: targetRegion,
@@ -1039,6 +1105,9 @@ try {
           exactComposerSemanticIds.has(owner.semanticId),
       ).length,
       topContextIconCount: composerTopInputs.length,
+    };
+    const threadObservation = {
+      structuralNewChatIconCount: currentThreadNewChatInputs.length,
     };
     const visibleControlsFor = (root = document) =>
       [
@@ -1153,6 +1222,10 @@ try {
         "sidebar-help",
         "sidebar-footer",
       ).length,
+      footerVoiceControlCount: controlsForSemanticId(
+        "sidebar-voice",
+        "sidebar-footer",
+      ).length,
       settingsControlCount: controlsForSemanticId(
         "sidebar-settings",
         "sidebar-footer",
@@ -1180,9 +1253,39 @@ try {
       fontSamples,
       icons,
       sidebarObservation,
+      threadObservation,
       viewport: { height: window.innerHeight, width: window.innerWidth },
     };
   }, { semanticLabelEntries: [...semanticLabels], threadOnly });
+  if (
+    !threadOnly &&
+    !result.icons.some(
+      (icon) =>
+        icon.region === "composer" &&
+        icon.owner?.semanticId === "composer-send",
+    )
+  ) {
+    const composerEditor = main.locator(
+      '[contenteditable="true"][role="textbox"]:visible',
+    );
+    if ((await composerEditor.count()) !== 1) {
+      throw new Error("Expected one visible Composer editor for Send capture.");
+    }
+    try {
+      await composerEditor.fill("current visual asset probe");
+      await main.waitForSelector('button[aria-label="Send"]:visible');
+      const sendIcon = await main.evaluate(() =>
+        window.__codexUiKitCaptureVisibleControlIcon({
+          ariaLabel: "Send",
+          id: "composer-send",
+          targetRegion: "composer",
+        }),
+      );
+      result.icons.push(sendIcon);
+    } finally {
+      await composerEditor.fill("").catch(() => {});
+    }
+  }
   if (threadOnly) {
     result.rasterAssets = await main.evaluate(async () => {
       const candidates = [
@@ -1236,17 +1339,46 @@ try {
   }
   fullCapture: try {
     if (threadOnly) break fullCapture;
-    const projectRow = main
-      .locator(
-        'nav div[role="button"][aria-expanded]:not([aria-haspopup])',
-      )
-      .first();
-    await projectRow.hover();
-    await projectRow.locator('button[aria-haspopup="menu"]').first().click();
-    await main.waitForSelector('[role="menu"]:visible');
-    const projectMenuLabels = await main
-      .locator('[role="menu"]:visible [role="menuitem"]')
-      .allTextContents();
+    const projectRows = main.locator(
+      'nav div[role="button"][aria-expanded]:not([aria-haspopup])',
+    );
+    if ((await projectRows.count()) === 0) {
+      throw new Error("Current visual capture requires a sidebar project row.");
+    }
+    let projectRow = projectRows.first();
+    let projectMenuLabels = [];
+    let markedProjectMenuFound = false;
+    for (let index = 0; index < (await projectRows.count()); index += 1) {
+      const candidate = projectRows.nth(index);
+      await candidate.hover();
+      await candidate
+        .locator('button[aria-haspopup="menu"]')
+        .first()
+        .click();
+      await main.waitForSelector('[role="menu"]:visible');
+      const labels = await main
+        .locator('[role="menu"]:visible [role="menuitem"]')
+        .allTextContents();
+      if (labels.some((label) => label.trim() === "Mark all as read")) {
+        projectRow = candidate;
+        projectMenuLabels = labels;
+        markedProjectMenuFound = true;
+        break;
+      }
+      await main.keyboard.press("Escape");
+      await main.waitForSelector('[role="menu"]', { state: "hidden" });
+    }
+    if (!markedProjectMenuFound) {
+      await projectRow.hover();
+      await projectRow
+        .locator('button[aria-haspopup="menu"]')
+        .first()
+        .click();
+      await main.waitForSelector('[role="menu"]:visible');
+      projectMenuLabels = await main
+        .locator('[role="menu"]:visible [role="menuitem"]')
+        .allTextContents();
+    }
     const projectMenuHasMarkAllAsRead = projectMenuLabels.some(
       (label) => label.trim() === "Mark all as read",
     );
@@ -1279,19 +1411,25 @@ try {
       .first()
       .click();
     await main.waitForSelector('[role="menu"]:visible');
-    const helpMenuIcons = await main.evaluate(() =>
-      window.__codexUiKitCaptureVisibleMenuIcons({
-        ids: [
-          "sidebar-help-menu-release-note",
-          "sidebar-help-menu-release-note",
-          "sidebar-help-menu-release-note",
-          "sidebar-help-menu-changelog",
-          "sidebar-help-menu-chrome",
-          "sidebar-help-menu-remote",
-          "sidebar-help-menu-keyboard",
-          "sidebar-help-menu-support",
-        ],
+    const helpMenuCapture = await main.evaluate(() =>
+      window.__codexUiKitCaptureVisibleMenuIconSlots({
+        itemCount: 8,
         region: "sidebar-help-menu",
+        slots: [
+          { id: "sidebar-help-menu-release-note", itemIndex: 0, svgIndex: 0 },
+          { id: "sidebar-help-menu-release-note", itemIndex: 1, svgIndex: 0 },
+          { id: "sidebar-help-menu-release-note", itemIndex: 2, svgIndex: 0 },
+          { id: "sidebar-help-menu-changelog", itemIndex: 3, svgIndex: 0 },
+          {
+            id: "sidebar-help-menu-changelog-external",
+            itemIndex: 3,
+            svgIndex: 1,
+          },
+          { id: "sidebar-help-menu-chrome", itemIndex: 4, svgIndex: 0 },
+          { id: "sidebar-help-menu-remote", itemIndex: 5, svgIndex: 0 },
+          { id: "sidebar-help-menu-keyboard", itemIndex: 6, svgIndex: 0 },
+          { id: "sidebar-help-menu-support", itemIndex: 7, svgIndex: 0 },
+        ],
       }),
     );
     await main.keyboard.press("Escape");
@@ -1329,11 +1467,6 @@ try {
         region: "sidebar-account-menu",
         slots: [
           { id: "sidebar-account-menu-usage", itemIndex: 1, svgIndex: 0 },
-          {
-            id: "sidebar-account-menu-usage-chevron",
-            itemIndex: 1,
-            svgIndex: 1,
-          },
           { id: "sidebar-account-menu-pet", itemIndex: 2, svgIndex: 0 },
           { id: "sidebar-account-menu-invite", itemIndex: 3, svgIndex: 0 },
           { id: "sidebar-account-menu-settings", itemIndex: 4, svgIndex: 0 },
@@ -1593,10 +1726,12 @@ try {
       { id: "settings-worktrees", label: "Worktrees" },
       { id: "settings-archived-chats", label: "Archived chats" },
     ];
-    const gitNavigation = main.getByRole("button", {
-      name: "Git",
-      exact: true,
-    });
+    const gitNavigation = main
+      .locator("nav:visible")
+      .getByRole("button", {
+        name: "Git",
+        exact: true,
+      });
     if ((await gitNavigation.count()) !== 1) {
       throw new Error("Settings route lost its unique Git navigation item.");
     }
@@ -1639,10 +1774,13 @@ try {
           padding: computed.padding,
         };
       };
-      const heading = document.querySelector("h1");
-      const navigation = document.querySelector("nav");
+      const heading = [...document.querySelectorAll("h1")].find(visible) ?? null;
+      const navigation =
+        [...document.querySelectorAll("nav")].find(visible) ?? null;
       const searchbox = navigation?.querySelector('[role="searchbox"]') ?? null;
-      const branchPrefix = document.querySelector('input[placeholder="codex/"]');
+      const branchPrefix = [
+        ...document.querySelectorAll('input[placeholder="codex/"]'),
+      ].find(visible) ?? null;
       const firstCard = branchPrefix?.closest("section") ??
         branchPrefix?.parentElement?.parentElement ??
         null;
@@ -1711,21 +1849,25 @@ try {
         searchbox: { rect: rect(searchbox), style: style(searchbox) },
       };
     });
-    const settingsSearch = main.getByRole("searchbox");
+    const settingsSearch = main.locator("nav:visible").getByRole("searchbox");
     await settingsSearch.fill("git");
     await main.waitForTimeout(150);
-    const searchResultLines = await main.locator("nav").evaluate((navigation) =>
-      navigation.innerText
-        .split("\n")
-        .map((line) => line.trim())
-        .filter(Boolean),
-    );
+    const searchResultLines = await main
+      .locator("nav:visible")
+      .evaluate((navigation) =>
+        navigation.innerText
+          .split("\n")
+          .map((line) => line.trim())
+          .filter(Boolean),
+      );
     await settingsSearch.fill("");
     await main.waitForTimeout(100);
-    const hooksNavigation = main.getByRole("button", {
-      name: "Hooks",
-      exact: true,
-    });
+    const hooksNavigation = main
+      .locator("nav:visible")
+      .getByRole("button", {
+        name: "Hooks",
+        exact: true,
+      });
     await hooksNavigation.click();
     await main.getByRole("heading", { name: "Hooks", exact: true }).waitFor();
     await main.getByText("No hooks found", { exact: true }).waitFor();
@@ -1778,14 +1920,18 @@ try {
       .getByRole("menuitem", { name: "Local", exact: true })
       .click();
 
-    result.icons.push(...projectMenuIcons, ...helpMenuIcons);
+    result.icons.push(...projectMenuIcons, ...helpMenuCapture.icons);
     result.icons.push(...accountMenuCapture.icons);
     result.icons.push(...workInCapture.icons, ...environmentCapture.icons);
     result.icons.push(...settingsCapture.icons, hooksReloadIcon);
     result.sidebarObservation.projectMenuItemCount = projectMenuIcons.length;
     result.sidebarObservation.projectMenuHasMarkAllAsRead =
       projectMenuHasMarkAllAsRead;
-    result.sidebarObservation.helpMenuItemCount = helpMenuIcons.length;
+    result.sidebarObservation.helpMenuIconCount =
+      helpMenuCapture.observation.iconCount;
+    result.sidebarObservation.helpMenuItemCount =
+      helpMenuCapture.observation.itemCount;
+    result.sidebarObservation.helpMenu = helpMenuCapture.observation;
     result.sidebarObservation.accountMenu = accountMenuCapture.observation;
     result.workspaceObservation = {
       environmentMenu: environmentCapture.observation,
@@ -1803,6 +1949,7 @@ try {
         delete window.__codexUiKitCaptureVisibleMenuIconSlots;
         delete window.__codexUiKitCaptureSettingsNavigationIcons;
         delete window.__codexUiKitCaptureSettingsActionIcon;
+        delete window.__codexUiKitCaptureVisibleControlIcon;
       })
       .catch(() => {});
   }

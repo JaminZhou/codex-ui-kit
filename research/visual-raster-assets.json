@@ -19,16 +19,16 @@
     }
   ],
   "baseline": {
-    "appAsarSha256": "928129601e8b36eccba603114d6912352f2b13182f3a7d60b32166d0e81aafb5",
-    "appVersion": "26.803.61601",
-    "buildNumber": "6396",
+    "appAsarSha256": "6e7e8791b8bf69a586ff994721fff518af391d9efdc66cd2e620dd2a4aedc90f",
+    "appVersion": "26.810.52044",
+    "buildNumber": "6662",
     "interactionState": "resting-and-open-sidebar-menus",
     "theme": "dark",
     "viewport": {
       "height": 820,
       "width": 1180
     },
-    "capturedAt": "2026-08-12"
+    "capturedAt": "2026-08-18"
   },
   "policy": {
     "distribution": "exploratory playground only; excluded from the published npm package",

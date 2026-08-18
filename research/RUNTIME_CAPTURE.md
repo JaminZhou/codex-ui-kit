@@ -121,7 +121,7 @@ they are not labeled current runtime observation or external product-pixel
 parity. A future disposable real task can promote each path only after its
 trigger, exact target, cleanup, and non-sensitive capture boundary are safe.
 
-### Current `26.803.61601` global-shell baseline
+### Current `26.810.52044` global-shell baseline
 
 The reproducible shell capture is implemented by
 `scripts/capture-current-baseline.mjs`. It accepts only an isolated loopback
@@ -135,9 +135,9 @@ metadata-change time must remain identical, and that change must predate the
 owner process by at least the start-time clock boundary. This fails closed if
 the installed bundle is replaced after the running Renderer starts, rather
 than attributing an old Renderer to newly installed bytes. The promoted
-contract pins build `6396`, Chromium `151.0.7922.76`, `223451508` ASAR bytes,
+contract pins build `6662`, Chromium `151.0.7922.137`, `279946146` ASAR bytes,
 and SHA-256
-`928129601e8b36eccba603114d6912352f2b13182f3a7d60b32166d0e81aafb5`.
+`6e7e8791b8bf69a586ff994721fff518af391d9efdc66cd2e620dd2a4aedc90f`.
 Main-target selection uses URL, area, route-independent `main`/navigation/
 sidebar-trigger landmarks, and visible-control density; it never selects by
 target order or private text. A Composer is not required until the fixed New
@@ -155,11 +155,10 @@ pnpm capture:current-baseline
 ```
 
 The allowlisted sequence is New chat → project pointer/Enter/Space expansion →
-project and Help menu inspection → fixed viewport matrix → prove automatic
-collapse at 720px → explicit Show/pin → Pull requests → New chat → explicit
-Hide cleanup. The project and responsive samples share the same single
-721→720 automatic-collapse transition so an explicit pin cannot pollute the
-automatic-collapse proof. The JSON contains only build, target structure,
+project and Help menu inspection → fixed viewport matrix → prove the sidebar
+remains visible at 720px → explicit Hide → explicit Show → Pull requests → New
+chat → explicit Hide cleanup. The first 720px sample occurs before any sidebar
+normalization, so a stale automatic-collapse assumption fails closed. The JSON contains only build, target structure,
 fixed route/control state, menu counts/focus/geometry, computed editor style,
 project-group state, geometry, scroll ownership, viewport, theme, and overflow.
 It never captures screenshots or arbitrary page/body text. Ancestor-aware
@@ -177,7 +176,7 @@ New chat is ready only when its fixed `home-icon` route marker is visible; a
 pre-existing Composer is insufficient. The contract requires that marker in
 all New chat samples, rejects it on Pull requests, and rejects any missing or
 non-finite horizontal-overflow measurement. At 720px, inspect and reject a
-still-visible sidebar before any explicit sidebar normalization. Validate the
+missing sidebar before any explicit sidebar normalization. Validate the
 documented main and Composer geometry in every New chat state plus the single
 navigation-owned wide/medium vertical scroller. The scroll owner must have
 finite content height larger than its exact client height, but its
@@ -187,9 +186,9 @@ de-identified project/task populations without changing the shell contract.
 The `sidebarLifecycle` contract requires six project groups, 30px project
 rows, pointer/Enter/Space collapse and restoration with focus retained, a
 214.05px-wide six- or seven-item project menu depending on whether Mark all as
-read is exposed, a 200×272.06 eight-item Help menu, Escape dismissal, compact
-automatic collapse, explicit persisted-width pinning, wide
-restoration, and zero horizontal overflow. The observed project menu drops
+read is exposed, a 320×272.06 eight-item Help menu, one 75.67×28 Voice footer
+control, Escape dismissal, compact visible-before-hide state, explicit
+persisted-width restoration, and zero horizontal overflow. The observed project menu drops
 focus to the document body on Escape; the Help menu returns focus to its
 trigger. The independent UIKit intentionally improves the former behavior and
 documents that divergence rather than weakening keyboard focus management.
@@ -200,9 +199,9 @@ port `9822`, exact main PID `24810`, and profile
 sidebar preference can persist at 322.91px, so the baseline now records
 `navigationWidth` and derives all dependent geometry instead of treating the
 274.11px fresh-profile default as universal. The wide resize range remains
-240–520px, but the 720px pinned matrix accepts only 240–368px so its main
-column stays at least 352px; larger persisted widths fail closed until their
-narrow overlay/modal behavior has an independent model. The probe then
+240–520px. The current 720px matrix clamps the persisted width only as needed
+to preserve a 240px main column; the observed 322.91px preference therefore
+remains visible rather than becoming a narrow overlay. The probe then
 captured the five-action Work in menu, the
 New-worktree no-environment menu, the current unavailable Environments route,
 and the seven-action project menu. It created no environment, worktree, task,

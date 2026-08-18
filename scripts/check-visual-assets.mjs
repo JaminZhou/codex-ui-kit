@@ -394,7 +394,10 @@ for (const id of [
   "sidebar-more",
   "sidebar-pin",
   "sidebar-archive",
+  "sidebar-activity",
+  "sidebar-activity-attention",
   "sidebar-help",
+  "sidebar-voice",
   "sidebar-project-menu-unpin",
   "sidebar-project-menu-reveal",
   "sidebar-project-menu-worktree",
@@ -404,12 +407,12 @@ for (const id of [
   "sidebar-project-menu-remove",
   "sidebar-help-menu-release-note",
   "sidebar-help-menu-changelog",
+  "sidebar-help-menu-changelog-external",
   "sidebar-help-menu-chrome",
   "sidebar-help-menu-remote",
   "sidebar-help-menu-keyboard",
   "sidebar-help-menu-support",
   "sidebar-account-menu-usage",
-  "sidebar-account-menu-usage-chevron",
   "sidebar-account-menu-pet",
   "sidebar-account-menu-invite",
   "sidebar-account-menu-settings",
@@ -449,17 +452,16 @@ for (const id of [
   "settings-worktrees",
   "settings-archived-chats",
   "composer-send",
-  "thread-header-new-chat",
   "thread-header-project",
   "thread-header-actions",
   "thread-header-open-in-chevron",
-  "thread-header-pinned-summary",
+  "thread-header-summary",
   "thread-header-bottom-panel",
   "thread-header-side-panel",
   "thread-assistant-copy",
   "thread-assistant-good",
   "thread-assistant-bad",
-  "thread-assistant-continue",
+  "thread-assistant-fork",
   "thread-command-terminal",
 ]) {
   if (!ids.has(id) || remaining.includes(id)) {
@@ -467,13 +469,13 @@ for (const id of [
   }
 }
 if (
-  manifest.icons.length !== 91 ||
+  manifest.icons.length !== 92 ||
   manifest.composerObservation?.topContextIconCount !== 3 ||
   manifest.composerObservation?.bottomActionIconCount !== 5 ||
   manifest.composerObservation?.exactSemanticIconCount !== 8
 ) {
   throw new Error(
-    "current visual asset capture must retain 91 promoted icons and the eight-icon Composer baseline",
+    "current visual asset capture must retain 92 promoted icons and the eight-icon Composer baseline",
   );
 }
 if (
@@ -510,9 +512,13 @@ const expectedProjectMenuItemCount = manifest.sidebarObservation
 if (
   manifest.sidebarObservation?.projectMenuItemCount !==
     expectedProjectMenuItemCount ||
+  manifest.sidebarObservation?.footerVoiceControlCount !== 1 ||
+  manifest.sidebarObservation?.footerHelpControlCount !== 1 ||
+  manifest.sidebarObservation?.helpMenuIconCount !== 9 ||
   manifest.sidebarObservation?.helpMenuItemCount !== 8 ||
+  manifest.sidebarObservation?.helpMenu?.iconCount !== 9 ||
   manifest.sidebarObservation?.accountMenu?.itemCount !== 6 ||
-  manifest.sidebarObservation?.accountMenu?.iconCount !== 6 ||
+  manifest.sidebarObservation?.accountMenu?.iconCount !== 5 ||
   manifest.sidebarObservation?.accountMenu?.imageCount !== 1 ||
   manifest.sidebarObservation?.accountMenu?.separatorCount !== 0 ||
   manifest.sidebarObservation?.accountMenu?.focusReturned !== true ||

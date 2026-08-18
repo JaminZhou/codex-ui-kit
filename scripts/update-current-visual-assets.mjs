@@ -1,6 +1,7 @@
 import { createHash } from "node:crypto";
 import { execFileSync } from "node:child_process";
-import { readFileSync, writeFileSync } from "node:fs";
+import { readFileSync, realpathSync, writeFileSync } from "node:fs";
+import { dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { sanitizeVisualAssetIcon } from "./visual-asset-contract.mjs";
 import {
@@ -11,6 +12,10 @@ import {
 const write = process.argv.includes("--write");
 const hooksOnly = process.argv.includes("--hooks-only");
 const threadOnly = process.argv.includes("--thread-only");
+const includeThreadCapture =
+  !threadOnly && process.env.CODEX_VISUAL_ASSET_INCLUDE_THREAD === "1";
+const conditionalCapturePath =
+  !threadOnly && process.env.CODEX_VISUAL_ASSET_CONDITIONAL_CAPTURE;
 const manifestPath = fileURLToPath(
   new URL("../research/visual-assets.json", import.meta.url),
 );
@@ -231,12 +236,6 @@ const promotionSpecs = new Map([
   ],
   ...[
     [
-      "thread-header-new-chat",
-      null,
-      "one visible unlabeled 16px current-thread titlebar control selected structurally after Forward",
-      "titlebar",
-    ],
-    [
       "thread-header-project",
       null,
       "one visible ownerless 16px current-thread project glyph selected structurally inside the titlebar",
@@ -250,8 +249,8 @@ const promotionSpecs = new Map([
       "titlebar",
     ],
     [
-      "thread-header-pinned-summary",
-      "Toggle pinned summary",
+      "thread-header-summary",
+      "Toggle summary",
       null,
       "titlebar",
     ],
@@ -271,8 +270,8 @@ const promotionSpecs = new Map([
     ["thread-assistant-good", "Good response", null, "conversation"],
     ["thread-assistant-bad", "Bad response", null, "conversation"],
     [
-      "thread-assistant-continue",
-      "Continue in new chat from here",
+      "thread-assistant-fork",
+      "Fork chat from here",
       null,
       "conversation",
     ],
@@ -315,6 +314,16 @@ const promotionSpecs = new Map([
       region: "sidebar-primary",
       retainExistingWhenAbsentOnSameFingerprint: true,
       semanticId: "sidebar-activity",
+    },
+  ],
+  [
+    "sidebar-activity-attention",
+    {
+      ownerAriaLabel: "View activity, needs attention",
+      ownerEvidence:
+        "current unread Activity control selected by its exact accessible label in a supplemental same-fingerprint capture",
+      region: "sidebar-primary",
+      semanticId: "sidebar-activity-attention",
     },
   ],
   [
@@ -423,6 +432,16 @@ const promotionSpecs = new Map([
       semanticId: "sidebar-help",
     },
   ],
+  [
+    "sidebar-voice",
+    {
+      ownerAriaLabel: "Start new voice chat",
+      ownerEvidence:
+        "current sidebar-footer Voice control selected by its exact accessible label and region",
+      region: "sidebar-footer",
+      semanticId: "sidebar-voice",
+    },
+  ],
   ...[
     "unpin",
     "reveal",
@@ -478,9 +497,18 @@ const promotionSpecs = new Map([
       semanticId: `sidebar-help-menu-${name}`,
     },
   ]),
+  [
+    "sidebar-help-menu-changelog-external",
+    {
+      ownerAriaLabel: null,
+      ownerEvidence:
+        "trailing external-link icon on the current Full changelog Help-menu row",
+      region: "sidebar-help-menu",
+      semanticId: "sidebar-help-menu-changelog-external",
+    },
+  ],
   ...[
     "usage",
-    "usage-chevron",
     "pet",
     "invite",
     "settings",
@@ -583,37 +611,139 @@ const promotionSpecs = new Map([
 ]);
 
 const manifest = JSON.parse(readFileSync(manifestPath, "utf8"));
-const capture = JSON.parse(
-  execFileSync(process.execPath, [capturePath], {
-    encoding: "utf8",
-    env: {
-      ...process.env,
-      ...(threadOnly ? { CODEX_VISUAL_ASSET_THREAD_ONLY: "1" } : {}),
-    },
-    maxBuffer: 64 * 1024 * 1024,
-  }),
-);
+const runCapture = (captureThreadOnly) =>
+  JSON.parse(
+    execFileSync(process.execPath, [capturePath], {
+      encoding: "utf8",
+      env: {
+        ...process.env,
+        ...(captureThreadOnly
+          ? { CODEX_VISUAL_ASSET_THREAD_ONLY: "1" }
+          : {}),
+      },
+      maxBuffer: 64 * 1024 * 1024,
+    }),
+  );
+const supplementalThreadCapture = includeThreadCapture
+  ? runCapture(true)
+  : null;
+const capture = runCapture(threadOnly);
+if (conditionalCapturePath) {
+  const normalizedProfile = realpathSync(
+    process.env.CODEX_VISUAL_ASSET_PROFILE,
+  );
+  const normalizedConditionalCapture = realpathSync(conditionalCapturePath);
+  if (dirname(normalizedConditionalCapture) !== normalizedProfile) {
+    throw new Error(
+      "The conditional visual capture must be a direct child of the isolated profile.",
+    );
+  }
+  const conditionalCapture = JSON.parse(
+    readFileSync(normalizedConditionalCapture, "utf8"),
+  );
+  if (
+    conditionalCapture.captureMode !== "full" ||
+    conditionalCapture.sidebarObservation?.projectMenuHasMarkAllAsRead !==
+      true ||
+    canonicalize(conditionalCapture.baselineContext) !==
+      canonicalize(capture.baselineContext)
+  ) {
+    throw new Error(
+      "Conditional visual capture must prove the same exact unread current-build context.",
+    );
+  }
+  for (const id of [
+    "sidebar-activity-attention",
+    "sidebar-project-menu-mark-read",
+  ]) {
+    const observed = conditionalCapture.icons.filter(
+      (icon) => icon.owner?.semanticId === id,
+    );
+    if (observed.length !== 1) {
+      throw new Error(
+        `Expected one conditional current capture for ${id}, received ${observed.length}.`,
+      );
+    }
+    if (
+      capture.icons.some((icon) => icon.owner?.semanticId === id)
+    ) {
+      throw new Error(
+        `Conditional current capture for ${id} overlaps the neutral capture.`,
+      );
+    }
+    capture.icons.push(observed[0]);
+  }
+}
+if (supplementalThreadCapture) {
+  if (
+    supplementalThreadCapture.captureMode !== "completed-thread" ||
+    supplementalThreadCapture.threadObservation
+      ?.structuralNewChatIconCount !== 0 ||
+    canonicalize(supplementalThreadCapture.baselineContext) !==
+      canonicalize(capture.baselineContext)
+  ) {
+    throw new Error(
+      "Supplemental current-thread capture must prove the same exact completed-thread build context.",
+    );
+  }
+  const supplementalIds = new Set([
+    "thread-header-project",
+    "thread-header-actions",
+    "thread-header-open-in-chevron",
+    "thread-header-summary",
+    "thread-header-bottom-panel",
+    "thread-header-side-panel",
+    "thread-assistant-copy",
+    "thread-assistant-good",
+    "thread-assistant-bad",
+    "thread-assistant-fork",
+    "thread-command-terminal",
+  ]);
+  for (const id of supplementalIds) {
+    const observed = supplementalThreadCapture.icons.filter(
+      (icon) => icon.owner?.semanticId === id,
+    );
+    if (observed.length !== 1) {
+      throw new Error(
+        `Expected one supplemental current-thread capture for ${id}, received ${observed.length}.`,
+      );
+    }
+    const existingGlobal = capture.icons.filter(
+      (icon) => icon.owner?.semanticId === id,
+    );
+    if (existingGlobal.length > 1) {
+      throw new Error(
+        `Expected at most one global current capture for ${id}, received ${existingGlobal.length}.`,
+      );
+    }
+    if (existingGlobal.length === 0) capture.icons.push(observed[0]);
+  }
+}
 capture.icons.forEach((icon, index) =>
   sanitizeVisualAssetIcon(icon, `capture.icons[${index}]`),
 );
 if (threadOnly) {
   const targetIds = [
     "composer-send",
-    "thread-header-new-chat",
     "thread-header-project",
     "thread-header-actions",
     "thread-header-open-in-chevron",
-    "thread-header-pinned-summary",
+    "thread-header-summary",
     "thread-header-bottom-panel",
     "thread-header-side-panel",
     "thread-assistant-copy",
     "thread-assistant-good",
     "thread-assistant-bad",
-    "thread-assistant-continue",
+    "thread-assistant-fork",
     "thread-command-terminal",
   ];
   if (capture.captureMode !== "completed-thread") {
     throw new Error("Targeted current-thread capture mode was not proven.");
+  }
+  if (capture.threadObservation?.structuralNewChatIconCount !== 0) {
+    throw new Error(
+      "Targeted current-thread capture must prove the removed header New chat control remains absent.",
+    );
   }
   const rasterAssets = capture.rasterAssets;
   if (
@@ -857,7 +987,8 @@ if (
   capture.composerObservation?.exactSemanticIconCount !== 8 ||
   canonicalize(capturedComposerRequiredIds) !==
     canonicalize(expectedComposerIds) ||
-  capturedComposerTerminalIds.length !== 1
+  canonicalize(capturedComposerTerminalIds) !==
+    canonicalize(["composer-send", "composer-voice"])
 ) {
   throw new Error(
     `Unexpected current Composer capture: ${canonicalize({
@@ -876,8 +1007,14 @@ if (
   capture.sidebarObservation?.projectMenuItemCount !==
     expectedProjectMenuItemCount ||
   capture.sidebarObservation?.helpMenuItemCount !== 8 ||
+  capture.sidebarObservation?.helpMenuIconCount !== 9 ||
+  capture.sidebarObservation?.helpMenu?.menuRect?.width !== 320 ||
+  Math.abs(
+    (capture.sidebarObservation?.helpMenu?.menuRect?.height ?? 0) - 272.06,
+  ) > 1 ||
+  capture.sidebarObservation?.footerVoiceControlCount !== 1 ||
   capture.sidebarObservation?.accountMenu?.itemCount !== 6 ||
-  capture.sidebarObservation?.accountMenu?.iconCount !== 6 ||
+  capture.sidebarObservation?.accountMenu?.iconCount !== 5 ||
   capture.sidebarObservation?.accountMenu?.imageCount !== 1 ||
   capture.sidebarObservation?.accountMenu?.separatorCount !== 0 ||
   capture.sidebarObservation?.accountMenu?.focusReturned !== true ||

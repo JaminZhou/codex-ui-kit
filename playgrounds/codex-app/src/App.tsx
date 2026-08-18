@@ -186,6 +186,7 @@ type DemoView =
 
 type SidebarGlyphName =
   | "activity"
+  | "activity-attention"
   | "automation"
   | "archive-current"
   | "folder"
@@ -216,6 +217,9 @@ type SummaryGlyphName =
 function SidebarGlyph({ name }: { name: SidebarGlyphName }) {
   if (name === "activity") {
     return <CurrentBuildIcon name="sidebar-activity" />;
+  }
+  if (name === "activity-attention") {
+    return <CurrentBuildIcon name="sidebar-activity-attention" />;
   }
   if (name === "new") {
     return <CurrentBuildIcon name="sidebar-new-chat" />;
@@ -1159,10 +1163,10 @@ function statusLabel(state: DemoProtocolState) {
 }
 
 function McpResponseActions({
-  includeShare = true,
+  includeFork = true,
   label = "MCP response actions",
 }: {
-  includeShare?: boolean;
+  includeFork?: boolean;
   label?: string;
 }) {
   return (
@@ -1172,26 +1176,17 @@ function McpResponseActions({
       role="toolbar"
     >
       <button aria-label="Copy response" type="button">
-        <svg aria-hidden="true" viewBox="0 0 16 16">
-          <rect height="9" rx="1.5" width="8" x="5" y="2" />
-          <path d="M10.5 13.5h-7a1 1 0 0 1-1-1v-7" />
-        </svg>
+        <CurrentBuildIcon name="thread-assistant-copy" />
       </button>
       <button aria-label="Good response" type="button">
-        <svg aria-hidden="true" viewBox="0 0 16 16">
-          <path d="M5.2 13H3.5a1 1 0 0 1-1-1V7.5a1 1 0 0 1 1-1h1.7M5.2 13V6.5L8 2.8c.6-.8 1.8-.3 1.7.7l-.3 2h2.5a1.5 1.5 0 0 1 1.4 2L11.8 12a1.5 1.5 0 0 1-1.4 1H5.2Z" />
-        </svg>
+        <CurrentBuildIcon name="thread-assistant-good" />
       </button>
       <button aria-label="Bad response" type="button">
-        <svg aria-hidden="true" viewBox="0 0 16 16">
-          <path d="M5.2 3H3.5a1 1 0 0 0-1 1v4.5a1 1 0 0 0 1 1h1.7M5.2 3v6.5L8 13.2c.6.8 1.8.3 1.7-.7l-.3-2h2.5a1.5 1.5 0 0 0 1.4-2L11.8 4a1.5 1.5 0 0 0-1.4-1H5.2Z" />
-        </svg>
+        <CurrentBuildIcon name="thread-assistant-bad" />
       </button>
-      {includeShare ? (
-        <button aria-label="Share response" type="button">
-          <svg aria-hidden="true" viewBox="0 0 16 16">
-            <path d="M5 3H3.5a1 1 0 0 0-1 1v8.5a1 1 0 0 0 1 1H12a1 1 0 0 0 1-1V11M8 8l5.5-5.5M9.5 2.5h4v4" />
-          </svg>
+      {includeFork ? (
+        <button aria-label="Fork chat from here" type="button">
+          <CurrentBuildIcon name="thread-assistant-fork" />
         </button>
       ) : null}
     </span>
@@ -3637,14 +3632,12 @@ export function App() {
                 <span />
               </div>
               <MenuItem
-                endIcon={
-                  <CurrentBuildIcon name="sidebar-account-menu-usage-chevron" />
-                }
+                shortcut="94% left"
                 startIcon={
                   <CurrentBuildIcon name="sidebar-account-menu-usage" />
                 }
               >
-                Usage remaining
+                Usage
               </MenuItem>
               <MenuItem
                 startIcon={
@@ -3679,55 +3672,67 @@ export function App() {
           )}
           actions={
             currentSidebarComposition ? (
-              <Menu
-                align="start"
-                className="demo-current-sidebar-menu demo-current-sidebar-help-menu"
-                label="Help menu"
-                onOpenChange={(open) => {
-                  setCurrentSidebarHelpMenuOpen(open);
-                  if (open) setCurrentSidebarAccountMenuOpen(false);
-                }}
-                open={currentSidebarHelpMenuOpen}
-                side="top"
-                sideOffset={7}
-                style={{ width: 200 }}
-                trigger={
-                  <button aria-label="Open help menu" type="button">
-                    <SidebarGlyph name="help-current" />
-                  </button>
-                }
-                width="auto"
-              >
+              <>
+                <button
+                  aria-label="Start new voice chat"
+                  className="demo-current-sidebar-voice"
+                  type="button"
+                >
+                  <CurrentBuildIcon name="sidebar-voice" />
+                  <span>Voice</span>
+                </button>
+                <Menu
+                  align="start"
+                  className="demo-current-sidebar-menu demo-current-sidebar-help-menu"
+                  label="Help menu"
+                  onOpenChange={(open) => {
+                    setCurrentSidebarHelpMenuOpen(open);
+                    if (open) setCurrentSidebarAccountMenuOpen(false);
+                  }}
+                  open={currentSidebarHelpMenuOpen}
+                  side="top"
+                  sideOffset={7}
+                  style={{ width: 320 }}
+                  trigger={
+                    <button aria-label="Open help menu" type="button">
+                      <SidebarGlyph name="help-current" />
+                    </button>
+                  }
+                  width="auto"
+                >
                 <div className="demo-current-sidebar-help-menu__heading">
                   What&apos;s new
                 </div>
                 <div className="demo-current-sidebar-help-menu__releases">
                   <MenuItem
-                    shortcut="7/30"
+                    shortcut="13 Aug"
                     startIcon={
                       <CurrentBuildIcon name="sidebar-help-menu-release-note" />
                     }
                   >
-                    Browser upgrades, multi-repository review, and image editing
+                    Computer History
                   </MenuItem>
                   <MenuItem
-                    shortcut="7/23"
+                    shortcut="11 Aug"
                     startIcon={
                       <CurrentBuildIcon name="sidebar-help-menu-release-note" />
                     }
                   >
-                    ChatGPT Voice and multi-folder projects
+                    Linux desktop preview and agent imports
                   </MenuItem>
                   <MenuItem
-                    shortcut="7/9"
+                    shortcut="31 Jul"
                     startIcon={
                       <CurrentBuildIcon name="sidebar-help-menu-release-note" />
                     }
                   >
-                    Codex joins the ChatGPT desktop app
+                    Record &amp; Replay expands to the EU, UK, and Switzerland
                   </MenuItem>
                 </div>
                 <MenuItem
+                  endIcon={
+                    <CurrentBuildIcon name="sidebar-help-menu-changelog-external" />
+                  }
                   startIcon={
                     <CurrentBuildIcon name="sidebar-help-menu-changelog" />
                   }
@@ -3763,7 +3768,8 @@ export function App() {
                 >
                   Help
                 </MenuItem>
-              </Menu>
+                </Menu>
+              </>
             ) : (
               <button aria-label="Open settings" type="button">
                 <SidebarGlyph name="settings" />
@@ -3797,7 +3803,7 @@ export function App() {
                 className="demo-sidebar-header-action"
                 type="button"
               >
-                <SidebarGlyph name="activity" />
+                <SidebarGlyph name="activity-attention" />
               </button>
             </span>
           </div>
@@ -4438,6 +4444,9 @@ export function App() {
               <ThreadSummaryPopover
                 onOpenChange={setThreadSummaryOpen}
                 open={threadSummaryOpen}
+                triggerIcon={
+                  <CurrentBuildIcon name="thread-header-summary" />
+                }
               >
                 {isCurrentSubagentReplay ? (
                   <ThreadSummaryPanel className="demo-subagent-summary-panel">
@@ -6435,7 +6444,7 @@ export function App() {
           <AgentMessage
             actions={
               <McpResponseActions
-                includeShare={false}
+                includeFork={false}
                 label="Persisted response actions"
               />
             }
@@ -6452,7 +6461,7 @@ export function App() {
               <AgentMessage
                 actions={
                   <McpResponseActions
-                    includeShare={false}
+                    includeFork={false}
                     label="Missing worktree response actions"
                   />
                 }
@@ -6468,7 +6477,7 @@ export function App() {
               <AgentMessage
                 actions={
                   <McpResponseActions
-                    includeShare={false}
+                    includeFork={false}
                     label="Model-only response actions"
                   />
                 }
@@ -7098,7 +7107,7 @@ export function App() {
               <AgentMessage
                 actions={
                   <McpResponseActions
-                    includeShare={false}
+                    includeFork={false}
                     label="Subagent response actions"
                   />
                 }
@@ -9648,6 +9657,7 @@ export function App() {
           activeFrame !== "pr-compact-detail"
         }
         responsivePanelContinuityKey={`${mode}:${view}:${scenarioId}`}
+        responsiveSidebarContinuity={false}
         sidePanel={
           view === "pull-request"
             ? pullRequestPanel
@@ -9715,7 +9725,13 @@ export function App() {
               : undefined
         }
         sidebar={sidebar}
-        sidebarMinMainWidth={subagentPanelSelected ? 220 : undefined}
+        sidebarMinMainWidth={
+          subagentPanelSelected
+            ? 220
+            : currentSidebarComposition
+              ? 240
+              : undefined
+        }
         sidebarOpen={sidebarOpen}
         sidebarResizable
         windowChrome={
