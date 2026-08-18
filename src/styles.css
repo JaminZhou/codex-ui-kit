@@ -3077,6 +3077,11 @@
   padding-inline-end: calc(var(--codex-ui-spacing) * 8);
 }
 
+.codex-ui-app-sidebar__item-row[data-secondary-status]:not([data-has-actions])
+  > .codex-ui-app-sidebar__item {
+  padding-inline-end: calc(var(--codex-ui-spacing) * 15);
+}
+
 .codex-ui-app-sidebar__item:hover,
 .codex-ui-app-sidebar__item:focus-visible,
 .codex-ui-app-sidebar__item[data-selected] {
@@ -3159,7 +3164,8 @@
   line-height: var(--codex-ui-line-height-xs);
 }
 
-.codex-ui-app-sidebar__item-status {
+.codex-ui-app-sidebar__item-status,
+.codex-ui-app-sidebar__item-secondary-status {
   align-items: center;
   color: color-mix(in srgb, var(--codex-ui-text) 70%, transparent);
   display: inline-flex;
@@ -3168,11 +3174,16 @@
   height: 1.25rem;
   justify-content: center;
   justify-self: end;
-  margin-inline: 0 var(--codex-ui-spacing);
+  margin-inline: 0 calc(var(--codex-ui-spacing) * 2);
   position: relative;
   transition: opacity var(--codex-ui-transition-fast);
   width: 1.25rem;
   z-index: 1;
+}
+
+.codex-ui-app-sidebar__item-row[data-secondary-status]
+  > .codex-ui-app-sidebar__item-status {
+  transform: translateX(-1.75rem);
 }
 
 .codex-ui-app-sidebar__item-status-spinner {
@@ -3208,7 +3219,7 @@
   display: inline-flex;
   height: 0.875rem;
   inset-block-start: 0.5rem;
-  inset-inline-end: 2.1875rem;
+  inset-inline-end: 2.4375rem;
   pointer-events: none;
   position: absolute;
   transition: opacity var(--codex-ui-transition-fast);
@@ -3236,7 +3247,12 @@
 
 .codex-ui-app-sidebar__item-row[data-worktree-status="restored"][data-status="idle"]
   .codex-ui-app-sidebar__item-worktree-indicator {
-  inset-inline-end: 0.4375rem;
+  inset-inline-end: 0.6875rem;
+}
+
+.codex-ui-app-sidebar__item-row[data-secondary-status]
+  .codex-ui-app-sidebar__item-worktree-indicator {
+  inset-inline-end: 4.1875rem;
 }
 
 .codex-ui-app-sidebar__item-row[data-has-actions]:hover
@@ -3245,6 +3261,12 @@
   .codex-ui-app-sidebar__item-status,
 .codex-ui-app-sidebar__item-row[data-has-actions][data-selected][data-status="idle"]
   .codex-ui-app-sidebar__item-status,
+.codex-ui-app-sidebar__item-row[data-has-actions]:hover
+  .codex-ui-app-sidebar__item-secondary-status,
+.codex-ui-app-sidebar__item-row[data-has-actions]:focus-within
+  .codex-ui-app-sidebar__item-secondary-status,
+.codex-ui-app-sidebar__item-row[data-has-actions][data-selected][data-status="idle"]
+  .codex-ui-app-sidebar__item-secondary-status,
 .codex-ui-app-sidebar__item-row[data-has-actions]:hover
   .codex-ui-app-sidebar__item-worktree-indicator,
 .codex-ui-app-sidebar__item-row[data-has-actions]:focus-within

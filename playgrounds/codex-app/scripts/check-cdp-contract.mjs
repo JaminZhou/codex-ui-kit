@@ -5452,7 +5452,7 @@ for (const scene of selectedScenes) {
                 '.codex-ui-app-sidebar__item-status[data-status="running"]',
               ).length,
               unread: sidebar.querySelectorAll(
-                '.codex-ui-app-sidebar__item-status[data-status="unread"]',
+                '.codex-ui-app-sidebar__item-status[data-status="unread"], .codex-ui-app-sidebar__item-secondary-status[data-status="unread"]',
               ).length,
               waiting: sidebar.querySelectorAll(
                 '.codex-ui-app-sidebar__item-status[data-status="waiting"]',
@@ -5478,8 +5478,16 @@ for (const scene of selectedScenes) {
                 const error = status?.querySelector(
                   ".codex-ui-app-sidebar__item-status-error",
                 );
+                const secondaryStatus = row?.querySelector(
+                  ".codex-ui-app-sidebar__item-secondary-status",
+                );
+                const secondaryAttention = secondaryStatus?.querySelector(
+                  ".codex-ui-app-sidebar__item-status-attention",
+                );
                 const rowBounds = row?.getBoundingClientRect();
                 const statusBounds = status?.getBoundingClientRect();
+                const secondaryStatusBounds =
+                  secondaryStatus?.getBoundingClientRect();
                 return {
                   animationDuration: spinner
                     ? getComputedStyle(spinner).animationDuration
@@ -5502,6 +5510,23 @@ for (const scene of selectedScenes) {
                     rowBounds && statusBounds
                       ? rowBounds.right - statusBounds.right
                       : null,
+                  secondaryAttentionColor: secondaryAttention
+                    ? getComputedStyle(secondaryAttention).backgroundColor
+                    : null,
+                  secondaryAttentionRect: secondaryAttention
+                    ? rect(secondaryAttention)
+                    : null,
+                  secondaryRightInset:
+                    rowBounds && secondaryStatusBounds
+                      ? rowBounds.right - secondaryStatusBounds.right
+                      : null,
+                  secondaryStatus:
+                    secondaryStatus?.getAttribute("data-status") ?? null,
+                  secondaryStatusRect: secondaryStatus
+                    ? rect(secondaryStatus)
+                    : null,
+                  secondaryVisualStatus:
+                    secondaryStatus?.getAttribute("data-visual-status") ?? null,
                   status: status?.getAttribute("data-status"),
                   statusRect: status ? rect(status) : null,
                   visualStatus: status?.getAttribute("data-visual-status"),
@@ -5521,6 +5546,9 @@ for (const scene of selectedScenes) {
                 );
                 const branch = row?.querySelector(
                   ".codex-ui-app-sidebar__item-worktree-indicator",
+                );
+                const secondaryStatus = row?.querySelector(
+                  ".codex-ui-app-sidebar__item-secondary-status",
                 );
                 const description = row?.querySelector(
                   ".codex-ui-app-sidebar__item-worktree-description",
@@ -5543,6 +5571,10 @@ for (const scene of selectedScenes) {
                   itemPaddingInlineEnd: getComputedStyle(item).paddingInlineEnd,
                   status: item.getAttribute("data-status"),
                   statusLabel: status?.getAttribute("aria-label"),
+                  secondaryStatus:
+                    secondaryStatus?.getAttribute("data-status") ?? null,
+                  secondaryVisualStatus:
+                    secondaryStatus?.getAttribute("data-visual-status") ?? null,
                   visualStatus: status?.getAttribute("data-visual-status"),
                   worktreeDescription:
                     description?.textContent?.trim() || null,
@@ -7354,11 +7386,18 @@ for (const scene of selectedScenes) {
         ["design-assets:2", "error", "error"],
       ];
       const expectedWorktreeStatuses = [
-        ["codex-ui-kit:1", "queued", "queued", "loading", null],
-        ["design-assets:0", "creating", "loading", "loading", null],
-        ["design-assets:1", "setting-up", "loading", "loading", null],
-        ["design-assets:2", "failed", "error", "error", null],
-        ["protocol-client:0", "restored", "idle", null, "Worktree is restored"],
+        ["codex-ui-kit:1", "queued", "queued", "loading", null, null],
+        ["design-assets:0", "creating", "loading", "loading", null, null],
+        ["design-assets:1", "setting-up", "loading", "loading", null, null],
+        ["design-assets:2", "failed", "error", "error", "unread", null],
+        [
+          "protocol-client:0",
+          "restored",
+          "idle",
+          null,
+          null,
+          "Worktree is restored",
+        ],
       ];
       const actualStatuses = contract.sidebar.statusFixtures.map(
         ({ fixture, status, visualStatus }) => [
@@ -7370,6 +7409,7 @@ for (const scene of selectedScenes) {
       const actualWorktreeStatuses = contract.sidebar.worktreeFixtures.map(
         ({
           fixture,
+          secondaryStatus,
           status,
           visualStatus,
           worktreeDescription,
@@ -7379,6 +7419,7 @@ for (const scene of selectedScenes) {
           worktreeStatus,
           status,
           visualStatus ?? null,
+          secondaryStatus,
           worktreeDescription,
         ],
       );
@@ -7387,7 +7428,8 @@ for (const scene of selectedScenes) {
           fixture.rowRect?.height !== 30 ||
           fixture.statusRect?.width !== 20 ||
           fixture.statusRect?.height !== 20 ||
-          fixture.rightInset !== 4 ||
+          fixture.rightInset !==
+            (fixture.fixture === "design-assets:2" ? 36 : 8) ||
           (fixture.visualStatus === "attention" &&
             (fixture.attentionRect?.width !== 8 ||
               fixture.attentionRect?.height !== 8 ||
@@ -7398,7 +7440,16 @@ for (const scene of selectedScenes) {
           (fixture.visualStatus === "loading" &&
             (fixture.animationDuration !== "1e-06s" ||
               fixture.animationName !== "none" ||
-              fixture.pathData.length !== 2)),
+              fixture.pathData.length !== 2)) ||
+          (fixture.fixture === "design-assets:2" &&
+            (fixture.secondaryStatus !== "unread" ||
+              fixture.secondaryVisualStatus !== "attention" ||
+              fixture.secondaryStatusRect?.width !== 20 ||
+              fixture.secondaryStatusRect?.height !== 20 ||
+              fixture.secondaryRightInset !== 8 ||
+              fixture.secondaryAttentionRect?.width !== 8 ||
+              fixture.secondaryAttentionRect?.height !== 8 ||
+              fixture.secondaryAttentionColor !== "rgb(131, 195, 255)")),
       );
       const worktreeGeometryInvalid =
         contract.sidebar.worktreeFixtures.some(
@@ -7406,7 +7457,11 @@ for (const scene of selectedScenes) {
             fixture.branchRect?.width !== 14 ||
             fixture.branchRect?.height !== 14 ||
             fixture.branchRightInset !==
-              (fixture.worktreeStatus === "restored" ? 7 : 35) ||
+              (fixture.worktreeStatus === "restored"
+                ? 11
+                : fixture.secondaryStatus
+                  ? 67
+                  : 39) ||
             (fixture.worktreeStatus === "restored" &&
               (fixture.hasActions ||
                 fixture.itemPaddingInlineEnd !== "32px" ||

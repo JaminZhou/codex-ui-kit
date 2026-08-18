@@ -1666,6 +1666,8 @@ function currentSidebarTaskStatus(projectId: string, taskIndex: number) {
       return "waiting" as const;
     case "codex-ui-kit:0":
       return "unread" as const;
+    case "design-assets:2":
+      return "unread" as const;
     default:
       return "idle" as const;
   }
