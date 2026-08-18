@@ -30,9 +30,13 @@ assert(
   packageJson.sideEffects?.includes("**/*.css"),
   "CSS must remain marked as a side effect",
 );
+const highlightJsVersion = packageJson.dependencies?.["highlight.js"];
 assert(
-  packageJson.dependencies?.["highlight.js"] === "11.11.1",
-  "highlight.js must remain a pinned runtime dependency",
+  typeof highlightJsVersion === "string" &&
+    /^(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)(?:-[0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*)?(?:\+[0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*)?$/.test(
+      highlightJsVersion,
+    ),
+  "highlight.js must remain an exact pinned runtime dependency",
 );
 
 function collectExportTargets(value) {
