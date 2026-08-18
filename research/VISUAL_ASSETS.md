@@ -117,10 +117,12 @@ theme, and viewport match the primary capture. It verifies every group and
 call-row MCP glyph, chevron, reconnect glyph, row geometry, and interaction
 state, then promotes the new-build manifest in one write. A stale, external,
 overlapping, incomplete, or differently rendered supplement fails closed.
+Every updater write also regenerates the current-thread replay subset from the
+same in-memory manifest, so MCP source hashes and styles cannot remain stale.
 
 The targeted updater proves the `completed-thread` capture mode and exact
 baseline context before promoting Send, four assistant actions, and seven
-thread-header primitives. The generated 21-icon demo subset strips non-paint
+thread-header primitives. The generated 24-icon demo subset strips non-paint
 computed properties while retaining each source SHA-256; it is checked on
 every research run and emitted as a separate demo chunk. The same path captures
 the visible VS Code integration PNG into

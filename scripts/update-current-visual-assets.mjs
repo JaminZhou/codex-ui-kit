@@ -13,6 +13,7 @@ import {
   currentMcpVisualAssetIds,
   mergeSupplementalCurrentMcpCapture,
 } from "./visual-asset-mcp-contract.mjs";
+import { serializeCurrentThreadVisualAssetSubset } from "./current-thread-visual-assets.mjs";
 
 const write = process.argv.includes("--write");
 const hooksOnly = process.argv.includes("--hooks-only");
@@ -37,6 +38,9 @@ const manifestPath = fileURLToPath(
 );
 const rasterManifestPath = fileURLToPath(
   new URL("../research/visual-raster-assets.json", import.meta.url),
+);
+const currentThreadSubsetPath = fileURLToPath(
+  new URL("../demo/current-thread-visual-assets.json", import.meta.url),
 );
 const capturePath = fileURLToPath(
   new URL("./capture-current-visual-assets.mjs", import.meta.url),
@@ -661,6 +665,13 @@ const promotionSpecs = new Map([
 ]);
 
 const manifest = JSON.parse(readFileSync(manifestPath, "utf8"));
+function writeManifestAndCurrentThreadSubset(output, message) {
+  const subsetOutput = serializeCurrentThreadVisualAssetSubset(manifest);
+  writeFileSync(manifestPath, output);
+  writeFileSync(currentThreadSubsetPath, subsetOutput);
+  console.log(message);
+  console.log(`Updated ${currentThreadSubsetPath}`);
+}
 const runCapture = (captureThreadOnly, captureMcpOnly = false) =>
   JSON.parse(
     execFileSync(process.execPath, [capturePath], {
@@ -885,8 +896,10 @@ if (mcpOnly) {
   );
   const output = `${JSON.stringify(manifest, null, 2)}\n`;
   if (write) {
-    writeFileSync(manifestPath, output);
-    console.log(`Updated ${manifestPath} with current MCP assets`);
+    writeManifestAndCurrentThreadSubset(
+      output,
+      `Updated ${manifestPath} with current MCP assets`,
+    );
   } else {
     process.stdout.write(output);
   }
@@ -1035,9 +1048,11 @@ if (threadOnly) {
     2,
   )}\n`;
   if (write) {
-    writeFileSync(manifestPath, output);
+    writeManifestAndCurrentThreadSubset(
+      output,
+      `Updated ${manifestPath} with current-thread assets`,
+    );
     writeFileSync(rasterManifestPath, rasterOutput);
-    console.log(`Updated ${manifestPath} with current-thread assets`);
   } else {
     process.stdout.write(output);
   }
@@ -1126,8 +1141,10 @@ if (hooksOnly) {
   ];
   const output = `${JSON.stringify(manifest, null, 2)}\n`;
   if (write) {
-    writeFileSync(manifestPath, output);
-    console.log(`Updated ${manifestPath} with current Hooks assets`);
+    writeManifestAndCurrentThreadSubset(
+      output,
+      `Updated ${manifestPath} with current Hooks assets`,
+    );
   } else {
     process.stdout.write(output);
   }
@@ -1457,8 +1474,7 @@ manifest.policy.globalPixelParityBlocker =
 
 const output = `${JSON.stringify(manifest, null, 2)}\n`;
 if (write) {
-  writeFileSync(manifestPath, output);
-  console.log(`Updated ${manifestPath}`);
+  writeManifestAndCurrentThreadSubset(output, `Updated ${manifestPath}`);
 } else {
   process.stdout.write(output);
 }
