@@ -12597,8 +12597,9 @@ button.codex-ui-generated-image-gallery__image {
     color: var(--codex-ui-text-secondary);
   }
 
+  .codex-ui-activity__button-chevron,
   .codex-ui-activity__button-chevron svg {
-    transition: none;
+    transition: none !important;
   }
 
   .codex-ui-thread-loading__spinner,

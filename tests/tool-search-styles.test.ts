@@ -68,6 +68,9 @@ describe("tool and search visual contract", () => {
     expect(styles).toMatch(
       /@media \(prefers-reduced-motion: reduce\) \{[\s\S]*?\.codex-ui-tool-call[\s\S]*?\.codex-ui-activity__disclosure\[data-open\][\s\S]*?animation: none/,
     );
+    expect(styles).toMatch(
+      /@media \(prefers-reduced-motion: reduce\) \{[\s\S]*?\.codex-ui-activity__button-chevron,[\s\S]*?\.codex-ui-activity__button-chevron svg \{[\s\S]*?transition: none !important/,
+    );
     const activePulse = styles.match(
       /@keyframes codex-ui-tool-activity-pulse \{([\s\S]*?)\n\}/,
     )?.[1];
