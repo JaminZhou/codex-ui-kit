@@ -14,14 +14,19 @@ exit gates; it does not replace the inventory.
   Desktop `26.810.52044` (`6662`). Unsampled earlier-build surfaces remain
   previous-build regression evidence rather than current verification.
 - The inventory contains 89 surface groups: 59 P0, 21 P1, and 9 P2.
-- 21 groups have current-build runtime evidence, 51 have previous-build-only
-  runtime evidence, and 17 have not been sampled.
-- The scoped `26.810.52044` refresh revalidates 92
+- 24 groups have current-build runtime evidence, 49 have previous-build-only
+  runtime evidence, and 16 have not been sampled.
+- The scoped `26.810.52044` refresh revalidates 95
   sidebar/menu/window-chrome/Composer/Settings/completed-thread icons against
   exact runtime evidence. It adds Voice and Activity-attention, widens Help to
   320px, removes the Account Usage chevron and thread-header New chat action,
   renames summary/Fork assets, and proves that a 720px resize keeps the sidebar
   visible before explicit Hide/Show.
+  The current MCP follow-up also re-reaches one Search → Fetch success, an
+  invalid-URL Fetch → Search → Fetch recovery, and a transient
+  `Reconnecting 2/5` row that completes in place. It promotes the exact MCP,
+  disclosure, and reconnect glyphs and restores current Browser/Electron/pixel
+  gates for all three rows without claiming the remaining MCP variants.
   Earlier hover/footer slices promoted More, Pin,
   Archive, and Help, confirms that Settings is absent from the sampled footer
   and that sampled project-task rows have no leading glyph. The Recents follow-up

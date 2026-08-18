@@ -18,6 +18,7 @@ export interface AgentActivityProps
   defaultOpen?: boolean;
   description?: ReactNode;
   detail?: ReactNode;
+  disclosureIcon?: ReactNode;
   disclosureIndicator?: boolean;
   disclosureMode?: "button" | "details" | "overlay-button";
   indicator?: ReactNode;
@@ -34,6 +35,7 @@ export function AgentActivity({
   defaultOpen = false,
   description,
   detail,
+  disclosureIcon,
   disclosureIndicator = false,
   disclosureMode = "details",
   indicator,
@@ -73,7 +75,16 @@ export function AgentActivity({
       aria-hidden="true"
       className="codex-ui-activity__button-chevron"
       data-visible={disclosureIndicator || resolvedOpen || undefined}
-    />
+    >
+      {disclosureIcon ?? (
+        <svg fill="none" height="20" viewBox="0 0 20 20" width="20">
+          <path
+            d="M7.52925 3.7793C7.75652 3.55203 8.10803 3.52383 8.36616 3.69434L8.47065 3.7793L14.2207 9.5293C14.4804 9.789 14.4804 10.211 14.2207 10.4707L8.47065 16.2207C8.21095 16.4804 7.78895 16.4804 7.52925 16.2207C7.26955 15.961 7.26955 15.539 7.52925 15.2793L12.8085 10L7.52925 4.7207L7.44429 4.61621C7.27378 4.35808 7.30198 4.00657 7.52925 3.7793Z"
+            fill="currentColor"
+          />
+        </svg>
+      )}
+    </span>
   );
 
   return (

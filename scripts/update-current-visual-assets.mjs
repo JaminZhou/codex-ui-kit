@@ -8,10 +8,27 @@ import {
   hasCurrentSidebarSettingsAbsenceEvidence,
   hasCurrentSidebarThreadAbsenceEvidence,
 } from "./visual-asset-sidebar-contract.mjs";
+import {
+  collectCurrentMcpVisualAssets,
+  currentMcpVisualAssetIds,
+  mergeSupplementalCurrentMcpCapture,
+} from "./visual-asset-mcp-contract.mjs";
+import { serializeCurrentThreadVisualAssetSubset } from "./current-thread-visual-assets.mjs";
 
 const write = process.argv.includes("--write");
 const hooksOnly = process.argv.includes("--hooks-only");
 const threadOnly = process.argv.includes("--thread-only");
+const mcpOnly = process.argv.includes("--mcp-only");
+if ([hooksOnly, threadOnly, mcpOnly].filter(Boolean).length > 1) {
+  throw new Error("Targeted current visual asset modes are mutually exclusive.");
+}
+const supplementalMcpCapturePath =
+  process.env.CODEX_VISUAL_ASSET_MCP_CAPTURE;
+if (supplementalMcpCapturePath && (hooksOnly || threadOnly || mcpOnly)) {
+  throw new Error(
+    "CODEX_VISUAL_ASSET_MCP_CAPTURE is available only during a full visual asset refresh.",
+  );
+}
 const includeThreadCapture =
   !threadOnly && process.env.CODEX_VISUAL_ASSET_INCLUDE_THREAD === "1";
 const conditionalCapturePath =
@@ -21,6 +38,9 @@ const manifestPath = fileURLToPath(
 );
 const rasterManifestPath = fileURLToPath(
   new URL("../research/visual-raster-assets.json", import.meta.url),
+);
+const currentThreadSubsetPath = fileURLToPath(
+  new URL("../demo/current-thread-visual-assets.json", import.meta.url),
 );
 const capturePath = fileURLToPath(
   new URL("./capture-current-visual-assets.mjs", import.meta.url),
@@ -291,6 +311,40 @@ const promotionSpecs = new Map([
       semanticId: id,
     },
   ]),
+  [
+    "thread-mcp-tool",
+    {
+      minimumCandidates: 3,
+      ownerAriaLabel: null,
+      ownerEvidence:
+        "current OpenAI Developer Docs integration and call-row glyph selected by exact completed group ownership",
+      region: "conversation",
+      retainExistingWhenAbsentOnSameFingerprint: true,
+      semanticId: "thread-mcp-tool",
+    },
+  ],
+  [
+    "thread-activity-chevron",
+    {
+      ownerAriaLabel: null,
+      ownerEvidence:
+        "current closed MCP call disclosure chevron selected by aria-labelledby ownership",
+      region: "conversation",
+      retainExistingWhenAbsentOnSameFingerprint: true,
+      semanticId: "thread-activity-chevron",
+    },
+  ],
+  [
+    "thread-reconnecting",
+    {
+      ownerAriaLabel: null,
+      ownerEvidence:
+        "current completed activity Reconnecting row selected structurally from a real recovered turn",
+      region: "conversation",
+      retainExistingWhenAbsentOnSameFingerprint: true,
+      semanticId: "thread-reconnecting",
+    },
+  ],
   [
     "sidebar-mode-chevron",
     {
@@ -611,7 +665,14 @@ const promotionSpecs = new Map([
 ]);
 
 const manifest = JSON.parse(readFileSync(manifestPath, "utf8"));
-const runCapture = (captureThreadOnly) =>
+function writeManifestAndCurrentThreadSubset(output, message) {
+  const subsetOutput = serializeCurrentThreadVisualAssetSubset(manifest);
+  writeFileSync(manifestPath, output);
+  writeFileSync(currentThreadSubsetPath, subsetOutput);
+  console.log(message);
+  console.log(`Updated ${currentThreadSubsetPath}`);
+}
+const runCapture = (captureThreadOnly, captureMcpOnly = false) =>
   JSON.parse(
     execFileSync(process.execPath, [capturePath], {
       encoding: "utf8",
@@ -620,6 +681,7 @@ const runCapture = (captureThreadOnly) =>
         ...(captureThreadOnly
           ? { CODEX_VISUAL_ASSET_THREAD_ONLY: "1" }
           : {}),
+        ...(captureMcpOnly ? { CODEX_VISUAL_ASSET_MCP_ONLY: "1" } : {}),
       },
       maxBuffer: 64 * 1024 * 1024,
     }),
@@ -627,7 +689,7 @@ const runCapture = (captureThreadOnly) =>
 const supplementalThreadCapture = includeThreadCapture
   ? runCapture(true)
   : null;
-const capture = runCapture(threadOnly);
+let capture = runCapture(threadOnly, mcpOnly);
 if (conditionalCapturePath) {
   const normalizedProfile = realpathSync(
     process.env.CODEX_VISUAL_ASSET_PROFILE,
@@ -719,9 +781,130 @@ if (supplementalThreadCapture) {
     if (existingGlobal.length === 0) capture.icons.push(observed[0]);
   }
 }
+if (supplementalMcpCapturePath) {
+  const normalizedProfile = realpathSync(
+    process.env.CODEX_VISUAL_ASSET_PROFILE,
+  );
+  const normalizedSupplementalCapture = realpathSync(
+    supplementalMcpCapturePath,
+  );
+  if (dirname(normalizedSupplementalCapture) !== normalizedProfile) {
+    throw new Error(
+      "The supplemental MCP capture must be a direct child of the isolated profile.",
+    );
+  }
+  const supplementalMcpCapture = JSON.parse(
+    readFileSync(normalizedSupplementalCapture, "utf8"),
+  );
+  capture = mergeSupplementalCurrentMcpCapture(
+    capture,
+    supplementalMcpCapture,
+  );
+}
 capture.icons.forEach((icon, index) =>
   sanitizeVisualAssetIcon(icon, `capture.icons[${index}]`),
 );
+if (mcpOnly) {
+  const observedById = collectCurrentMcpVisualAssets(
+    capture,
+    "Targeted current MCP capture",
+  );
+  const currentFingerprint = {
+    appAsarSha256: capture.baselineContext?.appAsarSha256,
+    appVersion: capture.baselineContext?.appVersion,
+    buildNumber: capture.baselineContext?.buildNumber,
+  };
+  const manifestFingerprint = {
+    appAsarSha256: manifest.baseline.appAsarSha256,
+    appVersion: manifest.baseline.appVersion,
+    buildNumber: manifest.baseline.buildNumber,
+  };
+  if (
+    canonicalize(currentFingerprint) !== canonicalize(manifestFingerprint) ||
+    capture.baselineContext?.interactionState !==
+      "completed-current-mcp-thread" ||
+    capture.baselineContext?.theme !== manifest.baseline.theme ||
+    canonicalize(capture.baselineContext?.viewport) !==
+      canonicalize(manifest.baseline.viewport)
+  ) {
+    throw new Error(
+      "Targeted current MCP capture must match the tracked fingerprint, theme, and viewport.",
+    );
+  }
+  const promotedById = new Map();
+  for (const id of currentMcpVisualAssetIds) {
+    const spec = promotionSpecs.get(id);
+    if (!spec) throw new Error(`Missing current MCP promotion spec: ${id}.`);
+    const observed = observedById.get(id);
+    const expectedMinimum = spec.minimumCandidates ?? 1;
+    if (observed.length < expectedMinimum) {
+      throw new Error(
+        `Expected at least ${expectedMinimum} targeted MCP captures for ${id}, received ${observed.length}.`,
+      );
+    }
+    if (new Set(observed.map(({ sha256 }) => sha256)).size !== 1) {
+      throw new Error(`${id} targeted captures do not share one fingerprint.`);
+    }
+    const existing = manifest.icons.find((icon) => icon.id === id);
+    if (
+      existing &&
+      (existing.region !== spec.region ||
+        existing.viewBox !== observed[0].viewBox ||
+        canonicalize(existing.rootAttributes) !==
+          canonicalize(observed[0].rootAttributes))
+    ) {
+      throw new Error(`${id} root geometry or region changed.`);
+    }
+    const promoted = {
+      id,
+      ownerAriaLabel: spec.ownerAriaLabel,
+      ...(spec.ownerEvidence ? { ownerEvidence: spec.ownerEvidence } : {}),
+      primitives: existing
+        ? promotePrimitives(existing, observed[0])
+        : observed[0].primitives,
+      region: spec.region,
+      renderSize: observed[0].renderSize,
+      rootAttributes: observed[0].rootAttributes,
+      rootComputedStyle: existing
+        ? promoteComputedStyle(
+            existing.rootComputedStyle,
+            observed[0].rootComputedStyle,
+          )
+        : observed[0].rootComputedStyle,
+      sourceClassName: observed[0].sourceClassName,
+      status: "runtime-observed",
+      viewBox: observed[0].viewBox,
+    };
+    promoted.sha256 = createHash("sha256")
+      .update(
+        canonicalize({
+          baselineContext: manifest.baseline,
+          primitives: promoted.primitives,
+          renderSize: promoted.renderSize,
+          rootAttributes: promoted.rootAttributes,
+          rootComputedStyle: promoted.rootComputedStyle,
+          sourceClassName: promoted.sourceClassName,
+          viewBox: promoted.viewBox,
+        }),
+      )
+      .digest("hex");
+    promotedById.set(id, promoted);
+  }
+  const existingById = new Map(manifest.icons.map((icon) => [icon.id, icon]));
+  manifest.icons = [...promotionSpecs.keys()].map(
+    (id) => promotedById.get(id) ?? existingById.get(id),
+  );
+  const output = `${JSON.stringify(manifest, null, 2)}\n`;
+  if (write) {
+    writeManifestAndCurrentThreadSubset(
+      output,
+      `Updated ${manifestPath} with current MCP assets`,
+    );
+  } else {
+    process.stdout.write(output);
+  }
+  process.exit(0);
+}
 if (threadOnly) {
   const targetIds = [
     "composer-send",
@@ -865,9 +1048,11 @@ if (threadOnly) {
     2,
   )}\n`;
   if (write) {
-    writeFileSync(manifestPath, output);
+    writeManifestAndCurrentThreadSubset(
+      output,
+      `Updated ${manifestPath} with current-thread assets`,
+    );
     writeFileSync(rasterManifestPath, rasterOutput);
-    console.log(`Updated ${manifestPath} with current-thread assets`);
   } else {
     process.stdout.write(output);
   }
@@ -956,8 +1141,10 @@ if (hooksOnly) {
   ];
   const output = `${JSON.stringify(manifest, null, 2)}\n`;
   if (write) {
-    writeFileSync(manifestPath, output);
-    console.log(`Updated ${manifestPath} with current Hooks assets`);
+    writeManifestAndCurrentThreadSubset(
+      output,
+      `Updated ${manifestPath} with current Hooks assets`,
+    );
   } else {
     process.stdout.write(output);
   }
@@ -1159,6 +1346,15 @@ function selectObservedIcon(id, spec, existing) {
   ) {
     return null;
   }
+  if (
+    candidates.length === 0 &&
+    fingerprintChanged &&
+    currentMcpVisualAssetIds.includes(id)
+  ) {
+    throw new Error(
+      `${id} requires CODEX_VISUAL_ASSET_MCP_CAPTURE from the same new-build profile during a fingerprint-changing full refresh.`,
+    );
+  }
   if (!spec.minimumCandidates && candidates.length !== 1) {
     throw new Error(
       `Expected one current capture for ${id}, received ${candidates.length}.`,
@@ -1278,8 +1474,7 @@ manifest.policy.globalPixelParityBlocker =
 
 const output = `${JSON.stringify(manifest, null, 2)}\n`;
 if (write) {
-  writeFileSync(manifestPath, output);
-  console.log(`Updated ${manifestPath}`);
+  writeManifestAndCurrentThreadSubset(output, `Updated ${manifestPath}`);
 } else {
   process.stdout.write(output);
 }

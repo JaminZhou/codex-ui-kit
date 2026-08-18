@@ -49,6 +49,12 @@ describe("ToolCallCard", () => {
       label?.parentElement?.id,
     );
     expect(chevron?.hasAttribute("data-visible")).toBe(false);
+    expect(chevron?.querySelector("svg")?.getAttribute("viewBox")).toBe(
+      "0 0 20 20",
+    );
+    expect(chevron?.querySelector("path")?.getAttribute("d")).toBe(
+      "M7.52925 3.7793C7.75652 3.55203 8.10803 3.52383 8.36616 3.69434L8.47065 3.7793L14.2207 9.5293C14.4804 9.789 14.4804 10.211 14.2207 10.4707L8.47065 16.2207C8.21095 16.4804 7.78895 16.4804 7.52925 16.2207C7.26955 15.961 7.26955 15.539 7.52925 15.2793L12.8085 10L7.52925 4.7207L7.44429 4.61621C7.27378 4.35808 7.30198 4.00657 7.52925 3.7793Z",
+    );
     fireEvent.click(toggle);
     expect(toggle.getAttribute("aria-expanded")).toBe("true");
     expect(chevron?.hasAttribute("data-visible")).toBe(true);
@@ -230,6 +236,10 @@ describe("McpToolCallGroup", () => {
     expect(html).toContain('aria-label="OpenAI Developer Docs tool calls"');
     expect(html).toContain("Search OpenAI docs");
     expect(html).toContain("Fetch OpenAI doc");
+    expect(html).toContain('viewBox="0 0 20 20"');
+    expect(html).toContain(
+      "M7.45996 14.375C7.45996 13.3616 6.63844 12.54 5.625 12.54",
+    );
   });
 
   it("announces active and failed integration states", () => {

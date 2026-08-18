@@ -6394,6 +6394,14 @@
   width: 0.875rem;
 }
 
+.codex-ui-stream-notice__icon
+  .codex-ui-stream-notice__reconnecting-icon {
+  fill: currentColor;
+  height: 1rem;
+  stroke: none;
+  width: 1rem;
+}
+
 .codex-ui-stream-notice[data-status="failed"]
   .codex-ui-stream-notice__icon {
   color: var(--codex-ui-text-error);
@@ -7028,33 +7036,41 @@ button.codex-ui-activity__header {
   align-items: center;
   display: flex;
   flex: 0 0 0.75rem;
-  height: 1rem;
+  height: 1.3125rem;
   justify-content: center;
+  min-width: 0;
   opacity: 0;
-  transition: opacity var(--codex-ui-transition);
+  rotate: none;
+  transition:
+    opacity var(--codex-ui-transition),
+    rotate var(--codex-ui-transition);
   width: 0.75rem;
 }
 
-.codex-ui-activity__button-chevron::after {
-  border-bottom: 1.5px solid currentColor;
-  border-right: 1.5px solid currentColor;
-  content: "";
-  height: 0.35rem;
-  transform: rotate(-45deg);
-  transition: transform var(--codex-ui-transition);
-  width: 0.35rem;
+.codex-ui-activity__button-chevron svg {
+  height: 0.875rem;
+  /* Disclosure state belongs to the wrapper, even for captured SVG roots. */
+  opacity: 1 !important;
+  rotate: none !important;
+  width: 0.875rem;
+}
+
+.codex-ui-activity__header:hover > .codex-ui-activity__button-chevron,
+.codex-ui-activity__header:focus-within > .codex-ui-activity__button-chevron {
+  opacity: 1;
 }
 
 .codex-ui-activity__button-chevron[data-visible],
-.codex-ui-activity__header:hover > .codex-ui-activity__button-chevron,
-.codex-ui-activity__header:focus-within > .codex-ui-activity__button-chevron {
-  opacity: 0.55;
+.codex-ui-activity__disclosure[data-open]
+  > .codex-ui-activity__header
+  > .codex-ui-activity__button-chevron {
+  opacity: 1;
 }
 
 .codex-ui-activity__disclosure[data-open]
   > .codex-ui-activity__header
-  > .codex-ui-activity__button-chevron::after {
-  transform: rotate(45deg) translateY(-0.1rem);
+  > .codex-ui-activity__button-chevron {
+  rotate: 90deg;
 }
 
 summary.codex-ui-activity__header::after {
@@ -7535,10 +7551,7 @@ summary.codex-ui-activity__header::after {
   fill: none;
   flex: 0 0 auto;
   height: 1rem;
-  stroke: currentColor;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  stroke-width: 1.15;
+  stroke: none;
   width: 1rem;
 }
 
@@ -12584,12 +12597,9 @@ button.codex-ui-generated-image-gallery__image {
     color: var(--codex-ui-text-secondary);
   }
 
-  .codex-ui-activity__button-chevron {
-    transition: none;
-  }
-
-  .codex-ui-activity__button-chevron::after {
-    transition: none;
+  .codex-ui-activity__button-chevron,
+  .codex-ui-activity__button-chevron svg {
+    transition: none !important;
   }
 
   .codex-ui-thread-loading__spinner,

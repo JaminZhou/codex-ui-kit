@@ -200,6 +200,14 @@ describe("StreamNotice", () => {
     const notice = screen.getByRole("status");
     expect(notice.getAttribute("aria-live")).toBe("polite");
     expect(screen.getByText("Server is busy, reconnecting 2/5")).toBeTruthy();
+    const reconnectingIcon = notice.querySelector(
+      ".codex-ui-stream-notice__reconnecting-icon",
+    );
+    expect(reconnectingIcon?.getAttribute("viewBox")).toBe("0 0 16 16");
+    expect(reconnectingIcon?.querySelectorAll("path")).toHaveLength(4);
+    expect(reconnectingIcon?.querySelector("path")?.getAttribute("d")).toBe(
+      "M8.09313 11.916C8.55971 11.9632 8.92406 12.3579 8.92418 12.8369C8.92397 13.3475 8.50993 13.7615 7.99938 13.7617C7.5204 13.7616 7.12563 13.3972 7.07848 12.9307L7.0736 12.8369L7.07848 12.7422C7.12582 12.2758 7.52054 11.9113 7.99938 11.9111L8.09313 11.916Z",
+    );
     const toggle = screen.getByRole("button", {
       name: "Show connection details",
     });

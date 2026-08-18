@@ -4,7 +4,7 @@
     "appVersion": "26.810.52044",
     "buildNumber": "6662",
     "sampledAt": "2026-08-18",
-    "reverifiedAt": "2026-08-18",
+    "reverifiedAt": "2026-08-19",
     "appAsarSha256": "6e7e8791b8bf69a586ff994721fff518af391d9efdc66cd2e620dd2a4aedc90f",
     "runtimeEvidence": "scoped_cdp",
     "runtimeEvidenceBuilds": {
@@ -276,11 +276,13 @@
         "cdp-26.727.40816:real-openai-developer-docs-search-fetch-success-expanded-1180x820",
         "cdp-26.727.40816:real-mcp-success-computed-styles-and-masked-906x820-regional-pixel-gate",
         "cdp-26.803.41515:real-openai-developer-docs-search-search-fetch-success-expanded-1180x820",
-        "cdp-26.803.41515:current-mcp-success-computed-styles-and-905x820-tool-group-pixel-gate"
+        "cdp-26.803.41515:current-mcp-success-computed-styles-and-905x820-tool-group-pixel-gate",
+        "cdp-26.810.52044:real-openai-developer-docs-search-fetch-success-expanded-1180x820",
+        "cdp-26.810.52044:current-mcp-success-computed-styles-exact-icons-and-1180x820-regional-pixel-gate"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "partial_legacy",
-      "electronStatus": "partial_legacy",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
       "priority": "p0"
     },
     {
@@ -298,11 +300,13 @@
         "cdp-26.727.40816:real-openai-developer-docs-invalid-url-three-search-fetch-recovery-expanded-1180x820",
         "cdp-26.727.40816:real-mcp-recovery-computed-styles-and-masked-906x820-regional-pixel-gate",
         "cdp-26.803.41515:real-openai-developer-docs-invalid-url-search-fetch-recovery-expanded-1180x820-and-720x680",
-        "cdp-26.803.41515:current-mcp-recovery-computed-styles-and-720x680-card-pixel-gate"
+        "cdp-26.803.41515:current-mcp-recovery-computed-styles-and-720x680-card-pixel-gate",
+        "cdp-26.810.52044:real-openai-developer-docs-invalid-url-search-fetch-recovery-expanded-1180x820-and-720x680",
+        "cdp-26.810.52044:current-mcp-recovery-computed-styles-exact-icons-and-720x680-card-pixel-gate"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "partial_legacy",
-      "electronStatus": "partial_legacy",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
       "priority": "p0"
     },
     {
@@ -388,10 +392,14 @@
       "area": "conversation",
       "ownership": "thread",
       "packageEvidence": ["local-conversation-page", "remote-conversation-page"],
-      "runtimeStatus": "not_sampled",
+      "runtimeStatus": "runtime_observed",
+      "runtimeEvidence": [
+        "cdp-26.810.52044:real-reconnecting-2-of-5-during-openai-developer-docs-turn-and-successful-in-place-recovery",
+        "cdp-26.810.52044:exact-four-path-reconnecting-glyph-and-replay-lifecycle-gates"
+      ],
       "implementationStatus": "partial",
-      "browserStatus": "partial_legacy",
-      "electronStatus": "partial_legacy",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
       "priority": "p0"
     },
     {

@@ -408,7 +408,7 @@ describe("protocol lifecycle reducer", () => {
     expect(hasActiveTurnWork(completed)).toBe(false);
   });
 
-  it("replays the current three-call MCP success sequence", () => {
+  it("replays the current two-call MCP success sequence", () => {
     const scenario = replayScenarios["mcp-current-success"];
     const running = reduceProtocolTrace(
       scenario.events.slice(0, scenario.frames["mcp-current-running"]),
@@ -423,16 +423,15 @@ describe("protocol lifecycle reducer", () => {
     ]);
     expect(completed.mcpToolCalls.map(({ toolLabel }) => toolLabel)).toEqual([
       "Search OpenAI docs",
-      "Search OpenAI docs",
       "Fetch OpenAI doc",
     ]);
     expect(completed.mcpToolCalls.every(({ status }) => status === "completed"))
       .toBe(true);
     expect(completed.turnDurationsMs["turn-current-mcp-success"]).toBe(
-      35_000,
+      25_000,
     );
     expect(completed.messages.at(-1)?.text).toContain(
-      "https://learn.chatgpt.com/docs/extend/mcp",
+      "https://developers.openai.com/codex/mcp",
     );
   });
 
@@ -525,7 +524,7 @@ describe("protocol lifecycle reducer", () => {
       { status: "completed", toolLabel: "Fetch OpenAI doc" },
     ]);
     expect(completed.turnDurationsMs["turn-current-mcp-recovery"]).toBe(
-      16_000,
+      18_000,
     );
     expect(completed.messages.at(-1)?.text).toContain("Recovery complete");
   });

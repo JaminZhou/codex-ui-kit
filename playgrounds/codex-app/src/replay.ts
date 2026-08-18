@@ -280,7 +280,7 @@ export const replayScenarios: Record<ReplayScenarioId, ReplayScenario> = {
   "mcp-current-success": scenario(
     "mcp-current-success",
     "Find current Codex MCP guidance",
-    "The current 26.803 product sequence uses two Search calls followed by one successful Fetch.",
+    "The current 26.810 product sequence uses one Search call followed by one successful Fetch for the canonical Codex MCP page.",
     mcpCurrentSuccessTrace,
   ),
   "mcp-current-integration-recovery": scenario(
@@ -292,7 +292,7 @@ export const replayScenarios: Record<ReplayScenarioId, ReplayScenario> = {
   "mcp-current-recovery": scenario(
     "mcp-current-recovery",
     "Recover current Codex MCP lookup",
-    "The current 26.803 product keeps failed Fetch, recovery Search, and successful Fetch inside one integration group.",
+    "The current 26.810 product keeps failed Fetch, recovery Search, and successful Fetch inside one integration group.",
     mcpCurrentRecoveryTrace,
   ),
   "mcp-tool-call": scenario(

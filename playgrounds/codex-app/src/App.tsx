@@ -7767,6 +7767,11 @@ export function App() {
         <StreamNotice
           additionalDetails={streamError.additionalDetails}
           data-item-id={streamError.id}
+          icon={
+            isCurrentTransportRecoveryReplay ? (
+              <CurrentBuildIcon name="thread-reconnecting" />
+            ) : undefined
+          }
           key={`stream-error:${streamError.id}`}
           reconnectAttempt={streamError.reconnectAttempt ?? undefined}
           reconnectMaxAttempts={
@@ -8382,7 +8387,17 @@ export function App() {
           <McpToolCallGroup
             data-testid="mcp-tool-call-group"
             defaultOpen={false}
+            disclosureIcon={
+              isCurrentMcpReplay ? (
+                <CurrentBuildIcon name="thread-activity-chevron" />
+              ) : undefined
+            }
             disclosureMode={isCurrentMcpReplay ? "button" : undefined}
+            icon={
+              isCurrentMcpReplay ? (
+                <CurrentBuildIcon name="thread-mcp-tool" />
+              ) : undefined
+            }
             name={toolCall.appName}
             open={initialSelection.capture ? captureOpen : undefined}
             source={toolCall.server}
@@ -8393,6 +8408,11 @@ export function App() {
               return (
                 <ToolCallCard
                   data-item-id={call.id}
+                  disclosureIcon={
+                    isCurrentMcpReplay ? (
+                      <CurrentBuildIcon name="thread-activity-chevron" />
+                    ) : undefined
+                  }
                   disclosureMode={
                     isCurrentMcpReplay ? "overlay-button" : undefined
                   }
@@ -8410,7 +8430,13 @@ export function App() {
                   }
                   failedLabel={call.toolLabel}
                   key={call.id}
-                  icon={<McpToolIcon />}
+                  icon={
+                    isCurrentMcpReplay ? (
+                      <CurrentBuildIcon name="thread-mcp-tool" />
+                    ) : (
+                      <McpToolIcon />
+                    )
+                  }
                   name={call.toolLabel}
                   open={
                     initialSelection.capture &&

@@ -47,6 +47,9 @@ describe("notice visual contract", () => {
     expect(styles).toMatch(
       /\.codex-ui-stream-notice \{[\s\S]*?font-size: 14px;[\s\S]*?line-height: 21px/,
     );
+    expect(styles).toMatch(
+      /\.codex-ui-stream-notice__reconnecting-icon \{[\s\S]*?fill: currentColor;[\s\S]*?height: 1rem;[\s\S]*?stroke: none;[\s\S]*?width: 1rem/,
+    );
   });
 
   it("locks the current fatal App Server recovery composition", () => {

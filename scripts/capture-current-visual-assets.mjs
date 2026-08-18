@@ -12,6 +12,10 @@ import {
 const port = Number(process.env.CODEX_VISUAL_ASSET_CDP_PORT);
 const expectedProfile = process.env.CODEX_VISUAL_ASSET_PROFILE;
 const threadOnly = process.env.CODEX_VISUAL_ASSET_THREAD_ONLY === "1";
+const mcpOnly = process.env.CODEX_VISUAL_ASSET_MCP_ONLY === "1";
+if (threadOnly && mcpOnly) {
+  throw new Error("Current visual asset capture modes are mutually exclusive.");
+}
 const appBundle = "/Applications/ChatGPT.app";
 const appInfoPlist = `${appBundle}/Contents/Info.plist`;
 const appAsar = `${appBundle}/Contents/Resources/app.asar`;
@@ -45,7 +49,9 @@ const baselineContext = {
   }).split(/\s+/)[0],
   appVersion: plistValue("CFBundleShortVersionString"),
   buildNumber: plistValue("CFBundleVersion"),
-  interactionState: "resting-and-open-sidebar-menus",
+  interactionState: mcpOnly
+    ? "completed-current-mcp-thread"
+    : "resting-and-open-sidebar-menus",
   theme: "dark",
   viewport: { height: 820, width: 1180 },
 };
@@ -265,6 +271,7 @@ try {
   }
   if (
     !threadOnly &&
+    !mcpOnly &&
     (await main.locator('[data-testid="home-icon"]:visible').count()) === 0
   ) {
     const newChat = main
@@ -308,7 +315,7 @@ try {
     await document.fonts.ready;
   });
   if (
-    threadOnly &&
+    (threadOnly || mcpOnly) &&
     (await main.locator(".group\\/activity-header:visible").count()) === 0
   ) {
     const workedFor = main.getByText(/^Worked for /);
@@ -322,8 +329,50 @@ try {
       timeout: 15_000,
     });
   }
+  if (mcpOnly) {
+    const workedFor = main.getByRole("button", { name: /^Worked for / });
+    for (let index = 0; index < (await workedFor.count()); index += 1) {
+      const disclosure = workedFor.nth(index);
+      if ((await disclosure.getAttribute("aria-expanded")) !== "true") {
+        await disclosure.click();
+      }
+    }
+    const groups = main.getByText("Used OpenAI Developer Docs integration", {
+      exact: true,
+    });
+    if ((await groups.count()) === 0) {
+      throw new Error(
+        "Current MCP capture requires a completed OpenAI Developer Docs group.",
+      );
+    }
+    for (let index = 0; index < (await groups.count()); index += 1) {
+      const groupButton = groups.nth(index).locator("xpath=ancestor::button[1]");
+      if (
+        (await groupButton.count()) === 1 &&
+        (await groupButton.getAttribute("aria-expanded")) !== "true"
+      ) {
+        await groupButton.click();
+      }
+    }
+    const callToggles = main.locator(
+      'button[aria-labelledby][aria-expanded="true"]',
+    );
+    for (let index = (await callToggles.count()) - 1; index >= 0; index -= 1) {
+      const toggle = callToggles.nth(index);
+      const labelId = await toggle.getAttribute("aria-labelledby");
+      const text = labelId
+        ? await main.evaluate(
+            (id) => document.getElementById(id)?.textContent?.trim() ?? null,
+            labelId,
+          )
+        : null;
+      if (text === "Search OpenAI docs" || text === "Fetch OpenAI doc") {
+        await toggle.click();
+      }
+    }
+  }
 
-  const result = await main.evaluate(({ semanticLabelEntries, threadOnly }) => {
+  const result = await main.evaluate(({ mcpOnly, semanticLabelEntries, threadOnly }) => {
     const semanticLabels = new Map(semanticLabelEntries);
     const resolveSemanticId = (
       label,
@@ -495,10 +544,11 @@ try {
         (left, right) =>
           right.width * right.height - left.width * left.height,
       )[0];
-    if (!navigationBounds && !threadOnly) {
+    if (!navigationBounds && !threadOnly && !mcpOnly) {
       throw new Error("Current visual capture requires one visible navigation.");
     }
-    const navigationRight = threadOnly ? 0 : navigationBounds?.right ?? 0;
+    const navigationRight =
+      threadOnly || mcpOnly ? 0 : navigationBounds?.right ?? 0;
     const region = (value) => {
       if (value.top < 52) return "titlebar";
       if (value.left < navigationRight && value.top < 250) {
@@ -1025,6 +1075,125 @@ try {
           viewBox: svg.getAttribute("viewBox"),
         };
       });
+    const captureSemanticSvg = (svg, semanticId) => {
+      const bounds = svg.getBoundingClientRect();
+      return {
+        owner: { role: "presentation", semanticId },
+        primitives: [...svg.children].map(serializeSvgElement),
+        region: "conversation",
+        rect: rect(svg),
+        renderSize: {
+          height: round(bounds.height),
+          width: round(bounds.width),
+        },
+        rootAttributes: attributes(svg, true),
+        rootComputedStyle: computedStyle(svg),
+        sourceClassName: svg.getAttribute("class") ?? "",
+        viewBox: svg.getAttribute("viewBox"),
+      };
+    };
+    let mcpObservation = null;
+    if (mcpOnly) {
+      const groupButtons = [...document.querySelectorAll("button")].filter(
+        (button) =>
+          isActuallyVisible(button) &&
+          button.textContent?.trim() ===
+            "Used OpenAI Developer Docs integration",
+      );
+      const callButtons = [
+        ...document.querySelectorAll("button[aria-labelledby][aria-expanded]"),
+      ].filter((button) => {
+        if (!isActuallyVisible(button)) return false;
+        const labelId = button.getAttribute("aria-labelledby");
+        const label = labelId ? document.getElementById(labelId) : null;
+        const text = label?.textContent?.trim();
+        return text === "Search OpenAI docs" || text === "Fetch OpenAI doc";
+      });
+      const findToolIcon = (owner) => {
+        const svgs = [
+          ...(owner?.querySelectorAll("svg") ?? []),
+        ].filter(isActuallyVisible);
+        return svgs.find(
+          (svg) =>
+            svg.getAttribute("viewBox") === "0 0 20 20" &&
+            Math.abs(svg.getBoundingClientRect().width - 16) <= 0.1,
+        );
+      };
+      const groupToolIcons = groupButtons
+        .map((button) => findToolIcon(button))
+        .filter(Boolean);
+      const callToolIcons = callButtons
+        .map((button) => findToolIcon(button.parentElement))
+        .filter(Boolean);
+      for (const svg of [...groupToolIcons, ...callToolIcons]) {
+        icons.push(captureSemanticSvg(svg, "thread-mcp-tool"));
+      }
+      const closedCall = callButtons.find(
+        (button) => button.getAttribute("aria-expanded") === "false",
+      );
+      const closedCallSvgs = [
+        ...(closedCall?.parentElement?.querySelectorAll("svg") ?? []),
+      ].filter((svg) => {
+        const bounds = svg.getBoundingClientRect();
+        return bounds.width > 0 && bounds.height > 0;
+      });
+      const activityChevron = closedCallSvgs.find(
+        (svg) =>
+          svg.getAttribute("viewBox") === "0 0 20 20" &&
+          Math.abs(svg.getBoundingClientRect().width - 14) <= 0.1,
+      );
+      if (activityChevron) {
+        icons.push(
+          captureSemanticSvg(activityChevron, "thread-activity-chevron"),
+        );
+      }
+      const reconnectingRows = [...document.querySelectorAll("div")]
+        .filter(
+          (element) =>
+            isActuallyVisible(element) &&
+            element.textContent?.trim().startsWith("Reconnecting") &&
+            element.querySelectorAll("svg").length >= 1,
+        )
+        .sort(
+          (left, right) =>
+            left.getBoundingClientRect().width -
+            right.getBoundingClientRect().width,
+        );
+      const reconnectingIcon = [
+        ...(reconnectingRows[0]?.querySelectorAll("svg") ?? []),
+      ].find(
+        (svg) =>
+          svg.getAttribute("viewBox") === "0 0 16 16" &&
+          Math.abs(svg.getBoundingClientRect().width - 16) <= 0.1,
+      );
+      if (reconnectingIcon) {
+        icons.push(
+          captureSemanticSvg(reconnectingIcon, "thread-reconnecting"),
+        );
+      }
+      const groupBounds = groupButtons[0]?.getBoundingClientRect();
+      const callBounds = callButtons[0]?.getBoundingClientRect();
+      const openGroupChevron = groupButtons[0]
+        ? [...groupButtons[0].querySelectorAll("svg")].find(
+            (svg) =>
+              svg.getAttribute("viewBox") === "0 0 20 20" &&
+              Math.abs(svg.getBoundingClientRect().width - 14) <= 0.1,
+          )
+        : null;
+      mcpObservation = {
+        activityChevronCount: activityChevron ? 1 : 0,
+        callCount: callButtons.length,
+        callHeight: callBounds ? round(callBounds.height) : null,
+        callToolIconCount: callToolIcons.length,
+        groupCount: groupButtons.length,
+        groupHeight: groupBounds ? round(groupBounds.height) : null,
+        groupToolIconCount: groupToolIcons.length,
+        openGroupChevronRotate: openGroupChevron
+          ? getComputedStyle(openGroupChevron).rotate
+          : null,
+        reconnectingIconCount: reconnectingIcon ? 1 : 0,
+      };
+    }
     const currentCommandTerminalIcons = [
       ...document.querySelectorAll(".group\\/activity-header"),
     ]
@@ -1261,13 +1430,15 @@ try {
       composerObservation,
       fontSamples,
       icons,
+      mcpObservation,
       sidebarObservation,
       threadObservation,
       viewport: { height: window.innerHeight, width: window.innerWidth },
     };
-  }, { semanticLabelEntries: [...semanticLabels], threadOnly });
+  }, { mcpOnly, semanticLabelEntries: [...semanticLabels], threadOnly });
   if (
     !threadOnly &&
+    !mcpOnly &&
     !result.icons.some(
       (icon) =>
         icon.region === "composer" &&
@@ -1347,7 +1518,7 @@ try {
     });
   }
   fullCapture: try {
-    if (threadOnly) break fullCapture;
+    if (threadOnly || mcpOnly) break fullCapture;
     const projectRows = main.locator(
       'nav div[role="button"][aria-expanded]:not([aria-haspopup])',
     );
@@ -1969,7 +2140,11 @@ try {
     throw new Error("Captured viewport does not match the baseline context.");
   }
   result.baselineContext = baselineContext;
-  result.captureMode = threadOnly ? "completed-thread" : "full";
+  result.captureMode = threadOnly
+    ? "completed-thread"
+    : mcpOnly
+      ? "completed-mcp-thread"
+      : "full";
 
   const canonicalize = (value) =>
     JSON.stringify(value, (_key, nested) => {

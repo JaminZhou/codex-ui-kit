@@ -44,6 +44,7 @@ export interface ToolCallCardProps
   children?: ReactNode;
   completedLabel?: ReactNode;
   defaultOpen?: boolean;
+  disclosureIcon?: AgentActivityProps["disclosureIcon"];
   disclosureIndicator?: AgentActivityProps["disclosureIndicator"];
   disclosureMode?: AgentActivityProps["disclosureMode"];
   emptyLabel?: ReactNode;
@@ -73,6 +74,7 @@ export function ToolCallCard({
   className,
   completedLabel,
   defaultOpen = false,
+  disclosureIcon,
   disclosureIndicator,
   disclosureMode,
   emptyLabel = "Tool returned no content",
@@ -172,6 +174,7 @@ export function ToolCallCard({
       className={classes}
       data-source={source}
       defaultOpen={defaultOpen}
+      disclosureIcon={disclosureIcon}
       disclosureIndicator={disclosureIndicator}
       disclosureMode={disclosureMode}
       description={

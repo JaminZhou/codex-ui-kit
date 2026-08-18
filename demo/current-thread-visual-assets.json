@@ -1661,6 +1661,317 @@
       "viewBox": "0 0 20 20"
     },
     {
+      "id": "thread-mcp-tool",
+      "primitives": [
+        {
+          "attributes": {
+            "d": "M7.45996 14.375C7.45996 13.3616 6.63844 12.54 5.625 12.54C4.61156 12.54 3.79004 13.3616 3.79004 14.375C3.79004 15.3884 4.61156 16.21 5.625 16.21C6.63844 16.21 7.45996 15.3884 7.45996 14.375ZM16.21 14.375C16.21 13.3616 15.3884 12.54 14.375 12.54C13.3616 12.54 12.54 13.3616 12.54 14.375C12.54 15.3884 13.3616 16.21 14.375 16.21C15.3884 16.21 16.21 15.3884 16.21 14.375ZM7.45996 5.625C7.45996 4.61156 6.63844 3.79004 5.625 3.79004C4.61156 3.79004 3.79004 4.61156 3.79004 5.625C3.79004 6.63844 4.61156 7.45996 5.625 7.45996C6.63844 7.45996 7.45996 6.63844 7.45996 5.625ZM16.21 5.625C16.21 4.61156 15.3884 3.79004 14.375 3.79004C13.3616 3.79004 12.54 4.61156 12.54 5.625C12.54 6.63844 13.3616 7.45996 14.375 7.45996C15.3884 7.45996 16.21 6.63844 16.21 5.625ZM17.54 14.375C17.54 16.123 16.123 17.54 14.375 17.54C12.627 17.54 11.21 16.123 11.21 14.375C11.21 12.627 12.627 11.21 14.375 11.21C16.123 11.21 17.54 12.627 17.54 14.375ZM8.79004 5.625C8.79004 7.37298 7.37298 8.79004 5.625 8.79004C3.87702 8.79004 2.45996 7.37298 2.45996 5.625C2.45996 3.87702 3.87702 2.45996 5.625 2.45996C7.37298 2.45996 8.79004 3.87702 8.79004 5.625ZM17.54 5.625C17.54 7.37298 16.123 8.79004 14.375 8.79004C13.7416 8.79004 13.153 8.60173 12.6582 8.28125L8.28125 12.6582C8.60173 13.153 8.79004 13.7416 8.79004 14.375C8.79004 16.123 7.37298 17.54 5.625 17.54C3.87702 17.54 2.45996 16.123 2.45996 14.375C2.45996 12.627 3.87702 11.21 5.625 11.21C6.25794 11.21 6.84623 11.3977 7.34082 11.7178L11.7178 7.34082C11.3977 6.84623 11.21 6.25794 11.21 5.625C11.21 3.87702 12.627 2.45996 14.375 2.45996C16.123 2.45996 17.54 3.87702 17.54 5.625Z",
+            "fill": "currentColor"
+          },
+          "computedStyle": {
+            "clip-path": "none",
+            "color": "oklab(0.903646 0.0000412762 0.0000180602 / 0.6)",
+            "display": "inline",
+            "fill": "oklab(0.903646 0.0000412762 0.0000180602 / 0.6)",
+            "fill-opacity": "1",
+            "filter": "none",
+            "height": "auto",
+            "opacity": "1",
+            "paint-order": "normal",
+            "shape-rendering": "auto",
+            "stroke": "none",
+            "stroke-dasharray": "none",
+            "stroke-dashoffset": "0px",
+            "stroke-linecap": "butt",
+            "stroke-linejoin": "miter",
+            "stroke-miterlimit": "4",
+            "stroke-opacity": "1",
+            "stroke-width": "1px",
+            "transform": "none",
+            "transform-origin": "0px 0px",
+            "vector-effect": "none",
+            "visibility": "visible",
+            "width": "auto"
+          },
+          "tag": "path"
+        }
+      ],
+      "renderSize": {
+        "height": 16,
+        "width": 16
+      },
+      "rootAttributes": {
+        "fill": "none",
+        "height": "20",
+        "width": "20"
+      },
+      "rootComputedStyle": {
+        "clip-path": "none",
+        "color": "oklab(0.903646 0.0000412762 0.0000180602 / 0.6)",
+        "display": "block",
+        "fill": "none",
+        "fill-opacity": "1",
+        "filter": "none",
+        "height": "16px",
+        "opacity": "1",
+        "paint-order": "normal",
+        "shape-rendering": "auto",
+        "stroke": "none",
+        "stroke-dasharray": "none",
+        "stroke-dashoffset": "0px",
+        "stroke-linecap": "butt",
+        "stroke-linejoin": "miter",
+        "stroke-miterlimit": "4",
+        "stroke-opacity": "1",
+        "stroke-width": "1px",
+        "transform": "none",
+        "transform-origin": "8px 8px",
+        "vector-effect": "none",
+        "visibility": "visible",
+        "width": "16px"
+      },
+      "sourceSha256": "ba06a325181496cd0b1b95c0ce09734454e5dddc40316f952817fff5c39016c6",
+      "viewBox": "0 0 20 20"
+    },
+    {
+      "id": "thread-activity-chevron",
+      "primitives": [
+        {
+          "attributes": {
+            "d": "M7.52925 3.7793C7.75652 3.55203 8.10803 3.52383 8.36616 3.69434L8.47065 3.7793L14.2207 9.5293C14.4804 9.789 14.4804 10.211 14.2207 10.4707L8.47065 16.2207C8.21095 16.4804 7.78895 16.4804 7.52925 16.2207C7.26955 15.961 7.26955 15.539 7.52925 15.2793L12.8085 10L7.52925 4.7207L7.44429 4.61621C7.27378 4.35808 7.30198 4.00657 7.52925 3.7793Z",
+            "fill": "currentColor"
+          },
+          "computedStyle": {
+            "clip-path": "none",
+            "color": "oklab(0.903646 0.0000412762 0.0000180602 / 0.6)",
+            "display": "inline",
+            "fill": "oklab(0.903646 0.0000412762 0.0000180602 / 0.6)",
+            "fill-opacity": "1",
+            "filter": "none",
+            "height": "auto",
+            "opacity": "1",
+            "paint-order": "normal",
+            "shape-rendering": "auto",
+            "stroke": "none",
+            "stroke-dasharray": "none",
+            "stroke-dashoffset": "0px",
+            "stroke-linecap": "butt",
+            "stroke-linejoin": "miter",
+            "stroke-miterlimit": "4",
+            "stroke-opacity": "1",
+            "stroke-width": "1px",
+            "transform": "none",
+            "transform-origin": "0px 0px",
+            "vector-effect": "none",
+            "visibility": "visible",
+            "width": "auto"
+          },
+          "tag": "path"
+        }
+      ],
+      "renderSize": {
+        "height": 14,
+        "width": 14
+      },
+      "rootAttributes": {
+        "fill": "none",
+        "height": "20",
+        "width": "20"
+      },
+      "rootComputedStyle": {
+        "clip-path": "none",
+        "color": "oklab(0.903646 0.0000412762 0.0000180602 / 0.6)",
+        "display": "block",
+        "fill": "none",
+        "fill-opacity": "1",
+        "filter": "none",
+        "height": "14px",
+        "opacity": "0",
+        "paint-order": "normal",
+        "shape-rendering": "auto",
+        "stroke": "none",
+        "stroke-dasharray": "none",
+        "stroke-dashoffset": "0px",
+        "stroke-linecap": "butt",
+        "stroke-linejoin": "miter",
+        "stroke-miterlimit": "4",
+        "stroke-opacity": "1",
+        "stroke-width": "1px",
+        "transform": "none",
+        "transform-origin": "7px 7px",
+        "vector-effect": "none",
+        "visibility": "visible",
+        "width": "14px"
+      },
+      "sourceSha256": "af33cab2e6b819f3a6f14c134d17aa643f1d7445d2ec49804871d4d27c4a87e6",
+      "viewBox": "0 0 20 20"
+    },
+    {
+      "id": "thread-reconnecting",
+      "primitives": [
+        {
+          "attributes": {
+            "d": "M8.09313 11.916C8.55971 11.9632 8.92406 12.3579 8.92418 12.8369C8.92397 13.3475 8.50993 13.7615 7.99938 13.7617C7.5204 13.7616 7.12563 13.3972 7.07848 12.9307L7.0736 12.8369L7.07848 12.7422C7.12582 12.2758 7.52054 11.9113 7.99938 11.9111L8.09313 11.916Z"
+          },
+          "computedStyle": {
+            "clip-path": "none",
+            "color": "oklab(0.903646 0.0000412762 0.0000180602 / 0.6)",
+            "display": "inline",
+            "fill": "oklab(0.903646 0.0000412762 0.0000180602 / 0.6)",
+            "fill-opacity": "1",
+            "filter": "none",
+            "height": "auto",
+            "opacity": "1",
+            "paint-order": "normal",
+            "shape-rendering": "auto",
+            "stroke": "none",
+            "stroke-dasharray": "none",
+            "stroke-dashoffset": "0px",
+            "stroke-linecap": "butt",
+            "stroke-linejoin": "miter",
+            "stroke-miterlimit": "4",
+            "stroke-opacity": "1",
+            "stroke-width": "1px",
+            "transform": "none",
+            "transform-origin": "0px 0px",
+            "vector-effect": "none",
+            "visibility": "visible",
+            "width": "auto"
+          },
+          "tag": "path"
+        },
+        {
+          "attributes": {
+            "d": "M7.99938 8.68555C9.12143 8.68562 10.199 9.1257 11.0004 9.91113C11.2072 10.1141 11.2101 10.4473 11.0072 10.6543C10.8043 10.8606 10.4719 10.8636 10.265 10.6611C9.65996 10.0682 8.84654 9.7364 7.99938 9.73633C7.15204 9.73633 6.3379 10.068 5.73278 10.6611C5.52583 10.8637 5.19349 10.8608 4.99059 10.6543C4.7877 10.4473 4.79157 10.1141 4.9984 9.91113C5.79976 9.1258 6.87735 8.68555 7.99938 8.68555Z"
+          },
+          "computedStyle": {
+            "clip-path": "none",
+            "color": "oklab(0.903646 0.0000412762 0.0000180602 / 0.6)",
+            "display": "inline",
+            "fill": "oklab(0.903646 0.0000412762 0.0000180602 / 0.6)",
+            "fill-opacity": "1",
+            "filter": "none",
+            "height": "auto",
+            "opacity": "1",
+            "paint-order": "normal",
+            "shape-rendering": "auto",
+            "stroke": "none",
+            "stroke-dasharray": "none",
+            "stroke-dashoffset": "0px",
+            "stroke-linecap": "butt",
+            "stroke-linejoin": "miter",
+            "stroke-miterlimit": "4",
+            "stroke-opacity": "1",
+            "stroke-width": "1px",
+            "transform": "none",
+            "transform-origin": "0px 0px",
+            "vector-effect": "none",
+            "visibility": "visible",
+            "width": "auto"
+          },
+          "tag": "path"
+        },
+        {
+          "attributes": {
+            "d": "M7.99938 5.45312C9.86602 5.45317 11.6672 6.10185 13.1 7.27539C13.3242 7.45905 13.3567 7.79035 13.1732 8.01465C12.9895 8.2387 12.6592 8.27137 12.4349 8.08789C11.1891 7.06742 9.62252 6.50395 7.99938 6.50391C6.37641 6.50394 4.8106 7.06764 3.56481 8.08789C3.34052 8.2716 3.00929 8.2389 2.82555 8.01465C2.64188 7.79037 2.67457 7.45912 2.89879 7.27539C4.33155 6.10192 6.13278 5.45316 7.99938 5.45312Z"
+          },
+          "computedStyle": {
+            "clip-path": "none",
+            "color": "oklab(0.903646 0.0000412762 0.0000180602 / 0.6)",
+            "display": "inline",
+            "fill": "oklab(0.903646 0.0000412762 0.0000180602 / 0.6)",
+            "fill-opacity": "1",
+            "filter": "none",
+            "height": "auto",
+            "opacity": "1",
+            "paint-order": "normal",
+            "shape-rendering": "auto",
+            "stroke": "none",
+            "stroke-dasharray": "none",
+            "stroke-dashoffset": "0px",
+            "stroke-linecap": "butt",
+            "stroke-linejoin": "miter",
+            "stroke-miterlimit": "4",
+            "stroke-opacity": "1",
+            "stroke-width": "1px",
+            "transform": "none",
+            "transform-origin": "0px 0px",
+            "vector-effect": "none",
+            "visibility": "visible",
+            "width": "auto"
+          },
+          "tag": "path"
+        },
+        {
+          "attributes": {
+            "d": "M7.99938 2.23828C10.539 2.23836 13.0018 3.05691 15.0277 4.55664C15.2603 4.72917 15.3093 5.05812 15.1371 5.29102C14.9646 5.52398 14.6357 5.57269 14.4027 5.40039C12.557 4.03405 10.3132 3.28914 7.99938 3.28906C5.68573 3.28915 3.44269 4.03422 1.59703 5.40039C1.36405 5.57286 1.03521 5.5239 0.862659 5.29102C0.690155 5.05798 0.739017 4.72916 0.972034 4.55664C2.99784 3.05703 5.45984 2.23837 7.99938 2.23828Z"
+          },
+          "computedStyle": {
+            "clip-path": "none",
+            "color": "oklab(0.903646 0.0000412762 0.0000180602 / 0.6)",
+            "display": "inline",
+            "fill": "oklab(0.903646 0.0000412762 0.0000180602 / 0.6)",
+            "fill-opacity": "1",
+            "filter": "none",
+            "height": "auto",
+            "opacity": "1",
+            "paint-order": "normal",
+            "shape-rendering": "auto",
+            "stroke": "none",
+            "stroke-dasharray": "none",
+            "stroke-dashoffset": "0px",
+            "stroke-linecap": "butt",
+            "stroke-linejoin": "miter",
+            "stroke-miterlimit": "4",
+            "stroke-opacity": "1",
+            "stroke-width": "1px",
+            "transform": "none",
+            "transform-origin": "0px 0px",
+            "vector-effect": "none",
+            "visibility": "visible",
+            "width": "auto"
+          },
+          "tag": "path"
+        }
+      ],
+      "renderSize": {
+        "height": 16,
+        "width": 16
+      },
+      "rootAttributes": {
+        "fill": "currentColor",
+        "height": "16",
+        "width": "16"
+      },
+      "rootComputedStyle": {
+        "clip-path": "none",
+        "color": "oklab(0.903646 0.0000412762 0.0000180602 / 0.6)",
+        "display": "block",
+        "fill": "oklab(0.903646 0.0000412762 0.0000180602 / 0.6)",
+        "fill-opacity": "1",
+        "filter": "none",
+        "height": "16px",
+        "opacity": "1",
+        "paint-order": "normal",
+        "shape-rendering": "auto",
+        "stroke": "none",
+        "stroke-dasharray": "none",
+        "stroke-dashoffset": "0px",
+        "stroke-linecap": "butt",
+        "stroke-linejoin": "miter",
+        "stroke-miterlimit": "4",
+        "stroke-opacity": "1",
+        "stroke-width": "1px",
+        "transform": "none",
+        "transform-origin": "8px 8px",
+        "vector-effect": "none",
+        "visibility": "visible",
+        "width": "16px"
+      },
+      "sourceSha256": "b669ae21e0e193abf3a7248db90899804f6bccd53239a1b8df15ef06052981d7",
+      "viewBox": "0 0 16 16"
+    },
+    {
       "id": "window-chrome-back",
       "primitives": [
         {

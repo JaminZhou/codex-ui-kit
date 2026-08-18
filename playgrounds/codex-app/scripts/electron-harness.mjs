@@ -628,11 +628,7 @@ export const visualScenes = [
     toolCount: 1,
   },
   {
-    callLabels: [
-      "Search OpenAI docs",
-      "Search OpenAI docs",
-      "Fetch OpenAI doc",
-    ],
+    callLabels: ["Search OpenAI docs", "Fetch OpenAI doc"],
     currentSidebar: true,
     frame: "mcp-current-success",
     groupLabel: "Used OpenAI Developer Docs integration",
@@ -640,8 +636,8 @@ export const visualScenes = [
     maxPixelRatio: crossMacOsSystemFontRatios.mcpToolCalls,
     scenario: "mcp-current-success",
     surfaces: ["mcpGroup"],
-    timelineLabel: "Worked for 35s",
-    toolCount: 3,
+    timelineLabel: "Worked for 25s",
+    toolCount: 2,
   },
   {
     currentSidebar: true,
@@ -832,7 +828,7 @@ export const visualScenes = [
     maxPixelRatio: 0.0225,
     scenario: "mcp-current-recovery",
     surfaces: ["mcpGroup"],
-    timelineLabel: "Worked for 16s",
+    timelineLabel: "Worked for 18s",
     toolCount: 3,
   },
   {
@@ -849,7 +845,7 @@ export const visualScenes = [
     maxPixelRatio: 0.0225,
     scenario: "mcp-current-recovery",
     surfaces: ["mcpGroup"],
-    timelineLabel: "Worked for 16s",
+    timelineLabel: "Worked for 18s",
     toolCount: 3,
     windowSize: { height: 680, width: 720 },
   },

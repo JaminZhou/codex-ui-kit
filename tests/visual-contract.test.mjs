@@ -19,6 +19,10 @@ const captureScript = readFileSync(
   new URL("../scripts/capture-current-visual-assets.mjs", import.meta.url),
   "utf8",
 );
+const updaterScript = readFileSync(
+  new URL("../scripts/update-current-visual-assets.mjs", import.meta.url),
+  "utf8",
+);
 
 describe("current-thread visual contract", () => {
   it("measures the removed structural header control before asserting its absence", () => {
@@ -32,6 +36,25 @@ describe("current-thread visual contract", () => {
     expect(captureScript.indexOf(declaration)).toBeLessThan(
       captureScript.indexOf(observation),
     );
+  });
+
+  it("captures MCP tool glyphs from both group and call-row owners", () => {
+    expect(captureScript).toContain(
+      "for (const svg of [...groupToolIcons, ...callToolIcons])",
+    );
+    expect(captureScript).toContain(
+      'icons.push(captureSemanticSvg(svg, "thread-mcp-tool"))',
+    );
+  });
+
+  it("regenerates the replay subset inside an MCP manifest write", () => {
+    const mcpBranch = updaterScript.slice(
+      updaterScript.indexOf("if (mcpOnly)"),
+      updaterScript.indexOf("if (threadOnly)"),
+    );
+
+    expect(mcpBranch).toContain("writeManifestAndCurrentThreadSubset(");
+    expect(mcpBranch).not.toContain("writeFileSync(manifestPath");
   });
 
   it("keeps the completed-thread compatibility command", () => {
