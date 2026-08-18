@@ -8593,6 +8593,56 @@ try {
   await currentReviewInteractionApp.close();
 }
 
+const commandInterruptionNoFrameScene = {
+  frame: "command-interruption-recovered",
+  id: "command-interruption-no-frame",
+  scenario: "interruption",
+};
+const {
+  app: commandInterruptionNoFrameApp,
+  page: commandInterruptionNoFramePage,
+} = await launchScene(commandInterruptionNoFrameScene, { capture: false });
+try {
+  const noFrameUrl = new URL(commandInterruptionNoFramePage.url());
+  noFrameUrl.searchParams.delete("frame");
+  await commandInterruptionNoFramePage.goto(noFrameUrl.href);
+  await commandInterruptionNoFramePage.emulateMedia({
+    reducedMotion: "reduce",
+  });
+  await commandInterruptionNoFramePage.waitForSelector(
+    '.demo-root[data-frame="command-interruption-recovered"][data-status="completed"] [data-item-id="command-interruption"][data-execution-status="interrupted"]',
+  );
+  const noFrameState = await commandInterruptionNoFramePage.evaluate(() => ({
+    assistantText:
+      document
+        .querySelector(
+          '[data-item-id="assistant-command-interruption-recovery"] .codex-ui-markdown',
+        )
+        ?.textContent?.replace(/\s+/g, " ")
+        .trim() ?? null,
+    commandSummary:
+      document
+        .querySelector(
+          '[data-item-id="command-interruption"] .codex-ui-activity__summary',
+        )
+        ?.textContent?.replace(/\s+/g, " ")
+        .trim() ?? null,
+  }));
+  if (
+    noFrameState.assistantText !==
+      "CURRENT INTERRUPTION RECOVERY ACCEPTED" ||
+    !noFrameState.commandSummary?.startsWith(
+      "Background terminal stopped with for i in $(seq 1 120)",
+    )
+  ) {
+    throw new Error(
+      `Current command no-frame settlement failed: ${JSON.stringify(noFrameState)}`,
+    );
+  }
+} finally {
+  await commandInterruptionNoFrameApp.close();
+}
+
 const commandInterruptionScene = {
   frame: "command-interruption-running",
   id: "command-interruption-interaction",

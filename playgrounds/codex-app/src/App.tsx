@@ -8745,7 +8745,8 @@ export function App() {
         const stopped =
           activeFrame === "command-interruption-stopping" ||
           activeFrame === "command-interruption-settled" ||
-          activeFrame === "command-interruption-recovered";
+          activeFrame === "command-interruption-recovered" ||
+          (activeFrame === null && command.status === "completed");
         const execution = (
           <CommandExecution
             command={command.command}
