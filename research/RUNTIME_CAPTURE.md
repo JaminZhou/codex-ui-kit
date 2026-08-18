@@ -808,6 +808,51 @@ retained the exact profile path, and the profile plus raw JSON and screenshots
 moved recoverably to
 `/Users/JaminZhou/.Trash/codex-ui-kit-mcp-current.YFVFyG-20260810`.
 
+### 26.810.52044 MCP success, failure, and reconnect capture
+
+The refresh used exact main PID `15575`, loopback-only CDP port `9841`, and
+unique profile `/private/tmp/codex-ui-kit-mcp-26-810.3DIzCN`. Preflight
+verified build `6662`, Chromium `151.0.7922.137`, the unchanged 279946146-byte
+ASAR and SHA-256
+`6e7e8791b8bf69a586ff994721fff518af391d9efdc66cd2e620dd2a4aedc90f`,
+the exact executable/profile ownership, and the 1180×820 main Renderer. The
+accepted synthetic tasks allowed only OpenAI Developer Docs Search/Fetch and
+explicitly prohibited shell, Browser, file, and project actions. One diagnostic
+task returned a different documentation page and was excluded.
+
+The accepted canonical task performed exactly Search OpenAI docs → Fetch
+OpenAI doc, completed in 25 seconds, and returned `Model Context Protocol` with
+`https://developers.openai.com/codex/mcp`. The accepted recovery stayed in one
+integration group, performed invalid-URL Fetch → Search → canonical Fetch,
+exposed `plaintext / Invalid URL`, and completed in 18 seconds. The wide
+failure card remains 736×67.3125px with the same 12.5px radius, 0.05 white
+background, 0.157 white border, 13/18.5714px language label, and 14/22.75px
+445-weight monospace output. After an explicit product-sidebar hide, the
+720×680 card is 688×67.3125px at x=16 with zero horizontal overflow.
+
+The first accepted turn also reached a real transient `Reconnecting 2/5` row
+and then completed in place. Current DOM capture records the exact 16×16 MCP
+glyph, 14×14 disclosure chevron with closed opacity zero and open rotation 90
+degrees, and exact four-path 16×16 reconnect glyph. The targeted updater
+requires repeated group glyphs to share one fingerprint and verifies group and
+call counts, 21px row heights, reconnect presence, build/theme/viewport, and
+the unchanged manifest fingerprint before writing.
+
+Independent Browser/CDP and Electron gates cover the current calls,
+content-width labelled disclosure buttons, neutral failure output, transport
+retry/recovery, and compact resize. Nine reviewed internal frames pass. The
+local-only product gates compare the aligned 736×80 successful tool region at
+1.9446331521739132% under 2% and the complete 688×67 compact failure card at
+1.2018396390142311% under 1.21%. Product screenshots and sidebar content stay
+outside the repository.
+
+Cleanup archived only the three exact synthetic tasks, terminated validated
+main PID `15575` and exact profile Crashpad handlers `15580` and `15582`,
+verified port `9841` and all exact-profile argv were gone, and moved the
+profile recoverably to
+`/Users/JaminZhou/.Trash/codex-ui-kit-mcp-26-810.3DIzCN-20260819`. The main
+Codex process remained running.
+
 ### 26.803.41515 unavailable integration and fallback capture
 
 A second isolated current-build process used exact main PID `74865`,

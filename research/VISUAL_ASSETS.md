@@ -144,7 +144,7 @@ attributes, class names, view boxes, and render sizes before capture output.
 Process/profile setup and exact-PID cleanup remain explicit operator steps.
 
 The current manifest fingerprints Codex Desktop `26.810.52044` (`6662`) and
-contains 92 runtime-observed exact icons. It covers the visible
+contains 95 runtime-observed exact icons. It covers the visible
 sidebar/menu/window-chrome/Composer/environment surfaces, including neutral
 and attention Activity, the new footer Voice action, the conditional Mark all
 as read action, and the widened Help menu's leading changelog plus trailing
@@ -157,7 +157,13 @@ Settings navigation primitives, the Hooks reload action, and the current
 completed-thread primitives: Send, project, thread actions, open-in chevron,
 summary, bottom panel, side panel, Copy, Good response, Bad response, Fork,
 and the real successful-command Terminal glyph. The prior header New chat,
-pinned-summary, and Continue IDs are not promoted on this build. The broader
+pinned-summary, and Continue IDs are not promoted on this build. The current
+set now also includes the exact MCP integration/call glyph, the 14×14
+content-width disclosure chevron, and the four-path 16×16 `Reconnecting`
+glyph from accepted real Search/Fetch, invalid-URL recovery, and transient
+transport-recovery turns. The targeted MCP updater requires repeated group
+glyphs to share one fingerprint and validates call/group counts, 21px rows,
+90-degree open rotation, build hash, theme, and viewport before promotion. The broader
 inventory and current-build lifecycle denominator remain incomplete, so
 global pixel parity is still ineligible. See
 [`26.810.52044.md`](26.810.52044.md) for the scoped probe evidence and its

@@ -12,6 +12,10 @@ import {
 const write = process.argv.includes("--write");
 const hooksOnly = process.argv.includes("--hooks-only");
 const threadOnly = process.argv.includes("--thread-only");
+const mcpOnly = process.argv.includes("--mcp-only");
+if ([hooksOnly, threadOnly, mcpOnly].filter(Boolean).length > 1) {
+  throw new Error("Targeted current visual asset modes are mutually exclusive.");
+}
 const includeThreadCapture =
   !threadOnly && process.env.CODEX_VISUAL_ASSET_INCLUDE_THREAD === "1";
 const conditionalCapturePath =
@@ -291,6 +295,40 @@ const promotionSpecs = new Map([
       semanticId: id,
     },
   ]),
+  [
+    "thread-mcp-tool",
+    {
+      minimumCandidates: 2,
+      ownerAriaLabel: null,
+      ownerEvidence:
+        "current OpenAI Developer Docs integration and call-row glyph selected by exact completed group ownership",
+      region: "conversation",
+      retainExistingWhenAbsentOnSameFingerprint: true,
+      semanticId: "thread-mcp-tool",
+    },
+  ],
+  [
+    "thread-activity-chevron",
+    {
+      ownerAriaLabel: null,
+      ownerEvidence:
+        "current closed MCP call disclosure chevron selected by aria-labelledby ownership",
+      region: "conversation",
+      retainExistingWhenAbsentOnSameFingerprint: true,
+      semanticId: "thread-activity-chevron",
+    },
+  ],
+  [
+    "thread-reconnecting",
+    {
+      ownerAriaLabel: null,
+      ownerEvidence:
+        "current completed activity Reconnecting row selected structurally from a real recovered turn",
+      region: "conversation",
+      retainExistingWhenAbsentOnSameFingerprint: true,
+      semanticId: "thread-reconnecting",
+    },
+  ],
   [
     "sidebar-mode-chevron",
     {
@@ -611,7 +649,7 @@ const promotionSpecs = new Map([
 ]);
 
 const manifest = JSON.parse(readFileSync(manifestPath, "utf8"));
-const runCapture = (captureThreadOnly) =>
+const runCapture = (captureThreadOnly, captureMcpOnly = false) =>
   JSON.parse(
     execFileSync(process.execPath, [capturePath], {
       encoding: "utf8",
@@ -620,6 +658,7 @@ const runCapture = (captureThreadOnly) =>
         ...(captureThreadOnly
           ? { CODEX_VISUAL_ASSET_THREAD_ONLY: "1" }
           : {}),
+        ...(captureMcpOnly ? { CODEX_VISUAL_ASSET_MCP_ONLY: "1" } : {}),
       },
       maxBuffer: 64 * 1024 * 1024,
     }),
@@ -627,7 +666,7 @@ const runCapture = (captureThreadOnly) =>
 const supplementalThreadCapture = includeThreadCapture
   ? runCapture(true)
   : null;
-const capture = runCapture(threadOnly);
+const capture = runCapture(threadOnly, mcpOnly);
 if (conditionalCapturePath) {
   const normalizedProfile = realpathSync(
     process.env.CODEX_VISUAL_ASSET_PROFILE,
@@ -722,6 +761,127 @@ if (supplementalThreadCapture) {
 capture.icons.forEach((icon, index) =>
   sanitizeVisualAssetIcon(icon, `capture.icons[${index}]`),
 );
+if (mcpOnly) {
+  const targetIds = [
+    "thread-mcp-tool",
+    "thread-activity-chevron",
+    "thread-reconnecting",
+  ];
+  const observation = capture.mcpObservation;
+  if (
+    capture.captureMode !== "completed-mcp-thread" ||
+    observation?.groupCount < 1 ||
+    observation?.callCount < 2 ||
+    observation?.groupToolIconCount !== observation.groupCount ||
+    observation?.callToolIconCount !== observation.callCount ||
+    observation?.activityChevronCount !== 1 ||
+    observation?.reconnectingIconCount !== 1 ||
+    Math.abs((observation?.groupHeight ?? 0) - 21) > 0.1 ||
+    Math.abs((observation?.callHeight ?? 0) - 21) > 0.1 ||
+    observation?.openGroupChevronRotate !== "90deg"
+  ) {
+    throw new Error(
+      `Targeted current MCP capture changed unexpectedly: ${canonicalize(observation)}.`,
+    );
+  }
+  const currentFingerprint = {
+    appAsarSha256: capture.baselineContext?.appAsarSha256,
+    appVersion: capture.baselineContext?.appVersion,
+    buildNumber: capture.baselineContext?.buildNumber,
+  };
+  const manifestFingerprint = {
+    appAsarSha256: manifest.baseline.appAsarSha256,
+    appVersion: manifest.baseline.appVersion,
+    buildNumber: manifest.baseline.buildNumber,
+  };
+  if (
+    canonicalize(currentFingerprint) !== canonicalize(manifestFingerprint) ||
+    capture.baselineContext?.interactionState !==
+      "completed-current-mcp-thread" ||
+    capture.baselineContext?.theme !== manifest.baseline.theme ||
+    canonicalize(capture.baselineContext?.viewport) !==
+      canonicalize(manifest.baseline.viewport)
+  ) {
+    throw new Error(
+      "Targeted current MCP capture must match the tracked fingerprint, theme, and viewport.",
+    );
+  }
+  const promotedById = new Map();
+  for (const id of targetIds) {
+    const spec = promotionSpecs.get(id);
+    if (!spec) throw new Error(`Missing current MCP promotion spec: ${id}.`);
+    const observed = capture.icons.filter(
+      (candidate) =>
+        candidate.region === spec.region &&
+        candidate.owner?.semanticId === spec.semanticId,
+    );
+    const expectedMinimum = spec.minimumCandidates ?? 1;
+    if (observed.length < expectedMinimum) {
+      throw new Error(
+        `Expected at least ${expectedMinimum} targeted MCP captures for ${id}, received ${observed.length}.`,
+      );
+    }
+    if (new Set(observed.map(({ sha256 }) => sha256)).size !== 1) {
+      throw new Error(`${id} targeted captures do not share one fingerprint.`);
+    }
+    const existing = manifest.icons.find((icon) => icon.id === id);
+    if (
+      existing &&
+      (existing.region !== spec.region ||
+        existing.viewBox !== observed[0].viewBox ||
+        canonicalize(existing.rootAttributes) !==
+          canonicalize(observed[0].rootAttributes))
+    ) {
+      throw new Error(`${id} root geometry or region changed.`);
+    }
+    const promoted = {
+      id,
+      ownerAriaLabel: spec.ownerAriaLabel,
+      ...(spec.ownerEvidence ? { ownerEvidence: spec.ownerEvidence } : {}),
+      primitives: existing
+        ? promotePrimitives(existing, observed[0])
+        : observed[0].primitives,
+      region: spec.region,
+      renderSize: observed[0].renderSize,
+      rootAttributes: observed[0].rootAttributes,
+      rootComputedStyle: existing
+        ? promoteComputedStyle(
+            existing.rootComputedStyle,
+            observed[0].rootComputedStyle,
+          )
+        : observed[0].rootComputedStyle,
+      sourceClassName: observed[0].sourceClassName,
+      status: "runtime-observed",
+      viewBox: observed[0].viewBox,
+    };
+    promoted.sha256 = createHash("sha256")
+      .update(
+        canonicalize({
+          baselineContext: manifest.baseline,
+          primitives: promoted.primitives,
+          renderSize: promoted.renderSize,
+          rootAttributes: promoted.rootAttributes,
+          rootComputedStyle: promoted.rootComputedStyle,
+          sourceClassName: promoted.sourceClassName,
+          viewBox: promoted.viewBox,
+        }),
+      )
+      .digest("hex");
+    promotedById.set(id, promoted);
+  }
+  const existingById = new Map(manifest.icons.map((icon) => [icon.id, icon]));
+  manifest.icons = [...promotionSpecs.keys()].map(
+    (id) => promotedById.get(id) ?? existingById.get(id),
+  );
+  const output = `${JSON.stringify(manifest, null, 2)}\n`;
+  if (write) {
+    writeFileSync(manifestPath, output);
+    console.log(`Updated ${manifestPath} with current MCP assets`);
+  } else {
+    process.stdout.write(output);
+  }
+  process.exit(0);
+}
 if (threadOnly) {
   const targetIds = [
     "composer-send",

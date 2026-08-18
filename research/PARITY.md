@@ -43,7 +43,7 @@ The authoritative current-build inventory is:
   BrowserWindow; it does not prove parity with unobserved product routes,
   panels, state transitions, or window types.
 - A scoped Codex Desktop `26.810.52044` (`6662`) visual probe revalidates the
-  exact 1180×820 dark/resting asset fingerprint and now retains 92 exact
+  exact 1180×820 dark/resting asset fingerprint and now retains 95 exact
   sidebar/menu/window-chrome/Composer/environment/Settings/completed-thread icons plus
   one separately hashed, playground-only VS Code integration raster. Its sampled sidebar
   hover/footer contract also
@@ -439,6 +439,20 @@ native compact variant, including the 736×67.3125px failure output and zero
 overflow at 720×680. Six reviewed internal baselines pass. Optional local-only
 product comparisons gate the success group at 1.6440% under 2% and the compact
 failure card at 1.1017% under 1.2%; external screenshots remain uncommitted.
+
+The `26.810.52044` MCP refresh supersedes the primary success/recovery anchors
+again. The accepted success now uses one Search → Fetch pair, completes in 25
+seconds, and returns the canonical `https://developers.openai.com/codex/mcp`
+URL. The accepted 18-second recovery keeps invalid-URL Fetch → Search → Fetch
+inside one integration group. A real `Reconnecting 2/5` row also recovered in
+place and completed the same turn. The exact MCP, disclosure, and reconnect
+SVG paths are promoted into the current asset contract. Browser/CDP and
+Electron cover the current call orders, labelled content-width disclosures,
+expanded neutral failure output, transport retry/recovery, and native compact
+resize. Nine reviewed internal frames pass. Optional local-only comparisons
+gate the 736×80 success region at 1.9446% under 2% and the complete 688×67
+compact failure card at 1.20184% under 1.21%; product screenshots remain
+uncommitted.
 
 A separate `26.803.41515` unavailable/fallback task now promotes
 `thread.tool-unavailable-recovery`. Its GitHub-MCP-only turn emits no false MCP

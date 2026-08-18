@@ -2188,7 +2188,7 @@ const { app: currentMcpApp, page: currentMcpPage } = await launchScene(
 
 try {
   const timeline = currentMcpPage.getByRole("button", {
-    name: "Worked for 35s",
+    name: "Worked for 25s",
   });
   if ((await timeline.getAttribute("aria-expanded")) !== "false") {
     throw new Error("Current Electron MCP timeline should start collapsed.");
@@ -2222,15 +2222,11 @@ try {
     ),
   }));
   if (
-    (await rows.count()) !== 3 ||
-    (await rowButtons.count()) !== 3 ||
+    (await rows.count()) !== 2 ||
+    (await rowButtons.count()) !== 2 ||
     JSON.stringify(currentState.callLabels) !==
-      JSON.stringify([
-        "Search OpenAI docs",
-        "Search OpenAI docs",
-        "Fetch OpenAI doc",
-      ]) ||
-    currentState.labelledButtons.length !== 3 ||
+      JSON.stringify(["Search OpenAI docs", "Fetch OpenAI doc"]) ||
+    currentState.labelledButtons.length !== 2 ||
     currentState.labelledButtons.some(
       ({ expanded, label }) => expanded !== "false" || !label,
     )
@@ -2255,7 +2251,7 @@ const {
 
 try {
   await currentMcpRecoveryPage
-    .getByRole("button", { name: "Worked for 16s" })
+    .getByRole("button", { name: "Worked for 18s" })
     .click();
   const group = currentMcpRecoveryPage.getByTestId("mcp-tool-call-group");
   await group

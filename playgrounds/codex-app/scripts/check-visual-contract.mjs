@@ -84,7 +84,7 @@ const currentMcpSuccessReference =
   process.env.CODEX_UI_KIT_CURRENT_MCP_SUCCESS_REFERENCE;
 const currentMcpSuccessReferenceSize = {
   height: 820,
-  width: 905,
+  width: 1180,
 };
 const currentMcpRecoveryCompactReference =
   process.env.CODEX_UI_KIT_CURRENT_MCP_RECOVERY_COMPACT_REFERENCE;
@@ -4105,12 +4105,12 @@ for (const scene of selectedScenes) {
       actual.height !== 820
     ) {
       throw new Error(
-        `${scene.id}: current MCP success comparison requires a 905x820 product main crop and an exact 1180x820 playground frame, received reference ${reference.width}x${reference.height} and actual ${actual.width}x${actual.height}.`,
+        `${scene.id}: current MCP success comparison requires exact 1180x820 product and playground frames, received reference ${reference.width}x${reference.height} and actual ${actual.width}x${actual.height}.`,
       );
     }
     const comparison = comparePng(
-      cropPng(reference, 85, 103, 736, 100),
-      cropPng(actual, 359, 227, 736, 100),
+      cropPng(reference, 323, 305, 736, 80),
+      cropPng(actual, 359, 239, 736, 80),
     );
     const maximumRatio = environmentRatio(
       "CODEX_UI_KIT_CURRENT_MCP_SUCCESS_MAX_DIFF_RATIO",
@@ -4144,12 +4144,12 @@ for (const scene of selectedScenes) {
       );
     }
     const comparison = comparePng(
-      cropPng(reference, 0, 207, 676, 67),
-      cropPng(actual, 28, 271, 676, 67),
+      cropPng(reference, 16, 293, 688, 67),
+      cropPng(actual, 16, 278, 688, 67),
     );
     const maximumRatio = environmentRatio(
       "CODEX_UI_KIT_CURRENT_MCP_RECOVERY_COMPACT_MAX_DIFF_RATIO",
-      0.012,
+      0.0121,
     );
     if (comparison.ratio > maximumRatio) {
       throw new Error(

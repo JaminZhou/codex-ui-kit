@@ -46,7 +46,8 @@ observation from a previous build remains historical evidence.
 ## Current baseline
 
 - Codex Desktop `26.810.52044` (`6662`)
-- Package sampled and fingerprint-reverified on 2026-08-18
+- Package sampled on 2026-08-18 and MCP lifecycle fingerprint-reverified on
+  2026-08-19
 - `app.asar` SHA-256:
   `6e7e8791b8bf69a586ff994721fff518af391d9efdc66cd2e620dd2a4aedc90f`
 - Computer Use automation: blocked by the environment safety policy for
@@ -62,7 +63,7 @@ observation from a previous build remains historical evidence.
   overlay without using private text. The exact `scrollHeight` remains
   content-dependent, so the contract locks the unique scroll owner and visible
   geometry rather than private task counts.
-- The same fingerprint revalidates 92
+- The same fingerprint revalidates 95
   context/Composer/sidebar/menu/window/environment/Settings/completed-thread
   assets, six project groups, Recents actions, the new footer Voice control,
   the 320px Help menu, the five-icon Account menu, and one successful-command
@@ -75,8 +76,8 @@ observation from a previous build remains historical evidence.
   previous-build regression evidence and have been downgraded from `verified`
   to `partial_legacy` until they are reached again on the current fingerprint.
 
-Current inventory: 89 surface groups; 21 have current-build runtime evidence, 51 have previous-build-only runtime evidence, 17 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 20 groups and Electron verification covers 20.
-Prior acceptance outside those 20 sampled current-build groups remains
+Current inventory: 89 surface groups; 24 have current-build runtime evidence, 49 have previous-build-only runtime evidence, 16 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 23 groups and Electron verification covers 23.
+Prior acceptance outside those 23 sampled current-build groups remains
 recorded as `partial_legacy` until current-build re-observation.
 
 The current package exposes candidates far beyond the old transcript sample:
@@ -854,6 +855,36 @@ at 1.1017% under 1.2%. Product screenshots remain outside the repository.
 `thread.mcp-tool-events` and `thread.mcp-tool-failure-retry` are therefore
 current-build Browser/Electron verified while their implementation remains
 partial for the open variants below.
+
+Build `26.810.52044` refreshes both MCP rows again and promotes the previously
+unsampled transport-recovery row. The accepted real success performs exactly
+one Search OpenAI docs call and one Fetch OpenAI doc call, completes in 25
+seconds, and returns `Model Context Protocol` with the canonical
+`https://developers.openai.com/codex/mcp` URL. A second accepted real turn
+performs invalid-URL Fetch → Search → canonical Fetch in the same integration
+group and completes in 18 seconds. Its wide neutral failure card remains
+736×67.3125px with a 12.5px radius, 0.05 white background, 0.157 white border,
+13/18.5714px language label, and 14/22.75px 445-weight monospace output; after
+an explicit product-sidebar hide, the 720×680 card is 688×67.3125px at x=16.
+
+The first accepted turn also reached a real transient `Reconnecting 2/5` row
+and then completed successfully without a new turn. The asset capture promotes
+the exact current MCP glyph, 14×14 disclosure chevron, and four-path 16×16
+reconnect glyph; all repeated group/call geometry is checked before writing the
+95-icon manifest. Browser/CDP now covers the two-call success, three-call
+failure recovery, content-width disclosure ownership, exact path assets,
+compact card, and existing reconnect/recovered lifecycle. Electron repeats
+the MCP interactions and native compact resize. Nine reviewed internal MCP /
+reconnect baselines pass. Optional local-only 26.810 comparisons keep the
+736×80 successful tool region at 1.9446331521739132% under 2% and the full
+688×67 compact failure card at 1.2018396390142311% under 1.21%; product frames
+remain outside the repository.
+
+This makes `thread.mcp-tool-events`, `thread.mcp-tool-failure-retry`, and
+`thread.error-retry-recovery` current-build runtime-observed and
+Browser/Electron verified. Implementation remains partial because
+authentication, elicitation, MCP approvals, cancellation, same-transport final
+failure, and other integrations are still open.
 
 The same build now refreshes `thread.tool-unavailable-recovery` with a separate
 real two-turn task. The first turn permits only GitHub MCP, emits no fabricated

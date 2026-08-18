@@ -463,19 +463,22 @@ for (const id of [
   "thread-assistant-bad",
   "thread-assistant-fork",
   "thread-command-terminal",
+  "thread-mcp-tool",
+  "thread-activity-chevron",
+  "thread-reconnecting",
 ]) {
   if (!ids.has(id) || remaining.includes(id)) {
     throw new Error(`${id} must be promoted from current-build runtime evidence`);
   }
 }
 if (
-  manifest.icons.length !== 92 ||
+  manifest.icons.length !== 95 ||
   manifest.composerObservation?.topContextIconCount !== 3 ||
   manifest.composerObservation?.bottomActionIconCount !== 5 ||
   manifest.composerObservation?.exactSemanticIconCount !== 8
 ) {
   throw new Error(
-    "current visual asset capture must retain 92 promoted icons and the eight-icon Composer baseline",
+    "current visual asset capture must retain 95 promoted icons and the eight-icon Composer baseline",
   );
 }
 if (

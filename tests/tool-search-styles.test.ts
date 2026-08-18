@@ -33,12 +33,19 @@ describe("tool and search visual contract", () => {
       /\.codex-ui-activity__overlay-toggle \{[\s\S]*?inset: 0;[\s\S]*?position: absolute/,
     );
     expect(styles).toMatch(
-      /\.codex-ui-activity__button-chevron \{[\s\S]*?flex: 0 0 0\.75rem;[\s\S]*?opacity: 0/,
+      /\.codex-ui-activity__button-chevron \{[\s\S]*?flex: 0 0 0\.75rem;[\s\S]*?height: 1\.3125rem;[\s\S]*?min-width: 0/,
     );
     expect(styles).toContain(
       `.codex-ui-activity__disclosure[data-open]
   > .codex-ui-activity__header
-  > .codex-ui-activity__button-chevron::after`,
+  > .codex-ui-activity__button-chevron
+  svg`,
+    );
+    expect(styles).toMatch(
+      /\.codex-ui-activity__button-chevron svg \{[\s\S]*?height: 0\.875rem;[\s\S]*?opacity: 0;[\s\S]*?rotate: none/,
+    );
+    expect(styles).toMatch(
+      /\.codex-ui-activity__disclosure\[data-open\][\s\S]*?\.codex-ui-activity__button-chevron[\s\S]*?svg \{[\s\S]*?rotate: 90deg/,
     );
   });
 
