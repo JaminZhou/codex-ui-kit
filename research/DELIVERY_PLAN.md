@@ -14,7 +14,7 @@ exit gates; it does not replace the inventory.
   Desktop `26.810.52044` (`6662`). Unsampled earlier-build surfaces remain
   previous-build regression evidence rather than current verification.
 - The inventory contains 89 surface groups: 59 P0, 21 P1, and 9 P2.
-- 24 groups have current-build runtime evidence, 49 have previous-build-only
+- 26 groups have current-build runtime evidence, 47 have previous-build-only
   runtime evidence, and 16 have not been sampled.
 - The scoped `26.810.52044` refresh revalidates 95
   sidebar/menu/window-chrome/Composer/Settings/completed-thread icons against
@@ -27,6 +27,10 @@ exit gates; it does not replace the inventory.
   `Reconnecting 2/5` row that completes in place. It promotes the exact MCP,
   disclosure, and reconnect glyphs and restores current Browser/Electron/pixel
   gates for all three rows without claiming the remaining MCP variants.
+  The current command follow-up additionally re-reaches exit-code-7 recovery
+  and command interruption. It proves that 26.810 retains the stopped
+  background-command row after process settlement and same-thread recovery,
+  superseding the previous `Ran …` rewrite.
   Earlier hover/footer slices promoted More, Pin,
   Archive, and Help, confirms that Settings is absent from the sampled footer
   and that sampled project-task rows have no leading glyph. The Recents follow-up

@@ -69,15 +69,15 @@ observation from a previous build remains historical evidence.
   the 320px Help menu, the five-icon Account menu, and one successful-command
   thread. See [`26.810.52044.md`](26.810.52044.md). The scoped visible-shell approximation
   list is empty, but the broader lifecycle denominator remains incomplete;
-  prior Terminal, failure, Markdown, MCP, attachment, approval, collaboration,
+  prior Terminal, Markdown, attachment, approval, collaboration,
   and unsampled Settings evidence keeps its original prefix until separately
   re-reached.
 - Terminal and subagent runtime captures from `26.730.61639` are retained as
   previous-build regression evidence and have been downgraded from `verified`
   to `partial_legacy` until they are reached again on the current fingerprint.
 
-Current inventory: 89 surface groups; 24 have current-build runtime evidence, 49 have previous-build-only runtime evidence, 16 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 23 groups and Electron verification covers 23.
-Prior acceptance outside those 23 sampled current-build groups remains
+Current inventory: 89 surface groups; 26 have current-build runtime evidence, 47 have previous-build-only runtime evidence, 16 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 25 groups and Electron verification covers 25.
+Prior acceptance outside those 25 sampled current-build groups remains
 recorded as `partial_legacy` until current-build re-observation.
 
 The current package exposes candidates far beyond the old transcript sample:
@@ -1075,6 +1075,21 @@ glyph contains three fill paths in a 20×20 viewBox. Its command text/output is
 settlement → recovery in 188 CDP frames and a real Electron window. Local-only
 690×820 command/composer comparisons pass at 2.3321% and 1.3947%. Raw product
 screenshots and private task text remain untracked.
+
+The `26.810.52044` command refresh now supersedes the failure and interruption
+presentation above. One exact command exited 7 after producing stderr and
+stdout, exposed `Worked for 5s`, and accepted a successful no-tool follow-up in
+the same task. A second long command was stopped after eight seconds; after its
+process ended and the recovery turn completed, the 656.59×21px row remained
+`Background terminal stopped with …` instead of changing to `Ran …`. The
+independent H5 fixture and protocol replay now preserve that stopped row across
+settlement and recovery. Browser/CDP covers 198 lifecycle frames, with current
+failure and interruption semantics at 1180×820, 690×820, and 720×680. The
+local-only current-product gates compare only owned regions: failure command
+4.2564%, failure Composer 2.2194%, stopped summary/command 2.5875%, and stopped
+Composer 2.2101%, all below their independent ceilings. Electron repeats the
+Stop → background Stop → settlement → same-thread recovery transition. Raw
+product screenshots and private navigation content remain untracked.
 
 A fourth `26.730.61309` disposable task entered `/compact` only after an exact
 no-tool baseline response. The current menu exposed `Compact this chat's

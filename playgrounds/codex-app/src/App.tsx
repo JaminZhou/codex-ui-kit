@@ -8739,40 +8739,32 @@ export function App() {
             {command.command}
           </span>
         );
-        const running = command.status === "running" && state.status === "running";
-        const stopping =
-          command.status === "running" && state.status === "interrupted";
+        const running =
+          command.status === "running" && state.status === "running";
+        const stopped =
+          state.status === "interrupted" || command.status === "completed";
         const execution = (
           <CommandExecution
             command={command.command}
-            compactDetail={running ? "Running command for 1m 28s" : undefined}
             data-item-id={command.id}
             data-testid="command-execution"
             hideRawCommand
             indicator={
-              stopping ? (
+              stopped ? (
                 <span
                   aria-hidden="true"
                   className="demo-command-stop-indicator"
                 />
               ) : undefined
             }
-            open={running ? true : undefined}
-            status={
-              stopping
-                ? "interrupted"
-                : command.status === "completed"
-                  ? "background-finished"
-                  : "running"
-            }
+            open={false}
+            status={stopped ? "interrupted" : "running"}
             terminalIcon={
               <CurrentBuildIcon name="thread-command-terminal" />
             }
             summary={
-              stopping ? (
+              stopped ? (
                 <>Background terminal stopped with {commandSummary}</>
-              ) : command.status === "completed" ? (
-                <>Ran {commandSummary}</>
               ) : (
                 <>Running {commandSummary}</>
               )
@@ -8783,7 +8775,7 @@ export function App() {
           <ActivityTimeline
             key={`command:${command.id}`}
             open
-            summary={<TurnDuration durationMs={95_000} status="working" />}
+            summary={<TurnDuration durationMs={7_000} status="working" />}
           >
             {execution}
           </ActivityTimeline>

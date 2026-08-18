@@ -8167,7 +8167,6 @@ for (const scene of selectedScenes) {
     if (scene.id.startsWith("command-interruption-")) {
       const commandOutput = contract.commandOutput;
       const running = scene.id === "command-interruption-running";
-      const stopping = scene.id === "command-interruption-stopping";
       const recovered = scene.id === "command-interruption-recovered";
       const interruptionState = await page.evaluate(() => ({
         assistantText:
@@ -8196,24 +8195,18 @@ for (const scene of selectedScenes) {
         : recovered
           ? "completed"
           : "interrupted";
-      const expectedCommandStatus = running
-        ? "running"
-        : stopping
-          ? "interrupted"
-          : "background-finished";
+      const expectedCommandStatus = running ? "running" : "interrupted";
       const expectedSummaryPrefix = running
-        ? "Running seq 1 120"
-        : stopping
-          ? "Background terminal stopped with seq 1 120"
-          : "Ran seq 1 120";
+        ? "Running for i in $(seq 1 120)"
+        : "Background terminal stopped with for i in $(seq 1 120)";
       if (
         !commandOutput ||
         contract.rootStatus !== expectedRootStatus ||
         commandOutput.status !== expectedCommandStatus ||
         !commandOutput.summary?.startsWith(expectedSummaryPrefix) ||
-        commandOutput.executionExpanded !== running ||
+        commandOutput.executionExpanded !== false ||
         commandOutput.timelineExpanded !== running ||
-        commandOutput.timelineLabel !== (running ? "Working for 1m 35s" : null) ||
+        commandOutput.timelineLabel !== (running ? "Working for 7s" : null) ||
         Math.abs((commandOutput.header?.rect.width ?? 0) - 736) > 1 ||
         Math.abs((commandOutput.header?.rect.height ?? 0) - 21) > 1 ||
         commandOutput.header?.style.fontSize !== "14px" ||
@@ -8223,17 +8216,12 @@ for (const scene of selectedScenes) {
         interruptionState.stopCount !== (running ? 1 : 0) ||
         interruptionState.sendCount !== (running ? 0 : 1) ||
         (running
-          ? !commandOutput.compactDetail ||
-            commandOutput.compactDetail.text !==
-              "Running command for 1m 28s" ||
-            commandOutput.compactDetail.style.fontSize !== "14px" ||
-            commandOutput.compactDetail.style.fontWeight !== "445" ||
-            commandOutput.compactDetail.style.lineHeight !== "21px" ||
+          ? commandOutput.compactDetail !== null ||
             contract.interruption !== null
           : commandOutput.compactDetail !== null ||
             !contract.interruption ||
             contract.interruption.status !== "stopped" ||
-            contract.interruption.label?.text !== "You stopped after 1m 35s" ||
+            contract.interruption.label?.text !== "You stopped after 8s" ||
             contract.interruption.label?.style.fontSize !== "14px" ||
             contract.interruption.label?.style.fontWeight !== "445" ||
             contract.interruption.label?.style.lineHeight !== "21px" ||
@@ -8243,7 +8231,7 @@ for (const scene of selectedScenes) {
             contract.interruption.rule?.style.marginTop !== "8px") ||
         (recovered
           ? interruptionState.assistantText !==
-            "INTERRUPTION RECOVERY ACCEPTED"
+            "CURRENT INTERRUPTION RECOVERY ACCEPTED"
           : interruptionState.assistantText !== null)
       ) {
         throw new Error(
@@ -8605,6 +8593,103 @@ try {
   await currentReviewInteractionApp.close();
 }
 
+const commandInterruptionNoFrameScene = {
+  frame: "command-interruption-recovered",
+  id: "command-interruption-no-frame",
+  scenario: "interruption",
+};
+const {
+  app: commandInterruptionNoFrameApp,
+  page: commandInterruptionNoFramePage,
+} = await launchScene(commandInterruptionNoFrameScene, { capture: false });
+try {
+  const noFrameUrl = new URL(commandInterruptionNoFramePage.url());
+  noFrameUrl.searchParams.delete("frame");
+  await commandInterruptionNoFramePage.goto(noFrameUrl.href);
+  await commandInterruptionNoFramePage.emulateMedia({
+    reducedMotion: "reduce",
+  });
+  await commandInterruptionNoFramePage.waitForSelector(
+    '.demo-root[data-frame="command-interruption-recovered"][data-status="completed"] [data-item-id="command-interruption"][data-execution-status="interrupted"]',
+  );
+  const noFrameReplayPosition = commandInterruptionNoFramePage.getByRole(
+    "slider",
+    { name: "Protocol event position" },
+  );
+  await noFrameReplayPosition.fill("3");
+  await commandInterruptionNoFramePage.waitForSelector(
+    '.demo-root[data-frame="command-interruption-running"][data-status="running"] [data-item-id="command-interruption"][data-execution-status="running"]',
+  );
+  if (
+    (await commandInterruptionNoFramePage
+      .getByText("Working for 7s", { exact: true })
+      .count()) !== 1
+  ) {
+    throw new Error(
+      "Current command replay position dropped the running timeline.",
+    );
+  }
+  await noFrameReplayPosition.fill("4");
+  await commandInterruptionNoFramePage.waitForSelector(
+    '.demo-root[data-frame="command-interruption-stopping"][data-status="interrupted"] [data-item-id="command-interruption"][data-execution-status="interrupted"] .demo-command-stop-indicator',
+  );
+  await noFrameReplayPosition.press("End");
+  await commandInterruptionNoFramePage.waitForSelector(
+    '.demo-root[data-frame="command-interruption-recovered"][data-status="completed"] [data-item-id="command-interruption"][data-execution-status="interrupted"]',
+  );
+  const noFrameState = await commandInterruptionNoFramePage.evaluate(() => ({
+    assistantText:
+      document
+        .querySelector(
+          '[data-item-id="assistant-command-interruption-recovery"] .codex-ui-markdown',
+        )
+        ?.textContent?.replace(/\s+/g, " ")
+        .trim() ?? null,
+    commandSummary:
+      document
+        .querySelector(
+          '[data-item-id="command-interruption"] .codex-ui-activity__summary',
+        )
+        ?.textContent?.replace(/\s+/g, " ")
+        .trim() ?? null,
+  }));
+  if (
+    noFrameState.assistantText !==
+      "CURRENT INTERRUPTION RECOVERY ACCEPTED" ||
+    !noFrameState.commandSummary?.startsWith(
+      "Background terminal stopped with for i in $(seq 1 120)",
+    )
+  ) {
+    throw new Error(
+      `Current command no-frame settlement failed: ${JSON.stringify(noFrameState)}`,
+    );
+  }
+  const unknownFrameUrl = new URL(commandInterruptionNoFramePage.url());
+  unknownFrameUrl.searchParams.set("frame", "command-interruption-stale");
+  await commandInterruptionNoFramePage.goto(unknownFrameUrl.href);
+  await commandInterruptionNoFramePage.waitForSelector(
+    '.demo-root[data-frame="command-interruption-stale"][data-status="completed"] [data-item-id="command-interruption"][data-execution-status="interrupted"] .demo-command-stop-indicator',
+  );
+  const unknownFrameSummary =
+    await commandInterruptionNoFramePage
+      .locator(
+        '[data-item-id="command-interruption"] .codex-ui-activity__summary',
+      )
+      .textContent();
+  if (
+    !unknownFrameSummary
+      ?.replace(/\s+/g, " ")
+      .trim()
+      .startsWith("Background terminal stopped with for i in $(seq 1 120)")
+  ) {
+    throw new Error(
+      `Current command unknown-frame settlement failed: ${unknownFrameSummary}`,
+    );
+  }
+} finally {
+  await commandInterruptionNoFrameApp.close();
+}
+
 const commandInterruptionScene = {
   frame: "command-interruption-running",
   id: "command-interruption-interaction",
@@ -8652,9 +8737,9 @@ try {
   }));
   if (
     !stopping.commandSummary?.startsWith(
-      "Background terminal stopped with seq 1 120",
+      "Background terminal stopped with for i in $(seq 1 120)",
     ) ||
-    stopping.interruption !== "You stopped after 1m 35s" ||
+    stopping.interruption !== "You stopped after 8s" ||
     stopping.stopCount !== 0 ||
     stopping.stopAllCount !== 1 ||
     stopping.stopProcessCount !== 1
@@ -8665,7 +8750,7 @@ try {
   }
 
   const prematureRecoveryPrompt =
-    "Do not use tools. Reply with exactly: INTERRUPTION RECOVERY ACCEPTED";
+    "Do not use tools. Reply exactly: CURRENT INTERRUPTION RECOVERY ACCEPTED";
   const prematureComposer = commandInterruptionPage.getByRole("textbox", {
     name: "Message composer",
   });
@@ -8686,7 +8771,7 @@ try {
     .getByRole("button", { name: "Stop all background terminals" })
     .click();
   await commandInterruptionPage.waitForSelector(
-    '.demo-root[data-frame="command-interruption-settled"][data-status="interrupted"] [data-item-id="command-interruption"][data-execution-status="background-finished"]',
+    '.demo-root[data-frame="command-interruption-settled"][data-status="interrupted"] [data-item-id="command-interruption"][data-execution-status="interrupted"]',
   );
   const composer = commandInterruptionPage.getByRole("textbox", {
     name: "Message composer",
@@ -8726,9 +8811,9 @@ try {
   }));
   if (
     recovered.activeElement !== "Message composer" ||
-    recovered.assistantText !== "INTERRUPTION RECOVERY ACCEPTED" ||
-    recovered.commandStatus !== "background-finished" ||
-    recovered.interruption !== "You stopped after 1m 35s" ||
+    recovered.assistantText !== "CURRENT INTERRUPTION RECOVERY ACCEPTED" ||
+    recovered.commandStatus !== "interrupted" ||
+    recovered.interruption !== "You stopped after 8s" ||
     recovered.stopCount !== 0
   ) {
     throw new Error(

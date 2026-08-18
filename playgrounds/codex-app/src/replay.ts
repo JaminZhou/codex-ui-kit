@@ -202,7 +202,7 @@ export const replayScenarios: Record<ReplayScenarioId, ReplayScenario> = {
   interruption: scenario(
     "interruption",
     "Run interrupt probe",
-    "A current long-running command is stopped, settles from its background-terminal row, and accepts a clean same-thread follow-up.",
+    "A current long-running command is stopped, retains its settled background-terminal row, and accepts a clean same-thread follow-up.",
     interruptionTrace,
   ),
   compaction: scenario(

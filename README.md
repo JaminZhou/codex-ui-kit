@@ -210,6 +210,17 @@ diff images remain outside the package by default. Set
 `CODEX_UI_KIT_THREAD_COMPACT_REFERENCE` alongside the wide reference to gate
 the 720×680 completed-thread scene in the same command.
 
+The current command gate accepts any combination of untracked 1180×820
+success, failure, and stable-interruption references. It compares only the
+owned command/summary and Composer regions; Browser and Electron separately
+verify output, Stop/background settlement, and same-thread recovery semantics:
+
+```bash
+CODEX_UI_KIT_COMMAND_FAILURE_REFERENCE=/absolute/path/to/failure.png \
+CODEX_UI_KIT_COMMAND_INTERRUPTION_REFERENCE=/absolute/path/to/stopped.png \
+  pnpm check:visual:command
+```
+
 The protocol-backed Codex App playground also accepts independent,
 untracked current-build references for multi-file Review, Pull request detail,
 and Terminal:

@@ -1183,6 +1183,40 @@ was removed. Both exact temporary profiles and all external screenshots/JSON
 were moved to recoverable Trash; the successful evidence remains in
 `codex-ui-kit-command-stop-cdp.ZbTpcV`.
 
+### Current 26.810.52044 command failure, interruption, and recovery
+
+The current refresh used exact main PID `99403`, loopback port `9851`, and the
+unique profile
+`/private/tmp/codex-ui-kit-command-26-810.PaoXaC/profile`. The installed
+`app.asar` was re-hashed before sampling as
+`6e7e8791b8bf69a586ff994721fff518af391d9efdc66cd2e620dd2a4aedc90f`.
+The isolated task ran only a bounded twelve-line success loop, one exact
+stdout/stderr command ending in `exit 7`, and one 120-second loop stopped after
+eight seconds. It did not read or write project files.
+
+The expanded failure activity exposed `Worked for 5s`, a 656.59px Shell card,
+13/19.5px command text at weight 445, stderr before stdout at weight 500, and
+`Exit code 7`. A no-tool follow-up returned exactly `CURRENT FAILURE RECOVERY
+ACCEPTED`. The interruption path exposed `Working for 7s`, then `You stopped
+after 8s` and a 656.59×21px `Background terminal stopped with …` row. No
+matching command process remained, yet that row persisted after the no-tool
+follow-up returned exactly `CURRENT INTERRUPTION RECOVERY ACCEPTED`; the
+current build did not rewrite it to `Ran …`.
+
+The independent fixture and public protocol replay now preserve the stopped
+row through settlement and recovery. Browser/CDP passes 198 lifecycle frames;
+the owned local-only failure command/Composer regions differ by 4.2564% and
+2.2194%, while the stopped summary-command/Composer regions differ by 2.5875%
+and 2.2101%, all below independent ceilings. Product screenshots, raw DOM,
+task text, and navigation metadata remain untracked.
+
+Post-capture hashing still matched the pre-capture fingerprint. Cleanup
+terminated only PID `99403` and its exact profile-specific process tree,
+closed port `9851`, removed the two ignored post-probe helpers, and left the
+original Codex PID `86536` running. The isolated profile, screenshots, and raw
+JSON were moved into the recoverable Trash item
+`codex-ui-kit-command-26-810.PaoXaC`.
+
 ### Current 26.730.61309 manual context compaction
 
 The compaction probe used exact main PID `13096`, loopback port `9543`, and
