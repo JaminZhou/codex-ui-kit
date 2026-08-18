@@ -758,7 +758,8 @@ export function AppShell({
       ? coordinatedPersistentMainMinWidth
       : normalizedSidePanelMinMainWidth;
   const responsiveSidebarMaxWidth =
-    layoutMode === "narrow" || shellWidth === null
+    (layoutMode === "narrow" && !currentBuildNarrowSidebar) ||
+    shellWidth === null
       ? normalizedSidebarMaxWidth
       : Math.max(
           normalizedSidebarMinWidth,
