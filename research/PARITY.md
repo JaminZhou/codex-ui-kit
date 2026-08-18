@@ -6,9 +6,11 @@ not establish full conversation, workspace, application, or product coverage.
 
 The authoritative current-build inventory is:
 
-- [`26.803.61601.md`](26.803.61601.md) for the current package fingerprint,
-  reproducible global-shell baseline, revalidated scoped visual assets,
-  Settings/Git/Appearance, and same-state dark-shell acceptance;
+- [`26.810.52044.md`](26.810.52044.md) for the current package fingerprint,
+  reproducible global-shell baseline, current sidebar/menu behavior, 92 scoped
+  visual assets, Settings/Git navigation, and one successful-command thread;
+- [`26.803.61601.md`](26.803.61601.md) for the previous shell, command,
+  Terminal, workspace, Settings, and same-state dark-shell acceptance;
 - [`26.803.41515.md`](26.803.41515.md) for the previous Markdown table,
   attachment, MCP, sidebar/Composer, and window-chrome captures;
 - [`26.730.61639.md`](26.730.61639.md) for the previous Terminal
@@ -40,8 +42,8 @@ The authoritative current-build inventory is:
 - The Electron playground validates the current package in a desktop
   BrowserWindow; it does not prove parity with unobserved product routes,
   panels, state transitions, or window types.
-- A scoped Codex Desktop `26.803.61601` (`6396`) visual probe revalidates the
-  exact 1180×820 dark/resting asset fingerprint and now retains 91 exact
+- A scoped Codex Desktop `26.810.52044` (`6662`) visual probe revalidates the
+  exact 1180×820 dark/resting asset fingerprint and now retains 92 exact
   sidebar/menu/window-chrome/Composer/environment/Settings/completed-thread icons plus
   one separately hashed, playground-only VS Code integration raster. Its sampled sidebar
   hover/footer contract also
@@ -51,9 +53,9 @@ The authoritative current-build inventory is:
   Sidebar/Back/Forward titlebar controls and all eight visible Composer
   context/action icons are exact. This empties the scoped visible-shell
   approximation list without making the broader inventory or lifecycle
-  denominator complete. The account-menu slice additionally locks six real
-  icons, six items, one de-identified avatar, zero role separators, Escape
-  focus return, and a 0.1979% owned pixel ratio. The ordinary sidebar status
+  denominator complete. The account-menu slice now locks five real icons, six
+  items, one de-identified avatar, zero role separators, and Escape focus
+  return; Usage no longer has a trailing chevron. The ordinary sidebar status
   slice now locks real active/unread geometry, color, actions replacement, and
   local-only pixels. A separate disposable-repository probe reaches real
   worktree create, controlled failure, Retry recovery, and restored rows; it
@@ -67,7 +69,7 @@ The authoritative current-build inventory is:
   the session-latched warning only after another app restart. Browser/CDP,
   Electron, and a 3.2572% local-only notice crop gate that observed boundary.
   Broader unsampled inventory still keeps global pixel parity ineligible.
-- The current-command follow-up re-reaches bounded success, exact `exit 7`,
+- The previous-command follow-up reached bounded success, exact `exit 7`,
   Stop, background settlement, and same-thread recovery on `26.803.61601`.
   It adds the exact three-path terminal glyph; matches the 13px/19.5px/445
   command typography; and separates current-turn Stop from host-owned Stop all

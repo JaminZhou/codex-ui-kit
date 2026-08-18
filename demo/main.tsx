@@ -514,9 +514,6 @@ function CurrentThreadExactHeader({ title }: { title: string }) {
           <button aria-label="Forward" disabled type="button">
             <CurrentThreadBuildIcon name="window-chrome-forward" />
           </button>
-          <button aria-label="New chat" type="button">
-            <CurrentThreadBuildIcon name="thread-header-new-chat" />
-          </button>
         </div>
       }
       endActions={
@@ -529,8 +526,8 @@ function CurrentThreadExactHeader({ title }: { title: string }) {
             <CurrentThreadRasterAsset name="thread-header-editor-vscode" />
             <CurrentThreadBuildIcon name="thread-header-open-in-chevron" />
           </button>
-          <button aria-label="Thread controls" type="button">
-            <CurrentThreadBuildIcon name="thread-header-pinned-summary" />
+          <button aria-label="Toggle summary" type="button">
+            <CurrentThreadBuildIcon name="thread-header-summary" />
           </button>
           <button aria-label="Toggle bottom panel" type="button">
             <CurrentThreadBuildIcon name="thread-header-bottom-panel" />
@@ -627,10 +624,13 @@ function CurrentThreadPixelFixture({
       ? streamingPixelReplies.compact
       : streamingPixelReplies.wide;
   const messageActions = [
-    ["copy", <CurrentThreadBuildIcon name="thread-assistant-copy" />],
-    ["like", <CurrentThreadBuildIcon name="thread-assistant-good" />],
-    ["dislike", <CurrentThreadBuildIcon name="thread-assistant-bad" />],
-    ["expand", <CurrentThreadBuildIcon name="thread-assistant-continue" />],
+    ["Copy response", <CurrentThreadBuildIcon name="thread-assistant-copy" />],
+    ["Good response", <CurrentThreadBuildIcon name="thread-assistant-good" />],
+    ["Bad response", <CurrentThreadBuildIcon name="thread-assistant-bad" />],
+    [
+      "Fork chat from here",
+      <CurrentThreadBuildIcon name="thread-assistant-fork" />,
+    ],
   ] as const;
 
   return (

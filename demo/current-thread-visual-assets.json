@@ -1,16 +1,16 @@
 {
   "schemaVersion": 1,
   "sourceBaseline": {
-    "appAsarSha256": "928129601e8b36eccba603114d6912352f2b13182f3a7d60b32166d0e81aafb5",
-    "appVersion": "26.803.61601",
-    "buildNumber": "6396",
+    "appAsarSha256": "6e7e8791b8bf69a586ff994721fff518af391d9efdc66cd2e620dd2a4aedc90f",
+    "appVersion": "26.810.52044",
+    "buildNumber": "6662",
     "interactionState": "resting-and-open-sidebar-menus",
     "theme": "dark",
     "viewport": {
       "height": 820,
       "width": 1180
     },
-    "capturedAt": "2026-08-12"
+    "capturedAt": "2026-08-18"
   },
   "sourceManifest": "research/visual-assets.json",
   "icons": [
@@ -24,9 +24,9 @@
           },
           "computedStyle": {
             "clip-path": "none",
-            "color": "rgb(255, 255, 255)",
+            "color": "rgb(223, 223, 223)",
             "display": "inline",
-            "fill": "rgb(255, 255, 255)",
+            "fill": "rgb(223, 223, 223)",
             "fill-opacity": "1",
             "filter": "none",
             "height": "auto",
@@ -61,7 +61,7 @@
       },
       "rootComputedStyle": {
         "clip-path": "none",
-        "color": "rgb(255, 255, 255)",
+        "color": "rgb(223, 223, 223)",
         "display": "block",
         "fill": "none",
         "fill-opacity": "1",
@@ -84,7 +84,7 @@
         "visibility": "visible",
         "width": "16px"
       },
-      "sourceSha256": "d3e737318aa0891ad5a0cc6c5d24a9bae3fc1f8d54dbbe3c10ca92206471948a",
+      "sourceSha256": "20fac0eb3af8eb4a1d22145af3bc6bc0a69304de4df322436fdabaa6b1d80080",
       "viewBox": "0 0 20 20"
     },
     {
@@ -101,9 +101,9 @@
               },
               "computedStyle": {
                 "clip-path": "none",
-                "color": "rgb(255, 255, 255)",
+                "color": "rgb(223, 223, 223)",
                 "display": "inline",
-                "fill": "rgb(255, 255, 255)",
+                "fill": "rgb(223, 223, 223)",
                 "fill-opacity": "1",
                 "filter": "none",
                 "height": "auto",
@@ -134,9 +134,9 @@
               },
               "computedStyle": {
                 "clip-path": "none",
-                "color": "rgb(255, 255, 255)",
+                "color": "rgb(223, 223, 223)",
                 "display": "inline",
-                "fill": "rgb(255, 255, 255)",
+                "fill": "rgb(223, 223, 223)",
                 "fill-opacity": "1",
                 "filter": "none",
                 "height": "auto",
@@ -162,9 +162,9 @@
           ],
           "computedStyle": {
             "clip-path": "none",
-            "color": "rgb(255, 255, 255)",
+            "color": "rgb(223, 223, 223)",
             "display": "inline",
-            "fill": "rgb(255, 255, 255)",
+            "fill": "rgb(223, 223, 223)",
             "fill-opacity": "1",
             "filter": "none",
             "height": "auto",
@@ -199,9 +199,9 @@
       },
       "rootComputedStyle": {
         "clip-path": "none",
-        "color": "rgb(255, 255, 255)",
+        "color": "rgb(223, 223, 223)",
         "display": "block",
-        "fill": "rgb(255, 255, 255)",
+        "fill": "rgb(223, 223, 223)",
         "fill-opacity": "1",
         "filter": "none",
         "height": "16px",
@@ -222,7 +222,7 @@
         "visibility": "visible",
         "width": "16px"
       },
-      "sourceSha256": "0cbfb8727554adf05a9db79897c4753d7c0ce28fb9390c48f63e899dea12e285",
+      "sourceSha256": "e42ce47764d17605c912f0d1fe5cb8601c35efd32c7d16ff5472ae7b46b1233e",
       "viewBox": "0 0 20 20"
     },
     {
@@ -294,7 +294,7 @@
         "visibility": "visible",
         "width": "14px"
       },
-      "sourceSha256": "0130128e8c6bb95f53f5940389a1cfc97e321fbb0560266539dd4bf6ca192df1",
+      "sourceSha256": "fce0619b4ea5b07521d63a8816a59dc5b16a2ee9fa2d8eb2917aeb195fa3a638",
       "viewBox": "0 0 16 16"
     },
     {
@@ -433,7 +433,7 @@
         "visibility": "visible",
         "width": "16px"
       },
-      "sourceSha256": "de25e6a991c9bb0d7e8125d4a77a95bcc398384882fc0623a67272f96dd3713c",
+      "sourceSha256": "006e290b4ae0d3fb5e4a635a10a7dafe08d153f1602afd8cbd835f08a5e032e5",
       "viewBox": "0 0 20 20"
     },
     {
@@ -506,7 +506,7 @@
         "visibility": "visible",
         "width": "16px"
       },
-      "sourceSha256": "533380421936e36e685ae2d859bf1b56ae0839c0a0220309a9e630a03ebbd837",
+      "sourceSha256": "8ab7b6b9a02cc6522f9f8005418495b364cd90d6a350274713b9e6854529f550",
       "viewBox": "0 0 20 20"
     },
     {
@@ -521,9 +521,9 @@
           },
           "computedStyle": {
             "clip-path": "none",
-            "color": "oklab(0.999994 0.0000455678 0.0000200868 / 0.85)",
+            "color": "oklab(0.903646 0.0000412762 0.0000180602 / 0.85)",
             "display": "inline",
-            "fill": "oklab(0.999994 0.0000455678 0.0000200868 / 0.85)",
+            "fill": "oklab(0.903646 0.0000412762 0.0000180602 / 0.85)",
             "fill-opacity": "1",
             "filter": "none",
             "height": "auto",
@@ -558,7 +558,7 @@
       },
       "rootComputedStyle": {
         "clip-path": "none",
-        "color": "oklab(0.999994 0.0000455678 0.0000200868 / 0.85)",
+        "color": "oklab(0.903646 0.0000412762 0.0000180602 / 0.85)",
         "display": "block",
         "fill": "none",
         "fill-opacity": "1",
@@ -581,7 +581,7 @@
         "visibility": "visible",
         "width": "16px"
       },
-      "sourceSha256": "afa241b367f37f54694ef9e01006625e423c61a9ad4a6780a1d4e9573fc7c059",
+      "sourceSha256": "4a452510b4e08dddc71398131a3ae66247d2d2dc504b1d48ce7cd9dbc14e7a4b",
       "viewBox": "0 0 16 16"
     },
     {
@@ -589,14 +589,14 @@
       "primitives": [
         {
           "attributes": {
-            "d": "M6.33325 1.88379C6.58178 1.88379 6.78345 2.08546 6.78345 2.33398C6.78328 2.58237 6.58168 2.78418 6.33325 2.78418H4.66626C3.62638 2.78435 2.78362 3.62711 2.78345 4.66699V11.334C2.78361 12.3739 3.62637 13.2176 4.66626 13.2178H11.3333C12.3733 13.2178 13.2169 12.374 13.217 11.334V9.66699C13.2172 9.41872 13.418 9.21795 13.6663 9.21777C13.9147 9.21777 14.1163 9.41861 14.1165 9.66699V11.334C14.1163 12.871 12.8703 14.1172 11.3333 14.1172H4.66626C3.12932 14.117 1.88322 12.8709 1.88306 11.334V4.66699C1.88323 3.13006 3.12933 1.88396 4.66626 1.88379H6.33325Z",
+            "d": "M6.33325 1.80763C6.62314 1.80763 6.85855 2.04315 6.85864 2.33302C6.85864 2.62297 6.6232 2.85841 6.33325 2.85841H4.66626C3.66786 2.85859 2.85891 3.66765 2.85864 4.66603V11.333C2.85864 12.3316 3.66769 13.1414 4.66626 13.1416H11.3333C12.332 13.1416 13.1418 12.3317 13.1418 11.333V9.66603C13.1421 9.37642 13.3766 9.14179 13.6663 9.14161C13.956 9.14161 14.1914 9.37631 14.1917 9.66603V11.333C14.1917 12.9116 12.9119 14.1914 11.3333 14.1914H4.66626C3.0878 14.1912 1.80786 12.9115 1.80786 11.333V4.66603C1.80813 3.08775 3.08796 1.80781 4.66626 1.80763H6.33325Z",
             "fill": "currentColor"
           },
           "computedStyle": {
             "clip-path": "none",
-            "color": "oklab(0.999994 0.0000455678 0.0000200868 / 0.85)",
+            "color": "oklab(0.903646 0.0000412762 0.0000180602 / 0.85)",
             "display": "inline",
-            "fill": "oklab(0.999994 0.0000455678 0.0000200868 / 0.85)",
+            "fill": "oklab(0.903646 0.0000412762 0.0000180602 / 0.85)",
             "fill-opacity": "1",
             "filter": "none",
             "height": "auto",
@@ -622,15 +622,15 @@
         {
           "attributes": {
             "clip-rule": "evenodd",
-            "d": "M10.8948 2.375C11.6494 1.63227 12.8628 1.63698 13.6116 2.38574C14.362 3.13643 14.3637 4.35266 13.6165 5.10644L9.36353 9.39355C9.01402 9.74579 8.56977 9.98985 8.08521 10.0967L6.17603 10.5166C5.74813 10.6107 5.36686 10.2296 5.46118 9.80176L5.88208 7.89746C5.98978 7.4105 6.23578 6.96428 6.59106 6.61426L10.8948 2.375ZM12.9749 3.02148C12.5756 2.62258 11.9289 2.62086 11.5266 3.0166L7.2229 7.25586C6.99148 7.4839 6.83116 7.77457 6.76099 8.0918L6.44165 9.53711L7.89185 9.21777C8.20744 9.14811 8.49721 8.98919 8.72485 8.75976L12.9778 4.47266C13.3759 4.07066 13.375 3.42164 12.9749 3.02148Z",
+            "d": "M10.842 2.32228C11.6259 1.55049 12.8863 1.55435 13.6643 2.33204C14.4442 3.11205 14.4469 4.37706 13.6702 5.16017L9.41626 9.4463C9.05652 9.80879 8.59956 10.0601 8.10083 10.1699L6.19263 10.5899C5.7111 10.6958 5.28165 10.2666 5.38794 9.78517L5.80884 7.88185C5.9196 7.38036 6.17342 6.92096 6.53931 6.56056L10.842 2.32228ZM12.9221 3.07521C12.552 2.7051 11.9524 2.70322 11.5793 3.07033L7.27563 7.30861C7.05429 7.52663 6.90125 7.80504 6.83423 8.10841L6.54028 9.43849L7.87524 9.14454C8.17687 9.07807 8.45355 8.92625 8.67114 8.70704L12.9241 4.41993C13.2934 4.04741 13.2928 3.44631 12.9221 3.07521Z",
             "fill": "currentColor",
             "fill-rule": "evenodd"
           },
           "computedStyle": {
             "clip-path": "none",
-            "color": "oklab(0.999994 0.0000455678 0.0000200868 / 0.85)",
+            "color": "oklab(0.903646 0.0000412762 0.0000180602 / 0.85)",
             "display": "inline",
-            "fill": "oklab(0.999994 0.0000455678 0.0000200868 / 0.85)",
+            "fill": "oklab(0.903646 0.0000412762 0.0000180602 / 0.85)",
             "fill-opacity": "1",
             "filter": "none",
             "height": "auto",
@@ -665,7 +665,7 @@
       },
       "rootComputedStyle": {
         "clip-path": "none",
-        "color": "oklab(0.999994 0.0000455678 0.0000200868 / 0.85)",
+        "color": "oklab(0.903646 0.0000412762 0.0000180602 / 0.85)",
         "display": "block",
         "fill": "none",
         "fill-opacity": "1",
@@ -688,7 +688,7 @@
         "visibility": "visible",
         "width": "16px"
       },
-      "sourceSha256": "42fd321090a0a87bba6f772408ff37d97b7ec424036fb442f92cb722c2152ae4",
+      "sourceSha256": "5fb845b5b497707b4548366680b75b598e129636ab739f2f7427d7fc6c76063e",
       "viewBox": "0 0 16 16"
     },
     {
@@ -761,11 +761,11 @@
         "visibility": "visible",
         "width": "16px"
       },
-      "sourceSha256": "c866c1666fd9ba71e1a31353c6f57665c5be59e66562ceac7273b904846d7e6f",
+      "sourceSha256": "2a82e0d8bf565202bdcfc77b451a9c06f4c41ba38252cbafddb51e3162c58017",
       "viewBox": "0 0 20 21"
     },
     {
-      "id": "thread-assistant-continue",
+      "id": "thread-assistant-fork",
       "primitives": [
         {
           "attributes": {
@@ -833,7 +833,7 @@
         "visibility": "visible",
         "width": "16px"
       },
-      "sourceSha256": "b7257cd4652ecc6ec9f8c96e35d838ab40d2b38947203db3bbb4b0d3f0d0c472",
+      "sourceSha256": "d41ed321c47ca2265e527566e50585251cfca29bf87c7b766bb980f3add6fe97",
       "viewBox": "0 0 20 20"
     },
     {
@@ -906,7 +906,7 @@
         "visibility": "visible",
         "width": "16px"
       },
-      "sourceSha256": "ea5986e729ae77a98d3745d6a15423e583ba5c1338a034125988ff9f54374b44",
+      "sourceSha256": "7f33060d46ba03511a8634f7d2191f44b1946361b90c413a461e80213804f0ef",
       "viewBox": "0 0 21 21"
     },
     {
@@ -979,7 +979,7 @@
         "visibility": "visible",
         "width": "16px"
       },
-      "sourceSha256": "078912cf5080303c484a533e5ea7cb4b93eff70155333bb4a860f53fd73db711",
+      "sourceSha256": "accb2f9668e351373268e5f8e03e44f66cab4b3d3333cb99e935c10474501831",
       "viewBox": "0 0 20 21"
     },
     {
@@ -1116,7 +1116,7 @@
         "visibility": "visible",
         "width": "18px"
       },
-      "sourceSha256": "dbf2f75098ba52545fc951e5ca4b8d9450f1ac8a387fad1ffe40164ed747236c",
+      "sourceSha256": "ecb188bc86d4b3f40a0af91223bf3ae87893e2e043277c6d1ffe2068ecdffb42",
       "viewBox": "0 0 21 21"
     },
     {
@@ -1223,115 +1223,8 @@
         "visibility": "visible",
         "width": "16px"
       },
-      "sourceSha256": "4631d3a41feaed50bb59d163fefc00be98088ae58a8da0633f14ebcefd95b565",
+      "sourceSha256": "e7e3765ac3647f7a1eca12b8155fa7a543e50bcbb24566e144ce7d1ec4645a54",
       "viewBox": "0 0 20 20"
-    },
-    {
-      "id": "thread-header-new-chat",
-      "primitives": [
-        {
-          "attributes": {
-            "d": "M6.33325 1.88379C6.58178 1.88379 6.78345 2.08546 6.78345 2.33398C6.78328 2.58237 6.58168 2.78418 6.33325 2.78418H4.66626C3.62638 2.78435 2.78362 3.62711 2.78345 4.66699V11.334C2.78361 12.3739 3.62637 13.2176 4.66626 13.2178H11.3333C12.3733 13.2178 13.2169 12.374 13.217 11.334V9.66699C13.2172 9.41872 13.418 9.21795 13.6663 9.21777C13.9147 9.21777 14.1163 9.41861 14.1165 9.66699V11.334C14.1163 12.871 12.8703 14.1172 11.3333 14.1172H4.66626C3.12932 14.117 1.88322 12.8709 1.88306 11.334V4.66699C1.88323 3.13006 3.12933 1.88396 4.66626 1.88379H6.33325Z",
-            "fill": "currentColor"
-          },
-          "computedStyle": {
-            "clip-path": "none",
-            "color": "rgba(255, 255, 255, 0.498)",
-            "display": "inline",
-            "fill": "rgba(255, 255, 255, 0.498)",
-            "fill-opacity": "1",
-            "filter": "none",
-            "height": "auto",
-            "opacity": "1",
-            "paint-order": "normal",
-            "shape-rendering": "auto",
-            "stroke": "none",
-            "stroke-dasharray": "none",
-            "stroke-dashoffset": "0px",
-            "stroke-linecap": "butt",
-            "stroke-linejoin": "miter",
-            "stroke-miterlimit": "4",
-            "stroke-opacity": "1",
-            "stroke-width": "1px",
-            "transform": "none",
-            "transform-origin": "0px 0px",
-            "vector-effect": "none",
-            "visibility": "visible",
-            "width": "auto"
-          },
-          "tag": "path"
-        },
-        {
-          "attributes": {
-            "clip-rule": "evenodd",
-            "d": "M10.8948 2.375C11.6494 1.63227 12.8628 1.63698 13.6116 2.38574C14.362 3.13643 14.3637 4.35266 13.6165 5.10644L9.36353 9.39355C9.01402 9.74579 8.56977 9.98985 8.08521 10.0967L6.17603 10.5166C5.74813 10.6107 5.36686 10.2296 5.46118 9.80176L5.88208 7.89746C5.98978 7.4105 6.23578 6.96428 6.59106 6.61426L10.8948 2.375ZM12.9749 3.02148C12.5756 2.62258 11.9289 2.62086 11.5266 3.0166L7.2229 7.25586C6.99148 7.4839 6.83116 7.77457 6.76099 8.0918L6.44165 9.53711L7.89185 9.21777C8.20744 9.14811 8.49721 8.98919 8.72485 8.75976L12.9778 4.47266C13.3759 4.07066 13.375 3.42164 12.9749 3.02148Z",
-            "fill": "currentColor",
-            "fill-rule": "evenodd"
-          },
-          "computedStyle": {
-            "clip-path": "none",
-            "color": "rgba(255, 255, 255, 0.498)",
-            "display": "inline",
-            "fill": "rgba(255, 255, 255, 0.498)",
-            "fill-opacity": "1",
-            "filter": "none",
-            "height": "auto",
-            "opacity": "1",
-            "paint-order": "normal",
-            "shape-rendering": "auto",
-            "stroke": "none",
-            "stroke-dasharray": "none",
-            "stroke-dashoffset": "0px",
-            "stroke-linecap": "butt",
-            "stroke-linejoin": "miter",
-            "stroke-miterlimit": "4",
-            "stroke-opacity": "1",
-            "stroke-width": "1px",
-            "transform": "none",
-            "transform-origin": "0px 0px",
-            "vector-effect": "none",
-            "visibility": "visible",
-            "width": "auto"
-          },
-          "tag": "path"
-        }
-      ],
-      "renderSize": {
-        "height": 16,
-        "width": 16
-      },
-      "rootAttributes": {
-        "fill": "none",
-        "height": "16",
-        "width": "16"
-      },
-      "rootComputedStyle": {
-        "clip-path": "none",
-        "color": "rgba(255, 255, 255, 0.498)",
-        "display": "block",
-        "fill": "none",
-        "fill-opacity": "1",
-        "filter": "none",
-        "height": "16px",
-        "opacity": "1",
-        "paint-order": "normal",
-        "shape-rendering": "auto",
-        "stroke": "none",
-        "stroke-dasharray": "none",
-        "stroke-dashoffset": "0px",
-        "stroke-linecap": "butt",
-        "stroke-linejoin": "miter",
-        "stroke-miterlimit": "4",
-        "stroke-opacity": "1",
-        "stroke-width": "1px",
-        "transform": "none",
-        "transform-origin": "8px 8px",
-        "vector-effect": "none",
-        "visibility": "visible",
-        "width": "16px"
-      },
-      "sourceSha256": "b954be6d890038674916751f715f3115f3eafdd07ac1afffc3697cbdbd183ae3",
-      "viewBox": "0 0 16 16"
     },
     {
       "id": "thread-header-open-in-chevron",
@@ -1345,16 +1238,16 @@
           },
           "computedStyle": {
             "clip-path": "none",
-            "color": "rgb(255, 255, 255)",
+            "color": "rgb(223, 223, 223)",
             "display": "inline",
-            "fill": "rgb(255, 255, 255)",
+            "fill": "rgb(223, 223, 223)",
             "fill-opacity": "1",
             "filter": "none",
             "height": "auto",
             "opacity": "1",
             "paint-order": "normal",
             "shape-rendering": "auto",
-            "stroke": "rgb(255, 255, 255)",
+            "stroke": "rgb(223, 223, 223)",
             "stroke-dasharray": "none",
             "stroke-dashoffset": "0px",
             "stroke-linecap": "butt",
@@ -1382,7 +1275,7 @@
       },
       "rootComputedStyle": {
         "clip-path": "none",
-        "color": "rgb(255, 255, 255)",
+        "color": "rgb(223, 223, 223)",
         "display": "block",
         "fill": "none",
         "fill-opacity": "1",
@@ -1405,11 +1298,11 @@
         "visibility": "visible",
         "width": "14px"
       },
-      "sourceSha256": "0184858156b4f081f90ee68da934e797a6a54398a56a8af7139a38f3d5921b08",
+      "sourceSha256": "2de59d846f7b4dc2c898c7c604ea20b5c09fd61567816ab197256a23e4271503",
       "viewBox": "0 0 20 21"
     },
     {
-      "id": "thread-header-pinned-summary",
+      "id": "thread-header-summary",
       "primitives": [
         {
           "attributes": {
@@ -1477,7 +1370,7 @@
         "visibility": "visible",
         "width": "16px"
       },
-      "sourceSha256": "97c19188454741349e8042fcc2ebdd648d3ceeeaba5dfb01aacd04e13b1c637c",
+      "sourceSha256": "f00041eab10e74a737db28ce861f3dd559fcdfb97c8249dae90966605e20749d",
       "viewBox": "0 0 20 20"
     },
     {
@@ -1485,14 +1378,16 @@
       "primitives": [
         {
           "attributes": {
-            "d": "M5.36914 2.1416C5.92368 2.14164 6.3602 2.23705 6.73242 2.38965C7.09745 2.53934 7.38155 2.73818 7.61816 2.9043C8.07599 3.22573 8.42077 3.47464 9.16602 3.47461H11.9473C13.3336 3.47484 14.4453 4.61217 14.4453 6V7.06543C14.4453 7.07196 14.4435 7.07845 14.4434 7.08496V11.3311C14.4432 12.7187 13.3316 13.8562 11.9453 13.8564H4.05371C2.66747 13.8562 1.55583 12.7187 1.55566 11.3311V7.35059C1.55545 7.34451 1.55377 7.33815 1.55371 7.33203C1.55371 7.32563 1.55539 7.31884 1.55566 7.3125V4.66699C1.55566 3.27918 2.66737 2.14185 4.05371 2.1416H5.36914ZM2.60547 7.85645V11.3311C2.60563 12.1519 3.26037 12.8054 4.05371 12.8057H11.9453C12.7387 12.8054 13.3934 12.1519 13.3936 11.3311V7.85645H2.60547ZM4.05371 3.19238C3.26027 3.19264 2.60547 3.84598 2.60547 4.66699V6.80664H13.3955V6C13.3955 5.17898 12.7407 4.52562 11.9473 4.52539H9.16699C8.07975 4.52558 7.50694 4.10863 7.01562 3.76367C6.77766 3.5966 6.57849 3.46159 6.33398 3.36133C6.09656 3.264 5.79646 3.19242 5.36914 3.19238H4.05371Z",
-            "fill": "currentColor"
+            "clip-rule": "evenodd",
+            "d": "M5.55957 2.14136C6.06503 2.14136 6.55801 2.30207 6.9668 2.59937L7.81836 3.21851C8.04761 3.38513 8.32401 3.47534 8.60742 3.47534H12.1338C13.4545 3.47559 14.5254 4.54621 14.5254 5.86694V11.4666C14.5254 12.7873 13.4545 13.8579 12.1338 13.8582H3.86621C2.54554 13.8579 1.47461 12.7873 1.47461 11.4666V4.53296C1.47486 3.21244 2.54569 2.1416 3.86621 2.14136H5.55957ZM2.52539 7.85718V11.4666C2.52539 12.2074 3.12544 12.8081 3.86621 12.8083H12.1338C12.8746 12.8081 13.4746 12.2074 13.4746 11.4666V7.85718H2.52539ZM3.86621 3.19214C3.12559 3.19238 2.52564 3.79234 2.52539 4.53296V6.8064H13.4746V5.86694C13.4746 5.12611 12.8746 4.52539 12.1338 4.52515H8.60742C8.10203 4.52515 7.60895 4.36534 7.2002 4.06812L6.34863 3.448C6.11937 3.28135 5.84301 3.19214 5.55957 3.19214H3.86621Z",
+            "fill": "currentColor",
+            "fill-rule": "evenodd"
           },
           "computedStyle": {
             "clip-path": "none",
-            "color": "rgb(255, 255, 255)",
+            "color": "rgb(223, 223, 223)",
             "display": "inline",
-            "fill": "rgb(255, 255, 255)",
+            "fill": "rgb(223, 223, 223)",
             "fill-opacity": "1",
             "filter": "none",
             "height": "auto",
@@ -1527,7 +1422,7 @@
       },
       "rootComputedStyle": {
         "clip-path": "none",
-        "color": "rgb(255, 255, 255)",
+        "color": "rgb(223, 223, 223)",
         "display": "block",
         "fill": "none",
         "fill-opacity": "1",
@@ -1550,7 +1445,7 @@
         "visibility": "visible",
         "width": "16px"
       },
-      "sourceSha256": "9902e4ef5ca5612d584eab04354ae2618f54d1da479f7631d92a9390a6eeb00f",
+      "sourceSha256": "34d88aab6402fe3bf798120699274b68f2bcc4589c9215098204861f6966a747",
       "viewBox": "0 0 16 16"
     },
     {
@@ -1623,7 +1518,7 @@
         "visibility": "visible",
         "width": "16px"
       },
-      "sourceSha256": "285b41f49b9bce51ce6343bc4903e03583203fd4cd7287a04ef4d831204088f4",
+      "sourceSha256": "65ad3ce1c7e504acfbb64658b023bcf8d6a36a8eee1962d04c466aec52b8111e",
       "viewBox": "0 0 20 20"
     },
     {
@@ -1636,9 +1531,9 @@
           },
           "computedStyle": {
             "clip-path": "none",
-            "color": "oklab(0.999994 0.0000455677 0.0000200868 / 0.6)",
+            "color": "oklab(0.903646 0.0000412762 0.0000180602 / 0.6)",
             "display": "inline",
-            "fill": "oklab(0.999994 0.0000455677 0.0000200868 / 0.6)",
+            "fill": "oklab(0.903646 0.0000412762 0.0000180602 / 0.6)",
             "fill-opacity": "1",
             "filter": "none",
             "height": "auto",
@@ -1668,9 +1563,9 @@
           },
           "computedStyle": {
             "clip-path": "none",
-            "color": "oklab(0.999994 0.0000455677 0.0000200868 / 0.6)",
+            "color": "oklab(0.903646 0.0000412762 0.0000180602 / 0.6)",
             "display": "inline",
-            "fill": "oklab(0.999994 0.0000455677 0.0000200868 / 0.6)",
+            "fill": "oklab(0.903646 0.0000412762 0.0000180602 / 0.6)",
             "fill-opacity": "1",
             "filter": "none",
             "height": "auto",
@@ -1702,9 +1597,9 @@
           },
           "computedStyle": {
             "clip-path": "none",
-            "color": "oklab(0.999994 0.0000455677 0.0000200868 / 0.6)",
+            "color": "oklab(0.903646 0.0000412762 0.0000180602 / 0.6)",
             "display": "inline",
-            "fill": "oklab(0.999994 0.0000455677 0.0000200868 / 0.6)",
+            "fill": "oklab(0.903646 0.0000412762 0.0000180602 / 0.6)",
             "fill-opacity": "1",
             "filter": "none",
             "height": "auto",
@@ -1739,7 +1634,7 @@
       },
       "rootComputedStyle": {
         "clip-path": "none",
-        "color": "oklab(0.999994 0.0000455677 0.0000200868 / 0.6)",
+        "color": "oklab(0.903646 0.0000412762 0.0000180602 / 0.6)",
         "display": "block",
         "fill": "none",
         "fill-opacity": "1",
@@ -1762,7 +1657,7 @@
         "visibility": "visible",
         "width": "16px"
       },
-      "sourceSha256": "557843f9acd6be6970766a6a67c74d0c15f03c24d976b34e7263e731bef7ba1a",
+      "sourceSha256": "f56b781903303ca01a06a10b996f77ef10fd8c7804bc6f9adefaf7a43cd5dbe3",
       "viewBox": "0 0 20 20"
     },
     {
@@ -1835,7 +1730,7 @@
         "visibility": "visible",
         "width": "16px"
       },
-      "sourceSha256": "2e65b32562ba0a19ade98973e9e577d58efe3a0f7cfcdd2bf173dccc2eae3439",
+      "sourceSha256": "baaec5f1ed49f7f240455de700418ef1f0a14f203ac9150ec0931c6cbc73a13c",
       "viewBox": "0 0 20 20"
     },
     {
@@ -1908,7 +1803,7 @@
         "visibility": "visible",
         "width": "16px"
       },
-      "sourceSha256": "9370968e201c198157ec3e559d768ec49898117d254514f8c7134329ae8d4574",
+      "sourceSha256": "0ba8f00bffe4884d4723ad7bd4efb0c92fd9eaac375180d094f9a2ca4117647b",
       "viewBox": "0 0 20 20"
     },
     {
@@ -1981,7 +1876,7 @@
         "visibility": "visible",
         "width": "16px"
       },
-      "sourceSha256": "a4de4e2cce0a62293bf484ab16dca1fd1cf793c8194010cc02f3faaae3dd76e0",
+      "sourceSha256": "4285025cb2bd98f495eb999a53c81d978e5ce5b1c33d2ea5f0afce3b6820e6ec",
       "viewBox": "0 0 20 20"
     }
   ]

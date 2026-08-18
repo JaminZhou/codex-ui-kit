@@ -10,12 +10,12 @@ export const currentBaselineViewports = Object.freeze({
 });
 
 export const currentBaselineFingerprint = Object.freeze({
-  appAsarBytes: 223_451_508,
+  appAsarBytes: 279_946_146,
   appAsarSha256:
-    "928129601e8b36eccba603114d6912352f2b13182f3a7d60b32166d0e81aafb5",
-  appVersion: "26.803.61601",
-  buildNumber: "6396",
-  chromiumVersion: "151.0.7922.76",
+    "6e7e8791b8bf69a586ff994721fff518af391d9efdc66cd2e620dd2a4aedc90f",
+  appVersion: "26.810.52044",
+  buildNumber: "6662",
+  chromiumVersion: "151.0.7922.137",
 });
 
 const primaryRoutes = Object.freeze([
@@ -33,16 +33,17 @@ const withinTolerance = (value, expected, tolerance = 1) =>
   Number.isFinite(value) && Math.abs(value - expected) <= tolerance;
 
 const currentSidebarWidthBounds = Object.freeze({ max: 520, min: 240 });
-const currentSidebarMinimumMainWidth = 352;
-const currentSidebarCompactPinnedMaximum =
-  currentBaselineViewports.compact.width - currentSidebarMinimumMainWidth;
+const currentSidebarMinimumMainWidth = 240;
 
 const currentSidebarWidthForViewport = (persistedWidth, viewportWidth) =>
   Math.min(
     persistedWidth,
-    Math.min(
-      currentSidebarWidthBounds.max,
-      viewportWidth - currentSidebarMinimumMainWidth,
+    Math.max(
+      currentSidebarWidthBounds.min,
+      Math.min(
+        currentSidebarWidthBounds.max,
+        viewportWidth - currentSidebarMinimumMainWidth,
+      ),
     ),
   );
 
@@ -88,6 +89,7 @@ export function assertCurrentSidebarLifecycle(lifecycle) {
     lifecycle?.enterExpanded,
     lifecycle?.spaceCollapsed,
     lifecycle?.spaceExpanded,
+    responsive?.compactVisibleBeforeCollapse,
     responsive?.compactCollapsed,
     responsive?.compactPinned,
     responsive?.wideRestored,
@@ -104,7 +106,6 @@ export function assertCurrentSidebarLifecycle(lifecycle) {
     !Number.isFinite(persistedNavigationWidth) ||
     persistedNavigationWidth < currentSidebarWidthBounds.min ||
     persistedNavigationWidth > currentSidebarWidthBounds.max ||
-    persistedNavigationWidth > currentSidebarCompactPinnedMaximum ||
     !withinTolerance(
       baseline?.projectRow?.rect?.width,
       persistedNavigationWidth - 16,
@@ -163,7 +164,7 @@ export function assertCurrentSidebarLifecycle(lifecycle) {
     helpMenu.opened.menuItemCount !== 8 ||
     !helpMenu.opened.focusInside ||
     helpMenu.opened.focusRole !== "menu" ||
-    !withinTolerance(helpMenu.opened.rect?.width, 200) ||
+    !withinTolerance(helpMenu.opened.rect?.width, 320) ||
     !withinTolerance(helpMenu.opened.rect?.height, 272.06) ||
     helpMenu.closed?.visibleMenuCount !== 0 ||
     helpMenu.closed.focusReturned !== true
@@ -172,7 +173,21 @@ export function assertCurrentSidebarLifecycle(lifecycle) {
       `Current sidebar lifecycle does not prove the Help menu boundary: ${JSON.stringify(helpMenu)}`,
     );
   }
+  const compactNavigationWidth = currentSidebarWidthForViewport(
+    persistedNavigationWidth,
+    currentBaselineViewports.compact.width,
+  );
   if (
+    responsive.compactVisibleBeforeCollapse.navigationVisible !== true ||
+    !withinTolerance(
+      responsive.compactVisibleBeforeCollapse.navigationWidth,
+      compactNavigationWidth,
+    ) ||
+    responsive.compactVisibleBeforeCollapse.showSidebarCount !== 0 ||
+    responsive.compactVisibleBeforeCollapse.projectExpanded !== false ||
+    Math.abs(
+      responsive.compactVisibleBeforeCollapse.horizontalOverflow ?? Infinity,
+    ) > 1 ||
     responsive.compactCollapsed.navigationVisible !== false ||
     responsive.compactCollapsed.showSidebarCount !== 1 ||
     responsive.compactCollapsed.projectExpanded !== false ||
@@ -180,7 +195,7 @@ export function assertCurrentSidebarLifecycle(lifecycle) {
     responsive.compactPinned.navigationVisible !== true ||
     !withinTolerance(
       responsive.compactPinned.navigationWidth,
-      persistedNavigationWidth,
+      compactNavigationWidth,
     ) ||
     responsive.compactPinned.projectExpanded !== false ||
     Math.abs(responsive.compactPinned.horizontalOverflow ?? Infinity) > 1 ||
@@ -335,6 +350,7 @@ export function assertCurrentBaselineRecord(record) {
     "wideNewChat",
     "mediumNewChat",
     "thresholdNewChat",
+    "compactVisibleBeforeCollapse",
     "compactCollapsed",
     "compactPinned",
     "compactPullRequests",
@@ -345,6 +361,7 @@ export function assertCurrentBaselineRecord(record) {
     compactPinned: currentBaselineViewports.compact,
     compactPullRequests: currentBaselineViewports.compact,
     compactRestored: currentBaselineViewports.compact,
+    compactVisibleBeforeCollapse: currentBaselineViewports.compact,
     mediumNewChat: currentBaselineViewports.medium,
     thresholdNewChat: currentBaselineViewports.threshold,
     wideNewChat: currentBaselineViewports.wide,
@@ -384,6 +401,7 @@ export function assertCurrentBaselineRecord(record) {
       "wideNewChat",
       "mediumNewChat",
       "thresholdNewChat",
+      "compactVisibleBeforeCollapse",
       "compactCollapsed",
       "compactPinned",
       "compactRestored",
@@ -404,6 +422,7 @@ export function assertCurrentBaselineRecord(record) {
     "wideNewChat",
     "mediumNewChat",
     "thresholdNewChat",
+    "compactVisibleBeforeCollapse",
     "compactPinned",
     "compactPullRequests",
     "compactRestored",
@@ -424,6 +443,7 @@ export function assertCurrentBaselineRecord(record) {
     "wideNewChat",
     "mediumNewChat",
     "thresholdNewChat",
+    "compactVisibleBeforeCollapse",
     "compactCollapsed",
     "compactPinned",
     "compactRestored",
@@ -439,19 +459,48 @@ export function assertCurrentBaselineRecord(record) {
       controlCount(state, "Add files and more") !== (newChatVisible ? 1 : 0) ||
       controlCount(state, "Dictate") !== (newChatVisible ? 1 : 0) ||
       controlCount(state, "Start new voice chat") !==
-        (newChatVisible ? 1 : 0)
+        (navigationVisible ? 1 : 0) + (newChatVisible ? 1 : 0)
     );
   });
   if (invalidControlStates.length > 0) {
+    const observedControls = Object.fromEntries(
+      invalidControlStates.map((state) => [
+        state,
+        Object.fromEntries(
+          [
+            "Back",
+            "Forward",
+            "Hide sidebar",
+            "Show sidebar",
+            "Add files and more",
+            "Dictate",
+            "Start new voice chat",
+          ].map((label) => [label, controlCount(state, label)]),
+        ),
+      ]),
+    );
     throw new Error(
-      `Current baseline record does not prove the fixed shell control matrix: ${JSON.stringify(invalidControlStates)}`,
+      `Current baseline record does not prove the fixed shell control matrix: ${JSON.stringify({ invalidControlStates, observedControls })}`,
     );
   }
   const persistedNavigationWidth = record.sidebarLifecycle.baseline.navigationWidth;
   const expectedNavigationByState = {
-    compactPinned: persistedNavigationWidth,
-    compactPullRequests: persistedNavigationWidth,
-    compactRestored: persistedNavigationWidth,
+    compactPinned: currentSidebarWidthForViewport(
+      persistedNavigationWidth,
+      currentBaselineViewports.compact.width,
+    ),
+    compactPullRequests: currentSidebarWidthForViewport(
+      persistedNavigationWidth,
+      currentBaselineViewports.compact.width,
+    ),
+    compactRestored: currentSidebarWidthForViewport(
+      persistedNavigationWidth,
+      currentBaselineViewports.compact.width,
+    ),
+    compactVisibleBeforeCollapse: currentSidebarWidthForViewport(
+      persistedNavigationWidth,
+      currentBaselineViewports.compact.width,
+    ),
     mediumNewChat: currentSidebarWidthForViewport(
       persistedNavigationWidth,
       currentBaselineViewports.medium.width,
@@ -469,6 +518,10 @@ export function assertCurrentBaselineRecord(record) {
     compactPinned: expectedNewChatGeometry(
       currentBaselineViewports.compact.width,
       expectedNavigationByState.compactPinned,
+    ),
+    compactVisibleBeforeCollapse: expectedNewChatGeometry(
+      currentBaselineViewports.compact.width,
+      expectedNavigationByState.compactVisibleBeforeCollapse,
     ),
     compactRestored: expectedNewChatGeometry(
       currentBaselineViewports.compact.width,
@@ -505,8 +558,8 @@ export function assertCurrentBaselineRecord(record) {
     );
   }
   const expectedScrollOwners = {
-    mediumNewChat: { clientHeight: 565 },
-    wideNewChat: { clientHeight: 705 },
+    mediumNewChat: { clientHeight: 519 },
+    wideNewChat: { clientHeight: 659 },
   };
   const invalidScrollOwnerStates = Object.entries(expectedScrollOwners)
     .filter(([state, expected]) => {
@@ -536,6 +589,8 @@ export function assertCurrentBaselineRecord(record) {
   const responsiveContract = {
     collapsedNavigation: collapsed.navigation,
     collapsedShowCount: collapsed.controls?.["Show sidebar"]?.length ?? 0,
+    compactVisibleNavigationWidth:
+      record.states.compactVisibleBeforeCollapse.navigation?.width ?? null,
     overflowStates: Object.fromEntries(
       Object.entries(record.states).map(([state, value]) => [
         state,
@@ -577,6 +632,10 @@ export function assertCurrentBaselineRecord(record) {
     !withinTolerance(
       responsiveContract.thresholdNavigationWidth,
       expectedNavigationByState.thresholdNewChat,
+    ) ||
+    !withinTolerance(
+      responsiveContract.compactVisibleNavigationWidth,
+      expectedNavigationByState.compactVisibleBeforeCollapse,
     ) ||
     responsiveContract.collapsedNavigation !== null ||
     responsiveContract.collapsedShowCount !== 1 ||

@@ -152,7 +152,7 @@ describe("current baseline capture contract", () => {
         Forward: [{}],
         "Hide sidebar": [{}],
         "Show sidebar": [],
-        "Start new voice chat": [{}],
+        "Start new voice chat": [{}, {}],
       },
       editor: {
         rect: {
@@ -179,9 +179,9 @@ describe("current baseline capture contract", () => {
       { editorLeft: 371.05, editorWidth: 712, mainWidth: 905.89 },
       [
         {
-          clientHeight: 705,
+          clientHeight: 659,
           overflowY: "auto",
-          rect: { height: 705 },
+          rect: { height: 659 },
           scrollHeight: 949,
         },
       ],
@@ -192,9 +192,9 @@ describe("current baseline capture contract", () => {
       { editorLeft: 302.11, editorWidth: 489.89, mainWidth: 545.89 },
       [
         {
-          clientHeight: 565,
+          clientHeight: 519,
           overflowY: "auto",
-          rect: { height: 565 },
+          rect: { height: 519 },
           scrollHeight: 909,
         },
       ],
@@ -209,6 +209,7 @@ describe("current baseline capture contract", () => {
       editorWidth: 389.89,
       mainWidth: 445.89,
     });
+    const compactVisibleBeforeCollapse = compactPinned;
     const compactCollapsed = {
       ...state(720, 680, {
         editorLeft: 28,
@@ -223,6 +224,7 @@ describe("current baseline capture contract", () => {
         }).controls,
         "Hide sidebar": [],
         "Show sidebar": [{}],
+        "Start new voice chat": [{}],
       },
       navigation: null,
       routes: Object.fromEntries(
@@ -237,7 +239,7 @@ describe("current baseline capture contract", () => {
         ...compactPinned.controls,
         "Add files and more": [],
         Dictate: [],
-        "Start new voice chat": [],
+        "Start new voice chat": [{}],
       },
       editor: null,
       routeMarkers: { newChatHome: 0 },
@@ -248,32 +250,32 @@ describe("current baseline capture contract", () => {
     };
     const record = {
       baseline: {
-        appAsarBytes: 223_451_508,
+        appAsarBytes: 279_946_146,
         appAsarSha256:
-          "928129601e8b36eccba603114d6912352f2b13182f3a7d60b32166d0e81aafb5",
-        appVersion: "26.803.61601",
-        buildNumber: "6396",
-        chromiumVersion: "151.0.7922.76",
+          "6e7e8791b8bf69a586ff994721fff518af391d9efdc66cd2e620dd2a4aedc90f",
+        appVersion: "26.810.52044",
+        buildNumber: "6662",
+        chromiumVersion: "151.0.7922.137",
       },
       captureKind: "renderer_emulation",
       runtimeBundleIdentity: {
         afterCapture: {
-          appAsarBytes: 223_451_508,
+          appAsarBytes: 279_946_146,
           appAsarSha256:
-            "928129601e8b36eccba603114d6912352f2b13182f3a7d60b32166d0e81aafb5",
+            "6e7e8791b8bf69a586ff994721fff518af391d9efdc66cd2e620dd2a4aedc90f",
           changedAtMs: 1_786_150_111_000,
           checkedAtMs: 1_786_351_000_000,
           device: "16777231",
-          inode: "341558647",
+          inode: "346397970",
         },
         beforeCapture: {
-          appAsarBytes: 223_451_508,
+          appAsarBytes: 279_946_146,
           appAsarSha256:
-            "928129601e8b36eccba603114d6912352f2b13182f3a7d60b32166d0e81aafb5",
+            "6e7e8791b8bf69a586ff994721fff518af391d9efdc66cd2e620dd2a4aedc90f",
           changedAtMs: 1_786_150_111_000,
           checkedAtMs: 1_786_350_900_000,
           device: "16777231",
-          inode: "341558647",
+          inode: "346397970",
         },
         ownerPid: 25_197,
         processStartedAtMs: 1_786_350_800_000,
@@ -301,7 +303,7 @@ describe("current baseline capture contract", () => {
             focusInside: true,
             focusRole: "menu",
             menuItemCount: 8,
-            rect: { height: 272.06, width: 200 },
+            rect: { height: 272.06, width: 320 },
             visibleMenuCount: 1,
           },
         },
@@ -322,6 +324,13 @@ describe("current baseline capture contract", () => {
           },
         },
         responsive: {
+          compactVisibleBeforeCollapse: {
+            horizontalOverflow: 0,
+            navigationVisible: true,
+            navigationWidth: 274.11,
+            projectExpanded: false,
+            showSidebarCount: 0,
+          },
           compactCollapsed: {
             horizontalOverflow: 0,
             navigationVisible: false,
@@ -350,6 +359,7 @@ describe("current baseline capture contract", () => {
         compactPinned,
         compactPullRequests,
         compactRestored: compactPinned,
+        compactVisibleBeforeCollapse,
         mediumNewChat: medium,
         thresholdNewChat: threshold,
         wideNewChat: wide,
@@ -404,6 +414,11 @@ describe("current baseline capture contract", () => {
             ...record.sidebarLifecycle.responsive.compactPinned,
             navigationWidth: persistedNavigationWidth,
           },
+          compactVisibleBeforeCollapse: {
+            ...record.sidebarLifecycle.responsive
+              .compactVisibleBeforeCollapse,
+            navigationWidth: persistedNavigationWidth,
+          },
           wideRestored: {
             ...record.sidebarLifecycle.responsive.wideRestored,
             navigationWidth: persistedNavigationWidth,
@@ -414,6 +429,10 @@ describe("current baseline capture contract", () => {
         compactCollapsed: record.states.compactCollapsed,
         compactPinned: withNavigationWidth(
           record.states.compactPinned,
+          persistedNavigationWidth,
+        ),
+        compactVisibleBeforeCollapse: withNavigationWidth(
+          record.states.compactVisibleBeforeCollapse,
           persistedNavigationWidth,
         ),
         compactPullRequests: withNavigationWidth(
@@ -456,7 +475,7 @@ describe("current baseline capture contract", () => {
         },
       }),
     ).not.toThrow();
-    expect(currentBaselineFingerprint.appVersion).toBe("26.803.61601");
+    expect(currentBaselineFingerprint.appVersion).toBe("26.810.52044");
     expect(currentBaselineViewports.compact.width).toBe(720);
     expect(() =>
       assertCurrentSidebarLifecycle({
@@ -490,7 +509,7 @@ describe("current baseline capture contract", () => {
         }),
       ).toThrow("project-group baseline");
     }
-    for (const invalidWidth of [undefined, 239, 369, 400, 521]) {
+    for (const invalidWidth of [undefined, 239, 521]) {
       expect(() =>
         assertCurrentSidebarLifecycle({
           ...record.sidebarLifecycle,
@@ -517,6 +536,11 @@ describe("current baseline capture contract", () => {
         },
         responsive: {
           ...persistedRecord.sidebarLifecycle.responsive,
+          compactVisibleBeforeCollapse: {
+            ...persistedRecord.sidebarLifecycle.responsive
+              .compactVisibleBeforeCollapse,
+            navigationWidth: 400,
+          },
           compactPinned: {
             ...persistedRecord.sidebarLifecycle.responsive.compactPinned,
             navigationWidth: 400,
@@ -527,7 +551,7 @@ describe("current baseline capture contract", () => {
           },
         },
       }),
-    ).toThrow("project-group baseline");
+    ).not.toThrow();
     expect(() =>
       assertCurrentSidebarLifecycle({
         ...persistedRecord.sidebarLifecycle,
@@ -668,7 +692,7 @@ describe("current baseline capture contract", () => {
               {
                 ...(record.states.wideNewChat
                   .navigationScrollOwners[0] as Record<string, unknown>),
-                scrollHeight: 705,
+                scrollHeight: 659,
               },
             ],
           },
@@ -786,9 +810,11 @@ describe("current baseline capture contract", () => {
     );
 
     expect(captureSource).toContain(
-      "The sidebar did not collapse automatically at the 720px breakpoint.",
+      "The sidebar did not remain visible at the 720px viewport:",
     );
-    expect(captureSource.indexOf("const automaticallyCollapsed")).toBeLessThan(
+    expect(
+      captureSource.indexOf("states.compactVisibleBeforeCollapse"),
+    ).toBeLessThan(
       captureSource.indexOf("await hideSidebar();"),
     );
     expect(captureSource).toContain('return "non-app-page";');

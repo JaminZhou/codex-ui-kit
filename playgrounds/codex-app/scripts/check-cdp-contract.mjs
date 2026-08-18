@@ -9092,15 +9092,15 @@ try {
       width: 820,
     },
     {
-      composerLeft: 16,
-      composerWidth: 688,
+      composerLeft: 290,
+      composerWidth: 414,
       height: 680,
       layoutMode: "narrow",
-      mainLeft: 0,
-      mainWidth: 720,
-      rootLeft: 0,
-      rootWidth: 720,
-      sidebarOpen: false,
+      mainLeft: 274,
+      mainWidth: 446,
+      rootLeft: 274,
+      rootWidth: 446,
+      sidebarOpen: true,
       width: 720,
     },
     {
@@ -9223,7 +9223,7 @@ try {
           ? expected.height / 2 - 41
           : expected.height / 2 - 47,
       ) ||
-      !near(state.heading.height, 33.6) ||
+      !near(state.heading.height, expected.width === 720 ? 67.19 : 33.6) ||
       !near(state.prompt.width, expected.rootWidth - 114) ||
       !near(state.prompt.height, 40)
     ) {
@@ -9976,9 +9976,16 @@ try {
     const help = document.querySelector(
       '.codex-ui-app-sidebar-footer__actions button[aria-label="Open help menu"]',
     );
+    const voice = document.querySelector(
+      '.codex-ui-app-sidebar-footer__actions button[aria-label="Start new voice chat"]',
+    );
     const helpIcon = help?.querySelector("[data-current-build-icon]");
+    const voiceIcon = voice?.querySelector("[data-current-build-icon]");
     const helpRect = help?.getBoundingClientRect();
     const helpIconRect = helpIcon?.getBoundingClientRect();
+    const voiceRect = voice?.getBoundingClientRect();
+    const voiceIconRect = voiceIcon?.getBoundingClientRect();
+    const voiceStyle = voice ? getComputedStyle(voice) : null;
     return {
       help: helpRect
         ? {
@@ -9987,6 +9994,20 @@ try {
             iconName: helpIcon?.getAttribute("data-current-build-icon"),
             iconWidth: helpIconRect?.width,
             width: helpRect.width,
+          }
+        : null,
+      voice: voiceRect
+        ? {
+            borderRadius: voiceStyle?.borderRadius,
+            color: voiceStyle?.color,
+            gap: voiceStyle?.gap,
+            height: voiceRect.height,
+            iconHeight: voiceIconRect?.height,
+            iconName: voiceIcon?.getAttribute("data-current-build-icon"),
+            iconWidth: voiceIconRect?.width,
+            label: voice?.textContent?.trim(),
+            paddingInline: voiceStyle?.paddingInline,
+            width: voiceRect.width,
           }
         : null,
       recentItemCount: document.querySelectorAll(
@@ -10050,7 +10071,16 @@ try {
     currentSidebarAssets.help?.height !== 32 ||
     currentSidebarAssets.help?.iconWidth !== 18 ||
     currentSidebarAssets.help?.iconHeight !== 18 ||
-    currentSidebarAssets.help?.iconName !== "sidebar-help"
+    currentSidebarAssets.help?.iconName !== "sidebar-help" ||
+    Math.abs((currentSidebarAssets.voice?.width ?? 0) - 75.67) > 1 ||
+    currentSidebarAssets.voice?.height !== 28 ||
+    currentSidebarAssets.voice?.iconWidth !== 16 ||
+    currentSidebarAssets.voice?.iconHeight !== 16 ||
+    currentSidebarAssets.voice?.iconName !== "sidebar-voice" ||
+    currentSidebarAssets.voice?.label !== "Voice" ||
+    currentSidebarAssets.voice?.gap !== "4px" ||
+    currentSidebarAssets.voice?.paddingInline !== "10px" ||
+    currentSidebarAssets.voice?.borderRadius !== "12.5px"
   ) {
     throw new Error(
       `sidebar-current: current-build action assets failed: ${JSON.stringify({
@@ -10190,7 +10220,7 @@ try {
     helpMenuContract.separatorCount !== 1 ||
     helpMenuContract.focusRole !== "menuitem" ||
     !helpMenuContract.focusReturned ||
-    Math.abs(helpMenuContract.rect.width - 200) > 1 ||
+    Math.abs(helpMenuContract.rect.width - 320) > 1 ||
     Math.abs(helpMenuContract.rect.height - 272.06) > 1 ||
     JSON.stringify(helpMenuContract.icons) !==
       JSON.stringify([
@@ -10198,6 +10228,7 @@ try {
         "sidebar-help-menu-release-note",
         "sidebar-help-menu-release-note",
         "sidebar-help-menu-changelog",
+        "sidebar-help-menu-changelog-external",
         "sidebar-help-menu-chrome",
         "sidebar-help-menu-remote",
         "sidebar-help-menu-keyboard",
@@ -10253,14 +10284,13 @@ try {
     accountMenuContract.dividerHeight !== 9 ||
     accountMenuContract.focusRole !== "menuitem" ||
     !accountMenuContract.focusReturned ||
-    accountTriggerBounds.width !== 218 ||
+    Math.abs(accountTriggerBounds.width - 138.33) > 1 ||
     accountTriggerBounds.height !== 29 ||
     Math.abs(accountMenuContract.rect.width - 258) > 1 ||
     Math.abs(accountMenuContract.rect.height - 188.38) > 1 ||
     JSON.stringify(accountMenuContract.icons) !==
       JSON.stringify([
         "sidebar-account-menu-usage",
-        "sidebar-account-menu-usage-chevron",
         "sidebar-account-menu-pet",
         "sidebar-account-menu-invite",
         "sidebar-account-menu-settings",
@@ -10300,12 +10330,12 @@ try {
       document
         .querySelector(".codex-ui-app-shell")
         ?.getAttribute("data-layout-mode") === "narrow" &&
-      !document
+      document
         .querySelector(".codex-ui-app-shell")
         ?.hasAttribute("data-sidebar-open"),
   );
   const responsiveProject = {
-    compactCollapsed: await sidebarPage.evaluate(() => ({
+    compactVisibleBeforeCollapse: await sidebarPage.evaluate(() => ({
       horizontalOverflow:
         document.documentElement.scrollWidth -
         document.documentElement.clientWidth,
@@ -10317,8 +10347,31 @@ try {
       sidebarOpen: document
         .querySelector(".codex-ui-app-shell")
         ?.hasAttribute("data-sidebar-open"),
+      sidebarWidth: document
+        .querySelector(".codex-ui-app-shell__sidebar")
+        ?.getBoundingClientRect().width,
     })),
   };
+  await sidebarPage.getByRole("button", { name: "Hide sidebar" }).click();
+  await sidebarPage.waitForFunction(
+    () =>
+      !document
+        .querySelector(".codex-ui-app-shell")
+        ?.hasAttribute("data-sidebar-open"),
+  );
+  responsiveProject.compactCollapsed = await sidebarPage.evaluate(() => ({
+    horizontalOverflow:
+      document.documentElement.scrollWidth -
+      document.documentElement.clientWidth,
+    projectExpanded: document
+      .querySelector(
+        '.codex-ui-app-sidebar__project-group [aria-expanded]',
+      )
+      ?.getAttribute("aria-expanded"),
+    sidebarOpen: document
+      .querySelector(".codex-ui-app-shell")
+      ?.hasAttribute("data-sidebar-open"),
+  }));
   await sidebarPage.getByRole("button", { name: "Show sidebar" }).click();
   await sidebarPage.waitForFunction(() =>
     document
@@ -10355,6 +10408,16 @@ try {
   await projectGroup.press("Enter");
   responsiveProject.keyboardRestored = await readProjectState();
   if (
+    !responsiveProject.compactVisibleBeforeCollapse.sidebarOpen ||
+    responsiveProject.compactVisibleBeforeCollapse.projectExpanded !==
+      "false" ||
+    Math.abs(
+      (responsiveProject.compactVisibleBeforeCollapse.sidebarWidth ?? 0) -
+        274,
+    ) > 1 ||
+    Math.abs(
+      responsiveProject.compactVisibleBeforeCollapse.horizontalOverflow,
+    ) > 1 ||
     responsiveProject.compactCollapsed.sidebarOpen ||
     responsiveProject.compactCollapsed.projectExpanded !== "false" ||
     Math.abs(responsiveProject.compactCollapsed.horizontalOverflow) > 1 ||
@@ -10859,7 +10922,7 @@ try {
       expected: {
         layoutMode: "narrow",
         sidePanelOpen: false,
-        sidebarOpen: false,
+        sidebarOpen: true,
       },
       height: 680,
       width: 720,
@@ -10942,7 +11005,7 @@ try {
     medium721.layoutMode !== "medium" ||
     !medium721.sidebarOpen ||
     narrow720.layoutMode !== "narrow" ||
-    narrow720.sidebarOpen ||
+    !narrow720.sidebarOpen ||
     narrow720.sidePanelOpen ||
     restored721.layoutMode !== "medium" ||
     !restored721.sidebarOpen ||

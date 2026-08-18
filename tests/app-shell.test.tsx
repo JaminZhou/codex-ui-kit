@@ -386,6 +386,71 @@ describe("application shell", () => {
     expect(sidePanel.getAttribute("aria-hidden")).toBe("true");
   });
 
+  it("keeps sidebar continuity independent from side-panel continuity", () => {
+    let resize: ((width: number) => void) | undefined;
+    class ResizeObserverMock {
+      constructor(
+        private readonly callback: ResizeObserverCallback,
+      ) {}
+
+      disconnect() {}
+
+      observe(target: Element) {
+        if (!target.classList.contains("codex-ui-app-shell")) return;
+        resize = (width) =>
+          this.callback(
+            [
+              {
+                contentRect: { height: 900, width },
+                target,
+              } as ResizeObserverEntry,
+            ],
+            this as unknown as ResizeObserver,
+          );
+      }
+
+      unobserve() {}
+    }
+    vi.stubGlobal("ResizeObserver", ResizeObserverMock);
+
+    function ResponsiveFixture() {
+      const [sidePanelOpen, setSidePanelOpen] = useState(true);
+      const [sidebarOpen, setSidebarOpen] = useState(true);
+      return (
+        <AppShell
+          onSidePanelOpenChange={setSidePanelOpen}
+          onSidebarOpenChange={setSidebarOpen}
+          responsivePanelContinuity
+          responsiveSidebarContinuity={false}
+          sidePanel={<button type="button">Review files</button>}
+          sidePanelOpen={sidePanelOpen}
+          sidebar={<button type="button">Projects</button>}
+          sidebarOpen={sidebarOpen}
+        >
+          Conversation
+        </AppShell>
+      );
+    }
+
+    render(<ResponsiveFixture />);
+    const sidebar = screen.getByRole("complementary", {
+      name: "App navigation",
+    });
+    const sidePanel = screen.getByRole("complementary", {
+      name: "Workspace panel",
+    });
+
+    act(() => resize?.(1_180));
+    act(() => resize?.(960));
+    expect(sidePanel.getAttribute("aria-hidden")).toBe("true");
+    act(() => resize?.(720));
+    expect(sidebar.getAttribute("aria-hidden")).toBe("false");
+    expect(sidePanel.getAttribute("aria-hidden")).toBe("true");
+    act(() => resize?.(961));
+    expect(sidebar.getAttribute("aria-hidden")).toBe("false");
+    expect(sidePanel.getAttribute("aria-hidden")).toBe("false");
+  });
+
   it("does not restore auto-collapse requests ignored by a controlled host", async () => {
     let resize: ((width: number) => void) | undefined;
     class ResizeObserverMock {
@@ -937,6 +1002,62 @@ describe("application shell", () => {
 
     act(() => resize?.(900));
     expect(shell.hasAttribute("data-sidebar-pinned")).toBe(true);
+    expect(main.hasAttribute("inert")).toBe(false);
+    expect(backdrop.tabIndex).toBe(-1);
+  });
+
+  it("clamps a persisted current-build sidebar before preserving the narrow split", () => {
+    let resize: ((width: number) => void) | undefined;
+    class ResizeObserverMock {
+      constructor(
+        private readonly callback: ResizeObserverCallback,
+      ) {}
+
+      disconnect() {}
+
+      observe(target: Element) {
+        if (!target.classList.contains("codex-ui-app-shell")) return;
+        resize = (width) =>
+          this.callback(
+            [
+              {
+                contentRect: { height: 680, width },
+                target,
+              } as ResizeObserverEntry,
+            ],
+            this as unknown as ResizeObserver,
+          );
+      }
+
+      unobserve() {}
+    }
+    vi.stubGlobal("ResizeObserver", ResizeObserverMock);
+    const { container } = render(
+      <AppShell
+        layoutMode="narrow"
+        narrowSidebarBehavior="current-build"
+        onSidebarOpenChange={() => undefined}
+        sidebar="Navigation"
+        sidebarMinMainWidth={240}
+        sidebarOpen
+        sidebarWidth={520}
+      >
+        Conversation
+      </AppShell>,
+    );
+    const shell = container.querySelector(
+      ".codex-ui-app-shell",
+    ) as HTMLDivElement;
+    const main = screen.getByRole("main", { name: "Conversation" });
+    const backdrop = container.querySelector(
+      '.codex-ui-app-shell__backdrop[data-backdrop="sidebar"]',
+    ) as HTMLButtonElement;
+
+    act(() => resize?.(720));
+    expect(shell.hasAttribute("data-sidebar-pinned")).toBe(true);
+    expect(shell.style.getPropertyValue("--codex-ui-app-sidebar-width")).toBe(
+      "480px",
+    );
     expect(main.hasAttribute("inert")).toBe(false);
     expect(backdrop.tabIndex).toBe(-1);
   });

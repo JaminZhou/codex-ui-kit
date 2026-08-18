@@ -193,14 +193,16 @@ All privileged behavior remains host-owned. The components never auto-approve co
   places the application-owned titlebar above the main track and keeps its
   trailing actions before a persistent right panel.
   `responsivePanelContinuity` can auto-collapse side surfaces at the measured
-  960/720px layout transitions and restore only surfaces that it closed;
-  disabling continuity or changing `responsivePanelContinuityKey` resets that
-  restoration intent for a new route or workspace. Controlled-host callbacks
-  must acknowledge the requested state before the surface becomes eligible
-  for later restoration.
-  `narrowSidebarBehavior="current-build"` matches the refreshed 720px
-  auto-collapse boundary and lets an explicit Show action pin the normal
-  sidebar track without reintroducing the removed edge-hover preview.
+  960/720px layout transitions and restore only surfaces that it closed.
+  `responsiveSidebarContinuity` can independently keep the sidebar visible
+  while retaining side-panel continuity; when omitted it follows
+  `responsivePanelContinuity`. Disabling continuity or changing
+  `responsivePanelContinuityKey` resets the matching restoration intent for a
+  new route or workspace. Controlled-host callbacks must acknowledge the
+  requested state before the surface becomes eligible for later restoration.
+  `narrowSidebarBehavior="current-build"` lets a visible sidebar keep its
+  clamped persistent track at narrow widths without reintroducing the removed
+  edge-hover preview.
 - `AppSidebar`, `AppSidebarSection`, `AppSidebarProjectGroup`,
   `AppSidebarItem`, and `AppSidebarFooter`: grouped primary navigation with
   one selected route, reusable expandable project/task groups,

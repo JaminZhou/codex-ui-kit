@@ -11,13 +11,17 @@ exit gates; it does not replace the inventory.
 ## Current position
 
 - The installed package and machine-readable evidence baseline are Codex
-  Desktop `26.803.61601` (`6396`). Unsampled earlier-build surfaces remain
+  Desktop `26.810.52044` (`6662`). Unsampled earlier-build surfaces remain
   previous-build regression evidence rather than current verification.
 - The inventory contains 89 surface groups: 59 P0, 21 P1, and 9 P2.
-- 34 groups have current-build runtime evidence, 38 have previous-build-only
+- 21 groups have current-build runtime evidence, 51 have previous-build-only
   runtime evidence, and 17 have not been sampled.
-- The scoped `26.803.61601` refresh revalidates 91
-  sidebar/menu/window-chrome/Composer/Settings/completed-thread icons against exact runtime evidence.
+- The scoped `26.810.52044` refresh revalidates 92
+  sidebar/menu/window-chrome/Composer/Settings/completed-thread icons against
+  exact runtime evidence. It adds Voice and Activity-attention, widens Help to
+  320px, removes the Account Usage chevron and thread-header New chat action,
+  renames summary/Fork assets, and proves that a 720px resize keeps the sidebar
+  visible before explicit Hide/Show.
   Earlier hover/footer slices promoted More, Pin,
   Archive, and Help, confirms that Settings is absent from the sampled footer
   and that sampled project-task rows have no leading glyph. The Recents follow-up
@@ -27,14 +31,14 @@ exit gates; it does not replace the inventory.
   denominator from 15 to 8. The Composer follow-up promotes Project, Worktree,
   Branch, Add files, Permission, Model chevron, Dictate, and Voice, reducing
   the scoped visible-shell denominator to zero while explicitly retaining the
-  broader inventory/lifecycle blocker. The current-command follow-up re-runs
+  broader inventory/lifecycle blocker. The `26.803.61601` command follow-up ran
   bounded success, exact `exit 7`, and a stopped 120-second command. It adds
   the exact three-path terminal glyph, separates the current-turn 28px Stop
   action from background-terminal Stop all/per-process controls, proves
   settlement and same-thread recovery, and promotes command execution/failure,
   interruption, and background-process management through Browser/CDP, real
   Electron, and local-only owned pixels.
-  The current Terminal follow-up separately proves that a child command's
+  The previous Terminal follow-up separately proves that a child command's
   `exit 7` returns to the same interactive shell instead of producing a
   terminal failure, while ordinary shell `exit` closes the tab. A real
   agent-created background process appears in the thread summary and opens a
@@ -43,10 +47,10 @@ exit gates; it does not replace the inventory.
   those evidence classes separate and adds four Browser/CDP, Electron, and
   reviewed pixel gates for command exit, reload, background summary, and
   close/reopen side-panel behavior.
-  The account-menu follow-up adds six exact icons and gates its six-item,
+  The previous account-menu follow-up added six exact icons and gated its six-item,
   one-avatar, zero-role-separator structure, 258.11×188.38 geometry, dismissal,
   focus return, and owned pixels at 0.1979%. Sidebar actions and ordinary task
-  status are now separate verified denominators. The current-build status
+  status are now separate verified denominators. The previous-build status
   slice reaches active and unread runtime states, preserves the active spinner
   while a follow-up is queued, and locks the exact trailing rail, spinner, dot,
   computed color, action replacement, and glyph pixels. The separate
@@ -304,7 +308,7 @@ new parity claims:
 - re-observe the shell, left sidebar, conversation, Composer, Review, Terminal,
   Markdown, and MCP anchors;
 - retain previous-build results as regression fixtures while promoting only
-  surfaces re-observed on `26.803.61601`;
+  surfaces re-observed on `26.810.52044`;
 - update inventory evidence prefixes and the current build note.
 
 Exit: the current build has a reproducible CDP capture recipe and no
@@ -355,7 +359,7 @@ Acceptance matrix:
 
 | Axis | Required states |
 | --- | --- |
-| Width | wide split, medium constrained split, 720px auto-collapse, explicit narrow pinned split, modal safety fallback |
+| Width | wide split, medium constrained split, 720px visible persistent sidebar, explicit Hide/Show, modal safety fallback below the persistent-track minimum |
 | Theme | light and dark |
 | Content | empty, normal, long names, dense history, overflow |
 | Lifecycle | loading, selected, running, queued, unread, error, restored |

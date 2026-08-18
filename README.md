@@ -22,22 +22,20 @@ Codex UI Kit turns those interaction patterns into protocol-neutral React primit
 - The current components are a partial coding-agent UI foundation, not a
   complete Codex Desktop reconstruction.
 - The authoritative full-surface inventory baseline is the installed
-  `26.803.61601` (`6396`) build. Its 87 candidate surface groups and
+  `26.810.52044` (`6662`) build. Its 89 candidate surface groups and
   build-scoped evidence status are tracked in
   [`research/UI_INVENTORY.md`](research/UI_INVENTORY.md); current-build
-  observation covers 23 groups; 47 previous-build groups remain regression
-  evidence and 17 are still unsampled. The current visual manifest binds 77
-  sidebar, menu, window-chrome, Composer, environment, and Settings icons to exact runtime evidence
-  with zero scoped approximations. The latest baseline refresh revalidates
-  six project groups, pointer/Enter/Space expansion, the six-item project menu,
-  the eight-item Help menu, explicit compact pinning, disabled window
-  navigation, and a same-state dark New chat shell. Browser/CDP, Electron, and
-  local-only current-product pixels pass at 3.1387% for the shell top, 0.4126%
-  for the footer, and 0.3146% for the main region. This is still a partial UI
-  foundation rather than a global reconstruction claim.
-  The newest vertical slice adds the full-page Settings shell, grouped search,
-  Git/review-delivery preferences, exact navigation assets, and wide/720px
-  current-product pixel gates; other Settings pages remain open.
+  observation covers 21 groups; 51 previous-build groups remain regression
+  evidence and 17 are still unsampled. The current visual manifest binds 92
+  sidebar, menu, window-chrome, Composer, environment, Settings, and thread
+  icons to exact runtime evidence with zero scoped approximations. The latest
+  baseline refresh revalidates six project groups, pointer/Enter/Space
+  expansion, project-menu variants, the new Voice footer control, the widened
+  Help menu, five-icon Account menu, visible 720px sidebar behavior, current
+  thread actions, and Settings/Git navigation. This is still a partial UI
+  foundation rather than a global reconstruction claim; older Terminal,
+  failure, approval, attachment, collaboration, and Settings-page evidence is
+  intentionally not promoted to the new build.
 - The repository is public and the package baseline is `0.1.0`, but the npm package has **not** been published.
 - The API remains pre-1.0 and may change while public documentation and consumer feedback mature.
 - Extracted application files, private IPC, bundled fonts, and OpenAI brand assets are not included.

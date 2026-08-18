@@ -302,6 +302,35 @@ try {
     );
   }
 
+  const sidebarVoice = page.locator(
+    '.codex-ui-app-sidebar-footer__actions button[aria-label="Start new voice chat"]',
+  );
+  const sidebarVoiceContract = await sidebarVoice.evaluate((button) => {
+    const bounds = button.getBoundingClientRect();
+    const icon = button.querySelector("[data-current-build-icon]");
+    const iconBounds = icon?.getBoundingClientRect();
+    return {
+      height: bounds.height,
+      iconHeight: iconBounds?.height,
+      iconName: icon?.getAttribute("data-current-build-icon"),
+      iconWidth: iconBounds?.width,
+      label: button.textContent?.trim(),
+      width: bounds.width,
+    };
+  });
+  if (
+    Math.abs(sidebarVoiceContract.width - 75.67) > 1 ||
+    sidebarVoiceContract.height !== 28 ||
+    sidebarVoiceContract.iconWidth !== 16 ||
+    sidebarVoiceContract.iconHeight !== 16 ||
+    sidebarVoiceContract.iconName !== "sidebar-voice" ||
+    sidebarVoiceContract.label !== "Voice"
+  ) {
+    throw new Error(
+      `Electron sidebar Voice control failed: ${JSON.stringify(sidebarVoiceContract)}`,
+    );
+  }
+
   const helpMenuTrigger = page.getByRole("button", {
     name: "Open help menu",
   });
@@ -314,6 +343,10 @@ try {
       icons.map((icon) => icon.getAttribute("data-current-build-icon")),
     );
   const helpMenuStructure = await helpMenu.evaluate((menu) => ({
+    rect: (() => {
+      const bounds = menu.getBoundingClientRect();
+      return { height: bounds.height, width: bounds.width };
+    })(),
     heading: menu.querySelector(
       ".demo-current-sidebar-help-menu__heading",
     )?.textContent,
@@ -323,10 +356,24 @@ try {
   await page.keyboard.press("Escape");
   await helpMenu.waitFor({ state: "hidden" });
   if (
-    helpMenuIcons.length !== 8 ||
+    helpMenuIcons.length !== 9 ||
     helpMenuStructure.heading !== "What's new" ||
     helpMenuStructure.itemCount !== 8 ||
     helpMenuStructure.separatorCount !== 1 ||
+    Math.abs(helpMenuStructure.rect.width - 320) > 1 ||
+    Math.abs(helpMenuStructure.rect.height - 272.06) > 1 ||
+    JSON.stringify(helpMenuIcons) !==
+      JSON.stringify([
+        "sidebar-help-menu-release-note",
+        "sidebar-help-menu-release-note",
+        "sidebar-help-menu-release-note",
+        "sidebar-help-menu-changelog",
+        "sidebar-help-menu-changelog-external",
+        "sidebar-help-menu-chrome",
+        "sidebar-help-menu-remote",
+        "sidebar-help-menu-keyboard",
+        "sidebar-help-menu-support",
+      ]) ||
     !(await helpMenuTrigger.evaluate(
       (element) => document.activeElement === element,
     ))
@@ -377,7 +424,6 @@ try {
     JSON.stringify(accountMenuContract.icons) !==
       JSON.stringify([
         "sidebar-account-menu-usage",
-        "sidebar-account-menu-usage-chevron",
         "sidebar-account-menu-pet",
         "sidebar-account-menu-invite",
         "sidebar-account-menu-settings",
@@ -1102,7 +1148,7 @@ try {
       document
         .querySelector(".codex-ui-app-shell")
         ?.getAttribute("data-layout-mode") === "narrow" &&
-      !document
+      document
         .querySelector(".codex-ui-app-shell")
         ?.hasAttribute("data-sidebar-open"),
   );
@@ -1118,19 +1164,12 @@ try {
       `Electron default window did not resize into narrow mode: ${JSON.stringify(narrowedState)}`,
     );
   }
-  const showNarrowSidebar = narrowPage.getByRole("button", {
-    name: "Show sidebar",
-  });
-  await showNarrowSidebar.click();
-  await narrowPage.waitForSelector(
-    ".codex-ui-app-shell[data-layout-mode=\"narrow\"][data-narrow-sidebar-behavior=\"current-build\"][data-sidebar-open] .codex-ui-app-shell__main:not([inert])",
-  );
   const pinnedMainWidth = await narrowPage
     .locator(".codex-ui-app-shell__main")
     .evaluate((element) => element.getBoundingClientRect().width);
   if (Math.abs(pinnedMainWidth - 446) > 1) {
     throw new Error(
-      `Electron current-build pinned sidebar geometry failed: ${pinnedMainWidth}`,
+      `Electron current-build visible narrow sidebar geometry failed: ${pinnedMainWidth}`,
     );
   }
   await narrowPage
@@ -1269,7 +1308,7 @@ try {
     BrowserWindow.getAllWindows()[0]?.setContentSize(720, 680);
   });
   await shellPage.waitForSelector(
-    '.codex-ui-app-shell[data-layout-mode="narrow"]:not([data-sidebar-open])',
+    '.codex-ui-app-shell[data-layout-mode="narrow"][data-sidebar-open]',
   );
   await shellApp.evaluate(({ BrowserWindow }) => {
     BrowserWindow.getAllWindows()[0]?.setContentSize(1180, 820);
@@ -2272,7 +2311,7 @@ try {
       document
         .querySelector(".codex-ui-app-shell")
         ?.getAttribute("data-layout-mode") === "narrow" &&
-      !document
+      document
         .querySelector(".codex-ui-app-shell")
         ?.hasAttribute("data-sidebar-open"),
     undefined,
@@ -2310,7 +2349,7 @@ try {
     wideState.groupStatus !== "completed" ||
     compactState.clientWidth !== 720 ||
     compactState.horizontalOverflow > 1 ||
-    compactState.visibleNavigation
+    !compactState.visibleNavigation
   ) {
     throw new Error(
       `Current Electron MCP recovery drifted: ${JSON.stringify({ compactState, wideState })}`,
@@ -2403,7 +2442,7 @@ try {
       document
         .querySelector(".codex-ui-app-shell")
         ?.getAttribute("data-layout-mode") === "narrow" &&
-      !document
+      document
         .querySelector(".codex-ui-app-shell")
         ?.hasAttribute("data-sidebar-open"),
     undefined,
@@ -2440,8 +2479,8 @@ try {
     ) ||
     compactState.clientWidth !== 720 ||
     compactState.horizontalOverflow > 1 ||
-    compactState.visibleNavigation ||
-    Math.abs((compactState.groupWidth ?? 0) - 688) > 1
+    !compactState.visibleNavigation ||
+    Math.abs((compactState.groupWidth ?? 0) - 414) > 1
   ) {
     throw new Error(
       `Current Electron integration recovery drifted: ${JSON.stringify({ compactState, wideState })}`,
@@ -2595,7 +2634,7 @@ try {
       document
         .querySelector(".codex-ui-app-shell")
         ?.getAttribute("data-layout-mode") === "narrow" &&
-      !document
+      document
         .querySelector(".codex-ui-app-shell")
         ?.hasAttribute("data-sidebar-open"),
     undefined,
@@ -2643,9 +2682,9 @@ try {
     reviewState.path !== "research/MIXED_TOOL_THREAD.md" ||
     !transcript?.includes("Mixed audit") ||
     !transcript.includes("All listed mixed-tool surfaces are represented.") ||
-    compactState.visibleNavigation ||
+    !compactState.visibleNavigation ||
     compactState.horizontalOverflow > 1 ||
-    Math.abs((compactState.composerWidth ?? 0) - 688) > 1
+    Math.abs((compactState.composerWidth ?? 0) - 414) > 1
   ) {
     throw new Error(
       `Current Electron mixed-tool workflow drifted: ${JSON.stringify({ compactState, mcpState, researchState, reviewState, transcript })}`,
@@ -4514,11 +4553,11 @@ try {
       width: 820,
     },
     {
-      composerWidth: 688,
+      composerWidth: 414,
       height: 680,
       layoutMode: "narrow",
-      rootWidth: 720,
-      sidebarOpen: false,
+      rootWidth: 446,
+      sidebarOpen: true,
       width: 720,
     },
     {
@@ -8759,7 +8798,7 @@ try {
   await subagentPage.waitForFunction(
     () =>
       window.innerWidth === 720 &&
-      !document
+      document
         .querySelector(".codex-ui-app-shell")
         ?.hasAttribute("data-sidebar-open"),
   );
@@ -8775,16 +8814,16 @@ try {
     )?.getBoundingClientRect();
     return (
       shell?.hasAttribute("data-side-panel-open") &&
-      Math.abs((side?.left ?? 0) - 390.6875) <= 1 &&
-      Math.abs((side?.width ?? 0) - 329.3125) <= 1
+      Math.abs((side?.left ?? 0) - 420) <= 1 &&
+      Math.abs((side?.width ?? 0) - 300) <= 1
     );
   });
   const compact720Subagent = await measureSubagentLayout();
   if (
-    compact720Subagent.sidebarOpen ||
+    !compact720Subagent.sidebarOpen ||
     !compact720Subagent.panelOverlay ||
-    compact720Subagent.sidebar?.right !== 0 ||
-    compact720Subagent.main?.width !== 720 ||
+    compact720Subagent.sidebar?.right !== 274 ||
+    compact720Subagent.main?.width !== 446 ||
     compact720Subagent.horizontalOverflow > 1
   ) {
     throw new Error(
@@ -9383,20 +9422,14 @@ try {
     active?.setContentSize(600, 680);
   });
   await workspaceMissingPage.waitForSelector(
-    '.codex-ui-app-shell[data-layout-mode="narrow"]:not([data-sidebar-open])',
-  );
-  await workspaceMissingPage
-    .getByRole("button", { name: "Show sidebar" })
-    .click();
-  await workspaceMissingPage.waitForSelector(
-    '.codex-ui-app-shell[data-layout-mode="narrow"][data-sidebar-open] .codex-ui-app-shell__main[inert]',
+    '.codex-ui-app-shell[data-layout-mode="narrow"][data-sidebar-open] .codex-ui-app-shell__main:not([inert])',
   );
   await retainedTask.click();
   await workspaceMissingPage.waitForSelector(
     '.demo-root[data-frame="workspace-directory-missing"]',
   );
   await workspaceMissingPage.waitForSelector(
-    '.codex-ui-app-shell[data-layout-mode="narrow"]:not([data-sidebar-open]) .codex-ui-app-shell__main:not([inert])',
+    '.codex-ui-app-shell[data-layout-mode="narrow"][data-sidebar-open] .codex-ui-app-shell__main:not([inert])',
   );
   const replaySummary = workspaceMissingPage.getByRole("dialog", {
     name: "Workspace summary",
@@ -10297,19 +10330,13 @@ try {
     active?.setContentSize(600, 680);
   });
   await narrowProjectCreationPage.waitForSelector(
-    '.codex-ui-app-shell[data-layout-mode="narrow"]:not([data-sidebar-open])',
-  );
-  await narrowProjectCreationPage
-    .getByRole("button", { name: "Show sidebar" })
-    .click();
-  await narrowProjectCreationPage.waitForSelector(
-    '.codex-ui-app-shell[data-layout-mode="narrow"][data-sidebar-open] .codex-ui-app-shell__main[inert]',
+    '.codex-ui-app-shell[data-layout-mode="narrow"][data-sidebar-open] .codex-ui-app-shell__main:not([inert])',
   );
   await narrowProjectCreationPage
     .getByRole("button", { name: "New project" })
     .click();
   await narrowProjectCreationPage.waitForSelector(
-    '.demo-root[data-view="workspace"][data-frame="workspace-project-created"] .codex-ui-app-shell[data-layout-mode="narrow"]:not([data-sidebar-open]) .codex-ui-app-shell__main:not([inert])',
+    '.demo-root[data-view="workspace"][data-frame="workspace-project-created"] .codex-ui-app-shell[data-layout-mode="narrow"][data-sidebar-open] .codex-ui-app-shell__main:not([inert])',
   );
 } finally {
   await narrowProjectCreationApp.close();

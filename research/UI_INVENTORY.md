@@ -45,37 +45,38 @@ observation from a previous build remains historical evidence.
 
 ## Current baseline
 
-- Codex Desktop `26.803.61601` (`6396`)
-- Package sampled on 2026-08-11 and fingerprint-reverified on 2026-08-13
+- Codex Desktop `26.810.52044` (`6662`)
+- Package sampled and fingerprint-reverified on 2026-08-18
 - `app.asar` SHA-256:
-  `928129601e8b36eccba603114d6912352f2b13182f3a7d60b32166d0e81aafb5`
+  `6e7e8791b8bf69a586ff994721fff518af391d9efdc66cd2e620dd2a4aedc90f`
 - Computer Use automation: blocked by the environment safety policy for
   `com.openai.codex`
 - Scoped CDP automation: available through a user-authorized second process;
   the Chromium profile is separate, but Codex application data and navigation
   are not fully isolated
 - Fresh current-build Renderer evidence now covers the New chat destination,
-  1180×820 and 820×680 shell, the exact 721→720 sidebar boundary, explicit
-  compact pinning, Pull requests selection and return to New chat, current
-  Composer geometry, zero horizontal overflow, and stable sidebar scroll
-  ownership. Structural target ranking excludes the avatar overlay without
-  using private text. The exact `scrollHeight` remains content-dependent, so
-  the contract locks the unique scroll owner and visible geometry rather than
-  private task counts.
-- The same fingerprint revalidates 91
-  context/Composer/sidebar/menu/window/environment/Settings/completed-thread assets, six project groups,
-  Recents actions, all sampled menus, and the disabled
-  window-navigation cursor. See
-  [`26.803.61601.md`](26.803.61601.md). The scoped visible-shell approximation
+  1180×820 and 820×680 shell, the exact 721→720 boundary where the sidebar now
+  remains visible, explicit Hide/Show, Pull requests selection and return to
+  New chat, current Composer geometry, zero horizontal overflow, and stable
+  sidebar scroll ownership. Structural target ranking excludes the avatar
+  overlay without using private text. The exact `scrollHeight` remains
+  content-dependent, so the contract locks the unique scroll owner and visible
+  geometry rather than private task counts.
+- The same fingerprint revalidates 92
+  context/Composer/sidebar/menu/window/environment/Settings/completed-thread
+  assets, six project groups, Recents actions, the new footer Voice control,
+  the 320px Help menu, the five-icon Account menu, and one successful-command
+  thread. See [`26.810.52044.md`](26.810.52044.md). The scoped visible-shell approximation
   list is empty, but the broader lifecycle denominator remains incomplete;
-  prior Markdown, MCP, attachment, approval, and collaboration evidence keeps
-  its `26.803.41515` prefix until separately re-reached.
+  prior Terminal, failure, Markdown, MCP, attachment, approval, collaboration,
+  and unsampled Settings evidence keeps its original prefix until separately
+  re-reached.
 - Terminal and subagent runtime captures from `26.730.61639` are retained as
   previous-build regression evidence and have been downgraded from `verified`
   to `partial_legacy` until they are reached again on the current fingerprint.
 
-Current inventory: 89 surface groups; 34 have current-build runtime evidence, 38 have previous-build-only runtime evidence, 17 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 33 groups and Electron verification covers 33.
-Prior acceptance outside those 33 sampled current-build groups remains
+Current inventory: 89 surface groups; 21 have current-build runtime evidence, 51 have previous-build-only runtime evidence, 17 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 20 groups and Electron verification covers 20.
+Prior acceptance outside those 20 sampled current-build groups remains
 recorded as `partial_legacy` until current-build re-observation.
 
 The current package exposes candidates far beyond the old transcript sample:
@@ -198,13 +199,15 @@ action, and footer rows into three independently gated current-build groups:
 `app.sidebar-project-actions-menu`, and `app.sidebar-help-menu`. The product
 record contains six expandable groups with 30px project rows, 30px task rows,
 2px/8px child-list block padding, 1px row/group separators,
-pointer/Enter/Space transitions, the 721→720 automatic-collapse rule,
-explicit 720px pinning, a 214.05px-wide project menu with conditional six- and
-seven-item variants, and a
-200×272.06 Help menu with a `What's new` heading and eight items. Browser/CDP
-and Electron repeat the lifecycle; four local-only ownership-masked product
-comparisons pass at 1.54%, 0.13%, 0.30%, and 3.12% for collapsed projects,
-the project menu, the Help menu, and the compact pinned sidebar. The broader
+pointer/Enter/Space transitions, the current 721→720 visible-sidebar rule,
+explicit Hide/Show, a 214.05px-wide project menu with conditional six- and
+seven-item variants, and a 320×272.06 Help menu with a `What's new` heading
+and eight items. The 46px footer now contains a 75.67×28 Voice action plus
+32×32 Help. Browser/CDP and Electron repeat the lifecycle; the current
+local-only 133×46 Voice/Help comparison passes at 3.1219%. Four older
+26.803.61601 ownership-masked comparisons remain regression evidence for
+collapsed projects, the project menu, the previous Help menu, and the compact
+sidebar; they are not relabeled as current pixels. The broader
 project-navigation, mutation/status, and account/settings rows remain
 `partial_legacy` because these narrower observations do not prove every state
 they own.
