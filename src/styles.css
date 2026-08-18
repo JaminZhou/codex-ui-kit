@@ -7057,7 +7057,7 @@ button.codex-ui-activity__header {
 
 .codex-ui-activity__header:hover > .codex-ui-activity__button-chevron,
 .codex-ui-activity__header:focus-within > .codex-ui-activity__button-chevron {
-  opacity: 0.55;
+  opacity: 1;
 }
 
 .codex-ui-activity__button-chevron[data-visible],

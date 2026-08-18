@@ -44,6 +44,9 @@ describe("tool and search visual contract", () => {
       /\.codex-ui-activity__button-chevron svg \{[\s\S]*?height: 0\.875rem;[\s\S]*?opacity: 1 !important;[\s\S]*?rotate: none !important/,
     );
     expect(styles).toMatch(
+      /\.codex-ui-activity__header:hover > \.codex-ui-activity__button-chevron,[\s\S]*?\.codex-ui-activity__header:focus-within > \.codex-ui-activity__button-chevron \{[\s\S]*?opacity: 1/,
+    );
+    expect(styles).toMatch(
       /\.codex-ui-activity__disclosure\[data-open\][\s\S]*?\.codex-ui-activity__button-chevron \{[\s\S]*?rotate: 90deg/,
     );
   });
