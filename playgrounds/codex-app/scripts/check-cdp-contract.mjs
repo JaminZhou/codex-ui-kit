@@ -8664,6 +8664,28 @@ try {
       `Current command no-frame settlement failed: ${JSON.stringify(noFrameState)}`,
     );
   }
+  const unknownFrameUrl = new URL(commandInterruptionNoFramePage.url());
+  unknownFrameUrl.searchParams.set("frame", "command-interruption-stale");
+  await commandInterruptionNoFramePage.goto(unknownFrameUrl.href);
+  await commandInterruptionNoFramePage.waitForSelector(
+    '.demo-root[data-frame="command-interruption-stale"][data-status="completed"] [data-item-id="command-interruption"][data-execution-status="interrupted"] .demo-command-stop-indicator',
+  );
+  const unknownFrameSummary =
+    await commandInterruptionNoFramePage
+      .locator(
+        '[data-item-id="command-interruption"] .codex-ui-activity__summary',
+      )
+      .textContent();
+  if (
+    !unknownFrameSummary
+      ?.replace(/\s+/g, " ")
+      .trim()
+      .startsWith("Background terminal stopped with for i in $(seq 1 120)")
+  ) {
+    throw new Error(
+      `Current command unknown-frame settlement failed: ${unknownFrameSummary}`,
+    );
+  }
 } finally {
   await commandInterruptionNoFrameApp.close();
 }
