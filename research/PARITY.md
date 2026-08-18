@@ -450,7 +450,7 @@ SVG paths are promoted into the current asset contract. Browser/CDP and
 Electron cover the current call orders, labelled content-width disclosures,
 expanded neutral failure output, transport retry/recovery, and native compact
 resize. Nine reviewed internal frames pass. Optional local-only comparisons
-gate the 736×80 success region at 1.9446% under 2% and the complete 688×67
+gate the 736×80 success region at 1.9565% under 2% and the complete 688×67
 compact failure card at 1.20184% under 1.21%; product screenshots remain
 uncommitted.
 

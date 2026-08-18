@@ -842,7 +842,7 @@ Independent Browser/CDP and Electron gates cover the current calls,
 content-width labelled disclosure buttons, neutral failure output, transport
 retry/recovery, and compact resize. Nine reviewed internal frames pass. The
 local-only product gates compare the aligned 736×80 successful tool region at
-1.9446331521739132% under 2% and the complete 688×67 compact failure card at
+1.956521739130435% under 2% and the complete 688×67 compact failure card at
 1.2018396390142311% under 1.21%. Product screenshots and sidebar content stay
 outside the repository.
 

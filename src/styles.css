@@ -7039,36 +7039,37 @@ button.codex-ui-activity__header {
   height: 1.3125rem;
   justify-content: center;
   min-width: 0;
-  width: 0.75rem;
-}
-
-.codex-ui-activity__button-chevron svg {
-  height: 0.875rem;
   opacity: 0;
   rotate: none;
   transition:
     opacity var(--codex-ui-transition),
     rotate var(--codex-ui-transition);
+  width: 0.75rem;
+}
+
+.codex-ui-activity__button-chevron svg {
+  height: 0.875rem;
+  /* Disclosure state belongs to the wrapper, even for captured SVG roots. */
+  opacity: 1 !important;
+  rotate: none !important;
   width: 0.875rem;
 }
 
-.codex-ui-activity__header:hover > .codex-ui-activity__button-chevron svg,
-.codex-ui-activity__header:focus-within > .codex-ui-activity__button-chevron svg {
+.codex-ui-activity__header:hover > .codex-ui-activity__button-chevron,
+.codex-ui-activity__header:focus-within > .codex-ui-activity__button-chevron {
   opacity: 0.55;
 }
 
-.codex-ui-activity__button-chevron[data-visible] svg,
+.codex-ui-activity__button-chevron[data-visible],
 .codex-ui-activity__disclosure[data-open]
   > .codex-ui-activity__header
-  > .codex-ui-activity__button-chevron
-  svg {
+  > .codex-ui-activity__button-chevron {
   opacity: 1;
 }
 
 .codex-ui-activity__disclosure[data-open]
   > .codex-ui-activity__header
-  > .codex-ui-activity__button-chevron
-  svg {
+  > .codex-ui-activity__button-chevron {
   rotate: 90deg;
 }
 

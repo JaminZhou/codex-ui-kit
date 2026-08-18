@@ -876,7 +876,7 @@ failure recovery, content-width disclosure ownership, exact path assets,
 compact card, and existing reconnect/recovered lifecycle. Electron repeats
 the MCP interactions and native compact resize. Nine reviewed internal MCP /
 reconnect baselines pass. Optional local-only 26.810 comparisons keep the
-736×80 successful tool region at 1.9446331521739132% under 2% and the full
+736×80 successful tool region at 1.956521739130435% under 2% and the full
 688×67 compact failure card at 1.2018396390142311% under 1.21%; product frames
 remain outside the repository.
 

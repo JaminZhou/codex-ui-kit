@@ -1125,7 +1125,7 @@ try {
       const callToolIcons = callButtons
         .map((button) => findToolIcon(button.parentElement))
         .filter(Boolean);
-      for (const svg of groupToolIcons) {
+      for (const svg of [...groupToolIcons, ...callToolIcons]) {
         icons.push(captureSemanticSvg(svg, "thread-mcp-tool"));
       }
       const closedCall = callButtons.find(

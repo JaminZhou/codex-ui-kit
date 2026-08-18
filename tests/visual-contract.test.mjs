@@ -34,6 +34,15 @@ describe("current-thread visual contract", () => {
     );
   });
 
+  it("captures MCP tool glyphs from both group and call-row owners", () => {
+    expect(captureScript).toContain(
+      "for (const svg of [...groupToolIcons, ...callToolIcons])",
+    );
+    expect(captureScript).toContain(
+      'icons.push(captureSemanticSvg(svg, "thread-mcp-tool"))',
+    );
+  });
+
   it("keeps the completed-thread compatibility command", () => {
     expect(packageJson.scripts["check:visual:current-thread"]).toBe(
       "pnpm build:demo && node scripts/check-current-thread-visual.mjs",
