@@ -834,9 +834,13 @@ The first accepted turn also reached a real transient `Reconnecting 2/5` row
 and then completed in place. Current DOM capture records the exact 16×16 MCP
 glyph, 14×14 disclosure chevron with closed opacity zero and open rotation 90
 degrees, and exact four-path 16×16 reconnect glyph. The targeted updater
-requires repeated group glyphs to share one fingerprint and verifies group and
-call counts, 21px row heights, reconnect presence, build/theme/viewport, and
-the unchanged manifest fingerprint before writing.
+requires every group and call-row glyph to share one fingerprint and verifies
+group and call counts, 21px row heights, reconnect presence,
+build/theme/viewport, and the unchanged manifest fingerprint before writing.
+For a future fingerprint change, a de-identified MCP capture stored inside the
+same isolated profile can instead supplement the full capture; the updater
+requires matching new-build fingerprint/theme/viewport and promotes the whole
+manifest atomically, avoiding any old/new baseline mix.
 
 Independent Browser/CDP and Electron gates cover the current calls,
 content-width labelled disclosure buttons, neutral failure output, transport

@@ -84,6 +84,40 @@ node scripts/update-current-visual-assets.mjs --thread-only --write
 pnpm update:current-thread-visual-assets
 ```
 
+MCP-only assets have two explicit refresh paths. On an unchanged manifest
+fingerprint, the targeted updater validates and promotes the completed MCP
+state directly:
+
+```sh
+CODEX_VISUAL_ASSET_CDP_PORT=<port> \
+CODEX_VISUAL_ASSET_PROFILE=<absolute-unique-profile> \
+node scripts/update-current-visual-assets.mjs --mcp-only --write
+```
+
+When the installed fingerprint changes, first save the de-identified MCP
+capture as a direct child of the same isolated profile, then supply it to the
+full refresh:
+
+```sh
+visual_profile=/absolute/path/to/unique-profile
+CODEX_VISUAL_ASSET_CDP_PORT=<port> \
+CODEX_VISUAL_ASSET_PROFILE="$visual_profile" \
+CODEX_VISUAL_ASSET_MCP_ONLY=1 \
+node scripts/capture-current-visual-assets.mjs \
+  > "$visual_profile/current-mcp-visual-assets.json"
+
+CODEX_VISUAL_ASSET_CDP_PORT=<port> \
+CODEX_VISUAL_ASSET_PROFILE="$visual_profile" \
+CODEX_VISUAL_ASSET_MCP_CAPTURE="$visual_profile/current-mcp-visual-assets.json" \
+pnpm update:visual-assets
+```
+
+The full updater accepts that supplement only when its app fingerprint,
+theme, and viewport match the primary capture. It verifies every group and
+call-row MCP glyph, chevron, reconnect glyph, row geometry, and interaction
+state, then promotes the new-build manifest in one write. A stale, external,
+overlapping, incomplete, or differently rendered supplement fails closed.
+
 The targeted updater proves the `completed-thread` capture mode and exact
 baseline context before promoting Send, four assistant actions, and seven
 thread-header primitives. The generated 21-icon demo subset strips non-paint
@@ -161,9 +195,10 @@ pinned-summary, and Continue IDs are not promoted on this build. The current
 set now also includes the exact MCP integration/call glyph, the 14×14
 content-width disclosure chevron, and the four-path 16×16 `Reconnecting`
 glyph from accepted real Search/Fetch, invalid-URL recovery, and transient
-transport-recovery turns. The targeted MCP updater requires repeated group
-glyphs to share one fingerprint and validates call/group counts, 21px rows,
-90-degree open rotation, build hash, theme, and viewport before promotion. The broader
+transport-recovery turns. The targeted MCP updater requires every group and
+call-row glyph to share one fingerprint and validates call/group counts, 21px
+rows, 90-degree open rotation, build hash, theme, and viewport before
+promotion. The broader
 inventory and current-build lifecycle denominator remain incomplete, so
 global pixel parity is still ineligible. See
 [`26.810.52044.md`](26.810.52044.md) for the scoped probe evidence and its

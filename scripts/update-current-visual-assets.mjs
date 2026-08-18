@@ -8,6 +8,11 @@ import {
   hasCurrentSidebarSettingsAbsenceEvidence,
   hasCurrentSidebarThreadAbsenceEvidence,
 } from "./visual-asset-sidebar-contract.mjs";
+import {
+  collectCurrentMcpVisualAssets,
+  currentMcpVisualAssetIds,
+  mergeSupplementalCurrentMcpCapture,
+} from "./visual-asset-mcp-contract.mjs";
 
 const write = process.argv.includes("--write");
 const hooksOnly = process.argv.includes("--hooks-only");
@@ -15,6 +20,13 @@ const threadOnly = process.argv.includes("--thread-only");
 const mcpOnly = process.argv.includes("--mcp-only");
 if ([hooksOnly, threadOnly, mcpOnly].filter(Boolean).length > 1) {
   throw new Error("Targeted current visual asset modes are mutually exclusive.");
+}
+const supplementalMcpCapturePath =
+  process.env.CODEX_VISUAL_ASSET_MCP_CAPTURE;
+if (supplementalMcpCapturePath && (hooksOnly || threadOnly || mcpOnly)) {
+  throw new Error(
+    "CODEX_VISUAL_ASSET_MCP_CAPTURE is available only during a full visual asset refresh.",
+  );
 }
 const includeThreadCapture =
   !threadOnly && process.env.CODEX_VISUAL_ASSET_INCLUDE_THREAD === "1";
@@ -298,7 +310,7 @@ const promotionSpecs = new Map([
   [
     "thread-mcp-tool",
     {
-      minimumCandidates: 2,
+      minimumCandidates: 3,
       ownerAriaLabel: null,
       ownerEvidence:
         "current OpenAI Developer Docs integration and call-row glyph selected by exact completed group ownership",
@@ -666,7 +678,7 @@ const runCapture = (captureThreadOnly, captureMcpOnly = false) =>
 const supplementalThreadCapture = includeThreadCapture
   ? runCapture(true)
   : null;
-const capture = runCapture(threadOnly, mcpOnly);
+let capture = runCapture(threadOnly, mcpOnly);
 if (conditionalCapturePath) {
   const normalizedProfile = realpathSync(
     process.env.CODEX_VISUAL_ASSET_PROFILE,
@@ -758,32 +770,34 @@ if (supplementalThreadCapture) {
     if (existingGlobal.length === 0) capture.icons.push(observed[0]);
   }
 }
+if (supplementalMcpCapturePath) {
+  const normalizedProfile = realpathSync(
+    process.env.CODEX_VISUAL_ASSET_PROFILE,
+  );
+  const normalizedSupplementalCapture = realpathSync(
+    supplementalMcpCapturePath,
+  );
+  if (dirname(normalizedSupplementalCapture) !== normalizedProfile) {
+    throw new Error(
+      "The supplemental MCP capture must be a direct child of the isolated profile.",
+    );
+  }
+  const supplementalMcpCapture = JSON.parse(
+    readFileSync(normalizedSupplementalCapture, "utf8"),
+  );
+  capture = mergeSupplementalCurrentMcpCapture(
+    capture,
+    supplementalMcpCapture,
+  );
+}
 capture.icons.forEach((icon, index) =>
   sanitizeVisualAssetIcon(icon, `capture.icons[${index}]`),
 );
 if (mcpOnly) {
-  const targetIds = [
-    "thread-mcp-tool",
-    "thread-activity-chevron",
-    "thread-reconnecting",
-  ];
-  const observation = capture.mcpObservation;
-  if (
-    capture.captureMode !== "completed-mcp-thread" ||
-    observation?.groupCount < 1 ||
-    observation?.callCount < 2 ||
-    observation?.groupToolIconCount !== observation.groupCount ||
-    observation?.callToolIconCount !== observation.callCount ||
-    observation?.activityChevronCount !== 1 ||
-    observation?.reconnectingIconCount !== 1 ||
-    Math.abs((observation?.groupHeight ?? 0) - 21) > 0.1 ||
-    Math.abs((observation?.callHeight ?? 0) - 21) > 0.1 ||
-    observation?.openGroupChevronRotate !== "90deg"
-  ) {
-    throw new Error(
-      `Targeted current MCP capture changed unexpectedly: ${canonicalize(observation)}.`,
-    );
-  }
+  const observedById = collectCurrentMcpVisualAssets(
+    capture,
+    "Targeted current MCP capture",
+  );
   const currentFingerprint = {
     appAsarSha256: capture.baselineContext?.appAsarSha256,
     appVersion: capture.baselineContext?.appVersion,
@@ -807,14 +821,10 @@ if (mcpOnly) {
     );
   }
   const promotedById = new Map();
-  for (const id of targetIds) {
+  for (const id of currentMcpVisualAssetIds) {
     const spec = promotionSpecs.get(id);
     if (!spec) throw new Error(`Missing current MCP promotion spec: ${id}.`);
-    const observed = capture.icons.filter(
-      (candidate) =>
-        candidate.region === spec.region &&
-        candidate.owner?.semanticId === spec.semanticId,
-    );
+    const observed = observedById.get(id);
     const expectedMinimum = spec.minimumCandidates ?? 1;
     if (observed.length < expectedMinimum) {
       throw new Error(
@@ -1318,6 +1328,15 @@ function selectObservedIcon(id, spec, existing) {
     spec.retainExistingWhenAbsentOnSameFingerprint
   ) {
     return null;
+  }
+  if (
+    candidates.length === 0 &&
+    fingerprintChanged &&
+    currentMcpVisualAssetIds.includes(id)
+  ) {
+    throw new Error(
+      `${id} requires CODEX_VISUAL_ASSET_MCP_CAPTURE from the same new-build profile during a fingerprint-changing full refresh.`,
+    );
   }
   if (!spec.minimumCandidates && candidates.length !== 1) {
     throw new Error(
