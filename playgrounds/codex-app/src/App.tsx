@@ -8739,14 +8739,18 @@ export function App() {
             {command.command}
           </span>
         );
+        const replayPositionSelected = activeFrame === null;
         const running =
-          activeFrame === "command-interruption-running" &&
-          command.status === "running";
+          command.status === "running" &&
+          (activeFrame === "command-interruption-running" ||
+            (replayPositionSelected && state.status === "running"));
         const stopped =
           activeFrame === "command-interruption-stopping" ||
           activeFrame === "command-interruption-settled" ||
           activeFrame === "command-interruption-recovered" ||
-          (activeFrame === null && command.status === "completed");
+          (replayPositionSelected &&
+            (state.status === "interrupted" ||
+              command.status === "completed"));
         const execution = (
           <CommandExecution
             command={command.command}

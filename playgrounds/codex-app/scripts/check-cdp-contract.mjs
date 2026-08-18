@@ -8612,6 +8612,31 @@ try {
   await commandInterruptionNoFramePage.waitForSelector(
     '.demo-root[data-frame="command-interruption-recovered"][data-status="completed"] [data-item-id="command-interruption"][data-execution-status="interrupted"]',
   );
+  const noFrameReplayPosition = commandInterruptionNoFramePage.getByRole(
+    "slider",
+    { name: "Protocol event position" },
+  );
+  await noFrameReplayPosition.fill("3");
+  await commandInterruptionNoFramePage.waitForSelector(
+    '.demo-root[data-frame="command-interruption-running"][data-status="running"] [data-item-id="command-interruption"][data-execution-status="running"]',
+  );
+  if (
+    (await commandInterruptionNoFramePage
+      .getByText("Working for 7s", { exact: true })
+      .count()) !== 1
+  ) {
+    throw new Error(
+      "Current command replay position dropped the running timeline.",
+    );
+  }
+  await noFrameReplayPosition.fill("4");
+  await commandInterruptionNoFramePage.waitForSelector(
+    '.demo-root[data-frame="command-interruption-stopping"][data-status="interrupted"] [data-item-id="command-interruption"][data-execution-status="interrupted"] .demo-command-stop-indicator',
+  );
+  await noFrameReplayPosition.press("End");
+  await commandInterruptionNoFramePage.waitForSelector(
+    '.demo-root[data-frame="command-interruption-recovered"][data-status="completed"] [data-item-id="command-interruption"][data-execution-status="interrupted"]',
+  );
   const noFrameState = await commandInterruptionNoFramePage.evaluate(() => ({
     assistantText:
       document
