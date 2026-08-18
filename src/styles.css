@@ -3183,7 +3183,7 @@
 
 .codex-ui-app-sidebar__item-row[data-secondary-status]
   > .codex-ui-app-sidebar__item-status {
-  transform: translateX(-1.75rem);
+  inset-inline-end: 1.75rem;
 }
 
 .codex-ui-app-sidebar__item-status-spinner {

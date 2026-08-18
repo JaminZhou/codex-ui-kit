@@ -200,7 +200,7 @@ describe("application shell visual contract", () => {
       "padding-inline-end: calc(var(--codex-ui-spacing) * 15);",
     );
     expect(styles).toMatch(
-      /\.codex-ui-app-sidebar__item-row\[data-secondary-status\][\s\S]*?> \.codex-ui-app-sidebar__item-status \{[\s\S]*?transform: translateX\(-1\.75rem\);/,
+      /\.codex-ui-app-sidebar__item-row\[data-secondary-status\][\s\S]*?> \.codex-ui-app-sidebar__item-status \{[\s\S]*?inset-inline-end: 1\.75rem;/,
     );
     expect(styles).toMatch(
       /\.codex-ui-app-sidebar__item-row\[data-secondary-status\][\s\S]*?\.codex-ui-app-sidebar__item-worktree-indicator \{[\s\S]*?inset-inline-end: 4\.1875rem;/,

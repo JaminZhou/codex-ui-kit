@@ -7482,6 +7482,42 @@ for (const scene of selectedScenes) {
           `${scene.id}: current sidebar status lifecycle failed: ${JSON.stringify(contract.sidebar)}`,
         );
       }
+      const rtlWorktreeGeometry = await page.evaluate(async () => {
+        const item = document.querySelector(
+          '[data-sidebar-worktree-status-fixture="design-assets:2"]',
+        );
+        const row = item?.closest(".codex-ui-app-sidebar__item-row");
+        if (!(row instanceof HTMLElement)) return null;
+        row.dir = "rtl";
+        await new Promise((resolve) => requestAnimationFrame(resolve));
+        const rowBounds = row.getBoundingClientRect();
+        const inlineStart = (selector) => {
+          const element = row.querySelector(selector);
+          if (!(element instanceof Element)) return null;
+          return element.getBoundingClientRect().left - rowBounds.left;
+        };
+        const geometry = {
+          branch: inlineStart(
+            ".codex-ui-app-sidebar__item-worktree-indicator",
+          ),
+          secondaryStatus: inlineStart(
+            ".codex-ui-app-sidebar__item-secondary-status",
+          ),
+          status: inlineStart(".codex-ui-app-sidebar__item-status"),
+        };
+        row.removeAttribute("dir");
+        return geometry;
+      });
+      if (
+        !rtlWorktreeGeometry ||
+        Math.abs(rtlWorktreeGeometry.secondaryStatus - 8) > 0.1 ||
+        Math.abs(rtlWorktreeGeometry.status - 36) > 0.1 ||
+        Math.abs(rtlWorktreeGeometry.branch - 67) > 0.1
+      ) {
+        throw new Error(
+          `${scene.id}: RTL worktree status geometry failed: ${JSON.stringify(rtlWorktreeGeometry)}`,
+        );
+      }
     }
     const expectedSidebarMax =
       scene.id === "markdown-table-actions-narrow"
