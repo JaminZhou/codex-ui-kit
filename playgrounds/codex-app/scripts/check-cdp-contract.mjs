@@ -1831,10 +1831,15 @@ for (const scene of selectedScenes) {
             ".codex-ui-project-index__columns button",
           ),
         ].find((element) => element.textContent?.trim() === "Updated");
+        const actionLabels = Array.from(
+          document.querySelectorAll(
+            ".codex-ui-project-index__item-actions button:first-child",
+          ),
+          (button) => button.getAttribute("aria-label"),
+        );
         return {
-          actions: document.querySelectorAll(
-            '[aria-label="Project actions"]',
-          ).length,
+          actionLabels,
+          actions: actionLabels.length,
           columns: getComputedStyle(
             document.querySelector(".codex-ui-project-index__columns"),
           ).gridTemplateColumns,
@@ -1892,6 +1897,10 @@ for (const scene of selectedScenes) {
         projectIndex.rows.length !== 14 ||
         projectIndex.rows.some(({ height }) => height !== 70) ||
         projectIndex.actions !== 14 ||
+        projectIndex.actionLabels.some(
+          (label) => !label?.startsWith("Project actions for "),
+        ) ||
+        new Set(projectIndex.actionLabels).size !== 14 ||
         projectIndex.toggles !== 14 ||
         projectIndex.expandedGroups !== (expanded ? 1 : 0) ||
         projectIndex.firstWrapper?.height !== (expanded ? 119 : 71) ||

@@ -6869,7 +6869,10 @@ export function App() {
       updated: item.updated,
       actions: (
         <>
-          <button aria-label="Project actions" type="button">
+          <button
+            aria-label={`Project actions for ${item.label}`}
+            type="button"
+          >
             <SidebarGlyph name="more-current" />
           </button>
           <button aria-label={`Pin ${item.label}`} type="button">
