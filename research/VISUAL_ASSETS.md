@@ -74,6 +74,31 @@ fingerprint. An optional interaction-state variant may be retained only when
 the installed app fingerprint is unchanged; all other missing, added, removed,
 duplicated, ambiguous, or unmatched primitives fail closed.
 
+The Composer permission control has two mutually exclusive visible states.
+On an unchanged fingerprint, a full capture may refresh one state and retain
+the already observed alternate state. On a fingerprint-changing refresh,
+capture the alternate permission state from the same isolated profile before
+running the full updater. After saving this supplement, switch the live
+Composer to the other permission state before the second command:
+
+```sh
+visual_profile=/absolute/path/to/unique-profile
+CODEX_VISUAL_ASSET_CDP_PORT=<port> \
+CODEX_VISUAL_ASSET_PROFILE="$visual_profile" \
+node scripts/capture-current-visual-assets.mjs \
+  > "$visual_profile/alternate-permission-visual-assets.json"
+
+CODEX_VISUAL_ASSET_CDP_PORT=<port> \
+CODEX_VISUAL_ASSET_PROFILE="$visual_profile" \
+CODEX_VISUAL_ASSET_PERMISSION_CAPTURE="$visual_profile/alternate-permission-visual-assets.json" \
+pnpm update:visual-assets
+```
+
+The primary and supplemental captures must show opposite permission states
+and match the exact build, interaction state, theme, viewport, and isolated
+profile. Missing, duplicated, stale, or externally stored evidence fails
+closed before either icon is promoted.
+
 For an already completed synthetic thread on that exact fingerprint, the
 targeted path avoids reopening mutable sidebar and Settings states:
 

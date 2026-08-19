@@ -379,6 +379,7 @@ if (
   !updaterSource.includes("capturedAt") ||
   !updaterSource.includes("--project-picker-only") ||
   !updaterSource.includes("CODEX_VISUAL_ASSET_PROJECT_PICKER_CAPTURE") ||
+  !updaterSource.includes("CODEX_VISUAL_ASSET_PERMISSION_CAPTURE") ||
   !updaterSource.includes("validateProjectPickerObservation")
 ) {
   throw new Error("visual asset promotion must remain deterministic and explicit");

@@ -1514,10 +1514,16 @@ Escape closes it and restores focus to the trigger. Denial yields
 `Worked for 1m 53s`, keeps the command unexecuted, and restores the empty
 736×98 Composer with `Ask for approval`. The exact Ask-mode hand SVG was
 captured independently from the non-ask shield under the same ASAR fingerprint.
+Future fingerprint-changing full refreshes require both mutually exclusive
+states in one atomic promotion: the alternate full capture must be a direct
+child of the same isolated profile and is supplied through
+`CODEX_VISUAL_ASSET_PERMISSION_CAPTURE`. An unchanged fingerprint may retain
+the already observed hidden variant; a changed fingerprint without same-build
+dual-state evidence fails closed.
 
 Browser/CDP locks geometry, shortcut hints, menu contents, no-execution state,
 and focus recovery. Electron repeats menu dismissal and denial. Local-only
-card/menu/Composer crops pass at 3.5133%, 4.7096%, and 2.1642% under 4%, 5%,
+card/menu/Composer crops pass at 3.2558%, 4.7096%, and 2.1642% under 4%, 5%,
 and 3.5% ceilings. Private paths, screenshots, and disposable profiles are not
 committed; both isolated profiles were moved recoverably to Trash after their
 exact processes, handlers, and loopback listeners were gone.

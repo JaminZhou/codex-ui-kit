@@ -16,6 +16,11 @@ import {
   currentMcpVisualAssetIds,
   mergeSupplementalCurrentMcpCapture,
 } from "./visual-asset-mcp-contract.mjs";
+import {
+  assertComposerPermissionRefreshCoverage,
+  composerPermissionVisualAssetIds,
+  mergeSupplementalComposerPermissionCapture,
+} from "./visual-asset-permission-contract.mjs";
 import { serializeCurrentThreadVisualAssetSubset } from "./current-thread-visual-assets.mjs";
 
 const write = process.argv.includes("--write");
@@ -30,8 +35,12 @@ const supplementalMcpCapturePath =
   process.env.CODEX_VISUAL_ASSET_MCP_CAPTURE;
 const supplementalProjectPickerCapturePath =
   process.env.CODEX_VISUAL_ASSET_PROJECT_PICKER_CAPTURE;
+const supplementalPermissionCapturePath =
+  process.env.CODEX_VISUAL_ASSET_PERMISSION_CAPTURE;
 if (
-  (supplementalMcpCapturePath || supplementalProjectPickerCapturePath) &&
+  (supplementalMcpCapturePath ||
+    supplementalProjectPickerCapturePath ||
+    supplementalPermissionCapturePath) &&
   (hooksOnly || threadOnly || mcpOnly || projectPickerOnly)
 ) {
   throw new Error(
@@ -260,6 +269,7 @@ const promotionSpecs = new Map([
       ownerEvidence:
         "one visible 16px current Ask for approval Composer control after Add files",
       region: "composer",
+      retainExistingWhenAbsentOnSameFingerprint: true,
       semanticId: "composer-permission-ask",
     },
   ],
@@ -881,6 +891,23 @@ if (supplementalMcpCapturePath) {
     supplementalMcpCapture,
   );
 }
+if (supplementalPermissionCapturePath) {
+  const normalizedProfile = realpathSync(
+    process.env.CODEX_VISUAL_ASSET_PROFILE,
+  );
+  const normalizedSupplementalCapture = realpathSync(
+    supplementalPermissionCapturePath,
+  );
+  if (dirname(normalizedSupplementalCapture) !== normalizedProfile) {
+    throw new Error(
+      "The supplemental Composer permission capture must be a direct child of the isolated profile.",
+    );
+  }
+  capture = mergeSupplementalComposerPermissionCapture(
+    capture,
+    JSON.parse(readFileSync(normalizedSupplementalCapture, "utf8")),
+  );
+}
 const projectPickerVisualAssetIds = [
   "composer-new-project",
   "composer-clear-project",
@@ -1395,10 +1422,7 @@ if (hooksOnly) {
   process.exit(0);
 }
 const composerTerminalIds = new Set(["composer-send", "composer-voice"]);
-const composerPermissionIds = new Set([
-  "composer-permission",
-  "composer-permission-ask",
-]);
+const composerPermissionIds = new Set(composerPermissionVisualAssetIds);
 const expectedComposerIds = [...promotionSpecs.entries()]
   .filter(
     ([id, spec]) =>
@@ -1418,6 +1442,21 @@ const capturedComposerRequiredIds = capturedComposerIds.filter(
 const capturedComposerPermissionIds = capturedComposerRequiredIds.filter(
   (id) => composerPermissionIds.has(id),
 );
+const incomingFingerprint = {
+  appAsarSha256: capture.baselineContext?.appAsarSha256,
+  appVersion: capture.baselineContext?.appVersion,
+  buildNumber: capture.baselineContext?.buildNumber,
+};
+const trackedFingerprint = {
+  appAsarSha256: manifest.baseline.appAsarSha256,
+  appVersion: manifest.baseline.appVersion,
+  buildNumber: manifest.baseline.buildNumber,
+};
+const fullRefreshFingerprintChanged =
+  canonicalize(incomingFingerprint) !== canonicalize(trackedFingerprint);
+assertComposerPermissionRefreshCoverage(capturedComposerPermissionIds, {
+  fingerprintChanged: fullRefreshFingerprintChanged,
+});
 const expectedCapturedComposerIds = [
   ...expectedComposerIds,
   ...capturedComposerPermissionIds,
@@ -1429,7 +1468,6 @@ if (
   capture.composerObservation?.topContextIconCount !== 3 ||
   capture.composerObservation?.bottomActionIconCount !== 5 ||
   capture.composerObservation?.exactSemanticIconCount !== 8 ||
-  capturedComposerPermissionIds.length !== 1 ||
   canonicalize(capturedComposerRequiredIds) !==
     canonicalize(expectedCapturedComposerIds) ||
   canonicalize(capturedComposerTerminalIds) !==
@@ -1552,18 +1590,7 @@ if (
   throw new Error("Capture is missing its exact baseline context.");
 }
 
-const previousFingerprint = {
-  appAsarSha256: manifest.baseline.appAsarSha256,
-  appVersion: manifest.baseline.appVersion,
-  buildNumber: manifest.baseline.buildNumber,
-};
-const currentFingerprint = {
-  appAsarSha256: baselineContext.appAsarSha256,
-  appVersion: baselineContext.appVersion,
-  buildNumber: baselineContext.buildNumber,
-};
-const fingerprintChanged =
-  canonicalize(previousFingerprint) !== canonicalize(currentFingerprint);
+const fingerprintChanged = fullRefreshFingerprintChanged;
 const settingsCaptureExpanded = !manifest.icons.some(
   ({ id }) => id === "settings-git",
 );
@@ -1627,6 +1654,15 @@ function selectObservedIcon(id, spec, existing) {
   ) {
     throw new Error(
       `${id} requires CODEX_VISUAL_ASSET_PROJECT_PICKER_CAPTURE from the same new-build profile during a fingerprint-changing full refresh.`,
+    );
+  }
+  if (
+    candidates.length === 0 &&
+    fingerprintChanged &&
+    composerPermissionIds.has(id)
+  ) {
+    throw new Error(
+      `${id} requires CODEX_VISUAL_ASSET_PERMISSION_CAPTURE with the alternate same-build Composer permission state during a fingerprint-changing full refresh.`,
     );
   }
   if (!spec.minimumCandidates && candidates.length !== 1) {
