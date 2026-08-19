@@ -1470,6 +1470,33 @@ as a direct child of the same isolated profile and pass its absolute path via
 build, theme, viewport, interaction state, directory, action contract, or icon
 cardinality instead of relabelling an older picker asset as current.
 
+## Current Projects Index sample
+
+The separate `26.810.52044` Projects Index probe used an isolated second
+process, unique `/private/tmp` profile, and loopback-only port `9871`. It first
+normalized the sidebar through explicit Hide/Show controls, returned to New
+chat, and then invoked the single in-memory product router to `/projects`.
+Renderer target selection, bundle fingerprinting, and pre/post-capture ASAR
+identity checks use the same fail-closed boundary as the shell capture.
+
+At 1180×820 with the persisted 322.91px sidebar, the route title starts at
+x=391.45 and the 736px table uses 512/64/128px columns. Search is 736×32 with
+a 688×18 input. Fourteen 70px rows each expose one `Toggle project` control
+and three 32px actions; the first expandable row produces a 119px wrapper and
+one recent-chat group. The probe verifies Updated descending, Name ascending
+and descending, exact `No projects`, and search-focus continuity. It then
+resizes to 600×600, explicitly hides the sidebar, and records the 560px
+416/128 table with Updated hidden and zero horizontal overflow.
+
+The tracked JSON contains only counts, geometry, styles, fixed labels, route
+state, and de-identified interaction results. Project/chat labels, raw JSON,
+screenshots, and profile data remain local-only. Browser/CDP gates ready,
+expanded, and compact frames; Electron independently covers creation,
+failure, retained rows, two recent-chat routes, and Composer submission. The
+local-only 1180×820 comparison passes at 0.2221% for the masked route and
+3.7068% for Create under 3.5% and 4% ceilings respectively, using
+`CODEX_UI_KIT_CURRENT_PROJECTS_INDEX_REFERENCE`.
+
 ## Required flow matrix
 
 ### 1. Application entry and navigation

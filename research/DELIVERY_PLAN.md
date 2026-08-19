@@ -14,7 +14,7 @@ exit gates; it does not replace the inventory.
   Desktop `26.810.52044` (`6662`). Unsampled earlier-build surfaces remain
   previous-build regression evidence rather than current verification.
 - The inventory contains 89 surface groups: 59 P0, 21 P1, and 9 P2.
-- 28 groups have current-build runtime evidence, 45 have previous-build-only
+- 29 groups have current-build runtime evidence, 44 have previous-build-only
   runtime evidence, and 16 have not been sampled.
 - The scoped `26.810.52044` refresh revalidates 97
   sidebar/menu/window-chrome/Composer/Settings/completed-thread icons against
@@ -39,6 +39,13 @@ exit gates; it does not replace the inventory.
   composition, promotes its exact New/Clear glyphs, and verifies empty search,
   Escape focus return, clear, and original-project restoration in Browser/CDP,
   Electron, and a 0.9546% local-only listbox comparison.
+  The current Projects Index follow-up separately reaches the real
+  `26.810.52044` route and locks fourteen 70px rows, 512/64/128 wide columns,
+  416/128 explicitly collapsed compact columns, three row actions, sorting,
+  empty search, expansion, and focus continuity. Browser/CDP, full Electron
+  creation/routing acceptance, and local-only 0.2221% route plus 3.7068%
+  Create-region comparisons now replace the previous-build-only primary route
+  denominator without claiming every loading/error/pending-worktree variant.
   Earlier hover/footer slices promoted More, Pin,
   Archive, and Help, confirms that Settings is absent from the sampled footer
   and that sampled project-task rows have no leading glyph. The Recents follow-up
@@ -446,6 +453,12 @@ run-location transition, environment empty menu, seven-branch picker, and
 1180→720 responsive geometry now pass Browser/CDP, Electron, and external
 pixel gates. The historical 600×600 local-environment dialog remains an
 independent host capability rather than the current New worktree entry path.
+The current `26.810.52044` Projects Index follow-up now delivers the primary
+ready/expanded/sort/empty/compact route at both 1180×820 and explicitly
+collapsed 600×600, with current geometry, assets, Browser/CDP, full Electron
+creation and distinct recent-chat routing, and ownership-masked pixels.
+Loading/error/partial-error and pending-worktree variants remain independent
+replay coverage until they are re-reached on the same installed build.
 The current follow-up adds the five-action `Work in` menu, treats Codex web as
 an external anchor rather than a synthetic execution environment, covers the
 New-worktree no-environment menu, and implements the current 768px unavailable

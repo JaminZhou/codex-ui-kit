@@ -76,8 +76,8 @@ observation from a previous build remains historical evidence.
   previous-build regression evidence and have been downgraded from `verified`
   to `partial_legacy` until they are reached again on the current fingerprint.
 
-Current inventory: 89 surface groups; 28 have current-build runtime evidence, 45 have previous-build-only runtime evidence, 16 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 27 groups and Electron verification covers 27.
-Prior acceptance outside those 27 sampled current-build groups remains
+Current inventory: 89 surface groups; 29 have current-build runtime evidence, 44 have previous-build-only runtime evidence, 16 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 28 groups and Electron verification covers 28.
+Prior acceptance outside those 28 sampled current-build groups remains
 recorded as `partial_legacy` until current-build re-observation.
 
 The current package exposes candidates far beyond the old transcript sample:
@@ -395,11 +395,15 @@ Projects route: `Projects`, `Search projects`, Name/Updated sorting, local
 project and pending-worktree status, 70px rows with 32px icons, row actions,
 and up to ten expandable recent chats. The independent full-app replay covers
 ready, expanded, loading, error, partial-error, search-empty, and 720px compact
-presentations; Browser/CDP now gates 163 lifecycle frames and Electron repeats
-the creation and routing contract. The inventory remains `partial_legacy`
-because its runtime denominator is still the prior `26.721` route sample;
-current installed-package structure and independent verification are recorded
-without falsely claiming current runtime or pixel reachability.
+presentations. A fresh isolated `26.810.52044` Renderer now additionally locks
+the primary route's fourteen 70px rows, 736px 512/64/128 table, three 32px row
+actions, ready/expanded/sort/empty/focus behavior, and the explicitly collapsed
+600×600 416/128 compact table. Browser/CDP covers the same three primary
+frames, Electron repeats project creation and two distinct recent-chat routes,
+and the local-only ownership-masked route passes at 0.2221% while Create passes
+at 3.7068%. The implementation remains partial for the wider loading/error/
+pending-worktree denominator, but the primary current route is no longer
+classified as previous-build-only.
 
 The `26.803.61601` branch-entry follow-up replaces the incorrect local-
 environment reuse with a dedicated branch workflow. The live Renderer exposes

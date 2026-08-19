@@ -12,6 +12,7 @@ import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import {
   assertCurrentBaselineRecord,
+  assertCurrentProjectsIndexObservation,
   assertCurrentSidebarLifecycle,
   currentBaselineFingerprint,
   currentBaselineViewports,
@@ -30,6 +31,134 @@ const candidate = (overrides: Record<string, unknown> = {}) => ({
 });
 
 describe("current baseline capture contract", () => {
+  const projectsObservation = () => ({
+    collapsed: { expandedCount: 0, focusOnToggle: true },
+    compact: {
+      header: {
+        gridTemplateColumns: "416px 128px",
+        rect: { height: 40, width: 560 },
+      },
+      horizontalOverflow: 0,
+      navigationVisible: false,
+      navigationWidth: null,
+      routePath: "/projects",
+      rows: { count: 14, firstRect: { height: 70, width: 560 } },
+      scrollOwners: [
+        {
+          clientHeight: 554,
+          overflowY: "auto",
+          rect: { height: 554, top: 46 },
+          scrollHeight: 1_188,
+        },
+      ],
+      updatedDisplay: "none",
+      viewport: { height: 600, width: 600 },
+    },
+    empty: { emptyMessageCount: 1, focusOnSearch: true, rowCount: 0 },
+    expanded: {
+      expandedCount: 1,
+      focusOnToggle: true,
+      recentGroupCount: 1,
+      wrapperHeight: 119,
+    },
+    sort: {
+      initial: {
+        name: { active: false, descending: false },
+        updated: { active: true, descending: true },
+      },
+      nameAscending: {
+        name: { active: true, descending: false },
+        updated: { active: false, descending: false },
+      },
+      nameDescending: {
+        name: { active: true, descending: true },
+        updated: { active: false, descending: false },
+      },
+      restored: {
+        name: { active: false, descending: false },
+        updated: { active: true, descending: true },
+      },
+    },
+    wide: {
+      header: {
+        gridTemplateColumns: "512px 64px 128px",
+        rect: { height: 40, width: 736 },
+      },
+      horizontalOverflow: 0,
+      navigationVisible: true,
+      navigationWidth: 322.91,
+      routePath: "/projects",
+      rows: { count: 14, firstRect: { height: 70, width: 736 } },
+      scrollOwners: [
+        {
+          clientHeight: 774,
+          overflowY: "auto",
+          rect: { height: 774, top: 46 },
+          scrollHeight: 1_188,
+        },
+      ],
+      search: {
+        count: 1,
+        placeholder: "Search projects",
+        rect: { height: 18, width: 688 },
+      },
+      title: {
+        count: 1,
+        rect: { height: 33.59 },
+        style: {
+          fontSize: "28px",
+          fontWeight: "400",
+          lineHeight: "33.6px",
+        },
+      },
+      updatedDisplay: "inline-flex",
+      viewport: { height: 820, width: 1180 },
+    },
+  });
+
+  it("gates current Projects geometry, interactions, and compact behavior", () => {
+    const observation = projectsObservation();
+    expect(() =>
+      assertCurrentProjectsIndexObservation(observation),
+    ).not.toThrow();
+    expect(() =>
+      assertCurrentProjectsIndexObservation({
+        ...observation,
+        compact: {
+          ...observation.compact,
+          header: {
+            ...observation.compact.header,
+            gridTemplateColumns: "432px 112px",
+          },
+        },
+      }),
+    ).toThrow("compact route geometry");
+    expect(() =>
+      assertCurrentProjectsIndexObservation({
+        ...observation,
+        empty: { ...observation.empty, focusOnSearch: false },
+      }),
+    ).toThrow("settled empty state");
+    expect(() =>
+      assertCurrentProjectsIndexObservation({
+        ...observation,
+        sort: {
+          ...observation.sort,
+          restored: {
+            ...observation.sort.restored,
+            updated: { active: true, descending: false },
+          },
+        },
+      }),
+    ).toThrow("sort cycle");
+    expect(() =>
+      assertCurrentProjectsIndexObservation({
+        ...observation,
+        expanded: { ...observation.expanded, recentGroupCount: 0 },
+      }),
+    ).toThrow("expansion and focus continuity");
+  });
+
   it("selects the structural main Renderer instead of target order", () => {
     expect(
       selectCurrentMainCandidate([
@@ -209,7 +338,6 @@ describe("current baseline capture contract", () => {
       editorWidth: 389.89,
       mainWidth: 445.89,
     });
-    const compactVisibleBeforeCollapse = compactPinned;
     const compactCollapsed = {
       ...state(720, 680, {
         editorLeft: 28,
@@ -233,6 +361,7 @@ describe("current baseline capture contract", () => {
         ),
       ),
     };
+    const compactVisibleBeforeCollapse = compactPinned;
     const compactPullRequests = {
       ...compactPinned,
       controls: {
@@ -489,7 +618,7 @@ describe("current baseline capture contract", () => {
         },
       }),
     ).toThrow("Help menu boundary");
-    for (const invalidCount of [undefined, 5, 5.5, 7]) {
+    for (const invalidCount of [undefined, 0, 1.5]) {
       expect(() =>
         assertCurrentSidebarLifecycle({
           ...record.sidebarLifecycle,
@@ -509,6 +638,16 @@ describe("current baseline capture contract", () => {
         }),
       ).toThrow("project-group baseline");
     }
+    expect(() =>
+      assertCurrentSidebarLifecycle({
+        ...record.sidebarLifecycle,
+        baseline: {
+          ...record.sidebarLifecycle.baseline,
+          expandedProjectGroupCount: 7,
+          projectGroupCount: 6,
+        },
+      }),
+    ).toThrow("project-group baseline");
     for (const invalidWidth of [undefined, 239, 521]) {
       expect(() =>
         assertCurrentSidebarLifecycle({
@@ -536,13 +675,13 @@ describe("current baseline capture contract", () => {
         },
         responsive: {
           ...persistedRecord.sidebarLifecycle.responsive,
+          compactPinned: {
+            ...persistedRecord.sidebarLifecycle.responsive.compactPinned,
+            navigationWidth: 400,
+          },
           compactVisibleBeforeCollapse: {
             ...persistedRecord.sidebarLifecycle.responsive
               .compactVisibleBeforeCollapse,
-            navigationWidth: 400,
-          },
-          compactPinned: {
-            ...persistedRecord.sidebarLifecycle.responsive.compactPinned,
             navigationWidth: 400,
           },
           wideRestored: {
@@ -815,7 +954,7 @@ describe("current baseline capture contract", () => {
     expect(
       captureSource.indexOf("states.compactVisibleBeforeCollapse"),
     ).toBeLessThan(
-      captureSource.indexOf("await hideSidebar();"),
+      captureSource.lastIndexOf("await hideSidebar();"),
     );
     expect(captureSource).toContain('return "non-app-page";');
     expect(captureSource).toContain('[data-testid="home-icon"]:visible');

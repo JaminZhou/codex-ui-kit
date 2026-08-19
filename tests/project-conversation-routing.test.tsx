@@ -1030,7 +1030,7 @@ describe("project conversation routing", () => {
     expect(onSortChange).toHaveBeenCalledWith("updated");
     fireEvent.click(
       screen.getByRole("button", {
-        name: "Hide recent chats in UI Kit",
+        name: "Toggle project",
       }),
     );
     expect(onExpandedChange).toHaveBeenCalledWith("ui-kit", false);

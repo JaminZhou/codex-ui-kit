@@ -9700,32 +9700,38 @@ try {
   await projectCreationPage.waitForSelector(
     '.demo-root[data-view="projects"][data-frame="projects-index-ready"]',
   );
+  const projectIndexRoute = projectCreationPage.locator(
+    ".demo-projects-route",
+  );
   if (
-    !(await projectCreationPage
-      .getByRole("button", { name: "Open project scripts" })
-      .isVisible()) ||
-    !(await projectCreationPage
-      .getByRole("button", { name: "Open project src" })
-      .isVisible())
+    (await projectIndexRoute
+      .locator(".codex-ui-project-index__label")
+      .filter({ hasText: /^scripts$/ })
+      .count()) !== 1 ||
+    (await projectIndexRoute
+      .locator(".codex-ui-project-index__label")
+      .filter({ hasText: /^src$/ })
+      .count()) !== 1
   ) {
     throw new Error(
       "Electron created projects did not remain visible in the project index.",
     );
   }
-  if (
-    !(await projectCreationPage
-      .getByRole("button", { name: "Open project component-lab" })
-      .isDisabled())
-  ) {
+  if ((await projectIndexRoute.locator("[data-project-row]").count()) !== 16) {
     throw new Error(
-      "Electron failed project row remained interactive and could route to a fallback workspace.",
+      "Electron Projects Index did not preserve the 14-row current baseline plus two created projects.",
     );
   }
 
-  await projectCreationPage
-    .getByRole("button", {
-      name: "Show recent chats in codex-ui-kit",
-    })
+  const codexUiKitProjectRow = projectIndexRoute
+    .locator("[data-project-row-wrapper]")
+    .filter({
+      has: projectCreationPage
+        .locator(".codex-ui-project-index__label")
+        .filter({ hasText: /^codex-ui-kit$/ }),
+    });
+  await codexUiKitProjectRow
+    .getByRole("button", { name: "Toggle project" })
     .click();
   await projectCreationPage
     .getByRole("button", {
@@ -9749,10 +9755,15 @@ try {
   await projectCreationPage
     .getByRole("button", { name: "View projects" })
     .click();
-  await projectCreationPage
-    .getByRole("button", {
-      name: "Show recent chats in codex-ui-kit",
-    })
+  const appServerProjectRow = projectCreationPage
+    .locator(".demo-projects-route [data-project-row-wrapper]")
+    .filter({
+      has: projectCreationPage
+        .locator(".codex-ui-project-index__label")
+        .filter({ hasText: /^codex-app-server-client$/ }),
+    });
+  await appServerProjectRow
+    .getByRole("button", { name: "Toggle project" })
     .click();
   await projectCreationPage
     .getByRole("button", {
@@ -9760,7 +9771,7 @@ try {
     })
     .click();
   await projectCreationPage.waitForSelector(
-    '.demo-root[data-view="workspace"][data-frame="projects-index-chat"] .demo-project-index-chat-route[data-project-id="codex-ui-kit"][data-chat-id="sidebar-contract"]',
+    '.demo-root[data-view="workspace"][data-frame="projects-index-chat"] .demo-project-index-chat-route[data-project-id="app-server-client"][data-chat-id="sidebar-contract"]',
   );
   const projectChatNewChat = projectCreationPage.getByRole("button", {
     exact: true,
@@ -9789,7 +9800,7 @@ try {
     (await projectChatComposer.inputValue()) !== "" ||
     !(await projectCreationPage
       .locator(
-        '.demo-root[data-view="workspace"][data-frame="projects-index-chat"] .demo-project-index-chat-route[data-project-id="codex-ui-kit"][data-chat-id="sidebar-contract"]',
+        '.demo-root[data-view="workspace"][data-frame="projects-index-chat"] .demo-project-index-chat-route[data-project-id="app-server-client"][data-chat-id="sidebar-contract"]',
       )
       .isVisible()) ||
     !(await projectCreationPage
@@ -10323,7 +10334,8 @@ try {
   if (
     (await knownProjectCreationPage
       .locator(".demo-projects-route")
-      .getByRole("button", { name: "Open project codex-ui-kit" })
+      .locator(".codex-ui-project-index__label")
+      .filter({ hasText: /^codex-ui-kit$/ })
       .count()) !== 1
   ) {
     throw new Error(
@@ -10355,8 +10367,7 @@ const {
 });
 try {
   await projectCreationFailurePage
-    .locator(".demo-projects-route")
-    .getByRole("button", { name: "New project" })
+    .getByRole("button", { name: "Create" })
     .click();
   const projectCreationAlert = projectCreationFailurePage.getByRole("alert");
   await projectCreationAlert.waitFor({ state: "visible" });

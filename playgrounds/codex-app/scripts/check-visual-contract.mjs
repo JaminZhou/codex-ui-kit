@@ -206,6 +206,12 @@ const currentBuildWorkspaceReference =
   process.env.CODEX_UI_KIT_WORKSPACE_REFERENCE;
 const currentDarkShellReference =
   process.env.CODEX_UI_KIT_CURRENT_DARK_SHELL_REFERENCE;
+const currentProjectsIndexReference =
+  process.env.CODEX_UI_KIT_CURRENT_PROJECTS_INDEX_REFERENCE;
+const currentProjectsIndexReferenceSize = {
+  height: 820,
+  width: 1180,
+};
 const currentBuildAppServerCrashReference =
   process.env.CODEX_UI_KIT_APP_SERVER_CRASH_REFERENCE;
 const currentBuildAppServerCrashReferenceSize = {
@@ -1390,6 +1396,85 @@ for (const scene of selectedScenes) {
     }
     console.log(
       `${scene.id}: current-build regional pixel ratios ${JSON.stringify(Object.fromEntries(Object.entries(comparisons).map(([region, comparison]) => [region, comparison.ratio])))}`,
+    );
+  }
+
+  if (
+    scene.id === "projects-index-ready" &&
+    currentProjectsIndexReference
+  ) {
+    const reference = flattenPng(
+      PNG.sync.read(await readFile(currentProjectsIndexReference)),
+      { blue: 24, green: 24, red: 24 },
+    );
+    if (
+      reference.width !== currentProjectsIndexReferenceSize.width ||
+      reference.height !== currentProjectsIndexReferenceSize.height ||
+      actual.width !== reference.width ||
+      actual.height !== reference.height
+    ) {
+      throw new Error(
+        `${scene.id}: current-build Projects comparison requires matching 1180x820 frames.`,
+      );
+    }
+    const rowMasks = Array.from({ length: 9 }, (_value, index) => [
+      {
+        height: 38,
+        left: 50,
+        top: 174 + index * 71 + 16,
+        width: 310,
+      },
+      {
+        height: 38,
+        left: 535,
+        top: 174 + index * 71 + 16,
+        width: 75,
+      },
+      {
+        height: 38,
+        left: 684,
+        top: 174 + index * 71 + 16,
+        width: 36,
+      },
+    ]).flat();
+    const comparisons = {
+      create: comparePng(
+        cropPng(reference, 1102, 0, 78, 46),
+        cropPng(actual, 1102, 0, 78, 46),
+      ),
+      route: comparePng(
+        maskPng(cropPng(reference, 367, 46, 768, 774), rowMasks),
+        maskPng(cropPng(actual, 343, 46, 768, 774), rowMasks),
+      ),
+    };
+    const limits = {
+      create: environmentRatio(
+        "CODEX_UI_KIT_CURRENT_PROJECTS_CREATE_MAX_DIFF_RATIO",
+        0.04,
+      ),
+      route: environmentRatio(
+        "CODEX_UI_KIT_CURRENT_PROJECTS_ROUTE_MAX_DIFF_RATIO",
+        0.035,
+      ),
+    };
+    for (const [region, comparison] of Object.entries(comparisons)) {
+      if (comparison.pixels > 0) {
+        await writeFile(
+          join(
+            artifactDirectory,
+            `${scene.id}.current-build.${region}.diff.png`,
+          ),
+          PNG.sync.write(comparison.diff),
+        );
+      }
+      if (comparison.ratio > limits[region]) {
+        throw new Error(
+          `${scene.id}: current-build Projects ${region} pixel ratio ${comparison.ratio} exceeds ${limits[region]}.`,
+        );
+      }
+    }
+    console.log(
+      `${scene.id}: current-build Projects pixel ratios ${JSON.stringify(Object.fromEntries(Object.entries(comparisons).map(([region, comparison]) => [region, comparison.ratio])))}`,
     );
   }
 

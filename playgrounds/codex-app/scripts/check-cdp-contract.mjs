@@ -1818,36 +1818,67 @@ for (const scene of selectedScenes) {
           const rect = element.getBoundingClientRect();
           return {
             height: rect.height,
+            left: rect.left,
+            top: rect.top,
             width: rect.width,
           };
         };
         const updated = document.querySelector(
           ".codex-ui-project-index__updated",
         );
+        const updatedHeader = [
+          ...document.querySelectorAll(
+            ".codex-ui-project-index__columns button",
+          ),
+        ].find((element) => element.textContent?.trim() === "Updated");
         return {
+          actions: document.querySelectorAll(
+            '[aria-label="Project actions"]',
+          ).length,
           columns: getComputedStyle(
             document.querySelector(".codex-ui-project-index__columns"),
           ).gridTemplateColumns,
+          create: bounds(document.querySelector(".demo-projects-create")),
           expandedGroups: document.querySelectorAll(
             '.codex-ui-project-index__recent[aria-label^="Recent chats in"]',
           ).length,
+          firstWrapper: bounds(
+            document.querySelector("[data-project-row-wrapper]"),
+          ),
+          header: bounds(document.querySelector("[data-projects-header]")),
           horizontalOverflow:
             document.documentElement.scrollWidth -
             document.documentElement.clientWidth,
           index: bounds(index),
           layout: index?.getAttribute("data-layout"),
           rows: Array.from(
-            document.querySelectorAll(".codex-ui-project-index__item"),
+            document.querySelectorAll("[data-project-row]"),
             bounds,
+          ),
+          search: bounds(document.querySelector(".demo-projects-search")),
+          searchInput: bounds(
+            document.querySelector('.codex-ui-project-index input[type="search"]'),
           ),
           searchPlaceholder: document
             .querySelector('.codex-ui-project-index input[type="search"]')
             ?.getAttribute("placeholder"),
-          title: document
-            .querySelector(".codex-ui-project-index__header h3")
-            ?.textContent?.trim(),
+          title: {
+            bounds: bounds(
+              document.querySelector(".codex-ui-project-index__header h3"),
+            ),
+            text: document
+              .querySelector(".codex-ui-project-index__header h3")
+              ?.textContent?.trim(),
+          },
+          toggles: document.querySelectorAll(
+            '[aria-label="Toggle project"]',
+          ).length,
           updatedDisplay: updated ? getComputedStyle(updated).display : null,
+          updatedHeaderDisplay: updatedHeader
+            ? getComputedStyle(updatedHeader).display
+            : null,
           view: document.querySelector(".demo-root")?.getAttribute("data-view"),
+          viewport: { height: innerHeight, width: innerWidth },
         };
       });
       const compact = scene.id === "projects-index-compact";
@@ -1855,15 +1886,53 @@ for (const scene of selectedScenes) {
       if (
         projectIndex.view !== "projects" ||
         projectIndex.layout !== "table" ||
-        projectIndex.title !== "Projects" ||
+        projectIndex.title.text !== "Projects" ||
         projectIndex.searchPlaceholder !== "Search projects" ||
         projectIndex.horizontalOverflow > 1 ||
-        projectIndex.rows.length !== 4 ||
+        projectIndex.rows.length !== 14 ||
         projectIndex.rows.some(({ height }) => height !== 70) ||
+        projectIndex.actions !== 14 ||
+        projectIndex.toggles !== 14 ||
         projectIndex.expandedGroups !== (expanded ? 1 : 0) ||
+        projectIndex.firstWrapper?.height !== (expanded ? 119 : 71) ||
+        projectIndex.create?.height !== 28 ||
+        Math.abs((projectIndex.create?.top ?? Infinity) - 9) > 1 ||
+        projectIndex.title.bounds?.height !== 33.59375 ||
+        Math.abs((projectIndex.title.bounds?.top ?? Infinity) - 66) > 0.1 ||
+        projectIndex.search?.height !== 32 ||
+        Math.abs((projectIndex.search?.top ?? Infinity) - 120) > 0.1 ||
+        projectIndex.searchInput?.height !== 18 ||
+        Math.abs((projectIndex.searchInput?.top ?? Infinity) - 127) > 0.1 ||
+        projectIndex.header?.height !== 40 ||
+        Math.abs((projectIndex.header?.top ?? Infinity) - 179.578125) > 0.1 ||
         (compact
-          ? projectIndex.updatedDisplay !== "none"
-          : projectIndex.updatedDisplay === "none")
+          ? projectIndex.viewport.width !== 600 ||
+            projectIndex.viewport.height !== 600 ||
+            projectIndex.index?.width !== 600 ||
+            projectIndex.index?.height !== 554 ||
+            projectIndex.title.bounds?.left !== 28 ||
+            projectIndex.search?.left !== 20 ||
+            projectIndex.search?.width !== 560 ||
+            projectIndex.header?.left !== 20 ||
+            projectIndex.header?.width !== 560 ||
+            projectIndex.columns !== "416px 128px" ||
+            projectIndex.rows[0]?.left !== 20 ||
+            projectIndex.rows[0]?.width !== 560 ||
+            projectIndex.updatedDisplay !== "none" ||
+            projectIndex.updatedHeaderDisplay !== "none"
+          : projectIndex.viewport.width !== 1180 ||
+            projectIndex.viewport.height !== 820 ||
+            projectIndex.index?.height !== 774 ||
+            projectIndex.title.bounds?.left !== 367 ||
+            projectIndex.search?.left !== 359 ||
+            projectIndex.search?.width !== 736 ||
+            projectIndex.header?.left !== 359 ||
+            projectIndex.header?.width !== 736 ||
+            projectIndex.columns !== "512px 64px 128px" ||
+            projectIndex.rows[0]?.left !== 359 ||
+            projectIndex.rows[0]?.width !== 736 ||
+            projectIndex.updatedDisplay === "none" ||
+            projectIndex.updatedHeaderDisplay === "none")
       ) {
         throw new Error(
           `Current projects index contract failed: ${JSON.stringify(projectIndex)}`,

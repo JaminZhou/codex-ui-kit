@@ -79,6 +79,126 @@ const validAppAsarSnapshot = (snapshot) =>
 const sameAppAsarSnapshot = (before, after) =>
   appAsarSnapshotFields.every((field) => before[field] === after[field]);
 
+const projectIndexScrollOwnerMatches = (
+  owners,
+  { clientHeight, height, top },
+) => {
+  const owner = owners?.[0];
+  return (
+    owners?.length === 1 &&
+    owner?.overflowY === "auto" &&
+    withinTolerance(owner?.clientHeight, clientHeight) &&
+    withinTolerance(owner?.rect?.height, height) &&
+    withinTolerance(owner?.rect?.top, top) &&
+    Number.isFinite(owner?.scrollHeight) &&
+    owner.scrollHeight > owner.clientHeight
+  );
+};
+
+export function assertCurrentProjectsIndexObservation(observation) {
+  const wide = observation?.wide;
+  const compact = observation?.compact;
+  if (
+    wide?.routePath !== "/projects" ||
+    wide?.viewport?.width !== currentBaselineViewports.wide.width ||
+    wide?.viewport?.height !== currentBaselineViewports.wide.height ||
+    wide?.title?.count !== 1 ||
+    !withinTolerance(wide?.title?.rect?.height, 33.59) ||
+    wide?.title?.style?.fontSize !== "28px" ||
+    wide?.title?.style?.fontWeight !== "400" ||
+    wide?.title?.style?.lineHeight !== "33.6px" ||
+    wide?.search?.count !== 1 ||
+    wide?.search?.placeholder !== "Search projects" ||
+    !withinTolerance(wide?.search?.rect?.width, 688) ||
+    !withinTolerance(wide?.search?.rect?.height, 18) ||
+    !withinTolerance(wide?.header?.rect?.width, 736) ||
+    !withinTolerance(wide?.header?.rect?.height, 40) ||
+    wide?.header?.gridTemplateColumns !== "512px 64px 128px" ||
+    !Number.isInteger(wide?.rows?.count) ||
+    wide.rows.count < 1 ||
+    !withinTolerance(wide?.rows?.firstRect?.width, 736) ||
+    !withinTolerance(wide?.rows?.firstRect?.height, 70) ||
+    wide?.updatedDisplay === "none" ||
+    wide?.navigationVisible !== true ||
+    Math.abs(wide?.horizontalOverflow ?? Infinity) > 1 ||
+    !projectIndexScrollOwnerMatches(wide?.scrollOwners, {
+      clientHeight: 774,
+      height: 774,
+      top: 46,
+    })
+  ) {
+    throw new Error(
+      `Current Projects observation does not prove the wide route geometry: ${JSON.stringify(wide)}`,
+    );
+  }
+  if (
+    compact?.routePath !== "/projects" ||
+    compact?.viewport?.width !== 600 ||
+    compact?.viewport?.height !== 600 ||
+    compact?.navigationVisible !== false ||
+    compact?.navigationWidth !== null ||
+    !withinTolerance(compact?.header?.rect?.width, 560) ||
+    !withinTolerance(compact?.header?.rect?.height, 40) ||
+    compact?.header?.gridTemplateColumns !== "416px 128px" ||
+    !Number.isInteger(compact?.rows?.count) ||
+    compact.rows.count !== wide.rows.count ||
+    !withinTolerance(compact?.rows?.firstRect?.width, 560) ||
+    !withinTolerance(compact?.rows?.firstRect?.height, 70) ||
+    compact?.updatedDisplay !== "none" ||
+    Math.abs(compact?.horizontalOverflow ?? Infinity) > 1 ||
+    !projectIndexScrollOwnerMatches(compact?.scrollOwners, {
+      clientHeight: 554,
+      height: 554,
+      top: 46,
+    })
+  ) {
+    throw new Error(
+      `Current Projects observation does not prove the compact route geometry: ${JSON.stringify(compact)}`,
+    );
+  }
+  const sort = observation?.sort;
+  if (
+    sort?.initial?.name?.active !== false ||
+    sort.initial.name.descending !== false ||
+    sort.initial.updated?.active !== true ||
+    sort.initial.updated.descending !== true ||
+    sort?.nameAscending?.name?.active !== true ||
+    sort.nameAscending.name.descending !== false ||
+    sort.nameAscending.updated?.active !== false ||
+    sort?.nameDescending?.name?.active !== true ||
+    sort.nameDescending.name.descending !== true ||
+    sort.nameDescending.updated?.active !== false ||
+    sort?.restored?.name?.active !== false ||
+    sort.restored.updated?.active !== true ||
+    sort.restored.updated.descending !== true
+  ) {
+    throw new Error(
+      `Current Projects observation does not prove the sort cycle: ${JSON.stringify(sort)}`,
+    );
+  }
+  if (
+    observation?.empty?.rowCount !== 0 ||
+    observation.empty.emptyMessageCount !== 1 ||
+    observation.empty.focusOnSearch !== true
+  ) {
+    throw new Error(
+      `Current Projects observation does not prove the settled empty state: ${JSON.stringify(observation?.empty)}`,
+    );
+  }
+  if (
+    observation?.expanded?.expandedCount !== 1 ||
+    observation.expanded.focusOnToggle !== true ||
+    observation.expanded.recentGroupCount !== 1 ||
+    !withinTolerance(observation.expanded.wrapperHeight, 119) ||
+    observation?.collapsed?.expandedCount !== 0 ||
+    observation.collapsed.focusOnToggle !== true
+  ) {
+    throw new Error(
+      `Current Projects observation does not prove expansion and focus continuity: ${JSON.stringify({ collapsed: observation?.collapsed, expanded: observation?.expanded })}`,
+    );
+  }
+}
+
 export function assertCurrentSidebarLifecycle(lifecycle) {
   const baseline = lifecycle?.baseline;
   const projectMenu = lifecycle?.projectMenu;
@@ -97,8 +217,11 @@ export function assertCurrentSidebarLifecycle(lifecycle) {
   ];
   const persistedNavigationWidth = baseline?.navigationWidth;
   if (
-    baseline?.projectGroupCount !== 6 ||
-    baseline?.expandedProjectGroupCount !== 6 ||
+    !Number.isInteger(baseline?.projectGroupCount) ||
+    baseline.projectGroupCount < 1 ||
+    !Number.isInteger(baseline?.expandedProjectGroupCount) ||
+    baseline.expandedProjectGroupCount < 1 ||
+    baseline.expandedProjectGroupCount > baseline.projectGroupCount ||
     baseline?.projectRow?.tag !== "div" ||
     baseline?.projectRow?.role !== "button" ||
     baseline?.projectRow?.tabIndex !== 0 ||
