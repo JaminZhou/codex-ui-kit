@@ -1,4 +1,4 @@
-import { mkdir, readFile, writeFile } from "node:fs/promises";
+import { mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import { existsSync } from "node:fs";
 import { join } from "node:path";
 import pixelmatch from "pixelmatch";
@@ -149,6 +149,24 @@ const currentBuildApprovalSimilarCompletedReference =
 const currentBuildApprovalReferenceSize = {
   height: 820,
   width: 906,
+};
+const currentApprovalPendingRegionReference =
+  process.env.CODEX_UI_KIT_CURRENT_APPROVAL_PENDING_REGION_REFERENCE;
+const currentApprovalOptionsRegionReference =
+  process.env.CODEX_UI_KIT_CURRENT_APPROVAL_OPTIONS_REGION_REFERENCE;
+const currentApprovalDeniedComposerRegionReference =
+  process.env.CODEX_UI_KIT_CURRENT_APPROVAL_DENIED_COMPOSER_REGION_REFERENCE;
+const currentApprovalPendingRegionReferenceSize = {
+  height: 162,
+  width: 736,
+};
+const currentApprovalOptionsRegionReferenceSize = {
+  height: 68,
+  width: 194,
+};
+const currentApprovalDeniedComposerRegionReferenceSize = {
+  height: 98,
+  width: 736,
 };
 const currentBuildCommandOutputReference =
   process.env.CODEX_UI_KIT_COMMAND_OUTPUT_REFERENCE;
@@ -498,14 +516,17 @@ async function compareCurrentBuildOverlay({
     join(artifactDirectory, `${sceneId}.current-build.png`),
     PNG.sync.write(overlayActual),
   );
+  const diffPath = join(
+    artifactDirectory,
+    `${sceneId}.current-build.diff.png`,
+  );
   if (comparison.pixels > 0) {
     await writeFile(
-      join(
-        artifactDirectory,
-        `${sceneId}.current-build.diff.png`,
-      ),
+      diffPath,
       PNG.sync.write(comparison.diff),
     );
+  } else {
+    await rm(diffPath, { force: true });
   }
   if (comparison.ratio > maximumRatio) {
     throw new Error(
@@ -671,6 +692,9 @@ for (const scene of selectedScenes) {
   let workspaceProjectListboxBounds;
   let workspaceWorktreeMenuBounds;
   let workspaceBranchCreateBounds;
+  let currentApprovalBounds;
+  let currentApprovalOptionsBounds;
+  let currentApprovalComposerBounds;
 
   try {
     if (scene.id === "workspace-ready") {
@@ -957,6 +981,7 @@ for (const scene of selectedScenes) {
       }
     }
     if (
+      scene.id === "approval-current-options" ||
       scene.id === "approval-current-similar-menu" ||
       scene.id === "approval-current-session-menu"
     ) {
@@ -975,6 +1000,48 @@ for (const scene of selectedScenes) {
               : "Allow similar commands",
         })
         .waitFor();
+    }
+    if (
+      scene.id === "approval-current-pending" ||
+      scene.id === "approval-current-options"
+    ) {
+      currentApprovalBounds = await page
+        .locator(".codex-ui-approval-request")
+        .evaluate((element) => {
+          const value = element.getBoundingClientRect();
+          return {
+            height: Math.round(value.height),
+            left: Math.round(value.left),
+            top: Math.round(value.top),
+            width: Math.round(value.width),
+          };
+        });
+    }
+    if (scene.id === "approval-current-options") {
+      currentApprovalOptionsBounds = await page
+        .locator(".codex-ui-approval-request__options-menu")
+        .evaluate((element) => {
+          const value = element.getBoundingClientRect();
+          return {
+            height: Math.round(value.height),
+            left: Math.round(value.left),
+            top: Math.round(value.top),
+            width: Math.round(value.width),
+          };
+        });
+    }
+    if (scene.id === "approval-current-denied") {
+      currentApprovalComposerBounds = await page
+        .locator(".codex-ui-composer")
+        .evaluate((element) => {
+          const value = element.getBoundingClientRect();
+          return {
+            height: Math.round(value.height),
+            left: Math.round(value.left),
+            top: Math.round(value.top),
+            width: Math.round(value.width),
+          };
+        });
     }
     if (scene.id === "mcp-current-success") {
       await page
@@ -2896,6 +2963,68 @@ for (const scene of selectedScenes) {
     console.log(
       `${scene.id}: current-build approval pixel ratio ${comparison.ratio}`,
     );
+  }
+  if (
+    scene.id === "approval-current-pending" &&
+    currentApprovalPendingRegionReference
+  ) {
+    await compareCurrentBuildOverlay({
+      actual,
+      actualBounds: currentApprovalBounds,
+      defaultMaximumRatio: 0.04,
+      expectedActualPosition: { left: 359, top: 642 },
+      masks: [
+        { height: 20, left: 38, top: 14, width: 70 },
+        { height: 22, left: 12, top: 45, width: 420 },
+        { height: 18, left: 20, top: 85, width: 696 },
+      ],
+      maximumRatioName:
+        "CODEX_UI_KIT_CURRENT_APPROVAL_PENDING_REGION_MAX_DIFF_RATIO",
+      referenceCrop: { height: 162, left: 0, top: 0, width: 736 },
+      referencePath: currentApprovalPendingRegionReference,
+      referenceSize: currentApprovalPendingRegionReferenceSize,
+      sceneId: `${scene.id}.region`,
+    });
+  }
+  if (
+    scene.id === "approval-current-options" &&
+    currentApprovalOptionsRegionReference
+  ) {
+    await compareCurrentBuildOverlay({
+      actual,
+      actualBounds: currentApprovalOptionsBounds,
+      defaultMaximumRatio: 0.05,
+      masks: [],
+      maximumRatioName:
+        "CODEX_UI_KIT_CURRENT_APPROVAL_OPTIONS_REGION_MAX_DIFF_RATIO",
+      referenceCrop: { height: 67, left: 0, top: 0, width: 193 },
+      referencePath: currentApprovalOptionsRegionReference,
+      referenceSize: currentApprovalOptionsRegionReferenceSize,
+      sceneId: `${scene.id}.region`,
+    });
+  }
+  if (
+    scene.id === "approval-current-denied" &&
+    currentApprovalDeniedComposerRegionReference
+  ) {
+    await compareCurrentBuildOverlay({
+      actual,
+      actualBounds: currentApprovalComposerBounds,
+      defaultMaximumRatio: 0.035,
+      expectedActualPosition: { left: 359, top: 706 },
+      masks: [
+        { height: 20, left: 10, top: 15, width: 140 },
+        { height: 35, left: 515, top: 27, width: 153 },
+        { height: 24, left: 60, top: 63, width: 135 },
+        { height: 24, left: 526, top: 63, width: 145 },
+      ],
+      maximumRatioName:
+        "CODEX_UI_KIT_CURRENT_APPROVAL_DENIED_COMPOSER_REGION_MAX_DIFF_RATIO",
+      referenceCrop: { height: 98, left: 0, top: 0, width: 736 },
+      referencePath: currentApprovalDeniedComposerRegionReference,
+      referenceSize: currentApprovalDeniedComposerRegionReferenceSize,
+      sceneId: `${scene.id}.region`,
+    });
   }
 
   if (

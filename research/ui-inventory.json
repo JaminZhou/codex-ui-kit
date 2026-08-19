@@ -380,14 +380,15 @@
       ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
+        "cdp-26.810.52044:real-outside-project-file-command-approval-pending-options-denied-no-execution-and-composer-recovery",
         "cdp-26.721:ask-for-approval-command-card-denied-without-execution",
         "cdp-26.727.40816:real-command-approval-pending-denied-no-execution-computed-styles-and-masked-regional-pixels",
         "cdp-26.730.61309:real-command-approval-allow-once-completed-computed-styles-and-masked-pending-completed-pixels",
         "cdp-26.730.61309:real-command-approval-similar-rule-repeated-command-no-second-prompt-computed-styles-and-masked-menu-completed-pixels"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "partial_legacy",
-      "electronStatus": "partial_legacy",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
       "priority": "p0"
     },
     {

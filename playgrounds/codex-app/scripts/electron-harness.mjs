@@ -1266,6 +1266,13 @@ export const visualScenes = [
     surfaces: ["approval", "command"],
   },
   {
+    frame: "approval-current-pending",
+    id: "approval-current-options",
+    maxPixelRatio: 0.0225,
+    scenario: "approval-denied",
+    surfaces: ["approval", "command"],
+  },
+  {
     frame: "approval-current-denied",
     id: "approval-current-denied",
     maxPixelRatio: 0.0225,

@@ -93,9 +93,11 @@ function ApprovalIdentityIcon({ kind }: { kind: ApprovalRequestKind }) {
 
 export interface ApprovalRequestProps
   extends Omit<HTMLAttributes<HTMLElement>, "children" | "title"> {
+  approvalOptionsIcon?: ReactNode;
   approvalOptionsLabel?: string;
   approveDisabled?: boolean;
   approveLabel?: ReactNode;
+  approveShortcutLabel?: ReactNode;
   autoFocus?: boolean;
   children?: ReactNode;
   decision?: ApprovalDecision;
@@ -114,14 +116,18 @@ export interface ApprovalRequestProps
   presentation?: "composer" | "default";
   reason?: ReactNode;
   rejectLabel?: ReactNode;
+  rejectShortcutLabel?: ReactNode;
+  showShortcutHints?: boolean;
   scopedApproveAction?: ApprovalAction;
   title: ReactNode;
 }
 
 export function ApprovalRequest({
+  approvalOptionsIcon,
   approvalOptionsLabel = "Approval options",
   approveDisabled = false,
   approveLabel,
+  approveShortcutLabel = "⏎",
   autoFocus = true,
   children,
   className,
@@ -141,6 +147,8 @@ export function ApprovalRequest({
   presentation = "default",
   reason,
   rejectLabel,
+  rejectShortcutLabel = "Esc",
+  showShortcutHints,
   scopedApproveAction,
   title,
   "aria-label": ariaLabel = "Approval request",
@@ -167,6 +175,13 @@ export function ApprovalRequest({
   const resolvedRejectLabel =
     rejectLabel ?? (kind === "generic" ? "Reject" : "Deny");
   const resolvedIdentity = identity ?? defaultIdentityLabels[kind];
+  const automaticShortcutHints =
+    presentation === "composer" && !disableHotkeys;
+  const rejectShortcutVisible =
+    showShortcutHints ??
+    (automaticShortcutHints && !actionsDisabled && Boolean(onReject));
+  const approveShortcutVisible =
+    showShortcutHints ?? (automaticShortcutHints && !primaryDisabled);
 
   useEffect(() => {
     if (!isPending) setOptionsOpen(false);
@@ -239,8 +254,8 @@ export function ApprovalRequest({
       const top =
         rect.bottom - borderOverlap + menuHeight <= window.innerHeight - edge
           ? rect.bottom - borderOverlap
-          : Math.max(edge, rect.top - menuHeight + borderOverlap);
-      setOptionsPosition({ left, top });
+          : Math.max(edge, rect.top - menuHeight - 2);
+      setOptionsPosition({ left: left - borderOverlap, top });
     };
 
     updatePosition();
@@ -490,7 +505,17 @@ export function ApprovalRequest({
               onClick={onReject}
               type="button"
             >
-              {resolvedRejectLabel}
+              <span className="codex-ui-approval-request__button-label">
+                {resolvedRejectLabel}
+              </span>
+              {rejectShortcutVisible ? (
+                <kbd
+                  aria-hidden="true"
+                  className="codex-ui-approval-request__shortcut"
+                >
+                  {rejectShortcutLabel}
+                </kbd>
+              ) : null}
             </button>
 
             {scopedApproveAction ? (
@@ -512,7 +537,17 @@ export function ApprovalRequest({
                       className="codex-ui-approval-request__spinner"
                     />
                   ) : null}
-                  {resolvedApproveLabel}
+                  <span className="codex-ui-approval-request__button-label">
+                    {resolvedApproveLabel}
+                  </span>
+                  {approveShortcutVisible ? (
+                    <kbd
+                      aria-hidden="true"
+                      className="codex-ui-approval-request__shortcut"
+                    >
+                      {approveShortcutLabel}
+                    </kbd>
+                  ) : null}
                 </button>
                 <button
                   aria-controls={optionsVisible ? optionsId : undefined}
@@ -525,7 +560,12 @@ export function ApprovalRequest({
                   ref={optionsToggleRef}
                   type="button"
                 >
-                  <span aria-hidden="true" />
+                  <span
+                    aria-hidden="true"
+                    className="codex-ui-approval-request__options-icon"
+                  >
+                    {approvalOptionsIcon}
+                  </span>
                 </button>
                 {optionsMenu}
               </div>
@@ -544,7 +584,17 @@ export function ApprovalRequest({
                     className="codex-ui-approval-request__spinner"
                   />
                 ) : null}
-                {resolvedApproveLabel}
+                <span className="codex-ui-approval-request__button-label">
+                  {resolvedApproveLabel}
+                </span>
+                {approveShortcutVisible ? (
+                  <kbd
+                    aria-hidden="true"
+                    className="codex-ui-approval-request__shortcut"
+                  >
+                    {approveShortcutLabel}
+                  </kbd>
+                ) : null}
               </button>
             )}
           </div>

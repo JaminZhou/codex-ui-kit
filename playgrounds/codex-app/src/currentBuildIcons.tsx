@@ -13,6 +13,7 @@ export type CurrentBuildIconName =
   | "composer-model-chevron"
   | "composer-new-project"
   | "composer-permission"
+  | "composer-permission-ask"
   | "composer-project"
   | "composer-send"
   | "composer-voice"

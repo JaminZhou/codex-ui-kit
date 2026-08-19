@@ -43,7 +43,7 @@ The authoritative current-build inventory is:
   BrowserWindow; it does not prove parity with unobserved product routes,
   panels, state transitions, or window types.
 - A scoped Codex Desktop `26.810.52044` (`6662`) visual probe revalidates the
-  exact 1180×820 dark/resting asset fingerprint and now retains 97 exact
+  exact 1180×820 dark/resting asset fingerprint and now retains 98 exact
   sidebar/menu/window-chrome/Composer/environment/Settings/completed-thread icons plus
   one separately hashed, playground-only VS Code integration raster. Its sampled sidebar
   hover/footer contract also

@@ -6833,7 +6833,16 @@ try {
     .count();
   const assistantFinalCount = await currentDeniedApprovalPage
     .getByText(
-      "Approval was not granted, so the command was not run.",
+      "未获批准，命令未执行。",
+      { exact: true },
+    )
+    .count();
+  await currentDeniedApprovalPage
+    .getByRole("button", { exact: true, name: "Worked for 1m 53s" })
+    .click();
+  const declinedCommandCount = await currentDeniedApprovalPage
+    .getByText(
+      "Did not run touch /outside/project/approval-sentinel",
       { exact: true },
     )
     .count();
@@ -6842,15 +6851,24 @@ try {
     .textContent())
     ?.replace(/^◉/, "")
     .trim();
+  const permissionIconName = await currentDeniedApprovalPage
+    .locator(
+      ".demo-composer-permission-trigger [data-current-build-icon]",
+    )
+    .getAttribute("data-current-build-icon");
   if (
     currentApprovalCount !== 0 ||
     assistantFinalCount !== 1 ||
-    permissionLabel !== "Ask for approval"
+    declinedCommandCount !== 1 ||
+    permissionLabel !== "Ask for approval" ||
+    permissionIconName !== "composer-permission-ask"
   ) {
     throw new Error(
       `Electron current approval rejection did not remove the card and complete without execution: ${JSON.stringify({
         assistantFinalCount,
         currentApprovalCount,
+        declinedCommandCount,
+        permissionIconName,
         permissionLabel,
       })}`,
     );

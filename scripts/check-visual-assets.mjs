@@ -379,6 +379,7 @@ if (
   !updaterSource.includes("capturedAt") ||
   !updaterSource.includes("--project-picker-only") ||
   !updaterSource.includes("CODEX_VISUAL_ASSET_PROJECT_PICKER_CAPTURE") ||
+  !updaterSource.includes("CODEX_VISUAL_ASSET_PERMISSION_CAPTURE") ||
   !updaterSource.includes("validateProjectPickerObservation")
 ) {
   throw new Error("visual asset promotion must remain deterministic and explicit");
@@ -488,7 +489,7 @@ for (const id of [
   }
 }
 if (
-  manifest.icons.length !== 97 ||
+  manifest.icons.length !== 98 ||
   manifest.composerObservation?.topContextIconCount !== 3 ||
   manifest.composerObservation?.bottomActionIconCount !== 5 ||
   manifest.composerObservation?.exactSemanticIconCount !== 8 ||
@@ -502,7 +503,7 @@ if (
   manifest.projectPickerObservation?.listbox?.rect?.width !== 252
 ) {
   throw new Error(
-    "current visual asset capture must retain 97 promoted icons, the eight-icon Composer baseline, and the current Project picker observation",
+    "current visual asset capture must retain 98 promoted icons, the eight-icon Composer baseline, and the current Project picker observation",
   );
 }
 if (

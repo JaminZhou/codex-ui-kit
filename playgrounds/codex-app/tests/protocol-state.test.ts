@@ -24,7 +24,7 @@ describe("protocol lifecycle reducer", () => {
     const completed = reduceProtocolTrace(scenario.events);
     const settled = settleApprovedCommandReplay(
       completed,
-      "approval-open-calculator",
+      "approval-create-sentinel",
       {
         durationMs: 23_000,
         messageId: "assistant-approval-approved",
@@ -54,7 +54,7 @@ describe("protocol lifecycle reducer", () => {
       kind: "message",
     });
     expect(settled.timeline).toContainEqual({
-      id: "command-open-calculator",
+      id: "command-create-approval-sentinel",
       kind: "command",
     });
   });
@@ -1034,13 +1034,13 @@ describe("protocol lifecycle reducer", () => {
     const completed = reduceProtocolTrace(scenario.events);
 
     expect(pending.approvals[0]).toMatchObject({
-      command: "open -a Calculator",
+      command: "touch /outside/project/approval-sentinel",
       decision: "pending",
-      itemId: "command-open-calculator",
+      itemId: "command-create-approval-sentinel",
       kind: "command",
     });
     expect(pending.commands[0]).toMatchObject({
-      command: "open -a Calculator",
+      command: "touch /outside/project/approval-sentinel",
       output: "",
       status: "running",
     });
@@ -1051,9 +1051,10 @@ describe("protocol lifecycle reducer", () => {
       status: "failed",
     });
     expect(completed.messages.at(-1)?.text).toBe(
-      "Approval was not granted, so the command was not run.",
+      "未获批准，命令未执行。",
     );
     expect(completed.status).toBe("completed");
+    expect(completed.turnDurationMs).toBe(113_000);
   });
 
   it("reduces the current allow-once approval through command completion", () => {
