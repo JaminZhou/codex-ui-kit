@@ -9073,8 +9073,81 @@ try {
   if ((await scopeItems.count()) !== 6) {
     throw new Error("Current Review scope menu must expose six choices.");
   }
-  await scopeItems.filter({ hasText: "Branch" }).focus();
-  await scopeItems.filter({ hasText: "Branch" }).press("Escape");
+  if (
+    (await currentReviewFilesPage.evaluate(
+      () => document.activeElement?.textContent?.trim(),
+    )) !== "Last Turn"
+  ) {
+    throw new Error("Current Review scope menu did not focus its selection.");
+  }
+  await scopeItems.filter({ hasText: "Last Turn" }).press("ArrowDown");
+  if (
+    (await currentReviewFilesPage.evaluate(
+      () => document.activeElement?.textContent?.trim(),
+    )) !== "Uncommitted"
+  ) {
+    throw new Error("Current Review scope menu did not move with ArrowDown.");
+  }
+  await scopeItems.filter({ hasText: "Uncommitted" }).press("End");
+  if (
+    (await currentReviewFilesPage.evaluate(
+      () => document.activeElement?.textContent?.trim(),
+    )) !== "Branch"
+  ) {
+    throw new Error("Current Review scope menu did not move with End.");
+  }
+
+  const jumpButton = currentReviewFilesPage.getByRole("button", {
+    name: "Jump to file",
+  });
+  await jumpButton.click();
+  const keyboardJumpOptions = currentReviewFilesPage.getByRole("option");
+  if (
+    (await currentReviewFilesPage
+      .getByRole("menu", { name: "Review scope" })
+      .count()) !== 0 ||
+    (await keyboardJumpOptions.count()) !== 3 ||
+    !(await currentReviewFilesPage.evaluate(
+      () =>
+        document.activeElement?.getAttribute("role") === "option" &&
+        document.activeElement?.getAttribute("aria-selected") === "true",
+    ))
+  ) {
+    throw new Error(
+      "Current Review jump menu was not exclusive or did not focus its selection.",
+    );
+  }
+  await keyboardJumpOptions.filter({ hasText: "alpha.txt" }).press("End");
+  if (
+    !(await currentReviewFilesPage.evaluate(() =>
+      document.activeElement?.textContent?.includes("obsolete.txt"),
+    ))
+  ) {
+    throw new Error("Current Review jump menu did not move with End.");
+  }
+  await keyboardJumpOptions.filter({ hasText: "obsolete.txt" }).press("Home");
+  if (
+    !(await currentReviewFilesPage.evaluate(() =>
+      document.activeElement?.textContent?.includes("added.txt"),
+    ))
+  ) {
+    throw new Error("Current Review jump menu did not move with Home.");
+  }
+  await currentReviewFilesPage
+    .getByRole("button", { name: "Review options" })
+    .click();
+  if (
+    (await currentReviewFilesPage
+      .getByRole("listbox", { name: "Changed files" })
+      .count()) !== 0
+  ) {
+    throw new Error("Current Review jump menu survived another toolbar action.");
+  }
+
+  await scopeButton.click();
+  await currentReviewFilesPage
+    .getByRole("menuitemradio", { name: "Last Turn" })
+    .press("Escape");
   await currentReviewFilesPage.waitForFunction(
     () =>
       document.activeElement?.getAttribute("aria-haspopup") === "menu" &&
@@ -9197,9 +9270,6 @@ try {
     );
   }
 
-  const jumpButton = currentReviewFilesPage.getByRole("button", {
-    name: "Jump to file",
-  });
   await jumpButton.click();
   const jumpOptions = currentReviewFilesPage.getByRole("option");
   if ((await jumpOptions.count()) !== 3) {

@@ -734,6 +734,44 @@ describe("FileReviewWorkspace", () => {
     await waitFor(() => expect(document.activeElement).toBe(jump));
   });
 
+  it("keeps toolbar popups exclusive, dismissible, and arrow navigable", async () => {
+    render(<FileReviewWorkspace files={files} />);
+
+    const scope = screen.getByRole("button", { name: "Last Turn" });
+    fireEvent.click(scope);
+    const scopeItems = screen.getAllByRole("menuitemradio");
+    expect(document.activeElement).toBe(scopeItems[0]);
+    fireEvent.keyDown(scopeItems[0], { key: "ArrowDown" });
+    expect(document.activeElement).toBe(scopeItems[1]);
+    fireEvent.keyDown(scopeItems[1], { key: "End" });
+    expect(document.activeElement).toBe(scopeItems.at(-1));
+
+    const jump = screen.getByRole("button", { name: "Jump to file" });
+    fireEvent.click(jump);
+    expect(screen.queryByRole("menu", { name: "Review scope" })).toBeNull();
+    const options = screen.getAllByRole("option");
+    expect(document.activeElement).toBe(options[0]);
+    fireEvent.keyDown(options[0], { key: "ArrowUp" });
+    expect(document.activeElement).toBe(options.at(-1));
+    fireEvent.keyDown(options.at(-1)!, { key: "Home" });
+    expect(document.activeElement).toBe(options[0]);
+
+    fireEvent.click(screen.getByRole("button", { name: "Hide files" }));
+    expect(screen.queryByRole("listbox", { name: "Changed files" })).toBeNull();
+
+    fireEvent.click(scope);
+    expect(screen.getByRole("menu", { name: "Review scope" })).toBeTruthy();
+    fireEvent.pointerDown(document.body);
+    expect(screen.queryByRole("menu", { name: "Review scope" })).toBeNull();
+
+    fireEvent.click(jump);
+    expect(screen.getByRole("listbox", { name: "Changed files" })).toBeTruthy();
+    scope.focus();
+    await waitFor(() =>
+      expect(screen.queryByRole("listbox", { name: "Changed files" })).toBeNull(),
+    );
+  });
+
   it("tracks changed file collections without selector escaping", () => {
     const { rerender } = render(<FileReviewWorkspace files={files} />);
     fireEvent.click(screen.getByRole("treeitem", { name: /alpha\.txt/ }));

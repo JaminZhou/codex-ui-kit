@@ -1,9 +1,11 @@
 import {
+  useEffect,
   useLayoutEffect,
   useMemo,
   useRef,
   useState,
   type HTMLAttributes,
+  type KeyboardEvent,
   type ReactNode,
 } from "react";
 import type { AgentItemStatus } from "../types.js";
@@ -1013,6 +1015,37 @@ function reviewWorkspaceStatus(change: FileChangeKind) {
   return "•";
 }
 
+function moveReviewPopupFocus(
+  event: KeyboardEvent<HTMLElement>,
+  selector: string,
+) {
+  if (!["ArrowDown", "ArrowUp", "Home", "End"].includes(event.key)) {
+    return false;
+  }
+  const items = [...event.currentTarget.querySelectorAll<HTMLButtonElement>(
+    selector,
+  )];
+  if (items.length === 0) return false;
+  const currentIndex = items.indexOf(
+    document.activeElement as HTMLButtonElement,
+  );
+  const nextIndex =
+    event.key === "Home"
+      ? 0
+      : event.key === "End"
+        ? items.length - 1
+        : event.key === "ArrowDown"
+          ? currentIndex < 0
+            ? 0
+            : (currentIndex + 1) % items.length
+          : currentIndex < 0
+            ? items.length - 1
+            : (currentIndex - 1 + items.length) % items.length;
+  event.preventDefault();
+  items[nextIndex]?.focus();
+  return true;
+}
+
 export function FileReviewWorkspace({
   className,
   defaultFilesVisible = true,
@@ -1046,7 +1079,11 @@ export function FileReviewWorkspace({
     () => new Set(),
   );
   const scopeButtonRef = useRef<HTMLButtonElement>(null);
+  const scopeMenuRef = useRef<HTMLSpanElement>(null);
+  const scopeWrapRef = useRef<HTMLSpanElement>(null);
   const jumpButtonRef = useRef<HTMLButtonElement>(null);
+  const jumpMenuRef = useRef<HTMLSpanElement>(null);
+  const jumpWrapRef = useRef<HTMLSpanElement>(null);
   const fileElementsRef = useRef(new Map<string, HTMLElement>());
   const resolvedScope = scope ?? internalScope;
   const resolvedSelectedPath = selectedPath ?? internalSelectedPath;
@@ -1123,6 +1160,51 @@ export function FileReviewWorkspace({
     });
   }, [files]);
 
+  useLayoutEffect(() => {
+    if (!scopeOpen) return;
+    const selected = scopeMenuRef.current?.querySelector<HTMLButtonElement>(
+      '[role="menuitemradio"][aria-checked="true"]',
+    );
+    const first = scopeMenuRef.current?.querySelector<HTMLButtonElement>(
+      '[role="menuitemradio"]',
+    );
+    (selected ?? first)?.focus();
+  }, [scopeOpen]);
+
+  useLayoutEffect(() => {
+    if (!jumpOpen) return;
+    const selected = jumpMenuRef.current?.querySelector<HTMLButtonElement>(
+      '[role="option"][aria-selected="true"]',
+    );
+    const first = jumpMenuRef.current?.querySelector<HTMLButtonElement>(
+      '[role="option"]',
+    );
+    (selected ?? first)?.focus();
+  }, [jumpOpen]);
+
+  useEffect(() => {
+    if (!scopeOpen && !jumpOpen) return;
+    const dismissForTarget = (target: EventTarget | null) => {
+      if (!(target instanceof Node)) return;
+      if (scopeOpen && !scopeWrapRef.current?.contains(target)) {
+        setScopeOpen(false);
+      }
+      if (jumpOpen && !jumpWrapRef.current?.contains(target)) {
+        setJumpOpen(false);
+      }
+    };
+    const handlePointerDown = (event: PointerEvent) =>
+      dismissForTarget(event.target);
+    const handleFocusIn = (event: FocusEvent) =>
+      dismissForTarget(event.target);
+    document.addEventListener("pointerdown", handlePointerDown, true);
+    document.addEventListener("focusin", handleFocusIn, true);
+    return () => {
+      document.removeEventListener("pointerdown", handlePointerDown, true);
+      document.removeEventListener("focusin", handleFocusIn, true);
+    };
+  }, [jumpOpen, scopeOpen]);
+
   return (
     <div
       aria-label={ariaLabel}
@@ -1135,14 +1217,26 @@ export function FileReviewWorkspace({
       <div
         aria-label="Review controls"
         className="codex-ui-file-review-workspace__toolbar"
+        onClickCapture={(event) => {
+          const target = event.target;
+          if (!(target instanceof Node)) return;
+          if (!scopeWrapRef.current?.contains(target)) setScopeOpen(false);
+          if (!jumpWrapRef.current?.contains(target)) setJumpOpen(false);
+        }}
         role="toolbar"
       >
-        <span className="codex-ui-file-review-workspace__scope-wrap">
+        <span
+          className="codex-ui-file-review-workspace__scope-wrap"
+          ref={scopeWrapRef}
+        >
           <button
             aria-expanded={scopeOpen}
             aria-haspopup="menu"
             className="codex-ui-file-review-workspace__scope"
-            onClick={() => setScopeOpen((open) => !open)}
+            onClick={() => {
+              setJumpOpen(false);
+              setScopeOpen((open) => !open);
+            }}
             onKeyDown={(event) => {
               if (event.key !== "Escape" || !scopeOpen) return;
               event.preventDefault();
@@ -1159,10 +1253,14 @@ export function FileReviewWorkspace({
               aria-label="Review scope"
               className="codex-ui-file-review-workspace__menu"
               onKeyDown={(event) => {
-                if (event.key !== "Escape") return;
-                event.preventDefault();
-                closePopup(setScopeOpen, scopeButtonRef);
+                if (event.key === "Escape") {
+                  event.preventDefault();
+                  closePopup(setScopeOpen, scopeButtonRef);
+                  return;
+                }
+                moveReviewPopupFocus(event, '[role="menuitemradio"]');
               }}
+              ref={scopeMenuRef}
               role="menu"
             >
               {fileReviewWorkspaceScopes.map((item) => (
@@ -1175,6 +1273,7 @@ export function FileReviewWorkspace({
                     closePopup(setScopeOpen, scopeButtonRef);
                   }}
                   role="menuitemradio"
+                  tabIndex={item === resolvedScope ? 0 : -1}
                   type="button"
                 >
                   {item}
@@ -1212,12 +1311,18 @@ export function FileReviewWorkspace({
           >
             {icon("collapseAll")}
           </button>
-          <span className="codex-ui-file-review-workspace__jump-wrap">
+          <span
+            className="codex-ui-file-review-workspace__jump-wrap"
+            ref={jumpWrapRef}
+          >
             <button
               aria-expanded={jumpOpen}
               aria-haspopup="listbox"
               aria-label="Jump to file"
-              onClick={() => setJumpOpen((open) => !open)}
+              onClick={() => {
+                setScopeOpen(false);
+                setJumpOpen((open) => !open);
+              }}
               onKeyDown={(event) => {
                 if (event.key !== "Escape" || !jumpOpen) return;
                 event.preventDefault();
@@ -1233,10 +1338,14 @@ export function FileReviewWorkspace({
                 aria-label="Changed files"
                 className="codex-ui-file-review-workspace__menu codex-ui-file-review-workspace__jump-menu"
                 onKeyDown={(event) => {
-                  if (event.key !== "Escape") return;
-                  event.preventDefault();
-                  closePopup(setJumpOpen, jumpButtonRef);
+                  if (event.key === "Escape") {
+                    event.preventDefault();
+                    closePopup(setJumpOpen, jumpButtonRef);
+                    return;
+                  }
+                  moveReviewPopupFocus(event, '[role="option"]');
                 }}
+                ref={jumpMenuRef}
                 role="listbox"
               >
                 {files.map((file, index) => (
@@ -1248,6 +1357,7 @@ export function FileReviewWorkspace({
                       closePopup(setJumpOpen, jumpButtonRef);
                     }}
                     role="option"
+                    tabIndex={file.path === resolvedSelectedPath ? 0 : -1}
                     type="button"
                   >
                     {file.path}

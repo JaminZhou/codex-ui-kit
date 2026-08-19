@@ -4422,9 +4422,40 @@ try {
     name: "Last Turn",
   });
   await scope.click();
-  if ((await currentReviewFilesPage.getByRole("menuitemradio").count()) !== 6) {
+  const scopeItems = currentReviewFilesPage.getByRole("menuitemradio");
+  if ((await scopeItems.count()) !== 6) {
     throw new Error("Electron current Review scope menu is incomplete.");
   }
+  if (
+    (await currentReviewFilesPage.evaluate(
+      () => document.activeElement?.textContent?.trim(),
+    )) !== "Last Turn"
+  ) {
+    throw new Error("Electron current Review scope did not focus its selection.");
+  }
+  await scopeItems.filter({ hasText: "Last Turn" }).press("ArrowDown");
+  if (
+    (await currentReviewFilesPage.evaluate(
+      () => document.activeElement?.textContent?.trim(),
+    )) !== "Uncommitted"
+  ) {
+    throw new Error("Electron current Review scope ignored ArrowDown.");
+  }
+  await scopeItems.filter({ hasText: "Uncommitted" }).press("End");
+  if (
+    (await currentReviewFilesPage.evaluate(
+      () => document.activeElement?.textContent?.trim(),
+    )) !== "Branch"
+  ) {
+    throw new Error("Electron current Review scope ignored End.");
+  }
+  await scopeItems.filter({ hasText: "Branch" }).press("Escape");
+  await currentReviewFilesPage.waitForFunction(
+    () =>
+      document.activeElement?.getAttribute("aria-haspopup") === "menu" &&
+      !document.querySelector('[role="menu"][aria-label="Review scope"]'),
+  );
+  await scope.click();
   await currentReviewFilesPage
     .getByRole("menuitemradio", { name: "Uncommitted" })
     .click();
