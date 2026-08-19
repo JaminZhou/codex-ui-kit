@@ -4073,7 +4073,9 @@ describe("application sidebar", () => {
             <AppSidebarItem worktreeStatus="setting-up">
               Setting up
             </AppSidebarItem>
-            <AppSidebarItem worktreeStatus="failed">Failed</AppSidebarItem>
+            <AppSidebarItem unread worktreeStatus="failed">
+              Failed
+            </AppSidebarItem>
             <AppSidebarItem
               aria-describedby="restored-context"
               worktreeStatus="restored"
@@ -4124,6 +4126,26 @@ describe("application sidebar", () => {
       screen.getByRole("status", { name: "Worktree init failed" })
         .getAttribute("data-visual-status"),
     ).toBe("error");
+    const failed = screen.getByRole("button", { name: "Failed" });
+    expect(failed.getAttribute("data-secondary-status")).toBe("unread");
+    const failedSecondaryStatus = failed.parentElement?.querySelector(
+      ".codex-ui-app-sidebar__item-secondary-status",
+    );
+    expect(failedSecondaryStatus?.getAttribute("data-status")).toBe("unread");
+    expect(failedSecondaryStatus?.getAttribute("data-visual-status")).toBe(
+      "attention",
+    );
+    expect(
+      failedSecondaryStatus?.querySelector(
+        ".codex-ui-app-sidebar__item-status-attention",
+      ),
+    ).toBeTruthy();
+    expect(
+      failed
+        .getAttribute("aria-describedby")
+        ?.split(/\s+/)
+        .includes(failedSecondaryStatus?.id ?? ""),
+    ).toBe(true);
     expect(
       screen.queryByRole("status", { name: "Worktree is restored" }),
     ).toBeNull();
@@ -4162,9 +4184,10 @@ describe("application sidebar", () => {
         .getAttribute("data-status"),
     ).toBe("unread");
     expect(
-      screen.getByRole("status", { name: "unread" }).getAttribute(
-        "data-visual-status",
-      ),
+      screen
+        .getByRole("button", { name: "Restored unread" })
+        .parentElement?.querySelector(".codex-ui-app-sidebar__item-status")
+        ?.getAttribute("data-visual-status"),
     ).toBe("attention");
   });
 

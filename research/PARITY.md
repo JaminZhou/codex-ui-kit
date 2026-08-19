@@ -57,10 +57,13 @@ The authoritative current-build inventory is:
   items, one de-identified avatar, zero role separators, and Escape focus
   return; Usage no longer has a trailing chevron. The ordinary sidebar status
   slice now locks real active/unread geometry, color, actions replacement, and
-  local-only pixels. A separate disposable-repository probe reaches real
-  worktree create, controlled failure, Retry recovery, and restored rows; it
-  locks all five worktree phases plus exact branch/spinner/error geometry and
-  local-only pixels. A later real-worktree probe proves project/task persistence
+  local-only pixels. A new `26.810.52044` disposable-repository probe supersedes
+  the prior worktree anchor with real create, controlled failure, Retry
+  recovery, and restored rows. It locks all five worktree phases and the
+  current failed-plus-unread three-track composition: 14×14 branch marker,
+  16×16 red error, 8×8 blue unread dot, and exact 8/36/67px rail/branch
+  insets. Browser/CDP, Electron, and owned local-only row pixels gate the same
+  current boundary. A later real-worktree probe proves project/task persistence
   across an app restart while also proving that New chat, rather than the exact
   thread, is the initial restored route. Selecting the retained task restores
   the conversation. Removing its disposable directory reaches the exact

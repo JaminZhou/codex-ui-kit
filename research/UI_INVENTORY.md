@@ -76,8 +76,8 @@ observation from a previous build remains historical evidence.
   previous-build regression evidence and have been downgraded from `verified`
   to `partial_legacy` until they are reached again on the current fingerprint.
 
-Current inventory: 89 surface groups; 26 have current-build runtime evidence, 47 have previous-build-only runtime evidence, 16 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 25 groups and Electron verification covers 25.
-Prior acceptance outside those 25 sampled current-build groups remains
+Current inventory: 89 surface groups; 27 have current-build runtime evidence, 46 have previous-build-only runtime evidence, 16 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 26 groups and Electron verification covers 26.
+Prior acceptance outside those 26 sampled current-build groups remains
 recorded as `partial_legacy` until current-build re-observation.
 
 The current package exposes candidates far beyond the old transcript sample:
@@ -213,20 +213,23 @@ project-navigation, mutation/status, and account/settings rows remain
 `partial_legacy` because these narrower observations do not prove every state
 they own.
 
-The ordinary task-status follow-up now reaches one real active thread and one
-background-completed unread thread on `26.803.61601`. It locks the 20×20
+The ordinary task-status follow-up reached one real active thread and one
+background-completed unread thread on `26.803.61601`. It locked the 20×20
 trailing rail, exact 16×16 active spinner geometry, and centered 8×8 unread dot
 using the computed `rgb(131, 195, 255)` link color. A queued follow-up does not
 replace the active spinner, so ordinary thread presentation is classified as
-`active | waiting | unread | idle`. A second isolated current-build probe now
-creates one real disposable worktree, reaches a deterministic create failure,
-and recovers it through the real Retry action. Package structure and runtime
-evidence together retain pending worktree `queued | creating | setting-up`
-phases as loading, `failed` as the error glyph, and `restored` as the persistent
-14×14 branch marker without a status rail. The independent Browser/CDP matrix
-reaches 158 frames, Electron verifies both lifecycle contracts, and local-only
-active/unread/loading/error/restored glyph masks pass at 5.12%, 1.90%, 4.11%,
-5.00%, and 1.67%; exact computed geometry and color are separate gates.
+`active | waiting | unread | idle`. The `26.810.52044` refresh now supersedes
+the primary worktree anchor with a real disposable create, controlled
+`.git/worktrees` failure, and successful Retry. Pending worktree phases retain
+the loading visual and restored retains the 14×14 branch marker, while a failed
+unread row keeps branch, red error, and blue unread as three simultaneous
+tracks. Ordinary status rails end 8px from the row edge; pending, failed, and
+restored branch insets are 39px, 67px, and 11px. Browser/CDP covers 198
+lifecycle frames and Electron repeats geometry, accessibility, and full
+action replacement. Three local-only row crops gate the owned trailing pixels;
+loading/error/restored pass at 2.9762%, 0%, and 0% under independent 6%, 6.5%,
+and 2.5% ceilings. The earlier active/unread ratios remain build-scoped
+regression evidence rather than current visual results.
 
 The same current-build manifest now supplies exact visible Sidebar, Back, and
 Forward primitives to the private playground window chrome. Browser/CDP and

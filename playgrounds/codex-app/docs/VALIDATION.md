@@ -152,15 +152,18 @@ Every deterministic scenario has one ID and produces four evidence layers:
    regions are located from their DOM contracts rather than hard-coded
    vertical offsets.
 
-The ordinary sidebar task-status scene accepts local-only 259×30 active and
-unread row references through
+The sidebar task-status scene accepts local-only 259×30 ordinary and worktree
+row references through
 `CODEX_UI_KIT_CURRENT_SIDEBAR_ACTIVE_STATUS_REFERENCE` and
-`CODEX_UI_KIT_CURRENT_SIDEBAR_UNREAD_STATUS_REFERENCE`. It crops the final
-28px status rail and compares foreground masks so selected/hover row paint
-does not overwhelm glyph geometry. CDP separately requires the 20×20 rail,
-4px right inset, exact 16×16 spinner paths, centered 8×8 dot, and computed
-`rgb(131, 195, 255)` unread color; Electron verifies hover replacement by the
-trailing actions.
+`CODEX_UI_KIT_CURRENT_SIDEBAR_UNREAD_STATUS_REFERENCE`, plus the three
+`CODEX_UI_KIT_CURRENT_SIDEBAR_WORKTREE_*_REFERENCE` variables. It crops the
+final 28px ordinary rail, 56px loading/restored region, or 84px failed unread
+region and compares foreground masks so selected/hover row paint does not
+overwhelm glyph geometry. Current CDP requires the 20×20 rails, 8px ordinary
+right inset, exact 16×16 spinner paths, centered 8×8 dot, and computed
+`rgb(131, 195, 255)` unread color. A failed unread worktree additionally keeps
+the 14×14 branch at 67px, red error rail at 36px, and blue unread rail at 8px;
+Electron verifies that trailing actions replace all three tracks.
 
 The layers do not vote on the same claim. Protocol proves lifecycle behavior;
 CDP explains layout; Electron proves the desktop host; pixels catch final

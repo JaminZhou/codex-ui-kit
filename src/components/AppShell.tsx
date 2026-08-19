@@ -2289,18 +2289,30 @@ export function AppSidebarItem({
   ...props
 }: AppSidebarItemProps) {
   const statusId = useId();
+  const secondaryStatusId = useId();
   const worktreeDescriptionId = useId();
   const ordinaryStatus = unread && status === "idle" ? "unread" : status;
   const resolvedStatus = worktreeStatus && worktreeStatus !== "restored"
     ? appSidebarWorktreeItemStatus(worktreeStatus)
     : ordinaryStatus;
   const visualStatus = appSidebarItemVisualStatus(resolvedStatus);
+  const secondaryStatus =
+    worktreeStatus &&
+    worktreeStatus !== "restored" &&
+    ordinaryStatus !== "idle" &&
+    appSidebarItemVisualStatus(ordinaryStatus) !== visualStatus
+      ? ordinaryStatus
+      : undefined;
+  const secondaryVisualStatus = secondaryStatus
+    ? appSidebarItemVisualStatus(secondaryStatus)
+    : undefined;
   const worktreeDescription = worktreeStatus === "restored"
     ? appSidebarWorktreeStatusLabel(worktreeStatus)
     : undefined;
   const describedBy = [
     ariaDescribedBy,
     resolvedStatus !== "idle" ? statusId : undefined,
+    secondaryStatus ? secondaryStatusId : undefined,
     worktreeDescription ? worktreeDescriptionId : undefined,
   ]
     .filter((value): value is string => Boolean(value))
@@ -2315,6 +2327,7 @@ export function AppSidebarItem({
       data-depth={depth}
       data-pinned={pinned || undefined}
       data-selected={selected || undefined}
+      data-secondary-status={secondaryStatus}
       data-status={resolvedStatus}
       data-worktree-status={worktreeStatus}
       type={type}
@@ -2348,6 +2361,7 @@ export function AppSidebarItem({
       data-depth={depth}
       data-has-actions={Boolean(actions) || undefined}
       data-selected={selected || undefined}
+      data-secondary-status={secondaryStatus}
       data-status={resolvedStatus}
       data-worktree-status={worktreeStatus}
     >
@@ -2376,6 +2390,18 @@ export function AppSidebarItem({
           role="status"
         >
           <AppSidebarItemStatusVisual status={visualStatus} />
+        </span>
+      ) : null}
+      {secondaryStatus && secondaryVisualStatus ? (
+        <span
+          aria-label={secondaryStatus}
+          className="codex-ui-app-sidebar__item-secondary-status"
+          data-status={secondaryStatus}
+          data-visual-status={secondaryVisualStatus}
+          id={secondaryStatusId}
+          role="status"
+        >
+          <AppSidebarItemStatusVisual status={secondaryVisualStatus} />
         </span>
       ) : null}
       {actions ? (

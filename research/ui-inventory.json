@@ -820,11 +820,12 @@
       "runtimeEvidence": [
         "cdp-26.721.81911:sibling-running-queued-unread-error-status-indicators",
         "cdp-26.727.40816:project-status-indicators",
-        "cdp-26.803.61601:disposable-real-worktree-create-controlled-failure-retry-recovery-and-restored-14px-branch-20px-status-rail"
+        "cdp-26.803.61601:disposable-real-worktree-create-controlled-failure-retry-recovery-and-restored-14px-branch-20px-status-rail",
+        "cdp-26.810.52044:disposable-real-worktree-create-controlled-failure-unread-composition-retry-recovery-30px-row-14px-branch-20px-status-rails"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "partial_legacy",
-      "electronStatus": "partial_legacy",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
       "priority": "p0"
     },
     {

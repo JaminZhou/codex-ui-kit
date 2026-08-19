@@ -2132,7 +2132,7 @@ for (const scene of selectedScenes) {
         defaultMaximumRatio: 0.065,
         maximumRatioName:
           "CODEX_UI_KIT_CURRENT_SIDEBAR_WORKTREE_ERROR_MAX_DIFF_RATIO",
-        ownedWidth: 56,
+        ownedWidth: 84,
         referencePath: currentBuildSidebarWorktreeErrorReference,
         sceneId: scene.id,
         status: "worktree-error",

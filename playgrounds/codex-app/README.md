@@ -1151,9 +1151,11 @@ CODEX_UI_KIT_CURRENT_SIDEBAR_COMPACT_PINNED_REFERENCE=/absolute/path/to/current-
 
 The combined ordinary/worktree task-status gate accepts five exact 259×30
 local-only product row captures. Ordinary states compare the final 28px status
-rail; worktree states compare the final 56px branch/status region. Each region
-is reduced to a foreground mask while CDP independently locks state identity,
-geometry, animation, color, and restored presentation:
+rail. Loading/restored worktree states compare the final 56px region, while
+the current failed-plus-unread composition compares the final 84px containing
+the branch, red error, and independent blue unread rail. Each region is reduced
+to a foreground mask while CDP independently locks state identity, geometry,
+animation, color, accessibility linkage, and restored presentation:
 
 ```bash
 CODEX_UI_KIT_CURRENT_SIDEBAR_ACTIVE_STATUS_REFERENCE=/absolute/path/to/current-sidebar-active-row.png \

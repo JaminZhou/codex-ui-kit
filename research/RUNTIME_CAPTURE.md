@@ -325,6 +325,38 @@ local screenshots move recoverably to the single Trash item
 `codex-ui-kit-worktree-status.DF99q0-20260811`; the original Codex process
 remains running.
 
+### Current `26.810.52044` worktree status lifecycle
+
+The current-build refresh repeats the bounded success and deterministic
+failure/Retry paths with two new disposable Git repositories, unique profiles,
+and loopback-only CDP ports. A third isolated process narrows the geometry
+sample. Repository registration uses the macOS open-file event by placing the
+disposable path before `--args`; a path passed only after `--args` is not a
+valid project-registration probe.
+
+The success path creates a real worktree and completes. The failure path
+blocks only the disposable `.git/worktrees` directory, reaches both the main
+`Worktree setup failed` surface and sidebar `Worktree init failed`, restores
+the directory, and completes through Retry. Cleanup archives the exact
+synthetic tasks, removes both disposable projects from the isolated app state,
+verifies their temporary worktrees are gone, closes only the isolated
+processes and ports, and leaves the original Codex process untouched. Raw
+profiles, screenshots, and task text remain local-only in recoverable Trash
+items.
+
+The 30px task row still uses a 14×14 branch glyph and 20×20 status rails, but
+the current trailing geometry differs from the earlier sample. Ordinary rails
+end 8px from the row edge. Pending worktree rows place the branch 39px from the
+edge, while restored idle rows place it 11px from the edge. Most importantly,
+a failed unread worktree keeps all three signals at once: branch at 67px, red
+16×16 error on a rail at 36px, and blue 8×8 unread attention on a second rail
+at 8px. Hover/focus actions replace the complete three-track presentation.
+Browser/CDP and Electron independently gate the composition, accessibility
+links, exact geometry, color, paths, and action replacement. Three local-only
+259×30 row crops gate only the owned trailing regions. Loading passes at
+2.9762% under 6%; failed-plus-unread and restored pass at 0% under 6.5% and
+2.5% respectively.
+
 ### Current `26.803.61601` worktree persistence and directory recovery
 
 A separate fresh-profile probe uses one disposable repository and one

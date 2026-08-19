@@ -14,7 +14,7 @@ exit gates; it does not replace the inventory.
   Desktop `26.810.52044` (`6662`). Unsampled earlier-build surfaces remain
   previous-build regression evidence rather than current verification.
 - The inventory contains 89 surface groups: 59 P0, 21 P1, and 9 P2.
-- 26 groups have current-build runtime evidence, 47 have previous-build-only
+- 27 groups have current-build runtime evidence, 46 have previous-build-only
   runtime evidence, and 16 have not been sampled.
 - The scoped `26.810.52044` refresh revalidates 95
   sidebar/menu/window-chrome/Composer/Settings/completed-thread icons against
@@ -31,6 +31,10 @@ exit gates; it does not replace the inventory.
   and command interruption. It proves that 26.810 retains the stopped
   background-command row after process settlement and same-thread recovery,
   superseding the previous `Ran …` rewrite.
+  The current worktree follow-up re-reaches real create, controlled failure,
+  failed-plus-unread composition, Retry, and recovery. It supersedes the
+  previous single-status replay with the observed branch/error/unread
+  three-track row and exact 8/36/67px trailing insets.
   Earlier hover/footer slices promoted More, Pin,
   Archive, and Help, confirms that Settings is absent from the sampled footer
   and that sampled project-task rows have no leading glyph. The Recents follow-up
@@ -345,7 +349,10 @@ slot. It is split into:
 - `app.sidebar-status-indicators`: ordinary active, waiting, unread, and idle
   task presentation across project and recent rows;
 - `app.sidebar-worktree-status-indicators`: pending worktree queued, creating,
-  setting-up, failed, and restored presentation;
+  setting-up, failed, and restored presentation. The current 26.810 slice now
+  re-reaches real create, controlled failure, failed-plus-unread composition,
+  Retry recovery, and exact 30px trailing geometry through product CDP,
+  Browser/CDP, Electron, and local-only pixels;
 - `app.sidebar-footer-account-settings`: account, settings, update/status, and
   footer overflow behavior.
 - `app.sidebar-help-menu`: current release-note grouping, support/setup actions,

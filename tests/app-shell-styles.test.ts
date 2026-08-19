@@ -182,7 +182,7 @@ describe("application shell visual contract", () => {
     );
     expect(component).toContain("appSidebarWorktreeItemStatus");
     expect(styles).toMatch(
-      /\.codex-ui-app-sidebar__item-worktree-indicator \{[\s\S]*?height: 0\.875rem;[\s\S]*?inset-inline-end: 2\.1875rem;[\s\S]*?pointer-events: none;[\s\S]*?transition: opacity var\(--codex-ui-transition-fast\);[\s\S]*?width: 0\.875rem;/,
+      /\.codex-ui-app-sidebar__item-worktree-indicator \{[\s\S]*?height: 0\.875rem;[\s\S]*?inset-inline-end: 2\.4375rem;[\s\S]*?pointer-events: none;[\s\S]*?transition: opacity var\(--codex-ui-transition-fast\);[\s\S]*?width: 0\.875rem;/,
     );
     expect(styles).toContain(
       '.codex-ui-app-sidebar__item-row[data-worktree-status="restored"][data-status="idle"]',
@@ -192,6 +192,21 @@ describe("application shell visual contract", () => {
     );
     expect(styles).toContain(
       "padding-inline-end: calc(var(--codex-ui-spacing) * 8);",
+    );
+    expect(styles).toContain(
+      ".codex-ui-app-sidebar__item-row[data-secondary-status]:not([data-has-actions])",
+    );
+    expect(styles).toContain(
+      "padding-inline-end: calc(var(--codex-ui-spacing) * 15);",
+    );
+    expect(styles).toMatch(
+      /\.codex-ui-app-sidebar__item-row\[data-secondary-status\][\s\S]*?> \.codex-ui-app-sidebar__item-status \{[\s\S]*?inset-inline-end: 1\.75rem;/,
+    );
+    expect(styles).toMatch(
+      /\.codex-ui-app-sidebar__item-row\[data-secondary-status\][\s\S]*?\.codex-ui-app-sidebar__item-worktree-indicator \{[\s\S]*?inset-inline-end: 4\.1875rem;/,
+    );
+    expect(styles).toContain(
+      ".codex-ui-app-sidebar__item-secondary-status",
     );
     expect(styles).toMatch(
       /\.codex-ui-app-sidebar__item-worktree-description \{[\s\S]*?clip-path: inset\(50%\);[\s\S]*?position: absolute;[\s\S]*?width: 1px;/,
