@@ -969,6 +969,9 @@ export interface FileReviewWorkspaceProps
   onScopeChange?: (scope: FileReviewWorkspaceScope) => void;
   rootLabel?: string;
   scope?: FileReviewWorkspaceScope;
+  /** Change this key to reveal the selected path again after repeated activation. */
+  selectionKey?: number | string;
+  selectedPath?: string;
 }
 
 const fileReviewWorkspaceScopes: readonly FileReviewWorkspaceScope[] = [
@@ -1025,6 +1028,8 @@ export function FileReviewWorkspace({
   onScopeChange,
   rootLabel = "Changes",
   scope,
+  selectionKey,
+  selectedPath,
   "aria-label": ariaLabel = "Review workspace",
   ...props
 }: FileReviewWorkspaceProps) {
@@ -1034,7 +1039,9 @@ export function FileReviewWorkspace({
   const [filter, setFilter] = useState("");
   const [filesVisible, setFilesVisible] = useState(defaultFilesVisible);
   const [split, setSplit] = useState(defaultSplit);
-  const [selectedPath, setSelectedPath] = useState(files[0]?.path ?? null);
+  const [internalSelectedPath, setInternalSelectedPath] = useState(
+    files[0]?.path ?? null,
+  );
   const [collapsedPaths, setCollapsedPaths] = useState<Set<string>>(
     () => new Set(),
   );
@@ -1042,6 +1049,7 @@ export function FileReviewWorkspace({
   const jumpButtonRef = useRef<HTMLButtonElement>(null);
   const fileElementsRef = useRef(new Map<string, HTMLElement>());
   const resolvedScope = scope ?? internalScope;
+  const resolvedSelectedPath = selectedPath ?? internalSelectedPath;
   const additions = files.reduce(
     (total, file) => total + (file.additions ?? 0),
     0,
@@ -1078,7 +1086,7 @@ export function FileReviewWorkspace({
     window.setTimeout(() => returnFocus.current?.focus());
   };
   const selectFile = (file: FileReviewItem, index: number) => {
-    setSelectedPath(file.path);
+    setInternalSelectedPath(file.path);
     onOpenFile?.(file, index);
     fileElementsRef.current
       .get(file.path)
@@ -1089,9 +1097,21 @@ export function FileReviewWorkspace({
     .join(" ");
 
   useLayoutEffect(() => {
-    if (selectedPath && files.some(({ path }) => path === selectedPath)) return;
-    setSelectedPath(files[0]?.path ?? null);
-  }, [files, selectedPath]);
+    if (
+      resolvedSelectedPath &&
+      files.some(({ path }) => path === resolvedSelectedPath)
+    ) {
+      return;
+    }
+    setInternalSelectedPath(files[0]?.path ?? null);
+  }, [files, resolvedSelectedPath]);
+
+  useLayoutEffect(() => {
+    if (!selectedPath) return;
+    fileElementsRef.current
+      .get(selectedPath)
+      ?.scrollIntoView({ block: "nearest", inline: "nearest" });
+  }, [files, selectedPath, selectionKey]);
 
   useLayoutEffect(() => {
     const currentPaths = new Set(files.map(({ path }) => path));
@@ -1219,7 +1239,7 @@ export function FileReviewWorkspace({
               >
                 {files.map((file, index) => (
                   <button
-                    aria-selected={file.path === selectedPath}
+                    aria-selected={file.path === resolvedSelectedPath}
                     key={file.path}
                     onClick={() => {
                       selectFile(file, index);
@@ -1378,7 +1398,9 @@ export function FileReviewWorkspace({
                   <button
                     aria-label={`Select ${file.path}`}
                     data-change={file.change}
-                    data-selected={selectedPath === file.path || undefined}
+                    data-selected={
+                      resolvedSelectedPath === file.path || undefined
+                    }
                     key={file.path}
                     onClick={() => selectFile(file, index)}
                     role="treeitem"

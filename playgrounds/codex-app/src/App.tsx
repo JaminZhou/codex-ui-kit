@@ -7108,6 +7108,8 @@ export function App() {
                   });
                 }}
                 rootLabel="current-review-26-810-probe"
+                selectionKey={reviewSelectionKey}
+                selectedPath={resolvedReview?.selectedPath}
               />
             ),
             id: "review",

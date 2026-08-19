@@ -756,6 +756,73 @@ describe("FileReviewWorkspace", () => {
     ).toBe("true");
   });
 
+  it("reveals externally requested files, including repeated activation", () => {
+    const originalScrollIntoView = Object.getOwnPropertyDescriptor(
+      HTMLElement.prototype,
+      "scrollIntoView",
+    );
+    const scrollIntoView = vi.fn();
+    Object.defineProperty(HTMLElement.prototype, "scrollIntoView", {
+      configurable: true,
+      value: scrollIntoView,
+    });
+
+    try {
+      const { rerender } = render(
+        <FileReviewWorkspace
+          files={files}
+          selectedPath={files[0].path}
+          selectionKey={0}
+        />,
+      );
+      scrollIntoView.mockClear();
+
+      rerender(
+        <FileReviewWorkspace
+          files={files}
+          selectedPath={files[1].path}
+          selectionKey={1}
+        />,
+      );
+
+      const selectedFile = screen.getByRole("listitem", {
+        name: "Review file probe/alpha.txt",
+      });
+      expect(
+        screen
+          .getByRole("treeitem", { name: "Select probe/alpha.txt" })
+          .getAttribute("data-selected"),
+      ).toBe("true");
+      expect(scrollIntoView).toHaveBeenCalledOnce();
+      expect(scrollIntoView.mock.instances[0]).toBe(selectedFile);
+      expect(scrollIntoView).toHaveBeenCalledWith({
+        block: "nearest",
+        inline: "nearest",
+      });
+
+      scrollIntoView.mockClear();
+      rerender(
+        <FileReviewWorkspace
+          files={files}
+          selectedPath={files[1].path}
+          selectionKey={2}
+        />,
+      );
+      expect(scrollIntoView).toHaveBeenCalledOnce();
+      expect(scrollIntoView.mock.instances[0]).toBe(selectedFile);
+    } finally {
+      if (originalScrollIntoView) {
+        Object.defineProperty(
+          HTMLElement.prototype,
+          "scrollIntoView",
+          originalScrollIntoView,
+        );
+      } else {
+        Reflect.deleteProperty(HTMLElement.prototype, "scrollIntoView");
+      }
+    }
+  });
+
   it("shows directory context when tree basenames collide", () => {
     render(
       <FileReviewWorkspace

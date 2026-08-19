@@ -9035,6 +9035,30 @@ try {
     );
   }
 
+  const requestedReviewPath =
+    "research/current-review-26-810-probe/alpha.txt";
+  await currentReviewFilesPage
+    .getByRole("button", { exact: true, name: "Close tab" })
+    .click();
+  await currentReviewFilesPage.waitForSelector(
+    ".codex-ui-app-shell:not([data-side-panel-open])",
+  );
+  await currentReviewFilesPage
+    .getByRole("button", { exact: true, name: `Open ${requestedReviewPath}` })
+    .click();
+  await currentReviewFilesPage.waitForSelector(
+    '.codex-ui-app-shell[data-side-panel-open] [data-testid="current-review-workspace"]',
+  );
+  if (
+    (await currentReviewFilesPage
+      .getByRole("treeitem", { name: `Select ${requestedReviewPath}` })
+      .getAttribute("data-selected")) !== "true"
+  ) {
+    throw new Error(
+      "Current Review file-card reopen did not reveal the requested path.",
+    );
+  }
+
   const scopeButton = currentReviewFilesPage.getByRole("button", {
     exact: true,
     name: "Last Turn",
