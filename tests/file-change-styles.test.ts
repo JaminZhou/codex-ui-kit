@@ -40,6 +40,12 @@ describe("file change visual contract", () => {
     );
     expect(styles).toContain(".codex-ui-file-diff__split-pane");
     expect(styles).toContain('data-line-kind="empty"');
+    expect(styles).toContain(
+      ".codex-ui-file-diff[data-wrap] .codex-ui-file-diff__split-pane code",
+    );
+    expect(styles).toContain(
+      ".codex-ui-file-diff[data-wrap] .codex-ui-file-diff__split-spanning code",
+    );
   });
 
   it("shows streaming content directly and honors reduced motion", () => {

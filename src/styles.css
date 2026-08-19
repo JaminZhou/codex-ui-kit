@@ -9429,6 +9429,11 @@ summary.codex-ui-activity__header::after {
   );
 }
 
+.codex-ui-file-diff__split-pane[data-line-kind="meta"] {
+  color: var(--codex-ui-text-tertiary);
+  font-style: italic;
+}
+
 .codex-ui-file-diff__split-spanning {
   grid-column: 1 / -1;
 }
@@ -9458,6 +9463,22 @@ summary.codex-ui-activity__header::after {
 }
 
 .codex-ui-file-diff[data-wrap] .codex-ui-file-diff__line code {
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}
+
+.codex-ui-file-diff[data-wrap] .codex-ui-file-diff__split-row {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  min-width: 100%;
+}
+
+.codex-ui-file-diff[data-wrap] .codex-ui-file-diff__split-pane,
+.codex-ui-file-diff[data-wrap] .codex-ui-file-diff__split-spanning {
+  grid-template-columns: 3.375rem minmax(0, 1fr);
+}
+
+.codex-ui-file-diff[data-wrap] .codex-ui-file-diff__split-pane code,
+.codex-ui-file-diff[data-wrap] .codex-ui-file-diff__split-spanning code {
   overflow-wrap: anywhere;
   white-space: pre-wrap;
 }

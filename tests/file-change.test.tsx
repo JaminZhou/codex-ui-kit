@@ -322,6 +322,42 @@ describe("FileDiff", () => {
     ).toBeTruthy();
   });
 
+  it("keeps replacements paired across no-newline metadata", () => {
+    render(
+      <FileDiff
+        layout="split"
+        lines={[
+          {
+            content: "old without newline",
+            kind: "deletion",
+            oldLineNumber: 1,
+          },
+          { content: "No newline at end of file", kind: "meta" },
+          {
+            content: "new without newline",
+            kind: "addition",
+            newLineNumber: 1,
+          },
+          { content: "No newline at end of file", kind: "meta" },
+        ]}
+      />,
+    );
+
+    const replacement = screen.getByRole("listitem", {
+      name: "Deleted line: old without newline; Added line: new without newline",
+    });
+    expect(
+      replacement.querySelector('[data-side="old"] code')?.textContent,
+    ).toBe("old without newline");
+    expect(
+      replacement.querySelector('[data-side="new"] code')?.textContent,
+    ).toBe("new without newline");
+    const markers = screen.getByRole("listitem", {
+      name: "Diff metadata: No newline at end of file; Diff metadata: No newline at end of file",
+    });
+    expect(markers.querySelectorAll('[data-line-kind="meta"]')).toHaveLength(2);
+  });
+
   it("exposes short, fallback, and wrapped rendering modes", () => {
     const short = renderToStaticMarkup(
       <FileDiff lines={lines} size="short" wrapLines />,
@@ -718,6 +754,26 @@ describe("FileReviewWorkspace", () => {
         .getByRole("treeitem", { name: /quoted/ })
       .getAttribute("data-selected"),
     ).toBe("true");
+  });
+
+  it("shows directory context when tree basenames collide", () => {
+    render(
+      <FileReviewWorkspace
+        files={[
+          { ...files[0], path: "src/index.ts" },
+          { ...files[1], path: "tests/index.ts" },
+        ]}
+      />,
+    );
+
+    const source = screen.getByRole("treeitem", {
+      name: "Select src/index.ts",
+    });
+    const tests = screen.getByRole("treeitem", {
+      name: "Select tests/index.ts",
+    });
+    expect(source.textContent).toContain("src/index.ts");
+    expect(tests.textContent).toContain("tests/index.ts");
   });
 
   it("prunes collapsed paths when the file collection is replaced", () => {

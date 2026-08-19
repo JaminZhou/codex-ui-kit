@@ -468,15 +468,46 @@ export function FileDiff({
   if (layout === "split") {
     for (let index = 0; index < indexedLines.length; ) {
       const current = indexedLines[index];
-      if (current.line.kind === "deletion") {
+      if (
+        current.line.kind === "deletion" ||
+        current.line.kind === "addition"
+      ) {
         const before: Array<(typeof indexedLines)[number]> = [];
         const after: Array<(typeof indexedLines)[number]> = [];
-        while (indexedLines[index]?.line.kind === "deletion") {
-          before.push(indexedLines[index]);
-          index += 1;
-        }
-        while (indexedLines[index]?.line.kind === "addition") {
-          after.push(indexedLines[index]);
+        const beforeMetadata = new Map<
+          number,
+          Array<(typeof indexedLines)[number]>
+        >();
+        const afterMetadata = new Map<
+          number,
+          Array<(typeof indexedLines)[number]>
+        >();
+        let lastSide: "after" | "before" | undefined;
+        let lastPosition = -1;
+
+        while (
+          indexedLines[index] &&
+          ["addition", "deletion", "meta"].includes(
+            indexedLines[index].line.kind,
+          )
+        ) {
+          const entry = indexedLines[index];
+          if (entry.line.kind === "deletion") {
+            before.push(entry);
+            lastSide = "before";
+            lastPosition = before.length - 1;
+          } else if (entry.line.kind === "addition") {
+            after.push(entry);
+            lastSide = "after";
+            lastPosition = after.length - 1;
+          } else if (lastSide && lastPosition >= 0) {
+            const metadata =
+              lastSide === "before" ? beforeMetadata : afterMetadata;
+            metadata.set(lastPosition, [
+              ...(metadata.get(lastPosition) ?? []),
+              entry,
+            ]);
+          }
           index += 1;
         }
         for (
@@ -488,12 +519,22 @@ export function FileDiff({
             after: after[pairIndex],
             before: before[pairIndex],
           });
+          const beforeMarkers = beforeMetadata.get(pairIndex) ?? [];
+          const afterMarkers = afterMetadata.get(pairIndex) ?? [];
+          for (
+            let markerIndex = 0;
+            markerIndex < Math.max(beforeMarkers.length, afterMarkers.length);
+            markerIndex += 1
+          ) {
+            splitRows.push({
+              after: afterMarkers[markerIndex],
+              before: beforeMarkers[markerIndex],
+            });
+          }
         }
         continue;
       }
-      if (current.line.kind === "addition") {
-        splitRows.push({ after: current });
-      } else if (current.line.kind === "context") {
+      if (current.line.kind === "context") {
         splitRows.push({ after: current, before: current });
       } else {
         splitRows.push({ spanning: current });
@@ -593,7 +634,12 @@ export function FileDiff({
               aria-label={labels.join("; ")}
               className="codex-ui-file-diff__split-row"
               data-line-kind={
-                row.before?.line.kind === "context" ? "context" : "change"
+                row.before?.line.kind === "context"
+                  ? "context"
+                  : row.before?.line.kind === "meta" ||
+                      row.after?.line.kind === "meta"
+                    ? "meta"
+                    : "change"
               }
               key={`pair:${index}:${row.before?.index ?? ""}:${row.after?.index ?? ""}`}
               role="listitem"
@@ -1004,6 +1050,15 @@ export function FileReviewWorkspace({
     (total, file) => total + (file.deletions ?? 0),
     0,
   );
+  const basenameCounts = files.reduce((counts, file) => {
+    const basename = file.path.split("/").at(-1) ?? file.path;
+    counts.set(basename, (counts.get(basename) ?? 0) + 1);
+    return counts;
+  }, new Map<string, number>());
+  const treeLabel = (file: FileReviewItem) => {
+    const basename = file.path.split("/").at(-1) ?? file.path;
+    return basenameCounts.get(basename) === 1 ? basename : file.path;
+  };
   const visibleFiles = files.filter((file) =>
     file.path.toLocaleLowerCase().includes(filter.trim().toLocaleLowerCase()),
   );
@@ -1321,6 +1376,7 @@ export function FileReviewWorkspace({
                 const index = files.indexOf(file);
                 return (
                   <button
+                    aria-label={`Select ${file.path}`}
                     data-change={file.change}
                     data-selected={selectedPath === file.path || undefined}
                     key={file.path}
@@ -1329,7 +1385,7 @@ export function FileReviewWorkspace({
                     type="button"
                   >
                     {icon("file")}
-                    <span>{file.path.split("/").at(-1)}</span>
+                    <span>{treeLabel(file)}</span>
                     <span
                       aria-label={file.change}
                       className="codex-ui-file-review-workspace__status"
