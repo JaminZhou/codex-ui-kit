@@ -14163,7 +14163,7 @@ button.codex-ui-generated-image-gallery__image {
   .codex-ui-project-index[data-layout="table"]
     .codex-ui-project-index__recent-item {
     grid-column: 1;
-    grid-template-columns: minmax(0, 1fr);
+    grid-template-columns: minmax(0, 1fr) auto;
   }
 
   .codex-ui-project-index[data-layout="table"]

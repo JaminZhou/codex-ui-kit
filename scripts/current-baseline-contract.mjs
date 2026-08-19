@@ -461,6 +461,7 @@ export function assertCurrentBaselineRecord(record) {
   }
 
   assertCurrentSidebarLifecycle(record.sidebarLifecycle);
+  assertCurrentProjectsIndexObservation(record.projectsIndexObservation);
   if (
     record.captureKind !== "renderer_emulation" ||
     !isMainRendererUrl(record.targetSelection?.selected?.url ?? "")

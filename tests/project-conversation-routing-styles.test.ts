@@ -118,5 +118,8 @@ describe("project conversation routing visual contract", () => {
     expect(styles).toMatch(
       /@container codex-ui-project-index \(max-width: 42\.5rem\)[\s\S]*?\.codex-ui-project-index__item-actions \{[\s\S]*?grid-column: 2;/,
     );
+    expect(styles).toMatch(
+      /@container codex-ui-project-index \(max-width: 42\.5rem\)[\s\S]*?\.codex-ui-project-index__recent-item \{[\s\S]*?grid-template-columns: minmax\(0, 1fr\) auto;/,
+    );
   });
 });

@@ -409,6 +409,7 @@ describe("current baseline capture contract", () => {
         ownerPid: 25_197,
         processStartedAtMs: 1_786_350_800_000,
       },
+      projectsIndexObservation: projectsObservation(),
       schemaVersion: 1,
       sidebarLifecycle: {
         baseline: {
@@ -497,6 +498,24 @@ describe("current baseline capture contract", () => {
     };
 
     expect(() => assertCurrentBaselineRecord(record)).not.toThrow();
+    expect(() =>
+      assertCurrentBaselineRecord({
+        ...record,
+        projectsIndexObservation: undefined,
+      }),
+    ).toThrow("wide route geometry");
+    expect(() =>
+      assertCurrentBaselineRecord({
+        ...record,
+        projectsIndexObservation: {
+          ...record.projectsIndexObservation,
+          compact: {
+            ...record.projectsIndexObservation.compact,
+            updatedDisplay: "inline-flex",
+          },
+        },
+      }),
+    ).toThrow("compact route geometry");
     const withNavigationWidth = (
       source: (typeof record.states)[keyof typeof record.states],
       navigationWidth: number,
