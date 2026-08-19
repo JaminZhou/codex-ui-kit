@@ -8566,7 +8566,7 @@ summary.codex-ui-activity__header::after {
 }
 
 .codex-ui-file-review-workspace {
-  background: var(--codex-ui-background-primary);
+  background: var(--codex-ui-conversation-thread-background);
   color: var(--codex-ui-text);
   container-type: inline-size;
   display: grid;
@@ -8771,7 +8771,7 @@ summary.codex-ui-activity__header::after {
 }
 
 .codex-ui-file-review-workspace__diffs {
-  background: rgb(23 23 23);
+  background: var(--codex-ui-conversation-thread-background);
   min-height: 0;
   min-width: 0;
   overflow: auto;
@@ -8783,7 +8783,10 @@ summary.codex-ui-activity__header::after {
 
 .codex-ui-file-review-workspace__diff > header {
   align-items: center;
-  background: rgb(34 34 34);
+  background: light-dark(
+    var(--codex-ui-background-surface-under),
+    rgb(34 34 34)
+  );
   display: flex;
   min-height: 2rem;
   padding: 0 0.375rem 0 0.75rem;
@@ -8857,8 +8860,18 @@ summary.codex-ui-activity__header::after {
 }
 
 .codex-ui-file-review-workspace__diff > .codex-ui-file-diff {
-  --codex-ui-editor-added: rgb(27 43 33);
-  --codex-ui-editor-deleted: rgb(54 28 26);
+  --codex-ui-editor-added: light-dark(
+    color-mix(in oklab, var(--codex-ui-green-500) 15%, transparent),
+    rgb(27 43 33)
+  );
+  --codex-ui-editor-deleted: light-dark(
+    color-mix(in oklab, var(--codex-ui-red-600) 15%, transparent),
+    rgb(54 28 26)
+  );
+  background: light-dark(
+    var(--codex-ui-conversation-thread-background),
+    var(--codex-ui-code-block-bg)
+  );
   border: 0;
   border-radius: 0;
   max-height: none;
@@ -8996,13 +9009,10 @@ summary.codex-ui-activity__header::after {
 }
 
 .codex-ui-file-review-workspace__tree > button[data-selected] {
-  background: var(--codex-ui-background-button-secondary);
-}
-
-[data-theme="dark"]
-  .codex-ui-file-review-workspace__tree
-  > button[data-selected] {
-  background: rgb(34 34 34);
+  background: light-dark(
+    var(--codex-ui-background-button-secondary),
+    rgb(34 34 34)
+  );
 }
 
 .codex-ui-file-review-workspace__tree > button > span:nth-child(2) {
@@ -9069,6 +9079,14 @@ summary.codex-ui-activity__header::after {
     + .codex-ui-file-change__stats
     [data-dot] {
     margin-inline-start: auto;
+  }
+}
+
+@container (max-width: 23rem) {
+  .codex-ui-file-review-workspace__toolbar-actions
+    > .codex-ui-file-review-workspace__optional-action,
+  .codex-ui-file-review-workspace__git-actions {
+    display: none;
   }
 }
 

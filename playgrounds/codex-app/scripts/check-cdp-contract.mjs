@@ -9159,6 +9159,44 @@ try {
     .getByRole("button", { name: "Show files" })
     .click();
 
+  const reviewResizer = currentReviewFilesPage.getByRole("separator", {
+    name: "Resize workspace panel",
+  });
+  await reviewResizer.press("Home");
+  const narrowToolbar = await currentReviewFilesPage.evaluate(() => {
+    const panel = document.querySelector(".codex-ui-app-shell__side-panel");
+    const toolbar = document.querySelector(
+      ".codex-ui-file-review-workspace__toolbar",
+    );
+    const optionalActions = [...document.querySelectorAll(
+      ".codex-ui-file-review-workspace__optional-action",
+    )];
+    const gitActions = document.querySelector(
+      ".codex-ui-file-review-workspace__git-actions",
+    );
+    return {
+      clientWidth: toolbar?.clientWidth ?? null,
+      gitDisplay: gitActions ? getComputedStyle(gitActions).display : null,
+      optionalVisibleCount: optionalActions.filter(
+        (element) => getComputedStyle(element).display !== "none",
+      ).length,
+      panelWidth: panel?.getBoundingClientRect().width ?? null,
+      scrollWidth: toolbar?.scrollWidth ?? null,
+    };
+  });
+  if (
+    Math.abs((narrowToolbar.panelWidth ?? 0) - 320) > 1 ||
+    narrowToolbar.gitDisplay !== "none" ||
+    narrowToolbar.optionalVisibleCount !== 0 ||
+    narrowToolbar.clientWidth === null ||
+    narrowToolbar.scrollWidth === null ||
+    narrowToolbar.scrollWidth > narrowToolbar.clientWidth + 1
+  ) {
+    throw new Error(
+      `Current Review narrow toolbar overflowed: ${JSON.stringify(narrowToolbar)}`,
+    );
+  }
+
   const jumpButton = currentReviewFilesPage.getByRole("button", {
     name: "Jump to file",
   });
@@ -9255,24 +9293,60 @@ try {
     const filterInput = document.querySelector(
       ".codex-ui-file-review-workspace__filter input",
     );
+    const diffHeader = document.querySelector(
+      ".codex-ui-file-review-workspace__diff > header",
+    );
+    const diffHeaderPath = diffHeader?.querySelector("code");
+    const diffSurface = document.querySelector(
+      ".codex-ui-file-review-workspace__diff > .codex-ui-file-diff",
+    );
     if (!(files instanceof HTMLElement)) return null;
     const background = getComputedStyle(files).backgroundColor;
     const treeColor = treeItem ? getComputedStyle(treeItem).color : "";
     const filterColor = filterInput ? getComputedStyle(filterInput).color : "";
+    const diffBackground = diffSurface
+      ? getComputedStyle(diffSurface).backgroundColor
+      : "";
+    const diffColor = diffSurface ? getComputedStyle(diffSurface).color : "";
+    const headerBackground = diffHeader
+      ? getComputedStyle(diffHeader).backgroundColor
+      : "";
+    const headerColor = diffHeaderPath
+      ? getComputedStyle(diffHeaderPath).color
+      : "";
     return {
       background,
+      diffBackground,
+      diffColor,
+      diffContrast: ratio(diffColor, diffBackground),
       filterContrast: ratio(filterColor, background),
       filterColor,
+      headerBackground,
+      headerColor,
+      headerContrast: ratio(headerColor, headerBackground),
       treeColor,
       treeContrast: ratio(treeColor, background),
     };
   });
   if (
     !lightContrast ||
+    ![
+      lightContrast.background,
+      lightContrast.diffBackground,
+      lightContrast.diffColor,
+      lightContrast.filterColor,
+      lightContrast.headerBackground,
+      lightContrast.headerColor,
+      lightContrast.treeColor,
+    ].every((value) => value.startsWith("rgb(")) ||
     !Number.isFinite(lightContrast.treeContrast) ||
     !Number.isFinite(lightContrast.filterContrast) ||
+    !Number.isFinite(lightContrast.headerContrast) ||
+    !Number.isFinite(lightContrast.diffContrast) ||
     lightContrast.treeContrast < 4.5 ||
-    lightContrast.filterContrast < 4.5
+    lightContrast.filterContrast < 4.5 ||
+    lightContrast.headerContrast < 4.5 ||
+    lightContrast.diffContrast < 4.5
   ) {
     throw new Error(
       `Current Review light file-tree contrast failed: ${JSON.stringify(lightContrast)}`,

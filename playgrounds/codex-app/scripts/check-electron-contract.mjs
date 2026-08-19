@@ -4487,6 +4487,44 @@ try {
     .getByRole("button", { name: "Show files" })
     .click();
 
+  const reviewResizer = currentReviewFilesPage.getByRole("separator", {
+    name: "Resize workspace panel",
+  });
+  await reviewResizer.press("Home");
+  const narrowToolbar = await currentReviewFilesPage.evaluate(() => {
+    const panel = document.querySelector(".codex-ui-app-shell__side-panel");
+    const toolbar = document.querySelector(
+      ".codex-ui-file-review-workspace__toolbar",
+    );
+    const optionalActions = [...document.querySelectorAll(
+      ".codex-ui-file-review-workspace__optional-action",
+    )];
+    const gitActions = document.querySelector(
+      ".codex-ui-file-review-workspace__git-actions",
+    );
+    return {
+      clientWidth: toolbar?.clientWidth ?? null,
+      gitDisplay: gitActions ? getComputedStyle(gitActions).display : null,
+      optionalVisibleCount: optionalActions.filter(
+        (element) => getComputedStyle(element).display !== "none",
+      ).length,
+      panelWidth: panel?.getBoundingClientRect().width ?? null,
+      scrollWidth: toolbar?.scrollWidth ?? null,
+    };
+  });
+  if (
+    Math.abs((narrowToolbar.panelWidth ?? 0) - 320) > 1 ||
+    narrowToolbar.gitDisplay !== "none" ||
+    narrowToolbar.optionalVisibleCount !== 0 ||
+    narrowToolbar.clientWidth === null ||
+    narrowToolbar.scrollWidth === null ||
+    narrowToolbar.scrollWidth > narrowToolbar.clientWidth + 1
+  ) {
+    throw new Error(
+      `Electron current Review narrow toolbar overflowed: ${JSON.stringify(narrowToolbar)}`,
+    );
+  }
+
   await currentReviewFilesPage
     .getByRole("button", { exact: true, name: "Undo" })
     .click();

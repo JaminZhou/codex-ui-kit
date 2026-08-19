@@ -1190,6 +1190,7 @@ export function FileReviewWorkspace({
         <span className="codex-ui-file-review-workspace__toolbar-actions">
           <button
             aria-label="Review options"
+            className="codex-ui-file-review-workspace__optional-action"
             onClick={onReviewOptions}
             type="button"
           >
@@ -1199,6 +1200,7 @@ export function FileReviewWorkspace({
             aria-label={
               allDiffsCollapsed ? "Expand all diffs" : "Collapse all diffs"
             }
+            className="codex-ui-file-review-workspace__optional-action"
             onClick={() =>
               setCollapsedPaths(() =>
                 allDiffsCollapsed
@@ -1256,6 +1258,7 @@ export function FileReviewWorkspace({
           </span>
           <button
             aria-label={split ? "Switch to unified diff" : "Switch to split diff"}
+            className="codex-ui-file-review-workspace__optional-action"
             onClick={() => setSplit((value) => !value)}
             type="button"
           >

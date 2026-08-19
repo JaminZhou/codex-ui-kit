@@ -53,13 +53,28 @@ describe("file change visual contract", () => {
       /\.codex-ui-file-review-workspace__files \{[\s\S]*?background: var\(--codex-ui-conversation-thread-background\)/,
     );
     expect(styles).toMatch(
-      /\.codex-ui-file-review-workspace__tree > button\[data-selected\] \{[\s\S]*?background: var\(--codex-ui-background-button-secondary\)/,
+      /\.codex-ui-file-review-workspace__tree > button\[data-selected\] \{[\s\S]*?background: light-dark\([\s\S]*?var\(--codex-ui-background-button-secondary\),[\s\S]*?rgb\(34 34 34\)/,
     );
     expect(styles).toContain(
       ".codex-ui-file-review-workspace[data-files-visible]",
     );
     expect(styles).toMatch(
       /\.codex-ui-file-review-workspace\[data-files-visible\][\s\S]*?\.codex-ui-file-review-workspace__file-identity[\s\S]*?code \{\s*display: none;/,
+    );
+  });
+
+  it("themes the complete Review diff area and contracts narrow actions", () => {
+    expect(styles).toMatch(
+      /\.codex-ui-file-review-workspace__diffs \{[\s\S]*?background: var\(--codex-ui-conversation-thread-background\)/,
+    );
+    expect(styles).toMatch(
+      /\.codex-ui-file-review-workspace__diff > header \{[\s\S]*?background: light-dark\([\s\S]*?var\(--codex-ui-background-surface-under\),[\s\S]*?rgb\(34 34 34\)/,
+    );
+    expect(styles).toMatch(
+      /\.codex-ui-file-review-workspace__diff > \.codex-ui-file-diff \{[\s\S]*?background: light-dark\([\s\S]*?var\(--codex-ui-conversation-thread-background\),[\s\S]*?var\(--codex-ui-code-block-bg\)/,
+    );
+    expect(styles).toMatch(
+      /@container \(max-width: 23rem\) \{[\s\S]*?\.codex-ui-file-review-workspace__toolbar-actions[\s\S]*?> \.codex-ui-file-review-workspace__optional-action,[\s\S]*?\.codex-ui-file-review-workspace__git-actions \{\s*display: none;/,
     );
   });
 
