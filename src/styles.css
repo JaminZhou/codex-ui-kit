@@ -13760,12 +13760,6 @@ button.codex-ui-generated-image-gallery__image {
 }
 
 .codex-ui-project-index[data-layout="table"]
-  .codex-ui-project-index__header
-  .codex-ui-project-index__actions {
-  display: none;
-}
-
-.codex-ui-project-index[data-layout="table"]
   .codex-ui-project-index__toolbar {
   border: 0;
   box-sizing: border-box;
@@ -13783,13 +13777,7 @@ button.codex-ui-generated-image-gallery__image {
   border-radius: 0;
   height: 1.125rem;
   line-height: 1.125rem;
-  outline: 0;
   padding: 0;
-}
-
-.codex-ui-project-index[data-layout="table"]
-  .codex-ui-project-index__toolbar input:focus-visible {
-  outline: 0;
 }
 
 .codex-ui-project-index[data-layout="table"]

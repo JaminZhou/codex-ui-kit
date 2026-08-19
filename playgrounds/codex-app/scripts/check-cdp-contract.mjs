@@ -1871,7 +1871,7 @@ for (const scene of selectedScenes) {
               ?.textContent?.trim(),
           },
           toggles: document.querySelectorAll(
-            '[aria-label="Toggle project"]',
+            '[aria-label^="Expand project "], [aria-label^="Collapse project "]',
           ).length,
           updatedDisplay: updated ? getComputedStyle(updated).display : null,
           updatedHeaderDisplay: updatedHeader

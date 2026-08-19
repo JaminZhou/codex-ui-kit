@@ -9731,7 +9731,7 @@ try {
         .filter({ hasText: /^codex-ui-kit$/ }),
     });
   await codexUiKitProjectRow
-    .getByRole("button", { name: "Toggle project" })
+    .getByRole("button", { name: "Expand project codex-ui-kit" })
     .click();
   await projectCreationPage
     .getByRole("button", {
@@ -9763,7 +9763,9 @@ try {
         .filter({ hasText: /^codex-app-server-client$/ }),
     });
   await appServerProjectRow
-    .getByRole("button", { name: "Toggle project" })
+    .getByRole("button", {
+      name: "Expand project codex-app-server-client",
+    })
     .click();
   await projectCreationPage
     .getByRole("button", {

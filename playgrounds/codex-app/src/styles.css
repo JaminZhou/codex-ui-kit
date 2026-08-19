@@ -418,6 +418,10 @@ textarea {
   line-height: 1.125rem;
 }
 
+.demo-projects-search input:focus-visible {
+  outline: 0;
+}
+
 .demo-root[data-view="projects"]
   .codex-ui-app-window-chrome {
   padding-inline-end: 0.5rem;

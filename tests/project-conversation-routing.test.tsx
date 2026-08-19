@@ -982,6 +982,7 @@ describe("project conversation routing", () => {
     const onSortChange = vi.fn();
     render(
       <ProjectIndex
+        actions={<button type="button">New project</button>}
         items={[
           {
             expanded: true,
@@ -1014,6 +1015,9 @@ describe("project conversation routing", () => {
     const index = screen.getByRole("navigation", { name: "Project index" });
     expect(index.getAttribute("data-layout")).toBe("table");
     expect(index.getAttribute("data-status")).toBe("partial-error");
+    expect(
+      screen.getByRole("button", { name: "New project" }),
+    ).toBeTruthy();
     expect(screen.getByRole("status").textContent).toContain(
       "Some projects may be missing",
     );
@@ -1030,7 +1034,7 @@ describe("project conversation routing", () => {
     expect(onSortChange).toHaveBeenCalledWith("updated");
     fireEvent.click(
       screen.getByRole("button", {
-        name: "Toggle project",
+        name: "Collapse project UI Kit",
       }),
     );
     expect(onExpandedChange).toHaveBeenCalledWith("ui-kit", false);

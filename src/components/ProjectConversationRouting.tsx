@@ -328,6 +328,10 @@ export function ProjectIndex({
             ]
               .filter(Boolean)
               .join(" ");
+            const tableItemActionLabel =
+              item.recentChats && onExpandedChange
+                ? `${item.expanded ? "Collapse" : "Expand"} project ${itemTextValue(item)}`
+                : `Open project ${itemTextValue(item)}`;
             const tableRow = (
               <div
                 className="codex-ui-project-index__row"
@@ -346,7 +350,7 @@ export function ProjectIndex({
                       ? item.expanded || false
                       : undefined
                   }
-                  aria-label="Toggle project"
+                  aria-label={tableItemActionLabel}
                   className="codex-ui-project-index__item"
                   data-selected={selected || undefined}
                   disabled={disabled}
