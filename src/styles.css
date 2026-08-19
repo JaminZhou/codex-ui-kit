@@ -8914,7 +8914,7 @@ summary.codex-ui-activity__header::after {
 }
 
 .codex-ui-file-review-workspace__files {
-  background: rgb(23 23 23);
+  background: var(--codex-ui-conversation-thread-background);
   border-inline-start: 1px solid var(--codex-ui-border);
   min-height: 0;
   min-width: 0;
@@ -8996,6 +8996,12 @@ summary.codex-ui-activity__header::after {
 }
 
 .codex-ui-file-review-workspace__tree > button[data-selected] {
+  background: var(--codex-ui-background-button-secondary);
+}
+
+[data-theme="dark"]
+  .codex-ui-file-review-workspace__tree
+  > button[data-selected] {
   background: rgb(34 34 34);
 }
 
@@ -9048,7 +9054,9 @@ summary.codex-ui-activity__header::after {
     flex: 0 0 auto;
   }
 
-  .codex-ui-file-review-workspace__file-identity code {
+  .codex-ui-file-review-workspace[data-files-visible]
+    .codex-ui-file-review-workspace__file-identity
+    code {
     display: none;
   }
 

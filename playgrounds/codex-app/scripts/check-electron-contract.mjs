@@ -4471,6 +4471,18 @@ try {
   await currentReviewFilesPage
     .getByRole("button", { name: "Hide files" })
     .click();
+  const visibleHeaderPathCount = await currentReviewFilesPage.evaluate(
+    () =>
+      [...document.querySelectorAll(
+        ".codex-ui-file-review-workspace__file-identity code",
+      )].filter((element) => getComputedStyle(element).display !== "none")
+        .length,
+  );
+  if (visibleHeaderPathCount !== 3) {
+    throw new Error(
+      `Electron current Review hidden tree lost file identities: ${visibleHeaderPathCount}`,
+    );
+  }
   await currentReviewFilesPage
     .getByRole("button", { name: "Show files" })
     .click();

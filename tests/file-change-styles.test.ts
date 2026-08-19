@@ -48,6 +48,21 @@ describe("file change visual contract", () => {
     );
   });
 
+  it("keeps the Review file tree themed and narrow hidden-tree paths visible", () => {
+    expect(styles).toMatch(
+      /\.codex-ui-file-review-workspace__files \{[\s\S]*?background: var\(--codex-ui-conversation-thread-background\)/,
+    );
+    expect(styles).toMatch(
+      /\.codex-ui-file-review-workspace__tree > button\[data-selected\] \{[\s\S]*?background: var\(--codex-ui-background-button-secondary\)/,
+    );
+    expect(styles).toContain(
+      ".codex-ui-file-review-workspace[data-files-visible]",
+    );
+    expect(styles).toMatch(
+      /\.codex-ui-file-review-workspace\[data-files-visible\][\s\S]*?\.codex-ui-file-review-workspace__file-identity[\s\S]*?code \{\s*display: none;/,
+    );
+  });
+
   it("shows streaming content directly and honors reduced motion", () => {
     expect(styles).toMatch(
       /\.codex-ui-file-change\[data-file-status="streaming"\][\s\S]*?animation: none/,

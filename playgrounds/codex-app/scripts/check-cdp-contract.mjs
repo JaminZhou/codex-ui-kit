@@ -9015,6 +9015,10 @@ try {
         layout: workspace?.getAttribute("data-layout"),
         panel: rect(".codex-ui-app-shell__side-panel"),
         toolbar: rect(".codex-ui-file-review-workspace__toolbar"),
+        visibleHeaderPathCount: [...document.querySelectorAll(
+          ".codex-ui-file-review-workspace__file-identity code",
+        )].filter((element) => getComputedStyle(element).display !== "none")
+          .length,
         visible: workspace?.getAttribute("data-files-visible") === "true",
       };
     });
@@ -9028,7 +9032,8 @@ try {
     Math.abs((initial.header?.height ?? 0) - 46) > 1 ||
     Math.abs((initial.toolbar?.height ?? 0) - 40) > 1 ||
     Math.abs((initial.filter?.height ?? 0) - 18) > 1 ||
-    Math.abs((initial.filter?.width ?? 0) - 182) > 1
+    Math.abs((initial.filter?.width ?? 0) - 182) > 1 ||
+    initial.visibleHeaderPathCount !== 0
   ) {
     throw new Error(
       `Current Review workspace geometry failed: ${JSON.stringify(initial)}`,
@@ -9141,7 +9146,11 @@ try {
     .getByRole("button", { name: "Hide files" })
     .click();
   const compact = await readReviewWorkspace();
-  if (compact.layout !== "split" || compact.visible) {
+  if (
+    compact.layout !== "split" ||
+    compact.visible ||
+    compact.visibleHeaderPathCount !== 3
+  ) {
     throw new Error(
       `Current Review layout controls failed: ${JSON.stringify(compact)}`,
     );
@@ -9202,6 +9211,75 @@ try {
   );
 } finally {
   await currentReviewFilesApp.close();
+}
+
+const {
+  app: currentReviewFilesLightApp,
+  page: currentReviewFilesLightPage,
+} = await launchScene(currentReviewFilesScene, {
+  capture: false,
+});
+try {
+  await currentReviewFilesLightPage
+    .locator(".demo-root")
+    .evaluate((element) => element.setAttribute("data-theme", "light"));
+  const lightContrast = await currentReviewFilesLightPage.evaluate(() => {
+    const parseRgb = (value) =>
+      value
+        .match(/[\d.]+/g)
+        ?.slice(0, 3)
+        .map(Number) ?? [];
+    const luminance = (channels) => {
+      const linear = channels.map((channel) => {
+        const normalized = channel / 255;
+        return normalized <= 0.04045
+          ? normalized / 12.92
+          : ((normalized + 0.055) / 1.055) ** 2.4;
+      });
+      return 0.2126 * linear[0] + 0.7152 * linear[1] + 0.0722 * linear[2];
+    };
+    const ratio = (foreground, background) => {
+      const foregroundLuminance = luminance(parseRgb(foreground));
+      const backgroundLuminance = luminance(parseRgb(background));
+      return (
+        (Math.max(foregroundLuminance, backgroundLuminance) + 0.05) /
+        (Math.min(foregroundLuminance, backgroundLuminance) + 0.05)
+      );
+    };
+    const files = document.querySelector(
+      ".codex-ui-file-review-workspace__files",
+    );
+    const treeItem = document.querySelector(
+      '.codex-ui-file-review-workspace__tree [role="treeitem"]',
+    );
+    const filterInput = document.querySelector(
+      ".codex-ui-file-review-workspace__filter input",
+    );
+    if (!(files instanceof HTMLElement)) return null;
+    const background = getComputedStyle(files).backgroundColor;
+    const treeColor = treeItem ? getComputedStyle(treeItem).color : "";
+    const filterColor = filterInput ? getComputedStyle(filterInput).color : "";
+    return {
+      background,
+      filterContrast: ratio(filterColor, background),
+      filterColor,
+      treeColor,
+      treeContrast: ratio(treeColor, background),
+    };
+  });
+  if (
+    !lightContrast ||
+    !Number.isFinite(lightContrast.treeContrast) ||
+    !Number.isFinite(lightContrast.filterContrast) ||
+    lightContrast.treeContrast < 4.5 ||
+    lightContrast.filterContrast < 4.5
+  ) {
+    throw new Error(
+      `Current Review light file-tree contrast failed: ${JSON.stringify(lightContrast)}`,
+    );
+  }
+} finally {
+  await currentReviewFilesLightApp.close();
 }
 
 const commandInterruptionNoFrameScene = {
