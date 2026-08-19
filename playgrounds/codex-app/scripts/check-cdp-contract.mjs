@@ -2566,8 +2566,13 @@ for (const scene of selectedScenes) {
                   projectDialog.querySelectorAll(
                     ".demo-workspace-project-dialog__actions button",
                   ),
-                  (button) =>
-                    button.textContent?.replace(/^＋/, "").trim() ?? "",
+                  (button) => button.textContent?.trim() ?? "",
+                ),
+                actionIconNames: Array.from(
+                  projectDialog.querySelectorAll(
+                    ".demo-workspace-project-dialog__actions [data-current-build-icon]",
+                  ),
+                  (icon) => icon.getAttribute("data-current-build-icon"),
                 ),
                 listbox: rect(projectListbox),
               }
@@ -2685,6 +2690,9 @@ for (const scene of selectedScenes) {
                 "composer-branch",
               ]
             : ["workspace-run-location-local", "composer-branch"]),
+        ...(projectExpected
+          ? ["composer-new-project", "composer-clear-project"]
+          : []),
         "composer-add-files",
         "composer-permission",
         "composer-model-chevron",
@@ -2767,12 +2775,21 @@ for (const scene of selectedScenes) {
         projectExpected &&
         (!contract.project ||
           Math.abs(contract.project.rect.width - 260) > 1 ||
-          Math.abs(contract.project.rect.height - 221) > 1 ||
+          Math.abs(contract.project.rect.height - 249.5) > 0.2 ||
           Math.abs(contract.project.listbox.width - 252) > 1 ||
+          Math.abs(contract.project.listbox.height - 142.81) > 0.2 ||
           contract.project.optionCount !== 14 ||
           contract.project.selectedCount !== 1 ||
           JSON.stringify(contract.project.actionLabels) !==
-            JSON.stringify(["New project"]) ||
+            JSON.stringify([
+              "New project",
+              "Don't work in a project",
+            ]) ||
+          JSON.stringify(contract.project.actionIconNames) !==
+            JSON.stringify([
+              "composer-new-project",
+              "composer-clear-project",
+            ]) ||
           contract.activeElement !== "Search projects" ||
           contract.contextButtons[0]?.expanded !== "true" ||
           contract.contextButtons[0]?.haspopup !== "dialog")
@@ -2780,6 +2797,61 @@ for (const scene of selectedScenes) {
         throw new Error(
           `${scene.id}: workspace project dialog failed: ${JSON.stringify(contract)}`,
         );
+      }
+      if (projectExpected) {
+        const projectDialog = page.getByRole("dialog", {
+          name: "Choose a project",
+        });
+        const search = projectDialog.getByRole("searchbox", {
+          name: "Search projects",
+        });
+        await search.fill("__codex_ui_kit_no_project__");
+        if (
+          (await projectDialog.getByRole("option").count()) !== 0 ||
+          !(await projectDialog
+            .getByText("No projects found", { exact: true })
+            .isVisible()) ||
+          (await projectDialog
+            .getByRole("button", { name: "New project" })
+            .count()) !== 1 ||
+          (await projectDialog
+            .getByRole("button", { name: "Don't work in a project" })
+            .count()) !== 1
+        ) {
+          throw new Error(
+            `${scene.id}: workspace empty project search did not preserve both fixed actions.`,
+          );
+        }
+        await page.keyboard.press("Escape");
+        const originalTrigger = page.getByRole("button", {
+          name: "Change project: codex-ui-kit",
+        });
+        await originalTrigger.waitFor({ state: "visible" });
+        await page.waitForFunction(
+          () =>
+            document.activeElement?.getAttribute("aria-label") ===
+            "Change project: codex-ui-kit",
+        );
+        await originalTrigger.click();
+        await projectDialog
+          .getByRole("button", { name: "Don't work in a project" })
+          .click();
+        await page.waitForSelector(
+          '.demo-root[data-frame="workspace-no-project"]',
+        );
+        const chooseProject = page.getByRole("button", {
+          name: "Choose project",
+        });
+        await chooseProject.click();
+        await projectDialog
+          .getByRole("option", { name: "Select project codex-ui-kit" })
+          .click();
+        await page.waitForSelector(
+          '.demo-root[data-frame="workspace-ready"]',
+        );
+        await page.getByRole("button", {
+          name: "Change project: codex-ui-kit",
+        }).waitFor({ state: "visible" });
       }
       if (
         environmentExpected &&

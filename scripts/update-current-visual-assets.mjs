@@ -3,7 +3,10 @@ import { execFileSync } from "node:child_process";
 import { readFileSync, realpathSync, writeFileSync } from "node:fs";
 import { dirname } from "node:path";
 import { fileURLToPath } from "node:url";
-import { sanitizeVisualAssetIcon } from "./visual-asset-contract.mjs";
+import {
+  sanitizeVisualAssetIcon,
+  sanitizeVisualScalarRecord,
+} from "./visual-asset-contract.mjs";
 import {
   hasCurrentSidebarSettingsAbsenceEvidence,
   hasCurrentSidebarThreadAbsenceEvidence,
@@ -19,14 +22,20 @@ const write = process.argv.includes("--write");
 const hooksOnly = process.argv.includes("--hooks-only");
 const threadOnly = process.argv.includes("--thread-only");
 const mcpOnly = process.argv.includes("--mcp-only");
-if ([hooksOnly, threadOnly, mcpOnly].filter(Boolean).length > 1) {
+const projectPickerOnly = process.argv.includes("--project-picker-only");
+if ([hooksOnly, threadOnly, mcpOnly, projectPickerOnly].filter(Boolean).length > 1) {
   throw new Error("Targeted current visual asset modes are mutually exclusive.");
 }
 const supplementalMcpCapturePath =
   process.env.CODEX_VISUAL_ASSET_MCP_CAPTURE;
-if (supplementalMcpCapturePath && (hooksOnly || threadOnly || mcpOnly)) {
+const supplementalProjectPickerCapturePath =
+  process.env.CODEX_VISUAL_ASSET_PROJECT_PICKER_CAPTURE;
+if (
+  (supplementalMcpCapturePath || supplementalProjectPickerCapturePath) &&
+  (hooksOnly || threadOnly || mcpOnly || projectPickerOnly)
+) {
   throw new Error(
-    "CODEX_VISUAL_ASSET_MCP_CAPTURE is available only during a full visual asset refresh.",
+    "Supplemental visual captures are available only during a full visual asset refresh.",
   );
 }
 const includeThreadCapture =
@@ -57,6 +66,37 @@ function canonicalize(value) {
       ),
     );
   });
+}
+
+const writeOutput = (output) =>
+  new Promise((resolve) => {
+    process.stdout.write(output, resolve);
+  });
+
+function validateProjectPickerObservation(observation, context) {
+  sanitizeVisualScalarRecord(
+    observation?.search?.style,
+    `${context}.projectPickerObservation.search.style`,
+  );
+  sanitizeVisualScalarRecord(
+    observation?.surface?.style,
+    `${context}.projectPickerObservation.surface.style`,
+  );
+  if (
+    canonicalize(observation?.actionLabels) !==
+      canonicalize(["New project", "Don't work in a project"]) ||
+    observation?.activePlaceholder !== "Search projects" ||
+    observation?.optionCount !== 14 ||
+    observation?.selectedCount !== 1 ||
+    Math.abs((observation?.surface?.rect?.width ?? 0) - 260) > 0.1 ||
+    Math.abs((observation?.surface?.rect?.height ?? 0) - 249.5) > 0.1 ||
+    Math.abs((observation?.listbox?.rect?.width ?? 0) - 252) > 0.1 ||
+    Math.abs((observation?.listbox?.rect?.height ?? 0) - 142.81) > 0.1
+  ) {
+    throw new Error(
+      `${context} Project picker capture contract changed: ${canonicalize(observation)}.`,
+    );
+  }
 }
 
 function primitiveGeometry(primitive) {
@@ -150,6 +190,28 @@ const promotionSpecs = new Map([
         "first of three visible current Composer context controls, selected structurally without retaining its dynamic label",
       region: "composer",
       semanticId: "composer-project",
+    },
+  ],
+  [
+    "composer-new-project",
+    {
+      ownerAriaLabel: "New project",
+      ownerEvidence:
+        "fixed current Project picker action selected by visible text ownership",
+      region: "conversation",
+      retainExistingWhenAbsentOnSameFingerprint: true,
+      semanticId: "composer-new-project",
+    },
+  ],
+  [
+    "composer-clear-project",
+    {
+      ownerAriaLabel: "Don't work in a project",
+      ownerEvidence:
+        "fixed current Project picker clear action selected by visible text ownership",
+      region: "conversation",
+      retainExistingWhenAbsentOnSameFingerprint: true,
+      semanticId: "composer-clear-project",
     },
   ],
   [
@@ -672,7 +734,11 @@ function writeManifestAndCurrentThreadSubset(output, message) {
   console.log(message);
   console.log(`Updated ${currentThreadSubsetPath}`);
 }
-const runCapture = (captureThreadOnly, captureMcpOnly = false) =>
+const runCapture = (
+  captureThreadOnly,
+  captureMcpOnly = false,
+  captureProjectPickerOnly = false,
+) =>
   JSON.parse(
     execFileSync(process.execPath, [capturePath], {
       encoding: "utf8",
@@ -682,6 +748,9 @@ const runCapture = (captureThreadOnly, captureMcpOnly = false) =>
           ? { CODEX_VISUAL_ASSET_THREAD_ONLY: "1" }
           : {}),
         ...(captureMcpOnly ? { CODEX_VISUAL_ASSET_MCP_ONLY: "1" } : {}),
+        ...(captureProjectPickerOnly
+          ? { CODEX_VISUAL_ASSET_PROJECT_PICKER_ONLY: "1" }
+          : {}),
       },
       maxBuffer: 64 * 1024 * 1024,
     }),
@@ -689,7 +758,7 @@ const runCapture = (captureThreadOnly, captureMcpOnly = false) =>
 const supplementalThreadCapture = includeThreadCapture
   ? runCapture(true)
   : null;
-let capture = runCapture(threadOnly, mcpOnly);
+let capture = runCapture(threadOnly, mcpOnly, projectPickerOnly);
 if (conditionalCapturePath) {
   const normalizedProfile = realpathSync(
     process.env.CODEX_VISUAL_ASSET_PROFILE,
@@ -801,9 +870,173 @@ if (supplementalMcpCapturePath) {
     supplementalMcpCapture,
   );
 }
+const projectPickerVisualAssetIds = [
+  "composer-new-project",
+  "composer-clear-project",
+];
+if (supplementalProjectPickerCapturePath) {
+  const normalizedProfile = realpathSync(
+    process.env.CODEX_VISUAL_ASSET_PROFILE,
+  );
+  const normalizedSupplementalCapture = realpathSync(
+    supplementalProjectPickerCapturePath,
+  );
+  if (dirname(normalizedSupplementalCapture) !== normalizedProfile) {
+    throw new Error(
+      "The supplemental Project picker capture must be a direct child of the isolated profile.",
+    );
+  }
+  const supplementalProjectPickerCapture = JSON.parse(
+    readFileSync(normalizedSupplementalCapture, "utf8"),
+  );
+  const captureIdentity = ({ baselineContext }) => ({
+    appAsarSha256: baselineContext?.appAsarSha256,
+    appVersion: baselineContext?.appVersion,
+    buildNumber: baselineContext?.buildNumber,
+    theme: baselineContext?.theme,
+    viewport: baselineContext?.viewport,
+  });
+  if (
+    supplementalProjectPickerCapture.captureMode !== "project-picker" ||
+    supplementalProjectPickerCapture.baselineContext?.interactionState !==
+      "open-current-project-picker" ||
+    canonicalize(captureIdentity(supplementalProjectPickerCapture)) !==
+      canonicalize(captureIdentity(capture))
+  ) {
+    throw new Error(
+      "The supplemental Project picker capture must prove the same exact build, theme, and viewport.",
+    );
+  }
+  validateProjectPickerObservation(
+    supplementalProjectPickerCapture.projectPickerObservation,
+    "Supplemental current",
+  );
+  for (const id of projectPickerVisualAssetIds) {
+    const spec = promotionSpecs.get(id);
+    const observed = supplementalProjectPickerCapture.icons.filter(
+      (icon) =>
+        icon.region === spec?.region &&
+        icon.owner?.semanticId === spec?.semanticId,
+    );
+    if (observed.length !== 1) {
+      throw new Error(
+        `Expected one supplemental Project picker capture for ${id}, received ${observed.length}.`,
+      );
+    }
+    if (capture.icons.some((icon) => icon.owner?.semanticId === id)) {
+      throw new Error(
+        `Supplemental Project picker capture for ${id} overlaps the resting capture.`,
+      );
+    }
+    capture.icons.push(observed[0]);
+  }
+  capture.projectPickerObservation =
+    supplementalProjectPickerCapture.projectPickerObservation;
+}
 capture.icons.forEach((icon, index) =>
   sanitizeVisualAssetIcon(icon, `capture.icons[${index}]`),
 );
+if (projectPickerOnly) {
+  const targetIds = projectPickerVisualAssetIds;
+  const currentFingerprint = {
+    appAsarSha256: capture.baselineContext?.appAsarSha256,
+    appVersion: capture.baselineContext?.appVersion,
+    buildNumber: capture.baselineContext?.buildNumber,
+  };
+  const manifestFingerprint = {
+    appAsarSha256: manifest.baseline.appAsarSha256,
+    appVersion: manifest.baseline.appVersion,
+    buildNumber: manifest.baseline.buildNumber,
+  };
+  const observation = capture.projectPickerObservation;
+  validateProjectPickerObservation(observation, "Targeted current");
+  if (
+    capture.captureMode !== "project-picker" ||
+    canonicalize(currentFingerprint) !== canonicalize(manifestFingerprint) ||
+    capture.baselineContext?.interactionState !== "open-current-project-picker" ||
+    capture.baselineContext?.theme !== manifest.baseline.theme ||
+    canonicalize(capture.baselineContext?.viewport) !==
+      canonicalize(manifest.baseline.viewport)
+  ) {
+    throw new Error(
+      "Targeted current Project picker capture must match the tracked fingerprint, theme, and viewport.",
+    );
+  }
+  const promotedById = new Map();
+  for (const id of targetIds) {
+    const spec = promotionSpecs.get(id);
+    if (!spec) throw new Error(`Missing Project picker promotion spec: ${id}.`);
+    const observed = capture.icons.filter(
+      (candidate) =>
+        candidate.region === spec.region &&
+        candidate.owner?.semanticId === spec.semanticId,
+    );
+    if (observed.length !== 1) {
+      throw new Error(
+        `Expected one targeted Project picker capture for ${id}, received ${observed.length}.`,
+      );
+    }
+    const existing = manifest.icons.find((icon) => icon.id === id);
+    if (
+      existing &&
+      (existing.region !== spec.region ||
+        existing.viewBox !== observed[0].viewBox ||
+        canonicalize(existing.rootAttributes) !==
+          canonicalize(observed[0].rootAttributes))
+    ) {
+      throw new Error(`${id} root geometry or region changed.`);
+    }
+    const promoted = {
+      id,
+      ownerAriaLabel: spec.ownerAriaLabel,
+      ...(spec.ownerEvidence ? { ownerEvidence: spec.ownerEvidence } : {}),
+      primitives: existing
+        ? promotePrimitives(existing, observed[0])
+        : observed[0].primitives,
+      region: spec.region,
+      renderSize: observed[0].renderSize,
+      rootAttributes: observed[0].rootAttributes,
+      rootComputedStyle: existing
+        ? promoteComputedStyle(
+            existing.rootComputedStyle,
+            observed[0].rootComputedStyle,
+          )
+        : observed[0].rootComputedStyle,
+      sourceClassName: observed[0].sourceClassName,
+      status: "runtime-observed",
+      viewBox: observed[0].viewBox,
+    };
+    promoted.sha256 = createHash("sha256")
+      .update(
+        canonicalize({
+          baselineContext: manifest.baseline,
+          primitives: promoted.primitives,
+          renderSize: promoted.renderSize,
+          rootAttributes: promoted.rootAttributes,
+          rootComputedStyle: promoted.rootComputedStyle,
+          sourceClassName: promoted.sourceClassName,
+          viewBox: promoted.viewBox,
+        }),
+      )
+      .digest("hex");
+    promotedById.set(id, promoted);
+  }
+  const existingById = new Map(manifest.icons.map((icon) => [icon.id, icon]));
+  manifest.icons = [...promotionSpecs.keys()].map(
+    (id) => promotedById.get(id) ?? existingById.get(id),
+  );
+  manifest.projectPickerObservation = observation;
+  const output = `${JSON.stringify(manifest, null, 2)}\n`;
+  if (write) {
+    writeManifestAndCurrentThreadSubset(
+      output,
+      `Updated ${manifestPath} with current Project picker assets`,
+    );
+  } else {
+    await writeOutput(output);
+  }
+  process.exit(0);
+}
 if (mcpOnly) {
   const observedById = collectCurrentMcpVisualAssets(
     capture,
@@ -901,7 +1134,7 @@ if (mcpOnly) {
       `Updated ${manifestPath} with current MCP assets`,
     );
   } else {
-    process.stdout.write(output);
+    await writeOutput(output);
   }
   process.exit(0);
 }
@@ -1054,7 +1287,7 @@ if (threadOnly) {
     );
     writeFileSync(rasterManifestPath, rasterOutput);
   } else {
-    process.stdout.write(output);
+    await writeOutput(output);
   }
   process.exit(0);
 }
@@ -1146,7 +1379,7 @@ if (hooksOnly) {
       `Updated ${manifestPath} with current Hooks assets`,
     );
   } else {
-    process.stdout.write(output);
+    await writeOutput(output);
   }
   process.exit(0);
 }
@@ -1328,6 +1561,13 @@ manifest.composerObservation = capture.composerObservation;
 manifest.sidebarObservation = capture.sidebarObservation;
 manifest.workspaceObservation = workspaceObservation;
 manifest.settingsObservation = settingsObservation;
+if (capture.projectPickerObservation) {
+  validateProjectPickerObservation(
+    capture.projectPickerObservation,
+    "Full-refresh supplemental",
+  );
+  manifest.projectPickerObservation = capture.projectPickerObservation;
+}
 
 function selectObservedIcon(id, spec, existing) {
   const regions = spec.regions ?? [spec.region];
@@ -1353,6 +1593,15 @@ function selectObservedIcon(id, spec, existing) {
   ) {
     throw new Error(
       `${id} requires CODEX_VISUAL_ASSET_MCP_CAPTURE from the same new-build profile during a fingerprint-changing full refresh.`,
+    );
+  }
+  if (
+    candidates.length === 0 &&
+    fingerprintChanged &&
+    projectPickerVisualAssetIds.includes(id)
+  ) {
+    throw new Error(
+      `${id} requires CODEX_VISUAL_ASSET_PROJECT_PICKER_CAPTURE from the same new-build profile during a fingerprint-changing full refresh.`,
     );
   }
   if (!spec.minimumCandidates && candidates.length !== 1) {

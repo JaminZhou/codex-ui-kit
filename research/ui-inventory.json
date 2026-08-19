@@ -70,11 +70,12 @@
         "cdp-26.721.81911:new-chat-project-dialog-260x250-listbox-252x142.81-14-options",
         "cdp-26.727.40816:new-chat-project-dialog-260x249.5-listbox-252x142.81",
         "cdp-26.730.61309:project-dialog-260x249.5-listbox-252x142.81-14-options",
-        "cdp-26.803.61601:project-dialog-260x221-search-listbox-252x143.5-fourteen-options-new-project-only-and-native-panel-entry"
+        "cdp-26.803.61601:project-dialog-260x221-search-listbox-252x143.5-fourteen-options-new-project-only-and-native-panel-entry",
+        "cdp-26.810.52044:project-dialog-260x249.5-search-listbox-252x142.81-fourteen-options-new-and-clear-project-empty-escape-focus-clear-restore"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "partial_legacy",
-      "electronStatus": "partial_legacy",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
       "priority": "p0"
     },
     {

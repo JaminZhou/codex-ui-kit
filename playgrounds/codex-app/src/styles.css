@@ -687,8 +687,8 @@ textarea {
   bottom: calc(100% + 1.5px);
   box-shadow: 0 8px 16px -4px rgba(0, 0, 0, 0.12);
   display: grid;
-  grid-template-rows: 28px minmax(0, 1fr) auto;
-  height: 221px;
+  grid-template-rows: 28px 142.8125px auto;
+  height: 249.5px;
   left: 20px;
   padding: 4px;
   position: absolute;
@@ -721,9 +721,11 @@ textarea {
   border-radius: 0;
   box-shadow: none;
   gap: 0;
-  height: 143.5px;
+  grid-column: 1;
+  grid-row: 2;
+  height: 142.8125px;
   inset: auto;
-  max-height: 143.5px;
+  max-height: 142.8125px;
   max-width: none;
   overflow-y: auto;
   padding: 0;
@@ -740,7 +742,7 @@ textarea {
   font-size: 13px;
   gap: 6px;
   grid-template-columns: 16px minmax(0, 1fr) 16px;
-  height: 28.5px;
+  height: 28.5625px;
   line-height: 18.5px;
   overflow: hidden;
   padding: 5px 8px;
@@ -768,6 +770,7 @@ textarea {
 .demo-workspace-project-dialog__actions {
   border-top: 1px solid var(--demo-shell-overlay-border);
   display: grid;
+  grid-row: 3;
   padding-top: 4px;
 }
 
@@ -782,10 +785,30 @@ textarea {
   display: flex;
   font-size: 13px;
   gap: 8px;
-  height: 28.5px;
+  height: 28.5625px;
   line-height: 18.5px;
   padding: 5px 8px;
   text-align: start;
+}
+
+.demo-workspace-project-dialog__actions [data-current-build-icon] {
+  flex: 0 0 16px;
+  height: 16px;
+  width: 16px;
+}
+
+.demo-workspace-project-dialog__empty {
+  align-items: center;
+  color: var(--demo-shell-text-secondary);
+  display: flex;
+  font-size: 13px;
+  grid-column: 1;
+  grid-row: 2;
+  justify-content: center;
+  line-height: 18.5px;
+  margin: 0;
+  pointer-events: none;
+  z-index: 1;
 }
 
 .demo-workspace-project-dialog__actions button:hover,

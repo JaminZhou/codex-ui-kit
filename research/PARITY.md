@@ -43,7 +43,7 @@ The authoritative current-build inventory is:
   BrowserWindow; it does not prove parity with unobserved product routes,
   panels, state transitions, or window types.
 - A scoped Codex Desktop `26.810.52044` (`6662`) visual probe revalidates the
-  exact 1180×820 dark/resting asset fingerprint and now retains 95 exact
+  exact 1180×820 dark/resting asset fingerprint and now retains 97 exact
   sidebar/menu/window-chrome/Composer/environment/Settings/completed-thread icons plus
   one separately hashed, playground-only VS Code integration raster. Its sampled sidebar
   hover/footer contract also
@@ -53,7 +53,9 @@ The authoritative current-build inventory is:
   Sidebar/Back/Forward titlebar controls and all eight visible Composer
   context/action icons are exact. This empties the scoped visible-shell
   approximation list without making the broader inventory or lifecycle
-  denominator complete. The account-menu slice now locks five real icons, six
+  denominator complete. The current Project picker additionally restores its
+  260×249.5 two-action composition, exact New/Clear glyphs, empty-search state,
+  Escape focus return, and clear/restore lifecycle. The account-menu slice now locks five real icons, six
   items, one de-identified avatar, zero role separators, and Escape focus
   return; Usage no longer has a trailing chevron. The ordinary sidebar status
   slice now locks real active/unread geometry, color, actions replacement, and

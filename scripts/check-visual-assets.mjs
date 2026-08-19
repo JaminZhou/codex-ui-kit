@@ -288,6 +288,15 @@ for (const icon of manifest.icons ?? []) {
     throw new Error(`current-build playgrounds do not render ${icon.id}`);
   }
 }
+for (const [surface, observation] of Object.entries({
+  search: manifest.projectPickerObservation?.search,
+  surface: manifest.projectPickerObservation?.surface,
+})) {
+  sanitizeVisualScalarRecord(
+    observation?.style,
+    `manifest.projectPickerObservation.${surface}.style`,
+  );
+}
 
 if (
   !rendererSource.includes("primitive.children?.map") ||
@@ -335,7 +344,9 @@ if (
   captureSource.includes("rawSemanticLabel") ||
   !captureSource.includes("computedStyle: computedStyle(element)") ||
   !captureSource.includes("sanitizeVisualAssetIcon") ||
-  !captureSource.includes("sanitizeVisualScalarRecord")
+  !captureSource.includes("sanitizeVisualScalarRecord") ||
+  !captureSource.includes("CODEX_VISUAL_ASSET_PROJECT_PICKER_ONLY") ||
+  !captureSource.includes("projectPickerObservation")
 ) {
   throw new Error(
     "visual capture must prove argv and listener ancestry and fail closed on visual SVG attributes",
@@ -365,7 +376,10 @@ if (
   !updaterSource.includes("Unexpected current Composer capture") ||
   !updaterSource.includes("remainingApproximationCandidates.add(id)") ||
   !updaterSource.includes("sanitizeVisualAssetIcon") ||
-  !updaterSource.includes("capturedAt")
+  !updaterSource.includes("capturedAt") ||
+  !updaterSource.includes("--project-picker-only") ||
+  !updaterSource.includes("CODEX_VISUAL_ASSET_PROJECT_PICKER_CAPTURE") ||
+  !updaterSource.includes("validateProjectPickerObservation")
 ) {
   throw new Error("visual asset promotion must remain deterministic and explicit");
 }
@@ -381,6 +395,8 @@ if (new Set(remaining).size !== remaining.length) {
 }
 for (const id of [
   "composer-project",
+  "composer-new-project",
+  "composer-clear-project",
   "composer-worktree",
   "composer-branch",
   "composer-add-files",
@@ -472,13 +488,21 @@ for (const id of [
   }
 }
 if (
-  manifest.icons.length !== 95 ||
+  manifest.icons.length !== 97 ||
   manifest.composerObservation?.topContextIconCount !== 3 ||
   manifest.composerObservation?.bottomActionIconCount !== 5 ||
-  manifest.composerObservation?.exactSemanticIconCount !== 8
+  manifest.composerObservation?.exactSemanticIconCount !== 8 ||
+  canonicalize(manifest.projectPickerObservation?.actionLabels) !==
+    canonicalize(["New project", "Don't work in a project"]) ||
+  manifest.projectPickerObservation?.optionCount !== 14 ||
+  manifest.projectPickerObservation?.selectedCount !== 1 ||
+  manifest.projectPickerObservation?.surface?.rect?.height !== 249.5 ||
+  manifest.projectPickerObservation?.surface?.rect?.width !== 260 ||
+  manifest.projectPickerObservation?.listbox?.rect?.height !== 142.81 ||
+  manifest.projectPickerObservation?.listbox?.rect?.width !== 252
 ) {
   throw new Error(
-    "current visual asset capture must retain 95 promoted icons and the eight-icon Composer baseline",
+    "current visual asset capture must retain 97 promoted icons, the eight-icon Composer baseline, and the current Project picker observation",
   );
 }
 if (

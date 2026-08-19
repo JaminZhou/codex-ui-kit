@@ -76,8 +76,8 @@ observation from a previous build remains historical evidence.
   previous-build regression evidence and have been downgraded from `verified`
   to `partial_legacy` until they are reached again on the current fingerprint.
 
-Current inventory: 89 surface groups; 27 have current-build runtime evidence, 46 have previous-build-only runtime evidence, 16 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 26 groups and Electron verification covers 26.
-Prior acceptance outside those 26 sampled current-build groups remains
+Current inventory: 89 surface groups; 28 have current-build runtime evidence, 45 have previous-build-only runtime evidence, 16 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 27 groups and Electron verification covers 27.
+Prior acceptance outside those 27 sampled current-build groups remains
 recorded as `partial_legacy` until current-build re-observation.
 
 The current package exposes candidates far beyond the old transcript sample:
@@ -375,14 +375,20 @@ host-defined route selector also remains partial/legacy. Global
 notification runtime observation and light-theme shell evidence also remain
 open.
 
-The `26.803.61601` project-entry follow-up separates two evidence levels. A
-live isolated Renderer re-observes the 260×221 project picker with a 28px
-search field, fourteen 28.5px options in a 252×143.5 scroll owner, and only
-the current fixed `New project` action; the removed
-`Don't work in a project` action is no longer rendered. The secure Electron
-host now owns directory selection through an explicit IPC boundary and a
-deterministic fixture proves selected-path return without touching a user
-project.
+The `26.810.52044` project-entry refresh supersedes the narrower previous
+sample. A live isolated Renderer now exposes a 260×249.5 project picker with a
+13/18.5714px search field, fourteen 28.56px options in a 252×142.81 scroll
+owner, and two fixed actions: `New project` and
+`Don't work in a project`. The two action glyphs are promoted from the current
+runtime into the 97-icon exact manifest. Empty search retains both actions and
+shows `No projects found`; Escape returns focus to the initiating project
+control; clearing switches to `Choose project`; and the original project can
+be selected again without creating a task or project. Browser/CDP covers all
+198 lifecycle frames, Electron repeats the empty/Escape/clear/restore flow,
+and the local-only ownership-masked current listbox differs by 0.9546% under
+an 8% ceiling. The secure Electron host continues to own directory selection
+through an explicit IPC boundary and deterministic fixtures prove selected-
+path return without touching a user project.
 
 The installed `projects-index-page` chunk structurally confirms the separate
 Projects route: `Projects`, `Search projects`, Name/Updated sorting, local

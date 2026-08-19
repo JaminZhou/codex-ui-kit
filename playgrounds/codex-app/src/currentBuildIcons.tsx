@@ -8,8 +8,10 @@ import {
 export type CurrentBuildIconName =
   | "composer-add-files"
   | "composer-branch"
+  | "composer-clear-project"
   | "composer-dictate"
   | "composer-model-chevron"
+  | "composer-new-project"
   | "composer-permission"
   | "composer-project"
   | "composer-send"

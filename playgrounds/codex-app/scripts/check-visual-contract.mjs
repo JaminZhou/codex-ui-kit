@@ -241,7 +241,7 @@ const currentBuildComposerIconReferenceBounds = [
 const currentBuildWorkspaceProjectReference =
   process.env.CODEX_UI_KIT_WORKSPACE_PROJECT_REFERENCE;
 const currentBuildWorkspaceProjectReferenceSize = {
-  height: 144,
+  height: 143,
   width: 252,
 };
 const currentBuildWorkspaceEnvironmentReference =

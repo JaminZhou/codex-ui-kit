@@ -14,9 +14,9 @@ exit gates; it does not replace the inventory.
   Desktop `26.810.52044` (`6662`). Unsampled earlier-build surfaces remain
   previous-build regression evidence rather than current verification.
 - The inventory contains 89 surface groups: 59 P0, 21 P1, and 9 P2.
-- 27 groups have current-build runtime evidence, 46 have previous-build-only
+- 28 groups have current-build runtime evidence, 45 have previous-build-only
   runtime evidence, and 16 have not been sampled.
-- The scoped `26.810.52044` refresh revalidates 95
+- The scoped `26.810.52044` refresh revalidates 97
   sidebar/menu/window-chrome/Composer/Settings/completed-thread icons against
   exact runtime evidence. It adds Voice and Activity-attention, widens Help to
   320px, removes the Account Usage chevron and thread-header New chat action,
@@ -35,6 +35,10 @@ exit gates; it does not replace the inventory.
   failed-plus-unread composition, Retry, and recovery. It supersedes the
   previous single-status replay with the observed branch/error/unread
   three-track row and exact 8/36/67px trailing insets.
+  The current Project picker follow-up restores the 260×249.5 two-action
+  composition, promotes its exact New/Clear glyphs, and verifies empty search,
+  Escape focus return, clear, and original-project restoration in Browser/CDP,
+  Electron, and a 0.9546% local-only listbox comparison.
   Earlier hover/footer slices promoted More, Pin,
   Archive, and Help, confirms that Settings is absent from the sampled footer
   and that sampled project-task rows have no leading glyph. The Recents follow-up

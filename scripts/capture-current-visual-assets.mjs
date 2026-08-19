@@ -13,7 +13,9 @@ const port = Number(process.env.CODEX_VISUAL_ASSET_CDP_PORT);
 const expectedProfile = process.env.CODEX_VISUAL_ASSET_PROFILE;
 const threadOnly = process.env.CODEX_VISUAL_ASSET_THREAD_ONLY === "1";
 const mcpOnly = process.env.CODEX_VISUAL_ASSET_MCP_ONLY === "1";
-if (threadOnly && mcpOnly) {
+const projectPickerOnly =
+  process.env.CODEX_VISUAL_ASSET_PROJECT_PICKER_ONLY === "1";
+if ([threadOnly, mcpOnly, projectPickerOnly].filter(Boolean).length > 1) {
   throw new Error("Current visual asset capture modes are mutually exclusive.");
 }
 const appBundle = "/Applications/ChatGPT.app";
@@ -51,6 +53,8 @@ const baselineContext = {
   buildNumber: plistValue("CFBundleVersion"),
   interactionState: mcpOnly
     ? "completed-current-mcp-thread"
+    : projectPickerOnly
+      ? "open-current-project-picker"
     : "resting-and-open-sidebar-menus",
   theme: "dark",
   viewport: { height: 820, width: 1180 },
@@ -167,6 +171,7 @@ const semanticLabels = new Map([
   ["Back to ChatGPT", "window-back-to-chatgpt"],
   ["Dictate", "composer-dictate"],
   ["Don't work in a project", "composer-clear-project"],
+  ["New project", "composer-new-project"],
   ["New chat", "sidebar-new-chat"],
   ["Open help menu", "sidebar-help"],
   ["Open settings", "sidebar-settings"],
@@ -372,7 +377,12 @@ try {
     }
   }
 
-  const result = await main.evaluate(({ mcpOnly, semanticLabelEntries, threadOnly }) => {
+  const result = await main.evaluate(({
+    mcpOnly,
+    projectPickerOnly,
+    semanticLabelEntries,
+    threadOnly,
+  }) => {
     const semanticLabels = new Map(semanticLabelEntries);
     const resolveSemanticId = (
       label,
@@ -1075,6 +1085,103 @@ try {
           viewBox: svg.getAttribute("viewBox"),
         };
       });
+    let projectPickerObservation = null;
+    if (projectPickerOnly) {
+      const dialogs = [...document.querySelectorAll('[role="dialog"]')].filter(
+        (dialog) =>
+          isActuallyVisible(dialog) &&
+          dialog.querySelector('input[placeholder="Search projects"]'),
+      );
+      if (dialogs.length !== 1) {
+        throw new Error(
+          `Expected one visible current Project picker, received ${dialogs.length}.`,
+        );
+      }
+      const dialog = dialogs[0];
+      const search = dialog.querySelector('input[placeholder="Search projects"]');
+      const listbox = dialog.querySelector('[role="listbox"]');
+      if (!(search instanceof HTMLInputElement) || !listbox) {
+        throw new Error("Current Project picker is missing its search or listbox.");
+      }
+      const actionLabels = ["New project", "Don't work in a project"];
+      const actions = actionLabels.map((label) => {
+        const matches = [...dialog.querySelectorAll("button")].filter(
+          (button) =>
+            isActuallyVisible(button) &&
+            !button.disabled &&
+            button.textContent?.trim() === label,
+        );
+        if (matches.length !== 1) {
+          throw new Error(
+            `Expected one enabled current Project picker action ${label}, received ${matches.length}.`,
+          );
+        }
+        const svgs = [...matches[0].querySelectorAll("svg")].filter(
+          isActuallyVisible,
+        );
+        if (svgs.length !== 1) {
+          throw new Error(
+            `Expected one visible SVG for current Project picker action ${label}, received ${svgs.length}.`,
+          );
+        }
+        return {
+          iconRect: rect(svgs[0]),
+          iconViewBox: svgs[0].getAttribute("viewBox"),
+          label,
+          rect: rect(matches[0]),
+        };
+      });
+      const exactIds = new Set([
+        "composer-new-project",
+        "composer-clear-project",
+      ]);
+      const exactIcons = icons.filter(({ owner }) =>
+        exactIds.has(owner.semanticId),
+      );
+      if (
+        exactIcons.length !== exactIds.size ||
+        exactIcons.some(({ owner }) => !exactIds.delete(owner.semanticId)) ||
+        exactIds.size !== 0
+      ) {
+        throw new Error(
+          "Current Project picker action icons did not map one-to-one to their semantic IDs.",
+        );
+      }
+      const listboxStyle = getComputedStyle(listbox);
+      const options = [...listbox.querySelectorAll('[role="option"]')];
+      projectPickerObservation = {
+        actionLabels,
+        actions,
+        activePlaceholder:
+          document.activeElement === search ? search.placeholder : null,
+        listbox: {
+          clientHeight: listbox.clientHeight,
+          overflowY: listboxStyle.overflowY,
+          rect: rect(listbox),
+          scrollHeight: listbox.scrollHeight,
+        },
+        optionCount: options.length,
+        search: {
+          rect: rect(search),
+          style: {
+            fontFamily: getComputedStyle(search).fontFamily,
+            fontSize: getComputedStyle(search).fontSize,
+            lineHeight: getComputedStyle(search).lineHeight,
+          },
+        },
+        selectedCount: options.filter(
+          (option) => option.getAttribute("aria-selected") === "true",
+        ).length,
+        surface: {
+          rect: rect(dialog),
+          style: {
+            backgroundColor: getComputedStyle(dialog).backgroundColor,
+            borderRadius: getComputedStyle(dialog).borderRadius,
+            boxShadow: getComputedStyle(dialog).boxShadow,
+          },
+        },
+      };
+    }
     const captureSemanticSvg = (svg, semanticId) => {
       const bounds = svg.getBoundingClientRect();
       return {
@@ -1431,11 +1538,17 @@ try {
       fontSamples,
       icons,
       mcpObservation,
+      projectPickerObservation,
       sidebarObservation,
       threadObservation,
       viewport: { height: window.innerHeight, width: window.innerWidth },
     };
-  }, { mcpOnly, semanticLabelEntries: [...semanticLabels], threadOnly });
+  }, {
+    mcpOnly,
+    projectPickerOnly,
+    semanticLabelEntries: [...semanticLabels],
+    threadOnly,
+  });
   if (
     !threadOnly &&
     !mcpOnly &&
@@ -1518,7 +1631,7 @@ try {
     });
   }
   fullCapture: try {
-    if (threadOnly || mcpOnly) break fullCapture;
+    if (threadOnly || mcpOnly || projectPickerOnly) break fullCapture;
     const projectRows = main.locator(
       'nav div[role="button"][aria-expanded]:not([aria-haspopup])',
     );
@@ -2144,6 +2257,8 @@ try {
     ? "completed-thread"
     : mcpOnly
       ? "completed-mcp-thread"
+      : projectPickerOnly
+        ? "project-picker"
       : "full";
 
   const canonicalize = (value) =>
@@ -2180,6 +2295,17 @@ try {
       sanitizeVisualScalarRecord(
         observation.style,
         `capture.settingsObservation.page.${surface}.style`,
+      );
+    }
+  }
+  for (const [surface, observation] of Object.entries({
+    search: result.projectPickerObservation?.search,
+    surface: result.projectPickerObservation?.surface,
+  })) {
+    if (observation?.style) {
+      sanitizeVisualScalarRecord(
+        observation.style,
+        `capture.projectPickerObservation.${surface}.style`,
       );
     }
   }
