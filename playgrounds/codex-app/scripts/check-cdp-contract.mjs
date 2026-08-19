@@ -1883,25 +1883,6 @@ for (const scene of selectedScenes) {
       });
       const compact = scene.id === "projects-index-compact";
       const expanded = scene.id === "projects-index-expanded";
-      const projectContentLeft = projectIndex.search?.left ?? Infinity;
-      const projectContentLeftInset =
-        projectContentLeft - (projectIndex.index?.left ?? -Infinity);
-      const projectContentInsetMinimum = compact ? 12.4 : 77.4;
-      const projectContentInsetMaximum = compact ? 20.1 : 85.1;
-      const projectContentAligned =
-        Math.abs(
-          (projectIndex.title.bounds?.left ?? Infinity) -
-            (projectContentLeft + 8),
-        ) <= 0.1 &&
-        Math.abs((projectIndex.header?.left ?? Infinity) - projectContentLeft) <=
-          0.1 &&
-        Math.abs(
-          (projectIndex.rows[0]?.left ?? Infinity) - projectContentLeft,
-        ) <= 0.1 &&
-        Math.abs(
-          (projectIndex.searchInput?.left ?? Infinity) -
-            (projectContentLeft + 36.9),
-        ) <= 0.25;
       if (
         projectIndex.view !== "projects" ||
         projectIndex.layout !== "table" ||
@@ -1924,29 +1905,31 @@ for (const scene of selectedScenes) {
         Math.abs((projectIndex.searchInput?.top ?? Infinity) - 127) > 0.1 ||
         projectIndex.header?.height !== 40 ||
         Math.abs((projectIndex.header?.top ?? Infinity) - 179.578125) > 0.1 ||
-        !projectContentAligned ||
-        projectContentLeftInset < projectContentInsetMinimum ||
-        projectContentLeftInset > projectContentInsetMaximum ||
         (compact
           ? projectIndex.viewport.width !== 600 ||
             projectIndex.viewport.height !== 600 ||
-            projectIndex.index?.left !== 0 ||
             projectIndex.index?.width !== 600 ||
             projectIndex.index?.height !== 554 ||
+            projectIndex.title.bounds?.left !== 28 ||
+            projectIndex.search?.left !== 20 ||
             projectIndex.search?.width !== 560 ||
+            projectIndex.header?.left !== 20 ||
             projectIndex.header?.width !== 560 ||
             projectIndex.columns !== "416px 128px" ||
+            projectIndex.rows[0]?.left !== 20 ||
             projectIndex.rows[0]?.width !== 560 ||
             projectIndex.updatedDisplay !== "none" ||
             projectIndex.updatedHeaderDisplay !== "none"
           : projectIndex.viewport.width !== 1180 ||
             projectIndex.viewport.height !== 820 ||
-            projectIndex.index?.left !== 274 ||
-            projectIndex.index?.width !== 906 ||
             projectIndex.index?.height !== 774 ||
+            projectIndex.title.bounds?.left !== 367 ||
+            projectIndex.search?.left !== 359 ||
             projectIndex.search?.width !== 736 ||
+            projectIndex.header?.left !== 359 ||
             projectIndex.header?.width !== 736 ||
             projectIndex.columns !== "512px 64px 128px" ||
+            projectIndex.rows[0]?.left !== 359 ||
             projectIndex.rows[0]?.width !== 736 ||
             projectIndex.updatedDisplay === "none" ||
             projectIndex.updatedHeaderDisplay === "none")

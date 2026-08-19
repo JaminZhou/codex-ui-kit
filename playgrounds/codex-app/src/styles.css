@@ -374,6 +374,16 @@ textarea {
   height: 100%;
 }
 
+.demo-root[data-capture][data-view="projects"]
+  .codex-ui-project-index {
+  scrollbar-width: none;
+}
+
+.demo-root[data-capture][data-view="projects"]
+  .codex-ui-project-index::-webkit-scrollbar {
+  display: none;
+}
+
 .demo-projects-route .codex-ui-project-index__item-actions svg,
 .demo-projects-route .codex-ui-project-index__recent svg {
   height: 1rem;
