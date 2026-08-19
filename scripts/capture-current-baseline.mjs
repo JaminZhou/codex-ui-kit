@@ -6,6 +6,7 @@ import { fileURLToPath } from "node:url";
 import { chromium } from "../playgrounds/codex-app/node_modules/playwright-core/index.mjs";
 import {
   assertCurrentBaselineRecord,
+  assertCurrentProjectsIndexObservation,
   currentBaselineViewports,
   resolveCurrentBaselineOutputPath,
   runBestEffortCurrentBaselineCleanup,
@@ -34,7 +35,7 @@ if (!expectedProfile?.startsWith("/") || /\s/.test(expectedProfile)) {
 }
 if (!allowNavigation) {
   throw new Error(
-    "Set CODEX_CURRENT_BASELINE_ALLOW_NAVIGATION=1 to authorize fixed New chat and Pull requests route navigation.",
+    "Set CODEX_CURRENT_BASELINE_ALLOW_NAVIGATION=1 to authorize fixed New chat, Projects, and Pull requests route navigation.",
   );
 }
 
@@ -739,9 +740,349 @@ try {
       },
     );
   };
+  const readMemoryRouterPath = () =>
+    page.evaluate(() => {
+      let fiber = null;
+      for (const element of [
+        document.documentElement,
+        document.body,
+        ...document.body.querySelectorAll("*"),
+      ]) {
+        const key = Object.getOwnPropertyNames(element).find(
+          (name) =>
+            name.startsWith("__reactFiber$") ||
+            name.startsWith("__reactContainer$"),
+        );
+        if (key) {
+          fiber = element[key];
+          break;
+        }
+      }
+      if (!fiber) return null;
+      while (fiber.return) fiber = fiber.return;
+      const paths = [];
+      const seen = new Set();
+      const stack = [fiber];
+      while (stack.length > 0) {
+        const node = stack.pop();
+        if (!node || seen.has(node)) continue;
+        seen.add(node);
+        const value = node.memoizedProps?.value;
+        if (typeof value?.location?.pathname === "string") {
+          paths.push(value.location.pathname);
+        }
+        if (node.child) stack.push(node.child);
+        if (node.sibling) stack.push(node.sibling);
+      }
+      return paths.length === 1 ? paths[0] : null;
+    });
+  const navigateMemoryRoute = async (pathname) => {
+    const invoked = await page.evaluate((nextPathname) => {
+      let fiber = null;
+      for (const element of [
+        document.documentElement,
+        document.body,
+        ...document.body.querySelectorAll("*"),
+      ]) {
+        const key = Object.getOwnPropertyNames(element).find(
+          (name) =>
+            name.startsWith("__reactFiber$") ||
+            name.startsWith("__reactContainer$"),
+        );
+        if (key) {
+          fiber = element[key];
+          break;
+        }
+      }
+      if (!fiber) return false;
+      while (fiber.return) fiber = fiber.return;
+      const navigators = [];
+      const seen = new Set();
+      const stack = [fiber];
+      while (stack.length > 0) {
+        const node = stack.pop();
+        if (!node || seen.has(node)) continue;
+        seen.add(node);
+        const value = node.memoizedProps?.value;
+        if (
+          value?.basename === "/" &&
+          value.navigator &&
+          typeof value.navigator.push === "function" &&
+          typeof value.navigator.replace === "function"
+        ) {
+          navigators.push(value.navigator);
+        }
+        if (node.child) stack.push(node.child);
+        if (node.sibling) stack.push(node.sibling);
+      }
+      if (navigators.length !== 1) return false;
+      navigators[0].push(nextPathname, null);
+      return true;
+    }, pathname);
+    if (!invoked) {
+      throw new Error("The current Renderer memory router was ambiguous.");
+    }
+    await page.waitForFunction(
+      (expectedPathname) => {
+        let fiber = null;
+        for (const element of [
+          document.documentElement,
+          document.body,
+          ...document.body.querySelectorAll("*"),
+        ]) {
+          const key = Object.getOwnPropertyNames(element).find(
+            (name) =>
+              name.startsWith("__reactFiber$") ||
+              name.startsWith("__reactContainer$"),
+          );
+          if (key) {
+            fiber = element[key];
+            break;
+          }
+        }
+        if (!fiber) return false;
+        while (fiber.return) fiber = fiber.return;
+        const paths = [];
+        const seen = new Set();
+        const stack = [fiber];
+        while (stack.length > 0) {
+          const node = stack.pop();
+          if (!node || seen.has(node)) continue;
+          seen.add(node);
+          const value = node.memoizedProps?.value;
+          if (typeof value?.location?.pathname === "string") {
+            paths.push(value.location.pathname);
+          }
+          if (node.child) stack.push(node.child);
+          if (node.sibling) stack.push(node.sibling);
+        }
+        return paths.length === 1 && paths[0] === expectedPathname;
+      },
+      pathname,
+      { timeout: 15_000 },
+    );
+  };
+  const inspectProjectsIndex = async () =>
+    page.evaluate(() => {
+      const visible = (element) =>
+        element instanceof Element &&
+        element.checkVisibility({
+          checkOpacity: true,
+          checkVisibilityCSS: true,
+        }) &&
+        element.getBoundingClientRect().width > 0 &&
+        element.getBoundingClientRect().height > 0;
+      const round = (value) => Math.round(value * 100) / 100;
+      const rect = (element) => {
+        if (!(element instanceof Element)) return null;
+        const bounds = element.getBoundingClientRect();
+        return {
+          height: round(bounds.height),
+          left: round(bounds.left),
+          top: round(bounds.top),
+          width: round(bounds.width),
+        };
+      };
+      const title = [...document.querySelectorAll("h1, h2, h3")].find(
+        (element) =>
+          visible(element) && element.textContent?.trim() === "Projects",
+      );
+      const search = [...document.querySelectorAll("input")].find(
+        (element) =>
+          visible(element) &&
+          (element.getAttribute("placeholder") === "Search projects" ||
+            element.getAttribute("aria-label") === "Search projects"),
+      );
+      const header = document.querySelector("[data-projects-header]");
+      const rows = [...document.querySelectorAll("[data-project-row]")];
+      const updated = [...(header?.querySelectorAll("button") ?? [])].find(
+        (element) => element.textContent?.trim() === "Updated",
+      );
+      const navigation = [...document.querySelectorAll("nav")].find(visible);
+      const scrollOwners = [...document.querySelectorAll("main *")]
+        .filter((element) => {
+          const style = getComputedStyle(element);
+          return (
+            visible(element) &&
+            (style.overflowY === "auto" || style.overflowY === "scroll") &&
+            element.scrollHeight > element.clientHeight
+          );
+        })
+        .map((element) => ({
+          clientHeight: element.clientHeight,
+          overflowY: getComputedStyle(element).overflowY,
+          rect: rect(element),
+          scrollHeight: element.scrollHeight,
+        }));
+      const titleStyle = title ? getComputedStyle(title) : null;
+      return {
+        header: {
+          gridTemplateColumns: header
+            ? getComputedStyle(header).gridTemplateColumns
+            : null,
+          rect: rect(header),
+        },
+        horizontalOverflow:
+          document.documentElement.scrollWidth -
+          document.documentElement.clientWidth,
+        navigationVisible: Boolean(navigation),
+        navigationWidth: navigation
+          ? round(navigation.getBoundingClientRect().width)
+          : null,
+        routePath: null,
+        rows: {
+          count: rows.length,
+          firstRect: rect(rows[0]),
+        },
+        scrollOwners,
+        search: {
+          count: search ? 1 : 0,
+          placeholder: search?.getAttribute("placeholder") ?? null,
+          rect: rect(search),
+        },
+        title: {
+          count: title ? 1 : 0,
+          rect: rect(title),
+          style: titleStyle
+            ? {
+                fontSize: titleStyle.fontSize,
+                fontWeight: titleStyle.fontWeight,
+                lineHeight: titleStyle.lineHeight,
+              }
+            : null,
+        },
+        updatedDisplay: updated ? getComputedStyle(updated).display : null,
+        viewport: { height: innerHeight, width: innerWidth },
+      };
+    });
+  const inspectProjectsIndexSort = () =>
+    page.evaluate(() => {
+      const state = (label) => {
+        const button = [...document.querySelectorAll(
+          "[data-projects-header] button",
+        )].find((element) => element.textContent?.trim() === label);
+        const icon = button?.querySelector("svg");
+        return {
+          active: Boolean(icon),
+          descending: Boolean(
+            icon?.getAttribute("class")?.split(/\s+/).includes("rotate-180"),
+          ),
+        };
+      };
+      return { name: state("Name"), updated: state("Updated") };
+    });
+  const captureProjectsIndexObservation = async () => {
+    await setViewport(currentBaselineViewports.wide);
+    await showSidebar();
+    if ((await readMemoryRouterPath()) !== "/") {
+      throw new Error("Projects capture must start from the New chat route.");
+    }
+    await navigateMemoryRoute("/projects");
+    await page.waitForFunction(
+      () =>
+        [...document.querySelectorAll("h1, h2, h3")].some(
+          (element) => element.textContent?.trim() === "Projects",
+        ) &&
+        document.querySelector("[data-projects-header]") &&
+        document.querySelector("[data-projects-rows]"),
+      undefined,
+      { timeout: 15_000 },
+    );
+    await page.evaluate(async () => {
+      await document.fonts.ready;
+    });
+    await waitForStableShellGeometry();
+    await page.mouse.move(1, 1);
+    const wide = await inspectProjectsIndex();
+    wide.routePath = await readMemoryRouterPath();
+
+    const sort = { initial: await inspectProjectsIndexSort() };
+    await page.getByRole("button", { exact: true, name: "Name" }).click();
+    sort.nameAscending = await inspectProjectsIndexSort();
+    await page.getByRole("button", { exact: true, name: "Name" }).click();
+    sort.nameDescending = await inspectProjectsIndexSort();
+    await page.getByRole("button", { exact: true, name: "Updated" }).click();
+    sort.restored = await inspectProjectsIndexSort();
+
+    const search = page.getByPlaceholder("Search projects");
+    await search.fill("__codex_ui_kit_no_match__");
+    await page.waitForTimeout(250);
+    const empty = await page.evaluate(() => ({
+      emptyMessageCount: [...document.querySelectorAll("main *")].filter(
+        (element) =>
+          element.children.length === 0 &&
+          element.textContent?.trim() === "No projects" &&
+          element.checkVisibility({
+            checkOpacity: true,
+            checkVisibilityCSS: true,
+          }),
+      ).length,
+      focusOnSearch:
+        document.activeElement?.getAttribute("placeholder") ===
+        "Search projects",
+      rowCount: document.querySelectorAll("[data-project-row]").length,
+    }));
+    await search.fill("");
+    await page.waitForFunction(
+      () => document.querySelectorAll("[data-project-row]").length > 0,
+    );
+
+    const toggle = page.locator('[aria-label="Toggle project"]').first();
+    await toggle.click();
+    await page.waitForFunction(
+      () =>
+        document
+          .querySelector('[aria-label="Toggle project"]')
+          ?.getAttribute("aria-expanded") === "true",
+    );
+    await page.waitForTimeout(250);
+    const expanded = await page.evaluate(() => {
+      const wrapper = document.querySelector("[data-project-row-wrapper]");
+      return {
+        expandedCount: document.querySelectorAll(
+          '[aria-label="Toggle project"][aria-expanded="true"]',
+        ).length,
+        focusOnToggle:
+          document.activeElement?.getAttribute("aria-label") ===
+          "Toggle project",
+        recentGroupCount: [...document.querySelectorAll("[aria-label]")].filter(
+          (element) =>
+            /^(Chats in|Local chats in|Recent chats in|Search matches in)/.test(
+              element.getAttribute("aria-label") ?? "",
+            ),
+        ).length,
+        wrapperHeight: wrapper
+          ? Math.round(wrapper.getBoundingClientRect().height * 100) / 100
+          : null,
+      };
+    });
+    await toggle.click();
+    await page.waitForFunction(
+      () =>
+        document
+          .querySelector('[aria-label="Toggle project"]')
+          ?.getAttribute("aria-expanded") === "false",
+    );
+    const collapsed = await page.evaluate(() => ({
+      expandedCount: document.querySelectorAll(
+        '[aria-label="Toggle project"][aria-expanded="true"]',
+      ).length,
+      focusOnToggle:
+        document.activeElement?.getAttribute("aria-label") ===
+        "Toggle project",
+    }));
+
+    await setViewport({ height: 600, width: 600 });
+    await hideSidebar();
+    const compact = await inspectProjectsIndex();
+    compact.routePath = await readMemoryRouterPath();
+    await setViewport(currentBaselineViewports.wide);
+    return { collapsed, compact, empty, expanded, sort, wide };
+  };
 
   await setViewport(currentBaselineViewports.wide);
   await waitForShell();
+  await hideSidebar();
   await showSidebar();
   await newChat().click();
   await waitForNewChat();
@@ -954,6 +1295,8 @@ try {
   sidebarLifecycle.responsive.keyboardRestored =
     await inspectProjectExpansion(projectRow);
 
+  const projectsIndexObservation =
+    await captureProjectsIndexObservation();
   await hideSidebar();
   const afterCaptureBundle = readAppAsarSnapshot();
   const record = {
@@ -966,6 +1309,7 @@ try {
       processStartedAtMs,
     },
     schemaVersion: 1,
+    projectsIndexObservation,
     sidebarLifecycle,
     states,
     targetSelection: {
@@ -989,6 +1333,7 @@ try {
       },
     },
   };
+  assertCurrentProjectsIndexObservation(projectsIndexObservation);
   assertCurrentBaselineRecord(record);
   const output = `${JSON.stringify(record, null, 2)}\n`;
   if (normalizedOutputPath) {

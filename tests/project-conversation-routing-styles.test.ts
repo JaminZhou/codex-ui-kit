@@ -103,5 +103,23 @@ describe("project conversation routing visual contract", () => {
     );
     expect(styles).toContain(".codex-ui-project-index__recent");
     expect(styles).toContain(".codex-ui-project-index__page-status");
+    expect(styles).toContain(
+      ".codex-ui-project-index__toolbar input:focus-visible {\n  outline: 2px solid var(--codex-ui-focus);",
+    );
+    expect(styles).not.toMatch(
+      /\.codex-ui-project-index\[data-layout="table"\][\s\S]*?\.codex-ui-project-index__toolbar input:focus-visible \{[^}]*outline:\s*0/,
+    );
+    expect(styles).not.toMatch(
+      /\.codex-ui-project-index\[data-layout="table"\][\s\S]*?\.codex-ui-project-index__header[\s\S]*?\.codex-ui-project-index__actions \{[^}]*display:\s*none/,
+    );
+    expect(styles).toMatch(
+      /\.codex-ui-project-index\[data-layout="table"\][\s\S]*?\.codex-ui-project-index__item-actions \{[\s\S]*?grid-column: 3;/,
+    );
+    expect(styles).toMatch(
+      /@container codex-ui-project-index \(max-width: 42\.5rem\)[\s\S]*?\.codex-ui-project-index__item-actions \{[\s\S]*?grid-column: 2;/,
+    );
+    expect(styles).toMatch(
+      /@container codex-ui-project-index \(max-width: 42\.5rem\)[\s\S]*?\.codex-ui-project-index__recent-item \{[\s\S]*?grid-template-columns: minmax\(0, 1fr\) auto;/,
+    );
   });
 });

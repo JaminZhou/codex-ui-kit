@@ -947,11 +947,12 @@
       "packageEvidence": ["projects-index-page"],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
-        "cdp-26.721:projects-entry-and-deidentified-list-structure"
+        "cdp-26.721:projects-entry-and-deidentified-list-structure",
+        "cdp-26.810.52044:projects-index-fourteen-row-wide-sort-empty-focus-explicitly-collapsed-compact-and-owned-pixel-lifecycle"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "partial_legacy",
-      "electronStatus": "partial_legacy",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
       "priority": "p0"
     },
     {

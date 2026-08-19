@@ -867,6 +867,28 @@ This slice does not create an environment or claim populated environment
 editing/repair coverage. Raw product screenshots and capture records remain
 local-only.
 
+## Current Projects Index slice
+
+- A fresh isolated Codex `26.810.52044` Renderer replaces the previous-build
+  Projects route denominator with fourteen 70px rows, a 736px
+  512/64/128 Name/Updated/action table, three 32px actions per row, and
+  expandable recent chats.
+- The public `ProjectIndex` keeps search, Name ascending/descending and Updated
+  descending sorting, exact `No projects` empty feedback, keyboard focus
+  continuity, and a 600×600 explicitly collapsed compact table with 416/128
+  columns and Updated hidden.
+- The demo reuses current runtime-observed folder, More, Pin, New chat, Search,
+  sort, and chevron assets while keeping project labels and host data synthetic.
+- Browser/CDP gates ready, expanded, and compact geometry. Electron proves
+  project creation success/failure, retained 14+2 rows, recent-chat expansion,
+  two distinct project/chat routes, and same-route Composer submission.
+- The local-only 1180×820 comparison masks project-owned labels, timestamps,
+  and pin state. The route differs by 0.2221% under 3.5%; Create differs by
+  3.7068% under 4% after exact computed-style and geometry matching.
+
+Raw product screenshots, capture JSON, project names, and profile data remain
+local-only.
+
 ## Current command-lifecycle follow-up
 
 - Current `26.810.52044` evidence re-runs bounded success, exact `exit 7`, and
@@ -1134,6 +1156,17 @@ The current dark-shell gate uses a same-state 1180×820 New chat reference:
 CODEX_UI_KIT_CURRENT_DARK_SHELL_REFERENCE=/absolute/path/to/current-dark-shell.png \
   pnpm --filter @codex-ui-kit/codex-app-playground check:visual -- \
   --scenes=current-dark-shell
+```
+
+The current Projects Index gate accepts one untracked 1180×820 product frame.
+It aligns the main route independently from the wider product sidebar, masks
+project-owned row content, and compares Create as a separate application-owned
+region:
+
+```bash
+CODEX_UI_KIT_CURRENT_PROJECTS_INDEX_REFERENCE=/absolute/path/to/current-projects-index.png \
+  pnpm --filter @codex-ui-kit/codex-app-playground check:visual -- \
+  --scenes=projects-index-ready,projects-index-expanded,projects-index-compact
 ```
 
 The current sidebar lifecycle gates accept four 1180×820 product frames and

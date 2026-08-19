@@ -189,6 +189,7 @@ type SidebarGlyphName =
   | "activity-attention"
   | "automation"
   | "archive-current"
+  | "chevron-current"
   | "folder"
   | "folder-current"
   | "help-current"
@@ -238,6 +239,9 @@ function SidebarGlyph({ name }: { name: SidebarGlyphName }) {
   }
   if (name === "archive-current") {
     return <CurrentBuildIcon name="sidebar-archive" />;
+  }
+  if (name === "chevron-current") {
+    return <CurrentBuildIcon name="sidebar-mode-chevron" />;
   }
   if (name === "help-current") {
     return <CurrentBuildIcon name="sidebar-help" />;
@@ -357,6 +361,7 @@ function querySelection() {
   const currentSidebar = params.get("currentSidebar") === "1";
   const requestedSidebarState = params.get("sidebarState");
   const sidebarState = [
+    "compact-collapsed",
     "compact-pinned",
     "account-menu",
     "help-menu",
@@ -1379,68 +1384,49 @@ const workspaceProjects = [
   },
 ];
 
-const currentProjectIndexItems = [
-  {
-    id: "codex-ui-kit",
-    kindLabel: "Local",
-    label: "codex-ui-kit",
-    path: "/workspace/codex-ui-kit",
-    recentChats: [
-      {
-        id: "project-index-parity",
-        label: "Match the current projects index",
-        meta: "2m",
-        pinned: true,
-      },
-      {
-        id: "sidebar-contract",
-        label: "Verify sidebar project behavior",
-        meta: "1h",
-      },
-    ],
-    status: "available" as const,
-    updated: "2m",
-    updatedOrder: 4,
-  },
-  {
-    id: "app-server-client",
-    kindLabel: "Local",
-    label: "codex-app-server-client",
-    path: "/workspace/codex-app-server-client",
-    recentChats: [
-      {
-        id: "protocol-baseline",
-        label: "Check the latest protocol baseline",
-        meta: "1d",
-      },
-    ],
-    status: "available" as const,
-    updated: "1d",
-    updatedOrder: 3,
-  },
-  {
-    id: "desktop-shell",
-    kindLabel: "Local",
-    label: "desktop-shell",
-    path: "/workspace/desktop-shell",
-    recentChats: [],
-    status: "loading" as const,
-    statusLabel: "Creating",
-    updated: "3d",
-    updatedOrder: 2,
-  },
-  {
-    id: "component-lab",
-    kindLabel: "Local",
-    label: "component-lab",
-    path: "/workspace/component-lab",
-    recentChats: [],
-    status: "error" as const,
-    statusLabel: "Failed",
-    updated: "1w",
-    updatedOrder: 1,
-  },
+const currentProjectIndexUpdated = [
+  "2m",
+  "1h",
+  "3h",
+  "10h",
+  "1d",
+  "3d",
+  "1w",
+  "2w",
+  "3w",
+  "1mo",
+  "1mo",
+  "2mo",
+  "3mo",
+  "4mo",
 ];
+
+const currentProjectIndexItems = workspaceProjects.map((project, index) => ({
+  id: project.id,
+  label: project.label,
+  path: project.path,
+  recentChats:
+    index === 0
+      ? [
+          {
+            id: "project-index-parity",
+            label: "Match the current projects index",
+            meta: "2m",
+          },
+        ]
+      : index === 1
+        ? [
+            {
+              id: "sidebar-contract",
+              label: "Verify sidebar project behavior",
+              meta: "1h",
+            },
+          ]
+        : [],
+  status: "available" as const,
+  updated: currentProjectIndexUpdated[index] ?? "4mo",
+  updatedOrder: workspaceProjects.length - index,
+}));
 
 const workspaceEnvironmentGroups = [
   {
@@ -2180,7 +2166,8 @@ export function App() {
         initialSelection.frame !== "mcp-current-integration-recovered" &&
         initialSelection.frame !== "mcp-current-recovery-completed" &&
         initialSelection.frame !== "current-mixed-completed" &&
-        initialSelection.frame !== "subagent-current-compact-720") ||
+        initialSelection.frame !== "subagent-current-compact-720" &&
+        initialSelection.sidebarState !== "compact-collapsed") ||
       !isNarrowDemoWindow(),
   );
   const [currentSidebarExpandedProjectIds, setCurrentSidebarExpandedProjectIds] =
@@ -6856,7 +6843,7 @@ export function App() {
       recentChats: [],
       status: "available" as const,
       updated: "Now",
-      updatedOrder: 5 + createdProjects.length - index,
+      updatedOrder: workspaceProjects.length + createdProjects.length - index,
     })),
     ...currentProjectIndexItems,
   ];
@@ -6876,13 +6863,32 @@ export function App() {
         : (left.updatedOrder - right.updatedOrder) * direction;
     })
     .map((item) => ({
-      ...item,
+      id: item.id,
+      label: item.label,
+      status: item.status,
+      updated: item.updated,
       actions: (
-        <button aria-label={`Project actions for ${item.label}`} type="button">
-          <SidebarGlyph name="more-current" />
-        </button>
+        <>
+          <button
+            aria-label={`Project actions for ${item.label}`}
+            type="button"
+          >
+            <SidebarGlyph name="more-current" />
+          </button>
+          <button aria-label={`Pin ${item.label}`} type="button">
+            <SidebarGlyph name="pin-current" />
+          </button>
+          <button
+            aria-label={`Start new chat in ${item.label}`}
+            onClick={() => openWorkspace(item.id)}
+            type="button"
+          >
+            <SidebarGlyph name="new" />
+          </button>
+        </>
       ),
       expanded: expandedProjectIndexIds.has(item.id),
+      expandIcon: <SidebarGlyph name="chevron-current" />,
       icon: <SidebarGlyph name="folder-current" />,
       recentChats: item.recentChats.map((chat) => ({
         ...chat,
@@ -6906,22 +6912,7 @@ export function App() {
   const projectsRoute = (
     <div className="demo-projects-route">
       <ProjectIndex
-        actions={
-          <Button
-            disabled={projectCreationStatus === "selecting"}
-            onClick={() => void createProject("projects")}
-            size="small"
-          >
-            {projectCreationStatus === "selecting"
-              ? "Choosing project…"
-              : "New project"}
-          </Button>
-        }
-        emptyState={
-          projectIndexQuery.trim()
-            ? "No projects found"
-            : "No projects"
-        }
+        emptyState="No projects"
         items={projectIndexItems}
         label="Projects"
         layout="table"
@@ -6949,6 +6940,7 @@ export function App() {
         }}
         sortBy={projectIndexSortBy}
         sortDirection={projectIndexSortDirection}
+        sortIcon={<SidebarGlyph name="chevron-current" />}
         status={projectIndexDisplayStatus}
         statusMessage={
           projectCreationStatus === "error" &&
@@ -6961,13 +6953,20 @@ export function App() {
                 : undefined
         }
         toolbar={
-          <input
-            aria-label="Search projects"
-            onChange={(event) => setProjectIndexQuery(event.currentTarget.value)}
-            placeholder="Search projects"
-            type="search"
-            value={projectIndexQuery}
-          />
+          <div className="demo-projects-search">
+            <div className="demo-projects-search__inner">
+              <SidebarGlyph name="search" />
+              <input
+                aria-label="Search projects"
+                onChange={(event) =>
+                  setProjectIndexQuery(event.currentTarget.value)
+                }
+                placeholder="Search projects"
+                type="search"
+                value={projectIndexQuery}
+              />
+            </div>
+          </div>
         }
       />
     </div>
@@ -9668,7 +9667,10 @@ export function App() {
           (initialSelection.capture &&
             activeFrame !== "pr-compact-detail" &&
             activeFrame !== "subagent-current-compact-720" &&
-            initialSelection.sidebarState !== "compact-pinned") ||
+            ![
+              "compact-collapsed",
+              "compact-pinned",
+            ].includes(initialSelection.sidebarState ?? "")) ||
           initialSelection.layoutMode === "wide"
             ? "wide"
             : undefined
@@ -9801,7 +9803,21 @@ export function App() {
                       disabled: true,
                       icon: <CurrentBuildIcon name="window-chrome-back" />,
                       label: "Back",
-                    }
+                  }
+              }
+              endActions={
+                view === "projects" ? (
+                  <Button
+                    className="demo-projects-create"
+                    disabled={projectCreationStatus === "selecting"}
+                    onClick={() => void createProject("projects")}
+                    size="small"
+                  >
+                    {projectCreationStatus === "selecting"
+                      ? "Choosing…"
+                      : "Create"}
+                  </Button>
+                ) : undefined
               }
               forwardAction={{
                 disabled: true,

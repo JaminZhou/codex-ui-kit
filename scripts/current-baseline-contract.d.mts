@@ -33,6 +33,8 @@ export function selectCurrentMainCandidate<T extends CurrentMainCandidate>(
 
 export function assertCurrentBaselineRecord(record: any): void;
 
+export function assertCurrentProjectsIndexObservation(observation: any): void;
+
 export function assertCurrentSidebarLifecycle(lifecycle: any): void;
 
 export function resolveCurrentBaselineOutputPath(

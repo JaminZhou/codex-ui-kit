@@ -107,6 +107,7 @@ export interface ProjectIndexItem {
   description?: ReactNode;
   disabled?: boolean;
   expanded?: boolean;
+  expandIcon?: ReactNode;
   icon?: ReactNode;
   id: string;
   kindLabel?: ReactNode;
@@ -156,6 +157,7 @@ export interface ProjectIndexProps
   selectedId?: string;
   sortBy?: ProjectIndexSortKey;
   sortDirection?: "ascending" | "descending";
+  sortIcon?: ReactNode;
   status?: ProjectIndexPageStatus;
   statusMessage?: ReactNode;
   title?: ReactNode;
@@ -195,6 +197,7 @@ export function ProjectIndex({
   selectedId,
   sortBy = "updated",
   sortDirection = "descending",
+  sortIcon,
   status = "ready",
   statusMessage,
   title = "Projects",
@@ -238,7 +241,7 @@ export function ProjectIndex({
             <span>{content}</span>
             {active ? (
               <span aria-hidden="true" data-direction={sortDirection}>
-                ↓
+                {sortIcon ?? "↓"}
               </span>
             ) : null}
           </button>
@@ -290,17 +293,21 @@ export function ProjectIndex({
         <div
           aria-label="Project columns"
           className="codex-ui-project-index__columns"
+          data-projects-header=""
         >
           {sortHeader("name", nameColumnLabel)}
+          {sortHeader("updated", updatedColumnLabel)}
           <div
-            aria-label="Project type and status"
+            aria-label="Project action columns"
             className="codex-ui-project-index__column-header"
           />
-          {sortHeader("updated", updatedColumnLabel)}
         </div>
       ) : null}
       {items.length > 0 ? (
-        <ul className="codex-ui-project-index__items">
+        <ul
+          className="codex-ui-project-index__items"
+          data-projects-rows={tableLayout ? "" : undefined}
+        >
           {items.map((item, index) => {
             const selected = item.id === selectedId;
             const disabled = projectIndexItemDisabled(item);
@@ -321,12 +328,137 @@ export function ProjectIndex({
             ]
               .filter(Boolean)
               .join(" ");
+            const tableMetadataId =
+              item.meta || item.statusLabel || item.kindLabel
+                ? `${projectIndexId}-table-metadata-${index}`
+                : undefined;
+            const tableUpdatedId = item.updated
+              ? `${projectIndexId}-table-updated-${index}`
+              : undefined;
+            const tableDescribedBy = [
+              descriptionId,
+              pathId,
+              tableMetadataId,
+              tableUpdatedId,
+            ]
+              .filter(Boolean)
+              .join(" ");
+            const tableRow = (
+              <div
+                className="codex-ui-project-index__row"
+                data-has-actions={Boolean(item.actions) || undefined}
+                data-has-expand={
+                  Boolean(item.recentChats && onExpandedChange) ||
+                  undefined
+                }
+                data-project-row=""
+              >
+                <div className="codex-ui-project-index__table-primary">
+                  <button
+                    aria-current={selected ? "page" : undefined}
+                    aria-describedby={tableDescribedBy || undefined}
+                    aria-label={`Open project ${itemTextValue(item)}`}
+                    className="codex-ui-project-index__item"
+                    data-selected={selected || undefined}
+                    disabled={disabled}
+                    onClick={() => onSelect(item.id)}
+                    type="button"
+                  >
+                    {item.icon ? (
+                      <span
+                        aria-hidden="true"
+                        className="codex-ui-project-index__icon"
+                      >
+                        {item.icon}
+                      </span>
+                    ) : null}
+                    <span className="codex-ui-project-index__copy">
+                      <span className="codex-ui-project-index__label">
+                        {item.label}
+                      </span>
+                      {item.description ? (
+                        <span
+                          className="codex-ui-project-index__description"
+                          id={descriptionId}
+                        >
+                          {item.description}
+                        </span>
+                      ) : null}
+                      {item.path ? (
+                        <code
+                          className="codex-ui-project-index__path"
+                          id={pathId}
+                        >
+                          {item.path}
+                        </code>
+                      ) : null}
+                      {tableMetadataId ? (
+                        <span
+                          className="codex-ui-project-index__table-metadata"
+                          id={tableMetadataId}
+                        >
+                          {item.kindLabel ? <span>{item.kindLabel}</span> : null}
+                          {item.statusLabel ? (
+                            <span
+                              className="codex-ui-project-index__status"
+                              data-status={item.status}
+                            >
+                              {item.statusLabel}
+                            </span>
+                          ) : null}
+                          {item.meta ? <span>{item.meta}</span> : null}
+                        </span>
+                      ) : null}
+                    </span>
+                  </button>
+                  {item.recentChats && onExpandedChange ? (
+                    <button
+                      aria-expanded={item.expanded || false}
+                      aria-label={`${item.expanded ? "Collapse" : "Expand"} project ${itemTextValue(item)}`}
+                      className="codex-ui-project-index__expand"
+                      disabled={disabled}
+                      onClick={() =>
+                        onExpandedChange(item.id, !item.expanded)
+                      }
+                      type="button"
+                    >
+                      <span
+                        aria-hidden="true"
+                        className="codex-ui-project-index__table-chevron"
+                        data-expanded={item.expanded || undefined}
+                      >
+                        {item.expandIcon ?? "⌄"}
+                      </span>
+                    </button>
+                  ) : null}
+                </div>
+                {item.updated ? (
+                  <span
+                    className="codex-ui-project-index__updated"
+                    id={tableUpdatedId}
+                  >
+                    {item.updated}
+                  </span>
+                ) : null}
+                {item.actions ? (
+                  <div
+                    aria-label={`Project actions for ${itemTextValue(item)}`}
+                    className="codex-ui-project-index__item-actions"
+                    role="toolbar"
+                  >
+                    {item.actions}
+                  </div>
+                ) : null}
+              </div>
+            );
             return (
               <li
                 data-expanded={item.expanded || undefined}
+                data-project-row-wrapper={tableLayout ? "" : undefined}
                 data-status={item.status}
                 key={item.id}
               >
+                {tableLayout ? tableRow : (
                 <div
                   className="codex-ui-project-index__row"
                   data-has-actions={Boolean(item.actions) || undefined}
@@ -431,6 +563,7 @@ export function ProjectIndex({
                     </div>
                   ) : null}
                 </div>
+                )}
                 {item.expanded && item.recentChats ? (
                   <div
                     aria-label={`Recent chats in ${itemTextValue(item)}`}
@@ -462,18 +595,22 @@ export function ProjectIndex({
                             const chatContent = (
                               <>
                                 <span>{chat.label}</span>
-                                {chat.meta ? (
-                                  <small id={chatMetaId}>{chat.meta}</small>
-                                ) : null}
-                                {chat.pinned ? (
-                                  <span
-                                    aria-label="Pinned"
-                                    id={chatPinnedId}
-                                  >
-                                    <span aria-hidden="true">●</span>
-                                    <span className="codex-ui-project-index__recent-pinned-label">
-                                      Pinned
-                                    </span>
+                                {chat.meta || chat.pinned ? (
+                                  <span className="codex-ui-project-index__recent-trailing">
+                                    {chat.meta ? (
+                                      <small id={chatMetaId}>{chat.meta}</small>
+                                    ) : null}
+                                    {chat.pinned ? (
+                                      <span
+                                        aria-label="Pinned"
+                                        id={chatPinnedId}
+                                      >
+                                        <span aria-hidden="true">●</span>
+                                        <span className="codex-ui-project-index__recent-pinned-label">
+                                          Pinned
+                                        </span>
+                                      </span>
+                                    ) : null}
                                   </span>
                                 ) : null}
                               </>

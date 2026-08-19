@@ -54,9 +54,10 @@ export const visualScenes = [
     id: "projects-index-compact",
     maxPixelRatio: 0.01,
     scenario: "workspace-workflow",
+    sidebarState: "compact-collapsed",
     theme: "dark",
     view: "projects",
-    windowSize: { height: 680, width: 720 },
+    windowSize: { height: 600, width: 600 },
   },
   {
     currentSidebar: true,
