@@ -979,16 +979,21 @@ describe("project conversation routing", () => {
   it("renders the current table index with sort and recent-chat ownership", () => {
     const onExpandedChange = vi.fn();
     const onOpenRecentChat = vi.fn();
+    const onSelect = vi.fn();
     const onSortChange = vi.fn();
     render(
       <ProjectIndex
         actions={<button type="button">New project</button>}
         items={[
           {
+            actions: <button type="button">UI Kit actions</button>,
+            description: "Component library",
             expanded: true,
             id: "ui-kit",
             kindLabel: "Local",
             label: "UI Kit",
+            meta: "3 tasks",
+            path: "/workspace/ui-kit",
             recentChats: [
               {
                 id: "parity",
@@ -997,13 +1002,20 @@ describe("project conversation routing", () => {
                 pinned: true,
               },
             ],
+            status: "available",
+            statusLabel: "Ready",
             updated: "2m",
+          },
+          {
+            actions: <button type="button">Docs actions</button>,
+            id: "docs",
+            label: "Docs",
           },
         ]}
         layout="table"
         onExpandedChange={onExpandedChange}
         onOpenRecentChat={onOpenRecentChat}
-        onSelect={() => undefined}
+        onSelect={onSelect}
         onSortChange={onSortChange}
         sortBy="updated"
         sortDirection="descending"
@@ -1032,6 +1044,21 @@ describe("project conversation routing", () => {
     ).toBe("false");
     fireEvent.click(updatedSort);
     expect(onSortChange).toHaveBeenCalledWith("updated");
+    const openProject = screen.getByRole("button", {
+      name: "Open project UI Kit",
+    });
+    fireEvent.click(openProject);
+    expect(onSelect).toHaveBeenCalledWith("ui-kit");
+    expect(accessibleDescriptionText(openProject)).toContain(
+      "Component library",
+    );
+    expect(accessibleDescriptionText(openProject)).toContain(
+      "/workspace/ui-kit",
+    );
+    expect(accessibleDescriptionText(openProject)).toContain("Local");
+    expect(accessibleDescriptionText(openProject)).toContain("Ready");
+    expect(accessibleDescriptionText(openProject)).toContain("3 tasks");
+    expect(accessibleDescriptionText(openProject)).toContain("2m");
     fireEvent.click(
       screen.getByRole("button", {
         name: "Collapse project UI Kit",
@@ -1046,6 +1073,16 @@ describe("project conversation routing", () => {
     expect(accessibleDescriptionText(recentChat)).toContain("2m");
     expect(accessibleDescriptionText(recentChat)).toContain("Pinned");
     expect(screen.getByLabelText("Pinned")).toBeTruthy();
+    expect(
+      screen.getByRole("toolbar", {
+        name: "Project actions for UI Kit",
+      }),
+    ).toBeTruthy();
+    expect(
+      screen.getByRole("toolbar", {
+        name: "Project actions for Docs",
+      }),
+    ).toBeTruthy();
   });
 
   it("renders recent chats as noninteractive content without an open handler", () => {

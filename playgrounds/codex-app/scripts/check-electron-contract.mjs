@@ -9722,6 +9722,17 @@ try {
       "Electron Projects Index did not preserve the 14-row current baseline plus two created projects.",
     );
   }
+  const leadingProjectLabels = await projectIndexRoute
+    .locator("[data-project-row] .codex-ui-project-index__label")
+    .allTextContents();
+  if (
+    JSON.stringify(leadingProjectLabels.slice(0, 2).sort()) !==
+    JSON.stringify(["scripts", "src"])
+  ) {
+    throw new Error(
+      "Electron Projects Index did not keep newly created projects ahead of older baseline rows.",
+    );
+  }
 
   const codexUiKitProjectRow = projectIndexRoute
     .locator("[data-project-row-wrapper]")

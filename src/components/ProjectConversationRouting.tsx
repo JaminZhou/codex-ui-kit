@@ -328,10 +328,21 @@ export function ProjectIndex({
             ]
               .filter(Boolean)
               .join(" ");
-            const tableItemActionLabel =
-              item.recentChats && onExpandedChange
-                ? `${item.expanded ? "Collapse" : "Expand"} project ${itemTextValue(item)}`
-                : `Open project ${itemTextValue(item)}`;
+            const tableMetadataId =
+              item.meta || item.statusLabel || item.kindLabel
+                ? `${projectIndexId}-table-metadata-${index}`
+                : undefined;
+            const tableUpdatedId = item.updated
+              ? `${projectIndexId}-table-updated-${index}`
+              : undefined;
+            const tableDescribedBy = [
+              descriptionId,
+              pathId,
+              tableMetadataId,
+              tableUpdatedId,
+            ]
+              .filter(Boolean)
+              .join(" ");
             const tableRow = (
               <div
                 className="codex-ui-project-index__row"
@@ -342,61 +353,96 @@ export function ProjectIndex({
                 }
                 data-project-row=""
               >
-                <button
-                  aria-current={selected ? "page" : undefined}
-                  aria-describedby={item.updated ? trailingId : undefined}
-                  aria-expanded={
-                    item.recentChats && onExpandedChange
-                      ? item.expanded || false
-                      : undefined
-                  }
-                  aria-label={tableItemActionLabel}
-                  className="codex-ui-project-index__item"
-                  data-selected={selected || undefined}
-                  disabled={disabled}
-                  onClick={() => {
-                    if (item.recentChats && onExpandedChange) {
-                      onExpandedChange(item.id, !item.expanded);
-                      return;
-                    }
-                    onSelect(item.id);
-                  }}
-                  type="button"
-                >
-                  {item.icon ? (
-                    <span
-                      aria-hidden="true"
-                      className="codex-ui-project-index__icon"
-                    >
-                      {item.icon}
+                <div className="codex-ui-project-index__table-primary">
+                  <button
+                    aria-current={selected ? "page" : undefined}
+                    aria-describedby={tableDescribedBy || undefined}
+                    aria-label={`Open project ${itemTextValue(item)}`}
+                    className="codex-ui-project-index__item"
+                    data-selected={selected || undefined}
+                    disabled={disabled}
+                    onClick={() => onSelect(item.id)}
+                    type="button"
+                  >
+                    {item.icon ? (
+                      <span
+                        aria-hidden="true"
+                        className="codex-ui-project-index__icon"
+                      >
+                        {item.icon}
+                      </span>
+                    ) : null}
+                    <span className="codex-ui-project-index__copy">
+                      <span className="codex-ui-project-index__label">
+                        {item.label}
+                      </span>
+                      {item.description ? (
+                        <span
+                          className="codex-ui-project-index__description"
+                          id={descriptionId}
+                        >
+                          {item.description}
+                        </span>
+                      ) : null}
+                      {item.path ? (
+                        <code
+                          className="codex-ui-project-index__path"
+                          id={pathId}
+                        >
+                          {item.path}
+                        </code>
+                      ) : null}
+                      {tableMetadataId ? (
+                        <span
+                          className="codex-ui-project-index__table-metadata"
+                          id={tableMetadataId}
+                        >
+                          {item.kindLabel ? <span>{item.kindLabel}</span> : null}
+                          {item.statusLabel ? (
+                            <span
+                              className="codex-ui-project-index__status"
+                              data-status={item.status}
+                            >
+                              {item.statusLabel}
+                            </span>
+                          ) : null}
+                          {item.meta ? <span>{item.meta}</span> : null}
+                        </span>
+                      ) : null}
                     </span>
-                  ) : null}
-                  <span className="codex-ui-project-index__copy">
-                    <span className="codex-ui-project-index__label">
-                      {item.label}
-                    </span>
-                  </span>
+                  </button>
                   {item.recentChats && onExpandedChange ? (
-                    <span
-                      aria-hidden="true"
-                      className="codex-ui-project-index__table-chevron"
-                      data-expanded={item.expanded || undefined}
+                    <button
+                      aria-expanded={item.expanded || false}
+                      aria-label={`${item.expanded ? "Collapse" : "Expand"} project ${itemTextValue(item)}`}
+                      className="codex-ui-project-index__expand"
+                      disabled={disabled}
+                      onClick={() =>
+                        onExpandedChange(item.id, !item.expanded)
+                      }
+                      type="button"
                     >
-                      {item.expandIcon ?? "›"}
-                    </span>
+                      <span
+                        aria-hidden="true"
+                        className="codex-ui-project-index__table-chevron"
+                        data-expanded={item.expanded || undefined}
+                      >
+                        {item.expandIcon ?? "›"}
+                      </span>
+                    </button>
                   ) : null}
-                </button>
+                </div>
                 {item.updated ? (
                   <span
                     className="codex-ui-project-index__updated"
-                    id={trailingId}
+                    id={tableUpdatedId}
                   >
                     {item.updated}
                   </span>
                 ) : null}
                 {item.actions ? (
                   <div
-                    aria-label="Project action controls"
+                    aria-label={`Project actions for ${itemTextValue(item)}`}
                     className="codex-ui-project-index__item-actions"
                     role="toolbar"
                   >

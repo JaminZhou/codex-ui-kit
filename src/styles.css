@@ -13867,7 +13867,7 @@ button.codex-ui-generated-image-gallery__image {
   display: grid;
   gap: 1rem;
   grid-template-columns: minmax(0, 1fr) 4rem 8rem;
-  height: 4.375rem;
+  min-height: 4.375rem;
   isolation: isolate;
   padding: 0.5rem 0;
 }
@@ -13905,6 +13905,26 @@ button.codex-ui-generated-image-gallery__image {
 }
 
 .codex-ui-project-index[data-layout="table"]
+  .codex-ui-project-index__table-primary {
+  align-items: center;
+  align-self: stretch;
+  display: flex;
+  min-width: 0;
+}
+
+.codex-ui-project-index[data-layout="table"]
+  .codex-ui-project-index__table-primary
+  .codex-ui-project-index__expand {
+  flex: 0 0 1.5rem;
+  height: 1.5rem;
+  inset: auto;
+  margin-inline-start: 0.5rem;
+  position: static;
+  transform: none;
+  width: 1.5rem;
+}
+
+.codex-ui-project-index[data-layout="table"]
   .codex-ui-project-index__item:hover:not(:disabled),
 .codex-ui-project-index[data-layout="table"]
   .codex-ui-project-index__item[data-selected] {
@@ -13927,6 +13947,30 @@ button.codex-ui-generated-image-gallery__image {
   .codex-ui-project-index__copy {
   display: block;
   flex: 0 1 auto;
+}
+
+.codex-ui-project-index[data-layout="table"]
+  .codex-ui-project-index__description,
+.codex-ui-project-index[data-layout="table"]
+  .codex-ui-project-index__path,
+.codex-ui-project-index[data-layout="table"]
+  .codex-ui-project-index__table-metadata {
+  display: block;
+  font-size: var(--codex-ui-font-size-xs);
+  line-height: 1.25;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.codex-ui-project-index[data-layout="table"]
+  .codex-ui-project-index__table-metadata {
+  color: var(--codex-ui-text-secondary);
+}
+
+.codex-ui-project-index[data-layout="table"]
+  .codex-ui-project-index__table-metadata > * + *::before {
+  content: " · ";
 }
 
 .codex-ui-project-index[data-layout="table"]
@@ -13955,6 +13999,13 @@ button.codex-ui-generated-image-gallery__image {
   transform: none;
 }
 
+.codex-ui-project-index[data-layout="table"]
+  .codex-ui-project-index__table-primary
+  .codex-ui-project-index__expand
+  .codex-ui-project-index__table-chevron[data-expanded] {
+  transform: none;
+}
+
 .codex-ui-project-index__table-chevron [data-current-build-icon] {
   height: 0.875rem;
   width: 0.875rem;
@@ -13975,6 +14026,7 @@ button.codex-ui-generated-image-gallery__image {
   gap: 0.5rem;
   inset: auto;
   justify-content: flex-end;
+  grid-column: 3;
   opacity: 1;
   position: static;
   transform: none;
@@ -14091,6 +14143,11 @@ button.codex-ui-generated-image-gallery__image {
     .codex-ui-project-index__columns
     .codex-ui-project-index__column-header:last-child {
     display: flex;
+    grid-column: 2;
+  }
+
+  .codex-ui-project-index[data-layout="table"]
+    .codex-ui-project-index__item-actions {
     grid-column: 2;
   }
 

@@ -6843,7 +6843,7 @@ export function App() {
       recentChats: [],
       status: "available" as const,
       updated: "Now",
-      updatedOrder: 5 + createdProjects.length - index,
+      updatedOrder: workspaceProjects.length + createdProjects.length - index,
     })),
     ...currentProjectIndexItems,
   ];
@@ -6863,7 +6863,10 @@ export function App() {
         : (left.updatedOrder - right.updatedOrder) * direction;
     })
     .map((item) => ({
-      ...item,
+      id: item.id,
+      label: item.label,
+      status: item.status,
+      updated: item.updated,
       actions: (
         <>
           <button aria-label="Project actions" type="button">
