@@ -204,6 +204,13 @@ describe("lifecycle visual policy", () => {
     );
   });
 
+  it("keeps current approval region artifacts distinct and current", () => {
+    expect(
+      contract.match(/sceneId: `\$\{scene\.id\}\.region`/g),
+    ).toHaveLength(3);
+    expect(contract).toContain("await rm(diffPath, { force: true })");
+  });
+
   it("gates the independent light shell without promoting emulated product evidence", () => {
     expect(electronHarness).toContain('id: "current-light-shell"');
     expect(electronHarness).toContain('theme: "light"');

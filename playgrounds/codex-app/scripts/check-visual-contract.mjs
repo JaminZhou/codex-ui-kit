@@ -1,4 +1,4 @@
-import { mkdir, readFile, writeFile } from "node:fs/promises";
+import { mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import { existsSync } from "node:fs";
 import { join } from "node:path";
 import pixelmatch from "pixelmatch";
@@ -516,14 +516,17 @@ async function compareCurrentBuildOverlay({
     join(artifactDirectory, `${sceneId}.current-build.png`),
     PNG.sync.write(overlayActual),
   );
+  const diffPath = join(
+    artifactDirectory,
+    `${sceneId}.current-build.diff.png`,
+  );
   if (comparison.pixels > 0) {
     await writeFile(
-      join(
-        artifactDirectory,
-        `${sceneId}.current-build.diff.png`,
-      ),
+      diffPath,
       PNG.sync.write(comparison.diff),
     );
+  } else {
+    await rm(diffPath, { force: true });
   }
   if (comparison.ratio > maximumRatio) {
     throw new Error(
@@ -2980,7 +2983,7 @@ for (const scene of selectedScenes) {
       referenceCrop: { height: 162, left: 0, top: 0, width: 736 },
       referencePath: currentApprovalPendingRegionReference,
       referenceSize: currentApprovalPendingRegionReferenceSize,
-      sceneId: scene.id,
+      sceneId: `${scene.id}.region`,
     });
   }
   if (
@@ -2997,7 +3000,7 @@ for (const scene of selectedScenes) {
       referenceCrop: { height: 67, left: 0, top: 0, width: 193 },
       referencePath: currentApprovalOptionsRegionReference,
       referenceSize: currentApprovalOptionsRegionReferenceSize,
-      sceneId: scene.id,
+      sceneId: `${scene.id}.region`,
     });
   }
   if (
@@ -3020,7 +3023,7 @@ for (const scene of selectedScenes) {
       referenceCrop: { height: 98, left: 0, top: 0, width: 736 },
       referencePath: currentApprovalDeniedComposerRegionReference,
       referenceSize: currentApprovalDeniedComposerRegionReferenceSize,
-      sceneId: scene.id,
+      sceneId: `${scene.id}.region`,
     });
   }
 
