@@ -5447,6 +5447,7 @@ export function App() {
       | null,
   ) => {
     if (overlay) setWorkspaceLocalEnvironmentOpen(false);
+    if (overlay !== "project") setWorkspaceProjectQuery("");
     setWorkspaceOverlay(overlay);
     setActiveFrame(
       overlay === "project"
@@ -6086,6 +6087,15 @@ export function App() {
             selectedId={workspaceProjectId ?? undefined}
             triggerId={workspaceProjectTriggerId}
           />
+          {filteredWorkspaceProjects.length === 0 ? (
+            <p
+              aria-live="polite"
+              className="demo-workspace-project-dialog__empty"
+              role="status"
+            >
+              No projects found
+            </p>
+          ) : null}
           <div className="demo-workspace-project-dialog__actions">
             <button
               aria-busy={projectCreationStatus === "selecting" || undefined}
@@ -6093,10 +6103,25 @@ export function App() {
               onClick={() => void createProject("workspace")}
               type="button"
             >
-              <span aria-hidden="true">＋</span>
+              <CurrentBuildIcon name="composer-new-project" />
               {projectCreationStatus === "selecting"
                 ? "Choosing project…"
                 : "New project"}
+            </button>
+            <button
+              onClick={() => {
+                openWorkspace(null);
+                setActiveFrame("workspace-no-project");
+                window.setTimeout(() =>
+                  document
+                    .getElementById("demo-workspace-project-trigger")
+                    ?.focus(),
+                );
+              }}
+              type="button"
+            >
+              <CurrentBuildIcon name="composer-clear-project" />
+              Don&apos;t work in a project
             </button>
           </div>
           {projectCreationStatus === "error" &&

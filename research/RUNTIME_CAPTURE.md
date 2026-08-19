@@ -1439,6 +1439,37 @@ and the profile, probes, JSON, and screenshots moved recoverably to Trash.
 Only de-identified measurements and reviewed independent baselines are
 tracked.
 
+## Current Project picker sample
+
+The `26.810.52044` picker probe used one isolated second process on loopback
+port `9865` and a unique profile. The selected main Renderer was resolved by
+URL and shell structure; account, project, and task strings were never retained
+in tracked evidence. The probe opened a fresh coding workspace but submitted
+no prompt and created no project or task.
+
+At 1180×820 the surface is 260×249.5 with a 15px radius, 13/18.5714px search,
+a 252×142.81 listbox, fourteen 28.56px options, and two fixed 28.56px actions:
+`New project` and `Don't work in a project`. Their 16×16 exact SVGs are now
+runtime-observed manifest assets. A no-result query yields zero options and
+`No projects found` while retaining both fixed actions. Escape returns focus
+to the exact initiating trigger. Clearing exposes `Choose project`; reopening
+and selecting the redacted original restores the prior state.
+
+Browser/CDP checks this static geometry and full interaction inside the
+198-frame matrix. Electron independently repeats the empty, Escape, clear,
+restore, and directory-selection paths. The local-only 252×143 listbox gate
+passes at 0.9546% after masking project-owned labels. Cleanup terminated only
+the exact isolated process and its two profile-owned Crashpad handlers, closed
+port `9865`, and moved the profile recoverably to Trash as
+`codex-ui-kit-project-picker-26-810.nCCMNV-20260819`; the primary process was
+not targeted.
+
+For a fingerprint-changing full asset refresh, keep the project-only capture
+as a direct child of the same isolated profile and pass its absolute path via
+`CODEX_VISUAL_ASSET_PROJECT_PICKER_CAPTURE`. The updater rejects a different
+build, theme, viewport, interaction state, directory, action contract, or icon
+cardinality instead of relabelling an older picker asset as current.
+
 ## Required flow matrix
 
 ### 1. Application entry and navigation

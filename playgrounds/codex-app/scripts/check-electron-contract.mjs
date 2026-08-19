@@ -4830,7 +4830,9 @@ try {
   if (
     (await projectDialog.getByRole("button", { name: "New project" }).count()) !==
       1 ||
-    (await projectDialog.getByText("Don't work in a project").count()) !== 0
+    (await projectDialog
+      .getByRole("button", { name: "Don't work in a project" })
+      .count()) !== 1
   ) {
     throw new Error(
       "Electron coding workspace project picker does not match the current action boundary.",
@@ -9586,12 +9588,71 @@ try {
   if (
     (await projectDialog.getByRole("button", { name: "New project" }).count()) !==
       1 ||
-    (await projectDialog.getByText("Don't work in a project").count()) !== 0
+    (await projectDialog
+      .getByRole("button", { name: "Don't work in a project" })
+      .count()) !== 1 ||
+    JSON.stringify(
+      await projectDialog
+        .locator(
+          ".demo-workspace-project-dialog__actions [data-current-build-icon]",
+        )
+        .evaluateAll((icons) =>
+          icons.map((icon) => icon.getAttribute("data-current-build-icon")),
+        ),
+    ) !==
+      JSON.stringify([
+        "composer-new-project",
+        "composer-clear-project",
+      ])
   ) {
     throw new Error(
-      "Electron current project picker retained a removed legacy action.",
+      "Electron current project picker did not expose the two exact current actions.",
     );
   }
+  const projectSearch = projectDialog.getByRole("searchbox", {
+    name: "Search projects",
+  });
+  await projectSearch.fill("__codex_ui_kit_no_project__");
+  if (
+    (await projectDialog.getByRole("option").count()) !== 0 ||
+    !(await projectDialog
+      .getByText("No projects found", { exact: true })
+      .isVisible())
+  ) {
+    throw new Error("Electron current project picker empty state was incomplete.");
+  }
+  await projectCreationPage.keyboard.press("Escape");
+  const initialProjectTrigger = projectCreationPage.getByRole("button", {
+    name: "Change project: codex-ui-kit",
+  });
+  await initialProjectTrigger.waitFor({ state: "visible" });
+  await projectCreationPage.waitForFunction(
+    () =>
+      document.activeElement?.getAttribute("aria-label") ===
+      "Change project: codex-ui-kit",
+  );
+  await initialProjectTrigger.click();
+  await projectDialog
+    .getByRole("button", { name: "Don't work in a project" })
+    .click();
+  await projectCreationPage.waitForSelector(
+    '.demo-root[data-frame="workspace-no-project"]',
+  );
+  const chooseProject = projectCreationPage.getByRole("button", {
+    name: "Choose project",
+  });
+  await chooseProject.click();
+  await projectDialog
+    .getByRole("option", { name: "Select project codex-ui-kit" })
+    .click();
+  await projectCreationPage.waitForSelector(
+    '.demo-root[data-frame="workspace-ready"]',
+  );
+  const restoredProjectTrigger = projectCreationPage.getByRole("button", {
+    name: "Change project: codex-ui-kit",
+  });
+  await restoredProjectTrigger.click();
+  await projectDialog.waitFor({ state: "visible" });
   await projectDialog.getByRole("button", { name: "New project" }).click();
   await projectCreationPage.waitForSelector(
     '.demo-root[data-view="workspace"][data-frame="workspace-project-created"]',
