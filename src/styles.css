@@ -13671,6 +13671,13 @@ button.codex-ui-generated-image-gallery__image {
   width: 1px;
 }
 
+.codex-ui-project-index__recent-trailing {
+  align-items: center;
+  display: inline-flex;
+  gap: 0.25rem;
+  min-width: 0;
+}
+
 .codex-ui-project-index__recent li > button > span:first-child,
 .codex-ui-project-index__recent-item > span:first-child {
   color: inherit;

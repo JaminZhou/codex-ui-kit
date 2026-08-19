@@ -427,7 +427,7 @@ export function ProjectIndex({
                         className="codex-ui-project-index__table-chevron"
                         data-expanded={item.expanded || undefined}
                       >
-                        {item.expandIcon ?? "›"}
+                        {item.expandIcon ?? "⌄"}
                       </span>
                     </button>
                   ) : null}
@@ -595,18 +595,22 @@ export function ProjectIndex({
                             const chatContent = (
                               <>
                                 <span>{chat.label}</span>
-                                {chat.meta ? (
-                                  <small id={chatMetaId}>{chat.meta}</small>
-                                ) : null}
-                                {chat.pinned ? (
-                                  <span
-                                    aria-label="Pinned"
-                                    id={chatPinnedId}
-                                  >
-                                    <span aria-hidden="true">●</span>
-                                    <span className="codex-ui-project-index__recent-pinned-label">
-                                      Pinned
-                                    </span>
+                                {chat.meta || chat.pinned ? (
+                                  <span className="codex-ui-project-index__recent-trailing">
+                                    {chat.meta ? (
+                                      <small id={chatMetaId}>{chat.meta}</small>
+                                    ) : null}
+                                    {chat.pinned ? (
+                                      <span
+                                        aria-label="Pinned"
+                                        id={chatPinnedId}
+                                      >
+                                        <span aria-hidden="true">●</span>
+                                        <span className="codex-ui-project-index__recent-pinned-label">
+                                          Pinned
+                                        </span>
+                                      </span>
+                                    ) : null}
                                   </span>
                                 ) : null}
                               </>

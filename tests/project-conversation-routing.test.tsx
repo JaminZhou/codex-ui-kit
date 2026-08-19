@@ -1059,11 +1059,11 @@ describe("project conversation routing", () => {
     expect(accessibleDescriptionText(openProject)).toContain("Ready");
     expect(accessibleDescriptionText(openProject)).toContain("3 tasks");
     expect(accessibleDescriptionText(openProject)).toContain("2m");
-    fireEvent.click(
-      screen.getByRole("button", {
-        name: "Collapse project UI Kit",
-      }),
-    );
+    const collapseProject = screen.getByRole("button", {
+      name: "Collapse project UI Kit",
+    });
+    expect(collapseProject.textContent).toBe("⌄");
+    fireEvent.click(collapseProject);
     expect(onExpandedChange).toHaveBeenCalledWith("ui-kit", false);
     const recentChat = screen.getByRole("button", {
       name: "Open chat Match project index",
@@ -1073,6 +1073,11 @@ describe("project conversation routing", () => {
     expect(accessibleDescriptionText(recentChat)).toContain("2m");
     expect(accessibleDescriptionText(recentChat)).toContain("Pinned");
     expect(screen.getByLabelText("Pinned")).toBeTruthy();
+    expect(
+      recentChat.querySelector(
+        ".codex-ui-project-index__recent-trailing",
+      )?.children,
+    ).toHaveLength(2);
     expect(
       screen.getByRole("toolbar", {
         name: "Project actions for UI Kit",
