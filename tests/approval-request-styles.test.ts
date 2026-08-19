@@ -17,9 +17,17 @@ describe("approval visual contract", () => {
     );
   });
 
-  it("locks the 162px current Composer-dock presentation", () => {
+  it("keeps the current Composer-dock presentation at least 162px tall", () => {
+    const composerShell = styles.match(
+      /\.codex-ui-approval-request\[data-presentation="composer"\] \{([\s\S]*?)\n\}/,
+    )?.[1];
+
+    expect(composerShell).toMatch(
+      /border-radius: 1\.5625rem;[\s\S]*?min-height: 10\.125rem;/,
+    );
+    expect(composerShell).not.toMatch(/(?:^|\n)\s*height:/);
     expect(styles).toMatch(
-      /\.codex-ui-approval-request\[data-presentation="composer"\] \{[\s\S]*?border-radius: 1\.5625rem;[\s\S]*?height: 10\.125rem;[\s\S]*?min-height: 10\.125rem;/,
+      /\.codex-ui-approval-request\[data-presentation="composer"\][\s\S]*?\.codex-ui-approval-request__header \{[\s\S]*?padding: 1rem 0\.75rem 0\.375rem;/,
     );
     expect(styles).toMatch(
       /\.codex-ui-approval-request\[data-presentation="composer"\][\s\S]*?\.codex-ui-approval-request__description \{[\s\S]*?border-radius: var\(--codex-ui-radius-md\);/,
