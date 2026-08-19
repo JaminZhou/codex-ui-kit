@@ -38,6 +38,8 @@ describe("file change visual contract", () => {
     expect(styles).toContain(
       ".codex-ui-file-diff[data-fade-bottom]:not([data-fade-top])",
     );
+    expect(styles).toContain(".codex-ui-file-diff__split-pane");
+    expect(styles).toContain('data-line-kind="empty"');
   });
 
   it("shows streaming content directly and honors reduced motion", () => {

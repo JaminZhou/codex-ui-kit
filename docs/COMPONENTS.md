@@ -39,7 +39,10 @@ Codex UI Kit exposes protocol-neutral React components. Hosts own data fetching,
   custom escaped-code highlighter.
 - `InlineCode`: standalone inline-code treatment.
 - `CodeBlock`: language header, copy feedback, syntax highlighting, and wrapped or unwrapped states.
-- `FileDiff`: structured context, hunk, metadata, addition, and deletion lines with optional wrapping, viewport modes, and scroll-edge fades. `fileDiffToText` converts the structured public line model into copyable plain text.
+- `FileDiff`: structured context, hunk, metadata, addition, and deletion lines
+  with optional wrapping, viewport modes, scroll-edge fades, and real unified
+  or paired old/new split rendering. `fileDiffToText` converts the structured
+  public line model into copyable plain text.
 
 The built-in highlighter escapes untrusted code. A custom `CodeHighlighter` returning `html` is treated as trusted markup, so hosts must escape untrusted input before returning it.
 

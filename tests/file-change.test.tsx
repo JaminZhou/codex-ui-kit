@@ -301,6 +301,27 @@ describe("FileDiff", () => {
     expect(renderedHtml).not.toContain("<mark>");
   });
 
+  it("pairs deleted and added content into distinct split panes", () => {
+    const { container } = render(<FileDiff layout="split" lines={lines} />);
+    const diff = screen.getByRole("list", { name: "File diff" });
+    const changedRow = screen.getByRole("listitem", {
+      name: "Deleted line: const status = 'old';; Added line: const status = 'ready';",
+    });
+
+    expect(diff.getAttribute("data-layout")).toBe("split");
+    expect(
+      changedRow.querySelector('[data-side="old"] code')?.textContent,
+    ).toBe("const status = 'old';");
+    expect(
+      changedRow.querySelector('[data-side="new"] code')?.textContent,
+    ).toBe("const status = 'ready';");
+    expect(
+      container.querySelector(
+        '.codex-ui-file-diff__split-row[data-line-kind="hunk"] .codex-ui-file-diff__split-spanning',
+      ),
+    ).toBeTruthy();
+  });
+
   it("exposes short, fallback, and wrapped rendering modes", () => {
     const short = renderToStaticMarkup(
       <FileDiff lines={lines} size="short" wrapLines />,
@@ -646,6 +667,16 @@ describe("FileReviewWorkspace", () => {
         "data-layout",
       ),
     ).toBe("split");
+    expect(
+      screen
+        .getByRole("list", { name: "Review diff for probe/alpha.txt" })
+        .getAttribute("data-layout"),
+    ).toBe("split");
+    expect(
+      screen.getByRole("listitem", {
+        name: "Deleted line: old; Added line: new",
+      }),
+    ).toBeTruthy();
     fireEvent.click(screen.getByRole("button", { name: "Hide files" }));
     expect(screen.queryByRole("complementary", { name: "Changed files" })).toBeNull();
   });
@@ -685,8 +716,37 @@ describe("FileReviewWorkspace", () => {
     expect(
       screen
         .getByRole("treeitem", { name: /quoted/ })
-        .getAttribute("data-selected"),
+      .getAttribute("data-selected"),
     ).toBe("true");
+  });
+
+  it("prunes collapsed paths when the file collection is replaced", () => {
+    const { rerender } = render(<FileReviewWorkspace files={files} />);
+    fireEvent.click(
+      screen.getByRole("button", { name: "Collapse all diffs" }),
+    );
+    expect(screen.queryByRole("list", { name: /Review diff for/ })).toBeNull();
+
+    const replacementFiles = files.map((file, index) => ({
+      ...file,
+      path: `replacement/file-${index}.txt`,
+    }));
+    rerender(<FileReviewWorkspace files={replacementFiles} />);
+
+    expect(
+      screen.getByRole("button", { name: "Collapse all diffs" }),
+    ).toBeTruthy();
+    expect(
+      screen.getAllByRole("list", { name: /Review diff for/ }),
+    ).toHaveLength(3);
+
+    fireEvent.click(
+      screen.getByRole("button", { name: "Collapse all diffs" }),
+    );
+    expect(screen.queryByRole("list", { name: /Review diff for/ })).toBeNull();
+    expect(
+      screen.getByRole("button", { name: "Expand all diffs" }),
+    ).toBeTruthy();
   });
 });
 

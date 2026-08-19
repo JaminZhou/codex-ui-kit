@@ -8896,10 +8896,21 @@ summary.codex-ui-activity__header::after {
   box-shadow: inset 3px 0 var(--codex-ui-danger);
 }
 
-.codex-ui-file-review-workspace[data-layout="split"]
-  .codex-ui-file-diff__line {
-  grid-template-columns: 2rem 2rem 1rem minmax(10rem, 1fr);
-  min-width: 21rem;
+.codex-ui-file-review-workspace .codex-ui-file-diff__split-row,
+.codex-ui-file-review-workspace .codex-ui-file-diff__split-pane,
+.codex-ui-file-review-workspace .codex-ui-file-diff__split-spanning {
+  line-height: 1.3125rem;
+  min-height: 1.3125rem;
+}
+
+.codex-ui-file-review-workspace
+  .codex-ui-file-diff__split-pane[data-line-kind="addition"] {
+  box-shadow: inset 3px 0 var(--codex-ui-success);
+}
+
+.codex-ui-file-review-workspace
+  .codex-ui-file-diff__split-pane[data-line-kind="deletion"] {
+  box-shadow: inset 3px 0 var(--codex-ui-danger);
 }
 
 .codex-ui-file-review-workspace__files {
@@ -9376,6 +9387,64 @@ summary.codex-ui-activity__header::after {
 }
 
 .codex-ui-file-diff__line code {
+  color: inherit;
+  font-family: inherit;
+  min-width: 0;
+  padding: 0 0.75rem 0 0;
+  white-space: pre;
+}
+
+.codex-ui-file-diff__split-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(10rem, 1fr));
+  min-height: var(--codex-ui-line-height-code);
+  min-width: 22rem;
+  width: 100%;
+}
+
+.codex-ui-file-diff__split-pane,
+.codex-ui-file-diff__split-spanning {
+  display: grid;
+  grid-template-columns: 3.375rem minmax(max-content, 1fr);
+  min-width: 0;
+}
+
+.codex-ui-file-diff__split-pane + .codex-ui-file-diff__split-pane {
+  border-inline-start: 1px solid var(--codex-ui-border);
+}
+
+.codex-ui-file-diff__split-pane[data-line-kind="addition"] {
+  background: var(--codex-ui-editor-added);
+}
+
+.codex-ui-file-diff__split-pane[data-line-kind="deletion"] {
+  background: var(--codex-ui-editor-deleted);
+}
+
+.codex-ui-file-diff__split-pane[data-line-kind="empty"] {
+  background: color-mix(
+    in srgb,
+    var(--codex-ui-background-primary) 42%,
+    transparent
+  );
+}
+
+.codex-ui-file-diff__split-spanning {
+  grid-column: 1 / -1;
+}
+
+.codex-ui-file-diff__split-row[data-line-kind="hunk"] {
+  background: color-mix(in srgb, var(--codex-ui-focus) 7%, transparent);
+  color: var(--codex-ui-focus);
+}
+
+.codex-ui-file-diff__split-row[data-line-kind="meta"] {
+  color: var(--codex-ui-text-tertiary);
+  font-style: italic;
+}
+
+.codex-ui-file-diff__split-pane code,
+.codex-ui-file-diff__split-spanning code {
   color: inherit;
   font-family: inherit;
   min-width: 0;

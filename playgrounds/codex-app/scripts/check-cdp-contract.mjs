@@ -9082,6 +9082,37 @@ try {
   await currentReviewFilesPage
     .getByRole("button", { name: "Switch to split diff" })
     .click();
+  const splitDiff = await currentReviewFilesPage.evaluate(() => {
+    const pairedRow = [...document.querySelectorAll(
+      ".codex-ui-file-diff__split-row",
+    )].find((element) =>
+      element.getAttribute("aria-label")?.includes("alpha baseline"),
+    );
+    return {
+      after: pairedRow
+        ?.querySelector('[data-side="new"] code')
+        ?.textContent?.trim(),
+      before: pairedRow
+        ?.querySelector('[data-side="old"] code')
+        ?.textContent?.trim(),
+      paneCount: document.querySelectorAll(
+        ".codex-ui-file-diff__split-pane",
+      ).length,
+      splitDiffCount: document.querySelectorAll(
+        '.codex-ui-file-diff[data-layout="split"]',
+      ).length,
+    };
+  });
+  if (
+    splitDiff.splitDiffCount !== 3 ||
+    splitDiff.paneCount !== 12 ||
+    splitDiff.before !== "alpha baseline" ||
+    splitDiff.after !== "alpha updated"
+  ) {
+    throw new Error(
+      `Current Review split diff did not create paired panes: ${JSON.stringify(splitDiff)}`,
+    );
+  }
   await currentReviewFilesPage
     .getByRole("button", { name: "Hide files" })
     .click();

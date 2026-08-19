@@ -433,6 +433,7 @@ export function fileDiffToText(lines: readonly FileDiffLine[]) {
 export interface FileDiffProps
   extends Omit<HTMLAttributes<HTMLDivElement>, "children"> {
   emptyLabel?: string;
+  layout?: "split" | "unified";
   lines: readonly FileDiffLine[];
   renderContent?: (line: FileDiffLine, index: number) => ReactNode;
   size?: FileDiffSize;
@@ -442,6 +443,7 @@ export interface FileDiffProps
 export function FileDiff({
   className,
   emptyLabel = "No diff lines",
+  layout = "unified",
   lines,
   onScroll,
   renderContent,
@@ -456,6 +458,52 @@ export function FileDiff({
   const classes = ["codex-ui-file-diff", className]
     .filter(Boolean)
     .join(" ");
+  const indexedLines = lines.map((line, index) => ({ index, line }));
+  const splitRows: Array<{
+    after?: (typeof indexedLines)[number];
+    before?: (typeof indexedLines)[number];
+    spanning?: (typeof indexedLines)[number];
+  }> = [];
+
+  if (layout === "split") {
+    for (let index = 0; index < indexedLines.length; ) {
+      const current = indexedLines[index];
+      if (current.line.kind === "deletion") {
+        const before: Array<(typeof indexedLines)[number]> = [];
+        const after: Array<(typeof indexedLines)[number]> = [];
+        while (indexedLines[index]?.line.kind === "deletion") {
+          before.push(indexedLines[index]);
+          index += 1;
+        }
+        while (indexedLines[index]?.line.kind === "addition") {
+          after.push(indexedLines[index]);
+          index += 1;
+        }
+        for (
+          let pairIndex = 0;
+          pairIndex < Math.max(before.length, after.length);
+          pairIndex += 1
+        ) {
+          splitRows.push({
+            after: after[pairIndex],
+            before: before[pairIndex],
+          });
+        }
+        continue;
+      }
+      if (current.line.kind === "addition") {
+        splitRows.push({ after: current });
+      } else if (current.line.kind === "context") {
+        splitRows.push({ after: current, before: current });
+      } else {
+        splitRows.push({ spanning: current });
+      }
+      index += 1;
+    }
+  }
+
+  const contentFor = ({ index, line }: (typeof indexedLines)[number]) =>
+    renderContent?.(line, index) ?? line.tokens ?? (line.content || " ");
 
   const updateFade = () => {
     const element = rootRef.current;
@@ -492,6 +540,7 @@ export function FileDiff({
       className={classes}
       data-fade-bottom={fade.bottom || undefined}
       data-fade-top={fade.top || undefined}
+      data-layout={layout}
       data-size={size}
       data-wrap={wrapLines || undefined}
       onScroll={(event) => {
@@ -507,6 +556,72 @@ export function FileDiff({
         <span className="codex-ui-file-diff__empty" role="listitem">
           {emptyLabel}
         </span>
+      ) : layout === "split" ? (
+        splitRows.map((row, index) => {
+          if (row.spanning) {
+            const { line } = row.spanning;
+            return (
+              <div
+                aria-label={`${diffLineLabels[line.kind]}: ${line.content}`}
+                className="codex-ui-file-diff__split-row"
+                data-line-kind={line.kind}
+                key={`span:${row.spanning.index}:${line.kind}`}
+                role="listitem"
+              >
+                <span className="codex-ui-file-diff__split-spanning">
+                  <span
+                    aria-hidden="true"
+                    className="codex-ui-file-diff__line-number"
+                  />
+                  <code>{contentFor(row.spanning)}</code>
+                </span>
+              </div>
+            );
+          }
+
+          const labelEntries =
+            row.before?.index === row.after?.index
+              ? [row.before]
+              : [row.before, row.after];
+          const labels = labelEntries.flatMap((entry) =>
+            entry
+              ? [`${diffLineLabels[entry.line.kind]}: ${entry.line.content}`]
+              : [],
+          );
+          return (
+            <div
+              aria-label={labels.join("; ")}
+              className="codex-ui-file-diff__split-row"
+              data-line-kind={
+                row.before?.line.kind === "context" ? "context" : "change"
+              }
+              key={`pair:${index}:${row.before?.index ?? ""}:${row.after?.index ?? ""}`}
+              role="listitem"
+            >
+              {(["before", "after"] as const).map((side) => {
+                const entry = row[side];
+                return (
+                  <span
+                    className="codex-ui-file-diff__split-pane"
+                    data-line-kind={entry?.line.kind ?? "empty"}
+                    data-side={side === "before" ? "old" : "new"}
+                    key={side}
+                  >
+                    <span
+                      aria-hidden="true"
+                      className="codex-ui-file-diff__line-number"
+                    >
+                      {side === "before"
+                        ? entry?.line.oldLineNumber ?? ""
+                        : entry?.line.newLineNumber ?? ""}
+                    </span>
+                    <code>{entry ? contentFor(entry) : " "}</code>
+                  </span>
+                );
+              })}
+            </div>
+          );
+        })
       ) : (
         lines.map((line, index) => (
           <div
@@ -526,9 +641,7 @@ export function FileDiff({
               {diffLinePrefixes[line.kind]}
             </span>
             <code>
-              {renderContent?.(line, index) ??
-                line.tokens ??
-                (line.content || " ")}
+              {contentFor({ index, line })}
             </code>
           </div>
         ))
@@ -894,6 +1007,9 @@ export function FileReviewWorkspace({
   const visibleFiles = files.filter((file) =>
     file.path.toLocaleLowerCase().includes(filter.trim().toLocaleLowerCase()),
   );
+  const allDiffsCollapsed =
+    files.length > 0 &&
+    files.every(({ path }) => collapsedPaths.has(path));
   const icon = (name: FileReviewWorkspaceIconName) => (
     <span aria-hidden="true" className="codex-ui-file-review-workspace__icon">
       {icons[name] ?? fileReviewWorkspaceFallbackIcons[name]}
@@ -921,6 +1037,16 @@ export function FileReviewWorkspace({
     if (selectedPath && files.some(({ path }) => path === selectedPath)) return;
     setSelectedPath(files[0]?.path ?? null);
   }, [files, selectedPath]);
+
+  useLayoutEffect(() => {
+    const currentPaths = new Set(files.map(({ path }) => path));
+    setCollapsedPaths((current) => {
+      const next = new Set(
+        [...current].filter((path) => currentPaths.has(path)),
+      );
+      return next.size === current.size ? current : next;
+    });
+  }, [files]);
 
   return (
     <div
@@ -996,13 +1122,11 @@ export function FileReviewWorkspace({
           </button>
           <button
             aria-label={
-              collapsedPaths.size === files.length
-                ? "Expand all diffs"
-                : "Collapse all diffs"
+              allDiffsCollapsed ? "Expand all diffs" : "Collapse all diffs"
             }
             onClick={() =>
-              setCollapsedPaths((current) =>
-                current.size === files.length
+              setCollapsedPaths(() =>
+                allDiffsCollapsed
                   ? new Set()
                   : new Set(files.map(({ path }) => path)),
               )
@@ -1156,6 +1280,7 @@ export function FileReviewWorkspace({
                   content.kind === "diff" ? (
                     <FileDiff
                       aria-label={`Review diff for ${file.path}`}
+                      layout={split ? "split" : "unified"}
                       lines={content.lines}
                       tabIndex={0}
                       wrapLines={false}
