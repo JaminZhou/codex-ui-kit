@@ -1497,6 +1497,31 @@ local-only 1180×820 comparison passes at 0.2221% for the masked route and
 3.7068% for Create under 3.5% and 4% ceilings respectively, using
 `CODEX_UI_KIT_CURRENT_PROJECTS_INDEX_REFERENCE`.
 
+## Current command-approval denial sample
+
+The `26.810.52044` approval probe used one isolated second process with a
+unique `/private/tmp` profile and loopback-only port `9564`. A first diagnostic
+`open -a Calculator` completed without asking in this build, so it was not
+promoted as approval evidence; the exact Calculator process was closed. The
+accepted fresh task requested only `touch` of one uniquely named Desktop
+sentinel and stopped at the real approval surface. The sentinel remained
+absent before pending, after Deny, and after final settlement.
+
+At 1180×820 the card is 736×162px and replaces the Composer. The split action
+row exposes 28px `Deny Esc`, `Allow once ⏎`, and options controls. The options
+surface is 193.22×67.13px with `Allow once` and `Allow similar commands`;
+Escape closes it and restores focus to the trigger. Denial yields
+`Worked for 1m 53s`, keeps the command unexecuted, and restores the empty
+736×98 Composer with `Ask for approval`. The exact Ask-mode hand SVG was
+captured independently from the non-ask shield under the same ASAR fingerprint.
+
+Browser/CDP locks geometry, shortcut hints, menu contents, no-execution state,
+and focus recovery. Electron repeats menu dismissal and denial. Local-only
+card/menu/Composer crops pass at 3.5133%, 4.7096%, and 2.1642% under 4%, 5%,
+and 3.5% ceilings. Private paths, screenshots, and disposable profiles are not
+committed; both isolated profiles were moved recoverably to Trash after their
+exact processes, handlers, and loopback listeners were gone.
+
 ## Required flow matrix
 
 ### 1. Application entry and navigation

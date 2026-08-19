@@ -77,6 +77,29 @@ describe("ApprovalRequest", () => {
     expect(
       screen.getByRole("button", { name: "Approval options" }),
     ).toBeTruthy();
+    expect(screen.getByText("Esc").tagName).toBe("KBD");
+    expect(screen.getByText("⏎").tagName).toBe("KBD");
+    expect(screen.getByRole("button", { name: "Deny" })).toBeTruthy();
+    expect(screen.getByRole("button", { name: "Allow once" })).toBeTruthy();
+  });
+
+  it("accepts an exact options glyph without changing its accessible name", () => {
+    render(
+      <ApprovalRequest
+        approvalOptionsIcon={<svg data-testid="options-icon" />}
+        kind="command"
+        onApprove={() => undefined}
+        onReject={() => undefined}
+        presentation="composer"
+        scopedApproveAction={{ onClick: () => undefined }}
+        title="Run command?"
+      />,
+    );
+
+    expect(screen.getByTestId("options-icon")).toBeTruthy();
+    expect(
+      screen.getByRole("button", { name: "Approval options" }),
+    ).toBeTruthy();
   });
 
   it("keeps the generic approve and reject labels compatible", () => {

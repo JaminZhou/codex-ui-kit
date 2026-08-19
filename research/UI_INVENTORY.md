@@ -76,7 +76,7 @@ observation from a previous build remains historical evidence.
   previous-build regression evidence and have been downgraded from `verified`
   to `partial_legacy` until they are reached again on the current fingerprint.
 
-Current inventory: 89 surface groups; 29 have current-build runtime evidence, 44 have previous-build-only runtime evidence, 16 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 28 groups and Electron verification covers 28.
+Current inventory: 89 surface groups; 30 have current-build runtime evidence, 43 have previous-build-only runtime evidence, 16 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 29 groups and Electron verification covers 29.
 Prior acceptance outside those 28 sampled current-build groups remains
 recorded as `partial_legacy` until current-build re-observation.
 
@@ -992,7 +992,19 @@ review path. This remains structural plus independent replay evidence: a safe
 real-product `acceptForSession` or auto-review timeout transition has not been
 sampled. Repeated denial, other non-command approval kinds, and rule lifetime
 across thread/restart boundaries also remain open; the denial runtime sample
-remains previous-build evidence.
+is now current-build evidence.
+
+The `26.810.52044` denial refresh uses a single outside-project empty-file
+sentinel because `open -a Calculator` no longer prompts under the sampled
+current policy. The real 736×162 pending card locks `Working for 1m 15s`, exact
+Terminal/chevron assets, 28px actions, `Esc`/`⏎` keycaps, and the
+193.22×67.13 two-choice menu. Escape restores trigger focus; Deny leaves the
+sentinel absent, settles as `Worked for 1m 53s`, and restores the 736×98 empty
+Composer with `Ask for approval`. Browser/CDP and Electron repeat the path.
+The local-only card, menu, and Composer comparisons pass at 3.5133%, 4.7096%,
+and 2.1642% under 4%, 5%, and 3.5% limits. This promotes only command denial;
+Allow once/matching-rule paths retain their previous-build evidence and other
+approval kinds remain open.
 
 The current attachment slice used a separate `26.730.61309` new chat and a
 synthetic 1×1 PNG delivered through the Composer paste path, avoiding the

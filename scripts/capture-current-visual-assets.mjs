@@ -1055,7 +1055,10 @@ try {
     ) {
       composerStructuralSemanticIds.set(
         composerPermissionInput.svg,
-        "composer-permission",
+        composerPermissionInput.owner.textContent?.trim() ===
+          "Ask for approval"
+          ? "composer-permission-ask"
+          : "composer-permission",
       );
       composerStructuralSemanticIds.set(
         composerModelChevronInput.svg,
@@ -1377,6 +1380,7 @@ try {
       "composer-branch",
       "composer-add-files",
       "composer-permission",
+      "composer-permission-ask",
       "composer-model-chevron",
       "composer-dictate",
       "composer-voice",
@@ -2019,12 +2023,10 @@ try {
       { id: "settings-worktrees", label: "Worktrees" },
       { id: "settings-archived-chats", label: "Archived chats" },
     ];
-    const gitNavigation = main
-      .locator("nav:visible")
-      .getByRole("button", {
-        name: "Git",
-        exact: true,
-      });
+    const gitNavigation = main.getByRole("button", {
+      name: "Git",
+      exact: true,
+    });
     if ((await gitNavigation.count()) !== 1) {
       throw new Error("Settings route lost its unique Git navigation item.");
     }

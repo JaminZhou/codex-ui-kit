@@ -4884,7 +4884,11 @@ export function App() {
                 >
                   <span aria-hidden="true">
                     {currentComposerComposition ? (
-                      <CurrentBuildIcon name="composer-permission" />
+                      selectedComposerPermission.id === "ask" ? (
+                        <CurrentBuildIcon name="composer-permission-ask" />
+                      ) : (
+                        <CurrentBuildIcon name="composer-permission" />
+                      )
                     ) : (
                       "◉"
                     )}
@@ -5092,12 +5096,20 @@ export function App() {
     : undefined;
   const composer = currentPendingApproval ? (
     <ApprovalRequest
+      approvalOptionsIcon={
+        <CurrentBuildIcon name="composer-model-chevron" />
+      }
       autoFocus={false}
       data-item-id={currentPendingApproval.itemId}
       data-testid="current-approval-request"
       description={currentPendingApproval.command}
       identity={
         currentPendingApproval.kind === "file" ? "Edit files" : "Terminal"
+      }
+      identityIcon={
+        currentPendingApproval.kind === "file" ? undefined : (
+          <CurrentBuildIcon name="thread-command-terminal" />
+        )
       }
       kind={currentPendingApproval.kind}
       onApprove={() =>
@@ -5128,7 +5140,9 @@ export function App() {
       title={
         currentPendingApproval.kind === "file"
           ? "Allow ChatGPT to edit the following file?"
-          : "Allow opening the requested local application?"
+          : scenarioId === "approval-denied"
+            ? "是否允许创建这个指定的 Desktop 哨兵文件?"
+            : "Allow opening the requested local application?"
       }
     />
   ) : (
@@ -8611,6 +8625,7 @@ export function App() {
       if (
         isCurrentApprovalReplay &&
         (command.id === "command-open-calculator" ||
+          command.id === "command-create-approval-sentinel" ||
           command.id === "command-open-calculator-once" ||
           command.id === "command-open-calculator-similar-first" ||
           command.id === "command-open-calculator-similar-second")
@@ -8622,7 +8637,7 @@ export function App() {
             ? 273_000
             : scenarioId === "approval-similar-commands"
               ? 98_000
-              : 14_000;
+          : 75_000;
         const completedTurnDurationMs = command.turnId
           ? state.turnDurationsMs[command.turnId]
           : undefined;
@@ -8637,7 +8652,9 @@ export function App() {
                     ? pendingDurationMs
                     : (completedTurnDurationMs ??
                       state.turnDurationMs ??
-                      23_000)
+                      (scenarioId === "approval-denied"
+                        ? 113_000
+                        : 23_000))
                 }
                 status={pending ? "working" : "worked"}
               />

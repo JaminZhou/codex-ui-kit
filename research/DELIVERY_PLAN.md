@@ -14,9 +14,9 @@ exit gates; it does not replace the inventory.
   Desktop `26.810.52044` (`6662`). Unsampled earlier-build surfaces remain
   previous-build regression evidence rather than current verification.
 - The inventory contains 89 surface groups: 59 P0, 21 P1, and 9 P2.
-- 29 groups have current-build runtime evidence, 44 have previous-build-only
+- 30 groups have current-build runtime evidence, 43 have previous-build-only
   runtime evidence, and 16 have not been sampled.
-- The scoped `26.810.52044` refresh revalidates 97
+- The scoped `26.810.52044` refresh revalidates 98
   sidebar/menu/window-chrome/Composer/Settings/completed-thread icons against
   exact runtime evidence. It adds Voice and Activity-attention, widens Help to
   320px, removes the Account Usage chevron and thread-header New chat action,
@@ -46,6 +46,11 @@ exit gates; it does not replace the inventory.
   creation/routing acceptance, and local-only 0.2221% route plus 3.7068%
   Create-region comparisons now replace the previous-build-only primary route
   denominator without claiming every loading/error/pending-worktree variant.
+  The current approval follow-up reaches one real outside-project command
+  prompt, options menu, safe denial, proven no-execution state, and Composer
+  recovery. It distinguishes the exact Ask-mode hand glyph from the non-ask
+  shield and adds current Browser/CDP, Electron, and three regional pixel gates
+  without promoting Allow or other approval kinds.
   Earlier hover/footer slices promoted More, Pin,
   Archive, and Help, confirms that Settings is absent from the sampled footer
   and that sampled project-task rows have no leading glyph. The Recents follow-up
@@ -426,8 +431,9 @@ separately versioned evidence. The streaming row is now also refreshed on the
 same current build with one real 1180→720 running resize and natural
 completion: reverse-origin follow, negative compact clipping, exact 16px Stop
 SVG in its 28px control, and Send recovery pass Browser/CDP plus independent
-wide/compact regional pixels. Tool, approval, file, interruption, compaction,
-and long-thread convergence remain the next Stage 2 work. The shared
+  wide/compact regional pixels. Command denial is now current as well; file,
+  remaining approval kinds, interruption, compaction, and long-thread
+  convergence remain the next Stage 2 work. The shared
 surface-token change affected 28 deterministic lifecycle baselines; each was
 reviewed and refreshed, and all 188 frames still pass their existing thresholds.
 

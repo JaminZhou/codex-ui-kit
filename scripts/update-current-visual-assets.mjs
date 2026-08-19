@@ -247,9 +247,20 @@ const promotionSpecs = new Map([
     {
       ownerAriaLabel: null,
       ownerEvidence:
-        "one visible 16px current Composer permission control after Add files",
+        "one visible 16px current non-ask Composer permission control after Add files",
       region: "composer",
+      retainExistingWhenAbsentOnSameFingerprint: true,
       semanticId: "composer-permission",
+    },
+  ],
+  [
+    "composer-permission-ask",
+    {
+      ownerAriaLabel: null,
+      ownerEvidence:
+        "one visible 16px current Ask for approval Composer control after Add files",
+      region: "composer",
+      semanticId: "composer-permission-ask",
     },
   ],
   [
@@ -1384,10 +1395,16 @@ if (hooksOnly) {
   process.exit(0);
 }
 const composerTerminalIds = new Set(["composer-send", "composer-voice"]);
+const composerPermissionIds = new Set([
+  "composer-permission",
+  "composer-permission-ask",
+]);
 const expectedComposerIds = [...promotionSpecs.entries()]
   .filter(
     ([id, spec]) =>
-      spec.region === "composer" && !composerTerminalIds.has(id),
+      spec.region === "composer" &&
+      !composerTerminalIds.has(id) &&
+      !composerPermissionIds.has(id),
   )
   .map(([id]) => id)
   .sort();
@@ -1398,6 +1415,13 @@ const capturedComposerIds = capture.icons
 const capturedComposerRequiredIds = capturedComposerIds.filter(
   (id) => !composerTerminalIds.has(id),
 );
+const capturedComposerPermissionIds = capturedComposerRequiredIds.filter(
+  (id) => composerPermissionIds.has(id),
+);
+const expectedCapturedComposerIds = [
+  ...expectedComposerIds,
+  ...capturedComposerPermissionIds,
+].sort();
 const capturedComposerTerminalIds = capturedComposerIds.filter((id) =>
   composerTerminalIds.has(id),
 );
@@ -1405,8 +1429,9 @@ if (
   capture.composerObservation?.topContextIconCount !== 3 ||
   capture.composerObservation?.bottomActionIconCount !== 5 ||
   capture.composerObservation?.exactSemanticIconCount !== 8 ||
+  capturedComposerPermissionIds.length !== 1 ||
   canonicalize(capturedComposerRequiredIds) !==
-    canonicalize(expectedComposerIds) ||
+    canonicalize(expectedCapturedComposerIds) ||
   canonicalize(capturedComposerTerminalIds) !==
     canonicalize(["composer-send", "composer-voice"])
 ) {
@@ -1415,7 +1440,7 @@ if (
       capturedComposerIds,
       capturedComposerTerminalIds,
       composerObservation: capture.composerObservation,
-      expectedComposerIds,
+      expectedComposerIds: expectedCapturedComposerIds,
     })}`,
   );
 }

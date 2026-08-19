@@ -19,10 +19,34 @@ describe("approval visual contract", () => {
 
   it("locks the 162px current Composer-dock presentation", () => {
     expect(styles).toMatch(
-      /\.codex-ui-approval-request\[data-presentation="composer"\] \{[\s\S]*?border-radius: 1\.5625rem;[\s\S]*?min-height: 10\.125rem;/,
+      /\.codex-ui-approval-request\[data-presentation="composer"\] \{[\s\S]*?border-radius: 1\.5625rem;[\s\S]*?height: 10\.125rem;[\s\S]*?min-height: 10\.125rem;/,
     );
     expect(styles).toMatch(
       /\.codex-ui-approval-request\[data-presentation="composer"\][\s\S]*?\.codex-ui-approval-request__description \{[\s\S]*?border-radius: var\(--codex-ui-radius-md\);/,
+    );
+    expect(styles).toMatch(
+      /\.codex-ui-approval-request\[data-presentation="composer"\][\s\S]*?\.codex-ui-approval-request__button \{[\s\S]*?border-radius: var\(--codex-ui-radius-full\);[\s\S]*?min-height: 1\.75rem;/,
+    );
+    expect(styles).toMatch(
+      /\.codex-ui-approval-request__shortcut \{[\s\S]*?height: 1\.125rem;[\s\S]*?min-width: 1\.25rem;/,
+    );
+    expect(styles).toMatch(
+      /\.codex-ui-approval-request\[data-presentation="composer"\][\s\S]*?\.codex-ui-approval-request__button\[data-action="reject"\] \{[\s\S]*?min-width: 5\.349609375rem;/,
+    );
+    expect(styles).toMatch(
+      /\.codex-ui-approval-request\[data-presentation="composer"\][\s\S]*?\.codex-ui-approval-request__button\[data-action="approve"\] \{[\s\S]*?min-width: 6\.7265625rem;/,
+    );
+  });
+
+  it("locks the current split trigger and approval options menu", () => {
+    expect(styles).toMatch(
+      /\.codex-ui-approval-request__options-toggle \{[\s\S]*?flex: 0 0 1\.5rem;[\s\S]*?width: 1\.5rem;/,
+    );
+    expect(styles).toMatch(
+      /\.codex-ui-approval-request__options-menu \{[\s\S]*?border-radius: 0\.9375rem;[\s\S]*?gap: 0\.125rem;[\s\S]*?padding: 0\.25rem;/,
+    );
+    expect(styles).toMatch(
+      /\.codex-ui-approval-request__options-menu button \{[\s\S]*?min-height: 1\.78515625rem;[\s\S]*?padding: 0 0\.5rem;/,
     );
   });
 

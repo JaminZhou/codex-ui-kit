@@ -2105,7 +2105,13 @@ for (const scene of selectedScenes) {
       );
       const expectedCurrentComposerIcons = [
         { height: 16, name: "composer-add-files", width: 16 },
-        { height: 16, name: "composer-permission", width: 16 },
+        {
+          height: 16,
+          name: scene.scenario.startsWith("mcp-")
+            ? "composer-permission"
+            : "composer-permission-ask",
+          width: 16,
+        },
         { height: 14, name: "composer-model-chevron", width: 14 },
         { height: 16, name: "composer-dictate", width: 16 },
       ];
@@ -5899,6 +5905,18 @@ for (const scene of selectedScenes) {
       scene.scenario === "approval-allow-once" ||
       scene.scenario === "approval-similar-commands"
     ) {
+      if (scene.id === "approval-current-options") {
+        await page
+          .getByTestId("current-approval-request")
+          .getByRole("button", { name: "Approval options" })
+          .click();
+        await page
+          .locator(
+            '.codex-ui-approval-request__options-menu [role="menuitem"]',
+          )
+          .filter({ hasText: "Allow similar commands" })
+          .waitFor();
+      }
       const approvalContract = await page.evaluate(() => {
         const rect = (element) => {
           if (!element) return null;
@@ -5928,6 +5946,14 @@ for (const scene of selectedScenes) {
                 actionLabels: [...approval.querySelectorAll("button")].map(
                   (button) => ({
                     ariaLabel: button.getAttribute("aria-label"),
+                    dataAction: button.getAttribute("data-action"),
+                    rect: rect(button),
+                    shortcut:
+                      button
+                        .querySelector(
+                          ".codex-ui-approval-request__shortcut",
+                        )
+                        ?.textContent?.trim() ?? null,
                     text: button.textContent?.replace(/\s+/g, " ").trim(),
                   }),
                 ),
@@ -5936,6 +5962,24 @@ for (const scene of selectedScenes) {
                 rect: rect(approval),
               }
             : null,
+          approvalOptions: (() => {
+            const menu = document.querySelector(
+              ".codex-ui-approval-request__options-menu",
+            );
+            return menu
+              ? {
+                  items: Array.from(
+                    menu.querySelectorAll('[role="menuitem"]'),
+                    (item) =>
+                      item.firstElementChild?.textContent
+                        ?.replace(/\s+/g, " ")
+                        .trim() ??
+                      item.textContent?.replace(/\s+/g, " ").trim(),
+                  ),
+                  rect: rect(menu),
+                }
+              : null;
+          })(),
           assistantText:
             [...document.querySelectorAll(
               '.codex-ui-agent-message[data-role="assistant"]',
@@ -5953,11 +5997,15 @@ for (const scene of selectedScenes) {
           composer: composer ? rect(composer) : null,
           permissionLabel:
             permissionTrigger?.textContent?.replace(/^◉/, "").trim() ?? null,
+          permissionIconName:
+            permissionTrigger
+              ?.querySelector("[data-current-build-icon]")
+              ?.getAttribute("data-current-build-icon") ?? null,
         };
       });
       if (scene.id === "approval-current-denied") {
         await page
-          .getByRole("button", { exact: true, name: "Worked for 23s" })
+          .getByRole("button", { exact: true, name: "Worked for 1m 53s" })
           .click();
         approvalContract.commandSummary = await page
           .locator(
@@ -5986,6 +6034,7 @@ for (const scene of selectedScenes) {
       }
       const pendingApprovalScene =
         scene.id === "approval-current-pending" ||
+        scene.id === "approval-current-options" ||
         scene.id === "approval-current-allow-once-pending" ||
         scene.id === "approval-current-similar-menu";
       const expectedPendingDuration =
@@ -5993,7 +6042,11 @@ for (const scene of selectedScenes) {
           ? "Working for 4m 33s"
           : scene.id === "approval-current-similar-menu"
             ? "Working for 1m 38s"
-          : "Working for 14s";
+            : "Working for 1m 15s";
+      const expectedPendingCommand =
+        scene.scenario === "approval-denied"
+          ? "Running touch /outside/project/approval-sentinel"
+          : "Running open -a Calculator";
       if (
         pendingApprovalScene &&
         (!approvalContract.approval ||
@@ -6004,14 +6057,19 @@ for (const scene of selectedScenes) {
           Math.abs(approvalContract.approval.rect.width - 736) > 1 ||
           Math.abs(approvalContract.approval.rect.height - 162) > 1 ||
           approvalContract.activitySummary !== expectedPendingDuration ||
-          approvalContract.commandSummary !==
-            "Running open -a Calculator" ||
+          approvalContract.commandSummary !== expectedPendingCommand ||
           approvalContract.composer !== null ||
           !approvalContract.approval.actionLabels.some(
-            ({ text }) => text === "Deny",
+            ({ dataAction, shortcut, text }) =>
+              dataAction === "reject" &&
+              shortcut === "Esc" &&
+              text === "DenyEsc",
           ) ||
           !approvalContract.approval.actionLabels.some(
-            ({ text }) => text === "Allow once",
+            ({ dataAction, shortcut, text }) =>
+              dataAction === "approve" &&
+              shortcut === "⏎" &&
+              text === "Allow once⏎",
           ) ||
           !approvalContract.approval.actionLabels.some(
             ({ ariaLabel }) => ariaLabel === "Approval options",
@@ -6022,19 +6080,55 @@ for (const scene of selectedScenes) {
         );
       }
       if (
+        scene.id === "approval-current-options" &&
+        (!approvalContract.approvalOptions ||
+          JSON.stringify(approvalContract.approvalOptions.items) !==
+            JSON.stringify(["Allow once", "Allow similar commands"]) ||
+          Math.abs(approvalContract.approvalOptions.rect.width - 193) > 2 ||
+          Math.abs(approvalContract.approvalOptions.rect.height - 68) > 2 ||
+          Math.abs(
+            approvalContract.approvalOptions.rect.top -
+              approvalContract.approval.rect.top -
+              49,
+          ) > 2)
+      ) {
+        throw new Error(
+          `${scene.id}: current approval options contract failed: ${JSON.stringify(approvalContract)}`,
+        );
+      }
+      if (scene.id === "approval-current-options") {
+        await page.keyboard.press("Escape");
+        const dismissedOptions = await page.evaluate(() => ({
+          activeLabel: document.activeElement?.getAttribute("aria-label"),
+          menuCount: document.querySelectorAll(
+            ".codex-ui-approval-request__options-menu",
+          ).length,
+        }));
+        if (
+          dismissedOptions.activeLabel !== "Approval options" ||
+          dismissedOptions.menuCount !== 0
+        ) {
+          throw new Error(
+            `${scene.id}: Escape did not dismiss options and restore trigger focus: ${JSON.stringify(dismissedOptions)}`,
+          );
+        }
+      }
+      if (
         scene.id === "approval-current-denied" &&
         (approvalContract.approval !== null ||
-          approvalContract.activitySummary !== "Worked for 23s" ||
+          approvalContract.activitySummary !== "Worked for 1m 53s" ||
           approvalContract.commandSummary !==
-            "Did not run open -a Calculator" ||
+            "Did not run touch /outside/project/approval-sentinel" ||
           approvalContract.assistantText !==
-            "Approval was not granted, so the command was not run." ||
+            "未获批准，命令未执行。" ||
           !approvalContract.composer ||
           Math.abs(approvalContract.composer.left - 359) > 1 ||
           Math.abs(approvalContract.composer.top - 706) > 1 ||
           Math.abs(approvalContract.composer.width - 736) > 1 ||
           Math.abs(approvalContract.composer.height - 98) > 1 ||
-          approvalContract.permissionLabel !== "Ask for approval")
+          approvalContract.permissionLabel !== "Ask for approval" ||
+          approvalContract.permissionIconName !==
+            "composer-permission-ask")
       ) {
         throw new Error(
           `${scene.id}: current denied approval contract failed: ${JSON.stringify(approvalContract)}`,
@@ -8667,7 +8761,8 @@ for (const scene of selectedScenes) {
 
     if (
       scene.id !== "composer-disabled" &&
-      scene.id !== "approval-current-pending"
+      scene.id !== "approval-current-pending" &&
+      scene.id !== "approval-current-options"
     ) {
       const expectedFocus = scene.surfaces?.includes("reviewPanel")
         ? contract.review.firstContentLabel
