@@ -4274,6 +4274,7 @@ describe("workspace panel", () => {
       <WorkspacePanel
         actions={<button type="button">Open in browser</button>}
         activeTabId="sources"
+        closeIcon={<span data-testid="workspace-close-icon">×</span>}
         label="Workspace"
         onActiveTabChange={onActiveTabChange}
         onClose={onClose}
@@ -4300,6 +4301,7 @@ describe("workspace panel", () => {
     expect(
       screen.getByRole("button", { name: "Open in browser" }),
     ).toBeTruthy();
+    expect(screen.getAllByTestId("workspace-close-icon")).toHaveLength(2);
 
     const sourceTab = screen.getByRole("tab", { name: "Sources" });
     const reviewTab = screen.getByRole("tab", { name: "Review" });

@@ -1,13 +1,21 @@
 // @vitest-environment happy-dom
 
-import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import {
+  cleanup,
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+} from "@testing-library/react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import {
   FileChange,
   FileChangeGroup,
   FileDiff,
+  FileRevertErrorDialog,
   FileReview,
+  FileReviewWorkspace,
   fileDiffToText,
   type FileDiffLine,
 } from "../src";
@@ -572,5 +580,132 @@ describe("FileReview", () => {
     } finally {
       stringify.mockRestore();
     }
+  });
+});
+
+describe("FileReviewWorkspace", () => {
+  const files = [
+    {
+      additions: 1,
+      change: "added" as const,
+      deletions: 0,
+      lines: [{ content: "added", kind: "addition" as const }],
+      path: "probe/added.txt",
+    },
+    {
+      additions: 1,
+      change: "modified" as const,
+      deletions: 2,
+      lines: [
+        { content: "old", kind: "deletion" as const },
+        { content: "new", kind: "addition" as const },
+      ],
+      path: "probe/alpha.txt",
+    },
+    {
+      additions: 0,
+      change: "deleted" as const,
+      deletions: 2,
+      lines: [{ content: "obsolete", kind: "deletion" as const }],
+      path: "probe/obsolete.txt",
+    },
+  ];
+
+  it("covers the current Review toolbar, scope, filter, and layout states", () => {
+    const onScopeChange = vi.fn();
+    const { container } = render(
+      <FileReviewWorkspace files={files} onScopeChange={onScopeChange} />,
+    );
+
+    expect(screen.getByText("+2")).toBeTruthy();
+    expect(screen.getByText("−4")).toBeTruthy();
+    fireEvent.click(screen.getByRole("button", { name: "Last Turn" }));
+    expect(screen.getByRole("menu", { name: "Review scope" })).toBeTruthy();
+    expect(screen.getAllByRole("menuitemradio")).toHaveLength(6);
+    fireEvent.click(screen.getByRole("menuitemradio", { name: "Uncommitted" }));
+    expect(onScopeChange).toHaveBeenCalledWith("Uncommitted");
+
+    fireEvent.change(screen.getByPlaceholderText("Filter files…"), {
+      target: { value: "alpha" },
+    });
+    expect(screen.getAllByRole("treeitem")).toHaveLength(1);
+    expect(screen.getByRole("treeitem").textContent).toContain("alpha.txt");
+
+    fireEvent.click(
+      screen.getByRole("button", { name: "Collapse all diffs" }),
+    );
+    expect(screen.queryByRole("list", { name: /Review diff for/ })).toBeNull();
+    fireEvent.click(screen.getByRole("button", { name: "Expand all diffs" }));
+    expect(
+      screen.getByRole("list", { name: "Review diff for probe/alpha.txt" }),
+    ).toBeTruthy();
+
+    fireEvent.click(screen.getByRole("button", { name: "Switch to split diff" }));
+    expect(
+      container.querySelector(".codex-ui-file-review-workspace")?.getAttribute(
+        "data-layout",
+      ),
+    ).toBe("split");
+    fireEvent.click(screen.getByRole("button", { name: "Hide files" }));
+    expect(screen.queryByRole("complementary", { name: "Changed files" })).toBeNull();
+  });
+
+  it("exposes all changed files through the jump listbox", async () => {
+    render(<FileReviewWorkspace files={files} />);
+
+    const jump = screen.getByRole("button", { name: "Jump to file" });
+    fireEvent.click(jump);
+
+    expect(screen.getByRole("listbox", { name: "Changed files" })).toBeTruthy();
+    const options = screen.getAllByRole("option");
+    expect(options).toHaveLength(3);
+    expect(options[0].getAttribute("aria-selected")).toBe("true");
+
+    options[2].focus();
+    fireEvent.keyDown(options[2], { key: "Escape" });
+    expect(screen.queryByRole("listbox", { name: "Changed files" })).toBeNull();
+    await waitFor(() => expect(document.activeElement).toBe(jump));
+  });
+
+  it("tracks changed file collections without selector escaping", () => {
+    const { rerender } = render(<FileReviewWorkspace files={files} />);
+    fireEvent.click(screen.getByRole("treeitem", { name: /alpha\.txt/ }));
+
+    const nextFiles = [
+      {
+        additions: 1,
+        change: "added" as const,
+        deletions: 0,
+        lines: [{ content: "new", kind: "addition" as const }],
+        path: 'probe/[new] "quoted".txt',
+      },
+    ];
+    rerender(<FileReviewWorkspace files={nextFiles} />);
+
+    expect(
+      screen
+        .getByRole("treeitem", { name: /quoted/ })
+        .getAttribute("data-selected"),
+    ).toBe("true");
+  });
+});
+
+describe("FileRevertErrorDialog", () => {
+  it("renders the observed Git apply failure and closes from its full-width action", () => {
+    const onOpenChange = vi.fn();
+    render(
+      <FileRevertErrorDialog onOpenChange={onOpenChange} open />,
+    );
+
+    expect(
+      screen.getByRole("dialog", { name: "Failed to revert changes" }),
+    ).toBeTruthy();
+    expect(
+      screen.getByText(
+        "Git apply error: error: patch with only garbage at line 4",
+      ),
+    ).toBeTruthy();
+    fireEvent.click(screen.getByRole("button", { name: "Close" }));
+    expect(onOpenChange).toHaveBeenCalledWith(false);
   });
 });

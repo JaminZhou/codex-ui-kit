@@ -228,11 +228,12 @@
         "cdp-26.721:synthetic-two-file-change-group-undo-review-800x600",
         "cdp-26.721:synthetic-mixed-rename-delete-binary-conflict-review",
         "cdp-26.730.61309:real-delete-card-last-turn-review",
-        "cdp-26.730.61309:real-marker-backed-two-file-rename-review"
+        "cdp-26.730.61309:real-marker-backed-two-file-rename-review",
+        "cdp-26.810.52044:real-three-file-card-added-modified-deleted-undo-review-and-undo-failure"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "partial_legacy",
-      "electronStatus": "partial_legacy",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
       "priority": "p0"
     },
     {
@@ -1025,11 +1026,12 @@
         "cdp-26.721:synthetic-multi-file-review-split-800x600-and-1180x820",
         "cdp-26.721:review-panel-16px-resizer-320px-min-352px-main-and-expand-restore",
         "cdp-26.727.40816:public-pr-nonmodal-side-panel-1180-960-820-720",
-        "cdp-26.730.61309:real-last-turn-review-370px-side-region"
+        "cdp-26.730.61309:real-last-turn-review-370px-side-region",
+        "cdp-26.810.52044:real-review-workspace-382.4375px-wide-336.19px-compact-and-resizable-panel"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "partial_legacy",
-      "electronStatus": "partial_legacy",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
       "priority": "p0"
     },
     {
@@ -1045,11 +1047,12 @@
         "cdp-26.721:synthetic-two-file-stacked-review-diffs",
         "cdp-26.721:synthetic-binary-and-conflict-review-notices",
         "cdp-26.727.40816:public-pr-code-successful-multi-file-diffs-and-display-controls",
-        "cdp-26.730.61309:real-delete-diff-and-marker-backed-rename-diffs"
+        "cdp-26.730.61309:real-delete-diff-and-marker-backed-rename-diffs",
+        "cdp-26.810.52044:real-added-modified-deleted-stacked-diffs-filter-tree-and-split-controls"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "partial_legacy",
-      "electronStatus": "partial_legacy",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
       "priority": "p0"
     },
     {
@@ -1064,11 +1067,12 @@
         "cdp-26.721:synthetic-multi-file-review-close-reopen-lifecycle",
         "cdp-26.721:synthetic-mixed-file-review-selection-and-undo",
         "cdp-26.727.40816:public-pr-code-scroll-height-81492-multi-file-content",
-        "cdp-26.730.61309:real-marker-backed-two-file-rename-selection-and-undo-replay"
+        "cdp-26.730.61309:real-marker-backed-two-file-rename-selection-and-undo-replay",
+        "cdp-26.810.52044:real-three-file-review-scope-filter-collapse-jump-layout-files-and-undo-failure"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "partial_legacy",
-      "electronStatus": "partial_legacy",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
       "priority": "p0"
     },
     {

@@ -281,6 +281,11 @@ try {
     );
   await page.keyboard.press("Escape");
   await projectMenu.waitFor({ state: "hidden" });
+  await page.waitForFunction(
+    () =>
+      document.activeElement?.getAttribute("aria-label") ===
+      "Project actions for session-browser",
+  );
   const projectMenuFocusReturned = await projectMenuTrigger.evaluate(
     (element) => document.activeElement === element,
   );
@@ -355,6 +360,9 @@ try {
   }));
   await page.keyboard.press("Escape");
   await helpMenu.waitFor({ state: "hidden" });
+  await page.waitForFunction(
+    () => document.activeElement?.getAttribute("aria-label") === "Open help menu",
+  );
   if (
     helpMenuIcons.length !== 9 ||
     helpMenuStructure.heading !== "What's new" ||
@@ -409,6 +417,14 @@ try {
   });
   await page.keyboard.press("Escape");
   await accountMenu.waitFor({ state: "hidden" });
+  await page.waitForFunction(() => {
+    const active = document.activeElement;
+    return (
+      active instanceof HTMLButtonElement &&
+      active.getAttribute("role") !== "menuitem" &&
+      (active.textContent?.includes("Demo account") ?? false)
+    );
+  });
   accountMenuContract.focusReturned = await accountMenuTrigger.evaluate(
     (element) => document.activeElement === element,
   );
@@ -4319,6 +4335,117 @@ try {
   );
 } finally {
   await currentReviewApp.close();
+}
+
+const currentReviewFilesScene = {
+  frame: "review-open",
+  id: "electron-current-review-files",
+  scenario: "current-review-files",
+};
+const { app: currentReviewFilesApp, page: currentReviewFilesPage } =
+  await launchScene(currentReviewFilesScene, { capture: false });
+try {
+  await currentReviewFilesPage.waitForSelector(
+    '.codex-ui-app-shell[data-side-panel-open] [data-testid="current-review-workspace"]',
+  );
+  const initialReviewFiles = await currentReviewFilesPage.evaluate(() => {
+    const rect = (selector) => {
+      const element = document.querySelector(selector);
+      if (!(element instanceof Element)) return null;
+      const value = element.getBoundingClientRect();
+      return { height: value.height, left: value.left, top: value.top, width: value.width };
+    };
+    return {
+      changeKinds: Array.from(
+        document.querySelectorAll(".codex-ui-file-change-group__file"),
+        (element) => element.getAttribute("data-change"),
+      ),
+      diffCount: document.querySelectorAll(
+        ".codex-ui-file-review-workspace__diff",
+      ).length,
+      exactIconNames: Array.from(
+        document.querySelectorAll(
+          '.codex-ui-file-review-workspace [data-current-build-icon^="review-"]',
+        ),
+        (element) => element.getAttribute("data-current-build-icon"),
+      ),
+      filter: rect(".codex-ui-file-review-workspace__filter input"),
+      panel: rect(".codex-ui-app-shell__side-panel"),
+      toolbar: rect(".codex-ui-file-review-workspace__toolbar"),
+      treeCount: document.querySelectorAll(
+        '.codex-ui-file-review-workspace__tree [role="treeitem"]',
+      ).length,
+    };
+  });
+  if (
+    JSON.stringify(initialReviewFiles.changeKinds) !==
+      JSON.stringify(["added", "modified", "deleted"]) ||
+    initialReviewFiles.diffCount !== 3 ||
+    initialReviewFiles.treeCount !== 3 ||
+    initialReviewFiles.exactIconNames.length < 17 ||
+    Math.abs((initialReviewFiles.panel?.width ?? 0) - 382.4375) > 1 ||
+    Math.abs((initialReviewFiles.toolbar?.height ?? 0) - 40) > 1 ||
+    Math.abs((initialReviewFiles.filter?.height ?? 0) - 18) > 1 ||
+    Math.abs((initialReviewFiles.filter?.width ?? 0) - 182) > 1
+  ) {
+    throw new Error(
+      `Electron current Review workspace failed: ${JSON.stringify(initialReviewFiles)}`,
+    );
+  }
+
+  const scope = currentReviewFilesPage.getByRole("button", {
+    exact: true,
+    name: "Last Turn",
+  });
+  await scope.click();
+  if ((await currentReviewFilesPage.getByRole("menuitemradio").count()) !== 6) {
+    throw new Error("Electron current Review scope menu is incomplete.");
+  }
+  await currentReviewFilesPage
+    .getByRole("menuitemradio", { name: "Uncommitted" })
+    .click();
+  await currentReviewFilesPage
+    .getByRole("button", { name: "Collapse all diffs" })
+    .click();
+  await currentReviewFilesPage
+    .getByRole("button", { name: "Expand all diffs" })
+    .click();
+  await currentReviewFilesPage
+    .getByRole("button", { name: "Switch to split diff" })
+    .click();
+  await currentReviewFilesPage
+    .getByRole("button", { name: "Hide files" })
+    .click();
+  await currentReviewFilesPage
+    .getByRole("button", { name: "Show files" })
+    .click();
+
+  await currentReviewFilesPage
+    .getByRole("button", { exact: true, name: "Undo" })
+    .click();
+  const failureDialog = currentReviewFilesPage.getByRole("dialog", {
+    name: "Failed to revert changes",
+  });
+  await failureDialog.waitFor();
+  const failureState = await currentReviewFilesPage.evaluate(() => ({
+    fileGroupCount: document.querySelectorAll(
+      '[data-testid="file-change-group"]',
+    ).length,
+    panelOpen:
+      document
+        .querySelector(".codex-ui-app-shell")
+        ?.hasAttribute("data-side-panel-open") ?? false,
+  }));
+  if (failureState.fileGroupCount !== 1 || !failureState.panelOpen) {
+    throw new Error(
+      `Electron current Review Undo failure lost state: ${JSON.stringify(failureState)}`,
+    );
+  }
+  await failureDialog
+    .getByRole("button", { exact: true, name: "Close" })
+    .click();
+} finally {
+  await currentReviewFilesApp.close();
 }
 
 const mixedReviewScene = {

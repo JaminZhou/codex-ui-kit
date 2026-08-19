@@ -7,7 +7,7 @@ not establish full conversation, workspace, application, or product coverage.
 The authoritative current-build inventory is:
 
 - [`26.810.52044.md`](26.810.52044.md) for the current package fingerprint,
-  reproducible global-shell baseline, current sidebar/menu behavior, 92 scoped
+  reproducible global-shell baseline, current sidebar/menu behavior, 115 scoped
   visual assets, Settings/Git navigation, and one successful-command thread;
 - [`26.803.61601.md`](26.803.61601.md) for the previous shell, command,
   Terminal, workspace, Settings, and same-state dark-shell acceptance;
@@ -43,7 +43,7 @@ The authoritative current-build inventory is:
   BrowserWindow; it does not prove parity with unobserved product routes,
   panels, state transitions, or window types.
 - A scoped Codex Desktop `26.810.52044` (`6662`) visual probe revalidates the
-  exact 1180×820 dark/resting asset fingerprint and now retains 98 exact
+  exact 1180×820 dark/resting asset fingerprint and now retains 115 exact
   sidebar/menu/window-chrome/Composer/environment/Settings/completed-thread icons plus
   one separately hashed, playground-only VS Code integration raster. Its sampled sidebar
   hover/footer contract also
@@ -74,6 +74,14 @@ The authoritative current-build inventory is:
   the session-latched warning only after another app restart. Browser/CDP,
   Electron, and a 3.2572% local-only notice crop gate that observed boundary.
   Broader unsampled inventory still keeps global pixel parity ineligible.
+- The current Review follow-up reaches one real added/modified/deleted
+  three-file card, the six-scope Review workspace at 1180×820 and 720×680, and
+  one real Undo failure dialog. Seventeen exact Review SVGs, computed geometry,
+  Browser/CDP interactions, full Electron acceptance, an integrated reviewed
+  baseline, and a 4.3339% local-only product-panel gate replace the previous
+  build for the sampled file-card/side-panel/editor/multi-file family. The
+  captured Git apply error remains setup-specific evidence; successful Undo,
+  binary/conflict product states, and broader PR review variants remain open.
 - The current command follow-up reaches bounded success, exact `exit 7`, Stop,
   persistent stopped-command settlement, and same-thread recovery on
   `26.810.52044`.

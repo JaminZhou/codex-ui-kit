@@ -1236,7 +1236,7 @@ follow-up returned exactly `CURRENT INTERRUPTION RECOVERY ACCEPTED`; the
 current build did not rewrite it to `Ran …`.
 
 The independent fixture and public protocol replay now preserve the stopped
-row through settlement and recovery. Browser/CDP passes 198 lifecycle frames;
+row through settlement and recovery. Browser/CDP passes 202 lifecycle frames;
 the owned local-only failure command/Composer regions differ by 4.2564% and
 2.2194%, while the stopped summary-command/Composer regions differ by 2.5875%
 and 2.2101%, all below independent ceilings. Product screenshots, raw DOM,

@@ -28,7 +28,8 @@ const hooksOnly = process.argv.includes("--hooks-only");
 const threadOnly = process.argv.includes("--thread-only");
 const mcpOnly = process.argv.includes("--mcp-only");
 const projectPickerOnly = process.argv.includes("--project-picker-only");
-if ([hooksOnly, threadOnly, mcpOnly, projectPickerOnly].filter(Boolean).length > 1) {
+const reviewOnly = process.argv.includes("--review-only");
+if ([hooksOnly, threadOnly, mcpOnly, projectPickerOnly, reviewOnly].filter(Boolean).length > 1) {
   throw new Error("Targeted current visual asset modes are mutually exclusive.");
 }
 const supplementalMcpCapturePath =
@@ -41,7 +42,7 @@ if (
   (supplementalMcpCapturePath ||
     supplementalProjectPickerCapturePath ||
     supplementalPermissionCapturePath) &&
-  (hooksOnly || threadOnly || mcpOnly || projectPickerOnly)
+  (hooksOnly || threadOnly || mcpOnly || projectPickerOnly || reviewOnly)
 ) {
   throw new Error(
     "Supplemental visual captures are available only during a full visual asset refresh.",
@@ -745,6 +746,41 @@ const promotionSpecs = new Map([
       semanticId: "settings-hooks-reload",
     },
   ],
+  ...[
+    ["review-tab", null, "current Review tab glyph selected by exact tab text"],
+    ["review-close", "Close Review tab", null],
+    ["review-open-tab", "Open side panel tab", null],
+    ["review-expand", "Expand panel", null],
+    ["review-scope-chevron", "Last Turn", null],
+    ["review-options", "Review options", null],
+    ["review-collapse-all", "Collapse all diffs", null],
+    ["review-jump-file", "Jump to file", null],
+    ["review-split-diff", "Switch to split diff", null],
+    ["review-files-toggle", "Hide files", null],
+    ["review-commit-or-push", "Commit or push", null],
+    ["review-more-git", "More Git actions", null],
+    ["review-copy-path", "Copy path", null],
+    ["review-file-toggle", "Toggle file diff", null],
+    ["review-open-in", "Open in", null],
+    [
+      "review-search",
+      null,
+      "current Review Filter files search glyph selected structurally from its exact input",
+    ],
+    [
+      "review-file-text",
+      null,
+      "current visible Review text-file use resolved against its exact runtime SVG symbol",
+    ],
+  ].map(([id, ownerAriaLabel, ownerEvidence]) => [
+    id,
+    {
+      ownerAriaLabel,
+      ...(ownerEvidence ? { ownerEvidence } : {}),
+      region: "review-panel",
+      semanticId: id,
+    },
+  ]),
 ]);
 
 const manifest = JSON.parse(readFileSync(manifestPath, "utf8"));
@@ -759,6 +795,7 @@ const runCapture = (
   captureThreadOnly,
   captureMcpOnly = false,
   captureProjectPickerOnly = false,
+  captureReviewOnly = false,
 ) =>
   JSON.parse(
     execFileSync(process.execPath, [capturePath], {
@@ -772,6 +809,7 @@ const runCapture = (
         ...(captureProjectPickerOnly
           ? { CODEX_VISUAL_ASSET_PROJECT_PICKER_ONLY: "1" }
           : {}),
+        ...(captureReviewOnly ? { CODEX_VISUAL_ASSET_REVIEW_ONLY: "1" } : {}),
       },
       maxBuffer: 64 * 1024 * 1024,
     }),
@@ -779,7 +817,7 @@ const runCapture = (
 const supplementalThreadCapture = includeThreadCapture
   ? runCapture(true)
   : null;
-let capture = runCapture(threadOnly, mcpOnly, projectPickerOnly);
+let capture = runCapture(threadOnly, mcpOnly, projectPickerOnly, reviewOnly);
 if (conditionalCapturePath) {
   const normalizedProfile = realpathSync(
     process.env.CODEX_VISUAL_ASSET_PROFILE,
@@ -974,6 +1012,169 @@ if (supplementalProjectPickerCapturePath) {
 capture.icons.forEach((icon, index) =>
   sanitizeVisualAssetIcon(icon, `capture.icons[${index}]`),
 );
+if (reviewOnly) {
+  const targetIds = [
+    "review-tab",
+    "review-close",
+    "review-open-tab",
+    "review-expand",
+    "review-scope-chevron",
+    "review-options",
+    "review-collapse-all",
+    "review-jump-file",
+    "review-split-diff",
+    "review-files-toggle",
+    "review-commit-or-push",
+    "review-more-git",
+    "review-copy-path",
+    "review-file-toggle",
+    "review-open-in",
+    "review-search",
+    "review-file-text",
+  ];
+  const observation = capture.reviewObservation;
+  sanitizeVisualScalarRecord(
+    observation?.filter?.style,
+    "capture.reviewObservation.filter.style",
+  );
+  const sameIdentity = ({ baselineContext }) => ({
+    appAsarSha256: baselineContext?.appAsarSha256,
+    appVersion: baselineContext?.appVersion,
+    buildNumber: baselineContext?.buildNumber,
+    theme: baselineContext?.theme,
+    viewport: baselineContext?.viewport,
+  });
+  if (
+    capture.captureMode !== "review-workspace" ||
+    capture.baselineContext?.interactionState !==
+      "open-current-review-workspace" ||
+    canonicalize(sameIdentity(capture)) !==
+      canonicalize({
+        appAsarSha256: manifest.baseline.appAsarSha256,
+        appVersion: manifest.baseline.appVersion,
+        buildNumber: manifest.baseline.buildNumber,
+        theme: manifest.baseline.theme,
+        viewport: manifest.baseline.viewport,
+      }) ||
+    canonicalize(observation?.fileNames) !==
+      canonicalize(["added.txt", "alpha.txt", "obsolete.txt"]) ||
+    observation?.copyPathCount !== 4 ||
+    observation?.fileTextIconCount !== 4 ||
+    observation?.openInCount !== 4 ||
+    observation?.toggleFileDiffCount !== 4 ||
+    observation?.filter?.placeholder !== "Filter files…" ||
+    Math.abs((observation?.filter?.rect?.width ?? 0) - 181.86) > 0.15 ||
+    Math.abs((observation?.panel?.rect?.width ?? 0) - 382.44) > 0.15 ||
+    Math.abs((observation?.panel?.rect?.height ?? 0) - 820) > 0.1 ||
+    observation?.splitDiffLabel !== "Switch to split diff" ||
+    canonicalize(observation?.toolbarLabels) !==
+      canonicalize([
+        "Last Turn",
+        "Review options",
+        "Collapse all diffs",
+        "Jump to file",
+        "Switch to split diff",
+        "Hide files",
+        "Commit or push",
+        "More Git actions",
+      ])
+  ) {
+    throw new Error(
+      `Targeted current Review capture contract changed: ${canonicalize(observation)}.`,
+    );
+  }
+  const expectedCandidateCounts = new Map([
+    ["review-copy-path", 4],
+    ["review-file-toggle", 4],
+    ["review-open-in", 4],
+  ]);
+  const promotedById = new Map();
+  for (const id of targetIds) {
+    const spec = promotionSpecs.get(id);
+    if (!spec) throw new Error(`Missing current Review promotion spec: ${id}.`);
+    const observed = capture.icons.filter(
+      (candidate) =>
+        candidate.region === spec.region &&
+        candidate.owner?.semanticId === spec.semanticId,
+    );
+    const expectedCount = expectedCandidateCounts.get(id) ?? 1;
+    if (observed.length !== expectedCount) {
+      throw new Error(
+        `Expected ${expectedCount} current Review captures for ${id}, received ${observed.length}.`,
+      );
+    }
+    const groups = new Map();
+    for (const candidate of observed) {
+      const bucket = groups.get(candidate.sha256) ?? [];
+      bucket.push(candidate);
+      groups.set(candidate.sha256, bucket);
+    }
+    const selectedGroup = [...groups.values()].sort(
+      (left, right) => right.length - left.length,
+    )[0];
+    const minimumMatching = id === "review-file-toggle" ? 3 : expectedCount;
+    if (!selectedGroup || selectedGroup.length < minimumMatching) {
+      throw new Error(`${id} current Review geometry is not deterministic.`);
+    }
+    const selected = selectedGroup[0];
+    const existing = manifest.icons.find((icon) => icon.id === id);
+    if (
+      existing &&
+      (existing.region !== spec.region ||
+        existing.viewBox !== selected.viewBox ||
+        canonicalize(existing.rootAttributes) !==
+          canonicalize(selected.rootAttributes))
+    ) {
+      throw new Error(`${id} root geometry or region changed.`);
+    }
+    const promoted = {
+      id,
+      ownerAriaLabel: spec.ownerAriaLabel,
+      ...(spec.ownerEvidence ? { ownerEvidence: spec.ownerEvidence } : {}),
+      primitives: existing
+        ? promotePrimitives(existing, selected)
+        : selected.primitives,
+      region: spec.region,
+      renderSize: selected.renderSize,
+      rootAttributes: selected.rootAttributes,
+      rootComputedStyle: existing
+        ? promoteComputedStyle(existing.rootComputedStyle, selected.rootComputedStyle)
+        : selected.rootComputedStyle,
+      sourceClassName: selected.sourceClassName,
+      status: "runtime-observed",
+      viewBox: selected.viewBox,
+    };
+    promoted.sha256 = createHash("sha256")
+      .update(
+        canonicalize({
+          baselineContext: manifest.baseline,
+          primitives: promoted.primitives,
+          renderSize: promoted.renderSize,
+          rootAttributes: promoted.rootAttributes,
+          rootComputedStyle: promoted.rootComputedStyle,
+          sourceClassName: promoted.sourceClassName,
+          viewBox: promoted.viewBox,
+        }),
+      )
+      .digest("hex");
+    promotedById.set(id, promoted);
+  }
+  const existingById = new Map(manifest.icons.map((icon) => [icon.id, icon]));
+  manifest.icons = [...promotionSpecs.keys()].map(
+    (id) => promotedById.get(id) ?? existingById.get(id),
+  );
+  manifest.reviewObservation = observation;
+  const output = `${JSON.stringify(manifest, null, 2)}\n`;
+  if (write) {
+    writeManifestAndCurrentThreadSubset(
+      output,
+      `Updated ${manifestPath} with current Review assets`,
+    );
+  } else {
+    await writeOutput(output);
+  }
+  process.exit(0);
+}
 if (projectPickerOnly) {
   const targetIds = projectPickerVisualAssetIds;
   const currentFingerprint = {

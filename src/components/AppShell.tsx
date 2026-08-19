@@ -2521,6 +2521,7 @@ export interface WorkspacePanelProps
   extends Omit<HTMLAttributes<HTMLElement>, "children" | "title"> {
   activeTabId: string;
   actions?: ReactNode;
+  closeIcon?: ReactNode;
   emptyState?: ReactNode;
   expandPanelLabel?: string;
   expanded?: boolean;
@@ -2542,6 +2543,7 @@ export function WorkspacePanel({
   activeTabId,
   actions,
   className,
+  closeIcon,
   emptyState = "No open tabs",
   expandPanelLabel = "Expand panel",
   expanded = false,
@@ -2691,7 +2693,7 @@ export function WorkspacePanel({
                 {tab.closable === false ? null : (
                   <IconButton
                     className="codex-ui-workspace-panel__tab-close"
-                    icon={<CloseIcon />}
+                    icon={closeIcon ?? <CloseIcon />}
                     label={
                       tab.closeLabel ??
                       (typeof tab.label === "string" ||
@@ -2714,7 +2716,7 @@ export function WorkspacePanel({
           activeTab.closable !== false &&
           !tabCloseButtons ? (
             <IconButton
-              icon={<CloseIcon />}
+              icon={closeIcon ?? <CloseIcon />}
               label={
                 activeTab.closeLabel ??
                 (typeof activeTab.label === "string" ||
@@ -2747,7 +2749,7 @@ export function WorkspacePanel({
           ) : null}
           {onClose ? (
             <IconButton
-              icon={<CloseIcon />}
+              icon={closeIcon ?? <CloseIcon />}
               label={`Close ${label.toLowerCase()}`}
               onClick={onClose}
               size="toolbar"

@@ -8,6 +8,7 @@ import {
 } from "react";
 import type { AgentItemStatus } from "../types.js";
 import { AgentActivity } from "./AgentActivity.js";
+import { Dialog } from "./Dialog.js";
 import { StatusIndicator } from "./StatusIndicator.js";
 
 export type FileChangeKind = "added" | "modified" | "deleted" | "renamed";
@@ -764,5 +765,499 @@ export function FileReview({
         );
       })}
     </div>
+  );
+}
+
+export type FileReviewWorkspaceScope =
+  | "Last Turn"
+  | "Uncommitted"
+  | "Unstaged"
+  | "Staged"
+  | "Committed"
+  | "Branch";
+
+export type FileReviewWorkspaceIconName =
+  | "scopeChevron"
+  | "options"
+  | "collapseAll"
+  | "jumpToFile"
+  | "splitDiff"
+  | "filesToggle"
+  | "commit"
+  | "moreGit"
+  | "copyPath"
+  | "fileToggle"
+  | "openIn"
+  | "search"
+  | "file";
+
+export type FileReviewWorkspaceIcons = Partial<
+  Record<FileReviewWorkspaceIconName, ReactNode>
+>;
+
+export interface FileReviewWorkspaceProps
+  extends Omit<HTMLAttributes<HTMLDivElement>, "children"> {
+  defaultFilesVisible?: boolean;
+  defaultScope?: FileReviewWorkspaceScope;
+  defaultSplit?: boolean;
+  files: readonly FileReviewItem[];
+  icons?: FileReviewWorkspaceIcons;
+  onCommit?: () => void;
+  onCopyPath?: (file: FileReviewItem, index: number) => void | Promise<void>;
+  onMoreGitActions?: () => void;
+  onOpenFile?: (file: FileReviewItem, index: number) => void;
+  onReviewOptions?: () => void;
+  onScopeChange?: (scope: FileReviewWorkspaceScope) => void;
+  rootLabel?: string;
+  scope?: FileReviewWorkspaceScope;
+}
+
+const fileReviewWorkspaceScopes: readonly FileReviewWorkspaceScope[] = [
+  "Last Turn",
+  "Uncommitted",
+  "Unstaged",
+  "Staged",
+  "Committed",
+  "Branch",
+];
+
+const fileReviewWorkspaceFallbackIcons: Record<
+  FileReviewWorkspaceIconName,
+  ReactNode
+> = {
+  collapseAll: "⇈",
+  commit: "●",
+  copyPath: "▣",
+  file: "▤",
+  fileToggle: "⌃",
+  filesToggle: "▥",
+  jumpToFile: "↧",
+  moreGit: "⌄",
+  openIn: "↗",
+  options: "•••",
+  scopeChevron: "⌄",
+  search: "⌕",
+  splitDiff: "▥",
+};
+
+function reviewWorkspaceContent(file: FileReviewItem): FileReviewContent {
+  return file.content ?? { kind: "diff", lines: file.lines };
+}
+
+function reviewWorkspaceStatus(change: FileChangeKind) {
+  if (change === "added") return "+";
+  if (change === "deleted") return "";
+  if (change === "renamed") return "R";
+  return "•";
+}
+
+export function FileReviewWorkspace({
+  className,
+  defaultFilesVisible = true,
+  defaultScope = "Last Turn",
+  defaultSplit = false,
+  files,
+  icons = {},
+  onCommit,
+  onCopyPath,
+  onMoreGitActions,
+  onOpenFile,
+  onReviewOptions,
+  onScopeChange,
+  rootLabel = "Changes",
+  scope,
+  "aria-label": ariaLabel = "Review workspace",
+  ...props
+}: FileReviewWorkspaceProps) {
+  const [internalScope, setInternalScope] = useState(defaultScope);
+  const [scopeOpen, setScopeOpen] = useState(false);
+  const [jumpOpen, setJumpOpen] = useState(false);
+  const [filter, setFilter] = useState("");
+  const [filesVisible, setFilesVisible] = useState(defaultFilesVisible);
+  const [split, setSplit] = useState(defaultSplit);
+  const [selectedPath, setSelectedPath] = useState(files[0]?.path ?? null);
+  const [collapsedPaths, setCollapsedPaths] = useState<Set<string>>(
+    () => new Set(),
+  );
+  const scopeButtonRef = useRef<HTMLButtonElement>(null);
+  const jumpButtonRef = useRef<HTMLButtonElement>(null);
+  const fileElementsRef = useRef(new Map<string, HTMLElement>());
+  const resolvedScope = scope ?? internalScope;
+  const additions = files.reduce(
+    (total, file) => total + (file.additions ?? 0),
+    0,
+  );
+  const deletions = files.reduce(
+    (total, file) => total + (file.deletions ?? 0),
+    0,
+  );
+  const visibleFiles = files.filter((file) =>
+    file.path.toLocaleLowerCase().includes(filter.trim().toLocaleLowerCase()),
+  );
+  const icon = (name: FileReviewWorkspaceIconName) => (
+    <span aria-hidden="true" className="codex-ui-file-review-workspace__icon">
+      {icons[name] ?? fileReviewWorkspaceFallbackIcons[name]}
+    </span>
+  );
+  const closePopup = (
+    setter: (open: boolean) => void,
+    returnFocus: { current: HTMLButtonElement | null },
+  ) => {
+    setter(false);
+    window.setTimeout(() => returnFocus.current?.focus());
+  };
+  const selectFile = (file: FileReviewItem, index: number) => {
+    setSelectedPath(file.path);
+    onOpenFile?.(file, index);
+    fileElementsRef.current
+      .get(file.path)
+      ?.scrollIntoView({ block: "nearest", inline: "nearest" });
+  };
+  const classes = ["codex-ui-file-review-workspace", className]
+    .filter(Boolean)
+    .join(" ");
+
+  useLayoutEffect(() => {
+    if (selectedPath && files.some(({ path }) => path === selectedPath)) return;
+    setSelectedPath(files[0]?.path ?? null);
+  }, [files, selectedPath]);
+
+  return (
+    <div
+      aria-label={ariaLabel}
+      className={classes}
+      data-files-visible={filesVisible || undefined}
+      data-layout={split ? "split" : "unified"}
+      role="region"
+      {...props}
+    >
+      <div
+        aria-label="Review controls"
+        className="codex-ui-file-review-workspace__toolbar"
+        role="toolbar"
+      >
+        <span className="codex-ui-file-review-workspace__scope-wrap">
+          <button
+            aria-expanded={scopeOpen}
+            aria-haspopup="menu"
+            className="codex-ui-file-review-workspace__scope"
+            onClick={() => setScopeOpen((open) => !open)}
+            onKeyDown={(event) => {
+              if (event.key !== "Escape" || !scopeOpen) return;
+              event.preventDefault();
+              closePopup(setScopeOpen, scopeButtonRef);
+            }}
+            ref={scopeButtonRef}
+            type="button"
+          >
+            {resolvedScope}
+            {icon("scopeChevron")}
+          </button>
+          {scopeOpen ? (
+            <span
+              aria-label="Review scope"
+              className="codex-ui-file-review-workspace__menu"
+              onKeyDown={(event) => {
+                if (event.key !== "Escape") return;
+                event.preventDefault();
+                closePopup(setScopeOpen, scopeButtonRef);
+              }}
+              role="menu"
+            >
+              {fileReviewWorkspaceScopes.map((item) => (
+                <button
+                  aria-checked={item === resolvedScope}
+                  key={item}
+                  onClick={() => {
+                    if (scope === undefined) setInternalScope(item);
+                    onScopeChange?.(item);
+                    closePopup(setScopeOpen, scopeButtonRef);
+                  }}
+                  role="menuitemradio"
+                  type="button"
+                >
+                  {item}
+                </button>
+              ))}
+            </span>
+          ) : null}
+        </span>
+        <span className="codex-ui-file-review-workspace__stats">
+          <span data-stat="additions">+{additions}</span>
+          <span data-stat="deletions">−{deletions}</span>
+        </span>
+        <span className="codex-ui-file-review-workspace__toolbar-actions">
+          <button
+            aria-label="Review options"
+            onClick={onReviewOptions}
+            type="button"
+          >
+            {icon("options")}
+          </button>
+          <button
+            aria-label={
+              collapsedPaths.size === files.length
+                ? "Expand all diffs"
+                : "Collapse all diffs"
+            }
+            onClick={() =>
+              setCollapsedPaths((current) =>
+                current.size === files.length
+                  ? new Set()
+                  : new Set(files.map(({ path }) => path)),
+              )
+            }
+            type="button"
+          >
+            {icon("collapseAll")}
+          </button>
+          <span className="codex-ui-file-review-workspace__jump-wrap">
+            <button
+              aria-expanded={jumpOpen}
+              aria-haspopup="listbox"
+              aria-label="Jump to file"
+              onClick={() => setJumpOpen((open) => !open)}
+              onKeyDown={(event) => {
+                if (event.key !== "Escape" || !jumpOpen) return;
+                event.preventDefault();
+                closePopup(setJumpOpen, jumpButtonRef);
+              }}
+              ref={jumpButtonRef}
+              type="button"
+            >
+              {icon("jumpToFile")}
+            </button>
+            {jumpOpen ? (
+              <span
+                aria-label="Changed files"
+                className="codex-ui-file-review-workspace__menu codex-ui-file-review-workspace__jump-menu"
+                onKeyDown={(event) => {
+                  if (event.key !== "Escape") return;
+                  event.preventDefault();
+                  closePopup(setJumpOpen, jumpButtonRef);
+                }}
+                role="listbox"
+              >
+                {files.map((file, index) => (
+                  <button
+                    aria-selected={file.path === selectedPath}
+                    key={file.path}
+                    onClick={() => {
+                      selectFile(file, index);
+                      closePopup(setJumpOpen, jumpButtonRef);
+                    }}
+                    role="option"
+                    type="button"
+                  >
+                    {file.path}
+                  </button>
+                ))}
+              </span>
+            ) : null}
+          </span>
+          <button
+            aria-label={split ? "Switch to unified diff" : "Switch to split diff"}
+            onClick={() => setSplit((value) => !value)}
+            type="button"
+          >
+            {icon("splitDiff")}
+          </button>
+          <button
+            aria-label={filesVisible ? "Hide files" : "Show files"}
+            onClick={() => setFilesVisible((visible) => !visible)}
+            type="button"
+          >
+            {icon("filesToggle")}
+          </button>
+          <span className="codex-ui-file-review-workspace__git-actions">
+            <button aria-label="Commit or push" onClick={onCommit} type="button">
+              {icon("commit")}
+              <span>Commit or push</span>
+            </button>
+            <button
+              aria-label="More Git actions"
+              onClick={onMoreGitActions}
+              type="button"
+            >
+              {icon("moreGit")}
+            </button>
+          </span>
+        </span>
+      </div>
+      <div className="codex-ui-file-review-workspace__body">
+        <div
+          aria-label="Review diffs"
+          className="codex-ui-file-review-workspace__diffs"
+          role="list"
+        >
+          {files.map((file, index) => {
+            const content = reviewWorkspaceContent(file);
+            const collapsed = collapsedPaths.has(file.path);
+            return (
+              <section
+                aria-label={`Review file ${file.path}`}
+                className="codex-ui-file-review-workspace__diff"
+                data-change={file.change}
+                data-collapsed={collapsed || undefined}
+                data-review-workspace-path={file.path}
+                key={file.path}
+                ref={(element) => {
+                  if (element) fileElementsRef.current.set(file.path, element);
+                  else fileElementsRef.current.delete(file.path);
+                }}
+                role="listitem"
+              >
+                <header>
+                  <span className="codex-ui-file-review-workspace__file-identity">
+                    {icon("file")}
+                    <code>{file.path}</code>
+                  </span>
+                  <FileChangeStats
+                    additions={file.additions}
+                    change={file.change}
+                    deletions={file.deletions}
+                  />
+                  <span className="codex-ui-file-review-workspace__file-actions">
+                    <button
+                      aria-label="Copy path"
+                      onClick={() => {
+                        if (onCopyPath) void onCopyPath(file, index);
+                        else copyWithClipboard(file.path);
+                      }}
+                      type="button"
+                    >
+                      {icon("copyPath")}
+                    </button>
+                    <button
+                      aria-expanded={!collapsed}
+                      aria-label="Toggle file diff"
+                      onClick={() =>
+                        setCollapsedPaths((current) => {
+                          const next = new Set(current);
+                          if (next.has(file.path)) next.delete(file.path);
+                          else next.add(file.path);
+                          return next;
+                        })
+                      }
+                      type="button"
+                    >
+                      {icon("fileToggle")}
+                    </button>
+                    <button
+                      aria-label="Open in"
+                      onClick={() => onOpenFile?.(file, index)}
+                      type="button"
+                    >
+                      {icon("openIn")}
+                    </button>
+                  </span>
+                </header>
+                {!collapsed ? (
+                  content.kind === "diff" ? (
+                    <FileDiff
+                      aria-label={`Review diff for ${file.path}`}
+                      lines={content.lines}
+                      tabIndex={0}
+                      wrapLines={false}
+                    />
+                  ) : (
+                    <FileReviewNotice
+                      description={content.description}
+                      kind={content.kind}
+                      title={content.title}
+                    />
+                  )
+                ) : null}
+              </section>
+            );
+          })}
+        </div>
+        {filesVisible ? (
+          <aside
+            aria-label="Changed files"
+            className="codex-ui-file-review-workspace__files"
+          >
+            <label className="codex-ui-file-review-workspace__filter">
+              {icon("search")}
+              <input
+                aria-label="Filter files"
+                onChange={(event) => setFilter(event.currentTarget.value)}
+                placeholder="Filter files…"
+                type="search"
+                value={filter}
+              />
+            </label>
+            <div className="codex-ui-file-review-workspace__tree" role="tree">
+              <div className="codex-ui-file-review-workspace__root">
+                {icon("scopeChevron")}
+                {rootLabel}
+              </div>
+              {visibleFiles.map((file) => {
+                const index = files.indexOf(file);
+                return (
+                  <button
+                    data-change={file.change}
+                    data-selected={selectedPath === file.path || undefined}
+                    key={file.path}
+                    onClick={() => selectFile(file, index)}
+                    role="treeitem"
+                    type="button"
+                  >
+                    {icon("file")}
+                    <span>{file.path.split("/").at(-1)}</span>
+                    <span
+                      aria-label={file.change}
+                      className="codex-ui-file-review-workspace__status"
+                    >
+                      {reviewWorkspaceStatus(file.change)}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          </aside>
+        ) : null}
+      </div>
+    </div>
+  );
+}
+
+export interface FileRevertErrorDialogProps {
+  closeIcon?: ReactNode;
+  description?: ReactNode;
+  onOpenChange: (open: boolean) => void;
+  open: boolean;
+  title?: ReactNode;
+}
+
+export function FileRevertErrorDialog({
+  closeIcon,
+  description = "Git apply error: error: patch with only garbage at line 4",
+  onOpenChange,
+  open,
+  title = "Failed to revert changes",
+}: FileRevertErrorDialogProps) {
+  return (
+    <Dialog
+      className="codex-ui-file-revert-error-dialog"
+      closeIcon={closeIcon}
+      description={description}
+      footer={
+        <button
+          className="codex-ui-file-revert-error-dialog__close-action"
+          onClick={() => onOpenChange(false)}
+          type="button"
+        >
+          Close
+        </button>
+      }
+      initialFocusSelector=".codex-ui-file-revert-error-dialog__close-action"
+      onOpenChange={onOpenChange}
+      open={open}
+      size="compact"
+      title={title}
+    >
+      <span aria-hidden="true" />
+    </Dialog>
   );
 }

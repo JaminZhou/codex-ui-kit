@@ -66,6 +66,8 @@ describe("file change visual contract", () => {
       ".codex-ui-file-diff *,",
       ".codex-ui-file-review,",
       ".codex-ui-file-review *,",
+      ".codex-ui-file-review-workspace,",
+      ".codex-ui-file-review-workspace *,",
     ]) {
       expect(styles).toContain(selector);
     }

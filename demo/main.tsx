@@ -39,7 +39,9 @@ import {
   Dialog,
   DialogChoice,
   FileChange,
+  FileChangeGroup,
   FileDiff,
+  FileReviewWorkspace,
   fileDiffToText,
   FloatingThreadPanel,
   GeneratedImageGallery,
@@ -1298,6 +1300,184 @@ function WorkflowFileDiffFixture() {
         </ConversationThreadShell>
         <WorkflowReviewPanel />
       </div>
+    </main>
+  );
+}
+
+const currentReviewWorkspaceFiles = [
+  {
+    additions: 1,
+    change: "added" as const,
+    deletions: 0,
+    lines: [
+      {
+        content: "added current review probe",
+        kind: "addition" as const,
+        newLineNumber: 1,
+      },
+    ],
+    path: "research/current-review-26-810-probe/added.txt",
+  },
+  {
+    additions: 1,
+    change: "modified" as const,
+    deletions: 2,
+    lines: [
+      {
+        content: "alpha baseline",
+        kind: "deletion" as const,
+        oldLineNumber: 1,
+      },
+      {
+        content: "alpha updated",
+        kind: "addition" as const,
+        newLineNumber: 1,
+      },
+      {
+        content: "line retained",
+        kind: "context" as const,
+        newLineNumber: 2,
+        oldLineNumber: 2,
+      },
+      { content: "", kind: "deletion" as const, oldLineNumber: 3 },
+    ],
+    path: "research/current-review-26-810-probe/alpha.txt",
+  },
+  {
+    additions: 0,
+    change: "deleted" as const,
+    deletions: 2,
+    lines: [
+      {
+        content: "obsolete baseline",
+        kind: "deletion" as const,
+        oldLineNumber: 1,
+      },
+      { content: "", kind: "deletion" as const, oldLineNumber: 2 },
+    ],
+    path: "research/current-review-26-810-probe/obsolete.txt",
+  },
+];
+
+function CurrentReviewFileCardFixture() {
+  const changes = currentReviewWorkspaceFiles.map(
+    ({ additions, change, deletions, path }) => ({
+      additions,
+      change,
+      deletions,
+      path,
+    }),
+  );
+
+  return (
+    <main
+      className="current-thread-pixel-fixture current-review-file-card-fixture"
+      data-theme="dark"
+      data-visual-scene="current-review-file-card"
+    >
+      <FileChangeGroup
+        changes={changes}
+        description={
+          <span className="current-review-file-card-fixture__stats">
+            <span data-stat="additions">+2</span>
+            <span data-stat="deletions">−4</span>
+          </span>
+        }
+        detail={
+          <span className="current-review-file-card-fixture__actions">
+            <button type="button">
+              Undo <span aria-hidden="true">↶</span>
+            </button>
+            <button type="button">Review</button>
+          </span>
+        }
+        indicator={<CurrentThreadBuildIcon name="review-file-text" />}
+        onOpenFile={() => undefined}
+        status="applied"
+      />
+    </main>
+  );
+}
+
+function CurrentReviewWorkspaceFixture() {
+  return (
+    <main
+      className="current-thread-pixel-fixture current-review-workspace-fixture"
+      data-theme="dark"
+      data-visual-scene="current-review-workspace"
+    >
+      <WorkspacePanel
+        actions={
+          <>
+            <button aria-label="Open side panel tab" type="button">
+              <CurrentThreadBuildIcon name="review-open-tab" />
+            </button>
+            <span className="current-review-workspace-fixture__spacer" />
+            <button aria-label="Expand panel" type="button">
+              <CurrentThreadBuildIcon name="review-expand" />
+            </button>
+            <button aria-label="Toggle bottom panel" type="button">
+              <CurrentThreadBuildIcon name="thread-header-bottom-panel" />
+            </button>
+            <button aria-label="Toggle side panel" type="button">
+              <CurrentThreadBuildIcon name="thread-header-side-panel" />
+            </button>
+          </>
+        }
+        activeTabId="review"
+        closeIcon={<CurrentThreadBuildIcon name="review-close" />}
+        label="Review"
+        onActiveTabChange={() => undefined}
+        onCloseTab={() => undefined}
+        placement="side"
+        tabCloseButtons
+        tabs={[
+          {
+            content: (
+              <FileReviewWorkspace
+                files={currentReviewWorkspaceFiles}
+                icons={{
+                  collapseAll: (
+                    <CurrentThreadBuildIcon name="review-collapse-all" />
+                  ),
+                  commit: (
+                    <CurrentThreadBuildIcon name="review-commit-or-push" />
+                  ),
+                  copyPath: <CurrentThreadBuildIcon name="review-copy-path" />,
+                  file: <CurrentThreadBuildIcon name="review-file-text" />,
+                  fileToggle: (
+                    <CurrentThreadBuildIcon name="review-file-toggle" />
+                  ),
+                  filesToggle: (
+                    <CurrentThreadBuildIcon name="review-files-toggle" />
+                  ),
+                  jumpToFile: (
+                    <CurrentThreadBuildIcon name="review-jump-file" />
+                  ),
+                  moreGit: <CurrentThreadBuildIcon name="review-more-git" />,
+                  openIn: <CurrentThreadBuildIcon name="review-open-in" />,
+                  options: <CurrentThreadBuildIcon name="review-options" />,
+                  scopeChevron: (
+                    <CurrentThreadBuildIcon name="review-scope-chevron" />
+                  ),
+                  search: <CurrentThreadBuildIcon name="review-search" />,
+                  splitDiff: (
+                    <CurrentThreadBuildIcon name="review-split-diff" />
+                  ),
+                }}
+                rootLabel="research/current-review-26-810-probe"
+              />
+            ),
+            id: "review",
+            label: (
+              <span className="current-review-workspace-fixture__tab-label">
+                <CurrentThreadBuildIcon name="review-tab" />
+                Review
+              </span>
+            ),
+          },
+        ]}
+      />
     </main>
   );
 }
@@ -4433,6 +4613,8 @@ const currentThreadCapture =
   capture === "current-thread-completed-compact" ||
   capture === "current-thread-streaming" ||
   capture === "current-thread-streaming-compact";
+const currentReviewWorkspaceCapture = capture === "current-review-workspace";
+const currentReviewFileCardCapture = capture === "current-review-file-card";
 const currentCommandLifecycleState: CurrentCommandLifecycleState | undefined =
   capture === "current-command-success"
     ? "success"
@@ -4478,7 +4660,11 @@ const continuityPixelState: ContinuityPixelState | undefined =
             : undefined;
 
 createRoot(document.getElementById("root")!).render(
-  currentCommandLifecycleState ? (
+  currentReviewFileCardCapture ? (
+    <CurrentReviewFileCardFixture />
+  ) : currentReviewWorkspaceCapture ? (
+    <CurrentReviewWorkspaceFixture />
+  ) : currentCommandLifecycleState ? (
     <CurrentCommandLifecycleFixture state={currentCommandLifecycleState} />
   ) : continuityPixelState ? (
     <ContinuityPixelFixture state={continuityPixelState} />

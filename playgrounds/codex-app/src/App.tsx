@@ -36,7 +36,9 @@ import {
   Dialog,
   EnvironmentSettingsPage,
   FileChangeGroup,
+  FileRevertErrorDialog,
   FileReview,
+  FileReviewWorkspace,
   GeneralSettingsPage,
   GitSettingsPage,
   HooksSettingsPage,
@@ -2292,6 +2294,12 @@ export function App() {
   const [reviewSelection, setReviewSelection] =
     useState<ReviewSelection | null>(null);
   const [reviewSelectionKey, setReviewSelectionKey] = useState(0);
+  const [reviewPanelWidth, setReviewPanelWidth] = useState(
+    initialSelection.scenarioId === "current-review-files" ? 382.4375 : 370,
+  );
+  const [fileRevertErrorOpen, setFileRevertErrorOpen] = useState(
+    initialSelection.frame === "undo-failed",
+  );
   const [rawToolOutput, setRawToolOutput] = useState<{
     name: string;
     value: unknown;
@@ -2456,6 +2464,12 @@ export function App() {
     mode === "replay" && scenarioId === "streaming-recovery";
   const isCurrentMixedToolReplay =
     mode === "replay" && scenarioId === "current-mixed-tool-thread";
+  const isCurrentReviewFilesReplay =
+    mode === "replay" && scenarioId === "current-review-files";
+
+  useEffect(() => {
+    setReviewPanelWidth(isCurrentReviewFilesReplay ? 382.4375 : 370);
+  }, [isCurrentReviewFilesReplay]);
   const isCurrentMcpReplay =
     mode === "replay" &&
     (scenarioId === "current-mixed-tool-thread" ||
@@ -2937,6 +2951,7 @@ export function App() {
     setWindowedSelectedMessageIndex(currentWindowedInitialIndex);
     setReviewOpen(false);
     setReviewSelection(null);
+    setFileRevertErrorOpen(false);
     setActiveConversationSidePanel(
       isSubagentScenarioId(nextId) && currentSubagentPanelFrame(frame)
         ? "subagents"
@@ -4399,7 +4414,8 @@ export function App() {
       scenarioId === "context-summary" ||
       isCurrentTransportRecoveryReplay ||
       isCurrentSubagentReplay ||
-      scenarioId === "current-review-rename");
+      scenarioId === "current-review-rename" ||
+      isCurrentReviewFilesReplay);
   const usesCurrentAskPermission =
     isCurrentApprovalReplay ||
     isCurrentAutomaticReviewReplay ||
@@ -4412,7 +4428,8 @@ export function App() {
     isCurrentTransportRecoveryReplay ||
     isCurrentMixedToolReplay ||
     isCurrentSubagentReplay ||
-    scenarioId === "current-review-rename";
+    scenarioId === "current-review-rename" ||
+    isCurrentReviewFilesReplay;
   const selectedComposerPermission =
     (usesCurrentAskPermission
       ? composerPermissionOptions[0]
@@ -4647,6 +4664,7 @@ export function App() {
     mode === "replay" &&
     (scenarioId === "multi-file-review" ||
       scenarioId === "current-review-rename" ||
+      scenarioId === "current-review-files" ||
       scenarioId === "mixed-file-review" ||
       scenarioId === "markdown" ||
       isCurrentMcpReplay ||
@@ -7013,7 +7031,8 @@ export function App() {
                   kind: "diff" as const,
                   lines:
                     change.kind === "added" ||
-                    scenarioId === "current-review-rename"
+                    scenarioId === "current-review-rename" ||
+                    scenarioId === "current-review-files"
                       ? content.lines.filter(({ kind }) => kind !== "hunk")
                       : content.lines,
                 }
@@ -7031,63 +7050,135 @@ export function App() {
     { additions: 0, deletions: 0 },
   );
   const reviewPanel = reviewFileChange ? (
-    <WorkspacePanel
-      activeTabId="review"
-      label="Review"
-      onActiveTabChange={() => undefined}
-      onClose={() => setReviewOpen(false)}
-      onCloseTab={() => setReviewOpen(false)}
-      placement="side"
-      tabs={[
-        {
-          content: (
-            <div className="demo-review-panel" data-testid="review-panel">
-              <div className="demo-review-panel__toolbar">
-                <div>
-                  <strong>
-                    {scenarioId === "current-review-rename"
-                      ? "Last Turn"
-                      : "Last turn"}
-                  </strong>
-                  {scenarioId === "current-review-rename" ? (
-                    <span aria-hidden="true">⌄</span>
-                  ) : (
-                    <span>
-                      {reviewFiles.length}{" "}
-                      {reviewFiles.length === 1 ? "file" : "files"}
-                    </span>
-                  )}
-                </div>
-                <span className="demo-review-panel__stats">
-                  <span data-stat="additions">
-                    +{reviewTotals.additions}
-                  </span>{" "}
-                  <span data-stat="deletions">
-                    {scenarioId === "current-review-rename" ? "-" : "−"}
-                    {reviewTotals.deletions}
-                  </span>
-                </span>
-              </div>
-              <FileReview
-                aria-label="Last turn file review"
+    isCurrentReviewFilesReplay ? (
+      <WorkspacePanel
+        actions={
+          <>
+            <button
+              aria-label="Open side panel tab"
+              className="demo-current-review-header-action"
+              type="button"
+            >
+              <CurrentBuildIcon name="review-open-tab" />
+            </button>
+            <span className="demo-current-review-header-spacer" />
+            <button
+              aria-label="Expand panel"
+              className="demo-current-review-header-action"
+              type="button"
+            >
+              <CurrentBuildIcon name="review-expand" />
+            </button>
+          </>
+        }
+        activeTabId="review"
+        className="demo-current-review-workspace-panel"
+        closeIcon={<CurrentBuildIcon name="review-close" />}
+        label="Review"
+        onActiveTabChange={() => undefined}
+        onCloseTab={() => setReviewOpen(false)}
+        placement="side"
+        tabCloseButtons
+        tabs={[
+          {
+            content: (
+              <FileReviewWorkspace
+                data-testid="current-review-workspace"
                 files={reviewFiles}
-                onSelectFile={(file) => {
+                icons={{
+                  collapseAll: <CurrentBuildIcon name="review-collapse-all" />,
+                  commit: <CurrentBuildIcon name="review-commit-or-push" />,
+                  copyPath: <CurrentBuildIcon name="review-copy-path" />,
+                  file: <CurrentBuildIcon name="review-file-text" />,
+                  fileToggle: <CurrentBuildIcon name="review-file-toggle" />,
+                  filesToggle: <CurrentBuildIcon name="review-files-toggle" />,
+                  jumpToFile: <CurrentBuildIcon name="review-jump-file" />,
+                  moreGit: <CurrentBuildIcon name="review-more-git" />,
+                  openIn: <CurrentBuildIcon name="review-open-in" />,
+                  options: <CurrentBuildIcon name="review-options" />,
+                  scopeChevron: <CurrentBuildIcon name="review-scope-chevron" />,
+                  search: <CurrentBuildIcon name="review-search" />,
+                  splitDiff: <CurrentBuildIcon name="review-split-diff" />,
+                }}
+                onOpenFile={(file) => {
                   setReviewSelectionKey((current) => current + 1);
                   setReviewSelection({
                     fileChangeId: reviewFileChange.id,
                     path: file.path,
                   });
                 }}
-                selectionKey={reviewSelectionKey}
-                selectedPath={resolvedReview?.selectedPath}
+                rootLabel="current-review-26-810-probe"
               />
-            </div>
-          ),
-          id: "review",
-          label: "Review",
-        },
-      ]}
-    />
+            ),
+            id: "review",
+            label: (
+              <span className="demo-current-review-tab-label">
+                <CurrentBuildIcon name="review-tab" />
+                Review
+              </span>
+            ),
+          },
+        ]}
+      />
+    ) : (
+      <WorkspacePanel
+        activeTabId="review"
+        label="Review"
+        onActiveTabChange={() => undefined}
+        onClose={() => setReviewOpen(false)}
+        onCloseTab={() => setReviewOpen(false)}
+        placement="side"
+        tabs={[
+          {
+            content: (
+              <div className="demo-review-panel" data-testid="review-panel">
+                <div className="demo-review-panel__toolbar">
+                  <div>
+                    <strong>
+                      {scenarioId === "current-review-rename"
+                        ? "Last Turn"
+                        : "Last turn"}
+                    </strong>
+                    {scenarioId === "current-review-rename" ? (
+                      <span aria-hidden="true">⌄</span>
+                    ) : (
+                      <span>
+                        {reviewFiles.length}{" "}
+                        {reviewFiles.length === 1 ? "file" : "files"}
+                      </span>
+                    )}
+                  </div>
+                  <span className="demo-review-panel__stats">
+                    <span data-stat="additions">
+                      +{reviewTotals.additions}
+                    </span>{" "}
+                    <span data-stat="deletions">
+                      {scenarioId === "current-review-rename" ? "-" : "−"}
+                      {reviewTotals.deletions}
+                    </span>
+                  </span>
+                </div>
+                <FileReview
+                  aria-label="Last turn file review"
+                  files={reviewFiles}
+                  onSelectFile={(file) => {
+                    setReviewSelectionKey((current) => current + 1);
+                    setReviewSelection({
+                      fileChangeId: reviewFileChange.id,
+                      path: file.path,
+                    });
+                  }}
+                  selectionKey={reviewSelectionKey}
+                  selectedPath={resolvedReview?.selectedPath}
+                />
+              </div>
+            ),
+            id: "review",
+            label: "Review",
+          },
+        ]}
+      />
+    )
   ) : null;
   const subagentPanel = hasSubagentSurface ? (
     <WorkspacePanel
@@ -8933,7 +9024,9 @@ export function App() {
         previousPath: change.previousPath,
       };
     });
-    const indicator = (
+    const indicator = isCurrentReviewFilesReplay ? (
+      <CurrentBuildIcon name="review-file-text" />
+    ) : (
       <svg
         aria-hidden="true"
         className="demo-file-indicator"
@@ -8949,6 +9042,10 @@ export function App() {
           {mode === "replay" ? (
             <button
               onClick={() => {
+                if (isCurrentReviewFilesReplay) {
+                  setFileRevertErrorOpen(true);
+                  return;
+                }
                 setUndoneFileIds((current) => {
                   const next = new Set(current);
                   next.add(fileChange.id);
@@ -8984,6 +9081,14 @@ export function App() {
           changes={changes}
           data-item-id={fileChange.id}
           data-testid="file-change-group"
+          description={
+            isCurrentReviewFilesReplay ? (
+              <span className="demo-current-review-card-stats">
+                <span data-stat="additions">+{reviewTotals.additions}</span>
+                <span data-stat="deletions">−{reviewTotals.deletions}</span>
+              </span>
+            ) : undefined
+          }
           detail={detail}
           indicator={indicator}
           onOpenFile={(change) => {
@@ -9714,7 +9819,7 @@ export function App() {
               ? setBackgroundTerminalPanelWidth
             : subagentPanelSelected
               ? setSubagentPanelWidth
-              : undefined
+              : setReviewPanelWidth
         }
         responsivePanelContinuity={
           !initialSelection.capture &&
@@ -9786,7 +9891,7 @@ export function App() {
               ? backgroundTerminalPanelWidth
             : subagentPanelSelected
               ? subagentPanelWidth
-              : undefined
+              : reviewPanelWidth
         }
         sidebar={sidebar}
         sidebarMinMainWidth={
@@ -10030,6 +10135,11 @@ export function App() {
           <code>{JSON.stringify(rawToolOutput?.value, null, 2)}</code>
         </pre>
       </Dialog>
+      <FileRevertErrorDialog
+        closeIcon={<CurrentBuildIcon name="review-close" />}
+        onOpenChange={setFileRevertErrorOpen}
+        open={fileRevertErrorOpen}
+      />
     </div>
   );
 }

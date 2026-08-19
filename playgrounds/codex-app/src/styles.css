@@ -3008,6 +3008,229 @@ textarea {
   max-width: 24.25rem;
 }
 
+.demo-root[data-scenario="current-review-files"] {
+  --codex-ui-font-openai-sans: -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
+}
+
+.demo-root[data-scenario="current-review-files"]
+  .codex-ui-app-shell__side-panel {
+  --codex-ui-workspace-panel-header-height: 2.875rem;
+  --codex-ui-workspace-panel-tab-max-width: 8.75rem;
+}
+
+.demo-current-review-workspace-panel .codex-ui-workspace-panel__header {
+  padding-inline: 0.5rem;
+}
+
+.demo-current-review-workspace-panel .codex-ui-workspace-panel__tab-item {
+  flex-basis: 8.75rem;
+}
+
+.demo-current-review-workspace-panel .codex-ui-workspace-panel__tab {
+  border-radius: 0.625rem;
+  font-size: 0.875rem;
+  font-weight: 445;
+  line-height: 1.125rem;
+  padding: 0.125rem 2rem 0.125rem 0.5rem;
+}
+
+.demo-current-review-workspace-panel .codex-ui-workspace-panel__tab-close {
+  height: 1.25rem;
+  inset-inline-end: 0;
+  width: 1.25rem;
+}
+
+.demo-current-review-workspace-panel
+  .codex-ui-workspace-panel__tab-close
+  svg {
+  height: 1.3125rem;
+  width: 0.875rem;
+}
+
+.demo-current-review-workspace-panel .codex-ui-workspace-panel__actions {
+  flex: 1 1 auto;
+  gap: 0.375rem;
+  margin-inline-start: 0.375rem;
+}
+
+.demo-current-review-header-action {
+  align-items: center;
+  appearance: none;
+  background: transparent;
+  border: 0;
+  border-radius: 0.625rem;
+  color: var(--codex-ui-text-secondary);
+  cursor: pointer;
+  display: inline-flex;
+  height: 1.75rem;
+  justify-content: center;
+  padding: 0;
+  width: 1.75rem;
+}
+
+.demo-current-review-header-action:hover {
+  background: var(--codex-ui-background-button-secondary-hover);
+  color: var(--codex-ui-text);
+}
+
+.demo-current-review-header-action:focus-visible {
+  outline: 2px solid var(--codex-ui-focus);
+  outline-offset: -1px;
+}
+
+.demo-current-review-header-action svg {
+  height: 1rem;
+  width: 1rem;
+}
+
+.demo-current-review-header-spacer {
+  flex: 1 1 auto;
+}
+
+.demo-current-review-tab-label {
+  align-items: center;
+  display: flex;
+  gap: 0.375rem;
+  min-width: 0;
+}
+
+.demo-current-review-tab-label svg {
+  flex: none;
+  height: 1rem;
+  width: 1rem;
+}
+
+.demo-current-review-workspace-panel .codex-ui-workspace-panel__content {
+  overflow: hidden;
+}
+
+.demo-root[data-scenario="current-review-files"]
+  .codex-ui-file-change-group {
+  background: rgb(31 31 31);
+  border: 0;
+  border-radius: 0.78125rem;
+  box-shadow: 0 0 0 0.5px rgb(255 255 255 / 0.157);
+  max-width: 46rem;
+}
+
+.demo-root[data-scenario="current-review-files"]
+  .codex-ui-file-change-group__summary,
+.demo-root[data-scenario="current-review-files"] .demo-file-actions button {
+  color: rgb(218 218 218);
+}
+
+.demo-root[data-scenario="current-review-files"]
+  .codex-ui-file-change-group__files {
+  background: rgb(25 25 25);
+  border-top-color: rgb(50 50 50);
+}
+
+.demo-root[data-scenario="current-review-files"]
+  .codex-ui-file-change-group__file
+  + .codex-ui-file-change-group__file {
+  border-top: 0;
+}
+
+.demo-root[data-scenario="current-review-files"]
+  .codex-ui-file-change-group__header {
+  min-height: 4.03125rem;
+  padding: 0.75rem;
+}
+
+.demo-root[data-scenario="current-review-files"]
+  .codex-ui-file-change-group__indicator {
+  background: rgb(21 21 21);
+  border-radius: 0.625rem;
+  color: rgb(117 117 117);
+  flex-basis: 2.5rem;
+}
+
+.demo-root[data-scenario="current-review-files"]
+  .codex-ui-file-change-group__indicator
+  svg {
+  height: 1rem;
+  width: 1rem;
+}
+
+.demo-root[data-scenario="current-review-files"]
+  .codex-ui-file-change-group__summary,
+.demo-root[data-scenario="current-review-files"]
+  .codex-ui-file-change-group__description,
+.demo-root[data-scenario="current-review-files"]
+  .codex-ui-file-change-group__file {
+  font-size: 0.875rem;
+  font-weight: 445;
+  line-height: 1.125rem;
+}
+
+.demo-current-review-card-stats {
+  display: inline-flex;
+  gap: 0.25rem;
+}
+
+.demo-current-review-card-stats [data-stat="additions"] {
+  color: rgb(7 193 112);
+}
+
+.demo-current-review-card-stats [data-stat="deletions"] {
+  color: rgb(255 58 61);
+}
+
+.demo-root[data-scenario="current-review-files"]
+  .codex-ui-file-change-group__file {
+  color: rgb(160 160 160);
+  min-height: 2.28125rem;
+}
+
+.demo-root[data-scenario="current-review-files"]
+  .codex-ui-file-change__stats
+  [data-dot] {
+  display: none;
+}
+
+.demo-root[data-scenario="current-review-files"]
+  .codex-ui-file-change__stats {
+  gap: 0.125rem;
+}
+
+.demo-root[data-scenario="current-review-files"] .demo-file-actions {
+  gap: 1.125rem;
+}
+
+.demo-root[data-scenario="current-review-files"] .demo-file-actions button {
+  background: transparent;
+  border: 0;
+  border-radius: 0.78125rem;
+  color: var(--codex-ui-text);
+  font-size: 0.875rem;
+  font-weight: 445;
+  height: 1.75rem;
+  line-height: 1.125rem;
+  padding: 0 0.75rem;
+}
+
+.demo-root[data-scenario="current-review-files"]
+  .demo-file-actions
+  button:first-child {
+  padding-inline: 0;
+}
+
+.demo-root[data-scenario="current-review-files"]
+  .demo-file-actions
+  button:last-child {
+  background: rgb(255 255 255 / 0.03);
+  border: 1px solid rgb(255 255 255 / 0.082);
+  padding-inline: 0.65625rem;
+}
+
+@media (max-width: 45rem) {
+  .demo-root[data-scenario="current-review-files"]
+    .codex-ui-file-review-workspace__body {
+    grid-template-columns: minmax(0, 1fr) 14.25rem;
+  }
+}
+
 .demo-pr-index {
   background: #101010;
   color: rgba(255, 255, 255, 0.92);

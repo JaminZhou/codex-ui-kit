@@ -101,6 +101,13 @@ failure/cancellation policy, pagination, and transcript streaming.
   content, optional controlled file selection, and a selected-file marker.
   Existing `lines` items remain supported; `FileReviewContent` makes non-text
   states explicit, and `FileReviewNotice` can also be composed independently.
+- `FileReviewWorkspace`: the current Review toolbar/body/tree composition with
+  controlled or uncontrolled six-way scope selection, aggregate statistics,
+  filtering, collapse/expand, jump selection, unified/split presentation,
+  changed-files visibility, Git-action hooks, and host-supplied exact icons.
+- `FileRevertErrorDialog`: controlled current-style Undo failure dialog with
+  replaceable title, description, and close icon; file mutation and recovery
+  policy remain host-owned.
 - `ApprovalRequest`: command, patch, network, permission, and generic approval
   card with scoped actions, shortcuts, loading, outcome states, and default or
   current Composer-dock presentation.
@@ -215,7 +222,8 @@ All privileged behavior remains host-owned. The components never auto-approve co
   chevron and action visibility transitions respect reduced motion.
 - `WorkspacePanel`: controlled side or bottom tab shell with labelled tab
   semantics, host action slots, close/open/expand hooks and labels, focusable
-  content, and host-owned tab contents.
+  content, an optional host-supplied exact close icon, and host-owned tab
+  contents.
 - `TerminalTranscript`, `TerminalPrompt`, and `TerminalSession`: terminal
   output, controlled input, and process-status composition with typed output
   rows, polite follow output, named log/input regions, and explicit
