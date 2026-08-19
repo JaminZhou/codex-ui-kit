@@ -114,6 +114,46 @@ describe("ApprovalRequest", () => {
     expect(screen.getByText("⏎").tagName).toBe("KBD");
   });
 
+  it("shows automatic shortcut hints only for available actions", () => {
+    const { rerender } = render(
+      <ApprovalRequest
+        kind="command"
+        onReject={() => undefined}
+        presentation="composer"
+        title="Run command?"
+      />,
+    );
+
+    expect(screen.getByText("Esc").tagName).toBe("KBD");
+    expect(screen.queryByText("⏎")).toBeNull();
+
+    rerender(
+      <ApprovalRequest
+        kind="command"
+        onApprove={() => undefined}
+        presentation="composer"
+        title="Run command?"
+      />,
+    );
+
+    expect(screen.queryByText("Esc")).toBeNull();
+    expect(screen.getByText("⏎").tagName).toBe("KBD");
+
+    rerender(
+      <ApprovalRequest
+        approveDisabled
+        kind="command"
+        onApprove={() => undefined}
+        onReject={() => undefined}
+        presentation="composer"
+        title="Run command?"
+      />,
+    );
+
+    expect(screen.getByText("Esc").tagName).toBe("KBD");
+    expect(screen.queryByText("⏎")).toBeNull();
+  });
+
   it("accepts an exact options glyph without changing its accessible name", () => {
     render(
       <ApprovalRequest

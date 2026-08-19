@@ -175,8 +175,13 @@ export function ApprovalRequest({
   const resolvedRejectLabel =
     rejectLabel ?? (kind === "generic" ? "Reject" : "Deny");
   const resolvedIdentity = identity ?? defaultIdentityLabels[kind];
-  const shortcutsVisible =
-    showShortcutHints ?? (presentation === "composer" && !disableHotkeys);
+  const automaticShortcutHints =
+    presentation === "composer" && !disableHotkeys;
+  const rejectShortcutVisible =
+    showShortcutHints ??
+    (automaticShortcutHints && !actionsDisabled && Boolean(onReject));
+  const approveShortcutVisible =
+    showShortcutHints ?? (automaticShortcutHints && !primaryDisabled);
 
   useEffect(() => {
     if (!isPending) setOptionsOpen(false);
@@ -503,7 +508,7 @@ export function ApprovalRequest({
               <span className="codex-ui-approval-request__button-label">
                 {resolvedRejectLabel}
               </span>
-              {shortcutsVisible ? (
+              {rejectShortcutVisible ? (
                 <kbd
                   aria-hidden="true"
                   className="codex-ui-approval-request__shortcut"
@@ -535,7 +540,7 @@ export function ApprovalRequest({
                   <span className="codex-ui-approval-request__button-label">
                     {resolvedApproveLabel}
                   </span>
-                  {shortcutsVisible ? (
+                  {approveShortcutVisible ? (
                     <kbd
                       aria-hidden="true"
                       className="codex-ui-approval-request__shortcut"
@@ -582,7 +587,7 @@ export function ApprovalRequest({
                 <span className="codex-ui-approval-request__button-label">
                   {resolvedApproveLabel}
                 </span>
-                {shortcutsVisible ? (
+                {approveShortcutVisible ? (
                   <kbd
                     aria-hidden="true"
                     className="codex-ui-approval-request__shortcut"
