@@ -83,6 +83,37 @@ describe("ApprovalRequest", () => {
     expect(screen.getByRole("button", { name: "Allow once" })).toBeTruthy();
   });
 
+  it("hides inactive shortcut hints unless a consumer explicitly opts in", () => {
+    const { rerender } = render(
+      <ApprovalRequest
+        disableHotkeys
+        kind="command"
+        onApprove={() => undefined}
+        onReject={() => undefined}
+        presentation="composer"
+        title="Run command?"
+      />,
+    );
+
+    expect(screen.queryByText("Esc")).toBeNull();
+    expect(screen.queryByText("⏎")).toBeNull();
+
+    rerender(
+      <ApprovalRequest
+        disableHotkeys
+        kind="command"
+        onApprove={() => undefined}
+        onReject={() => undefined}
+        presentation="composer"
+        showShortcutHints
+        title="Run command?"
+      />,
+    );
+
+    expect(screen.getByText("Esc").tagName).toBe("KBD");
+    expect(screen.getByText("⏎").tagName).toBe("KBD");
+  });
+
   it("accepts an exact options glyph without changing its accessible name", () => {
     render(
       <ApprovalRequest

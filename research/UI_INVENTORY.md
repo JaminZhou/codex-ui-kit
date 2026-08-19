@@ -1001,7 +1001,7 @@ Terminal/chevron assets, 28px actions, `Esc`/`⏎` keycaps, and the
 193.22×67.13 two-choice menu. Escape restores trigger focus; Deny leaves the
 sentinel absent, settles as `Worked for 1m 53s`, and restores the 736×98 empty
 Composer with `Ask for approval`. Browser/CDP and Electron repeat the path.
-The local-only card, menu, and Composer comparisons pass at 3.5133%, 4.7096%,
+The local-only card, menu, and Composer comparisons pass at 3.2558%, 4.7096%,
 and 2.1642% under 4%, 5%, and 3.5% limits. This promotes only command denial;
 Allow once/matching-rule paths retain their previous-build evidence and other
 approval kinds remain open.

@@ -175,7 +175,8 @@ export function ApprovalRequest({
   const resolvedRejectLabel =
     rejectLabel ?? (kind === "generic" ? "Reject" : "Deny");
   const resolvedIdentity = identity ?? defaultIdentityLabels[kind];
-  const shortcutsVisible = showShortcutHints ?? presentation === "composer";
+  const shortcutsVisible =
+    showShortcutHints ?? (presentation === "composer" && !disableHotkeys);
 
   useEffect(() => {
     if (!isPending) setOptionsOpen(false);
