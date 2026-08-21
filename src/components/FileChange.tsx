@@ -1,13 +1,16 @@
 import {
+  useEffect,
   useLayoutEffect,
   useMemo,
   useRef,
   useState,
   type HTMLAttributes,
+  type KeyboardEvent,
   type ReactNode,
 } from "react";
 import type { AgentItemStatus } from "../types.js";
 import { AgentActivity } from "./AgentActivity.js";
+import { Dialog } from "./Dialog.js";
 import { StatusIndicator } from "./StatusIndicator.js";
 
 export type FileChangeKind = "added" | "modified" | "deleted" | "renamed";
@@ -432,6 +435,7 @@ export function fileDiffToText(lines: readonly FileDiffLine[]) {
 export interface FileDiffProps
   extends Omit<HTMLAttributes<HTMLDivElement>, "children"> {
   emptyLabel?: string;
+  layout?: "split" | "unified";
   lines: readonly FileDiffLine[];
   renderContent?: (line: FileDiffLine, index: number) => ReactNode;
   size?: FileDiffSize;
@@ -441,6 +445,7 @@ export interface FileDiffProps
 export function FileDiff({
   className,
   emptyLabel = "No diff lines",
+  layout = "unified",
   lines,
   onScroll,
   renderContent,
@@ -455,6 +460,93 @@ export function FileDiff({
   const classes = ["codex-ui-file-diff", className]
     .filter(Boolean)
     .join(" ");
+  const indexedLines = lines.map((line, index) => ({ index, line }));
+  const splitRows: Array<{
+    after?: (typeof indexedLines)[number];
+    before?: (typeof indexedLines)[number];
+    spanning?: (typeof indexedLines)[number];
+  }> = [];
+
+  if (layout === "split") {
+    for (let index = 0; index < indexedLines.length; ) {
+      const current = indexedLines[index];
+      if (
+        current.line.kind === "deletion" ||
+        current.line.kind === "addition"
+      ) {
+        const before: Array<(typeof indexedLines)[number]> = [];
+        const after: Array<(typeof indexedLines)[number]> = [];
+        const beforeMetadata = new Map<
+          number,
+          Array<(typeof indexedLines)[number]>
+        >();
+        const afterMetadata = new Map<
+          number,
+          Array<(typeof indexedLines)[number]>
+        >();
+        let lastSide: "after" | "before" | undefined;
+        let lastPosition = -1;
+
+        while (
+          indexedLines[index] &&
+          ["addition", "deletion", "meta"].includes(
+            indexedLines[index].line.kind,
+          )
+        ) {
+          const entry = indexedLines[index];
+          if (entry.line.kind === "deletion") {
+            before.push(entry);
+            lastSide = "before";
+            lastPosition = before.length - 1;
+          } else if (entry.line.kind === "addition") {
+            after.push(entry);
+            lastSide = "after";
+            lastPosition = after.length - 1;
+          } else if (lastSide && lastPosition >= 0) {
+            const metadata =
+              lastSide === "before" ? beforeMetadata : afterMetadata;
+            metadata.set(lastPosition, [
+              ...(metadata.get(lastPosition) ?? []),
+              entry,
+            ]);
+          }
+          index += 1;
+        }
+        for (
+          let pairIndex = 0;
+          pairIndex < Math.max(before.length, after.length);
+          pairIndex += 1
+        ) {
+          splitRows.push({
+            after: after[pairIndex],
+            before: before[pairIndex],
+          });
+          const beforeMarkers = beforeMetadata.get(pairIndex) ?? [];
+          const afterMarkers = afterMetadata.get(pairIndex) ?? [];
+          for (
+            let markerIndex = 0;
+            markerIndex < Math.max(beforeMarkers.length, afterMarkers.length);
+            markerIndex += 1
+          ) {
+            splitRows.push({
+              after: afterMarkers[markerIndex],
+              before: beforeMarkers[markerIndex],
+            });
+          }
+        }
+        continue;
+      }
+      if (current.line.kind === "context") {
+        splitRows.push({ after: current, before: current });
+      } else {
+        splitRows.push({ spanning: current });
+      }
+      index += 1;
+    }
+  }
+
+  const contentFor = ({ index, line }: (typeof indexedLines)[number]) =>
+    renderContent?.(line, index) ?? line.tokens ?? (line.content || " ");
 
   const updateFade = () => {
     const element = rootRef.current;
@@ -491,6 +583,7 @@ export function FileDiff({
       className={classes}
       data-fade-bottom={fade.bottom || undefined}
       data-fade-top={fade.top || undefined}
+      data-layout={layout}
       data-size={size}
       data-wrap={wrapLines || undefined}
       onScroll={(event) => {
@@ -506,6 +599,77 @@ export function FileDiff({
         <span className="codex-ui-file-diff__empty" role="listitem">
           {emptyLabel}
         </span>
+      ) : layout === "split" ? (
+        splitRows.map((row, index) => {
+          if (row.spanning) {
+            const { line } = row.spanning;
+            return (
+              <div
+                aria-label={`${diffLineLabels[line.kind]}: ${line.content}`}
+                className="codex-ui-file-diff__split-row"
+                data-line-kind={line.kind}
+                key={`span:${row.spanning.index}:${line.kind}`}
+                role="listitem"
+              >
+                <span className="codex-ui-file-diff__split-spanning">
+                  <span
+                    aria-hidden="true"
+                    className="codex-ui-file-diff__line-number"
+                  />
+                  <code>{contentFor(row.spanning)}</code>
+                </span>
+              </div>
+            );
+          }
+
+          const labelEntries =
+            row.before?.index === row.after?.index
+              ? [row.before]
+              : [row.before, row.after];
+          const labels = labelEntries.flatMap((entry) =>
+            entry
+              ? [`${diffLineLabels[entry.line.kind]}: ${entry.line.content}`]
+              : [],
+          );
+          return (
+            <div
+              aria-label={labels.join("; ")}
+              className="codex-ui-file-diff__split-row"
+              data-line-kind={
+                row.before?.line.kind === "context"
+                  ? "context"
+                  : row.before?.line.kind === "meta" ||
+                      row.after?.line.kind === "meta"
+                    ? "meta"
+                    : "change"
+              }
+              key={`pair:${index}:${row.before?.index ?? ""}:${row.after?.index ?? ""}`}
+              role="listitem"
+            >
+              {(["before", "after"] as const).map((side) => {
+                const entry = row[side];
+                return (
+                  <span
+                    className="codex-ui-file-diff__split-pane"
+                    data-line-kind={entry?.line.kind ?? "empty"}
+                    data-side={side === "before" ? "old" : "new"}
+                    key={side}
+                  >
+                    <span
+                      aria-hidden="true"
+                      className="codex-ui-file-diff__line-number"
+                    >
+                      {side === "before"
+                        ? entry?.line.oldLineNumber ?? ""
+                        : entry?.line.newLineNumber ?? ""}
+                    </span>
+                    <code>{entry ? contentFor(entry) : " "}</code>
+                  </span>
+                );
+              })}
+            </div>
+          );
+        })
       ) : (
         lines.map((line, index) => (
           <div
@@ -525,9 +689,7 @@ export function FileDiff({
               {diffLinePrefixes[line.kind]}
             </span>
             <code>
-              {renderContent?.(line, index) ??
-                line.tokens ??
-                (line.content || " ")}
+              {contentFor({ index, line })}
             </code>
           </div>
         ))
@@ -764,5 +926,654 @@ export function FileReview({
         );
       })}
     </div>
+  );
+}
+
+export type FileReviewWorkspaceScope =
+  | "Last Turn"
+  | "Uncommitted"
+  | "Unstaged"
+  | "Staged"
+  | "Committed"
+  | "Branch";
+
+export type FileReviewWorkspaceIconName =
+  | "scopeChevron"
+  | "options"
+  | "collapseAll"
+  | "jumpToFile"
+  | "splitDiff"
+  | "filesToggle"
+  | "commit"
+  | "moreGit"
+  | "copyPath"
+  | "fileToggle"
+  | "openIn"
+  | "search"
+  | "file";
+
+export type FileReviewWorkspaceIcons = Partial<
+  Record<FileReviewWorkspaceIconName, ReactNode>
+>;
+
+export interface FileReviewWorkspaceProps
+  extends Omit<HTMLAttributes<HTMLDivElement>, "children"> {
+  defaultFilesVisible?: boolean;
+  defaultScope?: FileReviewWorkspaceScope;
+  defaultSplit?: boolean;
+  files: readonly FileReviewItem[];
+  icons?: FileReviewWorkspaceIcons;
+  onCommit?: () => void;
+  onCopyPath?: (file: FileReviewItem, index: number) => void | Promise<void>;
+  onMoreGitActions?: () => void;
+  onOpenFile?: (file: FileReviewItem, index: number) => void;
+  onReviewOptions?: () => void;
+  onScopeChange?: (scope: FileReviewWorkspaceScope) => void;
+  rootLabel?: string;
+  scope?: FileReviewWorkspaceScope;
+  /** Change this key to reveal the selected path again after repeated activation. */
+  selectionKey?: number | string;
+  selectedPath?: string;
+}
+
+const fileReviewWorkspaceScopes: readonly FileReviewWorkspaceScope[] = [
+  "Last Turn",
+  "Uncommitted",
+  "Unstaged",
+  "Staged",
+  "Committed",
+  "Branch",
+];
+
+const fileReviewWorkspaceFallbackIcons: Record<
+  FileReviewWorkspaceIconName,
+  ReactNode
+> = {
+  collapseAll: "⇈",
+  commit: "●",
+  copyPath: "▣",
+  file: "▤",
+  fileToggle: "⌃",
+  filesToggle: "▥",
+  jumpToFile: "↧",
+  moreGit: "⌄",
+  openIn: "↗",
+  options: "•••",
+  scopeChevron: "⌄",
+  search: "⌕",
+  splitDiff: "▥",
+};
+
+function reviewWorkspaceContent(file: FileReviewItem): FileReviewContent {
+  return file.content ?? { kind: "diff", lines: file.lines };
+}
+
+function reviewWorkspaceStatus(change: FileChangeKind) {
+  if (change === "added") return "+";
+  if (change === "deleted") return "";
+  if (change === "renamed") return "R";
+  return "•";
+}
+
+function moveReviewPopupFocus(
+  event: KeyboardEvent<HTMLElement>,
+  selector: string,
+) {
+  if (!["ArrowDown", "ArrowUp", "Home", "End"].includes(event.key)) {
+    return false;
+  }
+  const items = [...event.currentTarget.querySelectorAll<HTMLButtonElement>(
+    selector,
+  )];
+  if (items.length === 0) return false;
+  const currentIndex = items.indexOf(
+    document.activeElement as HTMLButtonElement,
+  );
+  const nextIndex =
+    event.key === "Home"
+      ? 0
+      : event.key === "End"
+        ? items.length - 1
+        : event.key === "ArrowDown"
+          ? currentIndex < 0
+            ? 0
+            : (currentIndex + 1) % items.length
+          : currentIndex < 0
+            ? items.length - 1
+            : (currentIndex - 1 + items.length) % items.length;
+  event.preventDefault();
+  items[nextIndex]?.focus();
+  return true;
+}
+
+export function FileReviewWorkspace({
+  className,
+  defaultFilesVisible = true,
+  defaultScope = "Last Turn",
+  defaultSplit = false,
+  files,
+  icons = {},
+  onCommit,
+  onCopyPath,
+  onMoreGitActions,
+  onOpenFile,
+  onReviewOptions,
+  onScopeChange,
+  rootLabel = "Changes",
+  scope,
+  selectionKey,
+  selectedPath,
+  "aria-label": ariaLabel = "Review workspace",
+  ...props
+}: FileReviewWorkspaceProps) {
+  const [internalScope, setInternalScope] = useState(defaultScope);
+  const [scopeOpen, setScopeOpen] = useState(false);
+  const [jumpOpen, setJumpOpen] = useState(false);
+  const [filter, setFilter] = useState("");
+  const [filesVisible, setFilesVisible] = useState(defaultFilesVisible);
+  const [split, setSplit] = useState(defaultSplit);
+  const [internalSelectedPath, setInternalSelectedPath] = useState(
+    files[0]?.path ?? null,
+  );
+  const [collapsedPaths, setCollapsedPaths] = useState<Set<string>>(
+    () => new Set(),
+  );
+  const scopeButtonRef = useRef<HTMLButtonElement>(null);
+  const scopeMenuRef = useRef<HTMLSpanElement>(null);
+  const scopeWrapRef = useRef<HTMLSpanElement>(null);
+  const jumpButtonRef = useRef<HTMLButtonElement>(null);
+  const jumpMenuRef = useRef<HTMLSpanElement>(null);
+  const jumpWrapRef = useRef<HTMLSpanElement>(null);
+  const fileElementsRef = useRef(new Map<string, HTMLElement>());
+  const resolvedScope = scope ?? internalScope;
+  const resolvedSelectedPath = selectedPath ?? internalSelectedPath;
+  const additions = files.reduce(
+    (total, file) => total + (file.additions ?? 0),
+    0,
+  );
+  const deletions = files.reduce(
+    (total, file) => total + (file.deletions ?? 0),
+    0,
+  );
+  const basenameCounts = files.reduce((counts, file) => {
+    const basename = file.path.split("/").at(-1) ?? file.path;
+    counts.set(basename, (counts.get(basename) ?? 0) + 1);
+    return counts;
+  }, new Map<string, number>());
+  const treeLabel = (file: FileReviewItem) => {
+    const basename = file.path.split("/").at(-1) ?? file.path;
+    return basenameCounts.get(basename) === 1 ? basename : file.path;
+  };
+  const visibleFiles = files.filter((file) =>
+    file.path.toLocaleLowerCase().includes(filter.trim().toLocaleLowerCase()),
+  );
+  const allDiffsCollapsed =
+    files.length > 0 &&
+    files.every(({ path }) => collapsedPaths.has(path));
+  const icon = (name: FileReviewWorkspaceIconName) => (
+    <span aria-hidden="true" className="codex-ui-file-review-workspace__icon">
+      {icons[name] ?? fileReviewWorkspaceFallbackIcons[name]}
+    </span>
+  );
+  const closePopup = (
+    setter: (open: boolean) => void,
+    returnFocus: { current: HTMLButtonElement | null },
+  ) => {
+    setter(false);
+    window.setTimeout(() => returnFocus.current?.focus());
+  };
+  const selectFile = (file: FileReviewItem, index: number) => {
+    setInternalSelectedPath(file.path);
+    onOpenFile?.(file, index);
+    fileElementsRef.current
+      .get(file.path)
+      ?.scrollIntoView({ block: "nearest", inline: "nearest" });
+  };
+  const classes = ["codex-ui-file-review-workspace", className]
+    .filter(Boolean)
+    .join(" ");
+
+  useLayoutEffect(() => {
+    if (
+      resolvedSelectedPath &&
+      files.some(({ path }) => path === resolvedSelectedPath)
+    ) {
+      return;
+    }
+    setInternalSelectedPath(files[0]?.path ?? null);
+  }, [files, resolvedSelectedPath]);
+
+  useLayoutEffect(() => {
+    if (!selectedPath) return;
+    fileElementsRef.current
+      .get(selectedPath)
+      ?.scrollIntoView({ block: "nearest", inline: "nearest" });
+  }, [files, selectedPath, selectionKey]);
+
+  useLayoutEffect(() => {
+    const currentPaths = new Set(files.map(({ path }) => path));
+    setCollapsedPaths((current) => {
+      const next = new Set(
+        [...current].filter((path) => currentPaths.has(path)),
+      );
+      return next.size === current.size ? current : next;
+    });
+  }, [files]);
+
+  useLayoutEffect(() => {
+    if (!scopeOpen) return;
+    const selected = scopeMenuRef.current?.querySelector<HTMLButtonElement>(
+      '[role="menuitemradio"][aria-checked="true"]',
+    );
+    const first = scopeMenuRef.current?.querySelector<HTMLButtonElement>(
+      '[role="menuitemradio"]',
+    );
+    (selected ?? first)?.focus();
+  }, [scopeOpen]);
+
+  useLayoutEffect(() => {
+    if (!jumpOpen) return;
+    const selected = jumpMenuRef.current?.querySelector<HTMLButtonElement>(
+      '[role="option"][aria-selected="true"]',
+    );
+    const first = jumpMenuRef.current?.querySelector<HTMLButtonElement>(
+      '[role="option"]',
+    );
+    (selected ?? first)?.focus();
+  }, [jumpOpen]);
+
+  useEffect(() => {
+    if (!scopeOpen && !jumpOpen) return;
+    const dismissForTarget = (target: EventTarget | null) => {
+      if (!(target instanceof Node)) return;
+      if (scopeOpen && !scopeWrapRef.current?.contains(target)) {
+        setScopeOpen(false);
+      }
+      if (jumpOpen && !jumpWrapRef.current?.contains(target)) {
+        setJumpOpen(false);
+      }
+    };
+    const handlePointerDown = (event: PointerEvent) =>
+      dismissForTarget(event.target);
+    const handleFocusIn = (event: FocusEvent) =>
+      dismissForTarget(event.target);
+    document.addEventListener("pointerdown", handlePointerDown, true);
+    document.addEventListener("focusin", handleFocusIn, true);
+    return () => {
+      document.removeEventListener("pointerdown", handlePointerDown, true);
+      document.removeEventListener("focusin", handleFocusIn, true);
+    };
+  }, [jumpOpen, scopeOpen]);
+
+  return (
+    <div
+      aria-label={ariaLabel}
+      className={classes}
+      data-files-visible={filesVisible || undefined}
+      data-layout={split ? "split" : "unified"}
+      role="region"
+      {...props}
+    >
+      <div
+        aria-label="Review controls"
+        className="codex-ui-file-review-workspace__toolbar"
+        onClickCapture={(event) => {
+          const target = event.target;
+          if (!(target instanceof Node)) return;
+          if (!scopeWrapRef.current?.contains(target)) setScopeOpen(false);
+          if (!jumpWrapRef.current?.contains(target)) setJumpOpen(false);
+        }}
+        role="toolbar"
+      >
+        <span
+          className="codex-ui-file-review-workspace__scope-wrap"
+          ref={scopeWrapRef}
+        >
+          <button
+            aria-expanded={scopeOpen}
+            aria-haspopup="menu"
+            className="codex-ui-file-review-workspace__scope"
+            onClick={() => {
+              setJumpOpen(false);
+              setScopeOpen((open) => !open);
+            }}
+            onKeyDown={(event) => {
+              if (event.key !== "Escape" || !scopeOpen) return;
+              event.preventDefault();
+              closePopup(setScopeOpen, scopeButtonRef);
+            }}
+            ref={scopeButtonRef}
+            type="button"
+          >
+            {resolvedScope}
+            {icon("scopeChevron")}
+          </button>
+          {scopeOpen ? (
+            <span
+              aria-label="Review scope"
+              className="codex-ui-file-review-workspace__menu"
+              onKeyDown={(event) => {
+                if (event.key === "Escape") {
+                  event.preventDefault();
+                  closePopup(setScopeOpen, scopeButtonRef);
+                  return;
+                }
+                moveReviewPopupFocus(event, '[role="menuitemradio"]');
+              }}
+              ref={scopeMenuRef}
+              role="menu"
+            >
+              {fileReviewWorkspaceScopes.map((item) => (
+                <button
+                  aria-checked={item === resolvedScope}
+                  key={item}
+                  onClick={() => {
+                    if (scope === undefined) setInternalScope(item);
+                    onScopeChange?.(item);
+                    closePopup(setScopeOpen, scopeButtonRef);
+                  }}
+                  role="menuitemradio"
+                  tabIndex={item === resolvedScope ? 0 : -1}
+                  type="button"
+                >
+                  {item}
+                </button>
+              ))}
+            </span>
+          ) : null}
+        </span>
+        <span className="codex-ui-file-review-workspace__stats">
+          <span data-stat="additions">+{additions}</span>
+          <span data-stat="deletions">−{deletions}</span>
+        </span>
+        <span className="codex-ui-file-review-workspace__toolbar-actions">
+          <button
+            aria-label="Review options"
+            className="codex-ui-file-review-workspace__optional-action"
+            onClick={onReviewOptions}
+            type="button"
+          >
+            {icon("options")}
+          </button>
+          <button
+            aria-label={
+              allDiffsCollapsed ? "Expand all diffs" : "Collapse all diffs"
+            }
+            className="codex-ui-file-review-workspace__optional-action"
+            onClick={() =>
+              setCollapsedPaths(() =>
+                allDiffsCollapsed
+                  ? new Set()
+                  : new Set(files.map(({ path }) => path)),
+              )
+            }
+            type="button"
+          >
+            {icon("collapseAll")}
+          </button>
+          <span
+            className="codex-ui-file-review-workspace__jump-wrap"
+            ref={jumpWrapRef}
+          >
+            <button
+              aria-expanded={jumpOpen}
+              aria-haspopup="listbox"
+              aria-label="Jump to file"
+              onClick={() => {
+                setScopeOpen(false);
+                setJumpOpen((open) => !open);
+              }}
+              onKeyDown={(event) => {
+                if (event.key !== "Escape" || !jumpOpen) return;
+                event.preventDefault();
+                closePopup(setJumpOpen, jumpButtonRef);
+              }}
+              ref={jumpButtonRef}
+              type="button"
+            >
+              {icon("jumpToFile")}
+            </button>
+            {jumpOpen ? (
+              <span
+                aria-label="Changed files"
+                className="codex-ui-file-review-workspace__menu codex-ui-file-review-workspace__jump-menu"
+                onKeyDown={(event) => {
+                  if (event.key === "Escape") {
+                    event.preventDefault();
+                    closePopup(setJumpOpen, jumpButtonRef);
+                    return;
+                  }
+                  moveReviewPopupFocus(event, '[role="option"]');
+                }}
+                ref={jumpMenuRef}
+                role="listbox"
+              >
+                {files.map((file, index) => (
+                  <button
+                    aria-selected={file.path === resolvedSelectedPath}
+                    key={file.path}
+                    onClick={() => {
+                      selectFile(file, index);
+                      closePopup(setJumpOpen, jumpButtonRef);
+                    }}
+                    role="option"
+                    tabIndex={file.path === resolvedSelectedPath ? 0 : -1}
+                    type="button"
+                  >
+                    {file.path}
+                  </button>
+                ))}
+              </span>
+            ) : null}
+          </span>
+          <button
+            aria-label={split ? "Switch to unified diff" : "Switch to split diff"}
+            className="codex-ui-file-review-workspace__optional-action"
+            onClick={() => setSplit((value) => !value)}
+            type="button"
+          >
+            {icon("splitDiff")}
+          </button>
+          <button
+            aria-label={filesVisible ? "Hide files" : "Show files"}
+            onClick={() => setFilesVisible((visible) => !visible)}
+            type="button"
+          >
+            {icon("filesToggle")}
+          </button>
+          <span className="codex-ui-file-review-workspace__git-actions">
+            <button aria-label="Commit or push" onClick={onCommit} type="button">
+              {icon("commit")}
+              <span>Commit or push</span>
+            </button>
+            <button
+              aria-label="More Git actions"
+              onClick={onMoreGitActions}
+              type="button"
+            >
+              {icon("moreGit")}
+            </button>
+          </span>
+        </span>
+      </div>
+      <div className="codex-ui-file-review-workspace__body">
+        <div
+          aria-label="Review diffs"
+          className="codex-ui-file-review-workspace__diffs"
+          role="list"
+        >
+          {files.map((file, index) => {
+            const content = reviewWorkspaceContent(file);
+            const collapsed = collapsedPaths.has(file.path);
+            return (
+              <section
+                aria-label={`Review file ${file.path}`}
+                className="codex-ui-file-review-workspace__diff"
+                data-change={file.change}
+                data-collapsed={collapsed || undefined}
+                data-review-workspace-path={file.path}
+                key={file.path}
+                ref={(element) => {
+                  if (element) fileElementsRef.current.set(file.path, element);
+                  else fileElementsRef.current.delete(file.path);
+                }}
+                role="listitem"
+              >
+                <header>
+                  <span className="codex-ui-file-review-workspace__file-identity">
+                    {icon("file")}
+                    <code>{file.path}</code>
+                  </span>
+                  <FileChangeStats
+                    additions={file.additions}
+                    change={file.change}
+                    deletions={file.deletions}
+                  />
+                  <span className="codex-ui-file-review-workspace__file-actions">
+                    <button
+                      aria-label="Copy path"
+                      onClick={() => {
+                        if (onCopyPath) void onCopyPath(file, index);
+                        else copyWithClipboard(file.path);
+                      }}
+                      type="button"
+                    >
+                      {icon("copyPath")}
+                    </button>
+                    <button
+                      aria-expanded={!collapsed}
+                      aria-label="Toggle file diff"
+                      onClick={() =>
+                        setCollapsedPaths((current) => {
+                          const next = new Set(current);
+                          if (next.has(file.path)) next.delete(file.path);
+                          else next.add(file.path);
+                          return next;
+                        })
+                      }
+                      type="button"
+                    >
+                      {icon("fileToggle")}
+                    </button>
+                    <button
+                      aria-label="Open in"
+                      onClick={() => onOpenFile?.(file, index)}
+                      type="button"
+                    >
+                      {icon("openIn")}
+                    </button>
+                  </span>
+                </header>
+                {!collapsed ? (
+                  content.kind === "diff" ? (
+                    <FileDiff
+                      aria-label={`Review diff for ${file.path}`}
+                      layout={split ? "split" : "unified"}
+                      lines={content.lines}
+                      tabIndex={0}
+                      wrapLines={false}
+                    />
+                  ) : (
+                    <FileReviewNotice
+                      description={content.description}
+                      kind={content.kind}
+                      title={content.title}
+                    />
+                  )
+                ) : null}
+              </section>
+            );
+          })}
+        </div>
+        {filesVisible ? (
+          <aside
+            aria-label="Changed files"
+            className="codex-ui-file-review-workspace__files"
+          >
+            <label className="codex-ui-file-review-workspace__filter">
+              {icon("search")}
+              <input
+                aria-label="Filter files"
+                onChange={(event) => setFilter(event.currentTarget.value)}
+                placeholder="Filter files…"
+                type="search"
+                value={filter}
+              />
+            </label>
+            <div className="codex-ui-file-review-workspace__tree" role="tree">
+              <div className="codex-ui-file-review-workspace__root">
+                {icon("scopeChevron")}
+                {rootLabel}
+              </div>
+              {visibleFiles.map((file) => {
+                const index = files.indexOf(file);
+                return (
+                  <button
+                    aria-label={`Select ${file.path}`}
+                    data-change={file.change}
+                    data-selected={
+                      resolvedSelectedPath === file.path || undefined
+                    }
+                    key={file.path}
+                    onClick={() => selectFile(file, index)}
+                    role="treeitem"
+                    type="button"
+                  >
+                    {icon("file")}
+                    <span>{treeLabel(file)}</span>
+                    <span
+                      aria-label={file.change}
+                      className="codex-ui-file-review-workspace__status"
+                    >
+                      {reviewWorkspaceStatus(file.change)}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          </aside>
+        ) : null}
+      </div>
+    </div>
+  );
+}
+
+export interface FileRevertErrorDialogProps {
+  closeIcon?: ReactNode;
+  description?: ReactNode;
+  onOpenChange: (open: boolean) => void;
+  open: boolean;
+  title?: ReactNode;
+}
+
+export function FileRevertErrorDialog({
+  closeIcon,
+  description = "Git apply error: error: patch with only garbage at line 4",
+  onOpenChange,
+  open,
+  title = "Failed to revert changes",
+}: FileRevertErrorDialogProps) {
+  return (
+    <Dialog
+      className="codex-ui-file-revert-error-dialog"
+      closeIcon={closeIcon}
+      description={description}
+      footer={
+        <button
+          className="codex-ui-file-revert-error-dialog__close-action"
+          onClick={() => onOpenChange(false)}
+          type="button"
+        >
+          Close
+        </button>
+      }
+      initialFocusSelector=".codex-ui-file-revert-error-dialog__close-action"
+      onOpenChange={onOpenChange}
+      open={open}
+      size="compact"
+      title={title}
+    >
+      <span aria-hidden="true" />
+    </Dialog>
   );
 }

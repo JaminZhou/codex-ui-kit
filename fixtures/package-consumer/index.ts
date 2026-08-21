@@ -62,10 +62,13 @@ import {
   DialogChoice,
   type DialogSize,
   FileChange,
+  FileChangeGroup,
   type FileChangeStatus,
   FileDiff,
+  FileRevertErrorDialog,
   type FileReviewContent,
   FileReviewNotice,
+  FileReviewWorkspace,
   GeneratedImageGallery,
   GeneralSettingsPage,
   type GeneralSettingsValue,
@@ -305,8 +308,11 @@ void appServerCrashRecoveryAction;
 void appRouteOutletAction;
 void appWindowChromeAction;
 void FileChange;
+void FileChangeGroup;
 void FileDiff;
+void FileRevertErrorDialog;
 void FileReviewNotice;
+void FileReviewWorkspace;
 void fileReviewContent;
 void GeneratedImageGallery;
 void ImagePreviewDialog;

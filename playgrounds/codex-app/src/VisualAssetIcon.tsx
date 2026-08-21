@@ -18,6 +18,34 @@ const reactTagNames: Readonly<Record<string, string>> = {
   radialgradient: "radialGradient",
 };
 
+const replayStyleProperties = new Set([
+  "clip-path",
+  "color",
+  "display",
+  "fill",
+  "fill-opacity",
+  "filter",
+  "height",
+  "mask",
+  "opacity",
+  "overflow",
+  "paint-order",
+  "shape-rendering",
+  "stroke",
+  "stroke-dasharray",
+  "stroke-dashoffset",
+  "stroke-linecap",
+  "stroke-linejoin",
+  "stroke-miterlimit",
+  "stroke-opacity",
+  "stroke-width",
+  "transform",
+  "transform-origin",
+  "vector-effect",
+  "visibility",
+  "width",
+]);
+
 export type VisualPrimitive = {
   attributes: Record<string, string>;
   children?: readonly VisualPrimitive[];
@@ -49,16 +77,18 @@ function toReactAttributes(attributes: object) {
 
 function toReactStyle(style: object): SVGProps<SVGElement>["style"] {
   return Object.fromEntries(
-    Object.entries(style).map(([name, value]) => {
-      const normalized = name
-        .replace(/^-webkit-/, "Webkit-")
-        .replace(/^-moz-/, "Moz-")
-        .replace(/^-ms-/, "ms-")
-        .replace(/-([a-z])/g, (_match, letter: string) =>
-          letter.toUpperCase(),
-        );
-      return [normalized, value];
-    }),
+    Object.entries(style)
+      .filter(([name]) => replayStyleProperties.has(name))
+      .map(([name, value]) => {
+        const normalized = name
+          .replace(/^-webkit-/, "Webkit-")
+          .replace(/^-moz-/, "Moz-")
+          .replace(/^-ms-/, "ms-")
+          .replace(/-([a-z])/g, (_match, letter: string) =>
+            letter.toUpperCase(),
+          );
+        return [normalized, value];
+      }),
   ) as SVGProps<SVGElement>["style"];
 }
 

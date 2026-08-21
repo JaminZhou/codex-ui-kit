@@ -8,6 +8,7 @@ import compactionTrace from "../fixtures/traces/compaction.jsonl?raw";
 import contextSummaryTrace from "../fixtures/traces/context-summary.jsonl?raw";
 import currentMixedToolThreadTrace from "../fixtures/traces/current-mixed-tool-thread.jsonl?raw";
 import currentReviewRenameTrace from "../fixtures/traces/current-review-rename.jsonl?raw";
+import currentReviewFilesTrace from "../fixtures/traces/current-review-files.jsonl?raw";
 import commandFailureRecoveryTrace from "../fixtures/traces/command-failure-recovery.jsonl?raw";
 import conversationLifecycleTrace from "../fixtures/traces/conversation-lifecycle.jsonl?raw";
 import backgroundTerminalTrace from "../fixtures/traces/background-terminal.jsonl?raw";
@@ -54,6 +55,7 @@ export type ReplayScenarioId =
   | "context-summary"
   | "current-mixed-tool-thread"
   | "current-review-rename"
+  | "current-review-files"
   | "large-file-review"
   | "long-command-output"
   | "markdown"
@@ -228,6 +230,12 @@ export const replayScenarios: Record<ReplayScenarioId, ReplayScenario> = {
     "Rename current review probe",
     "The current product presents a rename as separate marker-backed source and destination diffs while preserving the public move-path replay independently.",
     currentReviewRenameTrace,
+  ),
+  "current-review-files": scenario(
+    "current-review-files",
+    "Update current Review probe files",
+    "The current 26.810 Review workspace covers added, modified, and deleted files, toolbar and file-tree interactions, compact overlay behavior, and the observed Undo failure boundary.",
+    currentReviewFilesTrace,
   ),
   "multi-file-review": scenario(
     "multi-file-review",

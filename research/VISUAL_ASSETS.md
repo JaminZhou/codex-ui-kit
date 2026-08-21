@@ -9,9 +9,11 @@ truth for exact visual primitives observed in the current Codex Desktop build.
 Each entry records the application/build fingerprint, the de-identified CDP
 owner evidence, viewBox, rendered size, source root class, resolved root SVG
 style, per-primitive resolved style, root attributes, primitive geometry, and
-canonical SHA-256. Root and descendant class effects are replayed through the
-complete standard computed-style snapshots instead of depending on private
-upstream stylesheets. The same manifest explicitly lists remaining
+canonical SHA-256. The manifest retains complete standard computed-style
+snapshots for provenance, while replay keeps only SVG paint, visibility,
+transform, overflow, and rendered-size properties. Context-owned layout such
+as margin, position, and flex placement comes from the public component rather
+than leaking from the original DOM owner. The same manifest explicitly lists remaining
 approximations, so a passing regression check cannot be described as global
 pixel parity while the list is non-empty.
 
@@ -145,9 +147,30 @@ overlapping, incomplete, or differently rendered supplement fails closed.
 Every updater write also regenerates the current-thread replay subset from the
 same in-memory manifest, so MCP source hashes and styles cannot remain stale.
 
+Review assets have a separate fail-closed path for an already opened current
+Review workspace on the unchanged fingerprint:
+
+```sh
+visual_profile=/absolute/path/to/unique-profile
+CODEX_VISUAL_ASSET_CDP_PORT=<port> \
+CODEX_VISUAL_ASSET_PROFILE="$visual_profile" \
+CODEX_VISUAL_ASSET_REVIEW_ONLY=1 \
+node scripts/capture-current-visual-assets.mjs \
+  > "$visual_profile/current-review-visual-assets.json"
+
+pnpm update:visual-assets:review
+```
+
+The updater requires the exact dark 1180×820 `review-workspace` capture,
+matches seventeen semantic SVG groups, rejects missing or ambiguous geometry,
+resolves same-document `<use>` references into replayable symbol paths, and
+stores the fixed panel/filter/file observation. The replay subset is updated
+in the same write, and URL-bearing visual scalars are sanitized before captured
+JSON reaches stdout.
+
 The targeted updater proves the `completed-thread` capture mode and exact
 baseline context before promoting Send, four assistant actions, and seven
-thread-header primitives. The generated 24-icon demo subset strips non-paint
+thread-header primitives. The generated 41-icon demo subset strips non-paint
 computed properties while retaining each source SHA-256; it is checked on
 every research run and emitted as a separate demo chunk. The same path captures
 the visible VS Code integration PNG into

@@ -14,9 +14,9 @@ exit gates; it does not replace the inventory.
   Desktop `26.810.52044` (`6662`). Unsampled earlier-build surfaces remain
   previous-build regression evidence rather than current verification.
 - The inventory contains 89 surface groups: 59 P0, 21 P1, and 9 P2.
-- 30 groups have current-build runtime evidence, 43 have previous-build-only
+- 34 groups have current-build runtime evidence, 39 have previous-build-only
   runtime evidence, and 16 have not been sampled.
-- The scoped `26.810.52044` refresh revalidates 98
+- The scoped `26.810.52044` refresh revalidates 115
   sidebar/menu/window-chrome/Composer/Settings/completed-thread icons against
   exact runtime evidence. It adds Voice and Activity-attention, widens Help to
   320px, removes the Account Usage chevron and thread-header New chat action,
@@ -51,6 +51,12 @@ exit gates; it does not replace the inventory.
   recovery. It distinguishes the exact Ask-mode hand glyph from the non-ask
   shield and adds current Browser/CDP, Electron, and three regional pixel gates
   without promoting Allow or other approval kinds.
+  The current Review follow-up reaches a real three-file card, wide/compact
+  Review workspace, all six scopes and toolbar controls, exact file tree and
+  stacked diffs, plus one Undo failure dialog. It promotes seventeen exact
+  Review assets and restores current Browser/CDP, Electron, integrated visual,
+  and 4.3339% product-panel gates for four inventory groups while keeping
+  successful Undo and unsampled content variants open.
   Earlier hover/footer slices promoted More, Pin,
   Archive, and Help, confirms that Settings is absent from the sampled footer
   and that sampled project-task rows have no leading glyph. The Recents follow-up

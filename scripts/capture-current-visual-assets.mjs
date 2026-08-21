@@ -15,7 +15,8 @@ const threadOnly = process.env.CODEX_VISUAL_ASSET_THREAD_ONLY === "1";
 const mcpOnly = process.env.CODEX_VISUAL_ASSET_MCP_ONLY === "1";
 const projectPickerOnly =
   process.env.CODEX_VISUAL_ASSET_PROJECT_PICKER_ONLY === "1";
-if ([threadOnly, mcpOnly, projectPickerOnly].filter(Boolean).length > 1) {
+const reviewOnly = process.env.CODEX_VISUAL_ASSET_REVIEW_ONLY === "1";
+if ([threadOnly, mcpOnly, projectPickerOnly, reviewOnly].filter(Boolean).length > 1) {
   throw new Error("Current visual asset capture modes are mutually exclusive.");
 }
 const appBundle = "/Applications/ChatGPT.app";
@@ -55,6 +56,8 @@ const baselineContext = {
     ? "completed-current-mcp-thread"
     : projectPickerOnly
       ? "open-current-project-picker"
+      : reviewOnly
+        ? "open-current-review-workspace"
     : "resting-and-open-sidebar-menus",
   theme: "dark",
   viewport: { height: 820, width: 1180 },
@@ -189,6 +192,24 @@ const semanticLabels = new Map([
   ["Quick chat", "sidebar-quick-chat"],
   ["Search", "sidebar-search"],
   ["Secondary action", "thread-header-open-in-chevron"],
+  ["Close Review tab", "review-close"],
+  ["Collapse all diffs", "review-collapse-all"],
+  ["Copy path", "review-copy-path"],
+  ["Commit or push", "review-commit-or-push"],
+  ["Create PR", "review-create-pr"],
+  ["Expand panel", "review-expand"],
+  ["Hide files", "review-files-toggle"],
+  ["Jump to file", "review-jump-file"],
+  ["Last Turn", "review-scope-chevron"],
+  ["More Git actions", "review-more-git"],
+  ["Open in", "review-open-in"],
+  ["Open side panel tab", "review-open-tab"],
+  ["Review", "review-tab"],
+  ["Review options", "review-options"],
+  ["Show files", "review-files-toggle"],
+  ["Switch to split diff", "review-split-diff"],
+  ["Switch to unified diff", "review-split-diff"],
+  ["Toggle file diff", "review-file-toggle"],
   ["Send", "composer-send"],
   ["Scheduled", "sidebar-scheduled"],
   ["Settings", "sidebar-settings"],
@@ -236,6 +257,7 @@ try {
     { timeout: 15_000 },
   );
   if (
+    !reviewOnly &&
     (await main.locator('[contenteditable="true"][role="textbox"]').count()) ===
     0
   ) {
@@ -277,6 +299,7 @@ try {
   if (
     !threadOnly &&
     !mcpOnly &&
+    !reviewOnly &&
     (await main.locator('[data-testid="home-icon"]:visible').count()) === 0
   ) {
     const newChat = main
@@ -304,6 +327,7 @@ try {
     'main button[data-composer-navigation-target="run-location"]:visible',
   );
   if (
+    !reviewOnly &&
     (await initialRunLocationTrigger.count()) === 1 &&
     (await initialRunLocationTrigger.textContent())
       ?.trim()
@@ -380,6 +404,7 @@ try {
   const result = await main.evaluate(({
     mcpOnly,
     projectPickerOnly,
+    reviewOnly,
     semanticLabelEntries,
     threadOnly,
   }) => {
@@ -559,7 +584,15 @@ try {
     }
     const navigationRight =
       threadOnly || mcpOnly ? 0 : navigationBounds?.right ?? 0;
+    const reviewPanelBounds = reviewOnly
+      ? document
+          .querySelector('aside[data-app-shell-focus-area="right-panel"]')
+          ?.getBoundingClientRect() ?? null
+      : null;
     const region = (value) => {
+      if (reviewPanelBounds && value.left >= reviewPanelBounds.left) {
+        return "review-panel";
+      }
       if (value.top < 52) return "titlebar";
       if (value.left < navigationRight && value.top < 250) {
         return "sidebar-primary";
@@ -986,6 +1019,9 @@ try {
         if (
           !owner ||
           !targetRegion ||
+          (reviewOnly &&
+            targetRegion === "review-panel" &&
+            !svg.closest('aside[data-app-shell-focus-area="right-panel"]')) ||
           (targetRegion === "composer"
             ? !isActuallyVisible(svg)
             : getComputedStyle(svg).visibility !== "visible") ||
@@ -1185,12 +1221,12 @@ try {
         },
       };
     }
-    const captureSemanticSvg = (svg, semanticId) => {
+    const captureSemanticSvg = (svg, semanticId, targetRegion = "conversation") => {
       const bounds = svg.getBoundingClientRect();
       return {
         owner: { role: "presentation", semanticId },
         primitives: [...svg.children].map(serializeSvgElement),
-        region: "conversation",
+        region: targetRegion,
         rect: rect(svg),
         renderSize: {
           height: round(bounds.height),
@@ -1202,6 +1238,147 @@ try {
         viewBox: svg.getAttribute("viewBox"),
       };
     };
+    let reviewObservation = null;
+    if (reviewOnly) {
+      const isReviewVisible = (element) => {
+        if (!(element instanceof Element)) return false;
+        const bounds = element.getBoundingClientRect();
+        const style = getComputedStyle(element);
+        return (
+          bounds.width > 0 &&
+          bounds.height > 0 &&
+          bounds.right > 0 &&
+          bounds.left < innerWidth &&
+          bounds.bottom > 0 &&
+          bounds.top < innerHeight &&
+          style.display !== "none" &&
+          style.opacity !== "0" &&
+          style.visibility === "visible"
+        );
+      };
+      const panel = document.querySelector(
+        'aside[data-app-shell-focus-area="right-panel"]',
+      );
+      if (!panel || !isReviewVisible(panel)) {
+        throw new Error("Current Review capture requires one visible right panel.");
+      }
+      const reviewTabs = [...panel.querySelectorAll('[role="tab"]')].filter(
+        (tab) => isReviewVisible(tab) && tab.textContent?.trim() === "Review",
+      );
+      if (reviewTabs.length !== 1) {
+        throw new Error(
+          `Expected one visible Review tab, received ${reviewTabs.length}.`,
+        );
+      }
+      const filter = panel.querySelector('input[placeholder="Filter files…"]');
+      if (!(filter instanceof HTMLInputElement) || !isReviewVisible(filter)) {
+        throw new Error("Current Review capture requires its visible file filter.");
+      }
+      const searchSvgs = [
+        ...(filter.parentElement?.querySelectorAll("svg") ?? []),
+      ].filter(isReviewVisible);
+      if (searchSvgs.length !== 1) {
+        throw new Error(
+          `Expected one visible Review search icon, received ${searchSvgs.length}.`,
+        );
+      }
+      icons.push(
+        captureSemanticSvg(searchSvgs[0], "review-search", "review-panel"),
+      );
+
+      const visibleFileUses = [
+        ...panel.querySelectorAll('svg use[href="#file-tree-builtin-text"]'),
+      ].filter((use) => isReviewVisible(use.closest("svg")));
+      const fileSvg = visibleFileUses[0]?.closest("svg");
+      const fileSymbol = document.querySelector(
+        'symbol#file-tree-builtin-text',
+      );
+      if (!(fileSvg instanceof SVGElement) || !(fileSymbol instanceof SVGElement)) {
+        throw new Error("Current Review capture requires the visible text-file symbol.");
+      }
+      const namespace = "http://www.w3.org/2000/svg";
+      const expandedFileSvg = document.createElementNS(namespace, "svg");
+      expandedFileSvg.setAttribute("viewBox", fileSvg.getAttribute("viewBox") ?? "0 0 16 16");
+      expandedFileSvg.setAttribute("width", "16");
+      expandedFileSvg.setAttribute("height", "16");
+      expandedFileSvg.style.color = getComputedStyle(fileSvg).color;
+      expandedFileSvg.style.position = "fixed";
+      expandedFileSvg.style.left = "-1000px";
+      expandedFileSvg.style.top = "0";
+      for (const child of fileSymbol.children) {
+        const clone = child.cloneNode(true);
+        clone.removeAttribute("class");
+        expandedFileSvg.append(clone);
+      }
+      document.body.append(expandedFileSvg);
+      const fileBounds = fileSvg.getBoundingClientRect();
+      icons.push({
+        owner: { role: "presentation", semanticId: "review-file-text" },
+        primitives: [...expandedFileSvg.children].map(serializeSvgElement),
+        region: "review-panel",
+        rect: rect(fileSvg),
+        renderSize: {
+          height: round(fileBounds.height),
+          width: round(fileBounds.width),
+        },
+        rootAttributes: attributes(fileSvg, true),
+        rootComputedStyle: computedStyle(fileSvg),
+        sourceClassName: fileSvg.getAttribute("class") ?? "",
+        viewBox: fileSvg.getAttribute("viewBox"),
+      });
+      expandedFileSvg.remove();
+
+      const visibleButtons = [...panel.querySelectorAll("button")].filter(
+        isReviewVisible,
+      );
+      const countLabel = (label) =>
+        visibleButtons.filter(
+          (button) =>
+            button.getAttribute("aria-label") === label ||
+            button.getAttribute("title") === label ||
+            button.textContent?.trim() === label,
+        ).length;
+      reviewObservation = {
+        copyPathCount: countLabel("Copy path"),
+        fileNames: ["added.txt", "alpha.txt", "obsolete.txt"].filter((name) =>
+          [...panel.querySelectorAll("*")].some(
+            (element) =>
+              element.children.length === 0 && element.textContent?.trim() === name,
+          ),
+        ),
+        fileTextIconCount: visibleFileUses.length,
+        filter: {
+          placeholder: filter.placeholder,
+          rect: rect(filter),
+          style: fontStyle(filter),
+        },
+        openInCount: countLabel("Open in"),
+        panel: {
+          rect: rect(panel),
+          style: {
+            backgroundColor: getComputedStyle(panel).backgroundColor,
+            borderColor: getComputedStyle(panel).borderColor,
+          },
+        },
+        splitDiffLabel:
+          visibleButtons.find((button) =>
+            ["Switch to split diff", "Switch to unified diff"].includes(
+              button.getAttribute("aria-label") ?? "",
+            ),
+          )?.getAttribute("aria-label") ?? null,
+        toggleFileDiffCount: countLabel("Toggle file diff"),
+        toolbarLabels: [
+          "Last Turn",
+          "Review options",
+          "Collapse all diffs",
+          "Jump to file",
+          "Switch to split diff",
+          "Hide files",
+          "Commit or push",
+          "More Git actions",
+        ].filter((label) => countLabel(label) === 1),
+      };
+    }
     let mcpObservation = null;
     if (mcpOnly) {
       const groupButtons = [...document.querySelectorAll("button")].filter(
@@ -1543,6 +1720,7 @@ try {
       icons,
       mcpObservation,
       projectPickerObservation,
+      reviewObservation,
       sidebarObservation,
       threadObservation,
       viewport: { height: window.innerHeight, width: window.innerWidth },
@@ -1550,12 +1728,14 @@ try {
   }, {
     mcpOnly,
     projectPickerOnly,
+    reviewOnly,
     semanticLabelEntries: [...semanticLabels],
     threadOnly,
   });
   if (
     !threadOnly &&
     !mcpOnly &&
+    !reviewOnly &&
     !result.icons.some(
       (icon) =>
         icon.region === "composer" &&
@@ -1635,7 +1815,7 @@ try {
     });
   }
   fullCapture: try {
-    if (threadOnly || mcpOnly || projectPickerOnly) break fullCapture;
+    if (threadOnly || mcpOnly || projectPickerOnly || reviewOnly) break fullCapture;
     const projectRows = main.locator(
       'nav div[role="button"][aria-expanded]:not([aria-haspopup])',
     );
@@ -2261,6 +2441,8 @@ try {
       ? "completed-mcp-thread"
       : projectPickerOnly
         ? "project-picker"
+        : reviewOnly
+          ? "review-workspace"
       : "full";
 
   const canonicalize = (value) =>
@@ -2310,6 +2492,12 @@ try {
         `capture.projectPickerObservation.${surface}.style`,
       );
     }
+  }
+  if (result.reviewObservation?.filter?.style) {
+    sanitizeVisualScalarRecord(
+      result.reviewObservation.filter.style,
+      "capture.reviewObservation.filter.style",
+    );
   }
   result.icons = result.icons.map((icon, index) => {
     const sanitized = sanitizeVisualAssetIcon(

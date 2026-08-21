@@ -31,6 +31,6 @@ describe("current-thread visual asset subset", () => {
         "thread-reconnecting",
       ]),
     );
-    expect(currentThreadVisualAssetIds).toHaveLength(24);
+    expect(currentThreadVisualAssetIds).toHaveLength(41);
   });
 });

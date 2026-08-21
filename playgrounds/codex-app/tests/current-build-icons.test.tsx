@@ -23,6 +23,8 @@ describe("current-build visual assets", () => {
       expect(svg?.getAttribute("viewBox")).toBe(icon.viewBox);
       expect(svg?.style.width).toBe(`${icon.renderSize.width}px`);
       expect(svg?.style.height).toBe(`${icon.renderSize.height}px`);
+      expect(svg?.style.marginLeft).toBe("");
+      expect(svg?.style.position).toBe("");
       expect(svg?.children).toHaveLength(icon.primitives.length);
       for (const [name, value] of Object.entries(icon.rootAttributes)) {
         expect(svg?.getAttribute(name)).toBe(value);

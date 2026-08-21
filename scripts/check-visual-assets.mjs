@@ -346,6 +346,8 @@ if (
   !captureSource.includes("sanitizeVisualAssetIcon") ||
   !captureSource.includes("sanitizeVisualScalarRecord") ||
   !captureSource.includes("CODEX_VISUAL_ASSET_PROJECT_PICKER_ONLY") ||
+  !captureSource.includes("CODEX_VISUAL_ASSET_REVIEW_ONLY") ||
+  !captureSource.includes("reviewObservation") ||
   !captureSource.includes("projectPickerObservation")
 ) {
   throw new Error(
@@ -355,6 +357,8 @@ if (
 if (
   packageJson.scripts?.["update:visual-assets"] !==
     "node scripts/update-current-visual-assets.mjs --write" ||
+  packageJson.scripts?.["update:visual-assets:review"] !==
+    "node scripts/update-current-visual-assets.mjs --review-only --write" ||
   !updaterSource.includes("Expected one current capture") ||
   !updaterSource.includes("baselineContext") ||
   !updaterSource.includes("complete ordered primitive match with no leftovers") ||
@@ -378,6 +382,8 @@ if (
   !updaterSource.includes("sanitizeVisualAssetIcon") ||
   !updaterSource.includes("capturedAt") ||
   !updaterSource.includes("--project-picker-only") ||
+  !updaterSource.includes("--review-only") ||
+  !updaterSource.includes("Targeted current Review capture contract changed") ||
   !updaterSource.includes("CODEX_VISUAL_ASSET_PROJECT_PICKER_CAPTURE") ||
   !updaterSource.includes("CODEX_VISUAL_ASSET_PERMISSION_CAPTURE") ||
   !updaterSource.includes("validateProjectPickerObservation")
@@ -405,6 +411,23 @@ for (const id of [
   "composer-model-chevron",
   "composer-dictate",
   "composer-voice",
+  "review-tab",
+  "review-close",
+  "review-open-tab",
+  "review-expand",
+  "review-scope-chevron",
+  "review-options",
+  "review-collapse-all",
+  "review-jump-file",
+  "review-split-diff",
+  "review-files-toggle",
+  "review-commit-or-push",
+  "review-more-git",
+  "review-copy-path",
+  "review-file-toggle",
+  "review-open-in",
+  "review-search",
+  "review-file-text",
   "window-chrome-sidebar",
   "window-chrome-back",
   "window-chrome-forward",
@@ -489,7 +512,7 @@ for (const id of [
   }
 }
 if (
-  manifest.icons.length !== 98 ||
+  manifest.icons.length !== 115 ||
   manifest.composerObservation?.topContextIconCount !== 3 ||
   manifest.composerObservation?.bottomActionIconCount !== 5 ||
   manifest.composerObservation?.exactSemanticIconCount !== 8 ||
@@ -500,10 +523,23 @@ if (
   manifest.projectPickerObservation?.surface?.rect?.height !== 249.5 ||
   manifest.projectPickerObservation?.surface?.rect?.width !== 260 ||
   manifest.projectPickerObservation?.listbox?.rect?.height !== 142.81 ||
-  manifest.projectPickerObservation?.listbox?.rect?.width !== 252
+  manifest.projectPickerObservation?.listbox?.rect?.width !== 252 ||
+  canonicalize(manifest.reviewObservation?.fileNames) !==
+    canonicalize(["added.txt", "alpha.txt", "obsolete.txt"]) ||
+  manifest.reviewObservation?.copyPathCount !== 4 ||
+  manifest.reviewObservation?.fileTextIconCount !== 4 ||
+  manifest.reviewObservation?.openInCount !== 4 ||
+  manifest.reviewObservation?.toggleFileDiffCount !== 4 ||
+  manifest.reviewObservation?.filter?.placeholder !== "Filter files…" ||
+  Math.abs((manifest.reviewObservation?.filter?.rect?.width ?? 0) - 181.86) >
+    0.15 ||
+  Math.abs((manifest.reviewObservation?.panel?.rect?.width ?? 0) - 382.44) >
+    0.15 ||
+  manifest.reviewObservation?.panel?.rect?.height !== 820 ||
+  manifest.reviewObservation?.splitDiffLabel !== "Switch to split diff"
 ) {
   throw new Error(
-    "current visual asset capture must retain 98 promoted icons, the eight-icon Composer baseline, and the current Project picker observation",
+    "current visual asset capture must retain 115 promoted icons plus the Composer, Project picker, and Review observations",
   );
 }
 if (

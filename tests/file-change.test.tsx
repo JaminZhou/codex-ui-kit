@@ -1,13 +1,21 @@
 // @vitest-environment happy-dom
 
-import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import {
+  cleanup,
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+} from "@testing-library/react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import {
   FileChange,
   FileChangeGroup,
   FileDiff,
+  FileRevertErrorDialog,
   FileReview,
+  FileReviewWorkspace,
   fileDiffToText,
   type FileDiffLine,
 } from "../src";
@@ -293,6 +301,63 @@ describe("FileDiff", () => {
     expect(renderedHtml).not.toContain("<mark>");
   });
 
+  it("pairs deleted and added content into distinct split panes", () => {
+    const { container } = render(<FileDiff layout="split" lines={lines} />);
+    const diff = screen.getByRole("list", { name: "File diff" });
+    const changedRow = screen.getByRole("listitem", {
+      name: "Deleted line: const status = 'old';; Added line: const status = 'ready';",
+    });
+
+    expect(diff.getAttribute("data-layout")).toBe("split");
+    expect(
+      changedRow.querySelector('[data-side="old"] code')?.textContent,
+    ).toBe("const status = 'old';");
+    expect(
+      changedRow.querySelector('[data-side="new"] code')?.textContent,
+    ).toBe("const status = 'ready';");
+    expect(
+      container.querySelector(
+        '.codex-ui-file-diff__split-row[data-line-kind="hunk"] .codex-ui-file-diff__split-spanning',
+      ),
+    ).toBeTruthy();
+  });
+
+  it("keeps replacements paired across no-newline metadata", () => {
+    render(
+      <FileDiff
+        layout="split"
+        lines={[
+          {
+            content: "old without newline",
+            kind: "deletion",
+            oldLineNumber: 1,
+          },
+          { content: "No newline at end of file", kind: "meta" },
+          {
+            content: "new without newline",
+            kind: "addition",
+            newLineNumber: 1,
+          },
+          { content: "No newline at end of file", kind: "meta" },
+        ]}
+      />,
+    );
+
+    const replacement = screen.getByRole("listitem", {
+      name: "Deleted line: old without newline; Added line: new without newline",
+    });
+    expect(
+      replacement.querySelector('[data-side="old"] code')?.textContent,
+    ).toBe("old without newline");
+    expect(
+      replacement.querySelector('[data-side="new"] code')?.textContent,
+    ).toBe("new without newline");
+    const markers = screen.getByRole("listitem", {
+      name: "Diff metadata: No newline at end of file; Diff metadata: No newline at end of file",
+    });
+    expect(markers.querySelectorAll('[data-line-kind="meta"]')).toHaveLength(2);
+  });
+
   it("exposes short, fallback, and wrapped rendering modes", () => {
     const short = renderToStaticMarkup(
       <FileDiff lines={lines} size="short" wrapLines />,
@@ -572,5 +637,296 @@ describe("FileReview", () => {
     } finally {
       stringify.mockRestore();
     }
+  });
+});
+
+describe("FileReviewWorkspace", () => {
+  const files = [
+    {
+      additions: 1,
+      change: "added" as const,
+      deletions: 0,
+      lines: [{ content: "added", kind: "addition" as const }],
+      path: "probe/added.txt",
+    },
+    {
+      additions: 1,
+      change: "modified" as const,
+      deletions: 2,
+      lines: [
+        { content: "old", kind: "deletion" as const },
+        { content: "new", kind: "addition" as const },
+      ],
+      path: "probe/alpha.txt",
+    },
+    {
+      additions: 0,
+      change: "deleted" as const,
+      deletions: 2,
+      lines: [{ content: "obsolete", kind: "deletion" as const }],
+      path: "probe/obsolete.txt",
+    },
+  ];
+
+  it("covers the current Review toolbar, scope, filter, and layout states", () => {
+    const onScopeChange = vi.fn();
+    const { container } = render(
+      <FileReviewWorkspace files={files} onScopeChange={onScopeChange} />,
+    );
+
+    expect(screen.getByText("+2")).toBeTruthy();
+    expect(screen.getByText("−4")).toBeTruthy();
+    fireEvent.click(screen.getByRole("button", { name: "Last Turn" }));
+    expect(screen.getByRole("menu", { name: "Review scope" })).toBeTruthy();
+    expect(screen.getAllByRole("menuitemradio")).toHaveLength(6);
+    fireEvent.click(screen.getByRole("menuitemradio", { name: "Uncommitted" }));
+    expect(onScopeChange).toHaveBeenCalledWith("Uncommitted");
+
+    fireEvent.change(screen.getByPlaceholderText("Filter files…"), {
+      target: { value: "alpha" },
+    });
+    expect(screen.getAllByRole("treeitem")).toHaveLength(1);
+    expect(screen.getByRole("treeitem").textContent).toContain("alpha.txt");
+
+    fireEvent.click(
+      screen.getByRole("button", { name: "Collapse all diffs" }),
+    );
+    expect(screen.queryByRole("list", { name: /Review diff for/ })).toBeNull();
+    fireEvent.click(screen.getByRole("button", { name: "Expand all diffs" }));
+    expect(
+      screen.getByRole("list", { name: "Review diff for probe/alpha.txt" }),
+    ).toBeTruthy();
+
+    fireEvent.click(screen.getByRole("button", { name: "Switch to split diff" }));
+    expect(
+      container.querySelector(".codex-ui-file-review-workspace")?.getAttribute(
+        "data-layout",
+      ),
+    ).toBe("split");
+    expect(
+      screen
+        .getByRole("list", { name: "Review diff for probe/alpha.txt" })
+        .getAttribute("data-layout"),
+    ).toBe("split");
+    expect(
+      screen.getByRole("listitem", {
+        name: "Deleted line: old; Added line: new",
+      }),
+    ).toBeTruthy();
+    fireEvent.click(screen.getByRole("button", { name: "Hide files" }));
+    expect(screen.queryByRole("complementary", { name: "Changed files" })).toBeNull();
+  });
+
+  it("exposes all changed files through the jump listbox", async () => {
+    render(<FileReviewWorkspace files={files} />);
+
+    const jump = screen.getByRole("button", { name: "Jump to file" });
+    fireEvent.click(jump);
+
+    expect(screen.getByRole("listbox", { name: "Changed files" })).toBeTruthy();
+    const options = screen.getAllByRole("option");
+    expect(options).toHaveLength(3);
+    expect(options[0].getAttribute("aria-selected")).toBe("true");
+
+    options[2].focus();
+    fireEvent.keyDown(options[2], { key: "Escape" });
+    expect(screen.queryByRole("listbox", { name: "Changed files" })).toBeNull();
+    await waitFor(() => expect(document.activeElement).toBe(jump));
+  });
+
+  it("keeps toolbar popups exclusive, dismissible, and arrow navigable", async () => {
+    render(<FileReviewWorkspace files={files} />);
+
+    const scope = screen.getByRole("button", { name: "Last Turn" });
+    fireEvent.click(scope);
+    const scopeItems = screen.getAllByRole("menuitemradio");
+    expect(document.activeElement).toBe(scopeItems[0]);
+    fireEvent.keyDown(scopeItems[0], { key: "ArrowDown" });
+    expect(document.activeElement).toBe(scopeItems[1]);
+    fireEvent.keyDown(scopeItems[1], { key: "End" });
+    expect(document.activeElement).toBe(scopeItems.at(-1));
+
+    const jump = screen.getByRole("button", { name: "Jump to file" });
+    fireEvent.click(jump);
+    expect(screen.queryByRole("menu", { name: "Review scope" })).toBeNull();
+    const options = screen.getAllByRole("option");
+    expect(document.activeElement).toBe(options[0]);
+    fireEvent.keyDown(options[0], { key: "ArrowUp" });
+    expect(document.activeElement).toBe(options.at(-1));
+    fireEvent.keyDown(options.at(-1)!, { key: "Home" });
+    expect(document.activeElement).toBe(options[0]);
+
+    fireEvent.click(screen.getByRole("button", { name: "Hide files" }));
+    expect(screen.queryByRole("listbox", { name: "Changed files" })).toBeNull();
+
+    fireEvent.click(scope);
+    expect(screen.getByRole("menu", { name: "Review scope" })).toBeTruthy();
+    fireEvent.pointerDown(document.body);
+    expect(screen.queryByRole("menu", { name: "Review scope" })).toBeNull();
+
+    fireEvent.click(jump);
+    expect(screen.getByRole("listbox", { name: "Changed files" })).toBeTruthy();
+    scope.focus();
+    await waitFor(() =>
+      expect(screen.queryByRole("listbox", { name: "Changed files" })).toBeNull(),
+    );
+  });
+
+  it("tracks changed file collections without selector escaping", () => {
+    const { rerender } = render(<FileReviewWorkspace files={files} />);
+    fireEvent.click(screen.getByRole("treeitem", { name: /alpha\.txt/ }));
+
+    const nextFiles = [
+      {
+        additions: 1,
+        change: "added" as const,
+        deletions: 0,
+        lines: [{ content: "new", kind: "addition" as const }],
+        path: 'probe/[new] "quoted".txt',
+      },
+    ];
+    rerender(<FileReviewWorkspace files={nextFiles} />);
+
+    expect(
+      screen
+        .getByRole("treeitem", { name: /quoted/ })
+      .getAttribute("data-selected"),
+    ).toBe("true");
+  });
+
+  it("reveals externally requested files, including repeated activation", () => {
+    const originalScrollIntoView = Object.getOwnPropertyDescriptor(
+      HTMLElement.prototype,
+      "scrollIntoView",
+    );
+    const scrollIntoView = vi.fn();
+    Object.defineProperty(HTMLElement.prototype, "scrollIntoView", {
+      configurable: true,
+      value: scrollIntoView,
+    });
+
+    try {
+      const { rerender } = render(
+        <FileReviewWorkspace
+          files={files}
+          selectedPath={files[0].path}
+          selectionKey={0}
+        />,
+      );
+      scrollIntoView.mockClear();
+
+      rerender(
+        <FileReviewWorkspace
+          files={files}
+          selectedPath={files[1].path}
+          selectionKey={1}
+        />,
+      );
+
+      const selectedFile = screen.getByRole("listitem", {
+        name: "Review file probe/alpha.txt",
+      });
+      expect(
+        screen
+          .getByRole("treeitem", { name: "Select probe/alpha.txt" })
+          .getAttribute("data-selected"),
+      ).toBe("true");
+      expect(scrollIntoView).toHaveBeenCalledOnce();
+      expect(scrollIntoView.mock.instances[0]).toBe(selectedFile);
+      expect(scrollIntoView).toHaveBeenCalledWith({
+        block: "nearest",
+        inline: "nearest",
+      });
+
+      scrollIntoView.mockClear();
+      rerender(
+        <FileReviewWorkspace
+          files={files}
+          selectedPath={files[1].path}
+          selectionKey={2}
+        />,
+      );
+      expect(scrollIntoView).toHaveBeenCalledOnce();
+      expect(scrollIntoView.mock.instances[0]).toBe(selectedFile);
+    } finally {
+      if (originalScrollIntoView) {
+        Object.defineProperty(
+          HTMLElement.prototype,
+          "scrollIntoView",
+          originalScrollIntoView,
+        );
+      } else {
+        Reflect.deleteProperty(HTMLElement.prototype, "scrollIntoView");
+      }
+    }
+  });
+
+  it("shows directory context when tree basenames collide", () => {
+    render(
+      <FileReviewWorkspace
+        files={[
+          { ...files[0], path: "src/index.ts" },
+          { ...files[1], path: "tests/index.ts" },
+        ]}
+      />,
+    );
+
+    const source = screen.getByRole("treeitem", {
+      name: "Select src/index.ts",
+    });
+    const tests = screen.getByRole("treeitem", {
+      name: "Select tests/index.ts",
+    });
+    expect(source.textContent).toContain("src/index.ts");
+    expect(tests.textContent).toContain("tests/index.ts");
+  });
+
+  it("prunes collapsed paths when the file collection is replaced", () => {
+    const { rerender } = render(<FileReviewWorkspace files={files} />);
+    fireEvent.click(
+      screen.getByRole("button", { name: "Collapse all diffs" }),
+    );
+    expect(screen.queryByRole("list", { name: /Review diff for/ })).toBeNull();
+
+    const replacementFiles = files.map((file, index) => ({
+      ...file,
+      path: `replacement/file-${index}.txt`,
+    }));
+    rerender(<FileReviewWorkspace files={replacementFiles} />);
+
+    expect(
+      screen.getByRole("button", { name: "Collapse all diffs" }),
+    ).toBeTruthy();
+    expect(
+      screen.getAllByRole("list", { name: /Review diff for/ }),
+    ).toHaveLength(3);
+
+    fireEvent.click(
+      screen.getByRole("button", { name: "Collapse all diffs" }),
+    );
+    expect(screen.queryByRole("list", { name: /Review diff for/ })).toBeNull();
+    expect(
+      screen.getByRole("button", { name: "Expand all diffs" }),
+    ).toBeTruthy();
+  });
+});
+
+describe("FileRevertErrorDialog", () => {
+  it("renders the observed Git apply failure and closes from its full-width action", () => {
+    const onOpenChange = vi.fn();
+    render(
+      <FileRevertErrorDialog onOpenChange={onOpenChange} open />,
+    );
+
+    expect(
+      screen.getByRole("dialog", { name: "Failed to revert changes" }),
+    ).toBeTruthy();
+    expect(
+      screen.getByText(
+        "Git apply error: error: patch with only garbage at line 4",
+      ),
+    ).toBeTruthy();
+    fireEvent.click(screen.getByRole("button", { name: "Close" }));
+    expect(onOpenChange).toHaveBeenCalledWith(false);
   });
 });

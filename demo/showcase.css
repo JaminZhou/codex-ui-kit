@@ -908,6 +908,218 @@ code {
   --codex-ui-conversation-thread-user-turn-gap: 2rem;
 }
 
+.current-review-workspace-fixture {
+  --codex-ui-workspace-panel-header-height: 2.875rem;
+  --codex-ui-workspace-panel-tab-max-width: 8.75rem;
+  background: rgb(23 23 23);
+  height: 100dvh;
+  overflow: hidden;
+  width: 100vw;
+}
+
+.current-review-file-card-fixture {
+  background: rgb(23 23 23);
+  color: var(--codex-ui-text-secondary);
+  font-family: var(--codex-ui-font-sans);
+  height: 100dvh;
+  overflow: hidden;
+  width: 100vw;
+}
+
+.current-review-file-card-fixture .codex-ui-file-change-group {
+  background: rgb(31 31 31);
+  border: 0;
+  border-radius: 0.78125rem;
+  box-shadow: 0 0 0 0.5px rgb(255 255 255 / 0.157);
+  height: 100%;
+  width: 100%;
+}
+
+.current-review-file-card-fixture .codex-ui-file-change-group__summary,
+.current-review-file-card-fixture__actions button {
+  color: rgb(218 218 218);
+}
+
+.current-review-file-card-fixture .codex-ui-file-change-group__files {
+  background: rgb(25 25 25);
+  border-top-color: rgb(50 50 50);
+}
+
+.current-review-file-card-fixture
+  .codex-ui-file-change-group__file
+  + .codex-ui-file-change-group__file {
+  border-top: 0;
+}
+
+.current-review-file-card-fixture .codex-ui-file-change-group__header {
+  min-height: 4.03125rem;
+  padding: 0.75rem;
+}
+
+.current-review-file-card-fixture .codex-ui-file-change-group__indicator {
+  background: rgb(21 21 21);
+  border-radius: 0.625rem;
+  color: rgb(117 117 117);
+  flex-basis: 2.5rem;
+}
+
+.current-review-file-card-fixture
+  .codex-ui-file-change-group__indicator
+  svg {
+  height: 1rem;
+  width: 1rem;
+}
+
+.current-review-file-card-fixture .codex-ui-file-change-group__summary,
+.current-review-file-card-fixture .codex-ui-file-change-group__description,
+.current-review-file-card-fixture .codex-ui-file-change-group__file {
+  font-size: 0.875rem;
+  font-weight: 445;
+  line-height: 1.125rem;
+}
+
+.current-review-file-card-fixture .codex-ui-file-change-group__file {
+  color: rgb(160 160 160);
+  min-height: 2.28125rem;
+}
+
+.current-review-file-card-fixture .codex-ui-file-change__stats [data-dot] {
+  display: none;
+}
+
+.current-review-file-card-fixture .codex-ui-file-change__stats {
+  gap: 0.125rem;
+}
+
+.current-review-file-card-fixture__stats,
+.current-review-file-card-fixture__actions {
+  display: inline-flex;
+}
+
+.current-review-file-card-fixture__stats {
+  gap: 0.25rem;
+}
+
+.current-review-file-card-fixture__stats [data-stat="additions"] {
+  color: rgb(7 193 112);
+}
+
+.current-review-file-card-fixture__stats [data-stat="deletions"] {
+  color: rgb(255 58 61);
+}
+
+.current-review-file-card-fixture__actions {
+  gap: 1.125rem;
+}
+
+.current-review-file-card-fixture__actions button {
+  appearance: none;
+  background: transparent;
+  border: 0;
+  border-radius: 0.78125rem;
+  color: var(--codex-ui-text);
+  font-size: 0.875rem;
+  font-weight: 445;
+  height: 1.75rem;
+  line-height: 1.125rem;
+  padding: 0 0.75rem;
+}
+
+.current-review-file-card-fixture__actions button:first-child {
+  padding-inline: 0;
+}
+
+.current-review-file-card-fixture__actions button:last-child {
+  background: rgb(255 255 255 / 0.03);
+  border: 1px solid rgb(255 255 255 / 0.082);
+  padding-inline: 0.65625rem;
+}
+
+.current-review-workspace-fixture > .codex-ui-workspace-panel {
+  background: rgb(23 23 23);
+  height: 100%;
+}
+
+.current-review-workspace-fixture .codex-ui-workspace-panel__header {
+  padding-inline: 0.5rem;
+}
+
+.current-review-workspace-fixture .codex-ui-workspace-panel__tab-item {
+  flex-basis: 9.8125rem;
+}
+
+.current-review-workspace-fixture .codex-ui-workspace-panel__tabs {
+  flex: 0 0 10.375rem;
+}
+
+.current-review-workspace-fixture .codex-ui-workspace-panel__tab {
+  border-radius: 0.625rem;
+  font-size: 0.875rem;
+  font-weight: 445;
+  line-height: 1.125rem;
+  padding: 0.125rem 2rem 0.125rem 0.5rem;
+}
+
+.current-review-workspace-fixture .codex-ui-workspace-panel__tab-close {
+  height: 1.25rem;
+  inset-inline-end: 0;
+  width: 1.25rem;
+}
+
+.current-review-workspace-fixture
+  .codex-ui-workspace-panel__tab-close
+  svg {
+  height: 1.3125rem;
+  width: 0.875rem;
+}
+
+.current-review-workspace-fixture .codex-ui-workspace-panel__actions {
+  flex: 1 1 auto;
+  gap: 0.375rem;
+  margin-inline-start: 0;
+}
+
+.current-review-workspace-fixture .codex-ui-workspace-panel__actions > button {
+  align-items: center;
+  appearance: none;
+  background: transparent;
+  border: 0;
+  border-radius: 0.625rem;
+  color: var(--codex-ui-text-secondary);
+  display: inline-flex;
+  height: 1.75rem;
+  justify-content: center;
+  padding: 0;
+  width: 1.75rem;
+}
+
+.current-review-workspace-fixture
+  .codex-ui-workspace-panel__actions
+  > button
+  svg {
+  height: 1rem;
+  width: 1rem;
+}
+
+.current-review-workspace-fixture__spacer {
+  flex: 1 1 auto;
+}
+
+.current-review-workspace-fixture__tab-label {
+  align-items: center;
+  display: flex;
+  gap: 0.375rem;
+}
+
+.current-review-workspace-fixture__tab-label svg {
+  height: 1rem;
+  width: 1rem;
+}
+
+.current-review-workspace-fixture .codex-ui-workspace-panel__content {
+  overflow: hidden;
+}
+
 .workflow-pixel-fixture[data-visual-scene="current-workspace-file-diff"]
   .codex-ui-agent-message[data-role="user"]
   .codex-ui-agent-message__content {

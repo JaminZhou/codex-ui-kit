@@ -33,6 +33,7 @@ const currentReplayComposerScenarios = new Set([
   "compaction",
   "context-summary",
   "current-mixed-tool-thread",
+  "current-review-files",
   "current-review-rename",
   "interruption",
   "long-command-output",
@@ -5511,37 +5512,39 @@ for (const scene of selectedScenes) {
         review: {
           contentLabels: Array.from(
             document.querySelectorAll(
-              ".codex-ui-file-review .codex-ui-file-review__content[aria-label]",
+              ".codex-ui-file-review .codex-ui-file-review__content[aria-label], .codex-ui-file-review-workspace .codex-ui-file-diff[aria-label], .codex-ui-file-review-workspace .codex-ui-file-review-notice[aria-label]",
             ),
             (element) => element.getAttribute("aria-label"),
           ),
           diffLabels: Array.from(
             document.querySelectorAll(
-              '.codex-ui-file-review .codex-ui-file-diff[aria-label]',
+              '.codex-ui-file-review .codex-ui-file-diff[aria-label], .codex-ui-file-review-workspace .codex-ui-file-diff[aria-label]',
             ),
             (element) => element.getAttribute("aria-label"),
           ),
           fileCount: document.querySelectorAll(
-            ".codex-ui-file-review__file",
+            ".codex-ui-file-review__file, .codex-ui-file-review-workspace__diff",
           ).length,
           firstDiffLabel: document
             .querySelector(
-              '.codex-ui-file-review .codex-ui-file-diff[aria-label]',
+              '.codex-ui-file-review .codex-ui-file-diff[aria-label], .codex-ui-file-review-workspace .codex-ui-file-diff[aria-label]',
             )
             ?.getAttribute("aria-label"),
           firstContentLabel: document
             .querySelector(
-              ".codex-ui-file-review .codex-ui-file-review__content[aria-label]",
+              ".codex-ui-file-review .codex-ui-file-review__content[aria-label], .codex-ui-file-review-workspace .codex-ui-file-diff[aria-label], .codex-ui-file-review-workspace .codex-ui-file-review-notice[aria-label]",
             )
             ?.getAttribute("aria-label"),
           noticeKinds: Array.from(
             document.querySelectorAll(
-              ".codex-ui-file-review .codex-ui-file-review-notice",
+              ".codex-ui-file-review .codex-ui-file-review-notice, .codex-ui-file-review-workspace .codex-ui-file-review-notice",
             ),
             (element) => element.getAttribute("data-kind"),
           ),
           scroll: (() => {
-            const element = document.querySelector(".codex-ui-file-review");
+            const element = document.querySelector(
+              ".codex-ui-file-review, .codex-ui-file-review-workspace__diffs",
+            );
             return element
               ? {
                   clientHeight: element.clientHeight,
@@ -7813,6 +7816,8 @@ for (const scene of selectedScenes) {
     ) {
       throw new Error(`${scene.id}: Review panel split geometry is invalid.`);
     }
+    const expectedReviewWidth =
+      scene.id === "current-review-files" ? "382" : "370";
     if (
       scene.surfaces?.includes("reviewPanel") &&
       (!contract.sidePanelResizer ||
@@ -7820,7 +7825,7 @@ for (const scene of selectedScenes) {
         Math.abs(contract.sidePanelResizer.rect.width - 16) > 0.5 ||
         contract.sidePanelResizer.ariaMin !== "320" ||
         contract.sidePanelResizer.ariaMax !== "554" ||
-        contract.sidePanelResizer.ariaNow !== "370" ||
+        contract.sidePanelResizer.ariaNow !== expectedReviewWidth ||
         Math.abs(
           contract.sidePanelResizer.rect.left +
             contract.sidePanelResizer.rect.width / 2 -
@@ -7833,6 +7838,50 @@ for (const scene of selectedScenes) {
           resizer: contract.sidePanelResizer,
         })}`,
       );
+    }
+    if (scene.id === "current-review-undo-failed") {
+      const undoFailure = await page.evaluate(() => {
+        const dialog = document.querySelector(
+          '.codex-ui-file-revert-error-dialog [role="dialog"]',
+        );
+        const surface = dialog;
+        const bounds = surface?.getBoundingClientRect();
+        return {
+          activeText: document.activeElement?.textContent?.trim() ?? null,
+          description:
+            dialog
+              ?.querySelector(".codex-ui-dialog__description")
+              ?.textContent?.trim() ?? null,
+          fileGroupCount: document.querySelectorAll(
+            '[data-testid="file-change-group"]',
+          ).length,
+          panelOpen:
+            document
+              .querySelector(".codex-ui-app-shell")
+              ?.hasAttribute("data-side-panel-open") ?? false,
+          rect: bounds
+            ? { height: bounds.height, width: bounds.width }
+            : null,
+          title:
+            dialog
+              ?.querySelector(".codex-ui-dialog__title")
+              ?.textContent?.trim() ?? null,
+        };
+      });
+      if (
+        undoFailure.activeText !== "Close" ||
+        undoFailure.description !==
+          "Git apply error: error: patch with only garbage at line 4" ||
+        undoFailure.fileGroupCount !== 1 ||
+        undoFailure.panelOpen ||
+        undoFailure.title !== "Failed to revert changes" ||
+        Math.abs((undoFailure.rect?.width ?? 0) - 420) > 1 ||
+        Math.abs((undoFailure.rect?.height ?? 0) - 190.56) > 1
+      ) {
+        throw new Error(
+          `${scene.id}: Undo failure dialog contract failed: ${JSON.stringify(undoFailure)}`,
+        );
+      }
     }
     const backgroundSidePanelScene =
       scene.id === "terminal-current-background-list" ||
@@ -8762,7 +8811,8 @@ for (const scene of selectedScenes) {
     if (
       scene.id !== "composer-disabled" &&
       scene.id !== "approval-current-pending" &&
-      scene.id !== "approval-current-options"
+      scene.id !== "approval-current-options" &&
+      scene.id !== "current-review-undo-failed"
     ) {
       const expectedFocus = scene.surfaces?.includes("reviewPanel")
         ? contract.review.firstContentLabel
@@ -8927,6 +8977,453 @@ try {
   );
 } finally {
   await currentReviewInteractionApp.close();
+}
+
+const currentReviewFilesScene = {
+  frame: "review-open",
+  id: "current-review-files-interaction",
+  scenario: "current-review-files",
+};
+const { app: currentReviewFilesApp, page: currentReviewFilesPage } =
+  await launchScene(currentReviewFilesScene, { capture: false });
+try {
+  const readReviewWorkspace = () =>
+    currentReviewFilesPage.evaluate(() => {
+      const rect = (selector) => {
+        const element = document.querySelector(selector);
+        if (!(element instanceof Element)) return null;
+        const value = element.getBoundingClientRect();
+        return {
+          height: value.height,
+          left: value.left,
+          top: value.top,
+          width: value.width,
+        };
+      };
+      const workspace = document.querySelector(
+        ".codex-ui-file-review-workspace",
+      );
+      return {
+        diffCount: document.querySelectorAll(
+          ".codex-ui-file-review-workspace__diff",
+        ).length,
+        fileTreeCount: document.querySelectorAll(
+          '.codex-ui-file-review-workspace__tree [role="treeitem"]',
+        ).length,
+        filter: rect(".codex-ui-file-review-workspace__filter input"),
+        header: rect(".codex-ui-workspace-panel__header"),
+        layout: workspace?.getAttribute("data-layout"),
+        panel: rect(".codex-ui-app-shell__side-panel"),
+        toolbar: rect(".codex-ui-file-review-workspace__toolbar"),
+        visibleHeaderPathCount: [...document.querySelectorAll(
+          ".codex-ui-file-review-workspace__file-identity code",
+        )].filter((element) => getComputedStyle(element).display !== "none")
+          .length,
+        visible: workspace?.getAttribute("data-files-visible") === "true",
+      };
+    });
+  const initial = await readReviewWorkspace();
+  if (
+    initial.diffCount !== 3 ||
+    initial.fileTreeCount !== 3 ||
+    initial.layout !== "unified" ||
+    !initial.visible ||
+    Math.abs((initial.panel?.width ?? 0) - 382.4375) > 1 ||
+    Math.abs((initial.header?.height ?? 0) - 46) > 1 ||
+    Math.abs((initial.toolbar?.height ?? 0) - 40) > 1 ||
+    Math.abs((initial.filter?.height ?? 0) - 18) > 1 ||
+    Math.abs((initial.filter?.width ?? 0) - 182) > 1 ||
+    initial.visibleHeaderPathCount !== 0
+  ) {
+    throw new Error(
+      `Current Review workspace geometry failed: ${JSON.stringify(initial)}`,
+    );
+  }
+
+  const requestedReviewPath =
+    "research/current-review-26-810-probe/alpha.txt";
+  await currentReviewFilesPage
+    .getByRole("button", { exact: true, name: "Close tab" })
+    .click();
+  await currentReviewFilesPage.waitForSelector(
+    ".codex-ui-app-shell:not([data-side-panel-open])",
+  );
+  await currentReviewFilesPage
+    .getByRole("button", { exact: true, name: `Open ${requestedReviewPath}` })
+    .click();
+  await currentReviewFilesPage.waitForSelector(
+    '.codex-ui-app-shell[data-side-panel-open] [data-testid="current-review-workspace"]',
+  );
+  if (
+    (await currentReviewFilesPage
+      .getByRole("treeitem", { name: `Select ${requestedReviewPath}` })
+      .getAttribute("data-selected")) !== "true"
+  ) {
+    throw new Error(
+      "Current Review file-card reopen did not reveal the requested path.",
+    );
+  }
+
+  const scopeButton = currentReviewFilesPage.getByRole("button", {
+    exact: true,
+    name: "Last Turn",
+  });
+  await scopeButton.click();
+  const scopeItems = currentReviewFilesPage.getByRole("menuitemradio");
+  if ((await scopeItems.count()) !== 6) {
+    throw new Error("Current Review scope menu must expose six choices.");
+  }
+  if (
+    (await currentReviewFilesPage.evaluate(
+      () => document.activeElement?.textContent?.trim(),
+    )) !== "Last Turn"
+  ) {
+    throw new Error("Current Review scope menu did not focus its selection.");
+  }
+  await scopeItems.filter({ hasText: "Last Turn" }).press("ArrowDown");
+  if (
+    (await currentReviewFilesPage.evaluate(
+      () => document.activeElement?.textContent?.trim(),
+    )) !== "Uncommitted"
+  ) {
+    throw new Error("Current Review scope menu did not move with ArrowDown.");
+  }
+  await scopeItems.filter({ hasText: "Uncommitted" }).press("End");
+  if (
+    (await currentReviewFilesPage.evaluate(
+      () => document.activeElement?.textContent?.trim(),
+    )) !== "Branch"
+  ) {
+    throw new Error("Current Review scope menu did not move with End.");
+  }
+
+  const jumpButton = currentReviewFilesPage.getByRole("button", {
+    name: "Jump to file",
+  });
+  await jumpButton.click();
+  const keyboardJumpOptions = currentReviewFilesPage.getByRole("option");
+  if (
+    (await currentReviewFilesPage
+      .getByRole("menu", { name: "Review scope" })
+      .count()) !== 0 ||
+    (await keyboardJumpOptions.count()) !== 3 ||
+    !(await currentReviewFilesPage.evaluate(
+      () =>
+        document.activeElement?.getAttribute("role") === "option" &&
+        document.activeElement?.getAttribute("aria-selected") === "true",
+    ))
+  ) {
+    throw new Error(
+      "Current Review jump menu was not exclusive or did not focus its selection.",
+    );
+  }
+  await keyboardJumpOptions.filter({ hasText: "alpha.txt" }).press("End");
+  if (
+    !(await currentReviewFilesPage.evaluate(() =>
+      document.activeElement?.textContent?.includes("obsolete.txt"),
+    ))
+  ) {
+    throw new Error("Current Review jump menu did not move with End.");
+  }
+  await keyboardJumpOptions.filter({ hasText: "obsolete.txt" }).press("Home");
+  if (
+    !(await currentReviewFilesPage.evaluate(() =>
+      document.activeElement?.textContent?.includes("added.txt"),
+    ))
+  ) {
+    throw new Error("Current Review jump menu did not move with Home.");
+  }
+  await currentReviewFilesPage
+    .getByRole("button", { name: "Review options" })
+    .click();
+  if (
+    (await currentReviewFilesPage
+      .getByRole("listbox", { name: "Changed files" })
+      .count()) !== 0
+  ) {
+    throw new Error("Current Review jump menu survived another toolbar action.");
+  }
+
+  await scopeButton.click();
+  await currentReviewFilesPage
+    .getByRole("menuitemradio", { name: "Last Turn" })
+    .press("Escape");
+  await currentReviewFilesPage.waitForFunction(
+    () =>
+      document.activeElement?.getAttribute("aria-haspopup") === "menu" &&
+      !document.querySelector('[role="menu"][aria-label="Review scope"]'),
+  );
+
+  const filter = currentReviewFilesPage.getByRole("searchbox", {
+    name: "Filter files",
+  });
+  await filter.fill("alpha");
+  if (
+    (await currentReviewFilesPage.getByRole("treeitem").count()) !== 1 ||
+    !(await currentReviewFilesPage.getByRole("treeitem").first().innerText()).includes(
+      "alpha.txt",
+    )
+  ) {
+    throw new Error("Current Review filter did not isolate alpha.txt.");
+  }
+  await filter.fill("");
+
+  await currentReviewFilesPage
+    .getByRole("button", { name: "Collapse all diffs" })
+    .click();
+  if (
+    (await currentReviewFilesPage
+      .locator(".codex-ui-file-review-workspace__diff[data-collapsed]")
+      .count()) !== 3
+  ) {
+    throw new Error("Current Review collapse-all did not collapse every diff.");
+  }
+  await currentReviewFilesPage
+    .getByRole("button", { name: "Expand all diffs" })
+    .click();
+  await currentReviewFilesPage
+    .getByRole("button", { name: "Switch to split diff" })
+    .click();
+  const splitDiff = await currentReviewFilesPage.evaluate(() => {
+    const pairedRow = [...document.querySelectorAll(
+      ".codex-ui-file-diff__split-row",
+    )].find((element) =>
+      element.getAttribute("aria-label")?.includes("alpha baseline"),
+    );
+    return {
+      after: pairedRow
+        ?.querySelector('[data-side="new"] code')
+        ?.textContent?.trim(),
+      before: pairedRow
+        ?.querySelector('[data-side="old"] code')
+        ?.textContent?.trim(),
+      paneCount: document.querySelectorAll(
+        ".codex-ui-file-diff__split-pane",
+      ).length,
+      splitDiffCount: document.querySelectorAll(
+        '.codex-ui-file-diff[data-layout="split"]',
+      ).length,
+    };
+  });
+  if (
+    splitDiff.splitDiffCount !== 3 ||
+    splitDiff.paneCount !== 12 ||
+    splitDiff.before !== "alpha baseline" ||
+    splitDiff.after !== "alpha updated"
+  ) {
+    throw new Error(
+      `Current Review split diff did not create paired panes: ${JSON.stringify(splitDiff)}`,
+    );
+  }
+  await currentReviewFilesPage
+    .getByRole("button", { name: "Hide files" })
+    .click();
+  const compact = await readReviewWorkspace();
+  if (
+    compact.layout !== "split" ||
+    compact.visible ||
+    compact.visibleHeaderPathCount !== 3
+  ) {
+    throw new Error(
+      `Current Review layout controls failed: ${JSON.stringify(compact)}`,
+    );
+  }
+  await currentReviewFilesPage
+    .getByRole("button", { name: "Show files" })
+    .click();
+
+  const reviewResizer = currentReviewFilesPage.getByRole("separator", {
+    name: "Resize workspace panel",
+  });
+  await reviewResizer.press("Home");
+  const narrowToolbar = await currentReviewFilesPage.evaluate(() => {
+    const panel = document.querySelector(".codex-ui-app-shell__side-panel");
+    const toolbar = document.querySelector(
+      ".codex-ui-file-review-workspace__toolbar",
+    );
+    const optionalActions = [...document.querySelectorAll(
+      ".codex-ui-file-review-workspace__optional-action",
+    )];
+    const gitActions = document.querySelector(
+      ".codex-ui-file-review-workspace__git-actions",
+    );
+    return {
+      clientWidth: toolbar?.clientWidth ?? null,
+      gitDisplay: gitActions ? getComputedStyle(gitActions).display : null,
+      optionalVisibleCount: optionalActions.filter(
+        (element) => getComputedStyle(element).display !== "none",
+      ).length,
+      panelWidth: panel?.getBoundingClientRect().width ?? null,
+      scrollWidth: toolbar?.scrollWidth ?? null,
+    };
+  });
+  if (
+    Math.abs((narrowToolbar.panelWidth ?? 0) - 320) > 1 ||
+    narrowToolbar.gitDisplay !== "none" ||
+    narrowToolbar.optionalVisibleCount !== 0 ||
+    narrowToolbar.clientWidth === null ||
+    narrowToolbar.scrollWidth === null ||
+    narrowToolbar.scrollWidth > narrowToolbar.clientWidth + 1
+  ) {
+    throw new Error(
+      `Current Review narrow toolbar overflowed: ${JSON.stringify(narrowToolbar)}`,
+    );
+  }
+
+  await jumpButton.click();
+  const jumpOptions = currentReviewFilesPage.getByRole("option");
+  if ((await jumpOptions.count()) !== 3) {
+    throw new Error("Current Review jump menu must expose three files.");
+  }
+  await jumpOptions.filter({ hasText: "obsolete.txt" }).click();
+  if (
+    (await currentReviewFilesPage
+      .locator(
+        '.codex-ui-file-review-workspace__tree [role="treeitem"][data-selected]',
+      )
+      .innerText())
+      .trim()
+      .includes("obsolete.txt") === false
+  ) {
+    throw new Error("Current Review jump selection did not reach obsolete.txt.");
+  }
+
+  await currentReviewFilesPage
+    .getByRole("button", { exact: true, name: "Undo" })
+    .click();
+  const dialog = currentReviewFilesPage.getByRole("dialog", {
+    name: "Failed to revert changes",
+  });
+  await dialog.waitFor();
+  const failure = {
+    description: await dialog
+      .getByText("Git apply error: error: patch with only garbage at line 4")
+      .innerText(),
+    fileGroupCount: await currentReviewFilesPage
+      .locator('[data-testid="file-change-group"]')
+      .count(),
+    panelOpen: await currentReviewFilesPage
+      .locator(".codex-ui-app-shell")
+      .evaluate((element) => element.hasAttribute("data-side-panel-open")),
+  };
+  if (failure.fileGroupCount !== 1 || !failure.panelOpen) {
+    throw new Error(
+      `Current Review Undo failure lost state: ${JSON.stringify(failure)}`,
+    );
+  }
+  await dialog.getByRole("button", { exact: true, name: "Close" }).click();
+
+  await writeFile(
+    join(artifactDirectory, "current-review-files-interaction.json"),
+    `${JSON.stringify({ compact, failure, initial }, null, 2)}\n`,
+  );
+} finally {
+  await currentReviewFilesApp.close();
+}
+
+const {
+  app: currentReviewFilesLightApp,
+  page: currentReviewFilesLightPage,
+} = await launchScene(currentReviewFilesScene, {
+  capture: false,
+});
+try {
+  await currentReviewFilesLightPage
+    .locator(".demo-root")
+    .evaluate((element) => element.setAttribute("data-theme", "light"));
+  const lightContrast = await currentReviewFilesLightPage.evaluate(() => {
+    const parseRgb = (value) =>
+      value
+        .match(/[\d.]+/g)
+        ?.slice(0, 3)
+        .map(Number) ?? [];
+    const luminance = (channels) => {
+      const linear = channels.map((channel) => {
+        const normalized = channel / 255;
+        return normalized <= 0.04045
+          ? normalized / 12.92
+          : ((normalized + 0.055) / 1.055) ** 2.4;
+      });
+      return 0.2126 * linear[0] + 0.7152 * linear[1] + 0.0722 * linear[2];
+    };
+    const ratio = (foreground, background) => {
+      const foregroundLuminance = luminance(parseRgb(foreground));
+      const backgroundLuminance = luminance(parseRgb(background));
+      return (
+        (Math.max(foregroundLuminance, backgroundLuminance) + 0.05) /
+        (Math.min(foregroundLuminance, backgroundLuminance) + 0.05)
+      );
+    };
+    const files = document.querySelector(
+      ".codex-ui-file-review-workspace__files",
+    );
+    const treeItem = document.querySelector(
+      '.codex-ui-file-review-workspace__tree [role="treeitem"]',
+    );
+    const filterInput = document.querySelector(
+      ".codex-ui-file-review-workspace__filter input",
+    );
+    const diffHeader = document.querySelector(
+      ".codex-ui-file-review-workspace__diff > header",
+    );
+    const diffHeaderPath = diffHeader?.querySelector("code");
+    const diffSurface = document.querySelector(
+      ".codex-ui-file-review-workspace__diff > .codex-ui-file-diff",
+    );
+    if (!(files instanceof HTMLElement)) return null;
+    const background = getComputedStyle(files).backgroundColor;
+    const treeColor = treeItem ? getComputedStyle(treeItem).color : "";
+    const filterColor = filterInput ? getComputedStyle(filterInput).color : "";
+    const diffBackground = diffSurface
+      ? getComputedStyle(diffSurface).backgroundColor
+      : "";
+    const diffColor = diffSurface ? getComputedStyle(diffSurface).color : "";
+    const headerBackground = diffHeader
+      ? getComputedStyle(diffHeader).backgroundColor
+      : "";
+    const headerColor = diffHeaderPath
+      ? getComputedStyle(diffHeaderPath).color
+      : "";
+    return {
+      background,
+      diffBackground,
+      diffColor,
+      diffContrast: ratio(diffColor, diffBackground),
+      filterContrast: ratio(filterColor, background),
+      filterColor,
+      headerBackground,
+      headerColor,
+      headerContrast: ratio(headerColor, headerBackground),
+      treeColor,
+      treeContrast: ratio(treeColor, background),
+    };
+  });
+  if (
+    !lightContrast ||
+    ![
+      lightContrast.background,
+      lightContrast.diffBackground,
+      lightContrast.diffColor,
+      lightContrast.filterColor,
+      lightContrast.headerBackground,
+      lightContrast.headerColor,
+      lightContrast.treeColor,
+    ].every((value) => value.startsWith("rgb(")) ||
+    !Number.isFinite(lightContrast.treeContrast) ||
+    !Number.isFinite(lightContrast.filterContrast) ||
+    !Number.isFinite(lightContrast.headerContrast) ||
+    !Number.isFinite(lightContrast.diffContrast) ||
+    lightContrast.treeContrast < 4.5 ||
+    lightContrast.filterContrast < 4.5 ||
+    lightContrast.headerContrast < 4.5 ||
+    lightContrast.diffContrast < 4.5
+  ) {
+    throw new Error(
+      `Current Review light file-tree contrast failed: ${JSON.stringify(lightContrast)}`,
+    );
+  }
+} finally {
+  await currentReviewFilesLightApp.close();
 }
 
 const commandInterruptionNoFrameScene = {
@@ -10582,6 +11079,11 @@ try {
   });
   await sidebarPage.keyboard.press("Escape");
   await projectMenu.waitFor({ state: "hidden" });
+  await sidebarPage.waitForFunction(
+    () =>
+      document.activeElement?.getAttribute("aria-label") ===
+      "Project actions for session-browser",
+  );
   projectMenuContract.focusReturned = await projectMenuTrigger.evaluate(
     (element) => document.activeElement === element,
   );
@@ -10632,6 +11134,9 @@ try {
   });
   await sidebarPage.keyboard.press("Escape");
   await helpMenu.waitFor({ state: "hidden" });
+  await sidebarPage.waitForFunction(
+    () => document.activeElement?.getAttribute("aria-label") === "Open help menu",
+  );
   helpMenuContract.focusReturned = await helpMenuTrigger.evaluate(
     (element) => document.activeElement === element,
   );
@@ -10695,6 +11200,14 @@ try {
   });
   await sidebarPage.keyboard.press("Escape");
   await accountMenu.waitFor({ state: "hidden" });
+  await sidebarPage.waitForFunction(() => {
+    const active = document.activeElement;
+    return (
+      active instanceof HTMLButtonElement &&
+      active.getAttribute("role") !== "menuitem" &&
+      (active.textContent?.includes("Demo account") ?? false)
+    );
+  });
   accountMenuContract.focusReturned = await accountMenuTrigger.evaluate(
     (element) => document.activeElement === element,
   );

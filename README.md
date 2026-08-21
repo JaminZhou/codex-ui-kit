@@ -144,9 +144,9 @@ export function Example() {
 | Area | Main exports |
 | --- | --- |
 | [Thread and messages](docs/COMPONENTS.md#thread-and-message-surfaces) | `ConversationThreadShell`, `AgentThread`, `AgentTurn`, `AgentMessage`, loading and error states |
-| [Rich content](docs/COMPONENTS.md#rich-content) | `AgentMarkdown`, `InlineCode`, `CodeBlock`, `FileDiff`, `FileReview` |
+| [Rich content](docs/COMPONENTS.md#rich-content) | `AgentMarkdown`, `InlineCode`, `CodeBlock`, `FileDiff`, `FileReview`, `FileReviewWorkspace` |
 | [Agent activity](docs/COMPONENTS.md#agent-activity) | `ActivityTimeline`, `AgentReasoning`, `AgentPlan`, subagent surfaces |
-| [Tools and approvals](docs/COMPONENTS.md#tools-approvals-and-status) | `BrowserActivity`, `McpToolCallGroup`, `ToolCallCard`, `CommandExecution`, `FileChange`, `FileChangeGroup`, `ApprovalRequest`, `AutomaticApprovalReview` |
+| [Tools and approvals](docs/COMPONENTS.md#tools-approvals-and-status) | `BrowserActivity`, `McpToolCallGroup`, `ToolCallCard`, `CommandExecution`, `FileChange`, `FileChangeGroup`, `FileRevertErrorDialog`, `ApprovalRequest`, `AutomaticApprovalReview` |
 | [Composer](docs/COMPONENTS.md#composer) | `AgentComposer`, `ComposerDock`, context controls, attachments, mentions, modes, queued prompts |
 | [Interactive primitives](docs/COMPONENTS.md#interactive-primitives) | Buttons, dialogs, menus, selects, popovers, tooltips |
 | [Resources and media](docs/COMPONENTS.md#resources-and-media) | Resource cards, sources, artifacts, generated images |

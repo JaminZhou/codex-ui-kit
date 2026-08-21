@@ -63,7 +63,7 @@ observation from a previous build remains historical evidence.
   overlay without using private text. The exact `scrollHeight` remains
   content-dependent, so the contract locks the unique scroll owner and visible
   geometry rather than private task counts.
-- The same fingerprint revalidates 95
+- The same fingerprint revalidates 115
   context/Composer/sidebar/menu/window/environment/Settings/completed-thread
   assets, six project groups, Recents actions, the new footer Voice control,
   the 320px Help menu, the five-icon Account menu, and one successful-command
@@ -76,8 +76,8 @@ observation from a previous build remains historical evidence.
   previous-build regression evidence and have been downgraded from `verified`
   to `partial_legacy` until they are reached again on the current fingerprint.
 
-Current inventory: 89 surface groups; 30 have current-build runtime evidence, 43 have previous-build-only runtime evidence, 16 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 29 groups and Electron verification covers 29.
-Prior acceptance outside those 28 sampled current-build groups remains
+Current inventory: 89 surface groups; 34 have current-build runtime evidence, 39 have previous-build-only runtime evidence, 16 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 33 groups and Electron verification covers 33.
+Prior acceptance outside those 33 sampled current-build groups remains
 recorded as `partial_legacy` until current-build re-observation.
 
 The current package exposes candidates far beyond the old transcript sample:
@@ -384,7 +384,7 @@ runtime into the 97-icon exact manifest. Empty search retains both actions and
 shows `No projects found`; Escape returns focus to the initiating project
 control; clearing switches to `Choose project`; and the original project can
 be selected again without creating a task or project. Browser/CDP covers all
-198 lifecycle frames, Electron repeats the empty/Escape/clear/restore flow,
+202 lifecycle frames, Electron repeats the empty/Escape/clear/restore flow,
 and the local-only ownership-masked current listbox differs by 0.9546% under
 an 8% ceiling. The secure Electron host continues to own directory selection
 through an explicit IPC boundary and deterministic fixtures prove selected-
@@ -666,7 +666,7 @@ producing `+1 −0` and `+0 −1` diffs. The independent mapper therefore keeps
 the public `move_path` semantic and adds a separate current-product replay for
 the marker-backed presentation.
 
-That eight-event replay raises the matrix to 21 fixtures and 254 events.
+That previous eight-event replay raised the matrix to 21 fixtures and 254 events.
 Browser/CDP covers 86 reviewed frames, drives keyboard selection, close/reopen,
 sibling preservation, and Undo; Electron repeats the lifecycle in a real
 1180×820 `BrowserWindow`. The exact 906×820 current-build comparison passes at
@@ -677,6 +677,30 @@ sibling preservation, and Undo; Electron repeats the lifecycle in a real
 Browser/Electron verified for this sampled delete/rename family. Binary and
 conflict notices remain synthetic host-state coverage, so the broader Review
 family remains implementation-partial rather than product-level complete.
+
+A `26.810.52044` refresh now replaces that previous-build gate for the sampled
+card and Review family. A real three-file task renders one 737×174 `Edited 3
+files` card with `+2 −4`, opens a 382.4375px Review workspace at 1180×820, and
+keeps a 336.19px independently scroll-owned overlay at 720×680. Public
+`FileReviewWorkspace` and `FileRevertErrorDialog` compositions cover the six
+scope choices, filter, collapse/expand, jump, unified/split, files hide/show,
+per-file controls, and the observed 420×192 Undo failure without discarding the
+card or panel state. Seventeen exact current Review SVGs replace hand-drawn
+playground approximations; context-dependent computed layout styles are
+removed before replay while SVG paint and geometry remain exact.
+
+The protocol matrix is now 34 fixtures and 426 events. Browser/CDP and a real
+Electron `BrowserWindow` drive the current Review controls, focus return,
+selection, responsive panel, and Undo failure. Three reviewed integrated
+baselines guard the file card, open workspace, and failure dialog frames. The
+independent 383×820 product-panel gate passes at 4.3339% overall, while the
+737×174 product file-card gate passes at 4.4683%; both retain exact declared
+geometry contracts.
+`thread.file-change-diff`, `workspace.side-panel-shell`,
+`workspace.editor-diff`, and `workspace.multi-file-review` therefore regain
+current-build Browser/Electron verification for this sampled three-file and
+failure family. Binary/conflict notices and successful Undo remain outside the
+current product sample, so implementation status remains partial.
 
 The refreshed Pull request lifecycle keeps the controlled, resizable workspace
 panel but follows the `26.727.40816` non-modal overlay geometry. The
@@ -1108,7 +1132,7 @@ the same task. A second long command was stopped after eight seconds; after its
 process ended and the recovery turn completed, the 656.59×21px row remained
 `Background terminal stopped with …` instead of changing to `Ran …`. The
 independent H5 fixture and protocol replay now preserve that stopped row across
-settlement and recovery. Browser/CDP covers 198 lifecycle frames, with current
+settlement and recovery. Browser/CDP covers 202 lifecycle frames, with current
 failure and interruption semantics at 1180×820, 690×820, and 720×680. The
 local-only current-product gates compare only owned regions: failure command
 4.2564%, failure Composer 2.2194%, stopped summary/command 2.5875%, and stopped
