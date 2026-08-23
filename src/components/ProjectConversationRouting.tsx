@@ -1028,6 +1028,61 @@ export type NewConversationStartStatus =
   | "loading"
   | "ready";
 
+export interface NewConversationPromptOption {
+  disabled?: boolean;
+  icon?: ReactNode;
+  id: string;
+  label: string;
+  prompt?: string;
+}
+
+export interface NewConversationPromptGridProps
+  extends Omit<HTMLAttributes<HTMLDivElement>, "children" | "onSelect"> {
+  compactVisibleCount?: number;
+  label?: string;
+  onSelect?: (option: NewConversationPromptOption) => void;
+  options: readonly NewConversationPromptOption[];
+}
+
+export function NewConversationPromptGrid({
+  className,
+  compactVisibleCount = 2,
+  label = "Suggested prompts",
+  onSelect,
+  options,
+  ...props
+}: NewConversationPromptGridProps) {
+  const visibleCount = Math.max(0, Math.floor(compactVisibleCount));
+
+  return (
+    <div
+      {...props}
+      aria-label={label}
+      className={["codex-ui-new-conversation-prompt-grid", className]
+        .filter(Boolean)
+        .join(" ")}
+      role="group"
+    >
+      {options.map((option, index) => (
+        <button
+          data-compact-hidden={index >= visibleCount || undefined}
+          disabled={option.disabled}
+          key={option.id}
+          onClick={() => onSelect?.(option)}
+          type="button"
+        >
+          {option.icon ? (
+            <span className="codex-ui-new-conversation-prompt-grid__icon">
+              {option.icon}
+            </span>
+          ) : null}
+          <span>{option.label}</span>
+        </button>
+      ))}
+    </div>
+  );
+}
+
 export interface NewConversationStartProps
   extends Omit<
     HTMLAttributes<HTMLElement>,

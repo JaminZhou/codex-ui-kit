@@ -600,6 +600,55 @@ textarea {
   width: 45px;
 }
 
+.demo-current-home-mark {
+  color: var(--codex-ui-text);
+  height: 56px;
+  opacity: 0.3;
+  width: 56px;
+}
+
+.demo-current-home-icon--explore {
+  color: rgb(51 156 255);
+}
+
+.demo-current-home-icon--build {
+  color: light-dark(rgb(146 79 247), rgb(173 123 249));
+}
+
+.demo-current-home-icon--review {
+  color: light-dark(rgb(0 162 64), rgb(64 201 119));
+}
+
+.demo-current-home-icon--fix {
+  color: light-dark(rgb(226 85 7), rgb(251 106 34));
+}
+
+.demo-root[data-current-home] .demo-workspace-start
+  .codex-ui-new-conversation-start__header {
+  inset-inline: 20px;
+  top: calc(50% - 149.59375px);
+}
+
+.demo-root[data-current-home] .demo-workspace-start
+  .codex-ui-new-conversation-start__eyebrow {
+  height: 56px;
+}
+
+.demo-root[data-current-home] .demo-workspace-start
+  .codex-ui-new-conversation-start__header h3 {
+  margin-top: 24px;
+}
+
+.demo-root[data-current-home] .demo-workspace-start
+  .codex-ui-new-conversation-start__prompt {
+  bottom: calc(50% - 104px);
+  inset-inline: 16px;
+}
+
+.demo-root[data-current-home] .demo-current-home-prompts {
+  width: 100%;
+}
+
 .demo-workspace-start .codex-ui-new-conversation-start__header h3 {
   font-size: 28px;
   font-weight: 400;
@@ -1106,6 +1155,11 @@ textarea {
 }
 
 @container codex-ui-app-shell (max-width: 45rem) {
+  .demo-root[data-current-home] .demo-workspace-start
+    .codex-ui-new-conversation-start__header {
+    top: calc(50% - 183.1875px);
+  }
+
   .demo-workspace-start .codex-ui-new-conversation-start__header h3 {
     margin-top: 34px;
   }
@@ -3296,6 +3350,40 @@ textarea {
     ) {
     stroke: currentColor !important;
   }
+}
+
+.demo-root[data-current-home] .demo-workspace-start {
+  transform: translateX(0.5px);
+}
+
+.demo-root[data-current-home] .demo-current-home-mark {
+  color: rgb(223 223 223) !important;
+  opacity: 0.3 !important;
+}
+
+.demo-root[data-current-home][data-theme="light"]
+  .demo-current-home-mark {
+  color: rgb(26 28 31) !important;
+}
+
+.demo-root[data-current-home][data-theme="light"]
+  .demo-current-home-icon--explore {
+  color: rgb(51 156 255) !important;
+}
+
+.demo-root[data-current-home][data-theme="light"]
+  .demo-current-home-icon--build {
+  color: rgb(146 79 247) !important;
+}
+
+.demo-root[data-current-home][data-theme="light"]
+  .demo-current-home-icon--review {
+  color: rgb(0 162 64) !important;
+}
+
+.demo-root[data-current-home][data-theme="light"]
+  .demo-current-home-icon--fix {
+  color: rgb(226 85 7) !important;
 }
 
 .demo-composer-controls button {

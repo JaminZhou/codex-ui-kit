@@ -338,8 +338,11 @@ describe("lifecycle visual policy", () => {
     );
   });
 
-  it("gates the current dark shell against like-owned product regions", () => {
+  it("gates the current home across theme and compact states", () => {
     expect(electronHarness).toContain('id: "current-dark-shell"');
+    expect(electronHarness).toContain('id: "current-light-shell"');
+    expect(electronHarness).toContain('id: "current-dark-shell-compact"');
+    expect(electronHarness).toContain('id: "current-light-shell-compact"');
     expect(electronHarness).toContain('theme: "dark"');
     expect(electronHarness).toContain("currentSidebar: true");
     expect(cdpContract).toContain(
@@ -358,13 +361,37 @@ describe("lifecycle visual policy", () => {
       "CODEX_UI_KIT_CURRENT_DARK_SHELL_REFERENCE",
     );
     expect(contract).toContain(
-      'scene.id === "current-dark-shell" && currentDarkShellReference',
+      "CODEX_UI_KIT_CURRENT_LIGHT_SHELL_REFERENCE",
     );
-    expect(contract).toContain("cropPng(reference, 0, 0, 274, 250)");
-    expect(contract).toContain("cropPng(actual, 0, 0, 274, 250)");
-    expect(contract).toContain("0.08");
     expect(contract).toContain(
-      "CODEX_UI_KIT_CURRENT_DARK_SHELL_TOP_MAX_DIFF_RATIO",
+      "CODEX_UI_KIT_CURRENT_DARK_SHELL_COMPACT_REFERENCE",
+    );
+    expect(contract).toContain(
+      "CODEX_UI_KIT_CURRENT_LIGHT_SHELL_COMPACT_REFERENCE",
+    );
+    expect(contract).toContain(
+      '"current-dark-shell": currentDarkShellReference',
+    );
+    expect(contract).toContain(
+      '"current-light-shell-compact": currentLightShellCompactReference',
+    );
+    expect(contract).toContain(
+      "CODEX_UI_KIT_CURRENT_HOME_MAIN_MAX_DIFF_RATIO",
+    );
+    expect(contract).toContain("left: 323, top: 46, width: 857");
+    expect(contract).toContain("left: 323, top: 46, width: 397");
+    expect(contract).toContain("0.025");
+    expect(cdpContract).toContain(
+      'scene.id === "current-dark-shell-compact"',
+    );
+    expect(cdpContract).toContain(
+      'scene.id === "current-light-shell-compact"',
+    );
+    expect(electronContract).toContain(
+      'id: "electron-current-home-dark-wide"',
+    );
+    expect(electronContract).toContain(
+      'id: "electron-current-home-light-compact"',
     );
     expect(appSource).toContain(
       'view === "workspace" &&',

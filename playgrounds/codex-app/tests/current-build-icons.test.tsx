@@ -2,6 +2,7 @@
 
 import { cleanup, render } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
+import currentHomeAssets from "../../../research/current-home-assets.json";
 import currentProjectMenuAssets from "../../../research/current-project-menu-assets.json";
 import visualAssets from "../../../research/visual-assets.json";
 import { CurrentBuildIcon } from "../src/currentBuildIcons";
@@ -10,10 +11,11 @@ afterEach(cleanup);
 
 const resolvedIcons = [
   ...new Map(
-    [...visualAssets.icons, ...currentProjectMenuAssets.icons].map((icon) => [
-      icon.id,
-      icon,
-    ]),
+    [
+      ...visualAssets.icons,
+      ...currentProjectMenuAssets.icons,
+      ...currentHomeAssets.icons,
+    ].map((icon) => [icon.id, icon]),
   ).values(),
 ];
 

@@ -18,6 +18,7 @@ import {
   LocalEnvironmentDialog,
   Menu,
   MenuItem,
+  NewConversationPromptGrid,
   NewConversationStart,
   ProjectConversationPage,
   ProjectIndex,
@@ -35,6 +36,38 @@ function accessibleDescriptionText(element: Element) {
 }
 
 describe("project conversation routing", () => {
+  it("selects semantic new-conversation prompts and marks compact overflow", () => {
+    const onSelect = vi.fn();
+    render(
+      <NewConversationPromptGrid
+        onSelect={onSelect}
+        options={[
+          { icon: <span>1</span>, id: "explore", label: "Explore code" },
+          { id: "build", label: "Build a feature" },
+          { id: "review", label: "Review changes" },
+          { disabled: true, id: "fix", label: "Fix failures" },
+        ]}
+      />,
+    );
+
+    const prompts = screen.getByRole("group", { name: "Suggested prompts" });
+    const explore = within(prompts).getByRole("button", {
+      name: "1 Explore code",
+    });
+    fireEvent.click(explore);
+    expect(onSelect).toHaveBeenCalledWith(
+      expect.objectContaining({ id: "explore", label: "Explore code" }),
+    );
+    expect(
+      within(prompts)
+        .getByRole("button", { name: "Review changes" })
+        .getAttribute("data-compact-hidden"),
+    ).toBe("true");
+    expect(
+      within(prompts).getByRole("button", { name: "Fix failures" }),
+    ).toHaveProperty("disabled", true);
+  });
+
   it("creates a branch from a focused modal and returns focus after close", async () => {
     function BranchDialogHarness() {
       const [branchName, setBranchName] = useState("");

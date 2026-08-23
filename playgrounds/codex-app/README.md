@@ -929,6 +929,23 @@ local-only.
 Raw product screenshots, capture JSON, project names, and profile data remain
 local-only.
 
+## Current New chat home slice
+
+The `26.818.41509` New chat fixture reproduces the real current home at
+1180×820 and 720×680 in both Dark and Light. It preserves the sampled
+322.90625px sidebar, 56px home mark, four wide/two compact 104px suggestion
+cards, 736×98 Composer, and zero compact overflow. The mark and four prompt
+icons come from the narrow exact-source
+`research/current-home-assets.json` manifest; their geometry is fixed while
+theme paint remains semantic `currentColor` CSS.
+
+`NewConversationPromptGrid` is the reusable public surface. Browser/CDP and
+Electron gate prompt selection into the Composer, the project-dialog portal,
+Escape focus restoration, computed geometry, theme colors, and exact icon IDs.
+Four reviewed internal frames cover the full matrix. Local-only unmasked
+product comparisons cover the application-owned main region and currently pass
+between 0.2708% and 1.7855% under a 2.5% hard limit.
+
 ## Current command-lifecycle follow-up
 
 - Previous `26.810.52044` evidence re-ran bounded success, exact `exit 7`, and
@@ -1201,12 +1218,17 @@ CODEX_UI_KIT_SIDEBAR_REFERENCE=/absolute/path/to/sidebar-reference.png \
   pnpm --filter @codex-ui-kit/codex-app-playground check:visual
 ```
 
-The current dark-shell gate uses a same-state 1180×820 New chat reference:
+The current New chat home gate accepts same-state Dark/Light references at
+1180×820 and 720×680. It compares the complete application-owned main region
+without masks and applies one 2.5% ceiling to all four states:
 
 ```bash
 CODEX_UI_KIT_CURRENT_DARK_SHELL_REFERENCE=/absolute/path/to/current-dark-shell.png \
+CODEX_UI_KIT_CURRENT_LIGHT_SHELL_REFERENCE=/absolute/path/to/current-light-shell.png \
+CODEX_UI_KIT_CURRENT_DARK_SHELL_COMPACT_REFERENCE=/absolute/path/to/current-dark-shell-compact.png \
+CODEX_UI_KIT_CURRENT_LIGHT_SHELL_COMPACT_REFERENCE=/absolute/path/to/current-light-shell-compact.png \
   pnpm --filter @codex-ui-kit/codex-app-playground check:visual -- \
-  --scenes=current-dark-shell
+  --scenes=current-dark-shell,current-light-shell,current-dark-shell-compact,current-light-shell-compact
 ```
 
 The current Projects Index gate accepts one untracked 1180×820 product frame.

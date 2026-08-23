@@ -53,6 +53,7 @@ import {
   McpToolCallGroup,
   McpToolIcon,
   MessageAttachment,
+  NewConversationPromptGrid,
   NewConversationStart,
   PullRequestCheckList,
   PullRequestCommentComposer,
@@ -2036,6 +2037,9 @@ export function App() {
       : initialSelection.view === "workspace" &&
           initialSelection.frame === "workspace-branch-created"
         ? capturedWorkspaceBranch.id
+      : initialSelection.view === "workspace" &&
+          initialSelection.frame?.startsWith("current-home-")
+        ? "main"
       : initialSelection.view === "workspace" && initialSelection.capture
         ? "feature"
         : "main",
@@ -3697,6 +3701,7 @@ export function App() {
     initialSelection.currentSidebar ||
     initialSelection.frame?.startsWith("sidebar-current") ||
     !initialSelection.capture;
+  const currentHomeFrame = activeFrame?.startsWith("current-home-") ?? false;
   const workspacePersistenceFrame =
     view === "workspace" && currentWorkspacePersistenceFrame(activeFrame);
   const sidebarRecentScenarios = (
@@ -5576,6 +5581,8 @@ export function App() {
       ? "projects-index-chat"
       : activeFrame === "workspace-branch-created"
         ? activeFrame
+      : activeFrame?.startsWith("current-home-")
+        ? activeFrame
       : currentWorkspacePersistenceFrame(activeFrame)
       ? activeFrame
       : initialSelection.frame === "workspace-compact-ready"
@@ -6475,13 +6482,69 @@ export function App() {
           )
         }
         eyebrow={
-          <span aria-hidden="true" className="demo-workspace-mark">
-            ⌁
-          </span>
+          currentHomeFrame ? (
+            <CurrentBuildIcon
+              className="demo-current-home-mark"
+              name="home-mark"
+            />
+          ) : (
+            <span aria-hidden="true" className="demo-workspace-mark">
+              ⌁
+            </span>
+          )
         }
         label="New coding workspace"
         prompt={
-          workspaceProject ? (
+          currentHomeFrame ? (
+            <NewConversationPromptGrid
+              className="demo-current-home-prompts"
+              onSelect={(option) =>
+                setComposerValue(option.prompt ?? option.label)
+              }
+              options={[
+                {
+                  icon: (
+                    <CurrentBuildIcon
+                      className="demo-current-home-icon--explore"
+                      name="home-suggestion-explore"
+                    />
+                  ),
+                  id: "explore",
+                  label: "Explore and understand code",
+                },
+                {
+                  icon: (
+                    <CurrentBuildIcon
+                      className="demo-current-home-icon--build"
+                      name="home-suggestion-build"
+                    />
+                  ),
+                  id: "build",
+                  label: "Build a new feature, app, or tool",
+                },
+                {
+                  icon: (
+                    <CurrentBuildIcon
+                      className="demo-current-home-icon--review"
+                      name="home-suggestion-review"
+                    />
+                  ),
+                  id: "review",
+                  label: "Review code and suggest changes",
+                },
+                {
+                  icon: (
+                    <CurrentBuildIcon
+                      className="demo-current-home-icon--fix"
+                      name="home-suggestion-fix"
+                    />
+                  ),
+                  id: "fix",
+                  label: "Fix issues and failures",
+                },
+              ]}
+            />
+          ) : workspaceProject ? (
             <div className="demo-workspace-prompts">
               <button
                 onClick={() =>
@@ -9910,6 +9973,7 @@ export function App() {
       data-shell-state={view === "shell" ? shellState : undefined}
       data-app-server-state={appServerCrashed ? "crashed" : "running"}
       data-notification-action={shellNotificationAction ?? undefined}
+      data-current-home={currentHomeFrame || undefined}
       data-view={view}
     >
       {!initialSelection.capture && themeAvailable ? (
@@ -10145,6 +10209,7 @@ export function App() {
               : reviewPanelWidth
         }
         sidebar={sidebar}
+        sidebarWidth={currentHomeFrame ? 322.90625 : undefined}
         sidebarMinMainWidth={
           subagentPanelSelected
             ? 220

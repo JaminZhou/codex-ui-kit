@@ -15277,6 +15277,71 @@ button.codex-ui-generated-image-gallery__image {
   outline-offset: 2px;
 }
 
+.codex-ui-new-conversation-prompt-grid {
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  padding-inline: 0.8125rem;
+}
+
+.codex-ui-new-conversation-prompt-grid > button {
+  appearance: none;
+  background: light-dark(rgb(255 255 255), rgb(24 24 24));
+  border: 0;
+  border-radius: 1.25rem;
+  box-shadow:
+    0 0 0 0.5px light-dark(rgb(26 28 31 / 0.118), rgb(255 255 255 / 0.157)),
+    0 2px 4px -1px rgb(0 0 0 / 0.1);
+  color: var(--codex-ui-text);
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  font: inherit;
+  height: 6.5rem;
+  min-width: 0;
+  padding: 0.75rem 1rem;
+  text-align: start;
+}
+
+.codex-ui-new-conversation-prompt-grid > button:hover:not(:disabled) {
+  background: light-dark(rgb(248 248 248), rgb(32 32 32));
+}
+
+.codex-ui-new-conversation-prompt-grid > button:focus-visible {
+  outline: 2px solid var(--codex-ui-focus);
+  outline-offset: 2px;
+}
+
+.codex-ui-new-conversation-prompt-grid > button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.codex-ui-new-conversation-prompt-grid__icon {
+  align-items: center;
+  display: inline-flex;
+  flex: 0 0 auto;
+  height: 1.5rem;
+  justify-content: flex-start;
+  width: 100%;
+}
+
+.codex-ui-new-conversation-prompt-grid__icon > svg {
+  height: 1rem;
+  width: 1rem;
+}
+
+.codex-ui-new-conversation-prompt-grid > button > span:last-child {
+  align-items: flex-end;
+  display: flex;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  line-height: 1.25rem;
+  margin-top: auto;
+  min-height: 2.5rem;
+  width: 100%;
+}
+
 .codex-ui-new-conversation-start__header {
   color: var(--codex-ui-text);
   display: grid;
@@ -15802,6 +15867,16 @@ button.codex-ui-generated-image-gallery__image {
 
   .codex-ui-conversation-context-bar__item {
     justify-content: center;
+  }
+
+  .codex-ui-new-conversation-prompt-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    padding-inline: 0.84375rem;
+  }
+
+  .codex-ui-new-conversation-prompt-grid
+    > button[data-compact-hidden="true"] {
+    display: none;
   }
 }
 

@@ -14,7 +14,7 @@ exit gates; it does not replace the inventory.
   Desktop `26.818.41509` (`6962`). Unsampled earlier-build surfaces remain
   previous-build regression evidence rather than current verification.
 - The inventory contains 89 surface groups: 59 P0, 21 P1, and 9 P2.
-- 29 groups have current-build runtime evidence, 44 have previous-build-only
+- 30 groups have current-build runtime evidence, 43 have previous-build-only
   runtime evidence, and 16 have not been sampled.
 - The scoped `26.818.41509` refresh revalidates the global shell, responsive
   Composer, primary navigation, project-group lifecycle, Help menu, route
@@ -69,6 +69,12 @@ exit gates; it does not replace the inventory.
   branch/spinner/error/unread tracks, and action replacement. Browser/CDP,
   Electron, and three privacy-safe tail gates pass at 2.0833%, 0.7540%, and
   0.1786%.
+  A dedicated current New chat home slice now locks the actual Dark and Light
+  product preferences at 1180×820 and 720×680: persisted 322.90625px sidebar,
+  exact 56px mark, four wide/two compact prompt cards, five exact SVG sources,
+  prompt-to-Composer selection, project-dialog portal/focus return, and zero
+  overflow. Browser/CDP and Electron pass all four states; unmasked owned-main
+  pixel differences range from 0.2708% to 1.7855% under a 2.5% hard limit.
   The broader `26.810.52044` refresh remains
   previous-build regression evidence; it revalidated 115
   sidebar/menu/window-chrome/Composer/Settings/completed-thread icons against
@@ -440,8 +446,11 @@ create/failure/Retry status, and empty/loading/long-list collection states are
 now verified. The current empty state is tied to a live `No chats` project
 row; loading and the five-item `Show more` boundary are locked to current ASAR
 structure, then repeated through Browser/CDP, Electron, and reviewed pixels.
-The remaining Stage 1 work is the broader shell feedback, selection, portal,
-and cross-width/theme matrix below rather than another sidebar-row variant.
+The current New chat selection, project portal, Dark/Light, and 1180/720 matrix
+is now closed. The remaining Stage 1 work is broader route lifecycle feedback,
+global notification runtime evidence, account/settings overflow, and
+selection continuity beyond the New chat route rather than another
+sidebar-row variant.
 
 The same workstream also covers shell gaps that otherwise distort every
 feature:
