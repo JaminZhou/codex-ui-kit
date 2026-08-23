@@ -1444,6 +1444,16 @@ textarea {
   gap: 4px;
 }
 
+.demo-root[data-current-home][data-sidebar-state="account-menu"]
+  .codex-ui-app-sidebar__footer {
+  border-block-start: 0;
+}
+
+.demo-root[data-current-home][data-sidebar-state="account-menu"]
+  .codex-ui-app-sidebar-footer__account-control {
+  transform: translateY(0.5px);
+}
+
 .demo-root[data-sidebar-current]
   .codex-ui-app-sidebar-footer__actions
   > .demo-current-sidebar-voice {
@@ -1471,13 +1481,24 @@ textarea {
   box-shadow:
     0 0 0 0.5px rgba(255, 255, 255, 0.082),
     0 8px 16px -4px rgba(0, 0, 0, 0.12);
+  color: rgb(223 223 223);
   padding: 4px;
   margin-inline-start: 1px;
 }
 
+:root[data-theme="light"] .demo-current-sidebar-menu {
+  background: oklab(0.999994 0.0000455678 0.0000200868 / 0.9);
+  box-shadow:
+    0 0 0 0.5px rgba(26, 28, 31, 0.08),
+    0 8px 16px -4px rgba(0, 0, 0, 0.12);
+  color: rgb(26 28 31);
+}
+
 .demo-current-sidebar-menu .codex-ui-menu-item {
   border-radius: 12.5px;
+  color: inherit;
   font-size: 13px;
+  height: 28.5625px;
   line-height: 18.5714px;
   min-height: 28.5625px;
   padding: 5px 8px;
@@ -1582,6 +1603,10 @@ textarea {
 .demo-current-sidebar-account-menu__identity .codex-ui-menu-item__icon {
   height: 18px;
   width: 18px;
+}
+
+.demo-current-sidebar-account-menu .codex-ui-menu-item__icon {
+  color: inherit;
 }
 
 .demo-current-sidebar-help-menu {
@@ -3296,18 +3321,18 @@ textarea {
   width: 147.359375px;
 }
 
-.demo-root[data-theme="light"] .demo-current-build-icon,
-.demo-root[data-theme="light"] .demo-current-build-icon * {
+:root[data-theme="light"] .demo-current-build-icon,
+:root[data-theme="light"] .demo-current-build-icon * {
   -webkit-text-fill-color: currentColor !important;
   -webkit-text-stroke-color: currentColor !important;
   color: inherit !important;
 }
 
-.demo-root[data-theme="light"] .demo-composer-permission-trigger {
+:root[data-theme="light"] .demo-composer-permission-trigger {
   color: var(--codex-ui-text-warning);
 }
 
-.demo-root[data-theme="light"]
+:root[data-theme="light"]
   .demo-current-build-icon
   :is(path, circle, ellipse, line, polyline, polygon, rect)[style*="fill:"]:not(
     [style*="fill: none"]
@@ -3315,7 +3340,7 @@ textarea {
   fill: currentColor !important;
 }
 
-.demo-root[data-theme="light"]
+:root[data-theme="light"]
   .demo-current-build-icon
   :is(path, circle, ellipse, line, polyline, polygon, rect)[style*="stroke:"]:not(
     [style*="stroke: none"]

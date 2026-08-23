@@ -5669,6 +5669,228 @@ for (const currentHomeScene of currentHomeElectronScenes) {
   }
 }
 
+const currentAccountMenuElectronScenes = [
+  {
+    currentSidebar: true,
+    frame: "current-home-dark-wide",
+    id: "electron-current-sidebar-account-menu",
+    scenario: "workspace-workflow",
+    sidebarState: "account-menu",
+    theme: "dark",
+    view: "workspace",
+  },
+  {
+    currentSidebar: true,
+    frame: "current-home-light-wide",
+    id: "electron-current-sidebar-account-menu-light",
+    scenario: "workspace-workflow",
+    sidebarState: "account-menu",
+    theme: "light",
+    view: "workspace",
+  },
+  {
+    currentSidebar: true,
+    frame: "current-home-dark-compact",
+    id: "electron-current-sidebar-account-menu-compact",
+    scenario: "workspace-workflow",
+    sidebarState: "account-menu",
+    theme: "dark",
+    view: "workspace",
+    windowSize: { height: 680, width: 720 },
+  },
+  {
+    currentSidebar: true,
+    frame: "current-home-light-compact",
+    id: "electron-current-sidebar-account-menu-light-compact",
+    scenario: "workspace-workflow",
+    sidebarState: "account-menu",
+    theme: "light",
+    view: "workspace",
+    windowSize: { height: 680, width: 720 },
+  },
+];
+
+for (const accountMenuScene of currentAccountMenuElectronScenes) {
+  const { app: accountMenuApp, page: accountMenuPage } =
+    await launchScene(accountMenuScene);
+  try {
+    const menu = accountMenuPage.getByRole("menu", { name: "Account menu" });
+    const trigger = accountMenuPage.getByRole("button", {
+      exact: true,
+      name: "Demo account",
+    });
+    await menu.waitFor({ state: "visible" });
+    const nativeBounds = await accountMenuApp.evaluate(
+      ({ BrowserWindow }) =>
+        BrowserWindow.getAllWindows()[0]?.getContentBounds(),
+    );
+    const contract = await menu.evaluate((element) => {
+      const rect = (target) => {
+        const bounds = target?.getBoundingClientRect();
+        return bounds
+          ? {
+              height: bounds.height,
+              left: bounds.left,
+              top: bounds.top,
+              width: bounds.width,
+            }
+          : null;
+      };
+      const menuStyle = getComputedStyle(element);
+      const items = Array.from(
+        element.querySelectorAll('[role="menuitem"]'),
+      );
+      return {
+        colorScheme: getComputedStyle(document.documentElement).colorScheme,
+        dividerHeight: rect(
+          element.querySelector(
+            ".demo-current-sidebar-account-menu__divider",
+          ),
+        )?.height,
+        focusRole: document.activeElement?.getAttribute("role"),
+        horizontalOverflow:
+          document.documentElement.scrollWidth -
+          document.documentElement.clientWidth,
+        icons: Array.from(
+          element.querySelectorAll("[data-current-build-icon]"),
+          (icon) => icon.getAttribute("data-current-build-icon"),
+        ),
+        imageCount: element.querySelectorAll("img").length,
+        itemRects: items.map(rect),
+        itemStyles: items.map((item) => {
+          const style = getComputedStyle(item);
+          return {
+            backgroundColor: style.backgroundColor,
+            borderRadius: style.borderRadius,
+            fontSize: style.fontSize,
+            fontWeight: style.fontWeight,
+            lineHeight: style.lineHeight,
+            padding: style.padding,
+          };
+        }),
+        menuRect: rect(element),
+        menuStyle: {
+          backgroundColor: menuStyle.backgroundColor,
+          borderRadius: menuStyle.borderRadius,
+          boxShadow: menuStyle.boxShadow,
+          color: menuStyle.color,
+        },
+        separatorCount: element.querySelectorAll('[role="separator"]')
+          .length,
+        sidebarRect: rect(
+          document.querySelector(".codex-ui-app-shell__sidebar"),
+        ),
+        triggerRect: rect(
+          document.querySelector(
+            '.codex-ui-app-sidebar-footer button[aria-label="Demo account"]',
+          ),
+        ),
+      };
+    });
+    contract.triggerRect = await trigger.evaluate((element) => {
+      const bounds = element.getBoundingClientRect();
+      return {
+        height: bounds.height,
+        left: bounds.left,
+        top: bounds.top,
+        width: bounds.width,
+      };
+    });
+    const compact = accountMenuScene.id.endsWith("compact");
+    const expectedTop = compact ? 447 : 587;
+    const expectedItemTops = [
+      expectedTop + 4,
+      expectedTop + 41.5625,
+      expectedTop + 70.125,
+      expectedTop + 98.6875,
+      expectedTop + 127.25,
+      expectedTop + 155.8125,
+    ];
+    const expectedBackground =
+      accountMenuScene.theme === "light"
+        ? "oklab(0.999994 0.0000455678 0.0000200868 / 0.9)"
+        : "oklab(0.297161 0.0000135154 0.00000594556 / 0.9)";
+    const expectedColor =
+      accountMenuScene.theme === "light"
+        ? "rgb(26, 28, 31)"
+        : "rgb(223, 223, 223)";
+    const near = (actual, expected, tolerance = 0.15) =>
+      typeof actual === "number" && Math.abs(actual - expected) <= tolerance;
+    if (
+      nativeBounds?.width !== (compact ? 720 : 1180) ||
+      nativeBounds?.height !== (compact ? 680 : 820) ||
+      contract.colorScheme !== accountMenuScene.theme ||
+      contract.horizontalOverflow > 1 ||
+      contract.focusRole !== "menuitem" ||
+      contract.imageCount !== 1 ||
+      contract.separatorCount !== 0 ||
+      contract.dividerHeight !== 9 ||
+      !near(contract.sidebarRect?.width, 322.90625) ||
+      !near(contract.menuRect?.left, 9) ||
+      !near(contract.menuRect?.top, expectedTop) ||
+      !near(contract.menuRect?.width, 306.90625) ||
+      !near(contract.menuRect?.height, 188.375) ||
+      !near(contract.triggerRect?.width, 187.234375) ||
+      contract.triggerRect?.height !== 29 ||
+      !near(contract.triggerRect?.top, compact ? 642.5 : 782.5) ||
+      JSON.stringify(contract.icons) !==
+        JSON.stringify([
+          "sidebar-account-menu-usage",
+          "sidebar-account-menu-pet",
+          "sidebar-account-menu-invite",
+          "sidebar-account-menu-settings",
+          "sidebar-account-menu-logout",
+        ]) ||
+      contract.menuStyle.backgroundColor !== expectedBackground ||
+      contract.menuStyle.color !== expectedColor ||
+      contract.menuStyle.borderRadius !== "15px" ||
+      !contract.menuStyle.boxShadow.includes(
+        accountMenuScene.theme === "light"
+          ? "rgba(26, 28, 31, 0.08)"
+          : "rgba(255, 255, 255, 0.082)",
+      ) ||
+      contract.itemRects.length !== 6 ||
+      contract.itemRects.some(
+        (rect, index) =>
+          !near(rect?.left, 13) ||
+          !near(rect?.top, expectedItemTops[index]) ||
+          !near(rect?.width, 298.90625) ||
+          !near(rect?.height, 28.5625),
+      ) ||
+      contract.itemStyles[0]?.backgroundColor === "rgba(0, 0, 0, 0)" ||
+      contract.itemStyles.slice(1).some(
+        (style) =>
+          style.backgroundColor !== "rgba(0, 0, 0, 0)" ||
+          style.borderRadius !== "12.5px" ||
+          style.fontSize !== "13px" ||
+          style.fontWeight !== "445" ||
+          style.lineHeight !== "18.5714px" ||
+          style.padding !== "5px 8px",
+      )
+    ) {
+      throw new Error(
+        `${accountMenuScene.id}: current account menu geometry failed: ${JSON.stringify({ contract, nativeBounds })}`,
+      );
+    }
+    await accountMenuPage.keyboard.press("Escape");
+    await menu.waitFor({ state: "hidden" });
+    await accountMenuPage.waitForFunction(() => {
+      const active = document.activeElement;
+      return (
+        active instanceof HTMLButtonElement &&
+        (active.textContent?.includes("Demo account") ?? false)
+      );
+    });
+    if (!(await trigger.evaluate((element) => document.activeElement === element))) {
+      throw new Error(
+        `${accountMenuScene.id}: account menu did not restore trigger focus.`,
+      );
+    }
+  } finally {
+    await accountMenuApp.close();
+  }
+}
+
 const codingWorkspaceScene = {
   frame: "workspace-ready",
   id: "electron-coding-workspace",

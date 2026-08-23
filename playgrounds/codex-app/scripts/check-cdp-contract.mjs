@@ -61,6 +61,184 @@ const currentReplayComposerContracts = [];
 for (const scene of selectedScenes) {
   const { app, page } = await launchScene(scene);
   try {
+    if (scene.id.startsWith("current-sidebar-account-menu")) {
+      const compact = scene.id.endsWith("compact");
+      const menu = page.getByRole("menu", { name: "Account menu" });
+      const trigger = page.getByRole("button", {
+        exact: true,
+        name: "Demo account",
+      });
+      await menu.waitFor({ state: "visible" });
+      const accountMenuContract = await menu.evaluate((element) => {
+        const rect = (target) => {
+          const bounds = target?.getBoundingClientRect();
+          return bounds
+            ? {
+                height: bounds.height,
+                left: bounds.left,
+                top: bounds.top,
+                width: bounds.width,
+              }
+            : null;
+        };
+        const menuStyle = getComputedStyle(element);
+        const items = Array.from(
+          element.querySelectorAll('[role="menuitem"]'),
+        );
+        const sidebar = document.querySelector(
+          ".codex-ui-app-shell__sidebar",
+        );
+        return {
+          colorScheme: getComputedStyle(document.documentElement).colorScheme,
+          dividerHeight: rect(
+            element.querySelector(
+              ".demo-current-sidebar-account-menu__divider",
+            ),
+          )?.height,
+          focusRole: document.activeElement?.getAttribute("role"),
+          horizontalOverflow:
+            document.documentElement.scrollWidth -
+            document.documentElement.clientWidth,
+          icons: Array.from(
+            element.querySelectorAll("[data-current-build-icon]"),
+            (icon) => icon.getAttribute("data-current-build-icon"),
+          ),
+          imageCount: element.querySelectorAll("img").length,
+          itemRects: items.map(rect),
+          itemStyles: items.map((item) => {
+            const style = getComputedStyle(item);
+            return {
+              backgroundColor: style.backgroundColor,
+              borderRadius: style.borderRadius,
+              fontSize: style.fontSize,
+              fontWeight: style.fontWeight,
+              lineHeight: style.lineHeight,
+              padding: style.padding,
+            };
+          }),
+          labels: items.map((item) => item.textContent?.trim()),
+          menuRect: rect(element),
+          menuStyle: {
+            backgroundColor: menuStyle.backgroundColor,
+            borderRadius: menuStyle.borderRadius,
+            boxShadow: menuStyle.boxShadow,
+            color: menuStyle.color,
+          },
+          separatorCount: element.querySelectorAll('[role="separator"]')
+            .length,
+          sidebarRect: rect(sidebar),
+          triggerRect: rect(
+            document.querySelector(
+              '.codex-ui-app-sidebar-footer button[aria-label="Demo account"]',
+            ),
+          ),
+        };
+      });
+      accountMenuContract.triggerRect = await trigger.evaluate((element) => {
+        const bounds = element.getBoundingClientRect();
+        return {
+          height: bounds.height,
+          left: bounds.left,
+          top: bounds.top,
+          width: bounds.width,
+        };
+      });
+      const expectedTop = compact ? 447 : 587;
+      const expectedItemTops = [
+        expectedTop + 4,
+        expectedTop + 41.5625,
+        expectedTop + 70.125,
+        expectedTop + 98.6875,
+        expectedTop + 127.25,
+        expectedTop + 155.8125,
+      ];
+      const expectedBackground =
+        scene.theme === "light"
+          ? "oklab(0.999994 0.0000455678 0.0000200868 / 0.9)"
+          : "oklab(0.297161 0.0000135154 0.00000594556 / 0.9)";
+      const expectedColor =
+        scene.theme === "light" ? "rgb(26, 28, 31)" : "rgb(223, 223, 223)";
+      const near = (actual, expected, tolerance = 0.15) =>
+        typeof actual === "number" && Math.abs(actual - expected) <= tolerance;
+      if (
+        accountMenuContract.colorScheme !== scene.theme ||
+        accountMenuContract.horizontalOverflow > 1 ||
+        accountMenuContract.focusRole !== "menuitem" ||
+        accountMenuContract.imageCount !== 1 ||
+        accountMenuContract.separatorCount !== 0 ||
+        accountMenuContract.dividerHeight !== 9 ||
+        !near(accountMenuContract.sidebarRect?.width, 322.90625) ||
+        !near(accountMenuContract.menuRect?.left, 9) ||
+        !near(accountMenuContract.menuRect?.top, expectedTop) ||
+        !near(accountMenuContract.menuRect?.width, 306.90625) ||
+        !near(accountMenuContract.menuRect?.height, 188.375) ||
+        !near(accountMenuContract.triggerRect?.width, 187.234375) ||
+        accountMenuContract.triggerRect?.height !== 29 ||
+        !near(
+          accountMenuContract.triggerRect?.top,
+          compact ? 642.5 : 782.5,
+        ) ||
+        JSON.stringify(accountMenuContract.icons) !==
+          JSON.stringify([
+            "sidebar-account-menu-usage",
+            "sidebar-account-menu-pet",
+            "sidebar-account-menu-invite",
+            "sidebar-account-menu-settings",
+            "sidebar-account-menu-logout",
+          ]) ||
+        JSON.stringify(accountMenuContract.labels.slice(1)) !==
+          JSON.stringify([
+            "Usage94% left",
+            "Show pet",
+            "Invite a friend",
+            "Settings⌘,",
+            "Log out",
+          ]) ||
+        accountMenuContract.menuStyle.backgroundColor !== expectedBackground ||
+        accountMenuContract.menuStyle.color !== expectedColor ||
+        accountMenuContract.menuStyle.borderRadius !== "15px" ||
+        !accountMenuContract.menuStyle.boxShadow.includes(
+          scene.theme === "light"
+            ? "rgba(26, 28, 31, 0.08)"
+            : "rgba(255, 255, 255, 0.082)",
+        ) ||
+        accountMenuContract.itemRects.length !== 6 ||
+        accountMenuContract.itemRects.some(
+          (rect, index) =>
+            !near(rect?.left, 13) ||
+            !near(rect?.top, expectedItemTops[index]) ||
+            !near(rect?.width, 298.90625) ||
+            !near(rect?.height, 28.5625),
+        ) ||
+        accountMenuContract.itemStyles[0]?.backgroundColor ===
+          "rgba(0, 0, 0, 0)" ||
+        accountMenuContract.itemStyles.slice(1).some(
+          (style) =>
+            style.backgroundColor !== "rgba(0, 0, 0, 0)" ||
+            style.borderRadius !== "12.5px" ||
+            style.fontSize !== "13px" ||
+            style.fontWeight !== "445" ||
+            style.lineHeight !== "18.5714px" ||
+            style.padding !== "5px 8px",
+        )
+      ) {
+        throw new Error(
+          `${scene.id}: current account menu contract failed: ${JSON.stringify(accountMenuContract)}`,
+        );
+      }
+      await page.keyboard.press("Escape");
+      await menu.waitFor({ state: "hidden" });
+      await page.waitForFunction(() => {
+        const active = document.activeElement;
+        return (
+          active instanceof HTMLButtonElement &&
+          (active.textContent?.includes("Demo account") ?? false)
+        );
+      });
+      if (!(await trigger.evaluate((element) => document.activeElement === element))) {
+        throw new Error(`${scene.id}: account menu did not restore trigger focus.`);
+      }
+    }
     if (scene.id === "thread-windowed") {
       await page.waitForFunction(() => {
         const viewport = document.querySelector(

@@ -136,6 +136,9 @@ describe("lifecycle visual policy", () => {
       "CODEX_UI_KIT_CURRENT_SIDEBAR_PROJECT_MENU_REFERENCE",
       "CODEX_UI_KIT_CURRENT_SIDEBAR_HELP_MENU_REFERENCE",
       "CODEX_UI_KIT_CURRENT_SIDEBAR_ACCOUNT_MENU_REFERENCE",
+      "CODEX_UI_KIT_CURRENT_SIDEBAR_ACCOUNT_MENU_LIGHT_REFERENCE",
+      "CODEX_UI_KIT_CURRENT_SIDEBAR_ACCOUNT_MENU_COMPACT_REFERENCE",
+      "CODEX_UI_KIT_CURRENT_SIDEBAR_ACCOUNT_MENU_LIGHT_COMPACT_REFERENCE",
       "CODEX_UI_KIT_CURRENT_SIDEBAR_COMPACT_PINNED_REFERENCE",
       "CODEX_UI_KIT_CURRENT_SIDEBAR_ACTIVE_STATUS_REFERENCE",
       "CODEX_UI_KIT_CURRENT_SIDEBAR_UNREAD_STATUS_REFERENCE",
@@ -151,6 +154,9 @@ describe("lifecycle visual policy", () => {
       "current-sidebar-project-menu",
       "current-sidebar-help-menu",
       "current-sidebar-account-menu",
+      "current-sidebar-account-menu-light",
+      "current-sidebar-account-menu-compact",
+      "current-sidebar-account-menu-light-compact",
       "current-sidebar-compact-pinned",
       "current-sidebar-status-lifecycle",
       "current-sidebar-collection-empty",
@@ -184,8 +190,14 @@ describe("lifecycle visual policy", () => {
       "expectedActualPosition: { left: 235, top: 502 }",
     );
     expect(contract).toContain(
-      "expectedActualPosition: { left: 9, top: 587 }",
+      "expectedActualPosition: { left: 9, top: expectedTop }",
     );
+    expect(contract).toContain("const expectedTop = compact ? 447 : 587");
+    expect(contract).toContain("width: 307");
+    expect(contract).toContain(
+      'defaultMaximumRatio: scene.theme === "light" ? 0.006 : 0.005',
+    );
+    expect(appSource).toContain("currentHomeFrame\n                  ? 306.90625");
     expect(cdpContract).toContain(
       'helpMenuContract.heading !== "What\'s new"',
     );
@@ -197,6 +209,12 @@ describe("lifecycle visual policy", () => {
     );
     expect(electronContract).toContain(
       'accountMenuContract.separatorCount !== 0',
+    );
+    expect(cdpContract).toContain(
+      'scene.id.startsWith("current-sidebar-account-menu")',
+    );
+    expect(electronContract).toContain(
+      'id: "electron-current-sidebar-account-menu-light-compact"',
     );
   });
 
@@ -324,7 +342,7 @@ describe("lifecycle visual policy", () => {
       "!initialSelection.capture && themeAvailable",
     );
     expect(appStyles).toContain(
-      '.demo-root[data-theme="light"] .demo-current-build-icon',
+      ':root[data-theme="light"] .demo-current-build-icon',
     );
     expect(appStyles).toContain(
       "background: var(--demo-shell-overlay)",

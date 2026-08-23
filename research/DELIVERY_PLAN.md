@@ -144,7 +144,10 @@ exit gates; it does not replace the inventory.
   close/reopen side-panel behavior.
   The previous account-menu follow-up added six exact icons and gated its six-item,
   one-avatar, zero-role-separator structure, 258.11×188.38 geometry, dismissal,
-  focus return, and owned pixels at 0.1979%. Sidebar actions and ordinary task
+  focus return, and owned pixels at 0.1979%. The current `26.818.41509`
+  refresh now supersedes that layout with a Dark/Light × wide/compact matrix,
+  322.90625px sidebar, 306.90625×188.375px menu, 28.5625px rows, zero compact
+  overflow, and privacy-masked ratios from 0.3968% to 0.5458%. Sidebar actions and ordinary task
   status were separate verified denominators on that build. The previous-build status
   slice reached active and unread runtime states, preserved the active spinner
   while a follow-up is queued, and locks the exact trailing rail, spinner, dot,
@@ -436,7 +439,8 @@ slot. It is split into:
   Retry recovery, and exact 30px trailing geometry through product CDP,
   Browser/CDP, Electron, and local-only pixels;
 - `app.sidebar-footer-account-settings`: account, settings, update/status, and
-  footer overflow behavior.
+  footer overflow behavior. The current account/footer contract is closed;
+  full Settings routes remain owned by Stage 4.
 - `app.sidebar-help-menu`: current release-note grouping, support/setup actions,
   geometry, dismissal, and focus return.
 
@@ -447,10 +451,10 @@ now verified. The current empty state is tied to a live `No chats` project
 row; loading and the five-item `Show more` boundary are locked to current ASAR
 structure, then repeated through Browser/CDP, Electron, and reviewed pixels.
 The current New chat selection, project portal, Dark/Light, and 1180/720 matrix
-is now closed. The remaining Stage 1 work is broader route lifecycle feedback,
-global notification runtime evidence, account/settings overflow, and
-selection continuity beyond the New chat route rather than another
-sidebar-row variant.
+is now closed. The current footer/account menu matrix is also closed. The
+remaining Stage 1 work is broader route lifecycle feedback, global
+notification runtime evidence, and selection continuity beyond the New chat
+route rather than another sidebar-row variant.
 
 The same workstream also covers shell gaps that otherwise distort every
 feature:

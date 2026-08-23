@@ -70,6 +70,12 @@ observation from a previous build remains historical evidence.
   return, and zero compact overflow. Four unmasked owned-main comparisons pass
   between 0.2708% and 1.7855% under a 2.5% hard limit; the product preference
   was restored to System after capture.
+- A companion account-menu sample covers Dark and Light at 1180×820 and
+  720×680. It locks the 322.90625px sidebar, 306.90625×188.375px portalled
+  menu, six rows, 9px visual divider, five exact current icons, one avatar,
+  zero role separators, zero compact overflow, Escape dismissal, and trigger
+  focus return. Privacy-masked menu-region comparisons pass between 0.3968%
+  and 0.5458% under independent Dark 0.5% and Light 0.6% limits.
 - The project action menu moved from a Renderer DOM menu to the frozen
   `electronBridge.showContextMenu` path. The independent replica now locks the
   current six-action/three-separator provider, 221×187 geometry, six exact
@@ -111,13 +117,13 @@ observation from a previous build remains historical evidence.
   Browser/CDP and Electron pass; privacy-safe action/status tail comparisons
   pass between 0% and 3.1944%. Recents row count and text remain
   content-dependent rather than frozen.
-- The broader `26.810.52044` Review, Settings, account,
+- The broader `26.810.52044` Review and Settings,
   waiting/error sidebar variants, and exact-asset results remain
   previous-build regression evidence.
   They are not relabeled as current merely because the shell capture passes.
 
-Current inventory: 89 surface groups; 30 have current-build runtime evidence, 43 have previous-build-only runtime evidence, 16 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 27 groups and Electron verification covers 27.
-Prior acceptance outside those 27 sampled current-build groups remains
+Current inventory: 89 surface groups; 30 have current-build runtime evidence, 43 have previous-build-only runtime evidence, 16 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 28 groups and Electron verification covers 28.
+Prior acceptance outside those 28 sampled current-build groups remains
 recorded as `partial_legacy` until current-build re-observation.
 
 The current package exposes candidates far beyond the old transcript sample:
@@ -266,15 +272,18 @@ pointer/Enter/Space transitions, the current 721→720 visible-sidebar rule,
 explicit Hide/Show, a 221×187 native project menu with six fixed actions and
 one conditional unread action, and a 320×272.06 Help menu with a `What's new` heading
 and eight items. The 46px footer now contains a 75.67×28 Voice action plus
-32×32 Help. Browser/CDP and Electron repeat the lifecycle; the current
+32×32 Help. The current account-menu follow-up additionally locks the
+Dark/Light × wide/compact 306.90625×188.375px account surface and its six-row
+focus lifecycle. Browser/CDP and Electron repeat the lifecycle; the current
 local-only 133×46 Voice/Help comparison passes at 3.1219%. Four older
 26.803.61601 ownership-masked comparisons remain regression evidence for
 collapsed projects, the previous Help menu, and the compact sidebar; they are
 not relabeled as current pixels. The project menu instead has a current
-unmasked 221×187 native-region gate at 3.8449%. The broader
-project-navigation, mutation/status, and account/settings rows remain
-`partial_legacy` because these narrower observations do not prove every state
-they own.
+unmasked 221×187 native-region gate at 3.8449%. The account menu has four
+current privacy-masked region gates between 0.3968% and 0.5458%. The broader
+project-navigation and mutation/status rows remain `partial_legacy` because
+these narrower observations do not prove every state they own; full Settings
+routes remain separately owned Stage 4 surfaces.
 
 The ordinary task-status follow-up reached one real active thread and one
 background-completed unread thread on `26.803.61601`. It locked the 20×20
@@ -326,9 +335,9 @@ Renderer loads. A later `26.818.41509` isolated sample closes the New chat
 home's light-theme evidence gap: the real Light preference, computed paint,
 wide/compact geometry, prompt focus/selection, and external Light pixels are
 now recorded, and the preference was restored to System. This remains scoped
-to the visible current home and shell; account/settings overflow, broader
-route lifecycle feedback, and global notifications still require live Light
-evidence.
+to the visible current home and shell. The later account-menu matrix closes
+the footer/account Light and compact gap; broader Settings routes, route
+lifecycle feedback, and global notifications still require live evidence.
 
 The application-shell continuity slice splits window navigation, route
 lifecycle feedback, route selection/restoration, fatal App Server recovery,
