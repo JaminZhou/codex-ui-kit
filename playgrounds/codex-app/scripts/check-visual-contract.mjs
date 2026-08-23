@@ -192,6 +192,14 @@ const currentBuildCommandInterruptionReferenceSize = {
   height: 820,
   width: 1180,
 };
+const currentCommandFailureReference =
+  process.env.CODEX_UI_KIT_CURRENT_COMMAND_FAILURE_26_818_REFERENCE;
+const currentCommandInterruptionReference =
+  process.env.CODEX_UI_KIT_CURRENT_COMMAND_INTERRUPTION_26_818_REFERENCE;
+const currentCommandLifecycleReferenceSize = {
+  height: 820,
+  width: 1180,
+};
 const currentBuildContextCompactionReference =
   process.env.CODEX_UI_KIT_CONTEXT_COMPACTION_REFERENCE;
 const currentBuildContextCompactionReferenceSize = {
@@ -702,6 +710,8 @@ for (const scene of selectedScenes) {
   let currentApprovalOptionsBounds;
   let currentApprovalComposerBounds;
   let currentBasicThreadBounds;
+  let currentCommandFailureBounds;
+  let currentCommandInterruptionBounds;
 
   try {
     if (scene.id === "workspace-ready") {
@@ -842,6 +852,22 @@ for (const scene of selectedScenes) {
             width: Math.round(value.width),
           };
         });
+    }
+    if (scene.id === "current-command-failure-expanded") {
+      currentCommandFailureBounds = {
+        height: 253,
+        left: 222,
+        top: 273,
+        width: 736,
+      };
+    }
+    if (scene.id === "current-command-interruption-recovered") {
+      currentCommandInterruptionBounds = {
+        height: 211,
+        left: 222,
+        top: 451,
+        width: 736,
+      };
     }
     if (scene.id === "multi-file-review") {
       await page.evaluate(() => {
@@ -1240,6 +1266,44 @@ for (const scene of selectedScenes) {
       },
       referencePath: currentBasicThreadReference,
       referenceSize: currentBasicThreadReferenceSize,
+      sceneId: scene.id,
+    });
+  }
+
+  if (
+    scene.id === "current-command-failure-expanded" &&
+    currentCommandFailureReference
+  ) {
+    await compareCurrentBuildOverlay({
+      actual,
+      actualBounds: currentCommandFailureBounds,
+      defaultMaximumRatio: 0.05,
+      expectedActualPosition: { left: 222, top: 273 },
+      masks: [],
+      maximumRatioName:
+        "CODEX_UI_KIT_CURRENT_COMMAND_FAILURE_26_818_MAX_DIFF_RATIO",
+      referenceCrop: { height: 253, left: 222, top: 273, width: 736 },
+      referencePath: currentCommandFailureReference,
+      referenceSize: currentCommandLifecycleReferenceSize,
+      sceneId: scene.id,
+    });
+  }
+
+  if (
+    scene.id === "current-command-interruption-recovered" &&
+    currentCommandInterruptionReference
+  ) {
+    await compareCurrentBuildOverlay({
+      actual,
+      actualBounds: currentCommandInterruptionBounds,
+      defaultMaximumRatio: 0.045,
+      expectedActualPosition: { left: 222, top: 451 },
+      masks: [],
+      maximumRatioName:
+        "CODEX_UI_KIT_CURRENT_COMMAND_INTERRUPTION_26_818_MAX_DIFF_RATIO",
+      referenceCrop: { height: 211, left: 222, top: 451, width: 736 },
+      referencePath: currentCommandInterruptionReference,
+      referenceSize: currentCommandLifecycleReferenceSize,
       sceneId: scene.id,
     });
   }

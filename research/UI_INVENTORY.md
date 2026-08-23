@@ -75,12 +75,18 @@ observation from a previous build remains historical evidence.
   20px user bubble, four exact response-action assets, and all five Composer
   control hit targets. The local-only 768×774 product crop is compared without
   masks at 0.4320% changed pixels under a 0.5% hard limit.
-- The broader `26.810.52044` command, MCP, Review, Settings, worktree, account,
+- A current command task now revalidates exact exit-code-7 failure and
+  same-thread recovery plus a 58-second Stop and same-thread recovery. The
+  independent traces preserve the current `Worked for 10s`, stopped
+  background-terminal row, exact replies, actions, and glyphs. Browser/CDP and
+  Electron cover 1180×820 and 720×680; unmasked failure and interruption
+  regions pass at 4.4354% and 3.9512% under independent hard limits.
+- The broader `26.810.52044` MCP, Review, Settings, worktree, account,
   Recents, and exact-asset results remain previous-build regression evidence.
   They are not relabeled as current merely because the shell capture passes.
 
-Current inventory: 89 surface groups; 13 have current-build runtime evidence, 60 have previous-build-only runtime evidence, 16 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 10 groups and Electron verification covers 10.
-Prior acceptance outside those 10 sampled current-build groups remains
+Current inventory: 89 surface groups; 16 have current-build runtime evidence, 57 have previous-build-only runtime evidence, 16 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 13 groups and Electron verification covers 13.
+Prior acceptance outside those 13 sampled current-build groups remains
 recorded as `partial_legacy` until current-build re-observation.
 
 The current package exposes candidates far beyond the old transcript sample:
@@ -1153,6 +1159,20 @@ local-only current-product gates compare only owned regions: failure command
 Composer 2.2101%, all below their independent ceilings. Electron repeats the
 Stop → background Stop → settlement → same-thread recovery transition. Raw
 product screenshots and private navigation content remain untracked.
+
+The current `26.818.41509` command refresh supersedes that previous-build
+verification for the three sampled command groups. One exact read-only shell
+command emitted the current two-line stdout/stderr sample, exited 7, exposed
+`Worked for 10s`, and accepted an exact no-tool recovery. A second exact
+120-second command was stopped after 58 seconds, retained the stopped
+background-terminal row, and accepted an exact no-tool recovery in the same
+task. Browser/CDP locks current computed geometry, typography, labels, glyphs,
+response actions, and Composer state. Electron repeats both lifecycles at
+1180×820 and 720×680. Local-only unmasked product-region comparisons pass at
+4.4354% under 5% for failure and 3.9512% under 4.5% for interruption. This
+promotes `thread.command-execution`, `thread.command-failure-recovery`, and
+`thread.interruption-stop` on the current build; other command kinds,
+truncation variants, and process-management surfaces retain separate gates.
 
 A fourth `26.730.61309` disposable task entered `/compact` only after an exact
 no-tool baseline response. The current menu exposed `Compact this chat's

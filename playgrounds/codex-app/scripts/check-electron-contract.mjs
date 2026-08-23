@@ -7963,7 +7963,7 @@ try {
   });
   const failureTimeline = commandFailurePage.getByRole("button", {
     exact: true,
-    name: "Worked for 12s",
+    name: "Worked for 10s",
   });
   await failureTimeline.click();
   const failureCommand = commandFailurePage.locator(
@@ -7986,7 +7986,7 @@ try {
     return {
       followUpAccepted:
         document.body.textContent?.includes(
-          "Recovery follow-up accepted.",
+          "CURRENT COMMAND RECOVERY ACCEPTED",
         ) ?? false,
       lineCount: text.split("\n").length,
       outputEnd: text.slice(-18),
@@ -8000,9 +8000,9 @@ try {
   });
   if (
     !failureState.followUpAccepted ||
-    failureState.lineCount !== 161 ||
-    failureState.outputStart !== "stderr-001\ns" ||
-    !failureState.outputEnd.endsWith("080\nstderr-080\n") ||
+    failureState.lineCount !== 3 ||
+    failureState.outputStart !== "CURRENT FAIL" ||
+    !failureState.outputEnd.endsWith("FAILURE STDERR\n") ||
     failureState.scrollBottom === null ||
     Math.abs(failureState.scrollBottom) > 1 ||
     failureState.status !== "failed" ||
@@ -8021,8 +8021,7 @@ try {
   );
   if (
     typeof copiedOutput !== "string" ||
-    !copiedOutput.startsWith("stderr-001\nstdout-001") ||
-    !copiedOutput.endsWith("stdout-080\nstderr-080\n")
+    copiedOutput !== "CURRENT FAILURE STDOUT\nCURRENT FAILURE STDERR\n"
   ) {
     throw new Error(
       "Electron current command failure output copy omitted the observed transcript.",
@@ -8086,7 +8085,7 @@ try {
     !stopping.commandSummary?.startsWith(
       "Background terminal stopped with for i in $(seq 1 120)",
     ) ||
-    stopping.interruption !== "You stopped after 8s" ||
+    stopping.interruption !== "You stopped after 58s" ||
     stopping.stopAllCount !== 1 ||
     stopping.stopProcessCount !== 1
   ) {
@@ -8162,7 +8161,7 @@ try {
     recovered.activeElement !== "Message composer" ||
     recovered.assistantText !== "CURRENT INTERRUPTION RECOVERY ACCEPTED" ||
     recovered.commandStatus !== "interrupted" ||
-    recovered.interruption !== "You stopped after 8s" ||
+    recovered.interruption !== "You stopped after 58s" ||
     recovered.stopCount !== 0
   ) {
     throw new Error(
@@ -8229,6 +8228,174 @@ try {
   }
 } finally {
   await commandInterruptionApp.close();
+}
+
+const currentCommandResponsiveCases = [
+  {
+    frame: "command-failure-recovered",
+    id: "current-command-failure-expanded",
+    kind: "failure",
+    scenario: "command-failure-recovery",
+    windowSize: { height: 820, width: 1_180 },
+  },
+  {
+    frame: "command-failure-recovered",
+    id: "electron-current-command-failure-compact",
+    kind: "failure",
+    scenario: "command-failure-recovery",
+    windowSize: { height: 680, width: 720 },
+  },
+  {
+    frame: "command-interruption-recovered",
+    id: "current-command-interruption-recovered",
+    kind: "interruption",
+    scenario: "interruption",
+    windowSize: { height: 820, width: 1_180 },
+  },
+  {
+    frame: "command-interruption-recovered",
+    id: "electron-current-command-interruption-compact",
+    kind: "interruption",
+    scenario: "interruption",
+    windowSize: { height: 680, width: 720 },
+  },
+];
+
+for (const responsiveCase of currentCommandResponsiveCases) {
+  const { app: responsiveApp, page: responsivePage } = await launchScene(
+    {
+      ...responsiveCase,
+      currentSidebar: true,
+      sidebarState: "hidden",
+      theme: "dark",
+    },
+    { capture: true },
+  );
+  try {
+    if (responsiveCase.kind === "failure") {
+      const failure = responsivePage.locator(
+        '[data-item-id="command-failure-output"]',
+      );
+      const output = failure.locator(".codex-ui-command-output");
+      if (!(await output.isVisible())) {
+        const timeline = responsivePage.getByRole("button", {
+          exact: true,
+          name: "Worked for 10s",
+        });
+        if ((await timeline.getAttribute("aria-expanded")) !== "true") {
+          await timeline.click();
+        }
+        await failure.locator("summary").first().click();
+        await output.waitFor({ state: "visible" });
+      }
+    }
+    const nativeBounds = await responsiveApp.evaluate(({ BrowserWindow }) =>
+      BrowserWindow.getAllWindows()[0]?.getContentBounds(),
+    );
+    const responsive = await responsivePage.evaluate((kind) => {
+      const rect = (element) => {
+        const value = element?.getBoundingClientRect();
+        return value
+          ? {
+              height: value.height,
+              left: value.left,
+              top: value.top,
+              width: value.width,
+            }
+          : null;
+      };
+      const command = document.querySelector(
+        kind === "failure"
+          ? '[data-item-id="command-failure-output"]'
+          : '[data-item-id="command-interruption"]',
+      );
+      const assistant = document.querySelector(
+        kind === "failure"
+          ? '[data-item-id="assistant-command-failure-recovered"] .codex-ui-markdown'
+          : '[data-item-id="assistant-command-interruption-recovery"] .codex-ui-markdown',
+      );
+      const output = command?.querySelector(
+        ".codex-ui-command-output pre code",
+      );
+      return {
+        actionLabels: [...document.querySelectorAll("button")]
+          .filter((button) => button.checkVisibility())
+          .map(
+            (button) =>
+              button.getAttribute("aria-label") ??
+              button.textContent?.replace(/\s+/g, " ").trim(),
+          )
+          .filter(Boolean),
+        assistant: assistant?.textContent?.trim() ?? null,
+        command: rect(command),
+        commandStatus: command?.getAttribute("data-execution-status"),
+        composer: rect(document.querySelector(".codex-ui-composer")),
+        footer:
+          command
+            ?.querySelector(".codex-ui-command-execution__footer")
+            ?.textContent?.trim() ?? null,
+        horizontalOverflow:
+          document.documentElement.scrollWidth -
+          document.documentElement.clientWidth,
+        interruption:
+          document
+            .querySelector(
+              ".codex-ui-thread-interruption-summary__label",
+            )
+            ?.textContent?.trim() ?? null,
+        output: output?.textContent ?? null,
+        sidebarResizerCount: document.querySelectorAll(
+          '.codex-ui-app-shell__sidebar-resizer[role="separator"]',
+        ).length,
+        sidebarWidth:
+          document
+            .querySelector(".codex-ui-app-shell__sidebar")
+            ?.getBoundingClientRect().width ?? null,
+      };
+    }, responsiveCase.kind);
+    const wide = responsiveCase.windowSize.width === 1_180;
+    const expectedComposer = wide
+      ? { height: 98, left: 222, top: 706, width: 736 }
+      : { height: 98, left: 16, top: 566, width: 688 };
+    const expectedAssistant =
+      responsiveCase.kind === "failure"
+        ? "CURRENT COMMAND FAILURE OBSERVED"
+        : "CURRENT INTERRUPTION RECOVERY ACCEPTED";
+    if (
+      nativeBounds?.width !== responsiveCase.windowSize.width ||
+      nativeBounds?.height !== responsiveCase.windowSize.height ||
+      responsive.horizontalOverflow !== 0 ||
+      responsive.sidebarWidth !== 0 ||
+      responsive.sidebarResizerCount !== 0 ||
+      responsive.assistant !== expectedAssistant ||
+      Math.abs(
+        (responsive.command?.width ?? 0) - expectedComposer.width,
+      ) > 1 ||
+      Math.abs((responsive.command?.left ?? 0) - expectedComposer.left) > 1 ||
+      Math.abs((responsive.composer?.height ?? 0) - expectedComposer.height) >
+        1 ||
+      Math.abs((responsive.composer?.left ?? 0) - expectedComposer.left) > 1 ||
+      Math.abs((responsive.composer?.top ?? 0) - expectedComposer.top) > 1 ||
+      Math.abs((responsive.composer?.width ?? 0) - expectedComposer.width) > 1 ||
+      !["Copy response", "Good response", "Bad response", "Share response"].every(
+        (label) => responsive.actionLabels.includes(label),
+      ) ||
+      (responsiveCase.kind === "failure"
+        ? responsive.commandStatus !== "failed" ||
+          responsive.footer !== "Exit code 7" ||
+          responsive.output !==
+            "CURRENT FAILURE STDOUT\nCURRENT FAILURE STDERR\n"
+        : responsive.commandStatus !== "interrupted" ||
+          responsive.interruption !== "You stopped after 58s" ||
+          responsive.output !== null)
+    ) {
+      throw new Error(
+        `${responsiveCase.id}: Electron current command responsive contract failed: ${JSON.stringify({ nativeBounds, responsive })}`,
+      );
+    }
+  } finally {
+    await responsiveApp.close();
+  }
 }
 
 const contextCompactionScene = {

@@ -2022,6 +2022,20 @@ textarea {
   transform: translateX(-85px);
 }
 
+.demo-root[data-scenario="command-failure-recovery"][data-frame="command-failure-recovered"][data-sidebar-state="hidden"]
+  .codex-ui-thread-viewport,
+.demo-root[data-scenario="command-failure-recovery"][data-frame="command-failure-recovered"][data-sidebar-state="hidden"]
+  .codex-ui-conversation-thread-shell__composer {
+  transform: none;
+}
+
+.demo-root[data-scenario="interruption"][data-frame="command-interruption-recovered"][data-sidebar-state="hidden"]
+  [data-item-id="user-command-interruption-recovery"],
+.demo-root[data-scenario="interruption"][data-frame="command-interruption-recovered"][data-sidebar-state="hidden"]
+  [data-item-id="assistant-command-interruption-recovery"] {
+  transform: translateY(4px);
+}
+
 .demo-root[data-scenario="command-failure-recovery"]
   .codex-ui-thread-viewport {
   scrollbar-width: none;

@@ -365,6 +365,7 @@ function querySelection() {
   const sidebarState = [
     "compact-collapsed",
     "compact-pinned",
+    "hidden",
     "account-menu",
     "help-menu",
     "project-collapsed",
@@ -2166,7 +2167,8 @@ export function App() {
   const [liveStartPending, setLiveStartPending] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(
     () =>
-      (initialSelection.capture &&
+      initialSelection.sidebarState !== "hidden" &&
+      ((initialSelection.capture &&
         initialSelection.frame !== "pr-compact-detail" &&
         initialSelection.frame !== "workspace-compact-ready" &&
         initialSelection.frame !== "mcp-current-integration-recovered" &&
@@ -2174,7 +2176,7 @@ export function App() {
         initialSelection.frame !== "current-mixed-completed" &&
         initialSelection.frame !== "subagent-current-compact-720" &&
         initialSelection.sidebarState !== "compact-collapsed") ||
-      !isNarrowDemoWindow(),
+        !isNarrowDemoWindow()),
   );
   const [currentSidebarExpandedProjectIds, setCurrentSidebarExpandedProjectIds] =
     useState<Set<string>>(
@@ -8887,7 +8889,7 @@ export function App() {
                     ? 0
                     : ((command.turnId
                         ? state.turnDurationsMs[command.turnId]
-                        : undefined) ?? 12_857)
+                        : undefined) ?? 10_000)
                 }
                 status={command.status === "running" ? "working" : "worked"}
               />

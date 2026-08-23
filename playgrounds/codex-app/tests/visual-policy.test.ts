@@ -423,6 +423,45 @@ describe("lifecycle visual policy", () => {
     );
   });
 
+  it("gates current 26.818 command failure and interruption regions without masks", () => {
+    expect(electronHarness).toContain(
+      'id: "current-command-failure-expanded"',
+    );
+    expect(electronHarness).toContain(
+      'id: "current-command-interruption-recovered"',
+    );
+    expect(cdpContract).toContain(
+      'scene.id === "current-command-failure-expanded"',
+    );
+    expect(cdpContract).toContain(
+      'scene.id === "current-command-interruption-recovered"',
+    );
+    expect(electronContract).toContain(
+      'id: "electron-current-command-failure-compact"',
+    );
+    expect(electronContract).toContain(
+      'id: "electron-current-command-interruption-compact"',
+    );
+    expect(electronContract).toContain(
+      'windowSize: { height: 680, width: 720 }',
+    );
+    expect(contract).toContain(
+      "CODEX_UI_KIT_CURRENT_COMMAND_FAILURE_26_818_REFERENCE",
+    );
+    expect(contract).toContain(
+      "CODEX_UI_KIT_CURRENT_COMMAND_INTERRUPTION_26_818_REFERENCE",
+    );
+    expect(contract).toContain(
+      "CODEX_UI_KIT_CURRENT_COMMAND_FAILURE_26_818_MAX_DIFF_RATIO",
+    );
+    expect(contract).toContain(
+      "CODEX_UI_KIT_CURRENT_COMMAND_INTERRUPTION_26_818_MAX_DIFF_RATIO",
+    );
+    expect(contract).toContain("defaultMaximumRatio: 0.05");
+    expect(contract).toContain("defaultMaximumRatio: 0.045");
+    expect(contract.match(/masks: \[\]/g)?.length ?? 0).toBeGreaterThanOrEqual(3);
+  });
+
   it("gates the current manual context-compaction running frame", () => {
     expect(contract).toContain(
       "CODEX_UI_KIT_CONTEXT_COMPACTION_REFERENCE",
