@@ -142,6 +142,7 @@ describe("lifecycle visual policy", () => {
       "CODEX_UI_KIT_CURRENT_SIDEBAR_WORKTREE_LOADING_REFERENCE",
       "CODEX_UI_KIT_CURRENT_SIDEBAR_WORKTREE_ERROR_REFERENCE",
       "CODEX_UI_KIT_CURRENT_SIDEBAR_WORKTREE_RESTORED_REFERENCE",
+      "CODEX_UI_KIT_CURRENT_SIDEBAR_EMPTY_COLLECTION_REFERENCE",
     ]) {
       expect(contract).toContain(reference);
     }
@@ -152,9 +153,30 @@ describe("lifecycle visual policy", () => {
       "current-sidebar-account-menu",
       "current-sidebar-compact-pinned",
       "current-sidebar-status-lifecycle",
+      "current-sidebar-collection-empty",
+      "current-sidebar-collection-loading",
+      "current-sidebar-collection-long-list",
     ]) {
       expect(electronHarness).toContain(`id: "${scene}"`);
     }
+    expect(cdpContract).toContain(
+      'scene.id === "current-sidebar-collection-empty"',
+    );
+    expect(cdpContract).toContain(
+      'scene.id === "current-sidebar-collection-loading"',
+    );
+    expect(cdpContract).toContain(
+      'scene.id === "current-sidebar-collection-long-list"',
+    );
+    expect(electronContract).toContain(
+      'id: "electron-current-sidebar-collection-empty"',
+    );
+    expect(electronContract).toContain(
+      'id: "electron-current-sidebar-collection-loading"',
+    );
+    expect(electronContract).toContain(
+      'id: "electron-current-sidebar-collection-long-list"',
+    );
     expect(contract).toContain(
       "expectedActualPosition: { left: 211, top: 313 }",
     );

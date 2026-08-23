@@ -700,6 +700,9 @@ try {
         const error = status?.querySelector(
           ".codex-ui-app-sidebar__item-status-error",
         );
+        const statusPill = status?.querySelector(
+          ".codex-ui-app-sidebar__item-status-pill",
+        );
         const secondaryStatus = row?.querySelector(
           ".codex-ui-app-sidebar__item-secondary-status",
         );
@@ -747,6 +750,8 @@ try {
             secondaryStatus?.getAttribute("data-visual-status") ?? null,
           status: status?.getAttribute("data-status"),
           statusOpacity: status ? getComputedStyle(status).opacity : null,
+          statusPillRect: metric(statusPill),
+          statusPillText: statusPill?.textContent?.trim() ?? null,
           statusRect: metric(status),
           visualStatus: status?.getAttribute("data-visual-status"),
         };
@@ -811,7 +816,8 @@ try {
   );
   const expectedStatuses = [
     ["session-browser:0", "active", "loading"],
-    ["desktop-cleanup:0", "waiting", "attention"],
+    ["desktop-cleanup:0", "waiting", "waiting"],
+    ["desktop-cleanup:1", "error", "error"],
     ["codex-ui-kit:0", "unread", "attention"],
     ["codex-ui-kit:1", "queued", "loading"],
     ["design-assets:0", "loading", "loading"],
@@ -827,7 +833,9 @@ try {
       (fixture) =>
         fixture.statusOpacity !== "1" ||
         fixture.rowRect?.height !== 30 ||
-        fixture.statusRect?.width !== 20 ||
+        (fixture.visualStatus === "waiting"
+          ? Math.abs((fixture.statusRect?.width ?? 0) - 85.72) > 0.2
+          : fixture.statusRect?.width !== 20) ||
         fixture.statusRect?.height !== 20 ||
         fixture.rightInset !==
           (fixture.fixture === "design-assets:2" ? 36 : 8) ||
@@ -838,6 +846,10 @@ try {
         (fixture.visualStatus === "error" &&
           (fixture.errorRect?.width !== 16 ||
             fixture.errorRect?.height !== 16)) ||
+        (fixture.visualStatus === "waiting" &&
+          (fixture.statusPillText !== "Needs input" ||
+            fixture.statusPillRect?.height !== 20 ||
+            Math.abs((fixture.statusPillRect?.width ?? 0) - 85.72) > 0.2)) ||
         (fixture.visualStatus === "loading" &&
           (fixture.animationDuration !== "1e-06s" ||
             fixture.animationName !== "none")) ||
@@ -1000,6 +1012,155 @@ try {
   }
 } finally {
   await sidebarStatusApp.close();
+}
+
+for (const collectionScene of [
+  {
+    currentSidebar: true,
+    frame: "sidebar-current",
+    id: "electron-current-sidebar-collection-empty",
+    scenario: "streaming-recovery",
+    sidebarState: "collection-empty",
+  },
+  {
+    currentSidebar: true,
+    frame: "sidebar-current",
+    id: "electron-current-sidebar-collection-loading",
+    scenario: "streaming-recovery",
+    sidebarState: "collection-loading",
+  },
+  {
+    currentSidebar: true,
+    frame: "sidebar-current",
+    id: "electron-current-sidebar-collection-long-list",
+    scenario: "streaming-recovery",
+    sidebarSectionKind: "threads",
+    sidebarState: "collection-long-list",
+  },
+]) {
+  const { app: collectionApp, page: collectionPage } = await launchScene(
+    collectionScene,
+    { capture: false },
+  );
+  try {
+    const collection = await collectionPage.evaluate(() => {
+      const element = document.querySelector(
+        "[data-sidebar-collection-fixture]",
+      );
+      if (!(element instanceof HTMLElement)) return null;
+      const bounds = element.getBoundingClientRect();
+      const toggle = element.querySelector(
+        ".codex-ui-app-sidebar__collection-toggle",
+      );
+      const style = getComputedStyle(element);
+      return {
+        fixture: element.getAttribute("data-sidebar-collection-fixture"),
+        height: bounds.height,
+        itemCount: element.querySelectorAll(
+          '.codex-ui-app-sidebar__collection-item[role="listitem"]',
+        ).length,
+        loadingHeadingCount: element.querySelectorAll(
+          ".codex-ui-app-sidebar__collection-loading-heading > span",
+        ).length,
+        loadingRowCount: element.querySelectorAll(
+          ".codex-ui-app-sidebar__collection-loading-rows > span",
+        ).length,
+        state: element.getAttribute("data-state"),
+        style: {
+          fontSize: style.fontSize,
+          lineHeight: style.lineHeight,
+          opacity: style.opacity,
+          padding: style.padding,
+        },
+        text: element.textContent?.replace(/\s+/g, " ").trim() ?? null,
+        toggleExpanded: toggle?.getAttribute("aria-expanded") ?? null,
+        toggleText: toggle?.textContent?.trim() ?? null,
+      };
+    });
+    if (!collection) {
+      throw new Error(`${collectionScene.id}: collection fixture missing.`);
+    }
+    if (
+      collectionScene.sidebarState === "collection-empty" &&
+      (collection.fixture !== "empty" ||
+        collection.state !== "empty" ||
+        collection.text !== "No chats" ||
+        collection.height !== 29 ||
+        collection.style.fontSize !== "14px" ||
+        collection.style.lineHeight !== "21px" ||
+        collection.style.opacity !== "0.5" ||
+        collection.style.padding !== "4px 32px")
+    ) {
+      throw new Error(
+        `${collectionScene.id}: Electron empty collection drifted: ${JSON.stringify(collection)}`,
+      );
+    }
+    if (
+      collectionScene.sidebarState === "collection-loading" &&
+      (collection.fixture !== "loading" ||
+        collection.state !== "loading" ||
+        collection.loadingHeadingCount !== 1 ||
+        collection.loadingRowCount !== 4)
+    ) {
+      throw new Error(
+        `${collectionScene.id}: Electron loading collection drifted: ${JSON.stringify(collection)}`,
+      );
+    }
+    if (collectionScene.sidebarState === "collection-long-list") {
+      if (
+        collection.fixture !== "long-list" ||
+        collection.itemCount !== 5 ||
+        collection.toggleExpanded !== "false" ||
+        collection.toggleText !== "Show more"
+      ) {
+        throw new Error(
+          `${collectionScene.id}: Electron long collection drifted: ${JSON.stringify(collection)}`,
+        );
+      }
+      const toggle = collectionPage.getByRole("button", {
+        exact: true,
+        name: "Show more",
+      });
+      await toggle.focus();
+      await collectionPage.keyboard.press("Enter");
+      const expanded = await collectionPage.evaluate(() => {
+        const element = document.querySelector(
+          '[data-sidebar-collection-fixture="long-list"]',
+        );
+        const navigation = document.querySelector(
+          ".codex-ui-app-sidebar__navigation",
+        );
+        const toggle = element?.querySelector(
+          ".codex-ui-app-sidebar__collection-toggle",
+        );
+        return {
+          activeText: document.activeElement?.textContent?.trim() ?? null,
+          expanded: toggle?.getAttribute("aria-expanded") ?? null,
+          itemCount:
+            element?.querySelectorAll(
+              '.codex-ui-app-sidebar__collection-item[role="listitem"]',
+            ).length ?? 0,
+          scrollOverflow: navigation
+            ? navigation.scrollHeight - navigation.clientHeight
+            : null,
+          toggleText: toggle?.textContent?.trim() ?? null,
+        };
+      });
+      if (
+        expanded.itemCount !== 12 ||
+        expanded.expanded !== "true" ||
+        expanded.toggleText !== "Show less" ||
+        expanded.activeText !== "Show less" ||
+        !(expanded.scrollOverflow > 0)
+      ) {
+        throw new Error(
+          `${collectionScene.id}: Electron long collection expansion drifted: ${JSON.stringify(expanded)}`,
+        );
+      }
+    }
+  } finally {
+    await collectionApp.close();
+  }
 }
 
 const themeScene = {

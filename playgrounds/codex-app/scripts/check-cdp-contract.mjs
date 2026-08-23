@@ -5858,12 +5858,61 @@ for (const scene of selectedScenes) {
           if (!sidebar || !sidebarHeader || !navigation || !footer) {
             return null;
           }
+          const collection = sidebar.querySelector(
+            "[data-sidebar-collection-fixture]",
+          );
+          const collectionState = collection?.matches(
+            ".codex-ui-app-sidebar__collection-state, .codex-ui-app-sidebar__collection-loading",
+          )
+            ? collection
+            : null;
+          const collectionToggle = collection?.querySelector(
+            ".codex-ui-app-sidebar__collection-toggle",
+          );
           return {
             actionToolbars: sidebar.querySelectorAll(
               ".codex-ui-app-sidebar__item-actions[role=\"toolbar\"]",
             ).length,
             footer: rect(footer),
             header: rect(sidebarHeader),
+            collection: collection
+              ? {
+                  fixture: collection.getAttribute(
+                    "data-sidebar-collection-fixture",
+                  ),
+                  itemCount: collection.querySelectorAll(
+                    '.codex-ui-app-sidebar__collection-item[role="listitem"]',
+                  ).length,
+                  loadingHeadingCount: collection.querySelectorAll(
+                    ".codex-ui-app-sidebar__collection-loading-heading > span",
+                  ).length,
+                  loadingRowCount: collection.querySelectorAll(
+                    ".codex-ui-app-sidebar__collection-loading-rows > span",
+                  ).length,
+                  rect: rect(collection),
+                  state: collectionState?.getAttribute("data-state") ?? null,
+                  stateStyle: collectionState
+                    ? {
+                        color: getComputedStyle(collectionState).color,
+                        fontSize: getComputedStyle(collectionState).fontSize,
+                        lineHeight: getComputedStyle(collectionState).lineHeight,
+                        opacity: getComputedStyle(collectionState).opacity,
+                        padding: getComputedStyle(collectionState).padding,
+                      }
+                    : null,
+                  text:
+                    collectionState?.textContent
+                      ?.replace(/\s+/g, " ")
+                      .trim() ?? null,
+                  toggle: collectionToggle
+                    ? {
+                        expanded:
+                          collectionToggle.getAttribute("aria-expanded"),
+                        text: collectionToggle.textContent?.trim() ?? null,
+                      }
+                    : null,
+                }
+              : null,
             navigation: {
               clientHeight: navigation.clientHeight,
               rect: rect(navigation),
@@ -5919,6 +5968,9 @@ for (const scene of selectedScenes) {
                 const error = status?.querySelector(
                   ".codex-ui-app-sidebar__item-status-error",
                 );
+                const statusPill = status?.querySelector(
+                  ".codex-ui-app-sidebar__item-status-pill",
+                );
                 const secondaryStatus = row?.querySelector(
                   ".codex-ui-app-sidebar__item-secondary-status",
                 );
@@ -5969,6 +6021,8 @@ for (const scene of selectedScenes) {
                   secondaryVisualStatus:
                     secondaryStatus?.getAttribute("data-visual-status") ?? null,
                   status: status?.getAttribute("data-status"),
+                  statusPillRect: statusPill ? rect(statusPill) : null,
+                  statusPillText: statusPill?.textContent?.trim() ?? null,
                   statusRect: status ? rect(status) : null,
                   visualStatus: status?.getAttribute("data-visual-status"),
                 };
@@ -7875,6 +7929,9 @@ for (const scene of selectedScenes) {
       scene.id === "current-sidebar-recents";
     const currentSidebarStatusScene =
       scene.id === "current-sidebar-status-lifecycle";
+    const currentSidebarCollectionScene = scene.id.startsWith(
+      "current-sidebar-collection-",
+    );
     if (
       hiddenSidebarScene
         ? !contract.sidebar ||
@@ -7899,15 +7956,20 @@ for (const scene of selectedScenes) {
           ) > 1 ||
           contract.sidebar.navigation.scrollHeight <
             contract.sidebar.navigation.clientHeight ||
-          contract.sidebar.projectToggleExpanded !== "false" ||
-          contract.sidebar.actionToolbars < 8 ||
-          contract.sidebar.statusCounts.error !==
-            (currentSidebarStatusScene ? 1 : currentBuildSidebarScene ? 0 : 1) ||
-          (!currentBuildSidebarScene &&
-            contract.sidebar.statusCounts.queued < 1) ||
-          contract.sidebar.statusCounts.unread <
-            (currentBuildSidebarScene ? 1 : 2) ||
-          contract.sidebar.selectedCount < 1
+          (!currentSidebarCollectionScene &&
+            (contract.sidebar.projectToggleExpanded !== "false" ||
+              contract.sidebar.actionToolbars < 8 ||
+              contract.sidebar.statusCounts.error !==
+                (currentSidebarStatusScene
+                  ? 2
+                  : currentBuildSidebarScene
+                    ? 0
+                    : 1) ||
+              (!currentBuildSidebarScene &&
+                contract.sidebar.statusCounts.queued < 1) ||
+              contract.sidebar.statusCounts.unread <
+                (currentBuildSidebarScene ? 1 : 2) ||
+              contract.sidebar.selectedCount < 1))
     ) {
       throw new Error(
         `${scene.id}: current-build sidebar contract failed: ${JSON.stringify(contract.sidebar)}`,
@@ -7916,7 +7978,8 @@ for (const scene of selectedScenes) {
     if (currentSidebarStatusScene) {
       const expectedStatuses = [
         ["session-browser:0", "active", "loading"],
-        ["desktop-cleanup:0", "waiting", "attention"],
+        ["desktop-cleanup:0", "waiting", "waiting"],
+        ["desktop-cleanup:1", "error", "error"],
         ["codex-ui-kit:0", "unread", "attention"],
         ["codex-ui-kit:1", "queued", "loading"],
         ["design-assets:0", "loading", "loading"],
@@ -7964,7 +8027,9 @@ for (const scene of selectedScenes) {
       const geometryInvalid = contract.sidebar.statusFixtures.some(
         (fixture) =>
           fixture.rowRect?.height !== 30 ||
-          fixture.statusRect?.width !== 20 ||
+          (fixture.visualStatus === "waiting"
+            ? Math.abs((fixture.statusRect?.width ?? 0) - 85.72) > 0.2
+            : fixture.statusRect?.width !== 20) ||
           fixture.statusRect?.height !== 20 ||
           fixture.rightInset !==
             (fixture.fixture === "design-assets:2" ? 36 : 8) ||
@@ -7975,6 +8040,11 @@ for (const scene of selectedScenes) {
           (fixture.visualStatus === "error" &&
             (fixture.errorRect?.width !== 16 ||
               fixture.errorRect?.height !== 16)) ||
+          (fixture.visualStatus === "waiting" &&
+            (fixture.statusPillText !== "Needs input" ||
+              fixture.statusPillRect?.height !== 20 ||
+              Math.abs((fixture.statusPillRect?.width ?? 0) - 85.72) >
+                0.2)) ||
           (fixture.visualStatus === "loading" &&
             (fixture.animationDuration !== "1e-06s" ||
               fixture.animationName !== "none" ||
@@ -8010,6 +8080,7 @@ for (const scene of selectedScenes) {
         JSON.stringify(actualWorktreeStatuses) !==
           JSON.stringify(expectedWorktreeStatuses) ||
         contract.sidebar.statusCounts.active !== 1 ||
+        contract.sidebar.statusCounts.error !== 2 ||
         contract.sidebar.statusCounts.loading !== 2 ||
         contract.sidebar.statusCounts.queued < 1 ||
         contract.sidebar.statusCounts.waiting !== 1 ||
@@ -8055,6 +8126,84 @@ for (const scene of selectedScenes) {
         throw new Error(
           `${scene.id}: RTL worktree status geometry failed: ${JSON.stringify(rtlWorktreeGeometry)}`,
         );
+      }
+    }
+    if (currentSidebarCollectionScene) {
+      const collection = contract.sidebar.collection;
+      if (!collection) {
+        throw new Error(`${scene.id}: sidebar collection fixture missing.`);
+      }
+      if (
+        scene.id === "current-sidebar-collection-empty" &&
+        (collection.fixture !== "empty" ||
+          collection.state !== "empty" ||
+          collection.text !== "No chats" ||
+          collection.rect.height !== 29 ||
+          collection.stateStyle?.fontSize !== "14px" ||
+          collection.stateStyle?.lineHeight !== "21px" ||
+          collection.stateStyle?.opacity !== "0.5" ||
+          collection.stateStyle?.padding !== "4px 32px")
+      ) {
+        throw new Error(
+          `${scene.id}: current empty collection contract failed: ${JSON.stringify(collection)}`,
+        );
+      }
+      if (
+        scene.id === "current-sidebar-collection-loading" &&
+        (collection.fixture !== "loading" ||
+          collection.state !== "loading" ||
+          collection.loadingHeadingCount !== 1 ||
+          collection.loadingRowCount !== 4)
+      ) {
+        throw new Error(
+          `${scene.id}: current loading collection contract failed: ${JSON.stringify(collection)}`,
+        );
+      }
+      if (
+        scene.id === "current-sidebar-collection-long-list" &&
+        (collection.fixture !== "long-list" ||
+          collection.itemCount !== 5 ||
+          collection.toggle?.expanded !== "false" ||
+          collection.toggle?.text !== "Show more")
+      ) {
+        throw new Error(
+          `${scene.id}: current long collection contract failed: ${JSON.stringify(collection)}`,
+        );
+      }
+      if (scene.id === "current-sidebar-collection-long-list") {
+        const toggle = page.getByRole("button", {
+          exact: true,
+          name: "Show more",
+        });
+        await toggle.focus();
+        await toggle.click();
+        const expandedCollection = await page.evaluate(() => {
+          const collection = document.querySelector(
+            '[data-sidebar-collection-fixture="long-list"]',
+          );
+          const toggle = collection?.querySelector(
+            ".codex-ui-app-sidebar__collection-toggle",
+          );
+          return {
+            activeText: document.activeElement?.textContent?.trim() ?? null,
+            expanded: toggle?.getAttribute("aria-expanded") ?? null,
+            itemCount:
+              collection?.querySelectorAll(
+                '.codex-ui-app-sidebar__collection-item[role="listitem"]',
+              ).length ?? 0,
+            toggleText: toggle?.textContent?.trim() ?? null,
+          };
+        });
+        if (
+          expandedCollection.itemCount !== 12 ||
+          expandedCollection.expanded !== "true" ||
+          expandedCollection.toggleText !== "Show less" ||
+          expandedCollection.activeText !== "Show less"
+        ) {
+          throw new Error(
+            `${scene.id}: long collection expansion failed: ${JSON.stringify(expandedCollection)}`,
+          );
+        }
       }
     }
     const expectedSidebarMax =

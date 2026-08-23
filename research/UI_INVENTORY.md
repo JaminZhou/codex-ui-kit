@@ -233,7 +233,12 @@ share two 19×20 Pin/Archive buttons with an 8px gap and 8px toolbar right
 inset. Active and unread use the same 20×20 rail at 8px, with the exact 16×16
 spinner or centered 8×8 blue dot; completed has no status glyph. Browser/CDP,
 Electron, and four local-only action/status tail comparisons gate this current
-boundary. Ordinary waiting/error variants remain independently versioned.
+boundary. The next current slice adds the `Needs input` pill and an independent
+16×16 ordinary error row. It also reaches a live 29px `No chats` project row
+and locks current-ASAR loading (one heading plus four shimmer rows) and the
+five-item `Show more` boundary. Browser/CDP and Electron repeat
+five-to-twelve expansion, focus retention, `Show less`, and navigation
+overflow; a privacy-safe 140×29 empty crop passes at 1.8227%.
 
 A second `26.818.41509` sidebar probe now supersedes the worktree-specific
 status boundary as well. Two isolated disposable repositories reach real

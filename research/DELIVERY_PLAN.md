@@ -434,10 +434,14 @@ slot. It is split into:
 - `app.sidebar-help-menu`: current release-note grouping, support/setup actions,
   geometry, dismissal, and focus return.
 
-Current progress: current-build thread-history, hover actions, and ordinary
-active/completed/unread presentation and worktree-specific create/failure/Retry
-status are now verified. Ordinary waiting/error variants and
-empty/loading/long-list mutations remain open within Stage 1.
+Current progress: current-build thread-history, hover actions, ordinary
+active/completed/unread/waiting/error presentation, worktree-specific
+create/failure/Retry status, and empty/loading/long-list collection states are
+now verified. The current empty state is tied to a live `No chats` project
+row; loading and the five-item `Show more` boundary are locked to current ASAR
+structure, then repeated through Browser/CDP, Electron, and reviewed pixels.
+The remaining Stage 1 work is the broader shell feedback, selection, portal,
+and cross-width/theme matrix below rather than another sidebar-row variant.
 
 The same workstream also covers shell gaps that otherwise distort every
 feature:

@@ -1,4 +1,5 @@
 import {
+  Children,
   useEffect,
   useId,
   useLayoutEffect,
@@ -2027,6 +2028,188 @@ export function AppSidebarSection({
   );
 }
 
+const appSidebarLoadingWidths = [
+  70.53206044367144,
+  67.08967646448392,
+  51.77261710342607,
+  50.00019947998235,
+];
+
+export interface AppSidebarCollectionStateProps
+  extends Omit<HTMLAttributes<HTMLDivElement>, "children"> {
+  children?: ReactNode;
+  label?: string;
+  state: "empty" | "error" | "loading";
+}
+
+/**
+ * Current Codex sidebar collection feedback for initial loading, empty, and
+ * failed history reads. Loading uses the observed one-heading/four-row
+ * skeleton instead of substituting ordinary task rows.
+ */
+export function AppSidebarCollectionState({
+  children,
+  className,
+  label,
+  state,
+  ...props
+}: AppSidebarCollectionStateProps) {
+  if (state === "loading") {
+    const accessibleLabel = label ?? "Loading chats";
+    return (
+      <div
+        aria-label={accessibleLabel}
+        aria-live="polite"
+        className={[
+          "codex-ui-app-sidebar__collection-loading",
+          className,
+        ]
+          .filter(Boolean)
+          .join(" ")}
+        data-state={state}
+        role="status"
+        {...props}
+      >
+        <span
+          aria-hidden="true"
+          className="codex-ui-app-sidebar__collection-loading-heading"
+        >
+          <span style={{ width: "18%" }} />
+        </span>
+        <span
+          aria-hidden="true"
+          className="codex-ui-app-sidebar__collection-loading-rows"
+        >
+          {appSidebarLoadingWidths.map((width, index) => (
+            <span
+              key={index}
+              style={
+                {
+                  "--codex-ui-app-sidebar-loading-delay": `${-index * 120}ms`,
+                  width: `${width}%`,
+                } as CSSProperties
+              }
+            />
+          ))}
+        </span>
+      </div>
+    );
+  }
+
+  return (
+    <div
+      className={[
+        "codex-ui-app-sidebar__collection-state",
+        className,
+      ]
+        .filter(Boolean)
+        .join(" ")}
+      data-state={state}
+      role={state === "error" ? "alert" : "status"}
+      {...props}
+    >
+      {children ?? (state === "error" ? "Could not load chats" : "No chats")}
+    </div>
+  );
+}
+
+export interface AppSidebarCollectionProps
+  extends Omit<HTMLAttributes<HTMLDivElement>, "children"> {
+  children?: ReactNode;
+  defaultExpanded?: boolean;
+  emptyState?: ReactNode;
+  error?: ReactNode;
+  isLoading?: boolean;
+  loadingLabel?: string;
+  maxItems?: number;
+  onExpandedChange?: (expanded: boolean) => void;
+  showLessLabel?: ReactNode;
+  showMoreLabel?: ReactNode;
+}
+
+/** A bounded sidebar row collection with current empty/loading/error states. */
+export function AppSidebarCollection({
+  children,
+  className,
+  defaultExpanded = false,
+  emptyState,
+  error,
+  isLoading = false,
+  loadingLabel,
+  maxItems = 5,
+  onExpandedChange,
+  showLessLabel = "Show less",
+  showMoreLabel = "Show more",
+  ...props
+}: AppSidebarCollectionProps) {
+  const [expanded, setExpanded] = useState(defaultExpanded);
+  const items = Children.toArray(children);
+  const boundedMaxItems = Math.max(1, Math.floor(maxItems));
+  const hasOverflow = items.length > boundedMaxItems;
+  const visibleItems = expanded ? items : items.slice(0, boundedMaxItems);
+  const setCollectionExpanded = (nextExpanded: boolean) => {
+    setExpanded(nextExpanded);
+    onExpandedChange?.(nextExpanded);
+  };
+
+  if (isLoading) {
+    return (
+      <AppSidebarCollectionState
+        className={className}
+        label={loadingLabel}
+        state="loading"
+        {...props}
+      />
+    );
+  }
+  if (error) {
+    return (
+      <AppSidebarCollectionState className={className} state="error" {...props}>
+        {error}
+      </AppSidebarCollectionState>
+    );
+  }
+  if (items.length === 0) {
+    return (
+      <AppSidebarCollectionState className={className} state="empty" {...props}>
+        {emptyState}
+      </AppSidebarCollectionState>
+    );
+  }
+
+  return (
+    <div
+      className={["codex-ui-app-sidebar__collection", className]
+        .filter(Boolean)
+        .join(" ")}
+      data-expanded={expanded || undefined}
+      {...props}
+    >
+      <div className="codex-ui-app-sidebar__collection-items" role="list">
+        {visibleItems.map((item, index) => (
+          <div
+            className="codex-ui-app-sidebar__collection-item"
+            key={(item as ReactElement).key ?? index}
+            role="listitem"
+          >
+            {item}
+          </div>
+        ))}
+      </div>
+      {hasOverflow ? (
+        <button
+          aria-expanded={expanded}
+          className="codex-ui-app-sidebar__collection-toggle"
+          onClick={() => setCollectionExpanded(!expanded)}
+          type="button"
+        >
+          {expanded ? showLessLabel : showMoreLabel}
+        </button>
+      ) : null}
+    </div>
+  );
+}
+
 export type AppSidebarItemStatus =
   | "active"
   | "error"
@@ -2048,7 +2231,8 @@ type AppSidebarItemVisualStatus =
   | "attention"
   | "error"
   | "idle"
-  | "loading";
+  | "loading"
+  | "waiting";
 
 function appSidebarItemVisualStatus(
   status: AppSidebarItemStatus,
@@ -2060,8 +2244,9 @@ function appSidebarItemVisualStatus(
     case "running":
       return "loading";
     case "unread":
-    case "waiting":
       return "attention";
+    case "waiting":
+      return "waiting";
     case "error":
       return "error";
     case "idle":
@@ -2145,6 +2330,14 @@ function AppSidebarItemStatusVisual({
         aria-hidden="true"
         className="codex-ui-app-sidebar__item-status-attention"
       />
+    );
+  }
+
+  if (status === "waiting") {
+    return (
+      <span className="codex-ui-app-sidebar__item-status-pill">
+        Needs input
+      </span>
     );
   }
 

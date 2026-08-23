@@ -9,6 +9,7 @@ import {
   AppRouteOutlet,
   AppServerCrashRecovery,
   AppSidebar,
+  AppSidebarCollection,
   AppSidebarFooter,
   AppSidebarItem,
   AppSidebarProjectGroup,
@@ -431,6 +432,9 @@ function querySelection() {
     "help-menu",
     "project-collapsed",
     "project-menu",
+    "collection-empty",
+    "collection-loading",
+    "collection-long-list",
     "status-lifecycle",
   ].includes(requestedSidebarState ?? "")
     ? requestedSidebarState
@@ -1693,7 +1697,7 @@ const currentSidebarProjects = [
   {
     id: "desktop-cleanup",
     label: "desktop-cleanup",
-    tasks: ["Verify recent item cleanup"],
+    tasks: ["Verify recent item cleanup", "Inspect failed task"],
   },
   {
     id: "codex-ui-kit",
@@ -1725,6 +1729,8 @@ function currentSidebarTaskStatus(projectId: string, taskIndex: number) {
       return "active" as const;
     case "desktop-cleanup:0":
       return "waiting" as const;
+    case "desktop-cleanup:1":
+      return "error" as const;
     case "codex-ui-kit:0":
       return "unread" as const;
     case "design-assets:2":
@@ -1765,9 +1771,10 @@ function currentSidebarTaskStatusLabel(projectId: string, taskIndex: number) {
   const status = currentSidebarTaskStatus(projectId, taskIndex);
   return {
     active: "Task is active",
+    error: "Task failed",
     idle: undefined,
     unread: "Task has an unread update",
-    waiting: "Task is waiting for a response",
+    waiting: "Needs input",
   }[status];
 }
 
@@ -3694,7 +3701,91 @@ export function App() {
     view === "workspace" && currentWorkspacePersistenceFrame(activeFrame);
   const sidebarRecentScenarios = (
     Object.values(replayScenarios) as ReplayScenario[]
-  ).slice(0, currentSidebarComposition ? 6 : undefined);
+  ).slice(
+    0,
+    initialSelection.sidebarState === "collection-long-list"
+      ? 12
+      : currentSidebarComposition
+        ? 6
+        : undefined,
+  );
+  const currentSidebarVisibleProjects =
+    initialSelection.sidebarState === "collection-empty"
+      ? [
+          {
+            id: "protocol-client",
+            label: "codex-app-server-client",
+            tasks: [] as string[],
+          },
+        ]
+      : currentSidebarProjects;
+  const sidebarRecentItems = sidebarRecentScenarios.map((item, index) => (
+    <AppSidebarItem
+      actions={
+        currentSidebarComposition ? (
+          <>
+            <button
+              aria-label={`Pin recent task ${item.id}`}
+              type="button"
+            >
+              <SidebarGlyph name="pin-current" />
+            </button>
+            <button
+              aria-label={`Archive recent task ${item.id}`}
+              type="button"
+            >
+              <SidebarGlyph name="archive-current" />
+            </button>
+          </>
+        ) : (
+          <button
+            aria-label={`Sidebar actions for ${item.label}`}
+            type="button"
+          >
+            <SidebarGlyph name="more" />
+          </button>
+        )
+      }
+      actionsLabel={`Sidebar task actions for ${item.label}`}
+      key={item.id}
+      leading={
+        currentSidebarComposition ? undefined : (
+          <SidebarGlyph name="thread" />
+        )
+      }
+      onClick={() => selectScenario(item.id)}
+      selected={
+        !currentSidebarComposition &&
+        view === "conversation" &&
+        mode === "replay" &&
+        scenarioId === item.id
+      }
+      status={
+        currentSidebarComposition
+          ? "idle"
+          : index === 1
+            ? "queued"
+            : index === 2
+              ? "error"
+              : index === 3
+                ? "unread"
+                : "idle"
+      }
+      statusLabel={
+        currentSidebarComposition
+          ? undefined
+          : index === 1
+            ? "Task queued"
+            : index === 2
+              ? "Task failed"
+              : index === 3
+                ? "Unread update"
+                : undefined
+      }
+    >
+      {item.label}
+    </AppSidebarItem>
+  ));
   const sidebar = (
     <AppSidebar
       footer={
@@ -3993,6 +4084,14 @@ export function App() {
       }
       titlebarInset
     >
+      {initialSelection.sidebarState === "collection-loading" ? (
+        <AppSidebarCollection
+          data-sidebar-collection-fixture="loading"
+          isLoading
+          loadingLabel="Loading chats"
+        />
+      ) : (
+        <>
       <AppSidebarSection
         collapsible
         kind="pinned"
@@ -4000,7 +4099,7 @@ export function App() {
         toggleLabel="Toggle pinned tasks"
       >
         {currentSidebarComposition ? (
-          currentSidebarProjects.map((project) => (
+          currentSidebarVisibleProjects.map((project) => (
             <AppSidebarProjectGroup
               actions={
                 <>
@@ -4145,13 +4244,18 @@ export function App() {
                 })
               }
             >
-              {[
-                ...project.tasks,
-                ...(workspacePersistedTaskAvailable &&
-                project.id === "codex-ui-kit"
-                  ? ["Verify worktree persistence"]
-                  : []),
-              ].map((task, index) => (
+              {project.tasks.length === 0 ? (
+                <AppSidebarCollection
+                  data-sidebar-collection-fixture="empty"
+                  emptyState="No chats"
+                />
+              ) : [
+                  ...project.tasks,
+                  ...(workspacePersistedTaskAvailable &&
+                  project.id === "codex-ui-kit"
+                    ? ["Verify worktree persistence"]
+                    : []),
+                ].map((task, index) => (
                 <AppSidebarItem
                   actions={
                     task === "Verify worktree persistence" ||
@@ -4231,7 +4335,7 @@ export function App() {
                 >
                   {task}
                 </AppSidebarItem>
-              ))}
+                ))}
             </AppSidebarProjectGroup>
           ))
         ) : (
@@ -4341,73 +4445,16 @@ export function App() {
         title="Recents"
         toggleLabel="Toggle recent tasks"
       >
-        {sidebarRecentScenarios.map((item, index) => (
-          <AppSidebarItem
-            actions={
-              currentSidebarComposition ? (
-                <>
-                  <button
-                    aria-label={`Pin recent task ${item.id}`}
-                    type="button"
-                  >
-                    <SidebarGlyph name="pin-current" />
-                  </button>
-                  <button
-                    aria-label={`Archive recent task ${item.id}`}
-                    type="button"
-                  >
-                    <SidebarGlyph name="archive-current" />
-                  </button>
-                </>
-              ) : (
-                <button
-                  aria-label={`Sidebar actions for ${item.label}`}
-                  type="button"
-                >
-                  <SidebarGlyph name="more" />
-                </button>
-              )
-            }
-            actionsLabel={`Sidebar task actions for ${item.label}`}
-            key={item.id}
-            leading={
-              currentSidebarComposition ? undefined : (
-                <SidebarGlyph name="thread" />
-              )
-            }
-            onClick={() => selectScenario(item.id)}
-            selected={
-              !currentSidebarComposition &&
-              view === "conversation" &&
-              mode === "replay" &&
-              scenarioId === item.id
-            }
-            status={
-              currentSidebarComposition
-                ? "idle"
-                : index === 1
-                  ? "queued"
-                  : index === 2
-                    ? "error"
-                    : index === 3
-                      ? "unread"
-                      : "idle"
-            }
-            statusLabel={
-              currentSidebarComposition
-                ? undefined
-                : index === 1
-                  ? "Task queued"
-                  : index === 2
-                    ? "Task failed"
-                    : index === 3
-                      ? "Unread update"
-                      : undefined
-            }
+        {initialSelection.sidebarState === "collection-long-list" ? (
+          <AppSidebarCollection
+            data-sidebar-collection-fixture="long-list"
+            maxItems={5}
           >
-            {item.label}
-          </AppSidebarItem>
-        ))}
+            {sidebarRecentItems}
+          </AppSidebarCollection>
+        ) : (
+          sidebarRecentItems
+        )}
       </AppSidebarSection>
       <AppSidebarSection title="Connection">
         <AppSidebarItem
@@ -4422,6 +4469,8 @@ export function App() {
           Live local
         </AppSidebarItem>
       </AppSidebarSection>
+        </>
+      )}
     </AppSidebar>
   );
 

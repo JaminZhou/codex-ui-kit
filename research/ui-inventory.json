@@ -799,7 +799,8 @@
         "cdp-26.803.41515:recents-six-row-scroll-no-leading-glyph-pin-archive-actions",
         "cdp-26.803.61601:recents-six-row-scroll-no-leading-glyph-pin-archive-actions",
         "cdp-26.810.52044:recents-scroll-no-leading-glyph-pin-archive-actions",
-        "cdp-26.818.41509:project-task-active-complete-unread-and-content-dependent-recents-current"
+        "cdp-26.818.41509:project-task-active-complete-unread-and-content-dependent-recents-current",
+        "cdp-26.818.41509:live-no-chats-29px-empty-row-current-asar-one-heading-four-row-loading-and-five-item-show-more-browser-electron-twelve-row-expansion"
       ],
       "implementationStatus": "partial",
       "browserStatus": "verified",
@@ -837,7 +838,8 @@
         "cdp-26.730.61309:two-status-markers",
         "cdp-26.803.61601:active-thread-20px-rail-16px-spinner-and-8px-unread-link-dot",
         "cdp-26.810.52044:neutral-and-attention-activity-glyphs-plus-conditional-mark-read",
-        "cdp-26.818.41509:real-active-complete-unread-30px-row-20px-rail-16px-spinner-8px-dot-and-unmasked-status-pixels"
+        "cdp-26.818.41509:real-active-complete-unread-30px-row-20px-rail-16px-spinner-8px-dot-and-unmasked-status-pixels",
+        "cdp-26.818.41509:current-needs-input-pill-ordinary-16px-error-browser-electron-and-reviewed-status-pixels"
       ],
       "implementationStatus": "partial",
       "browserStatus": "verified",
