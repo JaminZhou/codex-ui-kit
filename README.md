@@ -22,20 +22,17 @@ Codex UI Kit turns those interaction patterns into protocol-neutral React primit
 - The current components are a partial coding-agent UI foundation, not a
   complete Codex Desktop reconstruction.
 - The authoritative full-surface inventory baseline is the installed
-  `26.810.52044` (`6662`) build. Its 89 candidate surface groups and
+  `26.818.41509` (`6962`) build. Its 89 candidate surface groups and
   build-scoped evidence status are tracked in
   [`research/UI_INVENTORY.md`](research/UI_INVENTORY.md); current-build
-  observation covers 21 groups; 51 previous-build groups remain regression
-  evidence and 17 are still unsampled. The current visual manifest binds 92
-  sidebar, menu, window-chrome, Composer, environment, Settings, and thread
-  icons to exact runtime evidence with zero scoped approximations. The latest
-  baseline refresh revalidates six project groups, pointer/Enter/Space
-  expansion, project-menu variants, the new Voice footer control, the widened
-  Help menu, five-icon Account menu, visible 720px sidebar behavior, current
-  thread actions, and Settings/Git navigation. This is still a partial UI
-  foundation rather than a global reconstruction claim; older Terminal,
-  failure, approval, attachment, collaboration, and Settings-page evidence is
-  intentionally not promoted to the new build.
+  observation covers 11 groups; 62 previous-build groups remain regression
+  evidence and 16 are still unsampled. The refresh revalidates the global
+  shell, responsive Composer, primary navigation, project-group lifecycle,
+  Help menu, route restoration, and Projects Index. It also records that the
+  project action menu is now Electron-native rather than a Renderer DOM menu.
+  The exact visual manifest is still bound to the previous `26.810.52044`
+  evidence and is not described as current until recaptured. This remains a
+  partial UI foundation rather than a global reconstruction claim.
 - The repository is public and the package baseline is `0.1.0`, but the npm package has **not** been published.
 - The API remains pre-1.0 and may change while public documentation and consumer feedback mature.
 - Extracted application files, private IPC, bundled fonts, and OpenAI brand assets are not included.

@@ -869,7 +869,7 @@ local-only.
 
 ## Current Projects Index slice
 
-- A fresh isolated Codex `26.810.52044` Renderer replaces the previous-build
+- A previously isolated Codex `26.810.52044` Renderer replaced the older-build
   Projects route denominator with fourteen 70px rows, a 736px
   512/64/128 Name/Updated/action table, three 32px actions per row, and
   expandable recent chats.
@@ -891,7 +891,7 @@ local-only.
 
 ## Current command-lifecycle follow-up
 
-- Current `26.810.52044` evidence re-runs bounded success, exact `exit 7`, and
+- Previous `26.810.52044` evidence re-ran bounded success, exact `exit 7`, and
   a stopped long-running command instead of relabeling the older replay.
 - `CommandExecution` uses the exact current three-path terminal glyph and
   13px/19.5px/445 command typography.

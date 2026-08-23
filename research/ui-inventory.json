@@ -1,11 +1,11 @@
 {
   "schemaVersion": 1,
   "baseline": {
-    "appVersion": "26.810.52044",
-    "buildNumber": "6662",
-    "sampledAt": "2026-08-18",
-    "reverifiedAt": "2026-08-19",
-    "appAsarSha256": "6e7e8791b8bf69a586ff994721fff518af391d9efdc66cd2e620dd2a4aedc90f",
+    "appVersion": "26.818.41509",
+    "buildNumber": "6962",
+    "sampledAt": "2026-08-23",
+    "reverifiedAt": "2026-08-23",
+    "appAsarSha256": "8eb91bd9efbf9a4dd04b9b0afdbfcb4e0bab5da18c1919ad74ca327c00c7e791",
     "runtimeEvidence": "scoped_cdp",
     "runtimeEvidenceBuilds": {
       "cdp": "26.715.72359",
@@ -16,7 +16,8 @@
       "cdp-26.730.61639": "26.730.61639",
       "cdp-26.803.41515": "26.803.41515",
       "cdp-26.803.61601": "26.803.61601",
-      "cdp-26.810.52044": "26.810.52044"
+      "cdp-26.810.52044": "26.810.52044",
+      "cdp-26.818.41509": "26.818.41509"
     }
   },
   "surfaces": [
@@ -34,8 +35,8 @@
         "cdp-26.810.52044:new-chat-wide-medium-721-720-visible-sidebar-destination"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "verified",
-      "electronStatus": "verified",
+      "browserStatus": "partial_legacy",
+      "electronStatus": "partial_legacy",
       "priority": "p0"
     },
     {
@@ -55,8 +56,8 @@
         "cdp-26.810.52044:visible-composer-project-worktree-branch-exact-assets"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "verified",
-      "electronStatus": "verified",
+      "browserStatus": "partial_legacy",
+      "electronStatus": "partial_legacy",
       "priority": "p0"
     },
     {
@@ -74,8 +75,8 @@
         "cdp-26.810.52044:project-dialog-260x249.5-search-listbox-252x142.81-fourteen-options-new-and-clear-project-empty-escape-focus-clear-restore"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "verified",
-      "electronStatus": "verified",
+      "browserStatus": "partial_legacy",
+      "electronStatus": "partial_legacy",
       "priority": "p0"
     },
     {
@@ -94,8 +95,8 @@
         "cdp-26.810.52044:completed-successful-command-thread-header-actions-and-composer-assets"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "verified",
-      "electronStatus": "verified",
+      "browserStatus": "partial_legacy",
+      "electronStatus": "partial_legacy",
       "priority": "p0"
     },
     {
@@ -113,8 +114,8 @@
         "cdp-26.810.52044:completed-assistant-copy-good-bad-and-fork-actions"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "verified",
-      "electronStatus": "verified",
+      "browserStatus": "partial_legacy",
+      "electronStatus": "partial_legacy",
       "priority": "p0"
     },
     {
@@ -195,8 +196,8 @@
         "cdp-26.810.52044:real-exit-7-shell-stderr-stdout-and-persistent-stopped-command-row"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "verified",
-      "electronStatus": "verified",
+      "browserStatus": "partial_legacy",
+      "electronStatus": "partial_legacy",
       "priority": "p0"
     },
     {
@@ -211,8 +212,8 @@
         "cdp-26.810.52044:real-exit-7-expanded-shell-stderr-before-stdout-and-successful-no-tool-recovery"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "verified",
-      "electronStatus": "verified",
+      "browserStatus": "partial_legacy",
+      "electronStatus": "partial_legacy",
       "priority": "p0"
     },
     {
@@ -232,8 +233,8 @@
         "cdp-26.810.52044:real-three-file-card-added-modified-deleted-undo-review-and-undo-failure"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "verified",
-      "electronStatus": "verified",
+      "browserStatus": "partial_legacy",
+      "electronStatus": "partial_legacy",
       "priority": "p0"
     },
     {
@@ -285,8 +286,8 @@
         "cdp-26.810.52044:current-mcp-success-computed-styles-exact-icons-and-1180x820-regional-pixel-gate"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "verified",
-      "electronStatus": "verified",
+      "browserStatus": "partial_legacy",
+      "electronStatus": "partial_legacy",
       "priority": "p0"
     },
     {
@@ -309,8 +310,8 @@
         "cdp-26.810.52044:current-mcp-recovery-computed-styles-exact-icons-and-720x680-card-pixel-gate"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "verified",
-      "electronStatus": "verified",
+      "browserStatus": "partial_legacy",
+      "electronStatus": "partial_legacy",
       "priority": "p0"
     },
     {
@@ -388,8 +389,8 @@
         "cdp-26.730.61309:real-command-approval-similar-rule-repeated-command-no-second-prompt-computed-styles-and-masked-menu-completed-pixels"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "verified",
-      "electronStatus": "verified",
+      "browserStatus": "partial_legacy",
+      "electronStatus": "partial_legacy",
       "priority": "p0"
     },
     {
@@ -403,8 +404,8 @@
         "cdp-26.810.52044:exact-four-path-reconnecting-glyph-and-replay-lifecycle-gates"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "verified",
-      "electronStatus": "verified",
+      "browserStatus": "partial_legacy",
+      "electronStatus": "partial_legacy",
       "priority": "p0"
     },
     {
@@ -426,8 +427,8 @@
         "cdp-26.810.52044:real-command-stop-persistent-background-terminal-stopped-row-and-same-thread-recovery"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "verified",
-      "electronStatus": "verified",
+      "browserStatus": "partial_legacy",
+      "electronStatus": "partial_legacy",
       "priority": "p0"
     },
     {
@@ -536,7 +537,8 @@
         "cdp-26.803.41515:new-chat-editor-712x44-wide-664x44-collapsed-389.89x44-pinned",
         "cdp-26.803.61601:new-chat-editor-712x44-wide-664x44-collapsed-389.89x44-pinned",
         "cdp-26.803.61601:streaming-composer-736x98-wide-688x98-compact-exact-stop-and-send-recovery",
-        "cdp-26.810.52044:new-chat-wide-medium-721-720-editor-and-two-voice-control-matrix"
+        "cdp-26.810.52044:new-chat-wide-medium-721-720-editor-and-two-voice-control-matrix",
+        "cdp-26.818.41509:new-chat-wide-medium-721-720-editor-and-two-voice-control-matrix"
       ],
       "implementationStatus": "partial",
       "browserStatus": "verified",
@@ -566,8 +568,8 @@
         "cdp-26.810.52044:visible-composer-context-and-work-in-five-action-exact-assets"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "verified",
-      "electronStatus": "verified",
+      "browserStatus": "partial_legacy",
+      "electronStatus": "partial_legacy",
       "priority": "p0"
     },
     {
@@ -679,7 +681,8 @@
         "cdp-26.730.61309:main-renderer-sidebar-274-titlebar-46-scroll-footer-resizer-exact-720-collapse-explicit-pin-and-no-edge-preview",
         "cdp-26.803.41515:wide-medium-721-720-collapse-explicit-pin-zero-overflow",
         "cdp-26.803.61601:wide-medium-721-720-collapse-explicit-pin-zero-overflow",
-        "cdp-26.810.52044:wide-medium-721-720-visible-before-explicit-hide-show-zero-overflow"
+        "cdp-26.810.52044:wide-medium-721-720-visible-before-explicit-hide-show-zero-overflow",
+        "cdp-26.818.41509:wide-medium-721-720-visible-before-explicit-hide-show-zero-overflow"
       ],
       "implementationStatus": "partial",
       "browserStatus": "verified",
@@ -701,7 +704,8 @@
         "cdp-26.730.61309:codex-search-activity-new-chat-quick-chat-and-primary-route-stack",
         "cdp-26.803.41515:new-chat-pull-requests-sites-scheduled-plugins-and-route-current",
         "cdp-26.803.61601:new-chat-pull-requests-sites-scheduled-plugins-and-route-current",
-        "cdp-26.810.52044:new-chat-pull-requests-sites-scheduled-plugins-and-route-current"
+        "cdp-26.810.52044:new-chat-pull-requests-sites-scheduled-plugins-and-route-current",
+        "cdp-26.818.41509:new-chat-pull-requests-sites-scheduled-plugins-and-route-current"
       ],
       "implementationStatus": "partial",
       "browserStatus": "verified",
@@ -719,7 +723,8 @@
         "cdp-26.727.40816:pinned-expanded-projects-collapsed-project-navigation",
         "cdp-26.730.61309:five-project-groups-expansion-selection-and-nested-tasks",
         "cdp-26.803.61601:six-project-groups-expanded-with-current-task-bands",
-        "cdp-26.810.52044:six-project-groups-expanded-with-current-task-bands"
+        "cdp-26.810.52044:six-project-groups-expanded-with-current-task-bands",
+        "cdp-26.818.41509:six-project-groups-expanded-project-row-baseline"
       ],
       "implementationStatus": "partial",
       "browserStatus": "partial_legacy",
@@ -735,7 +740,8 @@
       "runtimeEvidence": [
         "cdp-26.803.41515:six-project-groups-30px-rows-40px-task-bands-pointer-enter-space-collapse-and-wide-medium-720-pinned-restoration",
         "cdp-26.803.61601:six-project-groups-30px-project-and-task-rows-2px-8px-child-padding-1px-separators-pointer-enter-space-collapse-and-wide-medium-720-pinned-restoration",
-        "cdp-26.810.52044:six-project-groups-pointer-enter-space-and-720-visible-explicit-hide-show-restoration"
+        "cdp-26.810.52044:six-project-groups-pointer-enter-space-and-720-visible-explicit-hide-show-restoration",
+        "cdp-26.818.41509:six-project-groups-30px-rows-pointer-enter-space-and-720-visible-explicit-hide-show-restoration"
       ],
       "implementationStatus": "partial",
       "browserStatus": "verified",
@@ -752,11 +758,12 @@
         "cdp-26.803.41515:project-actions-menu-six-items-214.05x179.38-current-icons",
         "cdp-26.803.61601:project-actions-menu-six-items-214.05x179.38-current-icons",
         "cdp-26.803.61601:project-actions-menu-seven-items-214.05x207.94-mark-all-as-read-current-icon",
-        "cdp-26.810.52044:project-actions-menu-six-items-plus-conditional-mark-all-as-read-exact-icons"
+        "cdp-26.810.52044:project-actions-menu-six-items-plus-conditional-mark-all-as-read-exact-icons",
+        "cdp-26.818.41509:electron-native-project-menu-six-actions-three-separators-react-provider-and-221x187-quartz-window"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "verified",
-      "electronStatus": "verified",
+      "browserStatus": "partial_legacy",
+      "electronStatus": "partial_legacy",
       "priority": "p0"
     },
     {
@@ -774,8 +781,8 @@
         "cdp-26.810.52044:recents-scroll-no-leading-glyph-pin-archive-actions"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "verified",
-      "electronStatus": "verified",
+      "browserStatus": "partial_legacy",
+      "electronStatus": "partial_legacy",
       "priority": "p0"
     },
     {
@@ -792,8 +799,8 @@
         "cdp-26.810.52044:project-more-new-chat-and-recents-pin-archive-current-icons"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "verified",
-      "electronStatus": "verified",
+      "browserStatus": "partial_legacy",
+      "electronStatus": "partial_legacy",
       "priority": "p0"
     },
     {
@@ -810,8 +817,8 @@
         "cdp-26.810.52044:neutral-and-attention-activity-glyphs-plus-conditional-mark-read"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "verified",
-      "electronStatus": "verified",
+      "browserStatus": "partial_legacy",
+      "electronStatus": "partial_legacy",
       "priority": "p0"
     },
     {
@@ -827,8 +834,8 @@
         "cdp-26.810.52044:disposable-real-worktree-create-controlled-failure-unread-composition-retry-recovery-30px-row-14px-branch-20px-status-rails"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "verified",
-      "electronStatus": "verified",
+      "browserStatus": "partial_legacy",
+      "electronStatus": "partial_legacy",
       "priority": "p0"
     },
     {
@@ -843,11 +850,12 @@
         "cdp-26.730.61309:fixed-46px-footer-and-54px-scroll-padding",
         "cdp-26.803.61601:fixed-46px-footer-one-help-control-zero-settings-controls-and-redacted-account-content",
         "cdp-26.803.61601:account-menu-six-items-258.11x188.38-six-current-icons-one-avatar-zero-role-separators-and-escape-return",
-        "cdp-26.810.52044:fixed-46px-footer-voice-help-and-account-six-items-five-icons-no-usage-chevron"
+        "cdp-26.810.52044:fixed-46px-footer-voice-help-and-account-six-items-five-icons-no-usage-chevron",
+        "cdp-26.818.41509:fixed-footer-voice-help-and-zero-settings-controls"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "verified",
-      "electronStatus": "verified",
+      "browserStatus": "partial_legacy",
+      "electronStatus": "partial_legacy",
       "priority": "p0"
     },
     {
@@ -859,7 +867,8 @@
       "runtimeEvidence": [
         "cdp-26.803.41515:help-menu-whats-new-eight-items-200x272.06-current-icons-and-escape-return",
         "cdp-26.803.61601:help-menu-whats-new-eight-items-200x272.06-current-icons-and-escape-return",
-        "cdp-26.810.52044:help-menu-whats-new-eight-items-320x272.06-nine-current-icons-and-escape-return"
+        "cdp-26.810.52044:help-menu-whats-new-eight-items-320x272.06-nine-current-icons-and-escape-return",
+        "cdp-26.818.41509:help-menu-eight-items-320x272.06-dom-menu-and-escape-return"
       ],
       "implementationStatus": "partial",
       "browserStatus": "verified",
@@ -877,11 +886,12 @@
         "cdp-26.727.40816:titlebar-46-hide-sidebar-back-forward",
         "cdp-26.803.41515:visible-titlebar-sidebar-back-forward-28-buttons-16-icons",
         "cdp-26.803.61601:visible-titlebar-sidebar-back-forward-28-buttons-16-icons-and-disabled-not-allowed-cursor",
-        "cdp-26.810.52044:visible-titlebar-sidebar-back-forward-28-buttons-16-icons"
+        "cdp-26.810.52044:visible-titlebar-sidebar-back-forward-28-buttons-16-icons",
+        "cdp-26.818.41509:visible-titlebar-sidebar-back-forward-28px-controls"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "verified",
-      "electronStatus": "verified",
+      "browserStatus": "partial_legacy",
+      "electronStatus": "partial_legacy",
       "priority": "p0"
     },
     {
@@ -910,7 +920,8 @@
         "cdp-26.727.40816:pr-detail-auto-hide-and-explicit-reopen-at-1180-960-820-720",
         "cdp-26.803.41515:compact-pinned-pull-requests-to-new-chat-in-session-restoration",
         "cdp-26.803.61601:compact-pinned-pull-requests-to-new-chat-in-session-restoration",
-        "cdp-26.810.52044:compact-visible-pull-requests-to-new-chat-in-session-restoration"
+        "cdp-26.810.52044:compact-visible-pull-requests-to-new-chat-in-session-restoration",
+        "cdp-26.818.41509:compact-visible-pull-requests-to-new-chat-in-session-restoration"
       ],
       "implementationStatus": "partial",
       "browserStatus": "verified",
@@ -950,7 +961,8 @@
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
         "cdp-26.721:projects-entry-and-deidentified-list-structure",
-        "cdp-26.810.52044:projects-index-fourteen-row-wide-sort-empty-focus-explicitly-collapsed-compact-and-owned-pixel-lifecycle"
+        "cdp-26.810.52044:projects-index-fourteen-row-wide-sort-empty-focus-explicitly-collapsed-compact-and-owned-pixel-lifecycle",
+        "cdp-26.818.41509:projects-index-fourteen-row-wide-sort-empty-focus-explicitly-collapsed-compact"
       ],
       "implementationStatus": "partial",
       "browserStatus": "verified",
@@ -1030,8 +1042,8 @@
         "cdp-26.810.52044:real-review-workspace-382.4375px-wide-336.19px-compact-and-resizable-panel"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "verified",
-      "electronStatus": "verified",
+      "browserStatus": "partial_legacy",
+      "electronStatus": "partial_legacy",
       "priority": "p0"
     },
     {
@@ -1051,8 +1063,8 @@
         "cdp-26.810.52044:real-added-modified-deleted-stacked-diffs-filter-tree-and-split-controls"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "verified",
-      "electronStatus": "verified",
+      "browserStatus": "partial_legacy",
+      "electronStatus": "partial_legacy",
       "priority": "p0"
     },
     {
@@ -1071,8 +1083,8 @@
         "cdp-26.810.52044:real-three-file-review-scope-filter-collapse-jump-layout-files-and-undo-failure"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "verified",
-      "electronStatus": "verified",
+      "browserStatus": "partial_legacy",
+      "electronStatus": "partial_legacy",
       "priority": "p0"
     },
     {
@@ -1249,8 +1261,8 @@
         "cdp-26.810.52044:visible-settings-git-shell-search-21-items-and-24-exact-navigation-icons"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "verified",
-      "electronStatus": "verified",
+      "browserStatus": "partial_legacy",
+      "electronStatus": "partial_legacy",
       "priority": "p1"
     },
     {
@@ -1336,8 +1348,8 @@
         "cdp-26.810.52044:visible-git-settings-controls-and-grouped-search"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "verified",
-      "electronStatus": "verified",
+      "browserStatus": "partial_legacy",
+      "electronStatus": "partial_legacy",
       "priority": "p1"
     },
     {

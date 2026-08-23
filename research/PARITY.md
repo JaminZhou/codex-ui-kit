@@ -6,9 +6,12 @@ not establish full conversation, workspace, application, or product coverage.
 
 The authoritative current-build inventory is:
 
-- [`26.810.52044.md`](26.810.52044.md) for the current package fingerprint,
-  reproducible global-shell baseline, current sidebar/menu behavior, 115 scoped
-  visual assets, Settings/Git navigation, and one successful-command thread;
+- [`26.818.41509.md`](26.818.41509.md) for the current package fingerprint,
+  reproducible global-shell baseline, native project-menu change, Help menu,
+  responsive Composer shell, route restoration, and Projects Index;
+- [`26.810.52044.md`](26.810.52044.md) for the previous broader sidebar/menu,
+  115 scoped visual assets, Settings/Git navigation, command, MCP, worktree,
+  approval, and Review observations;
 - [`26.803.61601.md`](26.803.61601.md) for the previous shell, command,
   Terminal, workspace, Settings, and same-state dark-shell acceptance;
 - [`26.803.41515.md`](26.803.41515.md) for the previous Markdown table,
@@ -42,7 +45,12 @@ The authoritative current-build inventory is:
 - The Electron playground validates the current package in a desktop
   BrowserWindow; it does not prove parity with unobserved product routes,
   panels, state transitions, or window types.
-- A scoped Codex Desktop `26.810.52044` (`6662`) visual probe revalidates the
+- A scoped Codex Desktop `26.818.41509` (`6962`) probe revalidates the shell,
+  responsive Composer, primary navigation, project-group lifecycle, Help menu,
+  route restoration, and Projects Index. The project action menu now uses the
+  frozen Electron native context-menu bridge and a 221×187 native window; its
+  older DOM replica is intentionally `partial_legacy`.
+- The previous Codex Desktop `26.810.52044` (`6662`) visual probe revalidated the
   exact 1180×820 dark/resting asset fingerprint and now retains 115 exact
   sidebar/menu/window-chrome/Composer/environment/Settings/completed-thread icons plus
   one separately hashed, playground-only VS Code integration raster. Its sampled sidebar

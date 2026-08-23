@@ -10,12 +10,12 @@ export const currentBaselineViewports = Object.freeze({
 });
 
 export const currentBaselineFingerprint = Object.freeze({
-  appAsarBytes: 279_946_146,
+  appAsarBytes: 284_124_509,
   appAsarSha256:
-    "6e7e8791b8bf69a586ff994721fff518af391d9efdc66cd2e620dd2a4aedc90f",
-  appVersion: "26.810.52044",
-  buildNumber: "6662",
-  chromiumVersion: "151.0.7922.137",
+    "8eb91bd9efbf9a4dd04b9b0afdbfcb4e0bab5da18c1919ad74ca327c00c7e791",
+  appVersion: "26.818.41509",
+  buildNumber: "6962",
+  chromiumVersion: "151.0.7922.170",
 });
 
 const primaryRoutes = Object.freeze([
@@ -261,22 +261,76 @@ export function assertCurrentSidebarLifecycle(lifecycle) {
       })}`,
     );
   }
-  const projectMenuVariant = projectMenu?.opened?.hasMarkAllAsRead
-    ? { height: 207.94, menuItemCount: 7 }
-    : { height: 179.38, menuItemCount: 6 };
+  const markReadItem = projectMenu?.items?.find(
+    (item) => item.id === "mark-project-threads-read",
+  );
+  const expectedProjectMenuItems = [
+    ["unpin-project", "sidebarElectron.unpinProjectShort", "Unpin", "item"],
+    ["edit-project", "sidebarElectron.editProjectShort", "Edit", "item"],
+    ["project-actions-separator", null, null, "separator"],
+    [
+      "reveal-project-folder",
+      "sidebarElectron.openWorkspaceRootInFinder",
+      "Reveal in Finder",
+      "item",
+    ],
+    [
+      "create-permanent-worktree",
+      "sidebarElectron.createStableWorktree",
+      "Create permanent worktree",
+      "item",
+    ],
+    ["project-chat-actions-separator", null, null, "separator"],
+    ...(markReadItem
+      ? [
+          [
+            "mark-project-threads-read",
+            "sidebarElectron.markProjectThreadsRead",
+            "Mark all as read",
+            "item",
+          ],
+        ]
+      : []),
+    [
+      "archive-project-threads",
+      "sidebarElectron.archiveProjectThreads",
+      "Archive chats",
+      "item",
+    ],
+    ["project-remove-separator", null, null, "separator"],
+    [
+      "remove-project",
+      "sidebarElectron.removeProject.menuItem.local",
+      "Remove project",
+      "item",
+    ],
+  ];
+  const projectMenuItemsMatch =
+    projectMenu?.items?.length === expectedProjectMenuItems.length &&
+    projectMenu.items.every((item, index) => {
+      const [id, messageId, defaultMessage, type] =
+        expectedProjectMenuItems[index];
+      const isSeparator = type === "separator";
+      return (
+        item.id === id &&
+        item.messageId === messageId &&
+        item.defaultMessage === defaultMessage &&
+        item.type === type &&
+        item.enabled === true &&
+        item.hasIcon === !isSeparator &&
+        item.hasOnSelect === !isSeparator
+      );
+    });
   if (
-    projectMenu?.opened?.visibleMenuCount !== 1 ||
-    projectMenu.opened.menuItemCount !== projectMenuVariant.menuItemCount ||
-    !projectMenu.opened.focusInside ||
-    projectMenu.opened.focusRole !== "menu" ||
-    !withinTolerance(projectMenu.opened.rect?.width, 214.05) ||
-    !withinTolerance(
-      projectMenu.opened.rect?.height,
-      projectMenuVariant.height,
-    ) ||
-    projectMenu.closed?.visibleMenuCount !== 0 ||
-    projectMenu.closed.focusReturned !== false ||
-    projectMenu.closed.activeTag !== "body"
+    projectMenu?.renderMode !== "electron-native-context-menu" ||
+    projectMenu.bridge?.available !== true ||
+    projectMenu.bridge?.frozen !== true ||
+    projectMenu.trigger?.tag !== "button" ||
+    projectMenu.trigger?.ariaHaspopup !== "menu" ||
+    projectMenu.trigger?.ariaExpanded !== "false" ||
+    !withinTolerance(projectMenu.trigger?.rect?.width, 24) ||
+    !withinTolerance(projectMenu.trigger?.rect?.height, 24) ||
+    !projectMenuItemsMatch
   ) {
     throw new Error(
       `Current sidebar lifecycle does not prove the project menu boundary: ${JSON.stringify(projectMenu)}`,
