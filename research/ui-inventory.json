@@ -796,11 +796,12 @@
         "cdp-26.730.61309:pinned-and-recents-dense-scroll-history",
         "cdp-26.803.41515:recents-six-row-scroll-no-leading-glyph-pin-archive-actions",
         "cdp-26.803.61601:recents-six-row-scroll-no-leading-glyph-pin-archive-actions",
-        "cdp-26.810.52044:recents-scroll-no-leading-glyph-pin-archive-actions"
+        "cdp-26.810.52044:recents-scroll-no-leading-glyph-pin-archive-actions",
+        "cdp-26.818.41509:project-task-active-complete-unread-and-content-dependent-recents-current"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "partial_legacy",
-      "electronStatus": "partial_legacy",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
       "priority": "p0"
     },
     {
@@ -814,11 +815,12 @@
         "cdp-26.727.40816:project-pin-archive-actions-and-status-indicators",
         "cdp-26.730.61309:five-project-action-controls-five-new-chat-controls-and-two-status-markers",
         "cdp-26.803.61601:project-more-new-chat-six-project-task-and-six-recents-pin-archive-action-rows-with-current-icons",
-        "cdp-26.810.52044:project-more-new-chat-and-recents-pin-archive-current-icons"
+        "cdp-26.810.52044:project-more-new-chat-and-recents-pin-archive-current-icons",
+        "cdp-26.818.41509:project-task-and-recents-pin-archive-19x20-gap8-hover-replacement-and-unmasked-action-pixels"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "partial_legacy",
-      "electronStatus": "partial_legacy",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
       "priority": "p0"
     },
     {
@@ -832,11 +834,12 @@
         "cdp-26.727.40816:project-status-indicators",
         "cdp-26.730.61309:two-status-markers",
         "cdp-26.803.61601:active-thread-20px-rail-16px-spinner-and-8px-unread-link-dot",
-        "cdp-26.810.52044:neutral-and-attention-activity-glyphs-plus-conditional-mark-read"
+        "cdp-26.810.52044:neutral-and-attention-activity-glyphs-plus-conditional-mark-read",
+        "cdp-26.818.41509:real-active-complete-unread-30px-row-20px-rail-16px-spinner-8px-dot-and-unmasked-status-pixels"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "partial_legacy",
-      "electronStatus": "partial_legacy",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
       "priority": "p0"
     },
     {

@@ -368,6 +368,10 @@ const currentBuildSidebarActiveStatusReference =
   process.env.CODEX_UI_KIT_CURRENT_SIDEBAR_ACTIVE_STATUS_REFERENCE;
 const currentBuildSidebarUnreadStatusReference =
   process.env.CODEX_UI_KIT_CURRENT_SIDEBAR_UNREAD_STATUS_REFERENCE;
+const currentBuildSidebarTaskActionsReference =
+  process.env.CODEX_UI_KIT_CURRENT_SIDEBAR_TASK_ACTIONS_REFERENCE;
+const currentBuildSidebarRecentsActionsReference =
+  process.env.CODEX_UI_KIT_CURRENT_SIDEBAR_RECENTS_ACTIONS_REFERENCE;
 const currentBuildSidebarWorktreeLoadingReference =
   process.env.CODEX_UI_KIT_CURRENT_SIDEBAR_WORKTREE_LOADING_REFERENCE;
 const currentBuildSidebarWorktreeErrorReference =
@@ -588,9 +592,12 @@ async function compareCurrentBuildSidebarStatus({
     PNG.sync.read(await readFile(referencePath)),
     { blue: 24, green: 24, red: 24 },
   );
-  if (reference.width !== 259 || reference.height !== 30) {
+  if (
+    (reference.width !== 259 && reference.width !== ownedWidth) ||
+    reference.height !== 30
+  ) {
     throw new Error(
-      `${sceneId}: ${status} status reference must be exactly 259x30, received ${reference.width}x${reference.height}.`,
+      `${sceneId}: ${status} status reference must be exactly 259x30 or ${ownedWidth}x30, received ${reference.width}x${reference.height}.`,
     );
   }
   if (!actualBounds || actualBounds.width !== 258 || actualBounds.height !== 30) {
@@ -605,13 +612,16 @@ async function compareCurrentBuildSidebarStatus({
     actualBounds.width,
     actualBounds.height,
   );
-  const referenceRail = cropPng(
-    reference,
-    reference.width - ownedWidth,
-    0,
-    ownedWidth,
-    30,
-  );
+  const referenceRail =
+    reference.width === ownedWidth
+      ? reference
+      : cropPng(
+          reference,
+          reference.width - ownedWidth,
+          0,
+          ownedWidth,
+          30,
+        );
   const actualRail = cropPng(
     actualRow,
     actualRow.width - ownedWidth,
@@ -648,6 +658,57 @@ async function compareCurrentBuildSidebarStatus({
   }
   console.log(
     `${sceneId}: ${status} status pixel ratio ${comparison.ratio}`,
+  );
+}
+
+async function compareCurrentBuildSidebarActions({
+  actualPath,
+  defaultMaximumRatio,
+  maximumRatioName,
+  referencePath,
+  sceneId,
+  variant,
+}) {
+  const reference = flattenPng(
+    PNG.sync.read(await readFile(referencePath)),
+    { blue: 24, green: 24, red: 24 },
+  );
+  const actual = flattenPng(PNG.sync.read(await readFile(actualPath)), {
+    blue: 24,
+    green: 24,
+    red: 24,
+  });
+  if (
+    reference.width !== 72 ||
+    reference.height !== 30 ||
+    actual.width !== 72 ||
+    actual.height !== 30
+  ) {
+    throw new Error(
+      `${sceneId}: ${variant} action crops must both be exactly 72x30.`,
+    );
+  }
+  const comparison = comparePng(reference, actual);
+  const maximumRatio = environmentRatio(
+    maximumRatioName,
+    defaultMaximumRatio,
+  );
+  if (comparison.pixels > 0) {
+    await writeFile(
+      join(
+        artifactDirectory,
+        `${sceneId}.${variant}.current-build.diff.png`,
+      ),
+      PNG.sync.write(comparison.diff),
+    );
+  }
+  if (comparison.ratio > maximumRatio) {
+    throw new Error(
+      `${sceneId}: ${variant} action pixel ratio ${comparison.ratio} exceeds ${maximumRatio}.`,
+    );
+  }
+  console.log(
+    `${sceneId}: ${variant} action pixel ratio ${comparison.ratio}`,
   );
 }
 
@@ -718,6 +779,8 @@ for (const scene of selectedScenes) {
   const diffPath = join(artifactDirectory, `${scene.id}.diff.png`);
   let sidebarSelectedTop;
   let sidebarStatusBounds;
+  let sidebarTaskActionsActualPath;
+  let sidebarRecentsActionsActualPath;
   let sidebarMenuBounds;
   let sidebarMenuItemBounds;
   let sidebarRecentsBounds;
@@ -1123,6 +1186,70 @@ for (const scene of selectedScenes) {
       path: actualPath,
       type: "png",
     });
+    if (
+      scene.id === "current-sidebar-status-lifecycle" &&
+      currentBuildSidebarTaskActionsReference
+    ) {
+      const row = page
+        .locator('[data-sidebar-status-fixture="session-browser:0"]')
+        .locator("..");
+      await row.hover();
+      await page.waitForTimeout(150);
+      const bounds = await row.boundingBox();
+      if (!bounds || bounds.height !== 30 || bounds.width !== 258) {
+        throw new Error(
+          `${scene.id}: task action row must be exactly 258x30.`,
+        );
+      }
+      sidebarTaskActionsActualPath = join(
+        artifactDirectory,
+        `${scene.id}.task-actions.current-build.png`,
+      );
+      await page.screenshot({
+        animations: "disabled",
+        clip: {
+          height: 30,
+          width: 72,
+          x: bounds.x + bounds.width - 72,
+          y: bounds.y,
+        },
+        path: sidebarTaskActionsActualPath,
+        type: "png",
+      });
+    }
+    if (
+      scene.id === "current-sidebar-recents" &&
+      currentBuildSidebarRecentsActionsReference
+    ) {
+      const row = page
+        .locator(
+          '.codex-ui-app-sidebar__section[data-kind="threads"] .codex-ui-app-sidebar__item-row',
+        )
+        .first();
+      await row.hover();
+      await page.waitForTimeout(150);
+      const bounds = await row.boundingBox();
+      if (!bounds || bounds.height !== 30 || bounds.width !== 258) {
+        throw new Error(
+          `${scene.id}: Recents action row must be exactly 258x30.`,
+        );
+      }
+      sidebarRecentsActionsActualPath = join(
+        artifactDirectory,
+        `${scene.id}.recents-actions.current-build.png`,
+      );
+      await page.screenshot({
+        animations: "disabled",
+        clip: {
+          height: 30,
+          width: 72,
+          x: bounds.x + bounds.width - 72,
+          y: bounds.y,
+        },
+        path: sidebarRecentsActionsActualPath,
+        type: "png",
+      });
+    }
   } finally {
     await app.close();
   }
@@ -2367,6 +2494,20 @@ for (const scene of selectedScenes) {
   }
 
   if (scene.id === "current-sidebar-status-lifecycle") {
+    if (
+      currentBuildSidebarTaskActionsReference &&
+      sidebarTaskActionsActualPath
+    ) {
+      await compareCurrentBuildSidebarActions({
+        actualPath: sidebarTaskActionsActualPath,
+        defaultMaximumRatio: 0.06,
+        maximumRatioName:
+          "CODEX_UI_KIT_CURRENT_SIDEBAR_TASK_ACTIONS_MAX_DIFF_RATIO",
+        referencePath: currentBuildSidebarTaskActionsReference,
+        sceneId: scene.id,
+        variant: "task-actions",
+      });
+    }
     if (currentBuildSidebarActiveStatusReference) {
       await compareCurrentBuildSidebarStatus({
         actual,
@@ -2430,6 +2571,22 @@ for (const scene of selectedScenes) {
         status: "worktree-restored",
       });
     }
+  }
+
+  if (
+    scene.id === "current-sidebar-recents" &&
+    currentBuildSidebarRecentsActionsReference &&
+    sidebarRecentsActionsActualPath
+  ) {
+    await compareCurrentBuildSidebarActions({
+      actualPath: sidebarRecentsActionsActualPath,
+      defaultMaximumRatio: 0.06,
+      maximumRatioName:
+        "CODEX_UI_KIT_CURRENT_SIDEBAR_RECENTS_ACTIONS_MAX_DIFF_RATIO",
+      referencePath: currentBuildSidebarRecentsActionsReference,
+      sceneId: scene.id,
+      variant: "recents-actions",
+    });
   }
 
   if (

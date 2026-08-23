@@ -11768,17 +11768,17 @@ try {
       JSON.stringify(["sidebar-pin", "sidebar-archive"]) ||
     JSON.stringify(currentTaskActions.rects) !==
       JSON.stringify([
-        { height: 20, rightInset: 32, width: 20 },
-        { height: 20, rightInset: 4, width: 20 },
+        { height: 20, rightInset: 35, width: 19 },
+        { height: 20, rightInset: 8, width: 19 },
       ]) ||
     currentRecentActions.opacity !== "1" ||
-    currentRecentActions.gap !== 4 ||
+    currentRecentActions.gap !== 8 ||
     JSON.stringify(currentRecentActions.icons) !==
       JSON.stringify(["sidebar-pin", "sidebar-archive"]) ||
     JSON.stringify(currentRecentActions.rects) !==
       JSON.stringify([
-        { height: 24, rightInset: 32, width: 24 },
-        { height: 24, rightInset: 4, width: 24 },
+        { height: 20, rightInset: 35, width: 19 },
+        { height: 20, rightInset: 8, width: 19 },
       ]) ||
     currentSidebarAssets.settingsAction ||
     currentSidebarAssets.recentItemCount !== 6 ||

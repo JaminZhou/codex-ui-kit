@@ -3325,6 +3325,41 @@
   width: 1.5rem;
 }
 
+.codex-ui-app-sidebar__project-children
+  > .codex-ui-app-sidebar__item-row
+  > .codex-ui-app-sidebar__item-actions,
+.codex-ui-app-sidebar__section[data-kind="pinned"]
+  > .codex-ui-app-sidebar__items
+  > .codex-ui-app-sidebar__item-row
+  > .codex-ui-app-sidebar__item-actions,
+.codex-ui-app-sidebar__section[data-kind="threads"]
+  > .codex-ui-app-sidebar__items
+  > .codex-ui-app-sidebar__item-row
+  > .codex-ui-app-sidebar__item-actions {
+  gap: calc(var(--codex-ui-spacing) * 2);
+  margin-inline-end: calc(var(--codex-ui-spacing) * 2);
+}
+
+.codex-ui-app-sidebar__project-children
+  > .codex-ui-app-sidebar__item-row
+  .codex-ui-app-sidebar__item-actions
+  > button,
+.codex-ui-app-sidebar__section[data-kind="pinned"]
+  > .codex-ui-app-sidebar__items
+  > .codex-ui-app-sidebar__item-row
+  .codex-ui-app-sidebar__item-actions
+  > button,
+.codex-ui-app-sidebar__section[data-kind="threads"]
+  > .codex-ui-app-sidebar__items
+  > .codex-ui-app-sidebar__item-row
+  .codex-ui-app-sidebar__item-actions
+  > button {
+  border: 1px solid transparent;
+  height: 20px;
+  padding: 0;
+  width: 19px;
+}
+
 .codex-ui-app-sidebar__item-actions > button:hover,
 .codex-ui-app-sidebar__item-actions > button:focus-visible,
 .codex-ui-app-sidebar__item-actions

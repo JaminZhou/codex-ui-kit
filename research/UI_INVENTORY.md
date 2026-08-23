@@ -97,12 +97,20 @@ observation from a previous build remains historical evidence.
   exact response actions, system typography, and zero horizontal overflow.
   Unmasked wide and compact Markdown-root comparisons pass at 1.1682% and
   1.1932% under independent 1.3% hard limits.
+- A fresh sidebar task reaches current project-task and Recents hover actions
+  plus active, completed, and unread ordinary states. Both task families use
+  19×20 Pin/Archive controls with an 8px gap and 35px/8px right insets. The
+  20×20 status rail owns the exact 16×16 spinner and centered 8×8 blue dot.
+  Browser/CDP and Electron pass; privacy-safe action/status tail comparisons
+  pass between 0% and 3.1944%. Recents row count and text remain
+  content-dependent rather than frozen.
 - The broader `26.810.52044` Review, Settings, worktree, account,
-  Recents, and exact-asset results remain previous-build regression evidence.
+  waiting/error sidebar variants, and exact-asset results remain
+  previous-build regression evidence.
   They are not relabeled as current merely because the shell capture passes.
 
-Current inventory: 89 surface groups; 21 have current-build runtime evidence, 52 have previous-build-only runtime evidence, 16 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 18 groups and Electron verification covers 18.
-Prior acceptance outside those 18 sampled current-build groups remains
+Current inventory: 89 surface groups; 24 have current-build runtime evidence, 49 have previous-build-only runtime evidence, 16 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 21 groups and Electron verification covers 21.
+Prior acceptance outside those 21 sampled current-build groups remains
 recorded as `partial_legacy` until current-build re-observation.
 
 The current package exposes candidates far beyond the old transcript sample:
@@ -218,6 +226,15 @@ and a dedicated ownership-masked regional gate. The
 0.1163% for the ownership-masked selected row, and 0.4126% for the footer,
 where only account-owned content is masked and the Help control remains under
 comparison; the Recents region passes at 2.5356%.
+
+The current `26.818.41509` follow-up supersedes only the task-row action and
+ordinary-status geometry from that older slice. Project tasks and Recents now
+share two 19×20 Pin/Archive buttons with an 8px gap and 8px toolbar right
+inset. Active and unread use the same 20×20 rail at 8px, with the exact 16×16
+spinner or centered 8×8 blue dot; completed has no status glyph. Browser/CDP,
+Electron, and four local-only action/status tail comparisons gate this current
+boundary. Waiting/error and worktree-specific variants remain independently
+versioned.
 
 The current sidebar lifecycle follow-up splits the broad historical project,
 action, and footer rows into three independently gated current-build groups:

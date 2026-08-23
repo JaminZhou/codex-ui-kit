@@ -134,6 +134,12 @@ describe("application shell visual contract", () => {
     expect(styles).toMatch(
       /\.codex-ui-app-sidebar__item-actions \{[\s\S]*?grid-column: 2;[\s\S]*?position: relative;/,
     );
+    expect(styles).toMatch(
+      /\.codex-ui-app-sidebar__project-children[\s\S]*?> \.codex-ui-app-sidebar__item-row[\s\S]*?> \.codex-ui-app-sidebar__item-actions,[\s\S]*?gap: calc\(var\(--codex-ui-spacing\) \* 2\);[\s\S]*?margin-inline-end: calc\(var\(--codex-ui-spacing\) \* 2\);/,
+    );
+    expect(styles).toMatch(
+      /\.codex-ui-app-sidebar__project-children[\s\S]*?> \.codex-ui-app-sidebar__item-row[\s\S]*?\.codex-ui-app-sidebar__item-actions[\s\S]*?> button,[\s\S]*?border: 1px solid transparent;[\s\S]*?height: 20px;[\s\S]*?padding: 0;[\s\S]*?width: 19px;/,
+    );
     expect(styles).toContain(
       ".codex-ui-app-sidebar__item-status-spinner",
     );

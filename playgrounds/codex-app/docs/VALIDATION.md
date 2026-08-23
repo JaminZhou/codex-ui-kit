@@ -157,8 +157,9 @@ Every deterministic scenario has one ID and produces four evidence layers:
    regions are located from their DOM contracts rather than hard-coded
    vertical offsets.
 
-The sidebar task-status scene accepts local-only 259×30 ordinary and worktree
-row references through
+The sidebar task-status scene accepts local-only 259×30 ordinary/worktree rows;
+ordinary active/unread references may instead be privacy-safe 28×30 tails. They
+are supplied through
 `CODEX_UI_KIT_CURRENT_SIDEBAR_ACTIVE_STATUS_REFERENCE` and
 `CODEX_UI_KIT_CURRENT_SIDEBAR_UNREAD_STATUS_REFERENCE`, plus the three
 `CODEX_UI_KIT_CURRENT_SIDEBAR_WORKTREE_*_REFERENCE` variables. It crops the
@@ -169,6 +170,11 @@ right inset, exact 16×16 spinner paths, centered 8×8 dot, and computed
 `rgb(131, 195, 255)` unread color. A failed unread worktree additionally keeps
 the 14×14 branch at 67px, red error rail at 36px, and blue unread rail at 8px;
 Electron verifies that trailing actions replace all three tracks.
+Current project-task and Recents hover actions accept separate unmasked 72×30
+tails through `CODEX_UI_KIT_CURRENT_SIDEBAR_TASK_ACTIONS_REFERENCE` and
+`CODEX_UI_KIT_CURRENT_SIDEBAR_RECENTS_ACTIONS_REFERENCE`. CDP and Electron
+independently require the unified 19×20 Pin/Archive buttons, 8px gap, and
+35px/8px right insets before the pixel gate runs.
 
 The layers do not vote on the same claim. Protocol proves lifecycle behavior;
 CDP explains layout; Electron proves the desktop host; pixels catch final

@@ -1216,22 +1216,27 @@ CODEX_UI_KIT_CURRENT_SIDEBAR_COMPACT_PINNED_REFERENCE=/absolute/path/to/current-
   --scenes=current-sidebar-project-collapsed,current-sidebar-project-menu,current-sidebar-help-menu,current-sidebar-account-menu,current-sidebar-compact-pinned
 ```
 
-The combined ordinary/worktree task-status gate accepts five exact 259×30
-local-only product row captures. Ordinary states compare the final 28px status
-rail. Loading/restored worktree states compare the final 56px region, while
-the current failed-plus-unread composition compares the final 84px containing
-the branch, red error, and independent blue unread rail. Each region is reduced
-to a foreground mask while CDP independently locks state identity, geometry,
-animation, color, accessibility linkage, and restored presentation:
+The combined ordinary/worktree task-status gate accepts full 259×30 local-only
+product rows. Ordinary active/unread references may instead be privacy-safe
+28×30 tail crops; loading/restored worktree states compare the final 56px
+region, while the current failed-plus-unread composition compares the final
+84px containing the branch, red error, and independent blue unread rail. Each
+status region is reduced to a foreground mask while CDP independently locks
+state identity, geometry, animation, color, accessibility linkage, and
+restored presentation. Current project-task and Recents action gates accept
+unmasked privacy-safe 72×30 tail crops and independently lock the shared
+19×20 Pin/Archive buttons, 8px gap, and 35px/8px right insets:
 
 ```bash
 CODEX_UI_KIT_CURRENT_SIDEBAR_ACTIVE_STATUS_REFERENCE=/absolute/path/to/current-sidebar-active-row.png \
 CODEX_UI_KIT_CURRENT_SIDEBAR_UNREAD_STATUS_REFERENCE=/absolute/path/to/current-sidebar-unread-row.png \
+CODEX_UI_KIT_CURRENT_SIDEBAR_TASK_ACTIONS_REFERENCE=/absolute/path/to/current-sidebar-task-actions-tail.png \
+CODEX_UI_KIT_CURRENT_SIDEBAR_RECENTS_ACTIONS_REFERENCE=/absolute/path/to/current-sidebar-recents-actions-tail.png \
 CODEX_UI_KIT_CURRENT_SIDEBAR_WORKTREE_LOADING_REFERENCE=/absolute/path/to/current-sidebar-worktree-loading-row.png \
 CODEX_UI_KIT_CURRENT_SIDEBAR_WORKTREE_ERROR_REFERENCE=/absolute/path/to/current-sidebar-worktree-error-row.png \
 CODEX_UI_KIT_CURRENT_SIDEBAR_WORKTREE_RESTORED_REFERENCE=/absolute/path/to/current-sidebar-worktree-restored-row.png \
   pnpm --filter @codex-ui-kit/codex-app-playground check:visual -- \
-  --scenes=current-sidebar-status-lifecycle
+  --scenes=current-sidebar-recents,current-sidebar-status-lifecycle
 ```
 
 The App shell gate uses only the 120×46 application-owned titlebar crop:

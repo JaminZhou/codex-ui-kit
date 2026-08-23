@@ -51,6 +51,12 @@ The authoritative current-build inventory is:
   frozen Electron native context-menu bridge and a 221×187 native window; its
   independent replica locks the six current fixed icons, exact geometry,
   conditional unread variant, and a 3.8449% unmasked native-region gate.
+- A separate current sidebar task revalidates project-task and Recents history,
+  their unified 19×20 Pin/Archive hover actions, and ordinary active,
+  completed, and unread presentation. Browser/CDP and Electron lock the
+  geometry and replacement behavior; local-only 72×30 action and 28×30 status
+  tails pass between 0% and 3.1944%. Content-dependent Recents count is not a
+  parity constant, and waiting/error/worktree variants remain open.
 - The previous Codex Desktop `26.810.52044` (`6662`) visual probe revalidated the
   exact 1180×820 dark/resting asset fingerprint and now retains 115 exact
   sidebar/menu/window-chrome/Composer/environment/Settings/completed-thread icons plus
