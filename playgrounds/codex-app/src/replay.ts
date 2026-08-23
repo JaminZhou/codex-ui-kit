@@ -6,6 +6,7 @@ import approvalSimilarCommandsTrace from "../fixtures/traces/approval-similar-co
 import attachmentLifecycleTrace from "../fixtures/traces/attachment-lifecycle.jsonl?raw";
 import compactionTrace from "../fixtures/traces/compaction.jsonl?raw";
 import contextSummaryTrace from "../fixtures/traces/context-summary.jsonl?raw";
+import currentBasicMessageTrace from "../fixtures/traces/current-basic-message.jsonl?raw";
 import currentMixedToolThreadTrace from "../fixtures/traces/current-mixed-tool-thread.jsonl?raw";
 import currentReviewRenameTrace from "../fixtures/traces/current-review-rename.jsonl?raw";
 import currentReviewFilesTrace from "../fixtures/traces/current-review-files.jsonl?raw";
@@ -53,6 +54,7 @@ export type ReplayScenarioId =
   | "interruption"
   | "compaction"
   | "context-summary"
+  | "current-basic-message"
   | "current-mixed-tool-thread"
   | "current-review-rename"
   | "current-review-files"
@@ -314,6 +316,12 @@ export const replayScenarios: Record<ReplayScenarioId, ReplayScenario> = {
     "Recover Codex MCP docs lookup",
     "A failed fetch recovers through search, then a second turn runs a command, approval, and file review.",
     mcpRecoveryMixedThreadTrace,
+  ),
+  "current-basic-message": scenario(
+    "current-basic-message",
+    "Reply with exactly CURRENT BASIC MESSAGE.",
+    "A current 26.818 plain-text user and assistant turn with the completed response actions and restored Composer.",
+    currentBasicMessageTrace,
   ),
 };
 

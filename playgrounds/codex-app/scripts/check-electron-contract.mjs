@@ -11229,6 +11229,167 @@ for (const expected of [
   }
 }
 
+const currentBasicThreadScene = {
+  currentSidebar: true,
+  frame: "current-basic-completed",
+  id: "electron-current-basic-thread",
+  scenario: "current-basic-message",
+  theme: "dark",
+};
+const {
+  app: currentBasicThreadApp,
+  page: currentBasicThreadPage,
+} = await launchScene(currentBasicThreadScene, { capture: false });
+try {
+  const nativeBounds = await currentBasicThreadApp.evaluate(
+    ({ BrowserWindow }) => BrowserWindow.getAllWindows()[0]?.getContentBounds(),
+  );
+  const basicThread = await currentBasicThreadPage.evaluate(() => {
+    const rect = (element) => {
+      if (!(element instanceof Element)) return null;
+      const value = element.getBoundingClientRect();
+      return {
+        height: value.height,
+        left: value.left,
+        top: value.top,
+        width: value.width,
+      };
+    };
+    const user = document.querySelector(
+      '[data-item-id="user-current-basic"]',
+    );
+    const assistant = document.querySelector(
+      '[data-item-id="assistant-current-basic"]',
+    );
+    const composer = document.querySelector(".codex-ui-composer");
+    return {
+      actions: Array.from(
+        assistant?.querySelectorAll(
+          ".codex-ui-agent-message__actions button",
+        ) ?? [],
+        (button) => ({
+          icon: button
+            .querySelector("[data-current-build-icon]")
+            ?.getAttribute("data-current-build-icon"),
+          label: button.getAttribute("aria-label"),
+          rect: rect(button),
+        }),
+      ),
+      assistant: assistant
+        ?.querySelector(".codex-ui-agent-message__content")
+        ?.textContent?.trim(),
+      composer: rect(composer),
+      composerText: composer?.textContent
+        ?.replace(/\u200b/g, "")
+        .replace(/\s+/g, " ")
+        .trim(),
+      frame: document
+        .querySelector(".demo-root")
+        ?.getAttribute("data-frame"),
+      horizontalOverflow:
+        document.documentElement.scrollWidth -
+        document.documentElement.clientWidth,
+      user: user
+        ?.querySelector(".codex-ui-agent-message__content")
+        ?.textContent?.trim(),
+    };
+  });
+  if (
+    nativeBounds?.width !== 1180 ||
+    nativeBounds?.height !== 820 ||
+    basicThread.frame !== "current-basic-completed" ||
+    basicThread.user !== "Reply with exactly CURRENT BASIC MESSAGE." ||
+    basicThread.assistant !== "CURRENT BASIC MESSAGE." ||
+    basicThread.horizontalOverflow > 1 ||
+    basicThread.composer?.left !== 359 ||
+    basicThread.composer?.top !== 706 ||
+    basicThread.composer?.width !== 736 ||
+    basicThread.composer?.height !== 98 ||
+    basicThread.composerText !== "Full access5.6 Sol Extra High" ||
+    JSON.stringify(basicThread.actions.map(({ label }) => label)) !==
+      JSON.stringify([
+        "Copy",
+        "Good response",
+        "Bad response",
+        "Fork chat from here",
+      ]) ||
+    JSON.stringify(basicThread.actions.map(({ icon }) => icon)) !==
+      JSON.stringify([
+        "thread-assistant-copy",
+        "thread-assistant-good",
+        "thread-assistant-bad",
+        "thread-assistant-fork",
+      ]) ||
+    basicThread.actions.some(
+      ({ rect }, index) =>
+        rect?.left !== 355 + index * 28 ||
+        rect?.top !== 188 ||
+        rect?.width !== 26 ||
+        rect?.height !== 26,
+    )
+  ) {
+    throw new Error(
+      `Electron current basic thread contract failed: ${JSON.stringify({ basicThread, nativeBounds })}`,
+    );
+  }
+  await currentBasicThreadPage
+    .getByRole("button", { name: "Fork chat from here" })
+    .focus();
+  if (
+    (await currentBasicThreadPage.evaluate(() =>
+      document.activeElement?.getAttribute("aria-label"),
+    )) !== "Fork chat from here"
+  ) {
+    throw new Error("Electron current basic thread actions lost focus.");
+  }
+  await currentBasicThreadApp.evaluate(({ BrowserWindow }) => {
+    BrowserWindow.getAllWindows()[0]?.setContentSize(820, 680);
+  });
+  await currentBasicThreadPage.waitForFunction(
+    () => window.innerWidth === 820 && window.innerHeight === 680,
+  );
+  const compact = await currentBasicThreadPage.evaluate(() => {
+    const composer = document.querySelector(".codex-ui-composer");
+    const composerRect = composer?.getBoundingClientRect();
+    return {
+      actionCount: document.querySelectorAll(
+        '[data-item-id="assistant-current-basic"] .codex-ui-agent-message__actions button',
+      ).length,
+      composer: composerRect
+        ? {
+            bottom: composerRect.bottom,
+            left: composerRect.left,
+            right: composerRect.right,
+          }
+        : null,
+      horizontalOverflow:
+        document.documentElement.scrollWidth -
+        document.documentElement.clientWidth,
+      messageCount: document.querySelectorAll(
+        '[data-item-id="user-current-basic"], [data-item-id="assistant-current-basic"]',
+      ).length,
+      viewport: { height: innerHeight, width: innerWidth },
+    };
+  });
+  if (
+    compact.viewport.width !== 820 ||
+    compact.viewport.height !== 680 ||
+    compact.horizontalOverflow > 1 ||
+    compact.messageCount !== 2 ||
+    compact.actionCount !== 4 ||
+    !compact.composer ||
+    compact.composer.left < 0 ||
+    compact.composer.right > 820 ||
+    compact.composer.bottom > 680
+  ) {
+    throw new Error(
+      `Electron compact current basic thread failed: ${JSON.stringify(compact)}`,
+    );
+  }
+} finally {
+  await currentBasicThreadApp.close();
+}
+
 const appServerCrashScene = {
   frame: "app-server-crashed",
   id: "electron-app-server-crashed",
@@ -11358,5 +11519,5 @@ try {
 }
 
 console.log(
-  "Electron host, native-window, current project-directory creation, coding-workspace routing and persisted/missing-worktree recovery replay, conversation/Composer and current image-attachment lifecycle plus current menus, current long, failed, and interrupted command output plus manual context compaction, transport retry/recovery, fatal App Server restart, bounded global notification queue, thread summary, replay/live single, concurrent, nested, and mixed-recovery subagent delegation with 4/10 pagination, current mixed Search/Browser/MCP/approval/file/subagent flow, runtime-observed Hooks and package-observed Code review Settings, default 720px narrow reachability, resizable navigation/Review/Terminal/PR detail, PR tabs and expansion, MCP disclosure/result/unavailable-fallback, multi-file and mixed-content Review, selection/Undo, large diff scrolling, and compact geometry contracts passed.",
+  "Electron host, native-window, current basic message thread, current project-directory creation, coding-workspace routing and persisted/missing-worktree recovery replay, conversation/Composer and current image-attachment lifecycle plus current menus, current long, failed, and interrupted command output plus manual context compaction, transport retry/recovery, fatal App Server restart, bounded global notification queue, thread summary, replay/live single, concurrent, nested, and mixed-recovery subagent delegation with 4/10 pagination, current mixed Search/Browser/MCP/approval/file/subagent flow, runtime-observed Hooks and package-observed Code review Settings, default 720px narrow reachability, resizable navigation/Review/Terminal/PR detail, PR tabs and expansion, MCP disclosure/result/unavailable-fallback, multi-file and mixed-content Review, selection/Undo, large diff scrolling, and compact geometry contracts passed.",
 );

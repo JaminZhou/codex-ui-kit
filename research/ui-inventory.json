@@ -92,11 +92,12 @@
         "cdp-26.721:synthetic-thread-wide-2560x1410-header-timeline-composer-geometry",
         "cdp-26.721:synthetic-thread-emulated-800x600-responsive-geometry",
         "cdp-26.803.61601:completed-thread-1180x820-and-720x680-header-thread-composer-geometry-zero-overflow-and-responsive-collapse",
-        "cdp-26.810.52044:completed-successful-command-thread-header-actions-and-composer-assets"
+        "cdp-26.810.52044:completed-successful-command-thread-header-actions-and-composer-assets",
+        "cdp-26.818.41509:completed-basic-thread-wide-and-820x680-compact-shell-composer-geometry-zero-overflow"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "partial_legacy",
-      "electronStatus": "partial_legacy",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
       "priority": "p0"
     },
     {
@@ -111,11 +112,12 @@
         "cdp-26.721:synthetic-streaming-assistant-736x22-font-14-22",
         "cdp-26.803.61601:completed-user-bubble-assistant-flat-response-four-actions-14x22-typography-and-twelve-exact-thread-assets",
         "cdp-26.803.61601:real-plain-text-streaming-wide-to-compact-reverse-origin-follow-and-natural-completion",
-        "cdp-26.810.52044:completed-assistant-copy-good-bad-and-fork-actions"
+        "cdp-26.810.52044:completed-assistant-copy-good-bad-and-fork-actions",
+        "cdp-26.818.41509:fixed-user-assistant-turn-four-exact-actions-five-composer-controls-and-0.432-percent-unmasked-thread-region"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "partial_legacy",
-      "electronStatus": "partial_legacy",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
       "priority": "p0"
     },
     {

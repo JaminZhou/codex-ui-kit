@@ -2448,6 +2448,11 @@ textarea {
   margin-left: -4px;
 }
 
+.demo-root[data-scenario="current-basic-message"]
+  .demo-turn-actions.demo-mcp-turn-actions {
+  gap: 2px;
+}
+
 .demo-mcp-current-intro + .codex-ui-mcp-tool-call-group {
   margin-top: 16px;
   transform: translateY(-2px);
@@ -2875,6 +2880,46 @@ textarea {
   height: 1.75rem;
   padding: 0 0.5rem;
   width: 6.31640625rem;
+}
+
+.demo-root[data-scenario="current-basic-message"] .demo-composer-controls {
+  gap: 5px;
+}
+
+.demo-root[data-scenario="current-basic-message"]
+  .demo-composer-controls
+  > button,
+.demo-root[data-scenario="current-basic-message"]
+  .demo-composer-actions
+  > button {
+  align-items: center;
+  border-radius: 999px;
+  box-sizing: border-box;
+  display: inline-flex;
+  height: 28px;
+  justify-content: center;
+  width: 28px;
+}
+
+.demo-root[data-scenario="current-basic-message"] .demo-composer-actions {
+  font-size: 13px;
+  gap: 0;
+}
+
+.demo-root[data-scenario="current-basic-message"]
+  .codex-ui-composer__controls {
+  gap: 8px;
+}
+
+.demo-root[data-scenario="current-basic-message"]
+  .demo-composer-actions
+  > .demo-current-composer-model {
+  border-radius: 999px;
+  flex: 0 0 147.359375px;
+  gap: 4px;
+  justify-content: flex-end;
+  padding: 0 11px 0 16px;
+  width: 147.359375px;
 }
 
 .demo-root[data-theme="light"] .demo-current-build-icon,

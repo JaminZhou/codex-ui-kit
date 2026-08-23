@@ -1170,19 +1170,23 @@ function statusLabel(state: DemoProtocolState) {
 }
 
 function McpResponseActions({
+  copyLabel = "Copy response",
   includeFork = true,
   label = "MCP response actions",
+  toolbar = true,
 }: {
+  copyLabel?: string;
   includeFork?: boolean;
-  label?: string;
+  label?: string | null;
+  toolbar?: boolean;
 }) {
   return (
     <span
-      aria-label={label}
+      aria-label={label ?? undefined}
       className="demo-mcp-turn-actions demo-turn-actions"
-      role="toolbar"
+      role={toolbar ? "toolbar" : undefined}
     >
-      <button aria-label="Copy response" type="button">
+      <button aria-label={copyLabel} type="button">
         <CurrentBuildIcon name="thread-assistant-copy" />
       </button>
       <button aria-label="Good response" type="button">
@@ -2462,6 +2466,8 @@ export function App() {
     mode === "replay" && scenarioId === "context-summary";
   const isCurrentTransportRecoveryReplay =
     mode === "replay" && scenarioId === "streaming-recovery";
+  const isCurrentBasicMessageReplay =
+    mode === "replay" && scenarioId === "current-basic-message";
   const isCurrentMixedToolReplay =
     mode === "replay" && scenarioId === "current-mixed-tool-thread";
   const isCurrentReviewFilesReplay =
@@ -4432,6 +4438,7 @@ export function App() {
       scenarioId === "interruption" ||
       scenarioId === "compaction" ||
       scenarioId === "context-summary" ||
+      isCurrentBasicMessageReplay ||
       isCurrentTransportRecoveryReplay ||
       isCurrentSubagentReplay ||
       scenarioId === "current-review-rename" ||
@@ -4701,6 +4708,7 @@ export function App() {
       scenarioId === "interruption" ||
       scenarioId === "compaction" ||
       scenarioId === "context-summary" ||
+      isCurrentBasicMessageReplay ||
       isCurrentTransportRecoveryReplay ||
       isCurrentSubagentReplay);
   const showLifecycleComposer = isConversationLifecycle;
@@ -4965,14 +4973,24 @@ export function App() {
       controls={
         showMeasuredComposer || showLifecycleComposer ? (
           <span className="demo-composer-actions">
-            <span className="demo-current-composer-model">
-              <span>5.6 Sol Extra High</span>
-              {currentComposerComposition ? (
+            {isCurrentBasicMessageReplay ? (
+              <button
+                className="demo-current-composer-model"
+                type="button"
+              >
+                <span>5.6 Sol Extra High</span>
                 <CurrentBuildIcon name="composer-model-chevron" />
-              ) : (
-                <span aria-hidden="true">⌄</span>
-              )}
-            </span>
+              </button>
+            ) : (
+              <span className="demo-current-composer-model">
+                <span>5.6 Sol Extra High</span>
+                {currentComposerComposition ? (
+                  <CurrentBuildIcon name="composer-model-chevron" />
+                ) : (
+                  <span aria-hidden="true">⌄</span>
+                )}
+              </span>
+            )}
             <button aria-label="Dictate" type="button">
               {currentComposerComposition ? (
                 <CurrentBuildIcon name="composer-dictate" />
@@ -5013,7 +5031,8 @@ export function App() {
       submitLabel={
         isCurrentCommandInterruptionReplay ||
         isCurrentContextCompactionReplay ||
-        isCurrentTransportRecoveryReplay
+        isCurrentTransportRecoveryReplay ||
+        isCurrentBasicMessageReplay
           ? "Send"
           : undefined
       }
@@ -8085,6 +8104,8 @@ export function App() {
                     message.id === "assistant-approval-similar-second")) ||
                 (scenarioId === "long-command-output" &&
                   message.id === "assistant-long-command-final") ||
+                (isCurrentBasicMessageReplay &&
+                  message.id === "assistant-current-basic") ||
                 (scenarioId === "command-failure-recovery" &&
                   (message.id === "assistant-command-failure-recovered" ||
                     message.id === "assistant-command-follow-up")) ||
@@ -8108,10 +8129,16 @@ export function App() {
                 scenarioId === "approval-denied" ||
                 scenarioId === "approval-similar-commands" ||
                 scenarioId === "long-command-output" ||
+                isCurrentBasicMessageReplay ||
                 isCurrentSubagentReplay ? (
                   <McpResponseActions
+                    copyLabel={
+                      isCurrentBasicMessageReplay ? "Copy" : undefined
+                    }
                     label={
-                      message.id === "assistant-workflow" ||
+                      isCurrentBasicMessageReplay
+                        ? null
+                        : message.id === "assistant-workflow" ||
                       message.id === "assistant-approval-denied" ||
                       message.id === "assistant-approval-approved" ||
                       message.id === "assistant-approval-allow-once" ||
@@ -8120,6 +8147,7 @@ export function App() {
                         ? "Response actions"
                         : undefined
                     }
+                    toolbar={!isCurrentBasicMessageReplay}
                   />
                 ) : (
                   <span

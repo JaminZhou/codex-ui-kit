@@ -314,6 +314,34 @@ describe("lifecycle visual policy", () => {
     );
   });
 
+  it("gates the current basic thread without ownership masks", () => {
+    expect(electronHarness).toContain('id: "current-basic-thread"');
+    expect(electronHarness).toContain('scenario: "current-basic-message"');
+    expect(cdpContract).toContain(
+      'scene.id === "current-basic-thread"',
+    );
+    expect(cdpContract).toContain(
+      'basicThread.assistantText !== "CURRENT BASIC MESSAGE."',
+    );
+    expect(electronContract).toContain(
+      'id: "electron-current-basic-thread"',
+    );
+    expect(contract).toContain(
+      "CODEX_UI_KIT_CURRENT_BASIC_THREAD_REFERENCE",
+    );
+    expect(contract).toContain(
+      "CODEX_UI_KIT_CURRENT_BASIC_THREAD_MAX_DIFF_RATIO",
+    );
+    expect(contract).toContain("defaultMaximumRatio: 0.005");
+    expect(contract).toContain("masks: []");
+    expect(appSource).toContain(
+      'isCurrentBasicMessageReplay ? "Copy" : undefined',
+    );
+    expect(appSource).toContain(
+      'toolbar={!isCurrentBasicMessageReplay}',
+    );
+  });
+
   it("gates the current long-thread navigation and return control", () => {
     expect(contract).toContain(
       "CODEX_UI_KIT_LONG_THREAD_REFERENCE",
