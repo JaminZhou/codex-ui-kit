@@ -3204,9 +3204,9 @@ for (const scene of selectedScenes) {
           ) !==
             JSON.stringify([
               "Local",
-              "New worktree",
+              "New local worktree",
               "Connect Codex web",
-              "Send to cloud",
+              "Cloud",
               "Usage remaining",
             ]) ||
           JSON.stringify(
@@ -3260,16 +3260,15 @@ for (const scene of selectedScenes) {
         worktreeEnvironmentExpected &&
         (!contract.worktreeEnvironment ||
           Math.abs(contract.worktreeEnvironment.rect.width - 264) > 1 ||
-          Math.abs(contract.worktreeEnvironment.rect.height - 126) > 1 ||
+          Math.abs(contract.worktreeEnvironment.rect.height - 91.125) > 0.2 ||
           contract.worktreeEnvironment.buttons.length !== 2 ||
-          contract.worktreeEnvironment.emptyText?.trim() !==
-            "No environments found" ||
+          contract.worktreeEnvironment.emptyText !== null ||
           JSON.stringify(
             contract.worktreeEnvironment.buttons.map(({ label }) => label),
           ) !==
             JSON.stringify([
               "Work without environment",
-              "Environment settings",
+              "Set up project",
             ]) ||
           JSON.stringify(
             contract.worktreeEnvironment.buttons.map(({ role }) => role),

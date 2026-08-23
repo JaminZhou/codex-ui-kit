@@ -53,11 +53,12 @@
         "cdp-26.730.61309:local-and-new-worktree-four-part-context-controls-wide-and-720",
         "cdp-26.803.41515:visible-composer-project-worktree-branch-exact-assets",
         "cdp-26.803.61601:visible-composer-project-worktree-branch-exact-assets",
-        "cdp-26.810.52044:visible-composer-project-worktree-branch-exact-assets"
+        "cdp-26.810.52044:visible-composer-project-worktree-branch-exact-assets",
+        "cdp-26.818.41509:new-local-worktree-current-context-controls-exact-labels-and-no-environment-state"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "partial_legacy",
-      "electronStatus": "partial_legacy",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
       "priority": "p0"
     },
     {
@@ -583,11 +584,12 @@
         "cdp-26.803.41515:visible-composer-project-worktree-branch-exact-assets",
         "cdp-26.803.61601:visible-composer-project-worktree-branch-exact-assets",
         "cdp-26.803.61601:work-in-five-action-menu-external-codex-web-anchor-and-exact-icons",
-        "cdp-26.810.52044:visible-composer-context-and-work-in-five-action-exact-assets"
+        "cdp-26.810.52044:visible-composer-context-and-work-in-five-action-exact-assets",
+        "cdp-26.818.41509:work-in-new-local-worktree-no-environment-main-context-and-current-menus"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "partial_legacy",
-      "electronStatus": "partial_legacy",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
       "priority": "p0"
     },
     {
@@ -852,11 +854,12 @@
         "cdp-26.721.81911:sibling-running-queued-unread-error-status-indicators",
         "cdp-26.727.40816:project-status-indicators",
         "cdp-26.803.61601:disposable-real-worktree-create-controlled-failure-retry-recovery-and-restored-14px-branch-20px-status-rail",
-        "cdp-26.810.52044:disposable-real-worktree-create-controlled-failure-unread-composition-retry-recovery-30px-row-14px-branch-20px-status-rails"
+        "cdp-26.810.52044:disposable-real-worktree-create-controlled-failure-unread-composition-retry-recovery-30px-row-14px-branch-20px-status-rails",
+        "cdp-26.818.41509:disposable-real-worktree-create-controlled-failure-unread-composition-retry-recovery-30px-row-14px-branch-20px-status-rails-and-unmasked-tail-pixels"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "partial_legacy",
-      "electronStatus": "partial_legacy",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
       "priority": "p0"
     },
     {
@@ -1016,11 +1019,12 @@
         "cdp-26.727.40816:new-chat-project-dialog-and-context-entry-1180x820",
         "cdp-26.730.61309:new-chat-wide-compact-no-project-new-worktree-and-overlay-pixels",
         "cdp-26.803.61601:new-chat-project-dialog-new-project-only-and-native-directory-panel-entry",
-        "cdp-26.803.61601:new-chat-branch-create-dialog-and-git-settings-prefix-entry"
+        "cdp-26.803.61601:new-chat-branch-create-dialog-and-git-settings-prefix-entry",
+        "cdp-26.818.41509:new-local-worktree-success-controlled-failure-retry-and-recovery"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "partial_legacy",
-      "electronStatus": "partial_legacy",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
       "priority": "p0"
     },
     {
@@ -1263,11 +1267,12 @@
         "cdp:worktree-settings-empty-state-and-retention-controls",
         "cdp-26.721:local-environment-worktree-groups-and-main-context",
         "cdp-26.803.61601:real-worktree-task-cross-restart-persistence-with-selection-restored-thread",
-        "cdp-26.803.61601:missing-working-directory-model-only-turn-session-latched-warning-and-restart-recovery"
+        "cdp-26.803.61601:missing-working-directory-model-only-turn-session-latched-warning-and-restart-recovery",
+        "cdp-26.818.41509:disposable-real-worktree-create-controlled-failure-retry-recovery"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "partial_legacy",
-      "electronStatus": "partial_legacy",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
       "priority": "p0"
     },
     {

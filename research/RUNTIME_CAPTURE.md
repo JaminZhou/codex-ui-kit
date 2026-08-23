@@ -309,7 +309,7 @@ handlers, verified the port and exact profile argv were gone, and moved the
 record recoverably to
 `codex-ui-kit-runtime-id-cdp.TkSi3W-20260810` in Trash.
 
-### Current `26.803.61601` worktree status lifecycle
+### Previous `26.803.61601` worktree status lifecycle
 
 This mutating probe is limited to two fresh disposable Git repositories and
 two unique Chromium profiles. Each repository has one synthetic initial commit
@@ -376,7 +376,39 @@ links, exact geometry, color, paths, and action replacement. Three local-only
 2.9762% under 6%; failed-plus-unread and restored pass at 0% under 6.5% and
 2.5% respectively.
 
-### Current `26.803.61601` worktree persistence and directory recovery
+### Current `26.818.41509` worktree entry and status lifecycle
+
+The refresh uses two new disposable single-commit repositories, isolated
+Chromium profiles, and loopback-only ports 9881 and 9882. The primary Codex
+instance remains on 9874 and is checked before and after every mutating step.
+The current `Work in` menu exposes `Local`, `New local worktree`, `Connect
+Codex web`, disabled `Cloud`, and `Usage remaining`. The selected context uses
+`Select where to run the chat`, `Select a local environment`, and `What branch
+should this chat start from?`; the 264×91.125 Environment menu contains only
+`Work without environment` and `Set up project`.
+
+The success path reaches real loading and restored worktree rows. The failure
+path blocks only the disposable repository's `.git/worktrees` location,
+reaches `Worktree init failed` plus the main `Worktree setup failed` surface,
+and then completes through Retry after moving that blocker aside. All sampled
+rows are 30px high. Loading uses a 14×14 branch marker at a 39px right inset
+and a 20×20 status rail at 8px; failure keeps the branch at 67px, a red 16×16
+error at 38px, and a blue 8×8 unread dot at 14px; restored places the branch
+at 11px. The spinner's exact two paths and two-second animation are gated, but
+its transformed runtime bounding box and instantaneous angle are not frozen.
+
+Browser/CDP and Electron repeat the entry, failure, Retry, action replacement,
+and recovery lifecycle. Privacy-safe unmasked 56×30 loading/restored and 84×30
+failed-plus-unread tails pass at 2.0833%, 0.7540%, and 0.1786%. Both exact
+synthetic tasks are archived; raw task text, profiles, screenshots, and capture
+records remain outside version control. Cleanup uses each exact project's own
+`Remove project` confirmation, verifies that both repositories retain only
+their original worktree, terminates only isolated PIDs 65980/67237 and their
+profile-owned handlers, and confirms ports 9881/9882 and both profile arguments
+are absent while primary PID 43055 still owns 9874. The full probe root moves
+recoverably to `codex-ui-kit-worktree-26-818-20260824` in Trash.
+
+### Previous `26.803.61601` worktree persistence and directory recovery
 
 A separate fresh-profile probe uses one disposable repository and one
 loopback-only CDP listener. It creates a real worktree-backed task, waits for a

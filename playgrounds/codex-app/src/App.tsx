@@ -5895,18 +5895,18 @@ export function App() {
             ? workspaceEnvironmentId === "worktree"
               ? [
                   {
-                    ariaLabel: "Change run location: New worktree",
+                    ariaLabel: "Select where to run the chat",
                     controlsId: "demo-workspace-environment-menu",
                     icon: (
                       <CurrentBuildIcon name="workspace-run-location-worktree" />
                     ),
                     id: "environment",
                     kind: "run-location" as const,
-                    label: "New worktree",
+                    label: "New local worktree",
                     popupRole: "menu" as const,
                   },
                   {
-                    ariaLabel: "Change environment: No environment",
+                    ariaLabel: "Select a local environment",
                     controlsId:
                       "demo-workspace-worktree-environment-menu",
                     icon: (
@@ -5918,7 +5918,7 @@ export function App() {
                     popupRole: "menu" as const,
                   },
                   {
-                    ariaLabel: "Starting state: main",
+                    ariaLabel: "What branch should this chat start from?",
                     icon: <CurrentBuildIcon name="composer-branch" />,
                     id: "starting-state",
                     kind: "starting-state" as const,
@@ -5927,7 +5927,7 @@ export function App() {
                 ]
               : [
                   {
-                    ariaLabel: "Change run location: Local",
+                    ariaLabel: "Select where to run the chat",
                     controlsId: "demo-workspace-environment-menu",
                     icon: (
                       <CurrentBuildIcon name="workspace-run-location-local" />
@@ -5938,6 +5938,7 @@ export function App() {
                     popupRole: "menu" as const,
                   },
                   {
+                    ariaLabel: "Switch branch",
                     controlsId: "demo-workspace-worktree-menu",
                     disabled:
                       workspaceBranchCheckoutPending ||
@@ -6028,7 +6029,7 @@ export function App() {
                     <CurrentBuildIcon name="workspace-run-location-worktree" />
                   }
                 >
-                  New worktree
+                  New local worktree
                 </MenuItem>
                 <MenuLinkItem
                   endIcon={
@@ -6047,7 +6048,7 @@ export function App() {
                     <CurrentBuildIcon name="workspace-run-location-send-cloud" />
                   }
                 >
-                  Send to cloud
+                  Cloud
                 </MenuItem>
                 <div
                   aria-hidden="true"
@@ -6092,9 +6093,6 @@ export function App() {
                 >
                   Work without environment
                 </MenuItem>
-                <span className="demo-workspace-context-menu__empty">
-                  No environments found
-                </span>
                 <MenuItem
                   endIcon={
                     <CurrentBuildIcon name="workspace-environment-settings" />
@@ -6105,7 +6103,7 @@ export function App() {
                     setActiveFrame("workspace-environments-unavailable");
                   }}
                 >
-                  Environment settings
+                  Set up project
                 </MenuItem>
               </Menu>
             );

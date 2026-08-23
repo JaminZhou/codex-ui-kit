@@ -868,11 +868,13 @@ screenshots and product project names remain local-only.
 
 ## Current environment-entry slice
 
-- Current Codex `26.803.61601` evidence replaces the former Start in model
-  with the five-action Work in menu: Local, New worktree, an external Codex
-  web anchor, disabled Send to cloud, and Usage remaining.
-- New worktree exposes the separate no-environment menu. Environment settings
-  routes to the current 768px page with a Local environments unavailable
+- Current Codex `26.818.41509` evidence exposes the five-action Work in menu:
+  Local, New local worktree, an external Codex web anchor, disabled Cloud, and
+  Usage remaining. Local and worktree modes share `Select where to run the
+  chat`; the local branch action uses `Switch branch`.
+- New local worktree exposes a 264×91.125 two-action no-environment menu with
+  Work without environment and Set up project, without a static empty row.
+  Set up project routes to the current 768px page with a Local environments unavailable
   status card; the historical 600×600 `LocalEnvironmentDialog` remains an
   independent host capability, not this current route.
 - `MenuLinkItem` preserves menu styling and semantics for the external anchor,
@@ -881,8 +883,9 @@ screenshots and product project names remain local-only.
   directory is introduced.
 - Browser/CDP locks tags, roles, href, disabled state, exact icons, geometry,
   route and Back restoration. Real Electron repeats the interactions. Three
-  reviewed internal scenes and three local-only current-product comparisons
-  pass at 3.9193%, 3.0724%, and 0.0708%.
+  reviewed internal scenes pass; separate current-product loading,
+  failed-plus-unread, and restored worktree tails pass at 2.0833%, 0.7540%,
+  and 0.1786%.
 
 This slice does not create an environment or claim populated environment
 editing/repair coverage. Raw product screenshots and capture records remain

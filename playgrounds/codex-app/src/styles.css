@@ -914,9 +914,15 @@ textarea {
 }
 
 .demo-workspace-worktree-environment-menu {
-  height: 126px;
+  height: 91.125px;
   min-width: 264px;
   width: 264px;
+}
+
+.demo-workspace-worktree-environment-menu
+  .codex-ui-menu-section-label {
+  line-height: 16px;
+  min-height: 26px;
 }
 
 .demo-workspace-context-menu .codex-ui-menu-section-label {
