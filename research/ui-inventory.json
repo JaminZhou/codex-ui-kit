@@ -879,11 +879,12 @@
         "cdp-26.803.61601:fixed-46px-footer-one-help-control-zero-settings-controls-and-redacted-account-content",
         "cdp-26.803.61601:account-menu-six-items-258.11x188.38-six-current-icons-one-avatar-zero-role-separators-and-escape-return",
         "cdp-26.810.52044:fixed-46px-footer-voice-help-and-account-six-items-five-icons-no-usage-chevron",
-        "cdp-26.818.41509:fixed-footer-voice-help-and-zero-settings-controls"
+        "cdp-26.818.41509:fixed-footer-voice-help-and-zero-settings-controls",
+        "cdp-26.818.41509:account-menu-dark-light-wide-compact-six-items-306.90625x188.375-five-exact-icons-one-avatar-zero-role-separators-zero-overflow-and-escape-focus-return"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "partial_legacy",
-      "electronStatus": "partial_legacy",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
       "priority": "p0"
     },
     {

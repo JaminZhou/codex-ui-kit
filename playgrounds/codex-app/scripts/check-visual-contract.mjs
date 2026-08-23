@@ -366,6 +366,12 @@ const currentBuildSidebarHelpMenuReference =
   process.env.CODEX_UI_KIT_CURRENT_SIDEBAR_HELP_MENU_REFERENCE;
 const currentBuildSidebarAccountMenuReference =
   process.env.CODEX_UI_KIT_CURRENT_SIDEBAR_ACCOUNT_MENU_REFERENCE;
+const currentBuildSidebarAccountMenuLightReference =
+  process.env.CODEX_UI_KIT_CURRENT_SIDEBAR_ACCOUNT_MENU_LIGHT_REFERENCE;
+const currentBuildSidebarAccountMenuCompactReference =
+  process.env.CODEX_UI_KIT_CURRENT_SIDEBAR_ACCOUNT_MENU_COMPACT_REFERENCE;
+const currentBuildSidebarAccountMenuLightCompactReference =
+  process.env.CODEX_UI_KIT_CURRENT_SIDEBAR_ACCOUNT_MENU_LIGHT_COMPACT_REFERENCE;
 const currentBuildSidebarFooterControlsReference =
   process.env.CODEX_UI_KIT_CURRENT_SIDEBAR_FOOTER_CONTROLS_REFERENCE;
 const currentBuildSidebarCompactPinnedReference =
@@ -907,7 +913,7 @@ for (const scene of selectedScenes) {
     if (
       scene.id === "current-sidebar-project-menu" ||
       scene.id === "current-sidebar-help-menu" ||
-      scene.id === "current-sidebar-account-menu"
+      scene.id.startsWith("current-sidebar-account-menu")
     ) {
       const menu = page.locator('[role="menu"]');
       sidebarMenuBounds = await menu.evaluate((element) => {
@@ -2764,61 +2770,83 @@ for (const scene of selectedScenes) {
     });
   }
 
-  if (
-    scene.id === "current-sidebar-account-menu" &&
-    currentBuildSidebarAccountMenuReference
-  ) {
+  const currentBuildAccountMenuReference = {
+    "current-sidebar-account-menu": currentBuildSidebarAccountMenuReference,
+    "current-sidebar-account-menu-compact":
+      currentBuildSidebarAccountMenuCompactReference,
+    "current-sidebar-account-menu-light":
+      currentBuildSidebarAccountMenuLightReference,
+    "current-sidebar-account-menu-light-compact":
+      currentBuildSidebarAccountMenuLightCompactReference,
+  }[scene.id];
+  if (currentBuildAccountMenuReference) {
     if (sidebarMenuItemBounds?.length !== 6) {
       throw new Error(
         `${scene.id}: expected six account menu item bounds, received ${sidebarMenuItemBounds?.length ?? 0}.`,
       );
     }
+    const compact = scene.id.endsWith("compact");
+    const expectedTop = compact ? 447 : 587;
+    const maximumRatioName = {
+      "current-sidebar-account-menu":
+        "CODEX_UI_KIT_CURRENT_SIDEBAR_ACCOUNT_MENU_MAX_DIFF_RATIO",
+      "current-sidebar-account-menu-compact":
+        "CODEX_UI_KIT_CURRENT_SIDEBAR_ACCOUNT_MENU_COMPACT_MAX_DIFF_RATIO",
+      "current-sidebar-account-menu-light":
+        "CODEX_UI_KIT_CURRENT_SIDEBAR_ACCOUNT_MENU_LIGHT_MAX_DIFF_RATIO",
+      "current-sidebar-account-menu-light-compact":
+        "CODEX_UI_KIT_CURRENT_SIDEBAR_ACCOUNT_MENU_LIGHT_COMPACT_MAX_DIFF_RATIO",
+    }[scene.id];
     await compareCurrentBuildOverlay({
       actual,
       actualBounds: sidebarMenuBounds,
-      defaultMaximumRatio: 0.005,
-      expectedActualPosition: { left: 9, top: 587 },
+      // Light-mode alpha compositing in the native capture shifts the
+      // anti-aliased icon edge pixels while preserving source and geometry.
+      defaultMaximumRatio: scene.theme === "light" ? 0.006 : 0.005,
+      expectedActualPosition: { left: 9, top: expectedTop },
       masks: [
         {
           height: Math.max(0, sidebarMenuItemBounds[0].height - 8),
           left: 10,
           top: sidebarMenuItemBounds[0].top + 4,
-          width: 226,
+          width: 278,
         },
         {
           height: Math.max(0, sidebarMenuItemBounds[1].height - 8),
           left: 34,
           top: sidebarMenuItemBounds[1].top + 4,
-          width: 184,
+          width: 238,
         },
         ...sidebarMenuItemBounds.slice(2, 4).map(({ height, top }) => ({
           height: Math.max(0, height - 8),
           left: 34,
           top: top + 4,
-          width: 210,
+          width: 250,
         })),
         {
           height: Math.max(0, sidebarMenuItemBounds[4].height - 8),
           left: 34,
           top: sidebarMenuItemBounds[4].top + 4,
-          width: 172,
+          width: 205,
         },
         {
           height: Math.max(0, sidebarMenuItemBounds[5].height - 8),
           left: 34,
           top: sidebarMenuItemBounds[5].top + 4,
-          width: 210,
+          width: 250,
         },
       ],
-      maximumRatioName:
-        "CODEX_UI_KIT_CURRENT_SIDEBAR_ACCOUNT_MENU_MAX_DIFF_RATIO",
+      maximumRatioName,
       referenceCrop: {
         height: 188,
         left: 9,
-        top: 587,
-        width: 258,
+        top: expectedTop,
+        width: 307,
       },
-      referencePath: currentBuildSidebarAccountMenuReference,
+      referencePath: currentBuildAccountMenuReference,
+      referenceSize: compact
+        ? { height: 680, width: 720 }
+        : currentBuildWorkspaceReferenceSize,
       sceneId: scene.id,
     });
   }

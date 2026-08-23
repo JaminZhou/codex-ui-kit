@@ -1242,19 +1242,24 @@ CODEX_UI_KIT_CURRENT_PROJECTS_INDEX_REFERENCE=/absolute/path/to/current-projects
   --scenes=projects-index-ready,projects-index-expanded,projects-index-compact
 ```
 
-The current sidebar lifecycle gates accept four 1180×820 product frames and
-one exact 720×680 compact frame. The project-menu reference may instead be
-the exact local 221×187 native-window crop; its comparison is unmasked. All
-references remain untracked and local:
+The current sidebar lifecycle gates accept Dark/Light account-menu references
+at 1180×820 and 720×680 in addition to the other sidebar references. Account
+identity and dynamic Usage text are masked, while the surface, divider, five
+public icons, shortcut rail, edge, and shadow remain compared. The
+project-menu reference may instead be the exact local 221×187 native-window
+crop; its comparison is unmasked. All references remain untracked and local:
 
 ```bash
 CODEX_UI_KIT_CURRENT_SIDEBAR_PROJECT_COLLAPSED_REFERENCE=/absolute/path/to/current-sidebar-project-collapsed.png \
 CODEX_UI_KIT_CURRENT_SIDEBAR_PROJECT_MENU_REFERENCE=/absolute/path/to/current-sidebar-project-menu.png \
 CODEX_UI_KIT_CURRENT_SIDEBAR_HELP_MENU_REFERENCE=/absolute/path/to/current-sidebar-help-menu.png \
 CODEX_UI_KIT_CURRENT_SIDEBAR_ACCOUNT_MENU_REFERENCE=/absolute/path/to/current-sidebar-account-menu.png \
+CODEX_UI_KIT_CURRENT_SIDEBAR_ACCOUNT_MENU_LIGHT_REFERENCE=/absolute/path/to/current-sidebar-account-menu-light.png \
+CODEX_UI_KIT_CURRENT_SIDEBAR_ACCOUNT_MENU_COMPACT_REFERENCE=/absolute/path/to/current-sidebar-account-menu-compact.png \
+CODEX_UI_KIT_CURRENT_SIDEBAR_ACCOUNT_MENU_LIGHT_COMPACT_REFERENCE=/absolute/path/to/current-sidebar-account-menu-light-compact.png \
 CODEX_UI_KIT_CURRENT_SIDEBAR_COMPACT_PINNED_REFERENCE=/absolute/path/to/current-sidebar-compact-pinned.png \
   pnpm --filter @codex-ui-kit/codex-app-playground check:visual -- \
-  --scenes=current-sidebar-project-collapsed,current-sidebar-project-menu,current-sidebar-help-menu,current-sidebar-account-menu,current-sidebar-compact-pinned
+  --scenes=current-sidebar-project-collapsed,current-sidebar-project-menu,current-sidebar-help-menu,current-sidebar-account-menu,current-sidebar-account-menu-light,current-sidebar-account-menu-compact,current-sidebar-account-menu-light-compact,current-sidebar-compact-pinned
 ```
 
 The combined ordinary/worktree task-status gate accepts full 259×30 local-only

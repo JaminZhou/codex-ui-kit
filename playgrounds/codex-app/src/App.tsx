@@ -3808,9 +3808,11 @@ export function App() {
               }}
               open={currentSidebarAccountMenuOpen}
               side="top"
-              sideOffset={7.5}
+              sideOffset={currentHomeFrame ? 7.125 : 7.5}
               style={{
-                width: "calc(var(--codex-ui-app-sidebar-width) - 1rem)",
+                width: currentHomeFrame
+                  ? 306.90625
+                  : "calc(var(--codex-ui-app-sidebar-width) - 1rem)",
               }}
               trigger={trigger}
               width="auto"
