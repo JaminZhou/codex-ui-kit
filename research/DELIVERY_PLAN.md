@@ -14,7 +14,7 @@ exit gates; it does not replace the inventory.
   Desktop `26.818.41509` (`6962`). Unsampled earlier-build surfaces remain
   previous-build regression evidence rather than current verification.
 - The inventory contains 89 surface groups: 59 P0, 21 P1, and 9 P2.
-- 11 groups have current-build runtime evidence, 62 have previous-build-only
+- 13 groups have current-build runtime evidence, 60 have previous-build-only
   runtime evidence, and 16 have not been sampled.
 - The scoped `26.818.41509` refresh revalidates the global shell, responsive
   Composer, primary navigation, project-group lifecycle, Help menu, route
@@ -23,6 +23,10 @@ exit gates; it does not replace the inventory.
   menu with a 221×187 Quartz window. Its independent replica now locks the
   six observed current SVG sources, exact layout and focus lifecycle, the
   conditional unread variant, and a 3.8449% unmasked native-region comparison.
+  A separate fixed-message task now promotes `thread.shell` and
+  `thread.messages-basic` on 26.818: exact 1180×820 geometry, 820×680 compact
+  containment, four response actions, all five Composer hit targets, and a
+  no-mask 768×774 product comparison at 0.4320% changed pixels.
   The broader `26.810.52044` refresh remains
   previous-build regression evidence; it revalidated 115
   sidebar/menu/window-chrome/Composer/Settings/completed-thread icons against
@@ -434,12 +438,13 @@ Browser, MCP, command, approval, file Review, and subagent events under one
 public reducer and one Browser/Electron/pixel matrix. It is composition
 evidence, not a synthetic promotion of whole-thread current-product reachability.
 
-The basic completed conversation core is now refreshed on `26.803.61601` with
-one fresh exact synthetic reply. Settled 1180×820 and 720×680 CDP evidence,
+The basic completed conversation core is now refreshed on `26.818.41509` with
+one fresh exact reply. Settled 1180×820 and 820×680 CDP/Electron evidence,
 12 exact thread primitives, Browser geometry, regional pixel comparisons, and
 a real Electron BrowserWindow cover the header, user/assistant turn, four
-assistant actions, Composer, responsive insets, and zero overflow. Wide and
-compact full-frame deltas are 0.3272% and 0.6456%. Streaming, tool, approval,
+assistant actions, all five Composer controls, responsive containment, and
+zero overflow. The unmasked 768×774 current product region differs by 0.4320%
+under a 0.5% hard limit. Streaming, tool, approval,
 file, interruption, compaction, and long-thread rows initially retained their
 separately versioned evidence. The streaming row is now also refreshed on the
 same current build with one real 1180→720 running resize and natural
@@ -752,10 +757,11 @@ without confusing package readiness with full product reconstruction.
     pixels, public contract freeze, compatibility matrix, and release
     checklist.
 
-Each PR uses the same merge gate: current-head CI green, zero unresolved review
-threads, squash merge, branch cleanup, and post-merge CI verification. Bot
-review is advisory; a quota or service failure does not block merge. Concrete
-automated findings that do arrive are still fixed and resolved before merge.
+Each PR uses the fast local merge gate: latest-head `pnpm check`, complete
+`pnpm check:codex-app:acceptance`, and zero unresolved review threads. Once
+those pass, squash merge and clean the exact branch immediately. GitHub CI and
+bot review are advisory and are neither triggered nor awaited; a concrete
+finding that already exists before merge is still fixed and resolved.
 
 ## Planning rules
 

@@ -69,12 +69,18 @@ observation from a previous build remains historical evidence.
   current SVG sources, conditional unread variant, focus lifecycle, and a
   3.8449% unmasked native-region comparison. Details are recorded in
   [`26.818.41509.md`](26.818.41509.md).
+- A separate fixed-message task now revalidates the current completed
+  conversation shell. It locks the 768px thread and 736×98 Composer at
+  1180×820, compact containment at 820×680, 14/22px message typography, the
+  20px user bubble, four exact response-action assets, and all five Composer
+  control hit targets. The local-only 768×774 product crop is compared without
+  masks at 0.4320% changed pixels under a 0.5% hard limit.
 - The broader `26.810.52044` command, MCP, Review, Settings, worktree, account,
   Recents, and exact-asset results remain previous-build regression evidence.
   They are not relabeled as current merely because the shell capture passes.
 
-Current inventory: 89 surface groups; 11 have current-build runtime evidence, 62 have previous-build-only runtime evidence, 16 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 8 groups and Electron verification covers 8.
-Prior acceptance outside those 8 sampled current-build groups remains
+Current inventory: 89 surface groups; 13 have current-build runtime evidence, 60 have previous-build-only runtime evidence, 16 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 10 groups and Electron verification covers 10.
+Prior acceptance outside those 10 sampled current-build groups remains
 recorded as `partial_legacy` until current-build re-observation.
 
 The current package exposes candidates far beyond the old transcript sample:
@@ -517,6 +523,16 @@ overflow. Twelve exact thread primitives raise the visual manifest from 78 to
 integration PNG. Browser/CDP and Electron pass with no geometry violations;
 local-only regional comparisons pass at 0.3272% wide and 0.6456% compact. The source
 captures remain untracked.
+
+The current `26.818.41509` fixed-message follow-up now supersedes that shell
+and basic-message evidence without promoting the remaining conversation
+lifecycle. The live product and independent replay use the exact prompt and
+reply `CURRENT BASIC MESSAGE.`. CDP locks the 1180×820 thread, user bubble,
+assistant row, four 26×26 actions, five Composer controls, exact current SVG
+sources, and zero overflow; Electron repeats the wide contract and an
+820×680 compact resize. A 768×774 product-owned crop passes with no masks at
+`0.004320090439276485` changed pixels under a `0.005` hard limit. The capture
+profile and product screenshots remain local-only.
 
 The current streaming follow-up adds zero-violation wide and compact geometry.
 Its full-frame deltas are 0.3066% and 0.5074%; message-region deltas are

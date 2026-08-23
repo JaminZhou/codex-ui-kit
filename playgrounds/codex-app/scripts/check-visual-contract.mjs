@@ -80,6 +80,12 @@ const currentBuildMcpRecoveryReferenceSize = {
   height: 820,
   width: 906,
 };
+const currentBasicThreadReference =
+  process.env.CODEX_UI_KIT_CURRENT_BASIC_THREAD_REFERENCE;
+const currentBasicThreadReferenceSize = {
+  height: 774,
+  width: 768,
+};
 const currentMcpSuccessReference =
   process.env.CODEX_UI_KIT_CURRENT_MCP_SUCCESS_REFERENCE;
 const currentMcpSuccessReferenceSize = {
@@ -695,6 +701,7 @@ for (const scene of selectedScenes) {
   let currentApprovalBounds;
   let currentApprovalOptionsBounds;
   let currentApprovalComposerBounds;
+  let currentBasicThreadBounds;
 
   try {
     if (scene.id === "workspace-ready") {
@@ -822,6 +829,19 @@ for (const scene of selectedScenes) {
         )
         .first()
         .focus();
+    }
+    if (scene.id === "current-basic-thread") {
+      currentBasicThreadBounds = await page
+        .locator(".codex-ui-conversation-thread-shell__thread")
+        .evaluate((element) => {
+          const value = element.getBoundingClientRect();
+          return {
+            height: Math.round(window.innerHeight - value.top),
+            left: Math.round(value.left),
+            top: Math.round(value.top),
+            width: Math.round(value.width),
+          };
+        });
     }
     if (scene.id === "multi-file-review") {
       await page.evaluate(() => {
@@ -1201,6 +1221,27 @@ for (const scene of selectedScenes) {
     console.log(
       `${scene.id}: current-build App Server crash ratios ${JSON.stringify({ core: coreComparison.ratio, full: fullComparison.ratio })}`,
     );
+  }
+
+  if (scene.id === "current-basic-thread" && currentBasicThreadReference) {
+    await compareCurrentBuildOverlay({
+      actual,
+      actualBounds: currentBasicThreadBounds,
+      defaultMaximumRatio: 0.005,
+      expectedActualPosition: { left: 343, top: 46 },
+      masks: [],
+      maximumRatioName:
+        "CODEX_UI_KIT_CURRENT_BASIC_THREAD_MAX_DIFF_RATIO",
+      referenceCrop: {
+        height: 774,
+        left: 0,
+        top: 0,
+        width: 768,
+      },
+      referencePath: currentBasicThreadReference,
+      referenceSize: currentBasicThreadReferenceSize,
+      sceneId: scene.id,
+    });
   }
 
   if (scene.id === "workspace-ready" && currentBuildWorkspaceReference) {

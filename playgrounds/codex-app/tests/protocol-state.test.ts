@@ -19,6 +19,34 @@ import {
 import { replayScenarios } from "../src/replay";
 
 describe("protocol lifecycle reducer", () => {
+  it("replays the current fixed basic turn to a clean completion", () => {
+    const scenario = replayScenarios["current-basic-message"];
+    const completed = reduceProtocolTrace(scenario.events);
+
+    expect(scenario.frames).toEqual({
+      "current-basic-completed": 5,
+    });
+    expect(completed.status).toBe("completed");
+    expect(
+      completed.messages.map(({ id, status, text }) => ({
+        id,
+        status,
+        text,
+      })),
+    ).toEqual([
+      {
+        id: "user-current-basic",
+        status: "completed",
+        text: "Reply with exactly CURRENT BASIC MESSAGE.",
+      },
+      {
+        id: "assistant-current-basic",
+        status: "completed",
+        text: "CURRENT BASIC MESSAGE.",
+      },
+    ]);
+  });
+
   it("settles an approved command replay with completed work and a final response", () => {
     const scenario = replayScenarios["approval-denied"];
     const completed = reduceProtocolTrace(scenario.events);

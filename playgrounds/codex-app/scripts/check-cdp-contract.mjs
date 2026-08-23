@@ -32,6 +32,7 @@ const currentReplayComposerScenarios = new Set([
   "command-failure-recovery",
   "compaction",
   "context-summary",
+  "current-basic-message",
   "current-mixed-tool-thread",
   "current-review-files",
   "current-review-rename",
@@ -2085,6 +2086,256 @@ for (const scene of selectedScenes) {
         `${JSON.stringify(transport, null, 2)}\n`,
       );
     }
+    if (scene.id === "current-basic-thread") {
+      const basicThread = await page.evaluate(() => {
+        const rect = (element) => {
+          if (!(element instanceof Element)) return null;
+          const value = element.getBoundingClientRect();
+          return {
+            bottom: value.bottom,
+            height: value.height,
+            left: value.left,
+            right: value.right,
+            top: value.top,
+            width: value.width,
+          };
+        };
+        const style = (element) => {
+          if (!(element instanceof Element)) return null;
+          const value = getComputedStyle(element);
+          return {
+            backgroundColor: value.backgroundColor,
+            borderRadius: value.borderRadius,
+            fontFamily: value.fontFamily,
+            fontSize: value.fontSize,
+            fontWeight: value.fontWeight,
+            lineHeight: value.lineHeight,
+            maxWidth: value.maxWidth,
+            padding: value.padding,
+          };
+        };
+        const root = document.querySelector(".demo-root");
+        const sidebar = document.querySelector(
+          ".codex-ui-app-shell__sidebar",
+        );
+        const main = document.querySelector(".codex-ui-app-shell__main");
+        const thread = document.querySelector(
+          ".codex-ui-conversation-thread-shell__thread",
+        );
+        const user = document.querySelector(
+          '[data-item-id="user-current-basic"]',
+        );
+        const userContent = user?.querySelector(
+          ".codex-ui-agent-message__content",
+        );
+        const assistant = document.querySelector(
+          '[data-item-id="assistant-current-basic"]',
+        );
+        const assistantContent = assistant?.querySelector(
+          ".codex-ui-agent-message__content",
+        );
+        const actions = assistant?.querySelector(
+          ".codex-ui-agent-message__actions",
+        );
+        const actionStrip = actions?.querySelector(
+          ".demo-mcp-turn-actions",
+        );
+        const composer = document.querySelector(".codex-ui-composer");
+        return {
+          actions: rect(actions),
+          actionStrip: rect(actionStrip),
+          actionButtons: Array.from(
+            actions?.querySelectorAll("button") ?? [],
+            (button) => ({
+              icon: button
+                .querySelector("[data-current-build-icon]")
+                ?.getAttribute("data-current-build-icon"),
+              label: button.getAttribute("aria-label"),
+              rect: rect(button),
+            }),
+          ),
+          assistant: rect(assistant),
+          assistantContent: rect(assistantContent),
+          assistantStyle: style(assistantContent),
+          assistantText: assistantContent?.textContent?.trim(),
+          composer: rect(composer),
+          composerButtons: Array.from(
+            composer?.querySelectorAll("button") ?? [],
+            (button) => ({
+              icon: button
+                .querySelector("[data-current-build-icon]")
+                ?.getAttribute("data-current-build-icon"),
+              label: button.getAttribute("aria-label"),
+              rect: rect(button),
+              text: button.textContent?.replace(/\s+/g, " ").trim(),
+            }),
+          ),
+          composerModel: rect(
+            composer?.querySelector(".demo-current-composer-model"),
+          ),
+          composerText: composer?.textContent
+            ?.replace(/\u200b/g, "")
+            .replace(/\s+/g, " ")
+            .trim(),
+          frame: root?.getAttribute("data-frame"),
+          horizontalOverflow:
+            document.documentElement.scrollWidth -
+            document.documentElement.clientWidth,
+          main: rect(main),
+          scenario: root?.getAttribute("data-scenario"),
+          sidebar: rect(sidebar),
+          sidebarCurrent: root?.getAttribute("data-sidebar-current"),
+          status: root?.getAttribute("data-status"),
+          thread: rect(thread),
+          user: rect(user),
+          userContent: rect(userContent),
+          userStyle: style(userContent),
+          userText: userContent?.textContent?.trim(),
+          viewport: { height: innerHeight, width: innerWidth },
+        };
+      });
+      const expectedActionLabels = [
+        "Copy",
+        "Good response",
+        "Bad response",
+        "Fork chat from here",
+      ];
+      const expectedActionIcons = [
+        "thread-assistant-copy",
+        "thread-assistant-good",
+        "thread-assistant-bad",
+        "thread-assistant-fork",
+      ];
+      const expectedComposerButtons = [
+        {
+          height: 28,
+          icon: "composer-add-files",
+          label: "Add files and more",
+          left: 367,
+          top: 768,
+          width: 28,
+        },
+        {
+          height: 28,
+          icon: "composer-permission",
+          label: "Change permissions",
+          left: 400,
+          top: 768,
+          width: 101.0625,
+        },
+        {
+          height: 28,
+          icon: "composer-model-chevron",
+          label: null,
+          left: 875.59375,
+          top: 768,
+          width: 147.359375,
+        },
+        {
+          height: 28,
+          icon: "composer-dictate",
+          label: "Dictate",
+          left: 1023,
+          top: 768,
+          width: 28,
+        },
+        {
+          height: 28,
+          icon: undefined,
+          label: "Send",
+          left: 1059,
+          top: 768,
+          width: 28,
+        },
+      ];
+      if (
+        basicThread.frame !== "current-basic-completed" ||
+        basicThread.scenario !== "current-basic-message" ||
+        basicThread.status !== "completed" ||
+        basicThread.sidebarCurrent !== "true" ||
+        basicThread.viewport.width !== 1180 ||
+        basicThread.viewport.height !== 820 ||
+        basicThread.horizontalOverflow > 1 ||
+        basicThread.sidebar?.width !== 274 ||
+        basicThread.main?.left !== 274 ||
+        basicThread.main?.width !== 906 ||
+        basicThread.thread?.left !== 343 ||
+        basicThread.thread?.top !== 46 ||
+        basicThread.thread?.width !== 768 ||
+        basicThread.user?.left !== 359 ||
+        basicThread.user?.top !== 79 ||
+        basicThread.user?.width !== 736 ||
+        basicThread.userContent?.height !== 38 ||
+        Math.abs((basicThread.userContent?.width ?? 0) - 329.359375) >
+          0.01 ||
+        basicThread.userStyle?.borderRadius !== "20px" ||
+        basicThread.userStyle?.fontSize !== "14px" ||
+        basicThread.userStyle?.fontWeight !== "445" ||
+        basicThread.userStyle?.lineHeight !== "22px" ||
+        basicThread.userStyle?.maxWidth !== "77%" ||
+        basicThread.userStyle?.padding !== "8px 12px" ||
+        basicThread.assistantContent?.left !== 359 ||
+        basicThread.assistantContent?.top !== 163 ||
+        basicThread.assistantContent?.width !== 736 ||
+        basicThread.assistantContent?.height !== 22 ||
+        basicThread.assistantStyle?.fontSize !== "14px" ||
+        basicThread.assistantStyle?.fontWeight !== "445" ||
+        basicThread.assistantStyle?.lineHeight !== "22px" ||
+        basicThread.actions?.left !== 359 ||
+        basicThread.actions?.top !== 188 ||
+        basicThread.actions?.width !== 106 ||
+        basicThread.actions?.height !== 26 ||
+        basicThread.actionStrip?.left !== 355 ||
+        basicThread.actionStrip?.top !== 188 ||
+        basicThread.actionStrip?.width !== 110 ||
+        basicThread.actionStrip?.height !== 26 ||
+        basicThread.actionButtons.some(
+          ({ rect }, index) =>
+            rect?.left !== 355 + index * 28 ||
+            rect?.top !== 188 ||
+            rect?.width !== 26 ||
+            rect?.height !== 26,
+        ) ||
+        basicThread.composer?.left !== 359 ||
+        basicThread.composer?.top !== 706 ||
+        basicThread.composer?.width !== 736 ||
+        basicThread.composer?.height !== 98 ||
+        basicThread.userText !==
+          "Reply with exactly CURRENT BASIC MESSAGE." ||
+        basicThread.assistantText !== "CURRENT BASIC MESSAGE." ||
+        JSON.stringify(
+          basicThread.actionButtons.map(({ label }) => label),
+        ) !== JSON.stringify(expectedActionLabels) ||
+        JSON.stringify(
+          basicThread.actionButtons.map(({ icon }) => icon),
+        ) !== JSON.stringify(expectedActionIcons) ||
+        basicThread.composerText !== "Full access5.6 Sol Extra High" ||
+        basicThread.composerButtons.length !==
+          expectedComposerButtons.length ||
+        basicThread.composerButtons.some((button, index) => {
+          const expected = expectedComposerButtons[index];
+          return (
+            button.icon !== expected.icon ||
+            button.label !== expected.label ||
+            Math.abs((button.rect?.left ?? Infinity) - expected.left) >
+              0.1 ||
+            Math.abs((button.rect?.top ?? Infinity) - expected.top) > 0.1 ||
+            Math.abs((button.rect?.width ?? Infinity) - expected.width) >
+              0.1 ||
+            Math.abs((button.rect?.height ?? Infinity) - expected.height) >
+              0.1
+          );
+        })
+      ) {
+        throw new Error(
+          `Current basic thread contract failed: ${JSON.stringify(basicThread)}`,
+        );
+      }
+      await writeFile(
+        join(artifactDirectory, `${scene.id}-message.json`),
+        `${JSON.stringify(basicThread, null, 2)}\n`,
+      );
+    }
     if (
       currentReplayComposerScenarios.has(scene.scenario) ||
       currentApprovalComposerScenes.has(scene.id)
@@ -2108,7 +2359,9 @@ for (const scene of selectedScenes) {
         { height: 16, name: "composer-add-files", width: 16 },
         {
           height: 16,
-          name: scene.scenario.startsWith("mcp-")
+          name:
+            scene.scenario.startsWith("mcp-") ||
+            scene.scenario === "current-basic-message"
             ? "composer-permission"
             : "composer-permission-ask",
           width: 16,
