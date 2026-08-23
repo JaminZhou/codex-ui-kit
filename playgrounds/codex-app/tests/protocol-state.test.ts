@@ -269,6 +269,26 @@ describe("protocol lifecycle reducer", () => {
     );
   });
 
+  it("replays the current 26.818 Markdown sample exactly", () => {
+    const scenario = replayScenarios["markdown-current-26-818"];
+    const state = reduceProtocolTrace(scenario.events);
+    const assistant = state.messages.find(
+      ({ id }) => id === "assistant-markdown",
+    );
+
+    expect(scenario.frames).toEqual({
+      "markdown-current-26-818-complete": scenario.events.length,
+      "markdown-current-26-818-started": 3,
+    });
+    expect(state.status).toBe("completed");
+    expect(assistant).toMatchObject({
+      status: "completed",
+      text: expect.stringContaining("| Markdown | Ready |"),
+    });
+    expect(assistant?.text).toContain("a public link.");
+    expect(assistant?.text).not.toContain("https://example.com");
+  });
+
   it("preserves streaming Markdown mutations before a large completion", () => {
     const scenario = replayScenarios["markdown-streaming-large"];
     const linkState = reduceProtocolTrace(

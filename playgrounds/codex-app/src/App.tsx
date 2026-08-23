@@ -2546,6 +2546,8 @@ export function App() {
     mode === "replay" && scenarioId === "streaming-recovery";
   const isCurrentBasicMessageReplay =
     mode === "replay" && scenarioId === "current-basic-message";
+  const isCurrentMarkdown26818Replay =
+    mode === "replay" && scenarioId === "markdown-current-26-818";
   const isCurrentMixedToolReplay =
     mode === "replay" && scenarioId === "current-mixed-tool-thread";
   const isCurrentReviewFilesReplay =
@@ -4533,6 +4535,7 @@ export function App() {
       scenarioId === "compaction" ||
       scenarioId === "context-summary" ||
       isCurrentBasicMessageReplay ||
+      isCurrentMarkdown26818Replay ||
       isCurrentTransportRecoveryReplay ||
       isCurrentSubagentReplay ||
       scenarioId === "current-review-rename" ||
@@ -4806,6 +4809,7 @@ export function App() {
       scenarioId === "current-review-files" ||
       scenarioId === "mixed-file-review" ||
       scenarioId === "markdown" ||
+      isCurrentMarkdown26818Replay ||
       isCurrentMcpReplay ||
       scenarioId === "mcp-tool-call" ||
       scenarioId === "mcp-recovery-mixed-thread" ||
@@ -8188,6 +8192,8 @@ export function App() {
               mode === "replay" &&
               ((scenarioId === "markdown" &&
                 message.id === "assistant-markdown") ||
+                (isCurrentMarkdown26818Replay &&
+                  message.id === "assistant-markdown") ||
                 (scenarioId === "markdown-table-actions" &&
                   message.id === "assistant-markdown-table-actions") ||
                 (scenarioId === "markdown-streaming-large" &&
@@ -8246,13 +8252,18 @@ export function App() {
                 scenarioId === "approval-similar-commands" ||
                 scenarioId === "long-command-output" ||
                 isCurrentBasicMessageReplay ||
+                isCurrentMarkdown26818Replay ||
                 isCurrentSubagentReplay ? (
                   <McpResponseActions
                     copyLabel={
-                      isCurrentBasicMessageReplay ? "Copy" : undefined
+                      isCurrentBasicMessageReplay ||
+                      isCurrentMarkdown26818Replay
+                        ? "Copy"
+                        : undefined
                     }
                     label={
-                      isCurrentBasicMessageReplay
+                      isCurrentBasicMessageReplay ||
+                      isCurrentMarkdown26818Replay
                         ? null
                         : message.id === "assistant-workflow" ||
                       message.id === "assistant-approval-denied" ||
@@ -8263,7 +8274,10 @@ export function App() {
                         ? "Response actions"
                         : undefined
                     }
-                    toolbar={!isCurrentBasicMessageReplay}
+                    toolbar={
+                      !isCurrentBasicMessageReplay &&
+                      !isCurrentMarkdown26818Replay
+                    }
                   />
                 ) : (
                   <span
@@ -8347,6 +8361,7 @@ export function App() {
               ) : (
                 <AgentMarkdown
                   allowWideTables={scenarioId === "markdown-table-actions"}
+                  codeBlockWrapToggleable={isCurrentMarkdown26818Replay}
                   linkTarget="_blank"
                   streaming={message.status === "running"}
                 >

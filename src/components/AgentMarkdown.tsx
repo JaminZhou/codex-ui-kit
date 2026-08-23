@@ -198,7 +198,9 @@ export interface CodeBlockProps
   language?: string;
   label?: ReactNode;
   onCopy?: CodeCopyHandler;
+  onWrapChange?: (wrap: boolean) => void;
   wrap?: boolean;
+  wrapToggleable?: boolean;
 }
 
 function CodeCopyIcon({ copied = false }: { copied?: boolean }) {
@@ -218,6 +220,18 @@ function CodeCopyIcon({ copied = false }: { copied?: boolean }) {
     >
       <rect height="8.5" rx="1.5" width="8.5" x="5" y="2.5" />
       <path d="M10.5 11v1A1.5 1.5 0 0 1 9 13.5H4A1.5 1.5 0 0 1 2.5 12V7A1.5 1.5 0 0 1 4 5.5h1" />
+    </svg>
+  );
+}
+
+function CodeWrapIcon() {
+  return (
+    <svg
+      aria-hidden="true"
+      className="codex-ui-code-block__wrap-icon"
+      viewBox="0 0 20 20"
+    >
+      <path d="M14.375 9.502a3.165 3.165 0 0 1 0 6.33h-2.77l.949.948a.666.666 0 0 1-.942.94L9.53 15.639a.667.667 0 0 1 0-.942l2.083-2.083a.666.666 0 0 1 .942.94l-.949.949h2.77a1.836 1.836 0 0 0 0-3.67H3.333a.666.666 0 0 1 0-1.33h11.042Zm-7.709 5a.665.665 0 1 1 0 1.33H3.333a.666.666 0 0 1 0-1.33h3.333Zm10-10a.665.665 0 1 1 0 1.33H3.333a.666.666 0 0 1 0-1.33h13.333Z" />
     </svg>
   );
 }
@@ -433,10 +447,13 @@ export function CodeBlock({
   language,
   label,
   onCopy,
+  onWrapChange,
   wrap = false,
+  wrapToggleable = false,
   ...props
 }: CodeBlockProps) {
   const [copied, setCopied] = useState(false);
+  const [wrapped, setWrapped] = useState(wrap);
   const [canHighlight, setCanHighlight] = useState(
     !deferHighlightUntilVisible,
   );
@@ -461,6 +478,7 @@ export function CodeBlock({
     : typeof copyLabel === "string"
       ? copyLabel
       : "Copy code";
+  const resolvedWrap = wrapToggleable ? wrapped : wrap;
   const highlightRequest = useRef({
     disposed: false,
     lastStartedAtMs: null as number | null,
@@ -596,6 +614,10 @@ export function CodeBlock({
     [],
   );
 
+  useEffect(() => {
+    setWrapped(wrap);
+  }, [wrap]);
+
   const handleCopy = async () => {
     try {
       if (onCopy) {
@@ -615,6 +637,12 @@ export function CodeBlock({
     resetTimer.current = setTimeout(() => setCopied(false), 2_000);
   };
 
+  const handleWrapChange = () => {
+    const next = !resolvedWrap;
+    setWrapped(next);
+    onWrapChange?.(next);
+  };
+
   return (
     <figure
       ref={containerRef}
@@ -622,21 +650,38 @@ export function CodeBlock({
       data-language={language}
       data-markdown-copy="code-block"
       data-markdown-copy-text={normalizedCode}
-      data-wrap={wrap || undefined}
+      data-wrap={resolvedWrap || undefined}
       {...props}
     >
       <figcaption className="codex-ui-code-block__header">
         <span className="codex-ui-code-block__language">{resolvedLabel}</span>
-        {copyable ? (
-          <button
-            aria-label={accessibleCopyLabel}
-            className="codex-ui-code-block__copy"
-            data-copied={copied || undefined}
-            onClick={() => void handleCopy()}
-            type="button"
-          >
-            {copied ? copiedLabel : copyLabel}
-          </button>
+        {copyable || wrapToggleable ? (
+          <span className="codex-ui-code-block__actions">
+            {wrapToggleable ? (
+              <button
+                aria-label={
+                  resolvedWrap ? "Disable word wrap" : "Enable word wrap"
+                }
+                aria-pressed={resolvedWrap}
+                className="codex-ui-code-block__wrap"
+                onClick={handleWrapChange}
+                type="button"
+              >
+                <CodeWrapIcon />
+              </button>
+            ) : null}
+            {copyable ? (
+              <button
+                aria-label={accessibleCopyLabel}
+                className="codex-ui-code-block__copy"
+                data-copied={copied || undefined}
+                onClick={() => void handleCopy()}
+                type="button"
+              >
+                {copied ? copiedLabel : copyLabel}
+              </button>
+            ) : null}
+          </span>
         ) : null}
       </figcaption>
       <pre className="codex-ui-code-block__body" dir="ltr" tabIndex={0}>
@@ -732,6 +777,7 @@ export interface AgentMarkdownProps
   codeHighlighter?: CodeHighlighter | false;
   codeBlockCopyable?: boolean;
   codeBlockWrap?: boolean;
+  codeBlockWrapToggleable?: boolean;
   components?: Components;
   linkTarget?: "_blank" | "_parent" | "_self" | "_top";
   onCopyCode?: CodeCopyHandler;
@@ -747,6 +793,7 @@ export function AgentMarkdown({
   codeHighlighter,
   codeBlockCopyable = true,
   codeBlockWrap = false,
+  codeBlockWrapToggleable = false,
   components,
   linkTarget,
   onCopyCode,
@@ -810,6 +857,7 @@ export function AgentMarkdown({
                 language={language}
                 onCopy={handleCodeCopy}
                 wrap={codeBlockWrap}
+                wrapToggleable={codeBlockWrapToggleable}
               >
                 {value}
               </CodeBlock>
@@ -882,6 +930,7 @@ export function AgentMarkdown({
       allowWideTables,
       codeBlockCopyable,
       codeBlockWrap,
+      codeBlockWrapToggleable,
       codeHighlighter,
       components,
       hasCodeCopyHandler,

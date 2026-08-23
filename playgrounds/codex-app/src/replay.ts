@@ -18,6 +18,7 @@ import largeFileReviewTrace from "../fixtures/traces/large-file-review.jsonl?raw
 import longCommandOutputTrace from "../fixtures/traces/long-command-output.jsonl?raw";
 import markdownTableActionsTrace from "../fixtures/traces/markdown-table-actions.jsonl?raw";
 import markdownStreamingLargeTrace from "../fixtures/traces/markdown-streaming-large.jsonl?raw";
+import markdownCurrent26818Trace from "../fixtures/traces/markdown-current-26-818.jsonl?raw";
 import markdownTrace from "../fixtures/traces/markdown.jsonl?raw";
 import mcpCurrentIntegrationRecoveryTrace from "../fixtures/traces/mcp-current-integration-recovery.jsonl?raw";
 import mcpCurrent26818RecoveryTrace from "../fixtures/traces/mcp-current-26-818-recovery.jsonl?raw";
@@ -63,6 +64,7 @@ export type ReplayScenarioId =
   | "large-file-review"
   | "long-command-output"
   | "markdown"
+  | "markdown-current-26-818"
   | "markdown-table-actions"
   | "markdown-streaming-large"
   | "mcp-current-integration-recovery"
@@ -278,6 +280,12 @@ export const replayScenarios: Record<ReplayScenarioId, ReplayScenario> = {
     "Markdown response",
     "Heading, inline semantics, quote, list, table, code, and response actions.",
     markdownTrace,
+  ),
+  "markdown-current-26-818": scenario(
+    "markdown-current-26-818",
+    "Current 26.818 Markdown response",
+    "The runtime-observed 26.818 heading, inline semantics, quote, list, full-width narrow table, code block, and source-owned external URL text.",
+    markdownCurrent26818Trace,
   ),
   "markdown-table-actions": scenario(
     "markdown-table-actions",

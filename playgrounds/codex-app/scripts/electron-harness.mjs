@@ -568,6 +568,22 @@ export const visualScenes = [
     scenario: "markdown",
   },
   {
+    currentSidebar: true,
+    frame: "markdown-current-26-818-complete",
+    id: "markdown-current-26-818",
+    maxPixelRatio: 0.01,
+    scenario: "markdown-current-26-818",
+  },
+  {
+    currentSidebar: true,
+    frame: "markdown-current-26-818-complete",
+    id: "markdown-current-26-818-compact",
+    maxPixelRatio: 0.01,
+    scenario: "markdown-current-26-818",
+    sidebarState: "hidden",
+    windowSize: { height: 680, width: 720 },
+  },
+  {
     frame: "markdown-table-complete",
     id: "markdown-table-actions-hover",
     markdownTableState: "hover",

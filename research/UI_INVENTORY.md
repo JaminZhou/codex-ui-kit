@@ -88,12 +88,21 @@ observation from a previous build remains historical evidence.
   and the 720×680 recovery card. Browser/CDP and Electron repeat those states.
   Unmasked current-product regions pass at 2.1854% for success, 1.1649% for
   compact recovery, and 2.5926% for Sources under independent hard limits.
+- A fresh no-tool Markdown task reaches heading, strong text, inline code,
+  blockquote, list, a narrow two-column table, and a TypeScript code block at
+  1180×820 and 720×680. In this sampled source-annotated response, the external
+  URL is owned by Sources and the visible `public link` text is not an inline
+  anchor. Browser/CDP and Electron lock the 736/688×358 roots, full-width
+  tables, 73px code block with interactive word-wrap and Copy controls, four
+  exact response actions, system typography, and zero horizontal overflow.
+  Unmasked wide and compact Markdown-root comparisons pass at 1.1682% and
+  1.1932% under independent 1.3% hard limits.
 - The broader `26.810.52044` Review, Settings, worktree, account,
   Recents, and exact-asset results remain previous-build regression evidence.
   They are not relabeled as current merely because the shell capture passes.
 
-Current inventory: 89 surface groups; 20 have current-build runtime evidence, 53 have previous-build-only runtime evidence, 16 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 17 groups and Electron verification covers 17.
-Prior acceptance outside those 17 sampled current-build groups remains
+Current inventory: 89 surface groups; 21 have current-build runtime evidence, 52 have previous-build-only runtime evidence, 16 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 18 groups and Electron verification covers 18.
+Prior acceptance outside those 18 sampled current-build groups remains
 recorded as `partial_legacy` until current-build re-observation.
 
 The current package exposes candidates far beyond the old transcript sample:

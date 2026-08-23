@@ -5376,8 +5376,20 @@ for (const scene of selectedScenes) {
       const markdown = markdownRoot
         ? {
             actionCount: document.querySelectorAll(
-              '[aria-label="Markdown response actions"] button',
+              '[data-item-id="assistant-markdown"] .demo-turn-actions button',
             ).length,
+            actions: Array.from(
+              document.querySelectorAll(
+                '[data-item-id="assistant-markdown"] .demo-turn-actions button',
+              ),
+              (button) => ({
+                icon: button
+                  .querySelector("[data-current-build-icon]")
+                  ?.getAttribute("data-current-build-icon"),
+                label: button.getAttribute("aria-label"),
+                rect: rect(button),
+              }),
+            ),
             blockquote: markdownStyle(
               markdownRoot.querySelector("blockquote"),
             ),
@@ -5385,6 +5397,16 @@ for (const scene of selectedScenes) {
               markdownRoot.querySelector(
                 ".codex-ui-code-block__body code",
               ),
+            ),
+            codeActions: Array.from(
+              markdownRoot.querySelectorAll(
+                ".codex-ui-code-block__header button",
+              ),
+              (button) => ({
+                label: button.getAttribute("aria-label"),
+                pressed: button.getAttribute("aria-pressed"),
+                rect: rect(button),
+              }),
             ),
             codeBlock: markdownStyle(
               markdownRoot.querySelector(".codex-ui-code-block"),
@@ -8830,6 +8852,123 @@ for (const scene of selectedScenes) {
       ) {
         throw new Error(
           `${scene.id}: current-build Markdown contract failed: ${JSON.stringify(markdown)}`,
+        );
+      }
+    }
+
+    if (
+      scene.id === "markdown-current-26-818" ||
+      scene.id === "markdown-current-26-818-compact"
+    ) {
+      const markdown = contract.markdown;
+      const compact = scene.id.endsWith("-compact");
+      const expectedWidth = compact ? 688 : 736;
+      const expectedActionLabels = [
+        "Copy",
+        "Good response",
+        "Bad response",
+        "Fork chat from here",
+      ];
+      const expectedActionIcons = [
+        "thread-assistant-copy",
+        "thread-assistant-good",
+        "thread-assistant-bad",
+        "thread-assistant-fork",
+      ];
+      if (
+        !markdown ||
+        markdown.semantics.headings !== 1 ||
+        markdown.semantics.paragraphs !== 2 ||
+        markdown.semantics.blockquotes !== 1 ||
+        markdown.semantics.lists !== 1 ||
+        markdown.semantics.tables !== 1 ||
+        markdown.semantics.codeBlocks !== 1 ||
+        markdown.actionCount !== 4 ||
+        markdown.actions.some(
+          (action, index) =>
+            action.label !== expectedActionLabels[index] ||
+            action.icon !== expectedActionIcons[index] ||
+            Math.abs(action.rect.width - 26) > 0.5 ||
+            Math.abs(action.rect.height - 26) > 0.5 ||
+            Math.abs(
+              action.rect.left - (markdown.root.rect.left - 4 + index * 28),
+            ) > 1 ||
+            Math.abs(action.rect.top - (markdown.root.rect.bottom + 3)) > 1,
+        ) ||
+        markdown.copyLabel !== "Copy code" ||
+        markdown.codeActions.length !== 2 ||
+        markdown.codeActions[0].label !== "Enable word wrap" ||
+        markdown.codeActions[0].pressed !== "false" ||
+        Math.abs(markdown.codeActions[0].rect.width - 24) > 0.5 ||
+        Math.abs(markdown.codeActions[0].rect.height - 24) > 0.5 ||
+        markdown.codeActions[1].label !== "Copy code" ||
+        Math.abs(markdown.codeActions[1].rect.width - 26) > 0.5 ||
+        Math.abs(markdown.codeActions[1].rect.height - 26) > 0.5 ||
+        markdown.linkTarget !== undefined ||
+        Math.abs(markdown.root.rect.width - expectedWidth) > 1 ||
+        Math.abs(markdown.root.rect.height - 358) > 1 ||
+        markdown.root.color !== "rgb(223, 223, 223)" ||
+        markdown.root.fontFamily !==
+          '-apple-system, "system-ui", "Segoe UI", sans-serif' ||
+        Math.abs(markdown.heading.rect.top - markdown.root.rect.top) > 1 ||
+        markdown.heading.fontSize !== "24px" ||
+        markdown.heading.fontWeight !== "600" ||
+        markdown.heading.lineHeight !== "30px" ||
+        markdown.paragraph.fontSize !== "14px" ||
+        markdown.paragraph.fontWeight !== "445" ||
+        markdown.paragraph.lineHeight !== "22px" ||
+        markdown.paragraph.marginBlockEnd !== "11px" ||
+        markdown.blockquote.lineHeight !== "24px" ||
+        markdown.blockquote.padding !== "8px 0px 8px 24px" ||
+        markdown.unorderedList.padding !== "0px 0px 0px 21px" ||
+        Math.abs(markdown.unorderedList.rect.height - 52) > 1 ||
+        Math.abs(markdown.table.rect.width - expectedWidth) > 1 ||
+        Math.abs(markdown.table.rect.height - 89) > 1 ||
+        Math.abs(markdown.table.rect.left - markdown.root.rect.left) > 1 ||
+        Math.abs(markdown.tableScroll.rect.width - expectedWidth) > 1 ||
+        Math.abs(markdown.tableScroll.rect.left - markdown.root.rect.left) > 1 ||
+        markdown.inlineCode.fontSize !== "12.88px" ||
+        markdown.inlineCode.lineHeight !== "22px" ||
+        markdown.inlineCode.padding !== "1px 6px" ||
+        markdown.inlineCode.borderRadius !== "6px" ||
+        markdown.codeBlock.backgroundColor !== "rgba(255, 255, 255, 0.05)" ||
+        markdown.codeBlock.borderRadius !== "12.5px" ||
+        Math.abs(markdown.codeBlock.rect.width - expectedWidth) > 1 ||
+        Math.abs(markdown.codeBlock.rect.height - 73) > 1 ||
+        Math.abs(markdown.codeBlock.rect.bottom - markdown.root.rect.bottom) > 1 ||
+        contract.horizontalOverflow !== 0 ||
+        Math.abs(
+          contract.viewportScroll.scrollHeight -
+            contract.viewportScroll.clientHeight -
+            contract.viewportScroll.scrollTop,
+        ) > 1
+      ) {
+        throw new Error(
+          `${scene.id}: current 26.818 Markdown contract failed: ${JSON.stringify(markdown)}`,
+        );
+      }
+      const wrapToggle = page.getByRole("button", {
+        name: "Enable word wrap",
+      });
+      await wrapToggle.click();
+      const wrapped = await page.evaluate(() => {
+        const block = document.querySelector(
+          '[data-item-id="assistant-markdown"] .codex-ui-code-block',
+        );
+        const toggle = block?.querySelector(".codex-ui-code-block__wrap");
+        return {
+          label: toggle?.getAttribute("aria-label"),
+          pressed: toggle?.getAttribute("aria-pressed"),
+          wrapped: block?.getAttribute("data-wrap"),
+        };
+      });
+      if (
+        wrapped.label !== "Disable word wrap" ||
+        wrapped.pressed !== "true" ||
+        wrapped.wrapped !== "true"
+      ) {
+        throw new Error(
+          `${scene.id}: current 26.818 Markdown wrap toggle failed: ${JSON.stringify(wrapped)}`,
         );
       }
     }

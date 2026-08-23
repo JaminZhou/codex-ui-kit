@@ -534,6 +534,28 @@ describe("CodeBlock", () => {
     expect(html).not.toContain("Copy code");
   });
 
+  it("toggles code wrapping while preserving the copy action", () => {
+    const onWrapChange = vi.fn();
+    const { container } = render(
+      <CodeBlock onWrapChange={onWrapChange} wrapToggleable>
+        a long line
+      </CodeBlock>,
+    );
+    const block = container.querySelector(".codex-ui-code-block");
+    const toggle = screen.getByRole("button", { name: "Enable word wrap" });
+
+    expect(toggle.getAttribute("aria-pressed")).toBe("false");
+    expect(screen.getByRole("button", { name: "Copy code" })).toBeTruthy();
+    fireEvent.click(toggle);
+    expect(block?.getAttribute("data-wrap")).toBe("true");
+    expect(onWrapChange).toHaveBeenCalledWith(true);
+    fireEvent.click(
+      screen.getByRole("button", { name: "Disable word wrap" }),
+    );
+    expect(block?.hasAttribute("data-wrap")).toBe(false);
+    expect(onWrapChange).toHaveBeenLastCalledWith(false);
+  });
+
   it("keeps copy feedback idle when a host clipboard bridge rejects", async () => {
     render(
       <CodeBlock onCopy={async () => Promise.reject(new Error("denied"))}>

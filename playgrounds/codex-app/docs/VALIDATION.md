@@ -75,7 +75,7 @@ Every deterministic scenario has one ID and produces four evidence layers:
    output lines, then collapses and reopens the card to prove reverse-tail
    restoration.
 4. **Pixels** — full-frame regression screenshots after the structural gates
-   pass. The 192 reviewed frames include four current Terminal recovery and
+   pass. The 214 reviewed frames include four current Terminal recovery and
    background-process regressions. Those four are independent replay baselines,
    not current-product screenshots: real CDP separately establishes child
    `exit 7`, ordinary shell close, and background side-panel opening, while
@@ -91,7 +91,12 @@ Every deterministic scenario has one ID and produces four evidence layers:
    906×820 reference through `CODEX_UI_KIT_TERMINAL_REFERENCE` and gates the
    current `terminal-current-single` panel and content regions separately; the completed-Markdown
    scenario accepts `CODEX_UI_KIT_MARKDOWN_REFERENCE` and gates assistant,
-   fenced-code, and Composer regions separately; the successful-MCP scenario
+   fenced-code, and Composer regions separately. The current 26.818 scene
+   accepts untracked wide and compact Markdown-root crops through
+   `CODEX_UI_KIT_CURRENT_MARKDOWN_26_818_REFERENCE` and
+   `CODEX_UI_KIT_CURRENT_MARKDOWN_26_818_COMPACT_REFERENCE`; those compare the
+   full owned 736/688×358 roots without masks under separate 1.3% limits. The
+   successful-MCP scenario
    accepts `CODEX_UI_KIT_MCP_TOOL_CALL_REFERENCE` and gates full-main,
    tool-call, answer, and Composer regions separately; the current sidebar
    accepts a full 1180×820 external reference through
