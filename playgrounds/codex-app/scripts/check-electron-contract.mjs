@@ -7,6 +7,13 @@ import { promisify } from "node:util";
 
 const execFileAsync = promisify(execFile);
 
+async function waitForBranchLabel(targetPage, label) {
+  await targetPage
+    .getByRole("button", { name: "Switch branch" })
+    .getByText(label, { exact: true })
+    .waitFor();
+}
+
 const scene = {
   frame: "markdown-complete",
   id: "electron",
@@ -1168,7 +1175,7 @@ try {
   await themeProjectDialog.waitFor({ state: "hidden" });
 
   await themePage
-    .getByRole("button", { name: "Change run location: Local" })
+    .getByRole("button", { name: "Select where to run the chat" })
     .click();
   const themeEnvironmentMenu = themePage.getByRole("menu", {
     name: "Work in",
@@ -1196,15 +1203,15 @@ try {
     );
   }
   await themeEnvironmentMenu
-    .getByRole("menuitem", { name: "New worktree" })
+    .getByRole("menuitem", { name: "New local worktree" })
     .click();
   await themeEnvironmentMenu.waitFor({ state: "hidden" });
   await themePage
-    .getByRole("button", { name: "Change environment: No environment" })
+    .getByRole("button", { name: "Select a local environment" })
     .click();
   await themePage
     .getByRole("menu", { name: "Environment" })
-    .getByRole("menuitem", { name: "Environment settings" })
+    .getByRole("menuitem", { name: "Set up project" })
     .click();
   const lightEnvironmentSettings = themePage.getByRole("region", {
     name: "Environments",
@@ -1247,7 +1254,7 @@ try {
 
   await themePage
     .getByRole("button", {
-      name: "Change worktree: main",
+      name: "Switch branch",
     })
     .click();
   const themeWorktreeMenu = themePage.getByRole("menu", {
@@ -5693,10 +5700,10 @@ try {
   await codingWorkspacePage.waitForTimeout(50);
 
   await codingWorkspacePage.waitForSelector(
-    'button[aria-label="Change worktree: main"]:not([disabled])',
+    'button[aria-label="Switch branch"]:not([disabled])',
   );
   await codingWorkspacePage
-    .getByRole("button", { name: "Change worktree: main" })
+    .getByRole("button", { name: "Switch branch" })
     .click();
   await codingWorkspacePage
     .getByRole("menu", { name: "Branches" })
@@ -5713,7 +5720,7 @@ try {
   await reachableLocalEnvironmentDialog.waitFor({ state: "hidden" });
 
   await codingWorkspacePage
-    .getByRole("button", { name: "Change run location: Local" })
+    .getByRole("button", { name: "Select where to run the chat" })
     .press("ArrowDown");
   await codingWorkspacePage.waitForTimeout(50);
   const environmentMenu = codingWorkspacePage.getByRole("menu", {
@@ -5759,9 +5766,9 @@ try {
     JSON.stringify(environmentMenuContract.labels) !==
       JSON.stringify([
         "Local",
-        "New worktree",
+        "New local worktree",
         "Connect Codex web",
-        "Send to cloud",
+        "Cloud",
         "Usage remaining",
       ]) ||
     JSON.stringify(environmentMenuContract.roles) !==
@@ -5791,7 +5798,7 @@ try {
     );
   }
   await environmentMenu
-    .getByRole("menuitem", { name: "New worktree" })
+    .getByRole("menuitem", { name: "New local worktree" })
     .click();
   await codingWorkspacePage.waitForSelector(
     '.demo-root[data-frame="workspace-new-worktree"]',
@@ -5819,16 +5826,18 @@ try {
         "starting-state",
       ]) ||
     !newWorktreeState.contextLabels.includes(
-      "Change environment: No environment",
+      "Select a local environment",
     ) ||
-    !newWorktreeState.contextLabels.includes("Starting state: main")
+    !newWorktreeState.contextLabels.includes(
+      "What branch should this chat start from?",
+    )
   ) {
     throw new Error(
-      `Electron coding workspace did not enter the current New worktree state: ${JSON.stringify(newWorktreeState)}.`,
+      `Electron coding workspace did not enter the current New local worktree state: ${JSON.stringify(newWorktreeState)}.`,
     );
   }
   await codingWorkspacePage
-    .getByRole("button", { name: "Change environment: No environment" })
+    .getByRole("button", { name: "Select a local environment" })
     .click();
   const worktreeEnvironmentMenu = codingWorkspacePage.getByRole("menu", {
     name: "Environment",
@@ -5837,18 +5846,16 @@ try {
   if (
     (await codingWorkspacePage.evaluate(
       () => document.activeElement?.getAttribute("aria-label"),
-    )) !== "Change environment: No environment"
+    )) !== "Select a local environment"
   ) {
     throw new Error(
       "Electron coding workspace pointer-opened environment picker moved focus away from its trigger.",
     );
   }
   const worktreeEnvironmentState = {
-    empty: (
-      await worktreeEnvironmentMenu
-        .locator(".demo-workspace-context-menu__empty")
-        .textContent()
-    )?.trim(),
+    emptyCount: await worktreeEnvironmentMenu
+      .locator(".demo-workspace-context-menu__empty")
+      .count(),
     icons: await worktreeEnvironmentMenu
       .locator("[data-current-build-icon]")
       .evaluateAll((icons) =>
@@ -5859,11 +5866,11 @@ try {
       .allTextContents(),
   };
   if (
-    worktreeEnvironmentState.empty !== "No environments found" ||
+    worktreeEnvironmentState.emptyCount !== 0 ||
     JSON.stringify(worktreeEnvironmentState.items.map((item) => item.trim())) !==
       JSON.stringify([
         "Work without environment",
-        "Environment settings",
+        "Set up project",
       ]) ||
     JSON.stringify(worktreeEnvironmentState.icons) !==
       JSON.stringify([
@@ -5876,7 +5883,7 @@ try {
     );
   }
   await worktreeEnvironmentMenu
-    .getByRole("menuitem", { name: "Environment settings" })
+    .getByRole("menuitem", { name: "Set up project" })
     .click();
   const environmentsRoute = codingWorkspacePage.getByRole("region", {
     name: "Environments",
@@ -5965,7 +5972,7 @@ try {
     .getByRole("button", { name: "New chat", exact: true })
     .click();
   await codingWorkspacePage.waitForSelector(
-    'button[aria-label="Change run location: Local"]',
+    'button[aria-label="Select where to run the chat"]',
   );
   if ((await environmentsRoute.count()) !== 0) {
     throw new Error(
@@ -5973,28 +5980,28 @@ try {
     );
   }
   await codingWorkspacePage
-    .getByRole("button", { name: "Change run location: Local" })
+    .getByRole("button", { name: "Select where to run the chat" })
     .click();
   await environmentMenu.waitFor();
   await environmentMenu
-    .getByRole("menuitem", { name: "New worktree" })
+    .getByRole("menuitem", { name: "New local worktree" })
     .click();
   await codingWorkspacePage
-    .getByRole("button", { name: "Change environment: No environment" })
+    .getByRole("button", { name: "Select a local environment" })
     .click();
   await worktreeEnvironmentMenu.waitFor();
   await worktreeEnvironmentMenu
-    .getByRole("menuitem", { name: "Environment settings" })
+    .getByRole("menuitem", { name: "Set up project" })
     .click();
   await environmentsRoute.waitFor();
   await codingWorkspacePage
     .getByRole("button", { name: "Back to ChatGPT" })
     .click();
   await codingWorkspacePage.waitForSelector(
-    'button[aria-label="Change run location: New worktree"]',
+    'button[aria-label="Select where to run the chat"]',
   );
   await codingWorkspacePage
-    .getByRole("button", { name: "Change environment: No environment" })
+    .getByRole("button", { name: "Select a local environment" })
     .click();
   await worktreeEnvironmentMenu.waitFor();
   await codingWorkspacePage.keyboard.press("Tab");
@@ -6002,10 +6009,10 @@ try {
   await codingWorkspacePage.waitForFunction(
     () =>
       document.activeElement?.getAttribute("aria-label") ===
-      "Starting state: main",
+      "What branch should this chat start from?",
   );
   await codingWorkspacePage
-    .getByRole("button", { name: "Change environment: No environment" })
+    .getByRole("button", { name: "Select a local environment" })
     .press("ArrowDown");
   await worktreeEnvironmentMenu.waitFor();
   await codingWorkspacePage.waitForFunction(
@@ -6018,7 +6025,7 @@ try {
   await codingWorkspacePage.waitForFunction(
     () =>
       document.activeElement?.getAttribute("aria-label") ===
-      "Change environment: No environment",
+      "Select a local environment",
   );
   await codingWorkspacePage.keyboard.press("Enter");
   await worktreeEnvironmentMenu.waitFor();
@@ -6030,21 +6037,19 @@ try {
   await codingWorkspacePage.keyboard.press("Escape");
   await worktreeEnvironmentMenu.waitFor({ state: "hidden" });
   await codingWorkspacePage
-    .getByRole("button", { name: "Change run location: New worktree" })
+    .getByRole("button", { name: "Select where to run the chat" })
     .click();
   await environmentMenu
     .getByRole("menuitem", { name: "Local", exact: true })
     .click();
   await codingWorkspacePage.waitForSelector(
-    'button[aria-label="Change run location: Local"]',
+    'button[aria-label="Select where to run the chat"]',
   );
-  await codingWorkspacePage.waitForSelector(
-    'button[aria-label="Change worktree: main"]',
-  );
+  await waitForBranchLabel(codingWorkspacePage, "main");
 
   await codingWorkspacePage
     .getByRole("button", {
-      name: "Change worktree: main",
+      name: "Switch branch",
     })
     .click();
   await codingWorkspacePage.waitForTimeout(50);
@@ -6120,9 +6125,7 @@ try {
   await worktreeMenu
     .getByRole("menuitemradio", { name: "-topic" })
     .click();
-  await codingWorkspacePage.waitForSelector(
-    'button[aria-label="Change worktree: -topic"]',
-  );
+  await waitForBranchLabel(codingWorkspacePage, "-topic");
   const checkedOutDashBranch = await execFileAsync(
     "git",
     ["branch", "--show-current"],
@@ -6134,16 +6137,14 @@ try {
     );
   }
   await codingWorkspacePage
-    .getByRole("button", { name: "Change worktree: -topic" })
+    .getByRole("button", { name: "Switch branch" })
     .click();
   await worktreeMenu
     .getByRole("menuitemradio", { name: "main" })
     .click();
-  await codingWorkspacePage.waitForSelector(
-    'button[aria-label="Change worktree: main"]',
-  );
+  await waitForBranchLabel(codingWorkspacePage, "main");
   await codingWorkspacePage
-    .getByRole("button", { name: "Change worktree: main" })
+    .getByRole("button", { name: "Switch branch" })
     .click();
   await worktreeMenu
     .getByRole("menuitem", {
@@ -6979,7 +6980,7 @@ try {
     '.demo-root[data-frame="workspace-ready"]',
   );
   await codingWorkspacePage
-    .getByRole("button", { name: "Change worktree: main" })
+    .getByRole("button", { name: "Switch branch" })
     .click();
   await worktreeMenu
     .getByRole("menuitem", { name: "Create and checkout new branch…" })
@@ -7028,9 +7029,7 @@ try {
     );
   }
   await branchDialog.waitFor({ state: "hidden" });
-  await codingWorkspacePage.waitForSelector(
-    'button[aria-label="Change worktree: feature/sidebar-shell"]',
-  );
+  await waitForBranchLabel(codingWorkspacePage, "feature/sidebar-shell");
   const createdGitBranch = await execFileAsync(
     "git",
     ["branch", "--show-current"],
@@ -7043,7 +7042,7 @@ try {
   }
   await codingWorkspacePage
     .getByRole("button", {
-      name: "Change worktree: feature/sidebar-shell",
+      name: "Switch branch",
     })
     .click();
   await codingWorkspacePage.waitForTimeout(50);
@@ -7079,9 +7078,7 @@ try {
       name: "main",
     })
     .click();
-  await codingWorkspacePage.waitForSelector(
-    'button[aria-label="Change worktree: main"]',
-  );
+  await waitForBranchLabel(codingWorkspacePage, "main");
   const checkedOutMain = await execFileAsync(
     "git",
     ["branch", "--show-current"],
@@ -7093,17 +7090,17 @@ try {
     );
   }
   await codingWorkspacePage.waitForSelector(
-    'button[aria-label="Change run location: Local"]',
+    'button[aria-label="Select where to run the chat"]',
   );
 
   await codingWorkspacePage
-    .getByRole("button", { name: "Change worktree: main" })
+    .getByRole("button", { name: "Switch branch" })
     .click();
   await worktreeMenu
     .getByRole("menuitemradio", { name: "feature/sidebar-shell" })
     .click();
   await codingWorkspacePage
-    .getByRole("button", { name: "Change run location: Local" })
+    .getByRole("button", { name: "Select where to run the chat" })
     .click();
   const codexWebLink = environmentMenu.getByRole("menuitem", {
     name: "Connect Codex web",
@@ -7116,9 +7113,7 @@ try {
     throw new Error("Electron Codex web action is not the current external link.");
   }
   await codingWorkspacePage.keyboard.press("Escape");
-  await codingWorkspacePage.waitForSelector(
-    'button[aria-label="Change worktree: feature/sidebar-shell"]',
-  );
+  await waitForBranchLabel(codingWorkspacePage, "feature/sidebar-shell");
   const branchAfterRunLocationChange = await execFileAsync(
     "git",
     ["branch", "--show-current"],
@@ -7131,21 +7126,19 @@ try {
   }
   await codingWorkspacePage
     .getByRole("button", {
-      name: "Change worktree: feature/sidebar-shell",
+      name: "Switch branch",
     })
     .click();
   await worktreeMenu
     .getByRole("menuitemradio", { name: "main" })
     .click();
+  await waitForBranchLabel(codingWorkspacePage, "main");
   await codingWorkspacePage.waitForSelector(
-    'button[aria-label="Change worktree: main"]',
-  );
-  await codingWorkspacePage.waitForSelector(
-    'button[aria-label="Change run location: Local"]',
+    'button[aria-label="Select where to run the chat"]',
   );
 
   await codingWorkspacePage
-    .getByRole("button", { name: "Change worktree: main" })
+    .getByRole("button", { name: "Switch branch" })
     .click();
   await worktreeMenu
     .getByRole("menuitemradio", { name: "feature/sidebar-shell" })
@@ -7166,14 +7159,12 @@ try {
       name: "Select project codex-app-server-client",
     })
     .click();
-  await codingWorkspacePage.waitForSelector(
-    'button[aria-label="Change worktree: feature/sidebar-shell"]',
-  );
+  await waitForBranchLabel(codingWorkspacePage, "feature/sidebar-shell");
   await codingWorkspacePage.waitForTimeout(1_100);
   if (
     !(await codingWorkspacePage
       .getByRole("button", {
-        name: "Change worktree: feature/sidebar-shell",
+        name: "Switch branch",
       })
       .isVisible())
   ) {
@@ -7183,15 +7174,13 @@ try {
   }
   await codingWorkspacePage
     .getByRole("button", {
-      name: "Change worktree: feature/sidebar-shell",
+      name: "Switch branch",
     })
     .click();
   await worktreeMenu
     .getByRole("menuitemradio", { name: "main" })
     .click();
-  await codingWorkspacePage.waitForSelector(
-    'button[aria-label="Change worktree: main"]',
-  );
+  await waitForBranchLabel(codingWorkspacePage, "main");
 
   const workspaceComposer = codingWorkspacePage.getByRole("textbox", {
     name: "Do anything",
@@ -7373,9 +7362,7 @@ try {
     );
   }
   await currentCheckoutItem.click();
-  await currentCheckoutPage.waitForSelector(
-    'button[aria-label="Change worktree: feat/current-host-checkout"]',
-  );
+  await waitForBranchLabel(currentCheckoutPage, "feat/current-host-checkout");
   await currentCheckoutPage.waitForSelector(
     'button[aria-label="Change project: codex-app-server-client"]',
   );
@@ -7459,9 +7446,7 @@ try {
     );
   }
   await hostCurrentCheckout.click();
-  await linkedWorktreePage.waitForSelector(
-    'button[aria-label="Change worktree: main"]',
-  );
+  await waitForBranchLabel(linkedWorktreePage, "main");
   await linkedWorktreePage
     .getByRole("textbox", { name: "Do anything" })
     .fill("Run the host current-checkout lifecycle.");
@@ -7534,7 +7519,7 @@ const {
 });
 try {
   await externalWorkspacePage
-    .getByRole("button", { name: "Change run location: Local" })
+    .getByRole("button", { name: "Select where to run the chat" })
     .click();
   const externalAction = externalWorkspacePage
     .getByRole("menu", { name: "Work in" })
@@ -7548,7 +7533,7 @@ try {
   }
   await externalWorkspacePage.keyboard.press("Escape");
   await externalWorkspacePage
-    .getByRole("button", { name: "Change worktree: main" })
+    .getByRole("button", { name: "Switch branch" })
     .click();
   await externalWorkspacePage
     .getByRole("menu", { name: "Branches" })
@@ -7556,11 +7541,12 @@ try {
       name: "feat/current-workspace-entry-refresh",
     })
     .click();
-  await externalWorkspacePage.waitForSelector(
-    'button[aria-label="Change worktree: feat/current-workspace-entry-refresh"]',
+  await waitForBranchLabel(
+    externalWorkspacePage,
+    "feat/current-workspace-entry-refresh",
   );
   await externalWorkspacePage.waitForSelector(
-    'button[aria-label="Change run location: Local"]',
+    'button[aria-label="Select where to run the chat"]',
   );
   await externalWorkspacePage
     .getByRole("textbox", { name: "Do anything" })
@@ -10505,18 +10491,18 @@ try {
     );
   }
   await workspaceMissingPage
-    .getByRole("button", { name: "Change run location: Local" })
+    .getByRole("button", { name: "Select where to run the chat" })
     .click();
   await workspaceMissingPage
     .getByRole("menu", { name: "Work in" })
-    .getByRole("menuitem", { name: "New worktree" })
+    .getByRole("menuitem", { name: "New local worktree" })
     .click();
   await workspaceMissingPage
-    .getByRole("button", { name: "Change environment: No environment" })
+    .getByRole("button", { name: "Select a local environment" })
     .click();
   await workspaceMissingPage
     .getByRole("menu", { name: "Environment" })
-    .getByRole("menuitem", { name: "Environment settings" })
+    .getByRole("menuitem", { name: "Set up project" })
     .click();
   const persistedEnvironmentSettings = workspaceMissingPage.getByRole(
     "region",
@@ -10944,7 +10930,7 @@ try {
     '.demo-root[data-view="workspace"][data-frame="workspace-project-created"]',
   );
   await createdProjectBranchPage
-    .getByRole("button", { name: "Change worktree: main" })
+    .getByRole("button", { name: "Switch branch" })
     .click();
   const selectedProjectBranchMenu = createdProjectBranchPage.getByRole(
     "menu",
@@ -10999,18 +10985,16 @@ try {
   }
   await createdProjectBranchPage
     .getByRole("button", {
-      name: "Change worktree: feat/selected-project",
+      name: "Switch branch",
     })
     .click();
   await createdProjectBranchPage
     .getByRole("menu", { name: "Branches" })
     .getByRole("menuitemradio", { name: "main" })
     .click();
-  await createdProjectBranchPage.waitForSelector(
-    'button[aria-label="Change worktree: main"]',
-  );
+  await waitForBranchLabel(createdProjectBranchPage, "main");
   await createdProjectBranchPage
-    .getByRole("button", { name: "Change worktree: main" })
+    .getByRole("button", { name: "Switch branch" })
     .click();
   await createdProjectBranchPage
     .getByRole("menu", { name: "Branches" })
@@ -11028,7 +11012,7 @@ try {
     .click();
   const pendingCurrentProjectBranch = createdProjectBranchPage.getByRole(
     "button",
-    { name: "Change worktree: main" },
+    { name: "Switch branch" },
   );
   if (
     !(await pendingCurrentProjectBranch.isDisabled()) ||
@@ -11055,13 +11039,13 @@ try {
   await createdProjectBranchPage.waitForFunction(
     () => {
       const button = document.querySelector(
-        'button[aria-label="Change worktree: main"]',
+        'button[aria-label="Switch branch"]',
       );
       return button instanceof HTMLButtonElement && !button.disabled;
     },
   );
   await createdProjectBranchPage
-    .getByRole("button", { name: "Change worktree: main" })
+    .getByRole("button", { name: "Switch branch" })
     .click();
   const currentProjectMainBranch = createdProjectBranchPage
     .getByRole("menu", { name: "Branches" })
@@ -11079,7 +11063,7 @@ try {
     cwd: createdProjectStartupGitDirectory,
   });
   await createdProjectBranchPage
-    .getByRole("button", { name: "Change worktree: main" })
+    .getByRole("button", { name: "Switch branch" })
     .click();
   await createdProjectBranchPage
     .getByRole("menu", { name: "Branches" })
@@ -11100,7 +11084,7 @@ try {
     .click();
   const unboundProjectBranchControl = createdProjectBranchPage.getByRole(
     "button",
-    { name: "Change worktree: main" },
+    { name: "Switch branch" },
   );
   if (
     !(await unboundProjectBranchControl.isDisabled()) ||
@@ -11125,9 +11109,7 @@ try {
     .getByRole("dialog", { name: "Choose a project" })
     .getByRole("button", { name: "New project" })
     .click();
-  await createdProjectBranchPage.waitForSelector(
-    'button[aria-label="Change worktree: feat/selected-project"]',
-  );
+  await waitForBranchLabel(createdProjectBranchPage, "feat/selected-project");
   await createdProjectBranchPage
     .getByRole("textbox", { name: "Do anything" })
     .fill("Verify the in-place branch route.");
@@ -11205,7 +11187,7 @@ const {
 });
 try {
   const detachedBranchControl = detachedBranchPage.getByRole("button", {
-    name: "Change worktree: Detached HEAD",
+    name: "Switch branch",
   });
   await detachedBranchControl.waitFor({ state: "visible" });
   if (await detachedBranchControl.isDisabled()) {
@@ -11241,9 +11223,7 @@ try {
   await detachedBranchDialog
     .getByRole("button", { name: "Create and checkout" })
     .click();
-  await detachedBranchPage.waitForSelector(
-    'button[aria-label="Change worktree: feat/from-detached"]',
-  );
+  await waitForBranchLabel(detachedBranchPage, "feat/from-detached");
   const detachedCreatedBranch = await execFileAsync(
     "git",
     ["branch", "--show-current"],
@@ -11282,7 +11262,7 @@ const { app: unbornBranchApp, page: unbornBranchPage } = await launchScene(
 );
 try {
   const unbornBranchControl = unbornBranchPage.getByRole("button", {
-    name: "Change worktree: main (unborn)",
+    name: "Switch branch",
   });
   await unbornBranchControl.waitFor({ state: "visible" });
   await unbornBranchControl.click();
@@ -11306,9 +11286,7 @@ try {
   await unbornBranchDialog
     .getByRole("button", { name: "Create and checkout" })
     .click();
-  await unbornBranchPage.waitForSelector(
-    'button[aria-label="Change worktree: feat/from-unborn (unborn)"]',
-  );
+  await waitForBranchLabel(unbornBranchPage, "feat/from-unborn (unborn)");
   const unbornCreatedBranch = await execFileAsync(
     "git",
     ["branch", "--show-current"],

@@ -14,7 +14,7 @@ exit gates; it does not replace the inventory.
   Desktop `26.818.41509` (`6962`). Unsampled earlier-build surfaces remain
   previous-build regression evidence rather than current verification.
 - The inventory contains 89 surface groups: 59 P0, 21 P1, and 9 P2.
-- 24 groups have current-build runtime evidence, 49 have previous-build-only
+- 29 groups have current-build runtime evidence, 44 have previous-build-only
   runtime evidence, and 16 have not been sampled.
 - The scoped `26.818.41509` refresh revalidates the global shell, responsive
   Composer, primary navigation, project-group lifecycle, Help menu, route
@@ -62,6 +62,13 @@ exit gates; it does not replace the inventory.
   exact 16×16 spinner or centered 8×8 unread dot. Browser/CDP, Electron, and
   four privacy-safe tail comparisons pass between 0% and 3.1944%. The sampled
   eight-row Recents count remains content-dependent and is not frozen.
+  A second current sidebar probe now promotes the New local worktree entry,
+  real create/loading/restored, controlled failure, failed-plus-unread
+  composition, and Retry recovery. It locks the current generic context
+  labels, 264×91.125 two-action Environment menu, 30px worktree rows, exact
+  branch/spinner/error/unread tracks, and action replacement. Browser/CDP,
+  Electron, and three privacy-safe tail gates pass at 2.0833%, 0.7540%, and
+  0.1786%.
   The broader `26.810.52044` refresh remains
   previous-build regression evidence; it revalidated 115
   sidebar/menu/window-chrome/Composer/Settings/completed-thread icons against
@@ -418,7 +425,7 @@ slot. It is split into:
 - `app.sidebar-status-indicators`: ordinary active, waiting, unread, and idle
   task presentation across project and recent rows;
 - `app.sidebar-worktree-status-indicators`: pending worktree queued, creating,
-  setting-up, failed, and restored presentation. The previous 26.810 slice
+  setting-up, failed, and restored presentation. The current 26.818 slice
   re-reached real create, controlled failure, failed-plus-unread composition,
   Retry recovery, and exact 30px trailing geometry through product CDP,
   Browser/CDP, Electron, and local-only pixels;
@@ -428,9 +435,9 @@ slot. It is split into:
   geometry, dismissal, and focus return.
 
 Current progress: current-build thread-history, hover actions, and ordinary
-active/completed/unread presentation are now verified. Waiting/error variants,
-empty/loading/long-list mutations, and current-build worktree status remain
-open within Stage 1.
+active/completed/unread presentation and worktree-specific create/failure/Retry
+status are now verified. Ordinary waiting/error variants and
+empty/loading/long-list mutations remain open within Stage 1.
 
 The same workstream also covers shell gaps that otherwise distort every
 feature:
@@ -535,14 +542,20 @@ collapsed 600×600, with current structural geometry and Browser/CDP evidence.
 Full Electron creation and distinct recent-chat routing remain implementation
 acceptance, while the ownership-masked product pixels remain scoped to 26.810
 until they are recaptured against the current build.
-Loading/error/partial-error and pending-worktree variants remain independent
-replay coverage until they are re-reached on the same installed build.
 The current follow-up adds the five-action `Work in` menu, treats Codex web as
 an external anchor rather than a synthetic execution environment, covers the
 New-worktree no-environment menu, and implements the current 768px unavailable
 Environments route. Browser/CDP, Electron, and three local-only product gates
 pass without creating an environment. Populated environment creation/editing,
 repair variants, and real Remote connection lifecycles remain in this phase.
+The `26.818.41509` follow-up supersedes the worktree entry vocabulary with
+`New local worktree`, disabled `Cloud`, generic accessible context labels, and
+a 264×91.125 Environment menu containing only `Work without environment` and
+`Set up project`. Two isolated disposable repositories reach real success,
+controlled failure, Retry, and restored states. Browser/CDP, Electron, and
+three current-product tail comparisons now gate that sampled entry/repair
+lifecycle. Projects-route loading/error/partial-error, populated environment
+editing, and Remote connections remain independent work.
 
 Current branch-entry slice: `26.803.61601` Browser/CDP now locks the 296×280
 branch menu and 400×190.56 create-and-checkout dialog. The public
@@ -703,9 +716,10 @@ without confusing package readiness with full product reconstruction.
    task-status follow-up separately reaches active and unread on
    `26.803.61601`, corrects task rows from the former 40px approximation to the
    current 30px structure, and gates trailing status geometry, color, action
-   replacement, and pixels. The worktree follow-up then reaches a real create,
-   controlled failure, and Retry recovery in isolated disposable repositories;
-   it gates queued/creating/setting-up/failed/restored semantics, the exact
+   replacement, and pixels. The current `26.818.41509` worktree follow-up then
+   reaches a real create, controlled failure, and Retry recovery in isolated
+   disposable repositories; it gates the new entry vocabulary,
+   queued/creating/setting-up/failed/restored semantics, the exact
    branch/error/spinner primitives, and owned pixels.
 3. **Tool recovery and mixed thread — current success/recovery refreshed**:
    `26.818.41509` now covers a real Search → Fetch success, a real invalid-URL

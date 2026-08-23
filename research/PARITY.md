@@ -56,7 +56,13 @@ The authoritative current-build inventory is:
   completed, and unread presentation. Browser/CDP and Electron lock the
   geometry and replacement behavior; local-only 72×30 action and 28×30 status
   tails pass between 0% and 3.1944%. Content-dependent Recents count is not a
-  parity constant, and waiting/error/worktree variants remain open.
+  parity constant, and ordinary waiting/error variants remain open. A second
+  current-build probe now reaches real New local worktree success, controlled
+  failure, failed-plus-unread composition, Retry, and restored rows. It locks
+  the current entry labels, 264×91.125 Environment menu, 14px branch marker,
+  20px loading rail, exact status primitives, and action replacement;
+  privacy-safe loading/error/restored tails pass at 2.0833%, 0.7540%, and
+  0.1786%.
 - The previous Codex Desktop `26.810.52044` (`6662`) visual probe revalidated the
   exact 1180×820 dark/resting asset fingerprint and now retains 115 exact
   sidebar/menu/window-chrome/Composer/environment/Settings/completed-thread icons plus
@@ -80,7 +86,7 @@ The authoritative current-build inventory is:
   current failed-plus-unread three-track composition: 14×14 branch marker,
   16×16 red error, 8×8 blue unread dot, and exact 8/36/67px rail/branch
   insets. Browser/CDP, Electron, and owned local-only row pixels gate the same
-  current boundary. A later real-worktree probe proves project/task persistence
+  26.810 boundary. A later real-worktree probe proves project/task persistence
   across an app restart while also proving that New chat, rather than the exact
   thread, is the initial restored route. Selecting the retained task restores
   the conversation. Removing its disposable directory reaches the exact
@@ -138,7 +144,12 @@ The authoritative current-build inventory is:
   Ten more exact primitives raise the scoped manifest to 53. Browser/CDP,
   Electron, and three local-only product comparisons pass without creating an
   environment; populated environment editing/repair and Remote connections
-  remain open.
+  remain open. The current `26.818.41509` refresh supersedes the entry wording
+  with `New local worktree`, disabled `Cloud`, generic accessible context
+  labels, and a 264×91.125 two-action Environment menu. Two disposable
+  repositories additionally prove success, controlled failure, Retry, and
+  restored states in the real product; Browser/CDP, Electron, and three
+  privacy-safe tail gates repeat that sampled lifecycle.
 - A later current-build Settings capture promotes 24 exact Back/Search/item
   icons and reaches the full-page 322.91px navigation plus the 768px Git
   preferences page. The independent public shell and Git components pass

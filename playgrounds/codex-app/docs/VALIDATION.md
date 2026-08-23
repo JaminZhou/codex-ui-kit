@@ -170,6 +170,12 @@ right inset, exact 16×16 spinner paths, centered 8×8 dot, and computed
 `rgb(131, 195, 255)` unread color. A failed unread worktree additionally keeps
 the 14×14 branch at 67px, red error rail at 36px, and blue unread rail at 8px;
 Electron verifies that trailing actions replace all three tracks.
+For the current `26.818.41509` probe, the privacy-safe unmasked loading,
+failed-plus-unread, and restored tails differ by 2.0833%, 0.7540%, and 0.1786%.
+The same Browser/Electron slice requires the five-item Work in order with
+`New local worktree` and disabled `Cloud`, the generic current context labels, and
+the 264×91.125 Environment menu containing only `Work without environment`
+and `Set up project`.
 Current project-task and Recents hover actions accept separate unmasked 72×30
 tails through `CODEX_UI_KIT_CURRENT_SIDEBAR_TASK_ACTIONS_REFERENCE` and
 `CODEX_UI_KIT_CURRENT_SIDEBAR_RECENTS_ACTIONS_REFERENCE`. CDP and Electron

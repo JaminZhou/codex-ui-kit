@@ -104,13 +104,13 @@ observation from a previous build remains historical evidence.
   Browser/CDP and Electron pass; privacy-safe action/status tail comparisons
   pass between 0% and 3.1944%. Recents row count and text remain
   content-dependent rather than frozen.
-- The broader `26.810.52044` Review, Settings, worktree, account,
+- The broader `26.810.52044` Review, Settings, account,
   waiting/error sidebar variants, and exact-asset results remain
   previous-build regression evidence.
   They are not relabeled as current merely because the shell capture passes.
 
-Current inventory: 89 surface groups; 24 have current-build runtime evidence, 49 have previous-build-only runtime evidence, 16 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 21 groups and Electron verification covers 21.
-Prior acceptance outside those 21 sampled current-build groups remains
+Current inventory: 89 surface groups; 29 have current-build runtime evidence, 44 have previous-build-only runtime evidence, 16 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 26 groups and Electron verification covers 26.
+Prior acceptance outside those 26 sampled current-build groups remains
 recorded as `partial_legacy` until current-build re-observation.
 
 The current package exposes candidates far beyond the old transcript sample:
@@ -233,8 +233,16 @@ share two 19×20 Pin/Archive buttons with an 8px gap and 8px toolbar right
 inset. Active and unread use the same 20×20 rail at 8px, with the exact 16×16
 spinner or centered 8×8 blue dot; completed has no status glyph. Browser/CDP,
 Electron, and four local-only action/status tail comparisons gate this current
-boundary. Waiting/error and worktree-specific variants remain independently
-versioned.
+boundary. Ordinary waiting/error variants remain independently versioned.
+
+A second `26.818.41509` sidebar probe now supersedes the worktree-specific
+status boundary as well. Two isolated disposable repositories reach real
+create/loading/restored, controlled `.git/worktrees` failure, failed-plus-unread
+composition, and successful Retry recovery. Loading/restored use 56×30
+privacy-safe tails; failed-plus-unread uses 84×30. Their unmasked pixel ratios
+are 2.0833%, 0.7540%, and 0.1786%, while Browser/CDP and Electron lock the
+30px row, 14px branch marker, 20px loading rail, exact spinner/error paths,
+three-track failure composition, action replacement, and recovery.
 
 The current sidebar lifecycle follow-up splits the broad historical project,
 action, and footer rows into three independently gated current-build groups:
@@ -273,6 +281,18 @@ action replacement. Three local-only row crops gate the owned trailing pixels;
 loading/error/restored pass at 2.9762%, 0%, and 0% under independent 6%, 6.5%,
 and 2.5% ceilings. The earlier active/unread ratios remain build-scoped
 regression evidence rather than current visual results.
+
+The current `26.818.41509` refresh re-reaches that lifecycle with new product
+entry semantics and supersedes those older worktree pixels. `Work in` now
+contains `New local worktree` and disabled `Cloud`; the selected context uses
+the generic accessible labels `Select where to run the chat`, `Select a local
+environment`, and `What branch should this chat start from?`. Its 264×91.125
+Environment menu contains only `Work without environment` and `Set up
+project`. Real success, controlled failure, Retry, and restored states promote
+`conversation.context-controls`, `composer.project-worktree-selection`,
+`app.new-thread-workspace-selection`, `workspace.worktrees`, and
+`app.sidebar-worktree-status-indicators` to current-build Browser/Electron
+verification for this sampled lifecycle.
 
 The same current-build manifest now supplies exact visible Sidebar, Back, and
 Forward primitives to the private playground window chrome. Browser/CDP and
@@ -399,6 +419,12 @@ cloud cannot produce a synthetic working directory. New worktree exposes the
 comparisons pass at 3.9193%, 3.0724%, and 0.0708% without creating an
 environment. Implementation remains `partial` because populated environment
 creation/editing, repair variants, and real Remote connection lifecycles remain
+open. The current `26.818.41509` follow-up supersedes that entry vocabulary:
+`New local worktree`, disabled `Cloud`, a 264×91.125 two-action Environment
+menu without a static empty row, and `Set up project`. Two disposable
+repositories then reach real success, controlled failure, Retry, and restored
+states. Browser/CDP, Electron, and current-product tail gates cover the sampled
+entry and repair lifecycle; populated environment editing and Remote remain
 open. A later `26.803.61601`
 isolated probe creates a real worktree/task and proves project/task persistence
 across an app restart while keeping exact thread-route restoration conditional
