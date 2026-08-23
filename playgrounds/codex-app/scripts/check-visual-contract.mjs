@@ -2339,32 +2339,30 @@ for (const scene of selectedScenes) {
     scene.id === "current-sidebar-project-menu" &&
     currentBuildSidebarProjectMenuReference
   ) {
-    if (sidebarMenuItemBounds?.length !== 7) {
+    if (sidebarMenuItemBounds?.length !== 6) {
       throw new Error(
-        `${scene.id}: expected seven project menu item bounds, received ${sidebarMenuItemBounds?.length ?? 0}.`,
+        `${scene.id}: expected six project menu item bounds, received ${sidebarMenuItemBounds?.length ?? 0}.`,
       );
     }
     await compareCurrentBuildOverlay({
       actual,
       actualBounds: sidebarMenuBounds,
-      defaultMaximumRatio: 0.005,
+      // AppKit/CoreText and Chromium rasterize the same unmasked fixed labels
+      // and SVG paths differently. The exact structure and source hashes are
+      // gated independently; 5% keeps the full native-region comparison tight.
+      defaultMaximumRatio: 0.05,
       expectedActualPosition: { left: 211, top: 313 },
-      masks: sidebarMenuItemBounds.map(({ height, top, width }) => ({
-        height: Math.max(0, height - 8),
-        left: 34,
-        top: top + 4,
-        width: Math.max(0, width - 38),
-      })),
+      masks: [],
       maximumRatioName:
         "CODEX_UI_KIT_CURRENT_SIDEBAR_PROJECT_MENU_MAX_DIFF_RATIO",
       referenceCrop: {
-        height: 208,
+        height: 187,
         left: 0,
         top: 0,
-        width: 214,
+        width: 221,
       },
       referencePath: currentBuildSidebarProjectMenuReference,
-      referenceSize: { height: 208, width: 215 },
+      referenceSize: { height: 187, width: 221 },
       sceneId: scene.id,
     });
   }

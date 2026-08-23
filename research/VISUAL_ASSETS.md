@@ -4,8 +4,11 @@ Pixel comparison is useful only after every visible element in the compared
 surface has a known source. Approximate icons, fallback fonts, and inferred
 geometry otherwise create permanent noise that can hide regressions.
 
-[`visual-assets.json`](visual-assets.json) is the machine-checked source of
-truth for exact visual primitives observed in the current Codex Desktop build.
+[`visual-assets.json`](visual-assets.json) is the machine-checked broad manifest
+for 115 exact visual primitives observed on Codex Desktop `26.810.52044`.
+[`current-project-menu-assets.json`](current-project-menu-assets.json) is the
+narrow current-build `26.818.41509` manifest for the six native project-menu
+icons re-observed after that menu moved out of the Renderer DOM.
 Each entry records the application/build fingerprint, the de-identified CDP
 owner evidence, viewBox, rendered size, source root class, resolved root SVG
 style, per-primitive resolved style, root attributes, primitive geometry, and
@@ -17,8 +20,9 @@ than leaking from the original DOM owner. The same manifest explicitly lists rem
 approximations, so a passing regression check cannot be described as global
 pixel parity while the list is non-empty.
 
-Resolved root styles are exact only for the manifest's named dark, resting
-state at 1180×820. Other themes, interaction states, and viewport-specific
+Resolved root styles are exact only for each manifest's named build and state.
+The broad manifest records a dark, resting state at 1180×820; the narrow
+menu manifest records 16px native-menu rendering. Other themes, interaction states, and viewport-specific
 variants require their own runtime evidence before they can be called exact.
 
 The first manifest intentionally marks its remaining-approximation inventory

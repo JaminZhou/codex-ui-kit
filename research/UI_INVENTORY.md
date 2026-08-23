@@ -64,16 +64,17 @@ observation from a previous build remains historical evidence.
   geometry rather than private task counts. It also revalidates the 320px Help
   menu and the fourteen-row Projects Index.
 - The project action menu moved from a Renderer DOM menu to the frozen
-  `electronBridge.showContextMenu` path. The current six-action/three-separator
-  provider and its 221×187 Quartz window are recorded in
-  [`26.818.41509.md`](26.818.41509.md); the independent DOM replica remains
-  `partial_legacy` until its native-menu visual contract is updated.
+  `electronBridge.showContextMenu` path. The independent replica now locks the
+  current six-action/three-separator provider, 221×187 geometry, six exact
+  current SVG sources, conditional unread variant, focus lifecycle, and a
+  3.8449% unmasked native-region comparison. Details are recorded in
+  [`26.818.41509.md`](26.818.41509.md).
 - The broader `26.810.52044` command, MCP, Review, Settings, worktree, account,
   Recents, and exact-asset results remain previous-build regression evidence.
   They are not relabeled as current merely because the shell capture passes.
 
-Current inventory: 89 surface groups; 11 have current-build runtime evidence, 62 have previous-build-only runtime evidence, 16 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 7 groups and Electron verification covers 7.
-Prior acceptance outside those 7 sampled current-build groups remains
+Current inventory: 89 surface groups; 11 have current-build runtime evidence, 62 have previous-build-only runtime evidence, 16 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 8 groups and Electron verification covers 8.
+Prior acceptance outside those 8 sampled current-build groups remains
 recorded as `partial_legacy` until current-build re-observation.
 
 The current package exposes candidates far beyond the old transcript sample:
@@ -197,14 +198,15 @@ action, and footer rows into three independently gated current-build groups:
 record contains six expandable groups with 30px project rows, 30px task rows,
 2px/8px child-list block padding, 1px row/group separators,
 pointer/Enter/Space transitions, the current 721→720 visible-sidebar rule,
-explicit Hide/Show, a 214.05px-wide project menu with conditional six- and
-seven-item variants, and a 320×272.06 Help menu with a `What's new` heading
+explicit Hide/Show, a 221×187 native project menu with six fixed actions and
+one conditional unread action, and a 320×272.06 Help menu with a `What's new` heading
 and eight items. The 46px footer now contains a 75.67×28 Voice action plus
 32×32 Help. Browser/CDP and Electron repeat the lifecycle; the current
 local-only 133×46 Voice/Help comparison passes at 3.1219%. Four older
 26.803.61601 ownership-masked comparisons remain regression evidence for
-collapsed projects, the project menu, the previous Help menu, and the compact
-sidebar; they are not relabeled as current pixels. The broader
+collapsed projects, the previous Help menu, and the compact sidebar; they are
+not relabeled as current pixels. The project menu instead has a current
+unmasked 221×187 native-region gate at 3.8449%. The broader
 project-navigation, mutation/status, and account/settings rows remain
 `partial_legacy` because these narrower observations do not prove every state
 they own.

@@ -3918,7 +3918,16 @@ export function App() {
                     open={currentSidebarProjectMenuId === project.id}
                     side="bottom"
                     sideOffset={2}
-                    style={{ width: 214.05 }}
+                    style={{
+                      height: project.tasks.some(
+                        (_task, taskIndex) =>
+                          currentSidebarTaskStatus(project.id, taskIndex) ===
+                          "unread",
+                      )
+                        ? 212
+                        : 187,
+                      width: 221,
+                    }}
                     trigger={
                       <button
                         aria-label={`Project actions for ${project.label}`}
@@ -3934,9 +3943,19 @@ export function App() {
                         <CurrentBuildIcon name="sidebar-project-menu-unpin" />
                       }
                     >
-                      Unpin project
+                      Unpin
                     </MenuItem>
                     <MenuItem
+                      className="demo-current-sidebar-project-menu__item--edit"
+                      startIcon={
+                        <CurrentBuildIcon name="sidebar-project-menu-edit" />
+                      }
+                    >
+                      Edit
+                    </MenuItem>
+                    <MenuSeparator />
+                    <MenuItem
+                      className="demo-current-sidebar-project-menu__item--reveal"
                       startIcon={
                         <CurrentBuildIcon name="sidebar-project-menu-reveal" />
                       }
@@ -3950,20 +3969,20 @@ export function App() {
                     >
                       Create permanent worktree
                     </MenuItem>
-                    <MenuItem
-                      startIcon={
-                        <CurrentBuildIcon name="sidebar-project-menu-edit" />
-                      }
-                    >
-                      Edit project
-                    </MenuItem>
-                    <MenuItem
-                      startIcon={
-                        <CurrentBuildIcon name="sidebar-project-menu-mark-read" />
-                      }
-                    >
-                      Mark all as read
-                    </MenuItem>
+                    <MenuSeparator />
+                    {project.tasks.some(
+                      (_task, taskIndex) =>
+                        currentSidebarTaskStatus(project.id, taskIndex) ===
+                        "unread",
+                    ) ? (
+                      <MenuItem
+                        startIcon={
+                          <CurrentBuildIcon name="sidebar-project-menu-mark-read" />
+                        }
+                      >
+                        Mark all as read
+                      </MenuItem>
+                    ) : null}
                     <MenuItem
                       startIcon={
                         <CurrentBuildIcon name="sidebar-project-menu-archive" />
@@ -3971,13 +3990,14 @@ export function App() {
                     >
                       Archive chats
                     </MenuItem>
+                    <MenuSeparator />
                     <MenuItem
+                      className="demo-current-sidebar-project-menu__item--remove"
                       startIcon={
                         <CurrentBuildIcon name="sidebar-project-menu-remove" />
                       }
-                      tone="danger"
                     >
-                      Remove
+                      Remove project
                     </MenuItem>
                   </Menu>
                   <button

@@ -11067,6 +11067,18 @@ try {
   await projectMenu.waitFor({ state: "visible" });
   const projectMenuContract = await projectMenu.evaluate((menu) => {
     const bounds = menu.getBoundingClientRect();
+    const relativeRect = (element) => {
+      const value = element.getBoundingClientRect();
+      return {
+        height: value.height,
+        left: value.left - bounds.left,
+        top: value.top - bounds.top,
+        width: value.width,
+      };
+    };
+    const style = getComputedStyle(menu);
+    const firstItem = menu.querySelector('[role="menuitem"]');
+    const firstItemStyle = firstItem ? getComputedStyle(firstItem) : null;
     return {
       focusRole: document.activeElement?.getAttribute("role"),
       icons: Array.from(
@@ -11074,7 +11086,29 @@ try {
         (icon) => icon.getAttribute("data-current-build-icon"),
       ),
       itemCount: menu.querySelectorAll('[role="menuitem"]').length,
+      itemRects: Array.from(menu.querySelectorAll('[role="menuitem"]'),
+        relativeRect,
+      ),
+      labels: Array.from(
+        menu.querySelectorAll('[role="menuitem"]'),
+        (item) => item.textContent?.trim(),
+      ),
       rect: { height: bounds.height, width: bounds.width },
+      separatorCount: menu.querySelectorAll('[role="separator"]').length,
+      separatorRects: Array.from(
+        menu.querySelectorAll('[role="separator"]'),
+        relativeRect,
+      ),
+      style: {
+        backgroundColor: style.backgroundColor,
+        borderRadius: style.borderRadius,
+        borderTopColor: style.borderTopColor,
+        borderTopWidth: style.borderTopWidth,
+        fontSize: firstItemStyle?.fontSize,
+        fontWeight: firstItemStyle?.fontWeight,
+        gap: firstItemStyle?.gap,
+        padding: style.padding,
+      },
     };
   });
   await sidebarPage.keyboard.press("Escape");
@@ -11088,18 +11122,53 @@ try {
     (element) => document.activeElement === element,
   );
   if (
-    projectMenuContract.itemCount !== 7 ||
+    projectMenuContract.itemCount !== 6 ||
+    projectMenuContract.separatorCount !== 3 ||
     projectMenuContract.focusRole !== "menuitem" ||
     !projectMenuContract.focusReturned ||
-    Math.abs(projectMenuContract.rect.width - 214.05) > 1 ||
-    Math.abs(projectMenuContract.rect.height - 207.94) > 1 ||
+    Math.abs(projectMenuContract.rect.width - 221) > 1 ||
+    Math.abs(projectMenuContract.rect.height - 187) > 1 ||
+    JSON.stringify(projectMenuContract.itemRects) !==
+      JSON.stringify([
+        { height: 25, left: 5, top: 5, width: 211 },
+        { height: 25, left: 5, top: 30, width: 211 },
+        { height: 25, left: 5, top: 64, width: 211 },
+        { height: 25, left: 5, top: 89, width: 211 },
+        { height: 25, left: 5, top: 123, width: 211 },
+        { height: 25, left: 5, top: 157, width: 211 },
+      ]) ||
+    JSON.stringify(projectMenuContract.separatorRects) !==
+      JSON.stringify([
+        { height: 1, left: 16, top: 58, width: 189 },
+        { height: 1, left: 16, top: 117, width: 189 },
+        { height: 1, left: 16, top: 152, width: 189 },
+      ]) ||
+    JSON.stringify(projectMenuContract.style) !==
+      JSON.stringify({
+        backgroundColor: "rgb(26, 26, 26)",
+        borderRadius: "11px",
+        borderTopColor: "rgb(94, 94, 94)",
+        borderTopWidth: "1px",
+        fontSize: "13px",
+        fontWeight: "400",
+        gap: "6px",
+        padding: "4px",
+      }) ||
+    JSON.stringify(projectMenuContract.labels) !==
+      JSON.stringify([
+        "Unpin",
+        "Edit",
+        "Reveal in Finder",
+        "Create permanent worktree",
+        "Archive chats",
+        "Remove project",
+      ]) ||
     JSON.stringify(projectMenuContract.icons) !==
       JSON.stringify([
         "sidebar-project-menu-unpin",
+        "sidebar-project-menu-edit",
         "sidebar-project-menu-reveal",
         "sidebar-project-menu-worktree",
-        "sidebar-project-menu-edit",
-        "sidebar-project-menu-mark-read",
         "sidebar-project-menu-archive",
         "sidebar-project-menu-remove",
       ])
@@ -11108,6 +11177,50 @@ try {
       `sidebar-current: project menu contract failed: ${JSON.stringify(projectMenuContract)}`,
     );
   }
+  const unreadProjectMenuTrigger = sidebarPage.getByRole("button", {
+    name: "Project actions for codex-ui-kit",
+  });
+  await unreadProjectMenuTrigger.scrollIntoViewIfNeeded();
+  await unreadProjectMenuTrigger.click();
+  const unreadProjectMenu = sidebarPage.getByRole("menu", {
+    name: "codex-ui-kit project menu",
+  });
+  await unreadProjectMenu.waitFor({ state: "visible" });
+  const unreadProjectMenuContract = await unreadProjectMenu.evaluate((menu) => {
+    const bounds = menu.getBoundingClientRect();
+    return {
+      labels: Array.from(
+        menu.querySelectorAll('[role="menuitem"]'),
+        (item) => item.textContent?.trim(),
+      ),
+      rect: { height: bounds.height, width: bounds.width },
+      separatorCount: menu.querySelectorAll('[role="separator"]').length,
+    };
+  });
+  if (
+    JSON.stringify(unreadProjectMenuContract.labels) !==
+      JSON.stringify([
+        "Unpin",
+        "Edit",
+        "Reveal in Finder",
+        "Create permanent worktree",
+        "Mark all as read",
+        "Archive chats",
+        "Remove project",
+      ]) ||
+    unreadProjectMenuContract.separatorCount !== 3 ||
+    Math.abs(unreadProjectMenuContract.rect.width - 221) > 1 ||
+    Math.abs(unreadProjectMenuContract.rect.height - 212) > 1 ||
+    !(await unreadProjectMenu
+      .getByRole("menuitem", { name: "Mark all as read" })
+      .isVisible())
+  ) {
+    throw new Error(
+      `sidebar-current: unread project menu variant failed: ${JSON.stringify(unreadProjectMenuContract)}`,
+    );
+  }
+  await sidebarPage.keyboard.press("Escape");
+  await unreadProjectMenu.waitFor({ state: "hidden" });
 
   const helpMenuTrigger = sidebarPage.getByRole("button", {
     name: "Open help menu",

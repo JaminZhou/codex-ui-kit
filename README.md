@@ -28,11 +28,12 @@ Codex UI Kit turns those interaction patterns into protocol-neutral React primit
   observation covers 11 groups; 62 previous-build groups remain regression
   evidence and 16 are still unsampled. The refresh revalidates the global
   shell, responsive Composer, primary navigation, project-group lifecycle,
-  Help menu, route restoration, and Projects Index. It also records that the
-  project action menu is now Electron-native rather than a Renderer DOM menu.
-  The exact visual manifest is still bound to the previous `26.810.52044`
-  evidence and is not described as current until recaptured. This remains a
-  partial UI foundation rather than a global reconstruction claim.
+  Help menu, route restoration, Projects Index, and the Electron-native project
+  action menu. The menu now has a current six-icon manifest plus exact
+  Browser/Electron geometry and a 3.8449% unmasked native-region gate. The
+  broader 115-asset visual manifest remains bound to the previous
+  `26.810.52044` evidence. This remains a partial UI foundation rather than a
+  global reconstruction claim.
 - The repository is public and the package baseline is `0.1.0`, but the npm package has **not** been published.
 - The API remains pre-1.0 and may change while public documentation and consumer feedback mature.
 - Extracted application files, private IPC, bundled fonts, and OpenAI brand assets are not included.

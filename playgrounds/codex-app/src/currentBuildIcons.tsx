@@ -1,5 +1,6 @@
 import type { ComponentProps } from "react";
 import visualAssets from "../../../research/visual-assets.json";
+import currentProjectMenuAssets from "../../../research/current-project-menu-assets.json";
 import {
   VisualAssetIcon,
   type VisualAssetIconData,
@@ -128,7 +129,9 @@ interface CurrentBuildIconProps
 }
 
 export function CurrentBuildIcon({ name, ...props }: CurrentBuildIconProps) {
-  const icon = visualAssets.icons.find((candidate) => candidate.id === name);
+  const icon =
+    currentProjectMenuAssets.icons.find((candidate) => candidate.id === name) ??
+    visualAssets.icons.find((candidate) => candidate.id === name);
   if (!icon) throw new Error(`Unknown current-build icon: ${name}`);
 
   return (
