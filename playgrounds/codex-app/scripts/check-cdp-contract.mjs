@@ -39,6 +39,8 @@ const currentReplayComposerScenarios = new Set([
   "interruption",
   "long-command-output",
   "mcp-current-integration-recovery",
+  "mcp-current-26-818-recovery",
+  "mcp-current-26-818-success",
   "mcp-current-recovery",
   "mcp-current-success",
   "mcp-recovery-mixed-thread",
@@ -4825,13 +4827,16 @@ for (const scene of selectedScenes) {
       continue;
     }
 
-    if (scene.id === "mcp-current-recovery-compact") {
+    if (
+      scene.id === "mcp-current-recovery-compact" ||
+      scene.id === "mcp-current-26-818-recovery-compact"
+    ) {
       const compactMcp = await page.evaluate(() => {
         const group = document.querySelector(
           ".codex-ui-mcp-tool-call-group",
         );
         const error = document.querySelector(
-          '[data-item-id="mcp-current-fetch-invalid"] .codex-ui-tool-call__error[data-presentation="output"]',
+          '[data-item-id="mcp-current-fetch-invalid"] .codex-ui-tool-call__error[data-presentation="output"], [data-item-id="mcp-current-26-818-fetch-invalid"] .codex-ui-tool-call__error[data-presentation="output"]',
         );
         const cardRect = error?.getBoundingClientRect();
         return {
@@ -4845,6 +4850,7 @@ for (const scene of selectedScenes) {
             ? {
                 height: cardRect.height,
                 left: cardRect.left,
+                top: cardRect.top,
                 width: cardRect.width,
               }
             : null,
@@ -4852,7 +4858,7 @@ for (const scene of selectedScenes) {
           failedExpanded:
             document
               .querySelector(
-                '[data-item-id="mcp-current-fetch-invalid"] .codex-ui-activity__disclosure',
+                '[data-item-id="mcp-current-fetch-invalid"] .codex-ui-activity__disclosure, [data-item-id="mcp-current-26-818-fetch-invalid"] .codex-ui-activity__disclosure',
               )
               ?.hasAttribute("data-open") ?? false,
           groupExpanded:
@@ -4891,7 +4897,9 @@ for (const scene of selectedScenes) {
         !compactMcp.card ||
         Math.abs(compactMcp.card.left - 16) > 1 ||
         Math.abs(compactMcp.card.width - 688) > 1 ||
-        Math.abs(compactMcp.card.height - 67.3125) > 1
+        Math.abs(compactMcp.card.height - 67.3125) > 1 ||
+        (scene.id === "mcp-current-26-818-recovery-compact" &&
+          Math.abs(compactMcp.card.top - 271) > 1)
       ) {
         throw new Error(
           `${scene.id}: compact MCP contract failed: ${JSON.stringify(compactMcp)}`,
@@ -5450,7 +5458,7 @@ for (const scene of selectedScenes) {
               .map((element) => element.getAttribute("data-item-id")),
             failedCallAccessibleLabel: mcpGroup
               .querySelector(
-                '[data-item-id="mcp-fetch-invalid"] .codex-ui-tool-call__label, [data-item-id="mcp-current-fetch-invalid"] .codex-ui-tool-call__label',
+                '[data-item-id="mcp-fetch-invalid"] .codex-ui-tool-call__label, [data-item-id="mcp-current-fetch-invalid"] .codex-ui-tool-call__label, [data-item-id="mcp-current-26-818-fetch-invalid"] .codex-ui-tool-call__label',
               )
               ?.getAttribute("aria-label"),
             groupExpanded:
@@ -5506,7 +5514,7 @@ for (const scene of selectedScenes) {
           }
         : null;
       const failedMcpCall = document.querySelector(
-        '[data-item-id="mcp-fetch-invalid"], [data-item-id="mcp-current-fetch-invalid"]',
+        '[data-item-id="mcp-fetch-invalid"], [data-item-id="mcp-current-fetch-invalid"], [data-item-id="mcp-current-26-818-fetch-invalid"]',
       );
       const mcpFailure = failedMcpCall
         ? {
@@ -8044,7 +8052,9 @@ for (const scene of selectedScenes) {
     if (
       hiddenSidebarScene
         ? contract.sidebarResizer !== null ||
-          Math.abs(contract.shell.width - 1180) > 1
+          Math.abs(
+            contract.shell.width - (scene.windowSize?.width ?? 1180),
+          ) > 1
         : contract.styles.resizerCursor !== "col-resize" ||
           Math.abs(contract.sidebarResizer.rect.width - 16) > 0.5 ||
           contract.sidebarResizer.ariaMin !== "240" ||
@@ -8471,6 +8481,9 @@ for (const scene of selectedScenes) {
         ((scene.id === "mcp-tool-calls" ||
           scene.id === "mcp-recovery-completed" ||
           scene.id === "mcp-current-success" ||
+          scene.id === "mcp-current-26-818-success" ||
+          scene.id === "mcp-current-26-818-recovery-completed" ||
+          scene.id === "mcp-current-26-818-sources-pinned" ||
           scene.id === "mcp-current-integration-recovered" ||
           scene.id === "mcp-current-recovery-completed") &&
           (contract.mcp.groupStyle.fontFamily !==
@@ -8553,6 +8566,204 @@ for (const scene of selectedScenes) {
       throw new Error(
         `${scene.id}: recovered MCP error output contract failed: ${JSON.stringify(contract.mcpFailure)}`,
       );
+    }
+
+    if (scene.id === "mcp-current-26-818-sources-pinned") {
+      const readSources = () =>
+        page.evaluate(() => {
+          const rect = (element) => {
+            if (!(element instanceof Element)) return null;
+            const value = element.getBoundingClientRect();
+            return {
+              height: value.height,
+              left: value.left,
+              top: value.top,
+              width: value.width,
+            };
+          };
+          const style = (element) => {
+            if (!(element instanceof Element)) return null;
+            const value = getComputedStyle(element);
+            return {
+              backgroundColor: value.backgroundColor,
+              borderRadius: value.borderRadius,
+              color: value.color,
+              fontFamily: value.fontFamily,
+              fontSize: value.fontSize,
+              fontWeight: value.fontWeight,
+              lineHeight: value.lineHeight,
+              opacity: value.opacity,
+              padding: value.padding,
+              pointerEvents: value.pointerEvents,
+              transform: value.transform,
+            };
+          };
+          const dock = document.querySelector(
+            ".demo-current-mcp-source-summary-dock",
+          );
+          const surface = dock?.querySelector(
+            ".codex-ui-thread-summary-dock__surface",
+          );
+          const panel = dock?.querySelector(
+            ".demo-current-mcp-source-summary-panel",
+          );
+          const sections = panel?.querySelectorAll(
+            ".codex-ui-thread-summary-section",
+          );
+          const rows = panel?.querySelectorAll(
+            ".codex-ui-thread-summary-item",
+          );
+          const outputs = sections?.[0]?.querySelector(
+            ".codex-ui-thread-summary-section__header",
+          );
+          const source = rows?.[1];
+          const viewAll = rows?.[2];
+          const thread = document.querySelector(
+            ".codex-ui-thread-viewport__content",
+          );
+          const mcpGroup = document.querySelector(
+            ".codex-ui-mcp-tool-call-group",
+          );
+          const composer = document.querySelector(".codex-ui-composer");
+          const userBubble = document.querySelector(
+            "[data-user-message-bubble]",
+          );
+          const toggle = document.querySelector(
+            'button[aria-label="Toggle pinned summary"]',
+          );
+          return {
+            bodyOverflow:
+              document.documentElement.scrollWidth -
+              document.documentElement.clientWidth,
+            composer: rect(composer),
+            dock: {
+              open: dock?.getAttribute("data-open"),
+              pinned: dock?.getAttribute("data-pinned"),
+              rect: rect(dock),
+            },
+            outputs: { rect: rect(outputs), style: style(outputs) },
+            mcpGroup: rect(mcpGroup),
+            panel: { rect: rect(panel), style: style(panel) },
+            rowLabels: Array.from(
+              panel?.querySelectorAll(
+                ".codex-ui-thread-summary-item__label",
+              ) ?? [],
+              (element) => element.textContent?.trim(),
+            ),
+            source: { rect: rect(source), style: style(source) },
+            surface: { rect: rect(surface), style: style(surface) },
+            thread: rect(thread),
+            togglePressed: toggle?.getAttribute("aria-pressed"),
+            userBubble: rect(userBubble),
+            viewAll: { rect: rect(viewAll), style: style(viewAll) },
+          };
+        });
+      const initialSources = await readSources();
+      if (
+        initialSources.bodyOverflow !== 0 ||
+        initialSources.dock.open !== "true" ||
+        initialSources.dock.pinned !== "true" ||
+        initialSources.togglePressed !== "true" ||
+        !initialSources.panel.rect ||
+        Math.abs(initialSources.panel.rect.left - 864) > 1 ||
+        Math.abs(initialSources.panel.rect.top - 59) > 1 ||
+        Math.abs(initialSources.panel.rect.width - 300) > 1 ||
+        Math.abs(initialSources.panel.rect.height - 189) > 1 ||
+        initialSources.panel.style?.backgroundColor !== "rgb(45, 45, 45)" ||
+        initialSources.panel.style?.borderRadius !== "25px" ||
+        initialSources.panel.style?.fontWeight !== "445" ||
+        initialSources.panel.style?.lineHeight !== "21px" ||
+        !initialSources.outputs.rect ||
+        Math.abs(initialSources.outputs.rect.left - 864) > 1 ||
+        Math.abs(initialSources.outputs.rect.top - 69) > 1 ||
+        Math.abs(initialSources.outputs.rect.width - 300) > 1 ||
+        Math.abs(initialSources.outputs.rect.height - 28) > 1 ||
+        JSON.stringify(initialSources.rowLabels) !==
+          JSON.stringify([
+            "Create a file or site",
+            "openai-docs-mcp",
+            "View all",
+          ]) ||
+        !initialSources.source.rect ||
+        Math.abs(initialSources.source.rect.left - 878) > 1 ||
+        Math.abs(initialSources.source.rect.top - 182) > 2 ||
+        Math.abs(initialSources.source.rect.width - 272) > 1 ||
+        Math.abs(initialSources.source.rect.height - 29) > 1 ||
+        initialSources.source.style?.fontSize !== "16px" ||
+        initialSources.source.style?.lineHeight !== "24px" ||
+        !initialSources.viewAll.rect ||
+        Math.abs(initialSources.viewAll.rect.left - 878) > 1 ||
+        Math.abs(initialSources.viewAll.rect.top - 213) > 2 ||
+        Math.abs(initialSources.viewAll.rect.width - 272) > 1 ||
+        Math.abs(initialSources.viewAll.rect.height - 29) > 1 ||
+        !initialSources.thread ||
+        Math.abs(initialSources.thread.left + 158) > 1 ||
+        !initialSources.mcpGroup ||
+        Math.abs(initialSources.mcpGroup.left - 64) > 1 ||
+        !initialSources.composer ||
+        Math.abs(initialSources.composer.left - 63) > 2 ||
+        !initialSources.userBubble ||
+        Math.abs(initialSources.userBubble.left - 233) > 2
+      ) {
+        throw new Error(
+          `${scene.id}: pinned MCP Sources geometry failed: ${JSON.stringify(initialSources)}`,
+        );
+      }
+
+      const toggle = page.getByRole("button", {
+        name: "Toggle pinned summary",
+      });
+      await toggle.click();
+      const floatingSources = await readSources();
+      if (
+        floatingSources.dock.open !== "true" ||
+        floatingSources.dock.pinned !== "false" ||
+        floatingSources.togglePressed !== "false" ||
+        !floatingSources.thread ||
+        Math.abs(floatingSources.thread.left) > 1 ||
+        !floatingSources.mcpGroup ||
+        Math.abs(floatingSources.mcpGroup.left - 222) > 1
+      ) {
+        throw new Error(
+          `${scene.id}: floating MCP Sources state failed: ${JSON.stringify(floatingSources)}`,
+        );
+      }
+      await page.mouse.click(600, 600);
+      await page.waitForSelector(
+        '.demo-current-mcp-source-summary-dock[data-open="false"]',
+      );
+      const dismissedSources = await readSources();
+      if (
+        dismissedSources.dock.open !== "false" ||
+        dismissedSources.dock.pinned !== "false" ||
+        dismissedSources.surface.style?.opacity !== "0" ||
+        dismissedSources.surface.style?.pointerEvents !== "none"
+      ) {
+        throw new Error(
+          `${scene.id}: dismissed MCP Sources state failed: ${JSON.stringify(dismissedSources)}`,
+        );
+      }
+      await toggle.click();
+      const reopenedSources = await readSources();
+      if (
+        reopenedSources.dock.open !== "true" ||
+        reopenedSources.dock.pinned !== "true" ||
+        reopenedSources.togglePressed !== "true" ||
+        !reopenedSources.thread ||
+        Math.abs(reopenedSources.thread.left + 158) > 1 ||
+        !reopenedSources.mcpGroup ||
+        Math.abs(reopenedSources.mcpGroup.left - 64) > 1
+      ) {
+        throw new Error(
+          `${scene.id}: repinned MCP Sources state failed: ${JSON.stringify(reopenedSources)}`,
+        );
+      }
+      contract.currentMcpSources = {
+        dismissed: dismissedSources,
+        floating: floatingSources,
+        initial: initialSources,
+        reopened: reopenedSources,
+      };
     }
 
     if (scene.id === "markdown-complete") {

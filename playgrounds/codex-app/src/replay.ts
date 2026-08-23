@@ -20,6 +20,8 @@ import markdownTableActionsTrace from "../fixtures/traces/markdown-table-actions
 import markdownStreamingLargeTrace from "../fixtures/traces/markdown-streaming-large.jsonl?raw";
 import markdownTrace from "../fixtures/traces/markdown.jsonl?raw";
 import mcpCurrentIntegrationRecoveryTrace from "../fixtures/traces/mcp-current-integration-recovery.jsonl?raw";
+import mcpCurrent26818RecoveryTrace from "../fixtures/traces/mcp-current-26-818-recovery.jsonl?raw";
+import mcpCurrent26818SuccessTrace from "../fixtures/traces/mcp-current-26-818-success.jsonl?raw";
 import mcpCurrentRecoveryTrace from "../fixtures/traces/mcp-current-recovery.jsonl?raw";
 import mcpCurrentSuccessTrace from "../fixtures/traces/mcp-current-success.jsonl?raw";
 import mcpToolCallTrace from "../fixtures/traces/mcp-tool-call.jsonl?raw";
@@ -64,6 +66,8 @@ export type ReplayScenarioId =
   | "markdown-table-actions"
   | "markdown-streaming-large"
   | "mcp-current-integration-recovery"
+  | "mcp-current-26-818-recovery"
+  | "mcp-current-26-818-success"
   | "mcp-current-recovery"
   | "mcp-current-success"
   | "mcp-tool-call"
@@ -293,6 +297,12 @@ export const replayScenarios: Record<ReplayScenarioId, ReplayScenario> = {
     "The current 26.810 product sequence uses one Search call followed by one successful Fetch for the canonical Codex MCP page.",
     mcpCurrentSuccessTrace,
   ),
+  "mcp-current-26-818-success": scenario(
+    "mcp-current-26-818-success",
+    "Find current 26.818 Codex MCP guidance",
+    "The runtime-observed 26.818 product searches and fetches the current learn.chatgpt.com MCP page, then opens the pinned Outputs and Sources summary.",
+    mcpCurrent26818SuccessTrace,
+  ),
   "mcp-current-integration-recovery": scenario(
     "mcp-current-integration-recovery",
     "Recover an unavailable integration",
@@ -304,6 +314,12 @@ export const replayScenarios: Record<ReplayScenarioId, ReplayScenario> = {
     "Recover current Codex MCP lookup",
     "The current 26.810 product keeps failed Fetch, recovery Search, and successful Fetch inside one integration group.",
     mcpCurrentRecoveryTrace,
+  ),
+  "mcp-current-26-818-recovery": scenario(
+    "mcp-current-26-818-recovery",
+    "Recover current 26.818 Codex MCP lookup",
+    "The runtime-observed 26.818 product keeps an Invalid URL failure, recovery Search, and successful Fetch in one expanded integration group.",
+    mcpCurrent26818RecoveryTrace,
   ),
   "mcp-tool-call": scenario(
     "mcp-tool-call",

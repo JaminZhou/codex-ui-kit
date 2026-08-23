@@ -127,6 +127,7 @@ import {
   ThreadRenderError,
   ThreadSkeleton,
   ThreadSummaryDelta,
+  ThreadSummaryDock,
   ThreadSummaryIconButton,
   ThreadSummaryItem,
   ThreadSummaryPanel,
@@ -391,6 +392,7 @@ void ThreadNavigationControls;
 void ThreadRenderError;
 void ThreadSkeleton;
 void ThreadSummaryDelta;
+void ThreadSummaryDock;
 void ThreadSummaryIconButton;
 void ThreadSummaryItem;
 void ThreadSummaryPanel;

@@ -14,7 +14,7 @@ exit gates; it does not replace the inventory.
   Desktop `26.818.41509` (`6962`). Unsampled earlier-build surfaces remain
   previous-build regression evidence rather than current verification.
 - The inventory contains 89 surface groups: 59 P0, 21 P1, and 9 P2.
-- 16 groups have current-build runtime evidence, 57 have previous-build-only
+- 20 groups have current-build runtime evidence, 53 have previous-build-only
   runtime evidence, and 16 have not been sampled.
 - The scoped `26.818.41509` refresh revalidates the global shell, responsive
   Composer, primary navigation, project-group lifecycle, Help menu, route
@@ -36,7 +36,15 @@ exit gates; it does not replace the inventory.
   styles, geometry, labels, glyphs, actions, and recovery states; Electron
   repeats both flows at 1180×820 and 720×680. Unmasked product-region
   comparisons pass at 4.4354% under 5% for failure and 3.9512% under 4.5% for
-  interruption. The same capture exposed that the expanded Projects wrapper is
+  interruption. A fresh MCP task now promotes `thread.mcp-tool-events`,
+  `thread.mcp-tool-failure-retry`, `thread.panel-system`, and
+  `thread.sources-panel` on 26.818. It reaches real Search → Fetch success,
+  invalid-URL Fetch → Search → Fetch recovery, the 720×680 error card, and the
+  300×189 Sources summary through pinned, floating, dismissed, and repinned
+  states. Browser/CDP and Electron repeat the flows; unmasked current-product
+  regions pass at 2.1854% for success, 1.1649% for compact recovery, and
+  2.5926% for Sources under independent hard limits. The same capture exposed
+  that the expanded Projects wrapper is
   content-dependent; the sanitized gate now derives its height from the live
   Recent chats group instead of freezing a private-data-dependent 119px value.
   The broader `26.810.52044` refresh remains
@@ -441,11 +449,13 @@ the shell remains usable without horizontal overflow at the compact gate.
 - Composer queue, attachments, modes, permissions, environment/worktree
   context, long input, disabled/submitting/Stop states, and recovery.
 
-The real current-build MCP failure/retry path and the unavailable-integration
-fallback path are now delivered. The latter observes GitHub integration
-unavailability followed by OpenAI Developer Docs Search → Fetch recovery in the
-same thread; it does not claim that the unavailable transport itself
-reconnected. The current-style mixed multi-turn replay now composes search,
+The real current-build MCP success and invalid-URL failure/retry paths are now
+refreshed on `26.818.41509`, including the current public URL mention, 720px
+compact card, and Sources summary ownership lifecycle. The unavailable-
+integration fallback remains previous-build evidence: it observes GitHub
+integration unavailability followed by OpenAI Developer Docs Search → Fetch
+recovery in the same thread, but does not claim that the unavailable transport
+itself reconnected. The current-style mixed multi-turn replay now composes search,
 Browser, MCP, command, approval, file Review, and subagent events under one
 public reducer and one Browser/Electron/pixel matrix. It is composition
 evidence, not a synthetic promotion of whole-thread current-product reachability.
@@ -456,7 +466,7 @@ one fresh exact reply. Settled 1180×820 and 820×680 CDP/Electron evidence,
 a real Electron BrowserWindow cover the header, user/assistant turn, four
 assistant actions, all five Composer controls, responsive containment, and
 zero overflow. The unmasked 768×774 current product region differs by 0.4320%
-under a 0.5% hard limit. Streaming, tool, approval,
+under a 0.5% hard limit. Streaming, approval,
 file, interruption, compaction, and long-thread rows initially retained their
 separately versioned evidence. The streaming row is now also refreshed on the
 same current build with one real 1180→720 running resize and natural
@@ -668,12 +678,13 @@ without confusing package readiness with full product reconstruction.
    controlled failure, and Retry recovery in isolated disposable repositories;
    it gates queued/creating/setting-up/failed/restored semantics, the exact
    branch/error/spinner primitives, and owned pixels.
-3. **Tool recovery and mixed thread — delivered for current component contracts**:
-   `26.803.41515` now covers a real Search → Search → Fetch success and a real
-   invalid-URL Fetch → Search → Fetch recovery inside one integration group,
-   plus a real unavailable GitHub integration followed by same-thread OpenAI
-   Developer Docs Search → Fetch fallback, with Browser/CDP, Electron, compact
-   layout, and local-only pixel gates. The schema-valid current-style mixed
+3. **Tool recovery and mixed thread — current success/recovery refreshed**:
+   `26.818.41509` now covers a real Search → Fetch success, a real invalid-URL
+   Fetch → Search → Fetch recovery, 720×680 compact geometry, and the pinned →
+   floating → dismissed → repinned Sources summary, with Browser/CDP, Electron,
+   and unmasked local-only pixel gates. The previous `26.803.41515` unavailable
+   GitHub integration followed by same-thread OpenAI Developer Docs fallback
+   remains regression evidence. The schema-valid current-style mixed
    replay now adds Web Search → Browser open/find, MCP Search → Fetch,
    command approval, file Review, and delegated audit across wide and 720px
    layouts. Retain true same-transport disconnect/reconnect and a single real

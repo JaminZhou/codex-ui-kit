@@ -82,6 +82,7 @@ import {
   ThreadFloatingButton,
   ThreadMessageNavigationRail,
   ThreadSummaryDelta,
+  ThreadSummaryDock,
   ThreadSummaryIconButton,
   ThreadSummaryItem,
   ThreadSummaryPanel,
@@ -215,7 +216,8 @@ type SummaryGlyphName =
   | "changes"
   | "commit"
   | "computer"
-  | "github";
+  | "github"
+  | "link";
 
 function SidebarGlyph({ name }: { name: SidebarGlyphName }) {
   if (name === "activity") {
@@ -295,6 +297,8 @@ function SummaryGlyph({ name }: { name: SummaryGlyphName }) {
       "M2.25 3.25h11.5v7.5H2.25v-7.5Zm3 10h5.5M8 10.75v2.5",
     github:
       "M8 2.25a5.75 5.75 0 0 0-1.82 11.2c.29.05.39-.13.39-.28v-1.1c-1.63.35-1.97-.69-1.97-.69-.27-.68-.65-.86-.65-.86-.53-.36.04-.35.04-.35.59.04.9.6.9.6.52.9 1.36.64 1.69.49.05-.38.2-.64.37-.79-1.3-.15-2.67-.65-2.67-2.9 0-.64.23-1.16.6-1.57-.06-.15-.26-.74.06-1.54 0 0 .49-.16 1.58.6A5.5 5.5 0 0 1 8 4.54c.49 0 .97.07 1.43.2 1.1-.75 1.58-.6 1.58-.6.32.8.12 1.39.06 1.54.38.41.6.93.6 1.57 0 2.25-1.37 2.75-2.68 2.89.21.18.4.54.4 1.09v1.94c0 .15.1.33.4.27A5.75 5.75 0 0 0 8 2.25Z",
+    link:
+      "M6.25 9.75 9.75 6.25M5.25 11.75H4A2.75 2.75 0 0 1 4 6.25h2M10.75 4.25H12a2.75 2.75 0 1 1 0 5.5h-2",
   }[name];
   return (
     <svg aria-hidden="true" viewBox="0 0 16 16">
@@ -352,6 +356,63 @@ function DemoVsCodeIcon() {
   );
 }
 
+const currentLearnChatGptFavicon =
+  "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAPFBMVEVHcEwAgPcAevf3/P8AgPcAgPgAgPcAgPgAgPcAgPcAdPdgpvrh8P682f10s/uJvfsbjPjS5v44lvmjy/yT3YB9AAAACnRSTlMA////i0ydF8rrN2iBHgAAAXxJREFUOI2FU9uuwzAIa6BNWgK5/v+/HnKruk5H42GaigO242zbXe6w52XMddrDbd/ldm2uuuwb4nbzqv0D4s5335jzgTjmN9B6QI77/GxTEIlPlPuYDx5ZJGMMMRR4bln8sBoig8gZ0Q/E/lhAIgSmohQiiBjhXmJHP2CBwBiAirKpSGuE6/4kHZsIK1ERxGASjyWXGxKJ2TeA1+HZR+SSA0ypdghIpU9AxppIqSyadmsaQQQ6AEMKzIHAZ5l+bo0CZKEyVihBFer1d+i4tu5RzTpBoM8lDIKeIg8dHWCKfknTnzZHKfoptK9QEljIqNeK0+NGaUzA1UkaSIxZ2atAnIAsMEjatUMFQp/RAX7qtDMLiQup0eo0JAXk9m8aNaw2OhFSKAR6XcmwTJ/U6nHbek4SNBLZEwRcmbH3dbf1WRhjz0T9yNQ+8xhqjcwxygrDDMwd6RbGEjNLWP0V7JmpgdI83cl279i/6o7974fz++k1iH0+3q/2/8//D5sDEe8GCH/bAAAAAElFTkSuQmCC";
+
+function CurrentMcpLink({ href }: { href: string }) {
+  return (
+    <a
+      className="demo-current-mcp-answer__link"
+      data-inline-mention-interactive=""
+      href={href}
+      rel="noopener noreferrer"
+      target="_blank"
+    >
+      <span
+        className="demo-current-mcp-answer__favicon-container"
+        data-markdown-copy="exclude"
+      >
+        <img
+          alt=""
+          className="demo-current-mcp-answer__favicon"
+          decoding="async"
+          draggable={false}
+          src={currentLearnChatGptFavicon}
+        />
+      </span>
+      <span>{href}</span>
+    </a>
+  );
+}
+
+function CurrentMcpAnswer({ recovery }: { recovery?: boolean }) {
+  const href = recovery
+    ? "https://learn.chatgpt.com/docs/mcp-server"
+    : "https://learn.chatgpt.com/docs/extend/mcp";
+  return (
+    <div
+      className="demo-current-mcp-answer"
+      data-markdown-text-style="assistant-message"
+    >
+      <p>
+        {recovery ? (
+          <>
+            RECOVERY COMPLETE
+            <br />
+            Use Codex with the Agents SDK
+            <br />
+            <CurrentMcpLink href={href} />
+          </>
+        ) : (
+          <>
+            Model Context Protocol — <CurrentMcpLink href={href} />
+          </>
+        )}
+      </p>
+    </div>
+  );
+}
+
 function querySelection() {
   const params = new URLSearchParams(window.location.search);
   const requested = params.get("scenario");
@@ -373,6 +434,12 @@ function querySelection() {
     "status-lifecycle",
   ].includes(requestedSidebarState ?? "")
     ? requestedSidebarState
+    : null;
+  const requestedSummaryState = params.get("summaryState");
+  const summaryState = ["floating", "hidden", "pinned"].includes(
+    requestedSummaryState ?? "",
+  )
+    ? (requestedSummaryState as "floating" | "hidden" | "pinned")
     : null;
   const layoutMode =
     params.get("layout") === "wide" ? ("wide" as const) : undefined;
@@ -407,6 +474,7 @@ function querySelection() {
     scenarioId,
     shellState,
     sidebarState,
+    summaryState,
     theme,
     view,
   };
@@ -2126,6 +2194,13 @@ export function App() {
       currentSubagentSummaryFrame(initialSelection.frame) ||
       currentWorkspacePersistenceFrame(initialSelection.frame),
   );
+  const [mcpSourceSummaryOpen, setMcpSourceSummaryOpen] = useState(
+    initialSelection.summaryState === "floating" ||
+      initialSelection.summaryState === "pinned",
+  );
+  const [mcpSourceSummaryPinned, setMcpSourceSummaryPinned] = useState(
+    initialSelection.summaryState === "pinned",
+  );
   const [replayQueuedContinuation, setReplayQueuedContinuation] =
     useState<string | null>(() =>
       initialQueuedContinuation(initialSelection.frame),
@@ -2340,6 +2415,7 @@ export function App() {
   const liveStartPendingRef = useRef(false);
   const composerInputRef = useRef<HTMLTextAreaElement>(null);
   const composerResourceTriggerRef = useRef<HTMLButtonElement>(null);
+  const mcpSourceSummaryTriggerRef = useRef<HTMLButtonElement>(null);
   const workspaceEnvironmentTriggerRef =
     useRef<HTMLButtonElement>(null);
   const workspaceWorktreeTriggerRef = useRef<HTMLButtonElement>(null);
@@ -2474,6 +2550,20 @@ export function App() {
     mode === "replay" && scenarioId === "current-mixed-tool-thread";
   const isCurrentReviewFilesReplay =
     mode === "replay" && scenarioId === "current-review-files";
+  const isCurrentMcp26818SuccessReplay =
+    mode === "replay" && scenarioId === "mcp-current-26-818-success";
+  const isCurrentMcp26818RecoveryReplay =
+    mode === "replay" && scenarioId === "mcp-current-26-818-recovery";
+  const isCurrentMcp26818Replay =
+    isCurrentMcp26818SuccessReplay || isCurrentMcp26818RecoveryReplay;
+  const isCurrentMcpSuccessReplay =
+    mode === "replay" &&
+    (scenarioId === "mcp-current-success" ||
+      scenarioId === "mcp-current-26-818-success");
+  const isCurrentMcpRecoveryReplay =
+    mode === "replay" &&
+    (scenarioId === "mcp-current-recovery" ||
+      scenarioId === "mcp-current-26-818-recovery");
 
   useEffect(() => {
     setReviewPanelWidth(isCurrentReviewFilesReplay ? 382.4375 : 370);
@@ -2482,8 +2572,8 @@ export function App() {
     mode === "replay" &&
     (scenarioId === "current-mixed-tool-thread" ||
       scenarioId === "mcp-current-integration-recovery" ||
-      scenarioId === "mcp-current-success" ||
-      scenarioId === "mcp-current-recovery");
+      isCurrentMcpSuccessReplay ||
+      isCurrentMcpRecoveryReplay);
   const isCurrentSubagentReplay =
     mode === "replay" && isSubagentScenarioId(scenarioId);
   const hasSubagentSurface =
@@ -2954,6 +3044,8 @@ export function App() {
       (nextId === "context-summary" && frame === "context-summary-open") ||
         (isSubagentScenarioId(nextId) && currentSubagentSummaryFrame(frame)),
     );
+    setMcpSourceSummaryOpen(false);
+    setMcpSourceSummaryPinned(false);
     setActiveFrame(frame);
     setScenarioSelectionVersion((version) => version + 1);
     setWindowedSelectedMessageIndex(currentWindowedInitialIndex);
@@ -4587,6 +4679,24 @@ export function App() {
                   </ThreadSummaryPanel>
                 )}
               </ThreadSummaryPopover>
+            ) : isCurrentMcp26818Replay ? (
+              <button
+                aria-label="Toggle pinned summary"
+                aria-pressed={mcpSourceSummaryPinned}
+                className="codex-ui-thread-summary-toggle"
+                onClick={() => {
+                  if (mcpSourceSummaryOpen && mcpSourceSummaryPinned) {
+                    setMcpSourceSummaryPinned(false);
+                    return;
+                  }
+                  setMcpSourceSummaryOpen(true);
+                  setMcpSourceSummaryPinned(true);
+                }}
+                ref={mcpSourceSummaryTriggerRef}
+                type="button"
+              >
+                <CurrentBuildIcon name="thread-header-summary" />
+              </button>
             ) : (
               <button aria-label="Thread settings" type="button">
                 ☷
@@ -8084,10 +8194,14 @@ export function App() {
                   message.id === "assistant-markdown-streaming-large") ||
                 (scenarioId === "mcp-tool-call" &&
                   message.id === "assistant-mcp") ||
-                (scenarioId === "mcp-current-success" &&
-                  message.id === "assistant-current-mcp-success") ||
-                (scenarioId === "mcp-current-recovery" &&
-                  message.id === "assistant-current-mcp-recovery") ||
+                (isCurrentMcpSuccessReplay &&
+                  (message.id === "assistant-current-mcp-success" ||
+                    message.id ===
+                      "assistant-current-mcp-26-818-success")) ||
+                (isCurrentMcpRecoveryReplay &&
+                  (message.id === "assistant-current-mcp-recovery" ||
+                    message.id ===
+                      "assistant-current-mcp-26-818-recovery")) ||
                 (scenarioId === "mcp-current-integration-recovery" &&
                   (message.id ===
                     "assistant-current-integration-unavailable" ||
@@ -8225,13 +8339,20 @@ export function App() {
             status={agentMessageStatus(message.status)}
           >
             {message.role === "assistant" ? (
-              <AgentMarkdown
-                allowWideTables={scenarioId === "markdown-table-actions"}
-                linkTarget="_blank"
-                streaming={message.status === "running"}
-              >
-                {message.text || " "}
-              </AgentMarkdown>
+              message.id === "assistant-current-mcp-26-818-success" ? (
+                <CurrentMcpAnswer />
+              ) : message.id ===
+                "assistant-current-mcp-26-818-recovery" ? (
+                <CurrentMcpAnswer recovery />
+              ) : (
+                <AgentMarkdown
+                  allowWideTables={scenarioId === "markdown-table-actions"}
+                  linkTarget="_blank"
+                  streaming={message.status === "running"}
+                >
+                  {message.text || " "}
+                </AgentMarkdown>
+              )
             ) : (
               submittedMessageText || null
             )}
@@ -8522,13 +8643,18 @@ export function App() {
       const presentedGroupStatus =
         currentMcpTurnActive ? "running" : groupStatus;
       const currentMcpCaptureOpen =
-        (scenarioId === "mcp-current-success" &&
+        (isCurrentMcpSuccessReplay &&
           (activeFrame === "mcp-current-running" ||
-            activeFrame === "mcp-current-success")) ||
-        (scenarioId === "mcp-current-recovery" &&
+            activeFrame === "mcp-current-success" ||
+            activeFrame === "mcp-current-26-818-running" ||
+            activeFrame === "mcp-current-26-818-success")) ||
+        (isCurrentMcpRecoveryReplay &&
           (activeFrame === "mcp-current-recovery-failed" ||
             activeFrame === "mcp-current-recovery-retrying" ||
-            activeFrame === "mcp-current-recovery-completed")) ||
+            activeFrame === "mcp-current-recovery-completed" ||
+            activeFrame === "mcp-current-26-818-recovery-failed" ||
+            activeFrame === "mcp-current-26-818-recovery-retrying" ||
+            activeFrame === "mcp-current-26-818-recovery-completed")) ||
         (scenarioId === "mcp-current-integration-recovery" &&
           (activeFrame === "mcp-current-integration-recovering" ||
             activeFrame === "mcp-current-integration-recovered")) ||
@@ -8624,11 +8750,16 @@ export function App() {
                   open={
                     initialSelection.capture &&
                     (call.id === "mcp-fetch-invalid" ||
-                      call.id === "mcp-current-fetch-invalid") &&
+                      call.id === "mcp-current-fetch-invalid" ||
+                      call.id === "mcp-current-26-818-fetch-invalid") &&
                     (activeFrame === "mcp-recovery-failed" ||
                       activeFrame === "mcp-recovery-completed" ||
                       activeFrame === "mcp-current-recovery-failed" ||
-                      activeFrame === "mcp-current-recovery-completed")
+                      activeFrame === "mcp-current-recovery-completed" ||
+                      activeFrame ===
+                        "mcp-current-26-818-recovery-failed" ||
+                      activeFrame ===
+                        "mcp-current-26-818-recovery-completed")
                       ? true
                       : undefined
                   }
@@ -9697,6 +9828,12 @@ export function App() {
       data-scenario={scenarioId}
       data-sidebar-current={currentSidebarComposition || undefined}
       data-sidebar-state={initialSelection.sidebarState ?? undefined}
+      data-summary-open={
+        isCurrentMcp26818Replay ? mcpSourceSummaryOpen : undefined
+      }
+      data-summary-pinned={
+        isCurrentMcp26818Replay ? mcpSourceSummaryPinned : undefined
+      }
       data-status={displayedStatus}
       data-theme={appliedTheme}
       data-thread-following={
@@ -10129,6 +10266,57 @@ export function App() {
 
               </AgentTurn>
             </ConversationThreadShell>
+
+            {isCurrentMcp26818Replay ? (
+              <ThreadSummaryDock
+                anchorRef={mcpSourceSummaryTriggerRef}
+                className="demo-current-mcp-source-summary-dock"
+                onOpenChange={setMcpSourceSummaryOpen}
+                open={mcpSourceSummaryOpen}
+                pinned={mcpSourceSummaryPinned}
+              >
+                <ThreadSummaryPanel
+                  className="demo-current-mcp-source-summary-panel"
+                  label="MCP sources summary"
+                >
+                  <ThreadSummarySection
+                    actions={
+                      <ThreadSummaryIconButton
+                        icon="+"
+                        label="Create a file or site"
+                      />
+                    }
+                    title="Outputs"
+                  >
+                    <ThreadSummaryItem
+                      disabled
+                      label="Create a file or site"
+                    />
+                  </ThreadSummarySection>
+                  <ThreadSummarySection
+                    actions={
+                      <ThreadSummaryIconButton
+                        icon="+"
+                        label="Add a source"
+                      />
+                    }
+                    title="Sources"
+                  >
+                    <ThreadSummaryItem
+                      label="openai-docs-mcp"
+                      leading={
+                        <CurrentBuildIcon name="thread-mcp-tool" />
+                      }
+                    />
+                    <ThreadSummaryItem
+                      label="View all"
+                      leading={<SummaryGlyph name="link" />}
+                      tone="muted"
+                    />
+                  </ThreadSummarySection>
+                </ThreadSummaryPanel>
+              </ThreadSummaryDock>
+            ) : null}
 
             {mode === "replay" && !initialSelection.capture ? (
               <div className="demo-playback" aria-label="Replay controls">

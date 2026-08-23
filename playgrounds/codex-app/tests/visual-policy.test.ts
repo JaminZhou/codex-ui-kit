@@ -28,6 +28,46 @@ const appStyles = readFileSync(
 );
 
 describe("lifecycle visual policy", () => {
+  it("gates runtime-observed 26.818 MCP success, recovery, and Sources regions", () => {
+    expect(electronHarness).toContain('id: "mcp-current-26-818-success"');
+    expect(electronHarness).toContain(
+      'id: "mcp-current-26-818-recovery-compact"',
+    );
+    expect(electronHarness).toContain(
+      'id: "mcp-current-26-818-sources-pinned"',
+    );
+    expect(contract).toContain(
+      "CODEX_UI_KIT_CURRENT_MCP_SUCCESS_26_818_REFERENCE",
+    );
+    expect(contract).toContain(
+      "CODEX_UI_KIT_CURRENT_MCP_RECOVERY_26_818_COMPACT_REFERENCE",
+    );
+    expect(contract).toContain(
+      "CODEX_UI_KIT_CURRENT_MCP_SOURCES_26_818_REFERENCE",
+    );
+    expect(cdpContract).toContain(
+      'scene.id === "mcp-current-26-818-sources-pinned"',
+    );
+    expect(electronContract).toContain(
+      'id: "electron-current-mcp-26-818-success"',
+    );
+    expect(electronContract).toContain(
+      'id: "electron-current-mcp-26-818-recovery"',
+    );
+    expect(electronContract).toContain(
+      "26.818 Electron MCP Sources interaction drifted",
+    );
+    expect(electronContract).toContain(
+      "26.818 Electron MCP recovery drifted",
+    );
+    expect(electronMain).toContain("CODEX_DEMO_SUMMARY_STATE");
+    expect(electronHarness).toContain("CODEX_DEMO_SUMMARY_STATE");
+    expect(appSource).toContain('data-summary-pinned={');
+    expect(appStyles).toContain(
+      '.demo-root[data-summary-pinned="true"]',
+    );
+  });
+
   it("keeps the main gate strict while scoping raster tolerance to the sidebar", () => {
     expect(contract).toContain(
       "const defaultLifecycleMainPixelRatio = 0.0025",

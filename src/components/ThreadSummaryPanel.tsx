@@ -4,6 +4,9 @@ import {
   type HTMLAttributes,
   type ReactElement,
   type ReactNode,
+  type RefObject,
+  useEffect,
+  useRef,
   useState,
 } from "react";
 import { Popover } from "./InteractivePrimitives.js";
@@ -30,6 +33,66 @@ export function ThreadSummaryPanel({
       data-slot="thread-summary-panel"
     >
       {children}
+    </div>
+  );
+}
+
+export interface ThreadSummaryDockProps
+  extends Omit<HTMLAttributes<HTMLDivElement>, "children"> {
+  anchorRef?: RefObject<HTMLElement | null>;
+  children: ReactNode;
+  defaultOpen?: boolean;
+  dismissOnOutsidePointerDown?: boolean;
+  onOpenChange?: (open: boolean) => void;
+  open?: boolean;
+  pinned?: boolean;
+}
+
+export function ThreadSummaryDock({
+  anchorRef,
+  children,
+  className,
+  defaultOpen = false,
+  dismissOnOutsidePointerDown = true,
+  onOpenChange,
+  open,
+  pinned = false,
+  ...props
+}: ThreadSummaryDockProps) {
+  const [internalOpen, setInternalOpen] = useState(defaultOpen);
+  const dockRef = useRef<HTMLDivElement>(null);
+  const resolvedOpen = open ?? internalOpen;
+  const updateOpen = (nextOpen: boolean) => {
+    if (open === undefined) setInternalOpen(nextOpen);
+    onOpenChange?.(nextOpen);
+  };
+
+  useEffect(() => {
+    if (!resolvedOpen || pinned || !dismissOnOutsidePointerDown) return;
+    const dismiss = (event: PointerEvent) => {
+      const target = event.target;
+      if (!(target instanceof Node)) return;
+      if (dockRef.current?.contains(target)) return;
+      if (anchorRef?.current?.contains(target)) return;
+      updateOpen(false);
+    };
+    document.addEventListener("pointerdown", dismiss, true);
+    return () => document.removeEventListener("pointerdown", dismiss, true);
+  }, [anchorRef, dismissOnOutsidePointerDown, pinned, resolvedOpen]);
+
+  return (
+    <div
+      {...props}
+      aria-hidden={!resolvedOpen}
+      className={["codex-ui-thread-summary-dock", className]
+        .filter(Boolean)
+        .join(" ")}
+      data-open={resolvedOpen}
+      data-pinned={pinned}
+      data-slot="thread-summary-dock"
+      ref={dockRef}
+    >
+      <div className="codex-ui-thread-summary-dock__surface">{children}</div>
     </div>
   );
 }
