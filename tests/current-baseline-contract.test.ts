@@ -56,10 +56,12 @@ describe("current baseline capture contract", () => {
     },
     empty: { emptyMessageCount: 1, focusOnSearch: true, rowCount: 0 },
     expanded: {
+      collapsedWrapperHeight: 71,
       expandedCount: 1,
       focusOnToggle: true,
       recentGroupCount: 1,
-      wrapperHeight: 119,
+      recentGroupHeight: 108,
+      wrapperHeight: 191,
     },
     sort: {
       initial: {
@@ -155,6 +157,22 @@ describe("current baseline capture contract", () => {
       assertCurrentProjectsIndexObservation({
         ...observation,
         expanded: { ...observation.expanded, recentGroupCount: 0 },
+      }),
+    ).toThrow("expansion and focus continuity");
+    expect(() =>
+      assertCurrentProjectsIndexObservation({
+        ...observation,
+        expanded: {
+          ...observation.expanded,
+          recentGroupHeight: 121,
+          wrapperHeight: 204,
+        },
+      }),
+    ).not.toThrow();
+    expect(() =>
+      assertCurrentProjectsIndexObservation({
+        ...observation,
+        expanded: { ...observation.expanded, wrapperHeight: 160 },
       }),
     ).toThrow("expansion and focus continuity");
   });

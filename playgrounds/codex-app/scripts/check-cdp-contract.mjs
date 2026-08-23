@@ -5290,7 +5290,7 @@ for (const scene of selectedScenes) {
         !thread ||
         !composer ||
         !header ||
-        !sidebarResizer
+        (!sidebarResizer && root.getAttribute("data-sidebar-state") !== "hidden")
       ) {
         throw new Error("Required integration surfaces are missing.");
       }
@@ -6004,7 +6004,9 @@ for (const scene of selectedScenes) {
         })(),
         styles: {
           composerPosition: getComputedStyle(composer).position,
-          resizerCursor: getComputedStyle(sidebarResizer).cursor,
+          resizerCursor: sidebarResizer
+            ? getComputedStyle(sidebarResizer).cursor
+            : null,
           shellDisplay: getComputedStyle(shell).display,
           threadPaddingBottom: getComputedStyle(thread).paddingBottom,
           viewportOverflowY: getComputedStyle(viewport).overflowY,
@@ -6014,12 +6016,14 @@ for (const scene of selectedScenes) {
           scrollHeight: viewport.scrollHeight,
           scrollTop: viewport.scrollTop,
         },
-        sidebarResizer: {
-          ariaMax: sidebarResizer.getAttribute("aria-valuemax"),
-          ariaMin: sidebarResizer.getAttribute("aria-valuemin"),
-          ariaNow: sidebarResizer.getAttribute("aria-valuenow"),
-          rect: rect(sidebarResizer),
-        },
+        sidebarResizer: sidebarResizer
+          ? {
+              ariaMax: sidebarResizer.getAttribute("aria-valuemax"),
+              ariaMin: sidebarResizer.getAttribute("aria-valuemin"),
+              ariaNow: sidebarResizer.getAttribute("aria-valuenow"),
+              rect: rect(sidebarResizer),
+            }
+          : null,
         sidePanelResizer: sidePanelResizer
           ? {
               ariaMax: sidePanelResizer.getAttribute("aria-valuemax"),
@@ -7835,6 +7839,7 @@ for (const scene of selectedScenes) {
       throw new Error(`${scene.id}: conversation viewport is not scrollable.`);
     }
     const expectedViewportHeight = scene.windowSize?.height ?? 820;
+    const hiddenSidebarScene = scene.sidebarState === "hidden";
     const currentBuildSidebarScene =
       scene.currentSidebar === true ||
       scene.id === "current-sidebar" ||
@@ -7842,34 +7847,38 @@ for (const scene of selectedScenes) {
     const currentSidebarStatusScene =
       scene.id === "current-sidebar-status-lifecycle";
     if (
-      !contract.sidebar ||
-      !contract.sidebar.titlebarInset ||
-      Math.abs(contract.sidebar.rect.width - 274) > 1 ||
-      Math.abs(
-        contract.sidebar.rect.height - expectedViewportHeight,
-      ) > 1 ||
-      Math.abs(contract.sidebar.header.top - 46) > 1 ||
-      Math.abs(contract.sidebar.header.height - 70) > 1 ||
-      Math.abs(contract.sidebar.navigation.top - 116) > 1 ||
-      Math.abs(
-        contract.sidebar.navigation.bottom -
-          contract.sidebar.footer.top,
-      ) > 1 ||
-      Math.abs(contract.sidebar.footer.height - 46) > 1 ||
-      Math.abs(
-        contract.sidebar.footer.bottom - expectedViewportHeight,
-      ) > 1 ||
-      contract.sidebar.navigation.scrollHeight <
-        contract.sidebar.navigation.clientHeight ||
-      contract.sidebar.projectToggleExpanded !== "false" ||
-      contract.sidebar.actionToolbars < 8 ||
-      contract.sidebar.statusCounts.error !==
-        (currentSidebarStatusScene ? 1 : currentBuildSidebarScene ? 0 : 1) ||
-      (!currentBuildSidebarScene &&
-        contract.sidebar.statusCounts.queued < 1) ||
-      contract.sidebar.statusCounts.unread <
-        (currentBuildSidebarScene ? 1 : 2) ||
-      contract.sidebar.selectedCount < 1
+      hiddenSidebarScene
+        ? !contract.sidebar ||
+          Math.abs(contract.sidebar.rect.width) > 1 ||
+          Math.abs(contract.sidebar.navigation.rect.width) > 1
+        : !contract.sidebar ||
+          !contract.sidebar.titlebarInset ||
+          Math.abs(contract.sidebar.rect.width - 274) > 1 ||
+          Math.abs(
+            contract.sidebar.rect.height - expectedViewportHeight,
+          ) > 1 ||
+          Math.abs(contract.sidebar.header.top - 46) > 1 ||
+          Math.abs(contract.sidebar.header.height - 70) > 1 ||
+          Math.abs(contract.sidebar.navigation.top - 116) > 1 ||
+          Math.abs(
+            contract.sidebar.navigation.bottom -
+              contract.sidebar.footer.top,
+          ) > 1 ||
+          Math.abs(contract.sidebar.footer.height - 46) > 1 ||
+          Math.abs(
+            contract.sidebar.footer.bottom - expectedViewportHeight,
+          ) > 1 ||
+          contract.sidebar.navigation.scrollHeight <
+            contract.sidebar.navigation.clientHeight ||
+          contract.sidebar.projectToggleExpanded !== "false" ||
+          contract.sidebar.actionToolbars < 8 ||
+          contract.sidebar.statusCounts.error !==
+            (currentSidebarStatusScene ? 1 : currentBuildSidebarScene ? 0 : 1) ||
+          (!currentBuildSidebarScene &&
+            contract.sidebar.statusCounts.queued < 1) ||
+          contract.sidebar.statusCounts.unread <
+            (currentBuildSidebarScene ? 1 : 2) ||
+          contract.sidebar.selectedCount < 1
     ) {
       throw new Error(
         `${scene.id}: current-build sidebar contract failed: ${JSON.stringify(contract.sidebar)}`,
@@ -8033,11 +8042,14 @@ for (const scene of selectedScenes) {
             ? "508"
             : "520";
     if (
-      contract.styles.resizerCursor !== "col-resize" ||
-      Math.abs(contract.sidebarResizer.rect.width - 16) > 0.5 ||
-      contract.sidebarResizer.ariaMin !== "240" ||
-      contract.sidebarResizer.ariaMax !== expectedSidebarMax ||
-      contract.sidebarResizer.ariaNow !== "274"
+      hiddenSidebarScene
+        ? contract.sidebarResizer !== null ||
+          Math.abs(contract.shell.width - 1180) > 1
+        : contract.styles.resizerCursor !== "col-resize" ||
+          Math.abs(contract.sidebarResizer.rect.width - 16) > 0.5 ||
+          contract.sidebarResizer.ariaMin !== "240" ||
+          contract.sidebarResizer.ariaMax !== expectedSidebarMax ||
+          contract.sidebarResizer.ariaNow !== "274"
     ) {
       throw new Error(
         `${scene.id}: navigation resizer contract failed: ${JSON.stringify({
@@ -8705,7 +8717,8 @@ for (const scene of selectedScenes) {
     if (
       scene.id === "command-failure-running" ||
       scene.id === "command-failure-collapsed" ||
-      scene.id === "command-failure-expanded"
+      scene.id === "command-failure-expanded" ||
+      scene.id === "current-command-failure-expanded"
     ) {
       const commandOutput = contract.commandOutput;
       const running = scene.id === "command-failure-running";
@@ -8714,15 +8727,17 @@ for (const scene of selectedScenes) {
         !commandOutput ||
         !commandOutput.timelineExpanded ||
         commandOutput.timelineLabel !==
-          (running ? "Working" : "Worked for 12s") ||
+          (running ? "Working" : "Worked for 10s") ||
         commandOutput.executionExpanded !== expanded ||
         commandOutput.status !== (running ? "running" : "failed") ||
-        !commandOutput.summary?.startsWith(
-          running ? "Running command" : "Ran sh -c 'i=1;",
-        ) ||
-        !commandOutput.commandLabel?.startsWith("$ sh -c 'i=1;") ||
+        commandOutput.summary !==
+          (running
+            ? "Running command"
+            : "Ran printf 'CURRENT FAILURE STDERR\\n' >&2; printf 'CURRENT FAILURE STDOUT\\n'; exit 7") ||
+        commandOutput.commandLabel !==
+          "$ printf 'CURRENT FAILURE STDERR\\n' >&2; printf 'CURRENT FAILURE STDOUT\\n'; exit 7" ||
         commandOutput.commandExpanded !== "false" ||
-        commandOutput.lineCount !== 161 ||
+        commandOutput.lineCount !== 3 ||
         commandOutput.shellLabel !== "Shell" ||
         commandOutput.copyLabels.filter((label) => label === "Copy").length !==
           2
@@ -8740,9 +8755,9 @@ for (const scene of selectedScenes) {
           commandOutput.shell.style.overflow !== "hidden" ||
           !commandOutput.output ||
           Math.abs(commandOutput.output.rect.width - 734) > 1 ||
-          Math.abs(commandOutput.output.rect.height - 144) > 1 ||
-          commandOutput.output.clientHeight !== 144 ||
-          commandOutput.output.scrollHeight !== 3136 ||
+          Math.abs(commandOutput.output.rect.height - 55) > 1 ||
+          commandOutput.output.clientHeight !== 55 ||
+          commandOutput.output.scrollHeight !== 55 ||
           Math.abs(commandOutput.output.scrollTop) > 1 ||
           commandOutput.output.style.flexDirection !== "column-reverse" ||
           commandOutput.output.style.fontSize !== "13px" ||
@@ -8750,8 +8765,8 @@ for (const scene of selectedScenes) {
           commandOutput.output.style.maxHeight !== "144px" ||
           commandOutput.output.style.overflowY !== "auto" ||
           commandOutput.output.style.padding !== "8px" ||
-          commandOutput.output.textStart !== "stderr-001\ns" ||
-          !commandOutput.output.textEnd.endsWith("080\nstderr-080\n") ||
+          commandOutput.output.textStart !== "CURRENT FAIL" ||
+          !commandOutput.output.textEnd.endsWith("FAILURE STDERR\n") ||
           (!running && commandOutput.footer?.text !== "Exit code 7"))
       ) {
         throw new Error(
@@ -8759,7 +8774,102 @@ for (const scene of selectedScenes) {
         );
       }
 
-      if (scene.id === "command-failure-expanded") {
+      if (scene.id === "current-command-failure-expanded") {
+        const currentFailure = await page.evaluate(() => {
+          const rect = (element) => {
+            const value = element?.getBoundingClientRect();
+            return value
+              ? {
+                  height: value.height,
+                  left: value.left,
+                  top: value.top,
+                  width: value.width,
+                }
+              : null;
+          };
+          const assistant = document.querySelector(
+            '[data-item-id="assistant-command-failure-recovered"] .codex-ui-markdown',
+          );
+          const userRecovery = document.querySelector(
+            '[data-item-id="user-command-follow-up"] .codex-ui-agent-message__content',
+          );
+          const timeline = document.querySelector(
+            '[data-item-id="command-failure-output"]',
+          )?.closest(".codex-ui-activity-timeline");
+          return {
+            actionLabels: [...document.querySelectorAll("button")]
+              .filter((button) => button.checkVisibility())
+              .map(
+                (button) =>
+                  button.getAttribute("aria-label") ??
+                  button.textContent?.replace(/\s+/g, " ").trim(),
+              )
+              .filter(Boolean),
+            assistant: assistant
+              ? {
+                  rect: rect(assistant),
+                  style: {
+                    fontSize: getComputedStyle(assistant).fontSize,
+                    fontWeight: getComputedStyle(assistant).fontWeight,
+                    lineHeight: getComputedStyle(assistant).lineHeight,
+                  },
+                  text: assistant.textContent?.trim(),
+                }
+              : null,
+            composer: rect(document.querySelector(".codex-ui-composer")),
+            terminalIconCount: document.querySelectorAll(
+              '[data-current-build-icon="thread-command-terminal"]',
+            ).length,
+            timeline: rect(
+              timeline?.querySelector(
+                ".codex-ui-activity-timeline__toggle",
+              ),
+            ),
+            userRecovery: userRecovery
+              ? {
+                  rect: rect(userRecovery),
+                  text: userRecovery.textContent?.trim(),
+                }
+              : null,
+          };
+        });
+        if (
+          currentFailure.assistant?.text !==
+            "CURRENT COMMAND FAILURE OBSERVED" ||
+          currentFailure.assistant.style.fontSize !== "14px" ||
+          currentFailure.assistant.style.fontWeight !== "445" ||
+          currentFailure.assistant.style.lineHeight !== "22px" ||
+          Math.abs(currentFailure.assistant.rect.left - 222) > 1 ||
+          Math.abs(currentFailure.assistant.rect.top - 504) > 1 ||
+          Math.abs(currentFailure.assistant.rect.width - 736) > 1 ||
+          Math.abs(currentFailure.assistant.rect.height - 22) > 1 ||
+          currentFailure.userRecovery?.text !==
+            "Do not use tools. Reply exactly: CURRENT COMMAND RECOVERY ACCEPTED" ||
+          Math.abs((currentFailure.userRecovery?.rect.left ?? 0) - 427.94) >
+            1 ||
+          Math.abs((currentFailure.userRecovery?.rect.top ?? 0) - 561) > 1 ||
+          Math.abs((currentFailure.timeline?.left ?? 0) - 222) > 1 ||
+          Math.abs((currentFailure.timeline?.top ?? 0) - 269.92) > 1 ||
+          Math.abs((currentFailure.timeline?.height ?? 0) - 23) > 1 ||
+          Math.abs((currentFailure.composer?.left ?? 0) - 222) > 1 ||
+          Math.abs((currentFailure.composer?.top ?? 0) - 706) > 1 ||
+          Math.abs((currentFailure.composer?.width ?? 0) - 736) > 1 ||
+          Math.abs((currentFailure.composer?.height ?? 0) - 98) > 1 ||
+          currentFailure.terminalIconCount !== 1 ||
+          !["Copy response", "Good response", "Bad response", "Share response"].every(
+            (label) => currentFailure.actionLabels.includes(label),
+          )
+        ) {
+          throw new Error(
+            `${scene.id}: current 26.818 command failure evidence drifted: ${JSON.stringify(currentFailure)}`,
+          );
+        }
+      }
+
+      if (
+        scene.id === "command-failure-expanded" ||
+        scene.id === "current-command-failure-expanded"
+      ) {
         const commandLine = page.locator(
           '[data-item-id="command-failure-output"] .codex-ui-command-execution__command-line',
         );
@@ -8801,10 +8911,15 @@ for (const scene of selectedScenes) {
       }
     }
 
-    if (scene.id.startsWith("command-interruption-")) {
+    if (
+      scene.id.startsWith("command-interruption-") ||
+      scene.id === "current-command-interruption-recovered"
+    ) {
       const commandOutput = contract.commandOutput;
       const running = scene.id === "command-interruption-running";
-      const recovered = scene.id === "command-interruption-recovered";
+      const recovered =
+        scene.id === "command-interruption-recovered" ||
+        scene.id === "current-command-interruption-recovered";
       const interruptionState = await page.evaluate(() => ({
         assistantText:
           document
@@ -8858,7 +8973,7 @@ for (const scene of selectedScenes) {
           : commandOutput.compactDetail !== null ||
             !contract.interruption ||
             contract.interruption.status !== "stopped" ||
-            contract.interruption.label?.text !== "You stopped after 8s" ||
+            contract.interruption.label?.text !== "You stopped after 58s" ||
             contract.interruption.label?.style.fontSize !== "14px" ||
             contract.interruption.label?.style.fontWeight !== "445" ||
             contract.interruption.label?.style.lineHeight !== "21px" ||
@@ -8879,6 +8994,93 @@ for (const scene of selectedScenes) {
             rootStatus: contract.rootStatus,
           })}`,
         );
+      }
+      if (scene.id === "current-command-interruption-recovered") {
+        const currentInterruption = await page.evaluate(() => {
+          const rect = (element) => {
+            const value = element?.getBoundingClientRect();
+            return value
+              ? {
+                  height: value.height,
+                  left: value.left,
+                  top: value.top,
+                  width: value.width,
+                }
+              : null;
+          };
+          const assistant = document.querySelector(
+            '[data-item-id="assistant-command-interruption-recovery"] .codex-ui-markdown',
+          );
+          const userRecovery = document.querySelector(
+            '[data-item-id="user-command-interruption-recovery"] .codex-ui-agent-message__content',
+          );
+          return {
+            actionLabels: [...document.querySelectorAll("button")]
+              .filter((button) => button.checkVisibility())
+              .map(
+                (button) =>
+                  button.getAttribute("aria-label") ??
+                  button.textContent?.replace(/\s+/g, " ").trim(),
+              )
+              .filter(Boolean),
+            assistant: assistant
+              ? {
+                  rect: rect(assistant),
+                  style: {
+                    fontSize: getComputedStyle(assistant).fontSize,
+                    fontWeight: getComputedStyle(assistant).fontWeight,
+                    lineHeight: getComputedStyle(assistant).lineHeight,
+                  },
+                  text: assistant.textContent?.trim(),
+                }
+              : null,
+            composer: rect(document.querySelector(".codex-ui-composer")),
+            summary: rect(
+              document.querySelector(
+                ".codex-ui-thread-interruption-summary",
+              ),
+            ),
+            userRecovery: userRecovery
+              ? {
+                  rect: rect(userRecovery),
+                  text: userRecovery.textContent?.trim(),
+                }
+              : null,
+          };
+        });
+        if (
+          currentInterruption.assistant?.text !==
+            "CURRENT INTERRUPTION RECOVERY ACCEPTED" ||
+          currentInterruption.assistant.style.fontSize !== "14px" ||
+          currentInterruption.assistant.style.fontWeight !== "445" ||
+          currentInterruption.assistant.style.lineHeight !== "22px" ||
+          Math.abs(currentInterruption.assistant.rect.left - 222) > 1 ||
+          Math.abs(currentInterruption.assistant.rect.top - 614) > 1 ||
+          Math.abs(currentInterruption.assistant.rect.width - 736) > 1 ||
+          Math.abs(currentInterruption.assistant.rect.height - 22) > 1 ||
+          currentInterruption.userRecovery?.text !==
+            "Do not use tools. Reply exactly: CURRENT INTERRUPTION RECOVERY ACCEPTED" ||
+          Math.abs(
+            (currentInterruption.userRecovery?.rect.left ?? 0) - 400.92,
+          ) > 1 ||
+          Math.abs((currentInterruption.userRecovery?.rect.top ?? 0) - 530) >
+            1 ||
+          Math.abs((currentInterruption.summary?.left ?? 0) - 222) > 1 ||
+          Math.abs((currentInterruption.summary?.top ?? 0) - 451) > 1 ||
+          Math.abs((currentInterruption.summary?.width ?? 0) - 736) > 1 ||
+          Math.abs((currentInterruption.summary?.height ?? 0) - 30) > 1 ||
+          Math.abs((currentInterruption.composer?.left ?? 0) - 222) > 1 ||
+          Math.abs((currentInterruption.composer?.top ?? 0) - 706) > 1 ||
+          Math.abs((currentInterruption.composer?.width ?? 0) - 736) > 1 ||
+          Math.abs((currentInterruption.composer?.height ?? 0) - 98) > 1 ||
+          !["Copy response", "Good response", "Bad response", "Share response"].every(
+            (label) => currentInterruption.actionLabels.includes(label),
+          )
+        ) {
+          throw new Error(
+            `${scene.id}: current 26.818 command interruption evidence drifted: ${JSON.stringify(currentInterruption)}`,
+          );
+        }
       }
     }
 
@@ -9825,7 +10027,7 @@ try {
     !stopping.commandSummary?.startsWith(
       "Background terminal stopped with for i in $(seq 1 120)",
     ) ||
-    stopping.interruption !== "You stopped after 8s" ||
+    stopping.interruption !== "You stopped after 58s" ||
     stopping.stopCount !== 0 ||
     stopping.stopAllCount !== 1 ||
     stopping.stopProcessCount !== 1
@@ -9899,7 +10101,7 @@ try {
     recovered.activeElement !== "Message composer" ||
     recovered.assistantText !== "CURRENT INTERRUPTION RECOVERY ACCEPTED" ||
     recovered.commandStatus !== "interrupted" ||
-    recovered.interruption !== "You stopped after 8s" ||
+    recovered.interruption !== "You stopped after 58s" ||
     recovered.stopCount !== 0
   ) {
     throw new Error(

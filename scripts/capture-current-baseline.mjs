@@ -1077,6 +1077,12 @@ try {
     );
 
     const toggle = page.locator('[aria-label="Toggle project"]').first();
+    const collapsedWrapperHeight = await page.evaluate(() => {
+      const wrapper = document.querySelector("[data-project-row-wrapper]");
+      return wrapper
+        ? Math.round(wrapper.getBoundingClientRect().height * 100) / 100
+        : null;
+    });
     await toggle.click();
     await page.waitForFunction(
       () =>
@@ -1085,26 +1091,40 @@ try {
           ?.getAttribute("aria-expanded") === "true",
     );
     await page.waitForTimeout(250);
-    const expanded = await page.evaluate(() => {
+    const expanded = await page.evaluate((collapsedWrapperHeight) => {
       const wrapper = document.querySelector("[data-project-row-wrapper]");
+      const recentGroups = [...document.querySelectorAll("[aria-label]")].filter(
+        (element) =>
+          /^(Chats in|Local chats in|Recent chats in|Search matches in)/.test(
+            element.getAttribute("aria-label") ?? "",
+          ) &&
+          element.checkVisibility({
+            checkOpacity: true,
+            checkVisibilityCSS: true,
+          }),
+      );
       return {
+        collapsedWrapperHeight,
         expandedCount: document.querySelectorAll(
           '[aria-label="Toggle project"][aria-expanded="true"]',
         ).length,
         focusOnToggle:
           document.activeElement?.getAttribute("aria-label") ===
           "Toggle project",
-        recentGroupCount: [...document.querySelectorAll("[aria-label]")].filter(
-          (element) =>
-            /^(Chats in|Local chats in|Recent chats in|Search matches in)/.test(
-              element.getAttribute("aria-label") ?? "",
-            ),
-        ).length,
+        recentGroupCount: recentGroups.length,
+        recentGroupHeight:
+          Math.round(
+            recentGroups.reduce(
+              (height, element) =>
+                height + element.getBoundingClientRect().height,
+              0,
+            ) * 100,
+          ) / 100,
         wrapperHeight: wrapper
           ? Math.round(wrapper.getBoundingClientRect().height * 100) / 100
           : null,
       };
-    });
+    }, collapsedWrapperHeight);
     await toggle.click();
     await page.waitForFunction(
       () =>

@@ -784,23 +784,26 @@ describe("protocol lifecycle reducer", () => {
     expect(running.commands).toEqual([
       expect.objectContaining({
         exitCode: null,
-        output: expect.stringContaining("stderr-001\nstdout-001"),
+        output:
+          "CURRENT FAILURE STDOUT\nCURRENT FAILURE STDERR\n",
         status: "running",
       }),
     ]);
     expect(failed.commands).toEqual([
       expect.objectContaining({ exitCode: 7, status: "failed" }),
     ]);
-    expect(failed.commands[0]?.output).toContain("stdout-080\nstderr-080\n");
-    expect(failed.commands[0]?.output.split("\n")).toHaveLength(161);
+    expect(failed.commands[0]?.output).toBe(
+      "CURRENT FAILURE STDOUT\nCURRENT FAILURE STDERR\n",
+    );
+    expect(failed.commands[0]?.output.split("\n")).toHaveLength(3);
     expect(completed.status).toBe("completed");
     expect(completed.turnDurationsMs).toMatchObject({
-      "turn-command-failure": 12_857,
+      "turn-command-failure": 10_000,
       "turn-command-follow-up": 1_400,
     });
     expect(completed.messages.at(-1)).toMatchObject({
       id: "assistant-command-follow-up",
-      text: "Recovery follow-up accepted.",
+      text: "CURRENT COMMAND RECOVERY ACCEPTED",
     });
     expect(completed.timeline.map(({ kind }) => kind)).toEqual([
       "message",
@@ -839,16 +842,16 @@ describe("protocol lifecycle reducer", () => {
     expect(
       stopping.messages.find(({ id }) => id === "user-command-interruption")
         ?.interruptionDurationMs,
-    ).toBe(8_000);
+    ).toBe(58_000);
     expect(settled.status).toBe("interrupted");
     expect(settled.commands[0]).toMatchObject({
-      durationMs: 8_000,
+      durationMs: 58_000,
       exitCode: 0,
       status: "completed",
     });
     expect(recovered.status).toBe("completed");
     expect(recovered.turnDurationsMs).toMatchObject({
-      "turn-command-interruption": 8_000,
+      "turn-command-interruption": 58_000,
       "turn-command-interruption-recovery": 1_500,
     });
     expect(recovered.messages.at(-1)).toMatchObject({
@@ -858,7 +861,7 @@ describe("protocol lifecycle reducer", () => {
     expect(
       recovered.messages.find(({ id }) => id === "user-command-interruption")
         ?.interruptionDurationMs,
-    ).toBe(8_000);
+    ).toBe(58_000);
     expect(recovered.timeline.map(({ kind }) => kind)).toEqual([
       "message",
       "command",

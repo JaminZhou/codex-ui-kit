@@ -14,7 +14,7 @@ exit gates; it does not replace the inventory.
   Desktop `26.818.41509` (`6962`). Unsampled earlier-build surfaces remain
   previous-build regression evidence rather than current verification.
 - The inventory contains 89 surface groups: 59 P0, 21 P1, and 9 P2.
-- 13 groups have current-build runtime evidence, 60 have previous-build-only
+- 16 groups have current-build runtime evidence, 57 have previous-build-only
   runtime evidence, and 16 have not been sampled.
 - The scoped `26.818.41509` refresh revalidates the global shell, responsive
   Composer, primary navigation, project-group lifecycle, Help menu, route
@@ -27,6 +27,18 @@ exit gates; it does not replace the inventory.
   `thread.messages-basic` on 26.818: exact 1180×820 geometry, 820×680 compact
   containment, four response actions, all five Composer hit targets, and a
   no-mask 768×774 product comparison at 0.4320% changed pixels.
+  A current command task now also promotes command execution, failure recovery,
+  and interruption recovery on 26.818. One exact shell command emitted the
+  sampled stdout/stderr pair, exited 7, exposed `Worked for 10s`, and accepted
+  an exact no-tool recovery. A second 120-second command was stopped after 58
+  seconds, retained the stopped background-terminal row, and accepted a second
+  exact recovery in the same task. Browser/CDP locks the current computed
+  styles, geometry, labels, glyphs, actions, and recovery states; Electron
+  repeats both flows at 1180×820 and 720×680. Unmasked product-region
+  comparisons pass at 4.4354% under 5% for failure and 3.9512% under 4.5% for
+  interruption. The same capture exposed that the expanded Projects wrapper is
+  content-dependent; the sanitized gate now derives its height from the live
+  Recent chats group instead of freezing a private-data-dependent 119px value.
   The broader `26.810.52044` refresh remains
   previous-build regression evidence; it revalidated 115
   sidebar/menu/window-chrome/Composer/Settings/completed-thread icons against

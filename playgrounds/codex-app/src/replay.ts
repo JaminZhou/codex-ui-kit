@@ -164,7 +164,7 @@ export const replayScenarios: Record<ReplayScenarioId, ReplayScenario> = {
   "command-failure-recovery": scenario(
     "command-failure-recovery",
     "Recover from command failure",
-    "A current stdout/stderr command exits 7, expands into its bounded reverse-tail shell, and accepts a clean follow-up turn.",
+    "The current installed Codex stdout/stderr probe exits 7, preserves its exact shell card, and accepts the observed same-thread recovery response.",
     commandFailureRecoveryTrace,
   ),
   "terminal-lifecycle": scenario(
@@ -206,7 +206,7 @@ export const replayScenarios: Record<ReplayScenarioId, ReplayScenario> = {
   interruption: scenario(
     "interruption",
     "Run interrupt probe",
-    "A current long-running command is stopped, retains its settled background-terminal row, and accepts a clean same-thread follow-up.",
+    "The current installed Codex long-running command is stopped after 58 seconds, retains its settled background-terminal row, and accepts the observed same-thread recovery response.",
     interruptionTrace,
   ),
   compaction: scenario(

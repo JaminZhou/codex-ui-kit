@@ -185,11 +185,21 @@ export function assertCurrentProjectsIndexObservation(observation) {
       `Current Projects observation does not prove the settled empty state: ${JSON.stringify(observation?.empty)}`,
     );
   }
+  const expanded = observation?.expanded;
+  const expandedContentDelta =
+    expanded?.wrapperHeight - expanded?.collapsedWrapperHeight;
   if (
-    observation?.expanded?.expandedCount !== 1 ||
-    observation.expanded.focusOnToggle !== true ||
-    observation.expanded.recentGroupCount !== 1 ||
-    !withinTolerance(observation.expanded.wrapperHeight, 119) ||
+    expanded?.expandedCount !== 1 ||
+    expanded.focusOnToggle !== true ||
+    expanded.recentGroupCount !== 1 ||
+    !Number.isFinite(expanded.collapsedWrapperHeight) ||
+    expanded.collapsedWrapperHeight < 24 ||
+    !Number.isFinite(expanded.recentGroupHeight) ||
+    expanded.recentGroupHeight < 24 ||
+    !Number.isFinite(expandedContentDelta) ||
+    expandedContentDelta < expanded.recentGroupHeight ||
+    expandedContentDelta > expanded.recentGroupHeight + 24 ||
+    expanded.wrapperHeight <= expanded.collapsedWrapperHeight ||
     observation?.collapsed?.expandedCount !== 0 ||
     observation.collapsed.focusOnToggle !== true
   ) {

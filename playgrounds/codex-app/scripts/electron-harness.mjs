@@ -1261,6 +1261,26 @@ export const visualScenes = [
     surfaces: ["command"],
   },
   {
+    currentSidebar: true,
+    frame: "command-failure-recovered",
+    id: "current-command-failure-expanded",
+    maxPixelRatio: 0.01,
+    scenario: "command-failure-recovery",
+    sidebarState: "hidden",
+    surfaces: ["command"],
+    theme: "dark",
+  },
+  {
+    currentSidebar: true,
+    frame: "command-interruption-recovered",
+    id: "current-command-interruption-recovered",
+    maxPixelRatio: 0.01,
+    scenario: "interruption",
+    sidebarState: "hidden",
+    surfaces: ["command"],
+    theme: "dark",
+  },
+  {
     frame: "approval-pending",
     id: "approval-pending",
     scenario: "workspace-workflow",
@@ -1637,10 +1657,11 @@ export async function launchScene(
     capture &&
     (scene.id === "command-failure-running" ||
       scene.id === "command-failure-collapsed" ||
-      scene.id === "command-failure-expanded")
+      scene.id === "command-failure-expanded" ||
+      scene.id === "current-command-failure-expanded")
   ) {
     const timelineLabel =
-      scene.id === "command-failure-running" ? "Working" : "Worked for 12s";
+      scene.id === "command-failure-running" ? "Working" : "Worked for 10s";
     await page
       .getByRole("button", { exact: true, name: timelineLabel })
       .click();
@@ -1672,6 +1693,26 @@ export async function launchScene(
         }
       }, offset);
     }
+  }
+  if (capture && scene.id === "current-command-failure-expanded") {
+    await page.evaluate(() => {
+      const turn = document.querySelector(
+        ".codex-ui-conversation-thread-shell .codex-ui-agent-turn",
+      );
+      if (turn instanceof HTMLElement) {
+        turn.style.transform = "translateY(68px)";
+      }
+    });
+  }
+  if (capture && scene.id === "current-command-interruption-recovered") {
+    await page.evaluate(() => {
+      const turn = document.querySelector(
+        ".codex-ui-conversation-thread-shell .codex-ui-agent-turn",
+      );
+      if (turn instanceof HTMLElement) {
+        turn.style.transform = "translateY(238px)";
+      }
+    });
   }
   if (
     capture &&
