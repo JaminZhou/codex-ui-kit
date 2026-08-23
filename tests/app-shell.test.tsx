@@ -13,6 +13,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import {
   AppShell,
   AppSidebar,
+  AppSidebarCollection,
   AppSidebarFooter,
   AppSidebarItem,
   AppSidebarProjectGroup,
@@ -4044,20 +4045,75 @@ describe("application sidebar", () => {
         ),
       ).toBeTruthy();
     }
-    for (const label of ["waiting", "unread"]) {
-      const status = screen.getByRole("status", { name: label });
-      expect(status.getAttribute("data-visual-status")).toBe("attention");
-      expect(
-        status.querySelector(
-          ".codex-ui-app-sidebar__item-status-attention",
-        ),
-      ).toBeTruthy();
-    }
+    const waiting = screen.getByRole("status", { name: "waiting" });
+    expect(waiting.getAttribute("data-visual-status")).toBe("waiting");
+    expect(
+      waiting.querySelector(
+        ".codex-ui-app-sidebar__item-status-pill",
+      )?.textContent,
+    ).toBe("Needs input");
+    const unread = screen.getByRole("status", { name: "unread" });
+    expect(unread.getAttribute("data-visual-status")).toBe("attention");
+    expect(
+      unread.querySelector(
+        ".codex-ui-app-sidebar__item-status-attention",
+      ),
+    ).toBeTruthy();
     expect(
       screen
         .getByRole("status", { name: "error" })
         .querySelector(".codex-ui-app-sidebar__item-status-error"),
     ).toBeTruthy();
+  });
+
+  it("models loading, empty, failed, and bounded long sidebar collections", () => {
+    const onExpandedChange = vi.fn();
+    const { rerender } = render(
+      <AppSidebarCollection isLoading loadingLabel="Loading chats" />,
+    );
+
+    const loading = screen.getByRole("status", { name: "Loading chats" });
+    expect(
+      loading.querySelectorAll(
+        ".codex-ui-app-sidebar__collection-loading-heading > span",
+      ),
+    ).toHaveLength(1);
+    expect(
+      loading.querySelectorAll(
+        ".codex-ui-app-sidebar__collection-loading-rows > span",
+      ),
+    ).toHaveLength(4);
+
+    rerender(<AppSidebarCollection emptyState="No chats" />);
+    expect(screen.getByRole("status").textContent).toBe("No chats");
+
+    rerender(<AppSidebarCollection error="Could not load chats" />);
+    expect(screen.getByRole("alert").textContent).toBe(
+      "Could not load chats",
+    );
+
+    rerender(
+      <AppSidebarCollection
+        maxItems={2}
+        onExpandedChange={onExpandedChange}
+      >
+        <AppSidebarItem>First chat</AppSidebarItem>
+        <AppSidebarItem>Second chat</AppSidebarItem>
+        <AppSidebarItem>Third chat</AppSidebarItem>
+      </AppSidebarCollection>,
+    );
+    expect(screen.getAllByRole("listitem")).toHaveLength(2);
+    expect(
+      screen.getByRole("button", { name: "Show more" }).getAttribute(
+        "aria-expanded",
+      ),
+    ).toBe("false");
+    fireEvent.click(screen.getByRole("button", { name: "Show more" }));
+    expect(screen.getAllByRole("listitem")).toHaveLength(3);
+    expect(onExpandedChange).toHaveBeenCalledWith(true);
+    fireEvent.click(screen.getByRole("button", { name: "Show less" }));
+    expect(screen.getAllByRole("listitem")).toHaveLength(2);
+    expect(onExpandedChange).toHaveBeenLastCalledWith(false);
   });
 
   it("keeps pending worktree phases distinct while sharing current sidebar visuals", () => {

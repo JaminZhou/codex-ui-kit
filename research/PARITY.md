@@ -56,7 +56,11 @@ The authoritative current-build inventory is:
   completed, and unread presentation. Browser/CDP and Electron lock the
   geometry and replacement behavior; local-only 72×30 action and 28×30 status
   tails pass between 0% and 3.1944%. Content-dependent Recents count is not a
-  parity constant, and ordinary waiting/error variants remain open. A second
+  parity constant. The follow-up now locks current ordinary `Needs input` and
+  error rows plus `No chats`, the exact one-heading/four-row loading skeleton,
+  and the five-row `Show more` long-list boundary. Browser/CDP and Electron
+  repeat expansion/focus/overflow; a privacy-safe 140×29 live empty crop
+  differs by 1.8227%. A second
   current-build probe now reaches real New local worktree success, controlled
   failure, failed-plus-unread composition, Retry, and restored rows. It locks
   the current entry labels, 264×91.125 Environment menu, 14px branch marker,

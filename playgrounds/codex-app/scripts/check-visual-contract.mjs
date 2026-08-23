@@ -378,6 +378,8 @@ const currentBuildSidebarWorktreeErrorReference =
   process.env.CODEX_UI_KIT_CURRENT_SIDEBAR_WORKTREE_ERROR_REFERENCE;
 const currentBuildSidebarWorktreeRestoredReference =
   process.env.CODEX_UI_KIT_CURRENT_SIDEBAR_WORKTREE_RESTORED_REFERENCE;
+const currentBuildSidebarEmptyCollectionReference =
+  process.env.CODEX_UI_KIT_CURRENT_SIDEBAR_EMPTY_COLLECTION_REFERENCE;
 const currentBuildWindowChromeReference =
   process.env.CODEX_UI_KIT_WINDOW_CHROME_REFERENCE;
 const defaultLifecycleMainPixelRatio = 0.0025;
@@ -778,6 +780,7 @@ for (const scene of selectedScenes) {
   const baselinePath = join(baselineDirectory, `${scene.id}.png`);
   const diffPath = join(artifactDirectory, `${scene.id}.diff.png`);
   let sidebarSelectedTop;
+  let sidebarCollectionBounds;
   let sidebarStatusBounds;
   let sidebarTaskActionsActualPath;
   let sidebarRecentsActionsActualPath;
@@ -853,6 +856,8 @@ for (const scene of selectedScenes) {
         Object.fromEntries(
           [
             ["active", "session-browser:0"],
+            ["waiting", "desktop-cleanup:0"],
+            ["error", "desktop-cleanup:1"],
             ["unread", "codex-ui-kit:0"],
             ["worktree-loading", "codex-ui-kit:1"],
             ["worktree-error", "design-assets:2"],
@@ -879,6 +884,19 @@ for (const scene of selectedScenes) {
           }),
         ),
       );
+    }
+    if (scene.id.startsWith("current-sidebar-collection-")) {
+      sidebarCollectionBounds = await page
+        .locator("[data-sidebar-collection-fixture]")
+        .evaluate((element) => {
+          const value = element.getBoundingClientRect();
+          return {
+            height: Math.round(value.height),
+            left: Math.round(value.left),
+            top: Math.round(value.top),
+            width: Math.round(value.width),
+          };
+        });
     }
     if (
       scene.id === "current-sidebar-project-menu" ||
@@ -2571,6 +2589,72 @@ for (const scene of selectedScenes) {
         status: "worktree-restored",
       });
     }
+  }
+
+  if (
+    scene.id === "current-sidebar-collection-empty" &&
+    currentBuildSidebarEmptyCollectionReference
+  ) {
+    const reference = flattenPng(
+      PNG.sync.read(
+        await readFile(currentBuildSidebarEmptyCollectionReference),
+      ),
+      { blue: 24, green: 24, red: 24 },
+    );
+    if (reference.width !== 140 || reference.height !== 29) {
+      throw new Error(
+        `${scene.id}: current empty collection reference must be exactly 140x29, received ${reference.width}x${reference.height}.`,
+      );
+    }
+    if (
+      !sidebarCollectionBounds ||
+      sidebarCollectionBounds.width < 140 ||
+      sidebarCollectionBounds.height !== 29
+    ) {
+      throw new Error(
+        `${scene.id}: current empty collection bounds drifted: ${JSON.stringify(sidebarCollectionBounds)}.`,
+      );
+    }
+    const actualCollection = cropPng(
+      actual,
+      sidebarCollectionBounds.left,
+      sidebarCollectionBounds.top,
+      140,
+      29,
+    );
+    const comparison = comparePng(
+      foregroundMaskPng(reference),
+      foregroundMaskPng(actualCollection),
+      0,
+    );
+    await writeFile(
+      join(
+        artifactDirectory,
+        `${scene.id}.empty.current-build.png`,
+      ),
+      PNG.sync.write(actualCollection),
+    );
+    if (comparison.pixels > 0) {
+      await writeFile(
+        join(
+          artifactDirectory,
+          `${scene.id}.empty.current-build.diff.png`,
+        ),
+        PNG.sync.write(comparison.diff),
+      );
+    }
+    const maximumRatio = environmentRatio(
+      "CODEX_UI_KIT_CURRENT_SIDEBAR_EMPTY_COLLECTION_MAX_DIFF_RATIO",
+      0.06,
+    );
+    if (comparison.ratio > maximumRatio) {
+      throw new Error(
+        `${scene.id}: current empty collection pixel ratio ${comparison.ratio} exceeds ${maximumRatio}.`,
+      );
+    }
+    console.log(
+      `${scene.id}: current empty collection pixel ratio ${comparison.ratio}`,
+    );
   }
 
   if (

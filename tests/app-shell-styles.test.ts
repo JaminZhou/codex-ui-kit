@@ -186,6 +186,28 @@ describe("application shell visual contract", () => {
     expect(component).toContain(
       'export type AppSidebarWorktreeStatus =',
     );
+    expect(component).toContain(
+      "export function AppSidebarCollectionState",
+    );
+    expect(component).toContain(
+      "export function AppSidebarCollection",
+    );
+    expect(component).toContain("appSidebarLoadingWidths");
+    expect(styles).toMatch(
+      /\.codex-ui-app-sidebar__collection-state \{[\s\S]*?font-size: 0\.875rem;[\s\S]*?line-height: 1\.3125rem;[\s\S]*?opacity: 0\.5;[\s\S]*?padding: 0\.25rem 2rem;/,
+    );
+    expect(styles).toContain(
+      ".codex-ui-app-sidebar__collection-loading-rows > span::before",
+    );
+    expect(styles).toContain(
+      "animation: codex-ui-app-sidebar-shimmer 3s linear infinite;",
+    );
+    expect(styles).toContain(
+      '.codex-ui-app-sidebar__item-status[data-visual-status="waiting"]',
+    );
+    expect(styles).toContain(
+      ".codex-ui-app-sidebar__item-status-pill",
+    );
     expect(component).toContain("appSidebarWorktreeItemStatus");
     expect(styles).toMatch(
       /\.codex-ui-app-sidebar__item-worktree-indicator \{[\s\S]*?height: 0\.875rem;[\s\S]*?inset-inline-end: 2\.4375rem;[\s\S]*?pointer-events: none;[\s\S]*?transition: opacity var\(--codex-ui-transition-fast\);[\s\S]*?width: 0\.875rem;/,

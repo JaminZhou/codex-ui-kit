@@ -3010,6 +3010,121 @@
   display: none;
 }
 
+.codex-ui-app-sidebar__collection,
+.codex-ui-app-sidebar__collection-items {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.codex-ui-app-sidebar__collection-items {
+  gap: 1px;
+}
+
+.codex-ui-app-sidebar__collection-item {
+  min-width: 0;
+}
+
+.codex-ui-app-sidebar__collection-state {
+  color: var(--codex-ui-text-secondary);
+  font-size: 0.875rem;
+  line-height: 1.3125rem;
+  min-height: 1.8125rem;
+  opacity: 0.5;
+  padding: 0.25rem 2rem;
+}
+
+.codex-ui-app-sidebar__collection-loading {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  padding-inline: calc(var(--codex-ui-spacing) * 2);
+}
+
+.codex-ui-app-sidebar__collection-loading-heading,
+.codex-ui-app-sidebar__collection-loading-rows {
+  align-items: flex-start;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.codex-ui-app-sidebar__collection-loading-heading {
+  padding: 0.25rem 0 0.25rem calc(var(--codex-ui-spacing) * 2);
+}
+
+.codex-ui-app-sidebar__collection-loading-rows {
+  gap: 1px;
+  padding: 0.25rem calc(var(--codex-ui-spacing) * 2) 0;
+}
+
+.codex-ui-app-sidebar__collection-loading-heading > span,
+.codex-ui-app-sidebar__collection-loading-rows > span {
+  --codex-ui-app-sidebar-loading-base: color-mix(
+    in srgb,
+    var(--codex-ui-text-secondary) 10%,
+    transparent
+  );
+  --codex-ui-app-sidebar-loading-highlight: color-mix(
+    in srgb,
+    var(--codex-ui-text-secondary) 16%,
+    transparent
+  );
+  background: var(--codex-ui-app-sidebar-loading-base);
+  border-radius: var(--codex-ui-radius-md);
+  display: block;
+  height: 0.75rem;
+  overflow: hidden;
+  position: relative;
+}
+
+.codex-ui-app-sidebar__collection-loading-rows > span {
+  margin-block: calc(var(--codex-ui-spacing) * 2);
+}
+
+.codex-ui-app-sidebar__collection-loading-heading > span::before,
+.codex-ui-app-sidebar__collection-loading-rows > span::before {
+  animation: codex-ui-app-sidebar-shimmer 3s linear infinite;
+  animation-delay: var(--codex-ui-app-sidebar-loading-delay, 0ms);
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--codex-ui-app-sidebar-loading-highlight) 50%,
+    transparent 100%
+  );
+  content: "";
+  inset: 0;
+  pointer-events: none;
+  position: absolute;
+  transform: translateX(-100%);
+}
+
+.codex-ui-app-sidebar__collection-toggle {
+  align-items: center;
+  appearance: none;
+  background: transparent;
+  border: 0;
+  border-radius: var(--codex-ui-radius-lg);
+  color: var(--codex-ui-text-secondary);
+  cursor: pointer;
+  display: flex;
+  font: inherit;
+  font-size: 0.8125rem;
+  min-height: 1.875rem;
+  padding: 0.3125rem calc(var(--codex-ui-spacing) * 4);
+  text-align: start;
+}
+
+.codex-ui-app-sidebar__collection-toggle:hover,
+.codex-ui-app-sidebar__collection-toggle:focus-visible {
+  color: var(--codex-ui-text);
+}
+
+.codex-ui-app-sidebar__collection-toggle:focus-visible {
+  outline: 2px solid var(--codex-ui-focus);
+  outline-offset: -2px;
+}
+
 .codex-ui-app-sidebar__project-group,
 .codex-ui-app-sidebar__project-children {
   display: flex;
@@ -3217,6 +3332,21 @@
   color: var(--codex-ui-danger);
   height: 1rem;
   width: 1rem;
+}
+
+.codex-ui-app-sidebar__item-status[data-visual-status="waiting"] {
+  width: auto;
+}
+
+.codex-ui-app-sidebar__item-status-pill {
+  background: var(--codex-ui-background-button-tertiary-hover);
+  border-radius: var(--codex-ui-radius-full);
+  color: var(--codex-ui-text-secondary);
+  font-size: 0.75rem;
+  font-weight: var(--codex-ui-font-weight-medium);
+  line-height: 1.25rem;
+  padding-inline: calc(var(--codex-ui-spacing) * 2);
+  white-space: nowrap;
 }
 
 .codex-ui-app-sidebar__item-worktree-indicator {
@@ -13347,6 +13477,16 @@ button.codex-ui-generated-image-gallery__image {
   }
 }
 
+@keyframes codex-ui-app-sidebar-shimmer {
+  from {
+    transform: translateX(-100%);
+  }
+
+  to {
+    transform: translateX(100%);
+  }
+}
+
 @keyframes codex-ui-loading-shimmer {
   from {
     background-position: 100% 50%;
@@ -13397,6 +13537,8 @@ button.codex-ui-generated-image-gallery__image {
 
 @media (prefers-reduced-motion: reduce) {
   .codex-ui-app-sidebar__item-status-spinner,
+  .codex-ui-app-sidebar__collection-loading-heading > span::before,
+  .codex-ui-app-sidebar__collection-loading-rows > span::before,
   .codex-ui-status-indicator[data-status="running"],
   .codex-ui-command-execution .codex-ui-activity__body,
   .codex-ui-file-change

@@ -15,6 +15,8 @@ export const publicRuntimeExports = [
   "AppServerCrashRecovery",
   "AppShell",
   "AppSidebar",
+  "AppSidebarCollection",
+  "AppSidebarCollectionState",
   "AppSidebarFooter",
   "AppSidebarItem",
   "AppSidebarProjectGroup",

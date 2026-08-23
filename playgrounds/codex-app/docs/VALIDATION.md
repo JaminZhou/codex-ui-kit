@@ -75,7 +75,7 @@ Every deterministic scenario has one ID and produces four evidence layers:
    output lines, then collapses and reopens the card to prove reverse-tail
    restoration.
 4. **Pixels** — full-frame regression screenshots after the structural gates
-   pass. The 214 reviewed frames include four current Terminal recovery and
+   pass. The 217 reviewed frames include four current Terminal recovery and
    background-process regressions. Those four are independent replay baselines,
    not current-product screenshots: real CDP separately establishes child
    `exit 7`, ordinary shell close, and background side-panel opening, while
@@ -181,6 +181,13 @@ tails through `CODEX_UI_KIT_CURRENT_SIDEBAR_TASK_ACTIONS_REFERENCE` and
 `CODEX_UI_KIT_CURRENT_SIDEBAR_RECENTS_ACTIONS_REFERENCE`. CDP and Electron
 independently require the unified 19×20 Pin/Archive buttons, 8px gap, and
 35px/8px right insets before the pixel gate runs.
+The current collection slice separately requires the `Needs input` pill and
+ordinary error glyph, the one-heading/four-row loading skeleton, the 29px
+`No chats` state, and five-to-twelve `Show more`/`Show less` expansion with
+focus retention and Electron navigation overflow. An optional privacy-safe
+140×29 product crop is supplied through
+`CODEX_UI_KIT_CURRENT_SIDEBAR_EMPTY_COLLECTION_REFERENCE`; its foreground
+comparison is capped at 6%, while computed typography and padding remain exact.
 
 The layers do not vote on the same claim. Protocol proves lifecycle behavior;
 CDP explains layout; Electron proves the desktop host; pixels catch final

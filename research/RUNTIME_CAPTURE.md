@@ -408,6 +408,25 @@ profile-owned handlers, and confirms ports 9881/9882 and both profile arguments
 are absent while primary PID 43055 still owns 9874. The full probe root moves
 recoverably to `codex-ui-kit-worktree-26-818-20260824` in Trash.
 
+### Current `26.818.41509` sidebar collection edge states
+
+The primary Renderer on port 9874 provides the current empty-state anchor
+without a second app process: the visible `codex-app-server-client` project
+contains `No chats`. CDP records a 306.90625×29 row, 14px font, 21px line
+height, `4px 32px` padding, and 0.5 opacity. A privacy-safe 140×29 crop is kept
+outside version control and passes the independent empty-state foreground gate
+at 1.8227%.
+
+Current ASAR structure supplies the otherwise transient loading and pagination
+semantics: one 18%-wide 12px heading shimmer, four deterministic 12px row
+shimmers, a five-item nested collection limit, and `Show more`. Browser/CDP
+and Electron lock loading accessibility, empty/error semantics, five-to-twelve
+keyboard expansion, focus retention, `Show less`, and real navigation
+overflow. The status lifecycle also separates the current `Needs input` pill
+from unread attention and adds an ordinary 16×16 error row. The four reviewed
+pixel frames are independent replay baselines; only the narrow empty crop is a
+live-product pixel reference.
+
 ### Previous `26.803.61601` worktree persistence and directory recovery
 
 A separate fresh-profile probe uses one disposable repository and one

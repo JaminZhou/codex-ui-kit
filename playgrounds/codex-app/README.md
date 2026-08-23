@@ -759,6 +759,22 @@ Pending-worktree phases remain previous-build-only until runtime-reached on
 this fingerprint. Product screenshots, profiles, and raw application data
 remain untracked.
 
+## Current sidebar collection slice
+
+The current `26.818.41509` follow-up adds reusable
+`AppSidebarCollection`/`AppSidebarCollectionState` coverage for loading,
+empty, error, bounded, and expanded history. A live `No chats` project row
+locks 14px/21px type, 4px 32px padding, 29px height, and 50% description
+opacity. Current ASAR structure supplies the transient one-heading/four-row
+loading skeleton and the five-item `Show more` boundary.
+
+Ordinary waiting now renders the current `Needs input` pill rather than an
+unread dot, and ordinary error remains an independent 16px glyph. Browser/CDP
+and Electron gate five-to-twelve expansion, `Show less`, focus retention, and
+real sidebar overflow. Four reviewed frames cover the lifecycle; an optional
+privacy-safe 140×29 live-product empty crop passes at 1.8227% and stays
+untracked.
+
 ## Current native project-menu slice
 
 The current project-menu slice follows the menu's move from Renderer DOM to
@@ -1238,8 +1254,9 @@ CODEX_UI_KIT_CURRENT_SIDEBAR_RECENTS_ACTIONS_REFERENCE=/absolute/path/to/current
 CODEX_UI_KIT_CURRENT_SIDEBAR_WORKTREE_LOADING_REFERENCE=/absolute/path/to/current-sidebar-worktree-loading-row.png \
 CODEX_UI_KIT_CURRENT_SIDEBAR_WORKTREE_ERROR_REFERENCE=/absolute/path/to/current-sidebar-worktree-error-row.png \
 CODEX_UI_KIT_CURRENT_SIDEBAR_WORKTREE_RESTORED_REFERENCE=/absolute/path/to/current-sidebar-worktree-restored-row.png \
+CODEX_UI_KIT_CURRENT_SIDEBAR_EMPTY_COLLECTION_REFERENCE=/absolute/path/to/current-sidebar-empty-140x29.png \
   pnpm --filter @codex-ui-kit/codex-app-playground check:visual -- \
-  --scenes=current-sidebar-recents,current-sidebar-status-lifecycle
+  --scenes=current-sidebar-recents,current-sidebar-status-lifecycle,current-sidebar-collection-empty,current-sidebar-collection-loading,current-sidebar-collection-long-list
 ```
 
 The App shell gate uses only the 120×46 application-owned titlebar crop:
