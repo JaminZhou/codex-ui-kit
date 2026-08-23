@@ -14,7 +14,7 @@ exit gates; it does not replace the inventory.
   Desktop `26.818.41509` (`6962`). Unsampled earlier-build surfaces remain
   previous-build regression evidence rather than current verification.
 - The inventory contains 89 surface groups: 59 P0, 21 P1, and 9 P2.
-- 20 groups have current-build runtime evidence, 53 have previous-build-only
+- 21 groups have current-build runtime evidence, 52 have previous-build-only
   runtime evidence, and 16 have not been sampled.
 - The scoped `26.818.41509` refresh revalidates the global shell, responsive
   Composer, primary navigation, project-group lifecycle, Help menu, route
@@ -43,7 +43,16 @@ exit gates; it does not replace the inventory.
   300×189 Sources summary through pinned, floating, dismissed, and repinned
   states. Browser/CDP and Electron repeat the flows; unmasked current-product
   regions pass at 2.1854% for success, 1.1649% for compact recovery, and
-  2.5926% for Sources under independent hard limits. The same capture exposed
+  2.5926% for Sources under independent hard limits. A separate no-tool task
+  now promotes `thread.messages-markdown` on 26.818. It reaches heading,
+  strong text, inline code, blockquote, list, a narrow table, and TypeScript
+  code at 1180×820 and 720×680. The sampled external URL is source-owned and
+  leaves plain visible text instead of an inline anchor. Browser/CDP and
+  Electron lock the 736/688×358 roots, full-width table, 73px code block with
+  word-wrap/Copy actions, four exact response actions, current typography, and
+  zero overflow; unmasked
+  root comparisons pass at
+  1.1682% and 1.1932% under 1.3% limits. The same capture exposed
   that the expanded Projects wrapper is
   content-dependent; the sanitized gate now derives its height from the live
   Recent chats group instead of freezing a private-data-dependent 119px value.
@@ -459,6 +468,15 @@ itself reconnected. The current-style mixed multi-turn replay now composes searc
 Browser, MCP, command, approval, file Review, and subagent events under one
 public reducer and one Browser/Electron/pixel matrix. It is composition
 evidence, not a synthetic promotion of whole-thread current-product reachability.
+
+The core Markdown composition is now refreshed on `26.818.41509` with one
+real no-tool response. The wide and compact replays independently lock heading,
+strong and inline-code semantics, blockquote/list spacing, the current
+full-content-width narrow table, TypeScript code block and word-wrap toggle,
+and source-owned URL presentation. Streaming Markdown mutation, very wide
+table actions, and their
+error variants retain separately versioned evidence and remain open for fresh
+current-build reachability.
 
 The basic completed conversation core is now refreshed on `26.818.41509` with
 one fresh exact reply. Settled 1180×820 and 820×680 CDP/Electron evidence,

@@ -1132,6 +1132,17 @@ CODEX_UI_KIT_MARKDOWN_REFERENCE=/absolute/path/to/markdown-main-reference.png \
   pnpm --filter @codex-ui-kit/codex-app-playground check:visual
 ```
 
+The current `26.818.41509` Markdown gate accepts untracked wide and compact
+assistant-root crops. It compares the full 736×358 and 688×358 owned regions
+without masks:
+
+```bash
+CODEX_UI_KIT_CURRENT_MARKDOWN_26_818_REFERENCE=/absolute/path/to/current-markdown-root-wide.png \
+CODEX_UI_KIT_CURRENT_MARKDOWN_26_818_COMPACT_REFERENCE=/absolute/path/to/current-markdown-root-compact.png \
+  pnpm --filter @codex-ui-kit/codex-app-playground check:visual -- \
+  --scenes=markdown-current-26-818,markdown-current-26-818-compact
+```
+
 The successful MCP gate uses the expanded 906×820 main-only reference:
 
 ```bash

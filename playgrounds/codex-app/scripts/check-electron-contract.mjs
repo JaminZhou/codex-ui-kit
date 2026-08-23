@@ -1835,7 +1835,7 @@ try {
     tableScroll?.focus();
     return {
       actionCount: document.querySelectorAll(
-        '[aria-label="Markdown response actions"] button',
+        '[data-item-id="assistant-markdown"] .demo-turn-actions button',
       ).length,
       copiedText: window.__codexMarkdownCopiedText,
       copyFocused:
@@ -1863,6 +1863,166 @@ try {
   }
 } finally {
   await markdownApp.close();
+}
+
+async function currentMarkdown26818Contract(page) {
+  return page.evaluate(() => {
+    const root = document.querySelector(
+      '[data-item-id="assistant-markdown"] .codex-ui-markdown',
+    );
+    const metric = (selector) => {
+      const element = root?.querySelector(selector);
+      if (!(element instanceof HTMLElement)) return null;
+      const rect = element.getBoundingClientRect();
+      const style = getComputedStyle(element);
+      return {
+        backgroundColor: style.backgroundColor,
+        height: rect.height,
+        left: rect.left,
+        width: rect.width,
+      };
+    };
+    const rootRect = root?.getBoundingClientRect();
+    const rootStyle = root ? getComputedStyle(root) : null;
+    return {
+      actionCount: document.querySelectorAll(
+        '[data-item-id="assistant-markdown"] .demo-turn-actions button',
+      ).length,
+      actions: Array.from(
+        document.querySelectorAll(
+          '[data-item-id="assistant-markdown"] .demo-turn-actions button',
+        ),
+        (button) => ({
+          icon: button
+            .querySelector("[data-current-build-icon]")
+            ?.getAttribute("data-current-build-icon"),
+          label: button.getAttribute("aria-label"),
+        }),
+      ),
+      codeBlock: metric(".codex-ui-code-block"),
+      codeActions: Array.from(
+        root?.querySelectorAll(".codex-ui-code-block__header button") ?? [],
+        (button) => ({
+          label: button.getAttribute("aria-label"),
+          pressed: button.getAttribute("aria-pressed"),
+        }),
+      ),
+      copyLabel: root
+        ?.querySelector(".codex-ui-code-block__copy")
+        ?.getAttribute("aria-label"),
+      fontFamily: rootStyle?.fontFamily,
+      horizontalOverflow:
+        document.documentElement.scrollWidth -
+        document.documentElement.clientWidth,
+      inlineLinkCount: root?.querySelectorAll("a").length,
+      root: rootRect
+        ? {
+            color: rootStyle?.color,
+            height: rootRect.height,
+            left: rootRect.left,
+            width: rootRect.width,
+          }
+        : null,
+      table: metric("table"),
+      tableScroll: metric(".codex-ui-markdown__table-scroll"),
+    };
+  });
+}
+
+for (const currentMarkdownScene of [
+  {
+    currentSidebar: true,
+    frame: "markdown-current-26-818-complete",
+    id: "electron-markdown-current-26-818",
+    scenario: "markdown-current-26-818",
+  },
+  {
+    currentSidebar: true,
+    frame: "markdown-current-26-818-complete",
+    id: "electron-markdown-current-26-818-compact",
+    scenario: "markdown-current-26-818",
+    sidebarState: "hidden",
+    windowSize: { height: 680, width: 720 },
+  },
+]) {
+  const { app: currentMarkdownApp, page: currentMarkdownPage } =
+    await launchScene(currentMarkdownScene, { capture: false });
+  try {
+    const compact = currentMarkdownScene.id.endsWith("-compact");
+    const expectedWidth = compact ? 688 : 736;
+    const expectedActions = [
+      ["Copy", "thread-assistant-copy"],
+      ["Good response", "thread-assistant-good"],
+      ["Bad response", "thread-assistant-bad"],
+      ["Fork chat from here", "thread-assistant-fork"],
+    ];
+    const nativeBounds = await currentMarkdownApp.evaluate(
+      ({ BrowserWindow }) => BrowserWindow.getAllWindows()[0]?.getContentBounds(),
+    );
+    const contract = await currentMarkdown26818Contract(currentMarkdownPage);
+    if (
+      nativeBounds?.width !== (compact ? 720 : 1180) ||
+      nativeBounds?.height !== (compact ? 680 : 820) ||
+      !contract.root ||
+      Math.abs(contract.root.width - expectedWidth) > 1 ||
+      Math.abs(contract.root.height - 358) > 1 ||
+      Math.abs(contract.root.left - (compact ? 16 : 359)) > 1 ||
+      contract.root.color !== "rgb(223, 223, 223)" ||
+      contract.fontFamily !==
+        '-apple-system, "system-ui", "Segoe UI", sans-serif' ||
+      contract.actionCount !== 4 ||
+      contract.actions.some(
+        (action, index) =>
+          action.label !== expectedActions[index]?.[0] ||
+          action.icon !== expectedActions[index]?.[1],
+      ) ||
+      contract.inlineLinkCount !== 0 ||
+      contract.copyLabel !== "Copy code" ||
+      contract.codeActions.length !== 2 ||
+      contract.codeActions[0].label !== "Enable word wrap" ||
+      contract.codeActions[0].pressed !== "false" ||
+      contract.codeActions[1].label !== "Copy code" ||
+      !contract.table ||
+      Math.abs(contract.table.width - expectedWidth) > 1 ||
+      Math.abs(contract.table.height - 89) > 1 ||
+      !contract.tableScroll ||
+      Math.abs(contract.tableScroll.width - expectedWidth) > 1 ||
+      !contract.codeBlock ||
+      Math.abs(contract.codeBlock.width - expectedWidth) > 1 ||
+      Math.abs(contract.codeBlock.height - 73) > 1 ||
+      contract.codeBlock.backgroundColor !== "rgba(255, 255, 255, 0.05)" ||
+      contract.horizontalOverflow !== 0
+    ) {
+      throw new Error(
+        `${currentMarkdownScene.id}: current 26.818 Markdown Electron contract failed: ${JSON.stringify({ contract, nativeBounds })}`,
+      );
+    }
+    await currentMarkdownPage
+      .getByRole("button", { name: "Enable word wrap" })
+      .click();
+    const wrapped = await currentMarkdownPage.evaluate(() => {
+      const block = document.querySelector(
+        '[data-item-id="assistant-markdown"] .codex-ui-code-block',
+      );
+      const toggle = block?.querySelector(".codex-ui-code-block__wrap");
+      return {
+        label: toggle?.getAttribute("aria-label"),
+        pressed: toggle?.getAttribute("aria-pressed"),
+        wrapped: block?.getAttribute("data-wrap"),
+      };
+    });
+    if (
+      wrapped.label !== "Disable word wrap" ||
+      wrapped.pressed !== "true" ||
+      wrapped.wrapped !== "true"
+    ) {
+      throw new Error(
+        `${currentMarkdownScene.id}: current 26.818 Markdown Electron wrap toggle failed: ${JSON.stringify(wrapped)}`,
+      );
+    }
+  } finally {
+    await currentMarkdownApp.close();
+  }
 }
 
 const markdownStreamingScene = {

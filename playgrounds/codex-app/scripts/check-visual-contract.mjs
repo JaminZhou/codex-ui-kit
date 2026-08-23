@@ -62,6 +62,10 @@ const currentBuildMarkdownReferenceSize = {
   height: 820,
   width: 906,
 };
+const currentMarkdown26818Reference =
+  process.env.CODEX_UI_KIT_CURRENT_MARKDOWN_26_818_REFERENCE;
+const currentMarkdown26818CompactReference =
+  process.env.CODEX_UI_KIT_CURRENT_MARKDOWN_26_818_COMPACT_REFERENCE;
 const currentBuildMarkdownTablePreviewReference =
   process.env.CODEX_UI_KIT_MARKDOWN_TABLE_PREVIEW_REFERENCE;
 const currentBuildMarkdownTablePreviewReferenceSize = {
@@ -4119,6 +4123,65 @@ for (const scene of selectedScenes) {
         composer: composerComparison.ratio,
         full: comparison.ratio,
       })}`,
+    );
+  }
+
+  const currentMarkdownReference =
+    scene.id === "markdown-current-26-818"
+      ? currentMarkdown26818Reference
+      : scene.id === "markdown-current-26-818-compact"
+        ? currentMarkdown26818CompactReference
+        : null;
+  if (currentMarkdownReference) {
+    const compact = scene.id.endsWith("-compact");
+    const expected = compact
+      ? { height: 358, width: 688 }
+      : { height: 358, width: 736 };
+    const reference = PNG.sync.read(await readFile(currentMarkdownReference));
+    if (
+      reference.width !== expected.width ||
+      reference.height !== expected.height
+    ) {
+      throw new Error(
+        `${scene.id}: current 26.818 Markdown reference must be exactly ${expected.width}x${expected.height}, received ${reference.width}x${reference.height}.`,
+      );
+    }
+    const main = cropPng(
+      actual,
+      compact ? 16 : 359,
+      compact ? 95 : 235,
+      expected.width,
+      expected.height,
+    );
+    const comparison = comparePng(reference, main);
+    const currentBuildActualPath = join(
+      artifactDirectory,
+      `${scene.id}.current-build.png`,
+    );
+    const currentBuildDiffPath = join(
+      artifactDirectory,
+      `${scene.id}.current-build.diff.png`,
+    );
+    await writeFile(currentBuildActualPath, PNG.sync.write(main));
+    if (comparison.pixels > 0) {
+      await writeFile(
+        currentBuildDiffPath,
+        PNG.sync.write(comparison.diff),
+      );
+    }
+    const maximumRatio = environmentRatio(
+      compact
+        ? "CODEX_UI_KIT_CURRENT_MARKDOWN_26_818_COMPACT_MAX_DIFF_RATIO"
+        : "CODEX_UI_KIT_CURRENT_MARKDOWN_26_818_MAX_DIFF_RATIO",
+      0.013,
+    );
+    if (comparison.ratio > maximumRatio) {
+      throw new Error(
+        `${scene.id}: current 26.818 Markdown pixel ratio ${comparison.ratio} exceeds ${maximumRatio}.`,
+      );
+    }
+    console.log(
+      `${scene.id}: current 26.818 Markdown pixel ratio ${comparison.ratio}`,
     );
   }
 

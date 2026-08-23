@@ -375,10 +375,36 @@ describe("lifecycle visual policy", () => {
     expect(contract).toContain("defaultMaximumRatio: 0.005");
     expect(contract).toContain("masks: []");
     expect(appSource).toContain(
-      'isCurrentBasicMessageReplay ? "Copy" : undefined',
+      "isCurrentBasicMessageReplay ||\n                      isCurrentMarkdown26818Replay",
     );
     expect(appSource).toContain(
-      'toolbar={!isCurrentBasicMessageReplay}',
+      "!isCurrentBasicMessageReplay &&\n                      !isCurrentMarkdown26818Replay",
+    );
+  });
+
+  it("gates runtime-observed 26.818 Markdown at wide and compact widths", () => {
+    expect(electronHarness).toContain('id: "markdown-current-26-818"');
+    expect(electronHarness).toContain(
+      'id: "markdown-current-26-818-compact"',
+    );
+    expect(cdpContract).toContain(
+      'scene.id === "markdown-current-26-818"',
+    );
+    expect(cdpContract).toContain(
+      'scene.id === "markdown-current-26-818-compact"',
+    );
+    expect(electronContract).toContain(
+      'id: "electron-markdown-current-26-818"',
+    );
+    expect(contract).toContain(
+      "CODEX_UI_KIT_CURRENT_MARKDOWN_26_818_REFERENCE",
+    );
+    expect(contract).toContain(
+      "CODEX_UI_KIT_CURRENT_MARKDOWN_26_818_COMPACT_REFERENCE",
+    );
+    expect(contract).toContain("current 26.818 Markdown pixel ratio");
+    expect(appStyles).toContain(
+      '.demo-root[data-scenario="markdown-current-26-818"]',
     );
   });
 
