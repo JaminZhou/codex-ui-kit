@@ -14,7 +14,7 @@ exit gates; it does not replace the inventory.
   Desktop `26.818.41509` (`6962`). Unsampled earlier-build surfaces remain
   previous-build regression evidence rather than current verification.
 - The inventory contains 89 surface groups: 59 P0, 21 P1, and 9 P2.
-- 21 groups have current-build runtime evidence, 52 have previous-build-only
+- 24 groups have current-build runtime evidence, 49 have previous-build-only
   runtime evidence, and 16 have not been sampled.
 - The scoped `26.818.41509` refresh revalidates the global shell, responsive
   Composer, primary navigation, project-group lifecycle, Help menu, route
@@ -56,6 +56,12 @@ exit gates; it does not replace the inventory.
   that the expanded Projects wrapper is
   content-dependent; the sanitized gate now derives its height from the live
   Recent chats group instead of freezing a private-data-dependent 119px value.
+  A fresh sidebar task now promotes current thread history, task actions, and
+  ordinary active/completed/unread status. Project tasks and Recents share
+  19×20 Pin/Archive controls with an 8px gap; the 20×20 status rail keeps the
+  exact 16×16 spinner or centered 8×8 unread dot. Browser/CDP, Electron, and
+  four privacy-safe tail comparisons pass between 0% and 3.1944%. The sampled
+  eight-row Recents count remains content-dependent and is not frozen.
   The broader `26.810.52044` refresh remains
   previous-build regression evidence; it revalidated 115
   sidebar/menu/window-chrome/Composer/Settings/completed-thread icons against
@@ -420,6 +426,11 @@ slot. It is split into:
   footer overflow behavior.
 - `app.sidebar-help-menu`: current release-note grouping, support/setup actions,
   geometry, dismissal, and focus return.
+
+Current progress: current-build thread-history, hover actions, and ordinary
+active/completed/unread presentation are now verified. Waiting/error variants,
+empty/loading/long-list mutations, and current-build worktree status remain
+open within Stage 1.
 
 The same workstream also covers shell gaps that otherwise distort every
 feature:

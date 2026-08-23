@@ -1328,18 +1328,43 @@ textarea {
 
 .demo-root[data-sidebar-current]
   .codex-ui-app-sidebar__project-children
-  .codex-ui-app-sidebar__item-actions {
+  > .codex-ui-app-sidebar__item-row
+  > .codex-ui-app-sidebar__item-actions,
+.demo-root[data-sidebar-current]
+  .codex-ui-app-sidebar__section[data-kind="pinned"]
+  > .codex-ui-app-sidebar__items
+  > .codex-ui-app-sidebar__item-row
+  > .codex-ui-app-sidebar__item-actions,
+.demo-root[data-sidebar-current]
+  .codex-ui-app-sidebar__section[data-kind="threads"]
+  > .codex-ui-app-sidebar__items
+  > .codex-ui-app-sidebar__item-row
+  > .codex-ui-app-sidebar__item-actions {
   gap: 8px;
-  margin-inline-end: 4px;
+  margin-inline-end: 8px;
 }
 
 .demo-root[data-sidebar-current]
   .codex-ui-app-sidebar__project-children
+  > .codex-ui-app-sidebar__item-row
+  .codex-ui-app-sidebar__item-actions
+  > button,
+.demo-root[data-sidebar-current]
+  .codex-ui-app-sidebar__section[data-kind="pinned"]
+  > .codex-ui-app-sidebar__items
+  > .codex-ui-app-sidebar__item-row
+  .codex-ui-app-sidebar__item-actions
+  > button,
+.demo-root[data-sidebar-current]
+  .codex-ui-app-sidebar__section[data-kind="threads"]
+  > .codex-ui-app-sidebar__items
+  > .codex-ui-app-sidebar__item-row
   .codex-ui-app-sidebar__item-actions
   > button {
+  border: 1px solid transparent;
   height: 20px;
-  padding: 2px;
-  width: 20px;
+  padding: 0;
+  width: 19px;
 }
 
 .demo-root[data-sidebar-current]
