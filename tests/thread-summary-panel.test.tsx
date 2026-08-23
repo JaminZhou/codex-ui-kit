@@ -4,12 +4,14 @@ import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import {
   ThreadSummaryDelta,
+  ThreadSummaryDock,
   ThreadSummaryIconButton,
   ThreadSummaryItem,
   ThreadSummaryPanel,
   ThreadSummaryPopover,
   ThreadSummarySection,
 } from "../src";
+import { useRef, useState } from "react";
 
 afterEach(() => {
   cleanup();
@@ -38,6 +40,45 @@ function SummaryFixture({ defaultOpen = true }: { defaultOpen?: boolean }) {
         </ThreadSummarySection>
       </ThreadSummaryPanel>
     </ThreadSummaryPopover>
+  );
+}
+
+function DockFixture() {
+  const anchorRef = useRef<HTMLButtonElement>(null);
+  const [open, setOpen] = useState(true);
+  const [pinned, setPinned] = useState(true);
+  return (
+    <div>
+      <button
+        aria-label="Toggle pinned summary"
+        aria-pressed={pinned}
+        onClick={() => {
+          if (open && pinned) {
+            setPinned(false);
+            return;
+          }
+          setOpen(true);
+          setPinned(true);
+        }}
+        ref={anchorRef}
+        type="button"
+      >
+        Summary
+      </button>
+      <ThreadSummaryDock
+        anchorRef={anchorRef}
+        onOpenChange={setOpen}
+        open={open}
+        pinned={pinned}
+      >
+        <ThreadSummaryPanel label="Docked summary">
+          <ThreadSummarySection title="Sources">
+            <ThreadSummaryItem label="openai-docs-mcp" />
+          </ThreadSummarySection>
+        </ThreadSummaryPanel>
+      </ThreadSummaryDock>
+      <button type="button">Outside</button>
+    </div>
   );
 }
 
@@ -89,5 +130,30 @@ describe("thread summary panel", () => {
 
     expect(screen.queryByRole("dialog", { name: "Thread summary" })).toBeNull();
     expect(document.activeElement).toBe(trigger);
+  });
+
+  it("keeps a pinned dock open, then dismisses its floating state outside", () => {
+    render(<DockFixture />);
+    const dock = document.querySelector('[data-slot="thread-summary-dock"]');
+    const trigger = screen.getByRole("button", {
+      name: "Toggle pinned summary",
+    });
+    const outside = screen.getByRole("button", { name: "Outside" });
+
+    expect(dock?.getAttribute("data-open")).toBe("true");
+    expect(dock?.getAttribute("data-pinned")).toBe("true");
+    fireEvent.pointerDown(outside);
+    expect(dock?.getAttribute("data-open")).toBe("true");
+
+    fireEvent.click(trigger);
+    expect(trigger.getAttribute("aria-pressed")).toBe("false");
+    expect(dock?.getAttribute("data-pinned")).toBe("false");
+    fireEvent.pointerDown(outside);
+    expect(dock?.getAttribute("data-open")).toBe("false");
+    expect(dock?.getAttribute("aria-hidden")).toBe("true");
+
+    fireEvent.click(trigger);
+    expect(dock?.getAttribute("data-open")).toBe("true");
+    expect(dock?.getAttribute("data-pinned")).toBe("true");
   });
 });

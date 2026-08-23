@@ -131,6 +131,7 @@ export const publicRuntimeExports = [
   "ThreadRenderError",
   "ThreadSkeleton",
   "ThreadSummaryDelta",
+  "ThreadSummaryDock",
   "ThreadSummaryIconButton",
   "ThreadSummaryItem",
   "ThreadSummaryPanel",

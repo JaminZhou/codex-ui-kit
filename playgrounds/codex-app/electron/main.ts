@@ -670,6 +670,7 @@ function createWindow() {
   const capture = process.env.CODEX_DEMO_CAPTURE ?? "0";
   const currentSidebar = process.env.CODEX_DEMO_CURRENT_SIDEBAR ?? "0";
   const sidebarState = process.env.CODEX_DEMO_SIDEBAR_STATE ?? "";
+  const summaryState = process.env.CODEX_DEMO_SUMMARY_STATE ?? "";
   const layout = process.env.CODEX_DEMO_LAYOUT ?? "";
   const view = process.env.CODEX_DEMO_VIEW ?? "conversation";
   const requestedTheme = process.env.CODEX_DEMO_THEME;
@@ -697,6 +698,7 @@ function createWindow() {
     scenario,
     shellState,
     sidebarState,
+    summaryState,
     theme,
     view,
   }).toString();

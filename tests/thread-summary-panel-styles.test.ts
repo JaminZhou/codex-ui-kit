@@ -10,6 +10,8 @@ describe("thread summary panel visual contract", () => {
     expect(tokens).toContain("--codex-ui-thread-summary-panel-row-height: 1.8125rem");
     expect(tokens).toContain("--codex-ui-thread-summary-panel-width: 18.75rem");
     expect(styles).toContain(".codex-ui-popover.codex-ui-thread-summary-popover");
+    expect(styles).toContain(".codex-ui-thread-summary-dock[data-open=\"true\"]");
+    expect(styles).toContain("transform-origin: top right");
     expect(styles).toContain("padding: 0.625rem 0.875rem 0.375rem");
     expect(styles).toContain("height: var(--codex-ui-thread-summary-panel-row-height)");
   });

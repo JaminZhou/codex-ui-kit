@@ -4967,6 +4967,27 @@
   );
 }
 
+.codex-ui-thread-summary-dock {
+  pointer-events: none;
+}
+
+.codex-ui-thread-summary-dock__surface {
+  opacity: 0;
+  pointer-events: none;
+  transform: translate3d(0.5rem, -0.5rem, 0) scale(0.8);
+  transform-origin: top right;
+  transition:
+    opacity var(--codex-ui-transition-fast),
+    transform var(--codex-ui-transition-fast);
+}
+
+.codex-ui-thread-summary-dock[data-open="true"]
+  .codex-ui-thread-summary-dock__surface {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translate3d(0, 0, 0) scale(1);
+}
+
 .codex-ui-thread-summary-panel {
   background: var(
     --codex-ui-background-thread-summary,
