@@ -759,6 +759,27 @@ Pending-worktree phases remain previous-build-only until runtime-reached on
 this fingerprint. Product screenshots, profiles, and raw application data
 remain untracked.
 
+## Current native project-menu slice
+
+The current project-menu slice follows the menu's move from Renderer DOM to
+the frozen Electron context-menu bridge on Codex Desktop `26.818.41509`:
+
+- the sampled provider exposes six fixed actions and three separators in a
+  221×187 native window, with Mark all as read conditional on unread activity;
+- six re-observed SVG sources live in the narrow
+  `research/current-project-menu-assets.json` manifest; the current pencil and
+  folder supersede their previous-build shapes;
+- Browser/CDP and Electron gate exact labels, order, row/separator geometry,
+  computed styles, focus return, and the deterministic unread variant;
+- the local-only native crop compares the full 221×187 region without masks
+  at 3.8449% changed pixels under a 5% hard limit. Exact SVG hashes and geometry
+  are gated independently from AppKit/CoreText versus Chromium antialiasing.
+
+The sampled current project had no unread activity, so the current native
+Mark all as read icon remains unpromoted even though its conditional lifecycle
+is covered. Product screenshots, profiles, and raw application data remain
+untracked.
+
 ## Current branch creation slice
 
 - Current Codex `26.803.61601` evidence locks the 296×280 branch menu, seven
@@ -1170,7 +1191,9 @@ CODEX_UI_KIT_CURRENT_PROJECTS_INDEX_REFERENCE=/absolute/path/to/current-projects
 ```
 
 The current sidebar lifecycle gates accept four 1180×820 product frames and
-one exact 720×680 compact frame. All references remain untracked and local:
+one exact 720×680 compact frame. The project-menu reference may instead be
+the exact local 221×187 native-window crop; its comparison is unmasked. All
+references remain untracked and local:
 
 ```bash
 CODEX_UI_KIT_CURRENT_SIDEBAR_PROJECT_COLLAPSED_REFERENCE=/absolute/path/to/current-sidebar-project-collapsed.png \

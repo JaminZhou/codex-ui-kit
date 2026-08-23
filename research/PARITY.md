@@ -49,7 +49,8 @@ The authoritative current-build inventory is:
   responsive Composer, primary navigation, project-group lifecycle, Help menu,
   route restoration, and Projects Index. The project action menu now uses the
   frozen Electron native context-menu bridge and a 221×187 native window; its
-  older DOM replica is intentionally `partial_legacy`.
+  independent replica locks the six current fixed icons, exact geometry,
+  conditional unread variant, and a 3.8449% unmasked native-region gate.
 - The previous Codex Desktop `26.810.52044` (`6662`) visual probe revalidated the
   exact 1180×820 dark/resting asset fingerprint and now retains 115 exact
   sidebar/menu/window-chrome/Composer/environment/Settings/completed-thread icons plus

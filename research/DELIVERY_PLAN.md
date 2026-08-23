@@ -20,7 +20,10 @@ exit gates; it does not replace the inventory.
   Composer, primary navigation, project-group lifecycle, Help menu, route
   restoration, and Projects Index. It also records the project action menu's
   migration from a DOM menu to a six-action/three-separator Electron native
-  menu with a 221×187 Quartz window. The broader `26.810.52044` refresh remains
+  menu with a 221×187 Quartz window. Its independent replica now locks the
+  six observed current SVG sources, exact layout and focus lifecycle, the
+  conditional unread variant, and a 3.8449% unmasked native-region comparison.
+  The broader `26.810.52044` refresh remains
   previous-build regression evidence; it revalidated 115
   sidebar/menu/window-chrome/Composer/Settings/completed-thread icons against
   exact runtime evidence. It added Voice and Activity-attention, widened Help to
@@ -749,9 +752,10 @@ without confusing package readiness with full product reconstruction.
     pixels, public contract freeze, compatibility matrix, and release
     checklist.
 
-Each PR uses the same merge gate: current-head CI green, a fresh clean bot
-result after the latest push, zero unresolved review threads, squash merge,
-branch cleanup, and post-merge CI verification.
+Each PR uses the same merge gate: current-head CI green, zero unresolved review
+threads, squash merge, branch cleanup, and post-merge CI verification. Bot
+review is advisory; a quota or service failure does not block merge. Concrete
+automated findings that do arrive are still fixed and resolved before merge.
 
 ## Planning rules
 

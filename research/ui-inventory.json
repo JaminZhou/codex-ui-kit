@@ -759,11 +759,11 @@
         "cdp-26.803.61601:project-actions-menu-six-items-214.05x179.38-current-icons",
         "cdp-26.803.61601:project-actions-menu-seven-items-214.05x207.94-mark-all-as-read-current-icon",
         "cdp-26.810.52044:project-actions-menu-six-items-plus-conditional-mark-all-as-read-exact-icons",
-        "cdp-26.818.41509:electron-native-project-menu-six-actions-three-separators-react-provider-and-221x187-quartz-window"
+        "cdp-26.818.41509:electron-native-project-menu-six-actions-three-separators-react-provider-221x187-quartz-window-current-six-icon-sources-and-unmasked-3.8449-percent-region"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "partial_legacy",
-      "electronStatus": "partial_legacy",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
       "priority": "p0"
     },
     {
