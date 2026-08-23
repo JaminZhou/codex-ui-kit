@@ -379,28 +379,28 @@ describe("current baseline capture contract", () => {
     };
     const record = {
       baseline: {
-        appAsarBytes: 279_946_146,
+        appAsarBytes: 284_124_509,
         appAsarSha256:
-          "6e7e8791b8bf69a586ff994721fff518af391d9efdc66cd2e620dd2a4aedc90f",
-        appVersion: "26.810.52044",
-        buildNumber: "6662",
-        chromiumVersion: "151.0.7922.137",
+          "8eb91bd9efbf9a4dd04b9b0afdbfcb4e0bab5da18c1919ad74ca327c00c7e791",
+        appVersion: "26.818.41509",
+        buildNumber: "6962",
+        chromiumVersion: "151.0.7922.170",
       },
       captureKind: "renderer_emulation",
       runtimeBundleIdentity: {
         afterCapture: {
-          appAsarBytes: 279_946_146,
+          appAsarBytes: 284_124_509,
           appAsarSha256:
-            "6e7e8791b8bf69a586ff994721fff518af391d9efdc66cd2e620dd2a4aedc90f",
+            "8eb91bd9efbf9a4dd04b9b0afdbfcb4e0bab5da18c1919ad74ca327c00c7e791",
           changedAtMs: 1_786_150_111_000,
           checkedAtMs: 1_786_351_000_000,
           device: "16777231",
           inode: "346397970",
         },
         beforeCapture: {
-          appAsarBytes: 279_946_146,
+          appAsarBytes: 284_124_509,
           appAsarSha256:
-            "6e7e8791b8bf69a586ff994721fff518af391d9efdc66cd2e620dd2a4aedc90f",
+            "8eb91bd9efbf9a4dd04b9b0afdbfcb4e0bab5da18c1919ad74ca327c00c7e791",
           changedAtMs: 1_786_150_111_000,
           checkedAtMs: 1_786_350_900_000,
           device: "16777231",
@@ -439,18 +439,96 @@ describe("current baseline capture contract", () => {
         },
         pointerCollapsed: { expanded: false, focusOnRow: true },
         projectMenu: {
-          closed: {
-            activeTag: "body",
-            focusReturned: false,
-            visibleMenuCount: 0,
-          },
-          opened: {
-            focusInside: true,
-            focusRole: "menu",
-            hasMarkAllAsRead: false,
-            menuItemCount: 6,
-            rect: { height: 179.38, width: 214.05 },
-            visibleMenuCount: 1,
+          bridge: { available: true, frozen: true },
+          items: [
+            {
+              defaultMessage: "Unpin",
+              enabled: true,
+              hasIcon: true,
+              hasOnSelect: true,
+              id: "unpin-project",
+              messageId: "sidebarElectron.unpinProjectShort",
+              type: "item",
+            },
+            {
+              defaultMessage: "Edit",
+              enabled: true,
+              hasIcon: true,
+              hasOnSelect: true,
+              id: "edit-project",
+              messageId: "sidebarElectron.editProjectShort",
+              type: "item",
+            },
+            {
+              defaultMessage: null,
+              enabled: true,
+              hasIcon: false,
+              hasOnSelect: false,
+              id: "project-actions-separator",
+              messageId: null,
+              type: "separator",
+            },
+            {
+              defaultMessage: "Reveal in Finder",
+              enabled: true,
+              hasIcon: true,
+              hasOnSelect: true,
+              id: "reveal-project-folder",
+              messageId: "sidebarElectron.openWorkspaceRootInFinder",
+              type: "item",
+            },
+            {
+              defaultMessage: "Create permanent worktree",
+              enabled: true,
+              hasIcon: true,
+              hasOnSelect: true,
+              id: "create-permanent-worktree",
+              messageId: "sidebarElectron.createStableWorktree",
+              type: "item",
+            },
+            {
+              defaultMessage: null,
+              enabled: true,
+              hasIcon: false,
+              hasOnSelect: false,
+              id: "project-chat-actions-separator",
+              messageId: null,
+              type: "separator",
+            },
+            {
+              defaultMessage: "Archive chats",
+              enabled: true,
+              hasIcon: true,
+              hasOnSelect: true,
+              id: "archive-project-threads",
+              messageId: "sidebarElectron.archiveProjectThreads",
+              type: "item",
+            },
+            {
+              defaultMessage: null,
+              enabled: true,
+              hasIcon: false,
+              hasOnSelect: false,
+              id: "project-remove-separator",
+              messageId: null,
+              type: "separator",
+            },
+            {
+              defaultMessage: "Remove project",
+              enabled: true,
+              hasIcon: true,
+              hasOnSelect: true,
+              id: "remove-project",
+              messageId: "sidebarElectron.removeProject.menuItem.local",
+              type: "item",
+            },
+          ],
+          renderMode: "electron-native-context-menu",
+          trigger: {
+            ariaExpanded: "false",
+            ariaHaspopup: "menu",
+            rect: { height: 24, width: 24 },
+            tag: "button",
           },
         },
         responsive: {
@@ -613,17 +691,24 @@ describe("current baseline capture contract", () => {
           ...persistedRecord.sidebarLifecycle,
           projectMenu: {
             ...persistedRecord.sidebarLifecycle.projectMenu,
-            opened: {
-              ...persistedRecord.sidebarLifecycle.projectMenu.opened,
-              hasMarkAllAsRead: true,
-              menuItemCount: 7,
-              rect: { height: 207.94, width: 214.05 },
-            },
+            items: [
+              ...persistedRecord.sidebarLifecycle.projectMenu.items.slice(0, 6),
+              {
+                defaultMessage: "Mark all as read",
+                enabled: true,
+                hasIcon: true,
+                hasOnSelect: true,
+                id: "mark-project-threads-read",
+                messageId: "sidebarElectron.markProjectThreadsRead",
+                type: "item",
+              },
+              ...persistedRecord.sidebarLifecycle.projectMenu.items.slice(6),
+            ],
           },
         },
       }),
     ).not.toThrow();
-    expect(currentBaselineFingerprint.appVersion).toBe("26.810.52044");
+    expect(currentBaselineFingerprint.appVersion).toBe("26.818.41509");
     expect(currentBaselineViewports.compact.width).toBe(720);
     expect(() =>
       assertCurrentSidebarLifecycle({
@@ -742,10 +827,7 @@ describe("current baseline capture contract", () => {
         ...record.sidebarLifecycle,
         projectMenu: {
           ...record.sidebarLifecycle.projectMenu,
-          opened: {
-            ...record.sidebarLifecycle.projectMenu.opened,
-            hasMarkAllAsRead: true,
-          },
+          bridge: { available: false, frozen: true },
         },
       }),
     ).toThrow("project menu boundary");

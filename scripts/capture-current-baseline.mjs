@@ -646,6 +646,55 @@ try {
         visibleMenuCount: menus.length,
       };
     });
+  const inspectNativeProjectMenu = (trigger) =>
+    trigger.evaluate((element) => {
+      const round = (value) => Math.round(value * 100) / 100;
+      const bounds = element.getBoundingClientRect();
+      const fiberKey = Object.getOwnPropertyNames(element).find((name) =>
+        name.startsWith("__reactFiber$"),
+      );
+      let fiber = fiberKey ? element[fiberKey] : null;
+      let nativeItems = null;
+      while (fiber) {
+        if (typeof fiber.memoizedProps?.getNativeItems === "function") {
+          nativeItems = fiber.memoizedProps.getNativeItems();
+          break;
+        }
+        fiber = fiber.return;
+      }
+      if (!Array.isArray(nativeItems)) {
+        throw new Error(
+          "The current project action trigger did not expose one native-item provider.",
+        );
+      }
+      return {
+        bridge: {
+          available:
+            typeof window.electronBridge?.showContextMenu === "function",
+          frozen: Object.isFrozen(window.electronBridge),
+        },
+        items: nativeItems.map((item) => ({
+          defaultMessage: item.message?.defaultMessage ?? null,
+          enabled: item.enabled !== false,
+          hasIcon: item.type === "separator" ? false : Boolean(item.icon),
+          hasOnSelect:
+            item.type === "separator" ? false : typeof item.onSelect === "function",
+          id: item.id ?? null,
+          messageId: item.message?.id ?? null,
+          type: item.type ?? "item",
+        })),
+        renderMode: "electron-native-context-menu",
+        trigger: {
+          ariaExpanded: element.getAttribute("aria-expanded"),
+          ariaHaspopup: element.getAttribute("aria-haspopup"),
+          rect: {
+            height: round(bounds.height),
+            width: round(bounds.width),
+          },
+          tag: element.tagName.toLowerCase(),
+        },
+      };
+    });
   const inspectResponsiveSidebar = () =>
     page.evaluate(() => {
       const visible = (element) =>
@@ -1166,32 +1215,8 @@ try {
   const projectMenuTrigger = projectRow
     .locator('button[aria-haspopup="menu"]')
     .first();
-  await projectMenuTrigger.click();
-  await page.waitForSelector('[role="menu"]:visible');
-  await page.waitForTimeout(100);
-  sidebarLifecycle.projectMenu = { opened: await inspectOpenMenu() };
-  await page.keyboard.press("Escape");
-  await page.waitForFunction(
-    () =>
-      [...document.querySelectorAll('[role="menu"]')].every(
-        (element) =>
-          !element.checkVisibility({
-            checkOpacity: true,
-            checkVisibilityCSS: true,
-          }),
-      ),
-  );
-  sidebarLifecycle.projectMenu.closed = await page.evaluate((trigger) => ({
-    activeTag: document.activeElement?.tagName.toLowerCase() ?? null,
-    focusReturned: document.activeElement === trigger,
-    visibleMenuCount: [...document.querySelectorAll('[role="menu"]')].filter(
-      (element) =>
-        element.checkVisibility({
-          checkOpacity: true,
-          checkVisibilityCSS: true,
-        }),
-    ).length,
-  }), await projectMenuTrigger.elementHandle());
+  sidebarLifecycle.projectMenu =
+    await inspectNativeProjectMenu(projectMenuTrigger);
 
   const helpMenuTrigger = page
     .locator('button[aria-label="Open help menu"]:visible')

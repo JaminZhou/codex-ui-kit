@@ -45,39 +45,35 @@ observation from a previous build remains historical evidence.
 
 ## Current baseline
 
-- Codex Desktop `26.810.52044` (`6662`)
-- Package sampled on 2026-08-18 and MCP lifecycle fingerprint-reverified on
-  2026-08-19
+- Codex Desktop `26.818.41509` (`6962`)
+- Package and scoped shell lifecycle sampled on 2026-08-23
 - `app.asar` SHA-256:
-  `6e7e8791b8bf69a586ff994721fff518af391d9efdc66cd2e620dd2a4aedc90f`
+  `8eb91bd9efbf9a4dd04b9b0afdbfcb4e0bab5da18c1919ad74ca327c00c7e791`
 - Computer Use automation: blocked by the environment safety policy for
   `com.openai.codex`
 - Scoped CDP automation: available through a user-authorized second process;
   the Chromium profile is separate, but Codex application data and navigation
   are not fully isolated
-- Fresh current-build Renderer evidence now covers the New chat destination,
+- Fresh current-build Renderer evidence now covers the New chat shell,
   1180×820 and 820×680 shell, the exact 721→720 boundary where the sidebar now
   remains visible, explicit Hide/Show, Pull requests selection and return to
   New chat, current Composer geometry, zero horizontal overflow, and stable
   sidebar scroll ownership. Structural target ranking excludes the avatar
   overlay without using private text. The exact `scrollHeight` remains
   content-dependent, so the contract locks the unique scroll owner and visible
-  geometry rather than private task counts.
-- The same fingerprint revalidates 115
-  context/Composer/sidebar/menu/window/environment/Settings/completed-thread
-  assets, six project groups, Recents actions, the new footer Voice control,
-  the 320px Help menu, the five-icon Account menu, and one successful-command
-  thread. See [`26.810.52044.md`](26.810.52044.md). The scoped visible-shell approximation
-  list is empty, but the broader lifecycle denominator remains incomplete;
-  prior Terminal, Markdown, attachment, approval, collaboration,
-  and unsampled Settings evidence keeps its original prefix until separately
-  re-reached.
-- Terminal and subagent runtime captures from `26.730.61639` are retained as
-  previous-build regression evidence and have been downgraded from `verified`
-  to `partial_legacy` until they are reached again on the current fingerprint.
+  geometry rather than private task counts. It also revalidates the 320px Help
+  menu and the fourteen-row Projects Index.
+- The project action menu moved from a Renderer DOM menu to the frozen
+  `electronBridge.showContextMenu` path. The current six-action/three-separator
+  provider and its 221×187 Quartz window are recorded in
+  [`26.818.41509.md`](26.818.41509.md); the independent DOM replica remains
+  `partial_legacy` until its native-menu visual contract is updated.
+- The broader `26.810.52044` command, MCP, Review, Settings, worktree, account,
+  Recents, and exact-asset results remain previous-build regression evidence.
+  They are not relabeled as current merely because the shell capture passes.
 
-Current inventory: 89 surface groups; 34 have current-build runtime evidence, 39 have previous-build-only runtime evidence, 16 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 33 groups and Electron verification covers 33.
-Prior acceptance outside those 33 sampled current-build groups remains
+Current inventory: 89 surface groups; 11 have current-build runtime evidence, 62 have previous-build-only runtime evidence, 16 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 7 groups and Electron verification covers 7.
+Prior acceptance outside those 7 sampled current-build groups remains
 recorded as `partial_legacy` until current-build re-observation.
 
 The current package exposes candidates far beyond the old transcript sample:
@@ -218,8 +214,8 @@ background-completed unread thread on `26.803.61601`. It locked the 20×20
 trailing rail, exact 16×16 active spinner geometry, and centered 8×8 unread dot
 using the computed `rgb(131, 195, 255)` link color. A queued follow-up does not
 replace the active spinner, so ordinary thread presentation is classified as
-`active | waiting | unread | idle`. The `26.810.52044` refresh now supersedes
-the primary worktree anchor with a real disposable create, controlled
+`active | waiting | unread | idle`. The previous `26.810.52044` refresh
+superseded the primary worktree anchor with a real disposable create, controlled
 `.git/worktrees` failure, and successful Retry. Pending worktree phases retain
 the loading visual and restored retains the 14×14 branch marker, while a failed
 unread row keeps branch, red error, and blue unread as three simultaneous
@@ -375,7 +371,7 @@ host-defined route selector also remains partial/legacy. Global
 notification runtime observation and light-theme shell evidence also remain
 open.
 
-The `26.810.52044` project-entry refresh supersedes the narrower previous
+The previous `26.810.52044` project-entry refresh superseded the narrower
 sample. A live isolated Renderer now exposes a 260×249.5 project picker with a
 13/18.5714px search field, fourteen 28.56px options in a 252×142.81 scroll
 owner, and two fixed actions: `New project` and
@@ -395,7 +391,7 @@ Projects route: `Projects`, `Search projects`, Name/Updated sorting, local
 project and pending-worktree status, 70px rows with 32px icons, row actions,
 and up to ten expandable recent chats. The independent full-app replay covers
 ready, expanded, loading, error, partial-error, search-empty, and 720px compact
-presentations. A fresh isolated `26.810.52044` Renderer now additionally locks
+presentations. The isolated `26.810.52044` Renderer additionally locked
 the primary route's fourteen 70px rows, 736px 512/64/128 table, three 32px row
 actions, ready/expanded/sort/empty/focus behavior, and the explicitly collapsed
 600×600 416/128 compact table. Browser/CDP covers the same three primary
@@ -678,7 +674,7 @@ Browser/Electron verified for this sampled delete/rename family. Binary and
 conflict notices remain synthetic host-state coverage, so the broader Review
 family remains implementation-partial rather than product-level complete.
 
-A `26.810.52044` refresh now replaces that previous-build gate for the sampled
+A previous `26.810.52044` refresh replaced that older gate for the sampled
 card and Review family. A real three-file task renders one 737×174 `Edited 3
 files` card with `+2 −4`, opens a 382.4375px Review workspace at 1180×820, and
 keeps a 336.19px independently scroll-owned overlay at 720×680. Public
@@ -893,7 +889,7 @@ at 1.1017% under 1.2%. Product screenshots remain outside the repository.
 current-build Browser/Electron verified while their implementation remains
 partial for the open variants below.
 
-Build `26.810.52044` refreshes both MCP rows again and promotes the previously
+Build `26.810.52044` refreshed both MCP rows and promoted the previously
 unsampled transport-recovery row. The accepted real success performs exactly
 one Search OpenAI docs call and one Fetch OpenAI doc call, completes in 25
 seconds, and returns `Model Context Protocol` with the canonical
@@ -1018,7 +1014,7 @@ sampled. Repeated denial, other non-command approval kinds, and rule lifetime
 across thread/restart boundaries also remain open; the denial runtime sample
 is now current-build evidence.
 
-The `26.810.52044` denial refresh uses a single outside-project empty-file
+The previous `26.810.52044` denial refresh used a single outside-project empty-file
 sentinel because `open -a Calculator` no longer prompts under the sampled
 current policy. The real 736×162 pending card locks `Working for 1m 15s`, exact
 Terminal/chevron assets, 28px actions, `Esc`/`⏎` keycaps, and the
@@ -1125,7 +1121,7 @@ settlement → recovery in 188 CDP frames and a real Electron window. Local-only
 690×820 command/composer comparisons pass at 2.3321% and 1.3947%. Raw product
 screenshots and private task text remain untracked.
 
-The `26.810.52044` command refresh now supersedes the failure and interruption
+The previous `26.810.52044` command refresh superseded the failure and interruption
 presentation above. One exact command exited 7 after producing stderr and
 stdout, exposed `Worked for 5s`, and accepted a successful no-tool follow-up in
 the same task. A second long command was stopped after eight seconds; after its

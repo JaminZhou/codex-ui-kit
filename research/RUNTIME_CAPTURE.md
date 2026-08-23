@@ -121,7 +121,26 @@ they are not labeled current runtime observation or external product-pixel
 parity. A future disposable real task can promote each path only after its
 trigger, exact target, cleanup, and non-sensitive capture boundary are safe.
 
-### Current `26.810.52044` global-shell baseline
+### Current `26.818.41509` global-shell baseline
+
+The current installed build is `26.818.41509` (`6962`) with Chromium
+`151.0.7922.170`, a 284124509-byte `app.asar`, and SHA-256
+`8eb91bd9efbf9a4dd04b9b0afdbfcb4e0bab5da18c1919ad74ca327c00c7e791`.
+One isolated second process on loopback port `9881` re-runs the structural main
+Renderer selection, New chat at 1180/820/721/720 widths, sidebar lifecycle,
+Help menu, Pull requests round trip, and Projects Index route. The capture
+records no private labels or screenshots.
+
+The project action menu is no longer a Renderer `[role="menu"]`. Its 24×24
+trigger resolves through the live React owner to a frozen
+`electronBridge.showContextMenu` provider. The baseline records exact action
+IDs, message IDs, fixed labels, separators, icons, and selectable callbacks
+without invoking an action. A separate native observation moves the system
+pointer to the exact CDP trigger coordinate, observes one new ChatGPT-owned
+Quartz layer-101 window at 221×187, and closes it with system Escape. Raw pixels
+remain local-only. See [`26.818.41509.md`](26.818.41509.md).
+
+### Previous `26.810.52044` global-shell baseline
 
 The reproducible shell capture is implemented by
 `scripts/capture-current-baseline.mjs`. It accepts only an isolated loopback
@@ -325,7 +344,7 @@ local screenshots move recoverably to the single Trash item
 `codex-ui-kit-worktree-status.DF99q0-20260811`; the original Codex process
 remains running.
 
-### Current `26.810.52044` worktree status lifecycle
+### Previous `26.810.52044` worktree status lifecycle
 
 The current-build refresh repeats the bounded success and deterministic
 failure/Retry paths with two new disposable Git repositories, unique profiles,
@@ -1215,7 +1234,7 @@ was removed. Both exact temporary profiles and all external screenshots/JSON
 were moved to recoverable Trash; the successful evidence remains in
 `codex-ui-kit-command-stop-cdp.ZbTpcV`.
 
-### Current 26.810.52044 command failure, interruption, and recovery
+### Previous 26.810.52044 command failure, interruption, and recovery
 
 The current refresh used exact main PID `99403`, loopback port `9851`, and the
 unique profile

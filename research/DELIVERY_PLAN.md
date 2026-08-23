@@ -11,66 +11,71 @@ exit gates; it does not replace the inventory.
 ## Current position
 
 - The installed package and machine-readable evidence baseline are Codex
-  Desktop `26.810.52044` (`6662`). Unsampled earlier-build surfaces remain
+  Desktop `26.818.41509` (`6962`). Unsampled earlier-build surfaces remain
   previous-build regression evidence rather than current verification.
 - The inventory contains 89 surface groups: 59 P0, 21 P1, and 9 P2.
-- 34 groups have current-build runtime evidence, 39 have previous-build-only
+- 11 groups have current-build runtime evidence, 62 have previous-build-only
   runtime evidence, and 16 have not been sampled.
-- The scoped `26.810.52044` refresh revalidates 115
+- The scoped `26.818.41509` refresh revalidates the global shell, responsive
+  Composer, primary navigation, project-group lifecycle, Help menu, route
+  restoration, and Projects Index. It also records the project action menu's
+  migration from a DOM menu to a six-action/three-separator Electron native
+  menu with a 221×187 Quartz window. The broader `26.810.52044` refresh remains
+  previous-build regression evidence; it revalidated 115
   sidebar/menu/window-chrome/Composer/Settings/completed-thread icons against
-  exact runtime evidence. It adds Voice and Activity-attention, widens Help to
+  exact runtime evidence. It added Voice and Activity-attention, widened Help to
   320px, removes the Account Usage chevron and thread-header New chat action,
-  renames summary/Fork assets, and proves that a 720px resize keeps the sidebar
+  renamed summary/Fork assets, and proved that a 720px resize kept the sidebar
   visible before explicit Hide/Show.
-  The current MCP follow-up also re-reaches one Search → Fetch success, an
+  That previous MCP follow-up also re-reached one Search → Fetch success, an
   invalid-URL Fetch → Search → Fetch recovery, and a transient
-  `Reconnecting 2/5` row that completes in place. It promotes the exact MCP,
-  disclosure, and reconnect glyphs and restores current Browser/Electron/pixel
-  gates for all three rows without claiming the remaining MCP variants.
-  The current command follow-up additionally re-reaches exit-code-7 recovery
-  and command interruption. It proves that 26.810 retains the stopped
+  `Reconnecting 2/5` row that completed in place. It promoted the exact MCP,
+  disclosure, and reconnect glyphs and added Browser/Electron/pixel gates for
+  that build without claiming the remaining MCP variants.
+  The previous command follow-up additionally re-reached exit-code-7 recovery
+  and command interruption. It proved that 26.810 retained the stopped
   background-command row after process settlement and same-thread recovery,
   superseding the previous `Ran …` rewrite.
-  The current worktree follow-up re-reaches real create, controlled failure,
-  failed-plus-unread composition, Retry, and recovery. It supersedes the
+  The previous worktree follow-up re-reached real create, controlled failure,
+  failed-plus-unread composition, Retry, and recovery. It superseded the
   previous single-status replay with the observed branch/error/unread
   three-track row and exact 8/36/67px trailing insets.
-  The current Project picker follow-up restores the 260×249.5 two-action
-  composition, promotes its exact New/Clear glyphs, and verifies empty search,
+  The previous Project picker follow-up restored the 260×249.5 two-action
+  composition, promoted its exact New/Clear glyphs, and verified empty search,
   Escape focus return, clear, and original-project restoration in Browser/CDP,
   Electron, and a 0.9546% local-only listbox comparison.
   The current Projects Index follow-up separately reaches the real
-  `26.810.52044` route and locks fourteen 70px rows, 512/64/128 wide columns,
-  416/128 explicitly collapsed compact columns, three row actions, sorting,
-  empty search, expansion, and focus continuity. Browser/CDP, full Electron
-  creation/routing acceptance, and local-only 0.2221% route plus 3.7068%
-  Create-region comparisons now replace the previous-build-only primary route
-  denominator without claiming every loading/error/pending-worktree variant.
-  The current approval follow-up reaches one real outside-project command
+  `26.818.41509` route and locks fourteen 70px rows, 512/64/128 wide columns,
+  416/128 explicitly collapsed compact columns, sorting, empty search,
+  expansion, and focus continuity. Browser/CDP and Electron acceptance retain
+  the structural gate. The 0.2221% route and 3.7068% Create-region comparisons
+  remain explicitly scoped to the previous 26.810 build until current pixels
+  are recaptured.
+  The previous approval follow-up reached one real outside-project command
   prompt, options menu, safe denial, proven no-execution state, and Composer
-  recovery. It distinguishes the exact Ask-mode hand glyph from the non-ask
-  shield and adds current Browser/CDP, Electron, and three regional pixel gates
+  recovery. It distinguished the exact Ask-mode hand glyph from the non-ask
+  shield and added Browser/CDP, Electron, and three regional pixel gates
   without promoting Allow or other approval kinds.
-  The current Review follow-up reaches a real three-file card, wide/compact
+  The previous Review follow-up reached a real three-file card, wide/compact
   Review workspace, all six scopes and toolbar controls, exact file tree and
-  stacked diffs, plus one Undo failure dialog. It promotes seventeen exact
-  Review assets and restores current Browser/CDP, Electron, integrated visual,
+  stacked diffs, plus one Undo failure dialog. It promoted seventeen exact
+  Review assets and added Browser/CDP, Electron, integrated visual,
   and 4.3339% product-panel gates for four inventory groups while keeping
   successful Undo and unsampled content variants open.
   Earlier hover/footer slices promoted More, Pin,
-  Archive, and Help, confirms that Settings is absent from the sampled footer
+  Archive, and Help, confirmed that Settings is absent from the sampled footer
   and that sampled project-task rows have no leading glyph. The Recents follow-up
-  independently scrolls to one section, pairs six Pin/Archive rows, confirms
+  independently scrolled to one section, paired six Pin/Archive rows, confirmed
   zero leading SVGs. The window-chrome follow-up promoted the visible
-  Sidebar/Back/Forward controls and reduces the explicit visual approximation
-  denominator from 15 to 8. The Composer follow-up promotes Project, Worktree,
+  Sidebar/Back/Forward controls and reduced the explicit visual approximation
+  denominator from 15 to 8. The Composer follow-up promoted Project, Worktree,
   Branch, Add files, Permission, Model chevron, Dictate, and Voice, reducing
   the scoped visible-shell denominator to zero while explicitly retaining the
   broader inventory/lifecycle blocker. The `26.803.61601` command follow-up ran
   bounded success, exact `exit 7`, and a stopped 120-second command. It adds
   the exact three-path terminal glyph, separates the current-turn 28px Stop
-  action from background-terminal Stop all/per-process controls, proves
-  settlement and same-thread recovery, and promotes command execution/failure,
+  action from background-terminal Stop all/per-process controls, proved
+  settlement and same-thread recovery, and promoted command execution/failure,
   interruption, and background-process management through Browser/CDP, real
   Electron, and local-only owned pixels.
   The previous Terminal follow-up separately proves that a child command's
@@ -85,20 +90,20 @@ exit gates; it does not replace the inventory.
   The previous account-menu follow-up added six exact icons and gated its six-item,
   one-avatar, zero-role-separator structure, 258.11×188.38 geometry, dismissal,
   focus return, and owned pixels at 0.1979%. Sidebar actions and ordinary task
-  status are now separate verified denominators. The previous-build status
-  slice reaches active and unread runtime states, preserves the active spinner
+  status were separate verified denominators on that build. The previous-build status
+  slice reached active and unread runtime states, preserved the active spinner
   while a follow-up is queued, and locks the exact trailing rail, spinner, dot,
   computed color, action replacement, and glyph pixels. The separate
-  pending-worktree slice now reaches a real disposable worktree create, a
-  deterministic create failure, and a successful Retry recovery. It preserves
+  pending-worktree slice reached a real disposable worktree create, a
+  deterministic create failure, and a successful Retry recovery. It preserved
   queued/creating/setting-up/failed/restored semantics, locks the 14×14 branch
-  marker plus 20×20 status rail, and adds Browser/CDP, Electron, and local-only
+  marker plus 20×20 status rail, and added Browser/CDP, Electron, and local-only
   loading/error/restored pixel gates. The persistence follow-up creates a real
-  worktree and task, proves project/task survival across an isolated app
-  restart, records that the exact thread route is restored only after selecting
-  the retained task, and reaches the 736×37.125 missing-working-directory
-  notice. It separately proves that an editable Composer and model-only turn
-  remain available, that restoring the directory does not clear the notice in
+  worktree and task, proved project/task survival across an isolated app
+  restart, recorded that the exact thread route is restored only after selecting
+  the retained task, and reached the 736×37.125 missing-working-directory
+  notice. It separately proved that an editable Composer and model-only turn
+  remained available, that restoring the directory did not clear the notice in
   the existing app session, and that the next app restart recovers it. The
   independent current-sidebar replay, Browser/CDP, Electron, and a local-only
   notice-region gate cover the same observed boundary without inventing a
@@ -107,11 +112,11 @@ exit gates; it does not replace the inventory.
   structurally, records dark 1180×820, 820×680, 721×680, and 720×680 geometry,
   normalizes collapsed and explicitly pinned narrow states, verifies Pull
   requests → New chat restoration, and records zero horizontal overflow. Its
-  Browser/CDP and Electron counterparts cover the same boundary and owned
-  regional pixels. The capture is Renderer emulation; native resize remains a
-  separate Electron gate. A same-state dark New chat composition additionally
-  passes current-product top/footer/main gates at 3.1387%, 0.4126%, and
-  0.3146%. Earlier lifecycle evidence that was not re-reached retains its
+  Browser/CDP and Electron counterparts cover the same structural boundary.
+  The capture is Renderer emulation; native resize remains a separate Electron
+  gate. The 3.1387%, 0.4126%, and 0.3146% same-state dark New chat product
+  pixel results remain scoped to 26.810 until recaptured. Earlier lifecycle
+  evidence that was not re-reached retains its
   original build prefix.
 - The previous `26.730.61639` refresh covers the local Terminal session shell,
   a real bounded running/completed command with panel persistence, and the
@@ -343,7 +348,7 @@ new parity claims:
 - re-observe the shell, left sidebar, conversation, Composer, Review, Terminal,
   Markdown, and MCP anchors;
 - retain previous-build results as regression fixtures while promoting only
-  surfaces re-observed on `26.810.52044`;
+  surfaces re-observed on `26.818.41509`;
 - update inventory evidence prefixes and the current build note.
 
 Exit: the current build has a reproducible CDP capture recipe and no
@@ -371,8 +376,8 @@ slot. It is split into:
 - `app.sidebar-status-indicators`: ordinary active, waiting, unread, and idle
   task presentation across project and recent rows;
 - `app.sidebar-worktree-status-indicators`: pending worktree queued, creating,
-  setting-up, failed, and restored presentation. The current 26.810 slice now
-  re-reaches real create, controlled failure, failed-plus-unread composition,
+  setting-up, failed, and restored presentation. The previous 26.810 slice
+  re-reached real create, controlled failure, failed-plus-unread composition,
   Retry recovery, and exact 30px trailing geometry through product CDP,
   Browser/CDP, Electron, and local-only pixels;
 - `app.sidebar-footer-account-settings`: account, settings, update/status, and
@@ -465,10 +470,12 @@ run-location transition, environment empty menu, seven-branch picker, and
 1180→720 responsive geometry now pass Browser/CDP, Electron, and external
 pixel gates. The historical 600×600 local-environment dialog remains an
 independent host capability rather than the current New worktree entry path.
-The current `26.810.52044` Projects Index follow-up now delivers the primary
+The current `26.818.41509` Projects Index follow-up now delivers the primary
 ready/expanded/sort/empty/compact route at both 1180×820 and explicitly
-collapsed 600×600, with current geometry, assets, Browser/CDP, full Electron
-creation and distinct recent-chat routing, and ownership-masked pixels.
+collapsed 600×600, with current structural geometry and Browser/CDP evidence.
+Full Electron creation and distinct recent-chat routing remain implementation
+acceptance, while the ownership-masked product pixels remain scoped to 26.810
+until they are recaptured against the current build.
 Loading/error/partial-error and pending-worktree variants remain independent
 replay coverage until they are re-reached on the same installed build.
 The current follow-up adds the five-action `Work in` menu, treats Codex web as

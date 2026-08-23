@@ -227,22 +227,23 @@ sanitizer covers the de-identified font-style samples and all promoted icon styl
 attributes, class names, view boxes, and render sizes before capture output.
 Process/profile setup and exact-PID cleanup remain explicit operator steps.
 
-The current manifest fingerprints Codex Desktop `26.810.52044` (`6662`) and
-contains 95 runtime-observed exact icons. It covers the visible
+The latest committed exact-asset manifest fingerprints the previous Codex
+Desktop `26.810.52044` (`6662`) build and
+contains 95 runtime-observed exact icons. It covered the visible
 sidebar/menu/window-chrome/Composer/environment surfaces, including neutral
 and attention Activity, the new footer Voice action, the conditional Mark all
 as read action, and the widened Help menu's leading changelog plus trailing
-external-link glyphs. The Account menu now contributes five SVGs: Usage, Pet,
-Invite, Settings, and Log out; the removed Usage chevron is not retained as a
-current asset. The current build confirms that Settings is absent from the
+external-link glyphs. The Account menu contributed five SVGs: Usage, Pet,
+Invite, Settings, and Log out; the removed Usage chevron was not retained as an
+asset for that build. The sampled build confirmed that Settings is absent from the
 sampled footer and that sampled project-task and Recents rows have no leading
 glyph. The scoped visible-shell approximation list remains empty after 24
-Settings navigation primitives, the Hooks reload action, and the current
+Settings navigation primitives, the Hooks reload action, and the sampled
 completed-thread primitives: Send, project, thread actions, open-in chevron,
 summary, bottom panel, side panel, Copy, Good response, Bad response, Fork,
 and the real successful-command Terminal glyph. The prior header New chat,
-pinned-summary, and Continue IDs are not promoted on this build. The current
-set now also includes the exact MCP integration/call glyph, the 14×14
+pinned-summary, and Continue IDs were not promoted on that build. The set also
+included the exact MCP integration/call glyph, the 14×14
 content-width disclosure chevron, and the four-path 16×16 `Reconnecting`
 glyph from accepted real Search/Fetch, invalid-URL recovery, and transient
 transport-recovery turns. The targeted MCP updater requires every group and
@@ -257,5 +258,5 @@ separation from the broader UI inventory baseline.
 The current footer Voice/Help pair also has an optional local-only pixel gate.
 Provide a 133×46 product crop through
 `CODEX_UI_KIT_CURRENT_SIDEBAR_FOOTER_CONTROLS_REFERENCE`; the checked-in
-threshold is 3.5%, while the current 26.810.52044 comparison passes at
+threshold is 3.5%, while the previous 26.810.52044 comparison passes at
 3.1219%. The reference itself remains outside the repository.
