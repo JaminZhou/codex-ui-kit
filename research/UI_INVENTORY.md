@@ -63,6 +63,13 @@ observation from a previous build remains historical evidence.
   content-dependent, so the contract locks the unique scroll owner and visible
   geometry rather than private task counts. It also revalidates the 320px Help
   menu and the fourteen-row Projects Index.
+- A dedicated New chat home sample now covers actual Dark and Light product
+  preferences at 1180×820 and 720×680. It locks the persisted 322.90625px
+  sidebar, 56px mark, four wide/two compact prompt cards, exact five SVG
+  sources, prompt-to-Composer selection, project-dialog portal and focus
+  return, and zero compact overflow. Four unmasked owned-main comparisons pass
+  between 0.2708% and 1.7855% under a 2.5% hard limit; the product preference
+  was restored to System after capture.
 - The project action menu moved from a Renderer DOM menu to the frozen
   `electronBridge.showContextMenu` path. The independent replica now locks the
   current six-action/three-separator provider, 221×187 geometry, six exact
@@ -109,8 +116,8 @@ observation from a previous build remains historical evidence.
   previous-build regression evidence.
   They are not relabeled as current merely because the shell capture passes.
 
-Current inventory: 89 surface groups; 29 have current-build runtime evidence, 44 have previous-build-only runtime evidence, 16 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 26 groups and Electron verification covers 26.
-Prior acceptance outside those 26 sampled current-build groups remains
+Current inventory: 89 surface groups; 30 have current-build runtime evidence, 43 have previous-build-only runtime evidence, 16 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 27 groups and Electron verification covers 27.
+Prior acceptance outside those 27 sampled current-build groups remains
 recorded as `partial_legacy` until current-build re-observation.
 
 The current package exposes candidates far beyond the old transcript sample:
@@ -315,10 +322,13 @@ Browser/CDP, Electron, and one reviewed internal pixel baseline gate the
 the Project, Environment, and Worktree overlays and requires light semantic
 surfaces with readable foregrounds, requires a contrast-safe shell success
 indicator, and resolves System through the native Electron theme before the
-Renderer loads. This does not close the sidebar's light-theme evidence gap:
-the installed product was only inspected read-only with System selected on a
-dark macOS appearance, and no real Light preference or external Light pixel
-reference was captured.
+Renderer loads. A later `26.818.41509` isolated sample closes the New chat
+home's light-theme evidence gap: the real Light preference, computed paint,
+wide/compact geometry, prompt focus/selection, and external Light pixels are
+now recorded, and the preference was restored to System. This remains scoped
+to the visible current home and shell; account/settings overflow, broader
+route lifecycle feedback, and global notifications still require live Light
+evidence.
 
 The application-shell continuity slice splits window navigation, route
 lifecycle feedback, route selection/restoration, fatal App Server recovery,

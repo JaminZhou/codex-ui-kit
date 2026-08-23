@@ -5524,6 +5524,151 @@ try {
   await largeReviewApp.close();
 }
 
+const currentHomeElectronScenes = [
+  {
+    currentSidebar: true,
+    frame: "current-home-dark-wide",
+    id: "electron-current-home-dark-wide",
+    scenario: "workspace-workflow",
+    theme: "dark",
+    view: "workspace",
+  },
+  {
+    currentSidebar: true,
+    frame: "current-home-light-wide",
+    id: "electron-current-home-light-wide",
+    scenario: "workspace-workflow",
+    theme: "light",
+    view: "workspace",
+  },
+  {
+    currentSidebar: true,
+    frame: "current-home-dark-compact",
+    id: "electron-current-home-dark-compact",
+    scenario: "workspace-workflow",
+    theme: "dark",
+    view: "workspace",
+    windowSize: { height: 680, width: 720 },
+  },
+  {
+    currentSidebar: true,
+    frame: "current-home-light-compact",
+    id: "electron-current-home-light-compact",
+    scenario: "workspace-workflow",
+    theme: "light",
+    view: "workspace",
+    windowSize: { height: 680, width: 720 },
+  },
+];
+
+for (const currentHomeScene of currentHomeElectronScenes) {
+  const { app: currentHomeApp, page: currentHomePage } =
+    await launchScene(currentHomeScene);
+  try {
+    const nativeBounds = await currentHomeApp.evaluate(
+      ({ BrowserWindow }) =>
+        BrowserWindow.getAllWindows()[0]?.getContentBounds(),
+    );
+    const contract = await currentHomePage.evaluate(() => {
+      const visibleCards = Array.from(
+        document.querySelectorAll(
+          ".codex-ui-new-conversation-prompt-grid > button",
+        ),
+      ).filter((button) => getComputedStyle(button).display !== "none");
+      const sidebar = document.querySelector(
+        ".codex-ui-app-shell__sidebar",
+      );
+      const main = document.querySelector(".codex-ui-app-shell__main");
+      return {
+        colorScheme: getComputedStyle(document.documentElement).colorScheme,
+        frame: document
+          .querySelector(".demo-root")
+          ?.getAttribute("data-frame"),
+        horizontalOverflow:
+          document.documentElement.scrollWidth -
+          document.documentElement.clientWidth,
+        iconNames: Array.from(
+          document.querySelectorAll(
+            ".codex-ui-new-conversation-prompt-grid [data-current-build-icon]",
+          ),
+          (icon) => icon.getAttribute("data-current-build-icon"),
+        ),
+        mainWidth: main?.getBoundingClientRect().width,
+        markSize: document
+          .querySelector('[data-current-build-icon="home-mark"]')
+          ?.getBoundingClientRect().width,
+        sidebarWidth: sidebar?.getBoundingClientRect().width,
+        visibleCards: visibleCards.length,
+      };
+    });
+    const compact = currentHomeScene.frame.endsWith("-compact");
+    const expectedWidth = compact ? 720 : 1180;
+    const expectedHeight = compact ? 680 : 820;
+    if (
+      nativeBounds?.width !== expectedWidth ||
+      nativeBounds?.height !== expectedHeight ||
+      contract.frame !== currentHomeScene.frame ||
+      contract.colorScheme !== currentHomeScene.theme ||
+      contract.horizontalOverflow > 1 ||
+      Math.abs((contract.sidebarWidth ?? 0) - 322.90625) > 0.1 ||
+      Math.abs(
+        (contract.mainWidth ?? 0) - (compact ? 397.09375 : 857.09375),
+      ) > 0.1 ||
+      contract.markSize !== 56 ||
+      contract.visibleCards !== (compact ? 2 : 4) ||
+      JSON.stringify(contract.iconNames) !==
+        JSON.stringify([
+          "home-suggestion-explore",
+          "home-suggestion-build",
+          "home-suggestion-review",
+          "home-suggestion-fix",
+        ])
+    ) {
+      throw new Error(
+        `Electron current home geometry failed: ${JSON.stringify({ contract, nativeBounds })}`,
+      );
+    }
+
+    const firstPrompt = currentHomePage.getByRole("button", {
+      name: "Explore and understand code",
+    });
+    await firstPrompt.click();
+    const composer = currentHomePage.getByRole("textbox", {
+      name: "Do anything",
+    });
+    if ((await composer.inputValue()) !== "Explore and understand code") {
+      throw new Error("Electron current home prompt selection failed.");
+    }
+    await composer.fill("");
+
+    const destination = currentHomePage.locator(
+      "#demo-workspace-destination-trigger",
+    );
+    await destination.click();
+    const projectDialog = currentHomePage.getByRole("dialog", {
+      name: "Choose a project",
+    });
+    const projectSearch = projectDialog.getByRole("searchbox", {
+      name: "Search projects",
+    });
+    await projectSearch.waitFor();
+    await projectSearch.press("Escape");
+    await projectDialog.waitFor({ state: "hidden" });
+    await currentHomePage.waitForTimeout(20);
+    if (
+      (await currentHomePage.evaluate(
+        () => document.activeElement?.id,
+      )) !== "demo-workspace-destination-trigger"
+    ) {
+      throw new Error(
+        "Electron current home project portal did not restore focus.",
+      );
+    }
+  } finally {
+    await currentHomeApp.close();
+  }
+}
+
 const codingWorkspaceScene = {
   frame: "workspace-ready",
   id: "electron-coding-workspace",

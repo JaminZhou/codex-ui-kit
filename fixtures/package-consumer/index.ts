@@ -86,6 +86,8 @@ import {
   MenuSubmenu,
   MessageAttachment,
   type NoticeTone,
+  NewConversationPromptGrid,
+  type NewConversationPromptOption,
   NewConversationStart,
   ProposedPlan,
   Popover,
@@ -356,6 +358,8 @@ void ConversationRouteSelector;
 void conversationRouteSelectorAcceptsChildren;
 void Dialog;
 void DialogChoice;
+void NewConversationPromptGrid;
+void ({} as NewConversationPromptOption);
 void NewConversationStart;
 void ProposedPlan;
 void ProjectConversationPage;

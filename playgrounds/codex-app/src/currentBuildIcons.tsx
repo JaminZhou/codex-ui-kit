@@ -1,5 +1,6 @@
 import type { ComponentProps } from "react";
 import visualAssets from "../../../research/visual-assets.json";
+import currentHomeAssets from "../../../research/current-home-assets.json";
 import currentProjectMenuAssets from "../../../research/current-project-menu-assets.json";
 import {
   VisualAssetIcon,
@@ -19,6 +20,11 @@ export type CurrentBuildIconName =
   | "composer-send"
   | "composer-voice"
   | "composer-worktree"
+  | "home-mark"
+  | "home-suggestion-build"
+  | "home-suggestion-explore"
+  | "home-suggestion-fix"
+  | "home-suggestion-review"
   | "review-close"
   | "review-collapse-all"
   | "review-commit-or-push"
@@ -130,6 +136,7 @@ interface CurrentBuildIconProps
 
 export function CurrentBuildIcon({ name, ...props }: CurrentBuildIconProps) {
   const icon =
+    currentHomeAssets.icons.find((candidate) => candidate.id === name) ??
     currentProjectMenuAssets.icons.find((candidate) => candidate.id === name) ??
     visualAssets.icons.find((candidate) => candidate.id === name);
   if (!icon) throw new Error(`Unknown current-build icon: ${name}`);

@@ -79,6 +79,7 @@ export const publicRuntimeExports = [
   "MenuSeparator",
   "MenuSubmenu",
   "MessageAttachment",
+  "NewConversationPromptGrid",
   "NewConversationStart",
   "Popover",
   "ProjectConversationPage",

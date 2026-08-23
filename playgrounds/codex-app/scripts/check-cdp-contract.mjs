@@ -73,13 +73,16 @@ for (const scene of selectedScenes) {
       const lightShell = await page.evaluate(() => {
         const metric = (selector) => {
           const element = document.querySelector(selector);
-          if (!(element instanceof HTMLElement)) return null;
+          if (!(element instanceof Element)) return null;
           const value = element.getBoundingClientRect();
           const style = getComputedStyle(element);
           return {
             backgroundColor: style.backgroundColor,
             color: style.color,
             height: value.height,
+            left: value.left,
+            opacity: style.opacity,
+            top: value.top,
             width: value.width,
           };
         };
@@ -115,6 +118,44 @@ for (const scene of selectedScenes) {
             ),
             iconPaint,
           ),
+          homeCards: Array.from(
+            document.querySelectorAll(
+              ".codex-ui-new-conversation-prompt-grid > button",
+            ),
+            (button) => {
+              const value = button.getBoundingClientRect();
+              const style = getComputedStyle(button);
+              return {
+                backgroundColor: style.backgroundColor,
+                borderRadius: style.borderRadius,
+                display: style.display,
+                fontSize: getComputedStyle(
+                  button.querySelector(":scope > span:last-child"),
+                ).fontSize,
+                fontWeight: getComputedStyle(
+                  button.querySelector(":scope > span:last-child"),
+                ).fontWeight,
+                height: value.height,
+                label: button.textContent?.trim(),
+                left: value.left,
+                lineHeight: getComputedStyle(
+                  button.querySelector(":scope > span:last-child"),
+                ).lineHeight,
+                top: value.top,
+                width: value.width,
+              };
+            },
+          ),
+          homeIcons: Array.from(
+            document.querySelectorAll(
+              ".codex-ui-new-conversation-prompt-grid [data-current-build-icon]",
+            ),
+            (icon) => ({
+              color: getComputedStyle(icon).color,
+              name: icon.getAttribute("data-current-build-icon"),
+            }),
+          ),
+          homeMark: metric('[data-current-build-icon="home-mark"]'),
           horizontalOverflow:
             document.documentElement.scrollWidth -
             document.documentElement.clientWidth,
@@ -124,6 +165,9 @@ for (const scene of selectedScenes) {
             .querySelector(".demo-root")
             ?.getAttribute("data-theme"),
           sidebar: metric(".codex-ui-app-shell__sidebar"),
+          title: metric(
+            ".demo-workspace-start .codex-ui-new-conversation-start__header h3",
+          ),
           workspace: metric(".demo-workspace-route"),
         };
       });
@@ -149,14 +193,39 @@ for (const scene of selectedScenes) {
         lightShell.horizontalOverflow > 1 ||
         lightShell.main?.backgroundColor !== "rgb(255, 255, 255)" ||
         lightShell.workspace?.backgroundColor !== "rgb(255, 255, 255)" ||
-        lightShell.main?.width !== 906 ||
+        Math.abs((lightShell.main?.width ?? 0) - 857.09375) > 0.1 ||
         lightShell.workspace?.height !== 774 ||
-        lightShell.sidebar?.width !== 274 ||
+        Math.abs((lightShell.sidebar?.width ?? 0) - 322.90625) > 0.1 ||
         lightShell.sidebar?.height !== 820 ||
         lightShell.composer?.width !== 736 ||
         lightShell.composer?.height !== 98 ||
         lightShell.composer?.color !== "rgb(26, 28, 31)" ||
-        lightShell.allIcons.length < 18 ||
+        lightShell.allIcons.length < 23 ||
+        lightShell.homeMark?.height !== 56 ||
+        lightShell.homeMark?.width !== 56 ||
+        Math.abs((lightShell.homeMark?.top ?? 0) - 283.40625) > 0.2 ||
+        lightShell.homeMark?.opacity !== "0.3" ||
+        lightShell.title?.height !== 33.59375 ||
+        Math.abs((lightShell.title?.top ?? 0) - 363.40625) > 0.2 ||
+        lightShell.homeCards.length !== 4 ||
+        lightShell.homeCards.some(
+          ({ backgroundColor, borderRadius, fontSize, fontWeight, height, lineHeight, top, width }) =>
+            backgroundColor !== "rgb(255, 255, 255)" ||
+            borderRadius !== "20px" ||
+            fontSize !== "13px" ||
+            fontWeight !== "500" ||
+            height !== 104 ||
+            lineHeight !== "20px" ||
+            Math.abs(top - 433) > 0.2 ||
+            width !== 168.5,
+        ) ||
+        JSON.stringify(lightShell.homeIcons) !==
+          JSON.stringify([
+            { color: "rgb(51, 156, 255)", name: "home-suggestion-explore" },
+            { color: "rgb(146, 79, 247)", name: "home-suggestion-build" },
+            { color: "rgb(0, 162, 64)", name: "home-suggestion-review" },
+            { color: "rgb(226, 85, 7)", name: "home-suggestion-fix" },
+          ]) ||
         JSON.stringify(lightShell.contextIcons.map(({ name }) => name)) !==
           JSON.stringify(expectedContextIcons) ||
         JSON.stringify(lightShell.composerIcons.map(({ name }) => name)) !==
@@ -164,6 +233,7 @@ for (const scene of selectedScenes) {
         visiblePaints.some(
           ({ fill, name, stroke }) =>
             name !== "composer-voice" &&
+            name !== "home-mark" &&
             (fill === "rgb(255, 255, 255)" ||
               stroke === "rgb(255, 255, 255)" ||
               fill.startsWith("oklab(0.999") ||
@@ -174,9 +244,35 @@ for (const scene of selectedScenes) {
           `Current light shell contract failed: ${JSON.stringify(lightShell)}`,
         );
       }
+      const firstPrompt = page.getByRole("button", {
+        name: "Explore and understand code",
+      });
+      await firstPrompt.focus();
+      const promptFocus = await firstPrompt.evaluate((button) => ({
+        outlineStyle: getComputedStyle(button).outlineStyle,
+        outlineWidth: getComputedStyle(button).outlineWidth,
+      }));
+      await firstPrompt.click();
+      const selectedPrompt = await page
+        .getByRole("textbox", { name: "Do anything" })
+        .inputValue();
+      if (
+        promptFocus.outlineStyle !== "solid" ||
+        promptFocus.outlineWidth !== "2px" ||
+        selectedPrompt !== "Explore and understand code"
+      ) {
+        throw new Error(
+          `Current light home prompt interaction failed: ${JSON.stringify({ promptFocus, selectedPrompt })}`,
+        );
+      }
+      await page.getByRole("textbox", { name: "Do anything" }).fill("");
+      await page
+        .getByRole("form", { name: "Agent composer" })
+        .getByRole("button", { name: "Start new voice chat" })
+        .waitFor();
       await writeFile(
         join(artifactDirectory, "current-light-shell.json"),
-        `${JSON.stringify(lightShell, null, 2)}\n`,
+        `${JSON.stringify({ lightShell, promptFocus, selectedPrompt }, null, 2)}\n`,
       );
     }
     if (scene.id.startsWith("workspace-git-settings")) {
@@ -1715,13 +1811,16 @@ for (const scene of selectedScenes) {
       const darkShell = await page.evaluate(() => {
         const metric = (selector) => {
           const element = document.querySelector(selector);
-          if (!(element instanceof HTMLElement)) return null;
+          if (!(element instanceof Element)) return null;
           const value = element.getBoundingClientRect();
           const style = getComputedStyle(element);
           return {
             backgroundColor: style.backgroundColor,
             color: style.color,
             height: value.height,
+            left: value.left,
+            opacity: style.opacity,
+            top: value.top,
             width: value.width,
           };
         };
@@ -1752,6 +1851,40 @@ for (const scene of selectedScenes) {
             ),
             (icon) => icon.getAttribute("data-current-build-icon"),
           ),
+          homeCards: Array.from(
+            document.querySelectorAll(
+              ".codex-ui-new-conversation-prompt-grid > button",
+            ),
+            (button) => {
+              const value = button.getBoundingClientRect();
+              const style = getComputedStyle(button);
+              const label = button.querySelector(":scope > span:last-child");
+              const labelStyle = getComputedStyle(label);
+              return {
+                backgroundColor: style.backgroundColor,
+                borderRadius: style.borderRadius,
+                display: style.display,
+                fontSize: labelStyle.fontSize,
+                fontWeight: labelStyle.fontWeight,
+                height: value.height,
+                label: button.textContent?.trim(),
+                left: value.left,
+                lineHeight: labelStyle.lineHeight,
+                top: value.top,
+                width: value.width,
+              };
+            },
+          ),
+          homeIcons: Array.from(
+            document.querySelectorAll(
+              ".codex-ui-new-conversation-prompt-grid [data-current-build-icon]",
+            ),
+            (icon) => ({
+              color: getComputedStyle(icon).color,
+              name: icon.getAttribute("data-current-build-icon"),
+            }),
+          ),
+          homeMark: metric('[data-current-build-icon="home-mark"]'),
           forward: control("Forward"),
           horizontalOverflow:
             document.documentElement.scrollWidth -
@@ -1765,6 +1898,9 @@ for (const scene of selectedScenes) {
             .querySelector(".demo-root")
             ?.getAttribute("data-theme"),
           sidebar: metric(".codex-ui-app-shell__sidebar"),
+          title: metric(
+            ".demo-workspace-start .codex-ui-new-conversation-start__header h3",
+          ),
           workspace: metric(".demo-workspace-route"),
         };
       });
@@ -1775,12 +1911,37 @@ for (const scene of selectedScenes) {
         darkShell.horizontalOverflow > 1 ||
         darkShell.main?.backgroundColor !== "rgb(24, 24, 24)" ||
         darkShell.workspace?.backgroundColor !== "rgb(24, 24, 24)" ||
-        darkShell.main?.width !== 906 ||
+        Math.abs((darkShell.main?.width ?? 0) - 857.09375) > 0.1 ||
         darkShell.workspace?.height !== 774 ||
-        darkShell.sidebar?.width !== 274 ||
+        Math.abs((darkShell.sidebar?.width ?? 0) - 322.90625) > 0.1 ||
         darkShell.sidebar?.height !== 820 ||
         darkShell.composer?.width !== 736 ||
         darkShell.composer?.height !== 98 ||
+        darkShell.homeMark?.height !== 56 ||
+        darkShell.homeMark?.width !== 56 ||
+        Math.abs((darkShell.homeMark?.top ?? 0) - 283.40625) > 0.2 ||
+        darkShell.homeMark?.opacity !== "0.3" ||
+        darkShell.title?.height !== 33.59375 ||
+        Math.abs((darkShell.title?.top ?? 0) - 363.40625) > 0.2 ||
+        darkShell.homeCards.length !== 4 ||
+        darkShell.homeCards.some(
+          ({ backgroundColor, borderRadius, fontSize, fontWeight, height, lineHeight, top, width }) =>
+            backgroundColor !== "rgb(24, 24, 24)" ||
+            borderRadius !== "20px" ||
+            fontSize !== "13px" ||
+            fontWeight !== "500" ||
+            height !== 104 ||
+            lineHeight !== "20px" ||
+            Math.abs(top - 433) > 0.2 ||
+            width !== 168.5,
+        ) ||
+        JSON.stringify(darkShell.homeIcons) !==
+          JSON.stringify([
+            { color: "rgb(51, 156, 255)", name: "home-suggestion-explore" },
+            { color: "rgb(173, 123, 249)", name: "home-suggestion-build" },
+            { color: "rgb(64, 201, 119)", name: "home-suggestion-review" },
+            { color: "rgb(251, 106, 34)", name: "home-suggestion-fix" },
+          ]) ||
         darkShell.newChatCurrent !== "page" ||
         !darkShell.back?.disabled ||
         darkShell.back.cursor !== "not-allowed" ||
@@ -1812,6 +1973,79 @@ for (const scene of selectedScenes) {
       await writeFile(
         join(artifactDirectory, "current-dark-shell.json"),
         `${JSON.stringify(darkShell, null, 2)}\n`,
+      );
+    }
+    if (
+      scene.id === "current-dark-shell-compact" ||
+      scene.id === "current-light-shell-compact"
+    ) {
+      const compactHome = await page.evaluate(() => {
+        const rect = (selector) => {
+          const element = document.querySelector(selector);
+          if (!(element instanceof Element)) return null;
+          const value = element.getBoundingClientRect();
+          return {
+            height: value.height,
+            left: value.left,
+            top: value.top,
+            width: value.width,
+          };
+        };
+        return {
+          cards: Array.from(
+            document.querySelectorAll(
+              ".codex-ui-new-conversation-prompt-grid > button",
+            ),
+            (button) => ({
+              display: getComputedStyle(button).display,
+              ...rect(
+                `.codex-ui-new-conversation-prompt-grid > button:nth-child(${Array.from(button.parentElement.children).indexOf(button) + 1})`,
+              ),
+            }),
+          ),
+          colorScheme: getComputedStyle(document.documentElement).colorScheme,
+          composer: rect(".codex-ui-composer"),
+          horizontalOverflow:
+            document.documentElement.scrollWidth -
+            document.documentElement.clientWidth,
+          main: rect(".codex-ui-app-shell__main"),
+          mark: rect('[data-current-build-icon="home-mark"]'),
+          sidebar: rect(".codex-ui-app-shell__sidebar"),
+          title: rect(
+            ".demo-workspace-start .codex-ui-new-conversation-start__header h3",
+          ),
+        };
+      });
+      const visibleCards = compactHome.cards.filter(
+        ({ display }) => display !== "none",
+      );
+      const expectedScheme = scene.theme;
+      if (
+        compactHome.colorScheme !== expectedScheme ||
+        compactHome.horizontalOverflow > 1 ||
+        Math.abs((compactHome.sidebar?.width ?? 0) - 322.90625) > 0.1 ||
+        Math.abs((compactHome.main?.width ?? 0) - 397.09375) > 0.1 ||
+        compactHome.composer?.height !== 98 ||
+        Math.abs((compactHome.composer?.top ?? 0) - 566) > 0.2 ||
+        compactHome.mark?.height !== 56 ||
+        Math.abs((compactHome.mark?.top ?? 0) - 179.796875) > 0.2 ||
+        compactHome.title?.height !== 67.1875 ||
+        Math.abs((compactHome.title?.top ?? 0) - 259.796875) > 0.2 ||
+        visibleCards.length !== 2 ||
+        visibleCards.some(
+          ({ height, top, width }) =>
+            height !== 104 ||
+            Math.abs(top - 363) > 0.2 ||
+            Math.abs(width - 163.046875) > 0.1,
+        )
+      ) {
+        throw new Error(
+          `Current compact home contract failed: ${JSON.stringify(compactHome)}`,
+        );
+      }
+      await writeFile(
+        join(artifactDirectory, `${scene.id}.json`),
+        `${JSON.stringify(compactHome, null, 2)}\n`,
       );
     }
     if (scene.id.startsWith("projects-index-")) {
@@ -2686,14 +2920,14 @@ for (const scene of selectedScenes) {
           ".demo-workspace-start .codex-ui-new-conversation-start__header h3",
         );
         const prompt = document.querySelector(
-          ".demo-workspace-start .demo-workspace-prompts > button",
+          ".demo-workspace-start .demo-workspace-prompts > button, .demo-workspace-start .codex-ui-new-conversation-prompt-grid > button",
         );
         const prompts = Array.from(
           document.querySelectorAll(
-            ".demo-workspace-start .demo-workspace-prompts > button",
+            ".demo-workspace-start .demo-workspace-prompts > button, .demo-workspace-start .codex-ui-new-conversation-prompt-grid > button",
           ),
           (button) => rect(button),
-        );
+        ).filter((value) => value && value.width > 0);
         const context = document.querySelector(
           ".demo-workspace-start .codex-ui-conversation-context-bar",
         );
@@ -2713,7 +2947,7 @@ for (const scene of selectedScenes) {
             name: icon.getAttribute("data-current-build-icon"),
             rect: rect(icon),
           }),
-        );
+        ).filter(({ rect: value }) => value && value.width > 0);
         const projectDialog = document.querySelector(
           ".demo-workspace-project-dialog",
         );
@@ -3006,20 +3240,53 @@ for (const scene of selectedScenes) {
         scene.frame === "workspace-new-worktree" ||
         worktreeEnvironmentExpected;
       const compactExpected = scene.frame === "workspace-compact-ready";
+      const currentHomeExpected = scene.frame.startsWith("current-home-");
+      const currentHomeCompactExpected =
+        currentHomeExpected && scene.frame.endsWith("-compact");
       const expectedContextButtonCount = noProjectExpected
         ? 1
         : newWorktreeExpected
           ? 4
           : 3;
-      const expectedComposerWidth = compactExpected ? 688 : 736;
-      const expectedComposerLeft = compactExpected ? 16 : 358;
-      const expectedComposerBottom = compactExpected ? 664 : 804;
-      const expectedHeadingTop = compactExpected ? 299 : 363;
+      const expectedComposerWidth = currentHomeCompactExpected
+        ? 365.09375
+        : compactExpected
+          ? 688
+          : 736;
+      const expectedComposerLeft = currentHomeCompactExpected
+        ? 339.40625
+        : currentHomeExpected
+          ? 383.953125
+          : compactExpected
+            ? 16
+            : 358;
+      const expectedComposerBottom =
+        compactExpected || currentHomeCompactExpected ? 664 : 804;
+      const expectedHeadingTop = currentHomeCompactExpected
+        ? 259.796875
+        : currentHomeExpected
+          ? 363.390625
+          : compactExpected
+            ? 299
+            : 363;
       const repairingExpected = scene.frame === "workspace-repairing";
       const worktreeTrigger = contract.contextButtons.find(
         ({ kind }) => kind === "worktree",
       );
       const expectedCurrentIconNames = [
+        ...(currentHomeExpected
+          ? [
+              "home-mark",
+              "home-suggestion-explore",
+              "home-suggestion-build",
+              ...(currentHomeCompactExpected
+                ? []
+                : [
+                    "home-suggestion-review",
+                    "home-suggestion-fix",
+                  ]),
+            ]
+          : []),
         "composer-project",
         ...(noProjectExpected
           ? []
@@ -3053,13 +3320,32 @@ for (const scene of selectedScenes) {
         Math.abs(contract.composer.left - expectedComposerLeft) > 1 ||
         Math.abs(contract.composer.bottom - expectedComposerBottom) > 1 ||
         Math.abs(contract.heading.top - expectedHeadingTop) > 1 ||
-        Math.abs(contract.heading.height - 33.6) > 1 ||
-        contract.prompts.length !== (noProjectExpected ? 0 : 2) ||
+        Math.abs(
+          contract.heading.height -
+            (currentHomeCompactExpected ? 67.2 : 33.6),
+        ) > 1 ||
+        contract.prompts.length !==
+          (noProjectExpected
+            ? 0
+            : currentHomeExpected
+              ? currentHomeCompactExpected
+                ? 2
+                : 4
+              : 2) ||
         contract.prompts.some(
           (value) =>
             !value ||
-            Math.abs(value.width - (compactExpected ? 606 : 654)) > 1 ||
-            Math.abs(value.height - 40) > 1,
+            Math.abs(
+              value.width -
+                (currentHomeCompactExpected
+                  ? 163.046875
+                  : currentHomeExpected
+                    ? 168.5
+                    : compactExpected
+                      ? 606
+                      : 654),
+            ) > 1 ||
+            Math.abs(value.height - (currentHomeExpected ? 104 : 40)) > 1,
         ) ||
         contract.contextButtons.some(
           ({ rect: value }) => !value || Math.abs(value.height - 28) > 1,
@@ -3078,7 +3364,11 @@ for (const scene of selectedScenes) {
         ) !== JSON.stringify(expectedCurrentIconNames) ||
         contract.currentIcons.some(({ name, rect: value }) => {
           const expectedSize =
-            name === "composer-model-chevron" ? 14 : 16;
+            name === "home-mark"
+              ? 56
+              : name === "composer-model-chevron"
+                ? 14
+                : 16;
           return (
             !value ||
             Math.abs(value.width - expectedSize) > 1 ||

@@ -46,6 +46,21 @@ describe("project conversation routing visual contract", () => {
     );
   });
 
+  it("matches current prompt cards and reduces them at compact widths", () => {
+    expect(styles).toMatch(
+      /\.codex-ui-new-conversation-prompt-grid \{[\s\S]*?grid-template-columns: repeat\(4, minmax\(0, 1fr\)\);[\s\S]*?padding-inline: 0\.8125rem/,
+    );
+    expect(styles).toMatch(
+      /\.codex-ui-new-conversation-prompt-grid > button \{[\s\S]*?border-radius: 1\.25rem;[\s\S]*?display: flex;[\s\S]*?height: 6\.5rem;[\s\S]*?padding: 0\.75rem 1rem/,
+    );
+    expect(styles).toMatch(
+      /\.codex-ui-new-conversation-prompt-grid > button > span:last-child \{[\s\S]*?font-size: 0\.8125rem;[\s\S]*?font-weight: 500;[\s\S]*?line-height: 1\.25rem;[\s\S]*?min-height: 2\.5rem/,
+    );
+    expect(styles).toMatch(
+      /@container codex-ui-new-conversation-start \(max-width: 30rem\)[\s\S]*?\.codex-ui-new-conversation-prompt-grid \{[\s\S]*?grid-template-columns: repeat\(2, minmax\(0, 1fr\)\);[\s\S]*?button\[data-compact-hidden="true"\] \{[\s\S]*?display: none/,
+    );
+  });
+
   it("matches the current compact branch creation geometry", () => {
     expect(styles).toMatch(
       /\.codex-ui-branch-creation-dialog \.codex-ui-dialog__surface \{[\s\S]*?border-radius: 1\.5625rem;[\s\S]*?min-height: 11\.91rem;[\s\S]*?padding: 1\.25rem;[\s\S]*?width: min\(25rem, 100%\)/,
