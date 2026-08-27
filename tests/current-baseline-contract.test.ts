@@ -138,6 +138,33 @@ describe("current baseline capture contract", () => {
     expect(() =>
       assertCurrentProjectsIndexObservation({
         ...observation,
+        compact: {
+          ...observation.compact,
+          header: {
+            ...observation.compact.header,
+            rect: { ...observation.compact.header.rect, width: 560 },
+          },
+        },
+      }),
+    ).toThrow("compact route geometry");
+    expect(() =>
+      assertCurrentProjectsIndexObservation({
+        ...observation,
+        compact: {
+          ...observation.compact,
+          rows: {
+            ...observation.compact.rows,
+            firstRect: {
+              ...observation.compact.rows.firstRect,
+              width: 560,
+            },
+          },
+        },
+      }),
+    ).toThrow("compact route geometry");
+    expect(() =>
+      assertCurrentProjectsIndexObservation({
+        ...observation,
         empty: { ...observation.empty, focusOnSearch: false },
       }),
     ).toThrow("settled empty state");

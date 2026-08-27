@@ -137,12 +137,12 @@ export function assertCurrentProjectsIndexObservation(observation) {
     compact?.viewport?.height !== 600 ||
     compact?.navigationVisible !== false ||
     compact?.navigationWidth !== null ||
-    !withinTolerance(compact?.header?.rect?.width, 559) ||
+    compact?.header?.rect?.width !== 559 ||
     !withinTolerance(compact?.header?.rect?.height, 40) ||
     compact?.header?.gridTemplateColumns !== "415px 128px" ||
     !Number.isInteger(compact?.rows?.count) ||
     compact.rows.count !== wide.rows.count ||
-    !withinTolerance(compact?.rows?.firstRect?.width, 559) ||
+    compact?.rows?.firstRect?.width !== 559 ||
     !withinTolerance(compact?.rows?.firstRect?.height, 70) ||
     compact?.updatedDisplay !== "none" ||
     Math.abs(compact?.horizontalOverflow ?? Infinity) > 1 ||
