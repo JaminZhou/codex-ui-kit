@@ -129,7 +129,7 @@ observation from a previous build remains historical evidence.
   previous-build regression evidence.
   They are not relabeled as current merely because the shell capture passes.
 
-Current inventory: 89 surface groups; 12 have current-build runtime evidence, 61 have previous-build-only runtime evidence, 16 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 10 groups and Electron verification covers 10.
+Current inventory: 89 surface groups; 15 have current-build runtime evidence, 58 have previous-build-only runtime evidence, 16 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 10 groups and Electron verification covers 10.
 Prior acceptance outside those 10 sampled current-build groups remains
 recorded as `partial_legacy` until current-build re-observation.
 
@@ -268,6 +268,17 @@ privacy-safe tails; failed-plus-unread uses 84×30. Their unmasked pixel ratios
 are 2.0833%, 0.7540%, and 0.1786%, while Browser/CDP and Electron lock the
 30px row, 14px branch marker, 20px loading rail, exact spinner/error paths,
 three-track failure composition, action replacement, and recovery.
+
+The current `26.820.60940` follow-up re-observes the shared ordinary row
+system without relabelling the unsampled states. Project tasks and Recents
+remain 30px rows with the same current 19×20 Pin/Archive controls, 8px gap,
+35px/8px right insets, and exact current SVG paths. A real active task and
+real unread rows retain the 20×20 rail, 16×16 two-path spinner, and centered
+8×8 blue dot. Privacy-safe current product crops pass at 3.3796% project
+actions, 3.1944% Recents actions, 1.9048% active, and 3.5714% unread. The
+unread cap is 4% solely for the measured 306.90625px row's fractional raster
+origin; CDP and Electron still require exact geometry and color. Waiting,
+error, collection, and worktree states remain previous-build evidence.
 
 The current sidebar lifecycle follow-up splits the broad historical project,
 action, and footer rows into three independently gated current-build groups:

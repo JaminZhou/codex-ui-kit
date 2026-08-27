@@ -181,6 +181,12 @@ tails through `CODEX_UI_KIT_CURRENT_SIDEBAR_TASK_ACTIONS_REFERENCE` and
 `CODEX_UI_KIT_CURRENT_SIDEBAR_RECENTS_ACTIONS_REFERENCE`. CDP and Electron
 independently require the unified 19×20 Pin/Archive buttons, 8px gap, and
 35px/8px right insets before the pixel gate runs.
+The current `26.820.60940` ordinary-row refresh passes at 3.3796% for project
+active-row actions, 3.1944% for Recents idle-row actions, 1.9048% for active,
+and 3.5714% for unread. The unread foreground-mask ceiling is 4% because the
+measured 306.90625px product row places the exact 8×8 dot on a fractional
+raster origin; CDP and Electron continue to freeze its 20×20 rail, 14px dot
+right inset, and `rgb(131, 195, 255)` paint.
 The current collection slice separately requires the `Needs input` pill and
 ordinary error glyph, the one-heading/four-row loading skeleton, the 29px
 `No chats` state, and five-to-twelve `Show more`/`Show less` expansion with
