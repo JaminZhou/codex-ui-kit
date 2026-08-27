@@ -284,10 +284,34 @@ const restoreNewChat = async () => {
   if (!page || page.isClosed()) return;
   await page.setViewportSize(currentBaselineViewports.wide);
   const newChat = page
-    .locator("nav")
+    .locator("nav:visible")
     .getByText("New chat", { exact: true })
-    .first();
-  if ((await newChat.count()) === 1) await newChat.click();
+    .filter({ visible: true });
+  if ((await newChat.count()) !== 1) {
+    throw new Error("Could not resolve one visible New chat route.");
+  }
+  await newChat.click();
+  await page.waitForFunction(
+    () => {
+      const visible = (element) =>
+        element instanceof Element &&
+        element.checkVisibility({
+          checkOpacity: true,
+          checkVisibilityCSS: true,
+        });
+      const homeMarkers = [
+        ...document.querySelectorAll('[data-testid="home-icon"]'),
+      ].filter(visible);
+      const composers = [
+        ...document.querySelectorAll(
+          'textarea, [contenteditable="true"], [role="textbox"]',
+        ),
+      ].filter(visible);
+      return homeMarkers.length === 1 && composers.length > 0;
+    },
+    undefined,
+    { timeout: 15_000 },
+  );
   await page.mouse.move(1_000, 400);
 };
 
@@ -349,13 +373,24 @@ try {
       };
     }),
   );
-  const activeIndex = rowKinds.find((row) => row.active)?.index;
-  const unreadIndex = rowKinds.find((row) => row.unread)?.index;
+  const isOrdinaryRow = (row) => row.kind !== "worktree";
+  const activeIndex = rowKinds.find(
+    (row) => isOrdinaryRow(row) && row.active,
+  )?.index;
+  const unreadIndex = rowKinds.find(
+    (row) => isOrdinaryRow(row) && row.unread,
+  )?.index;
   const projectActionIndex = rowKinds.find(
-    (row) => row.project && row.active && !row.pinned,
+    (row) =>
+      isOrdinaryRow(row) && row.project && row.active && !row.pinned,
   )?.index;
   const recentsActionIndex = rowKinds.find(
-    (row) => !row.project && !row.pinned && !row.hasStatus && !row.selected,
+    (row) =>
+      isOrdinaryRow(row) &&
+      !row.project &&
+      !row.pinned &&
+      !row.hasStatus &&
+      !row.selected,
   )?.index;
   if (
     !Number.isInteger(activeIndex) ||
@@ -365,14 +400,24 @@ try {
   ) {
     throw new Error(
       `Prime the isolated sidebar with an active project-task, an unread row, and an idle Recents row before capture: ${JSON.stringify({
-        active: rowKinds.filter((row) => row.active).length,
+        active: rowKinds.filter(
+          (row) => isOrdinaryRow(row) && row.active,
+        ).length,
         projectActive: rowKinds.filter(
-          (row) => row.project && row.active && !row.pinned,
+          (row) =>
+            isOrdinaryRow(row) && row.project && row.active && !row.pinned,
         ).length,
         recentsIdle: rowKinds.filter(
-          (row) => !row.project && !row.pinned && !row.hasStatus && !row.selected,
+          (row) =>
+            isOrdinaryRow(row) &&
+            !row.project &&
+            !row.pinned &&
+            !row.hasStatus &&
+            !row.selected,
         ).length,
-        unread: rowKinds.filter((row) => row.unread).length,
+        unread: rowKinds.filter(
+          (row) => isOrdinaryRow(row) && row.unread,
+        ).length,
       })}`,
     );
   }
