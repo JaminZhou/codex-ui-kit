@@ -367,6 +367,7 @@ const sidebarRowsRecord = () => ({
     },
   },
   targetSelection: {
+    candidates: [{ url: "app://-/index.html" }],
     selected: { url: "app://-/index.html" },
   },
 });
@@ -506,6 +507,13 @@ describe("current baseline capture contract", () => {
     const privateRecord = sidebarRowsRecord() as Record<string, any>;
     privateRecord.title = "Private task";
     expect(() => assertCurrentSidebarRowsRecord(privateRecord)).toThrow(
+      "privacy boundary",
+    );
+
+    const privateCandidate = sidebarRowsRecord();
+    privateCandidate.targetSelection.candidates[0].url =
+      "https://example.test/private?repository=secret";
+    expect(() => assertCurrentSidebarRowsRecord(privateCandidate)).toThrow(
       "privacy boundary",
     );
 
@@ -1585,6 +1593,9 @@ describe("current baseline capture contract", () => {
     );
     expect(captureSource).toContain("homeMarkers.length === 1");
     expect(captureSource).toContain("composers.length > 0");
+    expect(captureSource).toContain("const recordCandidateUrl = (url) => {");
+    expect(captureSource).toContain('return "app://-/index.html?redacted";');
+    expect(captureSource).toContain('return "non-app-page";');
     const activePrecheck = captureSource.indexOf(
       "await assertActiveStatusVisible();",
     );
@@ -1599,8 +1610,11 @@ describe("current baseline capture contract", () => {
     expect(activePrecheck).toBeLessThan(activeScreenshot);
     expect(activeScreenshot).toBeLessThan(activePostcheck);
     expect(captureSource).toContain(
-      "The ordinary active sidebar spinner changed during screenshot capture.",
+      "const assertProjectActionActive = () =>",
     );
+    expect(
+      captureSource.match(/await assertProjectActionActive\(\);/g),
+    ).toHaveLength(4);
     expect(
       captureSource.indexOf("assertCurrentSidebarRowsRecord(record)"),
     ).toBeLessThan(

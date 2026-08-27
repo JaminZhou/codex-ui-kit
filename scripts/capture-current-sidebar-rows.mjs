@@ -238,6 +238,18 @@ const classifyAction = (label) => {
   if (normalized.includes("archive")) return "archive";
   return "other";
 };
+const recordCandidateUrl = (url) => {
+  if (
+    url === "app://-/index.html" ||
+    url === "app://-/index.html?initialRoute=%2Favatar-overlay"
+  ) {
+    return url;
+  }
+  if (url.startsWith("app://-/index.html?")) {
+    return "app://-/index.html?redacted";
+  }
+  return "non-app-page";
+};
 const inspectCandidate = async (page, index) => {
   const structure = await page.evaluate(() => {
     const visibleControls = [
@@ -641,25 +653,39 @@ try {
   const unreadRow = rows.nth(unreadIndex);
   const projectActionRow = rows.nth(projectActionIndex);
   const recentsActionRow = rows.nth(recentsActionIndex);
-  const assertActiveStatusVisible = async () => {
-    const activeStatusVisible = await activeRow.evaluate((element) => {
+  const assertOrdinaryActiveRow = async (
+    row,
+    { requireProject = false, subject },
+  ) => {
+    const activeStatusVisible = await row.evaluate((element, projectOnly) => {
       const spinner = element.querySelector(".animate-spin");
       return (
         element.getAttribute("data-app-action-sidebar-thread-kind") !==
           "worktree" &&
+        (!projectOnly ||
+          Boolean(
+            element.closest("[data-app-action-sidebar-project-list-id]"),
+          )) &&
         spinner instanceof Element &&
         spinner.checkVisibility({
           checkOpacity: true,
           checkVisibilityCSS: true,
         })
       );
-    });
+    }, requireProject);
     if (!activeStatusVisible) {
       throw new Error(
-        "The ordinary active sidebar spinner changed during screenshot capture.",
+        `The ordinary active ${subject} spinner changed during capture.`,
       );
     }
   };
+  const assertActiveStatusVisible = () =>
+    assertOrdinaryActiveRow(activeRow, { subject: "status" });
+  const assertProjectActionActive = () =>
+    assertOrdinaryActiveRow(projectActionRow, {
+      requireProject: true,
+      subject: "project action",
+    });
   const statuses = {
     active: await inspectActive(activeRow),
     unread: await inspectUnread(unreadRow),
@@ -679,16 +705,18 @@ try {
       28,
     ),
   };
+  await assertProjectActionActive();
+  const projectActions = await inspectActions(projectActionRow);
+  await page.mouse.move(1_000, 400);
+  await assertProjectActionActive();
   const actions = {
-    project: {
-      ...(await inspectActions(projectActionRow)),
-      sourceStatus: "active",
-    },
+    project: { ...projectActions, sourceStatus: "active" },
     recents: {
       ...(await inspectActions(recentsActionRow)),
       sourceStatus: "idle",
     },
   };
+  await assertProjectActionActive();
   await projectActionRow.hover();
   screenshots.projectActions = await screenshotRegion(
     projectActionRow,
@@ -696,6 +724,8 @@ try {
     72,
     { clearHover: false },
   );
+  await page.mouse.move(1_000, 400);
+  await assertProjectActionActive();
   await recentsActionRow.hover();
   screenshots.recentsActions = await screenshotRegion(
     recentsActionRow,
@@ -770,11 +800,19 @@ try {
     screenshots,
     statuses,
     targetSelection: {
-      candidates: candidates.map(({ page: _page, ...candidate }) => candidate),
-      selected: { ...selected, page: undefined },
+      candidates: candidates.map(({ page: _page, url, ...candidate }) => ({
+        ...candidate,
+        url: recordCandidateUrl(url),
+      })),
+      selected: {
+        area: selected.area,
+        index: selected.index,
+        landmarks: selected.landmarks,
+        url: recordCandidateUrl(selected.url),
+        visibleControls: selected.visibleControls,
+      },
     },
   };
-  delete record.targetSelection.selected.page;
   assertCurrentSidebarRowsRecord(record);
   record.sha256 = createHash("sha256")
     .update(JSON.stringify(record))

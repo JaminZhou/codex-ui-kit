@@ -724,6 +724,15 @@ export function assertCurrentSidebarRowsRecord(record) {
     ([key, expected]) => record?.fingerprint?.[key] !== expected,
   );
   const runtimeIdentity = record?.runtimeBundleIdentity;
+  const candidateUrls = record?.targetSelection?.candidates?.map(
+    (candidate) => candidate?.url,
+  );
+  const allowedCandidateUrls = new Set([
+    "app://-/index.html",
+    "app://-/index.html?initialRoute=%2Favatar-overlay",
+    "app://-/index.html?redacted",
+    "non-app-page",
+  ]);
   const serialized = JSON.stringify(record);
   if (
     record?.schemaVersion !== 1 ||
@@ -733,6 +742,9 @@ export function assertCurrentSidebarRowsRecord(record) {
     record.profileOwnerPid <= 1 ||
     runtimeIdentity?.ownerPid !== record.profileOwnerPid ||
     !provesRuntimeBundleIdentity(runtimeIdentity) ||
+    !Array.isArray(candidateUrls) ||
+    candidateUrls.length < 1 ||
+    candidateUrls.some((url) => !allowedCandidateUrls.has(url)) ||
     record?.targetSelection?.selected?.url !== "app://-/index.html" ||
     record?.restoredRoute !== "New chat" ||
     record?.privacyBoundary !==
