@@ -182,6 +182,25 @@ describe("interactive controls", () => {
     );
     expect(screen.queryByRole("dialog", { name: "Disable test" })).toBeNull();
   });
+
+  it("keeps content focus when a keyboard-opened popover has no focusable item", async () => {
+    render(
+      <Popover
+        initialFocus="content"
+        label="Static details"
+        trigger={<button type="button">Open static details</button>}
+      >
+        Static content
+      </Popover>,
+    );
+
+    fireEvent.click(
+      screen.getByRole("button", { name: "Open static details" }),
+      { detail: 0 },
+    );
+    const content = screen.getByRole("dialog", { name: "Static details" });
+    await waitFor(() => expect(document.activeElement).toBe(content));
+  });
 });
 
 describe("menus and selects", () => {

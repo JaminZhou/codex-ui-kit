@@ -94,6 +94,25 @@ const validAppAsarSnapshot = (snapshot) =>
 const sameAppAsarSnapshot = (before, after) =>
   appAsarSnapshotFields.every((field) => before[field] === after[field]);
 
+const provesRuntimeBundleIdentity = (runtimeIdentity) => {
+  const beforeBundle = runtimeIdentity?.beforeCapture;
+  const afterBundle = runtimeIdentity?.afterCapture;
+  const processStartedAtMs = runtimeIdentity?.processStartedAtMs;
+  const bundleChangedBeforeProcess =
+    validAppAsarSnapshot(beforeBundle) &&
+    Number.isSafeInteger(processStartedAtMs) &&
+    Math.ceil(beforeBundle.changedAtMs / 1_000) * 1_000 <= processStartedAtMs;
+  return (
+    Number.isSafeInteger(runtimeIdentity?.ownerPid) &&
+    runtimeIdentity.ownerPid > 1 &&
+    bundleChangedBeforeProcess &&
+    validAppAsarSnapshot(afterBundle) &&
+    sameAppAsarSnapshot(beforeBundle, afterBundle) &&
+    beforeBundle.checkedAtMs >= processStartedAtMs &&
+    afterBundle.checkedAtMs >= beforeBundle.checkedAtMs
+  );
+};
+
 const projectIndexScrollOwnerMatches = (
   owners,
   { clientHeight, height, top },
@@ -488,10 +507,13 @@ export function assertCurrentAccountMenuRecord(record) {
   const fingerprintMismatch = Object.entries(currentBaselineFingerprint).some(
     ([key, expected]) => record?.fingerprint?.[key] !== expected,
   );
+  const runtimeIdentity = record?.runtimeBundleIdentity;
   if (
     fingerprintMismatch ||
     !Number.isSafeInteger(record?.profileOwnerPid) ||
     record.profileOwnerPid <= 1 ||
+    runtimeIdentity?.ownerPid !== record.profileOwnerPid ||
+    !provesRuntimeBundleIdentity(runtimeIdentity) ||
     record?.restoredPreference !== "System" ||
     JSON.stringify(Object.keys(record?.states ?? {}).sort()) !==
       JSON.stringify(expectedStateKeys)
@@ -680,23 +702,7 @@ export function assertCurrentBaselineRecord(record) {
     );
   }
   const runtimeIdentity = record.runtimeBundleIdentity;
-  const beforeBundle = runtimeIdentity?.beforeCapture;
-  const afterBundle = runtimeIdentity?.afterCapture;
-  const processStartedAtMs = runtimeIdentity?.processStartedAtMs;
-  const bundleChangedBeforeProcess =
-    validAppAsarSnapshot(beforeBundle) &&
-    Number.isSafeInteger(processStartedAtMs) &&
-    Math.ceil(beforeBundle.changedAtMs / 1_000) * 1_000 <=
-      processStartedAtMs;
-  if (
-    !Number.isSafeInteger(runtimeIdentity?.ownerPid) ||
-    runtimeIdentity.ownerPid <= 1 ||
-    !bundleChangedBeforeProcess ||
-    !validAppAsarSnapshot(afterBundle) ||
-    !sameAppAsarSnapshot(beforeBundle, afterBundle) ||
-    beforeBundle.checkedAtMs < processStartedAtMs ||
-    afterBundle.checkedAtMs < beforeBundle.checkedAtMs
-  ) {
+  if (!provesRuntimeBundleIdentity(runtimeIdentity)) {
     throw new Error(
       "Current baseline record does not prove the running Renderer bundle identity.",
     );

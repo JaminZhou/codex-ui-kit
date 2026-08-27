@@ -167,6 +167,26 @@ const accountMenuRecord = () => ({
   fingerprint: currentBaselineFingerprint,
   profileOwnerPid: 12_345,
   restoredPreference: "System",
+  runtimeBundleIdentity: {
+    afterCapture: {
+      appAsarBytes: currentBaselineFingerprint.appAsarBytes,
+      appAsarSha256: currentBaselineFingerprint.appAsarSha256,
+      changedAtMs: 1_786_150_111_000,
+      checkedAtMs: 1_786_351_000_000,
+      device: "16777231",
+      inode: "346397970",
+    },
+    beforeCapture: {
+      appAsarBytes: currentBaselineFingerprint.appAsarBytes,
+      appAsarSha256: currentBaselineFingerprint.appAsarSha256,
+      changedAtMs: 1_786_150_111_000,
+      checkedAtMs: 1_786_350_900_000,
+      device: "16777231",
+      inode: "346397970",
+    },
+    ownerPid: 12_345,
+    processStartedAtMs: 1_786_350_800_000,
+  },
   states: {
     darkCompact: accountMenuState("dark", true),
     darkWide: accountMenuState("dark", false),
@@ -294,6 +314,13 @@ describe("current baseline capture contract", () => {
     unrestored.restoredPreference = "Dark";
     expect(() => assertCurrentAccountMenuRecord(unrestored)).toThrow(
       "restored preference",
+    );
+
+    const staleRenderer = accountMenuRecord();
+    staleRenderer.runtimeBundleIdentity.processStartedAtMs =
+      1_786_150_110_000;
+    expect(() => assertCurrentAccountMenuRecord(staleRenderer)).toThrow(
+      "isolated current build",
     );
   });
 
@@ -1326,6 +1353,9 @@ describe("current baseline capture contract", () => {
     expect(captureSource).toContain(
       "theme preference was not selected.",
     );
+    expect(captureSource).toContain("processStartedAtMs,");
+    expect(captureSource).toContain("beforeCapture: beforeCapture.bundle");
+    expect(captureSource).toContain("afterCapture: afterCapture.bundle");
     expect(captureSource.indexOf("assertCurrentAccountMenuRecord(record)")).toBeLessThan(
       captureSource.indexOf("for (const [key, state] of Object.entries(states))"),
     );

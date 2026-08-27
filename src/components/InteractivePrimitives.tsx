@@ -701,13 +701,17 @@ export function Popover({
       const selected = initialFocusSelector
         ? content.querySelector<HTMLElement>(initialFocusSelector)
         : null;
+      const focusableItems = getFocusableItems(content);
+      const requestedItem =
+        keyboardOpenTarget || initialFocus === "first"
+          ? keyboardOpenTarget === "last"
+            ? focusableItems.at(-1)
+            : focusableItems[0]
+          : null;
       const target =
         selected ??
-        (keyboardOpenTarget || initialFocus === "first"
-          ? keyboardOpenTarget === "last"
-            ? getFocusableItems(content).at(-1)
-            : getFocusableItems(content)[0]
-          : content);
+        requestedItem ??
+        (initialFocus === "content" ? content : null);
       keyboardOpenTargetRef.current = null;
       target?.focus();
     });
@@ -723,7 +727,11 @@ export function Popover({
     onClick: (event) => {
       triggerNode.props.onClick?.(event);
       if (!event.defaultPrevented && !nativeDisabled) {
-        if (!resolvedOpen && event.detail === 0) {
+        if (
+          !resolvedOpen &&
+          event.detail === 0 &&
+          (role === "menu" || role === "listbox" || initialFocus === "none")
+        ) {
           keyboardOpenTargetRef.current = "first";
         }
         setOpen(!resolvedOpen);

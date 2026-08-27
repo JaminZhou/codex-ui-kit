@@ -58,8 +58,8 @@ const plistValue = (key) =>
   execFileSync("/usr/bin/plutil", ["-extract", key, "raw", appInfoPlist], {
     encoding: "utf8",
   }).trim();
-const readInstalledFingerprint = async () => {
-  const asarBytes = await stat(appAsar);
+const readInstalledSnapshot = async () => {
+  const before = await stat(appAsar);
   const asarSha256 = execFileSync(
     "/usr/bin/shasum",
     ["-a", "256", appAsar],
@@ -67,15 +67,36 @@ const readInstalledFingerprint = async () => {
   )
     .trim()
     .split(/\s+/)[0];
+  const after = await stat(appAsar);
+  if (
+    before.dev !== after.dev ||
+    before.ino !== after.ino ||
+    before.size !== after.size ||
+    before.ctimeMs !== after.ctimeMs ||
+    before.mtimeMs !== after.mtimeMs
+  ) {
+    throw new Error("The installed app.asar changed while it was being hashed.");
+  }
   return {
-    appAsarBytes: asarBytes.size,
-    appAsarSha256: asarSha256,
-    appVersion: plistValue("CFBundleShortVersionString"),
-    buildNumber: plistValue("CFBundleVersion"),
-    chromiumVersion: plistValue("ChromiumBaseVersion"),
+    bundle: {
+      appAsarBytes: after.size,
+      appAsarSha256: asarSha256,
+      changedAtMs: Math.ceil(Math.max(after.ctimeMs, after.mtimeMs)),
+      checkedAtMs: Date.now(),
+      device: String(after.dev),
+      inode: String(after.ino),
+    },
+    fingerprint: {
+      appAsarBytes: after.size,
+      appAsarSha256: asarSha256,
+      appVersion: plistValue("CFBundleShortVersionString"),
+      buildNumber: plistValue("CFBundleVersion"),
+      chromiumVersion: plistValue("ChromiumBaseVersion"),
+    },
   };
 };
-const fingerprint = await readInstalledFingerprint();
+const beforeCapture = await readInstalledSnapshot();
+const fingerprint = beforeCapture.fingerprint;
 if (
   Object.entries(currentBaselineFingerprint).some(
     ([key, expected]) => fingerprint[key] !== expected,
@@ -146,6 +167,49 @@ if (isolatedOwners.length !== 1) {
   throw new Error("The isolated account-menu owner is ambiguous.");
 }
 const isolatedOwnerPid = isolatedOwners[0].pid;
+const processStartedAt = execFileSync(
+  "/bin/ps",
+  ["-p", isolatedOwnerPid, "-o", "lstart="],
+  {
+    encoding: "utf8",
+    env: { ...process.env, LC_ALL: "C" },
+  },
+).trim();
+const processStartedAtMatch = processStartedAt.match(
+  /^(?:Sun|Mon|Tue|Wed|Thu|Fri|Sat)\s+(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s+(\d{1,2})\s+(\d{2}):(\d{2}):(\d{2})\s+(\d{4})$/,
+);
+if (!processStartedAtMatch) {
+  throw new Error(
+    `Could not prove the isolated owner start time for PID ${isolatedOwnerPid}.`,
+  );
+}
+const monthIndex = [
+  "Jan",
+  "Feb",
+  "Mar",
+  "Apr",
+  "May",
+  "Jun",
+  "Jul",
+  "Aug",
+  "Sep",
+  "Oct",
+  "Nov",
+  "Dec",
+].indexOf(processStartedAtMatch[1]);
+const processStartedAtMs = new Date(
+  Number(processStartedAtMatch[6]),
+  monthIndex,
+  Number(processStartedAtMatch[2]),
+  Number(processStartedAtMatch[3]),
+  Number(processStartedAtMatch[4]),
+  Number(processStartedAtMatch[5]),
+).getTime();
+if (!Number.isSafeInteger(processStartedAtMs) || processStartedAtMs <= 0) {
+  throw new Error(
+    `Could not prove the isolated owner start time for PID ${isolatedOwnerPid}.`,
+  );
+}
 const parentPid = (pid) =>
   execFileSync("/bin/ps", ["-p", pid, "-o", "ppid="], {
     encoding: "utf8",
@@ -493,8 +557,8 @@ try {
     });
   }
   await restoreIsolatedState();
-  const fingerprintAfterCapture = await readInstalledFingerprint();
-  if (JSON.stringify(fingerprintAfterCapture) !== JSON.stringify(fingerprint)) {
+  const afterCapture = await readInstalledSnapshot();
+  if (JSON.stringify(afterCapture.fingerprint) !== JSON.stringify(fingerprint)) {
     throw new Error("The installed build changed during account-menu capture.");
   }
 
@@ -502,6 +566,12 @@ try {
     fingerprint,
     profileOwnerPid: Number(isolatedOwnerPid),
     restoredPreference: "System",
+    runtimeBundleIdentity: {
+      afterCapture: afterCapture.bundle,
+      beforeCapture: beforeCapture.bundle,
+      ownerPid: Number(isolatedOwnerPid),
+      processStartedAtMs,
+    },
     states,
   };
   assertCurrentAccountMenuRecord(record);
