@@ -62,7 +62,8 @@ observation from a previous build remains historical evidence.
   overlay without using private text. The exact `scrollHeight` remains
   content-dependent, so the contract locks the unique scroll owner and visible
   geometry rather than private task counts. It also revalidates the 320px Help
-  menu and the content-dependent Projects Index. At the collapsed 600px gate,
+  menu, the Dark/Light × wide/compact account menu, and the content-dependent
+  Projects Index. At the collapsed 600px gate,
   the new one-pixel route inset produces a 559px content width and 415/128
   columns; hiding the sidebar now also hides Back and Forward. Details are in
   [`26.820.60940.md`](26.820.60940.md).
@@ -73,12 +74,15 @@ observation from a previous build remains historical evidence.
   return, and zero compact overflow. Four unmasked owned-main comparisons pass
   between 0.2708% and 1.7855% under a 2.5% hard limit; the product preference
   was restored to System after capture.
-- The previous 26.818 account-menu sample covers Dark and Light at 1180×820 and
+- The current 26.820 account-menu sample covers Dark and Light at 1180×820 and
   720×680. It locks the 322.90625px sidebar, 306.90625×188.375px portalled
-  menu, six rows, 9px visual divider, five exact sampled icons, one avatar,
-  zero role separators, zero compact overflow, Escape dismissal, and trigger
-  focus return. Privacy-masked menu-region comparisons pass between 0.3968%
-  and 0.5458% under independent Dark 0.5% and Light 0.6% limits.
+  menu, six 28.5625px rows at weight 400, 9px visual divider, five exact
+  sampled icons, one avatar, menu-surface focus, zero role separators, zero
+  compact overflow, Escape dismissal, and trigger focus return. The account
+  trigger width remains content-dependent and is gated by inset, height,
+  footer position, containment, and a minimum usable width. Privacy-masked
+  menu-region comparisons pass between 0.3794% and 0.5284% under independent
+  Dark 0.5% and Light 0.6% limits; product screenshots remain local-only.
 - The project action menu remains on the frozen
   `electronBridge.showContextMenu` path. The independent replica now locks the
   current six-action/three-separator provider, 221×187 geometry, six exact
@@ -125,8 +129,8 @@ observation from a previous build remains historical evidence.
   previous-build regression evidence.
   They are not relabeled as current merely because the shell capture passes.
 
-Current inventory: 89 surface groups; 11 have current-build runtime evidence, 62 have previous-build-only runtime evidence, 16 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 9 groups and Electron verification covers 9.
-Prior acceptance outside those 9 sampled current-build groups remains
+Current inventory: 89 surface groups; 12 have current-build runtime evidence, 61 have previous-build-only runtime evidence, 16 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 10 groups and Electron verification covers 10.
+Prior acceptance outside those 10 sampled current-build groups remains
 recorded as `partial_legacy` until current-build re-observation.
 
 The current package exposes candidates far beyond the old transcript sample:
@@ -275,15 +279,16 @@ pointer/Enter/Space transitions, the current 721→720 visible-sidebar rule,
 explicit Hide/Show, a 221×187 native project menu with six fixed actions and
 one conditional unread action, and a 320×272.06 Help menu with a `What's new` heading
 and eight items. The 46px footer now contains a 75.67×28 Voice action plus
-32×32 Help. The current account-menu follow-up additionally locks the
-Dark/Light × wide/compact 306.90625×188.375px account surface and its six-row
-focus lifecycle. Browser/CDP and Electron repeat the lifecycle; the current
+32×32 Help. The current 26.820 account-menu follow-up additionally locks the
+Dark/Light × wide/compact 306.90625×188.375px account surface, menu-surface
+focus, 400 weight, responsive pinning, and its six-row focus-return lifecycle.
+Browser/CDP and Electron repeat the lifecycle; the current
 local-only 133×46 Voice/Help comparison passes at 3.1219%. Four older
 26.803.61601 ownership-masked comparisons remain regression evidence for
 collapsed projects, the previous Help menu, and the compact sidebar; they are
 not relabeled as current pixels. The project menu instead has a current
 unmasked 221×187 native-region gate at 3.8449%. The account menu has four
-current privacy-masked region gates between 0.3968% and 0.5458%. The broader
+26.820 privacy-masked region gates between 0.3794% and 0.5284%. The broader
 project-navigation and mutation/status rows remain `partial_legacy` because
 these narrower observations do not prove every state they own; full Settings
 routes remain separately owned Stage 4 surfaces.

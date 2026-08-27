@@ -1582,6 +1582,10 @@ textarea {
   gap: 0;
 }
 
+.demo-current-sidebar-account-menu .codex-ui-menu-item {
+  font-weight: 400;
+}
+
 .demo-current-sidebar-account-menu__divider {
   box-sizing: border-box;
   height: 9px;

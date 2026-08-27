@@ -11,6 +11,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import {
+  assertCurrentAccountMenuRecord,
   assertCurrentBaselineRecord,
   assertCurrentProjectsIndexObservation,
   assertCurrentSidebarLifecycle,
@@ -21,6 +22,51 @@ import {
   writeCurrentBaselineOutput,
 } from "../scripts/current-baseline-contract.mjs";
 
+const accountMenuVisualAssetIds = [
+  "sidebar-account-menu-usage",
+  "sidebar-account-menu-pet",
+  "sidebar-account-menu-invite",
+  "sidebar-account-menu-settings",
+  "sidebar-account-menu-logout",
+] as const;
+const accountMenuVisualAssets = JSON.parse(
+  readFileSync(
+    new URL("../research/visual-assets.json", import.meta.url),
+    "utf8",
+  ),
+) as {
+  icons: Array<{
+    id: string;
+    primitives: Array<{
+      attributes: Record<string, string>;
+      tag: string;
+    }>;
+    viewBox: string;
+  }>;
+};
+const accountMenuSvgGeometry = [
+  [],
+  ...accountMenuVisualAssetIds.map((id) => {
+    const icon = accountMenuVisualAssets.icons.find(
+      (candidate) => candidate.id === id,
+    );
+    if (!icon) throw new Error(`Missing account-menu visual asset: ${id}`);
+    return [
+      {
+        shapes: icon.primitives
+          .filter((shape) =>
+            ["circle", "line", "path", "rect"].includes(shape.tag),
+          )
+          .map((shape) => ({
+            d: shape.attributes.d ?? null,
+            tag: shape.tag,
+          })),
+        viewBox: icon.viewBox,
+      },
+    ];
+  }),
+];
+
 const candidate = (overrides: Record<string, unknown> = {}) => ({
   area: 1180 * 820,
   index: 1,
@@ -28,6 +74,125 @@ const candidate = (overrides: Record<string, unknown> = {}) => ({
   url: "app://-/index.html",
   visibleControls: 80,
   ...overrides,
+});
+
+const accountMenuState = (theme: "dark" | "light", compact: boolean) => {
+  const menuTop = compact ? 447 : 587;
+  const itemTops = [
+    menuTop + 4,
+    menuTop + 41.5625,
+    menuTop + 70.125,
+    menuTop + 98.6875,
+    menuTop + 127.25,
+    menuTop + 155.8125,
+  ];
+  const itemStyle = {
+    backgroundColor: "rgba(0, 0, 0, 0)",
+    borderRadius: "12.5px",
+    fontFamily: '-apple-system, "system-ui", "Segoe UI", sans-serif',
+    fontSize: "13px",
+    fontWeight: "400",
+    lineHeight: "18.5714px",
+    padding: "5px 8px",
+  };
+  return {
+    colorScheme: theme,
+    compact,
+    focusReturned: true,
+    focusRole: "menu",
+    horizontalOverflow: 0,
+    imageCount: 1,
+    itemCount: 6,
+    itemRects: itemTops.map((top) => ({
+      height: 28.5625,
+      left: 13,
+      top,
+      width: 298.90625,
+    })),
+    itemStyles: Array.from({ length: 6 }, () => ({ ...itemStyle })),
+    labels: [
+      "<account>",
+      "Usage <dynamic>",
+      "Show pet",
+      "Invite a friend",
+      "Settings⌘,",
+      "Log out",
+    ],
+    menuRect: {
+      height: 188.375,
+      left: 9,
+      top: menuTop,
+      width: 306.90625,
+    },
+    menuStyle: {
+      backgroundColor:
+        theme === "light"
+          ? "oklab(0.999994 0.0000455678 0.0000200868 / 0.9)"
+          : "oklab(0.297161 0.0000135154 0.00000594556 / 0.9)",
+      borderRadius: "15px",
+      boxShadow:
+        theme === "light"
+          ? "rgba(26, 28, 31, 0.08) 0px 0px 0px 0.5px"
+          : "rgba(255, 255, 255, 0.082) 0px 0px 0px 0.5px",
+      color: theme === "light" ? "rgb(26, 28, 31)" : "rgb(223, 223, 223)",
+    },
+    separatorCount: 0,
+    sidebarRect: {
+      height: compact ? 634 : 774,
+      left: 0,
+      top: 46,
+      width: 322.90625,
+    },
+    svgGeometry: accountMenuSvgGeometry.map((icons) =>
+      icons.map((icon) => ({
+        ...icon,
+        shapes: icon.shapes.map((shape) => ({ ...shape })),
+      })),
+    ),
+    theme: theme === "light" ? "Light" : "Dark",
+    triggerRect: {
+      height: 29,
+      left: 8,
+      top: compact ? 642.5 : 782.5,
+      width: 187.5625,
+    },
+    triggerTextLength: 9,
+    viewport: compact
+      ? currentBaselineViewports.compact
+      : currentBaselineViewports.wide,
+  };
+};
+
+const accountMenuRecord = () => ({
+  fingerprint: currentBaselineFingerprint,
+  profileOwnerPid: 12_345,
+  restoredPreference: "System",
+  runtimeBundleIdentity: {
+    afterCapture: {
+      appAsarBytes: currentBaselineFingerprint.appAsarBytes,
+      appAsarSha256: currentBaselineFingerprint.appAsarSha256,
+      changedAtMs: 1_786_150_111_000,
+      checkedAtMs: 1_786_351_000_000,
+      device: "16777231",
+      inode: "346397970",
+    },
+    beforeCapture: {
+      appAsarBytes: currentBaselineFingerprint.appAsarBytes,
+      appAsarSha256: currentBaselineFingerprint.appAsarSha256,
+      changedAtMs: 1_786_150_111_000,
+      checkedAtMs: 1_786_350_900_000,
+      device: "16777231",
+      inode: "346397970",
+    },
+    ownerPid: 12_345,
+    processStartedAtMs: 1_786_350_800_000,
+  },
+  states: {
+    darkCompact: accountMenuState("dark", true),
+    darkWide: accountMenuState("dark", false),
+    lightCompact: accountMenuState("light", true),
+    lightWide: accountMenuState("light", false),
+  },
 });
 
 describe("current baseline capture contract", () => {
@@ -116,6 +281,47 @@ describe("current baseline capture contract", () => {
       updatedDisplay: "inline-flex",
       viewport: { height: 820, width: 1180 },
     },
+  });
+
+  it("gates the sanitized current account-menu matrix", () => {
+    expect(() => assertCurrentAccountMenuRecord(accountMenuRecord())).not.toThrow();
+
+    const staleFocus = accountMenuRecord();
+    staleFocus.states.darkWide.focusRole = "menuitem";
+    expect(() => assertCurrentAccountMenuRecord(staleFocus)).toThrow(
+      "darkWide observation",
+    );
+
+    const staleWeight = accountMenuRecord();
+    staleWeight.states.lightCompact.itemStyles[2].fontWeight = "445";
+    expect(() => assertCurrentAccountMenuRecord(staleWeight)).toThrow(
+      "lightCompact observation",
+    );
+
+    const privateLabel = accountMenuRecord();
+    privateLabel.states.lightWide.labels[0] = "Private account";
+    expect(() => assertCurrentAccountMenuRecord(privateLabel)).toThrow(
+      "lightWide observation",
+    );
+
+    const staleIcon = accountMenuRecord();
+    staleIcon.states.darkWide.svgGeometry[1][0].shapes[0].d = "M0 0Z";
+    expect(() => assertCurrentAccountMenuRecord(staleIcon)).toThrow(
+      "darkWide observation",
+    );
+
+    const unrestored = accountMenuRecord();
+    unrestored.restoredPreference = "Dark";
+    expect(() => assertCurrentAccountMenuRecord(unrestored)).toThrow(
+      "restored preference",
+    );
+
+    const staleRenderer = accountMenuRecord();
+    staleRenderer.runtimeBundleIdentity.processStartedAtMs =
+      1_786_150_110_000;
+    expect(() => assertCurrentAccountMenuRecord(staleRenderer)).toThrow(
+      "isolated current build",
+    );
   });
 
   it("gates current Projects geometry, interactions, and compact behavior", () => {
@@ -1118,5 +1324,43 @@ describe("current baseline capture contract", () => {
     expect(captureSource).not.toContain(".reload(");
     expect(captureSource).not.toContain(".screenshot(");
     expect(captureSource).not.toContain("document.body.textContent");
+  });
+
+  it("restores an isolated account-menu capture from an already-open menu", () => {
+    const captureSource = readFileSync(
+      new URL("../scripts/capture-current-account-menu.mjs", import.meta.url),
+      "utf8",
+    );
+
+    expect(captureSource).toContain(
+      'const accountMenuExpanded =\n      (await trigger.getAttribute("aria-expanded")) === "true";',
+    );
+    expect(captureSource).toContain(
+      "if (!accountMenuExpanded) await trigger.click();",
+    );
+    expect(captureSource).toContain(
+      'const candidates = accountTriggerCandidates();',
+    );
+    expect(captureSource.indexOf("await candidates.count()")).toBeLessThan(
+      captureSource.indexOf("return candidates.nth(0)"),
+    );
+    expect(captureSource).not.toContain(
+      'page.locator(\'button[aria-haspopup="menu"]:has(img)\').first()',
+    );
+    expect(captureSource.indexOf("if (await radio.isChecked()) break;")).toBeLessThan(
+      captureSource.indexOf('if (theme !== "System")'),
+    );
+    expect(captureSource).toContain(
+      "theme preference was not selected.",
+    );
+    expect(captureSource).toContain("processStartedAtMs,");
+    expect(captureSource).toContain("beforeCapture: beforeCapture.bundle");
+    expect(captureSource).toContain("afterCapture: afterCapture.bundle");
+    expect(captureSource.indexOf("assertCurrentAccountMenuRecord(record)")).toBeLessThan(
+      captureSource.indexOf("for (const [key, state] of Object.entries(states))"),
+    );
+    expect(captureSource).toContain(
+      "Account-menu isolated-state cleanup failed:",
+    );
   });
 });

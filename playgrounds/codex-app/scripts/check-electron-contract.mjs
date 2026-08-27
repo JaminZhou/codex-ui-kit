@@ -563,7 +563,7 @@ try {
     accountMenuContract.imageCount !== 1 ||
     accountMenuContract.separatorCount !== 0 ||
     accountMenuContract.dividerHeight !== 9 ||
-    accountMenuContract.focusRole !== "menuitem" ||
+    accountMenuContract.focusRole !== "menu" ||
     !accountMenuContract.focusReturned ||
     Math.abs(accountMenuContract.rect.width - 258) > 1 ||
     Math.abs(accountMenuContract.rect.height - 188.38) > 1 ||
@@ -5821,7 +5821,7 @@ for (const accountMenuScene of currentAccountMenuElectronScenes) {
       nativeBounds?.height !== (compact ? 680 : 820) ||
       contract.colorScheme !== accountMenuScene.theme ||
       contract.horizontalOverflow > 1 ||
-      contract.focusRole !== "menuitem" ||
+      contract.focusRole !== "menu" ||
       contract.imageCount !== 1 ||
       contract.separatorCount !== 0 ||
       contract.dividerHeight !== 9 ||
@@ -5830,7 +5830,10 @@ for (const accountMenuScene of currentAccountMenuElectronScenes) {
       !near(contract.menuRect?.top, expectedTop) ||
       !near(contract.menuRect?.width, 306.90625) ||
       !near(contract.menuRect?.height, 188.375) ||
-      !near(contract.triggerRect?.width, 187.234375) ||
+      !near(contract.triggerRect?.left, 8) ||
+      contract.triggerRect?.width < 150 ||
+      contract.triggerRect?.left + contract.triggerRect?.width >
+        contract.sidebarRect?.left + contract.sidebarRect?.width ||
       contract.triggerRect?.height !== 29 ||
       !near(contract.triggerRect?.top, compact ? 642.5 : 782.5) ||
       JSON.stringify(contract.icons) !==
@@ -5857,13 +5860,12 @@ for (const accountMenuScene of currentAccountMenuElectronScenes) {
           !near(rect?.width, 298.90625) ||
           !near(rect?.height, 28.5625),
       ) ||
-      contract.itemStyles[0]?.backgroundColor === "rgba(0, 0, 0, 0)" ||
-      contract.itemStyles.slice(1).some(
+      contract.itemStyles.some(
         (style) =>
           style.backgroundColor !== "rgba(0, 0, 0, 0)" ||
           style.borderRadius !== "12.5px" ||
           style.fontSize !== "13px" ||
-          style.fontWeight !== "445" ||
+          style.fontWeight !== "400" ||
           style.lineHeight !== "18.5714px" ||
           style.padding !== "5px 8px",
       )

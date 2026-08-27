@@ -182,9 +182,72 @@ describe("interactive controls", () => {
     );
     expect(screen.queryByRole("dialog", { name: "Disable test" })).toBeNull();
   });
+
+  it("keeps content focus when a keyboard-opened popover has no focusable item", async () => {
+    render(
+      <Popover
+        initialFocus="content"
+        label="Static details"
+        trigger={<button type="button">Open static details</button>}
+      >
+        Static content
+      </Popover>,
+    );
+
+    fireEvent.click(
+      screen.getByRole("button", { name: "Open static details" }),
+      { detail: 0 },
+    );
+    const content = screen.getByRole("dialog", { name: "Static details" });
+    await waitFor(() => expect(document.activeElement).toBe(content));
+  });
 });
 
 describe("menus and selects", () => {
+  it("can focus the menu surface without highlighting an item", async () => {
+    render(
+      <Menu
+        defaultOpen
+        initialFocus="content"
+        label="Account menu"
+        trigger={<button type="button">Account</button>}
+      >
+        <MenuItem>Profile</MenuItem>
+        <MenuItem>Log out</MenuItem>
+      </Menu>,
+    );
+
+    const menu = screen.getByRole("menu", { name: "Account menu" });
+    await waitFor(() => expect(document.activeElement).toBe(menu));
+    expect(menu.getAttribute("tabindex")).toBe("-1");
+    fireEvent.keyDown(menu, { key: "ArrowUp" });
+    expect(document.activeElement).toBe(
+      screen.getByRole("menuitem", { name: "Log out" }),
+    );
+  });
+
+  it("focuses the first item when a content-focused menu is keyboard opened", async () => {
+    render(
+      <Menu
+        initialFocus="content"
+        label="Account menu"
+        trigger={<button type="button">Account</button>}
+      >
+        <MenuItem>Profile</MenuItem>
+        <MenuItem>Log out</MenuItem>
+      </Menu>,
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "Account" }), {
+      detail: 0,
+    });
+    await waitFor(() =>
+      expect(document.activeElement).toBe(
+        screen.getByRole("menuitem", { name: "Profile" }),
+      ),
+    );
+  });
+
   it("moves focus with menu keys, keeps checkboxes open, and closes on selection", async () => {
     const onCheckedChange = vi.fn();
     const onSelect = vi.fn();

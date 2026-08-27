@@ -238,7 +238,10 @@ function focusByKey(event: KeyboardEvent<HTMLElement>) {
   if (event.key === "End") nextIndex = items.length - 1;
   if (event.key === "ArrowDown") nextIndex = (currentIndex + 1) % items.length;
   if (event.key === "ArrowUp") {
-    nextIndex = (currentIndex - 1 + items.length) % items.length;
+    nextIndex =
+      currentIndex === -1
+        ? items.length - 1
+        : (currentIndex - 1 + items.length) % items.length;
   }
   event.preventDefault();
   items[nextIndex]?.focus();
@@ -442,7 +445,7 @@ function FloatingSurface({
         top: position?.top ?? 0,
         visibility: position ? "visible" : "hidden",
       } as CSSProperties}
-      tabIndex={role === "dialog" ? -1 : undefined}
+      tabIndex={role === "dialog" || role === "menu" ? -1 : undefined}
     >
       {children}
     </div>,
@@ -698,13 +701,17 @@ export function Popover({
       const selected = initialFocusSelector
         ? content.querySelector<HTMLElement>(initialFocusSelector)
         : null;
+      const focusableItems = getFocusableItems(content);
+      const requestedItem =
+        keyboardOpenTarget || initialFocus === "first"
+          ? keyboardOpenTarget === "last"
+            ? focusableItems.at(-1)
+            : focusableItems[0]
+          : null;
       const target =
         selected ??
-        (keyboardOpenTarget || initialFocus === "first"
-          ? keyboardOpenTarget === "last"
-            ? getFocusableItems(content).at(-1)
-            : getFocusableItems(content)[0]
-          : content);
+        requestedItem ??
+        (initialFocus === "content" ? content : null);
       keyboardOpenTargetRef.current = null;
       target?.focus();
     });
@@ -720,7 +727,11 @@ export function Popover({
     onClick: (event) => {
       triggerNode.props.onClick?.(event);
       if (!event.defaultPrevented && !nativeDisabled) {
-        if (!resolvedOpen && initialFocus === "none" && event.detail === 0) {
+        if (
+          !resolvedOpen &&
+          event.detail === 0 &&
+          (role === "menu" || role === "listbox" || initialFocus === "none")
+        ) {
           keyboardOpenTargetRef.current = "first";
         }
         setOpen(!resolvedOpen);

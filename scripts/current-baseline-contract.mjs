@@ -1,3 +1,4 @@
+import { createHash } from "node:crypto";
 import { constants, realpathSync } from "node:fs";
 import { open } from "node:fs/promises";
 import { basename, dirname, resolve } from "node:path";
@@ -31,6 +32,20 @@ const isMainRendererUrl = (url) =>
 
 const withinTolerance = (value, expected, tolerance = 1) =>
   Number.isFinite(value) && Math.abs(value - expected) <= tolerance;
+
+const sanitizedShapeSha256 = (shapes) => {
+  if (
+    !Array.isArray(shapes) ||
+    shapes.some(
+      (shape) =>
+        !["circle", "line", "path", "rect"].includes(shape?.tag) ||
+        (shape.d !== null && typeof shape.d !== "string"),
+    )
+  ) {
+    return null;
+  }
+  return createHash("sha256").update(JSON.stringify(shapes)).digest("hex");
+};
 
 const currentSidebarWidthBounds = Object.freeze({ max: 520, min: 240 });
 const currentSidebarMinimumMainWidth = 240;
@@ -78,6 +93,25 @@ const validAppAsarSnapshot = (snapshot) =>
 
 const sameAppAsarSnapshot = (before, after) =>
   appAsarSnapshotFields.every((field) => before[field] === after[field]);
+
+const provesRuntimeBundleIdentity = (runtimeIdentity) => {
+  const beforeBundle = runtimeIdentity?.beforeCapture;
+  const afterBundle = runtimeIdentity?.afterCapture;
+  const processStartedAtMs = runtimeIdentity?.processStartedAtMs;
+  const bundleChangedBeforeProcess =
+    validAppAsarSnapshot(beforeBundle) &&
+    Number.isSafeInteger(processStartedAtMs) &&
+    Math.ceil(beforeBundle.changedAtMs / 1_000) * 1_000 <= processStartedAtMs;
+  return (
+    Number.isSafeInteger(runtimeIdentity?.ownerPid) &&
+    runtimeIdentity.ownerPid > 1 &&
+    bundleChangedBeforeProcess &&
+    validAppAsarSnapshot(afterBundle) &&
+    sameAppAsarSnapshot(beforeBundle, afterBundle) &&
+    beforeBundle.checkedAtMs >= processStartedAtMs &&
+    afterBundle.checkedAtMs >= beforeBundle.checkedAtMs
+  );
+};
 
 const projectIndexScrollOwnerMatches = (
   owners,
@@ -463,6 +497,172 @@ export async function runBestEffortCurrentBaselineCleanup(steps) {
   return failures;
 }
 
+export function assertCurrentAccountMenuRecord(record) {
+  const expectedStateKeys = [
+    "darkCompact",
+    "darkWide",
+    "lightCompact",
+    "lightWide",
+  ];
+  const fingerprintMismatch = Object.entries(currentBaselineFingerprint).some(
+    ([key, expected]) => record?.fingerprint?.[key] !== expected,
+  );
+  const runtimeIdentity = record?.runtimeBundleIdentity;
+  if (
+    fingerprintMismatch ||
+    !Number.isSafeInteger(record?.profileOwnerPid) ||
+    record.profileOwnerPid <= 1 ||
+    runtimeIdentity?.ownerPid !== record.profileOwnerPid ||
+    !provesRuntimeBundleIdentity(runtimeIdentity) ||
+    record?.restoredPreference !== "System" ||
+    JSON.stringify(Object.keys(record?.states ?? {}).sort()) !==
+      JSON.stringify(expectedStateKeys)
+  ) {
+    throw new Error(
+      "Current account-menu record does not prove the isolated current build and restored preference.",
+    );
+  }
+
+  const expectedLabels = [
+    "<account>",
+    "Usage <dynamic>",
+    "Show pet",
+    "Invite a friend",
+    "Settings⌘,",
+    "Log out",
+  ];
+  const expectedSvgGeometry = [
+    [],
+    [
+      {
+        shapeSha256:
+          "34bf60b8f723ce29108d666e0d986df83ac517d0ea1c1819f391ffd30658e299",
+        viewBox: "0 0 20 20",
+      },
+    ],
+    [
+      {
+        shapeSha256:
+          "9841028b4294451d1bb03f57f1a3af1962c698dd5fb954c32f9ca7e6b774a0ae",
+        viewBox: "0 0 24 24",
+      },
+    ],
+    [
+      {
+        shapeSha256:
+          "807c6c99243f28084e80764a180e3b467b5cf03eccde3c65e76c1dd36bc7fb4e",
+        viewBox: "0 0 16 16",
+      },
+    ],
+    [
+      {
+        shapeSha256:
+          "65555b51ea39b9e7b21e1e8b1e77779c64c5e9729a12581be2cab78a938a20f4",
+        viewBox: "0 0 20 20",
+      },
+    ],
+    [
+      {
+        shapeSha256:
+          "4c7f061498fb83c30e5f24ff410cd44a0419b1578492c739d97bdf825bfd4fa2",
+        viewBox: "0 0 21 21",
+      },
+    ],
+  ];
+  for (const [key, state] of Object.entries(record.states)) {
+    const compact = key.endsWith("Compact");
+    const theme = key.startsWith("light") ? "light" : "dark";
+    const viewport = compact
+      ? currentBaselineViewports.compact
+      : currentBaselineViewports.wide;
+    const expectedTop = compact ? 447 : 587;
+    const expectedItemTops = [
+      expectedTop + 4,
+      expectedTop + 41.5625,
+      expectedTop + 70.125,
+      expectedTop + 98.6875,
+      expectedTop + 127.25,
+      expectedTop + 155.8125,
+    ];
+    const expectedBackground =
+      theme === "light"
+        ? "oklab(0.999994 0.0000455678 0.0000200868 / 0.9)"
+        : "oklab(0.297161 0.0000135154 0.00000594556 / 0.9)";
+    const expectedColor =
+      theme === "light" ? "rgb(26, 28, 31)" : "rgb(223, 223, 223)";
+    const svgGeometry = state?.svgGeometry?.map((icons) =>
+      icons.map((icon) => ({
+        shapeSha256: sanitizedShapeSha256(icon?.shapes),
+        viewBox: icon?.viewBox,
+      })),
+    );
+    if (
+      state?.theme?.toLowerCase() !== theme ||
+      state.colorScheme !== theme ||
+      state.compact !== compact ||
+      state.viewport?.width !== viewport.width ||
+      state.viewport?.height !== viewport.height ||
+      state.focusRole !== "menu" ||
+      state.focusReturned !== true ||
+      Math.abs(state.horizontalOverflow ?? Infinity) > 1 ||
+      state.imageCount !== 1 ||
+      state.itemCount !== 6 ||
+      state.separatorCount !== 0 ||
+      JSON.stringify(state.labels) !== JSON.stringify(expectedLabels) ||
+      !withinTolerance(state.sidebarRect?.left, 0) ||
+      !withinTolerance(state.sidebarRect?.top, 46) ||
+      !withinTolerance(state.sidebarRect?.width, 322.90625) ||
+      !withinTolerance(state.sidebarRect?.height, compact ? 634 : 774) ||
+      !withinTolerance(state.menuRect?.left, 9) ||
+      !withinTolerance(state.menuRect?.top, expectedTop) ||
+      !withinTolerance(state.menuRect?.width, 306.90625) ||
+      !withinTolerance(state.menuRect?.height, 188.375) ||
+      !withinTolerance(state.triggerRect?.left, 8) ||
+      !withinTolerance(state.triggerRect?.top, compact ? 642.5 : 782.5) ||
+      !withinTolerance(state.triggerRect?.height, 29) ||
+      !Number.isFinite(state.triggerRect?.width) ||
+      state.triggerRect.width < 150 ||
+      state.triggerRect.left + state.triggerRect.width >
+        state.sidebarRect.left + state.sidebarRect.width ||
+      !Number.isInteger(state.triggerTextLength) ||
+      state.triggerTextLength < 1 ||
+      state.menuStyle?.backgroundColor !== expectedBackground ||
+      state.menuStyle?.borderRadius !== "15px" ||
+      state.menuStyle?.color !== expectedColor ||
+      !state.menuStyle?.boxShadow?.includes(
+        theme === "light"
+          ? "rgba(26, 28, 31, 0.08)"
+          : "rgba(255, 255, 255, 0.082)",
+      ) ||
+      state.itemRects?.length !== 6 ||
+      state.itemRects.some(
+        (rect, index) =>
+          !withinTolerance(rect?.left, 13) ||
+          !withinTolerance(rect?.top, expectedItemTops[index]) ||
+          !withinTolerance(rect?.width, 298.90625) ||
+          !withinTolerance(rect?.height, 28.5625),
+      ) ||
+      state.itemStyles?.length !== 6 ||
+      state.itemStyles.some(
+        (style) =>
+          style.backgroundColor !== "rgba(0, 0, 0, 0)" ||
+          style.borderRadius !== "12.5px" ||
+          style.fontFamily !==
+            '-apple-system, "system-ui", "Segoe UI", sans-serif' ||
+          style.fontSize !== "13px" ||
+          style.fontWeight !== "400" ||
+          style.lineHeight !== "18.5714px" ||
+          style.padding !== "5px 8px",
+      ) ||
+      JSON.stringify(svgGeometry) !== JSON.stringify(expectedSvgGeometry)
+    ) {
+      throw new Error(
+        `Current account-menu ${key} observation does not match the current contract: ${JSON.stringify(state)}`,
+      );
+    }
+  }
+}
+
 export function selectCurrentMainCandidate(candidates) {
   const eligible = candidates
     .filter(
@@ -502,23 +702,7 @@ export function assertCurrentBaselineRecord(record) {
     );
   }
   const runtimeIdentity = record.runtimeBundleIdentity;
-  const beforeBundle = runtimeIdentity?.beforeCapture;
-  const afterBundle = runtimeIdentity?.afterCapture;
-  const processStartedAtMs = runtimeIdentity?.processStartedAtMs;
-  const bundleChangedBeforeProcess =
-    validAppAsarSnapshot(beforeBundle) &&
-    Number.isSafeInteger(processStartedAtMs) &&
-    Math.ceil(beforeBundle.changedAtMs / 1_000) * 1_000 <=
-      processStartedAtMs;
-  if (
-    !Number.isSafeInteger(runtimeIdentity?.ownerPid) ||
-    runtimeIdentity.ownerPid <= 1 ||
-    !bundleChangedBeforeProcess ||
-    !validAppAsarSnapshot(afterBundle) ||
-    !sameAppAsarSnapshot(beforeBundle, afterBundle) ||
-    beforeBundle.checkedAtMs < processStartedAtMs ||
-    afterBundle.checkedAtMs < beforeBundle.checkedAtMs
-  ) {
+  if (!provesRuntimeBundleIdentity(runtimeIdentity)) {
     throw new Error(
       "Current baseline record does not prove the running Renderer bundle identity.",
     );
