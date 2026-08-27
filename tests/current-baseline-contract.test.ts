@@ -1609,11 +1609,17 @@ describe("current baseline capture contract", () => {
     expect(activePrecheck).toBeGreaterThan(-1);
     expect(activePrecheck).toBeLessThan(activeScreenshot);
     expect(activeScreenshot).toBeLessThan(activePostcheck);
+    expect(
+      captureSource.match(/await assertUnreadStatusVisible\(\);/g),
+    ).toHaveLength(2);
     expect(captureSource).toContain(
       "const assertProjectActionActive = () =>",
     );
     expect(
       captureSource.match(/await assertProjectActionActive\(\);/g),
+    ).toHaveLength(4);
+    expect(
+      captureSource.match(/await assertRecentsActionIdle\(\);/g),
     ).toHaveLength(4);
     expect(
       captureSource.indexOf("assertCurrentSidebarRowsRecord(record)"),

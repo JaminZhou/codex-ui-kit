@@ -686,6 +686,66 @@ try {
       requireProject: true,
       subject: "project action",
     });
+  const assertUnreadStatusVisible = async () => {
+    const unreadStatusVisible = await unreadRow.evaluate((element) => {
+      const dot = [...element.querySelectorAll("span")].find((span) => {
+        const bounds = span.getBoundingClientRect();
+        return (
+          Math.abs(bounds.width - 8) <= 0.1 &&
+          Math.abs(bounds.height - 8) <= 0.1 &&
+          getComputedStyle(span).backgroundColor === "rgb(131, 195, 255)"
+        );
+      });
+      return (
+        element.getAttribute("data-app-action-sidebar-thread-kind") !==
+          "worktree" &&
+        dot instanceof Element &&
+        dot.checkVisibility({
+          checkOpacity: true,
+          checkVisibilityCSS: true,
+        })
+      );
+    });
+    if (!unreadStatusVisible) {
+      throw new Error(
+        "The ordinary unread sidebar dot changed during screenshot capture.",
+      );
+    }
+  };
+  const assertRecentsActionIdle = async () => {
+    const recentsActionIdle = await recentsActionRow.evaluate((element) => {
+      const visible = (candidate) =>
+        candidate instanceof Element &&
+        candidate.checkVisibility({
+          checkOpacity: true,
+          checkVisibilityCSS: true,
+        });
+      const unreadDot = [...element.querySelectorAll("span")].find((span) => {
+        const bounds = span.getBoundingClientRect();
+        return (
+          Math.abs(bounds.width - 8) <= 0.1 &&
+          Math.abs(bounds.height - 8) <= 0.1 &&
+          getComputedStyle(span).backgroundColor === "rgb(131, 195, 255)"
+        );
+      });
+      return (
+        element.getAttribute("data-app-action-sidebar-thread-kind") !==
+          "worktree" &&
+        !element.closest("[data-app-action-sidebar-project-list-id]") &&
+        element.getAttribute("data-app-action-sidebar-thread-pinned") !==
+          "true" &&
+        element.getAttribute("data-app-action-sidebar-thread-selected") !==
+          "true" &&
+        !visible(element.querySelector(".animate-spin")) &&
+        !visible(unreadDot)
+      );
+    });
+    if (!recentsActionIdle) {
+      throw new Error(
+        "The ordinary idle Recents row changed during action capture.",
+      );
+    }
+  };
   const statuses = {
     active: await inspectActive(activeRow),
     unread: await inspectUnread(unreadRow),
@@ -697,24 +757,28 @@ try {
     28,
   );
   await assertActiveStatusVisible();
+  await assertUnreadStatusVisible();
+  const unreadStatusScreenshot = await screenshotRegion(
+    unreadRow,
+    "unread-status.png",
+    28,
+  );
+  await assertUnreadStatusVisible();
   const screenshots = {
     activeStatus: activeStatusScreenshot,
-    unreadStatus: await screenshotRegion(
-      unreadRow,
-      "unread-status.png",
-      28,
-    ),
+    unreadStatus: unreadStatusScreenshot,
   };
   await assertProjectActionActive();
   const projectActions = await inspectActions(projectActionRow);
   await page.mouse.move(1_000, 400);
   await assertProjectActionActive();
+  await assertRecentsActionIdle();
+  const recentsActions = await inspectActions(recentsActionRow);
+  await page.mouse.move(1_000, 400);
+  await assertRecentsActionIdle();
   const actions = {
     project: { ...projectActions, sourceStatus: "active" },
-    recents: {
-      ...(await inspectActions(recentsActionRow)),
-      sourceStatus: "idle",
-    },
+    recents: { ...recentsActions, sourceStatus: "idle" },
   };
   await assertProjectActionActive();
   await projectActionRow.hover();
@@ -726,6 +790,7 @@ try {
   );
   await page.mouse.move(1_000, 400);
   await assertProjectActionActive();
+  await assertRecentsActionIdle();
   await recentsActionRow.hover();
   screenshots.recentsActions = await screenshotRegion(
     recentsActionRow,
@@ -733,6 +798,8 @@ try {
     72,
     { clearHover: false },
   );
+  await page.mouse.move(1_000, 400);
+  await assertRecentsActionIdle();
 
   const navigationRect = await navigation.evaluate((element) => {
     const bounds = element.getBoundingClientRect();
