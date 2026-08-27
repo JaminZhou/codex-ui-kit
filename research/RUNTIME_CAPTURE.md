@@ -304,9 +304,10 @@ profile and is atomically opened with no symlink following; capture refuses to
 overwrite an existing path. The record must match the promoted app version,
 build number, app.asar size/SHA-256, and Chromium version exactly. All five
 primary routes must appear once inside `nav` whenever navigation is visible.
-The fixed control matrix requires Back/Forward in every state, mutually
-exclusive Hide/Show sidebar controls, Composer controls on New chat, and no
-Composer controls on Pull requests.
+The fixed control matrix requires Back/Forward whenever navigation is visible
+and requires both controls to be absent in the explicitly collapsed state. It
+also requires mutually exclusive Hide/Show sidebar controls, Composer controls
+on New chat, and no Composer controls on Pull requests.
 
 The previous `26.803.41515` runtime-identity repeat used exact main PID `32692`, loopback port `9785`,
 and one fresh profile. Its owner started at `1786326246000` ms; both ASAR reads
