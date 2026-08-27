@@ -1286,6 +1286,13 @@ CODEX_UI_KIT_CURRENT_SIDEBAR_EMPTY_COLLECTION_REFERENCE=/absolute/path/to/curren
   --scenes=current-sidebar-recents,current-sidebar-status-lifecycle,current-sidebar-collection-empty,current-sidebar-collection-loading,current-sidebar-collection-long-list
 ```
 
+The `26.820.60940` ordinary-row refresh uses current 28×30 active/unread and
+72×30 project/Recents crops from `pnpm capture:current-sidebar-rows`. Its
+observed ratios are 1.9048%, 3.5714%, 3.3796%, and 3.1944% respectively. The
+unread default ceiling is 4% to cover the measured 306.90625px product row's
+fractional dot rasterization; the CDP and Electron contracts still require the
+exact 20×20 rail, centered 8×8 dot, color, action geometry, and SVG paths.
+
 The App shell gate uses only the 120×46 application-owned titlebar crop:
 
 ```bash

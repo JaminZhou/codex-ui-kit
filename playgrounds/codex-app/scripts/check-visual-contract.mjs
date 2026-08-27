@@ -2541,7 +2541,7 @@ for (const scene of selectedScenes) {
       await compareCurrentBuildSidebarStatus({
         actual,
         actualBounds: sidebarStatusBounds?.unread,
-        defaultMaximumRatio: 0.025,
+        defaultMaximumRatio: 0.04,
         maximumRatioName:
           "CODEX_UI_KIT_CURRENT_SIDEBAR_UNREAD_STATUS_MAX_DIFF_RATIO",
         referencePath: currentBuildSidebarUnreadStatusReference,

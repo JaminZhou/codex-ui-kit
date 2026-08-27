@@ -65,6 +65,7 @@
     "check:research": "node scripts/check-research-inventory.mjs && node scripts/check-visual-assets.mjs && node scripts/update-current-thread-visual-assets.mjs",
     "capture:current-baseline": "node scripts/capture-current-baseline.mjs",
     "capture:current-account-menu": "node scripts/capture-current-account-menu.mjs",
+    "capture:current-sidebar-rows": "node scripts/capture-current-sidebar-rows.mjs",
     "update:visual-assets": "node scripts/update-current-visual-assets.mjs --write",
     "update:visual-assets:review": "node scripts/update-current-visual-assets.mjs --review-only --write",
     "update:current-thread-visual-assets": "node scripts/update-current-thread-visual-assets.mjs --write",

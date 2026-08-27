@@ -15,6 +15,7 @@ import {
   assertCurrentBaselineRecord,
   assertCurrentProjectsIndexObservation,
   assertCurrentSidebarLifecycle,
+  assertCurrentSidebarRowsRecord,
   currentBaselineFingerprint,
   currentBaselineViewports,
   runBestEffortCurrentBaselineCleanup,
@@ -195,6 +196,181 @@ const accountMenuRecord = () => ({
   },
 });
 
+const sidebarActionObservation = (sourceStatus: "active" | "idle") => ({
+  buttons: [
+    {
+      category: "pin",
+      icon: {
+        height: "16px",
+        shapeSha256:
+          "5013a14576663d34d622cc3e478cf5051a9524cc4de77804658975a436c347ec",
+        viewBox: "0 0 20 20",
+        width: "16px",
+      },
+      rect: {
+        height: 20,
+        left: 252.906,
+        right: 271.906,
+        rightInset: 35,
+        top: 5,
+        width: 19,
+      },
+    },
+    {
+      category: "archive",
+      icon: {
+        height: "16px",
+        shapeSha256:
+          "e66561a77c7b18a98bd47c2c8aefee8a95599d50a78b18772d528ecce63a70ea",
+        viewBox: "0 0 20 20",
+        width: "16px",
+      },
+      rect: {
+        height: 20,
+        left: 279.906,
+        right: 298.906,
+        rightInset: 8,
+        top: 5,
+        width: 19,
+      },
+    },
+  ],
+  rowRect: { height: 30, width: 306.906 },
+  sourceStatus,
+  toolbarRect: {
+    height: 30,
+    left: 252.906,
+    right: 304.906,
+    rightInset: 2,
+    top: 0,
+    width: 52,
+  },
+});
+
+const sidebarRowsRecord = () => ({
+  actions: {
+    project: sidebarActionObservation("active"),
+    recents: sidebarActionObservation("idle"),
+  },
+  captureKind: "renderer_cdp",
+  fingerprint: currentBaselineFingerprint,
+  privacyBoundary: "counts-title-lengths-generic-actions-geometry-styles-only",
+  profileOwnerPid: 12_345,
+  restoredRoute: "New chat",
+  rowSummary: {
+    horizontalOverflow: 0,
+    kinds: { local: 8 },
+    pinnedRows: 0,
+    projectRows: 4,
+    recentRows: 4,
+    rowHeights: [30],
+    rowWidths: [306.906],
+    selectedRows: 0,
+    sidebarRect: { height: 774, left: 0, top: 46, width: 322.906 },
+    statusCounts: { active: 1, unread: 2 },
+    titleLengthRange: { max: 29, min: 6 },
+    totalRows: 8,
+    viewport: currentBaselineViewports.wide,
+  },
+  runtimeBundleIdentity: {
+    afterCapture: {
+      appAsarBytes: currentBaselineFingerprint.appAsarBytes,
+      appAsarSha256: currentBaselineFingerprint.appAsarSha256,
+      changedAtMs: 1_786_150_111_000,
+      checkedAtMs: 1_786_351_000_000,
+      device: "16777231",
+      inode: "346397970",
+    },
+    beforeCapture: {
+      appAsarBytes: currentBaselineFingerprint.appAsarBytes,
+      appAsarSha256: currentBaselineFingerprint.appAsarSha256,
+      changedAtMs: 1_786_150_111_000,
+      checkedAtMs: 1_786_350_900_000,
+      device: "16777231",
+      inode: "346397970",
+    },
+    ownerPid: 12_345,
+    processStartedAtMs: 1_786_350_800_000,
+  },
+  schemaVersion: 1,
+  screenshots: {
+    activeStatus: {
+      height: 30,
+      name: "active-status.png",
+      sha256: "a".repeat(64),
+      width: 28,
+    },
+    projectActions: {
+      height: 30,
+      name: "project-actions.png",
+      sha256: "b".repeat(64),
+      width: 72,
+    },
+    recentsActions: {
+      height: 30,
+      name: "recents-actions.png",
+      sha256: "c".repeat(64),
+      width: 72,
+    },
+    unreadStatus: {
+      height: 30,
+      name: "unread-status.png",
+      sha256: "d".repeat(64),
+      width: 28,
+    },
+  },
+  statuses: {
+    active: {
+      railRect: {
+        height: 20,
+        left: 278.906,
+        right: 298.906,
+        rightInset: 8,
+        top: 5,
+        width: 20,
+      },
+      rowRect: { height: 30, width: 306.906 },
+      spinner: {
+        animationDuration: "2s",
+        animationIterationCount: "infinite",
+        color: "oklab(0.903646 0.0000412762 0.0000180602 / 0.595)",
+        cssHeight: "16px",
+        cssWidth: "16px",
+        pathCount: 2,
+        shapeSha256:
+          "6806e63489028f080d9c4cc0468782d4ac40edb5ead946e8fd7f5fa156a8cb33",
+        viewBox: "0 0 24 24",
+      },
+    },
+    unread: {
+      dotRect: {
+        height: 8,
+        left: 284.906,
+        right: 292.906,
+        rightInset: 14,
+        top: 11,
+        width: 8,
+      },
+      dotStyle: {
+        backgroundColor: "rgb(131, 195, 255)",
+        borderRadius: "9999px",
+      },
+      railRect: {
+        height: 20,
+        left: 278.906,
+        right: 298.906,
+        rightInset: 8,
+        top: 5,
+        width: 20,
+      },
+      rowRect: { height: 30, width: 306.906 },
+    },
+  },
+  targetSelection: {
+    selected: { url: "app://-/index.html" },
+  },
+});
+
 describe("current baseline capture contract", () => {
   const projectsObservation = () => ({
     collapsed: { expandedCount: 0, focusOnToggle: true },
@@ -321,6 +497,28 @@ describe("current baseline capture contract", () => {
       1_786_150_110_000;
     expect(() => assertCurrentAccountMenuRecord(staleRenderer)).toThrow(
       "isolated current build",
+    );
+  });
+
+  it("gates sanitized current sidebar rows, actions, and status rails", () => {
+    expect(() => assertCurrentSidebarRowsRecord(sidebarRowsRecord())).not.toThrow();
+
+    const privateRecord = sidebarRowsRecord() as Record<string, any>;
+    privateRecord.title = "Private task";
+    expect(() => assertCurrentSidebarRowsRecord(privateRecord)).toThrow(
+      "privacy boundary",
+    );
+
+    const staleAction = sidebarRowsRecord();
+    staleAction.actions.project.buttons[0].rect.width = 20;
+    expect(() => assertCurrentSidebarRowsRecord(staleAction)).toThrow(
+      "project actions",
+    );
+
+    const staleUnread = sidebarRowsRecord();
+    staleUnread.statuses.unread.dotStyle.backgroundColor = "rgb(255, 0, 0)";
+    expect(() => assertCurrentSidebarRowsRecord(staleUnread)).toThrow(
+      "unread observation",
     );
   });
 
@@ -1362,5 +1560,36 @@ describe("current baseline capture contract", () => {
     expect(captureSource).toContain(
       "Account-menu isolated-state cleanup failed:",
     );
+  });
+
+  it("keeps current sidebar-row capture regional, sanitized, and recoverable", () => {
+    const captureSource = readFileSync(
+      new URL("../scripts/capture-current-sidebar-rows.mjs", import.meta.url),
+      "utf8",
+    );
+
+    expect(captureSource).toContain(
+      '"counts-title-lengths-generic-actions-geometry-styles-only"',
+    );
+    expect(captureSource).toContain(
+      "Prime the isolated sidebar with an active project-task",
+    );
+    expect(captureSource).toContain("beforeCapture: beforeCapture.bundle");
+    expect(captureSource).toContain("afterCapture: afterCapture.bundle");
+    expect(captureSource).toContain("await restoreNewChat();");
+    expect(
+      captureSource.indexOf("assertCurrentSidebarRowsRecord(record)"),
+    ).toBeLessThan(
+      captureSource.indexOf('join(outputDirectory, "sidebar-rows.json")'),
+    );
+    expect(captureSource.match(/page\.screenshot/g)).toHaveLength(1);
+    expect(captureSource).toContain("clip: {");
+    expect(captureSource).not.toContain(
+      "data-app-action-sidebar-thread-id",
+    );
+    expect(captureSource).not.toContain(
+      "data-app-action-sidebar-thread-host-id",
+    );
+    expect(captureSource).not.toContain("document.body.textContent");
   });
 });

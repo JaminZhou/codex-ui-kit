@@ -663,6 +663,224 @@ export function assertCurrentAccountMenuRecord(record) {
   }
 }
 
+const currentSidebarActionIconHashes = Object.freeze({
+  archive: "e66561a77c7b18a98bd47c2c8aefee8a95599d50a78b18772d528ecce63a70ea",
+  pin: "5013a14576663d34d622cc3e478cf5051a9524cc4de77804658975a436c347ec",
+});
+
+const currentSidebarScreenshotNames = Object.freeze([
+  "active-status.png",
+  "project-actions.png",
+  "recents-actions.png",
+  "unread-status.png",
+]);
+
+const validCurrentSidebarScreenshot = (screenshot, name, width) =>
+  screenshot?.name === name &&
+  screenshot?.width === width &&
+  screenshot?.height === 30 &&
+  /^[a-f0-9]{64}$/.test(screenshot?.sha256 ?? "");
+
+const currentSidebarActionObservationMatches = (
+  observation,
+  expectedSourceStatus,
+) => {
+  const buttons = observation?.buttons;
+  return (
+    observation?.sourceStatus === expectedSourceStatus &&
+    observation?.rowRect?.width !== undefined &&
+    withinTolerance(observation.rowRect.width, 306.90625) &&
+    withinTolerance(observation.rowRect.height, 30) &&
+    observation?.toolbarRect?.top === 0 &&
+    withinTolerance(observation?.toolbarRect?.height, 30, 0.1) &&
+    withinTolerance(observation?.toolbarRect?.width, 52, 0.1) &&
+    withinTolerance(observation?.toolbarRect?.rightInset, 2, 0.1) &&
+    Array.isArray(buttons) &&
+    buttons.length === 2 &&
+    buttons[0]?.category === "pin" &&
+    buttons[1]?.category === "archive" &&
+    buttons.every(
+      (button, index) =>
+        withinTolerance(button?.rect?.height, 20, 0.1) &&
+        withinTolerance(button?.rect?.top, 5, 0.1) &&
+        withinTolerance(button?.rect?.width, 19, 0.1) &&
+        withinTolerance(
+          button?.rect?.rightInset,
+          index === 0 ? 35 : 8,
+          0.1,
+        ) &&
+        button?.icon?.height === "16px" &&
+        button?.icon?.width === "16px" &&
+        button?.icon?.viewBox === "0 0 20 20" &&
+        button?.icon?.shapeSha256 ===
+          currentSidebarActionIconHashes[button.category],
+    ) &&
+    withinTolerance(buttons[1].rect.left - buttons[0].rect.right, 8, 0.1)
+  );
+};
+
+export function assertCurrentSidebarRowsRecord(record) {
+  const fingerprintMismatch = Object.entries(currentBaselineFingerprint).some(
+    ([key, expected]) => record?.fingerprint?.[key] !== expected,
+  );
+  const runtimeIdentity = record?.runtimeBundleIdentity;
+  const serialized = JSON.stringify(record);
+  if (
+    record?.schemaVersion !== 1 ||
+    record?.captureKind !== "renderer_cdp" ||
+    fingerprintMismatch ||
+    !Number.isSafeInteger(record?.profileOwnerPid) ||
+    record.profileOwnerPid <= 1 ||
+    runtimeIdentity?.ownerPid !== record.profileOwnerPid ||
+    !provesRuntimeBundleIdentity(runtimeIdentity) ||
+    record?.targetSelection?.selected?.url !== "app://-/index.html" ||
+    record?.restoredRoute !== "New chat" ||
+    record?.privacyBoundary !==
+      "counts-title-lengths-generic-actions-geometry-styles-only" ||
+    /"(?:hostId|profilePath|projectName|threadId|title)"\s*:/.test(serialized)
+  ) {
+    throw new Error(
+      "Current sidebar-row record does not prove the isolated current build and privacy boundary.",
+    );
+  }
+
+  const summary = record.rowSummary;
+  const kindCount = Object.values(summary?.kinds ?? {}).reduce(
+    (total, value) => total + value,
+    0,
+  );
+  if (
+    summary?.viewport?.width !== currentBaselineViewports.wide.width ||
+    summary?.viewport?.height !== currentBaselineViewports.wide.height ||
+    !withinTolerance(summary?.sidebarRect?.left, 0) ||
+    !withinTolerance(summary?.sidebarRect?.top, 46) ||
+    !withinTolerance(summary?.sidebarRect?.width, 322.90625) ||
+    !withinTolerance(summary?.sidebarRect?.height, 774) ||
+    !Number.isInteger(summary?.totalRows) ||
+    summary.totalRows < 4 ||
+    !Number.isInteger(summary?.projectRows) ||
+    summary.projectRows < 1 ||
+    !Number.isInteger(summary?.recentRows) ||
+    summary.recentRows < 1 ||
+    !Number.isInteger(summary?.pinnedRows) ||
+    summary.pinnedRows < 0 ||
+    summary.projectRows + summary.recentRows !== summary.totalRows ||
+    summary.pinnedRows > summary.totalRows ||
+    kindCount !== summary.totalRows ||
+    Object.values(summary?.kinds ?? {}).some(
+      (count) => !Number.isInteger(count) || count < 1,
+    ) ||
+    Object.keys(summary?.kinds ?? {}).some(
+      (kind) => !["cloud", "local", "worktree"].includes(kind),
+    ) ||
+    JSON.stringify(summary?.rowHeights) !== JSON.stringify([30]) ||
+    summary?.rowWidths?.length !== 1 ||
+    !withinTolerance(summary.rowWidths[0], 306.90625) ||
+    !Number.isInteger(summary?.titleLengthRange?.min) ||
+    summary.titleLengthRange.min < 1 ||
+    !Number.isInteger(summary?.titleLengthRange?.max) ||
+    summary.titleLengthRange.max < summary.titleLengthRange.min ||
+    summary.titleLengthRange.max > 256 ||
+    !Number.isInteger(summary?.selectedRows) ||
+    summary.selectedRows < 0 ||
+    summary.selectedRows > 1 ||
+    !Number.isInteger(summary?.statusCounts?.active) ||
+    summary.statusCounts.active < 1 ||
+    !Number.isInteger(summary?.statusCounts?.unread) ||
+    summary.statusCounts.unread < 1 ||
+    Math.abs(summary?.horizontalOverflow ?? Infinity) > 1
+  ) {
+    throw new Error(
+      `Current sidebar-row summary does not match the current contract: ${JSON.stringify(summary)}`,
+    );
+  }
+
+  const active = record.statuses?.active;
+  if (
+    !withinTolerance(active?.rowRect?.width, 306.90625) ||
+    !withinTolerance(active?.rowRect?.height, 30) ||
+    !withinTolerance(active?.railRect?.width, 20) ||
+    !withinTolerance(active?.railRect?.height, 20) ||
+    !withinTolerance(active?.railRect?.top, 5) ||
+    !withinTolerance(active?.railRect?.rightInset, 8) ||
+    active?.spinner?.cssHeight !== "16px" ||
+    active?.spinner?.cssWidth !== "16px" ||
+    active?.spinner?.viewBox !== "0 0 24 24" ||
+    active?.spinner?.pathCount !== 2 ||
+    active?.spinner?.shapeSha256 !==
+      "6806e63489028f080d9c4cc0468782d4ac40edb5ead946e8fd7f5fa156a8cb33" ||
+    active?.spinner?.animationDuration !== "2s" ||
+    active?.spinner?.animationIterationCount !== "infinite" ||
+    active?.spinner?.color !==
+      "oklab(0.903646 0.0000412762 0.0000180602 / 0.595)"
+  ) {
+    throw new Error(
+      `Current sidebar active observation does not match the current contract: ${JSON.stringify(active)}`,
+    );
+  }
+
+  const unread = record.statuses?.unread;
+  if (
+    !withinTolerance(unread?.rowRect?.width, 306.90625) ||
+    !withinTolerance(unread?.rowRect?.height, 30) ||
+    !withinTolerance(unread?.railRect?.width, 20) ||
+    !withinTolerance(unread?.railRect?.height, 20) ||
+    !withinTolerance(unread?.railRect?.top, 5) ||
+    !withinTolerance(unread?.railRect?.rightInset, 8) ||
+    !withinTolerance(unread?.dotRect?.width, 8) ||
+    !withinTolerance(unread?.dotRect?.height, 8) ||
+    !withinTolerance(unread?.dotRect?.top, 11) ||
+    !withinTolerance(unread?.dotRect?.rightInset, 14) ||
+    unread?.dotStyle?.backgroundColor !== "rgb(131, 195, 255)" ||
+    unread?.dotStyle?.borderRadius !== "9999px"
+  ) {
+    throw new Error(
+      `Current sidebar unread observation does not match the current contract: ${JSON.stringify(unread)}`,
+    );
+  }
+
+  for (const variant of ["project", "recents"]) {
+    if (
+      !currentSidebarActionObservationMatches(
+        record.actions?.[variant],
+        variant === "project" ? "active" : "idle",
+      )
+    ) {
+      throw new Error(
+        `Current sidebar ${variant} actions do not match the current contract: ${JSON.stringify(record.actions?.[variant])}`,
+      );
+    }
+  }
+
+  const screenshots = record.screenshots;
+  if (
+    !validCurrentSidebarScreenshot(
+      screenshots?.activeStatus,
+      currentSidebarScreenshotNames[0],
+      28,
+    ) ||
+    !validCurrentSidebarScreenshot(
+      screenshots?.projectActions,
+      currentSidebarScreenshotNames[1],
+      72,
+    ) ||
+    !validCurrentSidebarScreenshot(
+      screenshots?.recentsActions,
+      currentSidebarScreenshotNames[2],
+      72,
+    ) ||
+    !validCurrentSidebarScreenshot(
+      screenshots?.unreadStatus,
+      currentSidebarScreenshotNames[3],
+      28,
+    )
+  ) {
+    throw new Error(
+      "Current sidebar-row screenshots do not prove the four privacy-safe regions.",
+    );
+  }
+}
+
 export function selectCurrentMainCandidate(candidates) {
   const eligible = candidates
     .filter(

@@ -14,16 +14,18 @@ exit gates; it does not replace the inventory.
   Desktop `26.820.60940` (`7119`). Unsampled earlier-build surfaces remain
   previous-build regression evidence rather than current verification.
 - The inventory contains 89 surface groups: 59 P0, 21 P1, and 9 P2.
-- 12 groups have current-build runtime evidence, 61 have previous-build-only
+- 15 groups have current-build runtime evidence, 58 have previous-build-only
   runtime evidence, and 16 have not been sampled.
 - The scoped `26.820.60940` refresh revalidates the global shell, responsive
   Composer, primary navigation, project-group lifecycle, Help and account
-  menus, route restoration, and Projects Index. It locks the new
-  collapsed-shell removal of Back/Forward and the one-pixel 559px/415px
-  compact Projects drift. The
+  menus, route restoration, Projects Index, shared project/Recents rows and
+  actions, plus real active/unread status rails. It locks the new
+  collapsed-shell removal of Back/Forward, the one-pixel 559px/415px compact
+  Projects drift, and the 306.90625px row's fractional unread raster. The
   project action menu remains a six-action/three-separator Electron native
   menu with a 221×187 Quartz window, and all six fixed SVG sources are
-  unchanged. Its independent pixel comparison remains scoped to 26.818.
+  unchanged. Current regional pixels pass for the native project menu,
+  shared task actions, active spinner, and unread dot.
   The previous fixed-message task promotes `thread.shell` and
   `thread.messages-basic` on 26.818: exact 1180×820 geometry, 820×680 compact
   containment, four response actions, all five Composer hit targets, and a
@@ -458,12 +460,14 @@ verified. Its empty state is tied to a live `No chats` project row; loading and
 the five-item `Show more` boundary are locked to that build's ASAR structure,
 then repeated through Browser/CDP, Electron, and reviewed pixels. The New chat
 selection, project portal, Dark/Light, 1180/720, and footer/account matrices are
-also previous-build evidence. The current 26.820 slice revalidates the global
+also previous-build evidence. The current 26.820 slices revalidate the global
 shell, primary navigation, project-group lifecycle, project-actions provider,
-Help menu, account-menu matrix, and Projects Index. Remaining Stage 1 work
-includes re-observing the other sidebar groups on 26.820 plus broader route
-lifecycle feedback, global notification runtime evidence, and selection
-continuity beyond New chat.
+Help menu, account-menu matrix, Projects Index, shared 30px project/Recents
+history rows, shared Pin/Archive actions, and real active/unread status rails.
+Remaining Stage 1 work includes re-observing ordinary waiting/error and
+collection states, worktree-specific status, plus broader route lifecycle
+feedback, global notification runtime evidence, and selection continuity
+beyond New chat.
 
 The same workstream also covers shell gaps that otherwise distort every
 feature:
