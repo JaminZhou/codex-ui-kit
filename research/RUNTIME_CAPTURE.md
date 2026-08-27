@@ -385,7 +385,7 @@ links, exact geometry, color, paths, and action replacement. Three local-only
 2.9762% under 6%; failed-plus-unread and restored pass at 0% under 6.5% and
 2.5% respectively.
 
-### Current `26.818.41509` worktree entry and status lifecycle
+### Previous `26.818.41509` worktree entry and status lifecycle
 
 The refresh uses two new disposable single-commit repositories, isolated
 Chromium profiles, and loopback-only ports 9881 and 9882. The primary Codex
@@ -417,7 +417,7 @@ profile-owned handlers, and confirms ports 9881/9882 and both profile arguments
 are absent while primary PID 43055 still owns 9874. The full probe root moves
 recoverably to `codex-ui-kit-worktree-26-818-20260824` in Trash.
 
-### Current `26.818.41509` sidebar collection edge states
+### Previous `26.818.41509` sidebar collection edge states
 
 The primary Renderer on port 9874 provides the current empty-state anchor
 without a second app process: the visible `codex-app-server-client` project

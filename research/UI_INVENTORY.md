@@ -66,16 +66,16 @@ observation from a previous build remains historical evidence.
   the new one-pixel route inset produces a 559px content width and 415/128
   columns; hiding the sidebar now also hides Back and Forward. Details are in
   [`26.820.60940.md`](26.820.60940.md).
-- A dedicated New chat home sample now covers actual Dark and Light product
+- The previous 26.818 New chat home sample covers the sampled Dark and Light product
   preferences at 1180×820 and 720×680. It locks the persisted 322.90625px
   sidebar, 56px mark, four wide/two compact prompt cards, exact five SVG
   sources, prompt-to-Composer selection, project-dialog portal and focus
   return, and zero compact overflow. Four unmasked owned-main comparisons pass
   between 0.2708% and 1.7855% under a 2.5% hard limit; the product preference
   was restored to System after capture.
-- A companion account-menu sample covers Dark and Light at 1180×820 and
+- The previous 26.818 account-menu sample covers Dark and Light at 1180×820 and
   720×680. It locks the 322.90625px sidebar, 306.90625×188.375px portalled
-  menu, six rows, 9px visual divider, five exact current icons, one avatar,
+  menu, six rows, 9px visual divider, five exact sampled icons, one avatar,
   zero role separators, zero compact overflow, Escape dismissal, and trigger
   focus return. Privacy-masked menu-region comparisons pass between 0.3968%
   and 0.5458% under independent Dark 0.5% and Light 0.6% limits.
@@ -85,15 +85,15 @@ observation from a previous build remains historical evidence.
   current SVG sources, conditional unread variant, and focus lifecycle. The
   six sources were reverified unchanged on 26.820; the 3.8449% unmasked
   native-region comparison remains 26.818 evidence.
-- A separate fixed-message task now revalidates the current completed
+- The previous 26.818 fixed-message task revalidates the sampled completed
   conversation shell. It locks the 768px thread and 736×98 Composer at
   1180×820, compact containment at 820×680, 14/22px message typography, the
   20px user bubble, four exact response-action assets, and all five Composer
   control hit targets. The local-only 768×774 product crop is compared without
   masks at 0.4320% changed pixels under a 0.5% hard limit.
-- A current command task now revalidates exact exit-code-7 failure and
+- The previous 26.818 command task revalidates exact exit-code-7 failure and
   same-thread recovery plus a 58-second Stop and same-thread recovery. The
-  independent traces preserve the current `Worked for 10s`, stopped
+  independent traces preserve the sampled `Worked for 10s`, stopped
   background-terminal row, exact replies, actions, and glyphs. Browser/CDP and
   Electron cover 1180×820 and 720×680; unmasked failure and interruption
   regions pass at 4.4354% and 3.9512% under independent hard limits.
@@ -102,7 +102,7 @@ observation from a previous build remains historical evidence.
   It also records the 300×189 pinned Sources summary, its 316px layout
   ownership, the pinned → floating → outside-dismissed → repinned lifecycle,
   and the 720×680 recovery card. Browser/CDP and Electron repeat those states.
-  Unmasked current-product regions pass at 2.1854% for success, 1.1649% for
+  Unmasked sampled-product regions pass at 2.1854% for success, 1.1649% for
   compact recovery, and 2.5926% for Sources under independent hard limits.
 - A fresh no-tool Markdown task reaches heading, strong text, inline code,
   blockquote, list, a narrow two-column table, and a TypeScript code block at
@@ -113,7 +113,7 @@ observation from a previous build remains historical evidence.
   exact response actions, system typography, and zero horizontal overflow.
   Unmasked wide and compact Markdown-root comparisons pass at 1.1682% and
   1.1932% under independent 1.3% hard limits.
-- A fresh sidebar task reaches current project-task and Recents hover actions
+- The previous 26.818 sidebar task reaches sampled project-task and Recents hover actions
   plus active, completed, and unread ordinary states. Both task families use
   19×20 Pin/Archive controls with an 8px gap and 35px/8px right insets. The
   20×20 status rail owns the exact 16×16 spinner and centered 8×8 blue dot.
@@ -126,7 +126,7 @@ observation from a previous build remains historical evidence.
   They are not relabeled as current merely because the shell capture passes.
 
 Current inventory: 89 surface groups; 11 have current-build runtime evidence, 62 have previous-build-only runtime evidence, 16 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 9 groups and Electron verification covers 9.
-Prior acceptance outside those 28 sampled current-build groups remains
+Prior acceptance outside those 9 sampled current-build groups remains
 recorded as `partial_legacy` until current-build re-observation.
 
 The current package exposes candidates far beyond the old transcript sample:
@@ -243,15 +243,15 @@ and a dedicated ownership-masked regional gate. The
 where only account-owned content is masked and the Help control remains under
 comparison; the Recents region passes at 2.5356%.
 
-The current `26.818.41509` follow-up supersedes only the task-row action and
+The previous `26.818.41509` follow-up supersedes only the task-row action and
 ordinary-status geometry from that older slice. Project tasks and Recents now
 share two 19×20 Pin/Archive buttons with an 8px gap and 8px toolbar right
 inset. Active and unread use the same 20×20 rail at 8px, with the exact 16×16
 spinner or centered 8×8 blue dot; completed has no status glyph. Browser/CDP,
-Electron, and four local-only action/status tail comparisons gate this current
-boundary. The next current slice adds the `Needs input` pill and an independent
+Electron, and four local-only action/status tail comparisons gate this sampled
+boundary. The next slice adds the `Needs input` pill and an independent
 16×16 ordinary error row. It also reaches a live 29px `No chats` project row
-and locks current-ASAR loading (one heading plus four shimmer rows) and the
+and locks sampled-ASAR loading (one heading plus four shimmer rows) and the
 five-item `Show more` boundary. Browser/CDP and Electron repeat
 five-to-twelve expansion, focus retention, `Show less`, and navigation
 overflow; a privacy-safe 140×29 empty crop passes at 1.8227%.
@@ -306,7 +306,7 @@ loading/error/restored pass at 2.9762%, 0%, and 0% under independent 6%, 6.5%,
 and 2.5% ceilings. The earlier active/unread ratios remain build-scoped
 regression evidence rather than current visual results.
 
-The current `26.818.41509` refresh re-reaches that lifecycle with new product
+The previous `26.818.41509` refresh re-reaches that lifecycle with new product
 entry semantics and supersedes those older worktree pixels. `Work in` now
 contains `New local worktree` and disabled `Cloud`; the selected context uses
 the generic accessible labels `Select where to run the chat`, `Select a local
@@ -446,11 +446,11 @@ cloud cannot produce a synthetic working directory. New worktree exposes the
 comparisons pass at 3.9193%, 3.0724%, and 0.0708% without creating an
 environment. Implementation remains `partial` because populated environment
 creation/editing, repair variants, and real Remote connection lifecycles remain
-open. The current `26.818.41509` follow-up supersedes that entry vocabulary:
+open. The previous `26.818.41509` follow-up supersedes that entry vocabulary:
 `New local worktree`, disabled `Cloud`, a 264×91.125 two-action Environment
 menu without a static empty row, and `Set up project`. Two disposable
 repositories then reach real success, controlled failure, Retry, and restored
-states. Browser/CDP, Electron, and current-product tail gates cover the sampled
+states. Browser/CDP, Electron, and sampled-product tail gates cover the
 entry and repair lifecycle; populated environment editing and Remote remain
 open. A later `26.803.61601`
 isolated probe creates a real worktree/task and proves project/task persistence
@@ -616,7 +616,7 @@ integration PNG. Browser/CDP and Electron pass with no geometry violations;
 local-only regional comparisons pass at 0.3272% wide and 0.6456% compact. The source
 captures remain untracked.
 
-The current `26.818.41509` fixed-message follow-up now supersedes that shell
+The previous `26.818.41509` fixed-message follow-up supersedes that shell
 and basic-message evidence without promoting the remaining conversation
 lifecycle. The live product and independent replay use the exact prompt and
 reply `CURRENT BASIC MESSAGE.`. CDP locks the 1180×820 thread, user bubble,
@@ -1246,7 +1246,7 @@ Composer 2.2101%, all below their independent ceilings. Electron repeats the
 Stop → background Stop → settlement → same-thread recovery transition. Raw
 product screenshots and private navigation content remain untracked.
 
-The current `26.818.41509` command refresh supersedes that previous-build
+The previous `26.818.41509` command refresh supersedes that earlier-build
 verification for the three sampled command groups. One exact read-only shell
 command emitted the current two-line stdout/stderr sample, exited 7, exposed
 `Worked for 10s`, and accepted an exact no-tool recovery. A second exact

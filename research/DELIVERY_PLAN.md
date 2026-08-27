@@ -27,49 +27,49 @@ exit gates; it does not replace the inventory.
   `thread.messages-basic` on 26.818: exact 1180×820 geometry, 820×680 compact
   containment, four response actions, all five Composer hit targets, and a
   no-mask 768×774 product comparison at 0.4320% changed pixels.
-  A current command task now also promotes command execution, failure recovery,
-  and interruption recovery on 26.818. One exact shell command emitted the
+  The previous 26.818 command task promoted command execution, failure recovery,
+  and interruption recovery. One exact shell command emitted the
   sampled stdout/stderr pair, exited 7, exposed `Worked for 10s`, and accepted
   an exact no-tool recovery. A second 120-second command was stopped after 58
   seconds, retained the stopped background-terminal row, and accepted a second
-  exact recovery in the same task. Browser/CDP locks the current computed
+  exact recovery in the same task. Browser/CDP locks the sampled computed
   styles, geometry, labels, glyphs, actions, and recovery states; Electron
   repeats both flows at 1180×820 and 720×680. Unmasked product-region
   comparisons pass at 4.4354% under 5% for failure and 3.9512% under 4.5% for
-  interruption. A fresh MCP task now promotes `thread.mcp-tool-events`,
+  interruption. The previous 26.818 MCP task promoted `thread.mcp-tool-events`,
   `thread.mcp-tool-failure-retry`, `thread.panel-system`, and
-  `thread.sources-panel` on 26.818. It reaches real Search → Fetch success,
+  `thread.sources-panel`. It reaches real Search → Fetch success,
   invalid-URL Fetch → Search → Fetch recovery, the 720×680 error card, and the
   300×189 Sources summary through pinned, floating, dismissed, and repinned
-  states. Browser/CDP and Electron repeat the flows; unmasked current-product
+  states. Browser/CDP and Electron repeat the flows; unmasked sampled-product
   regions pass at 2.1854% for success, 1.1649% for compact recovery, and
-  2.5926% for Sources under independent hard limits. A separate no-tool task
-  now promotes `thread.messages-markdown` on 26.818. It reaches heading,
+  2.5926% for Sources under independent hard limits. A separate previous
+  26.818 no-tool task promoted `thread.messages-markdown`. It reaches heading,
   strong text, inline code, blockquote, list, a narrow table, and TypeScript
   code at 1180×820 and 720×680. The sampled external URL is source-owned and
   leaves plain visible text instead of an inline anchor. Browser/CDP and
   Electron lock the 736/688×358 roots, full-width table, 73px code block with
-  word-wrap/Copy actions, four exact response actions, current typography, and
+  word-wrap/Copy actions, four exact response actions, sampled typography, and
   zero overflow; unmasked
   root comparisons pass at
   1.1682% and 1.1932% under 1.3% limits. The same capture exposed
   that the expanded Projects wrapper is
   content-dependent; the sanitized gate now derives its height from the live
   Recent chats group instead of freezing a private-data-dependent 119px value.
-  A fresh sidebar task now promotes current thread history, task actions, and
+  A previous 26.818 sidebar task promoted thread history, task actions, and
   ordinary active/completed/unread status. Project tasks and Recents share
   19×20 Pin/Archive controls with an 8px gap; the 20×20 status rail keeps the
   exact 16×16 spinner or centered 8×8 unread dot. Browser/CDP, Electron, and
   four privacy-safe tail comparisons pass between 0% and 3.1944%. The sampled
   eight-row Recents count remains content-dependent and is not frozen.
-  A second current sidebar probe now promotes the New local worktree entry,
+  A second previous 26.818 sidebar probe promoted the New local worktree entry,
   real create/loading/restored, controlled failure, failed-plus-unread
-  composition, and Retry recovery. It locks the current generic context
+  composition, and Retry recovery. It locks the sampled generic context
   labels, 264×91.125 two-action Environment menu, 30px worktree rows, exact
   branch/spinner/error/unread tracks, and action replacement. Browser/CDP,
   Electron, and three privacy-safe tail gates pass at 2.0833%, 0.7540%, and
   0.1786%.
-  A dedicated current New chat home slice now locks the actual Dark and Light
+  The previous 26.818 New chat home slice locks the sampled Dark and Light
   product preferences at 1180×820 and 720×680: persisted 322.90625px sidebar,
   exact 56px mark, four wide/two compact prompt cards, five exact SVG sources,
   prompt-to-Composer selection, project-dialog portal/focus return, and zero
@@ -99,12 +99,12 @@ exit gates; it does not replace the inventory.
   composition, promoted its exact New/Clear glyphs, and verified empty search,
   Escape focus return, clear, and original-project restoration in Browser/CDP,
   Electron, and a 0.9546% local-only listbox comparison.
-  The current Projects Index follow-up separately reaches the real
+  The previous Projects Index follow-up separately reached the real
   `26.818.41509` route and locks fourteen 70px rows, 512/64/128 wide columns,
   416/128 explicitly collapsed compact columns, sorting, empty search,
   expansion, and focus continuity. Browser/CDP and Electron acceptance retain
   the structural gate. The 0.2221% route and 3.7068% Create-region comparisons
-  remain explicitly scoped to the previous 26.810 build until current pixels
+  remain explicitly scoped to the previous 26.810 build until 26.820 pixels
   are recaptured.
   The previous approval follow-up reached one real outside-project command
   prompt, options menu, safe denial, proven no-execution state, and Composer
@@ -144,7 +144,7 @@ exit gates; it does not replace the inventory.
   close/reopen side-panel behavior.
   The previous account-menu follow-up added six exact icons and gated its six-item,
   one-avatar, zero-role-separator structure, 258.11×188.38 geometry, dismissal,
-  focus return, and owned pixels at 0.1979%. The current `26.818.41509`
+  focus return, and owned pixels at 0.1979%. The previous `26.818.41509`
   refresh now supersedes that layout with a Dark/Light × wide/compact matrix,
   322.90625px sidebar, 306.90625×188.375px menu, 28.5625px rows, zero compact
   overflow, and privacy-masked ratios from 0.3968% to 0.5458%. Sidebar actions and ordinary task
@@ -163,7 +163,7 @@ exit gates; it does not replace the inventory.
   notice. It separately proved that an editable Composer and model-only turn
   remained available, that restoring the directory did not clear the notice in
   the existing app session, and that the next app restart recovers it. The
-  independent current-sidebar replay, Browser/CDP, Electron, and a local-only
+  independent previous-build sidebar replay, Browser/CDP, Electron, and a local-only
   notice-region gate cover the same observed boundary without inventing a
   Retry or repair control.
 - A reproducible sanitized global-shell capture now selects the main Renderer
@@ -434,27 +434,29 @@ slot. It is split into:
 - `app.sidebar-status-indicators`: ordinary active, waiting, unread, and idle
   task presentation across project and recent rows;
 - `app.sidebar-worktree-status-indicators`: pending worktree queued, creating,
-  setting-up, failed, and restored presentation. The current 26.818 slice
+  setting-up, failed, and restored presentation. The previous 26.818 slice
   re-reached real create, controlled failure, failed-plus-unread composition,
   Retry recovery, and exact 30px trailing geometry through product CDP,
   Browser/CDP, Electron, and local-only pixels;
 - `app.sidebar-footer-account-settings`: account, settings, update/status, and
-  footer overflow behavior. The current account/footer contract is closed;
+  footer overflow behavior. The previous 26.818 account/footer contract is closed
+  for that build;
   full Settings routes remain owned by Stage 4.
 - `app.sidebar-help-menu`: current release-note grouping, support/setup actions,
   geometry, dismissal, and focus return.
 
-Current progress: current-build thread-history, hover actions, ordinary
+Previous-build progress: 26.818 thread history, hover actions, ordinary
 active/completed/unread/waiting/error presentation, worktree-specific
-create/failure/Retry status, and empty/loading/long-list collection states are
-now verified. The current empty state is tied to a live `No chats` project
-row; loading and the five-item `Show more` boundary are locked to current ASAR
-structure, then repeated through Browser/CDP, Electron, and reviewed pixels.
-The current New chat selection, project portal, Dark/Light, and 1180/720 matrix
-is now closed. The current footer/account menu matrix is also closed. The
-remaining Stage 1 work is broader route lifecycle feedback, global
-notification runtime evidence, and selection continuity beyond the New chat
-route rather than another sidebar-row variant.
+create/failure/Retry status, and empty/loading/long-list collection states were
+verified. Its empty state is tied to a live `No chats` project row; loading and
+the five-item `Show more` boundary are locked to that build's ASAR structure,
+then repeated through Browser/CDP, Electron, and reviewed pixels. The New chat
+selection, project portal, Dark/Light, 1180/720, and footer/account matrices are
+also previous-build evidence. The current 26.820 slice revalidates the global
+shell, primary navigation, project-group lifecycle, project-actions provider,
+Help menu, and Projects Index. Remaining Stage 1 work includes re-observing the
+other sidebar groups on 26.820 plus broader route lifecycle feedback, global
+notification runtime evidence, and selection continuity beyond New chat.
 
 The same workstream also covers shell gaps that otherwise distort every
 feature:
@@ -493,8 +495,8 @@ the shell remains usable without horizontal overflow at the compact gate.
 - Composer queue, attachments, modes, permissions, environment/worktree
   context, long input, disabled/submitting/Stop states, and recovery.
 
-The real current-build MCP success and invalid-URL failure/retry paths are now
-refreshed on `26.818.41509`, including the current public URL mention, 720px
+The previous-build MCP success and invalid-URL failure/retry paths were
+refreshed on `26.818.41509`, including the sampled public URL mention, 720px
 compact card, and Sources summary ownership lifecycle. The unavailable-
 integration fallback remains previous-build evidence: it observes GitHub
 integration unavailability followed by OpenAI Developer Docs Search → Fetch
@@ -504,28 +506,28 @@ Browser, MCP, command, approval, file Review, and subagent events under one
 public reducer and one Browser/Electron/pixel matrix. It is composition
 evidence, not a synthetic promotion of whole-thread current-product reachability.
 
-The core Markdown composition is now refreshed on `26.818.41509` with one
+The previous-build Markdown composition was refreshed on `26.818.41509` with one
 real no-tool response. The wide and compact replays independently lock heading,
-strong and inline-code semantics, blockquote/list spacing, the current
+strong and inline-code semantics, blockquote/list spacing, the sampled
 full-content-width narrow table, TypeScript code block and word-wrap toggle,
 and source-owned URL presentation. Streaming Markdown mutation, very wide
 table actions, and their
 error variants retain separately versioned evidence and remain open for fresh
 current-build reachability.
 
-The basic completed conversation core is now refreshed on `26.818.41509` with
+The previous-build completed conversation core was refreshed on `26.818.41509` with
 one fresh exact reply. Settled 1180×820 and 820×680 CDP/Electron evidence,
 12 exact thread primitives, Browser geometry, regional pixel comparisons, and
 a real Electron BrowserWindow cover the header, user/assistant turn, four
 assistant actions, all five Composer controls, responsive containment, and
-zero overflow. The unmasked 768×774 current product region differs by 0.4320%
+zero overflow. The unmasked 768×774 sampled product region differs by 0.4320%
 under a 0.5% hard limit. Streaming, approval,
 file, interruption, compaction, and long-thread rows initially retained their
 separately versioned evidence. The streaming row is now also refreshed on the
-same current build with one real 1180→720 running resize and natural
+same previous build with one real 1180→720 running resize and natural
 completion: reverse-origin follow, negative compact clipping, exact 16px Stop
 SVG in its 28px control, and Send recovery pass Browser/CDP plus independent
-  wide/compact regional pixels. Command denial is now current as well; file,
+  wide/compact regional pixels. Command denial is verified on that build as well; file,
   remaining approval kinds, interruption, compaction, and long-thread
   convergence remain the next Stage 2 work. The shared
 surface-token change affected 28 deterministic lifecycle baselines; each was
@@ -553,15 +555,15 @@ run-location transition, environment empty menu, seven-branch picker, and
 1180→720 responsive geometry now pass Browser/CDP, Electron, and external
 pixel gates. The historical 600×600 local-environment dialog remains an
 independent host capability rather than the current New worktree entry path.
-The current `26.818.41509` Projects Index follow-up now delivers the primary
+The previous `26.818.41509` Projects Index follow-up delivers the primary
 ready/expanded/sort/empty/compact route at both 1180×820 and explicitly
-collapsed 600×600, with current structural geometry and Browser/CDP evidence.
+collapsed 600×600, with sampled structural geometry and Browser/CDP evidence.
 Full Electron creation and distinct recent-chat routing remain implementation
 acceptance, while the ownership-masked product pixels remain scoped to 26.810
 until they are recaptured against the current build.
-The current follow-up adds the five-action `Work in` menu, treats Codex web as
+The previous follow-up adds the five-action `Work in` menu, treats Codex web as
 an external anchor rather than a synthetic execution environment, covers the
-New-worktree no-environment menu, and implements the current 768px unavailable
+New-worktree no-environment menu, and implements the sampled 768px unavailable
 Environments route. Browser/CDP, Electron, and three local-only product gates
 pass without creating an environment. Populated environment creation/editing,
 repair variants, and real Remote connection lifecycles remain in this phase.
@@ -570,7 +572,7 @@ The `26.818.41509` follow-up supersedes the worktree entry vocabulary with
 a 264×91.125 Environment menu containing only `Work without environment` and
 `Set up project`. Two isolated disposable repositories reach real success,
 controlled failure, Retry, and restored states. Browser/CDP, Electron, and
-three current-product tail comparisons now gate that sampled entry/repair
+three sampled-product tail comparisons now gate that entry/repair
 lifecycle. Projects-route loading/error/partial-error, populated environment
 editing, and Remote connections remain independent work.
 
@@ -733,13 +735,13 @@ without confusing package readiness with full product reconstruction.
    task-status follow-up separately reaches active and unread on
    `26.803.61601`, corrects task rows from the former 40px approximation to the
    current 30px structure, and gates trailing status geometry, color, action
-   replacement, and pixels. The current `26.818.41509` worktree follow-up then
+   replacement, and pixels. The previous `26.818.41509` worktree follow-up then
    reaches a real create, controlled failure, and Retry recovery in isolated
    disposable repositories; it gates the new entry vocabulary,
    queued/creating/setting-up/failed/restored semantics, the exact
    branch/error/spinner primitives, and owned pixels.
-3. **Tool recovery and mixed thread — current success/recovery refreshed**:
-   `26.818.41509` now covers a real Search → Fetch success, a real invalid-URL
+3. **Tool recovery and mixed thread — previous success/recovery evidence**:
+   `26.818.41509` covers a real Search → Fetch success, a real invalid-URL
    Fetch → Search → Fetch recovery, 720×680 compact geometry, and the pinned →
    floating → dismissed → repinned Sources summary, with Browser/CDP, Electron,
    and unmasked local-only pixel gates. The previous `26.803.41515` unavailable
