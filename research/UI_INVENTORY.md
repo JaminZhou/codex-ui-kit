@@ -45,10 +45,10 @@ observation from a previous build remains historical evidence.
 
 ## Current baseline
 
-- Codex Desktop `26.818.41509` (`6962`)
-- Package and scoped shell lifecycle sampled on 2026-08-23
+- Codex Desktop `26.820.60940` (`7119`)
+- Package and scoped shell lifecycle sampled on 2026-08-27
 - `app.asar` SHA-256:
-  `8eb91bd9efbf9a4dd04b9b0afdbfcb4e0bab5da18c1919ad74ca327c00c7e791`
+  `c964aebbf9a6a0f70799d01215c611d8ef6ee63f816b3d57beccddd47a811fd9`
 - Computer Use automation: blocked by the environment safety policy for
   `com.openai.codex`
 - Scoped CDP automation: available through a user-authorized second process;
@@ -62,7 +62,10 @@ observation from a previous build remains historical evidence.
   overlay without using private text. The exact `scrollHeight` remains
   content-dependent, so the contract locks the unique scroll owner and visible
   geometry rather than private task counts. It also revalidates the 320px Help
-  menu and the fourteen-row Projects Index.
+  menu and the content-dependent Projects Index. At the collapsed 600px gate,
+  the new one-pixel route inset produces a 559px content width and 415/128
+  columns; hiding the sidebar now also hides Back and Forward. Details are in
+  [`26.820.60940.md`](26.820.60940.md).
 - A dedicated New chat home sample now covers actual Dark and Light product
   preferences at 1180×820 and 720×680. It locks the persisted 322.90625px
   sidebar, 56px mark, four wide/two compact prompt cards, exact five SVG
@@ -76,12 +79,12 @@ observation from a previous build remains historical evidence.
   zero role separators, zero compact overflow, Escape dismissal, and trigger
   focus return. Privacy-masked menu-region comparisons pass between 0.3968%
   and 0.5458% under independent Dark 0.5% and Light 0.6% limits.
-- The project action menu moved from a Renderer DOM menu to the frozen
+- The project action menu remains on the frozen
   `electronBridge.showContextMenu` path. The independent replica now locks the
   current six-action/three-separator provider, 221×187 geometry, six exact
-  current SVG sources, conditional unread variant, focus lifecycle, and a
-  3.8449% unmasked native-region comparison. Details are recorded in
-  [`26.818.41509.md`](26.818.41509.md).
+  current SVG sources, conditional unread variant, and focus lifecycle. The
+  six sources were reverified unchanged on 26.820; the 3.8449% unmasked
+  native-region comparison remains 26.818 evidence.
 - A separate fixed-message task now revalidates the current completed
   conversation shell. It locks the 768px thread and 736×98 Composer at
   1180×820, compact containment at 820×680, 14/22px message typography, the
@@ -122,7 +125,7 @@ observation from a previous build remains historical evidence.
   previous-build regression evidence.
   They are not relabeled as current merely because the shell capture passes.
 
-Current inventory: 89 surface groups; 30 have current-build runtime evidence, 43 have previous-build-only runtime evidence, 16 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 28 groups and Electron verification covers 28.
+Current inventory: 89 surface groups; 11 have current-build runtime evidence, 62 have previous-build-only runtime evidence, 16 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 9 groups and Electron verification covers 9.
 Prior acceptance outside those 28 sampled current-build groups remains
 recorded as `partial_legacy` until current-build re-observation.
 

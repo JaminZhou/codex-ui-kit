@@ -12,13 +12,13 @@ const expectedItems = [
 ] as const;
 
 describe("current native project-menu assets", () => {
-  it("binds the narrow manifest to the installed 26.818 package", () => {
+  it("binds the narrow manifest to the installed 26.820 package", () => {
     expect(currentProjectMenuAssets.baseline).toEqual({
       appAsarSha256:
-        "8eb91bd9efbf9a4dd04b9b0afdbfcb4e0bab5da18c1919ad74ca327c00c7e791",
-      appVersion: "26.818.41509",
-      buildNumber: "6962",
-      capturedAt: "2026-08-23",
+        "c964aebbf9a6a0f70799d01215c611d8ef6ee63f816b3d57beccddd47a811fd9",
+      appVersion: "26.820.60940",
+      buildNumber: "7119",
+      capturedAt: "2026-08-27",
       source: "electronBridge.showContextMenu getNativeItems",
     });
   });

@@ -11,19 +11,19 @@ exit gates; it does not replace the inventory.
 ## Current position
 
 - The installed package and machine-readable evidence baseline are Codex
-  Desktop `26.818.41509` (`6962`). Unsampled earlier-build surfaces remain
+  Desktop `26.820.60940` (`7119`). Unsampled earlier-build surfaces remain
   previous-build regression evidence rather than current verification.
 - The inventory contains 89 surface groups: 59 P0, 21 P1, and 9 P2.
-- 30 groups have current-build runtime evidence, 43 have previous-build-only
+- 11 groups have current-build runtime evidence, 62 have previous-build-only
   runtime evidence, and 16 have not been sampled.
-- The scoped `26.818.41509` refresh revalidates the global shell, responsive
+- The scoped `26.820.60940` refresh revalidates the global shell, responsive
   Composer, primary navigation, project-group lifecycle, Help menu, route
-  restoration, and Projects Index. It also records the project action menu's
-  migration from a DOM menu to a six-action/three-separator Electron native
-  menu with a 221×187 Quartz window. Its independent replica now locks the
-  six observed current SVG sources, exact layout and focus lifecycle, the
-  conditional unread variant, and a 3.8449% unmasked native-region comparison.
-  A separate fixed-message task now promotes `thread.shell` and
+  restoration, and Projects Index. It locks the new collapsed-shell removal
+  of Back/Forward and the one-pixel 559px/415px compact Projects drift. The
+  project action menu remains a six-action/three-separator Electron native
+  menu with a 221×187 Quartz window, and all six fixed SVG sources are
+  unchanged. Its independent pixel comparison remains scoped to 26.818.
+  The previous fixed-message task promotes `thread.shell` and
   `thread.messages-basic` on 26.818: exact 1180×820 geometry, 820×680 compact
   containment, four response actions, all five Composer hit targets, and a
   no-mask 768×774 product comparison at 0.4320% changed pixels.
@@ -406,7 +406,7 @@ new parity claims:
 - re-observe the shell, left sidebar, conversation, Composer, Review, Terminal,
   Markdown, and MCP anchors;
 - retain previous-build results as regression fixtures while promoting only
-  surfaces re-observed on `26.818.41509`;
+  surfaces re-observed on `26.820.60940`;
 - update inventory evidence prefixes and the current build note.
 
 Exit: the current build has a reproducible CDP capture recipe and no

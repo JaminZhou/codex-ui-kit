@@ -6,9 +6,12 @@ not establish full conversation, workspace, application, or product coverage.
 
 The authoritative current-build inventory is:
 
-- [`26.818.41509.md`](26.818.41509.md) for the current package fingerprint,
-  reproducible global-shell baseline, native project-menu change, Help menu,
-  responsive Composer shell, route restoration, and Projects Index;
+- [`26.820.60940.md`](26.820.60940.md) for the current package fingerprint,
+  reproducible global-shell baseline, Help menu, responsive Composer shell,
+  route restoration, native project-menu provider, and Projects Index drift;
+- [`26.818.41509.md`](26.818.41509.md) for the previous current-home,
+  account-menu, conversation, command, MCP, Markdown, sidebar-state, worktree,
+  and product-pixel slices;
 - [`26.810.52044.md`](26.810.52044.md) for the previous broader sidebar/menu,
   115 scoped visual assets, Settings/Git navigation, command, MCP, worktree,
   approval, and Review observations;
@@ -45,12 +48,14 @@ The authoritative current-build inventory is:
 - The Electron playground validates the current package in a desktop
   BrowserWindow; it does not prove parity with unobserved product routes,
   panels, state transitions, or window types.
-- A scoped Codex Desktop `26.818.41509` (`6962`) probe revalidates the shell,
+- A scoped Codex Desktop `26.820.60940` (`7119`) probe revalidates the shell,
   responsive Composer, primary navigation, project-group lifecycle, Help menu,
-  route restoration, and Projects Index. The project action menu now uses the
-  frozen Electron native context-menu bridge and a 221×187 native window; its
-  independent replica locks the six current fixed icons, exact geometry,
-  conditional unread variant, and a 3.8449% unmasked native-region gate.
+  route restoration, and Projects Index. Explicitly hiding the 720px sidebar
+  now removes Back and Forward alongside the navigation, and the collapsed
+  Projects content is 559px with 415/128 columns. The project action menu still
+  uses the frozen Electron native context-menu bridge and a 221×187 native
+  window; all six fixed icon sources remain exact. Its 3.8449% unmasked
+  native-region gate remains explicitly scoped to 26.818 until recaptured.
 - A separate current sidebar task revalidates project-task and Recents history,
   their unified 19×20 Pin/Archive hover actions, and ordinary active,
   completed, and unread presentation. Browser/CDP and Electron lock the
