@@ -1311,6 +1311,21 @@ describe("current baseline capture contract", () => {
     expect(captureSource).toContain(
       "if (!accountMenuExpanded) await trigger.click();",
     );
+    expect(captureSource).toContain(
+      'const candidates = accountTriggerCandidates();',
+    );
+    expect(captureSource.indexOf("await candidates.count()")).toBeLessThan(
+      captureSource.indexOf("return candidates.nth(0)"),
+    );
+    expect(captureSource).not.toContain(
+      'page.locator(\'button[aria-haspopup="menu"]:has(img)\').first()',
+    );
+    expect(captureSource.indexOf("if (await radio.isChecked()) break;")).toBeLessThan(
+      captureSource.indexOf('if (theme !== "System")'),
+    );
+    expect(captureSource).toContain(
+      "theme preference was not selected.",
+    );
     expect(captureSource.indexOf("assertCurrentAccountMenuRecord(record)")).toBeLessThan(
       captureSource.indexOf("for (const [key, state] of Object.entries(states))"),
     );

@@ -246,8 +246,24 @@ try {
   await page.bringToFront();
   await page.evaluate(async () => document.fonts.ready);
 
-  const accountTrigger = () =>
-    page.locator('button[aria-haspopup="menu"]:has(img)').first();
+  const accountTriggerCandidates = () =>
+    page.locator('button[aria-haspopup="menu"]:has(img):visible');
+  const requireAccountTrigger = async () => {
+    await page.waitForFunction(() =>
+      [...document.querySelectorAll('button[aria-haspopup="menu"]:has(img)')].some(
+        (element) =>
+          element.checkVisibility({
+            checkOpacity: true,
+            checkVisibilityCSS: true,
+          }),
+      ),
+    );
+    const candidates = accountTriggerCandidates();
+    if ((await candidates.count()) !== 1) {
+      throw new Error("The current account trigger is ambiguous.");
+    }
+    return candidates.nth(0);
+  };
   const waitForStableLayout = async () => {
     let previous = null;
     let stableSamples = 0;
@@ -310,17 +326,14 @@ try {
       .first();
     await target.waitFor({ state: "visible" });
     await target.click();
-    await accountTrigger().waitFor({ state: "visible" });
+    await requireAccountTrigger();
     await waitForStableLayout();
   };
   const goAppearance = async () => {
     if ((await page.getByRole("radio", { name: "Light", exact: true }).count()) === 1) {
       return;
     }
-    const trigger = accountTrigger();
-    if ((await trigger.count()) !== 1) {
-      throw new Error("The current account trigger is ambiguous.");
-    }
+    const trigger = await requireAccountTrigger();
     const accountMenuExpanded =
       (await trigger.getAttribute("aria-expanded")) === "true";
     if (!accountMenuExpanded) await trigger.click();
@@ -343,6 +356,13 @@ try {
       throw new Error(`The ${theme} theme label is ambiguous.`);
     }
     await label.click();
+    for (let attempt = 0; attempt < 40; attempt += 1) {
+      if (await radio.isChecked()) break;
+      if (attempt === 39) {
+        throw new Error(`The ${theme} theme preference was not selected.`);
+      }
+      await page.waitForTimeout(100);
+    }
     if (theme !== "System") {
       await page.waitForFunction(
         (expected) =>
@@ -371,10 +391,7 @@ try {
       await setViewport(viewport);
       await goNewChat();
     }
-    const trigger = accountTrigger();
-    if ((await trigger.count()) !== 1) {
-      throw new Error("The current account trigger is ambiguous.");
-    }
+    const trigger = await requireAccountTrigger();
     await trigger.click();
     const menu = page.locator('[role="menu"]:visible').first();
     await menu.waitFor({ state: "visible" });
