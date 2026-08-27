@@ -35,14 +35,14 @@ describe("current baseline capture contract", () => {
     collapsed: { expandedCount: 0, focusOnToggle: true },
     compact: {
       header: {
-        gridTemplateColumns: "416px 128px",
-        rect: { height: 40, width: 560 },
+        gridTemplateColumns: "415px 128px",
+        rect: { height: 40, width: 559 },
       },
       horizontalOverflow: 0,
       navigationVisible: false,
       navigationWidth: null,
       routePath: "/projects",
-      rows: { count: 14, firstRect: { height: 70, width: 560 } },
+      rows: { count: 14, firstRect: { height: 70, width: 559 } },
       scrollOwners: [
         {
           clientHeight: 554,
@@ -131,6 +131,33 @@ describe("current baseline capture contract", () => {
           header: {
             ...observation.compact.header,
             gridTemplateColumns: "432px 112px",
+          },
+        },
+      }),
+    ).toThrow("compact route geometry");
+    expect(() =>
+      assertCurrentProjectsIndexObservation({
+        ...observation,
+        compact: {
+          ...observation.compact,
+          header: {
+            ...observation.compact.header,
+            rect: { ...observation.compact.header.rect, width: 560 },
+          },
+        },
+      }),
+    ).toThrow("compact route geometry");
+    expect(() =>
+      assertCurrentProjectsIndexObservation({
+        ...observation,
+        compact: {
+          ...observation.compact,
+          rows: {
+            ...observation.compact.rows,
+            firstRect: {
+              ...observation.compact.rows.firstRect,
+              width: 560,
+            },
           },
         },
       }),
@@ -368,6 +395,8 @@ describe("current baseline capture contract", () => {
           editorWidth: 664,
           mainWidth: 720,
         }).controls,
+        Back: [],
+        Forward: [],
         "Hide sidebar": [],
         "Show sidebar": [{}],
         "Start new voice chat": [{}],
@@ -397,28 +426,28 @@ describe("current baseline capture contract", () => {
     };
     const record = {
       baseline: {
-        appAsarBytes: 284_124_509,
+        appAsarBytes: 282_402_769,
         appAsarSha256:
-          "8eb91bd9efbf9a4dd04b9b0afdbfcb4e0bab5da18c1919ad74ca327c00c7e791",
-        appVersion: "26.818.41509",
-        buildNumber: "6962",
+          "c964aebbf9a6a0f70799d01215c611d8ef6ee63f816b3d57beccddd47a811fd9",
+        appVersion: "26.820.60940",
+        buildNumber: "7119",
         chromiumVersion: "151.0.7922.170",
       },
       captureKind: "renderer_emulation",
       runtimeBundleIdentity: {
         afterCapture: {
-          appAsarBytes: 284_124_509,
+          appAsarBytes: 282_402_769,
           appAsarSha256:
-            "8eb91bd9efbf9a4dd04b9b0afdbfcb4e0bab5da18c1919ad74ca327c00c7e791",
+            "c964aebbf9a6a0f70799d01215c611d8ef6ee63f816b3d57beccddd47a811fd9",
           changedAtMs: 1_786_150_111_000,
           checkedAtMs: 1_786_351_000_000,
           device: "16777231",
           inode: "346397970",
         },
         beforeCapture: {
-          appAsarBytes: 284_124_509,
+          appAsarBytes: 282_402_769,
           appAsarSha256:
-            "8eb91bd9efbf9a4dd04b9b0afdbfcb4e0bab5da18c1919ad74ca327c00c7e791",
+            "c964aebbf9a6a0f70799d01215c611d8ef6ee63f816b3d57beccddd47a811fd9",
           changedAtMs: 1_786_150_111_000,
           checkedAtMs: 1_786_350_900_000,
           device: "16777231",
@@ -726,7 +755,7 @@ describe("current baseline capture contract", () => {
         },
       }),
     ).not.toThrow();
-    expect(currentBaselineFingerprint.appVersion).toBe("26.818.41509");
+    expect(currentBaselineFingerprint.appVersion).toBe("26.820.60940");
     expect(currentBaselineViewports.compact.width).toBe(720);
     expect(() =>
       assertCurrentSidebarLifecycle({

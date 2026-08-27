@@ -10,11 +10,11 @@ export const currentBaselineViewports = Object.freeze({
 });
 
 export const currentBaselineFingerprint = Object.freeze({
-  appAsarBytes: 284_124_509,
+  appAsarBytes: 282_402_769,
   appAsarSha256:
-    "8eb91bd9efbf9a4dd04b9b0afdbfcb4e0bab5da18c1919ad74ca327c00c7e791",
-  appVersion: "26.818.41509",
-  buildNumber: "6962",
+    "c964aebbf9a6a0f70799d01215c611d8ef6ee63f816b3d57beccddd47a811fd9",
+  appVersion: "26.820.60940",
+  buildNumber: "7119",
   chromiumVersion: "151.0.7922.170",
 });
 
@@ -137,12 +137,12 @@ export function assertCurrentProjectsIndexObservation(observation) {
     compact?.viewport?.height !== 600 ||
     compact?.navigationVisible !== false ||
     compact?.navigationWidth !== null ||
-    !withinTolerance(compact?.header?.rect?.width, 560) ||
+    compact?.header?.rect?.width !== 559 ||
     !withinTolerance(compact?.header?.rect?.height, 40) ||
-    compact?.header?.gridTemplateColumns !== "416px 128px" ||
+    compact?.header?.gridTemplateColumns !== "415px 128px" ||
     !Number.isInteger(compact?.rows?.count) ||
     compact.rows.count !== wide.rows.count ||
-    !withinTolerance(compact?.rows?.firstRect?.width, 560) ||
+    compact?.rows?.firstRect?.width !== 559 ||
     !withinTolerance(compact?.rows?.firstRect?.height, 70) ||
     compact?.updatedDisplay !== "none" ||
     Math.abs(compact?.horizontalOverflow ?? Infinity) > 1 ||
@@ -640,8 +640,8 @@ export function assertCurrentBaselineRecord(record) {
     const navigationVisible = state !== "compactCollapsed";
     const newChatVisible = newChatStates.includes(state);
     return (
-      controlCount(state, "Back") !== 1 ||
-      controlCount(state, "Forward") !== 1 ||
+      controlCount(state, "Back") !== (navigationVisible ? 1 : 0) ||
+      controlCount(state, "Forward") !== (navigationVisible ? 1 : 0) ||
       controlCount(state, "Hide sidebar") !== (navigationVisible ? 1 : 0) ||
       controlCount(state, "Show sidebar") !== (navigationVisible ? 0 : 1) ||
       controlCount(state, "Add files and more") !== (newChatVisible ? 1 : 0) ||

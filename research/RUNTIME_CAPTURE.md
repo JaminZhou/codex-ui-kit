@@ -121,24 +121,33 @@ they are not labeled current runtime observation or external product-pixel
 parity. A future disposable real task can promote each path only after its
 trigger, exact target, cleanup, and non-sensitive capture boundary are safe.
 
-### Current `26.818.41509` global-shell baseline
+### Current `26.820.60940` global-shell baseline
 
-The current installed build is `26.818.41509` (`6962`) with Chromium
-`151.0.7922.170`, a 284124509-byte `app.asar`, and SHA-256
-`8eb91bd9efbf9a4dd04b9b0afdbfcb4e0bab5da18c1919ad74ca327c00c7e791`.
+The current installed build is `26.820.60940` (`7119`) with Chromium
+`151.0.7922.170`, a 282402769-byte `app.asar`, and SHA-256
+`c964aebbf9a6a0f70799d01215c611d8ef6ee63f816b3d57beccddd47a811fd9`.
 One isolated second process on loopback port `9881` re-runs the structural main
 Renderer selection, New chat at 1180/820/721/720 widths, sidebar lifecycle,
 Help menu, Pull requests round trip, and Projects Index route. The capture
 records no private labels or screenshots.
 
-The project action menu is no longer a Renderer `[role="menu"]`. Its 24×24
+The project action menu remains outside the Renderer `[role="menu"]`. Its 24×24
 trigger resolves through the live React owner to a frozen
 `electronBridge.showContextMenu` provider. The baseline records exact action
 IDs, message IDs, fixed labels, separators, icons, and selectable callbacks
-without invoking an action. A separate native observation moves the system
-pointer to the exact CDP trigger coordinate, observes one new ChatGPT-owned
-Quartz layer-101 window at 221×187, and closes it with system Escape. Raw pixels
-remain local-only. See [`26.818.41509.md`](26.818.41509.md).
+without invoking an action. A separate native observation confirms the
+ChatGPT-owned Quartz layer-101 window remains 221×187. The six decoded fixed
+SVG sources match the narrow public manifest. The 720px explicitly collapsed
+shell now omits Back and Forward, while the collapsed 600px Projects content
+is 559px with 415/128 columns. Raw pixels remain local-only. See
+[`26.820.60940.md`](26.820.60940.md).
+
+### Previous `26.818.41509` global-shell baseline
+
+The prior build note retains the current-home, account-menu, conversation,
+command, MCP, Markdown, sidebar-state, worktree, and product-pixel evidence
+that has not yet been re-observed on 26.820. See
+[`26.818.41509.md`](26.818.41509.md).
 
 ### Previous `26.810.52044` global-shell baseline
 
@@ -295,9 +304,10 @@ profile and is atomically opened with no symlink following; capture refuses to
 overwrite an existing path. The record must match the promoted app version,
 build number, app.asar size/SHA-256, and Chromium version exactly. All five
 primary routes must appear once inside `nav` whenever navigation is visible.
-The fixed control matrix requires Back/Forward in every state, mutually
-exclusive Hide/Show sidebar controls, Composer controls on New chat, and no
-Composer controls on Pull requests.
+The fixed control matrix requires Back/Forward whenever navigation is visible
+and requires both controls to be absent in the explicitly collapsed state. It
+also requires mutually exclusive Hide/Show sidebar controls, Composer controls
+on New chat, and no Composer controls on Pull requests.
 
 The previous `26.803.41515` runtime-identity repeat used exact main PID `32692`, loopback port `9785`,
 and one fresh profile. Its owner started at `1786326246000` ms; both ASAR reads
@@ -376,7 +386,7 @@ links, exact geometry, color, paths, and action replacement. Three local-only
 2.9762% under 6%; failed-plus-unread and restored pass at 0% under 6.5% and
 2.5% respectively.
 
-### Current `26.818.41509` worktree entry and status lifecycle
+### Previous `26.818.41509` worktree entry and status lifecycle
 
 The refresh uses two new disposable single-commit repositories, isolated
 Chromium profiles, and loopback-only ports 9881 and 9882. The primary Codex
@@ -408,7 +418,7 @@ profile-owned handlers, and confirms ports 9881/9882 and both profile arguments
 are absent while primary PID 43055 still owns 9874. The full probe root moves
 recoverably to `codex-ui-kit-worktree-26-818-20260824` in Trash.
 
-### Current `26.818.41509` sidebar collection edge states
+### Previous `26.818.41509` sidebar collection edge states
 
 The primary Renderer on port 9874 provides the current empty-state anchor
 without a second app process: the visible `codex-app-server-client` project

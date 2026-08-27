@@ -6,9 +6,12 @@ not establish full conversation, workspace, application, or product coverage.
 
 The authoritative current-build inventory is:
 
-- [`26.818.41509.md`](26.818.41509.md) for the current package fingerprint,
-  reproducible global-shell baseline, native project-menu change, Help menu,
-  responsive Composer shell, route restoration, and Projects Index;
+- [`26.820.60940.md`](26.820.60940.md) for the current package fingerprint,
+  reproducible global-shell baseline, Help menu, responsive Composer shell,
+  route restoration, native project-menu provider, and Projects Index drift;
+- [`26.818.41509.md`](26.818.41509.md) for the previous New chat home,
+  account-menu, conversation, command, MCP, Markdown, sidebar-state, worktree,
+  and product-pixel slices;
 - [`26.810.52044.md`](26.810.52044.md) for the previous broader sidebar/menu,
   115 scoped visual assets, Settings/Git navigation, command, MCP, worktree,
   approval, and Review observations;
@@ -45,25 +48,27 @@ The authoritative current-build inventory is:
 - The Electron playground validates the current package in a desktop
   BrowserWindow; it does not prove parity with unobserved product routes,
   panels, state transitions, or window types.
-- A scoped Codex Desktop `26.818.41509` (`6962`) probe revalidates the shell,
+- A scoped Codex Desktop `26.820.60940` (`7119`) probe revalidates the shell,
   responsive Composer, primary navigation, project-group lifecycle, Help menu,
-  route restoration, and Projects Index. The project action menu now uses the
-  frozen Electron native context-menu bridge and a 221×187 native window; its
-  independent replica locks the six current fixed icons, exact geometry,
-  conditional unread variant, and a 3.8449% unmasked native-region gate.
-- A separate current sidebar task revalidates project-task and Recents history,
+  route restoration, and Projects Index. Explicitly hiding the 720px sidebar
+  now removes Back and Forward alongside the navigation, and the collapsed
+  Projects content is 559px with 415/128 columns. The project action menu still
+  uses the frozen Electron native context-menu bridge and a 221×187 native
+  window; all six fixed icon sources remain exact. Its 3.8449% unmasked
+  native-region gate remains explicitly scoped to 26.818 until recaptured.
+- A separate previous 26.818 sidebar task revalidated project-task and Recents history,
   their unified 19×20 Pin/Archive hover actions, and ordinary active,
   completed, and unread presentation. Browser/CDP and Electron lock the
   geometry and replacement behavior; local-only 72×30 action and 28×30 status
   tails pass between 0% and 3.1944%. Content-dependent Recents count is not a
-  parity constant. The follow-up now locks current ordinary `Needs input` and
+  parity constant. The follow-up locks the sampled ordinary `Needs input` and
   error rows plus `No chats`, the exact one-heading/four-row loading skeleton,
   and the five-row `Show more` long-list boundary. Browser/CDP and Electron
   repeat expansion/focus/overflow; a privacy-safe 140×29 live empty crop
   differs by 1.8227%. A second
-  current-build probe now reaches real New local worktree success, controlled
+  previous-build probe reached real New local worktree success, controlled
   failure, failed-plus-unread composition, Retry, and restored rows. It locks
-  the current entry labels, 264×91.125 Environment menu, 14px branch marker,
+  that build's entry labels, 264×91.125 Environment menu, 14px branch marker,
   20px loading rail, exact status primitives, and action replacement;
   privacy-safe loading/error/restored tails pass at 2.0833%, 0.7540%, and
   0.1786%.
@@ -87,7 +92,7 @@ The authoritative current-build inventory is:
   local-only pixels. A new `26.810.52044` disposable-repository probe supersedes
   the prior worktree anchor with real create, controlled failure, Retry
   recovery, and restored rows. It locks all five worktree phases and the
-  current failed-plus-unread three-track composition: 14×14 branch marker,
+  sampled failed-plus-unread three-track composition: 14×14 branch marker,
   16×16 red error, 8×8 blue unread dot, and exact 8/36/67px rail/branch
   insets. Browser/CDP, Electron, and owned local-only row pixels gate the same
   26.810 boundary. A later real-worktree probe proves project/task persistence
@@ -99,7 +104,7 @@ The authoritative current-build inventory is:
   the session-latched warning only after another app restart. Browser/CDP,
   Electron, and a 3.2572% local-only notice crop gate that observed boundary.
   Broader unsampled inventory still keeps global pixel parity ineligible.
-- The current Review follow-up reaches one real added/modified/deleted
+- The previous 26.810 Review follow-up reached one real added/modified/deleted
   three-file card, the six-scope Review workspace at 1180×820 and 720×680, and
   one real Undo failure dialog. Seventeen exact Review SVGs, computed geometry,
   Browser/CDP interactions, full Electron acceptance, an integrated reviewed
@@ -107,7 +112,7 @@ The authoritative current-build inventory is:
   build for the sampled file-card/side-panel/editor/multi-file family. The
   captured Git apply error remains setup-specific evidence; successful Undo,
   binary/conflict product states, and broader PR review variants remain open.
-- The current command follow-up reaches bounded success, exact `exit 7`, Stop,
+- The previous 26.810 command follow-up reached bounded success, exact `exit 7`, Stop,
   persistent stopped-command settlement, and same-thread recovery on
   `26.810.52044`.
   It adds the exact three-path terminal glyph; matches the 13px/19.5px/445
@@ -118,7 +123,7 @@ The authoritative current-build inventory is:
   app passes 198-frame CDP and real Electron interactions, and the four new
   local-only failure/stopped command and Composer regions pass between
   2.2101% and 4.2564%.
-- The same installed fingerprint now owns the machine-readable baseline. A
+- That installed fingerprint owned the machine-readable baseline at the time. A
   sanitized capture selects the main `app://-/index.html` Renderer by URL,
   area, shell landmarks, and visible-control density; it excludes the avatar
   overlay and stores no private text or screenshot. It records the 274.11px
@@ -129,7 +134,7 @@ The authoritative current-build inventory is:
   Browser/CDP, Electron, and owned regional-pixel gates promote only those
   sampled shell groups. The capture is Renderer emulation, not native-window
   resize evidence.
-- The current sidebar lifecycle follow-up records six project groups, 30px
+- The previous-build sidebar lifecycle follow-up records six project groups, 30px
   project and task rows, 2px/8px child-list padding, 1px separators,
   pointer/Enter/Space expansion, the conditional six-/seven-item project menu,
   the eight-item Help menu, and explicit 720px pinning. Twelve
@@ -137,10 +142,10 @@ The authoritative current-build inventory is:
   Electron, and four local-only comparisons pass at 1.54%, 0.13%, 0.30%, and
   3.12%; the references and raw product records remain untracked. The
   `26.803.61601` refresh repeats the structural lifecycle and adds a same-state
-  dark New chat composition. Its current-product top/footer/main regions pass
+  dark New chat composition. Its sampled-product top/footer/main regions pass
   at 3.1387%, 0.4126%, and 0.3146%, while evidence not re-reached on this build
   retains its previous build prefix.
-- A second current-build capture proves a persisted 322.91px sidebar within
+- A second previous-build capture proves a persisted 322.91px sidebar within
   the wide 240–520px resize contract and the stricter 240–368px compact-pinned
   evidence range, adds the five-action Work in menu, separates
   the external Codex web anchor from local execution state, and reaches the
@@ -148,17 +153,17 @@ The authoritative current-build inventory is:
   Ten more exact primitives raise the scoped manifest to 53. Browser/CDP,
   Electron, and three local-only product comparisons pass without creating an
   environment; populated environment editing/repair and Remote connections
-  remain open. The current `26.818.41509` refresh supersedes the entry wording
+  remain open. The previous `26.818.41509` refresh supersedes the entry wording
   with `New local worktree`, disabled `Cloud`, generic accessible context
   labels, and a 264×91.125 two-action Environment menu. Two disposable
   repositories additionally prove success, controlled failure, Retry, and
   restored states in the real product; Browser/CDP, Electron, and three
   privacy-safe tail gates repeat that sampled lifecycle.
-- A later current-build Settings capture promotes 24 exact Back/Search/item
+- A later previous-build Settings capture promotes 24 exact Back/Search/item
   icons and reaches the full-page 322.91px navigation plus the 768px Git
   preferences page. The independent public shell and Git components pass
   Browser/CDP, Electron, reviewed wide/720 baselines, and local-only
-  current-product comparisons at 2.4214% and 3.0210%. At that slice Hooks and
+  sampled-product comparisons at 2.4214% and 3.0210%. At that slice Hooks and
   all other Settings pages remained separate, and the scoped asset manifest
   reached 77 without closing the broader P1 denominator.
 - The next read-only capture splits Appearance from General and reaches its

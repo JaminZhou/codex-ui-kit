@@ -1231,12 +1231,36 @@ try {
   );
   sidebarLifecycle.spaceExpanded = await inspectProjectExpansion(projectRow);
 
-  await projectRow.hover();
-  const projectMenuTrigger = projectRow
-    .locator('button[aria-haspopup="menu"]')
-    .first();
-  sidebarLifecycle.projectMenu =
-    await inspectNativeProjectMenu(projectMenuTrigger);
+  const projectRows = page.locator(
+    'nav div[role="button"][aria-expanded]:not([aria-haspopup])',
+  );
+  let projectMenuObservation = null;
+  for (let index = 0; index < (await projectRows.count()); index += 1) {
+    const candidateRow = projectRows.nth(index);
+    await candidateRow.hover();
+    const candidateTrigger = candidateRow
+      .locator('button[aria-haspopup="menu"]')
+      .first();
+    if ((await candidateTrigger.count()) !== 1) continue;
+    const candidate = await inspectNativeProjectMenu(candidateTrigger);
+    const ids = candidate.items.map((item) => item.id);
+    if (
+      ids.includes("reveal-project-folder") &&
+      !ids.includes("mark-project-threads-read")
+    ) {
+      projectMenuObservation = candidate;
+      break;
+    }
+    if (ids.includes("reveal-project-folder")) {
+      projectMenuObservation ??= candidate;
+    }
+  }
+  if (!projectMenuObservation) {
+    throw new Error(
+      "A representative current project menu with Reveal in Finder was not available.",
+    );
+  }
+  sidebarLifecycle.projectMenu = projectMenuObservation;
 
   const helpMenuTrigger = page
     .locator('button[aria-label="Open help menu"]:visible')
