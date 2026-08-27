@@ -768,12 +768,15 @@ locks 14px/21px type, 4px 32px padding, 29px height, and 50% description
 opacity. Current ASAR structure supplies the transient one-heading/four-row
 loading skeleton and the five-item `Show more` boundary.
 
-Ordinary waiting now renders the current `Needs input` pill rather than an
-unread dot, and ordinary error remains an independent 16px glyph. Browser/CDP
-and Electron gate five-to-twelve expansion, `Show less`, focus retention, and
-real sidebar overflow. Four reviewed frames cover the lifecycle; an optional
-privacy-safe 140×29 live-product empty crop passes at 1.8227% and stays
-untracked.
+Ordinary error remains an independent 16px glyph, while the older
+`Needs input` pill is retained only as 26.818 evidence. The 26.820 refresh
+reaches a real waiting-on-approval project task and maps semantic `waiting` to
+the shared 16×16 spinner. It also replaces reversible expansion with the
+current one-way five-to-twelve `Show more` replay: the control is a 24px pill
+inside a 32px list item, has no `aria-expanded`, disappears after expansion,
+and never exposes `Show less`. Optional privacy-safe 28×30 waiting and 140×32
+Show-more product crops pass at 2.7381% and 3.8393% and stay untracked; the
+older 140×29 empty crop remains 26.818 evidence at 1.8227%.
 
 ## Current native project-menu slice
 

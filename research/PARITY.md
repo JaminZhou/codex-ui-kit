@@ -70,11 +70,14 @@ The authoritative current-build inventory is:
   completed, and unread presentation. Browser/CDP and Electron lock the
   geometry and replacement behavior; local-only 72×30 action and 28×30 status
   tails pass between 0% and 3.1944%. Content-dependent Recents count is not a
-  parity constant. The follow-up locks the sampled ordinary `Needs input` and
-  error rows plus `No chats`, the exact one-heading/four-row loading skeleton,
-  and the five-row `Show more` long-list boundary. Browser/CDP and Electron
-  repeat expansion/focus/overflow; a privacy-safe 140×29 live empty crop
-  differs by 1.8227%. A second
+  parity constant. The older follow-up locks its sampled ordinary `Needs
+  input` and error rows plus `No chats` and the exact one-heading/four-row
+  loading skeleton; a privacy-safe 140×29 live empty crop differs by 1.8227%.
+  The current 26.820 recapture supersedes waiting and long-list behavior: a
+  real waiting-on-approval project task keeps the shared 16×16 spinner, while
+  a five-row `Show more` control reveals all current rows and disappears with
+  no `Show less`. Browser/CDP and Electron repeat the one-way reveal; local
+  waiting/Show-more regions pass at 2.7381% and 3.8393%. A second
   previous-build probe reached real New local worktree success, controlled
   failure, failed-plus-unread composition, Retry, and restored rows. It locks
   that build's entry labels, 264×91.125 Environment menu, 14px branch marker,

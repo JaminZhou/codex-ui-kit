@@ -4046,12 +4046,12 @@ describe("application sidebar", () => {
       ).toBeTruthy();
     }
     const waiting = screen.getByRole("status", { name: "waiting" });
-    expect(waiting.getAttribute("data-visual-status")).toBe("waiting");
+    expect(waiting.getAttribute("data-visual-status")).toBe("loading");
     expect(
       waiting.querySelector(
-        ".codex-ui-app-sidebar__item-status-pill",
-      )?.textContent,
-    ).toBe("Needs input");
+        ".codex-ui-app-sidebar__item-status-spinner svg",
+      ),
+    ).toBeTruthy();
     const unread = screen.getByRole("status", { name: "unread" });
     expect(unread.getAttribute("data-visual-status")).toBe("attention");
     expect(
@@ -4102,18 +4102,17 @@ describe("application sidebar", () => {
         <AppSidebarItem>Third chat</AppSidebarItem>
       </AppSidebarCollection>,
     );
-    expect(screen.getAllByRole("listitem")).toHaveLength(2);
+    expect(screen.getAllByRole("listitem")).toHaveLength(3);
     expect(
-      screen.getByRole("button", { name: "Show more" }).getAttribute(
+      screen.getByRole("button", { name: "Show more" }).hasAttribute(
         "aria-expanded",
       ),
-    ).toBe("false");
+    ).toBe(false);
     fireEvent.click(screen.getByRole("button", { name: "Show more" }));
     expect(screen.getAllByRole("listitem")).toHaveLength(3);
     expect(onExpandedChange).toHaveBeenCalledWith(true);
-    fireEvent.click(screen.getByRole("button", { name: "Show less" }));
-    expect(screen.getAllByRole("listitem")).toHaveLength(2);
-    expect(onExpandedChange).toHaveBeenLastCalledWith(false);
+    expect(screen.queryByRole("button", { name: "Show more" })).toBeNull();
+    expect(screen.queryByRole("button", { name: "Show less" })).toBeNull();
   });
 
   it("keeps pending worktree phases distinct while sharing current sidebar visuals", () => {

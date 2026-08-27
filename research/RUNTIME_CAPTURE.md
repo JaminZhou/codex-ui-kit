@@ -427,15 +427,21 @@ height, `4px 32px` padding, and 0.5 opacity. A privacy-safe 140×29 crop is kept
 outside version control and passes the independent empty-state foreground gate
 at 1.8227%.
 
-Current ASAR structure supplies the otherwise transient loading and pagination
-semantics: one 18%-wide 12px heading shimmer, four deterministic 12px row
-shimmers, a five-item nested collection limit, and `Show more`. Browser/CDP
-and Electron lock loading accessibility, empty/error semantics, five-to-twelve
-keyboard expansion, focus retention, `Show less`, and real navigation
-overflow. The status lifecycle also separates the current `Needs input` pill
-from unread attention and adds an ordinary 16×16 error row. The four reviewed
-pixel frames are independent replay baselines; only the narrow empty crop is a
-live-product pixel reference.
+Current ASAR structure supplies the otherwise transient loading semantics: one
+18%-wide 12px heading shimmer and four deterministic 12px row shimmers. The
+older 26.818 lifecycle also separates its `Needs input` pill from unread
+attention and adds an ordinary 16×16 error row. Those error/loading claims and
+the 29px live empty crop remain explicitly tied to 26.818.
+
+The 26.820 edge-state recapture uses a disposable local project task blocked
+on a real `Deny`/`Allow once` approval and proves that the off-route row now
+keeps the ordinary 16×16 spinner instead of a text pill. The same isolated
+profile exposes a live five-row project boundary. `Show more` sits in the same
+`role=list` as a 32px `listitem`, has no `aria-expanded`, reveals all 11
+content-dependent rows, removes itself, and never exposes `Show less`.
+Browser/CDP and Electron repeat that one-way behavior with twelve replay rows.
+Privacy-safe 28×30 and 140×32 product crops pass at 2.7381% and 3.8393%; raw
+titles, thread IDs, profiles, and full screenshots remain local-only.
 
 ### Previous `26.803.61601` worktree persistence and directory recovery
 

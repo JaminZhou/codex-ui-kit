@@ -15,6 +15,8 @@ const port = Number(process.env.CODEX_CURRENT_SIDEBAR_CDP_PORT);
 const profilePath = process.env.CODEX_CURRENT_SIDEBAR_PROFILE;
 const requestedOutputDirectory =
   process.env.CODEX_CURRENT_SIDEBAR_OUTPUT_DIR;
+const waitingTitleSha256 =
+  process.env.CODEX_CURRENT_SIDEBAR_WAITING_TITLE_SHA256;
 const allowCapture =
   process.env.CODEX_CURRENT_SIDEBAR_ALLOW_CAPTURE === "1";
 const appBundle = "/Applications/ChatGPT.app";
@@ -30,9 +32,14 @@ if (!profilePath?.startsWith("/") || /\s/.test(profilePath)) {
 if (!requestedOutputDirectory?.startsWith("/")) {
   throw new Error("Set an absolute sidebar-row output directory.");
 }
+if (!/^[a-f0-9]{64}$/.test(waitingTitleSha256 ?? "")) {
+  throw new Error(
+    "Set the SHA-256 of one disposable waiting-approval task title.",
+  );
+}
 if (!allowCapture) {
   throw new Error(
-    "Set CODEX_CURRENT_SIDEBAR_ALLOW_CAPTURE=1 to authorize fixed route, hover, and screenshot sampling in the isolated app.",
+    "Set CODEX_CURRENT_SIDEBAR_ALLOW_CAPTURE=1 to authorize fixed route, hover, collection expansion, and screenshot sampling in the isolated app.",
   );
 }
 
@@ -348,7 +355,7 @@ try {
       ).length >= 4,
   );
 
-  const rowKinds = await rows.evaluateAll((elements) =>
+  const rawRowKinds = await rows.evaluateAll((elements) =>
     elements.map((element, index) => {
       const bounds = element.getBoundingClientRect();
       const unreadDot = [...element.querySelectorAll("span")].find((span) => {
@@ -376,23 +383,45 @@ try {
         selected:
           element.getAttribute("data-app-action-sidebar-thread-selected") ===
           "true",
-        titleLength: (
+        title: (
           element.querySelector("[data-thread-title]")?.textContent || ""
-        ).trim().length,
+        ).trim(),
         unread: Boolean(unreadDot),
         height: Math.round(bounds.height * 1_000) / 1_000,
         width: Math.round(bounds.width * 1_000) / 1_000,
       };
     }),
   );
-  const isOrdinaryRow = (row) => row.kind !== "worktree";
-  const activeIndex = rowKinds.find(
-    (row) => isOrdinaryRow(row) && row.active,
+  const waitingIndex = rawRowKinds.find(
+    (row) =>
+      row.kind !== "worktree" &&
+      row.project &&
+      row.active &&
+      !row.selected &&
+      createHash("sha256").update(row.title).digest("hex") ===
+        waitingTitleSha256,
   )?.index;
+  const rowKinds = rawRowKinds.map(({ title, ...row }) => ({
+    ...row,
+    titleLength: title.length,
+  }));
+  const isOrdinaryRow = (row) => row.kind !== "worktree";
+  const independentActiveIndex = rowKinds.find(
+    (row) =>
+      isOrdinaryRow(row) && row.active && row.index !== waitingIndex,
+  )?.index;
+  const activeIndex = independentActiveIndex ?? waitingIndex;
   const unreadIndex = rowKinds.find(
     (row) => isOrdinaryRow(row) && row.unread,
   )?.index;
   const projectActionIndex = rowKinds.find(
+    (row) =>
+      isOrdinaryRow(row) &&
+      row.project &&
+      row.active &&
+      !row.pinned &&
+      row.index !== waitingIndex,
+  )?.index ?? rowKinds.find(
     (row) =>
       isOrdinaryRow(row) && row.project && row.active && !row.pinned,
   )?.index;
@@ -406,15 +435,17 @@ try {
   )?.index;
   if (
     !Number.isInteger(activeIndex) ||
+    !Number.isInteger(waitingIndex) ||
     !Number.isInteger(unreadIndex) ||
     !Number.isInteger(projectActionIndex) ||
     !Number.isInteger(recentsActionIndex)
   ) {
     throw new Error(
-      `Prime the isolated sidebar with an active project-task, an unread row, and an idle Recents row before capture: ${JSON.stringify({
+      `Prime the isolated sidebar with a waiting-approval project task or an independent active task, an unread row, and an idle Recents row before capture: ${JSON.stringify({
         active: rowKinds.filter(
           (row) => isOrdinaryRow(row) && row.active,
         ).length,
+        waitingApproval: Number.isInteger(waitingIndex) ? 1 : 0,
         projectActive: rowKinds.filter(
           (row) =>
             isOrdinaryRow(row) && row.project && row.active && !row.pinned,
@@ -649,10 +680,30 @@ try {
     };
   };
 
-  const activeRow = rows.nth(activeIndex);
-  const unreadRow = rows.nth(unreadIndex);
-  const projectActionRow = rows.nth(projectActionIndex);
-  const recentsActionRow = rows.nth(recentsActionIndex);
+  const [
+    activeRow,
+    waitingRow,
+    unreadRow,
+    projectActionRow,
+    recentsActionRow,
+  ] = await Promise.all(
+    [
+      activeIndex,
+      waitingIndex,
+      unreadIndex,
+      projectActionIndex,
+      recentsActionIndex,
+    ].map((index) => rows.nth(index).elementHandle()),
+  );
+  if (
+    !activeRow ||
+    !waitingRow ||
+    !unreadRow ||
+    !projectActionRow ||
+    !recentsActionRow
+  ) {
+    throw new Error("A fixed sidebar-row handle disappeared before capture.");
+  }
   const assertOrdinaryActiveRow = async (
     row,
     { requireProject = false, subject },
@@ -681,6 +732,11 @@ try {
   };
   const assertActiveStatusVisible = () =>
     assertOrdinaryActiveRow(activeRow, { subject: "status" });
+  const assertWaitingStatusVisible = () =>
+    assertOrdinaryActiveRow(waitingRow, {
+      requireProject: true,
+      subject: "waiting approval",
+    });
   const assertProjectActionActive = () =>
     assertOrdinaryActiveRow(projectActionRow, {
       requireProject: true,
@@ -747,7 +803,17 @@ try {
     }
   };
   const statuses = {
-    active: await inspectActive(activeRow),
+    active: {
+      ...(await inspectActive(activeRow)),
+      sourceStatus:
+        activeIndex === waitingIndex ? "waitingOnApproval" : "running",
+    },
+    waiting: {
+      ...(await inspectActive(waitingRow)),
+      sourceStatus: "waitingOnApproval",
+      titleLength: rawRowKinds[waitingIndex].title.length,
+      titleSha256: waitingTitleSha256,
+    },
     unread: await inspectUnread(unreadRow),
   };
   await assertActiveStatusVisible();
@@ -757,6 +823,13 @@ try {
     28,
   );
   await assertActiveStatusVisible();
+  await assertWaitingStatusVisible();
+  const waitingStatusScreenshot = await screenshotRegion(
+    waitingRow,
+    "waiting-status.png",
+    28,
+  );
+  await assertWaitingStatusVisible();
   await assertUnreadStatusVisible();
   const unreadStatusScreenshot = await screenshotRegion(
     unreadRow,
@@ -767,6 +840,7 @@ try {
   const screenshots = {
     activeStatus: activeStatusScreenshot,
     unreadStatus: unreadStatusScreenshot,
+    waitingStatus: waitingStatusScreenshot,
   };
   await assertProjectActionActive();
   const projectActions = await inspectActions(projectActionRow);
@@ -776,8 +850,203 @@ try {
   const recentsActions = await inspectActions(recentsActionRow);
   await page.mouse.move(1_000, 400);
   await assertRecentsActionIdle();
+
+  const inspectCollection = async () =>
+    page.evaluate(() => {
+      const visible = (element) =>
+        element instanceof Element &&
+        element.checkVisibility({
+          checkOpacity: true,
+          checkVisibilityCSS: true,
+        }) &&
+        element.getBoundingClientRect().width > 0 &&
+        element.getBoundingClientRect().height > 0;
+      const navigation = [...document.querySelectorAll("nav")].find(visible);
+      if (!navigation) return null;
+      const showMoreButtons = [...navigation.querySelectorAll("button")].filter(
+        (button) =>
+          visible(button) && button.textContent?.trim() === "Show more",
+      );
+      const showLessButtons = [...navigation.querySelectorAll("button")].filter(
+        (button) =>
+          visible(button) && button.textContent?.trim() === "Show less",
+      );
+      const button = showMoreButtons[0];
+      const item = button?.closest('[role="listitem"]');
+      const list = item?.parentElement;
+      const projectList = list?.closest(
+        "[data-app-action-sidebar-project-list-id]",
+      );
+      if (!button || !item || !list || !projectList) {
+        return {
+          showLessCount: showLessButtons.length,
+          showMoreCount: showMoreButtons.length,
+        };
+      }
+      const buttonBounds = button.getBoundingClientRect();
+      const itemBounds = item.getBoundingClientRect();
+      const style = getComputedStyle(button);
+      return {
+        buttonBounds: buttonBounds.toJSON(),
+        buttonStyle: {
+          backgroundColor: style.backgroundColor,
+          borderRadius: style.borderRadius,
+          color: style.color,
+          fontFamily: style.fontFamily,
+          fontSize: style.fontSize,
+          fontWeight: style.fontWeight,
+          lineHeight: style.lineHeight,
+          padding: style.padding,
+          textAlign: style.textAlign,
+        },
+        itemBounds: itemBounds.toJSON(),
+        itemRole: item.getAttribute("role"),
+        listRole: list.getAttribute("role"),
+        rowCount: projectList.querySelectorAll(
+          "[data-app-action-sidebar-thread-row]",
+        ).length,
+        showLessCount: showLessButtons.length,
+        showMoreCount: showMoreButtons.length,
+        toggleAttributes: {
+          ariaControls: button.getAttribute("aria-controls"),
+          ariaExpanded: button.getAttribute("aria-expanded"),
+          role: button.getAttribute("role"),
+          type: button.getAttribute("type"),
+        },
+      };
+    });
+  const collectionToggle = page
+    .locator("nav:visible button")
+    .filter({ hasText: /^Show more$/ });
+  if ((await collectionToggle.count()) !== 1) {
+    throw new Error("The current Show more control is ambiguous.");
+  }
+  await collectionToggle.scrollIntoViewIfNeeded();
+  await page.waitForTimeout(50);
+  const collectionBeforeRaw = await inspectCollection();
+  if (
+    !collectionBeforeRaw?.buttonBounds ||
+    collectionBeforeRaw.showMoreCount !== 1 ||
+    collectionBeforeRaw.showLessCount !== 0 ||
+    collectionBeforeRaw.rowCount !== 5
+  ) {
+    throw new Error(
+      `The current project collection is not at the five-row Show more boundary: ${JSON.stringify(collectionBeforeRaw)}`,
+    );
+  }
+  const collectionItemBox = {
+    height: round(collectionBeforeRaw.itemBounds.height),
+    width: round(collectionBeforeRaw.itemBounds.width),
+    x: round(collectionBeforeRaw.itemBounds.x),
+    y: round(collectionBeforeRaw.itemBounds.y),
+  };
+  const showMorePath = join(outputDirectory, "show-more.png");
+  await page.screenshot({
+    clip: {
+      height: 32,
+      width: 140,
+      x: Math.round(collectionItemBox.x),
+      y: Math.round(collectionItemBox.y),
+    },
+    path: showMorePath,
+  });
+  const showMoreBytes = await readFile(showMorePath);
+  const showMorePng = PNG.sync.read(showMoreBytes);
+  if (showMorePng.width !== 140 || showMorePng.height !== 32) {
+    throw new Error("The Show more screenshot must be exactly 140x32.");
+  }
+  screenshots.showMore = {
+    height: 32,
+    name: "show-more.png",
+    sha256: createHash("sha256").update(showMoreBytes).digest("hex"),
+    width: 140,
+  };
+  if ((await collectionToggle.count()) !== 1) {
+    throw new Error("The current Show more control became ambiguous.");
+  }
+  await collectionToggle.click();
+  await page.waitForFunction(
+    (previousCount) => {
+      const visible = (element) =>
+        element instanceof Element &&
+        element.checkVisibility({
+          checkOpacity: true,
+          checkVisibilityCSS: true,
+        });
+      const navigation = [...document.querySelectorAll("nav")].find(visible);
+      const projectLists = [
+        ...(navigation?.querySelectorAll(
+          "[data-app-action-sidebar-project-list-id]",
+        ) ?? []),
+      ];
+      return projectLists.some(
+        (list) =>
+          list.querySelectorAll("[data-app-action-sidebar-thread-row]")
+            .length > previousCount,
+      );
+    },
+    collectionBeforeRaw.rowCount,
+  );
+  await page.waitForTimeout(300);
+  const collectionAfterRaw = await inspectCollection();
+  const expandedProjectRowCounts = await page.evaluate(() => {
+    const visible = (element) =>
+      element instanceof Element &&
+      element.checkVisibility({
+        checkOpacity: true,
+        checkVisibilityCSS: true,
+      });
+    return [
+      ...document.querySelectorAll(
+        "nav [data-app-action-sidebar-project-list-id]",
+      ),
+    ]
+      .filter(visible)
+      .map(
+        (list) =>
+          list.querySelectorAll("[data-app-action-sidebar-thread-row]")
+            .length,
+      );
+  });
+  const expandedRowCount = Math.max(...expandedProjectRowCounts);
+  if (
+    expandedRowCount <= collectionBeforeRaw.rowCount ||
+    (collectionAfterRaw?.showLessCount ?? 0) !== 0
+  ) {
+    throw new Error(
+      `The current project collection did not expand one-way: ${JSON.stringify({ collectionAfterRaw, expandedProjectRowCounts })}`,
+    );
+  }
+  const collection = {
+    afterExpansion: {
+      rowCount: expandedRowCount,
+      showLessCount: collectionAfterRaw?.showLessCount ?? 0,
+      showMoreCount: collectionAfterRaw?.showMoreCount ?? 0,
+    },
+    beforeExpansion: {
+      buttonRect: relativeRect(
+        collectionBeforeRaw.buttonBounds,
+        collectionBeforeRaw.itemBounds,
+      ),
+      buttonStyle: collectionBeforeRaw.buttonStyle,
+      itemRect: {
+        height: round(collectionBeforeRaw.itemBounds.height),
+        width: round(collectionBeforeRaw.itemBounds.width),
+      },
+      itemRole: collectionBeforeRaw.itemRole,
+      listRole: collectionBeforeRaw.listRole,
+      rowCount: collectionBeforeRaw.rowCount,
+      showLessCount: collectionBeforeRaw.showLessCount,
+      showMoreCount: collectionBeforeRaw.showMoreCount,
+      toggleAttributes: collectionBeforeRaw.toggleAttributes,
+    },
+  };
   const actions = {
-    project: { ...projectActions, sourceStatus: "active" },
+    project: {
+      ...projectActions,
+      sourceStatus:
+        projectActionIndex === waitingIndex ? "waitingOnApproval" : "active",
+    },
     recents: { ...recentsActions, sourceStatus: "idle" },
   };
   await assertProjectActionActive();
@@ -823,9 +1092,10 @@ try {
   const record = {
     actions,
     captureKind: "renderer_cdp",
+    collection,
     fingerprint,
     privacyBoundary:
-      "counts-title-lengths-generic-actions-geometry-styles-only",
+      "disposable-title-hash-counts-generic-actions-geometry-styles-only",
     profileOwnerPid: Number(isolatedOwnerPid),
     restoredRoute: "New chat",
     rowSummary: {
@@ -849,6 +1119,7 @@ try {
       statusCounts: {
         active: rowKinds.filter((row) => row.active).length,
         unread: rowKinds.filter((row) => row.unread).length,
+        waitingApproval: 1,
       },
       titleLengthRange: {
         max: Math.max(...rowKinds.map((row) => row.titleLength)),
@@ -899,6 +1170,7 @@ try {
     rowSummary: record.rowSummary,
     sha256: record.sha256,
     spinnerShapeSha256: statuses.active.spinner.shapeSha256,
+    waitingSpinnerShapeSha256: statuses.waiting.spinner.shapeSha256,
   };
 } catch (error) {
   captureError = error;

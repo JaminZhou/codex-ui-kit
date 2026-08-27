@@ -203,11 +203,9 @@ describe("application shell visual contract", () => {
       "animation: codex-ui-app-sidebar-shimmer 3s linear infinite;",
     );
     expect(styles).toContain(
-      '.codex-ui-app-sidebar__item-status[data-visual-status="waiting"]',
+      ".codex-ui-app-sidebar__collection-toggle-item",
     );
-    expect(styles).toContain(
-      ".codex-ui-app-sidebar__item-status-pill",
-    );
+    expect(styles).toContain("margin-inline-start: 1.4375rem;");
     expect(component).toContain("appSidebarWorktreeItemStatus");
     expect(styles).toMatch(
       /\.codex-ui-app-sidebar__item-worktree-indicator \{[\s\S]*?height: 0\.875rem;[\s\S]*?inset-inline-end: 2\.4375rem;[\s\S]*?pointer-events: none;[\s\S]*?transition: opacity var\(--codex-ui-transition-fast\);[\s\S]*?width: 0\.875rem;/,

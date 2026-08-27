@@ -6352,7 +6352,7 @@ for (const scene of selectedScenes) {
                     "data-sidebar-collection-fixture",
                   ),
                   itemCount: collection.querySelectorAll(
-                    '.codex-ui-app-sidebar__collection-item[role="listitem"]',
+                    '.codex-ui-app-sidebar__collection-item[role="listitem"]:not(.codex-ui-app-sidebar__collection-toggle-item)',
                   ).length,
                   loadingHeadingCount: collection.querySelectorAll(
                     ".codex-ui-app-sidebar__collection-loading-heading > span",
@@ -6379,7 +6379,27 @@ for (const scene of selectedScenes) {
                     ? {
                         expanded:
                           collectionToggle.getAttribute("aria-expanded"),
+                        itemRole:
+                          collectionToggle.parentElement?.getAttribute("role") ??
+                          null,
+                        listRole:
+                          collectionToggle.parentElement?.parentElement?.getAttribute(
+                            "role",
+                          ) ?? null,
                         text: collectionToggle.textContent?.trim() ?? null,
+                        style: {
+                          borderRadius:
+                            getComputedStyle(collectionToggle).borderRadius,
+                          fontSize: getComputedStyle(collectionToggle).fontSize,
+                          height: getComputedStyle(collectionToggle).height,
+                          lineHeight:
+                            getComputedStyle(collectionToggle).lineHeight,
+                          marginInlineStart:
+                            getComputedStyle(collectionToggle).marginInlineStart,
+                          padding: getComputedStyle(collectionToggle).padding,
+                          textAlign:
+                            getComputedStyle(collectionToggle).textAlign,
+                        },
                       }
                     : null,
                 }
@@ -8449,7 +8469,7 @@ for (const scene of selectedScenes) {
     if (currentSidebarStatusScene) {
       const expectedStatuses = [
         ["session-browser:0", "active", "loading"],
-        ["desktop-cleanup:0", "waiting", "waiting"],
+        ["desktop-cleanup:0", "waiting", "loading"],
         ["desktop-cleanup:1", "error", "error"],
         ["codex-ui-kit:0", "unread", "attention"],
         ["codex-ui-kit:1", "queued", "loading"],
@@ -8498,9 +8518,7 @@ for (const scene of selectedScenes) {
       const geometryInvalid = contract.sidebar.statusFixtures.some(
         (fixture) =>
           fixture.rowRect?.height !== 30 ||
-          (fixture.visualStatus === "waiting"
-            ? Math.abs((fixture.statusRect?.width ?? 0) - 85.72) > 0.2
-            : fixture.statusRect?.width !== 20) ||
+          fixture.statusRect?.width !== 20 ||
           fixture.statusRect?.height !== 20 ||
           fixture.rightInset !==
             (fixture.fixture === "design-assets:2" ? 36 : 8) ||
@@ -8511,11 +8529,6 @@ for (const scene of selectedScenes) {
           (fixture.visualStatus === "error" &&
             (fixture.errorRect?.width !== 16 ||
               fixture.errorRect?.height !== 16)) ||
-          (fixture.visualStatus === "waiting" &&
-            (fixture.statusPillText !== "Needs input" ||
-              fixture.statusPillRect?.height !== 20 ||
-              Math.abs((fixture.statusPillRect?.width ?? 0) - 85.72) >
-                0.2)) ||
           (fixture.visualStatus === "loading" &&
             (fixture.animationDuration !== "1e-06s" ||
               fixture.animationName !== "none" ||
@@ -8634,8 +8647,17 @@ for (const scene of selectedScenes) {
         scene.id === "current-sidebar-collection-long-list" &&
         (collection.fixture !== "long-list" ||
           collection.itemCount !== 5 ||
-          collection.toggle?.expanded !== "false" ||
-          collection.toggle?.text !== "Show more")
+          collection.toggle?.expanded !== null ||
+          collection.toggle?.itemRole !== "listitem" ||
+          collection.toggle?.listRole !== "list" ||
+          collection.toggle?.text !== "Show more" ||
+          collection.toggle?.style?.borderRadius !== "9999px" ||
+          collection.toggle?.style?.fontSize !== "14px" ||
+          collection.toggle?.style?.height !== "24px" ||
+          collection.toggle?.style?.lineHeight !== "18px" ||
+          collection.toggle?.style?.marginInlineStart !== "23px" ||
+          collection.toggle?.style?.padding !== "2px 8px" ||
+          collection.toggle?.style?.textAlign !== "center")
       ) {
         throw new Error(
           `${scene.id}: current long collection contract failed: ${JSON.stringify(collection)}`,
@@ -8656,20 +8678,22 @@ for (const scene of selectedScenes) {
             ".codex-ui-app-sidebar__collection-toggle",
           );
           return {
-            activeText: document.activeElement?.textContent?.trim() ?? null,
-            expanded: toggle?.getAttribute("aria-expanded") ?? null,
+            dataExpanded: collection?.getAttribute("data-expanded") ?? null,
             itemCount:
               collection?.querySelectorAll(
-                '.codex-ui-app-sidebar__collection-item[role="listitem"]',
+                '.codex-ui-app-sidebar__collection-item[role="listitem"]:not(.codex-ui-app-sidebar__collection-toggle-item)',
               ).length ?? 0,
-            toggleText: toggle?.textContent?.trim() ?? null,
+            showLessCount: [...(collection?.querySelectorAll("button") ?? [])]
+              .filter((button) => button.textContent?.trim() === "Show less")
+              .length,
+            toggleExists: Boolean(toggle),
           };
         });
         if (
           expandedCollection.itemCount !== 12 ||
-          expandedCollection.expanded !== "true" ||
-          expandedCollection.toggleText !== "Show less" ||
-          expandedCollection.activeText !== "Show less"
+          expandedCollection.dataExpanded !== "true" ||
+          expandedCollection.toggleExists ||
+          expandedCollection.showLessCount !== 0
         ) {
           throw new Error(
             `${scene.id}: long collection expansion failed: ${JSON.stringify(expandedCollection)}`,

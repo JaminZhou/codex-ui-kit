@@ -816,7 +816,7 @@ try {
   );
   const expectedStatuses = [
     ["session-browser:0", "active", "loading"],
-    ["desktop-cleanup:0", "waiting", "waiting"],
+    ["desktop-cleanup:0", "waiting", "loading"],
     ["desktop-cleanup:1", "error", "error"],
     ["codex-ui-kit:0", "unread", "attention"],
     ["codex-ui-kit:1", "queued", "loading"],
@@ -833,9 +833,7 @@ try {
       (fixture) =>
         fixture.statusOpacity !== "1" ||
         fixture.rowRect?.height !== 30 ||
-        (fixture.visualStatus === "waiting"
-          ? Math.abs((fixture.statusRect?.width ?? 0) - 85.72) > 0.2
-          : fixture.statusRect?.width !== 20) ||
+        fixture.statusRect?.width !== 20 ||
         fixture.statusRect?.height !== 20 ||
         fixture.rightInset !==
           (fixture.fixture === "design-assets:2" ? 36 : 8) ||
@@ -846,10 +844,6 @@ try {
         (fixture.visualStatus === "error" &&
           (fixture.errorRect?.width !== 16 ||
             fixture.errorRect?.height !== 16)) ||
-        (fixture.visualStatus === "waiting" &&
-          (fixture.statusPillText !== "Needs input" ||
-            fixture.statusPillRect?.height !== 20 ||
-            Math.abs((fixture.statusPillRect?.width ?? 0) - 85.72) > 0.2)) ||
         (fixture.visualStatus === "loading" &&
           (fixture.animationDuration !== "1e-06s" ||
             fixture.animationName !== "none")) ||
@@ -1057,7 +1051,7 @@ for (const collectionScene of [
         fixture: element.getAttribute("data-sidebar-collection-fixture"),
         height: bounds.height,
         itemCount: element.querySelectorAll(
-          '.codex-ui-app-sidebar__collection-item[role="listitem"]',
+          '.codex-ui-app-sidebar__collection-item[role="listitem"]:not(.codex-ui-app-sidebar__collection-toggle-item)',
         ).length,
         loadingHeadingCount: element.querySelectorAll(
           ".codex-ui-app-sidebar__collection-loading-heading > span",
@@ -1110,7 +1104,7 @@ for (const collectionScene of [
       if (
         collection.fixture !== "long-list" ||
         collection.itemCount !== 5 ||
-        collection.toggleExpanded !== "false" ||
+        collection.toggleExpanded !== null ||
         collection.toggleText !== "Show more"
       ) {
         throw new Error(
@@ -1134,23 +1128,25 @@ for (const collectionScene of [
           ".codex-ui-app-sidebar__collection-toggle",
         );
         return {
-          activeText: document.activeElement?.textContent?.trim() ?? null,
-          expanded: toggle?.getAttribute("aria-expanded") ?? null,
+          dataExpanded: element?.getAttribute("data-expanded") ?? null,
           itemCount:
             element?.querySelectorAll(
-              '.codex-ui-app-sidebar__collection-item[role="listitem"]',
+              '.codex-ui-app-sidebar__collection-item[role="listitem"]:not(.codex-ui-app-sidebar__collection-toggle-item)',
             ).length ?? 0,
           scrollOverflow: navigation
             ? navigation.scrollHeight - navigation.clientHeight
             : null,
-          toggleText: toggle?.textContent?.trim() ?? null,
+          showLessCount: [...(element?.querySelectorAll("button") ?? [])]
+            .filter((button) => button.textContent?.trim() === "Show less")
+            .length,
+          toggleExists: Boolean(toggle),
         };
       });
       if (
         expanded.itemCount !== 12 ||
-        expanded.expanded !== "true" ||
-        expanded.toggleText !== "Show less" ||
-        expanded.activeText !== "Show less" ||
+        expanded.dataExpanded !== "true" ||
+        expanded.toggleExists ||
+        expanded.showLessCount !== 0 ||
         !(expanded.scrollOverflow > 0)
       ) {
         throw new Error(

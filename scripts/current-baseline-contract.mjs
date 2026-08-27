@@ -672,7 +672,9 @@ const currentSidebarScreenshotNames = Object.freeze([
   "active-status.png",
   "project-actions.png",
   "recents-actions.png",
+  "show-more.png",
   "unread-status.png",
+  "waiting-status.png",
 ]);
 
 const validCurrentSidebarScreenshot = (screenshot, name, width) =>
@@ -681,13 +683,26 @@ const validCurrentSidebarScreenshot = (screenshot, name, width) =>
   screenshot?.height === 30 &&
   /^[a-f0-9]{64}$/.test(screenshot?.sha256 ?? "");
 
+const validCurrentSidebarBoxScreenshot = (
+  screenshot,
+  name,
+  width,
+  height,
+) =>
+  screenshot?.name === name &&
+  screenshot?.width === width &&
+  screenshot?.height === height &&
+  /^[a-f0-9]{64}$/.test(screenshot?.sha256 ?? "");
+
 const currentSidebarActionObservationMatches = (
   observation,
   expectedSourceStatus,
 ) => {
   const buttons = observation?.buttons;
   return (
-    observation?.sourceStatus === expectedSourceStatus &&
+    (Array.isArray(expectedSourceStatus)
+      ? expectedSourceStatus.includes(observation?.sourceStatus)
+      : observation?.sourceStatus === expectedSourceStatus) &&
     observation?.rowRect?.width !== undefined &&
     withinTolerance(observation.rowRect.width, 306.90625) &&
     withinTolerance(observation.rowRect.height, 30) &&
@@ -748,7 +763,7 @@ export function assertCurrentSidebarRowsRecord(record) {
     record?.targetSelection?.selected?.url !== "app://-/index.html" ||
     record?.restoredRoute !== "New chat" ||
     record?.privacyBoundary !==
-      "counts-title-lengths-generic-actions-geometry-styles-only" ||
+      "disposable-title-hash-counts-generic-actions-geometry-styles-only" ||
     /"(?:hostId|profilePath|projectName|threadId|title)"\s*:/.test(serialized)
   ) {
     throw new Error(
@@ -800,6 +815,7 @@ export function assertCurrentSidebarRowsRecord(record) {
     summary.statusCounts.active < 1 ||
     !Number.isInteger(summary?.statusCounts?.unread) ||
     summary.statusCounts.unread < 1 ||
+    summary?.statusCounts?.waitingApproval !== 1 ||
     Math.abs(summary?.horizontalOverflow ?? Infinity) > 1
   ) {
     throw new Error(
@@ -809,6 +825,7 @@ export function assertCurrentSidebarRowsRecord(record) {
 
   const active = record.statuses?.active;
   if (
+    !["running", "waitingOnApproval"].includes(active?.sourceStatus) ||
     !withinTolerance(active?.rowRect?.width, 306.90625) ||
     !withinTolerance(active?.rowRect?.height, 30) ||
     !withinTolerance(active?.railRect?.width, 20) ||
@@ -851,11 +868,78 @@ export function assertCurrentSidebarRowsRecord(record) {
     );
   }
 
+  const waiting = record.statuses?.waiting;
+  if (
+    waiting?.sourceStatus !== "waitingOnApproval" ||
+    !Number.isInteger(waiting?.titleLength) ||
+    waiting.titleLength < 1 ||
+    waiting.titleLength > 256 ||
+    !/^[a-f0-9]{64}$/.test(waiting?.titleSha256 ?? "") ||
+    !withinTolerance(waiting?.rowRect?.width, 306.90625) ||
+    !withinTolerance(waiting?.rowRect?.height, 30) ||
+    !withinTolerance(waiting?.railRect?.width, 20) ||
+    !withinTolerance(waiting?.railRect?.height, 20) ||
+    !withinTolerance(waiting?.railRect?.top, 5) ||
+    !withinTolerance(waiting?.railRect?.rightInset, 8) ||
+    waiting?.spinner?.cssHeight !== "16px" ||
+    waiting?.spinner?.cssWidth !== "16px" ||
+    waiting?.spinner?.viewBox !== "0 0 24 24" ||
+    waiting?.spinner?.pathCount !== 2 ||
+    waiting?.spinner?.shapeSha256 !== active?.spinner?.shapeSha256 ||
+    waiting?.spinner?.animationDuration !== "2s" ||
+    waiting?.spinner?.animationIterationCount !== "infinite" ||
+    waiting?.spinner?.color !== active?.spinner?.color
+  ) {
+    throw new Error(
+      `Current sidebar waiting observation does not match the current spinner contract: ${JSON.stringify(waiting)}`,
+    );
+  }
+
+  const collection = record.collection;
+  const beforeExpansion = collection?.beforeExpansion;
+  const afterExpansion = collection?.afterExpansion;
+  if (
+    beforeExpansion?.rowCount !== 5 ||
+    beforeExpansion?.showMoreCount !== 1 ||
+    beforeExpansion?.showLessCount !== 0 ||
+    beforeExpansion?.itemRole !== "listitem" ||
+    beforeExpansion?.listRole !== "list" ||
+    !withinTolerance(beforeExpansion?.itemRect?.width, 306.90625) ||
+    !withinTolerance(beforeExpansion?.itemRect?.height, 32) ||
+    !withinTolerance(beforeExpansion?.buttonRect?.left, 23) ||
+    !withinTolerance(beforeExpansion?.buttonRect?.top, 4) ||
+    !withinTolerance(beforeExpansion?.buttonRect?.width, 90.171875) ||
+    !withinTolerance(beforeExpansion?.buttonRect?.height, 24) ||
+    beforeExpansion?.toggleAttributes?.type !== "button" ||
+    beforeExpansion?.toggleAttributes?.ariaControls !== null ||
+    beforeExpansion?.toggleAttributes?.ariaExpanded !== null ||
+    beforeExpansion?.toggleAttributes?.role !== null ||
+    beforeExpansion?.buttonStyle?.backgroundColor !== "rgba(0, 0, 0, 0)" ||
+    beforeExpansion?.buttonStyle?.borderRadius !== "9999px" ||
+    beforeExpansion?.buttonStyle?.color !== "rgba(255, 255, 255, 0.498)" ||
+    beforeExpansion?.buttonStyle?.fontFamily !==
+      '-apple-system, "system-ui", "Segoe UI", sans-serif' ||
+    beforeExpansion?.buttonStyle?.fontSize !== "14px" ||
+    beforeExpansion?.buttonStyle?.fontWeight !== "400" ||
+    beforeExpansion?.buttonStyle?.lineHeight !== "18px" ||
+    beforeExpansion?.buttonStyle?.padding !== "2px 8px" ||
+    beforeExpansion?.buttonStyle?.textAlign !== "center" ||
+    !Number.isInteger(afterExpansion?.rowCount) ||
+    afterExpansion.rowCount <= beforeExpansion.rowCount ||
+    afterExpansion?.showLessCount !== 0
+  ) {
+    throw new Error(
+      `Current sidebar collection does not match the one-way Show more contract: ${JSON.stringify(collection)}`,
+    );
+  }
+
   for (const variant of ["project", "recents"]) {
     if (
       !currentSidebarActionObservationMatches(
         record.actions?.[variant],
-        variant === "project" ? "active" : "idle",
+        variant === "project"
+          ? ["active", "waitingOnApproval"]
+          : "idle",
       )
     ) {
       throw new Error(
@@ -881,14 +965,25 @@ export function assertCurrentSidebarRowsRecord(record) {
       currentSidebarScreenshotNames[2],
       72,
     ) ||
+    !validCurrentSidebarBoxScreenshot(
+      screenshots?.showMore,
+      currentSidebarScreenshotNames[3],
+      140,
+      32,
+    ) ||
     !validCurrentSidebarScreenshot(
       screenshots?.unreadStatus,
-      currentSidebarScreenshotNames[3],
+      currentSidebarScreenshotNames[4],
+      28,
+    ) ||
+    !validCurrentSidebarScreenshot(
+      screenshots?.waitingStatus,
+      currentSidebarScreenshotNames[5],
       28,
     )
   ) {
     throw new Error(
-      "Current sidebar-row screenshots do not prove the four privacy-safe regions.",
+      "Current sidebar-row screenshots do not prove the six privacy-safe regions.",
     );
   }
 }
