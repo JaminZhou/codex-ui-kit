@@ -238,7 +238,10 @@ function focusByKey(event: KeyboardEvent<HTMLElement>) {
   if (event.key === "End") nextIndex = items.length - 1;
   if (event.key === "ArrowDown") nextIndex = (currentIndex + 1) % items.length;
   if (event.key === "ArrowUp") {
-    nextIndex = (currentIndex - 1 + items.length) % items.length;
+    nextIndex =
+      currentIndex === -1
+        ? items.length - 1
+        : (currentIndex - 1 + items.length) % items.length;
   }
   event.preventDefault();
   items[nextIndex]?.focus();

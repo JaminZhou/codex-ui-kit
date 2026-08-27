@@ -321,10 +321,15 @@ try {
     if ((await trigger.count()) !== 1) {
       throw new Error("The current account trigger is ambiguous.");
     }
-    await trigger.click();
+    const accountMenuExpanded =
+      (await trigger.getAttribute("aria-expanded")) === "true";
+    if (!accountMenuExpanded) await trigger.click();
     const menu = page.locator('[role="menu"]:visible').first();
     await menu.waitFor({ state: "visible" });
-    await page.getByRole("menuitem").filter({ hasText: "Settings" }).first().click();
+    await menu
+      .getByRole("menuitem", { name: /^Settings/ })
+      .first()
+      .click();
     const appearance = page.getByText("Appearance", { exact: true }).first();
     await appearance.waitFor({ state: "visible" });
     await appearance.click();

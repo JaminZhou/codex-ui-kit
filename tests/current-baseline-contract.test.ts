@@ -1249,4 +1249,24 @@ describe("current baseline capture contract", () => {
     expect(captureSource).not.toContain(".screenshot(");
     expect(captureSource).not.toContain("document.body.textContent");
   });
+
+  it("restores an isolated account-menu capture from an already-open menu", () => {
+    const captureSource = readFileSync(
+      new URL("../scripts/capture-current-account-menu.mjs", import.meta.url),
+      "utf8",
+    );
+
+    expect(captureSource).toContain(
+      'const accountMenuExpanded =\n      (await trigger.getAttribute("aria-expanded")) === "true";',
+    );
+    expect(captureSource).toContain(
+      "if (!accountMenuExpanded) await trigger.click();",
+    );
+    expect(captureSource.indexOf("assertCurrentAccountMenuRecord(record)")).toBeLessThan(
+      captureSource.indexOf("for (const [key, state] of Object.entries(states))"),
+    );
+    expect(captureSource).toContain(
+      "Account-menu isolated-state cleanup failed:",
+    );
+  });
 });

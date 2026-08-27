@@ -194,12 +194,17 @@ describe("menus and selects", () => {
         trigger={<button type="button">Account</button>}
       >
         <MenuItem>Profile</MenuItem>
+        <MenuItem>Log out</MenuItem>
       </Menu>,
     );
 
     const menu = screen.getByRole("menu", { name: "Account menu" });
     await waitFor(() => expect(document.activeElement).toBe(menu));
     expect(menu.getAttribute("tabindex")).toBe("-1");
+    fireEvent.keyDown(menu, { key: "ArrowUp" });
+    expect(document.activeElement).toBe(
+      screen.getByRole("menuitem", { name: "Log out" }),
+    );
   });
 
   it("moves focus with menu keys, keeps checkboxes open, and closes on selection", async () => {
