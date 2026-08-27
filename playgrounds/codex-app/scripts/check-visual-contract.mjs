@@ -783,13 +783,8 @@ async function compareCurrentBuildWorkspaceFrame({
       `${sceneId}: current-build workspace frame pixel ratio ${comparison.ratio} exceeds ${maximumRatio}.`,
     );
   }
-  if (comparison.ratio > maximumRatio) {
-    throw new Error(
-      `${sceneId}: current-build ${status} status pixel ratio ${comparison.ratio} exceeds ${maximumRatio}.`,
-    );
-  }
   console.log(
-    `${sceneId}: current-build ${status} status pixel ratio ${comparison.ratio}`,
+    `${sceneId}: current-build workspace frame pixel ratio ${comparison.ratio}`,
   );
 }
 

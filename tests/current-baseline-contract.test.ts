@@ -607,6 +607,12 @@ describe("current baseline capture contract", () => {
     expect(() => assertCurrentSidebarRowsRecord(staleUnread)).toThrow(
       "unread observation",
     );
+
+    const lingeringShowMore = sidebarRowsRecord();
+    lingeringShowMore.collection.afterExpansion.showMoreCount = 1;
+    expect(() => assertCurrentSidebarRowsRecord(lingeringShowMore)).toThrow(
+      "one-way Show more contract",
+    );
   });
 
   it("gates current Projects geometry, interactions, and compact behavior", () => {

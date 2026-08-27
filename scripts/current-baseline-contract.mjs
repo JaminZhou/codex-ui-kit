@@ -926,6 +926,7 @@ export function assertCurrentSidebarRowsRecord(record) {
     beforeExpansion?.buttonStyle?.textAlign !== "center" ||
     !Number.isInteger(afterExpansion?.rowCount) ||
     afterExpansion.rowCount <= beforeExpansion.rowCount ||
+    afterExpansion?.showMoreCount !== 0 ||
     afterExpansion?.showLessCount !== 0
   ) {
     throw new Error(

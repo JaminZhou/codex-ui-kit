@@ -112,6 +112,18 @@ describe("lifecycle visual policy", () => {
     );
   });
 
+  it("keeps workspace-frame diagnostics independent from sidebar status", () => {
+    const workspaceFrameComparison = contract.slice(
+      contract.indexOf("async function compareCurrentBuildWorkspaceFrame"),
+      contract.indexOf("const regionalFailures"),
+    );
+
+    expect(workspaceFrameComparison).toContain(
+      "current-build workspace frame pixel ratio",
+    );
+    expect(workspaceFrameComparison).not.toContain("${status}");
+  });
+
   it("gates the dedicated current-build sidebar regions", () => {
     expect(contract).toContain('scene.id === "current-sidebar"');
     expect(contract).toContain("CODEX_UI_KIT_SIDEBAR_REFERENCE");

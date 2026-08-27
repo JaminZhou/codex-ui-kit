@@ -1011,6 +1011,7 @@ try {
   const expandedRowCount = Math.max(...expandedProjectRowCounts);
   if (
     expandedRowCount <= collectionBeforeRaw.rowCount ||
+    (collectionAfterRaw?.showMoreCount ?? 0) !== 0 ||
     (collectionAfterRaw?.showLessCount ?? 0) !== 0
   ) {
     throw new Error(
