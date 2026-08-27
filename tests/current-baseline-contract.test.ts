@@ -1585,6 +1585,22 @@ describe("current baseline capture contract", () => {
     );
     expect(captureSource).toContain("homeMarkers.length === 1");
     expect(captureSource).toContain("composers.length > 0");
+    const activePrecheck = captureSource.indexOf(
+      "await assertActiveStatusVisible();",
+    );
+    const activeScreenshot = captureSource.indexOf(
+      "const activeStatusScreenshot = await screenshotRegion(",
+    );
+    const activePostcheck = captureSource.indexOf(
+      "await assertActiveStatusVisible();",
+      activePrecheck + 1,
+    );
+    expect(activePrecheck).toBeGreaterThan(-1);
+    expect(activePrecheck).toBeLessThan(activeScreenshot);
+    expect(activeScreenshot).toBeLessThan(activePostcheck);
+    expect(captureSource).toContain(
+      "The ordinary active sidebar spinner changed during screenshot capture.",
+    );
     expect(
       captureSource.indexOf("assertCurrentSidebarRowsRecord(record)"),
     ).toBeLessThan(

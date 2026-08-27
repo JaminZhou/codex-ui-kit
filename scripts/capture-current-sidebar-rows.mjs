@@ -641,16 +641,38 @@ try {
   const unreadRow = rows.nth(unreadIndex);
   const projectActionRow = rows.nth(projectActionIndex);
   const recentsActionRow = rows.nth(recentsActionIndex);
+  const assertActiveStatusVisible = async () => {
+    const activeStatusVisible = await activeRow.evaluate((element) => {
+      const spinner = element.querySelector(".animate-spin");
+      return (
+        element.getAttribute("data-app-action-sidebar-thread-kind") !==
+          "worktree" &&
+        spinner instanceof Element &&
+        spinner.checkVisibility({
+          checkOpacity: true,
+          checkVisibilityCSS: true,
+        })
+      );
+    });
+    if (!activeStatusVisible) {
+      throw new Error(
+        "The ordinary active sidebar spinner changed during screenshot capture.",
+      );
+    }
+  };
   const statuses = {
     active: await inspectActive(activeRow),
     unread: await inspectUnread(unreadRow),
   };
+  await assertActiveStatusVisible();
+  const activeStatusScreenshot = await screenshotRegion(
+    activeRow,
+    "active-status.png",
+    28,
+  );
+  await assertActiveStatusVisible();
   const screenshots = {
-    activeStatus: await screenshotRegion(
-      activeRow,
-      "active-status.png",
-      28,
-    ),
+    activeStatus: activeStatusScreenshot,
     unreadStatus: await screenshotRegion(
       unreadRow,
       "unread-status.png",
