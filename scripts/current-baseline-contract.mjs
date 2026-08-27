@@ -1,3 +1,4 @@
+import { createHash } from "node:crypto";
 import { constants, realpathSync } from "node:fs";
 import { open } from "node:fs/promises";
 import { basename, dirname, resolve } from "node:path";
@@ -31,6 +32,20 @@ const isMainRendererUrl = (url) =>
 
 const withinTolerance = (value, expected, tolerance = 1) =>
   Number.isFinite(value) && Math.abs(value - expected) <= tolerance;
+
+const sanitizedShapeSha256 = (shapes) => {
+  if (
+    !Array.isArray(shapes) ||
+    shapes.some(
+      (shape) =>
+        !["circle", "line", "path", "rect"].includes(shape?.tag) ||
+        (shape.d !== null && typeof shape.d !== "string"),
+    )
+  ) {
+    return null;
+  }
+  return createHash("sha256").update(JSON.stringify(shapes)).digest("hex");
+};
 
 const currentSidebarWidthBounds = Object.freeze({ max: 520, min: 240 });
 const currentSidebarMinimumMainWidth = 240;
@@ -494,13 +509,43 @@ export function assertCurrentAccountMenuRecord(record) {
     "Settings⌘,",
     "Log out",
   ];
-  const expectedViewBoxes = [
+  const expectedSvgGeometry = [
     [],
-    ["0 0 20 20"],
-    ["0 0 24 24"],
-    ["0 0 16 16"],
-    ["0 0 20 20"],
-    ["0 0 21 21"],
+    [
+      {
+        shapeSha256:
+          "34bf60b8f723ce29108d666e0d986df83ac517d0ea1c1819f391ffd30658e299",
+        viewBox: "0 0 20 20",
+      },
+    ],
+    [
+      {
+        shapeSha256:
+          "9841028b4294451d1bb03f57f1a3af1962c698dd5fb954c32f9ca7e6b774a0ae",
+        viewBox: "0 0 24 24",
+      },
+    ],
+    [
+      {
+        shapeSha256:
+          "807c6c99243f28084e80764a180e3b467b5cf03eccde3c65e76c1dd36bc7fb4e",
+        viewBox: "0 0 16 16",
+      },
+    ],
+    [
+      {
+        shapeSha256:
+          "65555b51ea39b9e7b21e1e8b1e77779c64c5e9729a12581be2cab78a938a20f4",
+        viewBox: "0 0 20 20",
+      },
+    ],
+    [
+      {
+        shapeSha256:
+          "4c7f061498fb83c30e5f24ff410cd44a0419b1578492c739d97bdf825bfd4fa2",
+        viewBox: "0 0 21 21",
+      },
+    ],
   ];
   for (const [key, state] of Object.entries(record.states)) {
     const compact = key.endsWith("Compact");
@@ -523,8 +568,11 @@ export function assertCurrentAccountMenuRecord(record) {
         : "oklab(0.297161 0.0000135154 0.00000594556 / 0.9)";
     const expectedColor =
       theme === "light" ? "rgb(26, 28, 31)" : "rgb(223, 223, 223)";
-    const viewBoxes = state?.svgGeometry?.map((icons) =>
-      icons.map((icon) => icon.viewBox),
+    const svgGeometry = state?.svgGeometry?.map((icons) =>
+      icons.map((icon) => ({
+        shapeSha256: sanitizedShapeSha256(icon?.shapes),
+        viewBox: icon?.viewBox,
+      })),
     );
     if (
       state?.theme?.toLowerCase() !== theme ||
@@ -584,7 +632,7 @@ export function assertCurrentAccountMenuRecord(record) {
           style.lineHeight !== "18.5714px" ||
           style.padding !== "5px 8px",
       ) ||
-      JSON.stringify(viewBoxes) !== JSON.stringify(expectedViewBoxes)
+      JSON.stringify(svgGeometry) !== JSON.stringify(expectedSvgGeometry)
     ) {
       throw new Error(
         `Current account-menu ${key} observation does not match the current contract: ${JSON.stringify(state)}`,

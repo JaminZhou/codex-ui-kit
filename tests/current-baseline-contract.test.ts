@@ -22,6 +22,51 @@ import {
   writeCurrentBaselineOutput,
 } from "../scripts/current-baseline-contract.mjs";
 
+const accountMenuVisualAssetIds = [
+  "sidebar-account-menu-usage",
+  "sidebar-account-menu-pet",
+  "sidebar-account-menu-invite",
+  "sidebar-account-menu-settings",
+  "sidebar-account-menu-logout",
+] as const;
+const accountMenuVisualAssets = JSON.parse(
+  readFileSync(
+    new URL("../research/visual-assets.json", import.meta.url),
+    "utf8",
+  ),
+) as {
+  icons: Array<{
+    id: string;
+    primitives: Array<{
+      attributes: Record<string, string>;
+      tag: string;
+    }>;
+    viewBox: string;
+  }>;
+};
+const accountMenuSvgGeometry = [
+  [],
+  ...accountMenuVisualAssetIds.map((id) => {
+    const icon = accountMenuVisualAssets.icons.find(
+      (candidate) => candidate.id === id,
+    );
+    if (!icon) throw new Error(`Missing account-menu visual asset: ${id}`);
+    return [
+      {
+        shapes: icon.primitives
+          .filter((shape) =>
+            ["circle", "line", "path", "rect"].includes(shape.tag),
+          )
+          .map((shape) => ({
+            d: shape.attributes.d ?? null,
+            tag: shape.tag,
+          })),
+        viewBox: icon.viewBox,
+      },
+    ];
+  }),
+];
+
 const candidate = (overrides: Record<string, unknown> = {}) => ({
   area: 1180 * 820,
   index: 1,
@@ -98,14 +143,12 @@ const accountMenuState = (theme: "dark" | "light", compact: boolean) => {
       top: 46,
       width: 322.90625,
     },
-    svgGeometry: [
-      [],
-      [{ shapes: [], viewBox: "0 0 20 20" }],
-      [{ shapes: [], viewBox: "0 0 24 24" }],
-      [{ shapes: [], viewBox: "0 0 16 16" }],
-      [{ shapes: [], viewBox: "0 0 20 20" }],
-      [{ shapes: [], viewBox: "0 0 21 21" }],
-    ],
+    svgGeometry: accountMenuSvgGeometry.map((icons) =>
+      icons.map((icon) => ({
+        ...icon,
+        shapes: icon.shapes.map((shape) => ({ ...shape })),
+      })),
+    ),
     theme: theme === "light" ? "Light" : "Dark",
     triggerRect: {
       height: 29,
@@ -239,6 +282,12 @@ describe("current baseline capture contract", () => {
     privateLabel.states.lightWide.labels[0] = "Private account";
     expect(() => assertCurrentAccountMenuRecord(privateLabel)).toThrow(
       "lightWide observation",
+    );
+
+    const staleIcon = accountMenuRecord();
+    staleIcon.states.darkWide.svgGeometry[1][0].shapes[0].d = "M0 0Z";
+    expect(() => assertCurrentAccountMenuRecord(staleIcon)).toThrow(
+      "darkWide observation",
     );
 
     const unrestored = accountMenuRecord();

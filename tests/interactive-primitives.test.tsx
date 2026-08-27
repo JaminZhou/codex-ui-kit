@@ -207,6 +207,28 @@ describe("menus and selects", () => {
     );
   });
 
+  it("focuses the first item when a content-focused menu is keyboard opened", async () => {
+    render(
+      <Menu
+        initialFocus="content"
+        label="Account menu"
+        trigger={<button type="button">Account</button>}
+      >
+        <MenuItem>Profile</MenuItem>
+        <MenuItem>Log out</MenuItem>
+      </Menu>,
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "Account" }), {
+      detail: 0,
+    });
+    await waitFor(() =>
+      expect(document.activeElement).toBe(
+        screen.getByRole("menuitem", { name: "Profile" }),
+      ),
+    );
+  });
+
   it("moves focus with menu keys, keeps checkboxes open, and closes on selection", async () => {
     const onCheckedChange = vi.fn();
     const onSelect = vi.fn();

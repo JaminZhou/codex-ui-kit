@@ -723,7 +723,7 @@ export function Popover({
     onClick: (event) => {
       triggerNode.props.onClick?.(event);
       if (!event.defaultPrevented && !nativeDisabled) {
-        if (!resolvedOpen && initialFocus === "none" && event.detail === 0) {
+        if (!resolvedOpen && event.detail === 0) {
           keyboardOpenTargetRef.current = "first";
         }
         setOpen(!resolvedOpen);
