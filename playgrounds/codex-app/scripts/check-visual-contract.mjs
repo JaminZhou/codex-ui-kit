@@ -378,6 +378,8 @@ const currentBuildSidebarCompactPinnedReference =
   process.env.CODEX_UI_KIT_CURRENT_SIDEBAR_COMPACT_PINNED_REFERENCE;
 const currentBuildSidebarActiveStatusReference =
   process.env.CODEX_UI_KIT_CURRENT_SIDEBAR_ACTIVE_STATUS_REFERENCE;
+const currentBuildSidebarWaitingStatusReference =
+  process.env.CODEX_UI_KIT_CURRENT_SIDEBAR_WAITING_STATUS_REFERENCE;
 const currentBuildSidebarUnreadStatusReference =
   process.env.CODEX_UI_KIT_CURRENT_SIDEBAR_UNREAD_STATUS_REFERENCE;
 const currentBuildSidebarTaskActionsReference =
@@ -392,6 +394,8 @@ const currentBuildSidebarWorktreeRestoredReference =
   process.env.CODEX_UI_KIT_CURRENT_SIDEBAR_WORKTREE_RESTORED_REFERENCE;
 const currentBuildSidebarEmptyCollectionReference =
   process.env.CODEX_UI_KIT_CURRENT_SIDEBAR_EMPTY_COLLECTION_REFERENCE;
+const currentBuildSidebarShowMoreReference =
+  process.env.CODEX_UI_KIT_CURRENT_SIDEBAR_SHOW_MORE_REFERENCE;
 const currentBuildWindowChromeReference =
   process.env.CODEX_UI_KIT_WINDOW_CHROME_REFERENCE;
 const defaultLifecycleMainPixelRatio = 0.0025;
@@ -793,6 +797,7 @@ for (const scene of selectedScenes) {
   const diffPath = join(artifactDirectory, `${scene.id}.diff.png`);
   let sidebarSelectedTop;
   let sidebarCollectionBounds;
+  let sidebarShowMoreBounds;
   let sidebarStatusBounds;
   let sidebarTaskActionsActualPath;
   let sidebarRecentsActionsActualPath;
@@ -909,6 +914,19 @@ for (const scene of selectedScenes) {
             width: Math.round(value.width),
           };
         });
+      if (scene.id === "current-sidebar-collection-long-list") {
+        sidebarShowMoreBounds = await page
+          .locator(".codex-ui-app-sidebar__collection-toggle-item")
+          .evaluate((element) => {
+            const value = element.getBoundingClientRect();
+            return {
+              height: Math.round(value.height),
+              left: Math.round(value.left),
+              top: Math.round(value.top),
+              width: Math.round(value.width),
+            };
+          });
+      }
     }
     if (
       scene.id === "current-sidebar-project-menu" ||
@@ -2537,6 +2555,18 @@ for (const scene of selectedScenes) {
         status: "active",
       });
     }
+    if (currentBuildSidebarWaitingStatusReference) {
+      await compareCurrentBuildSidebarStatus({
+        actual,
+        actualBounds: sidebarStatusBounds?.waiting,
+        defaultMaximumRatio: 0.04,
+        maximumRatioName:
+          "CODEX_UI_KIT_CURRENT_SIDEBAR_WAITING_STATUS_MAX_DIFF_RATIO",
+        referencePath: currentBuildSidebarWaitingStatusReference,
+        sceneId: scene.id,
+        status: "waiting",
+      });
+    }
     if (currentBuildSidebarUnreadStatusReference) {
       await compareCurrentBuildSidebarStatus({
         actual,
@@ -2653,6 +2683,70 @@ for (const scene of selectedScenes) {
     }
     console.log(
       `${scene.id}: current empty collection pixel ratio ${comparison.ratio}`,
+    );
+  }
+
+  if (
+    scene.id === "current-sidebar-collection-long-list" &&
+    currentBuildSidebarShowMoreReference
+  ) {
+    const reference = flattenPng(
+      PNG.sync.read(await readFile(currentBuildSidebarShowMoreReference)),
+      { blue: 24, green: 24, red: 24 },
+    );
+    if (reference.width !== 140 || reference.height !== 32) {
+      throw new Error(
+        `${scene.id}: current Show more reference must be exactly 140x32, received ${reference.width}x${reference.height}.`,
+      );
+    }
+    if (
+      !sidebarShowMoreBounds ||
+      sidebarShowMoreBounds.width < 140 ||
+      sidebarShowMoreBounds.height !== 32
+    ) {
+      throw new Error(
+        `${scene.id}: current Show more bounds drifted: ${JSON.stringify(sidebarShowMoreBounds)}.`,
+      );
+    }
+    const actualShowMore = cropPng(
+      actual,
+      sidebarShowMoreBounds.left,
+      sidebarShowMoreBounds.top,
+      140,
+      32,
+    );
+    const comparison = comparePng(
+      foregroundMaskPng(reference),
+      foregroundMaskPng(actualShowMore),
+      0,
+    );
+    await writeFile(
+      join(
+        artifactDirectory,
+        `${scene.id}.show-more.current-build.png`,
+      ),
+      PNG.sync.write(actualShowMore),
+    );
+    if (comparison.pixels > 0) {
+      await writeFile(
+        join(
+          artifactDirectory,
+          `${scene.id}.show-more.current-build.diff.png`,
+        ),
+        PNG.sync.write(comparison.diff),
+      );
+    }
+    const maximumRatio = environmentRatio(
+      "CODEX_UI_KIT_CURRENT_SIDEBAR_SHOW_MORE_MAX_DIFF_RATIO",
+      0.05,
+    );
+    if (comparison.ratio > maximumRatio) {
+      throw new Error(
+        `${scene.id}: current Show more pixel ratio ${comparison.ratio} exceeds ${maximumRatio}.`,
+      );
+    }
+    console.log(
+      `${scene.id}: current Show more pixel ratio ${comparison.ratio}`,
     );
   }
 

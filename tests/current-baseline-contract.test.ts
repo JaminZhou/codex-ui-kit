@@ -254,7 +254,8 @@ const sidebarRowsRecord = () => ({
   },
   captureKind: "renderer_cdp",
   fingerprint: currentBaselineFingerprint,
-  privacyBoundary: "counts-title-lengths-generic-actions-geometry-styles-only",
+  privacyBoundary:
+    "disposable-title-hash-counts-generic-actions-geometry-styles-only",
   profileOwnerPid: 12_345,
   restoredRoute: "New chat",
   rowSummary: {
@@ -267,7 +268,7 @@ const sidebarRowsRecord = () => ({
     rowWidths: [306.906],
     selectedRows: 0,
     sidebarRect: { height: 774, left: 0, top: 46, width: 322.906 },
-    statusCounts: { active: 1, unread: 2 },
+    statusCounts: { active: 1, unread: 2, waitingApproval: 1 },
     titleLengthRange: { max: 29, min: 6 },
     totalRows: 8,
     viewport: currentBaselineViewports.wide,
@@ -318,6 +319,18 @@ const sidebarRowsRecord = () => ({
       sha256: "d".repeat(64),
       width: 28,
     },
+    showMore: {
+      height: 32,
+      name: "show-more.png",
+      sha256: "e".repeat(64),
+      width: 140,
+    },
+    waitingStatus: {
+      height: 30,
+      name: "waiting-status.png",
+      sha256: "f".repeat(64),
+      width: 28,
+    },
   },
   statuses: {
     active: {
@@ -341,6 +354,32 @@ const sidebarRowsRecord = () => ({
           "6806e63489028f080d9c4cc0468782d4ac40edb5ead946e8fd7f5fa156a8cb33",
         viewBox: "0 0 24 24",
       },
+      sourceStatus: "running",
+    },
+    waiting: {
+      railRect: {
+        height: 20,
+        left: 278.906,
+        right: 298.906,
+        rightInset: 8,
+        top: 5,
+        width: 20,
+      },
+      rowRect: { height: 30, width: 306.906 },
+      sourceStatus: "waitingOnApproval",
+      spinner: {
+        animationDuration: "2s",
+        animationIterationCount: "infinite",
+        color: "oklab(0.903646 0.0000412762 0.0000180602 / 0.595)",
+        cssHeight: "16px",
+        cssWidth: "16px",
+        pathCount: 2,
+        shapeSha256:
+          "6806e63489028f080d9c4cc0468782d4ac40edb5ead946e8fd7f5fa156a8cb33",
+        viewBox: "0 0 24 24",
+      },
+      titleLength: 32,
+      titleSha256: "1".repeat(64),
     },
     unread: {
       dotRect: {
@@ -364,6 +403,46 @@ const sidebarRowsRecord = () => ({
         width: 20,
       },
       rowRect: { height: 30, width: 306.906 },
+    },
+  },
+  collection: {
+    afterExpansion: {
+      rowCount: 11,
+      showLessCount: 0,
+      showMoreCount: 0,
+    },
+    beforeExpansion: {
+      buttonRect: {
+        height: 24,
+        left: 23,
+        right: 113.172,
+        rightInset: 193.734,
+        top: 4,
+        width: 90.172,
+      },
+      buttonStyle: {
+        backgroundColor: "rgba(0, 0, 0, 0)",
+        borderRadius: "9999px",
+        color: "rgba(255, 255, 255, 0.498)",
+        fontFamily: '-apple-system, "system-ui", "Segoe UI", sans-serif',
+        fontSize: "14px",
+        fontWeight: "400",
+        lineHeight: "18px",
+        padding: "2px 8px",
+        textAlign: "center",
+      },
+      itemRect: { height: 32, width: 306.906 },
+      itemRole: "listitem",
+      listRole: "list",
+      rowCount: 5,
+      showLessCount: 0,
+      showMoreCount: 1,
+      toggleAttributes: {
+        ariaControls: null,
+        ariaExpanded: null,
+        role: null,
+        type: "button",
+      },
     },
   },
   targetSelection: {
@@ -527,6 +606,12 @@ describe("current baseline capture contract", () => {
     staleUnread.statuses.unread.dotStyle.backgroundColor = "rgb(255, 0, 0)";
     expect(() => assertCurrentSidebarRowsRecord(staleUnread)).toThrow(
       "unread observation",
+    );
+
+    const lingeringShowMore = sidebarRowsRecord();
+    lingeringShowMore.collection.afterExpansion.showMoreCount = 1;
+    expect(() => assertCurrentSidebarRowsRecord(lingeringShowMore)).toThrow(
+      "one-way Show more contract",
     );
   });
 
@@ -1577,10 +1662,10 @@ describe("current baseline capture contract", () => {
     );
 
     expect(captureSource).toContain(
-      '"counts-title-lengths-generic-actions-geometry-styles-only"',
+      '"disposable-title-hash-counts-generic-actions-geometry-styles-only"',
     );
     expect(captureSource).toContain(
-      "Prime the isolated sidebar with an active project-task",
+      "Prime the isolated sidebar with a waiting-approval project task",
     );
     expect(captureSource).toContain("beforeCapture: beforeCapture.bundle");
     expect(captureSource).toContain("afterCapture: afterCapture.bundle");
@@ -1626,7 +1711,7 @@ describe("current baseline capture contract", () => {
     ).toBeLessThan(
       captureSource.indexOf('join(outputDirectory, "sidebar-rows.json")'),
     );
-    expect(captureSource.match(/page\.screenshot/g)).toHaveLength(1);
+    expect(captureSource.match(/page\.screenshot/g)).toHaveLength(2);
     expect(captureSource).toContain("clip: {");
     expect(captureSource).not.toContain(
       "data-app-action-sidebar-thread-id",

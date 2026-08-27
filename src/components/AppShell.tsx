@@ -2123,11 +2123,12 @@ export interface AppSidebarCollectionProps
   loadingLabel?: string;
   maxItems?: number;
   onExpandedChange?: (expanded: boolean) => void;
+  /** @deprecated Current Codex expansion is one-way and never renders this label. */
   showLessLabel?: ReactNode;
   showMoreLabel?: ReactNode;
 }
 
-/** A bounded sidebar row collection with current empty/loading/error states. */
+/** A bounded sidebar row collection with one-way current-product expansion. */
 export function AppSidebarCollection({
   children,
   className,
@@ -2138,7 +2139,7 @@ export function AppSidebarCollection({
   loadingLabel,
   maxItems = 5,
   onExpandedChange,
-  showLessLabel = "Show less",
+  showLessLabel: _showLessLabel,
   showMoreLabel = "Show more",
   ...props
 }: AppSidebarCollectionProps) {
@@ -2147,9 +2148,9 @@ export function AppSidebarCollection({
   const boundedMaxItems = Math.max(1, Math.floor(maxItems));
   const hasOverflow = items.length > boundedMaxItems;
   const visibleItems = expanded ? items : items.slice(0, boundedMaxItems);
-  const setCollectionExpanded = (nextExpanded: boolean) => {
-    setExpanded(nextExpanded);
-    onExpandedChange?.(nextExpanded);
+  const expandCollection = () => {
+    setExpanded(true);
+    onExpandedChange?.(true);
   };
 
   if (isLoading) {
@@ -2195,17 +2196,21 @@ export function AppSidebarCollection({
             {item}
           </div>
         ))}
+        {hasOverflow && !expanded ? (
+          <div
+            className="codex-ui-app-sidebar__collection-item codex-ui-app-sidebar__collection-toggle-item"
+            role="listitem"
+          >
+            <button
+              className="codex-ui-app-sidebar__collection-toggle"
+              onClick={expandCollection}
+              type="button"
+            >
+              {showMoreLabel}
+            </button>
+          </div>
+        ) : null}
       </div>
-      {hasOverflow ? (
-        <button
-          aria-expanded={expanded}
-          className="codex-ui-app-sidebar__collection-toggle"
-          onClick={() => setCollectionExpanded(!expanded)}
-          type="button"
-        >
-          {expanded ? showLessLabel : showMoreLabel}
-        </button>
-      ) : null}
     </div>
   );
 }
@@ -2231,8 +2236,7 @@ type AppSidebarItemVisualStatus =
   | "attention"
   | "error"
   | "idle"
-  | "loading"
-  | "waiting";
+  | "loading";
 
 function appSidebarItemVisualStatus(
   status: AppSidebarItemStatus,
@@ -2242,11 +2246,10 @@ function appSidebarItemVisualStatus(
     case "loading":
     case "queued":
     case "running":
+    case "waiting":
       return "loading";
     case "unread":
       return "attention";
-    case "waiting":
-      return "waiting";
     case "error":
       return "error";
     case "idle":
@@ -2330,14 +2333,6 @@ function AppSidebarItemStatusVisual({
         aria-hidden="true"
         className="codex-ui-app-sidebar__item-status-attention"
       />
-    );
-  }
-
-  if (status === "waiting") {
-    return (
-      <span className="codex-ui-app-sidebar__item-status-pill">
-        Needs input
-      </span>
     );
   }
 

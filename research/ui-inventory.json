@@ -811,7 +811,8 @@
         "cdp-26.810.52044:recents-scroll-no-leading-glyph-pin-archive-actions",
         "cdp-26.818.41509:project-task-active-complete-unread-and-content-dependent-recents-current",
         "cdp-26.818.41509:live-no-chats-29px-empty-row-current-asar-one-heading-four-row-loading-and-five-item-show-more-browser-electron-twelve-row-expansion",
-        "cdp-26.820.60940:privacy-safe-content-dependent-project-and-recents-local-history-with-shared-30px-rows"
+        "cdp-26.820.60940:privacy-safe-content-dependent-project-and-recents-local-history-with-shared-30px-rows",
+        "cdp-26.820.60940:live-five-row-show-more-one-way-eleven-row-expansion-no-show-less-and-browser-electron-twelve-row-replay"
       ],
       "implementationStatus": "partial",
       "browserStatus": "partial_legacy",
@@ -852,7 +853,8 @@
         "cdp-26.810.52044:neutral-and-attention-activity-glyphs-plus-conditional-mark-read",
         "cdp-26.818.41509:real-active-complete-unread-30px-row-20px-rail-16px-spinner-8px-dot-and-unmasked-status-pixels",
         "cdp-26.818.41509:current-needs-input-pill-ordinary-16px-error-browser-electron-and-reviewed-status-pixels",
-        "cdp-26.820.60940:real-active-and-unread-30px-row-20px-rail-16px-spinner-8px-dot-browser-electron-and-subpixel-aware-regional-pixels"
+        "cdp-26.820.60940:real-active-and-unread-30px-row-20px-rail-16px-spinner-8px-dot-browser-electron-and-subpixel-aware-regional-pixels",
+        "cdp-26.820.60940:disposable-real-waiting-on-approval-project-row-shared-16px-spinner-browser-electron-and-2.7381-percent-regional-pixel"
       ],
       "implementationStatus": "partial",
       "browserStatus": "partial_legacy",

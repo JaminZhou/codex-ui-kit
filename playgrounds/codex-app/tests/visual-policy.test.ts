@@ -112,6 +112,18 @@ describe("lifecycle visual policy", () => {
     );
   });
 
+  it("keeps workspace-frame diagnostics independent from sidebar status", () => {
+    const workspaceFrameComparison = contract.slice(
+      contract.indexOf("async function compareCurrentBuildWorkspaceFrame"),
+      contract.indexOf("const regionalFailures"),
+    );
+
+    expect(workspaceFrameComparison).toContain(
+      "current-build workspace frame pixel ratio",
+    );
+    expect(workspaceFrameComparison).not.toContain("${status}");
+  });
+
   it("gates the dedicated current-build sidebar regions", () => {
     expect(contract).toContain('scene.id === "current-sidebar"');
     expect(contract).toContain("CODEX_UI_KIT_SIDEBAR_REFERENCE");
@@ -141,11 +153,13 @@ describe("lifecycle visual policy", () => {
       "CODEX_UI_KIT_CURRENT_SIDEBAR_ACCOUNT_MENU_LIGHT_COMPACT_REFERENCE",
       "CODEX_UI_KIT_CURRENT_SIDEBAR_COMPACT_PINNED_REFERENCE",
       "CODEX_UI_KIT_CURRENT_SIDEBAR_ACTIVE_STATUS_REFERENCE",
+      "CODEX_UI_KIT_CURRENT_SIDEBAR_WAITING_STATUS_REFERENCE",
       "CODEX_UI_KIT_CURRENT_SIDEBAR_UNREAD_STATUS_REFERENCE",
       "CODEX_UI_KIT_CURRENT_SIDEBAR_WORKTREE_LOADING_REFERENCE",
       "CODEX_UI_KIT_CURRENT_SIDEBAR_WORKTREE_ERROR_REFERENCE",
       "CODEX_UI_KIT_CURRENT_SIDEBAR_WORKTREE_RESTORED_REFERENCE",
       "CODEX_UI_KIT_CURRENT_SIDEBAR_EMPTY_COLLECTION_REFERENCE",
+      "CODEX_UI_KIT_CURRENT_SIDEBAR_SHOW_MORE_REFERENCE",
     ]) {
       expect(contract).toContain(reference);
     }

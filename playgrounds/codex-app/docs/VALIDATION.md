@@ -187,11 +187,15 @@ and 3.5714% for unread. The unread foreground-mask ceiling is 4% because the
 measured 306.90625px product row places the exact 8×8 dot on a fractional
 raster origin; CDP and Electron continue to freeze its 20×20 rail, 14px dot
 right inset, and `rgb(131, 195, 255)` paint.
-The current collection slice separately requires the `Needs input` pill and
-ordinary error glyph, the one-heading/four-row loading skeleton, the 29px
-`No chats` state, and five-to-twelve `Show more`/`Show less` expansion with
-focus retention and Electron navigation overflow. An optional privacy-safe
-140×29 product crop is supplied through
+The current collection slice keeps the ordinary error glyph, the
+one-heading/four-row loading skeleton, and the 29px `No chats` state as
+explicit 26.818 evidence. On 26.820, semantic waiting uses the shared spinner,
+and five-to-twelve expansion is one-way: `Show more` has no `aria-expanded`
+and disappears without exposing `Show less`. Optional privacy-safe 28×30
+waiting and 140×32 Show-more crops are supplied through
+`CODEX_UI_KIT_CURRENT_SIDEBAR_WAITING_STATUS_REFERENCE` and
+`CODEX_UI_KIT_CURRENT_SIDEBAR_SHOW_MORE_REFERENCE`; their foreground
+comparisons are capped at 4% and 5%. The older 140×29 empty product crop uses
 `CODEX_UI_KIT_CURRENT_SIDEBAR_EMPTY_COLLECTION_REFERENCE`; its foreground
 comparison is capped at 6%, while computed typography and padding remain exact.
 

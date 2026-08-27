@@ -253,12 +253,11 @@ share two 19×20 Pin/Archive buttons with an 8px gap and 8px toolbar right
 inset. Active and unread use the same 20×20 rail at 8px, with the exact 16×16
 spinner or centered 8×8 blue dot; completed has no status glyph. Browser/CDP,
 Electron, and four local-only action/status tail comparisons gate this sampled
-boundary. The next slice adds the `Needs input` pill and an independent
-16×16 ordinary error row. It also reaches a live 29px `No chats` project row
-and locks sampled-ASAR loading (one heading plus four shimmer rows) and the
-five-item `Show more` boundary. Browser/CDP and Electron repeat
-five-to-twelve expansion, focus retention, `Show less`, and navigation
-overflow; a privacy-safe 140×29 empty crop passes at 1.8227%.
+boundary. The older slice also adds its `Needs input` pill and an independent
+16×16 ordinary error row. It reaches a live 29px `No chats` project row and
+locks sampled-ASAR loading (one heading plus four shimmer rows) and the
+five-item `Show more` boundary; a privacy-safe 140×29 empty crop passes at
+1.8227%.
 
 A second `26.818.41509` sidebar probe now supersedes the worktree-specific
 status boundary as well. Two isolated disposable repositories reach real
@@ -277,8 +276,13 @@ real unread rows retain the 20×20 rail, 16×16 two-path spinner, and centered
 8×8 blue dot. Privacy-safe current product crops pass at 3.3796% project
 actions, 3.1944% Recents actions, 1.9048% active, and 3.5714% unread. The
 unread cap is 4% solely for the measured 306.90625px row's fractional raster
-origin; CDP and Electron still require exact geometry and color. Waiting,
-error, collection, and worktree states remain previous-build evidence.
+origin; CDP and Electron still require exact geometry and color. A disposable
+waiting-on-approval task shows that 26.820 replaced the old text pill with the
+same 16×16 spinner, and a live project collection now performs a one-way
+five-to-eleven reveal with no `Show less`. Independent replay keeps a
+content-independent five-to-twelve gate; waiting and `Show more` product
+regions pass at 2.7381% and 3.8393%. Error, empty/loading, and worktree states
+remain previous-build evidence.
 
 The current sidebar lifecycle follow-up splits the broad historical project,
 action, and footer rows into three independently gated current-build groups:

@@ -464,10 +464,12 @@ also previous-build evidence. The current 26.820 slices revalidate the global
 shell, primary navigation, project-group lifecycle, project-actions provider,
 Help menu, account-menu matrix, Projects Index, shared 30px project/Recents
 history rows, shared Pin/Archive actions, and real active/unread status rails.
-Remaining Stage 1 work includes re-observing ordinary waiting/error and
-collection states, worktree-specific status, plus broader route lifecycle
-feedback, global notification runtime evidence, and selection continuity
-beyond New chat.
+The current edge refresh additionally re-observes a real waiting-on-approval
+project row as the shared spinner visual and replaces the older reversible
+long-list replay with the live one-way `Show more` lifecycle. Remaining Stage
+1 work includes re-observing ordinary error and collection empty/loading,
+worktree-specific status, plus broader route lifecycle feedback, global
+notification runtime evidence, and selection continuity beyond New chat.
 
 The same workstream also covers shell gaps that otherwise distort every
 feature:
@@ -854,10 +856,11 @@ without confusing package readiness with full product reconstruction.
     checklist.
 
 Each PR uses the fast local merge gate: latest-head `pnpm check`, complete
-`pnpm check:codex-app:acceptance`, and zero unresolved review threads. Once
-those pass, squash merge and clean the exact branch immediately. GitHub CI and
-bot review are advisory and are neither triggered nor awaited; a concrete
-finding that already exists before merge is still fixed and resolved.
+`pnpm check:codex-app:acceptance`, a fresh clean Codex review on that exact
+head, and zero unresolved bot review threads. Once those pass, squash merge
+and clean the exact branch immediately. GitHub CI is not queried or awaited;
+fresh Codex findings are fixed, replied to, and resolved before another review
+round.
 
 ## Planning rules
 
