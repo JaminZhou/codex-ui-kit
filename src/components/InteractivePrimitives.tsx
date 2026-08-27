@@ -442,7 +442,7 @@ function FloatingSurface({
         top: position?.top ?? 0,
         visibility: position ? "visible" : "hidden",
       } as CSSProperties}
-      tabIndex={role === "dialog" ? -1 : undefined}
+      tabIndex={role === "dialog" || role === "menu" ? -1 : undefined}
     >
       {children}
     </div>,

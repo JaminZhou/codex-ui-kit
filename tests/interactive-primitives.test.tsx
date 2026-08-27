@@ -185,6 +185,23 @@ describe("interactive controls", () => {
 });
 
 describe("menus and selects", () => {
+  it("can focus the menu surface without highlighting an item", async () => {
+    render(
+      <Menu
+        defaultOpen
+        initialFocus="content"
+        label="Account menu"
+        trigger={<button type="button">Account</button>}
+      >
+        <MenuItem>Profile</MenuItem>
+      </Menu>,
+    );
+
+    const menu = screen.getByRole("menu", { name: "Account menu" });
+    await waitFor(() => expect(document.activeElement).toBe(menu));
+    expect(menu.getAttribute("tabindex")).toBe("-1");
+  });
+
   it("moves focus with menu keys, keeps checkboxes open, and closes on selection", async () => {
     const onCheckedChange = vi.fn();
     const onSelect = vi.fn();

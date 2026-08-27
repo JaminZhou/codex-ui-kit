@@ -3801,6 +3801,7 @@ export function App() {
             <Menu
               align="start"
               className="demo-current-sidebar-menu demo-current-sidebar-account-menu"
+              initialFocus="content"
               label="Account menu"
               onOpenChange={(open) => {
                 setCurrentSidebarAccountMenuOpen(open);

@@ -463,6 +463,136 @@ export async function runBestEffortCurrentBaselineCleanup(steps) {
   return failures;
 }
 
+export function assertCurrentAccountMenuRecord(record) {
+  const expectedStateKeys = [
+    "darkCompact",
+    "darkWide",
+    "lightCompact",
+    "lightWide",
+  ];
+  const fingerprintMismatch = Object.entries(currentBaselineFingerprint).some(
+    ([key, expected]) => record?.fingerprint?.[key] !== expected,
+  );
+  if (
+    fingerprintMismatch ||
+    !Number.isSafeInteger(record?.profileOwnerPid) ||
+    record.profileOwnerPid <= 1 ||
+    record?.restoredPreference !== "System" ||
+    JSON.stringify(Object.keys(record?.states ?? {}).sort()) !==
+      JSON.stringify(expectedStateKeys)
+  ) {
+    throw new Error(
+      "Current account-menu record does not prove the isolated current build and restored preference.",
+    );
+  }
+
+  const expectedLabels = [
+    "<account>",
+    "Usage <dynamic>",
+    "Show pet",
+    "Invite a friend",
+    "Settings⌘,",
+    "Log out",
+  ];
+  const expectedViewBoxes = [
+    [],
+    ["0 0 20 20"],
+    ["0 0 24 24"],
+    ["0 0 16 16"],
+    ["0 0 20 20"],
+    ["0 0 21 21"],
+  ];
+  for (const [key, state] of Object.entries(record.states)) {
+    const compact = key.endsWith("Compact");
+    const theme = key.startsWith("light") ? "light" : "dark";
+    const viewport = compact
+      ? currentBaselineViewports.compact
+      : currentBaselineViewports.wide;
+    const expectedTop = compact ? 447 : 587;
+    const expectedItemTops = [
+      expectedTop + 4,
+      expectedTop + 41.5625,
+      expectedTop + 70.125,
+      expectedTop + 98.6875,
+      expectedTop + 127.25,
+      expectedTop + 155.8125,
+    ];
+    const expectedBackground =
+      theme === "light"
+        ? "oklab(0.999994 0.0000455678 0.0000200868 / 0.9)"
+        : "oklab(0.297161 0.0000135154 0.00000594556 / 0.9)";
+    const expectedColor =
+      theme === "light" ? "rgb(26, 28, 31)" : "rgb(223, 223, 223)";
+    const viewBoxes = state?.svgGeometry?.map((icons) =>
+      icons.map((icon) => icon.viewBox),
+    );
+    if (
+      state?.theme?.toLowerCase() !== theme ||
+      state.colorScheme !== theme ||
+      state.compact !== compact ||
+      state.viewport?.width !== viewport.width ||
+      state.viewport?.height !== viewport.height ||
+      state.focusRole !== "menu" ||
+      state.focusReturned !== true ||
+      Math.abs(state.horizontalOverflow ?? Infinity) > 1 ||
+      state.imageCount !== 1 ||
+      state.itemCount !== 6 ||
+      state.separatorCount !== 0 ||
+      JSON.stringify(state.labels) !== JSON.stringify(expectedLabels) ||
+      !withinTolerance(state.sidebarRect?.left, 0) ||
+      !withinTolerance(state.sidebarRect?.top, 46) ||
+      !withinTolerance(state.sidebarRect?.width, 322.90625) ||
+      !withinTolerance(state.sidebarRect?.height, compact ? 634 : 774) ||
+      !withinTolerance(state.menuRect?.left, 9) ||
+      !withinTolerance(state.menuRect?.top, expectedTop) ||
+      !withinTolerance(state.menuRect?.width, 306.90625) ||
+      !withinTolerance(state.menuRect?.height, 188.375) ||
+      !withinTolerance(state.triggerRect?.left, 8) ||
+      !withinTolerance(state.triggerRect?.top, compact ? 642.5 : 782.5) ||
+      !withinTolerance(state.triggerRect?.height, 29) ||
+      !Number.isFinite(state.triggerRect?.width) ||
+      state.triggerRect.width < 150 ||
+      state.triggerRect.left + state.triggerRect.width >
+        state.sidebarRect.left + state.sidebarRect.width ||
+      !Number.isInteger(state.triggerTextLength) ||
+      state.triggerTextLength < 1 ||
+      state.menuStyle?.backgroundColor !== expectedBackground ||
+      state.menuStyle?.borderRadius !== "15px" ||
+      state.menuStyle?.color !== expectedColor ||
+      !state.menuStyle?.boxShadow?.includes(
+        theme === "light"
+          ? "rgba(26, 28, 31, 0.08)"
+          : "rgba(255, 255, 255, 0.082)",
+      ) ||
+      state.itemRects?.length !== 6 ||
+      state.itemRects.some(
+        (rect, index) =>
+          !withinTolerance(rect?.left, 13) ||
+          !withinTolerance(rect?.top, expectedItemTops[index]) ||
+          !withinTolerance(rect?.width, 298.90625) ||
+          !withinTolerance(rect?.height, 28.5625),
+      ) ||
+      state.itemStyles?.length !== 6 ||
+      state.itemStyles.some(
+        (style) =>
+          style.backgroundColor !== "rgba(0, 0, 0, 0)" ||
+          style.borderRadius !== "12.5px" ||
+          style.fontFamily !==
+            '-apple-system, "system-ui", "Segoe UI", sans-serif' ||
+          style.fontSize !== "13px" ||
+          style.fontWeight !== "400" ||
+          style.lineHeight !== "18.5714px" ||
+          style.padding !== "5px 8px",
+      ) ||
+      JSON.stringify(viewBoxes) !== JSON.stringify(expectedViewBoxes)
+    ) {
+      throw new Error(
+        `Current account-menu ${key} observation does not match the current contract: ${JSON.stringify(state)}`,
+      );
+    }
+  }
+}
+
 export function selectCurrentMainCandidate(candidates) {
   const eligible = candidates
     .filter(

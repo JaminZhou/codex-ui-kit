@@ -163,7 +163,7 @@ for (const scene of selectedScenes) {
       if (
         accountMenuContract.colorScheme !== scene.theme ||
         accountMenuContract.horizontalOverflow > 1 ||
-        accountMenuContract.focusRole !== "menuitem" ||
+        accountMenuContract.focusRole !== "menu" ||
         accountMenuContract.imageCount !== 1 ||
         accountMenuContract.separatorCount !== 0 ||
         accountMenuContract.dividerHeight !== 9 ||
@@ -172,7 +172,12 @@ for (const scene of selectedScenes) {
         !near(accountMenuContract.menuRect?.top, expectedTop) ||
         !near(accountMenuContract.menuRect?.width, 306.90625) ||
         !near(accountMenuContract.menuRect?.height, 188.375) ||
-        !near(accountMenuContract.triggerRect?.width, 187.234375) ||
+        !near(accountMenuContract.triggerRect?.left, 8) ||
+        accountMenuContract.triggerRect?.width < 150 ||
+        accountMenuContract.triggerRect?.left +
+            accountMenuContract.triggerRect?.width >
+          accountMenuContract.sidebarRect?.left +
+            accountMenuContract.sidebarRect?.width ||
         accountMenuContract.triggerRect?.height !== 29 ||
         !near(
           accountMenuContract.triggerRect?.top,
@@ -210,14 +215,12 @@ for (const scene of selectedScenes) {
             !near(rect?.width, 298.90625) ||
             !near(rect?.height, 28.5625),
         ) ||
-        accountMenuContract.itemStyles[0]?.backgroundColor ===
-          "rgba(0, 0, 0, 0)" ||
-        accountMenuContract.itemStyles.slice(1).some(
+        accountMenuContract.itemStyles.some(
           (style) =>
             style.backgroundColor !== "rgba(0, 0, 0, 0)" ||
             style.borderRadius !== "12.5px" ||
             style.fontSize !== "13px" ||
-            style.fontWeight !== "445" ||
+            style.fontWeight !== "400" ||
             style.lineHeight !== "18.5714px" ||
             style.padding !== "5px 8px",
         )
@@ -12750,7 +12753,7 @@ try {
     accountMenuContract.imageCount !== 1 ||
     accountMenuContract.separatorCount !== 0 ||
     accountMenuContract.dividerHeight !== 9 ||
-    accountMenuContract.focusRole !== "menuitem" ||
+    accountMenuContract.focusRole !== "menu" ||
     !accountMenuContract.focusReturned ||
     Math.abs(accountTriggerBounds.width - 138.33) > 1 ||
     accountTriggerBounds.height !== 29 ||

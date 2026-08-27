@@ -50,12 +50,21 @@ The authoritative current-build inventory is:
   panels, state transitions, or window types.
 - A scoped Codex Desktop `26.820.60940` (`7119`) probe revalidates the shell,
   responsive Composer, primary navigation, project-group lifecycle, Help menu,
-  route restoration, and Projects Index. Explicitly hiding the 720px sidebar
-  now removes Back and Forward alongside the navigation, and the collapsed
+  account menu, route restoration, and Projects Index. Explicitly hiding the
+  720px sidebar now removes Back and Forward alongside the navigation, and the collapsed
   Projects content is 559px with 415/128 columns. The project action menu still
   uses the frozen Electron native context-menu bridge and a 221×187 native
   window; all six fixed icon sources remain exact. Its 3.8449% unmasked
   native-region gate remains explicitly scoped to 26.818 until recaptured.
+- The current 26.820 account-menu matrix supersedes the previous focus and
+  typography boundary at Dark/Light × 1180×820/720×680. The portalled surface
+  remains 306.90625×188.375px with six 28.5625px rows, five exact icons, one
+  avatar, zero role separators, zero overflow, Escape dismissal, and trigger
+  focus return; pointer open now focuses `role=menu` and every row computes to
+  weight 400. Content-dependent trigger width is no longer frozen.
+  Browser/CDP and Electron repeat the matrix, while privacy-masked current
+  product comparisons pass between 0.3794% and 0.5284% under the Dark
+  0.5%/Light 0.6% limits.
 - A separate previous 26.818 sidebar task revalidated project-task and Recents history,
   their unified 19×20 Pin/Archive hover actions, and ordinary active,
   completed, and unread presentation. Browser/CDP and Electron lock the

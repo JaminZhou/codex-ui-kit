@@ -14,12 +14,13 @@ exit gates; it does not replace the inventory.
   Desktop `26.820.60940` (`7119`). Unsampled earlier-build surfaces remain
   previous-build regression evidence rather than current verification.
 - The inventory contains 89 surface groups: 59 P0, 21 P1, and 9 P2.
-- 11 groups have current-build runtime evidence, 62 have previous-build-only
+- 12 groups have current-build runtime evidence, 61 have previous-build-only
   runtime evidence, and 16 have not been sampled.
 - The scoped `26.820.60940` refresh revalidates the global shell, responsive
-  Composer, primary navigation, project-group lifecycle, Help menu, route
-  restoration, and Projects Index. It locks the new collapsed-shell removal
-  of Back/Forward and the one-pixel 559px/415px compact Projects drift. The
+  Composer, primary navigation, project-group lifecycle, Help and account
+  menus, route restoration, and Projects Index. It locks the new
+  collapsed-shell removal of Back/Forward and the one-pixel 559px/415px
+  compact Projects drift. The
   project action menu remains a six-action/three-separator Electron native
   menu with a 221×187 Quartz window, and all six fixed SVG sources are
   unchanged. Its independent pixel comparison remains scoped to 26.818.
@@ -147,8 +148,12 @@ exit gates; it does not replace the inventory.
   focus return, and owned pixels at 0.1979%. The previous `26.818.41509`
   refresh now supersedes that layout with a Dark/Light × wide/compact matrix,
   322.90625px sidebar, 306.90625×188.375px menu, 28.5625px rows, zero compact
-  overflow, and privacy-masked ratios from 0.3968% to 0.5458%. Sidebar actions and ordinary task
-  status were separate verified denominators on that build. The previous-build status
+  overflow, and privacy-masked ratios from 0.3968% to 0.5458%. The current
+  26.820 matrix supersedes its focus/typography boundary: pointer open focuses
+  the menu surface, rows compute to weight 400, responsive compact pinning is
+  explicit, and four privacy-masked ratios pass from 0.3794% to 0.5284%.
+  Sidebar actions and ordinary task status were separate verified denominators
+  on the previous build. The previous-build status
   slice reached active and unread runtime states, preserved the active spinner
   while a follow-up is queued, and locks the exact trailing rail, spinner, dot,
   computed color, action replacement, and glyph pixels. The separate
@@ -439,8 +444,9 @@ slot. It is split into:
   Retry recovery, and exact 30px trailing geometry through product CDP,
   Browser/CDP, Electron, and local-only pixels;
 - `app.sidebar-footer-account-settings`: account, settings, update/status, and
-  footer overflow behavior. The previous 26.818 account/footer contract is closed
-  for that build;
+  footer overflow behavior. The 26.820 Dark/Light × wide/compact account menu
+  is current Browser/Electron verified with menu-surface focus, weight 400,
+  responsive pinning, Escape return, and local-only privacy-masked pixels;
   full Settings routes remain owned by Stage 4.
 - `app.sidebar-help-menu`: current release-note grouping, support/setup actions,
   geometry, dismissal, and focus return.
@@ -454,9 +460,10 @@ then repeated through Browser/CDP, Electron, and reviewed pixels. The New chat
 selection, project portal, Dark/Light, 1180/720, and footer/account matrices are
 also previous-build evidence. The current 26.820 slice revalidates the global
 shell, primary navigation, project-group lifecycle, project-actions provider,
-Help menu, and Projects Index. Remaining Stage 1 work includes re-observing the
-other sidebar groups on 26.820 plus broader route lifecycle feedback, global
-notification runtime evidence, and selection continuity beyond New chat.
+Help menu, account-menu matrix, and Projects Index. Remaining Stage 1 work
+includes re-observing the other sidebar groups on 26.820 plus broader route
+lifecycle feedback, global notification runtime evidence, and selection
+continuity beyond New chat.
 
 The same workstream also covers shell gaps that otherwise distort every
 feature:
