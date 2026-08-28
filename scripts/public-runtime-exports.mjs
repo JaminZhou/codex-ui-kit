@@ -69,6 +69,7 @@ export const publicRuntimeExports = [
   "InlineNotice",
   "LoadingShimmer",
   "LocalEnvironmentDialog",
+  "MarkdownImage",
   "McpToolCallGroup",
   "McpToolIcon",
   "Menu",

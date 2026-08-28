@@ -6205,9 +6205,14 @@ for (const scene of selectedScenes) {
           ];
         }),
       );
-      const markdownRoot = document.querySelector(
-        '[data-item-id="assistant-markdown"] .codex-ui-markdown',
+      const markdownItem = document.querySelector(
+        '[data-item-id="assistant-markdown"], [data-item-id="assistant-markdown-media"]',
       );
+      const markdownRoot = markdownItem?.querySelector(".codex-ui-markdown");
+      const markdownItemId = markdownItem?.getAttribute("data-item-id");
+      const markdownActionSelector = markdownItemId
+        ? `[data-item-id="${markdownItemId}"] .demo-turn-actions button`
+        : "";
       const markdownStyle = (element) => {
         if (!element) return null;
         const style = getComputedStyle(element);
@@ -6228,11 +6233,11 @@ for (const scene of selectedScenes) {
       const markdown = markdownRoot
         ? {
             actionCount: document.querySelectorAll(
-              '[data-item-id="assistant-markdown"] .demo-turn-actions button',
+              markdownActionSelector,
             ).length,
             actions: Array.from(
               document.querySelectorAll(
-                '[data-item-id="assistant-markdown"] .demo-turn-actions button',
+                markdownActionSelector,
               ),
               (button) => ({
                 icon: button
@@ -6270,6 +6275,45 @@ for (const scene of selectedScenes) {
             inlineCode: markdownStyle(
               markdownRoot.querySelector(".codex-ui-inline-code"),
             ),
+            math: {
+              annotation:
+                markdownRoot.querySelector(".katex annotation")?.textContent,
+              display: markdownStyle(
+                markdownRoot.querySelector(".katex-display"),
+              ),
+              katexCount: markdownRoot.querySelectorAll(".katex").length,
+              mathMlCount: markdownRoot.querySelectorAll("math").length,
+            },
+            media: {
+              footnoteSections:
+                markdownRoot.querySelectorAll("section[data-footnotes]").length,
+              grid: markdownStyle(
+                markdownRoot.querySelector(
+                  ".codex-ui-markdown__media-grid-paragraph",
+                ),
+              ),
+              items: Array.from(
+                markdownRoot.querySelectorAll(
+                  "[data-markdown-image-preview-trigger], [data-markdown-image-state]",
+                ),
+                (element) => ({
+                  href: element.getAttribute("href"),
+                  image: element.querySelector("img")
+                    ? {
+                        rect: rect(element.querySelector("img")),
+                        source: element.querySelector("img").getAttribute("src"),
+                      }
+                    : null,
+                  label: element.getAttribute("aria-label"),
+                  rect: rect(element),
+                  state:
+                    element.getAttribute("data-markdown-image-state") ??
+                    "ready",
+                  tag: element.tagName,
+                }),
+              ),
+              literalText: markdownRoot.textContent,
+            },
             linkTarget: markdownRoot
               .querySelector('a[href^="https://example.com"]')
               ?.getAttribute("target"),
@@ -10249,6 +10293,116 @@ for (const scene of selectedScenes) {
       ) {
         throw new Error(
           `${scene.id}: current 26.818 Markdown wrap toggle failed: ${JSON.stringify(wrapped)}`,
+        );
+      }
+    }
+
+    if (
+      scene.id === "markdown-current-26-820-media" ||
+      scene.id === "markdown-current-26-820-media-compact"
+    ) {
+      const markdown = contract.markdown;
+      const compact = scene.id.endsWith("-compact");
+      const expectedWidth = compact ? 688 : 736;
+      const expectedActionLabels = [
+        "Copy",
+        "Good response",
+        "Bad response",
+        "Fork chat from here",
+      ];
+      const expectedActionIcons = [
+        "thread-assistant-copy",
+        "thread-assistant-good",
+        "thread-assistant-bad",
+        "thread-assistant-fork",
+      ];
+      const [loaded, unavailable] = markdown?.media.items ?? [];
+      if (
+        !markdown ||
+        markdown.semantics.headings !== 0 ||
+        markdown.semantics.paragraphs !== 7 ||
+        markdown.actionCount !== 4 ||
+        markdown.actions.some(
+          (action, index) =>
+            action.label !== expectedActionLabels[index] ||
+            action.icon !== expectedActionIcons[index] ||
+            Math.abs(action.rect.width - 26) > 0.5 ||
+            Math.abs(action.rect.height - 26) > 0.5,
+        ) ||
+        Math.abs(markdown.root.rect.width - expectedWidth) > 1 ||
+        Math.abs(markdown.root.rect.height - 442.515625) > 1 ||
+        markdown.root.color !== "rgb(223, 223, 223)" ||
+        markdown.root.fontFamily !==
+          '-apple-system, "system-ui", "Segoe UI", sans-serif' ||
+        markdown.root.fontSize !== "14px" ||
+        markdown.root.fontWeight !== "445" ||
+        markdown.root.lineHeight !== "22px" ||
+        markdown.math.katexCount !== 1 ||
+        markdown.math.mathMlCount !== 1 ||
+        markdown.math.annotation !==
+          "\\int_0^1 x^2 \\, dx = \\frac{1}{3}" ||
+        !markdown.math.display ||
+        Math.abs(markdown.math.display.rect.width - expectedWidth) > 1 ||
+        Math.abs(markdown.math.display.rect.height - 41.9375) > 1 ||
+        markdown.math.display.marginBlockStart !== "14px" ||
+        markdown.math.display.marginBlockEnd !== "14px" ||
+        markdown.media.footnoteSections !== 0 ||
+        !markdown.media.literalText.includes("# Current 26.820 media output") ||
+        !markdown.media.literalText.includes("$E = mc^2$") ||
+        !markdown.media.literalText.includes("[^1]") ||
+        !markdown.media.literalText.includes("![External preview]") ||
+        !markdown.media.grid ||
+        Math.abs(markdown.media.grid.rect.width - expectedWidth) > 1 ||
+        Math.abs(markdown.media.grid.rect.height - 163.578125) > 1 ||
+        markdown.media.items.length !== 2 ||
+        loaded?.tag !== "BUTTON" ||
+        loaded.state !== "ready" ||
+        loaded.label !== "Loaded preview" ||
+        !loaded.image ||
+        Math.abs(loaded.rect.width - 200) > 1 ||
+        Math.abs(loaded.image.rect.width - 199.96875) > 1 ||
+        Math.abs(loaded.image.rect.height - 139.578125) > 1 ||
+        unavailable?.tag !== "A" ||
+        unavailable.state !== "unavailable" ||
+        unavailable.label !== "Unavailable preview" ||
+        unavailable.href !==
+          "https://example.invalid/codex-ui-kit-missing.png" ||
+        Math.abs(unavailable.rect.width - 96) > 1 ||
+        Math.abs(unavailable.rect.height - 96) > 1 ||
+        contract.horizontalOverflow !== 0
+      ) {
+        throw new Error(
+          `${scene.id}: current 26.820 Markdown media contract failed: ${JSON.stringify(markdown)}`,
+        );
+      }
+
+      const previewTrigger = page.getByRole("button", {
+        name: "Loaded preview",
+      });
+      await previewTrigger.click();
+      const preview = page.getByRole("dialog", { name: "Loaded preview" });
+      await preview.waitFor({ state: "visible" });
+      const previewContract = await preview.evaluate((element) => ({
+        imageCount: element.querySelectorAll(
+          ".codex-ui-image-preview__immersive-stage img",
+        ).length,
+        presentation: element.getAttribute("data-presentation"),
+      }));
+      if (
+        previewContract.presentation !== "immersive" ||
+        previewContract.imageCount !== 1
+      ) {
+        throw new Error(
+          `${scene.id}: current 26.820 Markdown preview contract failed: ${JSON.stringify(previewContract)}`,
+        );
+      }
+      await page
+        .getByRole("button", { name: "Close image preview" })
+        .click();
+      await preview.waitFor({ state: "detached" });
+      if (!(await previewTrigger.evaluate((element) => element === document.activeElement))) {
+        throw new Error(
+          `${scene.id}: current 26.820 Markdown preview did not restore trigger focus.`,
         );
       }
     }

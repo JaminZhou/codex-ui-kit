@@ -289,6 +289,28 @@ describe("protocol lifecycle reducer", () => {
     expect(assistant?.text).not.toContain("https://example.com");
   });
 
+  it("replays the current 26.820 Markdown media states exactly", () => {
+    const scenario = replayScenarios["markdown-current-26-820-media"];
+    const state = reduceProtocolTrace(scenario.events);
+    const assistant = state.messages.find(
+      ({ id }) => id === "assistant-markdown-media",
+    );
+
+    expect(scenario.frames).toEqual({
+      "markdown-current-26-820-media-complete": scenario.events.length,
+      "markdown-current-26-820-media-started": 3,
+    });
+    expect(state.status).toBe("completed");
+    expect(assistant).toMatchObject({
+      status: "completed",
+      text: expect.stringContaining("$$"),
+    });
+    expect(assistant?.text).toContain("$E = mc^2$");
+    expect(assistant?.text).toContain("[^1]");
+    expect(assistant?.text).toContain("current-markdown-preview.png");
+    expect(assistant?.text).toContain("codex-ui-kit-missing.png");
+  });
+
   it("preserves streaming Markdown mutations before a large completion", () => {
     const scenario = replayScenarios["markdown-streaming-large"];
     const linkState = reduceProtocolTrace(

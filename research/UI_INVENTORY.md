@@ -126,6 +126,17 @@ observation from a previous build remains historical evidence.
   exact response actions, system typography, and zero horizontal overflow.
   Unmasked wide and compact Markdown-root comparisons pass at 1.1682% and
   1.1932% under independent 1.3% hard limits.
+- A current 26.820 no-tool follow-up reaches one double-dollar block equation
+  and records the current 736/687px response roots and 14/22px computed
+  typography. Single-dollar math, the escaped heading/image source, and
+  footnote reference/definition remain literal in both sampled replies. The
+  installed renderer source separately confirms KaTeX 0.16.45, image grouping,
+  immersive preview, loading/unavailable fallbacks, and render retry. The
+  independent wide/compact replay verifies KaTeX/MathML semantics, 200px loaded
+  media, a 96px unavailable external-source link, real pointer preview and
+  focus restoration in Browser/CDP and Electron, plus two reviewed internal
+  pixel baselines. No current product response emitted raw image media, so no
+  current-product media raster comparison is claimed.
 - The previous 26.818 sidebar task reaches sampled project-task and Recents hover actions
   plus active, completed, and unread ordinary states. Both task families use
   19×20 Pin/Archive controls with an 8px gap and 35px/8px right insets. The
@@ -138,8 +149,8 @@ observation from a previous build remains historical evidence.
   previous-build regression evidence.
   They are not relabeled as current merely because the shell capture passes.
 
-Current inventory: 89 surface groups; 22 have current-build runtime evidence, 52 have previous-build-only runtime evidence, 15 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 13 groups and Electron verification covers 13.
-Prior acceptance outside those 10 sampled current-build groups remains
+Current inventory: 89 surface groups; 23 have current-build runtime evidence, 51 have previous-build-only runtime evidence, 15 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 14 groups and Electron verification covers 14.
+Prior acceptance outside those sampled current-build groups remains
 recorded as `partial_legacy` until current-build re-observation.
 
 The current package exposes candidates far beyond the old transcript sample:
@@ -1439,6 +1450,19 @@ product-level evidence still verifies only the sampled completed Markdown
 vocabulary against `26.721.41059`; its current status remains
 `partial_legacy`.
 
+The current `26.820.60940` follow-up supersedes that status for the sampled
+Markdown group. Two isolated no-tool replies render double-dollar block math
+through KaTeX while leaving single-dollar math, escaped heading/image source,
+and footnote syntax literal. Package inspection separately confirms the image
+preview, loading/unavailable, media-grid, and render-error branches. The public
+component now ships the exact KaTeX 0.16.45 CSS/fonts and models those source
+branches without private IPC. Wide/compact Browser/CDP and Electron verify the
+736/688px roots, KaTeX plus MathML semantics, 200px loaded media, 96px external
+fallback, four response actions, pointer-opened immersive preview, focus
+restoration, and zero overflow. Two reviewed replay rasters are committed; a
+current-product media raster remains unclaimed because the live replies did
+not emit raw image media.
+
 Read-only inspection of the unchanged `26.803.41515` ASAR fingerprint adds
 current source-structural evidence for `inline-markdown`, the in-progress
 boundary, the latest-turn follow controller and its 24px tolerance, and the
@@ -1456,6 +1480,6 @@ and viewport preview path. The public five-event replay contributes to the
 preview interaction, and 720×680 action reachability, and three reviewed
 internal baselines pass. A local-only
 1180×820 reference gates the preview and close regions at 3.9737% and 0.5929%
-under 4% and 1% ceilings. Streaming product reachability, images, math,
-citations/sources, plugin variants, table error variants, and Markdown error
-variants remain open.
+under 4% and 1% ceilings. Streaming product reachability, citations/sources,
+plugin variants, table error variants, live media emission, and broader
+Markdown error reachability remain open.

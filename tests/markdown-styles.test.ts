@@ -3,6 +3,10 @@ import { describe, expect, it } from "vitest";
 
 const styles = readFileSync(new URL("../src/styles.css", import.meta.url), "utf8");
 const tokens = readFileSync(new URL("../src/tokens.css", import.meta.url), "utf8");
+const buildConfig = readFileSync(
+  new URL("../vite.config.ts", import.meta.url),
+  "utf8",
+);
 
 describe("Markdown visual contract", () => {
   it("keeps the measured chat and code typography", () => {
@@ -42,6 +46,20 @@ describe("Markdown visual contract", () => {
     expect(styles).toContain("padding: 0 0.1875rem");
     expect(styles).toContain(".codex-ui-code-block__copy-icon");
     expect(styles).not.toContain(".codex-ui-code-block__copy svg");
+  });
+
+  it("ships current KaTeX, media preview, and unavailable-state styling", () => {
+    expect(styles).toContain('@import "katex/dist/katex.min.css"');
+    expect(buildConfig).toContain("katex/dist/katex.min.css");
+    expect(buildConfig).toContain('fileName: `fonts/${fileName}`');
+    expect(styles).toContain(".codex-ui-markdown .katex-display");
+    expect(styles).toContain(".codex-ui-markdown-image__trigger");
+    expect(styles).toContain("cursor: zoom-in");
+    expect(styles).toContain("max-height: 12.5rem");
+    expect(styles).toContain("max-width: 12.5rem");
+    expect(styles).toContain(".codex-ui-markdown-image__fallback");
+    expect(styles).toContain("min-height: 6rem");
+    expect(styles).toContain(".codex-ui-markdown__render-error");
   });
 
   it("resets only a top-level final code block margin", () => {
